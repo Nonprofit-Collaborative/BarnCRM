@@ -289,6 +289,30 @@ private class PortalDataTest {
 	}
 
 	@IsTest
+	static void aScopeThatReachesTheRowCapIsLoggedAsAWarning() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Fixture f = fixture();
+			PortalTestModule.register();
+			addScopedPage(f, PortalTestData.scope('Organization__c', 'Organization__c'));
+			PortalData.maxScopeRows = 1;
+
+			Test.startTest();
+			PortalData.read(f.session, 'colleagues');
+			Test.stopTest();
+
+			Assert.isTrue(
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'PortalData.scopeValues'
+					WITH SYSTEM_MODE
+				] > 0,
+				'The cap is logged so an admin can see rows were left out'
+			);
+		}
+	}
+
+	@IsTest
 	static void aScopedCatalogShowsOnlyRecordsTiedToThePerson() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Fixture f = fixture();

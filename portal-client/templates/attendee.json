@@ -44,7 +44,10 @@
         { "field": "Description__c", "label": "Description" },
         { "field": "Event__r.Name", "label": "Event" }
       ],
-      "where": [{ "field": "Status__c", "op": "equals", "value": "Confirmed" }],
+      "where": [
+        { "field": "Status__c", "op": "equals", "value": "Confirmed" },
+        { "field": "End__c", "op": "greaterOrEqual", "value": "TODAY" }
+      ],
       "personScope": {
         "field": "Event__c",
         "object": "Event_Attendee__c",
@@ -232,7 +235,10 @@
         { "field": "Venue__r.Map_URL__c", "label": "Venue Map" },
         { "field": "Online_Link__c", "label": "Join Online" }
       ],
-      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
+      "where": [
+        { "field": "Status__c", "op": "notEquals", "value": "Cancelled" },
+        { "field": "End__c", "op": "greaterOrEqual", "value": "TODAY" }
+      ],
       "personScope": {
         "field": "Id",
         "object": "Event_Attendee__c",

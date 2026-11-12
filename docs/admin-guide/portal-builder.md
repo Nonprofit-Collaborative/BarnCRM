@@ -181,7 +181,9 @@ A template is JSON in the portal's Template field. The sample in
   on the page, adds **Add to Calendar**: an .ics file of the page's records, made in the browser.
 - **download**: `true` adds **Download CSV** of the page's records as shown, made in the browser.
 - A text field marked `"edit": true, "scan": true` gets a **Scan** button on the add form, which
-  reads a QR code with the phone's camera where the browser can, and is typed otherwise.
+  reads a QR code with the phone's camera where the browser can, and is typed otherwise. Camera
+  scanning needs the browser's barcode reader: Chrome and Edge have it; iPhone Safari and Firefox
+  do not, so those people type the code.
 
 ### Installable App
 
@@ -191,7 +193,10 @@ name="Spring Summit"]`. The plugin then serves the app's manifest and a small se
 your site. The home screen icon is the site's **Site Icon** (Appearance, Customize, Site Identity;
 use a square image of at least 512 pixels), else a plain BarnCRM icon. The worker keeps only the
 plugin's own files for offline use, never a person's data. No app store and nothing to pay. Use
-it on one page per site: the worker serves the whole site.
+it on one page per site: the worker's scope is the site's own address (a site in a subfolder
+stays inside it). If another service worker, for example from a PWA plugin, already controls the
+site, the portal leaves it alone and does not register its own, so the page then works online
+only.
 
 ### Ready-Made Templates
 
@@ -236,7 +241,9 @@ template naming a missing module's object fails whole.
 **Member.** Pay Dues emails the member a payment link for the membership's dues, once Payments
 is ready (see [Memberships](memberships.md)). The Member Directory lists current members who
 chose to be shown, with only their name, level, location and bio, and has a search box. A member
-is never listed until they turn on Show Me to Other Members on My Directory Listing.
+is never listed until they turn on Show Me to Other Members on My Directory Listing. The
+directory reads at most 200 members, and the search box searches only those; a larger
+membership needs a narrower template (add a where test, for example one level).
 
 **Volunteer.** Sign Up adds the person to an open shift that has room and has not started, once
 per shift (a cancelled sign-up is reopened). Cancel Sign-Up works until the shift starts. A new

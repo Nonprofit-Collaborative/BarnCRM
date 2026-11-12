@@ -8,6 +8,6 @@
     <values><field>Module__c</field><value xsi:type="xsd:string">Memberships</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">Whether the morning run (6:50 AM in your org time zone) emails each member once, the set number of days before their membership ends, with the reminder template. It goes to the membership's contact when they have an email address and have not opted out of email. Default: off.</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether the morning run (6:55 AM in your org time zone) emails each member once, the set number of days before their membership ends, with the reminder template. It goes to the membership's contact when they have an email address and have not opted out of email. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">memberships.md</value></values>
 </CustomMetadata>

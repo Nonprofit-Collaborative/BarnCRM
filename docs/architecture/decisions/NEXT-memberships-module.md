@@ -62,7 +62,7 @@ field with one of those API names would collide on deploy.
    Registry, and renews: the new term starts the day after the old one ends when the old one is
    Current or Grace (renewing early or in grace keeps the member's dates), otherwise on the
    renewal date (Origin Rejoin).
-5. **The nightly run** (`MembershipsNightlyJobProvider`, one step, 6:50 AM, ADR-0166), in order:
+5. **The nightly run** (`MembershipsNightlyJobProvider`, one step, 6:55 AM, ADR-0166), in order:
    - **Gift renewals (G-22b)**, when Giving is installed and Renew From Gifts is on: each Received
      gift of the last 45 days allocated to an active level's fund, from a donor contact or
      donor account, and on no term yet (`Gift_Id__c` is unique), pays a term at the highest active

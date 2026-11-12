@@ -12,6 +12,13 @@
           <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">
             {text.intro}
           </p>
+          <p
+            lwc:if={setup.capped}
+            class="slds-text-body_small slds-text-color_error slds-var-m-bottom_x-small"
+            data-id="capped"
+          >
+            {cappedText}
+          </p>
           <div class="slds-grid slds-grid_vertical-align-end slds-wrap">
             <lightning-combobox
               class="slds-var-m-right_small"

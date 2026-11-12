@@ -54,7 +54,8 @@ Whatever the portal, a person sees and changes only their own records.
   turned them on, and only between people who accepted each other.
 - **Sponsor portal.** Sponsor contacts and booth staff scan attendees' badges. Only attendees who
   chose to share their details become leads; download a sponsor's leads from the event's
-  **Sponsors** tab.
+  **Sponsors** tab. The Scan button reads a code with the camera in Chrome and Edge; iPhone
+  Safari and Firefox cannot, so type the code there.
 - **Service portal.** People in your programs see their enrollments, services, upcoming sessions,
   goals and referrals, and update their phone and address. They never see case notes.
 - **Partner portal.** Staff of partner organizations see the referrals you shared with their

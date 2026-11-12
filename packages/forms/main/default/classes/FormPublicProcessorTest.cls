@@ -68,6 +68,16 @@ private class FormPublicProcessorTest {
 	}
 
 	@IsTest
+	static void theRunChainsOnlyWhileAQueueableSlotIsFree() {
+		// runs-as: deploying user (counts queueable slots only, no record access)
+		Assert.isTrue(FormPublicProcessor.canChain(), 'A free slot');
+		for (Integer i = 0; i < Limits.getLimitQueueableJobs(); i++) {
+			System.enqueueJob(new FormPublicProcessor.Run());
+		}
+		Assert.isFalse(FormPublicProcessor.canChain(), 'No slot left to chain on');
+	}
+
+	@IsTest
 	static void aSubmissionThatCannotBeProcessedIsMarkedFailed() {
 		System.runAs(admin()) {
 			Form__c form = FormsTestData.publicVolunteerInterest(50);

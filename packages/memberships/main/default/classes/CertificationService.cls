@@ -22,7 +22,7 @@ public with sharing class CertificationService {
 				BarnHelp.text('Memberships', 'Memberships_Cert_ErrorActive')
 			);
 		}
-		Date today = Date.today();
+		Date today = MembershipService.today();
 		holding.Status__c = ACTIVE;
 		holding.Earned_On__c = holding.Earned_On__c == null ? today : holding.Earned_On__c;
 		holding.Expires_On__c = endOf(today, holding.Certification__r.Valid_Months__c);
@@ -36,7 +36,7 @@ public with sharing class CertificationService {
 		if (refusal != null) {
 			throw new CertificationException(refusal);
 		}
-		Date today = Date.today();
+		Date today = MembershipService.today();
 		Date start = holding.Status__c == ACTIVE &&
 			holding.Expires_On__c >= today
 			? holding.Expires_On__c.addDays(1)

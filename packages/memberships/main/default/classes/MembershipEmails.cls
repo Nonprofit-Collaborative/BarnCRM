@@ -57,9 +57,16 @@ public with sharing class MembershipEmails {
 			message.setSaveAsActivity(false);
 			messages.add(message);
 		}
-		List<EmailSendOutcome> outcomes = sender.send(messages);
-		List<Membership_Term__c> unstamp = new List<Membership_Term__c>();
+		List<EmailSendOutcome> outcomes = new List<EmailSendOutcome>();
 		String lastFailure = '';
+		try {
+			outcomes = sender.send(messages);
+		} catch (Exception refused) {
+			// The whole call was refused (for example the daily limit): every stamp is cleared
+			// below so the reminders are retried, not lost.
+			lastFailure = refused.getMessage();
+		}
+		List<Membership_Term__c> unstamp = new List<Membership_Term__c>();
 		for (Integer i = 0; i < terms.size(); i++) {
 			if (i >= outcomes.size() || !outcomes[i].sent) {
 				Membership_Term__c clear = new Membership_Term__c(Id = terms[i].Id);

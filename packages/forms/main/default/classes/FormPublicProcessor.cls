@@ -83,10 +83,18 @@ public with sharing class FormPublicProcessor implements Schedulable {
 					markFailed(submission.Id, e);
 				}
 			}
-			if (batch.size() > PER_RUN && !Test.isRunningTest()) {
+			// A processed submission may have used the one chained slot (Events starts a checkout
+			// job); the next scheduled run picks up the rest rather than failing this one.
+			if (batch.size() > PER_RUN && canChain() && !Test.isRunningTest()) {
 				System.enqueueJob(new Run());
 			}
 		}
+	}
+
+	/** True while this transaction may still enqueue another job. */
+	@TestVisible
+	private static Boolean canChain() {
+		return Limits.getQueueableJobs() < Limits.getLimitQueueableJobs();
 	}
 
 	@TestVisible

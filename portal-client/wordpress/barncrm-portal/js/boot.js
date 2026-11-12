@@ -28,7 +28,14 @@ function installable(root) {
   addToHead('meta', { name: 'mobile-web-app-capable', content: 'yes' });
   addToHead('meta', { name: 'apple-mobile-web-app-title', content: data.barncrmName });
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register(data.barncrmWorker, { scope: '/' }).catch(() => undefined);
+    const scope = data.barncrmScope || '/';
+    // Another plugin's worker (for example a PWA plugin) may already control this site: leave
+    // it alone rather than replace it.
+    const other = navigator.serviceWorker.controller;
+    if (other && other.scriptURL !== new URL(data.barncrmWorker, document.baseURI).href) {
+      return;
+    }
+    navigator.serviceWorker.register(data.barncrmWorker, { scope }).catch(() => undefined);
   }
 }
 

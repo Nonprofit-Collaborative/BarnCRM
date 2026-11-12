@@ -48,6 +48,17 @@ describe('c-event-session-ratings', () => {
     expect(one(element, '[data-id="toggle"]')).toBeNull();
   });
 
+  it('says when only the first sessions have codes', async () => {
+    const element = await render({ ...SETUP, capped: true, linkLimit: 200 });
+    one(element, '[data-id="toggle"]').click();
+    await flush();
+    expect(one(element, '[data-id="capped"]')).not.toBeNull();
+    const plain = await render();
+    one(plain, '[data-id="toggle"]').click();
+    await flush();
+    expect(one(plain, '[data-id="capped"]')).toBeNull();
+  });
+
   it('opens the panel with the chosen form and saves a new choice', async () => {
     const element = await render();
     one(element, '[data-id="toggle"]').click();

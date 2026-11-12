@@ -2,6 +2,7 @@
   "languages": ["en"],
   "texts": {
     "Portal_Code_Email_Body": "Your sign-in code for {0} is {1}. It works for {2} minutes.\n\nIf you did not ask to sign in, you can ignore this email: nobody can sign in without the code.",
-    "Portal_Code_Email_Subject": "Your sign-in code for {0}"
+    "Portal_Code_Email_Subject": "Your sign-in code for {0}",
+    "Portal_Scope_Capped": "A portal page reads at most {0} of a person's scope records (newest first), so older ones are left out of the page. Narrow the page's scope conditions if people need them."
   }
 }

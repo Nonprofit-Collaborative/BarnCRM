@@ -208,6 +208,35 @@ private class EventPaymentsTest {
 	}
 
 	@IsTest
+	static void aFailedMarkIsReportedSoTheJobDoesNotChainOnIt() {
+		System.runAs(staff()) {
+			online(true);
+			Id waiting = register(EventRegistrationService.SOURCE_FORM, 25);
+			Assert.isTrue(EventCheckoutJob.markFailed(waiting), 'A saved mark is reported');
+			Assert.areEqual(EventPayments.FAILED, reload(waiting).Payment_Status__c, 'Failed');
+			Id gone = Id.valueOf(
+				Event_Registration__c.SObjectType.getDescribe().getKeyPrefix() + '000000000000AAA'
+			);
+			Assert.isFalse(
+				EventCheckoutJob.markFailed(gone),
+				'A mark that did not save is reported'
+			);
+		}
+	}
+
+	@IsTest
+	static void theMorningRunQueuesCheckoutsOnlyWhileOnlinePaymentsAreOn() {
+		System.runAs(staff()) {
+			online(false);
+			new EventEmailScheduler().execute(null);
+			Assert.isFalse(EventPayments.checkoutsQueued, 'Nothing queued while payments are off');
+			online(true);
+			new EventEmailScheduler().execute(null);
+			Assert.isTrue(EventPayments.checkoutsQueued, 'Unpaid registrations are swept up');
+		}
+	}
+
+	@IsTest
 	static void thePaymentConfirmsThenRefundsCancel() {
 		System.runAs(staff()) {
 			online(true);

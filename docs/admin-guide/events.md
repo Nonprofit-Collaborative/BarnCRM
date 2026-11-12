@@ -166,7 +166,9 @@ It needs BarnCRM Forms and its Salesforce Site (see [Forms](forms.md), Public Fo
 2. On the Agenda tab choose **Session Ratings**, pick the form and **Save**. It is stored in the
    event's **Session Rating Form Key**.
 3. **Print Rating Codes** opens a page with each confirmed session's title, time, room and QR
-   code, one per half page, to print and put by each door. Codes are drawn in the browser.
+   code, one per half page, to print and put by each door. Codes are drawn in the browser. An
+   event gets codes for its first 200 confirmed sessions by start time; past that, the panel says
+   so.
 
 Each answered form adds a **Session Rating** (rating and comment, no person) to the session. A
 session card shows its **Average Rating** and how many rated it; the Speakers tab shows each
@@ -581,7 +583,9 @@ The **Budget** panel on the event's **Details** tab, under the dashboard, tracks
   (Sponsorship, Partner Funds (MDF), Grant, In-Kind, Other), an optional **Partner Organization**
   and **Sponsor**, what is **Expected** and what is **Received**. **Add Funding** adds one.
 - The panel shows budgeted against actual for each category, funding expected against received,
-  and **Net Cost**: actual spend less funding received and the registrations' amount paid. Below
+  and **Net Cost**: actual spend less funding received and the registrations' amount paid (shown
+  as **Paid online**: it counts only payments taken through Paid Registration, not money you
+  collected outside BarnCRM; record that as Funding). Below
   it, **Budgeted Net Cost** uses budgeted spend and expected funding. The event dashboard shows Net
   Cost too.
 
@@ -604,7 +608,12 @@ Template field and put the shortcode on a page with `app="yes"`:
 `[barncrm_portal key="attendees" app="yes" name="Spring Summit"]`. People sign in with the email
 they registered with; with an Any Matching Person portal every registrant can sign in at once.
 
-What attendees see, always only for events they are registered for and not cancelled from:
+What attendees see, always only for events they are registered for and not cancelled from. The
+Agenda and Event Info pages leave out events that have ended, so past events do not crowd them;
+the Attendees and Sponsors pages still read up to 200 of a person's events (newest first, and a
+warning in the Error Log when that cap is reached). People scan QR codes (Scan buttons) only where
+the browser can read one itself: Chrome and Edge on Android and desktop can; iPhone Safari and
+Firefox cannot, and the person types the code instead.
 
 | Page | What it does |
 |---|---|
@@ -681,7 +690,9 @@ A step of [BarnCRM Nightly Jobs](nightly-jobs.md) named **Event reminders, follo
 no-shows** runs each morning at 7:30 AM while Event Management and at least one of the three
 settings are on. It has no switch of its own; if Health Check shows the nightly run as not
 scheduled, use its **Schedule all nightly jobs** fix once. All three settings ship off, because
-turning them on emails real people.
+turning them on emails real people. While **Take payment online** is on, the same morning run
+also starts checkouts for any registration still Pending Payment and Unpaid, so one whose
+checkout did not start at registration is picked up by the next morning.
 
 **Templates.** Two text templates ship in the **BarnCRM Events** email folder:
 `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up`. Copy one in Setup, Classic Email

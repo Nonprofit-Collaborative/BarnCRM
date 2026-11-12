@@ -25,17 +25,27 @@ public with sharing class EventCheckoutJob implements Queueable, Database.Allows
 			EventPayments.sendLink(waiting[0].Id);
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'EventCheckoutJob.execute', waiting[0].Id);
-			Database.update(
-				new Event_Registration__c(
-					Id = waiting[0].Id,
-					Payment_Status__c = EventPayments.FAILED
-				),
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			if (!markFailed(waiting[0].Id)) {
+				// Still Unpaid, so the next run would take it again: stop rather than loop.
+				return;
+			}
 		}
 		if (waiting.size() > 1 && !Test.isRunningTest()) {
 			System.enqueueJob(new EventCheckoutJob());
 		}
+	}
+
+	/** Marks the payment Failed; false when the save did not go through. */
+	@TestVisible
+	private static Boolean markFailed(Id registrationId) {
+		Database.SaveResult saved = Database.update(
+			new Event_Registration__c(
+				Id = registrationId,
+				Payment_Status__c = EventPayments.FAILED
+			),
+			false,
+			AccessLevel.SYSTEM_MODE
+		);
+		return saved.isSuccess();
 	}
 }
