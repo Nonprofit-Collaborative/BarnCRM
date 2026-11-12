@@ -150,7 +150,10 @@ CAPS = {
     # Release 1.5 EVT-A (branch feature/evt-a-ev20-21-26-27): 217,924 measured (EV-20 paid
     # registration through Payments, EV-21 proposal scoring, EV-26 badge overrides, EV-27
     # session ratings), plus about 2%.
-    "events": 222_300,
+    # Releases 1.11 to 1.13 EVT-B (branches feature/evt-b-*): 247,001 measured (EV-22 attendee
+    # app actions, EV-23 budget, EV-24 venue and room fills, EV-25 speaker checklist, EV-28
+    # booth scans, EV-29 agenda picks and ratings), plus about 2%.
+    "events": 252_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
