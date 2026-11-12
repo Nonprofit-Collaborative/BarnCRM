@@ -1,8 +1,7 @@
 /**
  * The Giving module's five nightly jobs, switched on and off together from the Nightly Jobs page
  * of the BarnCRM Settings console (ADR-0038). Each is a step of Core's one nightly run (ADR-0166
- * nightly-job-dispatcher), keyed by the name it was once scheduled under, so an upgrade adopts
- * the old schedule (R-NJ5).
+ * nightly-job-dispatcher), keyed by the name it was once scheduled under.
  *
  * The pledge reminders joined the other four in 1.5 (G-37). Scheduling them sends nothing on its
  * own: like the ask reminders, the step does nothing while its setting is off, and

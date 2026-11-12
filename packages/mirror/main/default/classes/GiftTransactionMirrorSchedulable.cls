@@ -18,10 +18,6 @@ public with sharing class GiftTransactionMirrorSchedulable implements Schedulabl
 
 	/** Starts tonight's run, unless the mirror is off or a run is still going. */
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		if (!isRunning()) {
 			GiftTransactionMirrorBatch.run();
 		}

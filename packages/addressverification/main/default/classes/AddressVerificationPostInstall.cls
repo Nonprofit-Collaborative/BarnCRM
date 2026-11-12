@@ -19,9 +19,7 @@ public with sharing class AddressVerificationPostInstall implements InstallHandl
 	 * `scripts/ci/check-setting-defaults.py` fails the build when one is missing.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Address_Verification_Settings__c.Verify_On_Save__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	public void onInstall(InstallContext context) {
 		if (context != null) {

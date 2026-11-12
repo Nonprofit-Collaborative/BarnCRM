@@ -2714,7 +2714,7 @@ settings console shows them in its Rollups section as before.
   row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
   Rollup Builder page's schedule line all use it. A save that changes it moves the scheduled
   nightly run at once: Core's settings service hands every changed key to the engine through
-  the third engine seam (`RollupEngineExtensionV3.afterSettingsSaved`, ADR-0125 decision 4),
+  the third engine seam (`RollupEngineExtension.afterSettingsSaved`, ADR-0125 decision 4),
   and `RollupScheduler.reschedule` replaces the job when one is scheduled and starts nothing
   when none is.
 
@@ -13498,10 +13498,9 @@ a switch, set by the Schedule and Stop buttons on its own page, org-wide. Shippe
 Acknowledgments and Pledge Reminders (shipped off). A step whose on/off is a setting reads that
 setting. A step that is off is recorded Skipped.
 
-**R-NJ5 Adopting old schedules.** Every scheduled job named by a step's key is aborted; a step
-with a switch whose job was scheduled has its switch turned On; when anything was adopted, the
-nightly run is scheduled. Run at install, upgrade and Finish Setup by Core and by each module, at
-the start of each nightly run, by Health Check's fix, and when an old job fires. Never throws.
+**R-NJ5 Adopting old schedules.** Removed at the namespaced cut-over (D-199, D-200): the managed
+release is a fresh install everywhere, so no org has a separate schedule of an earlier version to
+adopt.
 
 **R-NJ6 A run still going at midnight.** The new run supersedes it: the old run stops at its
 next check, and the new run's first step waits for the work the old step started.
@@ -19027,7 +19026,7 @@ mirrors the primary member).
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
-| 1.54 | 2026-11-12 | Cut-over cleanup (D-199, D-200 S4; ADR-0194 note of 2026-11-12). No object or field added. Removed, since the namespaced managed release is a fresh install everywhere: the Coordinator permission set group (`Volunteer_Coordinator`) and `RetiredRoleMigration`; the five retired Mirror sets (`Campaign_Sync`, `Opportunity_Mirror`, `Gift_Transaction_Mirror`, `Inbound_Gift_API`, `Record_Inbound_Gift_Action`) and `MirrorAccessSync`; the Volunteers Health Check finding `volunteer_coordinator_access` and its fix. `Volunteers_Coordinator` stays as an extra permission. |
+| 1.54 | 2026-11-12 | Cut-over cleanup (D-199, D-200 S4; ADR-0194 note of 2026-11-12). No object or field added. Removed, since the namespaced managed release is a fresh install everywhere: the Coordinator permission set group (`Volunteer_Coordinator`) and `RetiredRoleMigration`; the five retired Mirror sets (`Campaign_Sync`, `Opportunity_Mirror`, `Gift_Transaction_Mirror`, `Inbound_Gift_API`, `Record_Inbound_Gift_Action`) and `MirrorAccessSync`; the Volunteers Health Check finding `volunteer_coordinator_access` and its fix. `Volunteers_Coordinator` stays as an extra permission.  Also removed: R-NJ5's adoption of old schedules (`NightlyJobs.adoptOldSchedules`, `SeasonalAddressScheduler.adoptExistingSchedule`, the `ImportRowPurgeScheduler` shell); `RollupEngineExtensionV2` and `V3` merged into `RollupEngineExtension`. |
 
 ---
 ## 32. Entity ownership by package

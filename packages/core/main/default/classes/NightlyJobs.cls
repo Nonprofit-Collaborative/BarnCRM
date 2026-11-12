@@ -57,11 +57,6 @@ public with sharing class NightlyJobs {
 		'AddressVerificationNightlyJobProvider'
 	};
 
-	/** Separate schedules of steps that became part of another step: adopted, then aborted. */
-	private static final List<String> RETIRED_KEYS = new List<String>{
-		ImportRowPurgeScheduler.JOB_NAME
-	};
-
 	private static final String ERROR_CONTEXT = 'NightlyJobs';
 
 	/** Set by a test to the whole list, so no test depends on which modules are installed. */
@@ -71,13 +66,6 @@ public with sharing class NightlyJobs {
 	/** Injected by Core's tests by class name, since no other package is there to resolve. */
 	@TestVisible
 	private static Map<String, NightlyStepProvider> providerOverrides = new Map<String, NightlyStepProvider>();
-
-	/**
-	 * True lets a test adopt old schedules. Off in tests by default, because a test sees the
-	 * org's real scheduled jobs and an abort would not be rolled back.
-	 */
-	@TestVisible
-	private static Boolean adoptInTests = false;
 
 	/** The rows by key, read once per transaction; null until asked. */
 	private static Map<String, Nightly_Job__c> rowsByKey;
@@ -294,54 +282,6 @@ public with sharing class NightlyJobs {
 	}
 
 	// -------------------------------------------------------------------------------------
-	// Adopting the old schedules (R-NJ5)
-	// -------------------------------------------------------------------------------------
-
-	/**
-	 * Replaces every separate schedule a known step used to have with the nightly run: aborts
-	 * each, turns on the switch of a step that has one, and schedules the run when anything was
-	 * adopted. Returns true when something was. Never throws.
-	 */
-	@NamespaceAccessible
-	public static Boolean adoptOldSchedules() {
-		if (Test.isRunningTest() && !adoptInTests) {
-			return false;
-		}
-		try {
-			List<Nightly_Job__c> switched = new List<Nightly_Job__c>();
-			Boolean adopted = false;
-			for (String retired : RETIRED_KEYS) {
-				Id gone = ScheduledJobSelector.triggerIdByName(retired);
-				if (gone != null) {
-					ScheduledJobSelector.abort(gone);
-					adopted = true;
-				}
-			}
-			for (NightlyStep candidate : steps()) {
-				Id old = ScheduledJobSelector.triggerIdByName(candidate.key);
-				if (old == null) {
-					continue;
-				}
-				ScheduledJobSelector.abort(old);
-				adopted = true;
-				if (candidate.hasSwitch()) {
-					Nightly_Job__c row = rowFor(candidate.key);
-					row.Switch__c = SWITCH_ON;
-					switched.add(row);
-				}
-			}
-			save(switched);
-			if (adopted) {
-				start();
-			}
-			return adopted;
-		} catch (Exception failed) {
-			ErrorLogger.log(failed, ERROR_CONTEXT);
-			return false;
-		}
-	}
-
-	// -------------------------------------------------------------------------------------
 	// Health Check
 	// -------------------------------------------------------------------------------------
 
@@ -359,12 +299,11 @@ public with sharing class NightlyJobs {
 	}
 
 	/**
-	 * Adopts any old schedule, then schedules the nightly run and the hourly check where they
+	 * Schedules the nightly run and the hourly check where they
 	 * are missing. Returns the labels of those that were missing.
 	 */
 	public static List<String> scheduleAll() {
 		List<String> scheduled = unscheduledLabels();
-		adoptOldSchedules();
 		start();
 		TabAccessScheduler.start();
 		return scheduled;

@@ -20,9 +20,7 @@ public with sharing class ProjectsPostInstall implements InstallHandler, ModuleS
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Projects_Settings__c.Time_Tracking_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	@NamespaceAccessible
 	public ProjectsPostInstall() {

@@ -131,10 +131,12 @@ private class ModuleManagerServiceTest {
 	}
 
 	/**
-	 * An engine with the second seam, recording the modules it is told are on again, that also
+	 * An engine recording the modules it is told are on again, that also
 	 * stands in for the module's access sync.
 	 */
-	private class TurnOnEngine implements RollupEngineExtension, RollupEngineExtensionV2, ModuleAccessSync {
+	private class TurnOnEngine implements RollupEngineExtension, ModuleAccessSync {
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		}
 		public List<String> turnedOn = new List<String>();
 		public Integer syncsAsked = 0;
 		public void requestSync() {

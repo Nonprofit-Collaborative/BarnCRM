@@ -398,7 +398,7 @@ public with sharing class ModuleManagerService {
 	/** Tells the rollup engine a module is on again; a failure is logged, never in the way. */
 	private static void afterTurnedOn(String moduleName) {
 		try {
-			RollupEngineExtensionV2 engine = RollupEngineExtensions.findV2();
+			RollupEngineExtension engine = RollupEngineExtensions.find();
 			if (engine != null) {
 				engine.afterModuleTurnedOn(moduleName);
 			}

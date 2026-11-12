@@ -5,8 +5,7 @@
  * `NightlyStepProvider`. Steps are built fresh each time they are asked for, so `active` reads
  * the settings as they are now.
  *
- * The key is the name the step's work was scheduled under before the nightly run, so adopting
- * an old schedule (R-NJ5) finds it, and it is the row its switch and last result are kept on.
+ * The key is the row its switch and last result are kept on.
  */
 @NamespaceAccessible
 public with sharing class NightlyStep {

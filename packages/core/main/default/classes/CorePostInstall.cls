@@ -83,21 +83,11 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	 * checkbox is missing here.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		BarnCRM_Settings__c.Error_Digest_Include_Admin_Summary__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Test seam: true lets a test see the hourly tab access check scheduled. */
 	@TestVisible
 	private static Boolean scheduleTabCheckInTests = false;
-
-	/**
-	 * Test seam: true lets a test see an existing seasonal swap schedule adopted on an upgrade.
-	 * Off in tests otherwise, because what the org the tests run in has scheduled is not the
-	 * test's to depend on.
-	 */
-	@TestVisible
-	private static Boolean adoptSeasonalScheduleInTests = false;
 
 	/** Test seam: true lets a test see the nightly run scheduled by a new install. */
 	@TestVisible
@@ -208,10 +198,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		// never throws.
 		TabAccessService.requestSync();
 		scheduleTabAccessCheck();
-		alignSeasonalAddresses(isUpgrade);
-		// R-NJ5: the separate nightly schedules of an earlier version become the nightly run.
-		// After the seasonal alignment, which reads the old seasonal job. Never throws.
-		NightlyJobs.adoptOldSchedules();
+		alignSeasonalAddresses();
 		scheduleNightlyRunOnANewInstall(isNewInstall);
 		renameDataQualityQueries();
 		ShippedDefaultUpgrades.apply(
@@ -301,7 +288,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	/**
 	 * A new install schedules the nightly run, so its steps run once an admin switches them on
 	 * without anyone scheduling it by hand. Idempotent (an existing schedule is kept) and it
-	 * leaves every step switch as it is. An upgrade is left to `adoptOldSchedules`. Never throws.
+	 * leaves every step switch as it is. Never throws.
 	 */
 	private void scheduleNightlyRunOnANewInstall(Boolean isNewInstall) {
 		if (!isNewInstall || (Test.isRunningTest() && !scheduleNightlyInTests)) {
@@ -315,16 +302,12 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	}
 
 	/**
-	 * Makes the seasonal swap schedule match the Seasonal Addresses switch. An upgrade first
-	 * turns the switch on for an org that already runs the job, then the job is scheduled when
-	 * the switch is on and it is missing. A new install has the switch off, so nothing is
+	 * Makes the seasonal swap schedule match the Seasonal Addresses switch: the job is scheduled
+	 * when the switch is on and it is missing. A new install has the switch off, so nothing is
 	 * scheduled for it. Never throws.
 	 */
-	private void alignSeasonalAddresses(Boolean isUpgrade) {
+	private void alignSeasonalAddresses() {
 		try {
-			if (isUpgrade && (!Test.isRunningTest() || adoptSeasonalScheduleInTests)) {
-				SeasonalAddressScheduler.adoptExistingSchedule();
-			}
 			SeasonalAddressScheduler.scheduleIfEnabled();
 		} catch (Exception e) {
 			ErrorLogger.log(e, SEASONAL_CONTEXT);

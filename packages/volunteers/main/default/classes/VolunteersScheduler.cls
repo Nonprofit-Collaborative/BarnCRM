@@ -20,10 +20,6 @@ public with sharing class VolunteersScheduler implements Schedulable {
 	private static String jobNameInUse = JOB_NAME;
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		if (ShiftScheduleService.isTurnedOff()) {
 			ErrorLogger.logMessage(
 				BarnHelp.text('Volunteers', 'Volunteers_Schedules_SkippedTurnedOff'),

@@ -83,8 +83,6 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 	 * @param installerId the person to give Rollup Builder Admin, or null for nobody
 	 */
 	public void runSetup(Id installerId) {
-		// The rollup run scheduled on its own before the nightly run becomes a step (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		// The entry points record their own failures and return, so nothing here throws.
 		carryOverCoreSettings();
 		ensureSettingsRow();

@@ -339,7 +339,7 @@ public with sharing class SettingsService {
 		String objectName,
 		Map<Schema.SObjectField, Object> changed
 	) {
-		RollupEngineExtensionV3 engine = RollupEngineExtensions.findV3();
+		RollupEngineExtension engine = RollupEngineExtensions.find();
 		if (engine == null) {
 			return;
 		}

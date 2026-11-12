@@ -23,10 +23,7 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		LWC_Builder_Settings__c.Components_Enabled__c,
-		LWC_Builder_Settings__c.Source_Export__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {

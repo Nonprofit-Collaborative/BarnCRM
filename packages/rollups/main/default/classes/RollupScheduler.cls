@@ -68,10 +68,6 @@ public with sharing class RollupScheduler implements Schedulable {
 	 * (`RollupAccessSync`, D2).
 	 */
 	public void execute(SchedulableContext context) {
-		if (context != null && this.everyDefinition != true) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		if (RollupService.isTurnedOff()) {
 			ErrorLogger.logMessage(
 				BarnHelp.text('Rollups', 'Core_Rollups_ScheduledRunTurnedOff'),

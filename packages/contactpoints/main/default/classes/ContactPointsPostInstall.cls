@@ -27,11 +27,7 @@ public with sharing class ContactPointsPostInstall implements InstallHandler, Mo
 	 * `scripts/ci/check-setting-defaults.py` fails the build when one is missing.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Contact_Point_Sync_Settings__c.Sync_Emails__c,
-		Contact_Point_Sync_Settings__c.Sync_Phones__c,
-		Contact_Point_Sync_Settings__c.Sync_Addresses__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {

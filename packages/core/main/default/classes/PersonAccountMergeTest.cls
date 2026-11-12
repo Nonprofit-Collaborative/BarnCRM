@@ -17,6 +17,10 @@ private class PersonAccountMergeTest {
 
 	/** Records which survivors Core asked the engine to recalculate. */
 	private class RecordingEngine implements RollupEngineExtension {
+		public void afterModuleTurnedOn(String moduleName) {
+		}
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		}
 		public Map<String, Set<Id>> survivorsByObject = new Map<String, Set<Id>>();
 		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
 			return;

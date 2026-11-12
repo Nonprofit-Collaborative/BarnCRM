@@ -5,7 +5,8 @@
  *
  * Core does not contain the rollup engine and may not name it. It looks up an implementation by
  * name (`RollupEngineExtensions`) and, where none is installed, skips the step: an org without
- * the module has no totals to keep current.
+ * the module has no totals to keep current. One interface since the namespaced cut-over
+ * (D-199, D-200): the second and third seams (Turn on, settings saved) are methods here.
  */
 @NamespaceAccessible
 public interface RollupEngineExtension {
@@ -35,4 +36,18 @@ public interface RollupEngineExtension {
 	 * (active or not). Never null.
 	 */
 	Map<String, Set<String>> targetFieldsByObject();
+
+	/**
+	 * Called by the Module Manager after a module is turned on again (decision 9). The engine
+	 * acts only for its own module: it puts every total right (the totals waiting in its queue,
+	 * and a full recalculation, since saves made while it was off were not recorded).
+	 */
+	void afterModuleTurnedOn(String moduleName);
+
+	/**
+	 * Called by the settings service after a save changed settings, with the settings object's
+	 * API name and the API names of the fields that changed, both without a namespace prefix
+	 * (ADR-0136). The engine acts only for its own settings.
+	 */
+	void afterSettingsSaved(String settingsObject, Set<String> changedKeys);
 }

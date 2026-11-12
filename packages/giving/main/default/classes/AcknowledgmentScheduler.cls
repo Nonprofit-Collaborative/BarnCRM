@@ -18,10 +18,6 @@ public with sharing class AcknowledgmentScheduler implements Schedulable {
 	private static final String LOG_CONTEXT = 'AcknowledgmentScheduler.execute';
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		try {
 			if (!AcknowledgmentService.isEnabled()) {
 				// Switched off since the schedule was started. Nothing to do, and nothing wrong.

@@ -54,14 +54,10 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	// -------------------------------------------------------------------------------------
 
 	/**
-	 * The nightly start, as a step of the nightly run (or, in an org upgraded from before it,
-	 * from its own old schedule, which it adopts first: R-NJ5). Skipped when a copy started by
+	 * The nightly start, as a step of the nightly run. Skipped when a copy started by
 	 * hand is still waiting or running.
 	 */
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			NightlyJobs.adoptOldSchedules();
-		}
 		runNow();
 	}
 
