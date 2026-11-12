@@ -207,7 +207,10 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 	@TestVisible
 	private static List<SObject> read(String query, Set<String> ids) {
 		String objectName = query.substringAfter(' FROM ').substringBefore(' ').trim();
-		if (!NamespaceUtil.globalDescribe().containsKey(objectName.toLowerCase())) {
+		Schema.SObjectType type = NamespaceUtil.globalDescribe().get(objectName.toLowerCase());
+		// An org can have the object while the user cannot read it (Nonprofit Cloud's Party
+		// Relationship Group without the Group Membership permission set): none, as without it.
+		if (type == null || !type.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
 			return new List<SObject>();
 		}
 		// Every name is Nonprofit Cloud's own, fixed here; the only value is a bind.
