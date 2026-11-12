@@ -16,6 +16,10 @@ private class ProjectFinancialsTest {
 		Project__c project = ProjectsTestData.project('Active', 10);
 		project.Budget_Amount__c = 5000;
 		update project;
+		SettingsService.saveValues(
+			'Projects_Settings__c',
+			new Map<String, Object>{ 'Change_Requests_Enabled__c' => true }
+		);
 		insert new Project_Change_Request__c(
 			Project__c = project.Id,
 			Name = 'Extra report',
@@ -93,6 +97,22 @@ private class ProjectFinancialsTest {
 				String.valueOf(checked.Health_Reasons__c).contains('logged against'),
 				'12 of 20 hours is not over budget'
 			);
+		}
+	}
+
+	@IsTest
+	static void aNewChangeRequestIsRefusedWhileTrackingIsOff() {
+		System.runAs(ProjectsTestData.admin()) {
+			Project__c project = ProjectsTestData.project('Active', 10);
+			Database.SaveResult result = Database.insert(
+				new Project_Change_Request__c(
+					Project__c = project.Id,
+					Name = 'Extra',
+					Hours__c = 1
+				),
+				false
+			);
+			Assert.isFalse(result.isSuccess(), 'Track change requests is off by default');
 		}
 	}
 }

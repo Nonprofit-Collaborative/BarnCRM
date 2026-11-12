@@ -291,5 +291,6 @@ and Track change requests are off (PM-10 to PM-12).
 | 2 | As the project owner, approve it. | Change Hours 10 and Change Amount 1000 on the project; Remaining Budget rises by 1000; Budget Hours stays 10. |
 | 3 | Log 12 hours and Refresh Health. | Not over budget (12 of 20). The board's hours line shows the budget with the change. |
 | 4 | As staff A, edit the approved request's hours. | Refused: only Projects Admin. |
+| 5 | Turn off Track change requests. Add another change request. Open the project. | The new request is refused ("Change requests are turned off..."); the approved one still counts (Change Hours 10). |
 
 **Cleanup:** None.

@@ -37,7 +37,7 @@ BarnCRM Settings, **Projects** (org-wide):
 | Invoice payment return page | Your My Domain address | The https page a client returns to after paying online, such as your website's thank you page. Filled in with your My Domain address at install. |
 | Invoice due days | 30 | Days from the invoice date to its due date (1 to 365). |
 | Show financials and recognize revenue | Off | The financials card on the project page and the monthly recognized revenue rows. |
-| Track change requests | Off | A label for the feature: it is off by default and the docs call it on when your team uses change requests. It hides nothing and blocks nothing (see below). |
+| Track change requests | Off | New change requests are refused while it is off. Requests saved while it was on keep counting and can still be edited (see below). |
 
 What a setting set to Off hides is exactly what its row says: the tab, button, card or page.
 The related lists on the project page (Expenses, Invoices, Revenue, Resource Requests, Change
@@ -190,8 +190,9 @@ a row to adjust it, or delete it and use **Recognize Revenue** on the project to
 
 ## Change Requests (PM-12)
 
-Turn on **Track change requests** to tell your team to use them (the setting does not hide the
-related list or stop anyone adding one, and approved requests keep counting if you turn it off).
+Turn on **Track change requests** to use them. While it is off, a new change request is refused;
+requests saved while it was on keep counting. To hide the Change Requests related list, remove it
+from the Project page layout in Setup.
 Add **Change Requests** on a project: a title, description, and
 the hours and amount it adds (or removes, as a negative). Submit it; the project owner or Projects
 Admin approves or rejects it. Approved changes are added to **Change Hours** and **Change Amount**

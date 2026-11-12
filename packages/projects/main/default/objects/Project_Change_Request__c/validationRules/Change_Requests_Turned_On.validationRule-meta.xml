@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Change_Requests_Turned_On</fullName>
+    <active>true</active>
+    <description>New change requests need the Projects setting Track change requests (PM-12). Requests saved while it was on keep counting and can still be edited.</description>
+    <errorConditionFormula>ISNEW() &amp;&amp; NOT($Setup.Projects_Settings__c.Change_Requests_Enabled__c)</errorConditionFormula>
+    <errorMessage>Change requests are turned off. An admin can turn on Track change requests in BarnCRM Settings, Projects.</errorMessage>
+</ValidationRule>
