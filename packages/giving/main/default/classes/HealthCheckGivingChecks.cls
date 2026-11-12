@@ -167,28 +167,48 @@ public with sharing class HealthCheckGivingChecks {
 				continue;
 			}
 		}
-		if (formType == null || byForm.isEmpty()) {
+		Schema.SObjectType versionType = NamespaceUtil.packagedObjectType('Form_Version__c');
+		if (formType == null || versionType == null || byForm.isEmpty()) {
 			return null;
 		}
 		Set<Id> formIds = byForm.keySet();
-		String version = String.escapeSingleQuotes(NamespaceUtil.qualify('Published_Version__r'));
+		// Form__c.Published_Version__c is a version number, not a lookup: the published
+		// definition is the form's newest Form_Version__c, as Forms itself reads it.
+		String formLookup = String.escapeSingleQuotes(NamespaceUtil.qualify('Form__c'));
 		String definition = String.escapeSingleQuotes(NamespaceUtil.qualify('Definition__c'));
-		String formName = String.escapeSingleQuotes(String.valueOf(formType));
+		String versionNumber = String.escapeSingleQuotes(NamespaceUtil.qualify('Version__c'));
+		Map<Id, String> newest = new Map<Id, String>();
+		for (
+			SObject version : Database.query(
+				'SELECT ' +
+					formLookup +
+					', ' +
+					definition +
+					' FROM ' +
+					String.escapeSingleQuotes(String.valueOf(versionType)) +
+					' WHERE ' +
+					formLookup +
+					' IN :formIds ORDER BY ' +
+					versionNumber +
+					' DESC',
+				AccessLevel.SYSTEM_MODE
+			)
+		) {
+			Id formId = (Id) version.get(formLookup);
+			if (!newest.containsKey(formId)) {
+				newest.put(formId, (String) version.get(definition));
+			}
+		}
 		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
 		for (
 			SObject form : Database.query(
-				'SELECT Id, ' +
-					version +
-					'.' +
-					definition +
-					' FROM ' +
-					formName +
+				'SELECT Id FROM ' +
+					String.escapeSingleQuotes(String.valueOf(formType)) +
 					' WHERE Id IN :formIds',
 				AccessLevel.SYSTEM_MODE
 			)
 		) {
-			SObject published = form.getSObject(version);
-			if (!asksAmount(published == null ? null : (String) published.get(definition))) {
+			if (!asksAmount(newest.get(form.Id))) {
 				for (Appeal__c appeal : byForm.get(form.Id)) {
 					links.add(new HealthCheckService.Link(appeal));
 				}

@@ -262,4 +262,173 @@ private class MembershipRenewalsTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void theScheduledJobRunsTheSamePhasesAndOnePhaseFailingIsLoggedNotFatal() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipService.todayOverride = TODAY;
+			levels();
+			// A gift row with no fund makes the gift phase fail; the others still run.
+			MembershipRenewals.GiftRow broken = new MembershipRenewals.GiftRow();
+			broken.giftId = fakeId(77);
+			broken.amount = 500;
+			MembershipRenewals.giftsOverride = new List<MembershipRenewals.GiftRow>{ broken };
+
+			Test.startTest();
+			new MembershipRenewals().execute(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c LIKE 'MembershipRenewals.gifts%'
+					WITH SYSTEM_MODE
+				],
+				'The gift phase failure is logged against its phase'
+			);
+		}
+	}
+
+	@IsTest
+	static void remindersWithNoTemplateLogAWarningAndSendNothing() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipService.todayOverride = TODAY;
+			Memberships_Settings__c settings = Memberships_Settings__c.getOrgDefaults();
+			settings.SetupOwnerId = UserInfo.getOrganizationId();
+			settings.Reminder_Template__c = 'No_Such_Membership_Template';
+			upsert settings;
+			RecordingEmailSender sender = new RecordingEmailSender();
+			MembershipRenewals.emailSender = sender;
+
+			Test.startTest();
+			Assert.areEqual(0, MembershipRenewals.remind(), 'Nothing to send with');
+			Test.stopTest();
+
+			Assert.isTrue(sender.received.isEmpty(), 'No email went out');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'MembershipRenewals' AND Severity__c = 'Warning'
+					WITH SYSTEM_MODE
+				],
+				'The missing template is logged'
+			);
+		}
+	}
+
+	/** One record of a Giving object, made by name since Memberships does not depend on Giving. */
+	private static SObject made(String objectName, Map<String, Object> values) {
+		SObject record = NamespaceUtil.objectType(objectName).newSObject();
+		for (String field : values.keySet()) {
+			record.put(field, values.get(field));
+		}
+		insert record;
+		return record;
+	}
+
+	private static SObject giftFor(Id fundId, Id contactId, Decimal amount, Id commitmentId) {
+		Map<String, Object> values = new Map<String, Object>{
+			'Donor_Contact__c' => contactId,
+			'Amount__c' => amount,
+			'Type__c' => 'Check',
+			'Status__c' => 'Received',
+			'Gift_Date__c' => TODAY.addDays(-3),
+			'Acknowledgment_Status__c' => 'To acknowledge'
+		};
+		if (commitmentId != null) {
+			values.put('Commitment__c', commitmentId);
+		}
+		SObject gift = made('Gift__c', values);
+		// Giving may already have allocated the gift to the default fund.
+		if (
+			Database.countQuery(
+				'SELECT COUNT() FROM Gift_Allocation__c WHERE Gift__c = \'' + gift.Id + '\''
+			) == 0
+		) {
+			made(
+				'Gift_Allocation__c',
+				new Map<String, Object>{
+					'Gift__c' => gift.Id,
+					'Fund__c' => fundId,
+					'Amount__c' => amount
+				}
+			);
+		}
+		return gift;
+	}
+
+	@IsTest
+	static void giftsReadFromGivingJoinAMemberAndARecurringGiftCountsForTheYear() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			if (
+				NamespaceUtil.objectType('Gift_Allocation__c') == null ||
+				NamespaceUtil.objectType('Commitment__c') == null
+			) {
+				return;
+			}
+			MembershipService.todayOverride = TODAY;
+			SObject fund = made(
+				'Fund__c',
+				new Map<String, Object>{
+					'Name' => 'Zzmem Dues',
+					'Active__c' => true,
+					'Is_Default__c' => true
+				}
+			);
+			insert as user new Membership_Level__c(
+				Name = 'Individual',
+				Dues__c = 50,
+				Term_Months__c = 12,
+				Grace_Days__c = 30,
+				Fund_Id__c = String.valueOf(fund.Id)
+			);
+			Contact oneOff = person('Zzmem Oneoff');
+			Contact monthly = person('Zzmem Monthlygift');
+			SObject commitment = made(
+				'Commitment__c',
+				new Map<String, Object>{
+					'Type__c' => 'Recurring',
+					'Status__c' => 'Active',
+					'Donor_Contact__c' => monthly.Id,
+					'Amount__c' => 20,
+					'Frequency__c' => 'Monthly',
+					'Start_Date__c' => TODAY.addMonths(-3)
+				}
+			);
+			SObject first = giftFor(fund.Id, oneOff.Id, 60, null);
+			// 20 a month is under the dues as a gift, 240 as a year: the year is what counts.
+			SObject second = giftFor(fund.Id, monthly.Id, 20, commitment.Id);
+
+			Assert.areEqual(2, MembershipRenewals.renewFromGifts(), 'both members joined');
+
+			List<Membership_Term__c> single = termsOf(oneOff.Id);
+			Assert.areEqual(1, single.size(), 'the one-off giver joined');
+			Assert.areEqual('Gift', single[0].Source__c, 'paid by a gift');
+			Assert.areEqual(String.valueOf(first.Id), single[0].Gift_Id__c, 'the gift is recorded');
+			List<Membership_Term__c> recurring = termsOf(monthly.Id);
+			Assert.areEqual(1, recurring.size(), 'the monthly giver joined');
+			Assert.areEqual('Recurring Gift', recurring[0].Source__c, 'paid by a recurring gift');
+			Assert.areEqual(String.valueOf(second.Id), recurring[0].Gift_Id__c, 'its gift');
+			Assert.areEqual(0, MembershipRenewals.renewFromGifts(), 'a gift pays only once');
+
+			// Two years on both terms have ended; the active commitment renews only its member.
+			MembershipService.todayOverride = TODAY.addYears(2);
+			Assert.areEqual(2, MembershipRenewals.lapse(), 'both ended terms moved');
+			Assert.areEqual(
+				'Lapsed',
+				[SELECT Status__c FROM Membership_Term__c WHERE Id = :single[0].Id WITH USER_MODE]
+				.Status__c,
+				'no recurring gift: it lapses'
+			);
+			Assert.areEqual(
+				2,
+				termsOf(monthly.Id).size(),
+				'the active commitment renewed its term'
+			);
+		}
+	}
 }

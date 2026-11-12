@@ -61,7 +61,13 @@ private class GiftImportCreditsTest {
 
 	private static Import_Row__c row() {
 		return [
-			SELECT Status__c, Error_Message__c, Gift_Id__c, Soft_Credit_Id__c, Contact_2__c
+			SELECT
+				Status__c,
+				Error_Message__c,
+				Gift_Id__c,
+				Soft_Credit_Id__c,
+				Contact_1__c,
+				Contact_2__c
 			FROM Import_Row__c
 			WHERE Import_Batch__c = :batch.Id
 			WITH SYSTEM_MODE
@@ -161,6 +167,170 @@ private class GiftImportCreditsTest {
 				'Why.'
 			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'And no gift was made for it.');
+		}
+	}
+
+	private static void assertRefused(String expectedMessage, String why) {
+		Import_Row__c after = row();
+		Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, after.Status__c, why);
+		Assert.areEqual(expectedMessage, after.Error_Message__c, why);
+		Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift is made for it: ' + why);
+	}
+
+	@IsTest
+	static void aCreditValueThatCannotBeReadIsRefusedWithItsText() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(
+				new Map<String, String>{
+					'SoftCredit.Role__c' => 'Solicitor',
+					'SoftCredit.Amount__c' => 'a lot'
+				}
+			);
+
+			commitAsMaria();
+
+			assertRefused(
+				String.format(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorValueUnreadable'),
+					new List<String>{ 'a lot', Label.Giving_Import_TargetSoftCreditAmount }
+				),
+				'An amount that is not a number'
+			);
+		}
+	}
+
+	@IsTest
+	static void anUnknownCreditRoleIsRefusedWithWhatIsAccepted() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(new Map<String, String>{ 'SoftCredit.Role__c' => 'Cheerleader' });
+			commitAsMaria();
+			Import_Row__c role = row();
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, role.Status__c, 'Unknown role');
+			Assert.isTrue(role.Error_Message__c.contains('Cheerleader'), role.Error_Message__c);
+			Assert.isTrue(role.Error_Message__c.contains('Solicitor'), 'Lists what is accepted');
+		}
+	}
+
+	@IsTest
+	static void anUnknownTributeTypeIsRefused() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(
+				new Map<String, String>{
+					'Tribute.Type__c' => 'in spite of',
+					'Tribute.Honoree_Name__c' => 'Rosa Ramirez'
+				}
+			);
+			commitAsMaria();
+			Import_Row__c type = row();
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, type.Status__c, 'Unknown type');
+			Assert.isTrue(type.Error_Message__c.contains('in spite of'), type.Error_Message__c);
+		}
+	}
+
+	@IsTest
+	static void aTributeNeedsItsHonoree() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(new Map<String, String>{ 'Tribute.Type__c' => 'In memory of' });
+
+			commitAsMaria();
+
+			assertRefused(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorTributeHonoreeMissing'),
+				'A tribute with no honoree'
+			);
+		}
+	}
+
+	@IsTest
+	static void theCreditedPartyCanBeTheFirstPerson() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(
+				new Map<String, String>{
+					'SoftCredit.Role__c' => 'Solicitor',
+					'SoftCredit.Party' => ' contact 1 '
+				}
+			);
+			commitAsMaria();
+			Import_Row__c first = row();
+			Assert.areEqual(
+				ImportRowProcessor.STATUS_CREATED,
+				first.Status__c,
+				'Created: ' + first.Error_Message__c
+			);
+			Assert.areEqual(
+				first.Contact_1__c,
+				[SELECT Contact__c FROM Soft_Credit__c WHERE Id = :first.Soft_Credit_Id__c]
+				.Contact__c,
+				'Ana, the first person, is credited.'
+			);
+		}
+	}
+
+	@IsTest
+	static void aCreditToSomeoneOutsideTheFourChoicesIsRefused() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(
+				new Map<String, String>{
+					'SoftCredit.Role__c' => 'Solicitor',
+					'SoftCredit.Party' => 'Neighbour'
+				}
+			);
+			commitAsMaria();
+			assertRefused(
+				String.format(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditPartyChoice'),
+					new List<String>{ 'Neighbour' }
+				),
+				'A choice that is not one of four'
+			);
+		}
+	}
+
+	@IsTest
+	static void aCreditToAnOrganizationOrHouseholdTheRowDoesNotHaveIsRefused() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(
+				new Map<String, String>{
+					'SoftCredit.Role__c' => 'Solicitor',
+					'SoftCredit.Party' => 'Organization'
+				}
+			);
+
+			commitAsMaria();
+
+			assertRefused(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditPartyMissing'),
+				'The row has no organization'
+			);
+		}
+	}
+
+	@IsTest
+	static void aCreditOrTributeThePlatformRefusesFailsItsRowWholly() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			given(
+				new Map<String, String>{
+					'Tribute.Type__c' => 'In memory of',
+					'Tribute.Honoree_Name__c' => 'R'.repeat(300)
+				}
+			);
+
+			commitAsMaria();
+
+			Import_Row__c after = row();
+			Assert.areNotEqual(
+				ImportRowProcessor.STATUS_CREATED,
+				after.Status__c,
+				'Not created: ' + after.Error_Message__c
+			);
+			Assert.isTrue(
+				after.Error_Message__c.startsWith(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorFailed').substringBefore('{0}')
+				),
+				'Says the gift could not be saved: ' + after.Error_Message__c
+			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'R-GI7: saved whole or not at all');
+			Assert.areEqual(0, [SELECT COUNT() FROM Tribute__c], 'No tribute left behind');
 		}
 	}
 

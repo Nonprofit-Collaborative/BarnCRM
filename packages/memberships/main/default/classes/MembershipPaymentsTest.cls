@@ -120,6 +120,138 @@ private class MembershipPaymentsTest {
 		}
 	}
 
+	/** Payments that is ready but fails to start a checkout, or fails even to say if it is ready. */
+	private class FailingPayments implements Callable {
+		Boolean failReadiness;
+		FailingPayments(Boolean failReadiness) {
+			this.failReadiness = failReadiness;
+		}
+		public Object call(String action, Map<String, Object> args) {
+			if (action == 'isReady' && !failReadiness) {
+				return true;
+			}
+			throw new IllegalArgumentException('Payments is down');
+		}
+	}
+
+	@IsTest
+	static void paymentsIsNotReadyWhenItIsAbsentOrCannotSay() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipPayments.apiOverride = new FailingPayments(true);
+			Assert.isFalse(MembershipPayments.ready(), 'It could not answer');
+			MembershipPayments.apiOverride = null;
+			Assert.isFalse(MembershipPayments.ready(), 'Nothing is connected in a new org');
+		}
+	}
+
+	@IsTest
+	static void aTermThatCannotPayOrOwesNothingIsRefused() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipPayments.apiOverride = new FakePayments(true);
+			Assert.areEqual(
+				BarnHelp.text('Memberships', 'Memberships_Error_CannotRenew'),
+				refusal(term('Renewed', 'renewed.payer@example.org').Id),
+				'A renewed term is done'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Memberships', 'Memberships_Error_CannotRenew'),
+				refusal(term('Cancelled', 'cancelled.payer@example.org').Id),
+				'A cancelled term is done'
+			);
+			Membership_Term__c free = term('Current', 'free.payer@example.org');
+			Membership_Level__c level = [
+				SELECT Id
+				FROM Membership_Level__c
+				WHERE Id IN (SELECT Level__c FROM Membership_Term__c WHERE Id = :free.Id)
+				WITH USER_MODE
+			];
+			update as user new Membership_Level__c(Id = level.Id, Dues__c = 0);
+			Assert.areEqual(
+				BarnHelp.text('Memberships', 'Memberships_Error_NoDues'),
+				refusal(free.Id),
+				'A level with no dues has nothing to pay'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPendingTermPaysItsOwnDuesNotTheLevels() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			FakePayments payments = new FakePayments(true);
+			MembershipPayments.apiOverride = payments;
+			MembershipPayments.emailSender = new RecordingEmailSender();
+			Membership_Term__c pending = term('Pending', 'payer@example.org');
+			update as user new Membership_Term__c(Id = pending.Id, Dues__c = 75);
+
+			Test.startTest();
+			MembershipPayments.request(pending.Id);
+			Test.stopTest();
+
+			Assert.areEqual(1, payments.checkouts.size(), 'one checkout');
+			Assert.areEqual(75, (Decimal) payments.checkouts[0].get('amount'), 'its own dues');
+		}
+	}
+
+	@IsTest
+	static void aCheckoutPaymentsCannotStartLeavesNoLinkAndSendsNothing() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipPayments.apiOverride = new FailingPayments(false);
+			RecordingEmailSender sender = new RecordingEmailSender();
+			MembershipPayments.emailSender = sender;
+			Membership_Term__c current = term('Current', 'payer@example.org');
+
+			Test.startTest();
+			MembershipPayments.request(current.Id);
+			Test.stopTest();
+
+			Assert.isNull(
+				[SELECT Pay_Link__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE]
+				.Pay_Link__c,
+				'No link was stored'
+			);
+			Assert.isTrue(sender.received.isEmpty(), 'Nothing was emailed');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'MembershipPayments'
+					WITH SYSTEM_MODE
+				],
+				'The failure is logged against the term'
+			);
+		}
+	}
+
+	@IsTest
+	static void aLinkJobForATermThatIsGoneLogsAWarning() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipPayments.apiOverride = new FakePayments(true);
+			RecordingEmailSender sender = new RecordingEmailSender();
+			MembershipPayments.emailSender = sender;
+			Id gone = Id.valueOf(
+				Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+					.getKeyPrefix() + '000000000002'
+			);
+
+			Test.startTest();
+			new MembershipPayments(gone).execute(null);
+			Test.stopTest();
+
+			Assert.isTrue(sender.received.isEmpty(), 'Nothing was emailed');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'MembershipPayments' AND Severity__c = 'Warning'
+					WITH SYSTEM_MODE
+				],
+				'The link was not sent, and the log says so'
+			);
+		}
+	}
+
 	@IsTest
 	static void aPaymentRenewsOnceAndARefundCancels() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {

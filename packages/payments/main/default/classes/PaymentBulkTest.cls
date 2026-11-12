@@ -188,6 +188,102 @@ private class PaymentBulkTest {
 		}
 	}
 
+	/** Answers every request by failing in a way that is not a transport failure. */
+	private class Broken implements HttpCalloutMock {
+		public HttpResponse respond(HttpRequest request) {
+			throw new IllegalArgumentException('Unreadable answer');
+		}
+	}
+
+	@IsTest
+	static void anEventThatCannotBeReadIsMarkedFailedWithItsReason() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
+			Payment_Event__c event = PaymentsTestData.event(
+				PaymentService.PAYPAL,
+				null,
+				PaymentsTestData.payPalEvent(
+					'WH-BROKEN',
+					'PAYMENT.CAPTURE.COMPLETED',
+					new Map<String, Object>{ 'id' => 'CAPB' }
+				),
+				PaymentsTestData.payPalHeaders()
+			);
+			Test.setMock(HttpCalloutMock.class, new Broken());
+
+			Test.startTest();
+			new PaymentEventProcessor.Run().execute(null);
+			Test.stopTest();
+
+			Payment_Event__c after = PaymentsTestData.rereadEvent(event.Id);
+			Assert.areEqual('Failed', after.Status__c, 'Not read again and again');
+			Assert.isTrue(String.isNotBlank(after.Message__c), 'With the reason');
+			Assert.areEqual(0, PaymentEventProcessor.waiting(10).size(), 'None left Received');
+			Assert.areEqual(1, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'Logged');
+		}
+	}
+
+	@IsTest
+	static void aRunWhoseWriteFailsMarksItsEventsFailedAndLeavesThePaymentAlone() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.STRIPE);
+			Payment__c payment = pending(1, SINGLE_LISTENER)[0];
+			// A processor id longer than the field holds makes the payment update fail.
+			Payment_Event__c event = PaymentsTestData.event(
+				PaymentService.STRIPE,
+				'stripe:evt_long',
+				PaymentsTestData.stripeEvent(
+					'evt_long',
+					'checkout.session.completed',
+					new Map<String, Object>{
+						'client_reference_id' => payment.Reference__c,
+						'payment_intent' => 'pi_'.rightPad(300, 'x'),
+						'payment_status' => 'paid'
+					}
+				),
+				null
+			);
+
+			Test.startTest();
+			new PaymentEventProcessor.Run().execute(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				PaymentService.PENDING,
+				PaymentsTestData.reread(payment.Id).Status__c,
+				'The write was refused as a whole'
+			);
+			Payment_Event__c after = PaymentsTestData.rereadEvent(event.Id);
+			Assert.areEqual('Failed', after.Status__c, 'Not taken up again and again');
+			Assert.isTrue(String.isNotBlank(after.Message__c), 'With the reason');
+			Assert.isTrue(
+				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0,
+				'The failure is logged'
+			);
+		}
+	}
+
+	@IsTest
+	static void anAbandonJobThatCannotReadPaymentsLogsAndCancelsNothing() {
+		Payment__c stale;
+		System.runAs(PaymentsTestData.admin()) {
+			stale = pending(1, SINGLE_LISTENER)[0];
+			Test.setCreatedDate(stale.Id, Datetime.now().addDays(-3));
+		}
+		System.runAs(TestUsers.standardUser('Zzabandon Nobody')) {
+			Test.startTest();
+			new PaymentEventProcessor.Abandon().execute(null);
+			Test.stopTest();
+		}
+
+		Assert.areEqual(
+			PaymentService.PENDING,
+			PaymentsTestData.reread(stale.Id).Status__c,
+			'Nothing cancelled'
+		);
+		Assert.isTrue([SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0, 'Logged');
+	}
+
 	@IsTest
 	static void aPayPalRefundNamesItsCaptureAndRecentPaymentsAreCounted() {
 		System.runAs(PaymentsTestData.admin()) {

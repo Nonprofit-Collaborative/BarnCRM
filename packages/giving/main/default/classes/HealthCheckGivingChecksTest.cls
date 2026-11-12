@@ -18,6 +18,8 @@ private class HealthCheckGivingChecksTest {
 
 	@TestSetup
 	static void makeData() {
+		// For the donation form tests, whose Forms records need the Forms permission sets too.
+		TestUsers.adminWithInstalledModules();
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
 			Contact ana = GivingTestDataFactory.insertHouseholdContact(
@@ -470,6 +472,157 @@ private class HealthCheckGivingChecksTest {
 			}
 
 		}
+	}
+
+	private static String formDefinition(String fieldKey) {
+		return JSON.serialize(
+			new Map<String, Object>{
+				'steps' => new List<Object>{
+					new Map<String, Object>{
+						'fields' => new List<Object>{ new Map<String, Object>{ 'key' => fieldKey } }
+					}
+				}
+			}
+		);
+	}
+
+	/** A form and its versions, oldest first; null when Forms is not installed. */
+	private static Id insertForm(String name, List<String> definitions) {
+		Schema.SObjectType formType = NamespaceUtil.packagedObjectType('Form__c');
+		Schema.SObjectType versionType = NamespaceUtil.packagedObjectType('Form_Version__c');
+		if (formType == null || versionType == null) {
+			return null;
+		}
+		SObject form = formType.newSObject();
+		form.put(NamespaceUtil.qualify('Status__c'), 'Published');
+		form.put('Name', name);
+		insert form;
+		for (Integer i = 0; i < definitions.size(); i++) {
+			SObject version = versionType.newSObject();
+			version.put(NamespaceUtil.qualify('Form__c'), form.Id);
+			version.put(NamespaceUtil.qualify('Version__c'), i + 1);
+			version.put(NamespaceUtil.qualify('Definition__c'), definitions[i]);
+			insert version;
+		}
+		return form.Id;
+	}
+
+	private static Appeal__c donationAppeal(String name, String formKey) {
+		Appeal__c appeal = GivingTestDataFactory.buildAppeal(name);
+		appeal.Donation_Page__c = true;
+		appeal.Donation_Form_Key__c = formKey;
+		appeal.Goal__c = 1000;
+		insert appeal;
+		return appeal;
+	}
+
+	@IsTest
+	static void aDonationFormWhoseNewestVersionHasNoAmountQuestionIsReported() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			quietReceiptChecks();
+			// The newest version decides: the older one asked for an amount, this one does not.
+			Id dropped = insertForm(
+				'Dropped amount',
+				new List<String>{ formDefinition('amount'), formDefinition('note') }
+			);
+			Id restored = insertForm(
+				'Restored amount',
+				new List<String>{ formDefinition('note'), formDefinition('amount') }
+			);
+			if (dropped == null) {
+				return;
+			}
+			Appeal__c broken = donationAppeal('Broken coats', dropped);
+			donationAppeal('Working coats', restored);
+			donationAppeal('Not a form', 'not-an-id');
+
+			Map<String, Object> finding = findByKey(
+				HealthCheckGivingChecks.findings(),
+				'donation_form_no_amount'
+			);
+
+			System.assertNotEquals(null, finding, 'R-AP5: a page with no amount cannot check out.');
+			System.assertEquals(HealthCheckService.SEVERITY_WARNING, finding.get('severity'));
+			List<Object> links = (List<Object>) finding.get('links');
+			System.assertEquals(1, links.size(), 'Only the appeal whose newest version lacks it.');
+			System.assert(
+				String.valueOf(((Map<String, Object>) links[0]).get('url')).contains(broken.Id),
+				'It links the appeal.'
+			);
+			System.assertEquals(
+				null,
+				findByKey(HealthCheckGivingChecks.findings(), 'check_failed_donation_form_amount'),
+				'The check itself ran.'
+			);
+		}
+	}
+
+	@IsTest
+	static void aFormWithAnAmountQuestionIsNotReported() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			quietReceiptChecks();
+			Id fine = insertForm('Fine', new List<String>{ formDefinition('amount') });
+			if (fine == null) {
+				return;
+			}
+			donationAppeal('Fine coats', fine);
+			donationAppeal('Unreadable key', '   ');
+
+			System.assertEquals(
+				null,
+				findByKey(HealthCheckGivingChecks.findings(), 'donation_form_no_amount'),
+				'Every readable form asks for an amount.'
+			);
+		}
+	}
+
+	@IsTest
+	static void aFormWithNoPublishedDefinitionDoesNotAskForAnAmount() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			quietReceiptChecks();
+			Id empty = insertForm('No versions', new List<String>());
+			if (empty == null) {
+				return;
+			}
+			donationAppeal('Empty coats', empty);
+
+			System.assertNotEquals(
+				null,
+				findByKey(HealthCheckGivingChecks.findings(), 'donation_form_no_amount'),
+				'Nothing published means no amount question.'
+			);
+		}
+	}
+
+	@IsTest
+	static void readingAFormDefinitionForAnAmountQuestionIsForgiving() {
+		// runs-as: deploying user (a pure function of the text it is given)
+		System.assertEquals(true, HealthCheckGivingChecks.asksAmount(formDefinition('amount')));
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount(formDefinition('note')));
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount(null), 'No definition');
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount(' '), 'Blank');
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{not json'), 'Unreadable');
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{}'), 'No steps');
+		System.assertEquals(
+			false,
+			HealthCheckGivingChecks.asksAmount('{"steps":"x"}'),
+			'Odd steps'
+		);
+		System.assertEquals(
+			false,
+			HealthCheckGivingChecks.asksAmount('{"steps":["x"]}'),
+			'Odd step'
+		);
+		System.assertEquals(
+			false,
+			HealthCheckGivingChecks.asksAmount('{"steps":[{}]}'),
+			'No fields'
+		);
+		System.assertEquals(
+			false,
+			HealthCheckGivingChecks.asksAmount('{"steps":[{"fields":["amount"]}]}'),
+			'A field that is not an object'
+		);
 	}
 
 	@IsTest
