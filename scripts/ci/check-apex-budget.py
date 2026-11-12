@@ -186,7 +186,8 @@ CAPS = {
     # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
     # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
     # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
-    "corporatehub": 58_300,
+    # Quorum warning and immediate breach bell (CH-21, CH-22): 59,376 measured, plus about 2%.
+    "corporatehub": 60_600,
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.

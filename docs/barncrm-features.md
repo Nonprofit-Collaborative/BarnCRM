@@ -813,6 +813,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Board packet read tracking | Minor | Members mark the packet read in the board portal; the meeting panel counts reads. | Built, in review for release 1.14 | CH-18 |
 | Board self-assessment | Minor | Start Self-Assessment creates the year's assessment from the shipped template (13 statements) for each current seat holder, rated 1 to 5 in the board portal while Open. | Built, in review for release 1.14 | CH-19 |
 | Meeting availability poll | Minor | Up to three Poll Times on a meeting; members answer Yes, If Needed or No in the board portal; Choose This Time sets the start and closes the poll. | Built, in review for release 1.17 | CH-20 |
+| Quorum warning on Close Voting | Minor | Close Voting still records Passed or Failed by For against Against; when the meeting's Quorum Met is false it warns "This meeting did not reach quorum. Check your bylaws before relying on this vote.", ticks the motion's Closed Without Quorum box and shows "Closed without quorum" under the motion in the meeting panel (D-196). | Built, release 1.20 | CH-21 |
+| Immediate breach bell | Minor | The breach bell goes to the owner the moment a breach is logged instead of with the 6:45 AM run, through the same notification and recipient; the nightly run sends no second bell for the same deadline date. Switchable by the Data Breach: Bell When Logged automation and the Send Corporate Hub reminders setting; the first 50 breaches of a bulk load are told at once, the rest at 6:45 AM (D-196). | Built, release 1.20 | CH-22 |
 
 ---
 

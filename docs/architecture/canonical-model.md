@@ -16316,13 +16316,17 @@ its outcome.
 | Status | picklist | yes | Proposed, Voting Open, Passed, Failed, Tabled or Withdrawn. Default Proposed. |
 | Resolution Number | text | no | The organization's own numbering. |
 | Decided On | date | no | When it passed or failed. |
+| Closed Without Quorum | checkbox | no | Set when voting was closed while the meeting had not reached quorum (R-MO1, D-196). Default false. |
 | For, Against, Abstentions | number (roll-up) | no | The votes recorded (R-MO1). |
 
 ### Rules
 
 **R-MO1 Voting.** Open Voting sets Voting Open and adds one Board Vote, blank, per voting
 attendee. Close Voting sets Passed when For is greater than Against, otherwise Failed, and sets
-Decided On to today. Close Voting is refused unless the motion's Status is Voting Open.
+Decided On to today. Close Voting is refused unless the motion's Status is Voting Open. The
+outcome does not depend on quorum, but when the meeting's Quorum Met is false at close, Closed
+Without Quorum is set and the result carries a warning to check the bylaws (D-196, CH-21);
+otherwise it is cleared.
 
 ### Salesforce implementation
 
@@ -16338,6 +16342,7 @@ Decided On to today. Close Voting is refused unless the motion's Status is Votin
 | Status | `Status__c` | Picklist (values above), restricted, required |
 | Resolution Number | `Resolution_Number__c` | Text(40) |
 | Decided On | `Decided_On__c` | Date |
+| Closed Without Quorum | `Closed_Without_Quorum__c` | Checkbox, default false |
 | For | `Votes_For__c` | Roll-Up Summary (COUNT Board Vote, Vote For) |
 | Against | `Votes_Against__c` | Roll-Up Summary (COUNT Board Vote, Vote Against) |
 | Abstentions | `Abstentions__c` | Roll-Up Summary (COUNT Board Vote, Vote Abstain) |
@@ -16653,8 +16658,11 @@ and the people were told, or why not. Every breach is logged, reported or not.
 
 **R-DB1 Deadline reminders.** The nightly step reminds the owner of an Open or Contained breach
 whose risk is not Unlikely to Result in Risk and whose Authority Notified At is blank, once for
-its Authority Deadline date (within the reminder days, so on the first night). A Closed breach
-has its risk assessed (`Closed_Needs_Assessment`).
+its Authority Deadline date (within the reminder days, so on the first night). The same bell goes
+the moment such a breach is logged (CH-22, D-196), by the registry automation `Data_Breach_Bell`
+on insert when reminders are on; it stores the deadline date in Reminded For, so the nightly step
+sends no second bell for that date. A Closed breach has its risk assessed
+(`Closed_Needs_Assessment`).
 
 ### Salesforce implementation
 
@@ -18641,6 +18649,8 @@ mirrors the primary member).
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 | 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
 | 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
+
+| 1.48 | 2026-11-12 | Corporate Hub quorum warning and immediate breach bell (CH-21, CH-22, D-196). `Board_Motion__c.Closed_Without_Quorum__c` (Checkbox, default false); R-MO1 sets it when Close Voting finds Quorum Met false. R-DB1: registry automation `Data_Breach_Bell` sends the breach bell on insert. |
 
 ---
 ## 32. Entity ownership by package

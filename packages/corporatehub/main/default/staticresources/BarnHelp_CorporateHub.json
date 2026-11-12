@@ -59,6 +59,8 @@
     "CorporateHub_Reminder_TermTitle": "Term ends {2}: {0}, {1}",
     "CorporateHub_Board_NotAllowed": "That change is not allowed here.",
     "CorporateHub_Board_NotVoting": "Voting is not open on this motion, so it cannot be closed.",
+    "CorporateHub_Board_NoQuorumWarning": "This meeting did not reach quorum. Check your bylaws before relying on this vote.",
+    "CorporateHub_Board_NoQuorumNote": "Closed without quorum",
     "CorporateHub_Board_NoPollTimes": "Fill in at least Poll Time 1 before sending the poll or choosing a time.",
     "CorporateHub_Board_NothingToAsk": "A self-assessment needs current seats with a person and the shipped question template.",
     "CorporateHub_Board_Title": "Board",

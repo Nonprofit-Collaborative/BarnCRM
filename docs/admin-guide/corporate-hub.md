@@ -82,8 +82,12 @@ BarnCRM Settings, **Corporate Hub**:
 | Show board demographics | Off | Whether the Board panel shows the optional age range and gender of current seats. |
 
 The reminder step is **Corporate Hub reminders** on the Nightly Jobs page, at 6:45 AM, with its
-own switch. It runs once a night, so a breach logged during the day gets its first reminder with
-the next 6:45 AM run.
+own switch. It runs once a night, but a breach is different: its bell goes the moment the breach
+is logged (D-196), and the 6:45 AM run then sends no second bell for the same deadline date. The
+**Data Breach: Bell When Logged** row on the Automations page turns the immediate bell off, and
+**Send Corporate Hub reminders** turns off both; with either off, the first bell comes with the
+6:45 AM run. A breach logged in a bulk load tells its owner at once for the first 50 only; the
+6:45 AM run sends the rest.
 
 ## Templates
 
@@ -212,8 +216,8 @@ Log every personal data breach as a **Data Breach**, even one you will not repor
 the **Risk** (Not Yet Assessed, Unlikely to Result in Risk, Risk or High Risk), the decision on
 notifying and the actions taken. **Authority Deadline** is 72 hours after discovery. Until you
 record **Authority Notified At**, the owner of an open breach whose risk is not Unlikely to
-Result in Risk gets a bell reminder before the deadline, and the breach shows on the Corporate
-Hub page. Record **People Notified At** when you tell the people affected. A breach cannot be
+Result in Risk gets a bell reminder as soon as the breach is logged (D-196), and the breach
+shows on the Corporate Hub page. Record **People Notified At** when you tell the people affected. A breach cannot be
 closed while its risk is Not Yet Assessed.
 
 ### On the Corporate Hub Page
@@ -271,8 +275,11 @@ On the **Meeting** panel:
   meetings, until each is Done or Dropped.
 - **Motions**: add a Board Motion to the meeting. **Open Voting** gives each voting attendee a
   vote to cast in the portal; staff can also fill in votes. **Close Voting** records Passed (more
-  For than Against) or Failed and the date. A vote cannot change once voting closes, except by an
-  admin recording a vote taken by voice.
+  For than Against) or Failed and the date. When the meeting has not reached quorum, the outcome
+  is recorded the same way, a warning says to check your bylaws before relying on the vote, and
+  the motion's **Closed Without Quorum** box is ticked and shown under the motion in the panel
+  (D-196). A vote cannot change once voting closes, except by an admin recording a vote taken by
+  voice.
 - **Availability Poll**: before the time is fixed, leave Start blank, fill in up to three Poll
   Times and use **Send Poll** (it invites the board first if needed). Members answer Yes, If
   Needed or No for each time in the portal; **Choose This Time** sets the start and closes the
