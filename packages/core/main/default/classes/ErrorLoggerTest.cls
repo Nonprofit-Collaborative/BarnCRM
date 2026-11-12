@@ -465,4 +465,130 @@ private class ErrorLoggerTest {
 			);
 		}
 	}
+
+	private static Database.SaveResult saveResult(Boolean success, String message) {
+		Map<String, Object> result = new Map<String, Object>{ 'success' => success };
+		if (!success) {
+			result.put(
+				'errors',
+				new List<Object>{
+					new Map<String, Object>{
+						'statusCode' => 'FIELD_CUSTOM_VALIDATION_EXCEPTION',
+						'message' => message,
+						'fields' => new List<String>()
+					}
+				}
+			);
+		}
+		return (Database.SaveResult) JSON.deserialize(
+			JSON.serialize(result),
+			Database.SaveResult.class
+		);
+	}
+
+	@IsTest
+	static void theFailedRowsOfAPartialSaveCostOneStatement() {
+		System.runAs(TestUsers.admin()) {
+			Id aboutMe = UserInfo.getUserId();
+			List<Database.SaveResult> results = new List<Database.SaveResult>();
+			List<Id> recordIds = new List<Id>();
+			for (Integer i = 0; i < 50; i++) {
+				results.add(saveResult(Math.mod(i, 5) != 0, 'Row ' + i + ' was refused.'));
+				recordIds.add(aboutMe);
+			}
+
+			Test.startTest();
+			Integer statementsBefore = Limits.getPublishImmediateDML();
+			ErrorLogger.logFailures(
+				results,
+				recordIds,
+				'Partial save',
+				ErrorLogger.SEVERITY_WARNING
+			);
+			ErrorLogger.logFailures(null, null, 'Partial save', ErrorLogger.SEVERITY_WARNING);
+			Integer statementsAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Assert.areEqual(1, statementsAfter - statementsBefore, 'One statement for them all.');
+			Assert.areEqual(
+				10,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE
+						Context__c = 'Partial save'
+						AND Record_Reference__c = :String.valueOf(aboutMe)
+				],
+				'Each failed row is recorded about its own record, and no row that saved is.'
+			);
+		}
+	}
+
+	@IsTest
+	static void manyFailuresAboutTheirOwnRecordsCostOneStatement() {
+		System.runAs(TestUsers.admin()) {
+			Id aboutMe = UserInfo.getUserId();
+			List<Exception> failures = new List<Exception>();
+			for (Integer i = 0; i < 30; i++) {
+				failures.add(new DmlException('Owner ' + i + ' could not be saved.'));
+			}
+
+			Test.startTest();
+			Integer statementsBefore = Limits.getPublishImmediateDML();
+			ErrorLogger.logEach(failures, new List<Id>{ aboutMe, null, aboutMe }, 'Each owner');
+			Integer statementsAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Assert.areEqual(1, statementsAfter - statementsBefore, 'One statement for them all.');
+			Assert.areEqual(
+				30,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Each owner'],
+				'Every failure is recorded.'
+			);
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE
+						Context__c = 'Each owner'
+						AND Record_Reference__c = :String.valueOf(aboutMe)
+				],
+				'Each names its own record; past the end of the list, none.'
+			);
+		}
+	}
+
+	@IsTest
+	static void withNoStatementsLeftAnEntryNeverEndsTheSaveItReports() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			// Stands for a transaction that has spent its statements: none are left to log with.
+			ErrorLogWriter.reserve = Limits.getLimitDmlStatements();
+			Integer publishedBefore = Limits.getPublishImmediateDML();
+			Integer statementsBefore = Limits.getDmlStatements();
+			ErrorLogger.logMessage('Out of room.', 'No room', ErrorLogger.SEVERITY_ERROR);
+			Integer publishedAfter = Limits.getPublishImmediateDML();
+			Integer statementsAfter = Limits.getDmlStatements();
+			ErrorLogWriter.reserve = 2;
+			Test.stopTest();
+
+			Assert.areEqual(publishedBefore, publishedAfter, 'Nothing is published.');
+			Assert.areEqual(statementsBefore, statementsAfter, 'Nothing is inserted.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'No room'],
+				'The entry goes to the debug log, and the caller keeps its statements.'
+			);
+		}
+	}
+
+	@IsTest
+	static void loggingAlwaysLeavesTheReserveToTheCaller() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isTrue(ErrorLogWriter.hasRoom(147, 150), 'Three left: one to log, two kept.');
+			Assert.isFalse(ErrorLogWriter.hasRoom(148, 150), 'Two left: both are the caller\'s.');
+			Assert.isFalse(ErrorLogWriter.hasRoom(150, 150), 'None left: nothing is spent.');
+		}
+	}
 }

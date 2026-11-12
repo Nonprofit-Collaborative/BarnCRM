@@ -29,16 +29,48 @@
  *
  * It never throws (rule R-E2). A failure to log is swallowed rather than masking the original
  * failure, which the caller is usually in the middle of reporting to the user.
+ *
+ * Nor does it spend the caller's last statements. Running out of DML statements or immediate
+ * publishes is a LimitException nobody can catch, and it would roll back the save being
+ * reported, so with `reserve` or fewer left the entry goes to the debug log instead.
  */
 public without sharing class ErrorLogWriter {
+	/** Statements always left to the caller; a test raises it to stand for an exhausted limit. */
+	@TestVisible
+	private static Integer reserve = 2;
+
 	public static void write(List<Error_Log__c> entries) {
 		if (entries == null || entries.isEmpty()) {
 			return;
 		}
-		if (publish(entries)) {
+		Boolean dmlLeft = hasRoom(Limits.getDmlStatements(), Limits.getLimitDmlStatements());
+		if (
+			dmlLeft &&
+			hasRoom(Limits.getPublishImmediateDML(), Limits.getLimitPublishImmediateDML()) &&
+			publish(entries)
+		) {
 			return;
 		}
-		writeDirectly(entries);
+		if (dmlLeft) {
+			writeDirectly(entries);
+			return;
+		}
+		// Deliberate last resort: one more statement would end the caller's transaction, so
+		// the debug log is the only place left. Kept intentionally (PMD AvoidDebugStatements
+		// finding accepted, not suppressed).
+		System.debug(
+			LoggingLevel.ERROR,
+			'BarnCRM left ' +
+				entries.size() +
+				' Error Log entries unwritten, no statements left. The first: ' +
+				entries[0].Message__c
+		);
+	}
+
+	/** True while one more statement still leaves `reserve` for the caller. */
+	@TestVisible
+	private static Boolean hasRoom(Integer used, Integer maximum) {
+		return maximum - used > reserve;
 	}
 
 	/**

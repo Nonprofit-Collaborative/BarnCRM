@@ -93,7 +93,9 @@ CAPS = {
     # plus about 0.5%.
     # PAY-04 (D-196): the subscriptions listener and Update Card / automatic Pay Online,
     # 669,581 measured 2026-11-12, plus a small margin; both reuse the PAY-03 classes.
-    "giving": 670_000,
+    # Raised 2026-11-12 by 140 for PD3: the gift import's undo logs its failed deletes in one
+    # statement (ErrorLogger.logEach), 670,127 measured.
+    "giving": 670_140,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.

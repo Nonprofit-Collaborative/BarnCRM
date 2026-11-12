@@ -643,7 +643,7 @@ public without sharing class RollupQueue implements Queueable {
 		}
 		// Partial success: an entry another run already finished is simply gone.
 		Database.update(slice.remainders, false, AccessLevel.SYSTEM_MODE);
-		Database.delete(slice.finished, false, AccessLevel.SYSTEM_MODE);
+		deleteForGood(slice.finished);
 		if (!deferred.isEmpty()) {
 			Database.insert(deferred, AccessLevel.SYSTEM_MODE);
 		}
@@ -1035,13 +1035,39 @@ public without sharing class RollupQueue implements Queueable {
 			);
 		}
 		Database.update(rest, false, AccessLevel.SYSTEM_MODE);
-		Database.delete(emptied, false, AccessLevel.SYSTEM_MODE);
+		deleteForGood(emptied);
 		Database.insert(charged, false, AccessLevel.SYSTEM_MODE);
 		if (toBatch) {
 			// Already charged above: the batch only holds it.
 			RollupLargeParentBatch.begin(charged, false);
 		}
 		announceReady();
+	}
+
+	/**
+	 * Deletes entries and empties them from the Recycle Bin, where every processed entry would
+	 * otherwise wait fifteen days. Partial success, as before: an entry another run finished is
+	 * simply gone. This transaction's last insert stays in the bin, as `forgetRolledBackAttempt`
+	 * looks for it there to tell a test's stopTest from a rollback.
+	 */
+	private static void deleteForGood(List<Rollup_Queue__c> entries) {
+		List<Id> gone = new List<Id>();
+		for (
+			Database.DeleteResult result : Database.delete(entries, false, AccessLevel.SYSTEM_MODE)
+		) {
+			if (result.isSuccess() && result.getId() != lastEntryId) {
+				gone.add(result.getId());
+			}
+		}
+		if (gone.isEmpty()) {
+			return;
+		}
+		try {
+			Database.emptyRecycleBin(gone);
+		} catch (DmlException notEmptied) {
+			// The entries are deleted; left in the bin they only wait out the fifteen days.
+			ErrorLogger.log(notEmptied, LOG_CONTEXT);
+		}
 	}
 
 	/** The definitions an entry names; none means every active definition on its entity. */

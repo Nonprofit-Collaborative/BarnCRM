@@ -77,7 +77,7 @@ public with sharing class FieldHistoryService {
 				for (String field : fields) {
 					Object before = old == null ? null : old.get(field);
 					Object after = record.get(field);
-					if (!JSON.serialize(before).equals(JSON.serialize(after))) {
+					if (!same(before, after)) {
 						changes.add(change(field, before, after));
 					}
 				}
@@ -91,21 +91,41 @@ public with sharing class FieldHistoryService {
 					);
 				}
 			}
-			// System mode: the person saving need not have access to the history (R-FH2).
-			for (
-				Database.SaveResult saved : Database.insert(rows, false, AccessLevel.SYSTEM_MODE)
-			) {
-				if (!saved.isSuccess()) {
-					ErrorLogger.logMessage(
-						saved.getErrors()[0].getMessage(),
-						CONTEXT,
-						ErrorLogger.SEVERITY_WARNING
-					);
-				}
-			}
+			// System mode: the person saving need not have access to the history (R-FH2). Rows
+			// that fail are logged together, in one statement.
+			ErrorLogger.logFailures(
+				Database.insert(rows, false, AccessLevel.SYSTEM_MODE),
+				null,
+				CONTEXT,
+				ErrorLogger.SEVERITY_WARNING
+			);
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, CONTEXT);
 		}
+	}
+
+	/**
+	 * True when a field kept its value, without serializing either. Text compares with case,
+	 * so a change of case is kept; a number compares with its scale (1.0 to 1.00 is a change);
+	 * dates, times and checkboxes compare by value.
+	 */
+	@TestVisible
+	private static Boolean same(Object before, Object after) {
+		if (before == null || after == null) {
+			return before == after;
+		}
+		if (before instanceof String) {
+			return after instanceof String && ((String) before).equals((String) after);
+		}
+		if (
+			before instanceof Decimal ||
+			before instanceof Double ||
+			before instanceof Long ||
+			before instanceof Integer
+		) {
+			return String.valueOf(before).equals(String.valueOf(after));
+		}
+		return before == after;
 	}
 
 	/** One field's change: `f`, `o` and `n`, with long text cut and marked `t` (R-FH3). */

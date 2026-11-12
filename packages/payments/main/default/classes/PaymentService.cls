@@ -386,22 +386,20 @@ public with sharing class PaymentService {
 		}
 		update as user touched.values();
 		List<Payment_Event__c> events = new List<Payment_Event__c>();
+		List<Id> eventIds = new List<Id>();
 		for (Outcome o : outcomes) {
 			o.event.Status__c = o.status;
 			o.event.Message__c = o.message?.abbreviate(255);
 			events.add(o.event);
+			eventIds.add(o.event.Id);
 		}
-		List<Database.SaveResult> saved = Database.update(events, false, AccessLevel.USER_MODE);
-		for (Integer i = 0; i < saved.size(); i++) {
-			if (!saved[i].isSuccess()) {
-				ErrorLogger.logMessage(
-					saved[i].getErrors()[0].getMessage(),
-					CONTEXT + '.apply',
-					ErrorLogger.SEVERITY_WARNING,
-					events[i].Id
-				);
-			}
-		}
+		// Events that cannot be saved are logged together, in one statement.
+		ErrorLogger.logFailures(
+			Database.update(events, false, AccessLevel.USER_MODE),
+			eventIds,
+			CONTEXT + '.apply',
+			ErrorLogger.SEVERITY_WARNING
+		);
 		List<Payment__c> changed = new List<Payment__c>();
 		for (Payment__c payment : touched.values()) {
 			if (

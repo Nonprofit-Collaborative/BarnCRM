@@ -867,7 +867,9 @@ the app rather than in debug logs (plan Sections 2.3 and 4.8).
 **R-E1** Every caught exception in packaged code writes an Error Log record with a
 message an administrator can act on. A silent catch is a review failure.
 **R-E2** Error Log writing never itself throws; a failure to log is swallowed rather
-than masking the original error.
+than masking the original error. Nor does it spend the caller's last statements: with two or
+fewer DML statements or immediate publishes left, the entry goes to the debug log, since a
+limit exception there could not be caught and would roll back the save being reported.
 **R-E3** The Hub shows a tile of unresolved errors, and an optional digest email goes to
 the administrators (feature C-23, v0.6, R-E5).
 **R-E4 The entry outlives the transaction it documents.** Most failures worth recording
@@ -13480,11 +13482,16 @@ name, so Core names no module. Steps run one at a time, ordered by time of day (
 order registered). Each starts at its time of day or when the step before has finished,
 whichever is later.
 
-**R-NJ3 When a step has finished.** When no batch, queueable or future job the run's user
-started since the step began is holding, queued, preparing or processing. Checked every two
-minutes; after six hours the step is recorded Gave Up Waiting and the run moves on. A step whose
-jobs failed or reported errors is Done With Errors; a step whose start threw is Failed, with the
-error logged and in Last Message.
+**R-NJ3 When a step has finished.** The link that starts a step notes the Apex classes of the
+batch, queueable and future jobs its work started (the run user's jobs that exist after the work
+and did not before). The step has finished when no job of those classes the run's user started
+since the step began is holding, queued, preparing or processing, so a job it chains of the same
+class counts and unrelated work in the org does not. A step that started none is finished at the
+first check. A run that takes over a step left running cannot know what it started, so it waits
+on the classes of every such job of the run's user still unfinished since that step began.
+Checked every two minutes; after six hours the step is recorded Gave Up Waiting and the run moves
+on. A step whose own jobs failed or reported errors is Done With Errors; a step whose start threw
+is Failed, with the error logged and in Last Message.
 
 **R-NJ4 Switches.** A step whose on/off was its own schedule (Error Digest, Rollups, the four
 Giving jobs, Acknowledgments, Pledge Reminders, the Opportunity and Gift Transaction mirrors) has
