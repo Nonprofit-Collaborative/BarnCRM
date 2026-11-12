@@ -545,6 +545,7 @@ th, td { border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-al
 thead th { background: #eee; }
 td.num { text-align: right; }
 .dates, .unit { font-weight: normal; color: #444; }
+@page { size: landscape; margin: 12mm; }
 @media print { body { margin: 0; } thead { display: table-header-group; } tr { page-break-inside: avoid; } }
 </style>
 </head>

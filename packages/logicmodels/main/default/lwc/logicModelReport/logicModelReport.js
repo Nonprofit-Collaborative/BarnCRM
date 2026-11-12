@@ -8,14 +8,16 @@ import {
   reportHtml,
   reportPeriods
 } from 'c/logicModelRules';
-import { LABELS, format, stageLabel } from 'c/logicModelText';
+import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
+import reportPdf from '@salesforce/apex/LogicModelBuilderController.reportPdf';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Logic_Model_Report';
 
 /**
  * The Logic Model Report (L-04, R-IN7) under the builder: per indicator the baseline and, for the
- * chosen periods, the target, result and progress, downloadable as CSV or a printable page. It
+ * chosen periods, the target, result and progress, downloadable as CSV, a printable page or that
+ * page as a PDF (L-04b, made by the server). It
  * reads the builder's model, so it changes as the model is saved, and stores nothing.
  */
 export default class LogicModelReport extends LightningElement {
@@ -34,6 +36,8 @@ export default class LogicModelReport extends LightningElement {
   labels = LABELS;
   chosenKeys;
   resultMessage;
+  pdfBusy = false;
+  pdfError;
   _model;
 
   @api
@@ -148,5 +152,28 @@ export default class LogicModelReport extends LightningElement {
       fileName(FILE_BASE, new Date(), 'html')
     );
     this.resultMessage = LABELS.reportDownloaded;
+  }
+
+  get pdfDisabled() {
+    return this.cannotDownload || this.pdfBusy;
+  }
+
+  /** The same printable page, made a PDF by the server (L-04b), saved as a file. */
+  async handlePdf() {
+    this.pdfBusy = true;
+    this.pdfError = undefined;
+    try {
+      const base64 = await reportPdf({ html: reportHtml(this.built, this.words) });
+      const bytes = Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+      saveBlob(
+        new Blob([bytes], { type: 'application/pdf' }),
+        fileName(FILE_BASE, new Date(), 'pdf')
+      );
+      this.resultMessage = LABELS.reportDownloaded;
+    } catch (error) {
+      this.pdfError = messageFrom(error);
+    } finally {
+      this.pdfBusy = false;
+    }
   }
 }

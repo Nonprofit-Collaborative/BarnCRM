@@ -397,4 +397,43 @@ private class LogicModelBuilderControllerTest {
 			Assert.areEqual(failed, unreadable, 'Not an object');
 		}
 	}
+
+	@IsTest
+	static void theReportBecomesAPdfAndAPageThatLoadsAnythingIsRefused() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			String page =
+				'<!doctype html><html><head><meta charset="utf-8"><title>Report</title>' +
+				'<style>@page { size: landscape; } td { padding: 4px; }</style></head>' +
+				'<body><h1>Youth Reading: Logic Model Report</h1><table><tr>' +
+				'<td>Visits to our url (website) with src=home</td></tr></table></body></html>';
+
+			String pdf = LogicModelBuilderController.reportPdf(page);
+
+			Assert.isTrue(
+				EncodingUtil.base64Decode(pdf).size() > 0,
+				'The printable page comes back as a PDF, even with words like url ( in its text.'
+			);
+			for (
+				String refused : new List<String>{
+					'',
+					page.replace('<h1>', '<img src="https://example.org/x.png"><h1>'),
+					page.replace('<h1>', '<h1 style="background: red">'),
+					page.replace('td {', 'td { background: url(https://example.org/x.png); '),
+					page.replace('</head>', '<link rel="stylesheet" href="/x.css"></head>'),
+					page.replace('</head>', '<style>@import "x.css";</style></head>')
+				}
+			) {
+				try {
+					LogicModelBuilderController.reportPdf(refused);
+					Assert.fail('Refused: ' + refused.abbreviate(80));
+				} catch (AuraHandledException expected) {
+					Assert.areEqual(
+						LogicModelBuilderController.actionFailed(),
+						expected.getMessage(),
+						'Refused in plain words.'
+					);
+				}
+			}
+		}
+	}
 }

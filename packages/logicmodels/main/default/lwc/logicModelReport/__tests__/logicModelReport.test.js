@@ -2,11 +2,19 @@ import { createElement } from 'lwc';
 import LogicModelReport from 'c/logicModelReport';
 import { downloadCsv, saveBlob } from 'c/findCsv';
 
+import reportPdf from '@salesforce/apex/LogicModelBuilderController.reportPdf';
+
 jest.mock('c/findCsv', () => ({
   ...jest.requireActual('c/findCsv'),
   downloadCsv: jest.fn(),
   saveBlob: jest.fn()
 }));
+
+jest.mock(
+  '@salesforce/apex/LogicModelBuilderController.reportPdf',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 const period = (id, name, startDate, endDate, targetValue, resultValue) => ({
   id,
@@ -105,6 +113,31 @@ describe('c-logic-model-report', () => {
     expect(name).toMatch(/^Logic_Model_Report-.*\.html$/);
     await flush();
     expect(q(element, 'report-result').textContent.trim()).toBe('c.Core_Shared_ReportDownloaded');
+  });
+
+  it('downloads a PDF of the printable page made by the server (L-04b)', async () => {
+    reportPdf.mockResolvedValue(btoa('%PDF-1.4'));
+    const element = await render();
+    q(element, 'report-pdf').click();
+    await flush();
+    expect(reportPdf).toHaveBeenCalledTimes(1);
+    expect(reportPdf.mock.calls[0][0].html.startsWith('<!doctype html>')).toBe(true);
+    expect(reportPdf.mock.calls[0][0].html).toContain('@page { size: landscape;');
+    const [blob, name] = saveBlob.mock.calls[0];
+    expect(blob.type).toBe('application/pdf');
+    expect(blob.size).toBe(8);
+    expect(name).toMatch(/^Logic_Model_Report-.*\.pdf$/);
+    expect(q(element, 'report-pdf-error')).toBeNull();
+  });
+
+  it('shows why a PDF was not made', async () => {
+    reportPdf.mockRejectedValue({ body: { message: 'Not made.' } });
+    const element = await render();
+    q(element, 'report-pdf').click();
+    await flush();
+    expect(saveBlob).not.toHaveBeenCalled();
+    expect(q(element, 'report-pdf-error').textContent.trim()).toBe('Not made.');
+    expect(q(element, 'report-pdf').disabled).toBe(false);
   });
 
   it('keeps the choice when the model is saved and drops periods that are gone', async () => {

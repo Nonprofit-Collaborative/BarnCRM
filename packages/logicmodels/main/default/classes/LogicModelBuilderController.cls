@@ -332,6 +332,47 @@ public with sharing class LogicModelBuilderController {
 		}
 	}
 
+	/**
+	 * Anything in a page that would make the PDF service load something from elsewhere: a tag
+	 * that loads, an attribute that names an address or carries styles, or a second style block.
+	 * Values are escaped, so text a person typed never matches a tag.
+	 */
+	private static final Pattern LOADS_SOMETHING = Pattern.compile(
+		'(?i)<(script|link|img|iframe|frame|object|embed|svg|base|input)\\b|' +
+		'<[^>]*\\b(src|href|style|background|http-equiv)\\s*=|<style[\\s\\S]*<style'
+	);
+	/** In the page's one style block: a stylesheet or image fetched from elsewhere. */
+	private static final Pattern STYLE_LOADS = Pattern.compile('(?i)url\\s*\\(|@import');
+	/** The largest printable page turned into a PDF: well above a 50 indicator, 12 period report. */
+	private static final Integer MAX_REPORT_CHARACTERS = 1000000;
+
+	/**
+	 * The Logic Model Report as a PDF (L-04b), base64: the printable page the panel built
+	 * (`reportHtml` in logicModelRules, every value escaped, its own styles, no scripts) rendered
+	 * by the Visualforce PDF service with `Blob.toPdf` (ADR-0016), like Giving's receipts. Reads
+	 * and saves nothing. A page that would load anything from elsewhere is refused, so the service
+	 * never fetches a resource.
+	 *
+	 * @param html the printable report page
+	 * @return the PDF, base64
+	 */
+	@AuraEnabled
+	public static String reportPdf(String html) {
+		try {
+			if (
+				String.isBlank(html) ||
+				html.length() > MAX_REPORT_CHARACTERS ||
+				LOADS_SOMETHING.matcher(html).find() ||
+				STYLE_LOADS.matcher(html.substringBetween('<style', '</style>') ?? '').find()
+			) {
+				throw new LogicModelService.BuilderException(actionFailed());
+			}
+			return EncodingUtil.base64Encode(Blob.toPdf(html));
+		} catch (Exception e) {
+			throw handled(e);
+		}
+	}
+
 	private static Map<String, Object> parse(String payload) {
 		Object value = String.isBlank(payload) ? null : JSON.deserializeUntyped(payload);
 		if (!(value instanceof Map<String, Object>)) {
