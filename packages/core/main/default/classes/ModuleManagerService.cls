@@ -102,6 +102,7 @@ public with sharing class ModuleManagerService {
 			'Session_Schedule__c'
 		},
 		'LogicModels' => new List<String>{
+			'Assumption_Evidence__c',
 			'Indicator__c',
 			'Indicator_Period__c',
 			'Logic_Model__c',

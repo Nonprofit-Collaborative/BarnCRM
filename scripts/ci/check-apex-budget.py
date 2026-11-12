@@ -96,7 +96,9 @@ CAPS = {
     # VOL-2 (P-09): 172,177 measured with program capacity and the waitlist (EnrollmentCapacity),
     # plus about 2%.
     "programs": 175_600,
-    "logicmodels": 65_000,
+    # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
+    # the describe-built evidence words; 65,800 measured, plus about 1%.
+    "logicmodels": 66_500,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,

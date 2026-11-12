@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Strength__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>How strongly it supports the assumption. Strong: a rigorous study or several sources agree. Moderate: one good source. Limited: anecdote or early results. Challenges: it points the other way.</inlineHelpText>
+  <label>Strength</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Strong</fullName>
+        <default>false</default>
+        <label>Strong</label>
+      </value>
+      <value>
+        <fullName>Moderate</fullName>
+        <default>true</default>
+        <label>Moderate</label>
+      </value>
+      <value>
+        <fullName>Limited</fullName>
+        <default>false</default>
+        <label>Limited</label>
+      </value>
+      <value>
+        <fullName>Challenges</fullName>
+        <default>false</default>
+        <label>Challenges</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

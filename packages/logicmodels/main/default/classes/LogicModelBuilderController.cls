@@ -99,6 +99,21 @@ public with sharing class LogicModelBuilderController {
 	}
 
 	/**
+	 * Adds evidence to an arrow's assumption, or changes it (L-05).
+	 *
+	 * @param evidenceJson id, linkId, summary, source, sourceUrl, date, strength
+	 * @return the model
+	 */
+	@AuraEnabled
+	public static Map<String, Object> saveEvidence(String evidenceJson) {
+		try {
+			return LogicModelService.read(LogicModelService.saveEvidence(parse(evidenceJson)));
+		} catch (Exception e) {
+			throw handled(e);
+		}
+	}
+
+	/**
 	 * Adds or changes an indicator.
 	 *
 	 * @param indicatorJson id, elementId, name, unit, betterWhen, baselineValue, baselineDate,

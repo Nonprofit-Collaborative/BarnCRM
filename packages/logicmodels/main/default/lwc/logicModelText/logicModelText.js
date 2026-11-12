@@ -281,6 +281,12 @@ export const LABELS = Object.freeze({
   all: ALL,
   get starterHelp() {
     return helpText('LogicModels', 'LogicModels_Starter_Help');
+  },
+  get noEvidence() {
+    return helpText('LogicModels', 'LogicModels_Evidence_None');
+  },
+  get removeEvidenceConfirm() {
+    return helpText('LogicModels', 'LogicModels_Evidence_RemoveConfirm');
   }
 });
 

@@ -11987,6 +11987,59 @@ the same direction.
 
 ---
 
+## 29ZE1. Assumption Evidence
+
+### Definition
+
+One piece of evidence for an arrow's assumption (L-05): what it shows and where it comes from (a
+study, an evaluation, the organization's own survey, staff observation), so a funder can see
+why the organization believes one part leads to the next.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Arrow | reference(Logic Model Link) | yes | The arrow whose assumption it supports. |
+| What It Shows | text(255) | yes | What the evidence shows, in a sentence. |
+| Source | text(255) | no | Where it comes from. |
+| Source Link | url | no | A link to the source, if it is online. |
+| Date | date | no | When it was published or gathered. |
+| Strength | picklist | yes | Strong, Moderate (default), Limited or Challenges. |
+
+### Relationships
+
+- **Evidence to Logic Model Link**, many to one, as a detail of the arrow. Deleting the arrow
+  deletes its evidence.
+
+### Rules
+
+**R-AE1 Newest first.** The builder lists an arrow's evidence by date, newest first, undated
+evidence last, in the order it was added.
+
+**R-AE2 Strength.** Strong: a rigorous study or several sources agree. Moderate: one good
+source. Limited: anecdote or early results. Challenges: it points the other way. Moderate when
+none is given.
+
+**R-AE3 Who changes it.** Logic Models Admin and Staff add, change and remove evidence; Logic
+Models Read Only sees it.
+
+### Salesforce implementation
+
+- **Object:** `Assumption_Evidence__c`, name field AutoNumber `AEV-{000000}`, sharing Controlled
+  By Parent. Not tabbed: it is kept in the builder, on each arrow.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Arrow | `Link__c` | Master-Detail to `Logic_Model_Link__c`, relationship name Evidence |
+| What It Shows | `Summary__c` | Text(255), required |
+| Source | `Source__c` | Text(255) |
+| Source Link | `Source_Url__c` | URL |
+| Date | `Evidence_Date__c` | Date |
+| Strength | `Strength__c` | Picklist, restricted: Strong, Moderate (default), Limited, Challenges; required |
+
+---
+
 ## 29ZF. Indicator
 
 ### Definition
@@ -17250,6 +17303,7 @@ mirrors the primary member).
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.32 | 2026-11-11 | Evidence log (L-05). New Section 29ZE1 Assumption Evidence (`Assumption_Evidence__c`, a detail of `Logic_Model_Link__c`, rules R-AE1 to R-AE3): what it shows, source, source link, date and strength. Logic Models Admin and Staff edit it, Read Only reads it; the builder reads it with each arrow and `LogicModelBuilderController.saveEvidence` saves it. |
 
 ---
 ## 32. Entity ownership by package

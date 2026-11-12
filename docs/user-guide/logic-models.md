@@ -84,6 +84,11 @@ To change an assumption, click **Edit** beside the arrow. To remove an arrow, cl
 then **Remove** in the dialog.
 Arrows into the part are listed under **Comes From**.
 
+To record what supports an assumption, click **Assumption Evidence** under the arrow, then
+**Add**. Write **What It Shows**, and if you have them the **Source**, a **Source Link** and
+the **Date**, and pick a **Strength** (Strong, Moderate, Limited, or Challenges when it points the
+other way). Click **Save**. The newest evidence is listed first.
+
 ## To Measure an Output or Outcome
 
 1. Click the output or outcome. Its **Indicators** show below its arrows.
