@@ -124,3 +124,19 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | 6 | Set **Opportunity mirror direction** to Opportunities to Gifts with a start date before the Opportunities, and click **Run Now**. | No new gift: each Opportunity already has its gift. |
 
 **Cleanup:** set the direction back to Off; undo the steps in reverse order; switch acknowledgments back on if they were on.
+
+## T-MIG-09: Nonprofit Cloud Gifts and Soft Credits Copies Paid Gift Transactions Once
+
+**Purpose:** confirm the Nonprofit Cloud Gifts and Soft Credits kit (Mirror) copies designations, commitments, paid gift transactions and soft credits with the right donors, and that neither a rerun nor the Gift Transaction mirror duplicates a gift.
+**Prerequisites:** an org with Nonprofit Cloud Fundraising (person accounts on) and Core, Giving and Mirror deployed; admin user with **Salesforce Records Sync** and the Giving admin permission set; Gift Transaction mirror **Off**; **Send gift acknowledgments** off; a fund **General Fund** in BarnCRM. In Nonprofit Cloud: a Campaign **Spring Appeal**; gift designations **General Fund** and **Building Fund**; person account Ana with a recurring gift commitment of 25 every month; a paid gift transaction of 300 from Ana on Spring Appeal, designated 200 Building Fund and 100 General Fund, with a memorial tribute for "Grace" and a soft credit to person account Ben (role Solicitor, no amount); a paid gift transaction of 500 from business account **Test Org**; an unpaid gift transaction.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: Nonprofit Cloud Gifts and Soft Credits**. | Five steps: **Appeals**, **Funds**, **Commitments**, **Gifts**, **Soft Credits**. |
+| 2 | Run and load **Appeals** and **Funds**. | An appeal Spring Appeal. One new fund, Building Fund, whose Gift Designation ID is the designation's; General Fund is not created again. **Funds** shows 2 of 2 and **Verified**. |
+| 3 | Run and load **Commitments**. | Ana's recurring commitment of 25, Monthly, on her contact. **Verified**. |
+| 4 | Run **Gifts**, preview and load it. | 2 gifts, none for the unpaid transaction. Ana's gift of 300 on her contact, appeal Spring Appeal, split 200 Building Fund and 100 General Fund, tribute In memory of Grace; Test Org's gift of 500 on the organization. Each gift's **Gift Transaction ID** and external ID are the transaction's. **Verified**. |
+| 5 | Run and load **Soft Credits**. | On Ana's gift: Ben **Solicitor** for 300. **Verified**. |
+| 6 | Set the Gift Transaction mirror to Gifts to Gift Transactions with a start date before the gifts, and click **Run Now**. | No new gift transaction: each copied gift already has its link. |
+
+**Cleanup:** set the mirror back to Off; undo the steps in reverse order; switch acknowledgments back on if they were on.

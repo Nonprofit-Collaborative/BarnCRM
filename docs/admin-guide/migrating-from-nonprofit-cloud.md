@@ -179,7 +179,9 @@ file shape. The shapes differ in ways that matter:
 
 ## 6. What Does Not Come Across Yet
 
-These are not loaded by the four templates. Each has what to do in the meantime.
+These are not loaded by the four templates. Each has what to do in the meantime. In the org
+Nonprofit Cloud is in, the Nonprofit Cloud Gifts and Soft Credits kit (section 7) also copies
+funds, appeals, commitments, soft credits and tributes.
 
 | Not loaded | What to do meanwhile |
 |---|---|
@@ -207,6 +209,39 @@ that keeps people as person accounts:
 - An organization donor is found by name only if its account is a BarnCRM organization.
   A business account of another record type gets a new BarnCRM organization of the same
   name. Check the preview's "would create" count for organizations before you import.
+
+### The Nonprofit Cloud Gifts and Soft Credits Kit
+
+With BarnCRM Giving and BarnCRM Mirror installed in the same org, you need no files at all.
+On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: Nonprofit Cloud
+Gifts and Soft Credits**. The Migration Assistant ([Migration Assistant](migration-assistant.md))
+runs these steps in order, each with a preview and an undo:
+
+| Step | Reads | Makes |
+|---|---|---|
+| Appeals | Every Campaign | One appeal per campaign, or updates the appeal already linked to it. |
+| Funds | Every gift designation | One fund per designation, linked to it for the Gift Transaction mirror. A designation that already has a fund, linked or of the same name, is skipped; the step's check counts designations that have a fund. |
+| Commitments | Every gift commitment | One commitment of the same person or organization: **Recurring** when its schedule type says recurring (the amount of the next transaction), else a **Pledge** (its expected total), with frequency, dates, status and appeal. |
+| Gifts | Every gift transaction with status `Paid` | One gift per transaction, of the same donor (a person account's contact, else the account as an organization), with amount, date, payment method and reference, appeal, designations as funds (up to five) and its tribute. Each gift keeps the transaction's ID as its **Gift Transaction ID**, so the Gift Transaction mirror never copies it back, and a rerun never duplicates it. |
+| Soft Credits | Every gift soft credit of a paid transaction | One soft credit on that gift, of the recipient person or organization, with BarnCRM's role (another role becomes Other with its name kept) and its amount, or the gift's. |
+
+Before you run it:
+
+- Assign yourself the **Salesforce Records Sync** permission set (Mirror) and the Giving admin
+  permission set.
+- Set the Gift Transaction mirror ([Gift Transaction Mirror](gift-transaction-mirror.md)) to
+  **Off** while the kit runs.
+- Turn off acknowledgment rules, so copied gifts send no thank-you letters.
+- Check your completed status: the kit copies the status `Paid` only. Gifts with another
+  status (pledged, unpaid, written off, refunded) are not copied.
+
+Limits: Nonprofit Cloud is read in your access, so a record you cannot see is not counted or
+copied. Commitments are copied but gifts are not linked to them. A refund stays on the
+transaction and is not copied; record it in BarnCRM ([Refunds](refunds.md)). Households
+(Party Relationship Groups) are not converted: see
+[Nonprofit Cloud Households](nonprofit-cloud-households.md). The Nonprofit Cloud field names
+the kit reads come from Salesforce's documentation and are not yet checked against a live org;
+if your org differs, a step reports the missing field by name and copies nothing.
 
 ## 8. Common Mistakes
 

@@ -21,13 +21,11 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 		'Influencer'
 	};
 
-	/** One part of a gift's split: a General Accounting Unit's name and amount. */
-	@TestVisible
-	private class Part {
+	/** One part of a gift's split: a fund's name and amount (also the Nonprofit Cloud kit's). */
+	public class Part {
 		String fund;
 		Decimal amount;
-		@TestVisible
-		Part(String fund, Decimal amount) {
+		public Part(String fund, Decimal amount) {
 			this.fund = fund;
 			this.amount = amount;
 		}
@@ -116,9 +114,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 
 	/**
 	 * One Opportunity's row as a gift: donor choice and Id, payment method (Other when it has no
-	 * paid payment), reference, and the split. A single allocation of the whole amount is the
-	 * gift's one fund; more than five parts keep the first five, so the split no longer adds
-	 * up and the preview rejects the row where it can be seen.
+	 * paid payment), reference, and the split.
 	 */
 	@TestVisible
 	private static void giftRow(Map<String, Object> row, List<String> payment, List<Part> split) {
@@ -132,10 +128,18 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 		String method = payment == null ? null : payment[0];
 		row.put('Method', String.isBlank(method) ? 'Other' : method);
 		row.put('Reference', payment == null || payment[1] == null ? '' : payment[1]);
+		putSplit(row, split, (String) row.get('Amount'));
+	}
+
+	/**
+	 * A gift's split as the Fund1 to Fund5 and Amount1 to Amount5 columns. A single part of the
+	 * whole amount is the gift's one fund; more than five parts keep the first five, so the
+	 * split no longer adds up and the preview rejects the row where it can be seen.
+	 */
+	public static void putSplit(Map<String, Object> row, List<Part> split, String amount) {
 		if (split == null || split.isEmpty()) {
 			return;
 		}
-		String amount = (String) row.get('Amount');
 		if (
 			split.size() == 1 &&
 			split[0].amount != null &&
@@ -190,14 +194,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	 */
 	@TestVisible
 	private static void creditRow(Map<String, Object> row, String role, Decimal partialAmount) {
-		String chosen = 'Other';
-		for (String known : ROLES) {
-			chosen = known.equalsIgnoreCase(String.isBlank(role) ? '' : role.trim())
-				? known
-				: chosen;
-		}
-		row.put('CreditRole', chosen);
-		row.put('CustomRole', chosen != 'Other' ? '' : String.isBlank(role) ? 'Soft Credit' : role);
+		putRole(row, role);
 		if (!row.containsKey('npsp.Role__c')) {
 			row.put(
 				'Amount',
@@ -208,7 +205,23 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 		}
 	}
 
-	private static Set<String> column(List<Map<String, Object>> rows, String name) {
+	/**
+	 * A soft credit's CreditRole and CustomRole columns: BarnCRM's role of the same name, else
+	 * Other keeping the source's name (Soft Credit when blank) as the custom role.
+	 */
+	public static void putRole(Map<String, Object> row, String role) {
+		String chosen = 'Other';
+		for (String known : ROLES) {
+			chosen = known.equalsIgnoreCase(String.isBlank(role) ? '' : role.trim())
+				? known
+				: chosen;
+		}
+		row.put('CreditRole', chosen);
+		row.put('CustomRole', chosen != 'Other' ? '' : String.isBlank(role) ? 'Soft Credit' : role);
+	}
+
+	/** The distinct non-blank values of one column. */
+	public static Set<String> column(List<Map<String, Object>> rows, String name) {
 		Set<String> result = new Set<String>();
 		for (Map<String, Object> row : rows) {
 			if (String.isNotBlank((String) row.get(name))) {

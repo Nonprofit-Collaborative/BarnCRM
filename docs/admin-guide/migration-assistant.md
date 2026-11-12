@@ -32,6 +32,10 @@ org. These kits ship:
 - **NPSP Gifts and Soft Credits** (Mirror): copies Campaigns as appeals, won Opportunities as
   gifts with their funds and tribute, and contact, partial and account soft credits. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **Nonprofit Cloud Gifts and Soft Credits** (Mirror): copies Campaigns as appeals, gift
+  designations as funds, gift commitments, paid gift transactions as gifts (linked for the
+  Gift Transaction mirror) and gift soft credits. See
+  [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md#the-nonprofit-cloud-gifts-and-soft-credits-kit).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
