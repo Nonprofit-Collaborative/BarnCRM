@@ -167,6 +167,10 @@ day it was paid. **Cancelled** means the donor left the checkout without paying;
 or delete it. A refund made at Stripe or PayPal sets the gift to **Refunded** by itself, so do
 not record that refund again.
 
+A donor who pays a pledge with **Pay Online** in the donor portal gets the same kind of gift, on
+the pledge instead of an appeal: it appears as **Received** once the payment is confirmed and
+counts against the pledge's next payment.
+
 ## Common Problems
 
 - "This gift has a receipt number, so its amount, date, donor and in-kind description cannot change. Void the receipt and reissue it, or record a refund." The donor holds a receipt for this gift. Use **Void and Reissue** ([Receipts and acknowledgments](receipts-and-acknowledgments.md)) or record a refund.

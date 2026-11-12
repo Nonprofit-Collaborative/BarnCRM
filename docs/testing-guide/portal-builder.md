@@ -116,7 +116,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-PB-08: Donor Portal Template
 
-**Purpose:** confirm a donor sees only their own giving, with no payments and no edits beyond contact details.
+**Purpose:** confirm a donor sees only their own giving, with no edits beyond contact details (Pay Online is T-PB-12).
 **Prerequisites:** admin; Giving installed with sample data; a portal with key `donor`, Active, Invited, the template `portal-client/templates/donor.json`; Pat Tester signed in with two gifts (one Cancelled), a pledge and an issued receipt; another donor with gifts.
 
 | Step | Action | Expected result |
@@ -177,3 +177,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 6 | POST `page/action` `Memberships.PayDues` with Sam's membership Id. | 404 `not_found`. |
 
 **Cleanup:** turn Pat's listing off.
+
+## T-PB-12: Donor Pays a Pledge Online
+
+**Purpose:** confirm Pay Online emails the donor a checkout link for the next payment due and the payment becomes a Received gift on the pledge (PAY-03).
+**Prerequisites:** the T-PB-08 portal with the current `donor.json`; Payments in Test mode with Stripe test keys (see [Payments](payments.md)); Pat Tester with an email you can read and an Active monthly pledge of 100; another donor with a pledge.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=pledges`. | The page's actions include **Pay Online** (`Giving.PayOnline`). |
+| 2 | POST `page/action` `Giving.PayOnline` on Pat's pledge. | 200 with "We've emailed you a secure link to pay". Within minutes, an email to Pat with a Stripe checkout link for 100. |
+| 3 | Open the link and pay with 4242 4242 4242 4242; wait for the Payments run. | A **Received** gift of 100 from Pat on the pledge, **Payment Method** Card, with a **Payment Reference**; the first payment shows **Paid** and the pledge's Paid to Date rises by 100. |
+| 4 | POST `page/action` `Giving.PayOnline` with the other donor's pledge Id. | 404 `not_found`; no email. |
+| 5 | Clear the Stripe keys on Payments Setup; repeat step 2. | Refused; no email is sent. |
+
+**Cleanup:** enter the Stripe test keys again; delete the gift.
