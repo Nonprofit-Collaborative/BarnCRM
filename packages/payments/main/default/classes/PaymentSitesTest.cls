@@ -5,6 +5,8 @@
  */
 @IsTest(testFor='ApexClass:PaymentSites')
 private class PaymentSitesTest {
+	// runs-as: deploying user (Site and SiteDetail are read in system mode; no DML)
+
 	private static Site site(String id, String label, Id guestUserId) {
 		return (Site) JSON.deserialize(
 			JSON.serialize(
