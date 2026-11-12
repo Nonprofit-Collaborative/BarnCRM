@@ -669,4 +669,45 @@ private class GiftImportProcessorTest {
 			Assert.isFalse(keep.containsKey(giftIds.get(30)), 'An open, unposted gift can go');
 		}
 	}
+
+	@IsTest
+	static void giftsThatCannotBeUndoneAreLoggedInOneStatement() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			// Gift ids that name no gift: deleting them fails, row by row.
+			String prefix = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+				.getKeyPrefix();
+			List<GiftImportRow> gifts = new List<GiftImportRow>();
+			Set<String> giftIds = new Set<String>();
+			for (Integer i = 1; i <= 3; i++) {
+				GiftImportRow item = new GiftImportRow(
+					new Import_Row__c(),
+					new Map<String, Map<String, String>>()
+				);
+				item.error = 'Its allocation could not be saved.';
+				item.giftId = Id.valueOf(prefix + String.valueOf(i).leftPad(12, '0'));
+				giftIds.add(String.valueOf(item.giftId));
+				gifts.add(item);
+			}
+
+			Test.startTest();
+			Integer publishedBefore = Limits.getPublishImmediateDML();
+			GiftImportProcessor.undoTheUnfinished(gifts);
+			Integer publishedAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Assert.areEqual(1, publishedAfter - publishedBefore, 'One statement for every failure');
+			Assert.areEqual(
+				3,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE
+						Context__c = 'GiftImportProcessor.undoTheUnfinished'
+						AND Record_Reference__c IN :giftIds
+				],
+				'Each failure is logged about its own gift'
+			);
+			Assert.isNull(gifts[0].giftId, 'The row no longer claims the gift');
+		}
+	}
 }

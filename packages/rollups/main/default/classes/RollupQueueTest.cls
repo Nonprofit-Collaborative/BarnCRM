@@ -123,6 +123,62 @@ private class RollupQueueTest {
 		}
 	}
 
+	private static Integer inRecycleBin() {
+		return [
+			SELECT COUNT()
+			FROM Rollup_Queue__c
+			WHERE IsDeleted = TRUE
+			WITH SYSTEM_MODE
+			ALL ROWS
+		];
+	}
+
+	@IsTest
+	static void aFinishedEntryIsDeletedForGood() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			insertChildCount();
+			Set<Id> parents = parentsWithOneChild(5);
+
+			Test.startTest();
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => parents });
+			// The processor runs as its own transaction would, with no insert of its own.
+			RollupQueue.newTransactionForTest();
+			Test.stopTest();
+
+			Assert.areEqual(
+				5,
+				[SELECT COUNT() FROM Account WHERE Id IN :parents AND NumberOfEmployees = 1],
+				'The run recalculated them'
+			);
+			Assert.isTrue(entries().isEmpty(), 'And finished every entry');
+			Assert.areEqual(0, inRecycleBin(), 'None waits in the Recycle Bin');
+		}
+	}
+
+	@IsTest
+	static void anEntryARunThatStoppedEmptiedIsDeletedForGood() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			List<Rollup_Queue__c> held = new List<Rollup_Queue__c>{
+				new Rollup_Queue__c(
+					Target_Object__c = 'Account',
+					Record_Ids__c = String.join(new List<Id>(fakeAccountIds(2)), ','),
+					Record_Count__c = 2,
+					Attempts__c = 0
+				)
+			};
+			insert held;
+
+			Test.startTest();
+			RollupQueue.stopped(held, new Set<Id>(), 'Apex CPU time limit exceeded');
+			Test.stopTest();
+
+			List<Rollup_Queue__c> left = entries();
+			Assert.areEqual(1, left.size(), 'Its records are queued again');
+			Assert.areNotEqual(held[0].Id, left[0].Id, 'In a new entry, charged an attempt');
+			Assert.areEqual(0, inRecycleBin(), 'The emptied entry does not wait in the bin');
+		}
+	}
+
 	@IsTest
 	static void theProcessorRecalculatesASliceAndLeavesTheRestPending() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {

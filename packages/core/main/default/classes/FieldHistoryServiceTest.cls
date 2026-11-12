@@ -107,6 +107,50 @@ private class FieldHistoryServiceTest {
 	}
 
 	@IsTest
+	static void keepsAChangeOfCaseAndNothingForTheSameValue() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, new List<String>{ CITY });
+			List<Address__c> places = addresses(3);
+
+			Test.startTest();
+			moveTo(places, 'SPRINGFIELD');
+			moveTo(places, 'SPRINGFIELD');
+			Test.stopTest();
+
+			Assert.areEqual(
+				3,
+				[SELECT COUNT() FROM Field_History__c WITH SYSTEM_MODE],
+				'A change of case is kept, once; saving the same value again keeps nothing'
+			);
+		}
+	}
+
+	@IsTest
+	static void comparesValuesAsTheirTextOnceDid() {
+		System.runAs(TestUsers.admin()) {
+			Datetime noon = Datetime.newInstanceGmt(2026, 1, 2, 12, 0, 0);
+			Date day = Date.newInstance(2026, 1, 2);
+			Assert.isFalse(FieldHistoryService.same('Springfield', 'springfield'), 'Capitals');
+			Assert.isTrue(FieldHistoryService.same('Springfield', 'Springfield'), 'Same text');
+			Assert.isFalse(FieldHistoryService.same(1.0, 1.00), 'A change of scale');
+			Assert.isTrue(FieldHistoryService.same(2.50, 2.50), 'Same number');
+			Assert.isFalse(FieldHistoryService.same(2.5, 2.6), 'Another number');
+			Assert.isTrue(FieldHistoryService.same(day, Date.newInstance(2026, 1, 2)), 'Same day');
+			Assert.isFalse(FieldHistoryService.same(day, day.addDays(1)), 'Another day');
+			Assert.isTrue(
+				FieldHistoryService.same(noon, Datetime.newInstanceGmt(2026, 1, 2, 12, 0, 0)),
+				'Same moment'
+			);
+			Assert.isFalse(FieldHistoryService.same(noon, noon.addSeconds(1)), 'Another moment');
+			Assert.isTrue(FieldHistoryService.same(true, true), 'Same checkbox');
+			Assert.isFalse(FieldHistoryService.same(true, false), 'A ticked checkbox');
+			Assert.isTrue(FieldHistoryService.same(null, null), 'Both empty');
+			Assert.isFalse(FieldHistoryService.same(null, 'Springfield'), 'Filled in');
+			Assert.isFalse(FieldHistoryService.same(0, null), 'Cleared');
+		}
+	}
+
+	@IsTest
 	static void keepsNothingWhileOffOrPaused() {
 		System.runAs(TestUsers.admin()) {
 			turnOn(false, new List<String>{ CITY });

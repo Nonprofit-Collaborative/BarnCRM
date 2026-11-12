@@ -293,6 +293,59 @@ private class SeasonalAddressServiceTest {
 	}
 
 	@IsTest
+	static void collisionsInManyHouseholdsAreReportedInOneStatement() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> households = new List<Account>();
+			for (Integer i = 0; i < 3; i++) {
+				Account household = AddressTestDataFactory.newHousehold('Twice Seasonal ' + i);
+				household.BillingStreet = HOME_STREET;
+				household.BillingCity = HOME_CITY;
+				households.add(household);
+			}
+			Database.insert(households, AccessLevel.SYSTEM_MODE);
+			Set<Id> ownerIds = new Set<Id>();
+			List<Address__c> firsts = new List<Address__c>();
+			List<Address__c> seconds = new List<Address__c>();
+			for (Account household : households) {
+				ownerIds.add(household.Id);
+				firsts.add(seasonalAddress(household.Id, 11, 1, 3, 31));
+				Address__c second = seasonalAddress(household.Id, 12, 1, 2, 28);
+				second.City__c = 'Tucson';
+				seconds.add(second);
+			}
+			insert firsts;
+			insert seconds;
+
+			Test.startTest();
+			Integer publishedBefore = Limits.getPublishImmediateDML();
+			SeasonalAddressService.swapOwners(ownerIds, Date.newInstance(2027, 1, 15));
+			Integer publishedAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Set<String> firstIds = new Set<String>();
+			for (Address__c first : firsts) {
+				firstIds.add(String.valueOf(first.Id));
+			}
+			Assert.areEqual(
+				1,
+				publishedAfter - publishedBefore,
+				'Every collision is logged in one statement, not one per household.'
+			);
+			Assert.areEqual(
+				3,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE
+						Severity__c = :ErrorLogger.SEVERITY_WARNING
+						AND Record_Reference__c IN :firstIds
+				],
+				'Each household\'s collision is reported about its own address.'
+			);
+		}
+	}
+
+	@IsTest
 	static void aPersonalSeasonalAddressMovesWithoutMovingTheHousehold() {
 		System.runAs(TestUsers.admin()) {
 			Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');

@@ -288,7 +288,11 @@ insert runs it once per 200 records.
   `simulatedDmlStatementsUsed` let a test show a nearly spent transaction.
 - **One log write per call.** Queue messages and write them with
   `ErrorLogger.logMessages(messages, recordIds, context, severity)`, one statement however
-  many records failed (`CampaignSyncService.flushLog`).
+  many records failed (`CampaignSyncService.flushLog`). For a partial save, hand its results
+  to `ErrorLogger.logFailures(results, recordIds, context, severity)`; for caught exceptions
+  each about its own record, `ErrorLogger.logEach(exceptions, recordIds, context)`. Never call
+  `logMessage` or `log` inside a loop. `ErrorLogWriter` keeps two DML statements and two
+  immediate publishes for the caller and writes to the debug log instead once only those are left.
 - **Once-per-transaction warnings** use a static flag (`noAccessLogged`, `noHeadroomLogged`),
   so edits do not flood the log.
 - **Partial success on writes to objects the package does not own**, so a refused Campaign

@@ -33,6 +33,13 @@ private class NightlyRunTest {
 		}
 	}
 
+	/** Starts one job, as a step's batch or queueable would. */
+	private class StartingWork implements Schedulable {
+		public void execute(SchedulableContext context) {
+			System.enqueueJob(new Filler());
+		}
+	}
+
 	private static void only(List<NightlyStep> steps) {
 		NightlyRun.chain = false;
 		NightlyJobs.overrideStepsForTest(steps);
@@ -228,6 +235,60 @@ private class NightlyRunTest {
 			Test.stopTest();
 
 			Assert.isTrue(resumes, 'A full queue resumes from the one-time job');
+		}
+	}
+
+	@IsTest
+	static void aStepWaitsForTheJobsItStartedAndForNoOthers() {
+		System.runAs(TestUsers.admin()) {
+			only(
+				new List<NightlyStep>{
+					new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()),
+					new NightlyStep(SECOND, 'Second', 0, 0, new StartingWork())
+				}
+			);
+			NightlyRun run = new NightlyRun();
+			run.begin();
+			run.advance();
+			// Someone else's job, started after the first step began and still queued.
+			System.enqueueJob(new Filler());
+			run.advance();
+			Assert.isTrue(run.stepClassIds.isEmpty(), 'The first step started no job');
+			run.advance();
+			Assert.areEqual(
+				NightlyJobs.DONE,
+				row(FIRST).Last_Outcome__c,
+				'Done at once: another job neither holds it up nor marks it'
+			);
+
+			run.advance();
+			Assert.areEqual(1, run.stepClassIds.size(), 'The second step\'s job is noted');
+			run.advance();
+			Assert.areEqual(NightlyRun.WAIT, run.phase, 'Its own job, still queued, holds it');
+			Assert.areEqual(NightlyRun.POLL_MINUTES, NightlyRun.lastDelay, 'Checking again soon');
+			Assert.areEqual(NightlyJobs.RUNNING, row(SECOND).Last_Outcome__c, 'Still running');
+		}
+	}
+
+	@IsTest
+	static void aRunThatTakesOverWaitsForWhatIsStillAtWork() {
+		System.runAs(TestUsers.admin()) {
+			only(
+				new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) }
+			);
+			Nightly_Job__c left = NightlyJobs.rowFor(SECOND);
+			left.Last_Outcome__c = NightlyJobs.RUNNING;
+			left.Last_Started__c = Datetime.now().addHours(-20);
+			NightlyJobs.save(new List<Nightly_Job__c>{ left });
+			NightlyJobs.forget();
+			System.enqueueJob(new Filler());
+
+			NightlyRun run = new NightlyRun();
+			run.begin();
+			run.advance();
+
+			Assert.areEqual(1, run.stepClassIds.size(), 'What was started is still at work');
+			Assert.areEqual(NightlyRun.WAIT, run.phase, 'So the run waits for it');
 		}
 	}
 }

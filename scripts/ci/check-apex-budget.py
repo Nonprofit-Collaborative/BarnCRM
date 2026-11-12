@@ -95,8 +95,9 @@ CAPS = {
     # 669,581 measured 2026-11-12, plus a small margin; both reuse the PAY-03 classes.
     # W14 QA defect D6: donor levels compare totals and rungs in the corporate currency in a
     # multi-currency org (reusing RollupCurrency), 672,127 measured 2026-11-12; raised by the
-    # 2,546 added, plus about 2%.
-    "giving": 672_200,
+    # 2,546 added, plus about 2%. Plus 140 for PD3: the gift import's undo logs its failed
+    # deletes in one statement (ErrorLogger.logEach).
+    "giving": 672_340,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.

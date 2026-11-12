@@ -105,7 +105,9 @@ every night.
 
 ## How Long a Job May Take
 
-The run waits for everything a job started (batch and background jobs) before it moves on. It
+The run waits for everything a job started (batch and background jobs) before it moves on.
+Only that work counts: other background work running in the org at the same time, such as an
+import someone started, neither holds a job up nor makes it Done With Errors. The run
 checks every two minutes. After six hours it gives up waiting on that job, records **Gave Up
 Waiting**, and goes on with the next one. If a run is still going when the next night's run
 starts, the new run takes over: the job the old run was on is recorded as **Gave Up Waiting**,
