@@ -278,3 +278,21 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 8 | On the Import tab, **Load one object**, **Contact**, insert, with the step 7 file. | Every column with a field you can create maps by its heading; the three contacts come back as new records. |
 
 **Cleanup:** delete the Arctest contacts, their households and the archive files.
+
+## T-BULK-17: Backup Sets
+
+**Purpose:** confirm a Backup Set saves every matching record to Files, deletes nothing, is listed as a run, and its file puts values back through Load one object.
+**Prerequisites:** admin (BarnCRM Admin); three contacts with Last Name `Baktest` and Title `Before`; a saved Find query `Baktest people` (Contact, Last Name equals `Baktest`). A second user with only **BarnCRM Find and Export**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager**. As the second user, open it too. | The admin sees a **Backup Sets** tile under **Find and Change**; the second user does not. |
+| 2 | As the admin, select **Backup Sets**. | The tiles are replaced by the Backup Sets panel with **Back to Data Manager** above it; "No Backup Sets yet", and **Add a Backup Set** offers `Baktest people`. |
+| 3 | Choose `Baktest people` and press **Add**, then **Run Now**. | The set is listed; "Run started" shows and **Recent Runs** lists the run as Committing, then Complete with 3 records and a file name. A notification opens the file. |
+| 4 | Select the file name. | A file `Contact-<today>-<tag>-part-1` owned by you: a heading row of field API names (`Id` first) and three rows with every field you can read. The three contacts are unchanged. |
+| 5 | Open **Data Jobs** (Data Manager, Back). Filter by **Backup Set runs**. | The run is listed with "3 records saved to Files." and no **Undo**. It is not in the import history on the Import tab. |
+| 6 | In Find, open `Baktest people`, change a column, and **Save**. Reopen Backup Sets. | `Baktest people` is still a Backup Set. |
+| 7 | Change the three contacts' Title to `After`. On the Import tab choose **One Kind of Record**, **Contact**, **Update by record ID**, and load the step 4 file with only the **Id** and **Title** columns mapped. | The preview shows three updates to `Before`; after the load the three contacts' Title is `Before`. |
+| 8 | In Backup Sets, press **Remove** beside `Baktest people`. | It moves back to **Add a Backup Set**; the saved query and the run's file remain. |
+
+**Cleanup:** delete the Baktest contacts, their households, the saved query and the run's file.

@@ -1,6 +1,6 @@
 import { TASKS, matchTasks, wordsOf } from 'c/dataManagerTasks';
 
-const ALL = ['import', 'find', 'update', 'optimizer', 'duplicates', 'delete'];
+const ALL = ['import', 'find', 'backup', 'update', 'optimizer', 'duplicates', 'delete'];
 
 describe('c/dataManagerTasks', () => {
   it('names a Data Manager tile for every task', () => {

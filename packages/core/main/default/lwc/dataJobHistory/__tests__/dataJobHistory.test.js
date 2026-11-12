@@ -76,6 +76,10 @@ jest.mock('@salesforce/apex/BulkDeleteController.getPage', () => ({ default: jes
 jest.mock('@salesforce/apex/BulkDeleteController.undo', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/BackupSetController.getRuns', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+import getBackupRuns from '@salesforce/apex/BackupSetController.getRuns';
 
 const IMPORT_JOB = {
   id: 'a0B000000000001',
@@ -161,6 +165,7 @@ describe('c-data-job-history', () => {
     getRecentBatches.mockResolvedValue([IMPORT_JOB]);
     getUpdatePage.mockResolvedValue({ allowed: true, jobs: [UPDATE_JOB] });
     getDeletePage.mockResolvedValue({ allowed: true, jobs: [DELETE_JOB] });
+    getBackupRuns.mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -182,6 +187,26 @@ describe('c-data-job-history', () => {
       'Update',
       'Delete'
     ]);
+  });
+
+  it('lists Backup Set runs with nothing to undo (C-66)', async () => {
+    getBackupRuns.mockResolvedValue([
+      {
+        id: 'a0B000000000009',
+        name: 'IB-000009',
+        setName: 'Volunteers',
+        status: 'Complete',
+        running: false,
+        rows: 30,
+        startedAt: '2026-10-04T10:00:00.000Z'
+      }
+    ]);
+    const element = await render();
+
+    const backup = rows(element).find((row) => row.dataset.kind === 'Backup');
+    expect(backup.textContent).toContain('Volunteers');
+    expect(backup.querySelector('lightning-button-menu')).toBeNull();
+    expect(one(element, 'filter').options.map((option) => option.value)).toContain('Backup');
   });
 
   it('says "1 row" for a one-row import', async () => {

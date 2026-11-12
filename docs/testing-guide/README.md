@@ -50,7 +50,7 @@ page, even if that puts it out of reading order.
 | [Find](find.md) | FIND | 11 | Query builder, typed queries, export, saved queries, summaries, Show More, distance from a place |
 | [Grid](grid.md) | GRID | 3 | The Grid tile, a saved query in editable tables, edit and undo, related record tables, saved and shared grids |
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 13 | Data Manager, data jobs and undo, data quality checks, Field Use, picklist value usage and its snapshot history |
-| [Super Transformer and bulk delete](bulk-update-and-delete.md) | BULK | 16 | Super Transformer runs from Find, bulk delete, edit in Find, undo, the bulk path, Super Transformer, saved step lists, phone format, archive by query |
+| [Super Transformer and bulk delete](bulk-update-and-delete.md) | BULK | 17 | Super Transformer runs from Find, bulk delete, edit in Find, undo, the bulk path, Super Transformer, saved step lists, phone format, archive by query, Backup Sets |
 | [Duplicates](duplicates.md) | DUP | 19 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo, city-only household pairs, the Duplicate Rules Starter |
 | [Brands](brands.md) | BRAND | 5 | Brands off changes nothing, brands and legal entities with one default, assignments with one primary, brand defaulting and brand-aware receipts, brand visibility groups and shares |
 | [Field History](field-history.md) | FH | 3 | Turning Field History on, choosing fields, the Field History card, restore, Automation Control, retention and Health Check |

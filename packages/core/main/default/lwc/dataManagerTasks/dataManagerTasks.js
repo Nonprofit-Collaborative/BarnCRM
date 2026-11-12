@@ -55,6 +55,12 @@ export const TASKS = Object.freeze([
     text: 'Find households in a city',
     words: 'search address location state zip postal'
   },
+  // Backup Sets (C-66)
+  {
+    tool: 'backup',
+    text: 'Back up records to a file',
+    words: 'backup copy keep snapshot save restore before cleanup'
+  },
   // Super Transformer
   {
     tool: 'update',

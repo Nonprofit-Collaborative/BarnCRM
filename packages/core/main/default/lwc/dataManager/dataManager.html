@@ -13,6 +13,21 @@
             <c-barn-help learn-more-url={learnMoreUrl}></c-barn-help>
         </div>
 
+        <template lwc:if={panel}>
+            <lightning-button
+                variant="base"
+                icon-name="utility:back"
+                label={labels.back}
+                onclick={handleBack}
+                data-id="back"
+            ></lightning-button>
+            <div class="slds-var-m-top_small" data-id="panel">
+                <template lwc:if={showBackup}>
+                    <c-backup-sets></c-backup-sets>
+                </template>
+            </div>
+        </template>
+        <template lwc:else>
         <section class="slds-var-m-bottom_medium" data-id="task-search">
             <div class="slds-size_1-of-1 slds-medium-size_1-of-2">
                 <lightning-input
@@ -99,6 +114,7 @@
             <div class="slds-var-m-top_medium">
                 <c-barn-tool-grid groups={salesforceGroups} data-id="salesforce-tools"></c-barn-tool-grid>
             </div>
+        </template>
         </template>
     </c-barn-page-shell>
     </template>

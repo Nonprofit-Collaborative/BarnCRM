@@ -9,6 +9,7 @@ import getUpdatePage from '@salesforce/apex/BulkUpdateController.getPage';
 import undoUpdate from '@salesforce/apex/BulkUpdateController.undo';
 import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
+import getBackupRuns from '@salesforce/apex/BackupSetController.getRuns';
 import { startPolling } from 'c/jobPoller';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
@@ -51,7 +52,8 @@ const FIND_TAB = 'Find';
 const IMPORT = 'Import';
 const UPDATE = 'Update';
 const DELETE = 'Delete';
-const ALL_KINDS = [IMPORT, UPDATE, DELETE];
+const BACKUP = 'Backup';
+const ALL_KINDS = [IMPORT, UPDATE, DELETE, BACKUP];
 const IMPORTS_SHOWN = 10;
 
 function errorText(error) {
@@ -135,6 +137,23 @@ function fromBulkJob(job, kind) {
     canUndo: Boolean(job.canUndo && !job.running),
     running: Boolean(job.running),
     undoCount: isUpdate ? job.updatesToUndo : job.recordsToUndo
+  };
+}
+
+/** One Backup Set run (C-66): nothing to undo; its file is opened from Backup Sets. */
+function fromBackupRun(run) {
+  return {
+    key: run.id,
+    id: run.id,
+    kind: BACKUP,
+    kindLabel: helpText('Core', 'Core_DataJobs_KindBackup'),
+    name: run.name,
+    detail: run.setName,
+    status: run.status,
+    summary: format(helpText('Core', 'Core_DataJobs_BackupSummary'), run.rows || 0),
+    startedAt: run.startedAt,
+    canUndo: false,
+    running: Boolean(run.running)
   };
 }
 
@@ -292,12 +311,14 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   /** Reads every list this placement shows and replaces the rows; throws when a read fails. */
   async fetchJobs() {
     const wanted = this.wantedKinds;
-    const [imports, updates, deletes] = await Promise.all([
+    const [imports, updates, deletes, backups] = await Promise.all([
       wanted.includes(IMPORT) && canManageSettings
         ? getRecentBatches({ howMany: IMPORTS_SHOWN })
         : null,
       wanted.includes(UPDATE) && canBulkUpdate ? getUpdatePage({ everyone: this.everyone }) : null,
-      wanted.includes(DELETE) && canBulkDelete ? getDeletePage({ everyone: this.everyone }) : null
+      wanted.includes(DELETE) && canBulkDelete ? getDeletePage({ everyone: this.everyone }) : null,
+      // The server says null to someone who may not use Backup Sets.
+      wanted.includes(BACKUP) && canManageSettings ? getBackupRuns() : null
     ]);
     this.canSeeEveryone = Boolean(
       (updates && updates.allowed && updates.canSeeEveryone) ||
@@ -316,6 +337,10 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
     if (deletes && deletes.allowed) {
       allowed.push(DELETE);
       jobs = jobs.concat((deletes.jobs || []).map((job) => fromBulkJob(job, DELETE)));
+    }
+    if (Array.isArray(backups)) {
+      allowed.push(BACKUP);
+      jobs = jobs.concat(backups.map(fromBackupRun));
     }
     this.allowedKinds = allowed;
     this.jobs = jobs.sort(newestFirst);
@@ -347,7 +372,12 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   }
 
   get filterOptions() {
-    const names = { [IMPORT]: SHOW_IMPORTS, [UPDATE]: SHOW_UPDATES, [DELETE]: SHOW_DELETES };
+    const names = {
+      [IMPORT]: SHOW_IMPORTS,
+      [UPDATE]: SHOW_UPDATES,
+      [DELETE]: SHOW_DELETES,
+      [BACKUP]: helpText('Core', 'Core_DataJobs_ShowBackups')
+    };
     return [{ label: SHOW_ALL, value: 'all' }].concat(
       this.allowedKinds.map((kind) => ({ label: names[kind], value: kind }))
     );
