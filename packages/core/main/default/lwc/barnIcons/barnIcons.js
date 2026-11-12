@@ -121,6 +121,8 @@ const ICONS = Object.freeze({
   // Memberships
   Membership_Level__c: 'custom:custom48',
   Membership_Term__c: 'custom:custom45',
+  Certification__c: 'custom:custom8',
+  Member_Certification__c: 'custom:custom46',
   // Project Management
   Project__c: 'custom:custom62',
   Projects_Home: 'custom:custom64',
