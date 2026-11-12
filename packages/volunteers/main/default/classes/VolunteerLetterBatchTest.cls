@@ -152,13 +152,17 @@ private class VolunteerLetterBatchTest {
 
 		Assert.areEqual(
 			String.format(
-				Label.Volunteers_Letter_NoActiveTemplateForType,
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_NoActiveTemplateForType'),
 				new List<Object>{ HOURS_LETTER }
 			),
 			noTemplate,
 			'A readable message names the type.'
 		);
-		Assert.areEqual(Label.Volunteers_Letter_TypeRequired, blankType, 'A blank type too.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired'),
+			blankType,
+			'A blank type too.'
+		);
 		Assert.areEqual(jobsBefore, [SELECT COUNT() FROM AsyncApexJob], 'No job was started.');
 	}
 
@@ -183,7 +187,11 @@ private class VolunteerLetterBatchTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Volunteers_Letter_BadPeriod, refusal, 'The period is checked.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'),
+			refusal,
+			'The period is checked.'
+		);
 		Assert.areEqual(jobsBefore, [SELECT COUNT() FROM AsyncApexJob], 'No job was started.');
 	}
 
@@ -265,7 +273,9 @@ private class VolunteerLetterBatchTest {
 		Assert.areEqual(2, job.lettersMade(), 'Two letters made.');
 		Assert.areEqual(1, job.peopleFailed(), 'The chunk with no template failed.');
 		Assert.areEqual(
-			new Map<String, Integer>{ Label.Volunteers_Letter_NoHours => 1 },
+			new Map<String, Integer>{
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours') => 1
+			},
 			job.peopleSkippedByReason(),
 			'One person skipped, with the reason.'
 		);
@@ -279,7 +289,10 @@ private class VolunteerLetterBatchTest {
 			job.peopleFailed()
 		);
 		Assert.isTrue(body.contains('2 letters made, 1 skipped, 1 failed.'), body);
-		Assert.isTrue(body.contains(Label.Volunteers_Letter_NoHours), body);
+		Assert.isTrue(
+			body.contains(BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours')),
+			body
+		);
 		Assert.isTrue(
 			body.contains(BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersFailed')),
 			body

@@ -54,7 +54,7 @@ private class VolunteerSignupServiceTest {
 
 			Assert.areEqual(
 				String.format(
-					Label.Volunteers_Signup_AlreadySignedUp,
+					BarnHelp.text('Volunteers', 'Volunteers_Signup_AlreadySignedUp'),
 					new List<String>{ shift.Name }
 				),
 				again,
@@ -247,7 +247,7 @@ private class VolunteerSignupServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Volunteers_Hours_SecondEntryForSignup,
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_SecondEntryForSignup'),
 				message,
 				'One attendance stays one entry (R-VU3).'
 			);

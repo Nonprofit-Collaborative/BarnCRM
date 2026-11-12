@@ -613,7 +613,7 @@ private class VolunteersErasureExtensionTest {
 				Assert.fail('The erasure must be refused');
 			} catch (PersonErasure.ErasureException refused) {
 				Assert.areEqual(
-					Label.Volunteers_Erase_NeedVolunteersAccess,
+					BarnHelp.text('Volunteers', 'Volunteers_Erase_NeedVolunteersAccess'),
 					refused.getMessage(),
 					'The reason says which access is missing, not the platform\'s own words'
 				);

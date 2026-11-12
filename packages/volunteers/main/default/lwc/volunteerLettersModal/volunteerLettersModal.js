@@ -16,10 +16,6 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import THIS_YEAR_LABEL from '@salesforce/label/c.Volunteers_Shared_ThisYear';
 import LAST_YEAR_LABEL from '@salesforce/label/c.Volunteers_Shared_LastYear';
 import CUSTOM_LABEL from '@salesforce/label/c.Core_DataDictionary_ColCustom';
-import NEED_PERMISSION from '@salesforce/label/c.Volunteers_Letter_NeedManagePermission';
-import NO_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
-import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
-import NO_LEGAL_NAME from '@salesforce/label/c.Volunteers_LetterAction_NoLegalName';
 import TITLE from '@salesforce/label/c.Volunteers_Letters_Title';
 import WHO from '@salesforce/label/c.Volunteers_Letters_Who';
 import EVERYONE from '@salesforce/label/c.Volunteers_Letters_Everyone';
@@ -51,7 +47,9 @@ export default class VolunteerLettersModal extends LightningModal {
     make: MAKE,
     cancel: CANCEL,
     loading: LOADING,
-    noLegalName: NO_LEGAL_NAME
+    get noLegalName() {
+      return helpText('Volunteers', 'Volunteers_LetterAction_NoLegalName');
+    }
   };
 
   periodOptions = periodOptions({
@@ -112,10 +110,10 @@ export default class VolunteerLettersModal extends LightningModal {
       return this.loadFailed ? this.notice : undefined;
     }
     if (!this.context.canManage) {
-      return NEED_PERMISSION;
+      return helpText('Volunteers', 'Volunteers_Letter_NeedManagePermission');
     }
     if (!this.context.templates || this.context.templates.length === 0) {
-      return NO_TEMPLATE;
+      return helpText('Volunteers', 'Volunteers_Letter_NoActiveTemplate');
     }
     return undefined;
   }
@@ -251,7 +249,7 @@ export default class VolunteerLettersModal extends LightningModal {
   async handleMake() {
     this.notice = undefined;
     if (!this.fromDate || !this.toDate || this.fromDate > this.toDate) {
-      this.notice = BAD_PERIOD;
+      this.notice = helpText('Volunteers', 'Volunteers_Letter_BadPeriod');
       return;
     }
     if (this.isChosen && !this.hasPeople) {

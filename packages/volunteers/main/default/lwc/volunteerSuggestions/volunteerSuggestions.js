@@ -10,8 +10,6 @@ import WHY from '@salesforce/label/c.Core_FieldAccess_ColWhy';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import SIGN_UP from '@salesforce/label/c.Volunteers_Suggestions_SignUp';
 import SIGN_UP_FOR from '@salesforce/label/c.Volunteers_Suggestions_SignUpFor';
-import BOOKED from '@salesforce/label/c.Volunteers_Suggestions_Booked';
-import MORE_CONSIDERED from '@salesforce/label/c.Volunteers_Suggestions_MoreConsidered';
 import R_SKILLS from '@salesforce/label/c.Volunteers_Suggestions_ReasonSkills';
 import R_INTERESTS from '@salesforce/label/c.Volunteers_Suggestions_ReasonInterests';
 import R_AVAILABLE from '@salesforce/label/c.Volunteers_Suggestions_ReasonAvailable';
@@ -112,7 +110,10 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
 
   get moreNote() {
     return this.data && this.data.moreThanConsidered
-      ? format(MORE_CONSIDERED, this.data.candidates.length)
+      ? format(
+          helpText('Volunteers', 'Volunteers_Suggestions_MoreConsidered'),
+          this.data.candidates.length
+        )
       : undefined;
   }
 
@@ -161,7 +162,10 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
     this.resultMessage = undefined;
     addSignup({ shiftId: this.recordId, personId, status: null })
       .then(() => {
-        this.resultMessage = format(BOOKED, row ? row.name : '');
+        this.resultMessage = format(
+          helpText('Volunteers', 'Volunteers_Suggestions_Booked'),
+          row ? row.name : ''
+        );
         window.dispatchEvent(
           new CustomEvent(SIGNUPS_CHANGED, { detail: { shiftId: this.recordId } })
         );

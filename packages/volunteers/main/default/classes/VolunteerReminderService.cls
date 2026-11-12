@@ -66,7 +66,7 @@ public with sharing class VolunteerReminderService {
 		if (messageSignups.size() < signups.size()) {
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Volunteers_Reminders_StampFailed,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_StampFailed'),
 					new List<Object>{
 						signups.size() - messageSignups.size(),
 						signups.size(),
@@ -98,7 +98,7 @@ public with sharing class VolunteerReminderService {
 			Database.update(unstamp, false, AccessLevel.SYSTEM_MODE);
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Volunteers_Reminders_SendFailed,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_SendFailed'),
 					new List<Object>{
 						unstamp.size(),
 						signups.size(),
@@ -147,25 +147,25 @@ public with sharing class VolunteerReminderService {
 		String greeting = String.isBlank(firstName)
 			? System.Label.Volunteers_Reminders_GreetingNoName
 			: String.format(
-					System.Label.Volunteers_Reminders_Greeting,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_Greeting'),
 					new List<Object>{ firstName }
 			  );
 		String body =
 			greeting +
 			'\n\n' +
 			String.format(
-				System.Label.Volunteers_Reminders_Body,
+				BarnHelp.text('Volunteers', 'Volunteers_Reminders_Body'),
 				new List<Object>{ jobName, whenText }
 			);
 		if (String.isNotBlank(shift.Location__c)) {
 			body +=
 				'\n' +
 				String.format(
-					System.Label.Volunteers_Reminders_Where,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_Where'),
 					new List<Object>{ shift.Location__c }
 				);
 		}
-		body += '\n\n' + System.Label.Volunteers_Reminders_Closing;
+		body += '\n\n' + BarnHelp.text('Volunteers', 'Volunteers_Reminders_Closing');
 		String page = signup.Contact__c == null ? null : personalPageLink(signup.Id);
 		if (page != null) {
 			body +=
@@ -180,7 +180,10 @@ public with sharing class VolunteerReminderService {
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ email });
 		message.setSubject(
-			String.format(System.Label.Volunteers_Reminders_Subject, new List<Object>{ jobName })
+			String.format(
+				BarnHelp.text('Volunteers', 'Volunteers_Reminders_Subject'),
+				new List<Object>{ jobName }
+			)
 		);
 		message.setPlainTextBody(body);
 		message.setSaveAsActivity(false);

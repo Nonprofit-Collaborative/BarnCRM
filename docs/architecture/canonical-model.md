@@ -10524,8 +10524,8 @@ bypass stops it (R-A4).
   Reason, listed as one Kept row with the count of entries that have one. It reads everything
   first, and when the person has any Volunteers record or generated letter it refuses, before
   any change, a user lacking Manage Volunteers, edit on hours and sign-ups or delete on volunteer
-  skills and requirements, with `PersonErasure.ErasureException` and the label
-  `Volunteers_Erase_NeedVolunteersAccess` ("To erase a volunteer you also need Volunteers Admin
+  skills and requirements, with `PersonErasure.ErasureException` and the help text
+  `Volunteers_Erase_NeedVolunteersAccess` in `BarnHelp_Volunteers` ("To erase a volunteer you also need Volunteers Admin
   or Volunteers Coordinator."); a person with none is erased by anyone Core allows. It deletes
   the hour letters and certificates BarnCRM generated for the person (R-VL4; amends D-108),
   listed as Deleted under "Hour letters and certificates": a file linked to the person, saved

@@ -106,7 +106,9 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 			Schema.SObjectType.Volunteer_Skill__c.isDeletable() &&
 			Schema.SObjectType.Volunteer_Requirement__c.isDeletable();
 		if (!allowed) {
-			throw new PersonErasure.ErasureException(Label.Volunteers_Erase_NeedVolunteersAccess);
+			throw new PersonErasure.ErasureException(
+				BarnHelp.text('Volunteers', 'Volunteers_Erase_NeedVolunteersAccess')
+			);
 		}
 	}
 
@@ -184,7 +186,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 				PersonErasure.KEPT,
 				objectLabel,
 				entries.size(),
-				Label.Volunteers_Erase_HoursKept
+				BarnHelp.text('Volunteers', 'Volunteers_Erase_HoursKept')
 			)
 		);
 		List<Volunteer_Hours__c> cleared = new List<Volunteer_Hours__c>();
@@ -239,7 +241,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 				PersonErasure.KEPT,
 				objectLabel,
 				signups.size(),
-				Label.Volunteers_Erase_SignupsKept
+				BarnHelp.text('Volunteers', 'Volunteers_Erase_SignupsKept')
 			)
 		);
 		Datetime now = Datetime.now();

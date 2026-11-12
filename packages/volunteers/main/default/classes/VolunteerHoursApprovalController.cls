@@ -128,7 +128,9 @@ public with sharing class VolunteerHoursApprovalController {
 	public static ActionResult reject(List<Id> hoursIds, String reason) {
 		Set<Id> ids = checked(hoursIds);
 		if (String.isBlank(reason)) {
-			throw UserErrors.message(Label.Volunteers_Hours_RejectionReasonRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_RejectionReasonRequired')
+			);
 		}
 		try {
 			return resultOf(VolunteerHoursService.reject(ids, reason));
@@ -152,15 +154,19 @@ public with sharing class VolunteerHoursApprovalController {
 	/** The permission first, then a list that is present and not too long. */
 	private static Set<Id> checked(List<Id> hoursIds) {
 		if (!VolunteerHoursService.canManage()) {
-			throw UserErrors.message(Label.Volunteers_Hours_NeedManagePermission);
+			throw UserErrors.message(
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission')
+			);
 		}
 		if (hoursIds == null || hoursIds.isEmpty()) {
-			throw UserErrors.message(Label.Volunteers_Approve_NothingSelected);
+			throw UserErrors.message(
+				BarnHelp.text('Volunteers', 'Volunteers_Approve_NothingSelected')
+			);
 		}
 		if (hoursIds.size() > MAX_PER_CALL) {
 			throw UserErrors.message(
 				String.format(
-					Label.Volunteers_Approve_TooMany,
+					BarnHelp.text('Volunteers', 'Volunteers_Approve_TooMany'),
 					new List<String>{ String.valueOf(MAX_PER_CALL) }
 				)
 			);

@@ -207,7 +207,7 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 		}
 		List<String> lines = new List<String>{
 			String.format(
-				Label.Volunteers_JobNotice_LettersBody,
+				BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersBody'),
 				new List<Object>{ made.format(), skipped.format(), failed.format() }
 			)
 		};
@@ -216,7 +216,7 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 		for (String reason : reasons) {
 			lines.add(
 				String.format(
-					Label.Volunteers_JobNotice_LettersSkipped,
+					BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersSkipped'),
 					new List<Object>{ skippedByReason.get(reason).format(), reason }
 				)
 			);

@@ -1,7 +1,13 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import VolunteerSuggestions from 'c/volunteerSuggestions';
 import getSuggestions from '@salesforce/apex/VolunteerSuggestionController.getSuggestions';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
+
+setHelpTextForTest({
+  Volunteers_Suggestions_Booked: '{0} is signed up.',
+  Volunteers_Suggestions_MoreConsidered: 'Ranked from {0}'
+});
 
 jest.mock(
   '@salesforce/apex/VolunteerSuggestionController.getSuggestions',
@@ -12,13 +18,6 @@ jest.mock(
   '@salesforce/apex/VolunteerShiftSignupsController.addSignup',
   () => ({ default: jest.fn() }),
   { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Volunteers_Suggestions_Booked',
-  () => ({ default: '{0} is signed up.' }),
-  {
-    virtual: true
-  }
 );
 jest.mock(
   '@salesforce/label/c.Volunteers_Suggestions_SignUpFor',
@@ -35,11 +34,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Volunteers_Suggestions_ReasonSkills',
   () => ({ default: 'Has {0} of {1} skills' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Volunteers_Suggestions_MoreConsidered',
-  () => ({ default: 'Ranked from {0}' }),
   { virtual: true }
 );
 

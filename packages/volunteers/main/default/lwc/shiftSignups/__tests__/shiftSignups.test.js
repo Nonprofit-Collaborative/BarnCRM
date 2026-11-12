@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 
 const mockNavigate = jest.fn();
@@ -23,6 +24,11 @@ import setStatus from '@salesforce/apex/VolunteerShiftSignupsController.setStatu
 import closeShift from '@salesforce/apex/VolunteerShiftSignupsController.closeShift';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
+setHelpTextForTest({
+  Volunteers_Signups_NoHoursWarning: '{0} has no hours.',
+  Volunteers_Signups_HoursWritten: 'Hours recorded.'
+});
+
 jest.mock(
   '@salesforce/apex/VolunteerShiftSignupsController.closeShift',
   () => ({ default: jest.fn() }),
@@ -46,16 +52,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Volunteers_Signups_MarkAttended',
   () => ({ default: 'Mark {0} attended' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Volunteers_Signups_NoHoursWarning',
-  () => ({ default: '{0} has no hours.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Volunteers_Signups_HoursWritten',
-  () => ({ default: 'Hours recorded.' }),
   { virtual: true }
 );
 

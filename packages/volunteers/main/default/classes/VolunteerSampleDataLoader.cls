@@ -274,7 +274,10 @@ public with sharing class VolunteerSampleDataLoader {
 		}
 		VolunteerHoursService.reopen(submitted);
 		if (!rejected.isEmpty()) {
-			VolunteerHoursService.reject(rejected, Label.Volunteers_SampleData_RejectionReason);
+			VolunteerHoursService.reject(
+				rejected,
+				BarnHelp.text('Volunteers', 'Volunteers_SampleData_RejectionReason')
+			);
 		}
 		VolunteerHoursService.approve(approved);
 	}
@@ -330,7 +333,7 @@ public with sharing class VolunteerSampleDataLoader {
 		if (sentences.isEmpty()) {
 			return null;
 		}
-		sentences.add(Label.Volunteers_SampleData_KeptNext);
+		sentences.add(BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptNext'));
 		String message = String.join(sentences, ' ');
 		ErrorLogger.logMessage(message, REMOVE_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		return message;
@@ -373,7 +376,7 @@ public with sharing class VolunteerSampleDataLoader {
 					row.Skill__c,
 					row.Skill__r.Name,
 					String.format(
-						Label.Volunteers_SampleData_KeptSkillPerson,
+						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptSkillPerson'),
 						new List<Object>{
 							row.Skill__r.Name,
 							personName(row.Contact__r, row.Account__r)
@@ -386,7 +389,7 @@ public with sharing class VolunteerSampleDataLoader {
 					row.Skill__c,
 					row.Skill__r.Name,
 					String.format(
-						Label.Volunteers_SampleData_KeptSkillJob,
+						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptSkillJob'),
 						new List<Object>{ row.Skill__r.Name, row.Job__r.Name }
 					)
 				);
@@ -479,7 +482,7 @@ public with sharing class VolunteerSampleDataLoader {
 								: Label.Volunteers_SampleData_KeptSignup;
 					result.add(
 						String.format(
-							Label.Volunteers_SampleData_KeptShift,
+							BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptShift'),
 							new List<Object>{ shiftNames.get(shiftId), person, what }
 						)
 					);
@@ -489,7 +492,7 @@ public with sharing class VolunteerSampleDataLoader {
 				if (jobsOfShifts.contains(jobId)) {
 					result.add(
 						String.format(
-							Label.Volunteers_SampleData_KeptJobShifts,
+							BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptJobShifts'),
 							new List<Object>{ jobNames.get(jobId) }
 						)
 					);
@@ -498,7 +501,7 @@ public with sharing class VolunteerSampleDataLoader {
 					for (String person : jobHoursPeople.get(jobId)) {
 						result.add(
 							String.format(
-								Label.Volunteers_SampleData_KeptJobHours,
+								BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptJobHours'),
 								new List<Object>{ jobNames.get(jobId), person }
 							)
 						);
@@ -546,7 +549,7 @@ public with sharing class VolunteerSampleDataLoader {
 			} else {
 				problems.add(
 					String.format(
-						Label.Volunteers_SampleData_NotRemoved,
+						BarnHelp.text('Volunteers', 'Volunteers_SampleData_NotRemoved'),
 						new List<Object>{ results[i].getErrors()[0].getMessage() }
 					)
 				);

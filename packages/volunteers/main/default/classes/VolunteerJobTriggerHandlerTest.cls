@@ -38,7 +38,7 @@ private class VolunteerJobTriggerHandlerTest {
 			for (Database.DeleteResult result : usedResults) {
 				Assert.isFalse(result.isSuccess(), 'A job with shifts is kept.');
 				Assert.areEqual(
-					Label.Volunteers_Job_InUseNotDeletable,
+					BarnHelp.text('Volunteers', 'Volunteers_Job_InUseNotDeletable'),
 					result.getErrors()[0].getMessage(),
 					'And the message says to clear Active instead.'
 				);
@@ -69,7 +69,7 @@ private class VolunteerJobTriggerHandlerTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Volunteers_Job_InUseNotDeletable,
+				BarnHelp.text('Volunteers', 'Volunteers_Job_InUseNotDeletable'),
 				message,
 				'Approved hours keep their job: the rule always runs, paused or not.'
 			);

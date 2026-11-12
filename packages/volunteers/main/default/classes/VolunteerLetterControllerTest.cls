@@ -177,7 +177,7 @@ private class VolunteerLetterControllerTest {
 		Assert.isTrue(((List<Object>) staff.get('templates')).isEmpty(), 'Nothing offered.');
 		Assert.isFalse((Boolean) household.get('isPerson'), 'A household is not a person.');
 		Assert.areEqual(
-			Label.Volunteers_Letter_BadPeriod,
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'),
 			refused,
 			'The reason reaches the screen.'
 		);
@@ -254,7 +254,7 @@ private class VolunteerLetterControllerTest {
 
 		Assert.areEqual(1, chosen, 'A person chosen twice gets one letter.');
 		Assert.areEqual(
-			Label.Volunteers_Letter_NeedManagePermission,
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission'),
 			refused,
 			'Staff are told why not.'
 		);

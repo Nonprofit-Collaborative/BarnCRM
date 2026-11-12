@@ -132,8 +132,8 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 				withFirstListed(
 					oneOrMany(
 						howMany,
-						Label.Volunteers_HealthCheck_HoursWaitingDetailOne,
-						Label.Volunteers_HealthCheck_HoursWaitingDetail
+						BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_HoursWaitingDetailOne'),
+						BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_HoursWaitingDetail')
 					),
 					howMany
 				),
@@ -269,8 +269,14 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 				String.format(
 					oneOrMany(
 						howMany,
-						Label.Volunteers_HealthCheck_CoordinatorAccessDetailOne,
-						Label.Volunteers_HealthCheck_CoordinatorAccessDetail
+						BarnHelp.text(
+							'Volunteers',
+							'Volunteers_HealthCheck_CoordinatorAccessDetailOne'
+						),
+						BarnHelp.text(
+							'Volunteers',
+							'Volunteers_HealthCheck_CoordinatorAccessDetail'
+						)
 					),
 					values
 				),
@@ -319,8 +325,8 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 				String.format(
 					oneOrMany(
 						howMany,
-						Label.Volunteers_HealthCheck_RollupsOffDetailOne,
-						Label.Volunteers_HealthCheck_RollupsOffDetail
+						BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_RollupsOffDetailOne'),
+						BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_RollupsOffDetail')
 					),
 					values
 				),
@@ -356,7 +362,7 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 		}
 		new VolunteersAccessSync().requestSync();
 		return String.format(
-			Label.Volunteers_HealthCheck_CoordinatorAccessDone,
+			BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_CoordinatorAccessDone'),
 			new List<Object>{ String.join(scope, ', ') }
 		);
 	}
