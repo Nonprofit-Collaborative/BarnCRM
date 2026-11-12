@@ -16,6 +16,10 @@ import LightningConfirm from 'lightning/confirm';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
+  Core_RollupEase_DeleteQuestion: 'Delete {0}? This cannot be undone.'
+});
+
+setHelpTextForTest({
   Core_Rollups_RecalculateStarted: 'Recalculation started.',
   Core_Rollups_ScheduleActive: 'Nightly recalculation is scheduled for {0}.'
 });
@@ -84,11 +88,6 @@ jest.mock('@salesforce/apex/RollupController.runTonight', () => ({ default: jest
 jest.mock('@salesforce/apex/RollupController.deleteRollup', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupEase_DeleteQuestion',
-  () => ({ default: 'Delete {0}? This cannot be undone.' }),
-  { virtual: true }
-);
 setHelpTextForTest({ Core_RollupBuilder_DeleteShipped: 'Switch it off instead.' });
 
 const mockNavigate = jest.fn();

@@ -90,14 +90,17 @@ private class RollupExplainTest {
 			System.Assert.areEqual(RollupSentence.of(rollup), only.sentence);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_ExplainCounts,
+					BarnHelp.text('Rollups', 'Core_RollupEase_ExplainCounts'),
 					new List<String>{ (2).format(), (3).format(), (1).format() }
 				),
 				only.counts,
 				'Two kids count, Other is left out'
 			);
 			System.Assert.areEqual(3, only.rows.rows.size());
-			System.Assert.areEqual(Label.Core_RollupEase_ExplainNever, only.lastCalculated);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupEase_ExplainNever'),
+				only.lastCalculated
+			);
 			System.Assert.areEqual(
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),

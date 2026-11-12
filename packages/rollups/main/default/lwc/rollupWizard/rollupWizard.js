@@ -49,25 +49,13 @@ import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfi
 import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
 import LightningConfirm from 'lightning/confirm';
-import BUILDER_SENTENCE from '@salesforce/label/c.Core_RollupEase_BuilderSentence';
 import NOT_CHOSEN from '@salesforce/label/c.Core_RollupEase_NotChosen';
 import EVERY_RECORD from '@salesforce/label/c.Core_RollupEase_EveryRecord';
 import SOME_RECORDS from '@salesforce/label/c.Core_RollupEase_SomeRecords';
 import TARGET_PART from '@salesforce/label/c.Core_Format_Pair';
-import NOT_FOR_FIELD from '@salesforce/label/c.Core_RollupEase_NotForField';
-import FIELDS_NUMBERS from '@salesforce/label/c.Core_RollupEase_FieldsNumbers';
-import FIELDS_NUMBERS_DATES from '@salesforce/label/c.Core_RollupEase_FieldsNumbersDates';
-import NO_FIELD_FITS from '@salesforce/label/c.Core_RollupEase_NoFieldFits';
 import MODE_HEADING from '@salesforce/label/c.Core_RollupEase_ModeHeading';
-import MODE_INSTANT_AFTER from '@salesforce/label/c.Core_RollupEase_ModeInstantAfter';
-import MODE_INSTANT_DURING from '@salesforce/label/c.Core_RollupEase_ModeInstantDuring';
-import MODE_INSTANT_NONE from '@salesforce/label/c.Core_RollupEase_ModeInstantNone';
-import MODE_NIGHTLY from '@salesforce/label/c.Core_RollupEase_ModeNightly';
-import MODE_BOTH_TEXT from '@salesforce/label/c.Core_RollupEase_ModeBoth';
-import MODE_BOTH_NO_INSTANT from '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant';
 import PICK_SAMPLES from '@salesforce/label/c.Core_RollupEase_PickSamples';
 import SAMPLES_HEADING from '@salesforce/label/c.Core_RollupEase_SamplesHeading';
-import SAMPLES_NONE from '@salesforce/label/c.Core_RollupEase_SamplesNone';
 import SHOW_ROWS from '@salesforce/label/c.Core_RollupEase_ShowRows';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
 import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
@@ -82,7 +70,6 @@ import KIND_TEXT from '@salesforce/label/c.Core_ImportNewField_TypeText';
 import KIND_LONGTEXT from '@salesforce/label/c.Core_RollupEase_KindLongText';
 import KIND_CHECKBOX from '@salesforce/label/c.Core_ImportNewField_TypeCheckbox';
 import WRITE_FIELD from '@salesforce/label/c.Core_RollupEase_WriteField';
-import FIELD_DEPLOY from '@salesforce/label/c.Core_RollupEase_FieldDeploy';
 import DOWNLOAD_FIELD from '@salesforce/label/c.Core_RollupEase_DownloadField';
 import REFRESH_FIELDS from '@salesforce/label/c.Core_ImportNewField_RefreshButton';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
@@ -216,7 +203,9 @@ export default class RollupWizard extends LightningElement {
       return helpText('Rollups', 'Core_RollupEase_PickSamplesHelp');
     },
     samplesHeading: SAMPLES_HEADING,
-    samplesNone: SAMPLES_NONE,
+    get samplesNone() {
+      return helpText('Rollups', 'Core_RollupEase_SamplesNone');
+    },
     showRows: SHOW_ROWS,
     rowsHeading: ROWS_HEADING,
     createField: CREATE_FIELD,
@@ -500,7 +489,11 @@ export default class RollupWizard extends LightningElement {
       .filter((option) => !allowed.has(option.value))
       .map((option) => option.label);
     return hidden.length
-      ? format(NOT_FOR_FIELD, this.targetFieldLabel, hidden.join(', '))
+      ? format(
+          helpText('Rollups', 'Core_RollupEase_NotForField'),
+          this.targetFieldLabel,
+          hidden.join(', ')
+        )
       : undefined;
   }
 
@@ -510,13 +503,19 @@ export default class RollupWizard extends LightningElement {
       return undefined;
     }
     if (this.sourceFields.length && !this.copyFieldOptions.length) {
-      return format(NO_FIELD_FITS, this.chosenAggregateLabel);
+      return format(helpText('Rollups', 'Core_RollupEase_NoFieldFits'), this.chosenAggregateLabel);
     }
     if (READS_NUMBERS.has(this.current.aggregate)) {
-      return format(FIELDS_NUMBERS, this.chosenAggregateLabel);
+      return format(
+        helpText('Rollups', 'Core_RollupEase_FieldsNumbers'),
+        this.chosenAggregateLabel
+      );
     }
     if (READS_NUMBERS_OR_DATES.has(this.current.aggregate)) {
-      return format(FIELDS_NUMBERS_DATES, this.chosenAggregateLabel);
+      return format(
+        helpText('Rollups', 'Core_RollupEase_FieldsNumbersDates'),
+        this.chosenAggregateLabel
+      );
     }
     return undefined;
   }
@@ -566,7 +565,8 @@ export default class RollupWizard extends LightningElement {
    */
   get sentenceParts() {
     const values = this.sentenceValues;
-    return BUILDER_SENTENCE.split(/(\{\d\})/)
+    return helpText('Rollups', 'Core_RollupEase_BuilderSentence')
+      .split(/(\{\d\})/)
       .filter((piece) => piece !== '')
       .map((piece, index) => {
         const match = /^\{(\d)\}$/.exec(piece);
@@ -606,22 +606,27 @@ export default class RollupWizard extends LightningElement {
     const time = this.model && this.model.nightlyTime ? this.model.nightlyTime : '';
     let instantly;
     if (!this.sourceIsInstant) {
-      instantly = format(MODE_INSTANT_NONE, records);
+      instantly = format(helpText('Rollups', 'Core_RollupEase_ModeInstantNone'), records);
     } else {
       instantly = format(
-        this.model && this.model.inSave ? MODE_INSTANT_DURING : MODE_INSTANT_AFTER,
+        this.model && this.model.inSave
+          ? helpText('Rollups', 'Core_RollupEase_ModeInstantDuring')
+          : helpText('Rollups', 'Core_RollupEase_ModeInstantAfter'),
         target,
         records
       );
     }
     return [
       { key: 'instantly', text: instantly },
-      { key: 'nightly', text: format(MODE_NIGHTLY, target, time) },
+      {
+        key: 'nightly',
+        text: format(helpText('Rollups', 'Core_RollupEase_ModeNightly'), target, time)
+      },
       {
         key: 'both',
         text: this.sourceIsInstant
-          ? format(MODE_BOTH_TEXT, time)
-          : format(MODE_BOTH_NO_INSTANT, time, records)
+          ? format(helpText('Rollups', 'Core_RollupEase_ModeBoth'), time)
+          : format(helpText('Rollups', 'Core_RollupEase_ModeBothNoInstant'), time, records)
       }
     ];
   }
@@ -801,7 +806,10 @@ export default class RollupWizard extends LightningElement {
   }
 
   get fieldDeployText() {
-    return FIELD_DEPLOY.replace('{0}', this.generatedField.fileName);
+    return helpText('Rollups', 'Core_RollupEase_FieldDeploy').replace(
+      '{0}',
+      this.generatedField.fileName
+    );
   }
 
   handleOpenCreateField() {

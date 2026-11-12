@@ -246,7 +246,7 @@ public with sharing class RollupController {
 			if (sharer != null) {
 				throw new RollupService.RollupServiceException(
 					String.format(
-						Label.Core_RollupEase_ClearShared,
+						BarnHelp.text('Rollups', 'Core_RollupEase_ClearShared'),
 						new List<String>{ sharer.Name }
 					)
 				);

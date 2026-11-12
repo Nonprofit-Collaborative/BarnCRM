@@ -57,13 +57,10 @@ import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsCo
 import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
 import GROUP from '@salesforce/label/c.Core_Format_Parenthetical';
-import NO_MATCHES from '@salesforce/label/c.Core_RollupEase_NoMatches';
 import DELETE_HEADING from '@salesforce/label/c.Core_RollupEase_DeleteHeading';
-import DELETE_QUESTION from '@salesforce/label/c.Core_RollupEase_DeleteQuestion';
 import DELETE_CHOICE from '@salesforce/label/c.Core_RollupEase_DeleteChoice';
 import DELETE_KEEP from '@salesforce/label/c.Core_RollupEase_DeleteKeep';
 import DELETE_CLEAR from '@salesforce/label/c.Core_RollupEase_DeleteClear';
-import DELETED_CLEARED from '@salesforce/label/c.Core_RollupEase_DeletedCleared';
 import { bodyMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -198,7 +195,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     get searchHelp() {
       return helpText('Rollups', 'Core_RollupEase_SearchHelp');
     },
-    noMatches: NO_MATCHES,
+    get noMatches() {
+      return helpText('Rollups', 'Core_RollupEase_NoMatches');
+    },
     deleteHeading: DELETE_HEADING,
     deleteChoice: DELETE_CHOICE
   };
@@ -503,7 +502,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
   }
 
   get deleteQuestion() {
-    return this.deleting ? DELETE_QUESTION.replace('{0}', this.deleting.name) : '';
+    return this.deleting
+      ? helpText('Rollups', 'Core_RollupEase_DeleteQuestion').replace('{0}', this.deleting.name)
+      : '';
   }
 
   get deleteOptions() {
@@ -529,7 +530,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     return this.runAction(
       deleteRollup({ definitionId, clearValues }),
       undefined,
-      clearValues ? DELETED_CLEARED : this.labels.deleted
+      clearValues ? helpText('Rollups', 'Core_RollupEase_DeletedCleared') : this.labels.deleted
     );
   }
 

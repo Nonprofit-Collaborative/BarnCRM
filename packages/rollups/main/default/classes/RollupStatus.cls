@@ -60,13 +60,16 @@ public with sharing class RollupStatus {
 			return new State(
 				LEVEL_FAILED,
 				String.format(
-					Label.Core_RollupEase_StatusFailed,
+					BarnHelp.text('Rollups', 'Core_RollupEase_StatusFailed'),
 					new List<String>{ failed.format() }
 				)
 			);
 		}
 		if (running) {
-			return new State(LEVEL_RUNNING, Label.Core_RollupEase_StatusRunning);
+			return new State(
+				LEVEL_RUNNING,
+				BarnHelp.text('Rollups', 'Core_RollupEase_StatusRunning')
+			);
 		}
 		if (waiting != null && waiting > 0) {
 			return new State(

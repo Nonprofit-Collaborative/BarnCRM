@@ -51,7 +51,7 @@ private class RollupFieldGeneratorTest {
 			System.Assert.areEqual(4, field.steps.size(), 'Open, type and name, access, back');
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_FieldStepType,
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepType'),
 					new List<String>{
 						Label.Core_ImportNewField_TypeNumber,
 						'Rollup Test Tally',
@@ -142,21 +142,21 @@ private class RollupFieldGeneratorTest {
 			System.runAs(maria()) {
 				System.Assert.areEqual(
 					String.format(
-						Label.Core_RollupEase_FieldExists,
+						BarnHelp.text('Rollups', 'Core_RollupEase_FieldExists'),
 						new List<String>{ 'Member_Count__c' }
 					),
 					refusal('Account', 'Member Count', 'NUMBER')
 				);
 				System.Assert.areEqual(
-					Label.Core_RollupEase_FieldLabelProblem,
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldLabelProblem'),
 					refusal('Account', '  ', 'NUMBER')
 				);
 				System.Assert.areEqual(
-					Label.Core_RollupEase_FieldLabelProblem,
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldLabelProblem'),
 					refusal('No_Such_Object__c', 'Rollup Test Tally', 'NUMBER')
 				);
 				System.Assert.areEqual(
-					Label.Core_RollupEase_FieldKindProblem,
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldKindProblem'),
 					refusal('Account', 'Rollup Test Tally', 'PICKLIST')
 				);
 			}

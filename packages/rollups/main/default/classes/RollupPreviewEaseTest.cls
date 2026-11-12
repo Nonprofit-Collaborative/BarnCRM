@@ -88,7 +88,7 @@ private class RollupPreviewEaseTest {
 			);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_RowsShown,
+					BarnHelp.text('Rollups', 'Core_RollupEase_RowsShown'),
 					new List<String>{ (3).format(), (3).format() }
 				),
 				preview.rows.summary
@@ -125,7 +125,10 @@ private class RollupPreviewEaseTest {
 			}
 
 			System.Assert.areEqual(0, preview.rows.total);
-			System.Assert.areEqual(Label.Core_RollupEase_RowsNone, preview.rows.note);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupEase_RowsNone'),
+				preview.rows.note
+			);
 			System.Assert.isNull(preview.rows.summary);
 		}
 	}

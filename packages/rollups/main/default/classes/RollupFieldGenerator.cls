@@ -71,12 +71,12 @@ public with sharing class RollupFieldGenerator {
 			String trimmed = fieldLabel == null ? '' : fieldLabel.trim();
 			if (targetType == null || String.isBlank(trimmed) || trimmed.length() > NAME_LENGTH) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupEase_FieldLabelProblem
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldLabelProblem')
 				);
 			}
 			if (String.isBlank(kind) || !KINDS.containsKey(kind)) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupEase_FieldKindProblem
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldKindProblem')
 				);
 			}
 			Schema.DescribeSObjectResult described = targetType.getDescribe(
@@ -85,13 +85,16 @@ public with sharing class RollupFieldGenerator {
 			String name = nameFor(trimmed);
 			if (String.isBlank(name)) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupEase_FieldLabelProblem
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldLabelProblem')
 				);
 			}
 			String apiName = name + '__c';
 			if (described.fields.getMap().containsKey(apiName.toLowerCase())) {
 				throw new RollupService.RollupServiceException(
-					String.format(Label.Core_RollupEase_FieldExists, new List<String>{ apiName })
+					String.format(
+						BarnHelp.text('Rollups', 'Core_RollupEase_FieldExists'),
+						new List<String>{ apiName }
+					)
 				);
 			}
 			String objectName = described.getName();
@@ -111,15 +114,18 @@ public with sharing class RollupFieldGenerator {
 			field.fileName = 'BarnRollupField_' + objectName + '_' + apiName + '.zip';
 			field.steps = new List<String>{
 				String.format(
-					Label.Core_RollupEase_FieldStepOpen,
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepOpen'),
 					new List<String>{ described.getLabel() }
 				),
 				String.format(
-					Label.Core_RollupEase_FieldStepType,
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepType'),
 					new List<String>{ KINDS.get(kind), trimmed, name }
 				),
-				Label.Core_RollupEase_FieldStepAccess,
-				String.format(Label.Core_RollupEase_FieldStepBack, new List<String>{ trimmed })
+				BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepAccess'),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepBack'),
+					new List<String>{ trimmed }
+				)
 			};
 			return field;
 		} catch (Exception caught) {
@@ -155,7 +161,7 @@ public with sharing class RollupFieldGenerator {
 			'    <label>' +
 			fieldLabel.escapeXml() +
 			'</label>\n    <description>' +
-			Label.Core_RollupEase_FieldDescription.escapeXml() +
+			BarnHelp.text('Rollups', 'Core_RollupEase_FieldDescription').escapeXml() +
 			'</description>\n    <externalId>false</externalId>\n';
 		if (kind == 'NUMBER' || kind == 'CURRENCY') {
 			body +=

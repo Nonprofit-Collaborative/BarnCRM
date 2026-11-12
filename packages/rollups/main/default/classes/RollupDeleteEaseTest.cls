@@ -113,7 +113,10 @@ private class RollupDeleteEaseTest {
 			}
 
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupEase_ClearShared, new List<String>{ 'New count' }),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_ClearShared'),
+					new List<String>{ 'New count' }
+				),
 				message
 			);
 			System.Assert.areEqual(
