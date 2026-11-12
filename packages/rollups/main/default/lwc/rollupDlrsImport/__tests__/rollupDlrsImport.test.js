@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupDlrsImport from 'c/rollupDlrsImport';
 import LightningConfirm from 'lightning/confirm';
@@ -5,6 +6,13 @@ import getCandidates from '@salesforce/apex/RollupDlrsImport.getCandidates';
 import importRollups from '@salesforce/apex/RollupDlrsImport.importRollups';
 import compare from '@salesforce/apex/RollupDlrsImport.compare';
 import turnOn from '@salesforce/apex/RollupDlrsImport.turnOn';
+
+setHelpTextForTest({
+  Core_RollupBuilder_DlrsImportBecomes: 'Becomes a {0} on {1}',
+  Core_RollupBuilder_DlrsImportRefused: 'Not copied: {0}',
+  Core_RollupBuilder_DlrsImportFinished: '{0} turned on',
+  Core_RollupBuilder_DlrsConfirmQuestion: 'Click OK.'
+});
 
 jest.mock('@salesforce/apex/RollupDlrsImport.getCandidates', () => ({ default: jest.fn() }), {
   virtual: true
@@ -25,35 +33,9 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportBecomes',
-  () => ({ default: 'Becomes a {0} on {1}' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportRefused',
-  () => ({ default: 'Not copied: {0}' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished',
-  () => ({ default: '{0} turned on' }),
-  {
-    virtual: true
-  }
-);
 jest.mock('@salesforce/label/c.Core_RollupBuilder_DlrsImportSame', () => ({ default: 'Same' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion',
-  () => ({ default: 'Click OK.' }),
-  {
-    virtual: true
-  }
-);
 
 const MODEL = { aggregates: [{ value: 'COUNT', label: 'Count' }] };
 const CANDIDATES = [

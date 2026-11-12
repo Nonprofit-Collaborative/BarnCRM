@@ -234,7 +234,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 					'rollup_two_tools_same_field',
 					System.Label.Core_HealthCheck_TwoToolsTitle,
 					String.format(
-						System.Label.Core_HealthCheck_TwoToolsDetail,
+						BarnHelp.text('Rollups', 'Core_HealthCheck_TwoToolsDetail'),
 						new List<Object>{ String.join(pairs, '; ') }
 					),
 					HealthCheckService.SEVERITY_WARNING,

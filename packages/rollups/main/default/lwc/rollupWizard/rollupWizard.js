@@ -46,7 +46,6 @@ import SAVE_AND_CALCULATE from '@salesforce/label/c.Core_RollupBuilder_SaveAndCa
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
-import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
 import LightningConfirm from 'lightning/confirm';
 import NOT_CHOSEN from '@salesforce/label/c.Core_RollupEase_NotChosen';
@@ -74,7 +73,6 @@ import DOWNLOAD_FIELD from '@salesforce/label/c.Core_RollupEase_DownloadField';
 import REFRESH_FIELDS from '@salesforce/label/c.Core_ImportNewField_RefreshButton';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
-import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The combobox value for no bypass permission; a custom permission name never looks like it. */
@@ -844,7 +842,7 @@ export default class RollupWizard extends LightningElement {
   handleCopyField() {
     const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
     if (!clipboard || !clipboard.writeText) {
-      this.fieldNotice = COPY_FAILED;
+      this.fieldNotice = helpText('Rollups', 'Core_RollupBuilder_InstantCopyFailed');
       return Promise.resolve();
     }
     return clipboard
@@ -853,7 +851,7 @@ export default class RollupWizard extends LightningElement {
         this.fieldNotice = COPIED;
       })
       .catch(() => {
-        this.fieldNotice = COPY_FAILED;
+        this.fieldNotice = helpText('Rollups', 'Core_RollupBuilder_InstantCopyFailed');
       });
   }
 
@@ -1118,7 +1116,7 @@ export default class RollupWizard extends LightningElement {
   async askDlrs(conflict, draft, calculateNow) {
     const confirmed = await LightningConfirm.open({
       label: DLRS_CONFIRM_TITLE,
-      message: `${conflict} ${DLRS_CONFIRM_QUESTION}`,
+      message: `${conflict} ${helpText('Rollups', 'Core_RollupBuilder_DlrsConfirmQuestion')}`,
       theme: 'warning'
     });
     return confirmed ? saveSwitchingOffDlrs({ draft, calculateNow }) : undefined;

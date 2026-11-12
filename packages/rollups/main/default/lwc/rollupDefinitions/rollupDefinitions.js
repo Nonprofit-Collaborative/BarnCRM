@@ -53,7 +53,6 @@ import IMPORT_UPDATED from '@salesforce/label/c.Core_Import_ResultUpdated';
 import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
 import turnOnSwitchingOffDlrs from '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
-import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
 import GROUP from '@salesforce/label/c.Core_Format_Parenthetical';
@@ -395,7 +394,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     if (active && rollup && rollup.otherToolConflict) {
       const confirmed = await LightningConfirm.open({
         label: DLRS_CONFIRM_TITLE,
-        message: `${rollup.otherToolConflict} ${DLRS_CONFIRM_QUESTION}`,
+        message: `${rollup.otherToolConflict} ${helpText('Rollups', 'Core_RollupBuilder_DlrsConfirmQuestion')}`,
         theme: 'warning'
       });
       if (!confirmed) {

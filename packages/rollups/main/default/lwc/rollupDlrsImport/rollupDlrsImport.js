@@ -12,10 +12,7 @@ import STEP_COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepC
 import STEP_TURN_ON from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepTurnOn';
 import CAN_COPY from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCanCopy';
 import STAYS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStays';
-import NONE_ACTIVE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoneActive';
 import FILLS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFills';
-import BECOMES from '@salesforce/label/c.Core_RollupBuilder_DlrsImportBecomes';
-import NO_CHANGES from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoChanges';
 import COPY from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCopy';
 import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import BACK from '@salesforce/label/c.Core_Kit_Back';
@@ -23,22 +20,14 @@ import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
 import COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
 import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
-import CREATED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCreated';
-import UPDATED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportUpdated';
-import REFUSED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportRefused';
-import NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNotReached';
 import ACTIVE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportActive';
-import NOTHING_COPIED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNothingCopied';
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import VALUE_NOW from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueNow';
 import VALUE_BARN from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueBarn';
 import RESULT from '@salesforce/label/c.Core_Find_Result';
 import SAME from '@salesforce/label/c.Core_RollupBuilder_DlrsImportSame';
-import NO_RECORDS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoRecords';
-import FINISHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished';
 import NPSP_TITLE from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
-import CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CHOOSE_STEP = 'choose';
@@ -48,10 +37,16 @@ const TURN_ON_STEP = 'turnOn';
 /** Outcomes that leave a copy in BarnCRM (`RollupDlrsImport`). */
 const COPIED = new Set(['created', 'updated', 'active']);
 const OUTCOME_TEXT = {
-  created: CREATED,
-  updated: UPDATED,
+  get created() {
+    return helpText('Rollups', 'Core_RollupBuilder_DlrsImportCreated');
+  },
+  get updated() {
+    return helpText('Rollups', 'Core_RollupBuilder_DlrsImportUpdated');
+  },
   active: ACTIVE,
-  notReached: NOT_REACHED
+  get notReached() {
+    return helpText('Rollups', 'Core_RollupBuilder_DlrsImportNotReached');
+  }
 };
 
 const format = (template, ...values) =>
@@ -91,9 +86,11 @@ export default class RollupDlrsImport extends LightningElement {
     get noneActive() {
       return this.npsp
         ? helpText('Rollups', 'Core_RollupBuilder_NpspImportNoneActive')
-        : NONE_ACTIVE;
+        : helpText('Rollups', 'Core_RollupBuilder_DlrsImportNoneActive');
     },
-    noChanges: NO_CHANGES,
+    get noChanges() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportNoChanges');
+    },
     copy: COPY,
     next: NEXT,
     back: BACK,
@@ -101,14 +98,18 @@ export default class RollupDlrsImport extends LightningElement {
     finish: FINISH,
     compare: COMPARE,
     turnOn: TURN_ON,
-    nothingCopied: NOTHING_COPIED,
+    get nothingCopied() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportNothingCopied');
+    },
     record: RECORD,
     get valueNow() {
       return this.npsp ? helpText('Rollups', 'Core_RollupBuilder_NpspImportValueNow') : VALUE_NOW;
     },
     valueBarn: VALUE_BARN,
     result: RESULT,
-    noRecords: NO_RECORDS,
+    get noRecords() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportNoRecords');
+    },
     get finishHint() {
       return helpText('Rollups', 'Core_RollupBuilder_DlrsImportFinishHint');
     }
@@ -213,7 +214,11 @@ export default class RollupDlrsImport extends LightningElement {
         return {
           key: c.key,
           label: c.label,
-          becomes: format(BECOMES, this.aggregateLabel(c.draft.aggregate), this.target(c)),
+          becomes: format(
+            helpText('Rollups', 'Core_RollupBuilder_DlrsImportBecomes'),
+            this.aggregateLabel(c.draft.aggregate),
+            this.target(c)
+          ),
           notes,
           unchanged: notes.length === 0
         };
@@ -229,7 +234,9 @@ export default class RollupDlrsImport extends LightningElement {
         name: row.name,
         recordId: row.recordId,
         outcome:
-          row.outcome === 'refused' ? format(REFUSED, row.reason || '') : OUTCOME_TEXT[row.outcome],
+          row.outcome === 'refused'
+            ? format(helpText('Rollups', 'Core_RollupBuilder_DlrsImportRefused'), row.reason || '')
+            : OUTCOME_TEXT[row.outcome],
         copied: COPIED.has(row.outcome),
         active: row.outcome === 'active',
         switchedOff: COPIED.has(row.outcome) && row.outcome !== 'active',
@@ -317,7 +324,9 @@ export default class RollupDlrsImport extends LightningElement {
     const confirmed = await LightningConfirm.open({
       label: CONFIRM_TITLE,
       message:
-        row && row.confirmation ? `${row.confirmation} ${CONFIRM_QUESTION}` : CONFIRM_QUESTION,
+        row && row.confirmation
+          ? `${row.confirmation} ${helpText('Rollups', 'Core_RollupBuilder_DlrsConfirmQuestion')}`
+          : helpText('Rollups', 'Core_RollupBuilder_DlrsConfirmQuestion'),
       theme: 'warning'
     });
     if (!confirmed) {
@@ -347,7 +356,10 @@ export default class RollupDlrsImport extends LightningElement {
                 'Core_RollupBuilder_NpspImportFinished',
                 String(this.copies.length)
               )
-            : format(FINISHED, String(this.copies.length))
+            : format(
+                helpText('Rollups', 'Core_RollupBuilder_DlrsImportFinished'),
+                String(this.copies.length)
+              )
         }
       })
     );

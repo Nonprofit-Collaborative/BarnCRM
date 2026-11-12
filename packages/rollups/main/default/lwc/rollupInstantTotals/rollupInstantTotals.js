@@ -5,46 +5,41 @@ import getCode from '@salesforce/apex/RollupInstantTotals.getCode';
 import setTurnedOn from '@salesforce/apex/RollupInstantTotals.setTurnedOn';
 
 import TITLE from '@salesforce/label/c.Core_RollupBuilder_InstantTitle';
-import STATUS_BUILT_IN from '@salesforce/label/c.Core_RollupBuilder_InstantStatusBuiltIn';
-import STATUS_ON from '@salesforce/label/c.Core_RollupBuilder_InstantStatusOn';
-import STATUS_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantStatusOff';
-import STATUS_INACTIVE from '@salesforce/label/c.Core_RollupBuilder_InstantStatusInactive';
-import STATUS_NOT_SET_UP from '@salesforce/label/c.Core_RollupBuilder_InstantStatusNotSetUp';
-import STATUS_NOT_AVAILABLE from '@salesforce/label/c.Core_RollupBuilder_InstantStatusNotAvailable';
-import COUNT_MANY from '@salesforce/label/c.Core_RollupBuilder_InstantCount';
-import COUNT_ONE from '@salesforce/label/c.Core_RollupBuilder_InstantCountOne';
-import COUNT_NONE from '@salesforce/label/c.Core_RollupBuilder_InstantCountNone';
 import TURN_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnOn';
 import TURN_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnOff';
 import REMOVE from '@salesforce/label/c.Core_RollupBuilder_InstantRemove';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
-import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 import DOWNLOAD_DEPLOY from '@salesforce/label/c.Core_RollupBuilder_InstantDownloadDeploy';
 import DOWNLOAD_REMOVAL from '@salesforce/label/c.Core_RollupBuilder_InstantDownloadRemoval';
 import SETUP_TITLE from '@salesforce/label/c.Core_RollupBuilder_InstantSetupTitle';
-import SETUP_STEP_1 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep1';
-import SETUP_STEP_2 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep2';
-import SETUP_STEP_3 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep3';
-import SETUP_STEP_4 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep4';
 import REMOVE_TITLE from '@salesforce/label/c.Core_RollupBuilder_InstantRemoveTitle';
-import REMOVE_STEP_2 from '@salesforce/label/c.Core_RollupBuilder_InstantRemoveStep2';
 import TRIGGER_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTriggerHeading';
 import TEST_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTestHeading';
-import TURNED_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOff';
-import TURNED_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOn';
 import { bodyMessage, format } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The states `RollupInstantTotals` reports (ADR-0138). */
 const STATUS_TEXT = {
-  builtIn: STATUS_BUILT_IN,
-  on: STATUS_ON,
-  off: STATUS_OFF,
-  inactive: STATUS_INACTIVE,
-  notSetUp: STATUS_NOT_SET_UP,
-  notAvailable: STATUS_NOT_AVAILABLE
+  get builtIn() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantStatusBuiltIn');
+  },
+  get on() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantStatusOn');
+  },
+  get off() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantStatusOff');
+  },
+  get inactive() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantStatusInactive');
+  },
+  get notSetUp() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantStatusNotSetUp');
+  },
+  get notAvailable() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantStatusNotAvailable');
+  }
 };
 
 /** The status vocabulary word for each state: a trigger that is inactive is the one to look at. */
@@ -189,9 +184,11 @@ export default class RollupInstantTotals extends LightningElement {
 
   countText(count) {
     if (!count) {
-      return COUNT_NONE;
+      return helpText('Rollups', 'Core_RollupBuilder_InstantCountNone');
     }
-    return count === 1 ? COUNT_ONE : format(COUNT_MANY, count);
+    return count === 1
+      ? helpText('Rollups', 'Core_RollupBuilder_InstantCountOne')
+      : format(helpText('Rollups', 'Core_RollupBuilder_InstantCount'), count);
   }
 
   // --------------------------------------------------------------------------------- actions
@@ -251,7 +248,12 @@ export default class RollupInstantTotals extends LightningElement {
         this.states = this.states.map((entry) => {
           return entry.objectApiName === state.objectApiName ? state : entry;
         });
-        this.notice = format(turnedOn ? TURNED_ON : TURNED_OFF, state.objectLabel);
+        this.notice = format(
+          turnedOn
+            ? helpText('Rollups', 'Core_RollupBuilder_InstantTurnedOn')
+            : helpText('Rollups', 'Core_RollupBuilder_InstantTurnedOff'),
+          state.objectLabel
+        );
       })
       .catch((error) => {
         this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
@@ -267,7 +269,7 @@ export default class RollupInstantTotals extends LightningElement {
     this.notice = undefined;
     const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
     if (!clipboard || !clipboard.writeText) {
-      this.notice = COPY_FAILED;
+      this.notice = helpText('Rollups', 'Core_RollupBuilder_InstantCopyFailed');
       return Promise.resolve();
     }
     return clipboard
@@ -276,7 +278,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.notice = COPIED;
       })
       .catch(() => {
-        this.notice = COPY_FAILED;
+        this.notice = helpText('Rollups', 'Core_RollupBuilder_InstantCopyFailed');
       });
   }
 
@@ -303,10 +305,18 @@ export default class RollupInstantTotals extends LightningElement {
   get setupSteps() {
     const code = this.code;
     return [
-      format(SETUP_STEP_1, code.triggerName, this.openObject),
-      format(SETUP_STEP_2, code.testClassName),
-      format(SETUP_STEP_3, code.triggerName, code.testClassName),
-      format(SETUP_STEP_4, code.testClassName),
+      format(
+        helpText('Rollups', 'Core_RollupBuilder_InstantSetupStep1'),
+        code.triggerName,
+        this.openObject
+      ),
+      format(helpText('Rollups', 'Core_RollupBuilder_InstantSetupStep2'), code.testClassName),
+      format(
+        helpText('Rollups', 'Core_RollupBuilder_InstantSetupStep3'),
+        code.triggerName,
+        code.testClassName
+      ),
+      format(helpText('Rollups', 'Core_RollupBuilder_InstantSetupStep4'), code.testClassName),
       helpText('Rollups', 'Core_RollupBuilder_InstantSetupStep5')
     ].map((text, index) => ({ key: `setup-${index}`, text }));
   }
@@ -315,7 +325,11 @@ export default class RollupInstantTotals extends LightningElement {
     const code = this.code;
     return [
       helpText('Rollups', 'Core_RollupBuilder_InstantRemoveStep1'),
-      format(REMOVE_STEP_2, code.triggerName, code.testClassName),
+      format(
+        helpText('Rollups', 'Core_RollupBuilder_InstantRemoveStep2'),
+        code.triggerName,
+        code.testClassName
+      ),
       helpText('Rollups', 'Core_RollupBuilder_InstantRemoveStep3')
     ].map((text, index) => ({ key: `remove-${index}`, text }));
   }
