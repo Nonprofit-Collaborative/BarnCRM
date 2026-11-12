@@ -264,7 +264,7 @@ public with sharing class AccessExplorerController {
 	}
 
 	/**
-	 * People whose name contains the term, active first.
+	 * People with a name word starting with each word of the term, active first.
 	 * @param term at least two characters of a name
 	 * @return up to 20 people
 	 */
@@ -273,14 +273,18 @@ public with sharing class AccessExplorerController {
 		try {
 			requirePermission();
 			List<Choice> choices = new List<Choice>();
-			String pattern = likePattern(term);
-			if (pattern == null) {
+			String searchText = NameSearch.prefixTerm(term);
+			if (searchText == null) {
 				return choices;
 			}
+			// The search index finds the people (D-200 P5); one read by id orders them.
+			Map<Id, SObject> found = new Map<Id, SObject>(
+				NameSearch.find(searchText, 'User(Id LIMIT 200)')[0]
+			);
 			for (User person : [
 				SELECT Id, Name, IsActive, Profile.Name
 				FROM User
-				WHERE Name LIKE :pattern
+				WHERE Id IN :found.keySet()
 				WITH USER_MODE
 				ORDER BY IsActive DESC, Name
 				LIMIT :SEARCH_LIMIT

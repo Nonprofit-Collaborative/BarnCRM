@@ -167,6 +167,7 @@ public with sharing class FindRadius {
 		}
 		FindRelatedRecords.Rendered rendered = new FindRelatedRecords.Rendered();
 		rendered.clause =
+			boundingBox(fieldName, rendered.binds, latitude, longitude, miles) +
 			'DISTANCE(' +
 			fieldName +
 			', GEOLOCATION(:radiusLatitude, :radiusLongitude), \'mi\') < :radiusMiles';
@@ -208,6 +209,49 @@ public with sharing class FindRadius {
 	}
 
 	// ------------------------------------------------------------------------------ helpers
+
+	/**
+	 * Latitude and longitude ranges that hold the whole circle, ANDed ahead of DISTANCE so
+	 * the query narrows on plain number comparisons before measuring each row (D-200 P13).
+	 * One degree of latitude is about 69 miles; a degree of longitude shrinks by the cosine
+	 * of the latitude. Near a pole or across the date line the longitude range is left off,
+	 * and DISTANCE alone decides, as before.
+	 */
+	private static String boundingBox(
+		String fieldName,
+		Map<String, Object> binds,
+		Decimal latitude,
+		Decimal longitude,
+		Decimal miles
+	) {
+		String stem = fieldName.endsWith('__c')
+			? fieldName.removeEnd('__c') + '__'
+			: fieldName.removeEnd('Address');
+		String suffix = fieldName.endsWith('__c') ? '__s' : '';
+		String latitudeName = stem + 'Latitude' + suffix;
+		String longitudeName = stem + 'Longitude' + suffix;
+		Double centerLatitude = latitude.doubleValue();
+		Double centerLongitude = longitude.doubleValue();
+		Double latitudeSpan = miles.doubleValue() / 68.5d;
+		binds.put('boxSouth', centerLatitude - latitudeSpan);
+		binds.put('boxNorth', centerLatitude + latitudeSpan);
+		String clause = latitudeName + ' >= :boxSouth AND ' + latitudeName + ' <= :boxNorth AND ';
+		Double cosine = Math.cos(Math.abs(centerLatitude) * Math.PI / 180d);
+		Double longitudeSpan = cosine <= 0 ? 360d : latitudeSpan / cosine;
+		if (
+			Math.abs(centerLatitude) + latitudeSpan >= 89d ||
+			Math.abs(centerLongitude) + longitudeSpan >= 180d
+		) {
+			return clause;
+		}
+		binds.put('boxWest', centerLongitude - longitudeSpan);
+		binds.put('boxEast', centerLongitude + longitudeSpan);
+		return clause +
+			longitudeName +
+			' >= :boxWest AND ' +
+			longitudeName +
+			' <= :boxEast AND ';
+	}
 
 	private static Boolean isGeocodable(Schema.DescribeFieldResult field) {
 		Schema.DisplayType type = field.getType();

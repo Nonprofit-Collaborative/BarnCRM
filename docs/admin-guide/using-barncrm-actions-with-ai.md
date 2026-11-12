@@ -190,7 +190,9 @@ hand.
 
 **Find People returns nobody you know is there.** The assistant's user cannot see that
 person, or the assistant searched for a nickname or a misspelling. Ask it to search by email
-address, or by part of the last name.
+address, or by the start of the first or last name. Names are found through Salesforce search,
+so "garc" finds Garcia but "arcia" does not, and a person added in the last minute or so may
+not be found by name yet.
 
 **A duplicate person.** The assistant created someone who already existed. Keep the example
 topic's instruction to look the person up first, keep the confirmation step on for Create

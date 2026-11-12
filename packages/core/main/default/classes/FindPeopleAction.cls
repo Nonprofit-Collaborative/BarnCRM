@@ -22,6 +22,7 @@ global with sharing class FindPeopleAction {
 	private static final Integer DEFAULT_RESULTS = 10;
 	private static final Integer MAX_RESULTS = 25;
 	private static final Integer MAX_ROWS = 2000;
+	private static final Integer SEARCHES_PER_FIND = 25;
 
 	/** One search. */
 	global class Request {
@@ -133,7 +134,7 @@ global with sharing class FindPeopleAction {
 			if (isEmail(term)) {
 				emails.add(term.toLowerCase());
 			} else {
-				nameTerms.add('%' + term + '%');
+				nameTerms.add(NameSearch.prefixTerm(term));
 			}
 		}
 		if (nameTerms.isEmpty() && emails.isEmpty()) {
@@ -173,24 +174,40 @@ global with sharing class FindPeopleAction {
 	 * refused by the platform rather than answered with nothing.
 	 */
 	private static List<Contact> findContacts(List<String> nameTerms, List<String> emails) {
-		// One bind per name pattern: every value reaches the query as a bind, never as text.
-		Map<String, Object> binds = new Map<String, Object>{
-			'emails' => emails,
-			'maxRows' => MAX_ROWS
-		};
-		List<String> conditions = new List<String>();
-		for (Integer i = 0; i < nameTerms.size(); i++) {
-			conditions.add('Name LIKE :name' + i);
-			binds.put('name' + i, nameTerms[i]);
+		Set<Id> named = nameMatches(nameTerms);
+		return [
+			SELECT Id, Name, Email, AccountId
+			FROM Contact
+			WHERE Id IN :named OR Email IN :emails
+			WITH USER_MODE
+			ORDER BY Name, Id
+			LIMIT :MAX_ROWS
+		];
+	}
+
+	/**
+	 * Contacts whose name matches any of the searches, through the search index rather than
+	 * a LIKE scan (D-200 P5). Searches are sent SEARCHES_PER_FIND at a time, joined with OR,
+	 * so 200 searches stay well inside the per-transaction search limit; answer() checks
+	 * each contact against its own search afterwards.
+	 */
+	private static Set<Id> nameMatches(List<String> nameTerms) {
+		Set<Id> result = new Set<Id>();
+		for (Integer start = 0; start < nameTerms.size(); start += SEARCHES_PER_FIND) {
+			List<String> several = new List<String>();
+			for (Integer i = start; i < Math.min(start + SEARCHES_PER_FIND, nameTerms.size()); i++) {
+				several.add('(' + nameTerms[i] + ')');
+			}
+			for (
+				SObject record : NameSearch.find(
+					String.join(several, ' OR '),
+					'Contact(Id LIMIT ' + MAX_ROWS + ')'
+				)[0]
+			) {
+				result.add(record.Id);
+			}
 		}
-		if (!emails.isEmpty()) {
-			conditions.add('Email IN :emails');
-		}
-		String query =
-			'SELECT Id, Name, Email, AccountId FROM Contact WHERE ' +
-			String.join(conditions, ' OR ') +
-			' ORDER BY Name, Id LIMIT :maxRows';
-		return Database.queryWithBinds(query, binds, AccessLevel.USER_MODE);
+		return result;
 	}
 
 	/**

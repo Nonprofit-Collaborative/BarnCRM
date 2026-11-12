@@ -230,6 +230,7 @@ private class HouseholdOfPersonControllerTest {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
 			insert wei;
+			Test.setFixedSearchResults(new List<Id>{ wei.Id });
 
 			Test.startTest();
 			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
@@ -260,6 +261,12 @@ private class HouseholdOfPersonControllerTest {
 			person.put('FirstName', 'Quillon');
 			person.put('LastName', 'Vantrees');
 			insert person;
+			// The index finds both the account and the contact the platform keeps behind it.
+			List<Id> indexed = new List<Id>{ person.Id };
+			for (Contact behind : [SELECT Id FROM Contact WHERE AccountId = :person.Id]) {
+				indexed.add(behind.Id);
+			}
+			Test.setFixedSearchResults(indexed);
 
 			Test.startTest();
 			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
@@ -450,6 +457,7 @@ private class HouseholdOfPersonControllerTest {
 			Contact found = new Contact(FirstName = 'Zelda', LastName = 'Searchable');
 			TestDataFactory.pastDuplicateRules(found);
 			insert found;
+			Test.setFixedSearchResults(new List<Id>{ found.Id });
 
 			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
 				'Searchable'
