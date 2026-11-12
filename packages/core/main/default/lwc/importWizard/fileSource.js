@@ -1,4 +1,4 @@
-import { parseCsv, detectDelimiter } from './csv';
+import { parseCsv, detectDelimiter } from 'c/csvParser';
 import { isXlsx, readXlsx, readSheetNames } from './xlsx';
 
 /**
