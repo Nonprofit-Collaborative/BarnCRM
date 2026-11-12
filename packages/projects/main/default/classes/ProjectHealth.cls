@@ -36,6 +36,7 @@ public with sharing class ProjectHealth implements Schedulable {
 					Is_Template__c,
 					Target_Date__c,
 					Budget_Hours__c,
+					Change_Hours__c,
 					Actual_Hours__c,
 					Health__c,
 					Health_Reasons__c
@@ -71,6 +72,7 @@ public with sharing class ProjectHealth implements Schedulable {
 				Is_Template__c,
 				Target_Date__c,
 				Budget_Hours__c,
+				Change_Hours__c,
 				Actual_Hours__c,
 				Health__c,
 				Health_Reasons__c
@@ -103,7 +105,11 @@ public with sharing class ProjectHealth implements Schedulable {
 					);
 					offTrack = true;
 				}
-				Decimal budget = project.Budget_Hours__c;
+				// R-PM20: the budget is Budget Hours plus approved change requests' hours.
+				Decimal budget = project.Budget_Hours__c == null
+					? null
+					: project.Budget_Hours__c +
+					  (project.Change_Hours__c == null ? 0 : project.Change_Hours__c);
 				Decimal used = project.Actual_Hours__c == null ? 0 : project.Actual_Hours__c;
 				if (budget != null && budget > 0) {
 					Decimal percent = (used * 100 / budget).setScale(0);

@@ -8,13 +8,16 @@
 public with sharing class ProjectBillingController {
 	private static final String CONTEXT = 'ProjectBillingController';
 
-	/** What the project page's billing parts show: nothing unless invoices are on. */
+	/**
+	 * What the billing parts show: nothing unless invoices are on. With no project (Projects
+	 * Home), only whether they are on and the person manages projects.
+	 */
 	@AuraEnabled
 	public static Map<String, Object> getProjectBilling(Id projectId) {
 		try {
 			Boolean enabled = ProjectsSettings.billingEnabled();
 			String type = null;
-			if (enabled) {
+			if (enabled && projectId != null) {
 				Project__c project = [
 					SELECT Billing_Type__c
 					FROM Project__c
@@ -169,6 +172,26 @@ public with sharing class ProjectBillingController {
 			}
 			update as user stamps;
 			return invoices;
+		} catch (Exception e) {
+			throw failure(e);
+		}
+	}
+
+	/** The Financials card's figures (R-PM21); only `enabled` false while financials are off. */
+	@AuraEnabled
+	public static Map<String, Object> getFinancials(Id projectId) {
+		try {
+			return ProjectFinancials.card(projectId);
+		} catch (Exception e) {
+			throw failure(e);
+		}
+	}
+
+	/** Recognize Revenue (R-PM19): writes or redoes the project's row for a closed month. */
+	@AuraEnabled
+	public static Id recognizeRevenue(Id projectId, Date month) {
+		try {
+			return ProjectRevenue.recognizeMonth(projectId, month);
 		} catch (Exception e) {
 			throw failure(e);
 		}
