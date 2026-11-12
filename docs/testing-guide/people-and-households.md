@@ -354,3 +354,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Choose **Turn On** and confirm. | Households is on. Add a contact: it gets one BarnCRM household, and NPSP makes no household account for it. |
 
 **Cleanup:** none (Households cannot be turned off).
+
+## T-HH-23: Engagement Score
+
+**Purpose:** Confirm the engagement score is off until turned on, scores people nightly from the weights and targets, leaves out parts whose module is missing, and shows the meter ([Engagement Score](../admin-guide/engagement-score.md)).
+**Prerequisites:** admin; the nightly run scheduled; a person Ana with a task logged today. For step 4: Giving installed and a Received gift of 500 from Ana dated this month. A staff user (see [Test users](before-you-test.md#test-users)).
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open Ana. In **BarnCRM Settings**, **People and Households**, **People**, look at the three engagement settings. | No **Engagement Score** meter on Ana. **Turn on engagement score** is off; the weights read `Gifts 40, Hours 25, Events 20, Activity 15` and the targets `Gifts 1000, Hours 40, Events 4, Activity 90, Months 12`. On **General**, the **Nightly Jobs** panel lists **Engagement Score** at 2:30 as Off. |
+| 2 | Turn on **Turn on engagement score** and save. | The **Nightly Jobs** panel shows **Engagement Score** On. |
+| 3 | In an org with no Giving, Volunteers or Event Management, wait for the nightly run (or run the step from the Developer Console: `Database.executeBatch(new EngagementScoreJob(), 200);`). Open Ana. | Ana's meter reads 100 (only Activity can be measured, and her activity is today) with today's date under **Scored On**. A person with no activity reads 0. |
+| 4 | With Giving installed, rescore. Open Ana. | Ana reads 64: Gifts 0.5 x 40 plus Activity 1 x 15, over 40 + 15. |
+| 5 | Set the weights to `Gifts 0, Activity 10` and rescore. | Ana reads 100: Gifts weighs nothing, so the score is Activity alone. |
+| 6 | Log in as the staff user and open Ana. Try to edit **Engagement Score**. | The meter shows the same score; the field cannot be edited. |
+| 7 | As admin, turn the setting off and save. Open Ana. | No meter. The panel shows the step Off; tonight's run records it Skipped. |
+
+**Cleanup:** put the weights back to the default line; leave the setting off.

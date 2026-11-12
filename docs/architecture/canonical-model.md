@@ -678,6 +678,62 @@ does with the person name fields (Section 4 "Person references", ADR-0009).
 
 ---
 
+## 7A. Engagement Score
+
+### Definition
+
+How engaged a person has been lately, from 0 to 100, across gifts, volunteer hours, event
+attendance and activity recency, weighted by the admin (C-64, D-157, release 1.15; ADR-NEXT
+`NEXT-engagement-score.md`). Core scores it; gifts, hours and attendance come from Giving,
+Volunteers and Event Management when they are installed. Giving's donor score (Section 25T,
+G-19) stays the gifts-only rating.
+
+### Rules
+
+**R-ES1 Off until turned on.** Nothing is scored while `Engagement_Score_Enabled__c` is false:
+the nightly step is Skipped (R-NJ4) and the person page meter draws nothing. Turning it off
+leaves the last scores on the records.
+
+**R-ES2 Parts.** Four parts, each a fraction from 0 to 1 over the window of the last Months
+months (Section 12, Engagement Score keys): Gifts (Received gifts with this person as Donor
+Contact, sum of Amount, over the Gifts target), Hours (Approved volunteer hours, sum of Hours,
+over the Hours target), Events (attendees with status Attended whose event started in the
+window, a count, over the Events target), each capped at 1; Activity (1 minus the days since
+the person's Last Activity over the Activity days, floored at 0; 0 with no activity).
+
+**R-ES3 Score.** The weighted sum of the parts over the sum of the weights of the parts that
+can be measured, times 100, rounded to a whole number. A part whose module is not installed is
+left out of both sums; Activity can always be measured. All weights 0 scores 0.
+
+**R-ES4 Signals by name.** Core asks each class in `EngagementScore.SIGNAL_CLASSES` that is
+installed (`EngagementSignalExtension`: `key()`, `totals(contactIds, since)`; ADR-0017). An
+installed signal that cannot be built or throws fails that chunk, logged, and no one in it is
+rescored.
+
+**R-ES5 Nightly, in system mode.** The step `BarnCRM Engagement Score` (02:30) rescores every
+Contact in chunks of 200 and saves only the people whose score changed (or who had none), with
+Scored On set to that day, in system mode (ADR-0021): an unchanged person is not written, so
+the run does not move everyone's Last Modified date. Scored On is therefore the day the current
+score was set. A refused save is logged and the rest of the chunk is saved. No user edits
+either field.
+
+### Salesforce implementation
+
+- **Fields on Contact** (Core, read by Admin, Staff and Read Only, edited by none):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Engagement Score | `Engagement_Score__c` | Number(3, 0) |
+| Scored On | `Engagement_Scored_On__c` | Date |
+
+- **Classes:** `EngagementScore` (settings, the signal lookup and arithmetic),
+  `EngagementSignalExtension` (the seam), `EngagementScoreJob` (the batch and nightly step),
+  `EngagementScoreController` (whether the meter shows). Signals: `GivingEngagementSignal`,
+  `VolunteersEngagementSignal`, `EventsEngagementSignal`.
+- **Component:** `engagementMeter` on the Contact record page.
+
+---
+
 ## 8. Organization
 
 ### Definition
@@ -1277,6 +1333,17 @@ Added by C-73 (D-195, release 1.19). Shown in the console's General section as *
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Account_Tabs__c` | picklist(Organizations and Households, Accounts, Both) | Organizations and Households | Which account tabs BarnCRM's roles see: Organizations and Households shows the Households and Organizations tabs (today's tabs), Accounts shows the standard Accounts tab and hides those two, Both shows all three. Stored as text (ADR-0019); a blank or unknown value reads as Organizations and Households. Applied by `TabAccessService`, which gives and takes `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab` (each one tab, every BarnCRM role) and withholds `BarnCRM_Households` while Accounts is chosen; a change queues that sync. The role permission sets no longer carry the Organizations tab. A profile that shows the Accounts tab keeps it under any choice. |
+
+### Engagement Score keys
+
+Added by C-64 (D-157, release 1.15; Section 7A). Shown in the console's People and Households
+section.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Engagement_Score_Enabled__c` | boolean | false | Scores every person nightly and shows the meter on the person page (R-ES1). |
+| `Engagement_Score_Weights__c` | text | Gifts 40, Hours 25, Events 20, Activity 15 | Each part's weight, a name and a whole number from 0 to 100 per part, separated by commas. A part left out or unreadable reads as its default. |
+| `Engagement_Score_Targets__c` | text | Gifts 1000, Hours 40, Events 4, Activity 90, Months 12 | The gift amount, volunteer hours and events in the window that earn a part's whole weight, the days over which an activity's credit falls to nothing, and the window in months (1 to 60). A part left out, unreadable or not above 0 reads as its default. |
 
 ### Org Optimizer keys
 
@@ -17272,6 +17339,7 @@ mirrors the primary member).
 | 1.26 | 2026-11-11 | Person-field eligibility rules (release 1.19, P-14b, D-168 follow-up). R-EN8 and 29Y's Eligibility Rules: a condition's `field` may also be a path through the enrollment's Contact lookup (`Contact__r.<Contact field>`), offered for every readable Contact field of a rule type and read blank for an enrollment of an Account. Where Used matches rule fields as paths. No object or field added. |
 | 1.27 | 2026-11-11 | Logic model report PDF (release 1.19, L-04b, D-168 follow-up). R-IN7: the printable page also downloads as a PDF rendered by `Blob.toPdf` through `LogicModelBuilderController.reportPdf`; the page prints landscape. No object or field added. |
 | 1.28 | 2026-11-11 | Account Tabs (C-73, D-195, release 1.19). `BarnCRM_Settings__c` gains `Account_Tabs__c` (text, default Organizations and Households; Section 12 Account Tabs Key). New Core permission sets `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab`; the Organizations tab leaves the three role sets. The BarnCRM and BarnCRM Console apps list the standard Accounts tab. |
+| 1.29 | 2026-11-11 | Engagement score (C-64, D-157, release 1.15; ADR-NEXT `NEXT-engagement-score.md`). New Section 7A, rules R-ES1 to R-ES5. Contact gains `Engagement_Score__c` (Number(3, 0)) and `Engagement_Scored_On__c` (Date); `BarnCRM_Settings__c` gains `Engagement_Score_Enabled__c` (false), `Engagement_Score_Weights__c` and `Engagement_Score_Targets__c` (Section 12 Engagement Score keys). Core gains the `EngagementSignalExtension` seam and the nightly step `BarnCRM Engagement Score`; Giving, Volunteers and Event Management each add a signal class. No object added. |
 
 ---
 ## 32. Entity ownership by package

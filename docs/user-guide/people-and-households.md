@@ -125,6 +125,18 @@ You should see: "Moved. Both household names and member counts are up to date."
 You should see: the note under **Past Activity** in the activity timeline. Anyone who can see
 the record can read it, so write accordingly.
 
+## To Read a Person's Engagement Score
+
+When your admin has turned Engagement Score on, a person's page shows an **Engagement Score**
+meter from 0 to 100 and the day it was scored.
+
+1. Open the person. The meter is on the right of the page.
+2. Click the help icon beside the title to see what goes into the score.
+
+A higher score means more recent giving, volunteering, event attendance and logged activity,
+weighted the way your organization chose. It is worked out each night, so a gift entered today
+counts from tomorrow. To list people by score, use **Engagement Score** in Find or a list view.
+
 ## To Add an Organization
 
 1. Open the **Organizations** tab and open the list, then click **New**.

@@ -318,7 +318,7 @@ are not here: they have their own **Duplicate Matching** section, right after th
 
 | Box | Settings |
 |---|---|
-| People | How people belong to a household; Create a household automatically |
+| People | How people belong to a household; Create a household automatically; Turn on engagement score, Engagement score weights and Engagement score targets ([Engagement Score](engagement-score.md)) |
 | Households | Delete a household once it is empty; Keep the households of deleted people |
 | Household Names and Greetings | The **Preview and Recompute** naming panel (the three patterns); Include people who have died in names |
 | Relationships | Keep both sides of relationships in step |

@@ -136,6 +136,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-25 Multiple email addresses on a person | [emails.md](emails.md) | Core |
 | C-25, C-43 Preferred phone on a person | [preferred-phone.md](preferred-phone.md) | Core |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core |
+| C-64 Engagement score (a nightly 0 to 100 score and meter from gifts, hours, events and activity, admin-weighted) | [engagement-score.md](engagement-score.md) | Core (Giving, Volunteers and Event Management add their parts) |
 | Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) |
 
 ### Data Tools
