@@ -1,5 +1,12 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupFilterBuilder from 'c/rollupFilterBuilder';
+
+setHelpTextForTest({
+  Core_RollupFilter_EveryRecord: 'Every record counts.',
+  Core_RollupFilter_ErrorIncomplete: 'Condition {0} is missing something.',
+  Core_RollupFilter_ErrorLogic: 'Use only the numbers 1 to {0}.'
+});
 
 jest.mock('@salesforce/label/c.Core_RollupFilter_Whose', () => ({ default: '{0} whose {1}' }), {
   virtual: true
@@ -14,11 +21,6 @@ jest.mock('@salesforce/label/c.Core_RollupFilter_PhraseNoValue', () => ({ defaul
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_RollupFilter_Or', () => ({ default: 'or' }), { virtual: true });
-jest.mock(
-  '@salesforce/label/c.Core_RollupFilter_EveryRecord',
-  () => ({ default: 'Every record counts.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_RollupFilter_OpEquals', () => ({ default: 'is' }), {
   virtual: true
 });
@@ -31,16 +33,6 @@ jest.mock('@salesforce/label/c.Core_Filter_OpGreaterThan', () => ({ default: 'is
 jest.mock('@salesforce/label/c.Core_Filter_OpIsNull', () => ({ default: 'is blank' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupFilter_ErrorIncomplete',
-  () => ({ default: 'Condition {0} is missing something.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupFilter_ErrorLogic',
-  () => ({ default: 'Use only the numbers 1 to {0}.' }),
-  { virtual: true }
-);
 
 const FIELDS = [
   {

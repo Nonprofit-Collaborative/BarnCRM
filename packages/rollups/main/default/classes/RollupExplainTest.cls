@@ -100,7 +100,7 @@ private class RollupExplainTest {
 			System.Assert.areEqual(Label.Core_RollupEase_ExplainNever, only.lastCalculated);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_PreviewResult,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),
 					new List<String>{ (2).format(), (2).format() }
 				),
 				only.calculatedNow,

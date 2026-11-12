@@ -1,8 +1,14 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupNeedsAttention from 'c/rollupNeedsAttention';
 import getAttention from '@salesforce/apex/RollupAttentionController.getAttention';
 import retry from '@salesforce/apex/RollupAttentionController.retry';
 import processNow from '@salesforce/apex/RollupAttentionController.processNow';
+
+setHelpTextForTest({
+  Core_RollupBuilder_Started: 'Started.',
+  Core_RollupBuilder_Retried: 'Back in the queue.'
+});
 
 jest.mock(
   '@salesforce/apex/RollupAttentionController.getAttention',
@@ -15,14 +21,6 @@ jest.mock('@salesforce/apex/RollupAttentionController.retry', () => ({ default: 
 jest.mock('@salesforce/apex/RollupAttentionController.processNow', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupBuilder_Started', () => ({ default: 'Started.' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_Retried',
-  () => ({ default: 'Back in the queue.' }),
-  { virtual: true }
-);
 
 const ROW = {
   key: 'a0Q1a01',

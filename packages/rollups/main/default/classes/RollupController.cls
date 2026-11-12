@@ -202,7 +202,7 @@ public with sharing class RollupController {
 				RollupDateWindow.movesWithTheDate(definition)
 			) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate')
 				);
 			}
 			definition.Mode__c = mode;
@@ -359,7 +359,7 @@ public with sharing class RollupController {
 			Integer hour = Integer.valueOf(moment.format('H'));
 			FullRunEstimate estimate = new FullRunEstimate();
 			estimate.summary = String.format(
-				Label.Core_RollupBuilder_Estimate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_Estimate'),
 				new List<String>{ records.format(), minutes.format() }
 			);
 			estimate.workingHours = weekday <= 5 && hour >= 8 && hour < 18;
@@ -391,7 +391,10 @@ public with sharing class RollupController {
 				);
 			}
 			RollupScheduler.scheduleTonight();
-			return String.format(Label.Core_RollupBuilder_TonightScheduled, nightly);
+			return String.format(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_TonightScheduled'),
+				nightly
+			);
 		} catch (Exception caught) {
 			throw asUserError(caught, 'Recalculate all rollups tonight');
 		}

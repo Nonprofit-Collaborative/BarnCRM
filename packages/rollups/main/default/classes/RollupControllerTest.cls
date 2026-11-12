@@ -146,7 +146,10 @@ private class RollupControllerTest {
 				message = refused.getMessage();
 			}
 
-			System.Assert.areEqual(Label.Core_RollupBuilder_ErrorInstantMovesWithDate, message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate'),
+				message
+			);
 			System.Assert.areEqual(
 				RollupService.MODE_BOTH,
 				[SELECT Mode__c FROM Rollup_Definition__c WHERE Id = :rollup.Id].Mode__c,
@@ -174,7 +177,7 @@ private class RollupControllerTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_ErrorNoInstant,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNoInstant'),
 					new List<String>{
 						Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 							.getLabelPlural()
@@ -277,7 +280,7 @@ private class RollupControllerTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_Estimate,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_Estimate'),
 					new List<String>{ records.format(), (1).format() }
 				),
 				estimate.summary,
@@ -316,7 +319,7 @@ private class RollupControllerTest {
 			System.Assert.isTrue(records >= 200, 'The accounts are visible to Maria');
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_Estimate,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_Estimate'),
 					new List<String>{ records.format(), (1).format() }
 				),
 				estimate.summary,
@@ -359,7 +362,7 @@ private class RollupControllerTest {
 				first = RollupController.runTonight();
 				second = RollupController.runTonight();
 				expected = String.format(
-					Label.Core_RollupBuilder_TonightScheduled,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_TonightScheduled'),
 					new List<String>{ RollupScheduler.nightlyTime() }
 				);
 			}

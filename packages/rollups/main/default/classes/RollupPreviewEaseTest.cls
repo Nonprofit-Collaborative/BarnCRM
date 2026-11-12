@@ -152,7 +152,7 @@ private class RollupPreviewEaseTest {
 			System.Assert.areEqual('First Org', byId.get(first.Id).name);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_PreviewResult,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),
 					new List<String>{ (2).format(), Label.Core_RollupBuilder_PreviewEmpty }
 				),
 				byId.get(first.Id).result,

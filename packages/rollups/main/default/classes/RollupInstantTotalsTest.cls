@@ -137,9 +137,15 @@ private class RollupInstantTotalsTest {
 				'AccountHistory'
 			};
 			Map<String, String> refusals = new Map<String, String>{
-				'Contact' => Label.Core_RollupBuilder_InstantBuiltInError,
-				'Account' => Label.Core_RollupBuilder_InstantNotAvailableError,
-				'AccountHistory' => Label.Core_RollupBuilder_InstantNotAvailableError,
+				'Contact' => BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantBuiltInError'),
+				'Account' => BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_InstantNotAvailableError'
+				),
+				'AccountHistory' => BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_InstantNotAvailableError'
+				),
 				'Not_An_Object__c' => BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
 			};
 			for (String objectName : refusals.keySet()) {

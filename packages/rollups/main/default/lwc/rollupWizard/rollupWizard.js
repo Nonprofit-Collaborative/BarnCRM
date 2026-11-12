@@ -30,8 +30,6 @@ import WINDOW_THIS from '@salesforce/label/c.Core_RollupBuilder_WindowThisYear';
 import WINDOW_LAST from '@salesforce/label/c.Core_RollupBuilder_WindowLastYear';
 import WINDOW_TWO from '@salesforce/label/c.Core_RollupBuilder_WindowTwoYears';
 import WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_WindowDate';
-import CURRENCY_WARNING from '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning';
-import NUMBER_WARNING from '@salesforce/label/c.Core_RollupBuilder_NumberWarning';
 import FILTER from '@salesforce/label/c.Core_Find_Conditions';
 import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
@@ -40,20 +38,13 @@ import BYPASS_PERMISSION from '@salesforce/label/c.Core_RollupBuilder_BypassPerm
 import NONE from '@salesforce/label/c.Core_AccessCompare_None';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
-import SUMMARY from '@salesforce/label/c.Core_RollupBuilder_Summary';
 import BACK from '@salesforce/label/c.Core_Kit_Back';
 import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVE_AND_CALCULATE from '@salesforce/label/c.Core_RollupBuilder_SaveAndCalculate';
-import ERROR_NAME from '@salesforce/label/c.Core_RollupBuilder_ErrorNameNeeded';
-import ERROR_TARGET from '@salesforce/label/c.Core_RollupBuilder_ErrorTargetNeeded';
-import ERROR_SOURCE from '@salesforce/label/c.Core_RollupBuilder_ErrorSourceNeeded';
-import ERROR_ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_ErrorOrderByNeeded';
-import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindowNeedsDate';
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
-import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
@@ -395,7 +386,9 @@ export default class RollupWizard extends LightningElement {
 
   /** Step 5: says plainly that this total is not instant, and why (ADR-0136). */
   get noInstantNotice() {
-    return this.sourceIsInstant ? undefined : format(NO_INSTANT, this.recordsLabel);
+    return this.sourceIsInstant
+      ? undefined
+      : format(helpText('Rollups', 'Core_RollupBuilder_NoInstant'), this.recordsLabel);
   }
 
   get targetFieldOptions() {
@@ -702,10 +695,10 @@ export default class RollupWizard extends LightningElement {
       return undefined;
     }
     if (this.targetFieldType === 'currency') {
-      return CURRENCY_WARNING;
+      return helpText('Rollups', 'Core_RollupBuilder_CurrencyWarning');
     }
     return NUMBERS.has(this.targetFieldType) || MONEY.has(this.targetFieldType)
-      ? NUMBER_WARNING
+      ? helpText('Rollups', 'Core_RollupBuilder_NumberWarning')
       : undefined;
   }
 
@@ -719,7 +712,7 @@ export default class RollupWizard extends LightningElement {
     const source = this.sources.find((entry) => entry.value === this.sourceValue);
     const calculation = aggregate ? aggregate.label : this.current.aggregate;
     return format(
-      SUMMARY,
+      helpText('Rollups', 'Core_RollupBuilder_Summary'),
       sourceField ? `${calculation} (${sourceField.label})` : calculation,
       source ? source.label : this.current.relationshipPath,
       `${this.targetLabel}, ${targetField ? targetField.label : this.current.targetField}`
@@ -946,17 +939,17 @@ export default class RollupWizard extends LightningElement {
   stepProblem() {
     const draft = this.current;
     if (this.step === 1 && (!draft.targetObject || !draft.targetField)) {
-      return ERROR_TARGET;
+      return helpText('Rollups', 'Core_RollupBuilder_ErrorTargetNeeded');
     }
     if (this.step === 2 && !this.sourceValue) {
-      return ERROR_SOURCE;
+      return helpText('Rollups', 'Core_RollupBuilder_ErrorSourceNeeded');
     }
     if (this.step === 3) {
       if (!draft.aggregate || (this.needsSourceField && !draft.sourceField)) {
         return helpText('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded');
       }
       if (ORDERED.has(draft.aggregate) && !draft.orderByField) {
-        return ERROR_ORDER_BY;
+        return helpText('Rollups', 'Core_RollupBuilder_ErrorOrderByNeeded');
       }
       if (this.hasRowLimit && !draft.orderByField) {
         return helpText('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder');
@@ -965,7 +958,7 @@ export default class RollupWizard extends LightningElement {
         return helpText('Rollups', 'Core_Rollups_ErrorCustomDelimiterNeeded');
       }
       if (draft.fiscalYearAware && !draft.fiscalDateField && !this.sourceIsDate()) {
-        return ERROR_WINDOW_DATE;
+        return helpText('Rollups', 'Core_RollupBuilder_ErrorWindowNeedsDate');
       }
     }
     if (this.step === 4) {
@@ -977,7 +970,7 @@ export default class RollupWizard extends LightningElement {
       }
     }
     if (this.step === 5 && !(draft.name || '').trim()) {
-      return ERROR_NAME;
+      return helpText('Rollups', 'Core_RollupBuilder_ErrorNameNeeded');
     }
     return null;
   }

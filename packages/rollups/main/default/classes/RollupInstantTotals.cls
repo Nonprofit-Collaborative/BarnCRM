@@ -169,7 +169,7 @@ public with sharing class RollupInstantTotals {
 			String name = apiNameOf(type);
 			if (isBuiltIn(type)) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupBuilder_InstantBuiltInError
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantBuiltInError')
 				);
 			}
 			// Only an object the Builder counts (ADR-0136), and one that can carry a trigger.
@@ -178,7 +178,7 @@ public with sharing class RollupInstantTotals {
 				!triggerableAmong(new Set<String>{ name }).contains(name)
 			) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupBuilder_InstantNotAvailableError
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantNotAvailableError')
 				);
 			}
 			GeneratedCode code = new GeneratedCode();

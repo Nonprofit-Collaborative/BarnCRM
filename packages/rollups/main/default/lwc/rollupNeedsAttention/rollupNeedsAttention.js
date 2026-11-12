@@ -5,17 +5,13 @@ import processNow from '@salesforce/apex/RollupAttentionController.processNow';
 
 import TITLE from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
 import FAILED_TITLE from '@salesforce/label/c.Core_RollupBuilder_FailedTitle';
-import NOTHING_FAILED from '@salesforce/label/c.Core_RollupBuilder_NothingFailed';
 import COLUMN_RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import COLUMN_ERROR from '@salesforce/label/c.Core_RollupBuilder_ColumnError';
 import COLUMN_WHEN from '@salesforce/label/c.Core_FieldAccess_ColWhen';
 import COLUMN_TRIES from '@salesforce/label/c.Core_RollupBuilder_ColumnTries';
 import RETRY from '@salesforce/label/c.Core_RollupBuilder_Retry';
 import RETRY_ALL from '@salesforce/label/c.Core_RollupBuilder_RetryAll';
-import RETRIED from '@salesforce/label/c.Core_RollupBuilder_Retried';
-import NIGHTLY_OFF from '@salesforce/label/c.Core_RollupBuilder_NightlyOff';
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
-import STARTED from '@salesforce/label/c.Core_RollupBuilder_Started';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
@@ -30,10 +26,14 @@ export default class RollupNeedsAttention extends LightningElement {
   labels = {
     title: TITLE,
     failedTitle: FAILED_TITLE,
-    nothingFailed: NOTHING_FAILED,
+    get nothingFailed() {
+      return helpText('Rollups', 'Core_RollupBuilder_NothingFailed');
+    },
     retry: RETRY,
     retryAll: RETRY_ALL,
-    nightlyOff: NIGHTLY_OFF,
+    get nightlyOff() {
+      return helpText('Rollups', 'Core_RollupBuilder_NightlyOff');
+    },
     startNow: START_NOW
   };
 
@@ -148,7 +148,7 @@ export default class RollupNeedsAttention extends LightningElement {
     processNow()
       .then((attention) => {
         this.attention = attention;
-        this.notice = STARTED;
+        this.notice = helpText('Rollups', 'Core_RollupBuilder_Started');
         this.error = undefined;
       })
       .catch((error) => this.fail(error))
@@ -185,7 +185,7 @@ export default class RollupNeedsAttention extends LightningElement {
       .then((attention) => {
         this.attention = attention;
         this.selectedEntryIds = [];
-        this.notice = RETRIED;
+        this.notice = helpText('Rollups', 'Core_RollupBuilder_Retried');
         this.error = undefined;
       })
       .catch((error) => this.fail(error))

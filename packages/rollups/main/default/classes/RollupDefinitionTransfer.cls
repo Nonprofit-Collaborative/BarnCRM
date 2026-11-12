@@ -66,7 +66,7 @@ public with sharing class RollupDefinitionTransfer {
 				rollups.add(rollup);
 			}
 			if (rollups.isEmpty()) {
-				throw refusal(Label.Core_RollupBuilder_ExportNothing);
+				throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ExportNothing'));
 			}
 			return JSON.serializePretty(
 				new Map<String, Object>{
@@ -126,10 +126,12 @@ public with sharing class RollupDefinitionTransfer {
 				}
 				try {
 					if (String.isBlank(key) || key.length() > 80) {
-						throw refusal(Label.Core_RollupBuilder_ImportUnreadable);
+						throw refusal(
+							BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportUnreadable')
+						);
 					}
 					if (!seen.add(key)) {
-						throw refusal(Label.Core_RollupBuilder_ImportTwice);
+						throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportTwice'));
 					}
 					Boolean shipped = existing != null && existing.Is_Package_Default__c == true;
 					if (shipped || shippedKeys.contains(key)) {
@@ -181,7 +183,7 @@ public with sharing class RollupDefinitionTransfer {
 			throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'));
 		}
 		if ((Integer) version > FORMAT_VERSION) {
-			throw refusal(Label.Core_RollupBuilder_ImportNewer);
+			throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNewer'));
 		}
 		return (List<Object>) file.get('rollups');
 	}
@@ -205,7 +207,7 @@ public with sharing class RollupDefinitionTransfer {
 		if (!unknown.isEmpty()) {
 			throw refusal(
 				String.format(
-					Label.Core_RollupBuilder_ImportUnknown,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportUnknown'),
 					new List<String>{ String.join(unknown, ', ') }
 				)
 			);
@@ -217,7 +219,7 @@ public with sharing class RollupDefinitionTransfer {
 				RollupBuilderController.Draft.class
 			);
 		} catch (JSONException unreadable) {
-			throw refusal(Label.Core_RollupBuilder_ImportUnreadable);
+			throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportUnreadable'));
 		}
 		draft.recordId = existing == null ? null : existing.Id;
 		return RollupBuilderController.checkedRecord(draft);

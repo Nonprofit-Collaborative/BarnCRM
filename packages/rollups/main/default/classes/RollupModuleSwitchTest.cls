@@ -212,7 +212,7 @@ private class RollupModuleSwitchTest {
 
 			Assert.isNotNull(result.recordId, 'The rollup is saved');
 			Assert.areEqual(
-				System.Label.Core_RollupBuilder_SavedTurnedOff,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_SavedTurnedOff'),
 				result.notice,
 				'And the notice says it is calculated once the module is on'
 			);

@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupWizard from 'c/rollupWizard';
 import getTargetFields from '@salesforce/apex/RollupBuilderController.getTargetFields';
@@ -10,6 +11,12 @@ import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveS
 import LightningConfirm from 'lightning/confirm';
 import previewSamples from '@salesforce/apex/RollupBuilderController.previewSamples';
 import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
+
+setHelpTextForTest({
+  Core_RollupBuilder_CurrencyWarning: 'More than one currency.',
+  Core_RollupBuilder_Summary: '{0} of {1}, shown in {2}.',
+  Core_RollupBuilder_NoInstant: 'Instant totals are not available yet for {0}.'
+});
 
 jest.mock(
   '@salesforce/apex/RollupBuilderController.getTargetFields',
@@ -48,25 +55,9 @@ jest.mock(
 jest.mock('@salesforce/apex/RollupFieldGenerator.generate', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning',
-  () => ({ default: 'More than one currency.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_RollupBuilder_FilledBy', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_Summary',
-  () => ({ default: '{0} of {1}, shown in {2}.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_NoInstant',
-  () => ({ default: 'Instant totals are not available yet for {0}.' }),
-  { virtual: true }
-);
 
 jest.mock(
   '@salesforce/label/c.Core_RollupEase_BuilderSentence',

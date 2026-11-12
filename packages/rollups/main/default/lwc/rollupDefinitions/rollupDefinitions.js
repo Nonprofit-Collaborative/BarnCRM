@@ -41,19 +41,16 @@ import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DELETE_ROLLUP from '@salesforce/label/c.Core_Find_Delete';
-import DELETED from '@salesforce/label/c.Core_RollupBuilder_Deleted';
 import EXPORT_ROLLUPS from '@salesforce/label/c.Core_RollupBuilder_Export';
 import EXPORT_SELECT from '@salesforce/label/c.Core_RollupBuilder_ExportSelect';
 import IMPORT_FILE from '@salesforce/label/c.Core_RollupBuilder_ImportFile';
 import IMPORT_COLUMN from '@salesforce/label/c.Core_EraseAction_ColumnAction';
 import IMPORT_APPLY from '@salesforce/label/c.Core_RollupBuilder_ImportApply';
-import IMPORT_DONE from '@salesforce/label/c.Core_RollupBuilder_ImportDone';
 import IMPORT_WILL_CREATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillCreate';
 import IMPORT_WILL_UPDATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillUpdate';
 import IMPORT_CREATED from '@salesforce/label/c.Core_Import_ResultCreated';
 import IMPORT_UPDATED from '@salesforce/label/c.Core_Import_ResultUpdated';
 import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
-import IMPORT_NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_ImportNotReached';
 import turnOnSwitchingOffDlrs from '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
@@ -86,13 +83,17 @@ const OUTCOMES = {
     created: IMPORT_WILL_CREATE,
     updated: IMPORT_WILL_UPDATE,
     refused: IMPORT_REFUSED,
-    notReached: IMPORT_NOT_REACHED
+    get notReached() {
+      return helpText('Rollups', 'Core_RollupBuilder_ImportNotReached');
+    }
   },
   saved: {
     created: IMPORT_CREATED,
     updated: IMPORT_UPDATED,
     refused: IMPORT_REFUSED,
-    notReached: IMPORT_NOT_REACHED
+    get notReached() {
+      return helpText('Rollups', 'Core_RollupBuilder_ImportNotReached');
+    }
   }
 };
 
@@ -151,7 +152,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     get deleteShipped() {
       return helpText('Rollups', 'Core_RollupBuilder_DeleteShipped');
     },
-    deleted: DELETED,
+    get deleted() {
+      return helpText('Rollups', 'Core_RollupBuilder_Deleted');
+    },
     exportRollups: EXPORT_ROLLUPS,
     exportSelect: EXPORT_SELECT,
     importFile: IMPORT_FILE,
@@ -600,7 +603,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }));
         if (save) {
           this.importText = undefined;
-          this.noticeMessage = IMPORT_DONE;
+          this.noticeMessage = helpText('Rollups', 'Core_RollupBuilder_ImportDone');
         }
       })
       .catch((error) => {
