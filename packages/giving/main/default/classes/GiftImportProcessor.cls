@@ -197,7 +197,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			return;
 		}
 		String reason = String.format(
-			Label.Giving_Posting_ClosedPeriodNewGift,
+			BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 			new List<String>{ closed.format() }
 		);
 		for (GiftImportRow item : gifts) {

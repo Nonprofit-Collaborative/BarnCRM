@@ -194,7 +194,7 @@ public with sharing class GivingJobsController {
 			caught,
 			caught instanceof GivingJobsException,
 			context,
-			System.Label.Giving_Periods_UnexpectedError
+			BarnHelp.text('Giving', 'Giving_Periods_UnexpectedError')
 		);
 	}
 }

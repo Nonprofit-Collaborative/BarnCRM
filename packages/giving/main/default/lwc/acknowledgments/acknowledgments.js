@@ -45,7 +45,6 @@ import RUNS_HEADING from '@salesforce/label/c.Core_AutoMerge_RecentRuns';
 import NO_RUNS from '@salesforce/label/c.Giving_Acknowledgments_NoRuns';
 import TEMPLATE_NOT_FOUND from '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
-import ACTION_FAILED from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
 import COLUMN_RULE from '@salesforce/label/c.Giving_Acknowledgments_ColumnRule';
 import COLUMN_ORDER from '@salesforce/label/c.Giving_Acknowledgments_ColumnOrder';
 import COLUMN_CHANNEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnChannel';
@@ -271,7 +270,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_Receipt_UnexpectedError')
+      );
     }
   }
 
@@ -591,7 +593,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
         return refreshApex(this.wiredPage);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_Receipt_UnexpectedError')
+        );
       })
       .finally(() => {
         this.busy = false;

@@ -99,7 +99,9 @@ public with sharing class GiftAllocationController {
 			state.rows.add(row);
 		}
 		Boolean locked = isLocked(gift.Id) && !GiftPostingLock.canOverride();
-		state.lockedMessage = locked ? Label.Giving_Posting_AllocationLocked : null;
+		state.lockedMessage = locked
+			? BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')
+			: null;
 		state.canEdit =
 			!locked &&
 			gift.Amount__c != null &&

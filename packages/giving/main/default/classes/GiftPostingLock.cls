@@ -124,8 +124,8 @@ public with sharing class GiftPostingLock {
 					describe(
 						gift.Id,
 						isUndelete
-							? Label.Giving_Posting_OverrideRestored
-							: Label.Giving_Posting_OverrideCreated
+							? BarnHelp.text('Giving', 'Giving_Posting_OverrideRestored')
+							: BarnHelp.text('Giving', 'Giving_Posting_OverrideCreated')
 					)
 				);
 			} else if (isUndelete) {
@@ -137,11 +137,11 @@ public with sharing class GiftPostingLock {
 
 	private static String insertRefusal(Gift__c gift, Date closed) {
 		if (postingFieldsSet(gift)) {
-			return Label.Giving_Posting_FieldsWrittenByPosting;
+			return BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting');
 		}
 		if (isInBooks(gift) && isInClosedPeriod(gift.Gift_Date__c, closed)) {
 			return String.format(
-				Label.Giving_Posting_ClosedPeriodNewGift,
+				BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 				new List<String>{ closed.format() }
 			);
 		}
@@ -164,7 +164,7 @@ public with sharing class GiftPostingLock {
 				List<String> posting = changesTo(POSTING_FIELDS, previous, gift);
 				if (!posting.isEmpty()) {
 					changes.addAll(posting);
-					refusal = Label.Giving_Posting_FieldsWrittenByPosting;
+					refusal = BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting');
 				}
 			}
 			if (isLocked(previous, closed)) {
@@ -181,12 +181,12 @@ public with sharing class GiftPostingLock {
 			} else if (isInBooks(gift) && isInClosedPeriod(gift.Gift_Date__c, closed)) {
 				changes.add(
 					String.format(
-						Label.Giving_Posting_OverrideEnteredBooks,
+						BarnHelp.text('Giving', 'Giving_Posting_OverrideEnteredBooks'),
 						new List<String>{ String.valueOf(gift.Gift_Date__c) }
 					)
 				);
 				refusal = String.format(
-					Label.Giving_Posting_ClosedPeriodNewGift,
+					BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 					new List<String>{ closed.format() }
 				);
 			}
@@ -215,7 +215,9 @@ public with sharing class GiftPostingLock {
 		for (Gift__c gift : gifts) {
 			String refusal = isLocked(gift, closed)
 				? lockedMessage(gift, closed)
-				: originals.contains(gift.Id) ? Label.Giving_Posting_OriginalLocked : null;
+				: originals.contains(gift.Id)
+						? BarnHelp.text('Giving', 'Giving_Posting_OriginalLocked')
+						: null;
 			if (refusal == null) {
 				continue;
 			}
@@ -261,9 +263,14 @@ public with sharing class GiftPostingLock {
 				continue;
 			}
 			if (overridden) {
-				overrides.add(describe(record.Id, Label.Giving_Posting_OverrideDonorDeleted));
+				overrides.add(
+					describe(
+						record.Id,
+						BarnHelp.text('Giving', 'Giving_Posting_OverrideDonorDeleted')
+					)
+				);
 			} else {
-				record.addError(Label.Giving_Posting_DonorLocked);
+				record.addError(BarnHelp.text('Giving', 'Giving_Posting_DonorLocked'));
 			}
 		}
 		ErrorLogger.logMessages(overrides, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
@@ -354,7 +361,7 @@ public with sharing class GiftPostingLock {
 			if (overridden) {
 				overrides.add(describe(allocation.Gift__c, action));
 			} else {
-				allocation.addError(Label.Giving_Posting_AllocationLocked);
+				allocation.addError(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'));
 			}
 		}
 		ErrorLogger.logMessages(overrides, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
@@ -399,10 +406,10 @@ public with sharing class GiftPostingLock {
 
 	private static String lockedMessage(Gift__c gift, Date closed) {
 		if (isPosted(gift)) {
-			return Label.Giving_Posting_PostedGiftLocked;
+			return BarnHelp.text('Giving', 'Giving_Posting_PostedGiftLocked');
 		}
 		return String.format(
-			Label.Giving_Posting_ClosedGiftLocked,
+			BarnHelp.text('Giving', 'Giving_Posting_ClosedGiftLocked'),
 			new List<String>{ closed.format() }
 		);
 	}
@@ -445,7 +452,7 @@ public with sharing class GiftPostingLock {
 
 	private static String describe(Id giftId, String what) {
 		return String.format(
-			Label.Giving_Posting_OverrideLogged,
+			BarnHelp.text('Giving', 'Giving_Posting_OverrideLogged'),
 			new List<String>{ String.valueOf(giftId), what }
 		);
 	}

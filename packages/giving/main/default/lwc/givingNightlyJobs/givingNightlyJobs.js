@@ -14,7 +14,6 @@ import NEVER_RUN from '@salesforce/label/c.Giving_PledgeReminders_NeverRun';
 import SCHEDULE_BUTTON from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
 import STOP_BUTTON from '@salesforce/label/c.Giving_NightlyJobs_StopButton';
 import RUN_NOW from '@salesforce/label/c.Giving_NightlyJobs_RunNow';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -68,7 +67,7 @@ export default class GivingNightlyJobs extends LightningElement {
       this.view = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = UNEXPECTED_ERROR;
+      this.errorMessage = helpText('Giving', 'Giving_Periods_UnexpectedError');
     }
   }
 
@@ -142,7 +141,7 @@ export default class GivingNightlyJobs extends LightningElement {
         await refreshApex(this.wiredJobsResult);
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Periods_UnexpectedError'));
     } finally {
       this.busy = false;
     }

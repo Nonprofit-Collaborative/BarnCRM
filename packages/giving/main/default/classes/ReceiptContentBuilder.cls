@@ -31,15 +31,24 @@ public with sharing class ReceiptContentBuilder {
 	 */
 	public static final Decimal QUID_PRO_QUO_THRESHOLD = 75;
 
-	public static final String SENTENCE_NO_GOODS = Label.Giving_Receipt_NoGoods;
-	public static final String SENTENCE_INTANGIBLE_RELIGIOUS = Label.Giving_Receipt_IntangibleReligious;
+	public static final String SENTENCE_NO_GOODS = BarnHelp.text(
+		'Giving',
+		'Giving_Receipt_NoGoods'
+	);
+	public static final String SENTENCE_INTANGIBLE_RELIGIOUS = BarnHelp.text(
+		'Giving',
+		'Giving_Receipt_IntangibleReligious'
+	);
 
 	/**
 	 * What an in-kind gift puts where the template asked for an amount (R-RC12). A currency figure
 	 * there reads as a cash contribution of that amount, which is the one thing a document for
 	 * donated property must not say.
 	 */
-	public static final String IN_KIND_AMOUNT_PHRASE = Label.Giving_Receipt_InKindAmountPhrase;
+	public static final String IN_KIND_AMOUNT_PHRASE = BarnHelp.text(
+		'Giving',
+		'Giving_Receipt_InKindAmountPhrase'
+	);
 
 	/**
 	 * What every document states in place of a figure, for a gift of goods (G-18, ADR-0030,
@@ -47,13 +56,19 @@ public with sharing class ReceiptContentBuilder {
 	 * printing the fair market value the organization recorded is the one thing ADR-0016 forbids.
 	 * So the document says what is true: the organization has not stated a value.
 	 */
-	public static final String AMOUNT_NOT_STATED = Label.Giving_Receipt_AmountNotStated;
+	public static final String AMOUNT_NOT_STATED = BarnHelp.text(
+		'Giving',
+		'Giving_Receipt_AmountNotStated'
+	);
 
 	/** What an in-kind gift puts in the amount column of a statement (R-RC12). */
 	public static final String IN_KIND_LINE_AMOUNT = Label.Giving_Receipt_InKindLineAmount;
 
 	/** Why a statement's total is smaller than the sum of the lines above it (R-RC12). */
-	public static final String SENTENCE_IN_KIND_NOT_IN_TOTAL = Label.Giving_Receipt_InKindNotInTotal;
+	public static final String SENTENCE_IN_KIND_NOT_IN_TOTAL = BarnHelp.text(
+		'Giving',
+		'Giving_Receipt_InKindNotInTotal'
+	);
 
 	private static final String IN_KIND = 'In-kind';
 	private static final String TOKEN_OPEN = '{{';
@@ -131,7 +146,9 @@ public with sharing class ReceiptContentBuilder {
 			}
 		}
 		if (String.isBlank(details.legalName)) {
-			throw new ReceiptContentException(Label.Giving_Receipt_OrganizationIncomplete);
+			throw new ReceiptContentException(
+				BarnHelp.text('Giving', 'Giving_Receipt_OrganizationIncomplete')
+			);
 		}
 		return details;
 	}
@@ -162,10 +179,13 @@ public with sharing class ReceiptContentBuilder {
 
 		if (isInKind(gift)) {
 			String described = String.isBlank(gift.In_Kind_Description__c)
-				? Label.Giving_Receipt_InKindDescribedDefault
+				? BarnHelp.text('Giving', 'Giving_Receipt_InKindDescribedDefault')
 				: gift.In_Kind_Description__c.trim();
 			sentences.add(
-				String.format(Label.Giving_Receipt_InKindSentence, new List<String>{ described })
+				String.format(
+					BarnHelp.text('Giving', 'Giving_Receipt_InKindSentence'),
+					new List<String>{ described }
+				)
 			);
 		}
 
@@ -198,10 +218,10 @@ public with sharing class ReceiptContentBuilder {
 			deductible = 0;
 		}
 		String described = String.isBlank(gift.Benefit_Description__c)
-			? Label.Giving_Receipt_BenefitDefault
+			? BarnHelp.text('Giving', 'Giving_Receipt_BenefitDefault')
 			: gift.Benefit_Description__c.trim();
 		return String.format(
-			Label.Giving_Receipt_QuidProQuo,
+			BarnHelp.text('Giving', 'Giving_Receipt_QuidProQuo'),
 			new List<String>{ described, money(benefit), money(deductible) }
 		);
 	}
@@ -373,7 +393,9 @@ public with sharing class ReceiptContentBuilder {
 	@TestVisible
 	private static String mergeTokens(String templateBody, Map<String, String> tokens) {
 		if (String.isBlank(templateBody)) {
-			throw new ReceiptContentException(Label.Giving_Receipt_NoActiveTemplate);
+			throw new ReceiptContentException(
+				BarnHelp.text('Giving', 'Giving_Receipt_NoActiveTemplate')
+			);
 		}
 		String merged = templateBody.replace(GIFT_LINES_PARAGRAPH, '{{GiftLines}}');
 		for (String name : tokens.keySet()) {

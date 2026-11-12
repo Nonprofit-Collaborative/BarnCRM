@@ -38,12 +38,12 @@ private class GivingSmallClassesCoverageTest {
 			}
 
 			Assert.areEqual(
-				Label.Giving_Receipt_NothingToRender,
+				BarnHelp.text('Giving', 'Giving_Receipt_NothingToRender'),
 				blank,
 				'White space is nothing to render'
 			);
 			Assert.areEqual(
-				Label.Giving_Receipt_NothingToRender,
+				BarnHelp.text('Giving', 'Giving_Receipt_NothingToRender'),
 				empty,
 				'So is no document at all'
 			);

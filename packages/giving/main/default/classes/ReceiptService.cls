@@ -46,15 +46,21 @@ public with sharing class ReceiptService {
 		requireIssuePermission();
 		Gift__c gift = ReceiptSelector.giftForReceipting(giftId);
 		if (gift == null) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_GiftNotFound);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_GiftNotFound')
+			);
 		}
 		if (String.isNotBlank(gift.Receipt_Number__c)) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_GiftAlreadyReceipted);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_GiftAlreadyReceipted')
+			);
 		}
 		// No money has arrived for a Pending or Cancelled gift, and a receipt says it has. The
 		// statement run leaves the same two statuses out (R-RC8, R-G16).
 		if ('Pending'.equals(gift.Status__c) || 'Cancelled'.equals(gift.Status__c)) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_GiftNotReceived);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_GiftNotReceived')
+			);
 		}
 
 		Integer statementYear = gift.Gift_Date__c == null
@@ -132,14 +138,18 @@ public with sharing class ReceiptService {
 	public static Receipt__c voidReceipt(Id receiptId, String reason) {
 		requireIssuePermission();
 		if (String.isBlank(reason)) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_VoidNeedsReason);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_VoidNeedsReason')
+			);
 		}
 		Receipt__c receipt = ReceiptSelector.byId(receiptId);
 		if (receipt == null) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_NotFound);
+			throw new ReceiptServiceException(BarnHelp.text('Giving', 'Giving_Receipt_NotFound'));
 		}
 		if (STATUS_VOID.equals(receipt.Status__c)) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_AlreadyVoid);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_AlreadyVoid')
+			);
 		}
 		receipt.Status__c = STATUS_VOID;
 		receipt.Void_Reason__c = reason.trim();
@@ -162,10 +172,12 @@ public with sharing class ReceiptService {
 		requireIssuePermission();
 		Receipt__c original = ReceiptSelector.byId(receiptId);
 		if (original == null) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_NotFound);
+			throw new ReceiptServiceException(BarnHelp.text('Giving', 'Giving_Receipt_NotFound'));
 		}
 		if (original.Gift__c == null) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_ReissueNeedsGift);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_ReissueNeedsGift')
+			);
 		}
 
 		voidReceipt(receiptId, reason);
@@ -321,7 +333,9 @@ public with sharing class ReceiptService {
 	 */
 	public static void requireIssuePermission() {
 		if (!canIssueReceipts()) {
-			throw new ReceiptServiceException(Label.Giving_Receipt_NoPermission);
+			throw new ReceiptServiceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_NoPermission')
+			);
 		}
 	}
 }

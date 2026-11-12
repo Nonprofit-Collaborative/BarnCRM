@@ -267,7 +267,10 @@ private class GiftAllocationControllerTest {
 					saved.Id
 				);
 				Assert.isFalse(state.canEdit, 'Posted');
-				Assert.areEqual(Label.Giving_Posting_AllocationLocked, state.lockedMessage);
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
+					state.lockedMessage
+				);
 
 				try {
 					GiftAllocationController.save(
@@ -278,7 +281,10 @@ private class GiftAllocationControllerTest {
 					);
 					Assert.fail('The lock refuses it');
 				} catch (AuraHandledException refused) {
-					Assert.areEqual(Label.Giving_Posting_AllocationLocked, refused.getMessage());
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
+						refused.getMessage()
+					);
 				}
 				Assert.areEqual(250, amountsByFund(saved.Id).get(defaultFund()), 'Unchanged');
 			}

@@ -42,7 +42,9 @@ public without sharing class ReceiptNumberSequence {
 	 */
 	public static String seriesKeyFor(String receiptType, Integer statementYear) {
 		if (String.isBlank(receiptType) || statementYear == null) {
-			throw new ReceiptNumberSequenceException(Label.Giving_Receipt_SeriesIncomplete);
+			throw new ReceiptNumberSequenceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_SeriesIncomplete')
+			);
 		}
 		return receiptType + '-' + String.valueOf(statementYear);
 	}
@@ -131,7 +133,9 @@ public without sharing class ReceiptNumberSequence {
 			series = lockSeries(key);
 		}
 		if (series == null) {
-			throw new ReceiptNumberSequenceException(Label.Giving_Receipt_SeriesUnavailable);
+			throw new ReceiptNumberSequenceException(
+				BarnHelp.text('Giving', 'Giving_Receipt_SeriesUnavailable')
+			);
 		}
 
 		Integer first = series.Next_Counter__c.intValue();
