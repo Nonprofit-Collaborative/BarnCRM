@@ -167,6 +167,12 @@ It no longer does: the Households and Organizations tabs open the standard Accou
 **Households** and **Organizations** list views and the list view menu, which also holds
 **My Households** and **My Organizations**. Build more lists in Salesforce as usual.
 
+**"We would rather use the standard Accounts tab."**
+Set **Account Tabs** on **General** in BarnCRM Settings to **Accounts Tab (Standard)**: people
+see the Accounts tab, with the same Households and Organizations list views in its menu, and the
+Households and Organizations tabs go. **Both** keeps all three. See
+[Account Tabs](barncrm-settings.md#account-tabs).
+
 **"There is no Households tab."**
 Households is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
 role within a few minutes. Someone without a BarnCRM role does not get it: give them a role on

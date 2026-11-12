@@ -26,6 +26,9 @@
  * else (no record type, ADR-0141), is carried by the Household Upkeep feature, and goes to
  * every BarnCRM role while the feature is on.
  *
+ * The Account Tabs setting (C-73) picks the Organizations tab set (with Households), the
+ * standard Accounts tab set, or both, each going to every BarnCRM role while chosen.
+ *
  * The four BarnCRM apps follow the same way (ADR-0137): each has a BarnCRM App set that shows that app
  * and nothing else, its audience is every BarnCRM role (the admin apps: BarnCRM Admin only), and
  * the App Navigation Style setting says which style's sets are on.
@@ -41,6 +44,13 @@ public with sharing class TabAccessService {
 
 	/** Shows the Households tab only, no record type; carried by Household Upkeep (ADR-0141). */
 	public static final String HOUSEHOLDS_SET = 'BarnCRM_Households';
+	/** The Organizations tab and the standard Accounts tab, chosen by Account Tabs (C-73). */
+	public static final String ORGANIZATIONS_TAB = 'BarnCRM_Organizations_Tab';
+	public static final String ACCOUNTS_TAB = 'BarnCRM_Accounts_Tab';
+
+	/** The stored values of Account Tabs; anything else reads as Organizations and Households. */
+	public static final String ACCOUNT_TABS_ACCOUNTS = 'Accounts';
+	public static final String ACCOUNT_TABS_BOTH = 'Both';
 
 	public static final String STANDARD_APP = 'BarnCRM_App_Standard';
 	public static final String CONSOLE_APP = 'BarnCRM_App_Console';
@@ -76,6 +86,8 @@ public with sharing class TabAccessService {
 		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
 		HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		ORGANIZATIONS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		ACCOUNTS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		CONSOLE_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		ADMIN_STANDARD_APP => new List<String>{ ADMIN },
@@ -94,6 +106,23 @@ public with sharing class TabAccessService {
 		}
 		if (style != STYLE_STANDARD) {
 			names.addAll(new List<String>{ CONSOLE_APP, ADMIN_CONSOLE_APP });
+		}
+		return names;
+	}
+
+	/**
+	 * The account tab sets the Account Tabs setting turns on (C-73): Organizations for
+	 * Organizations and Households, the standard Accounts tab for Accounts, both for Both. A
+	 * blank or unknown value reads as Organizations and Households, today's tabs.
+	 */
+	public static Set<String> accountTabSetsOn() {
+		String choice = SettingsService.getSettings().Account_Tabs__c;
+		Set<String> names = new Set<String>();
+		if (choice != ACCOUNT_TABS_ACCOUNTS) {
+			names.add(ORGANIZATIONS_TAB);
+		}
+		if (choice == ACCOUNT_TABS_ACCOUNTS || choice == ACCOUNT_TABS_BOTH) {
+			names.add(ACCOUNTS_TAB);
 		}
 		return names;
 	}
@@ -171,6 +200,11 @@ public with sharing class TabAccessService {
 		Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
 		Set<String> turnedOn = FeatureSwitchService.tabSetsOn();
 		turnedOn.addAll(appSetsOn());
+		turnedOn.addAll(accountTabSetsOn());
+		// Accounts Tab (Standard) hides the Households tab too, whatever its feature says.
+		if (!turnedOn.contains(ORGANIZATIONS_TAB)) {
+			turnedOn.remove(HOUSEHOLDS_SET);
+		}
 		List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
 		List<PermissionSetAssignment> toDelete = new List<PermissionSetAssignment>();
 		Boolean more = false;

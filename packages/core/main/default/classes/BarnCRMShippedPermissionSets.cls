@@ -8,6 +8,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 	public static final Set<String> NAMES = new Set<String>{
 		'Accounting_Export',
 		'BarnCRM_Access_Manager',
+		'BarnCRM_Accounts_Tab',
 		'BarnCRM_Admin',
 		'BarnCRM_App_Admin_Console',
 		'BarnCRM_App_Admin_Standard',
@@ -20,6 +21,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'BarnCRM_Find_And_Export',
 		'BarnCRM_Households',
 		'BarnCRM_Metadata_Admin',
+		'BarnCRM_Organizations_Tab',
 		'BarnCRM_Read_Only',
 		'BarnCRM_Staff',
 		'BarnCRM_Tab_Bulk_Update',

@@ -1270,6 +1270,14 @@ Shown in the console's General section as **App Navigation Style**.
 |---|---|---|---|
 | `App_Navigation_Style__c` | picklist(Standard, Console, Both) | Both | Which navigation style of the BarnCRM apps BarnCRM shows: Standard shows BarnCRM and BarnCRM Admin, Console shows BarnCRM Console and BarnCRM Admin Console, Both shows all four. Stored as text (ADR-0019); a blank or unknown value reads as Both. Applied by `TabAccessService`, which gives and takes the `BarnCRM_App_*` permission sets; a change queues that sync. |
 
+### Account Tabs Key
+
+Added by C-73 (D-195, release 1.19). Shown in the console's General section as **Account Tabs**.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Account_Tabs__c` | picklist(Organizations and Households, Accounts, Both) | Organizations and Households | Which account tabs BarnCRM's roles see: Organizations and Households shows the Households and Organizations tabs (today's tabs), Accounts shows the standard Accounts tab and hides those two, Both shows all three. Stored as text (ADR-0019); a blank or unknown value reads as Organizations and Households. Applied by `TabAccessService`, which gives and takes `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab` (each one tab, every BarnCRM role) and withholds `BarnCRM_Households` while Accounts is chosen; a change queues that sync. The role permission sets no longer carry the Organizations tab. A profile that shows the Accounts tab keeps it under any choice. |
+
 ### Org Optimizer keys
 
 Added by Org Optimizer (ADR-0103 `0103-org-optimizer-and-data-manager-pages.md`). Shown in
@@ -17263,6 +17271,7 @@ mirrors the primary member).
 | 1.25 | 2026-11-11 | Programs sample data for goals, cohorts and sessions (release 1.19, P-10 and P-11 follow-up, D-168). 29ZA's sample data paragraph: the load gains two stages (a cohort with three sessions and attendance, then a goal with two steps per person Enrolled in tutoring); the removal deletes sample sessions and cohorts nothing refers to before the programs. No object or field added. |
 | 1.26 | 2026-11-11 | Person-field eligibility rules (release 1.19, P-14b, D-168 follow-up). R-EN8 and 29Y's Eligibility Rules: a condition's `field` may also be a path through the enrollment's Contact lookup (`Contact__r.<Contact field>`), offered for every readable Contact field of a rule type and read blank for an enrollment of an Account. Where Used matches rule fields as paths. No object or field added. |
 | 1.27 | 2026-11-11 | Logic model report PDF (release 1.19, L-04b, D-168 follow-up). R-IN7: the printable page also downloads as a PDF rendered by `Blob.toPdf` through `LogicModelBuilderController.reportPdf`; the page prints landscape. No object or field added. |
+| 1.28 | 2026-11-11 | Account Tabs (C-73, D-195, release 1.19). `BarnCRM_Settings__c` gains `Account_Tabs__c` (text, default Organizations and Households; Section 12 Account Tabs Key). New Core permission sets `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab`; the Organizations tab leaves the three role sets. The BarnCRM and BarnCRM Console apps list the standard Accounts tab. |
 
 ---
 ## 32. Entity ownership by package

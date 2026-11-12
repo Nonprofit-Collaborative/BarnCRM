@@ -150,6 +150,25 @@ The Households tab works the same way. **Households** carries the **BarnCRM Auto
 permission set, which shows the Households tab and nothing else (it gives no record type). Once
 the feature is on, BarnCRM gives it to everyone with a BarnCRM Admin, Staff or Read Only role.
 
+### Account Tabs
+
+**Account Tabs**, on **General**, chooses which tabs people with a BarnCRM role see for
+households and organizations:
+
+| Choice | Tabs shown |
+|---|---|
+| **Organization and Household Tabs** (the default) | **Households** and **Organizations**, as before |
+| **Accounts Tab (Standard)** | Salesforce's own **Accounts** tab, instead of Households and Organizations. Its list view menu already holds **Households**, **My Households**, **Organizations** and **My Organizations** |
+| **Both** | All three |
+
+It works like the Households tab: **BarnCRM Auto: Organizations Tab** and **BarnCRM Auto:
+Accounts Tab** each show one tab, and BarnCRM gives the chosen ones to everyone with a BarnCRM
+Admin, Staff or Read Only role within a few minutes of saving (and takes the others away). The
+Households tab still needs the **Households** feature on. The setting only adds tabs: a person
+whose profile already shows the Accounts tab keeps it whatever you choose, so to hide it, change
+the profile's tab setting in Setup. The BarnCRM and BarnCRM Console apps list the Accounts tab,
+so it shows in their navigation bar for anyone who can see it.
+
 ## Modules
 
 Modules are separate packages, not installed with Core. The **Modules** section lists the

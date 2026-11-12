@@ -1207,10 +1207,6 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Organizations</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
     <tab>Relationship__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

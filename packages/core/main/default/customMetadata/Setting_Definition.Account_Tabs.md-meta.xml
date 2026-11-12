@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Account tabs</label>
+  <protected>true</protected>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Picklist</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value
+      xsi:type="xsd:string"
+    >Which tabs people with a BarnCRM role see for households and organizations. Organization and Household Tabs shows the Households and Organizations tabs. Accounts Tab (Standard) shows Salesforce's own Accounts tab instead, whose list view menu already holds Households, My Households, Organizations and My Organizations. Both shows all three. The Households tab also needs the Households feature on. A person whose profile already shows the Accounts tab keeps it whatever you choose: only the profile can hide it.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">barncrm-settings.md</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:type="xsd:string">Organizations and Households:Organization and Household Tabs;Accounts:Accounts Tab (Standard);Both:Both</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">General</value>
+  </values>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Account_Tabs__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">8.5</value>
+  </values>
+</CustomMetadata>
