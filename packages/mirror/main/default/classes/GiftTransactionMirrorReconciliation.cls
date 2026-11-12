@@ -84,7 +84,9 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		Integer cap = maxRecords + 1;
 		// Each gift can cost a second row for its Gift Transaction, each one a check for a gift.
 		if (4 * cap > Limits.getLimitQueryRows() - Limits.getQueryRows()) {
-			throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_ErrorTooMany);
+			throw new ReconciliationException(
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_ErrorTooMany')
+			);
 		}
 		List<SObject> paid = GiftTransactionMirrorSelector.giftTransactionsInRange(
 			objectName,
@@ -107,7 +109,9 @@ public with sharing class GiftTransactionMirrorReconciliation {
 			AccessLevel.USER_MODE
 		);
 		if (paid.size() > maxRecords || gifts.size() > maxRecords) {
-			throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_ErrorTooMany);
+			throw new ReconciliationException(
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_ErrorTooMany')
+			);
 		}
 
 		Comparison result = new Comparison();
@@ -190,23 +194,29 @@ public with sharing class GiftTransactionMirrorReconciliation {
 			);
 		}
 		if (!GiftTransactionMirrorService.isAvailable()) {
-			throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_Unavailable);
+			throw new ReconciliationException(
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable')
+			);
 		}
 		String status = GiftTransactionMirrorService.paidStatus();
 		if (!GiftTransactionMirrorSchema.isActiveStatus(status)) {
 			throw new ReconciliationException(
 				String.format(
-					Label.Mirror_GiftTransactionMirror_UnknownStatus,
+					BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_UnknownStatus'),
 					new List<Object>{ status }
 				)
 			);
 		}
 		// User mode reads of a field the viewer cannot see fail with the platform's own words.
 		if (!Gift__c.Gift_Transaction_Id__c.getDescribe().isAccessible()) {
-			throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_NoLinkAccess);
+			throw new ReconciliationException(
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoLinkAccess')
+			);
 		}
 		if (!GiftTransactionMirrorSchema.canRead(GiftTransactionMirrorSchema.read())) {
-			throw new ReconciliationException(Label.Mirror_GiftTransactionMirror_NoRead);
+			throw new ReconciliationException(
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoRead')
+			);
 		}
 	}
 

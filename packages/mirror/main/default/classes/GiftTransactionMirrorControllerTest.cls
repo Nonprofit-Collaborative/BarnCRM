@@ -140,7 +140,7 @@ private class GiftTransactionMirrorControllerTest {
 			GiftTransactionMirrorSchema.absentForTest = true;
 			Assert.isFalse(GiftTransactionMirrorController.getStatus().available);
 			Assert.areEqual(
-				Label.Mirror_GiftTransactionMirror_Unavailable,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable'),
 				refusalOf(new Action('run'))
 			);
 
@@ -154,14 +154,14 @@ private class GiftTransactionMirrorControllerTest {
 			settings.Gift_Transaction_Mirror_Start__c = null;
 			upsert as system settings;
 			Assert.areEqual(
-				Label.Mirror_GiftTransactionMirror_NoStartDate,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoStartDate'),
 				refusalOf(new Action('schedule')),
 				'Not ready (R-GT2).'
 			);
 			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.OFF;
 			upsert as system settings;
 			Assert.areEqual(
-				Label.Mirror_GiftTransactionMirror_SwitchedOff,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_SwitchedOff'),
 				refusalOf(new Action('run'))
 			);
 		}
@@ -176,7 +176,7 @@ private class GiftTransactionMirrorControllerTest {
 		System.runAs(ana) {
 			for (String action : new List<String>{ 'status', 'stop', 'compare' }) {
 				Assert.areEqual(
-					Label.Mirror_GiftTransactionMirror_NoUsePermission,
+					BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoUsePermission'),
 					refusalOf(new Action(action)),
 					action
 				);

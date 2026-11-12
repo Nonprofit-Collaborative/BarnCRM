@@ -1,30 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Mirror_CampaignSync_LogFailed</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync log: platform refused the campaign</shortDescription>
-    <value>Campaign sync could not copy the appeal "{0}" to its Campaign: {1}</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_LogMissing</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync log: linked campaign not found</shortDescription>
-    <value>The Campaign linked to the appeal "{0}" was deleted or is not visible to you. If deleted, clear Campaign ID on the appeal to make a new Campaign. If it still exists, give the person saving the appeal access to it.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_InvalidCampaignId</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Appeal save refused: Campaign ID is not one</shortDescription>
-    <value>Campaign ID must be the record ID of a Campaign (18 characters, starting 701), or empty.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_CampaignSync_Title</fullName>
     <categories>Mirror, Campaign Sync</categories>
     <language>en_US</language>
@@ -33,67 +9,11 @@
     <value>Campaign Sync</value>
   </labels>
   <labels>
-    <fullName>Mirror_CampaignSync_Unavailable</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: org has no Campaigns</shortDescription>
-    <value>This org has no Campaigns (Salesforce Platform licenses do not include them), so Campaign sync cannot run here.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_SwitchedOff</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: the setting is off</shortDescription>
-    <value>Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_SwitchedOn</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: the setting is on</shortDescription>
-    <value>Campaign sync is on. Saving an appeal creates or updates its Campaign.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_Counts</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: appeals with a Campaign</shortDescription>
-    <value>{0} of {1} appeals have a Campaign.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_NoCampaignAccess</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: viewer cannot write Campaigns</shortDescription>
-    <value>You cannot create and edit Campaigns, so appeals you save get no Campaign. That needs Campaign access and the Marketing User box on your user record, both in Setup.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_NoManagePermission</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: viewer cannot sync all</shortDescription>
-    <value>Only someone with the Manage BarnCRM Settings permission can sync all appeals.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_CampaignSync_SyncAll</fullName>
     <categories>Mirror, Campaign Sync</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Campaign sync page: sync all button</shortDescription>
     <value>Sync All Appeals</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_CampaignSync_ErrorFailed</fullName>
-    <categories>Mirror, Campaign Sync</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Campaign sync page: unexpected failure</shortDescription>
-    <value>Something went wrong on the Campaign sync page. The details are in the Error Log.</value>
   </labels>
 </CustomLabels>

@@ -133,7 +133,9 @@ public with sharing class GiftTransactionMirrorController {
 
 	private static void requireUse() {
 		if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
-			throw UserErrors.message(Label.Mirror_GiftTransactionMirror_NoUsePermission);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoUsePermission')
+			);
 		}
 	}
 
@@ -156,10 +158,10 @@ public with sharing class GiftTransactionMirrorController {
 	@TestVisible
 	private static String refusal(Status current, Boolean scheduling) {
 		if (!current.available) {
-			return Label.Mirror_GiftTransactionMirror_Unavailable;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable');
 		}
 		if (current.direction == GiftTransactionMirrorService.OFF) {
-			return Label.Mirror_GiftTransactionMirror_SwitchedOff;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_SwitchedOff');
 		}
 		if (!current.canManage) {
 			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission');
@@ -168,7 +170,7 @@ public with sharing class GiftTransactionMirrorController {
 			return current.notReadyReason;
 		}
 		if (!current.canRun) {
-			return Label.Mirror_GiftTransactionMirror_NoAccess;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoAccess');
 		}
 		if (current.running && !scheduling) {
 			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Running');

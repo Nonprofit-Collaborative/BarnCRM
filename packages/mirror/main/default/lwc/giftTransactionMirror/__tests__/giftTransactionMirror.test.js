@@ -8,6 +8,11 @@ import copyRangeAgain from '@salesforce/apex/GiftTransactionMirrorController.cop
 import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from '../mirrorView';
 
 setHelpTextForTest({
+  Mirror_GiftTransactionMirror_DirectionGifts:
+    'Direction: Gifts to Gift Transactions. Received gifts dated on or after {0} get a matching Gift Transaction with status {1}.'
+});
+
+setHelpTextForTest({
   Mirror_OpportunityMirror_DifferenceCountAll: 'Differences found: {0}. All are listed.'
 });
 
@@ -37,14 +42,6 @@ jest.mock(
 jest.mock(
   '@salesforce/apex/GiftTransactionMirrorController.copyRangeAgain',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_GiftTransactionMirror_DirectionGifts',
-  () => ({
-    default:
-      'Direction: Gifts to Gift Transactions. Received gifts dated on or after {0} get a matching Gift Transaction with status {1}.'
-  }),
   { virtual: true }
 );
 

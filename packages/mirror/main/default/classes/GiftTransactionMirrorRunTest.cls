@@ -186,7 +186,12 @@ private class GiftTransactionMirrorRunTest {
 			totals.designationsUnavailable = true;
 			Assert.isTrue(
 				GiftTransactionMirrorBatch.summaryOf(totals)
-					.endsWith(Label.Mirror_GiftTransactionMirror_DesignationsUnavailable)
+					.endsWith(
+						BarnHelp.text(
+							'Mirror',
+							'Mirror_GiftTransactionMirror_DesignationsUnavailable'
+						)
+					)
 			);
 			Assert.isTrue(GiftTransactionMirrorBatch.hasHeadroom(100), 'A fresh chunk has room.');
 		}
@@ -295,7 +300,11 @@ private class GiftTransactionMirrorRunTest {
 				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 			GiftTransactionMirrorSchema.absentForTest = true;
-			assertRefused(GIFT_DATE, GIFT_DATE, Label.Mirror_GiftTransactionMirror_Unavailable);
+			assertRefused(
+				GIFT_DATE,
+				GIFT_DATE,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable')
+			);
 		}
 	}
 

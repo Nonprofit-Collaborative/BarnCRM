@@ -89,7 +89,10 @@ public with sharing class MirrorHealthCheckExtension implements HealthCheckExten
 					GIFT_TRANSACTION_MIRROR_STALE_KEY,
 					Label.Mirror_HealthCheck_GiftTransactionMirrorNotRunTitle,
 					String.format(
-						Label.Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail,
+						BarnHelp.text(
+							'Mirror',
+							'Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail'
+						),
 						new List<Object>{ since.format() }
 					),
 					HealthCheckService.SEVERITY_WARNING,

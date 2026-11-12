@@ -236,8 +236,11 @@ public with sharing class CampaignSyncService {
 				result.failed++;
 				log(
 					String.format(
-						Label.Mirror_CampaignSync_LogFailed,
-						new List<Object>{ appeal.Name, Label.Mirror_CampaignSync_InvalidCampaignId }
+						BarnHelp.text('Mirror', 'Mirror_CampaignSync_LogFailed'),
+						new List<Object>{
+							appeal.Name,
+							BarnHelp.text('Mirror', 'Mirror_CampaignSync_InvalidCampaignId')
+						}
 					),
 					appeal
 				);
@@ -394,7 +397,7 @@ public with sharing class CampaignSyncService {
 				result.failed++;
 				log(
 					String.format(
-						Label.Mirror_CampaignSync_LogMissing,
+						BarnHelp.text('Mirror', 'Mirror_CampaignSync_LogMissing'),
 						new List<Object>{ appeal.Name }
 					),
 					appeal
@@ -506,7 +509,9 @@ public with sharing class CampaignSyncService {
 		}
 		Id typed = MirrorSync.idOf(appeal.Campaign_Id__c, campaignType());
 		if (typed == null) {
-			appeal.Campaign_Id__c.addError(Label.Mirror_CampaignSync_InvalidCampaignId);
+			appeal.Campaign_Id__c.addError(
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_InvalidCampaignId')
+			);
 			return false;
 		}
 		appeal.Campaign_Id__c = String.valueOf(typed);
@@ -574,7 +579,7 @@ public with sharing class CampaignSyncService {
 		}
 		log(
 			String.format(
-				Label.Mirror_CampaignSync_LogFailed,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_LogFailed'),
 				new List<Object>{ appeal.Name, String.join(messages, ' ') }
 			),
 			appeal

@@ -9,10 +9,6 @@ import stop from '@salesforce/apex/GiftTransactionMirrorController.stop';
 import compare from '@salesforce/apex/GiftTransactionMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/GiftTransactionMirrorController.copyRangeAgain';
 import title from '@salesforce/label/c.Mirror_GiftTransactionMirror_Title';
-import unavailable from '@salesforce/label/c.Mirror_GiftTransactionMirror_Unavailable';
-import switchedOff from '@salesforce/label/c.Mirror_GiftTransactionMirror_SwitchedOff';
-import directionGifts from '@salesforce/label/c.Mirror_GiftTransactionMirror_DirectionGifts';
-import noAccess from '@salesforce/label/c.Mirror_GiftTransactionMirror_NoAccess';
 import runNowLabel from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
 import scheduleNightly from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
 import stopSchedule from '@salesforce/label/c.Giving_NightlyJobs_StopButton';
@@ -70,12 +66,18 @@ export default class GiftTransactionMirror extends LightningElement {
     get intro() {
       return helpText('Mirror', 'Mirror_GiftTransactionMirror_Intro');
     },
-    unavailable,
-    switchedOff,
+    get unavailable() {
+      return helpText('Mirror', 'Mirror_GiftTransactionMirror_Unavailable');
+    },
+    get switchedOff() {
+      return helpText('Mirror', 'Mirror_GiftTransactionMirror_SwitchedOff');
+    },
     get noManagePermission() {
       return helpText('Mirror', 'Mirror_OpportunityMirror_NoManagePermission');
     },
-    noAccess,
+    get noAccess() {
+      return helpText('Mirror', 'Mirror_GiftTransactionMirror_NoAccess');
+    },
     runNow: runNowLabel,
     scheduleNightly,
     stopSchedule,
@@ -194,7 +196,7 @@ export default class GiftTransactionMirror extends LightningElement {
 
   get directionText() {
     return fill(
-      directionGifts,
+      helpText('Mirror', 'Mirror_GiftTransactionMirror_DirectionGifts'),
       this.status.startDate ? this.day(this.status.startDate) : '',
       this.status.paidStatus
     );

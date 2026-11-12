@@ -243,7 +243,9 @@ private class InboundGiftServiceTest {
 				Assert.isTrue(entry.Message__c.contains('stripe:ch_'), 'The external id is named.');
 				Assert.isTrue(entry.Message__c.contains('donor_not_found'), 'The code is named.');
 				Assert.isFalse(
-					entry.Message__c.contains(Label.Mirror_InboundGift_ErrorDonorEmailNotFound),
+					entry.Message__c.contains(
+						BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorDonorEmailNotFound')
+					),
 					'The message stays in the response, out of the log.'
 				);
 			}

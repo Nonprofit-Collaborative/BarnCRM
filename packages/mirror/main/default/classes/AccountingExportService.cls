@@ -90,13 +90,17 @@ public with sharing class AccountingExportService {
 		Boolean onlyUnposted
 	) {
 		if (fromDate == null || toDate == null) {
-			throw new ExportException(Label.Mirror_AccountingExport_ErrorDatesRequired);
+			throw new ExportException(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorDatesRequired')
+			);
 		}
 		if (toDate < fromDate) {
-			throw new ExportException(Label.Mirror_AccountingExport_ErrorDateOrder);
+			throw new ExportException(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorDateOrder')
+			);
 		}
 		if (fundId != null && fundId.getSObjectType() != Fund__c.SObjectType) {
-			throw new ExportException(Label.Mirror_AccountingExport_ErrorFund);
+			throw new ExportException(BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorFund'));
 		}
 		Set<String> methods = new Set<String>(paymentMethods());
 		if (String.isNotBlank(paymentMethod)) {
@@ -109,7 +113,9 @@ public with sharing class AccountingExportService {
 		Builder builder = new Builder(onlyUnposted == true);
 		AccountingExportSelector.read(fromDate, toDate, fundId, methods, STATUSES, builder);
 		if (builder.overLimit) {
-			throw new ExportException(Label.Mirror_AccountingExport_ErrorTooManyRows);
+			throw new ExportException(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorTooManyRows')
+			);
 		}
 		return builder.finish();
 	}
@@ -131,7 +137,9 @@ public with sharing class AccountingExportService {
 		String downloadedDigest
 	) {
 		if (fundId != null) {
-			throw new ExportException(Label.Mirror_AccountingExport_MarkNeedsAllFunds);
+			throw new ExportException(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_MarkNeedsAllFunds')
+			);
 		}
 		ExportFile again = build(fromDate, toDate, null, paymentMethod, onlyUnposted);
 		if (again.digest == null || again.digest != downloadedDigest) {

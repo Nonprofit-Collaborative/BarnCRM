@@ -115,7 +115,7 @@ private class CampaignSyncUnavailableTest {
 
 			Assert.isFalse(status.available, 'The page says Campaign sync cannot work here.');
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_Unavailable,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_Unavailable'),
 				refusal,
 				'Sync all appeals is refused in words, before anything starts.'
 			);
