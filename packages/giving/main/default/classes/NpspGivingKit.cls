@@ -40,6 +40,13 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 		);
 		List<Map<String, Object>> rows = source.rows(records);
+		shapeRows(stepKey, rows);
+		return rows;
+	}
+
+	/** Each row's computed columns: a plan step's order and assignment, or a recurring one's. */
+	@TestVisible
+	private static void shapeRows(String stepKey, List<Map<String, Object>> rows) {
 		for (Map<String, Object> row : rows) {
 			if (stepKey == 'planSteps') {
 				planStep(row);
@@ -62,7 +69,6 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 				);
 			}
 		}
-		return rows;
 	}
 
 	/**
@@ -112,6 +118,7 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 	 * One text field of every NPSP record a query reads, in the user's access; none without
 	 * NPSP. The query writes `~` for the namespace separator, built here at run time.
 	 */
+	@TestVisible
 	private static Set<String> names(String written, String field) {
 		Set<String> result = new Set<String>();
 		String query = written.replace('~', '__');

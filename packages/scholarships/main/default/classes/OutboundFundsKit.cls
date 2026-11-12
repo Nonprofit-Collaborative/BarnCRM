@@ -31,10 +31,16 @@ public with sharing class OutboundFundsKit implements MigrationKitExtension {
 				MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 			)
 			.rows(records);
+		linkToParent(rows);
+		return rows;
+	}
+
+	/** Each row's own Id again, as the column its link to the earlier step reads. */
+	@TestVisible
+	private static void linkToParent(List<Map<String, Object>> rows) {
 		for (Map<String, Object> row : rows) {
 			row.put(PARENT_COLUMN, row.get('Id'));
 		}
-		return rows;
 	}
 
 	@NamespaceAccessible

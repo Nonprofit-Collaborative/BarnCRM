@@ -125,6 +125,144 @@ private class NpspGiftsKitTest {
 	}
 
 	@IsTest
+	static void aSplitKeepsAtMostFivePartsAndBlankAmounts() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		List<NpspGiftsKit.Part> parts = new List<NpspGiftsKit.Part>();
+		for (Integer index = 1; index <= 6; index++) {
+			parts.add(new NpspGiftsKit.Part('Fund ' + index, index == 2 ? null : index * 10));
+		}
+		Map<String, Object> many = new Map<String, Object>();
+		NpspGiftsKit.putSplit(many, parts, '210');
+		Assert.areEqual('Fund 5', many.get('Fund5'), 'the fifth part is kept');
+		Assert.isFalse(many.containsKey('Fund6'), 'the sixth part is dropped');
+		Assert.areEqual('', many.get('Amount2'), 'a part with no amount is blank');
+		Assert.areEqual('50', many.get('Amount5'), 'its amount as text');
+
+		Map<String, Object> mismatch = new Map<String, Object>();
+		NpspGiftsKit.putSplit(
+			mismatch,
+			new List<NpspGiftsKit.Part>{ new NpspGiftsKit.Part('Part Fund', 40) },
+			'100'
+		);
+		Assert.areEqual('40', mismatch.get('Amount1'), 'one part of the gift stays a split');
+
+		Map<String, Object> none = new Map<String, Object>();
+		NpspGiftsKit.putSplit(none, null, '100');
+		NpspGiftsKit.putSplit(none, new List<NpspGiftsKit.Part>(), '100');
+		Assert.isTrue(none.isEmpty(), 'no allocations, no columns');
+	}
+
+	@IsTest
+	static void rowsAreShapedWhenNpspHoldsNoPaymentsAllocationsOrPartialCredits() {
+		// runs-as: deploying user (text rows only; without NPSP its objects read as none)
+		List<Map<String, Object>> gifts = new List<Map<String, Object>>{
+			new Map<String, Object>{
+				'Id' => '006000000000003AAA',
+				'Amount' => '90',
+				'AccountId' => '001000000000003AAA',
+				'npsp.Primary_Contact__c' => '',
+				'Account.npe01.SYSTEM_IsIndividual__c' => 'true'
+			}
+		};
+		NpspGiftsKit.shapeGifts(gifts);
+		Assert.areEqual(
+			'Organization',
+			gifts[0].get('Donor'),
+			'no primary contact, so the account'
+		);
+		Assert.areEqual('Other', gifts[0].get('Method'), 'no paid payment');
+		Assert.areEqual('', gifts[0].get('Reference'), 'no reference');
+		Assert.isFalse(gifts[0].containsKey('Fund1'), 'no allocations, no split');
+
+		List<Map<String, Object>> credits = new List<Map<String, Object>>{
+			new Map<String, Object>{
+				'OpportunityId' => '006000000000003AAA',
+				'ContactId' => '003000000000003AAA',
+				'Role' => 'Influencer',
+				'Opportunity.Amount' => '90'
+			},
+			new Map<String, Object>{
+				'OpportunityId' => '006000000000003AAA',
+				'npsp.Role__c' => 'Friend'
+			}
+		};
+		NpspGiftsKit.shapeCredits(credits);
+		Assert.areEqual('Influencer', credits[0].get('CreditRole'), 'a contact credit role');
+		Assert.areEqual('90', credits[0].get('Amount'), 'the whole gift without a partial credit');
+		Assert.areEqual('Other', credits[1].get('CreditRole'), 'an account credit role');
+		Assert.areEqual('Friend', credits[1].get('CustomRole'), 'keeps NPSP name');
+	}
+
+	@IsTest
+	static void aReadReturnsOnlyWhatTheObjectHoldsAndNothingWithoutIdsOrTheObject() {
+		System.runAs(TestUsers.admin()) {
+			Contact ana = new Contact(LastName = 'Giftskit');
+			insert ana;
+			String query = 'SELECT Id FROM Contact WHERE Id IN :ids';
+			Assert.areEqual(
+				1,
+				NpspGiftsKit.read('Contact', query, new Set<String>{ ana.Id }).size(),
+				'the record is read'
+			);
+			Assert.isTrue(
+				NpspGiftsKit.read('Contact', query, new Set<String>()).isEmpty(),
+				'no ids, no query'
+			);
+			Assert.isTrue(
+				NpspGiftsKit.read('npsp~Allocation__c', query, new Set<String>{ ana.Id }).isEmpty(),
+				'no NPSP, no records'
+			);
+		}
+	}
+
+	@IsTest
+	static void aColumnListsItsDistinctNonBlankValues() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		Set<String> values = NpspGiftsKit.column(
+			new List<Map<String, Object>>{
+				new Map<String, Object>{ 'Id' => 'a' },
+				new Map<String, Object>{ 'Id' => 'a' },
+				new Map<String, Object>{ 'Id' => '' },
+				new Map<String, Object>{ 'Id' => 'b' }
+			},
+			'Id'
+		);
+		Assert.areEqual(new Set<String>{ 'a', 'b' }, values, 'distinct and non-blank');
+		Map<String, Object> padded = new Map<String, Object>();
+		NpspGiftsKit.putRole(padded, '  HONOREE ');
+		Assert.areEqual('Honoree', padded.get('CreditRole'), 'trimmed, any case');
+	}
+
+	@IsTest
+	static void stepsReadingNpspObjectsAreRefusedWithoutThemAndContactCreditsStage() {
+		System.runAs(TestUsers.withPermissionSets(
+			new List<String>{
+				TestUsers.CORE_ADMIN,
+				'Rollup_Builder_Admin',
+				'Giving_Admin',
+				'Salesforce_Records_Sync'
+			}
+		)) {
+			NpspGiftsKit extension = new NpspGiftsKit();
+			List<Map<String, Object>> credits = extension.rows(
+				'contactCredits',
+				new List<SObject>()
+			);
+			Assert.isTrue(credits.isEmpty(), 'no records, no staged credits');
+			for (String key : new List<String>{ 'gifts', 'accountCredits' }) {
+				try {
+					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+				} catch (Exception refused) {
+					Assert.isTrue(
+						refused.getMessage().contains('this org does not have'),
+						key + ' names what is missing: ' + refused.getMessage()
+					);
+				}
+			}
+		}
+	}
+
+	@IsTest
 	static void aSoftCreditKeepsBarnRolesAndPartialAmounts() {
 		// runs-as: deploying user (text rows only, no record or permission is read)
 		Map<String, Object> solicitor = new Map<String, Object>{ 'Opportunity.Amount' => '400' };

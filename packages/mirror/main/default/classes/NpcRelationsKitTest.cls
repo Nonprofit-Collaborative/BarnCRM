@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:NpcRelationsKit, ApexClass:MigrationKitService')
 private class NpcRelationsKitTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
+
 	@IsTest
 	static void eachStepHasItsTemplateAndNamesOnlyWhatItReads() {
 		System.runAs(TestUsers.admin()) {
@@ -65,6 +70,131 @@ private class NpcRelationsKitTest {
 		Assert.areEqual(2, kept.size(), 'Ana and Ben once, Cara and Ana once');
 		Assert.areEqual(ana, kept[0].get('ContactId'), 'the side whose person sorts first');
 		Assert.areEqual(cara, kept[1].get('ContactId'), 'held one way only');
+	}
+
+	@IsTest
+	static void withoutNonprofitCloudTheStepsAreRefusedAndNothingIsWanted() {
+		System.runAs(TestUsers.admin()) {
+			NpcRelationsKit extension = new NpcRelationsKit();
+			for (String key : new List<String>{ 'relationships', 'affiliations' }) {
+				try {
+					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+				} catch (Exception refused) {
+					Assert.isTrue(
+						refused.getMessage().contains('this org does not have'),
+						key + ' names what is missing: ' + refused.getMessage()
+					);
+				}
+				MigrationCheck check = extension.verify(key);
+				Assert.areEqual(0, check.source, key + ': nothing to copy');
+				Assert.areEqual(0, check.done, key + ': nothing copied');
+			}
+		}
+	}
+
+	@IsTest
+	static void stepRowsAreShapedWhenNonprofitCloudHoldsNoOtherDirectionOrHousehold() {
+		System.runAs(TestUsers.admin()) {
+			List<Map<String, Object>> relationships = NpcRelationsKit.shape(
+				'relationships',
+				new List<Map<String, Object>>{
+					new Map<String, Object>{ 'ContactId' => '', 'RelatedContactId' => '' }
+				}
+			);
+			Assert.areEqual(1, relationships.size(), 'no reverse side to drop');
+			List<Map<String, Object>> affiliations = NpcRelationsKit.shape(
+				'affiliations',
+				new List<Map<String, Object>>{
+					new Map<String, Object>{
+						'AccountId' => '001000000000004AAA',
+						'Roles' => 'Donor;Advisor'
+					}
+				}
+			);
+			Assert.areEqual(1, affiliations.size(), 'an organization is kept');
+			Assert.areEqual('Donor, Advisor', affiliations[0].get('Role'), 'roles as text');
+			Assert.isTrue(
+				NpcRelationsKit.notOrganizations(new Set<String>()).isEmpty(),
+				'no accounts to check'
+			);
+			Assert.areEqual(
+				new Set<String>{ 'x' },
+				NpcRelationsKit.column(
+					new List<Map<String, Object>>{
+						new Map<String, Object>{ 'AccountId' => 'x' },
+						new Map<String, Object>{ 'AccountId' => ' ' }
+					},
+					'AccountId'
+				),
+				'distinct non-blank values'
+			);
+		}
+	}
+
+	@IsTest
+	static void barnRecordsAloneAreNotCountedAsCopiedAndReadsAreBoundedByTheObject() {
+		System.runAs(TestUsers.admin()) {
+			Account org = new Account(Name = 'Relkit Org');
+			insert org;
+			List<Contact> people = new List<Contact>{
+				new Contact(LastName = 'Relkit One'),
+				new Contact(LastName = 'Relkit Two')
+			};
+			insert people;
+			insert new Relationship__c(
+				Contact__c = people[0].Id,
+				Related_Contact__c = people[1].Id,
+				Type__c = 'Friend',
+				Status__c = 'Current'
+			);
+			insert new Affiliation__c(
+				Contact__c = people[0].Id,
+				Organization__c = org.Id,
+				Role__c = 'Volunteer',
+				Status__c = 'Current'
+			);
+			for (String key : new List<String>{ 'relationships', 'affiliations' }) {
+				MigrationCheck check = new NpcRelationsKit().verify(key);
+				Assert.areEqual(0, check.source, key + ': nothing in Nonprofit Cloud to copy');
+				Assert.areEqual(0, check.done, key + ': BarnCRM records alone are not copies');
+			}
+			Assert.areEqual(
+				2,
+				NpcRelationsKit.read(
+						'SELECT Id FROM Contact WHERE Id IN :ids',
+						new Set<String>{ people[0].Id, people[1].Id }
+					)
+					.size(),
+				'a present object is read'
+			);
+			Assert.isTrue(
+				NpcRelationsKit.read(
+						'SELECT Id FROM NoSuchObject__x WHERE Id IN :ids',
+						new Set<String>{ people[0].Id }
+					)
+					.isEmpty(),
+				'an absent object reads as none'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPairHeldOneWayOnlyKeepsEveryRowAndBlankRolesStayBlank() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		List<Map<String, Object>> rows = new List<Map<String, Object>>{
+			new Map<String, Object>{
+				'ContactId' => '003000000000002AAA',
+				'RelatedContactId' => '003000000000001AAA'
+			}
+		};
+		Assert.areEqual(1, NpcRelationsKit.oneSide(rows, new Set<String>()).size(), 'one way');
+		List<Map<String, Object>> kept = NpcRelationsKit.organizations(
+			new List<Map<String, Object>>{
+				new Map<String, Object>{ 'AccountId' => '001000000000003AAA', 'Roles' => '' }
+			},
+			new Set<String>()
+		);
+		Assert.areEqual('', kept[0].get('Role'), 'no roles');
 	}
 
 	@IsTest

@@ -6,6 +6,11 @@
  */
 @IsTest(testFor='ApexClass:V4sMigrationKit')
 private class V4sMigrationKitTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith('Volunteers_Admin');
+	}
+
 	private static final List<String> STEPS = new List<String>{
 		'jobs',
 		'shifts',
@@ -81,6 +86,60 @@ private class V4sMigrationKitTest {
 			'past shift'
 		);
 		Assert.areEqual('Open', V4sMigrationKit.statusOf(starts, starts.addDays(-1)), 'future');
+	}
+
+	@IsTest
+	static void theShiftsStepIsRefusedWithoutV4sAndLongShiftsRoundToMinutes() {
+		System.runAs(TestUsers.adminWith('Volunteers_Admin')) {
+			try {
+				Assert.isNotNull(
+					new V4sMigrationKit().rows(V4sMigrationKit.SHIFTS, new List<SObject>()),
+					'staged'
+				);
+			} catch (Exception refused) {
+				Assert.isTrue(
+					refused.getMessage().contains('this org does not have'),
+					'names what is missing: ' + refused.getMessage()
+				);
+			}
+		}
+		Datetime starts = Datetime.newInstanceGmt(2026, 3, 14, 9, 0, 0);
+		Assert.areEqual(
+			JSON.serialize(starts.addMinutes(60)).remove('"'),
+			V4sMigrationKit.endOf(starts, 0),
+			'a zero length is one hour'
+		);
+		Assert.areEqual(
+			JSON.serialize(starts.addMinutes(45)).remove('"'),
+			V4sMigrationKit.endOf(starts, 0.75),
+			'three quarters of an hour'
+		);
+		Assert.areEqual('Open', V4sMigrationKit.statusOf(null, starts), 'no start is open');
+	}
+
+	@IsTest
+	static void shiftRowsGetAnEndAndAStatusFromTheirStartAndLength() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		Datetime starts = Datetime.newInstanceGmt(2026, 3, 14, 9, 0, 0);
+		List<Map<String, Object>> rows = new List<Map<String, Object>>{
+			new Map<String, Object>{
+				'GW_Volunteers.Start_Date_Time__c' => JSON.serialize(starts).remove('"'),
+				'GW_Volunteers.Duration__c' => '2'
+			},
+			new Map<String, Object>{
+				'GW_Volunteers.Start_Date_Time__c' => '',
+				'GW_Volunteers.Duration__c' => ''
+			}
+		};
+		V4sMigrationKit.shapeShifts(rows);
+		Assert.areEqual(
+			JSON.serialize(starts.addMinutes(120)).remove('"'),
+			rows[0].get(V4sMigrationKit.END_COLUMN),
+			'a two hour shift'
+		);
+		Assert.areEqual('Completed', rows[0].get(V4sMigrationKit.STATUS_COLUMN), 'long past');
+		Assert.areEqual('', rows[1].get(V4sMigrationKit.END_COLUMN), 'no start, no end');
+		Assert.areEqual('Open', rows[1].get(V4sMigrationKit.STATUS_COLUMN), 'no start is open');
 	}
 
 	@IsTest

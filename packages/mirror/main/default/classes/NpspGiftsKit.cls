@@ -60,6 +60,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 		return null;
 	}
 
+	@TestVisible
 	private static void shapeGifts(List<Map<String, Object>> rows) {
 		Set<String> ids = column(rows, 'Id');
 		Map<String, List<String>> payments = new Map<String, List<String>>();
@@ -158,6 +159,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 		}
 	}
 
+	@TestVisible
 	private static void shapeCredits(List<Map<String, Object>> rows) {
 		Set<String> ids = column(rows, 'OpportunityId');
 		Map<String, Decimal> partial = new Map<String, Decimal>();
@@ -237,6 +239,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	}
 
 	/** The records of an NPSP object, in the user's access; none when NPSP lacks the object. */
+	@TestVisible
 	private static List<SObject> read(String objectName, String query, Set<String> ids) {
 		if (
 			ids.isEmpty() ||

@@ -27,6 +27,12 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 				MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 			)
 			.rows(records);
+		return shape(stepKey, rows);
+	}
+
+	/** One step's rows as its template reads them. */
+	@TestVisible
+	private static List<Map<String, Object>> shape(String stepKey, List<Map<String, Object>> rows) {
 		if (stepKey == 'relationships') {
 			return oneSide(rows, reversed(rows));
 		}
@@ -151,6 +157,7 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 	}
 
 	/** Of these accounts, the households and person accounts. */
+	@TestVisible
 	private static Set<String> notOrganizations(Set<String> ids) {
 		Set<String> result = new Set<String>();
 		if (ids.isEmpty()) {
@@ -180,6 +187,7 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 	}
 
 	/** The distinct non-blank values of one column. */
+	@TestVisible
 	private static Set<String> column(List<Map<String, Object>> rows, String name) {
 		Set<String> result = new Set<String>();
 		for (Map<String, Object> row : rows) {
@@ -196,6 +204,7 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 	}
 
 	/** The records of a Nonprofit Cloud object, in the user's access; none without it. */
+	@TestVisible
 	private static List<SObject> read(String query, Set<String> ids) {
 		String objectName = query.substringAfter(' FROM ').substringBefore(' ').trim();
 		if (!NamespaceUtil.globalDescribe().containsKey(objectName.toLowerCase())) {
