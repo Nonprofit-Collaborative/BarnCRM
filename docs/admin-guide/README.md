@@ -128,7 +128,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core |
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core |
 | C-07 Coexistence mode | [coexistence-mode.md](coexistence-mode.md) | Core |
-| X-09 Nonprofit Cloud households | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core, only in an org with Nonprofit Cloud |
+| X-09 Nonprofit Cloud households, MIG-02b Household Model and conversion | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core (guards, Household Model, the conversion section) and Mirror (conversion source, kit, drift report), only in an org with Nonprofit Cloud |
 | X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | Core, only in an org with NPSP |
 | C-15 Relationships | [relationships.md](relationships.md) | Core |
 | C-16 Affiliations | [affiliations.md](affiliations.md) | Core |

@@ -5,8 +5,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Error Log context for NPSP household adoption.</shortDescription>
-        <value>NPSP household adoption</value>
+        <shortDescription>Error Log context for NPSP adoption and Nonprofit Cloud conversion.</shortDescription>
+        <value>Household adoption</value>
     </labels>
     <labels>
         <fullName>Core_NpspAdoption_Title</fullName>

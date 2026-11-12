@@ -37,8 +37,10 @@
                 <thead>
                   <tr class="slds-line-height_reset">
                     <th scope="col">{labels.columnName}</th>
-                    <th scope="col">{labels.columnFormal}</th>
-                    <th scope="col">{labels.columnInformal}</th>
+                    <template lwc:if={showGreetings}>
+                      <th scope="col">{labels.columnFormal}</th>
+                      <th scope="col">{labels.columnInformal}</th>
+                    </template>
                     <th scope="col">{labels.columnPrimary}</th>
                     <th scope="col">{labels.columnContacts}</th>
                   </tr>
@@ -47,8 +49,10 @@
                   <template for:each={sample} for:item="row">
                     <tr key={row.accountId}>
                       <th scope="row" data-label={labels.columnName}>{row.name}</th>
-                      <td data-label={labels.columnFormal}>{row.formalGreeting}</td>
-                      <td data-label={labels.columnInformal}>{row.informalGreeting}</td>
+                      <template lwc:if={showGreetings}>
+                        <td data-label={labels.columnFormal}>{row.formalGreeting}</td>
+                        <td data-label={labels.columnInformal}>{row.informalGreeting}</td>
+                      </template>
                       <td data-label={labels.columnPrimary}>{row.primaryContactName}</td>
                       <td data-label={labels.columnContacts}>{row.contactCount}</td>
                     </tr>

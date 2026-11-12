@@ -153,3 +153,22 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | 4 | Click **Undo** on both steps, in reverse order. | **Undone**; Nonprofit Cloud's records are unchanged. |
 
 **Cleanup:** delete the test records.
+
+## T-MIG-11: Nonprofit Cloud Households Convert in Place, With Members, and Undo
+
+**Purpose:** confirm the NPC Households kit (Mirror) converts native households in place, joins their members in membership records mode, changes no Nonprofit Cloud record, undoes cleanly, and that the Household Model field and drift report behave. This is the live check of the native rows the Apex tests only stand in for.
+**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed; admin user with **Manage BarnCRM Settings** and the **Group Membership** permission set; household membership set to membership records (Junction). In Nonprofit Cloud: household account **Lee Household** with a Party Relationship Group of type Household and account contact relations for person account Sam Lee (primary member, role Father, start date 2020-01-01), person account Kim Lee (role Daughter) and person account Bo Lee (inactive, no end date); household account **Park Household** with its group, set to Household Model **Nonprofit Cloud**; household account **Cho Household** with its group and one member.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **General**. | **Convert Nonprofit Cloud Households** is shown. "2 Nonprofit Cloud households can be converted"; the sample lists Lee Household and Cho Household with primary member and member count, and no greeting columns. Park Household is not listed. |
+| 2 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: NPC Households**. | One tool step, **Convert Nonprofit Cloud Households**, opening BarnCRM Settings. |
+| 3 | Leave **Keep Nonprofit Cloud's household names** checked, click **Convert Households**, type **2** and click **Convert**. | Started; the section updates by itself. **Last conversion**: 2 converted. |
+| 4 | Open Lee Household. | Record type Household, Household Model **Converted**, name unchanged, Custom Name checked, greetings filled. Household members: Sam (primary, Head, start 2020-01-01) and Kim (Child). Bo is not a member. |
+| 5 | Open Lee Household's Party Relationship Group and account contact relations. | Unchanged: same rows, same values, same last modified dates. |
+| 6 | Run step 1 again. | "Every Nonprofit Cloud household you can see is already a BarnCRM household or marked to stay in Nonprofit Cloud." |
+| 7 | Open **Health**. | No **Household Model Disagrees With Nonprofit Cloud** warning. Then set Cho Household's Household Model to **Automatic** and refresh: the warning names Cho Household. Set it back to **Converted**. |
+| 8 | Add a household member to Cho Household by hand, then click **Undo This Conversion**, type **2** and confirm. | **Last conversion**: 1 undone, 1 not put back. Lee Household has its old record type, Household Model **Automatic**, and no BarnCRM members; Cho Household is still a Household and its Household Adoption record says it has other members. No Nonprofit Cloud record changed. |
+| 9 | As a staff user without **Manage BarnCRM Settings**, open BarnCRM Settings, **General**. | **Convert Nonprofit Cloud Households** is not shown. |
+
+**Cleanup:** remove Cho Household's hand-added member and undo again, then delete the test records.

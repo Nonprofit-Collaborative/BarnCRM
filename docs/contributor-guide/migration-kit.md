@@ -75,6 +75,17 @@ Protected hierarchy custom settings are exported to `settings.csv` (organization
 values only) when the source org lets the API read them, and never reimported: a managed
 package's protected setting is not writable from outside the package.
 
+## Household adoption and conversion journals
+
+`Account.Household_Model__c` (MIG-02b) is a packaged Account field, so it carries over in
+place like any other. The `Household_Adoption__c` journal (NPSP adoption, ADR-0155, and the
+Nonprofit Cloud household conversion, ADR-NEXT `NEXT-npc-household-conversion.md`) is copied
+as an ordinary object, but the Household Member Ids a conversion writes inside its
+`Previous_Values__c` JSON are not whole-value Ids, so they are not translated. After a move,
+an undo of a conversion run made before it restores each Account but finds none of its
+members, and reports the household Not Restored because it still has members. Tell the
+administrator to finish or undo any conversion before the move.
+
 ## verify
 
 `verify` exports the target org with the same mapping, translates every Id through

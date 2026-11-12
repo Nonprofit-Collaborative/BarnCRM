@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Convert Nonprofit Cloud Households</label>
+  <protected>true</protected>
+  <values>
+    <field>Component__c</field>
+    <value xsi:type="xsd:string">npcHouseholdConversion</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">General</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Component</value>
+  </values>
+  <values>
+    <field>Required_Permission__c</field>
+    <value xsi:type="xsd:string">Manage_BarnCRM_Settings</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Turns the households Nonprofit Cloud already has into BarnCRM households, once and in place, with their members in membership records mode. Nonprofit Cloud's own records are never changed. Shown only when BarnCRM Mirror is installed and Nonprofit Cloud households are in this org. Preview first, confirm the number, undo any time.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">nonprofit-cloud-households.md</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">1.6</value>
+  </values>
+</CustomMetadata>
