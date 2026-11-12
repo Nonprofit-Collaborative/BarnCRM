@@ -114,6 +114,10 @@ const ICONS = Object.freeze({
   // Memberships
   Membership_Level__c: 'custom:custom48',
   Membership_Term__c: 'custom:custom45',
+  // Project Management
+  Project__c: 'custom:custom62',
+  Projects_Home: 'custom:custom64',
+  Time_Entry__c: 'custom:custom95',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

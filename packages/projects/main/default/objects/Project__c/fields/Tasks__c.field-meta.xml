@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Tasks__c</fullName>
+  <inlineHelpText>How many tasks the project has, not counting Cancelled ones.</inlineHelpText>
+  <label>Tasks</label>
+  <summaryFilterItems>
+    <field>Project_Task__c.Status__c</field>
+    <operation>notEqual</operation>
+    <value>Cancelled</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Project_Task__c.Project__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

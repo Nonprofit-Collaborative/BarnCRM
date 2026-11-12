@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>At_Risk_Days__c</fullName>
+  <defaultValue>7</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>How many days past due an open task must be before its project is At Risk, from 1 to 365. Default: 7.</inlineHelpText>
+  <label>Days late before at risk</label>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+</CustomField>

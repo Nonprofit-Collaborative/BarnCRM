@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Project Management's page logic in plain JavaScript: phase progress, the timeline, utilization
+    and the billable export columns (PM-02, PM-04).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

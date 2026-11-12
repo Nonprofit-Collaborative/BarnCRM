@@ -287,6 +287,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
 
+### Project Management
+
+| Feature | Page | Package |
+|---|---|---|
+| PM-01 to PM-05 Project Management: install, access, settings, projects, phases, tasks and milestones, templates (Salesforce Implementation, Program Launch, your own), time entries, assignments, budgets, utilization, Export Billable Time, health, status updates, the Projects at Risk card, reports | [projects.md](projects.md) | BarnCRM Project Management |
+
 ### Scholarships and Outbound Grants
 
 | Feature | Page | Package |

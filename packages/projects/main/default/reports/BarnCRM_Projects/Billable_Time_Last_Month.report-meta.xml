@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Time_Entry__c$User__c</field>
+  </columns>
+  <columns>
+    <field>Time_Entry__c$Task__c</field>
+  </columns>
+  <columns>
+    <field>Time_Entry__c$Date__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Time_Entry__c$Hours__c</field>
+  </columns>
+  <columns>
+    <field>Time_Entry__c$Exported_Date__c</field>
+  </columns>
+  <description>
+    Billable hours logged last month, grouped by project, for invoicing in your own system.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Time_Entry__c$Billable__c</column>
+      <operator>equals</operator>
+      <value>1</value>
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <dateGranularity>None</dateGranularity>
+    <field>Time_Entry__c$Project__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Billable Time Last Month</name>
+  <reportType>Time_Entries__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+  <timeFrameFilter>
+    <dateColumn>Time_Entry__c$Date__c</dateColumn>
+    <interval>INTERVAL_PREVMONTH</interval>
+  </timeFrameFilter>
+</Report>

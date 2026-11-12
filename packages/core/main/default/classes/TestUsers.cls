@@ -53,7 +53,8 @@ public class TestUsers {
 		'LWC_Builder_Admin',
 		'Scholarships_Admin',
 		'Territory_Admin',
-		'Memberships_Admin'
+		'Memberships_Admin',
+		'Projects_Admin'
 	};
 
 	/**

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Hours_In_Range</fullName>
+  <active>true</active>
+  <description>R-PM6: hours more than 0 and at most 24.</description>
+  <errorConditionFormula>OR(Hours__c &lt;= 0, Hours__c &gt; 24)</errorConditionFormula>
+  <errorDisplayField>Hours__c</errorDisplayField>
+  <errorMessage>Enter more than 0 and at most 24 hours.</errorMessage>
+</ValidationRule>

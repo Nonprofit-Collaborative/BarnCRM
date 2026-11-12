@@ -1,0 +1,96 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+      <template lwc:if={notice}>
+        <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+
+      <c-projects-at-risk class="slds-var-m-bottom_medium" data-id="at-risk"></c-projects-at-risk>
+
+      <section class="slds-var-m-vertical_medium" data-id="my-tasks">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.myTasks}</h2>
+        <template lwc:if={hasTasks}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={tasks} for:item="row">
+              <li key={row.Id} class="slds-item slds-grid slds-grid_vertical-align-center" data-id="task">
+                <span class="slds-col">
+                  <a href={row.href}>{row.Name}</a>
+                  <a href={row.projectHref} class="slds-var-m-left_x-small slds-text-color_weak">{row.projectName}</a>
+                  <span class="slds-var-m-left_x-small">{row.Due_Date__c}</span>
+                </span>
+                <lightning-button class="slds-col_bump-left" label={labels.done} data-task={row.Id} disabled={isWorking} onclick={handleDone} data-id="done"></lightning-button>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.noTasks}</p></template>
+      </section>
+
+      <section class="slds-var-m-bottom_medium" data-id="new-project">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.newTitle}</h2>
+        <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
+          <lightning-combobox class="slds-col" label={labels.template} options={templateOptions} value={draft.templateKey} data-field="templateKey" onchange={handleDraft} data-id="template"></lightning-combobox>
+          <lightning-input class="slds-col" label={labels.name} max-length="80" data-field="name" onchange={handleDraft}></lightning-input>
+          <lightning-input class="slds-col" type="date" label={labels.start} value={draft.startDate} data-field="startDate" onchange={handleDraft}></lightning-input>
+          <lightning-record-picker class="slds-col" label={labels.client} object-api-name="Account" data-field="accountId" onchange={handleDraft}></lightning-record-picker>
+          <lightning-record-picker class="slds-col" label={labels.contact} object-api-name="Contact" data-field="contactId" onchange={handleDraft}></lightning-record-picker>
+          <lightning-button class="slds-col" variant="brand" label={labels.create} disabled={isWorking} onclick={handleCreate} data-id="create"></lightning-button>
+        </div>
+      </section>
+
+      <template lwc:if={timeTracking}>
+        <section class="slds-var-m-bottom_medium" data-id="utilization">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.utilization}</h2>
+          <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-var-m-bottom_small">
+            <lightning-input class="slds-col" type="date" label={labels.from} value={fromDate} data-field="fromDate" onchange={handleRange}></lightning-input>
+            <lightning-input class="slds-col" type="date" label={labels.to} value={toDate} data-field="toDate" onchange={handleRange}></lightning-input>
+            <lightning-button class="slds-col" label={labels.show} onclick={handleShow} data-id="show"></lightning-button>
+          </div>
+          <template lwc:if={hasPeople}>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+              <thead>
+                <tr>
+                  <th scope="col" data-label={labels.person}>{labels.person}</th>
+                  <th scope="col" data-label={labels.logged}>{labels.logged}</th>
+                  <th scope="col" data-label={labels.billable}>{labels.billable}</th>
+                  <th scope="col" data-label={labels.planned}>{labels.planned}</th>
+                  <th scope="col" data-label={labels.capacity}>{labels.capacity}</th>
+                  <th scope="col" data-label={labels.used}>{labels.used}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={people} for:item="row">
+                  <tr key={row.userId} data-id="person">
+                    <td data-label={labels.person}>{row.name}</td>
+                    <td data-label={labels.logged}>{row.logged}</td>
+                    <td data-label={labels.billable}>{row.billable}</td>
+                    <td data-label={labels.planned}>{row.planned}</td>
+                    <td data-label={labels.capacity}>{row.capacity}</td>
+                    <td data-label={labels.used}>{row.used}%</td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </template>
+          <template lwc:else><p class="slds-text-color_weak">{labels.noTime}</p></template>
+
+          <template lwc:if={canManage}>
+            <div class="slds-var-m-top_medium" data-id="export">
+              <h3 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.exportTitle}</h3>
+              <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
+                <lightning-input class="slds-col" type="checkbox" label={labels.includeExported} checked={includeExported} data-field="includeExported" onchange={handleRange}></lightning-input>
+                <lightning-button class="slds-col" label={labels.exportButton} disabled={isWorking} onclick={handleExport} data-id="export-button"></lightning-button>
+              </div>
+            </div>
+          </template>
+        </section>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

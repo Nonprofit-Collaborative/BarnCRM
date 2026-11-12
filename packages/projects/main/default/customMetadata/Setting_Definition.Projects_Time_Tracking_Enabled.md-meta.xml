@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Track time and budgets</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Time_Tracking_Enabled__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Projects_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Projects</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Projects</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Shows Log Time and the budget lines on the project page, and Utilization and Export Billable Time on Projects Home. Default: on.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects.md</value></values>
+</CustomMetadata>

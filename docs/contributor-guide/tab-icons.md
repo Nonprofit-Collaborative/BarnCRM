@@ -100,6 +100,9 @@ Rules:
 | scholarships | Award_Program__c | Custom48: Trophy |
 | scholarships | Scholarships | Custom34: Insect |
 | territory | Territory_Management | Custom34: Insect |
+| projects | Project__c | Custom62: Chalkboard |
+| projects | Projects_Home | Custom64: Compass |
+| projects | Time_Entry__c | Custom95: Stopwatch |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |
@@ -186,6 +189,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | scholarships | applicationReview | custom:custom70 | Award_Application__c |
 | scholarships | awardCycleBoard | custom:custom48 | Award_Program__c |
 | scholarships | awardPanel | custom:custom80 | Award__c |
+| projects | projectBoard | custom:custom62 | Project__c |
+| projects | projectsAtRisk | custom:custom62 | Project__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |
 | mirror | giftTransactionMirror | custom:custom31 | Gift_Transaction_Mirror |

@@ -88,7 +88,8 @@ set -euo pipefail
 
 DIRS=(packages/core packages/rollups packages/giving packages/volunteers packages/programs
   packages/logicmodels packages/funders packages/forms packages/contactpoints
-  packages/events packages/portal packages/corporatehub packages/payments packages/lwcbuilder packages/scholarships packages/territory packages/memberships)
+  packages/events packages/portal packages/corporatehub packages/payments packages/lwcbuilder packages/scholarships packages/territory packages/memberships
+  packages/projects)
 
 PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case|PersonAccount|IsPersonAccount|GiftTransaction)\b|__dlm\b'
 

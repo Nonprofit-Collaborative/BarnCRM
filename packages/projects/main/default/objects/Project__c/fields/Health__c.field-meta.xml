@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Health__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>On Track, At Risk or Off Track, set each morning and by Refresh Health for an Active project. Blank for any other.</inlineHelpText>
+  <label>Health</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>On Track</fullName>
+        <default>false</default>
+        <label>On Track</label>
+      </value>
+      <value>
+        <fullName>At Risk</fullName>
+        <default>false</default>
+        <label>At Risk</label>
+      </value>
+      <value>
+        <fullName>Off Track</fullName>
+        <default>false</default>
+        <label>Off Track</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

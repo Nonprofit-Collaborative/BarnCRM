@@ -1,0 +1,22 @@
+.track {
+  position: relative;
+  height: var(--slds-g-sizing-4, 0.75rem);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+
+.bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.today {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--slds-g-sizing-border-2, 2px);
+  background: var(--slds-g-color-error-base-40, #ba0517);
+}

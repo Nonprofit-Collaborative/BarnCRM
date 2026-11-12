@@ -176,6 +176,10 @@ CAPS = {
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex.
     "memberships": 40_200,
+    # Project Management (PM-01 to PM-05, ADR-NEXT project management module): access sync,
+    # post-install, health, templates, reporting and the page controller, 32,637 measured,
+    # plus about 2%.
+    "projects": 33_300,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
