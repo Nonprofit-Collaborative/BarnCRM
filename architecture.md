@@ -274,3 +274,17 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Erasure start seam (ADR-0193, #1042): Core has an optional `PersonErasureStartExtension`; Contact Point Sync uses it to copy an erased person's addresses once instead of twice; end state unchanged; a refused or failed erasure leaves syncing on.
 - Without-sharing register: the Site guest's event survey form read runs without sharing in one inner class, `EventSurveyService.AttendeeFormReader` (ADR-0188 decision 3).
 - Budgets at 6da9f882: label budget 3,254; Apex caps contactpoints 62,700, portal 55,600.
+- Custom metadata required fields are enforced at deploy, not by offline checks (`Integration_App.Nonprofit_Cloud_Fundraising` lacked `Link_Url__c`); `scripts/ci/check-mdt-required-fields.py` now checks every record.
+- A dynamic `Database.query` row is an `SObject`: cast it (`(Import_Batch__c) row`) before reading typed fields, or the org compile fails (`FilesImportService.locked`).
+- Report date intervals are `INTERVAL_THISMONTH` and `INTERVAL_LASTMONTH`, not `CURMONTH` and `PREVMONTH`.
+- Modify All on an object needs Delete on it in the same permission set; to keep records undeletable leave Modify All off (Payments Admin on `Payment__c`).
+- A custom field cannot be a required lookup to User; leave it optional and add a validation rule (`Territory_Member__c.User__c`, rule `Member_Needs_User`).
+- `String.format` drops a lone apostrophe in help text; write `''`. The help apostrophe check keeps a baseline (now empty).
+- Apex names ignore case, so a local can shadow a constant: `MembershipRenewals` local `ROWS` shadowed the constant and broke the gift renewals query; same class of bug in Grant Finder status constants.
+- Site rows cannot be created in tests; `PaymentSites.describe` takes in-memory Sites (`@TestVisible`) so a test can pass them.
+- Payment page layout related list name is `Payment_Event__c.Payment__c`.
+- Large parallel release runs on both orgs can fail with "Too many concurrent Apex compilations" or `LIMIT_EXCEEDED` on inserts (26 classes on `oi-test` at a712e6a43); rerun the failed classes, they pass.
+- `barn-npc` release now sets 24 objects Public (was 12) and uses an 840-label post-destructive list since 6da9f882.
+- A SOQL cursor `Id > null` matches no rows; start a full first page from the key prefix plus zeros (`BrandShareJob`).
+- Giving, Memberships and other nightly steps are staggered by time of day: Core nightly 2:30 engagement score, Projects health 6:40, Memberships 6:50 (certifications) and 6:55, Scholarships 6:50.
+- Coverage floor exceptions (release gate `--release`): only `InstallmentTopUpSchedulable` (60%) remains after W12 coverage tests; gate at a712e6a43 had 0 classes under the floor on `barn-sales`.
