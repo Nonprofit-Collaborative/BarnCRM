@@ -853,10 +853,10 @@ a real run requires to be clean before it creates anything):
 - A Dev Hub linked to that namespace, named with `--devhub` (the CLI default is never used),
   and every package created in it (`sf package create`, by the owner) with its `0Ho` id in
   `packageAliases`.
-- Each dependency with a `versionNumber` (for example `"0.1.0.LATEST"`); for a managed
-  upgrade, `ancestorVersion` (`"HIGHEST"`) or `ancestorId` on every package; for managed, each
-  package's InstallHandler class (`<Module>PostInstall`) named as its `postInstallScript`
-  (ADR-0029 left this to whoever creates the first version).
+- Each dependency with a `versionNumber` and each package's InstallHandler class named as its
+  `postInstallScript`: both are in `sfdx-project.json` now and checked in CI (see "Creating
+  package versions" below). For a managed upgrade, `ancestorVersion` (`"HIGHEST"`) or
+  `ancestorId` on every package, which is added only after the first promoted version.
 - The Apex the checks call from anonymous Apex must be `global`: a subscriber org's
   anonymous Apex cannot see a package's `public` classes. Today `HealthCheckService`,
   `SampleDataLoader` and (for unlocked) every `<Module>PostInstall` are `public`. The
@@ -903,6 +903,52 @@ The script never prints an auth URL or token and never reads `sf org display --v
 **Checks by hand.** Install links, Module Manager's guided installs and the pages after an
 upgrade are in the Testing Guide, [Installing](../testing-guide/installing.md), T-INST-05. The
 plan mode itself is T-INST-04 and `scripts/ci/tests/test_package_upgrade_test.py`.
+
+### Creating package versions
+
+BarnCRM ships as 2GP managed packages from the first pilot, under the namespace `barn` (D-199),
+registered in a Partner Developer Edition org linked to the Partner Business Org Dev Hub. Until
+then `namespace` stays empty in `sfdx-project.json` and no package or version is created. The
+rest of `sfdx-project.json` is ready now (D-200, N5), so setting the namespace and pasting the
+package ids is all that is left:
+
+- **Version numbers.** Every package carries `1.21.0.NEXT` (`versionName` `v1.21`), the release
+  that made the project version-ready. One shared number keeps the dependency pins simple; a
+  package moves to its own number only once it ships a change the others do not.
+- **Dependencies** name `<that package's major.minor.patch>.LATEST`, so a build picks up the
+  newest build of the package it needs. Raising a package's `versionNumber` means raising every
+  pin on it; `check-namespace-readiness.py` fails until they match.
+- **`postInstallScript`** names each package's InstallHandler class (`<Module>PostInstall`).
+  The check fails when a package has an InstallHandler that is not named, or names a class that
+  is not one.
+- **`packageAliases`** is an empty placeholder. `sf package create` (the owner's step, once per
+  package, in the Dev Hub) prints a `0Ho` id; paste it as `"<package name>": "0Ho..."`. The ids
+  are never invented: `create-versions.sh` refuses while one is missing and prints the
+  `sf package create` command for it. Version aliases (`<name>@1.21.0-1`) are not kept here;
+  the run writes the `04t` ids to a file instead.
+- **`ancestorVersion`** is not set until the first version is promoted. From then on each
+  package carries `"ancestorVersion": "HIGHEST"`, which a managed upgrade needs (the install and
+  upgrade test checks it).
+
+**The script.** `scripts/packaging/create-versions.sh` builds one version of each chosen package
+in dependency order, read from `sfdx-project.json` through `package-upgrade-helper.py` (the
+reader the install and upgrade test uses). It prints the Dev Hub's `Package2VersionCreates`
+limit first, refuses (exit 2) while the namespace is empty, a `0Ho` id is missing or fewer
+creates are left than it needs, and **never promotes**: promotion is permanent and the owner's
+decision, one `sf package version promote` per version. It writes `<key> <04t id>` lines to
+`test-results/package-versions/<run id>.txt`, the file `package-upgrade-test.sh --from/--to`
+takes.
+
+```
+# What would be built, in what order, with which commands (no org, no Dev Hub):
+scripts/packaging/create-versions.sh --plan --devhub <pbo-devhub>
+
+# Build Core and Giving (and Rollup Builder, which Giving needs):
+scripts/packaging/create-versions.sh --devhub <pbo-devhub> --packages giving
+```
+
+`--no-code-coverage` skips the test run, but a version built that way can never be promoted.
+`scripts/ci/tests/test_create_versions.py` runs the plan mode and the refusals.
 
 ### Tests survive an org's own customizations
 

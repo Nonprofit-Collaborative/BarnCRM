@@ -14,10 +14,17 @@ deploys put everything in one bucket, so neither deploys nor org tests show thes
    package the prefix is the namespace, so the key comes from Apex (`NamespaceUtil.stateKey`)
    or is matched by its `__name` suffix (`settingsConsole`, `findRecords`).
 
+4. sfdx-project.json is ready for `sf package version create` (docs/contributor-guide/ci.md,
+   "Creating package versions"): every package whose source has an InstallHandler class names
+   it as `postInstallScript`, and every dependency on another BarnCRM package carries a
+   `versionNumber` of `<that package's major.minor.patch>.LATEST`.
+
 A known exception goes in DEFERRED below with its reason; an entry that matches nothing fails.
 """
 
 import glob
+import importlib.util
+import json
 import os
 import re
 import sys
@@ -26,6 +33,12 @@ from xml.etree import ElementTree
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import apex_visibility as av  # noqa: E402
 from apex_source import strip  # noqa: E402
+
+_spec = importlib.util.spec_from_file_location(
+    "upgrade_helper", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "org", "package-upgrade-helper.py")
+)
+helper = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(helper)
 
 NS = {"m": "http://soap.sforce.com/2006/04/metadata"}
 PAGE_TARGETS = {
@@ -171,6 +184,28 @@ def check(sources, deps):
     return problems
 
 
+def check_project(project, handler_of):
+    """[(path, line, message)] for what `sf package version create` needs in sfdx-project.json.
+
+    handler_of(path) is the InstallHandler class in that package directory, or None."""
+    problems, where = [], "sfdx-project.json"
+    dirs = helper.directories(project)
+    versions = {d.get("package"): d.get("versionNumber", "") for _, d in dirs}
+    for key, d in dirs:
+        handler = handler_of(d["path"])
+        if handler and d.get("postInstallScript") != handler:
+            problems.append((where, 1, f"{key}: postInstallScript must be {handler}, its InstallHandler"))
+        elif not handler and d.get("postInstallScript"):
+            problems.append((where, 1, f"{key}: postInstallScript {d['postInstallScript']} is not an InstallHandler here"))
+        for dep in d.get("dependencies", []):
+            if dep.get("package") not in versions:
+                continue
+            want = ".".join(versions[dep["package"]].split(".")[:3]) + ".LATEST"
+            if dep.get("versionNumber") != want:
+                problems.append((where, 1, f"{key}: dependency {dep['package']} needs versionNumber {want}"))
+    return problems
+
+
 def main():
     paths = [
         p
@@ -182,12 +217,14 @@ def main():
         with open(p, encoding="utf-8") as f:
             sources[p.replace(os.sep, "/")] = f.read()
     problems = check(sources, av.packages("."))
+    with open("sfdx-project.json", encoding="utf-8") as f:
+        problems += check_project(json.load(f), lambda path: helper.install_handler(".", path))
     for path, n, message in problems:
         print(f"{path}:{n}: {message}")
     if problems:
         print(f"{len(problems)} problem(s). See the docstring of {os.path.basename(__file__)}.")
         return 1
-    print(f"Components, labels and page state keys in {len(sources)} files are namespace ready.")
+    print(f"Components, labels and page state keys in {len(sources)} files, and sfdx-project.json, are namespace ready.")
     return 0
 
 

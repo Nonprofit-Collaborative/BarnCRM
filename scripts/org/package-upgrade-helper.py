@@ -14,6 +14,8 @@ Subcommands (all print to stdout, tab separated, one item per line):
   dependents  --project P --key K --select S    selected packages that need K (any depth)
   shape       --root R NAME                     definition file, edition, org name
   versions    --file F --select S               key and 04t id per selected package
+  aliases     --project P --select S            key, package name, 0Ho id or - (create-versions.sh)
+  limit       NAME                              remaining and max of a limit, from sf limits JSON
   readiness   (see parse_readiness)             OK / MISSING / NOTE lines; exit 1 on MISSING
   render      TEMPLATE OUT --ns NS [--set K=V] [--module KEY --root R]
   jget        PATH                              a value from the JSON on stdin
@@ -202,6 +204,28 @@ def read_versions(path, keys):
     if missing:
         fail(f"{path} has no 04t id for: " + ", ".join(missing))
     return found
+
+
+def cmd_aliases(args):
+    """Key, package name and its 0Ho id (or -) per selected package, for create-versions.sh."""
+    project = read_project(args.project)
+    keys, _ = select(project, args.select)
+    entries, aliases = dict(directories(project)), project.get("packageAliases", {})
+    for key in keys:
+        name = entries[key].get("package", key)
+        alias = str(aliases.get(name, ""))
+        print("\t".join([key, name, alias if alias.startswith("0Ho") else "-"]))
+
+
+def cmd_limit(args):
+    """'<remaining> <max>' of one Dev Hub limit from `sf limits api display --json` on stdin."""
+    try:
+        rows = json.load(sys.stdin).get("result", [])
+    except (ValueError, AttributeError):
+        return
+    for row in rows if isinstance(rows, list) else []:
+        if row.get("name") == args.name:
+            print(f"{row.get('remaining')} {row.get('max')}")
 
 
 def cmd_versions(args):
@@ -491,6 +515,12 @@ def main(argv):
     p = with_project(sub.add_parser("shape"))
     p.add_argument("name")
     p.set_defaults(run=cmd_shape)
+    p = with_project(sub.add_parser("aliases"))
+    p.add_argument("--select", default="all")
+    p.set_defaults(run=cmd_aliases)
+    p = sub.add_parser("limit")
+    p.add_argument("name")
+    p.set_defaults(run=cmd_limit)
     p = with_project(sub.add_parser("versions"))
     p.add_argument("--select", default="all")
     p.add_argument("--file", required=True)
