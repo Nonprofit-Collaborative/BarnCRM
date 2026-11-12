@@ -90,10 +90,6 @@ private class EventAttendeeAppTest {
 		SettingsService.clearCaches();
 	}
 
-	private static String help(String key) {
-		return BarnHelp.text('Events', key);
-	}
-
 	private static Attendee_Connection__c rowOf(Id personId) {
 		return [
 			SELECT Id, Status__c, Contact_Details__c, Other_Contact__c
@@ -104,9 +100,14 @@ private class EventAttendeeAppTest {
 
 	@IsTest
 	static void coreFindsTheAppActionsThroughEvents() {
-		Set<String> names = new EventsPortalExtension().actionNames();
-		Assert.isTrue(names.containsAll(EventAttendeeApp.actionNames()), 'Every app action named');
-		Assert.isTrue(names.contains(EventsPortalExtension.APPLY), 'The speaker actions stay');
+		System.runAs(staff()) {
+			Set<String> names = new EventsPortalExtension().actionNames();
+			Assert.isTrue(
+				names.containsAll(EventAttendeeApp.actionNames()),
+				'Every app action named'
+			);
+			Assert.isTrue(names.contains(EventsPortalExtension.APPLY), 'The speaker actions stay');
+		}
 	}
 
 	@IsTest
@@ -124,13 +125,29 @@ private class EventAttendeeAppTest {
 			String accepted = app.run(EventAttendeeApp.ACCEPT, c.ben.Id, rowOf(c.ben.Id).Id);
 			Test.stopTest();
 
-			Assert.areEqual(help('Events_App_RequestSent'), sent, 'Request sent');
-			Assert.areEqual(help('Events_App_AlreadyAsked'), again, 'One pair once (R-ACN1)');
-			Assert.areEqual(help('Events_App_NotYou'), self, 'Not with oneself');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_RequestSent'),
+				sent,
+				'Request sent'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_AlreadyAsked'),
+				again,
+				'One pair once (R-ACN1)'
+			);
+			Assert.areEqual(BarnHelp.text('Events', 'Events_App_NotYou'), self, 'Not with oneself');
 			Assert.areEqual('Requested', before.Status__c, 'The asker waits');
 			Assert.isNull(before.Contact_Details__c, 'Nothing shared before accepting (R-ACN2)');
-			Assert.areEqual(help('Events_App_NothingToAccept'), refused, 'The asker cannot accept');
-			Assert.areEqual(help('Events_App_Connected'), accepted, 'Ben accepts');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_NothingToAccept'),
+				refused,
+				'The asker cannot accept'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_Connected'),
+				accepted,
+				'Ben accepts'
+			);
 			Attendee_Connection__c anas = rowOf(c.ana.Id);
 			Assert.areEqual('Connected', anas.Status__c, 'Both connected');
 			Assert.areEqual('Ben on the conference chat', anas.Contact_Details__c, 'Ana sees Ben');
@@ -156,10 +173,18 @@ private class EventAttendeeAppTest {
 			String hidden = app.run(EventAttendeeApp.CONNECT, c.ben.Id, c.anaRow.Id);
 			Test.stopTest();
 
-			Assert.areEqual(help('Events_App_Declined'), declined, 'Declined');
+			Assert.areEqual(BarnHelp.text('Events', 'Events_App_Declined'), declined, 'Declined');
 			Assert.areEqual('Declined', rowOf(c.ana.Id).Status__c, 'Both declined');
-			Assert.areEqual(help('Events_App_AlreadyAsked'), again, 'No new request');
-			Assert.areEqual(help('Events_App_NotListed'), hidden, 'Only opted-in attendees');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_AlreadyAsked'),
+				again,
+				'No new request'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_NotListed'),
+				hidden,
+				'Only opted-in attendees'
+			);
 		}
 	}
 
@@ -187,16 +212,32 @@ private class EventAttendeeAppTest {
 			String replied = app.run(EventAttendeeApp.SEND_REPLY, c.ben.Id, received.Id);
 			Test.stopTest();
 
-			Assert.areEqual(help('Events_App_MessagesOff'), off, 'Off by default (R-AMS1)');
-			Assert.areEqual(help('Events_App_NotConnected'), notYet, 'Only to connections');
-			Assert.areEqual(help('Events_App_MessageSent'), sent, 'Sent once connected');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_MessagesOff'),
+				off,
+				'Off by default (R-AMS1)'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_NotConnected'),
+				notYet,
+				'Only to connections'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_MessageSent'),
+				sent,
+				'Sent once connected'
+			);
 			Assert.areEqual('Coffee?', received.Body__c, 'The draft was sent');
 			Assert.isNull(
 				[SELECT Draft_Message__c FROM Attendee_Connection__c WHERE Id = :anas.Id]
 				.Draft_Message__c,
 				'The draft is cleared'
 			);
-			Assert.areEqual(help('Events_App_MessageSent'), replied, 'Ben replies');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_MessageSent'),
+				replied,
+				'Ben replies'
+			);
 			Assert.areEqual(
 				'Yes, at 10',
 				[SELECT Body__c FROM Attendee_Message__c WHERE To_Contact__c = :c.ana.Id].Body__c,
@@ -230,21 +271,29 @@ private class EventAttendeeAppTest {
 			String removed = app.run(EventAttendeeApp.REMOVE_FROM_AGENDA, c.ana.Id, item.Id);
 			Test.stopTest();
 
-			Assert.areEqual(help('Events_App_Added'), added, 'Added');
-			Assert.areEqual(help('Events_App_AlreadyPicked'), twice, 'Once per session');
+			Assert.areEqual(BarnHelp.text('Events', 'Events_App_Added'), added, 'Added');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_AlreadyPicked'),
+				twice,
+				'Once per session'
+			);
 			Assert.areEqual(
 				BarnHelp.text('Events', 'Events_App_Overlaps', new List<Object>{ 'Keynote' }),
 				overlap,
 				'An overlap names the session (R-AGI1)'
 			);
-			Assert.areEqual(help('Events_App_SessionFull'), full, 'A full session is refused');
+			Assert.areEqual(
+				BarnHelp.text('Events', 'Events_App_SessionFull'),
+				full,
+				'A full session is refused'
+			);
 			Assert.isTrue(
 				[SELECT Overlaps__c FROM Agenda_Item__c WHERE Event_Session__c = :clash.Id]
 				.Overlaps__c,
 				'Allowed overlaps are marked'
 			);
 			Assert.isTrue(allowed.contains('Keynote'), 'And named');
-			Assert.areEqual(help('Events_App_Removed'), removed, 'Removed');
+			Assert.areEqual(BarnHelp.text('Events', 'Events_App_Removed'), removed, 'Removed');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Agenda_Item__c WHERE Id = :item.Id],

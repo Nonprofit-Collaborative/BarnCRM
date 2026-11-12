@@ -81,16 +81,16 @@ public without sharing class EventAttendeeApp {
 			WITH SYSTEM_MODE
 		];
 		if (found.isEmpty() || !found[0].Networking_Opt_In__c || found[0].Status__c == CANCELLED) {
-			return text('Events_App_NotListed');
+			return BarnHelp.text('Events', 'Events_App_NotListed');
 		}
 		Event_Attendee__c other = found[0];
 		if (other.Contact__c == personId) {
-			return text('Events_App_NotYou');
+			return BarnHelp.text('Events', 'Events_App_NotYou');
 		}
 		Id eventId = other.Event_Registration__r.Event__c;
 		Event_Attendee__c mine = attendeeAt(personId, eventId);
 		if (mine == null) {
-			return text('Events_App_NotAttending');
+			return BarnHelp.text('Events', 'Events_App_NotAttending');
 		}
 		Integer existing = [
 			SELECT COUNT()
@@ -104,13 +104,13 @@ public without sharing class EventAttendeeApp {
 		];
 		if (existing > 0) {
 			// A declined pair reads the same, so a request never learns it was declined.
-			return text('Events_App_AlreadyAsked');
+			return BarnHelp.text('Events', 'Events_App_AlreadyAsked');
 		}
 		insert as system new List<Attendee_Connection__c>{
 			side(eventId, personId, other.Contact__c, other.Id, REQUESTED),
 			side(eventId, other.Contact__c, personId, mine.Id, WANTS)
 		};
-		return text('Events_App_RequestSent');
+		return BarnHelp.text('Events', 'Events_App_RequestSent');
 	}
 
 	private static Attendee_Connection__c side(
@@ -134,7 +134,7 @@ public without sharing class EventAttendeeApp {
 	private static String answer(Id personId, Id connectionId, Boolean accept) {
 		Attendee_Connection__c mine = ownConnection(personId, connectionId);
 		if (mine == null || mine.Status__c == DECLINED || (accept && mine.Status__c != WANTS)) {
-			return text('Events_App_NothingToAccept');
+			return BarnHelp.text('Events', 'Events_App_NothingToAccept');
 		}
 		List<Attendee_Connection__c> theirs = [
 			SELECT Id
@@ -167,7 +167,9 @@ public without sharing class EventAttendeeApp {
 			changes.add(theirChange);
 		}
 		update as system changes;
-		return text(accept ? 'Events_App_Connected' : 'Events_App_Declined');
+		return accept
+			? BarnHelp.text('Events', 'Events_App_Connected')
+			: BarnHelp.text('Events', 'Events_App_Declined');
 	}
 
 	private static String reachOf(Id personId, Id eventId) {
@@ -179,17 +181,17 @@ public without sharing class EventAttendeeApp {
 
 	private static String sendMessage(Id personId, Id connectionId) {
 		if (!EventsSettings.attendeeMessages()) {
-			return text('Events_App_MessagesOff');
+			return BarnHelp.text('Events', 'Events_App_MessagesOff');
 		}
 		Attendee_Connection__c mine = ownConnection(personId, connectionId);
 		if (mine == null || mine.Status__c != CONNECTED) {
-			return text('Events_App_NotConnected');
+			return BarnHelp.text('Events', 'Events_App_NotConnected');
 		}
 		if (String.isBlank(mine.Draft_Message__c)) {
-			return text('Events_App_NothingToSend');
+			return BarnHelp.text('Events', 'Events_App_NothingToSend');
 		}
 		if (sentToday(personId) >= DAILY_MESSAGES) {
-			return text('Events_App_TooMany');
+			return BarnHelp.text('Events', 'Events_App_TooMany');
 		}
 		insert as system message(
 			mine.Event__c,
@@ -198,12 +200,12 @@ public without sharing class EventAttendeeApp {
 			mine.Draft_Message__c
 		);
 		update as system new Attendee_Connection__c(Id = mine.Id, Draft_Message__c = null);
-		return text('Events_App_MessageSent');
+		return BarnHelp.text('Events', 'Events_App_MessageSent');
 	}
 
 	private static String sendReply(Id personId, Id messageId) {
 		if (!EventsSettings.attendeeMessages()) {
-			return text('Events_App_MessagesOff');
+			return BarnHelp.text('Events', 'Events_App_MessagesOff');
 		}
 		List<Attendee_Message__c> found = [
 			SELECT Id, Event__c, From_Contact__c, Reply__c
@@ -212,7 +214,7 @@ public without sharing class EventAttendeeApp {
 			WITH SYSTEM_MODE
 		];
 		if (found.isEmpty() || String.isBlank(found[0].Reply__c)) {
-			return text('Events_App_NothingToSend');
+			return BarnHelp.text('Events', 'Events_App_NothingToSend');
 		}
 		Attendee_Message__c received = found[0];
 		Integer connected = [
@@ -224,10 +226,10 @@ public without sharing class EventAttendeeApp {
 			WITH SYSTEM_MODE
 		];
 		if (connected == 0) {
-			return text('Events_App_NotConnected');
+			return BarnHelp.text('Events', 'Events_App_NotConnected');
 		}
 		if (sentToday(personId) >= DAILY_MESSAGES) {
-			return text('Events_App_TooMany');
+			return BarnHelp.text('Events', 'Events_App_TooMany');
 		}
 		insert as system message(
 			received.Event__c,
@@ -236,7 +238,7 @@ public without sharing class EventAttendeeApp {
 			received.Reply__c
 		);
 		update as system new Attendee_Message__c(Id = received.Id, Reply__c = null);
-		return text('Events_App_MessageSent');
+		return BarnHelp.text('Events', 'Events_App_MessageSent');
 	}
 
 	private static Attendee_Message__c message(Id eventId, Id fromId, Id toId, String body) {
@@ -268,26 +270,26 @@ public without sharing class EventAttendeeApp {
 			WITH SYSTEM_MODE
 		];
 		if (found.isEmpty() || found[0].Status__c == CANCELLED) {
-			return text('Events_App_NotAttending');
+			return BarnHelp.text('Events', 'Events_App_NotAttending');
 		}
 		Event_Session__c session = found[0];
 		if (attendeeAt(personId, session.Event__c) == null) {
-			return text('Events_App_NotAttending');
+			return BarnHelp.text('Events', 'Events_App_NotAttending');
 		}
 		String key = pickKey(sessionId, personId);
 		if ([SELECT COUNT() FROM Agenda_Item__c WHERE Pick_Key__c = :key WITH SYSTEM_MODE] > 0) {
-			return text('Events_App_AlreadyPicked');
+			return BarnHelp.text('Events', 'Events_App_AlreadyPicked');
 		}
 		if (
 			session.Capacity__c != null &&
 			session.Agenda_Picks__c != null &&
 			session.Agenda_Picks__c >= session.Capacity__c
 		) {
-			return text('Events_App_SessionFull');
+			return BarnHelp.text('Events', 'Events_App_SessionFull');
 		}
 		String clash = overlapping(personId, session);
 		if (clash != null && !EventsSettings.allowAgendaOverlaps()) {
-			return text('Events_App_Overlaps', clash);
+			return BarnHelp.text('Events', 'Events_App_Overlaps', new List<Object>{ clash });
 		}
 		insert as system new Agenda_Item__c(
 			Event_Session__c = sessionId,
@@ -295,7 +297,9 @@ public without sharing class EventAttendeeApp {
 			Overlaps__c = clash != null,
 			Pick_Key__c = key
 		);
-		return clash == null ? text('Events_App_Added') : text('Events_App_AddedOverlap', clash);
+		return clash == null
+			? BarnHelp.text('Events', 'Events_App_Added')
+			: BarnHelp.text('Events', 'Events_App_AddedOverlap', new List<Object>{ clash });
 	}
 
 	/** The name of a session already on the person's agenda that overlaps this one, or null. */
@@ -329,7 +333,7 @@ public without sharing class EventAttendeeApp {
 		if (!found.isEmpty()) {
 			delete as system found;
 		}
-		return text('Events_App_Removed');
+		return BarnHelp.text('Events', 'Events_App_Removed');
 	}
 
 	// ---- Shared ----------------------------------------------------------------------------
@@ -376,13 +380,5 @@ public without sharing class EventAttendeeApp {
 	@TestVisible
 	private static String pickKey(Id sessionId, Id personId) {
 		return String.valueOf(sessionId) + String.valueOf(personId).left(15);
-	}
-
-	private static String text(String key) {
-		return BarnHelp.text('Events', key);
-	}
-
-	private static String text(String key, String value) {
-		return BarnHelp.text('Events', key, new List<Object>{ value });
 	}
 }
