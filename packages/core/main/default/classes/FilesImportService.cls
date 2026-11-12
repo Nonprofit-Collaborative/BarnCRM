@@ -481,7 +481,7 @@ public with sharing class FilesImportService {
 		if (DataJobs.find('Id', OPERATION_FILES, jobId) == null) {
 			throw new FilesImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
 		}
-		return Database.queryWithBinds(
+		return (Import_Batch__c) Database.queryWithBinds(
 			'SELECT ' + JOB_FIELDS + ' FROM Import_Batch__c WHERE Id = :jobId LIMIT 1 FOR UPDATE',
 			new Map<String, Object>{ 'jobId' => jobId },
 			AccessLevel.SYSTEM_MODE
