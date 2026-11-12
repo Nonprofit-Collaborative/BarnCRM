@@ -159,6 +159,11 @@ As it moves on, change the **Status** (Open, Accepted or Closed) and, when it en
 organization's roles and Programs Admins can see a referral you make. The **Open Referrals** list
 on the **Referrals** tab shows everything not yet closed.
 
+If the other organization is in BarnCRM and uses your partner portal, pick it as **Partner
+Organization**. Turn on **Shared With Partner** only when the person agreed to share the referral:
+the partner's staff then see it in the portal (the person, dates, direction, status and outcome,
+never the notes).
+
 ## To Check Whether Someone Is Eligible
 
 If your admin has set up eligibility rules, the program page's **Eligibility** tab has an

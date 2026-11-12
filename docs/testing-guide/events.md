@@ -1,7 +1,8 @@
 # Event Management
 
-Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-21, EV-26, EV-27) and their
-sample data.
+Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-21, EV-23 to EV-28) and
+their sample data. The attendee app (EV-22, EV-29) and sponsor lead scanning are tested in
+[Portal Builder](portal-builder.md), T-PB-12 and T-PB-13.
 Setup detail:
 [Event Management](../admin-guide/events.md).
 
@@ -558,3 +559,64 @@ and `Talk B` and a speaker on Talk A.
 | 6 | In an org without Forms, open the Agenda tab. | No Session Ratings button and no rating codes. |
 
 **Cleanup:** delete the ratings and clear the event's rating form.
+
+## T-EV-26: Venues and Rooms
+
+**Purpose:** confirm a venue and room fill the event and session (EV-24).
+**Prerequisites:** staff; an event with blank Venue Name and Venue Address and a session with no
+room or capacity.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Venues** tab. | List views All Venues and My Venues. |
+| 2 | New venue `Zz Hall`, address `1 Main St`, map link `https://example.org/map`; add room `Room A`, capacity 40, setup Theater, where `Second floor`. | Saved; Room A in the venue's Rooms list. |
+| 3 | On the event, pick Venue `Zz Hall` and save. | Venue Name `Zz Hall`, Venue Address `1 Main St`. |
+| 4 | Change the event's Venue Name to `Main Hall` and save again. | It stays `Main Hall`: only blanks fill. |
+| 5 | On **Agenda**, the session's **Edit**: pick Room Record `Room A`, save. | Room `Room A`, Capacity 40. |
+| 6 | Give a second session the same room and an overlapping time. | Both cards flag the room clash, as for a typed room. |
+
+**Cleanup:** delete the venue (its room goes with it); clear the event's venue fields.
+
+## T-EV-27: Session and Speaker Details
+
+**Purpose:** confirm session level, links and sponsor, and the speaker checklist (EV-25).
+**Prerequisites:** staff; an event with a session, a speaker and a sponsor; another event's sponsor.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Session **Edit**: Level Beginner, Session Type Lightning Talk, slides and recording links, Sponsored By the event's sponsor. | Saved. |
+| 2 | Try Sponsored By the other event's sponsor. | Not offered or refused: a sponsor of the same event only. |
+| 3 | Speaker **Edit**: headshot, LinkedIn and website links; Agreement Signed and Slides Received on. | Saved; the speaker's row shows `Checklist 2 of 3`. |
+
+**Cleanup:** none.
+
+## T-EV-28: Budget and Funding
+
+**Purpose:** confirm the Budget panel's totals and Net Cost (EV-23).
+**Prerequisites:** staff; an event with a registration whose Amount Paid is 100.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event's **Details** tab. | A Budget panel under the dashboard, with Add Expense and Add Funding. |
+| 2 | Add Expense `Hall` (Venue, Budgeted 1000, Actual 1200) and `Lunch` (Food and Beverage, Budgeted 500). | Venue 1,000 budgeted and 1,200 actual; Food and Beverage 500 and 0; totals 1,500 and 1,200. |
+| 3 | Add Funding `Acme MDF` (Partner Funds (MDF), Expected 800, Received 300). | Funding 800 expected, 300 received. |
+| 4 | Read the totals. | Net Cost 800 (1,200 less 300 less 100); Budgeted Net Cost 600 (1,500 less 800 less 100). The dashboard shows Net Cost 800. |
+| 5 | As read-only, open the event. | The panel shows; no Add buttons and no row menus. |
+
+**Cleanup:** remove the lines.
+
+## T-EV-29: Sponsor Lead Export
+
+**Purpose:** confirm staff download a sponsor's leads (EV-28).
+**Prerequisites:** T-PB-13 done, so the sponsor has a Lead and a Not Shared scan.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Sponsors**, the sponsor's menu, **Download Leads**. | A CSV with one row: name, email, title, company, interest, notes and scan time of the Lead; no Not Shared row. |
+| 2 | Do the same for a sponsor with no leads. | A message that there are no leads to download; no file. |
+
+**Cleanup:** none.

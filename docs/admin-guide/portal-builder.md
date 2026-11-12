@@ -170,10 +170,31 @@ A template is JSON in the portal's Template field. The sample in
 - A `related` page's `personField` may be `Parent__r.Contact__c`, a parent that itself looks up
   to the person (such as a speaker's session assignments). A page like that is read only: it
   shows records, never edits or adds them.
+- **personScope** narrows a `catalog` page to records tied to the person through another object:
+  `{ "field": "Event__c", "object": "Event_Attendee__c", "personField": "Contact__c",
+  "valueField": "Event__c", "where": [ ...tests on that object... ] }` shows only records whose
+  Event is one of the events the person has an attendee row for (and that row passes the tests).
+  `field` is a lookup or `Id`; `valueField` a lookup on the scope object; the scope object a custom
+  object with `personField` a lookup to the person. Actions on the page see only those records.
+- **calendar** `{ "title": ..., "start": ..., "end": ..., "location": ... }`, each a field already
+  on the page, adds **Add to Calendar**: an .ics file of the page's records, made in the browser.
+- **download**: `true` adds **Download CSV** of the page's records as shown, made in the browser.
+- A text field marked `"edit": true, "scan": true` gets a **Scan** button on the add form, which
+  reads a QR code with the phone's camera where the browser can, and is typed otherwise.
+
+### Installable App
+
+Add `app="yes"` to the shortcode, and optionally a `name`, to let people save the portal to their
+phone's home screen as an app (a progressive web app): `[barncrm_portal key="attendees" app="yes"
+name="Spring Summit"]`. The plugin then serves the app's manifest and a small service worker from
+your site. The home screen icon is the site's **Site Icon** (Appearance, Customize, Site Identity;
+use a square image of at least 512 pixels), else a plain BarnCRM icon. The worker keeps only the
+plugin's own files for offline use, never a person's data. No app store and nothing to pay. Use
+it on one page per site: the worker serves the whole site.
 
 ### Ready-Made Templates
 
-Five templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
+These templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
 needs its module: while the module is turned off the portal is unavailable, and where the module
 is not installed its pages fail and the Error Log says which field is missing, so install and turn
 on the module first. Every page shows only the signed-in person's own records, and only the fields
@@ -187,6 +208,29 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
 | Applicant Portal | `applicant.json`, Scholarships | Open Cycles (Apply), My Applications (Withdraw), My Awards (Accept Award), My Reports and Conditions, My Details |
 | Member Portal | `member.json`, Memberships | My Membership (Pay Dues), My Directory Listing (edit: show me to other members, where I am, about me), Member Directory (searchable) |
+| Attendee App | `attendee.json`, Event Management | My Events (networking choices), Agenda (Add to My Agenda), My Agenda (Add to Calendar, rate, Remove), Attendees (searchable, Connect), Connections (Accept, Decline, Send Message), Messages (Reply), Sent, Announcements, Sponsors, Event Info, My Details |
+| Sponsor Portal | `sponsor.json`, Event Management | My Sponsorships, My Leads (Scan to add, notes and interest, Download CSV), My Details |
+| Service Portal | `service.json`, Programs | My Programs, My Services, Upcoming Sessions, My Goals, My Referrals, My Details |
+| Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Funders | Shared Referrals, My Organizations, My Details; with Funders also My Grants and Grant Reports |
+
+**Attendee and Sponsor.** See [Event Management, Attendee App](events.md#attendee-app): the
+attendee list, connections, messages and agenda, and how sponsor lead scanning works. Every page
+beyond the person's own rows shows only events they are registered for (a `personScope` through
+their attendee rows, not Cancelled).
+
+**Service.** For people your programs serve. My Programs lists their enrollments that are not
+Withdrawn, My Services the services delivered to them, Upcoming Sessions the sessions of the
+cohorts they are enrolled in from today on, My Goals their goals (read only) and My Referrals
+their referrals without notes. Case notes are never shown. Read only except phone and mailing
+address. See [Programs](programs.md).
+
+**Partner.** For staff of partner organizations. A person sees the referrals whose **Partner
+Organization** is an organization they have a Current affiliation with, and only those with
+**Shared With Partner** on (off by default), without notes. My Organizations lists their current
+affiliations. `partner-funders.json` adds, where Funders is installed, My Grants (grants whose
+Funder Contact is the person) and Grant Reports (those grants' report, application and other
+document requirements once submitted). Use `partner.json` where Funders is not installed: a
+template naming a missing module's object fails whole.
 
 **Member.** Pay Dues emails the member a payment link for the membership's dues, once Payments
 is ready (see [Memberships](memberships.md)). The Member Directory lists current members who

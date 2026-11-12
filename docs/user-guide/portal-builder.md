@@ -25,7 +25,7 @@ Guide). This page is for staff who look after the people using them.
 - They then see the portal's pages: their own details, and the records of theirs the portal shows
   (for example their current roles), with only the fields the portal allows them to change.
 
-## The Volunteer, Speaker, Donor and Applicant Portals
+## The Ready-Made Portals
 
 Your admin may use one of the ready-made portals (see [Portal Builder](../admin-guide/portal-builder.md)).
 Whatever the portal, a person sees and changes only their own records.
@@ -47,6 +47,19 @@ Whatever the portal, a person sees and changes only their own records.
   application on the cycle; they complete it through its form link, and it becomes Submitted when
   the form arrives. They can withdraw it until it is decided, accept an offered award, and open
   report forms for the reports and conditions they owe.
+- **Attendee app.** Attendees of your events see the agenda and build their own, add it to their
+  phone's calendar, rate sessions, see announcements, sponsors and the venue map, and, if they
+  choose to be listed, find and connect with each other. Picks show on each session's **Agenda
+  Picks**; ratings arrive anonymous like any session rating. Messages work only if your admin
+  turned them on, and only between people who accepted each other.
+- **Sponsor portal.** Sponsor contacts and booth staff scan attendees' badges. Only attendees who
+  chose to share their details become leads; download a sponsor's leads from the event's
+  **Sponsors** tab.
+- **Service portal.** People in your programs see their enrollments, services, upcoming sessions,
+  goals and referrals, and update their phone and address. They never see case notes.
+- **Partner portal.** Staff of partner organizations see the referrals you shared with their
+  organization, and, where your organization uses Funders, the grants they are the contact for and
+  the reports you submitted.
 
 ## When Someone Cannot Sign In
 
