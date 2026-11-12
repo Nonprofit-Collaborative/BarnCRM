@@ -38,6 +38,7 @@ Read it in this order:
 - 2026-11-06 Batch B nonprofit stage: landing #958 squash-merged to `main` as ca99c753 (Giving, Programs, Volunteers, Funders and Logic Models usability and visual rollout, release 0.18). Release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914, coverage 93%, 0 classes under floor). Released to `barn-npc` (validation 0Afhk00000287cgCAA, 4,422 of 4,422, 6,838 components; quick deploy 0Afhk0000028JkHCAU; 64 removed components deleted; post-install clean). `mwdbdevsb` not yet deployed (needs approval and the D-179 scope). Next: Batch C (Forms, Contact Point Sync, Events, Portal Builder).
 - 2026-11-08 Batch C (releases 1.1 to 1.3: Forms, Contact Point Sync, Event Management, Portal Builder and the volunteer, speaker and donor portal templates, plus C-61, C-63, C-69 and V-10b): landing #1026 squash-merged to `main` as e4069239 after the release gate passed on `oi-test` and `barn-sales` (5,296 of 5,296, coverage 93% and 92%). Follow-ups: #1027 (52b17c41, Contact Point Sync bulk CPU: more than 50 people per chunk queue the sync, describe cached) and #1028 (2c26fd7b, three tests that failed only on `barn-npc`, test-only). Module tabs go into the four BarnCRM apps (D-188, ADR-0192); the stale BarnCRM Rollup Builder app was deleted on `barn-sales` and `oi-test`. Released to `barn-npc` at 2c26fd7b (validation 0Afhk0000029iK1CAI, 4,741 of 4,741, 7,517 components; quick deploy 0Afhk0000029jhVCAQ), post-install and access sync run for all eleven modules, module tabs deployed to the apps. Waiting: `mwdbdevsb` Core deploy (Brandon's approval), QA and UX.
 - 2026-11-09 Batch C whole-solution review (Section 9.8, five reviewers including the new performance reviewer): landing #1041 squash-merged to `main` as 6da9f882 with the review PRs #1030 to #1040, #1035, the erasure start seam #1042 (ADR-0193) and the D-191 follow-ups #1044 to #1046. Release gate at a3c103e6 passed on `barn-sales` and `oi-test` (5,323 of 5,323 each, coverage 93%). barn-npc (all packages) and mwdbdevsb (Core only, D-192) check-only validations started in parallel (D-191); the deploys follow when they pass. Simpler permission sets release N (#1047 to #1049) built for the next batch.
+- 2026-11-12 Batch D to I (releases 1.4 to 1.18 and permission set release N): landing #1235 squash-merged to `main` as 2efde31d4 after the release gate passed on `barn-sales` and `oi-test` (5,900 of 5,900 each); #1043 and #1047 to #1049 closed as landed. Deployed to `barn-npc` (all 20 packages, from 8242fe12e) and `mwdbdevsb` (Core and Rollups, a712e6a43). Brandon's QA and UX of the batch have not happened yet. Release 1.20 (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12) is built on `landing/batch-j` and in testing. Decisions D-193 to D-197.
 - Full handoff, including the exact C-29 landing steps: `docs/contributor-guide/ci.md`, section "Handoff: open work and what still needs testing".
 
 ---
@@ -882,14 +883,14 @@ Added 2026-11-04 (D-170) as a new release because the 0.17 table is complete and
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| UX-V1 | Shared visual kit: status badge, notice, stat tile formats, progress meter and icon registry (navigation icon equals tab icon), with the visual standard written into ux-kit.md; extends the D-140 kit to every screen | Major | Building | D-170 |
-| UX-V2 | Usability fixes: admin and data tools (findings from the admin slice, including flow changes) | Major | Building | D-170 |
-| UX-V3 | Usability fixes: people, households and Giving | Major | Building | D-170 |
-| UX-V4 | Usability fixes: Volunteers, Programs, Logic Models, Funders (absorbs UX-F4, the module visual pass) | Major | Building | D-170 |
-| UX-V5 | Record page tabs suite-wide (people, gifts, programs, grants and others) | Minor | Building | D-170 |
-| UX-V6 | App logos for Programs, Funders and Logic Models (barn-plus-badge style); Fundraising badge recolored off red (D-58); module apps use the brand color #007A9E | Minor | Building | D-170 |
-| UX-V7 | Drag and drop, added to existing controls: Grant Pipeline board, Ask Pipeline touch rebuild, transform step order, thank-you rule order, household split, logic model parts | Minor | Building | D-170 |
-| UX-V8 | Help text moved from labels to English-only JSON help catalogs per package (`BarnHelp_<Package>.json`, read by `c/barnHelpText` and `BarnHelp`), with a lower label cap of 4,150 (D-172) | Major | Building | D-171, D-172 |
+| UX-V1 | Shared visual kit: status badge, notice, stat tile formats, progress meter and icon registry (navigation icon equals tab icon), with the visual standard written into ux-kit.md; extends the D-140 kit to every screen | Major | Built (landing batch B) | D-170 |
+| UX-V2 | Usability fixes: admin and data tools (findings from the admin slice, including flow changes) | Major | Built (landing batch B) | D-170 |
+| UX-V3 | Usability fixes: people, households and Giving | Major | Built (landing batch B, #958) | D-170 |
+| UX-V4 | Usability fixes: Volunteers, Programs, Logic Models, Funders (absorbs UX-F4, the module visual pass) | Major | Built (landing batch B, #958) | D-170 |
+| UX-V5 | Record page tabs suite-wide (people, gifts, programs, grants and others) | Minor | Built (landing batch B) | D-170 |
+| UX-V6 | App logos for Programs, Funders and Logic Models (barn-plus-badge style); Fundraising badge recolored off red (D-58); module apps use the brand color #007A9E | Minor | Built (landing batch B) | D-170 |
+| UX-V7 | Drag and drop, added to existing controls: Grant Pipeline board, Ask Pipeline touch rebuild, transform step order, thank-you rule order, household split, logic model parts | Minor | Built (landing batch B, #958) | D-170 |
+| UX-V8 | Help text moved from labels to English-only JSON help catalogs per package (`BarnHelp_<Package>.json`, read by `c/barnHelpText` and `BarnHelp`), with a lower label cap of 4,150 (D-172) | Major | Built (landing batch B) | D-171, D-172 |
 | AR-01 | Messages (errors, toasts, confirmations, run results) move from labels to the help catalogs; labels stay for short UI strings and text JSON cannot reach; expected full suite about 2,400 labels | Major | In progress: Core built (#907: 943 moved, suite 3,163 labels, cap 3,215); module catalogs follow in their stages | D-172 |
 | AR-02 | Install pre-check: edition, Apex room, label room and name collisions | Major | Built (#876) | D-173 |
 | AR-03 | Per-package Apex size budget in CI, plus a character trim pass on Apex | Major | Built (#876 budget; #908 trims; #909 tabs: suite 4.39M to 3.52M characters, Core 1.94M) | D-173 |
@@ -960,6 +961,8 @@ The Event items of the old 1.12, moved up with 1.2 (D-177). Portal Builder (PB-0
 
 #### Release 1.4 (Batch D): Migration Assistant, volunteer self-service
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 C-46 Address Verification moved to release 1.15 (Brandon, 2026-11-04, D-177).
 
 | ID | Item | Size | Status | Source |
@@ -974,8 +977,11 @@ C-46 Address Verification moved to release 1.15 (Brandon, 2026-11-04, D-177).
 | V-13 | Volunteer recognition: hour milestones and anniversaries with a thank-you task | Minor | Planned | D-156 |
 | G-35 | Giving setup tabs move to Admin_Tabs | Minor | Planned | D-165 |
 | PERM-N | Simpler permission sets, release N (add and migrate): Coordinator retired with Team Member carry-over, Bulk Update and Bulk Delete include Find and Export, BarnCRM Admin gains Bulk Update's class, Giving Admin follows BarnCRM Admin, Fundraising Staff gets the module staff sets except Programs, Mirror sets merged into Salesforce Records Sync and Inbound Gifts, clearer set labels; nobody loses access (built as #1047 to #1049) | Major | Built | D-191 |
+| C-72 | Module detection without object names: Forms and Logic Models ship a Setting Definition row naming themselves so they need no probe object, like the six modules fixed in #1053 (a customer org's own same-named object, such as mwdbdevsb's Event__c and Volunteer_Hours__c, made modules read as installed while the namespace is deferred) | Minor | Planned | #1053 |
 
 #### Release 1.5 (Batch D): Recurring donor health, paid event registration, session proposals, Giving minors
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
 
 G-34 online donation page moved to release 1.15 with C-46 (Brandon, 2026-11-04, D-177), as did the stock and donor-advised fund gift fields (G-21, G-31). G-27 stays here, after MIG-06 in 1.4.
 
@@ -994,6 +1000,8 @@ G-34 online donation page moved to release 1.15 with C-46 (Brandon, 2026-11-04, 
 
 #### Release 1.6 (Batch D): Archive, generic merge, field history, Volunteers minors
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 Archive by Query does not depend on Backup Sets: it uses the shipped Find export, Download before delete and bulk delete, so it is placed by impact here and defines the export file format that Backup Sets (1.17) reuses.
 
 | ID | Item | Size | Status | Source |
@@ -1010,6 +1018,8 @@ Archive by Query does not depend on Backup Sets: it uses the shipped Find export
 
 #### Release 1.7 (Batch E): Corporate Hub, documents and compliance
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 C-46 Address Verification is not a prerequisite (Brandon, 2026-11-04, D-178): hub addresses are simply unverified until C-46 ships in 1.15.
 
 | ID | Item | Size | Status | Source |
@@ -1024,6 +1034,8 @@ C-46 Address Verification is not a prerequisite (Brandon, 2026-11-04, D-178): hu
 
 #### Release 1.8 (Batch E): Memberships, GDPR
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | G-22a | BarnCRM Memberships module: membership types and tiers, status and dates, household or organization members; not built on Opportunity (ADR first) | Major | Planned | D-157 |
@@ -1035,6 +1047,8 @@ C-46 Address Verification is not a prerequisite (Brandon, 2026-11-04, D-178): hu
 | PAY-02 | Membership dues and renewals paid online through PAY-01 (Stripe or PayPal hosted checkout), membership dated on payment | Minor | Planned | D-190 |
 
 #### Release 1.9 (Batch E): Migrations
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
 
 Each needs the Section 11.2 item 32 decisions it depends on (O-1 to O-12).
 
@@ -1048,6 +1062,8 @@ Each needs the Section 11.2 item 32 decisions it depends on (O-1 to O-12).
 | L-05 | Evidence log | Minor | Planned | Section 5.7 |
 
 #### Release 1.10 (Batch F): Board governance
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
 
 Portal Builder (PB-01) moved to release 1.3 (Brandon, 2026-11-04, D-178); the board portal template (PB-02) follows in 1.11.
 
@@ -1065,6 +1081,8 @@ Portal Builder (PB-01) moved to release 1.3 (Brandon, 2026-11-04, D-178); the bo
 
 #### Release 1.11 (Batch F): Board and member portals, grant management
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 PB-03 volunteer portal template moved to release 1.3 with Portal Builder (Brandon, 2026-11-04, D-178). PB-02 needs Portal Builder (1.3) and board governance (1.10); PB-09 needs Portal Builder (1.3) and Memberships (1.8).
 
 | ID | Item | Size | Status | Source |
@@ -1081,6 +1099,8 @@ PB-03 volunteer portal template moved to release 1.3 with Portal Builder (Brando
 
 #### Release 1.12 (Batch F): Scholarships and Outbound Grants
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | SG-01 | Programs and cycles (module; ADR first) | Major | Planned | D-122 |
@@ -1094,6 +1114,8 @@ PB-03 volunteer portal template moved to release 1.3 with Portal Builder (Brando
 | SG-09 | Conditional disbursements, blocked until named conditions are met | Minor | Planned | D-156 |
 
 #### Release 1.13 (Batch G): Multi-brand management, event operations, portal templates
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
 
 PB-07 and PB-08 moved to release 1.3 with Portal Builder (Brandon, 2026-11-04, D-178). PB-04 and PB-05 need Portal Builder (1.3) and their data modules.
 
@@ -1111,6 +1133,8 @@ PB-07 and PB-08 moved to release 1.3 with Portal Builder (Brandon, 2026-11-04, D
 
 #### Release 1.14 (Batch G): Brand visibility, LWC Builder start, board portal follow-ups
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 CH-18 and CH-19 came from the old 1.12 (D-177): they need the board portal (PB-02, 1.11) and stay with the portal releases.
 
 | ID | Item | Size | Status | Source |
@@ -1126,6 +1150,8 @@ CH-18 and CH-19 came from the old 1.12 (D-177): they need the board portal (PB-0
 
 #### Release 1.15 (Batch G): Address Verification, online donations
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 Moved later by Brandon (2026-11-04, D-177): "Address verification and online donation pages can move to a later batch." G-34 still needs MIG-06 (1.4) and the Forms engine (1.1); G-27 recurring donor health stays in 1.5, after MIG-06. G-21 and G-31 (stock and donor-advised fund gift fields) came from the old 1.3 as the natural minors beside the donation page. D-118 listed C-46 before Corporate Hub and Portal Builder; Brandon decided (2026-11-04, D-178) that C-46 is no longer a prerequisite of either, so their addresses are simply unverified until C-46 ships here.
 
 | ID | Item | Size | Status | Source |
@@ -1138,6 +1164,8 @@ Moved later by Brandon (2026-11-04, D-177): "Address verification and online don
 | G-31 | Donor-advised fund and gift-source fields with a DAF and stock report (pairs with G-21) | Minor | Planned | D-156 |
 
 #### Release 1.16 (Batch H): LWC Builder complete, Territory Management, Grid tool
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -1152,6 +1180,8 @@ Moved later by Brandon (2026-11-04, D-177): "Address verification and online don
 
 #### Release 1.17 (Batch H): Backup Sets and files import (late by Brandon's direction)
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 Two majors: Brandon placed Backup and files import late (D-157).
 
 | ID | Item | Size | Status | Source |
@@ -1164,6 +1194,8 @@ Two majors: Brandon placed Backup and files import late (D-157).
 
 #### Release 1.18 (Batch I): Project Management module (later by Brandon's direction)
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending. The Planned cells in the table below predate the build: every item in this release is Landed (#1235) unless a row says otherwise.
+
 Brandon (2026-11-04): "Please also add to the roadmap for later a PM Module which can handle projects in various ways, including Salesforce implementation projects. Perhaps this will be a PSA tool." A universal module (not nonprofit-specific, both editions proposed), so it follows the Core, universal, nonprofit order (D-38) like any module. The item list is provisional until the spec is written; sizes and the PSA scope are settled there.
 
 | ID | Item | Size | Status | Source |
@@ -1174,13 +1206,48 @@ Brandon (2026-11-04): "Please also add to the roadmap for later a PM Module whic
 | PM-04 | PSA layer, if the spec keeps it: time entries, resource assignment and utilization, budgets against actuals; billing only where it stays free of payment processing | Minor | Planned | D-175 |
 | PM-05 | Project status report and a home card of open projects at risk | Minor | Planned | D-175 |
 
+#### Release 1.19 (Batch I): Remaining approved items
+
+Added 2026-11-11 by the integrator so the combined build (Brandon's goal, 2026-11-11: build all remaining batches, then test once) covers every approved item that had no release: the AR-01 module part and the Later items from Batch B. Built last, after every module build is integrated, so AR-01 also covers the labels those builds add.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| AR-01b | AR-01 for the modules: messages (errors, toasts, confirmations, run results) in every module package move from labels to the package help catalogs, as Core did in #907 | Major | Planned | D-172 |
+| P-10 | Sample data for program goals (the built feature ships without sample records) | Minor | Planned | D-168 |
+| P-11 | Sample data for cohorts and sessions | Minor | Planned | D-168 |
+| P-14b | Person-field eligibility rules: rules over fields on the person, beyond the intake fields | Minor | Planned | D-168 |
+| L-04b | Logic model report as a PDF, beside the CSV and printable page | Minor | Planned | D-168 |
+| UTIL-01 | One shared framework-free utility module for the format and isoDate helper copies (plan 9.9), and the Logic Models samePeriodExists check wired into the period form or removed | Minor | Planned | D-168 |
+| C-73 | Account Tabs setting: Accounts Tab (Standard), Organization and Household Tabs (default) or Both, through tab permission sets | Minor | Built | D-195 |
+
+#### Release 1.20 (after Batch I): Batch D to I review decisions
+
+Status (2026-11-12): Built on `landing/batch-j` (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12), in testing; the Planned cells below predate the build.
+
+Added 2026-11-12 (D-196). Built now on their own branches, outside the Batch D to I landing; tested and deployed after the current batches are completely done.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| MIG-02b | Nonprofit Cloud Party Relationship Groups to BarnCRM households: `Account.Household_Model__c`, two ADRs, supervised reversible one-time conversion in Mirror (Section 11.2 item 9) | Major | Planned | D-196 |
+| PAY-04 | Payments subscription extension: recurring gifts store the processor's customer and subscription ids; donors update their card on the processor's own page from the portal; failed and renewed charge events | Major | Planned | D-196 |
+| LB-07 | LWC Builder charts with several groupings and totals; export writes working list and chart blocks | Major | Planned | D-196 |
+| CH-21 | Quorum warning when voting closes on a meeting without quorum (amends R-MO1) | Minor | Planned | D-196 |
+| CH-22 | Breach bell sent when a breach is logged, not only nightly | Minor | Planned | D-196 |
+| PM-06 | PSA rates: rate card by role and by person (bill and cost rates, effective dates); each time entry keeps the rate it was logged at, so revenue, cost and margin are right when people bill differently | Major | Planned | D-197 |
+| PM-07 | Timesheets and approvals: weekly timesheet grid, submit, approve or reject by the project manager, approved time locked; only approved time is billed, exported or counted as actual | Major | Planned | D-197 |
+| PM-08 | Project expenses: category, amount, billable, receipt on Files, same approval flow | Minor | Planned | D-197 |
+| PM-09 | Resource management: skills, resource requests (role, skills, hours, dates) filled by staffing, and a weekly allocation against capacity view | Major | Planned | D-197 |
+| PM-10 | Billing: billing type per project (time and materials, fixed fee by milestone, retainer), invoice records with lines built from approved time, expenses and milestones, printable invoice, Draft, Sent, Paid and Void, CSV export for accounting; with the Payments module installed, Pay Online on an invoice through the organization's own Stripe or PayPal and a paid payment marks the invoice Paid (Projects has no payment processing of its own) | Major | Planned | D-197 |
+| PM-11 | Project financials and revenue: revenue, cost and margin against budget, monthly recognized revenue (approved time for time and materials, percent complete for fixed fee) | Minor | Planned | D-197 |
+| PM-12 | Change requests: a requested scope change with its hours and amount, approved changes adjust the budget | Minor | Planned | D-197 |
+
 #### Held
 
 - C-38 scheduled imports and connections to other systems: on hold until Brandon starts it (D-39). The Google Sheets source for Super Importer waits with it (Brandon: "later"; it plugs in behind the C-49 file source).
 
 #### Later items from Batch B (plan notes, 2026-11-02; D-168)
 
-Not yet scheduled; each is slotted into a release under Section 9.7 when Brandon or the integrator picks it up.
+Slotted 2026-11-11 into release 1.19 (P-10, P-11, P-14b, L-04b, UTIL-01), except X-05 Junction mode (refused) and the done review candidates; the Review picklist note stays in the admin guide.
 
 - Sample data for goals, cohorts and sessions (P-10, P-11): the built features ship without sample records.
 - Person-field eligibility rules (P-14): rules over fields on the person, beyond the intake fields the rules cover now.
@@ -1894,7 +1961,7 @@ The pre-batch review (9.8) checks new work against this list; existing code is m
 7. Telemetry: include opt-in anonymous usage at all? Recommendation: yes, default off, disclosed on the listing. **Resolved 2026-10-12 (Brandon): deferred indefinitely, since there is no AppExchange listing for now; recorded as Decision D-24.**
 8. **B** How a household names its primary person, once people can be accounts. Found by the household model review on 2026-09-09. Canonical rule R-M3 says the member marked Is Primary is mirrored to the household's Primary Contact. Nothing implements it, and nothing can as written: `Account.Primary_Contact__c` is a lookup to Contact, so it cannot name a Person Account at all. A household composed entirely of person accounts therefore has no primary contact permanently, and member ordering loses the tiebreak that R-H5 gives it. Options: add a second lookup to Account beside the existing one (two fields for one idea, but both stay reportable); make the primary a question only `HouseholdService` answers, reading the junction in junction mode and the field in contact mode (consistent with R-H3 and R-M5, and the reason this is the recommendation); or drop the mirror from R-M3 and let the two modes differ openly. The cost of the recommendation is real and should decide it: a lookup field is reportable and a service method is not, so any report or formula that names the primary person would need the field to stay for contact mode and would have nothing in junction mode. This is escalation territory under Section 11.4, which names changing the household membership abstraction. Recorded as a known gap in `docs/architecture/canonical-model.md` Section 30 in the meantime, so the rule and the code no longer disagree silently. **Resolved provisionally 2026-09-23 (Brandon delegated the choice, to be confirmed when he tests): none of the three options.** A Person Account has a Contact record of its own (its person contact), and a lookup to Contact can name it, so R-M3 is kept as written with the one existing field. `HouseholdService` stays the only writer: in contact mode it mirrors the primary Contact, and in junction mode the primary member's Contact, or, when the member is a Person Account, that account's person contact, read through dynamic Apex only in orgs that have Person Accounts, so Core keeps no dependency on them. One field, reportable in both modes; the known gap in canonical model Section 30 closes when C-22 ships.
 
-9. **B** Party Relationship Group coexistence and migration. Found by the Sales Cloud and Nonprofit Cloud readiness audit on 2026-09-15. Today nothing stops the naming batch from renaming an Account that carries a native household group; the delete guard (ADR-0036) covers deletion only. Proposed design: one Account has exactly one household model (BarnCRM never writes the name, greetings or address of an Account that carries a native group, and never auto-creates a duplicate for a person already in one), a drift report rather than any sync, and a supervised, reversible, one-time migration in Mirror as feature X-09 that never deletes a native group, a membership relation or an Account. No two-way sync, because a computed name and a hand-edited name have no convergence rule. Roughly eight developer-days for the guards in Core and twelve for the migration in Mirror; needs two ADRs and an `Account.Household_Model__c` field. Update 2026-09-15: detection and the four Core guards (naming on all three callers, auto-creation, address propagation, Health Check info plus collision warning) are built on `feature/household-readiness` (PR 41), using the weaker "is the person's account a native household" rule for auto-creation because native membership lives on an object Core may not query. Decision still open: guards only, or guards plus the Mirror migration. **Resolved provisionally 2026-09-23 (Brandon delegated the choice, to be confirmed when he tests): guards only.** The guards already prevent the damage; the migration (about twelve developer-days) waits in the parking lot until a real org with native household groups asks for it.
+9. **B** Party Relationship Group coexistence and migration. Found by the Sales Cloud and Nonprofit Cloud readiness audit on 2026-09-15. Today nothing stops the naming batch from renaming an Account that carries a native household group; the delete guard (ADR-0036) covers deletion only. Proposed design: one Account has exactly one household model (BarnCRM never writes the name, greetings or address of an Account that carries a native group, and never auto-creates a duplicate for a person already in one), a drift report rather than any sync, and a supervised, reversible, one-time migration in Mirror as feature X-09 that never deletes a native group, a membership relation or an Account. No two-way sync, because a computed name and a hand-edited name have no convergence rule. Roughly eight developer-days for the guards in Core and twelve for the migration in Mirror; needs two ADRs and an `Account.Household_Model__c` field. Update 2026-09-15: detection and the four Core guards (naming on all three callers, auto-creation, address propagation, Health Check info plus collision warning) are built on `feature/household-readiness` (PR 41), using the weaker "is the person's account a native household" rule for auto-creation because native membership lives on an object Core may not query. Decision still open: guards only, or guards plus the Mirror migration. **Resolved provisionally 2026-09-23 (Brandon delegated the choice, to be confirmed when he tests): guards only.** The guards already prevent the damage; the migration (about twelve developer-days) waits in the parking lot until a real org with native household groups asks for it. **Resolved 2026-11-12 (Brandon, D-196): guards plus migration**, built now as MIG-02b (release 1.20), tested and deployed after the current batches.
 10. **B** Changing the membership mode on an org that already holds household data. No migration exists in either direction. Junction to Contact makes every membership row invisible, so the next upkeep recounts households to zero, renames them to the placeholder, and deletes them when empty-household deletion is on. Contact to Junction strands everyone already on a household, because `withoutAHousehold` skips them and they never get a membership row. A guard that refuses a switch that would strand data, with a Health Check finding, is being added on 2026-09-15. Decision: keep the guard only, or build the migration both ways. **Resolved provisionally 2026-09-23 (Brandon delegated the choice, to be confirmed when he tests): keep the guard only.** A switch that would strand data is refused, with a Health Check finding that says why. If an org needs to switch, the first migration to build is contact mode to junction mode (an org that turns on Person Accounts after adopting), and only when one asks.
 11. Professional Edition. **Platform Starter licenses are likewise not a target (Brandon, 2026-11-04, D-174): no compatibility needed.** **Resolved 2026-09-15 (Brandon): Professional Edition and below are not a target. Nothing has to be compatible with them, so the platform-event and permission-set-group concerns below are moot and no edition check is added to CI.** Kept for the audit trail: nothing in the repository verifies it. Field, object, record type and validation rule counts sit comfortably inside its limits; the exposure is feature availability. Permission set groups and custom platform events may be unavailable there, and `Error_Log_Event__e` is the entire error-logging path, so error logging could fail silently on that edition. Verified on 2026-09-15 from search snippets of the ISVforce Guide and release notes, not a direct read, so medium confidence: permission set groups work in that edition and packaged ones do not count against its cap of ten; objects and tabs from a security-reviewed package listed on AppExchange are exempt from its limits, which makes the exemption conditional on the listing, not on being open source; and `ErrorLogWriter` already falls back to a direct insert of `Error_Log__c` whenever publishing throws, so at runtime logging degrades rather than going silent. The one thing that could not be settled from documentation is whether a package that contains a platform event can install into Professional Edition at all, since the ISVforce Guide says platform events are not supported there. If that blocks installation, the whole package fails on that edition and the fix is to make the event optional in Core. Only a real Professional Edition trial org can answer it.
 12. Housekeeping to settle before the first package version, since a custom metadata type is effectively permanent once packaged. `Naming_Pattern__mdt` (four fields, six shipped records) has no consumer anywhere; naming reads the three pattern fields on BarnCRM Settings instead. **Resolved 2026-09-22 (Brandon): remove it; removed from Core the same day.** Still open: three permission set groups, Fundraising Staff, Program Staff and Volunteer Coordinator, each contain only BarnCRM Staff. Recommendation: remove them before the first package version, since adding a packaged group later is easy and removing one is not. Decision needed before the first package version, not after. **Resolved 2026-10-13 (Brandon): the Fundraising Staff group includes Giving Staff; recorded as Decision D-44.**
@@ -2253,6 +2320,11 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-190 | Payments and event additions (Brandon, 2026-11-09: "Payments through Stripe and Paypal should be within scope for events, donations, and whatever else is applicable. It doesn't need to be part of Batch C but this needs to be included in the plan somewhere. For events, it will also need session proposal management with multi-user scoring via a matrix. The networking app would probably need to be via a WordPress site that can save as an app on mobile devices (not through the app store). Please include the other suggestions above now and/or in the future via the plan."). New optional BarnCRM Payments module PAY-01 (1.4): the org's own Stripe and PayPal accounts through processor-hosted checkout and webhooks, shared by Events (EV-20, 1.5), donations (G-34, 1.15), memberships (PAY-02, 1.8) and the donor portal (PAY-03, 1.15); BarnCRM holds no money and stores no card data; payment processing stays out of Core. Events: EV-21 session proposals with matrix scoring and EV-26 badge overrides and EV-27 per-session ratings (1.5); EV-22 attendee networking app as an installable web app on the org's WordPress site (no app store) and EV-29 personal agenda (1.11); EV-23 budget, expenses and partner funding, EV-24 venues and rooms, EV-25 session and speaker details, EV-28 sponsor lead scanning (1.13). C-64 moved from 1.5 to 1.15 to keep release sizes. Source: the Midwest Dreamin' and Whova comparison of 2026-11-09 | Payments outside BarnCRM | Owner direction; a Dreamin' conference needs paid registration, review matrices and an attendee app |
 | D-191 | Batch C review follow-ups, testing speed-ups and permission set choices (Brandon, 2026-11-09). Testing ("Yes to all 3"): (a) the `barn-npc` and `mwdbdevsb` check-only validations start in parallel with the release gate instead of after it (re-run if the gate leads to a fix; each `mwdbdevsb` quick deploy still needs Brandon's approval); (b) a test-suite speed pass on the slowest classes that keeps every check; (c) relevant-test selection for the incremental gate is already in place (`select-org-tests.py`, D-142; Salesforce's RunRelevantTests was tried and dropped on batches 9 and 10 because it skipped the changed tests). Review findings: Report Subscriptions stay admin-only; `MatchingGiftService.link`/`unlink` (test-only callers, nothing broken) are removed as dead code with their rule tests moved onto the Matched Gift field; Events controllers show BarnCRM exception messages through `UserErrors.wrapShowingDml`; Events and Forms person matching moves to one shared Core helper; same-text labels are merged only where both uses are the same part of speech and meaning (noun and verb pairs stay separate); the unindexed filters (Form_Submission__c Status__c, the EventEmailBatch attendee scan) stay a watch item, and per-org Salesforce custom index requests are out of scope. Simpler permission sets (the simpler permission sets ADR in PR #1043, numbered when it lands), on Claude's recommendation as Brandon asked: D1 retire the Coordinator group (holders get Team Member plus Volunteers Coordinator); D2 Giving Admin follows BarnCRM Admin; D3 Fundraising Staff gets the module staff sets Team Member gets except Programs (case notes stay per person); D4 the Mirror merges; D5 Bulk Update and Bulk Delete include Find and Export; built add-then-remove over two releases, no user loses access | Hidden Events errors; duplicate matching code; per-org index requests; Coordinator role kept; case notes for all fundraisers | Owner direction; clearer errors and one code path, fewer and self-sufficient permission sets without widening access to client case notes |
 | D-192 | mwdbdevsb end-of-batch deploy (Brandon, 2026-11-09; Section 9.6): "The mwdbdevsb is approved at the end of every batch." Standing approval for each batch's mwdbdevsb deploy once the pre-batch review is done, both release gates pass and the mwdbdevsb check-only validation passes with 0 failures; Core only, new features off and modules uninstalled (2026-11-09 rule) and the Tab Access Check stop and restart as before; any other mwdbdevsb deploy or org change still needs his approval | Approval asked for each mwdbdevsb deploy | Owner direction; removes a wait at the end of every batch while keeping the check-only first rule |
+| D-193 | Tab icons shared across modules (Brandon, 2026-11-11: "Yes, duplicate tab icons is fine"). Salesforce documents only 100 tab motifs and BarnCRM uses all of them, so a module tab may use the same motif as a tab in another module. Core tabs keep motifs no other tab uses, and no two tabs in one package share one. Amends D-144 and UX-F3 | Every tab across every package unique | Out of motifs; Core stays recognizable everywhere, a module's own tabs stay distinct |
+| D-194 | Integration App rows and the standard object check (Brandon, 2026-11-11: "Sure"). `scripts/ci/check-standard-objects.sh` exempts Core's Integration_App custom metadata rows, which name another app's objects only to detect it and to drive Migration Assistant kits (D-85, D-125); Core code still never depends on those objects | Move detection rows into Mirror | Detection data is not a dependency; ADR-0013 still holds |
+| D-195 | Account Tabs setting and scheduling by hand (Brandon, 2026-11-11). (a) C-73, release 1.19: an org-wide **Account Tabs** setting in BarnCRM Settings with three choices: **Accounts Tab (Standard)**, **Organization and Household Tabs** (the default) or **Both**; it shows or hides the tabs through tab permission sets, like the Households tab. (b) Nightly jobs are scheduled only by a person pressing Schedule (Nightly Jobs page or Health Check), never by the deploy script: "that's better for someone to have to click to schedule". (c) A job switched on while the nightly run is not scheduled shows **Not Scheduled**, not On | Separate tabs only; deploy script schedules the run | Organizations coming from standard Salesforce keep the Accounts tab they know; scheduling stays a deliberate act by the person the jobs run as |
+| D-196 | Batch D to I review decisions (Brandon, 2026-11-12: "1. A 2. A 3. A but build it now and test/deploy after the current batches are completely done. 4. Both approved"). (1) CH-21: Close Voting still records Passed or Failed by For against Against (R-MO1), and when the meeting's Quorum Met is false it warns that the meeting did not reach quorum and the motion shows it; amends R-MO1. (2) PAY-04: a Payments subscription extension so donors can update the card on a recurring gift: the recurring gift stores the processor's customer and subscription ids and the portal opens the processor's own update-card page (Stripe and PayPal), with listener events for failed and renewed charges; completes PAY-03's card updates. (3) MIG-02b: guards plus migration for Section 11.2 item 9 (confirms the choice left provisional on 2026-09-23): `Account.Household_Model__c`, two ADRs, and a supervised, reversible, one-time conversion of Nonprofit Cloud Party Relationship Groups to BarnCRM households in Mirror that never deletes a native group, membership or Account. (4a) CH-22: the breach bell is sent when a breach is logged, not only by the nightly run. (4b) LB-07: LWC Builder charts with more than one grouping and total, and export of working list and chart blocks instead of placeholders. All five are built now on their own branches, outside the Batch D to I landing, and are tested and deployed after the current batches are completely done (release 1.20) | Warn only, block on no quorum or leave as is; card updates left out of PAY-03; guards only; nightly breach bell; charts and export as documented limits | A vote at a meeting without quorum is flagged where most bylaws make it invalid; donors fix a failed card themselves; organizations leaving Nonprofit Cloud keep their households; a 72-hour breach clock starts at once |
+| D-197 | Full featured PSA in release 1.20 (Brandon, 2026-11-12: "With 1.20, also please build out the full featured PSA tool"). Amends ADR-0208 decision 6 (light PSA) and decision 7 (no invoice): the Projects module adds PM-06 rates, PM-07 timesheets and approvals, PM-08 expenses, PM-09 resource management, PM-10 billing and invoice records, PM-11 financials and recognized revenue, PM-12 change requests. Scope set by the integrator (reversible, listed for Brandon's check-in). Still no payment processing in Projects (invoices are records for the organization's own accounting); amended the same day (Brandon: "Invoices linked to payments should be included. Everything else looks good."): with the Payments module installed, an invoice can be paid online through Payments' hosted checkout, and a paid payment marks it Paid, through Payments' listener extension so Projects stays dependent on Core only; the Time Tracking off switch keeps planning-only organizations unaffected, and each PSA part has its own setting. Built now on landing/batch-j, tested and deployed after the current batches | Keep the light PSA layer | Organizations that bill for services (Salesforce implementation partners, fee-for-service programs) can run projects end to end without a second system |
 
 ---
 
