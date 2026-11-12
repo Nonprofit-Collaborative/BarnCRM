@@ -24,8 +24,10 @@ already reads zips (an .xlsx file is one) in the browser.
 3. **Read in the browser.** The zip reader is moved out of the workbook reader into its own
    framework-free module (`c/zipReader`), and the CSV parser into `c/csvParser`, so both the
    import wizard and the files import use one copy.
-4. **Sent in groups.** Apex receives at most about 4 MB per call, so a file may be at most 2.5 MB
-   and the page sends files in groups of at most 3 MB or 20 files. Each file is a `ContentVersion`
+4. **Sent in groups.** A Lightning request carries at most about 4 MB and Apex holds at most
+   6 MB, and base64 makes a file a third larger, so a file may be at most 2 MB and the page sends
+   files in groups of at most 2 MB or 20 files; the server releases each file's text once it is
+   decoded. Each file is a `ContentVersion`
    saved as the person with `FirstPublishLocationId` set to its record, so the record shows it in
    Files and the person owns it.
 5. **Dry run first.** The dry run checks every row in the browser (file in the zip, size, Id
@@ -40,5 +42,5 @@ already reads zips (an .xlsx file is one) in the browser.
 ## Consequences
 
 - No new object, field or permission set: one picklist value, two browser modules.
-- Files over 2.5 MB are refused with the reason; they can be added by hand.
+- Files over 2 MB are refused with the reason; they can be added by hand.
 - A page closed in the middle leaves the job Running with what was sent; it can still be undone.

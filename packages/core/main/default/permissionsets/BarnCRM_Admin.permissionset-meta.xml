@@ -95,6 +95,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FilesImportController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FindController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

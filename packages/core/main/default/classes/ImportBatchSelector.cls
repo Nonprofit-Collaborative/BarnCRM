@@ -61,7 +61,8 @@ public with sharing class ImportBatchSelector {
 					BulkUpdateService.OPERATION_UPDATE,
 					BulkDeleteService.OPERATION_DELETE,
 					FieldAccessService.OPERATION_ACCESS,
-					BackupSetService.OPERATION_BACKUP
+					BackupSetService.OPERATION_BACKUP,
+					FilesImportService.OPERATION_FILES
 				}
 			},
 			AccessLevel.USER_MODE

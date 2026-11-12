@@ -8846,21 +8846,21 @@ most 1,000 characters). Other columns are ignored. A manifest with more than 2,0
 refused. The zip and the manifest are read in the browser (`c/zipReader`, `c/csvParser`).
 
 **R-FI2 Dry run.** Loads nothing. Each row is refused, with its reason, when the file is not in
-the zip, is empty or larger than 2.5 MB, its Record Id is blank or not an Id, the same file and
+the zip, is empty or larger than 2 MB, its Record Id is blank or not an Id, the same file and
 record are on an earlier row, or (checked on the server, in user mode) no record with that Id
 exists that the person can see. The page shows the counts and every refused row, and offers the
 rows as a CSV.
 
 **R-FI3 Load.** Only the rows the dry run accepted. The start creates the job (Operation Files,
 Status Committing, Row Count the rows to load, Undo Deadline the import undo window from now,
-R-IB7). The page then sends the files in groups of at most 3 MB or 20 files; each is inserted as
+R-IB7). The page then sends the files in groups of at most 2 MB or 20 files; each is inserted as
 the person as a `ContentVersion` with `FirstPublishLocationId` its record, so the person owns
 the document and the record shows it. A file the platform refuses is counted as rejected with
 the platform's reason. Each group writes one journal page (R-IJ1): a Created entry
 (`object` ContentDocument, `id`, `row`, `recordId`) per file saved and a Failed entry per file
 refused, and adds to the job's Rows Created and Rows Rejected. The finish makes the job
 Complete with a Run Log summary. A page closed in the middle leaves the job Committing with what
-was sent.
+was sent, read as Failed (R-IB13) and undoable.
 
 **R-FI4 Undo.** Within the Undo Deadline, once, by the person who loaded it or someone managing
 BarnCRM Settings: every document the journal lists as Created is deleted as the person, except

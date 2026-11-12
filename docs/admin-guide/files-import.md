@@ -16,7 +16,7 @@ file to a record you can see.
 Limits:
 
 - at most 2,000 files in one zip;
-- each file at most 2.5 MB (a larger file can be added to its record by hand);
+- each file at most 2 MB (a larger file can be added to its record by hand);
 - a browser that can unzip files (any current Chrome, Edge, Firefox or Safari).
 
 ## 3. Making the Zip
@@ -68,8 +68,8 @@ new version of since: that file is kept, and the job's run log counts it.
   exactly, including subfolders and capital letters.
 - **"No record with this Id that you can see."** The Id is from another org, the record was
   deleted, or sharing hides it from you.
-- **You closed the page during the load.** The files sent so far are saved and the job stays
-  **Committing**. Undo it, or load the zip again with only the rows that were not saved.
+- **You closed the page during the load.** The files sent so far are saved and the job shows
+  **Failed** in Data Jobs. Undo it, or load the zip again with only the rows that were not saved.
 
 ## Field Reference
 
