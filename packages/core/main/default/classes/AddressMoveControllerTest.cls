@@ -274,6 +274,69 @@ private class AddressMoveControllerTest {
 		}
 	}
 
+	/** R-AD10: the chosen extra fields, in the order saved. */
+	@IsTest
+	static void theCardFieldsAreTheChosenOnesThatAreNotAlreadyShown() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isTrue(AddressMoveController.getCardFields().isEmpty(), 'None chosen yet.');
+
+			SettingsService.saveSystemValue(
+				'Address_Card_Fields__c',
+				'Verification_Status__c,Latest_Verified_Date__c'
+			);
+			List<AddressMoveController.CardField> fields = AddressMoveController.getCardFields();
+
+			Assert.areEqual(2, fields.size(), 'Both chosen fields are shown.');
+			Assert.areEqual('Verification_Status__c', fields[0].apiName, 'In the order saved.');
+			Assert.areEqual(
+				Schema.SObjectType.Address__c.fields.Verification_Status__c.getLabel(),
+				fields[0].label,
+				'With its label.'
+			);
+			Assert.areEqual('Latest_Verified_Date__c', fields[1].apiName, 'Then the next.');
+		}
+	}
+
+	@IsTest
+	static void noRecordMeansNothingToOffer() {
+		System.runAs(TestUsers.admin()) {
+			AddressMoveController.CardContext context = AddressMoveController.getCardContext(null);
+
+			Assert.isFalse(context.isHousehold, 'Not a household.');
+			Assert.isTrue(context.households.isEmpty(), 'No households to pick.');
+		}
+	}
+
+	@IsTest
+	static void aMoveNamesPeopleSharingANameWithNothingToTellThemApartAsTheyAre() {
+		System.runAs(TestUsers.admin()) {
+			Account ruiz = household('The Ruiz Family');
+			Database.insert(ruiz, AccessLevel.SYSTEM_MODE);
+			Contact first = AddressTestDataFactory.newContact('Sam', 'Ruiz', ruiz.Id);
+			Contact second = AddressTestDataFactory.newContact('Sam', 'Ruiz', ruiz.Id);
+			Database.DMLOptions allowDuplicates = new Database.DMLOptions();
+			allowDuplicates.DuplicateRuleHeader.AllowSave = true;
+			Database.insert(
+				new List<Contact>{ first, second },
+				allowDuplicates,
+				AccessLevel.USER_MODE
+			);
+
+			AddressMoveController.MovePreview preview = AddressMoveController.getMovePreview(
+				ruiz.Id
+			);
+
+			Assert.areEqual(2, preview.moving.size(), 'Both take the address.');
+			for (AddressMoveController.Choice choice : preview.moving) {
+				Assert.areEqual(
+					'Sam Ruiz',
+					choice.name,
+					'Left as the name when nothing separates them.'
+				);
+			}
+		}
+	}
+
 	private static Account household(String name) {
 		Account record = AddressTestDataFactory.newHousehold(name);
 		record.BillingStreet = HOME_STREET;
