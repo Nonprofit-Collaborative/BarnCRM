@@ -189,6 +189,15 @@
     "Projects_Invoice_TimeLine": "{0}: time at {1} an hour",
     "Projects_Invoice_RetainerLine": "Retainer for {0}",
     "Projects_Invoice_PdfLabels": "Invoice|Bill To|Invoice Date|Due Date|Period|Total|Amount Paid|Balance Due|Notes",
-    "Projects_Invoice_PdfColumns": "Description|Date|Quantity|Unit Price|Amount"
+    "Projects_Invoice_PdfColumns": "Description|Date|Quantity|Unit Price|Amount",
+    "Projects_Invoice_OnlineOff": "Online payment is not available: turn on Take invoice payments online in BarnCRM Settings, Projects, and install and set up the BarnCRM Payments module.",
+    "Projects_Invoice_NothingToPay": "Only a Sent invoice with a balance due can be paid online.",
+    "Projects_Invoice_NoEmail": "Choose a Bill To Contact with an email address first.",
+    "Projects_Invoice_PaymentDescription": "Invoice {0} for {1}",
+    "Projects_Invoice_LinkSubject": "Invoice {0} from {1}",
+    "Projects_Invoice_LinkBody": "Invoice {0} from {1} is ready to pay online. Balance due: {2}.\n\nPay securely here: {3}\n\nThank you.",
+    "Projects_Invoice_LinkSent": "Payment link emailed to {0}.",
+    "Projects_Invoice_LinkNotEmailed": "The payment link was made and saved on the invoice, but the email could not be sent: {0}",
+    "Projects_Invoice_VoidReport": "A payment report for void invoice {0} was ignored. Refund the payment in your processor if it should not have been taken."
   }
 }

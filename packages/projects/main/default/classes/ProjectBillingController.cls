@@ -56,7 +56,9 @@ public with sharing class ProjectBillingController {
 			return new Map<String, Object>{
 				'enabled' => enabled,
 				'canManage' => enabled && Projects.canManage(),
-				'status' => invoice.Status__c
+				'status' => invoice.Status__c,
+				'balance' => ProjectInvoicePayments.balance(invoice),
+				'online' => enabled && ProjectInvoicePayments.available()
 			};
 		} catch (Exception e) {
 			throw failure(e);
@@ -94,6 +96,15 @@ public with sharing class ProjectBillingController {
 	public static Id printInvoice(Id invoiceId) {
 		try {
 			return ProjectInvoiceDocument.print(invoiceId);
+		} catch (Exception e) {
+			throw failure(e);
+		}
+	}
+
+	@AuraEnabled
+	public static String sendPaymentLink(Id invoiceId) {
+		try {
+			return ProjectInvoicePayments.sendLink(invoiceId);
 		} catch (Exception e) {
 			throw failure(e);
 		}
