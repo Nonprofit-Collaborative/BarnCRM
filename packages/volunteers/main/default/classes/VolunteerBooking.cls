@@ -18,7 +18,8 @@ public inherited sharing class VolunteerBooking {
 
 	/**
 	 * Books the person on the shift and returns the help text key of what happened. A shift that
-	 * is not Open, has started or whose job is inactive is closed. A full shift is refused unless
+	 * is not Open, has started or whose job is inactive is closed. A person already signed up is
+	 * told so, even when the shift is full. Otherwise a full shift is refused unless
 	 * the waitlist is on (the sign-up is then Waitlisted) or `overTarget` is true, as for a public
 	 * form already sent, which R-VS4 allows. A cancelled sign-up of the person is reopened.
 	 */
@@ -52,9 +53,6 @@ public inherited sharing class VolunteerBooking {
 			groupSize > MAX_GROUP
 			? 1
 			: groupSize;
-		if (!overTarget && !VolunteerSettings.waitlistEnabled() && placesLeft(shifts[0]) < places) {
-			return FULL;
-		}
 		Boolean isAccount = personId.getSObjectType() == Account.SObjectType;
 		List<Volunteer_Signup__c> existing = [
 			SELECT Id, Status__c
@@ -70,6 +68,11 @@ public inherited sharing class VolunteerBooking {
 			!existing.isEmpty() && existing[0].Status__c != VolunteerSignupService.STATUS_CANCELLED
 		) {
 			return ALREADY;
+		}
+		// After the already-signed-up check: a person whose own places filled the shift is told
+		// they are signed up, not that the shift is full.
+		if (!overTarget && !VolunteerSettings.waitlistEnabled() && placesLeft(shifts[0]) < places) {
+			return FULL;
 		}
 		Volunteer_Signup__c signup = existing.isEmpty()
 			? new Volunteer_Signup__c(

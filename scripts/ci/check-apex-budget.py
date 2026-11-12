@@ -211,8 +211,10 @@ CAPS = {
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
     # G-22e certifications (CertificationService, CertificationController, the erasure and
-    # nightly expiry hooks): 47,443 measured, plus about 1 percent.
-    "memberships": 48_460,
+    # nightly expiry hooks): 47,443 measured, plus about 1 percent. Raised 2026-11-12 for the
+    # erasure extension's system-mode find and access check (d96088f3d): 49,088 measured, plus
+    # about 0.5 percent.
+    "memberships": 49_340,
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%.

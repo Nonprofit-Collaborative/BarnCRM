@@ -147,6 +147,7 @@ private class CorporateHubControllerTest {
 				);
 			}
 		}
+		Test.getEventBus().deliver();
 		Assert.areEqual(
 			1,
 			[

@@ -8,17 +8,21 @@
  *   transaction.
  * It runs as whoever queued, scheduled or started it, in user mode.
  */
-public with sharing class AddressVerificationJob implements Queueable, Database.Batchable<SObject>, Database.AllowsCallouts, Schedulable {
-	private final List<Id> addressIds;
+public with sharing class AddressVerificationJob implements Database.Batchable<SObject>, Database.AllowsCallouts, Schedulable {
+	/**
+	 * The on-save job for the given addresses. A class of its own because Apex refuses a class
+	 * that is both Queueable and Batchable or Schedulable.
+	 */
+	public with sharing class OnSave implements Queueable, Database.AllowsCallouts {
+		private final List<Id> addressIds;
 
-	/** The nightly or on-demand batch. */
-	public AddressVerificationJob() {
-		this.addressIds = null;
-	}
+		public OnSave(List<Id> addressIds) {
+			this.addressIds = addressIds;
+		}
 
-	/** The on-save job for the given addresses. */
-	public AddressVerificationJob(List<Id> addressIds) {
-		this.addressIds = addressIds;
+		public void execute(QueueableContext context) {
+			AddressVerifier.verify(addressIds);
+		}
 	}
 
 	/** Starts the batch now, unless the module is off, the keys are missing or the limit is 0. */
@@ -31,10 +35,6 @@ public with sharing class AddressVerificationJob implements Queueable, Database.
 
 	public void execute(SchedulableContext context) {
 		startBatch();
-	}
-
-	public void execute(QueueableContext context) {
-		AddressVerifier.verify(addressIds);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
