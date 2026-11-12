@@ -53,6 +53,16 @@ public with sharing class EventsSettings {
 		return flag('Mark_No_Shows__c');
 	}
 
+	/** R-AMS1: whether connected attendees may message each other in the attendee app. Ships off. */
+	public static Boolean attendeeMessages() {
+		return flag('Attendee_Messages__c');
+	}
+
+	/** R-AGI1: whether an overlapping agenda pick is let through and marked. Ships off. */
+	public static Boolean allowAgendaOverlaps() {
+		return flag('Allow_Agenda_Overlaps__c');
+	}
+
 	/** How many days before an event its reminder goes out, 1 to 30. */
 	public static Integer reminderLeadDays() {
 		Object stored = read('Reminder_Lead_Days__c');

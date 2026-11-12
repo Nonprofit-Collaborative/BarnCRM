@@ -135,13 +135,18 @@ into six kinds:
 | EventsEngagementSignal | Org figure | How many events each person attended, for the nightly engagement score, whatever the scheduling user can see; returns counts only | ADR-0021, ADR-NEXT engagement score |
 | EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
 
-Two inner classes of `with sharing` classes also run without sharing (the register check counts only
+Three inner classes of `with sharing` classes also run without sharing (the register check counts only
 top-level classes, so it is listed here rather than as a row): `EventSurveyService.AttendeeFormReader`, kind
 Platform. A Site guest user, once a survey link's signed claim has matched, reads which form the
 Attended attendee's event names; it returns only that form identifier, never a record value
 (ADR-0188 decision 3). `EventSessionRatings.SessionFormReader` (kind Platform) does the same for a
 session's rating link: the guest reads which form the session's event names for ratings, and
 nothing else (ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`, decision 14).
+`EventOperationsHandler.ScanReader` (kinds Integrity and Upkeep) resolves a sponsor's badge scan
+whoever saves it, usually the sponsor portal's integration user: it reads the scanned attendee,
+the scanner's sponsorships and the leads already saved, keeps the attendee's details only when
+they share them, and writes the one anonymous Session Rating an agenda rating sends (ADR-NEXT
+`NEXT-events-attendee-app-operations-portal-templates.md`, decisions 9 and 13).
 
 ## Portal Builder
 
@@ -156,6 +161,7 @@ nothing else (ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`, dec
 |---|---|---|---|
 | ScholarshipsPortalExtension | Portal | The open cycle a portal person applies to, and that person's own application to withdraw and own Offered award to accept; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-NEXT scholarships outbound grants module |
 | EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
+| EventAttendeeApp | Portal | The attendee app's actions, reached only through EventsPortalExtension: the other attendee's row at an event the person attends (opted in only), the person's own connection rows and their pair's other row, messages to or from the person, and the person's own agenda picks; contact details are copied only on accept, and every write names only the verified person and the other side of their own connection | ADR-0021, ADR-NEXT events attendee app operations portal templates |
 | CorporateHubPortalExtension | Portal | A board member's own attendee row (packet read, minutes approved while submitted), own vote (only while voting is open) and own open policy or disclosure request; the integration user has no object access, and each action re-reads the row by the person Portal Builder verified | ADR-0021, ADR-NEXT corporate hub board governance |
 
 ## Mirror

@@ -26,7 +26,9 @@ public without sharing class EventsPortalExtension implements PortalActionExtens
 	}
 
 	public Set<String> actionNames() {
-		return new Set<String>{ APPLY, WITHDRAW, SEND_LINK };
+		Set<String> names = new Set<String>{ APPLY, WITHDRAW, SEND_LINK };
+		names.addAll(EventAttendeeApp.actionNames());
+		return names;
 	}
 
 	public String run(String actionName, Id personId, Id recordId) {
@@ -41,6 +43,10 @@ public without sharing class EventsPortalExtension implements PortalActionExtens
 		}
 		if (actionName == SEND_LINK) {
 			return sendLink(personId, recordId);
+		}
+		if (EventAttendeeApp.actionNames().contains(actionName)) {
+			// EV-22 and EV-29: the attendee app's connections, messages and agenda.
+			return EventAttendeeApp.run(actionName, personId, recordId);
 		}
 		throw new System.IllegalArgumentException('Unknown action ' + actionName);
 	}
