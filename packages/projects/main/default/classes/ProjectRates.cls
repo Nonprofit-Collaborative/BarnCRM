@@ -46,13 +46,18 @@ public with sharing class ProjectRates {
 			WITH SYSTEM_MODE
 		];
 		Map<Id, String> defaults = new Map<Id, String>();
-		for (Project_Resource__c resource : [
-			SELECT User__c, Default_Role__c
-			FROM Project_Resource__c
-			WHERE User__c IN :users AND Default_Role__c != NULL
-			WITH SYSTEM_MODE
-			ORDER BY CreatedDate DESC
-		]) {
+		for (
+			Project_Resource__c resource : ProjectResources.byUser(
+					[
+						SELECT User__c, Default_Role__c
+						FROM Project_Resource__c
+						WHERE User__c IN :users AND Default_Role__c != NULL
+						WITH SYSTEM_MODE
+						ORDER BY CreatedDate
+					]
+				)
+				.values()
+		) {
 			defaults.put(resource.User__c, resource.Default_Role__c);
 		}
 		Set<String> roles = new Set<String>(defaults.values());

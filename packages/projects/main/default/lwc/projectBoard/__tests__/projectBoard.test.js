@@ -39,6 +39,8 @@ const flush = () =>
 
 const BOARD = {
   timeTracking: true,
+  canCreateTime: true,
+  canCreateExpense: true,
   project: {
     Id: 'a01000000000001AAA',
     Health__c: 'At Risk',
@@ -180,6 +182,20 @@ describe('c-project-board', () => {
     await flush();
     expect(find(element, 'log-time')).toBeNull();
     expect(find(element, 'hours')).toBeNull();
+  });
+
+  it('hides Log Time and Add Expense from someone who cannot create them', async () => {
+    getBoard.mockResolvedValue({
+      ...BOARD,
+      expensesEnabled: true,
+      canCreateTime: false,
+      canCreateExpense: false
+    });
+    const element = mount();
+    await flush();
+    expect(find(element, 'log-time')).toBeNull();
+    expect(find(element, 'add-expense')).toBeNull();
+    expect(find(element, 'hours')).not.toBeNull();
   });
 
   it('adds approved change hours to the budget (R-PM20)', async () => {

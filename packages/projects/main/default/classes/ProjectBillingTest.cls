@@ -141,10 +141,11 @@ private class ProjectBillingTest {
 			Assert.areEqual('Paid', actions.get('status'), 'Marked paid');
 			Assert.isTrue((Boolean) actions.get('canManage'), 'Admin acts');
 			Project_Invoice__c voided = [
-				SELECT Status__c, Paid_Date__c, (SELECT Id FROM Lines__r)
+				SELECT Status__c, Paid_Date__c, Amount_Paid__c, (SELECT Id FROM Lines__r)
 				FROM Project_Invoice__c
 				WHERE Id = :invoiceId
 			];
+			Assert.areEqual(300, voided.Amount_Paid__c, 'Mark Paid records the full total paid');
 			Assert.areEqual('Void', voided.Status__c, 'Void from Paid');
 			Assert.areEqual(Date.today().addDays(-1), voided.Paid_Date__c, 'Paid Date as entered');
 			Assert.areEqual(1, voided.Lines__r.size(), 'A void invoice keeps its lines');
@@ -159,6 +160,62 @@ private class ProjectBillingTest {
 			} catch (AuraHandledException expected) {
 				Assert.isTrue(expected.getMessage().contains('Void'), 'Says it is void');
 			}
+		}
+	}
+
+	@IsTest
+	static void onlyADraftInvoiceCanBeDeleted() {
+		System.runAs(ProjectsTestData.admin()) {
+			billing(true);
+			Project__c project = project('Time and Materials');
+			insert entry(project.Id, 3, 100, Date.today());
+			Id invoiceId = ProjectBilling.build(project.Id, Date.today(), Date.today());
+			ProjectBilling.send(invoiceId);
+
+			Database.DeleteResult sent = Database.delete(invoiceId, false);
+			Assert.isFalse(sent.isSuccess(), 'A Sent invoice stays');
+			Assert.isTrue(
+				sent.getErrors()[0].getMessage().contains('Only a Draft'),
+				'Says why and what to do'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Time_Entry__c WHERE Invoice_Line__c != NULL],
+				'The billed work stays billed'
+			);
+
+			ProjectBilling.voidInvoice(invoiceId);
+			Assert.isFalse(Database.delete(invoiceId, false).isSuccess(), 'A Void invoice stays');
+
+			insert entry(project.Id, 1, 100, Date.today());
+			Id draftId = ProjectBilling.build(project.Id, Date.today(), Date.today());
+			Assert.isTrue(Database.delete(draftId, false).isSuccess(), 'A Draft can be deleted');
+		}
+	}
+
+	@IsTest
+	static void aPeriodTooBigForOneSaveIsRefusedBeforeAnythingIsWritten() {
+		System.runAs(ProjectsTestData.admin()) {
+			billing(true);
+			Project__c project = project('Time and Materials');
+			insert new List<Time_Entry__c>{
+				entry(project.Id, 1, 100, Date.today()),
+				entry(project.Id, 2, 100, Date.today())
+			};
+			ProjectBilling.dmlRowCap = 3;
+
+			try {
+				ProjectBilling.build(project.Id, Date.today(), Date.today());
+				Assert.fail('Four rows pass a cap of three');
+			} catch (Projects.ProjectsException expected) {
+				Assert.isTrue(expected.getMessage().contains('shorter period'), 'Asks for less');
+			}
+			Assert.areEqual(0, [SELECT COUNT() FROM Project_Invoice__c], 'No invoice was made');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Time_Entry__c WHERE Invoice_Line__c != NULL],
+				'No time was marked'
+			);
 		}
 	}
 

@@ -5,7 +5,7 @@
         <lightning-button-group>
           <lightning-button data-id="refresh" label={labels.refresh} disabled={isWorking} onclick={handleRefresh}></lightning-button>
           <lightning-button data-id="draft" label={labels.draft} disabled={isWorking} onclick={handleDraft}></lightning-button>
-          <template lwc:if={timeTracking}>
+          <template lwc:if={canLogTime}>
             <lightning-button data-id="log-time" label={labels.logTime} disabled={isWorking} onclick={handleStartLog}></lightning-button>
           </template>
           <template lwc:if={expensesEnabled}>

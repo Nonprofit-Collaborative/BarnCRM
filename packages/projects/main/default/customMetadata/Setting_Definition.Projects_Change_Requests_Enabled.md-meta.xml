@@ -8,6 +8,6 @@
     <values><field>Module__c</field><value xsi:type="xsd:string">Projects</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">110</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">Change requests with hours and an amount; approved ones add to the project's budget. Needs Track time and budgets. Default: off.</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Change requests with hours and an amount; approved ones add to the project's budget. Hides and blocks nothing, and saved requests keep counting when it is off. Needs Track time and budgets. Default: off.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects-psa.md</value></values>
 </CustomMetadata>

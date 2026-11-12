@@ -62,13 +62,15 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 				'monthStart' => month,
 				'monthEnd' => monthEnd,
 				'afterId' => afterId,
-				'chunk' => CHUNK
+				'chunk' => CHUNK + 1
 			};
 			// Access mode: system, as whoever scheduled the nightly run (ADR-0021).
-			List<Project__c> batch = Database.queryWithBinds(
+			List<Project__c> found = Database.queryWithBinds(
 				'SELECT ' +
 					FIELDS +
 					' FROM Project__c WHERE Is_Template__c = FALSE AND Billing_Type__c != :notBilled' +
+					' AND (Start_Date__c = NULL OR Start_Date__c <= :monthEnd)' +
+					' AND Id NOT IN (SELECT Project__c FROM Project_Revenue__c WHERE Month__c = :monthStart)' +
 					' AND (Status__c IN :running OR (Status__c = \'Completed\' AND Completed_Date__c >= :monthStart' +
 					' AND Completed_Date__c <= :monthEnd))' +
 					(afterId == null ? '' : ' AND Id > :afterId') +
@@ -76,27 +78,18 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 				binds,
 				AccessLevel.SYSTEM_MODE
 			);
-			if (batch.isEmpty()) {
+			if (found.isEmpty()) {
 				return;
 			}
-			Set<String> written = new Set<String>();
-			for (Project_Revenue__c row : [
-				SELECT Month_Key__c
-				FROM Project_Revenue__c
-				WHERE Project__c IN :batch AND Month__c = :month
-				WITH SYSTEM_MODE
-			]) {
-				written.add(row.Month_Key__c);
+			// The query took one row beyond the chunk to tell whether another chunk exists.
+			Boolean more = found.size() > CHUNK;
+			List<Project__c> batch = new List<Project__c>();
+			for (Integer i = 0; i < Math.min(found.size(), CHUNK); i++) {
+				batch.add(found[i]);
 			}
-			List<Project__c> open = new List<Project__c>();
-			for (Project__c project : batch) {
-				if (!written.contains(key(project.Id, month))) {
-					open.add(project);
-				}
-			}
-			save(recognize(open, month, AccessLevel.SYSTEM_MODE), AccessLevel.SYSTEM_MODE);
+			save(recognize(batch, month, AccessLevel.SYSTEM_MODE), AccessLevel.SYSTEM_MODE);
 			Integer total = done + batch.size();
-			if (batch.size() == CHUNK && total >= MAX_ROWS) {
+			if (more && total >= MAX_ROWS) {
 				ErrorLogger.logMessage(
 					BarnHelp.text(
 						'Projects',
@@ -106,7 +99,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 					'ProjectRevenue',
 					ErrorLogger.SEVERITY_WARNING
 				);
-			} else if (batch.size() == CHUNK && !Test.isRunningTest()) {
+			} else if (more && !Test.isRunningTest()) {
 				System.enqueueJob(new ProjectRevenue(month, batch[CHUNK - 1].Id, total));
 			}
 		} catch (Exception e) {

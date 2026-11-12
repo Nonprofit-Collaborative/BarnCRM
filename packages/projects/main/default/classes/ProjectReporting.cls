@@ -131,14 +131,19 @@ public with sharing class ProjectReporting {
 		// PM-09 (R-PM14): with Manage resources on, a person's own Weekly Capacity Hours.
 		Map<Id, Decimal> weekly = new Map<Id, Decimal>();
 		if (ProjectsSettings.resourcesEnabled()) {
-			for (Project_Resource__c resource : [
-				SELECT User__c, Weekly_Capacity_Hours__c
-				FROM Project_Resource__c
-				WHERE Weekly_Capacity_Hours__c != NULL
-				WITH USER_MODE
-				ORDER BY CreatedDate DESC
-				LIMIT 2000
-			]) {
+			for (
+				Project_Resource__c resource : ProjectResources.byUser(
+						[
+							SELECT User__c, Weekly_Capacity_Hours__c
+							FROM Project_Resource__c
+							WHERE Weekly_Capacity_Hours__c != NULL
+							WITH USER_MODE
+							ORDER BY CreatedDate
+							LIMIT 2000
+						]
+					)
+					.values()
+			) {
 				weekly.put(resource.User__c, resource.Weekly_Capacity_Hours__c);
 			}
 		}
