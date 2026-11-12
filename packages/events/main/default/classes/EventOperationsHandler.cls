@@ -9,7 +9,7 @@
  * clash flags, the public page and badges already read, and the room's capacity into a blank
  * Capacity. Reads in user mode: the person saving can read the venue they picked.
  *
- * A new Sponsor Lead (EV-28, registry row `Sponsor_Lead_Scan`, always runs) is resolved to the
+ * A new Booth Scan (EV-28, registry row `Sponsor_Lead_Scan`, always runs) is resolved to the
  * scanner's sponsorship and a status, keeping the attendee's details only when they share them
  * (R-SLD1, R-SLD2). An Agenda Item's first rating after its session starts adds one anonymous
  * Session Rating (EV-29, registry row `Agenda_Item_Rating`, always runs; R-AGI2). Both read in
@@ -132,7 +132,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 	 */
 	@TestVisible
 	private without sharing class ScanReader {
-		/** R-SLD1 and R-SLD2: the lead's sponsorship, status and, only for a Lead, its details. */
+		/** R-SLD1 and R-SLD2: the lead's sponsorship, status and, only when Shared, its details. */
 		void resolve(List<Sponsor_Lead__c> leads) {
 			Set<Id> scanners = new Set<Id>();
 			Set<Id> attendeeIds = new Set<Id>();
@@ -185,7 +185,7 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 				} else if (!taken.add(leadKey(lead.Event_Sponsor__c, attendee.Id))) {
 					lead.Status__c = 'Already Scanned';
 				} else {
-					lead.Status__c = 'Lead';
+					lead.Status__c = 'Shared';
 					lead.Event_Attendee__c = attendee.Id;
 					lead.Lead_Key__c = leadKey(lead.Event_Sponsor__c, attendee.Id);
 					lead.Lead_Name__c = String.isBlank(attendee.Badge_Name__c)

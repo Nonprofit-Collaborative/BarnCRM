@@ -107,7 +107,7 @@ private class EventSponsorLeadsTest {
 				]
 			);
 			Sponsor_Lead__c lead = saved.get(scans[0].Id);
-			Assert.areEqual('Lead', lead.Status__c, 'Ana shares (R-SLD2)');
+			Assert.areEqual('Shared', lead.Status__c, 'Ana shares (R-SLD2)');
 			Assert.areEqual(acme.Id, lead.Event_Sponsor__c, 'On Rosa sponsorship (R-SLD1)');
 			Assert.areEqual('Ana Garcia', lead.Lead_Name__c, 'Name copied');
 			Assert.areEqual('ana@example.org', lead.Lead_Email__c, 'Email copied');

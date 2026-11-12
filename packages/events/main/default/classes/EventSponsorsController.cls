@@ -372,7 +372,7 @@ public with sharing class EventSponsorsController {
 		}
 	}
 
-	/** A sponsor's leads for Download Leads (EV-28): Lead status only (R-SLD2). */
+	/** A sponsor's leads for Download Leads (EV-28): Shared status only (R-SLD2). */
 	public class Leads {
 		@AuraEnabled
 		public List<LeadColumn> columns = new List<LeadColumn>();
@@ -393,7 +393,7 @@ public with sharing class EventSponsorsController {
 
 	/**
 	 * A sponsor's leads, for the Sponsors tab's Download Leads: only attendees who shared their
-	 * details (status Lead), read in user mode.
+	 * details (status Shared), read in user mode.
 	 *
 	 * @param sponsorId the sponsor
 	 * @return the columns and rows; no rows when the sponsor has no leads
@@ -416,7 +416,7 @@ public with sharing class EventSponsorsController {
 					Notes__c,
 					CreatedDate
 				FROM Sponsor_Lead__c
-				WHERE Event_Sponsor__c = :sponsorId AND Status__c = 'Lead'
+				WHERE Event_Sponsor__c = :sponsorId AND Status__c = 'Shared'
 				WITH USER_MODE
 				ORDER BY CreatedDate
 				LIMIT 10000
