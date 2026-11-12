@@ -7,6 +7,10 @@
     <value xsi:type="xsd:string">Alternative</value>
   </values>
   <values>
+    <field>Link_Url__c</field>
+    <value xsi:type="xsd:string">https://www.salesforce.com/nonprofit/</value>
+  </values>
+  <values>
     <field>Status__c</field>
     <value xsi:type="xsd:string">InProgress</value>
   </values>
