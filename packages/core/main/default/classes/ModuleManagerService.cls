@@ -148,6 +148,8 @@ public with sharing class ModuleManagerService {
 			'Proposal_Presenter__c',
 			'Event_Venue__c',
 			'Event_Room__c',
+			'Event_Expense__c',
+			'Event_Funding__c',
 			'Session_Rating__c'
 		},
 		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },

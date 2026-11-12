@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Actual__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What was actually spent. Fill it in as bills come in.</inlineHelpText>
+  <label>Actual</label>
+  <precision>16</precision>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <scale>2</scale>
+  <type>Currency</type>
+</CustomField>
