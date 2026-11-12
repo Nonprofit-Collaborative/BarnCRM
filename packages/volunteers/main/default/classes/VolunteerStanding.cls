@@ -143,19 +143,15 @@ public inherited sharing class VolunteerStanding {
 		Integer saved = 0;
 		extending = true;
 		try {
-			for (
-				Database.SaveResult result : Database.insert(copies, false, AccessLevel.SYSTEM_MODE)
-			) {
-				if (result.isSuccess()) {
-					saved++;
-				} else {
-					ErrorLogger.logMessage(
-						result.getErrors()[0].getMessage(),
-						LOG_CONTEXT,
-						'Warning'
-					);
-				}
+			List<Database.SaveResult> results = Database.insert(
+				copies,
+				false,
+				AccessLevel.SYSTEM_MODE
+			);
+			for (Database.SaveResult result : results) {
+				saved += result.isSuccess() ? 1 : 0;
 			}
+			ErrorLogger.logFailures(results, null, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		} finally {
 			extending = false;
 		}

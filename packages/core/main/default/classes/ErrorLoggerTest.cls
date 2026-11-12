@@ -203,7 +203,9 @@ private class ErrorLoggerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, statementsAfter - statementsBefore, 'Still one statement.');
-			Assert.areEqual(2, [SELECT COUNT() FROM Error_Log__c], 'The empty entry is skipped.');
+			List<Error_Log__c> written = [SELECT Occurrences__c FROM Error_Log__c];
+			Assert.areEqual(1, written.size(), 'The same failure twice is one entry (R-E7).');
+			Assert.areEqual(2, written[0].Occurrences__c, 'The empty entry is skipped.');
 		}
 	}
 
@@ -540,21 +542,93 @@ private class ErrorLoggerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, statementsAfter - statementsBefore, 'One statement for them all.');
+			List<Error_Log__c> written = [
+				SELECT Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				WHERE Context__c = 'Each owner'
+			];
+			Assert.areEqual(1, written.size(), 'One message read the same way is one entry.');
+			Assert.areEqual(30, written[0].Occurrences__c, 'Every failure is counted.');
 			Assert.areEqual(
-				30,
-				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Each owner'],
-				'Every failure is recorded.'
+				String.valueOf(aboutMe),
+				written[0].Record_Reference__c,
+				'It names the record; the same record is not named twice.'
 			);
+			Assert.isNull(written[0].Other_Record_Ids__c, 'No other record was given.');
+		}
+	}
+
+	private static Error_Log_Event__e event(String message, Id recordId) {
+		return new Error_Log_Event__e(
+			Message__c = message,
+			Context__c = 'Bulk load',
+			Severity__c = 'Warning',
+			Record_Reference__c = recordId == null ? null : String.valueOf(recordId)
+		);
+	}
+
+	@IsTest
+	static void repeatsWithinTheHourAreCountedOnOneEntryNamingTheFirstRecords() {
+		System.runAs(TestUsers.admin()) {
+			List<Id> userIds = new List<Id>();
+			for (User someone : [SELECT Id FROM User LIMIT 15]) {
+				userIds.add(someone.Id);
+			}
+			List<Error_Log_Event__e> events = new List<Error_Log_Event__e>();
+			for (Integer i = 0; i < 2000; i++) {
+				events.add(
+					event('The household is missing.', userIds[Math.mod(i, userIds.size())])
+				);
+			}
+			events.add(event('A different failure.', null));
+
+			Test.startTest();
+			ErrorLogEventHandler.handle(events);
+			// A later delivery of the same failure adds to the entry already written.
+			ErrorLogEventHandler.handle(
+				new List<Error_Log_Event__e>{ event('The household is missing.', null) }
+			);
+			Test.stopTest();
+
+			List<Error_Log__c> written = [
+				SELECT Message__c, Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				ORDER BY Message__c
+			];
+			Assert.areEqual(2, written.size(), 'One entry per distinct failure.');
+			Assert.areEqual(1, written[0].Occurrences__c, 'The different failure once.');
+			Assert.areEqual(2001, written[1].Occurrences__c, 'Every repeat is counted.');
+			Assert.areEqual(String.valueOf(userIds[0]), written[1].Record_Reference__c);
+			Integer named = Math.min(userIds.size() - 1, ErrorLogEventHandler.MORE_RECORDS);
 			Assert.areEqual(
-				2,
-				[
-					SELECT COUNT()
-					FROM Error_Log__c
-					WHERE
-						Context__c = 'Each owner'
-						AND Record_Reference__c = :String.valueOf(aboutMe)
-				],
-				'Each names its own record; past the end of the list, none.'
+				named,
+				written[1].Other_Record_Ids__c.split(',').size(),
+				'The first records it happened on are named, up to the limit.'
+			);
+		}
+	}
+
+	@IsTest
+	static void anEntryReadOrAnHourOldStartsAFreshOne() {
+		System.runAs(TestUsers.admin()) {
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('Refused.', null) });
+			Error_Log__c first = [SELECT Id FROM Error_Log__c LIMIT 1];
+			update new Error_Log__c(Id = first.Id, Status__c = ErrorLogger.STATUS_ACKNOWLEDGED);
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('Refused.', null) });
+			Error_Log__c second = [SELECT Id FROM Error_Log__c WHERE Id != :first.Id LIMIT 1];
+			update new Error_Log__c(
+				Id = second.Id,
+				Timestamp__c = Datetime.now().addMinutes(-ErrorLogEventHandler.WINDOW_MINUTES - 1)
+			);
+
+			Test.startTest();
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('Refused.', null) });
+			Test.stopTest();
+
+			Assert.areEqual(
+				3,
+				[SELECT COUNT() FROM Error_Log__c WHERE Occurrences__c = 1],
+				'An acknowledged entry, or one first written over an hour ago, is not added to.'
 			);
 		}
 	}

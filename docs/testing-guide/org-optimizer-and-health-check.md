@@ -383,3 +383,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | With 7 subscriptions of your own, subscribe to another report. | A red notice: you already have 7 report subscriptions, the most Salesforce allows. |
 
 **Cleanup:** Remove the test subscriptions from each report's **Subscribe** button.
+
+## T-HC-23: Repeated Errors Are Counted on One Entry
+
+**Purpose:** Confirm the same failure repeated within an hour is one Error Log entry with a count and the first records named, and that a reviewed entry is not added to.
+**Prerequisites:** admin; the Developer Console (in an org where BarnCRM is installed from a package, put the namespace prefix before `ErrorLogger`).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **Debug**, **Open Execute Anonymous Window**, run `List<String> m = new List<String>(); List<Id> ids = new List<Id>(); for (User u : [SELECT Id FROM User LIMIT 20]) { m.add('QA repeat test'); ids.add(u.Id); } ErrorLogger.logMessages(m, ids, 'QA', 'Warning');` | It runs without an error. |
+| 2 | Open the **Error Log** tab, **New Errors**. | One **QA** entry, not one per user. Opened, **Occurrences** reads the number of users found (up to 20), **Record Reference** names the first user and **Other Records** lists up to ten more. |
+| 3 | Mark the entry **Acknowledged** and run step 1 again. | A second **QA** entry with its own count; the acknowledged one keeps its count. |
+
+**Cleanup:** Delete the two test entries.
