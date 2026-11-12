@@ -270,9 +270,9 @@ private class GivingJobsControllerTest {
 				'The page tells the component to disable its buttons for a reader.'
 			);
 			Assert.areEqual(
-				4,
+				5,
 				view.jobs.size(),
-				'A reader still sees all four jobs, because seeing whether they run is not a change.'
+				'A reader still sees all five jobs, because seeing whether they run is not a change.'
 			);
 		}
 	}

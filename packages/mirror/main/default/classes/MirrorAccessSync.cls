@@ -80,21 +80,25 @@ public with sharing class MirrorAccessSync extends ModuleAccessSyncBase {
 			}
 			String prefix = NamespaceUtil.prefix().removeEnd('__');
 			String namespace = String.isBlank(prefix) ? null : prefix;
+			// Every set's label, the successors included: an inactive holder is owed a set that
+			// nobody may hold yet, and the message names it as admins see it.
 			Map<String, String> labels = new Map<String, String>();
+			for (PermissionSet found : [
+				SELECT Name, Label
+				FROM PermissionSet
+				WHERE Name IN :names AND NamespacePrefix = :namespace
+				WITH SYSTEM_MODE
+			]) {
+				labels.put(found.Name, found.Label);
+			}
 			Map<Id, Set<String>> held = new Map<Id, Set<String>>();
 			Map<Id, User> people = new Map<Id, User>();
 			for (PermissionSetAssignment row : [
-				SELECT
-					AssigneeId,
-					Assignee.Name,
-					Assignee.IsActive,
-					PermissionSet.Name,
-					PermissionSet.Label
+				SELECT AssigneeId, Assignee.Name, Assignee.IsActive, PermissionSet.Name
 				FROM PermissionSetAssignment
 				WHERE PermissionSet.Name IN :names AND PermissionSet.NamespacePrefix = :namespace
 				WITH SYSTEM_MODE
 			]) {
-				labels.put(row.PermissionSet.Name, row.PermissionSet.Label);
 				if (!held.containsKey(row.AssigneeId)) {
 					held.put(row.AssigneeId, new Set<String>());
 				}

@@ -22,6 +22,7 @@ private class ReceiptBrandTest {
 		giving.SetupOwnerId = UserInfo.getOrganizationId();
 		giving.Receipt_Numbering_Scope__c = scope;
 		upsert giving;
+		SettingsService.clearCaches();
 		Legal_Entity__c entity = new Legal_Entity__c(
 			Name = 'Barn Thrift LLC',
 			Tax_Id__c = '98-7654321'
@@ -79,6 +80,8 @@ private class ReceiptBrandTest {
 			BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
 			core.Brand_Management__c = false;
 			upsert core;
+			// Every writer of a settings object clears the cache, as a settings save does.
+			SettingsService.clearCaches();
 			Gift__c branded = gift(thrift.Id);
 
 			Test.startTest();
