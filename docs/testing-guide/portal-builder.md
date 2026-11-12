@@ -193,7 +193,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** enter the Stripe test keys again; delete the gift.
 
-## T-PB-12: Attendee App
+## T-PB-13: Attendee App
 
 **Purpose:** confirm attendees see only their events, connect only by consent, message only when on, and build an agenda (EV-22, EV-29).
 **Prerequisites:** admin; Event Management; event `Zz Summit` with Confirmed sessions `S1` (capacity 1) and `S2` overlapping S1, and `S3` later; Pat and Sam Registered at it with emails; Lee Registered at another event; an announcement with Publish At in the past and one tomorrow; a portal with key `attendees`, Active, Any Matching Person, the template `portal-client/templates/attendee.json`, on a WordPress page with `app="yes"`; Pat signed in.
@@ -203,11 +203,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | GET `page?key=agenda` and `page?key=announcements`. | Zz Summit's sessions only; the past announcement only. |
 | 2 | GET `page?key=attendees`. | Empty: nobody opted in. |
-| 3 | As Sam, POST `page/save` on `events` with Show Me in the Attendee List on and a headline and How to Reach Me; as Pat, GET `page?key=attendees`. | Sam listed with name and headline; no email or How to Reach Me; Lee never listed. |
+| 3 | As Sam, POST `page/save` on `myevents` with Show Me in the Attendee List on and a headline and How to Reach Me; as Pat, GET `page?key=attendees`. | Sam listed with name and headline; no email or How to Reach Me; Lee never listed. |
 | 4 | As Pat, POST `page/action` `Events.Connect` on Sam's row; again. | "Your request was sent."; then "You have already asked to connect." Pat's row Requested; Sam's Wants to Connect with no How to Reach Me. |
 | 5 | As Sam, `Events.AcceptConnection` on that row. | Both Connected; each shows the other's How to Reach Me. |
 | 6 | As Pat, save Message to Send `Hi` on the connection and run `Events.SendMessage`. | "Messages are turned off for this event app."; nothing sent. |
-| 7 | Turn on **Attendee messages**; repeat step 6. As Sam, GET `page?key=inbox`; save Reply `Hello` and run `Events.SendReply`. | Sam has `Hi` from Pat; Pat's inbox has `Hello`. The draft and reply clear. |
+| 7 | Turn on **Attendee messages**; repeat step 6. As Sam, GET `page?key=messages`; save Reply `Hello` and run `Events.SendReply`. | Sam has `Hi` from Pat; Pat's Messages page has `Hello`. The draft and reply clear. |
 | 8 | As Pat, `Events.AddToAgenda` on S1; as Sam, on S1. | Pat's added; Sam's "This session is full." |
 | 9 | As Pat, `Events.AddToAgenda` on S2. Turn on **Allow overlapping picks** and repeat. | First "It overlaps S1 on your agenda."; then added and marked Overlaps. |
 | 10 | Open My Agenda in the browser; **Add to Calendar**. | An .ics file with S1 and S2 that a phone calendar imports. |
@@ -216,10 +216,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** turn both settings off; delete the connections, messages, picks and rating.
 
-## T-PB-13: Sponsor Lead Scanning
+## T-PB-14: Sponsor Lead Scanning
 
 **Purpose:** confirm sponsor staff collect only opted-in leads (EV-28).
-**Prerequisites:** T-PB-12's event; a Confirmed sponsor `Zz Co` whose Contact is Kim; Pat (Share My Details With Sponsors on) and Sam (off) attending; a portal with key `sponsors`, Active, Invited, the template `portal-client/templates/sponsor.json`, Kim invited and signed in on a phone.
+**Prerequisites:** T-PB-13's event; a Confirmed sponsor `Zz Co` whose Contact is Kim; Pat (Share My Details With Sponsors on) and Sam (off) attending; a portal with key `sponsors`, Active, Invited, the template `portal-client/templates/sponsor.json`, Kim invited and signed in on a phone.
 **Smoke:** no
 
 | Step | Action | Expected result |
@@ -233,7 +233,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** delete the leads.
 
-## T-PB-14: Service Portal Template
+## T-PB-15: Service Portal Template
 
 **Purpose:** confirm a client sees only their own program records, without case notes (PB-04).
 **Prerequisites:** admin; Programs installed with sample data; Pat enrolled (Enrolled) in a cohort with a session tomorrow, with a service delivery, a goal, a referral and a case note; a portal with key `service`, Active, Invited, the template `portal-client/templates/service.json`; Pat signed in.
@@ -241,13 +241,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | GET `programs`, `services`, `sessions`, `goals` and `referrals` pages. | Pat's enrollment, delivery, the cohort's upcoming session, goal and referral; nothing of anyone else; no notes field anywhere. |
+| 1 | GET the `programs`, `services`, `sessions` and `goals` pages. | Pat's enrollment, delivery, the cohort's upcoming session and goal; no referral; nothing of anyone else; no notes field anywhere. |
 | 2 | Set Pat's enrollment to Withdrawn; GET `programs` and `sessions`. | The enrollment and the cohort's sessions are gone. |
 | 3 | POST `page/save` on `goals`. | 403 `not_allowed`. |
 
 **Cleanup:** set the enrollment back.
 
-## T-PB-15: Partner Portal Template
+## T-PB-16: Partner Portal Template
 
 **Purpose:** confirm partner staff see only referrals shared with their organization (PB-05).
 **Prerequisites:** admin; Programs; organization `Zz Partners` with Kim's Current affiliation; two referrals with Partner Organization Zz Partners, one with Shared With Partner on; a portal with key `partner`, Active, Invited, the template `portal-client/templates/partner.json`; Kim signed in. For step 4, Funders installed, a grant whose Funder Contact is Kim with a submitted Narrative Report requirement and a Task, and the portal's template `partner-funders.json`.

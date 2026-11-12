@@ -2,7 +2,7 @@
 
 Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-21, EV-23 to EV-28) and
 their sample data. The attendee app (EV-22, EV-29) and sponsor lead scanning are tested in
-[Portal Builder](portal-builder.md), T-PB-12 and T-PB-13.
+[Portal Builder](portal-builder.md), T-PB-13 and T-PB-14.
 Setup detail:
 [Event Management](../admin-guide/events.md).
 
@@ -611,7 +611,7 @@ room or capacity.
 ## T-EV-29: Sponsor Lead Export
 
 **Purpose:** confirm staff download a sponsor's leads (EV-28).
-**Prerequisites:** T-PB-13 done, so the sponsor has a Shared and a Not Shared scan.
+**Prerequisites:** T-PB-14 done, so the sponsor has a Shared and a Not Shared scan.
 **Smoke:** no
 
 | Step | Action | Expected result |
