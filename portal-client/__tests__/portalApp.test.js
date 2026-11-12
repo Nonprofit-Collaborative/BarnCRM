@@ -226,6 +226,58 @@ describe('mountPortal', () => {
     expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
   });
 
+  it('opens a secure web address as a link and shows any other address as text', async () => {
+    const page = {
+      ...PROFILE,
+      fields: [
+        { field: 'Form_Link__c', label: 'Application Form', type: 'url', edit: false },
+        { field: 'Site__c', label: 'Site', type: 'url', edit: false }
+      ],
+      records: [
+        {
+          id: '003A',
+          values: { Form_Link__c: 'https://example.org/f?t=1', Site__c: 'javascript:alert(1)' }
+        }
+      ]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+
+    const links = root.querySelectorAll('dd a');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('https://example.org/f?t=1');
+    expect(links[0].textContent).toBe('Application Form');
+    expect(root.querySelectorAll('dd')[1].textContent).toBe('javascript:alert(1)');
+  });
+
+  it('filters a searchable page on the records already sent', async () => {
+    const directory = {
+      ...PROFILE,
+      kind: 'catalog',
+      canUpdate: false,
+      search: true,
+      fields: [{ field: 'Member_Name__c', label: 'Member', type: 'string', edit: false }],
+      records: [
+        { id: 'a01', values: { Member_Name__c: 'Pat Lee' } },
+        { id: 'a02', values: { Member_Name__c: 'Sam Ortiz' } }
+      ]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(directory)) });
+    await mountPortal(root, { api });
+    const box = root.querySelector('input[type="search"]');
+    box.value = 'ortiz';
+    box.dispatchEvent(new Event('input'));
+    const cards = root.querySelectorAll('.barn-portal-record');
+    expect(cards[0].hidden).toBe(true);
+    expect(cards[1].hidden).toBe(false);
+    expect(api.page).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows no search box on a page that does not ask for one', async () => {
+    await mountPortal(root, { api: fakeApi() });
+    expect(root.querySelector('input[type="search"]')).toBeNull();
+  });
+
   it('signs out back to the email screen', async () => {
     const api = fakeApi();
     await mountPortal(root, { api });

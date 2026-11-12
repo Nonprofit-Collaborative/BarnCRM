@@ -1,0 +1,85 @@
+<template>
+  <template lwc:if={block.title}>
+    <h3 class="slds-text-title_bold slds-var-m-bottom_x-small" data-id="title">{block.title}</h3>
+  </template>
+  <template lwc:if={errorMessage}>
+    <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+  </template>
+  <template lwc:if={isLoading}>
+    <lightning-spinner size="small" alternative-text={block.title}></lightning-spinner>
+  </template>
+
+  <template lwc:if={isFields}>
+    <template lwc:if={hasRecord}>
+      <lightning-record-view-form record-id={recordId} object-api-name={objectApiName} data-id="fields">
+        <div class="slds-grid slds-wrap">
+          <template for:each={fieldNames} for:item="field">
+            <div key={field.key} class={fieldCss}>
+              <lightning-output-field field-name={field.name}></lightning-output-field>
+            </div>
+          </template>
+        </div>
+      </lightning-record-view-form>
+    </template>
+    <template lwc:else>
+      <p class="slds-text-color_weak" data-id="needs-record">{noRecordText}</p>
+    </template>
+  </template>
+
+  <template lwc:if={isList}>
+    <template lwc:if={hasRows}>
+      <lightning-datatable
+        key-field="Id"
+        data={rows}
+        columns={columns}
+        hide-checkbox-column
+        data-id="list"
+      ></lightning-datatable>
+    </template>
+    <template lwc:elseif={showNoRows}>
+      <p class="slds-text-color_weak" data-id="no-rows">{noRowsText}</p>
+    </template>
+  </template>
+
+  <template lwc:if={isChart}>
+    <template lwc:if={chart}>
+      <p class="slds-text-color_weak slds-var-m-bottom_x-small" data-id="chart-title">
+        {chart.title}: {chart.measure}
+      </p>
+      <ul data-id="chart">
+        <template for:each={chart.bars} for:item="bar">
+          <li key={bar.key} class="slds-var-m-bottom_xx-small">
+            <div class="slds-grid slds-grid_align-spread">
+              <span>{bar.label}</span>
+              <span>{bar.value}</span>
+            </div>
+            <div class="slds-progress-bar slds-progress-bar_large" aria-hidden="true">
+              <span class="slds-progress-bar__value" style={bar.style}></span>
+            </div>
+          </li>
+        </template>
+      </ul>
+    </template>
+  </template>
+
+  <template lwc:if={isText}>
+    <lightning-formatted-rich-text value={block.body} data-id="text"></lightning-formatted-rich-text>
+  </template>
+
+  <template lwc:if={isImage}>
+    <img src={block.url} alt={block.altText} class="slds-max-full-width" data-id="image" />
+  </template>
+
+  <template lwc:if={isAction}>
+    <lightning-button label={block.label} onclick={handleAction} data-id="action"></lightning-button>
+    <template lwc:if={showFlow}>
+      <div class="slds-var-m-top_small" data-id="flow">
+        <lightning-flow
+          flow-api-name={block.flowName}
+          flow-input-variables={flowInputs}
+          onstatuschange={handleFlowStatus}
+        ></lightning-flow>
+      </div>
+    </template>
+  </template>
+</template>

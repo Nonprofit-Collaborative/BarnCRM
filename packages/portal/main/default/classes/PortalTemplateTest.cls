@@ -51,6 +51,13 @@ private class PortalTemplateTest {
 			Assert.areEqual('Role__c ASC', roles.orderBy, 'Ordered');
 			Assert.areEqual(1, roles.conditions.size(), 'One fixed test');
 			Assert.isNull(template.page('nope'), 'An unknown page is absent');
+			Assert.isFalse(roles.search, 'No search box unless asked');
+			Map<String, Object> searchable = sample();
+			rolesPage(searchable).put('search', true);
+			Assert.isTrue(
+				PortalTemplate.parse(JSON.serialize(searchable)).page('roles').search,
+				'A page may ask for a search box (PB-09)'
+			);
 		}
 	}
 

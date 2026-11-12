@@ -130,11 +130,13 @@ into six kinds:
 |---|---|---|---|
 | EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
 
-One inner class of a `with sharing` class also runs without sharing (the register check counts only
+Two inner classes of `with sharing` classes also run without sharing (the register check counts only
 top-level classes, so it is listed here rather than as a row): `EventSurveyService.AttendeeFormReader`, kind
 Platform. A Site guest user, once a survey link's signed claim has matched, reads which form the
 Attended attendee's event names; it returns only that form identifier, never a record value
-(ADR-0188 decision 3).
+(ADR-0188 decision 3). `EventSessionRatings.SessionFormReader` (kind Platform) does the same for a
+session's rating link: the guest reads which form the session's event names for ratings, and
+nothing else (ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`, decision 14).
 
 ## Portal Builder
 
@@ -147,6 +149,7 @@ Attended attendee's event names; it returns only that form identifier, never a r
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
+| ScholarshipsPortalExtension | Portal | The open cycle a portal person applies to, and that person's own application to withdraw and own Offered award to accept; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-NEXT scholarships outbound grants module |
 | EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 | CorporateHubPortalExtension | Portal | A board member's own attendee row (packet read, minutes approved while submitted), own vote (only while voting is open) and own open policy or disclosure request; the integration user has no object access, and each action re-reads the row by the person Portal Builder verified | ADR-0021, ADR-NEXT corporate hub board governance |
 

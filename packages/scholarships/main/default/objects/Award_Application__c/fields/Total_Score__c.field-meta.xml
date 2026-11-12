@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Total_Score__c</fullName>
+  <inlineHelpText>The submitted review scores added together.</inlineHelpText>
+  <label>Total Score</label>
+  <summaryFilterItems>
+    <field>Application_Review__c.Status__c</field>
+    <operation>equals</operation>
+    <value>Submitted</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Application_Review__c.Application__c</summaryForeignKey>
+  <summarizedField>Application_Review__c.Score__c</summarizedField>
+  <summaryOperation>sum</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

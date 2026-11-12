@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Organizations</fullName>
+  <columns>ACCOUNT.NAME</columns>
+  <columns>ACCOUNT.PHONE1</columns>
+  <columns>Primary_Contact__c</columns>
+  <filterScope>Mine</filterScope>
+  <filters>
+    <field>Is_Organization__c</field>
+    <operation>equals</operation>
+    <value>1</value>
+  </filters>
+  <label>My Organizations</label>
+</ListView>

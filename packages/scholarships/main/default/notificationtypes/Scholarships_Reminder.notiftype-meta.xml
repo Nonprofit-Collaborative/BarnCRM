@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customNotifTypeName>Scholarships reminder</customNotifTypeName>
+  <description>
+    Reminds the program owner before a recipient report or condition is due, and a reviewer of
+    applications assigned to them. Sent by Scholarships and Outbound Grants; turned off in BarnCRM
+    Settings, Scholarships and Grants.
+  </description>
+  <desktop>true</desktop>
+  <masterLabel>Scholarships reminder</masterLabel>
+  <mobile>true</mobile>
+</CustomNotificationType>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Own_Review</fullName>
+  <active>true</active>
+  <description>Only the assigned reviewer, or someone with Manage Scholarships, changes a review's scores, status or comments.</description>
+  <errorConditionFormula>AND(NOT(ISNEW()), OR(ISCHANGED(Score__c), ISCHANGED(Scores__c), ISCHANGED(Status__c), ISCHANGED(Comments__c), ISCHANGED(Recusal_Reason__c)), Reviewer__c &lt;&gt; $User.Id, NOT($Permission.Scholarships_Manage))</errorConditionFormula>
+  <errorMessage>Only the reviewer, or a holder of Manage Scholarships, can change a review.</errorMessage>
+</ValidationRule>

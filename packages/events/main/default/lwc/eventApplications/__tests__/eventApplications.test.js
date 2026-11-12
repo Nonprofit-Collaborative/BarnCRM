@@ -4,6 +4,9 @@ import getApplications from '@salesforce/apex/EventApplicationsController.getApp
 import saveReview from '@salesforce/apex/EventApplicationsController.saveReview';
 import decide from '@salesforce/apex/EventApplicationsController.decide';
 import EventRecordModal from 'c/eventRecordModal';
+import saveCriteria from '@salesforce/apex/EventProposalReview.saveCriteria';
+import addPresenter from '@salesforce/apex/EventProposalReview.addPresenter';
+import assignReviewers from '@salesforce/apex/EventProposalReview.assignReviewers';
 
 jest.mock(
   '@salesforce/apex/EventApplicationsController.getApplications',
@@ -16,6 +19,18 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/apex/EventApplicationsController.decide', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/EventProposalReview.saveCriteria', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/EventProposalReview.addPresenter', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/EventProposalReview.removePresenter', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/EventProposalReview.assignReviewers', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -107,7 +122,13 @@ describe('c-event-applications', () => {
 
   it('offers review, accept and decline only while undecided', async () => {
     const element = await render();
-    expect(itemsOf(menuOf(element, 0))).toEqual(['review', 'accept', 'decline', 'edit']);
+    expect(itemsOf(menuOf(element, 0))).toEqual([
+      'review',
+      'presenter',
+      'accept',
+      'decline',
+      'edit'
+    ]);
     expect(itemsOf(menuOf(element, 1))).toEqual(['edit']);
   });
 
@@ -132,7 +153,12 @@ describe('c-event-applications', () => {
     await flush();
     one(element, '[data-id="review-save"]').click();
     await flush();
-    expect(saveReview).toHaveBeenCalledWith({ applicationId: STRONG, score: 5, notes: 'Great' });
+    expect(saveReview).toHaveBeenCalledWith({
+      applicationId: STRONG,
+      score: 5,
+      notes: 'Great',
+      criteriaScoresJson: null
+    });
     expect(one(element, '[data-id="review-form-row"]')).toBeNull();
   });
 
@@ -192,6 +218,125 @@ describe('c-event-applications', () => {
     document.body.appendChild(broken);
     await flush();
     expect(one(broken, '[data-id="error-message"]').message).toBe('No access');
+  });
+
+  it('scores each weighted criterion and saves the rounded score with the criteria scores', async () => {
+    const criteria = [
+      { label: 'Relevance', weight: 2 },
+      { label: 'Clarity', weight: 1 }
+    ];
+    const element = await render({ ...DATA, criteria });
+    saveReview.mockResolvedValue();
+    choose(menuOf(element, 0), 'review');
+    await flush();
+    const pickers = all(element, '[data-id="criterion-score"]');
+    expect(pickers).toHaveLength(2);
+    expect(one(element, '[data-id="review-save"]').disabled).toBe(true);
+    pickers[0].dispatchEvent(new CustomEvent('change', { detail: { value: '5' } }));
+    pickers[1].dispatchEvent(new CustomEvent('change', { detail: { value: '2' } }));
+    await flush();
+    // The help catalog is not loaded under Jest, so the sentence reads as its key.
+    expect(one(element, '[data-id="weighted"]').textContent).toBe(
+      'c.Events_Applications_WeightedScore'
+    );
+    expect(one(element, '[data-id="review-save"]').disabled).toBe(false);
+    one(element, '[data-id="review-save"]').click();
+    await flush();
+    expect(saveReview).toHaveBeenCalledWith({
+      applicationId: STRONG,
+      score: 4,
+      notes: 'Good',
+      criteriaScoresJson: JSON.stringify({ Relevance: 5, Clarity: 2 })
+    });
+  });
+
+  it('hides names under blind review until decided, and filters to my assignments', async () => {
+    const data = {
+      ...DATA,
+      blindReview: true,
+      applications: [
+        { ...DATA.applications[0], assignedToMe: true, presenters: [] },
+        DATA.applications[1]
+      ]
+    };
+    const element = await render(data);
+    const names = all(element, '[data-id="application-row"] td:nth-child(3)').map((cell) =>
+      cell.textContent.trim()
+    );
+    expect(names[0]).toBe('c.Events_Applications_Hidden');
+    expect(names[1]).toBe('Sam Lee');
+    expect(one(element, '[data-id="assigned"]')).not.toBeNull();
+    const mine = one(element, '[data-id="mine"]');
+    mine.checked = true;
+    mine.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(all(element, '[data-id="application-row"]')).toHaveLength(1);
+  });
+
+  it('saves review criteria, assigns a reviewer to the selected and adds a presenter', async () => {
+    const element = await render({ ...DATA, canEditEvent: true, canAssign: true });
+    saveCriteria.mockResolvedValue();
+    one(element, '[data-id="criteria-toggle"]').click();
+    await flush();
+    one(element, '[data-id="add-criterion"]').click();
+    await flush();
+    const inputs = all(element, '[data-id="criterion"] lightning-input');
+    inputs[0].dispatchEvent(new CustomEvent('change', { detail: { value: 'Relevance' } }));
+    inputs[1].dispatchEvent(new CustomEvent('change', { detail: { value: '3' } }));
+    await flush();
+    one(element, '[data-id="criteria-save"]').click();
+    await flush();
+    expect(saveCriteria).toHaveBeenCalledWith({
+      eventId: EVENT_ID,
+      criteriaJson: JSON.stringify([{ label: 'Relevance', weight: 3 }])
+    });
+
+    assignReviewers.mockResolvedValue(1);
+    const box = all(element, '[data-id="select"]')[0];
+    box.checked = true;
+    box.dispatchEvent(new CustomEvent('change'));
+    one(element, '[data-id="assign-toggle"]').click();
+    await flush();
+    one(element, '[data-id="reviewer"]').dispatchEvent(
+      new CustomEvent('change', { detail: { recordId: '005000000000001AAA' } })
+    );
+    one(element, '[data-id="assign"]').click();
+    await flush();
+    expect(assignReviewers).toHaveBeenCalledWith({
+      applicationIds: [STRONG],
+      reviewerId: '005000000000001AAA'
+    });
+
+    addPresenter.mockResolvedValue('a0P000000000001AAA');
+    choose(menuOf(element, 0), 'presenter');
+    await flush();
+    one(element, '[data-id="presenter-person"]').dispatchEvent(
+      new CustomEvent('change', { detail: { recordId: '003000000000002AAA' } })
+    );
+    await flush();
+    one(element, '[data-id="presenter-save"]').click();
+    await flush();
+    expect(addPresenter).toHaveBeenCalledWith({
+      applicationId: STRONG,
+      contactId: '003000000000002AAA',
+      role: 'Speaker'
+    });
+  });
+
+  it('compares two selected proposals side by side and shows the matrix', async () => {
+    const element = await render({ ...DATA, criteria: [{ label: 'Relevance', weight: 1 }] });
+    one(element, '[data-id="compare"]').click();
+    await flush();
+    expect(one(element, '[data-id="compare-panel"]')).toBeNull();
+    all(element, '[data-id="select"]').forEach((box) => {
+      box.checked = true;
+      box.dispatchEvent(new CustomEvent('change'));
+    });
+    one(element, '[data-id="compare"]').click();
+    one(element, '[data-id="matrix-toggle"]').click();
+    await flush();
+    expect(all(element, '[data-id="compared"]')).toHaveLength(2);
+    expect(all(element, '[data-id="matrix-row"]')).toHaveLength(2);
   });
 
   it('opens the add form with the event filled in', async () => {

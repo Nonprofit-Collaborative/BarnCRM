@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Renew memberships from gifts</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Renew_From_Gifts__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Memberships_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Memberships</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Memberships</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
+    <values><field>Description__c</field><value
+      xsi:type="xsd:string"
+    >With Giving installed, whether each morning a received gift to a membership level's Giving fund pays a membership for its donor: a renewal of their latest membership, or a new one. A gift on a recurring gift counts its yearly amount and keeps the membership renewing. Levels with no fund are never renewed this way. Default: on.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">memberships.md</value></values>
+</CustomMetadata>

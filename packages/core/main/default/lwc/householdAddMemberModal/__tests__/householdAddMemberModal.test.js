@@ -3,6 +3,8 @@ import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import searchPeople from '@salesforce/apex/HouseholdOfPersonController.searchPeople';
 import addExistingPerson from '@salesforce/apex/HouseholdOfPersonController.addExistingPerson';
 import addNewPerson from '@salesforce/apex/HouseholdOfPersonController.addNewPerson';
+import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
+import moveContact from '@salesforce/apex/HouseholdController.moveContact';
 import findSameName from '@salesforce/apex/PersonSameNameController.findSameName';
 import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
 import { describeSameNamePerson, joinName } from '../sameNameHint';
@@ -19,6 +21,16 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/HouseholdOfPersonController.addExistingPerson',
+  () => ({ default: jest.fn(() => Promise.resolve()) }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson',
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/HouseholdController.moveContact',
   () => ({ default: jest.fn(() => Promise.resolve()) }),
   { virtual: true }
 );
@@ -81,10 +93,96 @@ describe('c-household-add-member-modal', () => {
     expect(root.querySelector('lightning-record-edit-form')).not.toBeNull();
     const fields = Array.from(root.querySelectorAll('lightning-input-field'));
     expect(fields.find((field) => field.fieldName === 'AccountId').value).toBe(HOUSEHOLD_ID);
-    expect(root.querySelector('.add-search-input')).toBeNull();
+    expect(fields.map((field) => field.fieldName)).toEqual(
+      expect.arrayContaining(['Email', 'Phone'])
+    );
+    expect(root.querySelector('.add-new-heading')).not.toBeNull();
+    expect(root.querySelector('.add-search-input')).not.toBeNull();
 
     root.querySelector('lightning-record-edit-form').dispatchEvent(new CustomEvent('success'));
     expect(closed).toHaveBeenCalledWith(true);
+  });
+
+  describe('searching for an existing person in the simple way', () => {
+    const LOPEZ = { householdId: '001000000000002AAA', name: 'The Lopez Family' };
+
+    beforeEach(() => {
+      setHelpTextForTest({
+        Core_HouseholdPanel_MoveConfirm: '{0} is in {1} and will move to this household.',
+        Core_HouseholdPanel_AlreadyHere: '{0} is already in this household.'
+      });
+      searchPeople.mockResolvedValue([MARIA]);
+    });
+
+    afterEach(() => {
+      clearHelpTextForTest();
+    });
+
+    async function choose(root) {
+      await search(root, 'Maria');
+      root.querySelector('.add-existing-button').dispatchEvent(new CustomEvent('click'));
+      await flush();
+    }
+
+    it('names the household the person is in and moves them only after Save', async () => {
+      getHouseholdsForPerson.mockResolvedValue([LOPEZ]);
+      moveContact.mockResolvedValue();
+      const { root, closed } = open(false);
+      await flush();
+      await choose(root);
+
+      expect(root.querySelector('.move-confirm-message').message).toBe(
+        'Maria Garcia is in The Lopez Family and will move to this household.'
+      );
+      expect(moveContact).not.toHaveBeenCalled();
+      root.querySelector('.move-save-button').dispatchEvent(new CustomEvent('click'));
+      await flush();
+
+      expect(moveContact).toHaveBeenCalledWith({
+        contactId: MARIA.id,
+        targetHouseholdId: HOUSEHOLD_ID,
+        sourceHouseholdId: null
+      });
+      expect(addExistingPerson).not.toHaveBeenCalled();
+      expect(closed).toHaveBeenCalledWith(true);
+    });
+
+    it('drops the question on Cancel and moves nobody', async () => {
+      getHouseholdsForPerson.mockResolvedValue([LOPEZ]);
+      const { root, closed } = open(false);
+      await flush();
+      await choose(root);
+      root.querySelector('.move-cancel-button').click();
+      await flush();
+
+      expect(root.querySelector('.move-confirm')).toBeNull();
+      expect(moveContact).not.toHaveBeenCalled();
+      expect(closed).not.toHaveBeenCalled();
+    });
+
+    it('moves a person who is in no household straight in', async () => {
+      getHouseholdsForPerson.mockResolvedValue([]);
+      moveContact.mockResolvedValue();
+      const { root, closed } = open(false);
+      await flush();
+      await choose(root);
+
+      expect(moveContact).toHaveBeenCalledTimes(1);
+      expect(closed).toHaveBeenCalledWith(true);
+    });
+
+    it('says so when the person is already in this household', async () => {
+      getHouseholdsForPerson.mockResolvedValue([{ householdId: HOUSEHOLD_ID, name: 'Here' }]);
+      const { root, closed } = open(false);
+      await flush();
+      await choose(root);
+
+      expect(root.querySelector('c-barn-notice.add-error').message).toBe(
+        'Maria Garcia is already in this household.'
+      );
+      expect(moveContact).not.toHaveBeenCalled();
+      expect(closed).not.toHaveBeenCalled();
+    });
   });
 
   it('offers a search and a new person form in the flexible way, and closes on Cancel', async () => {

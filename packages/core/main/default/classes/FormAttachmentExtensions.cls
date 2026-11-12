@@ -8,12 +8,13 @@
 public with sharing class FormAttachmentExtensions {
 	/**
 	 * The class names modules register: Event Management's registrations (EV-02) and Volunteers'
-	 * shift sign-ups and personal page (V-09).
+	 * shift sign-ups and personal page (V-09), and Scholarships' applications and reports (SG-02).
 	 */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
 		'EventFormAttachment',
-		'VolunteerFormAttachment'
+		'VolunteerFormAttachment',
+		'ScholarshipFormAttachment'
 	};
 
 	/** Injected by tests by class name, since no module is there to resolve. */

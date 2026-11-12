@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Rating_From_One_To_Five</fullName>
+  <active>true</active>
+  <description>R-SRT2: a rating is a whole number from 1 to 5.</description>
+  <errorConditionFormula>OR(Rating__c &lt; 1, Rating__c &gt; 5, Rating__c &lt;&gt; ROUND(Rating__c, 0))</errorConditionFormula>
+  <errorDisplayField>Rating__c</errorDisplayField>
+  <errorMessage>Enter a whole number from 1 to 5.</errorMessage>
+</ValidationRule>

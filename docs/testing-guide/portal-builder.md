@@ -161,3 +161,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 8 | POST any action with Bea's row Id. | 404 `not_found`; Bea's row is unchanged. |
 
 **Cleanup:** None.
+
+## T-PB-11: Member Portal Template
+
+**Purpose:** confirm a member sees their own membership, controls their own listing, and finds only members who opted in (PB-09).
+**Prerequisites:** admin; Memberships on; Pat and Sam each with a Current membership and an email; a portal with key `member`, Active, Invited, the template `portal-client/templates/member.json`; Pat signed in.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=membership`. | Pat's membership with level, dates and dues; none of Sam's. |
+| 2 | GET `page?key=directory`. | Empty: nobody has opted in. |
+| 3 | POST `page/save` on `listing` with Show Me to Other Members on and a location; GET `page?key=directory`. | Pat listed with name, level, location and bio only. |
+| 4 | Open the portal page in a browser on Member Directory and type part of Pat's location. | A search box above the list; only matching members stay shown. |
+| 5 | With Payments not ready, POST `page/action` `Memberships.PayDues` on Pat's membership. | Refused; no payment link is queued and the membership is unchanged. |
+| 6 | POST `page/action` `Memberships.PayDues` with Sam's membership Id. | 404 `not_found`. |
+
+**Cleanup:** turn Pat's listing off.

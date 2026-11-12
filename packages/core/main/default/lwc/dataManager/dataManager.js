@@ -45,6 +45,8 @@ import { matchTasks } from 'c/dataManagerTasks';
 const TABS = {
   import: 'Import',
   find: 'Find',
+  // The Grid (C-41) shows in the Find tab, chosen by the page's view state.
+  grid: 'Find',
   // Super Transformer (C-50) on the tab that kept the Bulk Update API name.
   update: 'Bulk_Update',
   optimizer: 'Data_Hygiene',
@@ -210,6 +212,14 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       findChange.push(
         tile('find', FIND_TITLE, helpText('Core', 'Core_DataManager_FindText'), iconFor('Find'))
       );
+      findChange.push(
+        tile(
+          'grid',
+          helpText('Core', 'Core_DataManager_GridTitle'),
+          helpText('Core', 'Core_DataManager_GridText'),
+          iconFor('Find')
+        )
+      );
     }
     if (canBulkUpdate) {
       findChange.push(
@@ -324,6 +334,10 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     // The bulk tiles open Find with a note saying where the bulk tool is (D-135).
     if (BULK_TOOLS[name] && this.toolStateKey) {
       pageReference.state = { [this.toolStateKey]: BULK_TOOLS[name] };
+    }
+    // The Grid tile opens Find's tab on the Grid view: the view key is the tool key's sibling.
+    if (name === 'grid' && this.toolStateKey) {
+      pageReference.state = { [this.toolStateKey.replace(/tool$/, 'view')]: 'grid' };
     }
     this[NavigationMixin.Navigate](pageReference);
   }

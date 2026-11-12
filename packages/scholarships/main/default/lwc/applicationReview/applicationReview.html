@@ -1,0 +1,49 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom70" data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
+        </template>
+        <template lwc:if={isBlind}>
+          <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="blind">{labels.blind}</p>
+        </template>
+        <template lwc:if={isOpen}>
+          <template for:each={criteria} for:item="criterion">
+            <lightning-input
+              key={criterion.key}
+              type="number"
+              min="0"
+              max={criterion.max}
+              step="0.5"
+              label={criterion.fieldLabel}
+              value={criterion.value}
+              data-key={criterion.key}
+              onchange={handleScore}
+            ></lightning-input>
+          </template>
+          <p class="slds-var-m-vertical_small" data-id="total">{labels.total} {total}</p>
+          <lightning-textarea label={labels.comments} value={comments} onchange={handleComments}></lightning-textarea>
+          <template lwc:if={recusing}>
+            <lightning-input label={labels.reason} required value={reason} onchange={handleReason} data-id="reason"></lightning-input>
+            <lightning-button variant="destructive" label={labels.recuse} disabled={isWorking} onclick={handleRecuse} data-id="confirm-recuse"></lightning-button>
+            <lightning-button label={labels.cancel} onclick={handleCancelRecuse}></lightning-button>
+          </template>
+          <template lwc:else>
+            <div class="slds-var-m-top_small">
+              <lightning-button label={labels.save} disabled={isWorking} onclick={handleSave} data-id="save"></lightning-button>
+              <lightning-button variant="brand" label={labels.submit} disabled={isWorking} onclick={handleSubmit} data-id="submit" class="slds-var-m-left_x-small"></lightning-button>
+              <lightning-button label={labels.recuse} disabled={isWorking} onclick={handleStartRecuse} data-id="recuse" class="slds-var-m-left_x-small"></lightning-button>
+            </div>
+          </template>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak" data-id="closed">{labels.closed}</p>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

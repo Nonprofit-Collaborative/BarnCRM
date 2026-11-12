@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Summary_JSON__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Counts by territory and owner and sample changes, written by the run and shown on the Territory Management page.</inlineHelpText>
+  <label>Summary</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

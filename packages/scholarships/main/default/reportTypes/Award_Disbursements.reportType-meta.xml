@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Award_Payment__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Disbursement records on awards: payee, amount, scheduled and paid dates, method and status.
+    BarnCRM records disbursements only; it never moves money.
+  </description>
+  <label>Award Disbursements</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Award__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Payee_Name__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Amount__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Scheduled_Date__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Payment_Method__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Paid_Date__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Reference__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Exported_Date__c</field>
+      <table>Award_Payment__c</table>
+    </columns>
+    <masterLabel>Disbursement</masterLabel>
+  </sections>
+</ReportType>
