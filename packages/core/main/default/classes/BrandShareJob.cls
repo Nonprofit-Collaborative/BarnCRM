@@ -101,10 +101,17 @@ public with sharing class BrandShareJob implements Queueable {
 			Id last;
 			if (full) {
 				scope = new Set<Id>();
+				// "Id > null" matches no rows, so the first page starts from the lowest possible Id.
+				Id floor = cursor != null
+					? cursor
+					: Id.valueOf(
+							Brand_Assignment__c.SObjectType.getDescribe().getKeyPrefix() +
+							'000000000000'
+					  );
 				for (Brand_Assignment__c row : [
 					SELECT Id, Account__c, Contact__r.AccountId
 					FROM Brand_Assignment__c
-					WHERE Id > :cursor AND (Account__c != NULL OR Contact__c != NULL)
+					WHERE Id > :floor AND (Account__c != NULL OR Contact__c != NULL)
 					WITH SYSTEM_MODE
 					ORDER BY Id
 					LIMIT :PAGE

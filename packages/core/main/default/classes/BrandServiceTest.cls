@@ -234,13 +234,11 @@ private class BrandServiceTest {
 				'A contact with no account adds nothing to the page scope'
 			);
 			insert new Brand_Assignment__c(Brand__c = chapter.Id, Contact__c = person.Id);
-			Id start = Id.valueOf(
-				Brand_Assignment__c.SObjectType.getDescribe().getKeyPrefix() + '000000000000'
-			);
 
 			Test.startTest();
 			Integer before = Limits.getQueueableJobs();
-			new BrandShareJob(true, true, null, start).execute(null);
+			// A null cursor is the real first page of a full run.
+			new BrandShareJob(true, true, null, null).execute(null);
 			Integer queued = Limits.getQueueableJobs() - before;
 			Test.stopTest();
 
