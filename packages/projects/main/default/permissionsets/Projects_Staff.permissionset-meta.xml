@@ -11,6 +11,14 @@
     <apexClass>ProjectsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>ProjectTimesheetController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ProjectApprovalsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Project__c.Health__c</field>
@@ -669,6 +677,14 @@
   </objectPermissions>
   <tabSettings>
     <tab>Projects_Home</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Projects_Timesheet</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Projects_Approvals</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
