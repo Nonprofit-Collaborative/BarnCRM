@@ -60,7 +60,8 @@ public with sharing class ImportBatchSelector {
 				'notImports' => new List<String>{
 					BulkUpdateService.OPERATION_UPDATE,
 					BulkDeleteService.OPERATION_DELETE,
-					FieldAccessService.OPERATION_ACCESS
+					FieldAccessService.OPERATION_ACCESS,
+					BackupSetService.OPERATION_BACKUP
 				}
 			},
 			AccessLevel.USER_MODE

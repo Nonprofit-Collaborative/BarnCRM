@@ -41,6 +41,8 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	/** An archive (R-BD9): every field it saves, headed by API name, and its bulk delete job. */
 	private Set<String> archiveFields;
 	private Id archiveJobId;
+	/** A Backup Set run (R-SQ15): the archive's file, no delete, and its Backup job. */
+	private Id backupJobId;
 
 	/**
 	 * An archive's export (R-BD9): the query's records with these fields, at most `rowLimit`,
@@ -57,6 +59,19 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 		archive.archiveFields = new Set<String>(fields);
 		archive.archiveJobId = jobId;
 		return archive;
+	}
+
+	/** A Backup Set run (R-SQ15): R-BD9's file, whose finish completes the Backup job. */
+	public static FindExportBatch forBackup(
+		String queryJson,
+		List<String> fields,
+		String tag,
+		Integer rowLimit,
+		Id jobId
+	) {
+		FindExportBatch backup = forArchive(queryJson, fields, tag, rowLimit, null);
+		backup.backupJobId = jobId;
+		return backup;
 	}
 
 	/**
@@ -166,6 +181,17 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				failed,
 				rowsWritten,
 				titleOf(objectName, tag, 1)
+			);
+		}
+		if (backupJobId != null) {
+			BackupSetService.afterExport(
+				backupJobId,
+				failed,
+				rowsWritten,
+				parts,
+				firstDocumentId,
+				titleOf(objectName, tag, 1),
+				rowsWritten >= rowLimit
 			);
 		}
 	}
