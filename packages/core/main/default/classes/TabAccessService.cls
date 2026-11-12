@@ -26,6 +26,9 @@
  * else (no record type, ADR-0141), is carried by the Household Upkeep feature, and goes to
  * every BarnCRM role while the feature is on.
  *
+ * The Account Tabs setting (C-73) picks the Organizations tab set (with Households), the
+ * standard Accounts tab set, or both, each going to every BarnCRM role while chosen.
+ *
  * The four BarnCRM apps follow the same way (ADR-0137): each has a BarnCRM App set that shows that app
  * and nothing else, its audience is every BarnCRM role (the admin apps: BarnCRM Admin only), and
  * the App Navigation Style setting says which style's sets are on.
@@ -41,6 +44,13 @@ public with sharing class TabAccessService {
 
 	/** Shows the Households tab only, no record type; carried by Household Upkeep (ADR-0141). */
 	public static final String HOUSEHOLDS_SET = 'BarnCRM_Households';
+	/** The Organizations tab and the standard Accounts tab, chosen by Account Tabs (C-73). */
+	public static final String ORGANIZATIONS_TAB = 'BarnCRM_Organizations_Tab';
+	public static final String ACCOUNTS_TAB = 'BarnCRM_Accounts_Tab';
+
+	/** The stored values of Account Tabs; anything else reads as Organizations and Households. */
+	public static final String ACCOUNT_TABS_ACCOUNTS = 'Accounts';
+	public static final String ACCOUNT_TABS_BOTH = 'Both';
 
 	public static final String STANDARD_APP = 'BarnCRM_App_Standard';
 	public static final String CONSOLE_APP = 'BarnCRM_App_Console';
@@ -64,17 +74,20 @@ public with sharing class TabAccessService {
 	/**
 	 * Each tab set, and the permission sets whose holders see that tab while it is on.
 	 * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
-	 * and so do Metadata Admin holders, who change its matching logic.
+	 * and so do Metadata Admin holders, who change its matching logic. Bulk Update and Bulk
+	 * Delete include Find and Export's grants (ADR-0194, D5), so their holders see its tabs.
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
 		DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		IMPORT_TAB => new List<String>{ ADMIN },
-		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
-		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
 		HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		ORGANIZATIONS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		ACCOUNTS_TAB => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		CONSOLE_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		ADMIN_STANDARD_APP => new List<String>{ ADMIN },
@@ -97,11 +110,31 @@ public with sharing class TabAccessService {
 		return names;
 	}
 
+	/**
+	 * The account tab sets the Account Tabs setting turns on (C-73): Organizations for
+	 * Organizations and Households, the standard Accounts tab for Accounts, both for Both. A
+	 * blank or unknown value reads as Organizations and Households, today's tabs.
+	 */
+	public static Set<String> accountTabSetsOn() {
+		String choice = SettingsService.getSettings().Account_Tabs__c;
+		Set<String> names = new Set<String>();
+		if (choice != ACCOUNT_TABS_ACCOUNTS) {
+			names.add(ORGANIZATIONS_TAB);
+		}
+		if (choice == ACCOUNT_TABS_ACCOUNTS || choice == ACCOUNT_TABS_BOTH) {
+			names.add(ACCOUNTS_TAB);
+		}
+		return names;
+	}
+
 	/** How many assignments one run gives or takes, well inside the 10,000 DML rows. */
 	@TestVisible
 	private static Integer rowsPerRun = 5000;
 
 	private static final String CONTEXT = 'TabAccessService.sync';
+
+	/** How many retired role holders one job carries over (`RetiredRoleMigration`). */
+	private static final Integer RETIRED_ROLE_ROWS = 1000;
 
 	/**
 	 * Every permission set Core ships is named so; `giveToHolders` refuses them. Core's own
@@ -144,6 +177,9 @@ public with sharing class TabAccessService {
 	 */
 	public with sharing class Job implements Queueable {
 		public void execute(QueueableContext jobContext) {
+			// Holders of a retired role get its successor (ADR-0194, D1); never throws, and
+			// its budget leaves the tab slice its 5,000 rows inside the 10,000.
+			RetiredRoleMigration.carryOver(RETIRED_ROLE_ROWS);
 			try {
 				// A test cannot chain one queued job from another.
 				if (syncOnce(rowsPerRun) && !Test.isRunningTest()) {
@@ -164,6 +200,11 @@ public with sharing class TabAccessService {
 		Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
 		Set<String> turnedOn = FeatureSwitchService.tabSetsOn();
 		turnedOn.addAll(appSetsOn());
+		turnedOn.addAll(accountTabSetsOn());
+		// Accounts Tab (Standard) hides the Households tab too, whatever its feature says.
+		if (!turnedOn.contains(ORGANIZATIONS_TAB)) {
+			turnedOn.remove(HOUSEHOLDS_SET);
+		}
 		List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
 		List<PermissionSetAssignment> toDelete = new List<PermissionSetAssignment>();
 		Boolean more = false;

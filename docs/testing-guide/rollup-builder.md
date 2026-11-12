@@ -143,7 +143,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-08: Staff and Read-Only Users See the Builder Read Only
 
 **Purpose:** confirm only a user with the Manage BarnCRM Settings permission can change rollups, and what everyone else sees.
-**Prerequisites:** staff and read-only users (see [Test users](before-you-test.md#test-users)); each holds **Rollup Builder User** (BarnCRM gives it to holders of **BarnCRM Staff** and **BarnCRM Read Only** at install, at each Turn on and with each nightly run; assign it in Setup if it is missing); T-RB-02 done.
+**Prerequisites:** staff and read-only users (see [Test users](before-you-test.md#test-users)); each holds **Rollup Builder Read Only** (BarnCRM gives it to holders of **BarnCRM Staff** and **BarnCRM Read Only** at install, at each Turn on and with each nightly run; assign it in Setup if it is missing); T-RB-02 done.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -153,10 +153,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 4 | Find **Test children per household**. | The row shows its name, description, what it counts, where it shows and its **Last Calculated** time. |
 | 5 | Look below the list. | No **Needs Attention** section is shown. |
 | 6 | Log in as the read-only user and repeat steps 1 to 5. | Same results as the staff user. |
-| 7 | As admin, in Setup remove **Rollup Builder User** from the read-only user. Log in as the read-only user and search the App Launcher for "Rollup". | The **Rollup Builder** tab is not offered. |
-| 8 | As admin, in Setup open the **Rollup Builder Admin** and **Rollup Builder User** permission sets. | **Rollup Builder Admin** gives create, edit and delete on rollup definitions; **Rollup Builder User** gives read only. Both open the **Rollup Builder** tab; neither names an app. |
+| 7 | As admin, in Setup remove **Rollup Builder Read Only** from the read-only user. Log in as the read-only user and search the App Launcher for "Rollup". | The **Rollup Builder** tab is not offered. |
+| 8 | As admin, in Setup open the **Rollup Builder Admin** and **Rollup Builder Read Only** permission sets. | **Rollup Builder Admin** gives create, edit and delete on rollup definitions; **Rollup Builder Read Only** gives read only. Both open the **Rollup Builder** tab; neither names an app. |
 
-**Cleanup:** assign **Rollup Builder User** to the read-only user again.
+**Cleanup:** assign **Rollup Builder Read Only** to the read-only user again.
 
 ## T-RB-09: Default Rollup Mode Decides How a New Rollup Starts
 
@@ -425,7 +425,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | In BarnCRM Settings, open the **Automation** page. | **Instant rollups on Shift** is listed and off. |
 | 4 | Back on **Instant Totals**, click **Turn On Instant Totals**, then click **Recalculate** on the rollup. | **Instant totals on Shift are turned back on.**, and after the recalculation **Test shift hours** is 5. |
 | 5 | Click **Remove the Trigger**. | **Remove the Trigger for Shift** opens with three steps, a CLI command with `--test-level RunLocalTests`, and **Download Removal Package** (`BarnRollup_Shift_c_Removal.zip`, holding `package.xml` and `destructiveChanges.xml`). |
-| 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the Trigger** but no **Turn Off Instant Totals** button. |
+| 6 | Sign in as a user with BarnCRM Staff and Rollup Builder Read Only only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the Trigger** but no **Turn Off Instant Totals** button. |
 
 **Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
 
@@ -522,7 +522,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Click **Copy** on **Test children per household**, change only the name to `Test children copy`, switch **Active** off and save. | The copy shows **Switched off** in **Status** and, in red under its name, "Cannot be switched on while Test children per household fills the same field for the same records." |
 | 3 | Switch the copy's **Active** toggle on. | It is refused with that reason, and the toggle goes back off. |
 | 4 | In Setup, on **Account**, create a Number field **Test Children Count 2** (`Test_Children_Count_2__c`). Edit the copy, choose **Test Children Count 2** in step 1, switch **Active** on and save. | Both rollups show, in red, "Calculates the same total as ..., into another field." |
-| 5 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the tab. | The **Status** column is empty. |
+| 5 | Sign in as a user with BarnCRM Staff and Rollup Builder Read Only only and open the tab. | The **Status** column is empty. |
 
 **Cleanup:** delete **Test children copy** and the field **Test Children Count 2**.
 
@@ -594,7 +594,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-46: Explain These Totals on a Record Page
 
 **Purpose:** confirm the record-page component explains each total, counts what was read, links the records, and shows the recalculation to admins only.
-**Prerequisites:** T-RB-02 done; **Test children per household** active; a staff user with **Rollup Builder User**.
+**Prerequisites:** T-RB-02 done; **Test children per household** active; a staff user with **Rollup Builder Read Only**.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -641,3 +641,19 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | As the admin, click **Recalculate All** on the **Rollup Builder** tab. | The run finishes as before; shipped rollups and their last calculated times are unaffected. |
 
 **Cleanup:** None.
+
+## T-RB-49: Import From NPSP Copies Customizable Rollups and Says Why Others Stay
+
+**Purpose:** confirm NPSP customizable rollups are read, copied switched off, compared and turned on with the NPSP question, and that NPSP is never changed.
+**Prerequisites:** an org with NPSP, Customizable Rollups enabled, Core and Rollup Builder deployed; admin user with Manage BarnCRM Settings; NPSP's shipped customizable rollups active.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab. | **Import From NPSP** is shown. |
+| 2 | Click it. | Step 1 lists the active NPSP rollups. Under **Can Be Copied**, account rollups from opportunities (for example Total Gifts on Account) and General Accounting Unit rollups from allocations. Under **Stays in NPSP**, contact rollups from opportunities ("NPSP credits contacts through contact roles"), soft credit and payment rollups, Years Donated, Donor Streak and Best Year, each with its reason. |
+| 3 | Leave one account rollup ticked (untick the rest), click **Next**, then **Copy Switched Off**. | "Copied, switched off." The Rollup Builder list shows it switched off, with Definition Key starting `NPSP_`. |
+| 4 | Click **Compare**. | Up to five accounts: **Value Now** (NPSP wrote it) beside **BarnCRM Value**, mostly **Same**. |
+| 5 | Click **Next**, then **Turn On**. | The question names the NPSP rollup and the field. **OK** turns it on; **Recent Changes** has the answer. |
+| 6 | Open **NPSP Settings**, **Customizable Rollups**. | The NPSP rollup is unchanged and still active. |
+
+**Cleanup:** delete the copy (keep values), or deactivate the NPSP rollup if you keep the copy.

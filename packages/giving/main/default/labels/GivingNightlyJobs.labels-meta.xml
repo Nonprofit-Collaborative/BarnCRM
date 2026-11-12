@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the top up job and when it runs</shortDescription>
-    <value>Installment Top Up</value>
+    <value>Payment Schedule Top Up</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_OverdueName</fullName>
@@ -33,60 +33,12 @@
     <value>Donor Levels</value>
   </labels>
   <labels>
-    <fullName>Giving_NightlyJobs_TopUpSummaryFormat</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the last top up run did</shortDescription>
-    <value>Extended {0} recurring schedules. {1} chunks could not be extended and are in the Error Log.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_OverdueSummaryFormat</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the last overdue pass did</shortDescription>
-    <value>Marked {0} payments Overdue.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_OverdueNoneFound</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: the overdue pass ran and found nothing</shortDescription>
-    <value>No payments were overdue.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_RunFailed</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: the run failed</shortDescription>
-    <value>The run failed. The reason is in the Error Log.</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_NextRunHeading</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: next run heading</shortDescription>
     <value>Next Run</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_ScheduleActive</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: the jobs are scheduled</shortDescription>
-    <value>The nightly jobs are scheduled.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_NotScheduled</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: the jobs are not scheduled</shortDescription>
-    <value>The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_ScheduleButton</fullName>
@@ -111,37 +63,5 @@
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that runs the jobs now</shortDescription>
     <value>Run the Jobs Now</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_RunNowStarted</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: the jobs have been started by hand</shortDescription>
-    <value>The top up and the overdue pass have started. Refresh this page in a minute to see what they did.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_Stale</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: a scheduled job fired and recorded nothing</shortDescription>
-    <value>This job was due and did not record a run. Open the Error Log to see why.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_ReadOnly</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: the reader may not change the schedule</shortDescription>
-    <value>You can see whether the jobs are running. Changing the schedule needs the Manage BarnCRM Settings permission.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_PermissionRequired</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: refusal for a user without the permission</shortDescription>
-    <value>Scheduling the nightly jobs needs the Manage BarnCRM Settings permission.</value>
   </labels>
 </CustomLabels>

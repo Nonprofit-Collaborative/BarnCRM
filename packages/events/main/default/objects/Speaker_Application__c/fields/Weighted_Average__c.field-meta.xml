@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Weighted_Average__c</fullName>
+  <inlineHelpText>The weighted scores added together and divided by the number of reviews, from 1 to 5. Ranks the proposals. Empty before the first review.</inlineHelpText>
+  <label>Weighted Average</label>
+  <trackTrending>false</trackTrending>
+  <formula>IF(Review_Count__c = 0, NULL, Weighted_Total__c / Review_Count__c)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <precision>18</precision>
+  <scale>2</scale>
+  <type>Number</type>
+</CustomField>

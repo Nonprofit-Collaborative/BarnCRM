@@ -187,7 +187,7 @@ private class RollupRecalcErrorHandlerTest {
 					Assert.fail('A second full run is refused');
 				} catch (AuraHandledException expected) {
 					Assert.areEqual(
-						Label.Core_Rollups_FullRunAlreadyRunning,
+						BarnHelp.text('Rollups', 'Core_Rollups_FullRunAlreadyRunning'),
 						expected.getMessage(),
 						'In plain words, with what to do'
 					);

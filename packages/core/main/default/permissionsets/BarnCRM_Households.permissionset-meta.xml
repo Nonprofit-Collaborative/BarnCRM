@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Households</label>
+  <label>BarnCRM Auto: Households Tab</label>
   <description>
     Shows the Households tab and nothing else, and gives no record type: BarnCRM creates
     households in system mode (ADR-0141). Given and taken by BarnCRM while the Households

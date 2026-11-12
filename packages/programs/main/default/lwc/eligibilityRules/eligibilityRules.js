@@ -4,7 +4,6 @@ import saveRules from '@salesforce/apex/EligibilityController.saveRules';
 import screen from '@salesforce/apex/EligibilityController.screen';
 
 import TITLE from '@salesforce/label/c.Programs_Elig_Title';
-import NO_RULES from '@salesforce/label/c.Programs_Elig_NoRules';
 import RULE from '@salesforce/label/c.Programs_Elig_Rule';
 import FIELD from '@salesforce/label/c.Programs_Elig_Field';
 import OPERATOR from '@salesforce/label/c.Programs_Elig_Operator';
@@ -25,20 +24,12 @@ import DEFAULT_TITLE from '@salesforce/label/c.Programs_Elig_DefaultTitle';
 import DEFAULT_RESULT from '@salesforce/label/c.Programs_Elig_DefaultResult';
 import DEFAULT_REASON from '@salesforce/label/c.Programs_Elig_DefaultReason';
 import SAVE from '@salesforce/label/c.Programs_Elig_Save';
-import SAVED from '@salesforce/label/c.Programs_Elig_Saved';
 import UNSAVED from '@salesforce/label/c.Core_Shared_UnsavedChanges';
 import PREVIEW_TITLE from '@salesforce/label/c.Programs_Elig_PreviewTitle';
 import PREVIEW_PERSON from '@salesforce/label/c.Programs_Elig_PreviewPerson';
-import NO_PEOPLE from '@salesforce/label/c.Programs_Elig_NoPeople';
-import PREVIEW_RESULT from '@salesforce/label/c.Programs_Elig_PreviewResult';
 import APPLY_ONE from '@salesforce/label/c.Programs_Elig_ApplyOne';
 import SCREEN_ALL from '@salesforce/label/c.Programs_Elig_ScreenAll';
 import INCLUDE_DECIDED from '@salesforce/label/c.Programs_Elig_IncludeDecided';
-import SCREENED from '@salesforce/label/c.Programs_Elig_Screened';
-import SAVE_FIRST from '@salesforce/label/c.Programs_Elig_SaveFirst';
-import NO_RULE_MATCHED from '@salesforce/label/c.Programs_Elig_NoRuleMatched';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Elig_MoreThanShown';
-import READ_ONLY from '@salesforce/label/c.Programs_Elig_ReadOnly';
 import OP_EQUALS from '@salesforce/label/c.Programs_Elig_OpEquals';
 import OP_NOT_EQUALS from '@salesforce/label/c.Programs_Elig_OpNotEquals';
 import OP_IN from '@salesforce/label/c.Programs_Elig_OpIn';
@@ -109,7 +100,9 @@ export default class EligibilityRules extends LightningElement {
     get intro() {
       return helpText('Programs', 'Programs_Elig_Intro');
     },
-    noRules: NO_RULES,
+    get noRules() {
+      return helpText('Programs', 'Programs_Elig_NoRules');
+    },
     field: FIELD,
     operator: OPERATOR,
     addCondition: ADD_CONDITION,
@@ -129,12 +122,18 @@ export default class EligibilityRules extends LightningElement {
     unsaved: UNSAVED,
     previewTitle: PREVIEW_TITLE,
     previewPerson: PREVIEW_PERSON,
-    noPeople: NO_PEOPLE,
+    get noPeople() {
+      return helpText('Programs', 'Programs_Elig_NoPeople');
+    },
     applyOne: APPLY_ONE,
     screenAll: SCREEN_ALL,
     includeDecided: INCLUDE_DECIDED,
-    moreThanShown: MORE_THAN_SHOWN,
-    readOnly: READ_ONLY,
+    get moreThanShown() {
+      return helpText('Programs', 'Programs_Elig_MoreThanShown');
+    },
+    get readOnly() {
+      return helpText('Programs', 'Programs_Elig_ReadOnly');
+    },
     loading: LOADING,
     value: VALUE,
     availableValues: AVAILABLE_VALUES,
@@ -386,8 +385,18 @@ export default class EligibilityRules extends LightningElement {
     if (!person) {
       return '';
     }
-    const decision = evaluateRules(this.config, person.values, NO_RULE_MATCHED);
-    return decision ? format(PREVIEW_RESULT, decision.status, decision.reason) : '';
+    const decision = evaluateRules(
+      this.config,
+      person.values,
+      helpText('Programs', 'Programs_Elig_NoRuleMatched')
+    );
+    return decision
+      ? format(
+          helpText('Programs', 'Programs_Elig_PreviewResult'),
+          decision.status,
+          decision.reason
+        )
+      : '';
   }
 
   get controlsDisabled() {
@@ -523,7 +532,7 @@ export default class EligibilityRules extends LightningElement {
         this.problems = problems || [];
         if (this.problems.length === 0) {
           this.savedJson = serializeRules(this.config);
-          this.resultMessage = SAVED;
+          this.resultMessage = helpText('Programs', 'Programs_Elig_Saved');
         }
       })
       .catch((error) => {
@@ -536,7 +545,7 @@ export default class EligibilityRules extends LightningElement {
 
   run(enrollmentId) {
     if (this.dirty) {
-      this.errorMessage = SAVE_FIRST;
+      this.errorMessage = helpText('Programs', 'Programs_Elig_SaveFirst');
       return Promise.resolve();
     }
     this.busy = true;
@@ -549,9 +558,9 @@ export default class EligibilityRules extends LightningElement {
     })
       .then((summary) => {
         this.resultMessage = summary.noRules
-          ? NO_RULES
+          ? helpText('Programs', 'Programs_Elig_NoRules')
           : format(
-              SCREENED,
+              helpText('Programs', 'Programs_Elig_Screened'),
               summary.eligible,
               summary.notEligible,
               summary.review,

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Engagement score targets</label>
+  <protected>true</protected>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Text</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">What earns each part its whole weight within the last Months months: Gifts is an amount given, Hours approved volunteer hours, Events events attended, and Activity the days over which a recent task, call or meeting stops counting. The default is Gifts 1000, Hours 40, Events 4, Activity 90, Months 12; Months is 1 to 60.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">engagement-score.md</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">People and Households</value>
+  </values>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Engagement_Score_Targets__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">80</value>
+  </values>
+</CustomMetadata>

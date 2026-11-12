@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Public</cacheControl>
+  <contentType>application/json</contentType>
+  <description>
+    Corporate Hub templates as JSON (CH-04, CH-06, CH-07): obligations and starter policies loaded
+    once per key by HubTemplates. General guidance, not legal advice.
+  </description>
+</StaticResource>

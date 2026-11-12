@@ -98,19 +98,25 @@ public with sharing class OpportunityMirrorService {
 
 		/** Writes the grouped refusals of gifts as Warnings, in one statement. */
 		public void writeRefusals() {
+			if (refusals.isEmpty()) {
+				return;
+			}
 			refusals.write(
 				CONTEXT,
-				Label.Mirror_OpportunityMirror_LogOne,
-				Label.Mirror_OpportunityMirror_LogMany
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOne'),
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogMany')
 			);
 		}
 
 		/** Writes the grouped refusals of Opportunities that could not become gifts. */
 		public void writeOpportunityRefusals() {
+			if (refusals.isEmpty()) {
+				return;
+			}
 			refusals.write(
 				CONTEXT,
-				Label.Mirror_OpportunityMirror_LogOneOpportunity,
-				Label.Mirror_OpportunityMirror_LogManyOpportunities
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOneOpportunity'),
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogManyOpportunities')
 			);
 		}
 	}
@@ -223,7 +229,7 @@ public with sharing class OpportunityMirrorService {
 			if (!noHeadroomLogged) {
 				noHeadroomLogged = true;
 				ErrorLogger.logMessage(
-					Label.Mirror_OpportunityMirror_LogNoHeadroom,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogNoHeadroom'),
 					CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -268,7 +274,7 @@ public with sharing class OpportunityMirrorService {
 			} else {
 				result.failed++;
 				result.refusals.add(
-					Label.Mirror_OpportunityMirror_InvalidOpportunityId,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_InvalidOpportunityId'),
 					gift.Name,
 					gift.Id
 				);
@@ -304,8 +310,8 @@ public with sharing class OpportunityMirrorService {
 			return;
 		}
 		String message = direction() == OPPORTUNITIES_TO_GIFTS
-			? Label.Mirror_OpportunityMirror_DeletedRemade
-			: Label.Mirror_OpportunityMirror_DeletedKept;
+			? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_DeletedRemade')
+			: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_DeletedKept');
 		MirrorSync.Warnings warnings = new MirrorSync.Warnings();
 		for (Gift__c gift : deleted) {
 			if (gift.Opportunity_Id__c != null) {
@@ -314,8 +320,8 @@ public with sharing class OpportunityMirrorService {
 		}
 		warnings.write(
 			CONTEXT,
-			Label.Mirror_OpportunityMirror_LogDeletedOne,
-			Label.Mirror_OpportunityMirror_LogDeletedMany
+			BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogDeletedOne'),
+			BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogDeletedMany')
 		);
 	}
 
@@ -348,7 +354,10 @@ public with sharing class OpportunityMirrorService {
 		}
 		noAccessLogged = true;
 		ErrorLogger.logMessage(
-			String.format(Label.Mirror_OpportunityMirror_LogNoAccess, new List<Object>{ howMany }),
+			String.format(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogNoAccess'),
+				new List<Object>{ howMany }
+			),
 			CONTEXT,
 			ErrorLogger.SEVERITY_WARNING
 		);
@@ -398,7 +407,11 @@ public with sharing class OpportunityMirrorService {
 			String stage = keepsStage ? null : stage(IN_TOTALS.contains(gift.Status__c));
 			if (!keepsStage && stage == null) {
 				result.failed++;
-				result.refusals.add(Label.Mirror_OpportunityMirror_NoStage, nameOf(gift), gift.Id);
+				result.refusals.add(
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoStage'),
+					nameOf(gift),
+					gift.Id
+				);
 				continue;
 			}
 			SObject desired = context.desiredOpportunity(gift, stage);
@@ -411,7 +424,11 @@ public with sharing class OpportunityMirrorService {
 			SObject existing = context.current.get(Id.valueOf(gift.Opportunity_Id__c));
 			if (existing == null) {
 				result.failed++;
-				result.refusals.add(Label.Mirror_OpportunityMirror_Missing, nameOf(gift), gift.Id);
+				result.refusals.add(
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Missing'),
+					nameOf(gift),
+					gift.Id
+				);
 				continue;
 			}
 			desired.Id = existing.Id;
@@ -534,7 +551,7 @@ public with sharing class OpportunityMirrorService {
 			if (!saved[i].isSuccess()) {
 				result.refusals.add(
 					String.format(
-						Label.Mirror_OpportunityMirror_ContactRole,
+						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ContactRole'),
 						new List<Object>{ messageOf(saved[i].getErrors()) }
 					),
 					nameOf(savedFor[i]),
@@ -594,7 +611,7 @@ public with sharing class OpportunityMirrorService {
 			if (!deleted[i].isSuccess()) {
 				result.refusals.add(
 					String.format(
-						Label.Mirror_OpportunityMirror_LogOrphan,
+						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOrphan'),
 						new List<Object>{
 							String.valueOf(orphans[i].Id),
 							messageOf(deleted[i].getErrors())
@@ -622,7 +639,9 @@ public with sharing class OpportunityMirrorService {
 		}
 		Id typed = idOf(gift);
 		if (typed == null) {
-			gift.Opportunity_Id__c.addError(Label.Mirror_OpportunityMirror_InvalidOpportunityId);
+			gift.Opportunity_Id__c.addError(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_InvalidOpportunityId')
+			);
 			return false;
 		}
 		gift.Opportunity_Id__c = String.valueOf(typed);
@@ -639,7 +658,7 @@ public with sharing class OpportunityMirrorService {
 			return gift.Name;
 		}
 		return String.format(
-			Label.Mirror_OpportunityMirror_NewGift,
+			BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NewGift'),
 			new List<Object>{ String.valueOf(gift.Amount__c), String.valueOf(gift.Gift_Date__c) }
 		);
 	}

@@ -16,6 +16,9 @@ The second list is **Merge Rules**: which value wins, field by field, when auto-
 two people (see [Duplicates](duplicates.md#merge-rules)). BarnCRM ships none; a field with no
 rule follows the **Merge rule for other fields** setting.
 
+The third list is **History Fields**: the fields whose changes Field History keeps, each as
+`Object.Field` (see [Field History](field-history.md)). BarnCRM ships none.
+
 Match sources, the related records the duplicate scan and imports compare, are custom
 metadata too, but they have their own editor: the **Matching Logic** area of the
 **Duplicate Matching** tab (see [Duplicates](duplicates.md#matching-logic)). It saves the

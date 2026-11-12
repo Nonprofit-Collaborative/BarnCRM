@@ -17,7 +17,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
 		GiftPostingLock.enforceOnAllocations(
 			(List<Gift_Allocation__c>) newRecords(),
 			null,
-			Label.Giving_Posting_OverrideAllocationAdded
+			BarnHelp.text('Giving', 'Giving_Posting_OverrideAllocationAdded')
 		);
 	}
 
@@ -25,7 +25,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
 		GiftPostingLock.enforceOnAllocations(
 			(List<Gift_Allocation__c>) newRecords(),
 			(Map<Id, Gift_Allocation__c>) oldRecordsById(),
-			Label.Giving_Posting_OverrideAllocationChanged
+			BarnHelp.text('Giving', 'Giving_Posting_OverrideAllocationChanged')
 		);
 	}
 
@@ -33,7 +33,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
 		GiftPostingLock.enforceOnAllocations(
 			(List<Gift_Allocation__c>) oldRecords(),
 			null,
-			Label.Giving_Posting_OverrideAllocationDeleted
+			BarnHelp.text('Giving', 'Giving_Posting_OverrideAllocationDeleted')
 		);
 	}
 
@@ -42,7 +42,7 @@ public with sharing class GiftAllocationPostingLockHandler extends TriggerHandle
 		GiftPostingLock.enforceOnAllocations(
 			(List<Gift_Allocation__c>) newRecords(),
 			null,
-			Label.Giving_Posting_OverrideAllocationRestored
+			BarnHelp.text('Giving', 'Giving_Posting_OverrideAllocationRestored')
 		);
 	}
 }

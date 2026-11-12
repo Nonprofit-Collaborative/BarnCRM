@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Campaign Sync</label>
+  <label>Campaign Sync (Retired)</label>
   <description>
-    For whoever creates appeals or runs Sync all appeals: reads and edits an appeal's Campaign ID
-    and opens the Campaign sync page. Creating the Campaigns also needs Campaign access and the
-    Marketing User box in Setup.
+    Retired: replaced by Salesforce Records Sync, which BarnCRM gives every holder; removed in the
+    next release. Do not assign.
   </description>
   <classAccesses>
     <apexClass>CampaignSyncController</apexClass>

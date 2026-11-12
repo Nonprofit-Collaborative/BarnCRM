@@ -107,7 +107,9 @@ public with sharing class VolunteerShiftSignupsController {
 			throw UserErrors.message(actionFailed());
 		}
 		if (personId == null) {
-			throw UserErrors.message(Label.Volunteers_Signups_PersonRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Volunteers', 'Volunteers_Signups_PersonRequired')
+			);
 		}
 		Volunteer_Signup__c signup = new Volunteer_Signup__c(Volunteer_Shift__c = shiftId);
 		if (String.isNotBlank(status)) {

@@ -67,10 +67,14 @@ public with sharing class OpportunityMirrorController {
 			);
 		}
 		if (fromDate == null || toDate == null) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDatesRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+			);
 		}
 		if (fromDate > toDate) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDateOrder);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder')
+			);
 		}
 		try {
 			OpportunityMirrorBatch.runRange(fromDate, toDate);
@@ -97,7 +101,9 @@ public with sharing class OpportunityMirrorController {
 	public static Status stop() {
 		Status current = status();
 		if (!current.canManage) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_NoManagePermission);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission')
+			);
 		}
 		try {
 			OpportunityMirrorSchedulable.stop();
@@ -122,7 +128,9 @@ public with sharing class OpportunityMirrorController {
 
 	private static void requireUse() {
 		if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_NoUsePermission);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoUsePermission')
+			);
 		}
 	}
 
@@ -144,19 +152,19 @@ public with sharing class OpportunityMirrorController {
 	@TestVisible
 	private static String refusal(Status current, Boolean scheduling) {
 		if (!current.available) {
-			return Label.Mirror_OpportunityMirror_Unavailable;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Unavailable');
 		}
 		if (current.direction == OpportunityMirrorService.OFF) {
-			return Label.Mirror_OpportunityMirror_SwitchedOff;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_SwitchedOff');
 		}
 		if (!current.canManage) {
-			return Label.Mirror_OpportunityMirror_NoManagePermission;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission');
 		}
 		if (!current.canRun) {
-			return Label.Mirror_OpportunityMirror_NoOpportunityAccess;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoOpportunityAccess');
 		}
 		if (current.running && !scheduling) {
-			return Label.Mirror_OpportunityMirror_Running;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Running');
 		}
 		return null;
 	}
@@ -195,6 +203,6 @@ public with sharing class OpportunityMirrorController {
 
 	private static AuraHandledException failed(Exception unexpected) {
 		ErrorLogger.log(unexpected, CONTEXT);
-		return UserErrors.message(Label.Mirror_OpportunityMirror_ErrorFailed);
+		return UserErrors.message(BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorFailed'));
 	}
 }

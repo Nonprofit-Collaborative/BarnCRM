@@ -35,6 +35,9 @@ public with sharing class EventDashboardController {
 		public Integer speakers = 0;
 		@AuraEnabled
 		public Integer confirmedSpeakers = 0;
+		/** R-EXP1: actual spend less funding received and registrations paid; null with no budget. */
+		@AuraEnabled
+		public Decimal netCost;
 		/** The templates as JSON text, for the browser module to read. */
 		@AuraEnabled
 		public String templatesJson;
@@ -128,6 +131,7 @@ public with sharing class EventDashboardController {
 					result.confirmedSpeakers += total;
 				}
 			}
+			result.netCost = netCost(eventId);
 			result.templatesJson = templates();
 			result.canApplyTemplate =
 				Schema.SObjectType.Event_Track__c.isCreateable() &&
@@ -216,6 +220,30 @@ public with sharing class EventDashboardController {
 				BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed')
 			);
 		}
+	}
+
+	/** R-EXP1 Net Cost, the Budget panel's figure, or null when the event has no budget lines. */
+	private static Decimal netCost(Id eventId) {
+		AggregateResult spend = [
+			SELECT COUNT(Id) lines, SUM(Actual__c) actual
+			FROM Event_Expense__c
+			WHERE Event__c = :eventId
+			WITH USER_MODE
+		];
+		AggregateResult money = [
+			SELECT COUNT(Id) lines, SUM(Received__c) received
+			FROM Event_Funding__c
+			WHERE Event__c = :eventId
+			WITH USER_MODE
+		];
+		if ((Integer) spend.get('lines') == 0 && (Integer) money.get('lines') == 0) {
+			return null;
+		}
+		Decimal actual = (Decimal) spend.get('actual');
+		Decimal received = (Decimal) money.get('received');
+		return (actual == null ? 0 : actual) -
+			(received == null ? 0 : received) -
+			EventBudgetController.registrationsPaid(eventId);
 	}
 
 	private static Boolean hasRecords(Id eventId) {

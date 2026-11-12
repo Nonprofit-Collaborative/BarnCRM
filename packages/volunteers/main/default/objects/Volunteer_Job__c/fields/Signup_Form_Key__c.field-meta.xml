@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Signup_Form_Key__c</fullName>
+  <description>V-09: the sign-up form's record identifier, as text, so Volunteers never depends on Forms.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The BarnCRM Forms form people fill in to sign up for this job's shifts on the public page, by its record ID. The form must be published and public.</inlineHelpText>
+  <label>Sign-Up Form</label>
+  <length>18</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

@@ -31,18 +31,20 @@ public with sharing class GiftImportCredits {
 		String role = picklistValue(
 			Soft_Credit__c.Role__c.getDescribe(),
 			item.value(entity, 'Role__c'),
-			Label.Giving_Import_ErrorSoftCreditRoleUnknown
+			BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditRoleUnknown')
 		);
 		String customRole = item.value(entity, 'Custom_Role__c');
 		if (role == ROLE_OTHER && customRole == null) {
-			throw new GiftImportRow.GiftImportException(Label.Giving_Import_ErrorCustomRoleMissing);
+			throw new GiftImportRow.GiftImportException(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorCustomRoleMissing')
+			);
 		}
 		String amountText = item.value(entity, 'Amount__c');
 		Decimal amount = amountText == null ? item.amount : GiftImportRow.parseAmount(amountText);
 		if (amount == null) {
 			throw new GiftImportRow.GiftImportException(
 				String.format(
-					Label.Giving_Import_ErrorValueUnreadable,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorValueUnreadable'),
 					new List<String>{ amountText, Label.Giving_Import_TargetSoftCreditAmount }
 				)
 			);
@@ -63,12 +65,12 @@ public with sharing class GiftImportCredits {
 		String type = picklistValue(
 			Tribute__c.Type__c.getDescribe(),
 			item.value(entity, 'Type__c'),
-			Label.Giving_Import_ErrorTributeTypeUnknown
+			BarnHelp.text('Giving', 'Giving_Import_ErrorTributeTypeUnknown')
 		);
 		String honoree = item.value(entity, 'Honoree_Name__c');
 		if (honoree == null) {
 			throw new GiftImportRow.GiftImportException(
-				Label.Giving_Import_ErrorTributeHonoreeMissing
+				BarnHelp.text('Giving', 'Giving_Import_ErrorTributeHonoreeMissing')
 			);
 		}
 		item.tribute = new Tribute__c(
@@ -123,7 +125,10 @@ public with sharing class GiftImportCredits {
 			}
 		}
 		throw new GiftImportRow.GiftImportException(
-			String.format(Label.Giving_Import_ErrorSoftCreditPartyChoice, new List<String>{ text })
+			String.format(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditPartyChoice'),
+				new List<String>{ text }
+			)
 		);
 	}
 
@@ -154,7 +159,10 @@ public with sharing class GiftImportCredits {
 			}
 			if (party == null) {
 				if (!(dryRun && item.names(comingFrom))) {
-					item.error = Label.Giving_Import_ErrorSoftCreditPartyMissing;
+					item.error = BarnHelp.text(
+						'Giving',
+						'Giving_Import_ErrorSoftCreditPartyMissing'
+					);
 				}
 			} else if (party.getSObjectType() == Contact.SObjectType) {
 				item.credit.Contact__c = party;
@@ -238,7 +246,7 @@ public with sharing class GiftImportCredits {
 					messages.add(error.getMessage());
 				}
 				owners[index].error = String.format(
-					Label.Giving_Import_ErrorFailed,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorFailed'),
 					new List<String>{ String.join(messages, ' ') }
 				);
 			}

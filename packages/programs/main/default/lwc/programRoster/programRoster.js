@@ -16,8 +16,6 @@ import SHOW_ENDED from '@salesforce/label/c.Programs_Roster_ShowEnded';
 import CAPTION from '@salesforce/label/c.Programs_Roster_Caption';
 import STAGE_FOR from '@salesforce/label/c.Programs_Roster_StageFor';
 import ADDED from '@salesforce/label/c.Programs_Roster_Added';
-import CHANGED from '@salesforce/label/c.Programs_Roster_Changed';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Roster_MoreThanShown';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { format, rosterRows, stageFigures, stageLabel, stageOptions } from './roster';
@@ -164,7 +162,7 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
   }
 
   get moreThanShownText() {
-    return format(MORE_THAN_SHOWN, MAX_SHOWN);
+    return format(helpText('Programs', 'Programs_Roster_MoreThanShown'), MAX_SHOWN);
   }
 
   get hasError() {
@@ -245,7 +243,7 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
     const row = this.enrollments.find((candidate) => candidate.recordId === enrollmentId);
     const who = row ? row.displayName : '';
     return this.run(setStage({ enrollmentId, stage, showEnded: this.showEnded }), (roster) =>
-      format(CHANGED, who, stageLabel(roster, stage))
+      format(helpText('Programs', 'Programs_Roster_Changed'), who, stageLabel(roster, stage))
     );
   }
 

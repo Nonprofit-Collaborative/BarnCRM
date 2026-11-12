@@ -36,7 +36,9 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 			try {
 				Database.delete(notes, true, AccessLevel.USER_MODE);
 			} catch (Exception refused) {
-				throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+				throw new PersonErasure.ErasureException(
+					BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin')
+				);
 			}
 			changes.add(
 				new PersonErasure.Change(
@@ -57,7 +59,9 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 			try {
 				Database.delete(referrals, true, AccessLevel.USER_MODE);
 			} catch (Exception refused) {
-				throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+				throw new PersonErasure.ErasureException(
+					BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin')
+				);
 			}
 			changes.add(
 				new PersonErasure.Change(
@@ -79,7 +83,9 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 			try {
 				Database.delete(goals, true, AccessLevel.USER_MODE);
 			} catch (Exception refused) {
-				throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+				throw new PersonErasure.ErasureException(
+					BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin')
+				);
 			}
 			changes.add(
 				new PersonErasure.Change(
@@ -99,7 +105,7 @@ public with sharing class ProgramsErasureExtension implements PersonErasureExten
 					Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 						.getLabelPlural(),
 					enrollments,
-					Label.Programs_Erase_EnrollmentsKept
+					BarnHelp.text('Programs', 'Programs_Erase_EnrollmentsKept')
 				)
 			);
 		}

@@ -15,6 +15,7 @@ public with sharing class GiftImportRow {
 
 	public static final String ATTRIBUTE_DONOR = 'Donor';
 	public static final String ATTRIBUTE_APPEAL = 'Appeal';
+	public static final String ATTRIBUTE_BRAND = 'Brand';
 	public static final String ATTRIBUTE_FUND = 'Fund';
 	public static final String ATTRIBUTE_AMOUNT = 'Amount';
 	public static final String ATTRIBUTE_PERCENT = 'Percent';
@@ -92,6 +93,9 @@ public with sharing class GiftImportRow {
 	public String externalId;
 	public String appeal;
 	public Id appealId;
+	/** C-47d: the brand named with `Gift.Brand`, and the one it was found to be. */
+	public String brand;
+	public Id brandId;
 	public String donorChoice;
 	/** The single fund named with `Allocation.Fund`, or null. */
 	public Part singleFund;
@@ -184,8 +188,8 @@ public with sharing class GiftImportRow {
 				// Allocations, credits and tributes need a gift to hang on (R-GI1).
 				fail(
 					namesGift
-						? Label.Giving_Import_ErrorAmountMissing
-						: Label.Giving_Import_ErrorPartsWithoutGift
+						? BarnHelp.text('Giving', 'Giving_Import_ErrorAmountMissing')
+						: BarnHelp.text('Giving', 'Giving_Import_ErrorPartsWithoutGift')
 				);
 				return;
 			}
@@ -194,7 +198,9 @@ public with sharing class GiftImportRow {
 			readGiftValues();
 			if (values.get(Gift__c.Type__c) == null) {
 				// The gift's type is required, and a guessed one would be wrong on a receipt.
-				throw new GiftImportException(Label.Giving_Import_ErrorTypeMissing);
+				throw new GiftImportException(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorTypeMissing')
+				);
 			}
 			readAllocations();
 		} catch (GiftImportException unreadable) {
@@ -222,15 +228,22 @@ public with sharing class GiftImportRow {
 		Decimal parsed = parseAmount(text);
 		if (parsed == null) {
 			throw new GiftImportException(
-				String.format(Label.Giving_Import_ErrorAmountUnreadable, new List<String>{ text })
+				String.format(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorAmountUnreadable'),
+					new List<String>{ text }
+				)
 			);
 		}
 		readableAmount = parsed;
 		if (inKind && parsed != 0) {
-			throw new GiftImportException(Label.Giving_Import_ErrorInKindAmount);
+			throw new GiftImportException(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorInKindAmount')
+			);
 		}
 		if (!inKind && parsed <= 0) {
-			throw new GiftImportException(Label.Giving_Import_ErrorAmountNotPositive);
+			throw new GiftImportException(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorAmountNotPositive')
+			);
 		}
 		amount = parsed;
 	}
@@ -251,12 +264,17 @@ public with sharing class GiftImportRow {
 	private void readDate() {
 		String text = value(ENTITY_GIFT, 'Gift_Date__c');
 		if (text == null) {
-			throw new GiftImportException(Label.Giving_Import_ErrorDateMissing);
+			throw new GiftImportException(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorDateMissing')
+			);
 		}
 		giftDate = parseDate(text);
 		if (giftDate == null) {
 			throw new GiftImportException(
-				String.format(Label.Giving_Import_ErrorDateUnreadable, new List<String>{ text })
+				String.format(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorDateUnreadable'),
+					new List<String>{ text }
+				)
 			);
 		}
 	}
@@ -275,7 +293,10 @@ public with sharing class GiftImportRow {
 			}
 		}
 		throw new GiftImportException(
-			String.format(Label.Giving_Import_ErrorDonorChoice, new List<String>{ text })
+			String.format(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorDonorChoice'),
+				new List<String>{ text }
+			)
 		);
 	}
 
@@ -285,6 +306,7 @@ public with sharing class GiftImportRow {
 	 */
 	private void readGiftValues() {
 		appeal = value(ENTITY_GIFT, ATTRIBUTE_APPEAL);
+		brand = value(ENTITY_GIFT, ATTRIBUTE_BRAND);
 		externalId = value(ENTITY_GIFT, 'External_Id__c');
 		Map<String, String> held = entities.get(ENTITY_GIFT.toLowerCase());
 		if (held == null) {
@@ -298,7 +320,8 @@ public with sharing class GiftImportRow {
 				attribute == 'amount__c' ||
 				attribute == 'gift_date__c' ||
 				attribute == ATTRIBUTE_DONOR.toLowerCase() ||
-				attribute == ATTRIBUTE_APPEAL.toLowerCase()
+				attribute == ATTRIBUTE_APPEAL.toLowerCase() ||
+				attribute == ATTRIBUTE_BRAND.toLowerCase()
 			) {
 				continue;
 			}
@@ -385,7 +408,7 @@ public with sharing class GiftImportRow {
 			if (part.fund == null || (part.amount == null) == (part.percent == null)) {
 				throw new GiftImportException(
 					String.format(
-						Label.Giving_Import_ErrorSplitPartIncomplete,
+						BarnHelp.text('Giving', 'Giving_Import_ErrorSplitPartIncomplete'),
 						new List<String>{ String.valueOf(part.index) }
 					)
 				);
@@ -396,12 +419,12 @@ public with sharing class GiftImportRow {
 			percentTotal += part.percent == null ? 0 : part.percent;
 		}
 		if (anyAmount && anyPercent) {
-			throw new GiftImportException(Label.Giving_Import_ErrorSplitMixed);
+			throw new GiftImportException(BarnHelp.text('Giving', 'Giving_Import_ErrorSplitMixed'));
 		}
 		if (anyAmount && amountTotal.setScale(2) != amount.setScale(2)) {
 			throw new GiftImportException(
 				String.format(
-					Label.Giving_Import_ErrorSplitAmountsDiffer,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorSplitAmountsDiffer'),
 					new List<String>{
 						amountTotal.setScale(2).format(),
 						amount.setScale(2).format()
@@ -412,7 +435,7 @@ public with sharing class GiftImportRow {
 		if (anyPercent && percentTotal != 100) {
 			throw new GiftImportException(
 				String.format(
-					Label.Giving_Import_ErrorSplitPercentsDiffer,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorSplitPercentsDiffer'),
 					new List<String>{ percentTotal.format() }
 				)
 			);
@@ -424,7 +447,7 @@ public with sharing class GiftImportRow {
 		if (parsed == null) {
 			throw new GiftImportException(
 				String.format(
-					Label.Giving_Import_ErrorValueUnreadable,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorValueUnreadable'),
 					new List<String>{ text, column }
 				)
 			);
@@ -507,7 +530,7 @@ public with sharing class GiftImportRow {
 		}
 		throw new GiftImportException(
 			String.format(
-				Label.Giving_Import_ErrorTypeUnknown,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorTypeUnknown'),
 				new List<String>{ text, String.join(accepted, ', ') }
 			)
 		);
@@ -543,7 +566,7 @@ public with sharing class GiftImportRow {
 		if (result == null) {
 			throw new GiftImportException(
 				String.format(
-					Label.Giving_Import_ErrorValueUnreadable,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorValueUnreadable'),
 					new List<String>{ text, field.getLabel() }
 				)
 			);

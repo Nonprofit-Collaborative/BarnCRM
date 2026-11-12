@@ -67,7 +67,7 @@ public with sharing class VolunteerSignupService {
 					: shift.Name;
 				signup.addError(
 					String.format(
-						Label.Volunteers_Signup_AlreadySignedUp,
+						BarnHelp.text('Volunteers', 'Volunteers_Signup_AlreadySignedUp'),
 						new List<String>{ shiftName }
 					)
 				);
@@ -130,7 +130,7 @@ public with sharing class VolunteerSignupService {
 				// Attendance is still saved; the Error Log says which hours to type by hand.
 				skipped.add(
 					String.format(
-						Label.Volunteers_Signup_NoHoursWritten,
+						BarnHelp.text('Volunteers', 'Volunteers_Signup_NoHoursWritten'),
 						new List<String>{ String.valueOf(signup.Id) }
 					)
 				);
@@ -187,7 +187,9 @@ public with sharing class VolunteerSignupService {
 		for (Volunteer_Hours__c entry : restored) {
 			Integer named = entriesBySignup.get(entry.Volunteer_Signup__c);
 			if (named != null && named > 1) {
-				entry.addError(Label.Volunteers_Hours_SecondEntryForSignup);
+				entry.addError(
+					BarnHelp.text('Volunteers', 'Volunteers_Hours_SecondEntryForSignup')
+				);
 			}
 		}
 	}

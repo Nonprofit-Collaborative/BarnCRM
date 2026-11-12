@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Estimated_Hours__c</fullName>
+  <inlineHelpText>The tasks' estimates added up, not counting Cancelled ones.</inlineHelpText>
+  <label>Estimated Hours</label>
+  <summarizedField>Project_Task__c.Estimated_Hours__c</summarizedField>
+  <summaryFilterItems>
+    <field>Project_Task__c.Status__c</field>
+    <operation>notEqual</operation>
+    <value>Cancelled</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Project_Task__c.Project__c</summaryForeignKey>
+  <summaryOperation>sum</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Budget_Line__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The grant budget line a Spent entry pays for. Only Spent entries count toward a line.</inlineHelpText>
+  <label>Budget Line</label>
+  <referenceTo>Grant_Budget_Line__c</referenceTo>
+  <relationshipLabel>Restricted Fund Entries</relationshipLabel>
+  <relationshipName>Fund_Entries</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

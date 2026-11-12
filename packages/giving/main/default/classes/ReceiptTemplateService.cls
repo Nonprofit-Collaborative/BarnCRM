@@ -43,7 +43,9 @@ public with sharing class ReceiptTemplateService {
 			template = ReceiptSelector.activeTemplate(receiptType);
 		}
 		if (template == null || String.isBlank(template.Body__c)) {
-			throw new ReceiptTemplateException(Label.Giving_Receipt_NoActiveTemplate);
+			throw new ReceiptTemplateException(
+				BarnHelp.text('Giving', 'Giving_Receipt_NoActiveTemplate')
+			);
 		}
 		return template.Body__c;
 	}
@@ -96,7 +98,9 @@ public with sharing class ReceiptTemplateService {
 			}
 		}
 		if (chosen == null) {
-			throw new ReceiptTemplateException(Label.Giving_Receipt_TemplateNotFound);
+			throw new ReceiptTemplateException(
+				BarnHelp.text('Giving', 'Giving_Receipt_TemplateNotFound')
+			);
 		}
 		for (Receipt_Template__c template : ReceiptSelector.allTemplates()) {
 			if (
@@ -117,7 +121,9 @@ public with sharing class ReceiptTemplateService {
 	public static void saveBody(Id templateId, String body) {
 		requireManagePermission();
 		if (String.isBlank(body)) {
-			throw new ReceiptTemplateException(Label.Giving_Receipt_EmptyTemplate);
+			throw new ReceiptTemplateException(
+				BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate')
+			);
 		}
 		Database.update(
 			new List<Receipt_Template__c>{
@@ -159,7 +165,9 @@ public with sharing class ReceiptTemplateService {
 	public static String preview(String receiptType, String body) {
 		requireManagePermission();
 		if (String.isBlank(body)) {
-			throw new ReceiptTemplateException(Label.Giving_Receipt_EmptyTemplate);
+			throw new ReceiptTemplateException(
+				BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate')
+			);
 		}
 		Date today = Date.today();
 		String donor = Label.Giving_Receipt_PreviewDonor;
@@ -214,7 +222,9 @@ public with sharing class ReceiptTemplateService {
 
 	private static void requireManagePermission() {
 		if (!canManageTemplates()) {
-			throw new ReceiptTemplateException(Label.Giving_Receipt_NoTemplatePermission);
+			throw new ReceiptTemplateException(
+				BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission')
+			);
 		}
 	}
 

@@ -16,20 +16,4 @@
         <shortDescription>Funder Report card download button</shortDescription>
         <value>Download Printable</value>
     </labels>
-    <labels>
-        <fullName>Funders_Report_NoTemplates</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Funder Report card with no active template</shortDescription>
-        <value>No active report template. A Funders admin adds one on the Funder Report Templates tab.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Report_ErrorLoad</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Funder Report card could not load</shortDescription>
-        <value>The report could not be prepared. Reload the page; if it happens again, tell your BarnCRM admin.</value>
-    </labels>
 </CustomLabels>

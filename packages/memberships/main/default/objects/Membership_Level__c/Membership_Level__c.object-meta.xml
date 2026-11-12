@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>A kind of membership the organization sells: type and tier, dues, term and grace days (canonical model 29MEM1).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Membership Level</label>
+  <nameField>
+    <label>Level Name</label>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Membership Levels</pluralLabel>
+  <searchLayouts>
+    <searchResultsAdditionalFields>Type__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Tier__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Dues__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Active__c</searchResultsAdditionalFields>
+  </searchLayouts>
+  <sharingModel>Read</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

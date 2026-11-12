@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Exactly_One_Record</fullName>
+  <active>true</active>
+  <description>R-BR9: a brand assignment names exactly one of Contact, Account or User.</description>
+  <errorConditionFormula>IF(ISBLANK(Contact__c), 0, 1) + IF(ISBLANK(Account__c), 0, 1) + IF(ISBLANK(User__c), 0, 1) &lt;&gt; 1</errorConditionFormula>
+  <errorMessage>Fill in exactly one of Contact, Account or User.</errorMessage>
+</ValidationRule>

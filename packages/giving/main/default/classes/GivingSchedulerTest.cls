@@ -57,7 +57,7 @@ private class GivingSchedulerTest {
 			);
 			Assert.areEqual(
 				String.format(
-					System.Label.Giving_NightlyJobs_OverdueSummaryFormat,
+					BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueSummaryFormat'),
 					new List<String>{ '1' }
 				),
 				settings.Installment_Overdue_Last_Run_Summary__c,
@@ -111,7 +111,7 @@ private class GivingSchedulerTest {
 				'A pass that found nothing still records that it ran, so a blank stamp means it has never run.'
 			);
 			Assert.areEqual(
-				System.Label.Giving_NightlyJobs_OverdueNoneFound,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueNoneFound'),
 				settings.Installment_Overdue_Last_Run_Summary__c,
 				'The page says the pass found nothing overdue rather than leaving the reader to guess.'
 			);
@@ -145,7 +145,7 @@ private class GivingSchedulerTest {
 			);
 			Assert.areEqual(
 				String.format(
-					System.Label.Giving_NightlyJobs_TopUpSummaryFormat,
+					BarnHelp.text('Giving', 'Giving_NightlyJobs_TopUpSummaryFormat'),
 					new List<String>{ '1', '0' }
 				),
 				settings.Installment_Top_Up_Last_Run_Summary__c,

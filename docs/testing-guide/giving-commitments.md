@@ -2,7 +2,7 @@
 
 Scripts for pledges and recurring gifts: payment schedules, paying a payment with a gift, pausing, cancelling, refunds and the overdue pass. Setup detail: [Commitments: pledges and recurring gifts](../admin-guide/commitments.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). The payment records' tab is labelled **Pledge Payments** (once it is in the app's navigation; until then open it from the app launcher). Leave the **Import** settings **Days either side of a payment's due date** (7) and **Amount difference allowed** (0) at their defaults.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). The payment records' tab is labelled **Scheduled Payments** (once it is in the app's navigation; until then open it from the app launcher). Leave the **Import** settings **Days either side of a payment's due date** (7) and **Amount difference allowed** (0) at their defaults.
 
 ## T-COM-01: Create a Pledge and See Its Schedule
 
@@ -16,7 +16,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | **Person** `Luis Garcia` (the picker shows his email under the name), **Pledge Total** `1200`, **How Often** `Monthly`, **First Payment Date** today, **Number of Payments** `12`. | The **Payment Schedule** line reads "12 payments of $100.00, the last one $100.00 on" a date eleven months from today. |
 | 3 | Clear **Number of Payments** and set **Last Payment Date** eleven months from today. Then type `12` in **Number of Payments** again. | The line shows the same 12 payments. Typing the number clears **Last Payment Date**. |
 | 4 | Change **Pledge Total** to `1000`. | The line reads "12 payments of $83.33, the last one $83.37 on" the same date. Set it back to `1200`. |
-| 5 | Click **Save**. | The commitment opens on its record page. **Status** Active, **Expected Total** 1,200.00, **Amount** 100.00, **Installments Planned** 12, **Household** The Garcia Family. |
+| 5 | Click **Save**. | The commitment opens on its record page. **Status** Active, **Expected Total** 1,200.00, **Amount** 100.00, **Payments Planned** 12, **Household** The Garcia Family. |
 | 6 | Look at the **Payment Schedule** card. | A **Total Expected** tile of $1,200.00, then 12 rows, **Number** 1 to 12, first **Due Date** today, monthly after that, each **Expected** 100.00 and **Status** Scheduled (a grey badge). The card shows **Pause**, **Mark Complete** and, last in red text, **Cancel Commitment**. |
 | 7 | Read **Paid To Date** and **Balance** (refresh after a few seconds if empty). | **Paid To Date** 0.00 (or empty), **Balance** 1,200.00. |
 | 8 | Open the **Commitments** tab, list view **Active Pledges**. | The new pledge is listed with the sample pledges. |
@@ -72,8 +72,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Set **Pays** to **None: a new gift on its own**, then choose the payment again. | Your choice stays as you set it. |
 | 4 | Click **Save**, then **Create Gifts**. | "Gifts created: 1 from this batch." |
 | 5 | Open the pledge. | That payment is Paid; **Paid To Date** rose and **Balance** fell by the amount. |
-| 6 | Open the gift the batch made. | **Commitment** names the pledge and **Installment** the payment. |
-| 7 | Note the pledge's next Scheduled payment. On the **Gifts** tab click **New**: the pledge's donor, **Amount** that payment's amount, **Payment Method** `Check`, **Commitment** the pledge, **Installment** that payment. Save, then open the pledge. | That payment is Paid and **Balance** fell by its amount. |
+| 6 | Open the gift the batch made. | **Commitment** names the pledge and **Scheduled Payment** the payment. |
+| 7 | Note the pledge's next Scheduled payment. On the **Gifts** tab click **New**: the pledge's donor, **Amount** that payment's amount, **Payment Method** `Check`, **Commitment** the pledge, **Scheduled Payment** that payment. Save, then open the pledge. | That payment is Paid and **Balance** fell by its amount. |
 
 **Cleanup:** none.
 
@@ -110,16 +110,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-COM-07: Nightly Jobs and Overdue Payments
 
-**Purpose:** confirm the three Giving jobs switch on as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run), run on demand, and fill the Overdue list view.
-**Prerequisites:** admin.
+**Purpose:** confirm the five Giving jobs (the pledge reminders among them, G-37) switch on as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run), run on demand, and fill the Overdue list view.
+**Prerequisites:** admin; **Send Pledge Reminders** off (as shipped).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Nightly Jobs**, **Open**. | Card **Nightly Jobs** with "The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own." and **Schedule Nightly Run**. |
+| 1 | Open **BarnCRM Settings**, **Giving**, **Nightly Jobs**, **Open**. | Card **Nightly Jobs** with "The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own." and **Schedule Nightly Run**. Five jobs are listed: **Payment Schedule Top Up**, **Overdue Pass**, **Donor Levels**, **Pledge Reminders** and **Ask Reminders**. |
 | 2 | Click **Schedule Nightly Run**. | "The nightly jobs are scheduled." Each job shows a **Next Run**. **Stop Nightly Run** and **Run the Jobs Now** show. |
-| 3 | Click **Run the Jobs Now**. | "The top up and the overdue pass have started. Refresh this page in a minute to see what they did." |
+| 2a | Open **Pledge Reminders**. | **Run every night** is on, and the page still says reminders are off: scheduling sends nothing while **Send Pledge Reminders** is off. |
+| 2b | On **Pledge Reminders**, turn **Run every night** off, then go back to **Nightly Jobs**. | The page still says the nightly jobs are scheduled: stopping the reminders leaves the other four running. Turn **Run every night** on again. |
+| 3 | Click **Run the Jobs Now**. | "The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did." No pledge reminder is sent or logged. |
 | 4 | Refresh after a minute. | **Last Run** for the top up and the overdue pass shows a time and a result line (for example a count of payments marked overdue, or that none were). |
-| 5 | Open the **Pledge Payments** tab, list view **Overdue**. | Lists payments with **Status** Overdue, including the sample monthly donor's three overdue payments. Each is more than the grace days (5) past due. |
+| 5 | Open the **Scheduled Payments** tab, list view **Overdue**. | Lists payments with **Status** Overdue, including the sample monthly donor's three overdue payments. Each is more than the grace days (5) past due. |
 | 6 | Switch to **Upcoming 30 Days**. | Payments due in the next 30 days. |
 | 7 | Back on **Nightly Jobs**, click **Stop Nightly Run** (undo). | The not-scheduled message returns. Payments already Overdue stay Overdue. |
 
@@ -133,7 +135,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the pledge, choose **Delete**, confirm. | Refused: "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead." |
-| 2 | Open one of its Paid payments from the **Pledge Payments** tab, choose **Delete**. | Refused: "This payment cannot be deleted because a gift has been received against it. Mark it Skipped instead." |
+| 2 | Open one of its Paid payments from the **Scheduled Payments** tab, choose **Delete**. | Refused: "This payment cannot be deleted because a gift has been received against it. Mark it Skipped instead." |
 | 3 | Open the pledge's donor (Carmen Torres), choose **Delete**. | Refused: "This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment or change its donor first. Merging a duplicate still works." |
 
 **Cleanup:** none.
@@ -162,7 +164,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Open the **Commitments** tab and the list view menu. | **All Commitments**, **My Commitments**, **Active Pledges**, **Active Recurring Gifts** and **Paused Commitments** are listed. |
 | 2 | Choose **All Commitments**. | Every commitment shows, with Type, Amount, Frequency and Status columns. |
 | 3 | Pause a sample recurring gift (see T-COM-06) and choose **Paused Commitments**. | It shows there and has left **Active Recurring Gifts**. Resume it afterwards. |
-| 4 | Open the **Pledge Payments** tab and the list view menu. | **All Installments**, **Overdue** and **Upcoming 30 Days** are listed. **All Installments** shows every payment. The tab, list headers and record pages say **Pledge Payment**, not Installment. |
+| 4 | Open the **Scheduled Payments** tab and the list view menu. | **All Scheduled Payments**, **Overdue** and **Upcoming 30 Days** are listed. **All Scheduled Payments** shows every payment. The tab, list headers and record pages say **Scheduled Payment**, not Installment or Pledge Payment (G-36). |
+| 5 | Open a gift that paid a payment, and a commitment's **Details**. | The gift's lookup reads **Scheduled Payment**; the commitment shows **Payments Planned**. The words are commitment for the record, pledge and recurring gift for its kinds, scheduled payment for each payment. |
 
 **Cleanup:** resume the paused commitment.
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Turn on field history</label>
+  <protected>true</protected>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Checkbox</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value
+      xsi:type="xsd:string"
+    >Turn this on to keep every change to the fields you choose on BarnCRM records (gifts, shifts, programs and more), beyond Salesforce's 20 tracked fields, with who changed it and when. Choose the fields on the Custom Metadata page under History Fields, as Object.Field (for example Address__c.City__c). The history shows on the Field History card and in the Record Inspector, and an admin can put an earlier value back. It is off until you turn it on.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">field-history.md</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">Field History</value>
+  </values>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Field_History_Enabled__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">10</value>
+  </values>
+</CustomMetadata>

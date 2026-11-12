@@ -59,7 +59,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 2 | Click `Reads at home`. Click **Add Indicator**: name `Students reading daily`, unit `students`, baseline `10`, **Save**. | The indicator shows `Unit: students. Better when Higher. Baseline: 10.` `Reads at home has no indicator.` leaves **Things to Look At**. |
 | 3 | Under it click **Add Period**: `2026 Q1`, 1 January 2026 to 31 March 2026, target `30`, result `20`. **Save**. | **Progress** shows a half bar with `50%`. Target and result are right-aligned. |
 | 4 | Click **Edit** on the row, change the result to `30`, **Save**. | **Progress** shows a full bar with `Met`. |
-| 5 | Add another period with the same dates. | Refused: `This indicator already has a period with these dates. Change that row instead.` |
+| 5 | Add another period with the same dates. | As soon as both dates are picked the form shows, in red under the dates, `This indicator already has a period with these dates. Change that row instead.` and **Save** is disabled. Change the end date: the message goes and **Save** is enabled. Edit the existing row: no message (its own dates). |
 | 6 | Add a period with an end date before its start date. | The save is refused with the end date message. |
 | 7 | Click **Edit** on `Reads at home` and open **Column**. | Only output and outcome columns are offered. |
 
@@ -143,7 +143,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 
 ## T-LM-09: The Logic Model Report
 
-**Purpose:** confirm the report compares chosen periods and downloads as CSV and a printable page.
+**Purpose:** confirm the report compares chosen periods and downloads as CSV, a printable page and a PDF.
 **Prerequisites:** staff and read-only, the model from T-LM-03. On `Students reading daily` add
 periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2026 Q4` and
 `2027 Q1` (three months each, target 30, no result).
@@ -155,9 +155,9 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 3 | Add a period with `2026 Q2`'s dates to another indicator, named `Spring`. | The report still lists one period for those dates; the other indicator's row fills its cells. An indicator without a period shows empty cells. |
 | 4 | Change a result in the builder and save. | The report shows the new result without reloading; the ticked periods stay ticked. |
 | 5 | Click **Download CSV**. Open the file. | Columns `Column`, `Part`, `Indicator`, `Unit`, `Better When`, `Baseline`, `Baseline Date`, then `Target`, `Result`, `Progress` for each ticked period, headed with its name. |
-| 6 | Click **Download Printable Report**, open the file in a browser and print preview. | The model's name, whose model it is, today's date and the table; the header repeats on each printed page. |
-| 7 | Untick every period. | `Choose at least one period to compare.` shows; both download buttons are disabled. |
-| 8 | As read-only, open the model. | The report shows and both downloads work. |
+| 6 | Click **Download Printable Report**, open the file in a browser and print preview. Then click **Download PDF** and open the PDF. | The model's name, whose model it is, today's date and the table; the header repeats on each printed page; the print preview is landscape. The PDF (`Logic_Model_Report-<date>.pdf`) shows the same title, line and table, landscape, with values such as `<held>` in a part name shown as typed. |
+| 7 | Untick every period. | `Choose at least one period to compare.` shows; all three download buttons are disabled. |
+| 8 | As read-only, open the model. | The report shows and all three downloads work. |
 
 **Cleanup:** None.
 
@@ -212,3 +212,20 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 8 | As read-only, open the model. | No handles and no drag hint. |
 
 **Cleanup:** Delete `Books` and the arrow, if saved.
+
+## T-LM-13: Evidence for an Assumption
+
+**Purpose:** confirm an arrow's evidence log adds, lists, changes and removes evidence, and that read-only users only see it (L-05).
+**Prerequisites:** staff, the model from T-LM-02 with the arrow `Weekly sessions` to `Sessions held`; a read-only user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Select `Weekly sessions`. Under the arrow to `Sessions held`, click **Assumption Evidence (0)**. | The log opens and says no evidence is recorded yet. **Add** shows. |
+| 2 | Click **Add**, type What It Shows `Staff saw more reading logs`, Source `Staff observation`, leave Date blank, and **Save**. | The status says `Saved.`; the log shows **Moderate** and the text. The toggle reads **Assumption Evidence (1)**. |
+| 3 | Add another: What It Shows `Attendance doubled`, Source `2025 program records`, Source Link `https://example.org`, Date 30 June 2025, Strength **Strong**. | It is listed first, with **Strong**, the source, the date and a **Source Link** that opens in a new tab. |
+| 4 | Click **Save** with What It Shows empty on a new piece. | Refused in the form: the field is required. |
+| 5 | **Edit** the first piece and set Strength **Challenges**; then **Remove** the other and confirm. | One piece left, with **Challenges**. |
+| 6 | As read-only, open the model and the same arrow's **Assumption Evidence**. | The piece shows; no **Add**, **Edit** or **Remove**. |
+| 7 | As staff, remove the arrow. | The arrow and its evidence are gone. |
+
+**Cleanup:** Add the arrow back if later scripts need it.

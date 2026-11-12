@@ -66,7 +66,10 @@ private class CommitmentDonorDeleteGuardTest {
 			String refusal = deleteRefusal(new Contact(Id = ana().Id));
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Commitment_DonorDeleteBlocked, refusal);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
+				refusal
+			);
 			Assert.areEqual(
 				ana().Id,
 				[SELECT Donor_Contact__c FROM Commitment__c WHERE Id = :pledge.Id].Donor_Contact__c,
@@ -87,7 +90,10 @@ private class CommitmentDonorDeleteGuardTest {
 			String onceCancelled = deleteRefusal(new Contact(Id = ana().Id));
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Commitment_DonorDeleteBlocked, whileActive);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
+				whileActive
+			);
 			Assert.isNull(onceCancelled, 'A cancelled pledge does not hold Ana.');
 		}
 	}
@@ -102,7 +108,10 @@ private class CommitmentDonorDeleteGuardTest {
 			String refusal = deleteRefusal(new Account(Id = ana().AccountId));
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Commitment_DonorDeleteBlocked, refusal);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
+				refusal
+			);
 		}
 	}
 
@@ -116,7 +125,10 @@ private class CommitmentDonorDeleteGuardTest {
 			String refusal = deleteRefusal(riverside);
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Commitment_DonorDeleteBlocked, refusal);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'),
+				refusal
+			);
 		}
 	}
 

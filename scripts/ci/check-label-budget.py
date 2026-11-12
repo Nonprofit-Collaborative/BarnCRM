@@ -49,8 +49,17 @@ import sys
 # thing (Super Importer, Opportunity Mirror, Gift Transaction Mirror, Seasonal Address Swap, "or").
 # Raised by 1 for Mirror_Sync_Compare: Mirror's two pages read a Rollups label before.
 # Lowered to 3,254 after merging two more same-text pairs (Households, Choose a kind of record).
-BUDGET = 3254
-TARGET = 3000
+# Raised by 1 for Volunteers_Access_AddOnCoordinator: Volunteers Coordinator becomes an Access page
+# extra permission (simpler permission sets, D1); the Mirror merge in the same release removes 3.
+# Combined build (landing/batch-d-i): set to the merged total, 3,258, for C-62 Merge Records' three
+# labels (C-67 used the last three); AR-01b (release 1.19) moves module messages out and lowers it.
+# Raised to 3,259 for the Migration Assistant (MIG-01, MIG-08) merged total, and to 3,261 for the
+# Volunteers hour value card and thank-you nightly step name (V-12, V-13).
+# AR-01b (release 1.19, D-172): 834 module messages moved to the help catalogs; lowered to the
+# merged total, 2,427. TARGET follows plan AR-01's expected suite of about 2,400.
+# W10: Programs_NightlyJobs_SchedulesName moved to the Programs help catalog; lowered to 2,426.
+BUDGET = 2426
+TARGET = 2400
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
 HELP_WORDS = {

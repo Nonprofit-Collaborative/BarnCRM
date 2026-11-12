@@ -414,7 +414,7 @@ public with sharing class RollupService {
 				// Turned off since the merge (ADR-0125 decision 9): the survivors wait in the
 				// queue, which Turn on drains.
 				ErrorLogger.logMessage(
-					System.Label.Core_Rollups_RunStoppedTurnedOff,
+					BarnHelp.text('Rollups', 'Core_Rollups_RunStoppedTurnedOff'),
 					CONTEXT_REAL_TIME,
 					ErrorLogger.SEVERITY_INFO
 				);
@@ -792,7 +792,9 @@ public with sharing class RollupService {
 	public static void recalculate(Id definitionId) {
 		Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 		if (definition == null) {
-			throw new RollupServiceException(System.Label.Core_Rollups_ErrorUnknownDefinition);
+			throw new RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition')
+			);
 		}
 		runFullRecalculation(new List<Rollup_Definition__c>{ definition });
 	}

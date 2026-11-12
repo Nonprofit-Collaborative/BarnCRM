@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Engagement_Score_Weights__c</fullName>
+  <defaultValue>&quot;Gifts 40, Hours 25, Events 20, Activity 15&quot;</defaultValue>
+  <description>Each engagement score part's weight, a name and a whole number per part (C-64, canonical model R-ES3). A part left out or unreadable reads as its default.</description>
+  <inlineHelpText>How much gifts, hours, events and activity each count toward the score.</inlineHelpText>
+  <label>Engagement Score Weights</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

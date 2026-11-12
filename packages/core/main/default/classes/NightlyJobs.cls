@@ -48,7 +48,13 @@ public with sharing class NightlyJobs {
 		'ProgramsNightlyJobProvider',
 		'LogicModelsNightlyJobProvider',
 		'FundersNightlyJobProvider',
-		'EventsNightlyJobProvider'
+		'EventsNightlyJobProvider',
+		'CorporateHubNightlyJobProvider',
+		'ScholarshipsNightlyJobProvider',
+		'TerritoryNightlyJobProvider',
+		'MembershipsNightlyJobProvider',
+		'ProjectsNightlyJobProvider',
+		'AddressVerificationNightlyJobProvider'
 	};
 
 	/** Separate schedules of steps that became part of another step: adopted, then aborted. */
@@ -141,6 +147,7 @@ public with sharing class NightlyJobs {
 			RecordRetentionBatch.step(),
 			SetupChangeCopyJob.step(),
 			EmptyHouseholdTidyScheduler.step(),
+			EngagementScoreJob.step(),
 			ErrorDigestScheduler.step()
 		};
 	}

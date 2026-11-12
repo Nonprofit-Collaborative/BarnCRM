@@ -100,10 +100,10 @@ public with sharing class GrantPaymentService {
 		];
 		Grant__c grant = grants.isEmpty() ? null : grants[0];
 		if (!canBuild(grant, grant == null ? 0 : livePayments(grantId))) {
-			throw new PaymentException(Label.Funders_Schedule_CannotBuild);
+			throw new PaymentException(BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'));
 		}
 		if (rows == null || rows.isEmpty() || rows.size() > MAX_PAYMENTS) {
-			throw new PaymentException(Label.Funders_Schedule_ErrorRows);
+			throw new PaymentException(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'));
 		}
 		Decimal total = 0;
 		List<Grant_Payment__c> payments = new List<Grant_Payment__c>();
@@ -116,7 +116,7 @@ public with sharing class GrantPaymentService {
 				row.dueDate < grant.Award_Start_Date__c ||
 				row.dueDate > grant.Award_End_Date__c
 			) {
-				throw new PaymentException(Label.Funders_Schedule_ErrorRows);
+				throw new PaymentException(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'));
 			}
 			total += row.amount;
 			payments.add(
@@ -129,7 +129,7 @@ public with sharing class GrantPaymentService {
 			);
 		}
 		if (total != grant.Amount_Awarded__c) {
-			throw new PaymentException(Label.Funders_Schedule_ErrorRows);
+			throw new PaymentException(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'));
 		}
 		Database.insert(payments, AccessLevel.USER_MODE);
 		if (String.isNotBlank(frequency)) {

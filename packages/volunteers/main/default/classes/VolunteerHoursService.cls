@@ -80,7 +80,9 @@ public with sharing class VolunteerHoursService {
 	public static StatusChange reject(Set<Id> hoursIds, String reason) {
 		requirePermission();
 		if (String.isBlank(reason)) {
-			throw new VolunteerHoursException(Label.Volunteers_Hours_RejectionReasonRequired);
+			throw new VolunteerHoursException(
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_RejectionReasonRequired')
+			);
 		}
 		String trimmed = reason.trim().abbreviate(255);
 		Datetime now = Datetime.now();
@@ -123,7 +125,9 @@ public with sharing class VolunteerHoursService {
 			Boolean allowed =
 				named == STATUS_SUBMITTED || (named == STATUS_APPROVED && !approvalRequired);
 			if (!allowed) {
-				entry.addError(Label.Volunteers_Hours_StatusThroughApproval);
+				entry.addError(
+					BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')
+				);
 				continue;
 			}
 			if (approvalRequired) {
@@ -159,7 +163,9 @@ public with sharing class VolunteerHoursService {
 				entry.Approved_Date__c != previous.Approved_Date__c ||
 				entry.Rejection_Reason__c != previous.Rejection_Reason__c
 			) {
-				entry.addError(Label.Volunteers_Hours_StatusThroughApproval);
+				entry.addError(
+					BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')
+				);
 			}
 		}
 	}
@@ -171,7 +177,9 @@ public with sharing class VolunteerHoursService {
 	public static void refuseDeletingApproved(List<Volunteer_Hours__c> entries) {
 		for (Volunteer_Hours__c entry : entries) {
 			if (entry.Status__c == STATUS_APPROVED) {
-				entry.addError(Label.Volunteers_Hours_ApprovedNotDeletable);
+				entry.addError(
+					BarnHelp.text('Volunteers', 'Volunteers_Hours_ApprovedNotDeletable')
+				);
 			}
 		}
 	}
@@ -230,7 +238,9 @@ public with sharing class VolunteerHoursService {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new VolunteerHoursException(Label.Volunteers_Hours_NeedManagePermission);
+			throw new VolunteerHoursException(
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission')
+			);
 		}
 	}
 

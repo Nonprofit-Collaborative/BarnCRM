@@ -5,6 +5,6 @@
     Settings, the Error Log, and assigning roles. Most organizations need one or two.
   </description>
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Admin Group</label>
+  <label>BarnCRM Admin</label>
   <permissionSets>BarnCRM_Admin</permissionSets>
 </PermissionSetGroup>

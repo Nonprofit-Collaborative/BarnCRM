@@ -6,6 +6,7 @@ import getJob from '@salesforce/apex/BulkDeleteController.getJob';
 import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
+import startArchive from '@salesforce/apex/BulkDeleteController.startArchive';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
@@ -32,6 +33,9 @@ jest.mock('@salesforce/apex/BulkDeleteController.startFile', () => ({ default: j
   virtual: true
 });
 jest.mock('@salesforce/apex/BulkDeleteController.backupPage', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/BulkDeleteController.startArchive', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock(
@@ -306,6 +310,45 @@ describe('c-bulk-delete', () => {
     expect(text).toContain('Contact ID,Last Name\r\n003000000000001,Person 0\r\n');
     expect(text).toContain("003000000000002,'=Person 1");
     expect(one(element, 'notice-message').message).toBe('Downloaded 2 records.');
+    expect(startDelete).not.toHaveBeenCalled();
+  });
+
+  it('archives: no download, and emptying the Recycle Bin needs the count typed again (C-67)', async () => {
+    previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
+    startArchive.mockResolvedValue(RUNNING);
+    capturePolls();
+    const element = createElement('c-bulk-delete', { is: BulkDelete });
+    element.queryJson = QUERY;
+    element.archive = true;
+    document.body.appendChild(element);
+    await flush();
+    expect(one(element, 'title').textContent).toBe('c.Core_Archive_Title');
+    one(element, 'preview').click();
+    await flush();
+
+    expect(one(element, 'backup')).toBeNull();
+    expect(one(element, 'undo-until')).not.toBeNull();
+    expect(one(element, 'empty-confirm')).toBeNull();
+    await change(one(element, 'confirm'), '200');
+    expect(one(element, 'start').disabled).toBe(false);
+
+    const box = one(element, 'empty-bin');
+    box.checked = true;
+    box.dispatchEvent(new CustomEvent('change', { detail: { checked: true } }));
+    await flush();
+    expect(one(element, 'empty-warning')).not.toBeNull();
+    expect(one(element, 'undo-until')).toBeNull();
+    expect(one(element, 'start').disabled).toBe(true);
+    await change(one(element, 'empty-confirm'), '200');
+    expect(one(element, 'start').disabled).toBe(false);
+
+    one(element, 'start').click();
+    await flush();
+    expect(startArchive).toHaveBeenCalledWith({
+      queryJson: QUERY,
+      confirmedCount: 200,
+      emptyConfirmedCount: 200
+    });
     expect(startDelete).not.toHaveBeenCalled();
   });
 

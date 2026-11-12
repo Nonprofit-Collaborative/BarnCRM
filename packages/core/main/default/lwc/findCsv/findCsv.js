@@ -8,6 +8,7 @@
  * holds every value as text, and nothing in it can run).
  */
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
+import { format, isoDate } from 'c/barnFormat';
 
 /** Text that is a plain negative decimal and nothing else. */
 const NEGATIVE_NUMBER = /^-\d+(\.\d+)?$/;
@@ -51,30 +52,19 @@ export function toCsv(columns, rows) {
  * person's local one (the UTC date names an evening export in a US time zone for tomorrow).
  */
 export function fileName(objectApiName, today = new Date(), extension = 'csv') {
-  const day = localIsoDate(today);
+  const day = isoDate(today);
   return `${String(objectApiName || 'export').replace(/[^A-Za-z0-9_]/g, '_')}-${day}.${extension}`;
 }
 
 /** A date as YYYY-MM-DD in the browser's own day (the form a date input and Apex take). */
-export function localIsoDate(date = new Date()) {
-  const two = (number) => String(number).padStart(2, '0');
-  return `${date.getFullYear()}-${two(date.getMonth() + 1)}-${two(date.getDate())}`;
-}
+export const localIsoDate = isoDate;
 
 // -----------------------------------------------------------------------------------------
 // What the Find components share
 // -----------------------------------------------------------------------------------------
 
-/**
- * A label with every `{0}`, `{1}` and so on replaced by the values, in order. A missing label
- * reads as empty text.
- */
-export function format(template, ...values) {
-  return values.reduce(
-    (text, value, index) => text.split(`{${index}}`).join(value),
-    template || ''
-  );
-}
+/** A label with its placeholders filled: the shared helper (UTIL-01), kept here for importers. */
+export { format };
 
 /**
  * The message to show for a failed server call or a thrown error: the server's message, else the

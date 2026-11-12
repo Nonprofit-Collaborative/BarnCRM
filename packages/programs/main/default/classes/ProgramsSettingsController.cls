@@ -45,20 +45,17 @@ public with sharing class ProgramsSettingsController {
 	@AuraEnabled
 	public static Settings savePrivacy(Boolean privateParticipants) {
 		if (!HealthCheckService.canManageSettings()) {
-			AuraHandledException refused = new AuraHandledException(
-				Label.Programs_Settings_NoAccess
-			);
-			refused.setMessage(Label.Programs_Settings_NoAccess);
-			throw refused;
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Settings_NoAccess'));
 		}
 		try {
 			ProgramsSharing.savePreset(privateParticipants);
 		} catch (Exception failure) {
-			ErrorLogger.log(failure, CONTEXT, null);
-			String message = BarnHelp.text('Programs', 'Programs_Fail_SettingsSave');
-			AuraHandledException refused = new AuraHandledException(message);
-			refused.setMessage(message);
-			throw refused;
+			throw UserErrors.wrap(
+				failure,
+				false,
+				CONTEXT,
+				BarnHelp.text('Programs', 'Programs_Fail_SettingsSave')
+			);
 		}
 		return getSettings();
 	}
@@ -90,11 +87,12 @@ public with sharing class ProgramsSettingsController {
 			}
 			return settings;
 		} catch (Exception failure) {
-			ErrorLogger.log(failure, CONTEXT, null);
-			String message = BarnHelp.text('Programs', 'Programs_Fail_SettingsLoad');
-			AuraHandledException refused = new AuraHandledException(message);
-			refused.setMessage(message);
-			throw refused;
+			throw UserErrors.wrap(
+				failure,
+				false,
+				CONTEXT,
+				BarnHelp.text('Programs', 'Programs_Fail_SettingsLoad')
+			);
 		}
 	}
 

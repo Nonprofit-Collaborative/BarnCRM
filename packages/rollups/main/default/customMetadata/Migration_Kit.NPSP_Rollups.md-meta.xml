@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Customizable Rollups</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Success_Pack</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your active NPSP customizable rollups into BarnCRM Rollup Builder, compares each copy with the values NPSP wrote, and turns each copy on as you deactivate its NPSP rollup. NPSP itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value xsi:type="xsd:string">[{"key":"copy_npsp","label":"Copy Rollups Into Rollup Builder","kind":"tool","help":"On the Rollup Builder tab, under Other Rollup Tools, click Import From NPSP. Copy the rollups, compare them, and turn each copy on. Then come back here and click Mark Done.","tab":"Rollup_Builder","toolLabel":"Open Rollup Builder"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value xsi:type="xsd:string">[{"key":"deactivate","text":"In NPSP Settings, Customizable Rollups, deactivate each rollup that now has a BarnCRM copy turned on."},{"key":"recalculate","text":"Check that no NPSP batch job (NPSP Settings, Batch Processing) still recalculates the fields BarnCRM now fills."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">RollupsMigrationKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">20</value>
+  </values>
+</CustomMetadata>

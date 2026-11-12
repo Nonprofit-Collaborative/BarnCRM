@@ -48,6 +48,13 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			),
 			target('Tribute.Message__c', Label.Giving_Import_TargetTributeMessage)
 		};
+		if (BrandService.isEnabled()) {
+			// C-47d, after Gift: appeal; offered only while brands are on (R-BR2).
+			result.add(
+				6,
+				target('Gift.Brand', BarnHelp.text('Giving', 'Giving_Import_TargetBrand'))
+			);
+		}
 		for (Integer index = 1; index <= GiftImportRow.MAX_PARTS; index++) {
 			List<String> partNumber = new List<String>{ String.valueOf(index) };
 			result.add(
@@ -112,8 +119,8 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			// A row is saved whole or not at all, which means deleting a gift whose credit or
 			// tribute was refused. Without that right a half-saved gift would stay behind, so
 			// the import is refused before anything is written, in the dry run too.
-			refuseAll(gifts, Label.Giving_Import_ErrorCannotDeleteGifts);
-			notes.add(Label.Giving_Import_ErrorCannotDeleteGifts);
+			refuseAll(gifts, BarnHelp.text('Giving', 'Giving_Import_ErrorCannotDeleteGifts'));
+			notes.add(BarnHelp.text('Giving', 'Giving_Import_ErrorCannotDeleteGifts'));
 		}
 		Integer paying = 0;
 		// Taken on every chunk, rows with gifts or not, so a dry run records what the commit
@@ -142,7 +149,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		if (paying > 0) {
 			notes.add(
 				String.format(
-					Label.Giving_Import_LogPaymentsMatched,
+					BarnHelp.text('Giving', 'Giving_Import_LogPaymentsMatched'),
 					new List<String>{ String.valueOf(paying) }
 				)
 			);
@@ -150,7 +157,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		if (!notLoaded.isEmpty()) {
 			notes.add(
 				String.format(
-					Label.Giving_Import_LogAttributesNotLoaded,
+					BarnHelp.text('Giving', 'Giving_Import_LogAttributesNotLoaded'),
 					new List<String>{ String.join(new List<String>(notLoaded), ', ') }
 				)
 			);
@@ -190,7 +197,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			return;
 		}
 		String reason = String.format(
-			Label.Giving_Posting_ClosedPeriodNewGift,
+			BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 			new List<String>{ closed.format() }
 		);
 		for (GiftImportRow item : gifts) {
@@ -270,24 +277,30 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 							: null;
 			}
 			if (choice == null) {
-				item.error = Label.Giving_Import_ErrorNoDonor;
+				item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorNoDonor');
 			} else if (choice == GiftImportRow.DONOR_CONTACT_1) {
 				if (row.Contact_1__c != null) {
 					item.donorContactId = row.Contact_1__c;
 				} else if (row.Person_1_Account__c != null) {
 					item.donorAccountId = row.Person_1_Account__c;
 				} else if (!personComing) {
-					item.error = Label.Giving_Import_ErrorDonorPersonMissing;
+					item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorDonorPersonMissing');
 				}
 			} else if (choice == GiftImportRow.DONOR_ORGANIZATION) {
 				item.donorAccountId = row.Organization__c;
 				if (row.Organization__c == null && !organizationComing) {
-					item.error = Label.Giving_Import_ErrorDonorOrganizationMissing;
+					item.error = BarnHelp.text(
+						'Giving',
+						'Giving_Import_ErrorDonorOrganizationMissing'
+					);
 				}
 			} else {
 				item.donorAccountId = row.Household__c;
 				if (row.Household__c == null && !personComing) {
-					item.error = Label.Giving_Import_ErrorDonorHouseholdMissing;
+					item.error = BarnHelp.text(
+						'Giving',
+						'Giving_Import_ErrorDonorHouseholdMissing'
+					);
 				}
 			}
 		}
@@ -446,6 +459,10 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			Commitment__c = item.commitmentId,
 			Created_By_Import_Batch__c = batch.Id
 		);
+		if (item.brandId != null) {
+			// C-47d; left blank, the gift takes its appeal's or the user's brand (R-BR4).
+			gift.Brand__c = item.brandId;
+		}
 		for (Schema.SObjectField field : item.values.keySet()) {
 			gift.put(field, item.values.get(field));
 		}
@@ -494,7 +511,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		for (Gift__c record : records) {
 			GiftImportRow item = byGiftId.get(record.Id);
 			if (!hasRoomForOneMore()) {
-				item.error = Label.Giving_Import_ErrorNotAttempted;
+				item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorNotAttempted');
 				continue;
 			}
 			Savepoint beforeThisGift = Database.setSavepoint();
@@ -509,7 +526,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			} catch (Exception rowRefused) {
 				Database.rollback(beforeThisGift);
 				item.error = String.format(
-					Label.Giving_Import_ErrorFailed,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorFailed'),
 					new List<String>{ rowRefused.getMessage() }
 				);
 			}
@@ -556,7 +573,10 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 
 	private static void refuseNotApplied(Set<Id> notApplied, Map<Id, GiftImportRow> byGiftId) {
 		for (Id giftId : notApplied) {
-			byGiftId.get(giftId).error = Label.Giving_GiftBatch_ErrorPostFailed;
+			byGiftId.get(giftId).error = BarnHelp.text(
+				'Giving',
+				'Giving_GiftBatch_ErrorPostFailed'
+			);
 		}
 	}
 
@@ -622,7 +642,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			messages.add(error.getMessage());
 		}
 		return String.format(
-			Label.Giving_Import_ErrorFailed,
+			BarnHelp.text('Giving', 'Giving_Import_ErrorFailed'),
 			new List<String>{ String.join(messages, ' ') }
 		);
 	}
@@ -664,11 +684,11 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		Date closed = GiftPostingLock.closedThrough();
 		for (Gift__c gift : gifts) {
 			if (gift.Receipt_Number__c != null || !gift.Receipts__r.isEmpty()) {
-				keep.put(gift.Id, Label.Giving_Import_UndoKeptReceipted);
+				keep.put(gift.Id, BarnHelp.text('Giving', 'Giving_Import_UndoKeptReceipted'));
 			} else if (GiftPostingLock.isInBooks(gift) && GiftPostingLock.isPosted(gift)) {
-				keep.put(gift.Id, Label.Giving_Import_UndoKeptPosted);
+				keep.put(gift.Id, BarnHelp.text('Giving', 'Giving_Import_UndoKeptPosted'));
 			} else if (GiftPostingLock.isLocked(gift, closed)) {
-				keep.put(gift.Id, Label.Giving_Import_UndoKeptClosedPeriod);
+				keep.put(gift.Id, BarnHelp.text('Giving', 'Giving_Import_UndoKeptClosedPeriod'));
 			} else if (gift.Gift_Date__c != null) {
 				donorIds.add(
 					gift.Donor_Contact__c != null ? gift.Donor_Contact__c : gift.Donor_Account__c
@@ -701,7 +721,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 				gift.Gift_Date__c != null &&
 				covered.contains(donor + ':' + gift.Gift_Date__c.year())
 			) {
-				keep.put(gift.Id, Label.Giving_Import_UndoKeptStatement);
+				keep.put(gift.Id, BarnHelp.text('Giving', 'Giving_Import_UndoKeptStatement'));
 			}
 		}
 	}
@@ -729,7 +749,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		}
 		for (Id recordId : named) {
 			if (recordId != null && recordIds.contains(recordId)) {
-				keep.put(recordId, Label.Giving_Import_UndoKeptDonor);
+				keep.put(recordId, BarnHelp.text('Giving', 'Giving_Import_UndoKeptDonor'));
 			}
 		}
 	}

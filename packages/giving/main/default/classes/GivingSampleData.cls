@@ -86,7 +86,9 @@ public with sharing class GivingSampleData implements SampleDataModule {
 		}
 		StaticResource resource = new GivingSampleDataSelector().getSampleDataResource();
 		if (resource == null) {
-			throw new SampleDataException(System.Label.Giving_SampleData_ResourceMissing);
+			throw new SampleDataException(
+				BarnHelp.text('Giving', 'Giving_SampleData_ResourceMissing')
+			);
 		}
 		return resource.Body.toString();
 	}

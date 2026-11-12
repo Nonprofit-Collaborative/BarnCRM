@@ -1,0 +1,63 @@
+<template>
+  <lightning-card title={t.title} icon-name={icon}>
+    <template lwc:if={canCreate}>
+      <lightning-button
+        slot="actions"
+        data-id="new"
+        label={t.add}
+        onclick={handleNew}
+      ></lightning-button>
+    </template>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={t.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+      <template lwc:if={hasDocuments}>
+        <ul class="slds-has-dividers_bottom-space">
+          <template for:each={documents} for:item="document">
+            <li key={document.id} data-id="document" class="slds-item">
+              <a href={document.url} class="slds-text-title_bold">{document.name}</a>
+              <p class="slds-text-body_small">
+                {document.type}. {document.status}
+                <template lwc:if={document.dueDate}>
+                  . {t.due}
+                  <lightning-formatted-date-time
+                    value={document.dueDate}
+                    time-zone="UTC"
+                  ></lightning-formatted-date-time>
+                </template>
+              </p>
+              <template lwc:if={document.fileId}>
+                <p class="slds-text-body_small">
+                  <a data-id="file" data-file={document.fileId} onclick={handleOpenFile}
+                    >{document.fileTitle}</a
+                  >
+                  <span class="slds-text-color_weak"> {document.version}</span>
+                </p>
+              </template>
+              <template lwc:else>
+                <p data-id="no-file" class="slds-text-body_small slds-text-color_weak">
+                  {t.noFile}
+                </p>
+              </template>
+              <template lwc:if={document.canUpload}>
+                <lightning-file-upload
+                  data-id="upload"
+                  label={t.upload}
+                  record-id={document.id}
+                  onuploadfinished={handleUploaded}
+                ></lightning-file-upload>
+              </template>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:elseif={card}>
+        <p data-id="empty" class="slds-text-body_regular">{t.empty}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

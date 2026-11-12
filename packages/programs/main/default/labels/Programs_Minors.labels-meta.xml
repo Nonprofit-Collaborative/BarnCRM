@@ -25,14 +25,6 @@
         <value>Add to the Count</value>
     </labels>
     <labels>
-        <fullName>Programs_Log_CountAdded</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: count added; {0} is the number added</shortDescription>
-        <value>Added {0} to the count.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Dashboard_PeopleCounted</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -41,108 +33,12 @@
         <value>Counted Without Names</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_BadJson</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: not valid JSON</shortDescription>
-        <value>The rules could not be read. Rebuild them in the Eligibility Rules panel.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadRule</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: rule not valid; {0} is the rule number</shortDescription>
-        <value>Rule {0} is not a valid rule.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadDefault</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: default result not valid</shortDescription>
-        <value>The result when no rule applies must be Eligible, Not Eligible or Review.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_TooManyRules</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: too many rules; {0} is the most allowed</shortDescription>
-        <value>A program may have at most {0} rules.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadResult</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: result not valid; {0} is the rule number</shortDescription>
-        <value>Rule {0}: the result must be Eligible, Not Eligible or Review.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadReason</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: reason missing or long; {0} is the rule number</shortDescription>
-        <value>Rule {0}: give a reason of 255 characters or fewer.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadConditions</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: conditions; {0} is the rule number, {1} the most allowed</shortDescription>
-        <value>Rule {0}: give between one and {1} conditions.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadField</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: field not offered; {0} is the rule number</shortDescription>
-        <value>Rule {0}: a condition names a field that is not one of the enrollment fields offered.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadOperator</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: operator not valid; {0} is the rule number</shortDescription>
-        <value>Rule {0}: a condition has an operator that is not offered.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_BadValue</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: value missing; {0} is the rule number</shortDescription>
-        <value>Rule {0}: a condition needs a value (at least one choice for is one of and is not one of).</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_NoRuleMatched</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules: default reason</shortDescription>
-        <value>No rule applied.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: title</shortDescription>
         <value>Eligibility Rules</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_NoRules</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: no rules</shortDescription>
-        <value>No rules yet. Add a rule to start screening.</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_Rule</fullName>
@@ -166,7 +62,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: field</shortDescription>
-        <value>Enrollment Field</value>
+        <value>Field</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_Operator</fullName>
@@ -249,14 +145,6 @@
         <value>Save Rules</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_Saved</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: saved</shortDescription>
-        <value>The rules are saved.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_PreviewTitle</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -271,22 +159,6 @@
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: preview person</shortDescription>
         <value>Open Enrollment</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_NoPeople</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: no open enrollments</shortDescription>
-        <value>No open enrollments to preview.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_PreviewResult</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility preview: {0} is the result, {1} the reason</shortDescription>
-        <value>These rules would give {0}: {1}</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_ApplyOne</fullName>
@@ -311,38 +183,6 @@
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: include decided</shortDescription>
         <value>Also screen enrollments already Eligible or Not Eligible</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_Screened</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Screening counts: {0} Eligible, {1} Not Eligible, {2} Review, {3} left alone</shortDescription>
-        <value>Screened: {0} Eligible, {1} Not Eligible, {2} Review, {3} left alone.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_SaveFirst</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: save before screening</shortDescription>
-        <value>Save the rules first: screening uses the saved rules.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_MoreThanShown</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: cut off</shortDescription>
-        <value>Showing the first 200 open enrollments. Screening handles the first 200 at a time.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Elig_ReadOnly</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: read only</shortDescription>
-        <value>Only Programs Admin can change the rules.</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_OpEquals</fullName>

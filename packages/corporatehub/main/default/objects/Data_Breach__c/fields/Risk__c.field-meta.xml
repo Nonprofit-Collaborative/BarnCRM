@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Risk__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Your assessment of the risk to people. Under the GDPR, a breach likely to result in a risk is reported to the authority, and a high risk also to the people affected.</inlineHelpText>
+  <label>Risk to People</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Not Yet Assessed</fullName>
+        <default>true</default>
+        <label>Not Yet Assessed</label>
+      </value>
+      <value>
+        <fullName>Unlikely</fullName>
+        <default>false</default>
+        <label>Unlikely to Result in Risk</label>
+      </value>
+      <value>
+        <fullName>Risk</fullName>
+        <default>false</default>
+        <label>Risk</label>
+      </value>
+      <value>
+        <fullName>High Risk</fullName>
+        <default>false</default>
+        <label>High Risk</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

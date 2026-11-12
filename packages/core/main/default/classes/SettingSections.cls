@@ -45,6 +45,9 @@ public with sharing class SettingSections {
 	public static final String HEALTH = 'Health';
 	@NamespaceAccessible
 	public static final String IMPORTING = 'Import';
+	/** Field History Keeper (C-68): its switch and retention, in the Data group. */
+	@NamespaceAccessible
+	public static final String FIELD_HISTORY = 'Field History';
 	@NamespaceAccessible
 	public static final String ORGANIZATION = 'Organization';
 	@NamespaceAccessible
@@ -82,6 +85,33 @@ public with sharing class SettingSections {
 	/** The Portal Builder module's sign-in switch and limits. */
 	@NamespaceAccessible
 	public static final String PORTALS = 'Portals';
+	/** The Forms module's row, which opens its Forms tab and announces the module (C-72). */
+	@NamespaceAccessible
+	public static final String FORMS = 'Forms';
+	/** The Logic Models module's row, which opens its Logic Models tab (C-72). */
+	@NamespaceAccessible
+	public static final String LOGIC_MODELS = 'Logic Models';
+	/** The Corporate Hub module's reminder and acknowledgment settings. */
+	@NamespaceAccessible
+	public static final String CORPORATE_HUB = 'Corporate Hub';
+	/** The Payments module's processor, mode and currency, and the link to Payments Setup. */
+	@NamespaceAccessible
+	public static final String PAYMENTS = 'Payments';
+	/** The LWC Builder module's built component settings. */
+	@NamespaceAccessible
+	public static final String LWC_BUILDER = 'LWC Builder';
+	/** The Scholarships and Outbound Grants module's reminder settings. */
+	@NamespaceAccessible
+	public static final String SCHOLARSHIPS = 'Scholarships and Grants';
+	/** The Territory Management module's row, which opens its Territory Management tab. */
+	@NamespaceAccessible
+	public static final String TERRITORY = 'Territory Management';
+	/** The Memberships module's renewal reminders and gift renewals. */
+	@NamespaceAccessible
+	public static final String MEMBERSHIPS = 'Memberships';
+	/** The Project Management module's time tracking and health settings. */
+	@NamespaceAccessible
+	public static final String PROJECTS = 'Projects';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -100,12 +130,22 @@ public with sharing class SettingSections {
 			EVENTS,
 			ROLLUPS,
 			PROGRAMS,
+			LOGIC_MODELS,
 			VOLUNTEERS,
+			FORMS,
 			PORTALS,
+			CORPORATE_HUB,
+			PAYMENTS,
+			LWC_BUILDER,
+			SCHOLARSHIPS,
+			TERRITORY,
+			MEMBERSHIPS,
+			PROJECTS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,
 			IMPORTING,
+			FIELD_HISTORY,
 			ORG_OPTIMIZER,
 			INTEGRATIONS,
 			HEALTH

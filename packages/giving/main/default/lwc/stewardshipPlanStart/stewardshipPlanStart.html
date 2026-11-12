@@ -1,5 +1,5 @@
 <template>
-  <div class="slds-var-p-around_medium">
+  <div lwc:if={helpReady} class="slds-var-p-around_medium">
     <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.heading}</h2>
 
     <template lwc:if={loadError}>

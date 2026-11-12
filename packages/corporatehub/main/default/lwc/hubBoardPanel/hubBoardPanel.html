@@ -1,0 +1,112 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom47" data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.seats}</h3>
+        <template lwc:if={hasSeats}>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="seats">
+            <template for:each={seats} for:item="seat">
+              <li key={seat.id} class="slds-item">
+                <span data-id="seat">{seat.name}</span>
+                <span class="slds-var-m-left_x-small">{seat.status}</span>
+                <template lwc:if={seat.flag}>
+                  <lightning-badge class="slds-var-m-left_x-small" label={labels.atLimit}></lightning-badge>
+                </template>
+                <div class="slds-text-color_weak">
+                  {labels.termEnds}
+                  <lightning-formatted-date-time
+                    lwc:if={seat.due}
+                    class="slds-var-m-left_xx-small"
+                    value={seat.due}
+                    time-zone="UTC"
+                  ></lightning-formatted-date-time>
+                  <template lwc:if={seat.detail}>
+                    <span class="slds-var-m-left_x-small" data-id="demographics">{seat.detail}</span>
+                  </template>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-var-m-bottom_small" data-id="no-seats">{labels.noSeats}</p>
+        </template>
+
+        <template lwc:if={hasExpiring}>
+          <c-barn-notice variant="warning" message={labels.expiring} data-id="expiring"></c-barn-notice>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.skills}</h3>
+        <template lwc:if={hasMatrix}>
+          <ul class="slds-var-m-bottom_x-small" data-id="matrix">
+            <template for:each={matrix} for:item="skill">
+              <li key={skill.skill}>{skill.skill}: {skill.count}</li>
+            </template>
+          </ul>
+        </template>
+        <p class="slds-var-m-bottom_small" data-id="gaps">{labels.gaps}</p>
+
+        <template lwc:if={showGiving}>
+          <p class="slds-var-m-bottom_small" data-id="giving">{labels.giving}</p>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.items}</h3>
+        <template lwc:if={hasItems}>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="items">
+            <template for:each={items} for:item="item">
+              <li key={item.id} class="slds-item">
+                {item.name}
+                <div class="slds-text-color_weak">
+                  {item.status}
+                  <lightning-formatted-date-time
+                    lwc:if={item.due}
+                    class="slds-var-m-left_x-small"
+                    value={item.due}
+                    time-zone="UTC"
+                  ></lightning-formatted-date-time>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-var-m-bottom_small" data-id="no-items">{labels.noItems}</p>
+        </template>
+
+        <template lwc:if={canManage}>
+          <div class="slds-grid slds-grid_vertical-align-end slds-var-m-bottom_small">
+            <lightning-combobox
+              data-id="document"
+              class="slds-col slds-var-m-right_x-small"
+              label={labels.document}
+              options={documentOptions}
+              value={documentId}
+              onchange={handleDocument}
+            ></lightning-combobox>
+            <lightning-button
+              data-id="request"
+              label={labels.request}
+              disabled={cannotRequest}
+              onclick={handleRequest}
+            ></lightning-button>
+          </div>
+          <lightning-button
+            data-id="assess"
+            label={labels.assess}
+            disabled={isWorking}
+            onclick={handleAssess}
+          ></lightning-button>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

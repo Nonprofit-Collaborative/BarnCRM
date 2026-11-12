@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>A request from a person about their own data (access, correction, erasure and the rest), with its due date, response and, for erasure, the Erasure record Core's Erase Person wrote (canonical model 29CH17).</description>
+  <enableActivities>true</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Data Subject Request</label>
+  <nameField>
+    <displayFormat>DSR-{00000}</displayFormat>
+    <label>Request Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Data Subject Requests</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

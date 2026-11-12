@@ -78,7 +78,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-05: An Empty Household Finding Links the Record
 
 **Purpose:** Confirm a data finding counts and links an empty household and changes nothing.
-**Prerequisites:** admin. A Household account with no members, for example `Empty Test Household` from T-DM-08.
+**Prerequisites:** admin. A Household account with no members, for example `Empty Test Household` from T-DM-10.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -136,7 +136,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then seven checks, and a closed part titled **For Developers: Old Code and Flows** with five more (see T-HC-16), including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
+| 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then seven checks, and a closed part titled **For Developers: Old Code and Flows** with five more (see T-HC-10), including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
 | 2 | Read a check with a count above 0. | The count in a warning-colored badge, up to five names, and **Open in Setup** with a new-window icon. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
 | 3 | Click **Open in Setup** on one check. | The matching Setup page opens. Nothing was removed. |
 | 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
@@ -144,7 +144,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Set **Days before a user is unused** back to `90`.
 
-## T-HC-16: Technical Debt Checks Follow the Old API Version Setting
+## T-HC-10: Technical Debt Checks Follow the Old API Version Setting
 
 **Purpose:** Confirm the technical debt checks (For Developers: Old Code and Flows) list Apex and flows on old API versions, state what they do not cover, and follow a bounded setting.
 **Prerequisites:** admin.
@@ -160,7 +160,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Set **Old API version** back to `50`.
 
-## T-HC-10: Data Dictionary Lists Fields, Fill Rates and a CSV
+## T-HC-11: Data Dictionary Lists Fields, Fill Rates and a CSV
 
 **Purpose:** Confirm an admin can document fields, add fill rates and download the table, and that nobody else sees it.
 **Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); sample data loaded.
@@ -178,7 +178,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Remove the help text added in step 6.
 
-## T-HC-17: Data Dictionary Automation Inventory Lists Triggers and Flows
+## T-HC-12: Data Dictionary Automation Inventory Lists Triggers and Flows
 
 **Purpose:** Confirm the Data Dictionary lists the Apex triggers and record-triggered flows of each chosen kind of record on request, says what it does not cover, and downloads its own CSV.
 **Prerequisites:** admin; Core deployed (it ships an Account trigger and template flows for Affiliation and Account).
@@ -194,7 +194,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | Choose a kind of record nothing runs on (a custom object with no trigger or flow) and build with the box ticked. | **No Apex triggers or record-triggered flows run on these kinds of record.** |
 | 8 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Data Dictionary** tile or tab. |
 
-## T-HC-11: Access Explorer Shows Who Can See What, and Why
+## T-HC-13: Access Explorer Shows Who Can See What, and Why
 
 **Purpose:** Confirm an admin can see a person's access and its sources, a permission set's access, who has access to a kind of record or field, and BarnCRM's permission sets, that each table downloads, and that nobody else sees it.
 **Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); staff holds the **Team Member** role.
@@ -218,7 +218,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None. Access Explorer changes nothing.
 
-## T-HC-12: Access Explorer Compares Two People and Reports Modify All
+## T-HC-14: Access Explorer Compares Two People and Reports Modify All
 
 **Purpose:** Confirm an admin can compare two people or two permission sets, showing differences only by default, and can list who holds Modify All Data, View All Data and object-level Modify All and View All.
 **Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); staff holds the **Team Member** role; the org has a System Administrator profile user.
@@ -237,7 +237,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None. Access Explorer changes nothing.
 
-## T-HC-13: Weekly Admin Summary in the Digest
+## T-HC-15: Weekly Admin Summary in the Digest
 
 **Purpose:** Confirm a weekly digest carries the admin summary, sends nothing when there is nothing to report, and the setting turns the summary off.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); the error digest scheduled; email deliverability set to all email; an Error Log with no New entries since the last digest.
@@ -254,7 +254,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Restore **Digest frequency** and **Send weekly admin summary** to their earlier values, and change the help text from step 7 back.
 
-## T-HC-14: Setup Changes Keeps Who Changed What
+## T-HC-16: Setup Changes Keeps Who Changed What
 
 **Purpose:** Confirm an admin can copy the Setup Audit Trail into BarnCRM, find a change by its words, day and section, download it, and that nobody else sees it.
 **Prerequisites:** admin (a System Administrator, so the trail can be read) and staff (see [Test users](before-you-test.md#test-users)). This script copies real Setup changes into **Setup Change** records; in a real-org sandbox that uses about 2 KB of data storage per change.
@@ -262,7 +262,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open **Org Optimizer**. | **Overview** has a **Setup Changes** tile under **Check Your Setup**: **Who changed what in Setup, and when, kept beyond Salesforce's 180 days.** |
-| 2 | Choose **Setup Changes** on an org where nothing has been copied yet. | **Nothing is kept yet. Press Copy New Changes Now to copy the last 180 days of Setup changes.** and **The nightly copy is not scheduled.** (or **New changes are copied every night at 1:30 and kept for 730 days.** if Health Check already scheduled it). The empty state reads **No kept change matches these filters.** |
+| 2 | Choose **Setup Changes** on an org where nothing has been copied yet. | **Nothing is kept yet. Press Copy New Changes Now to copy the last 180 days of Setup changes.** and **The nightly copy is not scheduled.** (or **This shows changes up to the last copy. New changes are copied every night at 1:30 and kept for 730 days. To see changes made since then, press Copy New Changes Now.** if Health Check already scheduled it). The empty state reads **No kept change matches these filters.** |
 | 3 | Click **Copy New Changes Now**. | **The copy has started and runs in the background.** The status line reads **A copy is running.** |
 | 4 | Wait a minute or two (longer in a busy org) and click **Refresh**. | **Kept: {n} changes, from {day} to {day}.**, the status line says the copy runs every night at 1:30 and keeps changes for 730 days, and the table lists changes newest first with **Changed At**, **Changed By**, **Logged In As**, **Section** and **What Changed**. |
 | 5 | In Setup, change the help text of any Contact field. Back on **Setup Changes**, click **Copy New Changes Now**, wait, then **Refresh**. | Your change is at the top, with your name in **Changed By** and the field in **What Changed**. |
@@ -275,7 +275,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to keep setup changes**; nobody edits or deletes them by hand.
 
-## T-HC-15: AI-Readiness Export Downloads a Pack With Sensitive Fields Handled
+## T-HC-17: AI-Readiness Export Downloads a Pack With Sensitive Fields Handled
 
 **Purpose:** Confirm an admin can download the AI-Readiness Export pack, that flagged fields are left out, masked or kept as chosen, and that nobody else sees it. Nothing is sent to an AI service.
 **Prerequisites:** admin and staff (see [Test users](before-you-test.md#test-users)); sample data loaded; a zip tool and a text editor.

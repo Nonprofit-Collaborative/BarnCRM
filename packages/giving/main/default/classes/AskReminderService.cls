@@ -122,7 +122,7 @@ public with sharing class AskReminderService {
 		AskReminderWriter.stampRun(
 			completedAt,
 			String.format(
-				System.Label.Giving_AskReminder_SummaryFormat,
+				BarnHelp.text('Giving', 'Giving_AskReminder_SummaryFormat'),
 				new List<String>{ String.valueOf(created), String.valueOf(failed) }
 			)
 		);
@@ -138,7 +138,7 @@ public with sharing class AskReminderService {
 				System.Label.Giving_AskReminder_Subject,
 				new List<String>{ String.valueOf(donor.get('Name')) }
 			),
-			Description = System.Label.Giving_AskReminder_Description,
+			Description = BarnHelp.text('Giving', 'Giving_AskReminder_Description'),
 			ActivityDate = (Date) donor.get('Next_Ask_Date__c'),
 			Status = TASK_STATUS,
 			Priority = TASK_PRIORITY,

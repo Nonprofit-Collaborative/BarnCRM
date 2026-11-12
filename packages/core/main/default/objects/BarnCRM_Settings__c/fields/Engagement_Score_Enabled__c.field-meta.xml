@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Engagement_Score_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether the nightly Engagement Score step scores every person and the person page shows the meter (C-64, canonical model R-ES1).</description>
+  <inlineHelpText>Score every person's engagement each night and show it on the person page.</inlineHelpText>
+  <label>Turn On Engagement Score</label>
+  <type>Checkbox</type>
+</CustomField>

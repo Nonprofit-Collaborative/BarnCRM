@@ -11,6 +11,7 @@ public with sharing class FundersSettings {
 	public static final Integer DEFAULT_REMINDER_LEAD_DAYS = 14;
 	public static final Integer MIN_REMINDER_LEAD_DAYS = 1;
 	public static final Integer MAX_REMINDER_LEAD_DAYS = 90;
+	public static final Integer DEFAULT_RENEWAL_LEAD_DAYS = 90;
 
 	/** R-GQ3: whether the morning job makes a task for each requirement coming due. Ships on. */
 	public static Boolean reminderTasksEnabled() {
@@ -24,20 +25,37 @@ public with sharing class FundersSettings {
 
 	/** R-FS1: how many days before a requirement is due its reminder goes out, 1 to 90. */
 	public static Integer reminderLeadDays() {
-		Object stored = read('Reminder_Lead_Days__c');
+		return days(
+			'Reminder_Lead_Days__c',
+			DEFAULT_REMINDER_LEAD_DAYS,
+			MIN_REMINDER_LEAD_DAYS,
+			MAX_REMINDER_LEAD_DAYS
+		);
+	}
+
+	/** R-FS2: whether the Grant Finder tab searches Grants.gov. Ships on. */
+	public static Boolean grantFinderEnabled() {
+		return flag('Grant_Finder_Enabled__c', true);
+	}
+
+	/** R-FS2: how many days before a renewable award ends its Renewal requirement is due, 1 to 365. */
+	public static Integer renewalLeadDays() {
+		return days('Renewal_Lead_Days__c', DEFAULT_RENEWAL_LEAD_DAYS, 1, 365);
+	}
+
+	/** A whole number of days in range; blank, unreadable or out of range reads as the default. */
+	private static Integer days(String key, Integer shipped, Integer least, Integer most) {
+		Object stored = read(key);
 		if (stored == null) {
-			return DEFAULT_REMINDER_LEAD_DAYS;
+			return shipped;
 		}
-		Integer days;
+		Integer value;
 		try {
-			days = Decimal.valueOf(String.valueOf(stored)).intValue();
+			value = Decimal.valueOf(String.valueOf(stored)).intValue();
 		} catch (TypeException unreadable) {
-			return DEFAULT_REMINDER_LEAD_DAYS;
+			return shipped;
 		}
-		if (days < MIN_REMINDER_LEAD_DAYS || days > MAX_REMINDER_LEAD_DAYS) {
-			return DEFAULT_REMINDER_LEAD_DAYS;
-		}
-		return days;
+		return value < least || value > most ? shipped : value;
 	}
 
 	private static Boolean flag(String key, Boolean shipped) {

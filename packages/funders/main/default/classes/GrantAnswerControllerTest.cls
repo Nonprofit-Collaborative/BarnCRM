@@ -97,7 +97,11 @@ private class GrantAnswerControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(Label.Funders_Answers_ErrorStamp, message, 'Reported plainly');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Answers_ErrorStamp'),
+				message,
+				'Reported plainly'
+			);
 		}
 	}
 }

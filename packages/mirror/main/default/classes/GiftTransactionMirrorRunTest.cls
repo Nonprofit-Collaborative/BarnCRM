@@ -186,7 +186,12 @@ private class GiftTransactionMirrorRunTest {
 			totals.designationsUnavailable = true;
 			Assert.isTrue(
 				GiftTransactionMirrorBatch.summaryOf(totals)
-					.endsWith(Label.Mirror_GiftTransactionMirror_DesignationsUnavailable)
+					.endsWith(
+						BarnHelp.text(
+							'Mirror',
+							'Mirror_GiftTransactionMirror_DesignationsUnavailable'
+						)
+					)
 			);
 			Assert.isTrue(GiftTransactionMirrorBatch.hasHeadroom(100), 'A fresh chunk has room.');
 		}
@@ -284,14 +289,22 @@ private class GiftTransactionMirrorRunTest {
 	static void theReconciliationRefusesWhatItCannotCompare() {
 		System.runAs(maria()) {
 			GiftTransactionMirrorSchema.useStandIns();
-			assertRefused(null, GIFT_DATE, Label.Mirror_OpportunityMirror_ErrorDatesRequired);
+			assertRefused(
+				null,
+				GIFT_DATE,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+			);
 			assertRefused(
 				GIFT_DATE.addDays(1),
 				GIFT_DATE,
-				Label.Mirror_OpportunityMirror_ErrorDateOrder
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 			GiftTransactionMirrorSchema.absentForTest = true;
-			assertRefused(GIFT_DATE, GIFT_DATE, Label.Mirror_GiftTransactionMirror_Unavailable);
+			assertRefused(
+				GIFT_DATE,
+				GIFT_DATE,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable')
+			);
 		}
 	}
 

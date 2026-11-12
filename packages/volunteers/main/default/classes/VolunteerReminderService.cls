@@ -66,7 +66,7 @@ public with sharing class VolunteerReminderService {
 		if (messageSignups.size() < signups.size()) {
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Volunteers_Reminders_StampFailed,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_StampFailed'),
 					new List<Object>{
 						signups.size() - messageSignups.size(),
 						signups.size(),
@@ -98,7 +98,7 @@ public with sharing class VolunteerReminderService {
 			Database.update(unstamp, false, AccessLevel.SYSTEM_MODE);
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Volunteers_Reminders_SendFailed,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_SendFailed'),
 					new List<Object>{
 						unstamp.size(),
 						signups.size(),
@@ -110,6 +110,18 @@ public with sharing class VolunteerReminderService {
 			);
 		}
 		return messageSignups.size() - unstamp.size();
+	}
+
+	/**
+	 * V-09 (R-VU10): the signed address of the person's own page for this sign-up, or null when no
+	 * Self-Service Profile Form is set or Forms has no active Site. Forms signs the address of the
+	 * form for the sign-up; the page is the same address without the form.
+	 */
+	@TestVisible
+	private static String personalPageLink(Id signupId) {
+		Id formId = VolunteerSettings.profileFormId();
+		String link = formId == null ? null : FormCatalogExtensions.publicLink(formId, signupId);
+		return link == null ? null : link.replace('form=' + formId + '&', '');
 	}
 
 	/** One reminder, addressed to the booking's Contact. */
@@ -135,30 +147,43 @@ public with sharing class VolunteerReminderService {
 		String greeting = String.isBlank(firstName)
 			? System.Label.Volunteers_Reminders_GreetingNoName
 			: String.format(
-					System.Label.Volunteers_Reminders_Greeting,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_Greeting'),
 					new List<Object>{ firstName }
 			  );
 		String body =
 			greeting +
 			'\n\n' +
 			String.format(
-				System.Label.Volunteers_Reminders_Body,
+				BarnHelp.text('Volunteers', 'Volunteers_Reminders_Body'),
 				new List<Object>{ jobName, whenText }
 			);
 		if (String.isNotBlank(shift.Location__c)) {
 			body +=
 				'\n' +
 				String.format(
-					System.Label.Volunteers_Reminders_Where,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_Where'),
 					new List<Object>{ shift.Location__c }
 				);
 		}
-		body += '\n\n' + System.Label.Volunteers_Reminders_Closing;
+		body += '\n\n' + BarnHelp.text('Volunteers', 'Volunteers_Reminders_Closing');
+		String page = signup.Contact__c == null ? null : personalPageLink(signup.Id);
+		if (page != null) {
+			body +=
+				'\n\n' +
+				BarnHelp.text(
+					'Volunteers',
+					'Volunteers_Reminders_PersonalPage',
+					new List<Object>{ page }
+				);
+		}
 
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ email });
 		message.setSubject(
-			String.format(System.Label.Volunteers_Reminders_Subject, new List<Object>{ jobName })
+			String.format(
+				BarnHelp.text('Volunteers', 'Volunteers_Reminders_Subject'),
+				new List<Object>{ jobName }
+			)
 		);
 		message.setPlainTextBody(body);
 		message.setSaveAsActivity(false);

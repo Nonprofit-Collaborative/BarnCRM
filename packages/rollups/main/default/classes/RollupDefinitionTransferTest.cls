@@ -157,8 +157,14 @@ private class RollupDefinitionTransferTest {
 			);
 
 			System.Assert.areEqual(RollupDefinitionTransfer.CREATED, rows[0].outcome);
-			System.Assert.areEqual(Label.Core_RollupBuilder_ImportTwice, rows[1].reason);
-			System.Assert.areEqual(Label.Core_RollupBuilder_ErrorNameNeeded, rows[2].reason);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportTwice'),
+				rows[1].reason
+			);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNameNeeded'),
+				rows[2].reason
+			);
 			System.Assert.isTrue(rows[3].reason.contains('notAnAttribute'), rows[3].reason);
 			System.Assert.areEqual(
 				BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportShipped'),
@@ -204,7 +210,7 @@ private class RollupDefinitionTransferTest {
 				new List<String>{
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'),
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'),
-					Label.Core_RollupBuilder_ImportNewer
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNewer')
 				},
 				messages
 			);
@@ -231,8 +237,8 @@ private class RollupDefinitionTransferTest {
 			}
 			System.Assert.areEqual(
 				new List<String>{
-					Label.Core_RollupBuilder_ExportNothing,
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ExportNothing'),
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				},
 				messages
 			);

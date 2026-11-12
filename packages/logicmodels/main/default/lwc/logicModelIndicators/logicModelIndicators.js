@@ -12,7 +12,14 @@ import getStarterChoices from '@salesforce/apex/LogicModelBuilderController.getS
 import saveStarterSource from '@salesforce/apex/LogicModelBuilderController.saveStarterSource';
 import applyModelPeriods from '@salesforce/apex/LogicModelBuilderController.useModelPeriods';
 
-import { FUNCTIONS, SOURCES, isComputed, progress, sourceReady } from 'c/logicModelRules';
+import {
+  FUNCTIONS,
+  SOURCES,
+  isComputed,
+  progress,
+  samePeriodExists,
+  sourceReady
+} from 'c/logicModelRules';
 import { LABELS, format, messageFrom, starterLabel } from 'c/logicModelText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -382,9 +389,25 @@ export default class LogicModelIndicators extends LightningElement {
     return this.busy || !this.indicatorDraft.name || !String(this.indicatorDraft.name).trim();
   }
 
+  /**
+   * The period form's dates match another period of the same indicator (R-IP2): said under the
+   * dates and Save is held, before the server would refuse it.
+   */
+  get periodDuplicate() {
+    const draft = this.periodDraft;
+    if (!this.periodFormId || !draft.startDate || !draft.endDate) {
+      return undefined;
+    }
+    const indicator = ((this.model && this.model.indicators) || []).find(
+      (item) => item.id === this.periodIndicatorId
+    );
+    const period = { ...draft, id: this.periodFormId === 'new' ? undefined : this.periodFormId };
+    return samePeriodExists(indicator, period) ? LABELS.periodExists : undefined;
+  }
+
   get periodSaveDisabled() {
     const draft = this.periodDraft;
-    return this.busy || !draft.name || !draft.startDate || !draft.endDate;
+    return this.busy || !draft.name || !draft.startDate || !draft.endDate || !!this.periodDuplicate;
   }
 
   // ------------------------------------------------------------------------ indicators

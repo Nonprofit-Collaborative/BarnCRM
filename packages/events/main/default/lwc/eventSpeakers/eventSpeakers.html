@@ -48,7 +48,17 @@
                 </template>
                 <template lwc:else>{row.name}</template>
               </th>
-              <td data-label={fieldLabels.Headline__c}>{row.headline}</td>
+              <td data-label={fieldLabels.Headline__c}>
+                {row.headline}
+                <p class="slds-text-body_small slds-text-color_weak" data-id="checklist">
+                  {row.checklistText}
+                </p>
+                <template lwc:if={row.ratingText}>
+                  <p class="slds-text-body_small slds-text-color_weak" data-id="rating">
+                    {row.ratingText}
+                  </p>
+                </template>
+              </td>
               <td data-label={fieldLabels.Status__c}>
                 <c-barn-status-badge status={row.statusWord} label={row.status}></c-barn-status-badge>
               </td>

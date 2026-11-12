@@ -484,8 +484,14 @@ private class ImportUndoTest {
 			Contact imported = importedPerson(batch, 'Ramirez');
 			savedByARollup(imported.Id);
 
-			// Undo pressed a second later, so the save is not read as the undo's.
-			undo(batch, Datetime.now().addSeconds(1));
+			// Undo pressed a second later, so the save is not read as the undo's. The person
+			// passes get their own limits: in Nonprofit Cloud, with every module's automation on
+			// a new person, the setup leaves the checks too few queries and they keep Ramirez.
+			undo(
+				batch,
+				Datetime.now().addSeconds(1),
+				ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_CONTACTS
+			);
 
 			Assert.isFalse(exists(imported.Id), 'A recalculated total keeps nobody.');
 		}
@@ -1128,7 +1134,12 @@ private class ImportUndoTest {
 			StubProcessor stub = installStub(new List<Schema.SObjectType>());
 			stub.keep.put(kept.Id, 'A gift with a receipt still names this person.');
 
-			undo(batch, Datetime.now());
+			// The person passes get their own limits, as each chunk does in the job.
+			undo(
+				batch,
+				Datetime.now(),
+				ImportUndoBatch.PASS_JUDGE_PREFIX + ImportUndoBatch.PASS_CONTACTS
+			);
 
 			Assert.isTrue(exists(kept.Id), 'The module said this one stays.');
 			Assert.isTrue(exists(kept.AccountId), 'So does the household they are still on.');

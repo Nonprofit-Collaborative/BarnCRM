@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Approvals_Count__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Attendees who approved the minutes in the board portal.</inlineHelpText>
+  <label>Minutes Approvals</label>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+  <summaryFilterItems>
+    <field>Meeting_Attendee__c.Minutes_Approved_On__c</field>
+    <operation>notEqual</operation>
+  </summaryFilterItems>
+  <summaryForeignKey>Meeting_Attendee__c.Meeting__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+</CustomField>

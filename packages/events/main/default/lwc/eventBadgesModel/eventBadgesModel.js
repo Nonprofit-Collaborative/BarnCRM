@@ -73,7 +73,7 @@ function pageHtml(title, style, body) {
 }
 
 /**
- * The badge page. `badges` is a list of { name, organization, ticketName, qr } where qr is an
+ * The badge page. `badges` is a list of { name, title, organization, ticketName, qr } where qr is an
  * image address (a data address made in the browser) or empty. `show` has organization, ticket
  * and qr switches.
  */
@@ -87,6 +87,7 @@ export function badgePageHtml(title, layoutValue, badges, show) {
       page-break-inside: avoid; break-inside: avoid; }
     .text { flex: 1 1 auto; min-width: 0; }
     .name { font-size: ${layout.nameSize}pt; font-weight: bold; line-height: 1.1; overflow-wrap: anywhere; }
+    .title { font-size: 12pt; font-style: italic; margin-top: 4pt; overflow-wrap: anywhere; }
     .org { font-size: 13pt; margin-top: 6pt; overflow-wrap: anywhere; }
     .ticket { font-size: 11pt; margin-top: 6pt; text-transform: uppercase; letter-spacing: 0.04em; color: #333; }
     .qr { flex: 0 0 auto; width: ${Math.min(1.1, layout.height - 0.6).toFixed(2)}in; height: auto; }
@@ -98,13 +99,15 @@ export function badgePageHtml(title, layoutValue, badges, show) {
         options.organization && badge.organization
           ? `<div class="org">${escapeHtml(badge.organization)}</div>`
           : '';
+      // EV-26: a Badge Title prints under the name only when it is set.
+      const titleLine = badge.title ? `<div class="title">${escapeHtml(badge.title)}</div>` : '';
       const ticket =
         options.ticket && badge.ticketName
           ? `<div class="ticket">${escapeHtml(badge.ticketName)}</div>`
           : '';
       const qr =
         options.qr && badge.qr ? `<img class="qr" src="${escapeHtml(badge.qr)}" alt="">` : '';
-      return `<div class="badge"><div class="text"><div class="name">${escapeHtml(badge.name)}</div>${org}${ticket}</div>${qr}</div>`;
+      return `<div class="badge"><div class="text"><div class="name">${escapeHtml(badge.name)}</div>${titleLine}${org}${ticket}</div>${qr}</div>`;
     })
     .join('');
   return pageHtml(title, style, `<div class="sheet">${cards}</div>`);
@@ -139,4 +142,29 @@ export function signInPageHtml(heading, subheading, rows, columns, blankRows) {
     style,
     `<h1>${escapeHtml(heading)}</h1><p class="meta">${escapeHtml(subheading)}</p><table><thead>${head}</thead><tbody>${lines}${blanks}</tbody></table>`
   );
+}
+
+/**
+ * Session rating codes (EV-27): one half page per session with its name, time and room, a call to
+ * rate and the QR code of its rating link. `sessions` is a list of { name, whenText, room, qr }.
+ */
+export function ratingCodesPageHtml(title, prompt, sessions) {
+  const style = `
+    .code { height: 4.8in; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; border-bottom: 1px dashed #999; page-break-inside: avoid; break-inside: avoid; }
+    .code h2 { font-size: 22pt; margin: 0 0 6pt; overflow-wrap: anywhere; }
+    .code p { font-size: 13pt; margin: 0 0 6pt; }
+    .code img { width: 2.4in; height: auto; margin-top: 8pt; }
+  `;
+  const pages = (sessions || [])
+    .map(
+      (session) =>
+        `<div class="code"><h2>${escapeHtml(session.name)}</h2><p>${escapeHtml(
+          [session.whenText, session.room].filter(Boolean).join(', ')
+        )}</p><p><strong>${escapeHtml(prompt)}</strong></p>${
+          session.qr ? `<img src="${escapeHtml(session.qr)}" alt="">` : ''
+        }</div>`
+    )
+    .join('');
+  return pageHtml(title, style, pages);
 }

@@ -151,21 +151,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** delete both volunteer skills, then delete "Test driving" (it deletes once nobody holds it).
 
-## T-VOL-10: Coordinator Role Gives Approval
+## T-VOL-10: Volunteers Coordinator Gives Approval
 
-**Purpose:** confirm a Team Member cannot approve hours, and giving the Coordinator role gives Volunteers Coordinator with approval.
+**Purpose:** confirm a Team Member cannot approve hours, and giving Volunteers Coordinator as an extra permission on the Access page gives approval.
 **Prerequisites:** staff user and admin user; at least one Submitted entry the staff user did not enter (sample data has four).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open **BarnCRM Volunteers**. | No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates** tab. |
 | 2 | Open **Volunteer Hours**, list view **All Hours**. | Only entries the staff user entered show; the sample entries do not. |
-| 3 | As admin, open **BarnCRM Settings**, **Access**. Find the staff user in **Find a person**, choose **Coordinator** and click **Give Access**, then confirm. | The staff user shows on the Coordinator card, still also on Team Member. |
-| 4 | Wait a minute. In Setup, open the staff user's **Permission Set Assignments**. | **Volunteers Coordinator** is assigned. |
+| 3 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **Volunteers Coordinator**, then confirm. The **Role** list does not offer Coordinator. | The staff user shows beside **Volunteers Coordinator**, still also on the Team Member card. |
+| 4 | In Setup, open the staff user's **Permission Set Assignments**. | **Volunteers Coordinator** is assigned. |
 | 5 | As staff, reload the app and open **Approve Hours**. | The tab shows with **Approve** and **Reject**; the four sample Submitted entries are listed. |
 | 6 | Tick one and click **Approve**. | "Entries approved: 1." |
 
-**Cleanup:** as staff, reopen that entry. As admin, click **Remove** for the staff user on the Coordinator card, then remove **Volunteers Coordinator** in Setup (the module never takes a set away).
+**Cleanup:** as staff, reopen that entry. As admin, under **Extra Permissions**, click **Remove** beside the staff user for **Volunteers Coordinator**.
 
 ## T-VOL-11: Read-Only User Sees and Changes Nothing
 
@@ -315,7 +315,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** set Weeks Ahead to Create Shifts back to 8; delete the schedule and its shifts.
 
-## T-VOL-22: Shift Schedule Form Preview
+## T-VOL-21: Shift Schedule Form Preview
 
 **Purpose:** confirm New Shift Schedule and Edit Schedule say how many shifts the pattern makes as the fields change (modules-24, D-183).
 **Prerequisites:** coordinator; a job; Weeks Ahead to Create Shifts at 8.
@@ -332,7 +332,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** delete the schedule and its shifts.
 
-## T-VOL-21: Volunteer Letters for Many People
+## T-VOL-22: Volunteer Letters for Many People
 
 **Purpose:** confirm Volunteer Letters on Approve Hours makes letters for everyone with approved hours, or for chosen people, without Flow Builder.
 **Prerequisites:** coordinator; two people with approved hours this year and one with none; an active Hours letter template.
@@ -363,3 +363,127 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 7 | Sign up one more person so the shift is full, clear **Nudge Sent On**, run it again. | No email: a full shift is never nudged. |
 
 **Cleanup:** switch **Send unfilled shift nudges** off; cancel the test shift.
+
+## T-VOL-24: Value of Volunteer Time
+
+**Purpose:** confirm the hour value shows on Volunteers Home and in letters, and 0 hides it.
+**Prerequisites:** admin user; sample data loaded (approved hours this month).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Value of one volunteer hour** reads 34.79. |
+| 2 | Open **Volunteers Home**. | A **Value of Hours This Month** figure shows this month's approved hours times 34.79, in your currency. |
+| 3 | Add `{HoursValue}` and `{HourValue}` to the Hours letter template and preview a letter for a person with approved hours. | The letter shows their hours times 34.79 and 34.79. |
+| 4 | Set the value to 0 and reload **Volunteers Home**; preview the letter again. | The figure is gone; both tokens are empty. |
+
+**Cleanup:** set the value back to 34.79; remove the tokens from the template.
+
+## T-VOL-25: Thank-You Tasks for Milestones and Anniversaries
+
+**Purpose:** confirm one task per milestone and anniversary, and none while the setting is off.
+**Prerequisites:** admin user; contact A with 30 approved hours and no Last Hour Milestone; contact B with Volunteer Since exactly two years ago today.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the Developer Console run `VolunteerRecognitionJob.startMorning();`. | Nothing happens: **Send thank-you tasks** is off by default. |
+| 2 | Turn **Send thank-you tasks** on and run it again. | Contact A has one open task for 25 hours, due today, owned by A's owner; A's **Last Hour Milestone** is 25. Contact B has one anniversary task. |
+| 3 | Run it again. | No new task for A or B: a person gets one anniversary task a day. |
+| 4 | Approve hours so A reaches 120, run again. | One task, for 100; Last Hour Milestone is 100. |
+
+**Cleanup:** turn the setting off; delete the tasks.
+
+## T-VOL-26: Waitlist and Minimum on a Shift
+
+**Purpose:** confirm a full shift waitlists and promotes oldest first, and the minimum only shows.
+**Prerequisites:** coordinator; a future Open shift with Volunteers Needed 2 and Minimum Volunteers 2; four people.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Sign up person 1. Open **Shifts Below Minimum**. | The shift is listed with **Below Minimum** ticked. |
+| 2 | Try Minimum Volunteers 3. | Refused: the minimum can't be more than Volunteers Needed. |
+| 3 | With **Waitlist when full** off, sign up persons 2 and 3. | All three are Signed up; Slots Remaining is -1. Cancel person 3. |
+| 4 | Turn **Waitlist when full** on. Sign up person 4, then person 3 again (reopen the cancelled row to Signed up). | Both are saved as **Waitlisted**; Slots Filled stays 2. |
+| 5 | Cancel person 2. | Person 4 (waitlisted first) becomes **Signed up**; person 3 stays Waitlisted. |
+| 6 | Raise Volunteers Needed to 3. | Person 3 becomes **Signed up**. |
+
+**Cleanup:** turn **Waitlist when full** off; cancel the shift.
+
+## T-VOL-27: Group and Standing Sign-Ups
+
+**Purpose:** confirm a group takes its places and a standing sign-up repeats on a schedule.
+**Prerequisites:** coordinator; an active weekly shift schedule with shifts for the next 8 weeks; a shift with Volunteers Needed 10.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the 10-place shift, sign up a leader and set **Group Size** 6, **Group Name** "Acme team". | **Places** is 6; the shift's Slots Filled is 6. |
+| 2 | With **Waitlist when full** on, sign up a group of 5 there. | Saved as **Waitlisted** (4 places left). A single person signed up next is Signed up. |
+| 3 | On the schedule's first shift, sign up a person and tick **Standing**. | Within seconds the person is Signed up, Standing, on every later shift of the schedule. |
+| 4 | Click **Create Shifts Now** after raising the horizon to 10 weeks. | The new shifts also have the standing person. |
+| 5 | Cancel the person's sign-ups from week 5 on, then create shifts again. | No new sign-ups for them. |
+
+**Cleanup:** cancel the test sign-ups; set the horizon back to 8.
+
+## T-VOL-28: Guardian Consent for a Young Volunteer
+
+**Purpose:** confirm a minor's sign-up is flagged and gets one consent step, and nothing is refused.
+**Prerequisites:** coordinator; a contact with a Birthdate 15 years ago; a future shift.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With **Guardian consent required** off, sign them up. | Saved; **Consent Needed** unticked; no new onboarding step. Delete the sign-up. |
+| 2 | Turn it on and sign them up again. | Saved, **Consent Needed** ticked; their **Volunteer Readiness** card shows **Guardian consent**, Not started. |
+| 3 | Sign them up for a second shift. | Flagged again, and still one Guardian consent step. |
+| 4 | Complete the step with a **Guardian**, today's Completed Date and an Expires a year out; sign them up for a third shift. | Not flagged. |
+| 5 | Set **Minor age** to 14 and sign up another 15-year-old with no consent. | Not flagged. |
+
+**Cleanup:** turn the setting off; set Minor age back to 18.
+
+## T-VOL-29: Background Check Details
+
+**Purpose:** confirm provider details are kept on the step and only coordinators see them.
+**Prerequisites:** coordinator and staff users; a person with a Background check step.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the coordinator, edit the step: Provider "Acme Screening", Reference ID "AS-123". | Saved; **Entry Source** reads Entered. |
+| 2 | Load a row with Load One Object with Entry Source Imported. | The row shows Imported. |
+| 3 | As the staff user, look for the step. | Not visible (requirements are kept to coordinators). |
+
+**Cleanup:** delete the loaded row.
+
+## T-VOL-30: Public Volunteer Sign-Up and Personal Page
+
+**Purpose:** confirm a guest can sign up on a public shift page, is matched to their record, and reaches only their own personal page.
+**Prerequisites:** admin; BarnCRM Forms on a Salesforce Site ([Forms testing](forms.md)); a published public sign-up form (first name, last name, email) and a published public profile form (`availabilityDays`, `emergencyContactName`); a job with two future Open shifts; an existing contact C with a known email; shift reminders on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open `<site>/FormsPublic?list=volunteers` in a private window. | "No shifts" or a list without this job: it is not public yet. |
+| 2 | On the job tick **Show on Public Page**, paste the form's ID in **Sign-Up Form**; reload. | Both shifts are listed, soonest first. As a staff user the two fields are read only. |
+| 3 | Open a shift. | The job's description, the shift's day, time and place, places left and the form. No names of people booked. |
+| 4 | Fill the form with C's name and email and send. | The confirmation shows. As the admin, C has a Signed up sign-up on that shift and no duplicate contact. |
+| 5 | Fill the shift up, then reload its page with **Waitlist when full** off. | Sign-up is closed. Turn the waitlist on: the form shows and a new sign-up is Waitlisted. |
+| 6 | Set **Self-service profile form** to the profile form; run `VolunteerReminderBatch.startMorning();` with C's shift inside the reminder window. | C's reminder ends with a personal link. |
+| 7 | Open the link. | C's first name, upcoming shift, hours this year and total with their value, and the profile form. |
+| 8 | Change one character of the link's signature and open it. | The page says it is not available. |
+| 9 | On the real link, pick availability days and an emergency contact name and send. | C's Availability Days and Emergency Contact Name now hold those values. |
+
+**Cleanup:** untick **Show on Public Page**; clear the profile form setting; delete the test sign-ups.
+
+## T-VOL-31: Moving From V4S With the Migration Kit
+
+**Purpose:** confirm the V4S Jobs, Shifts and Hours kit copies jobs, shifts, sign-ups and completed hours, keeps which job and shift each belongs to, and never changes V4S.
+**Prerequisites:** admin; an org with Volunteers for Salesforce installed (a scratch or test org, never production); in V4S, a job J with street and city, two shifts on J (one past with Duration 3, one future with no Duration), a Confirmed and a No-Show hours entry on the future shift, and a Completed hours entry of 2.5 hours on the past shift, each for an existing contact; **Hours require approval** on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | Volunteers for Salesforce shows **Installed in this org** and a **Start Migration** button. |
+| 2 | Select **Start Migration**, then preview and load **Volunteer Jobs**. | One job named as J, Location "street, city", Active. **Check this step** matches. |
+| 3 | Load **Volunteer Shifts**. | Two shifts on the new job: the past one ends three hours after its start and is Completed; the future one ends one hour after its start and is Open. |
+| 4 | Load **Sign-Ups**. | Two sign-ups on the new future shift: Confirmed and No show, for the same contacts. No Attended sign-up and no hours are made. |
+| 5 | Load **Completed Hours**. | One hours entry of 2.5 for the contact on the new job and past shift, Submitted, listed in **Approve Hours**. |
+| 6 | Open the V4S records. | Nothing in V4S changed. |
+| 7 | Undo **Completed Hours**, turn **Hours require approval** off, load the step again. | The entry is Approved. Turn the setting back on. |
+| 8 | Read the kit's checklist. | It names the V4S site pages, recurring schedules, tabs and permission sets, and uninstalling. |
+
+**Cleanup:** undo the four steps in reverse order.

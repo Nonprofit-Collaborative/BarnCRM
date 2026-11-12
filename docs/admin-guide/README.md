@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM landing/batch-c-review ef74bfa4 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM landing/batch-d-i bf7f0eff1 (the integrated Batch D to I build, on top of v1.0 and Batch C). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -107,7 +107,8 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
 | C-30 Editions | [editions.md](editions.md) | Core |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core |
-| Integrations roadmap page | [integrations.md](integrations.md) | Core |
+| Integrations roadmap page, detected apps and migration links (MIG-10) | [integrations.md](integrations.md) | Core |
+| MIG-01 Migration Assistant: kits from another app in the same org, ordered steps, verification, undo, retire checklist; adding a kit | [migration-assistant.md](migration-assistant.md) | Core, kits in modules |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core |
 | C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Giving) |
@@ -116,6 +117,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-08 Record pages | [record-pages.md](record-pages.md) | Core |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core |
+| C-47 Brands and Legal Entities: brand records, assignments, brand-aware receipts, receipt numbering per brand, optional brand-restricted visibility | [brands.md](brands.md) | Core, with brand fields in Giving, Volunteers, Programs and Portal Builder |
 
 ### People, Households and Relationships
 
@@ -134,6 +136,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-25 Multiple email addresses on a person | [emails.md](emails.md) | Core |
 | C-25, C-43 Preferred phone on a person | [preferred-phone.md](preferred-phone.md) | Core |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core |
+| C-64 Engagement score (a nightly 0 to 100 score and meter from gifts, hours, events and activity, admin-weighted) | [engagement-score.md](engagement-score.md) | Core (Giving, Volunteers and Event Management add their parts) |
 | Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) |
 
 ### Data Tools
@@ -145,9 +148,13 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-49d Creating a new field from an import | [import-new-fields.md](import-new-fields.md) | Core |
 | C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
+| C-41, C-41b Grid and saved grids | [grid.md](grid.md) | Core |
 | C-35 Super Transformer runs and undo | [bulk-update.md](bulk-update.md) | Core |
 | C-50 Super Transformer (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
+| C-67 Archive by Query (save old records to a file in Files, then delete them; optionally empty the Recycle Bin) | [archive-by-query.md](archive-by-query.md) | Core |
+| C-66 Backup Sets (saved Find queries saved to files in Files on demand; restore through Load one object) | [backup-sets.md](backup-sets.md) | Core |
+| C-70 Import Files (a zip with a manifest loaded into Files linked to records, with dry run and undo) | [files-import.md](files-import.md) | Core |
 | Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
@@ -158,6 +165,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
 | C-55 Record Inspector (every readable field of one record, on a page of its own opened from record pages) | [record-inspector.md](record-inspector.md) | Core |
 | C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
+| C-68 Field History (changes to chosen fields of BarnCRM's own objects, beyond 20 fields, with restore) | [field-history.md](field-history.md) | Core |
 | AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 
 ### Automation, Totals and Health
@@ -183,6 +191,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-17 Gift batches | [gift-batches.md](gift-batches.md) | Giving |
 | G-04 Refunds and write-offs | [refunds.md](refunds.md) | Giving |
 | G-18 In-kind gifts | [in-kind-gifts.md](in-kind-gifts.md) | Giving |
+| G-21, G-31 Stock, planned and donor-advised fund gifts | [stock-planned-and-daf-gifts.md](stock-planned-and-daf-gifts.md) | Giving |
 | G-07, G-11 Commitments | [commitments.md](commitments.md) | Giving |
 | G-08 Soft credits | [soft-credits.md](soft-credits.md) | Giving |
 | G-09 Tributes | [tributes.md](tributes.md) | Giving |
@@ -197,7 +206,9 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
+| G-27 Recurring donor health | [recurring-donor-health.md](recurring-donor-health.md) | Giving |
 | G-19 Donor scoring | [donor-scoring.md](donor-scoring.md) | Giving |
+| G-32 Wealth screening data | [wealth-screening.md](wealth-screening.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |
 | G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |
@@ -247,6 +258,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Funders |
 | F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Funders |
 | C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, the backfill | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
+| C-46 Address Verification: the org's own Smarty or Google key, checks on save and nightly, corrections, the nightly limit, Health Check | [address-verification.md](address-verification.md) | BarnCRM Address Verification |
 
 ### Forms
 
@@ -261,12 +273,56 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | EV-01 Events: install, roles, the Events page, Repeat Event, the event page; EV-03 ticket types and promo codes; EV-04 the Agenda Builder; EV-05 speakers; EV-06 the call for speakers; EV-09 sponsorship; EV-02 registrations, the waitlist and the Forms link; EV-11 the event dashboard and templates; EV-15 appointments; EV-08 volunteers; EV-12 check-in and QR codes; EV-14 settings, reminders, follow-ups and no-shows; EV-10 the Summit Events import | [events.md](events.md) | BarnCRM Event Management |
 | PB-01 Portal Builder: the integration user and its license, the External Client App, portals and templates, sign-in settings, the WordPress plugin | [portal-builder.md](portal-builder.md) | BarnCRM Portal Builder |
 
+### Corporate Hub
+
+| Feature | Page | Package |
+|---|---|---|
+| CH-01 to CH-08 Corporate Hub: install, access, settings, the shipped templates (not legal advice), Library Documents and versions, policy acknowledgments, the compliance calendar and completed cycles, agreements and renewals, data protection (processing activities, data subject requests, breaches), reminders, reports | [corporate-hub.md](corporate-hub.md) | BarnCRM Corporate Hub |
+
+### Payments
+
+| Feature | Page | Package |
+|---|---|---|
+| PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
+| MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Giving gifts | [online-giving-zapier.md](online-giving-zapier.md) | Giving (Mirror for recipe B) |
+
+### LWC Builder
+
+| Feature | Page | Package |
+|---|---|---|
+| LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
+
+### Project Management
+
+| Feature | Page | Package |
+|---|---|---|
+| PM-01 to PM-05 Project Management: install, access, settings, projects, phases, tasks and milestones, templates (Salesforce Implementation, Program Launch, your own), time entries, assignments, budgets, utilization, Export Billable Time, health, status updates, the Projects at Risk card, reports | [projects.md](projects.md) | BarnCRM Project Management |
+
+### Scholarships and Outbound Grants
+
+| Feature | Page | Package |
+|---|---|---|
+| SG-01 to SG-10, PB-06 Scholarships and Outbound Grants: install, access, settings, programs and cycles, eligibility rules, rubrics, reviewer panels and Assign Reviewers, blind review, applications from Forms, the review board and decisions, award letters, disbursements and conditions, the accounting export, recipient reports and renewals, the applicant portal, reports | [scholarships.md](scholarships.md) | BarnCRM Scholarships and Outbound Grants |
+
+### Territory Management
+
+| Feature | Page | Package |
+|---|---|---|
+| C-40 Territory Management: install, access, territories, rules and priority, preview, assign and undo, the nightly assignment; C-40b owner routing by territory owner, round robin and capacity | [territory-management.md](territory-management.md) | BarnCRM Territory Management |
+
+### Memberships
+
+| Feature | Page | Package |
+|---|---|---|
+| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Giving gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Giving, Payments and Portal Builder optional) |
+
 ### Moving From Another System
 
 | Feature | Page | Package |
 |---|---|---|
 | NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Giving |
 | Nonprofit Cloud import templates | [migrating-from-nonprofit-cloud.md](migrating-from-nonprofit-cloud.md) | Giving |
+| DonorPerfect, Bloomerang, Little Green Light, Neon, CiviCRM and Raiser's Edge NXT gift templates | [moving-from-another-crm.md](moving-from-another-crm.md) | Giving |
 | Moving rollups from Rollup Helper by hand | [moving-from-rollup-helper.md](moving-from-rollup-helper.md) | BarnCRM Rollup Builder |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package |
 

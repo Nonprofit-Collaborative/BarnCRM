@@ -91,6 +91,70 @@
       "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
+      "path": "packages/corporatehub",
+      "default": false,
+      "package": "BarnCRM Corporate Hub",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/payments",
+      "default": false,
+      "package": "BarnCRM Payments",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/lwcbuilder",
+      "default": false,
+      "package": "BarnCRM LWC Builder",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/scholarships",
+      "default": false,
+      "package": "BarnCRM Scholarships and Outbound Grants",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/territory",
+      "default": false,
+      "package": "BarnCRM Territory Management",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/memberships",
+      "default": false,
+      "package": "BarnCRM Memberships",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/projects",
+      "default": false,
+      "package": "BarnCRM Project Management",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/addressverification",
+      "default": false,
+      "package": "BarnCRM Address Verification",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
       "path": "packages/mirror",
       "default": false,
       "package": "BarnCRM Mirror",

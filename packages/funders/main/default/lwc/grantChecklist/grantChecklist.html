@@ -1,0 +1,50 @@
+<template>
+  <lightning-card title={t.title} icon-name={icon}>
+    <template lwc:if={canAdd}>
+      <lightning-button
+        slot="actions"
+        data-id="add"
+        label={t.add}
+        onclick={handleAdd}
+      ></lightning-button>
+    </template>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={t.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+      <template lwc:if={hasTasks}>
+        <p data-id="progress" class="slds-text-body_small slds-var-m-bottom_x-small">{progress}</p>
+        <ul>
+          <template for:each={tasks} for:item="task">
+            <li key={task.id} class="slds-var-m-bottom_x-small">
+              <lightning-input
+                type="checkbox"
+                data-id={task.id}
+                label={task.name}
+                checked={task.done}
+                disabled={task.locked}
+                onchange={handleDone}
+              ></lightning-input>
+              <p class="slds-text-body_small slds-text-color_weak slds-var-p-left_large">
+                <template lwc:if={task.dueDate}>
+                  {t.due}
+                  <lightning-formatted-date-time
+                    value={task.dueDate}
+                    time-zone="UTC"
+                  ></lightning-formatted-date-time>
+                </template>
+                <template lwc:if={task.assignedTo}>. {task.assignedTo}</template>
+              </p>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:elseif={card}>
+        <p data-id="empty" class="slds-text-body_regular">{t.empty}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

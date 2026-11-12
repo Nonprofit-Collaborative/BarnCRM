@@ -161,7 +161,7 @@ public with sharing class VolunteerNudgeService {
 		String greeting = String.isBlank(person.FirstName)
 			? System.Label.Volunteers_Reminders_GreetingNoName
 			: String.format(
-					System.Label.Volunteers_Reminders_Greeting,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_Greeting'),
 					new List<Object>{ person.FirstName }
 			  );
 		String body =
@@ -176,7 +176,7 @@ public with sharing class VolunteerNudgeService {
 			body +=
 				'\n' +
 				String.format(
-					System.Label.Volunteers_Reminders_Where,
+					BarnHelp.text('Volunteers', 'Volunteers_Reminders_Where'),
 					new List<Object>{ shift.Location__c }
 				);
 		}

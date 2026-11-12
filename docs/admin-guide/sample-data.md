@@ -88,9 +88,15 @@ there:
 | Services | 5 | Tutoring hour and Homework club session; Grocery bag and Hot meal; Reading circle |
 | Enrollments | 18 | Six in tutoring (four Enrolled, one Applied, one Withdrawn), eight Enrolled in the pantry and four Completed in summer reading, among 12 sample people |
 | Service deliveries | 40 | A grocery bag a week for the last four weeks to each person in the pantry (one week missed, as an Unexcused Absence), and two tutoring sessions of two hours to each person Enrolled in tutoring |
+| Cohorts | 1 | **Fall homework club**, Active, in tutoring, holding the four people Enrolled there |
+| Sessions | 3 | Homework club 1 and 2 (Held, in the last two weeks) and Homework club 3 (Scheduled, next week), 4:00 PM to 5:30 PM |
+| Attendance | 8 | Each cohort member at each Held session: Present, except one Excused Absence |
+| Goals | 4 | "Read one grade level higher", In Progress, for each person Enrolled in tutoring, with a review due in about two weeks |
+| Goal steps | 8 | Two per goal: "Take the reading assessment" (Done) and "Read 20 minutes each school day" (In Progress) |
 
-Removal takes the sample people's service deliveries and enrollments in the sample programs,
-then the sample programs and their services. A sample program one of your own people is enrolled
+Removal takes the sample people's service deliveries and enrollments in the sample programs
+(their goals and steps go with them), then the sample sessions and cohorts, then the sample
+programs and their services. A sample program one of your own people is enrolled
 in, or has a service delivery in, stays with those records, and so does a sample program with
 a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
 Warning in the [Error Log](error-log.md) names it: "Sample data removal kept the sample
@@ -109,6 +115,7 @@ there:
 | Grant requirements | 3 | On the Youth Programs Award: **Site visit** (Accepted, 10 days ago), **Quarter 1 financial report** (In Progress, due in 10 days) and **Interim narrative report** (Not Started, due in 75 days). With reminders on, the next morning's run reminds you about the financial report. |
 | Grant payments | 2 | On the Youth Programs Award, which is **Restricted**: 17,500 at the award start (Received) and 17,500 six months later (Expected). |
 | Restricted fund entries | 2 | On the same award: the first payment's **Received** entry (17,500) and **Spent** 6,000 on tutor stipends, so the **Restricted Balance** is 11,500. |
+| Grant budget lines | 2 | On the same award: Tutor stipends (30,000 requested, 28,000 awarded), which the Spent entry is on, and Books and supplies (10,000 requested, 7,000 awarded). |
 
 Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
 Funders when the core sample organizations are not there.

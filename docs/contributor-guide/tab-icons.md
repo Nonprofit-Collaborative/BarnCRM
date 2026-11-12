@@ -5,8 +5,8 @@ Every BarnCRM tab, Core and module, carries a motif whose number matches the ico
 Rules:
 
 - Write the motif as `CustomN: Name`, with the name the documented list gives for N.
-- No two BarnCRM tabs share a number, so each tab is recognizable in the navigation, the page header and a console tab.
-- A new tab takes a number no other BarnCRM tab uses. Add it to the table below; `scripts/ci/tests/test_core_navigation.py` fails if it is invalid or reused.
+- No two Core tabs share a number, and no two tabs in one package share a number, so each tab is recognizable in the navigation, the page header and a console tab. Salesforce documents only 100 motifs and BarnCRM had used all of them by the combined build (2026-11-11), so a module tab may reuse a number another module uses, never a Core tab's (D-193).
+- A new tab takes a number no Core tab and no tab in its own package uses; prefer one no tab uses. Add it to the table below; `scripts/ci/tests/test_core_navigation.py` fails if it is invalid or reused against these rules.
 - Add the tab to the icon registry, `packages/core/main/default/lwc/barnIcons/barnIcons.js`, keyed by the tab's API name, in the same PR. The same test fails when a tab is missing from the registry or listed with another number.
 - Navigation icon equals tab icon: a link or tile that opens a tab takes its icon from `iconFor('<tab API name>')` (c/barnIcons). See the [Visual Standard](ux-kit.md#visual-standard).
 - A card's header icon is its own page's or object's tab icon (`custom:customN` with that tab's number), never another tab's. See Card Icons below.
@@ -18,6 +18,7 @@ Rules:
 | core | Automation | Custom32: Factory |
 | core | BarnCRM_Home | Custom1: Heart |
 | core | BarnCRM_Settings | Custom67: Gears |
+| core | Brand__c | Custom56: Bottle |
 | core | Bulk_Update | Custom19: Wrench |
 | core | Data_Hygiene | Custom94: Stethoscope |
 | core | Data_Manager | Custom57: BuildingBlock |
@@ -28,6 +29,7 @@ Rules:
 | core | Households | Custom15: People |
 | core | Import | Custom18: Form |
 | core | Import_Row__c | Custom83: Pencil |
+| core | Legal_Entity__c | Custom58: Caduceus |
 | core | Organizations | Custom24: Building |
 | core | Record_Inspector | Custom38: Camera |
 | core | Relationship__c | Custom37: Bridge |
@@ -39,6 +41,8 @@ Rules:
 | funders | Funders_Board | Custom100: TVWidescreen |
 | funders | Grant_Answer__c | Custom87: Safe |
 | funders | Grant_Calendar | Custom82: Whistle |
+| funders | Grant_Checklist_Item__c | Custom70: Handsaw |
+| funders | Grant_Finder | Custom80: Motorcycle |
 | funders | Grant_Pipeline | Custom92: Ship |
 | funders | Grant_Requirement__c | Custom84: Presenter |
 | funders | Grant__c | Custom8: Diamond |
@@ -68,6 +72,8 @@ Rules:
 | giving | Receipt_Run__c | Custom36: Train |
 | giving | Receipt__c | Custom23: Envelope |
 | giving | Receipts | Custom27: Laptop |
+| giving | Recurring_Donor_Health | Custom86: RedCross |
+| giving | Recurring_Gift_Event__c | Custom21: Computer |
 | giving | Soft_Credit__c | Custom26: Flag |
 | giving | Stewardship_Plan_Template__c | Custom7: Square |
 | giving | Stewardship_Plan__c | Custom43: Jewel |
@@ -79,6 +85,32 @@ Rules:
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
+| corporatehub | Agreement__c | Custom93: ShoppingCart |
+| corporatehub | Board__c | Custom47: Knight |
+| corporatehub | Board_Meeting__c | Custom84: Presenter |
+| corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
+| corporatehub | Corporate_Hub | Custom72: Helicopter |
+| corporatehub | Data_Breach__c | Custom86: RedCross |
+| corporatehub | Data_Subject_Request__c | Custom91: Shield |
+| corporatehub | Hub_Document__c | Custom49: CD/DVD |
+| corporatehub | Processing_Activity__c | Custom55: Books |
+| payments | Payment__c | Custom40: Creditcard |
+| payments | Payment_Event__c | Custom95: Stopwatch |
+| memberships | Membership_Level__c | Custom48: Trophy |
+| memberships | Membership_Term__c | Custom45: Ticket |
+| memberships | Certification__c | Custom8: Diamond |
+| memberships | Member_Certification__c | Custom46: Stamp |
+| addressverification | Address_Verification_Setup | Custom73: HighwaySign |
+| payments | Payments_Setup | Custom70: Handsaw |
+| lwcbuilder | LWC_Builder | Custom34: Insect |
+| scholarships | Award__c | Custom80: Motorcycle |
+| scholarships | Award_Application__c | Custom70: Handsaw |
+| scholarships | Award_Program__c | Custom48: Trophy |
+| scholarships | Scholarships | Custom34: Insect |
+| territory | Territory_Management | Custom34: Insect |
+| projects | Project__c | Custom62: Chalkboard |
+| projects | Projects_Home | Custom64: Compass |
+| projects | Time_Entry__c | Custom95: Stopwatch |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |
@@ -131,9 +163,14 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | core | relationshipPanel | custom:custom37 | Relationship__c |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
+| funders | grantBudget | custom:custom8 | Grant__c |
 | funders | grantCalendar | custom:custom82 | Grant_Calendar |
+| funders | grantChecklist | custom:custom70 | Grant_Checklist_Item__c |
+| funders | grantDocuments | custom:custom84 | Grant_Requirement__c |
+| funders | grantFinder | custom:custom80 | Grant_Finder |
 | funders | grantLinkedRecord | custom:custom88 | Program__c |
 | funders | grantLinkedRecord | custom:custom42 | Fund__c |
+| funders | grantRenewals | custom:custom8 | Grant__c |
 | funders | grantOutcomes | custom:custom62 | Logic_Model__c |
 | funders | grantPipeline | custom:custom92 | Grant_Pipeline |
 | funders | grantReport | custom:custom99 | Funder_Report_Template__c |
@@ -148,12 +185,22 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | pledgeReminders | custom:custom95 | Pledge_Reminders |
 | giving | quickGiftEntry | custom:custom40 | Quick_Gift_Entry |
 | giving | receiptActions | custom:custom23 | Receipt__c |
+| giving | recurringDonorHealth | custom:custom86 | Recurring_Donor_Health |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
+| corporatehub | hubBoardPanel | custom:custom47 | Board__c |
+| corporatehub | hubMeetingPanel | custom:custom84 | Board_Meeting__c |
+| lwcbuilder | lwcBuilderStudio | custom:custom34 | LWC_Builder |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |
 | logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
+| memberships | certificationActions | custom:custom46 | Member_Certification__c |
+| scholarships | applicationReview | custom:custom70 | Award_Application__c |
+| scholarships | awardCycleBoard | custom:custom48 | Award_Program__c |
+| scholarships | awardPanel | custom:custom80 | Award__c |
+| projects | projectBoard | custom:custom62 | Project__c |
+| projects | projectsAtRisk | custom:custom62 | Project__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |
 | mirror | giftTransactionMirror | custom:custom31 | Gift_Transaction_Mirror |

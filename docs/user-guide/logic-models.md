@@ -4,8 +4,8 @@ This page covers building a logic model in BarnCRM: the parts of your program fr
 in to the change you hope for, the arrows between them, and the indicators that measure your
 outputs and outcomes, with a target and a result for each period.
 
-**Before you start:** open the **BarnCRM Logic Models** app from the App Launcher. Program Staff
-and Coordinators build models and can delete parts, but not a whole model. Admins can also delete
+**Before you start:** open the **BarnCRM Logic Models** app from the App Launcher. Team Members
+and Fundraising Staff build models and can delete parts, but not a whole model. Admins can also delete
 a whole model. Read Only users can look but change nothing. If you need more access, ask your
 admin (see the [Logic Models admin guide](../admin-guide/logic-models.md#roles-and-permission-sets)).
 
@@ -84,6 +84,11 @@ To change an assumption, click **Edit** beside the arrow. To remove an arrow, cl
 then **Remove** in the dialog.
 Arrows into the part are listed under **Comes From**.
 
+To record what supports an assumption, click **Assumption Evidence** under the arrow, then
+**Add**. Write **What It Shows**, and if you have them the **Source**, a **Source Link** and
+the **Date**, and pick a **Strength** (Strong, Moderate, Limited, or Challenges when it points the
+other way). Click **Save**. The newest evidence is listed first.
+
 ## To Measure an Output or Outcome
 
 1. Click the output or outcome. Its **Indicators** show below its arrows.
@@ -96,7 +101,7 @@ You should see: the period in the indicator's table. **Progress** is a bar with 
 result reaches the target, or how far it got from the baseline, for example 50%.
 
 To record a result later, click **Edit** on the period's row. Each indicator has one row for the
-same start and end dates.
+same start and end dates: the form tells you when the dates you pick are already used.
 
 ## To Use the Same Periods for Every Indicator
 
@@ -143,8 +148,8 @@ and the record it is about; BarnCRM builds the saved query in Find for them.
 1. Scroll to **Logic Model Report** at the bottom of the builder.
 2. Under **Periods to Compare**, tick the periods you want side by side. The latest four are
    ticked when the page opens.
-3. Click **Download CSV** for a spreadsheet, or **Download Printable Report** for a page to open
-   in your browser and print, or save as a PDF.
+3. Click **Download CSV** for a spreadsheet, **Download Printable Report** for a page to open
+   in your browser and print, or **Download PDF** for a PDF file to send.
 
 You should see: one row per indicator with its baseline and, for each period, the target, the
 result and the progress. Periods with the same dates count as one, so name them the same way on

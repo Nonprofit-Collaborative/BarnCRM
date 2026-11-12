@@ -25,14 +25,6 @@
     <value>Not yet</value>
   </labels>
   <labels>
-    <fullName>Giving_DonorLevels_Off</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: the feature is switched off</shortDescription>
-    <value>Donor levels are off. Build your ladder here, then turn Donor levels on in BarnCRM Settings under Giving.</value>
-  </labels>
-  <labels>
     <fullName>Giving_DonorLevels_NewLevel</fullName>
     <categories>Giving, Donor Levels</categories>
     <language>en_US</language>
@@ -47,14 +39,6 @@
     <protected>false</protected>
     <shortDescription>Donor levels page: recalculate button</shortDescription>
     <value>Recalculate Now</value>
-  </labels>
-  <labels>
-    <fullName>Giving_DonorLevels_RecalculateStarted</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: recalculation started</shortDescription>
-    <value>Placing every donor on the ladder. This runs in the background and the counts below update when it finishes.</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_ColumnLevel</fullName>
@@ -95,29 +79,5 @@
     <protected>false</protected>
     <shortDescription>Donor levels page: no maximum on the top rung</shortDescription>
     <value>and above</value>
-  </labels>
-  <labels>
-    <fullName>Giving_DonorLevels_NotPermitted</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: recalculation refused</shortDescription>
-    <value>You need the Manage BarnCRM Settings permission to place every donor on the ladder. Ask whoever set up BarnCRM for it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_DonorLevels_TurnOnFirst</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: recalculation refused because levels are off</shortDescription>
-    <value>Turn Donor levels on in BarnCRM Settings under Giving before placing donors on the ladder.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_DonorLevels_ActionFailed</fullName>
-    <categories>Giving, Donor Levels</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Donor levels page: something went wrong</shortDescription>
-    <value>BarnCRM could not read your donor levels. The details are in the Error Log.</value>
   </labels>
 </CustomLabels>

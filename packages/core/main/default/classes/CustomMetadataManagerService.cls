@@ -206,10 +206,23 @@ public with sharing class CustomMetadataManagerService {
 		mergeRules.choicesObject = Merge_Rule__mdt.SObjectType;
 		mergeRules.validator = new MergeRuleService.Validator();
 
+		// The fields Field History Keeper keeps (C-68, R-FH1): one active row per field.
+		EditableType historyFields = new EditableType();
+		historyFields.type = History_Field__mdt.SObjectType;
+		historyFields.label = BarnHelp.text('Core', 'Core_FieldHistory_TypeLabel');
+		historyFields.help = BarnHelp.text('Core', 'Core_FieldHistory_TypeHelp');
+		historyFields.fields = new List<Schema.SObjectField>{ History_Field__mdt.Field_Name__c };
+		historyFields.required = new Set<Schema.SObjectField>{ History_Field__mdt.Field_Name__c };
+		historyFields.archiveField = History_Field__mdt.Active__c;
+		historyFields.uniqueField = History_Field__mdt.Field_Name__c;
+		historyFields.choicesFrom = new Map<Schema.SObjectField, Schema.SObjectField>();
+		historyFields.validator = new FieldHistoryService.Validator();
+
 		return new Map<String, EditableType>{
 			nameOf(relationshipTypes) => relationshipTypes,
 			nameOf(matchSources) => matchSources,
-			nameOf(mergeRules) => mergeRules
+			nameOf(mergeRules) => mergeRules,
+			nameOf(historyFields) => historyFields
 		};
 	}
 

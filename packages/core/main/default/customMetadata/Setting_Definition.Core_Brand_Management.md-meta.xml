@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Use brands</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Brand_Management__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">BarnCRM_Settings__c</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Organization</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Description__c</field><value
+      xsi:type="xsd:string"
+    >For an organization that works under several names, such as programs, chapters, affiliates or a thrift store. On, new gifts, appeals, volunteer jobs, programs and portals take a brand, and receipts and letters print the brand's name, logo, address and signature. Off, everything prints your organization details as before.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">80</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">brands.md</value></values>
+</CustomMetadata>

@@ -19,7 +19,8 @@ const GROUPS = [
     label: ORGANIZATION,
     sections: [
       ['General', 'utility:settings'],
-      ['Organization', 'utility:company']
+      ['Organization', 'utility:company'],
+      ['Corporate Hub', 'utility:knowledge_base']
     ]
   },
   {
@@ -29,6 +30,7 @@ const GROUPS = [
       ['People and Households', 'utility:groups'],
       ['Addresses', 'utility:location'],
       ['Contact Points', 'utility:contact_request'],
+      ['Forms', 'utility:form'],
       ['Portals', 'utility:identity']
     ]
   },
@@ -38,6 +40,7 @@ const GROUPS = [
     sections: [
       ['Import', 'utility:upload'],
       ['Duplicate Matching', 'utility:merge'],
+      ['Field History', 'utility:clock'],
       ['Rollups', 'utility:summary'],
       ['Org Optimizer', 'utility:magicwand']
     ]
@@ -48,7 +51,8 @@ const GROUPS = [
     sections: [
       ['Giving', 'utility:moneybag'],
       ['Receipts', 'utility:email'],
-      ['Funders', 'utility:trophy']
+      ['Funders', 'utility:trophy'],
+      ['Scholarships and Grants', 'utility:education']
     ]
   },
   {
@@ -56,8 +60,11 @@ const GROUPS = [
     label: PROGRAMS,
     sections: [
       ['Programs', 'utility:education'],
+      ['Territory Management', 'utility:world'],
+      ['Logic Models', 'utility:hierarchy'],
       ['Volunteers', 'utility:people'],
-      ['Events', 'utility:event']
+      ['Events', 'utility:event'],
+      ['Projects', 'utility:task']
     ]
   },
   { name: 'more', label: MORE, sections: [] },
@@ -76,6 +83,16 @@ const GROUPS = [
 ];
 
 const OTHER_ICON = 'utility:settings';
+
+/**
+ * Where a row's Open button goes: a target that is an object (Form__c) opens that object's tab,
+ * where its records are set up (C-72); any other target is a page tab (ADR-0020).
+ */
+export function openPageReference(target) {
+  return String(target).endsWith('__c')
+    ? { type: 'standard__objectPage', attributes: { objectApiName: target, actionName: 'home' } }
+    : { type: 'standard__navItemPage', attributes: { apiName: target } };
+}
 
 /** The groups to show for these section names: `{ name, label, items: [{ name, label, iconName }] }`. */
 export function navigationGroups(sectionNames) {

@@ -21,9 +21,6 @@ import ATTENDANCE_RATE from '@salesforce/label/c.Programs_Dashboard_AttendanceRa
 import PROGRAM from '@salesforce/label/c.Core_Shared_Program';
 import BY_PROGRAM from '@salesforce/label/c.Programs_Dashboard_ByProgram';
 import NO_RATE from '@salesforce/label/c.Programs_Dashboard_NoRate';
-import NO_PROGRAMS from '@salesforce/label/c.Programs_Dashboard_NoPrograms';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Dashboard_MoreThanShown';
-import NO_ACCESS from '@salesforce/label/c.Programs_Dashboard_NoAccess';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import TOOLS from '@salesforce/label/c.Core_SettingsGroup_Tools';
 
@@ -91,9 +88,15 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
     delivered: DELIVERED,
     attendanceRate: ATTENDANCE_RATE,
     byProgram: BY_PROGRAM,
-    noPrograms: NO_PROGRAMS,
-    moreThanShown: MORE_THAN_SHOWN,
-    noAccess: NO_ACCESS,
+    get noPrograms() {
+      return helpText('Programs', 'Programs_Dashboard_NoPrograms');
+    },
+    get moreThanShown() {
+      return helpText('Programs', 'Programs_Dashboard_MoreThanShown');
+    },
+    get noAccess() {
+      return helpText('Programs', 'Programs_Dashboard_NoAccess');
+    },
     loading: LOADING
   };
 

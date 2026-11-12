@@ -77,7 +77,7 @@ main column has three tabs: **Details** (the gift's field sections), **Credits a
 first), the **Tributes** list (with **New**) and the **Acknowledgments** list are part of the
 page itself, so they look the same whichever page layout your profiles use. The sidebar keeps
 **Posting** and **Receipt Actions**. A gift that pays
-a pledge or recurring gift shows it in **Commitment** and **Installment**, both of which you
+a pledge or recurring gift shows it in **Commitment** and **Scheduled Payment**, both of which you
 can also set on the new gift form. The
 **Activity** panel can log a call, create a task or create an event.
 

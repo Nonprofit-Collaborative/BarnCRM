@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Venue_Room__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The room record. Saving copies its name into Room and its capacity into a blank Capacity.</inlineHelpText>
+  <label>Room Record</label>
+  <referenceTo>Event_Room__c</referenceTo>
+  <relationshipLabel>Sessions</relationshipLabel>
+  <relationshipName>Sessions</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

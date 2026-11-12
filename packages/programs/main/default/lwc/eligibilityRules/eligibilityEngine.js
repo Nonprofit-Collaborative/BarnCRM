@@ -8,6 +8,7 @@
  * operator, value } ], result, reason, basis } ] }. Rules are checked in order; the first whose
  * conditions all hold decides; when none does the default result decides.
  */
+import { format } from 'c/barnFormat';
 
 export const ELIGIBLE = 'Eligible';
 export const NOT_ELIGIBLE = 'Not Eligible';
@@ -239,13 +240,8 @@ export function evaluateRules(config, values, noRuleMatchedReason) {
   };
 }
 
-/** Replaces {0}, {1} and so on in a label with the values given. */
-export function format(template, ...values) {
-  return values.reduce(
-    (text, value, index) => text.split(`{${index}}`).join(String(value)),
-    template || ''
-  );
-}
+/** Replaces {0}, {1} and so on in a label with the values given (shared, UTIL-01). */
+export { format };
 
 /** Moves a rule one place up (-1) or down (1); returns a new list. */
 export function moveRule(rules, index, step) {

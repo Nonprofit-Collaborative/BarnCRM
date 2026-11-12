@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Territory Management page: territories, rules and members, Preview and Assign runs, and
+    Undo (C-40, C-40b; ADR-0205 territory management module).
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>territoryManager</componentName>
+        <identifier>territoryManagerPageComponent</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Territory Management</masterLabel>
+  <template>
+    <name>flexipage:defaultAppHomeTemplate</name>
+  </template>
+  <type>AppPage</type>
+</FlexiPage>

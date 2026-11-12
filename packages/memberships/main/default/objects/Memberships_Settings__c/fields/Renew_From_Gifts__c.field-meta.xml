@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Renew_From_Gifts__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description>Whether Giving gifts to a level's fund pay memberships.</description>
+  <externalId>false</externalId>
+  <label>Renew From Gifts</label>
+  <type>Checkbox</type>
+</CustomField>

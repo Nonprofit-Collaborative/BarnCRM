@@ -1,6 +1,6 @@
 # Funders
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03), the Grant Calendar (F-08), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06) and the board dashboard (F-07). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03), the Grant Calendar (F-08), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06), the board dashboard (F-07), the Grant Finder (F-09), application checklists (F-10), grant documents (F-11), budget versus awarded (F-12) and renewals (F-13). Setup detail: [Funders](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
 and Funders deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
@@ -299,3 +299,80 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 8 | At phone width, open the tab. | Tiles two to a row; the restricted tables stack each row. |
 
 **Cleanup:** none.
+
+## T-FUN-17: Grant Finder
+
+**Purpose:** confirm searching Grants.gov and saving a result as a prospect (F-09, R-GN11).
+**Prerequisites:** staff and read-only users; the org can reach `https://api.grants.gov`; no organization named after the agency of the result you save.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, open the **Grant Finder** tab, type `literacy`, keep **Posted** and click **Search**. | Up to 25 results, each with title, agency, opportunity number, open and close dates and assistance listing number; each title links to its Grants.gov page in a new tab. |
+| 2 | Click **Save to Pipeline** on a result. | `Saved to the pipeline as a prospect.`; the result shows **Saved** with a link. The grant is at Prospect with the title, close date as Application Deadline, Funding Source Federal, the agency as Federal Agency and Funder (a new organization), and the Funding Listing Link. |
+| 3 | Search `literacy` again. | The same result shows **Saved**, not **Save to Pipeline**. |
+| 4 | Search `zzqqxxnothing`. | `No open opportunities match. Try other words.` |
+| 5 | As read-only, open the tab and search. | Results show; no **Save to Pipeline** buttons. |
+| 6 | As the admin, turn **Grant Finder** off in BarnCRM Settings, Funders; reload the tab as staff. | The tab says the Grant Finder is off and shows no search. Turn it back on. |
+
+**Cleanup:** delete the saved grant and the organization it made.
+
+## T-FUN-18: Application Checklists
+
+**Purpose:** confirm checklist items become tasks by stage (F-10, R-GQ7).
+**Prerequisites:** admin and staff users; `Lakeside Foundation`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, on **Grant Checklist** add `Call the program officer` (Stage Prospect, Days Before Deadline 7, Assigned To staff) and `Attach the budget` (Stage Applied, blank days). | Both saved. As staff, the tab is read only. |
+| 2 | As staff, create `Checklist Grant` for Lakeside at Prospect with Application Deadline 30 days ahead. | Its **Checklist** card (Writing tab) shows `Call the program officer`, due 23 days ahead, assigned to staff, 0 of 1 done. |
+| 3 | Tick the task. | 1 of 1 done; the requirement's Status is Done. Untick it: Not Started. |
+| 4 | Move the grant to Applied. | `Attach the budget` is added, due on the deadline; the Prospect task is not added again. |
+| 5 | Click **Add Checklist Tasks**. | `No checklist tasks to add.`; nothing changes. |
+| 6 | As the admin, switch off **Grant: add checklist tasks** on the Automation page; create another Prospect grant. | No task is added. Click **Add Checklist Tasks** on it: the Prospect task is added. Switch the automation back on. |
+
+**Cleanup:** delete the grants and the checklist items.
+
+## T-FUN-19: Grant Documents
+
+**Purpose:** confirm document requirements and their files (F-11, R-GQ8).
+**Prerequisites:** staff and read-only users; `Checklist Grant` from T-FUN-18, or any grant.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, on the grant's **Documents** card click **New Document**; save `Letter of inquiry`, Type Letter of Inquiry, due in 10 days. | The card lists it with Not Started, its due date and no file. |
+| 2 | Click **Upload** on it and upload `loi.pdf`. | `loi.pdf` shows with version 1. |
+| 3 | Open the file, **Upload New Version**, then reload the grant. | Still one file, version 2. |
+| 4 | Set the requirement's Status to Submitted. | The card shows Submitted and today as the submitted date. |
+| 5 | As read-only, open the grant. | The document and its file show; no **Upload** or **New Document**. |
+
+**Cleanup:** delete the requirement and the file.
+
+## T-FUN-20: Budget Versus Awarded
+
+**Purpose:** confirm budget lines against the award and restricted spending (F-12, R-BL1, R-BL2, R-FE3).
+**Prerequisites:** staff user; an Awarded restricted grant `Budget Grant` with Amount Requested 30,000 and Amount Awarded 25,000, and a second grant `Other Grant`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, on `Budget Grant` add lines `Staff` (requested 20,000, awarded 18,000) and `Supplies` (requested 10,000, awarded 5,000). | The **Budget** card shows both lines and totals 30,000 requested and 23,000 awarded, with a note that the awarded lines differ from the grant's Amount Awarded by 2,000. |
+| 2 | Add a Spent fund entry of 4,000 with Budget Line `Staff`, and a Spent entry of 1,000 with no line. | `Staff`: spent 4,000, remaining 14,000; **Not on a line** 1,000. |
+| 3 | Add a Spent entry on `Other Grant` and choose `Staff` as its Budget Line. | Refused: `Pick a budget line of this entry's grant.` |
+| 4 | Set a line's Amount Requested to -1. | Refused: `A budget line's amounts can't be below zero.` |
+
+**Cleanup:** delete the entries and lines.
+
+## T-FUN-21: Renewals
+
+**Purpose:** confirm the renewal requirement, Start Renewal and the history (F-13, R-GN12, R-FS2).
+**Prerequisites:** staff user; `Budget Grant` from T-FUN-20 with its lines, Award End Date 200 days ahead.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff, tick **Renewable** on `Budget Grant`. | A **Renewal** requirement is added, due 110 days ahead (90 before the end date). |
+| 2 | Move the Award End Date 30 days later. | The Renewal requirement's due date moves 30 days later. |
+| 3 | On the **Renewals** card click **Start Renewal**. | `Renewal started.`; the new grant opens at Prospect, Amount Requested 25,000, Renewal Of `Budget Grant`, Renewable ticked, with copies of `Staff` and `Supplies` asking their awarded amounts. The old Renewal requirement is Done. |
+| 3a | On the original grant, start a renewal again (the card button, or a second tab opened before step 3). | Refused: "A renewal of this grant already exists." No second grant is made. |
+| 4 | Read the **Renewals** card on either grant. | Both grants, oldest first, with stage, award period and amounts; the grant you are on is marked. |
+| 5 | As the admin, set **Days before an award ends to renew** to 0 in Settings. | Refused: from 1 to 365. |
+
+**Cleanup:** delete the renewal grant.

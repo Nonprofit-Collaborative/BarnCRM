@@ -1,0 +1,96 @@
+<template>
+  <lightning-card title={t.title} icon-name={icon}>
+    <template lwc:if={canCreate}>
+      <lightning-button
+        slot="actions"
+        data-id="new"
+        label={t.add}
+        onclick={handleNew}
+      ></lightning-button>
+    </template>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={t.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+      <template lwc:if={hasLines}>
+        <table
+          class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+        >
+          <thead>
+            <tr>
+              <th scope="col">{t.line}</th>
+              <th scope="col" class="slds-text-align_right">{t.requested}</th>
+              <th scope="col" class="slds-text-align_right">{t.awarded}</th>
+              <th scope="col" class="slds-text-align_right">{t.spent}</th>
+              <th scope="col" class="slds-text-align_right">{t.remaining}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id} data-id="line">
+                <th scope="row"><a href={row.url}>{row.name}</a></th>
+                <td class="slds-text-align_right">
+                  <lightning-formatted-number
+                    value={row.requested}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </td>
+                <td class="slds-text-align_right">
+                  <lightning-formatted-number
+                    value={row.awarded}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </td>
+                <td class="slds-text-align_right">
+                  <lightning-formatted-number
+                    value={row.spent}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </td>
+                <td class={row.remainingClass} data-id="remaining">
+                  <lightning-formatted-number
+                    value={row.remaining}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </td>
+              </tr>
+            </template>
+            <tr>
+              <th scope="row">{t.total}</th>
+              <td class="slds-text-align_right">
+                <lightning-formatted-number
+                  value={view.totals.requested}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </td>
+              <td class="slds-text-align_right">
+                <lightning-formatted-number
+                  value={view.totals.awarded}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </td>
+              <td class="slds-text-align_right">
+                <lightning-formatted-number
+                  value={view.totals.spent}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+      <template lwc:elseif={budget}>
+        <p data-id="empty" class="slds-text-body_regular">{t.empty}</p>
+      </template>
+      <template for:each={notes} for:item="note">
+        <p key={note.key} data-id="note" class="slds-text-body_small slds-var-m-top_x-small">
+          {note.text}
+        </p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

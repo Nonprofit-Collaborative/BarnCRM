@@ -53,12 +53,14 @@ public with sharing class VolunteerLetterService {
 			? null
 			: VolunteerLetterSelector.template(templateId);
 		if (template == null || String.isBlank(template.Body__c)) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_TemplateNotFound);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_TemplateNotFound')
+			);
 		}
 		if (template.Active__c != true) {
 			throw new VolunteerLetterException(
 				String.format(
-					Label.Volunteers_Letter_TemplateInactive,
+					BarnHelp.text('Volunteers', 'Volunteers_Letter_TemplateInactive'),
 					new List<Object>{ template.Name }
 				)
 			);
@@ -73,7 +75,9 @@ public with sharing class VolunteerLetterService {
 	public static Id activeTemplateIdForType(String letterType) {
 		requireManage();
 		if (String.isBlank(letterType)) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_TypeRequired);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired')
+			);
 		}
 		Volunteer_Letter_Template__c template = VolunteerLetterSelector.activeTemplateOfType(
 			letterType.trim()
@@ -81,7 +85,7 @@ public with sharing class VolunteerLetterService {
 		if (template == null || String.isBlank(template.Body__c)) {
 			throw new VolunteerLetterException(
 				String.format(
-					Label.Volunteers_Letter_NoActiveTemplateForType,
+					BarnHelp.text('Volunteers', 'Volunteers_Letter_NoActiveTemplateForType'),
 					new List<Object>{ letterType.trim() }
 				)
 			);
@@ -101,7 +105,9 @@ public with sharing class VolunteerLetterService {
 
 	private static void requirePeriod(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null || fromDate > toDate) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_BadPeriod);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod')
+			);
 		}
 	}
 
@@ -117,17 +123,28 @@ public with sharing class VolunteerLetterService {
 		Map<Id, Person> found = readPeople(people);
 		Map<Id, Decimal> totals = new Map<Id, Decimal>();
 		Map<Id, String> jobLists = new Map<Id, String>();
-		collectHours(people, fromDate, toDate, totals, jobLists);
+		Map<Id, Set<Id>> brandsByPerson = new Map<Id, Set<Id>>();
+		collectHours(people, fromDate, toDate, totals, jobLists, brandsByPerson);
 
+		String organizationName = escape(
+			BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
+		);
 		Map<String, String> shared = new Map<String, String>{
-			'OrganizationName' => escape(
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
-			),
+			'OrganizationName' => organizationName,
 			'OrganizationAddress' => escape(OrganizationAddress.oneLine()),
+			'BrandName' => organizationName,
+			'BrandPhone' => '',
+			'BrandWebsite' => '',
+			'BrandSignature' => '',
+			'BrandLogo' => '',
 			'FromDate' => escape(fromDate.format()),
 			'ToDate' => escape(toDate.format()),
 			'Today' => escape(Date.today().format())
 		};
+		// V-12 (R-VP5, R-VL2): the value of an hour and of the person's hours; empty at 0.
+		Decimal rate = VolunteerSettings.hourValue();
+		shared.put('HourValue', escape(money(rate)));
+		Map<Id, Map<String, String>> brandTokens = brandTokens(brandsByPerson);
 
 		List<Letter> letters = new List<Letter>();
 		for (Id personId : people) {
@@ -136,17 +153,21 @@ public with sharing class VolunteerLetterService {
 			Person person = found.get(personId);
 			if (person == null) {
 				letter.skipReason = personId.getSObjectType() == Account.SObjectType
-					? Label.Volunteers_Letter_NotAPerson
-					: Label.Volunteers_Letter_PersonNotVisible;
+					? BarnHelp.text('Volunteers', 'Volunteers_Letter_NotAPerson')
+					: BarnHelp.text('Volunteers', 'Volunteers_Letter_PersonNotVisible');
 			} else if (!totals.containsKey(personId)) {
 				letter.personName = person.name;
-				letter.skipReason = Label.Volunteers_Letter_NoHours;
+				letter.skipReason = BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours');
 			} else {
 				letter.personName = person.name;
 				Map<String, String> values = new Map<String, String>(shared);
+				if (brandTokens.containsKey(personId)) {
+					values.putAll(brandTokens.get(personId));
+				}
 				values.put('PersonName', escape(person.name));
 				values.put('FirstName', escape(person.firstName));
 				values.put('Hours', escape(totals.get(personId).format()));
+				values.put('HoursValue', escape(money(totals.get(personId) * rate)));
 				values.put('JobList', jobLists.get(personId) + '</ul>');
 				letter.body = mergeTokens(template.Body__c, values);
 			}
@@ -217,7 +238,9 @@ public with sharing class VolunteerLetterService {
 
 	public static void requireManage() {
 		if (!VolunteerHoursService.canManage()) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_NeedManagePermission);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission')
+			);
 		}
 	}
 
@@ -269,7 +292,8 @@ public with sharing class VolunteerLetterService {
 		Date fromDate,
 		Date toDate,
 		Map<Id, Decimal> totals,
-		Map<Id, String> jobLists
+		Map<Id, String> jobLists,
+		Map<Id, Set<Id>> brandsByPerson
 	) {
 		if (people.isEmpty()) {
 			return;
@@ -290,6 +314,10 @@ public with sharing class VolunteerLetterService {
 				continue;
 			}
 			String job = (String) row.get('jobName');
+			if (!brandsByPerson.containsKey(personId)) {
+				brandsByPerson.put(personId, new Set<Id>());
+			}
+			brandsByPerson.get(personId).add((Id) row.get('brandId'));
 			totals.put(personId, (totals.containsKey(personId) ? totals.get(personId) : 0) + hours);
 			String opening = jobLists.containsKey(personId) ? jobLists.get(personId) : '<ul>';
 			jobLists.put(
@@ -308,6 +336,58 @@ public with sharing class VolunteerLetterService {
 					'</li>'
 			);
 		}
+	}
+
+	/**
+	 * C-47b, R-BR5: the letterhead tokens of each person whose hours in the period are all for
+	 * jobs of one brand (no brand reads as the default brand). A person whose jobs span brands, or
+	 * any person while brands are off, keeps the organization's identity. Read once per call.
+	 */
+	private static Map<Id, Map<String, String>> brandTokens(Map<Id, Set<Id>> brandsByPerson) {
+		Map<Id, Map<String, String>> result = new Map<Id, Map<String, String>>();
+		if (!BrandService.isEnabled()) {
+			return result;
+		}
+		Set<Id> brandIds = new Set<Id>();
+		for (Set<Id> brands : brandsByPerson.values()) {
+			brandIds.addAll(brands);
+		}
+		brandIds.remove(null);
+		Map<Id, BrandService.Profile> profiles = BrandService.profilesFor(brandIds);
+		profiles.put(null, BrandService.profileFor(null));
+		Map<String, String> logos = new Map<String, String>();
+		for (Id personId : brandsByPerson.keySet()) {
+			Set<Id> brands = brandsByPerson.get(personId);
+			BrandService.Profile brand = brands.size() == 1
+				? profiles.get(new List<Id>(brands)[0])
+				: null;
+			if (brand == null) {
+				continue;
+			}
+			Map<String, String> tokens = new Map<String, String>{
+				'BrandName' => escape(brand.brandName),
+				'BrandPhone' => escape(brand.phone),
+				'BrandWebsite' => escape(brand.website),
+				'BrandSignature' => escape(brand.signature).replace('\n', '<br/>')
+			};
+			if (String.isNotBlank(brand.legalName)) {
+				tokens.put('OrganizationName', escape(brand.legalName));
+			}
+			if (!brand.addressLines.isEmpty()) {
+				tokens.put('OrganizationAddress', escape(String.join(brand.addressLines, ', ')));
+			}
+			String logoId = brand.logoDocumentId;
+			if (String.isNotBlank(logoId) && !logos.containsKey(logoId)) {
+				String path = BrandService.logoPath(logoId);
+				logos.put(
+					logoId,
+					path == null ? '' : '<img class="logo" src="' + escape(path) + '" alt=""/>'
+				);
+			}
+			tokens.put('BrandLogo', String.isBlank(logoId) ? '' : logos.get(logoId));
+			result.put(personId, tokens);
+		}
+		return result;
 	}
 
 	private static final Pattern TOKEN = Pattern.compile('\\{(\\w+)\\}');
@@ -334,5 +414,31 @@ public with sharing class VolunteerLetterService {
 
 	private static String escape(String value) {
 		return value == null ? '' : value.escapeHtml4();
+	}
+
+	private static final Map<String, String> SYMBOLS = new Map<String, String>{
+		'USD' => '$',
+		'CAD' => '$',
+		'AUD' => '$',
+		'NZD' => '$',
+		'GBP' => '£',
+		'EUR' => '€'
+	};
+
+	/**
+	 * An amount in the org's default currency, such as $1,043.70: the common symbols, else the
+	 * ISO code. Null for nothing or 0, so the token merges as empty (R-VP5). The personal page
+	 * (`VolunteerPublicPage`) shows the value of hours the same way.
+	 */
+	public static String money(Decimal amount) {
+		if (amount == null || amount <= 0) {
+			return null;
+		}
+		Decimal rounded = amount.setScale(2, System.RoundingMode.HALF_UP);
+		Long whole = rounded.longValue();
+		String cents = String.valueOf(((rounded - whole) * 100).intValue()).leftPad(2, '0');
+		String code = UserInfo.getDefaultCurrency();
+		String symbol = SYMBOLS.containsKey(code) ? SYMBOLS.get(code) : code + ' ';
+		return symbol + whole.format() + '.' + cents;
 	}
 }

@@ -6,7 +6,7 @@ keeps its member count right. Organizations (employers, foundations, congregatio
 are kept separately.
 
 Before you start: open the **BarnCRM** app. Adding and changing people and households needs
-the Team Member, Coordinator, Fundraising Staff or Admin role. With Read Only you can look
+the Team Member, Fundraising Staff or Admin role. With Read Only you can look
 but not change; see [Read-only access](read-only-access.md).
 
 ## To Add a Person
@@ -38,8 +38,10 @@ into a household.
 1. Open the household and click the **Connections** tab. Find the **Members** card.
 2. Click **Add Member**. The **Add Member** dialog opens.
 3. Either search under **Add Someone Already in Salesforce** (type in **Search by name** and
-   choose the person), or fill in **Salutation**, **First Name** and **Last Name** under **Or
-   Add Someone New**.
+   choose the person), or fill in **Salutation**, **First Name** and **Last Name** (and,
+   if you like, **Email** and **Phone**) under **Or Add Someone New**. If the person you choose is in another
+   household, a line names it, for example "Ana Garcia is in The Lopez Family and will move to
+   this household." Click **Save** to confirm, or **Cancel** to leave them where they are.
 4. If a note appears under the name, such as "Already in BarnCRM: Ana Garcia, Tampa (Garcia
    Household). Use this person instead?", the person may already exist. Click **Use this
    person instead?** to add them rather than a duplicate; otherwise carry on.
@@ -47,8 +49,8 @@ into a household.
 
 You should see: "Added. The household name and greetings have been brought up to date." The
 dialog closes. Each member shows as a tile with their initials, a **Primary** badge on the primary contact and a **Deceased** badge on
-anyone marked deceased. (In orgs that use the simple way of belonging, the search box is not
-shown; you add someone new.)
+anyone marked deceased. (In orgs that use the simple way of belonging, a person belongs to
+one household, so adding someone from the search moves them here.)
 
 ## To Change the Primary Contact
 
@@ -122,6 +124,19 @@ You should see: "Moved. Both household names and member counts are up to date."
 
 You should see: the note under **Past Activity** in the activity timeline. Anyone who can see
 the record can read it, so write accordingly.
+
+## To Read a Person's Engagement Score
+
+When your admin has turned Engagement Score on, a person's page shows an **Engagement Score**
+meter from 0 to 100 and the day it was scored. A person who has not been scored yet shows
+**Not scored yet** in place of the meter.
+
+1. Open the person. The meter is on the right of the page.
+2. Click the help icon beside the title to see what goes into the score.
+
+A higher score means more recent giving, volunteering, event attendance and logged activity,
+weighted the way your organization chose. It is worked out each night, so a gift entered today
+counts from tomorrow. To list people by score, use **Engagement Score** in Find or a list view.
 
 ## To Add an Organization
 

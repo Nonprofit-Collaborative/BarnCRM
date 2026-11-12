@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Payments Setup page: the receiver address for each processor, whether each key is
+    entered, Save Keys and Clear.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Payments Setup</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

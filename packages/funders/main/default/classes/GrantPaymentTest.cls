@@ -133,7 +133,11 @@ private class GrantPaymentTest {
 			Assert.areEqual(2, built.payments.size(), 'Two payments');
 			Assert.areEqual(START, built.payments[0].dueDate, 'In date order');
 			Assert.areEqual(25000, built.amountScheduled, 'All of it scheduled');
-			Assert.areEqual(Label.Funders_Schedule_CannotBuild, again, 'Not twice');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'),
+				again,
+				'Not twice'
+			);
 			Assert.areEqual('Annual', built.frequency, 'The frequency is kept on the grant');
 			Assert.areEqual(5, before.frequencies.size(), 'Five frequencies to choose from');
 			Assert.isNotNull(before.fieldLabels.get('dueDate'), 'Headings from field labels');
@@ -173,12 +177,36 @@ private class GrantPaymentTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(Label.Funders_Schedule_ErrorRows, shortTotal, 'Must add up');
-			Assert.areEqual(Label.Funders_Schedule_ErrorRows, outside, 'Within the period');
-			Assert.areEqual(Label.Funders_Schedule_ErrorRows, zero, 'Above zero');
-			Assert.areEqual(Label.Funders_Schedule_ErrorRows, empty, 'Something to save');
-			Assert.areEqual(Label.Funders_Schedule_ErrorRows, unreadable, 'Readable');
-			Assert.areEqual(Label.Funders_Schedule_CannotBuild, notAwarded, 'Awarded only');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
+				shortTotal,
+				'Must add up'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
+				outside,
+				'Within the period'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
+				zero,
+				'Above zero'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
+				empty,
+				'Something to save'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
+				unreadable,
+				'Readable'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'),
+				notAwarded,
+				'Awarded only'
+			);
 			Assert.isFalse(
 				GrantScheduleController.getSchedule(applied.Id).canBuild,
 				'Not offered before the award'
@@ -216,8 +244,16 @@ private class GrantPaymentTest {
 			seen = GrantScheduleController.getSchedule(grant.Id);
 			Test.stopTest();
 		}
-		Assert.areEqual(Label.Funders_Pipeline_ErrorNoPermission, markRefusal, 'Cannot mark');
-		Assert.areEqual(Label.Funders_Pipeline_ErrorNoPermission, saveRefusal, 'Cannot build');
+		Assert.areEqual(
+			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
+			markRefusal,
+			'Cannot mark'
+		);
+		Assert.areEqual(
+			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
+			saveRefusal,
+			'Cannot build'
+		);
 		Assert.areEqual(1, seen.payments.size(), 'Reads the schedule');
 		Assert.isFalse(seen.canMarkReceived, 'Mark Received not offered');
 		Assert.isFalse(seen.canBuild, 'Build not offered');
@@ -309,6 +345,10 @@ private class GrantPaymentTest {
 				refusal = e.getMessage();
 			}
 		}
-		Assert.areEqual(Label.Funders_Pipeline_ErrorNoPermission, refusal, 'Refused');
+		Assert.areEqual(
+			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
+			refusal,
+			'Refused'
+		);
 	}
 }

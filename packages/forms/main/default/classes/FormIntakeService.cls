@@ -87,7 +87,13 @@ public without sharing class FormIntakeService {
 		/** The problem code of each refused answer, by field key (Invalid only). */
 		@AuraEnabled
 		public Map<String, String> problems = new Map<String, String>();
+		/** The processor's hosted checkout to send the person to, when the page takes a payment. */
+		@AuraEnabled
+		public String checkoutUrl;
 	}
+
+	/** The reserved answer key that keeps a page's payment with its submission (G-34). */
+	public static final String PAYMENT_KEY = '_payment';
 
 	/** The form to fill in, or null when it is not published or not public. */
 	public static PublicForm load(Id formId) {
@@ -99,11 +105,23 @@ public without sharing class FormIntakeService {
 	 * A module's public page for one of its records, as JSON, or null when no module publishes
 	 * it (ADR-0190 public event pages, decisions 1, 4 and 6). The module reads its own record;
 	 * this class only checks that the form the page names is published and public, and when it
-	 * is not, the page shows no form and the module's offline message.
+	 * is not, the page shows no form and the module's offline message. An address
+	 * `<id>.<signed claim>` whose claim is right for the record's attached form tells the module
+	 * the request is signed (ADR-0198 volunteer self-service, decision 3).
 	 */
 	public static String publicPage(String recordId) {
-		Id given = idOrNull(recordId);
-		Map<String, Object> page = given == null ? null : PublicPageExtensions.page(given);
+		Id given = idOrNull(idPart(recordId));
+		String claim = claimPart(recordId);
+		Boolean signed = false;
+		if (
+			given != null &&
+			String.isNotBlank(claim) &&
+			FormAttachmentExtensions.signedClaimRequired(given)
+		) {
+			Id attached = FormAttachmentExtensions.formFor(given);
+			signed = attached != null && claim.equals(claimFor(attached, given));
+		}
+		Map<String, Object> page = given == null ? null : PublicPageExtensions.page(given, signed);
 		if (page == null) {
 			return null;
 		}
@@ -211,6 +229,9 @@ public without sharing class FormIntakeService {
 			receipt.status = INVALID;
 			return receipt;
 		}
+		if (!startCheckout(contextId, counted, receipt)) {
+			return receipt;
+		}
 		Form_Submission__c submission = new Form_Submission__c(
 			Form__c = version.Form__c,
 			Form_Version__c = version.Id,
@@ -226,6 +247,39 @@ public without sharing class FormIntakeService {
 		receipt.status = RECEIVED;
 		receipt.message = FormPublicPolicy.confirmation(definition);
 		return receipt;
+	}
+
+	/**
+	 * Asks the module whose page the form was sent from for a hosted checkout, before anything is
+	 * stored, since its payment callout must come first (ADR-0211 `0211-online-donation-pages.md`,
+	 * decision 3). The payment is kept in the answers under `_payment`. A failure stores nothing
+	 * and answers Failed, so the person can send again. False when the answers must not be stored.
+	 */
+	private static Boolean startCheckout(
+		Id contextId,
+		Map<String, Object> counted,
+		Receipt receipt
+	) {
+		if (contextId == null) {
+			return true;
+		}
+		try {
+			String base = resumeBase();
+			Map<String, Object> started = PublicPageExtensions.startCheckout(
+				contextId,
+				counted,
+				base == null ? null : base + '/FormsPublic?record=' + contextId
+			);
+			if (started != null) {
+				counted.put(PAYMENT_KEY, String.valueOf(started.get('paymentId')));
+				receipt.checkoutUrl = String.valueOf(started.get('checkoutUrl'));
+			}
+			return true;
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.startCheckout', contextId);
+			receipt.status = FAILED;
+			return false;
+		}
 	}
 
 	/**
@@ -405,20 +459,31 @@ public without sharing class FormIntakeService {
 		);
 	}
 
+	/** The signing key of each form's current public version, read once a transaction. */
+	private static Map<Id, String> signingKeys = new Map<Id, String>();
+
 	/**
 	 * The signed claim for a link that names a record (EV-18): an HMAC-SHA256 of the form and the
 	 * record, with the signing key of the form's current public version (the key of decision 5,
 	 * no new secret). Null when the form is not public.
 	 */
 	public static String claimFor(Id formId, Id contextRecordId) {
-		Form_Version__c version = contextRecordId == null ? null : latestPublicVersion(formId);
-		if (version == null) {
+		if (contextRecordId == null) {
+			return null;
+		}
+		// One read per form a transaction: a reminder run signs a link for each of 100 bookings.
+		if (!signingKeys.containsKey(formId)) {
+			Form_Version__c version = latestPublicVersion(formId);
+			signingKeys.put(formId, version == null ? null : version.Signing_Key__c);
+		}
+		String key = signingKeys.get(formId);
+		if (key == null) {
 			return null;
 		}
 		Blob mac = Crypto.generateMac(
 			'hmacSHA256',
 			Blob.valueOf('claim:' + formId + ':' + contextRecordId),
-			EncodingUtil.convertFromHex(version.Signing_Key__c)
+			EncodingUtil.convertFromHex(key)
 		);
 		return EncodingUtil.base64Encode(mac).replace('+', '-').replace('/', '_').remove('=');
 	}

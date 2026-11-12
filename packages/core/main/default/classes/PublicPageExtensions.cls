@@ -6,9 +6,22 @@
  */
 @NamespaceAccessible
 public with sharing class PublicPageExtensions {
-	/** The class names modules register: Event Management's event pages (EV-16). */
+	/**
+	 * The class names modules register: event pages (EV-16), volunteer shift pages (V-09) and
+	 * appeal donation pages (G-34).
+	 */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'EventPublicPage' };
+	public static final List<String> EXTENSION_CLASSES = new List<String>{
+		'EventPublicPage',
+		'VolunteerPublicPage',
+		'GivingDonationPage'
+	};
+
+	/**
+	 * Whether the page being built was asked for with a signed claim the host checked (ADR-0198
+	 * volunteer self-service, decision 3). A page for a person's own record shows only then.
+	 */
+	private static Boolean signedRequest = false;
 
 	/** The module key of the package that serves public pages (BarnCRM Forms). */
 	private static final String HOST_MODULE = 'Forms';
@@ -61,6 +74,30 @@ public with sharing class PublicPageExtensions {
 	/** One record's public page, or null when no module publishes it. */
 	@NamespaceAccessible
 	public static Map<String, Object> page(Id recordId) {
+		return page(recordId, false);
+	}
+
+	/**
+	 * One record's public page, saying whether the host checked a signed claim for it; a module
+	 * reads that with `isSignedRequest()` while building the page.
+	 */
+	@NamespaceAccessible
+	public static Map<String, Object> page(Id recordId, Boolean signed) {
+		signedRequest = signed == true;
+		try {
+			return findPage(recordId);
+		} finally {
+			signedRequest = false;
+		}
+	}
+
+	/** Whether the page being built was asked for with a checked signed claim. */
+	@NamespaceAccessible
+	public static Boolean isSignedRequest() {
+		return signedRequest;
+	}
+
+	private static Map<String, Object> findPage(Id recordId) {
 		if (recordId == null) {
 			return null;
 		}
@@ -92,6 +129,33 @@ public with sharing class PublicPageExtensions {
 			} catch (Exception failed) {
 				ErrorLogger.log(failed, 'PublicPageExtensions.listPage');
 				return null;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Starts the checkout of the module whose page the record is on, when that module takes
+	 * payments (ADR-0211 `0211-online-donation-pages.md`, decision 2). Null when no module
+	 * publishes the record or it takes no payment. A failure is raised for the host to log and
+	 * answer, since the form must then not be stored.
+	 */
+	@NamespaceAccessible
+	public static Map<String, Object> startCheckout(
+		Id recordId,
+		Map<String, Object> answers,
+		String returnUrl
+	) {
+		if (recordId == null) {
+			return null;
+		}
+		Schema.SObjectType type = recordId.getSObjectType();
+		for (PublicPageExtension extension : installed()) {
+			if (extension.handles(type) == true) {
+				return extension instanceof PublicCheckoutExtension
+					? ((PublicCheckoutExtension) extension)
+							.startCheckout(recordId, answers, returnUrl)
+					: null;
 			}
 		}
 		return null;

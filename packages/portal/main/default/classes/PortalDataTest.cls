@@ -99,6 +99,38 @@ private class PortalDataTest {
 				((Map<String, Object>) people[0]).get('id'),
 				'Their own record'
 			);
+			Assert.isNull(menu.get('brand'), 'No brand while brands are off');
+		}
+	}
+
+	@IsTest
+	static void aBrandedPortalSendsItsBrandToTheClient() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Fixture f = fixture();
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Brand_Management__c = true;
+			upsert settings;
+			SettingsService.clearCaches();
+			Brand__c thrift = new Brand__c(
+				Name = 'Barn Thrift',
+				Primary_Color__c = '#1B5E20',
+				City__c = 'Shelbyville'
+			);
+			insert thrift;
+			f.session.portal.Brand__c = thrift.Id;
+
+			Test.startTest();
+			Map<String, Object> brand = (Map<String, Object>) PortalData.describe(f.session)
+				.get('brand');
+			Test.stopTest();
+
+			Assert.areEqual('Barn Thrift', brand.get('name'), 'The brand name');
+			Assert.areEqual('#1B5E20', brand.get('primaryColor'), 'The brand color');
+			Assert.areEqual(
+				new List<String>{ 'Shelbyville' },
+				brand.get('address'),
+				'The address lines'
+			);
 		}
 	}
 
@@ -239,6 +271,122 @@ private class PortalDataTest {
 			Test.stopTest();
 
 			Assert.areEqual('portal_unavailable', answer, 'Refused whole');
+		}
+	}
+
+	private static void addScopedPage(Fixture f, Map<String, Object> scope) {
+		Map<String, Object> template = (Map<String, Object>) JSON.deserializeUntyped(
+			PortalTestData.template()
+		);
+		Map<String, Object> page = PortalTestData.scopedPage(scope);
+		page.put(
+			'actions',
+			new List<Object>{
+				new Map<String, Object>{ 'extension' => 'Test.Thanks', 'label' => 'Say Thanks' }
+			}
+		);
+		((List<Object>) template.get('pages')).add(page);
+		f.session.portal.Template__c = JSON.serialize(template);
+	}
+
+	@IsTest
+	static void aScopeThatReachesTheRowCapIsLoggedAsAWarning() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Fixture f = fixture();
+			PortalTestModule.register();
+			addScopedPage(f, PortalTestData.scope('Organization__c', 'Organization__c'));
+			PortalData.maxScopeRows = 1;
+
+			Test.startTest();
+			PortalData.read(f.session, 'colleagues');
+			Test.stopTest();
+
+			Assert.isTrue(
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'PortalData.scopeValues'
+					WITH SYSTEM_MODE
+				] > 0,
+				'The cap is logged so an admin can see rows were left out'
+			);
+		}
+	}
+
+	@IsTest
+	static void aScopedCatalogShowsOnlyRecordsTiedToThePerson() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Fixture f = fixture();
+			Account elsewhere = new Account(Name = 'Zzdata Elsewhere');
+			insert elsewhere;
+			Affiliation__c stranger = new Affiliation__c(
+				Contact__c = f.other.Id,
+				Organization__c = elsewhere.Id,
+				Role__c = 'Treasurer',
+				Status__c = 'Current'
+			);
+			insert stranger;
+			PortalTestModule.register();
+			addScopedPage(f, PortalTestData.scope('Organization__c', 'Organization__c'));
+
+			Test.startTest();
+			Map<String, Object> page = PortalData.read(f.session, 'colleagues');
+			String onColleague = PortalData.runAction(
+				f.session,
+				'colleagues',
+				f.othersRole.Id,
+				'Test.Thanks'
+			);
+			String onStranger;
+			try {
+				PortalData.runAction(f.session, 'colleagues', stranger.Id, 'Test.Thanks');
+			} catch (PortalAuth.RefusalException refused) {
+				onStranger = refused.getMessage();
+			}
+			Map<String, Object> noScope = PortalTestData.scope(
+				'Organization__c',
+				'Organization__c'
+			);
+			noScope.put(
+				'where',
+				new List<Object>{
+					new Map<String, Object>{
+						'field' => 'Role__c',
+						'op' => 'equals',
+						'value' => 'Nobody'
+					}
+				}
+			);
+			addScopedPage(f, noScope);
+			Map<String, Object> empty = PortalData.read(f.session, 'colleagues');
+			Test.stopTest();
+
+			Set<Object> roles = new Set<Object>();
+			for (Object row : (List<Object>) page.get('records')) {
+				roles.add(
+					((Map<String, Object>) ((Map<String, Object>) row).get('values')).get('Role__c')
+				);
+			}
+			Assert.areEqual(
+				new Set<Object>{ 'Volunteer', 'Chair' },
+				roles,
+				'Current roles at the person\'s organization, not elsewhere or former'
+			);
+			Assert.areEqual('Thanks sent', onColleague, 'An action on a record in scope');
+			Assert.areEqual('not_found', onStranger, 'Never on a record outside the scope');
+			Assert.areEqual(
+				0,
+				((List<Object>) empty.get('records')).size(),
+				'An empty scope shows nothing'
+			);
+			Assert.areEqual(true, page.get('download'), 'Download CSV is offered');
+			Assert.areEqual(
+				'Start_Date__c',
+				((Map<String, String>) page.get('calendar')).get('start'),
+				'The calendar map is sent'
+			);
+			Map<String, Object> role = (Map<String, Object>) ((List<Object>) page.get('fields'))[0];
+			Assert.areEqual(false, role.get('scan'), 'No Scan unless asked');
 		}
 	}
 

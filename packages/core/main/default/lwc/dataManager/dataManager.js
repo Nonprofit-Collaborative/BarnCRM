@@ -45,12 +45,16 @@ import { matchTasks } from 'c/dataManagerTasks';
 const TABS = {
   import: 'Import',
   find: 'Find',
+  // The Grid (C-41) shows in the Find tab, chosen by the page's view state.
+  grid: 'Find',
   // Super Transformer (C-50) on the tab that kept the Bulk Update API name.
   update: 'Bulk_Update',
   optimizer: 'Data_Hygiene',
   duplicates: 'Duplicate_Matching',
   delete: 'Find'
 };
+/** The tiles whose tool opens on this page, in place of the hub, with a way back. */
+const PANELS = ['backup', 'files'];
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
 const BULK_TOOLS = { delete: 'delete' };
 
@@ -139,11 +143,29 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     },
     get taskSearchNone() {
       return helpText('Core', 'Core_DataManager_TaskSearchNone');
+    },
+    get back() {
+      return helpText('Core', 'Core_DataManager_Back');
     }
   };
 
   /** What was typed in What Do You Want to Do?. */
   taskQuery = '';
+
+  /** The tool open on this page in place of the hub (PANELS), or undefined. */
+  panel;
+
+  get showBackup() {
+    return this.panel === 'backup';
+  }
+
+  get showFiles() {
+    return this.panel === 'files';
+  }
+
+  handleBack() {
+    this.panel = undefined;
+  }
 
   learnMoreUrl = LEARN_MORE_URL;
 
@@ -204,12 +226,40 @@ export default class DataManager extends NavigationMixin(LightningElement) {
           iconFor('Import')
         )
       );
+      // Import Files (C-70): documents from a zip into Files, as every import, for admins.
+      bringIn.push(
+        tile(
+          'files',
+          helpText('Core', 'Core_DataManager_FilesTitle'),
+          helpText('Core', 'Core_DataManager_FilesText'),
+          'standard:file'
+        )
+      );
     }
     const findChange = [];
     if (canFind) {
       findChange.push(
         tile('find', FIND_TITLE, helpText('Core', 'Core_DataManager_FindText'), iconFor('Find'))
       );
+      findChange.push(
+        tile(
+          'grid',
+          helpText('Core', 'Core_DataManager_GridTitle'),
+          helpText('Core', 'Core_DataManager_GridText'),
+          iconFor('Find')
+        )
+      );
+      // Backup Sets (C-66): an administrator's tool, as restoring is an import.
+      if (canManageSettings) {
+        findChange.push(
+          tile(
+            'backup',
+            helpText('Core', 'Core_DataManager_BackupTitle'),
+            helpText('Core', 'Core_DataManager_BackupText'),
+            'standard:archive'
+          )
+        );
+      }
     }
     if (canBulkUpdate) {
       findChange.push(
@@ -304,6 +354,10 @@ export default class DataManager extends NavigationMixin(LightningElement) {
 
   async handleSelect(event) {
     const name = event.detail && event.detail.name;
+    if (PANELS.includes(name)) {
+      this.panel = name;
+      return;
+    }
     if (!TABS[name]) {
       return;
     }
@@ -324,6 +378,10 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     // The bulk tiles open Find with a note saying where the bulk tool is (D-135).
     if (BULK_TOOLS[name] && this.toolStateKey) {
       pageReference.state = { [this.toolStateKey]: BULK_TOOLS[name] };
+    }
+    // The Grid tile opens Find's tab on the Grid view: the view key is the tool key's sibling.
+    if (name === 'grid' && this.toolStateKey) {
+      pageReference.state = { [this.toolStateKey.replace(/tool$/, 'view')]: 'grid' };
     }
     this[NavigationMixin.Navigate](pageReference);
   }

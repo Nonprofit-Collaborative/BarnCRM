@@ -167,7 +167,9 @@ private class MirrorSyncTest {
 			Assert.areEqual(MirrorSync.MESSAGES_KEPT, logged.size(), 'At most the kept messages.');
 			Integer shared = 0;
 			for (Error_Log__c entry : logged) {
-				if (entry.Message__c.contains(Label.Mirror_Sync_OtherMessages)) {
+				if (
+					entry.Message__c.contains(BarnHelp.text('Mirror', 'Mirror_Sync_OtherMessages'))
+				) {
 					shared++;
 					Assert.isTrue(
 						entry.Message__c.startsWith('Could not copy 71 records'),

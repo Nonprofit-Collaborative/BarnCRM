@@ -107,7 +107,7 @@ public with sharing class TributeService {
 				tribute.Honoree_Contact__c == null &&
 				tribute.Honoree_Account__c == null
 			) {
-				tribute.addError(Label.Giving_Tribute_HonoreeRequired);
+				tribute.addError(BarnHelp.text('Giving', 'Giving_Tribute_HonoreeRequired'));
 				continue;
 			}
 			if (!TYPE_IN_MEMORY_OF.equals(tribute.Type__c)) {
@@ -122,7 +122,7 @@ public with sharing class TributeService {
 				tribute.Honoree_Account__c == tribute.Notification_Recipient_Account__c &&
 				deceased.contains(tribute.Honoree_Account__c);
 			if (notifiesHonoreeContact || notifiesHonoreeAccount) {
-				tribute.addError(Label.Giving_Tribute_DeceasedHonoreeNotified);
+				tribute.addError(BarnHelp.text('Giving', 'Giving_Tribute_DeceasedHonoreeNotified'));
 			}
 		}
 	}
@@ -150,7 +150,7 @@ public with sharing class TributeService {
 				continue;
 			}
 			if (takenGiftIds.contains(tribute.Gift__c)) {
-				tribute.addError(Label.Giving_Tribute_OnePerGift);
+				tribute.addError(BarnHelp.text('Giving', 'Giving_Tribute_OnePerGift'));
 				continue;
 			}
 			takenGiftIds.add(tribute.Gift__c);

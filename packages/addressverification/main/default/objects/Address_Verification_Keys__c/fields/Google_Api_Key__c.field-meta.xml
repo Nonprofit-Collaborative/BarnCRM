@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Google_Api_Key__c</fullName>
+  <description>The org's Google Cloud API key with the Address Validation API enabled. Written on Address Verification Setup only.</description>
+  <externalId>false</externalId>
+  <label>Google API Key</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

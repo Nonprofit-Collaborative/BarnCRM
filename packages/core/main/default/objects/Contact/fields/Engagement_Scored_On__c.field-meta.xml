@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Engagement_Scored_On__c</fullName>
+  <description>The day the nightly Engagement Score step set this person's current score; an unchanged score is not saved again (C-64, canonical model R-ES5).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The day the current engagement score was set.</inlineHelpText>
+  <label>Scored On</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

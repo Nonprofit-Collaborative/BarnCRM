@@ -220,7 +220,7 @@ C-46 Address Verification moved to release 1.15 (Brandon, 2026-11-04, D-177).
 
 ### 1.5 (Batch D): Recurring donor health, paid event registration, session proposals, Giving minors
 
-G-34 online donation page moved to release 1.15 with C-46 (D-177), as did G-21 and G-31. G-27 stays here, after MIG-06 in 1.4. C-64 moved to 1.15 to make room for event payments (D-190). Release N+1 of the simpler permission sets (the removals, ADR-NEXT, D-191) goes in this release, after release N (1.4).
+G-34 online donation page moved to release 1.15 with C-46 (D-177), as did G-21 and G-31. G-27 stays here, after MIG-06 in 1.4. C-64 moved to 1.15 to make room for event payments (D-190). Release N+1 of the simpler permission sets (the removals, ADR-0194, D-191) goes in this release, after release N (1.4).
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|

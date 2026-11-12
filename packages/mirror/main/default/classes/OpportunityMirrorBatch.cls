@@ -66,10 +66,10 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 	/** Why a run must not work now, or null when it may. */
 	private static String skipReason() {
 		if (AutomationControl.isPaused()) {
-			return Label.Mirror_OpportunityMirror_RunPaused;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_RunPaused');
 		}
 		if (!AutomationControl.isEnabled(OpportunityMirrorService.AUTOMATION_NAME)) {
-			return Label.Mirror_OpportunityMirror_RunSwitchedOff;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_RunSwitchedOff');
 		}
 		return null;
 	}
@@ -89,7 +89,7 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 				// Once a run: a mistyped name otherwise matches nothing without a word.
 				ErrorLogger.logMessage(
 					String.format(
-						Label.Mirror_OpportunityMirror_UnknownRecordTypes,
+						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_UnknownRecordTypes'),
 						new List<Object>{ String.join(unknown, ', ') }
 					),
 					LOG_CONTEXT,
@@ -99,7 +99,7 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 			if (OpportunityGiftService.listsMasterRecordType()) {
 				// Master is a real name, so it is not unknown, yet it matches no Opportunity.
 				ErrorLogger.logMessage(
-					Label.Mirror_OpportunityMirror_MasterRecordType,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_MasterRecordType'),
 					LOG_CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -166,8 +166,8 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 		}
 		String summary = String.format(
 			direction == OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS
-				? Label.Mirror_OpportunityMirror_LogRunGifts
-				: Label.Mirror_OpportunityMirror_LogRunOpportunities,
+				? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogRunGifts')
+				: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogRunOpportunities'),
 			new List<Object>{
 				totals.created,
 				totals.updated,

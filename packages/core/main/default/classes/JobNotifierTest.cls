@@ -186,6 +186,48 @@ private class JobNotifierTest {
 		}
 	}
 
+	/** A module's own type: absent or unrecipiented sends nothing, and nothing throws. */
+	@IsTest
+	static void aModulesOwnTypeNeverThrows() {
+		System.runAs(TestUsers.admin()) {
+			Id target = UserInfo.getUserId();
+			Test.startTest();
+			JobNotifier.ownType('No_Such_Type', null, 'Title', 'Body', target, 'Own type test');
+			JobNotifier.ownType(
+				'No_Such_Type',
+				new Set<String>(),
+				'Title',
+				'Body',
+				target,
+				'Own type test'
+			);
+			JobNotifier.ownType(
+				'No_Such_Type',
+				new Set<String>{ String.valueOf(target) },
+				'Title',
+				'Body',
+				target,
+				'Own type test'
+			);
+			JobNotifier.ownType(
+				'No_Such_Type',
+				new Set<String>{ String.valueOf(target) },
+				'Title again',
+				'Body',
+				target,
+				'Own type test'
+			);
+			Test.stopTest();
+
+			Assert.areEqual(0, JobNotifier.sent.size(), 'Not a job notice');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Own type test'],
+				'A missing type is quiet'
+			);
+		}
+	}
+
 	@IsTest
 	static void theStarterIsTheRunningUserButNobodyInAScheduledRun() {
 		System.runAs(TestUsers.admin()) {

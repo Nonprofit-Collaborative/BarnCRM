@@ -227,7 +227,11 @@ private class VolunteerShiftSignupsControllerTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Volunteers_Signups_PersonRequired, noPerson, 'A person is needed.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Signups_PersonRequired'),
+			noPerson,
+			'A person is needed.'
+		);
 		Assert.areEqual(
 			BarnHelp.text('Volunteers', 'Volunteers_Signups_ActionFailed'),
 			badStatus,

@@ -16,6 +16,8 @@
 public without sharing class EventsPortalExtension implements PortalActionExtension {
 	public static final String APPLY = 'Events.ApplyToSpeak';
 	public static final String WITHDRAW = 'Events.WithdrawProposal';
+	/** EV-20: emails the person their own registration's current payment link again. */
+	public static final String SEND_LINK = 'Events.SendPaymentLink';
 	private static final Integer NAME_LENGTH = 80;
 
 	@NamespaceAccessible
@@ -24,7 +26,9 @@ public without sharing class EventsPortalExtension implements PortalActionExtens
 	}
 
 	public Set<String> actionNames() {
-		return new Set<String>{ APPLY, WITHDRAW };
+		Set<String> names = new Set<String>{ APPLY, WITHDRAW, SEND_LINK };
+		names.addAll(EventAttendeeApp.actionNames());
+		return names;
 	}
 
 	public String run(String actionName, Id personId, Id recordId) {
@@ -37,7 +41,42 @@ public without sharing class EventsPortalExtension implements PortalActionExtens
 		if (actionName == WITHDRAW) {
 			return withdraw(personId, recordId);
 		}
+		if (actionName == SEND_LINK) {
+			return sendLink(personId, recordId);
+		}
+		if (EventAttendeeApp.actionNames().contains(actionName)) {
+			// EV-22 and EV-29: the attendee app's connections, messages and agenda.
+			return EventAttendeeApp.run(actionName, personId, recordId);
+		}
 		throw new System.IllegalArgumentException('Unknown action ' + actionName);
+	}
+
+	/**
+	 * Emails the person's own registration's current payment link (EV-20). No checkout is started
+	 * here: the portal's integration user makes no callout and queues no job; a registration with
+	 * no link yet gets one from the checkout job or from staff.
+	 */
+	private static String sendLink(Id personId, Id registrationId) {
+		List<Event_Registration__c> found = [
+			SELECT Id, Contact__c, Contact__r.Email, Payment_Status__c, Payment_Link__c, Status__c
+			FROM Event_Registration__c
+			WHERE Id = :registrationId AND Contact__c = :personId
+			WITH SYSTEM_MODE
+		];
+		if (found.isEmpty()) {
+			throw new System.QueryException('The registration is not this person\'s');
+		}
+		Event_Registration__c registration = found[0];
+		if (
+			String.isBlank(registration.Payment_Link__c) ||
+			registration.Payment_Status__c == EventPayments.PAID ||
+			registration.Status__c == EventRegistrationService.STATUS_CANCELLED
+		) {
+			return BarnHelp.text('Events', 'Events_Portal_NoPaymentLink');
+		}
+		return EventPayments.emailLink(registration) == EventTemplateMail.SENT
+			? BarnHelp.text('Events', 'Events_Portal_PaymentLinkSent')
+			: BarnHelp.text('Events', 'Events_Portal_NoPaymentLink');
 	}
 
 	private static String apply(Id personId, Id eventId) {

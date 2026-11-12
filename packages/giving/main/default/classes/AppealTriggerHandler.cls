@@ -67,7 +67,7 @@ public with sharing class AppealTriggerHandler extends TriggerHandler {
 			Integer steps = 0;
 			while (ancestorId != null && steps <= MAX_DEPTH) {
 				if (ancestorId == appeal.Id) {
-					appeal.addError(Label.Giving_Appeal_ParentCycle);
+					appeal.addError(BarnHelp.text('Giving', 'Giving_Appeal_ParentCycle'));
 					break;
 				}
 				ancestorId = parents.get(ancestorId);

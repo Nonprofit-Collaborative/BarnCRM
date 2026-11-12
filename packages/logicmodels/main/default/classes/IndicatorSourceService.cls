@@ -176,7 +176,9 @@ public with sharing class IndicatorSourceService {
 		Id indicatorId = Id.valueOf(textOf(fields.get('id')));
 		String source = textOf(fields.get('source'));
 		if (!SOURCES.contains(source)) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_Invalid);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
+			);
 		}
 		Indicator__c change = new Indicator__c(
 			Id = indicatorId,
@@ -212,7 +214,9 @@ public with sharing class IndicatorSourceService {
 			!Indicator_Period__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.isUpdateable()
 		) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_CannotRefresh);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_CannotRefresh')
+			);
 		}
 		List<Indicator__c> found = [
 			SELECT Id, Source__c
@@ -221,7 +225,9 @@ public with sharing class IndicatorSourceService {
 			WITH USER_MODE
 		];
 		if (found.isEmpty() || found[0].Source__c != COMPUTED) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_NotComputed);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_NotComputed')
+			);
 		}
 		IndicatorResultsBatch.run(new List<Id>{ indicatorId });
 	}
@@ -240,7 +246,7 @@ public with sharing class IndicatorSourceService {
 		} catch (QueryCompiler.QueryCompilerException refused) {
 			throw new LogicModelService.BuilderException(
 				String.format(
-					Label.LogicModels_Source_QueryRefused,
+					BarnHelp.text('LogicModels', 'LogicModels_Source_QueryRefused'),
 					new List<String>{ refused.getMessage() }
 				)
 			);
@@ -257,13 +263,15 @@ public with sharing class IndicatorSourceService {
 	 */
 	public static void check(String objectName, Definition definition) {
 		if (definition == null || !FUNCTIONS.contains(definition.function)) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_Invalid);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
+			);
 		}
 		Schema.DescribeFieldResult dateField = resolve(objectName, definition.dateField);
 		if (!DATES.contains(dateField.getType()) || !dateField.isFilterable()) {
 			throw new LogicModelService.BuilderException(
 				String.format(
-					Label.LogicModels_Source_DateField,
+					BarnHelp.text('LogicModels', 'LogicModels_Source_DateField'),
 					new List<String>{ dateField.getLabel() }
 				)
 			);
@@ -281,8 +289,8 @@ public with sharing class IndicatorSourceService {
 			throw new LogicModelService.BuilderException(
 				String.format(
 					definition.function == SUM
-						? Label.LogicModels_Source_SumField
-						: Label.LogicModels_Source_UniqueField,
+						? BarnHelp.text('LogicModels', 'LogicModels_Source_SumField')
+						: BarnHelp.text('LogicModels', 'LogicModels_Source_UniqueField'),
 					new List<String>{ measured.getLabel() }
 				)
 			);
@@ -291,7 +299,9 @@ public with sharing class IndicatorSourceService {
 
 	private static Schema.DescribeFieldResult resolve(String objectName, String path) {
 		if (String.isBlank(path)) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_Invalid);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
+			);
 		}
 		try {
 			return QueryCompiler.resolve(objectName, path);
@@ -311,7 +321,9 @@ public with sharing class IndicatorSourceService {
 					WITH USER_MODE
 			  ];
 		if (found.isEmpty()) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_QueryMissing);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_QueryMissing')
+			);
 		}
 		return found[0];
 	}

@@ -41,11 +41,14 @@ class CoreTabMotifs(unittest.TestCase):
     def test_each_core_tab_names_its_real_icon_once(self):
         self.assertEqual(len(MOTIFS), 100)
         seen = {}
-        # Every package's tabs (UX-F3): module tabs follow the Core rule, and no number repeats
-        # anywhere in BarnCRM (docs/contributor-guide/tab-icons.md lists them).
+        # Every package's tabs (UX-F3): module tabs follow the Core rule. Salesforce has only 100
+        # motifs and BarnCRM used them all in the combined build (2026-11-11), so a module tab may
+        # share a number with a tab in another module, never with a Core tab and never within its
+        # own package (D-193; docs/contributor-guide/tab-icons.md).
         pattern = os.path.join(ROOT, "packages", "*", "main", "default", "tabs", "*.tab-meta.xml")
         for path in sorted(glob.glob(pattern)):
             name = os.path.basename(path).replace(".tab-meta.xml", "")
+            package = path.split(os.sep + "packages" + os.sep, 1)[1].split(os.sep, 1)[0]
             motif = ET.parse(path).getroot().findtext("m:motif", namespaces=NS) or ""
             match = re.fullmatch(r"Custom(\d+): (\S+)", motif.strip())
             self.assertIsNotNone(match, f"{name}: motif {motif!r} is not 'CustomN: Name'")
@@ -53,8 +56,12 @@ class CoreTabMotifs(unittest.TestCase):
             self.assertEqual(
                 label, MOTIFS[number - 1], f"{name}: Custom{number} is {MOTIFS[number - 1]}"
             )
-            self.assertNotIn(number, seen, f"{name} and {seen.get(number)} share Custom{number}")
-            seen[number] = name
+            for other_package, other in seen.get(number, []):
+                self.assertFalse(
+                    other_package == package or "core" in (package, other_package),
+                    f"{name} and {other} share Custom{number}",
+                )
+            seen.setdefault(number, []).append((package, name))
 
 
 def tab_numbers():

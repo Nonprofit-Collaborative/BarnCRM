@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Skills__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What the member brings, for the board's skills gap view.</inlineHelpText>
+  <label>Skills</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>MultiselectPicklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Finance</fullName>
+        <default>false</default>
+        <label>Finance</label>
+      </value>
+      <value>
+        <fullName>Legal</fullName>
+        <default>false</default>
+        <label>Legal</label>
+      </value>
+      <value>
+        <fullName>Fundraising</fullName>
+        <default>false</default>
+        <label>Fundraising</label>
+      </value>
+      <value>
+        <fullName>Governance</fullName>
+        <default>false</default>
+        <label>Governance</label>
+      </value>
+      <value>
+        <fullName>Marketing and Communications</fullName>
+        <default>false</default>
+        <label>Marketing and Communications</label>
+      </value>
+      <value>
+        <fullName>Human Resources</fullName>
+        <default>false</default>
+        <label>Human Resources</label>
+      </value>
+      <value>
+        <fullName>Technology</fullName>
+        <default>false</default>
+        <label>Technology</label>
+      </value>
+      <value>
+        <fullName>Program Expertise</fullName>
+        <default>false</default>
+        <label>Program Expertise</label>
+      </value>
+      <value>
+        <fullName>Community Connections</fullName>
+        <default>false</default>
+        <label>Community Connections</label>
+      </value>
+      <value>
+        <fullName>Lived Experience</fullName>
+        <default>false</default>
+        <label>Lived Experience</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+  <visibleLines>6</visibleLines>
+</CustomField>

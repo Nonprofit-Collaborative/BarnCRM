@@ -45,6 +45,16 @@ describe('eventCheckInModel', () => {
     expect(visibleAttendees(undefined, 'x')).toEqual([]);
   });
 
+  it('shows and searches a badge name with the record name beside it', () => {
+    const jo = { ...JANE, badgeName: 'Jo' };
+    const found = visibleAttendees([jo, MAX], 'jo');
+    expect(found).toHaveLength(1);
+    expect(found[0].shownName).toBe('Jo');
+    expect(found[0].alsoName).toBe('Jane Doe');
+    expect(visibleAttendees([JANE], '')[0].shownName).toBe('Jane Doe');
+    expect(visibleAttendees([JANE], '')[0].alsoName).toBe('');
+  });
+
   it('counts who is in and who is still to come', () => {
     expect(counts([JANE, MAX])).toEqual({ total: 2, checkedIn: 1, remaining: 1 });
     expect(counts(undefined)).toEqual({ total: 0, checkedIn: 0, remaining: 0 });

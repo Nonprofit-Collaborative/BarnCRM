@@ -19,8 +19,7 @@ public with sharing class HealthCheckController {
 		try {
 			return HealthCheckService.buildReport();
 		} catch (Exception e) {
-			ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-			throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed'));
+			throw loadFailed(e);
 		}
 	}
 
@@ -33,8 +32,7 @@ public with sharing class HealthCheckController {
 		try {
 			return HealthCheckLastRun.read();
 		} catch (Exception e) {
-			ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-			throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed'));
+			throw loadFailed(e);
 		}
 	}
 
@@ -48,11 +46,8 @@ public with sharing class HealthCheckController {
 		try {
 			CoexistenceService.applyMode(OrgShapeDetector.recommendedCoexistenceMode());
 			return HealthCheckService.buildReport();
-		} catch (CoexistenceService.CoexistenceException e) {
-			throw new AuraHandledException(e.getMessage());
 		} catch (Exception e) {
-			ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-			throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
+			throw fixFailed(e, e instanceof CoexistenceService.CoexistenceException);
 		}
 	}
 
@@ -65,11 +60,8 @@ public with sharing class HealthCheckController {
 		try {
 			CoexistenceService.applyJunctionMembership();
 			return HealthCheckService.buildReport();
-		} catch (CoexistenceService.CoexistenceException e) {
-			throw new AuraHandledException(e.getMessage());
 		} catch (Exception e) {
-			ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-			throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
+			throw fixFailed(e, e instanceof CoexistenceService.CoexistenceException);
 		}
 	}
 
@@ -84,8 +76,7 @@ public with sharing class HealthCheckController {
 			HouseholdService.enableAutomaticHouseholds();
 			return HealthCheckService.buildReport();
 		} catch (Exception e) {
-			ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-			throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
+			throw fixFailed(e, false);
 		}
 	}
 
@@ -152,9 +143,31 @@ public with sharing class HealthCheckController {
 			throw e;
 		} catch (Exception e) {
 			Database.rollback(beforeFix);
-			ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-			throw UserErrors.message(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
+			throw fixFailed(e, false);
 		}
+	}
+
+	/** The error a failed load shows: logged, and replaced by the load failure text. */
+	private static AuraHandledException loadFailed(Exception caught) {
+		return UserErrors.wrap(
+			caught,
+			false,
+			System.Label.Core_HealthCheck_Title,
+			BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed')
+		);
+	}
+
+	/**
+	 * The error a failed fix shows: a message written for a person as it is, anything else
+	 * logged and replaced by the fix failure text.
+	 */
+	private static AuraHandledException fixFailed(Exception caught, Boolean shown) {
+		return UserErrors.wrap(
+			caught,
+			shown,
+			System.Label.Core_HealthCheck_Title,
+			BarnHelp.text('Core', 'Core_HealthCheck_FixFailed')
+		);
 	}
 
 	/** The button label of a fix, which also names it in the change history; null if unknown. */
@@ -253,9 +266,7 @@ public with sharing class HealthCheckController {
 
 	private static void requireManageSettings() {
 		if (!HealthCheckService.canManageSettings()) {
-			throw new AuraHandledException(
-				BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'));
 		}
 	}
 }

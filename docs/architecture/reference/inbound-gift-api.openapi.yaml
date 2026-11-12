@@ -20,7 +20,7 @@ info:
 
     Authenticate with OAuth 2.0 as the integration user the administrator created (for example
     the client credentials flow of an External Client App) and send the access token as a
-    bearer token. The user needs the Inbound Gift API permission set; without it Salesforce
+    bearer token. The user needs the Inbound Gifts permission set; without it Salesforce
     answers 403 before BarnCRM sees the request.
 
 
@@ -118,7 +118,7 @@ paths:
                 $ref: '#/components/schemas/PlatformErrors'
         '403':
           description: >-
-            Sent by Salesforce, not BarnCRM: the user lacks the Inbound Gift API permission set
+            Sent by Salesforce, not BarnCRM: the user lacks the Inbound Gifts permission set
             (access to the endpoint). The body is Salesforce's standard error list.
           content:
             application/json:

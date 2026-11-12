@@ -133,11 +133,11 @@
       <ul class="slds-has-dividers_bottom-space">
         <template for:each={goals} for:item="goal">
           <li key={goal.id} class="slds-item" data-id="goal" data-goal={goal.id}>
-            <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small">
-              <div class="slds-col slds-grow">
+            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_x-small">
+              <div class="slds-col slds-grow slds-shrink">
                 <h3 class="slds-text-heading_small" data-id="goal-title">{goal.name}</h3>
               </div>
-              <div class="slds-col slds-grow-none">
+              <div class="slds-col slds-grow-none slds-shrink-none">
                 <c-barn-status-badge status={goal.statusWord} label={goal.status} data-id="goal-status-badge"></c-barn-status-badge>
                 <template lwc:if={goal.reviewDue}>
                   <c-barn-status-badge
@@ -199,7 +199,7 @@
             </ul>
             <template lwc:if={canEdit}>
               <div class="slds-grid slds-grid_vertical-align-end slds-gutters_xx-small slds-var-m-left_small">
-                <div class="slds-col slds-grow">
+                <div class="slds-col slds-grow slds-shrink">
                   <lightning-input
                     data-id="new-step"
                     data-goal={goal.id}
@@ -211,7 +211,7 @@
                     onchange={handleStepNameChange}
                   ></lightning-input>
                 </div>
-                <div class="slds-col slds-grow-none">
+                <div class="slds-col slds-grow-none slds-shrink-none">
                   <lightning-button
                     data-id="add-step"
                     data-goal={goal.id}

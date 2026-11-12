@@ -295,9 +295,19 @@ public with sharing class SettingsService {
 		}
 		clearCaches();
 		applySeasonalSwitch(changed);
-		// Which apps people see follows this setting through the app sets (ADR-0137).
-		if (changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c)) {
+		// Which apps and account tabs people see follow these settings (ADR-0137, C-73).
+		if (
+			changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c) ||
+			changed.containsKey(BarnCRM_Settings__c.Account_Tabs__c)
+		) {
 			TabAccessService.requestSync();
+		}
+		// Brand visibility follows either brand switch: groups and shares added or removed (R-BR7).
+		if (
+			changed.containsKey(BarnCRM_Settings__c.Brand_Visibility__c) ||
+			changed.containsKey(BarnCRM_Settings__c.Brand_Management__c)
+		) {
+			BrandShareJob.requestFull();
 		}
 		notifyRollupEngine(objectName, changed);
 		return orgDefault(type);

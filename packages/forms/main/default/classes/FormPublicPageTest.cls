@@ -39,7 +39,8 @@ private class FormPublicPageTest {
 				'registration' => 'Open',
 				'formId' => formId,
 				'message' => 'Register below.',
-				'offlineMessage' => 'Not taken online.'
+				'offlineMessage' => 'Not taken online.',
+				'signed' => PublicPageExtensions.isSignedRequest()
 			};
 		}
 
@@ -96,6 +97,32 @@ private class FormPublicPageTest {
 			Assert.areEqual(String.valueOf(form.Id), page.get('formId'), 'The form is shown');
 			Assert.areEqual('Open', page.get('registration'));
 			Assert.isFalse(page.containsKey('offlineMessage'), 'Used by Forms only');
+		}
+	}
+
+	/** V-09: a page for a person's own record is told the claim was checked, and only when right. */
+	@IsTest
+	static void aSignedAddressIsCheckedBeforeThePageIsTold() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			PublicPageExtensions.useForTest(new EventLikePage(form.Id));
+			FormsTestModule.register();
+			FormsTestModule.signed = true;
+			FormsTestModule.attachedFormId = form.Id;
+			Id recordId = venue();
+			String claim = FormIntakeService.claimFor(form.Id, recordId);
+
+			Map<String, Object> right = parsed(
+				FormPublicController.getPage(recordId + '.' + claim)
+			);
+			Map<String, Object> wrong = parsed(
+				FormPublicController.getPage(recordId + '.' + claim.reverse())
+			);
+			Map<String, Object> plain = parsed(FormPublicController.getPage(recordId));
+
+			Assert.isTrue((Boolean) right.get('signed'), 'The right claim');
+			Assert.isFalse((Boolean) wrong.get('signed'), 'A wrong claim');
+			Assert.isFalse((Boolean) plain.get('signed'), 'No claim');
 		}
 	}
 
@@ -191,6 +218,105 @@ private class FormPublicPageTest {
 			RestContext.request.addParameter('kind', 'volunteers');
 			FormPublicRest.getForm();
 			Assert.areEqual(404, RestContext.response.statusCode, 'No such list');
+		}
+	}
+
+	/** A page that takes a payment (G-34), or fails to start one. */
+	private class ChargingPage implements PublicPageExtension, PublicCheckoutExtension {
+		Boolean fail;
+
+		ChargingPage(Boolean fail) {
+			this.fail = fail;
+		}
+
+		public String kind() {
+			return 'appeals';
+		}
+
+		public Boolean handles(Schema.SObjectType recordType) {
+			return recordType == Account.SObjectType;
+		}
+
+		public Map<String, Object> page(Id recordId) {
+			return new Map<String, Object>{ 'title' => 'Give' };
+		}
+
+		public Map<String, Object> listPage() {
+			return null;
+		}
+
+		public Map<String, Object> startCheckout(
+			Id recordId,
+			Map<String, Object> answers,
+			String returnUrl
+		) {
+			if (fail) {
+				throw new CalloutException('The processor did not answer');
+			}
+			return new Map<String, Object>{
+				'paymentId' => 'pay-123',
+				'checkoutUrl' => 'https://checkout.example.com/pay/123'
+			};
+		}
+	}
+
+	private static Map<String, Object> donor() {
+		return new Map<String, Object>{
+			'first' => 'Dana',
+			'last' => 'Zzdonor',
+			'email' => 'dana.zzdonor@example.org',
+			'postal' => '54321'
+		};
+	}
+
+	private static FormIntakeService.Receipt sendFromPage(Form__c form, Boolean fail) {
+		PublicPageExtensions.useForTest(new ChargingPage(fail));
+		FormIntakeService.actAsGuest = true;
+		String ticket = FormIntakeService.load(form.Id).ticket;
+		FormIntakeService.clockShiftMs = 10000;
+		return FormIntakeService.submit(ticket, donor(), null, venue(), null, null);
+	}
+
+	@IsTest
+	static void aPageThatChargesSendsThePersonToCheckoutAndKeepsThePayment() {
+		System.runAs(admin()) {
+			FormIntakeService.Receipt receipt = sendFromPage(
+				FormsTestData.publicVolunteerInterest(50),
+				false
+			);
+
+			Assert.areEqual(FormIntakeService.RECEIVED, receipt.status, 'Stored');
+			Assert.areEqual('https://checkout.example.com/pay/123', receipt.checkoutUrl);
+			Form_Submission__c stored = [
+				SELECT Answers__c
+				FROM Form_Submission__c
+				WITH USER_MODE
+				LIMIT 1
+			];
+			Assert.areEqual(
+				'pay-123',
+				((Map<String, Object>) JSON.deserializeUntyped(stored.Answers__c))
+					.get(FormIntakeService.PAYMENT_KEY),
+				'The payment is kept with the answers'
+			);
+		}
+	}
+
+	@IsTest
+	static void aCheckoutThatFailsStoresNothing() {
+		System.runAs(admin()) {
+			FormIntakeService.Receipt receipt = sendFromPage(
+				FormsTestData.publicVolunteerInterest(50),
+				true
+			);
+
+			Assert.areEqual(FormIntakeService.FAILED, receipt.status, 'Asked to try again');
+			Assert.isNull(receipt.checkoutUrl, 'No checkout');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Form_Submission__c WITH USER_MODE],
+				'Nothing was stored'
+			);
 		}
 	}
 }

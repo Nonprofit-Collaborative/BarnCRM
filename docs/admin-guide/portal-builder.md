@@ -106,7 +106,10 @@ licenses (where your organization has them) may be simpler than a portal.
    Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
    its own, D-188), Portals, New: a name people see, a
    **Key** matching the shortcode, **Access Mode**, **Second Factor**, **Session Hours**,
-   **Sender Address**, and the **Template** (below). Set **Status** to Active.
+   **Sender Address**, and the **Template** (below). Set **Status** to Active. With brands on
+   ([Brands and Legal Entities](brands.md)), also pick the portal's **Brand**: the portal shows
+   the brand's colors and a footer with its name, address, phone and website, and with no
+   Sender Address its codes come from the brand's Sender Email.
 9. **Let people in.** For an Invited portal, add a Portal Access for each person (Portal
    Accesses, New, or the Portal Accesses list on the portal). For Any Matching Person, anyone
    whose email matches exactly one person in BarnCRM can sign in.
@@ -158,16 +161,46 @@ A template is JSON in the portal's Template field. The sample in
 - **actions**: `update`, `create` (related pages: the person field is set for them), or a module's
   action such as `{ "extension": "Volunteers.SignUp", "label": "Sign Up" }` where that module offers
   it.
+- **search**: `true` shows a search box above the page's records that hides those not matching
+  every word typed. It filters only the records already shown (up to the page's `limit`), so it
+  never reads anything the page would not.
 - **requiresModules** lists module keys the portal needs; while one is not installed and on, the
   portal is unavailable.
 
 - A `related` page's `personField` may be `Parent__r.Contact__c`, a parent that itself looks up
   to the person (such as a speaker's session assignments). A page like that is read only: it
   shows records, never edits or adds them.
+- **personScope** narrows a `catalog` page to records tied to the person through another object:
+  `{ "field": "Event__c", "object": "Event_Attendee__c", "personField": "Contact__c",
+  "valueField": "Event_Registration__r.Event__c", "where": [ ...tests on that object... ] }` shows
+  only records whose Event is one of the events the person has an attendee row for (and that row
+  passes the tests). `field` is a lookup or `Id`; `valueField` a lookup on the scope object; either
+  may go through one parent (`Event_Registration__r.Event__c`); the scope object a custom
+  object with `personField` a lookup to the person. Actions on the page see only those records.
+- **calendar** `{ "title": ..., "start": ..., "end": ..., "location": ... }`, each a field already
+  on the page, adds **Add to Calendar**: an .ics file of the page's records, made in the browser.
+- **download**: `true` adds **Download CSV** of the page's records as shown, made in the browser.
+- A text field marked `"edit": true, "scan": true` gets a **Scan** button on the add form, which
+  reads a QR code with the phone's camera where the browser can, and is typed otherwise. Camera
+  scanning needs the browser's barcode reader: Chrome and Edge have it; iPhone Safari and Firefox
+  do not, so those people type the code.
+
+### Installable App
+
+Add `app="yes"` to the shortcode, and optionally a `name`, to let people save the portal to their
+phone's home screen as an app (a progressive web app): `[barncrm_portal key="attendees" app="yes"
+name="Spring Summit"]`. The plugin then serves the app's manifest and a small service worker from
+your site. The home screen icon is the site's **Site Icon** (Appearance, Customize, Site Identity;
+use a square image of at least 512 pixels), else a plain BarnCRM icon. The worker keeps only the
+plugin's own files for offline use, never a person's data. No app store and nothing to pay. Use
+it on one page per site: the worker's scope is the site's own address (a site in a subfolder
+stays inside it). If another service worker, for example from a PWA plugin, already controls the
+site, the portal leaves it alone and does not register its own, so the page then works online
+only.
 
 ### Ready-Made Templates
 
-Three templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
+These templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
 needs its module: while the module is turned off the portal is unavailable, and where the module
 is not installed its pages fail and the Error Log says which field is missing, so install and turn
 on the module first. Every page shows only the signed-in person's own records, and only the fields
@@ -178,6 +211,39 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Volunteer Portal | `volunteer.json`, Volunteers | Open Shifts (Sign Up), My Shifts (Cancel Sign-Up), My Hours (view and log), My Profile |
 | Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
 | Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
+| Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
+| Applicant Portal | `applicant.json`, Scholarships | Open Cycles (Apply), My Applications (Withdraw), My Awards (Accept Award), My Reports and Conditions, My Details |
+| Member Portal | `member.json`, Memberships | My Membership (Pay Dues), My Directory Listing (edit: show me to other members, where I am, about me), Member Directory (searchable) |
+| Attendee App | `attendee.json`, Event Management | My Events (networking choices), Agenda (Add to My Agenda), My Agenda (Add to Calendar, rate, Remove), Attendees (searchable, Connect), Connections (Accept, Decline, Send Message), Messages (Reply), Sent, Announcements, Sponsors, Event Info, My Details |
+| Sponsor Portal | `sponsor.json`, Event Management | My Sponsorships, My Leads (Scan to add, notes and interest, Download CSV), My Details |
+| Service Portal | `service.json`, Programs | My Programs, My Services, Upcoming Sessions, My Goals, My Referrals, My Details |
+| Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Funders | Shared Referrals, My Organizations, My Details; with Funders also My Grants and Grant Reports |
+
+**Attendee and Sponsor.** See [Event Management, Attendee App](events.md#attendee-app): the
+attendee list, connections, messages and agenda, and how sponsor lead scanning works. Every page
+beyond the person's own rows shows only events they are registered for (a `personScope` through
+their attendee rows, not Cancelled).
+
+**Service.** For people your programs serve. My Programs lists their enrollments that are not
+Withdrawn, My Services the services delivered to them, Upcoming Sessions the sessions of the
+cohorts they are enrolled in from today on, My Goals their goals (read only) and My Referrals
+their referrals without notes. Case notes are never shown. Read only except phone and mailing
+address. See [Programs](programs.md).
+
+**Partner.** For staff of partner organizations. A person sees the referrals whose **Partner
+Organization** is an organization they have a Current affiliation with, and only those with
+**Shared With Partner** on (off by default), without notes. My Organizations lists their current
+affiliations. `partner-funders.json` adds, where Funders is installed, My Grants (grants whose
+Funder Contact is the person) and Grant Reports (those grants' report, application and other
+document requirements once submitted). Use `partner.json` where Funders is not installed: a
+template naming a missing module's object fails whole.
+
+**Member.** Pay Dues emails the member a payment link for the membership's dues, once Payments
+is ready (see [Memberships](memberships.md)). The Member Directory lists current members who
+chose to be shown, with only their name, level, location and bio, and has a search box. A member
+is never listed until they turn on Show Me to Other Members on My Directory Listing. The
+directory reads at most 200 members, and the search box searches only those; a larger
+membership needs a narrower template (add a where test, for example one level).
 
 **Volunteer.** Sign Up adds the person to an open shift that has room and has not started, once
 per shift (a cancelled sign-up is reopened). Cancel Sign-Up works until the shift starts. A new
@@ -195,8 +261,38 @@ session's time can be public.
 
 **Donor.** Read only, except phone and mailing address on My Contact Details. Email is shown but
 not editable, because it is the person's sign-in. Receipts shows the list of issued receipts
-(number, date, amount); it does not send the document. There are no payments: BarnCRM takes no
-money. Cancelled gifts, pledges and recurring gifts are hidden.
+(number, date, amount); it does not send the document. Cancelled gifts, pledges and recurring
+gifts are hidden.
+
+**Pay Online (donor template, PAY-03).** On Pledges and Recurring Gifts, **Pay Online** emails the
+donor a secure link to pay the next payment due (the earliest unpaid scheduled payment, or the
+pledge balance) on your own Stripe or PayPal checkout page. BarnCRM holds no money and never sees
+a card. It needs the **Payments** module with your keys entered; without them the donor is told
+paying online isn't available. When the processor reports the payment, a **Received** gift
+appears on the pledge, dated the day it was paid, and is linked to the payment it covers. A
+refund at the processor sets it to **Refunded**. Changing the card on a recurring gift is not
+offered: each payment is paid through Pay Online. A portal saved before this release keeps its
+template: paste the new `donor.json` to add the button.
+
+**Board.** For board and committee members (Corporate Hub board governance). My Meetings lists
+the meetings the person is invited to, with the agenda and the meeting's Packet Link shown as
+text to open; the portal does not serve files. Minutes lists meetings whose minutes are
+Submitted for Approval or Approved; Approve Minutes records the person's approval while they are
+submitted. My Votes lists the person's vote on each motion put to them; a vote is cast only while
+the motion's voting is open and cannot be changed after it closes. Disclosures and Policies lists
+open requests made to the person (for example the yearly conflict-of-interest disclosure): they
+write any interests, say whether they have a conflict, then acknowledge. Board Self-Assessment
+and Meeting Availability appear while an assessment or a poll is open. Staff run everything from
+the board and meeting pages; see [Corporate Hub](corporate-hub.md#board-governance).
+
+**Applicant.** Open Cycles lists cycles whose Status is Open. Apply starts one Draft application
+per person per cycle (a withdrawn one does not count) while the cycle is open and its close date
+has not passed. The person fills in the application through its form link on My Applications,
+which opens the cycle's application form; if the link cannot be made at once, the nightly
+Scholarships run adds it. Withdraw works until the application is decided. Accept Award accepts
+an Offered award. My Reports and Conditions lists the open requirements on the person's awards,
+with a report form link where one is set. Read only otherwise; payments are not shown. See
+[Scholarships and Grants](scholarships.md).
 
 If your org has state and country picklists turned on, a changed State or Country must be a value
 in those lists.

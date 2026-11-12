@@ -63,10 +63,17 @@ public with sharing class ReceiptLogoSource {
 	 * print: no logo uploaded, the setting turned off, or a file that could not be resolved.
 	 */
 	public static String imageTag() {
+		return imageTag(null);
+	}
+
+	/** C-47b: a brand's logo file in place of the organization's, under the same settings. */
+	public static String imageTag(String brandLogoId) {
 		if (!printLogo()) {
 			return '';
 		}
-		String documentId = trimmed(SettingsService.getValue(SETTINGS_OBJECT, KEY_LOGO_DOCUMENT));
+		String documentId = String.isNotBlank(brandLogoId)
+			? brandLogoId.trim()
+			: trimmed(SettingsService.getValue(SETTINGS_OBJECT, KEY_LOGO_DOCUMENT));
 		if (String.isBlank(documentId)) {
 			return '';
 		}
@@ -108,7 +115,7 @@ public with sharing class ReceiptLogoSource {
 				if (version == null) {
 					warnOnce(
 						String.format(
-							Label.Giving_Receipt_LogoUnreadable,
+							BarnHelp.text('Giving', 'Giving_Receipt_LogoUnreadable'),
 							new List<String>{ String.valueOf(documentId) }
 						)
 					);

@@ -100,7 +100,7 @@ public without sharing class RollupWriter {
 					if (value == null) {
 						// R-R15: left out and logged, so the record's other totals still save.
 						String message = String.format(
-							System.Label.Core_Rollups_PicklistValueRefused,
+							BarnHelp.text('Rollups', 'Core_Rollups_PicklistValueRefused'),
 							new List<Object>{ text, describe.getLabel() }
 						);
 						if (!refused.containsKey(message)) {

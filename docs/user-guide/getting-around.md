@@ -4,8 +4,8 @@ BarnCRM lives inside Salesforce as a few apps. This page shows you how to open t
 records open in tabs, what the home page shows you, and where to look when BarnCRM tells you
 something (a tip, a "Learn More" link, or a notification under the bell).
 
-Before you start: you need a BarnCRM role (Team Member, Coordinator, Fundraising Staff, Read
-Only or Admin). If you cannot find the apps, ask your admin. See
+Before you start: you need a BarnCRM role (Team Member, Fundraising Staff, Read Only or
+Admin). If you cannot find the apps, ask your admin. See
 [Access](../admin-guide/access.md).
 
 ## The Apps
@@ -27,7 +27,10 @@ administrators only.
 
 **BarnCRM** has **Home**, **Contacts**, **Households**, **Organizations** and **Data
 Manager**. **BarnCRM Console** has the same, plus **Addresses**, **Relationships**,
-**Affiliations** and **Household Members** just before **Data Manager**. The admin apps
+**Affiliations** and **Household Members** just before **Data Manager**. If your admin chose
+the standard **Accounts** tab instead, you see **Accounts** in place of **Households** and
+**Organizations**: open its list view menu for **Households** or **Organizations** (or both
+kinds of tab, if your admin chose Both). The admin apps
 have **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**,
 **Automation** and **Error Log**. You see only the tabs your access allows, so your menu may be shorter. **Find**,
 **Super Importer** and **Super Transformer** are not in the navigation: open them from their
@@ -55,18 +58,18 @@ its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
 The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
-**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Installments**
-(each pledge payment), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
+**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Scheduled
+Payments** (each payment a commitment expects), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
 **Tributes**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Donor
 Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
 bottom of the screen.
 
 **Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
-you, overdue pledge payments, your asks due this month, open gift batches and running
+you, overdue scheduled payments, your asks due this month, open gift batches and running
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
 setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
-also in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
+also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
 click a chart to open its report.
 
 The **BarnCRM Volunteers** app has **Volunteers Home**, **Volunteer Jobs**, **Volunteer
@@ -197,8 +200,9 @@ Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. **Bring Data In** (**Super Importer**), **Duplicate Matching**, **Import Templates** and
-**Salesforce's Own Tools** are for admins. See
+it can still be undone. **Bring Data In** (**Super Importer** and **Import Files**), **Duplicate
+Matching**, **Import Templates** and **Salesforce's Own Tools** are for admins. Documents an admin
+loads with **Import Files** show in each record's **Files** list, owned by that admin. See
 [Data Manager](../admin-guide/data-manager.md).
 
 ## Common Problems

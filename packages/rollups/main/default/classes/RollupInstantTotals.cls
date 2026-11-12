@@ -169,7 +169,7 @@ public with sharing class RollupInstantTotals {
 			String name = apiNameOf(type);
 			if (isBuiltIn(type)) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupBuilder_InstantBuiltInError
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantBuiltInError')
 				);
 			}
 			// Only an object the Builder counts (ADR-0136), and one that can carry a trigger.
@@ -178,7 +178,7 @@ public with sharing class RollupInstantTotals {
 				!triggerableAmong(new Set<String>{ name }).contains(name)
 			) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupBuilder_InstantNotAvailableError
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantNotAvailableError')
 				);
 			}
 			GeneratedCode code = new GeneratedCode();
@@ -530,7 +530,9 @@ public with sharing class RollupInstantTotals {
 	private static Schema.SObjectType requireType(String objectApiName) {
 		Schema.SObjectType type = SettingsService.typeByName(objectApiName);
 		if (type == null) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorUnknownObject);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
+			);
 		}
 		return type;
 	}
@@ -560,7 +562,7 @@ public with sharing class RollupInstantTotals {
 			caught,
 			shown,
 			'RollupInstantTotals',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

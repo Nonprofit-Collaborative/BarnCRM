@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>User__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>A staff member who works for this brand. Their new records take this brand, and with brand visibility on they see its records.</inlineHelpText>
+  <label>User</label>
+  <referenceTo>User</referenceTo>
+  <relationshipName>Brand_Assignments</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

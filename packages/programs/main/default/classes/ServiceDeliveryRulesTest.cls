@@ -173,7 +173,7 @@ private class ServiceDeliveryRulesTest {
 
 			Assert.isFalse(result.isSuccess(), 'An organization is not a person.');
 			Assert.areEqual(
-				System.Label.Programs_Person_NotAPerson,
+				BarnHelp.text('Programs', 'Programs_Person_NotAPerson'),
 				result.getErrors()[0].getMessage()
 			);
 

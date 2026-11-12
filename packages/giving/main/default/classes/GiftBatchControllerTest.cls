@@ -183,7 +183,7 @@ private class GiftBatchControllerTest {
 					Assert.fail('A line of another batch must not be saved through this one.');
 				} catch (AuraHandledException e) {
 					Assert.areEqual(
-						Label.Giving_GiftBatch_ErrorLineMissing,
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorLineMissing'),
 						e.getMessage(),
 						'Why.'
 					);
@@ -310,7 +310,11 @@ private class GiftBatchControllerTest {
 				GiftBatchController.getBatch(gone.Id);
 				Assert.fail('A deleted batch cannot be opened.');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(Label.Giving_GiftBatch_ErrorBatchMissing, e.getMessage(), 'Why.');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'),
+					e.getMessage(),
+					'Why.'
+				);
 			}
 			Test.stopTest();
 		}

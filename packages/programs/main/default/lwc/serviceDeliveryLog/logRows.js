@@ -4,16 +4,13 @@
  * Lightning or Salesforce import, so it runs and is tested anywhere.
  */
 
+import { format } from 'c/barnFormat';
+
 const PRESENT = 'Present';
 const ABSENCES = ['Excused Absence', 'Unexcused Absence'];
 
-/** Replaces {0}, {1} and so on in a label with the values given. */
-export function format(template, ...values) {
-  return values.reduce(
-    (text, value, index) => text.split(`{${index}}`).join(value),
-    template || ''
-  );
-}
+/** Replaces {0}, {1} and so on in a label with the values given (shared, UTIL-01). */
+export { format };
 
 /** Whether this attendance is an absence, which delivers nothing (R-SD2). */
 export function isAbsence(attendance) {

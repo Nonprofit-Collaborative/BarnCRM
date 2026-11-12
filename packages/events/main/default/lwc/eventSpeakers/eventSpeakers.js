@@ -27,7 +27,13 @@ const SPEAKER_FIELDS = [
   'Status__c',
   'Bio__c',
   'Travel_Needs__c',
-  'AV_Needs__c'
+  'AV_Needs__c',
+  'Headshot_URL__c',
+  'LinkedIn_URL__c',
+  'Website_URL__c',
+  'Agreement_Signed__c',
+  'Slides_Received__c',
+  'Dry_Run_Done__c'
 ];
 const STATUS_WORDS = {
   Invited: 'pending',
@@ -116,6 +122,17 @@ export default class EventSpeakers extends LightningElement {
         ...speaker,
         href: speaker.contactId ? `/lightning/r/${speaker.contactId}/view` : null,
         statusWord: STATUS_WORDS[speaker.status] || 'neutral',
+        // EV-27: the average over every rating of the sessions the speaker is in.
+        ratingText: speaker.ratingCount
+          ? helpText(
+              'Events',
+              'Events_Speakers_Rated',
+              Number(speaker.averageRating).toFixed(1),
+              speaker.ratingCount
+            )
+          : '',
+        // EV-25: agreement signed, slides received and dry run done.
+        checklistText: helpText('Events', 'Events_Speakers_Checklist', speaker.checklistDone || 0),
         menuLabel: format(ACTIONS_FOR, speaker.name),
         menuItems: items,
         isAssigning: Boolean(this.assigning && this.assigning.speakerId === speaker.id),

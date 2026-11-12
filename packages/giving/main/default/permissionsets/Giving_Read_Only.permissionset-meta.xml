@@ -59,6 +59,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>RecurringHealthController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>StewardshipPlanController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -104,6 +108,31 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Days_Since_Last_Gift__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Card_Expires__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Failed_Charges__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Last_Failed_Charge__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Processor_Cancelled__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Processor_Subscription_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -383,6 +412,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Appeal__c.Donation_Form_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Appeal__c.Donation_Page__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Appeal__c.Cost__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -429,6 +468,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Appeal__c.Start_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Appeal__c.Brand__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -858,6 +902,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Gift__c.Brand__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Gift__c.Benefit_Description__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -944,6 +993,31 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Gift__c.Tribute__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Gift_Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Gift_Source_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Planned_Gift_Type__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Stock_Shares__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Stock_Symbol__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1154,6 +1228,51 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Receipt__c.Voided_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Amount__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Card_Expires__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Commitment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Detail__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Donor_Email__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Event_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.External_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Match_Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Subscription_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1463,6 +1582,15 @@
     <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
+    <object>Recurring_Gift_Event__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
     <object>Soft_Credit__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
@@ -1588,6 +1716,14 @@
   </tabSettings>
   <tabSettings>
     <tab>Receipts</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Recurring_Donor_Health</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Recurring_Gift_Event__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

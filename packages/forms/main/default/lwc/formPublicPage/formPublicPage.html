@@ -9,6 +9,14 @@
           <c-barn-notice variant="info" message={missingText}></c-barn-notice>
         </div>
       </template>
+      <template lwc:if={paymentNotice}>
+        <div class="slds-var-m-bottom_small" data-id="payment" role="status">
+          <c-barn-notice
+            variant={paymentNotice.variant}
+            message={paymentNotice.message}
+          ></c-barn-notice>
+        </div>
+      </template>
 
       <template lwc:if={view}>
         <article data-id="page">

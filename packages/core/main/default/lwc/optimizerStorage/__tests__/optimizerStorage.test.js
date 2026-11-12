@@ -1,6 +1,28 @@
 import { createElement } from 'lwc';
 import OptimizerStorage from 'c/optimizerStorage';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+
+jest.mock(
+  '@salesforce/apex/DataManagerController.findToolStateKey',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+const mockNavigate = jest.fn();
+jest.mock('lightning/navigation', () => {
+  const Navigate = Symbol('Navigate');
+  const NavigationMixin = (Base) =>
+    class extends Base {
+      [Navigate](...args) {
+        mockNavigate(...args);
+      }
+    };
+  NavigationMixin.Navigate = Navigate;
+  return { NavigationMixin, __esModule: true };
+});
 
 jest.mock(
   '@salesforce/apex/OrgOptimizerStorageController.getStorage',
@@ -68,6 +90,26 @@ describe('c-optimizer-storage', () => {
     expect(table.data[0].recordsText).toBe('More than 10000');
     expect(table.data[1].recordsText).toBe('12');
     expect(limit.querySelector('[data-id="near-limit"]')).toBeNull();
+  });
+
+  it('offers Archive Records only to a person who may archive, opening Find (C-67)', async () => {
+    getStorage.mockResolvedValue(STORAGE);
+    const element = await render();
+    findToolStateKey.emit('ns__tool');
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="archive-old"]')).toBeNull();
+    element.remove();
+
+    getStorage.mockResolvedValue({ ...STORAGE, canArchive: true });
+    const allowed = await render();
+    findToolStateKey.emit('ns__tool');
+    await flush();
+    allowed.shadowRoot.querySelector('[data-id="archive-old"]').click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' },
+      state: { ns__tool: 'archive' }
+    });
   });
 
   it('marks a limit near its end, and tells the page how full data storage is', async () => {

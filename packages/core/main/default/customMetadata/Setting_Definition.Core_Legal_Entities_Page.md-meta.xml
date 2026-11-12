@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Legal Entities</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:nil="true" /></values>
+    <values><field>Settings_Object__c</field><value xsi:nil="true" /></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Core</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Organization</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Component</value></values>
+    <values><field>Component__c</field><value xsi:nil="true" /></values>
+    <values><field>Navigation_Target__c</field><value xsi:type="xsd:string">Legal_Entity__c</value></values>
+    <values><field>Navigation_Label__c</field><value xsi:type="xsd:string">Legal Entities</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">A legal entity is the organization itself or a separately incorporated affiliate: its legal name, tax ID and registered address print on receipts for its brands. Open Legal Entities to add one or mark the default.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">86</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">brands.md</value></values>
+</CustomMetadata>

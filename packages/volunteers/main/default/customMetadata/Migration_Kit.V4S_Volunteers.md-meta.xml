@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>V4S Jobs, Shifts and Hours</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Volunteers_for_Salesforce</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your Volunteers for Salesforce jobs, shifts, sign-ups and completed hours into BarnCRM Volunteers, keeping which job and shift each belongs to. Your contacts stay the same records. V4S itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"jobs","label":"Volunteer Jobs","kind":"import","help":"Copies each V4S volunteer job.","source":"GW_Volunteers.Volunteer_Job__c","fields":["Name","GW_Volunteers.Description__c","GW_Volunteers.Inactive__c","GW_Volunteers.Location_Street__c","GW_Volunteers.Location_City__c"],"templateKey":"kit_v4s_jobs"},{"key":"shifts","label":"Volunteer Shifts","kind":"import","help":"Copies each shift onto its copied job; its end is the V4S start plus its length.","source":"GW_Volunteers.Volunteer_Shift__c","fields":["GW_Volunteers.Volunteer_Job__c","GW_Volunteers.Start_Date_Time__c","GW_Volunteers.Duration__c","GW_Volunteers.Desired_Number_of_Volunteers__c"],"links":[{"column":"GW_Volunteers.Volunteer_Job__c","step":"jobs"}],"templateKey":"kit_v4s_shifts"},{"key":"signups","label":"Sign-Ups","kind":"import","help":"Copies each V4S hours entry that is not completed, on a shift, as a sign-up of the same contact.","source":"GW_Volunteers.Volunteer_Hours__c","fields":["GW_Volunteers.Contact__c","GW_Volunteers.Volunteer_Shift__c","GW_Volunteers.Status__c","GW_Volunteers.Comments__c"],"filters":[{"field":"GW_Volunteers.Status__c","value":"Completed","op":"notEquals"},{"field":"GW_Volunteers.Volunteer_Shift__c","value":null,"op":"notEquals"}],"links":[{"column":"GW_Volunteers.Volunteer_Shift__c","step":"shifts"}],"templateKey":"kit_v4s_signups"},{"key":"hours","label":"Completed Hours","kind":"import","help":"Copies each completed V4S hours entry as hours of the same contact, approved at once while Hours require approval is off.","source":"GW_Volunteers.Volunteer_Hours__c","fields":["GW_Volunteers.Contact__c","GW_Volunteers.Volunteer_Job__c","GW_Volunteers.Volunteer_Shift__c","GW_Volunteers.Start_Date__c","GW_Volunteers.Hours_Worked__c","GW_Volunteers.Comments__c"],"filters":[{"field":"GW_Volunteers.Status__c","value":"Completed"}],"links":[{"column":"GW_Volunteers.Volunteer_Job__c","step":"jobs"},{"column":"GW_Volunteers.Volunteer_Shift__c","step":"shifts"}],"templateKey":"kit_v4s_hours"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"pages","text":"Take the V4S sign-up pages off your public site (Setup, Sites, the site's Visualforce pages such as VolunteersJobListingFS and VolunteersSignupFS), and point people to the BarnCRM public sign-up page instead."},{"key":"recurring","text":"In V4S, stop recurring job schedules from making new shifts (Job Recurrence Schedules: clear Schedule End Date or delete them), so shifts are made only in BarnCRM."},{"key":"tabs","text":"Remove the V4S tabs from your apps (Setup, App Manager) and the V4S permission sets from users who no longer need them."},{"key":"uninstall","text":"When you have checked your volunteers in BarnCRM and no report or automation uses V4S any more, uninstall it from Setup, Installed Packages."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">V4sMigrationKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">50</value>
+  </values>
+</CustomMetadata>

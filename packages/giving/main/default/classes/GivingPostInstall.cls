@@ -110,6 +110,9 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 			Giving_Settings__c.SObjectType,
 			SHIPPED_ON_ADDED_IN_UPGRADES
 		);
+		// BarnCRM Admin holders get Giving Admin (ADR-0194 D2); queued, since it writes setup
+		// objects, and it never throws.
+		new GivingAccessSync().requestSync();
 		ModuleSetups.markRan(MODULE_KEY);
 	}
 }

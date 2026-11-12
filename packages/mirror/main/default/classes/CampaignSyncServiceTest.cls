@@ -492,7 +492,7 @@ private class CampaignSyncServiceTest {
 			Test.stopTest();
 			Assert.isFalse(saved.isSuccess(), 'An Account identifier is not a Campaign (R-CS8).');
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_InvalidCampaignId,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_InvalidCampaignId'),
 				saved.getErrors()[0].getMessage(),
 				'The refusal says what the field must hold.'
 			);

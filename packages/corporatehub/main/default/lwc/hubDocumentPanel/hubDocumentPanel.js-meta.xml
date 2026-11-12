@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The library document panel: version, file upload, Mark Reviewed, Publish New Version, Retire,
+    Request Acknowledgments and who has acknowledged it (CH-01, CH-02).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Library Document Panel</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Hub_Document__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

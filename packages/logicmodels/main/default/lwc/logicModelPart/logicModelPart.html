@@ -152,6 +152,15 @@
                     ></lightning-button>
                   </template>
                 </template>
+                <c-logic-model-evidence
+                  data-id="arrow-evidence"
+                  model={model}
+                  link-id={arrow.id}
+                  can-edit={canEdit}
+                  can-delete={canDelete}
+                  onmodelchange={handleChildChange}
+                  onfailure={handleChildFailure}
+                ></c-logic-model-evidence>
               </li>
             </template>
           </ul>

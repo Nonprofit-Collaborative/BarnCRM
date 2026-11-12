@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Grant: add the renewal requirement</label>
+    <protected>true</protected>
+    <values>
+        <field>Object_Name__c</field>
+        <value xsi:type="xsd:string">Grant__c</value>
+    </values>
+    <values>
+        <field>Handler_Class__c</field>
+        <value xsi:type="xsd:string">GrantRenewalHandler</value>
+    </values>
+    <values>
+        <field>Execution_Order__c</field>
+        <value xsi:type="xsd:double">40</value>
+    </values>
+    <values>
+        <field>Enabled_By_Default__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Always_Runs__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">For an Awarded grant marked Renewable with an Award End Date, keeps one open Renewal requirement due before the award ends (the renewal days setting in Funders), and moves it when the end date moves. Grants not marked Renewable are never touched. Switch it off while you import past grants.</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Funders</value>
+    </values>
+</CustomMetadata>

@@ -80,7 +80,9 @@ public with sharing class GrantProgramController {
 	@AuraEnabled
 	public static void setProgram(Id grantId, String programId) {
 		if (!Schema.SObjectType.Grant__c.fields.Program_Id__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		try {
 			GrantService.setProgram(grantId, programId);

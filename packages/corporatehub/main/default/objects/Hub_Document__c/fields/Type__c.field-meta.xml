@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Type__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What kind of document this is.</inlineHelpText>
+  <label>Type</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Policy</fullName>
+        <default>true</default>
+        <label>Policy</label>
+      </value>
+      <value>
+        <fullName>Procedure</fullName>
+        <default>false</default>
+        <label>Procedure</label>
+      </value>
+      <value>
+        <fullName>Governing Document</fullName>
+        <default>false</default>
+        <label>Governing Document</label>
+      </value>
+      <value>
+        <fullName>Plan</fullName>
+        <default>false</default>
+        <label>Plan</label>
+      </value>
+      <value>
+        <fullName>Form</fullName>
+        <default>false</default>
+        <label>Form</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

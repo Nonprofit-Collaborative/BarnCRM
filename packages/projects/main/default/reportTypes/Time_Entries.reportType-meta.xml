@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Time_Entry__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>Hours logged on projects, by person, date, task and billable.</description>
+  <label>Time Entries</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Project__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Task__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>User__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Date__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Hours__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Billable__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Notes__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Exported_Date__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <masterLabel>Time Entry</masterLabel>
+  </sections>
+</ReportType>

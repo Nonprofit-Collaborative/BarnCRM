@@ -129,9 +129,7 @@ public with sharing class QueryFieldCatalog {
 		try {
 			return describe(objectApiName);
 		} catch (QueryFieldCatalogException refused) {
-			AuraHandledException reported = new AuraHandledException(refused.getMessage());
-			reported.setMessage(refused.getMessage());
-			throw reported;
+			throw UserErrors.message(refused.getMessage());
 		}
 	}
 

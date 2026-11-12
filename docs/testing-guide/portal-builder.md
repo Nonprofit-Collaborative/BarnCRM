@@ -116,7 +116,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-PB-08: Donor Portal Template
 
-**Purpose:** confirm a donor sees only their own giving, with no payments and no edits beyond contact details.
+**Purpose:** confirm a donor sees only their own giving, with no edits beyond contact details (Pay Online is T-PB-12).
 **Prerequisites:** admin; Giving installed with sample data; a portal with key `donor`, Active, Invited, the template `portal-client/templates/donor.json`; Pat Tester signed in with two gifts (one Cancelled), a pledge and an issued receipt; another donor with gifts.
 
 | Step | Action | Expected result |
@@ -143,3 +143,122 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Enter a wrong code on a fresh sign-in. | The message is read out as an alert and marked by a bar on its left. |
 
 **Cleanup:** sign out.
+
+## T-PB-10: Board Portal Template
+
+**Purpose:** confirm a board member sees and acts on only their own meetings, votes and requests (PB-02, CH-18, CH-19, CH-20).
+**Prerequisites:** admin; Corporate Hub on; the board, meetings and requests from the Corporate Hub tests T-CH-09 to T-CH-13, with Ade and Bea invited; a portal with key `board`, Active, Invited, the template `portal-client/templates/board.json`; Ade signed in.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=meetings`. | Ade's meetings only, with agenda and Packet Link; none of Bea's rows. |
+| 2 | POST `page/action` `CorporateHub.MarkPacketRead` on one row. | "Thank you. Your reading of the packet is recorded."; the meeting panel counts 1 packet read. |
+| 3 | With minutes Draft, GET `page?key=minutes`. Submit them as staff and GET again; run `CorporateHub.ApproveMinutes`. | Empty while Draft; then listed; the approval is recorded and counted on the meeting panel. |
+| 4 | Open voting on a motion; GET `page?key=votes`; run `CorporateHub.VoteFor`. Close voting; run `CorporateHub.VoteAgainst`. | Ade's blank vote listed; then For with Voted; after closing, "Voting on this motion is closed." and the vote stays For. |
+| 5 | GET `page?key=disclosures`; POST `page/save` with Interests Disclosed text and the conflict box; run `CorporateHub.Acknowledge`. | Ade's open request; saved; Acknowledged with Answered in Portal checked; it leaves the page. |
+| 6 | GET `page?key=assessment`; save a Rating of 4 and of 7. | 4 saves; 7 is refused (`save_failed`, the Error Log names the 1 to 5 rule). |
+| 7 | With the poll open, save Ade's Available for Time 1 as Yes; close the poll and try again. | Saved and counted; once closed the page is empty and the save is refused. |
+| 8 | POST any action with Bea's row Id. | 404 `not_found`; Bea's row is unchanged. |
+
+**Cleanup:** None.
+
+## T-PB-11: Member Portal Template
+
+**Purpose:** confirm a member sees their own membership, controls their own listing, and finds only members who opted in (PB-09).
+**Prerequisites:** admin; Memberships on; Pat and Sam each with a Current membership and an email; a portal with key `member`, Active, Invited, the template `portal-client/templates/member.json`; Pat signed in.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=membership`. | Pat's membership with level, dates and dues; none of Sam's. |
+| 2 | GET `page?key=directory`. | Empty: nobody has opted in. |
+| 3 | POST `page/save` on `listing` with Show Me to Other Members on and a location; GET `page?key=directory`. | Pat listed with name, level, location and bio only. |
+| 4 | Open the portal page in a browser on Member Directory and type part of Pat's location. | A search box above the list; only matching members stay shown. |
+| 5 | With Payments not ready, POST `page/action` `Memberships.PayDues` on Pat's membership. | Refused; no payment link is queued and the membership is unchanged. |
+| 6 | POST `page/action` `Memberships.PayDues` with Sam's membership Id. | 404 `not_found`. |
+
+**Cleanup:** turn Pat's listing off.
+
+## T-PB-12: Donor Pays a Pledge Online
+
+**Purpose:** confirm Pay Online emails the donor a checkout link for the next payment due and the payment becomes a Received gift on the pledge (PAY-03).
+**Prerequisites:** the T-PB-08 portal with the current `donor.json`; Payments in Test mode with Stripe test keys (see [Payments](payments.md)); Pat Tester with an email you can read and an Active monthly pledge of 100; another donor with a pledge.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=pledges`. | The page's actions include **Pay Online** (`Giving.PayOnline`). |
+| 2 | POST `page/action` `Giving.PayOnline` on Pat's pledge. | 200 with "We've emailed you a secure link to pay". Within minutes, an email to Pat with a Stripe checkout link for 100. |
+| 3 | Open the link and pay with 4242 4242 4242 4242; wait for the Payments run. | A **Received** gift of 100 from Pat on the pledge, **Payment Method** Card, with a **Payment Reference**; the first payment shows **Paid** and the pledge's Paid to Date rises by 100. |
+| 4 | POST `page/action` `Giving.PayOnline` with the other donor's pledge Id. | 404 `not_found`; no email. |
+| 5 | Clear the Stripe keys on Payments Setup; repeat step 2. | Refused; no email is sent. |
+
+**Cleanup:** enter the Stripe test keys again; delete the gift.
+
+## T-PB-13: Attendee App
+
+**Purpose:** confirm attendees see only their events, connect only by consent, message only when on, and build an agenda (EV-22, EV-29).
+**Prerequisites:** admin; Event Management; event `Zz Summit` with Confirmed sessions `S1` (capacity 1) and `S2` overlapping S1, and `S3` later; Pat and Sam Registered at it with emails; Lee Registered at another event; an announcement with Publish At in the past and one tomorrow; a portal with key `attendees`, Active, Any Matching Person, the template `portal-client/templates/attendee.json`, on a WordPress page with `app="yes"`; Pat signed in.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=agenda` and `page?key=announcements`. | Zz Summit's sessions only; the past announcement only. |
+| 2 | GET `page?key=attendees`. | Empty: nobody opted in. |
+| 3 | As Sam, POST `page/save` on `myevents` with Show Me in the Attendee List on and a headline and How to Reach Me; as Pat, GET `page?key=attendees`. | Sam listed with name and headline; no email or How to Reach Me; Lee never listed. |
+| 4 | As Pat, POST `page/action` `Events.Connect` on Sam's row; again. | "Your request was sent."; then "You have already asked to connect." Pat's row Requested; Sam's Wants to Connect with no How to Reach Me. |
+| 5 | As Sam, `Events.AcceptConnection` on that row. | Both Connected; each shows the other's How to Reach Me. |
+| 6 | As Pat, save Message to Send `Hi` on the connection and run `Events.SendMessage`. | "Messages are turned off for this event app."; nothing sent. |
+| 7 | Turn on **Attendee messages**; repeat step 6. As Sam, GET `page?key=messages`; save Reply `Hello` and run `Events.SendReply`. | Sam has `Hi` from Pat; Pat's Messages page has `Hello`. The draft and reply clear. |
+| 8 | As Pat, `Events.AddToAgenda` on S1; as Sam, on S1. | Pat's added; Sam's "This session is full." |
+| 9 | As Pat, `Events.AddToAgenda` on S2. Turn on **Allow overlapping picks** and repeat. | First "It overlaps S1 on your agenda."; then added and marked Overlaps. |
+| 10 | Open My Agenda in the browser; **Add to Calendar**. | An .ics file with S1 and S2 that a phone calendar imports. |
+| 11 | Before S1 starts, save My Rating 4 on it. Move S1's start to the past and save 4 again; then 5. | Refused; then a Session Rating 4 with no person and Rated on; then refused. |
+| 12 | On a phone, open the page and choose Add to Home Screen (Android Chrome: Install app). | It opens full screen with the site icon; signing in still works. |
+| 13 | Set Zz Summit's End to a past date; GET `page?key=agenda` and `page?key=eventinfo`. | Neither page lists the ended event or its sessions. |
+
+**Cleanup:** turn both settings off; delete the connections, messages, picks and rating.
+
+## T-PB-14: Sponsor Lead Scanning
+
+**Purpose:** confirm sponsor staff collect only opted-in leads (EV-28).
+**Prerequisites:** T-PB-13's event; a Confirmed sponsor `Zz Co` whose Contact is Kim; Pat (Share My Details With Sponsors on) and Sam (off) attending; a portal with key `sponsors`, Active, Invited, the template `portal-client/templates/sponsor.json`, Kim invited and signed in on a phone.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On My Leads, **Add**, **Scan**, scan Pat's badge QR code; save. | A Shared scan with Pat's name, email, title and company. |
+| 2 | Scan Pat again. | Already Scanned; no new details. |
+| 3 | Scan Sam's badge. | Not Shared; no name or email kept. |
+| 4 | Type `abc` as the code. | Not Found. |
+| 5 | Add a note and interest Hot to Pat's lead; **Download CSV**. | A file with Pat's row only. |
+| 6 | As a portal person who is no sponsor's contact or booth staff, add a lead. | Refused (`save_failed`). |
+
+**Cleanup:** delete the leads.
+
+## T-PB-15: Service Portal Template
+
+**Purpose:** confirm a client sees only their own program records, without case notes (PB-04).
+**Prerequisites:** admin; Programs installed with sample data; Pat enrolled (Enrolled) in a cohort with a session tomorrow, with a service delivery, a goal, a referral and a case note; a portal with key `service`, Active, Invited, the template `portal-client/templates/service.json`; Pat signed in.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET the `programs`, `services`, `sessions` and `goals` pages. | Pat's enrollment, delivery, the cohort's upcoming session and goal; no referral; nothing of anyone else; no notes field anywhere. |
+| 2 | Set Pat's enrollment to Withdrawn; GET `programs` and `sessions`. | The enrollment and the cohort's sessions are gone. |
+| 3 | POST `page/save` on `goals`. | 403 `not_allowed`. |
+
+**Cleanup:** set the enrollment back.
+
+## T-PB-16: Partner Portal Template
+
+**Purpose:** confirm partner staff see only referrals shared with their organization (PB-05).
+**Prerequisites:** admin; Programs; organization `Zz Partners` with Kim's Current affiliation; two referrals with Partner Organization Zz Partners, one with Shared With Partner on; a portal with key `partner`, Active, Invited, the template `portal-client/templates/partner.json`; Kim signed in. For step 4, Funders installed, a grant whose Funder Contact is Kim with a submitted Narrative Report requirement and a Task, and the portal's template `partner-funders.json`.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=referrals`. | The shared referral only, without notes. |
+| 2 | End Kim's affiliation (Former); GET again. | Empty. |
+| 3 | Restore it; turn Shared With Partner off on the shared referral; GET again. | Empty. |
+| 4 | With `partner-funders.json`, GET `grants` and `reports`. | Kim's grant; the submitted report, not the task. |
+
+**Cleanup:** restore the referral.

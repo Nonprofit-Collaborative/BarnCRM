@@ -62,7 +62,7 @@ public with sharing class ReceiptRendererFactory {
 			return new BlobToPdfReceiptRenderer();
 		}
 		if (!PERMITTED_RENDERERS.containsKey(chosen)) {
-			throw refusal(Label.Giving_Receipt_UnknownRenderer, chosen);
+			throw refusal(BarnHelp.text('Giving', 'Giving_Receipt_UnknownRenderer'), chosen);
 		}
 		return resolve(chosen);
 	}
@@ -84,13 +84,13 @@ public with sharing class ReceiptRendererFactory {
 	private static ReceiptRenderer resolve(String chosen) {
 		Type rendererType = Type.forName(PERMITTED_RENDERERS.get(chosen));
 		if (rendererType == null) {
-			throw refusal(Label.Giving_Receipt_RendererUnavailable, chosen);
+			throw refusal(BarnHelp.text('Giving', 'Giving_Receipt_RendererUnavailable'), chosen);
 		}
 		Object instance = rendererType.newInstance();
 		if (!(instance instanceof ReceiptRenderer)) {
 			// Unreachable while the map holds only renderers, and kept so that a future entry
 			// that is not one fails here rather than at the call site.
-			throw refusal(Label.Giving_Receipt_RendererUnavailable, chosen);
+			throw refusal(BarnHelp.text('Giving', 'Giving_Receipt_RendererUnavailable'), chosen);
 		}
 		return (ReceiptRenderer) instance;
 	}

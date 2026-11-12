@@ -8,7 +8,7 @@ A volunteer is a person you already have in BarnCRM. There is no separate volunt
 sign-ups and hours link to the person.
 
 **Before you start:** open the **BarnCRM Volunteers** app from the App Launcher. You need a
-Volunteers permission set, which comes with your BarnCRM role (Team Member, Coordinator, Admin or
+Volunteers permission set, which comes with your BarnCRM role (Team Member, Fundraising Staff, Admin or
 Read Only). If the app is missing, ask your admin (see the
 [Volunteers admin guide](../admin-guide/volunteers.md#roles-and-permission-sets)). Read Only
 users can look at jobs, shifts and sign-ups but change nothing.
@@ -103,7 +103,33 @@ You should see: "Sign-up added." under the figures, the person in the list, and 
 filled** up by one.
 
 More people than **Volunteers needed** can be signed up: **Slots remaining** then goes below
-zero.
+zero. If your admin turned on **Waitlist when full**, a sign-up on a full shift is saved as
+**Waitlisted** instead, and moves up to **Signed up** by itself when someone cancels.
+
+## To Book a Group or a Weekly Regular
+
+1. Sign up the group's leader, or the regular volunteer, as above.
+2. Click their name to open the sign-up, then **Edit**.
+3. For a group, set **Group Size** to how many are coming, the leader included, and add a
+   **Group Name** if you like. For someone who comes to this shift every week, tick **Standing**.
+4. Click **Save**.
+
+You should see: **Places** on the sign-up shows the group size, and the shift's **Slots filled**
+counts it. A standing sign-up adds the person to every later shift of the same schedule within a
+few seconds. To stop a standing booking, cancel their sign-ups from the day they stop.
+
+## To Find Shifts That Are Short of Their Minimum
+
+Open **Volunteer Shifts** and choose the list view **Shifts Below Minimum**. It lists open shifts
+still to come with fewer places filled than their **Minimum Volunteers**. Set a shift's minimum on
+the shift (Edit, **Minimum Volunteers**); it cannot be more than Volunteers Needed.
+
+## To See Why a Sign-Up Says Consent Needed
+
+**Consent Needed** on a sign-up means the volunteer was under your organization's minor age at
+booking and had no current guardian consent. A coordinator opens the person's **Volunteer
+Readiness** card, completes their **Guardian consent** step (Guardian, Completed Date, Expires),
+and decides whether they come. Nothing stops the sign-up.
 
 ## To Sign Up Someone From the Suggestions
 

@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "key": "board",
+  "title": "Board Portal",
+  "requiresModules": ["CorporateHub"],
+  "pages": [
+    {
+      "key": "meetings",
+      "title": "My Meetings",
+      "kind": "related",
+      "object": "Meeting_Attendee__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Meeting__r.Name", "label": "Meeting" },
+        { "field": "Board_Name__c", "label": "Board" },
+        { "field": "Meeting__r.Start__c", "label": "Starts" },
+        { "field": "Meeting__r.Location__c", "label": "Where" },
+        { "field": "Meeting__r.Agenda__c", "label": "Agenda" },
+        { "field": "Meeting__r.Packet_Link__c", "label": "Packet" },
+        { "field": "Attendance__c" },
+        { "field": "Packet_Read_On__c", "label": "You Read the Packet" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": [{ "extension": "CorporateHub.MarkPacketRead", "label": "I Have Read the Packet" }]
+    },
+    {
+      "key": "minutes",
+      "title": "Minutes",
+      "kind": "related",
+      "object": "Meeting_Attendee__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Meeting__r.Name", "label": "Meeting" },
+        { "field": "Meeting__r.Start__c", "label": "Held" },
+        { "field": "Meeting__r.Minutes_Status__c", "label": "Status" },
+        { "field": "Meeting__r.Minutes__c", "label": "Minutes" },
+        { "field": "Minutes_Approved_On__c", "label": "You Approved" }
+      ],
+      "where": [{ "field": "Minutes_Ready__c", "op": "equals", "value": "true" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": [{ "extension": "CorporateHub.ApproveMinutes", "label": "Approve Minutes" }]
+    },
+    {
+      "key": "votes",
+      "title": "My Votes",
+      "kind": "related",
+      "object": "Board_Vote__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Motion__r.Name", "label": "Motion" },
+        { "field": "Motion__r.Text__c", "label": "Text" },
+        { "field": "Meeting_Name__c", "label": "Meeting" },
+        { "field": "Motion__r.Status__c", "label": "Status" },
+        { "field": "Vote__c", "label": "Your Vote" },
+        { "field": "Voted_On__c", "label": "Voted" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 100,
+      "actions": [
+        { "extension": "CorporateHub.VoteFor", "label": "Vote For" },
+        { "extension": "CorporateHub.VoteAgainst", "label": "Vote Against" },
+        { "extension": "CorporateHub.Abstain", "label": "Abstain" }
+      ]
+    },
+    {
+      "key": "disclosures",
+      "title": "Disclosures and Policies",
+      "kind": "related",
+      "object": "Policy_Acknowledgment__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Document__r.Name", "label": "Policy" },
+        { "field": "Document__r.Summary__c", "label": "Summary" },
+        { "field": "Version__c" },
+        { "field": "Due_Date__c", "label": "Due" },
+        {
+          "field": "Conflict_Disclosed__c",
+          "label": "I Have a Conflict to Disclose",
+          "edit": true
+        },
+        { "field": "Disclosure__c", "label": "Interests Disclosed", "edit": true }
+      ],
+      "where": [{ "field": "Status__c", "op": "equals", "value": "Requested" }],
+      "orderBy": "Due_Date__c ASC",
+      "limit": 50,
+      "actions": [
+        "update",
+        { "extension": "CorporateHub.Acknowledge", "label": "I Have Read and Acknowledge" }
+      ]
+    },
+    {
+      "key": "assessment",
+      "title": "Board Self-Assessment",
+      "kind": "related",
+      "object": "Assessment_Answer__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Question__c" },
+        { "field": "Rating__c", "label": "Rating 1 to 5", "edit": true },
+        { "field": "Comment__c", "edit": true }
+      ],
+      "where": [{ "field": "Open__c", "op": "equals", "value": "true" }],
+      "orderBy": "Sort_Order__c ASC",
+      "limit": 100,
+      "actions": ["update"]
+    },
+    {
+      "key": "availability",
+      "title": "Meeting Availability",
+      "kind": "related",
+      "object": "Meeting_Attendee__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Meeting__r.Name", "label": "Meeting" },
+        { "field": "Meeting__r.Poll_Time_1__c", "label": "Time 1" },
+        { "field": "Available_1__c", "label": "Available for Time 1", "edit": true },
+        { "field": "Meeting__r.Poll_Time_2__c", "label": "Time 2" },
+        { "field": "Available_2__c", "label": "Available for Time 2", "edit": true },
+        { "field": "Meeting__r.Poll_Time_3__c", "label": "Time 3" },
+        { "field": "Available_3__c", "label": "Available for Time 3", "edit": true }
+      ],
+      "where": [{ "field": "Poll_Open__c", "op": "equals", "value": "true" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 20,
+      "actions": ["update"]
+    },
+    {
+      "key": "seats",
+      "title": "My Board Seats",
+      "kind": "related",
+      "object": "Board_Member__c",
+      "personField": "Person__c",
+      "fields": [
+        { "field": "Board__r.Name", "label": "Board" },
+        { "field": "Role__c" },
+        { "field": "Term_Start__c" },
+        { "field": "Term_End__c" }
+      ],
+      "orderBy": "Term_Start__c DESC",
+      "limit": 50
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true },
+        { "field": "MailingStreet", "label": "Street", "edit": true },
+        { "field": "MailingCity", "label": "City", "edit": true },
+        { "field": "MailingPostalCode", "label": "Postal Code", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

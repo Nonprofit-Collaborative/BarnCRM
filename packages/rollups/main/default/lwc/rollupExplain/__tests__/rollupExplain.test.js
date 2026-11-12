@@ -1,15 +1,15 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupExplain from 'c/rollupExplain';
 import explain from '@salesforce/apex/RollupExplainController.explain';
 
+setHelpTextForTest({
+  Core_RollupEase_ExplainAdmin: 'For admins: {0}'
+});
+
 jest.mock('@salesforce/apex/RollupExplainController.explain', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupEase_ExplainAdmin',
-  () => ({ default: 'For admins: {0}' }),
-  { virtual: true }
-);
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));

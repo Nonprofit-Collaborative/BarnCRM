@@ -4,7 +4,7 @@
   <protected>false</protected>
   <values>
     <field>Category__c</field>
-    <value xsi:type="xsd:string">InDevelopment</value>
+    <value xsi:type="xsd:string">Alternative</value>
   </values>
   <values>
     <field>Status__c</field>
@@ -12,7 +12,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Membership management from the Open Source Commons community (the Commons Project: Memberships), itself still pre-release. BarnCRM would look at an integration once the app is ready.</value>
+    <value xsi:type="xsd:string">Membership management from the Open Source Commons community (the Commons Project: Memberships). It does the same work as BarnCRM Memberships.</value>
   </values>
   <values>
     <field>Maintainer__c</field>
@@ -31,12 +31,18 @@
     <value xsi:type="xsd:string">Membership__c</value>
   </values>
   <values>
+    <field>Show_Only_When_Installed__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+  <values>
     <field>Related_Module__c</field>
-    <value xsi:nil="true" />
+    <value xsi:type="xsd:string">BarnCRM Memberships</value>
   </values>
   <values>
     <field>Compatibility__c</field>
-    <value xsi:type="xsd:string">Planned, not built, and not yet tested by BarnCRM. The app is pre-release and installs from source only. It needs Opportunities and Products, so it will not run on a Platform-only org. It books dues as Opportunities, so those amounts would not be in BarnCRM Giving totals, and it adds its own Contact trigger.</value>
+    <value
+      xsi:type="xsd:string"
+    >Use one or the other for the same members, not both. BarnCRM Memberships uses its own objects, so the two install side by side without a clash, and its Memberships Essentials migration kit copies levels and memberships across; not yet tested against a live Essentials org. Essentials needs Opportunities and Products, so it will not run on a Platform-only org, and it books dues as Opportunities, outside BarnCRM Giving totals.</value>
   </values>
   <values>
     <field>Sort_Order__c</field>

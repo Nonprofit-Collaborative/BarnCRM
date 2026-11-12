@@ -14,15 +14,11 @@ import postBatch from '@salesforce/apex/GiftBatchController.postBatch';
 import getPaymentChoices from '@salesforce/apex/GiftBatchController.getPaymentChoices';
 import columnPays from '@salesforce/label/c.Giving_GiftBatch_ColumnPays';
 import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
-import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
-import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
 import paysNoLongerOpen from '@salesforce/label/c.Giving_GiftEntryPays_NoLongerOpen';
-import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
 
 import title from '@salesforce/label/c.Giving_GiftBatch_Title';
 import controlTotalLabel from '@salesforce/label/c.Giving_GiftBatch_ControlTotalLabel';
 import enteredLabel from '@salesforce/label/c.Giving_GiftBatch_EnteredLabel';
-import balanced from '@salesforce/label/c.Giving_GiftBatch_Balanced';
 import columnLine from '@salesforce/label/c.Giving_GiftBatch_ColumnLine';
 import columnDonor from '@salesforce/label/c.Giving_GiftBatch_ColumnDonor';
 import columnAmount from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
@@ -45,9 +41,6 @@ import postButton from '@salesforce/label/c.Giving_GiftBatch_Post';
 import working from '@salesforce/label/c.Core_EraseAction_Working';
 import noLines from '@salesforce/label/c.Giving_GiftBatch_NoLines';
 import unsaved from '@salesforce/label/c.Core_Shared_UnsavedChanges';
-import savedToast from '@salesforce/label/c.Giving_GiftBatch_Saved';
-import errorLoadBatch from '@salesforce/label/c.Giving_GiftBatch_ErrorLoadBatch';
-import errorSaveRows from '@salesforce/label/c.Giving_GiftBatch_ErrorSaveRows';
 import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
 import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import { iconFor } from 'c/barnIcons';
@@ -111,7 +104,9 @@ export default class GiftBatchEntry extends LightningElement {
     get fromBatchHelp() {
       return helpText('Giving', 'Giving_GiftBatch_FromBatchHelp');
     },
-    paysErrorLoad,
+    get paysErrorLoad() {
+      return helpText('Giving', 'Giving_GiftEntryPays_ErrorLoad');
+    },
     donorPlaceholder,
     addLine,
     saveButton,
@@ -165,7 +160,7 @@ export default class GiftBatchEntry extends LightningElement {
         this.lookUpAllPayments();
       }
     } catch (error) {
-      this.formError = messageOf(error, errorLoadBatch);
+      this.formError = messageOf(error, helpText('Giving', 'Giving_GiftBatch_ErrorLoadBatch'));
     }
   }
 
@@ -296,7 +291,7 @@ export default class GiftBatchEntry extends LightningElement {
     }
     const gap = Math.round((this.controlTotal - this.enteredTotal) * 100) / 100;
     if (gap === 0) {
-      return balanced;
+      return helpText('Giving', 'Giving_GiftBatch_Balanced');
     }
     const amount = Math.abs(gap).toFixed(2);
     return gap > 0
@@ -305,7 +300,7 @@ export default class GiftBatchEntry extends LightningElement {
   }
 
   get isBalanced() {
-    return this.balanceText === balanced;
+    return this.balanceText === helpText('Giving', 'Giving_GiftBatch_Balanced');
   }
 
   /** Balanced is done; anything else is something to check before the gifts are created. */
@@ -392,9 +387,12 @@ export default class GiftBatchEntry extends LightningElement {
       answer.suggestedId &&
       line.installmentId === answer.suggestedId
     ) {
-      paysNote = paysOneSuggested;
+      paysNote = helpText('Giving', 'Giving_GiftEntryPays_OneSuggested');
     } else if (!line.paymentPicked && answer && answer.suggestedCount > 1) {
-      paysNote = paysSeveralSuggested.replace('{0}', answer.suggestedCount);
+      paysNote = helpText('Giving', 'Giving_GiftEntryPays_SeveralSuggested').replace(
+        '{0}',
+        answer.suggestedCount
+      );
     }
     return {
       showPays: options.length > 1 && !line.giftId,
@@ -529,7 +527,7 @@ export default class GiftBatchEntry extends LightningElement {
 
   async handleSave() {
     if (await this.save()) {
-      this.toast(savedToast, 'success');
+      this.toast(helpText('Giving', 'Giving_GiftBatch_Saved'), 'success');
     }
   }
 
@@ -561,7 +559,7 @@ export default class GiftBatchEntry extends LightningElement {
       this.lookUpAllPayments();
       return true;
     } catch (error) {
-      this.formError = messageOf(error, errorSaveRows);
+      this.formError = messageOf(error, helpText('Giving', 'Giving_GiftBatch_ErrorSaveRows'));
       return false;
     } finally {
       this.busy = false;

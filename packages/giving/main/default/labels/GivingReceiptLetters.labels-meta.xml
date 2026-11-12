@@ -17,14 +17,6 @@
     <value>Year End Statements</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_NoTemplates</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: the org has no receipt letters</shortDescription>
-    <value>This org has no receipt letters. BarnCRM creates the two it ships at install, so that step did not finish. Restore them here, then edit the wording.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_RestoreButton</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -119,37 +111,5 @@
     <protected>false</protected>
     <shortDescription>Receipts page: heading when no statement run has started</shortDescription>
     <value>No Statement Runs Yet</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_RestoredMessage</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast, letters restored</shortDescription>
-    <value>The letters BarnCRM ships are back.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_SavedMessage</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast, letter saved</shortDescription>
-    <value>Your receipt letter has been saved.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_ActivatedMessage</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast, letter switched on</shortDescription>
-    <value>This letter is now the one BarnCRM uses.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_StartedMessage</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast, statement run started</shortDescription>
-    <value>Year end statements are being generated. Click Refresh to see the run's progress below.</value>
   </labels>
 </CustomLabels>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Rating_Total__c</fullName>
+  <inlineHelpText>The ratings added together.</inlineHelpText>
+  <label>Rating Total</label>
+  <trackTrending>false</trackTrending>
+  <summaryForeignKey>Session_Rating__c.Event_Session__c</summaryForeignKey>
+  <summarizedField>Session_Rating__c.Rating__c</summarizedField>
+  <summaryOperation>sum</summaryOperation>
+  <type>Summary</type>
+</CustomField>

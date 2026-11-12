@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Minutes_Ready__c</fullName>
+  <externalId>false</externalId>
+  <formula>OR(ISPICKVAL(Meeting__r.Minutes_Status__c, 'Submitted for Approval'), ISPICKVAL(Meeting__r.Minutes_Status__c, 'Approved'))</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked when the minutes are submitted or approved.</inlineHelpText>
+  <label>Minutes Ready</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

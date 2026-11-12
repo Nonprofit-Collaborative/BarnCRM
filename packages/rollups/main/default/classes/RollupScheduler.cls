@@ -74,7 +74,7 @@ public with sharing class RollupScheduler implements Schedulable {
 		}
 		if (RollupService.isTurnedOff()) {
 			ErrorLogger.logMessage(
-				System.Label.Core_Rollups_ScheduledRunTurnedOff,
+				BarnHelp.text('Rollups', 'Core_Rollups_ScheduledRunTurnedOff'),
 				'RollupScheduler',
 				ErrorLogger.SEVERITY_INFO
 			);

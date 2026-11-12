@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Payments Webhook Guest</label>
+  <description>
+    For a Salesforce Site guest user only: receives Stripe and PayPal events. Grants the webhook
+    receiver Apex class, and no object or field.
+  </description>
+  <classAccesses>
+    <apexClass>PaymentWebhookRest</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+</PermissionSet>

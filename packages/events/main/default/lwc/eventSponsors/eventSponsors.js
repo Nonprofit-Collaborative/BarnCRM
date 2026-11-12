@@ -6,7 +6,8 @@ import addSponsor from '@salesforce/apex/EventSponsorsController.addSponsor';
 import addDeliverable from '@salesforce/apex/EventSponsorsController.addDeliverable';
 import setDeliverableStatus from '@salesforce/apex/EventSponsorsController.setDeliverableStatus';
 import removeSponsor from '@salesforce/apex/EventSponsorsController.removeSponsor';
-import { format, messageFrom } from 'c/findCsv';
+import getLeads from '@salesforce/apex/EventSponsorsController.getLeads';
+import { downloadCsv, format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
 import BarnConfirmModal from 'c/barnConfirmModal';
@@ -28,6 +29,7 @@ const SPONSOR_FIELDS = [
   'Level__c',
   'Amount__c',
   'Contact__c',
+  'Booth__c',
   'Linked_Record_Id__c',
   'Notes__c'
 ];
@@ -183,6 +185,7 @@ export default class EventSponsors extends LightningElement {
           label: helpText('Events', 'Events_Sponsors_AddDeliverable')
         });
       }
+      items.push({ value: 'leads', label: helpText('Events', 'Events_Sponsors_DownloadLeads') });
       items.push({ value: 'remove', label: REMOVE });
       return {
         ...sponsor,
@@ -276,6 +279,8 @@ export default class EventSponsors extends LightningElement {
       };
     } else if (value === 'remove') {
       this.confirmRemoveSponsor(sponsor);
+    } else if (value === 'leads') {
+      this.downloadLeads(sponsor);
     } else {
       this.editRecord('Sponsor__c', sponsor);
     }
@@ -331,6 +336,30 @@ export default class EventSponsors extends LightningElement {
     });
     if (saved) {
       await this.load();
+    }
+  }
+
+  /** EV-28: the sponsor's leads as a CSV file, only attendees who shared their details. */
+  async downloadLeads(sponsor) {
+    try {
+      const leads = await getLeads({ sponsorId: sponsor.id });
+      if (!leads.rows.length) {
+        this.dispatchEvent(
+          new ShowToastEvent({
+            message: helpText('Events', 'Events_Sponsors_NoLeads', sponsor.name),
+            variant: 'info'
+          })
+        );
+        return;
+      }
+      downloadCsv(`${sponsor.name} leads`, leads.columns, leads.rows);
+    } catch (error) {
+      this.dispatchEvent(
+        new ShowToastEvent({
+          message: messageFrom(error, helpText('Events', 'Events_Sponsors_LoadFailed')),
+          variant: 'error'
+        })
+      );
     }
   }
 

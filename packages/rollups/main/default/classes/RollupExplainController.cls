@@ -95,15 +95,12 @@ public with sharing class RollupExplainController {
 			}
 			return explained;
 		} catch (Exception caught) {
-			String message = caught instanceof RollupService.RollupServiceException
-				? caught.getMessage()
-				: Label.Core_Rollups_UnexpectedError;
-			if (!(caught instanceof RollupService.RollupServiceException)) {
-				ErrorLogger.log(caught, 'RollupExplainController');
-			}
-			AuraHandledException reported = new AuraHandledException(message);
-			reported.setMessage(message);
-			throw reported;
+			throw UserErrors.wrap(
+				caught,
+				caught instanceof RollupService.RollupServiceException,
+				'RollupExplainController',
+				BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
+			);
 		}
 	}
 
@@ -148,7 +145,7 @@ public with sharing class RollupExplainController {
 		explanation.sentence = RollupSentence.of(definition);
 		explanation.rows = RollupPreviewRows.of(definition, record.Id);
 		explanation.counts = String.format(
-			Label.Core_RollupEase_ExplainCounts,
+			BarnHelp.text('Rollups', 'Core_RollupEase_ExplainCounts'),
 			new List<String>{
 				explanation.rows.counted.format(),
 				explanation.rows.total.format(),
@@ -162,9 +159,9 @@ public with sharing class RollupExplainController {
 			? (Datetime) stamped
 			: definition.Last_Calculated__c;
 		explanation.lastCalculated = calculatedAt == null
-			? Label.Core_RollupEase_ExplainNever
+			? BarnHelp.text('Rollups', 'Core_RollupEase_ExplainNever')
 			: String.format(
-					Label.Core_RollupEase_ExplainLast,
+					BarnHelp.text('Rollups', 'Core_RollupEase_ExplainLast'),
 					new List<String>{ calculatedAt.format() }
 			  );
 		if (admin) {

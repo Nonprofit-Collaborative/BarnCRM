@@ -21,10 +21,8 @@ import SOURCE_FIELD from '@salesforce/label/c.Core_RollupBuilder_SourceField';
 import ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_OrderBy';
 import ORDER_DIRECTION from '@salesforce/label/c.Core_RollupBuilder_OrderDirection';
 import ROW_LIMIT from '@salesforce/label/c.Core_RollupBuilder_RowLimit';
-import ERROR_ROW_LIMIT_ORDER from '@salesforce/label/c.Core_Rollups_ErrorRowLimitNeedsOrder';
 import DELIMITER from '@salesforce/label/c.Core_RollupBuilder_Delimiter';
 import CUSTOM_DELIMITER from '@salesforce/label/c.Core_RollupBuilder_CustomDelimiter';
-import ERROR_CUSTOM_DELIMITER from '@salesforce/label/c.Core_Rollups_ErrorCustomDelimiterNeeded';
 import INCLUDE_DELETED from '@salesforce/label/c.Core_RollupBuilder_IncludeDeleted';
 import WINDOW from '@salesforce/label/c.Core_RollupBuilder_Window';
 import WINDOW_ALL from '@salesforce/label/c.Core_RollupBuilder_WindowAll';
@@ -32,8 +30,6 @@ import WINDOW_THIS from '@salesforce/label/c.Core_RollupBuilder_WindowThisYear';
 import WINDOW_LAST from '@salesforce/label/c.Core_RollupBuilder_WindowLastYear';
 import WINDOW_TWO from '@salesforce/label/c.Core_RollupBuilder_WindowTwoYears';
 import WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_WindowDate';
-import CURRENCY_WARNING from '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning';
-import NUMBER_WARNING from '@salesforce/label/c.Core_RollupBuilder_NumberWarning';
 import FILTER from '@salesforce/label/c.Core_Find_Conditions';
 import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
@@ -42,45 +38,23 @@ import BYPASS_PERMISSION from '@salesforce/label/c.Core_RollupBuilder_BypassPerm
 import NONE from '@salesforce/label/c.Core_AccessCompare_None';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
-import SUMMARY from '@salesforce/label/c.Core_RollupBuilder_Summary';
 import BACK from '@salesforce/label/c.Core_Kit_Back';
 import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVE_AND_CALCULATE from '@salesforce/label/c.Core_RollupBuilder_SaveAndCalculate';
-import ERROR_NAME from '@salesforce/label/c.Core_RollupBuilder_ErrorNameNeeded';
-import ERROR_TARGET from '@salesforce/label/c.Core_RollupBuilder_ErrorTargetNeeded';
-import ERROR_SOURCE from '@salesforce/label/c.Core_RollupBuilder_ErrorSourceNeeded';
-import ERROR_SOURCE_FIELD from '@salesforce/label/c.Core_Rollups_ErrorSourceFieldNeeded';
-import ERROR_ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_ErrorOrderByNeeded';
-import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindowNeedsDate';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
-import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
-import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
 import LightningConfirm from 'lightning/confirm';
-import BUILDER_SENTENCE from '@salesforce/label/c.Core_RollupEase_BuilderSentence';
 import NOT_CHOSEN from '@salesforce/label/c.Core_RollupEase_NotChosen';
 import EVERY_RECORD from '@salesforce/label/c.Core_RollupEase_EveryRecord';
 import SOME_RECORDS from '@salesforce/label/c.Core_RollupEase_SomeRecords';
 import TARGET_PART from '@salesforce/label/c.Core_Format_Pair';
-import NOT_FOR_FIELD from '@salesforce/label/c.Core_RollupEase_NotForField';
-import FIELDS_NUMBERS from '@salesforce/label/c.Core_RollupEase_FieldsNumbers';
-import FIELDS_NUMBERS_DATES from '@salesforce/label/c.Core_RollupEase_FieldsNumbersDates';
-import NO_FIELD_FITS from '@salesforce/label/c.Core_RollupEase_NoFieldFits';
 import MODE_HEADING from '@salesforce/label/c.Core_RollupEase_ModeHeading';
-import MODE_INSTANT_AFTER from '@salesforce/label/c.Core_RollupEase_ModeInstantAfter';
-import MODE_INSTANT_DURING from '@salesforce/label/c.Core_RollupEase_ModeInstantDuring';
-import MODE_INSTANT_NONE from '@salesforce/label/c.Core_RollupEase_ModeInstantNone';
-import MODE_NIGHTLY from '@salesforce/label/c.Core_RollupEase_ModeNightly';
-import MODE_BOTH_TEXT from '@salesforce/label/c.Core_RollupEase_ModeBoth';
-import MODE_BOTH_NO_INSTANT from '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant';
 import PICK_SAMPLES from '@salesforce/label/c.Core_RollupEase_PickSamples';
 import SAMPLES_HEADING from '@salesforce/label/c.Core_RollupEase_SamplesHeading';
-import SAMPLES_NONE from '@salesforce/label/c.Core_RollupEase_SamplesNone';
 import SHOW_ROWS from '@salesforce/label/c.Core_RollupEase_ShowRows';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
 import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
@@ -95,12 +69,10 @@ import KIND_TEXT from '@salesforce/label/c.Core_ImportNewField_TypeText';
 import KIND_LONGTEXT from '@salesforce/label/c.Core_RollupEase_KindLongText';
 import KIND_CHECKBOX from '@salesforce/label/c.Core_ImportNewField_TypeCheckbox';
 import WRITE_FIELD from '@salesforce/label/c.Core_RollupEase_WriteField';
-import FIELD_DEPLOY from '@salesforce/label/c.Core_RollupEase_FieldDeploy';
 import DOWNLOAD_FIELD from '@salesforce/label/c.Core_RollupEase_DownloadField';
 import REFRESH_FIELDS from '@salesforce/label/c.Core_ImportNewField_RefreshButton';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
-import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The combobox value for no bypass permission; a custom permission name never looks like it. */
@@ -229,7 +201,9 @@ export default class RollupWizard extends LightningElement {
       return helpText('Rollups', 'Core_RollupEase_PickSamplesHelp');
     },
     samplesHeading: SAMPLES_HEADING,
-    samplesNone: SAMPLES_NONE,
+    get samplesNone() {
+      return helpText('Rollups', 'Core_RollupEase_SamplesNone');
+    },
     showRows: SHOW_ROWS,
     rowsHeading: ROWS_HEADING,
     createField: CREATE_FIELD,
@@ -399,7 +373,9 @@ export default class RollupWizard extends LightningElement {
 
   /** Step 5: says plainly that this total is not instant, and why (ADR-0136). */
   get noInstantNotice() {
-    return this.sourceIsInstant ? undefined : format(NO_INSTANT, this.recordsLabel);
+    return this.sourceIsInstant
+      ? undefined
+      : format(helpText('Rollups', 'Core_RollupBuilder_NoInstant'), this.recordsLabel);
   }
 
   get targetFieldOptions() {
@@ -511,7 +487,11 @@ export default class RollupWizard extends LightningElement {
       .filter((option) => !allowed.has(option.value))
       .map((option) => option.label);
     return hidden.length
-      ? format(NOT_FOR_FIELD, this.targetFieldLabel, hidden.join(', '))
+      ? format(
+          helpText('Rollups', 'Core_RollupEase_NotForField'),
+          this.targetFieldLabel,
+          hidden.join(', ')
+        )
       : undefined;
   }
 
@@ -521,13 +501,19 @@ export default class RollupWizard extends LightningElement {
       return undefined;
     }
     if (this.sourceFields.length && !this.copyFieldOptions.length) {
-      return format(NO_FIELD_FITS, this.chosenAggregateLabel);
+      return format(helpText('Rollups', 'Core_RollupEase_NoFieldFits'), this.chosenAggregateLabel);
     }
     if (READS_NUMBERS.has(this.current.aggregate)) {
-      return format(FIELDS_NUMBERS, this.chosenAggregateLabel);
+      return format(
+        helpText('Rollups', 'Core_RollupEase_FieldsNumbers'),
+        this.chosenAggregateLabel
+      );
     }
     if (READS_NUMBERS_OR_DATES.has(this.current.aggregate)) {
-      return format(FIELDS_NUMBERS_DATES, this.chosenAggregateLabel);
+      return format(
+        helpText('Rollups', 'Core_RollupEase_FieldsNumbersDates'),
+        this.chosenAggregateLabel
+      );
     }
     return undefined;
   }
@@ -577,7 +563,8 @@ export default class RollupWizard extends LightningElement {
    */
   get sentenceParts() {
     const values = this.sentenceValues;
-    return BUILDER_SENTENCE.split(/(\{\d\})/)
+    return helpText('Rollups', 'Core_RollupEase_BuilderSentence')
+      .split(/(\{\d\})/)
       .filter((piece) => piece !== '')
       .map((piece, index) => {
         const match = /^\{(\d)\}$/.exec(piece);
@@ -617,22 +604,27 @@ export default class RollupWizard extends LightningElement {
     const time = this.model && this.model.nightlyTime ? this.model.nightlyTime : '';
     let instantly;
     if (!this.sourceIsInstant) {
-      instantly = format(MODE_INSTANT_NONE, records);
+      instantly = format(helpText('Rollups', 'Core_RollupEase_ModeInstantNone'), records);
     } else {
       instantly = format(
-        this.model && this.model.inSave ? MODE_INSTANT_DURING : MODE_INSTANT_AFTER,
+        this.model && this.model.inSave
+          ? helpText('Rollups', 'Core_RollupEase_ModeInstantDuring')
+          : helpText('Rollups', 'Core_RollupEase_ModeInstantAfter'),
         target,
         records
       );
     }
     return [
       { key: 'instantly', text: instantly },
-      { key: 'nightly', text: format(MODE_NIGHTLY, target, time) },
+      {
+        key: 'nightly',
+        text: format(helpText('Rollups', 'Core_RollupEase_ModeNightly'), target, time)
+      },
       {
         key: 'both',
         text: this.sourceIsInstant
-          ? format(MODE_BOTH_TEXT, time)
-          : format(MODE_BOTH_NO_INSTANT, time, records)
+          ? format(helpText('Rollups', 'Core_RollupEase_ModeBoth'), time)
+          : format(helpText('Rollups', 'Core_RollupEase_ModeBothNoInstant'), time, records)
       }
     ];
   }
@@ -706,10 +698,10 @@ export default class RollupWizard extends LightningElement {
       return undefined;
     }
     if (this.targetFieldType === 'currency') {
-      return CURRENCY_WARNING;
+      return helpText('Rollups', 'Core_RollupBuilder_CurrencyWarning');
     }
     return NUMBERS.has(this.targetFieldType) || MONEY.has(this.targetFieldType)
-      ? NUMBER_WARNING
+      ? helpText('Rollups', 'Core_RollupBuilder_NumberWarning')
       : undefined;
   }
 
@@ -723,7 +715,7 @@ export default class RollupWizard extends LightningElement {
     const source = this.sources.find((entry) => entry.value === this.sourceValue);
     const calculation = aggregate ? aggregate.label : this.current.aggregate;
     return format(
-      SUMMARY,
+      helpText('Rollups', 'Core_RollupBuilder_Summary'),
       sourceField ? `${calculation} (${sourceField.label})` : calculation,
       source ? source.label : this.current.relationshipPath,
       `${this.targetLabel}, ${targetField ? targetField.label : this.current.targetField}`
@@ -812,7 +804,10 @@ export default class RollupWizard extends LightningElement {
   }
 
   get fieldDeployText() {
-    return FIELD_DEPLOY.replace('{0}', this.generatedField.fileName);
+    return helpText('Rollups', 'Core_RollupEase_FieldDeploy').replace(
+      '{0}',
+      this.generatedField.fileName
+    );
   }
 
   handleOpenCreateField() {
@@ -847,7 +842,7 @@ export default class RollupWizard extends LightningElement {
   handleCopyField() {
     const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
     if (!clipboard || !clipboard.writeText) {
-      this.fieldNotice = COPY_FAILED;
+      this.fieldNotice = helpText('Rollups', 'Core_RollupBuilder_InstantCopyFailed');
       return Promise.resolve();
     }
     return clipboard
@@ -856,7 +851,7 @@ export default class RollupWizard extends LightningElement {
         this.fieldNotice = COPIED;
       })
       .catch(() => {
-        this.fieldNotice = COPY_FAILED;
+        this.fieldNotice = helpText('Rollups', 'Core_RollupBuilder_InstantCopyFailed');
       });
   }
 
@@ -950,26 +945,26 @@ export default class RollupWizard extends LightningElement {
   stepProblem() {
     const draft = this.current;
     if (this.step === 1 && (!draft.targetObject || !draft.targetField)) {
-      return ERROR_TARGET;
+      return helpText('Rollups', 'Core_RollupBuilder_ErrorTargetNeeded');
     }
     if (this.step === 2 && !this.sourceValue) {
-      return ERROR_SOURCE;
+      return helpText('Rollups', 'Core_RollupBuilder_ErrorSourceNeeded');
     }
     if (this.step === 3) {
       if (!draft.aggregate || (this.needsSourceField && !draft.sourceField)) {
-        return ERROR_SOURCE_FIELD;
+        return helpText('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded');
       }
       if (ORDERED.has(draft.aggregate) && !draft.orderByField) {
-        return ERROR_ORDER_BY;
+        return helpText('Rollups', 'Core_RollupBuilder_ErrorOrderByNeeded');
       }
       if (this.hasRowLimit && !draft.orderByField) {
-        return ERROR_ROW_LIMIT_ORDER;
+        return helpText('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder');
       }
       if (this.isCustomDelimiter && !draft.customDelimiter) {
-        return ERROR_CUSTOM_DELIMITER;
+        return helpText('Rollups', 'Core_Rollups_ErrorCustomDelimiterNeeded');
       }
       if (draft.fiscalYearAware && !draft.fiscalDateField && !this.sourceIsDate()) {
-        return ERROR_WINDOW_DATE;
+        return helpText('Rollups', 'Core_RollupBuilder_ErrorWindowNeedsDate');
       }
     }
     if (this.step === 4) {
@@ -981,7 +976,7 @@ export default class RollupWizard extends LightningElement {
       }
     }
     if (this.step === 5 && !(draft.name || '').trim()) {
-      return ERROR_NAME;
+      return helpText('Rollups', 'Core_RollupBuilder_ErrorNameNeeded');
     }
     return null;
   }
@@ -1121,13 +1116,16 @@ export default class RollupWizard extends LightningElement {
   async askDlrs(conflict, draft, calculateNow) {
     const confirmed = await LightningConfirm.open({
       label: DLRS_CONFIRM_TITLE,
-      message: `${conflict} ${DLRS_CONFIRM_QUESTION}`,
+      message: `${conflict} ${helpText('Rollups', 'Core_RollupBuilder_DlrsConfirmQuestion')}`,
       theme: 'warning'
     });
     return confirmed ? saveSwitchingOffDlrs({ draft, calculateNow }) : undefined;
   }
 
   fail(error) {
-    this.error = error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
+    this.error =
+      error && error.body && error.body.message
+        ? error.body.message
+        : helpText('Rollups', 'Core_Rollups_UnexpectedError');
   }
 }

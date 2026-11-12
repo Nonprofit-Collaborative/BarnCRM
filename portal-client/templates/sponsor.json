@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "key": "sponsor",
+  "title": "Sponsor Portal",
+  "requiresModules": ["Events"],
+  "pages": [
+    {
+      "key": "leads",
+      "title": "My Leads",
+      "kind": "related",
+      "object": "Sponsor_Lead__c",
+      "personField": "Scanned_By__c",
+      "fields": [
+        {
+          "field": "Badge_Code__c",
+          "label": "Badge Code",
+          "edit": true,
+          "required": true,
+          "scan": true
+        },
+        { "field": "Status__c" },
+        { "field": "Lead_Name__c", "label": "Name" },
+        { "field": "Lead_Email__c", "label": "Email" },
+        { "field": "Lead_Title__c", "label": "Title" },
+        { "field": "Lead_Company__c", "label": "Company" },
+        { "field": "Interest__c", "label": "Interest", "edit": true },
+        { "field": "Notes__c", "label": "Notes", "edit": true },
+        { "field": "CreatedDate", "label": "Scanned" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 200,
+      "search": true,
+      "download": true,
+      "actions": ["create", "update"]
+    },
+    {
+      "key": "sponsorships",
+      "title": "My Sponsorships",
+      "kind": "related",
+      "object": "Event_Sponsor__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Event__r.Name", "label": "Event" },
+        { "field": "Account__r.Name", "label": "Sponsor" },
+        { "field": "Level__r.Name", "label": "Level" },
+        { "field": "Booth__c", "label": "Booth" },
+        { "field": "Status__c" }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Declined" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": []
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

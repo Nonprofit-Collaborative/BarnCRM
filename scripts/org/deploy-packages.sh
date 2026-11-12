@@ -942,6 +942,22 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(events)
   # Portal Builder depends on Core only (ADR-0185, portal builder).
   MODULES+=(portal)
+  # Corporate Hub depends on Core only (ADR-0196, corporate hub module).
+  MODULES+=(corporatehub)
+  # Payments depends on Core only (ADR-0201 payments module).
+  MODULES+=(payments)
+  # LWC Builder depends on Core only (ADR-0203, lwc builder module).
+  MODULES+=(lwcbuilder)
+  # Scholarships and Outbound Grants depends on Core only (ADR-0204, scholarships module).
+  MODULES+=(scholarships)
+  # Territory Management depends on Core only (ADR-0205, territory management module).
+  MODULES+=(territory)
+  # Memberships depends on Core only; Giving and Payments are read by name (ADR-0206 memberships module).
+  MODULES+=(memberships)
+  # Project Management depends on Core only (ADR-0208, project management module).
+  MODULES+=(projects)
+  # Address Verification depends on Core only (ADR-0209 address verification module).
+  MODULES+=(addressverification)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -997,7 +1013,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
   # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
   # have no app of their own: these apps are where their tabs live (D-188).
-  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal)
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1034,7 +1050,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments LwcBuilder Scholarships Territory Memberships Projects AddressVerification Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1137,6 +1153,72 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   if ! printf '%s\n' 'new PortalAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Portal Builder access sync was not queued. Nothing else is affected: the hourly"
     echo "access check syncs the access."
+  fi
+
+  # The same gap for the Corporate Hub permission sets (ADR-0196, corporate hub module, decision 10).
+  echo ""
+  echo "== Queueing the Corporate Hub access sync =="
+  if ! printf '%s\n' 'new CorporateHubAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Corporate Hub access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Payments permission sets (ADR-0201 payments module, decision 9).
+  echo ""
+  echo "== Queueing the Payments access sync =="
+  if ! printf '%s\n' 'new PaymentsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Payments access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the LWC Builder permission sets (ADR-0203, lwc builder module, decision 9).
+  echo ""
+  echo "== Queueing the LWC Builder access sync =="
+  if ! printf '%s\n' 'new LwcBuilderAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The LWC Builder access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Scholarships permission sets (ADR-0204, scholarships module, decision 13).
+  echo ""
+  echo "== Queueing the Scholarships access sync =="
+  if ! printf '%s\n' 'new ScholarshipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Scholarships access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Territory Management permission sets (ADR-0205, territory management
+  # module, decision 7).
+  echo ""
+  echo "== Queueing the Territory Management access sync =="
+  if ! printf '%s\n' 'new TerritoryAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Territory Management access sync was not queued. Nothing else is affected: the"
+    echo "hourly access check syncs the access."
+  fi
+
+  # The same gap for the Memberships permission sets (ADR-0206 memberships module, decision 10).
+  echo ""
+  echo "== Queueing the Memberships access sync =="
+  if ! printf '%s\n' 'new MembershipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Memberships access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Project Management permission sets (ADR-0208, project management
+  # module, decision 9).
+  echo ""
+  echo "== Queueing the Project Management access sync =="
+  if ! printf '%s\n' 'new ProjectsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Project Management access sync was not queued. Nothing else is affected: the"
+    echo "hourly access check syncs the access."
+  fi
+
+  # The same gap for the Address Verification permission set (ADR-0209 address verification).
+  echo ""
+  echo "== Queueing the Address Verification access sync =="
+  if ! printf '%s\n' 'new AddressVerificationAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Address Verification access sync was not queued. Nothing else is affected: the"
+    echo "hourly access check syncs the access."
   fi
 fi
 

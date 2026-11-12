@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Inbound Gift API</label>
+  <label>Inbound Gift API (Retired)</label>
   <description>
-    The only set the integration user needs: find donors, funds and appeals; record gifts with their
-    allocations and household soft credits; read acknowledgment rules.
+    Retired: replaced by Inbound Gifts, which BarnCRM gives every holder; removed in the next
+    release. Do not assign.
   </description>
   <classAccesses>
     <apexClass>InboundGiftResource</apexClass>

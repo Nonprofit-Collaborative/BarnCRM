@@ -103,7 +103,7 @@ public without sharing class RollupClearBatch implements Database.Batchable<SObj
 	public void finish(Database.BatchableContext context) {
 		ErrorLogger.logMessage(
 			String.format(
-				Label.Core_RollupEase_ClearDone,
+				BarnHelp.text('Rollups', 'Core_RollupEase_ClearDone'),
 				new List<String>{ this.rollupName, this.cleared.format(), this.refused.format() }
 			),
 			CLASS_NAME,

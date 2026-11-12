@@ -37,7 +37,9 @@ there itself; after a package install, add them once in App Manager (see
 [The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). A form or submission
 opens on its own record page from any app.
 
-Forms has no settings, so it adds no section to BarnCRM Settings. It has no nightly job. Public
+Forms has no org-wide settings: each form is set up on its own record. BarnCRM Settings has a
+**Forms** section with one row, **Open Forms**, which opens the Forms tab. That row is also how
+BarnCRM knows Forms is installed. It has no nightly job. Public
 forms add their own checks to **Health Check** and a processing job you schedule from there (see
 [Public Forms](#public-forms)).
 
@@ -49,7 +51,7 @@ You never assign the Forms permission sets by hand. Give people their BarnCRM ro
 | BarnCRM role | Forms set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Forms Admin | Everything: build, publish and delete forms, fill them in, work submissions |
-| Team Member, Coordinator | Forms Staff | Fill in published forms and work their submissions, including Process Again; never builds or deletes a form |
+| Team Member, Fundraising Staff (Giving) | Forms Staff | Fill in published forms and work their submissions, including Process Again; never builds or deletes a form |
 | Read Only | Forms Read Only | Look at forms and submissions |
 
 Filling in a form writes the person, organization and related records **as the person filling
@@ -227,7 +229,10 @@ checks apply.
 The same Site page and API also serve a module's public pages: an event's page with its
 registration form (`FormsPublic?record=<event ID>`, `FormsPublic?list=events`, and
 `GET .../forms/v1/pages/<event ID>` or `GET .../forms/v1/pages?kind=events`). The module
-decides what is published; see [Event Management](events.md), Public Event Page.
+decides what is published; see [Event Management](events.md), Public Event Page. Volunteers
+publishes shift pages the same way (`FormsPublic?list=volunteers`, `FormsPublic?record=<shift
+ID>`, kind `volunteers`) and a volunteer's personal page, which opens only from the signed link
+in their shift reminder; see [Volunteers](volunteers.md), Public Sign-Up Page.
 
 ## Form Submissions
 

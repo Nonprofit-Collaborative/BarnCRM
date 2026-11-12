@@ -25,11 +25,17 @@ public with sharing class VolunteersAccessSync extends ModuleAccessSyncBase {
 		ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
 	};
 
-	/** Each other set, and the BarnCRM role (permission set group) whose holders get it. */
+	/**
+	 * Each other set, and the BarnCRM roles (permission set groups) whose holders get it.
+	 * Fundraising Staff is Giving's role, named as text: a role that is not installed is skipped
+	 * (ADR-0194 D3). Coordinator is retired (D1): its line stays this release so anyone given it
+	 * in Setup still gets Volunteers Coordinator, which is otherwise given per person on the
+	 * Access page (`Access_Add_On.Volunteers_Coordinator`).
+	 */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
 		'Volunteers_Coordinator' => new List<String>{ 'Volunteer_Coordinator' },
-		'Volunteers_Staff' => new List<String>{ 'Program_Staff' },
+		'Volunteers_Staff' => new List<String>{ 'Program_Staff', 'Fundraising_Staff' },
 		'Volunteers_Read_Only' => new List<String>{ 'Read_Only' }
 	};
 

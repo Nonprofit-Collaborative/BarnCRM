@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>What a payment processor said about a recurring gift: a failed or successful charge, a card about to expire or updated, a cancellation. Written by a Zapier recipe or by hand, matched to its commitment and applied to its health fields (G-27, canonical model 25V).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Recurring Gift Event</label>
+  <nameField>
+    <displayFormat>RGE-{000000}</displayFormat>
+    <label>Event Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Recurring Gift Events</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

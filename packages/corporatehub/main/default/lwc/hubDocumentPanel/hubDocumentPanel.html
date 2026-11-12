@@ -1,0 +1,102 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="standard:knowledge" data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+
+        <p data-id="version">{labels.version}</p>
+        <template lwc:if={canAsk}>
+          <p data-id="counts" class="slds-var-m-bottom_small">{labels.counts}</p>
+        </template>
+
+        <template lwc:if={canEdit}>
+          <lightning-file-upload
+            data-id="upload"
+            label={labels.upload}
+            record-id={recordId}
+            onuploadfinished={handleUploaded}
+          ></lightning-file-upload>
+          <div class="slds-var-m-vertical_small">
+            <lightning-button
+              data-id="reviewed"
+              label={labels.reviewed}
+              disabled={isWorking}
+              onclick={handleReviewed}
+              class="slds-var-m-right_x-small"
+            ></lightning-button>
+            <template lwc:if={canManage}>
+              <lightning-button
+                data-id="publish"
+                label={labels.publish}
+                disabled={isWorking}
+                onclick={handlePublish}
+                class="slds-var-m-right_x-small"
+              ></lightning-button>
+              <lightning-button
+                data-id="retire"
+                label={labels.retire}
+                disabled={isWorking}
+                onclick={handleRetire}
+              ></lightning-button>
+            </template>
+          </div>
+        </template>
+
+        <template lwc:if={canAsk}>
+          <div class="slds-grid slds-grid_vertical-align-end slds-var-m-bottom_small">
+            <lightning-input
+              data-id="group"
+              class="slds-col slds-var-m-right_x-small"
+              label={labels.group}
+              value={group}
+              onchange={handleGroup}
+            ></lightning-input>
+            <lightning-button
+              data-id="request"
+              variant="brand"
+              label={labels.request}
+              disabled={isWorking}
+              onclick={handleRequest}
+            ></lightning-button>
+          </div>
+          <template lwc:if={hasPeople}>
+            <ul class="slds-has-dividers_bottom-space" data-id="people">
+              <template for:each={people} for:item="row">
+                <li key={row.id} class="slds-item slds-grid slds-grid_vertical-align-center">
+                  <div class="slds-col">
+                    {row.name}
+                    <div class="slds-text-color_weak">
+                      {row.status}
+                      <lightning-formatted-date-time
+                        lwc:if={row.due}
+                        class="slds-var-m-left_x-small"
+                        value={row.due}
+                        time-zone="UTC"
+                      ></lightning-formatted-date-time>
+                    </div>
+                  </div>
+                  <template lwc:if={row.canRecord}>
+                    <lightning-button
+                      data-row-id={row.id}
+                      data-id="record"
+                      label={labels.record}
+                      disabled={isWorking}
+                      onclick={handleRecord}
+                    ></lightning-button>
+                  </template>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

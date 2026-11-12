@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Outbound Funds Migration: Awards</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_ofm_awards</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Outbound Funds migration kit, which reads the Outbound Funds funding requests that have an awarded amount: one award per request on its application, in the same cycle, with the recipient, awarded amount, award date and status.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "outfunds.FundingProgram__c", "target": "Record.Cycle__c"}, {"source": "Parent", "target": "Record.Application__c"}, {"source": "outfunds.Applying_Contact__c", "target": "Record.Contact__c"}, {"source": "outfunds.Applying_Organization__c", "target": "Record.Organization__c"}, {"source": "outfunds.Awarded_Amount__c", "target": "Record.Amount__c"}, {"source": "outfunds.Awarded_Date__c", "target": "Record.Decision_Date__c"}, {"source": "outfunds.Status__c", "target": "Record.Status__c", "transforms": [{"op": "map", "pairs": [{"text": "Awarded", "value": "Active"}, {"text": "Closed", "value": "Completed"}, {"text": "Completed", "value": "Completed"}, {"text": "Withdrawn", "value": "Cancelled"}, {"text": "Declined", "value": "Declined"}], "otherwise": "Active"}, {"op": "ifBlank", "value": "Active"}]}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Award__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

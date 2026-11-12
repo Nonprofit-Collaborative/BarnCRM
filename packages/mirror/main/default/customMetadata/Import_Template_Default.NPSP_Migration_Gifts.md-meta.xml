@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Migration: Gifts</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npsp_gifts</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the NPSP Gifts and Soft Credits migration kit, which reads won Opportunities in your org: one gift per Opportunity, of the same contact or organization by record ID, with its amount, close date, payment method, appeal, funds and tribute. The Opportunity's record ID is the gift's external ID and Opportunity ID.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "Id", "target": "Gift.External_Id__c"}, {"source": "OpportunityId", "target": "Gift.Opportunity_Id__c"}, {"source": "Amount", "target": "Gift.Amount__c"}, {"source": "CloseDate", "target": "Gift.Gift_Date__c"}, {"source": "Method", "target": "Gift.Type__c"}, {"source": "Reference", "target": "Gift.Payment_Reference__c"}, {"source": "CampaignId", "target": "Gift.Appeal"}, {"source": "Donor", "target": "Gift.Donor"}, {"source": "ContactId", "target": "Contact1.Id"}, {"source": "OrganizationId", "target": "Organization.Id"}, {"source": "Fund1", "target": "Allocation.Fund1"}, {"source": "Amount1", "target": "Allocation.Amount1"}, {"source": "Fund2", "target": "Allocation.Fund2"}, {"source": "Amount2", "target": "Allocation.Amount2"}, {"source": "Fund3", "target": "Allocation.Fund3"}, {"source": "Amount3", "target": "Allocation.Amount3"}, {"source": "Fund4", "target": "Allocation.Fund4"}, {"source": "Amount4", "target": "Allocation.Amount4"}, {"source": "Fund5", "target": "Allocation.Fund5"}, {"source": "Amount5", "target": "Allocation.Amount5"}, {"source": "npsp.Tribute_Type__c", "target": "Tribute.Type__c", "transforms": [{"op": "map", "pairs": [{"text": "Honor", "value": "In honor of"}, {"text": "Memorial", "value": "In memory of"}]}]}, {"source": "npsp.Honoree_Name__c", "target": "Tribute.Honoree_Name__c"}, {"source": "npsp.Notification_Recipient_Name__c", "target": "Tribute.Notification_Recipient_Name__c"}, {"source": "npsp.Notification_Message__c", "target": "Tribute.Message__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

@@ -197,7 +197,7 @@ public with sharing class AskPipelineController {
 			return board;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBoard');
-			throw UserErrors.message(Label.Giving_Ask_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorLoad'));
 		}
 	}
 
@@ -205,7 +205,7 @@ public with sharing class AskPipelineController {
 	@AuraEnabled
 	public static void moveStage(Id askId, String stage) {
 		if (!Schema.SObjectType.Ask__c.isUpdateable()) {
-			throw UserErrors.message(Label.Giving_Ask_ErrorNoPermission);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'));
 		}
 		try {
 			Database.update(new Ask__c(Id = askId, Stage__c = stage), true, AccessLevel.USER_MODE);
@@ -213,7 +213,7 @@ public with sharing class AskPipelineController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.moveStage', askId);
-			throw UserErrors.message(Label.Giving_Ask_ErrorUnexpected);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorUnexpected'));
 		}
 	}
 
@@ -225,10 +225,10 @@ public with sharing class AskPipelineController {
 	@AuraEnabled
 	public static void reopenAsk(Id askId) {
 		if (!Schema.SObjectType.Ask__c.isUpdateable()) {
-			throw UserErrors.message(Label.Giving_Ask_ErrorNoPermission);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'));
 		}
 		if (askId == null || AskSelector.forClose(askId) == null) {
-			throw UserErrors.message(Label.Giving_Ask_ErrorNotFound);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'));
 		}
 		try {
 			Database.update(
@@ -240,7 +240,7 @@ public with sharing class AskPipelineController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.reopenAsk', askId);
-			throw UserErrors.message(Label.Giving_Ask_ErrorUnexpected);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorUnexpected'));
 		}
 	}
 
@@ -249,16 +249,16 @@ public with sharing class AskPipelineController {
 	public static CloseResult closeAsk(CloseInput input) {
 		CloseResult result = new CloseResult();
 		if (!Schema.SObjectType.Ask__c.isUpdateable()) {
-			result.error = Label.Giving_Ask_ErrorNoPermission;
+			result.error = BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission');
 			return result;
 		}
 		Ask__c ask = input == null ? null : AskSelector.forClose(asId(input.askId));
 		if (ask == null) {
-			result.error = Label.Giving_Ask_ErrorNotFound;
+			result.error = BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound');
 			return result;
 		}
 		if (!AskRules.CLOSED_OUTCOMES.contains(input.outcome)) {
-			result.error = Label.Giving_Ask_ErrorOutcome;
+			result.error = BarnHelp.text('Giving', 'Giving_Ask_ErrorOutcome');
 			return result;
 		}
 		Savepoint beforeClose = Database.setSavepoint();
@@ -289,7 +289,7 @@ public with sharing class AskPipelineController {
 			ErrorLogger.log(e, CONTEXT + '.closeAsk', ask.Id);
 			result.giftId = null;
 			result.commitmentId = null;
-			result.error = Label.Giving_Ask_ErrorUnexpected;
+			result.error = BarnHelp.text('Giving', 'Giving_Ask_ErrorUnexpected');
 			return result;
 		}
 	}
@@ -309,7 +309,7 @@ public with sharing class AskPipelineController {
 			return null;
 		}
 		if (ask.Donor_Contact__c == null && ask.Donor_Account__c == null) {
-			return Label.Giving_Ask_ErrorNoDonor;
+			return BarnHelp.text('Giving', 'Giving_Ask_ErrorNoDonor');
 		}
 		if (kind == RESULT_GIFT) {
 			return recordGift(ask, input, closing, result);
@@ -320,7 +320,7 @@ public with sharing class AskPipelineController {
 		if (kind == RESULT_LINK) {
 			return linkExisting(ask, input, closing);
 		}
-		return Label.Giving_Ask_ErrorOutcome;
+		return BarnHelp.text('Giving', 'Giving_Ask_ErrorOutcome');
 	}
 
 	/** The gift now, through Quick Gift Entry's save, so every gift rule applies. */
@@ -344,7 +344,7 @@ public with sharing class AskPipelineController {
 				return saved.fieldErrors[0].message;
 			}
 			return String.isBlank(saved.formError)
-				? Label.Giving_Ask_ErrorUnexpected
+				? BarnHelp.text('Giving', 'Giving_Ask_ErrorUnexpected')
 				: saved.formError;
 		}
 		closing.Gift__c = saved.giftId;
@@ -392,23 +392,23 @@ public with sharing class AskPipelineController {
 	private static String linkExisting(Ask__c ask, CloseInput input, Ask__c closing) {
 		Id linked = asId(input.linkedId);
 		if (linked == null) {
-			return Label.Giving_Ask_ErrorChooseLink;
+			return BarnHelp.text('Giving', 'Giving_Ask_ErrorChooseLink');
 		}
 		if (linked.getSObjectType() == Gift__c.SObjectType) {
 			if (!AskSelector.isDonorsGift(linked, ask)) {
-				return Label.Giving_Ask_ErrorWrongDonor;
+				return BarnHelp.text('Giving', 'Giving_Ask_ErrorWrongDonor');
 			}
 			closing.Gift__c = linked;
 			return null;
 		}
 		if (linked.getSObjectType() == Commitment__c.SObjectType) {
 			if (!AskSelector.isDonorsCommitment(linked, ask)) {
-				return Label.Giving_Ask_ErrorWrongDonor;
+				return BarnHelp.text('Giving', 'Giving_Ask_ErrorWrongDonor');
 			}
 			closing.Commitment__c = linked;
 			return null;
 		}
-		return Label.Giving_Ask_ErrorChooseLink;
+		return BarnHelp.text('Giving', 'Giving_Ask_ErrorChooseLink');
 	}
 
 	private static Card toCard(Ask__c ask) {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Days_Before_Deadline__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>How many days before the grant's application deadline the task is due. Blank: on the deadline. Never before today; a grant with no deadline gets it due in 14 days.</inlineHelpText>
+  <label>Days Before Deadline</label>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

@@ -73,70 +73,6 @@
         <value>Cancel This Commitment?</value>
     </labels>
     <labels>
-        <fullName>Giving_Commitment_StatusChanged</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Confirms that a commitment's status changed.</shortDescription>
-        <value>The commitment was updated.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Commitment_DeleteBlocked</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when someone tries to delete a commitment that has been paid.</shortDescription>
-        <value>This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Commitment_DonorDeleteBlocked</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when deleting the donor of an open pledge or recurring gift.</shortDescription>
-        <value>This record is the donor of an active or paused pledge or recurring gift, so it cannot be deleted. Cancel the commitment or change its donor first. Merging a duplicate still works.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Commitment_InvalidSchedule</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when a schedule preview is asked for without enough information.</shortDescription>
-        <value>Enter an amount, a frequency, and a start date before previewing the schedule.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Commitment_NoPermission</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the person may read a commitment but not change it.</shortDescription>
-        <value>You can see this commitment but not change it. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Commitment_NotFound</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when a commitment cannot be read.</shortDescription>
-        <value>That commitment could not be found. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Commitment_TransitionNotAllowed</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when a status change is not allowed from the current status.</shortDescription>
-        <value>That change is not allowed from the commitment's current status. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Installment_DeleteBlocked</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when someone tries to delete a payment that has been paid.</shortDescription>
-        <value>This payment cannot be deleted because a gift has been received against it. Mark it Skipped instead.</value>
-    </labels>
-    <labels>
         <fullName>Giving_SchedulePreview_ColumnAmount</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -169,36 +105,12 @@
         <value>No Payments Yet</value>
     </labels>
     <labels>
-        <fullName>Giving_SchedulePreview_GenerateError</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when generating the schedule fails.</shortDescription>
-        <value>The payments could not be generated. The error has been logged for your administrator.</value>
-    </labels>
-    <labels>
         <fullName>Giving_SchedulePreview_GenerateNow</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Button that generates the schedule for a commitment that has none.</shortDescription>
         <value>Generate Now</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SchedulePreview_Generated</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the schedule has been generated.</shortDescription>
-        <value>The payment schedule has been generated.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SchedulePreview_LoadError</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the schedule cannot be read.</shortDescription>
-        <value>The payment schedule could not be loaded. The error has been logged for your administrator.</value>
     </labels>
     <labels>
         <fullName>Giving_SchedulePreview_Title</fullName>

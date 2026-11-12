@@ -13,7 +13,9 @@ public without sharing class VolunteerHealthCheckSelector {
 
 	private static void requireManageSettings() {
 		if (!HealthCheckService.canManageSettings()) {
-			throw new NotAllowedException(Label.Volunteers_HealthCheck_NeedsManageSettings);
+			throw new NotAllowedException(
+				BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_NeedsManageSettings')
+			);
 		}
 	}
 

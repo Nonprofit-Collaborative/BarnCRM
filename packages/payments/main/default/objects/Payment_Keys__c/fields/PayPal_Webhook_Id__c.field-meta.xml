@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>PayPal_Webhook_Id__c</fullName>
+  <description>The id PayPal gives the webhook, used to verify each event with PayPal. Written on Payments Setup only.</description>
+  <externalId>false</externalId>
+  <label>PayPal Webhook Id</label>
+  <length>64</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

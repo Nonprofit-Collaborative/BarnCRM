@@ -39,7 +39,9 @@ public with sharing class TributeController {
 	@AuraEnabled(cacheable=true)
 	public static TributeView getTribute(Id giftId) {
 		if (giftId == null) {
-			throw UserErrors.message(Label.Giving_TributeNotification_NotFound);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound')
+			);
 		}
 		try {
 			return viewFor(giftId);
@@ -51,12 +53,16 @@ public with sharing class TributeController {
 	@AuraEnabled
 	public static TributeView markNotificationSent(Id tributeId) {
 		if (tributeId == null) {
-			throw UserErrors.message(Label.Giving_TributeNotification_NotFound);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound')
+			);
 		}
 		try {
 			List<Tribute__c> found = TributeSelector.selectByIds(new Set<Id>{ tributeId });
 			if (found.isEmpty()) {
-				throw UserErrors.message(Label.Giving_TributeNotification_NotFound);
+				throw UserErrors.message(
+					BarnHelp.text('Giving', 'Giving_TributeNotification_NotFound')
+				);
 			}
 			Id giftId = found[0].Gift__c;
 			TributeService.markNotificationSent(new Set<Id>{ tributeId });
@@ -101,7 +107,7 @@ public with sharing class TributeController {
 			view.notificationSent == false &&
 			hasRecipient;
 		if (!hasRecipient && view.notificationSent == false) {
-			view.blockedReason = Label.Giving_TributeNotification_NoRecipient;
+			view.blockedReason = BarnHelp.text('Giving', 'Giving_TributeNotification_NoRecipient');
 		}
 		return view;
 	}
@@ -118,6 +124,6 @@ public with sharing class TributeController {
 
 	private static AuraHandledException report(Exception failure, Id recordId) {
 		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
+		return UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 	}
 }

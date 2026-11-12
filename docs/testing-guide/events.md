@@ -1,6 +1,8 @@
 # Event Management
 
-Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-19) and their sample data.
+Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-21, EV-23 to EV-28) and
+their sample data. The attendee app (EV-22, EV-29) and sponsor lead scanning are tested in
+[Portal Builder](portal-builder.md), T-PB-13 and T-PB-14.
 Setup detail:
 [Event Management](../admin-guide/events.md).
 
@@ -472,3 +474,151 @@ a Confirmed speaker and an Invited one, and the form's record ID in **Registrati
 
 **Cleanup:** delete Robin Zzpage's registration and contact and the Kim and Lee Zzpage contacts; untick
 **Public Page**.
+
+## T-EV-22: Paid Registration
+
+**Purpose:** confirm a paid public registration waits for payment with its seats held, is
+confirmed when the processor reports the payment, and is cancelled when the checkout is abandoned
+or refunded; and that nothing changes with the setting off.
+**Prerequisites:** the T-EV-21 setup (event, General ticket at `25`, public form, Site); BarnCRM
+Payments installed in **test mode** with Stripe test keys entered, its receiver address added in
+the Stripe dashboard and processing scheduled (see the Payments testing guide); a test email
+address you can read.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With **Take payment online** off, register `Pat Zzpay` (General) through the public page and process it. | Registered at once, amount owed 25, **Payment Status** empty; no email. |
+| 2 | In **BarnCRM Settings**, Events, turn on **Take payment online**. Reload the public page. | General's note says a secure payment link is emailed after registering. |
+| 3 | Register `Sam Zzpay` (General, your test email) and process it. | Sam's registration is **Pending Payment**, Payment Status **Unpaid**, and Sam holds a seat (seats left goes down). Within two minutes Payment Status is **Link Sent**, **Payment Link** holds a `checkout.stripe.com` address and the email `Complete your registration for <event>` arrives with it. |
+| 4 | Open the link and pay with Stripe's test card `4242 4242 4242 4242`. | Within 15 minutes the registration is **Registered**, Payment Status **Paid** and **Amount Paid** 25. |
+| 5 | In the Stripe dashboard, refund 10 of Sam's payment. | Within 15 minutes Payment Status **Partly Refunded**, Amount Paid 15; the registration stays Registered. Refund the rest: Payment Status **Refunded**, Amount Paid 0 and the registration **Cancelled**. |
+| 6 | Register `Ash Zzpay` (General) and process it; do not pay. Ask an admin to set the payment's created date back three days in a scratch org, or wait two days, then let processing run. | Ash's payment is Cancelled; the registration is **Cancelled**, Payment Status **Cancelled**, and the seat is free again. |
+| 7 | On **Registrations**, open the menu of Pat's registration (made with the setting off) and choose **Send Payment Link**. | `The payment link was emailed to the registrant.`; Payment Status **Link Sent**; the registration stays **Registered**. |
+| 8 | Open the menu of a free registration, then of Sam's paid one. | Neither menu offers **Send Payment Link**. |
+| 9 | Uninstall or disable Payments in a scratch org with the setting on and run **Health Check**. | Warning **Event Payments Are Not Ready**; form registrations are confirmed at once as in step 1. |
+
+**Cleanup:** delete the Zzpay registrations and contacts; turn **Take payment online** off.
+
+## T-EV-23: Session Proposals and Matrix Scoring
+
+**Purpose:** confirm presenters, reviewer assignments, weighted criteria, blind review, the
+scoring matrix and compare on the Applications tab.
+**Prerequisites:** admin and staff; an Open event with three proposals `Alpha`, `Beta` and
+`Gamma` from three people; a second user with Events Staff.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, choose **Scoring Criteria**, add `Relevance` weight `3` and `Delivery` weight `1`, and save. | Saved; the criteria show in that order. A weight of `11` or a label used twice is refused. |
+| 2 | Open Alpha's menu, **Add Presenter**, pick a person, role Moderator. | The presenter shows under Alpha. Adding the applicant, or a sixth presenter, is refused. |
+| 3 | Tick Alpha and Beta, choose **Assign Reviewers**, pick the staff user and click **Assign to Selected**. | The message starts `2 assignments added.`; doing it again adds 0. |
+| 4 | As the staff user, tick **My Assignments**. | Alpha and Beta only. |
+| 5 | Score Alpha: Relevance `5`, Delivery `1`. | Weighted score `4.00`, score 4. Alpha leaves My Assignments; Reviews 1. |
+| 6 | As admin, score Alpha Relevance `3`, Delivery `3`, and Beta Relevance `4`, Delivery `4`. | Alpha's weighted average `3.50` (two reviews); Beta `4.00`; Beta ranks first. |
+| 7 | Choose **Scoring Matrix**. | One row per proposal: Relevance and Delivery averages (Alpha 4.0 and 2.0), weighted average, total, reviews. |
+| 8 | Tick Alpha and Beta and choose **Compare**. | Side by side: applicant, weighted average, each criterion's average and abstract. With only one, or five, ticked, Compare asks for two to four. |
+| 9 | Tick **Blind Review** on the event's Details tab; reopen Applications. | Applicant, presenter and reviewer names show as `Hidden for blind review` on Alpha, Beta and Gamma. |
+| 10 | Accept Alpha. | Alpha's names show again; the applicant and the presenter are speakers at the event. |
+
+**Cleanup:** delete the proposals, speakers and criteria; untick Blind Review.
+
+## T-EV-24: Badge Overrides
+
+**Purpose:** confirm badge name, title and company print and show at check-in.
+**Prerequisites:** staff; an event with a Registered attendee `Jordan Zzbadge` whose account is
+`River Org`.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Registrations**, Jordan's menu, **Edit Badge**: name `Jo`, title `Chair`, company `Lake Org`; save. | Saved. |
+| 2 | On **Badges**, **Print Badges** with Show Organization on. | Jordan's badge reads `Jo`, `Chair` and `Lake Org`. |
+| 3 | Print the sign-in sheet. | Jordan's row reads `Jo` and `Lake Org`. |
+| 4 | On **Check-In**, search `Jo`. | Jordan shows as `Jo` with `Jordan Zzbadge` beside it. |
+| 5 | Clear the three fields and print again. | `Jordan Zzbadge` and `River Org`; no title line. |
+
+**Cleanup:** delete Jordan's registration.
+
+## T-EV-25: Session Ratings
+
+**Purpose:** confirm a session's QR code opens the rating form and ratings average on the session
+and speaker.
+**Prerequisites:** admin; BarnCRM Forms with an active Site; a published public form with a
+`rating` number question and a `comment` text question; an event with Confirmed sessions `Talk A`
+and `Talk B` and a speaker on Talk A.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Agenda** tab, **Session Ratings**, choose the form and save. | Saved. |
+| 2 | **Print Rating Codes**. | A print window with Talk A and Talk B, each with title, time, room and a QR code. |
+| 3 | Scan Talk A's code with a phone (or open its link in a private window), rate `5` with a comment, send; rate again `3`. Process the submissions. | Talk A's card shows `Rated 4.0 (2)`. Two Session Ratings on Talk A with no person. |
+| 4 | Open the **Speakers** tab. | Talk A's speaker shows `Average rating 4.0 from 2`. |
+| 5 | Send the form from Talk B's link with no rating; process it. | No rating is added to Talk B. |
+| 6 | In an org without Forms, open the Agenda tab. | No Session Ratings button and no rating codes. |
+| 7 | With more than 200 Confirmed sessions on one event, open **Session Ratings**. | A notice says only the first 200 confirmed sessions have codes. |
+
+**Cleanup:** delete the ratings and clear the event's rating form.
+
+## T-EV-26: Venues and Rooms
+
+**Purpose:** confirm a venue and room fill the event and session (EV-24).
+**Prerequisites:** staff; an event with blank Venue Name and Venue Address and a session with no
+room or capacity.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Venues** tab. | List views All Venues and My Venues. |
+| 2 | New venue `Zz Hall`, address `1 Main St`, map link `https://example.org/map`; add room `Room A`, capacity 40, setup Theater, where `Second floor`. | Saved; Room A in the venue's Rooms list. |
+| 3 | On the event, pick Venue `Zz Hall` and save. | Venue Name `Zz Hall`, Venue Address `1 Main St`. |
+| 4 | Change the event's Venue Name to `Main Hall` and save again. | It stays `Main Hall`: only blanks fill. |
+| 5 | On **Agenda**, the session's **Edit**: pick Room Record `Room A`, save. | Room `Room A`, Capacity 40. |
+| 6 | Give a second session the same room and an overlapping time. | Both cards flag the room clash, as for a typed room. |
+
+**Cleanup:** delete the venue (its room goes with it); clear the event's venue fields.
+
+## T-EV-27: Session and Speaker Details
+
+**Purpose:** confirm session level, links and sponsor, and the speaker checklist (EV-25).
+**Prerequisites:** staff; an event with a session, a speaker and a sponsor; another event's sponsor.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Session **Edit**: Level Beginner, Session Type Lightning Talk, slides and recording links, Sponsored By the event's sponsor. | Saved. |
+| 2 | Try Sponsored By the other event's sponsor. | Not offered or refused: a sponsor of the same event only. |
+| 3 | Speaker **Edit**: headshot, LinkedIn and website links; Agreement Signed and Slides Received on. | Saved; the speaker's row shows `Checklist 2 of 3`. |
+
+**Cleanup:** none.
+
+## T-EV-28: Budget and Funding
+
+**Purpose:** confirm the Budget panel's totals and Net Cost (EV-23).
+**Prerequisites:** staff; an event with a registration whose Amount Paid is 100.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event's **Details** tab. | A Budget panel under the dashboard, with Add Expense and Add Funding. |
+| 2 | Add Expense `Hall` (Venue, Budgeted 1000, Actual 1200) and `Lunch` (Food and Beverage, Budgeted 500). | Venue 1,000 budgeted and 1,200 actual; Food and Beverage 500 and 0; totals 1,500 and 1,200. |
+| 3 | Add Funding `Acme MDF` (Partner Funds (MDF), Expected 800, Received 300). | Funding 800 expected, 300 received. |
+| 4 | Read the totals. | Net Cost 800 (1,200 less 300 less 100); Budgeted Net Cost 600 (1,500 less 800 less 100). The dashboard shows Net Cost 800. |
+| 5 | As read-only, open the event. | The panel shows; no Add buttons and no row menus. |
+| 6 | Read the line that shows the registrations' payments. | It reads `Paid online: 100`. |
+
+**Cleanup:** remove the lines.
+
+## T-EV-29: Sponsor Lead Export
+
+**Purpose:** confirm staff download a sponsor's leads (EV-28).
+**Prerequisites:** T-PB-14 done, so the sponsor has a Shared and a Not Shared scan.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Sponsors**, the sponsor's menu, **Download Leads**. | A CSV with one row: name, email, title, company, interest, notes and scan time of the Shared scan; no Not Shared row. |
+| 2 | Do the same for a sponsor with no leads. | A message that there are no leads to download; no file. |
+
+**Cleanup:** none.

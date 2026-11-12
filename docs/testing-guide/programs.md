@@ -115,9 +115,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
 | 2 | Open **Programs**, list view **All Programs**. | **After-school tutoring** and **Food pantry** (Active) and **Summer reading** (Completed) are listed. |
-| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. |
+| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. The **Cohorts** tab lists **Fall homework club** (Active) with 4 members and 3 sessions: Homework club 1 and 2 Held, each with 4 attendance marks (one Excused Absence among them), and Homework club 3 Scheduled. The **Goals** tab lists 4 goals "Read one grade level higher" (In Progress), each with 2 steps, one Done. |
 | 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |
-| 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
+| 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone, with the cohort, its sessions and the goals. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
 | 6 | Delete Rita's enrollment, then select **Remove Sample Data** again. | **Food pantry** is gone. |
 | 7 | Load the sample data again, add a case note to one sample enrollment in **Summer reading**, then select **Remove Sample Data**. | **Summer reading** stays with that enrollment, and the Error Log Warning names it: "Sample data removal kept the sample programs Summer reading, because people of your own are enrolled in them or have services recorded in them, or a sample enrollment in them has case notes. Move or delete those enrollments, service deliveries and case notes, then select Remove Sample Data again." |
 | 8 | Delete that case note, then select **Remove Sample Data** again. | **Summer reading** is gone. |
@@ -330,6 +330,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 9 | Move rule 2 above rule 1, save, and preview Self. | Unchanged result (the rules do not overlap); with a rule 1 of **Referral Source** not blank, moving it first decides every row. |
 | 10 | Drag rule 2 by its handle above rule 1 with the mouse; then do the same on a phone (press and hold the handle); then by keyboard (Tab to the handle, Space, Up Arrow, Space). | Each time the rules swap, a line shows where the rule will land while dragging, **Unsaved changes** shows, and a screen reader hears "Moved Rule 2 to Eligibility Rules." Escape during a drag puts the rule back. **Move Up** and **Move Down** still work. |
 | 11 | As the staff user, open the program. | The rules show but cannot be changed and have no drag handles; **Screen Open Enrollments** works. |
+| 12 | As the admin, give the Self person a **Birthdate** of 1980-05-01 and the School person 2015-05-01. Add a rule and move it first: **Field** **Contact: Birthdate** less than 2008-01-01, **Result** Eligible, **Reason** "Adult". Save and preview each person. | **Contact: Birthdate** is offered after the enrollment fields, with a date box. Self: Eligible, "Adult"; School: the next rule decides (Eligible, "Referred by a partner"); Other (no birthdate): the rules after it decide, as before. In BarnCRM Settings, Where Used for Contact's **Birthdate** lists the program's Eligibility Rules. |
 
 **Cleanup:** clear the rules (remove each rule and **Save Rules**) and reset the enrollments' eligibility.
 
@@ -442,3 +443,37 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 9 | Try to delete the cohort. | Refused while it has a session schedule. |
 
 **Cleanup:** delete the schedule (its sessions stay), then the sessions without attendance.
+
+## T-PRG-26: Program Capacity and Waitlist
+
+**Purpose:** confirm Capacity only shows by default, and with the setting on a full program waitlists and promotes oldest first.
+**Prerequisites:** staff user and admin user; an Active program with Capacity 2 and nobody enrolled; four people.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **BarnCRM Settings**, **Programs**. | **Waitlist when full** is off. |
+| 2 | As staff, enroll persons 1, 2 and 3 as Enrolled. | All three are Enrolled: Capacity only shows. Withdraw person 3. |
+| 3 | Turn **Waitlist when full** on. Enroll person 4, then enroll person 3 again. | Both are saved as **Waitlisted**, with no Start Date. |
+| 4 | Try to enroll person 4 again. | Refused: one open enrollment per program (Waitlisted is open). |
+| 5 | Move person 1 to **Completed**. | Person 4 (waitlisted first) becomes **Enrolled** with today's Start Date; person 3 stays Waitlisted. |
+| 6 | Raise Capacity to 3. | Person 3 becomes **Enrolled**. |
+| 7 | Add an Applied enrollment for a fifth person. | Saved as Applied; nothing is moved. |
+
+**Cleanup:** turn **Waitlist when full** off; delete the test enrollments.
+
+## T-PRG-27: Moving From PMM With the Migration Assistant
+
+**Purpose:** confirm the PMM kit copies programs, cohorts, services, enrollments and deliveries in order and keeps their links ([Moving From PMM](../admin-guide/programs.md#moving-from-pmm)).
+**Prerequisites:** an org with PMM (free, from the AppExchange listing "Program Management Module") and BarnCRM Core and Programs. In PMM: program **Zztest Food** (Active) with cohort **Spring**, service **Meals** (unit Meals); contact Zztest Ana engaged in Zztest Food (stage Active, cohort Spring) with two service deliveries of Meals (quantity 2, Present; quantity blank, Unexcused Absence). Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | BarnCRM Settings, **Integrations**: on **Program Management Module (PMM)**, click **Start Migration**. | **PMM Programs and Services** opens with five steps: Programs, Cohorts, Services, Enrollments, Service Deliveries; only Programs can start. |
+| 2 | Start **Programs**, **Refresh** to **Ready to Review**, **Load**. | **Done**, **Verified**. Program **Zztest Food** (Active) exists in BarnCRM. |
+| 3 | Run **Cohorts** and **Services** the same way. | Each **Verified**. Cohort **Spring** and service **Meals** (Active, unit Meals) are on the BarnCRM program, not on any PMM record. |
+| 4 | Run **Enrollments**. | **Verified**. Zztest Ana has an enrollment in Zztest Food, stage **Enrolled**, cohort Spring. |
+| 5 | Run **Service Deliveries**. | **Verified** (2 read, 2 loaded). On the enrollment: one delivery Present, quantity 2; one Unexcused Absence, quantity 0. |
+| 6 | Click **Undo** on **Service Deliveries**, then try **Undo** on **Enrollments** before it. | The deliveries are removed. Enrollments then offers **Undo**; before the deliveries were undone it did not. |
+| 7 | Start **Service Deliveries** again and load. Tick each **Retire the Old App** item. | **Complete**. PMM's records are unchanged. |
+
+**Cleanup:** undo the steps from the last to the first, then delete the PMM test records.

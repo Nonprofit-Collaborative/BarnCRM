@@ -121,6 +121,18 @@ export default class EventDashboard extends LightningElement {
     ];
   }
 
+  /** R-EXP1 Net Cost from the Budget panel, empty while the event has no budget lines. */
+  get netCostNote() {
+    const value = this.counts.netCost;
+    return value === null || value === undefined
+      ? ''
+      : helpText(
+          'Events',
+          'Events_Budget_NetCost',
+          Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })
+        );
+  }
+
   get speakersNote() {
     const c = this.counts;
     return c.speakers

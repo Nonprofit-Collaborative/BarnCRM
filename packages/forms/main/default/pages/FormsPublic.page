@@ -31,12 +31,13 @@
           var formId = '{!JSENCODE($CurrentPage.parameters.form)}';
           var recordId = '{!JSENCODE($CurrentPage.parameters.record)}';
           var listKind = '{!JSENCODE($CurrentPage.parameters.list)}';
+          var payment = '{!JSENCODE($CurrentPage.parameters.payment)}';
           var isPage = !formId && (recordId || listKind);
           $Lightning.use('c:formsPublicApp', function () {
             $Lightning.createComponent(
               isPage ? 'c:formPublicPage' : 'c:formPublic',
               isPage
-                ? { recordId: recordId, listKind: listKind }
+                ? { recordId: recordId, listKind: listKind, payment: payment }
                 : {
                     formId: formId,
                     recordId: recordId,

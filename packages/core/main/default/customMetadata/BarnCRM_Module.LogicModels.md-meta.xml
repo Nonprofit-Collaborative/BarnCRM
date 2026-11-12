@@ -32,6 +32,6 @@
   </values>
   <values>
     <field>Probe_Object__c</field>
-    <value xsi:type="xsd:string">Logic_Model_Element__c</value>
+    <value xsi:nil="true" />
   </values>
 </CustomMetadata>

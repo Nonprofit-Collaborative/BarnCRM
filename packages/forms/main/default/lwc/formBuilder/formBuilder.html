@@ -257,8 +257,8 @@
                   ></lightning-radio-group>
                   <template lwc:if={showClauses}>
                     <template for:each={clauses} for:item="clause">
-                      <div key={clause.id} class="slds-grid slds-gutters_x-small slds-wrap">
-                        <div class="slds-col">
+                      <div key={clause.id} class="slds-grid slds-gutters_x-small">
+                        <div class="slds-col slds-shrink">
                           <lightning-combobox
                             data-id="clause-field"
                             data-index={clause.index}
@@ -269,7 +269,7 @@
                             onchange={handleClauseChange}
                           ></lightning-combobox>
                         </div>
-                        <div class="slds-col">
+                        <div class="slds-col slds-shrink">
                           <lightning-combobox
                             data-id="clause-op"
                             data-index={clause.index}
@@ -281,7 +281,7 @@
                           ></lightning-combobox>
                         </div>
                         <template lwc:if={clause.needsValue}>
-                          <div class="slds-col">
+                          <div class="slds-col slds-shrink">
                             <lightning-input
                               data-id="clause-value"
                               data-index={clause.index}
@@ -292,7 +292,7 @@
                             ></lightning-input>
                           </div>
                         </template>
-                        <div class="slds-col slds-grow-none slds-align-bottom">
+                        <div class="slds-col slds-grow-none slds-shrink-none slds-align-bottom">
                           <lightning-button-icon
                             icon-name="utility:delete"
                             alternative-text={labels.remove}

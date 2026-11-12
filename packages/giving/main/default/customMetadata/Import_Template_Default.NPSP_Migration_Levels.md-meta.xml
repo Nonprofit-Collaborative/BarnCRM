@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Migration: Donor Levels</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npsp_levels</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the NPSP Funds, Levels and Recurring Donations migration kit, which reads NPSP levels in your org: one donor level per level, with its name, description, minimum and maximum amounts and whether it is active.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "Name", "target": "Record.Name"}, {"source": "npsp.Active__c", "target": "Record.Active__c", "transforms": [{"op": "ifBlank", "value": "true"}]}, {"source": "npsp.Description__c", "target": "Record.Description__c"}, {"source": "npsp.Minimum_Amount__c", "target": "Record.Minimum_Amount__c", "transforms": [{"op": "ifBlank", "value": "0"}]}, {"source": "npsp.Maximum_Amount__c", "target": "Record.Maximum_Amount__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Donor_Level__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

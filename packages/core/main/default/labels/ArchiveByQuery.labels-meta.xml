@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_Archive_Title</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Archive by Query: panel title, Find menu item, Storage button</shortDescription>
+        <value>Archive Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Archive_Button</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Archive by Query: button that starts it; {0} is the count</shortDescription>
+        <value>Archive and Delete {0} Records</value>
+    </labels>
+    <labels>
+        <fullName>Core_Archive_EmptyBin</fullName>
+        <categories>BulkDelete</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Archive by Query: checkbox to also empty the Recycle Bin</shortDescription>
+        <value>Also empty them from the Recycle Bin</value>
+    </labels>
+</CustomLabels>

@@ -80,3 +80,26 @@
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+/* A branded portal (C-47b): the brand's colors where it set them, else the theme's. */
+.barncrm-portal h2 {
+  color: var(--barn-portal-primary, inherit);
+}
+
+.barncrm-portal .barn-portal-brand {
+  margin-top: 2em;
+  padding-top: 0.75em;
+  border-top: 2px solid var(--barn-portal-secondary, currentColor);
+  font-size: 0.9em;
+}
+
+.barncrm-portal .barn-portal-brand p {
+  margin: 0;
+}
+
+.barncrm-portal .barn-portal-scan video {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0.5em 0;
+}

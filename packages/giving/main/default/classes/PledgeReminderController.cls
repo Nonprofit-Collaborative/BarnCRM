@@ -134,7 +134,7 @@ public with sharing class PledgeReminderController {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
 				throw new PledgeReminderService.PledgeReminderException(
-					Label.Giving_PledgeReminders_NoPermission
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission')
 				);
 			}
 			if (scheduled == true) {
@@ -230,6 +230,11 @@ public with sharing class PledgeReminderController {
 		Boolean ours =
 			failure instanceof PledgeReminderService.PledgeReminderException ||
 			failure instanceof AcknowledgmentService.AcknowledgmentException;
-		return UserErrors.wrap(failure, ours, context, Label.Giving_Stewardship_ErrorActionFailed);
+		return UserErrors.wrap(
+			failure,
+			ours,
+			context,
+			BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
+		);
 	}
 }

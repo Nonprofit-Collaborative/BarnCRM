@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Colors_Are_Hex</fullName>
+  <active>true</active>
+  <description>Canonical model 29BR2: brand colors are #RRGGBB hex codes, or blank.</description>
+  <errorConditionFormula>(NOT(ISBLANK(Primary_Color__c)) &amp;&amp; NOT(REGEX(Primary_Color__c, &quot;#[0-9A-Fa-f]{6}&quot;))) || (NOT(ISBLANK(Secondary_Color__c)) &amp;&amp; NOT(REGEX(Secondary_Color__c, &quot;#[0-9A-Fa-f]{6}&quot;)))</errorConditionFormula>
+  <errorMessage>Enter colors as a hex code such as #1B5E20.</errorMessage>
+</ValidationRule>

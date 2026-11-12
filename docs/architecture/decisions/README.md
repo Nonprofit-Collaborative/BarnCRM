@@ -202,6 +202,28 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0191](0191-portal-templates-volunteer-speaker-donor.md) | Portal templates for volunteers, speakers and donors: shipped as template JSON, module actions through Core's seam, one read-only parent hop for the person | Accepted (builder decision) |
 | [0192](0192-batch-c-modules-add-tabs-to-barncrm-apps.md) | Batch C modules add their tabs to the BarnCRM apps instead of shipping an app | Accepted (builder decision) |
 | [0193](0193-erasure-start-seam.md) | An optional erasure start seam, so Contact Point Sync copies addresses once | Accepted (owner decision) |
+| [0194](0194-simpler-permission-sets.md) | Fewer, more inclusive roles and extra permissions | Accepted (owner decision) |
+| [0195](0195-field-history-keeper.md) | Field History Keeper captures changes in the trigger dispatcher | Proposed (builder decision) |
+| [0196](0196-corporate-hub-module.md) | The Corporate Hub module: document and policy library on Files, acknowledgments, compliance calendar, agreements, templates shipped as data | Accepted (builder decision) |
+| [0197](0197-migration-assistant.md) | The Migration Assistant Runs In-Org Migration Kits on the Import Engine | Proposed (builder decision) |
+| [0198](0198-volunteer-self-service-and-waitlists.md) | Volunteer self-service, capacity and waitlists: public shift pages on the Forms host, a signed personal page, one first-fit waitlist rule in Core | Accepted (builder decision) |
+| [0199](0199-corporate-hub-board-governance.md) | Corporate Hub board governance: boards and committees, meetings, motions and votes, disclosures, and the board portal template | Accepted (builder decision) |
+| [0200](0200-funders-grant-finder-and-grant-management.md) | Funders Grant Finder and grant management | Proposed (builder decision) |
+| [0201](0201-payments-module.md) | BarnCRM Payments: the org's own Stripe and PayPal through hosted checkout, one payment record, a verified webhook receiver and a Callable seam for the modules that charge | Accepted (builder decision) |
+| [0202](0202-brand-management-and-visibility.md) | Brand management in Core behind two off switches, a seam modules call, and brand-restricted visibility through Account shares to BarnCRM-owned brand groups | Proposed (builder decision) |
+| [0203](0203-lwc-builder-module.md) | The LWC Builder module: component definitions as JSON records, one packaged renderer reading in user mode, nothing deployed at run time | Accepted (builder decision) |
+| [0204](0204-scholarships-outbound-grants-module.md) | The Scholarships and Outbound Grants module: applications on Forms, rubric reviews with panels, awards, conditional disbursements recorded only, recipient reports, applicant portal template | Accepted (builder decision) |
+| [0205](0205-territory-management-module.md) | The Territory Management module: territories and rules as records, preview then assign, owner routing, undo through Core's data jobs | Accepted (builder decision) |
+| [0206](0206-memberships-module.md) | The BarnCRM Memberships module: its own package on Core, one record per membership term, renewals from Giving and from online payments, and a member directory portal | Accepted (builder decision) |
+| [0207](0207-events-paid-registration-proposals-ratings.md) | Event Management: paid registration through Payments, session proposal scoring, badge overrides and per-session ratings | Accepted (builder decision) |
+| [0208](0208-project-management-module.md) | The Project Management module: projects, phases, tasks and milestones, templates as JSON and as template projects, a light PSA layer (time, assignments, budgets, billable export without payments), health by rule and status updates | Accepted (builder decision) |
+| [0209](0209-address-verification-module.md) | BarnCRM Address Verification: the org's own Smarty or Google key, verified on save and nightly, writing only the two R-AD6 fields unless corrections are switched on | Accepted (builder decision) |
+| [0210](0210-donor-portal-payments.md) | Donor portal payments: a Pay Online action on a pledge or recurring gift that emails the donor the org's own hosted checkout, with the gift written from the payment's outcome | Accepted (builder decision) |
+| [0211](0211-online-donation-pages.md) | Online donation pages: an appeal's public page with a Forms form, handing off to the org's own Stripe or PayPal hosted checkout, with the gift written from the payment's outcome | Accepted (builder decision) |
+| [0212](0212-engagement-score.md) | Engagement score: a nightly Core score on Contact from admin weights, with module signals found by name | Accepted (builder decision) |
+| [0213](0213-backup-sets.md) | Backup Sets are saved Find queries exported to Files on demand | Proposed (builder decision) |
+| [0214](0214-files-import.md) | Files import loads a zip with a manifest into Files, in the browser | Proposed (builder decision) |
+| [0215](0215-events-attendee-app-operations-portal-templates.md) | Event Management attendee app, personal agenda, event operations, and the service and partner portal templates | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

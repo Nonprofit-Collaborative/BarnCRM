@@ -5,9 +5,11 @@
  * trusts. A template that fails any check is refused whole, never partly used.
  *
  * Shape (`schemaVersion` 1): `{ key, title, requiresModules: [..], pages: [{ key, title, kind:
- * person | related | catalog, object, personField, fields: [{ field, label, edit, required }],
- * where: [{ field, op, value }], orderBy, limit, actions: ["update", "create", { extension,
- * label }] }] }`.
+ * person | related | catalog, object, personField, fields: [{ field, label, edit, required, scan }],
+ * where: [{ field, op, value }], orderBy, limit, search, download, calendar: { title, start, end,
+ * location }, personScope: { field, object, personField, valueField, where }, actions: ["update",
+ * "create", { extension, label }] }] }`. `personScope`, `calendar`, `download` and `scan` are
+ * ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`, decisions 1 and 2.
  */
 public with sharing class PortalTemplate {
 	public static final Integer SCHEMA_VERSION = 1;
@@ -73,6 +75,14 @@ public with sharing class PortalTemplate {
 		public Integer rowLimit = 50;
 		public Boolean canUpdate = false;
 		public Boolean canCreate = false;
+		/** The client shows a search box that filters the records already sent (PB-09). */
+		public Boolean search = false;
+		/** The client offers Download CSV of the records shown. */
+		public Boolean download = false;
+		/** Add to Calendar: `title`, `start`, `end`, `location`, each a field path on the page. */
+		public Map<String, String> calendar;
+		/** A catalog page limited to records tied to the person through another object. */
+		public ScopeSpec scope;
 		public Map<String, String> extensionLabels = new Map<String, String>();
 
 		public FieldSpec field(String path) {
@@ -90,8 +100,22 @@ public with sharing class PortalTemplate {
 		public String label;
 		public Boolean edit = false;
 		public Boolean required = false;
+		/** The client's add and edit form offers Scan (a QR code) for this text field. */
+		public Boolean scan = false;
 		/** The field itself, or for `Parent__r.Name` the parent's field. */
 		public Schema.DescribeFieldResult describe;
+	}
+
+	/**
+	 * `personScope`: the page shows records whose `field` is one of the `valueField` values of
+	 * the scope object's records whose `personField` is the person and that pass `conditions`.
+	 */
+	public class ScopeSpec {
+		public String field;
+		public Schema.SObjectType objectType;
+		public String personField;
+		public String valueField;
+		public List<Condition> conditions = new List<Condition>();
 	}
 
 	public class Condition {
@@ -190,7 +214,110 @@ public with sharing class PortalTemplate {
 			page.rowLimit = Math.max(1, Math.min(rows, MAX_ROWS));
 		}
 		parseActions(page, asList(raw.get('actions')), at);
+		page.search = raw.get('search') == true;
+		page.download = raw.get('download') == true;
+		if (raw.get('calendar') != null) {
+			page.calendar = parseCalendar(asMap(raw.get('calendar'), 'calendar'), page, at);
+		}
+		if (raw.get('personScope') != null) {
+			if (page.kind != KIND_CATALOG) {
+				throw new TemplateException(at + 'personScope is for catalog pages');
+			}
+			page.scope = parseScope(
+				asMap(raw.get('personScope'), 'personScope'),
+				page,
+				fieldMap,
+				at
+			);
+		}
 		return page;
+	}
+
+	/** Each calendar entry names a field already on the page; title and a date start are needed. */
+	private static Map<String, String> parseCalendar(
+		Map<String, Object> raw,
+		PageSpec page,
+		String at
+	) {
+		Map<String, String> calendar = new Map<String, String>();
+		for (String part : new List<String>{ 'title', 'start', 'end', 'location' }) {
+			String path = asText(raw.get(part));
+			if (String.isBlank(path)) {
+				continue;
+			}
+			FieldSpec spec = page.field(path);
+			Boolean isTime =
+				spec != null &&
+				(spec.describe.getType() == Schema.DisplayType.DATE ||
+				spec.describe.getType() == Schema.DisplayType.DATETIME);
+			if (spec == null || ((part == 'start' || part == 'end') && !isTime)) {
+				throw new TemplateException(
+					at + 'calendar ' + part + ' must be a field on the page'
+				);
+			}
+			calendar.put(part, spec.path);
+		}
+		if (!calendar.containsKey('title') || !calendar.containsKey('start')) {
+			throw new TemplateException(at + 'calendar needs a title and a start');
+		}
+		return calendar;
+	}
+
+	/**
+	 * `field` is a lookup on the page's object (or `Id`) and `valueField` a lookup on the scope
+	 * object to the same object; either may be one parent hop. The scope object follows a page's
+	 * rules and its `personField` is a lookup to Contact.
+	 */
+	private static ScopeSpec parseScope(
+		Map<String, Object> raw,
+		PageSpec page,
+		Map<String, Schema.SObjectField> fieldMap,
+		String at
+	) {
+		ScopeSpec scope = new ScopeSpec();
+		String scopeAt = at + 'personScope ';
+		scope.field = asText(raw.get('field'));
+		Set<Schema.SObjectType> targets = new Set<Schema.SObjectType>();
+		if (scope.field != null && scope.field.equalsIgnoreCase('Id')) {
+			scope.field = 'Id';
+			targets.add(page.objectType);
+		} else if (String.isNotBlank(scope.field)) {
+			Schema.DescribeFieldResult link = describePath(scope.field, page.objectType, fieldMap);
+			if (link != null && link.getType() == Schema.DisplayType.REFERENCE) {
+				targets.addAll(link.getReferenceTo());
+			}
+		}
+		if (targets.isEmpty()) {
+			throw new TemplateException(scopeAt + 'field must be a lookup or Id');
+		}
+		scope.objectType = customObject(asText(raw.get('object')), scopeAt);
+		Map<String, Schema.SObjectField> scopeFields = scope.objectType.getDescribe()
+			.fields.getMap();
+		scope.personField = asText(raw.get('personField'));
+		if (!isPersonLink(scope.personField, scope.objectType, scopeFields)) {
+			throw new TemplateException(scopeAt + 'personField must be a lookup to Contact');
+		}
+		scope.valueField = asText(raw.get('valueField'));
+		Schema.DescribeFieldResult value = String.isBlank(scope.valueField)
+			? null
+			: describePath(scope.valueField, scope.objectType, scopeFields);
+		Boolean fits = false;
+		if (value != null && value.getType() == Schema.DisplayType.REFERENCE) {
+			for (Schema.SObjectType target : value.getReferenceTo()) {
+				fits = fits || targets.contains(target);
+			}
+		}
+		if (!fits) {
+			throw new TemplateException(
+				scopeAt + 'valueField must be a lookup to what field names'
+			);
+		}
+		for (Object rawCondition : asList(raw.get('where'))) {
+			scope.conditions.add(
+				parseCondition(asMap(rawCondition, 'where test'), scopeFields, scopeAt)
+			);
+		}
+		return scope;
 	}
 
 	/** A lookup to Contact, or `Parent__r.Contact__c`: one parent hop to a lookup to Contact. */
@@ -259,6 +386,12 @@ public with sharing class PortalTemplate {
 			if (!editable) {
 				throw new TemplateException(at + spec.path + ' cannot be edited in a portal');
 			}
+		}
+		spec.scan = raw.get('scan') == true;
+		if (spec.scan && !(spec.edit && spec.describe.getType() == Schema.DisplayType.STRING)) {
+			throw new TemplateException(
+				at + spec.path + ' can be scanned only as an edited text field'
+			);
 		}
 		return spec;
 	}

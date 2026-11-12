@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupDlrsImport from 'c/rollupDlrsImport';
 import LightningConfirm from 'lightning/confirm';
@@ -5,6 +6,13 @@ import getCandidates from '@salesforce/apex/RollupDlrsImport.getCandidates';
 import importRollups from '@salesforce/apex/RollupDlrsImport.importRollups';
 import compare from '@salesforce/apex/RollupDlrsImport.compare';
 import turnOn from '@salesforce/apex/RollupDlrsImport.turnOn';
+
+setHelpTextForTest({
+  Core_RollupBuilder_DlrsImportBecomes: 'Becomes a {0} on {1}',
+  Core_RollupBuilder_DlrsImportRefused: 'Not copied: {0}',
+  Core_RollupBuilder_DlrsImportFinished: '{0} turned on',
+  Core_RollupBuilder_DlrsConfirmQuestion: 'Click OK.'
+});
 
 jest.mock('@salesforce/apex/RollupDlrsImport.getCandidates', () => ({ default: jest.fn() }), {
   virtual: true
@@ -25,35 +33,9 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportBecomes',
-  () => ({ default: 'Becomes a {0} on {1}' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportRefused',
-  () => ({ default: 'Not copied: {0}' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished',
-  () => ({ default: '{0} turned on' }),
-  {
-    virtual: true
-  }
-);
 jest.mock('@salesforce/label/c.Core_RollupBuilder_DlrsImportSame', () => ({ default: 'Same' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion',
-  () => ({ default: 'Click OK.' }),
-  {
-    virtual: true
-  }
-);
 
 const MODEL = { aggregates: [{ value: 'COUNT', label: 'Count' }] };
 const CANDIDATES = [
@@ -151,6 +133,20 @@ describe('c-rollup-dlrs-import', () => {
     expect($(element, 'next').disabled).toBe(true);
   });
 
+  it('imports NPSP customizable rollups the same way, naming NPSP', async () => {
+    getCandidates.mockResolvedValue(CANDIDATES);
+    const element = createElement('c-rollup-dlrs-import', { is: RollupDlrsImport });
+    element.model = MODEL;
+    element.tool = 'npsp';
+    document.body.appendChild(element);
+    await flush();
+
+    expect(getCandidates).toHaveBeenCalledWith({ tool: 'npsp' });
+    expect($(element, 'title').textContent).toBe('c.Core_RollupBuilder_NpspImportTitle');
+    await copied(element);
+    expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'], tool: 'npsp' });
+  });
+
   it('reviews what each becomes, then copies the chosen ones switched off', async () => {
     const element = await build();
     await click(element, 'next');
@@ -161,7 +157,8 @@ describe('c-rollup-dlrs-import', () => {
     importRollups.mockResolvedValue(COPIED);
     await click(element, 'copy');
 
-    expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'] });
+    expect(getCandidates).toHaveBeenCalledWith({ tool: null });
+    expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'], tool: null });
     expect($(element, 'outcome').textContent).toBe('c.Core_RollupBuilder_DlrsImportCreated');
   });
 

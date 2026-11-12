@@ -42,11 +42,15 @@ public with sharing class GiftController {
 	public static GiftSummary getGiftSummary(Id giftId) {
 		try {
 			if (giftId == null) {
-				throw new GiftService.GiftServiceException(Label.Giving_Gift_OriginalNotFound);
+				throw new GiftService.GiftServiceException(
+					BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound')
+				);
 			}
 			List<Gift__c> gifts = GiftSelector.selectWithAllocations(new Set<Id>{ giftId });
 			if (gifts.isEmpty()) {
-				throw new GiftService.GiftServiceException(Label.Giving_Gift_OriginalNotFound);
+				throw new GiftService.GiftServiceException(
+					BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound')
+				);
 			}
 			GiftSummary summary = new GiftSummary(gifts[0]);
 			summary.canRefund = canRefund();
@@ -71,16 +75,15 @@ public with sharing class GiftController {
 
 	private static void requireRefundAccess() {
 		if (!canRefund()) {
-			AuraHandledException refused = new AuraHandledException(
-				Label.Giving_RefundGift_NoPermission
-			);
-			refused.setMessage(Label.Giving_RefundGift_NoPermission);
-			throw refused;
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_RefundGift_NoPermission'));
 		}
 	}
 
 	private static AuraHandledException asUserError(Exception cause) {
-		return UserErrors.wrapShowingDml(cause, Label.Giving_Gift_UnexpectedError);
+		return UserErrors.wrapShowingDml(
+			cause,
+			BarnHelp.text('Giving', 'Giving_Gift_UnexpectedError')
+		);
 	}
 
 	/**

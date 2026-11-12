@@ -107,6 +107,47 @@ private class BulkUpdateControllerTest {
 		}
 	}
 
+	/** ADR-0194 D5: Bulk Update and Bulk Delete each include Find and Export, no pair needed. */
+	@IsTest
+	static void bulkUpdateOrBulkDeleteAloneIncludesFindAndExport() {
+		System.runAs(TestUsers.admin()) {
+			User ola = TestDataFactory.createUser('Ola', new List<String>{ 'BarnCRM_Bulk_Update' });
+			User dee = TestDataFactory.createUser('Dee', new List<String>{ 'BarnCRM_Bulk_Delete' });
+			System.runAs(ola) {
+				System.Assert.isTrue(FindController.getPage().canBulkUpdate, 'Offered from Find');
+				System.Assert.isTrue(
+					BulkUpdateController.getPage(false).allowed,
+					'Bulk Update alone opens bulk update'
+				);
+			}
+			System.runAs(dee) {
+				System.Assert.isTrue(
+					FeatureManagement.checkPermission(FindController.PERMISSION),
+					'Bulk Delete alone carries Find and Export'
+				);
+			}
+		}
+	}
+
+	/** The gap fix: BarnCRM Admin shows the Bulk Update tab, so it grants its controller. */
+	@IsTest
+	static void barnCrmAdminGrantsTheBulkUpdateController() {
+		System.runAs(TestUsers.admin()) {
+			Integer granted = [
+				SELECT COUNT()
+				FROM SetupEntityAccess
+				WHERE
+					Parent.Name = :TestUsers.CORE_ADMIN
+					AND SetupEntityId IN (
+						SELECT Id
+						FROM ApexClass
+						WHERE Name = 'BulkUpdateController'
+					)
+			];
+			System.Assert.areEqual(1, granted, 'BarnCRM Admin grants BulkUpdateController');
+		}
+	}
+
 	@IsTest
 	static void thePermissionSetsAloneReadAJobAndItsRefusals() {
 		System.runAs(TestUsers.admin()) {

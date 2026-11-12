@@ -2,10 +2,12 @@ import { createElement } from 'lwc';
 import VolunteerLettersModal from 'c/volunteerLettersModal';
 import getListContext from '@salesforce/apex/VolunteerLetterController.getListContext';
 import startLetters from '@salesforce/apex/VolunteerLetterController.startLetters';
-import NEED_PERMISSION from '@salesforce/label/c.Volunteers_Letter_NeedManagePermission';
-import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
 import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
 import { periodDates, LAST_YEAR, THIS_YEAR } from 'c/volunteerPeriods';
+
+// Help catalog texts read as "c.<key>" in Jest (jest.config.js, c/barnHelpText).
+const NEED_PERMISSION = 'c.Volunteers_Letter_NeedManagePermission';
+const BAD_PERIOD = 'c.Volunteers_Letter_BadPeriod';
 
 jest.mock(
   '@salesforce/apex/VolunteerLetterController.getListContext',

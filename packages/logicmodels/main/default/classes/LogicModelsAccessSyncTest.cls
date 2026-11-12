@@ -95,4 +95,17 @@ private class LogicModelsAccessSyncTest {
 			);
 		}
 	}
+
+	/** ADR-0194 D3: Fundraising Staff (Giving's role, when installed) gets Logic Models Staff. */
+	@IsTest
+	static void fundraisingStaffGetsLogicModelsStaff() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			List<String> roles = LogicModelsAccessSync.BY_ROLE.get('Logic_Models_Staff');
+			Test.stopTest();
+
+			Assert.isTrue(roles.contains('Fundraising_Staff'), 'Fundraisers build logic models');
+			Assert.isTrue(roles.contains('Program_Staff'), 'As Team Members do');
+		}
+	}
 }

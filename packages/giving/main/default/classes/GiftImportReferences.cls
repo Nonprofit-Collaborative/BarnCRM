@@ -1,14 +1,15 @@
 /**
- * The funds and appeals a gift import's rows name, found in one query each per chunk
+ * The funds, appeals and brands a gift import's rows name, found in one query each per chunk
  * (R-GI3, R-GI4). A word is matched to a record by identifier, then by name, then (for a
  * fund) by accounting code, ignoring case; a word two records answer to is ambiguous and
  * rejects the row rather than guessing.
  */
 public with sharing class GiftImportReferences {
-	/** Finds each row's funds and appeal, and refuses a row that names one that is not there. */
+	/** Finds each row's funds, appeal and brand, and refuses a row naming one not there. */
 	public static void resolve(List<GiftImportRow> gifts) {
 		resolveFunds(pending(gifts));
-		resolveAppeals(pending(gifts));
+		resolveNamed(pending(gifts), false);
+		resolveNamed(pending(gifts), true);
 		requireADefaultFund(pending(gifts));
 	}
 
@@ -42,8 +43,8 @@ public with sharing class GiftImportReferences {
 				if (part.fundId == null && item.error == null) {
 					item.error = String.format(
 						funds.isAmbiguous(part.fund)
-							? Label.Giving_Import_ErrorFundAmbiguous
-							: Label.Giving_Import_ErrorFundNotFound,
+							? BarnHelp.text('Giving', 'Giving_Import_ErrorFundAmbiguous')
+							: BarnHelp.text('Giving', 'Giving_Import_ErrorFundNotFound'),
 						new List<String>{ part.fund }
 					);
 				}
@@ -59,34 +60,55 @@ public with sharing class GiftImportReferences {
 		return result;
 	}
 
-	private static void resolveAppeals(List<GiftImportRow> gifts) {
+	/** The appeal (R-GI3) or, C-47d, the brand each row names, by identifier or name. */
+	private static void resolveNamed(List<GiftImportRow> gifts, Boolean brands) {
 		Set<String> words = new Set<String>();
 		for (GiftImportRow item : gifts) {
-			if (item.appeal != null) {
-				words.add(item.appeal);
+			String word = brands ? item.brand : item.appeal;
+			if (word != null) {
+				words.add(word);
 			}
 		}
 		if (words.isEmpty()) {
 			return;
 		}
-		Lookup appeals = new Lookup();
-		for (Appeal__c appeal : GiftImportSelector.selectAppealsNamed(words)) {
-			appeals.add(appeal.Id, appeal.Name, null);
+		Lookup found = new Lookup();
+		for (
+			SObject record : brands
+				? (List<SObject>) GiftImportSelector.selectBrandsNamed(words)
+				: (List<SObject>) GiftImportSelector.selectAppealsNamed(words)
+		) {
+			found.add(record.Id, (String) record.get('Name'), null);
 		}
 		for (GiftImportRow item : gifts) {
-			if (item.appeal == null) {
+			String word = brands ? item.brand : item.appeal;
+			if (word == null) {
 				continue;
 			}
-			item.appealId = appeals.find(item.appeal);
-			if (item.appealId == null) {
+			Id recordId = found.find(word);
+			if (brands) {
+				item.brandId = recordId;
+			} else {
+				item.appealId = recordId;
+			}
+			if (recordId == null) {
 				item.error = String.format(
-					appeals.isAmbiguous(item.appeal)
-						? Label.Giving_Import_ErrorAppealAmbiguous
-						: Label.Giving_Import_ErrorAppealNotFound,
-					new List<String>{ item.appeal }
+					notFound(brands, found.isAmbiguous(word)),
+					new List<String>{ word }
 				);
 			}
 		}
+	}
+
+	private static String notFound(Boolean brands, Boolean ambiguous) {
+		if (brands) {
+			return ambiguous
+				? BarnHelp.text('Giving', 'Giving_Import_ErrorBrandAmbiguous')
+				: BarnHelp.text('Giving', 'Giving_Import_ErrorBrandNotFound');
+		}
+		return ambiguous
+			? BarnHelp.text('Giving', 'Giving_Import_ErrorAppealAmbiguous')
+			: BarnHelp.text('Giving', 'Giving_Import_ErrorAppealNotFound');
 	}
 
 	/**
@@ -103,7 +125,7 @@ public with sharing class GiftImportReferences {
 		}
 		for (GiftImportRow item : gifts) {
 			if (item.singleFund == null && !item.isSplit()) {
-				item.error = Label.Giving_Gift_DefaultFundMissing;
+				item.error = BarnHelp.text('Giving', 'Giving_Gift_DefaultFundMissing');
 			}
 		}
 	}

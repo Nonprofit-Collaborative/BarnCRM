@@ -29,6 +29,14 @@
         <behavior>Edit</behavior>
         <field>Coordinator__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Public_Page__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Signup_Form_Key__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>

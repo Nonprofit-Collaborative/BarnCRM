@@ -1,0 +1,68 @@
+<template>
+    <template lwc:if={helpReady}>
+        <template lwc:if={hasPanel}>
+            <section
+                class="slds-box slds-box_x-small slds-theme_shade slds-var-m-top_small"
+                aria-label={labels.title}
+                data-id="donor-panel"
+            >
+                <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
+                <dl class="slds-list_horizontal slds-wrap slds-text-body_small">
+                    <template lwc:if={householdUrl}>
+                        <dt class="slds-item_label slds-text-color_weak">{labels.household}</dt>
+                        <dd class="slds-item_detail" data-id="household">
+                            <a href={householdUrl} target="_blank">{panel.householdName}</a>
+                        </dd>
+                    </template>
+                    <dt class="slds-item_label slds-text-color_weak">{labels.totalGiving}</dt>
+                    <dd class="slds-item_detail" data-id="total-giving">{totalGiving}</dd>
+                    <template lwc:if={lastGiftDate}>
+                        <dt class="slds-item_label slds-text-color_weak">{labels.lastGift}</dt>
+                        <dd class="slds-item_detail" data-id="last-gift">{lastGiftDate}</dd>
+                    </template>
+                </dl>
+
+                <h4 class="slds-text-title_bold slds-var-m-top_x-small">{labels.gifts}</h4>
+                <template lwc:if={hasGifts}>
+                    <ul class="slds-text-body_small" data-id="gifts">
+                        <template for:each={gifts} for:item="gift">
+                            <li key={gift.key}>
+                                <a href={gift.url} target="_blank">{gift.line}</a>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="no-gifts">
+                        {labels.noGifts}
+                    </p>
+                </template>
+
+                <h4 class="slds-text-title_bold slds-var-m-top_x-small">{labels.commitments}</h4>
+                <template lwc:if={hasCommitments}>
+                    <ul class="slds-text-body_small" data-id="commitments">
+                        <template for:each={commitments} for:item="commitment">
+                            <li key={commitment.key}>
+                                <a href={commitment.url} target="_blank">{commitment.name}</a>:
+                                {commitment.line}
+                                <template lwc:if={commitment.next}>
+                                    <span class="slds-show slds-text-color_weak">{commitment.next}</span>
+                                </template>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:else>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="no-commitments">
+                        {labels.noCommitments}
+                    </p>
+                </template>
+            </section>
+        </template>
+        <template lwc:if={failed}>
+            <p class="slds-var-m-top_x-small slds-text-body_small slds-text-color_weak" role="status" data-id="panel-error">
+                {labels.loadError}
+            </p>
+        </template>
+    </template>
+</template>

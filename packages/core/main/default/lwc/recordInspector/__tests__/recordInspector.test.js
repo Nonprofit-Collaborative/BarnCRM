@@ -10,6 +10,11 @@ import { filterRows, normalize, parseRecordId } from '../inspectorRows';
 jest.mock('@salesforce/apex/RecordInspectorController.inspect', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/FieldHistoryController.getHistory',
+  () => ({ default: jest.fn(() => Promise.resolve({ enabled: false, entries: [] })) }),
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/RecordInspectorController.pageLink',
@@ -122,10 +127,12 @@ describe('c-record-inspector', () => {
     const element = mount();
     expect(inspect).not.toHaveBeenCalled();
     expect(q(element, '[data-id="intro"]')).not.toBeNull();
+    expect(q(element, '[data-id="field-history"]')).toBeNull();
 
     await open(element);
 
     expect(inspect).toHaveBeenCalledWith({ recordId: INSPECTION.recordId });
+    expect(q(element, '[data-id="field-history"]').recordId).toBe(INSPECTION.recordId);
     expect(rowNames(element)).toEqual(['LastName', 'Email', 'Fax', 'Notes__c']);
     expect(q(element, '[data-id="count"]').textContent).toBe('4 fields');
     expect(q(element, '[data-id="intro"]')).toBeNull();

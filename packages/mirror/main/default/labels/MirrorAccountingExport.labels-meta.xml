@@ -32,70 +32,6 @@
     <shortDescription>Accounting export page: download button</shortDescription>
     <value>Download File</value>
   </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_Summary</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: what the file holds</shortDescription>
-    <value>{0} rows from {1} gifts. Net total {2}.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_NoGifts</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export page: nothing in the range</shortDescription>
-    <value>No gifts in this range.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_ErrorDatesRequired</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export: a date is missing</shortDescription>
-    <value>Choose a From date and a To date.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_ErrorDateOrder</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export: dates in the wrong order</shortDescription>
-    <value>The To date is before the From date.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_ErrorTooManyRows</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export: over the row limit</shortDescription>
-    <value>More than 10,000 rows in this range. Choose a shorter range, or one fund.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_ErrorFund</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export: the fund is not a fund</shortDescription>
-    <value>Choose a fund from the list.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_NoExportPermission</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Export refused: no Accounting Export permission set</shortDescription>
-    <value>The accounting export needs the Accounting Export permission set. Ask your BarnCRM admin for it.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_AccountingExport_ErrorFailed</fullName>
-    <categories>Mirror, Accounting Export</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Accounting export: unexpected failure</shortDescription>
-    <value>The export could not be produced. The Error Log has the details.</value>
-  </labels>
     <labels>
         <fullName>Mirror_AccountingExport_OnlyUnposted</fullName>
         <categories>Mirror, Accounting Export</categories>
@@ -111,21 +47,5 @@
         <protected>false</protected>
         <shortDescription>Mark posted button</shortDescription>
         <value>Mark These Gifts Posted</value>
-    </labels>
-    <labels>
-        <fullName>Mirror_AccountingExport_Marked</fullName>
-        <categories>Mirror, Accounting Export</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Gifts marked posted</shortDescription>
-        <value>Marked {0} gifts posted. Gifts already posted were left as they were.</value>
-    </labels>
-    <labels>
-        <fullName>Mirror_AccountingExport_MarkNeedsAllFunds</fullName>
-        <categories>Mirror, Accounting Export</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Marking needs all funds</shortDescription>
-        <value>To mark gifts posted, download the export for all funds: a gift split across funds would be locked when only part of it is in this file.</value>
     </labels>
 </CustomLabels>

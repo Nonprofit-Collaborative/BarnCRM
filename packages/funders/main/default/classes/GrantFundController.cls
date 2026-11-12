@@ -74,7 +74,9 @@ public with sharing class GrantFundController {
 	@AuraEnabled
 	public static void setFund(Id grantId, String fundId) {
 		if (!Schema.SObjectType.Grant__c.fields.Fund_Id__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		try {
 			GrantFundService.setFund(grantId, fundId);

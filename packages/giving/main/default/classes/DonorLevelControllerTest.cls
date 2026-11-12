@@ -151,7 +151,7 @@ private class DonorLevelControllerTest {
 			}
 
 			Assert.areEqual(
-				Label.Giving_DonorLevels_TurnOnFirst,
+				BarnHelp.text('Giving', 'Giving_DonorLevels_TurnOnFirst'),
 				message,
 				'Placing donors while the feature is off would be work nobody asked for, and the ' +
 				'message says what to do instead.'
@@ -175,7 +175,7 @@ private class DonorLevelControllerTest {
 			}
 
 			Assert.areEqual(
-				Label.Giving_DonorLevels_NotPermitted,
+				BarnHelp.text('Giving', 'Giving_DonorLevels_NotPermitted'),
 				message,
 				'A recalculation writes to every donor in the org, so it needs the settings ' +
 				'permission and says so in words Maria can act on.'

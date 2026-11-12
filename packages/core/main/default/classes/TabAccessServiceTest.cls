@@ -78,6 +78,24 @@ private class TabAccessServiceTest {
 	}
 
 	@IsTest
+	static void bulkUpdateAloneSeesFindsTabsToo() {
+		System.runAs(TestUsers.admin()) {
+			List<String> sets = new List<String>{ 'BarnCRM_Bulk_Update' };
+			Id ola = TestUsers.standardUserWith('Ola', sets).Id;
+
+			Test.startTest();
+			TabAccessService.syncNow();
+			Test.stopTest();
+
+			Set<String> held = tabSetsOf(ola);
+			Assert.isTrue(held.contains(TabAccessService.FIND_TAB), 'It includes Find and Export');
+			Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'So Org Optimizer');
+			Assert.isTrue(held.contains(TabAccessService.BULK_UPDATE_TAB), 'And its own tab');
+			Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
+		}
+	}
+
+	@IsTest
 	static void givesTheHouseholdsTabToTheRolesWhileHouseholdUpkeepIsOn() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
@@ -538,6 +556,82 @@ private class TabAccessServiceTest {
 			);
 			Assert.areEqual(4, TabAccessService.appSetsOn().size(), 'Both');
 		}
+	}
+
+	@IsTest
+	static void theDefaultAccountTabsAreOrganizationsAndHouseholds() {
+		System.runAs(TestUsers.admin()) {
+			Id staff = userId(TEAM_MEMBER);
+
+			Test.startTest();
+			TabAccessService.syncNow();
+			Test.stopTest();
+
+			Assert.areEqual(
+				new Set<String>{ TabAccessService.ORGANIZATIONS_TAB },
+				accountSetsOf(staff),
+				'Today\'s tabs: Organizations, and no Accounts tab set'
+			);
+			Assert.isTrue(holdsHouseholds(staff), 'And Households, with its feature on');
+			Assert.isTrue(
+				accountSetsOf(userId(PRIYA)).isEmpty(),
+				'An extra permission alone is not a BarnCRM role'
+			);
+		}
+	}
+
+	@IsTest
+	static void accountsTabHidesHouseholdsAndOrganizationsAndBothShowsAllThree() {
+		Id staff = userId(TEAM_MEMBER);
+		System.runAs(TestUsers.admin()) {
+			TabAccessService.syncNow();
+		}
+		// A separate block: the platform does not mix the assignments with a settings write.
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			SettingsService.saveValues(
+				new Map<String, Object>{
+					'Account_Tabs__c' => TabAccessService.ACCOUNT_TABS_ACCOUNTS
+				}
+			);
+			Test.stopTest();
+
+			Assert.areEqual(
+				new Set<String>{ TabAccessService.ACCOUNTS_TAB },
+				accountSetsOf(staff),
+				'The save queued the sync: the Accounts tab instead of Organizations'
+			);
+			Assert.isFalse(holdsHouseholds(staff), 'Households is hidden too');
+			Assert.isTrue(
+				accountSetsOf(UserInfo.getUserId()).contains(TabAccessService.ACCOUNTS_TAB),
+				'The admin gets the Accounts tab as well'
+			);
+		}
+		System.runAs(TestUsers.admin()) {
+			SettingsService.saveValues(
+				new Map<String, Object>{ 'Account_Tabs__c' => TabAccessService.ACCOUNT_TABS_BOTH }
+			);
+		}
+		System.runAs(TestUsers.admin()) {
+			TabAccessService.syncNow();
+			Assert.areEqual(
+				new Set<String>{
+					TabAccessService.ACCOUNTS_TAB,
+					TabAccessService.ORGANIZATIONS_TAB
+				},
+				accountSetsOf(staff),
+				'Both: all three tabs'
+			);
+			Assert.isTrue(holdsHouseholds(staff), 'Households is back');
+		}
+	}
+
+	private static Set<String> accountSetsOf(Id userId) {
+		Set<String> names = setsOf(userId, 'BarnCRM_%_Tab');
+		names.retainAll(
+			new Set<String>{ TabAccessService.ACCOUNTS_TAB, TabAccessService.ORGANIZATIONS_TAB }
+		);
+		return names;
 	}
 
 	private static Id userId(String lastName) {

@@ -51,6 +51,13 @@ private class PortalTemplateTest {
 			Assert.areEqual('Role__c ASC', roles.orderBy, 'Ordered');
 			Assert.areEqual(1, roles.conditions.size(), 'One fixed test');
 			Assert.isNull(template.page('nope'), 'An unknown page is absent');
+			Assert.isFalse(roles.search, 'No search box unless asked');
+			Map<String, Object> searchable = sample();
+			rolesPage(searchable).put('search', true);
+			Assert.isTrue(
+				PortalTemplate.parse(JSON.serialize(searchable)).page('roles').search,
+				'A page may ask for a search box (PB-09)'
+			);
 		}
 	}
 
@@ -214,6 +221,83 @@ private class PortalTemplateTest {
 			Assert.isNotNull(blank, 'No template');
 			Assert.isNotNull(notJson, 'Not JSON');
 			Assert.isNotNull(noPages, 'No pages');
+		}
+	}
+
+	private static String pageRefusal(Map<String, Object> page) {
+		Map<String, Object> template = sample();
+		((List<Object>) template.get('pages')).add(page);
+		return refusal(template);
+	}
+
+	@IsTest
+	static void readsPersonScopeCalendarDownloadAndScan() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Map<String, Object> template = sample();
+			((List<Object>) template.get('pages'))
+				.add(
+					PortalTestData.scopedPage(
+						PortalTestData.scope('Organization__c', 'Organization__c')
+					)
+				);
+			((Map<String, Object>) ((List<Object>) rolesPage(template).get('fields'))[1])
+				.put('scan', true);
+			Map<String, Object> relatedScoped = sample();
+			rolesPage(relatedScoped)
+				.put('personScope', PortalTestData.scope('Organization__c', 'Organization__c'));
+			Map<String, Object> notPerson = PortalTestData.scope(
+				'Organization__c',
+				'Organization__c'
+			);
+			notPerson.put('personField', 'Organization__c');
+			Map<String, Object> badCalendar = PortalTestData.scopedPage(
+				PortalTestData.scope('Organization__c', 'Organization__c')
+			);
+			badCalendar.put(
+				'calendar',
+				new Map<String, Object>{ 'title' => 'Role__c', 'start' => 'Role__c' }
+			);
+			Map<String, Object> scanStatus = sample();
+			((Map<String, Object>) ((List<Object>) rolesPage(scanStatus).get('fields'))[2])
+				.put('scan', true);
+
+			Test.startTest();
+			PortalTemplate parsed = PortalTemplate.parse(JSON.serialize(template));
+			String hop = pageRefusal(
+				PortalTestData.scopedPage(
+					PortalTestData.scope('Contact__r.AccountId', 'Contact__r.AccountId')
+				)
+			);
+			String notCatalog = refusal(relatedScoped);
+			String notLookup = pageRefusal(
+				PortalTestData.scopedPage(PortalTestData.scope('Role__c', 'Organization__c'))
+			);
+			String otherTarget = pageRefusal(
+				PortalTestData.scopedPage(PortalTestData.scope('Organization__c', 'Contact__c'))
+			);
+			String noPerson = pageRefusal(PortalTestData.scopedPage(notPerson));
+			String calendarStart = pageRefusal(badCalendar);
+			String scanNotText = refusal(scanStatus);
+			Test.stopTest();
+
+			PortalTemplate.PageSpec page = parsed.page('colleagues');
+			Assert.areEqual('Organization__c', page.scope.field, 'Scoped by organization');
+			Assert.areEqual(
+				Affiliation__c.SObjectType,
+				page.scope.objectType,
+				'Through affiliations'
+			);
+			Assert.areEqual(1, page.scope.conditions.size(), 'With the scope\'s own test');
+			Assert.areEqual('Start_Date__c', page.calendar.get('start'), 'Calendar start');
+			Assert.isTrue(page.download, 'Download CSV');
+			Assert.isTrue(parsed.page('roles').field('Role__c').scan, 'Role may be scanned');
+			Assert.isNull(hop, 'Either path may go through one parent: ' + hop);
+			Assert.isNotNull(notCatalog, 'personScope is for catalog pages only');
+			Assert.isNotNull(notLookup, 'field must be a lookup');
+			Assert.isNotNull(otherTarget, 'valueField must point where field points');
+			Assert.isNotNull(noPerson, 'personField must be a Contact lookup');
+			Assert.isNotNull(calendarStart, 'A calendar start is a date');
+			Assert.isNotNull(scanNotText, 'Only an edited text field may be scanned');
 		}
 	}
 

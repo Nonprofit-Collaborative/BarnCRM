@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Generic_Merge_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether the Merge Records area of the Duplicate Matching tab is offered: merge two records of one BarnCRM object, journaled and undoable (C-62, canonical model R-DP11).</description>
+  <inlineHelpText>Offer Merge Records on the Duplicate Matching tab.</inlineHelpText>
+  <label>Turn On Merge Records</label>
+  <type>Checkbox</type>
+</CustomField>

@@ -9,6 +9,11 @@ import reorderSteps from '@salesforce/apex/StewardshipPlanController.reorderStep
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
+  Giving_Stewardship_RunningNotice:
+    'Editing a plan changes what starts next. Plans already running keep the tasks they laid out.'
+});
+
+setHelpTextForTest({
   Giving_Stewardship_Empty: 'You have not written a plan down yet.'
 });
 
@@ -44,15 +49,6 @@ jest.mock(
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
-
-jest.mock(
-  '@salesforce/label/c.Giving_Stewardship_RunningNotice',
-  () => ({
-    default:
-      'Editing a plan changes what starts next. Plans already running keep the tasks they laid out.'
-  }),
-  { virtual: true }
-);
 
 jest.mock('@salesforce/label/c.Core_Feature_On', () => ({ default: 'On' }), {
   virtual: true

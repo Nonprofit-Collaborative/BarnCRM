@@ -220,7 +220,7 @@ public without sharing class RollupQueue implements Queueable {
 			return;
 		}
 		String message = String.format(
-			System.Label.Core_Rollups_QueueSaveFailed,
+			BarnHelp.text('Rollups', 'Core_Rollups_QueueSaveFailed'),
 			new List<String>{ messageById.values()[0] }
 		);
 		insertEntries(
@@ -654,7 +654,7 @@ public without sharing class RollupQueue implements Queueable {
 		if (failed > 0) {
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Core_Rollups_QueueRunSummary,
+					BarnHelp.text('Rollups', 'Core_Rollups_QueueRunSummary'),
 					new List<String>{ String.valueOf(failed) }
 				),
 				LOG_CONTEXT,
@@ -770,7 +770,8 @@ public without sharing class RollupQueue implements Queueable {
 		if (entry.Attempts__c == null || entry.Attempts__c <= 0) {
 			return false;
 		}
-		String refused = System.Label.Core_Rollups_QueueSaveFailed.substringBefore('{0}');
+		String refused = BarnHelp.text('Rollups', 'Core_Rollups_QueueSaveFailed')
+			.substringBefore('{0}');
 		return String.isBlank(refused) ||
 			entry.Last_Error__c == null ||
 			!entry.Last_Error__c.startsWith(refused);
@@ -983,7 +984,7 @@ public without sharing class RollupQueue implements Queueable {
 	@TestVisible
 	private static void stopped(List<Rollup_Queue__c> held, Set<Id> takenIds, String reason) {
 		String message = String.format(
-				System.Label.Core_Rollups_QueueRunStopped,
+				BarnHelp.text('Rollups', 'Core_Rollups_QueueRunStopped'),
 				new List<String>{ reason }
 			)
 			.left(LAST_ERROR_LENGTH);
@@ -1055,7 +1056,7 @@ public without sharing class RollupQueue implements Queueable {
 	 */
 	public static List<Rollup_Queue__c> charge(List<Rollup_Queue__c> entries, String reason) {
 		String message = String.format(
-				System.Label.Core_Rollups_QueueRunStopped,
+				BarnHelp.text('Rollups', 'Core_Rollups_QueueRunStopped'),
 				new List<String>{ reason }
 			)
 			.left(LAST_ERROR_LENGTH);

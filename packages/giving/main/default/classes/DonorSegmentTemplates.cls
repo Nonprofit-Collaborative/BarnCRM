@@ -106,7 +106,7 @@ public with sharing class DonorSegmentTemplates {
 			objectName != ORGANIZATIONS)
 		) {
 			throw new DonorSegmentService.SegmentException(
-				System.Label.Giving_Segments_ErrorTemplate
+				BarnHelp.text('Giving', 'Giving_Segments_ErrorTemplate')
 			);
 		}
 		Boolean people = objectName == PEOPLE;

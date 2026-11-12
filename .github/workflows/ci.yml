@@ -81,6 +81,12 @@ jobs:
       - name: Check the global describe is read only through NamespaceUtil
         run: python3 scripts/ci/check-global-describe.py
 
+      - name: Check help texts filled in by String.format have no lone apostrophe
+        run: python3 scripts/ci/check-help-text-apostrophes.py
+
+      - name: Check custom metadata records fill every required field
+        run: python3 scripts/ci/check-mdt-required-fields.py
+
       - name: Check descriptions, field limits, layout actions and Apex type names
         run: python3 scripts/ci/check-metadata-lengths.py
 

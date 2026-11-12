@@ -74,9 +74,13 @@ private class GiftControllerTest {
 		}
 		Test.stopTest();
 
-		System.assertEquals(Label.Giving_RefundGift_NoPermission, refundMessage, 'Refund refused.');
 		System.assertEquals(
-			Label.Giving_RefundGift_NoPermission,
+			BarnHelp.text('Giving', 'Giving_RefundGift_NoPermission'),
+			refundMessage,
+			'Refund refused.'
+		);
+		System.assertEquals(
+			BarnHelp.text('Giving', 'Giving_RefundGift_NoPermission'),
 			writeOffMessage,
 			'Write-off refused.'
 		);

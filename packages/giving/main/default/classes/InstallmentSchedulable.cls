@@ -15,14 +15,14 @@ public with sharing class InstallmentSchedulable implements Schedulable {
 		try {
 			Integer marked = CommitmentService.markOverdue();
 			summary = marked == 0
-				? System.Label.Giving_NightlyJobs_OverdueNoneFound
+				? BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueNoneFound')
 				: String.format(
-						System.Label.Giving_NightlyJobs_OverdueSummaryFormat,
+						BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueSummaryFormat'),
 						new List<String>{ String.valueOf(marked) }
 				  );
 		} catch (Exception jobFailure) {
 			ErrorLogger.log(jobFailure, LOG_CONTEXT);
-			summary = System.Label.Giving_NightlyJobs_RunFailed;
+			summary = BarnHelp.text('Giving', 'Giving_NightlyJobs_RunFailed');
 		}
 		try {
 			CommitmentService.recordOverdueRun(System.now(), summary);

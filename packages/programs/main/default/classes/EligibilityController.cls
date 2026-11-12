@@ -233,26 +233,46 @@ public with sharing class EligibilityController {
 		return programs[0];
 	}
 
-	/** The enrollment fields a rule may read, by lower case API name: the org's own intake fields. */
+	/**
+	 * The fields a rule may read, by lower case API name: the org's own intake fields on the
+	 * enrollment, then (P-14b) the person's Contact fields as a path through the enrollment's
+	 * Contact lookup, such as `Contact__r.Birthdate`, labelled "Contact: Birthdate". An
+	 * enrollment of an Account has no Contact, so person fields read blank for it.
+	 */
 	@TestVisible
 	private static Map<String, Field> ruleFields() {
 		Map<String, Field> fields = new Map<String, Field>();
-		Map<String, Schema.SObjectField> all = Schema.SObjectType.Enrollment__c.fields.getMap();
+		addFields(fields, Schema.SObjectType.Enrollment__c.fields.getMap(), null, null);
+		addFields(
+			fields,
+			Schema.SObjectType.Contact.fields.getMap(),
+			Schema.SObjectType.Enrollment__c.fields.Contact__c.getRelationshipName() + '.',
+			Schema.SObjectType.Contact.getLabel() + ': '
+		);
+		return fields;
+	}
+
+	/** Adds the readable fields of one object; a null prefix means the enrollment's own. */
+	private static void addFields(
+		Map<String, Field> fields,
+		Map<String, Schema.SObjectField> all,
+		String pathPrefix,
+		String labelPrefix
+	) {
 		List<String> names = new List<String>(all.keySet());
 		names.sort();
 		for (String name : names) {
 			Schema.DescribeFieldResult describe = all.get(name).getDescribe();
 			if (
-				!describe.isCustom() ||
+				(pathPrefix == null && (!describe.isCustom() || OWN_FIELDS.contains(name))) ||
 				!describe.isAccessible() ||
-				OWN_FIELDS.contains(name) ||
 				!RULE_TYPES.contains(describe.getType())
 			) {
 				continue;
 			}
 			Field field = new Field();
-			field.apiName = describe.getName();
-			field.label = describe.getLabel();
+			field.apiName = (pathPrefix == null ? '' : pathPrefix) + describe.getName();
+			field.label = (labelPrefix == null ? '' : labelPrefix) + describe.getLabel();
 			field.kind = kindOf(describe.getType());
 			if (describe.getType() == Schema.DisplayType.PICKLIST) {
 				for (Schema.PicklistEntry entry : describe.getPicklistValues()) {
@@ -261,9 +281,8 @@ public with sharing class EligibilityController {
 					}
 				}
 			}
-			fields.put(name, field);
+			fields.put(field.apiName.toLowerCase(), field);
 		}
-		return fields;
 	}
 
 	private static String kindOf(Schema.DisplayType type) {
@@ -323,10 +342,18 @@ public with sharing class EligibilityController {
 	) {
 		Map<String, Object> values = new Map<String, Object>();
 		for (Field field : fields.values()) {
-			Object value = enrollment.get(field.apiName);
+			// A person field is read through the Contact lookup, blank when there is no Contact.
+			SObject source = enrollment;
+			String name = field.apiName;
+			if (name.contains('.')) {
+				source = enrollment.getSObject(name.substringBefore('.'));
+				name = name.substringAfter('.');
+			}
+			Object value = source?.get(name);
 			values.put(
 				field.apiName,
-				value instanceof Date ? (Object) String.valueOf(value) : value
+				// String.valueOf(Date) reads `yyyy-MM-dd 00:00:00`; the rules compare `yyyy-MM-dd`.
+				value instanceof Date ? (Object) String.valueOf(value).left(10) : value
 			);
 		}
 		return values;

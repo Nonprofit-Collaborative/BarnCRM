@@ -21,8 +21,9 @@ its record identifier (text), resolved by describe only where a `Program__c` obj
 
 ## Contents
 
-- Objects: `Logic_Model__c`, `Logic_Model_Element__c`, `Logic_Model_Link__c`, `Indicator__c`,
-  `Indicator_Period__c` (canonical model Sections 29ZC to 29ZG).
+- Objects: `Logic_Model__c`, `Logic_Model_Element__c`, `Logic_Model_Link__c`,
+  `Assumption_Evidence__c`, `Indicator__c`, `Indicator_Period__c` (canonical model Sections 29ZC
+  to 29ZG, with 29ZE1).
 - The **Logic Model Builder** panel (`logicModelBuilder`) on the Logic Model record page, with its
   framework-free rules module `logicModelRules` and the thin controller
   `LogicModelBuilderController`.

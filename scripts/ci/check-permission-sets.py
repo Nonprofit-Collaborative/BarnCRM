@@ -104,6 +104,9 @@ def check(path):
 
     for entry in root.findall(q("tabSettings")):
         value = entry.find(q("tab")).text
+        # A standard object's tab (standard-Account, C-73) is the platform's, never shipped.
+        if value.startswith("standard-"):
+            continue
         if not exists(f"packages/*/main/default/tabs/{value}.tab-meta.xml"):
             report("grants tab", value)
 

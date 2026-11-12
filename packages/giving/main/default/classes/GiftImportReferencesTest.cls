@@ -73,7 +73,8 @@ private class GiftImportReferencesTest {
 			Assert.isTrue(
 				rows[0]
 					.error.startsWith(
-						Label.Giving_Import_ErrorFundAmbiguous.substringBefore('{0}')
+						BarnHelp.text('Giving', 'Giving_Import_ErrorFundAmbiguous')
+							.substringBefore('{0}')
 					),
 				'The name is ambiguous: ' + rows[0].error
 			);
@@ -106,6 +107,36 @@ private class GiftImportReferencesTest {
 	}
 
 	@IsTest
+	static void aBrandIsFoundByNameOrIdAndTwoOfOneNameAreNotGuessed() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			GivingTestDataFactory.insertDefaultFund();
+			Brand__c thrift = new Brand__c(Name = 'Barn Thrift');
+			insert new List<Brand__c>{
+				thrift,
+				new Brand__c(Name = 'Chapter'),
+				new Brand__c(Name = 'Chapter')
+			};
+			List<GiftImportRow> rows = new List<GiftImportRow>();
+			for (String word : new List<String>{ 'barn thrift', thrift.Id, 'Chapter', 'Nowhere' }) {
+				rows.add(
+					row(new Map<String, String>{ 'Brand' => word }, new Map<String, String>())
+				);
+			}
+
+			GiftImportReferences.resolve(rows);
+
+			Assert.areEqual(thrift.Id, rows[0].brandId, 'By name, any capitals.');
+			Assert.areEqual(thrift.Id, rows[1].brandId, 'By identifier.');
+			Assert.isTrue(rows[2].error.contains('More than one brand'), rows[2].error);
+			Assert.isTrue(rows[3].error.contains('Nowhere'), 'A brand that is not there is named.');
+			Assert.isFalse(
+				rows[0].notLoaded.contains('Gift.brand'),
+				'The column is read as a brand, not skipped as a field'
+			);
+		}
+	}
+
+	@IsTest
 	static void aGiftWithNoFundNeedsADefaultFund() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<GiftImportRow> rows = new List<GiftImportRow>{
@@ -115,7 +146,7 @@ private class GiftImportReferencesTest {
 			GiftImportReferences.resolve(rows);
 
 			Assert.areEqual(
-				Label.Giving_Gift_DefaultFundMissing,
+				BarnHelp.text('Giving', 'Giving_Gift_DefaultFundMissing'),
 				rows[0].error,
 				'Said in the dry run, before the gift trigger would.'
 			);

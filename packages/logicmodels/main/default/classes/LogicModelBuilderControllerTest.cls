@@ -128,7 +128,11 @@ private class LogicModelBuilderControllerTest {
 
 			Assert.areEqual(3, sizeOf(model, 'elements'), 'Three parts');
 			Assert.areEqual(1, sizeOf(model, 'links'), 'One arrow');
-			Assert.areEqual(Label.LogicModels_Builder_ArrowExists, again, 'One arrow per pair');
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_ArrowExists'),
+				again,
+				'One arrow per pair'
+			);
 			Assert.isNotNull(backwards, 'Backwards is refused by the platform, with its message');
 			Map<String, Object> saved = (Map<String, Object>) ((List<Object>) model.get(
 				'links'
@@ -182,7 +186,7 @@ private class LogicModelBuilderControllerTest {
 
 			Assert.areEqual(
 				String.format(
-					Label.LogicModels_Builder_BackwardArrows,
+					BarnHelp.text('LogicModels', 'LogicModels_Builder_BackwardArrows'),
 					new List<String>{
 						String.format(
 							Label.Core_Address_DateRange,
@@ -257,7 +261,11 @@ private class LogicModelBuilderControllerTest {
 			Map<String, Object> period = (Map<String, Object>) periods[0];
 			Assert.areEqual(Date.newInstance(2026, 1, 1), period.get('startDate'), 'Its start');
 			Assert.areEqual(20, (Decimal) period.get('resultValue'), 'Its result');
-			Assert.areEqual(Label.LogicModels_Builder_PeriodExists, twice, 'Same dates refused');
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_PeriodExists'),
+				twice,
+				'Same dates refused'
+			);
 			Assert.areEqual('Lower', indicator.get('betterWhen'), 'Which way is better changed');
 		}
 	}
@@ -328,7 +336,7 @@ private class LogicModelBuilderControllerTest {
 
 			Assert.isNotNull(programs, 'A list, empty without Programs');
 			Assert.areEqual(
-				Label.LogicModels_Scope_BadProgram,
+				BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram'),
 				notAProgram,
 				'A person is not a program'
 			);
@@ -393,8 +401,51 @@ private class LogicModelBuilderControllerTest {
 			String failed = LogicModelBuilderController.actionFailed();
 			Assert.isTrue(failed.contains('Error Log'), 'The generic failure says what to do');
 			Assert.areEqual(failed, shown.getMessage(), 'Plain');
-			Assert.areEqual(Label.LogicModels_Builder_NotFound, missing, 'Not a model');
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'),
+				missing,
+				'Not a model'
+			);
 			Assert.areEqual(failed, unreadable, 'Not an object');
+		}
+	}
+
+	@IsTest
+	static void theReportBecomesAPdfAndAPageThatLoadsAnythingIsRefused() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			String page =
+				'<!doctype html><html><head><meta charset="utf-8"><title>Report</title>' +
+				'<style>@page { size: landscape; } td { padding: 4px; }</style></head>' +
+				'<body><h1>Youth Reading: Logic Model Report</h1><table><tr>' +
+				'<td>Visits to our url (website) with src=home</td></tr></table></body></html>';
+
+			String pdf = LogicModelBuilderController.reportPdf(page);
+
+			Assert.isTrue(
+				EncodingUtil.base64Decode(pdf).size() > 0,
+				'The printable page comes back as a PDF, even with words like url ( in its text.'
+			);
+			for (
+				String refused : new List<String>{
+					'',
+					page.replace('<h1>', '<img src="https://example.org/x.png"><h1>'),
+					page.replace('<h1>', '<h1 style="background: red">'),
+					page.replace('td {', 'td { background: url(https://example.org/x.png); '),
+					page.replace('</head>', '<link rel="stylesheet" href="/x.css"></head>'),
+					page.replace('</head>', '<style>@import "x.css";</style></head>')
+				}
+			) {
+				try {
+					LogicModelBuilderController.reportPdf(refused);
+					Assert.fail('Refused: ' + refused.abbreviate(80));
+				} catch (AuraHandledException expected) {
+					Assert.areEqual(
+						LogicModelBuilderController.actionFailed(),
+						expected.getMessage(),
+						'Refused in plain words.'
+					);
+				}
+			}
 		}
 	}
 }

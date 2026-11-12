@@ -1,0 +1,148 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom84" data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+
+        <p data-id="quorum" class="slds-var-m-bottom_x-small">{labels.quorum}</p>
+        <p data-id="portal" class="slds-text-color_weak slds-var-m-bottom_small">{labels.portal}</p>
+        <template lwc:if={hasAttendees}>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="attendees">
+            <template for:each={attendees} for:item="row">
+              <li key={row.id} class="slds-item slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col">
+                  {row.name}
+                  <div class="slds-text-color_weak">{row.portalNote}</div>
+                </div>
+                <lightning-combobox
+                  data-row-id={row.id}
+                  data-id="attendance"
+                  label={labels.attendance}
+                  variant="label-hidden"
+                  options={attendanceOptions}
+                  value={row.status}
+                  disabled={isWorking}
+                  onchange={handleAttendance}
+                ></lightning-combobox>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-var-m-bottom_small" data-id="no-attendees">{labels.noAttendees}</p>
+        </template>
+        <lightning-button
+          data-id="invite"
+          label={labels.invite}
+          disabled={isWorking}
+          onclick={handleInvite}
+          class="slds-var-m-bottom_small"
+        ></lightning-button>
+
+        <p data-id="minutes" class="slds-var-m-top_small">{labels.minutes}</p>
+        <div class="slds-var-m-vertical_x-small">
+          <template lwc:if={canSubmit}>
+            <lightning-button
+              data-id="submit"
+              label={labels.submit}
+              disabled={isWorking}
+              onclick={handleSubmit}
+            ></lightning-button>
+          </template>
+          <template lwc:if={canApprove}>
+            <lightning-button
+              data-id="approve"
+              variant="brand"
+              label={labels.approve}
+              disabled={isWorking}
+              onclick={handleApprove}
+            ></lightning-button>
+          </template>
+        </div>
+
+        <h3 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.carried}</h3>
+        <template lwc:if={hasCarried}>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="carried">
+            <template for:each={carried} for:item="item">
+              <li key={item.id} class="slds-item">
+                {item.name}
+                <span class="slds-text-color_weak slds-var-m-left_x-small">{item.status}</span>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-var-m-bottom_small" data-id="no-carried">{labels.noCarried}</p>
+        </template>
+
+        <template lwc:if={hasMotions}>
+          <h3 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.motions}</h3>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="motions">
+            <template for:each={motions} for:item="motion">
+              <li key={motion.id} class="slds-item slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col">
+                  {motion.name}
+                  <div class="slds-text-color_weak">{motion.status}: {motion.tally}</div>
+                </div>
+                <template lwc:if={motion.canOpen}>
+                  <lightning-button
+                    data-row-id={motion.id}
+                    data-id="open-voting"
+                    label={labels.openVoting}
+                    disabled={isWorking}
+                    onclick={handleOpenVoting}
+                  ></lightning-button>
+                </template>
+                <template lwc:if={motion.canClose}>
+                  <lightning-button
+                    data-row-id={motion.id}
+                    data-id="close-voting"
+                    label={labels.closeVoting}
+                    disabled={isWorking}
+                    onclick={handleCloseVoting}
+                  ></lightning-button>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </template>
+
+        <template lwc:if={hasPoll}>
+          <h3 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.poll}</h3>
+          <ul class="slds-has-dividers_bottom-space slds-var-m-bottom_small" data-id="poll">
+            <template for:each={pollTimes} for:item="slot">
+              <li key={slot.id} class="slds-item slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col">
+                  {slot.name}
+                  <div class="slds-text-color_weak">{slot.answer}</div>
+                </div>
+                <lightning-button
+                  data-row-id={slot.id}
+                  data-id="choose"
+                  label={labels.choose}
+                  disabled={isWorking}
+                  onclick={handleChoose}
+                ></lightning-button>
+              </li>
+            </template>
+          </ul>
+          <template lwc:if={canSendPoll}>
+            <lightning-button
+              data-id="send-poll"
+              label={labels.sendPoll}
+              disabled={isWorking}
+              onclick={handleSendPoll}
+            ></lightning-button>
+          </template>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

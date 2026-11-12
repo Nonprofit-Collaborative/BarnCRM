@@ -57,13 +57,13 @@ to Salesforce, not to BarnCRM.
 2. **Give that user what the actions need.** Each action needs the same access as doing the
    job by hand, and BarnCRM's own permission sets already include the four Core actions, so
    there is no Apex Class Access to add:
-   - **BarnCRM Staff** and **BarnCRM Admin** (and so Team Member, Coordinator and
-     BarnCRM Admin Group) give Find People, Get Household Summary, Create Person and Get Data
+   - **BarnCRM Staff Access** and **BarnCRM Admin Access** (and so Team Member, Fundraising
+     Staff and BarnCRM Admin) give Find People, Get Household Summary, Create Person and Get Data
      Job Status.
    - **BarnCRM Read Only** (and so the Read Only group) gives Find People and Get Household
      Summary. For an assistant that should only look things up, use a user with Read Only.
-   - Record Inbound Gift needs **Giving Staff**, which covers the records involved, and
-     Mirror's **Record Inbound Gift Action** permission set (Access page, Extra Permissions), which runs that one action and grants nothing else. Assign it
+   - Record Inbound Gift needs Mirror's **Inbound Gifts** permission set (Access page, Extra
+     Permissions), which runs that action and covers the records it writes, and nothing else. Assign it
      only to the users who may record gifts through an assistant; no BarnCRM role includes it,
      so no one gets the action without your decision.
    The actions run with the user's own access, so what each user can find or change is still
@@ -180,7 +180,7 @@ twice records the gift once.
 
 **The assistant does not offer the action.** Its user has none of the BarnCRM permission sets
 that include the action (see step 2; Read Only has no Create Person or Get Data Job Status),
-or, for Record Inbound Gift, is missing the **Record Inbound Gift Action** permission set, or the action
+or, for Record Inbound Gift, is missing the **Inbound Gifts** permission set, or the action
 was not added to the agent's topic or the MCP server. Check step 2 and step 3 above.
 
 **"You do not have access to the records this action reads or changes."** The assistant's user

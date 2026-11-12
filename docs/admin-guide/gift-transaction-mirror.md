@@ -59,7 +59,7 @@ You need the Mirror module and Nonprofit Cloud fundraising: the Fundraising Acce
 for you and whoever schedules the run, the Fundraising User permission. Without them the Gift
 Transaction Mirror page says the mirror is not available, and nothing else happens.
 
-1. Give yourself the **Gift Transaction Mirror** permission set on the Access page, under Extra
+1. Give yourself the **Salesforce Records Sync** permission set on the Access page, under Extra
    Permissions: the roles there do not include it.
 2. Check the Status value that means paid in your org. In Nonprofit Cloud, open any paid Gift
    Transaction and note its Status. The mirror needs the value's API name, which is usually the

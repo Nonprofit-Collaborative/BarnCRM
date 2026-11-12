@@ -7,13 +7,11 @@ import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
 import COUNTED from '@salesforce/label/c.Programs_Log_Counted';
 import COUNT_INPUT from '@salesforce/label/c.Programs_Log_CountInput';
 import ADD_COUNT from '@salesforce/label/c.Programs_Log_AddCount';
-import COUNT_ADDED from '@salesforce/label/c.Programs_Log_CountAdded';
 import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
 import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
 import SESSION_OF from '@salesforce/label/c.Programs_Log_SessionOf';
 import SESSION_COHORT from '@salesforce/label/c.Programs_Log_SessionCohort';
 import SESSION_EVERYONE from '@salesforce/label/c.Programs_Log_SessionEveryone';
-import SESSION_CANCELLED from '@salesforce/label/c.Programs_Log_SessionCancelled';
 
 import TITLE from '@salesforce/label/c.Programs_Log_Title';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
@@ -23,16 +21,10 @@ import QUANTITY from '@salesforce/label/c.Programs_Log_Quantity';
 import NOT_RECORDED from '@salesforce/label/c.Programs_Log_NotRecorded';
 import MARK_ALL_PRESENT from '@salesforce/label/c.Programs_Log_MarkAllPresent';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
-import SAVED from '@salesforce/label/c.Programs_Log_Saved';
-import SAVED_ONE from '@salesforce/label/c.Programs_Log_SavedOne';
-import NOTHING_TO_SAVE from '@salesforce/label/c.Programs_Log_NothingToSave';
-import NO_SERVICES from '@salesforce/label/c.Programs_Log_NoServices';
 import ATTENDANCE_FOR from '@salesforce/label/c.Programs_Log_AttendanceFor';
 import QUANTITY_FOR from '@salesforce/label/c.Programs_Log_QuantityFor';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Log_MoreThanShown';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import UNSAVED_TITLE from '@salesforce/label/c.Programs_Log_UnsavedTitle';
-import UNSAVED_ASK from '@salesforce/label/c.Programs_Log_UnsavedAsk';
 import UNSAVED_CHANGES from '@salesforce/label/c.Core_Shared_UnsavedChanges';
 import UNSAVED_ONE from '@salesforce/label/c.Core_Kit_UnsavedOne';
 import UNSAVED_MANY from '@salesforce/label/c.Core_Kit_UnsavedMany';
@@ -78,14 +70,20 @@ export default class ServiceDeliveryLog extends LightningElement {
     attendance: ATTENDANCE,
     markAllPresent: MARK_ALL_PRESENT,
     save: SAVE,
-    noServices: NO_SERVICES,
+    get noServices() {
+      return helpText('Programs', 'Programs_Log_NoServices');
+    },
     get empty() {
       return helpText('Programs', 'Programs_Log_Empty');
     },
-    moreThanShown: MORE_THAN_SHOWN,
+    get moreThanShown() {
+      return helpText('Programs', 'Programs_Log_MoreThanShown');
+    },
     countInput: COUNT_INPUT,
     addCount: ADD_COUNT,
-    sessionCancelled: SESSION_CANCELLED,
+    get sessionCancelled() {
+      return helpText('Programs', 'Programs_Log_SessionCancelled');
+    },
     loading: LOADING
   };
 
@@ -214,7 +212,7 @@ export default class ServiceDeliveryLog extends LightningElement {
       .then((log) => {
         this.log = log;
         this.countDraft = '';
-        this.resultMessage = format(COUNT_ADDED, people);
+        this.resultMessage = format(helpText('Programs', 'Programs_Log_CountAdded'), people);
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Log'));
@@ -270,7 +268,7 @@ export default class ServiceDeliveryLog extends LightningElement {
       size: 'small',
       label: UNSAVED_TITLE,
       message: format(
-        UNSAVED_ASK,
+        helpText('Programs', 'Programs_Log_UnsavedAsk'),
         service ? service.label : '',
         formatIsoDate(this.log.deliveryDate, LOCALE)
       ),
@@ -347,7 +345,7 @@ export default class ServiceDeliveryLog extends LightningElement {
     const entries = entriesToSave(this.log, this.drafts);
     this.errorMessage = undefined;
     if (entries.length === 0) {
-      this.resultMessage = NOTHING_TO_SAVE;
+      this.resultMessage = helpText('Programs', 'Programs_Log_NothingToSave');
       return Promise.resolve();
     }
     this.busy = true;
@@ -363,7 +361,10 @@ export default class ServiceDeliveryLog extends LightningElement {
       .then((log) => {
         this.log = log;
         this.drafts = {};
-        this.resultMessage = log.saved === 1 ? SAVED_ONE : format(SAVED, log.saved);
+        this.resultMessage =
+          log.saved === 1
+            ? helpText('Programs', 'Programs_Log_SavedOne')
+            : format(helpText('Programs', 'Programs_Log_Saved'), log.saved);
         if (this.isSession) {
           // The session is now Held: the page's details show it.
           this.dispatchEvent(new RefreshEvent());

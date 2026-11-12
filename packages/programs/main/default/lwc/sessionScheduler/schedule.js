@@ -4,6 +4,7 @@
  * panel's sentences. Dates are ISO strings ("2027-03-01") read and written in UTC, so no time
  * zone moves a day.
  */
+import { format } from 'c/barnFormat';
 
 /** The most sessions created in one action; the server checks it again. */
 export const MAX_SESSIONS = 200;
@@ -15,12 +16,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // 7 January 2024 was a Sunday; the week from it names each weekday.
 const A_SUNDAY = Date.UTC(2024, 0, 7);
 
-/** "{0} of {1}" with the values put in. */
-export function format(template, ...values) {
-  return String(template || '').replace(/\{(\d+)\}/g, (match, index) => {
-    return values[index] === undefined ? match : String(values[index]);
-  });
-}
+/** "{0} of {1}" with the values put in (shared, UTIL-01). */
+export { format };
 
 /** An ISO date as a UTC timestamp, or null when it is not one. */
 export function parseIsoDate(value) {

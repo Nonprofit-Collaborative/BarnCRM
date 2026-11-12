@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    BarnCRM Payments: the org's own Stripe account, to start a Checkout Session (PAY-01).
+  </description>
+  <disableProtocolSecurity>false</disableProtocolSecurity>
+  <isActive>true</isActive>
+  <url>https://api.stripe.com</url>
+</RemoteSiteSetting>

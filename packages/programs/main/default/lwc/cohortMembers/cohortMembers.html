@@ -31,13 +31,13 @@
           <ul class="slds-has-dividers_bottom-space">
             <template for:each={members} for:item="member">
               <li key={member.key} class="slds-item" data-id="member">
-                <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
-                  <div class="slds-col">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                  <div class="slds-col slds-grow slds-shrink">
                     <p class="slds-text-heading_small">{member.personName}</p>
                     <p class="slds-text-body_small slds-text-color_weak">{member.stage}</p>
                   </div>
                   <template lwc:if={canEdit}>
-                    <div class="slds-col slds-grow-none">
+                    <div class="slds-col slds-grow-none slds-shrink-none slds-var-p-left_small">
                       <lightning-button
                         data-id="remove"
                         data-enrollment={member.enrollmentId}

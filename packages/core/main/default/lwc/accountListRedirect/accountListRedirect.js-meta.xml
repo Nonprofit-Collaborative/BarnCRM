@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Tab landing page that opens a standard Account list view (with its view switcher) and
+    replaces itself in the browser history. Used by the Households and Organizations tabs.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Account List Redirect</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__AppPage">
+      <property name="filterName" type="String" label="List View" description="API name of the Account list view to open." />
+      <property name="linkLabel" type="String" label="Link Text" description="Text of the fallback link. Leave blank to use BarnCRM's own." />
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

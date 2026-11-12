@@ -165,6 +165,21 @@ describe('c-rollup-builder', () => {
     expect(list(element).refresh).toHaveBeenCalled();
   });
 
+  it('offers Import From NPSP when NPSP has an active customizable rollup', async () => {
+    const element = createElement('c-rollup-builder', { is: RollupBuilder });
+    document.body.appendChild(element);
+    getModel.emit({ ...MODEL, otherToolNotices: [], canImportFromNpsp: true });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="import-from-dlrs"]')).toBeNull();
+
+    element.shadowRoot
+      .querySelector('[data-id="import-from-npsp"]')
+      .dispatchEvent(new CustomEvent('click'));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('c-rollup-dlrs-import').tool).toBe('npsp');
+  });
+
   it('leaves the tab alone outside a console', async () => {
     getDraft.mockResolvedValue({ recordId: 'a01', name: 'Household total giving' });
     const element = build();

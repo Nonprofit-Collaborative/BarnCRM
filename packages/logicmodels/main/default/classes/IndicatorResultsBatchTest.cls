@@ -267,7 +267,11 @@ private class IndicatorResultsBatchTest {
 		}
 
 		Indicator__c after = indicator(indicatorId);
-		Assert.areEqual(Label.LogicModels_Source_QueryMissing, after.Source_Status__c, 'Reported');
+		Assert.areEqual(
+			BarnHelp.text('LogicModels', 'LogicModels_Source_QueryMissing'),
+			after.Source_Status__c,
+			'Reported'
+		);
 		Assert.isNull(after.Computed_At__c, 'Not computed');
 		Assert.isNull(results(indicatorId).get('Month'), 'No result written');
 	}

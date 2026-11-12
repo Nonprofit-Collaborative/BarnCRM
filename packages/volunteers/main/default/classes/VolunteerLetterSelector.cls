@@ -66,14 +66,19 @@ public with sharing class VolunteerLetterSelector {
 		);
 	}
 
-	/** Approved hours in the period, summed per person and job. */
+	/** Approved hours in the period, summed per person and job, with the job's brand (C-47b). */
 	public static List<AggregateResult> approvedHoursByJob(
 		Set<Id> personIds,
 		Date fromDate,
 		Date toDate
 	) {
 		return [
-			SELECT Contact__c, Account__c, Volunteer_Job__r.Name jobName, SUM(Hours__c) total
+			SELECT
+				Contact__c,
+				Account__c,
+				Volunteer_Job__r.Name jobName,
+				Volunteer_Job__r.Brand__c brandId,
+				SUM(Hours__c) total
 			FROM Volunteer_Hours__c
 			WHERE
 				Status__c = :VolunteerHoursService.STATUS_APPROVED
@@ -82,7 +87,7 @@ public with sharing class VolunteerLetterSelector {
 				AND (Contact__c IN :personIds
 				OR Account__c IN :personIds)
 			WITH USER_MODE
-			GROUP BY Contact__c, Account__c, Volunteer_Job__r.Name
+			GROUP BY Contact__c, Account__c, Volunteer_Job__r.Name, Volunteer_Job__r.Brand__c
 			ORDER BY Volunteer_Job__r.Name
 		];
 	}

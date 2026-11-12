@@ -19,6 +19,7 @@ const ICONS = Object.freeze({
   Automation: 'custom:custom32',
   BarnCRM_Home: 'custom:custom1',
   BarnCRM_Settings: 'custom:custom67',
+  Brand__c: 'custom:custom56',
   Bulk_Update: 'custom:custom19',
   Data_Hygiene: 'custom:custom94',
   Data_Manager: 'custom:custom57',
@@ -29,12 +30,14 @@ const ICONS = Object.freeze({
   Households: 'custom:custom15',
   Import: 'custom:custom18',
   Import_Row__c: 'custom:custom83',
+  Legal_Entity__c: 'custom:custom58',
   Organizations: 'custom:custom24',
   Record_Inspector: 'custom:custom38',
   Relationship__c: 'custom:custom37',
   // Events
   Event__c: 'custom:custom89',
   Event_Speaker__c: 'custom:custom75',
+  Event_Venue__c: 'custom:custom50',
   Events_Calendar: 'custom:custom66',
   Events_Home: 'custom:custom81',
   // Funders
@@ -42,6 +45,8 @@ const ICONS = Object.freeze({
   Funders_Board: 'custom:custom100',
   Grant_Answer__c: 'custom:custom87',
   Grant_Calendar: 'custom:custom82',
+  Grant_Checklist_Item__c: 'custom:custom70',
+  Grant_Finder: 'custom:custom80',
   Grant_Pipeline: 'custom:custom92',
   Grant_Requirement__c: 'custom:custom84',
   Grant__c: 'custom:custom8',
@@ -72,6 +77,8 @@ const ICONS = Object.freeze({
   Receipt_Run__c: 'custom:custom36',
   Receipt__c: 'custom:custom23',
   Receipts: 'custom:custom27',
+  Recurring_Donor_Health: 'custom:custom86',
+  Recurring_Gift_Event__c: 'custom:custom21',
   Soft_Credit__c: 'custom:custom26',
   Stewardship_Plan_Template__c: 'custom:custom7',
   Stewardship_Plan__c: 'custom:custom43',
@@ -87,6 +94,40 @@ const ICONS = Object.freeze({
   // Portal Builder
   Portal_Access__c: 'custom:custom77',
   Portal__c: 'custom:custom47',
+  // Corporate Hub
+  Agreement__c: 'custom:custom93',
+  Board__c: 'custom:custom47',
+  Board_Meeting__c: 'custom:custom84',
+  Compliance_Obligation__c: 'custom:custom97',
+  Corporate_Hub: 'custom:custom72',
+  Data_Breach__c: 'custom:custom86',
+  Data_Subject_Request__c: 'custom:custom91',
+  Hub_Document__c: 'custom:custom49',
+  Processing_Activity__c: 'custom:custom55',
+  // Payments
+  Payment_Event__c: 'custom:custom95',
+  Payment__c: 'custom:custom40',
+  Payments_Setup: 'custom:custom70',
+  // LWC Builder
+  LWC_Builder: 'custom:custom34',
+  // Scholarships and Outbound Grants
+  Award__c: 'custom:custom80',
+  Award_Application__c: 'custom:custom70',
+  Award_Program__c: 'custom:custom48',
+  Scholarships: 'custom:custom34',
+  // Territory Management
+  Territory_Management: 'custom:custom34',
+  // Address Verification
+  Address_Verification_Setup: 'custom:custom73',
+  // Memberships
+  Membership_Level__c: 'custom:custom48',
+  Membership_Term__c: 'custom:custom45',
+  Certification__c: 'custom:custom8',
+  Member_Certification__c: 'custom:custom46',
+  // Project Management
+  Project__c: 'custom:custom62',
+  Projects_Home: 'custom:custom64',
+  Time_Entry__c: 'custom:custom95',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

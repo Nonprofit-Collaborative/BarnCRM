@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Authority_Deadline__c</fullName>
+  <externalId>false</externalId>
+  <formula>Discovered_At__c + 3</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>72 hours after Discovered At: the GDPR limit for reporting a breach to the supervisory authority, unless it is unlikely to result in a risk.</inlineHelpText>
+  <label>Authority Deadline</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

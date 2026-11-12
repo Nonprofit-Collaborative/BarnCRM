@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Connects the org's own Stripe or PayPal account: the receiver addresses and the write-only
+    keys.
+  </description>
+  <flexiPage>Payments_Setup</flexiPage>
+  <label>Payments Setup</label>
+  <motif>Custom70: Handsaw</motif>
+</CustomTab>

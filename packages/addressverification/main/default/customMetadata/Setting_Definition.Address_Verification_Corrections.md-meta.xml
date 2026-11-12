@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Apply corrections</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Apply_Corrections__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Address_Verification_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Addresses</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">AddressVerification</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">120</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">When an address is verified, replace its street, city, state and postal code with the provider's standardized form, such as "123 Main St" for "123 main street". The country is never changed. Off by default: only Verification Status and Latest Verified Date are written.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
+</CustomMetadata>

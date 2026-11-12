@@ -2,7 +2,7 @@
 
 Scripts for entering gifts (Gifts tab, Quick Gift Entry, gift batches, import), funds, appeals, in-kind gifts and closed accounting periods. Setup detail: [Gifts](../admin-guide/gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-14). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-13). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
 
 ## T-GIFT-01: Funds and the Default Fund
 
@@ -11,7 +11,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-14), that fund is the only **General Fund** and the other 7 are sample funds. |
+| 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-13), that fund is the only **General Fund** and the other 7 are sample funds. |
 | 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Totals Last Updated** are read only. |
 | 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
@@ -233,7 +233,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-12: Giving Access by Permission Set
 
 **Purpose:** confirm what staff and read-only users can and cannot do with gifts and funds.
-**Prerequisites:** staff, then read-only; any sample gift.
+**Prerequisites:** staff, then read-only, then admin; any sample gift; for step 6, a user with no BarnCRM role.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -242,10 +242,11 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | As read-only, open the **BarnCRM Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
 | 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add Credit** is disabled. |
 | 5 | As read-only, open a person with gifts in the BarnCRM Fundraising app. | The **Giving** section and **Gifts** list show; there is no **Enter a Gift** button. |
+| 6 | As admin, on BarnCRM Settings, **Access**, give the user with no role the **BarnCRM Admin** role. Wait up to an hour, or run `new GivingAccessSync().requestSync();` in Anonymous Apex. In Setup, open the user's **Permission Set Assignments**. | **Giving Admin** is assigned, without anyone giving it. Cleanup: remove the role and Giving Admin. |
 
 **Cleanup:** none.
 
-## T-GIFT-14: A New Org Starts with a Default Fund
+## T-GIFT-13: A New Org Starts with a Default Fund
 
 **Purpose:** a freshly deployed Giving org already has one default fund, so the first gift works without any setup.
 **Prerequisites:** a new org deployed with `scripts/org/deploy-packages.sh` (default settings) or installed as packages, with no fund created by hand and no sample data loaded. Admin user.
@@ -261,7 +262,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 **Cleanup:** none (or delete the gift from step 4 and the fund).
 
-## T-GIFT-13: List Views for Gifts, Funds, Appeals, Donor Levels and Batches
+## T-GIFT-14: List Views for Gifts, Funds, Appeals, Donor Levels and Batches
 
 **Purpose:** each giving object opens with an All view and the status views an admin expects.
 **Prerequisites:** staff user, sample data loaded (the Inactive views are empty until you switch something off).
@@ -279,7 +280,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-15: Sample Data Reuses the Org's Default Fund
 
 **Purpose:** loading sample data on an org that already has a default fund does not add a second General Fund, and removing it leaves the org's fund.
-**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-14), no sample data loaded.
+**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-13), no sample data loaded.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -341,3 +342,109 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 6 | As a user with no Giving permission set, open Harper Garcia. | No card; the sidebar starts with the next card. |
 
 **Cleanup:** refund or delete the gift from step 3.
+
+## T-GIFT-19: Stock, Planned and Donor-Advised Fund Gift Details
+
+**Purpose:** a gift carries stock, planned gift and gift source details, the fields show when they apply, and the DAF and Stock report lists the gifts (G-21, G-31).
+**Prerequisites:** staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Quick Gift Entry, enter a gift for **Luis Garcia**: **Amount** `5000`, **Payment Method** `Stock`, today. Save and open the gift. | The **Gift** section shows **Stock Symbol** and **Shares** (empty), **Gift Source**, and **Planned Gift Type**. **Gift Source Name** is not shown. |
+| 2 | Click **Edit**, set **Stock Symbol** `ACME`, **Shares** `25.5`. Save. | Saved. **Amount** is still 5,000.00: nothing is computed from the shares. |
+| 3 | Enter a second gift for Luis Garcia: **Amount** `1000`, **Payment Method** `Check`. Edit it: **Gift Source** `Donor-Advised Fund`, **Gift Source Name** `Example Charitable Fund`. Save. | **Gift Source Name** shows once **Gift Source** is set. **Stock Symbol** and **Shares** are not shown on a check. |
+| 4 | Open Luis Garcia. | **Total Giving** went up by 6,000: the donor is still credited. |
+| 5 | Edit the check gift: **Planned Gift Type** `Bequest`. Save. | Saved; the value shows. |
+| 6 | In **Reports**, folder **BarnCRM Giving**, run **DAF and Stock Gifts This Year**. | Both gifts are listed with **Gift Source**, **Gift Source Name**, **Stock Symbol** and **Shares**; the total is 6,000. |
+| 7 | As the read-only user, open the stock gift. | The details show and cannot be edited. |
+
+**Cleanup:** delete both gifts.
+
+## T-GIFT-20: Donor Panel in Quick Gift Entry
+
+**Purpose:** choosing a donor in Quick Gift Entry shows their household, totals, recent gifts and open pledges and recurring gifts, read only.
+**Prerequisites:** staff (Giving Staff); sample data loaded; a person donor with a household, at least four gifts and an Active pledge with a scheduled payment still open.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Quick Gift Entry** and choose that person as the donor. | **About This Donor** opens under the donor box: the household as a link, **Total giving**, **Last gift**, three **Recent Gifts** (newest first) and the pledge under **Open Pledges and Recurring Gifts** with its balance and next payment due. |
+| 2 | Click a gift in the panel. | The gift opens in a new browser tab; the form keeps what was typed. |
+| 3 | Choose **Organization** and pick an organization with no gifts. | The panel shows no household line, **No gifts yet.** and **No open pledges or recurring gifts.** |
+| 4 | Clear the donor. | The panel closes. |
+| 5 | Choose the person again and save a gift. | The gift saves as before; the panel never blocks a save. |
+
+**Cleanup:** refund or delete the gift from step 5.
+
+## T-GIFT-21: Gift Templates for Other CRMs
+
+**Purpose:** confirm the six off-Salesforce gift templates are listed and load a file from one of them ([Moving From Another CRM](../admin-guide/moving-from-another-crm.md)).
+**Prerequisites:** T-GIFT-01 (a default fund); funds **General** and **Building** and an appeal **Spring Appeal**. A CSV file with the Little Green Light headings of the admin guide and three rows: Zztest Ana (ana@example.invalid), 50.00, Fund General, Appeal Spring Appeal, Gift ID LGL-1; the same donor, 25.00, Fund Building, no appeal, Gift ID LGL-2; Zztest Ben (no email), 10.00, Fund Capital, Gift ID LGL-3. Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Import** tab and the template list. | **DonorPerfect: Gifts**, **Bloomerang: Transactions**, **Little Green Light: Gifts**, **Neon CRM: Donations**, **CiviCRM: Contributions** and **Raiser's Edge NXT: Gifts** are listed. |
+| 2 | Choose **Little Green Light: Gifts** and the file. Run the preview. | 2 gifts to create for one new person, Zztest Ana; the third row is rejected naming the fund **Capital**. |
+| 3 | Load. Open Zztest Ana. | Two gifts: 50.00 to General with Spring Appeal, 25.00 to Building with no appeal; External ID LGL-1 and LGL-2. |
+| 4 | Load the same file again and preview. | The two gifts are matched, not created again. |
+
+**Cleanup:** undo the first load from Data Manager.
+
+## T-GIFT-22: NPSP Funds, Levels and Recurring Donations Kit
+
+**Purpose:** confirm the kit copies NPSP General Accounting Units, levels and recurring donations into Giving and never changes NPSP.
+**Prerequisites:** admin; an org with NPSP installed (a test org, never production); in NPSP, a General Accounting Unit "Building Fund", a level "Friend" (100 to 499.99), an open monthly recurring donation of 25 for a contact with a next payment date next month, an open one of 60 every 3 months (Installment Period Monthly, Installment Frequency 3) for a second contact, and a closed yearly one of 500 for an organization.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**, NPSP. | One **Start Migration** button per kit, including **Start Migration: NPSP Funds, Levels, Recurring Donations**. |
+| 2 | Start it; preview and load **Funds**, then **Donor Levels**. | A fund Building Fund and a donor level Friend with the same amounts. **Check this step** matches each. |
+| 3 | Load **Recurring Donations of People**. | A recurring commitment of 25, Monthly, Active, for the same contact, starting at the NPSP next payment date; no overdue payments. The one of 60 is **Quarterly**. |
+| 4 | Load **Recurring Donations of Organizations**. | A recurring commitment of 500, Yearly, Cancelled, for the organization. |
+| 5 | Open the NPSP records. | Nothing in NPSP changed. |
+
+**Cleanup:** undo the four steps in reverse order.
+
+## T-GIFT-23: Online Donation Page, Paid
+
+**Purpose:** confirm an appeal's donation page sends the donor to the org's own checkout and the gift ends Received (G-34).
+**Prerequisites:** admin; Forms and Payments deployed, a public Forms Site, Payments in Test mode with Stripe test keys (see [Payments](payments.md)); a published public form "Give" with First Name, Last Name, Email and a Number question keyed `amount`; an active appeal "Winter Coats" with a Goal of 5,000.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Winter Coats**, paste the form's ID into **Donation Form ID** and tick **Donation Page**. Save. | Saved. |
+| 2 | In a private browser window open `<Site>/FormsPublic?record=<appeal ID>`. | The appeal's name, description, **Our Goal** with 5,000, and the form under **Give Now**. No gift, donor or total shows. |
+| 3 | Fill in Dana Zzdonor, an email and amount 40. Send. | "Taking you to the secure payment page", then Stripe's test checkout for 40. |
+| 4 | Pay with the card 4242 4242 4242 4242. | Back on the appeal page with "Thank you. Your payment is being confirmed". |
+| 5 | Wait for the Forms and Payments processing runs (about 15 minutes), then open the appeal's gifts. | One gift from Dana Zzdonor of 40, **Received**, **Payment Method** Card, dated today, with a **Payment Reference**. |
+| 6 | Refund it in the Stripe dashboard; wait for the Payments run. | The gift is **Refunded**. |
+
+**Cleanup:** delete the gift and Dana Zzdonor; untick **Donation Page**.
+
+## T-GIFT-24: Online Donation Page, Cancelled and Not Ready
+
+**Purpose:** confirm a cancelled checkout charges nothing, and the page says giving is not open without Payments keys.
+**Prerequisites:** T-GIFT-23 steps 1 and 2.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Send the form for amount 25, then choose the back link on Stripe's checkout. | Back on the appeal page with "Your payment was cancelled and nothing was charged". |
+| 2 | Wait for processing; open the appeal's gifts. | A **Pending** gift of 25 with a **Payment Reference**; after Payments cancels the abandoned checkout, **Cancelled**. |
+| 3 | Send the form with the amount blank or 0. | The form refuses a blank amount; for 0, "something went wrong" and nothing is stored. |
+| 4 | Send the form for amount 3. | "Something went wrong", no checkout, nothing stored; the Error Log says the amount is below the page minimum of 5.00 (**Donation Page Minimum Amount** in Settings, Giving section). |
+| 5 | Open **Health Check** after editing the "Give" form to remove the `amount` question and publishing it. | `Donation Forms Without an Amount Question` links Winter Coats. Put the question back and publish: the finding is gone. |
+| 6 | On Payments Setup, clear the Stripe keys; reload the page. | The appeal shows with "Online giving for this appeal is not open right now" and no form. |
+
+**Cleanup:** enter the Stripe test keys again; delete the gifts; untick **Donation Page**.
+## T-GIFT-25: NPSP Engagement Plans and the Parity Report
+
+**Purpose:** confirm the NPSP Funds, Levels, Recurring Donations kit copies engagement plans as stewardship plans and reports parity for levels and plans.
+**Prerequisites:** T-GIFT-22 done (steps 1 to 4 loaded, not undone); in NPSP, an engagement plan template "New Donor Welcome" with a task "Call to thank" 3 days after (priority Medium, assigned to you) and a task "Send impact report" 30 days after (no assignee), and a second active level "Patron" with no BarnCRM donor level of that name.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the kit, run and load **Engagement Plans**. | An active stewardship plan template New Donor Welcome, started **Manual**. **Verified**. |
+| 2 | Run and load **Engagement Plan Tasks**. | Two steps: Call to thank, 3 days, Normal, **Specific user** you; Send impact report, 30 days, **Record owner**. **Verified**. |
+| 3 | Read **Verification** under **Levels, Engagement Plans and Rollups Parity**. | **In the other app now** counts the two active levels and one plan (3); **Done** is 2 (Friend and New Donor Welcome); **Check this step**. |
+| 4 | Create a BarnCRM donor level Patron, then **Refresh**. | **Done** is 3 and the step says **Verified**. Click **Open Stewardship Plans**: the tab opens. Click **Mark Done**. |
+
+**Cleanup:** undo the two plan steps in reverse order; delete the Patron donor level.

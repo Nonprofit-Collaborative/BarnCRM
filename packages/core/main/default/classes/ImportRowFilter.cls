@@ -149,10 +149,21 @@ public with sharing class ImportRowFilter {
 		if (keys.isEmpty()) {
 			return null;
 		}
+		List<String> values = new List<String>();
+		for (String key : keys) {
+			values.add(cells.get(ImportMapping.key(key)));
+		}
+		return digestOfValues(values);
+	}
+
+	/**
+	 * The Row Key a row whose key cells hold these values keeps, or null when every one is
+	 * empty; the Migration Assistant finds a moved source record by it (R-MK1).
+	 */
+	public static String digestOfValues(List<String> values) {
 		List<String> parts = new List<String>();
 		Boolean anyValue = false;
-		for (String key : keys) {
-			String value = cells.get(ImportMapping.key(key));
+		for (String value : values) {
 			value = value == null ? '' : value.trim().toLowerCase();
 			anyValue = anyValue || value.length() > 0;
 			parts.add(value);

@@ -318,7 +318,7 @@ private class GiftBatchServiceTest {
 					'Nothing to check against.'
 				);
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorBatchMissing,
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing'),
 					missingOutcome.formError,
 					'No batch.'
 				);
@@ -361,7 +361,9 @@ private class GiftBatchServiceTest {
 					found.add(problem.lineNumber + ':' + problem.message);
 				}
 				Assert.isTrue(
-					found.contains('1:' + Label.Giving_GiftBatch_ErrorRowDonorMissing),
+					found.contains(
+						'1:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDonorMissing')
+					),
 					'1'
 				);
 				Assert.isTrue(
@@ -370,9 +372,16 @@ private class GiftBatchServiceTest {
 					),
 					'2'
 				);
-				Assert.isTrue(found.contains('3:' + Label.Giving_GiftBatch_ErrorRowAmount), '3');
 				Assert.isTrue(
-					found.contains('1:' + Label.Giving_GiftBatch_ErrorRowPaymentMethod),
+					found.contains(
+						'3:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowAmount')
+					),
+					'3'
+				);
+				Assert.isTrue(
+					found.contains(
+						'1:' + BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentMethod')
+					),
 					'With no method anywhere, every line is missing one.'
 				);
 				Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'Nothing was created.');
@@ -784,7 +793,7 @@ private class GiftBatchServiceTest {
 				Assert.areEqual(1, outcome.lineProblems.size(), 'One line is wrong.');
 				Assert.areEqual(2, outcome.lineProblems[0].lineNumber, 'The second line is named.');
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorRowPaymentNotOpen,
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentNotOpen'),
 					outcome.lineProblems[0].message,
 					'It says the payment cannot be paid by this line.'
 				);

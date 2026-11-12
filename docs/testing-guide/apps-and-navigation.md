@@ -50,12 +50,12 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Read the deploy output. | A stage "Module tabs in the BarnCRM apps" ran and succeeded. |
-| 2 | As admin, open **BarnCRM Admin**. | After **Error Log**: **Rollup Builder**, **Accounting Periods**, **Giving Nightly Jobs**, **Donor Level Ladder**, **Stewardship Plan Setup**, then **Campaign Sync**, **Opportunity Mirror** and **Accounting Export**. Volunteers adds no admin page (its settings are the **Volunteers** section of **BarnCRM Settings**). **BarnCRM Admin Console** has the same. |
+| 2 | As admin, open **BarnCRM Admin**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Giving Nightly Jobs**, **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, then **Campaign Sync**, **Opportunity Mirror** and **Accounting Export**. Volunteers adds no admin page (its settings are the **Volunteers** section of **BarnCRM Settings**). **BarnCRM Admin Console** has the same. |
 | 3 | Open **BarnCRM**. | After **Find**: **Quick Gift Entry**, **Gifts**, **Commitments**, **Gift Batches** (and **Volunteer Shifts**, **Volunteer Hours** with Volunteers). |
 | 4 | In **BarnCRM**, open a gift from **Gifts**. | The gift opens on the same record page as in **BarnCRM Fundraising**. |
 | 5 | Open **BarnCRM Console**, then a gift from **Gifts**. | The gift opens in a console tab. |
 | 6 | From the App Launcher, search for "BarnCRM Rollup Builder". | No such app is listed; the **Rollup Builder** tab is. |
-| 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Giving**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup", then the App Manager steps. A module not installed lists no pages. |
+| 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Giving**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters", then the App Manager steps. A module not installed lists no pages. |
 | 8 | On the **BarnCRM Console** home page, look at **Modules**. | **BarnCRM Giving** has an **Open the App** link that opens **BarnCRM Fundraising**; **BarnCRM Rollup Builder** has none. |
 | 9 | As staff, open **BarnCRM**. | The Giving pages show only if the staff user's access allows them; no admin page is listed. |
 
@@ -97,3 +97,36 @@ best); for step 5, an org where first-run setup is not finished.
 | 7 | Open **BarnCRM Settings**, **Integrations**, in an org without DLRS. | DLRS is not listed. In an org with DLRS installed, it is listed under **Complementary Apps** as **Installed in this org**. |
 
 **Cleanup:** none.
+
+## T-APP-06: Households and Organizations Tabs Open Full List Views
+
+**Purpose:** confirm the tabs open the standard Account list page with its list view menu, and
+that My list views exist.
+**Prerequisites:** staff user with the **BarnCRM Households** tab; more than 25 households; a
+household and an organization owned by that user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Households** tab. | The standard Account list page opens on **Households** with every household (pages of rows, not a short card) and the list view menu. |
+| 2 | Select the browser Back button. | You return to the page before the tab, not to a blank tab page. |
+| 3 | In the list view menu, choose **My Households**. | Only households the user owns. |
+| 4 | Open the **Organizations** tab, then choose **My Organizations**. | The **Organizations** list opens with the menu; **My Organizations** lists only the user's own. |
+| 5 | Open the **Brands**, **Payments** and **Boards and Committees** tabs (where installed). | Each has **All** and **My** lists; **Brands** also has **Active Brands** and **Inactive Brands**. |
+
+**Cleanup:** none.
+
+## T-APP-07: Account Tabs Chooses Households and Organizations, Accounts, or Both
+
+**Purpose:** confirm the Account Tabs setting shows the chosen tabs to every BarnCRM role and that the default changes nothing (C-73).
+**Prerequisites:** admin user and staff user; the **Households** feature on; the staff user's profile does not show the Accounts tab (Setup, the profile's **Object Settings** or **Tab Settings**: Accounts **Default Off** or hidden).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **BarnCRM Settings**, **General**. | An **Account Tabs** row shows **Organization and Household Tabs** with its help, and the choices **Organization and Household Tabs**, **Accounts Tab (Standard)** and **Both: Organization, Household and Accounts Tabs**. |
+| 2 | As staff, open **BarnCRM**. | **Households** and **Organizations** show; **Accounts** does not. |
+| 3 | As admin, choose **Accounts Tab (Standard)** and **Save**. Wait a minute. | "Your settings are saved." **Recent changes** shows the change. |
+| 4 | As staff, reload **BarnCRM** and **BarnCRM Console**. | **Accounts** shows after **Contacts**; **Households** and **Organizations** are gone from both apps and the App Launcher. In **Accounts**, the list view menu holds **Households**, **My Households**, **Organizations** and **My Organizations**. |
+| 5 | As admin, choose **Both** and save; wait a minute; as staff, reload. | **Households**, **Organizations** and **Accounts** all show. |
+| 6 | As admin, choose **Organization and Household Tabs** and save; wait; as staff, reload. | Back to step 2: no **Accounts** tab. |
+
+**Cleanup:** leave **Account Tabs** on **Organization and Household Tabs**.

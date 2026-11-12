@@ -16,6 +16,21 @@
   </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Assumption_Evidence__c.Evidence_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Assumption_Evidence__c.Source_Url__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Assumption_Evidence__c.Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Indicator_Period__c.Notes__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -134,6 +149,15 @@
     <field>Logic_Model__c.Scope_Key__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Assumption_Evidence__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>

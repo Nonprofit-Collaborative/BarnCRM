@@ -1,11 +1,13 @@
 /**
  * Programs' part of Where Used (C-59, ADR-0159 `0159-where-used-extension.md`): every program
- * whose eligibility rules (P-14, R-EN8) read an enrollment field. Core finds this class by name
+ * whose eligibility rules (P-14, R-EN8) read an enrollment field, or a person's field through the
+ * enrollment's Contact lookup (P-14b, `Contact__r.Birthdate`). Core finds this class by name
  * (`WhereUsedExtensions`) and adds its answer to the one list.
  *
  * Programs are read in system mode: Core's controller has already checked Manage BarnCRM
  * Settings, and rules are setup, not organization data. A rule names an Enrollment field by its
- * API name in each condition's `field` (format in `EligibilityRules`).
+ * API name, or a person field by its path, in each condition's `field` (format in
+ * `EligibilityRules`).
  */
 @NamespaceAccessible
 public with sharing class ProgramsWhereUsedExtension implements WhereUsedExtension {
@@ -62,7 +64,7 @@ public with sharing class ProgramsWhereUsedExtension implements WhereUsedExtensi
 				Object field = condition instanceof Map<String, Object>
 					? ((Map<String, Object>) condition).get('field')
 					: null;
-				if (field instanceof String && target.matchesField(RULES_OBJECT, (String) field)) {
+				if (field instanceof String && target.matchesPath(RULES_OBJECT, (String) field)) {
 					return true;
 				}
 			}

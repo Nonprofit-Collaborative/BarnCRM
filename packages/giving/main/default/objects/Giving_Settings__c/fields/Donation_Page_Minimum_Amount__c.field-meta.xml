@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Donation_Page_Minimum_Amount__c</fullName>
+  <defaultValue>5</defaultValue>
+  <description>The smallest gift an appeal's online donation page takes; a smaller amount is refused before any checkout starts, against card testing (canonical model R-AP5). Empty means 5.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The smallest gift a donation page takes. Empty means 5.</inlineHelpText>
+  <label>Donation Page Minimum Amount</label>
+  <precision>16</precision>
+  <required>false</required>
+  <scale>2</scale>
+  <trackTrending>false</trackTrending>
+  <type>Currency</type>
+</CustomField>

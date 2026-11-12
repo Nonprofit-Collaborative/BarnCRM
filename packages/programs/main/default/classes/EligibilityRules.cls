@@ -1,7 +1,7 @@
 /**
  * Eligibility screening rules (P-14, canonical model Section 29ZA, R-EN8): the rules an admin
  * defines for a program, stored as JSON on the program, checked here and applied to an
- * enrollment's intake fields. Pure logic with no query or save, so it runs in any context. The
+ * enrollment's intake fields and its person's Contact fields (P-14b, `Contact__r.Birthdate`). Pure logic with no query or save, so it runs in any context. The
  * same rules are evaluated for the preview by the framework-free `eligibilityEngine.js` module in
  * the `eligibilityRules` panel (plan 9.9); the two must agree, and the tests in both carry the
  * same cases.
@@ -68,17 +68,17 @@ public with sharing class EligibilityRules {
 		try {
 			root = (Map<String, Object>) JSON.deserializeUntyped(rulesJson);
 		} catch (Exception notJson) {
-			problems.add(Label.Programs_Elig_BadJson);
+			problems.add(BarnHelp.text('Programs', 'Programs_Elig_BadJson'));
 			return problems;
 		}
 		if (root.containsKey('defaultResult') && !RESULTS.contains(text(root, 'defaultResult'))) {
-			problems.add(Label.Programs_Elig_BadDefault);
+			problems.add(BarnHelp.text('Programs', 'Programs_Elig_BadDefault'));
 		}
 		List<Object> rules = itemsOf(root, 'rules');
 		if (rules.size() > MAX_RULES) {
 			problems.add(
 				String.format(
-					Label.Programs_Elig_TooManyRules,
+					BarnHelp.text('Programs', 'Programs_Elig_TooManyRules'),
 					new List<String>{ String.valueOf(MAX_RULES) }
 				)
 			);
@@ -88,27 +88,36 @@ public with sharing class EligibilityRules {
 			String position = String.valueOf(i + 1);
 			if (!(rules[i] instanceof Map<String, Object>)) {
 				problems.add(
-					String.format(Label.Programs_Elig_BadRule, new List<String>{ position })
+					String.format(
+						BarnHelp.text('Programs', 'Programs_Elig_BadRule'),
+						new List<String>{ position }
+					)
 				);
 				continue;
 			}
 			Map<String, Object> rule = (Map<String, Object>) rules[i];
 			if (!RESULTS.contains(text(rule, 'result'))) {
 				problems.add(
-					String.format(Label.Programs_Elig_BadResult, new List<String>{ position })
+					String.format(
+						BarnHelp.text('Programs', 'Programs_Elig_BadResult'),
+						new List<String>{ position }
+					)
 				);
 			}
 			String reason = text(rule, 'reason');
 			if (String.isBlank(reason) || reason.length() > MAX_REASON) {
 				problems.add(
-					String.format(Label.Programs_Elig_BadReason, new List<String>{ position })
+					String.format(
+						BarnHelp.text('Programs', 'Programs_Elig_BadReason'),
+						new List<String>{ position }
+					)
 				);
 			}
 			List<Object> conditions = itemsOf(rule, 'all');
 			if (conditions.isEmpty() || conditions.size() > MAX_CONDITIONS) {
 				problems.add(
 					String.format(
-						Label.Programs_Elig_BadConditions,
+						BarnHelp.text('Programs', 'Programs_Elig_BadConditions'),
 						new List<String>{ position, String.valueOf(MAX_CONDITIONS) }
 					)
 				);
@@ -165,14 +174,14 @@ public with sharing class EligibilityRules {
 		result.status = RESULTS.contains(defaultResult) ? defaultResult : REVIEW;
 		String defaultReason = text(root, 'defaultReason');
 		result.reason = String.isBlank(defaultReason)
-			? Label.Programs_Elig_NoRuleMatched
+			? BarnHelp.text('Programs', 'Programs_Elig_NoRuleMatched')
 			: defaultReason;
 		return result;
 	}
 
 	private static String conditionProblem(Object item, Set<String> allowedFields) {
 		if (!(item instanceof Map<String, Object>)) {
-			return Label.Programs_Elig_BadRule;
+			return BarnHelp.text('Programs', 'Programs_Elig_BadRule');
 		}
 		Map<String, Object> condition = (Map<String, Object>) item;
 		String field = text(condition, 'field');
@@ -180,11 +189,11 @@ public with sharing class EligibilityRules {
 			String.isBlank(field) ||
 			(allowedFields != null && !allowedFields.contains(field.toLowerCase()))
 		) {
-			return Label.Programs_Elig_BadField;
+			return BarnHelp.text('Programs', 'Programs_Elig_BadField');
 		}
 		String operator = text(condition, 'operator');
 		if (!OPERATORS.contains(operator)) {
-			return Label.Programs_Elig_BadOperator;
+			return BarnHelp.text('Programs', 'Programs_Elig_BadOperator');
 		}
 		if (NO_VALUE_OPERATORS.contains(operator)) {
 			return null;
@@ -192,7 +201,7 @@ public with sharing class EligibilityRules {
 		Object value = condition.get('value');
 		if (LIST_OPERATORS.contains(operator)) {
 			if (!(value instanceof List<Object>) || ((List<Object>) value).isEmpty()) {
-				return Label.Programs_Elig_BadValue;
+				return BarnHelp.text('Programs', 'Programs_Elig_BadValue');
 			}
 		} else if (
 			value == null ||
@@ -200,7 +209,7 @@ public with sharing class EligibilityRules {
 			value instanceof Map<String, Object> ||
 			String.isBlank(String.valueOf(value))
 		) {
-			return Label.Programs_Elig_BadValue;
+			return BarnHelp.text('Programs', 'Programs_Elig_BadValue');
 		}
 		return null;
 	}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Open_Requirements__c</fullName>
+  <inlineHelpText>Conditions and reports not yet met or waived.</inlineHelpText>
+  <label>Open Requirements</label>
+  <summaryFilterItems>
+    <field>Award_Requirement__c.Status__c</field>
+    <operation>equals</operation>
+    <value>Open, Submitted</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Award_Requirement__c.Award__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

@@ -226,6 +226,159 @@ describe('mountPortal', () => {
     expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
   });
 
+  it('opens a secure web address as a link and shows any other address as text', async () => {
+    const page = {
+      ...PROFILE,
+      fields: [
+        { field: 'Form_Link__c', label: 'Application Form', type: 'url', edit: false },
+        { field: 'Site__c', label: 'Site', type: 'url', edit: false }
+      ],
+      records: [
+        {
+          id: '003A',
+          values: { Form_Link__c: 'https://example.org/f?t=1', Site__c: 'javascript:alert(1)' }
+        }
+      ]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+
+    const links = root.querySelectorAll('dd a');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('https://example.org/f?t=1');
+    expect(links[0].textContent).toBe('Application Form');
+    expect(root.querySelectorAll('dd')[1].textContent).toBe('javascript:alert(1)');
+  });
+
+  it('filters a searchable page on the records already sent', async () => {
+    const directory = {
+      ...PROFILE,
+      kind: 'catalog',
+      canUpdate: false,
+      search: true,
+      fields: [{ field: 'Member_Name__c', label: 'Member', type: 'string', edit: false }],
+      records: [
+        { id: 'a01', values: { Member_Name__c: 'Pat Lee' } },
+        { id: 'a02', values: { Member_Name__c: 'Sam Ortiz' } }
+      ]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(directory)) });
+    await mountPortal(root, { api });
+    const box = root.querySelector('input[type="search"]');
+    box.value = 'ortiz';
+    box.dispatchEvent(new Event('input'));
+    const cards = root.querySelectorAll('.barn-portal-record');
+    expect(cards[0].hidden).toBe(true);
+    expect(cards[1].hidden).toBe(false);
+    expect(api.page).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows no search box on a page that does not ask for one', async () => {
+    await mountPortal(root, { api: fakeApi() });
+    expect(root.querySelector('input[type="search"]')).toBeNull();
+    expect(buttonNamed(root, 'Add to Calendar')).toBeUndefined();
+    expect(buttonNamed(root, 'Download CSV')).toBeUndefined();
+  });
+
+  it('hands the person a calendar file and a CSV of the records shown', async () => {
+    const agenda = {
+      ...PROFILE,
+      kind: 'related',
+      canUpdate: false,
+      search: true,
+      download: true,
+      calendar: { title: 'Name', start: 'Starts__c' },
+      fields: [
+        { field: 'Name', label: 'Session', type: 'string', edit: false },
+        { field: 'Starts__c', label: 'Starts', type: 'datetime', edit: false }
+      ],
+      records: [
+        { id: 'a01', values: { Name: 'Keynote', Starts__c: '2026-11-20T15:00:00.000Z' } },
+        { id: 'a02', values: { Name: 'Lunch', Starts__c: '2026-11-20T17:00:00.000Z' } }
+      ]
+    };
+    const files = [];
+    const realCreate = URL.createObjectURL;
+    const realRevoke = URL.revokeObjectURL;
+    URL.createObjectURL = jest.fn((blob) => {
+      files.push(blob);
+      return 'blob:portal';
+    });
+    URL.revokeObjectURL = jest.fn();
+    const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    try {
+      await mountPortal(root, { api: fakeApi({ page: jest.fn(() => Promise.resolve(agenda)) }) });
+      const box = root.querySelector('input[type="search"]');
+      box.value = 'lunch';
+      box.dispatchEvent(new Event('input'));
+      buttonNamed(root, 'Add to Calendar').click();
+      buttonNamed(root, 'Download CSV').click();
+      const read = (blob) =>
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsText(blob);
+        });
+      const [ics, csv] = await Promise.all(files.map(read));
+      await flush();
+      expect(files[0].type).toBe('text/calendar');
+      expect(ics).toContain('SUMMARY:Lunch');
+      expect(ics).not.toContain('Keynote');
+      expect(csv.startsWith('Session,Starts\r\nLunch,')).toBe(true);
+      expect(click).toHaveBeenCalledTimes(2);
+    } finally {
+      URL.createObjectURL = realCreate;
+      URL.revokeObjectURL = realRevoke;
+      click.mockRestore();
+    }
+  });
+
+  it('offers Scan only where the browser reads QR codes, and fills the field', async () => {
+    const leads = {
+      ...PROFILE,
+      kind: 'related',
+      canUpdate: false,
+      canCreate: true,
+      fields: [
+        { field: 'Badge_Code__c', label: 'Badge Code', type: 'string', edit: true, scan: true }
+      ],
+      records: []
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(leads)) });
+    await mountPortal(root, { api });
+    buttonNamed(root, 'Add').click();
+    expect(buttonNamed(root, 'Scan')).toBeUndefined();
+
+    const stopTrack = jest.fn();
+    window.BarcodeDetector = jest.fn(() => ({
+      detect: jest.fn(() => Promise.resolve([{ rawValue: 'a0BXYZ' }]))
+    }));
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: {
+        getUserMedia: jest.fn(() => Promise.resolve({ getTracks: () => [{ stop: stopTrack }] }))
+      }
+    });
+    jest.useFakeTimers();
+    try {
+      await mountPortal(root, { api });
+      buttonNamed(root, 'Add').click();
+      buttonNamed(root, 'Scan').click();
+      await Promise.resolve();
+      await Promise.resolve();
+      jest.advanceTimersByTime(300);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(root.querySelector('[name="Badge_Code__c"]').value).toBe('a0BXYZ');
+      expect(stopTrack).toHaveBeenCalled();
+      expect(buttonNamed(root, 'Scan')).toBeDefined();
+    } finally {
+      jest.useRealTimers();
+      delete window.BarcodeDetector;
+      delete navigator.mediaDevices;
+    }
+  });
+
   it('signs out back to the email screen', async () => {
     const api = fakeApi();
     await mountPortal(root, { api });
@@ -267,5 +420,28 @@ describe('mountPortal', () => {
     await flush();
     expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
     expect(root.querySelector('[role="alert"]')).toBeNull();
+  });
+
+  it('shows the brand footer and colors, and skips a color that is not hex', async () => {
+    const brand = {
+      name: 'Barn Thrift',
+      primaryColor: '#1B5E20',
+      secondaryColor: 'red;}',
+      phone: '555-0100',
+      address: ['1 Main St', 'Shelbyville IL'],
+      website: null
+    };
+    const api = fakeApi({ me: jest.fn(() => Promise.resolve({ ...MENU, brand })) });
+    await mountPortal(root, { api });
+
+    const lines = Array.from(root.querySelectorAll('footer p')).map((p) => p.textContent);
+    expect(lines).toEqual(['Barn Thrift', '1 Main St', 'Shelbyville IL', '555-0100']);
+    expect(root.style.getPropertyValue('--barn-portal-primary')).toBe('#1B5E20');
+    expect(root.style.getPropertyValue('--barn-portal-secondary')).toBe('');
+  });
+
+  it('shows no footer for a portal without a brand', async () => {
+    await mountPortal(root, { api: fakeApi() });
+    expect(root.querySelector('footer')).toBeNull();
   });
 });

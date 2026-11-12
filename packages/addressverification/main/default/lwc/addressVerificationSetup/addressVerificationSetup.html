@@ -1,0 +1,86 @@
+<template>
+    <template lwc:if={helpReady}>
+    <!-- The App Page prints the name above this component, so the shell's title is for screen readers only. -->
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        icon-name={icons.page}
+        title-hidden
+        data-id="shell"
+    >
+        <div class="slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.title} size="small" data-id="loading"></lightning-spinner>
+            </template>
+            <template lwc:if={loaded}>
+                <p class="slds-var-m-bottom_medium" data-id="provider">{providerText}</p>
+                <template lwc:if={noManageShown}>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManage} data-id="no-manage"></c-barn-notice>
+                </template>
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="smarty">
+                        <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.smarty}</h2>
+                        <template for:each={smartyKeys} for:item="key">
+                            <lightning-input
+                                key={key.name}
+                                type="password"
+                                autocomplete="off"
+                                label={key.label}
+                                field-level-help={key.status}
+                                placeholder={key.status}
+                                value={key.value}
+                                data-name={key.name}
+                                disabled={locked}
+                                onchange={handleType}
+                            ></lightning-input>
+                        </template>
+                        <lightning-button
+                            class="slds-var-m-top_small"
+                            label={labels.clear}
+                            data-provider="Smarty"
+                            data-id="clear-smarty"
+                            disabled={locked}
+                            onclick={handleClear}
+                        ></lightning-button>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="google">
+                        <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.google}</h2>
+                        <template for:each={googleKeys} for:item="key">
+                            <lightning-input
+                                key={key.name}
+                                type="password"
+                                autocomplete="off"
+                                label={key.label}
+                                field-level-help={key.status}
+                                placeholder={key.status}
+                                value={key.value}
+                                data-name={key.name}
+                                disabled={locked}
+                                onchange={handleType}
+                            ></lightning-input>
+                        </template>
+                        <lightning-button
+                            class="slds-var-m-top_small"
+                            label={labels.clear}
+                            data-provider="Google"
+                            data-id="clear-google"
+                            disabled={locked}
+                            onclick={handleClear}
+                        ></lightning-button>
+                    </div>
+                </div>
+                <div class="slds-var-m-vertical_medium">
+                    <lightning-button variant="brand" label={labels.saveKeys} onclick={handleSave} disabled={locked} data-id="save"></lightning-button>
+                    <lightning-button class="slds-var-m-left_small" label={labels.verify} onclick={handleVerify} disabled={verifyLocked} data-id="verify"></lightning-button>
+                </div>
+                <template lwc:if={message}>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="success" message={message} data-id="message"></c-barn-notice>
+                </template>
+            </template>
+            <template lwc:if={error}>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
+            </template>
+        </div>
+    </c-barn-page-shell>
+    </template>
+</template>

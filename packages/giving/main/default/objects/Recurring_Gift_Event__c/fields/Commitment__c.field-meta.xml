@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Commitment__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The recurring gift this event is about. Found from the Subscription Id or the donor's email when left blank; choose it yourself for an Unmatched event.</inlineHelpText>
+  <label>Commitment</label>
+  <referenceTo>Commitment__c</referenceTo>
+  <relationshipLabel>Recurring Gift Events</relationshipLabel>
+  <relationshipName>Recurring_Gift_Events</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

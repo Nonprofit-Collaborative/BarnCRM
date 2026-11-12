@@ -25,14 +25,6 @@
         <value>Grant Calendar</value>
     </labels>
     <labels>
-        <fullName>Funders_Fund_Missing</fullName>
-        <categories>GivingFund</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Giving Fund card: the named fund cannot be found</shortDescription>
-        <value>The fund this grant named has been deleted or you cannot see it. Choose another, or No fund.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Fund_None</fullName>
         <categories>GivingFund</categories>
         <language>en_US</language>
@@ -41,36 +33,12 @@
         <value>No fund</value>
     </labels>
     <labels>
-        <fullName>Funders_Grant_BadFund</fullName>
-        <categories>GivingFund</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Grant save refused: Giving Fund is not a fund's record ID</shortDescription>
-        <value>Choose the fund in the Giving Fund card on the grant's page. This is not a Giving fund.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Schedule_Build</fullName>
         <categories>AwardSchedule</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Award Schedule card: button that saves the previewed payments</shortDescription>
         <value>Build Schedule</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Schedule_CannotBuild</fullName>
-        <categories>AwardSchedule</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Award Schedule: what Build Schedule needs; also its refusal</shortDescription>
-        <value>To build a schedule, the grant must be Awarded, with an Amount Awarded, an Award Start Date and an Award End Date, and have no expected or received payments.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Schedule_ErrorRows</fullName>
-        <categories>AwardSchedule</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Build Schedule refused: rows do not fit the award</shortDescription>
-        <value>Each payment needs a due date within the award period and an amount above zero, and together they must add up to the amount awarded.</value>
     </labels>
     <labels>
         <fullName>Funders_Schedule_MarkReceived</fullName>

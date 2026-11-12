@@ -32,7 +32,9 @@ public with sharing class RollupSentence {
 			: definition.Aggregate__c.toUpperCase();
 		Boolean readsField = !READS_NO_FIELD.contains(aggregate);
 		String sentence = String.format(
-			readsField ? Label.Core_RollupEase_Sentence : Label.Core_RollupEase_SentenceRecords,
+			readsField
+				? BarnHelp.text('Rollups', 'Core_RollupEase_Sentence')
+				: BarnHelp.text('Rollups', 'Core_RollupEase_SentenceRecords'),
 			new List<String>{
 				calculation(aggregate, fieldLabel(sourceType, definition.Source_Field__c)),
 				sourceType == null
@@ -47,7 +49,7 @@ public with sharing class RollupSentence {
 		);
 		List<String> parts = new List<String>{ sentence };
 		if (String.isNotBlank(definition.Filter_JSON__c)) {
-			parts.add(Label.Core_RollupEase_SentenceConditions);
+			parts.add(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceConditions'));
 		}
 		if (definition.Fiscal_Year_Aware__c == true) {
 			parts.add(windowOf(definition.Fiscal_Year_Offset__c));
@@ -55,7 +57,7 @@ public with sharing class RollupSentence {
 		if (definition.Row_Limit__c != null) {
 			parts.add(
 				String.format(
-					Label.Core_RollupEase_SentenceLimit,
+					BarnHelp.text('Rollups', 'Core_RollupEase_SentenceLimit'),
 					new List<String>{ definition.Row_Limit__c.intValue().format() }
 				)
 			);
@@ -141,11 +143,11 @@ public with sharing class RollupSentence {
 	private static String windowOf(Decimal offset) {
 		Integer years = offset == null ? 0 : offset.intValue();
 		if (years == -1) {
-			return Label.Core_RollupEase_SentenceLastYear;
+			return BarnHelp.text('Rollups', 'Core_RollupEase_SentenceLastYear');
 		}
 		if (years == -2) {
-			return Label.Core_RollupEase_SentenceTwoYearsAgo;
+			return BarnHelp.text('Rollups', 'Core_RollupEase_SentenceTwoYearsAgo');
 		}
-		return Label.Core_RollupEase_SentenceThisYear;
+		return BarnHelp.text('Rollups', 'Core_RollupEase_SentenceThisYear');
 	}
 }

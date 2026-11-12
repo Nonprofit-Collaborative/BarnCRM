@@ -162,6 +162,8 @@ public with sharing class HealthCheckService {
 	 * The developer names of the packaged permission set groups (the roles the Access page
 	 * assigns) that mean "this person uses BarnCRM", and the permission set that means
 	 * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
+	 * Coordinator (`Volunteer_Coordinator`) is retired (`AccessService.RETIRED_ROLES`) but still
+	 * counts while anyone holds it, until the next release removes it.
 	 */
 	public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
 	public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';
@@ -515,6 +517,7 @@ public with sharing class HealthCheckService {
 		steps.add(
 			new CheckStep('mirror_module', new HealthCheckOrgShapeChecks.MirrorModuleCheck())
 		);
+		steps.add(new CheckStep('brand_visibility', new BrandShareJob.VisibilityCheck()));
 		steps.add(
 			new CheckStep('multi_currency', new HealthCheckOrgShapeChecks.MultiCurrencyCheck())
 		);
@@ -542,6 +545,7 @@ public with sharing class HealthCheckService {
 		}
 
 		steps.add(new CheckStep('automation', new HealthCheckSettingsChecks.AutomationCheck()));
+		steps.add(new CheckStep('field_history', new FieldHistoryService.HealthCheck()));
 		steps.add(new CheckStep('fiscal_year', new HealthCheckSettingsChecks.FiscalYearCheck()));
 		steps.add(
 			new CheckStep(

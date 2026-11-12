@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Notice_Date__c</fullName>
+  <formula>End_Date__c - BLANKVALUE(Notice_Days__c, 0)</formula>
+  <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+  <externalId>false</externalId>
+  <inlineHelpText>End Date minus Notice Days: the last day to give notice.</inlineHelpText>
+  <label>Notice Date</label>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

@@ -252,7 +252,8 @@ private class IntegrationAppServiceTest {
 			IntegrationAppService.objectNamesOverride = new Set<String>{
 				named('GW_Volunteers', 'Volunteers_Settings__c'),
 				named('summit', 'Summit_Events__c'),
-				named('dlrs', 'LookupRollupSummary__c')
+				named('dlrs', 'LookupRollupSummary__c'),
+				'membership__c'
 			};
 			AppInfoLookup some = listed();
 			Test.stopTest();
@@ -276,7 +277,13 @@ private class IntegrationAppServiceTest {
 				Assert.isFalse(info.installed, 'Nothing is installed: ' + info.name);
 			}
 			Assert.isNotNull(none.get('Summit_Events_App'), 'A complement is listed either way');
-			Assert.isNotNull(none.get('Memberships_Essentials'), 'So is one in development');
+			// Memberships Essentials competes with BarnCRM Memberships since that module shipped.
+			Assert.isNull(none.get('Memberships_Essentials'), 'Memberships Essentials is hidden');
+			Assert.areEqual(
+				IntegrationAppService.CATEGORY_ALTERNATIVE,
+				some.get('Memberships_Essentials')?.category,
+				'It is listed, as an alternative, once installed'
+			);
 			Assert.isNull(
 				none.get('Volunteers_for_Salesforce'),
 				'Volunteers for Salesforce is hidden'

@@ -41,16 +41,22 @@ private class HealthCheckHouseholdChecksTest {
 	}
 
 	private static HealthCheckService.Finding runAsMaria(String key) {
+		return findingsAsMaria().get(key);
+	}
+
+	/**
+	 * Every finding of one run, by key. A full run asks every installed module's extension
+	 * too, so a test that reads two findings runs it once, not twice, to stay under 100 queries.
+	 */
+	private static Map<String, HealthCheckService.Finding> findingsAsMaria() {
 		User maria = HealthCheckTestHelper.mariaWithManageSettings();
-		HealthCheckService.Finding found;
+		Map<String, HealthCheckService.Finding> byKey = new Map<String, HealthCheckService.Finding>();
 		System.runAs(maria) {
 			for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-				if (key.equals(finding.key)) {
-					found = finding;
-				}
+				byKey.put(finding.key, finding);
 			}
 		}
-		return found;
+		return byKey;
 	}
 
 	/** Junction mode, keeping empty households, so a test can leave one empty on purpose. */
@@ -165,8 +171,15 @@ private class HealthCheckHouseholdChecksTest {
 			insert HouseholdTestDataFactory.newContact('Flo', 'Housed');
 			platformOnlyShape();
 
-			Assert.isNull(runAsMaria(PEOPLE), 'Everyone is in a household.');
-			Assert.isNull(runAsMaria(HOUSEHOLDS), 'And the household made for Flo has Flo in it.');
+			Test.startTest();
+			Map<String, HealthCheckService.Finding> findings = findingsAsMaria();
+			Test.stopTest();
+
+			Assert.isNull(findings.get(PEOPLE), 'Everyone is in a household.');
+			Assert.isNull(
+				findings.get(HOUSEHOLDS),
+				'And the household made for Flo has Flo in it.'
+			);
 		}
 	}
 

@@ -1,0 +1,4 @@
+# Help texts read with arguments that still have a lone apostrophe, found when
+# check-help-text-apostrophes.py was added (2026-11-12). Each is a known defect owned by another
+# package's fix work: double the apostrophe ('') in the catalog, then delete its line here.
+# One Package.Key per line; the check ignores these and fails on any new one.

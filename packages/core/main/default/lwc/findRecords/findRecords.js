@@ -52,6 +52,7 @@ import DELETE_CONFIRM_CANCEL from '@salesforce/label/c.Core_Find_DeleteConfirmCa
 import LOADING from '@salesforce/label/c.Core_EraseAction_Working';
 import BULK_UPDATE from '@salesforce/label/c.Core_SuperTransform_Title';
 import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
+import ARCHIVE from '@salesforce/label/c.Core_Archive_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
 import EXPORT_FILES from '@salesforce/label/c.Core_Find_ExportFiles';
 import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
@@ -107,6 +108,9 @@ const START_NOTES = {
   },
   get delete() {
     return helpText('Core', 'Core_Find_StartDelete');
+  },
+  get archive() {
+    return helpText('Core', 'Core_Find_StartArchive');
   }
 };
 
@@ -180,6 +184,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     summarize: SUMMARIZE,
     bulkUpdate: BULK_UPDATE,
     bulkDelete: BULK_DELETE,
+    archive: ARCHIVE,
     get noResults() {
       return helpText('Core', 'Core_Find_NoResults');
     },
@@ -233,6 +238,8 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
   shared = false;
   openQueryId;
   deleteQueryJson;
+  /** Whether the open bulk delete panel archives first (R-BD9). */
+  deleteArchive = false;
   busy = false;
   errorMessage;
   noticeMessage;
@@ -984,6 +991,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       'export-files': () => this.handleExportFiles(),
       'bulk-update': () => this.handleBulkUpdate(),
       'bulk-delete': () => this.handleBulkDelete(),
+      archive: () => this.handleBulkDelete(true),
       'save-as': () => this.handleSaveAs(),
       delete: () => this.handleDelete()
     };
@@ -1179,13 +1187,17 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     });
   }
 
-  /** Opens bulk delete over the query as it is now (C-37); one bulk panel is open at a time. */
-  handleBulkDelete() {
+  /**
+   * Opens bulk delete over the query as it is now (C-37), or as an archive (C-67, R-BD9); one
+   * bulk panel is open at a time.
+   */
+  handleBulkDelete(archive = false) {
     this.noticeMessage = undefined;
     this.errorMessage = undefined;
     if (!this.checkReady()) {
       return;
     }
+    this.deleteArchive = archive;
     this.deleteQueryJson = this.queryDocument();
   }
 

@@ -1,0 +1,155 @@
+# Migration Assistant
+
+Scripts for the Integrations page's detected apps and migration links and for the Migration
+Assistant. Setup detail: [Migration Assistant](../admin-guide/migration-assistant.md) and
+[Integrations](../admin-guide/integrations.md).
+
+Before you start: an org from [Before you test](before-you-test.md) with Core and BarnCRM Rollup
+Builder deployed. T-MIG-02 to T-MIG-05 need DLRS installed (free, from the AppExchange listing
+"Declarative Lookup Rollup Summaries Tool") with the **Test child count** rollup of
+[T-RB-33](rollup-builder.md#t-rb-33-turning-on-a-rollup-that-dlrs-also-fills-asks-first-and-the-answer-is-recorded)
+active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
+
+## T-MIG-01: Integrations Lists Only Installed Alternatives, and No Migration Without a Kit
+
+**Purpose:** confirm detected apps, notes and migration links show only where they apply.
+**Prerequisites:** admin user; an org without DLRS, NPSP or Nonprofit Cloud; a staff user without Manage BarnCRM Settings.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | Complementary Apps and In Development are listed. No DLRS, NPSP or Nonprofit Cloud Fundraising listing. No **Start Migration** button anywhere. |
+| 2 | Log in as the staff user and open the same page. | The same list. No **Start Migration** button. |
+
+**Cleanup:** None.
+
+## T-MIG-02: Start Migration Opens the DLRS Rollups Kit
+
+**Purpose:** confirm a detected app with a kit offers Start Migration, and the Assistant opens in place.
+**Prerequisites:** the org with DLRS; admin user with Manage BarnCRM Settings; a staff user without it.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | **DLRS (Declarative Lookup Rollup Summaries)** shows **Installed in this org** and **Start Migration**. |
+| 2 | Click **Start Migration**. | The list is replaced by **DLRS Rollups** with **Back to Integrations**, its description, one step **Copy DLRS Rollups** (**Not Started**) with **Open Rollup Builder** and **Mark Done**, and **Retire the Old App** with its items, not yet tickable. |
+| 3 | Under the step, read **Verification**. | **In the other app now** is the number of active DLRS rollups (at least 1); **Done** is 0; **Check this step**. |
+| 4 | Click **Back to Integrations**. | The list returns. |
+| 5 | Log in as the staff user and open **Integrations**. | DLRS is listed without **Start Migration**. |
+
+**Cleanup:** None.
+
+## T-MIG-03: A Tool Step, Verified and Marked Done
+
+**Purpose:** confirm a tool step opens its tool, verifies, and is marked done and undone.
+**Prerequisites:** T-MIG-02.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the Assistant, click **Open Rollup Builder**. | The **Rollup Builder** tab opens. |
+| 2 | Click **Import From DLRS** and copy, compare and turn on **Test child count** as in [T-RB-35](rollup-builder.md). | The copy is on. |
+| 3 | Return to **BarnCRM Settings**, **Integrations**, **Start Migration** on DLRS. | The same run opens. **Verification**: **Done** equals **In the other app now** for the copied rollups; **Verified** when every active DLRS rollup has a copy that is on. |
+| 4 | Click **Mark Done**. | The step reads **Done**; **Mark Not Done** replaces it. **Retire the Old App** items can now be ticked. |
+| 5 | Click **Mark Not Done**, then **Mark Done** again. | The step goes back to **Not Started**, then **Done**. |
+
+**Cleanup:** keep the run for T-MIG-04.
+
+## T-MIG-04: Retire Checklist Completes the Migration and Changes Nothing in DLRS
+
+**Purpose:** confirm the checklist completes the run, reopens it when unticked, and never touches the other app.
+**Prerequisites:** T-MIG-03.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Tick every item under **Retire the Old App**. | Each stays ticked after **Refresh**. After the last, the kit shows **Complete**. |
+| 2 | Untick one item. | **Complete** is gone. Tick it again: **Complete** returns. |
+| 3 | Open the **Lookup Rollup Summaries** tab (DLRS). | **Test child count** is exactly as before: still active. BarnCRM changed nothing in DLRS. |
+
+**Cleanup:** switch **Test child count** off in DLRS if you are done with it.
+
+## T-MIG-05: Only Administrators Can Run a Kit
+
+**Purpose:** confirm the server refuses a migration action without Manage BarnCRM Settings.
+**Prerequisites:** the org with DLRS; a test user with the Staff role and no Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the test user, in the Developer Console run `MigrationController.getKit('DLRS_Rollups');` | Fails: "You need Manage BarnCRM Settings to run a migration." |
+| 2 | As the test user, run `MigrationController.setToolStep('DLRS_Rollups', 'copy', true);` | Fails with the same message. No Migration Run record is created. |
+
+**Cleanup:** None.
+
+## T-MIG-06: NPSP and Its Rollup Kit Appear Only With NPSP
+
+**Purpose:** confirm NPSP is detected, its compatibility note shown, and the NPSP rollup kit offered.
+**Prerequisites:** an org with NPSP and Customizable Rollups enabled (NPSP Settings, Customizable Rollups), Core and Rollup Builder deployed; admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | Under Alternatives to BarnCRM Modules, **Nonprofit Success Pack (NPSP)** shows **Installed in this org**, its compatibility note and one button per NPSP kit installed, each named **Start Migration:** and the kit's name, in order (**NPSP People and Addresses** first, **NPSP Customizable Rollups** last). |
+| 2 | Click **Start Migration: NPSP Customizable Rollups**. | **NPSP Customizable Rollups** opens with one step **Copy NPSP Customizable Rollups** and **Open Rollup Builder**. **Verification** counts the active NPSP customizable rollups. |
+| 3 | Run [T-RB-49](rollup-builder.md). Come back and click **Refresh**. | **Done** counts the copies turned on. |
+
+**Cleanup:** None.
+
+## T-MIG-07: NPSP People and Addresses Moves Relationships, Affiliations and Addresses
+
+**Purpose:** confirm the NPSP People and Addresses kit runs its steps in order, copies each NPSP relationship once, and verifies.
+**Prerequisites:** the NPSP org of T-MIG-06 with Core deployed; in NPSP, a household with two contacts, Ana and Ben, a Spouse relationship between them (NPSP makes both sides), an affiliation of Ana to an organization **Test Org** as Primary, and a seasonal Vacation address on the household. Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, click **Start Migration: NPSP People and Addresses**. | Four steps: **Adopt NPSP Households** (Not Started, with **Open BarnCRM Settings**), then **Relationships**, **Affiliations** and **Household Addresses**, each Waiting. |
+| 2 | Click **Start** on **Relationships**. | Refused: "Finish the steps above this one first." |
+| 3 | Adopt the households ([T-HH-21](people-and-households.md#t-hh-21-adopt-npsp-households)). Come back and click **Mark Done** on the first step. | **Relationships** shows **Start**. |
+| 4 | Click **Start** on **Relationships**, then **Refresh** until **Ready to Review**. Click **Show Results**. | The preview creates 1 relationship (not 2): NPSP's own other side is not read. |
+| 5 | Click **Load** and confirm. **Refresh**. | **Done** and **Verified** (1 in the other app now, 1 read, 1 loaded, 0 rejected). Ana's record shows Ben as **Spouse**, and Ben's shows Ana as **Spouse**, made by BarnCRM. |
+| 6 | Run **Affiliations** and **Household Addresses** the same way. | Each **Verified**. Ana's affiliation to **Test Org** is primary. The household has a **Seasonal** address with the NPSP months and days, and both street lines. |
+| 7 | Click **Undo** on **Household Addresses**, then **Refresh**. | **Undone**; the addresses are gone. **Undo** is not offered on **Affiliations** while a later step is done; after the undo it is. |
+| 8 | Tick every item under **Retire the Old App**. | **Complete** only once every step is done again. NPSP's records are unchanged. |
+
+**Cleanup:** delete the test records, or keep them for the NPSP giving kits.
+
+## T-MIG-08: NPSP Gifts and Soft Credits Copies Won Opportunities Once
+
+**Purpose:** confirm the NPSP Gifts and Soft Credits kit (Mirror) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
+**Prerequisites:** the NPSP org of T-MIG-07 with Giving and Mirror deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, NPSP, click **Start Migration: NPSP Gifts and Soft Credits**. | Five steps: **Appeals**, **Gifts**, **Soft Credits**, **Contacts of Organization Gifts**, **Account Soft Credits**. |
+| 2 | Run and load **Appeals**. | An appeal Spring Appeal whose Campaign ID is the Campaign's. **Verified**. |
+| 3 | Run **Gifts** and open the preview. | 2 gifts would be created, none for the open Opportunity; Ana and Test Org are matched by record ID, nobody is created. |
+| 4 | Load it. | Ana's gift of 300 by Check, reference 1201, appeal Spring Appeal, split 200 Building Fund and 100 General Fund, tribute In memory of Grace; its **Opportunity ID** and external ID are the Opportunity's. Test Org's gift of 500. **Verified**. |
+| 5 | Run and load the three soft credit steps. | On Ana's gift: Ben **Solicitor** for 300, Cara **Other** (custom role Soft Credit) for 50. On Test Org's gift: Ana with her NPSP role. No credit for Ana on her own gift. Each step **Verified**. |
+| 6 | Set **Opportunity mirror direction** to Opportunities to Gifts with a start date before the Opportunities, and click **Run Now**. | No new gift: each Opportunity already has its gift. |
+
+**Cleanup:** set the direction back to Off; undo the steps in reverse order; switch acknowledgments back on if they were on.
+
+## T-MIG-09: Nonprofit Cloud Gifts and Soft Credits Copies Paid Gift Transactions Once
+
+**Purpose:** confirm the Nonprofit Cloud Gifts and Soft Credits kit (Mirror) copies designations, commitments, paid gift transactions and soft credits with the right donors, and that neither a rerun nor the Gift Transaction mirror duplicates a gift.
+**Prerequisites:** an org with Nonprofit Cloud Fundraising (person accounts on) and Core, Giving and Mirror deployed; admin user with **Salesforce Records Sync** and the Giving admin permission set; Gift Transaction mirror **Off**; **Send gift acknowledgments** off; a fund **General Fund** in BarnCRM. In Nonprofit Cloud: a Campaign **Spring Appeal**; gift designations **General Fund** and **Building Fund**; person account Ana with a recurring gift commitment of 25 every month; a paid gift transaction of 300 from Ana on Spring Appeal, designated 200 Building Fund and 100 General Fund, with a memorial tribute for "Grace" and a soft credit to person account Ben (role Solicitor, no amount); a paid gift transaction of 500 from business account **Test Org**; an unpaid gift transaction.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: Nonprofit Cloud Gifts and Soft Credits**. | Five steps: **Appeals**, **Funds**, **Commitments**, **Gifts**, **Soft Credits**. |
+| 2 | Run and load **Appeals** and **Funds**. | An appeal Spring Appeal. One new fund, Building Fund, whose Gift Designation ID is the designation's; General Fund is not created again. **Funds** shows 2 of 2 and **Verified**. |
+| 3 | Run and load **Commitments**. | Ana's recurring commitment of 25, Monthly, on her contact. **Verified**. |
+| 4 | Run **Gifts**, preview and load it. | 2 gifts, none for the unpaid transaction. Ana's gift of 300 on her contact, appeal Spring Appeal, split 200 Building Fund and 100 General Fund, tribute In memory of Grace; Test Org's gift of 500 on the organization. Each gift's **Gift Transaction ID** and external ID are the transaction's. **Verified**. |
+| 5 | Run and load **Soft Credits**. | On Ana's gift: Ben **Solicitor** for 300. **Verified**. |
+| 6 | Set the Gift Transaction mirror to Gifts to Gift Transactions with a start date before the gifts, and click **Run Now**. | No new gift transaction: each copied gift already has its link. |
+
+**Cleanup:** set the mirror back to Off; undo the steps in reverse order; switch acknowledgments back on if they were on.
+## T-MIG-10: Nonprofit Cloud Relationships and Affiliations Copies Each Pair Once and Skips Households
+
+**Purpose:** confirm the Nonprofit Cloud Relationships and Affiliations kit (Mirror) copies relationships once per pair of people and affiliations with organizations only.
+**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed; admin user with **Salesforce Records Sync**. In Nonprofit Cloud: person accounts Ana and Ben related as Wife and Husband; Ana linked to business account **Test Org** with roles Employee and Board Member; Ana a member of a household account that has a Party Relationship Group of type Household.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: NPC Relationships and Affiliations**. | Two steps: **Relationships**, **Affiliations**. |
+| 2 | Run **Relationships**, preview and load it. | One relationship staged for Ana and Ben, even if Nonprofit Cloud holds it both ways round. Ana's **Relationships** card shows Ben, Spouse; Ben's shows Ana, Spouse. **Verified** (1 of 1 pairs). |
+| 3 | Run **Affiliations**, preview and load it. | One affiliation: Ana at Test Org, role "Employee, Board Member", Current. None for the household. **Verified**. |
+| 4 | Click **Undo** on both steps, in reverse order. | **Undone**; Nonprofit Cloud's records are unchanged. |
+
+**Cleanup:** delete the test records.

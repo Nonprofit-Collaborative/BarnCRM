@@ -37,6 +37,9 @@ public with sharing class EventBadgesController {
 		public String name;
 		@AuraEnabled
 		public String organization;
+		/** The attendee's Badge Title (EV-26), blank when none is set. */
+		@AuraEnabled
+		public String title;
 		@AuraEnabled
 		public String ticketName;
 	}
@@ -73,7 +76,14 @@ public with sharing class EventBadgesController {
 			result.eventStart = event.Start__c;
 			result.venue = event.Venue_Name__c;
 			List<Event_Attendee__c> rows = [
-				SELECT Id, Name, Ticket_Type__r.Name, Contact__r.Account.Name
+				SELECT
+					Id,
+					Name,
+					Badge_Name__c,
+					Badge_Title__c,
+					Badge_Company__c,
+					Ticket_Type__r.Name,
+					Contact__r.Account.Name
 				FROM Event_Attendee__c
 				WHERE Event_Registration__r.Event__c = :eventId AND Status__c IN :PRINTABLE
 				WITH USER_MODE
@@ -84,9 +94,15 @@ public with sharing class EventBadgesController {
 			for (Integer i = 0; i < Math.min(rows.size(), ROW_LIMIT); i++) {
 				Person person = new Person();
 				person.id = rows[i].Id;
-				person.name = rows[i].Name;
+				// EV-26: the badge overrides win when set (ADR-0207 decision 13).
+				person.name = String.isNotBlank(rows[i].Badge_Name__c)
+					? rows[i].Badge_Name__c
+					: rows[i].Name;
+				person.title = rows[i].Badge_Title__c;
 				person.ticketName = rows[i].Ticket_Type__r?.Name;
-				person.organization = rows[i].Contact__r?.Account?.Name;
+				person.organization = String.isNotBlank(rows[i].Badge_Company__c)
+					? rows[i].Badge_Company__c
+					: rows[i].Contact__r?.Account?.Name;
 				result.attendees.add(person);
 			}
 			for (Event_Session__c session : [

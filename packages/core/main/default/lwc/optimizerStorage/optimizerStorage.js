@@ -1,5 +1,8 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getStorage from '@salesforce/apex/OrgOptimizerStorageController.getStorage';
+import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import ARCHIVE_OLD from '@salesforce/label/c.Core_Archive_Title';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
@@ -35,10 +38,15 @@ const LIMIT_LABELS = {
  * Org Optimizer's Storage and limits section (admin guide org-optimizer.md): the org's storage
  * and daily limits from OrgLimits, and the records BarnCRM's own objects hold. Read only; read
  * when the section is opened and on Refresh. After each read it fires `summary` with
- * `detail.dataStoragePercent` for the Overview tile.
+ * `detail.dataStoragePercent` for the Overview tile. For a person who may archive, Archive Old
+ * Records opens Find ready to archive (C-67, R-BD9).
  */
-export default class OptimizerStorage extends LightningElement {
+export default class OptimizerStorage extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
+
+  /** Find's tool state key, with the namespace's prefix (never a literal `c__`). */
+  @wire(findToolStateKey)
+  toolStateKey;
 
   labels = {
     title: STORAGE,
@@ -48,8 +56,23 @@ export default class OptimizerStorage extends LightningElement {
       return helpText('Core', 'Core_OrgOptimizer_OwnIntro');
     },
     refresh: REFRESH,
-    nearLimit: NEAR_LIMIT
+    nearLimit: NEAR_LIMIT,
+    archiveOld: ARCHIVE_OLD
   };
+
+  get canArchive() {
+    return Boolean(
+      this.storage && this.storage.canArchive && this.toolStateKey && this.toolStateKey.data
+    );
+  }
+
+  handleArchive() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' },
+      state: { [this.toolStateKey.data]: 'archive' }
+    });
+  }
 
   columns = [
     { label: COLUMN_OBJECT, fieldName: 'label' },

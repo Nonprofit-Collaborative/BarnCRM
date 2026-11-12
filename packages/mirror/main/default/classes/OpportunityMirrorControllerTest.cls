@@ -75,7 +75,7 @@ private class OpportunityMirrorControllerTest {
 	private static void assertRefusedAsUnavailable(String action) {
 		System.runAs(maria()) {
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_Unavailable,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Unavailable'),
 				refusalOf(new Action(action)),
 				'Without Opportunity ' + action + ' is refused in words (R-OM1).'
 			);
@@ -217,17 +217,17 @@ private class OpportunityMirrorControllerTest {
 			Test.startTest();
 			System.runAs(maria()) {
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_ErrorDatesRequired,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDatesRequired'),
 					refusalOf(new Action('compareEmpty'))
 				);
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_ErrorDateOrder,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 					refusalOf(new Action('compareReversed'))
 				);
 				Assert.areEqual(
 					OpportunityMirrorService.isAvailable()
-						? Label.Mirror_OpportunityMirror_ErrorTooMany
-						: Label.Mirror_OpportunityMirror_Unavailable,
+						? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorTooMany')
+						: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Unavailable'),
 					refusalOf(new Action('compare')),
 					'Refused rather than shown in part (ADR-0051).'
 				);
@@ -243,12 +243,12 @@ private class OpportunityMirrorControllerTest {
 			Test.startTest();
 			System.runAs(david) {
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_NoUsePermission,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoUsePermission'),
 					refusalOf(new Action('status')),
 					'The page says what he needs (ADR-0038 point 3).'
 				);
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_NoUsePermission,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoUsePermission'),
 					refusalOf(new Action('compare')),
 					'Refused in words, not with the platform error a user mode read gives.'
 				);
@@ -283,7 +283,7 @@ private class OpportunityMirrorControllerTest {
 			Test.startTest();
 			System.runAs(rosa) {
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_NoOpportunityRead,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoOpportunityRead'),
 					refusalOf(new Action('compare')),
 					'Refused plainly (R-OM11).'
 				);
@@ -309,7 +309,7 @@ private class OpportunityMirrorControllerTest {
 				Assert.isFalse(OpportunityMirrorController.getStatus().canManage, 'She may look.');
 				for (String action : new List<String>{ 'runNow', 'schedule', 'stop' }) {
 					Assert.areEqual(
-						Label.Mirror_OpportunityMirror_NoManagePermission,
+						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission'),
 						refusalOf(new Action(action)),
 						action + ' is refused (ADR-0038).'
 					);
@@ -345,8 +345,8 @@ private class OpportunityMirrorControllerTest {
 			System.runAs(admin) {
 				Assert.areEqual(
 					OpportunityMirrorService.isAvailable()
-						? Label.Mirror_OpportunityMirror_SwitchedOff
-						: Label.Mirror_OpportunityMirror_Unavailable,
+						? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_SwitchedOff')
+						: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Unavailable'),
 					refusalOf(new Action('runNow')),
 					'Nothing starts, and the page says why.'
 				);
@@ -377,7 +377,7 @@ private class OpportunityMirrorControllerTest {
 				);
 				choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_ErrorDateOrder,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 					refusalOf(new Action('copyReversed'))
 				);
 				Assert.isTrue(
@@ -419,27 +419,27 @@ private class OpportunityMirrorControllerTest {
 			status.running = true;
 			Assert.isNull(OpportunityMirrorController.refusal(status, true), 'Scheduling may.');
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_Running,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Running'),
 				OpportunityMirrorController.refusal(status, false)
 			);
 			status.canRun = false;
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_NoOpportunityAccess,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoOpportunityAccess'),
 				OpportunityMirrorController.refusal(status, false)
 			);
 			status.canManage = false;
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_NoManagePermission,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission'),
 				OpportunityMirrorController.refusal(status, false)
 			);
 			status.direction = OpportunityMirrorService.OFF;
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_SwitchedOff,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_SwitchedOff'),
 				OpportunityMirrorController.refusal(status, false)
 			);
 			status.available = false;
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_Unavailable,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Unavailable'),
 				OpportunityMirrorController.refusal(status, false)
 			);
 		}

@@ -439,7 +439,7 @@ private class GiftImportProcessorTest {
 			for (Import_Row__c row : rows()) {
 				Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Not saved.');
 				Assert.areEqual(
-					Label.Giving_Import_ErrorNotAttempted,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorNotAttempted'),
 					row.Error_Message__c,
 					'Saying why, and not blaming the row.'
 				);
@@ -479,12 +479,14 @@ private class GiftImportProcessorTest {
 			Import_Row__c row = rows()[0];
 			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, row.Status__c, 'Refused.');
 			Assert.areEqual(
-				Label.Giving_Import_ErrorCannotDeleteGifts,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorCannotDeleteGifts'),
 				row.Error_Message__c,
 				'Saying which permission is missing.'
 			);
 			Assert.isTrue(
-				outcome.notes.contains(Label.Giving_Import_ErrorCannotDeleteGifts),
+				outcome.notes.contains(
+					BarnHelp.text('Giving', 'Giving_Import_ErrorCannotDeleteGifts')
+				),
 				'And once in the run log: ' + outcome.notes
 			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift written.');
@@ -656,8 +658,14 @@ private class GiftImportProcessorTest {
 			Map<Id, String> keep = new GiftImportProcessor()
 				.reasonsToKeep(batch.Id, Gift__c.SObjectType, new Set<Id>(giftIds.values()));
 
-			Assert.areEqual(Label.Giving_Import_UndoKeptClosedPeriod, keep.get(giftIds.get(10)));
-			Assert.areEqual(Label.Giving_Import_UndoKeptPosted, keep.get(giftIds.get(20)));
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Import_UndoKeptClosedPeriod'),
+				keep.get(giftIds.get(10))
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Import_UndoKeptPosted'),
+				keep.get(giftIds.get(20))
+			);
 			Assert.isFalse(keep.containsKey(giftIds.get(30)), 'An open, unposted gift can go');
 		}
 	}

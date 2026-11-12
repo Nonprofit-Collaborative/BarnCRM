@@ -119,7 +119,7 @@ public with sharing class DonorSegmentService {
 	 */
 	public static Id saveFromTemplate(String templateKey, String objectName, String name) {
 		if (String.isBlank(name) || name.trim().length() > 80) {
-			throw new SegmentException(System.Label.Giving_Segments_ErrorName);
+			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorName'));
 		}
 		String document = DonorSegmentTemplates.document(templateKey, objectName);
 		QueryCompiler.compile(document);
@@ -192,7 +192,9 @@ public with sharing class DonorSegmentService {
 		document.remove('aggregate');
 		if (layout == LAYOUT_MAILCHIMP || layout == LAYOUT_CONSTANT_CONTACT) {
 			if (query.Object_Name__c != DonorSegmentTemplates.PEOPLE) {
-				throw new SegmentException(System.Label.Giving_Segments_ErrorPeopleOnly);
+				throw new SegmentException(
+					BarnHelp.text('Giving', 'Giving_Segments_ErrorPeopleOnly')
+				);
 			}
 			document.put('fields', EMAIL_FIELDS);
 			Map<String, Object> filter = filterOf(document);
@@ -204,7 +206,7 @@ public with sharing class DonorSegmentService {
 			);
 			document.put('filter', filter);
 		} else if (layout != LAYOUT_ALL) {
-			throw new SegmentException(System.Label.Giving_Segments_ErrorLayout);
+			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorLayout'));
 		}
 		String exportJson = JSON.serialize(document);
 		List<String> fields = fieldsOf(exportJson);
@@ -272,14 +274,14 @@ public with sharing class DonorSegmentService {
 					LIMIT 1
 			  ];
 		if (found.isEmpty()) {
-			throw new SegmentException(System.Label.Giving_Segments_ErrorNotFound);
+			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorNotFound'));
 		}
 		String objectName = found[0].Object_Name__c;
 		if (
 			objectName != DonorSegmentTemplates.PEOPLE &&
 			objectName != DonorSegmentTemplates.ORGANIZATIONS
 		) {
-			throw new SegmentException(System.Label.Giving_Segments_ErrorNotSegment);
+			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorNotSegment'));
 		}
 		return found[0];
 	}

@@ -186,7 +186,7 @@ private class ReceiptVoidReissueTest {
 				Test.stopTest();
 
 				Assert.areEqual(
-					Label.Giving_Gift_ReceiptLocked,
+					BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked'),
 					message,
 					'The refusal says what to do instead, in words a person can act on.'
 				);

@@ -28,8 +28,7 @@ everyone with a Programs permission set (the default), or only the people who ne
 - It needs BarnCRM Core and nothing else: not Giving, not Rollup Builder.
 - If the Program Management Module (PMM) is installed in your org, BarnCRM lists it on the
   **Integrations** page as an alternative. Use one or the other for the same programs, not both.
-  BarnCRM's programs, services and enrollments are laid out so a later PMM migration template
-  can move PMM's records across without new fields.
+  To move PMM's records into BarnCRM, use the PMM migration kit ([Moving From PMM](#moving-from-pmm)).
 - **Nonprofit Cloud Program Management.** A Nonprofit Cloud org has its own standard **Program**
   and **Program Enrollment** objects. BarnCRM Programs keeps its own programs, enrollments and
   service deliveries and never reads or writes those objects, so the two share no records and can
@@ -65,6 +64,25 @@ The same section also has **Weeks ahead to create sessions** (1 to 26, default 8
 org-wide): how far ahead repeating session schedules keep their sessions created (see Repeating
 Session Schedules). Change it there and click **Save**; the next run, or **Create Sessions Now**,
 fills up to the new horizon. A shorter value deletes nothing.
+
+It also has **Waitlist when full** (off by default, saved org-wide). See Capacity and Waitlists.
+
+### Capacity and Waitlists
+
+A program's **Capacity** (optional) is how many people it can have **Enrolled** at once. Empty
+means no limit.
+
+- With **Waitlist when full** off (the default), Capacity only shows; nothing is refused or
+  waitlisted.
+- Turn it on and an enrollment saved as **Enrolled** into a full program (new, moved to Enrolled,
+  or moved from another program) is saved as **Waitlisted** instead, whichever screen or import
+  saved it. When a place frees (someone Completed, Withdrawn or deleted, or Capacity raised), the
+  oldest Waitlisted enrollments move to **Enrolled**, and their Start Date is filled in. Places
+  are counted over every enrollment in the program, private ones included.
+- **Waitlisted** counts as open: a person can have only one open enrollment per program. It is
+  not counted in the dashboard's open enrollments or the person's Programs card. **Applied** is
+  never counted or moved up: move an applicant to Enrolled when you accept them.
+- Cohorts have no capacity of their own.
 
 **Intake and Eligibility Picklists.** The page lists the three intake picklists on an enrollment
 (**Referral Source**, **Eligibility Status** and **Eligibility Basis**) with the choices each
@@ -125,9 +143,11 @@ You never assign the Programs permission sets by hand. Give people their BarnCRM
 | BarnCRM role | Programs set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Programs Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Programs Staff | Set up programs, services, cohorts and sessions, enroll people and move them through the stages, take attendance, keep service plans; never deletes |
-| Team Member | Programs Staff | The same as Coordinator |
+| Team Member | Programs Staff | Set up programs, services, cohorts and sessions, enroll people and move them through the stages, take attendance, keep service plans; never deletes |
 | Read Only | Programs Read Only | Look at programs, services, cohorts, sessions, enrollments and service plans |
+
+Fundraising Staff does not get Programs Staff: program records hold the people you serve, which
+fundraisers do not need. A fundraiser who also runs a program gets the Team Member role as well.
 
 When it happens:
 
@@ -572,7 +592,7 @@ Programs Admin can change them; Programs Staff see them and can screen.
 1. Click **Add a Rule**. A rule says: **when all** of its conditions are true, the **Result** is
    Eligible, Not Eligible or Review, with a **Reason** (up to 255 characters, shown on the
    enrollment) and optionally an **Eligibility Basis** (or **Don't Change the Basis**).
-2. Each condition picks an **Enrollment Field**, a comparison (**equal to**, **not equal to**,
+2. Each condition picks a **Field**, a comparison (**equal to**, **not equal to**,
    **one of**, **not one of**, **greater than**, **greater than or equal to**, **less than**,
    **less than or equal to**, **blank**, **not blank**) and a **Value**. For **one of** and
    **not one of** on a picklist field, move the choices you want from **Available** to
@@ -590,7 +610,13 @@ Programs Admin can change them; Programs Staff see them and can screen.
 The fields offered are the enrollment's own intake fields: the custom fields on an enrollment
 that hold text, a choice, a number, a date or a checkbox, such as **Referral Source**, **Intake
 Date** or any field you add to Enrollment in Setup (for example household size or income band).
-The Eligibility fields themselves and links to people are not offered. Comparisons ignore
+The Eligibility fields themselves and links to people are not offered. After them come the
+person's own fields, named **Contact:** and the field, such as **Contact: Birthdate** or
+**Contact: Mailing Zip/Postal Code**: every Contact field of those kinds that you can read,
+including fields you add to Contact in Setup. A rule on a person field reads the enrolled
+contact's value; an enrollment of an Account has no contact, so the value reads as blank there.
+A rule on a date such as Birthdate compares with a fixed date (for example **less than**
+2008-01-01 for people born before 2008). Comparisons ignore
 capitals; two numbers compare as numbers (4 equals 4.0); dates compare as dates; a blank value
 never satisfies greater or less than.
 
@@ -654,6 +680,41 @@ Read Only has no access. Erasing a person **deletes** their referrals (see below
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.
 
+## Moving From PMM
+
+When the Program Management Module (PMM) is installed in the same org, the **PMM Programs and
+Services** kit of the [Migration Assistant](migration-assistant.md) copies its records into
+BarnCRM Programs, step by step, with a preview, a check that the numbers match and undo. Open
+**BarnCRM Settings**, **Integrations**, find **Program Management Module (PMM)** and click
+**Start Migration**. You need Manage BarnCRM Settings and admin access to Programs (the BarnCRM Admin role has both).
+
+| Step | PMM records read | BarnCRM records made |
+|---|---|---|
+| Programs | Every program: name, status, start and end dates, description, target population | Programs. Status Inactive becomes Completed; a blank status becomes Active. |
+| Cohorts | Every program cohort | Cohorts on the program the first step made. |
+| Services | Every service: name, status, unit of measurement, description | Services on the program the first step made; Active unless PMM's status is another value. |
+| Enrollments | Every program engagement with a contact | Enrollments of the same contact, on the program and cohort the earlier steps made. Stage Active becomes Enrolled; Applied, Enrolled, Completed, Withdrawn and Waitlisted keep their names. |
+| Service Deliveries | Every service delivery to a contact for a service | Service deliveries of the same contact, on the service and enrollment the earlier steps made, with date, quantity (1 when blank) and attendance (Present when blank). |
+
+Each later step finds the record an earlier step made from the PMM record it names, so the
+steps must run in order, and an undo goes backwards from the last.
+
+What stays in PMM, with the reason:
+
+- **Engagements and deliveries with no contact** (an account only): BarnCRM records a person on
+  each. They are not read, so the counts do not include them.
+- **Service schedules, sessions and participants**: make the sessions again with
+  [Repeating Session Schedules](#repeating-session-schedules). A delivery's session is not kept.
+- **Two open engagements of one contact in one program**: BarnCRM keeps one open enrollment
+  per person per program, so the preview rejects the second, naming it. End or delete one in
+  PMM, or correct the row and retry it.
+- **Two deliveries of one service to one contact on one day**: BarnCRM keeps one; the second
+  changes the first.
+
+The retire checklist then reminds you to remove PMM's tabs and permission sets so nobody keeps
+entering records there, and to uninstall PMM when you no longer need it. BarnCRM never changes
+PMM.
+
 ## Health Check
 
 With Programs installed, [Health Check](health-check.md) asks two more questions, shown only to
@@ -667,7 +728,8 @@ people who can manage BarnCRM Settings and not while Programs is turned off:
 ## Sample Data
 
 **Load Sample Data** in BarnCRM Settings also loads three sample programs, five services, 18
-enrollments and 40 service deliveries, and **Remove Sample Data** takes them away again, keeping
+enrollments, 40 service deliveries, a cohort with three sessions and their attendance, and four
+service plan goals with two steps each, and **Remove Sample Data** takes them away again, keeping
 a sample program that has real enrollments or service deliveries, or a sample enrollment with a
 case note. See
 [Sample data](sample-data.md#with-programs-installed).

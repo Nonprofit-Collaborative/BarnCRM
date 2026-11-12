@@ -63,6 +63,24 @@
         <identifier>RecordField_Installment</identifier>
       </fieldInstance>
     </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Gift_Source__c</fieldItem>
+        <identifier>RecordField_GiftSource</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Gift_Source_Name__c</fieldItem>
+        <identifier>RecordField_GiftSourceName</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Planned_Gift_Type__c</fieldItem>
+        <identifier>RecordField_PlannedGiftType</identifier>
+      </fieldInstance>
+    </itemInstances>
     <name>Facet-gift-column1</name>
     <type>Facet</type>
   </flexiPageRegions>
@@ -111,6 +129,32 @@
       <fieldInstance>
         <fieldItem>Record.Payment_Reference__c</fieldItem>
         <identifier>RecordField_PaymentReference</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Stock_Symbol__c</fieldItem>
+        <identifier>RecordField_StockSymbol</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!Record.Type__c}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>Stock</rightValue>
+          </criteria>
+        </visibilityRule>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Stock_Shares__c</fieldItem>
+        <identifier>RecordField_StockShares</identifier>
+        <visibilityRule>
+          <criteria>
+            <leftValue>{!Record.Type__c}</leftValue>
+            <operator>EQUAL</operator>
+            <rightValue>Stock</rightValue>
+          </criteria>
+        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <name>Facet-gift-column2</name>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>User__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The staff member asked. Fill in User or Person, not both.</inlineHelpText>
+  <label>User</label>
+  <referenceTo>User</referenceTo>
+  <relationshipLabel>Policy Acknowledgments</relationshipLabel>
+  <relationshipName>Policy_Acknowledgments</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

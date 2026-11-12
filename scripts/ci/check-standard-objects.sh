@@ -3,7 +3,7 @@
 #
 # Fails (exit 1) if any file under packages/core, packages/rollups, packages/giving,
 # packages/volunteers, packages/programs, packages/logicmodels, packages/funders, packages/forms,
-# packages/contactpoints, packages/events or packages/portal (excluding README.md files; see the Contact Point
+# packages/contactpoints, packages/events, packages/portal, packages/corporatehub, packages/lwcbuilder, packages/scholarships or packages/territory (excluding README.md files; see the Contact Point
 # Sync note below)
 # references, as whole
 # words, case-sensitive: Opportunity, Campaign, Lead, Case, OpportunityContactRole,
@@ -77,12 +77,19 @@
 # time and skips a source whose object is absent, so the word refuses no deployment (ADR-0133,
 # 0133-related-record-matching.md). These files are listed with the template headings, by
 # path, on the same terms: safe only while Match_Source has no MetadataRelationship field.
+#
+# D-194: a shipped Integration App (customMetadata/Integration_App.*.md-meta.xml) names the other
+# product's objects in Detection Objects as text, such as GiftTransaction for Nonprofit Cloud
+# Fundraising. IntegrationAppService only looks the names up in the global describe to tell
+# whether the product is installed (MIG-10), so the word refuses no deployment. Listed by path
+# on the same terms: safe only while Integration_App has no MetadataRelationship field.
 
 set -euo pipefail
 
 DIRS=(packages/core packages/rollups packages/giving packages/volunteers packages/programs
   packages/logicmodels packages/funders packages/forms packages/contactpoints
-  packages/events packages/portal)
+  packages/events packages/portal packages/corporatehub packages/payments packages/lwcbuilder packages/scholarships packages/territory packages/memberships
+  packages/projects packages/addressverification)
 
 PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case|PersonAccount|IsPersonAccount|GiftTransaction)\b|__dlm\b'
 
@@ -104,6 +111,7 @@ CONTACT_POINT_NPC_PATTERN="${NPC_PATTERN//|ContactPointAddress|ContactPointEmail
 MARKER='// detection-only:'
 TEMPLATE_HEADINGS='/customMetadata/Import_Template_Default.'
 MATCH_SOURCES='/customMetadata/Match_Source.'
+INTEGRATION_APPS='/customMetadata/Integration_App.'
 
 FAILED=0
 EXEMPTED=()
@@ -129,7 +137,8 @@ for DIR in "${DIRS[@]}"; do
     if [[ "$FILE" == *.cls || "$FILE" == *.trigger ]] && [[ "$LINE" == *"$MARKER"* ]]; then
       EXEMPTED+=("$LINE")
     elif [[ "$FILE" == *"$TEMPLATE_HEADINGS"*.md-meta.xml ||
-      "$FILE" == *"$MATCH_SOURCES"*.md-meta.xml ]]; then
+      "$FILE" == *"$MATCH_SOURCES"*.md-meta.xml ||
+      "$FILE" == *"$INTEGRATION_APPS"*.md-meta.xml ]]; then
       HEADINGS+=("$FILE")
     elif [[ "$FILE" == packages/programs/* ]] &&
       ! printf '%s' "${LINE#*:*:}" | sed -E 's/Case Notes?([^A-Za-z0-9_]|$)/\1/g' | grep -qwE "$PATTERN"; then

@@ -24,10 +24,18 @@ public with sharing class LogicModelsAccessSync extends ModuleAccessSyncBase {
 		ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
 	};
 
-	/** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
+	/**
+	 * Each other set, and the BarnCRM roles (permission set groups) whose holders get it. Fundraising
+	 * Staff is Giving's role, named as text: a role that is not installed is skipped (ADR-0194 D3).
+	 * Coordinator is retired and dropped in the next release (D1).
+	 */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
-		'Logic_Models_Staff' => new List<String>{ 'Program_Staff', 'Volunteer_Coordinator' },
+		'Logic_Models_Staff' => new List<String>{
+			'Program_Staff',
+			'Volunteer_Coordinator',
+			'Fundraising_Staff'
+		},
 		'Logic_Models_Read_Only' => new List<String>{ 'Read_Only' }
 	};
 

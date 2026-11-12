@@ -92,6 +92,12 @@
         <identifier>grantFundEntriesList</identifier>
       </componentInstance>
     </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>grantBudget</componentName>
+        <identifier>grantBudgetCard</identifier>
+      </componentInstance>
+    </itemInstances>
     <name>Facet-moneyTab</name>
     <type>Facet</type>
   </flexiPageRegions>
@@ -138,6 +144,18 @@
     <type>Facet</type>
   </flexiPageRegions>
   <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>grantChecklist</componentName>
+        <identifier>grantChecklistCard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>grantDocuments</componentName>
+        <identifier>grantDocumentsCard</identifier>
+      </componentInstance>
+    </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentName>grantAnswerLibrary</componentName>
@@ -268,6 +286,12 @@
         </componentInstanceProperties>
         <componentName>grantLinkedRecord</componentName>
         <identifier>grantFundCard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>grantRenewals</componentName>
+        <identifier>grantRenewalsCard</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

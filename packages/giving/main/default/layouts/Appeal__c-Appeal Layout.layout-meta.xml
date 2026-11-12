@@ -19,6 +19,14 @@
         <behavior>Edit</behavior>
         <field>Active__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Donation_Page__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Donation_Form_Key__c</field>
+      </layoutItems>
     </layoutColumns>
     <layoutColumns>
       <layoutItems>

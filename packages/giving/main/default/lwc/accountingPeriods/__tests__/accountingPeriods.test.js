@@ -2,6 +2,13 @@ import { createElement } from 'lwc';
 import AccountingPeriods from 'c/accountingPeriods';
 import getPeriod from '@salesforce/apex/AccountingPeriodController.getPeriod';
 import closeThrough from '@salesforce/apex/AccountingPeriodController.closeThrough';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_Periods_NotClosed: 'No period is closed.',
+  Giving_Periods_Saved: 'Saved. The books are closed through the date shown.',
+  Giving_Periods_UnexpectedError: 'Something went wrong. The details are in the Error Log.'
+});
 
 jest.mock('@salesforce/apex/AccountingPeriodController.getPeriod', () => ({ default: jest.fn() }), {
   virtual: true
@@ -10,26 +17,6 @@ jest.mock('@salesforce/apex/AccountingPeriodController.getPeriod', () => ({ defa
 jest.mock(
   '@salesforce/apex/AccountingPeriodController.closeThrough',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Periods_NotClosed',
-  () => ({ default: 'No period is closed.' }),
-  {
-    virtual: true
-  }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Periods_Saved',
-  () => ({ default: 'Saved. The books are closed through the date shown.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Periods_UnexpectedError',
-  () => ({ default: 'Something went wrong. The details are in the Error Log.' }),
   { virtual: true }
 );
 

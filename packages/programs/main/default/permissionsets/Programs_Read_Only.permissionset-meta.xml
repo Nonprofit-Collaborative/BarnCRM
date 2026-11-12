@@ -165,7 +165,17 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Program__c.Brand__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Program__c.Target_Population__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Program__c.Capacity__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

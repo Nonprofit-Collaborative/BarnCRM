@@ -14,9 +14,14 @@ private class SettingSectionsTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				22,
+				32,
 				sections.size(),
-				'Twenty-two section names are agreed across the suite'
+				'Thirty-two section names are agreed across the suite'
+			);
+			Assert.isTrue(
+				SettingSections.isKnown(SettingSections.FORMS) &&
+				SettingSections.isKnown(SettingSections.LOGIC_MODELS),
+				'Forms and Logic Models ship a row each that announces the module (C-72)'
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.EVENTS),

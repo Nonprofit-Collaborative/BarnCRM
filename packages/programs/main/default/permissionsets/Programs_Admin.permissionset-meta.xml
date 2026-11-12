@@ -197,7 +197,17 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Program__c.Brand__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Program__c.Target_Population__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Program__c.Capacity__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -323,6 +333,16 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Referral__c.Other_Organization__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Referral__c.Partner_Organization__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Referral__c.Shared_With_Partner__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

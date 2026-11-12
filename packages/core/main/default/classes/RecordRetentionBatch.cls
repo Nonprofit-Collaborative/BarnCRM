@@ -8,7 +8,8 @@
  * delete cascades through thousands of children), then Field Utilization Snapshot (R-FU7), Error
  * Log entries (R-E6; whatever their status, and 0 days keeps every entry) and the staged rows of
  * complete imports by the Delete Import Rows choice (R-IR5; an uncommitted preview keeps its rows
- * at least 30 days). An import left in Draft, Parsing or Dry run is an abandoned wizard: it goes
+ * at least 30 days), then Field History (R-FH5). An import left in Draft, Parsing or Dry run is
+ * an abandoned wizard: it goes
  * with the finished ones, after the same Days to Keep Import History. Each pass reads its days
  * from BarnCRM Settings, holding them between the bounds Section 12 gives.
  *
@@ -62,6 +63,8 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 	private static final Integer ERROR_LOG = 6;
 	@TestVisible
 	private static final Integer IMPORT_ROW_CHOICE = 7;
+	@TestVisible
+	private static final Integer FIELD_HISTORY = 8;
 
 	/** False in a test that runs one pass and checks it. */
 	@TestVisible
@@ -118,7 +121,7 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 	}
 
 	public void finish(Database.BatchableContext context) {
-		if (chain && pass < IMPORT_ROW_CHOICE) {
+		if (chain && pass < FIELD_HISTORY) {
 			Database.executeBatch(new RecordRetentionBatch(pass + 1), CHUNK_SIZE);
 		}
 	}
@@ -146,6 +149,8 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 			return 'SELECT Id FROM Import_Row__c WHERE ' + batchDone;
 		} else if (pass == IMPORT_BATCHES) {
 			return 'SELECT Id FROM Import_Batch__c WHERE ' + importDone + ' ORDER BY CreatedDate';
+		} else if (pass == FIELD_HISTORY) {
+			return 'SELECT Id FROM Field_History__c WHERE CreatedDate < :cutoff ORDER BY CreatedDate';
 		}
 		// A pass whose setting keeps everything reads nothing.
 		String keepAll = daysFor(pass) == null ? 'Id = null AND ' : '';
@@ -172,6 +177,8 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 			return errorLogDays();
 		} else if (pass == IMPORT_ROW_CHOICE) {
 			return ImportBatchService.rowRetentionDays();
+		} else if (pass == FIELD_HISTORY) {
+			return fieldHistoryDays();
 		}
 		return importHistoryDays();
 	}
@@ -213,6 +220,10 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	public static Integer fieldUtilizationDays() {
 		return days('Field_Utilization_Retention_Days__c', 730, 90);
+	}
+
+	public static Integer fieldHistoryDays() {
+		return days('Field_History_Retention_Days__c', 730, 30);
 	}
 
 	/** How many days Error Log entries are kept; null (the setting is 0) keeps every entry. */

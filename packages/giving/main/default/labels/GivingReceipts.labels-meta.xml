@@ -1,150 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_Receipt_AlreadyVoid</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipt is already void</shortDescription>
-    <value>This receipt has already been voided. Look for the receipt that replaced it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_EmptyTemplate</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Template body is empty</shortDescription>
-    <value>A receipt letter cannot be empty. Type the letter you want donors to read, or restore the one BarnCRM ships.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_GiftAlreadyReceipted</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift already carries a receipt number</shortDescription>
-    <value>This gift has already been receipted. To correct the receipt, void it and reissue it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_GiftNotReceived</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Pending or cancelled gift cannot be receipted</shortDescription>
-    <value>A pending or cancelled gift cannot be receipted, because no money has arrived. Mark the gift Received first.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_GiftNotFound</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift could not be read</shortDescription>
-    <value>That gift could not be found, or you do not have access to it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NoActiveTemplate</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>No active template for this receipt type</shortDescription>
-    <value>No receipt letter is switched on for this kind of document. Open BarnCRM Settings, then Receipts, then Receipt templates, and switch one on.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NoPermission</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>User cannot issue receipts</shortDescription>
-    <value>You do not have permission to issue receipts. Ask your BarnCRM admin for the Fundraising Staff role.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NoTemplatePermission</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>User cannot change the receipt letters</shortDescription>
-    <value>You do not have permission to change the receipt letters. Ask your BarnCRM admin for the BarnCRM Admin role, which carries Manage BarnCRM Settings.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NotFound</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipt could not be read</shortDescription>
-    <value>That receipt could not be found, or you do not have access to it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NothingToRender</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Renderer received no content</shortDescription>
-    <value>There was nothing to put on the receipt. Check that a receipt letter is switched on.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_OrganizationIncomplete</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Organization legal name missing</shortDescription>
-    <value>A receipt has to state who issued it. Open BarnCRM Settings, then Organization, and fill in your legal name.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_ReissueNeedsGift</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Statements are reissued by running again</shortDescription>
-    <value>A year end statement is reissued by voiding it and running statements again for that donor, not from this button.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_RendererUnavailable</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Configured renderer is not installed in this org</shortDescription>
-    <value>The receipt renderer chosen in settings ({0}) is not available in this org. Clear the setting to use the one BarnCRM ships.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_SeriesIncomplete</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipt type or year missing</shortDescription>
-    <value>A receipt number needs both a receipt type and a statement year.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_SeriesUnavailable</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Number series could not be locked</shortDescription>
-    <value>Receipt numbers are in use by another job right now. Wait a moment and try again.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_TemplateNotFound</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Template could not be read</shortDescription>
-    <value>That receipt letter could not be found. Refresh the page and try again.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_UnknownRenderer</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Configured renderer is not one BarnCRM offers</shortDescription>
-    <value>The receipt renderer chosen in settings ({0}) is not one BarnCRM offers. Clear the setting to use the one BarnCRM ships.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_VoidNeedsReason</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Void needs a reason</shortDescription>
-    <value>Say why this receipt is being voided. A void needs a reason and a date.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_PanelTitle</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -233,14 +89,6 @@
     <value>Receipt Issued</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_IssuedMessage</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts panel: toast, receipt issued, with its number</shortDescription>
-    <value>Receipt {0} has been issued. Click View PDF beside it to open the file.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_NotIssuedTitle</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -265,35 +113,11 @@
     <value>Receipt Reissued</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_ReissuedMessage</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts panel: toast, voided number and replacement number</shortDescription>
-    <value>Receipt {0} has been voided and reissued as {1}. The original file is unchanged.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_NotReissuedTitle</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts panel: toast title, receipt not reissued</shortDescription>
     <value>Receipt Not Reissued</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_UnexpectedError</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts: an unexpected failure with no message</shortDescription>
-    <value>That did not work. Try again, and if it keeps happening, ask your BarnCRM admin to check the Error Log.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_LogoUnreadable</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Error Log warning: the receipt logo file cannot be read</shortDescription>
-    <value>The receipt logo file {0} could not be read, so documents are made without a logo. Check that the file exists and that people who issue receipts can see it.</value>
   </labels>
 </CustomLabels>

@@ -1,0 +1,324 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom34" data-id="card">
+      <div slot="actions" class="slds-grid slds-wrap slds-grid_vertical-align-end">
+        <lightning-combobox
+          class="slds-var-m-right_x-small"
+          label={labels.component}
+          options={componentOptions}
+          value={selectedId}
+          onchange={handlePick}
+          data-id="pick"
+        ></lightning-combobox>
+        <lightning-button-group>
+          <lightning-button label={labels.newComponent} onclick={handleNew} data-id="new"></lightning-button>
+          <lightning-button label={previewLabel} onclick={handlePreview} data-id="preview"></lightning-button>
+          <template lwc:if={showExport}>
+            <lightning-button label={labels.exportSource} onclick={handleExport} data-id="export"></lightning-button>
+          </template>
+          <lightning-button
+            variant="brand"
+            label={labels.save}
+            onclick={handleSave}
+            disabled={isSaving}
+            data-id="save"
+          ></lightning-button>
+        </lightning-button-group>
+      </div>
+
+      <div class="slds-var-p-horizontal_medium">
+        <p class="slds-text-color_weak slds-var-m-bottom_small">{labels.intro}</p>
+        <template lwc:if={errorMessage}>
+          <c-barn-notice
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+        <template lwc:if={hasProblems}>
+          <c-barn-notice variant="warning" title={labels.problems} data-id="problems" class="slds-var-m-bottom_small">
+          </c-barn-notice>
+          <ul class="slds-list_dotted slds-var-m-bottom_small">
+            <template for:each={problems} for:item="problem">
+              <li key={problem.key} data-id="problem">{problem.text}</li>
+            </template>
+          </ul>
+        </template>
+
+        <div class="slds-grid slds-wrap slds-gutters_small slds-var-m-bottom_small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+            <lightning-input label={labels.name} value={details.name} data-prop="name" onchange={handleDetail} required data-id="name"></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+            <lightning-input
+              label={labels.key}
+              field-level-help={labels.keyHelp}
+              value={details.key}
+              data-prop="key"
+              onchange={handleDetail}
+              required
+              data-id="key"
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+            <lightning-input
+              label={labels.objectName}
+              field-level-help={labels.objectHelp}
+              value={details.objectName}
+              data-prop="objectName"
+              onchange={handleDetail}
+              data-id="object"
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+            <lightning-input label={labels.description} value={details.description} data-prop="description" onchange={handleDetail}></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-var-p-top_large">
+            <lightning-input type="checkbox" label={labels.active} checked={details.active} data-prop="active" onchange={handleDetail}></lightning-input>
+          </div>
+        </div>
+
+        <template lwc:if={exportFiles}>
+          <section class="slds-var-m-bottom_medium" data-id="export-panel">
+            <p class="slds-var-m-bottom_small">{labels.exportIntro}</p>
+            <template for:each={exportFiles} for:item="file">
+              <div key={file.key} class="slds-var-m-bottom_small">
+                <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                  <span class="slds-text-title_bold">{file.name}</span>
+                  <lightning-button label={labels.download} data-name={file.name} onclick={handleDownload}></lightning-button>
+                </div>
+                <lightning-textarea label={file.name} variant="label-hidden" value={file.content} readonly data-id="export-file"></lightning-textarea>
+              </div>
+            </template>
+            <lightning-button label={labels.close} onclick={handleCloseExport}></lightning-button>
+          </section>
+        </template>
+
+        <template lwc:if={previewing}>
+          <lightning-input
+            class="slds-var-m-bottom_small"
+            label={labels.previewRecord}
+            value={previewRecordId}
+            onchange={handlePreviewRecord}
+            data-id="preview-record"
+          ></lightning-input>
+          <c-lwc-builder-renderer
+            definition={previewDefinition}
+            record-id={previewRecordId}
+            object-api-name={previewObject}
+            data-id="preview-view"
+          ></c-lwc-builder-renderer>
+        </template>
+        <template lwc:else>
+          <div class="slds-grid slds-wrap slds-gutters_small">
+            <!-- The block list: drag a block onto a column, or press it to add it to the selected column. -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+              <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.blocks}</h2>
+              <p class="slds-text-color_weak slds-text-body_small slds-var-m-bottom_x-small">{labels.blocksHelp}</p>
+              <template for:each={palette} for:item="item">
+                <div
+                  key={item.type}
+                  class="slds-var-m-bottom_xx-small"
+                  draggable="true"
+                  data-type={item.type}
+                  ondragstart={handlePaletteDrag}
+                >
+                  <lightning-button
+                    stretch
+                    label={item.label}
+                    data-type={item.type}
+                    onclick={handlePaletteAdd}
+                    data-id="palette"
+                  ></lightning-button>
+                </div>
+              </template>
+            </div>
+
+            <!-- The canvas -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12" data-id="canvas">
+              <template lwc:if={hasSections}>
+                <template for:each={canvas} for:item="section">
+                  <div key={section.id} class="slds-box slds-var-m-bottom_small" data-id="section">
+                    <div class="slds-grid slds-grid_vertical-align-end slds-var-m-bottom_x-small">
+                      <lightning-input
+                        class="slds-col"
+                        label={labels.sectionTitle}
+                        value={section.title}
+                        data-id={section.id}
+                        onchange={handleSectionTitle}
+                      ></lightning-input>
+                      <lightning-button-icon icon-name="utility:arrowup" alternative-text={labels.moveUp} disabled={section.isFirst} data-id={section.id} data-delta="-1" onclick={handleMove}></lightning-button-icon>
+                      <lightning-button-icon icon-name="utility:arrowdown" alternative-text={labels.moveDown} disabled={section.isLast} data-id={section.id} data-delta="1" onclick={handleMove}></lightning-button-icon>
+                      <lightning-button-icon icon-name="utility:delete" alternative-text={labels.remove} data-id={section.id} onclick={handleRemove}></lightning-button-icon>
+                      <lightning-button-menu
+                        alternative-text={labels.addRow}
+                        label={labels.addRow}
+                        data-id={section.id}
+                        onselect={handleAddRow}
+                        class="slds-var-m-left_x-small"
+                      >
+                        <template for:each={layoutOptions} for:item="option">
+                          <lightning-menu-item key={option.value} value={option.value} label={option.label}></lightning-menu-item>
+                        </template>
+                      </lightning-button-menu>
+                    </div>
+                    <template for:each={section.rows} for:item="row">
+                      <div key={row.id} class="slds-var-m-bottom_x-small" data-id="row">
+                        <div class="slds-grid slds-grid_vertical-align-end">
+                          <lightning-combobox
+                            class="slds-col"
+                            label={labels.layout}
+                            options={layoutOptions}
+                            value={row.layout}
+                            data-id={row.id}
+                            onchange={handleRowLayout}
+                          ></lightning-combobox>
+                          <lightning-button-icon icon-name="utility:arrowup" alternative-text={labels.moveUp} disabled={row.isFirst} data-id={row.id} data-delta="-1" onclick={handleMove}></lightning-button-icon>
+                          <lightning-button-icon icon-name="utility:arrowdown" alternative-text={labels.moveDown} disabled={row.isLast} data-id={row.id} data-delta="1" onclick={handleMove}></lightning-button-icon>
+                          <lightning-button-icon icon-name="utility:delete" alternative-text={labels.remove} data-id={row.id} onclick={handleRemove}></lightning-button-icon>
+                        </div>
+                        <div class="slds-grid slds-wrap">
+                          <template for:each={row.columns} for:item="column">
+                            <div key={column.id} class={column.css}>
+                              <div
+                                class={column.zoneCss}
+                                data-column={column.id}
+                                onclick={handleSelectColumn}
+                                ondragover={handleDragOver}
+                                ondrop={handleDrop}
+                                data-id="column"
+                              >
+                                <template lwc:if={column.isEmpty}>
+                                  <p class="slds-text-color_weak slds-text-align_center">{labels.dropHere}</p>
+                                </template>
+                                <template for:each={column.blocks} for:item="block">
+                                  <div
+                                    key={block.id}
+                                    class={block.css}
+                                    draggable="true"
+                                    role="button"
+                                    tabindex="0"
+                                    data-block={block.id}
+                                    data-column={block.columnId}
+                                    onclick={handleSelectBlock}
+                                    ondragstart={handleBlockDrag}
+                                    ondragover={handleDragOver}
+                                    ondrop={handleDrop}
+                                    data-id="block"
+                                  >
+                                    <span class="slds-text-title_bold">{block.label}</span>
+                                    <template lwc:if={block.hasRule}>
+                                      <lightning-icon icon-name="utility:hide" size="xx-small" class="slds-var-m-left_xx-small" alternative-text={labels.visibility}></lightning-icon>
+                                    </template>
+                                    <div class="slds-truncate">{block.title}</div>
+                                  </div>
+                                </template>
+                              </div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </template>
+              <template lwc:else>
+                <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="empty-canvas">{labels.emptyCanvas}</p>
+              </template>
+              <lightning-button label={labels.addSection} icon-name="utility:add" onclick={handleAddSection} data-id="add-section"></lightning-button>
+            </div>
+
+            <!-- The selected block's properties -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12" data-id="properties">
+              <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.properties}</h2>
+              <template lwc:if={form}>
+                <p class="slds-var-m-bottom_x-small">{form.typeLabel}</p>
+                <lightning-input label={labels.blockTitle} value={form.title} data-prop="title" onchange={handleBlockProp} data-id="prop-title"></lightning-input>
+
+                <template lwc:if={form.isFields}>
+                  <lightning-input label={labels.fields} field-level-help={labels.fieldsHelp} value={form.fieldsText} data-prop="fields" onchange={handleBlockProp} data-id="prop-fields"></lightning-input>
+                  <lightning-input type="checkbox" label={labels.twoColumns} checked={form.isTwoColumns} data-prop="columns" onchange={handleBlockProp}></lightning-input>
+                </template>
+
+                <template lwc:if={form.isList}>
+                  <lightning-input label={labels.object} value={form.object} data-prop="object" onchange={handleBlockProp} data-id="prop-object"></lightning-input>
+                  <template lwc:if={form.isRelatedList}>
+                    <lightning-input label={labels.parentField} value={form.parentField} data-prop="parentField" onchange={handleBlockProp}></lightning-input>
+                  </template>
+                  <lightning-input label={labels.fields} field-level-help={labels.fieldsHelp} value={form.fieldsText} data-prop="fields" onchange={handleBlockProp}></lightning-input>
+                  <template lwc:if={form.isRecordList}>
+                    <lightning-input label={labels.filterField} value={form.filterField} data-prop="filterField" onchange={handleBlockProp}></lightning-input>
+                    <lightning-combobox label={labels.filterOperator} options={filterOptions} value={form.filterOperator} data-prop="filterOperator" onchange={handleBlockProp}></lightning-combobox>
+                    <lightning-input label={labels.filterValue} value={form.filterValue} data-prop="filterValue" onchange={handleBlockProp}></lightning-input>
+                  </template>
+                  <lightning-input label={labels.orderBy} value={form.orderBy} data-prop="orderBy" onchange={handleBlockProp}></lightning-input>
+                  <lightning-input type="checkbox" label={labels.descending} checked={form.isDescending} data-prop="direction" onchange={handleBlockProp}></lightning-input>
+                </template>
+
+                <template lwc:if={form.isChart}>
+                  <lightning-input label={labels.report} field-level-help={labels.reportHelp} value={form.report} data-prop="report" onchange={handleBlockProp} data-id="prop-report"></lightning-input>
+                </template>
+
+                <template lwc:if={form.isText}>
+                  <lightning-input-rich-text label={labels.body} label-visible value={form.body} data-prop="body" onchange={handleBlockProp}></lightning-input-rich-text>
+                </template>
+
+                <template lwc:if={form.isImage}>
+                  <lightning-input label={labels.url} field-level-help={labels.urlHelp} value={form.url} data-prop="url" onchange={handleBlockProp}></lightning-input>
+                  <lightning-input label={labels.altText} value={form.altText} data-prop="altText" onchange={handleBlockProp}></lightning-input>
+                </template>
+
+                <template lwc:if={form.isAction}>
+                  <lightning-input label={labels.buttonLabel} value={form.label} data-prop="label" onchange={handleBlockProp}></lightning-input>
+                  <lightning-combobox label={labels.kind} options={kindOptions} value={form.kind} data-prop="kind" onchange={handleBlockProp}></lightning-combobox>
+                  <template lwc:if={form.isQuickAction}>
+                    <lightning-input label={labels.actionName} value={form.actionName} data-prop="actionName" onchange={handleBlockProp}></lightning-input>
+                  </template>
+                  <template lwc:if={form.isFlow}>
+                    <lightning-input label={labels.flowName} value={form.flowName} data-prop="flowName" onchange={handleBlockProp}></lightning-input>
+                    <lightning-input type="checkbox" label={labels.passRecordId} checked={form.passRecordId} data-prop="passRecordId" onchange={handleBlockProp}></lightning-input>
+                  </template>
+                </template>
+
+                <h3 class="slds-text-title_bold slds-var-m-top_small">{labels.visibility}</h3>
+                <p class="slds-text-color_weak slds-text-body_small">{labels.visibilityHelp}</p>
+                <lightning-combobox label={labels.visibility} variant="label-hidden" options={ruleOptions} value={form.rule.type} data-prop="type" onchange={handleRuleProp} data-id="rule-type"></lightning-combobox>
+                <template lwc:if={form.ruleIsField}>
+                  <lightning-input label={labels.ruleField} value={form.rule.field} data-prop="field" onchange={handleRuleProp}></lightning-input>
+                  <lightning-combobox label={labels.ruleOperator} options={operatorOptions} value={form.rule.operator} data-prop="operator" onchange={handleRuleProp}></lightning-combobox>
+                  <template lwc:if={form.ruleNeedsValue}>
+                    <lightning-input label={labels.ruleValue} value={form.rule.value} data-prop="value" onchange={handleRuleProp}></lightning-input>
+                  </template>
+                </template>
+                <template lwc:if={form.ruleIsPermission}>
+                  <lightning-input label={labels.rulePermission} value={form.rule.permission} data-prop="permission" onchange={handleRuleProp}></lightning-input>
+                  <lightning-input type="checkbox" label={labels.ruleLacks} checked={form.ruleLacks} data-prop="has" onchange={handleRuleProp}></lightning-input>
+                </template>
+
+                <div class="slds-var-m-top_small">
+                  <lightning-button-group>
+                    <lightning-button-icon icon-name="utility:arrowup" alternative-text={labels.moveUp} data-direction="up" onclick={handleNudge} data-id="nudge-up"></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:arrowdown" alternative-text={labels.moveDown} data-direction="down" onclick={handleNudge}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:back" alternative-text={labels.moveLeft} data-direction="left" onclick={handleNudge}></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:forward" alternative-text={labels.moveRight} data-direction="right" onclick={handleNudge} data-id="nudge-right"></lightning-button-icon>
+                  </lightning-button-group>
+                  <lightning-button
+                    class="slds-var-m-left_x-small"
+                    variant="destructive-text"
+                    label={labels.remove}
+                    data-id={form.id}
+                    onclick={handleRemove}
+                  ></lightning-button>
+                </div>
+              </template>
+              <template lwc:else>
+                <p class="slds-text-color_weak" data-id="no-selection">{labels.noSelection}</p>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

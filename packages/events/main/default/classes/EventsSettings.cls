@@ -16,6 +16,17 @@ public with sharing class EventsSettings {
 	public static final String DEFAULT_ACCEPT_NOTICE_TEMPLATE = 'BarnCRM_Speaker_Accepted';
 	public static final String DEFAULT_DECLINE_NOTICE_TEMPLATE = 'BarnCRM_Speaker_Declined';
 	public static final String DEFAULT_SURVEY_TEMPLATE = 'BarnCRM_Event_Survey';
+	public static final String DEFAULT_PAYMENT_LINK_TEMPLATE = 'BarnCRM_Event_Payment_Link';
+
+	/** EV-20: whether a form registration that owes money waits for an online payment. Ships off. */
+	public static Boolean onlinePayments() {
+		return flag('Online_Payments__c');
+	}
+
+	/** EV-20: the payment link email template's unique name. */
+	public static String paymentLinkTemplate() {
+		return textOr('Payment_Link_Template__c', DEFAULT_PAYMENT_LINK_TEMPLATE);
+	}
 
 	/** R-SA5: the unique name of the email template for an accepted application. */
 	public static String acceptNoticeTemplate() {
@@ -40,6 +51,16 @@ public with sharing class EventsSettings {
 	/** Whether the morning run marks people still Registered after an event as No-Show. Ships off. */
 	public static Boolean markNoShows() {
 		return flag('Mark_No_Shows__c');
+	}
+
+	/** R-AMS1: whether connected attendees may message each other in the attendee app. Ships off. */
+	public static Boolean attendeeMessages() {
+		return flag('Attendee_Messages__c');
+	}
+
+	/** R-AGI1: whether an overlapping agenda pick is let through and marked. Ships off. */
+	public static Boolean allowAgendaOverlaps() {
+		return flag('Allow_Agenda_Overlaps__c');
 	}
 
 	/** How many days before an event its reminder goes out, 1 to 30. */

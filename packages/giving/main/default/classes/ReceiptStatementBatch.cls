@@ -87,7 +87,7 @@ public with sharing class ReceiptStatementBatch implements Database.Batchable<SO
 			Label.Giving_JobNotice_Statements,
 			false,
 			String.format(
-				Label.Giving_JobNotice_StatementsBody,
+				BarnHelp.text('Giving', 'Giving_JobNotice_StatementsBody'),
 				new List<Object>{
 					donorsProcessed.format(),
 					receiptsIssued.format(),

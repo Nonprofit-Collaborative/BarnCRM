@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Poll_Time_3__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>A candidate time for the availability poll.</inlineHelpText>
+  <label>Poll Time 3</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

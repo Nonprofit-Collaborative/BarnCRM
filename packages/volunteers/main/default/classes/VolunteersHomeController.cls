@@ -38,6 +38,9 @@ public with sharing class VolunteersHomeController {
 		/** The app page tab the figure opens, when it opens one instead of a list view. */
 		@AuraEnabled
 		public String tabName;
+		/** The ISO currency code of a money figure (V-12), or null for a count. */
+		@AuraEnabled
+		public String currencyCode;
 	}
 
 	@AuraEnabled
@@ -68,6 +71,19 @@ public with sharing class VolunteersHomeController {
 		month.objectApiName = hoursObject;
 		month.filterName = 'All_Volunteer_Hours';
 		addIfRead(tiles, month);
+
+		// V-12 (R-VP5): this month's hours times Hour Value, shown only; left out at 0.
+		Decimal rate = VolunteerSettings.hourValue();
+		if (month.value != null && rate > 0) {
+			Tile worth = new Tile();
+			worth.name = 'hoursValueThisMonth';
+			worth.label = Label.Volunteers_Home_HoursValueThisMonth;
+			worth.value = (month.value * rate).setScale(2);
+			worth.currencyCode = UserInfo.getDefaultCurrency();
+			worth.objectApiName = hoursObject;
+			worth.filterName = 'All_Volunteer_Hours';
+			tiles.add(worth);
+		}
 
 		Tile waiting = new Tile();
 		waiting.name = 'hoursToApprove';

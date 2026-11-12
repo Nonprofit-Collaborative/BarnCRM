@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Salesforce Records Sync</label>
+  <description>
+    Opens the Campaign sync, Opportunity mirror and Gift Transaction mirror pages and edits the IDs
+    they keep. The Salesforce objects need their own access in Setup. Replaces Campaign Sync,
+    Opportunity Mirror and Gift Transaction Mirror.
+  </description>
+  <classAccesses>
+    <apexClass>CampaignSyncController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GiftTransactionMirrorController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>OpportunityMirrorController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Use_Gift_Transaction_Mirror</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Use_Opportunity_Mirror</name>
+  </customPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Appeal__c.Campaign_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Fund__c.Gift_Designation_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Gift__c.Gift_Transaction_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Gift__c.Opportunity_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <tabSettings>
+    <tab>Campaign_Sync</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Gift_Transaction_Mirror</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Opportunity_Mirror</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

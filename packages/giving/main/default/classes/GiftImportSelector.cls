@@ -32,6 +32,18 @@ public with sharing class GiftImportSelector {
 		];
 	}
 
+	/** C-47d: the brands a file could mean by these words, by identifier or by name. */
+	public static List<Brand__c> selectBrandsNamed(Set<String> words) {
+		Set<Id> ids = idsAmong(words);
+		return [
+			SELECT Id, Name
+			FROM Brand__c
+			WHERE Id IN :ids OR Name IN :words
+			WITH USER_MODE
+			LIMIT 2000
+		];
+	}
+
 	/**
 	 * The soft credits already on these gifts, the automatic household ones included. The
 	 * gifts are the ones this import just made and soft credits share their gift's access, so

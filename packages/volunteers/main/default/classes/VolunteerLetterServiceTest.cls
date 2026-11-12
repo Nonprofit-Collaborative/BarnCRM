@@ -162,7 +162,7 @@ private class VolunteerLetterServiceTest {
 		Volunteer_Letter_Template__c template = new Volunteer_Letter_Template__c(
 			Name = 'Proof',
 			Type__c = VolunteerLetterTemplates.TYPE_HOURS_LETTER,
-			Body__c = '{OrganizationName}|{PersonName}|{FirstName}|{Hours}|{JobList}|{Typo}',
+			Body__c = '{OrganizationName}|{PersonName}|{FirstName}|{Hours}|{HoursValue}|{HourValue}|{JobList}|{Typo}',
 			Active__c = true
 		);
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
@@ -193,6 +193,12 @@ private class VolunteerLetterServiceTest {
 		Assert.isTrue(body.startsWith('Barn &amp; &lt;Co&gt;|'), body);
 		Assert.isTrue(body.contains('&lt;b&gt;Ruiz&lt;/b&gt;'), 'The name is escaped: ' + body);
 		Assert.isTrue(body.contains('|{Hours}|2|'), 'A value is never merged twice: ' + body);
+		String hoursValue = VolunteerLetterService.money(2 * VolunteerSettings.DEFAULT_HOUR_VALUE);
+		String hourValue = VolunteerLetterService.money(VolunteerSettings.DEFAULT_HOUR_VALUE);
+		Assert.isTrue(
+			body.contains('|2|' + hoursValue.escapeHtml4() + '|' + hourValue.escapeHtml4() + '|'),
+			'V-12: {HoursValue} is the hours times Hour Value, {HourValue} the rate: ' + body
+		);
 		Assert.isTrue(body.contains('&lt;script&gt;'), 'The job is escaped: ' + body);
 		Assert.isFalse(body.contains('<script>'), 'No markup from a value: ' + body);
 		Assert.isTrue(body.endsWith('|{Typo}'), 'An unknown token is left as typed: ' + body);
@@ -221,12 +227,12 @@ private class VolunteerLetterServiceTest {
 
 		Assert.isTrue(outcome.versionIds.isEmpty(), 'No file is made.');
 		Assert.areEqual(
-			Label.Volunteers_Letter_NoHours,
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours'),
 			outcome.skipped.get(person.Id),
 			'No hours.'
 		);
 		Assert.areEqual(
-			Label.Volunteers_Letter_NotAPerson,
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NotAPerson'),
 			outcome.skipped.get(household.Id),
 			'A household is not a person.'
 		);
@@ -271,9 +277,21 @@ private class VolunteerLetterServiceTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Volunteers_Letter_NeedManagePermission, byStaff, 'Staff cannot.');
-		Assert.areEqual(Label.Volunteers_Letter_NeedManagePermission, flow, 'Nor from a flow.');
-		Assert.areEqual(Label.Volunteers_Letter_BadPeriod, reversed, 'From after To is refused.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission'),
+			byStaff,
+			'Staff cannot.'
+		);
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission'),
+			flow,
+			'Nor from a flow.'
+		);
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'),
+			reversed,
+			'From after To is refused.'
+		);
 	}
 
 	@IsTest
@@ -316,7 +334,7 @@ private class VolunteerLetterServiceTest {
 
 		Assert.areEqual(6, refusals.size(), 'Every bad period is refused by both entry points.');
 		Assert.areEqual(
-			new Set<String>{ Label.Volunteers_Letter_BadPeriod },
+			new Set<String>{ BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod') },
 			new Set<String>(refusals),
 			'With the plain period message.'
 		);
@@ -431,5 +449,73 @@ private class VolunteerLetterServiceTest {
 
 		Assert.isNull(letter.skipReason, 'A person account is a person: ' + letter.skipReason);
 		Assert.isTrue(letter.body.contains(' 6 hours'), letter.body);
+	}
+
+	@IsTest
+	static void aLetterForOneBrandsJobsPrintsThatBrandAndMixedBrandsPrintTheOrganization() {
+		List<Contact> people;
+		Volunteer_Letter_Template__c template = new Volunteer_Letter_Template__c(
+			Name = 'Brand Proof',
+			Type__c = VolunteerLetterTemplates.TYPE_HOURS_LETTER,
+			Body__c = '{BrandName}|{OrganizationName}|{OrganizationAddress}|{BrandPhone}|{BrandSignature}|{BrandLogo}',
+			Active__c = true
+		);
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Brand_Management__c = true;
+			TestDataFactory.saveSettings(settings);
+			Legal_Entity__c entity = new Legal_Entity__c(Name = 'Thrift LLC');
+			insert entity;
+			Brand__c thrift = new Brand__c(
+				Name = 'Barn Thrift',
+				Legal_Entity__c = entity.Id,
+				Phone__c = '555-0100',
+				City__c = 'Shelbyville',
+				Letter_Signature__c = 'Ana Ruiz\nManager'
+			);
+			insert thrift;
+			Volunteer_Job__c sorting = VolunteersTestData.job('Sorting');
+			sorting.Brand__c = thrift.Id;
+			update sorting;
+			people = ownedContacts(2);
+			insert new List<Volunteer_Hours__c>{
+				VolunteersTestData.newHours(people[0].Id, sorting.Id, 3),
+				VolunteersTestData.newHours(people[1].Id, sorting.Id, 1),
+				VolunteersTestData.newHours(
+					people[1].Id,
+					[SELECT Id FROM Volunteer_Job__c WHERE Name = 'Food pantry'].Id,
+					2
+				)
+			};
+			insert template;
+		}
+		Map<Id, String> bodies = new Map<Id, String>();
+
+		Test.startTest();
+		System.runAs(user(COORDINATOR)) {
+			for (
+				VolunteerLetterService.Letter letter : VolunteerLetterService.mergeLetters(
+					idsOf(people),
+					template.Id,
+					FROM_DATE,
+					TO_DATE
+				)
+			) {
+				bodies.put(letter.personId, letter.body);
+			}
+		}
+		Test.stopTest();
+
+		Assert.areEqual(
+			'Barn Thrift|Thrift LLC|Shelbyville|555-0100|Ana Ruiz<br/>Manager|',
+			bodies.get(people[0].Id),
+			'One brand prints its name, entity, address, phone and signature'
+		);
+		Assert.isTrue(
+			bodies.get(people[1].Id)
+				.startsWith('Barn &amp; &lt;Co&gt;|Barn &amp; &lt;Co&gt;|1 Main St'),
+			'Jobs of two brands (one unbranded, no default) print the organization: ' +
+			bodies.get(people[1].Id)
+		);
 	}
 }

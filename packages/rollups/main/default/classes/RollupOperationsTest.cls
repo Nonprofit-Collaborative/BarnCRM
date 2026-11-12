@@ -368,7 +368,7 @@ private class RollupOperationsTest {
 				'Any into a checkbox'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorTargetNeedsCheckbox,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsCheckbox'),
 				RollupPlanner.targetTypeProblem('NONE', Schema.DisplayType.DOUBLE),
 				'None into a number'
 			);
@@ -377,12 +377,12 @@ private class RollupOperationsTest {
 				'A list into long text'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorTargetNeedsText,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsText'),
 				RollupPlanner.targetTypeProblem('TEXT_LIST_DISTINCT', Schema.DisplayType.DATE),
 				'A list into a date'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorTargetNeedsNumber,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsNumber'),
 				RollupPlanner.targetTypeProblem('COUNT_DISTINCT', Schema.DisplayType.STRING),
 				'Count distinct into text'
 			);
@@ -391,17 +391,17 @@ private class RollupOperationsTest {
 				'Last into text'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorTextTarget,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTextTarget'),
 				RollupPlanner.targetTypeProblem('SUM', Schema.DisplayType.STRING),
 				'A sum into text'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorCheckboxTarget,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorCheckboxTarget'),
 				RollupPlanner.targetTypeProblem('COUNT', Schema.DisplayType.BOOLEAN),
 				'A count into a checkbox'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorPicklistTarget,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorPicklistTarget'),
 				RollupPlanner.targetTypeProblem('MAX', Schema.DisplayType.PICKLIST),
 				'A maximum into a picklist'
 			);

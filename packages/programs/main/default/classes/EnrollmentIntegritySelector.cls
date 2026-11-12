@@ -11,7 +11,8 @@
  */
 public without sharing class EnrollmentIntegritySelector {
 	/**
-	 * The open enrollments (Applied or Enrolled) in these programs that name one of these people.
+	 * The open enrollments (Applied, Enrolled or Waitlisted) in these programs that name one of
+	 * these people.
 	 */
 	public static List<Enrollment__c> selectOpenFor(
 		Set<Id> programIds,
@@ -21,7 +22,7 @@ public without sharing class EnrollmentIntegritySelector {
 		if (programIds == null || programIds.isEmpty()) {
 			return new List<Enrollment__c>();
 		}
-		Set<String> openStages = EnrollmentService.OPEN_STAGES;
+		Set<String> openStages = EnrollmentService.ONE_PER_PERSON;
 		return [
 			SELECT Id, Program__c, Contact__c, Account__c
 			FROM Enrollment__c

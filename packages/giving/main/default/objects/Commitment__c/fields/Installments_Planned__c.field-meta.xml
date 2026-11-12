@@ -3,7 +3,7 @@
     <fullName>Installments_Planned__c</fullName>
     <description>How many installments the pledge is paid in.</description>
     <inlineHelpText>Leave empty to divide the expected total by the amount.</inlineHelpText>
-    <label>Installments Planned</label>
+    <label>Payments Planned</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

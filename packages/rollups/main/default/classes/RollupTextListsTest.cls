@@ -449,7 +449,7 @@ private class RollupTextListsTest {
 			custom.Custom_Delimiter__c = null;
 			Assert.areEqual(', ', RollupPlanner.separatorOf(custom), 'Comma if it went missing');
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorCustomDelimiterNeeded,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorCustomDelimiterNeeded'),
 				RollupPlanner.saveProblem(custom),
 				'Custom with nothing to write is refused'
 			);

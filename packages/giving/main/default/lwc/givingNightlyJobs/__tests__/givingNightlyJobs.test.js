@@ -3,6 +3,17 @@ import GivingNightlyJobs from 'c/givingNightlyJobs';
 import getJobs from '@salesforce/apex/GivingJobsController.getJobs';
 import setSchedule from '@salesforce/apex/GivingJobsController.setSchedule';
 import runNow from '@salesforce/apex/GivingJobsController.runNow';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_NightlyJobs_NotScheduled:
+    'The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own.',
+  Giving_NightlyJobs_RunNowStarted:
+    'The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did.',
+  Giving_NightlyJobs_ScheduleActive: 'The nightly jobs are scheduled.',
+  Giving_NightlyJobs_Stale:
+    'This job was due and did not record a run. Open the Error Log to see why.'
+});
 
 jest.mock(
   '@salesforce/apex/GivingJobsController.getJobs',
@@ -26,21 +37,6 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
 });
 
 jest.mock(
-  '@salesforce/label/c.Giving_NightlyJobs_ScheduleActive',
-  () => ({ default: 'The nightly jobs are scheduled.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_NightlyJobs_NotScheduled',
-  () => ({
-    default:
-      'The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
   '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton',
   () => ({ default: 'Schedule nightly run' }),
   { virtual: true }
@@ -49,21 +45,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Giving_NightlyJobs_StopButton',
   () => ({ default: 'Stop nightly run' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_NightlyJobs_RunNowStarted',
-  () => ({
-    default:
-      'The top up and the overdue pass have started. Refresh this page in a minute to see what they did.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_NightlyJobs_Stale',
-  () => ({ default: 'This job was due and did not record a run. Open the Error Log to see why.' }),
   { virtual: true }
 );
 
@@ -224,7 +205,7 @@ describe('c-giving-nightly-jobs', () => {
 
     expect(runNow).toHaveBeenCalled();
     expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toBe(
-      'The top up and the overdue pass have started. Refresh this page in a minute to see what they did.'
+      'The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did.'
     );
   });
 

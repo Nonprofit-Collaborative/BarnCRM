@@ -5,6 +5,7 @@
  * nothing from a record is read as HTML.
  */
 import { MESSAGES, errorText } from './messages.js';
+import { toCsv, toIcs } from './pageFiles.js';
 
 const INPUT_TYPES = {
   email: 'email',
@@ -126,6 +127,27 @@ function valueOf(input) {
   return input.value === '' ? null : input.value;
 }
 
+/** Hands the person a file made in the browser; nothing is sent anywhere. */
+function saveFile(name, type, text) {
+  if (typeof URL.createObjectURL !== 'function') {
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const link = el('a', { href: url, download: name });
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+/** True where the browser can read a QR code from the camera itself. */
+function canScan() {
+  return (
+    typeof window.BarcodeDetector === 'function' &&
+    typeof navigator.mediaDevices?.getUserMedia === 'function'
+  );
+}
+
 /** The form's values; with `before`, only those changed since, so untouched fields are kept. */
 function valuesOf(form, fields, before) {
   const values = {};
@@ -142,6 +164,35 @@ function valuesOf(form, fields, before) {
   return values;
 }
 
+const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+
+/**
+ * The portal's brand (C-47b): its colors as CSS variables on the root, and its name and contact
+ * lines in a footer. Null when the portal has no brand.
+ * @param {HTMLElement} root the portal's element
+ * @param {object} [brand] the brand from the menu
+ * @returns {HTMLElement|null} the footer
+ */
+export function brandFooter(root, brand) {
+  if (!brand) {
+    return null;
+  }
+  [
+    ['--barn-portal-primary', brand.primaryColor],
+    ['--barn-portal-secondary', brand.secondaryColor]
+  ].forEach(([name, value]) => {
+    if (HEX_COLOR.test(value || '')) {
+      root.style.setProperty(name, value);
+    }
+  });
+  const lines = [brand.name, ...(brand.address || []), brand.phone, brand.website];
+  return el(
+    'footer',
+    { class: 'barn-portal-brand' },
+    lines.filter(Boolean).map((line) => el('p', { text: line }))
+  );
+}
+
 /**
  * Shows the portal in `root`.
  * @param {HTMLElement} root the element to fill
@@ -151,7 +202,7 @@ function valuesOf(form, fields, before) {
  * @returns {Promise<void>} once the first screen is shown
  */
 export function mountPortal(root, { api, messages = MESSAGES }) {
-  const state = { challenge: null, menu: null, pageKey: null };
+  const state = { challenge: null, menu: null, pageKey: null, stopScan: null };
 
   function focusFirst(container) {
     const focusable = container.querySelector('input, select, textarea, button');
@@ -161,6 +212,10 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
   }
 
   function show(...nodes) {
+    // A camera left on by a scan is turned off whenever the screen changes.
+    if (state.stopScan) {
+      state.stopScan();
+    }
     root.replaceChildren(...nodes.filter(Boolean));
     focusFirst(root);
   }
@@ -282,6 +337,55 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     );
   }
 
+  /**
+   * A Scan button that fills `input` from a QR code, read by the browser's own detector from the
+   * camera; null where the browser cannot, and the person types the code instead.
+   */
+  function scanButton(input, alertSlot) {
+    if (!canScan()) {
+      return null;
+    }
+    const area = el('div', { class: 'barn-portal-scan' });
+    const start = el('button', {
+      type: 'button',
+      text: messages.scan,
+      onClick: () =>
+        navigator.mediaDevices
+          .getUserMedia({ video: { facingMode: 'environment' } })
+          .then((stream) => {
+            const video = el('video', { autoplay: true, playsinline: true, muted: true });
+            video.srcObject = stream;
+            const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+            const timer = setInterval(() => {
+              detector
+                .detect(video)
+                .then((codes) => {
+                  if (codes.length > 0 && state.stopScan) {
+                    input.value = codes[0].rawValue;
+                    state.stopScan();
+                    input.focus();
+                  }
+                })
+                .catch(() => undefined);
+            }, 300);
+            state.stopScan = () => {
+              clearInterval(timer);
+              stream.getTracks().forEach((track) => track.stop());
+              state.stopScan = null;
+              area.replaceChildren(start);
+            };
+            area.replaceChildren(
+              el('p', { text: messages.scanHint }),
+              video,
+              el('button', { type: 'button', text: messages.stopScan, onClick: state.stopScan })
+            );
+          })
+          .catch(() => alertSlot.replaceChildren(alertBox(messages.scanFailed)))
+    });
+    area.appendChild(start);
+    return area;
+  }
+
   function recordForm(page, record, alertSlot, onDone) {
     const editable = page.fields.filter((f) => f.edit);
     const values = record ? record.values : {};
@@ -297,7 +401,14 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     editable.forEach((field, i) => {
       const id = 'barn-portal-' + (record ? record.id : 'new') + '-' + i;
       form.appendChild(el('label', { for: id, text: field.label + (field.required ? ' *' : '') }));
-      form.appendChild(inputFor(field, values[field.field], id));
+      const input = inputFor(field, values[field.field], id);
+      form.appendChild(input);
+      if (field.scan) {
+        const scan = scanButton(input, alertSlot);
+        if (scan) {
+          form.appendChild(scan);
+        }
+      }
     });
     form.appendChild(el('button', { type: 'submit', text: messages.save }));
     form.appendChild(el('button', { type: 'button', text: messages.cancel, onClick: onDone }));
@@ -311,7 +422,15 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     const list = el('dl');
     page.fields.forEach((field) => {
       list.appendChild(el('dt', { text: field.label }));
-      list.appendChild(el('dd', { text: display(field, record.values[field.field], messages) }));
+      const value = record.values[field.field];
+      // A secure link (a signed form link, for example) opens; any other address stays text.
+      const secure =
+        field.type === 'url' && typeof value === 'string' && value.startsWith('https://');
+      list.appendChild(
+        secure
+          ? el('dd', {}, [el('a', { href: value, text: field.label })])
+          : el('dd', { text: display(field, value, messages) })
+      );
     });
     const buttons = el('div', { class: 'barn-portal-actions' });
     if (page.canUpdate && page.fields.some((f) => f.edit)) {
@@ -377,7 +496,56 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
         if (page.records.length === 0) {
           body.appendChild(el('p', { text: messages.nothingHere }));
         }
-        page.records.forEach((record) => body.appendChild(recordCard(page, record, alertSlot)));
+        const cards = page.records.map((record) => {
+          const card = recordCard(page, record, alertSlot);
+          body.appendChild(card);
+          return { card, text: Object.values(record.values).join(' ').toLowerCase() };
+        });
+        // A searchable page (PB-09) filters the records already sent: no second read.
+        if (page.search && cards.length > 0) {
+          const box = el('input', {
+            type: 'search',
+            class: 'barn-portal-search',
+            'aria-label': messages.search,
+            placeholder: messages.search
+          });
+          box.addEventListener('input', () => {
+            const words = box.value.toLowerCase().trim().split(/\s+/);
+            cards.forEach(({ card, text }) => {
+              card.hidden = !words.every((word) => text.includes(word));
+            });
+          });
+          body.prepend(box);
+        }
+        // Add to Calendar and Download CSV use the records shown (after any search).
+        const shown = () => page.records.filter((record, i) => !cards[i].card.hidden);
+        const tools = el('div', { class: 'barn-portal-actions' });
+        if (page.calendar && page.records.length > 0) {
+          tools.appendChild(
+            el('button', {
+              type: 'button',
+              text: messages.addToCalendar,
+              onClick: () => saveFile(key + '.ics', 'text/calendar', toIcs(page, shown()))
+            })
+          );
+        }
+        if (page.download && page.records.length > 0) {
+          tools.appendChild(
+            el('button', {
+              type: 'button',
+              text: messages.downloadCsv,
+              onClick: () =>
+                saveFile(
+                  key + '.csv',
+                  'text/csv',
+                  toCsv(page, shown(), (field, value) => display(field, value, messages))
+                )
+            })
+          );
+        }
+        if (tools.childNodes.length > 0) {
+          body.appendChild(tools);
+        }
         if (page.canCreate) {
           body.appendChild(
             el('button', {
@@ -399,7 +567,8 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
           nav(),
           heading,
           alertSlot,
-          body
+          body,
+          brandFooter(root, state.menu.brand)
         );
         // A new page starts at its heading, so a screen reader says which page opened.
         heading.focus();

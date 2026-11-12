@@ -191,7 +191,10 @@ private class AccountingExportServiceTest {
 				false
 			);
 
-			Assert.areEqual(Label.Mirror_AccountingExport_ErrorTooManyRows, refusal);
+			Assert.areEqual(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorTooManyRows'),
+				refusal
+			);
 			Assert.areEqual(5, atTheLimit.rowCount, 'Exactly the limit is still a file.');
 		}
 	}
@@ -217,19 +220,15 @@ private class AccountingExportServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Id notAFund = [SELECT Id FROM Contact LIMIT 1].Id;
 			Map<String, List<Object>> cases = new Map<String, List<Object>>{
-				Label.Mirror_AccountingExport_ErrorDatesRequired => new List<Object>{
-					null,
-					AUGUST_LAST,
-					null,
-					null
-				},
-				Label.Mirror_AccountingExport_ErrorDateOrder => new List<Object>{
-					AUGUST_LAST,
-					AUGUST_FIRST,
-					null,
-					null
-				},
-				Label.Mirror_AccountingExport_ErrorFund => new List<Object>{
+				BarnHelp.text(
+					'Mirror',
+					'Mirror_AccountingExport_ErrorDatesRequired'
+				) => new List<Object>{ null, AUGUST_LAST, null, null },
+				BarnHelp.text(
+					'Mirror',
+					'Mirror_AccountingExport_ErrorDateOrder'
+				) => new List<Object>{ AUGUST_LAST, AUGUST_FIRST, null, null },
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorFund') => new List<Object>{
 					AUGUST_FIRST,
 					AUGUST_LAST,
 					notAFund,
@@ -318,11 +317,14 @@ private class AccountingExportServiceTest {
 			}
 
 			Assert.areEqual(
-				Label.Mirror_AccountingExport_NoExportPermission,
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_NoExportPermission'),
 				exportRefusal,
 				'Giving Admin can see every gift but does not hold Export Accounting.'
 			);
-			Assert.areEqual(Label.Mirror_AccountingExport_NoExportPermission, markRefusal);
+			Assert.areEqual(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_NoExportPermission'),
+				markRefusal
+			);
 		}
 	}
 
@@ -373,7 +375,7 @@ private class AccountingExportServiceTest {
 		Assert.areEqual(5, view.rowCount);
 		Assert.areEqual(410, view.total);
 		Assert.areEqual(64, view.digest.length(), 'A SHA-256 in hex');
-		Assert.areEqual(Label.Mirror_AccountingExport_ErrorDateOrder, refusal);
+		Assert.areEqual(BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorDateOrder'), refusal);
 		Assert.areEqual(
 			BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload'),
 			markRefusal
@@ -401,6 +403,25 @@ private class AccountingExportServiceTest {
 		}
 		update handed;
 		return jen;
+	}
+
+	@IsTest
+	static void accountingExportAloneBuildsTheFile() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			User jen = owningAugust(
+				TestDataFactory.createUser('Jen', new List<String>{ 'Accounting_Export' })
+			);
+			System.runAs(jen) {
+				AccountingExportService.ExportFile file = AccountingExportService.build(
+					AUGUST_FIRST,
+					AUGUST_LAST,
+					null,
+					null,
+					false
+				);
+				Assert.areEqual(4, file.giftCount, 'No Giving set needed beside it: ' + file.csv);
+			}
+		}
 	}
 
 	@IsTest
@@ -529,7 +550,7 @@ private class AccountingExportServiceTest {
 				Assert.fail('A split gift would be locked with half of it exported');
 			} catch (AccountingExportService.ExportException refused) {
 				Assert.areEqual(
-					Label.Mirror_AccountingExport_MarkNeedsAllFunds,
+					BarnHelp.text('Mirror', 'Mirror_AccountingExport_MarkNeedsAllFunds'),
 					refused.getMessage()
 				);
 			}

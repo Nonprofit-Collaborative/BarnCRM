@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Transfers__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Countries outside your own the data goes to, and the safeguard used (for example standard contractual clauses).</inlineHelpText>
+  <label>Transfers Abroad</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Migration: Engagement Plan Tasks</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npsp_plan_steps</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the NPSP Funds, Levels and Recurring Donations migration kit, which reads NPSP engagement plan tasks: one step per task on the stewardship plan template the kit made from its engagement plan, with its subject, days after the start, priority, comments and assigned user.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "npsp.Engagement_Plan_Template__c", "target": "Record.Stewardship_Plan_Template__c"}, {"source": "Name", "target": "Record.Subject__c"}, {"source": "npsp.Days_After__c", "target": "Record.Days_After_Start__c", "transforms": [{"op": "ifBlank", "value": "0"}]}, {"source": "npsp.Priority__c", "target": "Record.Priority__c", "transforms": [{"op": "map", "pairs": [{"text": "Low", "value": "Low"}, {"text": "Normal", "value": "Normal"}, {"text": "Medium", "value": "Normal"}, {"text": "High", "value": "High"}], "otherwise": "Normal"}, {"op": "ifBlank", "value": "Normal"}]}, {"source": "npsp.Comments__c", "target": "Record.Comments__c"}, {"source": "npsp.Assigned_To__c", "target": "Record.Assigned_User__c"}, {"source": "AssignTo", "target": "Record.Assign_To__c"}, {"source": "Order", "target": "Record.Order__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Stewardship_Plan_Step__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

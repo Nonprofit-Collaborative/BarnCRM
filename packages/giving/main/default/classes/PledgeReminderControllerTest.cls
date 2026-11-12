@@ -45,7 +45,10 @@ private class PledgeReminderControllerTest {
 				PledgeReminderController.sendNow();
 				Assert.fail('A send while off must be refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(Label.Giving_PledgeReminders_Disabled, refused.getMessage());
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'),
+					refused.getMessage()
+				);
 			}
 		}
 	}

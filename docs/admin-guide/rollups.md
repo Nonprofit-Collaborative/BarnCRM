@@ -332,7 +332,7 @@ The **Rollup Builder** tab is where you create a new total and edit any existing
 or your own, without typing a query. It lists every rollup with its controls (mode, active,
 **Recalculate**, the nightly schedule, **Recalculate All** and **Restore Shipped Rollups**),
 and adds **New Rollup**, and **Edit**, **Copy** and **Delete** on each row. The tab comes with the
-**Rollup Builder Admin** permission set (**Rollup Builder User** opens it read only), and
+**Rollup Builder Admin** permission set (**Rollup Builder Read Only** opens it read only), and
 saving needs the **Manage BarnCRM Settings** permission. The Rollups section in BarnCRM
 Settings opens it.
 
@@ -345,7 +345,7 @@ ships, and the time each run stamps on a rollup, are the only saves exempt.
 
 You do not assign these sets by hand for BarnCRM's roles. When the module is installed, each
 time it is turned on on **Modules**, and with each nightly run once that is scheduled,
-BarnCRM gives **Rollup Builder User** to everyone holding the **BarnCRM Staff** or **BarnCRM
+BarnCRM gives **Rollup Builder Read Only** to everyone holding the **BarnCRM Staff** or **BarnCRM
 Read Only** permission set, and **Rollup Builder Admin** to everyone holding **BarnCRM
 Admin**, whether directly or through a role on the [Access](access.md) page, so someone given
 a role today has the set after tonight's run. It never takes a set away, so one you give by
@@ -354,11 +354,11 @@ hand stays. While the module is turned off it gives nothing.
 **A user who holds neither Rollup Builder set, such as an integration user.** Some saves have
 to announce, once they are saved, that totals are waiting: saves that run inside a
 background job (a Queueable), and ordinary saves made while a recalculation was already
-asked for or could not be started. The announcement needs the **Rollup Builder User** or
+asked for or could not be started. The announcement needs the **Rollup Builder Read Only** or
 **Rollup Builder Admin** set. Without one, the save still goes through and its totals are
 queued, but they wait for the next queue run or the nightly run, and the Error Log gets a
 Warning from `RollupQueue.announceReady`. To have them catch up within minutes, give that
-user **Rollup Builder User**. People with a BarnCRM role get it at install, at each **Turn
+user **Rollup Builder Read Only**. People with a BarnCRM role get it at install, at each **Turn
 on** and with each nightly run; until then the same wait applies to them.
 
 The **Rollups** section of **BarnCRM Settings** holds the module's own settings: **Default
@@ -705,7 +705,7 @@ person can read), it shows:
   record holds, without saving.
 
 It reads as the person looking: the counts and the list include only records they can open,
-and they need the **Rollup Builder User** (or **Rollup Builder Admin**) permission set to read
+and they need the **Rollup Builder Read Only** (or **Rollup Builder Admin**) permission set to read
 the rollups.
 
 ## Instant Totals on Other Objects
@@ -932,6 +932,11 @@ BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling 
 Only DLRS rollups that are active in DLRS count. Rollup Helper's rollups are not read, so
 neither the question nor the Health Check finding sees them: check those yourself.
 
+NPSP customizable rollups count the same way: in an org with NPSP, an active NPSP customizable
+rollup on the same field makes the question name NPSP ("The NPSP rollup ... also fills ...")
+and the answer is recorded the same way. NPSP's older built-in rollups (when Customizable
+Rollups is not enabled in NPSP Settings) are not read.
+
 ### Import From DLRS
 
 When DLRS has at least one active rollup, **Other Rollup Tools** on the **Rollup Builder** tab
@@ -990,6 +995,43 @@ A DLRS rollup stays in DLRS, and the wizard says why, when:
 
 Rebuild those by hand in the Builder if you want them in BarnCRM, or leave them running in
 DLRS on a field BarnCRM does not fill.
+
+### Import From NPSP Customizable Rollups
+
+In an org with NPSP's Customizable Rollups enabled and at least one active customizable rollup,
+**Other Rollup Tools** also has an **Import From NPSP** button (you need Manage BarnCRM
+Settings). It runs the same four steps as Import From DLRS, with the same compare and the same
+question before each copy is turned on, naming NPSP. Each copy's Definition Key is `NPSP_` and
+the NPSP rollup's API name, so importing again updates it. Nothing in NPSP is changed: after
+turning a copy on, deactivate the NPSP rollup in **NPSP Settings**, **Customizable Rollups**.
+The [Migration Assistant](migration-assistant.md) runs this as the NPSP Customizable Rollups
+kit, with a check and a retire checklist.
+
+How each NPSP setting is copied:
+
+| NPSP setting | In BarnCRM |
+|---|---|
+| Summary Object and Summary Field | The rollup's object and field |
+| Detail Object | The records counted, by the one lookup from them to the summary object (a standard lookup such as Account ID first when there are several) |
+| Operation | Sum, Count, Average, Largest (Max), Smallest (Min), First, Last |
+| Amount Field | The field read for Sum and Average, and for the others unless Detail Field is set |
+| Detail Field | The field read for Largest, Smallest, First and Last, when set |
+| Date Field | The order for First and Last (oldest first), and the date for a time bound |
+| Time Bound | All Time adds nothing; Years Ago 0 is this year, 1 is last year; Days Back n is the last n days |
+| Filter Group rules | Conditions joined by AND: equals, not equals, greater or less, in a list, not in a list, starts with, contains. A record type named in a rule becomes that record type |
+| Calculation | **Both** (updated as records change and every night) |
+
+An NPSP rollup stays in NPSP, and the wizard says why, when:
+
+- its operation is Years Donated, Donor Streak, Best Year or Best Year Total;
+- it reads its amount or date from another object than the records it counts, or a filter rule
+  is on another object (for example payments or soft credits);
+- it summarizes a contact from opportunities (NPSP credits contacts through contact roles,
+  which Rollup Builder does not follow);
+- it uses a fiscal year, or Years Ago above 1;
+- a filter rule uses another operator, or names a record type the org does not have;
+- the records it counts have no single lookup to its object;
+- or any check listed above for DLRS refuses it.
 
 ## Current Limits
 

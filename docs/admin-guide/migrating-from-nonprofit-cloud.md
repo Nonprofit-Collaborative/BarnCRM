@@ -179,12 +179,14 @@ file shape. The shapes differ in ways that matter:
 
 ## 6. What Does Not Come Across Yet
 
-These are not loaded by the four templates. Each has what to do in the meantime.
+These are not loaded by the four templates. Each has what to do in the meantime. In the org
+Nonprofit Cloud is in, the Nonprofit Cloud Gifts and Soft Credits kit (section 7) also copies
+funds, appeals, commitments, soft credits and tributes.
 
 | Not loaded | What to do meanwhile |
 |---|---|
-| Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). |
-| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). In the org Nonprofit Cloud is in, households (Party Relationship Groups) are not converted either: see [Nonprofit Cloud Households](nonprofit-cloud-households.md). |
+| Relationships and affiliations | In the org Nonprofit Cloud is in, use the kit below. For a new org, no ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Gift commitments (pledges and recurring gifts) and their schedules | No import yet. Create each active commitment by hand ([Commitments](commitments.md)) before loading gifts. With **Match or create**, a gift dated near one of its scheduled payments pays it; older gifts load as gifts on their own. |
 | Soft credits | A soft credit loads only on the same row as a new gift, and Nonprofit Cloud exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | Tributes | Same: add them by hand to the gift ([Tributes](tributes.md)). |
@@ -193,6 +195,25 @@ These are not loaded by the four templates. Each has what to do in the meantime.
 | Funds and appeals | Create them by hand first (section 4, step 1). |
 | An organization's details | A gift file creates an organization with its name only. Add its address and phone by hand. |
 | In-kind gifts (payment method In-kind) | BarnCRM wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic Gift List**, the value mapped to **Gift: fair market value**. |
+
+### The Nonprofit Cloud Relationships and Affiliations Kit
+
+With BarnCRM Mirror installed in the same org, on **Integrations**, Nonprofit Cloud
+Fundraising, click **Start Migration: NPC Relationships and Affiliations**. The
+Migration Assistant ([Migration Assistant](migration-assistant.md)) runs two steps, each with a
+preview, a check and an undo:
+
+| Step | Reads | Makes |
+|---|---|---|
+| Relationships | Every contact contact relation | One BarnCRM relationship per pair of people, with the related person's role as its type (Husband and Wife become Spouse, Mother and Father Parent, and so on; another role becomes Other), Current or Former from active, and its dates. BarnCRM writes the other side itself; where Nonprofit Cloud holds the pair both ways round, only one is copied. The check counts pairs of people. |
+| Affiliations | Every account contact relation with an organization | One affiliation per link, with its roles as text (Employee, Board Member), Current or Former from active, and its dates. Links to a household (an account with a Party Relationship Group of type Household) or to a person account are skipped. The check counts links to organizations. |
+
+Before you run it, open one relationship in the preview and check its type reads the right
+way round (the related person's role). Households themselves are not converted: BarnCRM keeps
+its guards for accounts that carry a Party Relationship Group (see
+[Nonprofit Cloud Households](nonprofit-cloud-households.md)). The Nonprofit Cloud field names
+the kit reads come from Salesforce's documentation and are not yet checked against a live org;
+if your org differs, a step reports the missing field by name and copies nothing.
 
 ## 7. Loading Into the Org Nonprofit Cloud Is In
 
@@ -207,6 +228,39 @@ that keeps people as person accounts:
 - An organization donor is found by name only if its account is a BarnCRM organization.
   A business account of another record type gets a new BarnCRM organization of the same
   name. Check the preview's "would create" count for organizations before you import.
+
+### The Nonprofit Cloud Gifts and Soft Credits Kit
+
+With BarnCRM Giving and BarnCRM Mirror installed in the same org, you need no files at all.
+On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: Nonprofit Cloud
+Gifts and Soft Credits**. The Migration Assistant ([Migration Assistant](migration-assistant.md))
+runs these steps in order, each with a preview and an undo:
+
+| Step | Reads | Makes |
+|---|---|---|
+| Appeals | Every Campaign | One appeal per campaign, or updates the appeal already linked to it. |
+| Funds | Every gift designation | One fund per designation, linked to it for the Gift Transaction mirror. A designation that already has a fund, linked or of the same name, is skipped; the step's check counts designations that have a fund. |
+| Commitments | Every gift commitment | One commitment of the same person or organization: **Recurring** when its schedule type says recurring (the amount of the next transaction), else a **Pledge** (its expected total), with frequency, dates, status and appeal. |
+| Gifts | Every gift transaction with status `Paid` | One gift per transaction, of the same donor (a person account's contact, else the account as an organization), with amount, date, payment method and reference, appeal, designations as funds (up to five) and its tribute. Each gift keeps the transaction's ID as its **Gift Transaction ID**, so the Gift Transaction mirror never copies it back, and a rerun never duplicates it. |
+| Soft Credits | Every gift soft credit of a paid transaction | One soft credit on that gift, of the recipient person or organization, with BarnCRM's role (another role becomes Other with its name kept) and its amount, or the gift's. |
+
+Before you run it:
+
+- Assign yourself the **Salesforce Records Sync** permission set (Mirror) and the Giving admin
+  permission set.
+- Set the Gift Transaction mirror ([Gift Transaction Mirror](gift-transaction-mirror.md)) to
+  **Off** while the kit runs.
+- Turn off acknowledgment rules, so copied gifts send no thank-you letters.
+- Check your completed status: the kit copies the status `Paid` only. Gifts with another
+  status (pledged, unpaid, written off, refunded) are not copied.
+
+Limits: Nonprofit Cloud is read in your access, so a record you cannot see is not counted or
+copied. Commitments are copied but gifts are not linked to them. A refund stays on the
+transaction and is not copied; record it in BarnCRM ([Refunds](refunds.md)). Households
+(Party Relationship Groups) are not converted: see
+[Nonprofit Cloud Households](nonprofit-cloud-households.md). The Nonprofit Cloud field names
+the kit reads come from Salesforce's documentation and are not yet checked against a live org;
+if your org differs, a step reports the missing field by name and copies nothing.
 
 ## 8. Common Mistakes
 

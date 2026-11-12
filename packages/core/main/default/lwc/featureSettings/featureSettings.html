@@ -11,8 +11,8 @@
         <ul class="slds-has-dividers_bottom-space" data-id="feature-list">
             <template for:each={rows} for:item="feature">
                 <li key={feature.key} class="slds-item" data-id="feature-row" data-key={feature.key}>
-                    <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
-                        <div class="slds-col slds-grow">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <div class="slds-col slds-grow slds-shrink">
                             <p class="slds-text-heading_x-small">{feature.name}</p>
                             <p class="slds-text-body_small slds-text-color_weak">{feature.description}</p>
                             <template lwc:if={feature.blockedReason}>
@@ -24,7 +24,7 @@
                                 ></c-barn-notice>
                             </template>
                         </div>
-                        <div class="slds-col slds-grow-none slds-var-p-left_small">
+                        <div class="slds-col slds-grow-none slds-shrink-none slds-var-p-left_small">
                             <template lwc:if={feature.showTurnOn}>
                                 <lightning-button
                                     label={labels.turnOn}

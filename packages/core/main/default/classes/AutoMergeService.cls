@@ -48,6 +48,8 @@ public with sharing class AutoMergeService {
 	 * undo removes these copies instead of moving anything (C-20, ContactTriggerHandler).
 	 */
 	private static final String ADDED_MEMBERSHIPS = 'Household_Member__c+';
+	/** Journal key for the file links a Generic Record Merge added to the kept record; undo removes them. */
+	public static final String ADDED_FILES = 'ContentDocumentLink+';
 	private static final Set<String> PERSON_FIELDS = new Set<String>{
 		'Id',
 		'Name',
@@ -365,7 +367,7 @@ public with sharing class AutoMergeService {
 		for (Candidate pair : pairs) {
 			mergedIds.add(pair.mergedId);
 		}
-		Map<Id, Moved> moved = movedRecords(mergedIds);
+		Map<Id, Moved> moved = movedRecords(Contact.SObjectType, mergedIds);
 		Set<Id> survivorIds = new Set<Id>();
 		for (Candidate pair : pairs) {
 			survivorIds.add(pair.survivorId);
@@ -467,19 +469,19 @@ public with sharing class AutoMergeService {
 		return added;
 	}
 
-	/** The related records of one merged-away person, by "Object.Field", and what was missed. */
-	private class Moved {
-		Map<String, List<Id>> byLink = new Map<String, List<Id>>();
-		List<String> notes = new List<String>();
+	/** The related records of one merged-away record, by "Object.Field", and what was missed. */
+	public class Moved {
+		public Map<String, List<Id>> byLink = new Map<String, List<Id>>();
+		public List<String> notes = new List<String>();
 	}
 
 	/**
-	 * Every related record pointing at these people through a link the person merging can
-	 * change, which is what the merge will move to the kept person. One query per link for
-	 * all of them; a link that cannot be read, or would leave too few queries for the merge,
-	 * is named in the notes instead.
+	 * Every related record pointing at these records (people here, any object for Generic
+	 * Record Merge, C-62) through a link the person merging can change, which is what the merge
+	 * moves to the kept record. One query per link for all of them; a link that cannot be read,
+	 * or would leave too few queries for the merge, is named in the notes instead.
 	 */
-	private static Map<Id, Moved> movedRecords(Set<Id> mergedIds) {
+	public static Map<Id, Moved> movedRecords(Schema.SObjectType type, Set<Id> mergedIds) {
 		Map<Id, Moved> result = new Map<Id, Moved>();
 		for (Id mergedId : mergedIds) {
 			result.put(mergedId, new Moved());
@@ -487,7 +489,7 @@ public with sharing class AutoMergeService {
 		if (mergedIds.isEmpty()) {
 			return result;
 		}
-		for (Schema.ChildRelationship link : Schema.SObjectType.Contact.getChildRelationships()) {
+		for (Schema.ChildRelationship link : type.getDescribe().getChildRelationships()) {
 			Schema.DescribeFieldResult field = link.getField().getDescribe();
 			Schema.DescribeSObjectResult child = link.getChildSObject()
 				.getDescribe(SObjectDescribeOptions.DEFERRED);
@@ -569,6 +571,7 @@ public with sharing class AutoMergeService {
 		restoreValues(restored, notesById);
 		moveBack(restored, notesById);
 		removeAddedMemberships(restored, notesById);
+		removeAddedFiles(restored, notesById);
 		for (Merge_Journal__c journal : journals) {
 			List<String> lines = notesById.get(journal.Id);
 			if (journal.Status__c != UNDO_FAILED) {
@@ -619,7 +622,26 @@ public with sharing class AutoMergeService {
 		return restored;
 	}
 
+	/** Puts back the changed values, one object at a time (people, or a C-62 merge's object). */
 	private static void restoreValues(
+		List<Merge_Journal__c> journals,
+		Map<Id, List<String>> notesById
+	) {
+		Map<Schema.SObjectType, List<Merge_Journal__c>> byType = new Map<Schema.SObjectType, List<Merge_Journal__c>>();
+		for (Merge_Journal__c journal : journals) {
+			Schema.SObjectType type = Id.valueOf(journal.Survivor_Id__c).getSObjectType();
+			if (!byType.containsKey(type)) {
+				byType.put(type, new List<Merge_Journal__c>());
+			}
+			byType.get(type).add(journal);
+		}
+		for (Schema.SObjectType type : byType.keySet()) {
+			restoreValues(type, byType.get(type), notesById);
+		}
+	}
+
+	private static void restoreValues(
+		Schema.SObjectType type,
 		List<Merge_Journal__c> journals,
 		Map<Id, List<String>> notesById
 	) {
@@ -639,28 +661,31 @@ public with sharing class AutoMergeService {
 		if (changesById.isEmpty()) {
 			return;
 		}
-		// Only names that are Contact fields go into the query, whatever the row says.
-		Map<String, Schema.SObjectField> contactFields = Schema.SObjectType.Contact.fields.getMap();
+		// Only names that are fields of the object go into the query, whatever the row says.
+		Schema.DescribeSObjectResult described = type.getDescribe();
+		Map<String, Schema.SObjectField> objectFields = described.fields.getMap();
 		for (String name : new List<String>(fieldNames)) {
-			if (!contactFields.containsKey(name)) {
+			if (!objectFields.containsKey(name)) {
 				fieldNames.remove(name);
 			}
 		}
 		fieldNames.add('Id');
-		Map<Id, Contact> survivors = new Map<Id, Contact>(
-			(List<Contact>) Database.queryWithBinds(
+		Map<Id, SObject> survivors = new Map<Id, SObject>(
+			Database.queryWithBinds(
 				'SELECT ' +
 					String.join(new List<String>(fieldNames), ', ') +
-					' FROM Contact WHERE Id IN :ids',
+					' FROM ' +
+					described.getName() +
+					' WHERE Id IN :ids',
 				new Map<String, Object>{ 'ids' => survivorIds },
 				AccessLevel.USER_MODE
 			)
 		);
-		List<Contact> updates = new List<Contact>();
+		List<SObject> updates = new List<SObject>();
 		List<Merge_Journal__c> updated = new List<Merge_Journal__c>();
 		for (Merge_Journal__c journal : journals) {
 			Map<String, Object> changes = changesById.get(journal.Id);
-			Contact survivor = survivors.get(journal.Survivor_Id__c);
+			SObject survivor = survivors.get(journal.Survivor_Id__c);
 			if (changes == null) {
 				continue;
 			}
@@ -670,7 +695,7 @@ public with sharing class AutoMergeService {
 				continue;
 			}
 			Map<String, Object> putBack = new Map<String, Object>{
-				'attributes' => new Map<String, Object>{ 'type' => 'Contact' },
+				'attributes' => new Map<String, Object>{ 'type' => described.getName() },
 				'Id' => survivor.Id
 			};
 			for (String field : changes.keySet()) {
@@ -691,7 +716,7 @@ public with sharing class AutoMergeService {
 				}
 			}
 			if (putBack.size() > 2) {
-				updates.add((Contact) JSON.deserialize(JSON.serialize(putBack), Contact.class));
+				updates.add((SObject) JSON.deserialize(JSON.serialize(putBack), SObject.class));
 				updated.add(journal);
 			}
 		}
@@ -720,7 +745,7 @@ public with sharing class AutoMergeService {
 				journal.Moved_Records__c
 			);
 			for (String key : byLink.keySet()) {
-				if (key == ADDED_MEMBERSHIPS) {
+				if (key == ADDED_MEMBERSHIPS || key == ADDED_FILES) {
 					continue;
 				}
 				if (!ownerByLink.containsKey(key)) {
@@ -884,6 +909,100 @@ public with sharing class AutoMergeService {
 			}
 		} catch (Exception unreadable) {
 			for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByRow.values())) {
+				addOnce(
+					notesById,
+					owner,
+					BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
+					key
+				);
+			}
+		}
+	}
+
+	/**
+	 * Links the other record's files to the kept record (Generic Record Merge), skipping files
+	 * already linked there; answers the new link Ids, which the journal keeps for undo.
+	 */
+	public static List<Id> shareFiles(Id keepId, Id otherId) {
+		Set<Id> linked = new Set<Id>();
+		for (ContentDocumentLink row : [
+			SELECT ContentDocumentId
+			FROM ContentDocumentLink
+			WHERE LinkedEntityId = :keepId
+			WITH USER_MODE
+		]) {
+			linked.add(row.ContentDocumentId);
+		}
+		List<ContentDocumentLink> added = new List<ContentDocumentLink>();
+		for (ContentDocumentLink row : [
+			SELECT ContentDocumentId
+			FROM ContentDocumentLink
+			WHERE LinkedEntityId = :otherId
+			WITH USER_MODE
+		]) {
+			if (linked.add(row.ContentDocumentId)) {
+				added.add(
+					new ContentDocumentLink(
+						LinkedEntityId = keepId,
+						ContentDocumentId = row.ContentDocumentId,
+						ShareType = 'V'
+					)
+				);
+			}
+		}
+		Database.insert(added, AccessLevel.USER_MODE);
+		List<Id> ids = new List<Id>();
+		for (ContentDocumentLink row : added) {
+			ids.add(row.Id);
+		}
+		return ids;
+	}
+
+	/** Undo of `shareFiles`: removes the links the merge added; a link gone already needs nothing. */
+	private static void removeAddedFiles(
+		List<Merge_Journal__c> journals,
+		Map<Id, List<String>> notesById
+	) {
+		Map<Id, Merge_Journal__c> ownerByLink = new Map<Id, Merge_Journal__c>();
+		for (Merge_Journal__c journal : journals) {
+			if (String.isBlank(journal.Moved_Records__c)) {
+				continue;
+			}
+			Object rows = ((Map<String, Object>) JSON.deserializeUntyped(journal.Moved_Records__c))
+				.get(ADDED_FILES);
+			for (Object rowId : rows == null ? new List<Object>() : (List<Object>) rows) {
+				ownerByLink.put((Id) String.valueOf(rowId), journal);
+			}
+		}
+		if (ownerByLink.isEmpty()) {
+			return;
+		}
+		String key = String.valueOf(ContentDocumentLink.SObjectType);
+		try {
+			Set<Id> linkIds = ownerByLink.keySet();
+			List<ContentDocumentLink> removing = [
+				SELECT Id
+				FROM ContentDocumentLink
+				WHERE Id IN :linkIds
+				WITH USER_MODE
+			];
+			List<Database.DeleteResult> results = Database.delete(
+				removing,
+				false,
+				AccessLevel.USER_MODE
+			);
+			for (Integer i = 0; i < results.size(); i++) {
+				if (!results[i].isSuccess()) {
+					addOnce(
+						notesById,
+						ownerByLink.get(removing[i].Id),
+						BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
+						key
+					);
+				}
+			}
+		} catch (Exception unreadable) {
+			for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByLink.values())) {
 				addOnce(
 					notesById,
 					owner,

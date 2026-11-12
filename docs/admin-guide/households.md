@@ -45,7 +45,7 @@ profile has no default Account record type, gets Household for every account the
 
 The **Households** tab is hidden until you turn Households on. Turning it on shows the
 tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the permission set
-**BarnCRM Households**, within a few minutes. The confirmation says so, and reminds staff to
+**BarnCRM Auto: Households Tab**, within a few minutes. The confirmation says so, and reminds staff to
 create households with **New Household** on BarnCRM Home, not the standard **New** button.
 The permission set shows the tab and nothing else, and gives no record type. BarnCRM keeps it
 in step like the tool tab sets, so do not assign it by hand: the nightly run removes it from
@@ -160,6 +160,19 @@ Everything else reads the same: the same member counts, the same names and greet
 the same Members panel. A household is still its own record, never a person.
 
 ## Common Mistakes
+
+**"The Households tab shows only a few households."**
+It no longer does: the Households and Organizations tabs open the standard Account list page
+(a small BarnCRM page redirects, replacing itself in the browser history) with the packaged
+**Households** and **Organizations** list views and the list view menu, which also holds
+**My Households** and **My Organizations**. Build more lists in Salesforce as usual.
+
+**"We would rather use the standard Accounts tab."**
+Set **Account Tabs** on **General** in BarnCRM Settings to **Accounts Tab (Standard)**: people
+see the Accounts tab, with the same Households and Organizations list views in its menu, and the
+Households and Organizations tabs go. **Both: Organization, Household and Accounts Tabs** keeps
+all three. See
+[Account Tabs](barncrm-settings.md#account-tabs).
 
 **"There is no Households tab."**
 Households is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM

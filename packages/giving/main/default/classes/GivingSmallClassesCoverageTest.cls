@@ -38,12 +38,12 @@ private class GivingSmallClassesCoverageTest {
 			}
 
 			Assert.areEqual(
-				Label.Giving_Receipt_NothingToRender,
+				BarnHelp.text('Giving', 'Giving_Receipt_NothingToRender'),
 				blank,
 				'White space is nothing to render'
 			);
 			Assert.areEqual(
-				Label.Giving_Receipt_NothingToRender,
+				BarnHelp.text('Giving', 'Giving_Receipt_NothingToRender'),
 				empty,
 				'So is no document at all'
 			);
@@ -75,7 +75,7 @@ private class GivingSmallClassesCoverageTest {
 
 			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areEqual(
-				System.Label.Giving_NightlyJobs_OverdueNoneFound,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueNoneFound'),
 				settings.Installment_Overdue_Last_Run_Summary__c,
 				'The page says the pass ran and found nothing'
 			);
@@ -95,7 +95,7 @@ private class GivingSmallClassesCoverageTest {
 			}
 
 			Assert.areEqual(
-				System.Label.Giving_NightlyJobs_RunFailed,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_RunFailed'),
 				Giving_Settings__c.getOrgDefaults().Installment_Overdue_Last_Run_Summary__c,
 				'A pass that could not read the payments says it failed rather than claiming none were late'
 			);
@@ -208,7 +208,7 @@ private class GivingSmallClassesCoverageTest {
 	@IsTest
 	static void aFailedSendWithNoReasonSaysSo() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			String unknown = Label.Giving_Acknowledgment_SendFailedUnknown;
+			String unknown = BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown');
 			Assert.areEqual(
 				unknown,
 				AcknowledgmentService.failureReasonOf(null, unknown),

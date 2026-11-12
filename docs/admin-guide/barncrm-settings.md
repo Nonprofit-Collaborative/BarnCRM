@@ -136,19 +136,38 @@ single automation for fine-grained control; that is not turning the feature off.
 
 **How tab hiding works.** Salesforce shows a tab to anyone holding a permission set that
 grants it, and an app cannot hide a tab any other way. So each feature tab has its own small
-packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab, and
+packaged permission set (for example **BarnCRM Auto: Find Tab**) that grants only that tab, and
 BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Super Transformer and
-Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
+Export, Bulk Update or Bulk Delete for Find, Data Manager and Org Optimizer, Bulk Update or
+Bulk Delete for Super Transformer). BarnCRM keeps these in step when a feature is turned on, when a role or extra
 permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
-up. Do not assign the BarnCRM Tab permission sets by hand: the hourly run removes them from
+up. Do not assign the BarnCRM Auto permission sets by hand: the hourly run removes them from
 anyone who should not have them.
 
-The Households tab works the same way. **Households** carries the **BarnCRM Households**
+The Households tab works the same way. **Households** carries the **BarnCRM Auto: Households Tab**
 permission set, which shows the Households tab and nothing else (it gives no record type). Once
 the feature is on, BarnCRM gives it to everyone with a BarnCRM Admin, Staff or Read Only role.
+
+### Account Tabs
+
+**Account Tabs**, on **General**, chooses which tabs people with a BarnCRM role see for
+households and organizations:
+
+| Choice | Tabs shown |
+|---|---|
+| **Organization and Household Tabs** (the default) | **Households** and **Organizations**, as before |
+| **Accounts Tab (Standard)** | Salesforce's own **Accounts** tab, instead of Households and Organizations. Its list view menu already holds **Households**, **My Households**, **Organizations** and **My Organizations** |
+| **Both: Organization, Household and Accounts Tabs** | All three |
+
+It works like the Households tab: **BarnCRM Auto: Organizations Tab** and **BarnCRM Auto:
+Accounts Tab** each show one tab, and BarnCRM gives the chosen ones to everyone with a BarnCRM
+Admin, Staff or Read Only role within a few minutes of saving (and takes the others away). The
+Households tab still needs the **Households** feature on. The setting only adds tabs: a person
+whose profile already shows the Accounts tab keeps it whatever you choose, so to hide it, change
+the profile's tab setting in Setup. The BarnCRM and BarnCRM Console apps list the Accounts tab,
+so it shows in their navigation bar for anyone who can see it.
 
 ## Modules
 
@@ -179,9 +198,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 2. The console opens with the section list on the
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
-   **People** (People and Households, Addresses, Contact Points, Portals), **Data** (Import,
+   **People** (People and Households, Addresses, Contact Points, Forms, Portals), **Data** (Import,
    Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Funders),
-   **Programs** (Programs, Volunteers, Events) and
+   **Programs** (Programs, Logic Models, Volunteers, Events) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
    Log is always last. On a phone or other narrow screen the list is replaced by a
@@ -299,7 +318,7 @@ are not here: they have their own **Duplicate Matching** section, right after th
 
 | Box | Settings |
 |---|---|
-| People | How people belong to a household; Create a household automatically |
+| People | How people belong to a household; Create a household automatically; Turn on engagement score, Engagement score weights and Engagement score targets ([Engagement Score](engagement-score.md)) |
 | Households | Delete a household once it is empty; Keep the households of deleted people |
 | Household Names and Greetings | The **Preview and Recompute** naming panel (the three patterns); Include people who have died in names |
 | Relationships | Keep both sides of relationships in step |
@@ -529,8 +548,8 @@ form at the top of that page:
 | Giving, Campaign Sync (BarnCRM Mirror) | **Marketing User** ticked on the user of each person who creates appeals | Users | No |
 | Giving, Opportunity Mirror (BarnCRM Mirror) | Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | Permission Sets (click the set, then Object Settings, Opportunities) | No |
 
-Giving Staff, Giving Admin and Giving Read Only, and Mirror's Campaign Sync, Opportunity Mirror
-and Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
+Giving Staff, Giving Admin and Giving Read Only, and Mirror's Salesforce Records Sync and
+Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
 no note. Accounting Export has no Setup note.
 
 ## Common Mistakes

@@ -1,70 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_Segments_ErrorNoPermission</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the person lacks the Find permission</shortDescription>
-    <value>Donor segments are Find queries, so they need the BarnCRM Find and Export permission set. Ask your BarnCRM admin for it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ErrorNotFound</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the segment is missing or not visible</shortDescription>
-    <value>That segment was not found. It may have been deleted, or it is no longer shared with you.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ErrorNotSegment</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: a saved query not of people or organizations</shortDescription>
-    <value>Only a saved query of people or organizations can be used as a donor segment.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ErrorTemplate</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the template does not apply to the choice</shortDescription>
-    <value>That template is not available for the records you chose.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ErrorName</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: the segment name is blank or too long</shortDescription>
-    <value>Give the segment a name of 80 characters or fewer.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ErrorPeopleOnly</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: an email tool layout on an organization segment</shortDescription>
-    <value>The Mailchimp and Constant Contact layouts are for people. Export an organization segment with All Columns.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ErrorLayout</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: an export layout that does not exist</shortDescription>
-    <value>Choose Mailchimp, Constant Contact or All Columns for the export.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_Unexpected</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: an unexpected failure, logged</shortDescription>
-    <value>Something went wrong with donor segments. The details are in the Error Log.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_LapsedName</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
@@ -153,14 +89,6 @@
     <value>Save as Segment</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_Saved</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: notice after a save; {0} is the segment name</shortDescription>
-    <value>Segment saved: {0}.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_SegmentsHeading</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
@@ -217,14 +145,6 @@
     <value>Show List</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_ListShown</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: above the list; {0} is the number of rows shown</shortDescription>
-    <value>Showing {0} records in the segment's own order and row limit. Change either in Find.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_LayoutField</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
@@ -257,43 +177,11 @@
     <value>All Columns</value>
   </labels>
   <labels>
-    <fullName>Giving_Segments_Exporting</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: progress; {0} is the rows read so far</shortDescription>
-    <value>Exporting: {0} rows read.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_ExportedDuplicates</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: export done; {0} rows written, {1} repeats left out</shortDescription>
-    <value>Exported {0} rows. {1} repeated email addresses were written only once.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_LimitReached</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: export stopped at the limit; {0} is the limit</shortDescription>
-    <value>Stopped at the export row limit of {0} rows.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Segments_EditInFind</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Segments: button that opens the segment in Find</shortDescription>
     <value>Edit in Find</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Segments_EmailPeopleOnly</fullName>
-    <categories>Giving, Segments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Segments: why organizations have only All Columns</shortDescription>
-    <value>Mailchimp and Constant Contact layouts are for people. Organizations export with All Columns.</value>
   </labels>
 </CustomLabels>

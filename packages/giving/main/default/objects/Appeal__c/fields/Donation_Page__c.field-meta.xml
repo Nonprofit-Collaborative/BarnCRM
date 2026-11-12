@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Donation_Page__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>G-34, canonical model R-AP5: whether BarnCRM Forms serves this appeal's public donation page.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Publishes this appeal's online donation page on your BarnCRM Forms site. It also needs a Donation Form Key and BarnCRM Payments set up.</inlineHelpText>
+  <label>Donation Page</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

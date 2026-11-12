@@ -7,13 +7,11 @@ import PICKLISTS_TITLE from '@salesforce/label/c.Programs_Settings_PicklistsTitl
 import DEFAULT_VALUE from '@salesforce/label/c.Programs_Settings_Default';
 import CHANGE_IN_SETUP from '@salesforce/label/c.Programs_Settings_ChangeInSetup';
 import CHANGE_FOR from '@salesforce/label/c.Programs_Settings_ChangeFor';
-import NO_ACCESS from '@salesforce/label/c.Programs_Settings_NoAccess';
 import PRIVACY_TITLE from '@salesforce/label/c.Programs_Settings_PrivacyTitle';
 import PRIVACY_LEGEND from '@salesforce/label/c.Programs_Settings_PrivacyLegend';
 import PRIVACY_SHARED from '@salesforce/label/c.Programs_Settings_PrivacyShared';
 import PRIVACY_PRIVATE from '@salesforce/label/c.Programs_Settings_PrivacyPrivate';
 import PRIVACY_DEFAULT from '@salesforce/label/c.Programs_Settings_PrivacyDefault';
-import SAVED from '@salesforce/label/c.Programs_Settings_Saved';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { PRIVATE, picklistRows, privacyOptions, storedPrivacy } from './settingsRows';
@@ -38,7 +36,9 @@ export default class ProgramsSettings extends LightningElement {
       return helpText('Programs', 'Programs_Settings_PicklistsIntro');
     },
     changeInSetup: CHANGE_IN_SETUP,
-    noAccess: NO_ACCESS,
+    get noAccess() {
+      return helpText('Programs', 'Programs_Settings_NoAccess');
+    },
     loading: LOADING,
     privacyTitle: PRIVACY_TITLE,
     get privacyIntro() {
@@ -121,7 +121,7 @@ export default class ProgramsSettings extends LightningElement {
     return savePrivacy({ privateParticipants: this.chosenPrivacy === PRIVATE })
       .then((settings) => {
         this.show(settings);
-        this.savedMessage = SAVED;
+        this.savedMessage = helpText('Programs', 'Programs_Settings_Saved');
       })
       .catch((error) => {
         this.errorMessage = messageOf(error, helpText('Programs', 'Programs_Fail_SettingsSave'));

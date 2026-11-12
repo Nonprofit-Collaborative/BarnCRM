@@ -20,6 +20,7 @@ The jobs in the run, by time of night:
 | 1:20 | Record Cleanup | Core | Always on; how long each kind of history is kept is set as below (the staged rows of finished imports follow **Delete Import Rows**, Import section) |
 | 1:30 | Setup Changes Copy | Core | Org Optimizer on or off |
 | 1:45 | Empty Household Tidy-Up | Core | **Delete Empty Households**, People and Households section |
+| 2:30 | Engagement Score | Core | **Turn on engagement score**, People and Households section (off until turned on); see [Engagement Score](engagement-score.md) |
 | 7:00 | Error Log digest | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
 
 With modules installed, these join the run (Schedule and Stop on each job's page now switch it
@@ -35,6 +36,7 @@ on and off; a job without a switch runs whenever its module is on):
 | 3:00 | Volunteer schedules | Volunteers | No switch |
 | 3:15 | Pledge reminders | Giving | Pledge Reminders page (off until switched on) |
 | 3:30 | Indicator results | Logic Models | No switch |
+| 5:45 | Territory assignment (records with no territory yet) | Territory Management | **Nightly Jobs** panel (off until switched on) |
 | 6:00 | Grant reminders | Funders | No switch |
 | 7:00 | Volunteer shift reminders | Volunteers | No switch |
 | 7:15 | Volunteer unfilled shift nudges | Volunteers | No switch (the **Send unfilled shift nudges** setting decides) |
@@ -52,7 +54,8 @@ Mirror, Volunteers, Logic Models, Funders). The Nightly Jobs panel lists every j
 The panel shows:
 
 - whether the nightly run is scheduled, and when it last started and how it ended;
-- every job in the order the run takes it, with its **Time**, its **Status** (On or Off), its
+- every job in the order the run takes it, with its **Time**, its **Status** (On, Off, or
+  Not Scheduled when it is on but the nightly run is not scheduled, so it does not run yet), its
   **Last Run** and its **Result**: Done, Done With Errors, Failed, Skipped (it was off),
   Gave Up Waiting, or Running.
 
@@ -87,6 +90,7 @@ and applies to the whole organization:
 | Setting | Section | Default | Accepted | What is deleted |
 |---|---|---|---|---|
 | **Days to keep merge history** | Duplicate Matching | 365 | 30 to 3650 | Merge Journal entries (undo is offered for 15 days, so this does not shorten it) |
+| **Days to keep field history** | Field History | 730 | 30 to 3650 | The changes [Field History](field-history.md) kept |
 | **Days to keep settings changes** | General | 730 | 180 to 3650 | The record of who changed which setting |
 | **Days to keep import history** | Import | 365 | 30 to 3650 | Finished imports and bulk jobs, with their rows and journal, once they can no longer be undone; and imports abandoned in Draft, Parsing or Preview (started and never committed), with their staged rows |
 | **Days to keep field use counts** | Org Optimizer | 730 | 90 to 3650 | Saved Field Utilization counts |

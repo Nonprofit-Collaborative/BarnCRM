@@ -31,7 +31,7 @@ public with sharing class GrantFundService {
 				looked = true;
 			}
 			if (fundId == null || (fundObject != null && fundId.getSObjectType() != fundObject)) {
-				grant.Fund_Id__c.addError(Label.Funders_Grant_BadFund);
+				grant.Fund_Id__c.addError(BarnHelp.text('Funders', 'Funders_Grant_BadFund'));
 				continue;
 			}
 			grant.Fund_Id__c = String.valueOf(fundId);
@@ -119,7 +119,9 @@ public with sharing class GrantFundService {
 			Schema.SObjectType type = fundType();
 			Id parsed = GrantService.asId(fundId);
 			if (type == null || parsed == null || parsed.getSObjectType() != type) {
-				throw new GrantService.GrantException(Label.Funders_Grant_BadFund);
+				throw new GrantService.GrantException(
+					BarnHelp.text('Funders', 'Funders_Grant_BadFund')
+				);
 			}
 			value = String.valueOf(parsed);
 		}

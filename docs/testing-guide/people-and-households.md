@@ -26,7 +26,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Testwell Family, select **Add Member** in the **Members** panel. | The **Add Member** dialog opens with Salutation, First Name and Last Name, a **Save** and a **Cancel** button. |
+| 1 | On The Testwell Family, select **Add Member** in the **Members** panel. | The **Add Member** dialog opens with **Add Someone Already in Salesforce** (a search box), then **Or Add Someone New** with Salutation, First Name, Last Name, Email and Phone, a **Save** and a **Cancel** button. |
+| 1a | Type `Garcia` in the search box and choose Maria Garcia, who is in The Garcia Family. | A line reads "Maria Garcia is in The Garcia Family and will move to this household." with **Save** and **Cancel**. **Cancel** removes the line and moves nobody; this time select **Save**: the dialog closes, Maria is a tile here and The Garcia Family lost her. Move her back with **Move to Another Household**. |
 | 2 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | The dialog closes. A toast reads **Added. The household name and greetings have been brought up to date.** Ben appears as a tile with his initials **BT**. |
 | 3 | Refresh the page. | Member Count **2**. Formal Greeting **Ms. Ada Testwell and Mr. Ben Testwell**. Informal Greeting **Ada and Ben**. The name stays **The Testwell Family**. |
 | 4 | Add a third member `Wei` `Lee` (no salutation) and refresh. | Member Count **3**. The name reads **Testwell and Lee Household** because the surnames differ. |
@@ -237,7 +238,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** as admin, delete the Mergetest household and The Otherowner Family.
 
-## T-HH-17: A Person in a Household Is Not Pointed at an Organization
+## T-HH-16: A Person in a Household Is Not Pointed at an Organization
 
 **Purpose:** in the simple way of belonging, changing a household member's Account Name to an organization is refused, while a person already at an organization can still be moved between organizations.
 **Prerequisites:** admin, the simple way of belonging. Two organizations (of the record type chosen in **Record type for organizations**) `Zztest Library` and `Zztest Trust`.
@@ -251,7 +252,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Hana, Omar, The Hhsixteen Family and both organizations.
 
-## T-HH-16: A Blocking Account Duplicate Rule Does Not Stop a New Person
+## T-HH-17: A Blocking Account Duplicate Rule Does Not Stop a New Person
 
 **Purpose:** households BarnCRM creates are saved past the org's Account duplicate rules, so adding a person never fails over a look-alike household.
 **Prerequisites:** admin; in Setup, an active Account duplicate rule on the standard account matching rule with **Action On Create** set to **Block**. Contact `Ana Duptest` already saved, with her household **The Duptest Family**.
@@ -279,7 +280,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | As the staff user, click **New Household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
 | 9 | As the staff user, open the household from step 7. On **Members** select **Add Member**, add `Zztest` `Rt`, then open the household's **Addresses** card. | Before the add the panel shows **No Members Yet**; the **Add Member** dialog opens and the new person shows as a tile. **Addresses** shows **No Addresses Yet** with **Add Address**. Nothing asks for a record type. |
-| 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
+| 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Auto: Households Tab** permission set's record type settings. | **BarnCRM Auto: Households Tab** is assigned; it grants no record type. |
 | 11 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
 
 **Cleanup:** none (Households cannot be turned off).
@@ -353,3 +354,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Choose **Turn On** and confirm. | Households is on. Add a contact: it gets one BarnCRM household, and NPSP makes no household account for it. |
 
 **Cleanup:** none (Households cannot be turned off).
+
+## T-HH-23: Engagement Score
+
+**Purpose:** Confirm the engagement score is off until turned on, scores people nightly from the weights and targets, leaves out parts whose module is missing, and shows the meter ([Engagement Score](../admin-guide/engagement-score.md)).
+**Prerequisites:** admin; the nightly run scheduled; a person Ana with a task logged today. For step 4: Giving installed and a Received gift of 500 from Ana dated this month. A staff user (see [Test users](before-you-test.md#test-users)).
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open Ana. In **BarnCRM Settings**, **People and Households**, **People**, look at the three engagement settings. | No **Engagement Score** meter on Ana. **Turn on engagement score** is off; the weights read `Gifts 40, Hours 25, Events 20, Activity 15` and the targets `Gifts 1000, Hours 40, Events 4, Activity 90, Months 12`. On **General**, the **Nightly Jobs** panel lists **Engagement Score** at 2:30 as Off. |
+| 2 | Turn on **Turn on engagement score** and save. | The **Nightly Jobs** panel shows **Engagement Score** On. Open Ana: the Engagement Score card says **Not scored yet** (no meter). |
+| 3 | In an org with no Giving, Volunteers or Event Management, wait for the nightly run (or run the step from the Developer Console: `Database.executeBatch(new EngagementScoreJob(), 200);`). Open Ana. | Ana's meter reads 100 (only Activity can be measured, and her activity is today) with today's date under **Scored On**. A person with no activity reads 0. |
+| 4 | With Giving installed, rescore. Open Ana. | Ana reads 64: Gifts 0.5 x 40 plus Activity 1 x 15, over 40 + 15. |
+| 5 | Set the weights to `Gifts 0, Activity 10` and rescore. | Ana reads 100: Gifts weighs nothing, so the score is Activity alone. |
+| 6 | Log in as the staff user and open Ana. Try to edit **Engagement Score**. | The meter shows the same score; the field cannot be edited. |
+| 7 | As admin, turn the setting off and save. Open Ana. | No meter. The panel shows the step Off; tonight's run records it Skipped. |
+
+**Cleanup:** put the weights back to the default line; leave the setting off.

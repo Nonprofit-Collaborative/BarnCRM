@@ -1,12 +1,20 @@
-/* The shipped templates (PB-03, PB-07, PB-08) checked offline against the package metadata in this
- * repository: Salesforce re-checks every call against the org, so a template that fails here
- * would be refused there. Also the person-scoped rules the templates must keep. */
+/* The shipped templates (PB-03 to PB-08, EV-22, EV-28) checked offline against the package metadata
+ * in this repository: Salesforce re-checks every call against the org, so a template that fails
+ * here would be refused there. Also the person-scoped rules the templates must keep. */
 import fs from 'fs';
 import path from 'path';
 import { checkTemplate } from '../src/portalTemplate.js';
 import volunteer from '../templates/volunteer.json';
 import speaker from '../templates/speaker.json';
 import donor from '../templates/donor.json';
+import board from '../templates/board.json';
+import applicant from '../templates/applicant.json';
+import member from '../templates/member.json';
+import attendee from '../templates/attendee.json';
+import sponsor from '../templates/sponsor.json';
+import service from '../templates/service.json';
+import partner from '../templates/partner.json';
+import partnerFunders from '../templates/partner-funders.json';
 
 const PACKAGES = path.join(__dirname, '..', '..', 'packages');
 const BUILT_IN = ['Id', 'Name', 'CreatedDate'];
@@ -39,10 +47,27 @@ const EDITABLE_TYPES = [
   'MultiselectPicklist'
 ];
 // Module key (BarnCRM_Module row) to the package folder that holds its objects.
-const FOLDERS = { Volunteers: 'volunteers', Events: 'events', Giving: 'giving' };
+const FOLDERS = {
+  Volunteers: 'volunteers',
+  Events: 'events',
+  Giving: 'giving',
+  CorporateHub: 'corporatehub',
+  Scholarships: 'scholarships',
+  Memberships: 'memberships',
+  Programs: 'programs',
+  Funders: 'funders'
+};
 const ACTION_CLASSES = {
   Volunteers: 'volunteers/main/default/classes/VolunteersPortalExtension.cls',
-  Events: 'events/main/default/classes/EventsPortalExtension.cls'
+  // Events hands the attendee app's actions to EventAttendeeApp, which names them.
+  Events: [
+    'events/main/default/classes/EventsPortalExtension.cls',
+    'events/main/default/classes/EventAttendeeApp.cls'
+  ],
+  CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls',
+  Scholarships: 'scholarships/main/default/classes/ScholarshipsPortalExtension.cls',
+  Memberships: 'memberships/main/default/classes/MembershipsPortalExtension.cls',
+  Giving: 'giving/main/default/classes/GivingPortalPayments.cls'
 };
 
 function fieldFile(objectName, field) {
@@ -72,7 +97,15 @@ function cases() {
   [
     ['volunteer', volunteer],
     ['speaker', speaker],
-    ['donor', donor]
+    ['donor', donor],
+    ['board', board],
+    ['applicant', applicant],
+    ['member', member],
+    ['attendee', attendee],
+    ['sponsor', sponsor],
+    ['service', service],
+    ['partner', partner],
+    ['partner-funders', partnerFunders]
   ].forEach(([name, template]) => {
     template.pages.forEach((page) => out.push([name + ' ' + page.key, template, page]));
   });
@@ -83,12 +116,20 @@ describe('shipped portal templates', () => {
   it.each([
     ['volunteer', volunteer],
     ['speaker', speaker],
-    ['donor', donor]
+    ['donor', donor],
+    ['board', board],
+    ['applicant', applicant],
+    ['member', member],
+    ['attendee', attendee],
+    ['sponsor', sponsor],
+    ['service', service],
+    ['partner', partner],
+    ['partner-funders', partnerFunders]
   ])('%s passes the shape rules and names its module', (name, template) => {
     expect(checkTemplate(template)).toEqual([]);
     expect(template.key).toBe(name);
-    expect(template.requiresModules).toHaveLength(1);
-    expect(FOLDERS[template.requiresModules[0]]).toBeDefined();
+    expect(template.requiresModules.length).toBeGreaterThan(0);
+    template.requiresModules.forEach((module) => expect(FOLDERS[module]).toBeDefined());
   });
 
   it.each(cases())(
@@ -112,15 +153,20 @@ describe('shipped portal templates', () => {
       if (page.kind === 'related' && !page.personField.includes('.')) {
         names.push(page.personField);
       }
+      Object.values(page.calendar || {}).forEach((field) =>
+        expect(page.fields.map((f) => f.field)).toContain(field)
+      );
       names.forEach((field) => {
         if (field.includes('.')) {
           const [relation, parentField] = field.split('.');
           const link = fieldFile(objectName, relation.replace(/__r$/, '__c'));
           expect(link).not.toBeNull();
           const target = tag(link, 'referenceTo');
-          expect(BUILT_IN.includes(parentField) || fieldFile(target, parentField) !== null).toBe(
-            true
-          );
+          const standard = target === 'Contact' && CONTACT_STANDARD.includes(parentField);
+          expect([
+            field,
+            BUILT_IN.includes(parentField) || standard || fieldFile(target, parentField) !== null
+          ]).toEqual([field, true]);
         } else {
           expect([label, field, known(field)]).toEqual([label, field, true]);
         }
@@ -170,24 +216,31 @@ describe('shipped portal templates', () => {
       });
   });
 
-  it('the donor template takes no payments and changes only contact details', () => {
+  it('the donor template edits only contact details and pays only through Pay Online on pledges', () => {
     const text = JSON.stringify(donor);
-    expect(text).not.toMatch(/Payment|Card|create/);
+    expect(text).not.toMatch(/Card|create/);
     donor.pages.forEach((page) => {
-      expect(page.actions.filter((a) => typeof a !== 'string' || a !== 'update')).toEqual([]);
-      if (page.actions.length > 0) {
+      const updates = page.actions.filter((a) => a === 'update');
+      const modules = page.actions.filter((a) => typeof a === 'object');
+      expect(page.actions.length).toBe(updates.length + modules.length);
+      if (updates.length > 0) {
         expect(page.kind).toBe('person');
         expect(page.key).toBe('contact');
       }
+      // PAY-03 (ADR-0210 donor portal payments): the one module action, on pledges only.
+      modules.forEach((action) => {
+        expect(action.extension).toBe('Giving.PayOnline');
+        expect(page.key).toBe('pledges');
+      });
     });
   });
 
   it('every module action a template names is offered by its module class', () => {
-    [volunteer, speaker].forEach((template) => {
-      const source = fs.readFileSync(
-        path.join(PACKAGES, ACTION_CLASSES[template.requiresModules[0]]),
-        'utf8'
-      );
+    [volunteer, speaker, board, applicant, member, donor, attendee, sponsor].forEach((template) => {
+      const source = []
+        .concat(ACTION_CLASSES[template.requiresModules[0]])
+        .map((file) => fs.readFileSync(path.join(PACKAGES, file), 'utf8'))
+        .join('\n');
       template.pages
         .flatMap((page) => page.actions)
         .filter((a) => typeof a === 'object')
@@ -195,8 +248,28 @@ describe('shipped portal templates', () => {
     });
   });
 
+  it('the board template never lets a member edit a vote, minutes or a status', () => {
+    board.pages.forEach((page) => {
+      page.fields
+        .filter((f) => f.edit)
+        .forEach((f) => expect(f.field).not.toMatch(/Vote__c|Minutes|Status__c|Attendance__c/));
+    });
+  });
+
+  it('the member directory lists only members who opted in, and edits nothing', () => {
+    const directory = member.pages.find((page) => page.key === 'directory');
+    expect(directory.kind).toBe('catalog');
+    expect(directory.search).toBe(true);
+    expect(directory.where).toContainEqual({
+      field: 'Directory_Opt_In__c',
+      op: 'equals',
+      value: 'true'
+    });
+    expect(directory.fields.map((f) => f.field)).not.toContain('Contact__c');
+  });
+
   it('titles and labels are in title case', () => {
-    const small = ['a', 'an', 'and', 'for', 'of', 'the', 'to'];
+    const small = ['a', 'an', 'and', 'for', 'in', 'of', 'the', 'to'];
     const titleCase = (text) =>
       text
         .split(' ')
@@ -207,5 +280,60 @@ describe('shipped portal templates', () => {
         .filter((f) => f.label)
         .forEach((f) => expect([f.label, titleCase(f.label)]).toEqual([f.label, true]));
     });
+  });
+
+  it.each(cases().filter(([, , page]) => page.personScope))(
+    '%s: the person scope names real lookups to the same object',
+    (label, template, page) => {
+      const scope = page.personScope;
+      // A path's lookup (one hop allowed) and the object it points to.
+      const lookupOf = (objectName, fieldPath) => {
+        if (fieldPath === 'Id') {
+          return objectName;
+        }
+        const parts = fieldPath.split('.');
+        let xml = fieldFile(objectName, parts[0].replace(/__r$/, '__c'));
+        if (parts.length === 2) {
+          xml = fieldFile(tag(xml, 'referenceTo'), parts[1]);
+        }
+        expect([label, fieldPath, xml !== null]).toEqual([label, fieldPath, true]);
+        return tag(xml, 'referenceTo');
+      };
+      expect(lookupOf(scope.object, scope.valueField)).toBe(lookupOf(page.object, scope.field));
+      expect(lookupOf(scope.object, scope.personField)).toBe('Contact');
+      (scope.where || []).forEach((test) =>
+        expect(fieldFile(scope.object, test.field)).not.toBeNull()
+      );
+    }
+  );
+
+  it('the attendee app lists only opted-in attendees, without email, phone or address', () => {
+    const list = attendee.pages.find((page) => page.key === 'attendees');
+    expect(list.where).toContainEqual({
+      field: 'Networking_Opt_In__c',
+      op: 'equals',
+      value: 'true'
+    });
+    const fields = list.fields.map((f) => f.field).join(' ');
+    expect(fields).not.toMatch(/Email|Phone|Address|Contact|Networking_Contact__c/);
+    attendee.pages
+      .filter((page) => page.kind === 'catalog')
+      .forEach((page) => expect(page.personScope).toBeDefined());
+  });
+
+  it('sponsors scan badge codes, and partners never see referral notes', () => {
+    const leads = sponsor.pages.find((page) => page.key === 'leads');
+    expect(leads.fields.find((f) => f.field === 'Badge_Code__c').scan).toBe(true);
+    expect(leads.personField).toBe('Scanned_By__c');
+    [partner, partnerFunders, service].forEach((template) =>
+      expect(JSON.stringify(template)).not.toMatch(/Notes__c|Case_Note__c/)
+    );
+    const shared = partner.pages.find((page) => page.key === 'referrals');
+    expect(shared.where).toContainEqual({
+      field: 'Shared_With_Partner__c',
+      op: 'equals',
+      value: 'true'
+    });
+    expect(partnerFunders.pages.slice(0, 1)).toEqual(partner.pages.slice(0, 1));
   });
 });

@@ -149,7 +149,7 @@ public with sharing class AcknowledgmentRunService {
 			AcknowledgmentWriter.updateRun(run);
 			AcknowledgmentService.recordLastRun(
 				String.format(
-					Label.Giving_Acknowledgment_LetterRunSummary,
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_LetterRunSummary'),
 					new List<String>{ String.valueOf(inFile.size()) }
 				)
 			);
@@ -159,7 +159,9 @@ public with sharing class AcknowledgmentRunService {
 			run.Finished__c = System.now();
 			AcknowledgmentWriter.updateRun(run);
 			ErrorLogger.log(failure, CONTEXT_LETTER, run.Id);
-			throw new AcknowledgmentRunException(Label.Giving_Acknowledgment_LetterRunFailed);
+			throw new AcknowledgmentRunException(
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_LetterRunFailed')
+			);
 		}
 	}
 
@@ -173,10 +175,14 @@ public with sharing class AcknowledgmentRunService {
 		AcknowledgmentService.requireSendPermission();
 		Acknowledgment_Run__c run = AcknowledgmentSelector.runById(runId);
 		if (run == null) {
-			throw new AcknowledgmentRunException(Label.Giving_Acknowledgment_RunNotFound);
+			throw new AcknowledgmentRunException(
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotFound')
+			);
 		}
 		if (!STATUS_READY_TO_MERGE.equals(run.Status__c)) {
-			throw new AcknowledgmentRunException(Label.Giving_Acknowledgment_RunNotWaiting);
+			throw new AcknowledgmentRunException(
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotWaiting')
+			);
 		}
 
 		List<Acknowledgment__c> rows = AcknowledgmentSelector.forRun(runId);
@@ -240,7 +246,7 @@ public with sharing class AcknowledgmentRunService {
 		);
 		AcknowledgmentService.recordLastRun(
 			String.format(
-				Label.Giving_Acknowledgment_EmailRunSummary,
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_EmailRunSummary'),
 				new List<String>{ String.valueOf(sent), String.valueOf(errorCount) }
 			)
 		);

@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM landing/batch-c-review ef74bfa4 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-d-i bf7f0eff1 (the integrated Batch D to I build, on top of v1.0 and Batch C). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
@@ -8,7 +8,7 @@ This guide is for staff who use BarnCRM every day: you look people up, keep hous
 
 Each page is a set of short recipes ("To do X: 1. 2. 3.") using the names you see on screen. Where a task needs an admin (a setting, a permission, a template), the page says so and links to the [Admin Guide](../admin-guide/README.md) instead of explaining it.
 
-What you can do depends on the role your admin gave you on the Access page (for example Fundraising Staff, Team Member, Coordinator or Read Only) and on which modules your organization uses. If a tab, button or panel in this guide is missing for you, ask your admin.
+What you can do depends on the role your admin gave you on the Access page (for example Fundraising Staff, Team Member or Read Only) and on which modules your organization uses. If a tab, button or panel in this guide is missing for you, ask your admin.
 
 ## Pages
 
@@ -16,19 +16,23 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Getting around BarnCRM](getting-around.md): the apps, tabs, Home, What's new, in-app tips and notifications.
 - [Read only access](read-only-access.md): what a person with the Read Only role can and cannot do.
+- Moving from another app: when your organization moves records from another app in the same org (for example DLRS rollups, NPSP relationships, affiliations, addresses, funds, levels, recurring donations and engagement plans, gifts and soft credits, Nonprofit Cloud gifts, commitments, soft credits, relationships and affiliations, or Volunteers for Salesforce jobs, shifts and hours), your admin runs the [Migration Assistant](../admin-guide/migration-assistant.md). Nothing changes in your daily work until they finish; ask them when the old app's screens stop being updated.
 
 ### People and Households
 
 - [Finding people and records](find.md): search, list views and the Find tab.
+- [Editing many records in a grid](grid.md): a saved search and its related records in tables you change on screen, and saved grids.
 - [Changing many records at once](super-transform.md): Super Transformer, with a preview and an undo, saved lists and a phone format.
-- [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
+- [Brands](brands.md): the Brand field on records, brand assignments, brand-printed receipts and brand filters, when your organization works under several names.
+- [Field history](field-history.md): who changed a field on a record, when, and what it was before.
+- [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes, the engagement score.
 - [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone, and their Contact Point copies where Contact Point Sync is installed.
 - [Relationships and affiliations](relationships-affiliations.md): how people are connected to each other and to organizations.
 - [Reviewing duplicates](duplicates.md): checking likely duplicate pairs and merging them.
 
 ### Gifts (Nonprofit Edition)
 
-- [Entering gifts](gifts.md): Quick Gift Entry, the Enter a Gift action, funds, soft credits, tributes, in-kind and matching gifts.
+- [Entering gifts](gifts.md): Quick Gift Entry, the Enter a Gift action, funds, soft credits, tributes, in-kind, stock, planned, donor-advised fund and matching gifts.
 - [Gift batches](gift-batches.md): typing a stack of checks against a deposit total.
 - [Pledges and recurring gifts](commitments.md): commitments, installments and paying them.
 - [The Ask Pipeline](ask-pipeline.md): tracking asks by step on a board, and closing them as won, declined or withdrawn.
@@ -65,11 +69,40 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Portals](portal-builder.md): who can sign in to a portal, ending someone's portal sessions, what a person sees when they sign in, and what the volunteer, speaker and donor portals show and let them do.
 
+### Corporate Hub
+
+- [Corporate Hub](corporate-hub.md): acknowledging policies, what is due on the Corporate Hub page, Library Documents and their versions, completing a compliance obligation with its evidence, agreements, data subject requests and breaches, and reminders.
+
+### Payments
+
+- [Payments](payments.md): finding a payment taken online, what its status means, and how refunds are made.
+
+### LWC Builder
+
+- [Built Components](lwc-builder.md): what a component your admin built shows, its buttons, and why a block or a record can be missing.
+
+### Project Management
+
+- [Projects](projects.md): Projects Home, new projects from templates, tasks and milestones, logging time, health and status updates.
+
+### Scholarships and Outbound Grants
+
+- [Scholarships and Grants](scholarships.md): reviewing applications with a rubric, recusing, the review board and decisions, award letters and acceptance, disbursements and conditions, recipient reports, renewals and the disbursement export.
+
+### Territory Management
+
+- [Territory Management](territory-management.md): your records' Territory, how assignment runs change territory and owner, and who can undo them.
+
+### Memberships
+
+- [Memberships](memberships.md): adding a member, what a membership's status means, renewing, sending a payment link, and the directory listing.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
 - [Donor segments](donor-segments.md): lists of donors by their giving, exported for Mailchimp or Constant Contact.
-- [Donor scores](donor-scores.md): how recently, how often and how much each donor gives, as a score and a segment on their record.
+- [Recurring donor health](recurring-donor-health.md): monthly recurring revenue and the recurring donors who may be about to stop.
+- [Donor scores](donor-scores.md): how recently, how often and how much each donor gives, as a score and a segment on their record, and any wealth screening loaded for them.
 
 ## Report a Bug or Give Feedback
 

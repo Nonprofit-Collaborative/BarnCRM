@@ -9,14 +9,6 @@
     <value>Year end statement run</value>
   </labels>
   <labels>
-    <fullName>Giving_JobNotice_StatementsBody</fullName>
-    <categories>Giving, Job Notifications</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Job notification body: statement run counts {0} to {2}</shortDescription>
-    <value>{0} donors checked, {1} statements issued, {2} batches with errors. Open the run for the details.</value>
-  </labels>
-  <labels>
     <fullName>Giving_JobNotice_Acknowledgments</fullName>
     <categories>Giving, Job Notifications</categories>
     <language>en_US</language>
@@ -25,27 +17,11 @@
     <value>Acknowledgment send</value>
   </labels>
   <labels>
-    <fullName>Giving_JobNotice_AcknowledgmentsBody</fullName>
-    <categories>Giving, Job Notifications</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Job notification body: acknowledgment send counts {0} to {2}</shortDescription>
-    <value>{0} gifts processed, {1} thank you emails sent, {2} could not be sent. Open the run for the details.</value>
-  </labels>
-  <labels>
     <fullName>Giving_JobNotice_DonorLevels</fullName>
     <categories>Giving, Job Notifications</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Job notification: name of a donor level recalculation</shortDescription>
     <value>Donor level recalculation</value>
-  </labels>
-  <labels>
-    <fullName>Giving_JobNotice_DonorLevelsBody</fullName>
-    <categories>Giving, Job Notifications</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Job notification body: donor level recalculation count {0}</shortDescription>
-    <value>{0} donors moved to a different level.</value>
   </labels>
 </CustomLabels>

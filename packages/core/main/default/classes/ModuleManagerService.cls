@@ -67,6 +67,7 @@ public with sharing class ModuleManagerService {
 			'Receipt_Number_Sequence__c',
 			'Receipt_Run__c',
 			'Receipt_Template__c',
+			'Recurring_Gift_Event__c',
 			'Soft_Credit__c',
 			'Stewardship_Plan__c',
 			'Stewardship_Plan_Step__c',
@@ -102,6 +103,7 @@ public with sharing class ModuleManagerService {
 			'Session_Schedule__c'
 		},
 		'LogicModels' => new List<String>{
+			'Assumption_Evidence__c',
 			'Indicator__c',
 			'Indicator_Period__c',
 			'Logic_Model__c',
@@ -112,6 +114,8 @@ public with sharing class ModuleManagerService {
 			'Funder_Report_Template__c',
 			'Grant__c',
 			'Grant_Answer__c',
+			'Grant_Budget_Line__c',
+			'Grant_Checklist_Item__c',
 			'Grant_Fund_Entry__c',
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
@@ -140,9 +144,72 @@ public with sharing class ModuleManagerService {
 			'Sponsor_Deliverable__c',
 			'Sponsorship_Level__c',
 			'Event_Table__c',
-			'Ticket_Type__c'
+			'Ticket_Type__c',
+			'Proposal_Presenter__c',
+			'Event_Venue__c',
+			'Event_Room__c',
+			'Event_Expense__c',
+			'Event_Funding__c',
+			'Sponsor_Lead__c',
+			'Event_Announcement__c',
+			'Agenda_Item__c',
+			'Attendee_Connection__c',
+			'Attendee_Message__c',
+			'Session_Rating__c'
 		},
-		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' }
+		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },
+		'CorporateHub' => new List<String>{
+			'Agreement__c',
+			'Assessment_Answer__c',
+			'Board__c',
+			'Board_Assessment__c',
+			'Board_Meeting__c',
+			'Board_Member__c',
+			'Board_Motion__c',
+			'Board_Vote__c',
+			'Compliance_Cycle__c',
+			'Compliance_Obligation__c',
+			'Data_Breach__c',
+			'Data_Subject_Request__c',
+			'Hub_Document__c',
+			'Meeting_Action_Item__c',
+			'Meeting_Attendee__c',
+			'Policy_Acknowledgment__c',
+			'Processing_Activity__c'
+		},
+		'Payments' => new List<String>{ 'Payment__c', 'Payment_Event__c' },
+		'LwcBuilder' => new List<String>{ 'Built_Component__c' },
+		'Scholarships' => new List<String>{
+			'Application_Review__c',
+			'Award__c',
+			'Award_Application__c',
+			'Award_Cycle__c',
+			'Award_Payment__c',
+			'Award_Program__c',
+			'Award_Requirement__c'
+		},
+		'Territory' => new List<String>{
+			'Territory__c',
+			'Territory_Member__c',
+			'Territory_Rule__c',
+			'Territory_Run__c'
+		},
+		'Memberships' => new List<String>{
+			'Certification__c',
+			'Continuing_Credit__c',
+			'Member_Certification__c',
+			'Membership_Benefit__c',
+			'Membership_Level__c',
+			'Membership_Term__c'
+		},
+		'Projects' => new List<String>{
+			'Project__c',
+			'Project_Assignment__c',
+			'Project_Phase__c',
+			'Project_Status_Update__c',
+			'Project_Task__c',
+			'Time_Entry__c'
+		}
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -157,7 +224,15 @@ public with sharing class ModuleManagerService {
 		'Forms' => 'Forms_Admin',
 		'ContactPoints' => 'Contact_Point_Sync_Admin',
 		'Events' => 'Events_Admin',
-		'Portal' => 'Portal_Admin'
+		'Portal' => 'Portal_Admin',
+		'CorporateHub' => 'Corporate_Hub_Admin',
+		'Payments' => 'Payments_Admin',
+		'LwcBuilder' => 'LWC_Builder_Admin',
+		'Scholarships' => 'Scholarships_Admin',
+		'Territory' => 'Territory_Admin',
+		'Memberships' => 'Memberships_Admin',
+		'Projects' => 'Projects_Admin',
+		'AddressVerification' => 'Address_Verification_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

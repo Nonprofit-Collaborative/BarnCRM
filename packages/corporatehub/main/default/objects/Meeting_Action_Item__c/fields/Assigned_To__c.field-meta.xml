@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Assigned_To__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>Who does it.</inlineHelpText>
+  <label>Assigned To</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Board Action Items</relationshipLabel>
+  <relationshipName>Board_Action_Items</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

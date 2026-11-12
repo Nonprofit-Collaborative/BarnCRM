@@ -114,6 +114,7 @@
   <tabs>Stewardship_Plan__c</tabs>
   <tabs>Acknowledgments</tabs>
   <tabs>Donor_Segments</tabs>
+  <tabs>Recurring_Donor_Health</tabs>
   <tabs>standard-Dashboard</tabs>
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>

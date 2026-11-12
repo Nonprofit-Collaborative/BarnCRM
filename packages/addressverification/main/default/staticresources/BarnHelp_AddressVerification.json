@@ -1,0 +1,30 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "AddressVerification_Error_BadProvider": "Choose Smarty or Google.",
+    "AddressVerification_Error_Provider": "{0} did not answer for {1} addresses. They stay Unverified and are tried again tonight. Check your keys and your provider account''s allowance.",
+    "AddressVerification_Health_KeysMissingDetail": "Address Verification is on but the {0} keys are not entered, so no address is checked. Enter them on Address Verification Setup, or choose the provider you have an account with in Settings, Addresses.",
+    "AddressVerification_Health_KeysMissingTitle": "Address Verification Keys Are Missing",
+    "AddressVerification_Health_WaitingDetail": "{0} current addresses have been Unverified for more than 30 days. Raise the nightly limit, select Verify Waiting Addresses on Address Verification Setup, or, with Smarty, check whether they are outside the United States, which Smarty does not check.",
+    "AddressVerification_Health_WaitingTitle": "Addresses Are Waiting To Be Verified",
+    "AddressVerification_NightlyStep": "Address Verification",
+    "AddressVerification_Setup_Clear": "Clear",
+    "AddressVerification_Setup_Failed": "That didn't work. Try again, and if it happens again, check the Error Log.",
+    "AddressVerification_Setup_GoogleApiKey": "Google API key",
+    "AddressVerification_Setup_GoogleHeading": "Google Address Validation",
+    "AddressVerification_Setup_Intro": "Addresses are checked with your organization's own account at Smarty or Google. BarnCRM holds no key and sells no lookups: each one counts against your provider account. Keys are never shown again once saved.",
+    "AddressVerification_Setup_KeyNotSet": "Not set",
+    "AddressVerification_Setup_KeySet": "Set, ending {0}",
+    "AddressVerification_Setup_NoManage": "Only someone with the Manage BarnCRM Settings permission can save keys or start a check.",
+    "AddressVerification_Setup_NotStarted": "Nothing was started: the module is off, the keys are missing, or the nightly limit is 0.",
+    "AddressVerification_Setup_Provider": "Provider in use: {0}. Change it in BarnCRM Settings, Addresses.",
+    "AddressVerification_Setup_SaveKeys": "Save Keys",
+    "AddressVerification_Setup_Saved": "Saved.",
+    "AddressVerification_Setup_SmartyAuthId": "Smarty Auth ID",
+    "AddressVerification_Setup_SmartyAuthToken": "Smarty Auth Token",
+    "AddressVerification_Setup_SmartyHeading": "Smarty US Street Address",
+    "AddressVerification_Setup_Started": "Started. Waiting addresses are checked in the background, up to the nightly limit.",
+    "AddressVerification_Setup_Title": "Address Verification Setup",
+    "AddressVerification_Setup_Verify": "Verify Waiting Addresses"
+  }
+}

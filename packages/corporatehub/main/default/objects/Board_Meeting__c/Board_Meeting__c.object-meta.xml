@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Board Meeting with its panel: the org default, since Corporate Hub has no app (ADR-0192)</comment>
+    <content>Board_Meeting_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <skipRecordTypeSelect>false</skipRecordTypeSelect>
+    <type>Flexipage</type>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Board Meeting with its panel: the org default, since Corporate Hub has no app (ADR-0192)</comment>
+    <content>Board_Meeting_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <skipRecordTypeSelect>false</skipRecordTypeSelect>
+    <type>Flexipage</type>
+  </actionOverrides>
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>One meeting of a board: agenda, packet, attendance, quorum, minutes and an availability poll; packets are Salesforce Files on it (canonical model 29CH9).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Board Meeting</label>
+  <nameField>
+    <label>Meeting Name</label>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Board Meetings</pluralLabel>
+  <sharingModel>ReadWrite</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

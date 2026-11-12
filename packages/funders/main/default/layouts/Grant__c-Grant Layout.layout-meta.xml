@@ -45,6 +45,18 @@
         <behavior>Edit</behavior>
         <field>Funding_Source__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Renewable__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Renewal_Of__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Opportunity_Url__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>
@@ -205,6 +217,19 @@
     <relatedList>Grant_Fund_Entry__c.Grant__c</relatedList>
     <sortField>Entry_Date__c</sortField>
     <sortOrder>Asc</sortOrder>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Amount_Requested__c</fields>
+    <fields>Amount_Awarded__c</fields>
+    <relatedList>Grant_Budget_Line__c.Grant__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Stage__c</fields>
+    <fields>Amount_Requested__c</fields>
+    <fields>Amount_Awarded__c</fields>
+    <relatedList>Grant__c.Renewal_Of__c</relatedList>
   </relatedLists>
   <relatedLists>
     <relatedList>RelatedActivityList</relatedList>

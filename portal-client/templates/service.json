@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "key": "service",
+  "title": "My Services",
+  "requiresModules": ["Programs"],
+  "pages": [
+    {
+      "key": "programs",
+      "title": "My Programs",
+      "kind": "related",
+      "object": "Enrollment__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Program__r.Name", "label": "Program" },
+        { "field": "Cohort__r.Name", "label": "Group" },
+        { "field": "Stage__c", "label": "Stage" },
+        { "field": "Start_Date__c", "label": "Started" },
+        { "field": "End_Date__c", "label": "Ended" }
+      ],
+      "where": [{ "field": "Stage__c", "op": "notEquals", "value": "Withdrawn" }],
+      "orderBy": "Start_Date__c DESC",
+      "limit": 50,
+      "actions": []
+    },
+    {
+      "key": "services",
+      "title": "My Services",
+      "kind": "related",
+      "object": "Service_Delivery__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Service__r.Name", "label": "Service" },
+        { "field": "Delivery_Date__c", "label": "Date" },
+        { "field": "Quantity__c", "label": "Quantity" },
+        { "field": "Attendance__c", "label": "Attendance" },
+        { "field": "Session__r.Name", "label": "Session" }
+      ],
+      "orderBy": "Delivery_Date__c DESC",
+      "limit": 100,
+      "download": true,
+      "actions": []
+    },
+    {
+      "key": "sessions",
+      "title": "Upcoming Sessions",
+      "kind": "catalog",
+      "object": "Session__c",
+      "fields": [
+        { "field": "Name", "label": "Session" },
+        { "field": "Session_Date__c", "label": "Date" },
+        { "field": "Start_Time__c", "label": "Starts" },
+        { "field": "End_Time__c", "label": "Ends" },
+        { "field": "Cohort__r.Name", "label": "Group" },
+        { "field": "Service__r.Name", "label": "Service" }
+      ],
+      "where": [
+        { "field": "Status__c", "op": "equals", "value": "Scheduled" },
+        { "field": "Session_Date__c", "op": "greaterOrEqual", "value": "TODAY" }
+      ],
+      "personScope": {
+        "field": "Cohort__c",
+        "object": "Enrollment__c",
+        "personField": "Contact__c",
+        "valueField": "Cohort__c",
+        "where": [{ "field": "Stage__c", "op": "equals", "value": "Enrolled" }]
+      },
+      "orderBy": "Session_Date__c ASC",
+      "limit": 100,
+      "calendar": { "title": "Name", "start": "Session_Date__c" },
+      "actions": []
+    },
+    {
+      "key": "goals",
+      "title": "My Goals",
+      "kind": "related",
+      "object": "Goal__c",
+      "personField": "Enrollment__r.Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Goal" },
+        { "field": "Status__c" },
+        { "field": "Target_Date__c", "label": "Target Date" },
+        { "field": "Last_Review_Date__c", "label": "Last Reviewed" }
+      ],
+      "orderBy": "Target_Date__c ASC",
+      "limit": 50,
+      "actions": []
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true },
+        { "field": "MailingStreet", "label": "Street", "edit": true },
+        { "field": "MailingCity", "label": "City", "edit": true },
+        { "field": "MailingState", "label": "State", "edit": true },
+        { "field": "MailingPostalCode", "label": "Postal Code", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

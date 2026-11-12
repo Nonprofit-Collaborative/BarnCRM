@@ -77,7 +77,7 @@ private class VolunteerHoursPermissionTest {
 		Test.stopTest();
 
 		Assert.areEqual(
-			Label.Volunteers_Hours_StatusThroughApproval,
+			BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval'),
 			running,
 			'With automation running the hours rules refuse it.'
 		);
@@ -121,7 +121,7 @@ private class VolunteerHoursPermissionTest {
 		Test.stopTest();
 
 		Assert.areEqual(
-			Label.Volunteers_Hours_ApprovedNotDeletable,
+			BarnHelp.text('Volunteers', 'Volunteers_Hours_ApprovedNotDeletable'),
 			deleted,
 			'Approved hours are kept even with automation paused (R-VG9); reopened, they go.'
 		);
@@ -159,7 +159,7 @@ private class VolunteerHoursPermissionTest {
 			if (!result.isSuccess()) {
 				refused++;
 				Assert.areEqual(
-					Label.Volunteers_Hours_ApprovedNotDeletable,
+					BarnHelp.text('Volunteers', 'Volunteers_Hours_ApprovedNotDeletable'),
 					result.getErrors()[0].getMessage(),
 					'Each refusal says to reopen first.'
 				);

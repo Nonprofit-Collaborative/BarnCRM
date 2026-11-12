@@ -92,7 +92,13 @@ const PAGE_GROUPS = {
     {
       id: 'People',
       label: PEOPLE,
-      keys: ['Household_Membership_Mode__c', 'Auto_Create_Households__c']
+      keys: [
+        'Household_Membership_Mode__c',
+        'Auto_Create_Households__c',
+        'Engagement_Score_Enabled__c',
+        'Engagement_Score_Weights__c',
+        'Engagement_Score_Targets__c'
+      ]
     },
     {
       id: 'Households',

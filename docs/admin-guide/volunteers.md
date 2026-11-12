@@ -77,18 +77,20 @@ menu at the top left.
 
 ## Roles and Permission Sets
 
-You never assign the Volunteers permission sets by hand. Give people their BarnCRM role on the
-[Access](access.md) page as usual, and the module gives each role its Volunteers set:
+Give people their BarnCRM role on the [Access](access.md) page as usual, and the module gives
+each role its Volunteers set:
 
 | BarnCRM role | Volunteers set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Volunteers Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Volunteers Coordinator | Everything Staff does, plus see and correct everyone's hours to approve or reject them |
-| Team Member | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
+| Team Member, Fundraising Staff (Giving) | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
 | Read Only | Volunteers Read Only | Look at jobs, shifts, sign-ups and volunteer details; sees no hours entries (see below) |
 
-The Coordinator and Team Member roles give the same access to people and households, so the
-module tells them apart by the role itself.
+Whoever approves hours also needs **Volunteers Coordinator**: everything Staff does, plus see
+and correct everyone's hours to approve or reject them, and manage skills, requirements and
+onboarding steps. It is not a role: give it on the Access page under **Extra Permissions**, on
+top of the person's role (usually Team Member). The Coordinator role is retired; in this
+release its holders keep it, also get Team Member, and keep Volunteers Coordinator.
 
 When it happens:
 
@@ -233,6 +235,128 @@ settings, and each saves as you change it.
 | Days before a shift to remind | 1 | How many days before a shift its reminder goes out, from 1 to 14. Default: 1. | At the next 7:00 AM run |
 | Send unfilled shift nudges | Off | Active volunteers who have helped on a job before get one email when one of its upcoming shifts is still short. See Unfilled Shift Nudges below. | At the next 7:15 AM run |
 | Days before a shift to nudge | 3 | How many days before an unfilled shift its nudge goes out, from 1 to 14. Default: 3. | At the next 7:15 AM run |
+| Value of one volunteer hour | 34.79 | What one hour is worth in your currency. See Value of Volunteer Time below. 0 hides every value. | Now |
+| Send thank-you tasks | Off | A thank-you task when a volunteer reaches an hours milestone or an anniversary. See Thank-You Tasks below. | At the next 7:30 AM run |
+| Hour milestones | 25, 50, 100, 250, 500, 1000 | The total hours that earn a thank-you task, separated by commas. | At the next 7:30 AM run |
+| Waitlist when full | Off | A full shift waitlists new sign-ups and moves them up when a place frees. See Waitlists and Shift Minimums below. | Now |
+| Guardian consent required | Off | A young volunteer's sign-up is flagged and gets a guardian consent step. See Young Volunteers below. | Now |
+| Minor age | 18 | The age below which a volunteer needs guardian consent, from 1 to 21. | Now |
+| Self-service profile form | Empty | The public form volunteers use on their personal page. See Public Sign-Up Page below. | At the next 7:00 AM reminder run |
+
+## Value of Volunteer Time
+
+**Value of one volunteer hour** turns hours into money for reports to funders and boards. The
+default, 34.79, is the national value of a volunteer hour Independent Sector published for 2024;
+change it to your state's figure or one your auditor gives you. It only displays, and nothing
+stores a value:
+
+- **Volunteers Home** shows **Value of Hours This Month**: this month's approved hours times the
+  rate, in your org's currency.
+- A volunteer's personal page (see Public Sign-Up Page) shows the value of their hours.
+- Hour letter and certificate templates can use `{HourValue}` (the rate) and `{HoursValue}` (the
+  person's hours in the letter's period times the rate).
+
+Set it to 0 to hide the figure and the personal page's value; the two tokens then merge as empty.
+
+## Thank-You Tasks
+
+With **Send thank-you tasks** on, a morning run at 7:30 AM (your org time zone) creates an open
+task due today, named for the volunteer, for each contact who:
+
+- reached one of the **Hour milestones** in their **Volunteer Hours Total** since the last
+  thank-you. A person who passes two milestones between runs gets one task, for the higher one.
+  The contact's **Last Hour Milestone** (read only) records the milestone thanked, so nobody is
+  thanked twice for the same one. Lowering a person's total never takes it back.
+- started volunteering on this day one or more years ago (**Volunteer Since**).
+
+The task goes to the contact's owner when that user is active, otherwise to the user the nightly
+run belongs to. Health Check's fix for unscheduled nightly jobs schedules the run. Contacts only:
+where your people are person accounts, add a report of milestones instead.
+
+## Waitlists and Shift Minimums
+
+**Volunteers Needed** is the most people you want on a shift; **Minimum Volunteers** (optional)
+is the fewest it needs to go ahead. While fewer places are filled than the minimum, the shift's
+**Below Minimum** is ticked, and the **Shifts Below Minimum** list view lists the open shifts still
+to come that are short. Nothing is cancelled for you. The minimum cannot be more than Volunteers
+Needed.
+
+With **Waitlist when full** off (the default), a full shift still takes sign-ups and **Slots
+Remaining** goes below zero, as before. Turn it on and:
+
+- A sign-up made as Signed up or Confirmed on a full shift is saved as **Waitlisted** instead,
+  from every screen: the Sign-Ups panel, the volunteer portal, the public sign-up page and
+  imports. A waitlisted sign-up takes no place.
+- When a place frees (a sign-up Cancelled or deleted, a group made smaller, or Volunteers Needed
+  raised) on a shift still to come, waitlisted people move up to **Signed up**, oldest first. A
+  group bigger than the places free is passed over for a smaller one behind it.
+- Moving up sends no email of its own. With **Send shift reminders** on, the person gets the usual
+  reminder before the shift.
+
+**Slots Filled** counts places, not sign-ups, and leaves out Cancelled and Waitlisted sign-ups.
+If you installed Volunteers before release 1.6, edit the **Volunteer shift slots filled** rollup
+in Rollup Builder to match: Sum of **Places**, where **Status** is not Cancelled or Waitlisted.
+
+## Group and Standing Sign-Ups
+
+**Groups.** A sign-up can hold a group: name the leader as the person, set **Group Size** to how
+many come (the leader included) and, if you like, a **Group Name** such as the company or class.
+**Places** shows how many places the booking takes, and the shift's figures count places.
+
+**Standing sign-ups.** For someone who comes every week, book them on one shift of a recurring
+schedule and tick **Standing**. BarnCRM books them on every later shift of that schedule, now and
+each time the schedule creates more shifts. Their latest sign-up on the schedule decides whether
+it continues: to end it, cancel their sign-ups from the day they stop. A standing booking does not
+keep an old shift when you change the schedule's days or times; the person moves to the new
+pattern's shifts.
+
+## Young Volunteers and Guardian Consent
+
+With **Guardian consent required** on, a sign-up for a contact younger than **Minor age** on the
+day of the shift (from their **Birthdate**), who has no current **Guardian consent** step, is
+saved with **Consent Needed** ticked and gets a **Guardian consent** onboarding step, Not
+started, unless an unfinished one is already there. Complete that step like any other: set its
+**Guardian** (the parent or guardian's contact), **Completed Date** and an **Expires** date, for
+example a year later. Nobody is refused: you decide whether they come. People with no Birthdate,
+or named by an account, are not checked.
+
+On the public sign-up page, a form that also writes the guardian as a second person, with the
+record key `guardian` (see the Forms admin guide), fills the step's **Guardian** for you.
+
+## Background Check Details
+
+A **Background check** step can say where the check is kept: **Provider** (the screening
+company), **Reference ID** (its reference for the check) and **Entry Source** (**Entered**, the
+default, or **Imported** for rows loaded from a provider's export with **Load One Object** in Data
+Manager). BarnCRM never contacts a screening provider and never stores what a check found.
+
+## Public Sign-Up Page
+
+Needs **BarnCRM Forms** set up on a Salesforce Site ([Forms](forms.md)). Volunteers works the
+same without it.
+
+1. Build a sign-up form in Forms that writes a person (name and email at least), publish it and
+   tick **Public**. The shift is passed to the form for you: add no shift question.
+2. On each job to offer, tick **Show on Public Page** and paste the form's record ID into
+   **Sign-Up Form**. Only Admins and Coordinators can change these two fields.
+3. Share `<your site address>/FormsPublic?list=volunteers`. It lists the open shifts of public,
+   active jobs that have not started, soonest first (up to 50). Each opens a page with the job's
+   description, the shift's day, time and place, how many places are left, and the form.
+
+The page never shows who is booked, the coordinator or notes. A sign-up is matched to an existing
+person the way every Forms submission is, so returning volunteers are not duplicated, and booked
+through the same rules as on the Sign-Ups panel: the waitlist, groups (a form question with the
+key `groupSize` and `groupName`) and the guardian check all apply. A full shift with **Waitlist
+when full** off says sign-up is closed.
+
+**Personal page.** Build a second public form for profile updates with the questions
+`availabilityDays`, `availabilityTimes`, `emergencyContactName` and `emergencyContactPhone`, publish
+it, and put its record ID in **Self-service profile form**. Each shift reminder then ends with a
+private link to the volunteer's own page: their upcoming shifts, approved hours this year and in
+total with their value, their last ten approved entries, and the profile form. The link is signed
+for that person and cannot be changed to show anyone else; answers update only that person's
+availability and emergency contact. With no form set, or Forms not on a Site, the line is left
+out of reminders.
 
 ## Shift Reminders
 
@@ -401,7 +525,8 @@ made:
 
 | Token | Filled with |
 |---|---|
-| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings (the address on one line, its parts separated by commas) |
+| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings (the address on one line, its parts separated by commas). With brands on, the brand's legal entity and address (see below) |
+| `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}`, `{BrandLogo}` | With brands on, the brand's name, phone, website, letter signature (one line per line) and logo; with brands off or no brand, `{BrandName}` is the organization name and the others are empty |
 | `{PersonName}`, `{FirstName}` | The person's name, and their preferred name (or first name) |
 | `{Hours}` | Their approved hours in the period |
 | `{JobList}` | A list of each job with its hours in the period |
@@ -721,9 +846,10 @@ click **Recalculate All** on the Rollups page. No Volunteers set is given while 
 
 Do this as Maria, who holds the Admin role, with a second user, Priya, who has none yet.
 
-1. On the [Access](access.md) page, give Priya the **Coordinator** role.
+1. On the [Access](access.md) page, give Priya the **Team Member** role, then, under **Extra
+   Permissions**, give her **Volunteers Coordinator**.
 2. In Setup, open Priya's user record and look at **Permission Set Assignments**. Within a
-   minute she holds **Volunteers Coordinator**.
+   minute she holds **Volunteers Staff** as well as **Volunteers Coordinator**.
 3. Open the **BarnCRM Volunteers** app. On **Volunteer Jobs**, create a job called "Food
    pantry" with yourself as **Coordinator**.
 4. On the job, add a shift for next Saturday from 9:00 to 12:00 with **Volunteers Needed** 3.
@@ -795,6 +921,39 @@ a coordinator reopens it (back to Submitted) and then deletes it.
 To import, a person needs the BarnCRM Admin role (for the Import tab) and a Volunteers role
 that enters hours (Team Member, Coordinator or Admin), since the load runs with that person's
 own permissions.
+
+## Moving From V4S
+
+When Volunteers for Salesforce (V4S) is installed in the same org, the
+[Migration Assistant](migration-assistant.md) offers the **V4S Jobs, Shifts and Hours** kit:
+open **BarnCRM Settings**, **Integrations**, find **Volunteers for Salesforce** and select
+**Start Migration**. It reads V4S in your org and never changes it. Your volunteers stay the same
+Contact records, so nothing about the people is copied.
+
+Run the four steps in order. Each one previews, loads, can be checked against the V4S count and
+undone, like any import.
+
+| Step | Reads from V4S | Makes in BarnCRM |
+|---|---|---|
+| Volunteer Jobs | Every Volunteer Job | A Volunteer Job with the same name and description; Location is the V4S street and city; Active is the opposite of V4S Inactive. |
+| Volunteer Shifts | Every Volunteer Shift | A shift on the job the first step made. Start is the V4S start; End is the start plus the V4S Duration (one hour when blank); Volunteers Needed is the V4S Desired Number (1 when blank). A shift already started is Completed, any other is Open. |
+| Sign-Ups | V4S hours that are not Completed and are on a shift | A sign-up of the same contact on the shift the second step made. Confirmed stays Confirmed; Web Sign Up and Prospect become Signed up; No-Show becomes No show; Canceled becomes Cancelled. Comments become Notes. |
+| Completed Hours | V4S hours that are Completed | Hours of the same contact on the job and shift the kit made, with Date Worked from the V4S start date, Hours from Hours Worked and Notes from Comments. |
+
+**Hours and approval.** A load cannot approve hours while **Hours require approval** is on (the
+default), so completed V4S hours arrive **Submitted** and wait in **Approve Hours**. To bring
+them in already approved, turn the setting off in the Volunteers section of BarnCRM Settings for
+the Completed Hours step, then turn it back on.
+
+**What can be rejected.** A V4S entry with no contact, completed hours of zero, or a second
+sign-up of the same person on the same shift is rejected and listed with the reason, so you can
+fix it in V4S and load the step again. Completed V4S hours do not also become Attended sign-ups,
+so nothing is counted twice.
+
+**Not moved.** V4S recurring schedules (Job Recurrence Schedules and Volunteer Recurrence
+Schedules), the V4S site pages, and V4S settings. Set up [Recurring Shifts](#recurring-shifts)
+and the [Public Sign-Up Page](#public-sign-up-page) in BarnCRM instead; the kit's checklist lists
+what to switch off in V4S.
 
 ## Common Mistakes
 

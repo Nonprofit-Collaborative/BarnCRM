@@ -6,7 +6,7 @@ use the right one. People also get three email boxes and a choice of which one y
 and a choice of which phone number to call.
 
 Before you start: open the **BarnCRM** app. Changing addresses, email and phone needs the Team
-Member, Coordinator, Fundraising Staff or Admin role. The **Addresses** card appears once your
+Member, Fundraising Staff or Admin role. The **Addresses** card appears once your
 admin has turned on the Addresses feature. Ask your admin; see
 [Addresses](../admin-guide/addresses.md).
 
@@ -142,6 +142,21 @@ You should see: the change on the record's **Addresses** card without a reload.
 Deleting a household, organization or person also deletes their addresses, unless your
 administrator chose to keep them. Restoring the record from the Recycle Bin brings its
 addresses back. Merging two people keeps both people's addresses on the one you keep.
+
+## To Check Whether an Address Is Verified
+
+Where your admin installed Address Verification, each current address is checked with your
+organization's address service soon after you add or change it.
+
+1. Open the address from the **Addresses** tab or related list.
+2. Look at **Verification Status** and **Latest Verified Date**.
+
+You should see: **Verified** with today's date a moment after saving a deliverable address,
+**Failed** when the service could not confirm it (check the street and postal code), or
+**Unverified** while it waits. Changing the street, city, state, postal code or country sets it
+back to Unverified until it is checked again. If your admin turned on corrections, a verified
+address may show the service's spelling, such as "St" for "Street". See
+[Address Verification](../admin-guide/address-verification.md).
 
 ## To Set a Person's Email Addresses
 

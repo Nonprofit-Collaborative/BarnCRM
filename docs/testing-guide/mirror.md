@@ -7,7 +7,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-MIR-01: Switch on Campaign Sync and Sync All Appeals
 
 **Purpose:** confirm the switch, the counts and Sync all appeals give every sample appeal a Campaign.
-**Prerequisites:** admin, with the **Campaign Sync** permission set and **Marketing User** ticked on your user (Setup, Users, your user, Edit). Sample data (7 appeals).
+**Prerequisites:** admin, with the **Salesforce Records Sync** permission set and **Marketing User** ticked on your user (Setup, Users, your user, Edit). Sample data (7 appeals).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -42,7 +42,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-MIR-03: Campaign Sync Access and Switching Off
 
 **Purpose:** confirm who cannot sync, and that switching off stops copying and deletes nothing.
-**Prerequisites:** staff given the **Campaign Sync** permission set (Marketing User not ticked); read-only; admin. Campaign sync on.
+**Prerequisites:** staff given the **Salesforce Records Sync** permission set (Marketing User not ticked); read-only; admin. Campaign sync on.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -52,12 +52,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 4 | Change the **Goal** of `Giving Tuesday` to 9,000 and save. Reload its Campaign. | Expected Revenue is still 7,500. Every Campaign is still there. |
 | 5 | Tick **Copy appeals to campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
 
-**Cleanup:** remove the **Campaign Sync** permission set from staff.
+**Cleanup:** remove the **Salesforce Records Sync** permission set from staff.
 
 ## T-MIR-04: Opportunity Mirror, Gifts to Opportunities
 
 **Purpose:** confirm a run gives every gift in the totals an Opportunity and the reconciliation agrees.
-**Prerequisites:** admin, with the **Opportunity Mirror** permission set. Sample data, with rollups recalculated.
+**Prerequisites:** admin, with the **Salesforce Records Sync** permission set. Sample data, with rollups recalculated.
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -92,7 +92,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-MIR-06: Opportunities to Gifts, Start Date and the Nightly Run
 
 **Purpose:** confirm a won Opportunity becomes a gift only after the start date, and the nightly run can be scheduled and stopped.
-**Prerequisites:** admin, with the **Opportunity Mirror** permission set.
+**Prerequisites:** admin, with the **Salesforce Records Sync** permission set.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -108,7 +108,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-MIR-07: Opportunity Mirror Access
 
 **Purpose:** confirm the page and run buttons are closed to people without the permission set or Manage BarnCRM Settings.
-**Prerequisites:** read-only; staff given the **Opportunity Mirror** permission set. Direction **Gifts to Opportunities**.
+**Prerequisites:** read-only; staff given the **Salesforce Records Sync** permission set. Direction **Gifts to Opportunities**.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -116,7 +116,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 2 | As staff, open the **Opportunity Mirror** tab. | `Starting or scheduling the mirror needs the Manage BarnCRM Settings permission.` **Run Now** and **Schedule Nightly Run** are disabled. |
 | 3 | As staff, run **Compare** for this year. | The comparison shows, limited to what staff can see. |
 
-**Cleanup:** remove the **Opportunity Mirror** permission set from staff; set the direction to **Off**.
+**Cleanup:** remove the **Salesforce Records Sync** permission set from staff; set the direction to **Off**.
 
 ## T-MIR-08: Download the Accounting Export
 
@@ -164,13 +164,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 1 | As read-only, search the App Launcher for `Accounting Export`. | No **Accounting Export** item is found. |
 | 2 | As staff, do the same. | No **Accounting Export** item is found. |
 | 3 | As admin, give staff **Accounting Export**. As staff, open the tab and download last month. | A file downloads, holding only the gifts staff can see. **Mark These Gifts Posted** shows, because the set includes Post Gifts. |
+| 4 | As admin, create a user with no BarnCRM role and give them only **Accounting Export**; make them the owner of one of last month's gifts. As that user, open the tab and download last month. | A file downloads holding that gift, with its date, fund, accounting code, amount and donor name: no Giving set is needed beside Accounting Export. |
 
-**Cleanup:** remove **Accounting Export** from staff.
+**Cleanup:** remove **Accounting Export** from staff and deactivate the user from step 4.
 
 ## T-MIR-11: Inbound Gift API, Record and Resend
 
 **Purpose:** confirm the REST endpoint records a gift once and refuses a changed resend.
-**Prerequisites:** an API user: `sf org create user --target-org <alias> --set-alias <alias>-api profileName="Standard User" LastName="API Tester" Username="api@<alias>.barncrm.test" Email="api@<alias>.barncrm.test"`, then `sf org assign permset --target-org <alias> --on-behalf-of api@<alias>.barncrm.test --name Inbound_Gift_API`. Sample data. Endpoint in a test org: `/services/apexrest/v1/gifts`.
+**Prerequisites:** an API user: `sf org create user --target-org <alias> --set-alias <alias>-api profileName="Standard User" LastName="API Tester" Username="api@<alias>.barncrm.test" Email="api@<alias>.barncrm.test"`, then `sf org assign permset --target-org <alias> --on-behalf-of api@<alias>.barncrm.test --name Inbound_Gifts`. Sample data. Endpoint in a test org: `/services/apexrest/v1/gifts`.
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -205,7 +206,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 ## T-MIR-13: Record Inbound Gift Action in Flow
 
 **Purpose:** confirm the Flow action records, recognizes a resend and refuses an unknown donor.
-**Prerequisites:** admin, with the **Record Inbound Gift Action** permission set. Sample data.
+**Prerequisites:** admin, with the **Inbound Gifts** permission set. Sample data.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -219,11 +220,11 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 ## T-MIR-14: Gift Transaction Mirror Without Nonprofit Cloud
 
 **Purpose:** confirm the Gift Transaction mirror stays out of the way in an org without Nonprofit Cloud, and its page is closed to people without the permission set.
-**Prerequisites:** admin, in any org without Nonprofit Cloud fundraising; staff without the **Gift Transaction Mirror** permission set.
+**Prerequisites:** admin, in any org without Nonprofit Cloud fundraising; staff without the **Salesforce Records Sync** permission set.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, give yourself the **Gift Transaction Mirror** permission set, then open **BarnCRM Settings**, **Giving**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty with `Not set` under it. |
+| 1 | As admin, give yourself the **Salesforce Records Sync** permission set, then open **BarnCRM Settings**, **Giving**. | **Gift Transaction mirror direction** shows **Off**, **Gift Transaction mirror paid status** shows `Paid`, and **Gift Transaction mirror start date** is empty with `Not set` under it. |
 | 2 | Open **Gift Transaction Mirror** from **Giving**. | `This org has no Nonprofit Cloud Gift Transactions you can use, so there is nothing to mirror. ...` No run buttons and no **Reconciliation** section. |
 | 3 | Set the direction to **Gifts to Gift Transactions**, the start date to today, and save. Record a gift of 25 from Luis Garcia on **Quick Gift Entry**. | The gift saves as usual. The page still says the mirror is not available, and the **Error Log** has no Gift Transaction mirror entry. |
 | 4 | On the **Gifts** tab, choose **Gifts and Their Gift Transactions**, type `abc` into a gift's **Gift Transaction ID** and save. | Saved: without Gift Transactions nothing is checked. Clear the value again. |
@@ -234,7 +235,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 ## T-MIR-15: Gift Transaction Mirror With Nonprofit Cloud
 
 **Purpose:** confirm a run copies gifts and their designations to Gift Transactions, keeps them up to date, and the reconciliation agrees.
-**Prerequisites:** admin with the Fundraising User permission and the **Gift Transaction Mirror** permission set, in an org with Nonprofit Cloud fundraising, at least one Gift Designation, and sample data.
+**Prerequisites:** admin with the Fundraising User permission and the **Salesforce Records Sync** permission set, in an org with Nonprofit Cloud fundraising, at least one Gift Designation, and sample data.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -248,3 +249,17 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 | 8 | Click **Schedule Nightly Run**, then **Stop Nightly Run**. | `Next nightly run: <date> 1:35 AM`, then `The nightly run is not scheduled.` |
 
 **Cleanup:** set the direction to **Off**; delete the 150 gift (its Gift Transaction stays, and the Error Log has one Warning naming it) and delete that Gift Transaction in Nonprofit Cloud.
+
+## T-MIR-16: Retired Mirror Sets Carry Over
+
+**Purpose:** confirm holders of the five retired Mirror sets get Salesforce Records Sync or Inbound Gifts, keep the old set, and an inactive holder is named instead (ADR-0194, simpler permission sets).
+**Prerequisites:** admin; two spare users, one active and one you will deactivate.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Setup, give the active user **Opportunity Mirror (Retired)** and the other **Campaign Sync (Retired)**, then deactivate the other. | Saved. |
+| 2 | Run `MirrorAccessSync.logInactiveHolders(); new MirrorAccessSync().requestSync();` in Anonymous Apex. Wait a minute. | The active user holds **Salesforce Records Sync** as well as Opportunity Mirror (Retired). The inactive user holds no new set. |
+| 3 | Open **Error Log**. | One Warning from MirrorAccessSync naming the inactive user, Campaign Sync (Retired) and Salesforce Records Sync. |
+| 4 | Open BarnCRM Settings, **Access**, **Extra Permissions**. | Mirror lists **Salesforce Records Sync**, **Accounting Export** and **Inbound Gifts**; the active user is listed beside Salesforce Records Sync. |
+
+**Cleanup:** remove both sets from the active user; reactivate or leave the other user as it was.

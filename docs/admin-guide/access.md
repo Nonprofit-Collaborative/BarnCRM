@@ -19,35 +19,40 @@ Roles ship with BarnCRM and are kept up to date for you.
 A module ships its own permission sets, and a Core role cannot include them. They reach
 people in one of two ways:
 
-- **Volunteers and Rollup Builder follow the roles for you.** Their sets are given
-  automatically to everyone holding the matching role (for example the Coordinator role gets
-  **Volunteers Coordinator**), at the latest within an hour.
-- **Giving and Mirror sets are chosen per person, on this page.** Turning a module on in the
-  [Module Manager](module-manager.md) gives its admin set (for Giving, **Giving Admin**) only to
-  you, the person who turned it on. Everyone else gets **Giving Admin**, **Giving Staff**,
-  **Giving Read Only**, **Campaign Sync**, **Opportunity Mirror**, **Accounting Export** and
-  the rest under "Extra Permissions" below, beside their role. The Fundraising Staff role
-  already includes Giving Staff.
+- **Every module's sets follow the roles for you.** Each module gives its Admin set to every
+  BarnCRM Admin (Giving Admin included), its Staff set to every Team Member, and its Read Only
+  set to every Read Only holder, at the latest within an hour. Fundraising Staff gets every
+  staff set Team Member gets except **Programs Staff**, which carries case notes: give a
+  fundraiser who works a program the Team Member role as well.
+- **A few sets are chosen per person, on this page.** Giving Staff and Giving Read Only for
+  anyone outside Fundraising Staff (donor amounts and receipts are given deliberately),
+  **Volunteers Coordinator** for whoever approves volunteer hours, and the Mirror sets are under
+  "Extra Permissions" below, beside the person's role.
 
 You never need Setup for either. If you would rather have a module set given automatically to
 every new user, a Salesforce user access policy can do it: see
 [Automatic access](automatic-access.md).
 
-BarnCRM Core ships four roles. The Fundraising Staff role comes with the Giving module,
-so it is listed only where Giving is installed, which makes five:
+BarnCRM Core ships three roles. The Fundraising Staff role comes with the Giving module,
+so it is listed only where Giving is installed, which makes four:
 
 | Role | Who it is for | What it gives |
 |---|---|---|
-| BarnCRM Admin (its card and the role list say **BarnCRM Admin Group**, its label in Salesforce) | The person who configures the app, usually you | Everything, including BarnCRM Settings, saving Custom Metadata, matching logic and setting up Create New Field in an import |
+| BarnCRM Admin | The person who configures the app, usually you | Everything, including BarnCRM Settings, saving Custom Metadata, matching logic and setting up Create New Field in an import |
 | Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
-| Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus program and service records when the Programs module is on |
-| Coordinator | Whoever schedules people and tracks their time | Day to day work with people, households, and organizations, plus volunteer shifts and hours when the Volunteers module is on |
+| Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus each installed module's staff access (programs, volunteer shifts and hours, and so on) |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
 
-The role names fit any organization, nonprofit or not. In Setup, Team Member and Coordinator
-keep their original API names, `Program_Staff` and `Volunteer_Coordinator`, so that upgrades
-keep working; you only need those names for an
-[automatic access](automatic-access.md) policy.
+**Coordinator is retired.** It gave exactly what Team Member gives. BarnCRM gives everyone who
+held it the Team Member role automatically, within the hour, and takes nothing away; the
+Coordinator role itself is removed in the next release. Someone who approves volunteer hours
+keeps that through the **Volunteers Coordinator** permission set.
+
+The role names fit any organization, nonprofit or not. In Setup, Team Member keeps its original
+API name, `Program_Staff`, and BarnCRM Admin its `BarnCRM_Admin_Group`, so that upgrades keep
+working; you only need those names for an [automatic access](automatic-access.md) policy. In
+Setup the permission sets inside the roles read **BarnCRM Admin Access**, **BarnCRM Staff
+Access** and **BarnCRM Read Only Access**: give the role, not those sets.
 
 Of the roles, only BarnCRM Admin gives Delete on accounts and contacts (a person's Salesforce
 profile may give it too). The other roles leave it out on purpose, and they do not need it for
@@ -83,7 +88,7 @@ to, not through the record it is about.
 | Maria, who configures BarnCRM | BarnCRM Admin, plus Giving Admin | Yes |
 | David, who enters the gifts | Fundraising Staff, which includes Giving Staff | Yes |
 | Tom, on the board | Read Only, plus Giving Read Only | Yes, read only |
-| Priya, who coordinates volunteers | Coordinator, and no Giving set | No |
+| Priya, who coordinates volunteers | Team Member, and no Giving set | No |
 | Sam, in programs | Team Member, and no Giving set | No |
 
 Priya and Sam can open the donor's household and the donor's contact record, because that is
@@ -142,9 +147,9 @@ Maria has just hired David to run a program. His Salesforce user already exists.
 Here is how she gives him access, checks it, and takes it away again.
 
 1. Open the BarnCRM app and click the **BarnCRM Settings** tab.
-2. In the left navigation, choose **Access**. You see a card for each role (five with Giving,
-   four without), each with a short description and the people who currently hold that role. On a fresh install only your
-   own name appears, on the **BarnCRM Admin Group** card.
+2. In the left navigation, choose **Access**. You see a card for each role (four with Giving,
+   three without), each with a short description and the people who currently hold that role. On a fresh install only your
+   own name appears, on the **BarnCRM Admin** card.
 3. In the **Find a person** box, type `David`. Matching active users appear as you type,
    each with their name and email address so you can tell two Davids apart.
 4. Choose **David Okafor**.
@@ -162,7 +167,7 @@ Here is how she gives him access, checks it, and takes it away again.
    **Remove**. Confirm, and a message says "David Okafor no longer has the Team Member
    role." His name disappears from the card.
 
-A person can hold more than one role. Giving David the Coordinator role as well
+A person can hold more than one role. Giving David the Read Only role as well
 does not remove Team Member, and removing one role leaves the other in place. Giving someone a
 role they already have changes nothing and reports no error.
 
@@ -177,8 +182,8 @@ Core's six are always listed:
 | Extra permission | What it lets the person do |
 |---|---|
 | BarnCRM Find and Export | Build, run, save and export Find queries and use Org Optimizer's Data Quality checks, seeing only the records the person can already see. BarnCRM Admin already includes it. |
-| BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export. |
-| BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
+| BarnCRM Bulk Update | Set, clear or copy fields on many records at once from a Find query, with undo. Includes Find and Export, so nothing else is needed. |
+| BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Includes Find and Export, so nothing else is needed. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
 | BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Review** list on the Duplicate Matching tab (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
 | BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings and in matching logic, which change the org's configuration. BarnCRM Admin already includes this, so it is only for someone who is not a BarnCRM Admin. |
@@ -187,17 +192,19 @@ A module's sets are listed after them, only where that module is installed:
 
 | Extra permission | Module | What it lets the person do |
 |---|---|---|
-| Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. |
+| Volunteers Coordinator | Volunteers | Approve, reject and correct everyone's volunteer hours, and manage skills, requirements and onboarding steps, on top of what the person's role gives. |
+| Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. Every BarnCRM Admin gets it automatically. |
 | Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
 | Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
-| Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign Sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
-| Opportunity Mirror | Mirror | Edit a gift's Opportunity ID and open the Opportunity Mirror page. Creating Opportunities also needs Opportunity access. |
-| Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Give it together with a Giving permission set that reads gifts. |
-| Inbound Gift API | Mirror | For the integration user only: record gifts another system sends through the Inbound Gift API. It needs nothing else from BarnCRM. |
-| Record Inbound Gift Action | Mirror | Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff. |
+| Salesforce Records Sync | Mirror | Open the Campaign Sync, Opportunity Mirror and Gift Transaction Mirror pages and edit the IDs they keep. Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in Setup (and, for Campaigns, the Marketing User box on the person's user). Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror: BarnCRM gives it to everyone who held one of them, who keep the old set until the next release. |
+| Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no Giving set beside it. Which gifts appear still follows your org's sharing. |
+| Inbound Gifts | Mirror | For an integration, flow or AI assistant user only: record gifts another system sends, through the Inbound Gift API or the Record Inbound Gift action. It needs nothing else from BarnCRM. Replaces Inbound Gift API and Record Inbound Gift Action, given the same way. |
 
-The Volunteers and Rollup Builder sets are not listed, because they follow the roles
-automatically (see the top of this page): removing one here would only be undone within the hour.
+The other module sets (Volunteers Admin, Staff and Read Only, Rollup Builder, and every other
+module's) are not listed, because they follow the roles automatically (see the top of this page):
+removing one here would only be undone within the hour. The same holds for Giving Admin given to
+a BarnCRM Admin, and, this release only, for Volunteers Coordinator held by someone who still has
+the retired Coordinator role.
 
 These are the only permissions this section gives. It never lists or assigns any other
 permission set in your org, including one you created yourself with the same name as one of
@@ -237,23 +244,24 @@ Error Log when it works.
 
 Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
 General, Features: Data Manager, Import, Find, Super Transformer and Org Optimizer. So no role or
-extra permission grants them any more. Each comes from its own permission set, **BarnCRM Tab:
-(tab name)**, which BarnCRM gives automatically to the people who should see it once its
+extra permission grants them any more. Each comes from its own permission set, **BarnCRM Auto:
+(tab name) Tab**, which BarnCRM gives automatically to the people who should see it once its
 feature is on:
 
 | Tab | Given to holders of |
 |---|---|
 | Data Manager | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Import | BarnCRM Admin |
-| Find | BarnCRM Admin, Find and Export |
+| Find | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Super Transformer | BarnCRM Admin, Bulk Update, Bulk Delete |
-| Org Optimizer | BarnCRM Admin, Find and Export |
+| Org Optimizer | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 
 This page keeps them in step when you give a role or extra permission. A role given in Setup or
 by a user access policy is caught up within the hour, and every upgrade catches everyone up, so an
-upgraded org keeps exactly the tabs it had. The BarnCRM Tab sets are never listed on this
-page and should not be assigned by hand. Nobody needs Assign Permission Sets for this: BarnCRM
+upgraded org keeps exactly the tabs it had. The BarnCRM Auto sets (these tab sets, the
+Households tab set and the four app sets) are never listed on this page and should not be
+assigned by hand. Nobody needs Assign Permission Sets for this: BarnCRM
 does it itself, and the tab sets grant nothing but the tab.
 
 ## What Still Needs Setup
@@ -305,8 +313,14 @@ Admin permission set, so BarnCRM Settings works. To finish, open BarnCRM Setting
 Access, and give them the BarnCRM Admin role.", with the number of attempts in place of
 {0}. Do what it says: on this page, give the installer the BarnCRM Admin role.
 
+**The Error Log names someone who "is inactive and holds the Coordinator (Retired) role".** After
+an upgrade BarnCRM gives every active Coordinator the Team Member role. It does not try for a
+deactivated user, because Salesforce may refuse, and writes this Warning instead, one per person.
+Nothing to do: they keep Coordinator, and if you reactivate them the hourly check gives them Team
+Member. If an entry says someone "could not be given Team Member", give it to them on this page.
+
 **You edited one of the shipped roles in Setup and now an upgrade has undone your change.**
-The shipped roles (four with BarnCRM Core, and Fundraising Staff with the Giving module)
+The shipped roles (three with BarnCRM Core, and Fundraising Staff with the Giving module)
 are replaced on every upgrade, so any change you make to them is lost. That is deliberate: it is what keeps the roles correct for you. If
 your organization needs something extra, create your own permission set in Setup for just
 that extra piece and assign it alongside the role. Your own permission sets are never

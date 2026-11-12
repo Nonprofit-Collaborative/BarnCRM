@@ -49,6 +49,14 @@ Each product shows:
   honestly. Where it says "not yet tested", it means exactly that.
 - **Learn More**, which opens the product's own page in a new tab. The page has no install
   links: find and install a product from its own page.
+- **Start Migration**, when the product is installed and BarnCRM has a migration kit for it,
+  shown to people with Manage BarnCRM Settings. It opens the
+  [Migration Assistant](migration-assistant.md) for that product in place of the list;
+  **Back to Integrations** returns. Today the kits are DLRS Rollups and NPSP Customizable
+  Rollups.
+
+The alternatives include **Nonprofit Success Pack (NPSP)** and **Nonprofit Cloud Fundraising**,
+each listed only when installed, with a note on running BarnCRM beside it.
 
 Some notes carry details to read before you try a product. For example, an event registration
 app that publishes public pages needs a Salesforce Site, which runs as a guest user: set that
@@ -77,6 +85,9 @@ Integration App**. Fields:
 - **Detection Objects** lists the product's own objects, separated by semicolons: write a
   packaged object as `namespace.Object__c`, with a dot where the platform has two underscores.
 - **Show Only When Installed** hides the product from an org that does not have it.
-- **Migration Path** is a short line, shown under the note, for a future migration.
+- **Migration Path** is a short line, shown under the note, saying where the migration is.
+
+A migration kit is its own record type, **Migration Kit**, shipped by the module that receives
+the records; see [Migration Assistant](migration-assistant.md#for-contributors-adding-a-kit).
 
 See [BarnCRM Settings](barncrm-settings.md) for the rest of the console.

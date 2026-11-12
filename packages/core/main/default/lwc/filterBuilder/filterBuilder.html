@@ -38,7 +38,7 @@
                 data-key={row.key}
             >
                 <legend class="slds-form-element__legend slds-form-element__label">{row.legend}</legend>
-                <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                <div class="slds-grid slds-gutters_x-small slds-grid_vertical-align-end">
                     <template lwc:if={canReorder}>
                         <div class="slds-col slds-grow-none">
                             <span
@@ -58,6 +58,8 @@
                             </span>
                         </div>
                     </template>
+                    <div class="slds-col slds-grow">
+                    <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
                     <template for:each={row.segments} for:item="segment">
                         <div key={segment.key} class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
                             <lightning-combobox
@@ -178,8 +180,10 @@
                             ></lightning-textarea>
                         </template>
                     </div>
+                    </div>
+                    </div>
+                    <div class="slds-col slds-grow-none slds-shrink-none">
                     <template lwc:if={canReorder}>
-                        <div class="slds-col slds-shrink-none">
                             <lightning-button-icon
                                 data-id="move-up"
                                 data-key={row.key}
@@ -200,9 +204,7 @@
                                 disabled={row.moveDownDisabled}
                                 onclick={handleMoveDown}
                             ></lightning-button-icon>
-                        </div>
                     </template>
-                    <div class="slds-col slds-shrink-none">
                         <lightning-button-icon
                             data-id="remove"
                             data-key={row.key}

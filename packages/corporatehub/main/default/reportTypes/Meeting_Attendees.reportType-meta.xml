@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Meeting_Attendee__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Who was invited to each board meeting and whether they attended, read the packet and approved
+    the minutes (CH-10, CH-14).
+  </description>
+  <label>Board Meeting Attendees</label>
+  <sections>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Name</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Meeting__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Person__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Attendance__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Voting__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Board_Name__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Packet_Read_On__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Minutes_Approved_On__c</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>CreatedDate</field>
+      <table>Meeting_Attendee__c</table>
+    </columns>
+    <masterLabel>Meeting Attendee</masterLabel>
+  </sections>
+</ReportType>

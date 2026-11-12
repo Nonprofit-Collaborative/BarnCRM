@@ -184,7 +184,7 @@ private class AcknowledgmentRunCoverageTest {
 					}
 				} catch (AcknowledgmentService.AcknowledgmentException expected) {
 					Assert.areEqual(
-						Label.Giving_Acknowledgment_NoPermission,
+						BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission'),
 						expected.getMessage()
 					);
 					refused++;
@@ -346,9 +346,13 @@ private class AcknowledgmentRunCoverageTest {
 				notWaiting = refused.getMessage();
 			}
 
-			Assert.areEqual(Label.Giving_Acknowledgment_RunNotFound, missing, 'No such run');
 			Assert.areEqual(
-				Label.Giving_Acknowledgment_RunNotWaiting,
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotFound'),
+				missing,
+				'No such run'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_RunNotWaiting'),
 				notWaiting,
 				'Not waiting to be marked'
 			);
@@ -516,8 +520,8 @@ private class AcknowledgmentRunCoverageTest {
 
 			Assert.areEqual(
 				new List<String>{
-					Label.Giving_Acknowledgment_NoPermission,
-					Label.Giving_Acknowledgment_NoPermission
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission'),
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission')
 				},
 				messages,
 				'Both buttons say what is missing in the words the label gives'
@@ -540,7 +544,7 @@ private class AcknowledgmentRunCoverageTest {
 			}
 
 			Assert.areEqual(
-				Label.Giving_Stewardship_ErrorActionFailed,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed'),
 				message,
 				'A person who cannot read the rules gets the general message, never a query error'
 			);

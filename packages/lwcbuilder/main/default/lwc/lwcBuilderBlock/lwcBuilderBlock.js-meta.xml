@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    One block of a built component: record fields, a list, a report chart, text, an image or a
+    button (LB-03, LB-04).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

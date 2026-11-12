@@ -8,7 +8,7 @@ ever merged for you: every merge is a pair someone looked at and confirmed.
 Before you start: reviewing suggestions needs the **BarnCRM Duplicate Review** add-on, which
 Salesforce allows only for users with a Sales Cloud or Service Cloud license. With it you see
 the **Duplicate Matching** tab and its **Review** list. Dismissing and merging from that list,
-and running the scan, also need the admin role (**BarnCRM Admin Group** on the Access page).
+and running the scan, also need the admin role (**BarnCRM Admin** on the Access page).
 Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 
 ## To Review a Possible Duplicate Person
@@ -71,6 +71,10 @@ You should see: "The two households are now one." Merged pairs leave the list.
 To merge the obvious duplicates in one go, an admin opens **Auto-Merge** on the same tab, clicks
 **Preview Exact Matches**, reads the pairs and confirms. A run can be undone for 15 days from
 **Recent Runs**. See [Auto-Merge](../admin-guide/duplicates.md#auto-merge).
+
+Two copies of something else (two funds, two appeals, two programs) can be merged by an admin
+in **Merge Records** on the same tab, once it is turned on. Ask your admin; see
+[Merge Records](../admin-guide/duplicates.md#merge-records).
 
 ## Why a Pair Is Suggested
 

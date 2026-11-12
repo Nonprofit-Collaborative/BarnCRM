@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Outbound Funds Migration: Requirements</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_ofm_requirements</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Outbound Funds migration kit, which reads the requirements of awarded funding requests: one requirement of the award per record, linked to its disbursement, with its name as the instructions, due date, type and status.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "outfunds.Funding_Request__c", "target": "Record.Award__c"}, {"source": "outfunds.Disbursement__c", "target": "Record.Disbursement__c"}, {"source": "Name", "target": "Record.Instructions__c"}, {"source": "outfunds.Due_Date__c", "target": "Record.Due_Date__c"}, {"source": "outfunds.Type__c", "target": "Record.Type__c", "transforms": [{"op": "map", "pairs": [{"text": "Report", "value": "Progress Report"}, {"text": "Interim Report", "value": "Progress Report"}, {"text": "Progress Report", "value": "Progress Report"}, {"text": "Final Report", "value": "Final Report"}], "otherwise": "Condition"}, {"op": "ifBlank", "value": "Condition"}]}, {"source": "outfunds.Status__c", "target": "Record.Status__c", "transforms": [{"op": "map", "pairs": [{"text": "Open", "value": "Open"}, {"text": "In Progress", "value": "Open"}, {"text": "Submitted", "value": "Submitted"}, {"text": "Complete", "value": "Met"}, {"text": "Completed", "value": "Met"}, {"text": "Accepted", "value": "Met"}, {"text": "Approved", "value": "Met"}, {"text": "Waived", "value": "Waived"}], "otherwise": "Open"}, {"op": "ifBlank", "value": "Open"}]}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Award_Requirement__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

@@ -128,7 +128,7 @@ private class GiftPostingServiceTest {
 					Assert.fail('A posted gift keeps its amount');
 				} catch (DmlException refused) {
 					Assert.areEqual(
-						Label.Giving_Posting_PostedGiftLocked,
+						BarnHelp.text('Giving', 'Giving_Posting_PostedGiftLocked'),
 						refused.getDmlMessage(0),
 						'Refused with the posted gift message'
 					);
@@ -148,13 +148,19 @@ private class GiftPostingServiceTest {
 					GiftPostingService.markPosted(ids);
 					Assert.fail('Marking posted needs Post Gifts');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(Label.Giving_Posting_NoPermission, refused.getMessage());
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_Posting_NoPermission'),
+						refused.getMessage()
+					);
 				}
 				try {
 					GiftPostingService.unpost(gifts.get(250).Id, 'Typo');
 					Assert.fail('Unposting needs Post Gifts');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(Label.Giving_Posting_NoPermission, refused.getMessage());
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_Posting_NoPermission'),
+						refused.getMessage()
+					);
 				}
 				Assert.isNull(reread(gifts.get(250).Id).Accounting_Posted_At__c, 'Nothing marked');
 			}
@@ -180,7 +186,7 @@ private class GiftPostingServiceTest {
 				Assert.fail('The posting fields are written only by marking posted');
 			} catch (DmlException refused) {
 				Assert.areEqual(
-					Label.Giving_Posting_FieldsWrittenByPosting,
+					BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'),
 					refused.getDmlMessage(0),
 					'The lock refuses it'
 				);
@@ -266,14 +272,20 @@ private class GiftPostingServiceTest {
 					GiftPostingService.unpost(giftId, 'Never posted');
 					Assert.fail('A gift that is not posted cannot be unposted');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(Label.Giving_Posting_NotPosted, refused.getMessage());
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_Posting_NotPosted'),
+						refused.getMessage()
+					);
 				}
 				GiftPostingService.markPosted(new Set<Id>{ giftId });
 				try {
 					GiftPostingService.unpost(giftId, '   ');
 					Assert.fail('A reason is required');
 				} catch (GiftPostingService.GiftPostingException refused) {
-					Assert.areEqual(Label.Giving_Posting_ReasonRequired, refused.getMessage());
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_Posting_ReasonRequired'),
+						refused.getMessage()
+					);
 				}
 				Assert.isNotNull(reread(giftId).Accounting_Posted_At__c, 'Still posted');
 			}

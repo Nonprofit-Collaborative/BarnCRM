@@ -147,7 +147,7 @@ public with sharing class RollupTemplates {
 			Rollup_Definition__c definition = RollupBuilderController.checkedRecord(spec.draft);
 			RollupWriter.saveAsUser(definition);
 			outcome.added = true;
-			outcome.message = Label.Core_RollupEase_TplAdded;
+			outcome.message = BarnHelp.text('Rollups', 'Core_RollupEase_TplAdded');
 		} catch (RollupService.RollupServiceException refused) {
 			outcome.message = refused.getMessage();
 		} catch (DmlException refused) {
@@ -173,7 +173,7 @@ public with sharing class RollupTemplates {
 		item.sentence = RollupSentence.of(recordOf(draft));
 		if (!item.canOpen) {
 			item.status = String.format(
-				Label.Core_RollupEase_TplNeedsObject,
+				BarnHelp.text('Rollups', 'Core_RollupEase_TplNeedsObject'),
 				new List<String>{ targetType == null ? draft.targetObject : draft.sourceObject }
 			);
 			return item;
@@ -181,7 +181,7 @@ public with sharing class RollupTemplates {
 		String key = (draft.targetObject + '.' + draft.targetField).toLowerCase();
 		if (filledBy.containsKey(key)) {
 			item.status = String.format(
-				Label.Core_RollupEase_TplFilled,
+				BarnHelp.text('Rollups', 'Core_RollupEase_TplFilled'),
 				new List<String>{ filledBy.get(key) }
 			);
 			return item;
@@ -192,7 +192,7 @@ public with sharing class RollupTemplates {
 		if (!fieldExists) {
 			item.needsField = true;
 			item.status = String.format(
-				Label.Core_RollupEase_TplNeedsField,
+				BarnHelp.text('Rollups', 'Core_RollupEase_TplNeedsField'),
 				new List<String>{
 					spec.name,
 					targetType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
@@ -201,7 +201,7 @@ public with sharing class RollupTemplates {
 			return item;
 		}
 		item.available = true;
-		item.status = Label.Core_RollupEase_TplReady;
+		item.status = BarnHelp.text('Rollups', 'Core_RollupEase_TplReady');
 		return item;
 	}
 
@@ -337,7 +337,9 @@ public with sharing class RollupTemplates {
 
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorNoPermission);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
+			);
 		}
 	}
 
@@ -346,7 +348,7 @@ public with sharing class RollupTemplates {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupTemplates',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

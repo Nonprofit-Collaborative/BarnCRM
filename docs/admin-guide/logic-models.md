@@ -45,7 +45,9 @@ all nightly jobs** fix schedules it.
 Then open the **BarnCRM Logic Models** app from the App Launcher. Its tab is **Logic Models**,
 which also joins the BarnCRM apps.
 
-Logic Models has no settings yet, so it adds no section to BarnCRM Settings.
+Logic Models has no org-wide settings yet: each logic model is set up on its own record.
+BarnCRM Settings has a **Logic Models** section with one row, **Open Logic Models**, which opens
+the Logic Models tab. That row is also how BarnCRM knows Logic Models is installed.
 
 ### Roles and Permission Sets
 
@@ -55,9 +57,8 @@ You never assign the Logic Models permission sets by hand. Give people their Bar
 | BarnCRM role | Logic Models set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model and choosing where an indicator's results come from |
-| Coordinator | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, indicators and periods; never deletes a whole model |
-| Team Member | Logic Models Staff | The same as Coordinator |
-| Read Only | Logic Models Read Only | Look at logic models, indicators and results |
+| Team Member, Fundraising Staff (Giving) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, evidence, indicators and periods; never deletes a whole model |
+| Read Only | Logic Models Read Only | Look at logic models, evidence, indicators and results |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when
 you turn the module back on, and every hour with BarnCRM's access check, for roles given in
@@ -125,6 +126,26 @@ and the same arrow cannot be added twice.
 Under **Comes From** the builder lists the arrows that point at the selected part. Click an
 arrow's assumption to change it, or **Remove** to delete the arrow (the builder asks first).
 
+### Evidence for an Assumption
+
+Under each arrow, **Assumption Evidence** (with its count) opens the arrow's evidence log: what
+supports its assumption and where that comes from. Click **Add** and fill in:
+
+- **What It Shows** (required): the finding in a sentence, for example "Families who attended
+  six or more sessions read with their children twice as often".
+- **Source**: a study, an evaluation, your own survey or staff observation.
+- **Source Link**: a link, if the source is online.
+- **Date**: when it was published or gathered.
+- **Strength**: **Strong** (a rigorous study, or several sources agree), **Moderate** (one good
+  source; the starting value), **Limited** (anecdote or early results) or **Challenges** (it
+  points the other way). Keep evidence that challenges an assumption: it is what tells you an
+  arrow needs another look.
+
+The log lists the newest first, with undated evidence last. **Edit** changes a piece and
+**Remove** deletes it (the builder asks first). Removing an arrow removes its evidence. Staff and
+admins add and change evidence; Read Only sees it. Evidence is stored as Assumption Evidence
+records, one per piece, under the arrow; there is no tab for them.
+
 ### Things to Look At
 
 Under the columns, the builder lists what usually needs attention in a model, as you build it:
@@ -169,6 +190,8 @@ asks first, in a dialog with a red **Delete** button.
 
 You can add as many periods as you need, and they may overlap (a year and its four quarters).
 The same start and end dates twice for one indicator are refused: change the row that is there.
+The period form says so under the dates as soon as you pick them, and holds **Save** until the
+dates differ.
 
 A part with indicators cannot be moved to the Inputs, Activities or Impact column; delete or
 move its indicators first.
@@ -298,7 +321,10 @@ you choose, the target, the result and the progress (**Met** or a percent).
 - **Download CSV** saves the report as a spreadsheet: Column, Part, Indicator, Unit, Better When,
   Baseline and Baseline Date, then a Target, Result and Progress column for each period.
 - **Download Printable Report** saves one web page with the table and the model's name. Open it
-  in your browser and print it, or print it to PDF, to send to a funder.
+  in your browser and print it.
+- **Download PDF** saves the same page as a PDF, landscape, ready to send to a funder. Salesforce's
+  own PDF service makes it (the one that makes Giving's receipts); nothing is stored and nothing
+  is sent anywhere else.
 
 Everyone who can open the model can see and download its report, including Read Only users. The
 report shows only what the person can read and stores nothing. Nothing needs setting up.
@@ -344,7 +370,7 @@ Do this as Maria, who holds the Admin role.
     **Result** box is read only.
 12. Scroll to **Logic Model Report**. Each indicator has a row with its baseline, and each chosen
     period its target, result and progress. Untick a period: its columns go. Click **Download
-    Printable Report**, open the file and print it.
+    Printable Report**, open the file and print it, then click **Download PDF** and open the PDF.
 
 ## Common Mistakes
 

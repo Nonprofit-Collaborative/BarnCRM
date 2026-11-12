@@ -23,11 +23,73 @@ private class PublicPageExtensionsTest {
 		}
 
 		public Map<String, Object> page(Id recordId) {
-			return new Map<String, Object>{ 'title' => 'Spring Gala' };
+			return new Map<String, Object>{
+				'title' => 'Spring Gala',
+				'signed' => PublicPageExtensions.isSignedRequest()
+			};
 		}
 
 		public Map<String, Object> listPage() {
 			return new Map<String, Object>{ 'title' => 'Our Events' };
+		}
+	}
+
+	/** Publishes account pages that take a payment (G-34's seam). */
+	private class Charging implements PublicPageExtension, PublicCheckoutExtension {
+		public String kind() {
+			return 'accounts';
+		}
+
+		public Boolean handles(Schema.SObjectType recordType) {
+			return recordType == Account.SObjectType;
+		}
+
+		public Map<String, Object> page(Id recordId) {
+			return new Map<String, Object>{ 'title' => 'Give' };
+		}
+
+		public Map<String, Object> listPage() {
+			return null;
+		}
+
+		public Map<String, Object> startCheckout(
+			Id recordId,
+			Map<String, Object> answers,
+			String returnUrl
+		) {
+			String amount = String.valueOf(answers.get('amount'));
+			return new Map<String, Object>{ 'checkoutUrl' => returnUrl + '#' + amount };
+		}
+	}
+
+	@IsTest
+	static void onlyAModuleThatChargesStartsACheckout() {
+		System.runAs(TestUsers.admin()) {
+			Id recordId = accountId();
+			register(new Publishing());
+			Map<String, Object> none = PublicPageExtensions.startCheckout(
+				recordId,
+				new Map<String, Object>{ 'amount' => 25 },
+				'https://example.org/page'
+			);
+			register(new Charging());
+			Map<String, Object> started = PublicPageExtensions.startCheckout(
+				recordId,
+				new Map<String, Object>{ 'amount' => 25 },
+				'https://example.org/page'
+			);
+
+			Assert.isNull(none, 'A page that takes no payment starts nothing');
+			Assert.areEqual(
+				'https://example.org/page#25',
+				started.get('checkoutUrl'),
+				'The module was given the answers and the return address'
+			);
+			Assert.isNull(
+				PublicPageExtensions.startCheckout(UserInfo.getUserId(), null, null),
+				'No module publishes users'
+			);
+			Assert.isNull(PublicPageExtensions.startCheckout(null, null, null), 'No record');
 		}
 	}
 
@@ -76,6 +138,24 @@ private class PublicPageExtensionsTest {
 			Assert.isNull(PublicPageExtensions.listPage(' '), 'No kind asked for');
 			Assert.isNull(PublicPageExtensions.page(null), 'No record asked for');
 			Assert.isNull(PublicPageExtensions.page(UserInfo.getUserId()), 'Not handled');
+		}
+	}
+
+	@IsTest
+	static void theModuleIsToldWhetherTheHostCheckedASignedClaim() {
+		System.runAs(TestUsers.admin()) {
+			register(new Publishing());
+			Id recordId = accountId();
+
+			Assert.isFalse(
+				(Boolean) PublicPageExtensions.page(recordId).get('signed'),
+				'Plain address'
+			);
+			Assert.isTrue(
+				(Boolean) PublicPageExtensions.page(recordId, true).get('signed'),
+				'Signed'
+			);
+			Assert.isFalse(PublicPageExtensions.isSignedRequest(), 'Only while the page is built');
 		}
 	}
 

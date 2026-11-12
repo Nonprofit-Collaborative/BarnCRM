@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Grant Finder: searches open federal funding listings on Grants.gov and saves one to the
+    pipeline as a prospect (F-09).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Grant Finder</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

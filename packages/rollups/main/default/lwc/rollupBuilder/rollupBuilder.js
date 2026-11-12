@@ -4,15 +4,16 @@ import getDraft from '@salesforce/apex/RollupBuilderController.getDraft';
 
 import TITLE from '@salesforce/label/c.Core_SettingsGroup_RollupBuilder';
 import COPY_OF from '@salesforce/label/c.Core_Import_CopyTemplateDefaultName';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
 import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
+import IMPORT_FROM_NPSP from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 import { bodyMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import ADVANCED from '@salesforce/label/c.Core_RollupBuilder_Advanced';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TAB_ICON = 'utility:builder';
 
@@ -22,10 +23,21 @@ const TAB_ICON = 'utility:builder';
  * Copy, which open the five steps. Saving refreshes the list.
  */
 export default class RollupBuilder extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
     otherTools: OTHER_TOOLS,
     importFromDlrs: IMPORT_FROM_DLRS,
+    importFromNpsp: IMPORT_FROM_NPSP,
     advanced: ADVANCED
   };
 
@@ -35,6 +47,8 @@ export default class RollupBuilder extends LightningElement {
   draft;
   editing = false;
   importing = false;
+  /** The tool being imported from: 'npsp', or null for DLRS. */
+  importTool = null;
   notice;
   error;
   enclosingTabId;
@@ -61,7 +75,7 @@ export default class RollupBuilder extends LightningElement {
     if (data) {
       this.model = data;
     } else if (error) {
-      this.error = bodyMessage(error, UNEXPECTED_ERROR);
+      this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
     }
   }
 
@@ -71,7 +85,7 @@ export default class RollupBuilder extends LightningElement {
   }
 
   get hasOtherTools() {
-    return this.otherToolNotices.length > 0;
+    return this.otherToolNotices.length > 0 || this.showNpspImport;
   }
 
   get listClass() {
@@ -83,9 +97,15 @@ export default class RollupBuilder extends LightningElement {
     return Boolean(this.model && this.model.canImportFromDlrs) && !this.editing && !this.importing;
   }
 
-  handleImport() {
+  /** Import From NPSP, the same when NPSP has an active customizable rollup (MIG-08). */
+  get showNpspImport() {
+    return Boolean(this.model && this.model.canImportFromNpsp) && !this.editing && !this.importing;
+  }
+
+  handleImport(event) {
     this.notice = undefined;
     this.error = undefined;
+    this.importTool = event.target.dataset.tool || null;
     this.importing = true;
   }
 
@@ -123,7 +143,7 @@ export default class RollupBuilder extends LightningElement {
         );
       })
       .catch((error) => {
-        this.error = bodyMessage(error, UNEXPECTED_ERROR);
+        this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       });
   }
 

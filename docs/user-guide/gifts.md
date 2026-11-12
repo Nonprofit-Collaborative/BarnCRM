@@ -22,6 +22,8 @@ You should see: a green notice with a check icon saying "Gift G-000123 saved" an
 
 If the donor still owes a pledge or recurring payment, a **Pays a scheduled payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
 
+When you choose the donor, an **About This Donor** panel opens under the donor box. It shows their household, total giving, last gift, their three most recent gifts, and any open pledges or recurring gifts with the balance left and the next payment due. Click a gift or pledge to open it in a new browser tab. The panel is only for looking; if it says it could not load, carry on and save the gift as usual.
+
 ## To Pay a Scheduled Payment
 
 When you choose a donor who has an active or paused pledge or recurring gift, Quick Gift Entry shows **Pays a scheduled payment**.
@@ -45,11 +47,22 @@ You should see: the payment on the commitment turn **Paid** (or **Partially paid
 
 You should see: the gift page shows an **In-kind Gift** section with **In-kind Description** and **Fair Market Value**. A gift that was part money and part goods is two gifts.
 
+## To Record a Gift of Stock, a Planned Gift or a Donor-Advised Fund Gift
+
+1. Enter the gift as usual, in Quick Gift Entry or on the **Gifts** tab, with the donor you are crediting and the value you record as **Amount**. For stock, set **Payment Method** to **Stock**.
+2. Open the gift and click **Edit**.
+3. For stock, fill in **Stock Symbol** and **Shares**.
+4. For a bequest, an annuity or a trust payment, choose the **Planned Gift Type**.
+5. When the money came through a donor-advised fund, a family foundation, an IRA or an employer program, choose the **Gift Source** and type the sponsor or foundation in **Gift Source Name**.
+6. Click **Save**.
+
+You should see: the fields on the gift's **Details** tab. The gift still counts in the donor's giving. The report **DAF and Stock Gifts This Year** lists gifts of stock and gifts through a donor-advised fund.
+
 ## To Add a Gift From a Person's or Organization's Page
 
 1. Open the person, household or organization in the BarnCRM Fundraising app.
 2. Click **Enter a Gift** in the action bar. Quick Gift Entry opens in a window with the donor already filled in.
-3. Fill in the gift as in [To enter a gift with Quick Gift Entry](#to-enter-a-gift-with-quick-gift-entry): amount, date, payment method, appeal and fund, a pledge payment, goods, a tribute or a match all work here.
+3. Fill in the gift as in [To enter a gift with Quick Gift Entry](#to-enter-a-gift-with-quick-gift-entry): amount, date, payment method, appeal and fund, a scheduled payment, goods, a tribute or a match all work here.
 4. Click **Save** (the window closes) or **Save and New** (the window stays open for the next gift from this donor).
 
 You should see: the gift in the record's **Gifts** list. For money promised but not arrived yet, an admin can use **New** on the **Gifts** tab and set **Status** to `Pending`.
@@ -69,7 +82,7 @@ You should see: the card's figures move once the gift is saved and the page is r
 A gift opens on the gift record page, with three tabs: **Details** (open first), **Credits and Tributes** and **Related**. From top to bottom:
 
 - The action bar: **Edit**, **Refund or Write Off** (only while **Status** is `Received`) and **Delete**.
-- On **Details**, **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Installment** (the pledge payment the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
+- On **Details**, **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Scheduled Payment** (the payment of a pledge or recurring gift the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
 - **Acknowledgment, Receipt and Recognition**: **Acknowledgment Status**, **Acknowledgment Date**, **Receipt Number**, **Matched Gift**, **Tribute**, and on a refund, **Original Gift** and **Refund Reason**.
 - **In-kind Gift**, only on an in-kind gift.
 - Side panels: **Posting**, **Gift Allocations** (which funds the gift went to, with **Edit Funds**: see [To split a gift across funds](#to-split-a-gift-across-funds)), **Receipts** and **Activity**.
@@ -139,6 +152,25 @@ When an employer matches an employee's gift, the employer is the donor of its ow
 You should see: on the employer's gift, the employee in **Soft Credits** as **Matched Donor**, marked **Automatic**. The employee's gift shows the link in its own **Matched Gift**. You enter the link once, from the employer's side. To undo it, clear **Matched Gift**.
 
 Quicker, when you enter the employer's gift in Quick Gift Entry: with the organization as donor, open **Matches an Employee's Gift** under **Fund** and choose the employee's gift from the list (gifts from people whose **Employer** is this organization, not matched yet, newest first). Saving the gift links both sides.
+
+## To Find Gifts Made on a Donation Page
+
+When your admin has given an appeal an online donation page, BarnCRM writes each online gift
+for you once the donor's form is processed.
+
+1. Open the appeal and look at its gifts.
+2. An online gift has a **Payment Reference** and a **Payment Method** of **Card** (Stripe) or
+   **Other** (PayPal).
+
+You should see: **Pending** while the payment is being confirmed, then **Received**, dated the
+day it was paid. **Cancelled** means the donor left the checkout without paying; you can keep
+or delete it. A refund made at Stripe or PayPal sets the gift to **Refunded** by itself, so do
+not record that refund again. A gift under your organization's minimum, or one of too many
+tried on the same appeal in an hour, is refused before checkout, so no gift is written for it.
+
+A donor who pays a pledge with **Pay Online** in the donor portal gets the same kind of gift, on
+the pledge instead of an appeal: it appears as **Received** once the payment is confirmed and
+counts against the pledge's next payment.
 
 ## Common Problems
 

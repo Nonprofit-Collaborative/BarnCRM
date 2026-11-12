@@ -78,7 +78,7 @@ public with sharing class ServicePlanController {
 		} else if (e instanceof ServicePlanService.PlanException) {
 			message = e.getMessage();
 		} else if (e instanceof QueryException || e instanceof System.NoAccessException) {
-			message = Label.Programs_Plan_NotFound;
+			message = BarnHelp.text('Programs', 'Programs_Plan_NotFound');
 		} else {
 			ErrorLogger.log(e, CONTEXT, recordId);
 		}

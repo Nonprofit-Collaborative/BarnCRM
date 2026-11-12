@@ -13,9 +13,7 @@ import MODE_REFUND from '@salesforce/label/c.Giving_RefundGift_ModeRefund';
 import MODE_WRITE_OFF from '@salesforce/label/c.Giving_RefundGift_ModeWriteOff';
 import CONFIRM from '@salesforce/label/c.Giving_RefundGift_Confirm';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import SUCCESS from '@salesforce/label/c.Giving_RefundGift_Success';
-import REASON_REQUIRED from '@salesforce/label/c.Giving_RefundGift_ReasonRequired';
-import NO_ACCESS from '@salesforce/label/c.Giving_RefundGift_NoPermission';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const REFUND = 'refund';
 const WRITE_OFF = 'writeOff';
@@ -37,7 +35,9 @@ export default class GiftRefund extends LightningElement {
     modeWriteOff: MODE_WRITE_OFF,
     confirm: CONFIRM,
     cancel: CANCEL,
-    noAccess: NO_ACCESS
+    get noAccess() {
+      return helpText('Giving', 'Giving_RefundGift_NoPermission');
+    }
   };
 
   mode = REFUND;
@@ -47,6 +47,15 @@ export default class GiftRefund extends LightningElement {
   working = false;
   loadError;
   canRefund;
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
 
   /**
    * A person who may read the gift but not record money going back is told so, and offered
@@ -114,7 +123,7 @@ export default class GiftRefund extends LightningElement {
 
   async handleConfirm() {
     if (!this.reason || !this.reason.trim()) {
-      this.toast(REASON_REQUIRED, 'error');
+      this.toast(helpText('Giving', 'Giving_RefundGift_ReasonRequired'), 'error');
       return;
     }
     this.working = true;
@@ -128,7 +137,7 @@ export default class GiftRefund extends LightningElement {
           reason: this.reason
         });
       }
-      this.toast(SUCCESS, 'success');
+      this.toast(helpText('Giving', 'Giving_RefundGift_Success'), 'success');
       this.close();
     } catch (error) {
       this.toast(this.messageOf(error), 'error');

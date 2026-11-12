@@ -55,28 +55,77 @@ CAPS = {
     # PublicPageExtension seam EV-16, EventsSampleData registration C-10, portal action
     # registry PB-03 and PB-07), plus about 2%. Main's D-185 feature-off cards and the
     # Automation page's stopped marker merged in within that margin.
-    "core": 2_114_900,
-    "rollups": 374_000,
+    # Combined build (landing/batch-d-i) 2026-11-11: 2,138,788 measured with C-62 Generic Merge,
+    # C-67 Archive by Query, C-68 Field History and the MIG-01 Migration Assistant framework,
+    # plus about 1%; the pre-batch review's trim pass looks at Core again.
+    # Raised 2026-11-11 for C-47 multi-brand management (BrandService seam and defaulting,
+    # BrandShareJob visibility upkeep, BrandTriggerHandler, BrandShareWriter): 2,160,448
+    # measured, plus about 0.5%.
+    # Raised 2026-11-11 for C-64 engagement score (EngagementScore, EngagementScoreJob, the
+    # EngagementSignalExtension seam, EngagementScoreController): 2,175,829 measured, plus about 2%.
+    "core": 2_219_000,
+    # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
+    # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
+    # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
+    # before the kit check, plus about 1%.
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 386,438 measured, plus
+    # about 0.5%.
+    "rollups": 388_400,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and
     # Giving at a Glance (GivingRecordGlanceExtension, people-giving-14), and the Thank-Yous
     # page's rule reorder and missing-template reason (people-giving-18), and the Ask
     # Pipeline's Recently Closed column and Reopen Ask (people-giving-19).
-    "giving": 608_000,
+    # Combined build 2026-11-11: 610,858 measured with G-33's donor panel and G-37's pledge job,
+    # plus room for G-27 still to come.
+    # Release 1.15: G-34 donation pages and PAY-03 portal payments, 630,018 measured 2026-11-11,
+    # plus room for G-27.
+    # With G-27, C-47b/d/e brands and the C-64 signal: 645,083 measured 2026-11-11, plus about
+    # 0.5%; the pre-batch review trims it.
+    # AR-01 messages move (D-172): BarnHelp.text('Giving', key) in place of Label.<name>,
+    # 654,593 measured 2026-11-12 with all five parts, plus about 0.5%.
+    # Giving and Money review fixes (bulk payment listener, status stepping, card-testing
+    # limits, portal payment guard, donation form Health Check): 663,899 measured 2026-11-12,
+    # plus about 0.5%.
+    "giving": 667_300,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
     # Batch C wave 3 landing: 193,083 measured (VolunteersPortalExtension PB-03), plus about 2%.
-    "volunteers": 196_900,
+    # VOL-2 (V-14, V-16): 206,823 measured with the shift waitlist, group and standing sign-ups
+    # and the one self-booking path (VolunteerCapacity, VolunteerStanding, VolunteerBooking),
+    # plus about 2%.
+    # VOL-3 (V-12, V-13, V-15): 217,833 measured with the value of hours on Home and in letters,
+    # the thank-you run (VolunteerRecognitionJob and its scheduler) and the minors check
+    # (VolunteerMinors), plus about 2%.
+    # VOL-4 (V-09): 230,699 measured with the public shift pages and personal page
+    # (VolunteerPublicPage), the shift and profile forms (VolunteerFormAttachment) and the
+    # reminder's personal link, plus about 2%.
+    # C-47b brand letters and the C-64 signal: 235,670 measured 2026-11-11, plus about 0.5%.
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 237,172 measured, plus
+    # about 0.5%.
+    "volunteers": 238_400,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
-    "programs": 168_000,
-    "logicmodels": 65_000,
+    # VOL-2 (P-09): 172,177 measured with program capacity and the waitlist (EnrollmentCapacity),
+    # plus about 2%.
+    # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 177,950 measured, plus
+    # about 0.5%.
+    "programs": 178_900,
+    # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
+    # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
+    # 66,645 measured 2026-11-11, plus about 0.5%.
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 67,478 measured, plus
+    # about 0.5%.
+    "logicmodels": 67_800,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
-    "funders": 100_500,
+    # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
+    # checklists, documents, budget lines and renewals, plus about 2%.
+    "funders": 126_700,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -111,7 +160,13 @@ CAPS = {
     # Batch C wave 3 landing: 186,595 measured (sample data C-10, EV-13 seating, EV-17 badges,
     # EV-18 survey, EV-19 calendar, EV-16 public pages, PB-07 EventsPortalExtension), plus
     # about 2%.
-    "events": 190_300,
+    # Release 1.5 EVT-A (branch feature/evt-a-ev20-21-26-27): 217,924 measured (EV-20 paid
+    # registration through Payments, EV-21 proposal scoring, EV-26 badge overrides, EV-27
+    # session ratings), plus about 2%.
+    # Releases 1.11 to 1.13 EVT-B (branches feature/evt-b-*): 247,001 measured (EV-22 attendee
+    # app actions, EV-23 budget, EV-24 venue and room fills, EV-25 speaker checklist, EV-28
+    # booth scans, EV-29 agenda picks and ratings), plus about 2%.
+    "events": 252_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
@@ -121,8 +176,60 @@ CAPS = {
     # Batch C review: 53,465 measured (one answer for every wrong code, authenticator codes used
     # once, where values typed at parse time), plus about 2%. Batch C review landing: 54,467
     # measured (QA's sign-in fixes plus perf's and simplification's portal changes), plus about 2%.
-    "portal": 55_600,
-    "mirror": 182_000,
+    # Releases 1.11 to 1.13 EVT-B (branch feature/evt-b-r1-11-portal-engine): 59,734 measured
+    # (personScope catalogs read and checked in Apex, calendar, download and scan options), plus
+    # about 2%.
+    "portal": 61_000,
+    # Corporate Hub (CH-01 to CH-08, ADR-0196 corporate hub module): access sync, post-install,
+    # the policy, compliance, reminder and template services and the page controller, 29,744
+    # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
+    # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
+    # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
+    # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
+    "corporatehub": 58_300,
+    # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
+    # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
+    # Payments Setup page's controller, measured 52,331.
+    # Giving and Money review fixes (bulk listener call, abandon job, callout-time budget,
+    # countRecent, PayPal refund capture, Schedule button): 55,965 measured 2026-11-12, plus
+    # about 0.5%.
+    "payments": 56_300,
+    # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
+    # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
+    # about 2%.
+    "lwcbuilder": 17_700,
+    # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
+    # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
+    # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
+    "scholarships": 50_300,
+    # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
+    # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
+    # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
+    # W10: chunk size by rule count, 31,845 measured, plus about 0.5%.
+    "territory": 32_000,
+    # Memberships (G-22a to G-22d, PAY-02, ADR-0206 memberships module): terms, renewals, the
+    # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
+    # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
+    # G-22e certifications (CertificationService, CertificationController, the erasure and
+    # nightly expiry hooks): 47,443 measured, plus about 1 percent. Raised 2026-11-12 for the
+    # erasure extension's system-mode find and access check (d96088f3d): 49,088 measured, plus
+    # about 0.5 percent.
+    "memberships": 49_340,
+    # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
+    # post-install, health, templates, reporting and the page controller, 32,637 measured,
+    # plus about 2%.
+    "projects": 33_300,
+    # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
+    # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
+    # 2026-11-11, plus about 2 percent.
+    "addressverification": 25_300,
+    # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
+    # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
+    # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
+    # AR-01 (D-172): Opportunity mirror messages read with BarnHelp.text instead of Label;
+    # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
+    # about 0.5%.
+    "mirror": 205_600,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

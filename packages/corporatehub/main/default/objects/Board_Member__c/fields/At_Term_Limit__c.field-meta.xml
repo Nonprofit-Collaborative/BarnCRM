@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>At_Term_Limit__c</fullName>
+  <externalId>false</externalId>
+  <formula>AND(NOT(ISBLANK(Board__r.Term_Limit__c)), BLANKVALUE(Term_Number__c, 1) &gt;= Board__r.Term_Limit__c)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked when this term reaches the board's term limit.</inlineHelpText>
+  <label>At Term Limit</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

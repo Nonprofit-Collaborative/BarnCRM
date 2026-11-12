@@ -37,11 +37,16 @@ const SESSION_FIELDS = [
   'Track__c',
   'Start__c',
   'End__c',
+  'Venue_Room__c',
   'Room__c',
   'Session_Type__c',
+  'Level__c',
   'Status__c',
   'Capacity__c',
-  'Description__c'
+  'Description__c',
+  'Slides_URL__c',
+  'Recording_URL__c',
+  'Sponsor__c'
 ];
 const MOVE_PREFIX = 'move:';
 
@@ -145,6 +150,22 @@ export default class EventAgenda extends LightningElement {
 
   get tracks() {
     return (this.agenda && this.agenda.tracks) || [];
+  }
+
+  /** The confirmed sessions with their time and room, for the rating codes (EV-27). */
+  get ratingSessions() {
+    return this.sessions
+      .filter((session) => session.status === 'Confirmed')
+      .map((session) => ({
+        id: session.id,
+        name: session.name,
+        room: session.room,
+        whenText: whenText(session.startsAt, session.endsAt, {
+          locale: LOCALE,
+          timeZone: TIME_ZONE,
+          range: DATE_RANGE
+        })
+      }));
   }
 
   get days() {
@@ -268,6 +289,14 @@ export default class EventAgenda extends LightningElement {
         range: DATE_RANGE
       }),
       detailText: [session.sessionType, session.room].filter(Boolean).join(', '),
+      ratingText: session.ratingCount
+        ? helpText(
+            'Events',
+            'Events_Agenda_Rated',
+            Number(session.averageRating).toFixed(1),
+            session.ratingCount
+          )
+        : '',
       isCancelled: session.status === 'Cancelled',
       notes,
       hasNotes: notes.length > 0,

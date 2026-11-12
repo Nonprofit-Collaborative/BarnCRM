@@ -73,7 +73,7 @@ private class ProgramRosterControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual('Tutoring', open.programName, 'The program is named.');
-			Assert.areEqual(4, open.stages.size(), 'Every stage has a figure.');
+			Assert.areEqual(5, open.stages.size(), 'Every stage has a figure.');
 			Assert.areEqual(1, countAt(open, 'Enrolled'), 'One enrolled.');
 			Assert.areEqual(1, countAt(open, 'Completed'), 'One completed.');
 			Assert.areEqual(1, open.enrollments.size(), 'Only the open one is listed.');
@@ -138,7 +138,7 @@ private class ProgramRosterControllerTest {
 
 			Assert.areEqual(
 				String.format(
-					Label.Programs_Enrollment_AlreadyOpen,
+					BarnHelp.text('Programs', 'Programs_Enrollment_AlreadyOpen'),
 					new List<String>{ 'Tutoring' }
 				),
 				message,
@@ -179,7 +179,7 @@ private class ProgramRosterControllerTest {
 
 			Assert.areEqual(
 				new List<String>{
-					Label.Programs_Roster_PersonRequired,
+					BarnHelp.text('Programs', 'Programs_Roster_PersonRequired'),
 					BarnHelp.text('Programs', 'Programs_Fail_Roster'),
 					BarnHelp.text('Programs', 'Programs_Fail_Roster'),
 					BarnHelp.text('Programs', 'Programs_Fail_Roster')

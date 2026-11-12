@@ -47,7 +47,9 @@ public with sharing class RollupsWhereUsedExtension implements WhereUsedExtensio
 			addTargetParts(target, definition, reference);
 			if (!reference.getParts().isEmpty()) {
 				found.add(
-					reference.withBreaks(System.Label.Core_RollupBuilder_WhereUsedBreaks)
+					reference.withBreaks(
+							BarnHelp.text('Rollups', 'Core_RollupBuilder_WhereUsedBreaks')
+						)
 						.withEdit('Rollup_Builder', null)
 				);
 			}

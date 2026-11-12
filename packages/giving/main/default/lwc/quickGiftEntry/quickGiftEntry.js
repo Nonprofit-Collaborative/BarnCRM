@@ -38,9 +38,6 @@ import successTitle from '@salesforce/label/c.Giving_QuickGiftEntry_SuccessTitle
 import successMessage from '@salesforce/label/c.Giving_QuickGiftEntry_SuccessMessage';
 import openGiftLink from '@salesforce/label/c.Giving_QuickGiftEntry_OpenGiftLink';
 import errorTitle from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorTitle';
-import errorLoadDefaults from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorLoadDefaults';
-import errorUnexpected from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorUnexpected';
-import fundNotApplied from '@salesforce/label/c.Giving_QuickGiftEntry_FundNotApplied';
 import tributeSection from '@salesforce/label/c.Giving_QuickGiftEntry_TributeSection';
 import matchSection from '@salesforce/label/c.Giving_QuickGiftEntry_MatchSection';
 import splitSection from '@salesforce/label/c.Giving_QuickGiftEntry_SplitSection';
@@ -48,9 +45,6 @@ import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import matchNone from '@salesforce/label/c.Core_AccessCompare_None';
 import paysLabel from '@salesforce/label/c.Giving_GiftEntryPays_Label';
 import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
-import paysOneSuggested from '@salesforce/label/c.Giving_GiftEntryPays_OneSuggested';
-import paysSeveralSuggested from '@salesforce/label/c.Giving_GiftEntryPays_SeveralSuggested';
-import paysErrorLoad from '@salesforce/label/c.Giving_GiftEntryPays_ErrorLoad';
 import { messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -197,7 +191,9 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     get paysHelp() {
       return helpText('Giving', 'Giving_GiftEntryPays_Help');
     },
-    paysErrorLoad,
+    get paysErrorLoad() {
+      return helpText('Giving', 'Giving_GiftEntryPays_ErrorLoad');
+    },
     tributeSection,
     matchSection,
     get matchHelp() {
@@ -564,12 +560,15 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.paymentPicked = false;
     if (choices && choices.suggestedId) {
       this.installmentId = choices.suggestedId;
-      this.paymentNote = paysOneSuggested;
+      this.paymentNote = helpText('Giving', 'Giving_GiftEntryPays_OneSuggested');
     } else {
       this.installmentId = '';
       const several = choices && choices.suggestedCount > 1;
       this.paymentNote = several
-        ? paysSeveralSuggested.replace('{0}', choices.suggestedCount)
+        ? helpText('Giving', 'Giving_GiftEntryPays_SeveralSuggested').replace(
+            '{0}',
+            choices.suggestedCount
+          )
         : undefined;
     }
   }
@@ -702,7 +701,10 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
       this.fieldLabels = this.defaults.fieldLabels || {};
       this.applyDefaults();
     } catch (error) {
-      this.formError = messageFrom(error, errorLoadDefaults);
+      this.formError = messageFrom(
+        error,
+        helpText('Giving', 'Giving_QuickGiftEntry_ErrorLoadDefaults')
+      );
     }
   }
 
@@ -775,7 +777,10 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
         return;
       }
       this.entrySaved = true;
-      this.saveWarning = result.fundNotApplied === true ? fundNotApplied : undefined;
+      this.saveWarning =
+        result.fundNotApplied === true
+          ? helpText('Giving', 'Giving_QuickGiftEntry_FundNotApplied')
+          : undefined;
       this.savedGift = {
         id: result.giftId,
         name: result.giftName,
@@ -799,7 +804,10 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
         this.startAnotherGift();
       }
     } catch (error) {
-      this.formError = messageFrom(error, errorUnexpected);
+      this.formError = messageFrom(
+        error,
+        helpText('Giving', 'Giving_QuickGiftEntry_ErrorUnexpected')
+      );
     } finally {
       this.saving = false;
     }
@@ -872,7 +880,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.setFieldErrors(errors);
     this.formError = result && result.formError ? result.formError : undefined;
     if (!this.formError && fieldErrors.length === 0) {
-      this.formError = errorUnexpected;
+      this.formError = helpText('Giving', 'Giving_QuickGiftEntry_ErrorUnexpected');
     }
   }
 

@@ -3,17 +3,5 @@
 # below the figure here; a class not listed has to meet the floor. Raise a figure when tests
 # improve, and take the line out once the class reaches 75%: the gate prints which ones have.
 # Read by scripts/org/run-org-tests.sh. Format: Name  percent  # note.
-AcknowledgmentController 67  # 96 of 143 lines
-AcknowledgmentRunService 67  # 94 of 140 lines
-AcknowledgmentScheduler 33  # 11 of 33 lines
-BlobToPdfReceiptRenderer 0  # 0 of 6 lines
-GiftDonorDeleteGuardHandler 66  # 4 of 6 lines
-GivingSampleData 47  # 11 of 23 lines
-HouseholdSoftCreditRecompute 73  # 36 of 49 lines
-InstallmentSchedulable 68  # 11 of 16 lines
+# 2026-11-12 release run: twelve classes reached 75% and were taken out.
 InstallmentTopUpSchedulable 60  # 3 of 5 lines
-ReceiptController 45  # 56 of 124 lines
-StewardshipTriggerHandler 70  # 7 of 10 lines
-StewardshipWriter 62  # 37 of 59 lines
-# No coverage row at all in that run: no test executed them.
-AcknowledgmentBatch 0  # no test ran it

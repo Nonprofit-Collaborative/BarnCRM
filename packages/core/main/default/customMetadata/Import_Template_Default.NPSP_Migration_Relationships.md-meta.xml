@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Migration: Relationships</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npsp_relationships</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the NPSP People and Addresses migration kit, which reads NPSP relationships in your org: one row per relationship NPSP did not create as the other side, because BarnCRM creates the other side itself. Both people are found by record ID. A type BarnCRM does not have becomes Other.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "npe4.Contact__c", "target": "Record.Contact__c"}, {"source": "npe4.RelatedContact__c", "target": "Record.Related_Contact__c"}, {"source": "npe4.Type__c", "target": "Record.Type__c", "transforms": [{"op": "map", "pairs": [{"text": "Spouse", "value": "Spouse"}, {"text": "Husband", "value": "Spouse"}, {"text": "Wife", "value": "Spouse"}, {"text": "Partner", "value": "Partner"}, {"text": "Parent", "value": "Parent"}, {"text": "Father", "value": "Parent"}, {"text": "Mother", "value": "Parent"}, {"text": "Child", "value": "Child"}, {"text": "Son", "value": "Child"}, {"text": "Daughter", "value": "Child"}, {"text": "Sibling", "value": "Sibling"}, {"text": "Brother", "value": "Sibling"}, {"text": "Sister", "value": "Sibling"}, {"text": "Grandparent", "value": "Grandparent"}, {"text": "Grandfather", "value": "Grandparent"}, {"text": "Grandmother", "value": "Grandparent"}, {"text": "Grandchild", "value": "Grandchild"}, {"text": "Grandson", "value": "Grandchild"}, {"text": "Granddaughter", "value": "Grandchild"}, {"text": "Friend", "value": "Friend"}, {"text": "Coworker", "value": "Colleague"}, {"text": "Colleague", "value": "Colleague"}, {"text": "Employer", "value": "Employer contact"}, {"text": "Employee", "value": "Employer contact"}], "otherwise": "Other"}, {"op": "ifBlank", "value": "Other"}]}, {"source": "npe4.Status__c", "target": "Record.Status__c", "transforms": [{"op": "map", "pairs": [{"text": "Former", "value": "Former"}], "otherwise": "Current"}, {"op": "ifBlank", "value": "Current"}]}, {"source": "npe4.Description__c", "target": "Record.Description__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Relationship__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

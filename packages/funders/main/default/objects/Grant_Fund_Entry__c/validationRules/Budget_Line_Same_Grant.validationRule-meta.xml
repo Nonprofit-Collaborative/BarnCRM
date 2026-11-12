@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Budget_Line_Same_Grant</fullName>
+  <active>true</active>
+  <description>R-FE3: an entry's budget line belongs to the entry's grant.</description>
+  <errorConditionFormula>AND(NOT(ISBLANK(Budget_Line__c)), Budget_Line__r.Grant__c &lt;&gt; Grant__c)</errorConditionFormula>
+  <errorDisplayField>Budget_Line__c</errorDisplayField>
+  <errorMessage>Pick a budget line of this entry's grant.</errorMessage>
+</ValidationRule>

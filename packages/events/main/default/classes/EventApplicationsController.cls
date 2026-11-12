@@ -35,6 +35,15 @@ public with sharing class EventApplicationsController {
 		/** Field labels by API name, so the tab needs no labels of its own for columns. */
 		@AuraEnabled
 		public Map<String, String> fieldLabels = new Map<String, String>();
+		/** EV-21: the event's weighted criteria (none: one score per review), and blind review. */
+		@AuraEnabled
+		public List<EventProposalReview.Criterion> criteria = new List<EventProposalReview.Criterion>();
+		@AuraEnabled
+		public Boolean blindReview = false;
+		@AuraEnabled
+		public Boolean canEditEvent = false;
+		@AuraEnabled
+		public Boolean canAssign = false;
 	}
 
 	/** One proposal with its scores. */
@@ -59,11 +68,20 @@ public with sharing class EventApplicationsController {
 		public Integer reviewCount = 0;
 		@AuraEnabled
 		public Decimal averageScore;
+		@AuraEnabled
+		public Decimal weightedAverage;
 		/** The viewing person's own score and note, when they have reviewed it. */
 		@AuraEnabled
 		public Integer myScore;
 		@AuraEnabled
 		public String myNotes;
+		@AuraEnabled
+		public String myCriteriaScores;
+		/** EV-21: the viewing person is assigned and has not scored it yet. */
+		@AuraEnabled
+		public Boolean assignedToMe = false;
+		@AuraEnabled
+		public List<PresenterRow> presenters = new List<PresenterRow>();
 		@AuraEnabled
 		public Datetime noticeSent;
 		@AuraEnabled
@@ -72,7 +90,7 @@ public with sharing class EventApplicationsController {
 		public List<ReviewRow> reviews = new List<ReviewRow>();
 	}
 
-	/** One reviewer's score. */
+	/** One reviewer's score; an assignment has none yet. */
 	public class ReviewRow {
 		@AuraEnabled
 		public String reviewer;
@@ -80,6 +98,21 @@ public with sharing class EventApplicationsController {
 		public Integer score;
 		@AuraEnabled
 		public String notes;
+		@AuraEnabled
+		public Decimal weightedScore;
+		/** Scores by criterion label, as JSON, when the event has criteria. */
+		@AuraEnabled
+		public String criteriaScores;
+	}
+
+	/** One more person on a proposal (R-PP1). */
+	public class PresenterRow {
+		@AuraEnabled
+		public String id;
+		@AuraEnabled
+		public String name;
+		@AuraEnabled
+		public String role;
 	}
 
 	/** The outcome of an accept or decline. */
@@ -120,8 +153,23 @@ public with sharing class EventApplicationsController {
 				result.fieldLabels.put(name, fields.get(name).getDescribe().getLabel());
 			}
 			Map<String, Schema.SObjectField> reviewFields = Schema.SObjectType.Speaker_Review__c.fields.getMap();
-			for (String name : new List<String>{ 'Score__c', 'Notes__c' }) {
+			for (String name : new List<String>{ 'Score__c', 'Notes__c', 'Reviewer__c' }) {
 				result.fieldLabels.put(name, reviewFields.get(name).getDescribe().getLabel());
+			}
+			result.fieldLabels.put(
+				'Weighted_Average__c',
+				fields.get('Weighted_Average__c').getDescribe().getLabel()
+			);
+			result.canEditEvent = Schema.SObjectType.Event__c.fields.Review_Criteria__c.isUpdateable();
+			result.canAssign = Schema.SObjectType.Speaker_Review__c.fields.Reviewer__c.isCreateable();
+			for (Event__c event : [
+				SELECT Review_Criteria__c, Blind_Review__c
+				FROM Event__c
+				WHERE Id = :eventId
+				WITH USER_MODE
+			]) {
+				result.criteria = EventProposalReview.criteriaOf(event.Review_Criteria__c);
+				result.blindReview = event.Blind_Review__c == true;
 			}
 			Map<Id, ApplicationRow> byId = new Map<Id, ApplicationRow>();
 			for (Speaker_Application__c application : [
@@ -136,12 +184,13 @@ public with sharing class EventApplicationsController {
 					Event_Speaker__c,
 					Review_Count__c,
 					Average_Score__c,
+					Weighted_Average__c,
 					Notice_Sent__c,
 					Notice_Result__c
 				FROM Speaker_Application__c
 				WHERE Event__c = :eventId
 				WITH USER_MODE
-				ORDER BY Average_Score__c DESC NULLS LAST, Name
+				ORDER BY Weighted_Average__c DESC NULLS LAST, Average_Score__c DESC NULLS LAST, Name
 				LIMIT 500
 			]) {
 				ApplicationRow row = new ApplicationRow();
@@ -157,6 +206,7 @@ public with sharing class EventApplicationsController {
 					? 0
 					: Integer.valueOf(application.Review_Count__c);
 				row.averageScore = application.Average_Score__c;
+				row.weightedAverage = application.Weighted_Average__c;
 				row.noticeSent = application.Notice_Sent__c;
 				row.noticeResult = application.Notice_Result__c;
 				byId.put(application.Id, row);
@@ -164,7 +214,14 @@ public with sharing class EventApplicationsController {
 			}
 			Set<Id> applicationIds = byId.keySet();
 			for (Speaker_Review__c review : [
-				SELECT Speaker_Application__c, Reviewer__c, Reviewer__r.Name, Score__c, Notes__c
+				SELECT
+					Speaker_Application__c,
+					Reviewer__c,
+					Reviewer__r.Name,
+					Score__c,
+					Notes__c,
+					Weighted_Score__c,
+					Criteria_Scores__c
 				FROM Speaker_Review__c
 				WHERE Speaker_Application__c IN :applicationIds
 				WITH USER_MODE
@@ -174,13 +231,31 @@ public with sharing class EventApplicationsController {
 				ApplicationRow row = byId.get(review.Speaker_Application__c);
 				ReviewRow line = new ReviewRow();
 				line.reviewer = review.Reviewer__r?.Name;
-				line.score = Integer.valueOf(review.Score__c);
+				line.score = review.Score__c == null ? null : Integer.valueOf(review.Score__c);
 				line.notes = review.Notes__c;
+				line.weightedScore = review.Weighted_Score__c;
+				line.criteriaScores = review.Criteria_Scores__c;
 				row.reviews.add(line);
 				if (review.Reviewer__c == UserInfo.getUserId()) {
 					row.myScore = line.score;
 					row.myNotes = review.Notes__c;
+					row.myCriteriaScores = review.Criteria_Scores__c;
+					row.assignedToMe = line.score == null;
 				}
+			}
+			for (Proposal_Presenter__c presenter : [
+				SELECT Id, Speaker_Application__c, Contact__r.Name, Role__c
+				FROM Proposal_Presenter__c
+				WHERE Speaker_Application__c IN :applicationIds
+				WITH USER_MODE
+				ORDER BY CreatedDate
+				LIMIT 2500
+			]) {
+				PresenterRow line = new PresenterRow();
+				line.id = presenter.Id;
+				line.name = presenter.Contact__r?.Name;
+				line.role = presenter.Role__c;
+				byId.get(presenter.Speaker_Application__c).presenters.add(line);
 			}
 			return result;
 		} catch (Exception e) {
@@ -196,19 +271,52 @@ public with sharing class EventApplicationsController {
 	 * Saves the viewing person's score for an application: one review per reviewer, so a second
 	 * save replaces the first (R-SA3). A first review moves a Submitted application to In Review.
 	 *
+	 * With the event's weighted criteria (EV-21, R-SA7) the reviewer scores each from 1 to 5 in
+	 * `criteriaScoresJson` (a map by label); the Weighted Score is worked out here and the Score is
+	 * it rounded. Without criteria `score` is the one score and the Weighted Score equals it.
+	 * Filling an assignment (an unscored review of the person's) scores it.
+	 *
 	 * @param applicationId the application
-	 * @param score a whole number from 1 to 5
+	 * @param score a whole number from 1 to 5, when the event has no criteria
 	 * @param notes why, or empty
+	 * @param criteriaScoresJson each criterion's score by label, when it has
 	 */
 	@AuraEnabled
-	public static void saveReview(Id applicationId, Integer score, String notes) {
+	public static void saveReview(
+		Id applicationId,
+		Integer score,
+		String notes,
+		String criteriaScoresJson
+	) {
 		try {
-			if (score == null || score < 1 || score > 5) {
-				throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_ScoreRange'));
-			}
 			Speaker_Application__c application = load(applicationId);
 			if (!UNDECIDED.contains(application.Status__c)) {
 				throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_Decided'));
+			}
+			List<EventProposalReview.Criterion> criteria = EventProposalReview.criteriaOf(
+				application.Event__r.Review_Criteria__c
+			);
+			Decimal weighted;
+			Map<String, Object> scores = null;
+			if (criteria.isEmpty()) {
+				if (score == null || score < 1 || score > 5) {
+					throw UserErrors.message(
+						BarnHelp.text('Events', 'Events_Applications_ScoreRange')
+					);
+				}
+				weighted = score;
+			} else {
+				try {
+					scores = String.isBlank(criteriaScoresJson)
+						? new Map<String, Object>()
+						: (Map<String, Object>) JSON.deserializeUntyped(criteriaScoresJson);
+					weighted = EventProposalReview.weightedScore(criteria, scores);
+				} catch (Exception refused) {
+					throw UserErrors.message(
+						BarnHelp.text('Events', 'Events_Applications_ScoreEach')
+					);
+				}
+				score = weighted.round(System.RoundingMode.HALF_UP).intValue();
 			}
 			List<Speaker_Review__c> mine = [
 				SELECT Id
@@ -226,6 +334,8 @@ public with sharing class EventApplicationsController {
 				  )
 				: mine[0];
 			review.Score__c = score;
+			review.Weighted_Score__c = weighted;
+			review.Criteria_Scores__c = scores == null ? null : JSON.serialize(scores);
 			review.Notes__c = notes;
 			Database.upsert(review, true, AccessLevel.USER_MODE);
 			if (application.Status__c == 'Submitted') {
@@ -276,8 +386,12 @@ public with sharing class EventApplicationsController {
 				Status__c = decision
 			);
 			if (decision == ACCEPTED) {
-				result.speakerId = speakerFor(application);
+				result.speakerId = speakerFor(application.Event__c, application.Contact__c);
 				change.Event_Speaker__c = result.speakerId;
+				// EV-21 (R-PP1): every presenter on the proposal becomes a speaker too.
+				for (Id presenter : EventProposalReview.presenterContacts(application.Id)) {
+					speakerFor(application.Event__c, presenter);
+				}
 			}
 			Database.update(change, true, AccessLevel.USER_MODE);
 			if (notify == true) {
@@ -298,25 +412,22 @@ public with sharing class EventApplicationsController {
 		}
 	}
 
-	/** The applicant as a speaker at the event: the one already there, or a new Invited one. */
-	private static Id speakerFor(Speaker_Application__c application) {
-		if (application.Contact__c == null) {
+	/** The person as a speaker at the event: the one already there, or a new Invited one. */
+	private static Id speakerFor(Id eventId, Id contactId) {
+		if (contactId == null) {
 			throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_NoApplicant'));
 		}
 		List<Event_Speaker__c> existing = [
 			SELECT Id
 			FROM Event_Speaker__c
-			WHERE Event__c = :application.Event__c AND Contact__c = :application.Contact__c
+			WHERE Event__c = :eventId AND Contact__c = :contactId
 			WITH USER_MODE
 			LIMIT 1
 		];
 		if (!existing.isEmpty()) {
 			return existing[0].Id;
 		}
-		Event_Speaker__c speaker = new Event_Speaker__c(
-			Event__c = application.Event__c,
-			Contact__c = application.Contact__c
-		);
+		Event_Speaker__c speaker = new Event_Speaker__c(Event__c = eventId, Contact__c = contactId);
 		Database.insert(speaker, true, AccessLevel.USER_MODE);
 		return speaker.Id;
 	}
@@ -326,44 +437,24 @@ public with sharing class EventApplicationsController {
 		String developerName = decision == ACCEPTED
 			? EventsSettings.acceptNoticeTemplate()
 			: EventsSettings.declineNoticeTemplate();
-		if (developerName == null) {
-			return NOTICE_OFF;
-		}
-		List<EmailTemplate> templates = [
-			SELECT Id
-			FROM EmailTemplate
-			WHERE DeveloperName = :developerName AND IsActive = TRUE
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
-		if (templates.isEmpty()) {
-			return NOTICE_UNKNOWN_TEMPLATE;
-		}
-		List<Contact> people = [
-			SELECT Id, Email
+		String email;
+		for (Contact person : [
+			SELECT Email
 			FROM Contact
 			WHERE Id = :application.Contact__c
 			WITH USER_MODE
 			LIMIT 1
-		];
-		if (people.isEmpty() || String.isBlank(people[0].Email)) {
-			return NOTICE_NO_EMAIL;
+		]) {
+			email = person.Email;
 		}
-		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-		message.setTemplateId(templates[0].Id);
-		message.setTargetObjectId(people[0].Id);
-		message.setWhatId(application.Id);
-		message.setTreatTargetObjectAsRecipient(true);
-		message.setSaveAsActivity(false);
-		try {
-			List<EmailSendOutcome> outcomes = emailSender.send(
-				new List<Messaging.SingleEmailMessage>{ message }
-			);
-			return !outcomes.isEmpty() && outcomes[0].sent ? NOTICE_SENT : NOTICE_FAILED;
-		} catch (Exception e) {
-			ErrorLogger.log(e, CONTEXT + '.sendNotice', application.Id);
-			return NOTICE_FAILED;
-		}
+		return EventTemplateMail.send(
+			emailSender,
+			developerName,
+			application.Contact__c,
+			email,
+			application.Id,
+			CONTEXT + '.sendNotice'
+		);
 	}
 
 	/** Records on the application when the notice went, or the sentence saying why it did not. */
@@ -394,7 +485,13 @@ public with sharing class EventApplicationsController {
 
 	private static Speaker_Application__c load(Id applicationId) {
 		List<Speaker_Application__c> found = [
-			SELECT Id, Event__c, Contact__c, Status__c, Event_Speaker__c
+			SELECT
+				Id,
+				Event__c,
+				Event__r.Review_Criteria__c,
+				Contact__c,
+				Status__c,
+				Event_Speaker__c
 			FROM Speaker_Application__c
 			WHERE Id = :applicationId
 			WITH USER_MODE

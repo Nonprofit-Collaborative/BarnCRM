@@ -29,6 +29,20 @@ public with sharing class VolunteerShiftTriggerHandler extends TriggerHandler {
 		nameUnnamed((List<Volunteer_Shift__c>) newRecords());
 	}
 
+	/** R-VU8: raising or clearing Volunteers Needed frees places for the people waiting. */
+	public override void afterUpdate() {
+		Map<Id, Volunteer_Shift__c> previousById = (Map<Id, Volunteer_Shift__c>) oldRecordsById();
+		Set<Id> raised = new Set<Id>();
+		for (Volunteer_Shift__c shift : (List<Volunteer_Shift__c>) newRecords()) {
+			Decimal before = previousById.get(shift.Id).Volunteers_Needed__c;
+			Decimal now = shift.Volunteers_Needed__c;
+			if (before != null && (now == null || now > before)) {
+				raised.add(shift.Id);
+			}
+		}
+		VolunteerCapacity.promote(raised);
+	}
+
 	private static void nameUnnamed(List<Volunteer_Shift__c> shifts) {
 		List<Volunteer_Shift__c> unnamed = new List<Volunteer_Shift__c>();
 		Set<Id> jobIds = new Set<Id>();

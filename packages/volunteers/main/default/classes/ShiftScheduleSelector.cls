@@ -112,7 +112,8 @@ public with sharing class ShiftScheduleSelector {
 	/**
 	 * Of these shifts, the Ids of those with a sign-up record of any status or an hours record.
 	 * Hours may name a shift with no sign-up, and deleting that shift would clear the hours' only
-	 * link to the work.
+	 * link to the work. A standing sign-up does not count (R-VU9): it goes with its shift, and the
+	 * person continues on the schedule's new shifts.
 	 */
 	public static Set<Id> shiftsInUse(Set<Id> shiftIds) {
 		Set<Id> inUse = new Set<Id>();
@@ -122,7 +123,7 @@ public with sharing class ShiftScheduleSelector {
 		for (AggregateResult row : [
 			SELECT Volunteer_Shift__c shiftId
 			FROM Volunteer_Signup__c
-			WHERE Volunteer_Shift__c IN :shiftIds
+			WHERE Volunteer_Shift__c IN :shiftIds AND Standing__c = FALSE
 			WITH SYSTEM_MODE
 			GROUP BY Volunteer_Shift__c
 		]) {

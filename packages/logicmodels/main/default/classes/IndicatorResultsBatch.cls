@@ -101,11 +101,15 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 		}
 		Indicator__c indicator = found[0];
 		if (indicator.Source_Query__c == null) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_QueryMissing);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_QueryMissing')
+			);
 		}
 		definition = IndicatorSourceService.parse(indicator.Source_Definition__c);
 		if (definition == null) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Source_Invalid);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
+			);
 		}
 		Date today = Date.today();
 		Date earliest;
@@ -192,7 +196,7 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 			}
 		}
 		if (Limits.getHeapSize() > Limits.getLimitHeapSize() * HEAP_SHARE) {
-			problem = Label.LogicModels_Source_TooManyUnique;
+			problem = BarnHelp.text('LogicModels', 'LogicModels_Source_TooManyUnique');
 			for (Bucket bucket : buckets) {
 				bucket.seen.clear();
 			}

@@ -121,6 +121,29 @@ public with sharing class BulkDeleteController {
 	}
 
 	/**
+	 * Starts an archive (R-BD9): the records saved to Files, then deleted. `emptyConfirmedCount`
+	 * is the count typed again to empty the Recycle Bin too, or null.
+	 */
+	@AuraEnabled
+	public static JobView startArchive(
+		String queryJson,
+		Integer confirmedCount,
+		Integer emptyConfirmedCount
+	) {
+		try {
+			requirePermission();
+			Import_Batch__c started = BulkDeleteService.startArchive(
+				queryJson,
+				confirmedCount,
+				emptyConfirmedCount
+			);
+			return toView(requireJob(started.Id), true);
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Start an archive');
+		}
+	}
+
+	/**
 	 * What deleting the records a delete by file's dry run Matched would do (R-BD7): the count
 	 * the person confirms, five by name, and what goes with them.
 	 */
@@ -252,7 +275,7 @@ public with sharing class BulkDeleteController {
 		view.running = state.running;
 		view.chunksDone = state.chunksDone;
 		view.chunksTotal = state.chunksTotal;
-		Boolean undoable = String.isBlank(state.refusal);
+		Boolean undoable = String.isBlank(state.refusal) && !BulkDeleteService.binEmptied(job);
 		view.canUndo = undoable && view.deleted > 0;
 		view.recordsToUndo = view.deleted;
 		// A job aborted, or stopped before its finish counted, deleted records it never

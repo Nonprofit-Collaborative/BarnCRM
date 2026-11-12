@@ -95,4 +95,17 @@ private class FormsAccessSyncTest {
 			);
 		}
 	}
+
+	/** ADR-0194 D3: Fundraising Staff (Giving's role, when installed) gets Forms Staff. */
+	@IsTest
+	static void fundraisingStaffGetsFormsStaff() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			List<String> roles = FormsAccessSync.BY_ROLE.get('Forms_Staff');
+			Test.stopTest();
+
+			Assert.isTrue(roles.contains('Fundraising_Staff'), 'Fundraisers fill in forms');
+			Assert.isTrue(roles.contains('Program_Staff'), 'As Team Members do');
+		}
+	}
 }

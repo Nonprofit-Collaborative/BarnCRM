@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Rubric__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The scoring criteria, as JSON. Blank means one overall score from 0 to 10.</inlineHelpText>
+  <label>Rubric</label>
+  <length>32768</length>
+  <required>false</required>
+  <visibleLines>4</visibleLines>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+</CustomField>

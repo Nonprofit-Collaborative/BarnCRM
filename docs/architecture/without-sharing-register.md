@@ -26,6 +26,7 @@ into six kinds:
 |---|---|---|---|
 | AffiliationUpkeepSelector | Integrity | Overlapping affiliations owned by someone else, so the primary-affiliation rule still refuses them | ADR-0021 category 2 |
 | AffiliationUpkeepWriter | Upkeep | The person's primary affiliation fields and their other affiliations, which the saver may not be able to edit | ADR-0021 category 2 |
+| BrandShareWriter | Platform | Brand groups, their members and Account shares granted to them, which a staff member assigning a brand cannot create; one default brand and entity and one primary assignment cleared on rows the saver may not edit | ADR-0021, ADR-0202 brand management and visibility |
 | AutomationSettingsWriter | Platform | The automation pause on the protected org settings and the Automation Setting rows from the shipped registry | ADR-0021 |
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
 | ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
@@ -66,11 +67,14 @@ into six kinds:
 | AskReminderWriter | Upkeep | Reminder tasks assigned to the donor's owner | ADR-0021 |
 | DonorLevelWriter | Upkeep | The two donor level fields | ADR-0021 |
 | GiftImportIntegritySelector | Integrity | A gift already loaded under an external ID, or a receipt that keeps a gift on undo | ADR-0021, ADR-0052 |
+| GivingDonationPage | Platform | A Site guest user or the API's integration user reads one active appeal staff marked Donation Page: its name, description, goal and donation form key; never a gift, a donor or a total. It starts the hosted checkout through Payments and writes nothing itself | ADR-0190 public event pages, ADR-0211 online donation pages |
+| GivingEngagementSignal | Org figure | Each person's Received gift total for the nightly engagement score, private gifts included; returns totals only | ADR-0021, ADR-0212 engagement score |
 | GivingHouseholdDependentsExtension | Integrity | Gifts that keep a household from being deleted | ADR-0021 |
 | HealthCheckGivingSelector | Org figure | Every gift for Health Check's counts | ADR-0021, ADR-0057 |
 | PledgeReminderWriter | Org job | Reminds donors the scheduling user may not see | ADR-0021 |
 | ReceiptNumberSequence | Platform | The receipt number sequence, which no permission set lets anyone write | ADR-0021 |
 | ReceiptWriter | Org job | Issues receipts for donors the running user may not see | ADR-0021 |
+| RecurringGiftUpkeep | Upkeep | Every recurring commitment, to match a processor event by subscription id or donor email, and the four health fields of the matched one; the recipe's integration user cannot see private commitments (G-27, R-RH1, R-RH2) | ADR-0021 |
 | StewardshipWriter | Upkeep | Stewardship tasks assigned to the donor's owner | ADR-0021 |
 
 ## Volunteers
@@ -81,7 +85,9 @@ into six kinds:
 | VolunteerHealthCheckSelector | Org figure | Private volunteer hours for Health Check's counts | ADR-0021, ADR-0057 |
 | VolunteerIntegritySelector | Integrity | Hours, sign-ups and attendance entries another staff member made | ADR-0021 |
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
+| VolunteerPublicPage | Platform | A Site guest user or the API's integration user reads the Open shifts still to come of jobs staff marked Show on Public Page (job name, description and location, shift times and place, places left as a count), and, only behind a signed claim the host checked, one person's own upcoming bookings, approved hours and last ten entries; never who else is booked, the coordinator or notes | ADR-0190 public event pages, ADR-0198 volunteer self-service |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
+| VolunteersEngagementSignal | Org figure | Each person's Approved volunteer hours for the nightly engagement score, private hours included; returns totals only | ADR-0021, ADR-0212 engagement score |
 | VolunteersHouseholdDependentsExtension | Integrity | Private hours that keep a household from being deleted | ADR-0021 |
 | VolunteersPortalExtension | Portal | The shift a portal person signs up for and that person's own sign-up to cancel; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 
@@ -126,13 +132,21 @@ into six kinds:
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
+| EventsEngagementSignal | Org figure | How many events each person attended, for the nightly engagement score, whatever the scheduling user can see; returns counts only | ADR-0021, ADR-0212 engagement score |
 | EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
 
-One inner class of a `with sharing` class also runs without sharing (the register check counts only
+Three inner classes of `with sharing` classes also run without sharing (the register check counts only
 top-level classes, so it is listed here rather than as a row): `EventSurveyService.AttendeeFormReader`, kind
 Platform. A Site guest user, once a survey link's signed claim has matched, reads which form the
 Attended attendee's event names; it returns only that form identifier, never a record value
-(ADR-0188 decision 3).
+(ADR-0188 decision 3). `EventSessionRatings.SessionFormReader` (kind Platform) does the same for a
+session's rating link: the guest reads which form the session's event names for ratings, and
+nothing else (ADR-0207 `0207-events-paid-registration-proposals-ratings.md`, decision 14).
+`EventOperationsHandler.ScanReader` (kinds Integrity and Upkeep) resolves a sponsor's badge scan
+whoever saves it, usually the sponsor portal's integration user: it reads the scanned attendee,
+the scanner's sponsorships and the leads already saved, keeps the attendee's details only when
+they share them, and writes the one anonymous Session Rating an agenda rating sends (ADR-0215
+`0215-events-attendee-app-operations-portal-templates.md`, decisions 9 and 13).
 
 ## Portal Builder
 
@@ -145,7 +159,10 @@ Attended attendee's event names; it returns only that form identifier, never a r
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
+| ScholarshipsPortalExtension | Portal | The open cycle a portal person applies to, and that person's own application to withdraw and own Offered award to accept; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0204 scholarships outbound grants module |
 | EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
+| EventAttendeeApp | Portal | The attendee app's actions, reached only through EventsPortalExtension: the other attendee's row at an event the person attends (opted in only), the person's own connection rows and their pair's other row, messages to or from the person, and the person's own agenda picks; contact details are copied only on accept, and every write names only the verified person and the other side of their own connection | ADR-0021, ADR-0215 events attendee app operations portal templates |
+| CorporateHubPortalExtension | Portal | A board member's own attendee row (packet read, minutes approved while submitted), own vote (only while voting is open) and own open policy or disclosure request; the integration user has no object access, and each action re-reads the row by the person Portal Builder verified | ADR-0021, ADR-0199 corporate hub board governance |
 
 ## Mirror
 

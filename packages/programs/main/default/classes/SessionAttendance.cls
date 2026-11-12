@@ -111,7 +111,9 @@ public with sharing class SessionAttendance {
 	public static Integer save(Id sessionId, List<ServiceDeliveryLogController.Entry> entries) {
 		Session__c session = checkedSession(sessionId);
 		if (session.Status__c == CANCELLED) {
-			throw UserErrors.message(Label.Programs_Session_CancelledNoAttendance);
+			throw UserErrors.message(
+				BarnHelp.text('Programs', 'Programs_Session_CancelledNoAttendance')
+			);
 		}
 		Set<String> allowed = new Set<String>(ServiceDeliveryService.ATTENDANCE);
 		List<Service_Delivery__c> toInsert = new List<Service_Delivery__c>();
@@ -228,7 +230,7 @@ public with sharing class SessionAttendance {
 	private static Session__c checkedSession(Id sessionId) {
 		Session__c session = sessionId == null ? null : CohortSelector.selectSession(sessionId);
 		if (session == null) {
-			throw UserErrors.message(Label.Programs_Session_NotFound);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Session_NotFound'));
 		}
 		return session;
 	}

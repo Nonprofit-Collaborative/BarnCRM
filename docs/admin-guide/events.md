@@ -9,8 +9,9 @@ window. A repeating event, such as a class every month, is a **series**: **Repea
 the next occurrences in one step, each its own event.
 
 Event Management works on its own: it needs BarnCRM Core and nothing else, and it uses no
-Campaign. BarnCRM takes no payments: ticket prices are what you charge, and payments go through
-your own processor.
+Campaign. BarnCRM never holds money: ticket prices are what you charge, paid outside BarnCRM, or,
+with the optional **BarnCRM Payments** module and **Take payment online** turned on, paid on your
+own Stripe or PayPal checkout page and recorded on the registration (see Paid Registration).
 
 ## How to Turn It On
 
@@ -26,7 +27,7 @@ Install the BarnCRM Event Management package after Core. The install:
 
 - gives the installing administrator the **Events Admin** permission set, and
 - gives each BarnCRM role its Event Management set: **Events Admin** to BarnCRM Admin holders,
-  **Events Staff** to the Team Member, Coordinator and Fundraising Staff roles, and **Events Read
+  **Events Staff** to the Team Member and Fundraising Staff roles, and **Events Read
   Only** to the Read Only role. Someone given a role later gets the set within the hour, or at
   once when the role is given on the **Access** page.
 
@@ -156,6 +157,24 @@ Two sessions in the same room at overlapping times, or with a speaker in common,
 red on both cards. Nothing is refused, and cancelled sessions are left out. **Repeat Event**
 copies tracks but not sessions.
 
+**Session ratings.** People in the room can rate a session from 1 to 5 by scanning its QR code.
+It needs BarnCRM Forms and its Salesforce Site (see [Forms](forms.md), Public Forms):
+
+1. In Forms, build a short form with a question keyed `rating` (a number or choice from 1 to 5)
+   and, if you like, one keyed `comment`. Publish it and turn on **Public**. It needs no question
+   that finds a person: ratings are anonymous.
+2. On the Agenda tab choose **Session Ratings**, pick the form and **Save**. It is stored in the
+   event's **Session Rating Form Key**.
+3. **Print Rating Codes** opens a page with each confirmed session's title, time, room and QR
+   code, one per half page, to print and put by each door. Codes are drawn in the browser. An
+   event gets codes for its first 200 confirmed sessions by start time; past that, the panel says
+   so.
+
+Each answered form adds a **Session Rating** (rating and comment, no person) to the session. A
+session card shows its **Average Rating** and how many rated it; the Speakers tab shows each
+speaker's average over the sessions they speak in. A form with no rating from 1 to 5 adds nothing.
+Anyone with the code can rate, as often as they like, so treat the averages as a guide.
+
 ### Speakers
 
 The **Speakers** tab lists the event's **speakers**, each a Core person, with their headline,
@@ -215,6 +234,33 @@ If a notice cannot go out, because the template is missing or inactive, the appl
 address or the send failed, the decision is still saved and **Notice Result** on the application
 says why.
 
+**Presenters.** A session proposal can have up to 5 presenters besides the applicant: open a
+proposal's menu and choose **Add Presenter**, pick the person and their role (Speaker, Moderator or
+Panelist). The remove button beside a presenter takes them off. Accepting the proposal makes the applicant and every
+presenter a speaker at the event.
+
+**Assigning reviewers.** Select proposals with their checkboxes, choose **Assign Reviewers**, pick
+a user and click **Assign to Selected**. They get the proposals to score; a reviewer already assigned or who has scored
+is not added again. **My Assignments** narrows the list to what you still have to score. An
+assignment that is not yet scored does not count in Reviews or the averages.
+
+**Scoring criteria.** **Scoring Criteria** (Events Staff and Events Admin) sets up to 10 criteria
+for the event, each with a label and a weight from 1 to 10, for example Relevance (weight 3),
+Speaker Experience (weight 1). With criteria, **Score** asks for a score from 1 to 5 on each; the
+review's **Weighted Score** is the scores averaged by their weights, and its Score is that rounded.
+Without criteria a review is one score from 1 to 5, as before. Proposals are ranked by
+**Weighted Average**. Changing the criteria later leaves earlier reviews as they were scored.
+
+**Scoring Matrix and Compare.** **Scoring Matrix** shows every proposal with its average on each
+criterion, its weighted average, total and number of reviews. Select two to four proposals and
+choose **Compare** to see them side by side: applicant, weighted average, each criterion's average
+and the abstract.
+
+**Blind review.** Turn on **Blind Review** on the event (Details tab) to hide applicants',
+presenters' and reviewers' names on the Applications tab until a proposal is accepted or declined.
+It keeps reviews fair; it is not a security setting, since the records themselves stay readable to
+people with Events access.
+
 ### Sponsorship
 
 The **Sponsors** tab runs the event's sponsorship. **Add Level** makes a tier, such as Gold, with an
@@ -264,7 +310,7 @@ created in that household. Choose each person's ticket and type a promo code if 
 | Promo code | Must be this event's, active, inside its dates, for one of the chosen tickets and under its Maximum Uses (registrations that are not cancelled count). Its discount sets each attendee's price. |
 | Seats | Registered, Attended and No-Show attendees hold a seat. With no seat left on the event's Capacity or the ticket's Quantity, a new attendee is **Waitlisted**. |
 | Once per event | A person already registered (not cancelled) is left out and named in a message. |
-| Amount Owed | The prices of the attendees holding a seat. BarnCRM records it and takes no payment. |
+| Amount Owed | The prices of the attendees holding a seat. Paid outside BarnCRM, or online with Paid Registration. |
 
 Each attendee's menu changes their status: **Mark Attended**, **Mark No-Show**, **Mark
 Registered**, **Move Off Waitlist** (only when a seat is free; nothing moves off the waitlist on
@@ -284,6 +330,42 @@ A submission that cannot be registered (outside those times, a ticket not on sal
 code, an unknown ticket)
 is kept for review in Forms. Staff can still register anyone on the tab. Without Forms, register
 people on the tab.
+
+### Paid Registration
+
+With the optional **BarnCRM Payments** module (see [Payments](payments.md)) set up with your own
+Stripe or PayPal keys, an event can take payment for its tickets online. Turn on **Take payment
+online** in the Events settings; it ships off.
+
+- **From the public page.** A registration from the event's form that owes more than zero is
+  saved as **Pending Payment** with **Payment Status** Unpaid. Its people are Registered, so their
+  seats are held. Within a minute or two BarnCRM asks your processor for a secure checkout page,
+  saves its address on the registration (**Payment Link**, Payment Status **Link Sent**) and emails
+  it to the registrant with the **Payment link email template** (`BarnCRM_Event_Payment_Link`,
+  in the BarnCRM Events folder; keep `{!Event_Registration__c.Payment_Link__c}` in a template of
+  your own). Promo codes are already applied to the amount.
+- **From the Registrations tab.** **Send Payment Link** in a registration's menu emails a new link
+  for any registration that owes money and is not paid. A registration made by staff is not held
+  for payment: it stays Registered and only records the payment.
+- **From the portal.** A portal template can offer the action `Events.SendPaymentLink` on a
+  person's own registrations; it emails their current link again (it makes no new one).
+
+If a checkout cannot be started (for example the processor refused the keys), Payment Status
+reads **Failed** and the **Error Log** says why; fix the cause and use **Send Payment Link**.
+
+| Payment Status | What happened | The registration |
+|---|---|---|
+| Paid | The processor confirmed the payment (up to 15 minutes later). **Amount Paid** is set. | Pending Payment becomes Registered. |
+| Failed | The card was declined. The payer can try again on the same page. | Still waits. |
+| Cancelled | The checkout was abandoned (after two days) or expired. | A registration waiting for payment is cancelled and its seats freed. |
+| Partly Refunded | Part of the payment was refunded in Stripe or PayPal. | Unchanged; Amount Paid is lowered. |
+| Refunded | All of it was refunded. | Cancelled. |
+
+BarnCRM issues no refunds and stores no card details: refund in your Stripe or PayPal dashboard
+and the refund is recorded here. Cancelling a paid registration does not refund it. Payment Status,
+Amount Paid, Payment Key and Payment Link are set only by BarnCRM. Health Check warns when **Take
+payment online** is on and Payments is not installed or its keys are missing; until it is ready,
+form registrations are confirmed at once as before.
 
 ### Public Event Page
 
@@ -317,9 +399,10 @@ otherwise the page says registration is not taken online. Answers get the public
 as for any public form, so people are matched, never duplicated, and seats, codes and the
 waitlist apply exactly as on the Registrations tab.
 
-**Paid tickets.** BarnCRM takes no payment. A ticket with a price shows the price and the
-**Public page payment note** setting (default "Pay at the door or by arrangement with us."); a
-free ticket shows Free. The registration records the amount owed.
+**Paid tickets.** A ticket with a price shows the price and the **Public page payment note**
+setting (default "Pay at the door or by arrangement with us."); a free ticket shows Free. The
+registration records the amount owed. With **Take payment online** on and Payments ready, the
+note says instead that a secure payment link is emailed after registering (see Paid Registration).
 
 **Off-platform sites.** Portal Builder or any other site can show the same pages through the
 Forms API as its integration user: `GET /services/apexrest/barncrm/forms/v1/pages/<event ID>`
@@ -392,7 +475,8 @@ volunteer jobs in Volunteers, where their hours and history stay.
 The **Check-In** tab is for the door. It lists everyone who holds a seat (Registered, Attended or
 No-Show) with a count of who is in and who is still to come.
 
-- **Search** by name, email or ticket; every word typed must match.
+- **Search** by name, email or ticket; every word typed must match. A person with a **Badge
+  Name** shows it, with their name beside it.
 - **Check In** moves a person to Attended; **Undo Check-In** puts them back to Registered. This is
   the same status the Registrations menu sets, so the Registrations tab and the reports agree.
 - **QR code.** The QR button beside a person draws their code in the browser, to show on a phone
@@ -452,8 +536,131 @@ Salesforce if the browser blocks the window.
   session; sessions have no attendance of their own, so a session sheet lists everyone
   registered for the event.
 
+**Badge overrides.** An attendee's **Badge Name** (a preferred name), **Badge Title** (a job title
+or pronouns) and **Badge Company** print instead of their name and account when set; the title
+prints only when set. Set them from the attendee's menu on the Registrations tab (**Edit Badge**),
+or on the attendee record. The sign-in sheet and Check-In use the same badge name and company.
+
 In the browser's print dialog choose Letter paper and turn off headers and footers for the
 cleanest badges. Events Read Only can print.
+
+### Venues and Rooms
+
+The **Venues** tab keeps each place you hold events once: its **Address**, **Capacity**, a **Map
+Link** (a map or floor plan the attendee app shows) and **Notes**. A venue's **Rooms** list holds
+its rooms, each with a **Capacity**, a **Setup** (Theater, Classroom, Banquet, Boardroom,
+Reception, U-Shape, Other) and **Where** (floor or wing, shown to attendees). The tab has All
+Venues and My Venues list views.
+
+Pick a **Venue** on the event (its Details) and, when you save, a blank **Venue Name** and **Venue
+Address** are filled from it. Pick a **Room Record** on a session (**Agenda** tab, the session's
+**Edit**): saving copies the room's name into the session's **Room**, and its capacity into a
+blank **Capacity**, so room clash flags, the public page and badges read the room as before. A
+later change to a venue or room is not pushed to events already saved; edit those, or pick the
+room again. Typing a room without a room record still works.
+
+### Session and Speaker Details
+
+Each session (**Agenda** tab, **Edit**) has a **Level** (All Levels, Beginner, Intermediate,
+Advanced), a **Slides Link**, a **Recording Link** and **Sponsored By**, a sponsor of the same
+event for a sponsored session. The session's format is its **Session Type**, which includes
+Lightning Talk and Roundtable.
+
+Each speaker (**Speakers** tab, **Edit**) has a **Headshot Link**, **LinkedIn** and **Website**,
+and a checklist: **Agreement Signed**, **Slides Received** and **Dry Run Done**. The Speakers tab
+shows how many of the three are done for each speaker. Speakers can keep their headshot and links
+current themselves in the speaker portal (see [Portal Builder](portal-builder.md)).
+
+### Budget and Funding
+
+The **Budget** panel on the event's **Details** tab, under the dashboard, tracks the money:
+
+- **Expenses** are the budget's lines. Each has an **Item**, a **Category** (Venue, Food and
+  Beverage, Audio Visual, Speakers, Travel, Marketing, Printing, Staff, Technology, Other), a
+  **Budgeted** amount, the **Actual** spent, a **Vendor**, a **Status** (Planned, Committed, Paid)
+  and a **Due Date**. **Add Expense** adds one; a line's menu edits or removes it.
+- **Funding** is money a sponsor or partner gives toward the event: its **Source**, a **Type**
+  (Sponsorship, Partner Funds (MDF), Grant, In-Kind, Other), an optional **Partner Organization**
+  and **Sponsor**, what is **Expected** and what is **Received**. **Add Funding** adds one.
+- The panel shows budgeted against actual for each category, funding expected against received,
+  and **Net Cost**: actual spend less funding received and the registrations' amount paid (shown
+  as **Paid online**: it counts only payments taken through Paid Registration, not money you
+  collected outside BarnCRM; record that as Funding). Below
+  it, **Budgeted Net Cost** uses budgeted spend and expected funding. The event dashboard shows Net
+  Cost too.
+
+A sponsor's amount on the Sponsors tab is what they agreed to give; it is not counted until you
+record the money as funding (Type Sponsorship, with the sponsor picked), so nothing is counted
+twice. Events Read Only see the panel; Events Staff and Admin add and change lines.
+
+### Announcements
+
+Add news for attendees from the event's **Announcements** related list: a **Title**, the
+**Message** and **Publish At** (now by default). The attendee app shows each announcement once its
+time has come, newest first. Change Publish At to schedule one.
+
+## Attendee App
+
+The attendee app is a portal (see [Portal Builder](portal-builder.md)) that attendees save to their
+phone's home screen from your WordPress site: no app store, nothing to pay. It needs Portal
+Builder and its WordPress plugin. Paste `portal-client/templates/attendee.json` into a portal's
+Template field and put the shortcode on a page with `app="yes"`:
+`[barncrm_portal key="attendees" app="yes" name="Spring Summit"]`. People sign in with the email
+they registered with; with an Any Matching Person portal every registrant can sign in at once.
+
+What attendees see, always only for events they are registered for and not cancelled from. The
+Agenda and Event Info pages leave out events that have ended, so past events do not crowd them;
+the Attendees and Sponsors pages still read up to 200 of a person's events (newest first, and a
+warning in the Error Log when that cap is reached). People scan QR codes (Scan buttons) only where
+the browser can read one itself: Chrome and Edge on Android and desktop can; iPhone Safari and
+Firefox cannot, and the person types the code instead.
+
+| Page | What it does |
+|---|---|
+| My Events | Their attendee rows. Here they choose **Show Me in the Attendee List**, write a **Headline**, **About Me** and **How to Reach Me**, and choose **Share My Details With Sponsors**. All off or blank until they choose. |
+| Agenda | The event's Confirmed sessions with time, room, track, type, level and description. **Add to My Agenda** picks one. |
+| My Agenda | Their picks, **Add to Calendar** (an .ics file for their phone's calendar), **Remove from My Agenda**, and **My Rating** with a comment once a session has started. |
+| Attendees | Attendees who chose to be listed: name, badge title and company, headline and about. Searchable. **Connect** asks to connect. |
+| Connections | Requests and connections. **Accept** or **Decline** a request; once connected, each sees the other's How to Reach Me. A private **Note** and a **Message to Send** with **Send Message**. |
+| Messages and Sent | Messages from connections, with **Reply**; and what they sent. |
+| Announcements | Your announcements, once their time has come. |
+| Sponsors | Confirmed sponsors with their level and booth. |
+| Event Info | Dates, venue, the venue's map link and the online link. |
+| My Details | Their name and phone. |
+
+Rules that protect attendees:
+
+- Nobody is listed until they turn on Show Me in the Attendee List, and the list never shows an
+  email, phone or address. How to Reach Me is shown only to people they accepted.
+- **Messages are off until you turn on Attendee messages** in Settings. Then a person can message
+  only someone they are connected with, up to 50 messages a day. Messages are Salesforce records
+  your event staff can read; say so in your event's code of conduct.
+- **Personal agenda.** A person picks a session once. A session whose picks reach its **Capacity**
+  is full. A session that overlaps one already picked is refused, unless you turn on **Allow
+  overlapping picks**; then it is added and marked Overlaps. The session's **Agenda Picks** shows
+  how many picked it.
+- **Ratings stay anonymous.** A rating from My Agenda adds one Session Rating with no name, the
+  same as the rating form's (see Session Ratings). It is sent once and cannot be changed.
+
+### Sponsor Lead Scanning
+
+Sponsors collect leads by scanning attendees' badge QR codes (the same code Check-In reads). Paste
+`portal-client/templates/sponsor.json` into a portal (Invited works well: add a Portal Access for
+each sponsor contact and booth staff member) and put its shortcode on a page, with `app="yes"` if
+sponsors should install it.
+
+- Who can scan: the sponsor's **Contact** on the Sponsors tab, and any attendee whose **Booth Staff
+  For** names the sponsor (set it with **Edit Badge** on the Registrations tab).
+- **Scan** reads the code with the phone's camera where the browser can (Chrome and Edge on
+  Android, for example); elsewhere the person types the code printed under it, or uses the
+  phone's camera app and pastes it.
+- Each scan is saved as a Booth Scan on the sponsorship at the scanned attendee's event. Only an
+  attendee who turned on **Share My Details With Sponsors** is **Shared**, with name, email,
+  title and company. Otherwise the scan is **Not Shared** and keeps nothing about the person; an
+  unknown code is **Not Found**; a second scan is **Already Scanned**.
+- The rep adds notes and an interest (Hot, Warm, Cold) and can **Download CSV** of their leads.
+  Staff use **Download Leads** in a sponsor's menu on the Sponsors tab: a CSV of that sponsor's
+  Shared scans.
 
 ## Settings
 
@@ -471,7 +678,11 @@ you change it.
 | Mark no-shows | Off | Once an event has ended (within seven days), attendees still **Registered** become **No-Show**. | At the next 7:30 AM run |
 | Accepted speaker notice template | BarnCRM_Speaker_Accepted | The unique name of the email template sent when a speaker application is accepted (see Call for Speakers). A blank value reads as the shipped template. | At the next decision |
 | Declined speaker notice template | BarnCRM_Speaker_Declined | The unique name of the email template sent when a speaker application is declined. A blank value reads as the shipped template; to send no email, make the template inactive. | At the next decision |
-| Public page payment note | Pay at the door or by arrangement with us. | Shown beside each ticket with a price on a public event page, since BarnCRM takes no payment. | At once |
+| Public page payment note | Pay at the door or by arrangement with us. | Shown beside each ticket with a price on a public event page while payment is not taken online. | At once |
+| Take payment online | Off | A form registration that owes money waits for an online payment through BarnCRM Payments, with its seats held (see Paid Registration). Needs Payments with its keys entered. | At the next registration |
+| Payment link email template | BarnCRM_Event_Payment_Link | The unique name of the email template that sends a registrant their payment link. | At the next link |
+| Attendee messages | Off | Connected attendees can message each other in the attendee app (see Attendee App). | At once |
+| Allow overlapping picks | Off | A person may add a session that overlaps one already on their agenda; it is marked Overlaps. | At the next pick |
 
 ## Reminders, Follow-Ups and No-Shows
 
@@ -479,7 +690,9 @@ A step of [BarnCRM Nightly Jobs](nightly-jobs.md) named **Event reminders, follo
 no-shows** runs each morning at 7:30 AM while Event Management and at least one of the three
 settings are on. It has no switch of its own; if Health Check shows the nightly run as not
 scheduled, use its **Schedule all nightly jobs** fix once. All three settings ship off, because
-turning them on emails real people.
+turning them on emails real people. While **Take payment online** is on, the same morning run
+also starts checkouts for any registration still Pending Payment and Unpaid, so one whose
+checkout did not start at registration is picked up by the next morning.
 
 **Templates.** Two text templates ship in the **BarnCRM Events** email folder:
 `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up`. Copy one in Setup, Classic Email
@@ -550,5 +763,5 @@ is left alone.
 
 ## Not Yet
 
-Session sign-up, speaker portal and ticket emails with the QR code for an
-event come in later releases.
+Ticket emails with the QR code for an event come in a later release. Push notifications to the
+attendee app are not offered: announcements show when the app is opened.

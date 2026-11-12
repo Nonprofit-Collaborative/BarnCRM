@@ -87,7 +87,7 @@ private class RollupAttentionControllerTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_Waiting,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_Waiting'),
 					new List<String>{ (1).format(), (0).format() }
 				),
 				attention.waiting
@@ -101,7 +101,10 @@ private class RollupAttentionControllerTest {
 			}
 			System.Assert.areEqual(new Set<String>{ 'Rivera Household', 'Chen Household' }, names);
 			System.Assert.isFalse(attention.nightlyScheduled, 'The nightly run is off');
-			System.Assert.areEqual(Label.Core_RollupBuilder_LastRunNever, attention.lastRun);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRunNever'),
+				attention.lastRun
+			);
 		}
 	}
 
@@ -112,7 +115,10 @@ private class RollupAttentionControllerTest {
 			System.runAs(maria()) {
 				attention = RollupAttentionController.getAttention();
 			}
-			System.Assert.areEqual(Label.Core_RollupBuilder_NothingWaiting, attention.waiting);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_NothingWaiting'),
+				attention.waiting
+			);
 			System.Assert.isTrue(attention.failed.isEmpty());
 		}
 	}
@@ -184,7 +190,10 @@ private class RollupAttentionControllerTest {
 					message = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				message
+			);
 			System.Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_FAILED]
@@ -207,12 +216,15 @@ private class RollupAttentionControllerTest {
 			done.chunksStopped = 1;
 
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupBuilder_LastRunGoing, new List<String>{ '3', '10' }),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRunGoing'),
+					new List<String>{ '3', '10' }
+				),
 				RollupAttentionController.lastRun(going)
 			);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_LastRun,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRun'),
 					new List<String>{ 'Completed', done.finishedAt.format(), '1' }
 				),
 				RollupAttentionController.lastRun(done)

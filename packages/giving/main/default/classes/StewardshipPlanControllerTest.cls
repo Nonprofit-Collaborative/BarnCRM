@@ -216,7 +216,7 @@ private class StewardshipPlanControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Giving_Stewardship_ErrorNameRequired,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNameRequired'),
 				message,
 				'A plan without a name is refused in words rather than with a stack trace.'
 			);
@@ -356,7 +356,7 @@ private class StewardshipPlanControllerTest {
 			}
 
 			Assert.areEqual(
-				Label.Giving_Stewardship_ErrorNotPermitted,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNotPermitted'),
 				message,
 				'Changing what the whole organization follows up on needs the settings permission, ' +
 				'and says so in words rather than failing quietly.'

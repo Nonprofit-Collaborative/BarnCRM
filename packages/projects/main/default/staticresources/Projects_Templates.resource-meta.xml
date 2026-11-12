@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Private</cacheControl>
+  <contentType>application/json</contentType>
+  <description>
+    The shipped project templates (Salesforce Implementation, Program Launch) as JSON: phases and
+    tasks placed by day offsets from a start date (PM-03, canonical model R-PM3). Read by the
+    ProjectTemplates Apex class.
+  </description>
+</StaticResource>

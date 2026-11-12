@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Number receipts by</label>
+  <protected>true</protected>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Receipt_Numbering_Scope__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">Giving_Settings__c</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">Receipts</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Giving</value>
+  </values>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Picklist</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:type="xsd:string">Organization:One series for the whole organization;Legal Entity:A series per legal entity with its own prefix;Brand:A series per brand with its own prefix</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">62</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Only while Use brands is on. With Legal Entity or Brand, a receipt for a gift with a brand is numbered in its own series when that entity or brand has a Receipt Number Prefix; otherwise it uses the organization series. Year-end statements always use the organization series, and no receipt is ever renumbered.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">brands.md</value>
+  </values>
+</CustomMetadata>

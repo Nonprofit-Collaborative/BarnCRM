@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Allow overlapping picks</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:type="xsd:string">Allow_Agenda_Overlaps__c</value>
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Events_Settings__c</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Events</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Events</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">Checkbox</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">98</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Whether an attendee may add a session to their own agenda in the attendee app when it overlaps a session already on it; the pick is then marked Overlaps. Off by default: an overlapping pick is refused and names the session it overlaps.</value>
+    </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">events.md</value>
+    </values>
+</CustomMetadata>

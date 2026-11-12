@@ -59,7 +59,7 @@ global with sharing class RollupRecalcRecordAction {
 				if (String.isNotBlank(rollup) && recalculated.isEmpty()) {
 					ErrorLogger.logMessage(
 						String.format(
-							System.Label.Core_Rollups_ErrorNoRollupNamed,
+							BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoRollupNamed'),
 							new List<String>{ rollup }
 						),
 						'RollupRecalcRecordAction',

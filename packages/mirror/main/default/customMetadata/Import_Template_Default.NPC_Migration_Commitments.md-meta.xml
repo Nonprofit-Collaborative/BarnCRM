@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Nonprofit Cloud Migration: Commitments</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npc_commitments</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Nonprofit Cloud Gifts and Soft Credits migration kit, which reads gift commitments: one recurring commitment or pledge per record, of the same person or organization, with its amount, expected total, frequency, dates, status and appeal.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "DonorContact", "target": "Record.Donor_Contact__c"}, {"source": "DonorAccount", "target": "Record.Donor_Account__c"}, {"source": "Type", "target": "Record.Type__c"}, {"source": "Amount", "target": "Record.Amount__c"}, {"source": "ExpectedTotalCmtAmount", "target": "Record.Expected_Total__c"}, {"source": "Frequency", "target": "Record.Frequency__c"}, {"source": "EffectiveStartDate", "target": "Record.Start_Date__c"}, {"source": "ExpectedEndDate", "target": "Record.End_Date__c"}, {"source": "CampaignId", "target": "Record.Appeal__c"}, {"source": "Status", "target": "Record.Status__c", "transforms": [{"op": "map", "pairs": [{"text": "Active", "value": "Active"}, {"text": "Paused", "value": "Paused"}, {"text": "Completed", "value": "Completed"}, {"text": "Fulfilled", "value": "Completed"}, {"text": "Closed", "value": "Cancelled"}, {"text": "Cancelled", "value": "Cancelled"}, {"text": "Canceled", "value": "Cancelled"}, {"text": "Lapsed", "value": "Cancelled"}, {"text": "Written Off", "value": "Cancelled"}], "otherwise": "Active"}, {"op": "ifBlank", "value": "Active"}]}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Commitment__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

@@ -6,16 +6,12 @@ import OPERATOR from '@salesforce/label/c.Core_RollupFilter_Operator';
 import VALUE from '@salesforce/label/c.Core_Filter_Value';
 import REMOVE from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import LOGIC from '@salesforce/label/c.Core_RollupFilter_Logic';
-import LIST_HELP from '@salesforce/label/c.Core_RollupFilter_ListHelp';
-import EVERY_RECORD from '@salesforce/label/c.Core_RollupFilter_EveryRecord';
 import WHOSE from '@salesforce/label/c.Core_RollupFilter_Whose';
 import AND from '@salesforce/label/c.Core_RollupFilter_And';
 import OR from '@salesforce/label/c.Core_RollupFilter_Or';
 import NOT from '@salesforce/label/c.Core_RollupFilter_Not';
 import TRUE_VALUE from '@salesforce/label/c.Core_BulkUpdate_True';
 import FALSE_VALUE from '@salesforce/label/c.Core_BulkUpdate_False';
-import ERROR_INCOMPLETE from '@salesforce/label/c.Core_RollupFilter_ErrorIncomplete';
-import ERROR_LOGIC from '@salesforce/label/c.Core_RollupFilter_ErrorLogic';
 import OP_EQUALS from '@salesforce/label/c.Core_RollupFilter_OpEquals';
 import OP_NOT_EQUALS from '@salesforce/label/c.Core_RollupFilter_OpNotEquals';
 import OP_LESS_THAN from '@salesforce/label/c.Core_Filter_OpLessThan';
@@ -124,7 +120,9 @@ export default class RollupFilterBuilder extends LightningElement {
     get logicHelp() {
       return helpText('Rollups', 'Core_RollupFilter_LogicHelp');
     },
-    listHelp: LIST_HELP
+    get listHelp() {
+      return helpText('Rollups', 'Core_RollupFilter_ListHelp');
+    }
   };
 
   conditions = [];
@@ -163,10 +161,10 @@ export default class RollupFilterBuilder extends LightningElement {
         (!NO_VALUE.has(condition.operator) && this.isBlank(condition.value))
     );
     if (incomplete) {
-      return format(ERROR_INCOMPLETE, incomplete.id);
+      return format(helpText('Rollups', 'Core_RollupFilter_ErrorIncomplete'), incomplete.id);
     }
     if (this.logic && !this.logicIsValid()) {
-      return format(ERROR_LOGIC, this.conditions.length);
+      return format(helpText('Rollups', 'Core_RollupFilter_ErrorLogic'), this.conditions.length);
     }
     return null;
   }
@@ -201,7 +199,7 @@ export default class RollupFilterBuilder extends LightningElement {
           ? condition.value.join(', ')
           : String(condition.value),
         valueList: Array.isArray(condition.value) ? condition.value : [],
-        valueHelp: isList ? LIST_HELP : undefined
+        valueHelp: isList ? helpText('Rollups', 'Core_RollupFilter_ListHelp') : undefined
       };
     });
   }
@@ -221,7 +219,7 @@ export default class RollupFilterBuilder extends LightningElement {
   /** The filter read back: "Gifts whose Status is one of Received or Refunded and Amount is greater than 0". */
   get sentence() {
     if (!this.hasConditions) {
-      return EVERY_RECORD;
+      return helpText('Rollups', 'Core_RollupFilter_EveryRecord');
     }
     const phraseById = new Map(
       this.conditions.map((condition) => [String(condition.id), this.phrase(condition)])

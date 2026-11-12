@@ -128,7 +128,16 @@ hours in Volunteers. You need the Volunteers permission to add jobs and shifts.
    first.
 3. Choose **Accept** to make the applicant a speaker (as **Invited**) or **Decline**, and confirm.
    If your admin chose email templates, the applicant gets the notice. If not, or if they have no
-   email address, a message tells you, and the application shows why.
+   email address, a message tells you, and the application shows why. Accepting also makes each
+   of the proposal's presenters a speaker.
+
+**Presenters, reviewers and criteria.** **Add Presenter** in a proposal's menu adds a co-speaker,
+moderator or panelist (up to 5). To share out the reviewing, tick proposals and choose **Assign
+Reviewers**; **My Assignments** shows what you still have to score. When the event has **Scoring
+Criteria** (set from the same tab), **Score** asks for 1 to 5 on each criterion and works out the
+weighted score for you. **Scoring Matrix** shows every proposal's average per criterion, and
+**Compare** puts two to four ticked proposals side by side. With **Blind Review** on the event,
+names stay hidden on this tab until a proposal is decided.
 
 ## Register People
 
@@ -153,6 +162,16 @@ still **Registered** as **No-Show** once the event is over. An attendee's **Remi
 
 If your organization uses Summit Events, its registrations appear here each morning with source
 **Summit Events**; change an imported attendee in BarnCRM.
+
+**Online payment.** When your admin takes payment online, a registration from the event's page
+that owes money shows **Pending Payment** until the person pays on the secure Stripe or PayPal page
+emailed to them; it then shows **Registered** and its **Payment Status** shows **Paid**. A booking
+whose payment is abandoned is cancelled after two days. **Send Payment Link** in a registration's
+menu emails a link to anyone who still owes. Refunds are made in Stripe or PayPal by your admin and
+show here on their own.
+
+**Badge details.** **Edit Badge** in an attendee's menu sets the name, title and company printed
+on their badge, when they differ from their record.
 
 ## Send a Survey After an Event
 
@@ -179,8 +198,21 @@ where people read about it and register.
    `/FormsPublic?record=` and the event's record ID.
 
 The page shows only confirmed sessions and speakers and active tickets; tickets with a price show
-the price and a note on how to pay, since BarnCRM takes no payment. People who register through
-the page appear on **Registrations** with source **Form**, usually within 15 minutes.
+the price and a note on how to pay (or, when your admin takes payment online, that a payment link
+is emailed). People who register through the page appear on **Registrations** with source
+**Form**, usually within 15 minutes.
+
+## Collect Session Ratings
+
+If your organization uses BarnCRM Forms, people can rate each session from 1 to 5 by scanning a
+QR code.
+
+1. Open the event and click the **Agenda** tab, then **Session Ratings**. Choose the rating form
+   your admin set up and click **Save**.
+2. Click **Print Rating Codes** and put each session's code by its door (one code per half
+   page).
+3. Each session card shows its average rating and how many rated it. The **Speakers** tab shows
+   each speaker's average.
 
 ## Check People In
 
@@ -188,7 +220,7 @@ the page appear on **Registrations** with source **Form**, usually within 15 min
 2. Find the person: type part of their name, email or ticket in **Search**, then click **Check
    In**. **Undo Check-In** takes it back.
 3. With a ticket's QR code: click **Scan with Camera** and hold the code to the camera (if you
-   do not see the button, your browser cannot scan; type the code into **Ticket code** and click
+   do not see the button, your browser cannot scan, as with iPhone Safari and Firefox; type the code into **Ticket code** and click
    **Check In by Code** instead). Pressing Enter in **Ticket code** checks the person in too, so
    a handheld barcode scanner that types the code and Enter works without clicking.
 4. To give someone their QR code, click the QR button beside their name and show or print it.
@@ -213,8 +245,46 @@ the page appear on **Registrations** with source **Form**, usually within 15 min
 1. Open the event and click the **Badges** tab.
 2. For badges: narrow the list with **Search** or **Ticket Type** if you only need some, choose a
    **Badge Size**, and choose whether to show the organization, the ticket type and a QR code.
+   A person's badge name, title and company (set with **Edit Badge** on the Registrations tab)
+   print instead of their own name and organization.
 3. Click **Print Badges**. A new window opens with the print dialog; print on Letter paper.
    (If nothing opens, allow pop-ups for this site.)
 4. For a sign-in sheet: choose **Whole Event** or a session under **Sheet For** and click **Print
    Sign-In Sheet**. People sign in the last column; the blank lines at the bottom are for people
    who were not registered.
+
+## Keep Venues and Rooms
+
+1. Open the **Venues** tab and click **New**: name, address, capacity, a map link and notes.
+2. On the venue, add its rooms in the **Rooms** list, each with capacity, setup and where it is.
+3. On an event, pick the **Venue**: a blank venue name and address fill in when you save.
+4. On the **Agenda** tab, a session's **Edit** has **Room Record**: pick a room and save. The
+   session's room and, if blank, its capacity come from the room.
+
+## Add Session and Speaker Details
+
+- A session's **Edit** on the **Agenda** tab also has **Level**, **Slides Link**, **Recording
+  Link** and **Sponsored By**.
+- A speaker's **Edit** on the **Speakers** tab has **Headshot Link**, **LinkedIn**, **Website**
+  and the checklist **Agreement Signed**, **Slides Received** and **Dry Run Done**. The speaker's
+  row shows how many of the three are done.
+
+## Track the Budget
+
+1. Open the event. On the **Details** tab, the **Budget** panel is under the dashboard.
+2. **Add Expense** for each line: item, category, budgeted amount, vendor, status and due date.
+   Fill in **Actual** as bills come in.
+3. **Add Funding** for money from sponsors and partners: source, type, expected and received.
+   Record a sponsor's payment here (type Sponsorship) when it arrives.
+4. The panel compares budgeted and actual by category and shows **Net Cost**: actual spend less
+   funding received and registration payments. The dashboard shows it too.
+
+## Post Announcements
+
+On the event, in the **Announcements** list, click **New**: a title, the message and when to
+publish it. The attendee app shows it from then on.
+
+## Download Sponsor Leads
+
+On the **Sponsors** tab, a sponsor's menu has **Download Leads**: a CSV of the attendees the
+sponsor's staff scanned who chose to share their details.

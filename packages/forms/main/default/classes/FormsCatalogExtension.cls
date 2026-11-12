@@ -46,17 +46,23 @@ public with sharing class FormsCatalogExtension implements FormCatalogExtension 
 		return questions;
 	}
 
+	private static Map<Id, Boolean> publicForms = new Map<Id, Boolean>();
+
 	/** The address on the first active Site that has one; null for a form that is not public. */
 	public String publicLink(Id formId, Id contextRecordId) {
-		Boolean isPublic = false;
-		for (Form__c form : [
-			SELECT Id
-			FROM Form__c
-			WHERE Id = :formId AND Status__c = 'Published' AND Public__c = TRUE
-			WITH USER_MODE
-		]) {
-			isPublic = true;
+		// Read once a transaction: a reminder run asks for a link for each of 100 bookings.
+		if (!publicForms.containsKey(formId)) {
+			publicForms.put(
+				formId,
+				[
+					SELECT COUNT()
+					FROM Form__c
+					WHERE Id = :formId AND Status__c = 'Published' AND Public__c = TRUE
+					WITH USER_MODE
+				] > 0
+			);
 		}
+		Boolean isPublic = publicForms.get(formId);
 		List<String> urls = FormsSites.activeSiteUrls();
 		if (!isPublic || urls.isEmpty()) {
 			return null;

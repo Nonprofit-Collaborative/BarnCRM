@@ -120,7 +120,8 @@ private class GiftInKindTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null && refusal.contains(Label.Giving_Gift_ReceiptLocked),
+				refusal != null &&
+				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'A receipted in-kind gift cannot be re-described: the donor already has the words.'
 			);
 			Assert.areEqual(
@@ -182,7 +183,7 @@ private class GiftInKindTest {
 				'A gift of goods with nothing written down cannot be receipted, so it is refused.'
 			);
 			Assert.areEqual(
-				Label.Giving_QuickGiftEntry_ErrorInKindDescriptionRequired,
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorInKindDescriptionRequired'),
 				byField.get('inKindDescription'),
 				'And the message names the description rather than talking about amounts.'
 			);

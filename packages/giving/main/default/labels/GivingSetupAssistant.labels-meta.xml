@@ -33,14 +33,6 @@
         <value>Tax identification number</value>
     </labels>
     <labels>
-        <fullName>Giving_SetupAssistant_EinPatternMessage</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what a tax identification number looks like</shortDescription>
-        <value>In the United States this is two digits, a hyphen, and seven digits, for example 12-3456789. Leave it blank if your country does not use one.</value>
-    </labels>
-    <labels>
         <fullName>Giving_SetupAssistant_LogoLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -79,14 +71,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: alternative text of the uploaded logo preview</shortDescription>
         <value>The logo that will be printed on your receipts</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SetupAssistant_SignaturePreviewAlt</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: alternative text of the uploaded signature preview</shortDescription>
-        <value>The signature that will be printed on your receipt letters</value>
     </labels>
     <labels>
         <fullName>Giving_SetupAssistant_EnterFirstGiftButton</fullName>

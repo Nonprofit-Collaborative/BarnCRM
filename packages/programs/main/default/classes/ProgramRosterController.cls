@@ -87,7 +87,7 @@ public with sharing class ProgramRosterController {
 			throw UserErrors.message(failed());
 		}
 		if (personId == null) {
-			throw UserErrors.message(Label.Programs_Roster_PersonRequired);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Roster_PersonRequired'));
 		}
 		Enrollment__c enrollment = new Enrollment__c(Program__c = programId);
 		if (String.isNotBlank(stage)) {
@@ -150,7 +150,8 @@ public with sharing class ProgramRosterController {
 			option.count = counts.containsKey(option.value) ? counts.get(option.value) : 0;
 			option.open = EnrollmentService.isOpen(option.value);
 			roster.stages.add(option);
-			if (showEnded || option.open) {
+			// Waitlisted people are listed with the open ones: they have not ended (P-09).
+			if (showEnded || EnrollmentService.ONE_PER_PERSON.contains(option.value)) {
 				listed.add(option.value);
 			}
 		}

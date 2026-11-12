@@ -79,7 +79,7 @@ public with sharing class RollupDefinitionValidationHandler extends TriggerHandl
 				record.addError(
 					Rollup_Definition__c.Bypass_Permission__c,
 					String.format(
-						System.Label.Core_Rollups_ErrorUnknownBypassPermission,
+						BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownBypassPermission'),
 						new List<String>{ name }
 					)
 				);

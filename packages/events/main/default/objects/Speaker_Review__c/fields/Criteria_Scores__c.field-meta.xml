@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Criteria_Scores__c</fullName>
+  <description>EV-21, R-SA6: each criterion's score from 1 to 5 as JSON { "label": score }, set by the Applications tab.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The score for each of the event's review criteria. Set by the Applications tab.</inlineHelpText>
+  <label>Criteria Scores</label>
+  <length>5000</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

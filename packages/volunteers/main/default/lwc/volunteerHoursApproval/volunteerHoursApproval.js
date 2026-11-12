@@ -9,7 +9,6 @@ import rejectHours from '@salesforce/apex/VolunteerHoursApprovalController.rejec
 import reopenHours from '@salesforce/apex/VolunteerHoursApprovalController.reopen';
 
 import TITLE from '@salesforce/label/c.Volunteers_Approve_Title';
-import READ_ONLY from '@salesforce/label/c.Volunteers_Hours_NeedManagePermission';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
 import SUBMITTED from '@salesforce/label/c.Volunteers_Approve_StatusSubmitted';
 import APPROVED from '@salesforce/label/c.Volunteers_Approve_StatusApproved';
@@ -36,13 +35,6 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import PREVIOUS from '@salesforce/label/c.Volunteers_Approve_Previous';
 import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import PAGE from '@salesforce/label/c.Volunteers_Approve_Page';
-import EMPTY from '@salesforce/label/c.Volunteers_Approve_Empty';
-import DONE_APPROVE from '@salesforce/label/c.Volunteers_Approve_DoneApprove';
-import DONE_REJECT from '@salesforce/label/c.Volunteers_Approve_DoneReject';
-import DONE_REOPEN from '@salesforce/label/c.Volunteers_Approve_DoneReopen';
-import REFUSED from '@salesforce/label/c.Volunteers_Approve_Refused';
-import REASON_REQUIRED from '@salesforce/label/c.Volunteers_Hours_RejectionReasonRequired';
-import DATE_RANGE from '@salesforce/label/c.Volunteers_Approve_DateRange';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -78,7 +70,9 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     get intro() {
       return helpText('Volunteers', 'Volunteers_Approve_Intro');
     },
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Volunteers', 'Volunteers_Hours_NeedManagePermission');
+    },
     show: SHOW,
     job: JOB,
     fromDate: FROM_DATE,
@@ -98,8 +92,12 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     cancel: CANCEL,
     previous: PREVIOUS,
     next: NEXT,
-    empty: EMPTY,
-    reasonRequired: REASON_REQUIRED,
+    get empty() {
+      return helpText('Volunteers', 'Volunteers_Approve_Empty');
+    },
+    get reasonRequired() {
+      return helpText('Volunteers', 'Volunteers_Hours_RejectionReasonRequired');
+    },
     loading: LOADING,
     letters: LETTERS
   };
@@ -352,7 +350,7 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     [fromInput, toInput].forEach((input) => input && input.setCustomValidity(''));
     if (this.fromDate && this.toDate && this.fromDate > this.toDate) {
       const input = changedInput || toInput;
-      input.setCustomValidity(DATE_RANGE);
+      input.setCustomValidity(helpText('Volunteers', 'Volunteers_Approve_DateRange'));
       input.reportValidity();
       return Promise.resolve();
     }
@@ -411,11 +409,17 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
   // -------------------------------------------------------------------------------- verbs
 
   handleApprove() {
-    return this.act(approveHours({ hoursIds: this.selectedIds }), DONE_APPROVE);
+    return this.act(
+      approveHours({ hoursIds: this.selectedIds }),
+      helpText('Volunteers', 'Volunteers_Approve_DoneApprove')
+    );
   }
 
   handleReopen() {
-    return this.act(reopenHours({ hoursIds: this.selectedIds }), DONE_REOPEN);
+    return this.act(
+      reopenHours({ hoursIds: this.selectedIds }),
+      helpText('Volunteers', 'Volunteers_Approve_DoneReopen')
+    );
   }
 
   handleShowReject() {
@@ -439,7 +443,9 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     const reasonInput = this.template.querySelector('[data-id="reason"]');
     if (!this.reason || !this.reason.trim()) {
       if (reasonInput) {
-        reasonInput.setCustomValidity(REASON_REQUIRED);
+        reasonInput.setCustomValidity(
+          helpText('Volunteers', 'Volunteers_Hours_RejectionReasonRequired')
+        );
         reasonInput.reportValidity();
         reasonInput.focus();
       }
@@ -450,7 +456,7 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     }
     return this.act(
       rejectHours({ hoursIds: this.selectedIds, reason: this.reason }),
-      DONE_REJECT
+      helpText('Volunteers', 'Volunteers_Approve_DoneReject')
     ).then((outcome) => {
       // A refused call keeps the form open with the reason typed, so it can be sent again.
       if (outcome !== false) {
@@ -480,7 +486,7 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
         }));
         // Announced once, by the status region; a toast as well would be read out twice.
         if (this.refusedLines.length) {
-          this.resultMessage = `${this.resultMessage} ${format(REFUSED, this.refusedLines.length)}`;
+          this.resultMessage = `${this.resultMessage} ${format(helpText('Volunteers', 'Volunteers_Approve_Refused'), this.refusedLines.length)}`;
         }
         this.focusResult = true;
         return this.load();

@@ -26,6 +26,13 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
+  '@salesforce/apex/GenericMergeController.getView',
+  () => ({
+    default: jest.fn(() => Promise.resolve({ enabled: false, objects: [], merges: [] }))
+  }),
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/label/c.Core_DuplicateMatching_ReviewCount',
   () => ({ default: 'Review ({0})' }),
   {
@@ -59,13 +66,13 @@ describe('c-duplicate-matching for an administrator', () => {
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 
-  it('opens on the review list, and offers Matching Logic and Auto-Merge', async () => {
+  it('opens on the review list, and offers Matching Logic, Auto-Merge and Merge Records', async () => {
     const element = await render();
 
     const tabs = Array.from(element.shadowRoot.querySelectorAll('lightning-tab')).map(
       (tab) => tab.value
     );
-    expect(tabs).toEqual(['review', 'matchingLogic', 'autoMerge']);
+    expect(tabs).toEqual(['review', 'matchingLogic', 'autoMerge', 'mergeRecords']);
     expect(element.shadowRoot.querySelector('c-auto-merge-panel')).toBeNull();
     expect(element.shadowRoot.querySelector('lightning-tabset').activeTabValue).toBe('review');
     expect(element.shadowRoot.querySelector('c-duplicate-review')).not.toBeNull();
@@ -116,5 +123,17 @@ describe('c-duplicate-matching for an administrator', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('c-auto-merge-panel')).not.toBeNull();
+  });
+
+  it('creates Merge Records when it is first opened', async () => {
+    const element = await render();
+
+    const merge = element.shadowRoot.querySelector('lightning-tab[data-id="tab-mergeRecords"]');
+    expect(merge.label).toBe('c.Core_GenericMerge_Tab');
+    expect(element.shadowRoot.querySelector('c-generic-merge')).toBeNull();
+    merge.dispatchEvent(new CustomEvent('active'));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('c-generic-merge')).not.toBeNull();
   });
 });

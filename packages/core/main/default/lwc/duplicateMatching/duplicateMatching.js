@@ -8,11 +8,13 @@ import REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import REVIEW_COUNT from '@salesforce/label/c.Core_DuplicateMatching_ReviewCount';
 import MATCHING_LOGIC from '@salesforce/label/c.Core_DuplicateMatching_MatchingLogic';
 import AUTO_MERGE from '@salesforce/label/c.Core_AutoMerge_Tab';
+import MERGE_RECORDS from '@salesforce/label/c.Core_GenericMerge_Tab';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const REVIEW_AREA = 'review';
 const MATCHING_LOGIC_AREA = 'matchingLogic';
 const AUTO_MERGE_AREA = 'autoMerge';
+const MERGE_RECORDS_AREA = 'mergeRecords';
 
 /**
  * The Duplicate Matching tab (ADR-0139, admin guide duplicates.md): one tab per area, each
@@ -32,6 +34,7 @@ export default class DuplicateMatching extends LightningElement {
     review: REVIEW,
     matchingLogic: MATCHING_LOGIC,
     autoMerge: AUTO_MERGE,
+    mergeRecords: MERGE_RECORDS,
     get noAccess() {
       return helpText('Core', 'Core_DuplicateMatching_NoAccess');
     }
@@ -73,7 +76,10 @@ export default class DuplicateMatching extends LightningElement {
     return Boolean(canManageSettings || canManageMetadata);
   }
 
-  /** Auto-Merge (C-51) needs Manage BarnCRM Settings, as merging from the review list does. */
+  /**
+   * Auto-Merge (C-51) and Merge Records (C-62) need Manage BarnCRM Settings, as merging from
+   * the review list does.
+   */
   get canSeeAutoMerge() {
     return Boolean(canManageSettings);
   }
@@ -88,13 +94,17 @@ export default class DuplicateMatching extends LightningElement {
       areas.push(MATCHING_LOGIC_AREA);
     }
     if (this.canSeeAutoMerge) {
-      areas.push(AUTO_MERGE_AREA);
+      areas.push(AUTO_MERGE_AREA, MERGE_RECORDS_AREA);
     }
     return areas;
   }
 
   get autoMergeOpened() {
     return Boolean(this.opened[AUTO_MERGE_AREA]);
+  }
+
+  get mergeRecordsOpened() {
+    return Boolean(this.opened[MERGE_RECORDS_AREA]);
   }
 
   get hasAnyArea() {

@@ -1,0 +1,111 @@
+<template>
+    <template lwc:if={helpReady}>
+    <!-- The App Page prints the name above this component, so the shell's title is for screen readers only. -->
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        icon-name={icons.page}
+        title-hidden
+        data-id="shell"
+    >
+        <div class="slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.title} size="small" data-id="loading"></lightning-spinner>
+            </template>
+            <template lwc:if={loaded}>
+                <p class="slds-var-m-bottom_medium" data-id="mode">{modeText}</p>
+                <template lwc:if={scheduled}>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.scheduled} data-id="scheduled"></c-barn-notice>
+                </template>
+                <template lwc:else>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.notScheduled} data-id="not-scheduled"></c-barn-notice>
+                    <lightning-button
+                        class="slds-var-m-bottom_medium"
+                        label={labels.schedule}
+                        disabled={locked}
+                        data-id="schedule"
+                        onclick={handleSchedule}
+                    ></lightning-button>
+                </template>
+                <template lwc:if={noSiteShown}>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.noSite} data-id="no-site"></c-barn-notice>
+                </template>
+                <template lwc:else>
+                    <p class="slds-var-m-bottom_small">{labels.addresses}</p>
+                    <ul class="slds-var-m-bottom_medium" data-id="receivers">
+                        <template for:each={receivers} for:item="receiver">
+                            <li key={receiver.site} class="slds-var-m-bottom_small">
+                                <p class="slds-text-title_bold">{receiver.site}</p>
+                                <lightning-input label={labels.stripeUrl} value={receiver.stripeUrl} read-only></lightning-input>
+                                <lightning-input label={labels.payPalUrl} value={receiver.payPalUrl} read-only></lightning-input>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+                <template lwc:if={noManageShown}>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManage} data-id="no-manage"></c-barn-notice>
+                </template>
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="stripe">
+                        <template for:each={stripeKeys} for:item="key">
+                            <lightning-input
+                                key={key.name}
+                                type="password"
+                                autocomplete="off"
+                                label={key.label}
+                                field-level-help={key.status}
+                                placeholder={key.status}
+                                value={key.value}
+                                data-name={key.name}
+                                disabled={locked}
+                                onchange={handleType}
+                            ></lightning-input>
+                        </template>
+                        <lightning-button
+                            class="slds-var-m-top_small"
+                            label={labels.clear}
+                            data-processor="Stripe"
+                            data-id="clear-stripe"
+                            disabled={locked}
+                            onclick={handleClear}
+                        ></lightning-button>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="paypal">
+                        <template for:each={payPalKeys} for:item="key">
+                            <lightning-input
+                                key={key.name}
+                                type="password"
+                                autocomplete="off"
+                                label={key.label}
+                                field-level-help={key.status}
+                                placeholder={key.status}
+                                value={key.value}
+                                data-name={key.name}
+                                disabled={locked}
+                                onchange={handleType}
+                            ></lightning-input>
+                        </template>
+                        <lightning-button
+                            class="slds-var-m-top_small"
+                            label={labels.clear}
+                            data-processor="PayPal"
+                            data-id="clear-paypal"
+                            disabled={locked}
+                            onclick={handleClear}
+                        ></lightning-button>
+                    </div>
+                </div>
+                <div class="slds-var-m-vertical_medium">
+                    <lightning-button variant="brand" label={labels.saveKeys} onclick={handleSave} disabled={locked} data-id="save"></lightning-button>
+                </div>
+                <template lwc:if={savedShown}>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="success" message={labels.saved} data-id="saved"></c-barn-notice>
+                </template>
+            </template>
+            <template lwc:if={error}>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
+            </template>
+        </div>
+    </c-barn-page-shell>
+    </template>
+</template>

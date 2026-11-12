@@ -357,7 +357,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 				Id = entry.Id,
 				Attempts__c = attempts,
 				Next_Attempt__c = Datetime.now().addMinutes(LEASE_MINUTES),
-				Last_Error__c = System.Label.Core_Rollups_QueueHeldByBatch
+				Last_Error__c = BarnHelp.text('Rollups', 'Core_Rollups_QueueHeldByBatch')
 			);
 			if (attempts >= RollupQueue.MAX_ATTEMPTS) {
 				change.Status__c = RollupQueue.STATUS_FAILED;
@@ -512,7 +512,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 			if (currentTarget().stoppedReason == null && this.queryIndex < plan.queries.size()) {
 				if (RollupService.isTurnedOff()) {
 					ErrorLogger.logMessage(
-						System.Label.Core_Rollups_RunStoppedTurnedOff,
+						BarnHelp.text('Rollups', 'Core_Rollups_RunStoppedTurnedOff'),
 						LOG_CONTEXT,
 						ErrorLogger.SEVERITY_INFO
 					);
@@ -539,7 +539,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	private void settle(Target target, RollupPlanner.Plan plan) {
 		if (target.stoppedReason != null) {
 			String message = String.format(
-					System.Label.Core_Rollups_QueueRunStopped,
+					BarnHelp.text('Rollups', 'Core_Rollups_QueueRunStopped'),
 					new List<String>{ target.stoppedReason }
 				)
 				.left(32768);

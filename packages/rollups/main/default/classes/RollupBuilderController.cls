@@ -142,6 +142,9 @@ public with sharing class RollupBuilderController {
 		/** Whether to offer Import from DLRS: an active DLRS rollup, and the right to manage. */
 		@AuraEnabled
 		public Boolean canImportFromDlrs { get; set; }
+		/** The same for Import From NPSP: an active NPSP customizable rollup (MIG-08). */
+		@AuraEnabled
+		public Boolean canImportFromNpsp { get; set; }
 		/** Whether instant totals are recalculated in the save rather than after it (U10). */
 		@AuraEnabled
 		public Boolean inSave { get; set; }
@@ -206,12 +209,12 @@ public with sharing class RollupBuilderController {
 	// ----------------------------------------------------------------------------------- reads
 
 	/**
-	 * Whether DLRS has an active rollup to import (R-R16). The model is cacheable, where a
-	 * failure log cannot be written, so a failure here only hides the button.
+	 * Whether DLRS, or NPSP when `npsp` is true, has an active rollup to import (R-R16). The
+	 * model is cacheable, where a failure log cannot be written, so a failure only hides the button.
 	 */
-	private static Boolean canImportFromDlrs() {
+	private static Boolean canImportFrom(Boolean npsp) {
 		try {
-			return RollupDlrs.hasActive();
+			return RollupDlrs.hasActive(npsp);
 		} catch (Exception unreadable) {
 			return false;
 		}
@@ -245,7 +248,8 @@ public with sharing class RollupBuilderController {
 			model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
 			model.modes = picklist(Rollup_Definition__c.Mode__c);
 			model.otherToolNotices = OtherRollupTools.notices();
-			model.canImportFromDlrs = model.canManage && canImportFromDlrs();
+			model.canImportFromDlrs = model.canManage && canImportFrom(false);
+			model.canImportFromNpsp = model.canManage && canImportFrom(true);
 			model.inSave = RollupService.recalculatesInTheSave();
 			model.nightlyTime = RollupScheduler.nightlyTime();
 			model.customPermissions = customPermissionOptions();
@@ -374,7 +378,7 @@ public with sharing class RollupBuilderController {
 			Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 			if (definition == null) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorUnknownDefinition
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition')
 				);
 			}
 			return toDraft(definition);
@@ -419,7 +423,7 @@ public with sharing class RollupBuilderController {
 			);
 			PreviewResult preview = new PreviewResult();
 			preview.maintains = String.format(
-				Label.Core_RollupBuilder_Maintains,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_Maintains'),
 				new List<String>{ count.format() }
 			);
 			if (recordId != null) {
@@ -463,7 +467,9 @@ public with sharing class RollupBuilderController {
 	private static void checkPreview(Draft draft) {
 		// It calculates any field of any record in system mode, so only an admin may ask.
 		if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorNoPermission);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
+			);
 		}
 		if (draft != null) {
 			draft.name = String.isBlank(draft.name) ? draft.targetField : draft.name;
@@ -478,13 +484,13 @@ public with sharing class RollupBuilderController {
 	/** A preview in words: the total calculated now, next to what the record holds (U5 too). */
 	public static String describe(RollupEngine.Preview preview) {
 		if (!preview.planned) {
-			return Label.Core_RollupBuilder_PreviewFailed;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewFailed');
 		}
 		if (!preview.admitted) {
-			return Label.Core_RollupBuilder_PreviewNotFilled;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewNotFilled');
 		}
 		return String.format(
-			Label.Core_RollupBuilder_PreviewResult,
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),
 			new List<String>{ display(preview.calculated), display(preview.current) }
 		);
 	}
@@ -551,7 +557,7 @@ public with sharing class RollupBuilderController {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			// Every other check first, so the question is asked only of a rollup that can save.
@@ -574,17 +580,23 @@ public with sharing class RollupBuilderController {
 			}
 			SaveResult result = new SaveResult();
 			result.recordId = definition.Id;
-			result.notice = Label.Core_RollupBuilder_Saved;
+			result.notice = BarnHelp.text('Rollups', 'Core_RollupBuilder_Saved');
 			if (calculateNow == true && definition.Active__c) {
 				// R-R14: one full run at a time. The rollup is saved either way; while the module
 				// is turned off, Turn on recalculates it with every other (ADR-0125 decision 9).
 				if (RollupService.isTurnedOff()) {
-					result.notice = Label.Core_RollupBuilder_SavedTurnedOff;
+					result.notice = BarnHelp.text('Rollups', 'Core_RollupBuilder_SavedTurnedOff');
 				} else if (RollupFullRecalcBatch.runningJobId() != null) {
-					result.notice = Label.Core_RollupBuilder_SavedNotCalculated;
+					result.notice = BarnHelp.text(
+						'Rollups',
+						'Core_RollupBuilder_SavedNotCalculated'
+					);
 				} else {
 					RollupService.recalculate(definition.Id);
-					result.notice = Label.Core_RollupBuilder_SavedAndCalculating;
+					result.notice = BarnHelp.text(
+						'Rollups',
+						'Core_RollupBuilder_SavedAndCalculating'
+					);
 				}
 			}
 			return result;
@@ -619,7 +631,7 @@ public with sharing class RollupBuilderController {
 			RollupDateWindow.movesWithTheDate(definition)
 		) {
 			throw new RollupService.RollupServiceException(
-				Label.Core_RollupBuilder_ErrorInstantMovesWithDate
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate')
 			);
 		}
 		// Instantly alone needs instant updates on the source entity (R-R12, ADR-0136).
@@ -646,15 +658,15 @@ public with sharing class RollupBuilderController {
 	@TestVisible
 	private static String problemWith(Draft draft) {
 		if (draft == null || String.isBlank(draft.name)) {
-			return Label.Core_RollupBuilder_ErrorNameNeeded;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNameNeeded');
 		}
 		Schema.SObjectType targetType = SettingsService.typeByName(draft.targetObject);
 		if (targetType == null || String.isBlank(draft.targetField)) {
-			return Label.Core_RollupBuilder_ErrorTargetNeeded;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorTargetNeeded');
 		}
 		Schema.SObjectField target = fieldMap(targetType).get(draft.targetField.toLowerCase());
 		if (target == null || !target.getDescribe().isUpdateable()) {
-			return Label.Core_Rollups_ErrorTargetNotWritable;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable');
 		}
 		String aggregate = String.isBlank(draft.aggregate) ? '' : draft.aggregate.toUpperCase();
 		if (!valuesOf(Rollup_Definition__c.Aggregate__c).contains(aggregate)) {
@@ -694,14 +706,17 @@ public with sharing class RollupBuilderController {
 		String records = sourceType == null
 			? definition.Source_Object__c
 			: sourceType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
-		return String.format(Label.Core_RollupBuilder_ErrorNoInstant, new List<String>{ records });
+		return String.format(
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNoInstant'),
+			new List<String>{ records }
+		);
 	}
 
 	/** The source entity, the path, the attributes read and the fiscal window. */
 	private static String sourceProblem(Draft draft, String aggregate) {
 		Schema.SObjectType sourceType = SettingsService.typeByName(draft.sourceObject);
 		if (sourceType == null || String.isBlank(draft.relationshipPath)) {
-			return Label.Core_RollupBuilder_ErrorSourceNeeded;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorSourceNeeded');
 		}
 		Map<String, Schema.SObjectField> fields = fieldMap(sourceType);
 		try {
@@ -713,23 +728,23 @@ public with sharing class RollupBuilderController {
 					(reference == null ||
 					reference.getDescribe().getType() != Schema.DisplayType.REFERENCE)
 				) {
-					return Label.Core_RollupBuilder_ErrorPathInvalid;
+					return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorPathInvalid');
 				}
 			}
 		} catch (RollupPath.RollupPathException unreadable) {
-			return Label.Core_RollupBuilder_ErrorPathInvalid;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorPathInvalid');
 		}
 		Schema.DisplayType readType = typeOf(fields, draft.sourceField);
 		if (!READS_NO_FIELD.contains(aggregate)) {
 			if (String.isBlank(draft.sourceField)) {
-				return Label.Core_Rollups_ErrorSourceFieldNeeded;
+				return BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded');
 			}
 			if (readType == null) {
-				return Label.Core_RollupBuilder_ErrorFieldUnknown;
+				return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown');
 			}
 		}
 		if ((aggregate == 'SUM' || aggregate == 'AVG') && !NUMBER_TYPES.contains(readType)) {
-			return Label.Core_RollupBuilder_ErrorSumNeedsNumber;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorSumNeedsNumber');
 		}
 		if (
 			(aggregate == 'MIN' ||
@@ -737,13 +752,13 @@ public with sharing class RollupBuilderController {
 			!NUMBER_TYPES.contains(readType) &&
 			!DATE_TYPES.contains(readType)
 		) {
-			return Label.Core_RollupBuilder_ErrorMinMaxType;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorMinMaxType');
 		}
 		if (ORDERED.contains(aggregate) && String.isBlank(draft.orderByField)) {
-			return Label.Core_RollupBuilder_ErrorOrderByNeeded;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorOrderByNeeded');
 		}
 		if (String.isNotBlank(draft.orderByField) && typeOf(fields, draft.orderByField) == null) {
-			return Label.Core_RollupBuilder_ErrorFieldUnknown;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown');
 		}
 		String limitProblem = RollupPlanner.rowLimitProblem(
 			aggregate,
@@ -758,7 +773,7 @@ public with sharing class RollupBuilderController {
 		}
 		if (draft.fiscalYearAware == true) {
 			if (!FISCAL_OFFSETS.contains(draft.fiscalYearOffset)) {
-				return Label.Core_RollupBuilder_ErrorWindowInvalid;
+				return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorWindowInvalid');
 			}
 			String dateField = String.isNotBlank(draft.fiscalDateField)
 				? draft.fiscalDateField
@@ -766,7 +781,7 @@ public with sharing class RollupBuilderController {
 			// A date only: the window's bounds are dates, which SOQL refuses against a date
 			// and time (ROLLUPS-3).
 			if (typeOf(fields, dateField) != Schema.DisplayType.DATE) {
-				return Label.Core_RollupBuilder_ErrorWindowNeedsDate;
+				return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorWindowNeedsDate');
 			}
 		}
 		return null;
@@ -786,7 +801,7 @@ public with sharing class RollupBuilderController {
 			return null;
 		}
 		if (readType != Schema.DisplayType.PICKLIST) {
-			return Label.Core_RollupBuilder_ErrorPicklistSource;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorPicklistSource');
 		}
 		Set<String> targetValues = new Set<String>();
 		for (Schema.PicklistEntry entry : target.getPicklistValues()) {
@@ -803,7 +818,7 @@ public with sharing class RollupBuilderController {
 		return missing.isEmpty()
 			? null
 			: String.format(
-					Label.Core_RollupBuilder_ErrorPicklistValues,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorPicklistValues'),
 					new List<String>{ String.join(missing, ', ') }
 			  );
 	}
@@ -829,7 +844,7 @@ public with sharing class RollupBuilderController {
 				? parentFieldProblem(fields, field)
 				: (fields.containsKey(field.toLowerCase())
 						? null
-						: Label.Core_RollupBuilder_ErrorFieldUnknown);
+						: BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown'));
 			if (problem != null) {
 				return problem;
 			}
@@ -844,7 +859,7 @@ public with sharing class RollupBuilderController {
 	private static String parentFieldProblem(Map<String, Schema.SObjectField> fields, String path) {
 		List<String> parts = path.split('\\.');
 		if (parts.size() > 2) {
-			return Label.Core_RollupBuilder_ErrorOneLookup;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorOneLookup');
 		}
 		for (Schema.SObjectField field : fields.values()) {
 			Schema.DescribeFieldResult lookup = field.getDescribe();
@@ -853,10 +868,10 @@ public with sharing class RollupBuilderController {
 					.get(parts[1].toLowerCase());
 				return parentField != null && parentField.getDescribe().isAccessible()
 					? null
-					: Label.Core_RollupBuilder_ErrorFieldUnknown;
+					: BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown');
 			}
 		}
-		return Label.Core_RollupBuilder_ErrorFieldUnknown;
+		return BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown');
 	}
 
 	/**
@@ -894,7 +909,7 @@ public with sharing class RollupBuilderController {
 				bothMet(targetType, mine, theirs)
 			) {
 				return String.format(
-					Label.Core_RollupBuilder_ErrorOverlap,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorOverlap'),
 					new List<String>{ other.Name }
 				);
 			}
@@ -1175,7 +1190,9 @@ public with sharing class RollupBuilderController {
 	private static Schema.SObjectType requireEntity(String name) {
 		Schema.SObjectType type = SettingsService.typeByName(name);
 		if (type == null) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorUnknownObject);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
+			);
 		}
 		return type;
 	}
@@ -1244,7 +1261,7 @@ public with sharing class RollupBuilderController {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupBuilderController',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

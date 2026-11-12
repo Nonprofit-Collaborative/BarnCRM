@@ -7,8 +7,8 @@ covers hour letters and certificates. Jobs, shifts and sign-ups are on
 
 **Before you start:** open the **BarnCRM Volunteers** app from the App Launcher. Team Members
 enter hours and see the hours they entered themselves. Approving hours, the readiness card and
-letters need the **Manage Volunteers** permission, which comes with the Coordinator and Admin
-roles (the **Volunteers Coordinator** and **Volunteers Admin** permission sets). Read Only users
+letters need the **Manage Volunteers** permission, which comes with the **Volunteers
+Coordinator** extra permission or the Admin role (**Volunteers Admin**). Read Only users
 see no hours entries. If you need more access, ask your admin (see the
 [Volunteers admin guide](../admin-guide/volunteers.md#roles-and-permission-sets)).
 
@@ -124,7 +124,7 @@ The list of skills itself is kept on the **Skills** tab by coordinators and admi
 
 ## To Check a Volunteer's Readiness
 
-Needs the Coordinator or Admin role.
+Needs **Volunteers Coordinator** or the Admin role.
 
 1. Open the person in the **BarnCRM Volunteers** app.
 2. Find the **Volunteer Readiness** card.
@@ -165,6 +165,30 @@ done." Each letter appears in that person's **Files** within a few minutes, and 
 says how many were made and who was skipped. If nobody has approved hours in the period, the
 dialog says so and starts nothing.
 
+## To See What Volunteer Time Is Worth
+
+**Volunteers Home** shows **Value of Hours This Month**: this month's approved hours times the
+value of one hour your admin set (34.79 unless changed). Letter templates can show it too, with
+`{HoursValue}` for the person's hours in the letter's period and `{HourValue}` for one hour. If
+your admin set the value to 0, neither shows.
+
+## To Act on a Thank-You Task
+
+When your admin turns on thank-you tasks, you get a task, due today, when a volunteer you own
+reaches an hours milestone (25, 50, 100 and so on) or the anniversary of their **Volunteer
+Since** date. Open the task from your **Tasks** list or the person's activity, thank them your
+way, and mark it **Completed**.
+
+## To Record a Background Check's Details
+
+1. Open the person's **Background check** onboarding step (from the **Volunteer Readiness** card
+   or the **Volunteer Requirements** tab).
+2. Click **Edit** and fill in **Provider** (the screening company) and **Reference ID** (its
+   reference for the check). Leave **Entry Source** as **Entered**.
+3. Click **Save**.
+
+Never write what the check found. BarnCRM does not contact the provider.
+
 ## Common Problems
 
 - Problem: someone else's hours are missing from **Volunteer Hours**. Why and what to do: hours
@@ -184,7 +208,7 @@ dialog says so and starts nothing.
   Use the **Approve Hours** tab, which needs Manage Volunteers.
 - Problem: **Approve Hours** shows "You need the Manage Volunteers permission to approve, reject
   or reopen volunteer hours. Ask your BarnCRM administrator." and no buttons. Why and what to do:
-  you do not have the Coordinator or Admin role.
+  you do not have **Volunteers Coordinator** or the Admin role.
 - Problem: "From must be on or before To." Why and what to do: fix the dates; the list stays as
   it was until you do.
 - Problem: "Not moved: ... The reasons are listed on the screen." Why and what to do: some
@@ -194,7 +218,7 @@ dialog says so and starts nothing.
 - Problem: no **Volunteer Profile** section or readiness card. Why and what to do: you opened
   the person in another app, or the person has no **Volunteer Status** yet. Switch to the
   **BarnCRM Volunteers** app, or ask a coordinator to set the status. The readiness card is
-  empty for anyone without the Coordinator or Admin role.
+  empty for anyone without **Volunteers Coordinator** or the Admin role.
 - Problem: "No letter: this person has no approved volunteer hours in the period." Why and what
   to do: approve the Submitted entries first, or widen **From** and **To**.
 - Problem: "Your organization's legal name is blank in BarnCRM Settings, so the letter will

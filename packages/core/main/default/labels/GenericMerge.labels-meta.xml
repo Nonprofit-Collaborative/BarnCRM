@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_GenericMerge_Keep</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge Records: label of the choice of record to keep</shortDescription>
+        <value>Record to Keep</value>
+    </labels>
+    <labels>
+        <fullName>Core_GenericMerge_OnlyDifferences</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Merge Records: checkbox that hides matching fields</shortDescription>
+        <value>Only Differences</value>
+    </labels>
+    <labels>
+        <fullName>Core_GenericMerge_Tab</fullName>
+        <categories>DuplicateManagement</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate Matching: name of the merge records tab</shortDescription>
+        <value>Merge Records</value>
+    </labels>
+</CustomLabels>

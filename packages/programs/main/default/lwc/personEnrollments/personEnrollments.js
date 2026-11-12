@@ -3,17 +3,15 @@ import { NavigationMixin } from 'lightning/navigation';
 import getEnrollments from '@salesforce/apex/PersonEnrollmentsController.getEnrollments';
 
 import TITLE from '@salesforce/label/c.Core_Settings_NavGroup_Programs';
-import EMPTY from '@salesforce/label/c.Programs_Person_Empty';
 import STARTED from '@salesforce/label/c.Core_DataJobs_Started';
 import ENDED from '@salesforce/label/c.Core_EraseAction_Ended';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Person_MoreThanShown';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import LAST_SERVICE from '@salesforce/label/c.Programs_Person_LastService';
 import SERVICES_ATTENDED from '@salesforce/label/c.Programs_Person_ServicesAttended';
 
 import { canShow, enrollmentRows, lastService } from './enrollmentRows';
-import { helpText, loadHelp } from 'c/barnHelpText';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Programs card on a person (P-01): every enrollment they have, open ones first, with the
@@ -21,15 +19,21 @@ import { helpText, loadHelp } from 'c/barnHelpText';
  * enrollments gets no card; a failed load shows a short message, never the error's own text.
  */
 export default class PersonEnrollments extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
 
   label = {
     title: TITLE,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Programs', 'Programs_Person_Empty');
+    },
     started: STARTED,
     ended: ENDED,
     refresh: REFRESH,
-    moreThanShown: MORE_THAN_SHOWN,
+    get moreThanShown() {
+      return helpText('Programs', 'Programs_Person_MoreThanShown');
+    },
     loading: LOADING,
     lastService: LAST_SERVICE
   };
@@ -39,6 +43,11 @@ export default class PersonEnrollments extends NavigationMixin(LightningElement)
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

@@ -153,10 +153,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 5 | As staff, open the **Super Transformer** tab. | The five Super Transformer steps, then **Data Jobs** with "Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
 | 6 | As admin, open the **Super Transformer** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
 | 7 | As admin, give staff **BarnCRM Bulk Delete**. Log in as staff and run a Find query. | **Bulk Delete** is offered. On **Access**, the Bulk Delete give step showed the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
-| 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Tab: Bulk Update**, **BarnCRM Tab: Find** and **BarnCRM Tab: Data Manager** are assigned (given by BarnCRM, not by hand). |
+| 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Auto: Bulk Update Tab**, **BarnCRM Auto: Find Tab** and **BarnCRM Auto: Data Manager Tab** are assigned (given by BarnCRM, not by hand). |
 | 9 | As admin, remove **BarnCRM Bulk Update**, **BarnCRM Bulk Delete** and **BarnCRM Find and Export** from staff on **Access**. Log in as staff. | The **Find**, **Super Transformer** and **Data Manager** tabs are gone. |
+| 10 | As admin, give staff **BarnCRM Bulk Update** only (no Find and Export). Wait a minute. Log in as staff, open **Find** and run a query. | The **Find** tab is there, the query runs and **Super Transformer** is offered in **Change Records**: Bulk Update includes Find and Export. |
+| 11 | As admin, remove **BarnCRM Bulk Update** from staff. | Staff is back to no extra permissions. |
 
-**Cleanup:** none (step 9 resets staff).
+**Cleanup:** none (step 11 resets staff).
 
 ## T-BULK-10: The Bulk Path from Data Manager
 
@@ -258,3 +260,39 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 5 | Set **Country code to drop** back to `1`, press **Preview**, then **Run Super Transformer** and **Run**. | Three phones are updated to `(555) 123-4567` form (the third with ` x12`); two are unchanged. Undo the run under **Data Jobs**; the original phones return. |
 
 **Cleanup:** delete the Phtest contacts.
+
+## T-BULK-16: Archive by Query
+
+**Purpose:** confirm an archive saves every matching record to Files before deleting, deletes only what is in the file, and empties the Recycle Bin only after the second typed count.
+**Prerequisites:** admin with **BarnCRM Bulk Delete**; four contacts with Last Name `Arctest` (First Name Arc1 to Arc4). Not on mwdbdevsb.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Org Optimizer**, **Storage and Limits**, and select **Archive Records**. | Find opens with a note that the Change Records menu offers Archive Records. As a user without BarnCRM Bulk Delete the button is not shown. |
+| 2 | Query **Contact** where **Last Name** **equals** `Arctest` and **First Name** **not equal to** `Arc4`, **Run**, open **Change Records** and choose **Archive Records**. | A panel **Archive Records** with **Preview**, **Confirm**, **Run**, and no **Download a Backup First** button. |
+| 3 | **Preview**, type `3`, and select **Archive and Delete 3 Records**. | The progress shows the file being saved, then the delete; finally "3 matched: 3 deleted, 0 refused." Two notifications: the file is saved, and the delete finished. |
+| 4 | Open **Files**. | A file `Contact-<today>-<tag>-part-1` owned by you: a heading row of field API names (`Id`, `FirstName`, `LastName` and the rest you can read) and three rows. |
+| 5 | Open **Data Manager**, **Data Jobs**, and **Undo** the job. | The three contacts come back. |
+| 6 | Run the query again, choose **Archive Records**, **Preview**, type `3`, tick **Also empty them from the Recycle Bin**. | A warning that this cannot be undone, and a second box **Type the number again to empty the Recycle Bin**; the start button stays disabled until it holds `3`. |
+| 7 | Type `3` in the second box and start. When it finishes, open **Data Jobs**. | The job shows 3 deleted and no **Undo**. Its run log says the records were emptied from the Recycle Bin. The Recycle Bin does not list them. |
+| 8 | On the Import tab, **Load one object**, **Contact**, insert, with the step 7 file. | Every column with a field you can create maps by its heading; the three contacts come back as new records. |
+
+**Cleanup:** delete the Arctest contacts, their households and the archive files.
+
+## T-BULK-17: Backup Sets
+
+**Purpose:** confirm a Backup Set saves every matching record to Files, deletes nothing, is listed as a run, and its file puts values back through Load one object.
+**Prerequisites:** admin (BarnCRM Admin); three contacts with Last Name `Baktest` and Title `Before`; a saved Find query `Baktest people` (Contact, Last Name equals `Baktest`). A second user with only **BarnCRM Find and Export**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager**. As the second user, open it too. | The admin sees a **Backup Sets** tile under **Find and Change**; the second user does not. |
+| 2 | As the admin, select **Backup Sets**. | The tiles are replaced by the Backup Sets panel with **Back to Data Manager** above it; "No Backup Sets yet", and **Add a Backup Set** offers `Baktest people`. |
+| 3 | Choose `Baktest people` and press **Add**, then **Run Now**. | The set is listed; "Run started" shows and **Recent Runs** lists the run as Committing, then Complete with 3 records and a file name. A notification opens the file. |
+| 4 | Select the file name. | A file `Contact-<today>-<tag>-part-1` owned by you: a heading row of field API names (`Id` first) and three rows with every field you can read. The three contacts are unchanged. |
+| 5 | Open **Data Jobs** (Data Manager, Back). Filter by **Backup Set runs**. | The run is listed with "3 records saved to Files." and no **Undo**. It is not in the import history on the Import tab. |
+| 6 | In Find, open `Baktest people`, change a column, and **Save**. Reopen Backup Sets. | `Baktest people` is still a Backup Set. |
+| 7 | Change the three contacts' Title to `After`. On the Import tab choose **One Kind of Record**, **Contact**, **Update by record ID**, and load the step 4 file with only the **Id** and **Title** columns mapped. | The preview shows three updates to `Before`; after the load the three contacts' Title is `Before`. |
+| 8 | In Backup Sets, press **Remove** beside `Baktest people`. | It moves back to **Add a Backup Set**; the saved query and the run's file remain. |
+
+**Cleanup:** delete the Baktest contacts, their households, the saved query and the run's file.

@@ -83,7 +83,9 @@ public with sharing class AccountingExportController {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(Label.Mirror_AccountingExport_ErrorFailed);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorFailed')
+			);
 		}
 	}
 
@@ -115,14 +117,18 @@ public with sharing class AccountingExportController {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(Label.Mirror_AccountingExport_ErrorFailed);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ErrorFailed')
+			);
 		}
 	}
 
 	/** The export builds a file of every gift the person can see, so it needs its own permission. */
 	private static void requireExport() {
 		if (!FeatureManagement.checkPermission(EXPORT_PERMISSION)) {
-			throw UserErrors.message(Label.Mirror_AccountingExport_NoExportPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_NoExportPermission')
+			);
 		}
 	}
 }

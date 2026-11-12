@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Brand__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Brands with the people, households, organizations and staff assigned to each (C-47e, R-BR6).
+  </description>
+  <label>Brands with Brand Assignments</label>
+  <join>
+    <outerJoin>true</outerJoin>
+    <relationship>Brand_Assignments__r</relationship>
+  </join>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Brand__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Legal_Entity__c</field>
+      <table>Brand__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Active__c</field>
+      <table>Brand__c</table>
+    </columns>
+    <masterLabel>Brands</masterLabel>
+  </sections>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Brand__c.Brand_Assignments__r</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Contact__c</field>
+      <table>Brand__c.Brand_Assignments__r</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Account__c</field>
+      <table>Brand__c.Brand_Assignments__r</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>User__c</field>
+      <table>Brand__c.Brand_Assignments__r</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Is_Primary__c</field>
+      <table>Brand__c.Brand_Assignments__r</table>
+    </columns>
+    <masterLabel>Brand Assignments</masterLabel>
+  </sections>
+</ReportType>

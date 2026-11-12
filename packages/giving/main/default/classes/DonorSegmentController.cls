@@ -110,7 +110,7 @@ public with sharing class DonorSegmentController {
 	private static void requirePermission() {
 		if (!FeatureManagement.checkPermission(FindController.PERMISSION)) {
 			throw new DonorSegmentService.SegmentException(
-				System.Label.Giving_Segments_ErrorNoPermission
+				BarnHelp.text('Giving', 'Giving_Segments_ErrorNoPermission')
 			);
 		}
 	}
@@ -120,6 +120,11 @@ public with sharing class DonorSegmentController {
 		Boolean shown =
 			caught instanceof DonorSegmentService.SegmentException ||
 			caught instanceof QueryCompiler.QueryCompilerException;
-		return UserErrors.wrap(caught, shown, CONTEXT, System.Label.Giving_Segments_Unexpected);
+		return UserErrors.wrap(
+			caught,
+			shown,
+			CONTEXT,
+			BarnHelp.text('Giving', 'Giving_Segments_Unexpected')
+		);
 	}
 }

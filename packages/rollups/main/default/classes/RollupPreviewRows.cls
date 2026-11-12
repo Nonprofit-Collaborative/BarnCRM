@@ -181,16 +181,16 @@ public with sharing class RollupPreviewRows {
 		detail.counted = 0;
 		for (RollupPlanner.SourceQuery query : plan.queries) {
 			if (query.token != null) {
-				detail.note = Label.Core_RollupEase_RowsHousehold;
+				detail.note = BarnHelp.text('Rollups', 'Core_RollupEase_RowsHousehold');
 				continue;
 			}
 			readRows(definition, query, targetId, detail);
 		}
 		if (detail.total == 0 && detail.note == null) {
-			detail.note = Label.Core_RollupEase_RowsNone;
+			detail.note = BarnHelp.text('Rollups', 'Core_RollupEase_RowsNone');
 		} else if (detail.total > 0) {
 			detail.summary = String.format(
-				Label.Core_RollupEase_RowsShown,
+				BarnHelp.text('Rollups', 'Core_RollupEase_RowsShown'),
 				new List<String>{ detail.rows.size().format(), detail.total.format() }
 			);
 		}

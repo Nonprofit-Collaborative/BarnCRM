@@ -105,6 +105,29 @@ describe('c-form-public', () => {
     expect(find(element, '[data-id="submit"]')).toBeNull();
   });
 
+  it('sends the person to the processor checkout when the page takes a payment', async () => {
+    const original = window.location;
+    delete window.location;
+    window.location = { assign: jest.fn() };
+    try {
+      getForm.mockResolvedValue(FORM);
+      submit.mockResolvedValue({
+        status: 'Received',
+        checkoutUrl: 'https://checkout.example.com/pay/1'
+      });
+      const element = await render({ formId: FORM.formId, recordId: 'a05000000000001' });
+      answer(element, 'last', 'Zzpublic');
+      find(element, '[data-id="submit"]').click();
+      await flush();
+      await flush();
+
+      expect(window.location.assign).toHaveBeenCalledWith('https://checkout.example.com/pay/1');
+      expect(find(element, '[data-id="outcome"] c-barn-notice').message).not.toBe('');
+    } finally {
+      window.location = original;
+    }
+  });
+
   it('keeps the form open when asked to send again, and shows refused answers', async () => {
     getForm.mockResolvedValue(FORM);
     submit.mockResolvedValueOnce({ status: 'Retry' });

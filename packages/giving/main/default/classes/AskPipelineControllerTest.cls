@@ -231,7 +231,11 @@ private class AskPipelineControllerTest {
 			Test.stopTest();
 
 			Assert.isFalse(refused.success, 'Another donor gift is refused.');
-			Assert.areEqual(Label.Giving_Ask_ErrorWrongDonor, refused.error, 'And says why.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorWrongDonor'),
+				refused.error,
+				'And says why.'
+			);
 			Assert.isTrue(linked.success, 'The donor gift is linked: ' + linked.error);
 			Assert.areEqual(
 				leeGift.Id,
@@ -296,8 +300,16 @@ private class AskPipelineControllerTest {
 				[SELECT Outcome__c FROM Ask__c WHERE Id = :open.Id].Outcome__c,
 				'Declined.'
 			);
-			Assert.areEqual(Label.Giving_Ask_ErrorOutcome, notClosed.error, 'Open is no close.');
-			Assert.areEqual(Label.Giving_Ask_ErrorNotFound, missing.error, 'Nothing to close.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorOutcome'),
+				notClosed.error,
+				'Open is no close.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'),
+				missing.error,
+				'Nothing to close.'
+			);
 		}
 	}
 
@@ -331,8 +343,16 @@ private class AskPipelineControllerTest {
 
 			Assert.areEqual(1, board.cards.size(), 'A reader sees the ask.');
 			Assert.isFalse(board.canEdit, 'But may not change it.');
-			Assert.areEqual(Label.Giving_Ask_ErrorNoPermission, result.error, 'Closing refused.');
-			Assert.areEqual(Label.Giving_Ask_ErrorNoPermission, refusal, 'Moving refused.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'),
+				result.error,
+				'Closing refused.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'),
+				refusal,
+				'Moving refused.'
+			);
 		}
 	}
 
@@ -385,7 +405,11 @@ private class AskPipelineControllerTest {
 			} catch (AuraHandledException e) {
 				missing = e.getMessage();
 			}
-			Assert.areEqual(Label.Giving_Ask_ErrorNotFound, missing, 'Nothing to reopen.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'),
+				missing,
+				'Nothing to reopen.'
+			);
 		}
 		User reader = TestUsers.peopleReaderWith(
 			'AskReopenReader',
@@ -398,7 +422,11 @@ private class AskPipelineControllerTest {
 			} catch (AuraHandledException e) {
 				refusal = e.getMessage();
 			}
-			Assert.areEqual(Label.Giving_Ask_ErrorNoPermission, refusal, 'A reader cannot reopen.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'),
+				refusal,
+				'A reader cannot reopen.'
+			);
 		}
 	}
 }

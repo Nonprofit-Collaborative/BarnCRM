@@ -5,6 +5,16 @@ import sendEmailsNow from '@salesforce/apex/AcknowledgmentController.sendEmailsN
 import produceLetters from '@salesforce/apex/AcknowledgmentController.produceLetters';
 import markLettersSent from '@salesforce/apex/AcknowledgmentController.markLettersSent';
 import reorderRules from '@salesforce/apex/AcknowledgmentController.reorderRules';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_Acknowledgments_EmailsStarted:
+    'The email send has started. The run below shows how it goes.',
+  Giving_Acknowledgments_LettersMarkedSent: 'Those letters are recorded as sent.',
+  Giving_Acknowledgments_NeverRun: 'Nothing has been sent yet.',
+  Giving_Acknowledgments_Off:
+    'Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.'
+});
 
 jest.mock(
   '@salesforce/apex/AcknowledgmentController.getPage',
@@ -64,35 +74,8 @@ jest.mock(
 );
 
 jest.mock(
-  '@salesforce/label/c.Giving_Acknowledgments_Off',
-  () => ({
-    default:
-      'Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Acknowledgments_NeverRun',
-  () => ({ default: 'Nothing has been sent yet.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Acknowledgments_EmailsStarted',
-  () => ({ default: 'The email send has started. The run below shows how it goes.' }),
-  { virtual: true }
-);
-
-jest.mock(
   '@salesforce/apex/AcknowledgmentController.reorderRules',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_Acknowledgments_LettersMarkedSent',
-  () => ({ default: 'Those letters are recorded as sent.' }),
   { virtual: true }
 );
 

@@ -12,12 +12,12 @@ public with sharing class IntegrationController {
 		try {
 			return IntegrationAppService.getApps();
 		} catch (Exception e) {
-			ErrorLogger.log(e, ERROR_CONTEXT);
-			AuraHandledException error = new AuraHandledException(
+			throw UserErrors.wrap(
+				e,
+				false,
+				ERROR_CONTEXT,
 				BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage')
 			);
-			error.setMessage(BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage'));
-			throw error;
 		}
 	}
 }

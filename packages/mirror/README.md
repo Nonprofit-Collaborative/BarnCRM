@@ -26,16 +26,23 @@ Built so far (iteration 0.6):
   `InboundGiftService`, which checks each gift through `InboundGiftRequest`. `InboundGift` and
   `InboundGiftResult` are the request and result.
   These four are the package's only `global` classes and are permanent (ADR-0051). Contract:
-  `docs/api/inbound-gift-api.md`. Permission sets: `Inbound_Gift_API` (the endpoint and every
-  record grant) and `Record_Inbound_Gift_Action` (the action's class only).
-- **Accounting export (X-04).** See `docs/admin-guide/accounting-export.md`.
+  `docs/api/inbound-gift-api.md`. Permission set: `Inbound_Gifts` (both classes and every
+  record grant).
+- **Accounting export (X-04).** Permission set: `Accounting_Export`, which also reads the gift,
+  allocation and fund fields the file shows. See `docs/admin-guide/accounting-export.md`.
+- **Access (ADR-0194, simpler permission sets, D4).** `MirrorAccessSync` (a Core module access
+  sync, found by name) gives `Salesforce_Records_Sync` to holders of the retired `Campaign_Sync`,
+  `Opportunity_Mirror` and `Gift_Transaction_Mirror`, and `Inbound_Gifts` to holders of the
+  retired `Inbound_Gift_API` and `Record_Inbound_Gift_Action`: active users only, at install,
+  upgrade, Turn on and hourly; `MirrorPostInstall` names inactive holders in the Error Log. The
+  retired sets are removed in the next release.
 - **Campaign sync (X-02).** The `Campaign_Sync` automation on Appeal (`CampaignSyncTriggerHandler`
   over `CampaignSyncService`) copies each appeal to a Campaign before it is saved, and stores
   the link in `Appeal__c.Campaign_Id__c`, a field Mirror adds to Giving's object.
   `CampaignSyncBatch` is Sync all appeals, started from the `campaignSync` page. Campaign is
   reached only through describe. Off until `Mirror_Settings__c.Campaign_Sync_Enabled__c` is
   switched on. `MirrorPostInstall` creates Mirror's automation switches. Permission set:
-  `Campaign_Sync`. See `docs/admin-guide/campaign-sync.md` and canonical model Section 29B.
+  `Salesforce_Records_Sync`. See `docs/admin-guide/campaign-sync.md` and canonical model Section 29B.
 - **Opportunity mirror (X-01).** The `Opportunity_Mirror` automation on Gift
   (`OpportunityMirrorTriggerHandler` over `OpportunityMirrorService`) copies each gift to its
   Opportunity before it is saved, in Gifts to Opportunities, and stores the link in
@@ -44,7 +51,7 @@ Built so far (iteration 0.6):
   `OpportunityGiftService`. `OpportunityMirrorReconciliation` compares a date range. All are
   started from the `opportunityMirror` page. Off until
   `Mirror_Settings__c.Opportunity_Mirror_Direction__c` is chosen. Shared pieces with Campaign
-  sync are in `MirrorSync`. Permission set: `Opportunity_Mirror`. See
+  sync are in `MirrorSync`. Permission set: `Salesforce_Records_Sync`. See
   `docs/admin-guide/opportunity-mirror.md` and canonical model Section 29C.
 - **Gift Transaction mirror (X-07).** Copies each received gift to a Nonprofit Cloud Gift
   Transaction, with designations for funds that carry a `Gift_Designation_Id__c`, in runs only:
@@ -56,7 +63,7 @@ Built so far (iteration 0.6):
   Nonprofit Cloud and the mirror reports itself unavailable there; tests use its stand-ins.
   `GiftTransactionMirrorReconciliation` compares a date range on the `giftTransactionMirror`
   page. Off until `Mirror_Settings__c.Gift_Transaction_Mirror_Direction__c` is chosen and a
-  start date is set. Permission set: `Gift_Transaction_Mirror`. See
+  start date is set. Permission set: `Salesforce_Records_Sync`. See
   `docs/admin-guide/gift-transaction-mirror.md` and canonical model Section 29C1.
 
 ## How to test it alone

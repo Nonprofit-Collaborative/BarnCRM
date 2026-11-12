@@ -6,8 +6,8 @@ BarnCRM. There is no separate participant record: an **enrollment** links the pe
 program, with a **stage** (Applied, Enrolled, Completed or Withdrawn).
 
 **Before you start:** open the **BarnCRM Programs** app from the App Launcher. You need a
-Programs permission set, which comes with your BarnCRM role (Team Member, Coordinator, Admin or
-Read Only). If the app is missing, ask your admin (see the
+Programs permission set, which comes with your BarnCRM role (Team Member, Admin or
+Read Only; Fundraising Staff alone does not include it). If the app is missing, ask your admin (see the
 [Programs admin guide](../admin-guide/programs.md#roles-and-permission-sets)). Read Only users
 can look at programs and enrollments but change nothing.
 
@@ -57,8 +57,15 @@ cannot be deleted.
 You should see: "Enrollment added." under the figures, the count for the stage goes up by one,
 and the person is listed with today as the Start Date (for Enrolled).
 
-Enrolling someone who already has an Applied or Enrolled enrollment in the same program is
-refused, with a message naming the program. Change the enrollment that is there instead.
+Enrolling someone who already has an Applied, Enrolled or Waitlisted enrollment in the same
+program is refused, with a message naming the program. Change the enrollment that is there
+instead.
+
+**When the program is full.** If the program has a **Capacity** and your admin turned on
+**Waitlist when full**, an enrollment into a full program is saved as **Waitlisted** instead of
+Enrolled. When someone completes or withdraws, or the capacity is raised, the person waiting
+longest moves to **Enrolled** by itself, with today as the Start Date. Without the setting,
+Capacity only shows on the program.
 
 ## To Import a Roster
 
@@ -152,6 +159,11 @@ As it moves on, change the **Status** (Open, Accepted or Closed) and, when it en
 organization's roles and Programs Admins can see a referral you make. The **Open Referrals** list
 on the **Referrals** tab shows everything not yet closed.
 
+If the other organization is in BarnCRM and uses your partner portal, pick it as **Partner
+Organization**. Turn on **Shared With Partner** only when the person agreed to share the referral:
+the partner's staff then see it in the portal (the person, dates, direction, status and outcome,
+never the notes).
+
 ## To Check Whether Someone Is Eligible
 
 If your admin has set up eligibility rules, the program page's **Eligibility** tab has an
@@ -162,8 +174,9 @@ save that result, or **Screen Open Enrollments** to do everyone. Screening sets 
 **Eligibility Status**, **Eligibility Basis** and **Eligibility Reason** on the enrollment.
 Someone already marked Eligible or Not Eligible is left alone unless you tick **Also screen
 enrollments already Eligible or Not Eligible**. **Review** means a person should look at the
-case. Only a Programs Admin changes the rules; you can still edit an enrollment's eligibility
-by hand.
+case. Rules read the enrollment's intake fields and can also read the person's own details,
+such as their birthdate, so keep both up to date before screening. Only a Programs Admin
+changes the rules; you can still edit an enrollment's eligibility by hand.
 
 ## To Record a Service by Hand
 

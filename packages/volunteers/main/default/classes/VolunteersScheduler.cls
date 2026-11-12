@@ -26,7 +26,7 @@ public with sharing class VolunteersScheduler implements Schedulable {
 		}
 		if (ShiftScheduleService.isTurnedOff()) {
 			ErrorLogger.logMessage(
-				System.Label.Volunteers_Schedules_SkippedTurnedOff,
+				BarnHelp.text('Volunteers', 'Volunteers_Schedules_SkippedTurnedOff'),
 				'VolunteersScheduler',
 				ErrorLogger.SEVERITY_INFO
 			);

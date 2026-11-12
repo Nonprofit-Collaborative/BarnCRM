@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Staff</label>
+  <label>BarnCRM Staff Access</label>
   <description>
-    For everyone doing the day job. Reads the Error Log so that a problem can be
-    described accurately, and changes nothing about how BarnCRM is configured.
+    Part of the Team Member and Fundraising Staff roles. Give a role, not this set. The day job;
+    reads the Error Log, and changes nothing about how BarnCRM is configured.
   </description>
   <classAccesses>
     <apexClass>AccessController</apexClass>
@@ -31,6 +31,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>EngagementScoreController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ErrorDigestController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -40,6 +44,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>FeatureController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FieldHistoryController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -126,6 +134,156 @@
     <apexClass>WhatsNewController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.City__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Country__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Is_Default__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Legal_Entity__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Letter_Signature__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Logo_Document_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Phone__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Postal_Code__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Primary_Color__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Receipt_Number_Prefix__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Secondary_Color__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Sender_Email__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.State__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Street__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand__c.Website__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Brand_Assignment__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Brand_Assignment__c.Assignment_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Brand_Assignment__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Brand_Assignment__c.Is_Primary__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Brand_Assignment__c.User__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.City__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Country__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Fiscal_Year_Start_Month__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Is_Default__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Postal_Code__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Receipt_Number_Prefix__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.State__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Street__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Legal_Entity__c.Tax_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Alternate_Email__c</field>
@@ -409,6 +567,16 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Contact.Deceased__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Engagement_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Engagement_Scored_On__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -903,6 +1071,33 @@
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Brand__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Brand_Assignment__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Legal_Entity__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>false</allowDelete>
     <allowEdit>true</allowEdit>
@@ -1023,10 +1218,6 @@
   </tabSettings>
   <tabSettings>
     <tab>BarnCRM_Settings</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Organizations</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

@@ -1,0 +1,33 @@
+<template>
+  <template lwc:if={helpReady}>
+    <template lwc:if={errorMessage}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+    <template lwc:if={emptyPreview}>
+      <p class="slds-text-color_weak slds-var-p-around_small" data-id="empty">{labels.empty}</p>
+    </template>
+    <template for:each={sections} for:item="section">
+      <lightning-card key={section.id} title={section.title} data-id="section">
+        <div class="slds-var-p-horizontal_small">
+          <template for:each={section.rows} for:item="row">
+            <div key={row.id} class="slds-grid slds-wrap slds-gutters_small">
+              <template for:each={row.columns} for:item="column">
+                <div key={column.id} class={column.css}>
+                  <template for:each={column.blocks} for:item="block">
+                    <div key={block.id} class="slds-var-m-bottom_small" data-id="block">
+                      <c-lwc-builder-block
+                        block={block}
+                        record-id={recordId}
+                        object-api-name={objectApiName}
+                      ></c-lwc-builder-block>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </lightning-card>
+    </template>
+  </template>
+</template>

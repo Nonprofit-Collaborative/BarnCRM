@@ -47,7 +47,15 @@ public class TestUsers {
 		'Forms_Admin',
 		'Contact_Point_Sync_Admin',
 		'Events_Admin',
-		'Portal_Admin'
+		'Portal_Admin',
+		'Corporate_Hub_Admin',
+		'Payments_Admin',
+		'LWC_Builder_Admin',
+		'Scholarships_Admin',
+		'Territory_Admin',
+		'Memberships_Admin',
+		'Projects_Admin',
+		'Address_Verification_Admin'
 	};
 
 	/**

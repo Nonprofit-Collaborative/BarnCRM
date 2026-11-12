@@ -5,7 +5,7 @@ government funders, how far along each one is, the deadlines coming up, and the 
 requires.
 
 **Before you start:** open the **BarnCRM Funders** app from the App Launcher. Fundraising Staff,
-Team Members and Coordinators add grants and move them through the stages, but cannot delete a
+Team Members add grants and move them through the stages, but cannot delete a
 grant. Admins can also delete one. Read Only users can look but change nothing. If you need more
 access, ask your admin (see the [Funders admin guide](../admin-guide/funders.md#roles-and-permission-sets)).
 
@@ -269,6 +269,61 @@ You should see: the answer in the **Answer Library** card on every grant's page.
 You should see: `Copied. Paste it into the application.`, and the answer's **Last used** date
 becomes today. If your browser does not allow copying, click **Show All**, select the text and
 copy it yourself.
+
+## To Find a Grant on Grants.gov
+
+1. Click the **Grant Finder** tab.
+2. Type words in **Search**, for example "after school", choose **Posted**, **Forecasted** or
+   both, and click **Search**.
+3. Click a title to read the opportunity on Grants.gov.
+4. Click **Save to Pipeline** on one worth pursuing.
+
+You should see: `Saved to the pipeline as a prospect.` and the result shows **Saved** with a link
+to its new grant, at Prospect with its deadline, agency and assistance listing number filled in.
+
+## To Work an Application Checklist
+
+Your admin can set up steps that are added to every grant at each stage. They show on the grant's
+**Writing** tab in the **Checklist** card, with who does each and when it is due.
+
+1. Tick a task's box when it is done.
+2. Ticked by mistake? Untick it: the task is open again.
+3. A grant from before the checklist was set up? Click **Add Checklist Tasks**.
+
+You should see: the done count go up, and a done task shown as done. Tasks are reminded like any
+requirement.
+
+## To Keep an LOI, Application or Report With Its Files
+
+1. On the grant's **Writing** tab, the **Documents** card lists its letters of inquiry,
+   applications and reports. Click **New Document** to add one (choose its **Type**), or use the
+   **Requirements** list.
+2. On a document, click **Upload** and pick the file.
+3. For a new draft of the same file, open the file and click **Upload New Version**.
+
+You should see: the document's latest file with its version number, status and due and submitted
+dates. Set **Status** to **Submitted** when it goes to the funder.
+
+## To Compare the Budget With the Award
+
+1. On the grant's **Money** tab, in **Budget Lines**, click **New** and add each line with its
+   **Amount Requested** and, once awarded, **Amount Awarded**.
+2. On each **Spent** restricted fund entry, choose its **Budget Line**.
+
+You should see: the **Budget** card with each line's requested, awarded, spent and remaining
+amounts, and a note when the lines do not add up to the grant's amounts or when spending is on no
+line.
+
+## To Renew a Grant
+
+1. On an awarded grant the funder may renew, tick **Renewable**. A **Renewal** requirement is
+   added, due before the award ends, and you are reminded of it.
+2. When you are ready to apply again, click **Start Renewal** on the **Renewals** card. A grant
+   gets one renewal: if one already exists you are told so, and no second grant is made.
+
+You should see: `Renewal started.` and the new grant opens at Prospect with the funder, purpose,
+budget lines and the amount awarded as the new request. Its **Renewals** card lists the grants of
+every year.
 
 ## Tips
 

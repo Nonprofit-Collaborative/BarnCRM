@@ -675,8 +675,13 @@ describe('c-find-records', () => {
     expect(panel.queryJson).toBe(
       JSON.stringify({ version: 1, object: 'Gift__c', fields: ['Name'], limit: 200 })
     );
+    expect(panel.archive).toBe(false);
     await choose(one(allowed, 'columns'), ['Name', 'Amount__c']);
     expect(allowed.shadowRoot.querySelector('c-bulk-delete')).toBeNull();
+
+    press(allowed, 'archive');
+    await flush();
+    expect(allowed.shadowRoot.querySelector('c-bulk-delete').archive).toBe(true);
   });
 
   /* ---------- Advanced Find (C-36) ---------- */
