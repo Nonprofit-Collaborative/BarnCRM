@@ -53,6 +53,7 @@
   <tabs>standard-Contact</tabs>
   <tabs>Households</tabs>
   <tabs>Organizations</tabs>
+  <tabs>standard-Account</tabs>
   <tabs>Data_Manager</tabs>
   <uiType>Lightning</uiType>
 </CustomApplication>

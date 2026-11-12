@@ -1952,10 +1952,6 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Organizations</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
     <tab>Record_Inspector</tab>
     <visibility>Visible</visibility>
   </tabSettings>

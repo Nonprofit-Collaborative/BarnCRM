@@ -114,3 +114,19 @@ household and an organization owned by that user.
 | 5 | Open the **Brands**, **Payments** and **Boards and Committees** tabs (where installed). | Each has **All** and **My** lists; **Brands** also has **Active Brands** and **Inactive Brands**. |
 
 **Cleanup:** none.
+
+## T-APP-07: Account Tabs Chooses Households and Organizations, Accounts, or Both
+
+**Purpose:** confirm the Account Tabs setting shows the chosen tabs to every BarnCRM role and that the default changes nothing (C-73).
+**Prerequisites:** admin user and staff user; the **Households** feature on; the staff user's profile does not show the Accounts tab (Setup, the profile's **Object Settings** or **Tab Settings**: Accounts **Default Off** or hidden).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open **BarnCRM Settings**, **General**. | An **Account Tabs** row shows **Organization and Household Tabs** with its help, and the choices **Organization and Household Tabs**, **Accounts Tab (Standard)** and **Both**. |
+| 2 | As staff, open **BarnCRM**. | **Households** and **Organizations** show; **Accounts** does not. |
+| 3 | As admin, choose **Accounts Tab (Standard)** and **Save**. Wait a minute. | "Your settings are saved." **Recent changes** shows the change. |
+| 4 | As staff, reload **BarnCRM** and **BarnCRM Console**. | **Accounts** shows after **Contacts**; **Households** and **Organizations** are gone from both apps and the App Launcher. In **Accounts**, the list view menu holds **Households**, **My Households**, **Organizations** and **My Organizations**. |
+| 5 | As admin, choose **Both** and save; wait a minute; as staff, reload. | **Households**, **Organizations** and **Accounts** all show. |
+| 6 | As admin, choose **Organization and Household Tabs** and save; wait; as staff, reload. | Back to step 2: no **Accounts** tab. |
+
+**Cleanup:** leave **Account Tabs** on **Organization and Household Tabs**.
