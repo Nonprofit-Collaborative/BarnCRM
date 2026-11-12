@@ -6,6 +6,7 @@ import addTask from '@salesforce/apex/ProjectsController.addTask';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
 import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock(
   '@salesforce/apex/ProjectTimesheetController.addExpense',
@@ -179,5 +180,13 @@ describe('c-project-board', () => {
     await flush();
     expect(find(element, 'log-time')).toBeNull();
     expect(find(element, 'hours')).toBeNull();
+  });
+
+  it('adds approved change hours to the budget (R-PM20)', async () => {
+    setHelpTextForTest({ Projects_Board_HoursLine: 'Budget: {2} hours' });
+    getBoard.mockResolvedValue({ ...BOARD, project: { ...BOARD.project, Change_Hours__c: 10 } });
+    const element = mount();
+    await flush();
+    expect(find(element, 'hours').textContent).toContain('Budget: 40 hours');
   });
 });

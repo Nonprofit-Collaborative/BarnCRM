@@ -1,0 +1,57 @@
+<template>
+  <template lwc:if={isShown}>
+    <lightning-card title={labels.title} icon-name={icon} data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice variant="success" message={notice} data-id="notice"></c-barn-notice>
+        </template>
+        <dl class="slds-list_horizontal slds-wrap" data-id="figures">
+          <dt class="slds-item_label slds-text-color_weak">{labels.budget}</dt>
+          <dd class="slds-item_detail"><lightning-formatted-number value={view.budget} format-style="currency" data-id="budget"></lightning-formatted-number></dd>
+          <dt class="slds-item_label slds-text-color_weak">{labels.revenue}</dt>
+          <dd class="slds-item_detail"><lightning-formatted-number value={view.revenue} format-style="currency" data-id="revenue"></lightning-formatted-number></dd>
+          <template lwc:if={withCost}>
+            <dt class="slds-item_label slds-text-color_weak">{labels.cost}</dt>
+            <dd class="slds-item_detail"><lightning-formatted-number value={view.cost} format-style="currency" data-id="cost"></lightning-formatted-number></dd>
+            <dt class="slds-item_label slds-text-color_weak">{labels.margin}</dt>
+            <dd class="slds-item_detail" data-id="margin"><lightning-formatted-number value={view.margin} format-style="currency"></lightning-formatted-number> ({view.marginPercent}%)</dd>
+          </template>
+          <dt class="slds-item_label slds-text-color_weak">{labels.invoiced}</dt>
+          <dd class="slds-item_detail"><lightning-formatted-number value={view.invoiced} format-style="currency"></lightning-formatted-number></dd>
+          <dt class="slds-item_label slds-text-color_weak">{labels.unbilled}</dt>
+          <dd class="slds-item_detail"><lightning-formatted-number value={view.unbilled} format-style="currency" data-id="unbilled"></lightning-formatted-number></dd>
+        </dl>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked slds-var-m-top_small"
+          data-id="months"
+        >
+          <thead>
+            <tr>
+              <th scope="col">{labels.month}</th>
+              <th scope="col">{labels.recognized}</th>
+              <template lwc:if={withCost}><th scope="col">{labels.cost}</th></template>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={view.months} for:item="row">
+              <tr key={row.key} data-id="month-row">
+                <td data-label={labels.month}>{row.label}</td>
+                <td data-label={labels.recognized}><lightning-formatted-number value={row.recognized} format-style="currency"></lightning-formatted-number></td>
+                <template lwc:if={withCost}><td data-label={labels.cost}><lightning-formatted-number value={row.cost} format-style="currency"></lightning-formatted-number></td></template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <template lwc:if={canManage}>
+          <div class="slds-grid slds-grid_vertical-align-end slds-gutters_x-small slds-var-m-top_small">
+            <lightning-input class="slds-col" type="date" label={labels.month} value={month} onchange={handleMonth} data-id="month"></lightning-input>
+            <lightning-button class="slds-col" label={labels.recognize} disabled={isWorking} onclick={handleRecognize} data-id="recognize"></lightning-button>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

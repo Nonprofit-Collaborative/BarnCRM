@@ -86,3 +86,22 @@ With rate cards on, each time entry keeps the bill rate it was logged at, from t
 else their role's, else the project's Hourly Rate. Changing a rate card later does not change
 time already logged. On Projects Home, **Apply Rates** gives rates to time logged before rate
 cards were turned on.
+
+## Invoices, Financials and Change Requests (When Your Admin Turns Them On)
+
+Your admin turns each part on in BarnCRM Settings, Projects.
+
+- **New Invoice** (admins, on the project page): choose a period and a Draft invoice is built from
+  the project's approved billable time, expenses, Done milestones or retainer months. Check the
+  lines on the invoice, then **Send**. **Print** saves a PDF to the invoice's Files. **Mark Paid**
+  records a payment the client made directly; **Void** cancels an invoice and frees its work to
+  bill again. With BarnCRM Payments, **Send Payment Link** emails the client a link to pay online,
+  and the invoice turns Paid when the payment goes through.
+- **Export Invoices** (admins, Projects Home): a CSV of sent and paid invoices with their lines for
+  your accounting system.
+- **Financials** (project page): budget with approved changes, revenue to date, invoiced and
+  unbilled, and recognized revenue month by month. Admins also see cost and margin, and can
+  **Recognize Revenue** for a closed month again after correcting it.
+- **Change Requests** (project page, Change Requests list): a scope change with the hours and
+  amount it adds (or removes, as a negative). The project owner approves or rejects it; approved
+  changes add to the budget the project is measured against.

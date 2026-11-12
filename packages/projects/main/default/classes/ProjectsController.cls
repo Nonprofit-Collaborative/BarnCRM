@@ -55,6 +55,7 @@ public with sharing class ProjectsController {
 					Estimated_Hours__c,
 					Actual_Hours__c,
 					Budget_Hours__c,
+					Change_Hours__c,
 					Budget_Amount__c,
 					Actual_Cost__c,
 					Remaining_Budget__c
