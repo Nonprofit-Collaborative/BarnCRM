@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The project record page: the project board (health, progress, budget, phases on a timeline,
-    tasks, Log Time, Draft Status Update) and related lists in the main column, New Invoice and
-    its details beside them (PM-02 to PM-05, PM-10). The PSA cards show only when their settings
-    are on.
+    Project page: the board and related lists in the main column, New Invoice and details beside
+    them (PM-02 to PM-05, PM-10). PSA cards show only when their settings are on.
   </description>
   <flexiPageRegions>
     <itemInstances>
