@@ -154,7 +154,9 @@ CAPS = {
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
     # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
-    "corporatehub": 52_500,
+    # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
+    # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
+    "corporatehub": 58_300,
     # Payments (PAY-01, ADR-NEXT payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.

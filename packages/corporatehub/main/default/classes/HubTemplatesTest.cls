@@ -27,10 +27,23 @@ private class HubTemplatesTest {
 				FROM Hub_Document__c
 				WITH USER_MODE
 			];
-			Assert.areEqual(10, loaded, 'Six obligations and four policies');
+			List<Processing_Activity__c> activities = [
+				SELECT Status__c, Template_Key__c
+				FROM Processing_Activity__c
+				WITH USER_MODE
+			];
+			Assert.areEqual(
+				21,
+				loaded,
+				'Eight obligations, eight policies and five processing activities'
+			);
 			Assert.areEqual(0, again, 'Never twice');
-			Assert.areEqual(6, obligations.size(), 'Six obligations');
-			Assert.areEqual(4, policies.size(), 'Four policies');
+			Assert.areEqual(8, obligations.size(), 'Eight obligations');
+			Assert.areEqual(8, policies.size(), 'Eight policies');
+			Assert.areEqual(5, activities.size(), 'Five processing activities (CH-05)');
+			for (Processing_Activity__c row : activities) {
+				Assert.areEqual('Draft', row.Status__c, row.Template_Key__c + ' arrives Draft');
+			}
 			for (Compliance_Obligation__c row : obligations) {
 				Assert.areEqual('Off', row.Status__c, row.Template_Key__c + ' arrives Off');
 				Assert.isTrue(
@@ -48,7 +61,11 @@ private class HubTemplatesTest {
 				);
 				needsAcknowledgment += row.Requires_Acknowledgment__c ? 1 : 0;
 			}
-			Assert.areEqual(2, needsAcknowledgment, 'Conflict of interest and whistleblower');
+			Assert.areEqual(
+				4,
+				needsAcknowledgment,
+				'Conflict of interest, whistleblower, data protection and breach response'
+			);
 		}
 	}
 

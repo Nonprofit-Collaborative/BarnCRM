@@ -36,6 +36,9 @@ public with sharing class CorporateHubController {
 		public List<Row> obligations = new List<Row>();
 		@AuraEnabled
 		public List<Row> agreements = new List<Row>();
+		/** Open data subject requests and breaches not yet reported (CH-05), the person's share. */
+		@AuraEnabled
+		public List<Row> privacy = new List<Row>();
 		@AuraEnabled
 		public Boolean canManage = false;
 	}
@@ -120,9 +123,69 @@ public with sharing class CorporateHubController {
 					)
 				);
 			}
+			addPrivacy(home);
 			return home;
 		} catch (Exception e) {
 			throw failure(e);
+		}
+	}
+
+	/** CH-05: open requests by due date, then breaches not yet reported by their 72-hour deadline. */
+	private static void addPrivacy(Home home) {
+		if (Schema.SObjectType.Data_Subject_Request__c.isAccessible()) {
+			for (Data_Subject_Request__c request : [
+				SELECT Id, Name, Due_Date__c, Owner.Name, Request_Type__c
+				FROM Data_Subject_Request__c
+				WHERE Status__c IN ('Received', 'In Progress')
+				WITH USER_MODE
+				ORDER BY Due_Date__c
+				LIMIT 50
+			]) {
+				String title = BarnHelp.text(
+					'CorporateHub',
+					'CorporateHub_Home_PrivacyRequest',
+					new List<Object>{ request.Name }
+				);
+				home.privacy.add(
+					row(
+						request.Id,
+						title,
+						request.Due_Date__c,
+						request.Owner.Name,
+						request.Request_Type__c,
+						null
+					)
+				);
+			}
+		}
+		if (Schema.SObjectType.Data_Breach__c.isAccessible()) {
+			for (Data_Breach__c breach : [
+				SELECT Id, Name, Authority_Deadline__c, Owner.Name, Status__c
+				FROM Data_Breach__c
+				WHERE
+					Status__c != 'Closed'
+					AND Risk__c != 'Unlikely'
+					AND Authority_Notified_At__c = NULL
+				WITH USER_MODE
+				ORDER BY Discovered_At__c
+				LIMIT 50
+			]) {
+				String title = BarnHelp.text(
+					'CorporateHub',
+					'CorporateHub_Home_PrivacyBreach',
+					new List<Object>{ breach.Name }
+				);
+				home.privacy.add(
+					row(
+						breach.Id,
+						title,
+						breach.Authority_Deadline__c?.date(),
+						breach.Owner.Name,
+						breach.Status__c,
+						null
+					)
+				);
+			}
 		}
 	}
 

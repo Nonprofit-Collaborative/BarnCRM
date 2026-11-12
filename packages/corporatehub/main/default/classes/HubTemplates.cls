@@ -1,8 +1,8 @@
 /**
- * The shipped templates (CH-04, CH-06, CH-07; canonical model R-CT1; ADR-0006 decision 3): the
- * JSON static resource `BarnCorporateHubTemplates` loaded as ordinary records, once per template
- * key. Obligations arrive Off and policies Draft; a record that already carries a key is never
- * touched, so an upgrade only adds new templates.
+ * The shipped templates (CH-04 to CH-07; canonical model R-CT1; ADR-0006 decision 3): the JSON
+ * static resource `BarnCorporateHubTemplates` loaded as ordinary records, once per template key.
+ * Obligations arrive Off, policies and processing activities (the CH-05 GDPR set) Draft; a record
+ * that already carries a key is never touched, so an upgrade only adds new templates.
  */
 public with sharing class HubTemplates {
 	@TestVisible
@@ -80,6 +80,27 @@ public with sharing class HubTemplates {
 				);
 			}
 		}
+		for (Object item : entries(templates, 'processingActivities')) {
+			Map<String, Object> t = (Map<String, Object>) item;
+			if (!have.contains(text(t, 'key').toLowerCase())) {
+				rows.add(
+					owned(
+						new Processing_Activity__c(
+							Name = text(t, 'name'),
+							Template_Key__c = text(t, 'key'),
+							Status__c = 'Draft',
+							Purpose__c = text(t, 'purpose'),
+							Lawful_Basis__c = text(t, 'lawfulBasis'),
+							Data_Subjects__c = text(t, 'dataSubjects'),
+							Data_Categories__c = text(t, 'dataCategories'),
+							Recipients__c = text(t, 'recipients'),
+							Retention__c = text(t, 'retention')
+						),
+						ownerId
+					)
+				);
+			}
+		}
 		if (asSystem == true) {
 			insert as system rows;
 		} else {
@@ -108,6 +129,14 @@ public with sharing class HubTemplates {
 					WITH SYSTEM_MODE
 				]
 			);
+			rows.addAll(
+				[
+					SELECT Template_Key__c
+					FROM Processing_Activity__c
+					WHERE Template_Key__c != NULL
+					WITH SYSTEM_MODE
+				]
+			);
 		} else {
 			rows.addAll(
 				[
@@ -121,6 +150,14 @@ public with sharing class HubTemplates {
 				[
 					SELECT Template_Key__c
 					FROM Hub_Document__c
+					WHERE Template_Key__c != NULL
+					WITH USER_MODE
+				]
+			);
+			rows.addAll(
+				[
+					SELECT Template_Key__c
+					FROM Processing_Activity__c
 					WHERE Template_Key__c != NULL
 					WITH USER_MODE
 				]
