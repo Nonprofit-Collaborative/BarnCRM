@@ -1,9 +1,16 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupInstantTotals from 'c/rollupInstantTotals';
 import getStates from '@salesforce/apex/RollupInstantTotals.getStates';
 import getState from '@salesforce/apex/RollupInstantTotals.getState';
 import getCode from '@salesforce/apex/RollupInstantTotals.getCode';
 import setTurnedOn from '@salesforce/apex/RollupInstantTotals.setTurnedOn';
+
+setHelpTextForTest({
+  Core_RollupBuilder_InstantStatusOn: 'On: the trigger {0} updates these totals at once.',
+  Core_RollupBuilder_InstantCount: '{0} instant rollups count this object.',
+  Core_RollupBuilder_InstantTurnedOff: 'Instant totals on {0} are turned off.'
+});
 
 jest.mock('@salesforce/apex/RollupInstantTotals.getStates', () => ({ default: jest.fn() }), {
   virtual: true
@@ -17,21 +24,6 @@ jest.mock('@salesforce/apex/RollupInstantTotals.getCode', () => ({ default: jest
 jest.mock('@salesforce/apex/RollupInstantTotals.setTurnedOn', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_InstantStatusOn',
-  () => ({ default: 'On: the trigger {0} updates these totals at once.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_InstantCount',
-  () => ({ default: '{0} instant rollups count this object.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOff',
-  () => ({ default: 'Instant totals on {0} are turned off.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_RollupBuilder_InstantCopied', () => ({ default: 'Copied.' }), {
   virtual: true
 });

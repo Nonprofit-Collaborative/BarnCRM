@@ -142,12 +142,12 @@ private class RollupModuleSwitchTest {
 			);
 			Assert.areEqual(
 				2,
-				infoLogsSaying(System.Label.Core_Rollups_FullRunTurnedOff),
+				infoLogsSaying(BarnHelp.text('Rollups', 'Core_Rollups_FullRunTurnedOff')),
 				'Each full run says why it did not start'
 			);
 			Assert.areEqual(
 				2,
-				infoLogsSaying(System.Label.Core_Rollups_ScheduledRunTurnedOff),
+				infoLogsSaying(BarnHelp.text('Rollups', 'Core_Rollups_ScheduledRunTurnedOff')),
 				'The nightly run and Run tonight each say they were skipped'
 			);
 		}
@@ -181,9 +181,9 @@ private class RollupModuleSwitchTest {
 
 			Assert.areEqual(
 				new List<String>{
-					System.Label.Core_Rollups_ErrorTurnedOff,
-					System.Label.Core_Rollups_ErrorTurnedOff,
-					System.Label.Core_Rollups_ErrorTurnedOff
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorTurnedOff'),
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorTurnedOff'),
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorTurnedOff')
 				},
 				refusals,
 				'Recalculate, Recalculate all and Run tonight each say the module is off'
@@ -212,7 +212,7 @@ private class RollupModuleSwitchTest {
 
 			Assert.isNotNull(result.recordId, 'The rollup is saved');
 			Assert.areEqual(
-				System.Label.Core_RollupBuilder_SavedTurnedOff,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_SavedTurnedOff'),
 				result.notice,
 				'And the notice says it is calculated once the module is on'
 			);

@@ -143,7 +143,10 @@ private class RollupTemplatesTest {
 			}
 
 			System.Assert.isTrue(first.added, first.message);
-			System.Assert.areEqual(Label.Core_RollupEase_TplAdded, first.message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupEase_TplAdded'),
+				first.message
+			);
 			Rollup_Definition__c saved = [
 				SELECT Name, Active__c, Mode__c, Aggregate__c, Target_Field__c
 				FROM Rollup_Definition__c
@@ -155,7 +158,10 @@ private class RollupTemplatesTest {
 
 			System.Assert.isFalse(second.added, 'A field is filled by one rollup');
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupEase_TplFilled, new List<String>{ saved.Name }),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_TplFilled'),
+					new List<String>{ saved.Name }
+				),
 				second.message
 			);
 			System.Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Definition__c]);
@@ -183,8 +189,14 @@ private class RollupTemplatesTest {
 					adding = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, listing);
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, adding);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				listing
+			);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				adding
+			);
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c]);
 		}
 	}

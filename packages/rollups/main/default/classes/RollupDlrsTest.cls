@@ -228,7 +228,7 @@ private class RollupDlrsTest {
 				'Filed under the rollup'
 			);
 			Assert.areEqual(
-				System.Label.Core_RollupBuilder_DlrsHistoryConfirmed,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsHistoryConfirmed'),
 				recorded[0].New_Value__c,
 				'Says she confirmed DLRS will be switched off'
 			);

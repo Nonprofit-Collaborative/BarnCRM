@@ -113,7 +113,7 @@ public with sharing class RollupDefinitionGuard {
 				canManage = BarnCRMPermissions.canManageSettings();
 			}
 			if (!canManage) {
-				record.addError(System.Label.Core_Rollups_ErrorNoPermission);
+				record.addError(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 				continue;
 			}
 			if (previous != null && !readsOrWritesChanged(record, previous)) {
@@ -130,7 +130,7 @@ public with sharing class RollupDefinitionGuard {
 	@TestVisible
 	private static String accessProblem(Rollup_Definition__c record) {
 		if (!isAllowedTarget(record.Target_Object__c)) {
-			return System.Label.Core_Rollups_ErrorTargetNotAllowed;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotAllowed');
 		}
 		Schema.SObjectType targetType = SettingsService.typeByName(record.Target_Object__c);
 		Schema.SObjectType sourceType = SettingsService.typeByName(record.Source_Object__c);
@@ -143,10 +143,10 @@ public with sharing class RollupDefinitionGuard {
 			? null
 			: targetFields.get(record.Target_Field__c.trim().toLowerCase());
 		if (target == null || !target.getDescribe().isUpdateable()) {
-			return System.Label.Core_Rollups_ErrorTargetNotWritable;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable');
 		}
 		if (!sourceType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
-			return System.Label.Core_Rollups_ErrorFieldNotReadable;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorFieldNotReadable');
 		}
 		Map<String, Schema.SObjectField> sourceFields = fieldMap(sourceType);
 		Set<String> read = new Set<String>();
@@ -156,14 +156,14 @@ public with sharing class RollupDefinitionGuard {
 		read.addAll(pathFields(record.Relationship_Path__c));
 		for (String field : read) {
 			if (!readable(sourceFields, field)) {
-				return System.Label.Core_Rollups_ErrorFieldNotReadable;
+				return BarnHelp.text('Rollups', 'Core_Rollups_ErrorFieldNotReadable');
 			}
 		}
 		if (
 			!filterReadable(sourceFields, record.Filter_JSON__c) ||
 			!filterReadable(targetFields, record.Target_Filter_JSON__c)
 		) {
-			return System.Label.Core_Rollups_ErrorFieldNotReadable;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorFieldNotReadable');
 		}
 		return null;
 	}

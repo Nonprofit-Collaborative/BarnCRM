@@ -49,36 +49,12 @@
         <value>Stays in DLRS</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportNoneActive</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS when DLRS has no active rollups</shortDescription>
-        <value>This org has no active DLRS rollups.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DlrsImportFills</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import from DLRS or NPSP line; {0} is the field, {1} the operation</shortDescription>
         <value>Fills {0}. Operation: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportBecomes</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS review line; {0} is the total, {1} is the field</shortDescription>
-        <value>Becomes a BarnCRM {0}, filling {1}, switched off.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportNoChanges</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS review line when nothing changes</shortDescription>
-        <value>Copied as it is.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportCopy</fullName>
@@ -97,52 +73,12 @@
         <value>Compare</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportCreated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS outcome of one rollup</shortDescription>
-        <value>Copied, switched off.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportUpdated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS outcome of one rollup</shortDescription>
-        <value>Copy updated, switched off.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportRefused</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS outcome; {0} is the reason</shortDescription>
-        <value>Not copied: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportNotReached</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS outcome when limits stopped the run</shortDescription>
-        <value>Not copied this time. Run the import again for the rest.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DlrsImportActive</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import from DLRS outcome once a copy is on</shortDescription>
         <value>Turned on.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportNothingCopied</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS when no rollup was copied</shortDescription>
-        <value>Nothing was copied.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportValueNow</fullName>
@@ -167,22 +103,6 @@
         <protected>false</protected>
         <shortDescription>Import from DLRS compare result when both values agree</shortDescription>
         <value>Same</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportNoRecords</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS compare with no target records</shortDescription>
-        <value>No records to compare yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DlrsImportFinished</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import from DLRS notice; {0} is how many copies were turned on</shortDescription>
-        <value>Import from DLRS finished: {0} copies turned on. Switch their DLRS rollups off in DLRS.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_NpspImportTitle</fullName>

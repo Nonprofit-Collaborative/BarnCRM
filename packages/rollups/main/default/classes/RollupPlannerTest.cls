@@ -282,17 +282,17 @@ private class RollupPlannerTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Assert.isNull(RollupPlanner.rowLimitProblem('COUNT', null, null), 'No limit, no check');
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorRowLimitInvalid,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitInvalid'),
 				RollupPlanner.rowLimitProblem('SUM', 0, 'Name'),
 				'At least 1'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorRowLimitAggregate,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitAggregate'),
 				RollupPlanner.rowLimitProblem('COUNT', 3, 'Name'),
 				'A count takes no limit'
 			);
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorRowLimitNeedsOrder,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder'),
 				RollupPlanner.rowLimitProblem('TEXT_LIST', 3, null),
 				'A limit needs an order'
 			);

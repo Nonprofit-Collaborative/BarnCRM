@@ -68,7 +68,9 @@ CAPS = {
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
     # before the kit check, plus about 1%.
-    "rollups": 386_000,
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 386,438 measured, plus
+    # about 0.5%.
+    "rollups": 388_400,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and

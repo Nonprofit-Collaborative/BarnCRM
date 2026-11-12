@@ -60,7 +60,7 @@ private class RollupDefinitionValidationTest {
 				} else {
 					Assert.isFalse(saved[i].isSuccess(), 'Any into a number does not');
 					Assert.areEqual(
-						Label.Core_Rollups_ErrorTargetNeedsCheckbox,
+						BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsCheckbox'),
 						saved[i].getErrors()[0].getMessage(),
 						'And says which kind of field to choose'
 					);
@@ -77,19 +77,19 @@ private class RollupDefinitionValidationTest {
 				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
 			);
 			Map<String, Rollup_Definition__c> wrong = new Map<String, Rollup_Definition__c>{
-				Label.Core_Rollups_ErrorTargetNeedsText => definition(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsText') => definition(
 					'Test_List_Into_Date',
 					'TEXT_LIST',
 					'LastName',
 					'Anniversary__c'
 				),
-				Label.Core_Rollups_ErrorTextTarget => definition(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTextTarget') => definition(
 					'Test_Sum_Into_Text',
 					'SUM',
 					'Birthdate',
 					'Site'
 				),
-				Label.Core_Rollups_ErrorSourceFieldNeeded => definition(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded') => definition(
 					'Test_List_Of_Nothing',
 					'TEXT_LIST',
 					null,
@@ -178,7 +178,7 @@ private class RollupDefinitionValidationTest {
 			new RollupDefinitionValidationHandler().beforeUpdate();
 
 			Assert.areEqual(
-				Label.Core_Rollups_ErrorRowLimitNeedsOrder,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder'),
 				unordered.getErrors()[0].getMessage(),
 				'A limit with no order cannot say which records come first'
 			);

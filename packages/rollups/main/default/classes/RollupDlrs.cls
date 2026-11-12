@@ -179,7 +179,7 @@ public with sharing class RollupDlrs {
 		return other == null
 			? null
 			: String.format(
-					Label.Core_RollupBuilder_DlrsSameField,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsSameField'),
 					new List<String>{ other.label, targetObject + '.' + targetField, toolOf(other) }
 			  );
 	}
@@ -199,7 +199,7 @@ public with sharing class RollupDlrs {
 				Label.Core_RollupBuilder_DlrsHistoryBefore,
 				new List<String>{ other.label, targetObject + '.' + targetField, toolOf(other) }
 			),
-			Label.Core_RollupBuilder_DlrsHistoryConfirmed
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsHistoryConfirmed')
 		);
 	}
 

@@ -32,7 +32,10 @@ public with sharing class RollupConflicts {
 		Rollup_Definition__c other = sharerOf(definition);
 		return other == null
 			? null
-			: String.format(Label.Core_RollupEase_ConflictBlocked, new List<String>{ other.Name });
+			: String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictBlocked'),
+					new List<String>{ other.Name }
+			  );
 	}
 
 	/**
@@ -87,18 +90,28 @@ public with sharing class RollupConflicts {
 		}
 		if (sameField(one, two) && overlaps(target, one, two)) {
 			if (one.Active__c == true && two.Active__c == true) {
-				add(found, one, Label.Core_RollupEase_ConflictOverwrites, two);
-				add(found, two, Label.Core_RollupEase_ConflictOverwrites, one);
+				add(
+					found,
+					one,
+					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'),
+					two
+				);
+				add(
+					found,
+					two,
+					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'),
+					one
+				);
 			} else if (one.Active__c == true) {
-				add(found, two, Label.Core_RollupEase_ConflictBlocked, one);
+				add(found, two, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictBlocked'), one);
 			} else {
-				add(found, one, Label.Core_RollupEase_ConflictBlocked, two);
+				add(found, one, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictBlocked'), two);
 			}
 			return;
 		}
 		if (one.Active__c == true && two.Active__c == true && sameCalculation(one, two)) {
-			add(found, one, Label.Core_RollupEase_ConflictDuplicate, two);
-			add(found, two, Label.Core_RollupEase_ConflictDuplicate, one);
+			add(found, one, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictDuplicate'), two);
+			add(found, two, BarnHelp.text('Rollups', 'Core_RollupEase_ConflictDuplicate'), one);
 		}
 	}
 

@@ -383,7 +383,7 @@ public without sharing class RollupAggregator {
 			// the definition is left out of the write rather than written without them (R-R15).
 			if (query.includeDeleted) {
 				throw new RollupPlanner.RollupPlanException(
-					System.Label.Core_Rollups_ErrorDeletedLargeParent
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorDeletedLargeParent')
 				);
 			}
 			run(query, fanoutFor(query.token, targetIds), answer, rowIds);

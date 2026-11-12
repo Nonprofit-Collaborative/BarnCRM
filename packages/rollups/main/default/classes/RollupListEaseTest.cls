@@ -67,7 +67,7 @@ private class RollupListEaseTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_SentenceRecords,
+					BarnHelp.text('Rollups', 'Core_RollupEase_SentenceRecords'),
 					new List<String>{
 						Label.Core_RollupEase_CalcCount,
 						describe(Account.SObjectType).getLabelPlural(),
@@ -104,12 +104,16 @@ private class RollupListEaseTest {
 				),
 				sentence
 			);
-			System.Assert.isTrue(sentence.contains(Label.Core_RollupEase_SentenceConditions));
-			System.Assert.isTrue(sentence.contains(Label.Core_RollupEase_SentenceLastYear));
+			System.Assert.isTrue(
+				sentence.contains(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceConditions'))
+			);
+			System.Assert.isTrue(
+				sentence.contains(BarnHelp.text('Rollups', 'Core_RollupEase_SentenceLastYear'))
+			);
 			System.Assert.isTrue(
 				sentence.contains(
 					String.format(
-						Label.Core_RollupEase_SentenceLimit,
+						BarnHelp.text('Rollups', 'Core_RollupEase_SentenceLimit'),
 						new List<String>{ (3).format() }
 					)
 				)
@@ -154,7 +158,10 @@ private class RollupListEaseTest {
 			RollupStatus.State failed = RollupStatus.stateOf(active, true, 5, 2);
 			System.Assert.areEqual(RollupStatus.LEVEL_FAILED, failed.level, 'Failures come first');
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupEase_StatusFailed, new List<String>{ (2).format() }),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_StatusFailed'),
+					new List<String>{ (2).format() }
+				),
 				failed.text
 			);
 			System.Assert.areEqual(
@@ -237,14 +244,17 @@ private class RollupListEaseTest {
 			);
 
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupEase_ConflictOverwrites, new List<String>{ 'Two' }),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictOverwrites'),
+					new List<String>{ 'Two' }
+				),
 				found.get(one.Id)[0]
 			);
 			System.Assert.isTrue(
 				found.get(off.Id)
 					.contains(
 						String.format(
-							Label.Core_RollupEase_ConflictBlocked,
+							BarnHelp.text('Rollups', 'Core_RollupEase_ConflictBlocked'),
 							new List<String>{ 'One' }
 						)
 					),
@@ -270,7 +280,10 @@ private class RollupListEaseTest {
 
 			System.Assert.isFalse(found.containsKey(forB.Id), 'No record is both A and B');
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupEase_ConflictDuplicate, new List<String>{ 'For A' }),
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictDuplicate'),
+					new List<String>{ 'For A' }
+				),
 				found.get(copy.Id)[0]
 			);
 		}
@@ -296,7 +309,7 @@ private class RollupListEaseTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_ConflictBlocked,
+					BarnHelp.text('Rollups', 'Core_RollupEase_ConflictBlocked'),
 					new List<String>{ 'Children' }
 				),
 				refusal

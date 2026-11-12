@@ -809,7 +809,7 @@ private class RollupLargeParentBatchTest {
 			update new Rollup_Queue__c(
 				Id = entry.Id,
 				Next_Attempt__c = Datetime.now().addMinutes(-1),
-				Last_Error__c = System.Label.Core_Rollups_QueueHeldByBatch
+				Last_Error__c = BarnHelp.text('Rollups', 'Core_Rollups_QueueHeldByBatch')
 			);
 			RollupLargeParentBatch.largeParentRowsForTest = 30;
 

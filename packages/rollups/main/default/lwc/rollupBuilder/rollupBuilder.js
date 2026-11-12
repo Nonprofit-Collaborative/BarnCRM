@@ -4,7 +4,6 @@ import getDraft from '@salesforce/apex/RollupBuilderController.getDraft';
 
 import TITLE from '@salesforce/label/c.Core_SettingsGroup_RollupBuilder';
 import COPY_OF from '@salesforce/label/c.Core_Import_CopyTemplateDefaultName';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
 import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
@@ -14,6 +13,7 @@ import { labelTab } from 'c/rollupTabLabel';
 import { bodyMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import ADVANCED from '@salesforce/label/c.Core_RollupBuilder_Advanced';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TAB_ICON = 'utility:builder';
 
@@ -23,6 +23,16 @@ const TAB_ICON = 'utility:builder';
  * Copy, which open the five steps. Saving refreshes the list.
  */
 export default class RollupBuilder extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
     otherTools: OTHER_TOOLS,
@@ -65,7 +75,7 @@ export default class RollupBuilder extends LightningElement {
     if (data) {
       this.model = data;
     } else if (error) {
-      this.error = bodyMessage(error, UNEXPECTED_ERROR);
+      this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
     }
   }
 
@@ -133,7 +143,7 @@ export default class RollupBuilder extends LightningElement {
         );
       })
       .catch((error) => {
-        this.error = bodyMessage(error, UNEXPECTED_ERROR);
+        this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       });
   }
 

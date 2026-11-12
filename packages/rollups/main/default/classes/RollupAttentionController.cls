@@ -81,7 +81,7 @@ public with sharing class RollupAttentionController {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			RollupQueue.retry(
@@ -105,7 +105,7 @@ public with sharing class RollupAttentionController {
 		try {
 			if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			RollupQueue.processPending();
@@ -127,12 +127,12 @@ public with sharing class RollupAttentionController {
 		Datetime oldest = (Datetime) totals.get('oldest');
 		attention.hasWaiting = !(records == null || records == 0 || oldest == null);
 		if (!attention.hasWaiting) {
-			attention.waiting = Label.Core_RollupBuilder_NothingWaiting;
+			attention.waiting = BarnHelp.text('Rollups', 'Core_RollupBuilder_NothingWaiting');
 			return;
 		}
 		Long minutes = (Datetime.now().getTime() - oldest.getTime()) / 60000;
 		attention.waiting = String.format(
-			Label.Core_RollupBuilder_Waiting,
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_Waiting'),
 			new List<String>{ records.format(), minutes.format() }
 		);
 	}
@@ -221,16 +221,16 @@ public with sharing class RollupAttentionController {
 	@TestVisible
 	private static String lastRun(RollupFullRecalcBatch.Progress progress) {
 		if (progress == null || progress.jobId == null) {
-			return Label.Core_RollupBuilder_LastRunNever;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRunNever');
 		}
 		if (progress.running) {
 			return String.format(
-				Label.Core_RollupBuilder_LastRunGoing,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRunGoing'),
 				new List<String>{ progress.chunksDone.format(), progress.chunksTotal.format() }
 			);
 		}
 		return String.format(
-			Label.Core_RollupBuilder_LastRun,
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRun'),
 			new List<String>{
 				progress.status,
 				progress.finishedAt == null ? '' : progress.finishedAt.format(),
@@ -244,7 +244,7 @@ public with sharing class RollupAttentionController {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupAttentionController',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

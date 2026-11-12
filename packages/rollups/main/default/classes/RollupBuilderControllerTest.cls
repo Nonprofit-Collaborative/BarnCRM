@@ -281,7 +281,7 @@ private class RollupBuilderControllerTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_ErrorNoInstant,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNoInstant'),
 					new List<String>{
 						Task.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 							.getLabelPlural()
@@ -324,7 +324,10 @@ private class RollupBuilderControllerTest {
 				RollupBuilderController.getTargetFields('No_Such_Object__c');
 				System.Assert.fail('An object the org does not have is refused');
 			} catch (AuraHandledException refused) {
-				System.Assert.areEqual(Label.Core_Rollups_ErrorUnknownObject, refused.getMessage());
+				System.Assert.areEqual(
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'),
+					refused.getMessage()
+				);
 			}
 		}
 	}
@@ -354,7 +357,10 @@ private class RollupBuilderControllerTest {
 			);
 			System.Assert.isFalse(saved.Is_Package_Default__c, 'It is her own rollup');
 			System.Assert.areEqual(admin.Id, saved.CreatedById, 'Saved as Maria, not the package');
-			System.Assert.areEqual(Label.Core_RollupBuilder_Saved, result.notice);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_Saved'),
+				result.notice
+			);
 		}
 	}
 
@@ -588,7 +594,10 @@ private class RollupBuilderControllerTest {
 			}
 			Test.stopTest();
 
-			System.Assert.areEqual(Label.Core_RollupBuilder_SavedAndCalculating, result.notice);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_SavedAndCalculating'),
+				result.notice
+			);
 			System.Assert.isNotNull(
 				[SELECT Last_Calculated__c FROM Rollup_Definition__c WHERE Id = :result.recordId]
 				.Last_Calculated__c,
@@ -605,7 +614,10 @@ private class RollupBuilderControllerTest {
 			System.runAs(david) {
 				message = saveRefusal(childCount());
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				message
+			);
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c], 'Nothing saved');
 		}
 	}
@@ -617,66 +629,90 @@ private class RollupBuilderControllerTest {
 
 			RollupBuilderController.Draft noName = childCount();
 			noName.name = ' ';
-			drafts.put(Label.Core_RollupBuilder_ErrorNameNeeded, noName);
+			drafts.put(BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorNameNeeded'), noName);
 
 			RollupBuilderController.Draft formula = childCount();
 			formula.targetField = 'CreatedDate';
-			drafts.put(Label.Core_Rollups_ErrorTargetNotWritable, formula);
+			drafts.put(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'), formula);
 
 			RollupBuilderController.Draft sumIntoCheckbox = childCount();
 			sumIntoCheckbox.targetField = 'Deceased__c';
-			drafts.put(Label.Core_Rollups_ErrorCheckboxTarget, sumIntoCheckbox);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorCheckboxTarget'),
+				sumIntoCheckbox
+			);
 
 			RollupBuilderController.Draft badPath = childCount();
 			badPath.relationshipPath = 'Name';
-			drafts.put(Label.Core_RollupBuilder_ErrorPathInvalid, badPath);
+			drafts.put(BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorPathInvalid'), badPath);
 
 			RollupBuilderController.Draft sumOfText = childCount();
 			sumOfText.aggregate = 'SUM';
 			sumOfText.sourceField = 'Name';
-			drafts.put(Label.Core_RollupBuilder_ErrorSumNeedsNumber, sumOfText);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorSumNeedsNumber'),
+				sumOfText
+			);
 
 			RollupBuilderController.Draft maxOfText = childCount();
 			maxOfText.aggregate = 'MAX';
 			maxOfText.sourceField = 'Name';
-			drafts.put(Label.Core_RollupBuilder_ErrorMinMaxType, maxOfText);
+			drafts.put(BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorMinMaxType'), maxOfText);
 
 			RollupBuilderController.Draft unordered = childCount();
 			unordered.aggregate = 'LAST';
 			unordered.sourceField = 'NumberOfEmployees';
-			drafts.put(Label.Core_RollupBuilder_ErrorOrderByNeeded, unordered);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorOrderByNeeded'),
+				unordered
+			);
 
 			RollupBuilderController.Draft limitedCount = childCount();
 			limitedCount.rowLimit = 3;
 			limitedCount.orderByField = 'NumberOfEmployees';
-			drafts.put(Label.Core_Rollups_ErrorRowLimitAggregate, limitedCount);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitAggregate'),
+				limitedCount
+			);
 
 			RollupBuilderController.Draft limitedUnordered = childCount();
 			limitedUnordered.aggregate = 'SUM';
 			limitedUnordered.sourceField = 'NumberOfEmployees';
 			limitedUnordered.rowLimit = 3;
-			drafts.put(Label.Core_Rollups_ErrorRowLimitNeedsOrder, limitedUnordered);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder'),
+				limitedUnordered
+			);
 
 			RollupBuilderController.Draft emptyCustom = childCount();
 			emptyCustom.delimiter = 'Custom';
-			drafts.put(Label.Core_Rollups_ErrorCustomDelimiterNeeded, emptyCustom);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorCustomDelimiterNeeded'),
+				emptyCustom
+			);
 
 			RollupBuilderController.Draft noDate = childCount();
 			noDate.fiscalYearAware = true;
 			noDate.fiscalYearOffset = 0;
 			noDate.fiscalDateField = 'Name';
-			drafts.put(Label.Core_RollupBuilder_ErrorWindowNeedsDate, noDate);
+			drafts.put(BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorWindowNeedsDate'), noDate);
 
 			RollupBuilderController.Draft badWindow = childCount();
 			badWindow.fiscalYearAware = true;
 			badWindow.fiscalYearOffset = 5;
 			badWindow.fiscalDateField = 'Anniversary__c';
-			drafts.put(Label.Core_RollupBuilder_ErrorWindowInvalid, badWindow);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorWindowInvalid'),
+				badWindow
+			);
 
 			RollupBuilderController.Draft unknownFilterField = childCount();
 			unknownFilterField.filterJson = nameFilter('equals', 'x')
 				.replace('"Name"', '"Nope__c"');
-			drafts.put(Label.Core_RollupBuilder_ErrorFieldUnknown, unknownFilterField);
+			drafts.put(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown'),
+				unknownFilterField
+			);
 
 			RollupBuilderController.Draft unreadableFilter = childCount();
 			unreadableFilter.filterJson = '{not json';
@@ -724,9 +760,15 @@ private class RollupBuilderControllerTest {
 			Map<String, String> expectedByPath = new Map<String, String>{
 				'Parent.Name' => null,
 				'parent.name' => null,
-				'Parent.Nope__c' => Label.Core_RollupBuilder_ErrorFieldUnknown,
-				'Nope__r.Name' => Label.Core_RollupBuilder_ErrorFieldUnknown,
-				'Parent.Parent.Name' => Label.Core_RollupBuilder_ErrorOneLookup
+				'Parent.Nope__c' => BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_ErrorFieldUnknown'
+				),
+				'Nope__r.Name' => BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorFieldUnknown'),
+				'Parent.Parent.Name' => BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_ErrorOneLookup'
+				)
 			};
 			for (String path : expectedByPath.keySet()) {
 				RollupBuilderController.Draft draft = childCount();
@@ -748,7 +790,10 @@ private class RollupBuilderControllerTest {
 			Map<String, String> sourceFieldByExpected = new Map<String, String>{
 				'same picklist' => 'Preferred_Email__c',
 				'text' => 'Name',
-				Label.Core_RollupBuilder_ErrorPicklistSource => 'NumberOfEmployees',
+				BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_ErrorPicklistSource'
+				) => 'NumberOfEmployees',
 				'missing values' => 'Household_Role__c'
 			};
 			for (String expected : sourceFieldByExpected.keySet()) {
@@ -761,7 +806,8 @@ private class RollupBuilderControllerTest {
 				if (expected == 'missing values') {
 					System.Assert.isTrue(
 						problem.startsWith(
-							Label.Core_RollupBuilder_ErrorPicklistValues.substringBefore('{0}')
+							BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorPicklistValues')
+								.substringBefore('{0}')
 						) && problem.contains('Head'),
 						'Names the values the target lacks: ' + problem
 					);
@@ -775,7 +821,7 @@ private class RollupBuilderControllerTest {
 			RollupBuilderController.Draft counted = childCount();
 			counted.targetField = 'Preferred_Email__c';
 			System.Assert.areEqual(
-				Label.Core_Rollups_ErrorPicklistTarget,
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorPicklistTarget'),
 				RollupBuilderController.problemWith(counted),
 				'A count is no picklist value'
 			);
@@ -805,7 +851,7 @@ private class RollupBuilderControllerTest {
 			onDate.fiscalDateField = 'Anniversary__c';
 
 			System.Assert.areEqual(
-				Label.Core_RollupBuilder_ErrorWindowNeedsDate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorWindowNeedsDate'),
 				RollupBuilderController.problemWith(onDatetime),
 				'A date and time field is refused'
 			);
@@ -855,12 +901,12 @@ private class RollupBuilderControllerTest {
 			}
 
 			System.Assert.areEqual(
-				Label.Core_RollupBuilder_ErrorInstantMovesWithDate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate'),
 				fiscalRefusal,
 				'A fiscal year window'
 			);
 			System.Assert.areEqual(
-				Label.Core_RollupBuilder_ErrorInstantMovesWithDate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorInstantMovesWithDate'),
 				recentRefusal,
 				'A last n days condition'
 			);
@@ -882,7 +928,10 @@ private class RollupBuilderControllerTest {
 					message = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				message
+			);
 		}
 	}
 
@@ -895,7 +944,7 @@ private class RollupBuilderControllerTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_ErrorOverlap,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorOverlap'),
 					new List<String>{ 'Child count' }
 				),
 				message,
@@ -987,7 +1036,7 @@ private class RollupBuilderControllerTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_PreviewResult,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),
 					new List<String>{ (200).format(), (5).format() }
 				),
 				preview.result,
@@ -995,7 +1044,7 @@ private class RollupBuilderControllerTest {
 			);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_Maintains,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_Maintains'),
 					new List<String>{ (201).format() }
 				),
 				preview.maintains,
@@ -1021,9 +1070,15 @@ private class RollupBuilderControllerTest {
 				preview = RollupBuilderController.preview(draft, parent.Id);
 			}
 
-			System.Assert.areEqual(Label.Core_RollupBuilder_PreviewNotFilled, preview.result);
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupBuilder_Maintains, new List<String>{ (0).format() }),
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewNotFilled'),
+				preview.result
+			);
+			System.Assert.areEqual(
+				String.format(
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_Maintains'),
+					new List<String>{ (0).format() }
+				),
 				preview.maintains,
 				'No account starts with Beta'
 			);
@@ -1048,7 +1103,10 @@ private class RollupBuilderControllerTest {
 
 			System.Assert.isNull(preview.result, 'No record picked, no total');
 			System.Assert.isNotNull(preview.maintains);
-			System.Assert.areEqual(Label.Core_RollupBuilder_ErrorTargetNeeded, refusal);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ErrorTargetNeeded'),
+				refusal
+			);
 		}
 	}
 

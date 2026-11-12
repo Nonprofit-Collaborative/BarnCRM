@@ -27,17 +27,12 @@ import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import COLUMN_LAST_CALCULATED from '@salesforce/label/c.Core_Rollups_ColumnLastCalculated';
 import RECALCULATE from '@salesforce/label/c.Core_Rollups_Recalculate';
 import RECALCULATE_ALL from '@salesforce/label/c.Core_Rollups_RecalculateAll';
-import RECALCULATE_STARTED from '@salesforce/label/c.Core_Rollups_RecalculateStarted';
 import SCHEDULE_NIGHTLY from '@salesforce/label/c.Core_Rollups_ScheduleNightly';
-import SCHEDULE_ACTIVE from '@salesforce/label/c.Core_Rollups_ScheduleActive';
-import SCHEDULE_MISSING from '@salesforce/label/c.Core_Rollups_ScheduleMissing';
 import STOP_SCHEDULE from '@salesforce/label/c.Core_Rollups_StopSchedule';
 import RESTORE_DEFAULTS from '@salesforce/label/c.Core_Rollups_RestoreDefaults';
 import NEVER_CALCULATED from '@salesforce/label/c.Core_Rollups_NeverCalculated';
 import FRESHNESS_TITLE from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
 import FRESHNESS_STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
-import READ_ONLY from '@salesforce/label/c.Core_Rollups_ReadOnly';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
@@ -46,32 +41,25 @@ import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DELETE_ROLLUP from '@salesforce/label/c.Core_Find_Delete';
-import DELETED from '@salesforce/label/c.Core_RollupBuilder_Deleted';
 import EXPORT_ROLLUPS from '@salesforce/label/c.Core_RollupBuilder_Export';
 import EXPORT_SELECT from '@salesforce/label/c.Core_RollupBuilder_ExportSelect';
 import IMPORT_FILE from '@salesforce/label/c.Core_RollupBuilder_ImportFile';
 import IMPORT_COLUMN from '@salesforce/label/c.Core_EraseAction_ColumnAction';
 import IMPORT_APPLY from '@salesforce/label/c.Core_RollupBuilder_ImportApply';
-import IMPORT_DONE from '@salesforce/label/c.Core_RollupBuilder_ImportDone';
 import IMPORT_WILL_CREATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillCreate';
 import IMPORT_WILL_UPDATE from '@salesforce/label/c.Core_RollupBuilder_ImportWillUpdate';
 import IMPORT_CREATED from '@salesforce/label/c.Core_Import_ResultCreated';
 import IMPORT_UPDATED from '@salesforce/label/c.Core_Import_ResultUpdated';
 import IMPORT_REFUSED from '@salesforce/label/c.Core_RollupBuilder_ImportRefused';
-import IMPORT_NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_ImportNotReached';
 import turnOnSwitchingOffDlrs from '@salesforce/apex/RollupController.turnOnSwitchingOffDlrs';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
-import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import SEARCH from '@salesforce/label/c.Core_RollupEase_Search';
 import GROUP from '@salesforce/label/c.Core_Format_Parenthetical';
-import NO_MATCHES from '@salesforce/label/c.Core_RollupEase_NoMatches';
 import DELETE_HEADING from '@salesforce/label/c.Core_RollupEase_DeleteHeading';
-import DELETE_QUESTION from '@salesforce/label/c.Core_RollupEase_DeleteQuestion';
 import DELETE_CHOICE from '@salesforce/label/c.Core_RollupEase_DeleteChoice';
 import DELETE_KEEP from '@salesforce/label/c.Core_RollupEase_DeleteKeep';
 import DELETE_CLEAR from '@salesforce/label/c.Core_RollupEase_DeleteClear';
-import DELETED_CLEARED from '@salesforce/label/c.Core_RollupEase_DeletedCleared';
 import { bodyMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -91,13 +79,17 @@ const OUTCOMES = {
     created: IMPORT_WILL_CREATE,
     updated: IMPORT_WILL_UPDATE,
     refused: IMPORT_REFUSED,
-    notReached: IMPORT_NOT_REACHED
+    get notReached() {
+      return helpText('Rollups', 'Core_RollupBuilder_ImportNotReached');
+    }
   },
   saved: {
     created: IMPORT_CREATED,
     updated: IMPORT_UPDATED,
     refused: IMPORT_REFUSED,
-    notReached: IMPORT_NOT_REACHED
+    get notReached() {
+      return helpText('Rollups', 'Core_RollupBuilder_ImportNotReached');
+    }
   }
 };
 
@@ -156,7 +148,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     get deleteShipped() {
       return helpText('Rollups', 'Core_RollupBuilder_DeleteShipped');
     },
-    deleted: DELETED,
+    get deleted() {
+      return helpText('Rollups', 'Core_RollupBuilder_Deleted');
+    },
     exportRollups: EXPORT_ROLLUPS,
     exportSelect: EXPORT_SELECT,
     importFile: IMPORT_FILE,
@@ -174,10 +168,16 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     columnLastCalculated: COLUMN_LAST_CALCULATED,
     recalculate: RECALCULATE,
     recalculateAll: RECALCULATE_ALL,
-    recalculateStarted: RECALCULATE_STARTED,
+    get recalculateStarted() {
+      return helpText('Rollups', 'Core_Rollups_RecalculateStarted');
+    },
     scheduleNightly: SCHEDULE_NIGHTLY,
-    scheduleActive: SCHEDULE_ACTIVE,
-    scheduleMissing: SCHEDULE_MISSING,
+    get scheduleActive() {
+      return helpText('Rollups', 'Core_Rollups_ScheduleActive');
+    },
+    get scheduleMissing() {
+      return helpText('Rollups', 'Core_Rollups_ScheduleMissing');
+    },
     stopSchedule: STOP_SCHEDULE,
     restoreDefaults: RESTORE_DEFAULTS,
     get emptyList() {
@@ -186,13 +186,17 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     neverCalculated: NEVER_CALCULATED,
     freshnessTitle: FRESHNESS_TITLE,
     freshnessStale: FRESHNESS_STALE,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Rollups', 'Core_Rollups_ReadOnly');
+    },
     columnStatus: COLUMN_STATUS,
     search: SEARCH,
     get searchHelp() {
       return helpText('Rollups', 'Core_RollupEase_SearchHelp');
     },
-    noMatches: NO_MATCHES,
+    get noMatches() {
+      return helpText('Rollups', 'Core_RollupEase_NoMatches');
+    },
     deleteHeading: DELETE_HEADING,
     deleteChoice: DELETE_CHOICE
   };
@@ -225,7 +229,10 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       this.page = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = bodyMessage(result.error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Rollups', 'Core_Rollups_UnexpectedError')
+      );
     }
   }
 
@@ -387,7 +394,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     if (active && rollup && rollup.otherToolConflict) {
       const confirmed = await LightningConfirm.open({
         label: DLRS_CONFIRM_TITLE,
-        message: `${rollup.otherToolConflict} ${DLRS_CONFIRM_QUESTION}`,
+        message: `${rollup.otherToolConflict} ${helpText('Rollups', 'Core_RollupBuilder_DlrsConfirmQuestion')}`,
         theme: 'warning'
       });
       if (!confirmed) {
@@ -420,7 +427,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         this.estimate = estimate;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -440,7 +447,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         this.noticeMessage = notice;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -494,7 +501,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
   }
 
   get deleteQuestion() {
-    return this.deleting ? DELETE_QUESTION.replace('{0}', this.deleting.name) : '';
+    return this.deleting
+      ? helpText('Rollups', 'Core_RollupEase_DeleteQuestion').replace('{0}', this.deleting.name)
+      : '';
   }
 
   get deleteOptions() {
@@ -520,7 +529,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     return this.runAction(
       deleteRollup({ definitionId, clearValues }),
       undefined,
-      clearValues ? DELETED_CLEARED : this.labels.deleted
+      clearValues ? helpText('Rollups', 'Core_RollupEase_DeletedCleared') : this.labels.deleted
     );
   }
 
@@ -543,7 +552,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         link.click();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -594,11 +603,11 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }));
         if (save) {
           this.importText = undefined;
-          this.noticeMessage = IMPORT_DONE;
+          this.noticeMessage = helpText('Rollups', 'Core_RollupBuilder_ImportDone');
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
         this.importText = undefined;
       })
       .finally(() => {
@@ -638,7 +647,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
         if (revert) {
           revert();
         }

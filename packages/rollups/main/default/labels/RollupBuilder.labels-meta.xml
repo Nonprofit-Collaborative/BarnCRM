@@ -1,126 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_RollupBuilder_ErrorNameNeeded</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: the rollup has no name.</shortDescription>
-        <value>Give the rollup a name, so you can find it in the list.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorTargetNeeded</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: no record or field chosen to show the total.</shortDescription>
-        <value>Choose the kind of record and the field that show the total, in step 1.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorSourceNeeded</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: no records chosen to count.</shortDescription>
-        <value>Choose the records to count and how they link to the record that shows the total, in step 2.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorPathInvalid</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: the link from counted records to the target is not valid.</shortDescription>
-        <value>BarnCRM cannot follow that link from the records you count to the record that shows the total. Choose it again in step 2.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorFieldUnknown</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: a chosen field is not on the records.</shortDescription>
-        <value>One of the fields you chose is not on those records any more. Choose it again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorSumNeedsNumber</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: Sum or Average of something that is not a number.</shortDescription>
-        <value>Sum and Average need a number, an amount or a percent to work on. Choose another field, or use Count.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorMinMaxType</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: Minimum or Maximum of a field that is not a number or date.</shortDescription>
-        <value>Minimum and Maximum need a number, an amount, a percent or a date. Choose another field.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorOrderByNeeded</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: First or Last without an order field.</shortDescription>
-        <value>First and Last need the field that decides which record comes first, usually a date. Choose one in step 3.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorWindowInvalid</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: the time window is not one BarnCRM offers.</shortDescription>
-        <value>Choose all time, this fiscal year, last fiscal year or two fiscal years ago.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorWindowNeedsDate</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: a fiscal year window without a date field.</shortDescription>
-        <value>A fiscal year window needs the date that decides which year a record falls in. Choose a date field in step 3, not a date and time field.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorInstantMovesWithDate</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: an Instantly total that changes as the date moves on.</shortDescription>
-        <value>This total changes as the date moves on, with no record saved, so only the nightly run keeps it right. Choose Both (recommended) or Every night.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorOverlap</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: another active rollup fills the same field. {0} is its name.</shortDescription>
-        <value>{0} already fills this field for some of the same records, so the two would overwrite each other. Choose another field, or add conditions under Only for some records so they never overlap.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorOneLookup</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: a filter reads a field more than one lookup away.</shortDescription>
-        <value>A filter can read a field of a record the counted records point to, but no further. Choose a field one lookup away.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorPicklistSource</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: a picklist target is filled from a field that is not text.</shortDescription>
-        <value>A picklist can be filled only from a picklist or a text field. Choose one of those to copy, or choose another field to fill.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorPicklistValues</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: source picklist values the target lacks. {0} is the values.</shortDescription>
-        <value>The picklist you fill does not have these values of the field you copy: {0}. Add them to that picklist, or choose another field.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_ParentField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -145,38 +25,6 @@
         <value>{0}, by {1} (their household)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Saved</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice after a rollup is saved.</shortDescription>
-        <value>Rollup saved. It is calculated in its next run.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_SavedAndCalculating</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice after a rollup is saved and its recalculation started.</shortDescription>
-        <value>Rollup saved, and its recalculation has started.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_SavedNotCalculated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice when a rollup is saved while a full recalculation runs.</shortDescription>
-        <value>Rollup saved. A full recalculation is already running, so click Recalculate on its row after that finishes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_SavedTurnedOff</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice when a rollup is saved while the module is turned off.</shortDescription>
-        <value>Rollup saved. BarnCRM Rollup Builder is turned off on Modules, so it is calculated once you turn it on.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_Operator</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -191,22 +39,6 @@
         <protected>false</protected>
         <shortDescription>Filter builder label for the logic string.</shortDescription>
         <value>Combine conditions</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_ListHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help for a list of values.</shortDescription>
-        <value>Separate the values with commas.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_EveryRecord</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter sentence when there are no conditions.</shortDescription>
-        <value>Every record counts.</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_Whose</fullName>
@@ -239,22 +71,6 @@
         <protected>false</protected>
         <shortDescription>Word negating a condition in the filter sentence.</shortDescription>
         <value>not</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_ErrorIncomplete</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter error: a condition is not filled in. {0} is its number.</shortDescription>
-        <value>Condition {0} needs a field, a comparison and a value. Fill it in or remove it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_ErrorLogic</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter error: the logic string is not valid. {0} is the condition count.</shortDescription>
-        <value>Combine conditions can use only the numbers 1 to {0}, AND, OR, NOT and brackets.</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_OpEquals</fullName>
@@ -343,22 +159,6 @@
         <protected>false</protected>
         <shortDescription>Step 1 label: a search box that finds any object to show the total on.</shortDescription>
         <value>Find another object</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_NoInstant</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5 notice: counted records have no rollup trigger. {0} plural name.</shortDescription>
-        <value>Instant totals are not available yet for {0}. This total updates in the nightly run and when you click Recalculate. For instant updates, turn on instant totals for it below, or use the Recalculate rollups Flow template and choose Both (recommended).</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ErrorNoInstant</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder error: Instantly only, counted records have no trigger. {0} plural.</shortDescription>
-        <value>Instant totals are not available yet for {0}, so this total cannot be Instantly only. Choose Both (recommended) or Every night.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_FilledBy</fullName>
@@ -489,22 +289,6 @@
         <value>Date that decides the year</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_CurrencyWarning</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Multi-currency warning on a total of amounts into a currency field.</shortDescription>
-        <value>This org uses more than one currency. Totals are converted to each record's currency at today's rates, not the rate on the gift date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_NumberWarning</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Multi-currency warning on a total of amounts into a number field.</shortDescription>
-        <value>This field is a number, not a currency, so the total is shown in the corporate currency.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_TargetFilter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -527,14 +311,6 @@
         <protected>false</protected>
         <shortDescription>Step 5 label: the optional bypass custom permission</shortDescription>
         <value>Skip for people with this custom permission (optional)</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Summary</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5 sentence. {0} calculation, {1} records counted, {2} target.</shortDescription>
-        <value>{0} of {1}, shown in {2}.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_SaveAndCalculate</fullName>
@@ -561,52 +337,12 @@
         <value>See it on a record</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_PreviewResult</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Preview: {0} the calculated value, {1} the value on the record now</shortDescription>
-        <value>Calculated: {0}. On the record now: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_PreviewNotFilled</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Preview: the record is outside the rollup target filter</shortDescription>
-        <value>This rollup does not fill this record, because of the conditions in Only for some records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_PreviewFailed</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Preview: the rollup could not be calculated</shortDescription>
-        <value>BarnCRM could not calculate this rollup. Check the conditions in step 4.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_PreviewEmpty</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Preview: a value that is empty</shortDescription>
         <value>(empty)</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Maintains</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5: how many records the rollup maintains; {0} is the count</shortDescription>
-        <value>This rollup will maintain about {0} records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Estimate</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Recalculate all estimate: {0} records, {1} rough minutes</shortDescription>
-        <value>About {0} records, roughly {1} minutes.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_StartNow</fullName>
@@ -625,44 +361,12 @@
         <value>Run Tonight</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TonightScheduled</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Run tonight: one run set; {0} is the nightly time</shortDescription>
-        <value>One recalculation of every total is set for the next {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Waiting</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: {0} records waiting, {1} minutes since the oldest</shortDescription>
-        <value>{0} records waiting, oldest {1} minutes ago.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_NothingWaiting</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: nothing waiting in the queue</shortDescription>
-        <value>No records waiting.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_FailedTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Needs attention: list of records that could not be saved</shortDescription>
         <value>Could Not Be Saved</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_NothingFailed</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: no failed records</shortDescription>
-        <value>Every total was saved.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ColumnError</fullName>
@@ -697,68 +401,12 @@
         <value>Retry All</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Retried</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: notice after a retry</shortDescription>
-        <value>Back in the queue. They are tried within minutes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_NightlyOff</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: the nightly run is not scheduled</shortDescription>
-        <value>The nightly run is not scheduled, so totals a bulk change missed are not put right overnight.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_LastRun</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention last run: {0} outcome, {1} finish time, {2} parts stopped</shortDescription>
-        <value>Last full run: {0}, finished {1}, {2} parts stopped.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_LastRunGoing</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: a full run is going; {0} parts done of {1}</shortDescription>
-        <value>A full run is going: {0} of {1} parts done.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_LastRunNever</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: no full run yet</shortDescription>
-        <value>No full run yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Started</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: the waiting records were started</shortDescription>
-        <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_Advanced</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder: heading of the collapsed Advanced section</shortDescription>
         <value>Advanced</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Deleted</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice after a rollup is deleted</shortDescription>
-        <value>Rollup deleted. The values it wrote stay on the records.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Export</fullName>
@@ -777,14 +425,6 @@
         <value>Include in the export</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ExportNothing</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Export refused: no admin-made rollup to export</shortDescription>
-        <value>There is no rollup you made to export. Rollups that came with BarnCRM are in every org already.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_ImportFile</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -799,14 +439,6 @@
         <protected>false</protected>
         <shortDescription>Button: save the rollups the file holds</shortDescription>
         <value>Import These Rollups</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportDone</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice after an import</shortDescription>
-        <value>Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportWillCreate</fullName>
@@ -831,62 +463,6 @@
         <protected>false</protected>
         <shortDescription>Import: the rollup is not saved; the reason follows</shortDescription>
         <value>Not saved</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportNotReached</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: stopped before this rollup</shortDescription>
-        <value>Not imported yet: import the same file again to finish</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportNewer</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import refused: the file comes from a newer BarnCRM</shortDescription>
-        <value>This file was made by a newer BarnCRM. Upgrade BarnCRM in this org, then import it again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportUnreadable</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: one rollup in the file cannot be read</shortDescription>
-        <value>This rollup cannot be read from the file. Export it again from the org it came from.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportTwice</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a Definition Key appears twice in the file</shortDescription>
-        <value>This rollup is in the file twice. Only the first one is used.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportUnknown</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: attributes this org does not know; {0} lists them</shortDescription>
-        <value>This rollup uses settings that BarnCRM in this org does not have ({0}). Upgrade BarnCRM in this org, then import it again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_InstantBuiltInError</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: BarnCRM already updates this object instantly</shortDescription>
-        <value>BarnCRM already keeps totals on this object up to date by itself, so it needs no trigger.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_InstantNotAvailableError</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: Salesforce allows no trigger on this object</shortDescription>
-        <value>Salesforce does not allow a trigger on this object, so its totals cannot be made instant. They are calculated every night and when you click Recalculate.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantSwitchName</fullName>

@@ -196,7 +196,9 @@ public with sharing class RollupDlrsImport {
 		try {
 			requirePermission();
 			if (dlrsOffConfirmed != true) {
-				throw refusal(Label.Core_RollupBuilder_DlrsActivateNeedsConfirm);
+				throw refusal(
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsActivateNeedsConfirm')
+				);
 			}
 			Rollup_Definition__c definition = require(definitionId);
 			RollupBuilderController.Draft draft = RollupBuilderController.toDraft(definition);
@@ -261,7 +263,7 @@ public with sharing class RollupDlrsImport {
 		candidate.draft = draft;
 		draft.name = dlrs.label.left(80);
 		String imported = String.format(
-			Label.Core_RollupBuilder_DlrsImportedFrom,
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsImportedFrom'),
 			new List<String>{ dlrs.key, RollupDlrs.toolOf(dlrs) }
 		);
 		draft.description = (String.isBlank(dlrs.description)
@@ -277,7 +279,7 @@ public with sharing class RollupDlrsImport {
 		draft.active = false;
 		mapMode(dlrs, candidate);
 		if ('user'.equalsIgnoreCase(dlrs.calculationSharingMode)) {
-			candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteSystemMode);
+			candidate.notes.add(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteSystemMode'));
 		}
 
 		if (String.isNotBlank(dlrs.unsupported)) {
@@ -288,7 +290,7 @@ public with sharing class RollupDlrsImport {
 		if (aggregate == null) {
 			reason(
 				candidate,
-				Label.Core_RollupBuilder_DlrsReasonOperation,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOperation'),
 				dlrs.aggregateOperation
 			);
 			return candidate;
@@ -307,7 +309,11 @@ public with sharing class RollupDlrsImport {
 					'operator' => 'is not null'
 				}
 			);
-			note(candidate, Label.Core_RollupBuilder_DlrsNoteCountField, dlrs.fieldToAggregate);
+			note(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCountField'),
+				dlrs.fieldToAggregate
+			);
 		} else if (aggregate != 'COUNT') {
 			draft.sourceField = dlrs.fieldToAggregate;
 		}
@@ -319,7 +325,11 @@ public with sharing class RollupDlrsImport {
 		try {
 			draft.filterJson = RollupDlrsCriteria.toFilter(dlrs.relationshipCriteria, required);
 		} catch (RollupDlrsCriteria.CriteriaException unreadable) {
-			reason(candidate, Label.Core_RollupBuilder_DlrsReasonCriteria, unreadable.getMessage());
+			reason(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonCriteria'),
+				unreadable.getMessage()
+			);
 		}
 		return candidate;
 	}
@@ -331,14 +341,22 @@ public with sharing class RollupDlrsImport {
 			? RollupService.MODE_SCHEDULED
 			: RollupService.MODE_BOTH;
 		if (mode == 'developer' || mode == 'process builder') {
-			note(candidate, Label.Core_RollupBuilder_DlrsNoteCalledByCode, dlrs.calculationMode);
+			note(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCalledByCode'),
+				dlrs.calculationMode
+			);
 		}
 		if (
 			candidate.draft.mode == RollupService.MODE_BOTH &&
 			String.isNotBlank(dlrs.childObject) &&
 			!RollupService.hasInstantUpdates(dlrs.childObject)
 		) {
-			note(candidate, Label.Core_RollupBuilder_DlrsNoteNightly, dlrs.childObject);
+			note(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNightly'),
+				dlrs.childObject
+			);
 		}
 	}
 
@@ -357,7 +375,11 @@ public with sharing class RollupDlrsImport {
 		if (String.isBlank(dlrs.fieldToOrderBy)) {
 			if (ORDERED.contains(aggregate)) {
 				draft.orderByField = dlrs.fieldToAggregate;
-				note(candidate, Label.Core_RollupBuilder_DlrsNoteNoOrder, dlrs.fieldToAggregate);
+				note(
+					candidate,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoOrder'),
+					dlrs.fieldToAggregate
+				);
 			}
 			return;
 		}
@@ -381,7 +403,11 @@ public with sharing class RollupDlrsImport {
 			}
 		}
 		if (!readable || blanksFirst == true) {
-			reason(candidate, Label.Core_RollupBuilder_DlrsReasonOrder, dlrs.fieldToOrderBy);
+			reason(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOrder'),
+				dlrs.fieldToOrderBy
+			);
 			return;
 		}
 		draft.orderByField = words[0];
@@ -394,7 +420,7 @@ public with sharing class RollupDlrsImport {
 		}
 		// SOQL sorts blanks first when ascending unless told otherwise.
 		if (blanksFirst == null && !descending) {
-			candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteBlanksLast);
+			candidate.notes.add(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteBlanksLast'));
 		}
 	}
 
@@ -408,11 +434,17 @@ public with sharing class RollupDlrsImport {
 			return;
 		}
 		if (aggregate == 'FIRST') {
-			candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteRowLimitFirst);
+			candidate.notes.add(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteRowLimitFirst')
+			);
 		} else if (RollupPlanner.ROW_LIMITED.contains(aggregate)) {
 			candidate.draft.rowLimit = dlrs.rowLimit;
 		} else {
-			reason(candidate, Label.Core_RollupBuilder_DlrsReasonRowLimit, dlrs.aggregateOperation);
+			reason(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonRowLimit'),
+				dlrs.aggregateOperation
+			);
 		}
 	}
 
@@ -422,7 +454,7 @@ public with sharing class RollupDlrsImport {
 		RollupBuilderController.Draft draft = candidate.draft;
 		if (String.isEmpty(raw)) {
 			draft.delimiter = 'Comma';
-			candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteNoDelimiter);
+			candidate.notes.add(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoDelimiter'));
 			return;
 		}
 		// DLRS writes these tokens because Salesforce trims a text value's spaces on save. The
@@ -431,7 +463,11 @@ public with sharing class RollupDlrsImport {
 		if (DELIMITER_BY_TEXT.containsKey(text)) {
 			draft.delimiter = DELIMITER_BY_TEXT.get(text);
 		} else if (text.contains('\n') || text.length() > CUSTOM_DELIMITER_LENGTH) {
-			reason(candidate, Label.Core_RollupBuilder_DlrsReasonDelimiter, raw);
+			reason(
+				candidate,
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonDelimiter'),
+				raw
+			);
 		} else {
 			draft.delimiter = RollupPlanner.CUSTOM_DELIMITER;
 			draft.customDelimiter = text;
@@ -457,7 +493,7 @@ public with sharing class RollupDlrsImport {
 		} else {
 			candidate.reasons.add(
 				String.format(
-					Label.Core_RollupBuilder_DlrsReasonPath,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonPath'),
 					new List<String>{
 						String.valueOf(dlrs.childObject),
 						String.valueOf(dlrs.relationshipField),
@@ -471,7 +507,9 @@ public with sharing class RollupDlrsImport {
 			candidate.existingId = earlier.Id;
 			candidate.draft.recordId = earlier.Id;
 			if (earlier.Active__c == true) {
-				candidate.reasons.add(Label.Core_RollupBuilder_DlrsReasonAlreadyOn);
+				candidate.reasons.add(
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonAlreadyOn')
+				);
 			}
 		}
 		for (Rollup_Definition__c other : existing) {
@@ -483,7 +521,11 @@ public with sharing class RollupDlrsImport {
 				other.Target_Field__c != null &&
 				other.Target_Field__c.equalsIgnoreCase(dlrs.aggregateResultField)
 			) {
-				reason(candidate, Label.Core_RollupBuilder_DlrsReasonFilled, other.Name);
+				reason(
+					candidate,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonFilled'),
+					other.Name
+				);
 			}
 		}
 		if (candidate.reasons.isEmpty()) {
@@ -584,7 +626,7 @@ public with sharing class RollupDlrsImport {
 	private static List<SObject> sample(Rollup_Definition__c definition) {
 		Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
 		if (targetType == null || String.isBlank(definition.Target_Field__c)) {
-			throw refusal(Label.Core_Rollups_ErrorUnknownObject);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'));
 		}
 		Map<String, Schema.SObjectField> fields = targetType.getDescribe(
 				SObjectDescribeOptions.DEFERRED
@@ -592,7 +634,7 @@ public with sharing class RollupDlrsImport {
 			.fields.getMap();
 		Schema.SObjectField target = fields.get(definition.Target_Field__c.toLowerCase());
 		if (target == null) {
-			throw refusal(Label.Core_Rollups_ErrorTargetNotWritable);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'));
 		}
 		// Every name comes from describe (the entity, its name field and the target attribute),
 		// never from the request, and every value is a bind, so there is nothing to escape.
@@ -670,7 +712,7 @@ public with sharing class RollupDlrsImport {
 	@TestVisible
 	private static String differenceOf(RollupEngine.Preview preview) {
 		if (preview.planned != true) {
-			return Label.Core_RollupBuilder_DlrsCompareNotCalculated;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareNotCalculated');
 		}
 		Object mine = blankAsNull(preview.calculated);
 		Object theirs = blankAsNull(preview.current);
@@ -678,9 +720,9 @@ public with sharing class RollupDlrsImport {
 			return null;
 		}
 		if ((isZero(mine) && theirs == null) || (isZero(theirs) && mine == null)) {
-			return Label.Core_RollupBuilder_DlrsCompareBlankZero;
+			return BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareBlankZero');
 		}
-		return Label.Core_RollupBuilder_DlrsCompareDiffer;
+		return BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareDiffer');
 	}
 
 	private static Object blankAsNull(Object value) {
@@ -735,7 +777,7 @@ public with sharing class RollupDlrsImport {
 	private static Rollup_Definition__c require(Id definitionId) {
 		Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 		if (definition == null) {
-			throw refusal(Label.Core_Rollups_ErrorUnknownDefinition);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition'));
 		}
 		return definition;
 	}
@@ -746,7 +788,7 @@ public with sharing class RollupDlrsImport {
 
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw refusal(Label.Core_Rollups_ErrorNoPermission);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
 	}
 
@@ -756,7 +798,7 @@ public with sharing class RollupDlrsImport {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupDlrsImport',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

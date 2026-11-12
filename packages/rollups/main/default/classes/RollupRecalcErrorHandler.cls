@@ -71,7 +71,7 @@ public without sharing class RollupRecalcErrorHandler {
 		RollupQueue.add(idsByTarget);
 		ErrorLogger.logMessage(
 			String.format(
-				System.Label.Core_Rollups_FullRunChunkQueued,
+				BarnHelp.text('Rollups', 'Core_Rollups_FullRunChunkQueued'),
 				new List<String>{ String.valueOf(queued) }
 			),
 			LOG_CONTEXT,

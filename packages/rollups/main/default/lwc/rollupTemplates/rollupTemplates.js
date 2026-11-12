@@ -5,7 +5,6 @@ import BUTTON from '@salesforce/label/c.Core_RollupEase_TplButton';
 import ADD from '@salesforce/label/c.Core_RollupEase_TplAdd';
 import OPEN from '@salesforce/label/c.Core_RollupEase_TplOpen';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
@@ -137,6 +136,9 @@ export default class RollupTemplates extends LightningElement {
   }
 
   fail(error) {
-    this.error = error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
+    this.error =
+      error && error.body && error.body.message
+        ? error.body.message
+        : helpText('Rollups', 'Core_Rollups_UnexpectedError');
   }
 }

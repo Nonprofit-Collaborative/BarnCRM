@@ -1,10 +1,8 @@
 import { LightningElement, api } from 'lwc';
 import explain from '@salesforce/apex/RollupExplainController.explain';
 import TITLE from '@salesforce/label/c.Core_RollupEase_ExplainTitle';
-import ADMIN from '@salesforce/label/c.Core_RollupEase_ExplainAdmin';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
@@ -50,7 +48,9 @@ export default class RollupExplain extends LightningElement {
         this.explanations = (result || []).map((item) => ({
           ...item,
           heading: `${item.fieldLabel}: ${item.value}`,
-          adminLine: item.calculatedNow ? ADMIN.replace('{0}', item.calculatedNow) : undefined,
+          adminLine: item.calculatedNow
+            ? helpText('Rollups', 'Core_RollupEase_ExplainAdmin').replace('{0}', item.calculatedNow)
+            : undefined,
           rowList: ((item.rows && item.rows.rows) || []).map((row) => ({
             ...row,
             url: '/' + row.recordId,
@@ -61,7 +61,9 @@ export default class RollupExplain extends LightningElement {
       .catch((error) => {
         this.explanations = undefined;
         this.error =
-          error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
+          error && error.body && error.body.message
+            ? error.body.message
+            : helpText('Rollups', 'Core_Rollups_UnexpectedError');
       })
       .finally(() => {
         this.loading = false;

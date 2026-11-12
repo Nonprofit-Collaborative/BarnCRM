@@ -150,7 +150,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 	public static Id begin(List<Rollup_Definition__c> definitions) {
 		if (RollupService.isTurnedOff()) {
 			ErrorLogger.logMessage(
-				System.Label.Core_Rollups_FullRunTurnedOff,
+				BarnHelp.text('Rollups', 'Core_Rollups_FullRunTurnedOff'),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_INFO
 			);
@@ -168,7 +168,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		if (running != null) {
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Core_Rollups_FullRunAlreadyRunningLog,
+					BarnHelp.text('Rollups', 'Core_Rollups_FullRunAlreadyRunningLog'),
 					new List<String>{ String.valueOf(running) }
 				),
 				LOG_CONTEXT,
@@ -427,7 +427,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 			complete();
 		} else if (RollupService.isTurnedOff()) {
 			ErrorLogger.logMessage(
-				System.Label.Core_Rollups_RunStoppedTurnedOff,
+				BarnHelp.text('Rollups', 'Core_Rollups_RunStoppedTurnedOff'),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_INFO
 			);
@@ -540,7 +540,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		if (this.run.failed > 0 || this.run.stoppedChunks > 0) {
 			ErrorLogger.logMessage(
 				String.format(
-					System.Label.Core_Rollups_FullRunSummary,
+					BarnHelp.text('Rollups', 'Core_Rollups_FullRunSummary'),
 					new List<String>{
 						String.valueOf(this.run.failed),
 						String.valueOf(this.run.stoppedChunks)
@@ -555,7 +555,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 			System.Label.Core_JobNotice_Rollups,
 			this.run.stoppedChunks > 0,
 			String.format(
-				System.Label.Core_JobNotice_RollupsBody,
+				BarnHelp.text('Rollups', 'Core_JobNotice_RollupsBody'),
 				new List<Object>{
 					this.run.written.format(),
 					this.run.failed.format(),
