@@ -73,6 +73,8 @@ public with sharing class PortalTemplate {
 		public Integer rowLimit = 50;
 		public Boolean canUpdate = false;
 		public Boolean canCreate = false;
+		/** The client shows a search box that filters the records already sent (PB-09). */
+		public Boolean search = false;
 		public Map<String, String> extensionLabels = new Map<String, String>();
 
 		public FieldSpec field(String path) {
@@ -190,6 +192,7 @@ public with sharing class PortalTemplate {
 			page.rowLimit = Math.max(1, Math.min(rows, MAX_ROWS));
 		}
 		parseActions(page, asList(raw.get('actions')), at);
+		page.search = raw.get('search') == true;
 		return page;
 	}
 

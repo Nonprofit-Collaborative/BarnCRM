@@ -260,7 +260,10 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 			? EventRegistrationService.seatsLeft(event, tickets)
 			: new Map<Id, Integer>();
 		String currencyCode = UserInfo.getDefaultCurrency();
-		String note = EventsSettings.publicPaymentNote();
+		// EV-20: with payment taken online, the note says the link is emailed after registering.
+		String note = EventPayments.takesOnline()
+			? BarnHelp.text('Events', 'Events_Public_PayOnlineNote')
+			: EventsSettings.publicPaymentNote();
 		List<Object> items = new List<Object>();
 		for (Ticket_Type__c ticket : tickets) {
 			Decimal price = ticket.Price__c == null ? 0 : ticket.Price__c;

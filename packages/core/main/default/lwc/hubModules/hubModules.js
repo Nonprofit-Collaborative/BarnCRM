@@ -32,8 +32,8 @@ function logoUrl(name) {
 }
 
 // A module with no logo shows its main tab's icon, so the icon here matches the tab (D-170):
-// Portal Builder its Portals tab, Contact Point Sync its page tab, Payments its Payments tab.
-// Others keep the apps icon.
+// Portal Builder its Portals tab, Contact Point Sync its page tab, Payments its Payments tab,
+// Memberships its Memberships tab. Others keep the apps icon.
 const FALLBACK_TABS = {
   Portal: 'Portal__c',
   ContactPoints: 'Contact_Point_Sync',
@@ -41,7 +41,8 @@ const FALLBACK_TABS = {
   Payments: 'Payment__c',
   LwcBuilder: 'LWC_Builder',
   Scholarships: 'Scholarships',
-  Territory: 'Territory_Management'
+  Territory: 'Territory_Management',
+  Memberships: 'Membership_Term__c'
 };
 const DEFAULT_ICON = 'standard:apps';
 

@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Amount_Owed__c</fullName>
   <externalId>false</externalId>
-  <inlineHelpText>What the attendees owe with the code applied. BarnCRM records it and takes no payment.</inlineHelpText>
+  <inlineHelpText>What the attendees owe with the code applied. Paid online only when Take payment online is on and BarnCRM Payments is installed.</inlineHelpText>
   <label>Amount Owed</label>
   <precision>16</precision>
   <required>false</required>

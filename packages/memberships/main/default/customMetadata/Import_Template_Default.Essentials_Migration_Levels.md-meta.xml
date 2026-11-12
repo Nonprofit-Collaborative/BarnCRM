@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Essentials Migration: Membership Levels</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_essentials_levels</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Memberships Essentials migration kit, which reads the Essentials membership products in your org: one row per product with a tier, with its term in months and its grace days.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "Name", "target": "Record.Name"}, {"source": "Description", "target": "Record.Description__c"}, {"source": "IsActive", "target": "Record.Active__c", "transforms": [{"op": "ifBlank", "value": "true"}]}, {"source": "Membership_Tier__c", "target": "Record.Tier__c"}, {"source": "Months", "target": "Record.Term_Months__c"}, {"source": "Grace_Period__c", "target": "Record.Grace_Days__c", "transforms": [{"op": "ifBlank", "value": "30"}]}, {"source": "Id", "target": "Record.External_Id__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Membership_Level__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

@@ -13,6 +13,8 @@
  */
 public with sharing class EventRegistrationService {
 	public static final String STATUS_REGISTERED = 'Registered';
+	/** A registration's status while its seats are held for an online payment (R-ERG5). */
+	public static final String STATUS_PENDING_PAYMENT = 'Pending Payment';
 	public static final String STATUS_WAITLISTED = 'Waitlisted';
 	public static final String STATUS_CANCELLED = 'Cancelled';
 	public static final String STATUS_ATTENDED = 'Attended';
@@ -213,7 +215,27 @@ public with sharing class EventRegistrationService {
 		}
 		insert as user attendees;
 		Event_Registration__c totals = settle(registration.Id, attendees);
+		// R-ERG5: a form registration that owes money waits for its online payment.
+		Boolean holdForPayment =
+			request.source == SOURCE_FORM &&
+			totals.Status__c == STATUS_REGISTERED &&
+			totals.Amount_Owed__c > 0 &&
+			EventPayments.takesOnline();
+		if (holdForPayment) {
+			totals.Status__c = STATUS_PENDING_PAYMENT;
+		}
 		update as user totals;
+		if (holdForPayment) {
+			Database.update(
+				new Event_Registration__c(
+					Id = registration.Id,
+					Payment_Status__c = EventPayments.UNPAID
+				),
+				true,
+				AccessLevel.SYSTEM_MODE
+			);
+			EventPayments.queueCheckouts();
+		}
 
 		result.registrationId = registration.Id;
 		result.status = totals.Status__c;
@@ -296,9 +318,28 @@ public with sharing class EventRegistrationService {
 		]) {
 			byRegistration.get(attendee.Event_Registration__c).add(attendee);
 		}
+		Set<Id> awaitingPayment = new Set<Id>();
+		for (Event_Registration__c registration : [
+			SELECT Id
+			FROM Event_Registration__c
+			WHERE Id IN :registrationIds AND Status__c = :STATUS_PENDING_PAYMENT
+			WITH SYSTEM_MODE
+		]) {
+			awaitingPayment.add(registration.Id);
+		}
 		List<Event_Registration__c> updates = new List<Event_Registration__c>();
 		for (Id registrationId : byRegistration.keySet()) {
-			updates.add(settle(registrationId, byRegistration.get(registrationId)));
+			Event_Registration__c settled = settle(
+				registrationId,
+				byRegistration.get(registrationId)
+			);
+			// A registration waiting for its payment keeps waiting while it holds a seat (R-ERG5).
+			if (
+				awaitingPayment.contains(registrationId) && settled.Status__c == STATUS_REGISTERED
+			) {
+				settled.Status__c = STATUS_PENDING_PAYMENT;
+			}
+			updates.add(settled);
 		}
 		update as user updates;
 	}

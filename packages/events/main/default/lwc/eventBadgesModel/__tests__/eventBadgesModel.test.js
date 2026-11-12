@@ -4,6 +4,7 @@ import {
   badgePageHtml,
   escapeHtml,
   layoutFor,
+  ratingCodesPageHtml,
   selectAttendees,
   signInPageHtml,
   ticketNames
@@ -57,6 +58,28 @@ describe('eventBadgesModel', () => {
     expect(html).not.toContain('<b>Roe</b>');
     expect(html).toContain('Gala &lt;Badges&gt;');
     expect(html).toContain('@page');
+    expect(html).not.toContain('<div class="title">');
+  });
+
+  it('builds a rating code page per session, escaped', () => {
+    const html = ratingCodesPageHtml('Gala', 'Rate this session', [
+      {
+        name: 'Talk <A>',
+        whenText: 'Nov 7, 9:00 AM',
+        room: 'Hall',
+        qr: 'data:image/png;base64,AA'
+      },
+      { name: 'Talk B' }
+    ]);
+    expect((html.match(/class="code"/g) || []).length).toBe(2);
+    expect(html).toContain('<h2>Talk &lt;A&gt;</h2><p>Nov 7, 9:00 AM, Hall</p>');
+    expect(html).toContain('<strong>Rate this session</strong>');
+    expect((html.match(/<img /g) || []).length).toBe(1);
+  });
+
+  it('prints a badge title under the name only when set', () => {
+    const html = badgePageHtml('Gala', 'standard', [{ name: 'Jo', title: 'Chair <i>' }], {});
+    expect(html).toContain('<div class="name">Jo</div><div class="title">Chair &lt;i&gt;</div>');
   });
 
   it('builds a sign-in sheet with blank rows', () => {

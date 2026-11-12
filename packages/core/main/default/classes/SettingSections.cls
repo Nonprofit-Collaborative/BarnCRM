@@ -106,6 +106,9 @@ public with sharing class SettingSections {
 	/** The Territory Management module's row, which opens its Territory Management tab. */
 	@NamespaceAccessible
 	public static final String TERRITORY = 'Territory Management';
+	/** The Memberships module's renewal reminders and gift renewals. */
+	@NamespaceAccessible
+	public static final String MEMBERSHIPS = 'Memberships';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -133,6 +136,7 @@ public with sharing class SettingSections {
 			LWC_BUILDER,
 			SCHOLARSHIPS,
 			TERRITORY,
+			MEMBERSHIPS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

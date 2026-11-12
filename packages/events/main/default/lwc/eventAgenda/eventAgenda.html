@@ -27,6 +27,7 @@
         ></lightning-button>
       </template>
     </div>
+    <c-event-session-ratings record-id={recordId} sessions={ratingSessions}></c-event-session-ratings>
 
     <template lwc:if={isLoading}>
       <lightning-spinner alternative-text={labels.agenda} size="small"></lightning-spinner>
@@ -116,6 +117,9 @@
                       </button>
                       <p class="slds-text-body_small">{card.whenText}</p>
                       <p class="slds-text-body_small slds-text-color_weak">{card.detailText}</p>
+                      <template lwc:if={card.ratingText}>
+                        <p class="slds-text-body_small" data-id="rating">{card.ratingText}</p>
+                      </template>
                       <template lwc:if={card.isCancelled}>
                         <c-barn-status-badge status="inactive" label={card.status}></c-barn-status-badge>
                       </template>

@@ -91,6 +91,8 @@ Rules:
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
 | payments | Payment__c | Custom40: Creditcard |
 | payments | Payment_Event__c | Custom95: Stopwatch |
+| memberships | Membership_Level__c | Custom48: Trophy |
+| memberships | Membership_Term__c | Custom45: Ticket |
 | payments | Payments_Setup | Custom70: Handsaw |
 | lwcbuilder | LWC_Builder | Custom34: Insect |
 | scholarships | Award__c | Custom80: Motorcycle |

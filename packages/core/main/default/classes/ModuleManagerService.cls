@@ -142,7 +142,9 @@ public with sharing class ModuleManagerService {
 			'Sponsor_Deliverable__c',
 			'Sponsorship_Level__c',
 			'Event_Table__c',
-			'Ticket_Type__c'
+			'Ticket_Type__c',
+			'Proposal_Presenter__c',
+			'Session_Rating__c'
 		},
 		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },
 		'CorporateHub' => new List<String>{
@@ -177,6 +179,11 @@ public with sharing class ModuleManagerService {
 			'Territory_Member__c',
 			'Territory_Rule__c',
 			'Territory_Run__c'
+		},
+		'Memberships' => new List<String>{
+			'Membership_Benefit__c',
+			'Membership_Level__c',
+			'Membership_Term__c'
 		}
 	};
 
@@ -197,7 +204,8 @@ public with sharing class ModuleManagerService {
 		'Payments' => 'Payments_Admin',
 		'LwcBuilder' => 'LWC_Builder_Admin',
 		'Scholarships' => 'Scholarships_Admin',
-		'Territory' => 'Territory_Admin'
+		'Territory' => 'Territory_Admin',
+		'Memberships' => 'Memberships_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */
