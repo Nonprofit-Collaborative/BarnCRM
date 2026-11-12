@@ -188,7 +188,11 @@ private class CaseNoteTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Programs_Erase_NeedProgramsAdmin, refusal, 'Refused, with why.');
+		Assert.areEqual(
+			BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'),
+			refusal,
+			'Refused, with why.'
+		);
 		Assert.areEqual(1, [SELECT COUNT() FROM Case_Note__c], 'Nothing was deleted.');
 	}
 

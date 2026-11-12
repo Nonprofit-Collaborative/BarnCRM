@@ -257,7 +257,11 @@ private class ProgramsSharingTest {
 			Test.stopTest();
 		}
 
-		Assert.areEqual(Label.Programs_Settings_NoAccess, refusal, 'Refused, with why.');
+		Assert.areEqual(
+			BarnHelp.text('Programs', 'Programs_Settings_NoAccess'),
+			refusal,
+			'Refused, with why.'
+		);
 		Assert.isFalse(ProgramsSharing.isPrivate(), 'Still Shared.');
 	}
 

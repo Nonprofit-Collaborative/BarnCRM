@@ -45,7 +45,7 @@ public with sharing class ProgramsSettingsController {
 	@AuraEnabled
 	public static Settings savePrivacy(Boolean privateParticipants) {
 		if (!HealthCheckService.canManageSettings()) {
-			throw UserErrors.message(Label.Programs_Settings_NoAccess);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Settings_NoAccess'));
 		}
 		try {
 			ProgramsSharing.savePreset(privateParticipants);

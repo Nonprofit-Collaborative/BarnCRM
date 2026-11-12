@@ -247,7 +247,7 @@ private class ServicePlanTest {
 		Assert.areEqual(today, goal.get('lastReviewDate'), 'Reviewed today.');
 		Assert.areEqual(today.addMonths(3), goal.get('nextReviewDate'));
 		Assert.areEqual(
-			Label.Programs_Plan_NextReviewPast,
+			BarnHelp.text('Programs', 'Programs_Plan_NextReviewPast'),
 			refusal,
 			'A past next review is refused.'
 		);
@@ -266,7 +266,7 @@ private class ServicePlanTest {
 			}
 		}
 		Test.stopTest();
-		Assert.areEqual(Label.Programs_Plan_NameRequired, refusal);
+		Assert.areEqual(BarnHelp.text('Programs', 'Programs_Plan_NameRequired'), refusal);
 	}
 
 	@IsTest
@@ -324,7 +324,7 @@ private class ServicePlanTest {
 		}
 		Test.stopTest();
 		Assert.areEqual(0, seen, 'Staff the enrollment is not shared with see no goal (R-GL1).');
-		Assert.areEqual(Label.Programs_Plan_NotFound, refusal);
+		Assert.areEqual(BarnHelp.text('Programs', 'Programs_Plan_NotFound'), refusal);
 	}
 
 	@IsTest
@@ -416,7 +416,7 @@ private class ServicePlanTest {
 			}
 		}
 		Test.stopTest();
-		Assert.areEqual(Label.Programs_Erase_NeedProgramsAdmin, refusal);
+		Assert.areEqual(BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'), refusal);
 	}
 
 	@IsTest
@@ -484,7 +484,7 @@ private class ServicePlanTest {
 			Assert.areEqual('Housed Pantry model', saved.get('outcomeName'));
 			Assert.isFalse((Boolean) saved.get('outcomeMissing'));
 			Assert.areEqual(
-				Label.Programs_Plan_BadOutcome,
+				BarnHelp.text('Programs', 'Programs_Plan_BadOutcome'),
 				refusal,
 				'Another program\'s outcome is refused.'
 			);

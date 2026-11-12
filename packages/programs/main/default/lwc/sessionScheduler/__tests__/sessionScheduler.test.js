@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import SessionScheduler from 'c/sessionScheduler';
 import getSchedule from '@salesforce/apex/SessionScheduleController.getSchedule';
@@ -16,6 +17,13 @@ import {
   toIsoDate,
   weekdayOptions
 } from '../schedule';
+
+setHelpTextForTest({
+  Programs_Schedule_Skipped: 'skipped {0}',
+  Programs_Schedule_PreviewMany: '{0} sessions',
+  Programs_Schedule_CreatedMany: '{0} made',
+  Programs_Schedule_IntroCohort: 'For {0}'
+});
 
 jest.mock(
   '@salesforce/apex/SessionScheduleController.getSchedule',
@@ -39,23 +47,7 @@ jest.mock(
   () => ({ default: jest.fn(() => Promise.resolve([])) }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Programs_Schedule_Skipped', () => ({ default: 'skipped {0}' }), {
-  virtual: true
-});
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
-jest.mock(
-  '@salesforce/label/c.Programs_Schedule_PreviewMany',
-  () => ({ default: '{0} sessions' }),
-  {
-    virtual: true
-  }
-);
-jest.mock('@salesforce/label/c.Programs_Schedule_CreatedMany', () => ({ default: '{0} made' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Schedule_IntroCohort', () => ({ default: 'For {0}' }), {
-  virtual: true
-});
 
 const COHORT_ID = 'a0C000000000001AAA';
 const SERVICE_ID = 'a0A000000000001AAA';

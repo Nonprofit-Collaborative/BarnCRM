@@ -112,7 +112,7 @@ public with sharing class EnrollmentService {
 			String programName = programNames.get(enrollment.Program__c);
 			enrollment.addError(
 				String.format(
-					Label.Programs_Enrollment_AlreadyOpen,
+					BarnHelp.text('Programs', 'Programs_Enrollment_AlreadyOpen'),
 					new List<String>{
 						programName == null ? String.valueOf(enrollment.Program__c) : programName
 					}

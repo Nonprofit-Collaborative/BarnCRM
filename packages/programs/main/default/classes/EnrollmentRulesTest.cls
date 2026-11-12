@@ -89,7 +89,7 @@ private class EnrollmentRulesTest {
 
 			Assert.isFalse(inserted.isSuccess(), 'An organization is not a person.');
 			Assert.areEqual(
-				System.Label.Programs_Person_NotAPerson,
+				BarnHelp.text('Programs', 'Programs_Person_NotAPerson'),
 				inserted.getErrors()[0].getMessage()
 			);
 			Assert.isFalse(changed.isSuccess(), 'Nor by changing the person.');
@@ -129,7 +129,7 @@ private class EnrollmentRulesTest {
 			Test.stopTest();
 
 			String expected = String.format(
-				Label.Programs_Enrollment_AlreadyOpen,
+				BarnHelp.text('Programs', 'Programs_Enrollment_AlreadyOpen'),
 				new List<String>{ 'Tutoring' }
 			);
 			for (Database.SaveResult result : results) {

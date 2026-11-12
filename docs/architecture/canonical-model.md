@@ -11141,8 +11141,8 @@ participant record; P-02 records what they attended and received.
 **R-EN1 Exactly one person.** Contact or Account, never both, never neither (validation rule,
 checked only when the enrollment is new or its person changes, as R-VU1). The Account is a person
 account: an organization or household account is refused on every path (tab, import, API), not
-only by the pickers, when the enrollment is created or its Account changes, with the label
-`Programs_Person_NotAPerson` (`ProgramPersonRule`, in the always-running `Enrollment_Rules`
+only by the pickers, when the enrollment is created or its Account changes, with the help text
+`Programs_Person_NotAPerson` in `BarnHelp_Programs` (`ProgramPersonRule`, in the always-running `Enrollment_Rules`
 handler; QA-F4). Whether the account is a person is read by name, so in an org without person
 accounts every Account is refused.
 

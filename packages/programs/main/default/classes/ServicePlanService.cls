@@ -74,7 +74,7 @@ public with sharing class ServicePlanService {
 			WITH USER_MODE
 		];
 		if (found.isEmpty()) {
-			throw new PlanException(Label.Programs_Plan_NotFound);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NotFound'));
 		}
 		Enrollment__c enrollment = found[0];
 		Map<String, Object> plan = new Map<String, Object>{
@@ -387,11 +387,11 @@ public with sharing class ServicePlanService {
 		Id goalId = idOf(fields, 'id');
 		Id enrollmentId = goalId == null ? idOf(fields, 'enrollmentId') : enrollmentOf(goalId);
 		if (enrollmentId == null) {
-			throw new PlanException(Label.Programs_Plan_NotFound);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NotFound'));
 		}
 		String name = text(fields, 'name');
 		if (name == null) {
-			throw new PlanException(Label.Programs_Plan_NameRequired);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NameRequired'));
 		}
 		Goal__c goal = new Goal__c(
 			Id = goalId,
@@ -433,17 +433,17 @@ public with sharing class ServicePlanService {
 		Id goalId = stepId == null ? idOf(fields, 'goalId') : goalOf(stepId);
 		Id enrollmentId = goalId == null ? null : enrollmentOf(goalId);
 		if (enrollmentId == null) {
-			throw new PlanException(Label.Programs_Plan_NotFound);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NotFound'));
 		}
 		Goal_Step__c step = new Goal_Step__c(Id = stepId);
 		if (fields.containsKey('name')) {
 			String name = text(fields, 'name');
 			if (name == null) {
-				throw new PlanException(Label.Programs_Plan_NameRequired);
+				throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NameRequired'));
 			}
 			step.Name = name.left(80);
 		} else if (stepId == null) {
-			throw new PlanException(Label.Programs_Plan_NameRequired);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NameRequired'));
 		}
 		String status = text(fields, 'status');
 		if (status != null) {
@@ -474,10 +474,10 @@ public with sharing class ServicePlanService {
 	public static Id markReviewed(Id goalId, Date nextReview) {
 		Id enrollmentId = goalId == null ? null : enrollmentOf(goalId);
 		if (enrollmentId == null) {
-			throw new PlanException(Label.Programs_Plan_NotFound);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NotFound'));
 		}
 		if (nextReview != null && nextReview < Date.today()) {
-			throw new PlanException(Label.Programs_Plan_NextReviewPast);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NextReviewPast'));
 		}
 		update as user new Goal__c(
 			Id = goalId,
@@ -497,7 +497,7 @@ public with sharing class ServicePlanService {
 				return outcomeId;
 			}
 		}
-		throw new PlanException(Label.Programs_Plan_BadOutcome);
+		throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_BadOutcome'));
 	}
 
 	/** The outcome identifier a goal holds now, or null. */
@@ -558,7 +558,7 @@ public with sharing class ServicePlanService {
 		}
 		Id result = asId(value);
 		if (result == null) {
-			throw new PlanException(Label.Programs_Plan_NotFound);
+			throw new PlanException(BarnHelp.text('Programs', 'Programs_Plan_NotFound'));
 		}
 		return result;
 	}

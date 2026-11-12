@@ -7,7 +7,6 @@ import scheduleSessions from '@salesforce/apex/SessionScheduleController.schedul
 import saveRepeatingSchedule from '@salesforce/apex/SessionScheduleController.saveRepeatingSchedule';
 
 import TITLE from '@salesforce/label/c.Programs_Schedule_Title';
-import INTRO_COHORT from '@salesforce/label/c.Programs_Schedule_IntroCohort';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
 import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
 import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
@@ -16,16 +15,6 @@ import START_TIME from '@salesforce/label/c.Programs_Schedule_StartTime';
 import END_TIME from '@salesforce/label/c.Programs_Schedule_EndTime';
 import SCHEDULE from '@salesforce/label/c.Programs_Schedule_Schedule';
 import SAVE_REPEATING from '@salesforce/label/c.Programs_Schedule_SaveRepeating';
-import NO_SERVICES from '@salesforce/label/c.Programs_Schedule_NoServices';
-import CHOOSE_DATES from '@salesforce/label/c.Programs_Schedule_ChooseDates';
-import CHOOSE_WEEKDAYS from '@salesforce/label/c.Programs_Schedule_ChooseWeekdays';
-import PREVIEW_NONE from '@salesforce/label/c.Programs_Schedule_PreviewNone';
-import PREVIEW_ONE from '@salesforce/label/c.Programs_Schedule_PreviewOne';
-import PREVIEW_MANY from '@salesforce/label/c.Programs_Schedule_PreviewMany';
-import TOO_MANY from '@salesforce/label/c.Programs_Schedule_TooMany';
-import CREATED_ONE from '@salesforce/label/c.Programs_Schedule_CreatedOne';
-import CREATED_MANY from '@salesforce/label/c.Programs_Schedule_CreatedMany';
-import SKIPPED from '@salesforce/label/c.Programs_Schedule_Skipped';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
@@ -63,7 +52,9 @@ export default class SessionScheduler extends LightningElement {
     endTime: END_TIME,
     schedule: SCHEDULE,
     saveRepeating: SAVE_REPEATING,
-    noServices: NO_SERVICES,
+    get noServices() {
+      return helpText('Programs', 'Programs_Schedule_NoServices');
+    },
     loading: LOADING
   };
 
@@ -170,7 +161,7 @@ export default class SessionScheduler extends LightningElement {
       return '';
     }
     return this.schedule.cohortId
-      ? format(INTRO_COHORT, this.schedule.cohortName)
+      ? format(helpText('Programs', 'Programs_Schedule_IntroCohort'), this.schedule.cohortName)
       : helpText('Programs', 'Programs_Schedule_IntroProgram');
   }
 
@@ -189,13 +180,13 @@ export default class SessionScheduler extends LightningElement {
     return previewMessage(
       this.planned,
       {
-        chooseDates: CHOOSE_DATES,
-        chooseWeekdays: CHOOSE_WEEKDAYS,
-        tooMany: TOO_MANY,
-        none: PREVIEW_NONE,
-        one: PREVIEW_ONE,
-        many: PREVIEW_MANY,
-        skipped: SKIPPED
+        chooseDates: helpText('Programs', 'Programs_Schedule_ChooseDates'),
+        chooseWeekdays: helpText('Programs', 'Programs_Schedule_ChooseWeekdays'),
+        tooMany: helpText('Programs', 'Programs_Schedule_TooMany'),
+        none: helpText('Programs', 'Programs_Schedule_PreviewNone'),
+        one: helpText('Programs', 'Programs_Schedule_PreviewOne'),
+        many: helpText('Programs', 'Programs_Schedule_PreviewMany'),
+        skipped: helpText('Programs', 'Programs_Schedule_Skipped')
       },
       this.takenDays
     );
@@ -263,9 +254,9 @@ export default class SessionScheduler extends LightningElement {
       .then((schedule) => {
         this.schedule = schedule;
         this.resultMessage = countMessage(schedule.created, schedule.skipped || 0, {
-          one: CREATED_ONE,
-          many: CREATED_MANY,
-          skipped: SKIPPED
+          one: helpText('Programs', 'Programs_Schedule_CreatedOne'),
+          many: helpText('Programs', 'Programs_Schedule_CreatedMany'),
+          skipped: helpText('Programs', 'Programs_Schedule_Skipped')
         });
         this.chosenWeekdays = [];
         this.dispatchEvent(new RefreshEvent());

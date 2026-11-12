@@ -345,20 +345,24 @@ private class SessionTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Programs_Schedule_ServiceRequired,
+				BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired'),
 				refusals[0],
 				'Not its service.'
 			);
-			Assert.areEqual(Label.Programs_Schedule_ServiceRequired, refusals[1], 'Not active.');
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired'),
+				refusals[1],
+				'Not active.'
+			);
 			Assert.areEqual(
 				String.format(
-					Label.Programs_Schedule_TooMany,
+					BarnHelp.text('Programs', 'Programs_Schedule_TooMany'),
 					new List<Object>{ SessionScheduleController.MAX_SESSIONS }
 				),
 				refusals[2]
 			);
-			Assert.areEqual(Label.Programs_Schedule_BadTime, refusals[3]);
-			Assert.areEqual(Label.Programs_Schedule_NoDates, refusals[4]);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Schedule_BadTime'), refusals[3]);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Schedule_NoDates'), refusals[4]);
 			Assert.areEqual(
 				BarnHelp.text('Programs', 'Programs_Fail_Schedule'),
 				refusals[5],
@@ -586,7 +590,10 @@ private class SessionTest {
 
 			Assert.isTrue(log.cancelled, 'R-SE3.');
 			Assert.isFalse(log.canEdit, 'No controls on a cancelled session.');
-			Assert.areEqual(Label.Programs_Session_CancelledNoAttendance, refusal);
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Session_CancelledNoAttendance'),
+				refusal
+			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c WITH SYSTEM_MODE]);
 		}
 	}
@@ -650,8 +657,8 @@ private class SessionTest {
 			new List<String>{
 				BarnHelp.text('Programs', 'Programs_Fail_Log'),
 				BarnHelp.text('Programs', 'Programs_Fail_Log'),
-				Label.Programs_Session_NotFound,
-				Label.Programs_Session_NotFound
+				BarnHelp.text('Programs', 'Programs_Session_NotFound'),
+				BarnHelp.text('Programs', 'Programs_Session_NotFound')
 			},
 			refusals
 		);
