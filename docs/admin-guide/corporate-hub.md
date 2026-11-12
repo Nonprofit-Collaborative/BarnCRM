@@ -169,8 +169,9 @@ history.
 An Agreement records the other party (an organization and a contact), dates, **Auto-Renews** with
 its renewal term, **Notice Days** (the **Notice Date** is worked out), value, terms, and the
 signed copy in Files. The owner is reminded before the notice date (or the end date when no notice
-is set). Each night an Active, auto-renewing agreement past its end date moves on by its term,
-and any other Active agreement past its end date becomes Expired.
+is set). Each night an Active, auto-renewing agreement past its end date moves on by its term
+(an end date on the last day of a month stays on the last day: 31 January, then 28 February,
+then 31 March), and any other Active agreement past its end date becomes Expired.
 
 ## Data Protection
 

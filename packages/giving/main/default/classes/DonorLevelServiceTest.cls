@@ -314,4 +314,69 @@ private class DonorLevelServiceTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void inASingleCurrencyOrgAmountsAreComparedAsEntered() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (UserInfo.isMultiCurrencyOrganization()) {
+				return;
+			}
+			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
+			Map<String, Donor_Level__c> rungs = ladderByName();
+			Account household = new Account(Name = 'The Okafor Family', Total_Giving__c = 999.99);
+
+			DonorLevelService.assignAll(new List<SObject>{ household });
+
+			Assert.areEqual(
+				rungs.get(FRIEND).Id,
+				household.Donor_Level__c,
+				'999.99 is still below the Sustainer minimum of 1000: nothing was converted.'
+			);
+			Assert.areEqual(
+				100,
+				DonorLevelService.ladder()[0].Minimum_Amount__c,
+				'The rungs keep the bounds as entered.'
+			);
+		}
+	}
+
+	@IsTest
+	static void inAMultiCurrencyOrgTotalsAndRungsAreComparedInTheCorporateCurrency() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Map<String, Donor_Level__c> byName = ladderByName();
+			DonorLevelService.testRates = new Map<String, Decimal>{ 'USD' => 1, 'EUR' => 0.5 };
+			List<Donor_Level__c> rungs = DonorLevelService.inCorporate(
+				DonorLevelSelector.selectActiveLevels(),
+				new Map<Id, String>{
+					byName.get(FRIEND).Id => 'USD',
+					byName.get(SUSTAINER).Id => 'USD',
+					byName.get(LEADERSHIP).Id => 'EUR'
+				}
+			);
+			Account household = new Account(Name = 'The Weber Family', Total_Giving__c = 600);
+
+			Boolean moved = DonorLevelService.assign(
+				household,
+				rungs,
+				DonorLevelService.DEFAULT_SOURCE_FIELD,
+				'EUR'
+			);
+
+			Assert.isTrue(moved, 'Placed');
+			Assert.areEqual(
+				byName.get(SUSTAINER).Id,
+				household.Donor_Level__c,
+				'600 EUR is 1,200 USD: Sustainer, not the Friend that 600 as entered would be.'
+			);
+			Assert.isNull(
+				DonorLevelService.levelFor(9999, rungs),
+				'Leadership Circle\'s 5,000 EUR minimum is 10,000 USD, above the Sustainer band.'
+			);
+			Assert.areEqual(
+				byName.get(LEADERSHIP).Id,
+				DonorLevelService.levelFor(10000, rungs),
+				'And 10,000 USD reaches it.'
+			);
+		}
+	}
 }

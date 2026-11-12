@@ -27,6 +27,7 @@ public with sharing class HubReminders implements Schedulable {
 	private static List<String> sentTitles = new List<String>();
 
 	private Integer sent = 0;
+	@TestVisible
 	private Date today;
 	private Integer settingDays;
 
@@ -159,7 +160,10 @@ public with sharing class HubReminders implements Schedulable {
 		return changed;
 	}
 
-	/** An agreement past its end date renews by its term, or expires. True when it changed. */
+	/**
+	 * An agreement past its end date renews by its term, or expires. True when it changed. A
+	 * month end stays a month end, so 31 January renews to 28 February, then 31 March.
+	 */
 	@TestVisible
 	private Boolean renew(Agreement__c row) {
 		if (row.End_Date__c >= today) {
@@ -171,7 +175,7 @@ public with sharing class HubReminders implements Schedulable {
 			return true;
 		}
 		while (row.End_Date__c < today) {
-			row.End_Date__c = row.End_Date__c.addMonths(months);
+			row.End_Date__c = HubCompliance.nextDue(row.End_Date__c, months);
 		}
 		return true;
 	}

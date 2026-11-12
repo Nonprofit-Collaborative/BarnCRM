@@ -265,6 +265,67 @@ private class ContactTriggerHandlerTest {
 		}
 	}
 
+	/**
+	 * A delete of more than 200 people arrives in chunks. Each chunk's before delete adds to
+	 * what the handler holds, by person, so the first chunk's households are still recounted
+	 * when a later chunk's before delete has run.
+	 */
+	@IsTest
+	static void deletingMoreThan200PeopleInJunctionModeRecountsEveryHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account first = HouseholdTestDataFactory.newHousehold('The Rivera Family');
+			Account second = HouseholdTestDataFactory.newHousehold('The Chen Family');
+			Database.insert(new List<Account>{ first, second }, AccessLevel.SYSTEM_MODE);
+			List<Contact> leaving = new List<Contact>();
+			for (Integer i = 0; i < 205; i++) {
+				leaving.add(HouseholdTestDataFactory.newContact('Mx.', 'Sam' + i, 'Rivera'));
+			}
+			Contact staysFirst = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Rivera');
+			Contact staysSecond = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Chen');
+			List<Contact> everyone = new List<Contact>(leaving);
+			everyone.add(staysFirst);
+			everyone.add(staysSecond);
+			insert everyone;
+			List<Household_Member__c> rows = new List<Household_Member__c>();
+			for (Integer i = 0; i < leaving.size(); i++) {
+				// The first chunk of 200 is all in the first household, the rest in the second.
+				Id householdId = i < 200 ? first.Id : second.Id;
+				rows.add(
+					new Household_Member__c(Household__c = householdId, Contact__c = leaving[i].Id)
+				);
+			}
+			rows.add(new Household_Member__c(Household__c = first.Id, Contact__c = staysFirst.Id));
+			rows.add(
+				new Household_Member__c(Household__c = second.Id, Contact__c = staysSecond.Id)
+			);
+			insert rows;
+
+			Test.startTest();
+			delete leaving;
+			Test.stopTest();
+
+			Map<Id, Account> after = new Map<Id, Account>(
+				[SELECT Member_Count__c FROM Account WHERE Id IN (:first.Id, :second.Id)]
+			);
+			Assert.areEqual(
+				1,
+				after.get(first.Id).Member_Count__c,
+				'The first chunk\'s household is recounted to the one person still in it'
+			);
+			Assert.areEqual(
+				1,
+				after.get(second.Id).Member_Count__c,
+				'The second chunk\'s household is recounted too'
+			);
+			Assert.areEqual(
+				2,
+				[SELECT COUNT() FROM Household_Member__c],
+				'Every departing person\'s membership row went with them'
+			);
+		}
+	}
+
 	@IsTest
 	static void restoringAContactInJunctionModePutsThemBackInTheHousehold() {
 		System.runAs(TestUsers.admin()) {

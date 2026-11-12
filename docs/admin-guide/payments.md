@@ -203,6 +203,10 @@ with no dependency on Payments: see the
   PayPal sandbox credentials fail to sign in when Mode is Live.
 - **The webhook pointed at the Salesforce login address** instead of the Site address shown on
   Payments Setup: the processor gets an error and nothing is recorded.
+- **The PayPal webhook created before the keys are saved**: until the client id, secret and
+  webhook id are saved, the PayPal address refuses every message and stores nothing. PayPal
+  retries, so save the keys soon after adding the webhook. Event types the module does not use
+  are acknowledged and not stored.
 - **Processing not scheduled, or scheduled by a user who was then deactivated**: payments stay
   Pending. Health Check reports both.
 - **Refunding in BarnCRM**: there is no refund button; refund in the processor's dashboard.

@@ -32,6 +32,10 @@ Everything is in the app. You never open Setup.
    - a **description**, optional, for what this level means and what a donor at it is
      offered;
    - **active**, which is on for a new rung.
+
+   In an org with more than one currency, a donor's total and a rung's amounts are each
+   converted to your corporate currency, at your static conversion rates, before they are
+   compared, so a rung entered in euros and a donor whose totals are in dollars still match.
 4. Repeat until your ladder is complete. There is no limit and no required number of
    rungs; four or five is usual.
 5. Back in **BarnCRM Settings**, then **Giving**, set **Donor level source**. This is

@@ -22,19 +22,15 @@
  */
 public with sharing class AccountTriggerHandler extends TriggerHandler {
 	/**
-	 * The households the people currently being deleted are leaving. Filled in
-	 * `beforeDelete` and consumed in `afterDelete`, which is also where it is emptied
-	 * again: one DML of 400 records runs the pair twice, so each half has to hand over
-	 * only its own chunk.
+	 * The membership rows the people being deleted had, read before they were removed, by
+	 * person. Filled in `beforeDelete`, and each `afterDelete` takes out only its own records:
+	 * their households are recounted, and a merge moves the rows to the survivor, since the
+	 * platform says a delete was a merge (by filling `MasterRecordId`) only after the delete,
+	 * when the rows are gone (C-20). Keyed by person and added to, never replaced: a delete of
+	 * more than 200 records arrives in chunks, and the dispatcher may run a chunk again
+	 * narrowed to the rows still standing.
 	 */
-	private static Set<Id> departingHouseholdIds = new Set<Id>();
-
-	/**
-	 * The membership rows the people being deleted had, read before they were removed. Only
-	 * a merge uses them: the platform says a delete was a merge (by filling `MasterRecordId`)
-	 * only after the delete, and by then the rows are gone (C-20, see `afterDelete`).
-	 */
-	private static List<Household_Member__c> departingMemberships = new List<Household_Member__c>();
+	private static Map<Id, List<Household_Member__c>> departingByPerson = new Map<Id, List<Household_Member__c>>();
 
 	private static final String CONTEXT = 'AccountTriggerHandler';
 
@@ -91,9 +87,11 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
 	 * delete and the undelete paths work.
 	 */
 	public override void beforeDelete() {
-		Set<Id> personIds = personIdsOf((List<Account>) oldRecords());
-		departingMemberships = HouseholdService.membershipsFor(personIds);
-		departingHouseholdIds = HouseholdService.removeMembershipsWithoutUpkeep(personIds);
+		departingByPerson.putAll(
+			HouseholdService.removeMembershipsWithoutUpkeep(
+				personIdsOf((List<Account>) oldRecords())
+			)
+		);
 	}
 
 	/**
@@ -108,10 +106,8 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
 	 */
 	public override void afterDelete() {
 		List<Account> gone = (List<Account>) oldRecords();
-		Set<Id> affected = departingHouseholdIds;
-		departingHouseholdIds = new Set<Id>();
-		List<Household_Member__c> removed = departingMemberships;
-		departingMemberships = new List<Household_Member__c>();
+		List<Household_Member__c> removed = HouseholdService.takeDeparting(departingByPerson, gone);
+		Set<Id> affected = HouseholdService.householdsOf(removed);
 
 		Map<Id, Id> survivorByMerged = survivorsOf(gone);
 		affected.addAll(

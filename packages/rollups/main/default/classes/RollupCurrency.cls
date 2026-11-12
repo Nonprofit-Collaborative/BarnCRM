@@ -17,7 +17,9 @@
  * `inherited sharing`: its one read is the conversion rates, in system mode; the rest is describe
  * calls and arithmetic, so the class needs no sharing of its own.
  */
+@NamespaceAccessible
 public inherited sharing class RollupCurrency {
+	@NamespaceAccessible
 	public static final String ISO_FIELD = 'CurrencyIsoCode';
 
 	/** Read only after `isMultiCurrency` says the org has the object. */
@@ -31,6 +33,7 @@ public inherited sharing class RollupCurrency {
 	@TestVisible
 	private static Map<String, Decimal> rateByIso;
 
+	@NamespaceAccessible
 	public static Boolean isMultiCurrency() {
 		return multiCurrencyOverride != null
 			? multiCurrencyOverride
@@ -72,7 +75,8 @@ public inherited sharing class RollupCurrency {
 		return null;
 	}
 
-	/** A value entered in this currency, in the corporate currency. */
+	/** A value entered in this currency, in the corporate currency. Also used by Giving's levels. */
+	@NamespaceAccessible
 	public static Decimal toCorporate(Decimal value, String isoCode) {
 		Decimal rate = rateFor(isoCode);
 		return value == null || rate == null || rate == 0 ? value : value / rate;

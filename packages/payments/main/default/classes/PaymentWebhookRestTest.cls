@@ -96,6 +96,7 @@ private class PaymentWebhookRestTest {
 	@IsTest
 	static void aPayPalEventIsKeptWithItsHeaders() {
 		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
 			String body = PaymentsTestData.payPalEvent(
 				'WH-7',
 				'PAYMENT.CAPTURE.COMPLETED',
@@ -129,6 +130,97 @@ private class PaymentWebhookRestTest {
 			Assert.isTrue(
 				stored.Headers__c.contains('paypal-transmission-sig'),
 				'Headers kept to verify'
+			);
+		}
+	}
+
+	private static Map<String, String> payPalHeaders() {
+		return (Map<String, String>) JSON.deserialize(
+			PaymentsTestData.payPalHeaders(),
+			Map<String, String>.class
+		);
+	}
+
+	private static Integer payPal(String body) {
+		return PaymentWebhookRest.store(request('paypal', body, payPalHeaders()), NOW);
+	}
+
+	@IsTest
+	static void nothingIsStoredForPayPalUntilItsKeysAreSaved() {
+		System.runAs(PaymentsTestData.admin()) {
+			String body = PaymentsTestData.payPalEvent(
+				'WH-6',
+				'PAYMENT.CAPTURE.COMPLETED',
+				new Map<String, Object>()
+			);
+
+			Assert.areEqual(400, payPal(body), 'Refused while PayPal is not set up');
+			Assert.areEqual(0, storedEvents(), 'Nothing stored');
+		}
+	}
+
+	@IsTest
+	static void aPayPalPostThatCannotBeAnEventItActsOnIsNotStored() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
+
+			Assert.areEqual(
+				200,
+				payPal(
+					PaymentsTestData.payPalEvent(
+						'WH-5',
+						'CUSTOMER.DISPUTE.CREATED',
+						new Map<String, Object>()
+					)
+				),
+				'A type the job does not act on is acknowledged, so PayPal stops sending it'
+			);
+			Assert.areEqual(
+				400,
+				payPal('{"id":"WH-4","event_type":"PAYMENT.CAPTURE.COMPLETED"}'),
+				'No resource'
+			);
+			Assert.areEqual(400, payPal('not json'), 'Not an event');
+			Assert.areEqual(0, storedEvents(), 'Nothing stored');
+		}
+	}
+
+	@IsTest
+	static void theHourlyCapIsCountedPerProcessor() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
+			List<Payment_Event__c> flood = new List<Payment_Event__c>();
+			for (Integer i = 0; i < PaymentWebhookRest.HOURLY_LIMIT; i++) {
+				flood.add(
+					new Payment_Event__c(
+						Processor__c = PaymentService.PAYPAL,
+						Status__c = 'Received',
+						Event_Id__c = 'WH-F' + i
+					)
+				);
+			}
+			Database.insert(flood, AccessLevel.SYSTEM_MODE);
+			String stripeBody = PaymentsTestData.stripeEvent(
+				'evt_7',
+				'charge.refunded',
+				new Map<String, Object>()
+			);
+
+			Assert.areEqual(
+				429,
+				payPal(
+					PaymentsTestData.payPalEvent(
+						'WH-3',
+						'PAYMENT.CAPTURE.COMPLETED',
+						new Map<String, Object>()
+					)
+				),
+				'PayPal is at its cap'
+			);
+			Assert.areEqual(
+				200,
+				stripe(stripeBody, PaymentsTestData.stripeSignature(stripeBody, NOW - 30)),
+				'Stripe events still arrive while PayPal posts fill PayPal\'s cap'
 			);
 		}
 	}

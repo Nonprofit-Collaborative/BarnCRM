@@ -2088,15 +2088,63 @@ public with sharing class HouseholdService {
 	/**
 	 * `removeMembershipsFor` with the membership handler stood down, for the person trigger
 	 * handlers' before delete: they recount and rename the households once, after the delete.
+	 * Answers the rows removed by the person they were for, every person named getting an
+	 * entry (empty when they had none), so that a handler adds each before delete to what it
+	 * holds instead of replacing it: a delete of more than 200 people arrives in chunks, and
+	 * the dispatcher may run a chunk again narrowed to the rows still standing.
 	 */
 	@NamespaceAccessible
-	public static Set<Id> removeMembershipsWithoutUpkeep(Set<Id> personIds) {
+	public static Map<Id, List<Household_Member__c>> removeMembershipsWithoutUpkeep(
+		Set<Id> personIds
+	) {
+		Map<Id, List<Household_Member__c>> result = new Map<Id, List<Household_Member__c>>();
+		for (Id personId : personIds) {
+			result.put(personId, new List<Household_Member__c>());
+		}
+		for (Household_Member__c row : membershipsFor(personIds)) {
+			List<Household_Member__c> rows = result.get(personOf(row));
+			if (rows != null) {
+				rows.add(row);
+			}
+		}
 		AutomationControl.bypass(MEMBER_HANDLER);
 		try {
-			return removeMembershipsFor(personIds);
+			removeMembershipsFor(personIds);
 		} finally {
 			AutomationControl.clearBypass(MEMBER_HANDLER);
 		}
+		return result;
+	}
+
+	/**
+	 * The rows `removeMembershipsWithoutUpkeep` answered for these deleted records, taken out
+	 * of what the handler holds, so that each after delete settles only its own records.
+	 */
+	@NamespaceAccessible
+	public static List<Household_Member__c> takeDeparting(
+		Map<Id, List<Household_Member__c>> held,
+		List<SObject> gone
+	) {
+		List<Household_Member__c> result = new List<Household_Member__c>();
+		for (SObject record : gone) {
+			List<Household_Member__c> rows = held.remove(record.Id);
+			if (rows != null) {
+				result.addAll(rows);
+			}
+		}
+		return result;
+	}
+
+	/** The households of these membership rows, kept for the person records' after delete. */
+	@NamespaceAccessible
+	public static Set<Id> householdsOf(List<Household_Member__c> rows) {
+		Set<Id> result = new Set<Id>();
+		for (Household_Member__c row : rows) {
+			if (row.Household__c != null) {
+				result.add(row.Household__c);
+			}
+		}
+		return result;
 	}
 
 	/**

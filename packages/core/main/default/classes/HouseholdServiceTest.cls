@@ -2736,4 +2736,48 @@ private class HouseholdServiceTest {
 			);
 		}
 	}
+
+	/**
+	 * The person handlers' delete hand-over, keyed by person: two before deletes add to what is
+	 * held, and each after delete takes out only its own records' rows.
+	 */
+	@IsTest
+	static void departingMembershipsAreHeldByPersonAcrossBeforeDeletes() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account first = HouseholdTestDataFactory.newHousehold('The Rivera Family');
+			Account second = HouseholdTestDataFactory.newHousehold('The Chen Family');
+			Database.insert(new List<Account>{ first, second }, AccessLevel.SYSTEM_MODE);
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Rivera');
+			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Chen');
+			insert new List<Contact>{ maria, wei };
+			insert new List<Household_Member__c>{
+				new Household_Member__c(Household__c = first.Id, Contact__c = maria.Id),
+				new Household_Member__c(Household__c = second.Id, Contact__c = wei.Id)
+			};
+			Map<Id, List<Household_Member__c>> held = new Map<Id, List<Household_Member__c>>();
+
+			Test.startTest();
+			held.putAll(HouseholdService.removeMembershipsWithoutUpkeep(new Set<Id>{ maria.Id }));
+			held.putAll(HouseholdService.removeMembershipsWithoutUpkeep(new Set<Id>{ wei.Id }));
+			List<Household_Member__c> firstChunk = HouseholdService.takeDeparting(
+				held,
+				new List<Contact>{ maria }
+			);
+			Test.stopTest();
+
+			Assert.areEqual(
+				new Set<Id>{ first.Id },
+				HouseholdService.householdsOf(firstChunk),
+				'The first chunk hands over only its own household, though a later chunk ran since'
+			);
+			Assert.isTrue(held.containsKey(wei.Id), 'The later chunk is still held for its own');
+			Assert.isFalse(held.containsKey(maria.Id), 'What was handed over is no longer held');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Household_Member__c],
+				'Both people\'s rows were removed'
+			);
+		}
+	}
 }

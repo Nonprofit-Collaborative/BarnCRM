@@ -70,12 +70,93 @@ public with sharing class DonorLevelService {
 		return SOURCE_FIELDS.contains(stored) ? stored : DEFAULT_SOURCE_FIELD;
 	}
 
-	/** The active rungs, lowest first, read once per transaction. */
+	/**
+	 * The active rungs, lowest first, read once per transaction. In a multi-currency org their
+	 * bounds are in the corporate currency, as the totals are compared (`inCorporate`).
+	 */
 	public static List<Donor_Level__c> ladder() {
 		if (cachedLadder == null) {
-			cachedLadder = DonorLevelSelector.selectActiveLevels();
+			List<Donor_Level__c> rungs = DonorLevelSelector.selectActiveLevels();
+			cachedLadder = inCorporate(rungs, currencies(rungs));
 		}
 		return cachedLadder;
+	}
+
+	/**
+	 * Multi-currency orgs (ADR-0083): a donor's total is in the donor record's currency and a
+	 * rung's bounds in the rung's, so both are brought to the corporate currency, at the org's
+	 * static rates, before they are compared. A single-currency org reads nothing more and
+	 * compares amounts as entered. Rates a test sets in `testRates` stand in for the org's.
+	 */
+	@TestVisible
+	private static Map<String, Decimal> testRates;
+
+	@TestVisible
+	private static Decimal toCorporate(Decimal value, String isoCode) {
+		if (testRates == null) {
+			return RollupCurrency.toCorporate(value, isoCode);
+		}
+		Decimal rate = testRates.get(isoCode);
+		return value == null || rate == null || rate == 0 ? value : value / rate;
+	}
+
+	/** These rungs with their bounds in the corporate currency, by each rung's currency. */
+	@TestVisible
+	private static List<Donor_Level__c> inCorporate(
+		List<Donor_Level__c> rungs,
+		Map<Id, String> isoById
+	) {
+		for (Donor_Level__c rung : rungs) {
+			String iso = isoById.get(rung.Id);
+			if (iso != null) {
+				rung.Minimum_Amount__c = toCorporate(rung.Minimum_Amount__c, iso);
+				rung.Maximum_Amount__c = toCorporate(rung.Maximum_Amount__c, iso);
+			}
+		}
+		return rungs;
+	}
+
+	/**
+	 * The currency of each saved record, read in system mode, only in a multi-currency org.
+	 * `CurrencyIsoCode` exists only there, so it is named as text, never compiled against.
+	 */
+	private static Map<Id, String> currencies(List<SObject> records) {
+		Map<Id, String> result = new Map<Id, String>();
+		Set<Id> ids = new Set<Id>();
+		for (SObject record : records) {
+			// A record in a save already carries it.
+			if (
+				record.Id != null &&
+				!record.getPopulatedFieldsAsMap().containsKey(RollupCurrency.ISO_FIELD)
+			) {
+				ids.add(record.Id);
+			}
+		}
+		if (ids.isEmpty() || !RollupCurrency.isMultiCurrency()) {
+			return result;
+		}
+		String query =
+			'SELECT Id, ' +
+			RollupCurrency.ISO_FIELD +
+			' FROM ' +
+			records[0].getSObjectType() +
+			' WHERE Id IN :ids';
+		for (
+			SObject row : (List<SObject>) Database.queryWithBinds(
+				query,
+				new Map<String, Object>{ 'ids' => ids },
+				AccessLevel.SYSTEM_MODE
+			)
+		) {
+			result.put(row.Id, (String) row.get(RollupCurrency.ISO_FIELD));
+		}
+		return result;
+	}
+
+	/** A record's currency: as it stands in a save, or as read for a recalculation. */
+	private static String currencyOf(SObject record, Map<Id, String> read) {
+		Object held = record.getPopulatedFieldsAsMap().get(RollupCurrency.ISO_FIELD);
+		return held != null ? (String) held : read.get(record.Id);
 	}
 
 	/** Forgets the cached ladder, for a test and for the batch between chunks. */
@@ -112,6 +193,17 @@ public with sharing class DonorLevelService {
 	 * calculation last ran (R-DL4).
 	 */
 	public static Boolean assign(SObject record, List<Donor_Level__c> rungs, String source) {
+		return assign(record, rungs, source, null);
+	}
+
+	/** The same, the record's total being in this currency (null: as the rungs are). */
+	@TestVisible
+	private static Boolean assign(
+		SObject record,
+		List<Donor_Level__c> rungs,
+		String source,
+		String isoCode
+	) {
 		if (record == null) {
 			return false;
 		}
@@ -121,7 +213,7 @@ public with sharing class DonorLevelService {
 			return false;
 		}
 		Object raw = record.get(names.get(source));
-		Decimal amount = raw == null ? null : (Decimal) raw;
+		Decimal amount = raw == null ? null : toCorporate((Decimal) raw, isoCode);
 		Id assigned = levelFor(amount, rungs);
 		Id held = (Id) record.get(names.get(FIELD_LEVEL));
 		if (assigned == held) {
@@ -145,8 +237,9 @@ public with sharing class DonorLevelService {
 		}
 		List<Donor_Level__c> rungs = ladder();
 		String source = sourceField();
+		Map<Id, String> read = currencies(records);
 		for (SObject record : records) {
-			if (assign(record, rungs, source)) {
+			if (assign(record, rungs, source, currencyOf(record, read))) {
 				moved.add(record);
 			}
 		}
