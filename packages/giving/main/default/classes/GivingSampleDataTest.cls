@@ -896,7 +896,7 @@ private class GivingSampleDataTest {
 			} catch (GivingSampleData.SampleDataException failed) {
 				threw = true;
 				System.assertEquals(
-					System.Label.Giving_SampleData_ErrorInvalidData,
+					BarnHelp.text('Giving', 'Giving_SampleData_ErrorInvalidData'),
 					failed.getMessage(),
 					'a payload that cannot be loaded says so with the packaged label'
 				);

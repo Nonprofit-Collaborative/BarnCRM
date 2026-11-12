@@ -75,7 +75,7 @@ private class GivingSmallClassesCoverageTest {
 
 			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			Assert.areEqual(
-				System.Label.Giving_NightlyJobs_OverdueNoneFound,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_OverdueNoneFound'),
 				settings.Installment_Overdue_Last_Run_Summary__c,
 				'The page says the pass ran and found nothing'
 			);
@@ -95,7 +95,7 @@ private class GivingSmallClassesCoverageTest {
 			}
 
 			Assert.areEqual(
-				System.Label.Giving_NightlyJobs_RunFailed,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_RunFailed'),
 				Giving_Settings__c.getOrgDefaults().Installment_Overdue_Last_Run_Summary__c,
 				'A pass that could not read the payments says it failed rather than claiming none were late'
 			);

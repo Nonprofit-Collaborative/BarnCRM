@@ -84,7 +84,7 @@ private class GiftImportRowTest {
 				'bad date' => read(gift('10', '2026-02-30')).error
 			};
 			Assert.areEqual(
-				Label.Giving_Import_ErrorAmountMissing,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorAmountMissing'),
 				refusals.get('no amount'),
 				'Amount required.'
 			);
@@ -93,12 +93,12 @@ private class GiftImportRowTest {
 				'Names the unreadable amount.'
 			);
 			Assert.areEqual(
-				Label.Giving_Import_ErrorAmountNotPositive,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorAmountNotPositive'),
 				refusals.get('zero'),
 				'More than zero.'
 			);
 			Assert.areEqual(
-				Label.Giving_Import_ErrorDateMissing,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorDateMissing'),
 				refusals.get('no date'),
 				'Date required.'
 			);
@@ -110,7 +110,7 @@ private class GiftImportRowTest {
 			Map<String, Map<String, String>> noType = gift('10', '2026-03-15');
 			noType.get('Gift').remove('Type__c');
 			Assert.areEqual(
-				Label.Giving_Import_ErrorTypeMissing,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorTypeMissing'),
 				read(noType).error,
 				'A payment method is required, never guessed.'
 			);
@@ -141,7 +141,7 @@ private class GiftImportRowTest {
 				}
 			);
 			Assert.areEqual(
-				Label.Giving_Import_ErrorPartsWithoutGift,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorPartsWithoutGift'),
 				row.error,
 				'Nothing to allocate.'
 			);
@@ -216,7 +216,7 @@ private class GiftImportRowTest {
 			entities.get('Allocation').put('Amount2', '40');
 			entities.get('Allocation').remove('Percent2');
 			Assert.areEqual(
-				Label.Giving_Import_ErrorSplitMixed,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorSplitMixed'),
 				read(entities).error,
 				'Not a mix.'
 			);

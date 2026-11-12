@@ -73,7 +73,8 @@ private class GiftImportReferencesTest {
 			Assert.isTrue(
 				rows[0]
 					.error.startsWith(
-						Label.Giving_Import_ErrorFundAmbiguous.substringBefore('{0}')
+						BarnHelp.text('Giving', 'Giving_Import_ErrorFundAmbiguous')
+							.substringBefore('{0}')
 					),
 				'The name is ambiguous: ' + rows[0].error
 			);

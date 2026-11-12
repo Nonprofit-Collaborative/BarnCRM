@@ -123,7 +123,7 @@ private class GivingSampleDataCoverageTest {
 				resolved = String.isNotBlank(GivingSampleData.getSampleDataJson());
 			} catch (GivingSampleData.SampleDataException missing) {
 				Assert.areEqual(
-					System.Label.Giving_SampleData_ResourceMissing,
+					BarnHelp.text('Giving', 'Giving_SampleData_ResourceMissing'),
 					missing.getMessage(),
 					'A missing resource says so in the label words'
 				);

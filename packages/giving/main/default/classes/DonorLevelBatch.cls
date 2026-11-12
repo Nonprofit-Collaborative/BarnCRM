@@ -86,7 +86,7 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 			Label.Giving_JobNotice_DonorLevels,
 			false,
 			String.format(
-				Label.Giving_JobNotice_DonorLevelsBody,
+				BarnHelp.text('Giving', 'Giving_JobNotice_DonorLevelsBody'),
 				new List<Object>{ moved.format() }
 			),
 			GIVING_SECTION

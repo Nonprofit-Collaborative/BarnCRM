@@ -239,7 +239,7 @@ public with sharing class GivingSampleDataSet {
 
 	private static GivingSampleData.SampleDataException invalidData() {
 		return new GivingSampleData.SampleDataException(
-			System.Label.Giving_SampleData_ErrorInvalidData
+			BarnHelp.text('Giving', 'Giving_SampleData_ErrorInvalidData')
 		);
 	}
 }

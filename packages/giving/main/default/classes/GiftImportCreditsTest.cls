@@ -156,7 +156,7 @@ private class GiftImportCreditsTest {
 			Import_Row__c after = row();
 			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, after.Status__c, 'Refused.');
 			Assert.areEqual(
-				Label.Giving_Import_ErrorCustomRoleMissing,
+				BarnHelp.text('Giving', 'Giving_Import_ErrorCustomRoleMissing'),
 				after.Error_Message__c,
 				'Why.'
 			);
@@ -196,12 +196,12 @@ private class GiftImportCreditsTest {
 			);
 
 			Assert.areEqual(
-				Label.Giving_Import_UndoKeptReceipted,
+				BarnHelp.text('Giving', 'Giving_Import_UndoKeptReceipted'),
 				gifts.get(gift.Id),
 				'Even void.'
 			);
 			Assert.areEqual(
-				Label.Giving_Import_UndoKeptDonor,
+				BarnHelp.text('Giving', 'Giving_Import_UndoKeptDonor'),
 				people.get(gift.Donor_Contact__c),
 				'Ana.'
 			);
@@ -231,7 +231,7 @@ private class GiftImportCreditsTest {
 				.reasonsToKeep(batch.Id, Gift__c.SObjectType, new Set<Id>{ gift.Id });
 
 			Assert.areEqual(
-				Label.Giving_Import_UndoKeptStatement,
+				BarnHelp.text('Giving', 'Giving_Import_UndoKeptStatement'),
 				keep.get(gift.Id),
 				'The 2026 statement.'
 			);

@@ -143,7 +143,7 @@ public with sharing class DonationMatcher {
 				!item.repeatsEarlierChunk
 			) {
 				item.error = String.format(
-					Label.Giving_Import_ErrorExternalIdRepeated,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorExternalIdRepeated'),
 					new List<String>{ item.externalId }
 				);
 			}
@@ -190,12 +190,12 @@ public with sharing class DonationMatcher {
 			List<Installment__c> closest = closest(item, candidates, claimed);
 			if (closest.size() > 1) {
 				item.error = String.format(
-					Label.Giving_Import_ErrorMatchTie,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorMatchTie'),
 					new List<String>{ describe(closest[0]), describe(closest[1]) }
 				);
 			} else if (closest.size() == 1 && behaviour == NEVER_MATCH) {
 				item.error = String.format(
-					Label.Giving_Import_ErrorNeverMatchInstallment,
+					BarnHelp.text('Giving', 'Giving_Import_ErrorNeverMatchInstallment'),
 					new List<String>{ describe(closest[0]) }
 				);
 			} else if (closest.size() == 1) {
@@ -204,7 +204,7 @@ public with sharing class DonationMatcher {
 				claimed.add(closest[0].Id);
 				matched++;
 			} else if (behaviour == MATCH_ONLY) {
-				item.error = Label.Giving_Import_ErrorMatchOnlyNone;
+				item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorMatchOnlyNone');
 			}
 		}
 		return matched;

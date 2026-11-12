@@ -111,7 +111,7 @@ public with sharing class HealthCheckGivingChecks {
 			return new HealthCheckService.Finding(
 					'receipt_generation_failed_once',
 					Label.Giving_HealthCheck_ReceiptFailedOneTitle,
-					Label.Giving_HealthCheck_ReceiptFailedOneDetail,
+					BarnHelp.text('Giving', 'Giving_HealthCheck_ReceiptFailedOneDetail'),
 					HealthCheckService.SEVERITY_INFO,
 					HealthCheckService.CATEGORY_SETTINGS
 				)
@@ -128,7 +128,10 @@ public with sharing class HealthCheckGivingChecks {
 		return new HealthCheckService.Finding(
 				'receipt_generation_failed',
 				String.format(Label.Giving_HealthCheck_ReceiptFailedManyTitle, count),
-				String.format(Label.Giving_HealthCheck_ReceiptFailedManyDetail, count),
+				String.format(
+					BarnHelp.text('Giving', 'Giving_HealthCheck_ReceiptFailedManyDetail'),
+					count
+				),
 				HealthCheckService.SEVERITY_WARNING,
 				HealthCheckService.CATEGORY_SETTINGS
 			)
@@ -149,7 +152,7 @@ public with sharing class HealthCheckGivingChecks {
 		}
 
 		String detail = String.format(
-			Label.Giving_HealthCheck_OverrideLockDetail,
+			BarnHelp.text('Giving', 'Giving_HealthCheck_OverrideLockDetail'),
 			new List<Object>{ holderList(holders) }
 		);
 		return new HealthCheckService.Finding(
@@ -207,7 +210,7 @@ public with sharing class HealthCheckGivingChecks {
 			  )
 			: count.format();
 
-		String text = Label.Giving_HealthCheck_UnpostedClosedPeriodDetail;
+		String text = BarnHelp.text('Giving', 'Giving_HealthCheck_UnpostedClosedPeriodDetail');
 		if (!first.isEmpty()) {
 			text +=
 				' ' +

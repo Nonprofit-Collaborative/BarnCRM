@@ -54,7 +54,7 @@ public with sharing class InstallmentTopUpBatch implements Database.Batchable<SO
 
 	private String summary() {
 		return String.format(
-			System.Label.Giving_NightlyJobs_TopUpSummaryFormat,
+			BarnHelp.text('Giving', 'Giving_NightlyJobs_TopUpSummaryFormat'),
 			new List<String>{ String.valueOf(processed), String.valueOf(failedChunks) }
 		);
 	}

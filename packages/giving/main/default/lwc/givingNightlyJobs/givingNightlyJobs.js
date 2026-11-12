@@ -11,14 +11,9 @@ import TITLE from '@salesforce/label/c.Giving_NightlyJobs_Title';
 import LAST_RUN_HEADING from '@salesforce/label/c.Core_ErrorDigest_LastRunTitle';
 import NEXT_RUN_HEADING from '@salesforce/label/c.Giving_NightlyJobs_NextRunHeading';
 import NEVER_RUN from '@salesforce/label/c.Giving_PledgeReminders_NeverRun';
-import NOT_SCHEDULED from '@salesforce/label/c.Giving_NightlyJobs_NotScheduled';
-import SCHEDULE_ACTIVE from '@salesforce/label/c.Giving_NightlyJobs_ScheduleActive';
 import SCHEDULE_BUTTON from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
 import STOP_BUTTON from '@salesforce/label/c.Giving_NightlyJobs_StopButton';
 import RUN_NOW from '@salesforce/label/c.Giving_NightlyJobs_RunNow';
-import RUN_NOW_STARTED from '@salesforce/label/c.Giving_NightlyJobs_RunNowStarted';
-import STALE from '@salesforce/label/c.Giving_NightlyJobs_Stale';
-import READ_ONLY from '@salesforce/label/c.Giving_NightlyJobs_ReadOnly';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -52,8 +47,12 @@ export default class GivingNightlyJobs extends LightningElement {
     nextRunHeading: NEXT_RUN_HEADING,
     neverRun: NEVER_RUN,
     runNow: RUN_NOW,
-    stale: STALE,
-    readOnly: READ_ONLY
+    get stale() {
+      return helpText('Giving', 'Giving_NightlyJobs_Stale');
+    },
+    get readOnly() {
+      return helpText('Giving', 'Giving_NightlyJobs_ReadOnly');
+    }
   };
 
   view;
@@ -98,7 +97,9 @@ export default class GivingNightlyJobs extends LightningElement {
   }
 
   get scheduleMessage() {
-    return this.isScheduled ? SCHEDULE_ACTIVE : NOT_SCHEDULED;
+    return this.isScheduled
+      ? helpText('Giving', 'Giving_NightlyJobs_ScheduleActive')
+      : helpText('Giving', 'Giving_NightlyJobs_NotScheduled');
   }
 
   get scheduleButtonLabel() {
@@ -127,7 +128,7 @@ export default class GivingNightlyJobs extends LightningElement {
   }
 
   handleRunNow() {
-    this.runAction(runNow(), RUN_NOW_STARTED);
+    this.runAction(runNow(), helpText('Giving', 'Giving_NightlyJobs_RunNowStarted'));
   }
 
   async runAction(promise, notice) {

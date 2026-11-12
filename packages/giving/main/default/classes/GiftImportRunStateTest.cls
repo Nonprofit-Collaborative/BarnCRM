@@ -94,6 +94,9 @@ private class GiftImportRunStateTest {
 			List<Integer> carried = new List<Integer>();
 
 			System.runAs(maria()) {
+				// BarnHelp reads the message catalog once per transaction: read it first, so
+				// each row counts only its own queries.
+				BarnHelp.text('Giving', 'Giving_Import_ErrorExternalIdRepeated');
 				Test.startTest();
 				ImportEntityProcessors.carriedState = null;
 				for (Import_Row__c row : ImportTestDataFactory.reload(batch.Id)) {

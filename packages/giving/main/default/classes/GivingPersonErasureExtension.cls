@@ -58,7 +58,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 				WHERE Donor_Contact__c IN :contacts OR Donor_Account__c IN :accounts
 				WITH SYSTEM_MODE
 			],
-			Label.Giving_Erase_GiftsKept
+			BarnHelp.text('Giving', 'Giving_Erase_GiftsKept')
 		);
 		changes.addAll(deleteHouseholdCredits(contacts, accounts));
 		kept(
@@ -70,7 +70,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 				WHERE Contact__c IN :contacts OR Account__c IN :accounts
 				WITH SYSTEM_MODE
 			],
-			Label.Giving_Erase_GiftsKept
+			BarnHelp.text('Giving', 'Giving_Erase_GiftsKept')
 		);
 		kept(
 			changes,
@@ -81,7 +81,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 				WHERE Donor_Contact__c IN :contacts OR Donor_Account__c IN :accounts
 				WITH SYSTEM_MODE
 			],
-			Label.Giving_Erase_GiftsKept
+			BarnHelp.text('Giving', 'Giving_Erase_GiftsKept')
 		);
 		kept(
 			changes,
@@ -92,7 +92,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 				WHERE Donor_Contact__c IN :contacts OR Donor_Account__c IN :accounts
 				WITH SYSTEM_MODE
 			],
-			Label.Giving_Erase_ReceiptsKept
+			BarnHelp.text('Giving', 'Giving_Erase_ReceiptsKept')
 		);
 
 		changes.addAll(eraseTributes(contacts, accounts));
