@@ -36,7 +36,24 @@
             icon-name="utility:print"
             disabled={cannotDownload}
             onclick={handlePrintable}
+            class="slds-var-m-right_small"
           ></lightning-button>
+          <lightning-button
+            data-id="report-pdf"
+            label={labels.reportPdf}
+            icon-name="utility:download"
+            disabled={pdfDisabled}
+            onclick={handlePdf}
+          ></lightning-button>
+          <template lwc:if={pdfError}>
+            <p
+              data-id="report-pdf-error"
+              class="slds-text-color_error slds-var-m-top_x-small"
+              role="alert"
+            >
+              {pdfError}
+            </p>
+          </template>
           <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">
             {labels.reportPrintHelp}
           </p>

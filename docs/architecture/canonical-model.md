@@ -12080,7 +12080,10 @@ heap limit it stops and writes Source Status instead of a wrong number.
 column, part and indicator order, with its baseline and, per period, the target, result and
 progress (R-IN2). Periods of different indicators with the same start and end dates are one
 period. The report is worked out in the browser from the model as the user can read it; it stores
-nothing and exports as CSV or one printable HTML page.
+nothing and exports as CSV or one printable HTML page, or (release 1.19, L-04b) that same page as
+a PDF: `LogicModelBuilderController.reportPdf` renders it with `Blob.toPdf` (ADR-0016) and
+returns it as base64, refusing a page with a tag or attribute that loads anything from elsewhere
+or a style that imports or fetches; it reads and saves nothing.
 
 ### Salesforce implementation
 
@@ -17259,6 +17262,7 @@ mirrors the primary member).
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
 | 1.25 | 2026-11-11 | Programs sample data for goals, cohorts and sessions (release 1.19, P-10 and P-11 follow-up, D-168). 29ZA's sample data paragraph: the load gains two stages (a cohort with three sessions and attendance, then a goal with two steps per person Enrolled in tutoring); the removal deletes sample sessions and cohorts nothing refers to before the programs. No object or field added. |
 | 1.26 | 2026-11-11 | Person-field eligibility rules (release 1.19, P-14b, D-168 follow-up). R-EN8 and 29Y's Eligibility Rules: a condition's `field` may also be a path through the enrollment's Contact lookup (`Contact__r.<Contact field>`), offered for every readable Contact field of a rule type and read blank for an enrollment of an Account. Where Used matches rule fields as paths. No object or field added. |
+| 1.27 | 2026-11-11 | Logic model report PDF (release 1.19, L-04b, D-168 follow-up). R-IN7: the printable page also downloads as a PDF rendered by `Blob.toPdf` through `LogicModelBuilderController.reportPdf`; the page prints landscape. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

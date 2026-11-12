@@ -254,6 +254,9 @@ export const LABELS = Object.freeze({
   reportChooseOne: REPORT_CHOOSE_ONE,
   reportDownloadCsv: REPORT_DOWNLOAD_CSV,
   reportPrintable: REPORT_PRINTABLE,
+  get reportPdf() {
+    return helpText('LogicModels', 'LogicModels_Report_Pdf');
+  },
   get reportPrintHelp() {
     return helpText('LogicModels', 'LogicModels_Report_PrintHelp');
   },

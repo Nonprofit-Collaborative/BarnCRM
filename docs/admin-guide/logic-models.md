@@ -299,7 +299,10 @@ you choose, the target, the result and the progress (**Met** or a percent).
 - **Download CSV** saves the report as a spreadsheet: Column, Part, Indicator, Unit, Better When,
   Baseline and Baseline Date, then a Target, Result and Progress column for each period.
 - **Download Printable Report** saves one web page with the table and the model's name. Open it
-  in your browser and print it, or print it to PDF, to send to a funder.
+  in your browser and print it.
+- **Download PDF** saves the same page as a PDF, landscape, ready to send to a funder. Salesforce's
+  own PDF service makes it (the one that makes Giving's receipts); nothing is stored and nothing
+  is sent anywhere else.
 
 Everyone who can open the model can see and download its report, including Read Only users. The
 report shows only what the person can read and stores nothing. Nothing needs setting up.
@@ -345,7 +348,7 @@ Do this as Maria, who holds the Admin role.
     **Result** box is read only.
 12. Scroll to **Logic Model Report**. Each indicator has a row with its baseline, and each chosen
     period its target, result and progress. Untick a period: its columns go. Click **Download
-    Printable Report**, open the file and print it.
+    Printable Report**, open the file and print it, then click **Download PDF** and open the PDF.
 
 ## Common Mistakes
 

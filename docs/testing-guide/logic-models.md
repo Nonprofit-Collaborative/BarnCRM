@@ -143,7 +143,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 
 ## T-LM-09: The Logic Model Report
 
-**Purpose:** confirm the report compares chosen periods and downloads as CSV and a printable page.
+**Purpose:** confirm the report compares chosen periods and downloads as CSV, a printable page and a PDF.
 **Prerequisites:** staff and read-only, the model from T-LM-03. On `Students reading daily` add
 periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2026 Q4` and
 `2027 Q1` (three months each, target 30, no result).
@@ -155,9 +155,9 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 3 | Add a period with `2026 Q2`'s dates to another indicator, named `Spring`. | The report still lists one period for those dates; the other indicator's row fills its cells. An indicator without a period shows empty cells. |
 | 4 | Change a result in the builder and save. | The report shows the new result without reloading; the ticked periods stay ticked. |
 | 5 | Click **Download CSV**. Open the file. | Columns `Column`, `Part`, `Indicator`, `Unit`, `Better When`, `Baseline`, `Baseline Date`, then `Target`, `Result`, `Progress` for each ticked period, headed with its name. |
-| 6 | Click **Download Printable Report**, open the file in a browser and print preview. | The model's name, whose model it is, today's date and the table; the header repeats on each printed page. |
-| 7 | Untick every period. | `Choose at least one period to compare.` shows; both download buttons are disabled. |
-| 8 | As read-only, open the model. | The report shows and both downloads work. |
+| 6 | Click **Download Printable Report**, open the file in a browser and print preview. Then click **Download PDF** and open the PDF. | The model's name, whose model it is, today's date and the table; the header repeats on each printed page; the print preview is landscape. The PDF (`Logic_Model_Report-<date>.pdf`) shows the same title, line and table, landscape, with values such as `<held>` in a part name shown as typed. |
+| 7 | Untick every period. | `Choose at least one period to compare.` shows; all three download buttons are disabled. |
+| 8 | As read-only, open the model. | The report shows and all three downloads work. |
 
 **Cleanup:** None.
 
