@@ -95,17 +95,19 @@ public with sharing class MatchingGiftService {
 			Gift__c partner = giftById.get(partnerId);
 			Gift__c record = byId.get(giftId);
 			if (edited == null || partner == null) {
-				record.addError(Label.Giving_MatchingGift_GiftNotFound);
+				record.addError(BarnHelp.text('Giving', 'Giving_MatchingGift_GiftNotFound'));
 				continue;
 			}
 			if (giftId == partnerId) {
-				record.addError(Label.Giving_MatchingGift_SameGift);
+				record.addError(BarnHelp.text('Giving', 'Giving_MatchingGift_SameGift'));
 				continue;
 			}
 			Gift__c employerGift = isOrganizationGift(edited) ? edited : partner;
 			Gift__c employeeGift = employerGift.Id == edited.Id ? partner : edited;
 			if (!isOrganizationGift(employerGift)) {
-				record.addError(Label.Giving_MatchingGift_EmployerMustBeOrganization);
+				record.addError(
+					BarnHelp.text('Giving', 'Giving_MatchingGift_EmployerMustBeOrganization')
+				);
 				continue;
 			}
 			String problem = problemWith(employerGift, employeeGift);
@@ -280,23 +282,23 @@ public with sharing class MatchingGiftService {
 	 */
 	private static String problemWith(Gift__c employerGift, Gift__c employeeGift) {
 		if (employerGift.Id == employeeGift.Id) {
-			return Label.Giving_MatchingGift_SameGift;
+			return BarnHelp.text('Giving', 'Giving_MatchingGift_SameGift');
 		}
 		if (isOrganizationGift(employeeGift) || donorPersonOf(employeeGift) == null) {
-			return Label.Giving_MatchingGift_EmployeeMustBePerson;
+			return BarnHelp.text('Giving', 'Giving_MatchingGift_EmployeeMustBePerson');
 		}
 		if (
 			linkedElsewhere(employeeGift, employerGift.Id) ||
 			linkedElsewhere(employerGift, employeeGift.Id)
 		) {
-			return Label.Giving_MatchingGift_AlreadyLinked;
+			return BarnHelp.text('Giving', 'Giving_MatchingGift_AlreadyLinked');
 		}
 		if (isClosedOut(employerGift) || isClosedOut(employeeGift)) {
-			return Label.Giving_MatchingGift_GiftNotReceived;
+			return BarnHelp.text('Giving', 'Giving_MatchingGift_GiftNotReceived');
 		}
 		Id statedEmployerId = employerOf(employeeGift);
 		if (statedEmployerId != null && statedEmployerId != employerGift.Donor_Account__c) {
-			return Label.Giving_MatchingGift_EmployerMismatch;
+			return BarnHelp.text('Giving', 'Giving_MatchingGift_EmployerMismatch');
 		}
 		return null;
 	}

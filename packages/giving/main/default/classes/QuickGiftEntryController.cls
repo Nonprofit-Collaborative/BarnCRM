@@ -721,7 +721,12 @@ public with sharing class QuickGiftEntryController {
 				);
 			}
 			if (asPersonId(this.honoreeId) == null && String.isBlank(this.honoreeName)) {
-				errors.add(new FieldError('honoree', Label.Giving_Tribute_HonoreeRequired));
+				errors.add(
+					new FieldError(
+						'honoree',
+						BarnHelp.text('Giving', 'Giving_Tribute_HonoreeRequired')
+					)
+				);
 			}
 		}
 

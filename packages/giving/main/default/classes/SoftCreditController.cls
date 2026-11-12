@@ -47,7 +47,7 @@ public with sharing class SoftCreditController {
 	@AuraEnabled(cacheable=true)
 	public static SoftCreditPanel getCredits(Id giftId) {
 		if (giftId == null) {
-			throw UserErrors.message(Label.Giving_SoftCredit_GiftRequired);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredit_GiftRequired'));
 		}
 		try {
 			return panelFor(giftId);
@@ -69,10 +69,10 @@ public with sharing class SoftCreditController {
 		Decimal amount
 	) {
 		if (giftId == null) {
-			throw UserErrors.message(Label.Giving_SoftCredit_GiftRequired);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredit_GiftRequired'));
 		}
 		if (personId == null) {
-			throw UserErrors.message(Label.Giving_SoftCredit_OneCreditedParty);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredit_OneCreditedParty'));
 		}
 		try {
 			Soft_Credit__c credit = new Soft_Credit__c(
@@ -102,14 +102,16 @@ public with sharing class SoftCreditController {
 	@AuraEnabled
 	public static SoftCreditPanel removeCredit(Id softCreditId) {
 		if (softCreditId == null) {
-			throw UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 		}
 		try {
 			List<Soft_Credit__c> found = SoftCreditSelector.selectByIds(
 				new Set<Id>{ softCreditId }
 			);
 			if (found.isEmpty()) {
-				throw UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
+				throw UserErrors.message(
+					BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed')
+				);
 			}
 			Soft_Credit__c credit = found[0];
 			if (credit.Is_Automatic__c == true) {
@@ -157,6 +159,6 @@ public with sharing class SoftCreditController {
 
 	private static AuraHandledException report(Exception failure, Id recordId) {
 		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(Label.Giving_SoftCredits_ActionFailed);
+		return UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 	}
 }

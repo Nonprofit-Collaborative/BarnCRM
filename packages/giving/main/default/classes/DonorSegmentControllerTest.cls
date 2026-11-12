@@ -232,13 +232,19 @@ private class DonorSegmentControllerTest {
 				DonorSegmentController.exportPage(segmentId, 'mailchimp', null);
 				Assert.fail('An email layout needs people.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(System.Label.Giving_Segments_ErrorPeopleOnly, messageOf(refused));
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Segments_ErrorPeopleOnly'),
+					messageOf(refused)
+				);
 			}
 			try {
 				DonorSegmentController.exportPage(segmentId, 'fax', null);
 				Assert.fail('Only the three layouts exist.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(System.Label.Giving_Segments_ErrorLayout, messageOf(refused));
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Segments_ErrorLayout'),
+					messageOf(refused)
+				);
 			}
 		}
 	}
@@ -253,10 +259,10 @@ private class DonorSegmentControllerTest {
 			);
 			insert gifts;
 			Map<String, String> expected = new Map<String, String>{
-				'gifts' => System.Label.Giving_Segments_ErrorNotSegment,
-				'missing' => System.Label.Giving_Segments_ErrorNotFound,
-				'name' => System.Label.Giving_Segments_ErrorName,
-				'template' => System.Label.Giving_Segments_ErrorTemplate
+				'gifts' => BarnHelp.text('Giving', 'Giving_Segments_ErrorNotSegment'),
+				'missing' => BarnHelp.text('Giving', 'Giving_Segments_ErrorNotFound'),
+				'name' => BarnHelp.text('Giving', 'Giving_Segments_ErrorName'),
+				'template' => BarnHelp.text('Giving', 'Giving_Segments_ErrorTemplate')
 			};
 			for (String attempt : expected.keySet()) {
 				try {
@@ -292,7 +298,10 @@ private class DonorSegmentControllerTest {
 				DonorSegmentController.getPage();
 				Assert.fail('Segments are Find queries, so Find is required (R-DS6).');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(System.Label.Giving_Segments_ErrorNoPermission, messageOf(refused));
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Segments_ErrorNoPermission'),
+					messageOf(refused)
+				);
 			}
 		}
 	}

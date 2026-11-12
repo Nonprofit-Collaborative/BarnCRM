@@ -550,7 +550,11 @@ private class QuickGiftEntryControllerTest {
 			Map<String, String> messages = messagesByField(result.fieldErrors);
 			Assert.isFalse(result.success, 'Refused.');
 			Assert.isTrue(messages.containsKey('tributeType'), 'Asks for the type.');
-			Assert.areEqual(Label.Giving_Tribute_HonoreeRequired, messages.get('honoree'), 'Who.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Tribute_HonoreeRequired'),
+				messages.get('honoree'),
+				'Who.'
+			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c WITH SYSTEM_MODE], 'No gift.');
 		}
 	}

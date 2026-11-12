@@ -33,7 +33,6 @@ import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
 import ORGANIZATIONS from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
 import NAME_FIELD from '@salesforce/label/c.Giving_Segments_NameField';
 import SAVE_AS_SEGMENT from '@salesforce/label/c.Giving_Segments_SaveAsSegment';
-import SAVED from '@salesforce/label/c.Giving_Segments_Saved';
 import SEGMENTS_HEADING from '@salesforce/label/c.Giving_Segments_SegmentsHeading';
 import EMPTY_HEADING from '@salesforce/label/c.Giving_Segments_EmptyHeading';
 import SEGMENT_FIELD from '@salesforce/label/c.Giving_Segments_SegmentField';
@@ -42,18 +41,13 @@ import OPTION_SHARED from '@salesforce/label/c.Giving_Segments_OptionShared';
 import COUNT from '@salesforce/label/c.Giving_Segments_Count';
 import COUNT_MORE from '@salesforce/label/c.Giving_Segments_CountMore';
 import SHOW_LIST from '@salesforce/label/c.Giving_Segments_ShowList';
-import LIST_SHOWN from '@salesforce/label/c.Giving_Segments_ListShown';
 import LAYOUT_FIELD from '@salesforce/label/c.Giving_Segments_LayoutField';
 import LAYOUT_MAILCHIMP from '@salesforce/label/c.Giving_Segments_LayoutMailchimp';
 import LAYOUT_CONSTANT_CONTACT from '@salesforce/label/c.Giving_Segments_LayoutConstantContact';
 import LAYOUT_ALL from '@salesforce/label/c.Giving_Segments_LayoutAll';
 import EXPORT from '@salesforce/label/c.Core_Find_ExportMenu';
-import EXPORTING from '@salesforce/label/c.Giving_Segments_Exporting';
 import EXPORTED from '@salesforce/label/c.Core_Find_ExportDone';
-import EXPORTED_DUPLICATES from '@salesforce/label/c.Giving_Segments_ExportedDuplicates';
-import LIMIT_REACHED from '@salesforce/label/c.Giving_Segments_LimitReached';
 import EDIT_IN_FIND from '@salesforce/label/c.Giving_Segments_EditInFind';
-import EMAIL_PEOPLE_ONLY from '@salesforce/label/c.Giving_Segments_EmailPeopleOnly';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PEOPLE_OBJECT = 'Contact';
@@ -82,7 +76,9 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
     layoutField: LAYOUT_FIELD,
     export: EXPORT,
     editInFind: EDIT_IN_FIND,
-    emailPeopleOnly: EMAIL_PEOPLE_ONLY
+    get emailPeopleOnly() {
+      return helpText('Giving', 'Giving_Segments_EmailPeopleOnly');
+    }
   };
 
   loaded = false;
@@ -214,7 +210,10 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
         objectName: this.objectName,
         name: this.segmentName
       });
-      this.noticeMessage = format(SAVED, this.segmentName.trim());
+      this.noticeMessage = format(
+        helpText('Giving', 'Giving_Segments_Saved'),
+        this.segmentName.trim()
+      );
       this.segmentId = undefined;
       this.applyPage(page, page.savedId);
     } catch (error) {
@@ -325,7 +324,7 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
         }
         return shown;
       });
-      this.listText = format(LIST_SHOWN, this.listRows.length);
+      this.listText = format(helpText('Giving', 'Giving_Segments_ListShown'), this.listRows.length);
     } catch (error) {
       this.errorMessage = messageFrom(error);
     } finally {
@@ -359,7 +358,10 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
         columns = columns || columnsFor(layout, page.columns);
         read += page.rows.length;
         rows.push(...collector.add(page.rows));
-        this.noticeMessage = format(EXPORTING, read.toLocaleString());
+        this.noticeMessage = format(
+          helpText('Giving', 'Giving_Segments_Exporting'),
+          read.toLocaleString()
+        );
         afterId = page.lastId;
         if (rows.length >= this.exportLimit) {
           limited = !page.done || rows.length > this.exportLimit;
@@ -372,10 +374,14 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
       }
       downloadCsv(`${segment.name}-${layout}`, columns, rows);
       const done = collector.duplicates
-        ? format(EXPORTED_DUPLICATES, rows.length.toLocaleString(), collector.duplicates)
+        ? format(
+            helpText('Giving', 'Giving_Segments_ExportedDuplicates'),
+            rows.length.toLocaleString(),
+            collector.duplicates
+          )
         : format(EXPORTED, rows.length.toLocaleString());
       this.noticeMessage = limited
-        ? `${done} ${format(LIMIT_REACHED, Number(this.exportLimit).toLocaleString())}`
+        ? `${done} ${format(helpText('Giving', 'Giving_Segments_LimitReached'), Number(this.exportLimit).toLocaleString())}`
         : done;
     } catch (error) {
       this.noticeMessage = undefined;

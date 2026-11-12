@@ -78,13 +78,17 @@ public with sharing class PledgeReminderService {
 
 	public static void requireEnabled() {
 		if (!isEnabled()) {
-			throw new PledgeReminderException(Label.Giving_PledgeReminders_Disabled);
+			throw new PledgeReminderException(
+				BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled')
+			);
 		}
 	}
 
 	public static void requireSendPermission() {
 		if (!AcknowledgmentService.canSend()) {
-			throw new PledgeReminderException(Label.Giving_PledgeReminders_NoPermission);
+			throw new PledgeReminderException(
+				BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission')
+			);
 		}
 	}
 
@@ -247,7 +251,9 @@ public with sharing class PledgeReminderService {
 			return Database.executeBatch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE);
 		} catch (Exception queueFailure) {
 			ErrorLogger.log(queueFailure, CONTEXT_START);
-			throw new PledgeReminderException(Label.Giving_Stewardship_ErrorActionFailed);
+			throw new PledgeReminderException(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
+			);
 		}
 	}
 
@@ -270,7 +276,7 @@ public with sharing class PledgeReminderService {
 		if (counts.withoutRecipient > 0) {
 			ErrorLogger.logMessage(
 				String.format(
-					Label.Giving_PledgeReminders_NoRecipient,
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_NoRecipient'),
 					new List<String>{ String.valueOf(counts.withoutRecipient) }
 				),
 				CONTEXT_SEND,
@@ -370,7 +376,7 @@ public with sharing class PledgeReminderService {
 			if (templateId == null) {
 				row.Status__c = STATUS_FAILED;
 				row.Failure_Reason__c = String.format(
-					Label.Giving_PledgeReminders_TemplateNotFound,
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_TemplateNotFound'),
 					new List<String>{ String.valueOf(row.Template__c) }
 				);
 				row.Reminder_Key__c = null;
@@ -393,7 +399,7 @@ public with sharing class PledgeReminderService {
 			PledgeReminderWriter.updateReminders(unsendable);
 			ErrorLogger.logMessage(
 				String.format(
-					Label.Giving_PledgeReminders_TemplatesMissing,
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_TemplatesMissing'),
 					new List<String>{ String.valueOf(unsendable.size()) }
 				),
 				CONTEXT_SEND,

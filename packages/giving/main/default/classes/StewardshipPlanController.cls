@@ -132,7 +132,9 @@ public with sharing class StewardshipPlanController {
 	public static Id saveTemplate(TemplateModel template) {
 		requireEdit();
 		if (template == null || String.isBlank(template.name)) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorNameRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNameRequired')
+			);
 		}
 		Stewardship_Plan_Template__c record = new Stewardship_Plan_Template__c(
 			Id = template.recordId,
@@ -160,7 +162,9 @@ public with sharing class StewardshipPlanController {
 	public static void setActive(Id templateId, Boolean active) {
 		requireEdit();
 		if (templateId == null) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
+			);
 		}
 		save(new Stewardship_Plan_Template__c(Id = templateId, Active__c = active == true));
 	}
@@ -170,10 +174,14 @@ public with sharing class StewardshipPlanController {
 	public static Id saveStep(Id templateId, StepModel step) {
 		requireEdit();
 		if (step == null || String.isBlank(step.subject)) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorSubjectRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorSubjectRequired')
+			);
 		}
 		if (step.recordId == null && templateId == null) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
+			);
 		}
 		Stewardship_Plan_Step__c record = new Stewardship_Plan_Step__c(
 			Id = step.recordId,
@@ -202,7 +210,9 @@ public with sharing class StewardshipPlanController {
 	public static void deleteStep(Id stepId) {
 		requireEdit();
 		if (stepId == null) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
+			);
 		}
 		try {
 			Database.delete(new Stewardship_Plan_Step__c(Id = stepId), true, AccessLevel.USER_MODE);
@@ -222,7 +232,9 @@ public with sharing class StewardshipPlanController {
 	public static void reorderSteps(Id templateId, List<Id> stepIds) {
 		requireEdit();
 		if (templateId == null || stepIds == null || stepIds.isEmpty()) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
+			);
 		}
 		Set<Id> owned = new Map<Id, Stewardship_Plan_Step__c>(
 				StewardshipSelector.selectStepsFor(templateId)
@@ -347,7 +359,9 @@ public with sharing class StewardshipPlanController {
 
 	private static void requireEdit() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw UserErrors.message(Label.Giving_Stewardship_ErrorNotPermitted);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNotPermitted')
+			);
 		}
 	}
 
@@ -358,6 +372,6 @@ public with sharing class StewardshipPlanController {
 
 	private static AuraHandledException report(Exception failure) {
 		ErrorLogger.log(failure, CONTEXT);
-		return UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
+		return UserErrors.message(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed'));
 	}
 }

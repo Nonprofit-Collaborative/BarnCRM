@@ -225,7 +225,7 @@ private class StewardshipServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				System.Label.Giving_Stewardship_ErrorAlreadyRunning,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning'),
 				message,
 				'A person who pressed a button is told why nothing happened (R-SP6).'
 			);
@@ -252,7 +252,7 @@ private class StewardshipServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				System.Label.Giving_Stewardship_ErrorOneDonor,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorOneDonor'),
 				message,
 				'A plan runs for one donor, never for nobody.'
 			);

@@ -361,7 +361,7 @@ public with sharing class AcknowledgmentController {
 			ours,
 			context,
 			recordId,
-			Label.Giving_Stewardship_ErrorActionFailed
+			BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
 		);
 	}
 }

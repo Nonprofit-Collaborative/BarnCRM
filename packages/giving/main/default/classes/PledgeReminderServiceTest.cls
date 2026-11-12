@@ -169,7 +169,10 @@ private class PledgeReminderServiceTest {
 				PledgeReminderService.startRun();
 				Assert.fail('A run cannot start while reminders are off.');
 			} catch (PledgeReminderService.PledgeReminderException refused) {
-				Assert.areEqual(Label.Giving_PledgeReminders_Disabled, refused.getMessage());
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'),
+					refused.getMessage()
+				);
 			}
 		}
 	}
@@ -183,7 +186,10 @@ private class PledgeReminderServiceTest {
 				PledgeReminderService.startRun();
 				Assert.fail('Sending needs the Send Acknowledgments permission.');
 			} catch (PledgeReminderService.PledgeReminderException refused) {
-				Assert.areEqual(Label.Giving_PledgeReminders_NoPermission, refused.getMessage());
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_PledgeReminders_NoPermission'),
+					refused.getMessage()
+				);
 			}
 		}
 	}

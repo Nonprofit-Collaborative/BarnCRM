@@ -17,7 +17,6 @@ import PERSON_LABEL from '@salesforce/label/c.Giving_SoftCredits_PersonLabel';
 import ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_RoleLabel';
 import CUSTOM_ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_CustomRoleLabel';
 import AMOUNT_LABEL from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
-import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
 import EMPTY_HEADING from '@salesforce/label/c.Giving_SoftCredits_EmptyHeading';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -109,7 +108,10 @@ export default class GiftSoftCredits extends LightningElement {
       this.panel = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_SoftCredits_ActionFailed')
+      );
     }
   }
 
@@ -195,7 +197,10 @@ export default class GiftSoftCredits extends LightningElement {
         return refreshApex(this.wiredPanel);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_SoftCredits_ActionFailed')
+        );
       })
       .finally(() => {
         this.busy = false;
@@ -212,7 +217,10 @@ export default class GiftSoftCredits extends LightningElement {
         return refreshApex(this.wiredPanel);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_SoftCredits_ActionFailed')
+        );
       })
       .finally(() => {
         this.busy = false;

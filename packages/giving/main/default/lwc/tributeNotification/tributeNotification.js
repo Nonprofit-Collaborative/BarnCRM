@@ -9,7 +9,6 @@ import MARK_SENT from '@salesforce/label/c.Giving_TributeNotification_MarkSent';
 import SENT from '@salesforce/label/c.Giving_TributeNotification_Sent';
 import NOT_SENT from '@salesforce/label/c.Giving_TributeNotification_NotSent';
 import NOTIFY_PREFIX from '@salesforce/label/c.Giving_TributeNotification_NotifyPrefix';
-import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -54,7 +53,10 @@ export default class TributeNotification extends LightningElement {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_SoftCredits_ActionFailed')
+      );
     }
   }
 
@@ -122,7 +124,10 @@ export default class TributeNotification extends LightningElement {
         return refreshApex(this.wiredTribute);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_SoftCredits_ActionFailed')
+        );
       })
       .finally(() => {
         this.busy = false;

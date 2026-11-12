@@ -43,21 +43,21 @@ public with sharing class SoftCreditTriggerHandler extends TriggerHandler {
 
 		for (Soft_Credit__c credit : credits) {
 			if (credit.Gift__c == null) {
-				credit.addError(Label.Giving_SoftCredit_GiftRequired);
+				credit.addError(BarnHelp.text('Giving', 'Giving_SoftCredit_GiftRequired'));
 				continue;
 			}
 			if (!hasExactlyOneCreditedParty(credit)) {
-				credit.addError(Label.Giving_SoftCredit_OneCreditedParty);
+				credit.addError(BarnHelp.text('Giving', 'Giving_SoftCredit_OneCreditedParty'));
 				continue;
 			}
 			if ('Other'.equals(credit.Role__c) && String.isBlank(credit.Custom_Role__c)) {
-				credit.addError(Label.Giving_SoftCredit_CustomRoleRequired);
+				credit.addError(BarnHelp.text('Giving', 'Giving_SoftCredit_CustomRoleRequired'));
 				continue;
 			}
 			Gift__c gift = giftById.get(credit.Gift__c);
 			Decimal giftAmount = gift == null ? null : gift.Amount__c;
 			if (!settleAmountAndPercent(credit, giftAmount)) {
-				credit.addError(Label.Giving_SoftCredit_AmountOrPercent);
+				credit.addError(BarnHelp.text('Giving', 'Giving_SoftCredit_AmountOrPercent'));
 			}
 		}
 	}

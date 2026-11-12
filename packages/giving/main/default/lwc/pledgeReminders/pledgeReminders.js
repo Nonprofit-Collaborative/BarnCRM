@@ -8,7 +8,6 @@ import markLettersSent from '@salesforce/apex/PledgeReminderController.markLette
 import setSchedule from '@salesforce/apex/PledgeReminderController.setSchedule';
 
 import TITLE from '@salesforce/label/c.Giving_PledgeReminders_Title';
-import OFF from '@salesforce/label/c.Giving_PledgeReminders_Off';
 import QUEUE_HEADING from '@salesforce/label/c.Giving_PledgeReminders_QueueHeading';
 import EMAILS_DUE from '@salesforce/label/c.Giving_PledgeReminders_EmailsDue';
 import LETTERS_DUE from '@salesforce/label/c.Giving_PledgeReminders_LettersDue';
@@ -16,11 +15,8 @@ import WITHOUT_RECIPIENT from '@salesforce/label/c.Giving_PledgeReminders_Withou
 import LETTERS_WAITING from '@salesforce/label/c.Giving_PledgeReminders_LettersWaiting';
 import LETTERS_AWAITING from '@salesforce/label/c.Giving_PledgeReminders_LettersAwaiting';
 import SEND_NOW from '@salesforce/label/c.Giving_PledgeReminders_SendNow';
-import SEND_STARTED from '@salesforce/label/c.Giving_PledgeReminders_SendStarted';
 import PRODUCE_LETTERS from '@salesforce/label/c.Giving_PledgeReminders_ProduceLetters';
-import LETTERS_READY from '@salesforce/label/c.Giving_PledgeReminders_LettersReady';
 import MARK_SENT from '@salesforce/label/c.Giving_PledgeReminders_MarkSent';
-import LETTERS_MARKED_SENT from '@salesforce/label/c.Giving_PledgeReminders_LettersMarkedSent';
 import NIGHTLY from '@salesforce/label/c.Giving_PledgeReminders_Nightly';
 import NEXT_RUN from '@salesforce/label/c.Giving_PledgeReminders_NextRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Giving_PledgeReminders_NotScheduled';
@@ -34,16 +30,13 @@ import NEW_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_NewStep
 import EDIT_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_EditStepHeading';
 import TEMPLATE_FIELD from '@salesforce/label/c.Giving_PledgeReminders_TemplateField';
 import TEMPLATE_PLACEHOLDER from '@salesforce/label/c.Giving_PledgeReminders_TemplatePlaceholder';
-import TEMPLATE_REQUIRED from '@salesforce/label/c.Giving_PledgeReminders_TemplateRequired';
 import SAVE_STEP from '@salesforce/label/c.Giving_PledgeReminders_SaveStep';
 import CANCEL_STEP from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import STEP_SAVED from '@salesforce/label/c.Giving_PledgeReminders_StepSaved';
 import LOG_HEADING from '@salesforce/label/c.Giving_PledgeReminders_LogHeading';
 import NO_LOG from '@salesforce/label/c.Giving_PledgeReminders_NoLog';
 import NO_STEPS_HEADING from '@salesforce/label/c.Giving_PledgeReminders_NoStepsHeading';
 import TEMPLATE_MISSING from '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
-import ACTION_FAILED from '@salesforce/label/c.Giving_PledgeReminders_ActionFailed';
 import COLUMN_STEP from '@salesforce/label/c.Giving_PledgeReminders_ColumnStep';
 import COLUMN_TIMING from '@salesforce/label/c.Core_FieldAccess_ColWhen';
 import COLUMN_CHANNEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnChannel';
@@ -91,7 +84,9 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
     get intro() {
       return helpText('Giving', 'Giving_PledgeReminders_Intro');
     },
-    off: OFF,
+    get off() {
+      return helpText('Giving', 'Giving_PledgeReminders_Off');
+    },
     get noSteps() {
       return helpText('Giving', 'Giving_PledgeReminders_NoSteps');
     },
@@ -116,7 +111,9 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
       return helpText('Giving', 'Giving_PledgeReminders_TemplateFieldHelp');
     },
     templatePlaceholder: TEMPLATE_PLACEHOLDER,
-    templateRequired: TEMPLATE_REQUIRED,
+    get templateRequired() {
+      return helpText('Giving', 'Giving_PledgeReminders_TemplateRequired');
+    },
     saveStep: SAVE_STEP,
     cancelStep: CANCEL_STEP,
     logHeading: LOG_HEADING,
@@ -153,7 +150,10 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_PledgeReminders_ActionFailed')
+      );
     }
   }
 
@@ -352,7 +352,7 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
 
   handleStepSaved() {
     this.showStepForm = false;
-    this.noticeMessage = STEP_SAVED;
+    this.noticeMessage = helpText('Giving', 'Giving_PledgeReminders_StepSaved');
     return refreshApex(this.wiredPage);
   }
 
@@ -368,15 +368,18 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
   }
 
   handleSendNow() {
-    return this.run(sendNow(), SEND_STARTED);
+    return this.run(sendNow(), helpText('Giving', 'Giving_PledgeReminders_SendStarted'));
   }
 
   handleProduceLetters() {
-    return this.run(produceLetters(), LETTERS_READY);
+    return this.run(produceLetters(), helpText('Giving', 'Giving_PledgeReminders_LettersReady'));
   }
 
   handleMarkSent() {
-    return this.run(markLettersSent(), LETTERS_MARKED_SENT);
+    return this.run(
+      markLettersSent(),
+      helpText('Giving', 'Giving_PledgeReminders_LettersMarkedSent')
+    );
   }
 
   handleScheduleChange(event) {
@@ -395,7 +398,10 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
         return refreshApex(this.wiredPage);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_PledgeReminders_ActionFailed')
+        );
       })
       .finally(() => {
         this.busy = false;

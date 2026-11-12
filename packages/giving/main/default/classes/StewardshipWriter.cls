@@ -35,7 +35,7 @@ public without sharing class StewardshipWriter {
 		}
 		if (plans.size() != templates.size()) {
 			ErrorLogger.logMessage(
-				System.Label.Giving_Stewardship_ErrorStartFailed,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorStartFailed'),
 				CONTEXT,
 				ErrorLogger.SEVERITY_ERROR
 			);

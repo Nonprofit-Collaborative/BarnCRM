@@ -145,7 +145,7 @@ private class RecognitionControllerTest {
 			System.assertEquals(null, view.recipientName, 'There is nobody to write to');
 			System.assertEquals(false, view.canMarkSent, 'So there is nothing to mark sent');
 			System.assertEquals(
-				Label.Giving_TributeNotification_NoRecipient,
+				BarnHelp.text('Giving', 'Giving_TributeNotification_NoRecipient'),
 				view.blockedReason,
 				'And the panel says why rather than hiding the button without a word'
 			);
