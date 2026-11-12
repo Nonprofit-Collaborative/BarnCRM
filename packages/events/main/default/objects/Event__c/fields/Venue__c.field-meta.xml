@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Venue__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The venue record. Saving fills a blank Venue Name and Venue Address from it.</inlineHelpText>
+  <label>Venue</label>
+  <referenceTo>Event_Venue__c</referenceTo>
+  <relationshipLabel>Events</relationshipLabel>
+  <relationshipName>Events</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

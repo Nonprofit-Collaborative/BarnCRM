@@ -52,6 +52,10 @@
     <layoutColumns>
       <layoutItems>
         <behavior>Edit</behavior>
+        <field>Venue__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
         <field>Venue_Name__c</field>
       </layoutItems>
       <layoutItems>

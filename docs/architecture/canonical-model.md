@@ -15048,7 +15048,7 @@ events already saved.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Address | `Address__c` | Text Area(255) |
+| Address | `Venue_Address__c` | Text Area(255) |
 | Capacity | `Capacity__c` | Number(7, 0) |
 | Map Link | `Map_URL__c` | URL(255) |
 | Notes | `Notes__c` | Long Text Area(5000) |

@@ -37,6 +37,7 @@ const ICONS = Object.freeze({
   // Events
   Event__c: 'custom:custom89',
   Event_Speaker__c: 'custom:custom75',
+  Event_Venue__c: 'custom:custom50',
   Events_Calendar: 'custom:custom66',
   Events_Home: 'custom:custom81',
   // Funders
