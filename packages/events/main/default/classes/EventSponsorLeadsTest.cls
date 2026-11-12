@@ -89,7 +89,7 @@ private class EventSponsorLeadsTest {
 				scan(person('Lee', 'Nobody'), ana.Id),
 				false
 			);
-			EventSponsorsController.Leads export = EventSponsorsController.getLeads(acme.Id);
+			EventSponsorsController.Leads download = EventSponsorsController.getLeads(acme.Id);
 			Test.stopTest();
 
 			Map<Id, Sponsor_Lead__c> saved = new Map<Id, Sponsor_Lead__c>(
@@ -130,10 +130,10 @@ private class EventSponsorLeadsTest {
 			);
 			Assert.areEqual('Not Found', saved.get(scans[3].Id).Status__c, 'Not a badge');
 			Assert.isFalse(stranger.isSuccess(), 'No sponsorship, no scan');
-			Assert.areEqual(1, export.rows.size(), 'Only the lead is exported');
+			Assert.areEqual(1, download.rows.size(), 'Only the lead is exported');
 			Assert.areEqual(
 				7,
-				export.columns.size(),
+				download.columns.size(),
 				'Name, email, title, company, interest, notes, date'
 			);
 		}
