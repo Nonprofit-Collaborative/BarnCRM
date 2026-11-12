@@ -235,7 +235,9 @@ public with sharing class MembershipRenewals implements Schedulable {
 		if (NamespaceUtil.objectType('Gift_Allocation__c') == null) {
 			return new List<GiftRow>();
 		}
-		List<GiftRow> rows = new List<GiftRow>();
+		// Not `rows`: Apex names ignore case, so a local of that name hides the ROWS limit and
+		// the query ends `LIMIT ()`.
+		List<GiftRow> found = new List<GiftRow>();
 		String query =
 			'SELECT {ns}Amount__c, {ns}Fund__c, {ns}Gift__c, {ns}Gift__r.{ns}Donor_Contact__c,' +
 			' {ns}Gift__r.{ns}Donor_Account__c, {ns}Gift__r.{ns}Gift_Date__c, {ns}Gift__r.{ns}Commitment__c' +
@@ -261,9 +263,9 @@ public with sharing class MembershipRenewals implements Schedulable {
 			row.accountId = (Id) gift.get(ns + 'Donor_Account__c');
 			row.giftDate = (Date) gift.get(ns + 'Gift_Date__c');
 			row.commitmentId = (Id) gift.get(ns + 'Commitment__c');
-			rows.add(row);
+			found.add(row);
 		}
-		return rows;
+		return found;
 	}
 
 	/** The yearly amount of each Recurring commitment the gifts belong to. */

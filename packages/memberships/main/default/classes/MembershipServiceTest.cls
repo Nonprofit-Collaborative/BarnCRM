@@ -20,6 +20,16 @@ private class MembershipServiceTest {
 		TestUsers.adminWith(ADMIN);
 	}
 
+	@IsTest
+	static void theTermTriggerHandlerNamesItselfForTheRegistry() {
+		// runs-as: deploying user (reads a name; touches no data or permissions)
+		Assert.areEqual(
+			'MembershipTermHandler',
+			new MembershipTermHandler().getName(),
+			'The registry row Membership_Term_Dates runs this handler by its name'
+		);
+	}
+
 	private static Membership_Level__c level(String name, Decimal dues, Decimal months) {
 		Membership_Level__c level = new Membership_Level__c(
 			Name = name,
