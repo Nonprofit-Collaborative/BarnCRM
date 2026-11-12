@@ -41,6 +41,7 @@ PACKAGES = {
     "events": "Events",
     "portal": "Portal",
     "payments": "Payments",
+    "memberships": "Memberships",
     "mirror": "Mirror",
     "corporatehub": "CorporateHub",
     "lwcbuilder": "LwcBuilder",

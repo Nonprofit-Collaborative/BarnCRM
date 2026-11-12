@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Is_Active__c</fullName>
+  <externalId>false</externalId>
+  <formula>OR(ISPICKVAL(Status__c, &quot;Current&quot;), ISPICKVAL(Status__c, &quot;Grace&quot;))</formula>
+  <inlineHelpText>True while the term is Current or in Grace.</inlineHelpText>
+  <label>Is Active</label>
+  <type>Checkbox</type>
+</CustomField>

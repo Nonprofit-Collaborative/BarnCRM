@@ -385,7 +385,27 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
         if (page.records.length === 0) {
           body.appendChild(el('p', { text: messages.nothingHere }));
         }
-        page.records.forEach((record) => body.appendChild(recordCard(page, record, alertSlot)));
+        const cards = page.records.map((record) => {
+          const card = recordCard(page, record, alertSlot);
+          body.appendChild(card);
+          return { card, text: Object.values(record.values).join(' ').toLowerCase() };
+        });
+        // A searchable page (PB-09) filters the records already sent: no second read.
+        if (page.search && cards.length > 0) {
+          const box = el('input', {
+            type: 'search',
+            class: 'barn-portal-search',
+            'aria-label': messages.search,
+            placeholder: messages.search
+          });
+          box.addEventListener('input', () => {
+            const words = box.value.toLowerCase().trim().split(/\s+/);
+            cards.forEach(({ card, text }) => {
+              card.hidden = !words.every((word) => text.includes(word));
+            });
+          });
+          body.prepend(box);
+        }
         if (page.canCreate) {
           body.appendChild(
             el('button', {

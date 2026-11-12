@@ -182,6 +182,9 @@
             <th scope="col">{fieldLabels.Attendee.Ticket_Type__c}</th>
             <th scope="col">{fieldLabels.Attendee.Price__c}</th>
             <th scope="col">{fieldLabels.Attendee.Status__c}</th>
+            <template lwc:if={showPayment}>
+              <th scope="col">{fieldLabels.Registration.Payment_Status__c}</th>
+            </template>
             <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
           </tr>
         </thead>
@@ -196,6 +199,14 @@
               </th>
               <td data-label={fieldLabels.Registration.Name}>
                 <a href={row.registrationHref}>{row.registrationName}</a>
+                <template lwc:if={row.pendingPayment}>
+                  <c-barn-status-badge
+                    class="slds-m-left_x-small"
+                    data-id="pending-payment"
+                    status="pending"
+                    label={row.registrationStatus}
+                  ></c-barn-status-badge>
+                </template>
               </td>
               <td data-label={fieldLabels.Attendee.Ticket_Type__c}>{row.ticketName}</td>
               <td data-label={fieldLabels.Attendee.Price__c}>
@@ -208,6 +219,17 @@
               <td data-label={fieldLabels.Attendee.Status__c}>
                 <c-barn-status-badge status={row.statusWord} label={row.status}></c-barn-status-badge>
               </td>
+              <template lwc:if={showPayment}>
+                <td data-label={fieldLabels.Registration.Payment_Status__c}>
+                  <template lwc:if={row.paymentStatus}>
+                    <c-barn-status-badge
+                      data-id="payment-status"
+                      status={row.paymentWord}
+                      label={row.paymentStatus}
+                    ></c-barn-status-badge>
+                  </template>
+                </td>
+              </template>
               <td>
                 <template lwc:if={row.hasMenu}>
                   <lightning-button-menu

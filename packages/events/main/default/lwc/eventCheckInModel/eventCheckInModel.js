@@ -26,8 +26,9 @@ export function findByCode(attendees, text) {
 }
 
 /**
- * The attendees matching the typed text in name, email or ticket (every word must match), by
- * name. Empty text matches everyone. Each row carries `checkedIn` for the screen.
+ * The attendees matching the typed text in name, badge name, email or ticket (every word must
+ * match), by name. Empty text matches everyone. Each row carries `checkedIn` and `shownName` (the
+ * badge name when set, EV-26) for the screen.
  */
 export function visibleAttendees(attendees, term) {
   const words = String(term || '')
@@ -36,13 +37,18 @@ export function visibleAttendees(attendees, term) {
     .filter(Boolean);
   return (attendees || [])
     .filter((attendee) => {
-      const haystack = [attendee.name, attendee.email, attendee.ticketName]
+      const haystack = [attendee.name, attendee.badgeName, attendee.email, attendee.ticketName]
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
       return words.every((word) => haystack.includes(word));
     })
-    .map((attendee) => ({ ...attendee, checkedIn: attendee.status === ATTENDED }));
+    .map((attendee) => ({
+      ...attendee,
+      checkedIn: attendee.status === ATTENDED,
+      shownName: attendee.badgeName || attendee.name,
+      alsoName: attendee.badgeName && attendee.badgeName !== attendee.name ? attendee.name : ''
+    }));
 }
 
 /** How many are expected, in and still to come. */

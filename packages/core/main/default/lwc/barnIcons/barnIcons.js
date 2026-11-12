@@ -114,6 +114,9 @@ const ICONS = Object.freeze({
   Scholarships: 'custom:custom34',
   // Territory Management
   Territory_Management: 'custom:custom34',
+  // Memberships
+  Membership_Level__c: 'custom:custom48',
+  Membership_Term__c: 'custom:custom45',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

@@ -1,0 +1,44 @@
+<template>
+  <template lwc:if={available}>
+    <div class="slds-var-m-bottom_small">
+      <lightning-button
+        data-id="toggle"
+        label={text.sessionRatings}
+        icon-name="utility:rating"
+        onclick={handleToggle}
+      ></lightning-button>
+      <template lwc:if={open}>
+        <div class="slds-box slds-box_x-small slds-var-m-top_x-small" data-id="panel">
+          <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">
+            {text.intro}
+          </p>
+          <div class="slds-grid slds-grid_vertical-align-end slds-wrap">
+            <lightning-combobox
+              class="slds-var-m-right_small"
+              data-id="form"
+              label={text.form}
+              options={formOptions}
+              value={chosenKey}
+              onchange={handleForm}
+            ></lightning-combobox>
+            <lightning-button
+              class="slds-var-m-right_x-small"
+              data-id="save"
+              variant="brand"
+              label={text.save}
+              disabled={busy}
+              onclick={handleSave}
+            ></lightning-button>
+            <lightning-button
+              data-id="print"
+              label={text.print}
+              icon-name="utility:print"
+              disabled={busy}
+              onclick={handlePrint}
+            ></lightning-button>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+</template>

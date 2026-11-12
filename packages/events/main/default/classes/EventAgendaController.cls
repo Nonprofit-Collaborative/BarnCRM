@@ -59,6 +59,11 @@ public with sharing class EventAgendaController {
 		/** The event speakers in the session, for the speaker clash check. */
 		@AuraEnabled
 		public List<String> speakerIds = new List<String>();
+		/** EV-27: how many rated the session and their average, from its roll-ups. */
+		@AuraEnabled
+		public Decimal ratingCount;
+		@AuraEnabled
+		public Decimal averageRating;
 	}
 
 	/**
@@ -92,7 +97,17 @@ public with sharing class EventAgendaController {
 			}
 			Integer maxRows = maxSessions + 1;
 			List<Event_Session__c> sessions = [
-				SELECT Id, Name, Track__c, Start__c, End__c, Room__c, Status__c, Session_Type__c
+				SELECT
+					Id,
+					Name,
+					Track__c,
+					Start__c,
+					End__c,
+					Room__c,
+					Status__c,
+					Session_Type__c,
+					Rating_Count__c,
+					Average_Rating__c
 				FROM Event_Session__c
 				WHERE Event__c = :eventId
 				WITH USER_MODE
@@ -156,6 +171,8 @@ public with sharing class EventAgendaController {
 		row.room = record.Room__c;
 		row.status = record.Status__c;
 		row.sessionType = record.Session_Type__c;
+		row.ratingCount = record.Rating_Count__c;
+		row.averageRating = record.Average_Rating__c;
 		return row;
 	}
 }

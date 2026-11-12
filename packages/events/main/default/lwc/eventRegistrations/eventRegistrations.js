@@ -4,13 +4,17 @@ import getRegistrations from '@salesforce/apex/EventRegistrationsController.getR
 import register from '@salesforce/apex/EventRegistrationsController.register';
 import setStatus from '@salesforce/apex/EventRegistrationsController.setStatus';
 import cancelRegistration from '@salesforce/apex/EventRegistrationsController.cancelRegistration';
+import sendPaymentLink from '@salesforce/apex/EventRegistrationsController.sendPaymentLink';
 import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import EventRecordModal from 'c/eventRecordModal';
 import {
   actionsFor,
   buildRequest,
   canSubmit,
+  paymentWord,
+  PENDING_PAYMENT,
   statusWord,
   summarize
 } from 'c/eventRegistrationsModel';
@@ -40,6 +44,18 @@ const ACTION_LABELS = {
   cancelAttendee: CANCEL_ATTENDEE,
   cancelRegistration: CANCEL_REGISTRATION
 };
+/** A menu item's words; the newer ones live in the help catalog, read when the menu draws. */
+function actionLabel(value) {
+  if (value === 'sendPaymentLink') {
+    return helpText('Events', 'Events_Registrations_SendPaymentLink');
+  }
+  if (value === 'editBadge') {
+    return helpText('Events', 'Events_Registrations_EditBadge');
+  }
+  return ACTION_LABELS[value];
+}
+/** What Edit Badge shows (EV-26), saved through the platform's record form. */
+const BADGE_FIELDS = ['Badge_Name__c', 'Badge_Title__c', 'Badge_Company__c'];
 
 /**
  * The Registrations tab of the event page (EV-02): the event's attendees with their ticket,
@@ -194,11 +210,12 @@ export default class EventRegistrations extends LightningElement {
   get rows() {
     const attendees = (this.data && this.data.attendees) || [];
     const canChange = Boolean(this.data && this.data.canChange);
+    const options = this.actionOptions;
     return attendees.map((attendee) => {
       const menuItems = canChange
-        ? actionsFor(attendee).map((action) => ({
+        ? actionsFor(attendee, options).map((action) => ({
             value: action.value,
-            label: ACTION_LABELS[action.value]
+            label: actionLabel(action.value)
           }))
         : [];
       return {
@@ -206,11 +223,22 @@ export default class EventRegistrations extends LightningElement {
         href: attendee.contactId ? `/lightning/r/${attendee.contactId}/view` : null,
         registrationHref: `/lightning/r/${attendee.registrationId}/view`,
         statusWord: statusWord(attendee.status),
+        pendingPayment: attendee.registrationStatus === PENDING_PAYMENT,
+        paymentWord: paymentWord(attendee.paymentStatus),
         menuLabel: format(ACTIONS_FOR, attendee.name),
         menuItems,
         hasMenu: menuItems.length > 0
       };
     });
+  }
+
+  get actionOptions() {
+    return { canSendPaymentLink: Boolean(this.data && this.data.canSendPaymentLink) };
+  }
+
+  /** The Payment Status column shows once any registration has one (EV-20). */
+  get showPayment() {
+    return ((this.data && this.data.attendees) || []).some((attendee) => attendee.paymentStatus);
   }
 
   get hasRows() {
@@ -281,8 +309,30 @@ export default class EventRegistrations extends LightningElement {
     if (!attendee) {
       return;
     }
-    const action = actionsFor(attendee).find((item) => item.value === event.detail.value);
+    const action = actionsFor(attendee, this.actionOptions).find(
+      (item) => item.value === event.detail.value
+    );
     if (!action) {
+      return;
+    }
+    if (action.value === 'editBadge') {
+      const saved = await EventRecordModal.open({
+        label: `${actionLabel('editBadge')}: ${attendee.name}`,
+        size: 'small',
+        objectApiName: 'Event_Attendee__c',
+        recordId: attendee.id,
+        fields: BADGE_FIELDS
+      });
+      if (saved) {
+        await this.load();
+      }
+      return;
+    }
+    if (action.value === 'sendPaymentLink') {
+      await this.run(async () => {
+        const message = await sendPaymentLink({ registrationId: attendee.registrationId });
+        this.toast(message, 'success');
+      });
       return;
     }
     if (action.value === 'cancelRegistration') {
