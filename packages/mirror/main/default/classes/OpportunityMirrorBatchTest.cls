@@ -43,7 +43,7 @@ private class OpportunityMirrorBatchTest {
 	private static User maria() {
 		return TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+			new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 

@@ -20,7 +20,7 @@ private class OpportunityMirrorRunTest {
 		// Built once for the class rather than in every test that runs as her.
 		TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Opportunity_Mirror' }
+			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 

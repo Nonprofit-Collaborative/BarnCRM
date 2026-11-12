@@ -148,7 +148,7 @@ private class OpportunityMirrorSelectorTest {
 			Database.insert(linked, AccessLevel.SYSTEM_MODE);
 			Set<String> found;
 			Test.startTest();
-			System.runAs(userWith('Opportunity_Mirror')) {
+			System.runAs(userWith('Salesforce_Records_Sync')) {
 				found = OpportunityMirrorSelector.linkedOpportunityIds(
 					new Set<String>{ LINKED_ID, OTHER_ID }
 				);
@@ -166,7 +166,7 @@ private class OpportunityMirrorSelectorTest {
 			Database.insert(appeal, AccessLevel.SYSTEM_MODE);
 			Map<String, Id> found;
 			Test.startTest();
-			System.runAs(userWith('Campaign_Sync')) {
+			System.runAs(userWith('Salesforce_Records_Sync')) {
 				found = OpportunityMirrorSelector.appealIdsByCampaignId(
 					new Set<String>{ CAMPAIGN_ID, '701000000000002AAA' }
 				);
