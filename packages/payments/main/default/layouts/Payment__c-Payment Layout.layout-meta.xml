@@ -84,6 +84,10 @@
       </layoutItems>
       <layoutItems>
         <behavior>Readonly</behavior>
+        <field>Plan_Id__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
         <field>Checkout_Url__c</field>
       </layoutItems>
     </layoutColumns>

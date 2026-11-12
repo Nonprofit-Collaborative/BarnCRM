@@ -164,6 +164,14 @@ Stripe or PayPal page. From then on:
   payments page). BarnCRM never sees the card. Stripe retries a failed charge on the new card.
 - **Pay Online is refused** on a recurring gift that is charged automatically, so nobody pays
   twice.
+- **PayPal plans are shared** (D-198). BarnCRM makes one PayPal product (named after your
+  organization, "... recurring payments") and one billing plan per amount, currency and schedule
+  ("25.00 USD every month"), and reuses them: two donors giving 25.00 monthly share one plan,
+  each with a subscription of their own, so renewals, failures, cancellations and Update Card
+  still reach the right recurring gift. The payment's **Plan Id** shows the plan. If you
+  deactivate a plan in PayPal, or connect another PayPal account, the next checkout makes a new
+  plan (and product) and uses it from then on. Donors see the plan name on PayPal's page, not
+  the gift's description. Stripe makes no product or plan of its own to reuse.
 
 Before you turn it on, add the subscription events to your processor's webhook (steps 2 and 3
 above). To stop a donor's automatic payments, cancel the subscription in your processor's

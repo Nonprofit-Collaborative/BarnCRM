@@ -4,12 +4,16 @@
  * Paid payments copied from the first, once each; failed charges, card updates and cancellations
  * change no payment and reach the listener once per run; Update Card opens the processor's own
  * page, and a completed Stripe setup session makes the new card the subscription's default.
+ * PayPal payers at one amount and interval share one plan and one product, each with their own
+ * subscription, and a plan or product PayPal refuses is replaced (R-PAY7, D-198).
  */
 @IsTest(
 	testFor='ApexClass:PaymentService, ApexClass:PaymentsApi, ApexClass:PaymentStripe, ApexClass:PaymentPayPal'
 )
 private class PaymentSubscriptionTest {
 	private static final String LISTENER = 'PaymentSubscriptionTest.Listener';
+	/** The plan key of `checkout()`: Test mode, 20.00 USD, every 3 months (R-PAY7). */
+	private static final String PLAN_KEY = 'Test:USD:20.00:MONTH:3';
 	private static List<String> told = new List<String>();
 	private static List<Map<String, Object>> news = new List<Map<String, Object>>();
 
@@ -183,6 +187,184 @@ private class PaymentSubscriptionTest {
 			String subscription = mock.last('billing/subscriptions').getBody();
 			Assert.isTrue(subscription.contains('"custom_id":"' + payment.Reference__c + '"'));
 			Assert.isTrue(subscription.contains('"plan_id":"P-1"'), subscription);
+			// R-PAY7: the plan and product are remembered for the next payer.
+			Assert.areEqual(PLAN_KEY, payment.Plan_Key__c, 'Mode, currency, amount, interval');
+			Assert.areEqual('P-1', payment.Plan_Id__c, 'The plan it uses');
+			Assert.areEqual('PROD-1', Payment_Keys__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual(
+				'plan-' + PLAN_KEY + '-PROD-1',
+				mock.last('billing/plans').getHeader('PayPal-Request-Id'),
+				'Keyed by the plan key'
+			);
+			Assert.areEqual(1, calls(mock, 'catalogs/products'), 'One product');
+			Assert.areEqual(1, calls(mock, 'billing/plans'), 'One plan');
+		}
+	}
+
+	private static Integer calls(PaymentsTestData.Processors mock, String addressPart) {
+		Integer count = 0;
+		for (HttpRequest request : mock.requests) {
+			count += request.getEndpoint().contains(addressPart) ? 1 : 0;
+		}
+		return count;
+	}
+
+	/** PayPal's shared product and the plan a first payer's subscription already uses. */
+	private static void remembered(String product, String plan) {
+		Payment_Keys__c keys = Payment_Keys__c.getOrgDefaults();
+		keys.PayPal_Product_Id__c = product;
+		update as system keys;
+		if (plan != null) {
+			Payment__c earlier = first(PaymentService.PAYPAL, 'I-0');
+			earlier.Plan_Key__c = PLAN_KEY;
+			earlier.Plan_Id__c = plan;
+			update as system earlier;
+		}
+	}
+
+	/** A PayPal checkout of `amount` every 3 months, as `ref`, straight to the PayPal class. */
+	private static Payment__c payPalCheckout(String ref, Decimal amount) {
+		Payment__c payment = new Payment__c(
+			Amount__c = amount,
+			Currency_Code__c = 'USD',
+			Description__c = 'Monthly gift',
+			Reference__c = ref
+		);
+		PaymentPayPal.startCheckout(
+			payment,
+			'https://example.org/thanks',
+			'https://example.org/sorry',
+			'month',
+			3
+		);
+		return payment;
+	}
+
+	/** PayPal refusing any request whose body names one of `gone`; the rest as `answers` says. */
+	private class Refusing implements HttpCalloutMock {
+		private PaymentsTestData.Processors answers;
+		private List<String> gone;
+
+		Refusing(PaymentsTestData.Processors answers, List<String> gone) {
+			this.answers = answers;
+			this.gone = gone;
+		}
+
+		public HttpResponse respond(HttpRequest request) {
+			for (String id : gone) {
+				if (request.getBody().contains('"' + id + '"')) {
+					answers.requests.add(request);
+					HttpResponse response = new HttpResponse();
+					response.setStatusCode(id.startsWith('PROD') ? 400 : 422);
+					response.setBody('{"name":"UNPROCESSABLE_ENTITY"}');
+					return response;
+				}
+			}
+			return answers.respond(request);
+		}
+	}
+
+	private static PaymentsTestData.Processors payPalAnswers(List<String> gone) {
+		PaymentsTestData.Processors mock = PaymentsTestData.processors()
+			.answer('oauth2/token', 200, '{"access_token":"tok"}')
+			.answer('catalogs/products', 201, '{"id":"PROD-1"}')
+			.answer('billing/plans', 201, '{"id":"P-1"}')
+			.answer(
+				'billing/subscriptions',
+				201,
+				'{"id":"I-1","links":[{"rel":"approve","href":"https://www.sandbox.paypal.com/approve"}]}'
+			);
+		Test.setMock(HttpCalloutMock.class, new Refusing(mock, gone));
+		return mock;
+	}
+
+	@IsTest
+	static void twoPayersAtOneAmountShareAPlanAndAnotherAmountGetsItsOwn() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
+			recurringOn();
+			remembered('PROD-1', 'P-1');
+			PaymentsTestData.Processors mock = payPalAnswers(new List<String>());
+
+			Test.startTest();
+			Payment__c same = payPalCheckout('ref-same', 20);
+			Integer plansBefore = calls(mock, 'billing/plans');
+			Payment__c other = payPalCheckout('ref-other', 35);
+			Test.stopTest();
+
+			Assert.areEqual(0, plansBefore, 'The same amount reuses the plan');
+			Assert.areEqual('P-1', same.Plan_Id__c, 'The earlier payer plan');
+			Assert.areEqual(1, calls(mock, 'billing/plans'), 'A new amount makes one plan');
+			Assert.areEqual(0, calls(mock, 'catalogs/products'), 'The product is reused');
+			Assert.areEqual('Test:USD:35.00:MONTH:3', other.Plan_Key__c, 'Its own key');
+			String plan = mock.last('billing/plans').getBody();
+			Assert.isTrue(plan.contains('"product_id":"PROD-1"'), plan);
+			Assert.isTrue(plan.contains('"value":"35.00"'), plan);
+			List<String> payers = new List<String>();
+			for (HttpRequest request : mock.requests) {
+				if (request.getEndpoint().contains('billing/subscriptions')) {
+					payers.add(
+						request.getBody().substringAfter('"custom_id":"').substringBefore('"')
+					);
+				}
+			}
+			Assert.areEqual(
+				new List<String>{ 'ref-same', 'ref-other' },
+				payers,
+				'Each payer still gets a subscription of their own'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPlanPayPalNoLongerHasIsReplacedAndRemembered() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
+			recurringOn();
+			remembered('PROD-1', 'P-OLD');
+			PaymentsTestData.Processors mock = payPalAnswers(new List<String>{ 'P-OLD' });
+
+			Test.startTest();
+			Payment__c payment = PaymentService.startCheckout(checkout());
+			Test.stopTest();
+
+			Assert.areEqual('P-1', payment.Plan_Id__c, 'The new plan replaces the old');
+			Assert.areEqual(1, calls(mock, 'billing/plans'), 'One new plan');
+			Assert.areEqual(0, calls(mock, 'catalogs/products'), 'The product is kept');
+			Assert.areEqual(2, calls(mock, 'billing/subscriptions'), 'Refused once, then made');
+			Assert.areEqual(
+				payment.Reference__c + '-2',
+				mock.last('billing/subscriptions').getHeader('PayPal-Request-Id'),
+				'The retry is a new request'
+			);
+			List<Payment__c> newest = [
+				SELECT Plan_Id__c
+				FROM Payment__c
+				WHERE Plan_Key__c = :PLAN_KEY
+				WITH SYSTEM_MODE
+				ORDER BY CreatedDate DESC, Id DESC
+				LIMIT 1
+			];
+			Assert.areEqual('P-1', newest[0].Plan_Id__c, 'The next payer gets the new plan');
+		}
+	}
+
+	@IsTest
+	static void aProductPayPalRefusesIsReplacedAndRemembered() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.PAYPAL);
+			recurringOn();
+			remembered('PROD-GONE', null);
+			PaymentsTestData.Processors mock = payPalAnswers(new List<String>{ 'PROD-GONE' });
+
+			Test.startTest();
+			Payment__c payment = PaymentService.startCheckout(checkout());
+			Test.stopTest();
+
+			Assert.areEqual('P-1', payment.Plan_Id__c, 'A plan on the new product');
+			Assert.areEqual(1, calls(mock, 'catalogs/products'), 'One new product');
+			Assert.areEqual(2, calls(mock, 'billing/plans'), 'Refused once, then made');
+			Assert.areEqual('PROD-1', Payment_Keys__c.getOrgDefaults().PayPal_Product_Id__c);
 		}
 	}
 

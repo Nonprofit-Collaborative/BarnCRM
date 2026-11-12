@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Plan_Id__c</fullName>
+  <description>For a PayPal subscription's first payment: the PayPal billing plan its subscription uses (canonical model R-PAY7). Written by Payments only.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The PayPal billing plan this subscription uses, to find it in PayPal. Payers who give the same amount on the same schedule share one plan.</inlineHelpText>
+  <label>Plan Id</label>
+  <length>50</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>
