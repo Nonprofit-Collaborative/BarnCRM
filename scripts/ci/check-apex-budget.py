@@ -206,7 +206,7 @@ CAPS = {
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
     # G-22e certifications (CertificationService, CertificationController, the erasure and
     # nightly expiry hooks): 47,443 measured, plus about 1 percent.
-    "memberships": 48_000,
+    "memberships": 48_460,
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%.

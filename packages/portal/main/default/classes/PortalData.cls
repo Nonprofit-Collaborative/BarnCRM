@@ -12,7 +12,8 @@
 public without sharing class PortalData {
 	private static final String CONTEXT = 'PortalData';
 	/** At most this many scope records are read for a personScope page. */
-	private static final Integer MAX_SCOPE_ROWS = 200;
+	@TestVisible
+	private static Integer maxScopeRows = 200;
 
 	/** The portal's title, the person's first name, and its pages, for the client's menu. */
 	public static Map<String, Object> describe(PortalAuth.Session session) {
@@ -267,11 +268,19 @@ public without sharing class PortalData {
 			scope.objectType.getDescribe().getName() +
 			' WHERE ' +
 			String.join(filters, ' AND ') +
-			' LIMIT ' +
-			MAX_SCOPE_ROWS;
+			' ORDER BY CreatedDate DESC LIMIT ' +
+			maxScopeRows;
 		Set<Id> values = new Set<Id>();
-		for (SObject row : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
+		List<SObject> rows = Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE);
+		for (SObject row : rows) {
 			values.add((Id) valueAt(row, scope.valueField));
+		}
+		if (rows.size() >= maxScopeRows) {
+			ErrorLogger.logMessage(
+				BarnHelp.text('Portal', 'Portal_Scope_Capped', new List<Object>{ maxScopeRows }),
+				CONTEXT + '.scopeValues',
+				ErrorLogger.SEVERITY_WARNING
+			);
 		}
 		return values;
 	}

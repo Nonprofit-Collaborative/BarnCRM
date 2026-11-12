@@ -46,7 +46,7 @@ public with sharing class MembershipRenewals implements Schedulable {
 				JOB_NAME,
 				BarnHelp.text('Memberships', 'Memberships_Nightly_Step'),
 				6,
-				50,
+				55,
 				new MembershipRenewals()
 			)
 			.activeWhen(MembershipService.moduleOn());
@@ -306,14 +306,37 @@ public with sharing class MembershipRenewals implements Schedulable {
 	@TestVisible
 	private static Integer lapse() {
 		Date today = MembershipService.today();
+		// A Grace term only changes once its level's grace days run out or a recurring gift renews
+		// it, so the rest are left out and cannot crowd out ended Current terms.
+		List<AggregateResult> shortest = [
+			SELECT MIN(Grace_Days__c) days
+			FROM Membership_Level__c
+			WITH SYSTEM_MODE
+		];
+		Decimal minGrace = shortest.isEmpty() ? null : (Decimal) shortest[0].get('days');
+		Date graceCut = today.addDays(-(minGrace == null ? 0 : minGrace.intValue()));
 		List<Membership_Term__c> ended = [
 			SELECT Id, Status__c, End_Date__c, Commitment_Id__c, Level__r.Grace_Days__c
 			FROM Membership_Term__c
-			WHERE Status__c IN ('Current', 'Grace') AND End_Date__c < :today
+			WHERE Status__c = 'Current' AND End_Date__c < :today
 			WITH SYSTEM_MODE
 			ORDER BY End_Date__c
 			LIMIT :ROWS
 		];
+		ended.addAll(
+			[
+				SELECT Id, Status__c, End_Date__c, Commitment_Id__c, Level__r.Grace_Days__c
+				FROM Membership_Term__c
+				WHERE
+					Status__c = 'Grace'
+					AND End_Date__c < :today
+					AND (End_Date__c < :graceCut
+					OR Commitment_Id__c != NULL)
+				WITH SYSTEM_MODE
+				ORDER BY End_Date__c
+				LIMIT :ROWS
+			]
+		);
 		Set<String> active = activeCommitments(ended);
 		List<MembershipService.Renewal> renewals = new List<MembershipService.Renewal>();
 		List<Membership_Term__c> moved = new List<Membership_Term__c>();

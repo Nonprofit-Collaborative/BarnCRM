@@ -160,7 +160,22 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 				]
 			);
 			Map<Id, List<Event_Sponsor__c>> sponsorships = sponsorshipsOf(scanners);
-			Set<String> taken = takenKeys(leads, attendees, sponsorships);
+			// A lead staff create for a booth names its sponsorship and may have no scanner.
+			Set<Id> namedIds = new Set<Id>();
+			for (Sponsor_Lead__c lead : leads) {
+				if (lead.Event_Sponsor__c != null) {
+					namedIds.add(lead.Event_Sponsor__c);
+				}
+			}
+			Map<Id, Event_Sponsor__c> named = new Map<Id, Event_Sponsor__c>(
+				[
+					SELECT Id, Event__c, Contact__c
+					FROM Event_Sponsor__c
+					WHERE Id IN :namedIds
+					WITH SYSTEM_MODE
+				]
+			);
+			Set<String> taken = takenKeys(leads, attendees, sponsorships, named.values());
 			for (Sponsor_Lead__c lead : leads) {
 				Event_Attendee__c attendee = attendees.get(attendeeCode(lead.Badge_Code__c));
 				Id eventId = attendee == null ? null : attendee.Event_Registration__r.Event__c;
@@ -168,6 +183,9 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 					sponsorships.get(lead.Scanned_By__c),
 					eventId
 				);
+				if (sponsor == null) {
+					sponsor = named.get(lead.Event_Sponsor__c);
+				}
 				if (sponsor == null && lead.Event_Sponsor__c == null) {
 					lead.addError(BarnHelp.text('Events', 'Events_Lead_NoSponsorship'));
 					continue;
@@ -255,9 +273,15 @@ public with sharing class EventOperationsHandler extends TriggerHandler {
 		private Set<String> takenKeys(
 			List<Sponsor_Lead__c> leads,
 			Map<Id, Event_Attendee__c> attendees,
-			Map<Id, List<Event_Sponsor__c>> sponsorships
+			Map<Id, List<Event_Sponsor__c>> sponsorships,
+			List<Event_Sponsor__c> named
 		) {
 			Set<String> keys = new Set<String>();
+			for (Event_Sponsor__c sponsor : named) {
+				for (Id attendeeId : attendees.keySet()) {
+					keys.add(leadKey(sponsor.Id, attendeeId));
+				}
+			}
 			for (List<Event_Sponsor__c> mine : sponsorships.values()) {
 				for (Event_Sponsor__c sponsor : mine) {
 					for (Id attendeeId : attendees.keySet()) {

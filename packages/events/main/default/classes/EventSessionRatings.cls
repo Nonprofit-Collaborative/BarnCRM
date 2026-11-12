@@ -26,6 +26,11 @@ public with sharing class EventSessionRatings {
 		/** Each confirmed session's rating address, by session record identifier. */
 		@AuraEnabled
 		public Map<String, String> links = new Map<String, String>();
+		/** True when more confirmed sessions exist than the links cover. */
+		@AuraEnabled
+		public Boolean capped = false;
+		@AuraEnabled
+		public Integer linkLimit = LINK_LIMIT;
 	}
 
 	/**
@@ -59,17 +64,20 @@ public with sharing class EventSessionRatings {
 				result.forms.add(choice);
 			}
 			if (formId != null) {
-				for (Event_Session__c session : [
+				Integer fetch = LINK_LIMIT + 1;
+				List<Event_Session__c> sessions = [
 					SELECT Id
 					FROM Event_Session__c
 					WHERE Event__c = :eventId AND Status__c = 'Confirmed'
 					WITH USER_MODE
 					ORDER BY Start__c ASC NULLS LAST, Name
-					LIMIT :LINK_LIMIT
-				]) {
-					String link = FormCatalogExtensions.publicLink(formId, session.Id);
+					LIMIT :fetch
+				];
+				result.capped = sessions.size() > LINK_LIMIT;
+				for (Integer i = 0; i < sessions.size() && i < LINK_LIMIT; i++) {
+					String link = FormCatalogExtensions.publicLink(formId, sessions[i].Id);
 					if (link != null) {
-						result.links.put(session.Id, link);
+						result.links.put(sessions[i].Id, link);
 					}
 				}
 			}

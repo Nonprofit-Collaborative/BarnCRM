@@ -220,7 +220,7 @@ QR code.
 2. Find the person: type part of their name, email or ticket in **Search**, then click **Check
    In**. **Undo Check-In** takes it back.
 3. With a ticket's QR code: click **Scan with Camera** and hold the code to the camera (if you
-   do not see the button, your browser cannot scan; type the code into **Ticket code** and click
+   do not see the button, your browser cannot scan, as with iPhone Safari and Firefox; type the code into **Ticket code** and click
    **Check In by Code** instead). Pressing Enter in **Ticket code** checks the person in too, so
    a handheld barcode scanner that types the code and Enter works without clicking.
 4. To give someone their QR code, click the QR button beside their name and show or print it.

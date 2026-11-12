@@ -65,7 +65,15 @@ private class MembershipRenewalsTest {
 
 	private static List<Membership_Term__c> termsOf(Id contactId) {
 		return [
-			SELECT Id, Status__c, Level__r.Name, Source__c, Start_Date__c, Gift_Id__c, Origin__c
+			SELECT
+				Id,
+				Status__c,
+				Level__r.Name,
+				Source__c,
+				Start_Date__c,
+				Gift_Id__c,
+				Origin__c,
+				Reminded_For__c
 			FROM Membership_Term__c
 			WHERE Contact__c = :contactId
 			WITH USER_MODE
@@ -165,6 +173,33 @@ private class MembershipRenewalsTest {
 	}
 
 	@IsTest
+	static void graceTermsAreLapsedOnlyOncePastTheirGraceDays() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipService.todayOverride = TODAY;
+			Id level = levels().get('Individual').Id;
+			Contact stillIn = person('Zzmem Still');
+			Contact pastIt = person('Zzmem Past');
+			insert as user new List<Membership_Term__c>{
+				new Membership_Term__c(
+					Level__c = level,
+					Contact__c = stillIn.Id,
+					Status__c = 'Grace',
+					Start_Date__c = TODAY.addYears(-1).addDays(-10)
+				),
+				new Membership_Term__c(
+					Level__c = level,
+					Contact__c = pastIt.Id,
+					Status__c = 'Grace',
+					Start_Date__c = TODAY.addYears(-1).addDays(-60)
+				)
+			};
+			Assert.areEqual(1, MembershipRenewals.lapse(), 'only the term past its grace moved');
+			Assert.areEqual('Grace', termsOf(stillIn.Id)[0].Status__c, 'within the grace days');
+			Assert.areEqual('Lapsed', termsOf(pastIt.Id)[0].Status__c, 'past the grace days');
+		}
+	}
+
+	@IsTest
 	static void remindersGoOncePerTermEndAndASendFailureIsRetried() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			MembershipService.todayOverride = TODAY;
@@ -185,6 +220,28 @@ private class MembershipRenewalsTest {
 			Assert.areEqual(1, MembershipRenewals.remind(), 'retried the next night');
 			Assert.areEqual(0, MembershipRenewals.remind(), 'and not sent twice');
 			Assert.areEqual(member.Id, sender.received[0].getTargetObjectId(), 'to the member');
+		}
+	}
+
+	@IsTest
+	static void aRefusedSendUnstampsEveryReminderSoItIsRetried() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			MembershipService.todayOverride = TODAY;
+			Id level = levels().get('Individual').Id;
+			Contact member = person('Zzmem Refused');
+			insert as user new Membership_Term__c(
+				Level__c = level,
+				Contact__c = member.Id,
+				Status__c = 'Current',
+				Start_Date__c = TODAY.addYears(-1).addDays(10)
+			);
+			RecordingEmailSender refusing = new RecordingEmailSender();
+			refusing.refuseWith = 'Single email limit exceeded.';
+			MembershipRenewals.emailSender = refusing;
+			Assert.areEqual(0, MembershipRenewals.remind(), 'the whole send was refused');
+			Assert.isNull(termsOf(member.Id)[0].Reminded_For__c, 'the stamp was cleared');
+			MembershipRenewals.emailSender = new RecordingEmailSender();
+			Assert.areEqual(1, MembershipRenewals.remind(), 'retried the next night');
 		}
 	}
 

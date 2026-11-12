@@ -557,6 +557,7 @@ and `Talk B` and a speaker on Talk A.
 | 4 | Open the **Speakers** tab. | Talk A's speaker shows `Average rating 4.0 from 2`. |
 | 5 | Send the form from Talk B's link with no rating; process it. | No rating is added to Talk B. |
 | 6 | In an org without Forms, open the Agenda tab. | No Session Ratings button and no rating codes. |
+| 7 | With more than 200 Confirmed sessions on one event, open **Session Ratings**. | A notice says only the first 200 confirmed sessions have codes. |
 
 **Cleanup:** delete the ratings and clear the event's rating form.
 
@@ -605,6 +606,7 @@ room or capacity.
 | 3 | Add Funding `Acme MDF` (Partner Funds (MDF), Expected 800, Received 300). | Funding 800 expected, 300 received. |
 | 4 | Read the totals. | Net Cost 800 (1,200 less 300 less 100); Budgeted Net Cost 600 (1,500 less 800 less 100). The dashboard shows Net Cost 800. |
 | 5 | As read-only, open the event. | The panel shows; no Add buttons and no row menus. |
+| 6 | Read the line that shows the registrations' payments. | It reads `Paid online: 100`. |
 
 **Cleanup:** remove the lines.
 

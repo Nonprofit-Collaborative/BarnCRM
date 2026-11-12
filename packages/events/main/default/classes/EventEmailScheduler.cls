@@ -11,6 +11,10 @@ public with sharing class EventEmailScheduler implements Schedulable {
 
 	public void execute(SchedulableContext context) {
 		EventEmailBatch.startMorning();
+		// Sweeps up Unpaid Pending Payment registrations whose checkout job never ran.
+		if (EventsSettings.onlinePayments()) {
+			EventPayments.queueCheckouts();
+		}
 	}
 
 	/** The job as a step of the nightly run (ADR-0166), before the working day. */
@@ -22,6 +26,8 @@ public with sharing class EventEmailScheduler implements Schedulable {
 				30,
 				new EventEmailScheduler()
 			)
-			.activeWhen(EventEmailService.nextActive(null) != null);
+			.activeWhen(
+				EventEmailService.nextActive(null) != null || EventsSettings.onlinePayments()
+			);
 	}
 }

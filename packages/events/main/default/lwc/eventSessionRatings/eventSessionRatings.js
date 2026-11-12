@@ -57,6 +57,14 @@ export default class EventSessionRatings extends LightningElement {
     }
   }
 
+  get cappedText() {
+    return helpText(
+      'Events',
+      'Events_Agenda_RatingCodesCapped',
+      this.setup && this.setup.linkLimit
+    );
+  }
+
   get available() {
     return Boolean(this.setup && this.setup.available);
   }

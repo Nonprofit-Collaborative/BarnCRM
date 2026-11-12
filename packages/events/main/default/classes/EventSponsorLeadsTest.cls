@@ -52,6 +52,46 @@ private class EventSponsorLeadsTest {
 	}
 
 	@IsTest
+	static void aStaffLeadNamingTheSponsorshipWithNoScannerIsMatchedAndNotDuplicated() {
+		System.runAs(staff()) {
+			Datetime start = Datetime.now().addDays(10);
+			Event__c event = new Event__c(
+				Name = 'Community Dreamin',
+				Status__c = 'Open',
+				Format__c = 'In Person',
+				Start__c = start,
+				End__c = start.addHours(8)
+			);
+			insert as user event;
+			Event_Sponsor__c acme = new Event_Sponsor__c(
+				Event__c = event.Id,
+				Name = 'Acme',
+				Status__c = 'Confirmed'
+			);
+			insert as user acme;
+			Event_Attendee__c ana = attend(event, person('Ana', 'Garcia'), true);
+
+			Sponsor_Lead__c first = new Sponsor_Lead__c(
+				Event_Sponsor__c = acme.Id,
+				Badge_Code__c = ana.Id
+			);
+			insert as user first;
+			Sponsor_Lead__c again = new Sponsor_Lead__c(
+				Event_Sponsor__c = acme.Id,
+				Badge_Code__c = ana.Id
+			);
+			insert as user again;
+
+			Map<Id, Sponsor_Lead__c> saved = new Map<Id, Sponsor_Lead__c>(
+				[SELECT Status__c, Event_Sponsor__c FROM Sponsor_Lead__c]
+			);
+			Assert.areEqual('Shared', saved.get(first.Id).Status__c, 'Matched, not Not Found');
+			Assert.areEqual(acme.Id, saved.get(first.Id).Event_Sponsor__c, 'Keeps its sponsorship');
+			Assert.areEqual('Already Scanned', saved.get(again.Id).Status__c, 'Once per sponsor');
+		}
+	}
+
+	@IsTest
 	static void aScanBecomesALeadOnlyWhenTheAttendeeShares() {
 		System.runAs(staff()) {
 			Datetime start = Datetime.now().addDays(10);

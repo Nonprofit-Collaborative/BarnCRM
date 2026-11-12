@@ -213,6 +213,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 10 | Open My Agenda in the browser; **Add to Calendar**. | An .ics file with S1 and S2 that a phone calendar imports. |
 | 11 | Before S1 starts, save My Rating 4 on it. Move S1's start to the past and save 4 again; then 5. | Refused; then a Session Rating 4 with no person and Rated on; then refused. |
 | 12 | On a phone, open the page and choose Add to Home Screen (Android Chrome: Install app). | It opens full screen with the site icon; signing in still works. |
+| 13 | Set Zz Summit's End to a past date; GET `page?key=agenda` and `page?key=eventinfo`. | Neither page lists the ended event or its sessions. |
 
 **Cleanup:** turn both settings off; delete the connections, messages, picks and rating.
 

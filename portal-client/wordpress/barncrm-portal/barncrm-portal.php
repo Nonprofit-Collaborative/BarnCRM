@@ -133,9 +133,10 @@ add_shortcode('barncrm_portal', function ($atts) {
             'start' => get_permalink() ?: home_url('/'),
         ), home_url('/'));
         $app = sprintf(
-            ' data-barncrm-manifest="%s" data-barncrm-worker="%s" data-barncrm-icon="%s" data-barncrm-name="%s"',
+            ' data-barncrm-manifest="%s" data-barncrm-worker="%s" data-barncrm-scope="%s" data-barncrm-icon="%s" data-barncrm-name="%s"',
             esc_url($manifest),
             esc_url(add_query_arg('barncrm_portal_sw', '1', home_url('/'))),
+            esc_attr(barncrm_portal_scope()),
             esc_url(barncrm_portal_icon(180)),
             esc_attr(barncrm_portal_app_name($atts['name']))
         );
@@ -205,9 +206,15 @@ function barncrm_portal_manifest() {
     exit;
 }
 
+/** The path the service worker controls: the site's own address, so a site in a subfolder stays inside it. */
+function barncrm_portal_scope() {
+    $path = wp_parse_url(home_url('/'), PHP_URL_PATH);
+    return $path ? $path : '/';
+}
+
 function barncrm_portal_worker() {
     header('Content-Type: text/javascript; charset=utf-8');
-    header('Service-Worker-Allowed: /');
+    header('Service-Worker-Allowed: ' . barncrm_portal_scope());
     header('Cache-Control: no-cache');
     $files = wp_json_encode(barncrm_portal_app_files());
     $cache = wp_json_encode('barncrm-portal-' . BARNCRM_PORTAL_VERSION);

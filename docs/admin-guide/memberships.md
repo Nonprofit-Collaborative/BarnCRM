@@ -136,11 +136,13 @@ To sign up a new member who pays online: add a membership with Status **Pending*
 
 ## Lapse Handling and Reminders
 
-The **Memberships** step of the nightly run (6:50 AM in your org time zone, see
+The **Memberships** step of the nightly run (6:55 AM in your org time zone, see
 [Nightly Jobs](nightly-jobs.md)) does, in order: renewals from gifts, renewals from active
 recurring gifts, then lapse handling (Current to Grace to Lapsed by the level's grace days), then
 reminders. A membership with no end date never lapses. Each part handles up to 2,000 memberships
-a morning; any more are handled the next morning.
+a morning; any more are handled the next morning. A reminder is only kept as sent once the email
+goes out: if the org's daily email limit refuses the send, the reminders are tried again the next
+morning.
 
 Reminders are **off** when you install, because they email your members. To turn them on, go to
 **BarnCRM Settings**, **Memberships**:
