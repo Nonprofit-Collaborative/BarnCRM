@@ -22,15 +22,14 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 	 * `beforeDelete`, while they still name the person, is what makes both the delete and
 	 * the undelete paths work. This mirrors `AccountTriggerHandler`, which has always done
 	 * it for a person stored as an account.
+	 *
+	 * Held as the rows themselves, by person: a merge moves them to the survivor, and the
+	 * platform says a delete was a merge (by filling `MasterRecordId`) only after the delete,
+	 * when the rows are gone (C-20, see `afterDelete`). Keyed by person and added to, never
+	 * replaced: a delete of more than 200 people arrives in chunks, and the dispatcher may run
+	 * a chunk again narrowed to the rows still standing.
 	 */
-	private static Set<Id> departingHouseholdIds = new Set<Id>();
-
-	/**
-	 * The membership rows those people had, read before they were removed. Only a merge uses
-	 * them: the platform says a delete was a merge (by filling `MasterRecordId`) only after
-	 * the delete, and by then the rows are gone (C-20, see `afterDelete`).
-	 */
-	private static List<Household_Member__c> departingMemberships = new List<Household_Member__c>();
+	private static Map<Id, List<Household_Member__c>> departingByPerson = new Map<Id, List<Household_Member__c>>();
 
 	public override void beforeInsert() {
 		HouseholdService.ensureHouseholds((List<Contact>) newRecords());
@@ -89,9 +88,11 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 	 * back. Does nothing in contact mode, where there are no membership rows.
 	 */
 	public override void beforeDelete() {
-		Set<Id> personIds = personIdsOf((List<Contact>) oldRecords());
-		departingMemberships = HouseholdService.membershipsFor(personIds);
-		departingHouseholdIds = HouseholdService.removeMembershipsWithoutUpkeep(personIds);
+		departingByPerson.putAll(
+			HouseholdService.removeMembershipsWithoutUpkeep(
+				personIdsOf((List<Contact>) oldRecords())
+			)
+		);
 	}
 
 	/**
@@ -107,10 +108,8 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
 	 */
 	public override void afterDelete() {
 		List<Contact> gone = (List<Contact>) oldRecords();
-		Set<Id> affected = departingHouseholdIds;
-		departingHouseholdIds = new Set<Id>();
-		List<Household_Member__c> removed = departingMemberships;
-		departingMemberships = new List<Household_Member__c>();
+		List<Household_Member__c> removed = HouseholdService.takeDeparting(departingByPerson, gone);
+		Set<Id> affected = HouseholdService.householdsOf(removed);
 		affected.addAll(householdIds(gone));
 
 		Map<Id, Id> survivorByMerged = survivorsOf(gone);

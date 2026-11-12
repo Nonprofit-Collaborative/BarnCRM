@@ -8,8 +8,11 @@
  * It only stores: one Payment Event, Received, in system mode (the guest has no object access).
  * A Stripe event is stored only when its Stripe-Signature verifies, under its unique key, so a
  * resend is a duplicate and answered 200. A PayPal event is stored with its transmission headers
- * and verified with PayPal by the processing job. It reads no record, returns no identifier and
- * answers every outcome with an empty body.
+ * and verified with PayPal by the processing job; before that, only cheap checks are possible, so
+ * one is refused while PayPal's keys are not saved, without every signing header, or without a
+ * resource, and one of a type the job does not act on is answered 200 and not stored. The hourly
+ * cap is per processor. It reads no record, returns no identifier and answers every outcome with
+ * an empty body.
  *
  * `global` because the platform requires it of a REST resource.
  */
@@ -18,7 +21,7 @@ global with sharing class PaymentWebhookRest {
 	/** Bodies over this are refused: processor events are a few kilobytes. */
 	@TestVisible
 	private static final Integer MAX_BYTES = 65536;
-	/** Events stored in the last hour before more are refused (a processor retries later). */
+	/** One processor's events stored in the last hour before more are refused (it retries later). */
 	@TestVisible
 	private static final Integer HOURLY_LIMIT = 500;
 	private static final String CONTEXT = 'PaymentWebhookRest';
@@ -49,11 +52,24 @@ global with sharing class PaymentWebhookRest {
 		if (request.requestBody == null || request.requestBody.size() > MAX_BYTES) {
 			return 400;
 		}
+		// An unconfigured PayPal has no webhook to verify against: anything posted is refused.
+		if (processor == PaymentService.PAYPAL && !PaymentService.isReady(processor)) {
+			return 400;
+		}
 		String raw = request.requestBody.toString();
 		Map<String, Object> body = PaymentStripe.parse(raw);
 		String eventId = PaymentStripe.text(body.get('id'));
 		if (String.isBlank(eventId) || eventId.length() > 200) {
 			return 400;
+		}
+		if (processor == PaymentService.PAYPAL) {
+			if (!(body.get('resource') instanceof Map<String, Object>)) {
+				return 400;
+			}
+			// A type the processing job does not act on is acknowledged and not stored.
+			if (!PaymentPayPal.EVENT_TYPES.contains(PaymentStripe.text(body.get('event_type')))) {
+				return 200;
+			}
 		}
 		Payment_Event__c event = new Payment_Event__c(
 			Processor__c = processor,
@@ -81,10 +97,15 @@ global with sharing class PaymentWebhookRest {
 			}
 			event.Headers__c = JSON.serialize(kept);
 		}
+		// Counted per processor, so posts to one address never hold up the other's events.
 		Datetime hourAgo = Datetime.now().addHours(-1);
 		if (
-			[SELECT COUNT() FROM Payment_Event__c WHERE CreatedDate > :hourAgo WITH SYSTEM_MODE] >=
-			HOURLY_LIMIT
+			[
+				SELECT COUNT()
+				FROM Payment_Event__c
+				WHERE CreatedDate > :hourAgo AND Processor__c = :processor
+				WITH SYSTEM_MODE
+			] >= HOURLY_LIMIT
 		) {
 			return 429;
 		}

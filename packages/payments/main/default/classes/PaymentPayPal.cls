@@ -19,6 +19,18 @@ public with sharing class PaymentPayPal {
 		'paypal-transmission-sig',
 		'paypal-transmission-time'
 	};
+	/** The event types `read` acts on: the receiver stores no other. Kept beside its switch. */
+	public static final Set<String> EVENT_TYPES = new Set<String>{
+		'CHECKOUT.ORDER.APPROVED',
+		'PAYMENT.CAPTURE.COMPLETED',
+		'PAYMENT.SALE.COMPLETED',
+		'BILLING.SUBSCRIPTION.PAYMENT.FAILED',
+		'BILLING.SUBSCRIPTION.CANCELLED',
+		'PAYMENT.CAPTURE.DENIED',
+		'PAYMENT.CAPTURE.DECLINED',
+		'PAYMENT.CAPTURE.REFUNDED',
+		'PAYMENT.CAPTURE.REVERSED'
+	};
 	private static final String CONTEXT = 'PaymentPayPal';
 	private static final String PLANS = '/v1/billing/plans';
 	private static final String SUBSCRIPTIONS = '/v1/billing/subscriptions';
@@ -303,6 +315,7 @@ public with sharing class PaymentPayPal {
 		Map<String, Object> resource = PaymentStripe.mapOf(body.get('resource'));
 		PaymentService.Change change = new PaymentService.Change();
 		change.reference = PaymentStripe.text(resource.get('custom_id'));
+		// Every type handled here is in EVENT_TYPES, which the receiver stores by.
 		switch on PaymentStripe.text(body.get('event_type')) {
 			when 'CHECKOUT.ORDER.APPROVED' {
 				List<Object> units = resource.get('purchase_units') instanceof List<Object>

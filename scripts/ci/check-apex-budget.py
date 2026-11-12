@@ -93,7 +93,10 @@ CAPS = {
     # plus about 0.5%.
     # PAY-04 (D-196): the subscriptions listener and Update Card / automatic Pay Online,
     # 669,581 measured 2026-11-12, plus a small margin; both reuse the PAY-03 classes.
-    "giving": 670_000,
+    # W14 QA defect D6: donor levels compare totals and rungs in the corporate currency in a
+    # multi-currency org (reusing RollupCurrency), 672,127 measured 2026-11-12; raised by the
+    # 2,546 added, plus about 2%.
+    "giving": 672_200,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -205,7 +208,10 @@ CAPS = {
     # PayPal plan reuse (D-198, ADR-0218 amendment): one shared product, plans found by key and
     # replaced when PayPal refuses them, 72,087 measured 2026-11-12; raised by the 2,702 added,
     # plus about 2%.
-    "payments": 72_400,
+    # W14 QA defect D2: the PayPal receiver refuses posts while PayPal is not set up, checks
+    # the resource and event type before storing, and caps per processor, 72,846 measured
+    # 2026-11-12; raised by the 759 added, plus about 2%.
+    "payments": 72_900,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus

@@ -144,6 +144,27 @@ private class HubRemindersTest {
 	}
 
 	@IsTest
+	static void aMonthEndAgreementRenewsToEachMonthEnd() {
+		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
+			HubReminders reminders = new HubReminders();
+			reminders.today = Date.newInstance(2026, 4, 15);
+			Agreement__c row = new Agreement__c(
+				Status__c = 'Active',
+				End_Date__c = Date.newInstance(2026, 1, 31),
+				Auto_Renews__c = true,
+				Renewal_Months__c = 1
+			);
+
+			Assert.isTrue(reminders.renew(row), 'Renewed');
+			Assert.areEqual(
+				Date.newInstance(2026, 4, 30),
+				row.End_Date__c,
+				'31 January renews through 28 February and 31 March to 30 April, not the 28th'
+			);
+		}
+	}
+
+	@IsTest
 	static void aLapsedAgreementRenewsByItsTermOrExpires() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Date lapsed = Date.today().addDays(-2);
@@ -163,7 +184,7 @@ private class HubRemindersTest {
 				WITH USER_MODE
 			];
 			Assert.areEqual('Active', renewed.Status__c, 'Still active');
-			Assert.areEqual(lapsed.addMonths(12), renewed.End_Date__c, 'One term on');
+			Assert.areEqual(HubCompliance.nextDue(lapsed, 12), renewed.End_Date__c, 'One term on');
 			Assert.areEqual(
 				'Expired',
 				[SELECT Status__c FROM Agreement__c WHERE Id = :ending.Id WITH USER_MODE].Status__c,
