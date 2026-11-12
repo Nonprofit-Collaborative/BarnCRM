@@ -424,7 +424,7 @@ public with sharing class HouseholdSelector {
 	 * query only in an org where it can matter.
 	 *
 	 * Then each Account's Household Model decides before detection (canonical model R-H15,
-	 * ADR-NEXT `NEXT-household-model-coexistence.md`): Converted is BarnCRM's, so never native;
+	 * ADR-0216 `0216-household-model-coexistence.md`): Converted is BarnCRM's, so never native;
 	 * Nonprofit Cloud is native whatever the probe finds; Automatic or blank asks detection. An
 	 * upkeep read (ADR-0021) in system mode: the answer decides what BarnCRM writes, never what
 	 * anybody sees.

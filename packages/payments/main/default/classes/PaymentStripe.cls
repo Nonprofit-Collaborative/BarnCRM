@@ -1,8 +1,8 @@
 /**
  * The org's own Stripe account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Checkout Sessions, the Stripe-Signature check on arrival, and reading a verified event into a
- * `PaymentService.Change`; subscriptions and the setup-mode card update (ADR-NEXT
- * `NEXT-payments-subscriptions.md`). Stripe API version: the account's default.
+ * `PaymentService.Change`; subscriptions and the setup-mode card update (ADR-0218
+ * `0218-payments-subscriptions.md`). Stripe API version: the account's default.
  */
 public with sharing class PaymentStripe {
 	public static final String ENDPOINT = 'https://api.stripe.com/v1/';
@@ -57,7 +57,7 @@ public with sharing class PaymentStripe {
 
 	/**
 	 * A Checkout Session in setup mode for the customer, with the subscription in its metadata
-	 * (ADR-NEXT payments subscriptions, decision 5): Stripe's own card form, valid 24 hours.
+	 * (ADR-0218 payments subscriptions, decision 5): Stripe's own card form, valid 24 hours.
 	 */
 	public static String updateCardUrl(String customerId, String subscriptionId, String back) {
 		return text(
@@ -283,7 +283,7 @@ public with sharing class PaymentStripe {
 
 	/**
 	 * A completed setup-mode session: reads the card it saved and makes it the subscription's
-	 * default (two callouts, before any write; ADR-NEXT payments subscriptions, decision 5).
+	 * default (two callouts, before any write; ADR-0218 payments subscriptions, decision 5).
 	 */
 	private static PaymentService.Change cardUpdated(Map<String, Object> obj, String subscription) {
 		if (subscription == null || text(obj.get('setup_intent')) == null) {

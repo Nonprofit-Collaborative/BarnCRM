@@ -1,5 +1,5 @@
 /**
- * Project invoices (PM-10; ADR-NEXT `NEXT-projects-psa.md` decision 6; canonical model R-PM16
+ * Project invoices (PM-10; ADR-0219 `0219-projects-psa.md` decision 6; canonical model R-PM16
  * and R-PM17): New Invoice builds a Draft from the project's unbilled work, then Send, Mark Paid
  * and Void. Every step needs Manage Projects and Create invoices on, and runs in user mode.
  * BarnCRM takes no payment here: Paid is a status the admin sets, or Payments reports (R-PM22).

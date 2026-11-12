@@ -1,5 +1,5 @@
 /**
- * Recognized revenue (PM-11; ADR-NEXT `NEXT-projects-psa.md` decision 7; canonical model R-PM19):
+ * Recognized revenue (PM-11; ADR-0219 `0219-projects-psa.md` decision 7; canonical model R-PM19):
  * one Project Revenue row per billed project per closed month, so a closed month never moves.
  * A row is what the project earned through the month's last day, as counted at the run, less
  * every earlier row; time approved late or a falling percent complete lands in the next month.

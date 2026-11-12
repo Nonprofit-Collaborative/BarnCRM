@@ -1,6 +1,6 @@
 /**
- * Pay Online on a project invoice (PM-10, D-197 as amended 2026-11-12; ADR-NEXT
- * `NEXT-projects-psa.md` decision 6; canonical model R-PM22). BarnCRM Payments is reached only by
+ * Pay Online on a project invoice (PM-10, D-197 as amended 2026-11-12; ADR-0219
+ * `0219-projects-psa.md` decision 6; canonical model R-PM22). BarnCRM Payments is reached only by
  * name, as Events reaches it (ADR-0207): `PaymentsApi` is built with `NamespaceUtil.build` (null
  * when Payments is not installed), and Payments builds `ProjectInvoicePaymentListener` by the name
  * stored on each payment, so neither package depends on the other. Projects charges nothing and

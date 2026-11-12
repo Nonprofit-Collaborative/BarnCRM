@@ -1,9 +1,9 @@
-# ADR-NEXT: Nonprofit Cloud Households Are Converted in Place, Once, Supervised and Reversible
+# ADR-0217: Nonprofit Cloud Households Are Converted in Place, Once, Supervised and Reversible
 
 **Status:** Proposed
 **Date:** 2026-11-12
 **Source:** D-196 (3), release 1.20 item MIG-02b; plan Section 11.2 item 9. Builds on the
-companion ADR-NEXT `NEXT-household-model-coexistence.md` (the `Household_Model__c` field),
+companion ADR-0216 `0216-household-model-coexistence.md` (the `Household_Model__c` field),
 ADR-0155 (NPSP household adoption: in place, journaled, undone in system mode), ADR-0197 (the
 Migration Assistant), ADR-0141 (only Core's writer sets the Household record type), ADR-0057
 (extension seams found by class name) and ADR-0013 (no compile-time Industries dependency).

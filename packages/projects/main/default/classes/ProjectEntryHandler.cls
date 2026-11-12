@@ -1,7 +1,7 @@
 /**
  * The two before-save rules on time entries and project expenses (registry rows
  * `Time_Entry_Rates_And_Status` and `Project_Expense_Status`, both Always Runs;
- * ADR-NEXT `NEXT-projects-psa.md` sections 2 to 4). With approvals on, a new entry or expense
+ * ADR-0219 `0219-projects-psa.md` sections 2 to 4). With approvals on, a new entry or expense
  * with no Status is saved Open (R-PM11); with rate cards on, a time entry keeps the Bill Rate
  * and Cost Rate it was logged at, written on insert and again when its date, person, project or
  * task changes while it is neither Approved nor invoiced (R-PM9). With both off it changes

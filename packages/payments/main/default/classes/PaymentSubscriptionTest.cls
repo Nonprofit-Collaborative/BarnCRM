@@ -1,5 +1,5 @@
 /**
- * Payments subscriptions (PAY-04, R-PAY6; ADR-NEXT payments subscriptions): a checkout with an
+ * Payments subscriptions (PAY-04, R-PAY6; ADR-0218 payments subscriptions): a checkout with an
  * interval is a subscription only with the setting on; Stripe and PayPal renewals become new
  * Paid payments copied from the first, once each; failed charges, card updates and cancellations
  * change no payment and reach the listener once per run; Update Card opens the processor's own

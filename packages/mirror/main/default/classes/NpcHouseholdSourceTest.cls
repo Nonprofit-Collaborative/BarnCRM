@@ -1,6 +1,6 @@
 /**
  * The Nonprofit Cloud household source, kit and drift report (MIG-02b, canonical model R-HA7,
- * R-HA8, R-H15; ADR-NEXT `NEXT-npc-household-conversion.md`). No test org has Nonprofit Cloud,
+ * R-HA8, R-H15; ADR-0217 `0217-npc-household-conversion.md`). No test org has Nonprofit Cloud,
  * so native membership rows are handed in as rows, and the native household group is stood in for
  * by `groupedForTest`; the real path is shown as it behaves without the objects (nothing
  * available, nothing selected, nothing to check).

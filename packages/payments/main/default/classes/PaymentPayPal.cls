@@ -1,7 +1,7 @@
 /**
  * The org's own PayPal account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Orders with an approve link, PayPal's own webhook verification, and capture of an approved
- * order; subscriptions (ADR-NEXT `NEXT-payments-subscriptions.md`). Every callout here runs
+ * order; subscriptions (ADR-0218 `0218-payments-subscriptions.md`). Every callout here runs
  * before any write of the transaction it is in.
  */
 public with sharing class PaymentPayPal {

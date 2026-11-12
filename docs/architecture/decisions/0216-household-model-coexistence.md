@@ -1,4 +1,4 @@
-# ADR-NEXT: One Household Model per Account, Recorded in Household Model
+# ADR-0216: One Household Model per Account, Recorded in Household Model
 
 **Status:** Proposed
 **Date:** 2026-11-12
@@ -7,7 +7,7 @@ Group coexistence, the provisional "guards only" choice of 2026-09-23 confirmed 
 migration). Builds on ADR-0036 (empty household delete guard), ADR-0130 (contact relations are
 not native households without native groups), ADR-0013 (Core runs on a Platform-only org) and
 ADR-0141 (only Core's writer gives an Account the Household record type). The conversion that
-sets the field is the companion ADR-NEXT `NEXT-npc-household-conversion.md`.
+sets the field is the companion ADR-0217 `0217-npc-household-conversion.md`.
 
 ## Context
 

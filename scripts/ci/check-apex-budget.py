@@ -199,7 +199,7 @@ CAPS = {
     # Giving and Money review fixes (bulk listener call, abandon job, callout-time budget,
     # countRecent, PayPal refund capture, Schedule button): 55,965 measured 2026-11-12, plus
     # about 0.5%.
-    # PAY-04 subscriptions (D-196, ADR-NEXT payments subscriptions): Stripe and PayPal
+    # PAY-04 subscriptions (D-196, ADR-0218 payments subscriptions): Stripe and PayPal
     # subscription checkouts, renewals, subscription news to listeners and Update Card:
     # 69,202 measured 2026-11-12, plus about 0.5%.
     "payments": 69_600,
@@ -228,7 +228,7 @@ CAPS = {
     "memberships": 49_340,
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
-    # plus about 2%. PSA model (D-197, ADR-NEXT projects PSA): the PSA settings accessors,
+    # plus about 2%. PSA model (D-197, ADR-0219 projects PSA): the PSA settings accessors,
     # 34,147 measured; each PSA builder raises it by what its own classes measure. Builder B
     # (PM-09 ProjectStaffingController and the utilization change): 7,751 measured. Builder A
     # (PM-06 to PM-08: rates, entry handler, timesheet and approvals): 17,221 measured. 59,119 in

@@ -1,5 +1,5 @@
 /**
- * The Staffing page and the allocation view (PM-09; ADR-NEXT `NEXT-projects-psa.md` decision 5,
+ * The Staffing page and the allocation view (PM-09; ADR-0219 `0219-projects-psa.md` decision 5,
  * R-PM14, R-PM15). Thin by design (plan Section 9.9): it returns the records the browser needs
  * and `c/projectsAllocationModel` works out allocation and ranks candidates. User mode
  * throughout; with Manage resources off it returns nothing and changes nothing.

@@ -1,5 +1,5 @@
 /**
- * Print on an invoice (PM-10; ADR-NEXT `NEXT-projects-psa.md` decision 6): a PDF of the invoice
+ * Print on an invoice (PM-10; ADR-0219 `0219-projects-psa.md` decision 6): a PDF of the invoice
  * made from HTML with `Blob.toPdf`, as Giving's receipts are, saved to the invoice's Files. No
  * Visualforce page. User mode; needs Manage Projects and Create invoices on.
  */

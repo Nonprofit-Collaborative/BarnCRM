@@ -1,8 +1,8 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the project health
  * check and, while Show financials and recognize revenue is on, the monthly revenue rows to the
- * one nightly run (ADR-0166; ADR-0208 `0208-project-management-module.md` decision 5; ADR-NEXT
- * `NEXT-projects-psa.md` decision 7).
+ * one nightly run (ADR-0166; ADR-0208 `0208-project-management-module.md` decision 5; ADR-0219
+ * `0219-projects-psa.md` decision 7).
  */
 @NamespaceAccessible
 public with sharing class ProjectsNightlyJobProvider implements NightlyStepProvider {

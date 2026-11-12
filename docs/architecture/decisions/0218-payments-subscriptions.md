@@ -1,4 +1,4 @@
-# ADR-NEXT: Payments subscriptions: a recurring gift charged by the processor's own subscription, renewals and failures told to Giving, and Update Card on the processor's own page
+# ADR-0218: Payments subscriptions: a recurring gift charged by the processor's own subscription, renewals and failures told to Giving, and Update Card on the processor's own page
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-12

@@ -1,5 +1,5 @@
 /**
- * Payments subscriptions in Giving (PAY-04, R-RH5; ADR-NEXT payments subscriptions, decision 4):
+ * Payments subscriptions in Giving (PAY-04, R-RH5; ADR-0218 payments subscriptions, decision 4):
  * the listener fills a recurring gift's processor ids once and records each change once as a
  * Recurring Gift Event, which G-27's rules apply to the gift's health.
  */

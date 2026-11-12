@@ -10,7 +10,7 @@
  *   isReady        { processor?, recurring? } returns true when that processor's keys are
  *                  entered (and, with recurring true, Automatic Recurring Payments is on)
  *   updateCard     { subscriptionId, customerId?, returnUrl } returns { url }, the processor's
- *                  own page for a new card (ADR-NEXT `NEXT-payments-subscriptions.md`)
+ *                  own page for a new card (ADR-0218 `0218-payments-subscriptions.md`)
  *   countRecent    { sourceRecordId, minutes?, status? } returns how many payments for that
  *                  record were started in the last minutes (default 60), of that status if given
  *

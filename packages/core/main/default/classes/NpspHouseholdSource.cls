@@ -10,7 +10,7 @@
  * This is the seam the tests replace (`instance`): no test org has NPSP, so the tests subclass
  * it to name ordinary Accounts as NPSP households and to hand back NPSP values.
  *
- * It is also the base of a second source (R-HA7, ADR-NEXT `NEXT-npc-household-conversion.md`):
+ * It is also the base of a second source (R-HA7, ADR-0217 `0217-npc-household-conversion.md`):
  * Mirror's `NpcHouseholdSource` overrides `key()`, the selection and the reads for Nonprofit
  * Cloud households, and `forKey` finds it by class name (ADR-0057), so Core names no native
  * object here.

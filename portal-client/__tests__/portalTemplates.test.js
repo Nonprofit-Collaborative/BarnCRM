@@ -228,7 +228,7 @@ describe('shipped portal templates', () => {
         expect(page.kind).toBe('person');
         expect(page.key).toBe('contact');
       }
-      // PAY-03 (ADR-0210) and PAY-04 (ADR-NEXT payments subscriptions): the two module
+      // PAY-03 (ADR-0210) and PAY-04 (ADR-0218 payments subscriptions): the two module
       // actions, on pledges only.
       modules.forEach((action) => {
         expect(['Giving.PayOnline', 'Giving.UpdateCard']).toContain(action.extension);

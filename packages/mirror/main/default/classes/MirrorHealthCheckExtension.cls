@@ -74,7 +74,7 @@ public with sharing class MirrorHealthCheckExtension implements HealthCheckExten
 	}
 
 	/**
-	 * The household drift report (MIG-02b, ADR-NEXT `NEXT-npc-household-conversion.md` decision
+	 * The household drift report (MIG-02b, ADR-0217 `0217-npc-household-conversion.md` decision
 	 * 8): Accounts whose Household Model and native household group disagree, counted and the
 	 * first ten named. A warning that changes nothing; a failed read is reported as such.
 	 */

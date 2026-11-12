@@ -1,4 +1,4 @@
-# ADR-NEXT: Projects PSA: rate cards, time and expense approvals, resource management, invoices, recognized revenue and change requests, each behind its own setting
+# ADR-0219: Projects PSA: rate cards, time and expense approvals, resource management, invoices, recognized revenue and change requests, each behind its own setting
 
 **Status:** Accepted (builder decision, for Brandon to confirm)
 **Date:** 2026-11-12

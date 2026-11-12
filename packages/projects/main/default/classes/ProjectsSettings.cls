@@ -27,7 +27,7 @@ public with sharing class ProjectsSettings {
 		return number('Weekly_Capacity_Hours__c', 40, 168);
 	}
 
-	/** PM-06: rate cards. Each PSA part ships off and needs time tracking on (ADR-NEXT projects-psa). */
+	/** PM-06: rate cards. Each PSA part ships off and needs time tracking on (ADR-0219 projects-psa). */
 	public static Boolean ratesEnabled() {
 		return part('Rates_Enabled__c');
 	}

@@ -2,7 +2,7 @@
  * Payments' one status flow (canonical model 29PAY1, R-PAY1 to R-PAY3; ADR-0201
  * `0201-payments-module.md`, decisions 3, 6 and 8): starting a checkout, applying what a
  * processor reported, cancelling abandoned checkouts and telling each payment's listener.
- * Subscriptions, renewals and Update Card: R-PAY6, ADR-NEXT `NEXT-payments-subscriptions.md`.
+ * Subscriptions, renewals and Update Card: R-PAY6, ADR-0218 `0218-payments-subscriptions.md`.
  */
 public with sharing class PaymentService {
 	/** Subscription news told to listeners (`subscriptionsChanged`, event). */
@@ -199,7 +199,7 @@ public with sharing class PaymentService {
 	}
 
 	/**
-	 * The processor's own page for a subscription's new card (ADR-NEXT payments subscriptions,
+	 * The processor's own page for a subscription's new card (ADR-0218 payments subscriptions,
 	 * decision 5): Stripe (`sub_...`) needs the customer; any other id is PayPal's.
 	 */
 	public static String updateCard(Map<String, Object> args) {
@@ -345,7 +345,7 @@ public with sharing class PaymentService {
 			}
 		}
 		// System mode: the processing administrator edits payments but creates none, and a
-		// renewal comes only from a verified processor event (ADR-NEXT payments subscriptions, 2).
+		// renewal comes only from a verified processor event (ADR-0218 payments subscriptions, 2).
 		Database.insert(renewals, AccessLevel.SYSTEM_MODE);
 		Map<String, List<Map<String, Object>>> news = new Map<String, List<Map<String, Object>>>();
 		for (Outcome o : outcomes) {

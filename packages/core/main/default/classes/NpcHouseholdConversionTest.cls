@@ -1,6 +1,6 @@
 /**
  * The Nonprofit Cloud source of household adoption (MIG-02b, canonical model R-HA7 to R-HA9,
- * ADR-NEXT `NEXT-npc-household-conversion.md`). Mirror's source is not in Core, so a fake with
+ * ADR-0217 `0217-npc-household-conversion.md`). Mirror's source is not in Core, so a fake with
  * the NPC key names ordinary Accounts as Nonprofit Cloud households: a conversion runs in
  * Junction mode, marks the Account Converted and journals the model it had, keeps its runs
  * apart from NPSP's, and its undo puts the model back except on a household with members.

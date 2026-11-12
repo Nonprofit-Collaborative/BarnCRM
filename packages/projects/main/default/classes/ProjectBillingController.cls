@@ -1,5 +1,5 @@
 /**
- * The billing and financials screens (PM-10, PM-11; ADR-NEXT `NEXT-projects-psa.md` decisions 6
+ * The billing and financials screens (PM-10, PM-11; ADR-0219 `0219-projects-psa.md` decisions 6
  * and 7): New Invoice on the project page, the actions on an invoice, Export Invoices on Projects
  * Home and the Financials card. Thin by design (plan Section 9.9): plain maps in user mode; the
  * CSV, margin and the open month are worked out by `c/projectsBillingModel`. A refusal written

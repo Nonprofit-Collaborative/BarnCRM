@@ -9,8 +9,8 @@
  * `NpspHouseholdSource`, so nothing here names NPSP and an org without it simply has nothing to
  * adopt. Every method requires Manage BarnCRM Settings (R-HA5).
  *
- * The same preview, run, journal and undo convert Nonprofit Cloud households (R-HA7, ADR-NEXT
- * `NEXT-npc-household-conversion.md`): each method takes a source key, NPSP when blank, and an
+ * The same preview, run, journal and undo convert Nonprofit Cloud households (R-HA7, ADR-0217
+ * `0217-npc-household-conversion.md`): each method takes a source key, NPSP when blank, and an
  * NPC run's id carries its key so each panel shows and undoes only its own runs.
  */
 public with sharing class NpspHouseholdAdoptionService {

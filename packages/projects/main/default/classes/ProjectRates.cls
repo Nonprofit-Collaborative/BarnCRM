@@ -1,5 +1,5 @@
 /**
- * PM-06 rate resolution (canonical model R-PM9; ADR-NEXT `NEXT-projects-psa.md` section 2).
+ * PM-06 rate resolution (canonical model R-PM9; ADR-0219 `0219-projects-psa.md` section 2).
  * For each time entry, its Bill Rate and Cost Rate come from the person's own rate, else the
  * rate for their role on the project, else (Bill Rate only) the project's Hourly Rate, each of
  * the two resolved separately. Reads the rate cards in system mode because Staff cannot read

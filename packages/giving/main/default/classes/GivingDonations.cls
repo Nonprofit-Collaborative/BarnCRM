@@ -254,7 +254,7 @@ public with sharing class GivingDonations implements Callable {
 	}
 
 	/**
-	 * Payments subscriptions (PAY-04, R-RH5; ADR-NEXT `NEXT-payments-subscriptions.md`, decision
+	 * Payments subscriptions (PAY-04, R-RH5; ADR-0218 `0218-payments-subscriptions.md`, decision
 	 * 4): fills each commitment's processor ids when blank and records each change once as a
 	 * Recurring Gift Event (upsert by its event key), which G-27's rules then apply.
 	 */

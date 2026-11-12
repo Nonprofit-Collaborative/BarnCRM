@@ -1,6 +1,6 @@
 /**
  * Projects' listener on the payment seam (PM-10, R-PM22; ADR-0201 `0201-payments-module.md`,
- * decision 8; ADR-NEXT `NEXT-projects-psa.md` decision 6). BarnCRM Payments builds it by the name
+ * decision 8; ADR-0219 `0219-projects-psa.md` decision 6). BarnCRM Payments builds it by the name
  * stored on each payment Send Payment Link started and tells it once per run about every changed
  * payment (`paymentsChanged`), or one at a time (`paymentChanged`) when the bulk call failed; the
  * work is `ProjectInvoicePayments.apply`.

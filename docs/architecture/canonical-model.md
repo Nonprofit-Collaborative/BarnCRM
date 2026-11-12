@@ -376,8 +376,8 @@ queued; the batch runs in the background and reports neither progress nor comple
 the console, and its counts are written to the debug log only. On households with Custom
 Name set, recomputation only fills a blank greeting (R-H8).
 
-**R-H15 One household model per Account (D-196, ADR-NEXT
-`NEXT-household-model-coexistence.md`).** Household Model says which household model owns an
+**R-H15 One household model per Account (D-196, ADR-0216
+`0216-household-model-coexistence.md`).** Household Model says which household model owns an
 Account: Automatic (the default; blank reads the same) leaves it to detection, Nonprofit Cloud
 keeps it a native household, Converted means BarnCRM owns it although its native household
 group is still there. The mutual exclusion guards (naming, automatic household creation,
@@ -7112,7 +7112,7 @@ data: a card is known only by its expiry month.
   year / 6, Yearly / 12) in the page's framework-free model; at-risk revenue is the same sum over
   the R-RH3 list; and the Received gifts on recurring gifts for this month and the eleven before,
   by calendar month. Read as the person.
-- **R-RH5 Payments subscriptions** (PAY-04, D-196; ADR-NEXT `NEXT-payments-subscriptions.md`).
+- **R-RH5 Payments subscriptions** (PAY-04, D-196; ADR-0218 `0218-payments-subscriptions.md`).
   When Payments tells Giving's listener of a subscription change on a commitment
   (`subscriptionsChanged`), the commitment's Processor Subscription Id and Processor Customer Id
   are filled when blank, and one Recurring Gift Event per change is upserted by External Id (the
@@ -13382,8 +13382,8 @@ answer is no. While in use, turning on Household Upkeep is refused with the reas
 setup leaves it out instead of failing, and its Features row shows the reason whether it is on
 or off. Nothing BarnCRM or NPSP stores is changed.
 
-**R-HA7 Nonprofit Cloud households are a second source (MIG-02b, D-196, ADR-NEXT
-`NEXT-npc-household-conversion.md`).** The same preview, run, journal and undo convert
+**R-HA7 Nonprofit Cloud households are a second source (MIG-02b, D-196, ADR-0217
+`0217-npc-household-conversion.md`).** The same preview, run, journal and undo convert
 Nonprofit Cloud households when Mirror is installed: Core finds Mirror's `NpcHouseholdSource`
 by class name, and without it, or without the native group object, that source is not
 available. Its candidates are Accounts carrying a `PartyRelationshipGroup` of type Household,
@@ -16803,7 +16803,7 @@ fails, is told one payment at a time (`paymentChanged`), each failure rolled bac
 **R-PAY4 No card data.** No field holds a card, bank account or PayPal sign-in; the processor's
 page takes them.
 
-**R-PAY6 Subscriptions** (PAY-04, D-196; ADR-NEXT `NEXT-payments-subscriptions.md`). With
+**R-PAY6 Subscriptions** (PAY-04, D-196; ADR-0218 `0218-payments-subscriptions.md`). With
 Automatic Recurring Payments on, a checkout started with an interval is a processor subscription;
 its first payment gains the Subscription Id. A paid charge on a subscription is matched by its
 Processor Payment Id; failing that, the subscription's first payment (by reference, else by
@@ -18107,7 +18107,7 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Rules
 
-- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-NEXT `NEXT-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-0219 `0219-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, section Projects, module `Projects`. A blank or out of range number reads as its default.
 - **PSA switches.** Every PSA switch ships off and reads off while Track time and budgets is off. Take invoice payments online also needs Create invoices and the Payments module.
 
 ### Salesforce implementation
@@ -18137,7 +18137,7 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Definition
 
-A bill rate and an optional cost rate for one person or one role, from a date (PM-06, ADR-NEXT `NEXT-projects-psa.md`, D-197). Org-wide; resolved for each time entry by R-PM9 (29PM5).
+A bill rate and an optional cost rate for one person or one role, from a date (PM-06, ADR-0219 `0219-projects-psa.md`, D-197). Org-wide; resolved for each time entry by R-PM9 (29PM5).
 
 ### Rules
 
@@ -19000,9 +19000,9 @@ mirrors the primary member).
 | 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
 | 1.48 | 2026-11-12 | Corporate Hub quorum warning and immediate breach bell (CH-21, CH-22, D-196). `Board_Motion__c.Closed_Without_Quorum__c` (Checkbox, default false); R-MO1 sets it when Close Voting finds Quorum Met false. R-DB1: registry automation `Data_Breach_Bell` sends the breach bell on insert. |
 | 1.49 | 2026-11-12 | LWC Builder charts with two groupings and three totals (LB-07, D-196; ADR-0203 amendment of 2026-11-12). No object or field added. R-LB1: a `chart` block gains the optional `display` property (`grouped` or `stacked`, blank read as `grouped`); the definition stays schema version 1, and an additive property with a meaning-keeping default does not raise it. |
-| 1.50 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-NEXT `NEXT-household-model-coexistence.md`, ADR-NEXT `NEXT-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, Junction members joined with primary, role and dates, `Household_Model__c` and the new membership rows journaled and undone. Mirror ships kit `NPC_Households` (one tool step) and a Health Check drift report. No object added. |
-| 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-NEXT `NEXT-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
-| 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-NEXT `NEXT-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
+| 1.50 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-0216 `0216-household-model-coexistence.md`, ADR-0217 `0217-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, Junction members joined with primary, role and dates, `Household_Model__c` and the new membership rows journaled and undone. Mirror ships kit `NPC_Households` (one tool step) and a Health Check drift report. No object added. |
+| 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
+| 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 
 ---
 ## 32. Entity ownership by package

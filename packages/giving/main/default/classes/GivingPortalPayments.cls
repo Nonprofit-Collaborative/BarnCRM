@@ -27,7 +27,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 	@TestVisible
 	private static EmailSender emailSender = new MessagingEmailSender();
 
-	/** Update Card (PAY-04; ADR-NEXT `NEXT-payments-subscriptions.md`, decision 6). */
+	/** Update Card (PAY-04; ADR-0218 `0218-payments-subscriptions.md`, decision 6). */
 	public static final String UPDATE_CARD = 'Giving.UpdateCard';
 	/** A recurring gift's Frequency as the processor's interval and count (PAY-04). */
 	private static final Map<String, List<Object>> EVERY = new Map<String, List<Object>>{

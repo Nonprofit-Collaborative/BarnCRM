@@ -1,6 +1,6 @@
 /**
  * Nonprofit Cloud households as a source of Core's household adoption (MIG-02b, canonical model
- * R-HA7 and R-HA8, ADR-NEXT `NEXT-npc-household-conversion.md`). Core finds this class by name
+ * R-HA7 and R-HA8, ADR-0217 `0217-npc-household-conversion.md`). Core finds this class by name
  * (`NpspHouseholdSource.forKey`, ADR-0057) and runs the same preview, run, journal and undo it
  * runs for NPSP.
  *
@@ -182,7 +182,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 			: ' AND IsActive = true';
 	}
 
-	/** Native roles to Household Member roles (ADR-NEXT conversion decision 4). */
+	/** Native roles to Household Member roles (ADR-0217 conversion decision 4). */
 	private static final Map<String, String> ROLES = new Map<String, String>{
 		'husband' => 'Spouse or Partner',
 		'wife' => 'Spouse or Partner',
@@ -294,7 +294,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	}
 
 	// ---------------------------------------------------------------------------------------
-	// The drift report (ADR-NEXT conversion decision 8), shown by MirrorHealthCheckExtension
+	// The drift report (ADR-0217 conversion decision 8), shown by MirrorHealthCheckExtension
 	// ---------------------------------------------------------------------------------------
 
 	/** Test seam: the Accounts said to carry a native household group, in place of the query. */

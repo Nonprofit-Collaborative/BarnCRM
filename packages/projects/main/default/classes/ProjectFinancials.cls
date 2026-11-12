@@ -1,5 +1,5 @@
 /**
- * The Financials card's figures (PM-11; ADR-NEXT `NEXT-projects-psa.md` decision 7; canonical
+ * The Financials card's figures (PM-11; ADR-0219 `0219-projects-psa.md` decision 7; canonical
  * model R-PM21), worked out on demand in user mode: budget (Budget Amount plus approved changes),
  * revenue and cost to date (as R-PM19 earns them, through today), invoiced (Sent and Paid totals)
  * and the stored months. Cost is read only by those who can read cost (Projects Admin); margin,
