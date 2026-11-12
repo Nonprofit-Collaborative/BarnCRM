@@ -354,6 +354,7 @@ public with sharing class HouseholdWriter {
 			);
 		}
 		if (redundant != null && !redundant.isEmpty()) {
+			List<String> failed = new List<String>();
 			for (
 				Database.DeleteResult result : Database.delete(
 					redundant,
@@ -362,12 +363,10 @@ public with sharing class HouseholdWriter {
 				)
 			) {
 				if (!result.isSuccess()) {
-					log(
-						firstMessage(result.getErrors()),
-						Label.Core_Households_ErrorContextMergeSettle
-					);
+					failed.add(firstMessage(result.getErrors()));
 				}
 			}
+			logAll(failed, Label.Core_Households_ErrorContextMergeSettle);
 		}
 	}
 
@@ -386,14 +385,13 @@ public with sharing class HouseholdWriter {
 				false,
 				AccessLevel.USER_MODE
 			);
+			List<String> failed = new List<String>();
 			for (Database.DeleteResult result : deletes) {
 				if (!result.isSuccess()) {
-					log(
-						firstMessage(result.getErrors()),
-						Label.Core_Households_ErrorContextMembership
-					);
+					failed.add(firstMessage(result.getErrors()));
 				}
 			}
+			logAll(failed, Label.Core_Households_ErrorContextMembership);
 		} catch (Exception e) {
 			ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership);
 		}
@@ -419,14 +417,13 @@ public with sharing class HouseholdWriter {
 				false,
 				AccessLevel.USER_MODE
 			);
+			List<String> failed = new List<String>();
 			for (Database.DeleteResult result : deletes) {
 				if (!result.isSuccess()) {
-					log(
-						firstMessage(result.getErrors()),
-						Label.Core_Households_ErrorContextMembership
-					);
+					failed.add(firstMessage(result.getErrors()));
 				}
 			}
+			logAll(failed, Label.Core_Households_ErrorContextMembership);
 		} catch (Exception e) {
 			ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership);
 		}
@@ -446,37 +443,42 @@ public with sharing class HouseholdWriter {
 				false,
 				AccessLevel.USER_MODE
 			);
+			List<String> failed = new List<String>();
 			for (Database.UndeleteResult result : restores) {
 				if (!result.isSuccess()) {
-					log(
-						firstMessage(result.getErrors()),
-						Label.Core_Households_ErrorContextMembership
-					);
+					failed.add(firstMessage(result.getErrors()));
 				}
 			}
+			logAll(failed, Label.Core_Households_ErrorContextMembership);
 		} catch (Exception e) {
 			ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership);
 		}
 	}
 
 	private static void logFailures(List<Database.SaveResult> saves, String context) {
+		List<String> failed = new List<String>();
 		for (Database.SaveResult save : saves) {
 			if (!save.isSuccess()) {
-				log(firstMessage(save.getErrors()), context);
+				failed.add(firstMessage(save.getErrors()));
 			}
 		}
+		logAll(failed, context);
 	}
 
 	private static String firstMessage(List<Database.Error> errors) {
 		return errors == null || errors.isEmpty() ? '' : errors[0].getMessage();
 	}
 
-	private static void log(String message, String context) {
-		ErrorLogger.log(
-			new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorSaveFailed') + ' ' + message
-			),
-			context
-		);
+	/** One entry per refused row, written in one statement after the loop (R-E7). */
+	private static void logAll(List<String> messages, String context) {
+		List<Exception> thrown = new List<Exception>();
+		for (String message : messages) {
+			thrown.add(
+				new HouseholdException(
+					BarnHelp.text('Core', 'Core_Households_ErrorSaveFailed') + ' ' + message
+				)
+			);
+		}
+		ErrorLogger.log(thrown, context);
 	}
 }

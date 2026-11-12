@@ -1,0 +1,6 @@
+# Error Log calls check-log-in-loop.py allows inside a loop over save results.
+# One per line: ClassName.methodName # reason
+CampaignSyncService.copy # logRefusal only queues the message; flushLog writes the queue in one statement (R-CS5)
+CampaignSyncService.deleteOrphans # log only queues the message; flushLog writes the queue in one statement (R-CS5)
+CampaignSyncService.fixParentsCreatedHere # logRefusal only queues the message; flushLog writes the queue in one statement (R-CS5)
+CampaignSyncService.storeLinks # logRefusal only queues the message; flushLog writes the queue in one statement (R-CS5)

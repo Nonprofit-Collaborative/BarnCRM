@@ -861,6 +861,9 @@ the app rather than in debug logs (plan Sections 2.3 and 4.8).
 | Technical Detail | long text | no | Exception type, stack trace, and query or DML detail, for a developer or a bug report. |
 | Severity | picklist(Info, Warning, Error, Critical) | yes | How badly the failure affects the org's data or operations. |
 | Status | picklist(New, Acknowledged, Resolved, Ignored) | yes | Where the admin has got to with this error. |
+| Occurrences | integer, default 1 | no | How many times the same failure happened within an hour of the first, counted on this one entry (R-E7). |
+| Other Records | text(255) | no | Up to ten more records the same failure happened on, comma separated, after Record Reference (R-E7). |
+| Occurrence Key | text(64) | no | A SHA-256 hash of Context, Severity and Message, by which a repeat finds its entry (R-E7). Indexed, not unique. |
 
 ### Rules
 
@@ -900,6 +903,15 @@ its passes, deletes every entry, whatever its Status, created more than
 `Error_Log_Retention_Days__c` days before (default 180, 0 keeps every entry). The delete is
 package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
 setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
+**R-E7 A repeat is counted, not written again (D-200 P4).** The subscriber writes one entry
+per distinct failure: an event whose Context, Message and Severity match a New entry first
+written within the last hour adds its count to that entry's Occurrences and names its record
+in Other Records while fewer than ten are named; repeats inside one delivery fold together
+first. An entry an administrator has acknowledged, resolved or ignored, or one first written
+over an hour before, is never added to: the next repeat starts a new entry. Code that saves
+with partial success logs the refused rows once, after the loop over the results
+(`ErrorLogger.logFailures`, `logMessages` or one summary), never one call per row;
+`scripts/ci/check-log-in-loop.py` enforces it, with an allowlist that names its reasons.
 
 ### Salesforce implementation
 
@@ -908,7 +920,9 @@ setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
 - **Fields:** `Timestamp__c` (DateTime), `User__c` (Lookup to User), `Context__c` (Text),
   `Record_Reference__c` (Text), `Object_Name__c` (Text), `Message__c` (Long Text Area),
   `Technical_Detail__c` (Long Text Area), `Severity__c` (Picklist: Info, Warning, Error,
-  Critical), `Status__c` (Picklist: New, Acknowledged, Resolved, Ignored).
+  Critical), `Status__c` (Picklist: New, Acknowledged, Resolved, Ignored),
+  `Occurrences__c` (Number, default 1), `Other_Record_Ids__c` (Text 255),
+  `Occurrence_Key__c` (Text 64, External ID for its index, not unique).
 - **Event:** `Error_Log_Event__e`, a platform event with publish behavior Publish
   Immediately, carrying the same values so that they survive a rollback (rule R-E4):
   `Message__c`, `Technical_Detail__c` (Long Text Area), `Context__c`,
@@ -19039,6 +19053,7 @@ mirrors the primary member).
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
 | 1.54 | 2026-11-12 | Cut-over cleanup (D-199, D-200 S4; ADR-0194 note of 2026-11-12). No object or field added. Removed, since the namespaced managed release is a fresh install everywhere: the Coordinator permission set group (`Volunteer_Coordinator`) and `RetiredRoleMigration`; the five retired Mirror sets (`Campaign_Sync`, `Opportunity_Mirror`, `Gift_Transaction_Mirror`, `Inbound_Gift_API`, `Record_Inbound_Gift_Action`) and `MirrorAccessSync`; the Volunteers Health Check finding `volunteer_coordinator_access` and its fix. `Volunteers_Coordinator` stays as an extra permission.  Also removed: R-NJ5's adoption of old schedules (`NightlyJobs.adoptOldSchedules`, `SeasonalAddressScheduler.adoptExistingSchedule`, the `ImportRowPurgeScheduler` shell); `RollupEngineExtensionV2` and `V3` merged into `RollupEngineExtension`. |
+| 1.55 | 2026-11-12 | Error Log under load (D-200 P4, release 1.22). `Error_Log__c` gains `Occurrences__c` (Number, default 1), `Other_Record_Ids__c` (Text(255)) and `Occurrence_Key__c` (Text(64), external ID for its index); rule R-E7: the subscriber counts a repeat of a New entry's Context, Message and Severity within an hour on that entry, naming up to ten more records, and code logs a partial save's refused rows once after the loop (`check-log-in-loop.py`). No object added. |
 
 ---
 ## 32. Entity ownership by package

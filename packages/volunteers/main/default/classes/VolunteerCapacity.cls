@@ -134,13 +134,12 @@ public inherited sharing class VolunteerCapacity {
 		if (promoted.isEmpty()) {
 			return;
 		}
-		for (
-			Database.SaveResult result : Database.update(promoted, false, AccessLevel.SYSTEM_MODE)
-		) {
-			if (!result.isSuccess()) {
-				ErrorLogger.logMessage(result.getErrors()[0].getMessage(), LOG_CONTEXT, 'Warning');
-			}
-		}
+		ErrorLogger.logFailures(
+			Database.update(promoted, false, AccessLevel.SYSTEM_MODE),
+			null,
+			LOG_CONTEXT,
+			ErrorLogger.SEVERITY_WARNING
+		);
 	}
 
 	/**

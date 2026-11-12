@@ -138,22 +138,15 @@ public with sharing class VolunteerRecognitionJob implements Database.Batchable<
 		for (Integer i = 0; i < stamps.size(); i++) {
 			if (stamps[i].isSuccess()) {
 				tasks.add(milestoneTasks[i]);
-			} else {
-				ErrorLogger.logMessage(
-					stamps[i].getErrors()[0].getMessage(),
-					LOG_CONTEXT,
-					'Warning'
-				);
 			}
 		}
+		ErrorLogger.logFailures(stamps, null, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		Integer made = 0;
-		for (Database.SaveResult result : Database.insert(tasks, false, AccessLevel.SYSTEM_MODE)) {
-			if (result.isSuccess()) {
-				made++;
-			} else {
-				ErrorLogger.logMessage(result.getErrors()[0].getMessage(), LOG_CONTEXT, 'Warning');
-			}
+		List<Database.SaveResult> results = Database.insert(tasks, false, AccessLevel.SYSTEM_MODE);
+		for (Database.SaveResult result : results) {
+			made += result.isSuccess() ? 1 : 0;
 		}
+		ErrorLogger.logFailures(results, null, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		return made;
 	}
 

@@ -49,6 +49,14 @@
       </layoutItems>
       <layoutItems>
         <behavior>Readonly</behavior>
+        <field>Other_Record_Ids__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Occurrences__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
         <field>User__c</field>
       </layoutItems>
     </layoutColumns>
