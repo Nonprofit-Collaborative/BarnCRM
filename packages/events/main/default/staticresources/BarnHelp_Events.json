@@ -367,6 +367,7 @@
     "Events_Agenda_RateThisSession": "Rate this session",
     "Events_Agenda_Rated": "Rated {0} ({1})",
     "Events_Speakers_Rated": "Average rating {0} from {1}",
+    "Events_Speakers_Checklist": "Checklist {0} of 3",
     "Events_Applications_Criteria": "Scoring Criteria",
     "Events_Applications_CriteriaIntro": "Reviewers score each criterion from 1 to 5; a criterion with weight 2 counts twice as much as one with weight 1. With no criteria, a review is one score from 1 to 5. Changing the criteria leaves earlier reviews as they were.",
     "Events_Applications_Criterion": "Criterion",

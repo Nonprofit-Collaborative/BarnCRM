@@ -28,6 +28,7 @@ const SPONSOR_FIELDS = [
   'Level__c',
   'Amount__c',
   'Contact__c',
+  'Booth__c',
   'Linked_Record_Id__c',
   'Notes__c'
 ];
