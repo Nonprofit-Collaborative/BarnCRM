@@ -841,7 +841,7 @@ still deleted.
 | | N-1 from a git ref | N-1 from a `04t` file | Post-install |
 |---|---|---|---|
 | `managed` | Refused: a managed beta cannot be upgraded (or installed in production). `--promote-from` promotes each N-1 version after it is built: **promotion is permanent and needs the owner's approval**, and N must then carry a higher major.minor.patch | The ids must be released (promoted) versions | Runs on its own: each package's `postInstallScript` |
-| `unlocked` | Unpromoted versions install in scratch orgs | Any versions | A post-install script runs for managed packages only, so after every install and upgrade the script calls each package's `new <ns>.<Module>PostInstall().runSetup(UserInfo.getUserId())` as the admin itself (`setup-n1` and `setup-n` steps) |
+| `unlocked` | Unpromoted versions install in scratch orgs | Any versions | A post-install script runs for managed packages only, so after every install and upgrade the script calls `<ns>.BarnInstallCheck.finishSetup('<Module>')` for each package as the admin itself (`setup-n1` and `setup-n` steps) |
 
 `--plan` prints which path applies on its "N-1 path" line.
 

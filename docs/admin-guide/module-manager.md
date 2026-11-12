@@ -111,7 +111,9 @@ visibility. To hide a module from a colleague, take away its role on the
 Install BarnCRM and its modules as packages. Each package runs its own setup steps when it is
 installed and at every upgrade: it creates its automation switches, import templates and
 shipped totals, gives the installer its administrator access, and so on. Copying the source
-into an org by hand skips those steps, and the module then works only in part.
+into an org by hand skips those steps, and the module then works only in part. When an upgrade
+adds new setup steps to a module and they did not run (for example, the upgrade's own steps
+failed), the row is flagged again in the same way until they do.
 
 A row whose setup steps never ran says "Its setup steps never ran, which happens when source
 is copied in by hand. Finish Setup runs the steps a package install runs." With the **Manage

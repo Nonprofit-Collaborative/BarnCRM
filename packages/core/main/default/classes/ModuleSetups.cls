@@ -15,9 +15,27 @@
  * followed by `PostInstall`. A package version from before FS1 has no class that implements
  * `ModuleSetup`, so it is never flagged; its next upgrade runs its steps and adds its key. That
  * is the backfill: an org that ran setup before this change keeps a clean report.
+ *
+ * The marker is per package key and setup revision (D-200, N4): `Giving` means revision 1,
+ * `Giving:2` revision 2. A post-install class that gains steps implements `Revisioned` and
+ * raises its revision, so an org whose marker holds an older revision (an upgrade whose
+ * post-install failed, or source copied in) is flagged again until those steps run. A class
+ * that does not implement it is revision 1.
  */
 @NamespaceAccessible
 public with sharing class ModuleSetups {
+	/**
+	 * A post-install class whose setup steps have changed since its first version. Raise the
+	 * number whenever the steps gain something an existing org needs; never lower it.
+	 */
+	@NamespaceAccessible
+	public interface Revisioned {
+		/** The current revision of the setup steps, 2 or more (1 is a class without this). */
+		Integer setupRevision();
+	}
+
+	private static final String REVISION_SEPARATOR = ':';
+
 	/** The suffix after the package key that names its post-install class. */
 	@NamespaceAccessible
 	public static final String CLASS_SUFFIX = 'PostInstall';
@@ -55,27 +73,57 @@ public with sharing class ModuleSetups {
 	@NamespaceAccessible
 	public static void markRan(String moduleKey) {
 		try {
-			if (String.isBlank(moduleKey) || ran().contains(moduleKey.trim().toLowerCase())) {
+			if (String.isBlank(moduleKey)) {
 				return;
 			}
-			List<String> keys = stored();
-			keys.add(moduleKey.trim());
+			String key = moduleKey.trim();
+			Integer revision = revisionOf(key);
+			List<String> entries = new List<String>();
+			for (String entry : stored()) {
+				if (!entry.substringBefore(REVISION_SEPARATOR).equalsIgnoreCase(key)) {
+					entries.add(entry);
+				} else if (revisionIn(entry) >= revision) {
+					return;
+				}
+			}
+			entries.add(revision > 1 ? key + REVISION_SEPARATOR + revision : key);
 			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ MARKER_KEY => String.join(keys, ',') }
+				new Map<String, Object>{ MARKER_KEY => String.join(entries, ',') }
 			);
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT);
 		}
 	}
 
-	/** The keys of the packages whose setup has run, lower case. */
+	/**
+	 * The keys of the packages whose setup has run at their current revision, lower case. A key
+	 * marked at an older revision than its post-install class now declares is left out.
+	 */
 	@NamespaceAccessible
 	public static Set<String> ran() {
 		Set<String> keys = new Set<String>();
-		for (String key : stored()) {
-			keys.add(key.toLowerCase());
+		for (String entry : stored()) {
+			String key = entry.substringBefore(REVISION_SEPARATOR);
+			if (revisionIn(entry) >= revisionOf(key)) {
+				keys.add(key.toLowerCase());
+			}
 		}
 		return keys;
+	}
+
+	/** The revision a marker entry records: the number after the separator, else 1. */
+	private static Integer revisionIn(String entry) {
+		String number = entry.substringAfter(REVISION_SEPARATOR).trim();
+		return number.isNumeric() ? Integer.valueOf(number) : 1;
+	}
+
+	/** The revision the package's setup class declares now, 1 when it declares none. */
+	private static Integer revisionOf(String moduleKey) {
+		ModuleSetup setup = setupFor(moduleKey);
+		Integer revision = setup instanceof Revisioned
+			? ((Revisioned) setup).setupRevision()
+			: null;
+		return revision == null || revision < 1 ? 1 : revision;
 	}
 
 	private static List<String> stored() {
