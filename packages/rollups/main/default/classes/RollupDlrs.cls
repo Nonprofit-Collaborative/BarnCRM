@@ -196,7 +196,7 @@ public with sharing class RollupDlrs {
 		SettingsService.logChange(
 			CHANGE_PREFIX + rollupName,
 			String.format(
-				Label.Core_RollupBuilder_DlrsHistoryBefore,
+				Label.Rollups_RollupBuilder_DlrsHistoryBefore,
 				new List<String>{ other.label, targetObject + '.' + targetField, toolOf(other) }
 			),
 			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsHistoryConfirmed')

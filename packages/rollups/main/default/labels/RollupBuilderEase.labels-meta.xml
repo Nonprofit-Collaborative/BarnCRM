@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_RollupEase_CalcSum</fullName>
+        <fullName>Rollups_RollupEase_CalcSum</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>Total of {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcCount</fullName>
+        <fullName>Rollups_RollupEase_CalcCount</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>Number of</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcMin</fullName>
+        <fullName>Rollups_RollupEase_CalcMin</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>Smallest {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcMax</fullName>
+        <fullName>Rollups_RollupEase_CalcMax</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>Largest {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcAvg</fullName>
+        <fullName>Rollups_RollupEase_CalcAvg</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Average {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcFirst</fullName>
+        <fullName>Rollups_RollupEase_CalcFirst</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>First {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcLast</fullName>
+        <fullName>Rollups_RollupEase_CalcLast</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -57,7 +57,7 @@
         <value>Last {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcCountDistinct</fullName>
+        <fullName>Rollups_RollupEase_CalcCountDistinct</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -65,7 +65,7 @@
         <value>Number of different {0} values</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcAny</fullName>
+        <fullName>Rollups_RollupEase_CalcAny</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -73,7 +73,7 @@
         <value>Whether there are any</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcNone</fullName>
+        <fullName>Rollups_RollupEase_CalcNone</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -81,7 +81,7 @@
         <value>Whether there are no</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcTextList</fullName>
+        <fullName>Rollups_RollupEase_CalcTextList</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -89,7 +89,7 @@
         <value>List of {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CalcTextListDistinct</fullName>
+        <fullName>Rollups_RollupEase_CalcTextListDistinct</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -97,7 +97,7 @@
         <value>List of each different {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_LinkHousehold</fullName>
+        <fullName>Rollups_RollupEase_LinkHousehold</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -105,7 +105,7 @@
         <value>{0}'s household</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_LinkHouseholdMembers</fullName>
+        <fullName>Rollups_RollupEase_LinkHouseholdMembers</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -113,7 +113,7 @@
         <value>{0}'s household members</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_StatusOff</fullName>
+        <fullName>Rollups_RollupEase_StatusOff</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -121,7 +121,7 @@
         <value>Switched off</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_StatusWaiting</fullName>
+        <fullName>Rollups_RollupEase_StatusWaiting</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -129,7 +129,7 @@
         <value>{0} records waiting</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_StatusClear</fullName>
+        <fullName>Rollups_RollupEase_StatusClear</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -137,7 +137,7 @@
         <value>Nothing waiting</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_Search</fullName>
+        <fullName>Rollups_RollupEase_Search</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -145,7 +145,7 @@
         <value>Search rollups</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_NotChosen</fullName>
+        <fullName>Rollups_RollupEase_NotChosen</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -153,7 +153,7 @@
         <value>(not chosen yet)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_EveryRecord</fullName>
+        <fullName>Rollups_RollupEase_EveryRecord</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -161,7 +161,7 @@
         <value>every record</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_SomeRecords</fullName>
+        <fullName>Rollups_RollupEase_SomeRecords</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -169,7 +169,7 @@
         <value>only those that meet its conditions ({0})</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ModeHeading</fullName>
+        <fullName>Rollups_RollupEase_ModeHeading</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -177,7 +177,7 @@
         <value>What Each Choice Means</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_PickSamples</fullName>
+        <fullName>Rollups_RollupEase_PickSamples</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -185,7 +185,7 @@
         <value>Pick Sample Records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_SamplesHeading</fullName>
+        <fullName>Rollups_RollupEase_SamplesHeading</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -193,7 +193,7 @@
         <value>Sample Records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ShowRows</fullName>
+        <fullName>Rollups_RollupEase_ShowRows</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -201,7 +201,7 @@
         <value>Show Records Read</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RowsHeading</fullName>
+        <fullName>Rollups_RollupEase_RowsHeading</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -209,7 +209,7 @@
         <value>Records Read for This Record</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RowCounted</fullName>
+        <fullName>Rollups_RollupEase_RowCounted</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -217,7 +217,7 @@
         <value>Counted</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RowFails</fullName>
+        <fullName>Rollups_RollupEase_RowFails</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -225,7 +225,7 @@
         <value>Left out: does not meet condition {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RowNoOrder</fullName>
+        <fullName>Rollups_RollupEase_RowNoOrder</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -233,7 +233,7 @@
         <value>Left out: {0} is blank</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RowBeyondLimit</fullName>
+        <fullName>Rollups_RollupEase_RowBeyondLimit</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -241,7 +241,7 @@
         <value>Left out: only the first {0} count</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RowOutsideWindow</fullName>
+        <fullName>Rollups_RollupEase_RowOutsideWindow</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -249,7 +249,7 @@
         <value>Left out: outside the year this rollup counts</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_DeleteHeading</fullName>
+        <fullName>Rollups_RollupEase_DeleteHeading</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -257,7 +257,7 @@
         <value>Delete This Rollup</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_DeleteChoice</fullName>
+        <fullName>Rollups_RollupEase_DeleteChoice</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -265,7 +265,7 @@
         <value>What happens to the values it wrote</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_DeleteKeep</fullName>
+        <fullName>Rollups_RollupEase_DeleteKeep</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -273,7 +273,7 @@
         <value>Keep them on the records (nothing updates them again)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_DeleteClear</fullName>
+        <fullName>Rollups_RollupEase_DeleteClear</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -281,7 +281,7 @@
         <value>Clear them from every record it fills, in the background</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CreateField</fullName>
+        <fullName>Rollups_RollupEase_CreateField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -289,7 +289,7 @@
         <value>Create a Field</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_NewFieldLabel</fullName>
+        <fullName>Rollups_RollupEase_NewFieldLabel</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -297,7 +297,7 @@
         <value>Field label</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_NewFieldKind</fullName>
+        <fullName>Rollups_RollupEase_NewFieldKind</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -305,7 +305,7 @@
         <value>Field type</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_KindLongText</fullName>
+        <fullName>Rollups_RollupEase_KindLongText</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -313,7 +313,7 @@
         <value>Text Area (Long)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_WriteField</fullName>
+        <fullName>Rollups_RollupEase_WriteField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -321,7 +321,7 @@
         <value>Write the Field</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_DownloadField</fullName>
+        <fullName>Rollups_RollupEase_DownloadField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -329,7 +329,7 @@
         <value>Download Field Package</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ExplainTitle</fullName>
+        <fullName>Rollups_RollupEase_ExplainTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -337,7 +337,7 @@
         <value>Explain These Totals</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplButton</fullName>
+        <fullName>Rollups_RollupEase_TplButton</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -345,7 +345,7 @@
         <value>Starter Templates</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplAdd</fullName>
+        <fullName>Rollups_RollupEase_TplAdd</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -353,7 +353,7 @@
         <value>Add the Chosen Rollups</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplOpen</fullName>
+        <fullName>Rollups_RollupEase_TplOpen</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -361,7 +361,7 @@
         <value>Open in Builder</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplStarter</fullName>
+        <fullName>Rollups_RollupEase_TplStarter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -369,7 +369,7 @@
         <value>Nonprofit Starter</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplAverageGift</fullName>
+        <fullName>Rollups_RollupEase_TplAverageGift</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -377,7 +377,7 @@
         <value>Average Gift</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplFirstGiftAmount</fullName>
+        <fullName>Rollups_RollupEase_TplFirstGiftAmount</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -385,7 +385,7 @@
         <value>First Gift Amount</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplLastGiftAmount</fullName>
+        <fullName>Rollups_RollupEase_TplLastGiftAmount</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -393,7 +393,7 @@
         <value>Last Gift Amount</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplSmallestGift</fullName>
+        <fullName>Rollups_RollupEase_TplSmallestGift</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -401,7 +401,7 @@
         <value>Smallest Gift</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplGiftsThisYear</fullName>
+        <fullName>Rollups_RollupEase_TplGiftsThisYear</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -409,7 +409,7 @@
         <value>Gifts This Fiscal Year</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplAppealAverageGift</fullName>
+        <fullName>Rollups_RollupEase_TplAppealAverageGift</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -417,7 +417,7 @@
         <value>Appeal Average Gift</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplAppealDonors</fullName>
+        <fullName>Rollups_RollupEase_TplAppealDonors</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

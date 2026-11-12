@@ -6,13 +6,13 @@ import TITLE from '@salesforce/label/c.Core_SettingsGroup_RollupBuilder';
 import COPY_OF from '@salesforce/label/c.Core_Import_CopyTemplateDefaultName';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
 import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
-import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
-import IMPORT_FROM_NPSP from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
+import IMPORT_FROM_DLRS from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportTitle';
+import IMPORT_FROM_NPSP from '@salesforce/label/c.Rollups_RollupBuilder_NpspImportTitle';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 import { bodyMessage } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
-import ADVANCED from '@salesforce/label/c.Core_RollupBuilder_Advanced';
+import ADVANCED from '@salesforce/label/c.Rollups_RollupBuilder_Advanced';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TAB_ICON = 'utility:builder';

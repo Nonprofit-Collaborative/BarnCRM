@@ -8,20 +8,26 @@ setHelpTextForTest({
   Core_RollupFilter_ErrorLogic: 'Use only the numbers 1 to {0}.'
 });
 
-jest.mock('@salesforce/label/c.Core_RollupFilter_Whose', () => ({ default: '{0} whose {1}' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupFilter_Whose', () => ({ default: '{0} whose {1}' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupFilter_And', () => ({ default: 'and' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupFilter_And', () => ({ default: 'and' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupFilter_Phrase', () => ({ default: '{0} {1} {2}' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupFilter_Phrase', () => ({ default: '{0} {1} {2}' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupFilter_PhraseNoValue', () => ({ default: '{0} {1}' }), {
+jest.mock(
+  '@salesforce/label/c.Rollups_RollupFilter_PhraseNoValue',
+  () => ({ default: '{0} {1}' }),
+  {
+    virtual: true
+  }
+);
+jest.mock('@salesforce/label/c.Rollups_RollupFilter_Or', () => ({ default: 'or' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupFilter_Or', () => ({ default: 'or' }), { virtual: true });
-jest.mock('@salesforce/label/c.Core_RollupFilter_OpEquals', () => ({ default: 'is' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupFilter_OpEquals', () => ({ default: 'is' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_Filter_OpIn', () => ({ default: 'is one of' }), {

@@ -59,7 +59,7 @@ private class RollupTemplatesTest {
 			System.Assert.areEqual(1, templates.size());
 			RollupTemplates.Template starter = templates[0];
 			System.Assert.areEqual(RollupTemplates.NONPROFIT_STARTER, starter.key);
-			System.Assert.areEqual(Label.Core_RollupEase_TplStarter, starter.name);
+			System.Assert.areEqual(Label.Rollups_RollupEase_TplStarter, starter.name);
 			System.Assert.areEqual(7, starter.items.size());
 			for (RollupTemplates.Item item : starter.items) {
 				System.Assert.isFalse(item.draft.active, item.key + ' is added switched off');
@@ -154,7 +154,7 @@ private class RollupTemplatesTest {
 			System.Assert.isFalse(saved.Active__c, 'Added switched off');
 			System.Assert.areEqual(RollupService.MODE_BOTH, saved.Mode__c);
 			System.Assert.areEqual('AVG', saved.Aggregate__c);
-			System.Assert.areEqual(Label.Core_RollupEase_TplAverageGift, saved.Name);
+			System.Assert.areEqual(Label.Rollups_RollupEase_TplAverageGift, saved.Name);
 
 			System.Assert.isFalse(second.added, 'A field is filled by one rollup');
 			System.Assert.areEqual(

@@ -68,17 +68,21 @@ jest.mock(
 jest.mock('@salesforce/apex/RollupFieldGenerator.generate', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupBuilder_FilledBy', () => ({ default: '{0} ({1})' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupBuilder_FilledBy', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
 
-jest.mock('@salesforce/label/c.Core_RollupEase_NotChosen', () => ({ default: '(not chosen)' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupEase_NotChosen', () => ({ default: '(not chosen)' }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupEase_EveryRecord', () => ({ default: 'every record' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_RollupEase_SomeRecords', () => ({ default: '{0} rules' }), {
+jest.mock(
+  '@salesforce/label/c.Rollups_RollupEase_EveryRecord',
+  () => ({ default: 'every record' }),
+  {
+    virtual: true
+  }
+);
+jest.mock('@salesforce/label/c.Rollups_RollupEase_SomeRecords', () => ({ default: '{0} rules' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
@@ -719,7 +723,9 @@ describe('c-rollup-wizard', () => {
       query(element, 'copy-field').click();
       await flush();
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(GENERATED.fieldXml);
-      expect(query(element, 'field-notice').textContent).toBe('c.Core_RollupBuilder_InstantCopied');
+      expect(query(element, 'field-notice').textContent).toBe(
+        'c.Rollups_RollupBuilder_InstantCopied'
+      );
     });
 
     it('chooses the new field once Refresh Fields finds it (U8)', async () => {

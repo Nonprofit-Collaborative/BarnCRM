@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportTitle</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>Import From DLRS</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportStepChoose</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportStepChoose</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>Choose</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportStepCompare</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportStepCompare</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>Compare</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportStepTurnOn</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportStepTurnOn</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>Turn On</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportCanCopy</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportCanCopy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Can Be Copied</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportStays</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportStays</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>Stays in DLRS</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportFills</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportFills</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -57,7 +57,7 @@
         <value>Fills {0}. Operation: {1}.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportCopy</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportCopy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -65,7 +65,7 @@
         <value>Copy Switched Off</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportCompare</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportCompare</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -73,7 +73,7 @@
         <value>Compare</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportActive</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportActive</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -81,7 +81,7 @@
         <value>Turned on.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportValueNow</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportValueNow</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -89,7 +89,7 @@
         <value>Value Now (DLRS)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportValueBarn</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportValueBarn</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -97,7 +97,7 @@
         <value>BarnCRM Value</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DlrsImportSame</fullName>
+        <fullName>Rollups_RollupBuilder_DlrsImportSame</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -105,7 +105,7 @@
         <value>Same</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_NpspImportTitle</fullName>
+        <fullName>Rollups_RollupBuilder_NpspImportTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

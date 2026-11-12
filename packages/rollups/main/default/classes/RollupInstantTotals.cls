@@ -210,7 +210,7 @@ public with sharing class RollupInstantTotals {
 			AutomationControl.ensureSwitch(
 				automationName,
 				String.format(
-					Label.Core_RollupBuilder_InstantSwitchName,
+					Label.Rollups_RollupBuilder_InstantSwitchName,
 					new List<Object>{ objectLabel }
 				),
 				name,

@@ -39,7 +39,7 @@ public with sharing class RollupsWhereUsedExtension implements WhereUsedExtensio
 		]) {
 			WhereUsedService.Reference reference = new WhereUsedService.Reference(
 				KIND,
-				System.Label.Core_Rollups_PageTitle,
+				System.Label.Rollups_Rollups_PageTitle,
 				definition.Name,
 				definition.Id
 			);
@@ -68,7 +68,7 @@ public with sharing class RollupsWhereUsedExtension implements WhereUsedExtensio
 	) {
 		String source = definition.Source_Object__c;
 		if (target.isObject() && target.isObject(source)) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedCounts);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedCounts);
 			return;
 		}
 		if (
@@ -76,13 +76,13 @@ public with sharing class RollupsWhereUsedExtension implements WhereUsedExtensio
 			target.matchesField(source, definition.Order_By_Field__c) ||
 			target.matchesField(source, definition.Fiscal_Date_Field__c)
 		) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedSourceField);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedSourceField);
 		}
 		if (target.matchesFilter(source, definition.Filter_JSON__c)) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedSourceFilter);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedSourceFilter);
 		}
 		if (pathNames(target, source, definition.Relationship_Path__c)) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedPath);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedPath);
 		}
 	}
 
@@ -94,14 +94,14 @@ public with sharing class RollupsWhereUsedExtension implements WhereUsedExtensio
 	) {
 		String written = definition.Target_Object__c;
 		if (target.isObject() && target.isObject(written)) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedWrites);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedWrites);
 			return;
 		}
 		if (target.matchesField(written, definition.Target_Field__c)) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedTargetField);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedTargetField);
 		}
 		if (target.matchesFilter(written, definition.Target_Filter_JSON__c)) {
-			reference.addPart(System.Label.Core_RollupBuilder_WhereUsedTargetFilter);
+			reference.addPart(System.Label.Rollups_RollupBuilder_WhereUsedTargetFilter);
 		}
 	}
 

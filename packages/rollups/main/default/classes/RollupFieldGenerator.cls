@@ -26,7 +26,7 @@ public with sharing class RollupFieldGenerator {
 		'DATE' => Label.Core_ImportNewField_TypeDate,
 		'DATETIME' => Label.Core_ImportNewField_TypeDateTime,
 		'TEXT' => Label.Core_ImportNewField_TypeText,
-		'LONGTEXT' => Label.Core_RollupEase_KindLongText,
+		'LONGTEXT' => Label.Rollups_RollupEase_KindLongText,
 		'CHECKBOX' => Label.Core_ImportNewField_TypeCheckbox
 	};
 

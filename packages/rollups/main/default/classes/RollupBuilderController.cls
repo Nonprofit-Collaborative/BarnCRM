@@ -351,7 +351,7 @@ public with sharing class RollupBuilderController {
 					FieldOption option = toOption(described);
 					option.value = lookup.getRelationshipName() + '.' + described.getName();
 					option.label = String.format(
-						Label.Core_RollupBuilder_ParentField,
+						Label.Rollups_RollupBuilder_ParentField,
 						new List<String>{ lookupLabel, described.getLabel() }
 					);
 					options.add(option);
@@ -498,7 +498,7 @@ public with sharing class RollupBuilderController {
 	/** A value as the administrator reads it, in her locale; also Import from DLRS's compare. */
 	public static String display(Object value) {
 		if (value == null || value == '') {
-			return Label.Core_RollupBuilder_PreviewEmpty;
+			return Label.Rollups_RollupBuilder_PreviewEmpty;
 		}
 		if (value instanceof Integer) {
 			return ((Integer) value).format();
@@ -1062,8 +1062,8 @@ public with sharing class RollupBuilderController {
 			option.instant = RollupService.hasInstantUpdates(option.sourceObject);
 			option.label = String.format(
 				token == null
-					? Label.Core_RollupBuilder_SourceBy
-					: Label.Core_RollupBuilder_SourceByHousehold,
+					? Label.Rollups_RollupBuilder_SourceBy
+					: Label.Rollups_RollupBuilder_SourceByHousehold,
 				new List<String>{ childType.getLabel(), reference.getLabel() }
 			);
 			options.add(option);

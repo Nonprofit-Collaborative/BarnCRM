@@ -24,9 +24,13 @@ jest.mock('@salesforce/apex/RollupInstantTotals.getCode', () => ({ default: jest
 jest.mock('@salesforce/apex/RollupInstantTotals.setTurnedOn', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/label/c.Core_RollupBuilder_InstantCopied', () => ({ default: 'Copied.' }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/label/c.Rollups_RollupBuilder_InstantCopied',
+  () => ({ default: 'Copied.' }),
+  {
+    virtual: true
+  }
+);
 
 const SHIFT = {
   objectApiName: 'Shift__c',
