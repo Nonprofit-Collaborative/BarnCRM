@@ -33,7 +33,9 @@ public with sharing class LogicModelService {
 			WITH USER_MODE
 		];
 		if (models.isEmpty()) {
-			throw new BuilderException(Label.LogicModels_Builder_NotFound);
+			throw new BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
+			);
 		}
 		Logic_Model__c model = models[0];
 		Schema.DescribeSObjectResult elements = Logic_Model_Element__c.SObjectType.getDescribe(
@@ -403,7 +405,9 @@ public with sharing class LogicModelService {
 				key == LogicModelScope.ORGANIZATION ||
 				Id.valueOf(key).getSObjectType() != type
 			) {
-				throw new BuilderException(Label.LogicModels_Scope_BadProgram);
+				throw new BuilderException(
+					BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram')
+				);
 			}
 			value = key;
 		}
@@ -507,7 +511,7 @@ public with sharing class LogicModelService {
 		if (!backward.isEmpty()) {
 			throw new BuilderException(
 				String.format(
-					Label.LogicModels_Builder_BackwardArrows,
+					BarnHelp.text('LogicModels', 'LogicModels_Builder_BackwardArrows'),
 					new List<String>{ String.join(backward, '; ') }
 				)
 			);
@@ -571,7 +575,9 @@ public with sharing class LogicModelService {
 			WITH USER_MODE
 		];
 		if (existing > 0) {
-			throw new BuilderException(Label.LogicModels_Builder_ArrowExists);
+			throw new BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_ArrowExists')
+			);
 		}
 		Logic_Model_Link__c link = new Logic_Model_Link__c(
 			Logic_Model__c = idOf(fields, 'modelId'),
@@ -642,7 +648,9 @@ public with sharing class LogicModelService {
 			WITH USER_MODE
 		];
 		if (same > 0) {
-			throw new BuilderException(Label.LogicModels_Builder_PeriodExists);
+			throw new BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_PeriodExists')
+			);
 		}
 		Indicator__c indicator = [
 			SELECT Element__c, Source__c
@@ -722,7 +730,9 @@ public with sharing class LogicModelService {
 			]
 			.Indicator__r.Element__r.Logic_Model__c;
 		} else {
-			throw new BuilderException(Label.LogicModels_Builder_NotFound);
+			throw new BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
+			);
 		}
 		Database.delete(recordId, true, AccessLevel.USER_MODE);
 		return modelId;

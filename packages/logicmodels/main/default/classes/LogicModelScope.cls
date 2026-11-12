@@ -24,7 +24,9 @@ public with sharing class LogicModelScope {
 		for (Logic_Model__c model : models) {
 			String key = keyFor(model.Program_Id__c);
 			if (key == null) {
-				model.Program_Id__c.addError(Label.LogicModels_Scope_BadProgram);
+				model.Program_Id__c.addError(
+					BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram')
+				);
 				continue;
 			}
 			model.Program_Id__c = key == ORGANIZATION ? null : key;
@@ -77,7 +79,7 @@ public with sharing class LogicModelScope {
 
 	private static String messageFor(String key) {
 		return key == ORGANIZATION
-			? Label.LogicModels_Scope_OrganizationTaken
-			: Label.LogicModels_Scope_ProgramTaken;
+			? BarnHelp.text('LogicModels', 'LogicModels_Scope_OrganizationTaken')
+			: BarnHelp.text('LogicModels', 'LogicModels_Scope_ProgramTaken');
 	}
 }

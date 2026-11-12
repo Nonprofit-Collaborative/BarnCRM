@@ -90,7 +90,9 @@ public with sharing class LogicModelPeriodService {
 			WITH USER_MODE
 		];
 		if (models.isEmpty()) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Builder_NotFound);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
+			);
 		}
 		return parse(models[0].Periods__c);
 	}
@@ -207,7 +209,9 @@ public with sharing class LogicModelPeriodService {
 			}
 		}
 		if (wanted == null) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Builder_NotFound);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
+			);
 		}
 		List<Indicator__c> indicators = [
 			SELECT Id, (SELECT Start_Date__c, End_Date__c FROM Periods__r)
@@ -233,7 +237,9 @@ public with sharing class LogicModelPeriodService {
 			WITH USER_MODE
 		];
 		if (indicators.isEmpty()) {
-			throw new LogicModelService.BuilderException(Label.LogicModels_Builder_NotFound);
+			throw new LogicModelService.BuilderException(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
+			);
 		}
 		return copy(indicators, periodsOfModel(modelId));
 	}

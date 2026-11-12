@@ -244,10 +244,26 @@ private class IndicatorSourceServiceTest {
 				'Notes is not groupable: ' + notCountable
 			);
 			Assert.isNotNull(noSuchField, 'An unknown field is refused');
-			Assert.areEqual(Label.LogicModels_Source_Invalid, badSource, 'Unknown source');
-			Assert.areEqual(Label.LogicModels_Source_Invalid, badFunction, 'Unknown function');
-			Assert.areEqual(Label.LogicModels_Source_QueryMissing, noQuery, 'Deleted query');
-			Assert.areEqual(Label.LogicModels_Source_NotComputed, notComputed, 'Typed in');
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'),
+				badSource,
+				'Unknown source'
+			);
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'),
+				badFunction,
+				'Unknown function'
+			);
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_QueryMissing'),
+				noQuery,
+				'Deleted query'
+			);
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Source_NotComputed'),
+				notComputed,
+				'Typed in'
+			);
 			Assert.areEqual(50, resultOf(fixture.periodId), 'Nothing changed');
 		}
 	}
@@ -298,7 +314,7 @@ private class IndicatorSourceServiceTest {
 		Assert.areEqual(true, model.get('canRefresh'), 'Staff may refresh');
 		Assert.isNotNull(refused, 'Staff cannot change a source');
 		Assert.areEqual(
-			Label.LogicModels_Source_CannotRefresh,
+			BarnHelp.text('LogicModels', 'LogicModels_Source_CannotRefresh'),
 			readerRefresh,
 			'A reader cannot refresh'
 		);

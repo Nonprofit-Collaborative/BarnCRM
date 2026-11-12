@@ -85,12 +85,12 @@ private class LogicModelRulesTest {
 
 			Assert.isTrue(together[0].isSuccess(), 'The first is the organization\'s model');
 			Assert.areEqual(
-				Label.LogicModels_Scope_OrganizationTaken,
+				BarnHelp.text('LogicModels', 'LogicModels_Scope_OrganizationTaken'),
 				firstError(together[1]),
 				'A second in the same save is refused'
 			);
 			Assert.areEqual(
-				Label.LogicModels_Scope_OrganizationTaken,
+				BarnHelp.text('LogicModels', 'LogicModels_Scope_OrganizationTaken'),
 				firstError(later),
 				'And so is one saved later'
 			);
@@ -122,12 +122,16 @@ private class LogicModelRulesTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.LogicModels_Scope_ProgramTaken,
+				BarnHelp.text('LogicModels', 'LogicModels_Scope_ProgramTaken'),
 				firstError(again),
 				'The program has a model, saved under its short identifier'
 			);
 			Assert.isTrue(other.isSuccess(), 'Another program may have its own');
-			Assert.areEqual(Label.LogicModels_Scope_BadProgram, firstError(bad), 'Refused');
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram'),
+				firstError(bad),
+				'Refused'
+			);
 			Logic_Model__c saved = [
 				SELECT Program_Id__c, Scope_Key__c
 				FROM Logic_Model__c
@@ -155,7 +159,7 @@ private class LogicModelRulesTest {
 
 			Assert.isTrue(renamed.isSuccess(), 'Keeping its own scope is fine');
 			Assert.areEqual(
-				Label.LogicModels_Scope_OrganizationTaken,
+				BarnHelp.text('LogicModels', 'LogicModels_Scope_OrganizationTaken'),
 				firstError(moved),
 				'Moving onto the organization, which has a model, is refused'
 			);
