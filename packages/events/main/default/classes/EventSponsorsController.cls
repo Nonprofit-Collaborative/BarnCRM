@@ -359,6 +359,84 @@ public with sharing class EventSponsorsController {
 		}
 	}
 
+	/** One column of the leads download: its label and the row key it reads. */
+	public class LeadColumn {
+		@AuraEnabled
+		public String label;
+		@AuraEnabled
+		public String path;
+
+		LeadColumn(String label, String path) {
+			this.label = label;
+			this.path = path;
+		}
+	}
+
+	/** A sponsor's leads for Download Leads (EV-28): Lead status only (R-SLD2). */
+	public class Leads {
+		@AuraEnabled
+		public List<LeadColumn> columns = new List<LeadColumn>();
+		@AuraEnabled
+		public List<Map<String, Object>> rows = new List<Map<String, Object>>();
+	}
+
+	/** The fields a leads download holds, in order. */
+	private static final List<Schema.SObjectField> LEAD_FIELDS = new List<Schema.SObjectField>{
+		Sponsor_Lead__c.Lead_Name__c,
+		Sponsor_Lead__c.Lead_Email__c,
+		Sponsor_Lead__c.Lead_Title__c,
+		Sponsor_Lead__c.Lead_Company__c,
+		Sponsor_Lead__c.Interest__c,
+		Sponsor_Lead__c.Notes__c,
+		Sponsor_Lead__c.CreatedDate
+	};
+
+	/**
+	 * A sponsor's leads, for the Sponsors tab's Download Leads: only attendees who shared their
+	 * details (status Lead), read in user mode.
+	 *
+	 * @param sponsorId the sponsor
+	 * @return the columns and rows; no rows when the sponsor has no leads
+	 */
+	@AuraEnabled
+	public static Leads getLeads(Id sponsorId) {
+		try {
+			Leads result = new Leads();
+			for (Schema.SObjectField field : LEAD_FIELDS) {
+				Schema.DescribeFieldResult describe = field.getDescribe();
+				result.columns.add(new LeadColumn(describe.getLabel(), describe.getName()));
+			}
+			for (Sponsor_Lead__c lead : [
+				SELECT
+					Lead_Name__c,
+					Lead_Email__c,
+					Lead_Title__c,
+					Lead_Company__c,
+					toLabel(Interest__c),
+					Notes__c,
+					CreatedDate
+				FROM Sponsor_Lead__c
+				WHERE Event_Sponsor__c = :sponsorId AND Status__c = 'Lead'
+				WITH USER_MODE
+				ORDER BY CreatedDate
+				LIMIT 10000
+			]) {
+				Map<String, Object> row = new Map<String, Object>();
+				for (Schema.SObjectField field : LEAD_FIELDS) {
+					row.put(field.getDescribe().getName(), lead.get(field));
+				}
+				result.rows.add(row);
+			}
+			return result;
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.getLeads', sponsorId);
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Sponsors_LoadFailed')
+			);
+		}
+	}
+
 	/** Names the linked Giving or Funders record, where it exists and can be read. */
 	private static void addLinkedLabels(List<SponsorRow> rows) {
 		List<String> ids = new List<String>();

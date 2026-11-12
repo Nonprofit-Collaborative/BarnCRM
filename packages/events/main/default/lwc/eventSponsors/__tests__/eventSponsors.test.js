@@ -8,6 +8,8 @@ import removeSponsor from '@salesforce/apex/EventSponsorsController.removeSponso
 import { deleteRecord } from 'lightning/uiRecordApi';
 import EventRecordModal from 'c/eventRecordModal';
 import { setHelpTextForTest } from 'c/barnHelpText';
+import getLeads from '@salesforce/apex/EventSponsorsController.getLeads';
+import { downloadCsv } from 'c/findCsv';
 
 jest.mock('@salesforce/apex/EventSponsorsController.getSponsors', () => ({ default: jest.fn() }), {
   virtual: true
@@ -31,6 +33,10 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('lightning/uiRecordApi', () => ({ deleteRecord: jest.fn() }), { virtual: true });
+jest.mock('@salesforce/apex/EventSponsorsController.getLeads', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('c/findCsv', () => ({ ...jest.requireActual('c/findCsv'), downloadCsv: jest.fn() }));
 
 const EVENT_ID = 'a01000000000001AAA';
 const ACME = 'a08000000000001AAA';
@@ -229,6 +235,26 @@ describe('c-event-sponsors', () => {
     expect(EventRecordModal.open).toHaveBeenCalledWith(
       expect.objectContaining({ defaults: { Event__c: EVENT_ID } })
     );
+  });
+
+  it('downloads a sponsor leads, or says there are none (EV-28)', async () => {
+    const element = await render();
+    const columns = [{ label: 'Name', path: 'Lead_Name__c' }];
+    getLeads.mockResolvedValueOnce({ columns, rows: [{ Lead_Name__c: 'Ana Garcia' }] });
+    choose(sponsorMenu(element, 0), 'leads');
+    await flush();
+    expect(getLeads).toHaveBeenCalledWith({ sponsorId: ACME });
+    expect(downloadCsv).toHaveBeenCalledWith('Acme Software leads', columns, [
+      { Lead_Name__c: 'Ana Garcia' }
+    ]);
+
+    const toasts = jest.fn();
+    element.addEventListener('lightning__showtoast', toasts);
+    getLeads.mockResolvedValueOnce({ columns, rows: [] });
+    choose(sponsorMenu(element, 0), 'leads');
+    await flush();
+    expect(downloadCsv).toHaveBeenCalledTimes(1);
+    expect(toasts).toHaveBeenCalled();
   });
 
   it('removes a sponsor and a level after the person confirms', async () => {
