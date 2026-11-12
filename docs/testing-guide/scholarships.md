@@ -121,3 +121,19 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | 4 | On My Awards press **Accept Award** on an Offered award. | It shows Accepted. |
 
 **Cleanup:** None.
+
+## T-SG-09: Moving From Outbound Funds
+
+**Purpose:** confirm the Outbound Funds kit copies programs, requests, awards, disbursements and requirements with their links, and never changes Outbound Funds.
+**Prerequisites:** a test org (never production) with the Outbound Funds Module installed and this module on; admin user with Manage Scholarships; **Send Scholarships reminders** off. In Outbound Funds: a funding program "Community Grants" (In progress, total 50,000); a funding request "Garden Project" from a contact and organization for 5,000, Awarded 4,000, with one Paid disbursement of 2,000 by EFT, one Scheduled disbursement of 2,000, and a requirement "Final Report" (type Report) due next month on the second disbursement; a second request "Library Hours", Declined, with no awarded amount.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**, Outbound Funds Module. | **Start Migration: Outbound Funds Programs and Awards**. Click it: six steps, Programs first, the rest Waiting. |
+| 2 | Run and load **Programs**, then **Cycles**. | An award program Community Grants, type Grant, active, with one cycle Community Grants (Open, budget 50,000). Each **Verified**. |
+| 3 | Run and load **Applications**. | Two applications in that cycle: Garden Project (Awarded, 5,000 requested) and Library Hours (Declined). **Verified**. |
+| 4 | Run and load **Awards**. | One award of 4,000, Active, on the Garden Project application, for the same contact and organization. **Verified** (1 in the other app). |
+| 5 | Run and load **Disbursements**, then **Requirements**. | Two disbursements on the award (Paid by Bank Transfer, and Scheduled); one requirement, Open, due next month, linked to the Scheduled disbursement. Each **Verified**. |
+| 6 | Open the Outbound Funds records. | Nothing changed. |
+
+**Cleanup:** undo the six steps in reverse order; switch reminders back on if they were on.

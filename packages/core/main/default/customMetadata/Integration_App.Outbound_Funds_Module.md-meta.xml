@@ -12,7 +12,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Grants you give: funding requests, disbursements and the funding programs they come from. It does the same work as BarnCRM Funders.</value>
+    <value xsi:type="xsd:string">Grants you give: funding requests, disbursements and the funding programs they come from. It does the same work as BarnCRM Scholarships and Outbound Grants.</value>
   </values>
   <values>
     <field>Maintainer__c</field>
@@ -32,15 +32,15 @@
   </values>
   <values>
     <field>Related_Module__c</field>
-    <value xsi:type="xsd:string">BarnCRM Funders</value>
+    <value xsi:type="xsd:string">BarnCRM Scholarships and Outbound Grants</value>
   </values>
   <values>
     <field>Compatibility__c</field>
-    <value xsi:type="xsd:string">Use one or the other for the same records, not both. It installs the SFDO Base package, which is closed source. Not built and not yet tested alongside BarnCRM. BarnCRM may offer a migration path to BarnCRM Funders in a future release.</value>
+    <value xsi:type="xsd:string">Use one or the other for the same records, not both. It installs the SFDO Base package, which is closed source. With BarnCRM Scholarships and Outbound Grants installed, the Outbound Funds kit copies its programs, requests, awards, disbursements and requirements; Outbound Funds itself is never changed.</value>
   </values>
   <values>
     <field>Migration_Path__c</field>
-    <value xsi:nil="true" />
+    <value xsi:type="xsd:string">Start Migration (with Scholarships and Outbound Grants installed); the Scholarships and Outbound Grants admin guide page.</value>
   </values>
   <values>
     <field>Show_Only_When_Installed__c</field>
