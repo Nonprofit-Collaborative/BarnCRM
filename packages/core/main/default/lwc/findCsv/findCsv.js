@@ -52,7 +52,7 @@ export function toCsv(columns, rows) {
  * person's local one (the UTC date names an evening export in a US time zone for tomorrow).
  */
 export function fileName(objectApiName, today = new Date(), extension = 'csv') {
-  const day = localIsoDate(today);
+  const day = isoDate(today);
   return `${String(objectApiName || 'export').replace(/[^A-Za-z0-9_]/g, '_')}-${day}.${extension}`;
 }
 
