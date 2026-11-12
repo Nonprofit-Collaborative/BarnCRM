@@ -5,6 +5,11 @@ import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTemplate';
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
+import applyRates from '@salesforce/apex/ProjectsController.applyRates';
+
+jest.mock('@salesforce/apex/ProjectsController.applyRates', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/ProjectsController.getHome', () => ({ default: jest.fn() }), {
   virtual: true
@@ -109,6 +114,26 @@ describe('c-projects-home', () => {
     expect(exportBillable).toHaveBeenCalledWith(
       expect.objectContaining({ includeExported: false })
     );
+    expect(find(element, 'notice')).not.toBeNull();
+  });
+
+  it('shows Apply Rates to a manager only with rate cards on, and applies them', async () => {
+    getHome.mockResolvedValue(HOME);
+    getUtilization.mockResolvedValue([]);
+    let element = mount();
+    await flush();
+    await flush();
+    expect(find(element, 'apply-rates')).toBeNull();
+    document.body.removeChild(element);
+
+    getHome.mockResolvedValue({ ...HOME, ratesEnabled: true });
+    applyRates.mockResolvedValue(12);
+    element = mount();
+    await flush();
+    await flush();
+    find(element, 'apply-rates').click();
+    await flush();
+    expect(applyRates).toHaveBeenCalledTimes(1);
     expect(find(element, 'notice')).not.toBeNull();
   });
 

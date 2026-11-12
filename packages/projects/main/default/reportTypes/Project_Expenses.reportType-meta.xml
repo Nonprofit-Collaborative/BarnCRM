@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Project_Expense__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Project expenses by project, person, date, category and status, with the billable flag.
+  </description>
+  <label>Project Expenses</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Project__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>User__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Date__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Category__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Amount__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Billable__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Description__c</field>
+      <table>Project_Expense__c</table>
+    </columns>
+    <masterLabel>Project Expense</masterLabel>
+  </sections>
+</ReportType>

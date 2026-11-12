@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    My week of time and expenses, Monday to Sunday: enter hours, submit the week for approval.
+  </description>
+  <flexiPage>Projects_Timesheet</flexiPage>
+  <label>Timesheet</label>
+  <motif>Custom95: Stopwatch</motif>
+</CustomTab>

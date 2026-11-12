@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Staff_Tabs__c</field>
-    <value xsi:type="xsd:string">Projects_Home:Projects Home;Project__c;Time_Entry__c;Project_Expense__c;Project_Resource__c</value>
+    <value xsi:type="xsd:string">Projects_Home:Projects Home;Projects_Timesheet:Timesheet;Projects_Approvals:Approvals;Project__c;Time_Entry__c;Project_Expense__c;Project_Resource__c</value>
   </values>
   <values>
     <field>Admin_Tabs__c</field>

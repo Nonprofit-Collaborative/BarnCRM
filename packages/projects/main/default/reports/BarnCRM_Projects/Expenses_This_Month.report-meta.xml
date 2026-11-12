@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Project_Expense__c$User__c</field>
+  </columns>
+  <columns>
+    <field>Project_Expense__c$Date__c</field>
+  </columns>
+  <columns>
+    <field>Project_Expense__c$Billable__c</field>
+  </columns>
+  <columns>
+    <field>Project_Expense__c$Status__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Project_Expense__c$Amount__c</field>
+  </columns>
+  <description>Expenses dated this month, grouped by category (PM-08).</description>
+  <format>Summary</format>
+  <groupingsDown>
+    <dateGranularity>None</dateGranularity>
+    <field>Project_Expense__c$Category__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Expenses This Month</name>
+  <reportType>Project_Expenses__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+  <timeFrameFilter>
+    <dateColumn>Project_Expense__c$Date__c</dateColumn>
+    <interval>INTERVAL_THISMONTH</interval>
+  </timeFrameFilter>
+</Report>

@@ -5,6 +5,13 @@ import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import addTask from '@salesforce/apex/ProjectsController.addTask';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
+import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
+
+jest.mock(
+  '@salesforce/apex/ProjectTimesheetController.addExpense',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/ProjectsController.getBoard', () => ({ default: jest.fn() }), {
   virtual: true
@@ -133,6 +140,37 @@ describe('c-project-board', () => {
       expect.objectContaining({ projectId: 'a01000000000001AAA', billable: false })
     );
     expect(find(element, 'error-message').message).toBe('Enter more than 0 and at most 24 hours.');
+  });
+
+  it('shows Add Expense only when expenses are on and adds one', async () => {
+    getBoard.mockResolvedValue(BOARD);
+    let element = mount();
+    await flush();
+    expect(find(element, 'add-expense')).toBeNull();
+    document.body.removeChild(element);
+
+    getBoard.mockResolvedValue({ ...BOARD, expensesEnabled: true });
+    addExpense.mockResolvedValue('a09000000000001AAA');
+    element = mount();
+    await flush();
+    find(element, 'add-expense').click();
+    await flush();
+    const amount = element.shadowRoot.querySelector(
+      '[data-id="expense-form"] lightning-input[data-field="amount"]'
+    );
+    amount.value = '42.5';
+    amount.dispatchEvent(new CustomEvent('change'));
+    find(element, 'save-expense').click();
+    await flush();
+    expect(addExpense).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: 'a01000000000001AAA',
+        amount: 42.5,
+        category: 'Travel',
+        billable: false
+      })
+    );
+    expect(find(element, 'expense-form')).toBeNull();
   });
 
   it('hides Log Time and the hours when time tracking is off', async () => {

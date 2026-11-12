@@ -1,0 +1,66 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+      <template lwc:if={notice}>
+        <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+
+      <template lwc:if={enabled}>
+        <template lwc:if={hasGroups}>
+          <template for:each={groups} for:item="group">
+            <section key={group.key} class="slds-box slds-var-m-bottom_small" data-id="group">
+              <div class="slds-grid slds-grid_vertical-align-end slds-wrap">
+                <div class="slds-col">
+                  <p class="slds-text-title_bold" data-id="heading">{group.heading}</p>
+                  <p class="slds-text-color_weak">{group.projects}</p>
+                </div>
+                <lightning-input class="slds-col slds-var-m-horizontal_small" label={labels.reason} max-length="255" value={group.reason} data-group={group.key} onchange={handleReason} data-id="reason"></lightning-input>
+                <lightning-button variant="brand" label={labels.approve} data-group={group.key} data-ids={group.idList} disabled={isWorking} onclick={handleApprove} data-id="approve"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small" label={labels.reject} data-group={group.key} data-ids={group.idList} disabled={isWorking} onclick={handleReject} data-id="reject"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small" variant="base" label={labels.details} data-group={group.key} onclick={handleToggle} data-id="details"></lightning-button>
+              </div>
+              <template lwc:if={group.shown}>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-top_small">
+                  <thead>
+                    <tr>
+                      <th scope="col" data-label={labels.date}>{labels.date}</th>
+                      <th scope="col" data-label={labels.project}>{labels.project}</th>
+                      <th scope="col" data-label={labels.what}>{labels.what}</th>
+                      <th scope="col" data-label={labels.notes}>{labels.notes}</th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <template for:each={group.lines} for:item="line">
+                      <tr key={line.Id} data-id="line">
+                        <td data-label={labels.date}>{line.Date__c}</td>
+                        <td data-label={labels.project}>{line.Project__r.Name}</td>
+                        <td data-label={labels.what}>{line.what}</td>
+                        <td data-label={labels.notes}>{line.note}</td>
+                        <td>
+                          <lightning-button label={labels.approve} data-group={group.key} data-ids={line.Id} disabled={isWorking} onclick={handleApprove} data-id="approve-line"></lightning-button>
+                          <lightning-button class="slds-var-m-left_x-small" label={labels.reject} data-group={group.key} data-ids={line.Id} disabled={isWorking} onclick={handleReject} data-id="reject-line"></lightning-button>
+                        </td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </template>
+            </section>
+          </template>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak" data-id="empty">{labels.empty}</p></template>
+      </template>
+      <template lwc:elseif={isLoading}></template>
+      <template lwc:else>
+        <p class="slds-text-color_weak" data-id="off">{labels.off}</p>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>
