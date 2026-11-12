@@ -75,9 +75,9 @@ private class EventApplicationsControllerTest {
 			Speaker_Application__c strong = application(event, 'Strong', 'b@example.org');
 
 			Test.startTest();
-			EventApplicationsController.saveReview(weak.Id, 2, 'Thin');
-			EventApplicationsController.saveReview(strong.Id, 5, 'Great');
-			EventApplicationsController.saveReview(strong.Id, 4, 'Great, a little long');
+			EventApplicationsController.saveReview(weak.Id, 2, 'Thin', null);
+			EventApplicationsController.saveReview(strong.Id, 5, 'Great', null);
+			EventApplicationsController.saveReview(strong.Id, 4, 'Great, a little long', null);
 			EventApplicationsController.Applications result = EventApplicationsController.getApplications(
 				event.Id
 			);
@@ -105,7 +105,7 @@ private class EventApplicationsControllerTest {
 			Test.startTest();
 			Boolean refused = false;
 			try {
-				EventApplicationsController.saveReview(talk.Id, 6, null);
+				EventApplicationsController.saveReview(talk.Id, 6, null, null);
 			} catch (AuraHandledException e) {
 				refused = true;
 			}
@@ -322,7 +322,7 @@ private class EventApplicationsControllerTest {
 				decideRefused = true;
 			}
 			try {
-				EventApplicationsController.saveReview(talk.Id, 3, null);
+				EventApplicationsController.saveReview(talk.Id, 3, null, null);
 			} catch (AuraHandledException e) {
 				reviewRefused = true;
 			}

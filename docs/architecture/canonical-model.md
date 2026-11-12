@@ -13609,6 +13609,9 @@ with its own tickets, agenda and later its own registrations.
 | Public Page | boolean | yes (defaults false) | Whether the event has a public page on the organization's Site and API (EV-16, R-EV5). |
 | Show Speakers | boolean | yes (defaults false) | Whether the public page names the event's confirmed speakers, with headline and bio (R-EV5). |
 | Show Seats Left | boolean | yes (defaults false) | Whether the public page shows seats left per ticket type (R-EV5). |
+| Review Criteria | long text | no | The call for speakers' weighted scoring criteria, a JSON list of up to 10 `{ "label", "weight" }` (EV-21, R-SA6). |
+| Blind Review | boolean | yes (defaults false) | Whether the Applications tab hides applicants', presenters' and reviewers' names until a proposal is decided (EV-21, R-SA7). |
+| Session Rating Form Key | text | no | The Forms form each session's QR code opens for a rating (EV-27, R-SRT1). |
 
 ### Relationships
 
@@ -13666,6 +13669,9 @@ registration form is shown while the status is Open and now is inside the regist
 | Public Page | `Public_Page__c` | Checkbox, default false (EV-16) |
 | Show Speakers | `Public_Speakers__c` | Checkbox, default false (EV-16) |
 | Show Seats Left | `Public_Seats__c` | Checkbox, default false (EV-16) |
+| Review Criteria | `Review_Criteria__c` | Long Text Area(5000), JSON (EV-21) |
+| Blind Review | `Blind_Review__c` | Checkbox, default false (EV-21) |
+| Session Rating Form Key | `Session_Rating_Form_Key__c` | Text(18): the Forms form for session ratings, by record identifier (EV-27, ADR-0014) |
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
@@ -13843,6 +13849,8 @@ yet is unscheduled.
 | Session Type | picklist | yes | Talk, Workshop, Panel, Keynote, Break or Other. Default Talk. |
 | Status | picklist | yes | Draft, Confirmed or Cancelled. Default Confirmed. |
 | Description | long text | no | What it covers. |
+| Ratings, Rating Total | roll-up summary | no | The count and the sum of the session's ratings (EV-27, 29EV27). |
+| Average Rating | formula | no | Rating Total divided by Ratings; empty before the first rating. |
 
 ### Rules
 
@@ -13875,6 +13883,9 @@ by drag and drop or by keyboard saves its Track and nothing else.
 | Session Type | `Session_Type__c` | Picklist, restricted, required |
 | Status | `Status__c` | Picklist (Draft, Confirmed, Cancelled), restricted, required |
 | Description | `Description__c` | Long Text Area(32768) |
+| Ratings | `Rating_Count__c` | Roll-Up Summary (COUNT Session Rating) (EV-27) |
+| Rating Total | `Rating_Total__c` | Roll-Up Summary (SUM Session Rating Rating) (EV-27) |
+| Average Rating | `Average_Rating__c` | Formula (Number, 1 decimal) (EV-27) |
 
 - **Validation rules:** `Start_And_End_Together`, `End_After_Start` (R-ESN1),
   `Inside_Event_Dates` (R-ESN2), `Capacity_Above_Zero`.
@@ -13982,8 +13993,10 @@ a second assignment of the same speaker to the same session.
 ### Definition
 
 One booking for an event (EV-02): the person who registered, the attendees it holds, the promo
-code used and what is owed. BarnCRM records the amount owed and never takes a payment (plan
-Section 1.5). Design: ADR-0182 `0182-event-registrations.md`.
+code used and what is owed. BarnCRM holds no money: with Take payment online on and BarnCRM
+Payments installed, the amount owed is paid on the org's own Stripe or PayPal hosted checkout and
+recorded here (EV-20). Design: ADR-0182 `0182-event-registrations.md`; payment: ADR-NEXT
+`NEXT-events-paid-registration-proposals-ratings.md`.
 
 ### Attributes
 
@@ -13991,9 +14004,13 @@ Section 1.5). Design: ADR-0182 `0182-event-registrations.md`.
 |---|---|---|---|
 | Event | reference to Event | yes | The event booked. |
 | Registrant | reference to Person | yes, when created | The Core person who registered, matched or created (R-ERG1). |
-| Status | picklist | yes | Registered, Waitlisted (every attendee waits for a seat) or Cancelled. |
+| Status | picklist | yes | Registered, Pending Payment (seats held until the online payment is made, R-ERG5), Waitlisted (every attendee waits for a seat) or Cancelled. |
 | Promo Code | reference to Promo Code | no | The code applied (R-ERG2). |
 | Amount Owed | currency | no | The attendees' prices with the code applied. |
+| Payment Status | picklist | no | Empty when no online payment was asked for; else Unpaid, Link Sent, Paid, Failed, Partly Refunded, Refunded or Cancelled (R-ERG6). |
+| Amount Paid | currency | no | What the processor reported paid, less refunds (R-ERG6). |
+| Payment Key | text | no | The current Payments payment's record identifier, as text (ADR-0014). |
+| Payment Link | long text | no | The processor's hosted checkout address for the current payment, for the payment email. |
 | Source | picklist | yes | Staff, Form or Summit Events. Default Staff. |
 | Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
 | External Key | text | no | The key of the booking this was imported from, unique: `summit:` and the Summit Events registration's identifier (EV-10, R-ERG4). |
@@ -14015,6 +14032,22 @@ morning run imports each Summit registration (not Started or Cancelled) as a reg
 attendee, keyed by its External Key, through R-ERG1; a registration already imported is never
 imported again, and later changes are made in BarnCRM.
 
+**R-ERG5 A form registration with something to pay waits for payment (EV-20).** With Take payment
+online on (29EV25) and Payments installed, a form registration owing more than zero is saved
+Pending Payment, Payment Status Unpaid, its attendees Registered and holding their seats. The job
+`EventCheckoutJob` starts its checkout and emails the payment link; a staff registration is never
+held for payment, though staff may send it a link.
+
+**R-ERG6 Payments decide the payment status (EV-20).** Only the processor's report, through
+`EventPaymentListener` and only for the registration's current Payment Key, changes Payment Status
+and Amount Paid: Paid makes a Pending Payment registration Registered; Failed keeps it waiting;
+Cancelled (checkout abandoned) and a full refund cancel a registration still waiting, or a refunded
+one, and free its seats; a partial refund lowers Amount Paid. BarnCRM issues no refund.
+
+**R-ERG7 One live checkout per registration.** Send Payment Link starts a new checkout only for a
+registration that owes money and is not Paid; the new payment replaces the Payment Key, so a
+report about an older payment changes nothing.
+
 ### Salesforce implementation
 
 - **Object:** `Event_Registration__c`, name field Auto Number (`REG-{000000}`), sharing Private.
@@ -14023,9 +14056,13 @@ imported again, and later changes are made in BarnCRM.
 |---|---|---|
 | Event | `Event__c` | Lookup(Event), required, Restrict delete |
 | Registrant | `Contact__c` | Lookup(Contact), Clear on delete |
-| Status | `Status__c` | Picklist (Registered, Waitlisted, Cancelled), restricted, required |
+| Status | `Status__c` | Picklist (Registered, Pending Payment, Waitlisted, Cancelled), restricted, required |
 | Promo Code | `Promo_Code__c` | Lookup(Promo Code), Clear on delete |
 | Amount Owed | `Amount_Owed__c` | Currency(16, 2) |
+| Payment Status | `Payment_Status__c` | Picklist (Unpaid, Link Sent, Paid, Failed, Partly Refunded, Refunded, Cancelled), restricted (EV-20) |
+| Amount Paid | `Amount_Paid__c` | Currency(16, 2) (EV-20) |
+| Payment Key | `Payment_Key__c` | Text(18) (EV-20) |
+| Payment Link | `Payment_Link__c` | Long Text Area(1000) (EV-20) |
 | Source | `Source__c` | Picklist (Staff, Form, Summit Events), restricted, required |
 | Form Submission Key | `Form_Submission_Key__c` | Text(18) |
 | External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
@@ -14038,6 +14075,10 @@ imported again, and later changes are made in BarnCRM.
   (Core's `ImportMatcher` and `ImportDuplicateRuleMatcher`). Forms reaches it through
   `EventFormAttachment` (Core's `FormAttachmentExtension`); the event names its form in
   `Registration_Form_Key__c` (29EV1).
+- **Payment (EV-20):** `EventPayments` (builds Payments' `PaymentsApi` by name, so Events never
+  depends on Payments), `EventCheckoutJob` (Queueable allowing callouts, one checkout a run,
+  chained) and `EventPaymentListener` (Callable, built by name by Payments); the payment email is
+  the template named in Events Settings (shipped `BarnCRM_Event_Payment_Link`).
 
 ---
 
@@ -14060,6 +14101,7 @@ they came.
 | Table | reference to Event Table | no | The table the person sits at (EV-13). |
 | Dietary Needs | text | no | Meal needs, up to 255 characters (EV-13). |
 | Access Needs | text | no | Access needs, up to 255 characters (EV-13). |
+| Badge Name, Badge Title, Badge Company | text | no | What the badge prints instead of the name and the person's account, and a title line (EV-26, R-EAT4). |
 
 ### Rules
 
@@ -14089,9 +14131,16 @@ that is not cancelled is not added again.
 | Dietary Needs | `Dietary_Needs__c` | Text(255) (EV-13) |
 | Access Needs | `Access_Needs__c` | Text(255) (EV-13) |
 | Survey Link | `Survey_Link__c` | Text(255), set by the morning run when it sends the survey email (EV-18, R-ESV2) |
+| Badge Name | `Badge_Name__c` | Text(80) (EV-26) |
+| Badge Title | `Badge_Title__c` | Text(80) (EV-26) |
+| Badge Company | `Badge_Company__c` | Text(80) (EV-26) |
 
 **R-EAT3 Each email goes once.** The morning run stamps an attendee before emailing it and clears
 the stamp when the send fails; clearing a stamp by hand sends that email again.
+
+**R-EAT4 A badge override wins where it is set (EV-26).** Badges, sign-in sheets and Check-In show
+Badge Name for the name and Badge Company for the organization when set, else the attendee's name
+and the person's account; Badge Title prints only when set.
 
 - **Panel:** the Registrations tab of the event page (`eventRegistrations`), with
   `EventRegistrationsController` (thin, user mode); counts, status badges and menu items come
@@ -14236,8 +14285,10 @@ event (29EV6). Same review pattern as the Funders and Programs reviews, with no 
 | Speaker | reference to Event Speaker | no | Set when the application is accepted (R-SA4). |
 | Notice Sent | date and time | no | When the accept or decline email went out. |
 | Notice Result | text | no | Why no notice went out, when it did not (R-SA5). |
-| Reviews, Total Score | roll-up summary | no | The count and the sum of the application's reviews. |
+| Reviews, Total Score | roll-up summary | no | The count and the sum of the application's scored reviews (an unscored review is an assignment, R-SA8). |
 | Average Score | formula | no | Total Score divided by Reviews; empty before the first review (R-SA2). |
+| Weighted Total, Weighted Average | roll-up summary, formula | no | The sum of the scored reviews' Weighted Scores and that divided by Reviews; ranks the proposals (EV-21, R-SA6). |
+| Presenters | detail records | no | Up to 5 more presenters (29EV30, R-SA9). |
 
 ### Rules
 
@@ -14259,6 +14310,25 @@ BarnCRM_Speaker_Accepted or BarnCRM_Speaker_Declined), with the applicant as the
 application as the record it merges. When no email goes out (the template is missing or inactive, the applicant has no email address, or the send fails) the
 decision stands and Notice Result says why; when it goes, Notice Sent holds the time.
 
+**R-SA6 Weighted criteria (EV-21).** An event's Review Criteria lists up to 10 criteria, each a
+label (up to 40 characters, unique) and a whole weight from 1 to 10. With criteria a review scores
+each from 1 to 5; its Weighted Score is the sum of score times weight divided by the sum of weights,
+to two decimals, and its Score that rounded half up. Without criteria a review is one score from 1
+to 5 and its Weighted Score equals it. The rule is `eventApplicationsModel.js` and
+`EventProposalScoring`, tested against the same cases. Changing the criteria leaves earlier reviews
+as scored.
+
+**R-SA7 Blind review hides names, not records (EV-21).** With Blind Review on, the Applications tab
+shows no applicant, presenter or reviewer name for an undecided proposal; record pages are
+unchanged.
+
+**R-SA8 An assignment is an unscored review (EV-21).** Assign Reviewers adds a review with a
+reviewer and no score for each chosen user and proposal that has none; scoring fills it in. Roll-ups
+count only scored reviews.
+
+**R-SA9 Accepting makes every presenter a speaker (EV-21).** Accepting a proposal finds or makes a
+speaker (29EV6) for the applicant and for each presenter; a presenter with no person is skipped.
+
 ### Salesforce implementation
 
 - **Object:** `Speaker_Application__c`, name field Text, label Proposal Title, master-detail to
@@ -14274,9 +14344,11 @@ decision stands and Notice Result says why; when it goes, Notice Sent holds the 
 | Speaker | `Event_Speaker__c` | Lookup(Event Speaker), Clear on delete |
 | Notice Sent | `Notice_Sent__c` | Date/Time |
 | Notice Result | `Notice_Result__c` | Text(255) |
-| Reviews | `Review_Count__c` | Roll-Up Summary (COUNT Speaker Review) |
+| Reviews | `Review_Count__c` | Roll-Up Summary (COUNT Speaker Review, Score not blank) |
 | Total Score | `Total_Score__c` | Roll-Up Summary (SUM Speaker Review Score) |
 | Average Score | `Average_Score__c` | Formula (Number, 1 decimal) |
+| Weighted Total | `Weighted_Total__c` | Roll-Up Summary (SUM Speaker Review Weighted Score) (EV-21) |
+| Weighted Average | `Weighted_Average__c` | Formula (Number, 2 decimals) (EV-21) |
 
 - **Validation rule:** `Applicant_Required_When_Created` (R-SA1).
 - **Panel:** the Applications tab of the event page (`eventApplications`), with
@@ -14295,13 +14367,15 @@ One reviewer's score and note for a speaker application (EV-06).
 | Attribute | Type | Required | Definition |
 |---|---|---|---|
 | Application | reference to Speaker Application | yes | The application scored. |
-| Reviewer | reference to User | no | The person who scored it; set to the person saving. |
-| Score | number | yes | A whole number from 1 to 5 (R-SA3). |
+| Reviewer | reference to User | no | The person who scored it; set to the person saving, or to the user assigned (R-SA8). |
+| Score | number | no | A whole number from 1 to 5 (R-SA3); empty while only assigned (R-SA8). |
 | Notes | long text | no | Why. |
+| Criteria Scores | long text | no | Each criterion's score, JSON `{ "label": score }` (EV-21, R-SA6). |
+| Weighted Score | number | no | The weight-averaged score to two decimals (R-SA6). |
 
 ### Rules
 
-**R-SA3 One score per reviewer per application, from 1 to 5.** A validation rule keeps the score
+**R-SA3 One review per reviewer per application, from 1 to 5.** A validation rule keeps a score
 a whole number from 1 to 5. The Applications tab saves the viewing person's review as an upsert, so
 a second save replaces the first; reviews cannot be added or replaced once the application is
 decided.
@@ -14315,8 +14389,10 @@ decided.
 |---|---|---|
 | Application | `Speaker_Application__c` | Master-Detail(Speaker Application) |
 | Reviewer | `Reviewer__c` | Lookup(User), Clear on delete |
-| Score | `Score__c` | Number(1, 0), required |
+| Score | `Score__c` | Number(1, 0) |
 | Notes | `Notes__c` | Long Text Area(5000) |
+| Criteria Scores | `Criteria_Scores__c` | Long Text Area(5000), JSON (EV-21) |
+| Weighted Score | `Weighted_Score__c` | Number(3, 2) (EV-21) |
 
 - **Validation rule:** `Score_From_One_To_Five` (R-SA3).
 
@@ -14478,7 +14554,9 @@ follow-up and No-Show settings (EV-14).
 | Mark no-shows | boolean | yes (defaults false) | Whether the morning run marks attendees still Registered as No-Show once an event (ended within seven days) is over. |
 | Accepted Notice Template | text | yes (defaults BarnCRM_Speaker_Accepted) | The unique name of the email template sent when an application is accepted. |
 | Declined Notice Template | text | yes (defaults BarnCRM_Speaker_Declined) | The unique name of the email template sent when an application is declined. |
-| Payment note | text | yes (defaults "Pay at the door or by arrangement with us.") | Shown beside each priced ticket on a public event page (EV-16): BarnCRM takes no payment. A blank one reads as the default. |
+| Payment note | text | yes (defaults "Pay at the door or by arrangement with us.") | Shown beside each priced ticket on a public event page (EV-16) while payments are not taken online. A blank one reads as the default. |
+| Take payment online | boolean | yes (defaults false) | Whether a form registration with something to pay waits for payment through BarnCRM Payments (EV-20, R-ERG5). Needs Payments. |
+| Payment link email template | text | yes (defaults BarnCRM_Event_Payment_Link) | The unique name of the template that emails a registrant their payment link (EV-20). |
 
 ### Rules
 
@@ -14510,16 +14588,103 @@ reads as its shipped value.
 | Survey email template | `Survey_Template__c` | Text(80), default BarnCRM_Event_Survey (EV-18) |
 | Mark no-shows | `Mark_No_Shows__c` | Checkbox, default false |
 | Payment note | `Public_Payment_Note__c` | Text(255), default "Pay at the door or by arrangement with us." |
+| Take payment online | `Online_Payments__c` | Checkbox, default false (EV-20) |
+| Payment link email template | `Payment_Link_Template__c` | Text(80), default BarnCRM_Event_Payment_Link (EV-20) |
 
 - **Setting Definitions:** `Events_Reminders_Enabled`, `Events_Reminder_Lead_Days`,
   `Events_Reminder_Template`, `Events_Follow_Ups_Enabled`, `Events_Follow_Up_Template`,
   `Events_Mark_No_Shows` (sort 10 to 60), `Events_Accept_Notice_Template` (70),
   `Events_Decline_Notice_Template` (80), `Events_Survey_Template` (55),
-  `Events_Public_Payment_Note` (90), section Events (Core's `SettingSections.EVENTS`).
+  `Events_Public_Payment_Note` (90), `Events_Online_Payments` (92),
+  `Events_Payment_Link_Template` (94), section Events (Core's `SettingSections.EVENTS`).
 - **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
   templates `BarnCRM_Event_Reminder`, `BarnCRM_Event_Follow_Up`, `BarnCRM_Event_Survey`,
-  `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined` ship in the folder BarnCRM Events.
+  `BarnCRM_Speaker_Accepted`, `BarnCRM_Speaker_Declined` and `BarnCRM_Event_Payment_Link` (EV-20)
+  ship in the folder BarnCRM Events.
+
+---
+
+## 29EV27. Session Rating
+
+### Definition
+
+One anonymous rating of a session (EV-27, ADR-NEXT
+`NEXT-events-paid-registration-proposals-ratings.md`), from the event's session rating form,
+opened by the session's QR code. Numbered for its plan item.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Session | reference to Event Session | yes | The session rated. |
+| Rating | number | yes | A whole number from 1 to 5 (R-SRT2). |
+| Comment | long text | no | What the person wrote. |
+| Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
+
+### Rules
+
+**R-SRT1 A rating comes from the event's rating form.** Each session's QR code opens the form
+named in its event's Session Rating Form Key, tied to the session, on the org's Site; each
+processed submission with a `rating` answer from 1 to 5 adds one rating (and its `comment`). A
+submission with no usable rating adds nothing; a submission is kept once.
+
+**R-SRT2 Ratings are whole numbers from 1 to 5 and name no person.**
+
+**R-SRT3 A speaker's average is computed on read**, over the ratings of the sessions they are
+assigned to (29EV7), on the Speakers tab.
+
+### Salesforce implementation
+
+- **Object:** `Session_Rating__c`, name field Auto Number (`RAT-{000000}`), master-detail to
+  Event Session (`Event_Session__c`, relationship Ratings), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Session | `Event_Session__c` | Master-Detail(Event Session) |
+| Rating | `Rating__c` | Number(1, 0), required |
+| Comment | `Comment__c` | Long Text Area(2000) |
+| Form Submission Key | `Form_Submission_Key__c` | Text(18) |
+
+- **Validation rule:** `Rating_From_One_To_Five` (R-SRT2).
+- **Service:** `EventSessionRatings` through `EventFormAttachment` (Core's
+  `FormAttachmentExtension`), which now also handles `Event_Session__c`.
+
+---
+
+## 29EV30. Proposal Presenter
+
+### Definition
+
+One more presenter on a session proposal (EV-21): a co-speaker, moderator or panelist besides the
+applicant. Numbered past the plan's Event Management items.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Proposal | reference to Speaker Application | yes | The proposal. |
+| Person | reference to Contact | yes, when created | The Core person presenting. |
+| Role | picklist | yes | Speaker, Moderator or Panelist. Default Speaker. |
+
+### Rules
+
+**R-PP1 Up to 5 presenters, each once.** The Applications tab adds a presenter only while the
+proposal has fewer than 5 and only a person not already its applicant or presenter.
+
+### Salesforce implementation
+
+- **Object:** `Proposal_Presenter__c`, name field Auto Number (`PRS-{000000}`), master-detail to
+  Speaker Application (`Speaker_Application__c`, relationship Presenters), sharing Controlled by
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Proposal | `Speaker_Application__c` | Master-Detail(Speaker Application) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Role | `Role__c` | Picklist (Speaker, Moderator, Panelist), restricted, required |
+
+- **Validation rule:** `Person_Required_When_Created` (R-PP1).
 
 ---
 
@@ -17084,6 +17249,7 @@ mirrors the primary member).
 | 1.21 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
+| 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
 
 ---
 ## 32. Entity ownership by package
@@ -17229,6 +17395,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Sponsor Deliverable | Event Management | 1.3 (EV-09) | 29EV24 |
 | Events Settings | Event Management | 1.3 (EV-06, EV-14) | 29EV25 |
 | Event Table | Event Management | 1.3 (EV-13) | 29EV26 |
+| Session Rating | Event Management | 1.5 (EV-27) | 29EV27 |
+| Proposal Presenter | Event Management | 1.5 (EV-21) | 29EV30 |
 | Portal | Portal Builder | 1.3 (PB-01) | 29PB1 |
 | Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
 | Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |

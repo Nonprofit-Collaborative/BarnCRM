@@ -18,6 +18,9 @@ public with sharing class EventRegistrationsController {
 		public Boolean canRegister = false;
 		@AuraEnabled
 		public Boolean canChange = false;
+		/** EV-20: BarnCRM Payments is installed and the person may change registrations. */
+		@AuraEnabled
+		public Boolean canSendPaymentLink = false;
 		@AuraEnabled
 		public Boolean truncated = false;
 		@AuraEnabled
@@ -59,6 +62,10 @@ public with sharing class EventRegistrationsController {
 		public String registrationStatus;
 		@AuraEnabled
 		public String source;
+		@AuraEnabled
+		public Decimal amountOwed;
+		@AuraEnabled
+		public String paymentStatus;
 	}
 
 	/**
@@ -74,6 +81,9 @@ public with sharing class EventRegistrationsController {
 				Schema.SObjectType.Event_Registration__c.isCreateable() &&
 				Schema.SObjectType.Event_Attendee__c.isCreateable();
 			result.canChange = Schema.SObjectType.Event_Attendee__c.isUpdateable();
+			result.canSendPaymentLink =
+				Schema.SObjectType.Event_Registration__c.isUpdateable() &&
+				EventPayments.api() != null;
 			result.currencyCode = UserInfo.getDefaultCurrency();
 			labels(
 				result,
@@ -85,7 +95,13 @@ public with sharing class EventRegistrationsController {
 				result,
 				Schema.SObjectType.Event_Registration__c.fields.getMap(),
 				'Event_Registration__c',
-				new List<String>{ 'Name', 'Contact__c', 'Promo_Code__c', 'Source__c' }
+				new List<String>{
+					'Name',
+					'Contact__c',
+					'Promo_Code__c',
+					'Source__c',
+					'Payment_Status__c'
+				}
 			);
 			labels(
 				result,
@@ -125,7 +141,9 @@ public with sharing class EventRegistrationsController {
 					Event_Registration__c,
 					Event_Registration__r.Name,
 					Event_Registration__r.Status__c,
-					Event_Registration__r.Source__c
+					Event_Registration__r.Source__c,
+					Event_Registration__r.Amount_Owed__c,
+					Event_Registration__r.Payment_Status__c
 				FROM Event_Attendee__c
 				WHERE Event_Registration__r.Event__c = :eventId
 				WITH USER_MODE
@@ -205,6 +223,31 @@ public with sharing class EventRegistrationsController {
 		}
 	}
 
+	/**
+	 * EV-20: emails the registrant a new link to pay what the registration owes (R-ERG7).
+	 *
+	 * @return the sentence to show
+	 */
+	@AuraEnabled
+	public static String sendPaymentLink(Id registrationId) {
+		try {
+			if (!Schema.SObjectType.Event_Registration__c.isUpdateable()) {
+				throw new EventPayments.PaymentLinkException(
+					BarnHelp.text('Events', 'Events_Shared_NotSaved')
+				);
+			}
+			String outcome = EventPayments.sendLink(registrationId);
+			return outcome == EventTemplateMail.SENT
+				? BarnHelp.text('Events', 'Events_Payment_LinkSent')
+				: BarnHelp.text('Events', 'Events_Payment_LinkNotEmailed');
+		} catch (EventPayments.PaymentLinkException refused) {
+			throw UserErrors.message(refused.getMessage());
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.sendPaymentLink', registrationId);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+		}
+	}
+
 	private static void labels(
 		Registrations result,
 		Map<String, Schema.SObjectField> fields,
@@ -231,6 +274,8 @@ public with sharing class EventRegistrationsController {
 		row.registrationName = record.Event_Registration__r?.Name;
 		row.registrationStatus = record.Event_Registration__r?.Status__c;
 		row.source = record.Event_Registration__r?.Source__c;
+		row.amountOwed = record.Event_Registration__r?.Amount_Owed__c;
+		row.paymentStatus = record.Event_Registration__r?.Payment_Status__c;
 		return row;
 	}
 }
