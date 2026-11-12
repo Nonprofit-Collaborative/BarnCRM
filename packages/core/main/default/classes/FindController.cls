@@ -415,7 +415,12 @@ public with sharing class FindController {
 			if (String.isBlank(recordId)) {
 				Database.insert(query, AccessLevel.USER_MODE);
 			} else {
-				query.Id = requireOwn(recordId).Id;
+				Saved_Query__c stored = requireOwn(recordId);
+				query.Id = stored.Id;
+				// A Backup Set stays one when it is saved again from Find (R-SQ15).
+				if (BackupSetService.isBackupSet(stored.Query_JSON__c)) {
+					query.Query_JSON__c = BackupSetService.marked(queryJson);
+				}
 				Database.update(query, AccessLevel.USER_MODE);
 			}
 			SavedQuerySharingWriter.setShared(new Map<Id, Boolean>{ query.Id => shared == true });
@@ -512,7 +517,7 @@ public with sharing class FindController {
 		List<Saved_Query__c> found = String.isBlank(recordId)
 			? new List<Saved_Query__c>()
 			: [
-					SELECT Id, OwnerId
+					SELECT Id, OwnerId, Query_JSON__c
 					FROM Saved_Query__c
 					WHERE Id = :recordId
 					WITH USER_MODE

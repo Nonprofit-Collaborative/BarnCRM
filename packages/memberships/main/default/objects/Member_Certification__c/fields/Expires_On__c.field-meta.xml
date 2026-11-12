@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Expires_On__c</fullName>
+  <externalId>false</externalId>
+  <required>false</required>
+  <inlineHelpText>The last day it is valid. Set by Grant and Renew from Valid Months; blank means it does not expire.</inlineHelpText>
+  <label>Expires On</label>
+  <type>Date</type>
+</CustomField>

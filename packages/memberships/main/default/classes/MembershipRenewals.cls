@@ -1,7 +1,7 @@
 /**
  * The Memberships step of the nightly run (ADR-0166; ADR-NEXT `NEXT-memberships-module.md`,
  * decision 5), in order: renewals from Giving gifts (R-MEM6), renewals from active recurring
- * gifts and lapse handling (R-MEM4), then reminders (R-MEM5). Each phase takes up to `ROWS`
+ * gifts and lapse handling (R-MEM4), reminders (R-MEM5), then certification expiry (R-MEM12). Each phase takes up to `ROWS`
  * terms a night; the rest wait for the next. It acts for the organization, in system mode.
  *
  * Giving is read by name (dynamic SOQL, names qualified by the namespace), so this package never
@@ -76,6 +76,11 @@ public with sharing class MembershipRenewals implements Schedulable {
 			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.remind');
+		}
+		try {
+			CertificationService.expire();
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.certifications');
 		}
 	}
 
