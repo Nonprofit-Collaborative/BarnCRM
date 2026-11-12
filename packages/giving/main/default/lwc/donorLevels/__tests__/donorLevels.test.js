@@ -5,6 +5,12 @@ import recalculate from '@salesforce/apex/DonorLevelController.recalculate';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
+  Giving_DonorLevels_Off:
+    'Donor levels are off. Build your ladder here, then turn Donor levels on in BarnCRM Settings under Giving.',
+  Giving_DonorLevels_RecalculateStarted: 'Placing every donor on the ladder.'
+});
+
+setHelpTextForTest({
   Giving_DonorLevels_Empty:
     'You have not created any levels yet. Choose New level to add the first rung.'
 });
@@ -35,23 +41,8 @@ jest.mock('@salesforce/label/c.Core_MatchLogic_Inactive', () => ({ default: 'Ina
 });
 
 jest.mock(
-  '@salesforce/label/c.Giving_DonorLevels_Off',
-  () => ({
-    default:
-      'Donor levels are off. Build your ladder here, then turn Donor levels on in BarnCRM Settings under Giving.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
   '@salesforce/label/c.Giving_DonorLevels_NeverRecalculated',
   () => ({ default: 'Not yet' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_DonorLevels_RecalculateStarted',
-  () => ({ default: 'Placing every donor on the ladder.' }),
   { virtual: true }
 );
 

@@ -27,7 +27,7 @@ public with sharing class CommitmentEntry {
 		Date firstPaymentDate
 	) {
 		if (total == null || total <= 0) {
-			return Label.Giving_Ask_ErrorAmount;
+			return BarnHelp.text('Giving', 'Giving_Ask_ErrorAmount');
 		}
 		if (
 			payments == null ||
@@ -35,7 +35,7 @@ public with sharing class CommitmentEntry {
 			String.isBlank(frequency) ||
 			firstPaymentDate == null
 		) {
-			return Label.Giving_Ask_ErrorPledgeSchedule;
+			return BarnHelp.text('Giving', 'Giving_Ask_ErrorPledgeSchedule');
 		}
 		return null;
 	}

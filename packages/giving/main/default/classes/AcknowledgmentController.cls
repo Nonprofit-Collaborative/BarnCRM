@@ -335,7 +335,7 @@ public with sharing class AcknowledgmentController {
 	private static void requireManagePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
 			throw new AcknowledgmentService.AcknowledgmentException(
-				Label.Giving_Acknowledgment_NoPermission
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission')
 			);
 		}
 	}

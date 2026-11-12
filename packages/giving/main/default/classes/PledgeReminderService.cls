@@ -441,7 +441,7 @@ public with sharing class PledgeReminderService {
 				row.Status__c = STATUS_FAILED;
 				row.Failure_Reason__c = AcknowledgmentService.failureReasonOf(
 					outcome,
-					Label.Giving_Acknowledgment_SendFailedUnknown
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown')
 				);
 				// The key goes, so the next run tries this reminder again while it is recent.
 				row.Reminder_Key__c = null;
@@ -474,7 +474,9 @@ public with sharing class PledgeReminderService {
 					Status__c = row.Status__c,
 					Sent_On__c = row.Sent_On__c,
 					Reminder_Key__c = row.Reminder_Key__c,
-					Failure_Reason__c = sent ? null : Label.Giving_Acknowledgment_SendFailedUnknown
+					Failure_Reason__c = sent
+						? null
+						: BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown')
 				)
 			);
 		}

@@ -570,7 +570,7 @@ public with sharing class CommitmentService {
 				donorsWithOpenCommitments.contains(record.Id) &&
 				record.get('MasterRecordId') == null
 			) {
-				record.addError(System.Label.Giving_Commitment_DonorDeleteBlocked);
+				record.addError(BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'));
 			}
 		}
 	}
@@ -646,7 +646,9 @@ public with sharing class CommitmentService {
 				continue;
 			}
 			if (!allowedFrom.contains(commitment.Status__c)) {
-				throw new CommitmentException(System.Label.Giving_Commitment_TransitionNotAllowed);
+				throw new CommitmentException(
+					BarnHelp.text('Giving', 'Giving_Commitment_TransitionNotAllowed')
+				);
 			}
 			changed.add(new Commitment__c(Id = commitment.Id, Status__c = target));
 		}

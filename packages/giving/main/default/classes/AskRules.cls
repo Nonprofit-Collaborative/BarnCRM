@@ -135,7 +135,7 @@ public with sharing class AskRules {
 				ask.addError(
 					Ask__c.Stage__c,
 					String.format(
-						Label.Giving_Ask_ErrorStageNotInList,
+						BarnHelp.text('Giving', 'Giving_Ask_ErrorStageNotInList'),
 						new List<Object>{ ask.Stage__c, String.join(stages, ', ') }
 					)
 				);

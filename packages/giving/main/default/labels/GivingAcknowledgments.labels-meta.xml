@@ -1,92 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_Acknowledgment_NoPermission</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the permission a send needs</shortDescription>
-    <value>Sending thank yous needs the Send Acknowledgments permission. Ask your BarnCRM admin for the Fundraising Staff role.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_SendFailedUnknown</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: a send failed with no message</shortDescription>
-    <value>The email could not be sent and Salesforce gave no reason.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_TemplatesMissing</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the log entry for missing templates in one chunk</shortDescription>
-    <value>{0} thank yous could not be sent because their rule names an email template this org does not have.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_NoRecipient</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the log entry for gifts with no recipient</shortDescription>
-    <value>{0} gifts in this send had nobody to email and stayed in the queue: {1}. Give the donor a contact with an email address, or write a rule that sends these by letter.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_EmailRunSummary</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the last run summary for an email run</shortDescription>
-    <value>Emailed thank yous: {0} sent, {1} did not go.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_LetterRunSummary</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the last run summary for a letter run</shortDescription>
-    <value>Letters to merge: {0} ready to print.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_LetterRunFailed</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the letter run failed</shortDescription>
-    <value>The letter merge file could not be produced. The reason is in the Error Log.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_RunNotFound</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the run was not found</shortDescription>
-    <value>That acknowledgment run no longer exists.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgment_RunNotWaiting</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: the run is not ready to be marked sent</shortDescription>
-    <value>That run is not waiting to be marked sent. Only a letter run whose file has been produced can be marked sent.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_Title</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Thank-Yous page: heading</shortDescription>
     <value>Thank-Yous</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_Off</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the feature is off</shortDescription>
-    <value>Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_QueueHeading</fullName>
@@ -137,28 +57,12 @@
     <value>Opted out of email, sent by letter</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_QueueCapped</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the queue is longer than the page limit</shortDescription>
-    <value>The queue is longer than this page counts. Send what is here and the rest will be counted next time.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_SendEmails</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the button that starts an email run</shortDescription>
     <value>Send Emails Now</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_EmailsStarted</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the email run has been queued</shortDescription>
-    <value>The email send has started. The run below shows how it goes.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_ProduceLetters</fullName>
@@ -177,14 +81,6 @@
     <value>Mark as Sent</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_LettersMarkedSent</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the letters were marked sent</shortDescription>
-    <value>Those letters are recorded as sent.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_Nightly</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -199,14 +95,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: when the nightly send is next due</shortDescription>
     <value>Next run</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_NeverRun</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: no run has happened</shortDescription>
-    <value>Nothing has been sent yet.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_RulesHeading</fullName>
@@ -255,30 +143,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the template picker before a choice</shortDescription>
     <value>Choose a template</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_TemplateRequired</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: an email rule has no template</shortDescription>
-    <value>An email rule needs an email template. Choose one from the list.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_RuleSaved</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: a rule was saved</shortDescription>
-    <value>The rule has been saved.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_NoRuns</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: no runs exist</shortDescription>
-    <value>No sends yet.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_TemplateNotFound</fullName>

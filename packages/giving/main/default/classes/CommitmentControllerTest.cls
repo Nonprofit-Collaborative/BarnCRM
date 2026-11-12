@@ -204,7 +204,11 @@ private class CommitmentControllerTest {
 
 		Assert.isFalse(seen.canChange, 'A reader is offered no status change.');
 		Assert.isFalse(seen.canGenerate, 'A reader is offered no schedule to generate.');
-		Assert.areEqual(Label.Giving_Commitment_NoPermission, message, 'Told why.');
+		Assert.areEqual(
+			BarnHelp.text('Giving', 'Giving_Commitment_NoPermission'),
+			message,
+			'Told why.'
+		);
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.areEqual(
 				'Active',

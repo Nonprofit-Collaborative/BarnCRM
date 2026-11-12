@@ -208,7 +208,7 @@ private class GivingSmallClassesCoverageTest {
 	@IsTest
 	static void aFailedSendWithNoReasonSaysSo() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			String unknown = Label.Giving_Acknowledgment_SendFailedUnknown;
+			String unknown = BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown');
 			Assert.areEqual(
 				unknown,
 				AcknowledgmentService.failureReasonOf(null, unknown),

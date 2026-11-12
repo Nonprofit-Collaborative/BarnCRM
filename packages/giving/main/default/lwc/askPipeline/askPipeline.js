@@ -23,9 +23,6 @@ import TILE_WON from '@salesforce/label/c.Giving_AskPipeline_TileWon';
 import TILE_DECLINED from '@salesforce/label/c.Giving_AskPipeline_TileDeclined';
 import WON_DETAIL from '@salesforce/label/c.Giving_AskPipeline_WonDetail';
 import OTHER_COLUMN_LABEL from '@salesforce/label/c.Giving_AskPipeline_OtherColumn';
-import COLUMN_EMPTY from '@salesforce/label/c.Giving_AskPipeline_ColumnEmpty';
-import TRUNCATED from '@salesforce/label/c.Giving_AskPipeline_Truncated';
-import READ_ONLY from '@salesforce/label/c.Giving_AskPipeline_ReadOnly';
 import NO_DONOR from '@salesforce/label/c.Giving_AskPipeline_NoDonor';
 import DAYS_IN_STAGE from '@salesforce/label/c.Giving_AskPipeline_DaysInStage';
 import MOVE_TO from '@salesforce/label/c.Core_Shared_MoveTo';
@@ -61,9 +58,7 @@ import FIELD_LINK_PLEDGE from '@salesforce/label/c.Giving_AskPipeline_FieldLinkP
 import FIELD_NEXT_ASK from '@salesforce/label/c.Giving_AskPipeline_FieldNextAsk';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import CLOSED from '@salesforce/label/c.Giving_AskPipeline_Closed';
 import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
-import ERROR_ACTION from '@salesforce/label/c.Giving_AskPipeline_ErrorAction';
 import REOPEN_ASK from '@salesforce/label/c.Giving_AskPipeline_ReopenAsk';
 import RECENTLY_CLOSED from '@salesforce/label/c.Giving_AskPipeline_RecentlyClosed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -81,7 +76,9 @@ const format = (template, ...values) =>
   values.reduce((text, value, index) => text.replace(`{${index}}`, value), template);
 
 const messageOf = (error) =>
-  (error && error.body && error.body.message) || (error && error.message) || ERROR_ACTION;
+  (error && error.body && error.body.message) ||
+  (error && error.message) ||
+  helpText('Giving', 'Giving_AskPipeline_ErrorAction');
 
 /**
  * The Ask Pipeline (G-26, canonical model Section 25R): every open ask by stage as a board or a
@@ -119,11 +116,15 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     tileOpenAmount: TILE_OPEN_AMOUNT,
     tileWon: TILE_WON,
     tileDeclined: TILE_DECLINED,
-    columnEmpty: COLUMN_EMPTY,
+    get columnEmpty() {
+      return helpText('Giving', 'Giving_AskPipeline_ColumnEmpty');
+    },
     get empty() {
       return helpText('Giving', 'Giving_AskPipeline_Empty');
     },
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Giving', 'Giving_AskPipeline_ReadOnly');
+    },
     closeAsk: CLOSE_ASK,
     outcomeLabel: OUTCOME_LABEL,
     resultLabel: RESULT_LABEL,
@@ -403,7 +404,9 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
   }
 
   get truncatedMessage() {
-    return this.board && this.board.truncated ? format(TRUNCATED, this.board.cards.length) : null;
+    return this.board && this.board.truncated
+      ? format(helpText('Giving', 'Giving_AskPipeline_Truncated'), this.board.cards.length)
+      : null;
   }
 
   get wonDetail() {
@@ -640,10 +643,11 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       });
       if (result && result.success) {
         this.closing = undefined;
-        this.toast(CLOSED, 'success');
+        this.toast(helpText('Giving', 'Giving_AskPipeline_Closed'), 'success');
         await this.load();
       } else {
-        this.closeError = (result && result.error) || ERROR_ACTION;
+        this.closeError =
+          (result && result.error) || helpText('Giving', 'Giving_AskPipeline_ErrorAction');
       }
     } catch (error) {
       this.closeError = messageOf(error);

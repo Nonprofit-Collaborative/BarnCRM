@@ -8,10 +8,8 @@ import TITLE from '@salesforce/label/c.Core_SettingsGroup_DonorLevels';
 import MEASURED_ON from '@salesforce/label/c.Giving_DonorLevels_MeasuredOn';
 import LAST_RECALCULATED from '@salesforce/label/c.Giving_DonorLevels_LastRecalculated';
 import NEVER_RECALCULATED from '@salesforce/label/c.Giving_DonorLevels_NeverRecalculated';
-import OFF from '@salesforce/label/c.Giving_DonorLevels_Off';
 import NEW_LEVEL from '@salesforce/label/c.Giving_DonorLevels_NewLevel';
 import RECALCULATE from '@salesforce/label/c.Giving_DonorLevels_Recalculate';
-import RECALCULATE_STARTED from '@salesforce/label/c.Giving_DonorLevels_RecalculateStarted';
 import COLUMN_LEVEL from '@salesforce/label/c.Giving_DonorLevels_ColumnLevel';
 import COLUMN_FROM from '@salesforce/label/c.Core_SetupChanges_From';
 import EMPTY_HEADING from '@salesforce/label/c.Giving_DonorLevels_EmptyHeading';
@@ -20,7 +18,6 @@ import COLUMN_DONORS from '@salesforce/label/c.Giving_DonorLevels_ColumnDonors';
 import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import TOP_OF_LADDER from '@salesforce/label/c.Giving_DonorLevels_TopOfLadder';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
-import ACTION_FAILED from '@salesforce/label/c.Giving_DonorLevels_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -50,7 +47,9 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
     measuredOn: MEASURED_ON,
     lastRecalculated: LAST_RECALCULATED,
     never: NEVER_RECALCULATED,
-    off: OFF,
+    get off() {
+      return helpText('Giving', 'Giving_DonorLevels_Off');
+    },
     get empty() {
       return helpText('Giving', 'Giving_DonorLevels_Empty');
     },
@@ -80,7 +79,10 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_DonorLevels_ActionFailed')
+      );
     }
   }
 
@@ -158,11 +160,14 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
     this.noticeMessage = undefined;
     return recalculate()
       .then(() => {
-        this.noticeMessage = RECALCULATE_STARTED;
+        this.noticeMessage = helpText('Giving', 'Giving_DonorLevels_RecalculateStarted');
         return refreshApex(this.wiredLadder);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_DonorLevels_ActionFailed')
+        );
       })
       .finally(() => {
         this.busy = false;

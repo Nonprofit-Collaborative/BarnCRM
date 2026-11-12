@@ -161,7 +161,7 @@ private class CommitmentEntryTest {
 				'An incomplete pledge has no preview yet.'
 			);
 			Assert.areEqual(
-				Label.Giving_Ask_ErrorAmount,
+				BarnHelp.text('Giving', 'Giving_Ask_ErrorAmount'),
 				CommitmentEntryController.save(input).error,
 				'Saving it asks for the total, as Record a Pledge does.'
 			);

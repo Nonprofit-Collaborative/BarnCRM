@@ -84,7 +84,7 @@ public with sharing class CommitmentController {
 	@AuraEnabled(cacheable=true)
 	public static SchedulePreview getSchedule(Id commitmentId) {
 		if (commitmentId == null) {
-			throw UserErrors.message(System.Label.Giving_Commitment_NotFound);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_NotFound'));
 		}
 		try {
 			List<InstallmentRow> rows = new List<InstallmentRow>();
@@ -98,7 +98,7 @@ public with sharing class CommitmentController {
 			List<Commitment__c> commitments = new CommitmentSelector()
 				.selectByIds(new Set<Id>{ commitmentId });
 			if (commitments.isEmpty()) {
-				throw UserErrors.message(System.Label.Giving_Commitment_NotFound);
+				throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_NotFound'));
 			}
 			schedule.commitmentStatus = commitments[0].Status__c;
 			schedule.canChange = canChange(commitmentId);
@@ -109,7 +109,7 @@ public with sharing class CommitmentController {
 			throw alreadyHandled;
 		} catch (Exception readFailure) {
 			ErrorLogger.log(readFailure, 'CommitmentController.getSchedule');
-			throw UserErrors.message(System.Label.Giving_SchedulePreview_LoadError);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SchedulePreview_LoadError'));
 		}
 	}
 
@@ -125,7 +125,7 @@ public with sharing class CommitmentController {
 			input.startDate == null ||
 			String.isBlank(input.frequency)
 		) {
-			throw UserErrors.message(System.Label.Giving_Commitment_InvalidSchedule);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_InvalidSchedule'));
 		}
 		try {
 			Commitment__c draft = new Commitment__c(
@@ -147,7 +147,7 @@ public with sharing class CommitmentController {
 			return new SchedulePreview(rows, false);
 		} catch (Exception previewFailure) {
 			ErrorLogger.log(previewFailure, 'CommitmentController.getSchedulePreview');
-			throw UserErrors.message(System.Label.Giving_SchedulePreview_LoadError);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_SchedulePreview_LoadError'));
 		}
 	}
 
@@ -158,16 +158,18 @@ public with sharing class CommitmentController {
 	@AuraEnabled
 	public static SchedulePreview generateNow(Id commitmentId) {
 		if (commitmentId == null) {
-			throw UserErrors.message(System.Label.Giving_Commitment_NotFound);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_NotFound'));
 		}
 		if (!canChange(commitmentId) || !Schema.SObjectType.Installment__c.isCreateable()) {
-			throw UserErrors.message(System.Label.Giving_Commitment_NoPermission);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_NoPermission'));
 		}
 		try {
 			CommitmentService.generateInstallments(new Set<Id>{ commitmentId });
 		} catch (Exception generateFailure) {
 			ErrorLogger.log(generateFailure, 'CommitmentController.generateNow');
-			throw UserErrors.message(System.Label.Giving_SchedulePreview_GenerateError);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_SchedulePreview_GenerateError')
+			);
 		}
 		return getSchedule(commitmentId);
 	}
@@ -178,12 +180,12 @@ public with sharing class CommitmentController {
 	@AuraEnabled
 	public static SchedulePreview changeStatus(Id commitmentId, String action) {
 		if (commitmentId == null) {
-			throw UserErrors.message(System.Label.Giving_Commitment_NotFound);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_NotFound'));
 		}
 		// Checked first: a refused save would otherwise read as a status the change cannot
 		// be made from, which sends a reader looking for the wrong cause.
 		if (!canChange(commitmentId)) {
-			throw UserErrors.message(System.Label.Giving_Commitment_NoPermission);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Commitment_NoPermission'));
 		}
 		Set<Id> commitmentIds = new Set<Id>{ commitmentId };
 		try {
@@ -197,7 +199,9 @@ public with sharing class CommitmentController {
 			} else if ('complete'.equals(wanted)) {
 				CommitmentService.complete(commitmentIds);
 			} else {
-				throw UserErrors.message(System.Label.Giving_Commitment_TransitionNotAllowed);
+				throw UserErrors.message(
+					BarnHelp.text('Giving', 'Giving_Commitment_TransitionNotAllowed')
+				);
 			}
 		} catch (CommitmentService.CommitmentException notAllowed) {
 			throw UserErrors.message(notAllowed.getMessage());
@@ -205,7 +209,9 @@ public with sharing class CommitmentController {
 			throw alreadyHandled;
 		} catch (Exception changeFailure) {
 			ErrorLogger.log(changeFailure, 'CommitmentController.changeStatus');
-			throw UserErrors.message(System.Label.Giving_Commitment_TransitionNotAllowed);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_Commitment_TransitionNotAllowed')
+			);
 		}
 		return getSchedule(commitmentId);
 	}

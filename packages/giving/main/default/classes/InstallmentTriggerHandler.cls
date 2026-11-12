@@ -27,7 +27,7 @@ public with sharing class InstallmentTriggerHandler extends TriggerHandler {
 				(installment.Paid_Amount__c != null &&
 				installment.Paid_Amount__c != 0);
 			if (paid) {
-				installment.addError(System.Label.Giving_Installment_DeleteBlocked);
+				installment.addError(BarnHelp.text('Giving', 'Giving_Installment_DeleteBlocked'));
 			}
 		}
 	}

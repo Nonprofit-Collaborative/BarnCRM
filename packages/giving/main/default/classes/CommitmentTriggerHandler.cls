@@ -135,7 +135,7 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 		}
 		for (Commitment__c commitment : commitments) {
 			if (blocked.contains(commitment.Id)) {
-				commitment.addError(System.Label.Giving_Commitment_DeleteBlocked);
+				commitment.addError(BarnHelp.text('Giving', 'Giving_Commitment_DeleteBlocked'));
 			}
 		}
 	}

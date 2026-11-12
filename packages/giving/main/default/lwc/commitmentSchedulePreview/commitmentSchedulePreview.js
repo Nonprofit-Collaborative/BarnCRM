@@ -5,9 +5,6 @@ import changeStatus from '@salesforce/apex/CommitmentController.changeStatus';
 
 import TITLE from '@salesforce/label/c.Giving_SchedulePreview_Title';
 import GENERATE_NOW from '@salesforce/label/c.Giving_SchedulePreview_GenerateNow';
-import GENERATED from '@salesforce/label/c.Giving_SchedulePreview_Generated';
-import GENERATE_ERROR from '@salesforce/label/c.Giving_SchedulePreview_GenerateError';
-import LOAD_ERROR from '@salesforce/label/c.Giving_SchedulePreview_LoadError';
 import COLUMN_SEQUENCE from '@salesforce/label/c.Giving_Receipt_ColumnNumber';
 import COLUMN_DUE_DATE from '@salesforce/label/c.Giving_SchedulePreview_ColumnDueDate';
 import COLUMN_AMOUNT from '@salesforce/label/c.Giving_SchedulePreview_ColumnAmount';
@@ -18,7 +15,6 @@ import ACTION_PAUSE from '@salesforce/label/c.Giving_Commitment_ActionPause';
 import ACTION_RESUME from '@salesforce/label/c.Giving_Commitment_ActionResume';
 import ACTION_CANCEL from '@salesforce/label/c.Giving_Commitment_ActionCancel';
 import ACTION_COMPLETE from '@salesforce/label/c.Giving_Commitment_ActionComplete';
-import STATUS_CHANGED from '@salesforce/label/c.Giving_Commitment_StatusChanged';
 import CANCEL_TITLE from '@salesforce/label/c.Giving_Commitment_CancelConfirmTitle';
 import KEEP_IT from '@salesforce/label/c.Core_Find_DeleteConfirmCancel';
 import EMPTY_HEADING from '@salesforce/label/c.Giving_SchedulePreview_EmptyHeading';
@@ -116,7 +112,10 @@ export default class CommitmentSchedulePreview extends LightningElement {
       this.absorb(await getSchedule({ commitmentId: this.recordId }));
     } catch (error) {
       this.installments = [];
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Giving', 'Giving_SchedulePreview_LoadError')
+      );
     } finally {
       this.loading = false;
     }
@@ -128,9 +127,12 @@ export default class CommitmentSchedulePreview extends LightningElement {
     this.noticeMessage = undefined;
     try {
       this.absorb(await generateNow({ commitmentId: this.recordId }));
-      this.noticeMessage = GENERATED;
+      this.noticeMessage = helpText('Giving', 'Giving_SchedulePreview_Generated');
     } catch (error) {
-      this.errorMessage = bodyMessage(error, GENERATE_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Giving', 'Giving_SchedulePreview_GenerateError')
+      );
     } finally {
       this.loading = false;
     }
@@ -169,9 +171,12 @@ export default class CommitmentSchedulePreview extends LightningElement {
     this.noticeMessage = undefined;
     try {
       this.absorb(await changeStatus({ commitmentId: this.recordId, action }));
-      this.noticeMessage = STATUS_CHANGED;
+      this.noticeMessage = helpText('Giving', 'Giving_Commitment_StatusChanged');
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Giving', 'Giving_SchedulePreview_LoadError')
+      );
     } finally {
       this.loading = false;
     }

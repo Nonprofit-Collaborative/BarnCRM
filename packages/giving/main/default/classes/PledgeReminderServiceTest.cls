@@ -388,7 +388,10 @@ private class PledgeReminderServiceTest {
 				FROM Pledge_Reminder__c
 			];
 			Assert.areEqual('Failed', row.Status__c, 'Settled again on its own, not left Queued.');
-			Assert.areEqual(Label.Giving_Acknowledgment_SendFailedUnknown, row.Failure_Reason__c);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown'),
+				row.Failure_Reason__c
+			);
 			Assert.isNull(row.Reminder_Key__c);
 		}
 	}
