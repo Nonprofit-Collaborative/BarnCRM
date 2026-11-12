@@ -1,4 +1,4 @@
-import { parseCsv, toRecords, withoutFormulaGuard, detectDelimiter } from '../csv';
+import { parseCsv, toRecords, withoutFormulaGuard, detectDelimiter } from 'c/csvParser';
 import { toCsv } from 'c/findCsv';
 
 describe('the CSV reader', () => {

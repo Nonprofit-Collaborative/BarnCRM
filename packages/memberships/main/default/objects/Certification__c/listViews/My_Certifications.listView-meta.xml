@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Certifications</fullName>
+  <columns>NAME</columns>
+  <columns>Credits_Required__c</columns>
+  <columns>Valid_Months__c</columns>
+  <columns>Active__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Certifications</label>
+</ListView>
