@@ -3,6 +3,8 @@ import { api } from 'lwc';
 import searchPeople from '@salesforce/apex/HouseholdOfPersonController.searchPeople';
 import addExistingPerson from '@salesforce/apex/HouseholdOfPersonController.addExistingPerson';
 import addNewPerson from '@salesforce/apex/HouseholdOfPersonController.addNewPerson';
+import getHouseholdsForPerson from '@salesforce/apex/HouseholdOfPersonController.getHouseholdsForPerson';
+import moveContact from '@salesforce/apex/HouseholdController.moveContact';
 import findSameName from '@salesforce/apex/PersonSameNameController.findSameName';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { describeSameNamePerson, joinName } from './sameNameHint';
@@ -38,6 +40,10 @@ const PERSON_MODE = 'person';
  * resolves { id, name } with the new person, or with the existing person chosen from the
  * same-name hint. It resolves undefined when closed without a person.
  *
+ * Add Member offers the search in both ways of belonging. In the simple way, choosing a person
+ * moves them here with HouseholdController.moveContact (the panel's Move path), after Save when
+ * they are in another household, which is named first.
+ *
  * Both show the same-name hint (people-giving-24) under the name fields: "Already in BarnCRM:
  * Ana Garcia, Tampa (Garcia Household). Use this person instead?", one click to switch.
  */
@@ -71,6 +77,9 @@ export default class HouseholdAddMemberModal extends LightningModal {
   searchTimer;
   searchSequence = 0;
 
+  /** Simple way: the person chosen from the search, waiting for Save to move them here. */
+  pendingMove;
+
   newSalutation = '';
   newFirstName = '';
   newLastName = '';
@@ -99,6 +108,19 @@ export default class HouseholdAddMemberModal extends LightningModal {
   /** The flexible way of Add Member: search plus the add-new fields saved by Apex. */
   get searchMode() {
     return !this.personMode && this.junctionMode;
+  }
+
+  /** Add Member offers the search in both ways of belonging; the new person dialog does not. */
+  get showSearch() {
+    return !this.personMode;
+  }
+
+  get hasPendingMove() {
+    return Boolean(this.pendingMove);
+  }
+
+  get pendingMessage() {
+    return this.pendingMove ? this.pendingMove.message : '';
   }
 
   get hasSearchResults() {
@@ -138,6 +160,7 @@ export default class HouseholdAddMemberModal extends LightningModal {
   handleSearchInput(event) {
     const term = event.target.value || '';
     this.searchTerm = term;
+    this.pendingMove = undefined;
     this.clearSearchTimer();
     // eslint-disable-next-line @lwc/lwc/no-async-operation
     this.searchTimer = setTimeout(() => {
@@ -176,7 +199,59 @@ export default class HouseholdAddMemberModal extends LightningModal {
 
   handleAddExisting(event) {
     const personId = event.currentTarget.dataset.personId;
+    if (!this.junctionMode) {
+      return this.chooseToMove(personId);
+    }
     return this.save(addExistingPerson({ householdId: this.householdId, personId }));
+  }
+
+  /**
+   * The simple way: a person is in one household, so adding them moves them. When they are in
+   * another one, say so first and wait for Save; when they are in none, move them straight in.
+   */
+  async chooseToMove(personId) {
+    const person = this.searchResults.find((candidate) => candidate.id === personId);
+    const name = person ? person.name : '';
+    this.busy = true;
+    this.errorMessage = undefined;
+    this.pendingMove = undefined;
+    try {
+      const households = (await getHouseholdsForPerson({ personId })) || [];
+      if (households.some((household) => household.householdId === this.householdId)) {
+        this.errorMessage = helpText('Core', 'Core_HouseholdPanel_AlreadyHere', name);
+        return undefined;
+      }
+      if (households.length === 0) {
+        return await this.moveHere(personId);
+      }
+      this.pendingMove = {
+        personId,
+        message: helpText('Core', 'Core_HouseholdPanel_MoveConfirm', name, households[0].name)
+      };
+    } catch (error) {
+      this.errorMessage = this.readError(error);
+    } finally {
+      this.busy = false;
+    }
+    return undefined;
+  }
+
+  moveHere(personId) {
+    return this.save(
+      moveContact({
+        contactId: personId,
+        targetHouseholdId: this.householdId,
+        sourceHouseholdId: null
+      })
+    );
+  }
+
+  handleConfirmMove() {
+    return this.moveHere(this.pendingMove.personId);
+  }
+
+  handleCancelMove() {
+    this.pendingMove = undefined;
   }
 
   handleNewSalutationChange(event) {

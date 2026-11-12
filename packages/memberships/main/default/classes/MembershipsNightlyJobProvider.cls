@@ -1,0 +1,16 @@
+/**
+ * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Memberships step,
+ * renewals, lapse handling and reminders, to the one nightly run (ADR-0166; ADR-NEXT
+ * `NEXT-memberships-module.md` decision 5).
+ */
+@NamespaceAccessible
+public with sharing class MembershipsNightlyJobProvider implements NightlyStepProvider {
+	@NamespaceAccessible
+	public MembershipsNightlyJobProvider() {
+		// Built by name from Core (NightlyJobs), so it needs a public constructor.
+	}
+
+	public List<NightlyStep> nightlySteps() {
+		return new List<NightlyStep>{ MembershipRenewals.step() };
+	}
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Previous_Term__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <referenceTo>Membership_Term__c</referenceTo>
+  <relationshipLabel>Renewals</relationshipLabel>
+  <relationshipName>Renewals</relationshipName>
+  <required>false</required>
+  <inlineHelpText>The term this one renews.</inlineHelpText>
+  <label>Renews</label>
+  <type>Lookup</type>
+</CustomField>

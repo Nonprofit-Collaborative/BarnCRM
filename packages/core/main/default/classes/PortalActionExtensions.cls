@@ -16,7 +16,8 @@ public with sharing class PortalActionExtensions {
 		'VolunteersPortalExtension',
 		'EventsPortalExtension',
 		'CorporateHubPortalExtension',
-		'ScholarshipsPortalExtension'
+		'ScholarshipsPortalExtension',
+		'MembershipsPortalExtension'
 	};
 
 	/** Injected by tests by class name, since no module is there to resolve. */

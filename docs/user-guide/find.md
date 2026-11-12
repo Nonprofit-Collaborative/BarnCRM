@@ -22,13 +22,16 @@ You should see: the record open in its own tab (in the **BarnCRM** app).
 ## To Use a List View
 
 1. Open the **Households**, **Organizations** or **Contacts** tab.
-2. On **Households** and **Organizations**, the tab shows the list of that name. On
-   **Contacts**, pick a list from the list view menu.
-3. Click a column heading to sort, or open the list and use Salesforce's list filters.
+2. The **Households** and **Organizations** tabs open the full Salesforce list page for
+   accounts, on the list of that name. Use the list view menu to pick another, for example
+   **My Households** or **My Organizations** (the ones you own). On **Contacts**, pick a list
+   from the same menu. Every BarnCRM object with a tab has an **All** list and a **My** list.
+3. Click a column heading to sort, or use Salesforce's list filters.
 
 You should see: the **Households** list with the household name, **Member Count**,
 **Informal Greeting** and **Custom Name**; the **Organizations** list with the name, phone and
-**Primary Contact**.
+**Primary Contact**; and the list view menu with all the lists. The Back button returns to the
+page you came from, not to the tab.
 
 ## To Build and Run a Query in Find
 

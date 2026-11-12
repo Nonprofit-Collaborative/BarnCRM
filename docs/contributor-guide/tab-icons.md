@@ -91,12 +91,15 @@ Rules:
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
 | payments | Payment__c | Custom40: Creditcard |
 | payments | Payment_Event__c | Custom95: Stopwatch |
+| memberships | Membership_Level__c | Custom48: Trophy |
+| memberships | Membership_Term__c | Custom45: Ticket |
 | payments | Payments_Setup | Custom70: Handsaw |
 | lwcbuilder | LWC_Builder | Custom34: Insect |
 | scholarships | Award__c | Custom80: Motorcycle |
 | scholarships | Award_Application__c | Custom70: Handsaw |
 | scholarships | Award_Program__c | Custom48: Trophy |
 | scholarships | Scholarships | Custom34: Insect |
+| territory | Territory_Management | Custom34: Insect |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |

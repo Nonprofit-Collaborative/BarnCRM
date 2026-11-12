@@ -1,0 +1,238 @@
+<template>
+    <template lwc:if={helpReady}>
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        icon-name={iconName}
+        help-storage-key="territoryManager"
+        data-id="shell"
+    >
+        <div slot="actions">
+            <lightning-button
+                data-id="new-territory"
+                label={labels.newTerritory}
+                icon-name="utility:add"
+                disabled={busy}
+                onclick={handleNewTerritory}
+            ></lightning-button>
+        </div>
+        <div slot="help" class="slds-var-p-bottom_small">
+            <p>
+                {labels.intro}
+                <c-barn-help class="slds-var-m-left_xx-small" learn-more-url={guideUrl}></c-barn-help>
+            </p>
+        </div>
+
+        <div class="slds-is-relative">
+            <template lwc:if={busy}>
+                <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={errorMessage}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+            </template>
+            <template lwc:if={statusMessage}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="success" message={statusMessage} data-id="status"></c-barn-notice>
+            </template>
+            <template lwc:if={limitWarning}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="warning" message={limitWarning} data-id="limit"></c-barn-notice>
+            </template>
+
+            <template lwc:if={editingTerritory}>
+                <section class="slds-box slds-var-m-bottom_medium" data-id="territory-editor">
+                    <lightning-record-edit-form
+                        object-api-name={territoryObject}
+                        record-id={editor.recordId}
+                        onsuccess={handleFormSuccess}
+                        onerror={handleFormError}
+                    >
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field field-name="Name"></lightning-input-field>
+                        <lightning-input-field field-name="Active__c"></lightning-input-field>
+                        <lightning-input-field field-name="Priority__c"></lightning-input-field>
+                        <lightning-input-field field-name="Routing__c"></lightning-input-field>
+                        <lightning-input-field field-name="Owner_User__c"></lightning-input-field>
+                        <lightning-input-field field-name="Description__c"></lightning-input-field>
+                        <div class="slds-var-m-top_small">
+                            <lightning-button type="submit" variant="brand" label={labels.save}></lightning-button>
+                            <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancel}></lightning-button>
+                        </div>
+                    </lightning-record-edit-form>
+                </section>
+            </template>
+
+            <template lwc:if={editingMember}>
+                <section class="slds-box slds-var-m-bottom_medium" data-id="member-editor">
+                    <lightning-record-edit-form
+                        object-api-name={memberObject}
+                        onsuccess={handleFormSuccess}
+                        onerror={handleFormError}
+                    >
+                        <lightning-messages></lightning-messages>
+                        <lightning-input-field field-name="Territory__c" value={editor.territoryId} class="slds-hide"></lightning-input-field>
+                        <lightning-input-field field-name="User__c"></lightning-input-field>
+                        <lightning-input-field field-name="Capacity__c"></lightning-input-field>
+                        <lightning-input-field field-name="Active__c"></lightning-input-field>
+                        <div class="slds-var-m-top_small">
+                            <lightning-button type="submit" variant="brand" label={labels.save}></lightning-button>
+                            <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancel}></lightning-button>
+                        </div>
+                    </lightning-record-edit-form>
+                </section>
+            </template>
+
+            <template lwc:if={editingRule}>
+                <section class="slds-box slds-var-m-bottom_medium" data-id="rule-editor">
+                    <lightning-combobox
+                        data-id="applies-to"
+                        label={labels.appliesTo}
+                        options={kindChoices}
+                        value={ruleDraft.appliesTo}
+                        onchange={handleKindChange}
+                    ></lightning-combobox>
+                    <div class="slds-var-m-top_small">
+                        <c-filter-builder
+                            object-api-name={ruleObject}
+                            value={ruleDraft.filterJson}
+                            onchange={handleFilterChange}
+                        ></c-filter-builder>
+                    </div>
+                    <lightning-input
+                        class="slds-var-m-top_small"
+                        data-id="rule-active"
+                        type="checkbox"
+                        label={labels.ruleActive}
+                        checked={ruleDraft.active}
+                        onchange={handleRuleActiveChange}
+                    ></lightning-input>
+                    <div class="slds-var-m-top_small">
+                        <lightning-button data-id="save-rule" variant="brand" label={labels.save} disabled={busy} onclick={handleSaveRule}></lightning-button>
+                        <lightning-button class="slds-var-m-left_x-small" data-id="check-rule" label={labels.checkRule} disabled={busy} onclick={handleCheckRule}></lightning-button>
+                        <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancel}></lightning-button>
+                        <span class="slds-var-m-left_small" data-id="rule-count">{ruleCountLine}</span>
+                    </div>
+                </section>
+            </template>
+
+            <section class="slds-var-m-bottom_large" data-id="run-bar">
+                <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-gutters_x-small">
+                    <div class="slds-col slds-no-flex">
+                        <lightning-button data-id="preview" label={labels.preview} disabled={runDisabled} onclick={handlePreview}></lightning-button>
+                    </div>
+                    <div class="slds-col slds-no-flex">
+                        <lightning-button data-id="assign" variant="brand" label={labels.assign} disabled={runDisabled} onclick={handleAssign}></lightning-button>
+                    </div>
+                    <div class="slds-col slds-no-flex">
+                        <lightning-input
+                            data-id="only-unassigned"
+                            type="checkbox"
+                            label={labels.onlyUnassigned}
+                            checked={onlyUnassigned}
+                            onchange={handleOnlyUnassigned}
+                        ></lightning-input>
+                    </div>
+                    <div class="slds-col slds-no-flex">
+                        <lightning-button data-id="refresh" label={labels.refresh} icon-name="utility:refresh" onclick={handleRefresh}></lightning-button>
+                    </div>
+                </div>
+                <template lwc:if={isRunning}>
+                    <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="running">{labels.running}</p>
+                </template>
+            </section>
+
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.territories}</h2>
+            <template lwc:if={hasTerritories}>
+                <template for:each={territories} for:item="territory">
+                    <article key={territory.id} class="slds-box slds-var-m-bottom_small" data-id="territory">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col">
+                                <h3 class="slds-text-heading_small">{territory.heading}</h3>
+                                <p class="slds-text-body_small slds-text-color_weak">{territory.detail} {territory.ownerLine}</p>
+                            </div>
+                            <lightning-button-group>
+                                <lightning-button data-id={territory.id} label={labels.edit} onclick={handleEditTerritory}></lightning-button>
+                                <lightning-button data-id={territory.id} data-name={territory.name} label={labels.remove} onclick={handleDelete}></lightning-button>
+                            </lightning-button-group>
+                        </div>
+                        <div class="slds-grid slds-wrap slds-gutters_small slds-var-m-top_small">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <h4 class="slds-text-title_bold">{labels.rules}</h4>
+                                <template lwc:if={territory.hasRules}>
+                                    <ul>
+                                        <template for:each={territory.rules} for:item="rule">
+                                            <li key={rule.id} class="slds-grid slds-grid_vertical-align-center slds-var-p-vertical_xx-small">
+                                                <span class={rule.lineClass}>{rule.line}</span>
+                                                <lightning-button-icon class="slds-var-m-left_x-small" icon-name="utility:edit" alternative-text={labels.edit} variant="bare" data-id={rule.id} onclick={handleEditRule}></lightning-button-icon>
+                                                <lightning-button-icon icon-name="utility:delete" alternative-text={labels.remove} variant="bare" data-id={rule.id} data-name={rule.name} onclick={handleDelete}></lightning-button-icon>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                                <template lwc:else>
+                                    <p class="slds-text-color_weak">{labels.noRules}</p>
+                                </template>
+                                <lightning-button variant="base" data-id={territory.id} label={labels.addRule} onclick={handleAddRule}></lightning-button>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <h4 class="slds-text-title_bold">{labels.members}</h4>
+                                <template lwc:if={territory.hasMembers}>
+                                    <ul>
+                                        <template for:each={territory.members} for:item="member">
+                                            <li key={member.id} class="slds-grid slds-grid_vertical-align-center slds-var-p-vertical_xx-small">
+                                                <span class={member.lineClass}>{member.line}</span>
+                                                <lightning-button-icon class="slds-var-m-left_x-small" icon-name="utility:delete" alternative-text={labels.remove} variant="bare" data-id={member.id} data-name={member.userName} onclick={handleDelete}></lightning-button-icon>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </template>
+                                <template lwc:else>
+                                    <p class="slds-text-color_weak">{labels.noMembers}</p>
+                                </template>
+                                <lightning-button variant="base" data-id={territory.id} label={labels.addMember} onclick={handleAddMember}></lightning-button>
+                            </div>
+                        </div>
+                    </article>
+                </template>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak" data-id="no-territories">{labels.noTerritories}</p>
+            </template>
+
+            <h2 class="slds-text-heading_small slds-var-m-top_large slds-var-m-bottom_x-small">{labels.runs}</h2>
+            <template lwc:if={hasRuns}>
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={runs} for:item="run">
+                        <li key={run.key} class="slds-item" data-id="run">
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <span class="slds-col">{run.line}</span>
+                                <lightning-button variant="base" data-id={run.id} label={labels.show} onclick={handleShowRun}></lightning-button>
+                                <template lwc:if={run.canUndo}>
+                                    <lightning-button class="slds-var-m-left_x-small" data-id={run.id} label={labels.undo} disabled={busy} onclick={handleUndo}></lightning-button>
+                                </template>
+                            </div>
+                            <template lwc:if={run.message}>
+                                <p class="slds-text-color_error">{run.message}</p>
+                            </template>
+                            <template lwc:if={run.isOpen}>
+                                <ul class="slds-var-m-top_x-small slds-var-m-left_medium">
+                                    <template for:each={run.territoryLines} for:item="entry">
+                                        <li key={entry.key}>{entry.text}</li>
+                                    </template>
+                                </ul>
+                                <p class="slds-text-title_bold slds-var-m-top_x-small slds-var-m-left_medium">{labels.sample}</p>
+                                <ul class="slds-var-m-left_medium">
+                                    <template for:each={run.sampleLines} for:item="entry">
+                                        <li key={entry.key} class="slds-text-body_small">{entry.text}</li>
+                                    </template>
+                                </ul>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak" data-id="no-runs">{labels.noRuns}</p>
+            </template>
+        </div>
+    </c-barn-page-shell>
+    </template>
+</template>

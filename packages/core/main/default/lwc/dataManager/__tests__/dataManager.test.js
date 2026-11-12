@@ -132,6 +132,7 @@ describe('c-data-manager', () => {
     expect(tiles(element).map((tile) => tile.name)).toEqual([
       'import',
       'find',
+      'grid',
       'optimizer',
       'duplicates',
       'delete'
@@ -262,6 +263,20 @@ describe('c-data-manager', () => {
     expect(mockNavigate).toHaveBeenLastCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Find' }
+    });
+  });
+
+  it('opens the Grid view of the Find tab from its tile', async () => {
+    const element = await render();
+    findToolStateKey.emit('ns__tool');
+
+    select(element, 'grid');
+    await flush();
+
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Find' },
+      state: { ns__view: 'grid' }
     });
   });
 

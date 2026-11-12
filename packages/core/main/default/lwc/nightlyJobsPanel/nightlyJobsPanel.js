@@ -23,6 +23,14 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
  * Minutes after midnight as the reader writes a time of day in their Salesforce locale, for
  * example 1:15 AM. A clock time, not an instant: formatted as UTC so no time zone moves it.
  */
+/** A step's state: Off, On, or Not Scheduled when it is on but the nightly run is not scheduled. */
+function stepState(isOn, scheduled, onLabel, offLabel) {
+  if (!isOn) {
+    return offLabel;
+  }
+  return scheduled ? onLabel : helpText('Core', 'Core_NightlyJobs_StateNotScheduled');
+}
+
 export function timeOfDay(minute) {
   const at = new Date(Date.UTC(2000, 0, 1, Math.floor(minute / 60), minute % 60));
   return at.toLocaleTimeString(LOCALE, {
@@ -80,13 +88,15 @@ export default class NightlyJobsPanel extends LightningElement {
       });
   }
 
+  /** A step switched on while the run is not scheduled never runs, so it says so, not On. */
   get rows() {
+    const scheduled = !!(this.panel && this.panel.scheduled);
     return ((this.panel && this.panel.steps) || []).map((step) => ({
       key: step.key,
       label: step.label,
       time: timeOfDay(step.minute),
-      state: step.isOn ? ON : OFF,
-      stateStatus: step.isOn ? 'on' : 'off',
+      state: stepState(step.isOn, scheduled, ON, OFF),
+      stateStatus: !step.isOn ? 'off' : scheduled ? 'on' : 'warning',
       lastStarted: step.lastStarted,
       outcome: step.outcome,
       outcomeStatus: step.outcomeStatus,

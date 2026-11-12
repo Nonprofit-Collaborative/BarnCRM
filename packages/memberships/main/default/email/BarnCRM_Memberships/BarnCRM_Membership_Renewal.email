@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+Thank you for being a member. Your membership ends on {!Membership_Term__c.End_Date__c}.
+
+To renew, reply to this email or ask us for a link to pay online. We would love to keep you with us.
+
+With thanks,
+
+{!Organization.Name}

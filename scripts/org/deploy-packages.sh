@@ -950,6 +950,10 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(lwcbuilder)
   # Scholarships and Outbound Grants depends on Core only (ADR-NEXT, scholarships module).
   MODULES+=(scholarships)
+  # Territory Management depends on Core only (ADR-NEXT, territory management module).
+  MODULES+=(territory)
+  # Memberships depends on Core only; Giving and Payments are read by name (ADR-NEXT memberships module).
+  MODULES+=(memberships)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -1005,7 +1009,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
   # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
   # have no app of their own: these apps are where their tabs live (D-188).
-  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships)
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1042,7 +1046,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments LwcBuilder Scholarships Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments LwcBuilder Scholarships Territory Memberships Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1176,6 +1180,23 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   echo "== Queueing the Scholarships access sync =="
   if ! printf '%s\n' 'new ScholarshipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Scholarships access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Territory Management permission sets (ADR-NEXT, territory management
+  # module, decision 7).
+  echo ""
+  echo "== Queueing the Territory Management access sync =="
+  if ! printf '%s\n' 'new TerritoryAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Territory Management access sync was not queued. Nothing else is affected: the"
+    echo "hourly access check syncs the access."
+  fi
+
+  # The same gap for the Memberships permission sets (ADR-NEXT memberships module, decision 10).
+  echo ""
+  echo "== Queueing the Memberships access sync =="
+  if ! printf '%s\n' 'new MembershipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Memberships access sync was not queued. Nothing else is affected: the hourly"
     echo "access check syncs the access."
   fi
 fi

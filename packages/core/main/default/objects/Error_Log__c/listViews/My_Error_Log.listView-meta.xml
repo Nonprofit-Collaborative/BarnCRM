@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Error_Log</fullName>
+  <columns>NAME</columns>
+  <columns>Timestamp__c</columns>
+  <columns>Severity__c</columns>
+  <columns>Status__c</columns>
+  <columns>Context__c</columns>
+  <columns>Message__c</columns>
+  <columns>User__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Error Log</label>
+</ListView>
