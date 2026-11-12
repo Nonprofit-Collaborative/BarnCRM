@@ -1,0 +1,139 @@
+<template>
+    <template lwc:if={helpReady}>
+        <section data-id="files-import">
+            <h2 class="slds-text-heading_medium">{labels.title}</h2>
+            <p class="slds-var-m-vertical_x-small">{labels.intro}</p>
+            <template lwc:if={errorMessage}>
+                <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+            </template>
+            <template lwc:if={noticeMessage}>
+                <c-barn-notice variant="success" message={noticeMessage} data-id="notice"></c-barn-notice>
+            </template>
+
+            <lightning-input
+                type="file"
+                accept=".zip"
+                label={labels.choose}
+                disabled={busy}
+                onchange={handleFile}
+                data-id="zip"
+            ></lightning-input>
+            <template lwc:if={hasRows}>
+                <p class="slds-var-m-top_x-small" data-id="manifest">{manifestLine}</p>
+                <div class="slds-var-m-top_small">
+                    <lightning-button
+                        label={labels.dryRun}
+                        disabled={dryRunDisabled}
+                        onclick={handleDryRun}
+                        data-id="dry-run"
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-var-m-left_x-small"
+                        variant="brand"
+                        label={labels.load}
+                        disabled={loadDisabled}
+                        onclick={handleLoad}
+                        data-id="load"
+                    ></lightning-button>
+                </div>
+            </template>
+            <template lwc:if={progress}>
+                <p class="slds-var-m-top_small" data-id="progress">{progressLine}</p>
+                <lightning-progress-bar value={progressValue} size="medium"></lightning-progress-bar>
+            </template>
+            <template lwc:if={checked}>
+                <p class="slds-var-m-top_small" data-id="summary">{summaryLine}</p>
+                <lightning-button
+                    class="slds-var-m-top_x-small"
+                    variant="base"
+                    label={labels.download}
+                    onclick={handleDownload}
+                    data-id="download"
+                ></lightning-button>
+            </template>
+            <template lwc:if={hasRefused}>
+                <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.refusedHeading}</h3>
+                <div class="slds-scrollable_x">
+                    <table
+                        class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+                        data-id="refused"
+                    >
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col">{labels.row}</th>
+                                <th scope="col">{labels.file}</th>
+                                <th scope="col">{labels.recordId}</th>
+                                <th scope="col">{labels.result}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={refusedRows} for:item="row">
+                                <tr key={row.key}>
+                                    <td data-label={labels.row}>{row.row}</td>
+                                    <td class="slds-cell-wrap" data-label={labels.file}>{row.file}</td>
+                                    <td data-label={labels.recordId}>{row.recordId}</td>
+                                    <td class="slds-cell-wrap" data-label={labels.result}>{row.result}</td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+
+            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.recentHeading}</h3>
+            <template lwc:if={hasJobs}>
+                <ul class="slds-has-dividers_bottom-space" data-id="jobs">
+                    <template for:each={jobRows} for:item="job">
+                        <li key={job.id} class="slds-item slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <span class="slds-col slds-grow">
+                                <span class="slds-text-title_bold">{job.name}</span>
+                                <span class="slds-var-m-left_x-small">{job.fileName}</span>
+                                <span class="slds-var-m-left_x-small">{job.status}</span>
+                                <span class="slds-var-m-left_x-small slds-text-color_weak">{job.summary}</span>
+                            </span>
+                            <template lwc:if={job.canUndo}>
+                                <lightning-button
+                                    variant="base"
+                                    label={labels.undo}
+                                    data-id={job.id}
+                                    disabled={busy}
+                                    onclick={handleUndo}
+                                ></lightning-button>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-color_weak" data-id="jobs-none">{labels.recentNone}</p>
+            </template>
+            <template lwc:if={undoTarget}>
+                <div class="slds-box slds-var-m-top_small" data-id="undo-confirm">
+                    <p>{undoLine}</p>
+                    <lightning-input
+                        label={undoLine}
+                        variant="label-hidden"
+                        value={undoText}
+                        onchange={handleUndoText}
+                        data-id="undo-text"
+                    ></lightning-input>
+                    <div class="slds-var-m-top_x-small">
+                        <lightning-button
+                            label={labels.cancel}
+                            onclick={handleUndoCancel}
+                            data-id="undo-cancel"
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-var-m-left_x-small"
+                            variant="destructive"
+                            label={labels.undoButton}
+                            disabled={undoDisabled}
+                            onclick={handleUndoConfirm}
+                            data-id="undo-button"
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+        </section>
+    </template>
+</template>

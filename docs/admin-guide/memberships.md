@@ -184,11 +184,57 @@ membership that has not ended is Current, one that has ended is Lapsed. Dues are
 (Essentials keeps prices in price books): enter them on each level. Essentials itself is never
 changed; retire it with the kit's checklist when you are ready.
 
+## Certifications and Continuing Credits
+
+Some organizations certify people (a trainer, a counselor, a docent) and ask them to keep learning
+to stay certified. Memberships keeps both:
+
+- a **Certification** is a credential you grant, with the **Credits Required** to renew it and
+  how many **Valid Months** it lasts (default 24; **0** for one that never expires);
+- a **Member Certification** is one person holding one certification: its status (Pending, Active,
+  Expired or Revoked), when it was **Earned On** and when it **Expires On**;
+- a **Continuing Credit** is credits the person earned toward renewing it: a course, a conference
+  session, an event.
+
+There is nothing to turn on. Admins set up certifications; staff record holders and credits.
+
+### Setting Up a Certification
+
+1. Open the **Certifications** tab and click **New**.
+2. Give it a **Name**, the **Credits Required** to renew, and its **Valid Months**. Clear **Active**
+   later to stop offering it; current holders keep it.
+
+### Granting, Credits and Renewing
+
+1. On the **Member Certifications** tab, click **New**: choose the **Certification** and the
+   **Contact**. It starts **Pending**.
+2. When they pass, open it and press **Grant** in the **Certification** panel. It becomes
+   **Active**, Earned On is today and Expires On is set from Valid Months.
+3. Add each **Continuing Credit** from its **Continuing Credits** list: the credits, the date,
+   what earned them and the kind of activity. **Credits Toward Renewal** adds them up.
+4. When Credits Toward Renewal reaches Credits Required, press **Renew**. The new period starts
+   the day after the old Expires On (or today, if it had expired) and the credits are marked
+   **Used**, so the next renewal starts from none. Renew is refused until there are enough
+   credits.
+5. **Revoke** ends a certification at once. **Grant** makes it Active again.
+
+Each morning an Active certification past its Expires On becomes **Expired**, in the Memberships
+step of the nightly run.
+
+### Who Gets What With Certifications
+
+| Permission set | Certifications | Member certifications and credits |
+|---|---|---|
+| Memberships Admin | Create, edit, delete | Create, edit, delete, see all |
+| Memberships Staff | Read | Create, edit |
+| Memberships Read Only | Read | Read |
+
 ## Erasing a Person
 
 When you erase a person (see [Erase a Person](erase-a-person.md)), their memberships stay (as gifts
 do) but their directory listing and the membership notes are cleared and the listing is turned
-off.
+off. Their certifications and credits stay too, with their notes and the credits' activity text
+cleared.
 
 ## Troubleshooting
 
@@ -197,4 +243,5 @@ off.
 | A gift did not renew a membership | The level's Giving Fund ID, the gift is Received and allocated to that fund, the gift meets the level's dues, Renew memberships from gifts is on, the gift is from the last 45 days |
 | Email Payment Link says Payments is not ready | Payments is installed, turned on and its keys are entered on Payments Setup |
 | A paid membership is still Pending | Payments processing is scheduled (Health Check); payments are applied every 15 minutes |
+| Renew on a certification is refused | Credits Toward Renewal is below Credits Required, the certification never expires (Valid Months 0), or it is Pending or Revoked (use Grant) |
 | No reminder was sent | Reminders are on, the membership has a contact with an email address who has not opted out, and the reminder template exists and is active |

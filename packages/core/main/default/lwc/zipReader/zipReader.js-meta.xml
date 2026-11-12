@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Reads a zip in the browser (central directory, entries inflated with DecompressionStream).
+    Shared by the import wizard's workbook reader and Import Files.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
