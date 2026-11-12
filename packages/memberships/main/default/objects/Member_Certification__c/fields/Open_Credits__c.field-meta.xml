@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Open_Credits__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The continuing credits earned toward the next renewal: every credit not yet used by a renewal.</inlineHelpText>
+  <label>Credits Toward Renewal</label>
+  <summarizedField>Continuing_Credit__c.Credits__c</summarizedField>
+  <summaryFilterItems>
+    <field>Continuing_Credit__c.Used__c</field>
+    <operation>equals</operation>
+    <value>False</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Continuing_Credit__c.Member_Certification__c</summaryForeignKey>
+  <summaryOperation>sum</summaryOperation>
+  <type>Summary</type>
+</CustomField>
