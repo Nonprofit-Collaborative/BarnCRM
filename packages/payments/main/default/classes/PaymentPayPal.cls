@@ -1,11 +1,15 @@
 /**
  * The org's own PayPal account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Orders with an approve link, PayPal's own webhook verification, and capture of an approved
- * order. Every callout here runs before any write of the transaction it is in.
+ * order; subscriptions (ADR-NEXT `NEXT-payments-subscriptions.md`). Every callout here runs
+ * before any write of the transaction it is in.
  */
 public with sharing class PaymentPayPal {
 	public static final String LIVE_BASE = 'https://api-m.paypal.com';
 	public static final String TEST_BASE = 'https://api-m.sandbox.paypal.com';
+	/** Where a payer changes the funding source of their automatic payments (Update Card). */
+	public static final String AUTOPAY = 'https://www.paypal.com/myaccount/autopay/';
+	public static final String AUTOPAY_TEST = 'https://www.sandbox.paypal.com/myaccount/autopay/';
 	/** The headers PayPal signs an event with, kept on the event for verification. */
 	public static final List<String> HEADERS = new List<String>{
 		'paypal-auth-algo',
@@ -22,11 +26,84 @@ public with sharing class PaymentPayPal {
 		return PaymentService.mode() == PaymentService.LIVE ? LIVE_BASE : TEST_BASE;
 	}
 
-	/** Creates the Order and sets its id and approve link on the payment. */
-	public static void startCheckout(Payment__c payment, String successUrl, String cancelUrl) {
+	/**
+	 * Creates the Order, or with an interval a product, a plan and a subscription, and sets its
+	 * id and approve link on the payment.
+	 */
+	public static void startCheckout(
+		Payment__c payment,
+		String successUrl,
+		String cancelUrl,
+		String interval,
+		Integer intervalCount
+	) {
 		String value = PaymentService.noDecimals(payment.Currency_Code__c)
 			? String.valueOf(payment.Amount__c.setScale(0))
 			: String.valueOf(payment.Amount__c.setScale(2));
+		String ref = payment.Reference__c;
+		if (interval != null) {
+			String name = payment.Description__c.abbreviate(127);
+			String product = idOf(
+				send(
+					'/v1/catalogs/products',
+					JSON.serialize(new Map<String, Object>{ 'name' => name, 'type' => 'SERVICE' }),
+					ref + '-product'
+				)
+			);
+			String plan = idOf(
+				send(
+					'/v1/billing/plans',
+					JSON.serialize(
+						new Map<String, Object>{
+							'product_id' => product,
+							'name' => name,
+							'billing_cycles' => new List<Object>{
+								new Map<String, Object>{
+									'frequency' => new Map<String, Object>{
+										'interval_unit' => interval.toUpperCase(),
+										'interval_count' => intervalCount
+									},
+									'tenure_type' => 'REGULAR',
+									'sequence' => 1,
+									'total_cycles' => 0,
+									'pricing_scheme' => new Map<String, Object>{
+										'fixed_price' => new Map<String, Object>{
+											'value' => value,
+											'currency_code' => payment.Currency_Code__c
+										}
+									}
+								}
+							},
+							'payment_preferences' => new Map<String, Object>{
+								'payment_failure_threshold' => 3
+							}
+						}
+					),
+					ref + '-plan'
+				)
+			);
+			approve(
+				payment,
+				send(
+					'/v1/billing/subscriptions',
+					JSON.serialize(
+						new Map<String, Object>{
+							'plan_id' => plan,
+							'custom_id' => ref,
+							'application_context' => new Map<String, Object>{
+								'return_url' => successUrl,
+								'cancel_url' => cancelUrl,
+								'user_action' => 'SUBSCRIBE_NOW',
+								'shipping_preference' => 'NO_SHIPPING'
+							}
+						}
+					),
+					ref
+				)
+			);
+			payment.Subscription_Id__c = payment.Checkout_Id__c;
+			return;
+		}
 		Map<String, Object> order = new Map<String, Object>{
 			'intent' => 'CAPTURE',
 			'purchase_units' => new List<Object>{
@@ -51,11 +128,11 @@ public with sharing class PaymentPayPal {
 				}
 			}
 		};
-		HttpResponse response = send(
-			'/v2/checkout/orders',
-			JSON.serialize(order),
-			payment.Reference__c
-		);
+		approve(payment, send('/v2/checkout/orders', JSON.serialize(order), ref));
+	}
+
+	/** Sets the order's or subscription's id and approve link on the payment, or refuses. */
+	private static void approve(Payment__c payment, HttpResponse response) {
 		Map<String, Object> body = PaymentStripe.parse(response.getBody());
 		String link;
 		for (
@@ -69,20 +146,33 @@ public with sharing class PaymentPayPal {
 			}
 		}
 		if (response.getStatusCode() > 201 || link == null) {
-			ErrorLogger.logMessage(
-				'PayPal answered ' +
-					response.getStatusCode() +
-					': ' +
-					response.getBody().abbreviate(200),
-				CONTEXT + '.startCheckout',
-				ErrorLogger.SEVERITY_ERROR
-			);
-			throw PaymentService.problem(
-				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ 'PayPal' })
-			);
+			refuse(response);
 		}
 		payment.Checkout_Id__c = PaymentStripe.text(body.get('id'));
 		payment.Checkout_Url__c = link;
+	}
+
+	/** The id PayPal gave a created product or plan, or refuses. */
+	private static String idOf(HttpResponse response) {
+		String id = PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('id'));
+		if (id == null) {
+			refuse(response);
+		}
+		return id;
+	}
+
+	private static void refuse(HttpResponse response) {
+		ErrorLogger.logMessage(
+			'PayPal answered ' +
+				response.getStatusCode() +
+				': ' +
+				response.getBody().abbreviate(200),
+			CONTEXT + '.startCheckout',
+			ErrorLogger.SEVERITY_ERROR
+		);
+		throw PaymentService.problem(
+			BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ 'PayPal' })
+		);
 	}
 
 	/**
@@ -116,6 +206,28 @@ public with sharing class PaymentPayPal {
 			when 'PAYMENT.CAPTURE.COMPLETED' {
 				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
 				change.status = PaymentService.PAID;
+			}
+			when 'PAYMENT.SALE.COMPLETED' {
+				// A subscription's charge (R-PAY6): the sale names its subscription and reference.
+				change.subscriptionId = PaymentStripe.text(resource.get('billing_agreement_id'));
+				if (change.subscriptionId == null) {
+					return outcome;
+				}
+				change.reference = PaymentStripe.text(resource.get('custom'));
+				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
+				change.amount = decimalOf(PaymentStripe.mapOf(resource.get('amount')).get('total'));
+				change.status = PaymentService.PAID;
+				change.subscriptionEvent = PaymentService.CHARGE_SUCCEEDED;
+			}
+			when 'BILLING.SUBSCRIPTION.PAYMENT.FAILED' {
+				change.subscriptionId = PaymentStripe.text(resource.get('id'));
+				change.subscriptionEvent = PaymentService.CHARGE_FAILED;
+				change.detail = BarnHelp.text('Payments', 'Payments_Detail_ChargeFailed');
+			}
+			when 'BILLING.SUBSCRIPTION.CANCELLED' {
+				change.subscriptionId = PaymentStripe.text(resource.get('id'));
+				change.subscriptionEvent = PaymentService.SUBSCRIPTION_CANCELLED;
+				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Cancelled');
 			}
 			when 'PAYMENT.CAPTURE.DENIED', 'PAYMENT.CAPTURE.DECLINED' {
 				change.processorPaymentId = PaymentStripe.text(resource.get('id'));

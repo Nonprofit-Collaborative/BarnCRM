@@ -193,7 +193,10 @@ CAPS = {
     # Giving and Money review fixes (bulk listener call, abandon job, callout-time budget,
     # countRecent, PayPal refund capture, Schedule button): 55,965 measured 2026-11-12, plus
     # about 0.5%.
-    "payments": 56_300,
+    # PAY-04 subscriptions (D-196, ADR-NEXT payments subscriptions): Stripe and PayPal
+    # subscription checkouts, renewals, subscription news to listeners and Update Card:
+    # 69,202 measured 2026-11-12, plus about 0.5%.
+    "payments": 69_600,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%.

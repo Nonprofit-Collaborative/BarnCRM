@@ -53,7 +53,9 @@ private class PaymentPayPalTest {
 				PaymentPayPal.startCheckout(
 					payment,
 					'https://example.org/ok',
-					'https://example.org/no'
+					'https://example.org/no',
+					null,
+					1
 				);
 				Assert.fail('Refused');
 			} catch (PaymentsApi.PaymentException e) {
@@ -89,7 +91,9 @@ private class PaymentPayPalTest {
 			PaymentPayPal.startCheckout(
 				payment,
 				'https://example.org/ok',
-				'https://example.org/no'
+				'https://example.org/no',
+				null,
+				1
 			);
 			Test.stopTest();
 
