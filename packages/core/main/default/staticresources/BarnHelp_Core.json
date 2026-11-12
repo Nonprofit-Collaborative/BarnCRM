@@ -434,6 +434,7 @@
     "Core_Edition_NotChosen": "Not chosen yet. Choose it in first-run setup, or with Change edition below.",
     "Core_Edition_Saved": "Edition changed. Reload open BarnCRM pages to see the new module lists.",
     "Core_Emails_PreferredEmpty": "The {0} email address is empty, so there is nothing to put in the ordinary Email box. Type that address in, or choose a different preferred email.",
+    "Core_EngagementMeter_Help": "How engaged this person has been lately, from 0 to 100, worked out each night from the gifts they gave, the volunteer hours they worked, the events they attended and how recently an activity was logged for them, weighted the way your organization chose in BarnCRM Settings. Parts your organization does not use are left out.",
     "Core_EraseAction_Done": "Erased. The list above is what changed, and the Erasure record keeps it.",
     "Core_EraseAction_ReferenceHelp": "Your own reference for the request, for example a ticket number. It is kept, so never type a name or an email address.",
     "Core_EraseAction_Warning": "Erasing removes what your organization holds about this person, and it cannot be undone. Press Preview first: it lists exactly what will change, and changes nothing.",

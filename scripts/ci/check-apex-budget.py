@@ -61,7 +61,9 @@ CAPS = {
     # Raised 2026-11-11 for C-47 multi-brand management (BrandService seam and defaulting,
     # BrandShareJob visibility upkeep, BrandTriggerHandler, BrandShareWriter): 2,160,448
     # measured, plus about 0.5%.
-    "core": 2_171_000,
+    # Raised 2026-11-11 for C-64 engagement score (EngagementScore, EngagementScoreJob, the
+    # EngagementSignalExtension seam, EngagementScoreController): 2,175,829 measured, plus about 2%.
+    "core": 2_219_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
