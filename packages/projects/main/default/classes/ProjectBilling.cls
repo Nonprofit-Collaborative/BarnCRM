@@ -16,6 +16,10 @@ public with sharing class ProjectBilling {
 	/** R-PM10: time and expenses count when their Status is blank or Approved. */
 	public static final String COUNTED = '(Status__c = NULL OR Status__c = \'Approved\')';
 
+	/** Most DML rows one build may write (invoice, lines, marked sources); the limit is 10,000. */
+	@TestVisible
+	private static Integer dmlRowCap = 9000;
+
 	/** R-PM16: the Draft for a period, its lines, and each source marked with its line. */
 	public static Id build(Id projectId, Date periodStart, Date periodEnd) {
 		requireBilling();
@@ -83,6 +87,16 @@ public with sharing class ProjectBilling {
 		if (lines.isEmpty()) {
 			throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Invoice_Nothing'));
 		}
+		// Every source is updated and every line inserted: refuse a period too big before any DML.
+		Integer rows = 1 + lines.size();
+		for (List<SObject> members : sources) {
+			rows += members.size();
+		}
+		if (rows > dmlRowCap) {
+			throw Projects.refuse(
+				BarnHelp.text('Projects', 'Projects_Invoice_TooMany', new List<Object>{ rows })
+			);
+		}
 		Project_Invoice__c invoice = new Project_Invoice__c(
 			Project__c = projectId,
 			Status__c = DRAFT,
@@ -128,10 +142,11 @@ public with sharing class ProjectBilling {
 
 	/** R-PM17 Mark Paid: a Sent invoice the client paid directly, on the date given. */
 	public static void markPaid(Id invoiceId, Date paidDate) {
-		load(invoiceId, SENT);
+		Project_Invoice__c invoice = load(invoiceId, SENT);
 		update as user new Project_Invoice__c(
 			Id = invoiceId,
 			Status__c = PAID,
+			Amount_Paid__c = invoice.Total__c,
 			Paid_Date__c = paidDate == null ? Date.today() : paidDate
 		);
 	}

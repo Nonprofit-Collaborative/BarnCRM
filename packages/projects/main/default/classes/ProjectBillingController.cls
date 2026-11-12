@@ -153,6 +153,7 @@ public with sharing class ProjectBillingController {
 							Amount__c
 						FROM Lines__r
 						ORDER BY Service_Date__c
+						LIMIT 500
 					)
 				FROM Project_Invoice__c
 				WHERE

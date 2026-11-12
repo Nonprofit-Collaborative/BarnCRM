@@ -59,6 +59,14 @@ public class ProjectRevenueTest {
 				Billing_Type__c = 'Not Billed'
 			);
 			projects.add(notBilled);
+			projects.add(
+				new Project__c(
+					Name = 'Starts this month',
+					Status__c = 'Active',
+					Start_Date__c = Date.today().toStartOfMonth(),
+					Hourly_Rate__c = 100
+				)
+			);
 			insert projects;
 			List<Time_Entry__c> entries = new List<Time_Entry__c>();
 			for (Integer i = 0; i < 60; i++) {
@@ -74,7 +82,7 @@ public class ProjectRevenueTest {
 			Assert.areEqual(
 				60,
 				[SELECT COUNT() FROM Project_Revenue__c],
-				'One row per billed project'
+				'One row per billed project, none for one that starts after the month'
 			);
 			Project_Revenue__c row = [
 				SELECT Recognized_Amount__c, Cost_Amount__c, Method__c, Month__c

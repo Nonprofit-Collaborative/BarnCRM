@@ -21,6 +21,21 @@ private class ProjectsPostInstallTest {
 	}
 
 	@IsTest
+	static void anUnsavedReturnPageShowsTheMyDomainAddressInTheConsole() {
+		System.runAs(TestUsers.admin()) {
+			Assert.areEqual(
+				ProjectsSettings.myDomain(),
+				SettingsService.getEffectiveValue(
+					ProjectsSettings.SETTINGS_OBJECT,
+					'Invoice_Return_Url__c',
+					'Text'
+				),
+				'Never blank, on an org the install never ran in'
+			);
+		}
+	}
+
+	@IsTest
 	static void installGivesTheSetsThroughTheRoles() {
 		System.runAs(TestUsers.admin()) {
 			User member = TestUsers.standardUser('Member');

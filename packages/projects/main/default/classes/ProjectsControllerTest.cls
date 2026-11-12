@@ -44,6 +44,8 @@ private class ProjectsControllerTest {
 			Assert.areEqual(2, board.tasks.size(), 'Both tasks');
 			Assert.areEqual(1, board.project.Tasks_Done__c, 'One done');
 			Assert.isTrue(board.timeTracking, 'Time tracking ships on');
+			Assert.isTrue(board.canCreateTime, 'An admin may log time');
+			Assert.isTrue(board.canCreateExpense, 'An admin may add an expense');
 			Project_Task__c done = [
 				SELECT Completed_Date__c
 				FROM Project_Task__c

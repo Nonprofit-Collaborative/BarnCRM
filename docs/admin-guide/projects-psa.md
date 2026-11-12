@@ -37,7 +37,14 @@ BarnCRM Settings, **Projects** (org-wide):
 | Invoice payment return page | Your My Domain address | The https page a client returns to after paying online, such as your website's thank you page. Filled in with your My Domain address at install. |
 | Invoice due days | 30 | Days from the invoice date to its due date (1 to 365). |
 | Show financials and recognize revenue | Off | The financials card on the project page and the monthly recognized revenue rows. |
-| Track change requests | Off | Change requests on projects; approved ones add to the budget. |
+| Track change requests | Off | A label for the feature: it is off by default and the docs call it on when your team uses change requests. It hides nothing and blocks nothing (see below). |
+
+What a setting set to Off hides is exactly what its row says: the tab, button, card or page.
+The related lists on the project page (Expenses, Invoices, Revenue, Resource Requests, Change
+Requests) are part of the page layout and are not hidden by any setting; remove one from the
+Project Layout in Setup if you do not want your team to see it. Change requests already saved,
+and approved ones already counted, keep counting toward the budget whatever the setting says,
+because the roll-ups on the project read the records, not the setting.
 
 ## Who Approves
 
@@ -73,6 +80,10 @@ A rate change never reprices time already logged. To reprice an entry, change it
 person) before it is approved. With rate cards on, **Actual Cost** is the sum of each entry's
 hours times the rate it was logged at.
 
+Two cost figures on a project differ on purpose: **Actual Cost** is time at the **bill rate**
+(the billed value of the time), and **Labor Cost** is time at the **cost rate** (what the time
+costs you; Projects Admin only).
+
 ## Timesheets and Approvals (PM-07)
 
 With **Approve time and expenses** on:
@@ -95,7 +106,8 @@ does not approve Open or Submitted time: approve it first.
 
 With **Track expenses** on, add expenses from the project page (**Add Expense**), the timesheet,
 or the **Project Expenses** tab: date, category, amount, billable, description, and the receipt
-as a file on the expense (Files related list). With approvals on, expenses go through the same
+as a file on the expense, attached when the Timesheet prompts for it or from the expense's Files
+list (Add Expense on the project page does not prompt). With approvals on, expenses go through the same
 submit, approve and lock steps as time. Expense categories can be added in Setup (Project
 Expense, Category field).
 
@@ -136,14 +148,17 @@ Every billing type also adds approved billable expenses. Add other lines by hand
 invoice is Draft.
 
 1. **New Invoice** on the project page (Projects Admin) builds a **Draft** for a period. Work on
-   it is marked invoiced so it is never billed twice; deleting a Draft frees it.
+   it is marked invoiced so it is never billed twice; deleting a Draft frees it. Only a Draft
+   can be deleted (use Void on the others), and a project with a Sent, Paid or Void invoice
+   cannot be deleted. A period with more than about 9,000 records of work is refused with a
+   message asking for a shorter period; build the invoice in parts.
 2. Check the lines, then **Send**: the Invoice Date and Due Date (plus Invoice due days) are filled
    in and the lines are locked.
 3. **Print** saves a PDF of the invoice to its Files, to email from Salesforce or your mail.
-4. When the client pays you directly, **Mark Paid** with the Paid Date. **Void** cancels an invoice
+4. When the client pays you directly, **Mark Paid** with the Paid Date; Amount Paid is set to the invoice total. **Void** cancels an invoice
    and frees its work to be billed again; a void invoice stays void.
 5. **Export Invoices** on Projects Home downloads sent and paid invoices with their lines as a
-   CSV for your accounting system.
+   CSV for your accounting system (up to 500 lines for each invoice).
 
 Invoice numbers are automatic (INV-000001 and up) and never reused.
 
@@ -175,7 +190,9 @@ a row to adjust it, or delete it and use **Recognize Revenue** on the project to
 
 ## Change Requests (PM-12)
 
-With **Track change requests** on, add **Change Requests** on a project: a title, description, and
+Turn on **Track change requests** to tell your team to use them (the setting does not hide the
+related list or stop anyone adding one, and approved requests keep counting if you turn it off).
+Add **Change Requests** on a project: a title, description, and
 the hours and amount it adds (or removes, as a negative). Submit it; the project owner or Projects
 Admin approves or rejects it. Approved changes are added to **Change Hours** and **Change Amount**
 on the project, and the project is measured against Budget plus changes (Remaining Budget,

@@ -17,7 +17,7 @@
     "Projects_Time_Off": "Time tracking is off in BarnCRM Settings, Projects.",
     "Projects_Rates_Off": "Use rate cards is off in BarnCRM Settings, Projects.",
     "Projects_Rates_Apply": "Apply Rates",
-    "Projects_Rates_Applied": "Rates applied to {0} time entries. If that is 5,000, run Apply Rates again until it finds none.",
+    "Projects_Rates_Applied": "Time entries given rates: {0}. If that is 5,000, run Apply Rates again until it finds none.",
     "Projects_Approvals_Off": "Approve time and expenses is off in BarnCRM Settings, Projects.",
     "Projects_Approvals_ReasonNeeded": "Enter a reason for the rejection.",
     "Projects_Approvals_Title": "Approvals",
@@ -181,6 +181,8 @@
     "Projects_Export_Done": "{0} entries exported. Use the file in your accounting or invoicing system.",
     "Projects_Billing_Off": "Invoices are off. Turn on Create invoices in BarnCRM Settings, Projects.",
     "Projects_Invoice_PeriodInvalid": "Choose a period start on or before the period end.",
+    "Projects_Invoice_TooMany": "This period has too much work to invoice in one save ({0} records). Choose a shorter period and build the invoice in parts.",
+    "Projects_Invoice_DeleteBlocked": "Only a Draft invoice can be deleted, and a project that has a Sent, Paid or Void invoice cannot be deleted either. To undo an invoice, Void it: Void keeps its record and frees its work to be billed again.",
     "Projects_Invoice_NotBilled": "This project's Billing Type is Not Billed, so it has no invoices.",
     "Projects_Invoice_Nothing": "Nothing to invoice in this period: no approved billable time or expenses, Done milestones with a Billing Amount, or retainer months that are not already invoiced.",
     "Projects_Invoice_NoLines": "Add at least one line before sending the invoice.",
@@ -233,6 +235,6 @@
     "Projects_Billing_ExportTitle": "Export Invoices",
     "Projects_Billing_ExportInclude": "Include invoices already exported",
     "Projects_Billing_ExportButton": "Export Invoices",
-    "Projects_Billing_ExportDone": "{0} invoices exported. Use the file in your accounting system."
+    "Projects_Billing_ExportDone": "{0} invoices exported, with up to 500 lines each. Use the file in your accounting system."
   }
 }

@@ -218,25 +218,22 @@ public with sharing class ProjectStaffingController {
 
 	/** One row per person: if a second was made by hand, the oldest wins. */
 	private static List<Project_Resource__c> resources() {
-		Map<Id, Project_Resource__c> byUser = new Map<Id, Project_Resource__c>();
-		for (Project_Resource__c resource : [
-			SELECT
-				User__c,
-				User__r.Name,
-				Skills__c,
-				Weekly_Capacity_Hours__c,
-				Default_Role__c,
-				Active__c
-			FROM Project_Resource__c
-			WITH USER_MODE
-			ORDER BY CreatedDate
-			LIMIT 2000
-		]) {
-			if (!byUser.containsKey(resource.User__c)) {
-				byUser.put(resource.User__c, resource);
-			}
-		}
-		return byUser.values();
+		return ProjectResources.byUser(
+				[
+					SELECT
+						User__c,
+						User__r.Name,
+						Skills__c,
+						Weekly_Capacity_Hours__c,
+						Default_Role__c,
+						Active__c
+					FROM Project_Resource__c
+					WITH USER_MODE
+					ORDER BY CreatedDate
+					LIMIT 2000
+				]
+			)
+			.values();
 	}
 
 	/** Open requests, all of them or those overlapping a date range. */

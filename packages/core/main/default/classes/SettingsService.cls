@@ -139,6 +139,14 @@ public with sharing class SettingsService {
 	private static final Set<String> SHOWN_AS_STORED = new Set<String>{
 		'household_membership_mode__c'
 	};
+	/**
+	 * Text settings that show the org's My Domain address while blank, as `object.field` in
+	 * lower case: the address is known only at run time, so no declared default can hold it.
+	 * A module's install fills the stored value too; this covers an org it never ran in.
+	 */
+	private static final Set<String> SHOWN_AS_MY_DOMAIN = new Set<String>{
+		'projects_settings__c.invoice_return_url__c'
+	};
 
 	/**
 	 * What the console should show for a setting: the stored value, or, when nothing is stored,
@@ -177,6 +185,13 @@ public with sharing class SettingsService {
 		}
 		if (isCoreSettings(type) && SHOWN_AS_STORED.contains(name)) {
 			return stored;
+		}
+		if (
+			SHOWN_AS_MY_DOMAIN.contains(
+				type.getDescribe().getLocalName().toLowerCase() + '.' + name
+			)
+		) {
+			return Url.getOrgDomainUrl().toExternalForm();
 		}
 		Object declared = type.newSObject(null, true).get(field);
 		return declared == null ? stored : declared;

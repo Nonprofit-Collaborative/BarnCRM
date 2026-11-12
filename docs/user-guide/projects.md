@@ -76,8 +76,8 @@ hours, cost, billable export and invoices.
 ## Expenses (When Your Admin Turns Them On)
 
 **Add Expense** on a project, or on the Timesheet, records the date, category, amount, whether it
-is billable and a description. Attach the receipt as a file on the expense when prompted, or from
-its Files list later. With approvals on, expenses are submitted, approved or rejected with the
+is billable and a description. Attach the receipt as a file on the expense when the Timesheet
+prompts you, or from the expense's Files list. With approvals on, expenses are submitted, approved or rejected with the
 week, like time.
 
 ## Rates (Admins)
@@ -95,7 +95,7 @@ Your admin turns each part on in BarnCRM Settings, Projects.
   the project's approved billable time, expenses, Done milestones or retainer months. Check the
   lines on the invoice, then **Send**. **Print** saves a PDF to the invoice's Files. **Mark Paid**
   records a payment the client made directly; **Void** cancels an invoice and frees its work to
-  bill again. With BarnCRM Payments, **Send Payment Link** emails the client a link to pay online,
+  bill again. Only a Draft invoice can be deleted: Void the others. With BarnCRM Payments, **Send Payment Link** emails the client a link to pay online,
   and the invoice turns Paid when the payment goes through.
 - **Export Invoices** (admins, Projects Home): a CSV of sent and paid invoices with their lines for
   your accounting system.

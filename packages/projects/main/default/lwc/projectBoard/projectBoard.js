@@ -79,8 +79,17 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
     };
   }
 
+  // Add Expense and Log Time show only to someone who may create those records.
   get expensesEnabled() {
-    return this.timeTracking && this.board?.expensesEnabled === true;
+    return (
+      this.timeTracking &&
+      this.board?.expensesEnabled === true &&
+      this.board?.canCreateExpense === true
+    );
+  }
+
+  get canLogTime() {
+    return this.timeTracking && this.board?.canCreateTime === true;
   }
 
   get categoryOptions() {

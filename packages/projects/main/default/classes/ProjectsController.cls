@@ -21,6 +21,10 @@ public with sharing class ProjectsController {
 		public Boolean expensesEnabled = false;
 		@AuraEnabled
 		public Boolean approvalsEnabled = false;
+		@AuraEnabled
+		public Boolean canCreateTime = false;
+		@AuraEnabled
+		public Boolean canCreateExpense = false;
 	}
 
 	public class Home {
@@ -93,6 +97,9 @@ public with sharing class ProjectsController {
 			board.timeTracking = ProjectsSettings.timeTracking();
 			board.expensesEnabled = ProjectsSettings.expensesEnabled();
 			board.approvalsEnabled = ProjectsSettings.approvalsEnabled();
+			// Read Only users see the board but not the buttons that would fail for them.
+			board.canCreateTime = Schema.SObjectType.Time_Entry__c.isCreateable();
+			board.canCreateExpense = Schema.SObjectType.Project_Expense__c.isCreateable();
 			return board;
 		} catch (Exception e) {
 			throw failure(e);

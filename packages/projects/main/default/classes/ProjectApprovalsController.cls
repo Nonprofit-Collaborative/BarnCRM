@@ -27,54 +27,29 @@ public with sharing class ProjectApprovalsController {
 				return queue;
 			}
 			Id me = UserInfo.getUserId();
-			Boolean all = Projects.canManage();
-			for (Time_Entry__c entry : [
-				SELECT
-					Id,
-					Project__c,
-					Project__r.Name,
-					Project__r.OwnerId,
-					Task__r.Name,
-					User__c,
-					User__r.Name,
-					Date__c,
-					Hours__c,
-					Billable__c,
-					Notes__c
-				FROM Time_Entry__c
-				WHERE Status__c = 'Submitted'
-				WITH USER_MODE
-				ORDER BY User__r.Name, Date__c
-				LIMIT 2000
-			]) {
-				if (all || entry.Project__r.OwnerId == me) {
-					queue.entries.add(entry);
-				}
-			}
+			// Anyone who cannot manage sees only their own projects' rows, chosen in the query so
+			// the row limit counts only rows they may decide.
+			String owned = Projects.canManage() ? '' : ' AND Project__r.OwnerId = :me';
+			Map<String, Object> binds = new Map<String, Object>{ 'me' => me };
+			queue.entries = (List<Time_Entry__c>) Database.queryWithBinds(
+				'SELECT Id, Project__c, Project__r.Name, Project__r.OwnerId, Task__r.Name, User__c, ' +
+					'User__r.Name, Date__c, Hours__c, Billable__c, Notes__c FROM Time_Entry__c ' +
+					'WHERE Status__c = \'Submitted\'' +
+					owned +
+					' ORDER BY User__r.Name, Date__c LIMIT 2000',
+				binds,
+				AccessLevel.USER_MODE
+			);
 			if (ProjectsSettings.expensesEnabled()) {
-				for (Project_Expense__c expense : [
-					SELECT
-						Id,
-						Project__c,
-						Project__r.Name,
-						Project__r.OwnerId,
-						User__c,
-						User__r.Name,
-						Date__c,
-						Category__c,
-						Amount__c,
-						Billable__c,
-						Description__c
-					FROM Project_Expense__c
-					WHERE Status__c = 'Submitted'
-					WITH USER_MODE
-					ORDER BY User__r.Name, Date__c
-					LIMIT 1000
-				]) {
-					if (all || expense.Project__r.OwnerId == me) {
-						queue.expenses.add(expense);
-					}
-				}
+				queue.expenses = (List<Project_Expense__c>) Database.queryWithBinds(
+					'SELECT Id, Project__c, Project__r.Name, Project__r.OwnerId, User__c, User__r.Name, ' +
+						'Date__c, Category__c, Amount__c, Billable__c, Description__c ' +
+						'FROM Project_Expense__c WHERE Status__c = \'Submitted\'' +
+						owned +
+						' ORDER BY User__r.Name, Date__c LIMIT 1000',
+					binds,
+					AccessLevel.USER_MODE
+				);
 			}
 			return queue;
 		} catch (Exception e) {

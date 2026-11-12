@@ -154,7 +154,7 @@ Developer; the project's Hourly Rate 100.
 |---|---|---|
 | 1 | Log 2 hours as staff A. Turn on **Use rate cards** in BarnCRM Settings, Projects, after step 1 only. | The entry from step 1 has no Bill Rate. |
 | 2 | Project Rates tab: add a Role rate Developer, Bill Rate 150, Cost Rate 80, Effective From 60 days ago. Add a Person rate for staff A, Bill Rate 175, no Cost Rate, Effective From 30 days ago. | Both saved. A rate with both a Person and a Role is refused. |
-| 3 | Projects Home, **Apply Rates**. | "Rates applied to 1 time entries." The step 1 entry now has Bill Rate 175 and Amount 350; Cost Rate is visible to admin only (80). |
+| 3 | Projects Home, **Apply Rates**. | "Time entries given rates: 1." The step 1 entry now has Bill Rate 175 and Amount 350; Cost Rate is visible to admin only (80). |
 | 4 | As staff A, log 1 hour today. As the admin, log 1 hour. | Staff A: Bill Rate 175, Cost Rate 80. Admin: Bill Rate 100 (the project rate), no Cost Rate. |
 | 5 | Change staff A's Person rate to 999. Open the step 4 entry. | Still 175: a rate change never reprices logged time. |
 | 6 | Change the step 4 entry's Date to 45 days ago. | Bill Rate 150 (the Role rate): a new date prices it again. |
@@ -243,7 +243,7 @@ and Track change requests are off (PM-10 to PM-12).
 | 1 | Set a project's Billing Type to Fixed Fee; give a milestone a Billing Amount of 1000 and mark it Done. | Saved. |
 | 2 | New Invoice for this month. | One Milestone line of 1000. |
 | 3 | Set another project to Retainer with Retainer Amount 500 and a Start Date last month; New Invoice from the first of last month to today. | Two Retainer lines of 500. Running it again for the same months adds none. |
-| 4 | Send both; on one, Mark Paid with yesterday's date. | Paid, with that Paid Date. |
+| 4 | Send both; on one, Mark Paid with yesterday's date. | Paid, with that Paid Date and an Amount Paid equal to the Total. Deleting either Sent or Paid invoice is refused with a message to Void it instead. |
 | 5 | Projects Home, Export Invoices for this month. | A CSV with one row per line and the invoice columns; the invoices' Exported Date is today. Exporting again gives only the heading line unless Include invoices already exported is checked. |
 | 6 | Set a project to Not Billed and open it. | No New Invoice. |
 
@@ -274,8 +274,9 @@ and Track change requests are off (PM-10 to PM-12).
 | 2 | As staff A, open the project. | The card without cost and margin. |
 | 3 | As admin, Recognize Revenue for last month. | A Project Revenue row for last month (Revenue related list) with Method and Recognized Amount; Recognized Revenue on the project matches. |
 | 4 | Log 1 billable hour dated last month, then Recognize Revenue for this month's first day. | Refused: the open month is never stored. |
-| 5 | In BarnCRM Settings, Automation, Nightly Jobs. | Project revenue at 6:42 AM, switched on. |
-| 6 | Open Reports, BarnCRM Projects; run Unbilled Approved Time, Invoices Outstanding and Recognized Revenue by Month. | Each runs: approved billable time not yet invoiced, Sent invoices with their due dates and lines, and the recognized amount by month. |
+| 5 | Recognize Revenue for last month again. | The step 3 row is updated, not duplicated: its Recognized Amount now includes the hour logged in step 4. |
+| 6 | In BarnCRM Settings, Automation, Nightly Jobs. | Project revenue at 6:42 AM, switched on. |
+| 7 | Open Reports, BarnCRM Projects; run Unbilled Approved Time, Invoices Outstanding and Recognized Revenue by Month. | Each runs: approved billable time not yet invoiced, Sent invoices with their due dates and lines, and the recognized amount by month. |
 
 **Cleanup:** None.
 
