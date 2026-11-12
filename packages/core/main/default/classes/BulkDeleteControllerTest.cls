@@ -212,6 +212,112 @@ private class BulkDeleteControllerTest {
 		}
 	}
 
+	/** The download before a delete (R-BD8) reads a page of the matching records as the person. */
+	@IsTest
+	static void theBackupPageListsTheMatchingRecords() {
+		System.runAs(TestUsers.admin()) {
+			makeVolunteers(3);
+			System.runAs(deleter()) {
+				BulkDeleteService.BackupPage page = BulkDeleteController.backupPage(
+					VOLUNTEERS,
+					null,
+					null
+				);
+				System.Assert.areEqual('Contact', page.objectName, 'The object');
+				System.Assert.areEqual(3, page.rows.size(), 'Every match');
+				System.Assert.isTrue(page.done, 'One page was enough');
+			}
+		}
+	}
+
+	/** Every entry point is refused for someone without the permission, nothing deleted. */
+	@IsTest
+	static void everyEntryPointIsRefusedWithoutThePermission() {
+		System.runAs(TestUsers.admin()) {
+			makeVolunteers(2);
+			String refusal = BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission');
+			List<String> messages = new List<String>();
+			try {
+				BulkDeleteController.startArchive(VOLUNTEERS, 2, null);
+			} catch (AuraHandledException expected) {
+				messages.add(expected.getMessage());
+			}
+			try {
+				BulkDeleteController.backupPage(VOLUNTEERS, null, null);
+			} catch (AuraHandledException expected) {
+				messages.add(expected.getMessage());
+			}
+			try {
+				BulkDeleteController.previewFile('001000000000000AAA');
+			} catch (AuraHandledException expected) {
+				messages.add(expected.getMessage());
+			}
+			try {
+				BulkDeleteController.backupPage(null, '001000000000000AAA', null);
+			} catch (AuraHandledException expected) {
+				messages.add(expected.getMessage());
+			}
+			try {
+				BulkDeleteController.startFile('001000000000000AAA', 2);
+			} catch (AuraHandledException expected) {
+				messages.add(expected.getMessage());
+			}
+			try {
+				BulkDeleteController.undo('001000000000000AAA', 2);
+			} catch (AuraHandledException expected) {
+				messages.add(expected.getMessage());
+			}
+			System.Assert.areEqual(6, messages.size(), 'All six refused');
+			for (String message : messages) {
+				System.Assert.areEqual(refusal, message, 'In the same words');
+			}
+			System.Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nothing deleted');
+		}
+	}
+
+	/** A delete by file that is not a finished dry run is refused, and so is a wrong archive count. */
+	@IsTest
+	static void aFileOrArchiveRequestThatDoesNotCheckOutIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			makeVolunteers(2);
+			System.runAs(deleter()) {
+				Integer refused = 0;
+				try {
+					BulkDeleteController.startArchive(VOLUNTEERS, 2, 3);
+				} catch (AuraHandledException expected) {
+					System.Assert.areEqual(
+						BarnHelp.text('Core', 'Core_Archive_ErrorEmptyConfirm'),
+						expected.getMessage(),
+						'The Recycle Bin count must match'
+					);
+					refused++;
+				}
+				try {
+					BulkDeleteController.startArchive(VOLUNTEERS, 1, null);
+				} catch (AuraHandledException expected) {
+					refused++;
+				}
+				try {
+					BulkDeleteController.previewFile('001000000000000AAA');
+				} catch (AuraHandledException expected) {
+					refused++;
+				}
+				try {
+					BulkDeleteController.backupPage(null, '001000000000000AAA', null);
+				} catch (AuraHandledException expected) {
+					refused++;
+				}
+				try {
+					BulkDeleteController.startFile('001000000000000AAA', 2);
+				} catch (AuraHandledException expected) {
+					refused++;
+				}
+				System.Assert.areEqual(5, refused, 'Each is refused');
+			}
+			System.Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'Nothing deleted');
+		}
+	}
+
 	@IsTest
 	static void aJobThatIsNotABulkDeleteIsNotFound() {
 		System.runAs(TestUsers.admin()) {
