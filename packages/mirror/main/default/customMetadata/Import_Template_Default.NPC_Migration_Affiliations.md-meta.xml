@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Nonprofit Cloud Migration: Affiliations</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npc_affiliations</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Nonprofit Cloud Relationships and Affiliations migration kit, which reads account contact relations with an organization (not a household or a person account): one affiliation per record, with its roles, status from active, and dates.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "ContactId", "target": "Record.Contact__c"}, {"source": "AccountId", "target": "Record.Organization__c"}, {"source": "Role", "target": "Record.Role__c"}, {"source": "IsActive", "target": "Record.Status__c", "transforms": [{"op": "map", "pairs": [{"text": "false", "value": "Former"}], "otherwise": "Current"}, {"op": "ifBlank", "value": "Current"}]}, {"source": "StartDate", "target": "Record.Start_Date__c"}, {"source": "EndDate", "target": "Record.End_Date__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Affiliation__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>
