@@ -36,7 +36,7 @@ private class RollupsWhereUsedExtensionTest {
 			if (reference.getName() == 'Staff with email') {
 				Assert.areEqual(NamespaceUtil.qualify('Rollup_Builder'), reference.getEditTab());
 				Assert.areEqual(
-					System.Label.Core_RollupBuilder_WhereUsedBreaks,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_WhereUsedBreaks'),
 					reference.getBreaks()
 				);
 				return reference.getParts();

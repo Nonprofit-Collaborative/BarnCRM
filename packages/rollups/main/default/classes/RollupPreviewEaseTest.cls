@@ -189,7 +189,10 @@ private class RollupPreviewEaseTest {
 					message = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				message
+			);
 		}
 	}
 

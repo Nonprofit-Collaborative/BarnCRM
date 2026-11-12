@@ -183,8 +183,14 @@ private class RollupTemplatesTest {
 					adding = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, listing);
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, adding);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				listing
+			);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				adding
+			);
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c]);
 		}
 	}

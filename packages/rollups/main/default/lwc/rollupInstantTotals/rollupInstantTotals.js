@@ -34,7 +34,6 @@ import TRIGGER_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTrigg
 import TEST_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTestHeading';
 import TURNED_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOff';
 import TURNED_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOn';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import { bodyMessage, format } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -150,7 +149,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.states = (states || []).filter((state) => Boolean(state));
       })
       .catch((error) => {
-        this.error = bodyMessage(error, UNEXPECTED_ERROR);
+        this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       });
   }
 
@@ -230,7 +229,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.panel = panel;
       })
       .catch((error) => {
-        this.error = bodyMessage(error, UNEXPECTED_ERROR);
+        this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -255,7 +254,7 @@ export default class RollupInstantTotals extends LightningElement {
         this.notice = format(turnedOn ? TURNED_ON : TURNED_OFF, state.objectLabel);
       })
       .catch((error) => {
-        this.error = bodyMessage(error, UNEXPECTED_ERROR);
+        this.error = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;

@@ -232,7 +232,7 @@ private class RollupDefinitionTransferTest {
 			System.Assert.areEqual(
 				new List<String>{
 					Label.Core_RollupBuilder_ExportNothing,
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				},
 				messages
 			);

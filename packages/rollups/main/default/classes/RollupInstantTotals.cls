@@ -530,7 +530,9 @@ public with sharing class RollupInstantTotals {
 	private static Schema.SObjectType requireType(String objectApiName) {
 		Schema.SObjectType type = SettingsService.typeByName(objectApiName);
 		if (type == null) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorUnknownObject);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
+			);
 		}
 		return type;
 	}
@@ -560,7 +562,7 @@ public with sharing class RollupInstantTotals {
 			caught,
 			shown,
 			'RollupInstantTotals',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

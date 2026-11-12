@@ -62,7 +62,7 @@ public with sharing class RollupFieldGenerator {
 		try {
 			if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			Schema.SObjectType targetType = String.isBlank(objectApiName)
@@ -127,7 +127,7 @@ public with sharing class RollupFieldGenerator {
 				caught,
 				caught instanceof RollupService.RollupServiceException,
 				'RollupFieldGenerator',
-				Label.Core_Rollups_UnexpectedError
+				BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 			);
 		}
 	}

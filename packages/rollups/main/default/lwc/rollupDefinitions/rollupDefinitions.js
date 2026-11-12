@@ -27,17 +27,12 @@ import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import COLUMN_LAST_CALCULATED from '@salesforce/label/c.Core_Rollups_ColumnLastCalculated';
 import RECALCULATE from '@salesforce/label/c.Core_Rollups_Recalculate';
 import RECALCULATE_ALL from '@salesforce/label/c.Core_Rollups_RecalculateAll';
-import RECALCULATE_STARTED from '@salesforce/label/c.Core_Rollups_RecalculateStarted';
 import SCHEDULE_NIGHTLY from '@salesforce/label/c.Core_Rollups_ScheduleNightly';
-import SCHEDULE_ACTIVE from '@salesforce/label/c.Core_Rollups_ScheduleActive';
-import SCHEDULE_MISSING from '@salesforce/label/c.Core_Rollups_ScheduleMissing';
 import STOP_SCHEDULE from '@salesforce/label/c.Core_Rollups_StopSchedule';
 import RESTORE_DEFAULTS from '@salesforce/label/c.Core_Rollups_RestoreDefaults';
 import NEVER_CALCULATED from '@salesforce/label/c.Core_Rollups_NeverCalculated';
 import FRESHNESS_TITLE from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
 import FRESHNESS_STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
-import READ_ONLY from '@salesforce/label/c.Core_Rollups_ReadOnly';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import NEW_ROLLUP from '@salesforce/label/c.Core_RollupBuilder_New';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
@@ -174,10 +169,16 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     columnLastCalculated: COLUMN_LAST_CALCULATED,
     recalculate: RECALCULATE,
     recalculateAll: RECALCULATE_ALL,
-    recalculateStarted: RECALCULATE_STARTED,
+    get recalculateStarted() {
+      return helpText('Rollups', 'Core_Rollups_RecalculateStarted');
+    },
     scheduleNightly: SCHEDULE_NIGHTLY,
-    scheduleActive: SCHEDULE_ACTIVE,
-    scheduleMissing: SCHEDULE_MISSING,
+    get scheduleActive() {
+      return helpText('Rollups', 'Core_Rollups_ScheduleActive');
+    },
+    get scheduleMissing() {
+      return helpText('Rollups', 'Core_Rollups_ScheduleMissing');
+    },
     stopSchedule: STOP_SCHEDULE,
     restoreDefaults: RESTORE_DEFAULTS,
     get emptyList() {
@@ -186,7 +187,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     neverCalculated: NEVER_CALCULATED,
     freshnessTitle: FRESHNESS_TITLE,
     freshnessStale: FRESHNESS_STALE,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Rollups', 'Core_Rollups_ReadOnly');
+    },
     columnStatus: COLUMN_STATUS,
     search: SEARCH,
     get searchHelp() {
@@ -225,7 +228,10 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       this.page = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = bodyMessage(result.error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Rollups', 'Core_Rollups_UnexpectedError')
+      );
     }
   }
 
@@ -420,7 +426,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         this.estimate = estimate;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -440,7 +446,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         this.noticeMessage = notice;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -543,7 +549,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         link.click();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
       })
       .finally(() => {
         this.busy = false;
@@ -598,7 +604,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
         this.importText = undefined;
       })
       .finally(() => {
@@ -638,7 +644,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Rollups', 'Core_Rollups_UnexpectedError'));
         if (revert) {
           revert();
         }

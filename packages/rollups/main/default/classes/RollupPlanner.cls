@@ -151,12 +151,14 @@ public with sharing class RollupPlanner {
 			return null;
 		}
 		if (rowLimit < 1) {
-			return System.Label.Core_Rollups_ErrorRowLimitInvalid;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitInvalid');
 		}
 		if (String.isBlank(aggregate) || !ROW_LIMITED.contains(aggregate.toUpperCase())) {
-			return System.Label.Core_Rollups_ErrorRowLimitAggregate;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitAggregate');
 		}
-		return String.isBlank(orderBy) ? System.Label.Core_Rollups_ErrorRowLimitNeedsOrder : null;
+		return String.isBlank(orderBy)
+			? BarnHelp.text('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder')
+			: null;
 	}
 
 	/**
@@ -235,7 +237,7 @@ public with sharing class RollupPlanner {
 	/** Why this delimiter cannot be saved (R-R10): Custom with nothing to write. */
 	public static String delimiterProblem(String delimiter, String customDelimiter) {
 		return delimiter == CUSTOM_DELIMITER && String.isEmpty(customDelimiter)
-			? System.Label.Core_Rollups_ErrorCustomDelimiterNeeded
+			? BarnHelp.text('Rollups', 'Core_Rollups_ErrorCustomDelimiterNeeded')
 			: null;
 	}
 
@@ -251,37 +253,37 @@ public with sharing class RollupPlanner {
 		if (operation == 'ANY' || operation == 'NONE') {
 			return type == Schema.DisplayType.BOOLEAN
 				? null
-				: System.Label.Core_Rollups_ErrorTargetNeedsCheckbox;
+				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsCheckbox');
 		}
 		if (operation == 'TEXT_LIST' || operation == 'TEXT_LIST_DISTINCT') {
 			return TEXT_TYPES.contains(type)
 				? null
-				: System.Label.Core_Rollups_ErrorTargetNeedsText;
+				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsText');
 		}
 		if (operation == 'COUNT_DISTINCT') {
 			return NUMBER_TYPES.contains(type)
 				? null
-				: System.Label.Core_Rollups_ErrorTargetNeedsNumber;
+				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNeedsNumber');
 		}
 		if (type == Schema.DisplayType.BOOLEAN) {
-			return System.Label.Core_Rollups_ErrorCheckboxTarget;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorCheckboxTarget');
 		}
 		if (TEXT_TYPES.contains(type)) {
 			return operation == 'FIRST' ||
 				operation == 'LAST'
 				? null
-				: System.Label.Core_Rollups_ErrorTextTarget;
+				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTextTarget');
 		}
 		// A picklist holds one of its values: FIRST and LAST copy one (ADR-0136).
 		if (type == Schema.DisplayType.PICKLIST) {
 			return operation == 'FIRST' ||
 				operation == 'LAST'
 				? null
-				: System.Label.Core_Rollups_ErrorPicklistTarget;
+				: BarnHelp.text('Rollups', 'Core_Rollups_ErrorPicklistTarget');
 		}
 		return NUMBER_AND_DATE_TYPES.contains(type)
 			? null
-			: System.Label.Core_Rollups_ErrorTargetType;
+			: BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetType');
 	}
 
 	/**
@@ -323,7 +325,7 @@ public with sharing class RollupPlanner {
 			? null
 			: KIND_BY_AGGREGATE.get(definition.Aggregate__c.toUpperCase());
 		if (problem == null && kind == KIND_LISTED && String.isBlank(definition.Source_Field__c)) {
-			problem = System.Label.Core_Rollups_ErrorSourceFieldNeeded;
+			problem = BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded');
 		}
 		return problem;
 	}
@@ -389,7 +391,9 @@ public with sharing class RollupPlanner {
 			? null
 			: targetFieldMap.get(definition.Target_Field__c.toLowerCase());
 		if (field == null || !engineCanWrite(field.getDescribe())) {
-			throw new RollupPlanException(System.Label.Core_Rollups_ErrorTargetNotWritable);
+			throw new RollupPlanException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable')
+			);
 		}
 		String problem = targetTypeProblem(definition.Aggregate__c, field.getDescribe().getType());
 		if (problem != null) {
@@ -430,10 +434,14 @@ public with sharing class RollupPlanner {
 			throw new RollupPlanException(System.Label.Core_Rollups_ErrorInvalidOperator);
 		}
 		if (SettingsService.typeByName(definition.Source_Object__c) == null) {
-			throw new RollupPlanException(System.Label.Core_Rollups_ErrorUnknownObject);
+			throw new RollupPlanException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
+			);
 		}
 		if (!READS_NO_FIELD.contains(aggregate) && String.isBlank(definition.Source_Field__c)) {
-			throw new RollupPlanException(System.Label.Core_Rollups_ErrorSourceFieldNeeded);
+			throw new RollupPlanException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded')
+			);
 		}
 		String field = READS_NO_FIELD.contains(aggregate)
 			? null

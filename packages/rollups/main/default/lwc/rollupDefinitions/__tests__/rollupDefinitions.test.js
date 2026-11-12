@@ -15,6 +15,11 @@ import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importD
 import LightningConfirm from 'lightning/confirm';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
+setHelpTextForTest({
+  Core_Rollups_RecalculateStarted: 'Recalculation started.',
+  Core_Rollups_ScheduleActive: 'Nightly recalculation is scheduled for {0}.'
+});
+
 jest.mock(
   '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions',
   () => ({ default: jest.fn() }),
@@ -110,18 +115,6 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
 jest.mock(
   '@salesforce/label/c.Core_Rollups_FreshnessStale',
   () => ({ default: 'Rollups have not been calculated in more than 36 hours.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_Rollups_RecalculateStarted',
-  () => ({ default: 'Recalculation started.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_Rollups_ScheduleActive',
-  () => ({ default: 'Nightly recalculation is scheduled for {0}.' }),
   { virtual: true }
 );
 

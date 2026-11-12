@@ -100,7 +100,11 @@ private class RollupDlrsImportTest {
 					message = refused.getMessage();
 				}
 			}
-			Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message, 'Refused');
+			Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				message,
+				'Refused'
+			);
 		}
 	}
 
@@ -513,7 +517,7 @@ private class RollupDlrsImportTest {
 				'Long_Delimiter' => Label.Core_RollupBuilder_DlrsReasonDelimiter,
 				'No_Path' => Label.Core_RollupBuilder_DlrsReasonPath,
 				'Filled' => Label.Core_RollupBuilder_DlrsReasonFilled,
-				'Wrong_Type' => Label.Core_Rollups_ErrorTextTarget
+				'Wrong_Type' => BarnHelp.text('Rollups', 'Core_Rollups_ErrorTextTarget')
 			};
 			for (String key : templateByKey.keySet()) {
 				RollupDlrsImport.Candidate candidate = found.get(key);

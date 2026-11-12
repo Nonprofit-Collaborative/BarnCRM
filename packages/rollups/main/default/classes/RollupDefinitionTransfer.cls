@@ -152,7 +152,7 @@ public with sharing class RollupDefinitionTransfer {
 				} catch (Exception unexpected) {
 					ErrorLogger.log(unexpected, 'RollupDefinitionTransfer');
 					row.outcome = REFUSED;
-					row.reason = Label.Core_Rollups_UnexpectedError;
+					row.reason = BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError');
 				}
 			}
 			return rows;
@@ -241,7 +241,7 @@ public with sharing class RollupDefinitionTransfer {
 
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw refusal(Label.Core_Rollups_ErrorNoPermission);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
 	}
 
@@ -251,7 +251,7 @@ public with sharing class RollupDefinitionTransfer {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupDefinitionTransfer',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

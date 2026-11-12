@@ -193,7 +193,9 @@ public with sharing class RollupController {
 			requirePermission();
 			Rollup_Definition__c definition = require(definitionId);
 			if (!isKnownMode(mode)) {
-				throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorInvalidMode);
+				throw new RollupService.RollupServiceException(
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorInvalidMode')
+				);
 			}
 			if (
 				RollupService.MODE_REAL_TIME.equals(mode) &&
@@ -509,7 +511,7 @@ public with sharing class RollupController {
 		Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 		if (definition == null) {
 			throw new RollupService.RollupServiceException(
-				Label.Core_Rollups_ErrorUnknownDefinition
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition')
 			);
 		}
 		return definition;
@@ -521,7 +523,9 @@ public with sharing class RollupController {
 	 */
 	private static void refuseWhileTurnedOff() {
 		if (RollupService.isTurnedOff()) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorTurnedOff);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorTurnedOff')
+			);
 		}
 	}
 
@@ -529,7 +533,7 @@ public with sharing class RollupController {
 	private static void refuseWhileAFullRunIsGoing() {
 		if (RollupFullRecalcBatch.runningJobId() != null) {
 			throw new RollupService.RollupServiceException(
-				Label.Core_Rollups_FullRunAlreadyRunning
+				BarnHelp.text('Rollups', 'Core_Rollups_FullRunAlreadyRunning')
 			);
 		}
 	}
@@ -540,7 +544,9 @@ public with sharing class RollupController {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorNoPermission);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
+			);
 		}
 	}
 
@@ -553,7 +559,7 @@ public with sharing class RollupController {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			context,
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

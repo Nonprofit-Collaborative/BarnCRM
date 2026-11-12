@@ -56,12 +56,4 @@
         <shortDescription>Where Used: the rollup's filter on target records names the field.</shortDescription>
         <value>Filter on target records</value>
     </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_WhereUsedBreaks</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What breaks for a rollup when the field is deleted.</shortDescription>
-        <value>The rollup stops calculating and appears in Needs Attention until it is edited or turned off.</value>
-    </labels>
 </CustomLabels>

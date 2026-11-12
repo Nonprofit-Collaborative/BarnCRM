@@ -140,7 +140,7 @@ private class RollupInstantTotalsTest {
 				'Contact' => Label.Core_RollupBuilder_InstantBuiltInError,
 				'Account' => Label.Core_RollupBuilder_InstantNotAvailableError,
 				'AccountHistory' => Label.Core_RollupBuilder_InstantNotAvailableError,
-				'Not_An_Object__c' => Label.Core_Rollups_ErrorUnknownObject
+				'Not_An_Object__c' => BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
 			};
 			for (String objectName : refusals.keySet()) {
 				try {

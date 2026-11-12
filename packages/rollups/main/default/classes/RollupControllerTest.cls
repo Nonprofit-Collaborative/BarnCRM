@@ -459,7 +459,7 @@ private class RollupControllerTest {
 					System.Assert.fail('Only a settings manager deletes');
 				} catch (AuraHandledException refused) {
 					System.Assert.areEqual(
-						Label.Core_Rollups_ErrorNoPermission,
+						BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
 						refused.getMessage()
 					);
 				}
@@ -490,8 +490,8 @@ private class RollupControllerTest {
 			}
 			System.Assert.areEqual(
 				new List<String>{
-					Label.Core_Rollups_ErrorNoPermission,
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				},
 				messages
 			);

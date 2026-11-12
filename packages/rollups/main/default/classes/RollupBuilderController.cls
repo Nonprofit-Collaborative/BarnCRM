@@ -378,7 +378,7 @@ public with sharing class RollupBuilderController {
 			Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 			if (definition == null) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorUnknownDefinition
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition')
 				);
 			}
 			return toDraft(definition);
@@ -467,7 +467,9 @@ public with sharing class RollupBuilderController {
 	private static void checkPreview(Draft draft) {
 		// It calculates any field of any record in system mode, so only an admin may ask.
 		if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorNoPermission);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
+			);
 		}
 		if (draft != null) {
 			draft.name = String.isBlank(draft.name) ? draft.targetField : draft.name;
@@ -555,7 +557,7 @@ public with sharing class RollupBuilderController {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			// Every other check first, so the question is asked only of a rollup that can save.
@@ -658,7 +660,7 @@ public with sharing class RollupBuilderController {
 		}
 		Schema.SObjectField target = fieldMap(targetType).get(draft.targetField.toLowerCase());
 		if (target == null || !target.getDescribe().isUpdateable()) {
-			return Label.Core_Rollups_ErrorTargetNotWritable;
+			return BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable');
 		}
 		String aggregate = String.isBlank(draft.aggregate) ? '' : draft.aggregate.toUpperCase();
 		if (!valuesOf(Rollup_Definition__c.Aggregate__c).contains(aggregate)) {
@@ -726,7 +728,7 @@ public with sharing class RollupBuilderController {
 		Schema.DisplayType readType = typeOf(fields, draft.sourceField);
 		if (!READS_NO_FIELD.contains(aggregate)) {
 			if (String.isBlank(draft.sourceField)) {
-				return Label.Core_Rollups_ErrorSourceFieldNeeded;
+				return BarnHelp.text('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded');
 			}
 			if (readType == null) {
 				return Label.Core_RollupBuilder_ErrorFieldUnknown;
@@ -1179,7 +1181,9 @@ public with sharing class RollupBuilderController {
 	private static Schema.SObjectType requireEntity(String name) {
 		Schema.SObjectType type = SettingsService.typeByName(name);
 		if (type == null) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorUnknownObject);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
+			);
 		}
 		return type;
 	}
@@ -1248,7 +1252,7 @@ public with sharing class RollupBuilderController {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupBuilderController',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

@@ -16,7 +16,7 @@ import RETRIED from '@salesforce/label/c.Core_RollupBuilder_Retried';
 import NIGHTLY_OFF from '@salesforce/label/c.Core_RollupBuilder_NightlyOff';
 import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import STARTED from '@salesforce/label/c.Core_RollupBuilder_Started';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Needs attention in the Rollup Builder (rollup proposal slice S13, canonical model Section 14A):
@@ -25,6 +25,8 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
  * off, and how the last full run ended.
  */
 export default class RollupNeedsAttention extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
   labels = {
     title: TITLE,
     failedTitle: FAILED_TITLE,
@@ -54,6 +56,11 @@ export default class RollupNeedsAttention extends LightningElement {
   busy = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -188,6 +195,9 @@ export default class RollupNeedsAttention extends LightningElement {
   }
 
   fail(error) {
-    this.error = error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
+    this.error =
+      error && error.body && error.body.message
+        ? error.body.message
+        : helpText('Rollups', 'Core_Rollups_UnexpectedError');
   }
 }

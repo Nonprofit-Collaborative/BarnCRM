@@ -39,7 +39,6 @@ import FINISHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished'
 import NPSP_TITLE from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CHOOSE_STEP = 'choose';
@@ -377,6 +376,9 @@ export default class RollupDlrsImport extends LightningElement {
   }
 
   fail(error) {
-    this.error = error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
+    this.error =
+      error && error.body && error.body.message
+        ? error.body.message
+        : helpText('Rollups', 'Core_Rollups_UnexpectedError');
   }
 }

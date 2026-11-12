@@ -584,7 +584,7 @@ public with sharing class RollupDlrsImport {
 	private static List<SObject> sample(Rollup_Definition__c definition) {
 		Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
 		if (targetType == null || String.isBlank(definition.Target_Field__c)) {
-			throw refusal(Label.Core_Rollups_ErrorUnknownObject);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'));
 		}
 		Map<String, Schema.SObjectField> fields = targetType.getDescribe(
 				SObjectDescribeOptions.DEFERRED
@@ -592,7 +592,7 @@ public with sharing class RollupDlrsImport {
 			.fields.getMap();
 		Schema.SObjectField target = fields.get(definition.Target_Field__c.toLowerCase());
 		if (target == null) {
-			throw refusal(Label.Core_Rollups_ErrorTargetNotWritable);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'));
 		}
 		// Every name comes from describe (the entity, its name field and the target attribute),
 		// never from the request, and every value is a bind, so there is nothing to escape.
@@ -735,7 +735,7 @@ public with sharing class RollupDlrsImport {
 	private static Rollup_Definition__c require(Id definitionId) {
 		Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 		if (definition == null) {
-			throw refusal(Label.Core_Rollups_ErrorUnknownDefinition);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition'));
 		}
 		return definition;
 	}
@@ -746,7 +746,7 @@ public with sharing class RollupDlrsImport {
 
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw refusal(Label.Core_Rollups_ErrorNoPermission);
+			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
 	}
 
@@ -756,7 +756,7 @@ public with sharing class RollupDlrsImport {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupDlrsImport',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

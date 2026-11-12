@@ -21,10 +21,8 @@ import SOURCE_FIELD from '@salesforce/label/c.Core_RollupBuilder_SourceField';
 import ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_OrderBy';
 import ORDER_DIRECTION from '@salesforce/label/c.Core_RollupBuilder_OrderDirection';
 import ROW_LIMIT from '@salesforce/label/c.Core_RollupBuilder_RowLimit';
-import ERROR_ROW_LIMIT_ORDER from '@salesforce/label/c.Core_Rollups_ErrorRowLimitNeedsOrder';
 import DELIMITER from '@salesforce/label/c.Core_RollupBuilder_Delimiter';
 import CUSTOM_DELIMITER from '@salesforce/label/c.Core_RollupBuilder_CustomDelimiter';
-import ERROR_CUSTOM_DELIMITER from '@salesforce/label/c.Core_Rollups_ErrorCustomDelimiterNeeded';
 import INCLUDE_DELETED from '@salesforce/label/c.Core_RollupBuilder_IncludeDeleted';
 import WINDOW from '@salesforce/label/c.Core_RollupBuilder_Window';
 import WINDOW_ALL from '@salesforce/label/c.Core_RollupBuilder_WindowAll';
@@ -51,10 +49,8 @@ import SAVE_AND_CALCULATE from '@salesforce/label/c.Core_RollupBuilder_SaveAndCa
 import ERROR_NAME from '@salesforce/label/c.Core_RollupBuilder_ErrorNameNeeded';
 import ERROR_TARGET from '@salesforce/label/c.Core_RollupBuilder_ErrorTargetNeeded';
 import ERROR_SOURCE from '@salesforce/label/c.Core_RollupBuilder_ErrorSourceNeeded';
-import ERROR_SOURCE_FIELD from '@salesforce/label/c.Core_Rollups_ErrorSourceFieldNeeded';
 import ERROR_ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_ErrorOrderByNeeded';
 import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindowNeedsDate';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
 import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
@@ -957,16 +953,16 @@ export default class RollupWizard extends LightningElement {
     }
     if (this.step === 3) {
       if (!draft.aggregate || (this.needsSourceField && !draft.sourceField)) {
-        return ERROR_SOURCE_FIELD;
+        return helpText('Rollups', 'Core_Rollups_ErrorSourceFieldNeeded');
       }
       if (ORDERED.has(draft.aggregate) && !draft.orderByField) {
         return ERROR_ORDER_BY;
       }
       if (this.hasRowLimit && !draft.orderByField) {
-        return ERROR_ROW_LIMIT_ORDER;
+        return helpText('Rollups', 'Core_Rollups_ErrorRowLimitNeedsOrder');
       }
       if (this.isCustomDelimiter && !draft.customDelimiter) {
-        return ERROR_CUSTOM_DELIMITER;
+        return helpText('Rollups', 'Core_Rollups_ErrorCustomDelimiterNeeded');
       }
       if (draft.fiscalYearAware && !draft.fiscalDateField && !this.sourceIsDate()) {
         return ERROR_WINDOW_DATE;
@@ -1128,6 +1124,9 @@ export default class RollupWizard extends LightningElement {
   }
 
   fail(error) {
-    this.error = error && error.body && error.body.message ? error.body.message : UNEXPECTED_ERROR;
+    this.error =
+      error && error.body && error.body.message
+        ? error.body.message
+        : helpText('Rollups', 'Core_Rollups_UnexpectedError');
   }
 }

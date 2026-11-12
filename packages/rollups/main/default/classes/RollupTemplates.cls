@@ -337,7 +337,9 @@ public with sharing class RollupTemplates {
 
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new RollupService.RollupServiceException(Label.Core_Rollups_ErrorNoPermission);
+			throw new RollupService.RollupServiceException(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
+			);
 		}
 	}
 
@@ -346,7 +348,7 @@ public with sharing class RollupTemplates {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupTemplates',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

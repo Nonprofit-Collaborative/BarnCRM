@@ -99,7 +99,7 @@ public with sharing class RollupExplainController {
 				caught,
 				caught instanceof RollupService.RollupServiceException,
 				'RollupExplainController',
-				Label.Core_Rollups_UnexpectedError
+				BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 			);
 		}
 	}

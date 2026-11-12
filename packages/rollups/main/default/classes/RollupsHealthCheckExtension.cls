@@ -61,7 +61,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			outcome +=
 				' ' +
 				String.format(
-					System.Label.Core_HealthCheck_RollupsSkippedDetail,
+					BarnHelp.text('Rollups', 'Core_HealthCheck_RollupsSkippedDetail'),
 					new List<Object>{ String.join(skipped, ', ') }
 				);
 		}
@@ -108,7 +108,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			// The detail is complete before the Finding is built: another package writes a
 			// Finding only through its @NamespaceAccessible constructor and methods.
 			String detail = String.format(
-				System.Label.Core_HealthCheck_RollupsMissingDetail,
+				BarnHelp.text('Rollups', 'Core_HealthCheck_RollupsMissingDetail'),
 				values
 			);
 			List<String> skipped = RollupService.skippedDefaultNames();
@@ -116,7 +116,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 				detail +=
 					' ' +
 					String.format(
-						System.Label.Core_HealthCheck_RollupsSkippedDetail,
+						BarnHelp.text('Rollups', 'Core_HealthCheck_RollupsSkippedDetail'),
 						new List<Object>{ String.join(skipped, ', ') }
 					);
 			}
@@ -162,25 +162,25 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			}
 			String detail = HealthCheckService.forCount(
 				waiting.size(),
-				System.Label.Core_HealthCheck_NightlyOffDetailOne,
-				System.Label.Core_HealthCheck_NightlyOffDetail,
+				BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffDetailOne'),
+				BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffDetail'),
 				new List<Object>{ String.valueOf(waiting.size()) }
 			);
 			// Said only when some rollup recalculates nowhere else; one set to Both still
 			// updates as records change.
 			if (waiting.size() == 1 && nightlyOnly == 1) {
-				detail += ' ' + System.Label.Core_HealthCheck_NightlyOffOnlyThenIt;
+				detail += ' ' + BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffOnlyThenIt');
 			} else if (nightlyOnly > 0) {
 				detail +=
 					' ' +
 					HealthCheckService.forCount(
 						nightlyOnly,
-						System.Label.Core_HealthCheck_NightlyOffOnlyThenOne,
-						System.Label.Core_HealthCheck_NightlyOffOnlyThen,
+						BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffOnlyThenOne'),
+						BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffOnlyThen'),
 						new List<Object>{ String.valueOf(nightlyOnly) }
 					);
 			}
-			detail += ' ' + System.Label.Core_HealthCheck_NightlyOffFixHint;
+			detail += ' ' + BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffFixHint');
 			return new HealthCheckService.Finding(
 				'nightly_rollups_not_scheduled',
 				System.Label.Core_HealthCheck_NightlyOffTitle,

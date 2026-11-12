@@ -184,7 +184,10 @@ private class RollupAttentionControllerTest {
 					message = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(Label.Core_Rollups_ErrorNoPermission, message);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+				message
+			);
 			System.Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_FAILED]

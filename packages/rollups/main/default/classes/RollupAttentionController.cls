@@ -81,7 +81,7 @@ public with sharing class RollupAttentionController {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			RollupQueue.retry(
@@ -105,7 +105,7 @@ public with sharing class RollupAttentionController {
 		try {
 			if (!FeatureManagement.checkPermission('Manage_BarnCRM_Settings')) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_Rollups_ErrorNoPermission
+					BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 				);
 			}
 			RollupQueue.processPending();
@@ -244,7 +244,7 @@ public with sharing class RollupAttentionController {
 			caught,
 			caught instanceof RollupService.RollupServiceException,
 			'RollupAttentionController',
-			Label.Core_Rollups_UnexpectedError
+			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

@@ -63,7 +63,11 @@ private class RollupDefinitionGuardTest {
 			saved.isSuccess(),
 			'A save from outside the Builder still needs the permission'
 		);
-		Assert.areEqual(System.Label.Core_Rollups_ErrorNoPermission, firstError(saved), 'Says why');
+		Assert.areEqual(
+			BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
+			firstError(saved),
+			'Says why'
+		);
 	}
 
 	@IsTest
@@ -118,7 +122,7 @@ private class RollupDefinitionGuardTest {
 			messages.add(error.getMessage());
 		}
 		Assert.isTrue(
-			messages.contains(System.Label.Core_Rollups_ErrorTargetNotAllowed),
+			messages.contains(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotAllowed')),
 			'Says the object cannot hold a total: ' + messages
 		);
 	}
@@ -153,7 +157,11 @@ private class RollupDefinitionGuardTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(System.Label.Core_Rollups_ErrorTargetNotWritable, problem, 'Says why');
+		Assert.areEqual(
+			BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'),
+			problem,
+			'Says why'
+		);
 	}
 
 	@IsTest
@@ -170,7 +178,11 @@ private class RollupDefinitionGuardTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(System.Label.Core_Rollups_ErrorFieldNotReadable, problem, 'Says why');
+		Assert.areEqual(
+			BarnHelp.text('Rollups', 'Core_Rollups_ErrorFieldNotReadable'),
+			problem,
+			'Says why'
+		);
 	}
 
 	@IsTest
