@@ -59,7 +59,7 @@ public with sharing class ProjectBilling {
 			addRetainer(project, periodStart, periodEnd, lines, sources);
 		}
 		for (
-			Project_Expense__c expense : Database.queryWithBinds(
+			Project_Expense__c expense : (List<Project_Expense__c>) Database.queryWithBinds(
 				'SELECT Id, Category__c, Description__c, Date__c, Amount__c FROM Project_Expense__c ' +
 					'WHERE Project__c = :projectId AND Billable__c = TRUE AND Invoice_Line__c = NULL ' +
 					'AND Date__c >= :periodStart AND Date__c <= :periodEnd AND ' +
@@ -230,7 +230,7 @@ public with sharing class ProjectBilling {
 	) {
 		Map<String, Integer> lineFor = new Map<String, Integer>();
 		for (
-			Time_Entry__c entry : Database.queryWithBinds(
+			Time_Entry__c entry : (List<Time_Entry__c>) Database.queryWithBinds(
 				'SELECT Id, User__c, User__r.Name, Hours__c, Bill_Rate__c FROM Time_Entry__c ' +
 					'WHERE Project__c = :projectId AND Billable__c = TRUE AND Invoice_Line__c = NULL ' +
 					'AND Date__c >= :periodStart AND Date__c <= :periodEnd AND ' +

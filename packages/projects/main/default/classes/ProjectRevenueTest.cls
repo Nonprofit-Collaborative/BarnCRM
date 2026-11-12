@@ -7,7 +7,7 @@
 @IsTest(
 	testFor='ApexClass:ProjectRevenue, ApexClass:ProjectsNightlyJobProvider, ApexClass:ProjectBilling'
 )
-private class ProjectRevenueTest {
+public class ProjectRevenueTest {
 	@TestSetup
 	static void setup() {
 		TestUsers.adminWith(ProjectsTestData.ADMIN_SET);

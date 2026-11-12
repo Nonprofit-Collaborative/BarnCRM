@@ -47,7 +47,7 @@ public with sharing class ProjectFinancials {
 		];
 		List<Map<String, Object>> months = new List<Map<String, Object>>();
 		for (
-			Project_Revenue__c row : Database.queryWithBinds(
+			Project_Revenue__c row : (List<Project_Revenue__c>) Database.queryWithBinds(
 				'SELECT Month__c, Recognized_Amount__c, Percent_Complete__c' +
 					(withCost ? ', Cost_Amount__c' : '') +
 					' FROM Project_Revenue__c WHERE Project__c = :projectId' +

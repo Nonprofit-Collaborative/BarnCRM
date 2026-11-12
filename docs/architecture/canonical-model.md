@@ -18206,7 +18206,7 @@ A person who can be staffed on projects, with skills, weekly capacity and a defa
 
 | Attribute | API name | Type |
 |---|---|---|
-| Person | `User__c` | Lookup(User), required, relationship Project_Resources |
+| Person | `User__c` | Lookup(User), relationship Project_Resources, delete rule Set Null; required by the validation rule `Resource_Needs_User` (a required lookup to User is not allowed) |
 | Skills | `Skills__c` | Multi-Select Picklist (`Project_Skills`) |
 | Weekly Capacity Hours | `Weekly_Capacity_Hours__c` | Number(3, 0) |
 | Default Role | `Default_Role__c` | Text(80) |

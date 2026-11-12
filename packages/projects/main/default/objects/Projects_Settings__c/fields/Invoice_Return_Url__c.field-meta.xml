@@ -4,7 +4,6 @@
   <externalId>false</externalId>
   <inlineHelpText>The https page a client returns to after paying an invoice online, such as your website's thank you page. Default: blank, which returns them to your Salesforce My Domain address.</inlineHelpText>
   <label>Invoice payment return page</label>
-  <length>255</length>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>Url</type>
