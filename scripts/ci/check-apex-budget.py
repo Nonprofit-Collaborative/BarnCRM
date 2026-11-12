@@ -229,9 +229,10 @@ CAPS = {
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%. PSA model (D-197, ADR-NEXT projects PSA): the PSA settings accessors,
     # 34,147 measured; each PSA builder raises it by what its own classes measure. Builder B
-    # (PM-09 ProjectStaffingController and the utilization change): 7,751 measured, 41,898 in
+    # (PM-09 ProjectStaffingController and the utilization change): 7,751 measured. Builder A
+    # (PM-06 to PM-08: rates, entry handler, timesheet and approvals): 17,221 measured. 59,119 in
     # all, plus about 2%.
-    "projects": 42_700,
+    "projects": 60_300,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

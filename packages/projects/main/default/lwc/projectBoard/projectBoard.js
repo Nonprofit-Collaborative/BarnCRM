@@ -4,6 +4,7 @@ import getBoard from '@salesforce/apex/ProjectsController.getBoard';
 import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import addTask from '@salesforce/apex/ProjectsController.addTask';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
+import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
 import draftStatusUpdate from '@salesforce/apex/ProjectsController.draftStatusUpdate';
 import { localIsoDate, messageFrom } from 'c/findCsv';
@@ -36,6 +37,8 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
   newTask = {};
   logging = false;
   entry = {};
+  spending = false;
+  expense = {};
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -68,8 +71,22 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       notes: helpText('Projects', 'Projects_Board_Notes'),
       save: helpText('Projects', 'Projects_Board_Save'),
       cancel: helpText('Projects', 'Projects_Board_Cancel'),
-      today: helpText('Projects', 'Projects_Board_Today')
+      today: helpText('Projects', 'Projects_Board_Today'),
+      addExpense: helpText('Projects', 'Projects_Expense_Add'),
+      category: helpText('Projects', 'Projects_Expense_Category'),
+      amount: helpText('Projects', 'Projects_Expense_Amount'),
+      description: helpText('Projects', 'Projects_Expense_Description')
     };
+  }
+
+  get expensesEnabled() {
+    return this.timeTracking && this.board?.expensesEnabled === true;
+  }
+
+  get categoryOptions() {
+    return ['Travel', 'Lodging', 'Meals', 'Mileage', 'Software', 'Supplies', 'Other'].map(
+      (value) => ({ label: value, value })
+    );
   }
 
   get project() {
@@ -242,6 +259,40 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
   handleCancel() {
     this.addingPhase = undefined;
     this.logging = false;
+    this.spending = false;
+  }
+
+  handleStartExpense() {
+    this.spending = true;
+    this.expense = { date: localIsoDate(), category: 'Travel', billable: false };
+  }
+
+  handleExpense(event) {
+    const field = event.target.dataset.field;
+    const value =
+      event.target.type === 'checkbox'
+        ? event.target.checked
+        : (event.detail?.value ?? event.target.value);
+    this.expense = { ...this.expense, [field]: value };
+  }
+
+  async handleSaveExpense() {
+    const e = this.expense;
+    const saved = await this.run(
+      () =>
+        addExpense({
+          projectId: this.recordId,
+          workDate: e.date,
+          category: e.category,
+          amount: e.amount === undefined || e.amount === '' ? null : Number(e.amount),
+          billable: e.billable === true,
+          description: e.description
+        }),
+      helpText('Projects', 'Projects_Timesheet_ExpenseAdded')
+    );
+    if (saved) {
+      this.spending = false;
+    }
   }
 
   handleStartLog() {
@@ -270,7 +321,10 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
           billable: e.billable === true,
           notes: e.notes
         }),
-      helpText('Projects', 'Projects_Board_TimeLogged')
+      // With approvals on a new entry is Open until the week is submitted (R-PM11).
+      this.board?.approvalsEnabled
+        ? helpText('Projects', 'Projects_Board_TimeLoggedOpen')
+        : helpText('Projects', 'Projects_Board_TimeLogged')
     );
     if (saved) {
       this.logging = false;

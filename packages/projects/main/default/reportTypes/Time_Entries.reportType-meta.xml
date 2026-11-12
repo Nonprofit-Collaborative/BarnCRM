@@ -42,6 +42,11 @@
       <table>Time_Entry__c</table>
     </columns>
     <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
       <checkedByDefault>false</checkedByDefault>
       <field>Notes__c</field>
       <table>Time_Entry__c</table>

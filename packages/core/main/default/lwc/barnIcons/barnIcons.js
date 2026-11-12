@@ -127,6 +127,8 @@ const ICONS = Object.freeze({
   // Project Management
   Project__c: 'custom:custom62',
   Projects_Home: 'custom:custom64',
+  Projects_Timesheet: 'custom:custom95',
+  Projects_Approvals: 'custom:custom46',
   Time_Entry__c: 'custom:custom95',
   Project_Expense__c: 'custom:custom93',
   Project_Invoice__c: 'custom:custom41',

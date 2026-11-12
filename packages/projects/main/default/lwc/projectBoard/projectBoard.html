@@ -8,6 +8,9 @@
           <template lwc:if={timeTracking}>
             <lightning-button data-id="log-time" label={labels.logTime} disabled={isWorking} onclick={handleStartLog}></lightning-button>
           </template>
+          <template lwc:if={expensesEnabled}>
+            <lightning-button data-id="add-expense" label={labels.addExpense} disabled={isWorking} onclick={handleStartExpense}></lightning-button>
+          </template>
         </lightning-button-group>
       </div>
       <div class="slds-var-p-horizontal_medium">
@@ -50,6 +53,18 @@
             <lightning-input class="slds-col" type="checkbox" label={labels.billable} checked={entry.billable} data-field="billable" onchange={handleEntry}></lightning-input>
             <lightning-input class="slds-col" label={labels.notes} value={entry.notes} max-length="255" data-field="notes" onchange={handleEntry}></lightning-input>
             <lightning-button class="slds-col" variant="brand" label={labels.save} disabled={isWorking} onclick={handleSaveTime} data-id="save-time"></lightning-button>
+            <lightning-button class="slds-col" label={labels.cancel} onclick={handleCancel}></lightning-button>
+          </div>
+        </template>
+
+        <template lwc:if={spending}>
+          <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-var-m-bottom_small" data-id="expense-form">
+            <lightning-input class="slds-col" type="date" label={labels.date} value={expense.date} data-field="date" onchange={handleExpense}></lightning-input>
+            <lightning-combobox class="slds-col" label={labels.category} value={expense.category} options={categoryOptions} data-field="category" onchange={handleExpense}></lightning-combobox>
+            <lightning-input class="slds-col" type="number" step="0.01" min="0" label={labels.amount} value={expense.amount} data-field="amount" onchange={handleExpense}></lightning-input>
+            <lightning-input class="slds-col" type="checkbox" label={labels.billable} checked={expense.billable} data-field="billable" onchange={handleExpense}></lightning-input>
+            <lightning-input class="slds-col" label={labels.description} value={expense.description} max-length="255" data-field="description" onchange={handleExpense}></lightning-input>
+            <lightning-button class="slds-col" variant="brand" label={labels.save} disabled={isWorking} onclick={handleSaveExpense} data-id="save-expense"></lightning-button>
             <lightning-button class="slds-col" label={labels.cancel} onclick={handleCancel}></lightning-button>
           </div>
         </template>

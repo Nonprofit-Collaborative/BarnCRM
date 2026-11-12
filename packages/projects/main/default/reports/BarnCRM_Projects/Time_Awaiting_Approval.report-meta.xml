@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Time_Entry__c$Project__c</field>
+  </columns>
+  <columns>
+    <field>Time_Entry__c$Date__c</field>
+  </columns>
+  <columns>
+    <field>Time_Entry__c$Task__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Time_Entry__c$Hours__c</field>
+  </columns>
+  <description>
+    Time submitted for approval and not yet decided, grouped by person (PM-07).
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Time_Entry__c$Status__c</column>
+      <operator>equals</operator>
+      <value>Submitted</value>
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <dateGranularity>None</dateGranularity>
+    <field>Time_Entry__c$User__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Time Awaiting Approval</name>
+  <reportType>Time_Entries__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+</Report>

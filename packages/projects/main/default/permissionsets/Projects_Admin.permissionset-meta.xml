@@ -14,6 +14,14 @@
     <apexClass>ProjectStaffingController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>ProjectTimesheetController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ProjectApprovalsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
     <name>Projects_Manage</name>
@@ -701,6 +709,14 @@
   </objectPermissions>
   <tabSettings>
     <tab>Projects_Home</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Projects_Timesheet</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Projects_Approvals</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

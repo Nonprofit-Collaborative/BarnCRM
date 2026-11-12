@@ -86,6 +86,9 @@
               <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
                 <lightning-input class="slds-col" type="checkbox" label={labels.includeExported} checked={includeExported} data-field="includeExported" onchange={handleRange}></lightning-input>
                 <lightning-button class="slds-col" label={labels.exportButton} disabled={isWorking} onclick={handleExport} data-id="export-button"></lightning-button>
+                <template lwc:if={ratesEnabled}>
+                  <lightning-button class="slds-col" label={labels.applyRates} disabled={isWorking} onclick={handleApplyRates} data-id="apply-rates"></lightning-button>
+                </template>
               </div>
             </div>
           </template>

@@ -52,3 +52,37 @@ to fix its hours or task. Hours are more than 0 and at most 24 in a day.
   An assignment's hours are spread over its working days (Monday to Friday); over capacity shows
   in red, point at a cell to see the hours logged, and the last row is the hours of requests not
   yet filled. Only approved time counts as logged when your organization approves time.
+
+
+## Timesheet and Approvals (When Your Admin Turns Them On)
+
+**Timesheet** shows your week, Monday to Sunday. Add a row for a project (and a task), type hours
+in the day cells, then **Save**. When the week is done, **Submit Week**: Open and Rejected time
+and expenses become Submitted and are locked while the project's owner decides. **Recall Week**
+puts them back to Open if you need to change something before they are decided. A rejected entry
+shows the reason; fix it and submit again. A cell cannot be emptied (staff cannot delete time):
+change the hours, or ask a Projects admin to remove the entry. A cell with two or more entries
+shows their total and is changed where they were logged.
+
+Time you log from the project's **Log Time** is saved as Open too, and goes with the week when
+you submit it.
+
+**Approvals** is for project owners (Projects admins see every project). Time and expenses
+submitted on your projects are grouped by person and week: **Approve** or **Reject** a whole
+week, or open **Details** and decide one line. A rejection needs a reason, typed in the week's
+Rejection Reason box. Approved time is locked and is the only time that counts in a project's
+hours, cost, billable export and invoices.
+
+## Expenses (When Your Admin Turns Them On)
+
+**Add Expense** on a project, or on the Timesheet, records the date, category, amount, whether it
+is billable and a description. Attach the receipt as a file on the expense when prompted, or from
+its Files list later. With approvals on, expenses are submitted, approved or rejected with the
+week, like time.
+
+## Rates (Admins)
+
+With rate cards on, each time entry keeps the bill rate it was logged at, from the person's rate,
+else their role's, else the project's Hourly Rate. Changing a rate card later does not change
+time already logged. On Projects Home, **Apply Rates** gives rates to time logged before rate
+cards were turned on.
