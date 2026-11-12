@@ -1,0 +1,159 @@
+<template>
+  <template lwc:if={helpReady}>
+    <div class="slds-var-m-bottom_medium">
+      <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
+      <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+      </template>
+
+      <template lwc:if={hasData}>
+        <p class="slds-text-heading_small" data-id="net-cost">{netCostText}</p>
+        <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="budgeted-net-cost">
+          {budgetedNetCostText}
+        </p>
+
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{fieldLabels.Expenses}</h3>
+        <template lwc:if={canAddExpense}>
+          <lightning-button
+            data-id="add-expense"
+            class="slds-var-m-bottom_small"
+            label={labels.addExpense}
+            icon-name="utility:add"
+            disabled={busy}
+            onclick={handleAddExpense}
+          ></lightning-button>
+        </template>
+        <template lwc:if={hasExpenses}>
+          <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+            data-id="expenses"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col">{fieldLabels.Expense_Name}</th>
+                <th scope="col">{fieldLabels.Expense_Category__c}</th>
+                <th scope="col">{fieldLabels.Expense_Budgeted__c}</th>
+                <th scope="col">{fieldLabels.Expense_Actual__c}</th>
+                <th scope="col">{fieldLabels.Expense_Status__c}</th>
+                <template lwc:if={canEdit}>
+                  <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={expenseRows} for:item="line">
+                <tr key={line.id} data-id="expense-row">
+                  <th scope="row" data-label={fieldLabels.Expense_Name}>{line.name}</th>
+                  <td data-label={fieldLabels.Expense_Category__c}>{line.category}</td>
+                  <td data-label={fieldLabels.Expense_Budgeted__c}>{line.budgetedText}</td>
+                  <td data-label={fieldLabels.Expense_Actual__c}>{line.actualText}</td>
+                  <td data-label={fieldLabels.Expense_Status__c}>{line.status}</td>
+                  <template lwc:if={canEdit}>
+                    <td>
+                      <lightning-button-menu
+                        data-id={line.id}
+                        data-kind="expenses"
+                        alternative-text={line.menuLabel}
+                        icon-size="x-small"
+                        menu-alignment="right"
+                        disabled={busy}
+                        onselect={handleMenu}
+                      >
+                        <template for:each={menuItems} for:item="item">
+                          <lightning-menu-item key={item.value} label={item.label} value={item.value}></lightning-menu-item>
+                        </template>
+                      </lightning-button-menu>
+                    </td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <ul class="slds-var-m-top_x-small" data-id="categories">
+            <template for:each={categoryLines} for:item="row">
+              <li key={row.key}>{row.text}</li>
+            </template>
+          </ul>
+          <p class="slds-var-m-bottom_medium" data-id="expense-totals">{expenseTotalsText}</p>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak slds-var-m-bottom_medium" data-id="expenses-empty">
+            {labels.expensesEmpty}
+          </p>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{fieldLabels.Funding}</h3>
+        <template lwc:if={canAddFunding}>
+          <lightning-button
+            data-id="add-funding"
+            class="slds-var-m-bottom_small"
+            label={labels.addFunding}
+            icon-name="utility:add"
+            disabled={busy}
+            onclick={handleAddFunding}
+          ></lightning-button>
+        </template>
+        <template lwc:if={hasFunding}>
+          <table
+            class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+            data-id="funding"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col">{fieldLabels.Funding_Name}</th>
+                <th scope="col">{fieldLabels.Funding_Type__c}</th>
+                <th scope="col">{fieldLabels.Funding_Account__c}</th>
+                <th scope="col">{fieldLabels.Funding_Expected__c}</th>
+                <th scope="col">{fieldLabels.Funding_Received__c}</th>
+                <template lwc:if={canEdit}>
+                  <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={fundingRows} for:item="line">
+                <tr key={line.id} data-id="funding-row">
+                  <th scope="row" data-label={fieldLabels.Funding_Name}>{line.name}</th>
+                  <td data-label={fieldLabels.Funding_Type__c}>{line.type}</td>
+                  <td data-label={fieldLabels.Funding_Account__c}>{line.source}</td>
+                  <td data-label={fieldLabels.Funding_Expected__c}>{line.expectedText}</td>
+                  <td data-label={fieldLabels.Funding_Received__c}>{line.receivedText}</td>
+                  <template lwc:if={canEdit}>
+                    <td>
+                      <lightning-button-menu
+                        data-id={line.id}
+                        data-kind="funding"
+                        alternative-text={line.menuLabel}
+                        icon-size="x-small"
+                        menu-alignment="right"
+                        disabled={busy}
+                        onselect={handleMenu}
+                      >
+                        <template for:each={menuItems} for:item="item">
+                          <lightning-menu-item key={item.value} label={item.label} value={item.value}></lightning-menu-item>
+                        </template>
+                      </lightning-button-menu>
+                    </td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <p class="slds-var-m-top_x-small" data-id="funding-totals">{fundingTotalsText}</p>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak" data-id="funding-empty">{labels.fundingEmpty}</p>
+        </template>
+        <p class="slds-text-color_weak slds-var-m-top_x-small" data-id="registrations-paid">
+          {registrationsText}
+        </p>
+      </template>
+    </div>
+  </template>
+</template>

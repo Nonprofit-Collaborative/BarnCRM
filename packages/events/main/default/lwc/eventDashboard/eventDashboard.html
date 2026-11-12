@@ -29,6 +29,12 @@
           </p>
         </template>
 
+        <template lwc:if={netCostNote}>
+          <p class="slds-text-color_weak slds-var-m-top_x-small" data-id="net-cost">
+            {netCostNote}
+          </p>
+        </template>
+
         <h3 class="slds-text-heading_small slds-var-m-top_medium">{text.setup}</h3>
         <ul class="slds-var-m-top_x-small" data-id="steps">
           <template for:each={steps} for:item="step">
