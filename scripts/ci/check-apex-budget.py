@@ -103,7 +103,9 @@ CAPS = {
     # VOL-2 (P-09): 172,177 measured with program capacity and the waitlist (EnrollmentCapacity),
     # plus about 2%.
     # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
-    "programs": 177_800,
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 177,950 measured, plus
+    # about 0.5%.
+    "programs": 178_900,
     # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
     # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
     # 66,645 measured 2026-11-11, plus about 0.5%.
