@@ -26,9 +26,6 @@ public with sharing class HubReminders implements Schedulable {
 	@TestVisible
 	private static List<String> sentTitles = new List<String>();
 
-	private static Id typeId;
-	private static Boolean typeLookedUp = false;
-
 	private Integer sent = 0;
 	private Date today;
 	private Integer settingDays;
@@ -393,36 +390,6 @@ public with sharing class HubReminders implements Schedulable {
 			return;
 		}
 		sentTitles.add(title);
-		try {
-			Id notificationType = notificationType();
-			if (notificationType == null) {
-				return;
-			}
-			Messaging.CustomNotification notification = new Messaging.CustomNotification();
-			notification.setNotificationTypeId(notificationType);
-			notification.setTitle(title.abbreviate(250));
-			notification.setBody(body.abbreviate(750));
-			notification.setTargetId(targetId);
-			notification.send(recipientIds);
-		} catch (Exception refused) {
-			ErrorLogger.log(refused, CONTEXT, targetId);
-		}
-	}
-
-	private static Id notificationType() {
-		if (!typeLookedUp) {
-			typeLookedUp = true;
-			try {
-				List<SObject> types = Database.queryWithBinds(
-					'SELECT Id FROM CustomNotificationType WHERE DeveloperName = :name LIMIT 1', // detection-only: dynamic, and an org without it is caught below
-					new Map<String, Object>{ 'name' => NOTIFICATION_TYPE },
-					AccessLevel.SYSTEM_MODE
-				);
-				typeId = types.isEmpty() ? null : types[0].Id;
-			} catch (QueryException notInThisEdition) {
-				typeId = null;
-			}
-		}
-		return typeId;
+		JobNotifier.ownType(NOTIFICATION_TYPE, recipientIds, title, body, targetId, CONTEXT);
 	}
 }

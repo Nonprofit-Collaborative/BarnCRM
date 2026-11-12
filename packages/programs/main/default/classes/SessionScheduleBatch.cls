@@ -31,7 +31,7 @@ public with sharing class SessionScheduleBatch implements Database.Batchable<SOb
 	public static NightlyStep step() {
 		return new NightlyStep(
 			JOB_NAME,
-			System.Label.Programs_NightlyJobs_SchedulesName,
+			BarnHelp.text('Programs', 'Programs_NightlyJobs_SchedulesName'),
 			3,
 			10,
 			new SessionScheduleBatch()

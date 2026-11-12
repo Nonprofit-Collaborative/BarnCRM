@@ -371,6 +371,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 1 | As staff, tick **Renewable** on `Budget Grant`. | A **Renewal** requirement is added, due 110 days ahead (90 before the end date). |
 | 2 | Move the Award End Date 30 days later. | The Renewal requirement's due date moves 30 days later. |
 | 3 | On the **Renewals** card click **Start Renewal**. | `Renewal started.`; the new grant opens at Prospect, Amount Requested 25,000, Renewal Of `Budget Grant`, Renewable ticked, with copies of `Staff` and `Supplies` asking their awarded amounts. The old Renewal requirement is Done. |
+| 3a | On the original grant, start a renewal again (the card button, or a second tab opened before step 3). | Refused: "A renewal of this grant already exists." No second grant is made. |
 | 4 | Read the **Renewals** card on either grant. | Both grants, oldest first, with stage, award period and amounts; the grant you are on is marked. |
 | 5 | As the admin, set **Days before an award ends to renew** to 0 in Settings. | Refused: from 1 to 365. |
 

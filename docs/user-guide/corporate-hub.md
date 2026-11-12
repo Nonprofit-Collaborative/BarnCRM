@@ -62,7 +62,7 @@ Create a meeting from the **Board Meetings** tab, then on its page:
 4. Type the minutes, then press **Submit Minutes for Approval**. Members approve them in the
    board portal; an admin marks them approved once the board has.
 5. Add motions on the meeting. **Open Voting** lets members vote in the portal; **Close Voting**
-   records whether it passed.
+   records whether it passed, and works only on a motion whose voting is open.
 
 Open action items from earlier meetings are listed on each later meeting until someone marks
 them Done. To find a time before scheduling, leave Start blank, fill in up to three Poll Times

@@ -188,6 +188,7 @@ export default class LwcBuilderStudio extends LightningElement {
       orderBy: helpText('LwcBuilder', 'LwcBuilder_Prop_OrderBy'),
       descending: helpText('LwcBuilder', 'LwcBuilder_Prop_Descending'),
       report: helpText('LwcBuilder', 'LwcBuilder_Prop_Report'),
+      reportHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_ReportHelp'),
       body: helpText('LwcBuilder', 'LwcBuilder_Prop_Body'),
       url: helpText('LwcBuilder', 'LwcBuilder_Prop_Url'),
       urlHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_UrlHelp'),

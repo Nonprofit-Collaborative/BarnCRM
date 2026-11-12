@@ -67,6 +67,7 @@
     "Funders_Pipeline_LoadFailed": "The Grant Pipeline did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Program_LoadFailed": "The Program card did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Renewal_RequirementName": "Renewal application",
+    "Funders_Renewals_AlreadyStarted": "A renewal of this grant already exists. Open it from the Renewals list instead of starting another.",
     "Funders_Renewals_Empty": "No earlier or later years yet.",
     "Funders_Renewals_Start": "Start Renewal",
     "Funders_Renewals_Started": "Renewal started.",

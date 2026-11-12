@@ -81,7 +81,7 @@ properties (up, down, previous column, next column).
 | Record Fields | Fields of the record the page is for | Record pages only. A field the viewer cannot read is left out. Choose one or two columns. |
 | Related List | Records whose lookup points at the page record | Name the child object and its lookup field. Up to six fields; sort by any field. |
 | Record List | Records of any object | Up to six fields, one optional filter (a field equals, or does not equal, a value), a sort. |
-| Report Chart | Bars for a standard summary or matrix report's first grouping and first summary | Enter the report's API name (Report Unique Name). The report runs as the viewer. Tabular reports cannot be charted. |
+| Report Chart | Bars for a standard summary or matrix report's first grouping and first summary | Enter the report's API name (Report Unique Name). The report runs as the viewer. Tabular reports cannot be charted. Only the first grouping and first summary are drawn, and a chart exports as a placeholder. |
 | Text | Formatted text | Bold, italic, lists and links. Scripts are removed. |
 | Image | A picture | Use a Salesforce address (for example `/resource/YourLogo`) or an `https` address listed in Setup, Trusted URLs. Always fill in the alternative text. |
 | Button | Opens a quick action or runs a screen flow | See Buttons below. |

@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Used by the Outbound Funds migration kit, which reads the disbursements of awarded funding requests: one disbursement of the award per record, with its amount, scheduled and paid dates, status and payment method.</value>
+    <value xsi:type="xsd:string">Used by the Outbound Funds migration kit, which reads the disbursements of awarded funding requests: one disbursement of the award per record, with its amount, scheduled and paid dates, status and payment method. A Paid disbursement is only saved by someone with Manage Scholarships, so run this step as that person.</value>
   </values>
   <values>
     <field>Column_Mapping_JSON__c</field>

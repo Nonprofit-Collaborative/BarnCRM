@@ -156,6 +156,49 @@ private class TerritoryRunBatchTest {
 	}
 
 	@IsTest
+	static void aKindWithManyRulesReadsSmallerChunksAndStaysInTheQueryLimit() {
+		System.runAs(TestUsers.adminWith('Territory_Admin')) {
+			Territory__c wide = territory('Wide', 10, TerritoryRouting.KEEP_OWNER);
+			for (Integer i = 0; i < TerritoryRunBatch.MAX_RULES; i++) {
+				rule(wide, lastNameIs('NoMatch' + i));
+			}
+			List<Contact> people = new List<Contact>();
+			for (Integer i = 0; i < 200; i++) {
+				people.add(new Contact(LastName = 'Person' + i));
+			}
+			insert as user people;
+			Assert.areEqual(
+				TerritoryRunBatch.CHUNK_MANY_RULES,
+				TerritoryRunBatch.chunkFor(TerritoryRunBatch.KIND_PEOPLE),
+				'Many rules, small chunk'
+			);
+
+			Test.startTest();
+			Id runId = TerritoryRunBatch.launch(
+				TerritoryRunBatch.MODE_PREVIEW,
+				false,
+				TerritoryRunBatch.kindsToRun()
+			);
+			Test.stopTest();
+
+			Territory_Run__c run = runOf(runId);
+			Assert.areEqual(TerritoryRunBatch.STATUS_DONE, run.Status__c, run.Message__c);
+			Assert.isTrue(run.Checked__c <= TerritoryRunBatch.CHUNK_MANY_RULES, 'One small chunk');
+		}
+	}
+
+	@IsTest
+	static void aKindWithFewRulesReadsFullChunks() {
+		System.runAs(TestUsers.adminWith('Territory_Admin')) {
+			rule(territory('North', 10, TerritoryRouting.KEEP_OWNER), lastNameIs('Alvarez'));
+			Assert.areEqual(
+				TerritoryRunBatch.CHUNK,
+				TerritoryRunBatch.chunkFor(TerritoryRunBatch.KIND_PEOPLE)
+			);
+		}
+	}
+
+	@IsTest
 	static void poolsCountWhatMembersAlreadyOwn() {
 		User admin = TestUsers.adminWith('Territory_Admin');
 		System.runAs(admin) {

@@ -318,7 +318,8 @@ line.
 
 1. On an awarded grant the funder may renew, tick **Renewable**. A **Renewal** requirement is
    added, due before the award ends, and you are reminded of it.
-2. When you are ready to apply again, click **Start Renewal** on the **Renewals** card.
+2. When you are ready to apply again, click **Start Renewal** on the **Renewals** card. A grant
+   gets one renewal: if one already exists you are told so, and no second grant is made.
 
 You should see: `Renewal started.` and the new grant opens at Prospect with the funder, purpose,
 budget lines and the amount awarded as the new request. Its **Renewals** card lists the grants of

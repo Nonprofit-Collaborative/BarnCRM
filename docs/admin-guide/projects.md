@@ -114,6 +114,10 @@ An Active project that is not a template is:
   or more, or the hours used reach the Budget warning percent of Budget Hours;
 - **On Track** otherwise.
 
+The nightly check covers up to 2,000 projects (Active ones first by target date, plus any with a
+health already set). When it reaches 2,000 it writes a warning to the Error Log, and projects
+beyond it are not checked that night; use **Refresh Health** on those.
+
 Health Reasons lists each reason. **Draft Status Update** writes a dated Project Status Update
 with the health, percent complete and hours, what was done since the last update, what is due in
 the next 14 days, and the risks. Edit it, then share the record or print the page.

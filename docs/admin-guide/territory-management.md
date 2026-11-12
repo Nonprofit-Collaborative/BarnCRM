@@ -71,6 +71,10 @@ At most 50 active rules for each kind of record. Households are accounts of the 
 type; organizations are accounts of your organization record type (BarnCRM Settings,
 **Organization**), or of none.
 
+Each rule is one query for every batch of records a run reads, so a run reads 200 records at a
+time for a kind with 10 active rules or fewer, and 50 at a time for a kind with more. A run on
+many records with many rules therefore takes more, smaller batches.
+
 ## Preview and Assign
 
 1. Press **Preview**. The run reads every person, household and organization in the background

@@ -119,6 +119,8 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | 2 | On Open Cycles press **Apply** on another open cycle. | A message that a draft was started; My Applications shows it with its form link. |
 | 3 | Open the form link and submit. | The same application, now Submitted with the answers. |
 | 4 | On My Awards press **Accept Award** on an Offered award. | It shows Accepted. |
+| 5 | As admin set an application of the applicant to Ineligible. As the applicant press **Withdraw** on it. | "This application has been decided and cannot be withdrawn." Its status stays Ineligible. |
+| 6 | Delete a cycle after the applicant has its page open, then press **Apply** on it. | "This cycle is not taking applications." and no error page. |
 
 **Cleanup:** None.
 

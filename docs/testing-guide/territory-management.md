@@ -35,6 +35,7 @@ households and organizations with addresses).
 | 2 | Create territory **Everyone Else**, priority 900, Keep Owner, with a People rule and no conditions. | Saved. |
 | 3 | Press **Preview**, press **Refresh** until its line under **Recent Runs** reads Done, and press **Show Details**. | Checked equals the number of people (only kinds with a rule are read); the Boston count matches step 1; Everyone Else has the rest of the people; households and organizations are not moved (no rule). |
 | 4 | Open a Boston person. | Territory is still empty: Preview changed nothing. |
+| 5 | Add People rules until the kind has 50 active (a repeat of step 2's rule is enough), then press **Preview** with a few hundred people. | The run reaches Done with no "too many SOQL queries" message (people are read 50 at a time). Deactivate the extra rules afterwards. |
 
 **Cleanup:** None (T-TM-03 uses the territories).
 

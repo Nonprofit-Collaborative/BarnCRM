@@ -45,6 +45,13 @@ public with sharing class ProjectHealth implements Schedulable {
 				ORDER BY Target_Date__c NULLS LAST
 				LIMIT :MAX_ROWS
 			];
+			if (records.size() >= MAX_ROWS) {
+				ErrorLogger.logMessage(
+					BarnHelp.text('Projects', 'Projects_Health_CapReached', new List<Object>{ MAX_ROWS }),
+					'ProjectHealth',
+					ErrorLogger.SEVERITY_WARNING
+				);
+			}
 			update as system assess(records, AccessLevel.SYSTEM_MODE);
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'ProjectHealth');

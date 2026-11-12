@@ -82,7 +82,8 @@ BarnCRM Settings, **Corporate Hub**:
 | Show board demographics | Off | Whether the Board panel shows the optional age range and gender of current seats. |
 
 The reminder step is **Corporate Hub reminders** on the Nightly Jobs page, at 6:45 AM, with its
-own switch.
+own switch. It runs once a night, so a breach logged during the day gets its first reminder with
+the next 6:45 AM run.
 
 ## Templates
 
@@ -191,8 +192,11 @@ bell reminder before that date.
 Log each request a person makes about their data as a **Data Subject Request** (numbered
 DSR-00001 on): the **Request Type** (Access, Rectification, Erasure, Restriction, Portability,
 Objection or Other), the person (a Contact, when you have one) or the requester's name and email,
-the date received (today by default) and the **Due Date** (received plus 30 days by default;
-change it when you extend the deadline). Tick **Identity Verified** once checked. Status is
+the date received (today by default) and the **Due Date** (left blank, it becomes the date
+received plus 30 days when you save, and follows the date received if you correct it and never
+edited the due date; change it when you extend the deadline and it stays as you set it). The
+**Data Subject Request: Due Date** row on the Automations page turns this
+off. Tick **Identity Verified** once checked. Status is
 Received, In Progress, Completed, Refused or Withdrawn; a closed request needs its **Completed
 Date**. The owner gets one bell reminder before the due date.
 
