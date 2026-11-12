@@ -4295,7 +4295,7 @@ packaged report DAF and Stock Gifts This Year lists them.
 | Commitment | `Commitment__c` | Lookup to `Commitment__c` (v0.3) |
 | Installment | `Installment__c` | Lookup to `Installment__c` (v0.3) |
 | External Id | `External_Id__c` | Text, External Id, unique |
-| Payment Reference | `Payment_Reference__c` | Text |
+| Payment Reference | `Payment_Reference__c` | Text, External Id (indexed: online payments find their gift by it) |
 | Original Gift | `Original_Gift__c` | Lookup to `Gift__c` |
 | Refund Reason | `Refund_Reason__c` | Text |
 | In-kind Description | `In_Kind_Description__c` | Long Text Area (v0.4) |
@@ -4486,7 +4486,7 @@ object means something specific and is unavailable on Platform licenses.
 | Net Raised | decimal | computed | Total raised less cost, calculated live from the two values. |
 | Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. The Percent formula returns the plain ratio (0.5 for half) and Salesforce displays it as 50%. |
 | Donation Page | boolean | yes (defaults false) | Whether the appeal has a public online donation page (G-34, R-AP5). |
-| Donation Form Key | text (18) | no | The Forms form donors fill in on the donation page, by record identifier (ADR-0014). |
+| Donation Form ID | text (18) | no | The Forms form donors fill in on the donation page, by record identifier (ADR-0014). Labelled Donation Form ID; the API name keeps "Key". |
 
 ### Relationships
 
@@ -4516,12 +4516,17 @@ Mirror (plan Section 4.12): the Campaign ID attribute and the one-way copy of Se
 both shipped by the Mirror package, so Giving itself never names Campaign.
 
 **R-AP5 Online donation page** (G-34, ADR-0211 `0211-online-donation-pages.md`). An active
-appeal with Donation Page on and a Donation Form Key naming a published public form has a public
+appeal with Donation Page on and a Donation Form ID naming a published public form has a public
 page served by Forms (`<site>/FormsPublic?record=<appeal>`). The page shows the name,
 description and goal only. Sending the form starts a hosted checkout through Payments with the
 answer `amount`; the gift (Donor Contact the person Forms matched, Appeal, Payment Reference the
 payment's identifier) is Pending until Payments reports Paid (Received), Refunded (Refunded) or
-Cancelled (Cancelled), whichever of form processing and the payment report comes last.
+Cancelled (Cancelled), whichever of form processing and the payment report comes last. A gift
+the status rules move only through a step (Cancelled to Received, Pending to Refunded) is moved
+through Pending or Received first. Against card testing, a checkout is refused when the amount is
+below `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (default 5) or the appeal has started
+30 checkouts in the last hour. Health Check lists active appeals with Donation Page on whose form
+has no `amount` question.
 
 ### Salesforce implementation
 
@@ -4541,7 +4546,7 @@ Cancelled (Cancelled), whichever of form processing and the payment report comes
 | Percent To Goal | `Percent_To_Goal__c` | Formula (Percent) |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
 | Donation Page | `Donation_Page__c` | Checkbox, default false (G-34) |
-| Donation Form Key | `Donation_Form_Key__c` | Text(18) (G-34) |
+| Donation Form ID | `Donation_Form_Key__c` | Text(18) (G-34) |
 
 Rollup target attributes on `Appeal__c` are listed in Section 26.
 
@@ -4712,6 +4717,7 @@ these keys, which is what makes a module that is off leave nothing behind.
 | Default Appeal | `Default_Appeal__c` | Text(18) (v0.6, from Core) |
 | Ask Stages | `Ask_Stages__c` | Text(255) (release 0.13, G-26, R-SO2) |
 | Receipt Numbering Scope | `Receipt_Numbering_Scope__c` | Text(40), default `Organization` (release 1.14, C-47f, R-BR8) |
+| Donation Page Minimum Amount | `Donation_Page_Minimum_Amount__c` | Currency(16, 2), default 5 (G-34 card-testing guard, R-AP5) |
 
 - **Service:** Core `SettingsService`, reading and writing this object through the
   `Settings_Object__c` field on `Setting_Definition__mdt` (ADR-0017).
@@ -16702,7 +16708,7 @@ the money or any card or account number.
 | Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture id, once known. |
 | Checkout Url | long text | no | The hosted checkout page address. |
 | Paid At | datetime | no | When the processor reported the money captured. |
-| Detail | text | no | The last failure, refund or cancellation reason the processor gave. |
+| Detail | text | no | The last failure, refund or cancellation reason the processor gave; until then, what the consumer passed as `detail` (Giving: the scheduled payment charged). |
 
 ### Rules
 
@@ -16715,7 +16721,12 @@ back.
 A partial refund keeps Paid; a refund of the whole amount sets Refunded.
 
 **R-PAY3 Abandoned checkouts.** A payment still Pending with no Processor Payment Id two days
-after it was created is set Cancelled with the detail that the checkout expired.
+after it was created is set Cancelled with the detail that the checkout expired, 50 at a time in
+a queued job of its own, apart from event processing.
+
+**R-PAY5 Listeners told in bulk.** After each run, each listener class is told once with every
+payment of its own that changed (`paymentsChanged`); a listener that does not answer true, or
+fails, is told one payment at a time (`paymentChanged`), each failure rolled back on its own.
 
 **R-PAY4 No card data.** No field holds a card, bank account or PayPal sign-in; the processor's
 page takes them.
@@ -16779,6 +16790,11 @@ does not confirm is Rejected.
 
 **R-PEV3 The guest only stores.** The receiver inserts the event and reads nothing; processing
 runs as the administrator who scheduled it.
+
+**R-PEV4 Callout time.** A run stops reading events once 60 seconds have passed (a PayPal event
+can take three 20-second callouts), leaving the rest Received for the next run. An event whose
+callout failed in transport stays Received and is read again; only a run that fails to write
+marks the events it read Failed.
 
 ### Salesforce implementation
 
@@ -18624,6 +18640,7 @@ mirrors the primary member).
 | 1.44 | 2026-11-11 | Backup Sets, files import and certifications (C-66, C-70, G-22e, D-157; ADR-0213 `0213-backup-sets.md`, ADR-0214 `0214-files-import.md`). `Import_Batch__c.Operation__c` gains Backup and Files (Section 16). Section 29D gains rule R-SQ15: the query document's optional `backup` key marks a saved query as a Backup Set, run on demand as a Backup data job writing R-BD9's file to Files. New Section 29FI Files import (no object, rules R-FI1 to R-FI5): a zip with `manifest.csv` loaded as `ContentVersion` linked to records, journaled per group and undone by deleting the documents. Memberships gains Sections 29MEM5 Certification (`Certification__c`), 29MEM6 Member Certification (`Member_Certification__c`, rules R-MEM10 to R-MEM13, validation rule `Needs_Contact`) and 29MEM7 Continuing Credit (`Continuing_Credit__c`, master-detail to Member Certification, rolled up into `Open_Credits__c`). |
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 | 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
+| 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
 
 ---
 ## 32. Entity ownership by package

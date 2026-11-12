@@ -98,8 +98,9 @@ requires these steps in **Setup**, and no app can do them for you:
 
 ### 4. Schedule Processing
 
-Open **Health Check** and select **Schedule Payment Processing**. It runs every 15 minutes as
-you, so keep your user active. It checks each processor event, records the payment's new status
+**Payments Setup** says whether processing is scheduled. If it is not, select **Schedule
+Processing** there (or **Schedule Payment Processing** in Health Check). Nothing is scheduled
+until you choose to. It runs every 15 minutes as you, so keep your user active. It checks each processor event, records the payment's new status
 and tells the module the payment belongs to.
 
 ### 5. Test, Then Go Live
@@ -135,7 +136,10 @@ reports them.
 
 **Payment Events** lists every message the processors sent, with what was done with it
 (Applied, Ignored, Rejected, Failed) and why. Each processor message is used once, however many
-times it is sent.
+times it is sent. A run reads up to 20 messages and stops early after a minute of waiting on
+PayPal, leaving the rest **Received** for the next run. A message whose processor could not be
+reached stays **Received** and is tried again at the next run. Abandoned checkouts are cancelled
+50 at a time in a job of their own.
 
 ## Health Check
 

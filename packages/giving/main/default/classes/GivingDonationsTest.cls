@@ -23,11 +23,15 @@ private class GivingDonationsTest {
 	private class FakePayments implements Callable {
 		String status = 'Pending';
 		Map<String, Object> asked;
+		Integer recent = 0;
 
 		public Object call(String action, Map<String, Object> args) {
 			switch on action {
 				when 'isReady' {
 					return true;
+				}
+				when 'countRecent' {
+					return recent;
 				}
 				when 'startCheckout' {
 					asked = args;
@@ -219,6 +223,131 @@ private class GivingDonationsTest {
 			new GivingDonationPage().received(receipt(open.Id, null));
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c WITH USER_MODE]);
+		}
+	}
+
+	private static Gift__c onlineGift(Id appealId, Id donorId, String reference, String status) {
+		Gift__c record = GivingTestDataFactory.buildGift(donorId, 40);
+		record.Appeal__c = appealId;
+		record.Payment_Reference__c = reference;
+		record.Status__c = status;
+		return record;
+	}
+
+	@IsTest
+	static void aLatePaymentAndARefundOfAPendingGiftStepThroughTheStatusRules() {
+		System.runAs(admin()) {
+			Appeal__c open = appeal(true);
+			Id donorId = donor().Id;
+			insert as user new List<Gift__c>{
+				onlineGift(open.Id, donorId, 'pay-late', 'Cancelled'),
+				onlineGift(open.Id, donorId, 'pay-back', 'Pending')
+			};
+
+			Object answered = new GivingDonations()
+				.call(
+					'paymentsChanged',
+					new Map<String, Object>{
+						'payments' => new List<Object>{
+							new Map<String, Object>{
+								'paymentId' => 'pay-late',
+								'status' => 'Paid'
+							},
+							new Map<String, Object>{
+								'paymentId' => 'pay-back',
+								'status' => 'Refunded'
+							}
+						}
+					}
+				);
+
+			Assert.areEqual(true, answered, 'The bulk form is handled');
+			Map<String, String> statuses = new Map<String, String>();
+			for (Gift__c gift : [
+				SELECT Payment_Reference__c, Status__c
+				FROM Gift__c
+				WHERE Payment_Reference__c IN ('pay-late', 'pay-back')
+				WITH USER_MODE
+			]) {
+				statuses.put(gift.Payment_Reference__c, gift.Status__c);
+			}
+			Assert.areEqual(
+				'Received',
+				statuses.get('pay-late'),
+				'Cancelled, then Pending, then Received'
+			);
+			Assert.areEqual(
+				'Refunded',
+				statuses.get('pay-back'),
+				'Pending, then Received, then Refunded'
+			);
+		}
+	}
+
+	@IsTest
+	static void twentySixPaymentsSettleTheirGiftsInOneCall() {
+		System.runAs(admin()) {
+			Appeal__c open = appeal(true);
+			Id donorId = donor().Id;
+			List<Gift__c> gifts = new List<Gift__c>();
+			List<Object> told = new List<Object>();
+			for (Integer i = 0; i < 26; i++) {
+				gifts.add(onlineGift(open.Id, donorId, 'pay-bulk-' + i, 'Pending'));
+				told.add(
+					new Map<String, Object>{ 'paymentId' => 'pay-bulk-' + i, 'status' => 'Paid' }
+				);
+			}
+			insert as user gifts;
+
+			Test.startTest();
+			Integer before = Limits.getQueries();
+			new GivingDonations()
+				.call('paymentsChanged', new Map<String, Object>{ 'payments' => told });
+			Integer used = Limits.getQueries() - before;
+			Test.stopTest();
+
+			Assert.areEqual(
+				26,
+				[SELECT COUNT() FROM Gift__c WHERE Status__c = 'Received' WITH USER_MODE],
+				'Every gift settled'
+			);
+			Assert.isTrue(used < 40, 'Queries do not grow with the payments: ' + used);
+		}
+	}
+
+	@IsTest
+	static void aSmallAmountOrTooManyCheckoutsAreRefusedBeforeTheCheckout() {
+		System.runAs(admin()) {
+			FakePayments payments = new FakePayments();
+			GivingDonations.paymentsForTest = payments;
+			Appeal__c open = appeal(true);
+			List<String> refused = new List<String>();
+			for (Integer recent : new List<Integer>{ 0, GivingDonationPage.CHECKOUTS_PER_HOUR }) {
+				payments.recent = recent;
+				try {
+					new GivingDonationPage()
+						.startCheckout(
+							open.Id,
+							new Map<String, Object>{ 'amount' => recent == 0 ? 1 : 40 },
+							'https://give.example.org/FormsPublic?record=' + open.Id
+						);
+				} catch (GivingDonationPage.DonationPageException expected) {
+					refused.add(expected.getMessage());
+				}
+			}
+
+			Assert.areEqual(
+				new List<String>{
+					BarnHelp.text(
+						'Giving',
+						'Giving_Donate_BelowMinimum',
+						new List<Object>{ (5.0).setScale(2).format() }
+					),
+					BarnHelp.text('Giving', 'Giving_Donate_TooMany')
+				},
+				refused
+			);
+			Assert.isNull(payments.asked, 'No checkout started');
 		}
 	}
 }

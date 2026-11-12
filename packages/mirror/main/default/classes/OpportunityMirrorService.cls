@@ -98,6 +98,9 @@ public with sharing class OpportunityMirrorService {
 
 		/** Writes the grouped refusals of gifts as Warnings, in one statement. */
 		public void writeRefusals() {
+			if (refusals.isEmpty()) {
+				return;
+			}
 			refusals.write(
 				CONTEXT,
 				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOne'),
@@ -107,6 +110,9 @@ public with sharing class OpportunityMirrorService {
 
 		/** Writes the grouped refusals of Opportunities that could not become gifts. */
 		public void writeOpportunityRefusals() {
+			if (refusals.isEmpty()) {
+				return;
+			}
 			refusals.write(
 				CONTEXT,
 				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOneOpportunity'),

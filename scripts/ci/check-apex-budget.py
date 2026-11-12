@@ -85,7 +85,10 @@ CAPS = {
     # 0.5%; the pre-batch review trims it.
     # AR-01 messages move (D-172): BarnHelp.text('Giving', key) in place of Label.<name>,
     # 654,593 measured 2026-11-12 with all five parts, plus about 0.5%.
-    "giving": 657_900,
+    # Giving and Money review fixes (bulk payment listener, status stepping, card-testing
+    # limits, portal payment guard, donation form Health Check): 663,899 measured 2026-11-12,
+    # plus about 0.5%.
+    "giving": 667_300,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -187,7 +190,10 @@ CAPS = {
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
-    "payments": 53_400,
+    # Giving and Money review fixes (bulk listener call, abandon job, callout-time budget,
+    # countRecent, PayPal refund capture, Schedule button): 55,965 measured 2026-11-12, plus
+    # about 0.5%.
+    "payments": 56_300,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%.

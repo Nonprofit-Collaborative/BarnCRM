@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import getSetup from '@salesforce/apex/PaymentsSetupController.getSetup';
 import saveKeys from '@salesforce/apex/PaymentsSetupController.saveKeys';
 import clearKeys from '@salesforce/apex/PaymentsSetupController.clearKeys';
+import scheduleProcessing from '@salesforce/apex/PaymentsSetupController.scheduleProcessing';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 
@@ -55,6 +56,15 @@ export default class PaymentsSetup extends LightningElement {
     },
     get payPalUrl() {
       return helpText('Payments', 'Payments_Setup_PayPalUrl');
+    },
+    get scheduled() {
+      return helpText('Payments', 'Payments_Setup_Scheduled');
+    },
+    get notScheduled() {
+      return helpText('Payments', 'Payments_Setup_NotScheduled');
+    },
+    get schedule() {
+      return helpText('Payments', 'Payments_Setup_Schedule');
     }
   };
 
@@ -141,6 +151,15 @@ export default class PaymentsSetup extends LightningElement {
 
   handleSave() {
     return this.run(() => saveKeys({ keys: this.typed }));
+  }
+
+  get scheduled() {
+    return this.setup.scheduled === true;
+  }
+
+  /** Scheduling stays the admin's click, never automatic (D-195). */
+  handleSchedule() {
+    return this.run(() => scheduleProcessing());
   }
 
   handleClear(event) {

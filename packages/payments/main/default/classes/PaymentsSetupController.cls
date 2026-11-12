@@ -55,6 +55,9 @@ public with sharing class PaymentsSetupController {
 		public String mode;
 		@AuraEnabled
 		public Boolean canManage;
+		/** Whether event processing is scheduled (it never is until an admin chooses; D-195). */
+		@AuraEnabled
+		public Boolean scheduled;
 		@AuraEnabled
 		public List<Receiver> receivers = new List<Receiver>();
 		@AuraEnabled
@@ -101,6 +104,18 @@ public with sharing class PaymentsSetupController {
 		return write(stored);
 	}
 
+	/** Schedules event processing as the person choosing it, as the Health Check fix does. */
+	@AuraEnabled
+	public static Setup scheduleProcessing() {
+		refuseUnlessManager();
+		try {
+			PaymentEventProcessor.schedule();
+			return setup();
+		} catch (Exception unexpected) {
+			throw UserErrors.wrap(unexpected, CONTEXT, true);
+		}
+	}
+
 	private static void refuseUnlessManager() {
 		if (!HealthCheckService.canManageSettings()) {
 			throw UserErrors.message(BarnHelp.text('Payments', 'Payments_Setup_NoManage'));
@@ -127,6 +142,7 @@ public with sharing class PaymentsSetupController {
 		result.processor = PaymentService.defaultProcessor();
 		result.mode = PaymentService.mode();
 		result.canManage = HealthCheckService.canManageSettings();
+		result.scheduled = PaymentEventProcessor.isScheduled();
 		for (PaymentSites.SiteInfo site : PaymentSites.active()) {
 			if (site.url != null) {
 				Receiver receiver = new Receiver();

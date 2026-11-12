@@ -52,6 +52,7 @@ public with sharing class HealthCheckGivingChecks {
 	private static final String CHECK_RECEIPT_GENERATION = 'receipt_generation';
 	private static final String CHECK_OVERRIDE_RECEIPT_LOCK = 'override_receipt_lock';
 	private static final String CHECK_UNPOSTED_CLOSED_PERIOD = 'unposted_gifts_closed_period';
+	private static final String CHECK_DONATION_FORM_AMOUNT = 'donation_form_amount';
 
 	/**
 	 * Every finding Giving adds to the Health Check report, for this viewer. Each check is
@@ -63,6 +64,7 @@ public with sharing class HealthCheckGivingChecks {
 		if (HealthCheckService.canManageSettings()) {
 			checks.add(CHECK_OVERRIDE_RECEIPT_LOCK);
 			checks.add(CHECK_UNPOSTED_CLOSED_PERIOD);
+			checks.add(CHECK_DONATION_FORM_AMOUNT);
 		}
 
 		List<HealthCheckService.Finding> findings = new List<HealthCheckService.Finding>();
@@ -82,6 +84,9 @@ public with sharing class HealthCheckGivingChecks {
 		}
 		if (check == CHECK_UNPOSTED_CLOSED_PERIOD) {
 			return unpostedClosedPeriodFinding();
+		}
+		if (check == CHECK_DONATION_FORM_AMOUNT) {
+			return donationFormAmountFinding();
 		}
 		return receiptGenerationFinding();
 	}
@@ -136,6 +141,102 @@ public with sharing class HealthCheckGivingChecks {
 				HealthCheckService.CATEGORY_SETTINGS
 			)
 			.withFix(Label.Core_ErrorLogTile_ViewAll, ErrorLogCountSelector.listViewUrl());
+	}
+
+	/**
+	 * Active appeals with Donation Page on whose donation form has no `amount` question (R-AP5):
+	 * their page cannot start a checkout. Forms is read by name, so Giving needs no Forms.
+	 */
+	private static HealthCheckService.Finding donationFormAmountFinding() {
+		Schema.SObjectType formType = NamespaceUtil.packagedObjectType('Form__c');
+		Map<Id, List<Appeal__c>> byForm = new Map<Id, List<Appeal__c>>();
+		for (Appeal__c appeal : [
+			SELECT Id, Name, Donation_Form_Key__c
+			FROM Appeal__c
+			WHERE Active__c = TRUE AND Donation_Page__c = TRUE AND Donation_Form_Key__c != NULL
+			WITH USER_MODE
+			LIMIT 200
+		]) {
+			try {
+				Id formId = Id.valueOf(appeal.Donation_Form_Key__c.trim());
+				if (!byForm.containsKey(formId)) {
+					byForm.put(formId, new List<Appeal__c>());
+				}
+				byForm.get(formId).add(appeal);
+			} catch (StringException notAnId) {
+				continue;
+			}
+		}
+		if (formType == null || byForm.isEmpty()) {
+			return null;
+		}
+		Set<Id> formIds = byForm.keySet();
+		String version = NamespaceUtil.qualify('Published_Version__r');
+		String definition = NamespaceUtil.qualify('Definition__c');
+		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
+		for (
+			SObject form : Database.query(
+				'SELECT Id, ' +
+					version +
+					'.' +
+					definition +
+					' FROM ' +
+					formType +
+					' WHERE Id IN :formIds',
+				AccessLevel.SYSTEM_MODE
+			)
+		) {
+			SObject published = form.getSObject(version);
+			if (!asksAmount(published == null ? null : (String) published.get(definition))) {
+				for (Appeal__c appeal : byForm.get(form.Id)) {
+					links.add(new HealthCheckService.Link(appeal));
+				}
+			}
+		}
+		if (links.isEmpty()) {
+			return null;
+		}
+		return new HealthCheckService.Finding(
+				'donation_form_no_amount',
+				BarnHelp.text('Giving', 'Giving_HealthCheck_DonationFormTitle'),
+				BarnHelp.text('Giving', 'Giving_HealthCheck_DonationFormDetail'),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withLinks(links);
+	}
+
+	/** True when a form definition has a question whose key is `amount`. */
+	@TestVisible
+	private static Boolean asksAmount(String definition) {
+		Object steps;
+		try {
+			steps = String.isBlank(definition)
+				? null
+				: ((Map<String, Object>) JSON.deserializeUntyped(definition)).get('steps');
+		} catch (Exception unreadable) {
+			return false;
+		}
+		for (
+			Object step : steps instanceof List<Object> ? (List<Object>) steps : new List<Object>()
+		) {
+			Object fields = step instanceof Map<String, Object>
+				? ((Map<String, Object>) step).get('fields')
+				: null;
+			for (
+				Object field : fields instanceof List<Object>
+					? (List<Object>) fields
+					: new List<Object>()
+			) {
+				if (
+					field instanceof Map<String, Object> &&
+					((Map<String, Object>) field).get('key') == GivingDonationPage.ANSWER_AMOUNT
+				) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	/**

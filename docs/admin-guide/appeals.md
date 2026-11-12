@@ -53,8 +53,9 @@ Site for Forms, and your processor keys entered on Payments Setup (see
    `amount` (the gift amount) and the person questions Forms needs to match the donor (first
    name, last name, email). Keys `email`, `firstName` and `lastName` also fill in the
    processor's page. Publish it and turn on **Public**.
-2. On the appeal, paste the form's record ID into **Donation Form Key** and tick **Donation
-   Page**. The appeal must be **Active**.
+2. On the appeal, paste the form's record ID into **Donation Form ID** and tick **Donation
+   Page**. The appeal must be **Active**. Health Check lists any active appeal with Donation
+   Page on whose form has no `amount` question.
 3. Share `<your Site address>/FormsPublic?record=<the appeal's record ID>`. The page shows
    the appeal's name, description and goal, then the form under **Give Now**.
 
@@ -66,6 +67,15 @@ payment's identifier is in the gift's **Payment Reference**.
 
 If Payments is not installed or its keys are missing, the page shows the appeal and says online
 giving is not open. Recurring online gifts are not offered yet.
+
+Against card testing (stolen cards tried with tiny gifts), a page refuses a gift below
+**Donation Page Minimum Amount** (Settings, Giving section; default 5) and refuses new checkouts
+once the appeal has started 30 in the last hour. A refused gift starts no checkout, the form says
+it could not be sent, and the Error Log says why.
+
+If a payment that was Cancelled is paid late, or a Pending gift is refunded, the gift is moved
+through the step the gift status rules need (Cancelled to Pending to Received; Pending to
+Received to Refunded), so it always ends at the payment's status.
 
 ## List Views
 

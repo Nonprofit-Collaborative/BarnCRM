@@ -133,6 +133,7 @@ public with sharing class PaymentPayPal {
 					total = PaymentStripe.mapOf(resource.get('amount'));
 				}
 				change.amountRefunded = decimalOf(total.get('value'));
+				change.processorPaymentId = refundedCapture(resource);
 				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Refunded');
 			}
 			when 'PAYMENT.CAPTURE.REVERSED' {
@@ -260,6 +261,23 @@ public with sharing class PaymentPayPal {
 			throw new CalloutException('PayPal sign-in failed: ' + response.getStatusCode());
 		}
 		return token;
+	}
+
+	/** A refund's capture id, from its `up` link (`.../v2/payments/captures/{id}`), or null. */
+	@TestVisible
+	private static String refundedCapture(Map<String, Object> refund) {
+		for (
+			Object item : refund.get('links') instanceof List<Object>
+				? (List<Object>) refund.get('links')
+				: new List<Object>()
+		) {
+			Map<String, Object> link = PaymentStripe.mapOf(item);
+			String href = PaymentStripe.text(link.get('href'));
+			if (link.get('rel') == 'up' && href != null && href.contains('/captures/')) {
+				return href.substringAfterLast('/captures/').substringBefore('/');
+			}
+		}
+		return null;
 	}
 
 	private static Decimal decimalOf(Object value) {

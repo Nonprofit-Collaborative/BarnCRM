@@ -16,6 +16,7 @@ import {
 } from 'c/recurringHealthModel';
 
 const HELP = 'Giving';
+const UNMATCHED_CAP = 10000;
 
 const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
@@ -154,10 +155,12 @@ export default class RecurringDonorHealth extends LightningElement {
   }
 
   get unmatchedMessage() {
+    const count = this.page ? this.page.unmatched : 0;
+    // The controller counts up to UNMATCHED_CAP (10,000): at the cap there may be more.
     return helpText(
       'Giving',
       'Giving_RecurringHealth_Unmatched',
-      this.page ? this.page.unmatched : 0
+      count >= UNMATCHED_CAP ? `${UNMATCHED_CAP.toLocaleString()}+` : count
     );
   }
 

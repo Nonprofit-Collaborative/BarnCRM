@@ -18,6 +18,8 @@ private class NpspGivingKitTest {
 	/** Columns the extension adds or the template keys on, beyond the fields a step reads. */
 	private static final Set<String> ADDED = new Set<String>{
 		NpspGivingKit.START_COLUMN,
+		NpspGivingKit.FREQUENCY_COLUMN,
+		NpspGivingKit.STATUS_COLUMN,
 		'Id',
 		'Order',
 		'AssignTo'
@@ -72,6 +74,10 @@ private class NpspGivingKitTest {
 		Assert.areEqual('2026-12-15', NpspGivingKit.startOf(nextPayment, established), 'next');
 		Assert.areEqual('2019-01-15', NpspGivingKit.startOf(null, established), 'closed one');
 		Assert.areEqual('', NpspGivingKit.startOf(null, null), 'neither');
+		Assert.areEqual('Quarterly', NpspGivingKit.frequencyOf('Monthly', '3'), 'every 3 months');
+		Assert.areEqual('Twice a year', NpspGivingKit.frequencyOf('Monthly', '6'), 'every 6');
+		Assert.areEqual('Monthly', NpspGivingKit.frequencyOf('Monthly', null), 'every month');
+		Assert.areEqual('Weekly', NpspGivingKit.frequencyOf('Weekly', '2'), 'kept');
 		NpspGivingKit extension = new NpspGivingKit();
 		Assert.isNull(extension.rows('funds', new List<SObject>()), 'default rows');
 		Assert.isNull(extension.verify('levels'), 'counts are compared');

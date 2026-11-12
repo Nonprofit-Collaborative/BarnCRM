@@ -12,6 +12,8 @@ public with sharing class RecurringHealthController {
 	private static final String KEY_EXPIRY_DAYS = 'Recurring_Card_Expiry_Days__c';
 	private static final Integer DEFAULT_EXPIRY_DAYS = 60;
 	private static final Integer MAX_ROWS = 200;
+	/** Unmatched events are counted up to this many; the page shows it as "10,000+". */
+	private static final Integer UNMATCHED_CAP = 10000;
 
 	public class HealthPage {
 		@AuraEnabled
@@ -98,6 +100,7 @@ public with sharing class RecurringHealthController {
 					FROM Recurring_Gift_Event__c
 					WHERE Match_Status__c = :RecurringGiftUpkeep.UNMATCHED
 					WITH USER_MODE
+					LIMIT :UNMATCHED_CAP
 				];
 			}
 			return page;

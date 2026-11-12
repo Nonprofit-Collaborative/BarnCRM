@@ -89,6 +89,20 @@ private class PaymentsSetupControllerTest {
 	}
 
 	@IsTest
+	static void processingIsShownUnscheduledUntilTheAdminSchedulesIt() {
+		System.runAs(PaymentsTestData.admin()) {
+			Assert.isFalse(PaymentsSetupController.getSetup().scheduled, 'Never automatic');
+
+			Test.startTest();
+			PaymentsSetupController.Setup after = PaymentsSetupController.scheduleProcessing();
+			Test.stopTest();
+
+			Assert.isTrue(after.scheduled, 'Scheduled by the click');
+			Assert.isTrue(PaymentEventProcessor.isScheduled(), 'The four jobs');
+		}
+	}
+
+	@IsTest
 	static void someoneWhoCannotManageSettingsCannotChangeKeys() {
 		User staff = TestUsers.standardUserWith(
 			'Zzpay Staff',

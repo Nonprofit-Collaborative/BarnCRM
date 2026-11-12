@@ -25,6 +25,9 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | 1 | Open **BarnCRM Settings**, **Payments**. | **Processor** Stripe, **Mode** Test, **Default currency** USD, and a **Payments Setup** link. |
 | 2 | Open **Health Check**. | `Payment Keys Are Missing` for Stripe, `Payment Processing Is Not Scheduled` with **Schedule Payment Processing**, and, if the Site guest lacks it, `A Site Guest User Can't Receive Payment News` with **Give Payments Webhook Guest**. |
 | 3 | Select both fixes. | Both findings are gone after the page refreshes. **Setup > Scheduled Jobs** lists four `BarnCRM Payments Processing` jobs. |
+| 4 | Open **Payments Setup**. | "Processing is scheduled" and no **Schedule Processing** button. |
+| 5 | In **Setup > Scheduled Jobs**, delete the four `BarnCRM Payments Processing` jobs. Reload **Payments Setup**. | A warning that processing is not scheduled and a **Schedule Processing** button. |
+| 6 | Select **Schedule Processing**. | "Processing is scheduled"; the four jobs are back in **Scheduled Jobs**. |
 
 **Cleanup:** None.
 

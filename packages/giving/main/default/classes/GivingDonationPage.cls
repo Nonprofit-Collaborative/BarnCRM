@@ -15,6 +15,10 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 	public static final String ANSWER_AMOUNT = 'amount';
 	private static final String OPEN = 'Open';
 	private static final String NONE = 'None';
+	/** Checkouts one appeal's page may start in an hour (card-testing guard). */
+	@TestVisible
+	private static final Integer CHECKOUTS_PER_HOUR = 30;
+	private static final Decimal DEFAULT_MINIMUM = 5;
 
 	@NamespaceAccessible
 	public GivingDonationPage() {
@@ -69,7 +73,9 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 		}
 		Map<String, Object> given = answers == null ? new Map<String, Object>() : answers;
 		String name = (text(given, 'firstName') + ' ' + text(given, 'lastName')).trim();
-		Map<String, Object> started = (Map<String, Object>) GivingDonations.payments()
+		Callable payments = GivingDonations.payments();
+		refuseCardTesting(appeal.Id, given.get(ANSWER_AMOUNT), payments);
+		Map<String, Object> started = (Map<String, Object>) payments
 			.call(
 				'startCheckout',
 				new Map<String, Object>{
@@ -104,6 +110,56 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 	/** Writes the gift, as the staff user processing the submission (decision 5). */
 	public void received(FormSubmissionReceipt receipt) {
 		GivingDonations.record(receipt);
+	}
+
+	/**
+	 * Against card testing (stolen cards tried with small gifts): an amount under the Donation
+	 * Page Minimum Amount setting, or a checkout past CHECKOUTS_PER_HOUR on the appeal in the last
+	 * hour, is refused before any checkout starts.
+	 */
+	@TestVisible
+	private static void refuseCardTesting(Id appealId, Object amount, Callable payments) {
+		Decimal minimum = minimumAmount();
+		Decimal given;
+		try {
+			given = amount == null ? null : Decimal.valueOf(String.valueOf(amount));
+		} catch (TypeException notANumber) {
+			given = null;
+		}
+		if (given == null || given < minimum) {
+			throw new DonationPageException(
+				BarnHelp.text(
+					'Giving',
+					'Giving_Donate_BelowMinimum',
+					new List<Object>{ minimum.setScale(2).format() }
+				)
+			);
+		}
+		Object recent = payments.call(
+			'countRecent',
+			new Map<String, Object>{ 'sourceRecordId' => appealId, 'minutes' => 60 }
+		);
+		if (recent instanceof Integer && (Integer) recent >= CHECKOUTS_PER_HOUR) {
+			throw new DonationPageException(BarnHelp.text('Giving', 'Giving_Donate_TooMany'));
+		}
+	}
+
+	/** The Donation Page Minimum Amount setting; 5 when unset, unreadable or below 0. */
+	private static Decimal minimumAmount() {
+		Object value = SettingsService.getValue(
+			'Giving_Settings__c',
+			'Donation_Page_Minimum_Amount__c'
+		);
+		try {
+			Decimal minimum = value == null ? null : Decimal.valueOf(String.valueOf(value).trim());
+			return minimum == null || minimum < 0 ? DEFAULT_MINIMUM : minimum;
+		} catch (TypeException unreadable) {
+			return DEFAULT_MINIMUM;
+		}
+	}
+
+	/** A checkout the page refuses; Forms logs it and answers Failed. */
+	public class DonationPageException extends Exception {
 	}
 
 	private static Appeal__c published(Id recordId) {

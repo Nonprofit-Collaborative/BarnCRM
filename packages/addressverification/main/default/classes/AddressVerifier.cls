@@ -16,6 +16,12 @@ public with sharing class AddressVerifier {
 	public static final String UNVERIFIED = 'Unverified';
 	/** Lookups one transaction makes, inside the 100 callouts Salesforce allows. */
 	public static final Integer PER_TRANSACTION = 50;
+	/**
+	 * Lookups stop after this long: a transaction allows 120 seconds of callouts and one lookup may
+	 * wait 20, so the rest stay Unverified for the next run.
+	 */
+	@TestVisible
+	private static Long calloutBudgetMs = 95000;
 	/** The fields whose change makes an address Unverified (R-AV2). */
 	public static final List<Schema.SObjectField> WATCHED = new List<Schema.SObjectField>{
 		Address__c.Street__c,
@@ -129,6 +135,7 @@ public with sharing class AddressVerifier {
 		Map<Id, Outcome> found = new Map<Id, Outcome>();
 		List<Address__c> looked = new List<Address__c>();
 		Integer providerErrors = 0;
+		Long started = System.currentTimeMillis();
 		for (Address__c address : [
 			SELECT Id, Street__c, City__c, State__c, Postal_Code__c, Country__c, Status__c
 			FROM Address__c
@@ -138,6 +145,9 @@ public with sharing class AddressVerifier {
 		]) {
 			if (!supports(address) || String.isBlank(address.Street__c)) {
 				continue;
+			}
+			if (System.currentTimeMillis() - started > calloutBudgetMs) {
+				break;
 			}
 			Outcome outcome = lookUp(address);
 			if (outcome == null) {

@@ -20,16 +20,27 @@ private class GivingPortalPaymentsTest {
 	/** Stands in for BarnCRM Payments. */
 	private class FakePayments implements Callable {
 		Map<String, Object> asked;
+		Integer recent = 0;
 
 		public Object call(String action, Map<String, Object> args) {
-			if (action == 'isReady') {
-				return true;
+			switch on action {
+				when 'isReady' {
+					return true;
+				}
+				when 'countRecent' {
+					return recent;
+				}
+				when 'getPayment' {
+					return new Map<String, Object>{ 'amount' => 100.00, 'currency' => 'USD' };
+				}
+				when else {
+					asked = args;
+					return new Map<String, Object>{
+						'paymentId' => 'pay-9',
+						'checkoutUrl' => 'https://checkout.example.com/9'
+					};
+				}
 			}
-			asked = args;
-			return new Map<String, Object>{
-				'paymentId' => 'pay-9',
-				'checkoutUrl' => 'https://checkout.example.com/9'
-			};
 		}
 	}
 
@@ -148,6 +159,76 @@ private class GivingPortalPaymentsTest {
 			Assert.areEqual(person.Id, gifts[0].Donor_Contact__c);
 			Assert.areEqual('Other', gifts[0].Type__c, 'PayPal');
 			Assert.areEqual(Date.newInstance(2026, 11, 3), gifts[0].Gift_Date__c);
+		}
+	}
+
+	@IsTest
+	static void aLinkSentMinutesAgoIsNotSentAgain() {
+		System.runAs(admin()) {
+			FakePayments payments = new FakePayments();
+			payments.recent = 1;
+			GivingDonations.paymentsForTest = payments;
+			RecordingEmailSender sender = new RecordingEmailSender();
+			GivingPortalPayments.emailSender = sender;
+			Contact person = donor('pat.zzpledge@example.org');
+			Commitment__c record = pledge(person.Id);
+
+			Test.startTest();
+			new GivingPortalPayments().run(GivingPortalPayments.PAY_ONLINE, person.Id, record.Id);
+			Test.stopTest();
+
+			Assert.isNull(payments.asked, 'No second checkout');
+			Assert.areEqual(0, sender.received.size(), 'No second email');
+		}
+	}
+
+	@IsTest
+	static void theGiftPaysTheScheduledPaymentTheCheckoutCharged() {
+		System.runAs(admin()) {
+			FakePayments payments = new FakePayments();
+			GivingDonations.paymentsForTest = payments;
+			GivingPortalPayments.emailSender = new RecordingEmailSender();
+			Contact person = donor('pat.zzpledge@example.org');
+			Commitment__c record = pledge(person.Id);
+			List<Installment__c> scheduled = [
+				SELECT Id
+				FROM Installment__c
+				WHERE Commitment__c = :record.Id
+				WITH USER_MODE
+				ORDER BY Due_Date__c
+			];
+
+			Test.startTest();
+			new GivingPortalPayments().run(GivingPortalPayments.PAY_ONLINE, person.Id, record.Id);
+			Test.stopTest();
+			Assert.areEqual(scheduled[0].Id, payments.asked.get('detail'), 'The first one due');
+
+			// A paid report naming the second payment (as if the first was paid meanwhile).
+			new GivingDonations()
+				.call(
+					'paymentChanged',
+					new Map<String, Object>{
+						'paymentId' => 'pay-9',
+						'status' => 'Paid',
+						'sourceRecordId' => record.Id,
+						'personId' => person.Id,
+						'amount' => 100.00,
+						'processor' => 'Stripe',
+						'detail' => String.valueOf(scheduled[1].Id)
+					}
+				);
+
+			Assert.areEqual(
+				scheduled[1].Id,
+				[
+					SELECT Installment__c
+					FROM Gift__c
+					WHERE Payment_Reference__c = 'pay-9'
+					WITH USER_MODE
+				]
+				.Installment__c,
+				'Linked to the payment the checkout charged'
+			);
 		}
 	}
 }

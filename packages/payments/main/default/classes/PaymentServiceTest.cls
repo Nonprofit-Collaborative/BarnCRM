@@ -13,9 +13,12 @@ private class PaymentServiceTest {
 		TestUsers.adminWith(PaymentsTestData.ADMIN);
 	}
 
-	/** A consumer's listener: keeps what it is told. */
+	/** A consumer's listener with only the one-payment form: keeps what it is told. */
 	public class Listener implements Callable {
 		public Object call(String action, Map<String, Object> args) {
+			if (action != 'paymentChanged') {
+				return null;
+			}
 			told.add(action + ':' + args.get('previousStatus') + '>' + args.get('status'));
 			return null;
 		}

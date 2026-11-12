@@ -1,4 +1,5 @@
 import { createElement } from 'lwc';
+import { clearHelpTextForTest, setHelpTextForTest } from 'c/barnHelpText';
 import RecurringDonorHealth from 'c/recurringDonorHealth';
 import getPage from '@salesforce/apex/RecurringHealthController.getPage';
 import createFollowUp from '@salesforce/apex/RecurringHealthController.createFollowUp';
@@ -88,5 +89,14 @@ describe('c-recurring-donor-health', () => {
     element = mount();
     await flush();
     expect(find(element, 'error-message')).not.toBeNull();
+  });
+
+  it('shows a capped unmatched count with a plus', async () => {
+    setHelpTextForTest({ Giving_RecurringHealth_Unmatched: '{0} unmatched' });
+    getPage.mockResolvedValue({ ...PAGE, unmatched: 10000 });
+    const element = mount();
+    await flush();
+    expect(find(element, 'unmatched').message).toBe(`${(10000).toLocaleString()}+ unmatched`);
+    clearHelpTextForTest();
   });
 });

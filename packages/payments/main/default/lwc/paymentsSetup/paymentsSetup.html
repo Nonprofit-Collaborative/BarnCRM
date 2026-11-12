@@ -14,6 +14,19 @@
             </template>
             <template lwc:if={loaded}>
                 <p class="slds-var-m-bottom_medium" data-id="mode">{modeText}</p>
+                <template lwc:if={scheduled}>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.scheduled} data-id="scheduled"></c-barn-notice>
+                </template>
+                <template lwc:else>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="warning" message={labels.notScheduled} data-id="not-scheduled"></c-barn-notice>
+                    <lightning-button
+                        class="slds-var-m-bottom_medium"
+                        label={labels.schedule}
+                        disabled={locked}
+                        data-id="schedule"
+                        onclick={handleSchedule}
+                    ></lightning-button>
+                </template>
                 <template lwc:if={noSiteShown}>
                     <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.noSite} data-id="no-site"></c-barn-notice>
                 </template>
