@@ -66,6 +66,9 @@ public with sharing class GiftTransactionMirrorService {
 
 		/** Writes the grouped refusals as Warnings, in one statement. */
 		public void writeRefusals() {
+			if (refusals.isEmpty()) {
+				return;
+			}
 			refusals.write(
 				CONTEXT,
 				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogOne'),

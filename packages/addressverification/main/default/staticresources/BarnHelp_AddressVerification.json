@@ -2,7 +2,7 @@
   "languages": ["en"],
   "texts": {
     "AddressVerification_Error_BadProvider": "Choose Smarty or Google.",
-    "AddressVerification_Error_Provider": "{0} did not answer for {1} addresses. They stay Unverified and are tried again tonight. Check your keys and your provider account's allowance.",
+    "AddressVerification_Error_Provider": "{0} did not answer for {1} addresses. They stay Unverified and are tried again tonight. Check your keys and your provider account''s allowance.",
     "AddressVerification_Health_KeysMissingDetail": "Address Verification is on but the {0} keys are not entered, so no address is checked. Enter them on Address Verification Setup, or choose the provider you have an account with in Settings, Addresses.",
     "AddressVerification_Health_KeysMissingTitle": "Address Verification Keys Are Missing",
     "AddressVerification_Health_WaitingDetail": "{0} current addresses have been Unverified for more than 30 days. Raise the nightly limit, select Verify Waiting Addresses on Address Verification Setup, or, with Smarty, check whether they are outside the United States, which Smarty does not check.",

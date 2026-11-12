@@ -19,6 +19,11 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 	/** The recurring steps' columns as the kit writes them, read from the default rows. */
 	private static final String NEXT_FIELD = 'npe03.Next_Payment_Date__c';
 	private static final String ESTABLISHED_FIELD = 'npe03.Date_Established__c';
+	/** The columns the recurring templates map to Frequency and Status, built from two fields each. */
+	@TestVisible
+	private static final String FREQUENCY_COLUMN = 'Frequency';
+	@TestVisible
+	private static final String STATUS_COLUMN = 'Status';
 
 	@NamespaceAccessible
 	public NpspGivingKit() {
@@ -42,6 +47,18 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 				row.put(
 					START_COLUMN,
 					startOf((String) row.get(NEXT_FIELD), (String) row.get(ESTABLISHED_FIELD))
+				);
+				row.put(
+					FREQUENCY_COLUMN,
+					frequencyOf(
+						(String) row.get('npe03.Installment_Period__c'),
+						(String) row.get('npsp.InstallmentFrequency__c')
+					)
+				);
+				String status = (String) row.get('npsp.Status__c');
+				row.put(
+					STATUS_COLUMN,
+					String.isBlank(status) ? (String) row.get('npe03.Open_Ended_Status__c') : status
 				);
 			}
 		}
@@ -107,6 +124,34 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 			result.add(String.valueOf(record.get(field)));
 		}
 		return result;
+	}
+
+	/**
+	 * NPSP's period and its "every so many" count as one BarnCRM frequency: monthly every 3 is
+	 * Quarterly, every 6 Twice a year, every 12 Yearly. Any other count keeps the period.
+	 */
+	@TestVisible
+	private static String frequencyOf(String period, String every) {
+		Integer count;
+		try {
+			count = String.isBlank(every) ? 1 : Decimal.valueOf(every.trim()).intValue();
+		} catch (TypeException notANumber) {
+			count = 1;
+		}
+		if (period == 'Monthly') {
+			switch on count {
+				when 3 {
+					return 'Quarterly';
+				}
+				when 6 {
+					return 'Twice a year';
+				}
+				when 12 {
+					return 'Yearly';
+				}
+			}
+		}
+		return period;
 	}
 
 	/** The next payment date, else the date established, as a file would hold it. */

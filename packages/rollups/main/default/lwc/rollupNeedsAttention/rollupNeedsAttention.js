@@ -90,8 +90,12 @@ export default class RollupNeedsAttention extends LightningElement {
    * Shown to someone who can act on it, or with the error a load ended in. Staff and Read Only
    * see the Builder without it: the queue is not read for them (RollupAttentionController).
    */
+  // Reads helpReady so the section renders again once the help text (nightlyOff, nothingFailed)
+  // has loaded: those getters on the plain labels object are not reactive themselves.
   get shown() {
-    return !!this.error || !!this.notice || (this.canManageList && this.hasItems);
+    return (
+      this.helpReady && (!!this.error || !!this.notice || (this.canManageList && this.hasItems))
+    );
   }
 
   get canManageList() {

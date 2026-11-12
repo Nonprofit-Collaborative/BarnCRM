@@ -1,3 +1,4 @@
+import * as help from 'c/barnHelpText';
 import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import RollupNeedsAttention from 'c/rollupNeedsAttention';
@@ -132,6 +133,24 @@ describe('c-rollup-needs-attention', () => {
 
     const readOnly = await build({ ...ATTENTION, hasWaiting: true, canManage: false });
     expect(query(readOnly, 'start-now')).toBeNull();
+  });
+
+  it('renders its help text once the Rollups help has loaded', async () => {
+    let release;
+    jest.spyOn(help, 'isHelpLoaded').mockReturnValue(false);
+    jest.spyOn(help, 'loadHelp').mockReturnValue(
+      new Promise((resolve) => {
+        release = resolve;
+      })
+    );
+    const element = await build({ ...ATTENTION, failed: [] });
+    expect(query(element, 'needs-attention')).toBeNull();
+
+    release();
+    await flush();
+    expect(query(element, 'nightly-off').message).toBe('c.Core_RollupBuilder_NightlyOff');
+    expect(query(element, 'nothing-failed').heading).toBe('c.Core_RollupBuilder_NothingFailed');
+    jest.restoreAllMocks();
   });
 
   it('shows nothing to someone who cannot manage settings', async () => {
