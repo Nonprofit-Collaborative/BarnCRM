@@ -218,4 +218,85 @@ private class FieldHistoryServiceTest {
 			Assert.isNull(fine, 'Nothing to say when every field can be kept');
 		}
 	}
+
+	@IsTest
+	static void theCardShowsWhetherItIsOnAndTheKeptChanges() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, new List<String>{ CITY });
+			List<Address__c> places = addresses(1);
+			moveTo(places, 'Shelbyville');
+
+			Test.startTest();
+			FieldHistoryController.HistoryView whileOn = FieldHistoryController.getHistory(
+				places[0].Id
+			);
+			turnOn(false, new List<String>{ CITY });
+			FieldHistoryController.HistoryView whileOff = FieldHistoryController.getHistory(
+				places[0].Id
+			);
+			Test.stopTest();
+
+			Assert.isTrue(whileOn.enabled, 'The card is on');
+			Assert.areEqual(1, whileOn.entries.size(), 'The kept change is listed');
+			Assert.isFalse(whileOff.enabled, 'The card reports it is off');
+		}
+	}
+
+	@IsTest
+	static void aRecordThatCannotBeReadHasNoCard() {
+		System.runAs(TestUsers.admin()) {
+			Id missing =
+				Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000009';
+			Test.startTest();
+			try {
+				FieldHistoryController.getHistory(missing);
+				Assert.fail('A record that is not there has no history to show');
+			} catch (AuraHandledException refused) {
+				Assert.isTrue(String.isNotBlank(refused.getMessage()), 'Told why');
+			}
+			Test.stopTest();
+		}
+	}
+
+	@IsTest
+	static void onlyAnAdminRestoresAndAnUnreadableRowIsLogged() {
+		User noAccess;
+		System.runAs(TestUsers.admin()) {
+			noAccess = TestUsers.minimumAccessUserWith('Zztest NoRestore', new List<String>());
+		}
+		System.runAs(noAccess) {
+			try {
+				FieldHistoryController.restore(
+					Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getKeyPrefix() + '000000000001',
+					Field_History__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getKeyPrefix() + '000000000001',
+					'City__c'
+				);
+				Assert.fail('Restore is for admins');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_FieldHistory_NoPermission'),
+					refused.getMessage(),
+					'Told why'
+				);
+			}
+		}
+		System.runAs(TestUsers.admin()) {
+			Field_History__c broken = new Field_History__c(
+				Record_Id__c = '001000000000001AAA',
+				Changes__c = 'not json'
+			);
+			insert as system broken;
+			Test.startTest();
+			try {
+				FieldHistoryController.restore(broken.Record_Id__c, broken.Id, 'City__c');
+				Assert.fail('A row that cannot be read is not restored');
+			} catch (AuraHandledException refused) {
+				Assert.isTrue(String.isNotBlank(refused.getMessage()), 'Told something');
+			}
+			Test.stopTest();
+		}
+	}
 }

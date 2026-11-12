@@ -56,4 +56,74 @@ private class TerritoryNightlyJobProviderTest {
 			Assert.areEqual(1, run.Changes__c, 'Alvarez moved');
 		}
 	}
+
+	@IsTest
+	static void aRuleThatCannotRunIsLoggedAndNothingStarts() {
+		System.runAs(TestUsers.adminWith('Territory_Admin')) {
+			Territory__c north = new Territory__c(
+				Name = 'North',
+				Priority__c = 1,
+				Routing__c = TerritoryRouting.KEEP_OWNER
+			);
+			insert as user north;
+			insert as system new Territory_Rule__c(
+				Territory__c = north.Id,
+				Applies_To__c = TerritoryRunBatch.KIND_PEOPLE,
+				Filter_JSON__c = '{"version": 1, "conditions": [{"id": 1, "field": "No_Such_Field__c", "operator": "equals", "value": "x"}]}',
+				Active__c = true
+			);
+
+			Test.startTest();
+			new TerritoryNightlyJobProvider.Assign().execute(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Territory_Run__c WITH SYSTEM_MODE],
+				'A rule that cannot run starts no run'
+			);
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'TerritoryNightlyJobProvider'
+					WITH SYSTEM_MODE
+				],
+				'The refusal is written to the Error Log'
+			);
+		}
+	}
+
+	@IsTest
+	static void itStartsNothingWhileARunIsBusy() {
+		System.runAs(TestUsers.adminWith('Territory_Admin')) {
+			Territory__c north = new Territory__c(
+				Name = 'North',
+				Priority__c = 1,
+				Routing__c = TerritoryRouting.KEEP_OWNER
+			);
+			insert as user north;
+			insert as user new Territory_Rule__c(
+				Territory__c = north.Id,
+				Applies_To__c = TerritoryRunBatch.KIND_PEOPLE,
+				Active__c = true
+			);
+			insert as system new Territory_Run__c(
+				Mode__c = TerritoryRunBatch.MODE_ASSIGN,
+				Status__c = TerritoryRunBatch.STATUS_RUNNING
+			);
+			Assert.isTrue(TerritoryRunBatch.busy(), 'A run is going');
+
+			Test.startTest();
+			new TerritoryNightlyJobProvider.Assign().execute(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Territory_Run__c WITH SYSTEM_MODE],
+				'The busy run is the only one: the nightly step waits'
+			);
+		}
+	}
 }

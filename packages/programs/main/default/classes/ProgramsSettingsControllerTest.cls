@@ -54,4 +54,67 @@ private class ProgramsSettingsControllerTest {
 			Assert.areEqual(0, settings.intakePicklists.size(), 'No picklists.');
 		}
 	}
+
+	@IsTest
+	static void anAdminSavesTheParticipantPrivacyPresetOrgWide() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			Assert.areEqual(
+				ProgramsSharing.SHARED,
+				ProgramsSettingsController.getSettings().participantPrivacy,
+				'Shared until an admin chooses'
+			);
+
+			Test.startTest();
+			ProgramsSettingsController.Settings saved = ProgramsSettingsController.savePrivacy(
+				true
+			);
+			Test.stopTest();
+
+			Assert.areEqual(ProgramsSharing.PRIVATE_PRESET, saved.participantPrivacy, 'Private');
+			Assert.isTrue(ProgramsSharing.isPrivate(), 'Saved org-wide');
+			Assert.areEqual(
+				ProgramsSharing.SHARED,
+				ProgramsSettingsController.savePrivacy(false).participantPrivacy,
+				'And back to Shared'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPageThatCannotLoadIsRefusedWithAMessage() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			// A broken entry in the list makes the read fail the way an unreadable field would.
+			ProgramsSettingsController.INTAKE_PICKLISTS.add(null);
+			try {
+				ProgramsSettingsController.getSettings();
+				Assert.fail('The page could not be read');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Programs', 'Programs_Fail_SettingsLoad'),
+					refused.getMessage(),
+					'Told in the page\'s words'
+				);
+			}
+		}
+	}
+
+	@IsTest
+	static void aReaderCannotSaveThePrivacyPreset() {
+		System.runAs(TestUsers.standardUserWith(
+			'Reader',
+			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
+		)) {
+			try {
+				ProgramsSettingsController.savePrivacy(true);
+				Assert.fail('Refused');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Programs', 'Programs_Settings_NoAccess'),
+					refused.getMessage(),
+					'Told why'
+				);
+			}
+			Assert.isFalse(ProgramsSharing.isPrivate(), 'Nothing changed');
+		}
+	}
 }

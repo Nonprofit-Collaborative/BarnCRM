@@ -110,4 +110,49 @@ private class AddressVerificationControllerTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void healthCheckSaysNothingToSomeoneWhoCannotManageSettingsOrWhileTheModuleIsOff() {
+		User staff = [SELECT Id FROM User WHERE LastName = 'Zzav Staff' WITH SYSTEM_MODE LIMIT 1];
+		System.runAs(staff) {
+			Assert.isTrue(
+				new AddressVerificationHealthCheckExtension().findings().isEmpty(),
+				'Staff cannot manage settings, so nothing is reported'
+			);
+		}
+		System.runAs(AddressVerificationTestData.admin()) {
+			ModuleManagerService.turnOff(AddressVerifier.MODULE);
+			Assert.isFalse(AddressVerifier.isOn(), 'The module is off');
+			Assert.isTrue(
+				new AddressVerificationHealthCheckExtension().findings().isEmpty(),
+				'Nothing is reported while the module is off'
+			);
+		}
+	}
+
+	@IsTest
+	static void healthCheckCountsCurrentAddressesStillUnverifiedAfterThirtyDays() {
+		System.runAs(AddressVerificationTestData.admin()) {
+			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
+			AddressVerificationTestData.addresses(2, 'United States');
+
+			Assert.isTrue(
+				new AddressVerificationHealthCheckExtension().findings().isEmpty(),
+				'Addresses changed just now are not waiting yet'
+			);
+			// A test cannot age a record, so the wait is moved to put the cut-off tomorrow.
+			AddressVerificationHealthCheckExtension.waitDays = -1;
+			Assert.areEqual(
+				2,
+				AddressVerificationHealthCheckExtension.waitingCount(),
+				'Both current, unverified addresses are now past the wait'
+			);
+			List<HealthCheckService.Finding> found = new AddressVerificationHealthCheckExtension()
+				.findings();
+
+			Assert.areEqual(1, found.size(), 'The waiting count is reported');
+			Assert.areEqual('address_verification_waiting', found[0].key, 'The finding');
+			Assert.areEqual(HealthCheckService.SEVERITY_INFO, found[0].severity, 'Info only');
+		}
+	}
 }

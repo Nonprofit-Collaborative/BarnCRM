@@ -123,4 +123,83 @@ private class TerritoryControllerTest {
 			}
 		}
 	}
+
+	@IsTest
+	static void thePageShowsMembersAndRunsWithTheirDataJobs() {
+		System.runAs(TestUsers.adminWith('Territory_Admin')) {
+			Territory__c north = northWithRule();
+			insert as user new Territory_Member__c(
+				Territory__c = north.Id,
+				User__c = UserInfo.getUserId(),
+				Capacity__c = 5
+			);
+			Import_Batch__c job = new Import_Batch__c(
+				Operation__c = 'Update',
+				Status__c = ImportBatchService.STATUS_COMPLETE
+			);
+			insert as system job;
+			insert as system new List<Territory_Run__c>{
+				new Territory_Run__c(
+					Mode__c = TerritoryRunBatch.MODE_ASSIGN,
+					Status__c = TerritoryRunBatch.STATUS_DONE,
+					Data_Job_Id__c = job.Id
+				),
+				new Territory_Run__c(
+					Mode__c = TerritoryRunBatch.MODE_PREVIEW,
+					Status__c = TerritoryRunBatch.STATUS_DONE
+				)
+			};
+
+			Map<String, Object> page = TerritoryController.getPage();
+
+			Map<String, Object> shown = (Map<String, Object>) ((List<Object>) page.get(
+				'territories'
+			))[0];
+			List<Object> members = (List<Object>) shown.get('members');
+			Assert.areEqual(1, members.size(), 'The member is listed');
+			Map<String, Object> member = (Map<String, Object>) members[0];
+			Assert.areEqual(UserInfo.getUserId(), member.get('userId'), 'Who it is');
+			Assert.areEqual(true, member.get('userActive'), 'Active');
+			Integer undoable = 0;
+			for (Object item : (List<Object>) page.get('runs')) {
+				Map<String, Object> run = (Map<String, Object>) item;
+				if (run.get('canUndo') == true) {
+					undoable++;
+					Assert.areEqual(
+						ImportBatchService.STATUS_COMPLETE,
+						run.get('jobStatus'),
+						'The job status is read'
+					);
+				}
+			}
+			Assert.areEqual(1, undoable, 'Only the run with a finished Data job can be undone');
+		}
+	}
+
+	@IsTest
+	static void aRunNeedsAKnownModeAndARuleCountNeedsAKnownKind() {
+		System.runAs(TestUsers.adminWith('Territory_Admin')) {
+			northWithRule();
+			try {
+				TerritoryController.startRun('Other', false);
+				Assert.fail('Only Preview and Assign run');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Territory', 'Territory_Error_NothingToRun'),
+					refused.getMessage(),
+					'Told why'
+				);
+			}
+			try {
+				TerritoryController.countRule('Widgets', null);
+				Assert.fail('An unknown kind is not counted');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Territory', 'Territory_Error_NothingToRun'),
+					refused.getMessage(),
+					'Told why'
+				);
+			}
+		}
+	}
 }
