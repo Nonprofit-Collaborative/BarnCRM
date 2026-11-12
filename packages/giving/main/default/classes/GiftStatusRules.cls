@@ -35,16 +35,20 @@ public with sharing class GiftStatusRules {
 			}
 			if (after == STATUS_CANCELLED) {
 				if (before != STATUS_PENDING) {
-					gift.Status__c.addError(Label.Giving_Gift_CancelOnlyPending);
+					gift.Status__c.addError(
+						BarnHelp.text('Giving', 'Giving_Gift_CancelOnlyPending')
+					);
 					continue;
 				}
 				gift.Installment__c = null;
 			} else if (before == STATUS_CANCELLED && after != STATUS_PENDING) {
-				gift.Status__c.addError(Label.Giving_Gift_CancelledOnlyToPending);
+				gift.Status__c.addError(
+					BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending')
+				);
 			} else if (before == STATUS_PENDING && REVERSED.contains(after)) {
 				gift.Status__c.addError(
 					String.format(
-						Label.Giving_Gift_ReverseNeedsReceived,
+						BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'),
 						new List<String>{ STATUS_PENDING }
 					)
 				);
@@ -73,12 +77,15 @@ public with sharing class GiftStatusRules {
 			String after = statusOf(gift);
 			if (after == STATUS_CANCELLED && before != STATUS_CANCELLED) {
 				entries.add(
-					String.format(Label.Giving_Gift_CancelledLogged, new List<String>{ gift.Name })
+					String.format(
+						BarnHelp.text('Giving', 'Giving_Gift_CancelledLogged'),
+						new List<String>{ gift.Name }
+					)
 				);
 			} else if (before == STATUS_CANCELLED && after != STATUS_CANCELLED) {
 				entries.add(
 					String.format(
-						Label.Giving_Gift_UncancelledLogged,
+						BarnHelp.text('Giving', 'Giving_Gift_UncancelledLogged'),
 						new List<String>{ gift.Name }
 					)
 				);

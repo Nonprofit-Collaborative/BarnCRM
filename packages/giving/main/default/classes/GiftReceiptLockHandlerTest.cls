@@ -178,20 +178,23 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				amountRefusal != null && amountRefusal.contains(Label.Giving_Gift_ReceiptLocked),
+				amountRefusal != null &&
+				amountRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'Changing the amount contradicts the document the donor holds.'
 			);
 			Assert.isTrue(
-				dateRefusal != null && dateRefusal.contains(Label.Giving_Gift_ReceiptLocked),
+				dateRefusal != null &&
+				dateRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'So does changing the date the receipt states.'
 			);
 			Assert.isTrue(
-				donorRefusal != null && donorRefusal.contains(Label.Giving_Gift_ReceiptLocked),
+				donorRefusal != null &&
+				donorRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'So does moving the gift to another donor.'
 			);
 			Assert.isTrue(
 				numberRefusal != null &&
-				numberRefusal.contains(Label.Giving_Gift_ReceiptNumberLocked),
+				numberRefusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberLocked')),
 				'And the number itself is locked, or the lock could be lifted in two saves.'
 			);
 
@@ -229,7 +232,8 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null && refusal.contains(Label.Giving_Gift_ReceiptedGiftNotDeletable),
+				refusal != null &&
+				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptedGiftNotDeletable')),
 				'A receipted gift is corrected by a refund or a reissue, never deleted.'
 			);
 			Assert.areEqual(
@@ -252,7 +256,8 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null && refusal.contains(Label.Giving_Gift_ReceiptLocked),
+				refusal != null &&
+				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked')),
 				'The pause stops BarnCRM filling things in, never stops it refusing something.'
 			);
 			Assert.areEqual(
@@ -352,7 +357,8 @@ private class GiftReceiptLockHandlerTest {
 				'At Warning, which is what the Error Log page filters on.'
 			);
 			Assert.isTrue(
-				logged[0].Message__c.contains(Label.Giving_Gift_OverrideDeleted),
+				logged[0]
+					.Message__c.contains(BarnHelp.text('Giving', 'Giving_Gift_OverrideDeleted')),
 				'Saying what was done, not just that something was: ' + logged[0].Message__c
 			);
 		}
@@ -386,7 +392,8 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null && refusal.contains(Label.Giving_Gift_ReversedGiftNotDeletable),
+				refusal != null &&
+				refusal.contains(BarnHelp.text('Giving', 'Giving_Gift_ReversedGiftNotDeletable')),
 				'Refused for the reason R-G3 gives, not the receipt one: ' + refusal
 			);
 			Assert.areEqual(
@@ -445,7 +452,10 @@ private class GiftReceiptLockHandlerTest {
 				'sets make it read only, so the field is not offered for editing anywhere.'
 			);
 			Assert.isTrue(
-				refusal != null && refusal.contains(Label.Giving_Gift_ReceiptNumberNotIssuedByHand),
+				refusal != null &&
+				refusal.contains(
+					BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')
+				),
 				'And the refusal does not depend on that: a number typed onto a gift is refused ' +
 					'whoever was granted the field, because it came from no sequence: ' +
 					refusal
@@ -488,7 +498,10 @@ private class GiftReceiptLockHandlerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				refusal != null && refusal.contains(Label.Giving_Gift_ReceiptNumberNotIssuedByHand),
+				refusal != null &&
+				refusal.contains(
+					BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')
+				),
 				'Creating the gift with the number in place is the same tamper as typing it on ' +
 					'afterwards, so it is refused the same way: ' +
 					refusal
@@ -563,7 +576,7 @@ private class GiftReceiptLockHandlerTest {
 				'the gifts it is for rather than lifting the rule for the whole transaction.'
 			);
 			Assert.areEqual(
-				Label.Giving_Gift_ReceiptNumberNotIssuedByHand,
+				BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand'),
 				results[1].getErrors()[0].getMessage(),
 				'And refused for the right reason: that number came from no sequence.'
 			);

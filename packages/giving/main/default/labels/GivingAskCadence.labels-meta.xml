@@ -9,22 +9,6 @@
     <value>Ask {0}: next ask is due</value>
   </labels>
   <labels>
-    <fullName>Giving_AskReminder_Description</fullName>
-    <categories>Giving, Ask Cadence</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Ask reminder task: description</shortDescription>
-    <value>This donor's Next Ask Date has arrived. Make the ask, then set a new Next Ask Date and update Last Touch Date on the donor record.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_AskReminder_SummaryFormat</fullName>
-    <categories>Giving, Ask Cadence</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the last ask reminder pass did</shortDescription>
-    <value>Created {0} ask reminders. {1} could not be created and are in the Error Log.</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_AskRemindersName</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>

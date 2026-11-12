@@ -82,16 +82,19 @@ private class AccountingPeriodControllerTest {
 				AccountingPeriodController.closeThrough(lastMonthEnd());
 				Assert.areEqual(lastMonthEnd(), GiftPostingLock.closedThrough(), 'Forward is fine');
 
-				Assert.areEqual(Label.Giving_Periods_NotBeforeToday, refusalOf(Date.today()));
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'),
+					refusalOf(Date.today())
+				);
 				// Yesterday in Maria's time zone can be today in the org's.
 				Assert.areEqual(
-					Label.Giving_Periods_NotBeforeToday,
+					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'),
 					refusalOf(Date.today().addDays(-1))
 				);
 				AccountingPeriodController.closeThrough(Date.today().addDays(-2));
 				Assert.areEqual(Date.today().addDays(-2), GiftPostingLock.closedThrough());
 				Assert.areEqual(
-					Label.Giving_Periods_NotBeforeToday,
+					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'),
 					refusalOf(Date.today().addDays(3))
 				);
 				Assert.isNull(
@@ -110,12 +113,12 @@ private class AccountingPeriodControllerTest {
 				AccountingPeriodController.closeThrough(lastMonthEnd());
 
 				Assert.areEqual(
-					Label.Giving_Periods_ReopenNeedsOverride,
+					BarnHelp.text('Giving', 'Giving_Periods_ReopenNeedsOverride'),
 					refusalOf(lastMonthEnd().addDays(-5)),
 					'Moving back reopens days'
 				);
 				Assert.areEqual(
-					Label.Giving_Periods_ReopenNeedsOverride,
+					BarnHelp.text('Giving', 'Giving_Periods_ReopenNeedsOverride'),
 					refusalOf(null),
 					'Clearing reopens everything'
 				);
@@ -168,7 +171,10 @@ private class AccountingPeriodControllerTest {
 			System.runAs(david()) {
 				AccountingPeriodController.PeriodView view = AccountingPeriodController.getPeriod();
 				Assert.isFalse(view.canManage);
-				Assert.areEqual(Label.Giving_Periods_PermissionRequired, refusalOf(lastMonthEnd()));
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Periods_PermissionRequired'),
+					refusalOf(lastMonthEnd())
+				);
 				Assert.isNull(GiftPostingLock.closedThrough(), 'Nothing closed');
 			}
 

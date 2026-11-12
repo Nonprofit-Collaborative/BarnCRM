@@ -14,7 +14,11 @@ private class ReceiptGiftStatusTest {
 			ReceiptService.issueForGift(giftId);
 			Assert.fail(why);
 		} catch (ReceiptService.ReceiptServiceException refused) {
-			Assert.areEqual(Label.Giving_Receipt_GiftNotReceived, refused.getMessage(), why);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Receipt_GiftNotReceived'),
+				refused.getMessage(),
+				why
+			);
 		}
 	}
 

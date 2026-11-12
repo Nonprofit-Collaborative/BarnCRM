@@ -51,7 +51,9 @@ public with sharing class GiftPostingController {
 			? new List<Gift__c>()
 			: GiftPostingSelector.selectForPosting(new Set<Id>{ giftId });
 		if (found.isEmpty()) {
-			throw new GiftPostingService.GiftPostingException(Label.Giving_Posting_NotPosted);
+			throw new GiftPostingService.GiftPostingException(
+				BarnHelp.text('Giving', 'Giving_Posting_NotPosted')
+			);
 		}
 		Gift__c gift = found[0];
 		state.inBooks = GiftPostingLock.isInBooks(gift);
@@ -71,7 +73,7 @@ public with sharing class GiftPostingController {
 			caught,
 			caught instanceof GiftPostingService.GiftPostingException,
 			context,
-			Label.Giving_Periods_UnexpectedError
+			BarnHelp.text('Giving', 'Giving_Periods_UnexpectedError')
 		);
 	}
 }

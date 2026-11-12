@@ -45,7 +45,7 @@ public with sharing class PledgeReminderBatch implements Database.Batchable<SObj
 
 	public void finish(Database.BatchableContext context) {
 		String summary = String.format(
-			Label.Giving_PledgeReminders_RunSummary,
+			BarnHelp.text('Giving', 'Giving_PledgeReminders_RunSummary'),
 			new List<String>{
 				String.valueOf(totals.emails),
 				String.valueOf(totals.letters),

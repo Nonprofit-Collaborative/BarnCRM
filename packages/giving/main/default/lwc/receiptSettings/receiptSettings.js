@@ -12,9 +12,7 @@ import startStatementRun from '@salesforce/apex/ReceiptController.startStatement
 
 import TEMPLATES_TAB from '@salesforce/label/c.Giving_Receipt_TemplatesTab';
 import STATEMENTS_TAB from '@salesforce/label/c.Giving_Receipt_StatementsTab';
-import NO_TEMPLATES from '@salesforce/label/c.Giving_Receipt_NoTemplates';
 import RESTORE from '@salesforce/label/c.Giving_Receipt_RestoreButton';
-import READ_ONLY from '@salesforce/label/c.Giving_Receipt_NoTemplatePermission';
 import LETTER_PICKER from '@salesforce/label/c.Giving_Receipt_LetterPicker';
 import LETTER_OPTION from '@salesforce/label/c.Core_Format_Parenthetical';
 import LETTER_OPTION_OFF from '@salesforce/label/c.Giving_Receipt_LetterOptionOff';
@@ -34,11 +32,6 @@ import COLUMN_ISSUED from '@salesforce/label/c.Giving_Receipt_ColumnIssued';
 import COLUMN_ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import NO_RUNS from '@salesforce/label/c.Giving_Receipt_NoRuns';
 import NO_TEMPLATES_HEADING from '@salesforce/label/c.Giving_Receipt_NoTemplatesHeading';
-import RESTORED_MESSAGE from '@salesforce/label/c.Giving_Receipt_RestoredMessage';
-import SAVED_MESSAGE from '@salesforce/label/c.Giving_Receipt_SavedMessage';
-import ACTIVATED_MESSAGE from '@salesforce/label/c.Giving_Receipt_ActivatedMessage';
-import STARTED_MESSAGE from '@salesforce/label/c.Giving_Receipt_StartedMessage';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TOKENS = [
@@ -118,10 +111,14 @@ export default class ReceiptSettings extends LightningElement {
   labels = {
     templatesTab: TEMPLATES_TAB,
     statementsTab: STATEMENTS_TAB,
-    noTemplates: NO_TEMPLATES,
+    get noTemplates() {
+      return helpText('Giving', 'Giving_Receipt_NoTemplates');
+    },
     noTemplatesHeading: NO_TEMPLATES_HEADING,
     restore: RESTORE,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Giving', 'Giving_Receipt_NoTemplatePermission');
+    },
     letterPicker: LETTER_PICKER,
     editor: EDITOR,
     get letterheadNote() {
@@ -280,13 +277,17 @@ export default class ReceiptSettings extends LightningElement {
    * install (ADR-0029); this is the button that says so out loud when they are not there.
    */
   async handleRestore() {
-    await this.act(() => restoreDefaultTemplates(), RESTORED_MESSAGE, this.wiredTemplates);
+    await this.act(
+      () => restoreDefaultTemplates(),
+      helpText('Giving', 'Giving_Receipt_RestoredMessage'),
+      this.wiredTemplates
+    );
   }
 
   async handleSave() {
     await this.act(
       () => saveTemplate({ templateId: this.selectedTemplateId, body: this.draftBody }),
-      SAVED_MESSAGE,
+      helpText('Giving', 'Giving_Receipt_SavedMessage'),
       this.wiredTemplates
     );
   }
@@ -312,7 +313,7 @@ export default class ReceiptSettings extends LightningElement {
   async handleActivate() {
     await this.act(
       () => activateTemplate({ templateId: this.selectedTemplateId }),
-      ACTIVATED_MESSAGE,
+      helpText('Giving', 'Giving_Receipt_ActivatedMessage'),
       this.wiredTemplates
     );
   }
@@ -320,7 +321,7 @@ export default class ReceiptSettings extends LightningElement {
   async handleGenerate() {
     await this.act(
       () => startStatementRun({ statementYear: this.statementYear }),
-      STARTED_MESSAGE,
+      helpText('Giving', 'Giving_Receipt_StartedMessage'),
       this.wiredRuns
     );
   }
@@ -356,6 +357,6 @@ export default class ReceiptSettings extends LightningElement {
     if (error && error.body && error.body.message) {
       return error.body.message;
     }
-    return UNEXPECTED_ERROR;
+    return helpText('Giving', 'Giving_Receipt_UnexpectedError');
   }
 }

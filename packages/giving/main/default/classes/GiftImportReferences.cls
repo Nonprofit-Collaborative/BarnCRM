@@ -43,8 +43,8 @@ public with sharing class GiftImportReferences {
 				if (part.fundId == null && item.error == null) {
 					item.error = String.format(
 						funds.isAmbiguous(part.fund)
-							? Label.Giving_Import_ErrorFundAmbiguous
-							: Label.Giving_Import_ErrorFundNotFound,
+							? BarnHelp.text('Giving', 'Giving_Import_ErrorFundAmbiguous')
+							: BarnHelp.text('Giving', 'Giving_Import_ErrorFundNotFound'),
 						new List<String>{ part.fund }
 					);
 				}
@@ -107,8 +107,8 @@ public with sharing class GiftImportReferences {
 				: BarnHelp.text('Giving', 'Giving_Import_ErrorBrandNotFound');
 		}
 		return ambiguous
-			? Label.Giving_Import_ErrorAppealAmbiguous
-			: Label.Giving_Import_ErrorAppealNotFound;
+			? BarnHelp.text('Giving', 'Giving_Import_ErrorAppealAmbiguous')
+			: BarnHelp.text('Giving', 'Giving_Import_ErrorAppealNotFound');
 	}
 
 	/**
@@ -125,7 +125,7 @@ public with sharing class GiftImportReferences {
 		}
 		for (GiftImportRow item : gifts) {
 			if (item.singleFund == null && !item.isSplit()) {
-				item.error = Label.Giving_Gift_DefaultFundMissing;
+				item.error = BarnHelp.text('Giving', 'Giving_Gift_DefaultFundMissing');
 			}
 		}
 	}

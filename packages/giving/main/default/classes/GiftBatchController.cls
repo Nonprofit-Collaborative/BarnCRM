@@ -127,7 +127,7 @@ public with sharing class GiftBatchController {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBatch', batchId);
-			throw UserErrors.message(Label.Giving_GiftBatch_ErrorLoadBatch);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorLoadBatch'));
 		}
 	}
 
@@ -140,7 +140,9 @@ public with sharing class GiftBatchController {
 		try {
 			Gift_Batch__c batch = GiftBatchSelector.selectForUpdate(batchId);
 			if (batch == null) {
-				throw new GiftBatchException(Label.Giving_GiftBatch_ErrorBatchMissing);
+				throw new GiftBatchException(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing')
+				);
 			}
 			if (GiftBatchService.STATUS_POSTED.equals(batch.Status__c)) {
 				throw new GiftBatchException(
@@ -164,7 +166,7 @@ public with sharing class GiftBatchController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.saveLines', batchId);
-			throw UserErrors.message(Label.Giving_GiftBatch_ErrorSaveRows);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorSaveRows'));
 		}
 	}
 
@@ -178,7 +180,9 @@ public with sharing class GiftBatchController {
 		try {
 			Gift_Batch__c batch = batchId == null ? null : GiftBatchSelector.selectById(batchId);
 			if (batch == null) {
-				throw new GiftBatchException(Label.Giving_GiftBatch_ErrorBatchMissing);
+				throw new GiftBatchException(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing')
+				);
 			}
 			List<GiftEntryPayments.Request> requests = new List<GiftEntryPayments.Request>();
 			for (Line line : lines == null ? new List<Line>() : lines) {
@@ -197,7 +201,7 @@ public with sharing class GiftBatchController {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getPaymentChoices', batchId);
-			throw UserErrors.message(Label.Giving_GiftEntryPays_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorLoad'));
 		}
 	}
 
@@ -245,7 +249,9 @@ public with sharing class GiftBatchController {
 				row.Id = rowId;
 				updates.add(row);
 			} else {
-				throw new GiftBatchException(Label.Giving_GiftBatch_ErrorLineMissing);
+				throw new GiftBatchException(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorLineMissing')
+				);
 			}
 		}
 		if (!updates.isEmpty()) {
@@ -273,7 +279,9 @@ public with sharing class GiftBatchController {
 	private static BatchView view(Id batchId) {
 		Gift_Batch__c batch = batchId == null ? null : GiftBatchSelector.selectById(batchId);
 		if (batch == null) {
-			throw new GiftBatchException(Label.Giving_GiftBatch_ErrorBatchMissing);
+			throw new GiftBatchException(
+				BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing')
+			);
 		}
 		List<Gift_Batch_Row__c> rows = GiftBatchSelector.selectRows(batchId);
 		BatchView result = new BatchView();

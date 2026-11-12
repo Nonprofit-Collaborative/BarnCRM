@@ -55,8 +55,10 @@ import sys
 # labels (C-67 used the last three); AR-01b (release 1.19) moves module messages out and lowers it.
 # Raised to 3,259 for the Migration Assistant (MIG-01, MIG-08) merged total, and to 3,261 for the
 # Volunteers hour value card and thank-you nightly step name (V-12, V-13).
-BUDGET = 3261
-TARGET = 3000
+# AR-01b (release 1.19, D-172): 834 module messages moved to the help catalogs; lowered to the
+# merged total, 2,427. TARGET follows plan AR-01's expected suite of about 2,400.
+BUDGET = 2427
+TARGET = 2400
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
 HELP_WORDS = {

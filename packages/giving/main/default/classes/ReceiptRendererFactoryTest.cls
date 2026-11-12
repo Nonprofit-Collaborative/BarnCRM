@@ -157,7 +157,7 @@ private class ReceiptRendererFactoryTest {
 			} catch (ReceiptRendererFactory.ReceiptRendererFactoryException refused) {
 				Assert.areEqual(
 					String.format(
-						Label.Giving_Receipt_UnknownRenderer,
+						BarnHelp.text('Giving', 'Giving_Receipt_UnknownRenderer'),
 						new List<String>{ PROBE_CLASS }
 					),
 					refused.getMessage(),
@@ -187,7 +187,7 @@ private class ReceiptRendererFactoryTest {
 			} catch (ReceiptRendererFactory.ReceiptRendererFactoryException refused) {
 				Assert.areEqual(
 					String.format(
-						Label.Giving_Receipt_UnknownRenderer,
+						BarnHelp.text('Giving', 'Giving_Receipt_UnknownRenderer'),
 						new List<String>{ 'Whatever Maria typed' }
 					),
 					refused.getMessage(),
@@ -227,7 +227,7 @@ private class ReceiptRendererFactoryTest {
 			} catch (ReceiptRendererFactory.ReceiptRendererFactoryException refused) {
 				Assert.areEqual(
 					String.format(
-						Label.Giving_Receipt_RendererUnavailable,
+						BarnHelp.text('Giving', 'Giving_Receipt_RendererUnavailable'),
 						new List<String>{ ReceiptRendererFactory.KEY_VISUALFORCE }
 					),
 					refused.getMessage(),

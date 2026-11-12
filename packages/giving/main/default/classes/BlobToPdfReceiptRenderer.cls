@@ -16,7 +16,9 @@
 public with sharing class BlobToPdfReceiptRenderer implements ReceiptRenderer {
 	public Blob render(String html) {
 		if (String.isBlank(html)) {
-			throw new ReceiptRendererException(Label.Giving_Receipt_NothingToRender);
+			throw new ReceiptRendererException(
+				BarnHelp.text('Giving', 'Giving_Receipt_NothingToRender')
+			);
 		}
 		return Blob.toPdf(html);
 	}

@@ -249,7 +249,11 @@ private class DonationMatcherTest {
 			Assert.isNull(always[0].installmentId, 'Always create does not look.');
 			Assert.isNull(always[0].error, 'And creates.');
 			Assert.isTrue(never[0].error.contains(payments[0].Name), 'Never match names it.');
-			Assert.areEqual(Label.Giving_Import_ErrorMatchOnlyNone, only[0].error, 'Match only.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Import_ErrorMatchOnlyNone'),
+				only[0].error,
+				'Match only.'
+			);
 			Assert.isTrue(loaded.error.contains('TX-1'), 'A gift already loaded is refused too.');
 		}
 	}

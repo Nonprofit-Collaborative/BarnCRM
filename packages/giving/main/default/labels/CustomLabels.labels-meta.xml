@@ -129,108 +129,12 @@
         <value>The Gift Was Not Saved</value>
     </labels>
     <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorDonorRequired</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: no donor chosen</shortDescription>
-        <value>Choose the person or organization who gave this gift.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorAmountRequired</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: amount missing or not positive</shortDescription>
-        <value>Enter an amount greater than zero. A refund is entered from the original gift, not here.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorInKindDescriptionRequired</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: in-kind description missing</shortDescription>
-        <value>Describe what was given. This text is the donor&apos;s receipt, so a gift of goods cannot be saved without it.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorFairMarketValueNegative</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: fair market value is negative</shortDescription>
-        <value>Fair market value cannot be negative. Leave it empty if you do not have a figure yet.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorDateRequired</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: gift date missing</shortDescription>
-        <value>Enter the date the gift arrived.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorTypeRequired</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: gift type missing</shortDescription>
-        <value>Choose a payment method.</value>
-    </labels>
-    <labels>
         <fullName>Giving_QuickGiftEntry_ErrorTypeInvalid</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Quick gift entry: gift type not one of the choices</shortDescription>
         <value>Choose a payment method from the list.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorFundUnavailable</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: chosen fund is gone</shortDescription>
-        <value>That fund is not available any more. Choose another fund.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorAppealUnavailable</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: chosen appeal is gone</shortDescription>
-        <value>That appeal is not available any more. Choose another appeal.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorNoInput</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: nothing was sent to save</shortDescription>
-        <value>No gift was sent to save. Enter the gift again.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorLoadDefaults</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: defaults could not be read</shortDescription>
-        <value>The form could not load its settings. Ask your BarnCRM admin to check the default fund and default appeal in BarnCRM Settings.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_ErrorUnexpected</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: unexpected failure</shortDescription>
-        <value>The gift could not be saved. Your administrator can find the details in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_QuickGiftEntry_FundNotApplied</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Quick gift entry: the gift saved but the chosen fund was not applied</shortDescription>
-        <value>The gift was saved, but it is already split across more than one fund, so the fund you chose was not applied. Open the gift to change its allocations.</value>
     </labels>
     <labels>
         <fullName>Giving_QuickGiftEntry_MatchSection</fullName>

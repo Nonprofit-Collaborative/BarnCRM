@@ -27,7 +27,6 @@ import APPEAL from '@salesforce/label/c.Giving_QuickGiftEntry_AppealLabel';
 import SCHEDULE from '@salesforce/label/c.Giving_SchedulePreview_Title';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import NO_PERMISSION from '@salesforce/label/c.Giving_Commitment_NoPermission';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -232,7 +231,7 @@ export default class CommitmentNew extends NavigationMixin(LightningElement) {
   }
 
   get noPermission() {
-    return NO_PERMISSION;
+    return helpText('Giving', 'Giving_Commitment_NoPermission');
   }
 
   get saveDisabled() {

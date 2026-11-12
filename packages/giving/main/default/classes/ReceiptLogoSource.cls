@@ -115,7 +115,7 @@ public with sharing class ReceiptLogoSource {
 				if (version == null) {
 					warnOnce(
 						String.format(
-							Label.Giving_Receipt_LogoUnreadable,
+							BarnHelp.text('Giving', 'Giving_Receipt_LogoUnreadable'),
 							new List<String>{ String.valueOf(documentId) }
 						)
 					);

@@ -23,7 +23,7 @@ public with sharing class ReceiptRunService {
 	 */
 	public static Receipt_Run__c startStatementRun(Integer statementYear) {
 		if (!ReceiptService.canIssueReceipts()) {
-			throw new ReceiptRunException(Label.Giving_Receipt_NoPermission);
+			throw new ReceiptRunException(BarnHelp.text('Giving', 'Giving_Receipt_NoPermission'));
 		}
 		Integer year = statementYear == null ? defaultStatementYear() : statementYear;
 

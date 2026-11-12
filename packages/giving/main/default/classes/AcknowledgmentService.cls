@@ -200,7 +200,7 @@ public with sharing class AcknowledgmentService {
 			// these donors an address, and thirty log entries do not say that better than one.
 			ErrorLogger.logMessage(
 				String.format(
-					Label.Giving_Acknowledgment_NoRecipient,
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_NoRecipient'),
 					new List<String>{
 						String.valueOf(unreachable.size()),
 						String.join(unreachable, ', ')
@@ -289,7 +289,7 @@ public with sharing class AcknowledgmentService {
 			AcknowledgmentWriter.updateAcknowledgments(unsendable);
 			ErrorLogger.logMessage(
 				String.format(
-					Label.Giving_Acknowledgment_TemplatesMissing,
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_TemplatesMissing'),
 					new List<String>{ String.valueOf(unsendable.size()) }
 				),
 				CONTEXT_SEND,
@@ -323,7 +323,7 @@ public with sharing class AcknowledgmentService {
 				row.Status__c = STATUS_FAILED;
 				row.Failure_Reason__c = failureReasonOf(
 					outcome,
-					Label.Giving_Acknowledgment_SendFailedUnknown
+					BarnHelp.text('Giving', 'Giving_Acknowledgment_SendFailedUnknown')
 				);
 				// The key goes, so the next send tries this gift again (R-AK7).
 				row.Gift_Key__c = null;
@@ -412,7 +412,9 @@ public with sharing class AcknowledgmentService {
 
 	public static void requireSendPermission() {
 		if (!canSend()) {
-			throw new AcknowledgmentException(Label.Giving_Acknowledgment_NoPermission);
+			throw new AcknowledgmentException(
+				BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission')
+			);
 		}
 	}
 

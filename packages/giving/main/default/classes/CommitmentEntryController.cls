@@ -138,7 +138,7 @@ public with sharing class CommitmentEntryController {
 	public static SaveResult save(EntryInput input) {
 		SaveResult result = new SaveResult();
 		if (!Schema.SObjectType.Commitment__c.isCreateable()) {
-			result.error = Label.Giving_Commitment_NoPermission;
+			result.error = BarnHelp.text('Giving', 'Giving_Commitment_NoPermission');
 			return result;
 		}
 		result.error = problem(input);
@@ -162,7 +162,7 @@ public with sharing class CommitmentEntryController {
 	/** The first thing wrong with the entries, or null. */
 	private static String problem(EntryInput input) {
 		if (input == null) {
-			return Label.Giving_Ask_ErrorAmount;
+			return BarnHelp.text('Giving', 'Giving_Ask_ErrorAmount');
 		}
 		Id contactId = asId(input.donorContactId);
 		Id accountId = asId(input.donorAccountId);

@@ -8,8 +8,6 @@ import deleteStep from '@salesforce/apex/StewardshipPlanController.deleteStep';
 import reorderSteps from '@salesforce/apex/StewardshipPlanController.reorderSteps';
 
 import TITLE from '@salesforce/label/c.Giving_Stewardship_Title';
-import RUNNING_NOTICE from '@salesforce/label/c.Giving_Stewardship_RunningNotice';
-import READ_ONLY_NOTICE from '@salesforce/label/c.Giving_Stewardship_ReadOnlyNotice';
 import NEW_PLAN from '@salesforce/label/c.Giving_Stewardship_NewPlan';
 import EDIT_PLAN from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import TURN_ON from '@salesforce/label/c.Core_Feature_TurnOn';
@@ -39,7 +37,6 @@ import STEP_COMMENTS from '@salesforce/label/c.Giving_Stewardship_StepComments';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
-import ACTION_FAILED from '@salesforce/label/c.Giving_Stewardship_ErrorActionFailed';
 import SELECTED from '@salesforce/label/c.Core_DataDictionary_SelectedLabel';
 import COLUMN_ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import { bodyMessage } from 'c/findCsv';
@@ -137,8 +134,12 @@ export default class StewardshipPlans extends LightningElement {
     get intro() {
       return helpText('Giving', 'Giving_Stewardship_Intro');
     },
-    runningNotice: RUNNING_NOTICE,
-    readOnlyNotice: READ_ONLY_NOTICE,
+    get runningNotice() {
+      return helpText('Giving', 'Giving_Stewardship_RunningNotice');
+    },
+    get readOnlyNotice() {
+      return helpText('Giving', 'Giving_Stewardship_ReadOnlyNotice');
+    },
     get empty() {
       return helpText('Giving', 'Giving_Stewardship_Empty');
     },
@@ -206,7 +207,10 @@ export default class StewardshipPlans extends LightningElement {
       }
     }
     if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_Stewardship_ErrorActionFailed')
+      );
     }
   }
 
@@ -505,7 +509,10 @@ export default class StewardshipPlans extends LightningElement {
         this.noticeMessage = SAVED;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_Stewardship_ErrorActionFailed')
+        );
       })
       .finally(() => {
         this.busy = false;

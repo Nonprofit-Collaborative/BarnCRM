@@ -95,7 +95,7 @@ private class StewardshipStartControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Giving_Stewardship_ErrorDonorNotVisible,
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorDonorNotVisible'),
 				refusal,
 				'Says the donor cannot be seen.'
 			);
@@ -124,7 +124,11 @@ private class StewardshipStartControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Stewardship_ErrorAlreadyRunning, message, 'Told why.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning'),
+				message,
+				'Told why.'
+			);
 		}
 	}
 
@@ -156,7 +160,11 @@ private class StewardshipStartControllerTest {
 		Test.stopTest();
 
 		Assert.isFalse(model.canStart, 'A reader is offered no Start.');
-		Assert.areEqual(Label.Giving_Stewardship_StartNoPermission, message, 'Told why.');
+		Assert.areEqual(
+			BarnHelp.text('Giving', 'Giving_Stewardship_StartNoPermission'),
+			message,
+			'Told why.'
+		);
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'Nothing started.');
 		}

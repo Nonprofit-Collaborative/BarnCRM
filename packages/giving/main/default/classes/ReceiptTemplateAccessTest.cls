@@ -94,7 +94,7 @@ private class ReceiptTemplateAccessTest {
 				Assert.fail('A user without Manage BarnCRM Settings created the shipped letters.');
 			} catch (ReceiptTemplateService.ReceiptTemplateException refused) {
 				Assert.areEqual(
-					Label.Giving_Receipt_NoTemplatePermission,
+					BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission'),
 					refused.getMessage(),
 					'It names the role to ask for.'
 				);
@@ -123,7 +123,7 @@ private class ReceiptTemplateAccessTest {
 				Assert.fail('A user without Manage BarnCRM Settings rewrote a receipt letter.');
 			} catch (ReceiptTemplateService.ReceiptTemplateException refused) {
 				Assert.areEqual(
-					Label.Giving_Receipt_NoTemplatePermission,
+					BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission'),
 					refused.getMessage(),
 					'It names the role to ask for.'
 				);
@@ -157,7 +157,7 @@ private class ReceiptTemplateAccessTest {
 				Assert.fail('A user without Manage BarnCRM Settings changed the letter in use.');
 			} catch (ReceiptTemplateService.ReceiptTemplateException refused) {
 				Assert.areEqual(
-					Label.Giving_Receipt_NoTemplatePermission,
+					BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission'),
 					refused.getMessage(),
 					'It names the role to ask for.'
 				);

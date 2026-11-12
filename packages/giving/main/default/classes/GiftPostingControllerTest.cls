@@ -128,7 +128,10 @@ private class GiftPostingControllerTest {
 					GiftPostingController.unpost(gift.Id, 'Typo');
 					Assert.fail('Refused');
 				} catch (AuraHandledException refused) {
-					Assert.areEqual(Label.Giving_Posting_NoPermission, refused.getMessage());
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_Posting_NoPermission'),
+						refused.getMessage()
+					);
 				}
 			}
 

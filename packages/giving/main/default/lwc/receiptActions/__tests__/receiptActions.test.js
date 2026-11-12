@@ -5,6 +5,12 @@ import getGiftReceiptState from '@salesforce/apex/ReceiptController.getGiftRecei
 import issueReceipt from '@salesforce/apex/ReceiptController.issue';
 import voidAndReissue from '@salesforce/apex/ReceiptController.voidAndReissue';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_Receipt_IssuedMessage: 'Receipt {0} has been issued.',
+  Giving_Receipt_UnexpectedError: 'That did not work.'
+});
 
 jest.mock(
   '@salesforce/apex/ReceiptController.getGiftReceiptState',
@@ -43,17 +49,6 @@ jest.mock(
 jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Giving_Receipt_IssuedMessage',
-  () => ({ default: 'Receipt {0} has been issued.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Giving_Receipt_UnexpectedError',
-  () => ({ default: 'That did not work.' }),
-  { virtual: true }
-);
-
 const GIFT_ID = 'a00000000000001';
 const DOCUMENT_ID = '069000000000001';
 

@@ -183,7 +183,9 @@ public with sharing class GivingJobsController {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new GivingJobsException(System.Label.Giving_NightlyJobs_PermissionRequired);
+			throw new GivingJobsException(
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_PermissionRequired')
+			);
 		}
 	}
 
@@ -192,7 +194,7 @@ public with sharing class GivingJobsController {
 			caught,
 			caught instanceof GivingJobsException,
 			context,
-			System.Label.Giving_Periods_UnexpectedError
+			BarnHelp.text('Giving', 'Giving_Periods_UnexpectedError')
 		);
 	}
 }

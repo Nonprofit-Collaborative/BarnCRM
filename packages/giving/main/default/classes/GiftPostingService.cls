@@ -51,7 +51,7 @@ public with sharing class GiftPostingService {
 		if (giftIds.size() > MAX_GIFTS_PER_MARK) {
 			throw new GiftPostingException(
 				String.format(
-					Label.Giving_Posting_TooMany,
+					BarnHelp.text('Giving', 'Giving_Posting_TooMany'),
 					new List<String>{ String.valueOf(MAX_GIFTS_PER_MARK) }
 				)
 			);
@@ -83,13 +83,15 @@ public with sharing class GiftPostingService {
 	public static void unpost(Id giftId, String reason) {
 		requirePermission();
 		if (String.isBlank(reason)) {
-			throw new GiftPostingException(Label.Giving_Posting_ReasonRequired);
+			throw new GiftPostingException(
+				BarnHelp.text('Giving', 'Giving_Posting_ReasonRequired')
+			);
 		}
 		List<Gift__c> found = giftId == null
 			? new List<Gift__c>()
 			: GiftPostingSelector.selectForPosting(new Set<Id>{ giftId });
 		if (found.isEmpty() || !GiftPostingLock.isPosted(found[0])) {
-			throw new GiftPostingException(Label.Giving_Posting_NotPosted);
+			throw new GiftPostingException(BarnHelp.text('Giving', 'Giving_Posting_NotPosted'));
 		}
 		save(
 			new List<Gift__c>{
@@ -103,7 +105,7 @@ public with sharing class GiftPostingService {
 		ErrorLogger.logMessages(
 			new List<String>{
 				String.format(
-					Label.Giving_Posting_UnpostLogged,
+					BarnHelp.text('Giving', 'Giving_Posting_UnpostLogged'),
 					new List<String>{
 						found[0].Name,
 						reason.trim(),
@@ -119,7 +121,7 @@ public with sharing class GiftPostingService {
 
 	private static void requirePermission() {
 		if (!canPost()) {
-			throw new GiftPostingException(Label.Giving_Posting_NoPermission);
+			throw new GiftPostingException(BarnHelp.text('Giving', 'Giving_Posting_NoPermission'));
 		}
 	}
 

@@ -4,6 +4,12 @@ import getPage from '@salesforce/apex/PledgeReminderController.getPage';
 import sendNow from '@salesforce/apex/PledgeReminderController.sendNow';
 import produceLetters from '@salesforce/apex/PledgeReminderController.produceLetters';
 import markLettersSent from '@salesforce/apex/PledgeReminderController.markLettersSent';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_PledgeReminders_Off: 'Reminders are off',
+  Giving_PledgeReminders_SendStarted: 'The run has started.'
+});
 
 jest.mock(
   '@salesforce/apex/PledgeReminderController.getPage',
@@ -35,13 +41,6 @@ jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolv
 });
 
 jest.mock(
-  '@salesforce/label/c.Giving_PledgeReminders_Off',
-  () => ({ default: 'Reminders are off' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
   '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound',
   () => ({ default: 'Template not found' }),
   { virtual: true }
@@ -66,11 +65,6 @@ jest.mock(
   {
     virtual: true
   }
-);
-jest.mock(
-  '@salesforce/label/c.Giving_PledgeReminders_SendStarted',
-  () => ({ default: 'The run has started.' }),
-  { virtual: true }
 );
 jest.mock('@salesforce/label/c.Core_MatchLogic_Inactive', () => ({ default: 'Inactive' }), {
   virtual: true

@@ -100,7 +100,7 @@ private class GiftPostingLockTest {
 
 	private static String closedGiftMessage() {
 		return String.format(
-			Label.Giving_Posting_ClosedGiftLocked,
+			BarnHelp.text('Giving', 'Giving_Posting_ClosedGiftLocked'),
 			new List<String>{ lastClosedDay().format() }
 		);
 	}
@@ -132,7 +132,7 @@ private class GiftPostingLockTest {
 			Assert.isFalse(results[0].isSuccess(), 'A gift dated in a closed month is refused.');
 			Assert.areEqual(
 				String.format(
-					Label.Giving_Posting_ClosedPeriodNewGift,
+					BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 					new List<String>{ lastClosedDay().format() }
 				),
 				results[0].getErrors()[0].getMessage(),
@@ -213,7 +213,7 @@ private class GiftPostingLockTest {
 			Test.stopTest();
 
 			String expected = String.format(
-				Label.Giving_Posting_ClosedPeriodNewGift,
+				BarnHelp.text('Giving', 'Giving_Posting_ClosedPeriodNewGift'),
 				new List<String>{ lastClosedDay().format() }
 			);
 			Assert.areEqual(
@@ -260,11 +260,20 @@ private class GiftPostingLockTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_AllocationLocked, moved, 'No fund changes.');
-			Assert.areEqual(Label.Giving_Posting_AllocationLocked, removed, 'None is taken away.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
+				moved,
+				'No fund changes.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked'),
+				removed,
+				'None is taken away.'
+			);
 			Assert.isFalse(added.isSuccess(), 'None is added.');
 			Assert.isTrue(
-				messagesOf(added.getErrors()).contains(Label.Giving_Posting_AllocationLocked),
+				messagesOf(added.getErrors())
+					.contains(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')),
 				'Refused by the lock: ' + messagesOf(added.getErrors())
 			);
 		}
@@ -293,7 +302,8 @@ private class GiftPostingLockTest {
 
 			Assert.isFalse(result.isSuccess(), 'Restoring is adding a fund to the books.');
 			Assert.isTrue(
-				messagesOf(result.getErrors()).contains(Label.Giving_Posting_AllocationLocked),
+				messagesOf(result.getErrors())
+					.contains(BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')),
 				'Refused by the lock, pause or no pause: ' + messagesOf(result.getErrors())
 			);
 		}
@@ -316,7 +326,7 @@ private class GiftPostingLockTest {
 			String refusal = deleteRefusal(ana());
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_DonorLocked, refusal);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_DonorLocked'), refusal);
 			Assert.isNotNull(giftOf(250).Donor_Contact__c, 'The books still name Ana.');
 		}
 	}
@@ -333,7 +343,7 @@ private class GiftPostingLockTest {
 			String onceReopened = deleteRefusal(ana());
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_DonorLocked, whileClosed);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_DonorLocked'), whileClosed);
 			Assert.isNull(onceReopened, 'Nothing of Ana\'s is in a closed period any more.');
 		}
 	}
@@ -383,7 +393,7 @@ private class GiftPostingLockTest {
 			String refusal = deleteRefusal(riverside);
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_DonorLocked, refusal);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_DonorLocked'), refusal);
 		}
 	}
 
@@ -400,7 +410,7 @@ private class GiftPostingLockTest {
 			String refusal = deleteRefusal(new Account(Id = household));
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_DonorLocked, refusal);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_DonorLocked'), refusal);
 			Assert.areEqual(ana().Id, giftOf(250).Donor_Contact__c, 'The books still name Ana.');
 		}
 	}
@@ -420,7 +430,7 @@ private class GiftPostingLockTest {
 			String refusal = deleteRefusal(new Gift__c(Id = original.Id));
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_OriginalLocked, refusal);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_OriginalLocked'), refusal);
 		}
 	}
 
@@ -461,8 +471,16 @@ private class GiftPostingLockTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_PostedGiftLocked, amount, 'The amount is posted.');
-			Assert.areEqual(Label.Giving_Posting_PostedGiftLocked, deleted, 'So is the gift.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Posting_PostedGiftLocked'),
+				amount,
+				'The amount is posted.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Posting_PostedGiftLocked'),
+				deleted,
+				'So is the gift.'
+			);
 			Assert.isNull(appeal, 'What the books do not hold stays editable.');
 		}
 	}
@@ -484,9 +502,17 @@ private class GiftPostingLockTest {
 			String cleared = refusalOf(new Gift__c(Id = gift.Id, Accounting_Posted_At__c = null));
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Posting_FieldsWrittenByPosting, typed, 'Not by hand.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'),
+				typed,
+				'Not by hand.'
+			);
 			Assert.isFalse(created.isSuccess(), 'Nor on a new gift.');
-			Assert.areEqual(Label.Giving_Posting_FieldsWrittenByPosting, cleared, 'Nor cleared.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Posting_FieldsWrittenByPosting'),
+				cleared,
+				'Nor cleared.'
+			);
 			Assert.isNotNull(giftOf(40).Accounting_Posted_At__c, 'The door itself works.');
 		}
 	}
@@ -542,7 +568,7 @@ private class GiftPostingLockTest {
 
 			Assert.areEqual(
 				String.format(
-					Label.Giving_Gift_ReverseNeedsReceived,
+					BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'),
 					new List<String>{ 'Pending' }
 				),
 				refusal,

@@ -269,7 +269,7 @@ private class QuickGiftEntryControllerTest {
 			Map<String, String> byField = messagesByField(result.fieldErrors);
 			Assert.isTrue(byField.containsKey('donor'), 'The message names the donor field.');
 			Assert.areEqual(
-				Label.Giving_QuickGiftEntry_ErrorDonorRequired,
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorDonorRequired'),
 				byField.get('donor'),
 				'The message is the one the admin guide quotes.'
 			);
@@ -313,7 +313,7 @@ private class QuickGiftEntryControllerTest {
 			Assert.isFalse(result.success, 'None of that is a gift yet.');
 			Map<String, String> byField = messagesByField(result.fieldErrors);
 			Assert.areEqual(
-				Label.Giving_QuickGiftEntry_ErrorAmountRequired,
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorAmountRequired'),
 				byField.get('amount'),
 				'A refund is entered from the original gift, not here.'
 			);
@@ -357,12 +357,12 @@ private class QuickGiftEntryControllerTest {
 
 			Map<String, String> byField = messagesByField(result.fieldErrors);
 			Assert.areEqual(
-				Label.Giving_QuickGiftEntry_ErrorFundUnavailable,
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorFundUnavailable'),
 				byField.get('fundId'),
 				'A fund reference that is not a fund is refused.'
 			);
 			Assert.areEqual(
-				Label.Giving_QuickGiftEntry_ErrorAppealUnavailable,
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorAppealUnavailable'),
 				byField.get('appealId'),
 				'An appeal reference that is not an appeal is refused.'
 			);
@@ -473,7 +473,7 @@ private class QuickGiftEntryControllerTest {
 
 			Assert.isFalse(result.success, 'Nothing saved.');
 			Assert.areEqual(
-				Label.Giving_GiftEntryPays_ErrorNotOpen,
+				BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorNotOpen'),
 				messagesByField(result.fieldErrors).get('installmentId'),
 				'The message sits beside the payment list.'
 			);
@@ -497,7 +497,7 @@ private class QuickGiftEntryControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Giving_GiftEntryPays_ErrorInKind,
+				BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorInKind'),
 				messagesByField(result.fieldErrors).get('installmentId'),
 				'A gift of goods pays no pledge.'
 			);
@@ -550,7 +550,11 @@ private class QuickGiftEntryControllerTest {
 			Map<String, String> messages = messagesByField(result.fieldErrors);
 			Assert.isFalse(result.success, 'Refused.');
 			Assert.isTrue(messages.containsKey('tributeType'), 'Asks for the type.');
-			Assert.areEqual(Label.Giving_Tribute_HonoreeRequired, messages.get('honoree'), 'Who.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Tribute_HonoreeRequired'),
+				messages.get('honoree'),
+				'Who.'
+			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c WITH SYSTEM_MODE], 'No gift.');
 		}
 	}
@@ -710,7 +714,7 @@ private class QuickGiftEntryControllerTest {
 
 			Assert.isFalse(result.success, 'Nothing was saved.');
 			Assert.areEqual(
-				Label.Giving_QuickGiftEntry_ErrorNoInput,
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorNoInput'),
 				result.formError,
 				'The person is told to enter the gift again.'
 			);

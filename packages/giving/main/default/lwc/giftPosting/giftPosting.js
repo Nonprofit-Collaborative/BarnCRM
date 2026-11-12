@@ -4,12 +4,8 @@ import unpost from '@salesforce/apex/GiftPostingController.unpost';
 
 import TITLE from '@salesforce/label/c.Giving_PostingCard_Title';
 import POSTED_BY from '@salesforce/label/c.Giving_PostingCard_PostedBy';
-import NOT_POSTED from '@salesforce/label/c.Giving_PostingCard_NotPosted';
-import NOT_IN_BOOKS from '@salesforce/label/c.Giving_PostingCard_NotInBooks';
 import REASON_LABEL from '@salesforce/label/c.Giving_PostingCard_ReasonLabel';
 import UNPOST_BUTTON from '@salesforce/label/c.Giving_PostingCard_UnpostButton';
-import REASON_REQUIRED from '@salesforce/label/c.Giving_Posting_ReasonRequired';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -28,8 +24,12 @@ export default class GiftPosting extends LightningElement {
   labels = {
     title: TITLE,
     postedBy: POSTED_BY,
-    notPosted: NOT_POSTED,
-    notInBooks: NOT_IN_BOOKS,
+    get notPosted() {
+      return helpText('Giving', 'Giving_PostingCard_NotPosted');
+    },
+    get notInBooks() {
+      return helpText('Giving', 'Giving_PostingCard_NotInBooks');
+    },
     get closedPeriod() {
       return helpText('Giving', 'Giving_PostingCard_ClosedPeriod');
     },
@@ -56,7 +56,7 @@ export default class GiftPosting extends LightningElement {
     try {
       this.state = await getState({ giftId: this.recordId });
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Periods_UnexpectedError'));
     }
   }
 
@@ -94,7 +94,7 @@ export default class GiftPosting extends LightningElement {
 
   async handleUnpost() {
     if (!this.reason.trim()) {
-      this.errorMessage = REASON_REQUIRED;
+      this.errorMessage = helpText('Giving', 'Giving_Posting_ReasonRequired');
       return;
     }
     this.busy = true;
@@ -105,7 +105,7 @@ export default class GiftPosting extends LightningElement {
       this.reason = '';
       this.noticeMessage = helpText('Giving', 'Giving_PostingCard_Unposted');
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Periods_UnexpectedError'));
     } finally {
       this.busy = false;
     }

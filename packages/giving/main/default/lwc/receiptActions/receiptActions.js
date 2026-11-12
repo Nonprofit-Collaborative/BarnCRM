@@ -19,14 +19,10 @@ import VOID_AND_REISSUE from '@salesforce/label/c.Giving_Receipt_VoidAndReissueB
 import VIEW_PDF from '@salesforce/label/c.Giving_Receipt_ViewPdf';
 import VIEW_PDF_OF from '@salesforce/label/c.Giving_Receipt_ViewPdfOf';
 import ISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_IssuedTitle';
-import ISSUED_MESSAGE from '@salesforce/label/c.Giving_Receipt_IssuedMessage';
 import NOT_ISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_NotIssuedTitle';
 import REASON_NEEDED_TITLE from '@salesforce/label/c.Giving_Receipt_ReasonNeededTitle';
-import REASON_NEEDED from '@salesforce/label/c.Giving_Receipt_VoidNeedsReason';
 import REISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_ReissuedTitle';
-import REISSUED_MESSAGE from '@salesforce/label/c.Giving_Receipt_ReissuedMessage';
 import NOT_REISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_NotReissuedTitle';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import RECEIPT_OBJECT from '@salesforce/schema/Receipt__c';
@@ -154,7 +150,11 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
     this.working = true;
     try {
       const receipt = await issueReceipt({ giftId: this.recordId });
-      this.toast(ISSUED_TITLE, ISSUED_MESSAGE.replace('{0}', receipt.receiptNumber), 'success');
+      this.toast(
+        ISSUED_TITLE,
+        helpText('Giving', 'Giving_Receipt_IssuedMessage').replace('{0}', receipt.receiptNumber),
+        'success'
+      );
       await refreshApex(this.wiredState);
     } catch (error) {
       this.toast(NOT_ISSUED_TITLE, this.messageOf(error), 'error');
@@ -165,7 +165,11 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
 
   async handleVoidAndReissue() {
     if (!this.reason || !this.reason.trim()) {
-      this.toast(REASON_NEEDED_TITLE, REASON_NEEDED, 'warning');
+      this.toast(
+        REASON_NEEDED_TITLE,
+        helpText('Giving', 'Giving_Receipt_VoidNeedsReason'),
+        'warning'
+      );
       return;
     }
     const current = this.issuedReceipt;
@@ -192,10 +196,9 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
       });
       this.toast(
         REISSUED_TITLE,
-        REISSUED_MESSAGE.replace('{0}', current.receiptNumber).replace(
-          '{1}',
-          replacement.receiptNumber
-        ),
+        helpText('Giving', 'Giving_Receipt_ReissuedMessage')
+          .replace('{0}', current.receiptNumber)
+          .replace('{1}', replacement.receiptNumber),
         'success'
       );
       this.reason = '';
@@ -211,7 +214,7 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
     if (error && error.body && error.body.message) {
       return error.body.message;
     }
-    return UNEXPECTED_ERROR;
+    return helpText('Giving', 'Giving_Receipt_UnexpectedError');
   }
 
   toast(title, message, variant) {

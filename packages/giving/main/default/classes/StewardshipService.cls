@@ -192,16 +192,22 @@ public with sharing class StewardshipService {
 	 */
 	public static Stewardship_Plan__c start(Id templateId, Id contactId, Id accountId) {
 		if (templateId == null) {
-			throw new StewardshipException(System.Label.Giving_Stewardship_ErrorNoTemplate);
+			throw new StewardshipException(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNoTemplate')
+			);
 		}
 		if ((contactId == null) == (accountId == null)) {
-			throw new StewardshipException(System.Label.Giving_Stewardship_ErrorOneDonor);
+			throw new StewardshipException(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorOneDonor')
+			);
 		}
 		List<Stewardship_Plan_Template__c> found = StewardshipSelector.selectTemplateById(
 			templateId
 		);
 		if (found.isEmpty() || found[0].Active__c != true) {
-			throw new StewardshipException(System.Label.Giving_Stewardship_ErrorNoTemplate);
+			throw new StewardshipException(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNoTemplate')
+			);
 		}
 		Id donorId = contactId == null ? accountId : contactId;
 		Set<String> running = runningKeys(
@@ -211,7 +217,9 @@ public with sharing class StewardshipService {
 			)
 		);
 		if (running.contains(runningKey(templateId, donorId))) {
-			throw new StewardshipException(System.Label.Giving_Stewardship_ErrorAlreadyRunning);
+			throw new StewardshipException(
+				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning')
+			);
 		}
 		Stewardship_Plan__c started = plan(templateId, contactId, accountId, null);
 		StewardshipWriter.startPlans(

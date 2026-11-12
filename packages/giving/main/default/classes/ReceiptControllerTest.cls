@@ -131,12 +131,12 @@ private class ReceiptControllerTest {
 				Assert.areEqual('Donor asked', voided.voidReason, 'With the reason given');
 				Assert.isNotNull(voided.voidedOn, 'And when');
 				Assert.areEqual(
-					Label.Giving_Receipt_AlreadyVoid,
+					BarnHelp.text('Giving', 'Giving_Receipt_AlreadyVoid'),
 					refusalOf(new VoidIt(issued.id, 'Again')),
 					'A second void is refused in words'
 				);
 				Assert.areEqual(
-					Label.Giving_Receipt_VoidNeedsReason,
+					BarnHelp.text('Giving', 'Giving_Receipt_VoidNeedsReason'),
 					refusalOf(new VoidIt(issued.id, ' ')),
 					'A void with no reason is refused in words'
 				);
@@ -154,24 +154,24 @@ private class ReceiptControllerTest {
 				Id missingReceipt = FakeIds.of(Receipt__c.SObjectType, 1);
 
 				Assert.areEqual(
-					Label.Giving_Receipt_GiftAlreadyReceipted,
+					BarnHelp.text('Giving', 'Giving_Receipt_GiftAlreadyReceipted'),
 					refusalOf(new Issue(gift.Id)),
 					'A receipted gift is not receipted twice'
 				);
 				Assert.areEqual(
-					Label.Giving_Receipt_NotFound,
+					BarnHelp.text('Giving', 'Giving_Receipt_NotFound'),
 					refusalOf(new VoidIt(missingReceipt, 'x')),
 					'A receipt that is not there is named as missing'
 				);
 				Assert.areEqual(
-					Label.Giving_Receipt_NotFound,
+					BarnHelp.text('Giving', 'Giving_Receipt_NotFound'),
 					refusalOf(new Reissue(missingReceipt)),
 					'So is one to reissue'
 				);
 
 				ReceiptService.issuePermission = false;
 				Assert.areEqual(
-					Label.Giving_Receipt_NoPermission,
+					BarnHelp.text('Giving', 'Giving_Receipt_NoPermission'),
 					refusalOf(new Issue(gift.Id)),
 					'A person without the permission is told what to ask for'
 				);
@@ -268,12 +268,12 @@ private class ReceiptControllerTest {
 				}
 
 				Assert.areEqual(
-					Label.Giving_Receipt_EmptyTemplate,
+					BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate'),
 					blank,
 					'An empty letter is refused'
 				);
 				Assert.areEqual(
-					Label.Giving_Receipt_TemplateNotFound,
+					BarnHelp.text('Giving', 'Giving_Receipt_TemplateNotFound'),
 					missing,
 					'A letter that is not there is named'
 				);
@@ -334,7 +334,11 @@ private class ReceiptControllerTest {
 				} catch (AuraHandledException refused) {
 					message = refused.getMessage();
 				}
-				Assert.areEqual(Label.Giving_Receipt_NoPermission, message, 'Refused in words');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Receipt_NoPermission'),
+					message,
+					'Refused in words'
+				);
 				Assert.areEqual(0, [SELECT COUNT() FROM Receipt_Run__c], 'No run was recorded');
 			}
 		}

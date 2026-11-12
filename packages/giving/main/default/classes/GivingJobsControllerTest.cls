@@ -241,7 +241,7 @@ private class GivingJobsControllerTest {
 				'Scheduling a job that writes to every donor record needs the settings permission.'
 			);
 			Assert.areEqual(
-				System.Label.Giving_NightlyJobs_PermissionRequired,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_PermissionRequired'),
 				refused.getMessage(),
 				'The refusal says which permission is missing rather than showing a platform error.'
 			);

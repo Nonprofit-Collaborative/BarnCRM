@@ -93,7 +93,7 @@ private class MatchingGiftServiceTest {
 
 			assertRefused(
 				result,
-				Label.Giving_MatchingGift_EmployerMustBeOrganization,
+				BarnHelp.text('Giving', 'Giving_MatchingGift_EmployerMustBeOrganization'),
 				'A match is money a company paid'
 			);
 		}
@@ -112,7 +112,7 @@ private class MatchingGiftServiceTest {
 
 			assertRefused(
 				result,
-				Label.Giving_MatchingGift_EmployeeMustBePerson,
+				BarnHelp.text('Giving', 'Giving_MatchingGift_EmployeeMustBePerson'),
 				'The gift being matched comes from a person'
 			);
 		}
@@ -131,7 +131,7 @@ private class MatchingGiftServiceTest {
 
 			assertRefused(
 				result,
-				Label.Giving_MatchingGift_EmployerMismatch,
+				BarnHelp.text('Giving', 'Giving_MatchingGift_EmployerMismatch'),
 				'The employer on the person and the company that paid must agree'
 			);
 		}
@@ -185,7 +185,7 @@ private class MatchingGiftServiceTest {
 
 			assertRefused(
 				result,
-				Label.Giving_MatchingGift_AlreadyLinked,
+				BarnHelp.text('Giving', 'Giving_MatchingGift_AlreadyLinked'),
 				'One gift matches one gift'
 			);
 		}
@@ -247,7 +247,7 @@ private class MatchingGiftServiceTest {
 
 			assertRefused(
 				result,
-				Label.Giving_MatchingGift_GiftNotReceived,
+				BarnHelp.text('Giving', 'Giving_MatchingGift_GiftNotReceived'),
 				'A refunded gift is not half of a matching pair'
 			);
 			Gift__c employerGift = [

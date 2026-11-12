@@ -83,7 +83,9 @@ CAPS = {
     # plus room for G-27.
     # With G-27, C-47b/d/e brands and the C-64 signal: 645,083 measured 2026-11-11, plus about
     # 0.5%; the pre-batch review trims it.
-    "giving": 648_300,
+    # AR-01 messages move (D-172): BarnHelp.text('Giving', key) in place of Label.<name>,
+    # 654,593 measured 2026-11-12 with all five parts, plus about 0.5%.
+    "giving": 657_900,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.

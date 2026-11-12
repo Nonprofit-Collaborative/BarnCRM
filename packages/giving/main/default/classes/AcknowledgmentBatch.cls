@@ -56,7 +56,7 @@ public with sharing class AcknowledgmentBatch implements Database.Batchable<SObj
 			Label.Giving_JobNotice_Acknowledgments,
 			false,
 			String.format(
-				Label.Giving_JobNotice_AcknowledgmentsBody,
+				BarnHelp.text('Giving', 'Giving_JobNotice_AcknowledgmentsBody'),
 				new List<Object>{ processed.format(), sent.format(), errors.format() }
 			),
 			runId

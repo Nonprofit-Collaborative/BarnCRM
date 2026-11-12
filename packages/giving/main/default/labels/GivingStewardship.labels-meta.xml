@@ -1,68 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_Stewardship_ErrorNoTemplate</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the plan asked for is missing or switched off</shortDescription>
-    <value>That plan is not available. It may have been deleted, or turned off on the Stewardship Plans page.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorOneDonor</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: a plan needs exactly one donor</shortDescription>
-    <value>Choose one person or one organization to run this plan for, not both and not neither.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorDonorNotVisible</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the person starting a plan cannot see the donor</shortDescription>
-    <value>You cannot see this donor, so no plan was started.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorAlreadyRunning</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: this plan is already running for this donor</shortDescription>
-    <value>This plan is already running for this donor. Mark the running one complete or cancelled before starting it again, so the same tasks are not created twice.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorStartFailed</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the plans and their templates did not line up</shortDescription>
-    <value>BarnCRM could not start one or more stewardship plans because the plans and their templates did not line up. No tasks were created. This is a fault in BarnCRM, not something to correct in your data.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_Title</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: the page title</shortDescription>
     <value>Stewardship Plans</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_RunningNotice</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: editing a plan does not reach into running plans</shortDescription>
-    <value>Editing a plan changes what starts next. Plans already running keep the tasks they laid out, because those tasks are already in people's lists and weekly plans.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ReadOnlyNotice</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: this user may read but not change plans</shortDescription>
-    <value>You can read the plans here. Changing them needs the Manage BarnCRM Settings permission.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_NewPlan</fullName>
@@ -185,38 +129,6 @@
     <value>Comments</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_ErrorNotPermitted</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: this user may not change plans</shortDescription>
-    <value>Changing stewardship plans needs the Manage BarnCRM Settings permission. Ask whoever administers BarnCRM for your organization.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorNameRequired</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: a plan needs a name</shortDescription>
-    <value>A plan needs a name before it can be saved.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorSubjectRequired</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: a step needs a subject</shortDescription>
-    <value>A step needs a subject, because that is the line the assignee reads in their task list.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ErrorActionFailed</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Giving: the page could not do what was asked</shortDescription>
-    <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_StartHeading</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -239,45 +151,5 @@
     <protected>false</protected>
     <shortDescription>Start plan action: the button that starts the plan</shortDescription>
     <value>Start Plan</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartNone</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: no plan is turned on</shortDescription>
-    <value>No stewardship plan is turned on. An administrator writes plans and turns them on in BarnCRM Settings, Giving, Stewardship plans.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartSuccess</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: toast after a plan starts</shortDescription>
-    <value>The plan has started. Its tasks are in the task lists of the people they are assigned to.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartNoPermission</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: the person may not start a plan</shortDescription>
-    <value>You can see stewardship plans but not start one. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartLoadFailed</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: the list of plans could not be read</shortDescription>
-    <value>The stewardship plans could not be read. Close this window and try again.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartChooseFirst</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: Start pressed with no plan chosen</shortDescription>
-    <value>Choose the plan to start.</value>
   </labels>
 </CustomLabels>

@@ -9,10 +9,7 @@ import PLAN from '@salesforce/label/c.Giving_Stewardship_ColumnPlan';
 import CHOOSE from '@salesforce/label/c.Giving_Stewardship_StartChoose';
 import START from '@salesforce/label/c.Giving_Stewardship_StartButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import NONE from '@salesforce/label/c.Giving_Stewardship_StartNone';
-import SUCCESS from '@salesforce/label/c.Giving_Stewardship_StartSuccess';
-import NO_ACCESS from '@salesforce/label/c.Giving_Stewardship_StartNoPermission';
-import CHOOSE_FIRST from '@salesforce/label/c.Giving_Stewardship_StartChooseFirst';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Starts a stewardship plan by hand on the person, household or organization the action was
@@ -27,8 +24,12 @@ export default class StewardshipPlanStart extends LightningElement {
     choose: CHOOSE,
     start: START,
     cancel: CANCEL,
-    none: NONE,
-    noAccess: NO_ACCESS
+    get none() {
+      return helpText('Giving', 'Giving_Stewardship_StartNone');
+    },
+    get noAccess() {
+      return helpText('Giving', 'Giving_Stewardship_StartNoPermission');
+    }
   };
 
   plans = [];
@@ -37,6 +38,15 @@ export default class StewardshipPlanStart extends LightningElement {
   loadError;
   templateId;
   working = false;
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
 
   @wire(getStartable)
   loadPlans({ data, error }) {
@@ -82,13 +92,13 @@ export default class StewardshipPlanStart extends LightningElement {
 
   async handleStart() {
     if (!this.templateId) {
-      this.toast(CHOOSE_FIRST, 'error');
+      this.toast(helpText('Giving', 'Giving_Stewardship_StartChooseFirst'), 'error');
       return;
     }
     this.working = true;
     try {
       await startPlan({ templateId: this.templateId, donorId: this.recordId });
-      this.toast(SUCCESS, 'success');
+      this.toast(helpText('Giving', 'Giving_Stewardship_StartSuccess'), 'success');
       this.close();
     } catch (error) {
       this.toast(this.messageOf(error), 'error');

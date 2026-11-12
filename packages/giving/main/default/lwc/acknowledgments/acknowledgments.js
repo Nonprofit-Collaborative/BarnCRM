@@ -9,23 +9,18 @@ import setSchedule from '@salesforce/apex/AcknowledgmentController.setSchedule';
 import reorderRules from '@salesforce/apex/AcknowledgmentController.reorderRules';
 
 import TITLE from '@salesforce/label/c.Giving_Acknowledgments_Title';
-import OFF from '@salesforce/label/c.Giving_Acknowledgments_Off';
 import QUEUE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_QueueHeading';
 import EMAIL_QUEUE from '@salesforce/label/c.Giving_Acknowledgments_EmailQueue';
 import LETTER_QUEUE from '@salesforce/label/c.Giving_Acknowledgments_LetterQueue';
 import UNMATCHED from '@salesforce/label/c.Giving_Acknowledgments_Unmatched';
 import WITHOUT_RECIPIENT from '@salesforce/label/c.Giving_Acknowledgments_WithoutRecipient';
 import OPTED_OUT from '@salesforce/label/c.Giving_Acknowledgments_OptedOut';
-import QUEUE_CAPPED from '@salesforce/label/c.Giving_Acknowledgments_QueueCapped';
 import SEND_EMAILS from '@salesforce/label/c.Giving_Acknowledgments_SendEmails';
-import EMAILS_STARTED from '@salesforce/label/c.Giving_Acknowledgments_EmailsStarted';
 import PRODUCE_LETTERS from '@salesforce/label/c.Giving_Acknowledgments_ProduceLetters';
 import MARK_SENT from '@salesforce/label/c.Giving_Acknowledgments_MarkSent';
-import LETTERS_MARKED_SENT from '@salesforce/label/c.Giving_Acknowledgments_LettersMarkedSent';
 import NIGHTLY from '@salesforce/label/c.Giving_Acknowledgments_Nightly';
 import NEXT_RUN from '@salesforce/label/c.Giving_Acknowledgments_NextRun';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
-import NEVER_RUN from '@salesforce/label/c.Giving_Acknowledgments_NeverRun';
 import RULES_HEADING from '@salesforce/label/c.Giving_Acknowledgments_RulesHeading';
 import NEW_RULE from '@salesforce/label/c.Giving_Acknowledgments_NewRule';
 import EDIT_RULE from '@salesforce/label/c.Core_CmdtManager_EditAction';
@@ -37,15 +32,11 @@ import NEW_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_NewRule
 import EDIT_RULE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_EditRuleHeading';
 import TEMPLATE_FIELD from '@salesforce/label/c.Giving_Acknowledgments_TemplateField';
 import TEMPLATE_PLACEHOLDER from '@salesforce/label/c.Giving_Acknowledgments_TemplatePlaceholder';
-import TEMPLATE_REQUIRED from '@salesforce/label/c.Giving_Acknowledgments_TemplateRequired';
 import SAVE_RULE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL_RULE from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import RULE_SAVED from '@salesforce/label/c.Giving_Acknowledgments_RuleSaved';
 import RUNS_HEADING from '@salesforce/label/c.Core_AutoMerge_RecentRuns';
-import NO_RUNS from '@salesforce/label/c.Giving_Acknowledgments_NoRuns';
 import TEMPLATE_NOT_FOUND from '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
-import ACTION_FAILED from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
 import COLUMN_RULE from '@salesforce/label/c.Giving_Acknowledgments_ColumnRule';
 import COLUMN_ORDER from '@salesforce/label/c.Giving_Acknowledgments_ColumnOrder';
 import COLUMN_CHANNEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnChannel';
@@ -187,7 +178,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     get intro() {
       return helpText('Giving', 'Giving_Acknowledgments_Intro');
     },
-    off: OFF,
+    get off() {
+      return helpText('Giving', 'Giving_Acknowledgments_Off');
+    },
     get noRules() {
       return helpText('Giving', 'Giving_Acknowledgments_NoRules');
     },
@@ -206,7 +199,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     unmatched: UNMATCHED,
     withoutRecipient: WITHOUT_RECIPIENT,
     optedOut: OPTED_OUT,
-    queueCapped: QUEUE_CAPPED,
+    get queueCapped() {
+      return helpText('Giving', 'Giving_Acknowledgments_QueueCapped');
+    },
     sendEmails: SEND_EMAILS,
     produceLetters: PRODUCE_LETTERS,
     markSent: MARK_SENT,
@@ -216,7 +211,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       return helpText('Giving', 'Giving_Acknowledgments_NotScheduled');
     },
     lastRun: LAST_RUN,
-    neverRun: NEVER_RUN,
+    get neverRun() {
+      return helpText('Giving', 'Giving_Acknowledgments_NeverRun');
+    },
     rulesHeading: RULES_HEADING,
     newRule: NEW_RULE,
     editRule: EDIT_RULE,
@@ -225,11 +222,15 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       return helpText('Giving', 'Giving_Acknowledgments_TemplateFieldHelp');
     },
     templatePlaceholder: TEMPLATE_PLACEHOLDER,
-    templateRequired: TEMPLATE_REQUIRED,
+    get templateRequired() {
+      return helpText('Giving', 'Giving_Acknowledgments_TemplateRequired');
+    },
     saveRule: SAVE_RULE,
     cancelRule: CANCEL_RULE,
     runsHeading: RUNS_HEADING,
-    noRuns: NO_RUNS,
+    get noRuns() {
+      return helpText('Giving', 'Giving_Acknowledgments_NoRuns');
+    },
     inactive: INACTIVE,
     columnRule: COLUMN_RULE,
     columnOrder: COLUMN_ORDER,
@@ -271,7 +272,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     }
     if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Giving', 'Giving_Receipt_UnexpectedError')
+      );
     }
   }
 
@@ -490,7 +494,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
 
   handleRuleSaved() {
     this.showRuleForm = false;
-    this.noticeMessage = RULE_SAVED;
+    this.noticeMessage = helpText('Giving', 'Giving_Acknowledgments_RuleSaved');
     return refreshApex(this.wiredPage);
   }
 
@@ -506,7 +510,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
   }
 
   handleSendEmails() {
-    return this.run(sendEmailsNow(), EMAILS_STARTED);
+    return this.run(sendEmailsNow(), helpText('Giving', 'Giving_Acknowledgments_EmailsStarted'));
   }
 
   handleProduceLetters() {
@@ -516,7 +520,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
   handleMarkSent(event) {
     return this.run(
       markLettersSent({ runId: event.currentTarget.dataset.recordId }),
-      LETTERS_MARKED_SENT
+      helpText('Giving', 'Giving_Acknowledgments_LettersMarkedSent')
     );
   }
 
@@ -591,7 +595,10 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
         return refreshApex(this.wiredPage);
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Giving', 'Giving_Receipt_UnexpectedError')
+        );
       })
       .finally(() => {
         this.busy = false;

@@ -87,19 +87,39 @@ public with sharing class GiftBatchService {
 				);
 			} else if (!hasContact && !hasAccount) {
 				problems.add(
-					new LineProblem(row.Id, line, Label.Giving_GiftBatch_ErrorRowDonorMissing)
+					new LineProblem(
+						row.Id,
+						line,
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDonorMissing')
+					)
 				);
 			}
 			if (row.Amount__c == null || row.Amount__c <= 0) {
-				problems.add(new LineProblem(row.Id, line, Label.Giving_GiftBatch_ErrorRowAmount));
+				problems.add(
+					new LineProblem(
+						row.Id,
+						line,
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowAmount')
+					)
+				);
 			}
 			Resolved values = new Resolved(batch, row);
 			if (values.giftDate == null) {
-				problems.add(new LineProblem(row.Id, line, Label.Giving_GiftBatch_ErrorRowDate));
+				problems.add(
+					new LineProblem(
+						row.Id,
+						line,
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowDate')
+					)
+				);
 			}
 			if (String.isBlank(values.paymentMethod)) {
 				problems.add(
-					new LineProblem(row.Id, line, Label.Giving_GiftBatch_ErrorRowPaymentMethod)
+					new LineProblem(
+						row.Id,
+						line,
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentMethod')
+					)
 				);
 			}
 		}
@@ -111,7 +131,7 @@ public with sharing class GiftBatchService {
 					new LineProblem(
 						row.Id,
 						index + 1,
-						Label.Giving_GiftBatch_ErrorRowPaymentNotOpen
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowPaymentNotOpen')
 					)
 				);
 			}
@@ -211,7 +231,7 @@ public with sharing class GiftBatchService {
 	/** Why a batch cannot be posted at all, before its lines are looked at, or null. */
 	private static String refusal(Gift_Batch__c batch, List<Gift_Batch_Row__c> rows) {
 		if (batch == null) {
-			return Label.Giving_GiftBatch_ErrorBatchMissing;
+			return BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorBatchMissing');
 		}
 		if (STATUS_POSTED.equals(batch.Status__c)) {
 			return BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorAlreadyCreated');

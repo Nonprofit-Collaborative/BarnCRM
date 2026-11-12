@@ -148,7 +148,7 @@ private class ReceiptLetterEditorTest {
 				Assert.fail('A user who may not edit letters previewed one.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
-					Label.Giving_Receipt_NoTemplatePermission,
+					BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission'),
 					refused.getMessage(),
 					'It names the role to ask for.'
 				);
@@ -167,7 +167,7 @@ private class ReceiptLetterEditorTest {
 				Assert.fail('An empty letter was previewed.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
-					Label.Giving_Receipt_EmptyTemplate,
+					BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate'),
 					refused.getMessage(),
 					'It says what to do.'
 				);

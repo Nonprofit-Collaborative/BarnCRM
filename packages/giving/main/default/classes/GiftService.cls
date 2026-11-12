@@ -206,8 +206,8 @@ public with sharing class GiftService {
 				}
 				gift.addError(
 					hadReceipt
-						? Label.Giving_Gift_ReceiptNumberLocked
-						: Label.Giving_Gift_ReceiptNumberNotIssuedByHand
+						? BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberLocked')
+						: BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand')
 				);
 				continue;
 			}
@@ -236,7 +236,7 @@ public with sharing class GiftService {
 				overrides.add(describeOverride(previous, gift));
 				continue;
 			}
-			gift.addError(Label.Giving_Gift_ReceiptLocked);
+			gift.addError(BarnHelp.text('Giving', 'Giving_Gift_ReceiptLocked'));
 		}
 		// One call, whatever the size of the save: an override that nobody recorded is the thing
 		// an auditor cannot reconstruct (ADR-0024).
@@ -264,7 +264,7 @@ public with sharing class GiftService {
 		}
 		for (Gift__c gift : gifts) {
 			if (String.isNotBlank(gift.Receipt_Number__c)) {
-				gift.addError(Label.Giving_Gift_ReceiptNumberNotIssuedByHand);
+				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_ReceiptNumberNotIssuedByHand'));
 			}
 		}
 	}
@@ -285,11 +285,11 @@ public with sharing class GiftService {
 			}
 			overrides.add(
 				String.format(
-					Label.Giving_Gift_ReceiptLockOverridden,
+					BarnHelp.text('Giving', 'Giving_Gift_ReceiptLockOverridden'),
 					new List<String>{
 						String.valueOf(gift.Id),
 						valueOrNone(gift.Receipt_Number__c),
-						Label.Giving_Gift_OverrideCreatedWithNumber
+						BarnHelp.text('Giving', 'Giving_Gift_OverrideCreatedWithNumber')
 					}
 				)
 			);
@@ -390,7 +390,7 @@ public with sharing class GiftService {
 			);
 		}
 		return String.format(
-			Label.Giving_Gift_ReceiptLockOverridden,
+			BarnHelp.text('Giving', 'Giving_Gift_ReceiptLockOverridden'),
 			new List<String>{
 				String.valueOf(previous.Id),
 				valueOrNone(previous.Receipt_Number__c),
@@ -405,7 +405,7 @@ public with sharing class GiftService {
 	 */
 	public static String change(Schema.SObjectField field, Object before, Object after) {
 		return String.format(
-			Label.Giving_Gift_OverrideChange,
+			BarnHelp.text('Giving', 'Giving_Gift_OverrideChange'),
 			new List<String>{
 				field.getDescribe().getLabel(),
 				valueOrNone(before),
@@ -415,7 +415,9 @@ public with sharing class GiftService {
 	}
 
 	private static String valueOrNone(Object value) {
-		return value == null ? Label.Giving_Gift_OverrideValueNone : String.valueOf(value);
+		return value == null
+			? BarnHelp.text('Giving', 'Giving_Gift_OverrideValueNone')
+			: String.valueOf(value);
 	}
 
 	/**
@@ -443,23 +445,23 @@ public with sharing class GiftService {
 			// trace of why. Receipt immutability is what ADR-0024 decided to make liftable, and
 			// this is a different rule that happens to be enforced next door.
 			if (withReversals.contains(gift.Id)) {
-				gift.addError(Label.Giving_Gift_ReversedGiftNotDeletable);
+				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_ReversedGiftNotDeletable'));
 				continue;
 			}
 			if (String.isBlank(gift.Receipt_Number__c)) {
 				continue;
 			}
 			if (!overridden) {
-				gift.addError(Label.Giving_Gift_ReceiptedGiftNotDeletable);
+				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_ReceiptedGiftNotDeletable'));
 				continue;
 			}
 			overrides.add(
 				String.format(
-					Label.Giving_Gift_ReceiptLockOverridden,
+					BarnHelp.text('Giving', 'Giving_Gift_ReceiptLockOverridden'),
 					new List<String>{
 						String.valueOf(gift.Id),
 						valueOrNone(gift.Receipt_Number__c),
-						Label.Giving_Gift_OverrideDeleted
+						BarnHelp.text('Giving', 'Giving_Gift_OverrideDeleted')
 					}
 				)
 			);
@@ -501,7 +503,7 @@ public with sharing class GiftService {
 		Id defaultFundId = resolveDefaultFundId();
 		if (defaultFundId == null) {
 			for (Gift__c gift : candidates.values()) {
-				gift.addError(Label.Giving_Gift_DefaultFundMissing);
+				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_DefaultFundMissing'));
 			}
 			return;
 		}
@@ -523,7 +525,7 @@ public with sharing class GiftService {
 		} catch (Exception allocationError) {
 			ErrorLogger.log(allocationError, 'GiftService.applyDefaultAllocations');
 			for (Gift__c gift : candidates.values()) {
-				gift.addError(Label.Giving_Gift_DefaultAllocationFailed);
+				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_DefaultAllocationFailed'));
 			}
 		} finally {
 			giftsInHand = held;
@@ -831,7 +833,7 @@ public with sharing class GiftService {
 				problems.put(
 					giftId,
 					String.format(
-						Label.Giving_Gift_AllocationsMustTotal,
+						BarnHelp.text('Giving', 'Giving_Gift_AllocationsMustTotal'),
 						new List<String>{
 							String.valueOf(allocated),
 							String.valueOf(expected),
@@ -894,7 +896,7 @@ public with sharing class GiftService {
 					)
 				);
 			} else {
-				gift.addError(Label.Giving_Gift_AmountChangeSplit);
+				gift.addError(BarnHelp.text('Giving', 'Giving_Gift_AmountChangeSplit'));
 			}
 		}
 		if (!toUpdate.isEmpty()) {
@@ -904,7 +906,7 @@ public with sharing class GiftService {
 			} catch (Exception allocationError) {
 				ErrorLogger.log(allocationError, 'GiftService.synchronizeAllocationsToAmount');
 				for (Gift__c gift : changed.values()) {
-					gift.addError(Label.Giving_Gift_AllocationUpdateFailed);
+					gift.addError(BarnHelp.text('Giving', 'Giving_Gift_AllocationUpdateFailed'));
 				}
 			} finally {
 				giftsInHand = held;
@@ -925,10 +927,14 @@ public with sharing class GiftService {
 		Gift__c original = loadReversible(giftId);
 		Decimal remaining = remainingAmount(original);
 		if (amount == null || amount <= 0) {
-			throw new GiftServiceException(Label.Giving_Gift_RefundAmountRequired);
+			throw new GiftServiceException(
+				BarnHelp.text('Giving', 'Giving_Gift_RefundAmountRequired')
+			);
 		}
 		if (amount > remaining) {
-			throw new GiftServiceException(Label.Giving_Gift_RefundExceedsRemaining);
+			throw new GiftServiceException(
+				BarnHelp.text('Giving', 'Giving_Gift_RefundExceedsRemaining')
+			);
 		}
 		Boolean nothingLeftAfterThis = amount == remaining;
 		return recordReversal(
@@ -949,7 +955,7 @@ public with sharing class GiftService {
 		if (remaining <= 0) {
 			throw new GiftServiceException(
 				String.format(
-					Label.Giving_Gift_AlreadyReversed,
+					BarnHelp.text('Giving', 'Giving_Gift_AlreadyReversed'),
 					new List<String>{ String.valueOf(original.Status__c) }
 				)
 			);
@@ -959,15 +965,17 @@ public with sharing class GiftService {
 
 	private static Gift__c loadReversible(Id giftId) {
 		if (giftId == null) {
-			throw new GiftServiceException(Label.Giving_Gift_OriginalNotFound);
+			throw new GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'));
 		}
 		List<Gift__c> gifts = GiftSelector.selectWithAllocations(new Set<Id>{ giftId });
 		if (gifts.isEmpty()) {
-			throw new GiftServiceException(Label.Giving_Gift_OriginalNotFound);
+			throw new GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'));
 		}
 		Gift__c original = gifts[0];
 		if (original.Amount__c == null || original.Amount__c <= 0) {
-			throw new GiftServiceException(Label.Giving_Gift_CannotReverseNegative);
+			throw new GiftServiceException(
+				BarnHelp.text('Giving', 'Giving_Gift_CannotReverseNegative')
+			);
 		}
 		// R-G3: only money received goes back. A Pending gift that will never be paid is
 		// cancelled instead (R-G16); a Refunded or Written off one has nothing left and is
@@ -978,7 +986,10 @@ public with sharing class GiftService {
 			status == GiftStatusRules.STATUS_CANCELLED
 		) {
 			throw new GiftServiceException(
-				String.format(Label.Giving_Gift_ReverseNeedsReceived, new List<String>{ status })
+				String.format(
+					BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'),
+					new List<String>{ status }
+				)
 			);
 		}
 		return original;

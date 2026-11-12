@@ -32,7 +32,7 @@ private class ReceiptServiceTest {
 				Assert.fail('A user with no permission issued a receipt.');
 			} catch (ReceiptService.ReceiptServiceException refused) {
 				Assert.areEqual(
-					Label.Giving_Receipt_NoPermission,
+					BarnHelp.text('Giving', 'Giving_Receipt_NoPermission'),
 					refused.getMessage(),
 					'It names the role to ask for.'
 				);
@@ -65,7 +65,7 @@ private class ReceiptServiceTest {
 					Assert.fail('The same gift was receipted twice.');
 				} catch (ReceiptService.ReceiptServiceException refused) {
 					Assert.areEqual(
-						Label.Giving_Receipt_GiftAlreadyReceipted,
+						BarnHelp.text('Giving', 'Giving_Receipt_GiftAlreadyReceipted'),
 						refused.getMessage(),
 						'It points at void and reissue.'
 					);
@@ -100,7 +100,7 @@ private class ReceiptServiceTest {
 					Assert.fail('A receipt was voided with no reason.');
 				} catch (ReceiptService.ReceiptServiceException refused) {
 					Assert.areEqual(
-						Label.Giving_Receipt_VoidNeedsReason,
+						BarnHelp.text('Giving', 'Giving_Receipt_VoidNeedsReason'),
 						refused.getMessage(),
 						'It asks for a reason.'
 					);
