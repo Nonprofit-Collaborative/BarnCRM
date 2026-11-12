@@ -40,7 +40,11 @@ private class DataSubjectRequestHandlerTest {
 			insert as user rows;
 
 			Assert.areEqual(received.addDays(30), reload(rows[0].Id).Due_Date__c, 'First');
-			Assert.areEqual(received.addDays(25), reload(rows[1].Id).Due_Date__c, 'Second, in bulk');
+			Assert.areEqual(
+				received.addDays(25),
+				reload(rows[1].Id).Due_Date__c,
+				'Second, in bulk'
+			);
 		}
 	}
 

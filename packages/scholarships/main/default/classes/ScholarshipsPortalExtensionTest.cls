@@ -90,7 +90,8 @@ private class ScholarshipsPortalExtensionTest {
 
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed'),
-				new ScholarshipsPortalExtension().run(ScholarshipsPortalExtension.APPLY, lee.Id, gone),
+				new ScholarshipsPortalExtension()
+					.run(ScholarshipsPortalExtension.APPLY, lee.Id, gone),
 				'Closed'
 			);
 		}

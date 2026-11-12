@@ -47,7 +47,11 @@ public with sharing class ProjectHealth implements Schedulable {
 			];
 			if (records.size() >= MAX_ROWS) {
 				ErrorLogger.logMessage(
-					BarnHelp.text('Projects', 'Projects_Health_CapReached', new List<Object>{ MAX_ROWS }),
+					BarnHelp.text(
+						'Projects',
+						'Projects_Health_CapReached',
+						new List<Object>{ MAX_ROWS }
+					),
 					'ProjectHealth',
 					ErrorLogger.SEVERITY_WARNING
 				);
