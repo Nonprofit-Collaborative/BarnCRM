@@ -592,7 +592,7 @@ Programs Admin can change them; Programs Staff see them and can screen.
 1. Click **Add a Rule**. A rule says: **when all** of its conditions are true, the **Result** is
    Eligible, Not Eligible or Review, with a **Reason** (up to 255 characters, shown on the
    enrollment) and optionally an **Eligibility Basis** (or **Don't Change the Basis**).
-2. Each condition picks an **Enrollment Field**, a comparison (**equal to**, **not equal to**,
+2. Each condition picks a **Field**, a comparison (**equal to**, **not equal to**,
    **one of**, **not one of**, **greater than**, **greater than or equal to**, **less than**,
    **less than or equal to**, **blank**, **not blank**) and a **Value**. For **one of** and
    **not one of** on a picklist field, move the choices you want from **Available** to
@@ -610,7 +610,13 @@ Programs Admin can change them; Programs Staff see them and can screen.
 The fields offered are the enrollment's own intake fields: the custom fields on an enrollment
 that hold text, a choice, a number, a date or a checkbox, such as **Referral Source**, **Intake
 Date** or any field you add to Enrollment in Setup (for example household size or income band).
-The Eligibility fields themselves and links to people are not offered. Comparisons ignore
+The Eligibility fields themselves and links to people are not offered. After them come the
+person's own fields, named **Contact:** and the field, such as **Contact: Birthdate** or
+**Contact: Mailing Zip/Postal Code**: every Contact field of those kinds that you can read,
+including fields you add to Contact in Setup. A rule on a person field reads the enrolled
+contact's value; an enrollment of an Account has no contact, so the value reads as blank there.
+A rule on a date such as Birthdate compares with a fixed date (for example **less than**
+2008-01-01 for people born before 2008). Comparisons ignore
 capitals; two numbers compare as numbers (4 equals 4.0); dates compare as dates; a blank value
 never satisfies greater or less than.
 

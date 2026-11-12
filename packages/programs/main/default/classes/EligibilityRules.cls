@@ -1,7 +1,7 @@
 /**
  * Eligibility screening rules (P-14, canonical model Section 29ZA, R-EN8): the rules an admin
  * defines for a program, stored as JSON on the program, checked here and applied to an
- * enrollment's intake fields. Pure logic with no query or save, so it runs in any context. The
+ * enrollment's intake fields and its person's Contact fields (P-14b, `Contact__r.Birthdate`). Pure logic with no query or save, so it runs in any context. The
  * same rules are evaluated for the preview by the framework-free `eligibilityEngine.js` module in
  * the `eligibilityRules` panel (plan 9.9); the two must agree, and the tests in both carry the
  * same cases.

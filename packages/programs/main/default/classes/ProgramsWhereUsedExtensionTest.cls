@@ -69,4 +69,25 @@ private class ProgramsWhereUsedExtensionTest {
 			Assert.isTrue(ProgramsWhereUsedExtension.rulesName(target, RULES));
 		}
 	}
+
+	@IsTest
+	static void aPersonFieldIsFoundThroughTheContactLookup() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			String rules = RULES.replace('Referral_Source__c', 'Contact__r.Birthdate');
+			Assert.isTrue(
+				ProgramsWhereUsedExtension.rulesName(
+					WhereUsedService.target('Contact', 'Birthdate'),
+					rules
+				),
+				'A rule on the person\'s Birthdate names Contact.Birthdate (P-14b).'
+			);
+			Assert.isFalse(
+				ProgramsWhereUsedExtension.rulesName(
+					WhereUsedService.target('Contact', 'Email'),
+					rules
+				),
+				'Not another Contact field.'
+			);
+		}
+	}
 }

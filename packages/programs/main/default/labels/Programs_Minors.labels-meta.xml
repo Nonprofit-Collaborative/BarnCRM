@@ -166,7 +166,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: field</shortDescription>
-        <value>Enrollment Field</value>
+        <value>Field</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_Operator</fullName>

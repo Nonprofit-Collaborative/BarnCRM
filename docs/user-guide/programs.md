@@ -169,8 +169,9 @@ save that result, or **Screen Open Enrollments** to do everyone. Screening sets 
 **Eligibility Status**, **Eligibility Basis** and **Eligibility Reason** on the enrollment.
 Someone already marked Eligible or Not Eligible is left alone unless you tick **Also screen
 enrollments already Eligible or Not Eligible**. **Review** means a person should look at the
-case. Only a Programs Admin changes the rules; you can still edit an enrollment's eligibility
-by hand.
+case. Rules read the enrollment's intake fields and can also read the person's own details,
+such as their birthdate, so keep both up to date before screening. Only a Programs Admin
+changes the rules; you can still edit an enrollment's eligibility by hand.
 
 ## To Record a Service by Hand
 

@@ -10745,7 +10745,7 @@ its enrollments (29ZA) are who takes part.
 | Start Date | date | no | When the program began, or will begin. |
 | End Date | date | no | When the program ended, or will end. |
 | Coordinator | reference(User) | no | The staff member who runs this program. |
-| Eligibility Rules | long text (JSON) | no | The program's eligibility screening rules (P-14, R-EN8): ordered rules over the enrollment's intake fields, in the documented format below. Edited in the Eligibility Rules panel, never by hand. |
+| Eligibility Rules | long text (JSON) | no | The program's eligibility screening rules (P-14, R-EN8): ordered rules over the enrollment's intake fields and, through its Contact lookup, the person's Contact fields (P-14b), in the documented format below. Edited in the Eligibility Rules panel, never by hand. |
 | Capacity | integer | no | How many people the program can have Enrolled at once (P-09, R-EN10). Empty means no limit. |
 
 **Eligibility rules format (version 1).** `{ "version": 1, "defaultResult": "Review",
@@ -10911,7 +10911,9 @@ of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history
 
 **R-EN8 Screening sets the eligibility fields from the program's rules (P-14).** Screening an
 enrollment (one, or the program's open ones, Applied or Enrolled, up to 200 a run) evaluates the
-program's eligibility rules (Section 29Y) over the enrollment's intake fields: the first rule
+program's eligibility rules (Section 29Y) over the enrollment's intake fields and (release 1.19,
+P-14b) the person's Contact fields, named by a path such as `Contact__r.Birthdate` and read
+blank for an enrollment of an Account: the first rule
 whose conditions all hold decides, else the rules' default (Review unless set). The result sets
 Eligibility Status (Eligible, Not Eligible or Review), Eligibility Reason, and Eligibility Basis
 when the rule names one. When the status changes, Eligibility Date becomes today for Eligible
@@ -17256,6 +17258,7 @@ mirrors the primary member).
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
 | 1.25 | 2026-11-11 | Programs sample data for goals, cohorts and sessions (release 1.19, P-10 and P-11 follow-up, D-168). 29ZA's sample data paragraph: the load gains two stages (a cohort with three sessions and attendance, then a goal with two steps per person Enrolled in tutoring); the removal deletes sample sessions and cohorts nothing refers to before the programs. No object or field added. |
+| 1.26 | 2026-11-11 | Person-field eligibility rules (release 1.19, P-14b, D-168 follow-up). R-EN8 and 29Y's Eligibility Rules: a condition's `field` may also be a path through the enrollment's Contact lookup (`Contact__r.<Contact field>`), offered for every readable Contact field of a rule type and read blank for an enrollment of an Account. Where Used matches rule fields as paths. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
