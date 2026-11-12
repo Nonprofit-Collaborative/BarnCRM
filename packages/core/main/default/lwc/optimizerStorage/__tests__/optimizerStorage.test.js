@@ -105,6 +105,7 @@ describe('c-optimizer-storage', () => {
     findToolStateKey.emit('ns__tool');
     await flush();
     allowed.shadowRoot.querySelector('[data-id="archive-old"]').click();
+    await flush();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Find' },

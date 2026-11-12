@@ -11,6 +11,7 @@ import listChildRelationships from '@salesforce/apex/FindController.listChildRel
 import getTargets from '@salesforce/apex/BulkUpdateController.getTargets';
 import getObjectInfo from '@salesforce/apex/QueryFieldCatalog.getObjectInfo';
 import { iconFor } from 'c/barnIcons';
+import { tabPageReference } from 'c/barnTabs';
 import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import {
@@ -414,13 +415,9 @@ export default class GridTool extends NavigationMixin(LightningElement) {
   }
 
   /** Opens the saved query in Find, to change its fields or conditions. */
-  handleOpenInFind() {
+  async handleOpenInFind() {
     const stateKey = this.stateKeyPrefix() + SAVED_QUERY_STATE;
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: FIND_TAB },
-      state: { [stateKey]: this.sourceId }
-    });
+    this[NavigationMixin.Navigate](await tabPageReference(FIND_TAB, { [stateKey]: this.sourceId }));
   }
 
   /** `c`, or the namespace, read from the page's own view key (never a literal prefix). */

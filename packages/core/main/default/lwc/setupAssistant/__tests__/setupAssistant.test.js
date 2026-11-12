@@ -692,6 +692,7 @@ describe('c-setup-assistant', () => {
     await settle();
 
     click(element, 'import-link');
+    await settle();
 
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',

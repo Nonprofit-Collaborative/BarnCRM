@@ -453,6 +453,7 @@ describe('c-data-manager', () => {
     expect(empty.heading).toBe('c.Core_DataManager_MappingsEmpty');
     expect(empty.message).toBe('c.Core_DataManager_MappingsEmptyHint');
     one(element, 'create-template').click();
+    await flush();
     expect(mockNavigate).toHaveBeenLastCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Import' }

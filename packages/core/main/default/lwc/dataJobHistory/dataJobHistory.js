@@ -47,6 +47,7 @@ import OPEN_FIND from '@salesforce/label/c.Core_BulkUpdate_OpenFind';
 import { NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import { format } from 'c/findCsv';
+import { tabPageReference } from 'c/barnTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FIND_TAB = 'Find';
@@ -236,12 +237,9 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   }
 
   /** A bulk update starts in Find (D-135): opens it with the note that says where. */
-  handleOpenFind() {
-    const pageReference = { type: 'standard__navItemPage', attributes: { apiName: FIND_TAB } };
-    if (this.toolStateKey) {
-      pageReference.state = { [this.toolStateKey]: 'update' };
-    }
-    this[NavigationMixin.Navigate](pageReference);
+  async handleOpenFind() {
+    const state = this.toolStateKey ? { [this.toolStateKey]: 'update' } : undefined;
+    this[NavigationMixin.Navigate](await tabPageReference(FIND_TAB, state));
   }
 
   jobs = [];
