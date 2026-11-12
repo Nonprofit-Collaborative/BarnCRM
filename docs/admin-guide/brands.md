@@ -58,6 +58,27 @@ details as before, and no app shows a Brands tab.
 Brand assignments can also be loaded with **Import** (map the Brand column to the brand's record
 ID) and changed in bulk with **Bulk Update**.
 
+## Brands on Records: Import and Bulk Update
+
+- **Gift import**: map a column to **Gift: brand** (offered while brands are on). Each value is a
+  brand name or record ID; a name two brands share, or one that matches none, rejects the row.
+  An empty value lets the gift take its appeal's brand, else the importing user's.
+- **Import** of appeals, volunteer jobs, programs or portals: map the **Brand** column to the
+  brand's record ID, like any other lookup.
+- **Bulk Update**: pick the object (Gifts, Appeals, Volunteer Jobs, Programs or Portals), the
+  records, and set **Brand** to the brand's record ID.
+
+## Brand Filters in List Views, Reports and Dashboards
+
+- **List views**: on any Gifts, Appeals, Volunteer Jobs, Programs or Portals list, open the
+  filter panel and add **Brand** equals the brand name. Save it as a new view, such as
+  "Barn Thrift Gifts", and share it with that brand's staff.
+- **Reports**: Gifts, Gifts with Allocations and every standard report type on these objects
+  carry **Brand**. Asks carry their appeal's brand (**Appeal: Brand**), and Volunteer Hours,
+  Volunteer Shifts and Volunteer Signups their job's brand (**Volunteer Job: Brand**).
+- **Dashboards**: open a dashboard, **Edit**, **+ Filter**, choose **Brand** (or **Volunteer
+  Job: Brand**) and add a value per brand. Every component's report must include that field.
+
 ## Brand-Restricted Visibility (Optional)
 
 Some organizations need staff of one brand not to see another brand's people.

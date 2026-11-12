@@ -20,6 +20,11 @@
       <table>Volunteer_Shift__c</table>
     </columns>
     <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Volunteer_Job__c.Brand__c</field>
+      <table>Volunteer_Shift__c</table>
+    </columns>
+    <columns>
       <checkedByDefault>true</checkedByDefault>
       <field>Start_Time__c</field>
       <table>Volunteer_Shift__c</table>

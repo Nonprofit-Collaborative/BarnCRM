@@ -14,7 +14,10 @@ your admin may have turned on brands. You will then see:
   address and signature, thank-you emails sent from the brand's address, and portals in the
   brand's colors. A volunteer letter takes the brand of the jobs the hours were for; hours for
   jobs of several brands print your organization instead.
-- In reports and list views, a **Brand** filter, so you can see one brand's gifts or people.
+- In reports and list views, a **Brand** filter, so you can see one brand's gifts or people. In
+  a list view, open the filter panel and add **Brand** equals the brand name. Volunteer hours,
+  shifts and signups reports filter on **Volunteer Job: Brand**, and asks on **Appeal: Brand**.
+- When importing gifts, a **Gift: brand** column to set each gift's brand by name.
 
 If your admin also turned on **Share records by brand**, you see the households, people and
 organizations of the brands you belong to, plus anything you could already see. If a record you

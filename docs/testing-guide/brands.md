@@ -66,6 +66,9 @@ organization legal name filled in.
 | 3 | Issue a receipt for the `Barn Thrift` gift. | The letterhead shows `Barn Thrift`, its address, and the legal name `Barn Thrift LLC` and its tax ID. |
 | 4 | In **Receipts**, set **Number receipts by** to **Brand**; give `Barn Thrift` the prefix `BT`. Issue a receipt for another `Barn Thrift` gift. | Its number starts `BT-`. A gift with no brand still gets the organization prefix. |
 | 5 | In **Reports**, create a Gifts report filtered on **Brand** equals `Barn Thrift`. | Only `Barn Thrift` gifts are listed. |
+| 6 | Create a Volunteer Hours with Job and Shift report and an Asks report; add **Volunteer Job: Brand** and **Appeal: Brand** and filter on `Barn Thrift`. | Only hours on `Barn Thrift` jobs, and asks on `Barn Thrift` appeals, are listed. |
+| 7 | Import a gift file with a **Gift: brand** column: one row `barn thrift`, one row with `North Chapter`'s record ID, one row `Nowhere`, one row empty on the `North Chapter` appeal. Dry run, then commit. | The `Nowhere` row is rejected with "No brand is named Nowhere."; the others load with brands `Barn Thrift`, `North Chapter` and `North Chapter` (from the appeal). With **Use brands** off, the picker has no **Gift: brand**. |
+| 8 | In **Bulk Update**, choose Gifts, pick two `North Chapter` gifts and set **Brand** to `Barn Thrift`'s record ID. On the Gifts tab, filter the list on **Brand** equals `Barn Thrift`. | Both gifts now show `Barn Thrift` and appear in the filtered list. |
 
 **Cleanup:** set **Number receipts by** back to **Organization**.
 

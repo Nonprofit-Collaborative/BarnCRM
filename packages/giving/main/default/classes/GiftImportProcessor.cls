@@ -48,6 +48,13 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			),
 			target('Tribute.Message__c', Label.Giving_Import_TargetTributeMessage)
 		};
+		if (BrandService.isEnabled()) {
+			// C-47d, after Gift: appeal; offered only while brands are on (R-BR2).
+			result.add(
+				6,
+				target('Gift.Brand', BarnHelp.text('Giving', 'Giving_Import_TargetBrand'))
+			);
+		}
 		for (Integer index = 1; index <= GiftImportRow.MAX_PARTS; index++) {
 			List<String> partNumber = new List<String>{ String.valueOf(index) };
 			result.add(
@@ -446,6 +453,10 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			Commitment__c = item.commitmentId,
 			Created_By_Import_Batch__c = batch.Id
 		);
+		if (item.brandId != null) {
+			// C-47d; left blank, the gift takes its appeal's or the user's brand (R-BR4).
+			gift.Brand__c = item.brandId;
+		}
 		for (Schema.SObjectField field : item.values.keySet()) {
 			gift.put(field, item.values.get(field));
 		}

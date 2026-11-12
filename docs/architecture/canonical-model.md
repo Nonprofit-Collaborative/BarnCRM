@@ -6231,7 +6231,10 @@ Type is matched to its picklist ignoring case, with a short list of the words pa
 use ("credit card" is Card, "cheque" is Check, "bank transfer" is ACH, "in kind" is In-kind);
 anything else rejects the row and names the accepted values. The virtual attribute
 `Gift.Appeal` names an appeal by name or identifier; an appeal that does not exist rejects the
-row. The gift carries Created By Import Batch (R-IB3).
+row. Likewise `Gift.Brand` (C-47d, offered in the picker only while `Brand_Management__c` is on)
+names a brand by name or identifier, read in user mode; none or two of one name rejects the row,
+and an empty value leaves the gift to R-BR4 defaulting. The gift carries Created By Import
+Batch (R-IB3).
 
 **R-GI4 The allocations.** `Allocation.Fund` names one fund, by name, accounting code or
 identifier; an inactive fund is accepted, because a migration names funds that have since
@@ -16043,6 +16046,14 @@ Email). Corporate Hub renders no documents; its board portal is a portal.
 
 **R-BR6 Filters (C-47e).** Every Brand lookup is a reportable field, and the report type
 `Brands_With_Assignments` lists brands with the people, organizations and staff assigned.
+Packaged report types on a branded record or its child carry the brand: `Gifts` and
+`Gifts_with_Allocations` (`Brand__c`), `Asks` (`Appeal__c.Brand__c`),
+`Volunteer_Hours_with_Job_and_Shift` and `Volunteer_Shifts_with_Job`
+(`Volunteer_Job__c.Brand__c`) and `Volunteer_Signups`
+(`Volunteer_Shift__c.Volunteer_Job__c.Brand__c`), none checked by default. No list view or
+dashboard filter is shipped (a shipped brand column would show a brand field while brands are
+off, R-BR2, and filter values are the org's own brand names); list views and dashboards filter
+on the field as the admin guide describes.
 
 **R-BR7 Brand-restricted visibility (C-47c, optional).** With `Brand_Visibility__c` on, each
 active brand has a public group (`BarnCRM_Brand_` plus the brand ID) whose members are the users
@@ -17264,6 +17275,7 @@ mirrors the primary member).
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
 | 1.25 | 2026-11-11 | Brand-aware letters, thank yous and portals (C-47b, D-119, D-120). No object or field added. R-BR5 names every output and adds `BrandService.senderIdsFor` and `BrandService.logoPath`; R-VL2 gains `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}` and `{BrandLogo}`; the portal menu (`PortalData.describe`) gains `brand`. |
+| 1.26 | 2026-11-11 | Brand in gift import and report types (C-47d, C-47e, D-119). No object or field added. R-GI3 gains the virtual attribute `Gift.Brand`; R-BR6 names the report types that carry the brand. |
 
 ---
 ## 32. Entity ownership by package
