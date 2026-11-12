@@ -203,6 +203,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
+| G-27 Recurring donor health | [recurring-donor-health.md](recurring-donor-health.md) | Giving |
 | G-19 Donor scoring | [donor-scoring.md](donor-scoring.md) | Giving |
 | G-32 Wealth screening data | [wealth-screening.md](wealth-screening.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |

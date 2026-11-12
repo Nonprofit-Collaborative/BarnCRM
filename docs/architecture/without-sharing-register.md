@@ -73,6 +73,7 @@ into six kinds:
 | PledgeReminderWriter | Org job | Reminds donors the scheduling user may not see | ADR-0021 |
 | ReceiptNumberSequence | Platform | The receipt number sequence, which no permission set lets anyone write | ADR-0021 |
 | ReceiptWriter | Org job | Issues receipts for donors the running user may not see | ADR-0021 |
+| RecurringGiftUpkeep | Upkeep | Every recurring commitment, to match a processor event by subscription id or donor email, and the four health fields of the matched one; the recipe's integration user cannot see private commitments (G-27, R-RH1, R-RH2) | ADR-0021 |
 | StewardshipWriter | Upkeep | Stewardship tasks assigned to the donor's owner | ADR-0021 |
 
 ## Volunteers

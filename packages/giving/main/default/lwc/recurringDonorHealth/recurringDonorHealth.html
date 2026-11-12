@@ -1,0 +1,98 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <c-barn-notice
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
+      <template lwc:if={page}>
+        <section class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium" data-id="totals">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="slds-box slds-box_x-small">
+              <p class="slds-text-title">{labels.mrr}</p>
+              <p class="slds-text-heading_medium" data-id="mrr">
+                <lightning-formatted-number value={revenue.total} format-style="currency"></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="slds-box slds-box_x-small">
+              <p class="slds-text-title">{labels.active}</p>
+              <p class="slds-text-heading_medium" data-id="active">{revenue.count}</p>
+            </div>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <div class="slds-box slds-box_x-small">
+              <p class="slds-text-title">{labels.atRisk}</p>
+              <p class="slds-text-heading_medium" data-id="at-risk">
+                <lightning-formatted-number value={risk.total} format-style="currency"></lightning-formatted-number>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="slds-var-m-bottom_medium" data-id="months">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.months}</h2>
+          <ul>
+            <template for:each={months} for:item="row">
+              <li key={row.key} class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_xx-small">
+                <span class="slds-size_1-of-4">{row.label}</span>
+                <span class="slds-size_2-of-4">
+                  <lightning-progress-bar value={row.share} size="medium"></lightning-progress-bar>
+                </span>
+                <span class="slds-size_1-of-4 slds-text-align_right">
+                  <lightning-formatted-number value={row.total} format-style="currency"></lightning-formatted-number>
+                </span>
+              </li>
+            </template>
+          </ul>
+        </section>
+
+        <template lwc:if={hasUnmatched}>
+          <c-barn-notice
+            variant="warning"
+            message={unmatchedMessage}
+            data-id="unmatched"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+
+        <section data-id="save-list">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.list}</h2>
+          <template lwc:if={hasRows}>
+            <ul class="slds-has-dividers_bottom-space">
+              <template for:each={risk.rows} for:item="row">
+                <li key={row.id} class="slds-item slds-grid slds-grid_vertical-align-center">
+                  <div class="slds-col">
+                    <a href={row.href}>{row.title}</a>
+                    <div class="slds-text-color_weak">{row.amountText}</div>
+                    <div class="slds-text-color_error">{row.reasonText}</div>
+                  </div>
+                  <lightning-button
+                    data-row-id={row.id}
+                    data-id="follow-up"
+                    label={labels.followUp}
+                    disabled={isWorking}
+                    onclick={handleFollowUp}
+                  ></lightning-button>
+                </li>
+              </template>
+            </ul>
+          </template>
+          <template lwc:else>
+            <p class="slds-text-color_weak" data-id="no-rows">{labels.noRows}</p>
+          </template>
+        </section>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

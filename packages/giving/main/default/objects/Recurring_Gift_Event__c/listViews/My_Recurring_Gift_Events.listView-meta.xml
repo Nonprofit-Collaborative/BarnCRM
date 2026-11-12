@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Recurring_Gift_Events</fullName>
+  <columns>NAME</columns>
+  <columns>Event_Type__c</columns>
+  <columns>Event_Date__c</columns>
+  <columns>Commitment__c</columns>
+  <columns>Match_Status__c</columns>
+  <columns>Detail__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Recurring Gift Events</label>
+</ListView>

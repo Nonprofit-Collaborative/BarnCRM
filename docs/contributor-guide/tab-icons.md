@@ -72,6 +72,8 @@ Rules:
 | giving | Receipt_Run__c | Custom36: Train |
 | giving | Receipt__c | Custom23: Envelope |
 | giving | Receipts | Custom27: Laptop |
+| giving | Recurring_Donor_Health | Custom86: RedCross |
+| giving | Recurring_Gift_Event__c | Custom21: Computer |
 | giving | Soft_Credit__c | Custom26: Flag |
 | giving | Stewardship_Plan_Template__c | Custom7: Square |
 | giving | Stewardship_Plan__c | Custom43: Jewel |
@@ -181,6 +183,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | pledgeReminders | custom:custom95 | Pledge_Reminders |
 | giving | quickGiftEntry | custom:custom40 | Quick_Gift_Entry |
 | giving | receiptActions | custom:custom23 | Receipt__c |
+| giving | recurringDonorHealth | custom:custom86 | Recurring_Donor_Health |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
 | corporatehub | hubBoardPanel | custom:custom47 | Board__c |

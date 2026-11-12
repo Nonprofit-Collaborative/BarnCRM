@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Donor_Email__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The donor's email at the processor. Used to find the commitment when there is no Subscription Id match: the donor must have exactly one active or paused recurring gift.</inlineHelpText>
+  <label>Donor Email</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Email</type>
+  <unique>false</unique>
+</CustomField>

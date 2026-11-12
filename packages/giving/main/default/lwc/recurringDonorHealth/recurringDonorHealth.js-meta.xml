@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Recurring donor health: monthly recurring revenue, twelve months of recurring gifts received
+    and the Save the Sustainer list of recurring gifts with failed charges, expiring cards,
+    cancellations or overdue payments, with a follow-up task (G-27).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Recurring Donor Health</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

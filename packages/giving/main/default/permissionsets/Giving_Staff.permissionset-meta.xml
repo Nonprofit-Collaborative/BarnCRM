@@ -72,6 +72,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>RecurringHealthController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>SoftCreditController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -133,6 +137,31 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Days_Since_Last_Gift__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Card_Expires__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Failed_Charges__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Last_Failed_Charge__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Commitment__c.Processor_Cancelled__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Commitment__c.Processor_Subscription_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1257,6 +1286,51 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Amount__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Card_Expires__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Commitment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Detail__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Donor_Email__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Event_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.External_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Recurring_Gift_Event__c.Match_Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Recurring_Gift_Event__c.Subscription_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Soft_Credit__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1558,6 +1632,15 @@
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Recurring_Gift_Event__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
@@ -1691,6 +1774,14 @@
   </tabSettings>
   <tabSettings>
     <tab>Receipts</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Recurring_Donor_Health</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Recurring_Gift_Event__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
