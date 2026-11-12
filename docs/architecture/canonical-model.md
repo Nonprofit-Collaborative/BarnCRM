@@ -7096,6 +7096,13 @@ data: a card is known only by its expiry month.
   year / 6, Yearly / 12) in the page's framework-free model; at-risk revenue is the same sum over
   the R-RH3 list; and the Received gifts on recurring gifts for this month and the eleven before,
   by calendar month. Read as the person.
+- **R-RH5 Payments subscriptions** (PAY-04, D-196; ADR-NEXT `NEXT-payments-subscriptions.md`).
+  When Payments tells Giving's listener of a subscription change on a commitment
+  (`subscriptionsChanged`), the commitment's Processor Subscription Id and Processor Customer Id
+  are filled when blank, and one Recurring Gift Event per change is upserted by External Id (the
+  processor event's key): chargeSucceeded is Charge Succeeded, chargeFailed Charge Failed,
+  cardUpdated Card Updated (with Card Expires), cancelled Cancelled. R-RH1 and R-RH2 then apply
+  it. User mode, as the Payments processing administrator.
 
 ### Salesforce implementation
 
@@ -7115,11 +7122,13 @@ data: a card is known only by its expiry month.
 | External Id | `External_Id__c` | Text(100), unique, external ID |
 | Match Status | `Match_Status__c` | Picklist (Unmatched, Matched), restricted |
 
-- **Fields on `Commitment__c`** (Giving Admin edits them; Staff edit only the subscription id):
+- **Fields on `Commitment__c`** (Giving Admin edits them; Staff edit only the subscription id
+  and read the customer id):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Processor Subscription Id | `Processor_Subscription_Id__c` | Text(100), unique, external ID |
+| Processor Customer Id | `Processor_Customer_Id__c` | Text(100), external ID: the processor's customer (Stripe `cus_...`), filled by R-RH5 or by an admin; Update Card needs it for Stripe |
 | Failed Charges | `Failed_Charges__c` | Number(3, 0) |
 | Last Failed Charge | `Last_Failed_Charge__c` | Date |
 | Card Expires | `Card_Expires__c` | Date |
@@ -16705,9 +16714,10 @@ the money or any card or account number.
 | Listener | text | no | The consumer's class told of each change (ADR-0201 payments module, decision 8). |
 | Reference | text | yes | A random identifier sent to the processor and matched on its events; unique. |
 | Checkout Id | text | no | The Stripe Checkout Session id or the PayPal Order id. |
-| Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture id, once known. |
+| Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture or sale id, once known (a Stripe renewal whose invoice has no payment intent: the invoice id). |
 | Checkout Url | long text | no | The hosted checkout page address. |
 | Paid At | datetime | no | When the processor reported the money captured. |
+| Subscription Id | text | no | The processor's subscription (Stripe `sub_...`, PayPal `I-...`) this payment started or renewed (R-PAY6). |
 | Detail | text | no | The last failure, refund or cancellation reason the processor gave; until then, what the consumer passed as `detail` (Giving: the scheduled payment charged). |
 
 ### Rules
@@ -16730,6 +16740,16 @@ fails, is told one payment at a time (`paymentChanged`), each failure rolled bac
 
 **R-PAY4 No card data.** No field holds a card, bank account or PayPal sign-in; the processor's
 page takes them.
+
+**R-PAY6 Subscriptions** (PAY-04, D-196; ADR-NEXT `NEXT-payments-subscriptions.md`). With
+Automatic Recurring Payments on, a checkout started with an interval is a processor subscription;
+its first payment gains the Subscription Id. A paid charge on a subscription is matched by its
+Processor Payment Id; failing that, the subscription's first payment (by reference, else by
+Subscription Id) takes it while it has no Processor Payment Id; otherwise a new Paid payment is
+written, copied from the first payment (person, source record, listener, description, currency,
+mode; never its detail), with a new reference and the charged amount. A failed charge, a card
+update and a cancellation change no payment; with each paid charge they are told to the first
+payment's listener as `subscriptionsChanged`, once per run, inside a savepoint.
 
 ### Salesforce implementation
 
@@ -16754,6 +16774,7 @@ page takes them.
 | Processor Payment Id | `Processor_Payment_Id__c` | Text(255), external ID |
 | Checkout Url | `Checkout_Url__c` | Long Text Area(2048) |
 | Paid At | `Paid_At__c` | DateTime |
+| Subscription Id | `Subscription_Id__c` | Text(100), external ID |
 | Detail | `Detail__c` | Text(255) |
 
 ---
@@ -16826,6 +16847,7 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 |---|---|---|---|
 | Processor | text | yes (defaults Stripe) | Stripe or PayPal: used when a module does not name one. |
 | Mode | text | yes (defaults Test) | Test or Live. Test takes no real money. |
+| Automatic Recurring Payments | checkbox | yes (defaults off) | A checkout started with an interval is a processor subscription (R-PAY6). |
 | Currency | text | yes (defaults USD) | The three-letter currency used when a module does not name one. |
 
 ### Salesforce implementation
@@ -16837,9 +16859,10 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | Processor | `Processor__c` | Text(20), default "Stripe" |
 | Mode | `Mode__c` | Text(10), default "Test" |
 | Currency | `Currency__c` | Text(3), default "USD" |
+| Automatic Recurring Payments | `Recurring_Payments__c` | Checkbox, default false |
 
 - **Setting Definitions:** `Payments_Processor`, `Payments_Mode`, `Payments_Currency`,
-  `Payments_Setup_Page`, section Payments.
+  `Payments_Recurring`, `Payments_Setup_Page`, section Payments.
 
 ---
 
@@ -18641,6 +18664,7 @@ mirrors the primary member).
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 | 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
 | 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
+| 1.48 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-NEXT `NEXT-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 
 ---
 ## 32. Entity ownership by package
