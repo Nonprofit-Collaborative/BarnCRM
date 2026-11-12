@@ -59,7 +59,8 @@ Map<String, Object> started = (Map<String, Object>) payments.call('startCheckout
 	'payerEmail' => 'ana@example.org',// optional, prefilled on Stripe
 	'personId' => contactId,          // optional, a Contact id
 	'sourceRecordId' => registration.Id, // optional, your record
-	'listener' => 'EventPaymentListener' // optional, your Callable class
+	'listener' => 'EventPaymentListener', // optional, your Callable class
+	'detail' => installmentId          // optional, kept as the payment's detail until the processor's
 });
 // started: { paymentId, checkoutUrl, status ('Pending'), reference }
 ```
@@ -74,14 +75,21 @@ Map<String, Object> started = (Map<String, Object>) payments.call('startCheckout
 
 Other calls: `call('getPayment', new Map<String, Object>{ 'paymentId' => id })` returns the
 payment map below (null when not found); `call('isReady', new Map<String, Object>{ 'processor' =>
-'PayPal' })` returns true when that processor's keys are set.
+'PayPal' })` returns true when that processor's keys are set; `call('countRecent', new
+Map<String, Object>{ 'sourceRecordId' => id, 'minutes' => 10, 'status' => 'Pending' })` returns
+how many payments for your record were started in the last minutes (default 60), of that status
+if given (a count only, so a public page may ask it, for example to refuse card testing).
 
 ### Being told of a change
 
 Give `listener` the name of a class of yours that implements `System.Callable`, with a public
 no-argument constructor (and `@NamespaceAccessible` once packaged). When a payment's status or
-refunded amount changes, the processing job calls
-`call('paymentChanged', payment)` with:
+refunded amount changes, the processing job first calls your class once for the whole run,
+`call('paymentsChanged', new Map<String, Object>{ 'payments' => [payment, ...] })`, with every
+changed payment of yours. Answer `true` when you handled them, which keeps a run of many
+payments inside the limits (one query for all, not one per payment). Answer anything else (a
+listener written before this form answers null) and it calls `call('paymentChanged', payment)`
+once per payment instead. Each payment map holds:
 
 | Key | Value |
 |---|---|
@@ -98,7 +106,8 @@ refunded amount changes, the processing job calls
 
 - It runs as the administrator who scheduled processing, in user mode, inside a savepoint: if
   your listener throws, your writes are undone and the failure logged, and the payment keeps its
-  new status. Make it safe to call twice with the same status.
+  new status. A failed `paymentsChanged` is followed by `paymentChanged` for each payment, each
+  in its own savepoint. Make both safe to call twice with the same status.
 - Do no callout in it; enqueue a job if you need one.
 - Test mode payments arrive the same way with `mode` `Test`; decide whether to act on them.
 

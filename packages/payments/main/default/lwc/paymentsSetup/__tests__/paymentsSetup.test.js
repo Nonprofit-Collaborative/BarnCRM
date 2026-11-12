@@ -3,6 +3,7 @@ import PaymentsSetup from 'c/paymentsSetup';
 import getSetup from '@salesforce/apex/PaymentsSetupController.getSetup';
 import saveKeys from '@salesforce/apex/PaymentsSetupController.saveKeys';
 import clearKeys from '@salesforce/apex/PaymentsSetupController.clearKeys';
+import scheduleProcessing from '@salesforce/apex/PaymentsSetupController.scheduleProcessing';
 
 jest.mock('@salesforce/apex/PaymentsSetupController.getSetup', () => ({ default: jest.fn() }), {
   virtual: true
@@ -13,6 +14,11 @@ jest.mock('@salesforce/apex/PaymentsSetupController.saveKeys', () => ({ default:
 jest.mock('@salesforce/apex/PaymentsSetupController.clearKeys', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/PaymentsSetupController.scheduleProcessing',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 const SETUP = {
   processor: 'Stripe',
@@ -106,6 +112,18 @@ describe('c-payments-setup', () => {
     await flush();
     expect(clearKeys).toHaveBeenCalledWith({ processor: 'PayPal' });
     expect(find(element, 'error').message).toBe('Not allowed.');
+  });
+
+  it('says processing is not scheduled and schedules it on the click', async () => {
+    const element = await render(SETUP);
+    expect(find(element, 'not-scheduled')).not.toBeNull();
+    expect(find(element, 'scheduled')).toBeNull();
+    scheduleProcessing.mockResolvedValue({ ...SETUP, scheduled: true });
+    find(element, 'schedule').click();
+    await flush();
+    expect(scheduleProcessing).toHaveBeenCalled();
+    expect(find(element, 'scheduled')).not.toBeNull();
+    expect(find(element, 'schedule')).toBeNull();
   });
 
   it('shows a general message when the page cannot load', async () => {

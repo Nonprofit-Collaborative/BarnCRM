@@ -158,6 +158,7 @@ public with sharing class PaymentService {
 			Person__c = idOf(args.get('personId'), Contact.SObjectType),
 			Source_Record_Id__c = text(args, 'sourceRecordId')?.left(18),
 			Listener__c = text(args, 'listener')?.left(255),
+			Detail__c = text(args, 'detail')?.abbreviate(255),
 			Reference__c = newReference()
 		);
 		try {
@@ -388,8 +389,8 @@ public with sharing class PaymentService {
 			toStatus == REFUNDED);
 	}
 
-	/** R-PAY3: abandoned checkouts are Cancelled, and their listeners told. */
-	public static void cancelAbandoned() {
+	/** R-PAY3: up to `count` abandoned checkouts are Cancelled and their listeners told; returns how many. */
+	public static Integer cancelAbandoned(Integer count) {
 		Datetime before = Datetime.now().addDays(-ABANDONED_DAYS);
 		List<Payment__c> stale = [
 			SELECT
@@ -408,40 +409,82 @@ public with sharing class PaymentService {
 			FROM Payment__c
 			WHERE Status__c = :PENDING AND Processor_Payment_Id__c = NULL AND CreatedDate < :before
 			WITH USER_MODE
-			LIMIT 200
+			ORDER BY CreatedDate ASC
+			LIMIT :count
 		];
 		Map<Id, String> previous = new Map<Id, String>();
+		String expired = BarnHelp.text('Payments', 'Payments_Detail_Expired');
 		for (Payment__c p : stale) {
 			previous.put(p.Id, p.Status__c);
 			p.Status__c = CANCELLED;
-			p.Detail__c = BarnHelp.text('Payments', 'Payments_Detail_Expired');
+			p.Detail__c = expired;
 		}
 		update as user stale;
 		notifyAll(stale, previous);
+		return stale.size();
 	}
 
 	// ---- Listeners ----
 
+	/**
+	 * Tells each listener once, with every changed payment of its own (`paymentsChanged`,
+	 * `{ payments: [payment map, ...] }`; a listener that handled them answers true). A listener
+	 * that answers anything else, or fails, is told one payment at a time (`paymentChanged`), each
+	 * failure rolled back on its own.
+	 */
 	private static void notifyAll(List<Payment__c> payments, Map<Id, String> previous) {
+		Map<String, List<Payment__c>> byListener = new Map<String, List<Payment__c>>();
 		for (Payment__c payment : payments) {
-			if (String.isBlank(payment.Listener__c)) {
-				continue;
+			if (String.isNotBlank(payment.Listener__c)) {
+				if (!byListener.containsKey(payment.Listener__c)) {
+					byListener.put(payment.Listener__c, new List<Payment__c>());
+				}
+				byListener.get(payment.Listener__c).add(payment);
 			}
-			System.Savepoint before = Database.setSavepoint();
+		}
+		for (String name : byListener.keySet()) {
+			List<Payment__c> mine = byListener.get(name);
+			Callable listener;
 			try {
-				Callable listener = (Callable) NamespaceUtil.build(
-					payment.Listener__c,
+				listener = (Callable) NamespaceUtil.build(
+					name,
 					Callable.class,
 					CONTEXT + '.notify'
 				);
-				if (listener != null) {
-					Map<String, Object> told = toMap(payment);
-					told.put('previousStatus', previous.get(payment.Id));
-					listener.call('paymentChanged', told);
+			} catch (Exception e) {
+				ErrorLogger.log(e, CONTEXT + '.notify', mine[0].Id);
+			}
+			if (listener == null) {
+				continue;
+			}
+			List<Map<String, Object>> told = new List<Map<String, Object>>();
+			for (Payment__c payment : mine) {
+				Map<String, Object> one = toMap(payment);
+				one.put('previousStatus', previous.get(payment.Id));
+				told.add(one);
+			}
+			System.Savepoint before = Database.setSavepoint();
+			try {
+				if (
+					listener.call(
+						'paymentsChanged',
+						new Map<String, Object>{ 'payments' => told }
+					) == true
+				) {
+					continue;
 				}
 			} catch (Exception e) {
 				Database.rollback(before);
-				ErrorLogger.log(e, CONTEXT + '.notify', payment.Id);
+				ErrorLogger.log(e, CONTEXT + '.notify', mine[0].Id);
+			}
+			for (Integer i = 0; i < mine.size(); i++) {
+				before = Database.setSavepoint();
+				try {
+					listener.call('paymentChanged', told[i]);
+				} catch (Exception e) {
+					Database.rollback(before);
+					ErrorLogger.log(e, CONTEXT + '.notify', mine[i].Id);
+				}
 			}
 		}
 	}
