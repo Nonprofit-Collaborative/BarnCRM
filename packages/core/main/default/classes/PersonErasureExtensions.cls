@@ -19,6 +19,7 @@ public with sharing class PersonErasureExtensions {
 		'GivingPersonErasureExtension',
 		'VolunteersErasureExtension',
 		'ProgramsErasureExtension',
+		'MembershipsErasureExtension',
 		'ContactPointErasureExtension'
 	};
 

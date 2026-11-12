@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Send Scholarships reminders</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Reminders_Enabled__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Scholarships_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Scholarships and Grants</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Scholarships</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether the morning run (6:50 AM in your org time zone) sends the owner of each award a bell notification before a report or condition is due, once per date. Default: on.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">scholarships.md</value></values>
+</CustomMetadata>

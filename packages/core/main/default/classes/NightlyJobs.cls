@@ -50,6 +50,9 @@ public with sharing class NightlyJobs {
 		'FundersNightlyJobProvider',
 		'EventsNightlyJobProvider',
 		'CorporateHubNightlyJobProvider',
+		'ScholarshipsNightlyJobProvider',
+		'TerritoryNightlyJobProvider',
+		'MembershipsNightlyJobProvider',
 		'AddressVerificationNightlyJobProvider'
 	};
 

@@ -40,6 +40,15 @@ public with sharing class EventSpeakersController {
 		public String status;
 		@AuraEnabled
 		public List<Assignment> assignments = new List<Assignment>();
+		/**
+		 * EV-27 (R-SRT3): the average of every rating of the sessions the speaker is in, to one
+		 * decimal, and how many there are; null and 0 when none.
+		 */
+		@AuraEnabled
+		public Decimal averageRating;
+		@AuraEnabled
+		public Decimal ratingCount = 0;
+		private Decimal ratingTotal = 0;
 	}
 
 	/** A speaker's place in a session. */
@@ -128,7 +137,14 @@ public with sharing class EventSpeakersController {
 			}
 			Set<Id> speakerIds = byId.keySet();
 			for (Session_Speaker__c link : [
-				SELECT Id, Event_Speaker__c, Event_Session__c, Event_Session__r.Name, Role__c
+				SELECT
+					Id,
+					Event_Speaker__c,
+					Event_Session__c,
+					Event_Session__r.Name,
+					Event_Session__r.Rating_Count__c,
+					Event_Session__r.Rating_Total__c,
+					Role__c
 				FROM Session_Speaker__c
 				WHERE Event_Speaker__c IN :speakerIds
 				WITH USER_MODE
@@ -140,7 +156,19 @@ public with sharing class EventSpeakersController {
 				assignment.sessionId = link.Event_Session__c;
 				assignment.sessionName = link.Event_Session__r.Name;
 				assignment.role = link.Role__c;
-				byId.get(link.Event_Speaker__c).assignments.add(assignment);
+				SpeakerRow row = byId.get(link.Event_Speaker__c);
+				row.assignments.add(assignment);
+				Decimal count = link.Event_Session__r.Rating_Count__c;
+				if (count != null && count > 0) {
+					row.ratingCount += count;
+					row.ratingTotal += link.Event_Session__r.Rating_Total__c;
+				}
+			}
+			for (SpeakerRow row : result.speakers) {
+				if (row.ratingCount > 0) {
+					row.averageRating = (row.ratingTotal / row.ratingCount)
+						.setScale(1, System.RoundingMode.HALF_UP);
+				}
 			}
 			return result;
 		} catch (Exception e) {

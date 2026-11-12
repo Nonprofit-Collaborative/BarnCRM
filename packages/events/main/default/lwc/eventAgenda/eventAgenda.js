@@ -147,6 +147,22 @@ export default class EventAgenda extends LightningElement {
     return (this.agenda && this.agenda.tracks) || [];
   }
 
+  /** The confirmed sessions with their time and room, for the rating codes (EV-27). */
+  get ratingSessions() {
+    return this.sessions
+      .filter((session) => session.status === 'Confirmed')
+      .map((session) => ({
+        id: session.id,
+        name: session.name,
+        room: session.room,
+        whenText: whenText(session.startsAt, session.endsAt, {
+          locale: LOCALE,
+          timeZone: TIME_ZONE,
+          range: DATE_RANGE
+        })
+      }));
+  }
+
   get days() {
     return daysOf(this.sessions, TIME_ZONE);
   }
@@ -268,6 +284,14 @@ export default class EventAgenda extends LightningElement {
         range: DATE_RANGE
       }),
       detailText: [session.sessionType, session.room].filter(Boolean).join(', '),
+      ratingText: session.ratingCount
+        ? helpText(
+            'Events',
+            'Events_Agenda_Rated',
+            Number(session.averageRating).toFixed(1),
+            session.ratingCount
+          )
+        : '',
       isCancelled: session.status === 'Cancelled',
       notes,
       hasNotes: notes.length > 0,

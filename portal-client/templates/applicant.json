@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "key": "applicant",
+  "title": "Applicant Portal",
+  "requiresModules": ["Scholarships"],
+  "pages": [
+    {
+      "key": "cycles",
+      "title": "Open Cycles",
+      "kind": "catalog",
+      "object": "Award_Cycle__c",
+      "fields": [
+        { "field": "Name", "label": "Cycle" },
+        { "field": "Program__r.Name", "label": "Program" },
+        { "field": "Close_Date__c", "label": "Closes" },
+        { "field": "Eligibility__c", "label": "Who Can Apply" }
+      ],
+      "where": [{ "field": "Status__c", "op": "equals", "value": "Open" }],
+      "orderBy": "Close_Date__c ASC",
+      "limit": 50,
+      "actions": [{ "extension": "Scholarships.Apply", "label": "Apply" }]
+    },
+    {
+      "key": "applications",
+      "title": "My Applications",
+      "kind": "related",
+      "object": "Award_Application__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Application" },
+        { "field": "Cycle__r.Name", "label": "Cycle" },
+        { "field": "Status__c" },
+        { "field": "Submitted_Date__c", "label": "Submitted" },
+        { "field": "Form_Link__c", "label": "Application Form" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": [{ "extension": "Scholarships.Withdraw", "label": "Withdraw" }]
+    },
+    {
+      "key": "awards",
+      "title": "My Awards",
+      "kind": "related",
+      "object": "Award__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Award" },
+        { "field": "Cycle__r.Name", "label": "Cycle" },
+        { "field": "Amount__c" },
+        { "field": "Status__c" },
+        { "field": "Conditions__c", "label": "Terms and Conditions" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": [{ "extension": "Scholarships.AcceptAward", "label": "Accept Award" }]
+    },
+    {
+      "key": "reports",
+      "title": "My Reports and Conditions",
+      "kind": "related",
+      "object": "Award_Requirement__c",
+      "personField": "Award__r.Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Requirement" },
+        { "field": "Type__c" },
+        { "field": "Due_Date__c", "label": "Due" },
+        { "field": "Status__c" },
+        { "field": "Instructions__c" },
+        { "field": "Form_Link__c", "label": "Report Form" }
+      ],
+      "where": [
+        { "field": "Status__c", "op": "notEquals", "value": "Met" },
+        { "field": "Status__c", "op": "notEquals", "value": "Waived" }
+      ],
+      "orderBy": "Due_Date__c ASC",
+      "limit": 50,
+      "actions": []
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+
+      <section class="slds-var-m-bottom_medium" data-id="reviews">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.reviews}</h2>
+        <template lwc:if={hasReviews}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={reviews} for:item="row">
+              <li key={row.id} class="slds-item"><a href={row.href}>{row.name}</a> <span class="slds-text-color_weak">{row.detail}</span></li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.noReviews}</p></template>
+      </section>
+
+      <section class="slds-var-m-bottom_medium" data-id="cycles">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.cycles}</h2>
+        <template lwc:if={hasCycles}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={cycles} for:item="row">
+              <li key={row.id} class="slds-item"><a href={row.href}>{row.name}</a> <span class="slds-text-color_weak">{row.detailText}</span></li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.noCycles}</p></template>
+      </section>
+
+      <section class="slds-var-m-bottom_medium" data-id="due">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.due}</h2>
+        <template lwc:if={hasDue}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={due} for:item="row">
+              <li key={row.id} class="slds-item">
+                <a href={row.href}>{row.name}</a> {row.recipient} <lightning-formatted-number value={row.amount} format-style="currency"></lightning-formatted-number>
+                <lightning-formatted-date-time value={row.scheduled} class="slds-var-m-left_x-small"></lightning-formatted-date-time>
+                <template lwc:if={row.held}><span class="slds-badge slds-var-m-left_x-small">{labels.held}</span></template>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.noDue}</p></template>
+      </section>
+
+      <template lwc:if={canManage}>
+        <section data-id="export">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.exportTitle}</h2>
+          <div class="slds-grid slds-gutters slds-grid_vertical-align-end slds-wrap">
+            <lightning-input class="slds-col" type="date" label={labels.from} value={exportFrom} data-field="exportFrom" onchange={handleRange}></lightning-input>
+            <lightning-input class="slds-col" type="date" label={labels.to} value={exportTo} data-field="exportTo" onchange={handleRange}></lightning-input>
+            <lightning-button class="slds-col" data-id="export-button" label={labels.exportButton} disabled={isWorking} onclick={handleExport}></lightning-button>
+          </div>
+        </section>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

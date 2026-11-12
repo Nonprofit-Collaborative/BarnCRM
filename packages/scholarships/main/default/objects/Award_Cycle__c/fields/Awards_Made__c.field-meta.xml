@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Awards_Made__c</fullName>
+  <inlineHelpText>How many awards are offered, accepted, active or completed.</inlineHelpText>
+  <label>Awards Made</label>
+  <summaryFilterItems>
+    <field>Award__c.Status__c</field>
+    <operation>equals</operation>
+    <value>Offered, Accepted, Active, Completed</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Award__c.Cycle__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

@@ -38,6 +38,9 @@ public with sharing class EventCheckInController {
 		public String id;
 		@AuraEnabled
 		public String name;
+		/** The attendee's Badge Name (EV-26), shown before the name when set. */
+		@AuraEnabled
+		public String badgeName;
 		@AuraEnabled
 		public String email;
 		@AuraEnabled
@@ -73,7 +76,7 @@ public with sharing class EventCheckInController {
 				result.tickets.add(option);
 			}
 			List<Event_Attendee__c> rows = [
-				SELECT Id, Name, Contact__r.Email, Ticket_Type__r.Name, Status__c
+				SELECT Id, Name, Badge_Name__c, Contact__r.Email, Ticket_Type__r.Name, Status__c
 				FROM Event_Attendee__c
 				WHERE
 					Event_Registration__r.Event__c = :eventId
@@ -87,6 +90,7 @@ public with sharing class EventCheckInController {
 				Person person = new Person();
 				person.id = rows[i].Id;
 				person.name = rows[i].Name;
+				person.badgeName = rows[i].Badge_Name__c;
 				person.email = rows[i].Contact__r?.Email;
 				person.ticketName = rows[i].Ticket_Type__r?.Name;
 				person.status = rows[i].Status__c;

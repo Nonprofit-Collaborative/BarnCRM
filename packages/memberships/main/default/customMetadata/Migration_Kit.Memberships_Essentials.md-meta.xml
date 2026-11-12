@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Memberships Essentials Members</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Memberships_Essentials</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your Memberships Essentials membership products (those with a tier) as BarnCRM membership levels, then your Essentials memberships as BarnCRM memberships at those levels, keeping their account, primary contact and dates. Dues are not copied: enter them on each level. Memberships Essentials itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"levels","label":"Membership Levels","kind":"import","help":"Copies each Essentials membership product that has a tier as a level, with its term in months and its grace period.","source":"Product2","fields":["Name","Description","IsActive","Membership_Tier__c","Term__c","Term_Unit__c","Grace_Period__c"],"filters":[{"field":"Membership_Tier__c","value":null,"op":"notEquals"}],"templateKey":"kit_essentials_levels"},{"key":"terms","label":"Memberships","kind":"import","help":"Copies each Essentials membership at its copied level: Current when it has not ended, else Lapsed.","source":"Membership__c","fields":["Account__c","Primary_Contact__c","Product__c","Start_Date__c","End_Date__c","Does_Not_Expire__c"],"filters":[{"field":"Product__c","value":null,"op":"notEquals"}],"links":[{"column":"Product__c","step":"levels"}],"templateKey":"kit_essentials_terms"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"dues","text":"Enter the dues on each copied membership level (Membership Levels tab): Essentials keeps prices in price books, which BarnCRM does not read."},{"key":"forms","text":"Stop Essentials membership forms and flows from making new memberships, so new members are added only in BarnCRM."},{"key":"fields","text":"Reports or automation that read the Essentials membership fields on Contact and Account (Membership Status, Membership End Date) should move to the BarnCRM Memberships tab and its reports."},{"key":"uninstall","text":"When you have checked your members in BarnCRM, remove the Essentials metadata and its permission sets from your org."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">EssentialsMigrationKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">60</value>
+  </values>
+</CustomMetadata>

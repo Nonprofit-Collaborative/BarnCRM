@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Reminder_Template__c</fullName>
+  <defaultValue>"BarnCRM_Membership_Renewal"</defaultValue>
+  <description>The unique name of the renewal reminder email template.</description>
+  <externalId>false</externalId>
+  <label>Reminder Template</label>
+  <length>80</length>
+  <required>false</required>
+  <unique>false</unique>
+  <type>Text</type>
+</CustomField>

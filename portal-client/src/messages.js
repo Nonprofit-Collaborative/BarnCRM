@@ -29,6 +29,7 @@ export const MESSAGES = {
   yes: 'Yes',
   no: 'No',
   nothingHere: 'Nothing to show here yet.',
+  search: 'Search',
   loading: 'Loading...',
   greeting: 'Hello, {0}',
   errors: {

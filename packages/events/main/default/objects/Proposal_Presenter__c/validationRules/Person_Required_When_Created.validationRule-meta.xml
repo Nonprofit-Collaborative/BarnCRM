@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Person_Required_When_Created</fullName>
+  <active>true</active>
+  <description>R-PP1: a new presenter names a Core person. A person deleted later leaves the presenter with none.</description>
+  <errorConditionFormula>ISNEW() &amp;&amp; ISBLANK(Contact__c)</errorConditionFormula>
+  <errorDisplayField>Contact__c</errorDisplayField>
+  <errorMessage>Choose the person who presents.</errorMessage>
+</ValidationRule>

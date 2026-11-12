@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Receipt_Runs</fullName>
+  <columns>NAME</columns>
+  <columns>Type__c</columns>
+  <columns>Statement_Year__c</columns>
+  <columns>Status__c</columns>
+  <columns>Started__c</columns>
+  <columns>Finished__c</columns>
+  <columns>Receipts_Issued__c</columns>
+  <columns>Errors__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Receipt Runs</label>
+</ListView>

@@ -161,6 +161,12 @@ the same Members panel. A household is still its own record, never a person.
 
 ## Common Mistakes
 
+**"The Households tab shows only a few households."**
+It no longer does: the Households and Organizations tabs open the standard Account list page
+(a small BarnCRM page redirects, replacing itself in the browser history) with the packaged
+**Households** and **Organizations** list views and the list view menu, which also holds
+**My Households** and **My Organizations**. Build more lists in Salesforce as usual.
+
 **"There is no Households tab."**
 Households is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
 role within a few minutes. Someone without a BarnCRM role does not get it: give them a role on

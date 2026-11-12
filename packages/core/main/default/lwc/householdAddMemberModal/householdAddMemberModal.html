@@ -2,7 +2,7 @@
     <lightning-modal-header label={label}></lightning-modal-header>
     <lightning-modal-body>
         <div class="slds-is-relative">
-            <template lwc:if={searchMode}>
+            <template lwc:if={showSearch}>
                 <div class="add-existing-section">
                     <h2 class="slds-text-heading_small">{labels.addExistingHeading}</h2>
                     <lightning-input
@@ -36,8 +36,32 @@
                             {labels.addExistingNoResults}
                         </p>
                     </template>
+                    <template lwc:if={hasPendingMove}>
+                        <div class="slds-var-m-top_small move-confirm">
+                            <c-barn-notice
+                                variant="info"
+                                message={pendingMessage}
+                                class="move-confirm-message"
+                            ></c-barn-notice>
+                            <div class="slds-var-m-top_x-small">
+                                <lightning-button
+                                    label={labels.cancel}
+                                    onclick={handleCancelMove}
+                                    class="slds-var-m-right_x-small move-cancel-button"
+                                ></lightning-button>
+                                <lightning-button
+                                    variant="brand"
+                                    label={labels.save}
+                                    disabled={busy}
+                                    onclick={handleConfirmMove}
+                                    class="move-save-button"
+                                ></lightning-button>
+                            </div>
+                        </div>
+                    </template>
                 </div>
-
+            </template>
+            <template lwc:if={searchMode}>
                 <div class="add-new-section slds-var-m-top_medium">
                     <h2 class="slds-text-heading_small">{labels.addNewHeading}</h2>
                     <lightning-input
@@ -93,6 +117,9 @@
             <template lwc:else>
                 <lightning-record-edit-form object-api-name="Contact" onsuccess={handleFormSuccess}>
                     <lightning-messages></lightning-messages>
+                    <template lwc:if={showSearch}>
+                        <h2 class="slds-text-heading_small slds-var-m-top_medium add-new-heading">{labels.addNewHeading}</h2>
+                    </template>
                     <lightning-input-field field-name="Salutation"></lightning-input-field>
                     <lightning-input-field
                         field-name="FirstName"
@@ -126,6 +153,8 @@
                         <lightning-input-field field-name="MailingPostalCode"></lightning-input-field>
                     </template>
                     <template lwc:else>
+                        <lightning-input-field field-name="Email"></lightning-input-field>
+                        <lightning-input-field field-name="Phone"></lightning-input-field>
                         <div class="slds-hide">
                             <lightning-input-field field-name="AccountId" value={householdId}></lightning-input-field>
                         </div>

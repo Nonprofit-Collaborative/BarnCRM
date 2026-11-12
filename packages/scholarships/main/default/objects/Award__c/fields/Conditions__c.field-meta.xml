@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Conditions__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The terms the recipient accepts, as the letter states them.</inlineHelpText>
+  <label>Terms and Conditions</label>
+  <length>32768</length>
+  <required>false</required>
+  <visibleLines>4</visibleLines>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+</CustomField>

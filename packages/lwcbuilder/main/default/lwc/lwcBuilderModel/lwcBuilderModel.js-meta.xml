@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The LWC Builder's definition document: build, move, validate, visibility rules and export as
+    LWC source, framework-free (LB-01 to LB-06).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

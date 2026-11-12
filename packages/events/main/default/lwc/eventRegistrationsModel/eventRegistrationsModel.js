@@ -2,7 +2,7 @@
  * Registration rules the Registrations tab draws from (EV-02, canonical model 29EV8 and 29EV9),
  * framework free so they port to BarnCRM for WordPress (plan 9.9). No Salesforce imports.
  *
- * An attendee is `{ id, status, registrationId, registrationStatus }`.
+ * An attendee is `{ id, status, registrationId, registrationStatus, amountOwed, paymentStatus }`.
  */
 
 export const REGISTERED = 'Registered';
@@ -10,6 +10,24 @@ export const WAITLISTED = 'Waitlisted';
 export const CANCELLED = 'Cancelled';
 export const ATTENDED = 'Attended';
 export const NO_SHOW = 'No-Show';
+/** A registration's status while an online payment is awaited (EV-20, R-ERG5). */
+export const PENDING_PAYMENT = 'Pending Payment';
+export const PAID = 'Paid';
+
+const PAYMENT_WORDS = {
+  Unpaid: 'pending',
+  'Link Sent': 'pending',
+  [PAID]: 'complete',
+  Failed: 'not-met',
+  'Partly Refunded': 'pending',
+  Refunded: 'inactive',
+  Cancelled: 'inactive'
+};
+
+/** The status badge word for a registration's Payment Status (EV-20). */
+export function paymentWord(paymentStatus) {
+  return PAYMENT_WORDS[paymentStatus] || 'neutral';
+}
 
 /** Statuses that hold a seat (R-EAT1). */
 export const SEATED = [REGISTERED, ATTENDED, NO_SHOW];
@@ -65,9 +83,11 @@ export function summarize(attendees, capacity) {
 /**
  * The status changes offered for an attendee, as `{ value, target }`: the value names the
  * action, the target the status it sets. `cancelRegistration` is offered while the
- * registration is not cancelled.
+ * registration is not cancelled. `editBadge` is always offered (EV-26); `sendPaymentLink` when
+ * `options.canSendPaymentLink` and the registration owes money, is not paid and is not cancelled
+ * (EV-20, R-ERG7).
  */
-export function actionsFor(attendee) {
+export function actionsFor(attendee, options) {
   const actions = [];
   const add = (value, target) => actions.push({ value, target });
   switch (attendee && attendee.status) {
@@ -94,7 +114,21 @@ export function actionsFor(attendee) {
     default:
       break;
   }
-  if (attendee && attendee.registrationStatus && attendee.registrationStatus !== CANCELLED) {
+  if (!attendee) {
+    return actions;
+  }
+  add('editBadge', null);
+  const open = Boolean(attendee.registrationStatus) && attendee.registrationStatus !== CANCELLED;
+  if (
+    open &&
+    options &&
+    options.canSendPaymentLink &&
+    Number(attendee.amountOwed) > 0 &&
+    attendee.paymentStatus !== PAID
+  ) {
+    add('sendPaymentLink', null);
+  }
+  if (open) {
     add('cancelRegistration', null);
   }
   return actions;
