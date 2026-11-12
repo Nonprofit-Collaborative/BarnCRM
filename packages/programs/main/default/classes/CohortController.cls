@@ -85,11 +85,14 @@ public with sharing class CohortController {
 		List<Id> enrollments = enrollmentIds == null ? new List<Id>() : enrollmentIds;
 		List<Id> people = personIds == null ? new List<Id>() : personIds;
 		if (enrollments.isEmpty() && people.isEmpty()) {
-			throw UserErrors.message(Label.Programs_Cohort_NobodyChosen);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Cohort_NobodyChosen'));
 		}
 		if (enrollments.size() + people.size() > MAX_SHOWN) {
 			throw UserErrors.message(
-				String.format(Label.Programs_Cohort_TooMany, new List<Object>{ MAX_SHOWN })
+				String.format(
+					BarnHelp.text('Programs', 'Programs_Cohort_TooMany'),
+					new List<Object>{ MAX_SHOWN }
+				)
 			);
 		}
 		try {
@@ -142,7 +145,7 @@ public with sharing class CohortController {
 	private static Cohort__c checkedCohort(Id cohortId) {
 		Cohort__c cohort = cohortId == null ? null : CohortSelector.selectCohort(cohortId);
 		if (cohort == null) {
-			throw UserErrors.message(Label.Programs_Cohort_NotFound);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Cohort_NotFound'));
 		}
 		return cohort;
 	}

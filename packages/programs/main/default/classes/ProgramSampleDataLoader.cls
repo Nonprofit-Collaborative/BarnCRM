@@ -472,7 +472,7 @@ public with sharing class ProgramSampleDataLoader {
 			return null;
 		}
 		String message = String.format(
-			Label.Programs_SampleData_Kept,
+			BarnHelp.text('Programs', 'Programs_SampleData_Kept'),
 			new List<Object>{ String.join(names, ', ') }
 		);
 		ErrorLogger.logMessage(message, REMOVE_CONTEXT, ErrorLogger.SEVERITY_WARNING);

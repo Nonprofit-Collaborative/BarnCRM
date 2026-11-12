@@ -87,7 +87,7 @@ public with sharing class ProgramRosterController {
 			throw UserErrors.message(failed());
 		}
 		if (personId == null) {
-			throw UserErrors.message(Label.Programs_Roster_PersonRequired);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Roster_PersonRequired'));
 		}
 		Enrollment__c enrollment = new Enrollment__c(Program__c = programId);
 		if (String.isNotBlank(stage)) {

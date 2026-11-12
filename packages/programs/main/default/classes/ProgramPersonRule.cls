@@ -42,7 +42,10 @@ public with sharing class ProgramPersonRule {
 				continue;
 			}
 			for (SObject record : byAccount.get(accountId)) {
-				record.addError('Account__c', System.Label.Programs_Person_NotAPerson);
+				record.addError(
+					'Account__c',
+					BarnHelp.text('Programs', 'Programs_Person_NotAPerson')
+				);
 			}
 		}
 	}

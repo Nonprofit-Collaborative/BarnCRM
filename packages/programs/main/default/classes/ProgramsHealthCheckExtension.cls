@@ -70,7 +70,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
 				new HealthCheckService.Finding(
 					NPC_KEY,
 					Label.Programs_HealthCheck_NpcProgramsTitle,
-					Label.Programs_HealthCheck_NpcProgramsDetail,
+					BarnHelp.text('Programs', 'Programs_HealthCheck_NpcProgramsDetail'),
 					HealthCheckService.SEVERITY_INFO,
 					HealthCheckService.CATEGORY_ORG_SHAPE
 				)
@@ -130,7 +130,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
 							Label.Programs_HealthCheck_OpenAfterEndTitle,
 							new List<Object>{ counted }
 					  ),
-				Label.Programs_HealthCheck_OpenAfterEndDetail,
+				BarnHelp.text('Programs', 'Programs_HealthCheck_OpenAfterEndDetail'),
 				HealthCheckService.SEVERITY_INFO,
 				HealthCheckService.CATEGORY_SETTINGS
 			)

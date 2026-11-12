@@ -1,9 +1,14 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import ProgramRoster from 'c/programRoster';
 import getRoster from '@salesforce/apex/ProgramRosterController.getRoster';
 import enroll from '@salesforce/apex/ProgramRosterController.enroll';
 import setStage from '@salesforce/apex/ProgramRosterController.setStage';
 import { format, rosterRows, stageFigures, stageLabel } from '../roster';
+
+setHelpTextForTest({
+  Programs_Roster_Changed: '{0} is now {1}.'
+});
 
 jest.mock('@salesforce/apex/ProgramRosterController.getRoster', () => ({ default: jest.fn() }), {
   virtual: true
@@ -12,9 +17,6 @@ jest.mock('@salesforce/apex/ProgramRosterController.enroll', () => ({ default: j
   virtual: true
 });
 jest.mock('@salesforce/apex/ProgramRosterController.setStage', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Roster_Changed', () => ({ default: '{0} is now {1}.' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Roster_Added', () => ({ default: 'Enrollment added.' }), {

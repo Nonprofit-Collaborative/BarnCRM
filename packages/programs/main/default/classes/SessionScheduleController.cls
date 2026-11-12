@@ -123,16 +123,21 @@ public with sharing class SessionScheduleController {
 		String endTime
 	) {
 		if (serviceId == null) {
-			throw UserErrors.message(Label.Programs_Schedule_ServiceRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired')
+			);
 		}
 		Set<Date> unique = new Set<Date>(dates == null ? new List<Date>() : dates);
 		unique.remove(null);
 		if (unique.isEmpty()) {
-			throw UserErrors.message(Label.Programs_Schedule_NoDates);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Schedule_NoDates'));
 		}
 		if (unique.size() > MAX_SESSIONS) {
 			throw UserErrors.message(
-				String.format(Label.Programs_Schedule_TooMany, new List<Object>{ MAX_SESSIONS })
+				String.format(
+					BarnHelp.text('Programs', 'Programs_Schedule_TooMany'),
+					new List<Object>{ MAX_SESSIONS }
+				)
 			);
 		}
 		Time starts = parsedTime(startTime);
@@ -271,7 +276,7 @@ public with sharing class SessionScheduleController {
 				return offered;
 			}
 		}
-		throw UserErrors.message(Label.Programs_Schedule_ServiceRequired);
+		throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired'));
 	}
 
 	private static Preview previewOf(Id scheduleId) {
@@ -304,7 +309,7 @@ public with sharing class SessionScheduleController {
 		if (recordId != null && recordId.getSObjectType() == Cohort__c.SObjectType) {
 			Cohort__c cohort = CohortSelector.selectCohort(recordId);
 			if (cohort == null) {
-				throw UserErrors.message(Label.Programs_Cohort_NotFound);
+				throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Cohort_NotFound'));
 			}
 			schedule.cohortId = cohort.Id;
 			schedule.cohortName = cohort.Name;
@@ -352,7 +357,7 @@ public with sharing class SessionScheduleController {
 			Integer.valueOf(parts[0]) > 23 ||
 			Integer.valueOf(parts[1].left(2)) > 59
 		) {
-			throw UserErrors.message(Label.Programs_Schedule_BadTime);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Schedule_BadTime'));
 		}
 		return Time.newInstance(Integer.valueOf(parts[0]), Integer.valueOf(parts[1].left(2)), 0, 0);
 	}

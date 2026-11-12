@@ -40,14 +40,20 @@ public with sharing class CohortService {
 			Enrollment__c enrollment = chosen.get(enrollmentId);
 			if (enrollment == null) {
 				outcome.refusals.add(
-					new Refusal(String.valueOf(enrollmentId), Label.Programs_Cohort_NotFoundOne)
+					new Refusal(
+						String.valueOf(enrollmentId),
+						BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne')
+					)
 				);
 			} else if (
 				enrollment.Program__c != cohort.Program__c ||
 				!EnrollmentService.isOpen(enrollment.Stage__c)
 			) {
 				outcome.refusals.add(
-					new Refusal(personNameOf(enrollment), Label.Programs_Cohort_NotOpen)
+					new Refusal(
+						personNameOf(enrollment),
+						BarnHelp.text('Programs', 'Programs_Cohort_NotOpen')
+					)
 				);
 			} else if (enrollment.Cohort__c != cohort.Id) {
 				toUpdate.add(new Enrollment__c(Id = enrollment.Id, Cohort__c = cohort.Id));
@@ -103,7 +109,7 @@ public with sharing class CohortService {
 		);
 		Enrollment__c enrollment = found.get(enrollmentId);
 		if (enrollment == null || enrollment.Cohort__c != cohortId) {
-			throw UserErrors.message(Label.Programs_Cohort_NotFoundOne);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'));
 		}
 		Database.update(
 			new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Cohort__c = null) },

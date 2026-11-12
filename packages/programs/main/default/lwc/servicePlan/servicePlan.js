@@ -32,7 +32,6 @@ import LAST_REVIEWED_ON from '@salesforce/label/c.Programs_Plan_LastReviewedOn';
 import CLOSED_ON from '@salesforce/label/c.Programs_Plan_ClosedOn';
 import REVIEW_DUE from '@salesforce/label/c.Programs_Plan_ReviewDue';
 import WORKS_TOWARD from '@salesforce/label/c.Programs_Plan_WorksToward';
-import OUTCOME_MISSING from '@salesforce/label/c.Programs_Plan_OutcomeMissing';
 import STEPS_DONE from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 import NEW_STEP from '@salesforce/label/c.Programs_Plan_NewStep';
 import NEW_STEP_FOR from '@salesforce/label/c.Programs_Plan_NewStepFor';
@@ -40,7 +39,6 @@ import ADD_STEP from '@salesforce/label/c.Core_Shared_AddStep';
 import MARK_REVIEWED from '@salesforce/label/c.Programs_Plan_MarkReviewed';
 import SAVE_REVIEW from '@salesforce/label/c.Programs_Plan_SaveReview';
 import NOTES from '@salesforce/label/c.Programs_Plan_Notes';
-import MORE_NOTES from '@salesforce/label/c.Programs_Plan_MoreNotes';
 import NEW_NOTE from '@salesforce/label/c.Programs_Plan_NewNote';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
@@ -87,7 +85,9 @@ export default class ServicePlan extends NavigationMixin(LightningElement) {
     save: SAVE,
     cancel: CANCEL,
     reviewDue: REVIEW_DUE,
-    outcomeMissing: OUTCOME_MISSING,
+    get outcomeMissing() {
+      return helpText('Programs', 'Programs_Plan_OutcomeMissing');
+    },
     addStep: ADD_STEP,
     markReviewed: MARK_REVIEWED,
     saveReview: SAVE_REVIEW,
@@ -170,7 +170,7 @@ export default class ServicePlan extends NavigationMixin(LightningElement) {
         closedOn: CLOSED_ON,
         worksToward: WORKS_TOWARD,
         stepsDone: STEPS_DONE,
-        moreNotes: MORE_NOTES,
+        moreNotes: helpText('Programs', 'Programs_Plan_MoreNotes'),
         newStepFor: NEW_STEP_FOR
       },
       LOCALE

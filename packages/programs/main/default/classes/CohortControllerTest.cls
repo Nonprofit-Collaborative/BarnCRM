@@ -86,7 +86,10 @@ private class CohortControllerTest {
 			Assert.isTrue(before.canEdit && before.canEnroll, 'The admin may add and enroll.');
 			Assert.areEqual(3, after.added, 'Ana moved in; Ben and Cara enrolled in it.');
 			Assert.areEqual(2, after.failures.size(), 'Each refused alone.');
-			Assert.areEqual(Label.Programs_Cohort_NotOpen, after.failures[0].message);
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Cohort_NotOpen'),
+				after.failures[0].message
+			);
 			Assert.areEqual(
 				new Set<String>{ 'Pat Ana', 'Pat Ben', 'Pat Cara' },
 				namesOf(after.members)
@@ -141,7 +144,11 @@ private class CohortControllerTest {
 			Assert.areEqual(0, after.members.size(), 'Out of the cohort.');
 			Assert.areEqual(2, after.candidates.size(), 'Both may be added again.');
 			Assert.areEqual(2, [SELECT COUNT() FROM Enrollment__c WITH SYSTEM_MODE], 'Kept.');
-			Assert.areEqual(Label.Programs_Cohort_NotFoundOne, refusal, 'Not a member.');
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'),
+				refusal,
+				'Not a member.'
+			);
 		}
 	}
 
@@ -246,12 +253,12 @@ private class CohortControllerTest {
 		Test.stopTest();
 		Assert.areEqual(
 			new List<String>{
-				Label.Programs_Cohort_NobodyChosen,
+				BarnHelp.text('Programs', 'Programs_Cohort_NobodyChosen'),
 				String.format(
-					Label.Programs_Cohort_TooMany,
+					BarnHelp.text('Programs', 'Programs_Cohort_TooMany'),
 					new List<Object>{ CohortController.MAX_SHOWN }
 				),
-				Label.Programs_Cohort_NotFound,
+				BarnHelp.text('Programs', 'Programs_Cohort_NotFound'),
 				BarnHelp.text('Programs', 'Programs_Fail_Cohort')
 			},
 			refusals

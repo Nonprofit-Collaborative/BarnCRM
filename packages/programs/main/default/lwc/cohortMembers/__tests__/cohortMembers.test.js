@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import CohortMembers from 'c/cohortMembers';
 import getMembers from '@salesforce/apex/CohortController.getMembers';
@@ -17,6 +18,11 @@ import {
   withoutPerson
 } from '../members';
 
+setHelpTextForTest({
+  Programs_Cohort_AddedMany: '{0} added.',
+  Programs_Cohort_SomeFailed: '{0} not.'
+});
+
 jest.mock('@salesforce/apex/CohortController.getMembers', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -27,12 +33,6 @@ jest.mock('@salesforce/apex/CohortController.removeMember', () => ({ default: je
   virtual: true
 });
 jest.mock('@salesforce/apex/CohortController.getPersonName', () => ({ default: jest.fn() }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Cohort_AddedMany', () => ({ default: '{0} added.' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Cohort_SomeFailed', () => ({ default: '{0} not.' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Cohort_Chosen', () => ({ default: 'Chosen: {0}' }), {

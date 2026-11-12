@@ -10,7 +10,6 @@ import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import REMOVE_FOR from '@salesforce/label/c.Programs_Cohort_RemoveFor';
 import ADD_PEOPLE from '@salesforce/label/c.Programs_Cohort_AddPeople';
 import CANDIDATES from '@salesforce/label/c.Programs_Cohort_Candidates';
-import NO_CANDIDATES from '@salesforce/label/c.Programs_Cohort_NoCandidates';
 import SELECT_ALL from '@salesforce/label/c.Programs_Cohort_SelectAll';
 import TICK_FOR from '@salesforce/label/c.Programs_Cohort_TickFor';
 import SOMEONE_ELSE from '@salesforce/label/c.Programs_Cohort_SomeoneElse';
@@ -19,13 +18,7 @@ import ADD_TO_LIST from '@salesforce/label/c.Programs_Cohort_AddToList';
 import TAKE_OFF_LIST from '@salesforce/label/c.Programs_Cohort_TakeOffList';
 import ADD_TO_COHORT from '@salesforce/label/c.Programs_Cohort_AddToCohort';
 import CHOSEN from '@salesforce/label/c.Programs_Cohort_Chosen';
-import ADDED_ONE from '@salesforce/label/c.Programs_Cohort_AddedOne';
-import ADDED_MANY from '@salesforce/label/c.Programs_Cohort_AddedMany';
-import SOME_FAILED from '@salesforce/label/c.Programs_Cohort_SomeFailed';
 import NOT_ADDED from '@salesforce/label/c.Programs_Cohort_NotAdded';
-import REMOVED from '@salesforce/label/c.Programs_Cohort_Removed';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Cohort_MoreThanShown';
-import TOO_MANY from '@salesforce/label/c.Programs_Cohort_TooMany';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
@@ -69,14 +62,18 @@ export default class CohortMembers extends LightningElement {
     remove: REMOVE,
     addPeople: ADD_PEOPLE,
     candidates: CANDIDATES,
-    noCandidates: NO_CANDIDATES,
+    get noCandidates() {
+      return helpText('Programs', 'Programs_Cohort_NoCandidates');
+    },
     selectAll: SELECT_ALL,
     someoneElse: SOMEONE_ELSE,
     person: PERSON,
     addToList: ADD_TO_LIST,
     addToCohort: ADD_TO_COHORT,
     notAdded: NOT_ADDED,
-    moreThanShown: MORE_THAN_SHOWN,
+    get moreThanShown() {
+      return helpText('Programs', 'Programs_Cohort_MoreThanShown');
+    },
     loading: LOADING
   };
 
@@ -235,7 +232,9 @@ export default class CohortMembers extends LightningElement {
 
   get chosenMessage() {
     const max = this.data ? this.data.maxPerAction : 200;
-    return this.chosen > max ? format(TOO_MANY, max) : format(CHOSEN, this.chosen);
+    return this.chosen > max
+      ? format(helpText('Programs', 'Programs_Cohort_TooMany'), max)
+      : format(CHOSEN, this.chosen);
   }
 
   get addDisabled() {
@@ -313,9 +312,9 @@ export default class CohortMembers extends LightningElement {
         this.data = data;
         this.failures = (data.failures || []).map((one, index) => ({ ...one, key: String(index) }));
         this.resultMessage = addedMessage(data, {
-          addedOne: ADDED_ONE,
-          addedMany: ADDED_MANY,
-          someFailed: SOME_FAILED
+          addedOne: helpText('Programs', 'Programs_Cohort_AddedOne'),
+          addedMany: helpText('Programs', 'Programs_Cohort_AddedMany'),
+          someFailed: helpText('Programs', 'Programs_Cohort_SomeFailed')
         });
         return true;
       })
@@ -335,7 +334,7 @@ export default class CohortMembers extends LightningElement {
     return removeMember({ cohortId: this.recordId, enrollmentId })
       .then((data) => {
         this.data = data;
-        this.resultMessage = REMOVED;
+        this.resultMessage = helpText('Programs', 'Programs_Cohort_Removed');
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
