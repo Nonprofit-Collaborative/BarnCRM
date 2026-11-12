@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "key": "member",
+  "title": "Member Portal",
+  "requiresModules": ["Memberships"],
+  "pages": [
+    {
+      "key": "membership",
+      "title": "My Membership",
+      "kind": "related",
+      "object": "Membership_Term__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Level__r.Name", "label": "Level" },
+        { "field": "Status__c" },
+        { "field": "Start_Date__c", "label": "Starts" },
+        { "field": "End_Date__c", "label": "Ends" },
+        { "field": "Member_Since__c", "label": "Member Since" },
+        { "field": "Dues__c", "label": "Dues" }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Renewed" }],
+      "orderBy": "Start_Date__c DESC",
+      "limit": 10,
+      "actions": [{ "extension": "Memberships.PayDues", "label": "Pay Dues" }]
+    },
+    {
+      "key": "listing",
+      "title": "My Directory Listing",
+      "kind": "related",
+      "object": "Membership_Term__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Level__r.Name", "label": "Level" },
+        { "field": "Directory_Opt_In__c", "label": "Show Me to Other Members", "edit": true },
+        { "field": "Directory_Location__c", "label": "Where I Am", "edit": true },
+        { "field": "Directory_Bio__c", "label": "About Me", "edit": true }
+      ],
+      "where": [{ "field": "Is_Active__c", "op": "equals", "value": "true" }],
+      "orderBy": "Start_Date__c DESC",
+      "limit": 5,
+      "actions": ["update"]
+    },
+    {
+      "key": "directory",
+      "title": "Member Directory",
+      "kind": "catalog",
+      "object": "Membership_Term__c",
+      "search": true,
+      "fields": [
+        { "field": "Member_Name__c", "label": "Member" },
+        { "field": "Level__r.Name", "label": "Level" },
+        { "field": "Directory_Location__c", "label": "Where" },
+        { "field": "Directory_Bio__c", "label": "About" }
+      ],
+      "where": [
+        { "field": "Directory_Opt_In__c", "op": "equals", "value": "true" },
+        { "field": "Is_Active__c", "op": "equals", "value": "true" }
+      ],
+      "orderBy": "Member_Name__c ASC",
+      "limit": 200,
+      "actions": []
+    }
+  ]
+}

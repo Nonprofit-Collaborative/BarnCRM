@@ -25,7 +25,7 @@ Guide). This page is for staff who look after the people using them.
 - They then see the portal's pages: their own details, and the records of theirs the portal shows
   (for example their current roles), with only the fields the portal allows them to change.
 
-## The Volunteer, Speaker and Donor Portals
+## The Volunteer, Speaker, Donor and Applicant Portals
 
 Your admin may use one of the ready-made portals (see [Portal Builder](../admin-guide/portal-builder.md)).
 Whatever the portal, a person sees and changes only their own records.
@@ -43,6 +43,10 @@ Whatever the portal, a person sees and changes only their own records.
 - **Donor portal.** Donors see their giving totals, pledge balance, gifts, pledges and issued
   receipts, and can change their phone and mailing address. They cannot give, edit gifts or
   download receipts through it; BarnCRM takes no payments.
+- **Applicant portal.** Applicants choose an open cycle and apply, which starts a Draft
+  application on the cycle; they complete it through its form link, and it becomes Submitted when
+  the form arrives. They can withdraw it until it is decided, accept an offered award, and open
+  report forms for the reports and conditions they owe.
 
 ## When Someone Cannot Sign In
 

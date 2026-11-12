@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Email_Recipients__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Whether the same morning run also emails the recipient (the award's Recipient contact, when it has an email address) about a report or condition coming due, with their own report link. Uses your org's email limits. Default: off.</inlineHelpText>
+  <label>Email recipients about reports</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

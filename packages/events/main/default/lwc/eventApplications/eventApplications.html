@@ -1,15 +1,177 @@
 <template>
   <template lwc:if={helpReady}>
     <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
-    <template lwc:if={canAdd}>
+    <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-bottom_small">
+      <template lwc:if={canAdd}>
+        <lightning-button
+          data-id="add-application"
+          class="slds-var-m-right_x-small"
+          label={labels.addApplication}
+          icon-name="utility:add"
+          disabled={busy}
+          onclick={handleAdd}
+        ></lightning-button>
+      </template>
+      <template lwc:if={canEditEvent}>
+        <lightning-button
+          data-id="criteria-toggle"
+          class="slds-var-m-right_x-small"
+          label={labels.criteria}
+          onclick={handleCriteriaToggle}
+        ></lightning-button>
+      </template>
       <lightning-button
-        data-id="add-application"
-        class="slds-var-m-bottom_small"
-        label={labels.addApplication}
-        icon-name="utility:add"
-        disabled={busy}
-        onclick={handleAdd}
+        data-id="matrix-toggle"
+        class="slds-var-m-right_x-small"
+        label={labels.matrix}
+        onclick={handleMatrixToggle}
       ></lightning-button>
+      <lightning-button
+        data-id="compare"
+        class="slds-var-m-right_x-small"
+        label={labels.compare}
+        onclick={handleCompare}
+      ></lightning-button>
+      <template lwc:if={canAssign}>
+        <lightning-button
+          data-id="assign-toggle"
+          class="slds-var-m-right_small"
+          label={labels.assignReviewer}
+          onclick={handleAssignToggle}
+        ></lightning-button>
+      </template>
+      <lightning-input
+        data-id="mine"
+        type="toggle"
+        label={labels.myAssignments}
+        checked={mineOnly}
+        message-toggle-active=""
+        message-toggle-inactive=""
+        onchange={handleMine}
+      ></lightning-input>
+    </div>
+
+    <template lwc:if={criteriaOpen}>
+      <div class="slds-box slds-box_x-small slds-var-m-bottom_small" data-id="criteria-editor">
+        <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">
+          {labels.criteriaIntro}
+        </p>
+        <template for:each={draftRows} for:item="draft">
+          <div key={draft.key} class="slds-grid slds-grid_vertical-align-end" data-id="criterion">
+            <lightning-input
+              class="slds-var-m-right_x-small"
+              data-index={draft.index}
+              data-field="label"
+              label={labels.criterion}
+              value={draft.label}
+              max-length="40"
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-input
+              class="slds-var-m-right_x-small"
+              data-index={draft.index}
+              data-field="weight"
+              type="number"
+              min="1"
+              max="10"
+              label={labels.weight}
+              value={draft.weight}
+              onchange={handleDraft}
+            ></lightning-input>
+            <lightning-button-icon
+              icon-name="utility:delete"
+              alternative-text={draft.removeLabel}
+              data-index={draft.index}
+              onclick={handleRemoveCriterion}
+            ></lightning-button-icon>
+          </div>
+        </template>
+        <div class="slds-var-m-top_x-small">
+          <lightning-button
+            data-id="add-criterion"
+            label={labels.addCriterion}
+            disabled={cannotAddCriterion}
+            onclick={handleAddCriterion}
+          ></lightning-button>
+          <lightning-button
+            data-id="criteria-save"
+            class="slds-var-m-left_x-small"
+            variant="brand"
+            label={labels.save}
+            disabled={cannotSaveCriteria}
+            onclick={handleCriteriaSave}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+
+    <template lwc:if={assignOpen}>
+      <div class="slds-box slds-box_x-small slds-var-m-bottom_small" data-id="assign-panel">
+        <lightning-record-picker
+          data-id="reviewer"
+          label={fieldLabels.Reviewer__c}
+          object-api-name="User"
+          onchange={handleReviewer}
+        ></lightning-record-picker>
+        <lightning-button
+          data-id="assign"
+          class="slds-var-m-top_x-small"
+          variant="brand"
+          label={labels.assign}
+          disabled={busy}
+          onclick={handleAssign}
+        ></lightning-button>
+      </div>
+    </template>
+
+    <template lwc:if={matrixOpen}>
+      <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked slds-var-m-bottom_small"
+        data-id="matrix"
+      >
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">{fieldLabels.Name}</th>
+            <template for:each={criteria} for:item="criterion">
+              <th key={criterion.label} scope="col">{criterion.label}</th>
+            </template>
+            <th scope="col">{labels.total}</th>
+            <th scope="col">{fieldLabels.Weighted_Average__c}</th>
+            <th scope="col">{labels.reviews}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={matrix} for:item="line">
+            <tr key={line.id} data-id="matrix-row">
+              <th scope="row">{line.name}</th>
+              <template for:each={line.cells} for:item="cell">
+                <td key={cell.key}>{cell.text}</td>
+              </template>
+              <td>{line.total}</td>
+              <td>{line.average}</td>
+              <td>{line.reviews}</td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+
+    <template lwc:if={compareOpen}>
+      <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small" data-id="compare-panel">
+        <template for:each={compared} for:item="item">
+          <div key={item.id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4" data-id="compared">
+            <div class="slds-box slds-box_x-small">
+              <p class="slds-text-title_bold">{item.name}</p>
+              <p class="slds-text-body_small">{item.applicant}</p>
+              <p class="slds-text-body_small">{item.averageText}</p>
+              <template for:each={item.criterionLines} for:item="line">
+                <p key={line.key} class="slds-text-body_small">{line.text}</p>
+              </template>
+              <p class="slds-text-body_small slds-var-m-top_x-small">{item.abstractText}</p>
+            </div>
+          </div>
+        </template>
+      </div>
     </template>
 
     <template lwc:if={isLoading}>
@@ -31,19 +193,39 @@
       >
         <thead>
           <tr class="slds-line-height_reset">
+            <th scope="col"><span class="slds-assistive-text">{labels.compare}</span></th>
             <th scope="col">{fieldLabels.Name}</th>
             <th scope="col">{fieldLabels.Contact__c}</th>
             <th scope="col">{fieldLabels.Track__c}</th>
             <th scope="col">{fieldLabels.Status__c}</th>
-            <th scope="col">{fieldLabels.Average_Score__c}</th>
+            <th scope="col">{scoreHeading}</th>
             <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
           </tr>
         </thead>
         <template for:each={rows} for:item="row">
           <tbody key={row.id}>
             <tr data-id="application-row">
+              <td>
+                <lightning-input
+                  type="checkbox"
+                  data-id="select"
+                  data-row={row.id}
+                  label={row.selectLabel}
+                  variant="label-hidden"
+                  checked={row.selected}
+                  onchange={handleSelect}
+                ></lightning-input>
+              </td>
               <th scope="row" data-label={fieldLabels.Name}>
                 {row.name}
+                <template lwc:if={row.assignedToMe}>
+                  <c-barn-status-badge
+                    class="slds-m-left_x-small"
+                    data-id="assigned"
+                    status="pending"
+                    label={labels.assigned}
+                  ></c-barn-status-badge>
+                </template>
                 <template lwc:if={row.noticeResult}>
                   <div class="slds-text-body_small slds-text-color_weak" data-id="notice-result">
                     {row.noticeResult}
@@ -55,12 +237,27 @@
                   <a href={row.href}>{row.applicant}</a>
                 </template>
                 <template lwc:else>{row.applicant}</template>
+                <template for:each={row.presenters} for:item="presenter">
+                  <div key={presenter.id} class="slds-text-body_small" data-id="presenter">
+                    {presenter.text}
+                    <template lwc:if={row.canEditPresenters}>
+                      <lightning-button-icon
+                        icon-name="utility:close"
+                        size="x-small"
+                        variant="bare"
+                        alternative-text={presenter.removeLabel}
+                        data-id={presenter.id}
+                        onclick={handleRemovePresenter}
+                      ></lightning-button-icon>
+                    </template>
+                  </div>
+                </template>
               </td>
               <td data-label={fieldLabels.Track__c}>{row.track}</td>
               <td data-label={fieldLabels.Status__c}>
                 <c-barn-status-badge status={row.statusWord} label={row.status}></c-barn-status-badge>
               </td>
-              <td data-label={fieldLabels.Average_Score__c} data-id="average">{row.averageText}</td>
+              <td data-label={scoreHeading} data-id="average">{row.averageText}</td>
               <td>
                 <lightning-button-menu
                   data-id={row.id}
@@ -79,16 +276,62 @@
                 </lightning-button-menu>
               </td>
             </tr>
+            <template lwc:if={row.isAddingPresenter}>
+              <tr data-id="presenter-form-row">
+                <td colspan="7">
+                  <lightning-record-picker
+                    data-id="presenter-person"
+                    label={labels.presenter}
+                    object-api-name="Contact"
+                    onchange={handlePresenterPerson}
+                  ></lightning-record-picker>
+                  <lightning-combobox
+                    data-id="presenter-role"
+                    label={labels.role}
+                    options={roleOptions}
+                    value={presenterForm.role}
+                    onchange={handlePresenterRole}
+                  ></lightning-combobox>
+                  <div class="slds-var-m-top_x-small">
+                    <lightning-button label={labels.cancel} onclick={handlePresenterCancel}></lightning-button>
+                    <lightning-button
+                      data-id="presenter-save"
+                      class="slds-var-m-left_x-small"
+                      variant="brand"
+                      label={labels.addPresenter}
+                      disabled={cannotAddPresenter}
+                      onclick={handlePresenterSave}
+                    ></lightning-button>
+                  </div>
+                </td>
+              </tr>
+            </template>
             <template lwc:if={row.isReviewing}>
               <tr data-id="review-form-row">
-                <td colspan="6">
-                  <lightning-combobox
-                    data-id="review-score"
-                    label={fieldLabels.Score__c}
-                    options={scoreChoices}
-                    value={reviewing.score}
-                    onchange={handleScore}
-                  ></lightning-combobox>
+                <td colspan="7">
+                  <template lwc:if={hasCriteria}>
+                    <template for:each={criterionScores} for:item="item">
+                      <lightning-combobox
+                        key={item.label}
+                        data-id="criterion-score"
+                        data-label={item.label}
+                        label={item.text}
+                        options={scoreChoices}
+                        value={item.value}
+                        onchange={handleCriterionScore}
+                      ></lightning-combobox>
+                    </template>
+                    <p class="slds-text-body_small slds-var-m-top_x-small" data-id="weighted">{weightedText}</p>
+                  </template>
+                  <template lwc:else>
+                    <lightning-combobox
+                      data-id="review-score"
+                      label={fieldLabels.Score__c}
+                      options={scoreChoices}
+                      value={reviewing.score}
+                      onchange={handleScore}
+                    ></lightning-combobox>
+                  </template>
                   <lightning-textarea
                     data-id="review-notes"
                     label={fieldLabels.Notes__c}
@@ -116,7 +359,7 @@
             </template>
             <template lwc:if={row.hasReviews}>
               <tr data-id="reviews-row">
-                <td colspan="6" class="slds-text-body_small">
+                <td colspan="7" class="slds-text-body_small">
                   <ul>
                     <template for:each={row.reviews} for:item="review">
                       <li key={review.key} data-id="review">{review.text}</li>

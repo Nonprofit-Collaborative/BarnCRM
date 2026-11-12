@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Grid tool's logic in plain JavaScript (C-41, C-41b): saved grids among saved queries,
+    the grid document, table columns and rows, related record rows and refused drafts. Imported
+    by the Grid page.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

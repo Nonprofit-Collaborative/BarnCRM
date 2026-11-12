@@ -1,0 +1,57 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom48" data-id="card">
+      <div slot="actions">
+        <template lwc:if={canManage}>
+          <lightning-button data-id="assign" label={labels.assign} disabled={isWorking} onclick={handleAssign}></lightning-button>
+        </template>
+      </div>
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
+        </template>
+        <template lwc:if={hasBudget}>
+          <p class="slds-var-m-bottom_x-small" data-id="remaining">
+            {labels.remaining} <lightning-formatted-number value={remaining} format-style="currency"></lightning-formatted-number>
+          </p>
+        </template>
+        <template lwc:if={formLink}>
+          <p class="slds-var-m-bottom_small" data-id="form-link">{labels.formLink} <a href={formLink} target="_blank">{formLink}</a></p>
+        </template>
+        <template lwc:if={hasRows}>
+          <ol class="slds-has-dividers_bottom-space">
+            <template for:each={rows} for:item="row">
+              <li key={row.id} class="slds-item" data-id="row">
+                <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                  <div class="slds-col">
+                    <span class="slds-text-title_bold">{row.rank}</span>
+                    <a href={row.href} class="slds-var-m-left_x-small">{row.name}</a>
+                    <span class="slds-var-m-left_x-small">{row.shownApplicant}</span>
+                    <span class="slds-var-m-left_x-small slds-text-color_weak">{row.status}</span>
+                    <span class="slds-var-m-left_x-small"><lightning-formatted-number value={row.average} maximum-fraction-digits="2"></lightning-formatted-number> ({row.submitted})</span>
+                    <span class="slds-var-m-left_x-small"><lightning-formatted-number value={row.requested} format-style="currency"></lightning-formatted-number></span>
+                  </div>
+                  <template lwc:if={row.decidable}>
+                    <template lwc:if={row.isAwarding}>
+                      <lightning-input type="number" formatter="currency" step="0.01" label={labels.amount} value={awardAmount} onchange={handleAmount} data-id="amount"></lightning-input>
+                      <lightning-button variant="brand" label={labels.save} disabled={isWorking} onclick={handleSaveAward} data-id="save-award"></lightning-button>
+                      <lightning-button label={labels.cancel} onclick={handleCancel}></lightning-button>
+                    </template>
+                    <template lwc:else>
+                      <lightning-button data-row-id={row.id} data-id="award" label={labels.award} disabled={isWorking} onclick={handleStartAward}></lightning-button>
+                      <lightning-button data-row-id={row.id} data-id="decline" label={labels.decline} disabled={isWorking} onclick={handleDecline}></lightning-button>
+                    </template>
+                  </template>
+                </div>
+              </li>
+            </template>
+          </ol>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.empty}</p></template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

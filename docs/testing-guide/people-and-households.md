@@ -26,7 +26,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On The Testwell Family, select **Add Member** in the **Members** panel. | The **Add Member** dialog opens with Salutation, First Name and Last Name, a **Save** and a **Cancel** button. |
+| 1 | On The Testwell Family, select **Add Member** in the **Members** panel. | The **Add Member** dialog opens with **Add Someone Already in Salesforce** (a search box), then **Or Add Someone New** with Salutation, First Name, Last Name, Email and Phone, a **Save** and a **Cancel** button. |
+| 1a | Type `Garcia` in the search box and choose Maria Garcia, who is in The Garcia Family. | A line reads "Maria Garcia is in The Garcia Family and will move to this household." with **Save** and **Cancel**. **Cancel** removes the line and moves nobody; this time select **Save**: the dialog closes, Maria is a tile here and The Garcia Family lost her. Move her back with **Move to Another Household**. |
 | 2 | Enter `Mr.`, `Ben`, `Testwell` and select **Save**. | The dialog closes. A toast reads **Added. The household name and greetings have been brought up to date.** Ben appears as a tile with his initials **BT**. |
 | 3 | Refresh the page. | Member Count **2**. Formal Greeting **Ms. Ada Testwell and Mr. Ben Testwell**. Informal Greeting **Ada and Ben**. The name stays **The Testwell Family**. |
 | 4 | Add a third member `Wei` `Lee` (no salutation) and refresh. | Member Count **3**. The name reads **Testwell and Lee Household** because the surnames differ. |

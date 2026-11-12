@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Account__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <referenceTo>Account</referenceTo>
+  <relationshipLabel>Memberships</relationshipLabel>
+  <relationshipName>Memberships</relationshipName>
+  <required>false</required>
+  <inlineHelpText>The household or organization that is the member. Leave blank for a person's own membership.</inlineHelpText>
+  <label>Household or Organization</label>
+  <type>Lookup</type>
+</CustomField>

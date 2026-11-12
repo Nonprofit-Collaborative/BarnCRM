@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customSettingsType>Hierarchy</customSettingsType>
+  <description>The Memberships module's org-wide settings, edited in the BarnCRM Settings console (canonical model 29MEM4).</description>
+  <enableFeeds>false</enableFeeds>
+  <label>Memberships Settings</label>
+  <visibility>Protected</visibility>
+</CustomObject>

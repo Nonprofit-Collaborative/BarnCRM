@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Award_Application__c$Name</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Cycle__c</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Contact__c</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Organization__c</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Status__c</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Average_Score__c</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Review_Count__c</field>
+  </columns>
+  <columns>
+    <field>Award_Application__c$Amount_Requested__c</field>
+  </columns>
+  <description>
+    Applications still being decided, highest average review score first. Applications with no
+    submitted review have no score and sort last.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Award_Application__c$Status__c</column>
+      <operator>equals</operator>
+      <value>Submitted,Eligible,In Review</value>
+    </criteriaItems>
+  </filter>
+  <format>Tabular</format>
+  <name>Applications Ranked by Score</name>
+  <reportType>Award_Applications__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+  <sortColumn>Award_Application__c$Average_Score__c</sortColumn>
+  <sortOrder>Desc</sortOrder>
+</Report>

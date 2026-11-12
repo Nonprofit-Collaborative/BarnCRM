@@ -5,11 +5,11 @@ The website half of BarnCRM Portal Builder (ADR-0185 portal builder, D-187). It 
 | Path | What it is |
 |---|---|
 | `src/portalApi.js` | Calls the portal API through the website's proxy. Never holds the OAuth secret or the session token. |
-| `src/portalApp.js` | The sign-in screens (email, emailed code, authenticator) and the template's pages with edit forms. Framework-free; text only through `textContent`. |
+| `src/portalApp.js` | The sign-in screens (email, emailed code, authenticator) and the template's pages with edit forms. Framework-free; text only through `textContent`. A `url` field whose value starts with `https://` (a signed form link) shows as a link named for the field. |
 | `src/messages.js` | The words shown, English; pass a copy to `mountPortal` to change them. |
 | `src/portalTemplate.js` | `checkTemplate(json)`: the template shape rules Salesforce applies, to check a template before pasting it into a Portal. Salesforce also checks objects and fields against the org. |
 | `templates/sample.json` | A starting template: My Details (the person) and My Roles (their current affiliations). |
-| `templates/volunteer.json`, `speaker.json`, `donor.json`, `board.json` | The ready-made templates (PB-03, PB-07, PB-08, PB-02). Each names its module in `requiresModules` (Volunteers, Event Management, Giving, Corporate Hub); module actions go through Core's `PortalActionExtension`. Checked against the package metadata by `__tests__/portalTemplates.test.js`. |
+| `templates/volunteer.json`, `speaker.json`, `donor.json`, `board.json`, `applicant.json` | The ready-made templates (PB-03, PB-07, PB-08, PB-02, PB-06). Each names its module in `requiresModules` (Volunteers, Event Management, Giving, Corporate Hub, Scholarships); module actions go through Core's `PortalActionExtension`. Checked against the package metadata by `__tests__/portalTemplates.test.js`. |
 | `wordpress/barncrm-portal/` | The WordPress plugin: settings page, the `[barncrm_portal key="..."]` shortcode, and the proxy. `css/portal.css` lays the portal out (one field per line, phone-width inputs, marked alerts) in the theme's own fonts and colors. |
 | `build-wordpress.sh` | Builds `barncrm-portal.zip` with the client inside, for Plugins, Add New, Upload Plugin. |
 | `__tests__/` | Jest tests, run with the repository's `npm run test:unit`. |

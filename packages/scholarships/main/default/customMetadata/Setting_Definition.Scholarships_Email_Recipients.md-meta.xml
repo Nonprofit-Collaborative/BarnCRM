@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Email recipients about reports</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Email_Recipients__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Scholarships_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Scholarships and Grants</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Scholarships</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether the same morning run also emails the recipient (the award's Recipient contact, when it has an email address) about a report or condition coming due, with their own report link. Uses your org's email limits. Default: off.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">scholarships.md</value></values>
+</CustomMetadata>

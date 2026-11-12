@@ -147,6 +147,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-49d Creating a new field from an import | [import-new-fields.md](import-new-fields.md) | Core |
 | C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
+| C-41, C-41b Grid and saved grids | [grid.md](grid.md) | Core |
 | C-35 Super Transformer runs and undo | [bulk-update.md](bulk-update.md) | Core |
 | C-50 Super Transformer (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
@@ -280,6 +281,30 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
 | MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Giving gifts | [online-giving-zapier.md](online-giving-zapier.md) | Giving (Mirror for recipe B) |
+
+### LWC Builder
+
+| Feature | Page | Package |
+|---|---|---|
+| LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
+
+### Scholarships and Outbound Grants
+
+| Feature | Page | Package |
+|---|---|---|
+| SG-01 to SG-10, PB-06 Scholarships and Outbound Grants: install, access, settings, programs and cycles, eligibility rules, rubrics, reviewer panels and Assign Reviewers, blind review, applications from Forms, the review board and decisions, award letters, disbursements and conditions, the accounting export, recipient reports and renewals, the applicant portal, reports | [scholarships.md](scholarships.md) | BarnCRM Scholarships and Outbound Grants |
+
+### Territory Management
+
+| Feature | Page | Package |
+|---|---|---|
+| C-40 Territory Management: install, access, territories, rules and priority, preview, assign and undo, the nightly assignment; C-40b owner routing by territory owner, round robin and capacity | [territory-management.md](territory-management.md) | BarnCRM Territory Management |
+
+### Memberships
+
+| Feature | Page | Package |
+|---|---|---|
+| G-22a to G-22d, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Giving gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Giving, Payments and Portal Builder optional) |
 
 ### Moving From Another System
 

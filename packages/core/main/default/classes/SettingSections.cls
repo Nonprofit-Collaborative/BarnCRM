@@ -97,6 +97,18 @@ public with sharing class SettingSections {
 	/** The Payments module's processor, mode and currency, and the link to Payments Setup. */
 	@NamespaceAccessible
 	public static final String PAYMENTS = 'Payments';
+	/** The LWC Builder module's built component settings. */
+	@NamespaceAccessible
+	public static final String LWC_BUILDER = 'LWC Builder';
+	/** The Scholarships and Outbound Grants module's reminder settings. */
+	@NamespaceAccessible
+	public static final String SCHOLARSHIPS = 'Scholarships and Grants';
+	/** The Territory Management module's row, which opens its Territory Management tab. */
+	@NamespaceAccessible
+	public static final String TERRITORY = 'Territory Management';
+	/** The Memberships module's renewal reminders and gift renewals. */
+	@NamespaceAccessible
+	public static final String MEMBERSHIPS = 'Memberships';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -121,6 +133,10 @@ public with sharing class SettingSections {
 			PORTALS,
 			CORPORATE_HUB,
 			PAYMENTS,
+			LWC_BUILDER,
+			SCHOLARSHIPS,
+			TERRITORY,
+			MEMBERSHIPS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

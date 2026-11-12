@@ -311,7 +311,15 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     const list = el('dl');
     page.fields.forEach((field) => {
       list.appendChild(el('dt', { text: field.label }));
-      list.appendChild(el('dd', { text: display(field, record.values[field.field], messages) }));
+      const value = record.values[field.field];
+      // A secure link (a signed form link, for example) opens; any other address stays text.
+      const secure =
+        field.type === 'url' && typeof value === 'string' && value.startsWith('https://');
+      list.appendChild(
+        secure
+          ? el('dd', {}, [el('a', { href: value, text: field.label })])
+          : el('dd', { text: display(field, value, messages) })
+      );
     });
     const buttons = el('div', { class: 'barn-portal-actions' });
     if (page.canUpdate && page.fields.some((f) => f.edit)) {
@@ -377,7 +385,27 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
         if (page.records.length === 0) {
           body.appendChild(el('p', { text: messages.nothingHere }));
         }
-        page.records.forEach((record) => body.appendChild(recordCard(page, record, alertSlot)));
+        const cards = page.records.map((record) => {
+          const card = recordCard(page, record, alertSlot);
+          body.appendChild(card);
+          return { card, text: Object.values(record.values).join(' ').toLowerCase() };
+        });
+        // A searchable page (PB-09) filters the records already sent: no second read.
+        if (page.search && cards.length > 0) {
+          const box = el('input', {
+            type: 'search',
+            class: 'barn-portal-search',
+            'aria-label': messages.search,
+            placeholder: messages.search
+          });
+          box.addEventListener('input', () => {
+            const words = box.value.toLowerCase().trim().split(/\s+/);
+            cards.forEach(({ card, text }) => {
+              card.hidden = !words.every((word) => text.includes(word));
+            });
+          });
+          body.prepend(box);
+        }
         if (page.canCreate) {
           body.appendChild(
             el('button', {

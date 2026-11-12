@@ -56,6 +56,7 @@ public without sharing class PortalData {
 			'kind' => page.kind,
 			'canUpdate' => page.canUpdate,
 			'canCreate' => page.canCreate,
+			'search' => page.search,
 			'actions' => extensionList(page),
 			'fields' => fields,
 			'records' => records

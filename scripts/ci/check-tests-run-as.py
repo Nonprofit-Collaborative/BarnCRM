@@ -53,6 +53,10 @@ SOURCES = [
     "packages/portal/main/**/*.cls",
     "packages/corporatehub/main/**/*.cls",
     "packages/payments/main/**/*.cls",
+    "packages/lwcbuilder/main/**/*.cls",
+    "packages/scholarships/main/**/*.cls",
+    "packages/territory/main/**/*.cls",
+    "packages/memberships/main/**/*.cls",
     "packages/addressverification/main/**/*.cls",
     "packages/mirror/main/**/*.cls",
 ]

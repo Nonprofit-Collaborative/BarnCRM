@@ -53,7 +53,7 @@ describe('c-nightly-jobs-panel', () => {
   });
 
   it('lists every step in order with its time and whether it is on', async () => {
-    const element = await render();
+    const element = await render({ ...PANEL, scheduled: true });
     const rows = element.shadowRoot.querySelectorAll('tbody tr');
     expect(rows.length).toBe(2);
     expect(rows[0].dataset.key).toBe('BarnCRM Seasonal Addresses');
@@ -67,6 +67,16 @@ describe('c-nightly-jobs-panel', () => {
     expect(outcome.label).toBe('Done');
     expect(outcome.status).toBe('done');
     expect(rows[0].querySelector('[data-id="outcome"] c-barn-status-badge')).toBeNull();
+  });
+
+  it('shows a step that is on as Not Scheduled while the nightly run is not scheduled', async () => {
+    const element = await render();
+    const rows = element.shadowRoot.querySelectorAll('tbody tr');
+    const off = rows[0].querySelector('[data-id="state"] c-barn-status-badge');
+    const pending = rows[1].querySelector('[data-id="state"] c-barn-status-badge');
+    expect(off.label).toBe('c.Core_Feature_Off');
+    expect(pending.label).toBe('c.Core_NightlyJobs_StateNotScheduled');
+    expect(pending.status).toBe('warning');
   });
 
   it('says the run is not scheduled and offers to schedule it', async () => {

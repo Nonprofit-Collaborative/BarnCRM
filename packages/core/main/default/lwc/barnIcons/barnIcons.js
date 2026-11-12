@@ -102,8 +102,20 @@ const ICONS = Object.freeze({
   Payment_Event__c: 'custom:custom95',
   Payment__c: 'custom:custom40',
   Payments_Setup: 'custom:custom70',
+  // LWC Builder
+  LWC_Builder: 'custom:custom34',
+  // Scholarships and Outbound Grants
+  Award__c: 'custom:custom80',
+  Award_Application__c: 'custom:custom70',
+  Award_Program__c: 'custom:custom48',
+  Scholarships: 'custom:custom34',
+  // Territory Management
+  Territory_Management: 'custom:custom34',
   // Address Verification
   Address_Verification_Setup: 'custom:custom73',
+  // Memberships
+  Membership_Level__c: 'custom:custom48',
+  Membership_Term__c: 'custom:custom45',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

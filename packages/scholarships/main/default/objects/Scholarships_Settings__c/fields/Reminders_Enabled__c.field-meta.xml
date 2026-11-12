@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Reminders_Enabled__c</fullName>
+  <defaultValue>true</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Whether the morning run (6:50 AM in your org time zone) sends the owner of each award a bell notification before a report or condition is due, once per date. Default: on.</inlineHelpText>
+  <label>Send Scholarships reminders</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

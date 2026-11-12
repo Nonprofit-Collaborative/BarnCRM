@@ -142,7 +142,9 @@ public with sharing class ModuleManagerService {
 			'Sponsor_Deliverable__c',
 			'Sponsorship_Level__c',
 			'Event_Table__c',
-			'Ticket_Type__c'
+			'Ticket_Type__c',
+			'Proposal_Presenter__c',
+			'Session_Rating__c'
 		},
 		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },
 		'CorporateHub' => new List<String>{
@@ -161,7 +163,28 @@ public with sharing class ModuleManagerService {
 			'Meeting_Attendee__c',
 			'Policy_Acknowledgment__c'
 		},
-		'Payments' => new List<String>{ 'Payment__c', 'Payment_Event__c' }
+		'Payments' => new List<String>{ 'Payment__c', 'Payment_Event__c' },
+		'LwcBuilder' => new List<String>{ 'Built_Component__c' },
+		'Scholarships' => new List<String>{
+			'Application_Review__c',
+			'Award__c',
+			'Award_Application__c',
+			'Award_Cycle__c',
+			'Award_Payment__c',
+			'Award_Program__c',
+			'Award_Requirement__c'
+		},
+		'Territory' => new List<String>{
+			'Territory__c',
+			'Territory_Member__c',
+			'Territory_Rule__c',
+			'Territory_Run__c'
+		},
+		'Memberships' => new List<String>{
+			'Membership_Benefit__c',
+			'Membership_Level__c',
+			'Membership_Term__c'
+		}
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -179,6 +202,10 @@ public with sharing class ModuleManagerService {
 		'Portal' => 'Portal_Admin',
 		'CorporateHub' => 'Corporate_Hub_Admin',
 		'Payments' => 'Payments_Admin',
+		'LwcBuilder' => 'LWC_Builder_Admin',
+		'Scholarships' => 'Scholarships_Admin',
+		'Territory' => 'Territory_Admin',
+		'Memberships' => 'Memberships_Admin',
 		'AddressVerification' => 'Address_Verification_Admin'
 	};
 

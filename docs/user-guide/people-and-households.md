@@ -38,8 +38,10 @@ into a household.
 1. Open the household and click the **Connections** tab. Find the **Members** card.
 2. Click **Add Member**. The **Add Member** dialog opens.
 3. Either search under **Add Someone Already in Salesforce** (type in **Search by name** and
-   choose the person), or fill in **Salutation**, **First Name** and **Last Name** under **Or
-   Add Someone New**.
+   choose the person), or fill in **Salutation**, **First Name** and **Last Name** (and,
+   if you like, **Email** and **Phone**) under **Or Add Someone New**. If the person you choose is in another
+   household, a line names it, for example "Ana Garcia is in The Lopez Family and will move to
+   this household." Click **Save** to confirm, or **Cancel** to leave them where they are.
 4. If a note appears under the name, such as "Already in BarnCRM: Ana Garcia, Tampa (Garcia
    Household). Use this person instead?", the person may already exist. Click **Use this
    person instead?** to add them rather than a duplicate; otherwise carry on.
@@ -47,8 +49,8 @@ into a household.
 
 You should see: "Added. The household name and greetings have been brought up to date." The
 dialog closes. Each member shows as a tile with their initials, a **Primary** badge on the primary contact and a **Deceased** badge on
-anyone marked deceased. (In orgs that use the simple way of belonging, the search box is not
-shown; you add someone new.)
+anyone marked deceased. (In orgs that use the simple way of belonging, a person belongs to
+one household, so adding someone from the search moves them here.)
 
 ## To Change the Primary Contact
 

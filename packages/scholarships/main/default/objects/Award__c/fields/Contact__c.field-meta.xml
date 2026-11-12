@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Contact__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The person receiving the award, or the contact for an organization.</inlineHelpText>
+  <label>Recipient</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Awards Received</relationshipLabel>
+  <relationshipName>Awards_Received</relationshipName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

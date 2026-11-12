@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Payment_Link__c</fullName>
+  <description>EV-20: the processor's hosted checkout address for the current payment, merged into the payment link email.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The secure Stripe or PayPal page where the registrant pays. Set by BarnCRM.</inlineHelpText>
+  <label>Payment Link</label>
+  <length>1000</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>2</visibleLines>
+</CustomField>

@@ -1,0 +1,8 @@
+<template>
+    <template lwc:if={showGrid}>
+        <c-grid-tool state-key={viewKey} data-id="grid"></c-grid-tool>
+    </template>
+    <template lwc:else>
+        <c-find-records data-id="find"></c-find-records>
+    </template>
+</template>
