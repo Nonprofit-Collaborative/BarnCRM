@@ -9,6 +9,6 @@
   <trackTrending>false</trackTrending>
   <type>Lookup</type>
   <referenceTo>Contact</referenceTo>
-  <relationshipLabel>Scanned Leads</relationshipLabel>
+  <relationshipLabel>Booth Scans Made</relationshipLabel>
   <relationshipName>Scanned_Leads</relationshipName>
 </CustomField>

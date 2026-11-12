@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Status__c</fullName>
   <externalId>false</externalId>
-  <inlineHelpText>Set when the scan is saved: Lead only when the attendee shares their details.</inlineHelpText>
+  <inlineHelpText>Set when the scan is saved: Shared only when the attendee shares their details.</inlineHelpText>
   <label>Status</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
@@ -12,9 +12,9 @@
     <valueSetDefinition>
       <sorted>false</sorted>
       <value>
-        <fullName>Lead</fullName>
+        <fullName>Shared</fullName>
         <default>false</default>
-        <label>Lead</label>
+        <label>Shared</label>
       </value>
       <value>
         <fullName>Not Shared</fullName>

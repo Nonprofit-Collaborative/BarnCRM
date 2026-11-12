@@ -12,14 +12,14 @@
   <enableSearch>false</enableSearch>
   <enableSharing>true</enableSharing>
   <enableStreamingApi>true</enableStreamingApi>
-  <label>Sponsor Lead</label>
+  <label>Booth Scan</label>
   <nameField>
-    <displayFormat>LEAD-{000000}</displayFormat>
-    <label>Lead Number</label>
+    <displayFormat>SCAN-{000000}</displayFormat>
+    <label>Scan Number</label>
     <trackHistory>false</trackHistory>
     <type>AutoNumber</type>
   </nameField>
-  <pluralLabel>Sponsor Leads</pluralLabel>
+  <pluralLabel>Booth Scans</pluralLabel>
   <sharingModel>ControlledByParent</sharingModel>
   <visibility>Public</visibility>
 </CustomObject>

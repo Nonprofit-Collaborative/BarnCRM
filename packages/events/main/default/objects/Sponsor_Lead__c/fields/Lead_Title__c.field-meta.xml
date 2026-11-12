@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Lead_Title__c</fullName>
   <externalId>false</externalId>
-  <inlineHelpText>Copied from the attendee's badge title for a Lead.</inlineHelpText>
+  <inlineHelpText>Copied from the attendee's badge title when shared.</inlineHelpText>
   <label>Title</label>
   <length>80</length>
   <required>false</required>
