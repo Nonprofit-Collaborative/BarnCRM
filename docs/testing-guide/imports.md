@@ -543,3 +543,20 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 | 6 | On a phone, press and hold a suggestion, then drag it onto a column. | It maps after the hold; a quick swipe scrolls instead. |
 
 **Cleanup:** leave the page without importing.
+
+## T-IMP-26: Import Files From a Zip
+
+**Purpose:** confirm Import Files loads documents into Files linked to records, with dry run and undo (C-70, R-FI1 to R-FI4).
+**Prerequisites:** admin; two contacts, A and B; a zip holding `a.pdf`, `b.pdf`, a file over 2 MB `big.pdf` and `manifest.csv` with headings `File`, `Record Id`, `Title` and rows: `a.pdf` for A with title `Pledge`, `b.pdf` for B, `big.pdf` for A, `missing.pdf` for A, `a.pdf` for A again, and `b.pdf` for a deleted contact's Id.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Data Manager** and select **Import Files**. Choose the zip. | The panel says the manifest lists 6 files. **Load Files** is not available yet. |
+| 2 | Press **Dry Run**. | 2 files are ready; 4 rows are refused, each with its reason (too large, not in the zip, repeated, no record you can see). **Download Rows** saves every row with its result. |
+| 3 | Press **Load Files**. | A progress line counts the files, then the panel says 2 files were saved. **Recent Loads** lists the job. |
+| 4 | Open contact A and contact B. | A's **Files** list shows **Pledge**; B's shows **b**. You own both. |
+| 5 | On B's file, upload a new version. Then in **Recent Loads** select **Undo Load**, type 2 and press **Delete the Files**. | The load is undone: **Pledge** is deleted; B's file is kept, and the job's run log counts it as kept. |
+| 6 | Open **Data Jobs** on Data Manager and filter by **Files imports**. | The job shows **Undone** with no Undo. |
+| 7 | Choose a zip whose manifest is inside a folder. | The panel says the zip has no manifest.csv at its top. |
+
+**Cleanup:** delete B's kept file.
