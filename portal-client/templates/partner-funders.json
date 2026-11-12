@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "key": "partner-funders",
+  "title": "Partner Portal",
+  "requiresModules": ["Programs", "Funders"],
+  "pages": [
+    {
+      "key": "referrals",
+      "title": "Shared Referrals",
+      "kind": "catalog",
+      "object": "Referral__c",
+      "fields": [
+        { "field": "Name", "label": "Referral" },
+        { "field": "Referral_Date__c", "label": "Date" },
+        { "field": "Contact__r.FirstName", "label": "First Name" },
+        { "field": "Contact__r.LastName", "label": "Last Name" },
+        { "field": "Status__c" },
+        { "field": "Outcome__c", "label": "Outcome" },
+        { "field": "Partner_Organization__r.Name", "label": "Shared With" }
+      ],
+      "where": [{ "field": "Shared_With_Partner__c", "op": "equals", "value": "true" }],
+      "personScope": {
+        "field": "Partner_Organization__c",
+        "object": "Affiliation__c",
+        "personField": "Contact__c",
+        "valueField": "Organization__c",
+        "where": [{ "field": "Status__c", "op": "equals", "value": "Current" }]
+      },
+      "orderBy": "Referral_Date__c DESC",
+      "limit": 200,
+      "search": true,
+      "download": true,
+      "actions": []
+    },
+    {
+      "key": "grants",
+      "title": "Grants",
+      "kind": "related",
+      "object": "Grant__c",
+      "personField": "Funder_Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Grant" },
+        { "field": "Stage__c", "label": "Stage" },
+        { "field": "Amount_Requested__c", "label": "Requested" },
+        { "field": "Amount_Awarded__c", "label": "Awarded" },
+        { "field": "Award_Start_Date__c", "label": "Award Starts" },
+        { "field": "Award_End_Date__c", "label": "Award Ends" }
+      ],
+      "where": [{ "field": "Stage__c", "op": "notEquals", "value": "Prospect" }],
+      "orderBy": "Award_Start_Date__c DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "reports",
+      "title": "Submitted Reports",
+      "kind": "related",
+      "object": "Grant_Requirement__c",
+      "personField": "Grant__r.Funder_Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Report" },
+        { "field": "Grant__r.Name", "label": "Grant" },
+        { "field": "Type__c", "label": "Type" },
+        { "field": "Due_Date__c", "label": "Due" },
+        { "field": "Submitted_Date__c", "label": "Submitted" }
+      ],
+      "where": [{ "field": "Submitted_Date__c", "op": "isNotBlank" }],
+      "orderBy": "Submitted_Date__c DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "Phone", "edit": true },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

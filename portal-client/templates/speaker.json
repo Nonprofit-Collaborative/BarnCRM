@@ -88,6 +88,9 @@
         { "field": "Status__c" },
         { "field": "Headline__c", "edit": true },
         { "field": "Bio__c", "edit": true },
+        { "field": "Headshot_URL__c", "label": "Headshot Link", "edit": true },
+        { "field": "LinkedIn_URL__c", "label": "LinkedIn", "edit": true },
+        { "field": "Website_URL__c", "label": "Website", "edit": true },
         { "field": "AV_Needs__c", "edit": true },
         { "field": "Travel_Needs__c", "edit": true }
       ],

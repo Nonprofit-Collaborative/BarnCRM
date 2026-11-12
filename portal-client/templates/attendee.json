@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "key": "attendee",
+  "title": "Event App",
+  "requiresModules": ["Events"],
+  "pages": [
+    {
+      "key": "myevents",
+      "title": "My Events",
+      "kind": "related",
+      "object": "Event_Attendee__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Event_Name__c", "label": "Event" },
+        { "field": "Status__c" },
+        { "field": "Badge_Name__c", "label": "Badge Name" },
+        { "field": "Networking_Opt_In__c", "label": "Show Me in the Attendee List", "edit": true },
+        { "field": "Networking_Headline__c", "label": "Headline", "edit": true },
+        { "field": "Networking_Bio__c", "label": "About Me", "edit": true },
+        { "field": "Networking_Contact__c", "label": "How to Reach Me", "edit": true },
+        {
+          "field": "Share_With_Sponsors__c",
+          "label": "Share My Details With Sponsors",
+          "edit": true
+        }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 20,
+      "actions": ["update"]
+    },
+    {
+      "key": "agenda",
+      "title": "Agenda",
+      "kind": "catalog",
+      "object": "Event_Session__c",
+      "fields": [
+        { "field": "Name", "label": "Session" },
+        { "field": "Start__c", "label": "Starts" },
+        { "field": "End__c", "label": "Ends" },
+        { "field": "Room__c", "label": "Room" },
+        { "field": "Session_Type__c", "label": "Format" },
+        { "field": "Level__c", "label": "Level" },
+        { "field": "Description__c", "label": "Description" },
+        { "field": "Event__r.Name", "label": "Event" }
+      ],
+      "where": [{ "field": "Status__c", "op": "equals", "value": "Confirmed" }],
+      "personScope": {
+        "field": "Event__c",
+        "object": "Event_Attendee__c",
+        "personField": "Contact__c",
+        "valueField": "Event_Registration__r.Event__c",
+        "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }]
+      },
+      "orderBy": "Start__c ASC",
+      "limit": 200,
+      "search": true,
+      "calendar": { "title": "Name", "start": "Start__c", "end": "End__c", "location": "Room__c" },
+      "actions": [{ "extension": "Events.AddToAgenda", "label": "Add to My Agenda" }]
+    },
+    {
+      "key": "myagenda",
+      "title": "My Agenda",
+      "kind": "related",
+      "object": "Agenda_Item__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Event_Session__r.Name", "label": "Session" },
+        { "field": "Event_Session__r.Start__c", "label": "Starts" },
+        { "field": "Event_Session__r.End__c", "label": "Ends" },
+        { "field": "Event_Session__r.Room__c", "label": "Room" },
+        { "field": "Overlaps__c", "label": "Overlaps Another Pick" },
+        { "field": "My_Rating__c", "label": "My Rating", "edit": true },
+        { "field": "My_Comment__c", "label": "My Comment", "edit": true },
+        { "field": "Rated__c", "label": "Rating Sent" }
+      ],
+      "orderBy": "CreatedDate ASC",
+      "limit": 200,
+      "calendar": {
+        "title": "Event_Session__r.Name",
+        "start": "Event_Session__r.Start__c",
+        "end": "Event_Session__r.End__c",
+        "location": "Event_Session__r.Room__c"
+      },
+      "actions": ["update", { "extension": "Events.RemoveFromAgenda", "label": "Remove" }]
+    },
+    {
+      "key": "attendees",
+      "title": "Attendees",
+      "kind": "catalog",
+      "object": "Event_Attendee__c",
+      "fields": [
+        { "field": "Badge_Name__c", "label": "Name" },
+        { "field": "Networking_Headline__c", "label": "Headline" },
+        { "field": "Badge_Title__c", "label": "Title" },
+        { "field": "Badge_Company__c", "label": "Company" },
+        { "field": "Networking_Bio__c", "label": "About" },
+        { "field": "Event_Name__c", "label": "Event" }
+      ],
+      "where": [
+        { "field": "Networking_Opt_In__c", "op": "equals", "value": "true" },
+        { "field": "Status__c", "op": "notEquals", "value": "Cancelled" }
+      ],
+      "personScope": {
+        "field": "Event_Registration__r.Event__c",
+        "object": "Event_Attendee__c",
+        "personField": "Contact__c",
+        "valueField": "Event_Registration__r.Event__c",
+        "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }]
+      },
+      "orderBy": "Badge_Name__c ASC",
+      "limit": 200,
+      "search": true,
+      "actions": [{ "extension": "Events.Connect", "label": "Connect" }]
+    },
+    {
+      "key": "connections",
+      "title": "Connections",
+      "kind": "related",
+      "object": "Attendee_Connection__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Other_Attendee__r.Badge_Name__c", "label": "Person" },
+        { "field": "Other_Attendee__r.Networking_Headline__c", "label": "Headline" },
+        { "field": "Event__r.Name", "label": "Event" },
+        { "field": "Status__c" },
+        { "field": "Contact_Details__c", "label": "How to Reach Them" },
+        { "field": "Note__c", "label": "My Private Note", "edit": true },
+        { "field": "Draft_Message__c", "label": "Message to Send", "edit": true }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Declined" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 200,
+      "search": true,
+      "actions": [
+        "update",
+        { "extension": "Events.AcceptConnection", "label": "Accept" },
+        { "extension": "Events.DeclineConnection", "label": "Decline" },
+        { "extension": "Events.SendMessage", "label": "Send Message" }
+      ]
+    },
+    {
+      "key": "messages",
+      "title": "Messages",
+      "kind": "related",
+      "object": "Attendee_Message__c",
+      "personField": "To_Contact__c",
+      "fields": [
+        { "field": "From_Contact__r.Name", "label": "From" },
+        { "field": "Sent_At__c", "label": "Sent" },
+        { "field": "Body__c", "label": "Message" },
+        { "field": "Reply__c", "label": "My Reply", "edit": true }
+      ],
+      "orderBy": "Sent_At__c DESC",
+      "limit": 100,
+      "actions": ["update", { "extension": "Events.SendReply", "label": "Send Reply" }]
+    },
+    {
+      "key": "sent",
+      "title": "Sent",
+      "kind": "related",
+      "object": "Attendee_Message__c",
+      "personField": "From_Contact__c",
+      "fields": [
+        { "field": "To_Contact__r.Name", "label": "To" },
+        { "field": "Sent_At__c", "label": "Sent" },
+        { "field": "Body__c", "label": "Message" }
+      ],
+      "orderBy": "Sent_At__c DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "announcements",
+      "title": "Announcements",
+      "kind": "catalog",
+      "object": "Event_Announcement__c",
+      "fields": [
+        { "field": "Name", "label": "Title" },
+        { "field": "Publish_At__c", "label": "Posted" },
+        { "field": "Body__c", "label": "Announcement" },
+        { "field": "Event__r.Name", "label": "Event" }
+      ],
+      "where": [{ "field": "Publish_At__c", "op": "lessOrEqual", "value": "NOW" }],
+      "personScope": {
+        "field": "Event__c",
+        "object": "Event_Attendee__c",
+        "personField": "Contact__c",
+        "valueField": "Event_Registration__r.Event__c",
+        "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }]
+      },
+      "orderBy": "Publish_At__c DESC",
+      "limit": 50,
+      "actions": []
+    },
+    {
+      "key": "sponsors",
+      "title": "Sponsors",
+      "kind": "catalog",
+      "object": "Event_Sponsor__c",
+      "fields": [
+        { "field": "Account__r.Name", "label": "Sponsor" },
+        { "field": "Level__r.Name", "label": "Level" },
+        { "field": "Booth__c", "label": "Booth" },
+        { "field": "Event__r.Name", "label": "Event" }
+      ],
+      "where": [{ "field": "Status__c", "op": "equals", "value": "Confirmed" }],
+      "personScope": {
+        "field": "Event__c",
+        "object": "Event_Attendee__c",
+        "personField": "Contact__c",
+        "valueField": "Event_Registration__r.Event__c",
+        "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }]
+      },
+      "orderBy": "Booth__c ASC",
+      "limit": 100,
+      "search": true,
+      "actions": []
+    },
+    {
+      "key": "eventinfo",
+      "title": "Event Info",
+      "kind": "catalog",
+      "object": "Event__c",
+      "fields": [
+        { "field": "Name", "label": "Event" },
+        { "field": "Start__c", "label": "Starts" },
+        { "field": "End__c", "label": "Ends" },
+        { "field": "Format__c", "label": "Format" },
+        { "field": "Venue_Name__c", "label": "Venue" },
+        { "field": "Venue_Address__c", "label": "Address" },
+        { "field": "Venue__r.Map_URL__c", "label": "Venue Map" },
+        { "field": "Online_Link__c", "label": "Join Online" }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
+      "personScope": {
+        "field": "Id",
+        "object": "Event_Attendee__c",
+        "personField": "Contact__c",
+        "valueField": "Event_Registration__r.Event__c",
+        "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }]
+      },
+      "orderBy": "Start__c ASC",
+      "limit": 20,
+      "calendar": {
+        "title": "Name",
+        "start": "Start__c",
+        "end": "End__c",
+        "location": "Venue_Name__c"
+      },
+      "actions": []
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}
