@@ -68,10 +68,14 @@ public with sharing class GiftTransactionMirrorController {
 	public static Status copyRangeAgain(Date fromDate, Date toDate) {
 		Status current = checked(false);
 		if (fromDate == null || toDate == null) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDatesRequired);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+			);
 		}
 		if (fromDate > toDate) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDateOrder);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder')
+			);
 		}
 		try {
 			GiftTransactionMirrorBatch.runRange(fromDate, toDate);
@@ -99,7 +103,9 @@ public with sharing class GiftTransactionMirrorController {
 		requireUse();
 		Status current = status();
 		if (!current.canManage) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_NoManagePermission);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission')
+			);
 		}
 		try {
 			GiftTransactionMirrorSchedulable.stop();
@@ -156,7 +162,7 @@ public with sharing class GiftTransactionMirrorController {
 			return Label.Mirror_GiftTransactionMirror_SwitchedOff;
 		}
 		if (!current.canManage) {
-			return Label.Mirror_OpportunityMirror_NoManagePermission;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoManagePermission');
 		}
 		if (current.notReadyReason != null) {
 			return current.notReadyReason;
@@ -165,7 +171,7 @@ public with sharing class GiftTransactionMirrorController {
 			return Label.Mirror_GiftTransactionMirror_NoAccess;
 		}
 		if (current.running && !scheduling) {
-			return Label.Mirror_OpportunityMirror_Running;
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Running');
 		}
 		return null;
 	}
@@ -192,6 +198,6 @@ public with sharing class GiftTransactionMirrorController {
 	private static AuraHandledException failed(Exception unexpected) {
 		ErrorLogger.log(unexpected, CONTEXT);
 		// The shared Mirror page wording, kept once to stay within the org's custom label limit.
-		return UserErrors.message(Label.Mirror_OpportunityMirror_ErrorFailed);
+		return UserErrors.message(BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorFailed'));
 	}
 }

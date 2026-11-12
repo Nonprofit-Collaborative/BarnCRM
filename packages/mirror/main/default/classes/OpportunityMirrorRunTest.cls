@@ -347,7 +347,7 @@ private class OpportunityMirrorRunTest {
 			];
 			Assert.areEqual(1, warned.size(), 'One Warning a run, not a silent run.');
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_MasterRecordType,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_MasterRecordType'),
 				warned[0].Message__c,
 				'It says why Master matches nothing and what to do.'
 			);

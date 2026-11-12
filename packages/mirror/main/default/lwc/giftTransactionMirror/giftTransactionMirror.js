@@ -21,26 +21,17 @@ import columnGiftTransaction from '@salesforce/label/c.Mirror_GiftTransactionMir
 import columnGiftTransactionAmount from '@salesforce/label/c.Mirror_GiftTransactionMirror_ColumnGiftTransactionAmount';
 import columnTransactionDate from '@salesforce/label/c.Mirror_GiftTransactionMirror_ColumnTransactionDate';
 // Wording both mirror pages share, kept once to stay within the org's custom label limit.
-import noManagePermission from '@salesforce/label/c.Mirror_OpportunityMirror_NoManagePermission';
 import nextRun from '@salesforce/label/c.Mirror_OpportunityMirror_NextRun';
-import notScheduled from '@salesforce/label/c.Mirror_OpportunityMirror_NotScheduled';
-import runningNow from '@salesforce/label/c.Mirror_OpportunityMirror_Running';
-import started from '@salesforce/label/c.Mirror_OpportunityMirror_Started';
-import lastRun from '@salesforce/label/c.Mirror_OpportunityMirror_LastRun';
-import noLastRun from '@salesforce/label/c.Mirror_OpportunityMirror_NoLastRun';
 import loading from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import reconciliationTitle from '@salesforce/label/c.Mirror_OpportunityMirror_ReconciliationTitle';
 import fromDate from '@salesforce/label/c.Mirror_OpportunityMirror_FromDate';
 import toDate from '@salesforce/label/c.Mirror_OpportunityMirror_ToDate';
 import compareLabel from '@salesforce/label/c.Mirror_Sync_Compare';
 import noDifferences from '@salesforce/label/c.Core_AccessCompare_NoDifferences';
-import differenceCount from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount';
-import differenceCountAll from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCountAll';
 import columnGift from '@salesforce/label/c.Giving_Section_Gift';
 import columnGiftAmount from '@salesforce/label/c.Mirror_OpportunityMirror_ColumnGiftAmount';
 import columnGiftDate from '@salesforce/label/c.Giving_AskPipeline_FieldGiftDate';
 import columnDifference from '@salesforce/label/c.Core_AccessCompare_ColDifference';
-import errorFailed from '@salesforce/label/c.Mirror_OpportunityMirror_ErrorFailed';
 import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from './mirrorView';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -81,7 +72,9 @@ export default class GiftTransactionMirror extends LightningElement {
     },
     unavailable,
     switchedOff,
-    noManagePermission,
+    get noManagePermission() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_NoManagePermission');
+    },
     noAccess,
     runNow: runNowLabel,
     scheduleNightly,
@@ -208,17 +201,25 @@ export default class GiftTransactionMirror extends LightningElement {
   }
 
   get scheduleText() {
-    return this.view.scheduled ? fill(nextRun, this.moment(this.status.nextRunAt)) : notScheduled;
+    return this.view.scheduled
+      ? fill(nextRun, this.moment(this.status.nextRunAt))
+      : helpText('Mirror', 'Mirror_OpportunityMirror_NotScheduled');
   }
 
   get lastRunText() {
     return this.status.lastRunAt
-      ? fill(lastRun, this.moment(this.status.lastRunAt), this.status.lastSummary || '')
-      : noLastRun;
+      ? fill(
+          helpText('Mirror', 'Mirror_OpportunityMirror_LastRun'),
+          this.moment(this.status.lastRunAt),
+          this.status.lastSummary || ''
+        )
+      : helpText('Mirror', 'Mirror_OpportunityMirror_NoLastRun');
   }
 
   get runningText() {
-    return this.justStarted ? started : runningNow;
+    return this.justStarted
+      ? helpText('Mirror', 'Mirror_OpportunityMirror_Started')
+      : helpText('Mirror', 'Mirror_OpportunityMirror_Running');
   }
 
   get copyAgainShown() {
@@ -241,8 +242,8 @@ export default class GiftTransactionMirror extends LightningElement {
   get differenceText() {
     return differenceTextOf(this.comparison, {
       noDifferences,
-      differenceCount,
-      differenceCountAll
+      differenceCount: helpText('Mirror', 'Mirror_OpportunityMirror_DifferenceCount'),
+      differenceCountAll: helpText('Mirror', 'Mirror_OpportunityMirror_DifferenceCountAll')
     });
   }
 
@@ -305,6 +306,9 @@ export default class GiftTransactionMirror extends LightningElement {
   }
 
   messageOf(failure) {
-    return (failure && failure.body && failure.body.message) || errorFailed;
+    return (
+      (failure && failure.body && failure.body.message) ||
+      helpText('Mirror', 'Mirror_OpportunityMirror_ErrorFailed')
+    );
   }
 }

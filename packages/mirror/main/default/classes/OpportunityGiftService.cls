@@ -162,10 +162,10 @@ public with sharing class OpportunityGiftService {
 			Id accountId = (Id) opportunity.get('AccountId');
 			String refusal = amount == null ||
 				amount <= 0
-				? Label.Mirror_OpportunityMirror_AmountNotAboveZero
+				? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_AmountNotAboveZero')
 				: (contactId == null &&
 						accountId == null
-						? Label.Mirror_OpportunityMirror_NoDonor
+						? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NoDonor')
 						: null);
 			if (refusal != null) {
 				result.failed++;

@@ -98,11 +98,11 @@ private class GiftTransactionMirrorControllerTest {
 					.differenceCount
 			);
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_ErrorDateOrder,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 				refusalOf(new Action('compare'))
 			);
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_Running,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Running'),
 				refusalOf(new Action('copyBackwards')),
 				'A second run waits for the first.'
 			);
@@ -122,7 +122,7 @@ private class GiftTransactionMirrorControllerTest {
 
 			Test.startTest();
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_ErrorDateOrder,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 				refusalOf(new Action('copyBackwards')),
 				'An end date before the start is refused before anything starts.'
 			);
@@ -147,7 +147,7 @@ private class GiftTransactionMirrorControllerTest {
 			GiftTransactionMirrorSchema.absentForTest = false;
 			GiftTransactionMirrorSchema.useStandIns();
 			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_ErrorDatesRequired,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDatesRequired'),
 				refusalOf(new Action('copyNoDates'))
 			);
 			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();

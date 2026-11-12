@@ -284,11 +284,15 @@ private class GiftTransactionMirrorRunTest {
 	static void theReconciliationRefusesWhatItCannotCompare() {
 		System.runAs(maria()) {
 			GiftTransactionMirrorSchema.useStandIns();
-			assertRefused(null, GIFT_DATE, Label.Mirror_OpportunityMirror_ErrorDatesRequired);
+			assertRefused(
+				null,
+				GIFT_DATE,
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+			);
 			assertRefused(
 				GIFT_DATE.addDays(1),
 				GIFT_DATE,
-				Label.Mirror_OpportunityMirror_ErrorDateOrder
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 			GiftTransactionMirrorSchema.absentForTest = true;
 			assertRefused(GIFT_DATE, GIFT_DATE, Label.Mirror_GiftTransactionMirror_Unavailable);

@@ -210,7 +210,7 @@ private class OpportunityMirrorUnavailableTest {
 			Assert.isFalse(status.canRun, 'And that no run can.');
 			for (String action : refusals.keySet()) {
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_Unavailable,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_Unavailable'),
 					refusals.get(action),
 					action + ' is refused in words, before anything starts.'
 				);

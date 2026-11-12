@@ -62,7 +62,7 @@ public with sharing class MirrorHealthCheckExtension implements HealthCheckExten
 					MIRROR_STALE_KEY,
 					Label.Mirror_HealthCheck_MirrorNotRunTitle,
 					String.format(
-						Label.Mirror_HealthCheck_MirrorNotRunDetail,
+						BarnHelp.text('Mirror', 'Mirror_HealthCheck_MirrorNotRunDetail'),
 						new List<Object>{ since.format() }
 					),
 					HealthCheckService.SEVERITY_WARNING,
