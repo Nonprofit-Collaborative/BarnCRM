@@ -197,8 +197,9 @@ CAPS = {
     "payments": 56_300,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
-    # about 2%.
-    "lwcbuilder": 17_700,
+    # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
+    # about 1%.
+    "lwcbuilder": 20_000,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.

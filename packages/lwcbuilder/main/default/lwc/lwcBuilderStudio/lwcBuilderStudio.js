@@ -104,6 +104,7 @@ export default class LwcBuilderStudio extends LightningElement {
   helpReady = isHelpLoaded(HELP_PACKAGES);
   components = [];
   sourceExport = true;
+  rowsPerList;
   canEdit = false;
   selectedId = NEW;
   details = this.blankDetails();
@@ -137,6 +138,7 @@ export default class LwcBuilderStudio extends LightningElement {
       const studio = await getStudio();
       this.components = studio.components || [];
       this.sourceExport = studio.sourceExport !== false;
+      this.rowsPerList = studio.rowsPerList;
       this.canEdit = studio.canEdit === true;
       this.errorMessage = undefined;
     } catch (error) {
@@ -189,6 +191,8 @@ export default class LwcBuilderStudio extends LightningElement {
       descending: helpText('LwcBuilder', 'LwcBuilder_Prop_Descending'),
       report: helpText('LwcBuilder', 'LwcBuilder_Prop_Report'),
       reportHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_ReportHelp'),
+      stacked: helpText('LwcBuilder', 'LwcBuilder_Prop_Stacked'),
+      stackedHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_StackedHelp'),
       body: helpText('LwcBuilder', 'LwcBuilder_Prop_Body'),
       url: helpText('LwcBuilder', 'LwcBuilder_Prop_Url'),
       urlHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_UrlHelp'),
@@ -324,6 +328,7 @@ export default class LwcBuilderStudio extends LightningElement {
       fieldsText: (block.fields || []).join(', '),
       isTwoColumns: block.columns === 2,
       isDescending: block.direction === 'desc',
+      isStacked: block.display === 'stacked',
       isFields: block.type === 'fields',
       isRelatedList: block.type === 'relatedList',
       isList: block.type === 'relatedList' || block.type === 'recordList',
@@ -524,6 +529,8 @@ export default class LwcBuilderStudio extends LightningElement {
       value = value ? 2 : 1;
     } else if (prop === 'direction') {
       value = value ? 'desc' : 'asc';
+    } else if (prop === 'display') {
+      value = value ? 'stacked' : 'grouped';
     }
     this.change(updateItem(this.definition, this.selectedBlockId, { [prop]: value }));
   }
@@ -604,7 +611,10 @@ export default class LwcBuilderStudio extends LightningElement {
   }
 
   handleExport() {
-    const { files } = exportSource(this.definition, this.details);
+    const { files } = exportSource(this.definition, {
+      ...this.details,
+      rowLimit: this.rowsPerList
+    });
     this.exportFiles = files.map((file) => ({ ...file, key: file.name }));
   }
 

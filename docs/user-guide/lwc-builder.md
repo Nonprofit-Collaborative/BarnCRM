@@ -10,7 +10,9 @@ A built component looks like any other card on the page. It can hold:
 - **Record fields** from the record you are looking at.
 - **Lists** of related or other records. Click a name to open the record.
 - **Charts** from a report, run with your own access, so the totals can differ from a
-  colleague's.
+  colleague's. A chart can split each bar by a second grouping (a legend names the colors) and
+  show up to three totals. Press **Show Table** to read the same values as a table, and
+  **Show Chart** to go back.
 - **Text and images** your admin added.
 - **Buttons** that open a quick action or a flow. A flow opens inside the card; press the
   button again to close it.

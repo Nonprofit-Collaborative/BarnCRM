@@ -69,6 +69,11 @@ private class LwcBuilderControllerTest {
 				'One row in the builder'
 			);
 			Assert.areEqual(true, studio.get('sourceExport'), 'Source export ships on');
+			Assert.areEqual(
+				LwcBuilderController.rowsPerList(),
+				studio.get('rowsPerList'),
+				'Export uses the Rows per List setting (LB-07)'
+			);
 		}
 	}
 
@@ -331,6 +336,11 @@ private class LwcBuilderControllerTest {
 				),
 				chart,
 				'A report that is not there'
+			);
+			Assert.areEqual(
+				0,
+				LwcBuilderController.cell(null, 3).size(),
+				'A report cell with no fact is empty, not an error (LB-07)'
 			);
 			Assert.areEqual(1, values.getDataRows().size(), 'Every component the admin can read');
 			Assert.areEqual('Donor_Snapshot', first.getValue(), 'The picklist stores the key');

@@ -4,7 +4,7 @@ import loadRecords from '@salesforce/apex/LwcBuilderController.loadRecords';
 import loadChart from '@salesforce/apex/LwcBuilderController.loadChart';
 import { messageFrom } from 'c/findCsv';
 import { helpText } from 'c/barnHelpText';
-import { isSafeImageUrl } from 'c/lwcBuilderModel';
+import { chartView, isSafeImageUrl } from 'c/lwcBuilderModel';
 
 // lightning-datatable column types for the field types Apex reports; anything else is text.
 const COLUMN_TYPES = {
@@ -22,9 +22,9 @@ const COLUMN_TYPES = {
 };
 
 /**
- * One block of a built component (LB-03, LB-04): the page record's fields through Lightning
- * Data Service, a related or record list and a report chart through LwcBuilderController (user
- * mode), rich text, an image, or a button that opens a quick action or runs a flow. What the
+ * One block of a built component (LB-03, LB-04, LB-07): the page record's fields through
+ * Lightning Data Service, a related or record list and a report chart through
+ * LwcBuilderController (user mode; the chart laid out by c/lwcBuilderModel), rich text, an image, or a button that opens a quick action or runs a flow. What the
  * viewer may not read or run, the platform refuses; this block only draws.
  */
 export default class LwcBuilderBlock extends NavigationMixin(LightningElement) {
@@ -39,6 +39,7 @@ export default class LwcBuilderBlock extends NavigationMixin(LightningElement) {
   errorMessage;
   isLoading = false;
   showFlow = false;
+  showTable = false;
 
   @api
   get block() {
@@ -94,6 +95,25 @@ export default class LwcBuilderBlock extends NavigationMixin(LightningElement) {
   }
   get noRecordText() {
     return helpText('LwcBuilder', 'LwcBuilder_Block_NeedsRecord');
+  }
+  get tableToggleLabel() {
+    return this.showTable
+      ? helpText('LwcBuilder', 'LwcBuilder_Chart_ShowChart')
+      : helpText('LwcBuilder', 'LwcBuilder_Chart_ShowTable');
+  }
+  // The table is always there for screen readers; Show Table makes it visible too.
+  get tableCss() {
+    return this.showTable
+      ? 'slds-table slds-table_bordered slds-table_cell-buffer'
+      : 'slds-assistive-text';
+  }
+
+  get showChart() {
+    return !this.showTable;
+  }
+
+  toggleTable() {
+    this.showTable = !this.showTable;
   }
 
   async load() {
@@ -155,18 +175,7 @@ export default class LwcBuilderBlock extends NavigationMixin(LightningElement) {
     this.isLoading = true;
     try {
       const result = await loadChart({ reportName: this.current.report });
-      const bars = result.bars || [];
-      const max = Math.max(1, ...bars.map((bar) => Math.abs(Number(bar.value) || 0)));
-      this.chart = {
-        title: result.title,
-        measure: result.measure,
-        bars: bars.map((bar, index) => ({
-          key: `bar${index}`,
-          label: bar.label,
-          value: bar.value === null || bar.value === undefined ? '' : bar.value,
-          style: `width: ${Math.round((Math.abs(Number(bar.value) || 0) / max) * 100)}%`
-        }))
-      };
+      this.chart = chartView(result, this.current.display);
     } catch (error) {
       this.chart = undefined;
       this.errorMessage = messageFrom(error, helpText('LwcBuilder', 'LwcBuilder_Error_Generic'));

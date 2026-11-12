@@ -1,0 +1,50 @@
+/* Report Chart bars (LB-07): SLDS 2 styling hooks with fallbacks, five series tones. */
+.lane {
+  padding-right: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.lane:empty {
+  display: none;
+}
+
+.track {
+  display: flex;
+  height: var(--slds-g-sizing-5, 0.75rem);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  overflow: hidden;
+}
+
+/* A flex item, so it fills the track's height. */
+.segment {
+  background: var(--slds-g-color-accent-1, #0176d3);
+}
+
+.swatch {
+  display: inline-block;
+  width: var(--slds-g-sizing-5, 0.75rem);
+  height: var(--slds-g-sizing-5, 0.75rem);
+  margin-right: var(--slds-g-spacing-1, 0.25rem);
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+  vertical-align: middle;
+}
+
+.tone0 {
+  background: var(--slds-g-color-palette-blue-40, #0b5cab);
+}
+
+.tone1 {
+  background: var(--slds-g-color-palette-teal-40, #056764);
+}
+
+.tone2 {
+  background: var(--slds-g-color-palette-violet-40, #5a1ba9);
+}
+
+.tone3 {
+  background: var(--slds-g-color-palette-green-40, #2e844a);
+}
+
+.tone4 {
+  background: var(--slds-g-color-palette-orange-40, #8c4b02);
+}

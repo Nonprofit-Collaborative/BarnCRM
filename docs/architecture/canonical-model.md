@@ -17125,10 +17125,12 @@ deployed metadata.
 columns: [{id, width, blocks: [block]}]}]}]}`. A row's column widths are twelfths and add up to
 12. A block is `{id, type, title, visibility}` plus its type's properties: `fields` (page
 record fields), `relatedList` (object, parent field, fields, sort), `recordList` (object,
-fields, one optional filter, sort), `chart` (report API name), `text` (rich text), `image`
-(address, alternative text) and `action` (quick action or screen flow). Ids are unique within
-the document. The `lwcBuilderModel` module validates it; Apex checks only that it is a JSON
-object with a known schema version.
+fields, one optional filter, sort), `chart` (report API name; optional `display`, `grouped` or
+`stacked`, blank read as `grouped`), `text` (rich text), `image` (address, alternative text) and
+`action` (quick action or screen flow). Ids are unique within the document. The
+`lwcBuilderModel` module validates it; Apex checks only that it is a JSON object with a known
+schema version. A property added later with a default that keeps old documents meaning what
+they meant (such as `display`) does not raise the schema version.
 
 **R-LB2 Reads are the viewer's.** Every block reads in user mode or through Lightning Data
 Service, so object, field and record access apply. List queries name only fields the schema
@@ -18649,8 +18651,8 @@ mirrors the primary member).
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 | 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
 | 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
-
 | 1.48 | 2026-11-12 | Corporate Hub quorum warning and immediate breach bell (CH-21, CH-22, D-196). `Board_Motion__c.Closed_Without_Quorum__c` (Checkbox, default false); R-MO1 sets it when Close Voting finds Quorum Met false. R-DB1: registry automation `Data_Breach_Bell` sends the breach bell on insert. |
+| 1.49 | 2026-11-12 | LWC Builder charts with two groupings and three totals (LB-07, D-196; ADR-0203 amendment of 2026-11-12). No object or field added. R-LB1: a `chart` block gains the optional `display` property (`grouped` or `stacked`, blank read as `grouped`); the definition stays schema version 1, and an additive property with a meaning-keeping default does not raise it. |
 
 ---
 ## 32. Entity ownership by package

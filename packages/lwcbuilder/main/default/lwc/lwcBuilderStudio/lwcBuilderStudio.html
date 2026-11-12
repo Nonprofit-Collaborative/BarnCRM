@@ -258,6 +258,7 @@
 
                 <template lwc:if={form.isChart}>
                   <lightning-input label={labels.report} field-level-help={labels.reportHelp} value={form.report} data-prop="report" onchange={handleBlockProp} data-id="prop-report"></lightning-input>
+                  <lightning-input type="checkbox" label={labels.stacked} field-level-help={labels.stackedHelp} checked={form.isStacked} data-prop="display" onchange={handleBlockProp} data-id="prop-display"></lightning-input>
                 </template>
 
                 <template lwc:if={form.isText}>
