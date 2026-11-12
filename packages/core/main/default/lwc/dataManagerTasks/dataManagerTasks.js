@@ -29,6 +29,12 @@ export const TASKS = Object.freeze([
     text: 'Update records from a spreadsheet',
     words: 'change edit file csv excel'
   },
+  // Import Files (C-70)
+  {
+    tool: 'files',
+    text: 'Load documents and attachments into Files',
+    words: 'files attachments documents zip pdf scans letters photos upload migrate'
+  },
   {
     tool: 'import',
     text: 'Delete the records a file lists',

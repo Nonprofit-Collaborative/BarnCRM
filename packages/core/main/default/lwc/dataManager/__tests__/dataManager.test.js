@@ -131,6 +131,7 @@ describe('c-data-manager', () => {
     // Bulk Update Records is off in this test, so there is no Update Many Records tile.
     expect(tiles(element).map((tile) => tile.name)).toEqual([
       'import',
+      'files',
       'find',
       'grid',
       'backup',
@@ -151,6 +152,7 @@ describe('c-data-manager', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(one(element, 'tools')).toBeNull();
     expect(one(element, 'panel').querySelector('c-backup-sets')).not.toBeNull();
+    expect(one(element, 'panel').querySelector('c-files-import')).toBeNull();
 
     one(element, 'back').click();
     await flush();

@@ -10,6 +10,8 @@ import undoUpdate from '@salesforce/apex/BulkUpdateController.undo';
 import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
 import getBackupRuns from '@salesforce/apex/BackupSetController.getRuns';
+import getFilesJobs from '@salesforce/apex/FilesImportController.getJobs';
+import undoFiles from '@salesforce/apex/FilesImportController.undo';
 import { startPolling } from 'c/jobPoller';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
@@ -53,7 +55,8 @@ const IMPORT = 'Import';
 const UPDATE = 'Update';
 const DELETE = 'Delete';
 const BACKUP = 'Backup';
-const ALL_KINDS = [IMPORT, UPDATE, DELETE, BACKUP];
+const FILES = 'Files';
+const ALL_KINDS = [IMPORT, UPDATE, DELETE, BACKUP, FILES];
 const IMPORTS_SHOWN = 10;
 
 function errorText(error) {
@@ -154,6 +157,25 @@ function fromBackupRun(run) {
     startedAt: run.startedAt,
     canUndo: false,
     running: Boolean(run.running)
+  };
+}
+
+/** One files import (C-70): undone by typing the number of files it saved (R-FI4). */
+function fromFilesJob(job) {
+  return {
+    key: job.id,
+    id: job.id,
+    kind: FILES,
+    kindLabel: helpText('Core', 'Core_DataJobs_KindFiles'),
+    name: job.name,
+    detail: job.fileName,
+    status: job.status,
+    summary: format(helpText('Core', 'Core_DataJobs_FilesSummary'), job.saved, job.refused),
+    startedAt: job.startedAt,
+    undoDeadline: job.undoDeadline,
+    canUndo: Boolean(job.canUndo),
+    running: false,
+    undoCount: job.saved
   };
 }
 
@@ -311,14 +333,15 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   /** Reads every list this placement shows and replaces the rows; throws when a read fails. */
   async fetchJobs() {
     const wanted = this.wantedKinds;
-    const [imports, updates, deletes, backups] = await Promise.all([
+    const [imports, updates, deletes, backups, files] = await Promise.all([
       wanted.includes(IMPORT) && canManageSettings
         ? getRecentBatches({ howMany: IMPORTS_SHOWN })
         : null,
       wanted.includes(UPDATE) && canBulkUpdate ? getUpdatePage({ everyone: this.everyone }) : null,
       wanted.includes(DELETE) && canBulkDelete ? getDeletePage({ everyone: this.everyone }) : null,
       // The server says null to someone who may not use Backup Sets.
-      wanted.includes(BACKUP) && canManageSettings ? getBackupRuns() : null
+      wanted.includes(BACKUP) && canManageSettings ? getBackupRuns() : null,
+      wanted.includes(FILES) && canManageSettings ? getFilesJobs() : null
     ]);
     this.canSeeEveryone = Boolean(
       (updates && updates.allowed && updates.canSeeEveryone) ||
@@ -341,6 +364,10 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
     if (Array.isArray(backups)) {
       allowed.push(BACKUP);
       jobs = jobs.concat(backups.map(fromBackupRun));
+    }
+    if (Array.isArray(files)) {
+      allowed.push(FILES);
+      jobs = jobs.concat(files.map(fromFilesJob));
     }
     this.allowedKinds = allowed;
     this.jobs = jobs.sort(newestFirst);
@@ -376,7 +403,8 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
       [IMPORT]: SHOW_IMPORTS,
       [UPDATE]: SHOW_UPDATES,
       [DELETE]: SHOW_DELETES,
-      [BACKUP]: helpText('Core', 'Core_DataJobs_ShowBackups')
+      [BACKUP]: helpText('Core', 'Core_DataJobs_ShowBackups'),
+      [FILES]: helpText('Core', 'Core_DataJobs_ShowFiles')
     };
     return [{ label: SHOW_ALL, value: 'all' }].concat(
       this.allowedKinds.map((kind) => ({ label: names[kind], value: kind }))
@@ -445,17 +473,20 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
     if (!this.isBulkUndo) {
       return '';
     }
-    const template =
-      this.undoTarget.kind === UPDATE
-        ? helpText('Core', 'Core_BulkUpdate_UndoConfirm')
-        : helpText('Core', 'Core_BulkDelete_UndoConfirm');
-    return format(template, this.undoTarget.undoCount);
+    const templates = {
+      [UPDATE]: helpText('Core', 'Core_BulkUpdate_UndoConfirm'),
+      [DELETE]: helpText('Core', 'Core_BulkDelete_UndoConfirm'),
+      [FILES]: helpText('Core', 'Core_FilesImport_UndoConfirm')
+    };
+    return format(templates[this.undoTarget.kind], this.undoTarget.undoCount);
   }
 
   get bulkUndoButton() {
-    return this.undoTarget && this.undoTarget.kind === DELETE
-      ? DELETE_UNDO_BUTTON
-      : UPDATE_UNDO_BUTTON;
+    const kind = this.undoTarget && this.undoTarget.kind;
+    if (kind === FILES) {
+      return helpText('Core', 'Core_FilesImport_UndoButton');
+    }
+    return kind === DELETE ? DELETE_UNDO_BUTTON : UPDATE_UNDO_BUTTON;
   }
 
   get bulkUndoDisabled() {
@@ -522,6 +553,14 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   async handleBulkUndoConfirm() {
     await this.work(async () => {
       const target = this.undoTarget;
+      if (target.kind === FILES) {
+        // Synchronous: the files are deleted when it returns (R-FI4).
+        const job = await undoFiles({ jobId: target.id, confirmedFiles: target.undoCount });
+        const row = fromFilesJob(job);
+        this.jobs = this.jobs.map((existing) => (existing.id === row.id ? row : existing));
+        this.finishUndo(helpText('Core', 'Core_FilesImport_Undone'));
+        return;
+      }
       const undone =
         target.kind === UPDATE
           ? await undoUpdate({ jobId: target.id, confirmedUpdates: target.undoCount })

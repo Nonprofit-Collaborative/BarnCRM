@@ -25,6 +25,9 @@
                 <template lwc:if={showBackup}>
                     <c-backup-sets></c-backup-sets>
                 </template>
+                <template lwc:if={showFiles}>
+                    <c-files-import></c-files-import>
+                </template>
             </div>
         </template>
         <template lwc:else>

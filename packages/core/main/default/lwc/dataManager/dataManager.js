@@ -54,7 +54,7 @@ const TABS = {
   delete: 'Find'
 };
 /** The tiles whose tool opens on this page, in place of the hub, with a way back. */
-const PANELS = ['backup'];
+const PANELS = ['backup', 'files'];
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
 const BULK_TOOLS = { delete: 'delete' };
 
@@ -159,6 +159,10 @@ export default class DataManager extends NavigationMixin(LightningElement) {
     return this.panel === 'backup';
   }
 
+  get showFiles() {
+    return this.panel === 'files';
+  }
+
   handleBack() {
     this.panel = undefined;
   }
@@ -220,6 +224,15 @@ export default class DataManager extends NavigationMixin(LightningElement) {
           IMPORT_TITLE,
           helpText('Core', 'Core_DataManager_ImportText'),
           iconFor('Import')
+        )
+      );
+      // Import Files (C-70): documents from a zip into Files, as every import, for admins.
+      bringIn.push(
+        tile(
+          'files',
+          helpText('Core', 'Core_DataManager_FilesTitle'),
+          helpText('Core', 'Core_DataManager_FilesText'),
+          'standard:file'
         )
       );
     }
