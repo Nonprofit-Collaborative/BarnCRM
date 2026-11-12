@@ -122,12 +122,12 @@ private class NpspHouseholdAdoptionTest {
 
 			Test.startTest();
 			try {
-				NpspHouseholdAdoptionController.getStatus();
+				NpspHouseholdAdoptionController.getStatus(null);
 			} catch (AuraHandledException e) {
 				statusMessage = e.getMessage();
 			}
 			try {
-				NpspHouseholdAdoptionController.adopt(true, 1);
+				NpspHouseholdAdoptionController.adopt(null, true, 1);
 			} catch (AuraHandledException e) {
 				adoptMessage = e.getMessage();
 			}
@@ -146,7 +146,9 @@ private class NpspHouseholdAdoptionTest {
 	static void previewCountsAndSamplesCandidates() {
 		System.runAs(TestUsers.admin()) {
 			Fixture f = fixture();
-			NpspHouseholdAdoptionService.Status status = NpspHouseholdAdoptionController.getStatus();
+			NpspHouseholdAdoptionService.Status status = NpspHouseholdAdoptionController.getStatus(
+				null
+			);
 			Assert.isTrue(status.available, 'the fake source has households');
 			Assert.areEqual(2, status.candidateCount, 'both households are candidates');
 			Assert.isFalse(status.moreThanLimit, 'two is under the run limit');
@@ -171,7 +173,7 @@ private class NpspHouseholdAdoptionTest {
 			Fixture f = fixture();
 			Id original = accounts(f).get(f.smith.Id).RecordTypeId;
 			Test.startTest();
-			String runId = NpspHouseholdAdoptionController.adopt(true, 2);
+			String runId = NpspHouseholdAdoptionController.adopt(null, true, 2);
 			Test.stopTest();
 
 			Map<Id, Account> after = accounts(f);
@@ -350,7 +352,7 @@ private class NpspHouseholdAdoptionTest {
 				'no permission'
 			);
 			try {
-				NpspHouseholdAdoptionController.getStatus();
+				NpspHouseholdAdoptionController.getStatus(null);
 				Assert.fail('status needs the permission too');
 			} catch (AuraHandledException e) {
 				Assert.areEqual(
@@ -383,7 +385,7 @@ private class NpspHouseholdAdoptionTest {
 
 	private static void assertRefused(String expected, Integer confirmed, String why) {
 		try {
-			NpspHouseholdAdoptionController.adopt(true, confirmed);
+			NpspHouseholdAdoptionController.adopt(null, true, confirmed);
 			Assert.fail('refused: ' + why);
 		} catch (AuraHandledException e) {
 			Assert.areEqual(expected, e.getMessage(), why);
