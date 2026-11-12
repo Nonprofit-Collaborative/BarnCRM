@@ -1,7 +1,7 @@
 /**
  * Project Management's reporting (ADR-0208 `0208-project-management-module.md` decisions 6 to
  * 8), in user mode: Draft Status Update (R-PM8), utilization by person (R-PM5) and the billable
- * time export (R-PM7). The CSV itself is built in the browser.
+ * time export (R-PM7, counted time only, R-PM10). The CSV itself is built in the browser.
  */
 public with sharing class ProjectReporting {
 	private static final Integer NEXT_DAYS = 14;
@@ -203,13 +203,19 @@ public with sharing class ProjectReporting {
 				Hours__c,
 				Notes__c,
 				Exported_Date__c,
+				Bill_Rate__c,
 				User__r.Name,
 				Task__r.Name,
 				Project__r.Name,
 				Project__r.Account__r.Name,
 				Project__r.Hourly_Rate__c
 			FROM Time_Entry__c
-			WHERE Billable__c = TRUE AND Date__c >= :fromDate AND Date__c <= :toDate
+			WHERE
+				Billable__c = TRUE
+				AND Date__c >= :fromDate
+				AND Date__c <= :toDate
+				AND (Status__c = NULL
+				OR Status__c = 'Approved')
 			WITH USER_MODE
 			ORDER BY Project__r.Name, Date__c
 			LIMIT 10000
@@ -224,7 +230,10 @@ public with sharing class ProjectReporting {
 		// and a master-detail field cannot be written on update.
 		List<Time_Entry__c> stamps = new List<Time_Entry__c>();
 		for (Time_Entry__c entry : entries) {
-			Decimal rate = entry.Project__r.Hourly_Rate__c;
+			// The rate the entry was logged at (PM-06), else the project's, as before.
+			Decimal rate = entry.Bill_Rate__c != null
+				? entry.Bill_Rate__c
+				: entry.Project__r.Hourly_Rate__c;
 			rows.add(
 				new Map<String, Object>{
 					'entry' => entry.Name,

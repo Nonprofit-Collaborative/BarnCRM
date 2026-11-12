@@ -228,8 +228,11 @@ CAPS = {
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%. PSA model (D-197, ADR-NEXT projects PSA): the PSA settings accessors,
-    # 34,147 measured; each PSA builder raises it by what its own classes measure.
-    "projects": 34_200,
+    # 34,147 measured; each PSA builder raises it by what its own classes measure. Builder A
+    # (PM-06 to PM-08: ProjectRates, ProjectEntryHandler, the timesheet and approvals
+    # controllers and their ProjectsController and ProjectReporting changes): 51,368 measured
+    # (17,221 more than the model), plus about 2%.
+    "projects": 52_400,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

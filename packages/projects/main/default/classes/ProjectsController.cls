@@ -17,6 +17,10 @@ public with sharing class ProjectsController {
 		public List<Project_Task__c> tasks;
 		@AuraEnabled
 		public Boolean timeTracking = false;
+		@AuraEnabled
+		public Boolean expensesEnabled = false;
+		@AuraEnabled
+		public Boolean approvalsEnabled = false;
 	}
 
 	public class Home {
@@ -28,6 +32,8 @@ public with sharing class ProjectsController {
 		public Boolean canManage = false;
 		@AuraEnabled
 		public Boolean timeTracking = false;
+		@AuraEnabled
+		public Boolean ratesEnabled = false;
 	}
 
 	@AuraEnabled
@@ -84,6 +90,8 @@ public with sharing class ProjectsController {
 				LIMIT 2000
 			];
 			board.timeTracking = ProjectsSettings.timeTracking();
+			board.expensesEnabled = ProjectsSettings.expensesEnabled();
+			board.approvalsEnabled = ProjectsSettings.approvalsEnabled();
 			return board;
 		} catch (Exception e) {
 			throw failure(e);
@@ -185,6 +193,7 @@ public with sharing class ProjectsController {
 			Home home = new Home();
 			home.canManage = Projects.canManage();
 			home.timeTracking = ProjectsSettings.timeTracking();
+			home.ratesEnabled = ProjectsSettings.ratesEnabled();
 			home.templates = ProjectTemplates.available();
 			home.myTasks = [
 				SELECT Id, Name, Status__c, Milestone__c, Due_Date__c, Project__c, Project__r.Name
@@ -249,6 +258,16 @@ public with sharing class ProjectsController {
 	public static List<ProjectReporting.Utilization> getUtilization(Date fromDate, Date toDate) {
 		try {
 			return ProjectReporting.utilization(fromDate, toDate);
+		} catch (Exception e) {
+			throw failure(e);
+		}
+	}
+
+	/** Apply Rates (Manage Projects): fills the rates of entries logged before rates were on. */
+	@AuraEnabled
+	public static Integer applyRates() {
+		try {
+			return ProjectRates.applyRates();
 		} catch (Exception e) {
 			throw failure(e);
 		}
