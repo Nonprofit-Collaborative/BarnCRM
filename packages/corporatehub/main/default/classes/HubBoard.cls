@@ -126,10 +126,22 @@ public with sharing class HubBoard {
 		return votes.size();
 	}
 
-	/** R-MO1: Passed when For is greater than Against, otherwise Failed; decided today. */
-	public static String closeVoting(Id motionId) {
+	/** What Close Voting tells the panel: the outcome, and a warning when quorum was not met. */
+	public class CloseResult {
+		@AuraEnabled
+		public String outcome;
+		@AuraEnabled
+		public String warning;
+	}
+
+	/**
+	 * R-MO1: Passed when For is greater than Against, otherwise Failed; decided today. A meeting
+	 * without quorum does not change the outcome: the motion records it and the result warns
+	 * (CH-21, D-196).
+	 */
+	public static CloseResult closeVoting(Id motionId) {
 		Board_Motion__c motion = [
-			SELECT Id, Status__c, Votes_For__c, Votes_Against__c
+			SELECT Id, Status__c, Votes_For__c, Votes_Against__c, Meeting__r.Quorum_Met__c
 			FROM Board_Motion__c
 			WHERE Id = :motionId
 			WITH USER_MODE
@@ -141,14 +153,20 @@ public with sharing class HubBoard {
 		}
 		Decimal votesFor = motion.Votes_For__c == null ? 0 : motion.Votes_For__c;
 		Decimal against = motion.Votes_Against__c == null ? 0 : motion.Votes_Against__c;
-		String outcome = votesFor > against ? 'Passed' : 'Failed';
+		CloseResult result = new CloseResult();
+		result.outcome = votesFor > against ? 'Passed' : 'Failed';
+		Boolean noQuorum = motion.Meeting__r?.Quorum_Met__c != true;
+		if (noQuorum) {
+			result.warning = BarnHelp.text('CorporateHub', 'CorporateHub_Board_NoQuorumWarning');
+		}
 		// Only the changed fields: the vote totals are not ones a user may write.
 		update as user new Board_Motion__c(
 			Id = motionId,
-			Status__c = outcome,
-			Decided_On__c = Date.today()
+			Status__c = result.outcome,
+			Decided_On__c = Date.today(),
+			Closed_Without_Quorum__c = noQuorum
 		);
-		return outcome;
+		return result;
 	}
 
 	/** R-BMT4: opens the poll, inviting the board first when nobody is invited yet. */

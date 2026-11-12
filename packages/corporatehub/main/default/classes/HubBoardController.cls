@@ -148,7 +148,14 @@ public with sharing class HubBoardController {
 				view.attendees.add(line);
 			}
 			for (Board_Motion__c motion : [
-				SELECT Id, Name, Status__c, Votes_For__c, Votes_Against__c, Abstentions__c
+				SELECT
+					Id,
+					Name,
+					Status__c,
+					Votes_For__c,
+					Votes_Against__c,
+					Abstentions__c,
+					Closed_Without_Quorum__c
 				FROM Board_Motion__c
 				WHERE Meeting__c = :meetingId
 				WITH USER_MODE
@@ -161,6 +168,7 @@ public with sharing class HubBoardController {
 					count(motion.Votes_Against__c),
 					count(motion.Abstentions__c)
 				};
+				line.flag = motion.Closed_Without_Quorum__c;
 				view.motions.add(line);
 			}
 			for (Meeting_Action_Item__c item : HubBoard.carriedItems(view.meeting)) {
@@ -219,7 +227,7 @@ public with sharing class HubBoardController {
 	}
 
 	@AuraEnabled
-	public static String closeVoting(Id motionId) {
+	public static HubBoard.CloseResult closeVoting(Id motionId) {
 		try {
 			return HubBoard.closeVoting(motionId);
 		} catch (Exception e) {

@@ -170,8 +170,10 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 3 | As the staff user change a vote. | Refused: "Voting on this motion is closed." As the admin it saves. |
 | 4 | Press **Close Voting** again on the closed motion. | Refused: "Voting is not open on this motion, so it cannot be closed." Status and Decided On are unchanged. |
 | 5 | On a motion that was never opened, press **Close Voting**. | The same refusal. |
+| 6 | Confirm step 2 gave no warning and Closed Without Quorum is unticked on that motion (Ade and Bea were Present). | No warning toast; no "Closed without quorum" under the motion. |
+| 7 | On a second meeting where nobody is Present, add a motion, press **Open Voting**, cast one vote For, press **Close Voting** (CH-21, D-196). | "Voting closed: Passed." plus a warning: "This meeting did not reach quorum. Check your bylaws before relying on this vote." The motion shows "Closed without quorum" and its Closed Without Quorum box is ticked. |
 
-**Cleanup:** None.
+**Cleanup:** Delete the second meeting.
 
 ## T-CH-12: Disclosures and Self-Assessment
 
@@ -227,13 +229,14 @@ Admin) and a second user with the Team Member role, called the staff user below.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open **Data Breaches** and create one: Breach Title "Lost laptop". | Status Open, Risk Not Yet Assessed, Discovered At now, Authority Deadline 72 hours later. |
+| 1 | From the App Launcher, open **Data Breaches** and create one: Breach Title "Lost laptop". | Status Open, Risk Not Yet Assessed, Discovered At now, Authority Deadline 72 hours later. The owner gets a bell at once ("Breach Lost laptop: report to the authority by ...") and Reminded For is the deadline date (CH-22, D-196). |
 | 2 | Set Status Closed and save. | Refused while the risk is Not Yet Assessed. Set Status back to Open. |
 | 3 | Open the Corporate Hub page. | Data Protection lists "Breach not yet reported: Lost laptop". |
-| 4 | Create a second breach with Risk **Unlikely to Result in Risk**. | It is not listed on the Corporate Hub page. |
+| 4 | Create a second breach with Risk **Unlikely to Result in Risk**. | It is not listed on the Corporate Hub page, and no bell is sent. |
 | 5 | Open the Processing Activity "Donor records and fundraising": tick DPIA Required, DPIA Review Date in 10 days, Status Active. | Saved. |
-| 6 | Run **Corporate Hub reminders** now. | Two bell notifications: the first breach ("report to the authority by ...") and the DPIA review. None for the low-risk breach. |
+| 6 | Run **Corporate Hub reminders** now. | One bell notification: the DPIA review. None for the first breach (already told in step 1) or the low-risk breach. |
 | 7 | Run it again. | No new notification. |
 | 8 | Fill in Authority Notified At on the first breach. | It leaves the Corporate Hub page. |
+| 9 | On the Automations page turn off **Data Breach: Bell When Logged**, then create a breach "Phishing email" with Risk **Risk**. | No bell on saving. Run **Corporate Hub reminders**: one bell for "Phishing email". Turn the row back on. |
 
-**Cleanup:** Delete the two breaches; set the activity back to Draft and untick DPIA Required.
+**Cleanup:** Delete the three breaches; set the activity back to Draft and untick DPIA Required.

@@ -70,6 +70,45 @@ public with sharing class HubReminders implements Schedulable {
 		}
 	}
 
+	/** The most bells one logging transaction sends; the nightly run sends the rest. */
+	@TestVisible
+	private static final Integer MAX_LOGGED_BELLS = 50;
+
+	/**
+	 * R-DB1 (CH-22, D-196): the breach bell goes the moment a breach is logged, through the same
+	 * `send` and title as the nightly run, and the deadline date is stored in Reminded For so the
+	 * nightly run sends none for that date. A breach the nightly run would not remind (Closed,
+	 * unlikely to be a risk, already reported, or owned by a queue) gets no bell here either.
+	 */
+	public static void bellLogged(List<Data_Breach__c> logged) {
+		HubReminders bell = new HubReminders();
+		bell.today = Date.today();
+		String title = BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_BreachTitle');
+		List<Data_Breach__c> stamped = new List<Data_Breach__c>();
+		for (Data_Breach__c row : logged) {
+			if (
+				bell.sent >= MAX_LOGGED_BELLS ||
+				row.Status__c == 'Closed' ||
+				row.Risk__c == 'Unlikely' ||
+				row.Authority_Notified_At__c != null ||
+				row.Discovered_At__c == null
+			) {
+				continue;
+			}
+			Date target = row.Discovered_At__c.addDays(3).date();
+			if (
+				bell.send(
+					row.OwnerId,
+					String.format(title, new List<Object>{ row.Name, target.format() }),
+					row.Id
+				)
+			) {
+				stamped.add(new Data_Breach__c(Id = row.Id, Reminded_For__c = target));
+			}
+		}
+		update as system stamped;
+	}
+
 	/** R-AG1, then R-CR1 for agreements: the rows changed, renewed, expired or reminded. */
 	private List<Agreement__c> agreements(Boolean remind) {
 		List<Agreement__c> changed = new List<Agreement__c>();
