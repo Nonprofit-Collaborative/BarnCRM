@@ -270,9 +270,18 @@ pledge balance) on your own Stripe or PayPal checkout page. BarnCRM holds no mon
 a card. It needs the **Payments** module with your keys entered; without them the donor is told
 paying online isn't available. When the processor reports the payment, a **Received** gift
 appears on the pledge, dated the day it was paid, and is linked to the payment it covers. A
-refund at the processor sets it to **Refunded**. Changing the card on a recurring gift is not
-offered: each payment is paid through Pay Online. A portal saved before this release keeps its
+refund at the processor sets it to **Refunded**. A portal saved before this release keeps its
 template: paste the new `donor.json` to add the button.
+
+**Automatic payments and Update Card (donor template, PAY-04).** With **Automatic Recurring
+Payments** on in the Payments settings, **Pay Online** on a recurring gift sets up automatic
+payments for the gift's amount and frequency instead of one payment: the processor saves the
+card and charges it each period, and each charge becomes a **Received** gift (see
+[Payments](payments.md#automatic-recurring-payments)). Pay Online is then refused on that gift.
+**Update Card**, on the same list, emails the donor a link to your processor's own page to change
+the card (Stripe) or the PayPal funding source; it works only on an Active recurring gift with a
+Processor Subscription Id, and for Stripe a Processor Customer Id. With the setting off, Pay
+Online works as above and Update Card is refused. Paste the new `donor.json` to add the button.
 
 **Board.** For board and committee members (Corporate Hub board governance). My Meetings lists
 the meetings the person is invited to, with the agenda and the meeting's Packet Link shown as

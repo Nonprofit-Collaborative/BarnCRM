@@ -172,6 +172,15 @@ A donor who pays a pledge with **Pay Online** in the donor portal gets the same 
 the pledge instead of an appeal: it appears as **Received** once the payment is confirmed and
 counts against the pledge's next payment.
 
+When your admin has turned on automatic recurring payments, a donor who chooses Pay Online on a
+recurring gift is charged automatically each period by Stripe or PayPal. Each charge appears as
+a **Received** gift on the recurring gift without anyone entering it. The recurring gift shows
+**Processor Subscription Id**, and a failed charge, a new card or a cancellation at the processor
+shows in **Failed Charges**, **Card Expires** and **Cancelled at Processor**, as on the Recurring
+Donor Health page. A donor fixes a failed or expiring card with **Update Card** in the donor
+portal; nobody at your organization handles the card. To stop the charges, cancel the
+subscription in Stripe or PayPal, then set the gift's Status yourself.
+
 ## Common Problems
 
 - "This gift has a receipt number, so its amount, date, donor and in-kind description cannot change. Void the receipt and reissue it, or record a refund." The donor holds a receipt for this gift. Use **Void and Reissue** ([Receipts and acknowledgments](receipts-and-acknowledgments.md)) or record a refund.

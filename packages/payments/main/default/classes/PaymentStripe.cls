@@ -1,10 +1,11 @@
 /**
  * The org's own Stripe account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Checkout Sessions, the Stripe-Signature check on arrival, and reading a verified event into a
- * `PaymentService.Change`. Stripe API version: the account's default.
+ * `PaymentService.Change`; subscriptions and the setup-mode card update (ADR-NEXT
+ * `NEXT-payments-subscriptions.md`). Stripe API version: the account's default.
  */
 public with sharing class PaymentStripe {
-	public static final String ENDPOINT = 'https://api.stripe.com/v1/checkout/sessions';
+	public static final String ENDPOINT = 'https://api.stripe.com/v1/';
 	/** How far the signed time may be from now, in seconds (Stripe's own default). */
 	@TestVisible
 	private static final Integer TOLERANCE_SECONDS = 300;
@@ -16,56 +17,114 @@ public with sharing class PaymentStripe {
 	 * (ADR-0201 payments module, decision 7): its signing secret must be readable by Apex for
 	 * the HMAC check, so both Stripe keys are kept in the one write-only place.
 	 */
-	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
-	public static void startCheckout(Payment__c payment, String successUrl, String cancelUrl) {
+	public static void startCheckout(
+		Payment__c payment,
+		String successUrl,
+		String cancelUrl,
+		String interval,
+		Integer intervalCount
+	) {
 		String ref = payment.Reference__c;
+		String item = 'line_items[0][price_data]';
 		Map<String, String> form = new Map<String, String>{
-			'mode' => 'payment',
+			'mode' => interval == null ? 'payment' : 'subscription',
 			'success_url' => successUrl,
 			'cancel_url' => cancelUrl,
 			'client_reference_id' => ref,
 			'line_items[0][quantity]' => '1',
-			'line_items[0][price_data][currency]' => payment.Currency_Code__c.toLowerCase(),
-			'line_items[0][price_data][unit_amount]' => String.valueOf(
+			item + '[currency]' => payment.Currency_Code__c.toLowerCase(),
+			item + '[unit_amount]' => String.valueOf(
 				PaymentService.minorUnits(payment.Amount__c, payment.Currency_Code__c)
 			),
-			'line_items[0][price_data][product_data][name]' => payment.Description__c,
-			'metadata[barncrm_reference]' => ref,
-			'payment_intent_data[metadata][barncrm_reference]' => ref
+			item + '[product_data][name]' => payment.Description__c,
+			'metadata[barncrm_reference]' => ref
 		};
+		if (interval == null) {
+			form.put('payment_intent_data[metadata][barncrm_reference]', ref);
+		} else {
+			// The reference rides on the subscription, so its invoices and cancellation carry it.
+			form.put(item + '[recurring][interval]', interval);
+			form.put(item + '[recurring][interval_count]', String.valueOf(intervalCount));
+			form.put('subscription_data[metadata][barncrm_reference]', ref);
+		}
 		if (String.isNotBlank(payment.Payer_Email__c)) {
 			form.put('customer_email', payment.Payer_Email__c);
 		}
-		List<String> pairs = new List<String>();
-		for (String key : form.keySet()) {
-			pairs.add(
-				EncodingUtil.urlEncode(key, 'UTF-8') +
-					'=' +
-					EncodingUtil.urlEncode(form.get(key), 'UTF-8')
-			);
-		}
+		Map<String, Object> body = send('POST', 'checkout/sessions', form, ref);
+		payment.Checkout_Id__c = text(body.get('id'));
+		payment.Checkout_Url__c = text(body.get('url'));
+	}
+
+	/**
+	 * A Checkout Session in setup mode for the customer, with the subscription in its metadata
+	 * (ADR-NEXT payments subscriptions, decision 5): Stripe's own card form, valid 24 hours.
+	 */
+	public static String updateCardUrl(String customerId, String subscriptionId, String back) {
+		return text(
+			send(
+					'POST',
+					'checkout/sessions',
+					new Map<String, String>{
+						'mode' => 'setup',
+						'customer' => customerId,
+						'currency' => (PaymentService.settings().Currency__c ?? 'USD')
+							.toLowerCase(),
+						'success_url' => back,
+						'cancel_url' => back,
+						'metadata[barncrm_subscription]' => subscriptionId
+					},
+					null
+				)
+				.get('url')
+		);
+	}
+
+	/**
+	 * One Stripe API call with the org's own secret key, from the protected setting
+	 * Payment_Keys__c, not a Named Credential (ADR-0201 payments module, decision 7): its signing
+	 * secret must be readable by Apex for the HMAC check, so both Stripe keys are kept in the one
+	 * write-only place. Throws a PaymentException unless Stripe answers 200 with an id.
+	 */
+	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
+	private static Map<String, Object> send(
+		String method,
+		String path,
+		Map<String, String> form,
+		String idempotencyKey
+	) {
 		HttpRequest request = new HttpRequest();
-		request.setEndpoint(ENDPOINT);
-		request.setMethod('POST');
+		request.setEndpoint(ENDPOINT + path);
+		request.setMethod(method);
 		request.setTimeout(20000);
 		request.setHeader('Authorization', 'Bearer ' + PaymentService.keys().Stripe_Secret_Key__c);
-		request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-		request.setHeader('Idempotency-Key', ref);
-		request.setBody(String.join(pairs, '&'));
+		if (form != null) {
+			List<String> pairs = new List<String>();
+			for (String key : form.keySet()) {
+				pairs.add(
+					EncodingUtil.urlEncode(key, 'UTF-8') +
+						'=' +
+						EncodingUtil.urlEncode(form.get(key) ?? '', 'UTF-8')
+				);
+			}
+			request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+			request.setBody(String.join(pairs, '&'));
+		}
+		if (idempotencyKey != null) {
+			request.setHeader('Idempotency-Key', idempotencyKey);
+		}
 		HttpResponse response = new Http().send(request);
 		Map<String, Object> body = parse(response.getBody());
-		if (response.getStatusCode() != 200 || !(body.get('url') instanceof String)) {
+		if (response.getStatusCode() != 200 || !(body.get('id') instanceof String)) {
 			ErrorLogger.logMessage(
 				'Stripe answered ' + response.getStatusCode() + ': ' + errorOf(body),
-				CONTEXT + '.startCheckout',
+				CONTEXT + '.' + path.substringBefore('/'),
 				ErrorLogger.SEVERITY_ERROR
 			);
 			throw PaymentService.problem(
 				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ 'Stripe' })
 			);
 		}
-		payment.Checkout_Id__c = (String) body.get('id');
-		payment.Checkout_Url__c = (String) body.get('url');
+		return body;
 	}
 
 	/**
@@ -145,8 +204,47 @@ public with sharing class PaymentStripe {
 			change.reference = text(obj.get('client_reference_id')) ?? change.reference;
 			change.checkoutId = text(obj.get('id'));
 			change.processorPaymentId = text(obj.get('payment_intent'));
+			change.subscriptionId = text(obj.get('subscription'));
+		}
+		change.customerId = text(obj.get('customer'));
+		if (type == 'checkout.session.completed' && obj.get('mode') == 'setup') {
+			outcome.change = cardUpdated(obj, text(metadata.get('barncrm_subscription')));
+			return outcome;
+		}
+		if (type != null && type.startsWith('invoice.')) {
+			// Older API versions name the subscription on the invoice, newer ones under parent.
+			Map<String, Object> details = mapOf(
+				mapOf(obj.get('parent')).get('subscription_details') ??
+					obj.get('subscription_details')
+			);
+			change.subscriptionId = text(obj.get('subscription')) ??
+				text(details.get('subscription'));
+			change.reference = text(mapOf(details.get('metadata')).get('barncrm_reference'));
+			if (change.subscriptionId == null) {
+				return outcome;
+			}
 		}
 		switch on type {
+			when 'invoice.paid' {
+				// Newer API versions put no payment intent on the invoice: its own id stands in.
+				change.processorPaymentId = text(obj.get('payment_intent')) ?? text(obj.get('id'));
+				change.amount = PaymentService.fromMinorUnits(
+					obj.get('amount_paid'),
+					text(obj.get('currency'))
+				);
+				change.status = PaymentService.PAID;
+				change.paidAt = eventTime;
+				change.subscriptionEvent = PaymentService.CHARGE_SUCCEEDED;
+			}
+			when 'invoice.payment_failed' {
+				change.subscriptionEvent = PaymentService.CHARGE_FAILED;
+				change.detail = BarnHelp.text('Payments', 'Payments_Detail_ChargeFailed');
+			}
+			when 'customer.subscription.deleted' {
+				change.subscriptionId = text(obj.get('id'));
+				change.subscriptionEvent = PaymentService.SUBSCRIPTION_CANCELLED;
+				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Cancelled');
+			}
 			when 'checkout.session.completed', 'checkout.session.async_payment_succeeded' {
 				String paymentStatus = text(obj.get('payment_status'));
 				if (paymentStatus == 'paid' || paymentStatus == 'no_payment_required') {
@@ -181,6 +279,48 @@ public with sharing class PaymentStripe {
 		}
 		outcome.change = change;
 		return outcome;
+	}
+
+	/**
+	 * A completed setup-mode session: reads the card it saved and makes it the subscription's
+	 * default (two callouts, before any write; ADR-NEXT payments subscriptions, decision 5).
+	 */
+	private static PaymentService.Change cardUpdated(Map<String, Object> obj, String subscription) {
+		if (subscription == null || text(obj.get('setup_intent')) == null) {
+			return null;
+		}
+		Map<String, Object> method = mapOf(
+			send(
+					'GET',
+					'setup_intents/' +
+						EncodingUtil.urlEncode(text(obj.get('setup_intent')), 'UTF-8') +
+						'?expand%5B%5D=payment_method',
+					null,
+					null
+				)
+				.get('payment_method')
+		);
+		send(
+			'POST',
+			'subscriptions/' + EncodingUtil.urlEncode(subscription, 'UTF-8'),
+			new Map<String, String>{ 'default_payment_method' => text(method.get('id')) },
+			null
+		);
+		PaymentService.Change change = new PaymentService.Change();
+		change.subscriptionId = subscription;
+		change.customerId = text(obj.get('customer'));
+		change.subscriptionEvent = PaymentService.CARD_UPDATED;
+		Map<String, Object> card = mapOf(method.get('card'));
+		if (card.get('exp_year') instanceof Integer && card.get('exp_month') instanceof Integer) {
+			change.cardExpires = Date.newInstance(
+					(Integer) card.get('exp_year'),
+					(Integer) card.get('exp_month'),
+					1
+				)
+				.addMonths(1)
+				.addDays(-1);
+		}
+		return change;
 	}
 
 	public static Map<String, Object> parse(String json) {

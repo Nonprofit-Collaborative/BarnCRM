@@ -180,8 +180,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-PB-12: Donor Pays a Pledge Online
 
-**Purpose:** confirm Pay Online emails the donor a checkout link for the next payment due and the payment becomes a Received gift on the pledge (PAY-03).
-**Prerequisites:** the T-PB-08 portal with the current `donor.json`; Payments in Test mode with Stripe test keys (see [Payments](payments.md)); Pat Tester with an email you can read and an Active monthly pledge of 100; another donor with a pledge.
+**Purpose:** confirm Pay Online emails the donor a checkout link for the next payment due and the payment becomes a Received gift on the pledge (PAY-03), and that a recurring gift set up for automatic payments takes Update Card (PAY-04, D-196).
+**Prerequisites:** the T-PB-08 portal with the current `donor.json`; Payments in Test mode with Stripe test keys and the T-PAY-09 webhook events (see [Payments](payments.md)); Pat Tester with an email you can read, an Active monthly pledge of 100 and an Active Monthly recurring gift of 20; another donor with a pledge.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -190,8 +190,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Open the link and pay with 4242 4242 4242 4242; wait for the Payments run. | A **Received** gift of 100 from Pat on the pledge, **Payment Method** Card, with a **Payment Reference**; the first payment shows **Paid** and the pledge's Paid to Date rises by 100. |
 | 4 | POST `page/action` `Giving.PayOnline` with the other donor's pledge Id. | 404 `not_found`; no email. |
 | 5 | Clear the Stripe keys on Payments Setup; repeat step 2. | Refused; no email is sent. |
+| 6 | Enter the Stripe test keys again. POST `page/action` `Giving.UpdateCard` on Pat's recurring gift. | Refused: the gift has no Processor Subscription Id. |
+| 7 | Turn on **Automatic Recurring Payments** (BarnCRM Settings, Payments). POST `Giving.PayOnline` on Pat's recurring gift; open the emailed link. | Stripe's page charges 20 monthly. |
+| 8 | Pay with 4242 4242 4242 4242; wait for the Payments run. | A **Received** gift of 20 on the recurring gift. The gift shows **Processor Subscription Id** (`sub_...`) and **Processor Customer Id** (`cus_...`), and a Recurring Gift Event **Charge Succeeded**, Matched. |
+| 9 | POST `Giving.PayOnline` on the same recurring gift. | Refused; no email. |
+| 10 | POST `Giving.UpdateCard` on it. Open the emailed link, enter 4242 4242 4242 4242 with expiry 12/34; wait for the Payments run. | 200 with "We've emailed you a secure link to update your card"; Stripe's page charges nothing. Then a Recurring Gift Event **Card Updated**, and the gift's **Card Expires** is 31/12/2034 (in your date format). |
+| 11 | POST `Giving.UpdateCard` on Pat's pledge. | Refused; no email. |
 
-**Cleanup:** enter the Stripe test keys again; delete the gift.
+**Cleanup:** cancel the subscription in Stripe; turn Automatic Recurring Payments off; delete the gifts.
 
 ## T-PB-13: Attendee App
 

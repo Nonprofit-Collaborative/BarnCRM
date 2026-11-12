@@ -91,7 +91,9 @@ CAPS = {
     # Giving and Money review fixes (bulk payment listener, status stepping, card-testing
     # limits, portal payment guard, donation form Health Check): 663,899 measured 2026-11-12,
     # plus about 0.5%.
-    "giving": 667_300,
+    # PAY-04 (D-196): the subscriptions listener and Update Card / automatic Pay Online,
+    # 669,581 measured 2026-11-12, plus a small margin; both reuse the PAY-03 classes.
+    "giving": 670_000,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -197,7 +199,10 @@ CAPS = {
     # Giving and Money review fixes (bulk listener call, abandon job, callout-time budget,
     # countRecent, PayPal refund capture, Schedule button): 55,965 measured 2026-11-12, plus
     # about 0.5%.
-    "payments": 56_300,
+    # PAY-04 subscriptions (D-196, ADR-NEXT payments subscriptions): Stripe and PayPal
+    # subscription checkouts, renewals, subscription news to listeners and Update Card:
+    # 69,202 measured 2026-11-12, plus about 0.5%.
+    "payments": 69_600,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Processor_Customer_Id__c</fullName>
+  <caseSensitive>false</caseSensitive>
+  <externalId>true</externalId>
+  <inlineHelpText>The payment processor's customer for this recurring gift (for example a Stripe customer id, cus_...). Filled by Payments; Update Card needs it for Stripe.</inlineHelpText>
+  <label>Processor Customer Id</label>
+  <length>100</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

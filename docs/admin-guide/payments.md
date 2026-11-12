@@ -59,6 +59,7 @@ Open **BarnCRM Settings**, **Payments**:
 | Processor | Stripe | The processor used when a module does not choose one. |
 | Mode | Test | **Test** uses your processor's test keys and takes no real money. Switch to **Live** only after a test payment worked end to end. |
 | Default currency | USD | The three-letter currency used when a module does not name one. |
+| Automatic Recurring Payments | Off | When on, a donor who pays a recurring gift online sets up automatic payments: the processor saves the card and charges it each period, and the donor can update the card from the donor portal. See [Automatic Recurring Payments](#automatic-recurring-payments). |
 
 ### Setting Up a Site (Once)
 
@@ -82,7 +83,9 @@ requires these steps in **Setup**, and no app can do them for you:
 4. In Stripe, **Developers > Webhooks > Add endpoint**: paste the address and choose these
    events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
    `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`,
-   `payment_intent.payment_failed`. Save, then reveal the **Signing secret** (`whsec_...`).
+   `payment_intent.payment_failed`, and, for automatic recurring payments, `invoice.paid`,
+   `invoice.payment_failed` and `customer.subscription.deleted`. Save, then reveal the
+   **Signing secret** (`whsec_...`).
 5. In **Payments Setup**, paste the secret key and the signing secret and select **Save Keys**.
 
 ### 3. Connect PayPal
@@ -91,8 +94,9 @@ requires these steps in **Setup**, and no app can do them for you:
    create an app. Copy its **Client ID** and **Secret**.
 2. In the app, **Add Webhook**: paste the **PayPal address** from **Payments Setup** and choose
    **Checkout order approved**, **Payment capture completed**, **Payment capture denied**,
-   **Payment capture refunded** and **Payment capture reversed**. Save, and copy the **Webhook
-   ID** PayPal shows.
+   **Payment capture refunded** and **Payment capture reversed**, and, for automatic recurring
+   payments, **Payment sale completed**, **Billing subscription payment failed** and **Billing
+   subscription cancelled**. Save, and copy the **Webhook ID** PayPal shows.
 3. In **Payments Setup**, paste the client id, the secret and the webhook id and select **Save
    Keys**.
 
@@ -141,6 +145,33 @@ PayPal, leaving the rest **Received** for the next run. A message whose processo
 reached stays **Received** and is tried again at the next run. Abandoned checkouts are cancelled
 50 at a time in a job of their own.
 
+## Automatic Recurring Payments
+
+With **Automatic Recurring Payments** on (PAY-04, D-196), a donor who chooses **Pay Online** on
+a recurring gift in the donor portal sets up automatic payments for the gift's amount and how
+often it comes (weekly, every two weeks, monthly, quarterly, twice a year or yearly), on your
+Stripe or PayPal page. From then on:
+
+- **The processor charges each period** from the saved card or PayPal account and retries a
+  failed charge on its own schedule. Each charge it reports paid becomes a **Paid** payment with
+  the same **Subscription Id** as the first, and a **Received** gift on the recurring gift.
+- **The recurring gift keeps its health.** The gift gets **Processor Subscription Id** and
+  **Processor Customer Id**, and each failed charge, renewed charge, card update and
+  cancellation becomes a Recurring Gift Event, so **Failed Charges**, **Card Expires** and
+  **Cancelled at Processor** stay current on the Recurring Donor Health page.
+- **The donor updates the card** with **Update Card** in the donor portal: an email with a link
+  to your processor's own page (Stripe's card form, valid 24 hours, or PayPal's automatic
+  payments page). BarnCRM never sees the card. Stripe retries a failed charge on the new card.
+- **Pay Online is refused** on a recurring gift that is charged automatically, so nobody pays
+  twice.
+
+Before you turn it on, add the subscription events to your processor's webhook (steps 2 and 3
+above). To stop a donor's automatic payments, cancel the subscription in your processor's
+dashboard: BarnCRM records **Cancelled at Processor** and never changes the gift's Status.
+Recurring gifts set up outside BarnCRM (for example through a Zapier recipe) keep working as
+before; for Stripe ones, fill **Processor Customer Id** (`cus_...`) on the recurring gift to let
+the donor use Update Card.
+
 ## Health Check
 
 | Check | What to do |
@@ -167,6 +198,8 @@ with no dependency on Payments: see the
 - **Processing not scheduled, or scheduled by a user who was then deactivated**: payments stay
   Pending. Health Check reports both.
 - **Refunding in BarnCRM**: there is no refund button; refund in the processor's dashboard.
+- **Automatic Recurring Payments on without the subscription events** in the webhook: the first
+  payment is recorded, but renewals, failed charges and card updates are not.
 
 ## Other Giving Tools
 

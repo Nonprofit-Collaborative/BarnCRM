@@ -132,6 +132,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Commitment__c.Processor_Customer_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Commitment__c.Processor_Subscription_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>

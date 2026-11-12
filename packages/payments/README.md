@@ -80,6 +80,24 @@ Map<String, Object>{ 'sourceRecordId' => id, 'minutes' => 10, 'status' => 'Pendi
 how many payments for your record were started in the last minutes (default 60), of that status
 if given (a count only, so a public page may ask it, for example to refuse card testing).
 
+### Automatic recurring payments (PAY-04)
+
+With the setting **Automatic Recurring Payments** on, `startCheckout` with `'interval' =>
+'month'` (`week`, `month` or `year`) and `'intervalCount' => 1` (1 to 12) starts a subscription
+at the processor instead of one payment; with it off, both keys are ignored. Ask first with
+`call('isReady', new Map<String, Object>{ 'recurring' => true })`, true only when the keys are
+set and the setting is on. The first payment gains a Subscription Id once paid; each later charge
+the processor reports paid is a new payment, copied from the first, told to your listener as
+usual. `call('updateCard', new Map<String, Object>{ 'subscriptionId' => 'sub_...', 'customerId'
+=> 'cus_...', 'returnUrl' => 'https://...' })` returns `{ url }`, the processor's own page for a
+new card (Stripe needs the customer id; a PayPal `I-...` id gives PayPal's automatic payments
+page). Your listener is also told, once per run, `call('subscriptionsChanged', new Map<String,
+Object>{ 'changes' => [change, ...] })`, each change `{ subscriptionId, customerId,
+sourceRecordId, personId, processor, mode, event, eventKey, eventDate, amount, cardExpires,
+detail }` with `event` one of `chargeSucceeded`, `chargeFailed`, `cardUpdated`, `cancelled`.
+`eventKey` is the processor event's unique key: use it to record each change once. It runs in a
+savepoint like `paymentsChanged`.
+
 ### Being told of a change
 
 Give `listener` the name of a class of yours that implements `System.Callable`, with a public

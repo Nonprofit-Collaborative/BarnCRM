@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Recurring_Payments__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>When on, a checkout a module starts with an interval is a subscription at the processor (PAY-04).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Recurring gifts paid online are charged automatically by Stripe or PayPal each period.</inlineHelpText>
+  <label>Automatic Recurring Payments</label>
+  <type>Checkbox</type>
+</CustomField>
