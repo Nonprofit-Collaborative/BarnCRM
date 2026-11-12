@@ -7,6 +7,7 @@
  * 2. Queue `ProjectsAccessSync`, which gives Projects Admin to every BarnCRM Admin holder (the
  *    installer among them, given BarnCRM Admin by Core's own install) and the other sets to
  *    BarnCRM's roles. Queued, since a permission set assignment is a setup object write.
+ * 3. Fill a blank Invoice payment return page with the org's My Domain address (`fillReturnUrl`).
  *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what Finish
  * Setup runs for a module copied into an org by hand (`ModuleSetups`).
@@ -42,9 +43,32 @@ public with sharing class ProjectsPostInstall implements InstallHandler, ModuleS
 			Projects_Settings__c.SObjectType,
 			SHIPPED_ON_ADDED_IN_UPGRADES
 		);
+		fillReturnUrl();
 		ModuleSetups.markRan(MODULE_KEY);
 		try {
 			new ProjectsAccessSync().requestSync();
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'ProjectsPostInstall');
+		}
+	}
+
+	/**
+	 * Fills Invoice payment return page with the org's My Domain address while it is blank, so
+	 * the settings console shows a changeable value, never a blank (PM-10). Written as the
+	 * package's own bookkeeping, as `ShippedDefaultUpgrades` writes, since no person chose it.
+	 */
+	@TestVisible
+	private static void fillReturnUrl() {
+		try {
+			SObject stored = OrgSettingsSystemWriter.lockStored(Projects_Settings__c.SObjectType);
+			if (stored == null || String.isBlank((String) stored.get('Invoice_Return_Url__c'))) {
+				OrgSettingsSystemWriter.save(
+					Projects_Settings__c.SObjectType,
+					new Map<Schema.SObjectField, Object>{
+						Projects_Settings__c.Invoice_Return_Url__c => ProjectsSettings.myDomain()
+					}
+				);
+			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'ProjectsPostInstall');
 		}

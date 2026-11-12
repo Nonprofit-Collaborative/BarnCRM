@@ -18126,7 +18126,7 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Manage resources | `Resources_Enabled__c` | Checkbox, default false (PM-09) |
 | Create invoices | `Billing_Enabled__c` | Checkbox, default false (PM-10) |
 | Take invoice payments online | `Online_Payments_Enabled__c` | Checkbox, default false (PM-10, R-PM22) |
-| Invoice payment return page | `Invoice_Return_Url__c` | URL(255); blank returns the payer to the org's My Domain address |
+| Invoice payment return page | `Invoice_Return_Url__c` | URL(255); filled with the org's My Domain address at install while blank (`ProjectsPostInstall`), so it is never blank; read as that address if cleared |
 | Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
 | Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
 | Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |

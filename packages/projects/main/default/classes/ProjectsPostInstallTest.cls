@@ -51,6 +51,38 @@ private class ProjectsPostInstallTest {
 				'The health step joins the nightly run'
 			);
 			Assert.areEqual(400, steps[0].minute, 'At 6:40 AM');
+			SettingsService.clearCaches();
+			Assert.areEqual(
+				Url.getOrgDomainUrl().toExternalForm(),
+				String.valueOf(
+					SettingsService.getValue(
+						ProjectsSettings.SETTINGS_OBJECT,
+						'Invoice_Return_Url__c'
+					)
+				),
+				'The return page is filled with My Domain, never blank'
+			);
+		}
+	}
+
+	@IsTest
+	static void aReturnPageTheAdminChoseIsKept() {
+		System.runAs(TestUsers.admin()) {
+			OrgSettingsSystemWriter.save(
+				Projects_Settings__c.SObjectType,
+				new Map<Schema.SObjectField, Object>{
+					Projects_Settings__c.Invoice_Return_Url__c => 'https://example.org/thanks'
+				}
+			);
+			Test.startTest();
+			new ProjectsPostInstall().runSetup(null);
+			Test.stopTest();
+			SettingsService.clearCaches();
+			Assert.areEqual(
+				'https://example.org/thanks',
+				ProjectsSettings.invoiceReturnUrl(),
+				'A saved page is never replaced'
+			);
 		}
 	}
 }

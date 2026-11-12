@@ -231,8 +231,9 @@ CAPS = {
     # 34,147 measured; each PSA builder raises it by what its own classes measure. Builder B
     # (PM-09 ProjectStaffingController and the utilization change): 7,751 measured. Builder A
     # (PM-06 to PM-08: rates, entry handler, timesheet and approvals): 17,221 measured. 59,119 in
-    # all, plus about 2%.
-    "projects": 60_300,
+    # all. Builder C billing (PM-10: ProjectBilling, ProjectBillingController,
+    # ProjectInvoiceDocument, the return page default): +17,760. 77,034 measured, plus about 2%.
+    "projects": 78_600,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

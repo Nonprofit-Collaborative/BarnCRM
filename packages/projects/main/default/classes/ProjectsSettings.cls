@@ -72,10 +72,20 @@ public with sharing class ProjectsSettings {
 		return number('Invoice_Due_Days__c', 30, 365);
 	}
 
-	/** Where a client lands after paying online; blank when not set (the caller uses My Domain). */
+	/**
+	 * Where a client lands after paying online. Filled with the org's My Domain address at
+	 * install (`ProjectsPostInstall`), so the console shows it; read as that address if cleared.
+	 */
 	public static String invoiceReturnUrl() {
 		Object stored = read('Invoice_Return_Url__c');
-		return stored == null ? null : String.valueOf(stored).trim();
+		return stored == null || String.isBlank(String.valueOf(stored))
+			? myDomain()
+			: String.valueOf(stored).trim();
+	}
+
+	/** The org's My Domain address, the shipped Invoice payment return page. */
+	public static String myDomain() {
+		return Url.getOrgDomainUrl().toExternalForm();
 	}
 
 	private static Boolean part(String key) {
