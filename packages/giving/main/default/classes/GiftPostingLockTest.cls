@@ -542,7 +542,7 @@ private class GiftPostingLockTest {
 
 			Assert.areEqual(
 				String.format(
-					Label.Giving_Gift_ReverseNeedsReceived,
+					BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'),
 					new List<String>{ 'Pending' }
 				),
 				refusal,

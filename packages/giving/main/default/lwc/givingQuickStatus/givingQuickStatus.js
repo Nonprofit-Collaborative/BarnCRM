@@ -14,9 +14,8 @@ import REOPEN_ASK from '@salesforce/label/c.Giving_AskPipeline_ReopenAsk';
 import MARK_PLAN_COMPLETE from '@salesforce/label/c.Giving_QuickStatus_MarkPlanComplete';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Gift_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
-import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { fieldId, quickStatus, updateInput } from './quickStatusActions';
 
 const TITLES = {
@@ -72,7 +71,7 @@ export default class GivingQuickStatus extends LightningElement {
       this.errorMessage = undefined;
       this.loaded = true;
     } else if (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Gift_UnexpectedError'));
       this.loaded = true;
     }
   }
@@ -121,7 +120,7 @@ export default class GivingQuickStatus extends LightningElement {
       this.close();
     } catch (error) {
       // The object's own rule says why (for example, a gift that is no longer Pending).
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Gift_UnexpectedError'));
     } finally {
       this.busy = false;
     }

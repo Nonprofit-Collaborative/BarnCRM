@@ -8,7 +8,6 @@ import save from '@salesforce/apex/GiftAllocationController.save';
 import EDIT_FUNDS from '@salesforce/label/c.Giving_FundSplit_EditFunds';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Gift_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -52,7 +51,7 @@ export default class GiftAllocations extends LightningElement {
       this.state = await getState({ giftId: this.recordId });
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Gift_UnexpectedError'));
     }
   }
 
@@ -151,7 +150,7 @@ export default class GiftAllocations extends LightningElement {
       // The gift's other lists and the fund totals on the page read the new split.
       notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Giving', 'Giving_Gift_UnexpectedError'));
     } finally {
       this.busy = false;
     }

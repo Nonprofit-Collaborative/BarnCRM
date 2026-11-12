@@ -41,7 +41,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
 		for (Fund__c fund : funds) {
 			Integer used = allocationCounts.get(fund.Id);
 			if (used != null && used > 0) {
-				fund.addError(Label.Giving_Fund_InUseNotDeletable);
+				fund.addError(BarnHelp.text('Giving', 'Giving_Fund_InUseNotDeletable'));
 			}
 		}
 	}
@@ -60,7 +60,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
 		if (defaults > 1) {
 			for (Fund__c fund : funds) {
 				if (fund.Is_Default__c == true) {
-					fund.addError(Label.Giving_Fund_OneDefaultAtATime);
+					fund.addError(BarnHelp.text('Giving', 'Giving_Fund_OneDefaultAtATime'));
 				}
 			}
 		}
@@ -136,7 +136,7 @@ public with sharing class FundTriggerHandler extends TriggerHandler {
 
 	private void reportFailure() {
 		for (Fund__c fund : (List<Fund__c>) newRecords()) {
-			fund.addError(Label.Giving_Fund_DefaultNotSaved);
+			fund.addError(BarnHelp.text('Giving', 'Giving_Fund_DefaultNotSaved'));
 		}
 	}
 }

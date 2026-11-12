@@ -42,7 +42,9 @@ public with sharing class QuickGiftEntryController {
 			return defaults;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getDefaults');
-			throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorLoadDefaults);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorLoadDefaults')
+			);
 		}
 	}
 
@@ -68,7 +70,9 @@ public with sharing class QuickGiftEntryController {
 				: KIND_ORGANIZATION;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getDonorKind');
-			throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorLoadDefaults);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorLoadDefaults')
+			);
 		}
 	}
 
@@ -110,7 +114,9 @@ public with sharing class QuickGiftEntryController {
 			return choices;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getMatchableGifts');
-			throw UserErrors.message(Label.Giving_QuickGiftEntry_ErrorUnexpected);
+			throw UserErrors.message(
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorUnexpected')
+			);
 		}
 	}
 
@@ -138,7 +144,7 @@ public with sharing class QuickGiftEntryController {
 				.get('gift');
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getPaymentChoices');
-			throw UserErrors.message(Label.Giving_GiftEntryPays_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorLoad'));
 		}
 	}
 
@@ -153,7 +159,7 @@ public with sharing class QuickGiftEntryController {
 	public static SaveResult saveGift(GiftInput input) {
 		SaveResult result = new SaveResult();
 		if (input == null) {
-			result.formError = Label.Giving_QuickGiftEntry_ErrorNoInput;
+			result.formError = BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorNoInput');
 			return result;
 		}
 		result.fieldErrors = input.validate();
@@ -165,7 +171,10 @@ public with sharing class QuickGiftEntryController {
 			Gift__c gift = input.toGift();
 			if (!applyChosenPayment(gift, input)) {
 				result.fieldErrors.add(
-					new FieldError('installmentId', Label.Giving_GiftEntryPays_ErrorNotOpen)
+					new FieldError(
+						'installmentId',
+						BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorNotOpen')
+					)
 				);
 				return result;
 			}
@@ -194,12 +203,12 @@ public with sharing class QuickGiftEntryController {
 			ErrorLogger.log(e, CONTEXT + '.saveGift');
 			result.formError = e.getNumDml() > 0
 				? e.getDmlMessage(0)
-				: Label.Giving_QuickGiftEntry_ErrorUnexpected;
+				: BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorUnexpected');
 			return result;
 		} catch (Exception e) {
 			Database.rollback(beforeSave);
 			ErrorLogger.log(e, CONTEXT + '.saveGift');
-			result.formError = Label.Giving_QuickGiftEntry_ErrorUnexpected;
+			result.formError = BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorUnexpected');
 			return result;
 		}
 	}
@@ -594,7 +603,10 @@ public with sharing class QuickGiftEntryController {
 			validateAmountOrGoods(errors);
 			if (this.giftDate == null) {
 				errors.add(
-					new FieldError('giftDate', Label.Giving_QuickGiftEntry_ErrorDateRequired)
+					new FieldError(
+						'giftDate',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorDateRequired')
+					)
 				);
 			}
 			validateType(errors);
@@ -603,12 +615,18 @@ public with sharing class QuickGiftEntryController {
 				asId(this.appealId, Appeal__c.SObjectType) == null
 			) {
 				errors.add(
-					new FieldError('appealId', Label.Giving_QuickGiftEntry_ErrorAppealUnavailable)
+					new FieldError(
+						'appealId',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorAppealUnavailable')
+					)
 				);
 			}
 			if (String.isNotBlank(this.fundId) && asId(this.fundId, Fund__c.SObjectType) == null) {
 				errors.add(
-					new FieldError('fundId', Label.Giving_QuickGiftEntry_ErrorFundUnavailable)
+					new FieldError(
+						'fundId',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorFundUnavailable')
+					)
 				);
 			}
 			validatePayment(errors);
@@ -630,7 +648,10 @@ public with sharing class QuickGiftEntryController {
 					errors.add(
 						new FieldError(
 							'inKindDescription',
-							Label.Giving_QuickGiftEntry_ErrorInKindDescriptionRequired
+							BarnHelp.text(
+								'Giving',
+								'Giving_QuickGiftEntry_ErrorInKindDescriptionRequired'
+							)
 						)
 					);
 				}
@@ -638,7 +659,10 @@ public with sharing class QuickGiftEntryController {
 					errors.add(
 						new FieldError(
 							'fairMarketValue',
-							Label.Giving_QuickGiftEntry_ErrorFairMarketValueNegative
+							BarnHelp.text(
+								'Giving',
+								'Giving_QuickGiftEntry_ErrorFairMarketValueNegative'
+							)
 						)
 					);
 				}
@@ -646,7 +670,10 @@ public with sharing class QuickGiftEntryController {
 			}
 			if (this.amount == null || this.amount <= 0) {
 				errors.add(
-					new FieldError('amount', Label.Giving_QuickGiftEntry_ErrorAmountRequired)
+					new FieldError(
+						'amount',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorAmountRequired')
+					)
 				);
 			}
 		}
@@ -657,10 +684,18 @@ public with sharing class QuickGiftEntryController {
 				return;
 			}
 			if (isInKind()) {
-				errors.add(new FieldError('installmentId', Label.Giving_GiftEntryPays_ErrorInKind));
+				errors.add(
+					new FieldError(
+						'installmentId',
+						BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorInKind')
+					)
+				);
 			} else if (asId(this.installmentId, Installment__c.SObjectType) == null) {
 				errors.add(
-					new FieldError('installmentId', Label.Giving_GiftEntryPays_ErrorNotOpen)
+					new FieldError(
+						'installmentId',
+						BarnHelp.text('Giving', 'Giving_GiftEntryPays_ErrorNotOpen')
+					)
 				);
 			}
 		}
@@ -737,14 +772,22 @@ public with sharing class QuickGiftEntryController {
 					)
 				);
 			} else if (!hasContact && !hasAccount) {
-				errors.add(new FieldError('donor', Label.Giving_QuickGiftEntry_ErrorDonorRequired));
+				errors.add(
+					new FieldError(
+						'donor',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorDonorRequired')
+					)
+				);
 			}
 		}
 
 		private void validateType(List<FieldError> errors) {
 			if (String.isBlank(this.giftType)) {
 				errors.add(
-					new FieldError('giftType', Label.Giving_QuickGiftEntry_ErrorTypeRequired)
+					new FieldError(
+						'giftType',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorTypeRequired')
+					)
 				);
 				return;
 			}

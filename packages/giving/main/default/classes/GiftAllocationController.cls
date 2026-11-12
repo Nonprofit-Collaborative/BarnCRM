@@ -114,7 +114,9 @@ public with sharing class GiftAllocationController {
 			? new List<Gift__c>()
 			: GiftSelector.selectWithAllocations(new Set<Id>{ giftId });
 		if (found.isEmpty()) {
-			throw new GiftService.GiftServiceException(Label.Giving_Gift_OriginalNotFound);
+			throw new GiftService.GiftServiceException(
+				BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound')
+			);
 		}
 		return found[0];
 	}
@@ -247,6 +249,6 @@ public with sharing class GiftAllocationController {
 			return UserErrors.message(((DmlException) caught).getDmlMessage(0));
 		}
 		ErrorLogger.log(caught, CONTEXT, giftId);
-		return UserErrors.message(Label.Giving_Gift_UnexpectedError);
+		return UserErrors.message(BarnHelp.text('Giving', 'Giving_Gift_UnexpectedError'));
 	}
 }

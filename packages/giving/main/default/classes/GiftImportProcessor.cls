@@ -573,7 +573,10 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 
 	private static void refuseNotApplied(Set<Id> notApplied, Map<Id, GiftImportRow> byGiftId) {
 		for (Id giftId : notApplied) {
-			byGiftId.get(giftId).error = Label.Giving_GiftBatch_ErrorPostFailed;
+			byGiftId.get(giftId).error = BarnHelp.text(
+				'Giving',
+				'Giving_GiftBatch_ErrorPostFailed'
+			);
 		}
 	}
 

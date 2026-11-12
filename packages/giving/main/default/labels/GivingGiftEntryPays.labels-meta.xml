@@ -9,14 +9,6 @@
     <value>Pays</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_ErrorRowPaymentNotOpen</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: a line names a payment it can no longer pay</shortDescription>
-    <value>This line pays a payment that is no longer open, or is not this donor's. Choose again in Pays, or None.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftEntryPays_Choice</fullName>
     <categories>Giving, Gift Entry</categories>
     <language>en_US</language>
@@ -55,45 +47,5 @@
     <protected>false</protected>
     <shortDescription>Gift entry: the choice to pay no scheduled payment</shortDescription>
     <value>None: a new gift on its own</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftEntryPays_OneSuggested</fullName>
-    <categories>Giving, Gift Entry</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift entry: why a payment was chosen in advance</shortDescription>
-    <value>Chosen because it is due near the gift date and expects this amount. Choose None if the gift is not for it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftEntryPays_SeveralSuggested</fullName>
-    <categories>Giving, Gift Entry</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift entry: several payments match, nothing chosen</shortDescription>
-    <value>{0} payments could be this gift, so none was chosen. Choose the right one, or None.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftEntryPays_ErrorNotOpen</fullName>
-    <categories>Giving, Gift Entry</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift entry: the chosen payment can no longer be paid</shortDescription>
-    <value>That payment is no longer open, or is not this donor's. Nothing was saved. Choose again, or None.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftEntryPays_ErrorInKind</fullName>
-    <categories>Giving, Gift Entry</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift entry: a gift of goods cannot pay a scheduled payment</shortDescription>
-    <value>A gift of goods cannot pay a scheduled payment. Choose None.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftEntryPays_ErrorLoad</fullName>
-    <categories>Giving, Gift Entry</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift entry: the scheduled payments could not be loaded</shortDescription>
-    <value>The donor's scheduled payments could not be loaded. You can still save the gift on its own.</value>
   </labels>
 </CustomLabels>

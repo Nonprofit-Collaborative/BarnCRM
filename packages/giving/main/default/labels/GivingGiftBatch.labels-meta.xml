@@ -9,14 +9,6 @@
     <value>Add Line</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_Balanced</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: totals agree</shortDescription>
-    <value>Balanced: the lines add up to the control total.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_CellLabel</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
@@ -89,78 +81,6 @@
     <value>Entered</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_ErrorBatchMissing</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch not found</shortDescription>
-    <value>This batch could not be found. It may have been deleted.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorLineMissing</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: line not in this batch</shortDescription>
-    <value>One of these lines no longer belongs to this batch. Reload the page and try again.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorLoadBatch</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch could not be opened</shortDescription>
-    <value>This batch could not be opened. Ask your BarnCRM admin to check the Error Log.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorPostFailed</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: post failed, nothing saved</shortDescription>
-    <value>The batch did not post, and no gifts were created. The batch is still here as you left it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorRowAmount</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: line amount not above zero</shortDescription>
-    <value>This line needs an amount greater than zero. Money that went back is recorded as a refund on the gift, not here.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorRowDate</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: line has no date</shortDescription>
-    <value>This line has no gift date. Give it one, or set the batch's default gift date.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorRowDonorMissing</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: line has no donor</shortDescription>
-    <value>This line has no donor. Find the person or organization that gave.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorRowPaymentMethod</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: line has no payment method</shortDescription>
-    <value>This line has no payment method. Give it one, or set the batch's default payment method.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorSaveRows</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: lines could not be saved</shortDescription>
-    <value>Your lines could not be saved. Nothing was lost from the screen: try again in a moment.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_FromBatch</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
@@ -183,14 +103,6 @@
     <protected>false</protected>
     <shortDescription>Gift batch: remove a line, {0} is the line number</shortDescription>
     <value>Remove line {0}</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_Saved</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: lines saved toast</shortDescription>
-    <value>Lines saved.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_Title</fullName>

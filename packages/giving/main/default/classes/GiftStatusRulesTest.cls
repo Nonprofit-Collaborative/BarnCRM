@@ -72,11 +72,11 @@ private class GiftStatusRulesTest {
 			Assert.areEqual(
 				new List<String>{
 					String.format(
-						Label.Giving_Gift_CancelledLogged,
+						BarnHelp.text('Giving', 'Giving_Gift_CancelledLogged'),
 						new List<String>{ pending.Name }
 					),
 					String.format(
-						Label.Giving_Gift_UncancelledLogged,
+						BarnHelp.text('Giving', 'Giving_Gift_UncancelledLogged'),
 						new List<String>{ pending.Name }
 					)
 				},
@@ -98,9 +98,18 @@ private class GiftStatusRulesTest {
 			String toWrittenOff = refusalOf(pending.Id, 'Written off');
 			Test.stopTest();
 
-			Assert.areEqual(Label.Giving_Gift_CancelOnlyPending, receivedRefusal);
-			Assert.areEqual(Label.Giving_Gift_CancelledOnlyToPending, toReceived);
-			Assert.areEqual(Label.Giving_Gift_CancelledOnlyToPending, toWrittenOff);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Gift_CancelOnlyPending'),
+				receivedRefusal
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending'),
+				toReceived
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Gift_CancelledOnlyToPending'),
+				toWrittenOff
+			);
 			Assert.areEqual('Received', giftOf(100).Status__c);
 			Assert.areEqual('Cancelled', giftOf(40).Status__c);
 		}
@@ -111,7 +120,7 @@ private class GiftStatusRulesTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c pending = giftOf(40);
 			String expected = String.format(
-				Label.Giving_Gift_ReverseNeedsReceived,
+				BarnHelp.text('Giving', 'Giving_Gift_ReverseNeedsReceived'),
 				new List<String>{ 'Pending' }
 			);
 

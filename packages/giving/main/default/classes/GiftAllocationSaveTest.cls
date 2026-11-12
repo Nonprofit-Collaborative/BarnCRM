@@ -106,7 +106,7 @@ private class GiftAllocationSaveTest {
 
 			Assert.isFalse(result.isSuccess(), 'The package cannot know which fund changed.');
 			Assert.areEqual(
-				Label.Giving_Gift_AmountChangeSplit,
+				BarnHelp.text('Giving', 'Giving_Gift_AmountChangeSplit'),
 				result.getErrors()[0].getMessage(),
 				'The person is told to adjust the split first.'
 			);

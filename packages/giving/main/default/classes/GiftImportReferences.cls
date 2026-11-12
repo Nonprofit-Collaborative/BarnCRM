@@ -125,7 +125,7 @@ public with sharing class GiftImportReferences {
 		}
 		for (GiftImportRow item : gifts) {
 			if (item.singleFund == null && !item.isSplit()) {
-				item.error = Label.Giving_Gift_DefaultFundMissing;
+				item.error = BarnHelp.text('Giving', 'Giving_Gift_DefaultFundMissing');
 			}
 		}
 	}

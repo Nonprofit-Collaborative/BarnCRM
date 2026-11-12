@@ -146,7 +146,7 @@ private class GiftImportReferencesTest {
 			GiftImportReferences.resolve(rows);
 
 			Assert.areEqual(
-				Label.Giving_Gift_DefaultFundMissing,
+				BarnHelp.text('Giving', 'Giving_Gift_DefaultFundMissing'),
 				rows[0].error,
 				'Said in the dry run, before the gift trigger would.'
 			);

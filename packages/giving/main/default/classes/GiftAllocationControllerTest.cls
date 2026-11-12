@@ -292,7 +292,10 @@ private class GiftAllocationControllerTest {
 				GiftAllocationController.getState(null);
 				Assert.fail('No gift');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(Label.Giving_Gift_OriginalNotFound, refused.getMessage());
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'),
+					refused.getMessage()
+				);
 			}
 		}
 	}
