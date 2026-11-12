@@ -443,6 +443,248 @@ private class LwcBuilderControllerTest {
 	}
 
 	@IsTest
+	static void aDefinitionSentAsTextIsCheckedAndOneTooLargeIsRefused() {
+		System.runAs(admin()) {
+			Map<String, Object> saved = save(new Map<String, Object>{ 'definition' => DEFINITION });
+			String notJson = refusalOf(
+				new Map<String, Object>{ 'key' => 'Other', 'definition' => '{not json' }
+			);
+			String tooLarge = refusalOf(
+				new Map<String, Object>{
+					'key' => 'Other',
+					'definition' => new Map<String, Object>{
+						'schemaVersion' => 1,
+						'sections' => new List<Object>{ 'x'.repeat(140000) }
+					}
+				}
+			);
+			String noBody;
+			try {
+				LwcBuilderController.saveComponent(null);
+			} catch (AuraHandledException e) {
+				noBody = e.getMessage();
+			}
+
+			Assert.areEqual(DEFINITION, saved.get('definition'), 'A text definition is stored');
+			Assert.areEqual(
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Definition'),
+				notJson,
+				'Text that is not JSON is not a definition'
+			);
+			Assert.areEqual(
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_TooLarge'),
+				tooLarge,
+				'A definition over the size limit is refused'
+			);
+			Assert.areEqual(
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_NameNeeded'),
+				noBody,
+				'Nothing sent is a missing name'
+			);
+		}
+	}
+
+	@IsTest
+	static void aSaveThatCannotBeStoredOrIdentifiedIsRefusedWithoutAStack() {
+		System.runAs(admin()) {
+			Map<String, Object> gone = save(new Map<String, Object>{ 'key' => 'Gone' });
+			delete as user new Built_Component__c(Id = (Id) gone.get('id'));
+			String deleted = refusalOf(new Map<String, Object>{ 'id' => gone.get('id') });
+			String badId = refusalOf(new Map<String, Object>{ 'id' => 'not an id' });
+			Map<String, Object> noObject = save(
+				new Map<String, Object>{ 'key' => 'No_Object', 'objectName' => '' }
+			);
+
+			Assert.isNotNull(deleted, 'Updating a row that was deleted is refused');
+			Assert.areEqual(
+				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Generic'),
+				badId,
+				'An id that is not an id shows the generic message'
+			);
+			Assert.areEqual(
+				'',
+				noObject.get('objectName') ?? '',
+				'A component need not name an object'
+			);
+		}
+	}
+
+	@IsTest
+	static void theRendererIgnoresAKeyThatIsNotAKey() {
+		System.runAs(admin()) {
+			Map<String, Object> result = LwcBuilderController.loadComponent('not a key');
+
+			Assert.areEqual(true, result.get('enabled'), 'Components are on');
+			Assert.areEqual(false, result.get('found'), 'A bad key finds nothing');
+			Assert.isFalse(result.containsKey('definition'), 'And reads nothing');
+		}
+	}
+
+	@IsTest
+	static void permissionChecksStopAtFiftyNamesAndTolerateNone() {
+		System.runAs(admin()) {
+			List<String> names = new List<String>();
+			for (Integer i = 0; i < 60; i++) {
+				names.add('Not_Real_' + i);
+			}
+
+			Map<String, Boolean> held = LwcBuilderController.checkPermissions(names);
+
+			Assert.areEqual(50, held.size(), 'At most fifty are checked');
+			Assert.isFalse(held.get('Not_Real_0'), 'Unknown is false');
+			Assert.isTrue(
+				LwcBuilderController.checkPermissions(null).isEmpty(),
+				'No names, no answers'
+			);
+		}
+	}
+
+	@IsTest
+	static void aListShowsAtMostSixColumnsTypesItsFilterAndNeedsAKnownObject() {
+		System.runAs(admin()) {
+			save(new Map<String, Object>{ 'name' => 'Listed', 'key' => 'Listed' });
+
+			Map<String, Object> wide = LwcBuilderController.loadRecords(
+				JSON.serialize(
+					new Map<String, Object>{
+						'object' => 'Built_Component__c',
+						'fields' => new List<String>{
+							'Name',
+							'Key__c',
+							'Description__c',
+							'Object_Name__c',
+							'Active__c',
+							'Version__c',
+							'Definition__c'
+						},
+						'filterField' => 'Version__c',
+						'filterValue' => '1',
+						'orderBy' => 'Version__c'
+					}
+				)
+			);
+			Map<String, Object> noFields = LwcBuilderController.loadRecords(
+				JSON.serialize(
+					new Map<String, Object>{
+						'object' => 'Built_Component__c',
+						'fields' => 'Name',
+						'parentField' => 'OwnerId',
+						'recordId' => ''
+					}
+				)
+			);
+			Map<String, Object> blankFilter = LwcBuilderController.loadRecords(
+				JSON.serialize(
+					new Map<String, Object>{
+						'object' => 'Built_Component__c',
+						'fields' => new List<String>{ 'Name' },
+						'filterField' => 'Description__c',
+						'filterValue' => ' '
+					}
+				)
+			);
+			String noObject = listRefusal(new Map<String, Object>{ 'object' => 'Nope__c' });
+			String noName = listRefusal(new Map<String, Object>{ 'fields' => new List<String>() });
+			String badSort = listRefusal(
+				new Map<String, Object>{ 'object' => 'Built_Component__c', 'orderBy' => 'Nope__c' }
+			);
+
+			Assert.areEqual(6, ((List<Object>) wide.get('columns')).size(), 'Six columns at most');
+			Assert.areEqual(1, ((List<SObject>) wide.get('rows')).size(), 'Version 1 matches');
+			Assert.isTrue(
+				((List<Object>) noFields.get('columns')).isEmpty(),
+				'Fields not a list: none'
+			);
+			Assert.isTrue(
+				((List<SObject>) noFields.get('rows')).isEmpty(),
+				'A parent with no id matches nothing'
+			);
+			Assert.areEqual(
+				1,
+				((List<SObject>) blankFilter.get('rows')).size(),
+				'A blank filter value compares with null, so the row with no description matches'
+			);
+			String expected = BarnHelp.text(
+				'LwcBuilder',
+				'LwcBuilder_Error_Object',
+				new List<Object>{ 'Nope__c' }
+			);
+			Assert.areEqual(expected, noObject, 'An object that is not there');
+			Assert.isNotNull(noName, 'No object at all is refused');
+			Assert.isTrue(
+				badSort.contains('Nope__c'),
+				'A sort field not on the object: ' + badSort
+			);
+		}
+	}
+
+	@IsTest
+	static void dateAndNumberFiltersAreTypedAndBadOnesNameTheField() {
+		System.runAs(admin()) {
+			Map<String, Object> byDate = LwcBuilderController.loadRecords(
+				JSON.serialize(
+					new Map<String, Object>{
+						'object' => 'Contact',
+						'fields' => new List<String>{ 'LastName' },
+						'filterField' => 'Birthdate',
+						'filterValue' => '2001-02-03',
+						'filterOperator' => 'notEquals',
+						'orderBy' => 'LastName'
+					}
+				)
+			);
+			String badDate = listRefusal(
+				new Map<String, Object>{
+					'object' => 'Contact',
+					'filterField' => 'Birthdate',
+					'filterValue' => 'yesterday'
+				}
+			);
+
+			Assert.areEqual(1, ((List<Object>) byDate.get('columns')).size(), 'One column');
+			Assert.isTrue(((List<SObject>) byDate.get('rows')).isEmpty(), 'No contacts exist');
+			Assert.isTrue(badDate.contains('yesterday'), 'The value is named: ' + badDate);
+		}
+	}
+
+	@IsTest
+	static void rowsPerListFallsBackToTenWhenOutOfRange() {
+		insert as system new LWC_Builder_Settings__c(
+			SetupOwnerId = UserInfo.getOrganizationId(),
+			Rows_Per_List__c = 500
+		);
+		SettingsService.clearCaches();
+		System.runAs(admin()) {
+			Assert.areEqual(
+				10,
+				LwcBuilderController.rowsPerList(),
+				'Over 200 is the default of 10'
+			);
+		}
+	}
+
+	@IsTest
+	static void aReportNameThatIsNotAnApiNameFindsNoReport() {
+		System.runAs(admin()) {
+			String refused;
+			try {
+				LwcBuilderController.loadChart('not a name');
+			} catch (AuraHandledException e) {
+				refused = e.getMessage();
+			}
+			Assert.areEqual(
+				BarnHelp.text(
+					'LwcBuilder',
+					'LwcBuilder_Chart_NoReport',
+					new List<Object>{ 'not a name' }
+				),
+				refused,
+				'Refused without querying'
+			);
+		}
+	}
+
+	@IsTest
 	static void aChartHasAtMostTwoHundredRows() {
 		// runs-as: deploying user (plain inputs, no record or report is read)
 		List<Map<String, Object>> groups = new List<Map<String, Object>>();

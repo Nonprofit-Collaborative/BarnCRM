@@ -32,6 +32,13 @@ private class DataBreachHandlerTest {
 	}
 
 	@IsTest
+	static void theHandlerNamesItselfForTheTriggerRegistry() {
+		// runs-as: deploying user (no record or permission is read)
+		DataBreachHandler handler = new DataBreachHandler();
+		Assert.areEqual('DataBreachHandler', handler.getName(), 'The registry row name');
+	}
+
+	@IsTest
 	static void aLoggedBreachSendsOneBellAndTheNightlyRunSendsNone() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Data_Breach__c row = breach('Lost laptop', 'Not Yet Assessed');

@@ -137,6 +137,119 @@ private class NpcHouseholdSourceTest {
 	}
 
 	@IsTest
+	static void theBindsKeepBarnHouseholdsAndAdministratorChoicesOut() {
+		System.runAs(TestUsers.admin()) {
+			Map<String, Object> binds = new NpcHouseholdSource().binds();
+
+			Assert.areEqual(
+				HouseholdService.householdRecordTypeId(),
+				binds.get('barnHousehold'),
+				'BarnCRM households are never candidates'
+			);
+			Assert.areEqual(
+				new List<String>{
+					HouseholdSelector.MODEL_CONVERTED,
+					HouseholdSelector.MODEL_NATIVE
+				},
+				binds.get('keptModels'),
+				'Converted and Nonprofit Cloud households are left as they are'
+			);
+		}
+	}
+
+	@IsTest
+	static void nothingIsReadOrCountedForNoAccountsOrWithoutTheNativeObjects() {
+		System.runAs(TestUsers.admin()) {
+			NpcHouseholdSource source = new NpcHouseholdSource();
+			Account plain = new Account(Name = 'Npc Source Counted');
+			insert plain;
+
+			Assert.isTrue(source.read(null).isEmpty(), 'no accounts asked for');
+			Assert.isTrue(source.read(new Set<Id>()).isEmpty(), 'an empty set asks for none');
+			Assert.isTrue(source.memberCounts(null).isEmpty(), 'no counts for no accounts');
+			Assert.isTrue(source.memberCounts(new Set<Id>()).isEmpty(), 'an empty set counts none');
+			Assert.areEqual(
+				0,
+				source.verify('somethingElse').source,
+				'only the households step is checked'
+			);
+			Assert.areEqual(0, source.verify('somethingElse').done, 'and nothing is done there');
+			if (!source.available()) {
+				Assert.isTrue(
+					source.memberCounts(new Set<Id>{ plain.Id }).isEmpty(),
+					'without the native objects nothing is counted'
+				);
+				Assert.isNull(
+					source.read(new Set<Id>{ plain.Id })[0].primaryContactId,
+					'no primary'
+				);
+			}
+			Assert.isFalse(
+				NpcHouseholdSource.readable('not_a_real_object__c'),
+				'unknown is unreadable'
+			);
+		}
+	}
+
+	@IsTest
+	static void rowsWithoutAnAccountOrContactAreSkippedAndFormerMembersWithDatesKept() {
+		// runs-as: deploying user (rows only, no record or permission is read)
+		Id lee = Id.valueOf('001000000000001');
+		Id kim = Id.valueOf('001000000000002');
+		Id sam = Id.valueOf('003000000000001');
+		Id ann = Id.valueOf('003000000000002');
+		Date ended = Date.newInstance(2022, 3, 1);
+		Map<Id, List<NpspHouseholdSource.Member>> members = NpcHouseholdSource.members(
+			new List<Map<String, Object>>{
+				new Map<String, Object>{ 'AccountId' => null, 'ContactId' => sam },
+				new Map<String, Object>{ 'AccountId' => lee, 'ContactId' => null },
+				new Map<String, Object>{
+					'AccountId' => lee,
+					'ContactId' => sam,
+					'Roles' => ' Mother ; Wife',
+					'IsActive' => false,
+					'EndDate' => ended
+				},
+				new Map<String, Object>{
+					'AccountId' => kim,
+					'ContactId' => ann,
+					'Roles' => 'Other'
+				}
+			}
+		);
+
+		Assert.areEqual(2, members.size(), 'two accounts have members');
+		Assert.areEqual(1, members.get(lee).size(), 'rows missing a side are skipped');
+		Assert.areEqual(ended, members.get(lee)[0].endDate, 'a former member keeps the end date');
+		Assert.areEqual('Head', members.get(lee)[0].role, 'roles are trimmed and case-insensitive');
+		Assert.isFalse(members.get(lee)[0].isPrimary, 'no flag, not primary');
+		Assert.areEqual('Other', members.get(kim)[0].role, 'Other maps to Other');
+		Assert.isNull(NpcHouseholdSource.members(new List<Map<String, Object>>()).get(lee), 'none');
+	}
+
+	@IsTest
+	static void driftShowsOnlyTheFirstFewNamesButCountsAll() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> back = new List<Account>();
+			for (Integer i = 0; i < 3; i++) {
+				back.add(
+					new Account(
+						Name = 'Drift Back ' + i,
+						Household_Model__c = HouseholdSelector.MODEL_CONVERTED
+					)
+				);
+			}
+			Database.insert(back, AccessLevel.SYSTEM_MODE);
+			NpcHouseholdSource.groupedForTest = new Set<Id>();
+
+			NpcHouseholdSource.Drift drift = NpcHouseholdSource.drift(1);
+
+			Assert.areEqual(3, drift.count, 'all three are counted');
+			Assert.areEqual(1, drift.names.size(), 'only one name is shown');
+		}
+	}
+
+	@IsTest
 	static void driftListsWhereModelAndGroupDisagreeAndTheCheckCounts() {
 		System.runAs(TestUsers.admin()) {
 			Account collision = HouseholdTestDataFactory.newHousehold('Drift Collision');
