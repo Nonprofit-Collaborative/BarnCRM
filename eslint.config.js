@@ -5,11 +5,14 @@ const lwcConfig = require('@salesforce/eslint-config-lwc/recommended');
 // Pure modules: plain JavaScript with no Salesforce runtime in it, so the logic can be reused
 // outside Salesforce and tested without stubs (portability, plan Section 4.4). A file belongs
 // here when it is a helper inside a component bundle (its name differs from the bundle's) and
-// works on plain values only. Add every new such module to this list; the rule below then
-// keeps it from importing the platform. See docs/contributor-guide/ci.md, static step 3.
+// works on plain values only, or a shared service module made only of such code. Add every new
+// such module to this list; the rule below then keeps it from importing the platform. See
+// docs/contributor-guide/ci.md, static step 3.
 const PURE_MODULES = [
-  'packages/core/main/default/lwc/importWizard/csv.js',
-  'packages/core/main/default/lwc/importWizard/xlsx.js'
+  'packages/core/main/default/lwc/csvParser/csvParser.js',
+  'packages/core/main/default/lwc/filesImportModel/filesImportModel.js',
+  'packages/core/main/default/lwc/importWizard/xlsx.js',
+  'packages/core/main/default/lwc/zipReader/zipReader.js'
 ];
 
 // A renamed or moved module would silently drop out of the rule, so a stale entry fails lint.

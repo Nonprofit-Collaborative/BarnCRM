@@ -105,6 +105,10 @@ You should see: "Saved" followed by the name. To open it later, choose it in **S
 queries**. Queries shared with you show the sharer's name, for example "Springfield, no email
 (shared by Maria Lopez)". Only the person who saved a query can change, share or delete it.
 
+An administrator can make a saved query a **Backup Set**, so a copy of its records can be saved
+to a file whenever they want one ([Backup Sets](../admin-guide/backup-sets.md)). Saving the query
+again in Find keeps it a Backup Set.
+
 ## To Delete a Saved Query
 
 1. Open the query from **Saved searches**, open the menu next to **Save** and choose **Delete**.
@@ -162,4 +166,5 @@ You should see: the builder filled in from your text, ready to run.
 - [Duplicates](duplicates.md)
 - Admin Guide: [Find and export](../admin-guide/find.md),
   [Super Transformer](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
-  [Archive by Query](../admin-guide/archive-by-query.md), [Access](../admin-guide/access.md)
+  [Archive by Query](../admin-guide/archive-by-query.md), [Backup Sets](../admin-guide/backup-sets.md),
+  [Access](../admin-guide/access.md)
