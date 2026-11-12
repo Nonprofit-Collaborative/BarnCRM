@@ -96,7 +96,9 @@ CAPS = {
     # (VolunteerPublicPage), the shift and profile forms (VolunteerFormAttachment) and the
     # reminder's personal link, plus about 2%.
     # C-47b brand letters and the C-64 signal: 235,670 measured 2026-11-11, plus about 0.5%.
-    "volunteers": 236_900,
+    # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 237,172 measured, plus
+    # about 0.5%.
+    "volunteers": 238_400,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
