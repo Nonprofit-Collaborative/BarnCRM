@@ -67,6 +67,7 @@ public with sharing class ModuleManagerService {
 			'Receipt_Number_Sequence__c',
 			'Receipt_Run__c',
 			'Receipt_Template__c',
+			'Recurring_Gift_Event__c',
 			'Soft_Credit__c',
 			'Stewardship_Plan__c',
 			'Stewardship_Plan_Step__c',

@@ -72,6 +72,7 @@ Rules:
 | giving | Receipt_Run__c | Custom36: Train |
 | giving | Receipt__c | Custom23: Envelope |
 | giving | Receipts | Custom27: Laptop |
+| giving | Recurring_Gift_Event__c | Custom21: Computer |
 | giving | Soft_Credit__c | Custom26: Flag |
 | giving | Stewardship_Plan_Template__c | Custom7: Square |
 | giving | Stewardship_Plan__c | Custom43: Jewel |

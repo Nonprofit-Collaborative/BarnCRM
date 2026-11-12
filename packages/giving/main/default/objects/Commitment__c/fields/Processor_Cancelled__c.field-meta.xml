@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Processor_Cancelled__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When the processor reported the recurring gift cancelled. The commitment stays as it is until you change its Status; a later successful charge clears this date.</inlineHelpText>
+  <label>Cancelled at Processor</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

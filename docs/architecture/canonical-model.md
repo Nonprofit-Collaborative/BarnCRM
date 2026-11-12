@@ -6947,6 +6947,96 @@ so the two ratings are free text; the score is a number so it sorts and filters 
 
 ---
 
+## 25V. Recurring donor health
+
+### Definition
+
+Recurring donor health (G-27, D-156, release 1.5) watches open-ended recurring gifts
+(Commitments of Type Recurring) for the signs a sustainer is about to be lost: a failed charge, a
+card about to expire, a cancellation at the payment processor, or a payment gone Overdue. The
+processor's news arrives as Recurring Gift Event records, written by a Zapier recipe from the
+organization's own processor account (the MIG-06 approach: Zapier's Salesforce Create Record or
+Upsert action, no BarnCRM-held key) or by hand. BarnCRM calls no processor and stores no card
+data: a card is known only by its expiry month.
+
+### Attributes (Recurring Gift Event)
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Event Number | auto number | yes | RGE-000001. |
+| Commitment | reference to Commitment | no | The recurring gift. Found by R-RH1 when blank. Cleared when deleted. |
+| Event Type | picklist | yes | Charge Failed (default), Charge Succeeded, Card Expiring, Card Updated or Cancelled. |
+| Event Date | date | no | When it happened. Default today. |
+| Subscription Id | text | no | The processor's id for the recurring gift. |
+| Donor Email | email | no | The donor's email at the processor. |
+| Card Expires | date | no | Last day of the card's expiry month. |
+| Amount | currency | no | The charge's amount. |
+| Detail | text | no | The processor's reason. |
+| External Id | text | no | The processor's event id, so a repeated recipe records it once. |
+| Match Status | picklist | no | Matched or Unmatched, set on save. |
+
+### Rules
+
+- **R-RH1 Matching.** Before an event is saved without a Commitment, the commitment whose
+  Processor Subscription Id equals its Subscription Id (ignoring case) is taken; failing that,
+  the one Active or Paused recurring gift whose donor Contact's Email equals its Donor Email. Two
+  or more such gifts for one email match none. Match Status is Matched when a Commitment is set,
+  else Unmatched; a person can choose the Commitment later (the Unmatched Events list view).
+- **R-RH2 Applying.** When an event gains its Commitment (on insert, or when one is chosen
+  later), it changes that commitment, oldest event first: Charge Failed adds 1 to Failed Charges
+  (at most 999) and moves Last Failed Charge to its date if later; Charge Succeeded sets Failed
+  Charges to 0 and clears Cancelled at Processor; Card Expiring sets Card Expires (its own date,
+  or the end of the event's month); Card Updated sets Card Expires to its date or clears it;
+  Cancelled sets Cancelled at Processor. The commitment's Status never changes: staff decide.
+  The work runs in system mode (`RecurringGiftUpkeep`, Upkeep, ADR-0021) because the recipe's
+  integration user cannot see private commitments. Registry row `Recurring_Gift_Event_Health`.
+- **R-RH3 Save the Sustainer list.** Active recurring gifts with Failed Charges over 0, Card
+  Expires on or before today plus `Recurring_Card_Expiry_Days__c` (default 60, 0 to 365), a
+  Cancelled at Processor date, or an Overdue installment; at most 200, largest first; each with
+  its reasons and a Create Follow-Up Task action (a Task for the person, about the gift and its
+  donor). Read as the person (user mode).
+- **R-RH4 Monthly recurring revenue.** Active recurring gifts' amounts by Frequency, turned into
+  monthly values (Weekly x 52 / 12, Every two weeks x 26 / 12, Monthly x 1, Quarterly / 3, Twice a
+  year / 6, Yearly / 12) in the page's framework-free model; at-risk revenue is the same sum over
+  the R-RH3 list; and the Received gifts on recurring gifts for this month and the eleven before,
+  by calendar month. Read as the person.
+
+### Salesforce implementation
+
+- **Object:** `Recurring_Gift_Event__c`, name field Auto Number (RGE-{000000}), sharing Private
+  (Giving Admin views all), tab Recurring Gift Events with All, My and Unmatched Events views.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Commitment | `Commitment__c` | Lookup(Commitment), Clear on delete |
+| Event Type | `Event_Type__c` | Picklist (values above), restricted, required |
+| Event Date | `Event_Date__c` | Date, default `TODAY()` |
+| Subscription Id | `Subscription_Id__c` | Text(100) |
+| Donor Email | `Donor_Email__c` | Email |
+| Card Expires | `Card_Expires__c` | Date |
+| Amount | `Amount__c` | Currency(16, 2) |
+| Detail | `Detail__c` | Text(255) |
+| External Id | `External_Id__c` | Text(100), unique, external ID |
+| Match Status | `Match_Status__c` | Picklist (Unmatched, Matched), restricted |
+
+- **Fields on `Commitment__c`** (Giving Admin edits them; Staff edit only the subscription id):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Processor Subscription Id | `Processor_Subscription_Id__c` | Text(100), unique, external ID |
+| Failed Charges | `Failed_Charges__c` | Number(3, 0) |
+| Last Failed Charge | `Last_Failed_Charge__c` | Date |
+| Card Expires | `Card_Expires__c` | Date |
+| Cancelled at Processor | `Processor_Cancelled__c` | Date |
+
+- **Field on `Giving_Settings__c`:** Recurring Card Expiry Days, `Recurring_Card_Expiry_Days__c`,
+  Number, default 60 (Setting Definition `Recurring_Card_Expiry_Days`, section Giving).
+- **Code:** trigger `RecurringGiftEventTrigger`, handler `RecurringGiftEventHandler`, upkeep
+  `RecurringGiftUpkeep`, page controller `RecurringHealthController`, components
+  `recurringDonorHealth` and `recurringHealthModel`, tab and app page `Recurring_Donor_Health`.
+
+---
+
 ## 26. Packaged default rollups
 
 ### Definition
@@ -17250,6 +17340,7 @@ mirrors the primary member).
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.26 | 2026-11-11 | Recurring donor health (G-27, D-156). New Section 25V: Recurring Gift Event (`Recurring_Gift_Event__c`), five health fields on `Commitment__c` (`Processor_Subscription_Id__c`, `Failed_Charges__c`, `Last_Failed_Charge__c`, `Card_Expires__c`, `Processor_Cancelled__c`) and `Giving_Settings__c.Recurring_Card_Expiry_Days__c`; rules R-RH1 to R-RH4. |
 
 ---
 ## 32. Entity ownership by package
@@ -17322,6 +17413,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
 | Ask | Giving | release 0.13 (G-26) | 25R |
 | Wealth screening data (Contact fields) | Giving | release 1.5 (G-32) | 25U |
+| Recurring Gift Event | Giving | release 1.5 (G-27) | 25V |
 | Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Event_Type__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What the processor reported.</inlineHelpText>
+  <label>Event Type</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Charge Failed</fullName>
+        <default>true</default>
+        <label>Charge Failed</label>
+      </value>
+      <value>
+        <fullName>Charge Succeeded</fullName>
+        <default>false</default>
+        <label>Charge Succeeded</label>
+      </value>
+      <value>
+        <fullName>Card Expiring</fullName>
+        <default>false</default>
+        <label>Card Expiring</label>
+      </value>
+      <value>
+        <fullName>Card Updated</fullName>
+        <default>false</default>
+        <label>Card Updated</label>
+      </value>
+      <value>
+        <fullName>Cancelled</fullName>
+        <default>false</default>
+        <label>Cancelled</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>
