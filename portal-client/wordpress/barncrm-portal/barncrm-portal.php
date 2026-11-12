@@ -2,13 +2,14 @@
 /**
  * Plugin Name: BarnCRM Portal
  * Description: Shows a BarnCRM Portal Builder portal on a page, and passes its calls to Salesforce on the server so the OAuth secret and the session token never reach the browser.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * License: BSD-3-Clause
  *
  * How it works (ADR-0185 portal builder, decision 8):
- * - The shortcode [barncrm_portal key="..."] writes a div that js/boot.js fills.
+ * - The shortcode [barncrm_portal key="..."] writes a div that js/boot.js fills. With app="yes"
+ *   (and an optional name="...") the page can be added to a phone's home screen as an app.
  * - The browser calls this site's REST route /wp-json/barncrm-portal/v1/<path>.
  * - This plugin gets an access token for the integration user with the OAuth client credentials
  *   flow (cached for 20 minutes), adds it, and forwards the call to
@@ -22,6 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 const BARNCRM_PORTAL_OPTION = 'barncrm_portal_settings';
+const BARNCRM_PORTAL_VERSION = '0.2.0';
 const BARNCRM_PORTAL_PATHS = array(
     'login/start' => 'POST',
     'login/verify' => 'POST',
@@ -114,20 +116,133 @@ function barncrm_portal_settings_page() {
 /* ---------- Shortcode ---------- */
 
 add_shortcode('barncrm_portal', function ($atts) {
-    $atts = shortcode_atts(array('key' => ''), $atts, 'barncrm_portal');
+    $atts = shortcode_atts(array('key' => '', 'app' => 'no', 'name' => ''), $atts, 'barncrm_portal');
     $key = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $atts['key']);
     if ($key === '') {
         return '';
     }
-    wp_enqueue_script_module('barncrm-portal', plugins_url('js/boot.js', __FILE__), array(), '0.1.0');
-    wp_enqueue_style('barncrm-portal', plugins_url('css/portal.css', __FILE__), array(), '0.1.0');
+    wp_enqueue_script_module('barncrm-portal', plugins_url('js/boot.js', __FILE__), array(), BARNCRM_PORTAL_VERSION);
+    wp_enqueue_style('barncrm-portal', plugins_url('css/portal.css', __FILE__), array(), BARNCRM_PORTAL_VERSION);
+    $app = '';
+    if ($atts['app'] === 'yes') {
+        // An installable web app (ADR-NEXT events attendee app, decision 3): a manifest for this
+        // page and a service worker at the site root that caches only this plugin's own files.
+        $manifest = add_query_arg(array(
+            'barncrm_portal_manifest' => $key,
+            'name' => barncrm_portal_app_name($atts['name']),
+            'start' => get_permalink() ?: home_url('/'),
+        ), home_url('/'));
+        $app = sprintf(
+            ' data-barncrm-manifest="%s" data-barncrm-worker="%s" data-barncrm-icon="%s" data-barncrm-name="%s"',
+            esc_url($manifest),
+            esc_url(add_query_arg('barncrm_portal_sw', '1', home_url('/'))),
+            esc_url(barncrm_portal_icon(180)),
+            esc_attr(barncrm_portal_app_name($atts['name']))
+        );
+    }
     return sprintf(
-        '<div class="barncrm-portal" data-barncrm-portal="%s" data-barncrm-endpoint="%s" data-barncrm-nonce="%s"></div>',
+        '<div class="barncrm-portal" data-barncrm-portal="%s" data-barncrm-endpoint="%s" data-barncrm-nonce="%s"%s></div>',
         esc_attr($key),
         esc_url(rest_url('barncrm-portal/v1')),
-        esc_attr(wp_create_nonce('barncrm_portal'))
+        esc_attr(wp_create_nonce('barncrm_portal')),
+        $app
     );
 });
+
+/* ---------- Installable app: manifest and service worker ---------- */
+
+function barncrm_portal_app_name($name) {
+    $name = trim(sanitize_text_field((string) $name));
+    return $name === '' ? get_bloginfo('name') : mb_substr($name, 0, 45);
+}
+
+/** The site icon at this size, else the plugin's own. */
+function barncrm_portal_icon($size) {
+    $site = get_site_icon_url($size);
+    return $site ? $site : plugins_url('img/icon.svg', __FILE__);
+}
+
+/** The files the service worker keeps for offline start-up: this plugin's scripts and style. */
+function barncrm_portal_app_files() {
+    $files = array();
+    foreach (array('js/boot.js', 'js/portalApi.js', 'js/portalApp.js', 'js/messages.js', 'js/pageFiles.js', 'css/portal.css') as $file) {
+        $files[] = plugins_url($file, __FILE__);
+    }
+    return $files;
+}
+
+add_action('init', function () {
+    if (isset($_GET['barncrm_portal_manifest'])) {
+        barncrm_portal_manifest();
+    } elseif (isset($_GET['barncrm_portal_sw'])) {
+        barncrm_portal_worker();
+    }
+});
+
+function barncrm_portal_manifest() {
+    $name = barncrm_portal_app_name(wp_unslash($_GET['name'] ?? ''));
+    // The app opens on the page that showed the portal, never on another site.
+    $start = wp_validate_redirect(esc_url_raw(wp_unslash($_GET['start'] ?? '')), home_url('/'));
+    $site_icon = get_site_icon_url(512);
+    $icons = $site_icon
+        ? array(
+            array('src' => get_site_icon_url(192), 'sizes' => '192x192'),
+            array('src' => $site_icon, 'sizes' => '512x512'),
+        )
+        : array(array('src' => plugins_url('img/icon.svg', __FILE__), 'sizes' => 'any', 'type' => 'image/svg+xml'));
+    nocache_headers();
+    header('Content-Type: application/manifest+json; charset=utf-8');
+    echo wp_json_encode(array(
+        'name' => $name,
+        'short_name' => mb_substr($name, 0, 12),
+        'start_url' => $start,
+        'scope' => home_url('/'),
+        'display' => 'standalone',
+        'background_color' => '#ffffff',
+        'theme_color' => '#ffffff',
+        'icons' => $icons,
+    ));
+    exit;
+}
+
+function barncrm_portal_worker() {
+    header('Content-Type: text/javascript; charset=utf-8');
+    header('Service-Worker-Allowed: /');
+    header('Cache-Control: no-cache');
+    $files = wp_json_encode(barncrm_portal_app_files());
+    $cache = wp_json_encode('barncrm-portal-' . BARNCRM_PORTAL_VERSION);
+    $offline = wp_json_encode('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Offline</title><p style="font-family:sans-serif;padding:16px">You are offline. Connect to the internet and open the app again.</p>');
+    // Only this plugin's files are cached. A portal call or a page's data is never stored, so
+    // nothing about a person stays on the phone beyond the HttpOnly session cookie.
+    echo <<<JS
+const CACHE = {$cache};
+const FILES = {$files};
+self.addEventListener('install', (event) => {
+  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('barncrm-portal-') && k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET') {
+    return;
+  }
+  if (FILES.includes(request.url.split('?')[0])) {
+    event.respondWith(caches.match(request.url.split('?')[0]).then((hit) => hit || fetch(request)));
+  } else if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request).catch(() => new Response({$offline}, { headers: { 'Content-Type': 'text/html; charset=utf-8' } }))
+    );
+  }
+});
+JS;
+    exit;
+}
 
 /* ---------- The proxy ---------- */
 

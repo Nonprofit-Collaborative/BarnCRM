@@ -96,3 +96,10 @@
 .barncrm-portal .barn-portal-brand p {
   margin: 0;
 }
+
+.barncrm-portal .barn-portal-scan video {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0.5em 0;
+}
