@@ -107,7 +107,7 @@ public with sharing class MembershipService {
 			levelIds.add(request.levelId);
 		}
 		Map<Id, Membership_Term__c> olds = new Map<Id, Membership_Term__c>(
-			Database.queryWithBinds(
+			(List<Membership_Term__c>) Database.queryWithBinds(
 				'SELECT Id, Status__c, Level__c, Contact__c, Account__c, End_Date__c, Start_Date__c,' +
 					' Member_Since__c, Commitment_Id__c, Directory_Opt_In__c, Directory_Location__c,' +
 					' Directory_Bio__c FROM Membership_Term__c WHERE Id IN :termIds',

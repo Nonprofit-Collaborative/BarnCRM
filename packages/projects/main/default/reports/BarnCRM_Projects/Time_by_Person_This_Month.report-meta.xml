@@ -26,6 +26,6 @@
   <showDetails>true</showDetails>
   <timeFrameFilter>
     <dateColumn>Time_Entry__c$Date__c</dateColumn>
-    <interval>INTERVAL_CURMONTH</interval>
+    <interval>INTERVAL_THISMONTH</interval>
   </timeFrameFilter>
 </Report>

@@ -123,7 +123,7 @@
     <fields>Status__c</fields>
     <fields>Message__c</fields>
     <fields>CREATED_DATE</fields>
-    <relatedList>Payment_Events__r</relatedList>
+    <relatedList>Payment_Event__c.Payment__c</relatedList>
   </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>

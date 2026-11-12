@@ -73,12 +73,6 @@
       <fieldInstance>
         <fieldItem>Record.Gift_Source_Name__c</fieldItem>
         <identifier>RecordField_GiftSourceName</identifier>
-        <visibilityRule>
-          <criteria>
-            <leftValue>{!Record.Gift_Source__c}</leftValue>
-            <operator>NE</operator>
-          </criteria>
-        </visibilityRule>
       </fieldInstance>
     </itemInstances>
     <itemInstances>

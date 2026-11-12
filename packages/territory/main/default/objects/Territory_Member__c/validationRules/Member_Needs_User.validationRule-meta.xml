@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Member_Needs_User</fullName>
+    <active>true</active>
+    <description>A territory member names the user who takes records. The field cannot be required on the field itself, because a required lookup to User needs a delete rule that User lookups do not allow.</description>
+    <errorConditionFormula>ISBLANK(User__c)</errorConditionFormula>
+    <errorDisplayField>User__c</errorDisplayField>
+    <errorMessage>Choose the user who takes this territory&apos;s records.</errorMessage>
+</ValidationRule>

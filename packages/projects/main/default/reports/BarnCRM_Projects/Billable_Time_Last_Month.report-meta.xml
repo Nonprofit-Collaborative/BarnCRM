@@ -38,6 +38,6 @@
   <showDetails>true</showDetails>
   <timeFrameFilter>
     <dateColumn>Time_Entry__c$Date__c</dateColumn>
-    <interval>INTERVAL_PREVMONTH</interval>
+    <interval>INTERVAL_LASTMONTH</interval>
   </timeFrameFilter>
 </Report>
