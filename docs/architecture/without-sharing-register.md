@@ -67,6 +67,7 @@ into six kinds:
 | AskReminderWriter | Upkeep | Reminder tasks assigned to the donor's owner | ADR-0021 |
 | DonorLevelWriter | Upkeep | The two donor level fields | ADR-0021 |
 | GiftImportIntegritySelector | Integrity | A gift already loaded under an external ID, or a receipt that keeps a gift on undo | ADR-0021, ADR-0052 |
+| GivingEngagementSignal | Org figure | Each person's Received gift total for the nightly engagement score, private gifts included; returns totals only | ADR-0021, ADR-NEXT engagement score |
 | GivingHouseholdDependentsExtension | Integrity | Gifts that keep a household from being deleted | ADR-0021 |
 | HealthCheckGivingSelector | Org figure | Every gift for Health Check's counts | ADR-0021, ADR-0057 |
 | PledgeReminderWriter | Org job | Reminds donors the scheduling user may not see | ADR-0021 |
@@ -84,6 +85,7 @@ into six kinds:
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
 | VolunteerPublicPage | Platform | A Site guest user or the API's integration user reads the Open shifts still to come of jobs staff marked Show on Public Page (job name, description and location, shift times and place, places left as a count), and, only behind a signed claim the host checked, one person's own upcoming bookings, approved hours and last ten entries; never who else is booked, the coordinator or notes | ADR-0190 public event pages, ADR-NEXT volunteer self-service |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
+| VolunteersEngagementSignal | Org figure | Each person's Approved volunteer hours for the nightly engagement score, private hours included; returns totals only | ADR-0021, ADR-NEXT engagement score |
 | VolunteersHouseholdDependentsExtension | Integrity | Private hours that keep a household from being deleted | ADR-0021 |
 | VolunteersPortalExtension | Portal | The shift a portal person signs up for and that person's own sign-up to cancel; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 
@@ -128,6 +130,7 @@ into six kinds:
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
+| EventsEngagementSignal | Org figure | How many events each person attended, for the nightly engagement score, whatever the scheduling user can see; returns counts only | ADR-0021, ADR-NEXT engagement score |
 | EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
 
 Two inner classes of `with sharing` classes also run without sharing (the register check counts only
