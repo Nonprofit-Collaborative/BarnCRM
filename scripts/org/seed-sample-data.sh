@@ -18,7 +18,8 @@
 # and exits successfully so callers (create-scratch-org.sh) do not fail.
 #
 # --namespace <ns> is for an org where BarnCRM is installed as a namespaced package
-# (scripts/org/package-upgrade-test.sh): the loader is called as <ns>.SampleDataLoader and
+# (scripts/org/package-upgrade-test.sh): the loader is called through the global entry point
+# <ns>.BarnInstallCheck.loadSampleData() (a subscriber cannot see public classes) and
 # the fields polled carry the <ns>__ prefix. Without it, the source-deployed (no namespace)
 # names are used, as before.
 
@@ -41,7 +42,7 @@ APEX_FILE="$REPO_ROOT/scripts/org/load-sample-data.apex"
 if [[ -n "$NAMESPACE" && -f "$APEX_FILE" ]]; then
   APEX_FILE="$(mktemp -t barn-seed-XXXXXX)"
   trap 'rm -f "$APEX_FILE"' EXIT
-  printf '%s.SampleDataLoader.load();\n' "$NAMESPACE" >"$APEX_FILE"
+  printf '%s.BarnInstallCheck.loadSampleData();\n' "$NAMESPACE" >"$APEX_FILE"
 fi
 SAMPLE_JSON="$REPO_ROOT/packages/core/main/default/staticresources/SampleData.json"
 POLL_INTERVAL_SECONDS=5

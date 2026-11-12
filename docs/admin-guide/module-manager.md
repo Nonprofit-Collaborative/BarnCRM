@@ -124,6 +124,11 @@ other steps without it. The steps only add what is missing, so pressing it twice
 recorded under **Recent Changes** in BarnCRM Settings. Health Check reports the same thing (see
 [Health Check](health-check.md#how-a-fix-button-works)).
 
+Setup is what gives anyone the **Manage BarnCRM Settings** permission, so an org where it never
+ran can have nobody who holds it. While no active user in the org holds that permission, a user
+with Salesforce's **Customize Application** permission also sees **Finish Setup** (and nothing
+else changes for them). Once someone holds the permission, only they can press it.
+
 Finish Setup is a recovery step for an org built from copied source, not a way to install
 BarnCRM: install the packages.
 

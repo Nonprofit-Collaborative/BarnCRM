@@ -857,11 +857,13 @@ a real run requires to be clean before it creates anything):
   `postInstallScript`: both are in `sfdx-project.json` now and checked in CI (see "Creating
   package versions" below). For a managed upgrade, `ancestorVersion` (`"HIGHEST"`) or
   `ancestorId` on every package, which is added only after the first promoted version.
-- The Apex the checks call from anonymous Apex must be `global`: a subscriber org's
-  anonymous Apex cannot see a package's `public` classes. Today `HealthCheckService`,
-  `SampleDataLoader` and (for unlocked) every `<Module>PostInstall` are `public`. The
-  readiness list names each one; adding a `global` entry point is an owner decision, because a
-  global signature can never change in a managed package.
+- The Apex the checks call from anonymous Apex is `global`: a subscriber org's anonymous Apex
+  cannot see a package's `public` classes. The templates and `seed-sample-data.sh --namespace`
+  call only Core's `BarnInstallCheck` (D-199): `runHealthCheck()` (a map of `findings`,
+  `errors` and `errorFindings`), `loadSampleData()` and `finishSetup(packageKey)`, each
+  delegating to the public service and allowed only to someone who may run setup. Its global
+  signatures are permanent; keep it to these three. The readiness list fails only when a
+  template names a class that is not in the source.
 - **Owner approval for the scratch orgs.** The project's test orgs are fixed; any other org is
   approved first. A real run creates one org per shape and refuses without
   `--yes-create-orgs`, the record of that approval. It prints the count first.

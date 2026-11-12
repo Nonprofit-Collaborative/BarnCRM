@@ -31,6 +31,15 @@ public with sharing class NamespaceUtil {
 	}
 
 	/**
+	 * The namespace as setup objects store it in `NamespacePrefix` (`mynamespace`), or null
+	 * when there is none, so `NamespacePrefix = :value` matches this package's own rows only.
+	 */
+	@NamespaceAccessible
+	public static String namespacePrefix() {
+		return String.isBlank(prefix()) ? null : prefix().removeEnd('__');
+	}
+
+	/**
 	 * A packaged API name with whatever prefix this org needs, for example a tab or page name.
 	 */
 	@NamespaceAccessible

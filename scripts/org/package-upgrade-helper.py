@@ -48,10 +48,6 @@ COUNTED = {
     "volunteers": ["Volunteer_Hours__c", "Volunteer_Job__c"],
 }
 
-# Classes the shell script calls from anonymous Apex outside the templates:
-# seed-sample-data.sh --namespace runs <ns>.SampleDataLoader.load().
-EXTRA_ENTRY_POINTS = ["core:SampleDataLoader"]
-
 ID_04T = re.compile(r"^04t[0-9A-Za-z]{12}([0-9A-Za-z]{3})?$")
 NS_REF = re.compile(r"%%NS%%\.([A-Za-z_][A-Za-z0-9_]*)")
 
@@ -139,15 +135,6 @@ def class_file(root, project, name):
         if os.path.exists(path):
             return path
     return None
-
-
-def is_global(root, project, name):
-    path = class_file(root, project, name)
-    if not path:
-        return None
-    with open(path, encoding="utf-8") as handle:
-        text = handle.read()
-    return re.search(r"^\s*global\b[^{;]*\bclass\s+" + re.escape(name) + r"\b", text, re.M) is not None
 
 
 def cmd_namespace(args):
@@ -347,17 +334,16 @@ def cmd_readiness(args):
         add("NOTE", "unlocked: post-install scripts run for managed packages only, so this run calls each "
             "package's runSetup as the admin after every install and upgrade")
 
-    entry_points = []
-    for template in templates_for(args.templates, keys, args.uninstall):
-        with open(template, encoding="utf-8") as handle:
-            entry_points += [(os.path.basename(template), name) for name in NS_REF.findall(handle.read())]
-    entry_points += [("seed-sample-data.sh", e.split(":", 1)[1]) for e in EXTRA_ENTRY_POINTS if e.split(":", 1)[0] in keys]
+    # The templates and seed-sample-data.sh reach the packages only through the global Core
+    # class BarnInstallCheck (D-199); a name here with no class in the source is a typo.
+    templates = templates_for(args.templates, keys, args.uninstall)
     if not managed:
-        entry_points += [("post-install.apex", h) for h in (install_handler(args.root, entries[k]["path"]) for k in keys) if h]
-    not_global = sorted({name for _, name in entry_points if is_global(args.root, project, name) is False})
-    unknown = sorted({name for _, name in entry_points if is_global(args.root, project, name) is None})
-    add("MISSING" if not_global else "OK", "not global, so anonymous Apex in a subscriber org cannot call them: " +
-        ", ".join(not_global) if not_global else "every Apex entry point the checks call is global")
+        templates.append(os.path.join(args.templates, "post-install.apex"))
+    entry_points = []
+    for template in templates:
+        with open(template, encoding="utf-8") as handle:
+            entry_points += NS_REF.findall(handle.read())
+    unknown = sorted({name for name in entry_points if class_file(args.root, project, name) is None})
     if unknown:
         add("MISSING", "entry points with no class in the source: " + ", ".join(unknown))
 

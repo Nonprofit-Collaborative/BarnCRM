@@ -19,7 +19,7 @@
 #
 # --plan prints every step and command for the chosen options and touches nothing: no org, no
 # Dev Hub, no worktree, no file. It also prints the readiness list (namespace, package
-# aliases, ancestors, post-install scripts, global entry points), which a real run requires
+# aliases, ancestors, post-install scripts, Apex entry points), which a real run requires
 # to be clean before it creates anything. scripts/ci/tests/test_package_upgrade_test.py runs
 # it this way.
 #
@@ -389,7 +389,7 @@ apex() { # alias file: runs anonymous Apex as the org's admin; fails on compile 
 
 step_setup() { # alias index: unlocked only, the package's post-install as the admin
   local out="${WORK:-<work>}/apex/setup-${KEYS[$2]}.apex"
-  render post-install.apex "$out" --set "CLASS=${HANDLERS[$2]}" || return 1
+  render post-install.apex "$out" --set "KEY=${HANDLERS[$2]%PostInstall}" || return 1
   apex "$1" "$out"
 }
 

@@ -466,6 +466,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 7 | Open **Modules**. | No row says "Its setup steps never ran". |
 | 8 | Repeat step 2, then in **Modules** click **Finish Setup** on the **BarnCRM Giving** row. | The sentence and the button go away. No error shows, although Giving's steps had already run once: they only add what is missing, so the org has one General Fund and one of each receipt letter, not two. |
 | 9 | Open **General** and scroll to **Recent Changes**. | **Finish Setup** and **Health Check: Finish Setup** each list **BarnCRM Giving**, with your name. |
+| 10 | In a scratch org where nobody holds **Manage BarnCRM Settings** (remove BarnCRM Admin from every user), repeat step 2, then open **Modules** as a System Administrator. | **Finish Setup** shows on the **BarnCRM Giving** row (no other button does). Click it: the steps run and the notice goes away. Give BarnCRM Admin back to one user: a System Administrator without it no longer sees the button. |
 
 **Cleanup:** None: **Modules Setup Run** lists Giving again.
 
