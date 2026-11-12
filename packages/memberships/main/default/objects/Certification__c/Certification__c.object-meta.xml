@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>A credential the organization grants, with the continuing credits it takes to renew and how long it lasts (canonical model 29MEM5).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Certification</label>
+  <nameField>
+    <label>Certification Name</label>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Certifications</pluralLabel>
+  <searchLayouts>
+    <searchResultsAdditionalFields>Credits_Required__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Valid_Months__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Active__c</searchResultsAdditionalFields>
+  </searchLayouts>
+  <sharingModel>Read</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

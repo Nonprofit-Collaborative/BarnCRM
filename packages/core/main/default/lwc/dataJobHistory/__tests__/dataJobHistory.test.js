@@ -76,6 +76,30 @@ jest.mock('@salesforce/apex/BulkDeleteController.getPage', () => ({ default: jes
 jest.mock('@salesforce/apex/BulkDeleteController.undo', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock('@salesforce/apex/BackupSetController.getRuns', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+import getBackupRuns from '@salesforce/apex/BackupSetController.getRuns';
+jest.mock('@salesforce/apex/FilesImportController.getJobs', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/FilesImportController.undo', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+import getFilesJobs from '@salesforce/apex/FilesImportController.getJobs';
+import undoFiles from '@salesforce/apex/FilesImportController.undo';
+
+const FILES_JOB = {
+  id: 'a0B000000000010',
+  name: 'IB-000010',
+  fileName: 'letters.zip',
+  status: 'Complete',
+  saved: 12,
+  refused: 1,
+  startedAt: '2026-10-05T10:00:00.000Z',
+  undoDeadline: '2026-11-04T00:00:00.000Z',
+  canUndo: true
+};
 
 const IMPORT_JOB = {
   id: 'a0B000000000001',
@@ -161,6 +185,8 @@ describe('c-data-job-history', () => {
     getRecentBatches.mockResolvedValue([IMPORT_JOB]);
     getUpdatePage.mockResolvedValue({ allowed: true, jobs: [UPDATE_JOB] });
     getDeletePage.mockResolvedValue({ allowed: true, jobs: [DELETE_JOB] });
+    getBackupRuns.mockResolvedValue(null);
+    getFilesJobs.mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -182,6 +208,47 @@ describe('c-data-job-history', () => {
       'Update',
       'Delete'
     ]);
+  });
+
+  it('lists Backup Set runs with nothing to undo (C-66)', async () => {
+    getBackupRuns.mockResolvedValue([
+      {
+        id: 'a0B000000000009',
+        name: 'IB-000009',
+        setName: 'Volunteers',
+        status: 'Complete',
+        running: false,
+        rows: 30,
+        startedAt: '2026-10-04T10:00:00.000Z'
+      }
+    ]);
+    const element = await render();
+
+    const backup = rows(element).find((row) => row.dataset.kind === 'Backup');
+    expect(backup.textContent).toContain('Volunteers');
+    expect(backup.querySelector('lightning-button-menu')).toBeNull();
+    expect(one(element, 'filter').options.map((option) => option.value)).toContain('Backup');
+  });
+
+  it('lists a files import and undoes it after the file count is typed (C-70)', async () => {
+    getFilesJobs.mockResolvedValue([FILES_JOB]);
+    undoFiles.mockResolvedValue({ ...FILES_JOB, status: 'Undone', canUndo: false });
+    const element = await render();
+
+    const files = rows(element).find((row) => row.dataset.kind === 'Files');
+    expect(files.textContent).toContain('letters.zip');
+    expect(one(element, 'filter').options.map((option) => option.value)).toContain('Files');
+
+    pickUndo(element, FILES_JOB.id);
+    await flush();
+    expect(one(element, 'bulk-undo-start').disabled).toBe(true);
+    await change(one(element, 'undo-confirm'), '12');
+    one(element, 'bulk-undo-start').click();
+    await flush();
+
+    expect(undoFiles).toHaveBeenCalledWith({ jobId: FILES_JOB.id, confirmedFiles: 12 });
+    expect(one(element, 'bulk-undo-box')).toBeNull();
+    expect(one(element, 'notice-message')).not.toBeNull();
   });
 
   it('says "1 row" for a one-row import', async () => {

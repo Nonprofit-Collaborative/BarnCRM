@@ -776,10 +776,10 @@ public with sharing class BulkDeleteService {
 
 	/**
 	 * The fields a download holds: every field the person may read, Id first, leaving out
-	 * compound address and location fields (their parts are listed) and binary content.
+	 * compound address and location fields (their parts are listed) and binary content. Backup
+	 * Sets (R-SQ15) save the same fields.
 	 */
-	@TestVisible
-	private static List<Schema.DescribeFieldResult> backupFields(Schema.SObjectType type) {
+	public static List<Schema.DescribeFieldResult> backupFields(Schema.SObjectType type) {
 		List<Schema.DescribeFieldResult> result = new List<Schema.DescribeFieldResult>();
 		List<Schema.DescribeFieldResult> others = new List<Schema.DescribeFieldResult>();
 		for (Schema.SObjectField token : type.getDescribe().fields.getMap().values()) {

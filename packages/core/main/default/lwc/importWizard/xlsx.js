@@ -3,18 +3,13 @@
  * of text, the same shape `parseCsv` returns, so the rest of the wizard does not know which
  * kind of file it was given.
  *
- * An .xlsx file is a zip of XML documents. This reads the zip's central directory, inflates
- * the few parts it needs with the browser's own DecompressionStream, and reads the XML with
- * DOMParser. It reads values, not formatting: a formula gives the value Excel last saved for
- * it, a date gives YYYY-MM-DD (with the time when there is one), and a number gives the digits
- * Excel stored. See ADR-0049 (the workbook is read in the browser without SheetJS).
+ * An .xlsx file is a zip of XML documents. This opens the zip with `c/zipReader`, inflates the
+ * few parts it needs, and reads the XML with DOMParser. It reads values, not formatting: a
+ * formula gives the value Excel last saved for it, a date gives YYYY-MM-DD (with the time when
+ * there is one), and a number gives the digits Excel stored. See ADR-0049 (the workbook is
+ * read in the browser without SheetJS).
  */
-
-const EOCD_SIGNATURE = 0x06054b50;
-const CENTRAL_SIGNATURE = 0x02014b50;
-const LOCAL_SIGNATURE = 0x04034b50;
-const STORED = 0;
-const DEFLATED = 8;
+import { canUnzip, decodeUtf8, openZip, ZipError, ZIP_ERRORS } from 'c/zipReader';
 
 /** Excel's built-in number formats that show a date or a time. */
 const BUILT_IN_DATE_FORMATS = new Set([14, 15, 16, 17, 18, 19, 20, 21, 22, 45, 46, 47]);
@@ -46,7 +41,7 @@ class XlsxError extends Error {
 
 /** True when this browser can read a workbook: it needs DecompressionStream. */
 export function canReadXlsx() {
-  return typeof DecompressionStream === 'function';
+  return canUnzip();
 }
 
 /** True for a file the wizard should read as a workbook rather than as CSV text. */
@@ -106,22 +101,12 @@ export async function readXlsx(buffer, options = {}) {
 
 /** The parsed workbook part, and a reader for the zip's other parts. */
 async function openWorkbook(buffer, options) {
-  const inflate = options.inflate || inflateInBrowser;
-  const bytes = new Uint8Array(buffer);
-  const entries = readCentralDirectory(bytes);
+  const zip = asWorkbookError(() => openZip(buffer, options));
   const read = async (path) => {
-    const entry = entries.get(path.replace(/^\//, ''));
-    if (!entry) {
-      return null;
-    }
-    if (entry.uncompressedSize > MAX_PART_BYTES) {
-      throw new XlsxError(XLSX_ERRORS.tooLarge);
-    }
-    const part = await extract(bytes, entry, inflate);
-    if (part.length > MAX_PART_BYTES) {
-      throw new XlsxError(XLSX_ERRORS.tooLarge);
-    }
-    return decodeUtf8(part);
+    const part = await asWorkbookErrorAsync(() =>
+      zip.read(path.replace(/^\//, ''), MAX_PART_BYTES)
+    );
+    return part ? decodeUtf8(part) : null;
   };
 
   const workbookXml = await read('xl/workbook.xml');
@@ -131,71 +116,30 @@ async function openWorkbook(buffer, options) {
   return { workbook: parseXml(workbookXml), read };
 }
 
-// -----------------------------------------------------------------------------------------
-// The zip
-// -----------------------------------------------------------------------------------------
-
-function readCentralDirectory(bytes) {
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  let eocd = -1;
-  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 65535); i--) {
-    if (view.getUint32(i, true) === EOCD_SIGNATURE) {
-      eocd = i;
-      break;
-    }
+/** A zip that cannot be read is a file that is not a workbook; the other reasons keep theirs. */
+function workbookError(error) {
+  if (error instanceof ZipError) {
+    return new XlsxError(
+      error.reason === ZIP_ERRORS.notAZip ? XLSX_ERRORS.notAWorkbook : error.reason
+    );
   }
-  if (eocd < 0) {
-    throw new XlsxError(XLSX_ERRORS.notAWorkbook);
-  }
-  const count = view.getUint16(eocd + 10, true);
-  let offset = view.getUint32(eocd + 16, true);
-  const entries = new Map();
-  for (let i = 0; i < count; i++) {
-    if (offset + 46 > bytes.length || view.getUint32(offset, true) !== CENTRAL_SIGNATURE) {
-      throw new XlsxError(XLSX_ERRORS.notAWorkbook);
-    }
-    const nameLength = view.getUint16(offset + 28, true);
-    const extraLength = view.getUint16(offset + 30, true);
-    const commentLength = view.getUint16(offset + 32, true);
-    const name = decodeUtf8(bytes.subarray(offset + 46, offset + 46 + nameLength));
-    entries.set(name, {
-      method: view.getUint16(offset + 10, true),
-      compressedSize: view.getUint32(offset + 20, true),
-      uncompressedSize: view.getUint32(offset + 24, true),
-      localOffset: view.getUint32(offset + 42, true)
-    });
-    offset += 46 + nameLength + extraLength + commentLength;
-  }
-  return entries;
+  return error;
 }
 
-async function extract(bytes, entry, inflate) {
-  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  const local = entry.localOffset;
-  if (view.getUint32(local, true) !== LOCAL_SIGNATURE) {
-    throw new XlsxError(XLSX_ERRORS.notAWorkbook);
+function asWorkbookError(work) {
+  try {
+    return work();
+  } catch (error) {
+    throw workbookError(error);
   }
-  const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
-  const data = bytes.subarray(start, start + entry.compressedSize);
-  if (entry.method === STORED) {
-    return data;
-  }
-  if (entry.method === DEFLATED) {
-    return inflate(data);
-  }
-  throw new XlsxError(XLSX_ERRORS.notAWorkbook);
 }
 
-async function inflateInBrowser(data) {
-  if (!canReadXlsx()) {
-    throw new XlsxError(XLSX_ERRORS.unsupportedBrowser);
+async function asWorkbookErrorAsync(work) {
+  try {
+    return await work();
+  } catch (error) {
+    throw workbookError(error);
   }
-  const stream = new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
-function decodeUtf8(bytes) {
-  return new TextDecoder('utf-8').decode(bytes);
 }
 
 // -----------------------------------------------------------------------------------------
