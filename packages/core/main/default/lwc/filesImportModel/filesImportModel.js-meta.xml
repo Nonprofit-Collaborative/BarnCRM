@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Import Files' browser logic: reads manifest.csv from the zip, checks rows, and groups the
+    files to send.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
