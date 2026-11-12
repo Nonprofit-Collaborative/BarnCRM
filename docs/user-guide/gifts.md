@@ -165,7 +165,8 @@ for you once the donor's form is processed.
 You should see: **Pending** while the payment is being confirmed, then **Received**, dated the
 day it was paid. **Cancelled** means the donor left the checkout without paying; you can keep
 or delete it. A refund made at Stripe or PayPal sets the gift to **Refunded** by itself, so do
-not record that refund again.
+not record that refund again. A gift under your organization's minimum, or one of too many
+tried on the same appeal in an hour, is refused before checkout, so no gift is written for it.
 
 A donor who pays a pledge with **Pay Online** in the donor portal gets the same kind of gift, on
 the pledge instead of an appeal: it appears as **Received** once the payment is confirmed and

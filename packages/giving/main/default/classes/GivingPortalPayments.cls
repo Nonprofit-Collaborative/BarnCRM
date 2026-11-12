@@ -15,6 +15,8 @@
 public with sharing class GivingPortalPayments implements PortalActionExtension, Queueable, Database.AllowsCallouts {
 	public static final String PAY_ONLINE = 'Giving.PayOnline';
 	private static final String CONTEXT = 'GivingPortalPayments';
+	/** A Pending checkout this recent for the commitment means its link was just sent. */
+	private static final Integer RECENT_MINUTES = 10;
 	private static final Set<String> DUE = new Set<String>{
 		'Scheduled',
 		'Partially paid',
@@ -70,9 +72,23 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 			return;
 		}
 		String url;
+		String amountText = amount.setScale(2).format();
 		try {
+			Callable payments = GivingDonations.payments();
+			Object recent = payments.call(
+				'countRecent',
+				new Map<String, Object>{
+					'sourceRecordId' => commitment.Id,
+					'minutes' => RECENT_MINUTES,
+					'status' => 'Pending'
+				}
+			);
+			if (recent instanceof Integer && (Integer) recent > 0) {
+				// A link sent minutes ago is still open: a second click sends no second one.
+				return;
+			}
 			String back = GivingDonations.returnUrl();
-			Map<String, Object> started = (Map<String, Object>) GivingDonations.payments()
+			Map<String, Object> started = (Map<String, Object>) payments
 				.call(
 					'startCheckout',
 					new Map<String, Object>{
@@ -88,10 +104,23 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 						'payerEmail' => commitment.Donor_Contact__r.Email,
 						'personId' => commitment.Donor_Contact__c,
 						'sourceRecordId' => commitment.Id,
-						'listener' => GivingDonations.LISTENER
+						'listener' => GivingDonations.LISTENER,
+						// The scheduled payment charged, so the gift pays that one (GivingDonations).
+						'detail' => nextDue(commitment)?.Id
 					}
 				);
 			url = String.valueOf(started.get('checkoutUrl'));
+			Map<String, Object> payment = (Map<String, Object>) payments.call(
+				'getPayment',
+				new Map<String, Object>{ 'paymentId' => started.get('paymentId') }
+			);
+			if (payment?.get('amount') instanceof Decimal) {
+				// The amount as charged: no decimals for a currency without them.
+				amountText =
+					((Decimal) payment.get('amount')).format() +
+					' ' +
+					String.valueOf(payment.get('currency'));
+			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT, commitment.Id);
 			return;
@@ -105,7 +134,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 				'Giving_PayOnline_EmailBody',
 				new List<Object>{
 					commitment.Donor_Contact__r.FirstName ?? '',
-					amount.setScale(2).format(),
+					amountText,
 					commitment.Name,
 					url
 				}
@@ -132,16 +161,24 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 	 */
 	@TestVisible
 	private static Decimal amountDue(Commitment__c commitment) {
-		for (Installment__c next : commitment.Installments__r) {
-			Decimal left = (next.Expected_Amount__c ?? 0) - (next.Paid_Amount__c ?? 0);
-			if (left > 0) {
-				return left;
-			}
+		Installment__c next = nextDue(commitment);
+		if (next != null) {
+			return next.Expected_Amount__c - (next.Paid_Amount__c ?? 0);
 		}
 		Decimal fallback = commitment.Type__c == 'Pledge'
 			? commitment.Balance__c
 			: commitment.Amount__c;
 		return fallback ?? 0;
+	}
+
+	/** The earliest scheduled payment with an amount left to pay, or null. */
+	private static Installment__c nextDue(Commitment__c commitment) {
+		for (Installment__c next : commitment.Installments__r) {
+			if ((next.Expected_Amount__c ?? 0) - (next.Paid_Amount__c ?? 0) > 0) {
+				return next;
+			}
+		}
+		return null;
 	}
 
 	private static Commitment__c load(Id recordId) {
@@ -161,7 +198,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 				Donor_Contact__r.FirstName,
 				Donor_Contact__r.Email,
 				(
-					SELECT Expected_Amount__c, Paid_Amount__c
+					SELECT Id, Expected_Amount__c, Paid_Amount__c
 					FROM Installments__r
 					WHERE Status__c IN :DUE
 					ORDER BY Due_Date__c ASC NULLS LAST

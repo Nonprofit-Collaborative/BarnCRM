@@ -392,13 +392,13 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-22: NPSP Funds, Levels and Recurring Donations Kit
 
 **Purpose:** confirm the kit copies NPSP General Accounting Units, levels and recurring donations into Giving and never changes NPSP.
-**Prerequisites:** admin; an org with NPSP installed (a test org, never production); in NPSP, a General Accounting Unit "Building Fund", a level "Friend" (100 to 499.99), an open monthly recurring donation of 25 for a contact with a next payment date next month, and a closed yearly one of 500 for an organization.
+**Prerequisites:** admin; an org with NPSP installed (a test org, never production); in NPSP, a General Accounting Unit "Building Fund", a level "Friend" (100 to 499.99), an open monthly recurring donation of 25 for a contact with a next payment date next month, an open one of 60 every 3 months (Installment Period Monthly, Installment Frequency 3) for a second contact, and a closed yearly one of 500 for an organization.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Integrations**, NPSP. | One **Start Migration** button per kit, including **Start Migration: NPSP Funds, Levels, Recurring Donations**. |
 | 2 | Start it; preview and load **Funds**, then **Donor Levels**. | A fund Building Fund and a donor level Friend with the same amounts. **Check this step** matches each. |
-| 3 | Load **Recurring Donations of People**. | A recurring commitment of 25, Monthly, Active, for the same contact, starting at the NPSP next payment date; no overdue payments. |
+| 3 | Load **Recurring Donations of People**. | A recurring commitment of 25, Monthly, Active, for the same contact, starting at the NPSP next payment date; no overdue payments. The one of 60 is **Quarterly**. |
 | 4 | Load **Recurring Donations of Organizations**. | A recurring commitment of 500, Yearly, Cancelled, for the organization. |
 | 5 | Open the NPSP records. | Nothing in NPSP changed. |
 
@@ -411,7 +411,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Winter Coats**, paste the form's ID into **Donation Form Key** and tick **Donation Page**. Save. | Saved. |
+| 1 | On **Winter Coats**, paste the form's ID into **Donation Form ID** and tick **Donation Page**. Save. | Saved. |
 | 2 | In a private browser window open `<Site>/FormsPublic?record=<appeal ID>`. | The appeal's name, description, **Our Goal** with 5,000, and the form under **Give Now**. No gift, donor or total shows. |
 | 3 | Fill in Dana Zzdonor, an email and amount 40. Send. | "Taking you to the secure payment page", then Stripe's test checkout for 40. |
 | 4 | Pay with the card 4242 4242 4242 4242. | Back on the appeal page with "Thank you. Your payment is being confirmed". |
@@ -430,7 +430,9 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 1 | Send the form for amount 25, then choose the back link on Stripe's checkout. | Back on the appeal page with "Your payment was cancelled and nothing was charged". |
 | 2 | Wait for processing; open the appeal's gifts. | A **Pending** gift of 25 with a **Payment Reference**; after Payments cancels the abandoned checkout, **Cancelled**. |
 | 3 | Send the form with the amount blank or 0. | The form refuses a blank amount; for 0, "something went wrong" and nothing is stored. |
-| 4 | On Payments Setup, clear the Stripe keys; reload the page. | The appeal shows with "Online giving for this appeal is not open right now" and no form. |
+| 4 | Send the form for amount 3. | "Something went wrong", no checkout, nothing stored; the Error Log says the amount is below the page minimum of 5.00 (**Donation Page Minimum Amount** in Settings, Giving section). |
+| 5 | Open **Health Check** after editing the "Give" form to remove the `amount` question and publishing it. | `Donation Forms Without an Amount Question` links Winter Coats. Put the question back and publish: the finding is gone. |
+| 6 | On Payments Setup, clear the Stripe keys; reload the page. | The appeal shows with "Online giving for this appeal is not open right now" and no form. |
 
 **Cleanup:** enter the Stripe test keys again; delete the gifts; untick **Donation Page**.
 ## T-GIFT-25: NPSP Engagement Plans and the Parity Report

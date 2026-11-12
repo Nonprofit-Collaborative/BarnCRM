@@ -4295,7 +4295,7 @@ packaged report DAF and Stock Gifts This Year lists them.
 | Commitment | `Commitment__c` | Lookup to `Commitment__c` (v0.3) |
 | Installment | `Installment__c` | Lookup to `Installment__c` (v0.3) |
 | External Id | `External_Id__c` | Text, External Id, unique |
-| Payment Reference | `Payment_Reference__c` | Text |
+| Payment Reference | `Payment_Reference__c` | Text, External Id (indexed: online payments find their gift by it) |
 | Original Gift | `Original_Gift__c` | Lookup to `Gift__c` |
 | Refund Reason | `Refund_Reason__c` | Text |
 | In-kind Description | `In_Kind_Description__c` | Long Text Area (v0.4) |
@@ -4486,7 +4486,7 @@ object means something specific and is unavailable on Platform licenses.
 | Net Raised | decimal | computed | Total raised less cost, calculated live from the two values. |
 | Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. The Percent formula returns the plain ratio (0.5 for half) and Salesforce displays it as 50%. |
 | Donation Page | boolean | yes (defaults false) | Whether the appeal has a public online donation page (G-34, R-AP5). |
-| Donation Form Key | text (18) | no | The Forms form donors fill in on the donation page, by record identifier (ADR-0014). |
+| Donation Form ID | text (18) | no | The Forms form donors fill in on the donation page, by record identifier (ADR-0014). Labelled Donation Form ID; the API name keeps "Key". |
 
 ### Relationships
 
@@ -4516,12 +4516,17 @@ Mirror (plan Section 4.12): the Campaign ID attribute and the one-way copy of Se
 both shipped by the Mirror package, so Giving itself never names Campaign.
 
 **R-AP5 Online donation page** (G-34, ADR-NEXT `NEXT-online-donation-pages.md`). An active
-appeal with Donation Page on and a Donation Form Key naming a published public form has a public
+appeal with Donation Page on and a Donation Form ID naming a published public form has a public
 page served by Forms (`<site>/FormsPublic?record=<appeal>`). The page shows the name,
 description and goal only. Sending the form starts a hosted checkout through Payments with the
 answer `amount`; the gift (Donor Contact the person Forms matched, Appeal, Payment Reference the
 payment's identifier) is Pending until Payments reports Paid (Received), Refunded (Refunded) or
-Cancelled (Cancelled), whichever of form processing and the payment report comes last.
+Cancelled (Cancelled), whichever of form processing and the payment report comes last. A gift
+the status rules move only through a step (Cancelled to Received, Pending to Refunded) is moved
+through Pending or Received first. Against card testing, a checkout is refused when the amount is
+below `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (default 5) or the appeal has started
+30 checkouts in the last hour. Health Check lists active appeals with Donation Page on whose form
+has no `amount` question.
 
 ### Salesforce implementation
 
@@ -4541,7 +4546,7 @@ Cancelled (Cancelled), whichever of form processing and the payment report comes
 | Percent To Goal | `Percent_To_Goal__c` | Formula (Percent) |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
 | Donation Page | `Donation_Page__c` | Checkbox, default false (G-34) |
-| Donation Form Key | `Donation_Form_Key__c` | Text(18) (G-34) |
+| Donation Form ID | `Donation_Form_Key__c` | Text(18) (G-34) |
 
 Rollup target attributes on `Appeal__c` are listed in Section 26.
 
@@ -4712,6 +4717,7 @@ these keys, which is what makes a module that is off leave nothing behind.
 | Default Appeal | `Default_Appeal__c` | Text(18) (v0.6, from Core) |
 | Ask Stages | `Ask_Stages__c` | Text(255) (release 0.13, G-26, R-SO2) |
 | Receipt Numbering Scope | `Receipt_Numbering_Scope__c` | Text(40), default `Organization` (release 1.14, C-47f, R-BR8) |
+| Donation Page Minimum Amount | `Donation_Page_Minimum_Amount__c` | Currency(16, 2), default 5 (G-34 card-testing guard, R-AP5) |
 
 - **Service:** Core `SettingsService`, reading and writing this object through the
   `Settings_Object__c` field on `Setting_Definition__mdt` (ADR-0017).
@@ -16695,7 +16701,7 @@ the money or any card or account number.
 | Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture id, once known. |
 | Checkout Url | long text | no | The hosted checkout page address. |
 | Paid At | datetime | no | When the processor reported the money captured. |
-| Detail | text | no | The last failure, refund or cancellation reason the processor gave. |
+| Detail | text | no | The last failure, refund or cancellation reason the processor gave; until then, what the consumer passed as `detail` (Giving: the scheduled payment charged). |
 
 ### Rules
 
@@ -16708,7 +16714,12 @@ back.
 A partial refund keeps Paid; a refund of the whole amount sets Refunded.
 
 **R-PAY3 Abandoned checkouts.** A payment still Pending with no Processor Payment Id two days
-after it was created is set Cancelled with the detail that the checkout expired.
+after it was created is set Cancelled with the detail that the checkout expired, 50 at a time in
+a queued job of its own, apart from event processing.
+
+**R-PAY5 Listeners told in bulk.** After each run, each listener class is told once with every
+payment of its own that changed (`paymentsChanged`); a listener that does not answer true, or
+fails, is told one payment at a time (`paymentChanged`), each failure rolled back on its own.
 
 **R-PAY4 No card data.** No field holds a card, bank account or PayPal sign-in; the processor's
 page takes them.
@@ -16772,6 +16783,11 @@ does not confirm is Rejected.
 
 **R-PEV3 The guest only stores.** The receiver inserts the event and reads nothing; processing
 runs as the administrator who scheduled it.
+
+**R-PEV4 Callout time.** A run stops reading events once 60 seconds have passed (a PayPal event
+can take three 20-second callouts), leaving the rest Received for the next run. An event whose
+callout failed in transport stays Received and is read again; only a run that fails to write
+marks the events it read Failed.
 
 ### Salesforce implementation
 
