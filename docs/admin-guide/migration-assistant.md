@@ -29,12 +29,16 @@ org. These kits ship:
 - **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
   levels and recurring donations. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **Outbound Funds Programs and Awards** (Scholarships and Outbound Grants): copies Outbound
+  Funds funding programs (each with one cycle), funding requests as applications and awards,
+  disbursements and requirements. See
+  [Scholarships and Outbound Grants](scholarships.md#moving-from-outbound-funds).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
 in the order they are listed.
 
-A kit for Outbound Funds follows in a later release. Until a kit
+Until a kit
 covers what you need, the import templates in [Migrating From NPSP](migrating-from-npsp.md) and
 [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md) move those records from a
 file.

@@ -23,8 +23,9 @@ organizations that give money: scholarships, fellowships, mini-grants and other 
   accept awards and send reports (see [Portal Builder](portal-builder.md)).
 - **Reports and dashboard** (SG-08): standard Salesforce reports and one dashboard.
 
-Organizations on Nonprofit Cloud Grantmaking or Outbound Funds keep those tools; BarnCRM does not
-read or change them.
+Organizations on Nonprofit Cloud Grantmaking or Outbound Funds keep those tools; BarnCRM never
+changes them. An organization moving from Outbound Funds can copy its records in with the
+Migration Assistant (see [Moving From Outbound Funds](#moving-from-outbound-funds)).
 
 ## Install and Turn On
 
@@ -187,6 +188,35 @@ or Open cycle, linked to the award by Renewal Of.
 The **BarnCRM Scholarships** folder holds Applications by Cycle and Status, Applications Ranked by
 Score, Awards by Program, Disbursements Due Next 30 Days and Recipient Reports Due, and the
 **Scholarships and Grants** dashboard. Copy them to change them.
+
+## Moving From Outbound Funds
+
+When the Outbound Funds Module (the free Salesforce.org package for grants you give) is installed
+in the same org, the [Migration Assistant](migration-assistant.md) copies its records into this
+module, with a preview, a check that the numbers match and undo for each step. Open **BarnCRM
+Settings**, **Integrations**, find **Outbound Funds Module** and click **Start Migration: Outbound
+Funds Programs and Awards**. You need Manage BarnCRM Settings and Manage Scholarships, and you
+should see every Outbound Funds record.
+
+| Step | What it does |
+|---|---|
+| Programs | Copies each funding program as an award program of type **Grant**, with its description; a Completed or Closed program is inactive. |
+| Cycles | Outbound Funds has no cycles, so each copied program gets one cycle named after the funding program, with its start and end dates as open and close dates, its total amount as the budget, and its status (In progress becomes Open, Completed becomes Closed). |
+| Applications | Copies each funding request as an application in that cycle: its name as the title, applying contact and organization, requested amount, application date, what it is for as the summary, and status (In progress becomes Draft, Under Review becomes In Review, Rejected becomes Declined). |
+| Awards | Copies each funding request with an awarded amount as an award on its application: recipient, amount, award date as the decision date, and status (Awarded becomes Active, Closed becomes Completed, Withdrawn becomes Cancelled). |
+| Disbursements | Copies each disbursement of an awarded request onto its award: amount, scheduled and paid dates, status (Pending and Approved become Scheduled) and method (EFT, ACH and wire become Bank Transfer; any other becomes Other). |
+| Requirements | Copies each requirement of an awarded request onto its award, linked to its disbursement: its name as the instructions, due date, type (a report becomes Progress Report or Final Report, anything else Condition) and status (Complete and Accepted become Met). |
+
+Before you load requirements, switch **Send Scholarships reminders** off (BarnCRM Settings,
+**Scholarships and Grants**) if you do not want reminders for old requirements, and switch it back
+on afterwards. The retire checklist reminds you
+to point applicants at BarnCRM, deactivate your own flows on Outbound Funds objects, and rebuild
+your reports. Review scores, the review board and award letters start fresh in BarnCRM: Outbound
+Funds' reviews, notes and files are not copied.
+
+The Outbound Funds names the kit reads come from its public repository, not from a current
+package version: if your version differs, the step stops before reading anything and names the
+field it could not find.
 
 ## Removing the Module
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Outbound Funds Programs and Awards</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Outbound_Funds_Module</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your Outbound Funds funding programs as award programs, each with one cycle, your funding requests as applications, the awarded ones also as awards, and their disbursements and requirements, keeping every link. Outbound Funds itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"programs","label":"Programs","kind":"import","help":"Copies each funding program as an award program of type Grant.","source":"outfunds.Funding_Program__c","fields":["Name","outfunds.Description__c","outfunds.Status__c"],"templateKey":"kit_ofm_programs"},{"key":"cycles","label":"Cycles","kind":"import","help":"Gives each copied program one cycle with the funding program's dates, budget and status.","source":"outfunds.Funding_Program__c","fields":["Name","outfunds.Start_Date__c","outfunds.End_Date__c","outfunds.Status__c","outfunds.Total_Program_Amount__c"],"links":[{"column":"Parent","step":"programs"}],"templateKey":"kit_ofm_cycles"},{"key":"applications","label":"Applications","kind":"import","help":"Copies each funding request as an application in its program's cycle.","source":"outfunds.Funding_Request__c","fields":["Name","outfunds.FundingProgram__c","outfunds.Applying_Contact__c","outfunds.Applying_Organization__c","outfunds.Requested_Amount__c","outfunds.Application_Date__c","outfunds.Requested_For__c","outfunds.Status__c"],"links":[{"column":"outfunds.FundingProgram__c","step":"cycles"}],"templateKey":"kit_ofm_applications"},{"key":"awards","label":"Awards","kind":"import","help":"Copies each funding request with an awarded amount as an award on its application.","source":"outfunds.Funding_Request__c","fields":["outfunds.FundingProgram__c","outfunds.Applying_Contact__c","outfunds.Applying_Organization__c","outfunds.Awarded_Amount__c","outfunds.Awarded_Date__c","outfunds.Status__c"],"filters":[{"field":"outfunds.Awarded_Amount__c","value":null,"op":"notEquals"}],"links":[{"column":"outfunds.FundingProgram__c","step":"cycles"},{"column":"Parent","step":"applications"}],"templateKey":"kit_ofm_awards"},{"key":"disbursements","label":"Disbursements","kind":"import","help":"Copies each disbursement of an awarded request as a disbursement of its award.","source":"outfunds.Disbursement__c","fields":["outfunds.Funding_Request__c","outfunds.Amount__c","outfunds.Scheduled_Date__c","outfunds.Disbursement_Date__c","outfunds.Status__c","outfunds.Disbursement_Method__c"],"filters":[{"field":"outfunds.Funding_Request__r.outfunds.Awarded_Amount__c","value":null,"op":"notEquals"}],"links":[{"column":"outfunds.Funding_Request__c","step":"awards"}],"templateKey":"kit_ofm_disbursements"},{"key":"requirements","label":"Requirements","kind":"import","help":"Copies each requirement of an awarded request as a requirement of its award, linked to its disbursement.","source":"outfunds.Requirement__c","fields":["Name","outfunds.Funding_Request__c","outfunds.Disbursement__c","outfunds.Due_Date__c","outfunds.Status__c","outfunds.Type__c"],"filters":[{"field":"outfunds.Funding_Request__r.outfunds.Awarded_Amount__c","value":null,"op":"notEquals"}],"links":[{"column":"outfunds.Funding_Request__c","step":"awards"},{"column":"outfunds.Disbursement__c","step":"disbursements"}],"templateKey":"kit_ofm_requirements"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"intake","text":"Point applicants at your BarnCRM application form or portal, and remove the Outbound Funds app and tabs from staff profiles and permission sets, so new requests are made only in BarnCRM."},{"key":"automation","text":"Deactivate any flow, process or scheduled job your organization built on Outbound Funds objects (Setup, Flows and Scheduled Jobs), so nothing keeps updating the old records."},{"key":"reports","text":"Rebuild the Outbound Funds reports and dashboards you use from the BarnCRM Scholarships folder, then retire the old ones."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">OutboundFundsKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">60</value>
+  </values>
+</CustomMetadata>
