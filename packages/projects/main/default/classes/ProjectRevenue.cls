@@ -151,7 +151,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 		Map<Id, Decimal[]> earlier = new Map<Id, Decimal[]>();
 		// Access mode: the caller's, passed as `mode`.
 		for (
-			AggregateResult sum : Database.queryWithBinds(
+			AggregateResult sum : (List<AggregateResult>) Database.queryWithBinds(
 				'SELECT Project__c p, SUM(Recognized_Amount__c) r, SUM(Cost_Amount__c) c FROM Project_Revenue__c ' +
 				'WHERE Project__c IN :billed AND Month__c < :month GROUP BY Project__c',
 				new Map<String, Object>{ 'billed' => billed, 'month' => month },
@@ -210,7 +210,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 			' WHERE Project__c IN :ids AND Date__c <= :through AND ' + ProjectBilling.COUNTED;
 		// Access mode: the caller's, passed as `mode`.
 		for (
-			AggregateResult sum : Database.queryWithBinds(
+			AggregateResult sum : (List<AggregateResult>) Database.queryWithBinds(
 				'SELECT Project__c p, Billable__c b, SUM(Amount__c) a' +
 					(withCost ? ', SUM(Cost_Amount__c) c' : '') +
 					' FROM Time_Entry__c' +
@@ -232,7 +232,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 		}
 		// Access mode: the caller's, passed as `mode`.
 		for (
-			AggregateResult sum : Database.queryWithBinds(
+			AggregateResult sum : (List<AggregateResult>) Database.queryWithBinds(
 				'SELECT Project__c p, SUM(Hours__c) h FROM Time_Entry__c' +
 					counted +
 					' AND Billable__c = TRUE AND Bill_Rate__c = NULL GROUP BY Project__c',
@@ -247,7 +247,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 		}
 		// Access mode: the caller's, passed as `mode`.
 		for (
-			AggregateResult sum : Database.queryWithBinds(
+			AggregateResult sum : (List<AggregateResult>) Database.queryWithBinds(
 				'SELECT Project__c p, Billable__c b, SUM(Amount__c) a FROM Project_Expense__c' +
 					counted +
 					' GROUP BY Project__c, Billable__c',
@@ -296,7 +296,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 		List<Project_Revenue__c> changed = new List<Project_Revenue__c>();
 		// Access mode: the caller's, passed as `mode`.
 		for (
-			Project_Revenue__c existing : Database.queryWithBinds(
+			Project_Revenue__c existing : (List<Project_Revenue__c>) Database.queryWithBinds(
 				'SELECT Id, Month_Key__c FROM Project_Revenue__c WHERE Month_Key__c IN :keys',
 				new Map<String, Object>{ 'keys' => keys },
 				mode
