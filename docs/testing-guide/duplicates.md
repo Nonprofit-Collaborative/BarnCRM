@@ -294,7 +294,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-20: Merge Records Merges Two Funds and Moves Their Gifts
 
 **Purpose:** Confirm Merge Records compares two records of one BarnCRM object, starts each field from the merge rules, moves the related records, sends the other record to the Recycle Bin and lists the merge.
-**Prerequisites:** admin. Giving installed. Two funds: `Zztest Fund A` with **Description** blank, and `Zztest Fund B` with Description `Merge test` and one gift on it. In a Core-only org use two import mappings instead (Data Manager, Import, save a mapping twice) with one import job on the second.
+**Prerequisites:** admin. Giving installed. Two funds: `Zztest Fund A` with **Description** blank, and `Zztest Fund B` with Description `Merge test`, one gift on it and one file (`Zztest merge file.txt`) in its **Files**. In a Core-only org use two import mappings instead (Data Manager, Import, save a mapping twice) with one import job on the second.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -302,8 +302,8 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 2 | In **BarnCRM Settings**, **Duplicate Matching**, turn on **Turn On Merge Records** and save. Reopen the tab, then **Merge Records**. | The intro, **Object**, a disabled **Compare** and **Recent Merges** reading that nothing was merged in the last 15 days. |
 | 3 | Choose **Object** Fund, pick `Zztest Fund A` as **First Record** and `Zztest Fund B` as **Second Record**, click **Compare**. | The two funds side by side, `Zztest Fund A` chosen as **Record to Keep**. **Description** shows the value `Merge test` selected (merge rule Not blank). No owner, record type or unique field rows. |
 | 4 | Tick **Only Differences**. | Only rows whose values differ remain. |
-| 5 | Click **Merge** and confirm. | A message: merged, 1 related record moved, 1 value changed. The comparison closes. **Recent Merges** lists `Fund: Zztest Fund B` with **Undo**. |
-| 6 | Open `Zztest Fund A`. | Description reads `Merge test`; the gift that was on Fund B is on Fund A. `Zztest Fund B` is in the Recycle Bin. |
+| 5 | Click **Merge** and confirm. | A message: merged, 2 related records moved (the gift and the file link), 1 value changed. The comparison closes. **Recent Merges** lists `Fund: Zztest Fund B` with **Undo**. |
+| 6 | Open `Zztest Fund A`. | Description reads `Merge test`; the gift that was on Fund B is on Fund A, and `Zztest merge file.txt` is in Fund A's **Files**. `Zztest Fund B` is in the Recycle Bin. |
 | 7 | On **Auto-Merge**, read **Recent Runs**. | The fund merge is not listed there. |
 
 **Cleanup:** Keep the merge for T-DUP-21.
@@ -316,7 +316,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Under **Recent Merges**, click **Undo** on `Zztest Fund B` and confirm. | The row reads **Undone** and **Undo** is gone. |
-| 2 | Open both funds. | `Zztest Fund B` is back (same record Id), with its gift. Fund A's Description is blank again. |
+| 2 | Open both funds. | `Zztest Fund B` is back (same record Id), with its gift. Fund A's Description is blank again and the file is no longer in Fund A's **Files**. |
 | 3 | Compare two records where the person merging cannot read a related object (for example as an admin without access to one module's objects), and click **Merge**. | An error names the records that could not be read and says nothing was merged. Both records are unchanged. |
 | 4 | As a user without **BarnCRM Admin**, open the **Duplicate Matching** tab. | No **Merge Records** area. |
 

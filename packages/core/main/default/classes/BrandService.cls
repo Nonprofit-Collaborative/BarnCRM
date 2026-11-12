@@ -306,23 +306,27 @@ public with sharing class BrandService {
 		if (String.isBlank(parentField) || !fields.containsKey(parentField.toLowerCase())) {
 			return brands;
 		}
-		Set<Id> parentIds = new Set<Id>();
+		Map<Schema.SObjectType, Set<Id>> parentsByType = new Map<Schema.SObjectType, Set<Id>>();
 		for (SObject record : records) {
 			if (record.get(BRAND_FIELD) == null && record.get(parentField) != null) {
-				parentIds.add((Id) record.get(parentField));
+				Id parentId = (Id) record.get(parentField);
+				Schema.SObjectType parentType = parentId.getSObjectType();
+				if (!parentsByType.containsKey(parentType)) {
+					parentsByType.put(parentType, new Set<Id>());
+				}
+				parentsByType.get(parentType).add(parentId);
 			}
 		}
-		if (parentIds.isEmpty()) {
-			return brands;
-		}
-		Schema.SObjectType parentType = new List<Id>(parentIds)[0].getSObjectType();
-		if (!parentType.getDescribe().fields.getMap().containsKey(BRAND_FIELD.toLowerCase())) {
-			return brands;
-		}
-		// Names come from describe, never input.
-		String query = 'SELECT Id, Brand__c FROM ' + parentType + ' WHERE Id IN :parentIds';
-		for (SObject parent : Database.query(query, AccessLevel.SYSTEM_MODE)) {
-			brands.put(parent.Id, (Id) parent.get(BRAND_FIELD));
+		for (Schema.SObjectType parentType : parentsByType.keySet()) {
+			if (!parentType.getDescribe().fields.getMap().containsKey(BRAND_FIELD.toLowerCase())) {
+				continue;
+			}
+			Set<Id> parentIds = parentsByType.get(parentType);
+			// Names come from describe, never input.
+			String query = 'SELECT Id, Brand__c FROM ' + parentType + ' WHERE Id IN :parentIds';
+			for (SObject parent : Database.query(query, AccessLevel.SYSTEM_MODE)) {
+				brands.put(parent.Id, (Id) parent.get(BRAND_FIELD));
+			}
 		}
 		return brands;
 	}
@@ -352,17 +356,25 @@ public with sharing class BrandService {
 
 	/** R-BR1: saving a brand or entity as Default clears it on every other one. */
 	public static void keepOneDefault(List<SObject> records) {
-		Set<Id> newDefaults = new Set<Id>();
+		List<Id> saved = new List<Id>();
 		for (SObject record : records) {
 			if (record.get('Is_Default__c') == true) {
-				newDefaults.add(record.Id);
+				saved.add(record.Id);
 			}
 		}
-		if (newDefaults.isEmpty()) {
+		if (saved.isEmpty()) {
 			return;
 		}
 		Schema.SObjectType type = records[0].getSObjectType();
+		Set<Id> newDefaults = new Set<Id>(saved);
 		List<SObject> others = new List<SObject>();
+		// Several saved as Default together: the last one stays, the rest are cleared.
+		saved.remove(saved.size() - 1);
+		for (Id extra : saved) {
+			SObject clear = type.newSObject(extra);
+			clear.put('Is_Default__c', false);
+			others.add(clear);
+		}
 		// The type is the trigger's own object.
 		String query =
 			'SELECT Id FROM ' +

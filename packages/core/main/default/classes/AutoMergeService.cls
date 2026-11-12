@@ -48,6 +48,8 @@ public with sharing class AutoMergeService {
 	 * undo removes these copies instead of moving anything (C-20, ContactTriggerHandler).
 	 */
 	private static final String ADDED_MEMBERSHIPS = 'Household_Member__c+';
+	/** Journal key for the file links a Generic Record Merge added to the kept record; undo removes them. */
+	public static final String ADDED_FILES = 'ContentDocumentLink+';
 	private static final Set<String> PERSON_FIELDS = new Set<String>{
 		'Id',
 		'Name',
@@ -569,6 +571,7 @@ public with sharing class AutoMergeService {
 		restoreValues(restored, notesById);
 		moveBack(restored, notesById);
 		removeAddedMemberships(restored, notesById);
+		removeAddedFiles(restored, notesById);
 		for (Merge_Journal__c journal : journals) {
 			List<String> lines = notesById.get(journal.Id);
 			if (journal.Status__c != UNDO_FAILED) {
@@ -742,7 +745,7 @@ public with sharing class AutoMergeService {
 				journal.Moved_Records__c
 			);
 			for (String key : byLink.keySet()) {
-				if (key == ADDED_MEMBERSHIPS) {
+				if (key == ADDED_MEMBERSHIPS || key == ADDED_FILES) {
 					continue;
 				}
 				if (!ownerByLink.containsKey(key)) {
@@ -906,6 +909,100 @@ public with sharing class AutoMergeService {
 			}
 		} catch (Exception unreadable) {
 			for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByRow.values())) {
+				addOnce(
+					notesById,
+					owner,
+					BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
+					key
+				);
+			}
+		}
+	}
+
+	/**
+	 * Links the other record's files to the kept record (Generic Record Merge), skipping files
+	 * already linked there; answers the new link Ids, which the journal keeps for undo.
+	 */
+	public static List<Id> shareFiles(Id keepId, Id otherId) {
+		Set<Id> linked = new Set<Id>();
+		for (ContentDocumentLink row : [
+			SELECT ContentDocumentId
+			FROM ContentDocumentLink
+			WHERE LinkedEntityId = :keepId
+			WITH USER_MODE
+		]) {
+			linked.add(row.ContentDocumentId);
+		}
+		List<ContentDocumentLink> added = new List<ContentDocumentLink>();
+		for (ContentDocumentLink row : [
+			SELECT ContentDocumentId
+			FROM ContentDocumentLink
+			WHERE LinkedEntityId = :otherId
+			WITH USER_MODE
+		]) {
+			if (linked.add(row.ContentDocumentId)) {
+				added.add(
+					new ContentDocumentLink(
+						LinkedEntityId = keepId,
+						ContentDocumentId = row.ContentDocumentId,
+						ShareType = 'V'
+					)
+				);
+			}
+		}
+		Database.insert(added, AccessLevel.USER_MODE);
+		List<Id> ids = new List<Id>();
+		for (ContentDocumentLink row : added) {
+			ids.add(row.Id);
+		}
+		return ids;
+	}
+
+	/** Undo of `shareFiles`: removes the links the merge added; a link gone already needs nothing. */
+	private static void removeAddedFiles(
+		List<Merge_Journal__c> journals,
+		Map<Id, List<String>> notesById
+	) {
+		Map<Id, Merge_Journal__c> ownerByLink = new Map<Id, Merge_Journal__c>();
+		for (Merge_Journal__c journal : journals) {
+			if (String.isBlank(journal.Moved_Records__c)) {
+				continue;
+			}
+			Object rows = ((Map<String, Object>) JSON.deserializeUntyped(journal.Moved_Records__c))
+				.get(ADDED_FILES);
+			for (Object rowId : rows == null ? new List<Object>() : (List<Object>) rows) {
+				ownerByLink.put((Id) String.valueOf(rowId), journal);
+			}
+		}
+		if (ownerByLink.isEmpty()) {
+			return;
+		}
+		String key = String.valueOf(ContentDocumentLink.SObjectType);
+		try {
+			Set<Id> linkIds = ownerByLink.keySet();
+			List<ContentDocumentLink> removing = [
+				SELECT Id
+				FROM ContentDocumentLink
+				WHERE Id IN :linkIds
+				WITH USER_MODE
+			];
+			List<Database.DeleteResult> results = Database.delete(
+				removing,
+				false,
+				AccessLevel.USER_MODE
+			);
+			for (Integer i = 0; i < results.size(); i++) {
+				if (!results[i].isSuccess()) {
+					addOnce(
+						notesById,
+						ownerByLink.get(removing[i].Id),
+						BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
+						key
+					);
+				}
+			}
+		} catch (Exception unreadable) {
+			for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByLink.values())) {
 				addOnce(
 					notesById,
 					owner,

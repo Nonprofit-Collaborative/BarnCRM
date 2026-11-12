@@ -118,6 +118,8 @@ describe('c-data-manager', () => {
     expect(icons).toEqual(
       expect.objectContaining({
         import: 'custom:custom18',
+        files: 'standard:file',
+        backup: 'standard:archive',
         find: 'custom:custom39',
         optimizer: 'custom:custom94',
         duplicates: 'custom:custom90'

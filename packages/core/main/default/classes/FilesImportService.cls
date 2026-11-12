@@ -213,7 +213,7 @@ public with sharing class FilesImportService {
 			if (reason == null) {
 				groupBytes += data.size();
 				if (groupBytes > MAX_GROUP_BYTES) {
-					reason = BarnHelp.text('Core', 'Core_FilesImport_ErrorFileTooLarge');
+					reason = BarnHelp.text('Core', 'Core_FilesImport_ErrorGroupFull');
 				}
 			}
 			if (reason != null) {

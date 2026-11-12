@@ -21,7 +21,6 @@ jest.mock(
 function render() {
   const element = createElement('c-account-list-redirect', { is: AccountListRedirect });
   element.filterName = 'Households';
-  element.linkLabel = 'Open Households';
   document.body.appendChild(element);
   return element;
 }
@@ -50,7 +49,7 @@ describe('c-account-list-redirect', () => {
   it('shows a fallback link that navigates without replacing', () => {
     const element = render();
     const link = element.shadowRoot.querySelector('[data-id="open"]');
-    expect(link.textContent).toBe('Open Households');
+    expect(link.textContent).toBe('c.Core_AccountListRedirect_OpenHouseholds');
     link.click();
     expect(mockNavigate).toHaveBeenCalledTimes(2);
     expect(mockNavigate.mock.calls[1][1]).toBe(false);

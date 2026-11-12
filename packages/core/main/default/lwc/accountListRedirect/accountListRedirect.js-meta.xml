@@ -13,7 +13,7 @@
   <targetConfigs>
     <targetConfig targets="lightning__AppPage">
       <property name="filterName" type="String" label="List View" description="API name of the Account list view to open." />
-      <property name="linkLabel" type="String" label="Link Text" description="Text of the fallback link." />
+      <property name="linkLabel" type="String" label="Link Text" description="Text of the fallback link. Leave blank to use BarnCRM's own." />
     </targetConfig>
   </targetConfigs>
 </LightningComponentBundle>

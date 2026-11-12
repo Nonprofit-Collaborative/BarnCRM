@@ -11,10 +11,6 @@
           <name>filterName</name>
           <value>Households</value>
         </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>linkLabel</name>
-          <value>Open Households</value>
-        </componentInstanceProperties>
         <componentName>accountListRedirect</componentName>
         <identifier>accountListRedirectHouseholds</identifier>
       </componentInstance>

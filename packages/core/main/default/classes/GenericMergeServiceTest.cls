@@ -203,6 +203,133 @@ private class GenericMergeServiceTest {
 		}
 	}
 
+	private static Id fileOn(Id recordId, String title) {
+		ContentVersion version = new ContentVersion(
+			Title = title,
+			PathOnClient = title + '.txt',
+			VersionData = Blob.valueOf(title)
+		);
+		insert version;
+		Id documentId = [
+			SELECT ContentDocumentId
+			FROM ContentVersion
+			WHERE Id = :version.Id
+			WITH SYSTEM_MODE
+		]
+		.ContentDocumentId;
+		insert new ContentDocumentLink(
+			LinkedEntityId = recordId,
+			ContentDocumentId = documentId,
+			ShareType = 'V'
+		);
+		return documentId;
+	}
+
+	private static Set<Id> filesOn(Id recordId) {
+		Set<Id> documents = new Set<Id>();
+		for (ContentDocumentLink row : [
+			SELECT ContentDocumentId
+			FROM ContentDocumentLink
+			WHERE LinkedEntityId = :recordId
+			WITH SYSTEM_MODE
+		]) {
+			documents.add(row.ContentDocumentId);
+		}
+		return documents;
+	}
+
+	@IsTest
+	static void mergeLinksTheOtherRecordsFilesAndUndoRemovesThem() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true);
+			Import_Template__c keep = mapping('Gifts 2025', null);
+			Import_Template__c other = mapping('Gifts 2025 copy', null);
+			Id onlyOther = fileOn(other.Id, 'Only other');
+			Id shared = fileOn(other.Id, 'Shared');
+			insert new ContentDocumentLink(
+				LinkedEntityId = keep.Id,
+				ContentDocumentId = shared,
+				ShareType = 'V'
+			);
+			Test.startTest();
+			GenericMergeService.Outcome outcome = GenericMergeService.mergeRecords(
+				MAPPING,
+				keep.Id,
+				other.Id,
+				new List<String>()
+			);
+			Assert.areEqual(1, outcome.moved, 'One file linked; the shared one was already there');
+			Assert.isTrue(filesOn(keep.Id).contains(onlyOther), 'The kept record has the file');
+			Assert.isTrue(filesOn(keep.Id).contains(shared), 'The shared file is still there');
+			Merge_Journal__c journal = [
+				SELECT Id, Survivor_Id__c, Merged_Id__c, Merged_Name__c, Moved_Records__c, Notes__c
+				FROM Merge_Journal__c
+				WHERE Merged_Id__c = :other.Id
+				WITH SYSTEM_MODE
+			];
+			Assert.isTrue(
+				journal.Moved_Records__c.contains(AutoMergeService.ADDED_FILES),
+				'The journal keeps the new file links'
+			);
+			AutoMergeService.undo(new List<Merge_Journal__c>{ journal });
+			Test.stopTest();
+
+			Set<Id> after = filesOn(keep.Id);
+			Assert.isFalse(after.contains(onlyOther), 'Undo takes the added link away');
+			Assert.isTrue(after.contains(shared), 'A link the merge did not add stays');
+			Assert.areEqual(
+				AutoMergeService.UNDONE,
+				[SELECT Status__c FROM Merge_Journal__c WHERE Id = :journal.Id WITH SYSTEM_MODE]
+				.Status__c,
+				'Undone in full'
+			);
+		}
+	}
+
+	@IsTest
+	static void relatedRecordsOfSeveralObjectsMoveOnePerObject() {
+		System.runAs(TestUsers.admin()) {
+			Import_Template__c template = mapping('Gifts 2025', null);
+			Import_Batch__c earlier = ImportTestDataFactory.batch(template);
+			Import_Batch__c to = ImportTestDataFactory.batch(template);
+			Account org = new Account(Name = 'Moves', Created_By_Import_Batch__c = earlier.Id);
+			insert org;
+			Contact person = new Contact(
+				LastName = 'Moves',
+				Created_By_Import_Batch__c = earlier.Id
+			);
+			insert person;
+			Test.startTest();
+			Integer count = GenericMergeService.moveRelated(
+				new Map<String, List<Id>>{
+					'Account.Created_By_Import_Batch__c' => new List<Id>{ org.Id },
+					'Contact.Created_By_Import_Batch__c' => new List<Id>{ person.Id, to.Id }
+				},
+				to.Id
+			);
+			Test.stopTest();
+
+			Assert.areEqual(2, count, 'The kept record linked to the other is left');
+			Assert.areEqual(
+				to.Id,
+				[SELECT Created_By_Import_Batch__c FROM Account WHERE Id = :org.Id WITH SYSTEM_MODE]
+				.Created_By_Import_Batch__c,
+				'The account moved'
+			);
+			Assert.areEqual(
+				to.Id,
+				[
+					SELECT Created_By_Import_Batch__c
+					FROM Contact
+					WHERE Id = :person.Id
+					WITH SYSTEM_MODE
+				]
+				.Created_By_Import_Batch__c,
+				'The contact moved'
+			);
+		}
+	}
+
 	@IsTest
 	static void refusesAFieldOutsideTheChoice() {
 		System.runAs(TestUsers.admin()) {

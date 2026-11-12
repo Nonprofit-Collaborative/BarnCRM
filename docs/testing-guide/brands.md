@@ -83,7 +83,7 @@ organization legal name filled in.
 | 1 | Turn on **Share records by brand** and save. Wait a minute. | In Setup, Public Groups, a group `BarnCRM Brand ...` exists per active brand with the staff user as a member. |
 | 2 | As the staff user, open the household assigned to `North Chapter`. | It opens and can be edited. A household with no brand that the staff user does not own is not visible. |
 | 3 | As admin, delete that household's `North Chapter` assignment. Wait a minute; as the staff user, refresh. | The household is no longer visible. |
-| 4 | Set Account default sharing back to Public Read/Write and run **Health Check**. | A warning: "Brand visibility is on, but Accounts are not Private". |
+| 4 | Set Account default sharing back to Public Read/Write and run **Health Check**. | A warning: "Brand Visibility Is On, but Accounts Are Not Private". |
 | 5 | Turn **Share records by brand** off. Wait a minute. | The BarnCRM brand groups are gone, and with them the shares. |
 
 **Cleanup:** restore your org's Account sharing default and turn **Use brands** off.

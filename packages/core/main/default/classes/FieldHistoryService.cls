@@ -132,8 +132,9 @@ public with sharing class FieldHistoryService {
 		if (fieldsByObject == null) {
 			fieldsByObject = new Map<String, List<String>>();
 			for (History_Field__mdt row : rows()) {
+				// By type only: who saves a record must not decide what is kept.
 				Schema.DescribeFieldResult field = row.Active__c == true
-					? keepable(row.Field_Name__c)
+					? keepable(row.Field_Name__c, false)
 					: null;
 				if (field != null) {
 					String key = row.Field_Name__c.substringBefore('.').trim().toLowerCase();
@@ -176,6 +177,11 @@ public with sharing class FieldHistoryService {
 	 * formula, roll-up summary, auto number, long text area or rich text) of an offered object.
 	 */
 	public static Schema.DescribeFieldResult keepable(String name) {
+		return keepable(name, true);
+	}
+
+	/** `checkAccess` false leaves out the running user's create or edit access to the field. */
+	private static Schema.DescribeFieldResult keepable(String name, Boolean checkAccess) {
 		if (String.isBlank(name) || !name.contains('.')) {
 			return null;
 		}
@@ -194,7 +200,9 @@ public with sharing class FieldHistoryService {
 			!field.isCalculated() &&
 			!field.isAutoNumber() &&
 			!longText &&
-			(field.isUpdateable() || field.isCreateable())
+			(!checkAccess ||
+			field.isUpdateable() ||
+			field.isCreateable())
 			? field
 			: null;
 	}

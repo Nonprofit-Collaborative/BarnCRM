@@ -115,7 +115,7 @@ public with sharing class BrandShareJob implements Queueable {
 				scope.remove(null);
 			}
 			syncShares(scope, groupsByBrand());
-			if (full && last != null && scope.size() > 0) {
+			if (full && last != null) {
 				System.enqueueJob(new BrandShareJob(true, true, null, last));
 			}
 		} catch (Exception failure) {
