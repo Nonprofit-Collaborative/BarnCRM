@@ -792,6 +792,118 @@ Records, the settings saved in BarnCRM Settings, and components the organization
 are kept. The Admin Guide (Installing BarnCRM, Upgrading) tells administrators to clone a
 shipped component rather than edit it.
 
+### Package install and upgrade test
+
+`scripts/org/package-upgrade-test.sh` installs real package versions into new scratch orgs,
+one per org shape (plan Section 4.2), and upgrades them: the test the source deploys above
+cannot be. It is written now and run later: package versions wait for the namespace, Dev Hub
+and steward entity (D-87), and D-173 places the first run after the v1.0 test cycle and
+before the first production pilot, as a sandbox-only managed beta. Until the namespace is in
+`sfdx-project.json` it exits 2 unless `--plan` is given.
+
+**What one run does.** It reads the namespace, the packages and their dependency order from
+`sfdx-project.json` (nothing is hard-coded), then:
+
+1. Builds version N-1 from `--from` and version N from `--to`, each in a temporary detached
+   worktree, with `sf package version create --code-coverage --installation-key-bypass
+   --wait`, in dependency order. A file of existing `04t` ids (one `<package key> <04t>` per
+   line, `#` comments allowed) skips the build for that side.
+2. For each shape (`--shapes platform,sales,npsp,npc`, default all four, mapped to
+   `config/scratch-defs/platform-only.json`, `sales-cloud.json`, `npsp.json` and
+   `nonprofit-cloud.json`): creates a scratch org with `--no-namespace` (a subscriber org),
+   installs NPSP for the `npsp` shape with `scripts/org/install-npsp.sh`, and installs N-1 in
+   dependency order (`sf package install --wait --publish-wait --security-type AdminsOnly
+   --no-prompt`).
+3. Checks N-1 as the installing admin: the installed versions (`sf package installed list`),
+   Health Check with no error finding (`health-check.apex`), and no Error Log row since the org
+   was created.
+4. Loads the sample data (`scripts/org/seed-sample-data.sh <alias> --namespace <ns>`) and
+   records the counts of the records it writes (households and contacts, members,
+   relationships, affiliations, gifts, allocations, funds, volunteer hours and jobs).
+5. Upgrades every package to N in dependency order and checks again: versions are N, Health
+   Check, Error Log, the counts unchanged, and the smoke assertions in
+   `scripts/org/package-upgrade-test/smoke-<package>.apex` (a new person gets a named
+   household; a gift moves Total Giving; approved volunteer hours post to the total), each run
+   as the admin and rolled back with a savepoint.
+6. With `--uninstall-check[=<key>]` (default `volunteers`; a module nothing chosen depends
+   on): uninstalls it, checks it is gone, that none of its classes, objects or Core automation
+   switches remain (`uninstall-check.apex`, plan Principle 3), and that Health Check and the
+   Core smoke assertion still pass.
+7. Deletes each org unless `--keep-orgs`, and writes the report.
+
+After a failed step the rest of that shape is skipped and the next shape runs; the org is
+still deleted.
+
+**Managed or unlocked.** `--type` says how the packages are registered in the Dev Hub
+(`sf package create` fixes that; the run checks it with `sf package list`). Default `managed`
+(D-173).
+
+| | N-1 from a git ref | N-1 from a `04t` file | Post-install |
+|---|---|---|---|
+| `managed` | Refused: a managed beta cannot be upgraded (or installed in production). `--promote-from` promotes each N-1 version after it is built: **promotion is permanent and needs the owner's approval**, and N must then carry a higher major.minor.patch | The ids must be released (promoted) versions | Runs on its own: each package's `postInstallScript` |
+| `unlocked` | Unpromoted versions install in scratch orgs | Any versions | A post-install script runs for managed packages only, so after every install and upgrade the script calls each package's `new <ns>.<Module>PostInstall().runSetup(UserInfo.getUserId())` as the admin itself (`setup-n1` and `setup-n` steps) |
+
+`--plan` prints which path applies on its "N-1 path" line.
+
+**Before it can run** (each is a MISSING line in the readiness list, which `--plan` prints and
+a real run requires to be clean before it creates anything):
+
+- The namespace registered and set in `sfdx-project.json` (D-87), at `--from` and `--to` too:
+  build only from commits after it is set.
+- A Dev Hub linked to that namespace, named with `--devhub` (the CLI default is never used),
+  and every package created in it (`sf package create`, by the owner) with its `0Ho` id in
+  `packageAliases`.
+- Each dependency with a `versionNumber` (for example `"0.1.0.LATEST"`); for a managed
+  upgrade, `ancestorVersion` (`"HIGHEST"`) or `ancestorId` on every package; for managed, each
+  package's InstallHandler class (`<Module>PostInstall`) named as its `postInstallScript`
+  (ADR-0029 left this to whoever creates the first version).
+- The Apex the checks call from anonymous Apex must be `global`: a subscriber org's
+  anonymous Apex cannot see a package's `public` classes. Today `HealthCheckService`,
+  `SampleDataLoader` and (for unlocked) every `<Module>PostInstall` are `public`. The
+  readiness list names each one; adding a `global` entry point is an owner decision, because a
+  global signature can never change in a managed package.
+- **Owner approval for the scratch orgs.** The project's test orgs are fixed; any other org is
+  approved first. A real run creates one org per shape and refuses without
+  `--yes-create-orgs`, the record of that approval. It prints the count first.
+- **Limits.** One scratch org per shape counts against the Dev Hub's active and daily scratch
+  org limits, and building from refs creates two versions per package (40 for all 20
+  packages) against the daily package version limit. Check with `sf limits api display
+  --target-org <devhub>` (`ActiveScratchOrgs`, `DailyScratchOrgs`, `Package2VersionCreates`),
+  and narrow with `--packages` or `--shapes`. Builds with `--code-coverage` run every test and
+  take long.
+- The `npsp` shape needs verified NPSP ids in `scripts/org/install-npsp.sh`; the `npc` shape
+  needs a Dev Hub entitled to Nonprofit Cloud (see [Scratch orgs](scratch-orgs.md)).
+
+**Commands.**
+
+```
+# See what a run would do (no org, no Dev Hub, no files):
+scripts/org/package-upgrade-test.sh --plan --from v0.18 --to main --shapes platform,npc
+
+# Managed, N-1 already released, N built from main, all four shapes:
+scripts/org/package-upgrade-test.sh --devhub <devhub> --from released-n1.txt --to main \
+  --yes-create-orgs --uninstall-check
+
+# Unlocked, a few packages, one shape, keep the org for the manual checks (T-INST-05):
+scripts/org/package-upgrade-test.sh --devhub <devhub> --type unlocked --from <ref> --to main \
+  --packages giving,volunteers --shapes platform --keep-orgs --yes-create-orgs
+```
+
+`--packages` takes package keys (folder names under `packages/`) and adds what they need.
+
+**Reading the report.** `--report <dir>` (default `test-results/package-upgrade/<run id>`,
+ignored by git) gets `summary.md` and `summary.json`: one section per shape (plus `build`),
+each step with PASS, FAIL or SKIP, its seconds and a detail (the `04t` id built, the
+username created, the counts, or the first part of the error). `logs/<shape>-<step>.log` holds
+the sf JSON of each step. Read the first FAIL in a shape: everything after it says SKIP.
+Exit status 0 means every step passed, 1 means a step failed, 2 means it refused to start.
+The script never prints an auth URL or token and never reads `sf org display --verbose`: from
+`sf org create scratch --json` it keeps only the username.
+
+**Checks by hand.** Install links, Module Manager's guided installs and the pages after an
+upgrade are in the Testing Guide, [Installing](../testing-guide/installing.md), T-INST-05. The
+plan mode itself is T-INST-04 and `scripts/ci/tests/test_package_upgrade_test.py`.
+
 ### Tests survive an org's own customizations
 
 BarnCRM installs as source with no namespace, so its tests are the org's local tests: they run

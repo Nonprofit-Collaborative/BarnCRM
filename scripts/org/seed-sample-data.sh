@@ -16,18 +16,33 @@
 #
 # Safe to call before scripts/org/load-sample-data.apex exists; it just prints a note
 # and exits successfully so callers (create-scratch-org.sh) do not fail.
+#
+# --namespace <ns> is for an org where BarnCRM is installed as a namespaced package
+# (scripts/org/package-upgrade-test.sh): the loader is called as <ns>.SampleDataLoader and
+# the fields polled carry the <ns>__ prefix. Without it, the source-deployed (no namespace)
+# names are used, as before.
 
 set -euo pipefail
 
 ALIAS="${1:-}"
+NAMESPACE=""
+if [[ "${2:-}" == "--namespace" ]]; then
+  NAMESPACE="${3:-}"
+fi
+P="${NAMESPACE:+${NAMESPACE}__}"
 
-if [[ -z "$ALIAS" ]]; then
-  echo "Usage: seed-sample-data.sh <org-alias>" >&2
+if [[ -z "$ALIAS" || ( "${2:-}" == "--namespace" && -z "$NAMESPACE" ) ]]; then
+  echo "Usage: seed-sample-data.sh <org-alias> [--namespace <ns>]" >&2
   exit 1
 fi
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 APEX_FILE="$REPO_ROOT/scripts/org/load-sample-data.apex"
+if [[ -n "$NAMESPACE" && -f "$APEX_FILE" ]]; then
+  APEX_FILE="$(mktemp -t barn-seed-XXXXXX)"
+  trap 'rm -f "$APEX_FILE"' EXIT
+  printf '%s.SampleDataLoader.load();\n' "$NAMESPACE" >"$APEX_FILE"
+fi
 SAMPLE_JSON="$REPO_ROOT/packages/core/main/default/staticresources/SampleData.json"
 POLL_INTERVAL_SECONDS=5
 # The chain is longer than it was: five contact chunks, the connection stage, and then the
@@ -76,14 +91,14 @@ RUNNING_JOB_QUERY="SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'Samp
 
 ELAPSED=0
 while [[ "$ELAPSED" -lt "$MAX_WAIT_SECONDS" ]]; do
-  CONTACTS="$(count_query "SELECT COUNT() FROM Contact WHERE Sample_Data__c = true")"
+  CONTACTS="$(count_query "SELECT COUNT() FROM Contact WHERE ${P}Sample_Data__c = true")"
   RUNNING_JOBS="$(count_query "$RUNNING_JOB_QUERY")"
 
   echo "  ${CONTACTS} / ${EXPECTED_CONTACTS} contacts loaded, ${RUNNING_JOBS} load job(s) still running (${ELAPSED}s elapsed)"
 
   if [[ "$CONTACTS" -ge "$EXPECTED_CONTACTS" && "$RUNNING_JOBS" -eq 0 ]]; then
-    HOUSEHOLDS="$(count_query "SELECT COUNT() FROM Account WHERE Sample_Data__c = true AND RecordType.DeveloperName = 'Household'")"
-    ORGANIZATIONS="$(count_query "SELECT COUNT() FROM Account WHERE Sample_Data__c = true AND Is_Organization__c = true")"
+    HOUSEHOLDS="$(count_query "SELECT COUNT() FROM Account WHERE ${P}Sample_Data__c = true AND RecordType.DeveloperName = 'Household'")"
+    ORGANIZATIONS="$(count_query "SELECT COUNT() FROM Account WHERE ${P}Sample_Data__c = true AND ${P}Is_Organization__c = true")"
     echo "Sample data load complete: ${HOUSEHOLDS} households, ${CONTACTS} contacts, ${ORGANIZATIONS} organizations."
     exit 0
   fi
