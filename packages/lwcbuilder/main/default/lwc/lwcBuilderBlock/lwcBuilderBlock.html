@@ -43,22 +43,64 @@
 
   <template lwc:if={isChart}>
     <template lwc:if={chart}>
-      <p class="slds-text-color_weak slds-var-m-bottom_x-small" data-id="chart-title">
-        {chart.title}: {chart.measure}
-      </p>
-      <ul data-id="chart">
-        <template for:each={chart.bars} for:item="bar">
-          <li key={bar.key} class="slds-var-m-bottom_xx-small">
-            <div class="slds-grid slds-grid_align-spread">
-              <span>{bar.label}</span>
-              <span>{bar.value}</span>
+      <div class="slds-grid slds-grid_align-spread slds-var-m-bottom_x-small">
+        <p class="slds-text-color_weak" data-id="chart-title">{chart.caption}</p>
+        <lightning-button variant="base" label={tableToggleLabel} onclick={toggleTable} data-id="chart-toggle"></lightning-button>
+      </div>
+      <template lwc:if={showChart}>
+        <div aria-hidden="true" data-id="chart">
+          <template lwc:if={chart.legend.length}>
+            <ul class="slds-list_horizontal slds-wrap slds-var-m-bottom_x-small" data-id="legend">
+              <template for:each={chart.legend} for:item="entry">
+                <li key={entry.key} class="slds-var-m-right_small"><span class={entry.swatch}></span>{entry.label}</li>
+              </template>
+            </ul>
+          </template>
+          <template for:each={chart.groups} for:item="group">
+            <div key={group.key} class="slds-var-m-bottom_small">
+              <p class="slds-text-title_bold">{group.label}</p>
+              <template for:each={group.measures} for:item="measure">
+                <div key={measure.key}>
+                  <template lwc:if={chart.showMeasureNames}>
+                    <p class="slds-text-body_small slds-text-color_weak">{measure.label}</p>
+                  </template>
+                  <template for:each={measure.tracks} for:item="track">
+                    <div key={track.key} class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_xx-small">
+                      <span class="lane slds-truncate slds-size_1-of-4">{track.label}</span>
+                      <span class="track slds-col">
+                        <template for:each={track.segments} for:item="segment">
+                          <span key={segment.key} class={segment.css} style={segment.style}></span>
+                        </template>
+                      </span>
+                      <span class="slds-var-p-left_x-small">{track.value}</span>
+                    </div>
+                  </template>
+                </div>
+              </template>
             </div>
-            <div class="slds-progress-bar slds-progress-bar_large" aria-hidden="true">
-              <span class="slds-progress-bar__value" style={bar.style}></span>
-            </div>
-          </li>
-        </template>
-      </ul>
+          </template>
+        </div>
+      </template>
+      <table class={tableCss} data-id="chart-table">
+        <thead>
+          <tr>
+            <th scope="col"><span class="slds-assistive-text">{chart.title}</span></th>
+            <template for:each={chart.table.headers} for:item="header">
+              <th key={header.key} scope="col">{header.label}</th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={chart.table.rows} for:item="row">
+            <tr key={row.key}>
+              <th scope="row">{row.label}</th>
+              <template for:each={row.cells} for:item="cell">
+                <td key={cell.key}>{cell.value}</td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
     </template>
   </template>
 

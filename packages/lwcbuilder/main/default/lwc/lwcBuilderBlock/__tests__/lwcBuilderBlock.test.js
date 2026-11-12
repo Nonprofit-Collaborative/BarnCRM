@@ -104,21 +104,47 @@ describe('c-lwc-builder-block', () => {
     expect(find(element, 'no-rows')).toBeNull();
   });
 
-  it('draws report bars relative to the largest value', async () => {
+  it('draws report bars relative to the largest value, with a table behind them', async () => {
     loadChart.mockResolvedValue({
       title: 'Gifts by Fund',
-      measure: 'Sum of Amount',
-      bars: [
-        { label: 'General', value: 200 },
-        { label: 'Building', value: 50 }
+      measures: ['Sum of Amount'],
+      series: [],
+      groups: [
+        { label: 'General', cells: [[{ value: 200, label: '$200' }]] },
+        { label: 'Building', cells: [[{ value: 50, label: '$50' }]] }
       ]
     });
     const element = mount({ id: 'b3', type: 'chart', report: 'Gifts_By_Fund' });
     await flush();
     expect(loadChart).toHaveBeenCalledWith({ reportName: 'Gifts_By_Fund' });
-    const bars = element.shadowRoot.querySelectorAll('.slds-progress-bar__value');
+    expect(find(element, 'chart-title').textContent).toBe('Gifts by Fund: Sum of Amount');
+    const bars = element.shadowRoot.querySelectorAll('.segment');
     expect(bars[0].getAttribute('style')).toContain('100%');
     expect(bars[1].getAttribute('style')).toContain('25%');
+    expect(find(element, 'chart').getAttribute('aria-hidden')).toBe('true');
+    const table = find(element, 'chart-table');
+    expect(table.className).toBe('slds-assistive-text');
+    expect(table.querySelectorAll('td')[0].textContent).toBe('$200');
+
+    find(element, 'chart-toggle').click();
+    await flush();
+    expect(find(element, 'chart')).toBeNull();
+    expect(find(element, 'chart-table').className).toContain('slds-table');
+  });
+
+  it('stacks a second grouping when the block asks for it', async () => {
+    loadChart.mockResolvedValue({
+      title: 'Asks',
+      measures: ['Sum of Amount'],
+      series: ['2025', '2026'],
+      groups: [{ label: 'Won', cells: [[{ value: 30 }], [{ value: 10 }]] }]
+    });
+    const element = mount({ id: 'b6', type: 'chart', report: 'Asks', display: 'stacked' });
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="legend"] li')).toHaveLength(2);
+    const segments = element.shadowRoot.querySelectorAll('.segment');
+    expect(segments).toHaveLength(2);
+    expect(segments[0].getAttribute('style')).toContain('75%');
   });
 
   it('shows only safe images', () => {

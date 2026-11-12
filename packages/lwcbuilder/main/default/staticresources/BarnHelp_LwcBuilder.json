@@ -12,6 +12,8 @@
     "LwcBuilder_Error_FilterValue": "{0} is not a value {1} can hold. Use a number, a date written 2026-12-31, or true or false.",
     "LwcBuilder_Chart_NoReport": "There is no report with the API name {0} that you can open. Use the report''s Report Unique Name.",
     "LwcBuilder_Chart_NotChartable": "{0} cannot be charted. Use a summary or matrix report with at least one grouping and one summary.",
+    "LwcBuilder_Chart_ShowTable": "Show Table",
+    "LwcBuilder_Chart_ShowChart": "Show Chart",
     "LwcBuilder_Block_NoRows": "No records to show.",
     "LwcBuilder_Block_NeedsRecord": "This block shows a record's fields, so it appears on record pages. In the preview, enter a record Id.",
     "LwcBuilder_Preview_Empty": "Nothing to show yet. Add a section and drag blocks into it.",
@@ -73,7 +75,9 @@
     "LwcBuilder_Prop_OrderBy": "Sort by",
     "LwcBuilder_Prop_Descending": "Newest or largest first",
     "LwcBuilder_Prop_Report": "Report API name",
-    "LwcBuilder_Prop_ReportHelp": "The chart draws the report's first grouping and first summary only, as bars. Other groupings and summaries are not shown. A chart block exports as a placeholder.",
+    "LwcBuilder_Prop_ReportHelp": "The report's Report Unique Name. A summary report's first two groupings, or a matrix report's row and column groupings, are drawn as bars, with up to three of its summaries (for example Sum of Amount and Record Count).",
+    "LwcBuilder_Prop_Stacked": "Stack the second grouping",
+    "LwcBuilder_Prop_StackedHelp": "With two groupings, show each group's values as one bar split by the second grouping, instead of a bar for each.",
     "LwcBuilder_Prop_Body": "Text",
     "LwcBuilder_Prop_Url": "Image address",
     "LwcBuilder_Prop_UrlHelp": "A Salesforce address such as /resource/YourLogo, or an https address listed in Setup, Trusted URLs.",
@@ -112,7 +116,7 @@
     "LwcBuilder_Problem_RuleField": "the visibility rule needs a field API name and a condition.",
     "LwcBuilder_Problem_RulePermission": "the visibility rule needs a custom permission API name.",
     "LwcBuilder_Problem_Other": "this block cannot be shown. Remove it.",
-    "LwcBuilder_Export_Intro": "The component as an LWC bundle for a developer to finish, deploy and maintain. List and chart blocks are placeholders with a comment saying what to connect; a chart shows only its report's first grouping and first summary here. Nothing is deployed for you.",
+    "LwcBuilder_Export_Intro": "The component as an LWC bundle for a developer to finish, deploy and maintain. List and chart blocks are placeholders with a comment saying what to connect. Nothing is deployed for you.",
     "LwcBuilder_Export_Download": "Download",
     "LwcBuilder_Export_Close": "Close"
   }

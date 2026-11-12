@@ -59,7 +59,8 @@ Metadata from Non-Certified Package Versions via Apex" org setting.
      not equal, a value), a sort and a row limit;
    - **Report Chart**: the first grouping and first summary of a standard summary or matrix
      report, by its API name, run through the Reports API as the user and drawn as plain bars
-     (no CRM Analytics, no chart library);
+     (no CRM Analytics, no chart library); two groupings and three summaries since the
+     2026-11-12 amendment (D-196);
    - **Text**: rich text shown through `lightning-formatted-rich-text`, which strips scripts;
    - **Image**: a Salesforce-relative address (a static resource or a file) or an `https`
      address the org's CSP Trusted Sites allow, with alternative text.
@@ -119,3 +120,28 @@ Metadata from Non-Certified Package Versions via Apex" org setting.
 - A renamed or deleted field leaves the block showing an error message, not a broken page.
 - A quick action that a page layout does not offer, or a flow the user may not run, fails with
   the platform's own message.
+
+## Amendment, 2026-11-12 (D-196, LB-07, release 1.20): charts with two groupings and three totals
+
+Decision 5's Report Chart block no longer stops at the first grouping and first summary.
+
+- **Still a standard report, run once as the user.** The source stays a summary or matrix
+  report by its API name (plan LB-03: charts from standard reports only), so the admin builds
+  the groupings, filters and totals in the report builder they know. One
+  `Reports.ReportManager.runReport` per block, as before; no aggregate SOQL of the builder's
+  own, which would need a second way to define groupings, date buckets such as Fiscal Year and
+  filters.
+- **Up to two groupings.** A summary report's first two row groupings, or a matrix report's
+  first row and first column grouping. The second grouping becomes series (at most 12, in the
+  order they first appear); groups stop at 200.
+- **Up to three totals.** The report's first three summaries (for example Sum of Amount and
+  Record Count), each drawn on its own scale.
+- **Grouped or stacked.** A chart block gains an optional `display` property, `grouped` (the
+  default: one bar per series) or `stacked` (one bar per measure split by series). It is
+  additive, so the definition stays schema version 1: a saved block without it reads as
+  grouped.
+- **Framework-free layout.** Apex returns plain `{title, measures, series, groups: [{label,
+  cells}]}`; `lwcBuilderModel.chartView` computes bar widths, legend and a data table, so the
+  same logic serves WordPress (plan 9.9). Bars use SLDS 2 styling hooks with fallbacks. The
+  drawn chart is hidden from screen readers and a data table carries the same values, visible
+  through Show Table.

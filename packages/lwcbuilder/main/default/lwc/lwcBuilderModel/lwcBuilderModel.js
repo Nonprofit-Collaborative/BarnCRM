@@ -1,5 +1,5 @@
 /**
- * The LWC Builder's definition document (LB-01 to LB-06; ADR-0203 `0203-lwc-builder-module.md`,
+ * The LWC Builder's definition document (LB-01 to LB-07; ADR-0203 `0203-lwc-builder-module.md`,
  * decision 3; canonical model R-LB1), with no Salesforce dependency so the same logic can serve
  * another platform (plan 9.9).
  *
@@ -9,6 +9,7 @@
 
 export const SCHEMA_VERSION = 1;
 export const MAX_FIELDS = 6;
+export const MAX_MEASURES = 3;
 export const BLOCK_TYPES = [
   'fields',
   'relatedList',
@@ -188,7 +189,7 @@ export function newBlock(id, type) {
         direction: 'asc'
       };
     case 'chart':
-      return { ...block, report: '' };
+      return { ...block, report: '', display: 'grouped' };
     case 'text':
       return { ...block, body: '' };
     case 'image':
@@ -435,6 +436,97 @@ export function validate(definition) {
     }
   });
   return problems;
+}
+
+const TONES = 5;
+const percent = (value, max) => `width: ${max > 0 ? Math.round((value / max) * 100) : 0}%`;
+
+/**
+ * What a Report Chart block draws (LB-03, LB-07; D-196), from what LwcBuilderController.loadChart
+ * returns: `{title, measures: [label], series: [label], groups: [{label, cells: [[{value,
+ * label}]]}]}`, where `cells` holds one list per series (one list when the report has a single
+ * grouping) of one value per measure. Up to three measures, each scaled to its own largest
+ * value. `display` 'stacked' draws a group's series as one bar per measure; 'grouped' (the
+ * default, and the only way with one grouping) one bar per series. `table` is the same data as
+ * rows and columns, for screen readers and the Show Table view.
+ */
+export function chartView(result, display) {
+  const data = result || {};
+  const measures = (Array.isArray(data.measures) ? data.measures : []).slice(0, MAX_MEASURES);
+  const series = Array.isArray(data.series) ? data.series : [];
+  const groups = Array.isArray(data.groups) ? data.groups : [];
+  const lanes = series.length ? series : [''];
+  const stacked = display === 'stacked' && series.length > 0;
+  const cellOf = (group, lane, measure) => ((group.cells || [])[lane] || [])[measure];
+  const size = (cell) => Math.abs(Number(cell && cell.value) || 0);
+  const shown = (cell) => {
+    if (!cell || cell.value === null || cell.value === undefined) return '';
+    return cell.label === null || cell.label === undefined ? String(cell.value) : cell.label;
+  };
+  const total = (group, m) =>
+    lanes.reduce((sum, name, lane) => sum + size(cellOf(group, lane, m)), 0);
+  const largest = (group, m) => {
+    if (stacked) return total(group, m);
+    return Math.max(...lanes.map((name, lane) => size(cellOf(group, lane, m))));
+  };
+  const max = measures.map((label, m) => Math.max(0, ...groups.map((group) => largest(group, m))));
+  const tone = (lane) => (series.length ? `segment tone${lane % TONES}` : 'segment');
+  const segment = (key, group, lane, m) => ({
+    key,
+    css: tone(lane),
+    style: percent(size(cellOf(group, lane, m)), max[m])
+  });
+  return {
+    title: data.title || '',
+    caption: measures.length === 1 ? `${data.title || ''}: ${measures[0]}` : data.title || '',
+    showMeasureNames: measures.length > 1,
+    legend: series.map((label, lane) => ({
+      key: `s${lane}`,
+      label,
+      swatch: `swatch tone${lane % TONES}`
+    })),
+    groups: groups.map((group, g) => ({
+      key: `g${g}`,
+      label: group.label,
+      measures: measures.map((label, m) => ({
+        key: `g${g}m${m}`,
+        label,
+        tracks: stacked
+          ? [
+              {
+                key: `g${g}m${m}t`,
+                label: '',
+                value: total(group, m).toLocaleString(),
+                segments: series.map((name, lane) => segment(`g${g}m${m}s${lane}`, group, lane, m))
+              }
+            ]
+          : lanes.map((name, lane) => ({
+              key: `g${g}m${m}l${lane}`,
+              label: name,
+              value: shown(cellOf(group, lane, m)),
+              segments: [segment(`g${g}m${m}l${lane}s`, group, lane, m)]
+            }))
+      }))
+    })),
+    table: {
+      headers: lanes.flatMap((name, lane) =>
+        measures.map((label, m) => ({
+          key: `h${lane}m${m}`,
+          label: [name, label].filter(Boolean).join(': ')
+        }))
+      ),
+      rows: groups.map((group, g) => ({
+        key: `r${g}`,
+        label: group.label,
+        cells: lanes.flatMap((name, lane) =>
+          measures.map((label, m) => ({
+            key: `r${g}l${lane}m${m}`,
+            value: shown(cellOf(group, lane, m))
+          }))
+        )
+      }))
+    }
+  };
 }
 
 /** A component key from its name: Donor Snapshot becomes Donor_Snapshot. */

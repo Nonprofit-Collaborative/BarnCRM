@@ -70,6 +70,10 @@ a field).
 | 3 | Change the Record List field to `Not_A_Field__c`. | The block says the field is not on the object; the rest of the component still shows. |
 | 4 | Add a Report Chart block with the summary report's API name. | One bar per grouping with its value. |
 | 5 | Enter a tabular report's API name. | The block says the report cannot be charted. |
+| 6 | Point the chart at a summary report grouped by two fields (for example Stage, then Fiscal Year) with two summaries (for example Sum of Amount and Record Count). | Each group shows each total by name, with one bar per value of the second grouping and a legend; each total has its own scale. |
+| 7 | Tick **Stack the second grouping**. | Each total is one bar per group, split into colored parts that match the legend; the total shows at its end. |
+| 8 | Press **Show Table**, then **Show Chart**. | A table with a row per group and a column per second-grouping value and total, with the report's formatted values; then the bars again. |
+| 9 | Use a matrix report (rows by one field, columns by another). | Rows are the groups and columns the bars or stacked parts. |
 
 **Cleanup:** Fix the Record List field.
 
