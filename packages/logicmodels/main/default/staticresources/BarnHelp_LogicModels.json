@@ -60,7 +60,7 @@
     "LogicModels_Source_NotRunYet": "Not worked out yet.",
     "LogicModels_Source_QueryHelp": "Build and save the query in Find. Leave dates out of it: each period adds its own.",
     "LogicModels_Source_QueryMissing": "The saved query can't be found. It may have been deleted or not shared with you: choose another under Source.",
-    "LogicModels_Source_QueryRefused": "The saved query can't be used: {0}",
+    "LogicModels_Source_QueryRefused": "The saved query can''t be used: {0}",
     "LogicModels_Source_RefreshFailed": "The results were not worked out. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "LogicModels_Source_ResultComputed": "Worked out from the source, so it can't be typed.",
     "LogicModels_Source_StillWorking": "The results are still being worked out. Select Check Again in a minute.",

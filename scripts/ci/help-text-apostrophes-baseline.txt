@@ -2,26 +2,3 @@
 # check-help-text-apostrophes.py was added (2026-11-12). Each is a known defect owned by another
 # package's fix work: double the apostrophe ('') in the catalog, then delete its line here.
 # One Package.Key per line; the check ignores these and fails on any new one.
-Core.Core_DuplicateManagement_RuleFieldInvalid
-Core.Core_DuplicateStarter_StepRepairMatch
-Core.Core_DuplicateStarter_StepRepairRule
-Core.Core_Erase_CannotEdit
-Core.Core_Erase_CannotEditFields
-Core.Core_Find_RadiusUnknownPostal
-Core.Core_ImportNewField_ConnectionRefused
-Core.Core_Import_ErrorFileValueNotAllowed
-Core.Core_Import_ErrorOrganizationRecordTypeUnavailable
-Core.Core_Import_LogControlAmountAgrees
-Core.Core_Import_LogControlAmountDiffers
-Core.Core_Import_LogRelatedParentFieldSkipped
-Core.Core_Import_LogRowsSkipped
-Core.Core_Import_UndoErrorCountChanged
-Core.Core_ReportSubscriptions_LimitReached
-Core.Core_WhereUsed_ErrorNoField
-Core.Core_WhereUsed_ErrorNoObject
-Events.Events_Health_PublicNoFormDetail
-Forms.Forms_Public_FieldNotAllowed
-Forms.Forms_Public_ObjectNotAllowed
-Forms.Forms_Resume_EmailBody
-LogicModels.LogicModels_Source_QueryRefused
-LwcBuilder.LwcBuilder_Chart_NoReport

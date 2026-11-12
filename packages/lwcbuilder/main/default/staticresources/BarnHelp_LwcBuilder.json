@@ -10,7 +10,7 @@
     "LwcBuilder_Error_Definition": "This is not a component the LWC Builder can read. Open it in the builder and save it again.",
     "LwcBuilder_Error_Field": "{0} is not a field on {1}. Check the API name in Object Manager.",
     "LwcBuilder_Error_FilterValue": "{0} is not a value {1} can hold. Use a number, a date written 2026-12-31, or true or false.",
-    "LwcBuilder_Chart_NoReport": "There is no report with the API name {0} that you can open. Use the report's Report Unique Name.",
+    "LwcBuilder_Chart_NoReport": "There is no report with the API name {0} that you can open. Use the report''s Report Unique Name.",
     "LwcBuilder_Chart_NotChartable": "{0} cannot be charted. Use a summary or matrix report with at least one grouping and one summary.",
     "LwcBuilder_Block_NoRows": "No records to show.",
     "LwcBuilder_Block_NeedsRecord": "This block shows a record's fields, so it appears on record pages. In the preview, enter a record Id.",
