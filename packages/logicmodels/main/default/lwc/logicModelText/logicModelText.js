@@ -2,6 +2,7 @@
  * The Logic Model Builder's words, in one place for its three panels: every label comes from
  * the LogicModels custom labels, so the text exports as translatable strings (plan 9.9).
  */
+import { format } from 'c/barnFormat';
 import TITLE from '@salesforce/label/c.LogicModels_Builder_Title';
 import FOR_LABEL from '@salesforce/label/c.LogicModels_Builder_For';
 import WHOLE_ORGANIZATION from '@salesforce/label/c.LogicModels_Builder_WholeOrganization';
@@ -119,10 +120,12 @@ import STARTER_PEOPLE_SERVED from '@salesforce/label/c.LogicModels_Starter_Peopl
 import STARTER_SERVICES_DELIVERED from '@salesforce/label/c.LogicModels_Starter_ServicesDelivered';
 import STARTER_VOLUNTEER_HOURS from '@salesforce/label/c.LogicModels_Starter_VolunteerHours';
 import STARTER_GRANTS_AWARDED from '@salesforce/label/c.LogicModels_Starter_GrantsAwarded';
+import PERIOD_EXISTS from '@salesforce/label/c.LogicModels_Builder_PeriodExists';
 import { helpText } from 'c/barnHelpText';
 
 export const LABELS = Object.freeze({
   title: TITLE,
+  periodExists: PERIOD_EXISTS,
   forLabel: FOR_LABEL,
   wholeOrganization: WHOLE_ORGANIZATION,
   programMissing: PROGRAM_MISSING,
@@ -311,13 +314,8 @@ export function stageLabel(key) {
   return STAGE_LABELS[key] || key;
 }
 
-/** A label with {0}, {1} filled in. */
-export function format(template, ...values) {
-  return String(template || '').replace(/\{(\d+)\}/g, (match, index) => {
-    const value = values[Number(index)];
-    return value === undefined || value === null ? '' : String(value);
-  });
-}
+/** A label with {0}, {1} filled in (shared, UTIL-01). */
+export { format };
 
 /** Why a column change is refused: the arrows it would turn backward (R-LL2). */
 export function backwardMessage(backward) {

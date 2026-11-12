@@ -4,6 +4,7 @@
  * date, and builds what to save. No Lightning or Salesforce import, so it runs and is tested
  * anywhere (a WordPress block, Node).
  */
+import { format } from 'c/barnFormat';
 
 /** How far ahead Mark Reviewed offers the next review (R-GL3); the user changes it each time. */
 export const REVIEW_MONTHS = 3;
@@ -24,13 +25,8 @@ export function goalStatusWord(status) {
   return 'neutral';
 }
 
-/** Replaces {0}, {1} and so on in a label with the values given. */
-export function format(template, ...values) {
-  return values.reduce(
-    (text, value, index) => text.split(`{${index}}`).join(value),
-    template || ''
-  );
-}
+/** Replaces {0}, {1} and so on in a label with the values given (shared, UTIL-01). */
+export { format };
 
 /** Today as YYYY-MM-DD in the given time zone (the user's, not the browser's). */
 export function todayIn(timeZone, now = new Date()) {

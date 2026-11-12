@@ -107,6 +107,14 @@ Each component has Jest tests written as stories (one case per variant a screen 
 
 The two modules are framework free (no `lightning/*` or `@salesforce/*` imports), so they port to BarnCRM for WordPress (plan 9.9). `c-barn-empty-state` also takes `size="compact"` (below).
 
+## Text and Date Helpers
+
+| Module | Use it for | Main exports |
+|---|---|---|
+| `c/barnFormat` | Filling a label's `{0}`, `{1}` placeholders, and a local date as `YYYY-MM-DD` (the form a date input and Apex take) | `format(template, ...values)` (a placeholder with no value given stays; a null value reads as empty), `isoDate(date = new Date())` |
+
+Framework free (plan 9.9, UTIL-01). A module that offered its own copy re-exports this one (`import { format } from 'c/barnFormat'; export { format };`) so its callers and tests are unchanged; write no new copy.
+
 ## Drag and Drop
 
 | Module | Use it for | Main exports |

@@ -436,6 +436,13 @@
                     onchange={handlePeriodField}
                   ></lightning-input>
                 </div>
+                <template lwc:if={periodDuplicate}>
+                  <div class="slds-col slds-size_1-of-1">
+                    <p data-id="period-duplicate" class="slds-text-color_error" role="alert">
+                      {periodDuplicate}
+                    </p>
+                  </div>
+                </template>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                   <lightning-input
                     data-id="period-target"
