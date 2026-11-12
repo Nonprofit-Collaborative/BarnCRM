@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Time_Entry__c$User__c</field>
+  </columns>
+  <columns>
+    <field>Time_Entry__c$Date__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Time_Entry__c$Hours__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Time_Entry__c$Amount__c</field>
+  </columns>
+  <description>
+    Billable time that counts (approved, or logged while approvals were off) and is on no invoice
+    yet, by project: what New Invoice would bill.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Time_Entry__c$Billable__c</column>
+      <operator>equals</operator>
+      <value>1</value>
+    </criteriaItems>
+    <criteriaItems>
+      <column>Time_Entry__c$Status__c</column>
+      <operator>notEqual</operator>
+      <value>Open,Submitted,Rejected</value>
+    </criteriaItems>
+    <criteriaItems>
+      <column>Time_Entry__c$Invoice_Line__c</column>
+      <operator>equals</operator>
+      <value />
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <dateGranularity>None</dateGranularity>
+    <field>Time_Entry__c$Project__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Unbilled Approved Time</name>
+  <reportType>Time_Entries__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+  <timeFrameFilter>
+    <dateColumn>Time_Entry__c$Date__c</dateColumn>
+    <interval>INTERVAL_CUSTOM</interval>
+  </timeFrameFilter>
+</Report>

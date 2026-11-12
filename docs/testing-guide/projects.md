@@ -201,3 +201,94 @@ Turn on **Approve time and expenses**.
 | 6 | Turn **Track expenses** off. | No Add Expense button and no expenses section on the Timesheet; existing expenses remain. |
 
 **Cleanup:** None.
+
+## T-PM-20: Invoices Off at Install
+
+**Purpose:** confirm nothing changes while Create invoices, Show financials and recognize revenue,
+and Track change requests are off (PM-10 to PM-12).
+**Prerequisites:** T-PM-05; admin.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open BarnCRM Settings, Projects. | Create invoices, Take invoice payments online, Show financials and recognize revenue and Track change requests are off; Invoice due days 30; Invoice payment return page shows your My Domain address (https://...my.salesforce.com), not blank. |
+| 2 | Open the project from T-PM-05. | No New Invoice card and no Financials card. |
+| 3 | Open Projects Home. | No Export Invoices card. |
+
+**Cleanup:** None.
+
+## T-PM-21: Build, Send, Print and Void an Invoice
+
+**Purpose:** confirm R-PM16 and R-PM17.
+**Prerequisites:** T-PM-20; turn on Create invoices.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On a Time and Materials project, log 3 billable hours today for you and 2 for staff A. Add a billable 50 Travel expense (with Track expenses on). | Saved. |
+| 2 | On the project, New Invoice with the period this month. | A Draft invoice opens (INV-000001 or the next number) with one Time line per person and rate and an Expense line; Total is the sum. |
+| 3 | New Invoice again for the same period. | Refused: nothing to invoice. Nothing is billed twice. |
+| 4 | On the invoice, Send. | Sent; Invoice Date today, Due Date 30 days later. Lines can no longer be edited. |
+| 5 | Print. | A PDF named after the invoice is in the invoice's Files, with your organization's name, the lines and Balance Due. |
+| 6 | Void, then confirm. | Void; the lines stay; the time entries' Invoice Line is blank again; New Invoice for the period builds a new Draft. |
+| 7 | As staff A, open the new invoice and the project. | No invoice actions and no New Invoice. |
+
+**Cleanup:** Delete the Draft from step 6.
+
+## T-PM-22: Fixed Fee and Retainer Invoices, Mark Paid and Export
+
+**Purpose:** confirm the other billing types and the CSV.
+**Prerequisites:** T-PM-21.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set a project's Billing Type to Fixed Fee; give a milestone a Billing Amount of 1000 and mark it Done. | Saved. |
+| 2 | New Invoice for this month. | One Milestone line of 1000. |
+| 3 | Set another project to Retainer with Retainer Amount 500 and a Start Date last month; New Invoice from the first of last month to today. | Two Retainer lines of 500. Running it again for the same months adds none. |
+| 4 | Send both; on one, Mark Paid with yesterday's date. | Paid, with that Paid Date. |
+| 5 | Projects Home, Export Invoices for this month. | A CSV with one row per line and the invoice columns; the invoices' Exported Date is today. Exporting again gives only the heading line unless Include invoices already exported is checked. |
+| 6 | Set a project to Not Billed and open it. | No New Invoice. |
+
+**Cleanup:** None.
+
+## T-PM-23: Pay Online Through BarnCRM Payments
+
+**Purpose:** confirm R-PM22 (needs the Payments module set up with test keys).
+**Prerequisites:** T-PM-22; Payments installed and set up; turn on Take invoice payments online.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Give a Sent invoice a Bill To Contact with your email; Send Payment Link. | A message that the link was emailed; Payment Link and Payment Key are filled. |
+| 2 | Open the email and pay with a Stripe or PayPal test card. | After Payments processes the event: Amount Paid equals Total, Status Paid, Paid Date the payment's date. |
+| 3 | Refund part of the payment in the processor. | After processing: Amount Paid drops by the refund and the invoice is Sent again. |
+| 4 | Turn Take invoice payments online off (or test without Payments installed). | Send Payment Link does not show. |
+
+**Cleanup:** None.
+
+## T-PM-24: Financials and Recognized Revenue
+
+**Purpose:** confirm R-PM19 and R-PM21.
+**Prerequisites:** T-PM-21; turn on Show financials and recognize revenue.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the project. | A Financials card: budget, revenue to date, cost and margin (admin), invoiced and unbilled, and a month table ending with this month (open). |
+| 2 | As staff A, open the project. | The card without cost and margin. |
+| 3 | As admin, Recognize Revenue for last month. | A Project Revenue row for last month (Revenue related list) with Method and Recognized Amount; Recognized Revenue on the project matches. |
+| 4 | Log 1 billable hour dated last month, then Recognize Revenue for this month's first day. | Refused: the open month is never stored. |
+| 5 | In BarnCRM Settings, Automation, Nightly Jobs. | Project revenue at 6:42 AM, switched on. |
+| 6 | Open Reports, BarnCRM Projects; run Unbilled Approved Time, Invoices Outstanding and Recognized Revenue by Month. | Each runs: approved billable time not yet invoiced, Sent invoices with their due dates and lines, and the recognized amount by month. |
+
+**Cleanup:** None.
+
+## T-PM-25: Change Requests
+
+**Purpose:** confirm R-PM20.
+**Prerequisites:** T-PM-05; turn on Track change requests.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff A, add a Change Request on a project with Budget Hours 10: 10 hours, 1000. Try to set it Approved. | Refused: only the project owner or Projects Admin decides. |
+| 2 | As the project owner, approve it. | Change Hours 10 and Change Amount 1000 on the project; Remaining Budget rises by 1000; Budget Hours stays 10. |
+| 3 | Log 12 hours and Refresh Health. | Not over budget (12 of 20). The board's hours line shows the budget with the change. |
+| 4 | As staff A, edit the approved request's hours. | Refused: only Projects Admin. |
+
+**Cleanup:** None.

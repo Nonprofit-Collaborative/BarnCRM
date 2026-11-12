@@ -56,6 +56,21 @@
       <field>Exported_Date__c</field>
       <table>Time_Entry__c</table>
     </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Bill_Rate__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Amount__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Invoice_Line__c</field>
+      <table>Time_Entry__c</table>
+    </columns>
     <masterLabel>Time Entry</masterLabel>
   </sections>
 </ReportType>

@@ -34,7 +34,7 @@ BarnCRM Settings, **Projects** (org-wide):
 | Manage resources | Off | The Staffing page, resource requests and the allocation view. |
 | Create invoices | Off | Billing Type on projects, New Invoice, the invoice actions and Export Invoices. |
 | Take invoice payments online | Off | Send Payment Link on a sent invoice. Needs Create invoices and the Payments module. |
-| Invoice payment return page | Blank | The https page a client returns to after paying online. Blank: your My Domain address. |
+| Invoice payment return page | Your My Domain address | The https page a client returns to after paying online, such as your website's thank you page. Filled in with your My Domain address at install. |
 | Invoice due days | 30 | Days from the invoice date to its due date (1 to 365). |
 | Show financials and recognize revenue | Off | The financials card on the project page and the monthly recognized revenue rows. |
 | Track change requests | Off | Change requests on projects; approved ones add to the budget. |

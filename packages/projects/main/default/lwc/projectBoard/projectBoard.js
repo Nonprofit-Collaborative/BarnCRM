@@ -125,12 +125,15 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
 
   get hoursText() {
     const p = this.project;
+    const hasBudget = p.Budget_Hours__c !== undefined && p.Budget_Hours__c !== null;
+    // R-PM20: approved change requests add their hours to the budget.
+    const budget = hasBudget ? p.Budget_Hours__c + (p.Change_Hours__c || 0) : '-';
     return helpText(
       'Projects',
       'Projects_Board_HoursLine',
       p.Actual_Hours__c || 0,
       p.Estimated_Hours__c || 0,
-      p.Budget_Hours__c ?? '-'
+      budget
     );
   }
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Export Invoices: sent and paid project invoices with their lines as a CSV for accounting, for
+    Projects Home and any Lightning app page (PM-10).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Projects Export Invoices</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__HomePage</target>
+  </targets>
+</LightningComponentBundle>

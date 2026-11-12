@@ -47,7 +47,7 @@ row in the Projects section (module `Projects`, Help Path `projects-psa.md`):
 | Show financials and recognize revenue (`Projects_Revenue_Enabled`) | `Revenue_Enabled__c` | Off | PM-11 |
 | Track change requests (`Projects_Change_Requests_Enabled`) | `Change_Requests_Enabled__c` | Off | PM-12 |
 | Take invoice payments online (`Projects_Online_Payments_Enabled`) | `Online_Payments_Enabled__c` | Off | PM-10 |
-| Invoice payment return page (`Projects_Invoice_Return_Url`) | `Invoice_Return_Url__c` | Blank: the org's My Domain address | PM-10 |
+| Invoice payment return page (`Projects_Invoice_Return_Url`) | `Invoice_Return_Url__c` | The org's My Domain address, filled in at install (never blank) | PM-10 |
 | Invoice due days (`Projects_Invoice_Due_Days`) | `Invoice_Due_Days__c` | 30 (1 to 365) | PM-10 |
 
 Every part ships off because each changes what an existing page shows or counts. Track time

@@ -8,6 +8,10 @@
     roles.
   </description>
   <classAccesses>
+    <apexClass>ProjectBillingController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ProjectsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

@@ -1,0 +1,15 @@
+<template>
+  <template lwc:if={isShown}>
+    <lightning-card title={labels.title} icon-name={icon} data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <p class="slds-text-color_weak slds-var-m-bottom_x-small">{labels.intro}</p>
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+        </template>
+        <lightning-input type="date" label={labels.start} value={period.start} data-field="start" onchange={handlePeriod} data-id="start"></lightning-input>
+        <lightning-input type="date" label={labels.end} value={period.end} data-field="end" onchange={handlePeriod} data-id="end"></lightning-input>
+        <lightning-button class="slds-var-m-top_small" variant="brand" label={labels.build} disabled={isWorking} onclick={handleBuild} data-id="build"></lightning-button>
+      </div>
+    </lightning-card>
+  </template>
+</template>
