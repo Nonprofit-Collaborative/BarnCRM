@@ -190,6 +190,9 @@ public with sharing class ModuleManagerService {
 			'Territory_Run__c'
 		},
 		'Memberships' => new List<String>{
+			'Certification__c',
+			'Continuing_Credit__c',
+			'Member_Certification__c',
 			'Membership_Benefit__c',
 			'Membership_Level__c',
 			'Membership_Term__c'

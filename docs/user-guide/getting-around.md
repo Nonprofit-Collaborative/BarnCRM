@@ -200,8 +200,9 @@ Data Manager. You can undo a bulk delete from **Data Jobs** for up to 15 days.
    deletes**, and press **Refresh** to see the latest.
 
 You should see: your recent jobs, newest first, each with its counts and an **Undo** while
-it can still be undone. **Bring Data In** (**Super Importer**), **Duplicate Matching**, **Import Templates** and
-**Salesforce's Own Tools** are for admins. See
+it can still be undone. **Bring Data In** (**Super Importer** and **Import Files**), **Duplicate
+Matching**, **Import Templates** and **Salesforce's Own Tools** are for admins. Documents an admin
+loads with **Import Files** show in each record's **Files** list, owned by that admin. See
 [Data Manager](../admin-guide/data-manager.md).
 
 ## Common Problems
