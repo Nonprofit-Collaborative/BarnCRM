@@ -285,6 +285,10 @@ private class EligibilityRulesTest {
 			new Map<String, Object>()
 		);
 		Assert.areEqual('Review', plain.status, 'Review when no default is given.');
-		Assert.areEqual(Label.Programs_Elig_NoRuleMatched, plain.reason, 'The label says so.');
+		Assert.areEqual(
+			BarnHelp.text('Programs', 'Programs_Elig_NoRuleMatched'),
+			plain.reason,
+			'The label says so.'
+		);
 	}
 }

@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import ServiceDeliveryLog from 'c/serviceDeliveryLog';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
@@ -19,6 +20,10 @@ import {
   withQuantity
 } from '../logRows';
 
+setHelpTextForTest({
+  Programs_Log_CountAdded: 'Added {0}.'
+});
+
 jest.mock('@salesforce/apex/ServiceDeliveryLogController.getLog', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -31,9 +36,6 @@ jest.mock(
   { virtual: true }
 );
 jest.mock('@salesforce/label/c.Programs_Log_Counted', () => ({ default: 'Counted: {0}' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Log_CountAdded', () => ({ default: 'Added {0}.' }), {
   virtual: true
 });
 jest.mock(

@@ -7,7 +7,6 @@ import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
 import COUNTED from '@salesforce/label/c.Programs_Log_Counted';
 import COUNT_INPUT from '@salesforce/label/c.Programs_Log_CountInput';
 import ADD_COUNT from '@salesforce/label/c.Programs_Log_AddCount';
-import COUNT_ADDED from '@salesforce/label/c.Programs_Log_CountAdded';
 import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
 import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
 import SESSION_OF from '@salesforce/label/c.Programs_Log_SessionOf';
@@ -214,7 +213,7 @@ export default class ServiceDeliveryLog extends LightningElement {
       .then((log) => {
         this.log = log;
         this.countDraft = '';
-        this.resultMessage = format(COUNT_ADDED, people);
+        this.resultMessage = format(helpText('Programs', 'Programs_Log_CountAdded'), people);
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Log'));

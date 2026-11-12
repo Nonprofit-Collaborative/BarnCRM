@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import EligibilityRules from 'c/eligibilityRules';
 import getState from '@salesforce/apex/EligibilityController.getState';
@@ -12,6 +13,13 @@ import {
   serializeRules
 } from '../eligibilityEngine';
 
+setHelpTextForTest({
+  Programs_Elig_PreviewResult: 'Would give {0}: {1}',
+  Programs_Elig_Screened: '{0} E, {1} N, {2} R, {3} left.',
+  Programs_Elig_Saved: 'Saved.',
+  Programs_Elig_NoRuleMatched: 'None.'
+});
+
 jest.mock('@salesforce/apex/EligibilityController.getState', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -21,29 +29,13 @@ jest.mock('@salesforce/apex/EligibilityController.saveRules', () => ({ default: 
 jest.mock('@salesforce/apex/EligibilityController.screen', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Programs_Elig_PreviewResult',
-  () => ({ default: 'Would give {0}: {1}' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Programs_Elig_Screened',
-  () => ({ default: '{0} E, {1} N, {2} R, {3} left.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Programs_Elig_Rule', () => ({ default: 'Rule {0}' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Elig_Saved', () => ({ default: 'Saved.' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_Filter_Value', () => ({ default: 'Value' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Elig_ValueList', () => ({ default: 'commas' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Programs_Elig_NoRuleMatched', () => ({ default: 'None.' }), {
   virtual: true
 });
 
