@@ -565,9 +565,10 @@ private class RollupQueueTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Test.startTest();
 			RollupQueue.queueableForTest = false;
-			RollupQueue.waitingForTest = 1;
+			// D-200 P13: the save reads when a processor was last asked for, not the job list.
+			RollupQueue.requestedAtForTest = Datetime.now().addMinutes(-1);
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
-			Assert.areEqual(0, processorsQueued(), 'One waits already');
+			Assert.areEqual(0, processorsQueued(), 'One was asked for a minute ago');
 			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'Asks again after commit');
 
 			// The waiting processor ran without these entries; the subscriber is a new transaction.
@@ -577,6 +578,40 @@ private class RollupQueueTest {
 
 			Assert.areEqual(1, processorsQueued(), 'The subscriber starts one for them');
 			Assert.areEqual(0, RollupQueue.readyEventsPublished, 'And asks nothing more');
+			Test.stopTest();
+		}
+	}
+
+	/**
+	 * D-200 P13: a save that queues entries runs no query to find a processor. The first one
+	 * queues a processor and stamps when; the next, while the stamp is recent, leaves the exact
+	 * check to the subscriber; once the stamp is old (a processor that died), a save queues one.
+	 */
+	@IsTest
+	static void aSaveRunsNoQueryAndReadsTheStampOfTheLastProcessorAskedFor() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			Test.startTest();
+			RollupQueue.queueableForTest = false;
+			RollupQueue.readStampInTests = true;
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+			Assert.areEqual(1, processorsQueued(), 'Nothing recent, so it queues one');
+			Assert.isNotNull(
+				Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c,
+				'And stamps when'
+			);
+
+			RollupQueue.newTransactionForTest();
+			Integer queriesBefore = Limits.getQueries();
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+			Assert.areEqual(0, Limits.getQueries() - queriesBefore, 'No query in the save');
+			Assert.areEqual(1, processorsQueued(), 'Recent: it queues no second one');
+			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The subscriber checks exactly');
+
+			RollupQueue.newTransactionForTest();
+			RollupQueue.requestedAtForTest = Datetime.now()
+				.addMinutes(-RollupQueue.REQUEST_FRESH_MINUTES - 1);
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+			Assert.areEqual(2, processorsQueued(), 'Old: the one asked for may be gone');
 			Test.stopTest();
 		}
 	}

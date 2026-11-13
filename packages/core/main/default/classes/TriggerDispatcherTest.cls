@@ -415,6 +415,49 @@ private class TriggerDispatcherTest {
 		}
 	}
 
+	/**
+	 * D-200 P10: while the rollup engine writes totals, a person or organization update runs
+	 * only the rows marked to run on rollup writes and those that always run; other objects,
+	 * and the same update outside a rollup write, run every row.
+	 */
+	@IsTest
+	static void aRollupWriteRunsOnlyTheAutomationsThatReadTotals() {
+		System.runAs(TestUsers.admin()) {
+			TestRegisteredHandler.reset();
+			List<Automation_Registry__mdt> entries = new List<Automation_Registry__mdt>();
+			for (String name : new List<String>{ 'Ordinary', 'Reads_Totals', 'Rule' }) {
+				Automation_Registry__mdt entry = TestDataFactory.registryEntry(name, true);
+				entry.Handler_Class__c = 'TestRegisteredHandler';
+				entry.Object_Name__c = 'Contact';
+				entry.Runs_On_Rollup_Writes__c = name == 'Reads_Totals';
+				entry.Always_Runs__c = name == 'Rule';
+				entries.add(entry);
+			}
+			AutomationRegistrySelector.registryOverride = entries;
+
+			Test.startTest();
+			TriggerDispatcher.startRollupWrite();
+			TriggerDispatcher.run('Contact', contextFor(System.TriggerOperation.AFTER_UPDATE));
+			Integer duringWrite = TestRegisteredHandler.runCount;
+			Boolean insertLimited = TriggerDispatcher.isRollupWrite(
+				'Contact',
+				System.TriggerOperation.AFTER_INSERT
+			);
+			Boolean otherObjectLimited = TriggerDispatcher.isRollupWrite(
+				'Error_Log__c',
+				System.TriggerOperation.AFTER_UPDATE
+			);
+			TriggerDispatcher.endRollupWrite();
+			TriggerDispatcher.run('Contact', contextFor(System.TriggerOperation.AFTER_UPDATE));
+			Test.stopTest();
+
+			Assert.areEqual(2, duringWrite, 'The row that reads totals and the rule ran.');
+			Assert.areEqual(5, TestRegisteredHandler.runCount, 'After the write, all three ran.');
+			Assert.isFalse(insertLimited, 'Only updates are limited.');
+			Assert.isFalse(otherObjectLimited, 'Only people and organizations are limited.');
+		}
+	}
+
 	@IsTest
 	static void anAlwaysRunsAutomationIgnoresTheBypassThePauseAndTheSwitch() {
 		System.runAs(TestUsers.admin()) {

@@ -21,7 +21,9 @@ setHelpTextForTest({
 
 setHelpTextForTest({
   Core_Rollups_RecalculateStarted: 'Recalculation started.',
-  Core_Rollups_ScheduleActive: 'Nightly recalculation is scheduled for {0}.'
+  Core_Rollups_ScheduleActive: 'Nightly recalculation is scheduled for {0}.',
+  Core_Rollups_LargeParentHours: 'At most once every {0} hours.',
+  Core_Rollups_LargeParentOneHour: 'At most once an hour.'
 });
 
 jest.mock(
@@ -347,6 +349,22 @@ describe('c-rollup-definitions', () => {
     expect(element.shadowRoot.querySelector('[data-id="schedule-message"]').textContent).toBe(
       'Nightly recalculation is scheduled for 10:00 PM.'
     );
+  });
+
+  it('says how often a large parent is recalculated, and nothing at 0', async () => {
+    const element = createComponent();
+    getPage.emit({ ...PAGE, largeParentHours: 1 });
+    await flush();
+    const message = () => element.shadowRoot.querySelector('[data-id="large-parent-message"]');
+    expect(message().textContent).toBe('At most once an hour.');
+
+    getPage.emit({ ...PAGE, largeParentHours: 4 });
+    await flush();
+    expect(message().textContent).toBe('At most once every 4 hours.');
+
+    getPage.emit({ ...PAGE, largeParentHours: 0 });
+    await flush();
+    expect(message()).toBeNull();
   });
 
   it('starts and stops the nightly recalculation', async () => {

@@ -252,8 +252,10 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 	@TestVisible
 	private static Boolean lockRuns() {
 		Id org = UserInfo.getOrganizationId();
+		lockRecord = null;
 		try {
-			if (lockedRow(org).isEmpty()) {
+			List<Rollup_Run_Lock__c> locked = lockedRow(org);
+			if (locked.isEmpty()) {
 				try {
 					if (competingLockForTest) {
 						Database.insert(
@@ -261,15 +263,15 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 							AccessLevel.SYSTEM_MODE
 						);
 					}
-					Database.insert(
-						new Rollup_Run_Lock__c(SetupOwnerId = org),
-						AccessLevel.SYSTEM_MODE
-					);
+					Rollup_Run_Lock__c created = new Rollup_Run_Lock__c(SetupOwnerId = org);
+					Database.insert(created, AccessLevel.SYSTEM_MODE);
+					locked.add(created);
 				} catch (DmlException collided) {
 					// Another run created it first: wait for it as for any holder.
-					lockedRow(org);
+					locked = lockedRow(org);
 				}
 			}
+			lockRecord = locked.isEmpty() ? null : locked[0];
 			return true;
 		} catch (QueryException unavailable) {
 			ErrorLogger.log(unavailable, LOG_CONTEXT);
@@ -279,7 +281,7 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 
 	private static List<Rollup_Run_Lock__c> lockedRow(Id org) {
 		return [
-			SELECT Id
+			SELECT Id, Last_Run_Started__c
 			FROM Rollup_Run_Lock__c
 			WHERE SetupOwnerId = :org
 			WITH SYSTEM_MODE
@@ -287,6 +289,10 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 			FOR UPDATE
 		];
 	}
+
+	/** The lock row `lockRuns` took, with when the last run started. */
+	@TestVisible
+	private static Rollup_Run_Lock__c lockRecord;
 
 	/** Test seam: another run creates the lock record just before this one's first insert. */
 	@TestVisible
@@ -311,6 +317,12 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 		// Locked first, so a second processor deciding at the same moment waits for this one to
 		// commit and then sees the run it started.
 		if (lockRuns() && runningJobId() == null) {
+			// D-200 P2: at most one run per Large Parent Hours; saves in between share the next.
+			Datetime allowedAt = nextRunAllowedAt();
+			if (allowedAt > Datetime.now()) {
+				waitUntil(entries, allowedAt);
+				return false;
+			}
 			List<Rollup_Queue__c> held = hold(entries, charge);
 			List<Target> targets = targetsFor(held);
 			try {
@@ -327,20 +339,49 @@ public without sharing class RollupLargeParentBatch implements Database.Batchabl
 			}
 			if (started) {
 				startedForTest = true;
+				noteRunStarted();
 				return true;
 			}
 		}
+		waitUntil(entries, Datetime.now().addMinutes(BUSY_MINUTES));
+		return false;
+	}
+
+	private static void waitUntil(List<Rollup_Queue__c> entries, Datetime dueAt) {
 		List<Rollup_Queue__c> waiting = new List<Rollup_Queue__c>();
 		for (Rollup_Queue__c entry : entries) {
-			waiting.add(
-				new Rollup_Queue__c(
-					Id = entry.Id,
-					Next_Attempt__c = Datetime.now().addMinutes(BUSY_MINUTES)
-				)
-			);
+			waiting.add(new Rollup_Queue__c(Id = entry.Id, Next_Attempt__c = dueAt));
 		}
 		Database.update(waiting, false, AccessLevel.SYSTEM_MODE);
-		return false;
+	}
+
+	/**
+	 * The Large Parent Hours setting (D-200 P2): the fewest hours between two runs, 0 to 24.
+	 * Blank or out of range is the shipped 1.
+	 */
+	public static Integer largeParentHours() {
+		Decimal stored = Rollup_Settings__c.getOrgDefaults().Large_Parent_Hours__c;
+		return stored == null || stored < 0 || stored > 24 ? 1 : stored.intValue();
+	}
+
+	/** When the next run may start: the last one's start plus the setting's hours. */
+	@TestVisible
+	private static Datetime nextRunAllowedAt() {
+		Datetime last = lockRecord == null ? null : lockRecord.Last_Run_Started__c;
+		return last == null ? Datetime.now() : last.addHours(largeParentHours());
+	}
+
+	/** Stamps the start on the locked row, inside the lock this transaction holds. */
+	private static void noteRunStarted() {
+		if (lockRecord == null || lockRecord.Id == null) {
+			return;
+		}
+		lockRecord.Last_Run_Started__c = Datetime.now();
+		Database.update(
+			new Rollup_Run_Lock__c(Id = lockRecord.Id, Last_Run_Started__c = Datetime.now()),
+			false,
+			AccessLevel.SYSTEM_MODE
+		);
 	}
 
 	/**

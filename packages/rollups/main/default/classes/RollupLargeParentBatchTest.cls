@@ -800,6 +800,36 @@ private class RollupLargeParentBatchTest {
 		}
 	}
 
+	/**
+	 * D-200 P2: a run started within Large Parent Hours (default 1) holds the next one back; the
+	 * entries wait until the hour is up, uncharged, and saves in between share that run.
+	 */
+	@IsTest
+	static void aLargeParentIsRecalculatedAtMostOncePerSetHours() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			insertDefinitions();
+			Account parent = parentWith(1, 0);
+			Test.startTest();
+			Boolean first = RollupLargeParentBatch.begin(
+				new List<Rollup_Queue__c>{ entryFor(parent.Id, 0) },
+				true
+			);
+			Rollup_Queue__c later = entryFor(parent.Id, 0);
+			Boolean second = RollupLargeParentBatch.begin(new List<Rollup_Queue__c>{ later }, true);
+			Test.stopTest();
+
+			Assert.isTrue(first, 'The first run starts');
+			Assert.isFalse(second, 'The next waits for the hour');
+			Assert.areEqual(1, RollupLargeParentBatch.largeParentHours(), 'Shipped default');
+			Rollup_Queue__c waiting = reread(later.Id);
+			Assert.areEqual(0, waiting.Attempts__c, 'Not charged');
+			Assert.isTrue(
+				waiting.Next_Attempt__c > Datetime.now().addMinutes(55),
+				'Due when the hour since the last run is up'
+			);
+		}
+	}
+
 	@IsTest
 	static void anExpiredHoldIsRoutedAgainAndCharged() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {

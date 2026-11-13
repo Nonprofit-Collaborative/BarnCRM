@@ -1565,6 +1565,7 @@ Automation Setting records (Section 10) on install and on upgrade.
 | `Object_Name__c` | text | The object whose trigger this automation runs on. |
 | `Execution_Order__c` | integer | The order in which handlers run for that object. |
 | `Module__c` | text (40) | The module that ships this automation, for example Giving or Mirror; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
+| `Runs_On_Rollup_Writes__c` | boolean, default false | Whether this automation runs when the rollup engine updates a person's or organization's totals (D-200 P10). `RollupWriter` marks its update as a rollup write, and the dispatcher then runs, for Contact and Account updates, only the rows marked this way or `Always_Runs__c`; field history is kept as for any update. Shipped on: donor level and donor score assignment (Account and Contact) and the person rollup row (`Core_Rollups_Contact`, so a definition of the administrator's that reads a person's total still sees it change). Not copied to Automation Setting. |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized
@@ -2683,13 +2684,25 @@ uncharged, and are routed again.
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
-- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, no fields. Its one org-level
-  record is the row a large parent run locks before it starts (R-RQ6); the code creates it the
-  first time and nothing else reads or writes it.
+- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, one field,
+  `Last_Run_Started__c` (DateTime). Its one org-level record is the row a large parent run locks
+  before it starts (R-RQ6); the code creates it the first time and nothing else reads or writes
+  it. **Throttle (D-200 P2):** under the lock, a run starts only when `Large_Parent_Hours__c`
+  (Section 14B, default 1) has passed since `Last_Run_Started__c`, which the run stamps as it
+  starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
+  the saves queued in between merge into that one run. The Rollup Builder page says how often.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
+- **Processor request stamp (D-200 P13):** a save that queues entries runs no query to find a
+  processor. It reads `Processor_Requested_At__c` on `Rollup_Settings__c` (from the platform's
+  cache):
+  within the last ten minutes it publishes the Ready event, whose subscriber checks the job list
+  exactly after commit; otherwise it queues a processor and stamps the time (for a chained
+  processor queued with a delay, the time it is due). A processor that died is still found
+  missing: by the subscriber's exact check while the stamp is recent, and by the next save once
+  it is not. The subscriber, background jobs and the nightly run keep the exact check.
 
 ---
 
@@ -2723,6 +2736,8 @@ settings console shows them in its Rollups section as before.
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 | `Nightly_Run_Hour__c` | integer(0 to 23) | 2 | The hour the nightly run starts (R-R4), in the time zone of the person who scheduled it, shown as a time (2:00 AM). Blank or out of range means 2. |
+| `Large_Parent_Hours__c` | integer(0 to 24) | 1 | The fewest hours between two large parent runs (R-RQ6, D-200 P2); 0 runs as soon as possible. Blank or out of range means 1. |
+| `Processor_Requested_At__c` | datetime | blank | Not a setting and not in the console: when the Rollup Queue last asked for a processor (D-200 P13, Section 14A). Written by the engine only. |
 
 ---
 
@@ -19028,6 +19043,7 @@ mirrors the primary member).
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
+| 1.55 | 2026-11-12 | Rollups under load (D-200 P2, P10, P13, release 1.22). `Automation_Registry__mdt` gains `Runs_On_Rollup_Writes__c` (Checkbox): during a `RollupWriter` update, Contact and Account run only rows so marked or Always Runs (shipped on donor level and donor score assignment and `Core_Rollups_Contact`). `Rollup_Settings__c` gains `Large_Parent_Hours__c` (Number, default 1, Setting Definition `Rollup_Large_Parent_Hours`) and `Processor_Requested_At__c` (DateTime, engine only); `Rollup_Run_Lock__c` gains `Last_Run_Started__c` (DateTime): a large parent run starts at most once per that many hours, and a save that queues totals finds a processor without a query. No object added. |
 
 ---
 ## 32. Entity ownership by package

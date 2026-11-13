@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Processor_Requested_At__c</fullName>
+    <description>Not a setting: when the Rollup Queue last asked for a processor (or, for one queued with a delay, when it is due to start). A save that queues totals reads it instead of querying for a waiting processor, and asks the subscriber to check exactly while it is recent (D-200 P13). Written by the engine only; not shown in the settings console.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Used by BarnCRM to know when the Rollup Queue last asked for a processor.</inlineHelpText>
+    <label>Processor Requested At</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>
