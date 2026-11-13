@@ -205,16 +205,32 @@ private class NpcHouseholdConversionTest {
 				'Lee gets the record type it had before the run'
 			);
 			// Where the org turns a blank record type into the household type, Lee stays a
-			// household, and the household rules refuse putting the old Primary Contact back, so
-			// the model can be checked only where the record type comes back as it was.
+			// household and the household rules refuse putting the old Primary Contact back, so
+			// Lee's undo is refused and reported instead; the rest is checked where the record
+			// type comes back as it was.
 			if (expectedType == leeBefore.RecordTypeId) {
 				Assert.areEqual(
 					leeModelBefore,
 					after.get(lee.Id).Household_Model__c,
 					'Lee gets the model it had before the run'
 				);
+				Assert.isTrue(
+					membersOf(lee.Id).isEmpty(),
+					'the membership the run made is removed'
+				);
+			} else {
+				Assert.areEqual(
+					'Not Restored',
+					[
+						SELECT Status__c
+						FROM Household_Adoption__c
+						WHERE Account_Id__c = :String.valueOf(lee.Id)
+						WITH SYSTEM_MODE
+					]
+					.Status__c,
+					'A refused undo is reported as Not Restored'
+				);
 			}
-			Assert.isTrue(membersOf(lee.Id).isEmpty(), 'the membership the run made is removed');
 			Assert.areEqual('Converted', after.get(kim.Id).Household_Model__c, 'Kim kept');
 			Household_Adoption__c kept = [
 				SELECT Status__c, Note__c
