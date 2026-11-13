@@ -1222,7 +1222,7 @@ Added 2026-11-11 by the integrator so the combined build (Brandon's goal, 2026-1
 
 #### Release 1.20 (after Batch I): Batch D to I review decisions
 
-Status (2026-11-12): Built on `landing/batch-j` (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12), in testing; the Planned cells below predate the build.
+Status (2026-11-13): Built (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12) and carried into `landing/batch-k`, where it passed the release gate with releases 1.21 to 1.24; the Planned cells below predate the build.
 
 Added 2026-11-12 (D-196). Built now on their own branches, outside the Batch D to I landing; tested and deployed after the current batches are completely done.
 
@@ -1243,7 +1243,7 @@ Added 2026-11-12 (D-196). Built now on their own branches, outside the Batch D t
 
 #### Releases 1.21 to 1.24 (landing/batch-k): pilot readiness (D-199, D-200, D-201)
 
-Status (2026-11-12): building on branches off `landing/batch-k`; tested and deployed together after all four are built. Item codes are the 2026-11-12 whole-solution review's (QA Q, UX R, Namespace N, Performance P, Simplify S).
+Status (2026-11-13): built and integrated on `landing/batch-k` with release 1.20; release gate passed on `barn-platform` (Developer Edition, every package: 6,060 of 6,060 tests, 93% coverage, at 0014e4726) after gate fixes and the pre-batch QA and UX fixes. `barn-sales` and `oi-test` (Enterprise) cannot take the full suite: 203 custom objects against Enterprise's 200 (decision pending). S11 deferred until after M-2 (proposed, Brandon to confirm). Earlier (2026-11-12): building on branches off `landing/batch-k`; tested and deployed together after all four are built. Item codes are the 2026-11-12 whole-solution review's (QA Q, UX R, Namespace N, Performance P, Simplify S).
 
 | Release | Items | Size |
 |---|---|---|
