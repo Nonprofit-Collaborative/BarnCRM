@@ -20,6 +20,13 @@ me today" in one look, so a fundraiser no longer starts on a menu of twenty tabs
 - **Fundraising Setup**: a tile for each setup page that left the app's menu (**Donor Level
   Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**). All four
   are also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, before **Error Log**.
+- **More**: a tile for each list that left the app's menu in release 1.24 (D-200): **Asks**,
+  **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring
+  Donor Health** and **Dashboards**. Each opens its list or page, and each is still in the App
+  Launcher.
+- **Record Your First Gift**: until the org has a gift, a first-run panel replaces the empty
+  figures with two actions, **Enter a Gift** and **Import a File** (the Import tab, for a file of
+  past gifts). It goes away by itself once the first gift is saved.
 - Two report charts: **Giving by Month** and **Open Asks by Stage**.
 
 Each figure's name is the object's own label and its status word is the picklist value's label,
@@ -30,7 +37,10 @@ A figure counts at most 2,000 records and shows "2,000+" past that.
 Each figure, tile and button shows only to someone who can read the records behind it:
 **Enter a Gift** needs create access to gifts, the **Donor Level Ladder** and **Stewardship
 Plan Setup** tiles need the **Manage BarnCRM Settings** permission, and the other two setup
-tiles need read access to pledge reminders or receipt runs.
+tiles need read access to pledge reminders or receipt runs. A **More** tile needs read access to
+its object (gifts, for Donor Segments and Recurring Donor Health). The first-run panel shows only
+to someone who can create gifts, and **Import a File** only to someone who can create import
+batches.
 
 ## How to Turn It On
 
@@ -45,6 +55,13 @@ Plan Setup**, **Pledge Reminders** and **Receipt Letters**. Nothing was removed:
 under **Fundraising Setup** on Fundraising Home, is still in the App Launcher, and the first two
 are also in the BarnCRM Admin apps. Anyone can add one back to their own menu with the pencil
 icon at the end of the navigation bar.
+
+In release 1.24 (D-200 R5) the menu went down to thirteen tabs: **Fundraising Home**, **Quick
+Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask
+Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous** and
+**Reports**. **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor
+Segments**, **Recurring Donor Health** and **Dashboards** left it. They are tiles under **More**
+on Fundraising Home, are still in the App Launcher, and can be added back with the pencil icon.
 
 ## The Charts
 
@@ -75,11 +92,14 @@ region and pick a report). The figures and setup tiles are one component, **Fund
 2. Read the five figures. Click **Scheduled Payments** with **Overdue**: the Overdue list view opens.
 3. Go back and click **Enter a Gift**: Quick Gift Entry opens.
 4. As an administrator, open **Donor Level Ladder** from **Fundraising Setup**.
-5. Scroll to the charts and click one to open its report.
+5. Under **More**, click **Funds**: the Funds list opens.
+6. Scroll to the charts and click one to open its report.
 
 ## Common Mistakes
 
 - **Expecting the setup pages in the menu.** They are tiles under **Fundraising Setup** now.
+- **Looking for Funds or Appeals in the menu.** They are tiles under **More**, and in the App
+  Launcher.
 - **A chart says it has no data.** The person may lack the Run Reports permission or read access
   to the records; the Giving permission sets give the second, a profile or role gives the first.
 

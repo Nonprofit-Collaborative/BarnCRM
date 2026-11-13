@@ -61,19 +61,22 @@ its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
 The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
-**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Scheduled
-Payments** (each payment a commitment expects), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
-**Tributes**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Donor
-Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
-bottom of the screen.
+**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**,
+**Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous** and **Reports**, plus
+**Quick Gift Entry** in the utility bar at the bottom of the screen. **Asks**, **Scheduled
+Payments** (each payment a commitment expects), **Funds**, **Appeals**, **Tributes**, **Donor
+Segments**, **Recurring Donor Health** and **Dashboards** are tiles under **More** on
+Fundraising Home, and are in the App Launcher.
 
 **Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
 you, overdue scheduled payments, your asks due this month, open gift batches and running
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
 setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
-also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
-click a chart to open its report.
+also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Before
+the first gift is saved, **Record Your First Gift** offers **Enter a Gift** and **Import a
+File**. Below are two charts, **Giving by Month** and **Open Asks by Stage**; click a chart to
+open its report.
 
 The **BarnCRM Volunteers** app has **Volunteers Home**, **Volunteer Jobs**, **Volunteer
 Shifts**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**,

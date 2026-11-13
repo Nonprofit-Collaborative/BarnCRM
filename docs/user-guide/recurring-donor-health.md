@@ -6,7 +6,8 @@ payment that is overdue. Setup detail: [Recurring donor health](../admin-guide/r
 
 ## To See Your Recurring Donors
 
-1. In the **BarnCRM Fundraising** app, open **Recurring Donor Health**.
+1. In the **BarnCRM Fundraising** app, on **Fundraising Home**, click **Recurring Donor
+   Health** under **More**.
 2. The top shows **Monthly Recurring Revenue**, **Active Recurring Gifts** and **Monthly
    Revenue at Risk**.
 3. **Recurring Gifts Received, Last 12 Months** shows each month's total.

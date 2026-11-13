@@ -151,6 +151,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the T-CRED-01 gift. | **Soft Credits** lists the credits; **Add Credit** is disabled and no **Remove** buttons show. |
 | 2 | Open the second gift from T-CRED-06 (tribute not sent). | The **Tribute** panel shows the summary; no **Mark Notification Sent** button. |
-| 3 | Open the **Tributes** tab in the BarnCRM Fundraising app. | No **New** button. |
+| 3 | In the BarnCRM Fundraising app, open **Fundraising Home** and click **Tributes** under **More**. | No **New** button. |
 
 **Cleanup:** none.

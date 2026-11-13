@@ -150,7 +150,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM Fundraising**. | It opens on **Fundraising Home**, the first tab. **Scheduled Payments** follows **Commitments** in the menu. **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders** and **Receipt Letters** are not in the menu. |
+| 1 | As admin, open **BarnCRM Fundraising**. | It opens on **Fundraising Home**, the first tab. The menu has thirteen tabs: **Fundraising Home**, **Quick Gift Entry**, **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**, **Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Reports**. **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health** and **Dashboards** are not in the menu. |
 | 2 | Read the figures. | Five bordered figures with their tab icons: **Gifts** (badge **To acknowledge**), **Scheduled Payments** (badge **Overdue**), **My Asks Due This Month**, **Gift Batches** (badge **Open**), **Stewardship Plans** (badge **Running**). A badge on a zero count is grey. |
 | 3 | Click **Scheduled Payments**. | The Scheduled Payments list view **Overdue** opens; its count matches the figure. Go back. |
 | 4 | Click **Gifts**. | The **Thank-Yous** page opens. Go back and click **My Asks Due This Month**: the Asks list view of that name opens. |
@@ -161,6 +161,9 @@ For every script on this page:
 | 9 | As read-only, open Fundraising Home. | The figures show; **Enter a Gift** does not; **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters**. |
 | 10 | As admin, open the **BarnCRM** app's **Home**. | Beside **Errors**, the **Errors by Day** chart shows the last 30 days of Error and Critical Error Log entries. As staff, the chart does not show. |
 | 11 | On a phone, open BarnCRM Fundraising. | Fundraising Home shows the figures two across, then Enter a Gift, then the setup tiles and charts stacked. |
+| 12 | As admin, on Fundraising Home read **More**. | Eight tiles, each with an icon and one line: **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health**, **Dashboards**. Click **Funds**: the Funds list opens. Go back and click **Donor Segments**: its page opens. Go back and click **Dashboards**: the Dashboards home opens. |
+| 13 | Open the App Launcher and search `Appeals`. | **Appeals** is listed and opens its list. |
+| 14 | In an org with the Giving module and no gifts yet (a new scratch org before sample data), open Fundraising Home as admin. | **Record Your First Gift** shows with **Enter a Gift** and **Import a File**. **Import a File** opens the **Import** tab. Save one gift and reload: the panel is gone and the figures show. |
 
 **Cleanup:** None.
 
@@ -172,7 +175,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the **BarnCRM Fundraising** app, open **Recurring Donor Health**. | **Monthly Recurring Revenue** includes 35.00 for the two gifts (25 plus 120 / 12); **Active Recurring Gifts** counts both. **Save the Sustainer** lists neither. |
+| 1 | In the **BarnCRM Fundraising** app, on **Fundraising Home**, click **Recurring Donor Health** under **More**. | **Monthly Recurring Revenue** includes 35.00 for the two gifts (25 plus 120 / 12); **Active Recurring Gifts** counts both. **Save the Sustainer** lists neither. |
 | 2 | Open **Recurring Gift Events**, select **New**: Event Type **Charge Failed**, Subscription Id `SUB_TEST_1`, Detail "Card declined". Save. | Match Status **Matched**; Commitment is donor A's gift. On the gift, **Failed Charges** is 1 and **Last Failed Charge** is today. |
 | 3 | Back on Recurring Donor Health. | Donor A's gift is listed with a failed charges reason; **Monthly Revenue at Risk** is 25.00. |
 | 4 | Select **Create Follow-Up Task** on it. | A success message shows; a task due today, assigned to you, is on the gift and on donor A. |
