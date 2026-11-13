@@ -128,6 +128,7 @@ private class ContactPointErasureExtensionTest {
 	private static Integer eraseAna(Boolean hold, String lastName) {
 		List<Contact> people;
 		Integer syncs;
+		ContactPointSyncService.Result again;
 		System.runAs(eraser()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			people = household(lastName);
@@ -142,11 +143,18 @@ private class ContactPointErasureExtensionTest {
 			Integer counted = ContactPointSyncService.addressSyncsForTest.get(people[0].Id);
 			syncs = counted == null ? 0 : counted;
 			ContactPointSyncService.holdingForTest = true;
+			// The check runs as the eraser too. The erasure ends the memberships on the
+			// eraser's today (the test user is on GMT), and a membership counts as current
+			// while its end date is after the running user's today. Run as the deploying
+			// user, in the evening west of GMT that is still yesterday, so the check would
+			// count the ended membership as current and remake the address copy the erasure
+			// rightly removed (seen only as before the hold: with the hold, the last sync
+			// leaves the eraser's household answer cached, and the check reuses it).
+			again = ContactPointSyncService.syncPeople(
+				new Set<Id>{ people[0].Id, people[1].Id },
+				null
+			);
 		}
-		ContactPointSyncService.Result again = ContactPointSyncService.syncPeople(
-			new Set<Id>{ people[0].Id, people[1].Id },
-			null
-		);
 		Assert.areEqual(
 			0,
 			again.created + again.updated + again.deleted + again.failed,
