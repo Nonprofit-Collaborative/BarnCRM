@@ -980,7 +980,6 @@ core/NamespaceUtil.cls | public static String qualify(String)
 core/NamespaceUtil.cls | public static String stateKey(String)
 core/NamespaceUtil.cls | public static Type resolveType(String)
 core/NightlyJobs.cls | public class NightlyJobs
-core/NightlyJobs.cls | public static Boolean adoptOldSchedules()
 core/NightlyJobs.cls | public static Boolean isOn(NightlyStep)
 core/NightlyJobs.cls | public static Boolean isScheduled()
 core/NightlyJobs.cls | public static Boolean isStepScheduled(String,Boolean)
@@ -1148,12 +1147,8 @@ core/RecordGlanceExtensions.cls | public static List<RecordGlance.Card> cardsFor
 core/RecordGlanceExtensions.cls | public static List<RecordGlanceExtension> installed()
 core/RecordGlanceExtensions.cls | public static final List<String> EXTENSION_CLASSES
 core/RollupEngineExtension.cls | public interface RollupEngineExtension
-core/RollupEngineExtensionV2.cls | public interface RollupEngineExtensionV2
-core/RollupEngineExtensionV3.cls | public interface RollupEngineExtensionV3
 core/RollupEngineExtensions.cls | public class RollupEngineExtensions
 core/RollupEngineExtensions.cls | public static RollupEngineExtension find()
-core/RollupEngineExtensions.cls | public static RollupEngineExtensionV2 findV2()
-core/RollupEngineExtensions.cls | public static RollupEngineExtensionV3 findV3()
 core/RollupEngineExtensions.cls | public static final String EXTENSION_CLASS
 core/RollupFilterParser.cls | public Boolean negated
 core/RollupFilterParser.cls | public String field
@@ -1242,8 +1237,12 @@ core/SettingsService.cls | public static BarnCRM_Settings__c firstSaveRecord()
 core/SettingsService.cls | public static BarnCRM_Settings__c getSettings()
 core/SettingsService.cls | public static BarnCRM_Settings__c saveSystemValue(String,Object)
 core/SettingsService.cls | public static BarnCRM_Settings__c saveValues(Map<String,Object>)
+core/SettingsService.cls | public static Boolean flag(String,String)
 core/SettingsService.cls | public static Boolean hasKey(String)
 core/SettingsService.cls | public static Boolean hasKey(String,String)
+core/SettingsService.cls | public static Decimal number(String,String)
+core/SettingsService.cls | public static Decimal storedNumber(String)
+core/SettingsService.cls | public static Decimal toNumber(Object)
 core/SettingsService.cls | public static Object getEffectiveValue(String,String,String)
 core/SettingsService.cls | public static Object getValue(String)
 core/SettingsService.cls | public static Object getValue(String,String)
@@ -1252,6 +1251,7 @@ core/SettingsService.cls | public static SObject firstSaveRecord(Schema.SObjectT
 core/SettingsService.cls | public static SObject saveValues(String,Map<String,Object>)
 core/SettingsService.cls | public static Schema.SObjectType typeByName(String)
 core/SettingsService.cls | public static String householdMembershipMode()
+core/SettingsService.cls | public static String text(String,String)
 core/SettingsService.cls | public static final String COEXISTENCE_MODE_DEFAULT
 core/SettingsService.cls | public static final String CORE_SETTINGS_OBJECT
 core/SettingsService.cls | public static final String MEMBERSHIP_MODE_DEFAULT
@@ -1603,8 +1603,6 @@ mirror/InboundGiftResult.cls | global String errorCode
 mirror/InboundGiftResult.cls | global String message
 mirror/InboundGiftResult.cls | global String outcome
 mirror/InboundGiftResult.cls | global class InboundGiftResult
-mirror/MirrorAccessSync.cls | public MirrorAccessSync()
-mirror/MirrorAccessSync.cls | public class MirrorAccessSync
 mirror/MirrorHealthCheckExtension.cls | public MirrorHealthCheckExtension()
 mirror/MirrorHealthCheckExtension.cls | public class MirrorHealthCheckExtension
 mirror/MirrorNightlyJobProvider.cls | public MirrorNightlyJobProvider()
@@ -1850,7 +1848,6 @@ volunteers/VolunteersEventExtension.cls | public VolunteersEventExtension()
 volunteers/VolunteersEventExtension.cls | public class VolunteersEventExtension
 volunteers/VolunteersHealthCheckExtension.cls | public VolunteersHealthCheckExtension()
 volunteers/VolunteersHealthCheckExtension.cls | public class VolunteersHealthCheckExtension
-volunteers/VolunteersHealthCheckExtension.cls | public static final String FIX_KEY_COORDINATOR_ACCESS
 volunteers/VolunteersHouseholdDependentsExtension.cls | public VolunteersHouseholdDependentsExtension()
 volunteers/VolunteersHouseholdDependentsExtension.cls | public class VolunteersHouseholdDependentsExtension
 volunteers/VolunteersNightlyJobProvider.cls | public VolunteersNightlyJobProvider()
