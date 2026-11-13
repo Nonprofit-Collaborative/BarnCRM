@@ -5226,7 +5226,12 @@ organization that awards a level permanently records that on the donor, not here
 Real time: assignment happens in the save that changes the source total, which includes
 the save the rollup engine itself makes when a gift lands, and it runs before the record
 is written so it costs no second update. Scheduled: a nightly pass re-places every donor,
-which is what catches a fiscal year turning over and a ladder edited yesterday. On demand:
+which is what catches a fiscal year turning over and a ladder edited yesterday. Since D-200 P1
+it re-places every donor only when no recalculation is recorded, a `Donor_Level__c` row or a
+setting change naming Donor was saved since `Donor_Levels_Last_Recalculated__c`, a fiscal year
+started since, or that time is more than seven days old; otherwise, with donor scores switched
+on, it rescores only the donors whose last gift date crossed a recency cutoff since then, and
+records no recalculation. On demand:
 the Recalculate button on the Donor Levels page does the scheduled pass now. Assignment is
 idempotent in all three: running it twice over unchanged data writes nothing the second
 time.
@@ -19027,6 +19032,7 @@ mirrors the primary member).
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
 | 1.54 | 2026-11-12 | Cut-over cleanup (D-199, D-200 S4; ADR-0194 note of 2026-11-12). No object or field added. Removed, since the namespaced managed release is a fresh install everywhere: the Coordinator permission set group (`Volunteer_Coordinator`) and `RetiredRoleMigration`; the five retired Mirror sets (`Campaign_Sync`, `Opportunity_Mirror`, `Gift_Transaction_Mirror`, `Inbound_Gift_API`, `Record_Inbound_Gift_Action`) and `MirrorAccessSync`; the Volunteers Health Check finding `volunteer_coordinator_access` and its fix. `Volunteers_Coordinator` stays as an extra permission.  Also removed: R-NJ5's adoption of old schedules (`NightlyJobs.adoptOldSchedules`, `SeasonalAddressScheduler.adoptExistingSchedule`, the `ImportRowPurgeScheduler` shell); `RollupEngineExtensionV2` and `V3` merged into `RollupEngineExtension`. |
+| 1.57 | 2026-11-12 | Nightly donor level pass gated (D-200 P1, release 1.22). R-DL6: every donor is re-placed only after a ladder or donor setting change, a fiscal year turnover, with no recalculation recorded, or a week after the last; other nights rescore only donors crossing a recency cutoff. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
