@@ -1,0 +1,22 @@
+{
+  "orgName": "BarnCRM Multi-Currency",
+  "edition": "Developer",
+  "hasSampleData": false,
+  "features": ["MultiCurrency"],
+  "settings": {
+    "currencySettings": {
+      "enableMultiCurrency": true
+    },
+    "deploymentSettings": {
+      "doesSkipAsyncApexValidation": true
+    },
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "securitySettings": {
+      "sessionSettings": {
+        "forceRelogin": false
+      }
+    }
+  }
+}
