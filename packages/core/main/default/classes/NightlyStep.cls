@@ -32,6 +32,14 @@ public with sharing class NightlyStep {
 	@NamespaceAccessible
 	public Boolean active = true;
 
+	/** The step's own summary of its last run, when it keeps one, shown on the Nightly Jobs card. */
+	@NamespaceAccessible
+	public String summary;
+
+	/** True when the card offers Run Now: the step is safe to start by hand at any time. */
+	@NamespaceAccessible
+	public Boolean canRunNow = false;
+
 	private final Schedulable work;
 
 	/**
@@ -60,6 +68,20 @@ public with sharing class NightlyStep {
 	@NamespaceAccessible
 	public NightlyStep activeWhen(Boolean isActive) {
 		this.active = isActive == true;
+		return this;
+	}
+
+	/** Shows the step's own summary of its last run on the Nightly Jobs card. */
+	@NamespaceAccessible
+	public NightlyStep withSummary(String lastSummary) {
+		this.summary = lastSummary;
+		return this;
+	}
+
+	/** Offers Run Now on the Nightly Jobs card: only for a step safe to repeat at any time. */
+	@NamespaceAccessible
+	public NightlyStep runnableNow() {
+		this.canRunNow = true;
 		return this;
 	}
 

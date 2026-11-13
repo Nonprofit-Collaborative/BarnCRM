@@ -3,8 +3,8 @@
  * Address Verification Admin, BarnCRM Admin holders get it too, it is never given twice, and a
  * refused grant is logged without failing the install.
  */
-@IsTest(testFor='ApexClass:AddressVerificationAccessSync, ApexClass:AddressVerificationPostInstall')
-private class AddressVerificationAccessSyncTest {
+@IsTest(testFor='ApexClass:AddressVerificationPostInstall')
+private class AddressVerificationPostInstallTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.admin();
@@ -14,9 +14,7 @@ private class AddressVerificationAccessSyncTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE
-				AssigneeId = :userId
-				AND PermissionSet.Name = :AddressVerificationAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Address_Verification_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -27,7 +25,7 @@ private class AddressVerificationAccessSyncTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id holding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ AddressVerificationAccessSync.ADMIN_SET }
+					new List<String>{ 'Address_Verification_Admin' }
 				)
 				.Id;
 			User boss = TestUsers.standardUser('Boss');
@@ -38,14 +36,17 @@ private class AddressVerificationAccessSyncTest {
 
 			Test.startTest();
 			Test.testInstall(new AddressVerificationPostInstall(), null);
-			System.enqueueJob(new AddressVerificationPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new AddressVerificationPostInstall.InstallerAccess(holding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('AddressVerification', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('AddressVerification', holding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds the admin set');
 			Assert.areEqual(1, adminSetsHeldBy(holding), 'Never given twice');
 			Assert.areEqual(1, adminSetsHeldBy(boss.Id), 'A BarnCRM Admin holder gets it');
-			Assert.isFalse(AddressVerificationAccessSync.syncOnce(), 'Nothing left to give');
+			Assert.isFalse(
+				ModuleAccessSyncs.syncOnce('AddressVerification'),
+				'Nothing left to give'
+			);
 		}
 	}
 
@@ -57,14 +58,14 @@ private class AddressVerificationAccessSyncTest {
 			Test.startTest();
 			new AddressVerificationPostInstall().onInstall(null);
 			new AddressVerificationPostInstall().runSetup(null);
-			System.enqueueJob(new AddressVerificationPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('AddressVerification', notAUser));
 			Test.stopTest();
 
 			Assert.isTrue(
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :AddressVerificationPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'AddressVerificationPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				] >= 1,
 				'The refusal is in the Error Log'

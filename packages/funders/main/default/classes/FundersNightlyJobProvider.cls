@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Funders step to the
+ * The class Core finds by name (registered in its catalog row) to add the Funders step to the
  * one nightly run (ADR-0166 nightly-job-dispatcher): the grant requirement reminder run (F-02).
  */
 @NamespaceAccessible

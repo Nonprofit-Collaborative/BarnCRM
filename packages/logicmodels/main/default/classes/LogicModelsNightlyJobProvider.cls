@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Logic Models step
+ * The class Core finds by name (registered in its catalog row) to add the Logic Models step
  * to the one nightly run (ADR-0166 nightly-job-dispatcher, ADR-0158 `0158-indicator-sources.md`):
  * the run that works out computed indicators' results.
  */

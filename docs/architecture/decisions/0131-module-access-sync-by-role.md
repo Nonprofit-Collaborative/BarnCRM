@@ -57,3 +57,11 @@ would be one more scheduled job for Health Check to count.
   own, well inside the platform's limit on queued jobs.
 - A class named `<ModuleKey>AccessSync` that is not an access sync is logged as an error each
   time it is looked for: the name is reserved for this seam.
+
+## Note, 2026-11-13: the sets are catalog data (D-200 S1)
+
+Each module's sets and audiences now live on its module catalog row (`Access_By_Permission_Set__c`,
+`Access_By_Role__c`), and one generic sync in `ModuleAccessSyncs` gives them; the per-module
+`<ModuleKey>AccessSync` classes and the naming convention are retired (ADR-0017 note of
+2026-11-13). Rollup Builder's sets join the hourly check, which before only its own nightly
+step and Turn on asked for.

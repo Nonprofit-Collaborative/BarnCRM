@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add Mirror's steps to the
+ * The class Core finds by name (registered in its catalog row) to add Mirror's steps to the
  * one nightly run (ADR-0166 nightly-job-dispatcher): the nightly run of the Opportunity mirror
  * and of the Gift Transaction mirror (X-07), and the Case requests run (D-201, while Send Cases
  * to a service provider is on). Each mirror step is in tonight's run only while that

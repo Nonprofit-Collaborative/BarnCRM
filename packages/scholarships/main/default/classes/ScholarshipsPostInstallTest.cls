@@ -2,7 +2,7 @@
  * Maria installs Scholarships: BarnCRM Admin holders get Scholarships Admin, BarnCRM's roles get
  * their sets, and nothing in the install can fail it.
  */
-@IsTest(testFor='ApexClass:ScholarshipsPostInstall, ApexClass:ScholarshipsAccessSync')
+@IsTest(testFor='ApexClass:ScholarshipsPostInstall')
 private class ScholarshipsPostInstallTest {
 	@TestSetup
 	static void createTestUser() {
@@ -33,14 +33,14 @@ private class ScholarshipsPostInstallTest {
 
 			Assert.areEqual(
 				1,
-				held(TestUsers.admin().Id, ScholarshipsAccessSync.ADMIN_SET),
+				held(TestUsers.admin().Id, 'Scholarships_Admin'),
 				'BarnCRM Admin holds Scholarships Admin'
 			);
 			Assert.areEqual(1, held(member.Id, 'Scholarships_Staff'), 'Team Member holds Staff');
 			Assert.areEqual(
-				'Scholarships',
-				new ScholarshipsAccessSync().moduleName(),
-				'Module key'
+				new List<String>{ 'Scholarships_Admin' },
+				ModuleAccessSyncs.adminSets('Scholarships'),
+				'The catalog row names the admin set'
 			);
 		}
 	}

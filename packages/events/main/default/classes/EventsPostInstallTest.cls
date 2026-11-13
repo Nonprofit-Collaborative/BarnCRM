@@ -13,7 +13,7 @@ private class EventsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :EventsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Events_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -24,7 +24,7 @@ private class EventsPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ EventsAccessSync.ADMIN_SET }
+					new List<String>{ 'Events_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -35,8 +35,8 @@ private class EventsPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new EventsPostInstall(), null);
-			System.enqueueJob(new EventsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new EventsPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Events', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Events', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Events Admin');
@@ -56,7 +56,7 @@ private class EventsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :EventsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'EventsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -73,7 +73,7 @@ private class EventsPostInstallTest {
 
 			Test.startTest();
 			new EventsPostInstall().onInstall(null);
-			System.enqueueJob(new EventsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Events', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -81,7 +81,7 @@ private class EventsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :EventsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'EventsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

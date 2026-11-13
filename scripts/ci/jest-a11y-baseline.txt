@@ -95,7 +95,6 @@ giftPosting
 giftRefund
 giftSoftCredits
 giftTransactionMirror
-givingNightlyJobs
 givingQuickStatus
 grantAnswerLibrary
 grantAwardModal

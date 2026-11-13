@@ -5,6 +5,8 @@ import LOCALE from '@salesforce/i18n/locale';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getPanel from '@salesforce/apex/NightlyJobsController.getPanel';
 import schedule from '@salesforce/apex/NightlyJobsController.schedule';
+import setStep from '@salesforce/apex/NightlyJobsController.setStep';
+import runStep from '@salesforce/apex/NightlyJobsController.runStep';
 
 import TITLE from '@salesforce/label/c.Core_NightlyJobs_Title';
 import JOB from '@salesforce/label/c.Core_NightlyJobs_ColumnJob';
@@ -16,6 +18,10 @@ import RESULT from '@salesforce/label/c.Core_Find_Result';
 import ON from '@salesforce/label/c.Core_Feature_On';
 import OFF from '@salesforce/label/c.Core_Feature_Off';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
+import TURN_ON from '@salesforce/label/c.Core_NightlyJobs_TurnOn';
+import TURN_OFF from '@salesforce/label/c.Core_NightlyJobs_TurnOff';
+import RUN_NOW from '@salesforce/label/c.Core_NightlyJobs_RunNow';
+import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -42,9 +48,10 @@ export function timeOfDay(minute) {
 
 /**
  * The Nightly Jobs panel on the General page of the BarnCRM Settings console (ADR-0166
- * nightly-job-dispatcher): the one nightly schedule, and every step in the order the run takes
- * it, with its time, whether it is on, and how it last ran. Each step is switched on and off on
- * its own page; the only action here is scheduling the run when it is not scheduled.
+ * nightly-job-dispatcher): the one nightly schedule, and every module's step in the order the run
+ * takes it, with its time, whether it is on, and how it last ran. A manager schedules the run,
+ * turns a step with a switch on or off, and starts a step that allows it now (D-200 S6: this one
+ * card replaced Giving's Nightly Jobs page).
  */
 export default class NightlyJobsPanel extends LightningElement {
   helpReady = isHelpLoaded('Core');
@@ -63,7 +70,12 @@ export default class NightlyJobsPanel extends LightningElement {
     status: STATUS,
     lastRun: LAST_RUN,
     result: RESULT,
-    schedule: SCHEDULE
+    schedule: SCHEDULE,
+    runNow: RUN_NOW,
+    actions: ACTIONS,
+    get missed() {
+      return helpText('Core', 'Core_NightlyJobs_Missed');
+    }
   };
 
   connectedCallback() {
@@ -100,8 +112,49 @@ export default class NightlyJobsPanel extends LightningElement {
       lastStarted: step.lastStarted,
       outcome: step.outcome,
       outcomeStatus: step.outcomeStatus,
-      message: step.message
+      message: step.message,
+      hasSwitch: step.hasSwitch === true,
+      switchLabel: step.switchedOn ? TURN_OFF : TURN_ON,
+      switchedOn: step.switchedOn === true,
+      canRunNow: step.canRunNow === true,
+      summary: step.summary,
+      missed: step.missed === true
     }));
+  }
+
+  /** Read from the platform so the buttons never flicker; the controller checks it again. */
+  get canManage() {
+    return canManageSettings === true;
+  }
+
+  handleSwitch(event) {
+    const key = event.target.dataset.key;
+    const row = this.rows.find((candidate) => candidate.key === key);
+    return this.act(
+      setStep({ key, turnOn: !(row && row.switchedOn) }),
+      helpText('Core', 'Core_NightlyJobs_SwitchSaved')
+    );
+  }
+
+  handleRunNow(event) {
+    return this.act(
+      runStep({ key: event.target.dataset.key }),
+      helpText('Core', 'Core_NightlyJobs_RunStarted')
+    );
+  }
+
+  async act(call, notice) {
+    this.busy = true;
+    this.errorMessage = undefined;
+    this.noticeMessage = undefined;
+    try {
+      this.panel = await call;
+      this.noticeMessage = notice;
+    } catch (error) {
+      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+    } finally {
+      this.busy = false;
+    }
   }
 
   get hasLastRun() {
@@ -119,17 +172,7 @@ export default class NightlyJobsPanel extends LightningElement {
     return !!this.panel && !this.panel.scheduled && canManageSettings === true;
   }
 
-  async handleSchedule() {
-    this.busy = true;
-    this.errorMessage = undefined;
-    this.noticeMessage = undefined;
-    try {
-      this.panel = await schedule();
-      this.noticeMessage = helpText('Core', 'Core_NightlyJobs_ScheduledNotice');
-    } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
-    } finally {
-      this.busy = false;
-    }
+  handleSchedule() {
+    return this.act(schedule(), helpText('Core', 'Core_NightlyJobs_ScheduledNotice'));
   }
 }

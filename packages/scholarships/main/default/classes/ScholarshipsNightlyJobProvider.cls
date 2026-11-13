@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Scholarships
+ * The class Core finds by name (registered in its catalog row) to add the Scholarships
  * reminders and cycle dates to the one nightly run (ADR-0166; ADR-0204
  * `0204-scholarships-outbound-grants-module.md` decision 11).
  */

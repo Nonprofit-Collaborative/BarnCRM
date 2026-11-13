@@ -34,4 +34,12 @@
     <field>Probe_Object__c</field>
     <value xsi:nil="true" />
   </values>
+  <values>
+    <field>Access_By_Permission_Set__c</field>
+    <value xsi:type="xsd:string">LWC_Builder_Admin=BarnCRM_Admin</value>
+  </values>
+  <values>
+    <field>Access_By_Role__c</field>
+    <value xsi:type="xsd:string">LWC_Builder_Staff=Program_Staff,Fundraising_Staff;LWC_Builder_Read_Only=Read_Only</value>
+  </values>
 </CustomMetadata>

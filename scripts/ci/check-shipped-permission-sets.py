@@ -2,7 +2,7 @@
 """Fails if BarnCRMShippedPermissionSets does not name exactly the permission sets BarnCRM ships.
 
 The Field Access Manager (C-65, ADR-0156) never offers a permission set BarnCRM ships: the
-package and the access syncs (TabAccessService, ModuleAccessSyncBase, RollupAccessSync) manage
+package and the access syncs (TabAccessService, ModuleAccessSyncs) manage
 their access, so an edit there would be overwritten or would drift. In an installed package the
 namespace already hides them; in an unpackaged install only their names do. The class holds
 those names as data, generated from every package directory in sfdx-project.json, so a set

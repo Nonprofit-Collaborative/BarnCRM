@@ -4,8 +4,7 @@
     "description": ["Maria configures giving and fixes mistakes: funds, appeals, gifts, refunds and", "write-offs, including deleting a record entered by accident."],
     "add": {
       "classAccesses": {
-        "AccountingPeriodController": {"enabled": "true"},
-        "GivingJobsController": {"enabled": "true"}
+        "AccountingPeriodController": {"enabled": "true"}
       },
       "customPermissions": {
         "Post_Gifts": {"enabled": "true"}
@@ -20,7 +19,6 @@
       "tabSettings": {
         "Donor_Levels": {"visibility": "Visible"},
         "Giving_Accounting_Periods": {"visibility": "Visible"},
-        "Giving_Nightly_Jobs": {"visibility": "Visible"},
         "Stewardship_Plans": {"visibility": "Visible"}
       },
       "userPermissions": {

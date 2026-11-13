@@ -7,16 +7,14 @@
  *
  * 1. Queue the job that gives the installer LWC Builder Admin (a permission set assignment is a
  *    setup object write).
- * 2. Give BarnCRM's roles their LWC Builder sets (`LwcBuilderAccessSync`), queued for the same
+ * 2. Give BarnCRM's roles their LWC Builder sets (`ModuleAccessSyncs`), queued for the same
  *    reason; the installer's job runs it after its own grant.
  *
  * Nothing else changes: a built component shows only where an admin places it.
  */
 @NamespaceAccessible
 public with sharing class LwcBuilderPostInstall implements InstallHandler, ModuleSetup {
-	private static final String MODULE_KEY = 'LwcBuilder';
-	@TestVisible
-	private static final String ACCESS_CONTEXT = 'LwcBuilderPostInstall.grantInstallerAccess';
+	public static final String MODULE_KEY = 'LwcBuilder';
 
 	/**
 	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
@@ -50,79 +48,6 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 			SHIPPED_ON_ADDED_IN_UPGRADES
 		);
 		ModuleSetups.markRan(MODULE_KEY);
-		if (installerId == null) {
-			new LwcBuilderAccessSync().requestSync();
-			return;
-		}
-		try {
-			System.enqueueJob(new InstallerAccess(installerId));
-		} catch (Exception e) {
-			ErrorLogger.log(e, ACCESS_CONTEXT);
-			new LwcBuilderAccessSync().requestSync();
-		}
-	}
-
-	/**
-	 * Gives the installer LWC Builder Admin, unless they hold it already, then BarnCRM's roles
-	 * their sets. System mode: the install runs as the platform's package user.
-	 */
-	public without sharing class InstallerAccess implements Queueable {
-		private final Id installerId;
-
-		public InstallerAccess(Id installerId) {
-			this.installerId = installerId;
-		}
-
-		public void execute(QueueableContext jobContext) {
-			giveInstaller();
-			try {
-				// A test cannot chain one queued job from another.
-				if (LwcBuilderAccessSync.syncOnce() && !Test.isRunningTest()) {
-					System.enqueueJob(new ModuleAccessSyncBase.Job(new LwcBuilderAccessSync()));
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
-
-		private void giveInstaller() {
-			try {
-				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
-					LwcBuilderAccessSync.ADMIN_SET
-				);
-				if (permissionSet == null) {
-					return;
-				}
-				Integer held = [
-					SELECT COUNT()
-					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
-					WITH SYSTEM_MODE
-				];
-				if (held > 0) {
-					return;
-				}
-				Database.SaveResult saved = Database.insert(
-					new PermissionSetAssignment(
-						AssigneeId = installerId,
-						PermissionSetId = permissionSet.Id
-					),
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
-				// A duplicate means another job gave it a moment before: what was wanted.
-				for (Database.Error error : saved.getErrors()) {
-					if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-						ErrorLogger.logMessage(
-							error.getMessage(),
-							ACCESS_CONTEXT,
-							ErrorLogger.SEVERITY_WARNING
-						);
-					}
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
+		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}
 }
