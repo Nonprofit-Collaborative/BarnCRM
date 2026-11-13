@@ -4,10 +4,9 @@
  * model R-NJ1 to R-NJ7). `NightlyRun` runs the steps; this class is everything else, and what
  * every page, Health Check and the install steps call.
  *
- * Steps are Core's own plus those of each dependent package that registers a
- * `NightlyStepProvider`, found by class name as `HealthCheckExtensions` finds an extension: a
- * class name takes no `__` prefix, so it is tried with this package's namespace and then
- * without. A provider that is missing, cannot be built or throws is skipped and logged.
+ * Steps are Core's own plus those of each module whose catalog row registers a
+ * `NightlyStepProvider` (`ModuleExtensions`, D-200 S1), asked in catalog order. A provider that
+ * is missing or cannot be built is skipped; one that throws is skipped and logged.
  *
  * Switches and results are rows of `Nightly_Job__c`, one per step key plus one for the run,
  * read once per transaction and written in system mode (ADR-0021): they are the package's own
@@ -38,34 +37,11 @@ public with sharing class NightlyJobs {
 	public static final String SKIPPED = 'Skipped';
 	public static final String GAVE_UP = 'Gave Up Waiting';
 
-	/** The provider classes dependent packages register, in the order they are asked. */
-	@NamespaceAccessible
-	public static final List<String> PROVIDER_CLASSES = new List<String>{
-		'RollupsNightlyJobProvider',
-		'GivingNightlyJobProvider',
-		'MirrorNightlyJobProvider',
-		'VolunteersNightlyJobProvider',
-		'ProgramsNightlyJobProvider',
-		'LogicModelsNightlyJobProvider',
-		'FundersNightlyJobProvider',
-		'EventsNightlyJobProvider',
-		'CorporateHubNightlyJobProvider',
-		'ScholarshipsNightlyJobProvider',
-		'TerritoryNightlyJobProvider',
-		'MembershipsNightlyJobProvider',
-		'ProjectsNightlyJobProvider',
-		'AddressVerificationNightlyJobProvider'
-	};
-
 	private static final String ERROR_CONTEXT = 'NightlyJobs';
 
 	/** Set by a test to the whole list, so no test depends on which modules are installed. */
 	@TestVisible
 	private static List<NightlyStep> stepsOverride;
-
-	/** Injected by Core's tests by class name, since no other package is there to resolve. */
-	@TestVisible
-	private static Map<String, NightlyStepProvider> providerOverrides = new Map<String, NightlyStepProvider>();
 
 	/** The rows by key, read once per transaction; null until asked. */
 	private static Map<String, Nightly_Job__c> rowsByKey;
@@ -109,8 +85,8 @@ public with sharing class NightlyJobs {
 			registered.addAll(stepsOverride);
 		} else {
 			registered.addAll(coreSteps());
-			for (String className : PROVIDER_CLASSES) {
-				registered.addAll(providedBy(className));
+			for (Object provider : ModuleExtensions.all(NightlyStepProvider.class)) {
+				registered.addAll(providedBy((NightlyStepProvider) provider));
 			}
 		}
 		builtSteps = inOrder(registered);
@@ -161,27 +137,14 @@ public with sharing class NightlyJobs {
 		return ordered;
 	}
 
-	private static List<NightlyStep> providedBy(String className) {
+	private static List<NightlyStep> providedBy(NightlyStepProvider provider) {
 		try {
-			NightlyStepProvider provider = providerOverrides.containsKey(className)
-				? providerOverrides.get(className)
-				: resolve(className);
-			List<NightlyStep> provided = provider == null ? null : provider.nightlySteps();
+			List<NightlyStep> provided = provider.nightlySteps();
 			return provided == null ? new List<NightlyStep>() : provided;
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, ERROR_CONTEXT);
 			return new List<NightlyStep>();
 		}
-	}
-
-	private static NightlyStepProvider resolve(String className) {
-		Type providerType = NamespaceUtil.resolveType(className);
-		if (providerType == null) {
-			return null;
-		}
-		Object candidate = providerType.newInstance();
-		// A module still on its provider from before the nightly run (mid-upgrade) is skipped.
-		return candidate instanceof NightlyStepProvider ? (NightlyStepProvider) candidate : null;
 	}
 
 	// -------------------------------------------------------------------------------------

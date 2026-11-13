@@ -23,7 +23,7 @@ public with sharing class GrantReminderService {
 	/** Whether a run should start: the module is on and at least one reminder setting is on. */
 	public static Boolean isActive() {
 		return !ModuleManagerService.turnedOff()
-				.contains(FundersAccessSync.MODULE_NAME.toLowerCase()) &&
+				.contains(FundersPostInstall.MODULE_KEY.toLowerCase()) &&
 			(FundersSettings.reminderTasksEnabled() || FundersSettings.reminderEmailsEnabled());
 	}
 

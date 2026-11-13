@@ -6,6 +6,9 @@ import ERROR_LOG_OBJECT from '@salesforce/schema/Error_Log__c';
 import { refreshApex } from '@salesforce/apex';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
+import getBugReport from '@salesforce/apex/ErrorLogController.getBugReport';
+import Toast from 'lightning/toast';
+import { bugReportText } from 'c/bugReportText';
 
 import TITLE from '@salesforce/label/c.Core_ErrorLogTile_Title';
 import NEW_COUNT from '@salesforce/label/c.Core_ErrorLogTile_NewCount';
@@ -16,6 +19,22 @@ import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ROW_COUNT = 5;
+
+/** The bug report's headings, from the Core help catalog (QA review Q10). */
+function bugReportWords() {
+  return {
+    heading: helpText('Core', 'Core_ErrorLogTile_BugReport_Heading'),
+    where: helpText('Core', 'Core_ErrorLogTile_BugReport_Where'),
+    object: helpText('Core', 'Core_ErrorLogTile_BugReport_Object'),
+    severity: helpText('Core', 'Core_ErrorLogTile_BugReport_Severity'),
+    when: helpText('Core', 'Core_ErrorLogTile_BugReport_When'),
+    times: helpText('Core', 'Core_ErrorLogTile_BugReport_Times'),
+    codes: helpText('Core', 'Core_ErrorLogTile_BugReport_Codes'),
+    stack: helpText('Core', 'Core_ErrorLogTile_BugReport_Stack'),
+    none: helpText('Core', 'Core_ErrorLogTile_BugReport_None'),
+    noDetail: helpText('Core', 'Core_ErrorLogTile_BugReport_NoDetail')
+  };
+}
 
 export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
@@ -39,9 +58,17 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
     openEntry: OPEN_ENTRY,
     get readOnly() {
       return helpText('Core', 'Core_ErrorLogTile_ReadOnly');
+    },
+    get copyBugReport() {
+      return helpText('Core', 'Core_ErrorLogTile_CopyBugReport');
+    },
+    get copyFailed() {
+      return helpText('Core', 'Core_ErrorLogTile_CopyFailed');
     }
   };
 
+  /** The report text, shown to copy by hand when the browser refuses the clipboard. */
+  reportText;
   tile;
   errorMessage;
   busy = false;
@@ -119,6 +146,29 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
           refreshApex(this.wiredTileResult);
         }
       });
+  }
+
+  /**
+   * Copy for Bug Report (QA review Q10): redacted text (c/bugReportText keeps only error codes
+   * and stack lines, never the message or a record) on the clipboard, or shown to copy by hand.
+   */
+  async handleCopyBugReport(event) {
+    const errorLogId = event.target.dataset.entry;
+    this.errorMessage = undefined;
+    this.reportText = undefined;
+    let text;
+    try {
+      text = bugReportText(await getBugReport({ errorLogId }), bugReportWords());
+    } catch (error) {
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_ErrorLog_ActionFailed'));
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      Toast.show({ label: helpText('Core', 'Core_ErrorLogTile_Copied'), variant: 'success' }, this);
+    } catch {
+      this.reportText = text;
+    }
   }
 
   /** In a console the entry opens as a subtab beside this tile; elsewhere it opens as a page. */

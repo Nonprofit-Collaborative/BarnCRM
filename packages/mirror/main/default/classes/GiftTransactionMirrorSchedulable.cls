@@ -9,12 +9,6 @@
 public with sharing class GiftTransactionMirrorSchedulable implements Schedulable {
 	/** The name the run was scheduled under, now the step's key. */
 	public static final String JOB_NAME = 'BarnCRM Mirror: Gift Transaction mirror';
-	private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
-		'Queued',
-		'Preparing',
-		'Processing',
-		'Holding'
-	};
 
 	/** Starts tonight's run, unless the mirror is off or a run is still going. */
 	public void execute(SchedulableContext context) {
@@ -63,17 +57,6 @@ public with sharing class GiftTransactionMirrorSchedulable implements Schedulabl
 
 	/** True while a run is queued or in progress, so only one runs at a time. */
 	public static Boolean isRunning() {
-		Set<String> statuses = RUNNING_JOB_STATUSES;
-		return ![
-				SELECT Id
-				FROM AsyncApexJob
-				WHERE
-					ApexClass.Name = :GiftTransactionMirrorBatch.CLASS_NAME
-					AND JobType = 'BatchApex'
-					AND Status IN :statuses
-				WITH USER_MODE
-				LIMIT 1
-			]
-			.isEmpty();
+		return MirrorSync.isRunning(GiftTransactionMirrorBatch.CLASS_NAME);
 	}
 }

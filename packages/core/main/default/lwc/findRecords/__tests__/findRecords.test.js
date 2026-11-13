@@ -227,11 +227,11 @@ describe('c-find-records', () => {
     jest.restoreAllMocks();
   });
 
-  it('leaves the page name to the App Page header, with no card around the page', async () => {
+  it('shows the page name in its shell, on its tab, with no card around the page', async () => {
     const element = await render();
 
     const shell = one(element, 'shell');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBe(false);
     expect(shell.title).toBe('c.Core_Find_Title');
     expect(shell.purpose).toBe('c.Core_Find_Purpose');
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();

@@ -7,16 +7,16 @@
 private class EventVolunteersControllerTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staffWithVolunteers() {
 		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, EventsAccessSync.ADMIN_SET, 'Volunteers_Admin' }
+			new List<String>{ TestUsers.CORE_ADMIN, 'Events_Admin', 'Volunteers_Admin' }
 		);
 	}
 

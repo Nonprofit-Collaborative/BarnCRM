@@ -107,6 +107,65 @@ private class ErrorLogControllerTest {
 	}
 
 	@IsTest
+	static void anAdministratorsBugReportCarriesTheTechnicalDetail() {
+		System.runAs(TestUsers.admin()) {
+			Error_Log__c entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
+
+			Test.startTest();
+			Map<String, Object> report = ErrorLogController.getBugReport(entry.Id);
+			Test.stopTest();
+
+			Assert.areEqual('Test context 0', report.get('context'), 'Where it happened.');
+			Assert.areEqual(ErrorLogger.SEVERITY_ERROR, report.get('severity'), 'How bad it was.');
+			Assert.areEqual(
+				'TestException: number 0',
+				report.get('technicalDetail'),
+				'The page redacts the detail; the server hands it over for that.'
+			);
+			Assert.isFalse(report.containsKey('message'), 'The message never leaves the org.');
+		}
+	}
+
+	@IsTest
+	static void staffGetABugReportWithoutTheTechnicalDetail() {
+		Error_Log__c entry;
+		User staff;
+		System.runAs(TestUsers.admin()) {
+			entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
+			staff = TestUsers.standardUserWith(
+				'BugReportStaff',
+				new List<String>{ 'BarnCRM_Staff' }
+			);
+		}
+
+		System.runAs(staff) {
+			Test.startTest();
+			Map<String, Object> report = ErrorLogController.getBugReport(entry.Id);
+			try {
+				ErrorLogController.getBugReport('not-an-id');
+				Assert.fail('A value that is not an entry is refused.');
+			} catch (AuraHandledException expected) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound'),
+					expected.getMessage(),
+					'Staff are told to refresh the page.'
+				);
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				'Test context 0',
+				report.get('context'),
+				'Staff see where it happened.'
+			);
+			Assert.isNull(
+				report.get('technicalDetail'),
+				'Staff may not read Technical Detail, so the report leaves it out.'
+			);
+		}
+	}
+
+	@IsTest
 	static void anEmptyLogIsAnEmptyTile() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();

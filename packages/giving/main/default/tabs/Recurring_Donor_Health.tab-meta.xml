@@ -4,7 +4,7 @@
     Recurring donor health: monthly recurring revenue and the Save the Sustainer list of recurring
     gifts with failed charges, expiring cards, cancellations or missed payments (G-27).
   </description>
-  <flexiPage>Recurring_Donor_Health</flexiPage>
   <label>Recurring Donor Health</label>
+  <lwcComponent>recurringDonorHealth</lwcComponent>
   <motif>Custom86: RedCross</motif>
 </CustomTab>

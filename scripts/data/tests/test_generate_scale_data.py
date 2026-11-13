@@ -145,6 +145,22 @@ class Tier1Tests(unittest.TestCase):
         chunks = gen.split_rows_to_chunks(rows)
         self.assertEqual([len(c) for c in chunks], [200, 200, 50])
 
+    def test_skew_puts_the_extra_gifts_on_one_donor(self):
+        with tempfile.TemporaryDirectory() as other:
+            out = Path(other)
+            gen.generate_tier1(
+                Namespace(
+                    out_dir=str(out), households=40, contacts=100, gifts=300,
+                    no_default_fund=False, skip_fund_code=[], acknowledge_every=10,
+                    skew_gifts=1200,
+                )
+            )
+            donors = {}
+            for row in read(out / "gifts.csv"):
+                donors[row["Contact_Key"]] = donors.get(row["Contact_Key"], 0) + 1
+            self.assertEqual(sum(donors.values()), 1500)
+            self.assertGreaterEqual(max(donors.values()), 1200)
+
 
 class ResolveTests(unittest.TestCase):
     def write(self, path, header, rows):

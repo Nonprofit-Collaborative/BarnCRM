@@ -3,7 +3,7 @@
   <description>
     Build your own Lightning components on a drag-and-drop grid, preview them and export them.
   </description>
-  <flexiPage>LWC_Builder</flexiPage>
   <label>LWC Builder</label>
+  <lwcComponent>lwcBuilderStudio</lwcComponent>
   <motif>Custom34: Insect</motif>
 </CustomTab>

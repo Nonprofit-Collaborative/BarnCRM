@@ -4,7 +4,7 @@
  * date, and builds what to save. No Lightning or Salesforce import, so it runs and is tested
  * anywhere (a WordPress block, Node).
  */
-import { format } from 'c/barnFormat';
+import { format, utcIsoDate } from 'c/barnFormat';
 
 /** How far ahead Mark Reviewed offers the next review (R-GL3); the user changes it each time. */
 export const REVIEW_MONTHS = 3;
@@ -48,7 +48,7 @@ export function addMonths(isoDate, months) {
     Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)
   ).getUTCDate();
   target.setUTCDate(Math.min(day, lastDay));
-  return target.toISOString().slice(0, 10);
+  return utcIsoDate(target);
 }
 
 /** An ISO date shown in the user's locale, or '' for none. */

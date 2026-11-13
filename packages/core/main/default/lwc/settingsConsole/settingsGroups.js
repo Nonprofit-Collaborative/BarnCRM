@@ -173,9 +173,9 @@ const PAGE_GROUPS = {
       ]
     },
     {
-      id: 'Nightly Jobs and Accounting Periods',
+      id: 'Accounting Periods',
       label: GIVING_JOBS,
-      keys: ['Giving_Nightly_Jobs', 'Giving_Accounting_Periods']
+      keys: ['Giving_Accounting_Periods']
     },
     {
       id: 'BarnCRM Mirror',

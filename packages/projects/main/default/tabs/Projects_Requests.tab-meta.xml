@@ -4,7 +4,7 @@
     Requests and issues: log, triage, assign and resolve requests, with comments and the tasks and
     change requests they become (D-201).
   </description>
-  <flexiPage>Projects_Requests</flexiPage>
   <label>Requests</label>
+  <lwcComponent>projectsRequests</lwcComponent>
   <motif>Custom18: Form</motif>
 </CustomTab>

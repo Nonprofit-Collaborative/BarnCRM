@@ -20,8 +20,11 @@ both shapes below before a release.
 | Person Accounts | `scripts/org/create-scratch-org.sh person-accounts <alias> --days 30 --no-sample-data` | The default. Closest to an Agentforce Nonprofit org; Opportunity and Campaign exist, so Mirror can be tested. |
 | Platform only | `scripts/org/create-scratch-org.sh platform-only <alias> --days 30 --no-sample-data` | Proving Core and the modules work with no Sales or Service objects, and that every Core permission set fits a Salesforce Platform license (the script checks this itself). |
 
-The other shapes (`sales-cloud`, `npsp`, `nonprofit-cloud`) exist in `config/scratch-defs/`;
-use them only when a script asks for them. `nonprofit-cloud` needs an entitled Dev Hub.
+The other shapes (`sales-cloud`, `npsp`, `nonprofit-cloud`, `multi-currency`) exist in
+`config/scratch-defs/`; use them only when a script asks for them. `nonprofit-cloud` needs an
+entitled Dev Hub. Every Apex test runs on the Sales Cloud, Person Accounts, Platform-only and
+NPSP shapes, and once per version on multi-currency, in the release gate
+(`scripts/org/release-gate.sh`), so a script here need not repeat what those tests prove.
 
 The script creates the org, deploys Core, gives your login user every Core permission set, and
 prints the expiry date. A scratch org lasts at most 30 days. To start again from a clean org,

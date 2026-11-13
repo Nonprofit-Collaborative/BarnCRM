@@ -4,7 +4,7 @@
     The date the books are closed through (G-20), reached from the Giving section of Nonprofit
     Settings.
   </description>
-  <flexiPage>Giving_Accounting_Periods</flexiPage>
   <label>Accounting Periods</label>
+  <lwcComponent>accountingPeriods</lwcComponent>
   <motif>Custom55: Books</motif>
 </CustomTab>

@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={helpReady}>
-  <c-barn-page-shell title={labels.title} purpose={labels.intro} title-hidden data-id="shell">
+  <c-barn-page-shell title={labels.title} purpose={labels.intro} data-id="shell">
     <div>
       <template lwc:if={hasAnyArea}>
         <lightning-tabset active-tab-value={activeArea}>

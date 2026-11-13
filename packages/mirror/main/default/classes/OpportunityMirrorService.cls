@@ -78,22 +78,13 @@ public with sharing class OpportunityMirrorService {
 	private static Boolean noHeadroomLogged = false;
 
 	/** What one call did, for the run summary and the tests. */
-	public class Result {
-		public Integer created = 0;
-		public Integer updated = 0;
-		public Integer unchanged = 0;
-		public Integer failed = 0;
-		public Integer skipped = 0;
-		/** The refusals, grouped by message; written by the caller (R-OM6). */
-		public MirrorSync.Warnings refusals = new MirrorSync.Warnings();
+	public class Result extends MirrorSync.Result {
+		public override String nameOf(Gift__c gift) {
+			return OpportunityMirrorService.nameOf(gift);
+		}
 
-		public void add(Result other) {
-			created += other.created;
-			updated += other.updated;
-			unchanged += other.unchanged;
-			failed += other.failed;
-			skipped += other.skipped;
-			refusals.addAll(other.refusals);
+		public override String orphanTemplate() {
+			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOrphan');
 		}
 
 		/** Writes the grouped refusals of gifts as Warnings, in one statement. */
@@ -286,7 +277,14 @@ public with sharing class OpportunityMirrorService {
 		Savepoint beforeChunk = Database.setSavepoint();
 		try {
 			Result copied = copy(valid);
-			storeLinks(valid, linkBefore, copied);
+			MirrorSync.storeLinks(
+				valid,
+				Gift__c.Opportunity_Id__c,
+				linkBefore,
+				opportunityType(),
+				AUTOMATION_NAME,
+				copied
+			);
 			result.add(copied);
 		} catch (Exception unexpected) {
 			Database.rollback(beforeChunk);
@@ -309,16 +307,12 @@ public with sharing class OpportunityMirrorService {
 		if (deleted == null || deleted.isEmpty() || !isAvailable() || direction() == OFF) {
 			return;
 		}
-		String message = direction() == OPPORTUNITIES_TO_GIFTS
-			? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_DeletedRemade')
-			: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_DeletedKept');
-		MirrorSync.Warnings warnings = new MirrorSync.Warnings();
-		for (Gift__c gift : deleted) {
-			if (gift.Opportunity_Id__c != null) {
-				warnings.add(message, gift.Name + ' (' + gift.Opportunity_Id__c + ')', gift.Id);
-			}
-		}
-		warnings.write(
+		MirrorSync.warnLeftBehind(
+			deleted,
+			Gift__c.Opportunity_Id__c,
+			direction() == OPPORTUNITIES_TO_GIFTS
+				? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_DeletedRemade')
+				: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_DeletedKept'),
 			CONTEXT,
 			BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogDeletedOne'),
 			BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogDeletedMany')
@@ -458,7 +452,7 @@ public with sharing class OpportunityMirrorService {
 					result.created++;
 				} else {
 					result.failed++;
-					refuse(result, insertedFor[i], saved[i].getErrors());
+					result.refuse(insertedFor[i], saved[i].getErrors());
 				}
 			}
 		}
@@ -473,7 +467,7 @@ public with sharing class OpportunityMirrorService {
 					result.updated++;
 				} else {
 					result.failed++;
-					refuse(result, updatedFor[i], saved[i].getErrors());
+					result.refuse(updatedFor[i], saved[i].getErrors());
 				}
 			}
 		}
@@ -552,73 +546,10 @@ public with sharing class OpportunityMirrorService {
 				result.refusals.add(
 					String.format(
 						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ContactRole'),
-						new List<Object>{ messageOf(saved[i].getErrors()) }
+						new List<Object>{ MirrorSync.messageOf(saved[i].getErrors()) }
 					),
 					nameOf(savedFor[i]),
 					savedFor[i].Id
-				);
-			}
-		}
-	}
-
-	/**
-	 * Saves each gift whose link changed, with partial success. A gift that is refused is counted
-	 * as failed, and an Opportunity created for it in this call is deleted again (R-OM9).
-	 */
-	private static void storeLinks(List<Gift__c> gifts, Map<Id, String> linkBefore, Result result) {
-		List<Gift__c> links = new List<Gift__c>();
-		List<Gift__c> linkedFor = new List<Gift__c>();
-		for (Gift__c gift : gifts) {
-			if (!MirrorSync.same(gift.Opportunity_Id__c, linkBefore.get(gift.Id))) {
-				links.add(new Gift__c(Id = gift.Id, Opportunity_Id__c = gift.Opportunity_Id__c));
-				linkedFor.add(gift);
-			}
-		}
-		if (links.isEmpty()) {
-			return;
-		}
-		List<Database.SaveResult> saved;
-		AutomationControl.bypass(AUTOMATION_NAME);
-		try {
-			saved = Database.update(links, false, AccessLevel.USER_MODE);
-		} finally {
-			AutomationControl.clearBypass(AUTOMATION_NAME);
-		}
-		List<SObject> orphans = new List<SObject>();
-		List<Gift__c> orphanedFor = new List<Gift__c>();
-		for (Integer i = 0; i < saved.size(); i++) {
-			if (saved[i].isSuccess()) {
-				continue;
-			}
-			Gift__c gift = linkedFor[i];
-			result.failed++;
-			refuse(result, gift, saved[i].getErrors());
-			if (linkBefore.get(gift.Id) == null) {
-				result.created--;
-				orphans.add(opportunityType().newSObject(Id.valueOf(gift.Opportunity_Id__c)));
-				orphanedFor.add(gift);
-			}
-		}
-		if (orphans.isEmpty()) {
-			return;
-		}
-		List<Database.DeleteResult> deleted = Database.delete(
-			orphans,
-			false,
-			AccessLevel.USER_MODE
-		);
-		for (Integer i = 0; i < deleted.size(); i++) {
-			if (!deleted[i].isSuccess()) {
-				result.refusals.add(
-					String.format(
-						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogOrphan'),
-						new List<Object>{
-							String.valueOf(orphans[i].Id),
-							messageOf(deleted[i].getErrors())
-						}
-					),
-					orphanedFor[i].Name,
-					orphanedFor[i].Id
 				);
 			}
 		}
@@ -661,18 +592,6 @@ public with sharing class OpportunityMirrorService {
 			BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_NewGift'),
 			new List<Object>{ String.valueOf(gift.Amount__c), String.valueOf(gift.Gift_Date__c) }
 		);
-	}
-
-	private static void refuse(Result result, Gift__c gift, List<Database.Error> errors) {
-		result.refusals.add(messageOf(errors), nameOf(gift), gift.Id);
-	}
-
-	private static String messageOf(List<Database.Error> errors) {
-		List<String> messages = new List<String>();
-		for (Database.Error error : errors) {
-			messages.add(error.getMessage());
-		}
-		return String.join(messages, ' ');
 	}
 
 	/** Whether a gift of this status leaves its Opportunity's stage as it is (R-OM3). */

@@ -31,7 +31,7 @@ public with sharing class EventsHealthCheckExtension implements HealthCheckExten
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		if (
 			!HealthCheckService.canManageSettings() ||
-			ModuleManagerService.turnedOff().contains(EventsAccessSync.MODULE_NAME.toLowerCase()) ||
+			ModuleManagerService.turnedOff().contains(EventsPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Event__c.isAccessible()
 		) {
 			return found;

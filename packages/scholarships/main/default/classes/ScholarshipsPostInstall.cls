@@ -4,7 +4,7 @@
  * none can abort an install, since every failure is written to the Error Log instead:
  *
  * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`).
- * 2. Queue `ScholarshipsAccessSync`, which gives Scholarships Admin to every BarnCRM Admin holder
+ * 2. Queue `ModuleAccessSyncs`, which gives Scholarships Admin to every BarnCRM Admin holder
  *    (the installer among them, given BarnCRM Admin by Core's own install) and the other sets to
  *    BarnCRM's roles. Queued, since a permission set assignment is a setup object write.
  *
@@ -13,7 +13,7 @@
  */
 @NamespaceAccessible
 public with sharing class ScholarshipsPostInstall implements InstallHandler, ModuleSetup {
-	private static final String MODULE_KEY = 'Scholarships';
+	public static final String MODULE_KEY = 'Scholarships';
 	/**
 	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
@@ -42,7 +42,7 @@ public with sharing class ScholarshipsPostInstall implements InstallHandler, Mod
 		);
 		ModuleSetups.markRan(MODULE_KEY);
 		try {
-			new ScholarshipsAccessSync().requestSync();
+			ModuleAccessSyncs.requestFor(MODULE_KEY);
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'ScholarshipsPostInstall');
 		}

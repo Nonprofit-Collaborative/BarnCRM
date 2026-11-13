@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the nightly address
+ * The class Core finds by name (registered in its catalog row) to add the nightly address
  * check to the one nightly run (ADR-0166; ADR-0209 `0209-address-verification-module.md`,
  * decision 5). Its switch ships on; it runs only while the module is on, the chosen provider's
  * keys are entered and the Nightly Limit is above 0, so a fresh install looks nothing up.
