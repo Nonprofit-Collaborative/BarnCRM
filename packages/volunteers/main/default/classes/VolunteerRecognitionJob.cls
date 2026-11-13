@@ -17,7 +17,11 @@ public with sharing class VolunteerRecognitionJob implements Database.Batchable<
 		if (ShiftScheduleService.isTurnedOff() || !VolunteerSettings.recognitionEnabled()) {
 			return null;
 		}
-		return Database.executeBatch(new VolunteerRecognitionJob(), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new VolunteerRecognitionJob(),
+			CHUNK_SIZE,
+			'VolunteerRecognitionJob'
+		);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

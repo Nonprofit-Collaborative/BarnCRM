@@ -9,8 +9,8 @@ public with sharing class GrantManagementController {
 	private static final String CONTEXT = 'GrantManagementController';
 	private static final Integer MAX_ROWS = 200;
 
-	/** The Checklist card: the grant's Task requirements. */
-	@AuraEnabled
+	/** The Checklist card: the grant's Task requirements. Cached; the card refreshes it after a save. */
+	@AuraEnabled(cacheable=true)
 	public static Map<String, Object> getChecklist(Id grantId) {
 		try {
 			List<Map<String, Object>> tasks = new List<Map<String, Object>>();
@@ -194,8 +194,8 @@ public with sharing class GrantManagementController {
 		}
 	}
 
-	/** The Renewals card: the chain across years and whether Start Renewal is offered (R-GN12). */
-	@AuraEnabled
+	/** The Renewals card: the chain across years and whether Start Renewal is offered (R-GN12). Cached. */
+	@AuraEnabled(cacheable=true)
 	public static Map<String, Object> getRenewals(Id grantId) {
 		try {
 			List<Map<String, Object>> chain = new List<Map<String, Object>>();

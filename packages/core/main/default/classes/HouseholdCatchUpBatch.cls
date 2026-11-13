@@ -66,7 +66,11 @@ public with sharing class HouseholdCatchUpBatch implements Database.Batchable<SO
 
 	private static Id enqueue(Boolean personAccounts) {
 		try {
-			return Database.executeBatch(new HouseholdCatchUpBatch(personAccounts), chunkSize);
+			return AsyncStarter.batch(
+				new HouseholdCatchUpBatch(personAccounts),
+				chunkSize,
+				LOG_CONTEXT
+			);
 		} catch (Exception e) {
 			ErrorLogger.log(e, LOG_CONTEXT);
 			return null;

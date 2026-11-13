@@ -288,6 +288,7 @@ private class AccessExplorerControllerTest {
 		System.runAs(TestUsers.admin()) {
 			PermissionSet created = testSet();
 			User person = pat(created);
+			Test.setFixedSearchResults(new List<Id>{ person.Id });
 			List<AccessExplorerController.Choice> people;
 			List<AccessExplorerController.Choice> sets;
 			List<AccessExplorerController.Choice> tooShort;

@@ -1,4 +1,5 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getChecklist from '@salesforce/apex/GrantManagementController.getChecklist';
 import addChecklistTasks from '@salesforce/apex/GrantManagementController.addChecklistTasks';
@@ -21,26 +22,35 @@ export default class GrantChecklist extends LightningElement {
   errorMessage;
   isLoading = true;
 
+  wiredCard;
+
   connectedCallback() {
     if (!this.helpReady) {
       loadHelp('Funders').then(() => {
         this.helpReady = true;
       });
     }
-    this.load();
   }
 
-  async load() {
-    this.isLoading = true;
-    try {
-      this.card = await getChecklist({ grantId: this.recordId });
+  // Cached read (D-200 P11); each save below refreshes it with load().
+  @wire(getChecklist, { grantId: '$recordId' })
+  receiveChecklist(result) {
+    this.wiredCard = result;
+    const { data, error } = result;
+    if (data) {
+      this.card = data;
       this.errorMessage = undefined;
-    } catch (error) {
+    } else if (error) {
       this.card = undefined;
       this.errorMessage = messageFrom(error, helpText('Funders', 'Funders_Manage_LoadFailed'));
-    } finally {
+    }
+    if (data || error) {
       this.isLoading = false;
     }
+  }
+
+  load() {
+    return refreshApex(this.wiredCard);
   }
 
   get t() {

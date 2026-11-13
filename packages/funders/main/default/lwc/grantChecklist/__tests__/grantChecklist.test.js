@@ -5,11 +5,19 @@ import addChecklistTasks from '@salesforce/apex/GrantManagementController.addChe
 import setTaskDone from '@salesforce/apex/GrantManagementController.setTaskDone';
 import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
 
+import { refreshApex } from '@salesforce/apex';
+
 jest.mock(
   '@salesforce/apex/GrantManagementController.getChecklist',
-  () => ({ default: jest.fn() }),
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
   { virtual: true }
 );
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/apex/GrantManagementController.addChecklistTasks',
   () => ({ default: jest.fn() }),
@@ -30,10 +38,10 @@ const TASKS = [
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 async function render(card) {
-  getChecklist.mockResolvedValue(card);
   const element = createElement('c-grant-checklist', { is: GrantChecklist });
   element.recordId = 'a01000000000001';
   document.body.appendChild(element);
+  getChecklist.emit(card);
   await flush();
   return element;
 }
@@ -62,7 +70,17 @@ describe('c-grant-checklist', () => {
     box.dispatchEvent(new CustomEvent('change'));
     await flush();
     expect(setTaskDone).toHaveBeenCalledWith({ requirementId: 'r2', done: true });
-    expect(getChecklist).toHaveBeenCalledTimes(2);
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the load error', async () => {
+    const element = createElement('c-grant-checklist', { is: GrantChecklist });
+    element.recordId = 'a01000000000001';
+    document.body.appendChild(element);
+    getChecklist.error({ message: 'No access' });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="empty"]')).toBeNull();
+    expect(getChecklist.getLastConfig()).toEqual({ grantId: 'a01000000000001' });
   });
 
   it('adds the checklist tasks of the grant stage', async () => {

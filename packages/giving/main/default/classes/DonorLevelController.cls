@@ -83,7 +83,11 @@ public with sharing class DonorLevelController {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_DonorLevels_TurnOnFirst'));
 		}
 		try {
-			return Database.executeBatch(new DonorLevelBatch(), DonorLevelSchedulable.CHUNK_SIZE);
+			return AsyncStarter.batch(
+				new DonorLevelBatch(),
+				DonorLevelSchedulable.CHUNK_SIZE,
+				'DonorLevelController'
+			);
 		} catch (Exception failure) {
 			throw report(failure);
 		}

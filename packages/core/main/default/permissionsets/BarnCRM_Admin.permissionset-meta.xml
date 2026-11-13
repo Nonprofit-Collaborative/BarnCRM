@@ -572,6 +572,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Address__c.Match_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Address__c.Person_Account__c</field>
     <readable>true</readable>

@@ -171,7 +171,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		String first = BulkUpdateService.OPERATION_UPDATE.equals(operation)
 			? PASS_RESTORE
 			: passes()[0];
-		return Database.executeBatch(
+		return AsyncStarter.batch(
 			new ImportUndoBatch(
 				batchId,
 				countedAtStart,
@@ -180,7 +180,8 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 				false,
 				toTheSecond(Datetime.now())
 			),
-			scopeFor(first, batchId)
+			scopeFor(first, batchId),
+			'ImportUndoBatch'
 		);
 	}
 

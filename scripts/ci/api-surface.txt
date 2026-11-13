@@ -40,6 +40,11 @@ core/AccountKinds.cls | public static final String KEY_ORGANIZATION_RECORD_TYPE
 core/AccountKinds.cls | public static final String NO_RECORD_TYPE
 core/AccountKinds.cls | public static final String SHIPPED_RECORD_TYPE
 core/AccountKinds.cls | public static void storeDetectedIfBlank()
+core/AsyncStarter.cls | public class AsyncStarter
+core/AsyncStarter.cls | public class BusyException
+core/AsyncStarter.cls | public static Id batch(Database.Batchable<SObject>,Integer,String)
+core/AsyncStarter.cls | public static Id queue(Queueable,Integer,String)
+core/AsyncStarter.cls | public static Id queue(Queueable,String)
 core/AutomationControl.cls | public class AutomationControl
 core/AutomationControl.cls | public class AutomationControlException
 core/AutomationControl.cls | public static Boolean canManage()
@@ -352,6 +357,7 @@ core/HealthCheckService.cls | public class HealthCheckService
 core/HealthCheckService.cls | public class Link
 core/HealthCheckService.cls | public class Report
 core/HealthCheckService.cls | public static Boolean canManageSettings()
+core/HealthCheckService.cls | public static Boolean nearLimits()
 core/HealthCheckService.cls | public static Finding checkFailed(String,Exception)
 core/HealthCheckService.cls | public static List<Finding> run()
 core/HealthCheckService.cls | public static String forCount(Integer,String,String,List<Object>)
@@ -363,6 +369,9 @@ core/HealthCheckService.cls | public static final String FIX_CUSTOM_PERMISSIONS_
 core/HealthCheckService.cls | public static final String SEVERITY_ERROR
 core/HealthCheckService.cls | public static final String SEVERITY_INFO
 core/HealthCheckService.cls | public static final String SEVERITY_WARNING
+core/HealthCheckSkew.cls | public class HealthCheckSkew
+core/HealthCheckSkew.cls | public static HealthCheckService.Finding ownership(String,String,String,Map<String,Object>,String)
+core/HealthCheckSkew.cls | public static Integer threshold()
 core/HouseholdDependentsExtension.cls | public interface HouseholdDependentsExtension
 core/HouseholdDependentsExtensions.cls | public class HouseholdDependentsExtensions
 core/HouseholdDependentsExtensions.cls | public static Set<Id> householdsWithDependents(Set<Id>)

@@ -41,7 +41,7 @@ public with sharing class SessionScheduleBatch implements Database.Batchable<SOb
 	/** Starts the nightly run; nothing while Programs is turned off. */
 	public void execute(SchedulableContext context) {
 		if (!SessionScheduleService.isTurnedOff()) {
-			Database.executeBatch(new SessionScheduleBatch(), CHUNK_SIZE);
+			AsyncStarter.batch(new SessionScheduleBatch(), CHUNK_SIZE, 'SessionScheduleBatch');
 		}
 	}
 

@@ -71,8 +71,8 @@ public with sharing class GrantScheduleController {
 		public Date receivedDate;
 	}
 
-	/** The card for one grant. */
-	@AuraEnabled
+	/** The card for one grant. Cached; the card refreshes it after a save. */
+	@AuraEnabled(cacheable=true)
 	public static Schedule getSchedule(Id grantId) {
 		try {
 			Schedule schedule = new Schedule();

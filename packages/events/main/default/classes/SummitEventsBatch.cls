@@ -12,7 +12,7 @@ public with sharing class SummitEventsBatch implements Database.Batchable<SObjec
 		if (!SummitEventsAdapter.isActive()) {
 			return null;
 		}
-		return Database.executeBatch(new SummitEventsBatch(), CHUNK_SIZE);
+		return AsyncStarter.batch(new SummitEventsBatch(), CHUNK_SIZE, 'SummitEventsBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

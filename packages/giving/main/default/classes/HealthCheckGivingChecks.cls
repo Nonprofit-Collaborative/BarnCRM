@@ -53,6 +53,8 @@ public with sharing class HealthCheckGivingChecks {
 	private static final String CHECK_OVERRIDE_RECEIPT_LOCK = 'override_receipt_lock';
 	private static final String CHECK_UNPOSTED_CLOSED_PERIOD = 'unposted_gifts_closed_period';
 	private static final String CHECK_DONATION_FORM_AMOUNT = 'donation_form_amount';
+	private static final String CHECK_LOOKUP_SKEW = 'gift_lookup_skew';
+	private static final String CHECK_GIFT_OWNERSHIP_SKEW = 'gift_ownership_skew';
 
 	/**
 	 * Every finding Giving adds to the Health Check report, for this viewer. Each check is
@@ -65,10 +67,15 @@ public with sharing class HealthCheckGivingChecks {
 			checks.add(CHECK_OVERRIDE_RECEIPT_LOCK);
 			checks.add(CHECK_UNPOSTED_CLOSED_PERIOD);
 			checks.add(CHECK_DONATION_FORM_AMOUNT);
+			checks.add(CHECK_LOOKUP_SKEW);
+			checks.add(CHECK_GIFT_OWNERSHIP_SKEW);
 		}
 
 		List<HealthCheckService.Finding> findings = new List<HealthCheckService.Finding>();
 		for (String check : checks) {
+			if (HealthCheckService.nearLimits()) {
+				break;
+			}
 			try {
 				addIfAny(findings, run(check));
 			} catch (Exception e) {
@@ -88,7 +95,67 @@ public with sharing class HealthCheckGivingChecks {
 		if (check == CHECK_DONATION_FORM_AMOUNT) {
 			return donationFormAmountFinding();
 		}
+		if (check == CHECK_LOOKUP_SKEW) {
+			return lookupSkewFinding();
+		}
+		if (check == CHECK_GIFT_OWNERSHIP_SKEW) {
+			return HealthCheckSkew.ownership(
+				CHECK_GIFT_OWNERSHIP_SKEW,
+				Gift__c.SObjectType.getDescribe().getName(),
+				null,
+				null,
+				Gift__c.SObjectType.getDescribe().getLabelPlural()
+			);
+		}
 		return receiptGenerationFinding();
+	}
+
+	/**
+	 * Funds and Appeals with more than HealthCheckSkew.threshold() gifts (D-200 P12, lookup
+	 * skew). Every gift saved against one of them locks the same parent row, so large parallel
+	 * loads fail with lock errors. Read from the rollup counts, never by counting gifts.
+	 */
+	private static HealthCheckService.Finding lookupSkewFinding() {
+		Integer threshold = HealthCheckSkew.threshold();
+		List<SObject> skewed = new List<SObject>();
+		skewed.addAll(
+			[
+				SELECT Id, Name
+				FROM Fund__c
+				WHERE Gift_Count__c > :threshold
+				WITH SYSTEM_MODE
+				ORDER BY Gift_Count__c DESC
+				LIMIT :LINKS_SHOWN
+			]
+		);
+		skewed.addAll(
+			[
+				SELECT Id, Name
+				FROM Appeal__c
+				WHERE Gift_Count__c > :threshold
+				WITH SYSTEM_MODE
+				ORDER BY Gift_Count__c DESC
+				LIMIT :LINKS_SHOWN
+			]
+		);
+		if (skewed.isEmpty()) {
+			return null;
+		}
+		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
+		for (SObject record : skewed) {
+			links.add(new HealthCheckService.Link(record));
+		}
+		return new HealthCheckService.Finding(
+				CHECK_LOOKUP_SKEW,
+				BarnHelp.text('Giving', 'Giving_HealthCheck_LookupSkewTitle'),
+				String.format(
+					BarnHelp.text('Giving', 'Giving_HealthCheck_LookupSkewDetail'),
+					new List<Object>{ threshold.format() }
+				),
+				HealthCheckService.SEVERITY_INFO,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withLinks(links);
 	}
 
 	private static void addIfAny(

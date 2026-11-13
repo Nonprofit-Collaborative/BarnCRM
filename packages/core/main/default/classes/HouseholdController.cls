@@ -131,7 +131,13 @@ public with sharing class HouseholdController {
 					BarnHelp.text('Core', 'Core_Households_ErrorNoSettingsPermission')
 				);
 			}
-			return String.valueOf(Database.executeBatch(new HouseholdNamingBatch(), 200));
+			return String.valueOf(
+				AsyncStarter.batch(
+					new HouseholdNamingBatch(),
+					200,
+					Label.Core_Households_ErrorContextNaming
+				)
+			);
 		} catch (Exception e) {
 			throw HouseholdException.forScreen(e, Label.Core_Households_ErrorContextNaming, null);
 		}

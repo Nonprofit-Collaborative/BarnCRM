@@ -40,8 +40,8 @@ public with sharing class GrantProgramController {
 		}
 	}
 
-	/** The card for one grant. */
-	@AuraEnabled
+	/** The card for one grant. Cached; the card refreshes it after a save. */
+	@AuraEnabled(cacheable=true)
 	public static ProgramCard getProgram(Id grantId) {
 		try {
 			ProgramCard card = new ProgramCard();

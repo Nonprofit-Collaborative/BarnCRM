@@ -1047,6 +1047,23 @@ private class HealthCheckServiceTest {
 		}
 	}
 
+	/** D-200 P7: near a limit, the rest is reported as not checked instead of failing. */
+	@IsTest
+	static void nearTheLimitsTheRestIsLeftForAnotherRun() {
+		System.runAs(TestUsers.admin()) {
+			OrgShapeDetector.overrideShape = shape(true, false, false, false);
+			HealthCheckService.queryBudget = -1;
+
+			List<HealthCheckService.Finding> findings = HealthCheckService.run();
+
+			Assert.areEqual(1, findings.size(), 'Only the not checked finding: ' + findings);
+			HealthCheckService.Finding skipped = find(findings, 'not_checked');
+			Assert.isNotNull(skipped, 'The skipped checks are reported');
+			Assert.isTrue(skipped.detail.contains('org_shape'), 'And named: ' + skipped.detail);
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, skipped.severity);
+		}
+	}
+
 	@IsTest
 	static void oneFailingCheckDoesNotHideTheOthers() {
 		System.runAs(TestUsers.admin()) {

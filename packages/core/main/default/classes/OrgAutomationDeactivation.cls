@@ -97,7 +97,10 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			Items__c = JSON.serialize(items)
 		);
 		insert as user snapshot;
-		System.enqueueJob(new OrgAutomationDeactivation(snapshot.Id, MODE_SNAPSHOT));
+		AsyncStarter.queue(
+			new OrgAutomationDeactivation(snapshot.Id, MODE_SNAPSHOT),
+			'OrgAutomationDeactivation'
+		);
 		return snapshot.Id;
 	}
 
@@ -117,7 +120,10 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 		}
 		snapshot.Status__c = 'Restoring';
 		update as user snapshot;
-		System.enqueueJob(new OrgAutomationDeactivation(snapshot.Id, MODE_RESTORE));
+		AsyncStarter.queue(
+			new OrgAutomationDeactivation(snapshot.Id, MODE_RESTORE),
+			'OrgAutomationDeactivation'
+		);
 		return snapshot.Id;
 	}
 

@@ -188,7 +188,7 @@ public with sharing class BackupSetService {
 		);
 		Database.insert(job, AccessLevel.SYSTEM_MODE);
 		String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
-		job.Job_Id__c = Database.executeBatch(
+		job.Job_Id__c = AsyncStarter.batch(
 			FindExportBatch.forBackup(
 				query.Query_JSON__c,
 				fields,
@@ -196,7 +196,8 @@ public with sharing class BackupSetService {
 				FindController.exportLimit(),
 				job.Id
 			),
-			BulkDeleteService.BACKUP_PAGE_SIZE
+			BulkDeleteService.BACKUP_PAGE_SIZE,
+			'BackupSetService'
 		);
 		Database.update(
 			new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c),

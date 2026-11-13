@@ -13,7 +13,7 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 	public static final String JOB_NAME = 'BarnCRM Seasonal Addresses';
 
 	public void execute(SchedulableContext context) {
-		Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
+		runNow();
 	}
 
 	/** True when the Seasonal Addresses switch is on. */
@@ -46,7 +46,11 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 
 	/** Runs the swap now, without waiting for tonight. */
 	public static Id runNow() {
-		return Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new SeasonalAddressBatch(),
+			SeasonalAddressBatch.CHUNK_SIZE,
+			'SeasonalAddressScheduler'
+		);
 	}
 
 	/** True when the switch is on and the nightly run is scheduled. */

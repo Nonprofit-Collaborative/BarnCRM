@@ -35,9 +35,10 @@ public with sharing class AcknowledgmentRunService {
 		Acknowledgment_Run__c run = newRun(AcknowledgmentRuleService.CHANNEL_EMAIL);
 		AcknowledgmentWriter.insertRun(run);
 		try {
-			run.Async_Job_Id__c = Database.executeBatch(
+			run.Async_Job_Id__c = AsyncStarter.batch(
 				new AcknowledgmentBatch(run.Id),
-				AcknowledgmentBatch.SCOPE
+				AcknowledgmentBatch.SCOPE,
+				'AcknowledgmentRunService'
 			);
 			run.Status__c = STATUS_RUNNING;
 			run.Started__c = System.now();

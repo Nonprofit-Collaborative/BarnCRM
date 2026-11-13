@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Match_Key__c</fullName>
+  <description>The normalized postal code, a bar and the first street word normalization leaves as written, for example 02139|77 (D-200 P6). Set on every save by BarnCRM so duplicate matching reads addresses through this index instead of searching every street. Written by BarnCRM only; there is no reason to edit it by hand.</description>
+  <externalId>true</externalId>
+  <inlineHelpText>Set by BarnCRM on every save, so duplicate matching can find this address quickly.</inlineHelpText>
+  <label>Match Key</label>
+  <length>100</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

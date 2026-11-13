@@ -3,7 +3,17 @@ import GrantOutcomes from 'c/grantOutcomes';
 import getOutcomes from '@salesforce/apex/GrantOutcomeController.getOutcomes';
 import setOutcome from '@salesforce/apex/GrantOutcomeController.setOutcome';
 
-jest.mock('@salesforce/apex/GrantOutcomeController.getOutcomes', () => ({ default: jest.fn() }), {
+import { refreshApex } from '@salesforce/apex';
+
+jest.mock(
+  '@salesforce/apex/GrantOutcomeController.getOutcomes',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/GrantOutcomeController.setOutcome', () => ({ default: jest.fn() }), {
@@ -66,10 +76,10 @@ function flush() {
 }
 
 async function render(card = CARD) {
-  getOutcomes.mockResolvedValue(card);
   const element = createElement('c-grant-outcomes', { is: GrantOutcomes });
   element.recordId = 'g1';
   document.body.appendChild(element);
+  getOutcomes.emit(card);
   await flush();
   return element;
 }
@@ -110,7 +120,7 @@ describe('c-grant-outcomes', () => {
     save.click();
     await flush();
     expect(setOutcome).toHaveBeenCalledWith({ requirementId: 'r1', outcomeId: null });
-    expect(getOutcomes).toHaveBeenCalledTimes(2);
+    expect(refreshApex).toHaveBeenCalledTimes(1);
   });
 
   it('shows the outcome read-only to someone who cannot edit', async () => {
@@ -130,9 +140,10 @@ describe('c-grant-outcomes', () => {
   });
 
   it('shows a load error', async () => {
-    getOutcomes.mockRejectedValue({ body: { message: 'Broken' } });
     const element = createElement('c-grant-outcomes', { is: GrantOutcomes });
+    element.recordId = 'g1';
     document.body.appendChild(element);
+    getOutcomes.error({ message: 'Broken' });
     await flush();
     expect(one(element, '[data-id="error-message"]').textContent).toBe('Broken');
   });

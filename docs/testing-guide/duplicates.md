@@ -321,3 +321,18 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 4 | As a user without **BarnCRM Admin**, open the **Duplicate Matching** tab. | No **Merge Records** area. |
 
 **Cleanup:** Delete the Zztest funds and gift.
+
+## T-DUP-22: Address Match Keys
+
+**Purpose:** Confirm every address gets a Match Key on save, older addresses are filled from Health Check, and the scan still pairs people at one address written two ways.
+**Prerequisites:** admin with BarnCRM Admin; the shipped Address match sources on; Workbench or the Developer Console to read a field the page does not show.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Add an address `77 Massachusetts Avenue`, `02139-4307` to Zztest Ana Ruiz, then read its **Match Key**. | `02139\|77`. |
+| 2 | Change its street to `North Main St.` and postal code to `02140`, then read the key again. | `02140\|main`. |
+| 3 | Run Health Check. | On an org upgraded from before 1.22, **Match Keys Not Filled** with **Fill Match Keys**. |
+| 4 | Click **Fill Match Keys** and confirm. | **Filling match keys in the background.** After a minute or two, **Run Again** shows no such finding. |
+| 5 | Give Zztest Anna Ruiz-Lopez the address `77 massachusetts ave.`, `02139`, put Ana back on `77 Massachusetts Avenue`, `02139`, and run the duplicate scan. | Ana and Anna are listed, with "Same address on" the Address source. |
+
+**Cleanup:** Delete the Zztest addresses.

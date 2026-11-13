@@ -5,6 +5,7 @@ import saveSchedule from '@salesforce/apex/GrantScheduleController.saveSchedule'
 import markReceived from '@salesforce/apex/GrantScheduleController.markReceived';
 import undoReceived from '@salesforce/apex/GrantScheduleController.undoReceived';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import { refreshApex } from '@salesforce/apex';
 import { clearHelpTextForTest, setHelpTextForTest } from 'c/barnHelpText';
 
 const TOAST = 'lightning__showtoast';
@@ -13,7 +14,15 @@ jest.mock('@salesforce/apex/GrantScheduleController.undoReceived', () => ({ defa
   virtual: true
 });
 
-jest.mock('@salesforce/apex/GrantScheduleController.getSchedule', () => ({ default: jest.fn() }), {
+jest.mock(
+  '@salesforce/apex/GrantScheduleController.getSchedule',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/GrantScheduleController.saveSchedule', () => ({ default: jest.fn() }), {
@@ -68,10 +77,10 @@ function flush() {
 }
 
 async function render(schedule) {
-  getSchedule.mockResolvedValue(schedule);
   const element = createElement('c-grant-schedule', { is: GrantSchedule });
   element.recordId = GRANT_ID;
   document.body.appendChild(element);
+  getSchedule.emit(schedule);
   await flush();
   return element;
 }
@@ -104,7 +113,10 @@ describe('c-grant-schedule', () => {
       new CustomEvent('change', { detail: { value: 'Annual' } })
     );
     await flush();
-    getSchedule.mockResolvedValue(SCHEDULED);
+    refreshApex.mockImplementationOnce(() => {
+      getSchedule.emit(SCHEDULED);
+      return Promise.resolve();
+    });
     one(element, '[data-id="build-schedule"]').click();
     await flush();
 
@@ -131,7 +143,7 @@ describe('c-grant-schedule', () => {
     buttons[0].click();
     await flush();
     expect(markReceived).toHaveBeenCalledWith({ paymentId: PAYMENT_ID });
-    expect(getSchedule).toHaveBeenCalledTimes(2);
+    expect(refreshApex).toHaveBeenCalledTimes(1);
   });
 
   it('offers Undo after Mark Received and puts the payment back', async () => {
@@ -200,10 +212,11 @@ describe('c-grant-schedule', () => {
     await flush();
     expect(toasts[0]).toMatchObject({ message: 'Refused.', variant: 'error' });
 
-    getSchedule.mockRejectedValue({ body: { message: 'Could not load.' } });
+    document.body.removeChild(element);
     const broken = createElement('c-grant-schedule', { is: GrantSchedule });
     broken.recordId = GRANT_ID;
     document.body.appendChild(broken);
+    getSchedule.error({ message: 'Could not load.' });
     await flush();
     expect(one(broken, '[data-id="error-message"]').message).toBe('Could not load.');
   });

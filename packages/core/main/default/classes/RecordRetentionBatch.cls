@@ -84,7 +84,11 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	/** As a step of the nightly run: starts the first pass. */
 	public void execute(SchedulableContext context) {
-		Database.executeBatch(new RecordRetentionBatch(SETTING_CHANGES), CHUNK_SIZE);
+		AsyncStarter.batch(
+			new RecordRetentionBatch(SETTING_CHANGES),
+			CHUNK_SIZE,
+			'RecordRetentionBatch'
+		);
 	}
 
 	/** The step: twenty past one. No switch. The import row cleanup is its pass 7. */

@@ -152,7 +152,7 @@ public with sharing class DuplicateRulesStarter {
 					BarnHelp.text('Core', 'Core_DuplicateStarter_NothingToDo')
 				);
 			}
-			System.enqueueJob(new StarterJob(needed, 0));
+			AsyncStarter.queue(new StarterJob(needed, 0), 'DuplicateRulesStarter');
 			return view();
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'DuplicateRulesStarter.start', true);

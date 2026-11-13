@@ -443,6 +443,24 @@ public with sharing class MatchSourceService {
 		Set<String> cut = new Set<String>();
 		if (source.normalization == EMAIL) {
 			readInto(rows, cut, keys, source, keys, null);
+		} else if (AddressMatchKeyHandler.usable(source)) {
+			// D-200 P6: one read through the Match Key index instead of LIKE over every street.
+			Set<String> matchKeys = new Set<String>();
+			for (String key : keys) {
+				matchKeys.add(matchKey(key));
+			}
+			Integer before = MatchSourceSelector.cutLookups();
+			rows.addAll(
+				MatchSourceSelector.rowsByValues(
+					source,
+					Address__c.Match_Key__c.getDescribe().getName(),
+					matchKeys,
+					null
+				)
+			);
+			if (MatchSourceSelector.cutLookups() > before) {
+				cut.addAll(keys);
+			}
 		} else {
 			Map<String, Map<String, String>> clauses = new Map<String, Map<String, String>>();
 			Map<String, Set<String>> keysByClause = new Map<String, Set<String>>();
@@ -534,6 +552,26 @@ public with sharing class MatchSourceService {
 			}
 		}
 		return clause;
+	}
+
+	/**
+	 * The Match Key of a normalized address key (D-200 P6): its postal code, a bar and the
+	 * first street word normalization leaves as written, the same word likeClause reads by.
+	 * Two addresses with one normalized key always share it, so a read by match key finds
+	 * every row the exact comparison afterwards can keep.
+	 */
+	public static String matchKey(String addressKey) {
+		if (addressKey == null) {
+			return null;
+		}
+		String word = '';
+		for (String part : addressKey.substringBeforeLast('|').split(' ')) {
+			if (String.isNotBlank(part) && !SHORTENED.contains(part)) {
+				word = part;
+				break;
+			}
+		}
+		return (addressKey.substringAfterLast('|') + '|' + word).left(100);
 	}
 
 	/** The records whose source rows are looked up: the records, and their Individuals. */

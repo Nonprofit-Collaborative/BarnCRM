@@ -8,7 +8,11 @@ public with sharing class EmptyHouseholdTidyScheduler implements Schedulable {
 	public static final String JOB_NAME = 'BarnCRM Empty Household Tidy-up';
 
 	public void execute(SchedulableContext context) {
-		Database.executeBatch(new EmptyHouseholdTidyBatch(), EmptyHouseholdTidyBatch.CHUNK_SIZE);
+		AsyncStarter.batch(
+			new EmptyHouseholdTidyBatch(),
+			EmptyHouseholdTidyBatch.CHUNK_SIZE,
+			'EmptyHouseholdTidyScheduler'
+		);
 	}
 
 	/** The tidy-up as a step of the nightly run: a quarter to two, after the import cleanup. */
