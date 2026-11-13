@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    A gift mirror's page, shared by the Opportunity mirror and the Gift Transaction mirror pages:
+    the direction, Run Now, the nightly schedule, and the reconciliation of a date range.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

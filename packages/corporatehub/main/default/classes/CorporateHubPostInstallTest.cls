@@ -24,7 +24,7 @@ private class CorporateHubPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ CorporateHubAccessSync.ADMIN_SET }
+					new List<String>{ 'Corporate_Hub_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -35,20 +35,12 @@ private class CorporateHubPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new CorporateHubPostInstall(), null);
-			System.enqueueJob(new CorporateHubPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new CorporateHubPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('CorporateHub', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('CorporateHub', alreadyHolding));
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				setsHeldBy(fresh, CorporateHubAccessSync.ADMIN_SET),
-				'The installer holds it'
-			);
-			Assert.areEqual(
-				1,
-				setsHeldBy(alreadyHolding, CorporateHubAccessSync.ADMIN_SET),
-				'Never twice'
-			);
+			Assert.areEqual(1, setsHeldBy(fresh, 'Corporate_Hub_Admin'), 'The installer holds it');
+			Assert.areEqual(1, setsHeldBy(alreadyHolding, 'Corporate_Hub_Admin'), 'Never twice');
 			Assert.areEqual(
 				1,
 				setsHeldBy(member.Id, 'Corporate_Hub_Staff'),
@@ -59,7 +51,7 @@ private class CorporateHubPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :CorporateHubPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'CorporateHubPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -75,7 +67,7 @@ private class CorporateHubPostInstallTest {
 
 			Test.startTest();
 			new CorporateHubPostInstall().onInstall(null);
-			System.enqueueJob(new CorporateHubPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('CorporateHub', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -83,7 +75,7 @@ private class CorporateHubPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :CorporateHubPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'CorporateHubPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

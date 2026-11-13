@@ -11,6 +11,7 @@
   </capabilities>
   <targets>
     <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
   </targets>
   <targetConfigs>
     <targetConfig targets="lightning__AppPage">

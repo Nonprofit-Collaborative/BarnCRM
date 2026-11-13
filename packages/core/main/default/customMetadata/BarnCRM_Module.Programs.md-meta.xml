@@ -35,6 +35,19 @@
     <value xsi:nil="true" />
   </values>
   <values>
+    <field>Access_By_Permission_Set__c</field>
+    <value xsi:type="xsd:string">Programs_Admin=BarnCRM_Admin</value>
+  </values>
+  <values>
+    <field>Access_By_Role__c</field>
+    <value xsi:type="xsd:string">Programs_Staff=Program_Staff;Programs_Read_Only=Read_Only</value>
+  </values>
+  <values>
+    <field>Extensions__c</field>
+    <value xsi:type="xsd:string">NightlyStepProvider: ProgramsNightlyJobProvider
+ModuleAccessStep: ProgramsAccessStep</value>
+  </values>
+  <values>
     <field>Quick_Links__c</field>
     <value xsi:type="xsd:string">Enrollment__c.new:Enroll:Start someone in a program.</value>
   </values>

@@ -73,3 +73,23 @@ way an administrator thinks, which is what plan Section 4.8 actually asks for.
   tab alongside its Setting Definition row.
 - `Component__c` is now documented as Core-only. A module that puts a component name there gets
   the "not installed" message, which is the correct outcome: Core genuinely cannot render it.
+
+## Amendment A1, 2026-11-13: a page with one component is a component tab (release 1.23, S12)
+
+A module's page "and its own tab" (Decision 2) no longer needs an app page when the page holds
+one component and needs no record. The component declares `lightning__Tab`, and its CustomTab
+names it with `<lwcComponent>` instead of `<flexiPage>`. The tab keeps its API name, so
+`Navigation_Target__c` rows and every `standard__navItemPage` link reach it unchanged.
+
+1. **Converted.** 41 single-component app pages across Core and the modules became component
+   tabs, and their FlexiPages were removed.
+2. **Kept as app pages.** A page that sets component properties (Households, Organizations) or
+   holds more than one component (Bulk Update, Import), and every record page.
+3. **The title.** An app page printed its name above the component, so page components passed
+   `title-hidden` to `c-barn-page-shell`. A component tab prints no header, so those components
+   now show the shell's title.
+4. **Reachability.** `check-components-reachable.py` counts a component a tab names as reached.
+
+Consequence: one fewer metadata file per page, and no page layout an admin can edit separately
+from the component. An org that already has a converted tab as an app-page tab may need the
+tab redeployed and the old FlexiPage removed through the destructive manifest.

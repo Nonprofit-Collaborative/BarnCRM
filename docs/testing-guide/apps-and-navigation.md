@@ -50,12 +50,12 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Read the deploy output. | A stage "Module tabs in the BarnCRM apps" ran and succeeded. |
-| 2 | As admin, open **BarnCRM Admin**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Giving Nightly Jobs**, **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, then **Campaign Sync**, **Opportunity Mirror** and **Accounting Export**. Volunteers adds no admin page (its settings are the **Volunteers** section of **BarnCRM Settings**). **BarnCRM Admin Console** has the same. |
+| 2 | As admin, open **BarnCRM Admin**. | Before **Error Log**, which stays the last tab: **Rollup Builder**, **Accounting Periods**, **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**, then **Campaign Sync**, **Opportunity Mirror** and **Accounting Export**. Volunteers adds no admin page (its settings are the **Volunteers** section of **BarnCRM Settings**). **BarnCRM Admin Console** has the same. |
 | 3 | Open **BarnCRM**. | After **Find**: **Quick Gift Entry**, **Gifts**, **Commitments**, **Gift Batches** (and **Volunteer Shifts**, **Volunteer Hours** with Volunteers). |
 | 4 | In **BarnCRM**, open a gift from **Gifts**. | The gift opens on the same record page as in **BarnCRM Fundraising**. |
 | 5 | Open **BarnCRM Console**, then a gift from **Gifts**. | The gift opens in a console tab. |
 | 6 | From the App Launcher, search for "BarnCRM Rollup Builder". | No such app is listed; the **Rollup Builder** tab is. |
-| 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Giving**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters", then the App Manager steps. A module not installed lists no pages. |
+| 7 | Open **BarnCRM**, **Home**, **Setup Checklist**, **Modules**. | Under **BarnCRM Giving**: "Add to BarnCRM and BarnCRM Console: Quick Gift Entry, Gifts, Commitments, Gift Batches" and "Add to BarnCRM Admin and BarnCRM Admin Console: Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters", then the App Manager steps. A module not installed lists no pages. |
 | 8 | On the **BarnCRM Console** home page, look at **Modules**. | **BarnCRM Giving** has an **Open the App** link that opens **BarnCRM Fundraising**; **BarnCRM Rollup Builder** has none. |
 | 9 | As staff, open **BarnCRM**. | The Giving pages show only if the staff user's access allows them; no admin page is listed. |
 

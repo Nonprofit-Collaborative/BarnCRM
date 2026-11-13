@@ -64,7 +64,7 @@ public with sharing class RollupScheduler implements Schedulable {
 	 * is turned off (ADR-0125 decision 9), a one-off Run tonight included, and an Info entry
 	 * says the run was skipped; the schedule stays, so it runs again once it is on.
 	 * The nightly run also gives the Rollup Builder sets to anyone given a BarnCRM role since
-	 * (`RollupAccessSync`, D2).
+	 * (`ModuleAccessSyncs`, D2).
 	 */
 	public void execute(SchedulableContext context) {
 		if (RollupService.isTurnedOff()) {
@@ -79,7 +79,7 @@ public with sharing class RollupScheduler implements Schedulable {
 			RollupService.startFullRunOfEveryDefinition();
 		} else {
 			RollupService.startNightlyRun();
-			RollupAccessSync.requestSync();
+			ModuleAccessSyncs.requestFor(RollupService.MODULE_NAME);
 		}
 		RollupQueue.processPending();
 	}

@@ -95,7 +95,6 @@
     "Programs_Roster_Empty": "No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.",
     "Programs_Roster_MoreThanShown": "Showing the first {0}. The Enrollments tab lists them all.",
     "Programs_Roster_PersonRequired": "Choose the person to enroll.",
-    "Programs_SampleData_Kept": "Sample data removal kept the sample programs {0}, because people of your own are enrolled in them or have services recorded in them, or a sample enrollment in them has case notes. Move or delete those enrollments, service deliveries and case notes, then select Remove Sample Data again.",
     "Programs_Schedule_BadTime": "Enter times as hours and minutes, for example 18:30.",
     "Programs_Schedule_ChooseDates": "Choose a From date and a To date on or after it.",
     "Programs_Schedule_ChooseWeekdays": "Choose at least one day of the week.",

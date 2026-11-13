@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Private</cacheControl>
+  <contentType>application/json</contentType>
+  <description>
+    Events sample data (C-10), loaded by Core's SampleDataFile (D-200
+    S2). Format: data/sample/README.md.
+  </description>
+</StaticResource>

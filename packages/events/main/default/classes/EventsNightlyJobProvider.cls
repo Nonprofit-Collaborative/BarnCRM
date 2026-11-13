@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Event Management
+ * The class Core finds by name (registered in its catalog row) to add the Event Management
  * steps to the one nightly run (ADR-0166): the morning event email run (EV-14) and, only when
  * Summit Events is installed, the Summit Events import (EV-10).
  */

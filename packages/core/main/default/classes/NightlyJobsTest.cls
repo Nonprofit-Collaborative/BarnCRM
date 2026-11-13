@@ -41,11 +41,18 @@ private class NightlyJobsTest {
 
 	/** Every module provider replaced: the first gives `steps`, the second throws. */
 	private static void modulesGive(List<NightlyStep> steps) {
-		for (String className : NightlyJobs.PROVIDER_CLASSES) {
-			NightlyJobs.providerOverrides.put(className, new FakeProvider(new List<NightlyStep>()));
-		}
-		NightlyJobs.providerOverrides.put(NightlyJobs.PROVIDER_CLASSES[0], new FakeProvider(steps));
-		NightlyJobs.providerOverrides.put(NightlyJobs.PROVIDER_CLASSES[1], new BrokenProvider());
+		ModuleExtensions.stubForTest(
+			NightlyStepProvider.class,
+			'Example_A',
+			new FakeProvider(steps),
+			true
+		);
+		ModuleExtensions.stubForTest(
+			NightlyStepProvider.class,
+			'Example_B',
+			new BrokenProvider(),
+			true
+		);
 		NightlyJobs.forget();
 	}
 

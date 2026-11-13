@@ -26,7 +26,15 @@ module.exports = {
     // Same reason: c/workspaceTabs and the components that use it must share one stub, so a
     // test that emits a tab id or checks openSubtab sees the module the component imported.
     '^lightning/platformWorkspaceApi$':
-      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/platformWorkspaceApi/platformWorkspaceApi.js'
+      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/platformWorkspaceApi/platformWorkspaceApi.js',
+    // The accessibility assertion each component test makes (QA review Q5).
+    '^barn/a11y$': '<rootDir>/packages/core/test/jest-helpers/a11y.js'
+  },
+  // A floor under the coverage CI measures (npm run test:unit:coverage), about two points below
+  // the 2026-11-12 totals (statements 91.2, branches 80.9, functions 90.9, lines 90.9). Raise it
+  // as coverage rises; never lower it to land a change (QA review Q5).
+  coverageThreshold: {
+    global: { statements: 89, branches: 79, functions: 89, lines: 89 }
   },
   // No LWC components exist yet in any package; allow jest to pass cleanly until they do.
   passWithNoTests: true

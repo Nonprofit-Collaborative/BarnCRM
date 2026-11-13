@@ -152,4 +152,36 @@ private class AffiliationControllerTest {
 			Assert.areEqual(ORGANIZATION, context.otherEndField, 'An organization is added');
 		}
 	}
+
+	/**
+	 * QA review Q1: the card works for the staff who use it, not only for an admin. A user on
+	 * the Standard User profile holding BarnCRM Staff reads the switch and the card's lookups
+	 * for an organization the admin added.
+	 */
+	@IsTest
+	static void aStaffUserGetsTheCardForAnOrganization() {
+		List<Account> orgs;
+		User staff;
+		System.runAs(TestUsers.admin()) {
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.AFFILIATIONS
+			);
+			RelationshipTestDataFactory.quietOtherAutomations();
+			orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
+			staff = TestDataFactory.createUser('Staff', new List<String>{ 'BarnCRM_Staff' });
+		}
+
+		Boolean shown;
+		AffiliationController.CardContext context;
+		Test.startTest();
+		System.runAs(staff) {
+			shown = AffiliationController.isFeatureOn();
+			context = AffiliationController.getCardContext(orgs[0].Id);
+		}
+		Test.stopTest();
+
+		Assert.isTrue(shown, 'Staff see the card while Affiliations is on');
+		Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end, for staff too');
+	}
 }

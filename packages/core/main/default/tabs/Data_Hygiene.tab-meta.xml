@@ -4,7 +4,7 @@
     Org Optimizer: what in the org needs attention, in sections loaded only when opened (data
     quality checks, duplicates, field utilization, Health Check). API name kept from Data Hygiene.
   </description>
-  <flexiPage>Data_Hygiene</flexiPage>
   <label>Org Optimizer</label>
+  <lwcComponent>orgOptimizer</lwcComponent>
   <motif>Custom94: Stethoscope</motif>
 </CustomTab>

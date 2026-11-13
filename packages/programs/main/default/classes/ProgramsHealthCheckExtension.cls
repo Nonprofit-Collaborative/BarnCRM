@@ -51,7 +51,7 @@ public with sharing class ProgramsHealthCheckExtension implements HealthCheckExt
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		if (
 			!HealthCheckService.canManageSettings() ||
-			ModuleManagerService.turnedOff().contains(ProgramsAccessSync.MODULE_NAME.toLowerCase())
+			ModuleManagerService.turnedOff().contains(ProgramsPostInstall.MODULE_KEY.toLowerCase())
 		) {
 			return found;
 		}

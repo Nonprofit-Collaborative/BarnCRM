@@ -221,7 +221,9 @@ loads with **Import Files** show in each record's **Files** list, owned by that 
   Log." Refresh. If it keeps happening, tell your admin.
 - Problem: "Something went wrong while BarnCRM was updating this record, so it was not saved."
   Only that record was refused; anything else you saved at the same time went ahead. Try
-  again; if it repeats, tell your admin, who will find the reason in the Error Log.
+  again; if it repeats, tell your admin, who will find the reason in the Error Log. If it
+  looks like a BarnCRM bug, your admin can copy a report with no names or record details in
+  it (**Copy for Bug Report**) to post on BarnCRM's GitHub page.
 - Problem: no notification arrived. Check that you have not muted notifications in your own
   Salesforce settings. The job still finished; open its record to check.
 - Problem: "An administrator needs to finish setting up BarnCRM." BarnCRM has not been set up

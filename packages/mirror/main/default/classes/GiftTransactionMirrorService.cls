@@ -36,32 +36,25 @@ public with sharing class GiftTransactionMirrorService {
 	private static String orgTimeZone;
 
 	/** What one call did, for the run summary and the tests. */
-	public class Result {
-		public Integer created = 0;
-		public Integer updated = 0;
-		public Integer unchanged = 0;
-		public Integer failed = 0;
-		public Integer skipped = 0;
+	public class Result extends MirrorSync.Result {
 		/** Designations written, and allocations left without one (R-GT5). */
 		public Integer designated = 0;
 		public Integer undesignated = 0;
 		/** True when Gift Transactions were created but designations could not be written. */
 		public Boolean designationsUnavailable = false;
-		/** The refusals, grouped by message; written by the run when it ends (R-GT7). */
-		public MirrorSync.Warnings refusals = new MirrorSync.Warnings();
 		/** The gifts whose Gift Transaction this call created and linked, for the designations. */
 		public List<Gift__c> createdFor = new List<Gift__c>();
 
-		public void add(Result other) {
-			created += other.created;
-			updated += other.updated;
-			unchanged += other.unchanged;
-			failed += other.failed;
-			skipped += other.skipped;
-			designated += other.designated;
-			undesignated += other.undesignated;
-			designationsUnavailable = designationsUnavailable || other.designationsUnavailable;
-			refusals.addAll(other.refusals);
+		public override void add(MirrorSync.Result other) {
+			super.add(other);
+			Result theirs = (Result) other;
+			designated += theirs.designated;
+			undesignated += theirs.undesignated;
+			designationsUnavailable = designationsUnavailable || theirs.designationsUnavailable;
+		}
+
+		public override String orphanTemplate() {
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogOrphan');
 		}
 
 		/** Writes the grouped refusals as Warnings, in one statement. */
@@ -232,15 +225,10 @@ public with sharing class GiftTransactionMirrorService {
 		if (linked.isEmpty() || !isOn()) {
 			return;
 		}
-		MirrorSync.Warnings warnings = new MirrorSync.Warnings();
-		for (Gift__c gift : linked) {
-			warnings.add(
-				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_DeletedKept'),
-				gift.Name + ' (' + gift.Gift_Transaction_Id__c + ')',
-				gift.Id
-			);
-		}
-		warnings.write(
+		MirrorSync.warnLeftBehind(
+			linked,
+			Gift__c.Gift_Transaction_Id__c,
+			BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_DeletedKept'),
 			CONTEXT,
 			BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogDeletedOne'),
 			BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogDeletedMany')
@@ -440,7 +428,7 @@ public with sharing class GiftTransactionMirrorService {
 					result.created++;
 				} else {
 					result.failed++;
-					refuse(result, insertedFor[i], saved[i].getErrors());
+					result.refuse(insertedFor[i], saved[i].getErrors());
 				}
 			}
 		}
@@ -455,7 +443,7 @@ public with sharing class GiftTransactionMirrorService {
 					result.updated++;
 				} else {
 					result.failed++;
-					refuse(result, updatedFor[i], saved[i].getErrors());
+					result.refuse(updatedFor[i], saved[i].getErrors());
 				}
 			}
 		}
@@ -477,49 +465,18 @@ public with sharing class GiftTransactionMirrorService {
 	}
 
 	/**
-	 * Saves each gift whose link changed, with partial success and this automation bypassed. A gift
-	 * that is refused is counted as failed, and a Gift Transaction created for it in this call is
-	 * deleted again (R-GT7).
+	 * Stores each new link (MirrorSync.storeLinks, R-GT7) and drops a gift whose Gift Transaction
+	 * was deleted again from the ones that get designations.
 	 */
 	private static void storeLinks(List<Gift__c> gifts, Map<Id, String> linkBefore, Result result) {
-		List<Gift__c> links = new List<Gift__c>();
-		List<Gift__c> linkedFor = new List<Gift__c>();
-		for (Gift__c gift : gifts) {
-			if (!MirrorSync.same(gift.Gift_Transaction_Id__c, linkBefore.get(gift.Id))) {
-				links.add(
-					new Gift__c(Id = gift.Id, Gift_Transaction_Id__c = gift.Gift_Transaction_Id__c)
-				);
-				linkedFor.add(gift);
-			}
-		}
-		if (links.isEmpty()) {
-			return;
-		}
-		List<Database.SaveResult> saved;
-		AutomationControl.bypass(AUTOMATION_NAME);
-		try {
-			saved = Database.update(links, false, AccessLevel.USER_MODE);
-		} finally {
-			AutomationControl.clearBypass(AUTOMATION_NAME);
-		}
-		List<SObject> orphans = new List<SObject>();
-		List<Gift__c> orphanedFor = new List<Gift__c>();
-		Set<Id> unlinked = new Set<Id>();
-		Schema.SObjectType giftTransaction = GiftTransactionMirrorSchema.objectType();
-		for (Integer i = 0; i < saved.size(); i++) {
-			if (saved[i].isSuccess()) {
-				continue;
-			}
-			Gift__c gift = linkedFor[i];
-			result.failed++;
-			refuse(result, gift, saved[i].getErrors());
-			if (linkBefore.get(gift.Id) == null) {
-				result.created--;
-				unlinked.add(gift.Id);
-				orphans.add(giftTransaction.newSObject(Id.valueOf(gift.Gift_Transaction_Id__c)));
-				orphanedFor.add(gift);
-			}
-		}
+		Set<Id> unlinked = MirrorSync.storeLinks(
+			gifts,
+			Gift__c.Gift_Transaction_Id__c,
+			linkBefore,
+			GiftTransactionMirrorSchema.objectType(),
+			AUTOMATION_NAME,
+			result
+		);
 		if (!unlinked.isEmpty()) {
 			List<Gift__c> stillLinked = new List<Gift__c>();
 			for (Gift__c gift : result.createdFor) {
@@ -528,29 +485,6 @@ public with sharing class GiftTransactionMirrorService {
 				}
 			}
 			result.createdFor = stillLinked;
-		}
-		if (orphans.isEmpty()) {
-			return;
-		}
-		List<Database.DeleteResult> deleted = Database.delete(
-			orphans,
-			false,
-			AccessLevel.USER_MODE
-		);
-		for (Integer i = 0; i < deleted.size(); i++) {
-			if (!deleted[i].isSuccess()) {
-				result.refusals.add(
-					String.format(
-						BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogOrphan'),
-						new List<Object>{
-							String.valueOf(orphans[i].Id),
-							messageOf(deleted[i].getErrors())
-						}
-					),
-					orphanedFor[i].Name,
-					orphanedFor[i].Id
-				);
-			}
 		}
 	}
 
@@ -620,26 +554,12 @@ public with sharing class GiftTransactionMirrorService {
 				result.refusals.add(
 					String.format(
 						BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_DesignationRefused'),
-						new List<Object>{ messageOf(saved[i].getErrors()) }
+						new List<Object>{ MirrorSync.messageOf(saved[i].getErrors()) }
 					),
 					insertedFor[i].Name,
 					insertedFor[i].Id
 				);
 			}
 		}
-	}
-
-	// ------------------------------------------------------------------------------- helpers
-
-	private static void refuse(Result result, Gift__c gift, List<Database.Error> errors) {
-		result.refusals.add(messageOf(errors), gift.Name, gift.Id);
-	}
-
-	public static String messageOf(List<Database.Error> errors) {
-		List<String> messages = new List<String>();
-		for (Database.Error error : errors) {
-			messages.add(error.getMessage());
-		}
-		return String.join(messages, ' ');
 	}
 }

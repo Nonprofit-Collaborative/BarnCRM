@@ -323,6 +323,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 3 | Click **Open This Entry**. | The Error Log record opens (as a subtab in the console). **Status** is **New**. |
 | 4 | Back on the tile, click **Mark Acknowledged**. | The badge count drops by one (the entry stays in the recent list). The record's **Status** reads **Acknowledged**. On **Home**, **Errors to Review** drops by one after a reload. |
 | 5 | As staff, open the **Error Log** tab and the entry. | The entry is readable. **Status** cannot be edited and **Technical Detail** is not shown. |
+| 6 | As admin, on the **Error Log** card click **Copy for Bug Report** on **Testing guide entry**, then paste into a text editor. | A toast says it was copied. The text starts "BarnCRM bug report." and names **Testing guide**, **Error** and the time in UTC; it does not contain "Testing guide entry" (the message). If the browser blocks copying, a box on the card shows the same text. |
 
 **Cleanup:** set the entry's **Status** to **Resolved** as admin.
 
@@ -512,8 +513,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Nightly Jobs and Accounting Periods**, then **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
-| 2 | In an org where they were never scheduled, choose **Schedule**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
+| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
+| 2 | In an org where they were never scheduled, choose **Schedule Nightly Jobs**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
 | 3 | Open **Data Manager**, select **Import a File**, and open the **Template** picker. | Template names are in title casing, for example "Generic Gift List" and "NPSP: Opportunities and Payments". A template you renamed keeps your name. |
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 

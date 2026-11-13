@@ -68,7 +68,6 @@ const ICONS = Object.freeze({
   Gift_Batch__c: 'custom:custom13',
   Gift__c: 'custom:custom41',
   Giving_Accounting_Periods: 'custom:custom55',
-  Giving_Nightly_Jobs: 'custom:custom10',
   Installment__c: 'custom:custom45',
   Pledge_Reminder_Step__c: 'custom:custom79',
   Pledge_Reminder__c: 'custom:custom25',
