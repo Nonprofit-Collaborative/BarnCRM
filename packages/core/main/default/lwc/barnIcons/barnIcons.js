@@ -136,6 +136,7 @@ const ICONS = Object.freeze({
   Project_Rate__c: 'custom:custom17',
   Project_Resource__c: 'custom:custom47',
   Projects_Staffing: 'custom:custom84',
+  Request_Connection__c: 'custom:custom68',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

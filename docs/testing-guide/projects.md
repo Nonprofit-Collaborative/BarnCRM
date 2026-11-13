@@ -346,3 +346,21 @@ Contact from T-PM-30.
 | 7 | Sign in as another person. | Neither the request nor its updates are listed. |
 
 **Cleanup:** Delete the request and the test portal.
+
+## T-PM-33: Requests From Another Organization
+
+**Purpose:** confirm the request API and R-PM26 (D-201).
+**Prerequisites:** T-PM-30; Take requests from outside on; an integration user with Projects
+Request Intake and an External Client App with client credentials run as that user; a REST
+client (Postman, or Workbench REST Explorer signed in as that user).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Without a Request Connection, `POST /services/apexrest/barncrm/requests/v1/requests` with `orgId` your org id, `reference` T-1, `subject`. | `403 not_allowed`; nothing saved. |
+| 2 | On the Request Connections tab, add one: a name, an Account, your org id, the integration user, Hourly Limit 2. Send the same call. | `201` with a number and status New. The request has Channel Partner Organization, the connection's Account, Owner the Requests queue. |
+| 3 | Send it again. | `200` with the same number; still one request. |
+| 4 | Send references T-2 and T-3. | T-2 is `201`; T-3 is `429 too_many`. |
+| 5 | Resolve T-1 with a resolution. `GET ...requests?orgId=<org id>&refs=T-1,T-2`. | Both listed; T-1 Resolved with the resolution. |
+| 6 | Untick Active on the connection and send T-4. Send a body that is not JSON. | `403 not_allowed`; then `400 bad_request`. |
+
+**Cleanup:** Delete the requests and the connection.

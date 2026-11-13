@@ -18428,6 +18428,9 @@ Overdue is true while New or In Progress past the Due Date; Waiting on Requester
 | Overdue | `Overdue__c` | Formula (Checkbox) |
 | Satisfaction | `Satisfaction__c` | Picklist (Satisfied, Not Satisfied), restricted |
 | Reply | `Reply__c` | Long Text Area(32768); a portal reply, emptied by R-PM24 |
+| Connection | `Connection__c` | Lookup(Request_Connection__c), Set Null, relationship Requests; the organization it came from |
+| External Reference | `External_Reference__c` | Text(80); the sending organization's own reference |
+| External Key | `External_Key__c` | Text(120), unique; connection Id and reference, so a resend never duplicates |
 
 ## 29PM17. Request Comment
 
@@ -18449,6 +18452,28 @@ Shared With Requester ships off, so a comment is internal unless staff share it;
 | Comment | `Body__c` | Long Text Area(32768) |
 | Shared With Requester | `Shared__c` | Checkbox, default false |
 | From Requester | `From_Requester__c` | Checkbox, default false |
+
+## 29PM18. Request Connection
+
+### Definition
+
+Another organization allowed to send requests in through the request API, as its own integration user (D-201).
+
+### Rules
+
+**R-PM26 Request intake.** A call is served only while Take requests from outside is on and an Active connection names the calling user and the org id the call gives; every other call is refused the same way. A request with a reference the connection already sent answers the existing one. New requests past the Hourly Limit in the last hour are refused. Requests arrive with Channel Partner Organization, Requesting Organization the connection's Account, and the sender's name and email in the description (no Contact is made). Validation rules: `Integration_User_Needed`, `Org_Id_Shape` (15 or 18 characters starting 00D).
+
+### Salesforce implementation
+
+- **Object:** `Request_Connection__c`, label Request Connection, name field Text (Organization Name), sharing Read/Write, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Account | `Account__c` | Lookup(Account), Set Null |
+| Org Id | `Org_Id__c` | Text(18), required, unique |
+| Integration User | `Integration_User__c` | Lookup(User) |
+| Active | `Active__c` | Checkbox, default true, history tracked |
+| Hourly Limit | `Hourly_Limit__c` | Number(4, 0), default 60 |
 
 ## 29AV1. Address Verification Settings
 
@@ -19098,7 +19123,7 @@ mirrors the primary member).
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
-| 1.54 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-NEXT `NEXT-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. |
+| 1.54 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-NEXT `NEXT-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. New Section 29PM18 Request Connection (`Request_Connection__c`, R-PM26) for the request API; Request gains Connection, External Reference and External Key. |
 
 ---
 ## 32. Entity ownership by package
@@ -19313,6 +19338,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Change Request | Project Management | 1.20 (PM-12) | 29PM15 |
 | Request | Project Management | 1.21 (D-201) | 29PM16 |
 | Request Comment | Project Management | 1.21 (D-201) | 29PM17 |
+| Request Connection | Project Management | 1.21 (D-201) | 29PM18 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

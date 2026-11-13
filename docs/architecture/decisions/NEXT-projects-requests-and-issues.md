@@ -166,8 +166,9 @@ both are installed and doing nothing otherwise, so neither package depends on th
   where available, ADR-0185 research), given `Projects_Request_Intake` (the API class only, no
   object access). A call is served only when an Active Request Connection names the calling user
   and its Org Id equals the body's `orgId`; anything else is `403 not_allowed`, the same answer
-  for every refusal. Requests read and written in system mode, only that connection's rows
-  (without sharing register: Projects intake kind).
+  for every refusal. Requests read and written in system mode, only that connection's rows,
+  through a private inner `without sharing` class (the register lists top-level classes only, so
+  nothing is added to it).
 - **Limits.** Bodies over 32 KB are refused; a connection's creates in the last hour at its Hourly
   Limit answer `429`, as PaymentWebhookRest caps per processor; both switches off answer `403`.
   Errors return a short code, never a stack or record detail.

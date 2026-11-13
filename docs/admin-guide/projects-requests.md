@@ -116,10 +116,13 @@ description; no Contact is created. Turning a connection off stops it at once.
 
 The API: `POST /services/apexrest/barncrm/requests/v1/requests` with JSON `orgId`, `reference`,
 `subject`, `description`, `type`, `priority`, `category`, `requesterName`, `requesterEmail`;
-answers `number`, `status` and `dueDate`. Sending the same `reference` again returns the same
-request. `GET /services/apexrest/barncrm/requests/v1/requests?refs=A,B` (up to 200) answers the
-status, due date and resolution of that organization's own requests. Any refusal answers `403`,
-too many new requests in an hour `429`.
+`reference` and `subject` are required. It answers `201` with `reference`, `number`, `status`,
+`priority`, `dueDate` and `resolution`; sending the same `reference` again answers `200` with the
+same request. A type, priority or category your org does not have becomes Service Request,
+Medium or General. `GET /services/apexrest/barncrm/requests/v1/requests?orgId=...&refs=A,B` (up
+to 200 references) answers `requests`, the same fields for that organization's own requests.
+Any refusal answers `403 not_allowed`, too many new requests in an hour `429 too_many`, and a
+body over 32 KB or not valid JSON `400 bad_request`.
 
 ## Sending Your Cases to a Service Provider (BarnCRM Mirror)
 

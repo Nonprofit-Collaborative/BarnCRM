@@ -21,7 +21,9 @@
   <columns>
     <field>Project_Request__c$Satisfaction__c</field>
   </columns>
-  <description>Requests resolved or closed this month, with the requester's satisfaction.</description>
+  <description>
+    Requests resolved or closed this month, with the requester's satisfaction.
+  </description>
   <filter>
     <criteriaItems>
       <column>Project_Request__c$Status__c</column>

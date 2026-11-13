@@ -41,6 +41,7 @@
     "Projects_Requests_Channel": "Channel",
     "Projects_Requests_Satisfaction": "Satisfaction",
     "Projects_Requests_NeedProject": "Choose the request's project and save first.",
+    "Projects_Requests_SubmittedBy": "Submitted by {0} {1}",
     "Projects_Requests_ExternalOff": "Requests from outside are turned off. An admin can turn on Take requests from outside in BarnCRM Settings, Projects.",
     "Projects_Requests_Notice_Arrived": "New request {0}: {1}",
     "Projects_Requests_Notice_Assigned": "Request {0} assigned to you: {1}",

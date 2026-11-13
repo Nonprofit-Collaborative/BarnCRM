@@ -235,6 +235,46 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Project_Request__c.Connection__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Project_Request__c.External_Reference__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Project_Request__c.External_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Request_Connection__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Request_Connection__c.Org_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Request_Connection__c.Integration_User__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Request_Connection__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Request_Connection__c.Hourly_Limit__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Project_Request__c.Description__c</field>
     <readable>true</readable>
@@ -833,6 +873,15 @@
     <object>Project_Request_Comment__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Request_Connection__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <tabSettings>
     <tab>Projects_Home</tab>
     <visibility>Visible</visibility>
@@ -875,6 +924,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Projects_Requests</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Request_Connection__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

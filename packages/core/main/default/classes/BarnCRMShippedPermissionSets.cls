@@ -73,6 +73,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Programs_Staff',
 		'Projects_Admin',
 		'Projects_Read_Only',
+		'Projects_Request_Intake',
 		'Projects_Staff',
 		'Record_Inbound_Gift_Action',
 		'Rollup_Builder_Admin',
