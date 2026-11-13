@@ -79,8 +79,9 @@ CAPS = {
     # D-200 S1 and S6 (release 1.23): module wiring as catalog data (ModuleExtensions,
     # ModuleAccessSyncs, the catalog fields) and the one nightly card's switch and Run Now:
     # 2,256,617 measured with S2, raised by what they add (about 8,000) plus about 0.1%; the
-    # modules shrank by about 50,000 together.
-    "core": 2_258_900,
+    # modules shrank by about 50,000 together. D-200 R7 (release 1.24): Home quick links read
+    # from the module catalog (HubController): 2,259,870 measured, plus about 0.1%.
+    "core": 2_262_100,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

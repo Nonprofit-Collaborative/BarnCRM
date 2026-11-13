@@ -128,7 +128,7 @@ const ICONS = Object.freeze({
   Projects_Home: 'custom:custom64',
   Projects_Timesheet: 'custom:custom25',
   Projects_Approvals: 'custom:custom46',
-  Projects_Requests: 'custom:custom18',
+  Projects_Requests: 'custom:custom23',
   Time_Entry__c: 'custom:custom95',
   Project_Expense__c: 'custom:custom93',
   Project_Invoice__c: 'custom:custom41',
@@ -150,6 +150,7 @@ const ICONS = Object.freeze({
   Program__c: 'custom:custom88',
   Programs_Dashboard: 'custom:custom9',
   Programs_Settings: 'custom:custom73',
+  Record_Service: 'custom:custom8',
   Referral__c: 'custom:custom85',
   Service_Count__c: 'custom:custom6',
   Service_Delivery__c: 'custom:custom16',
@@ -157,6 +158,7 @@ const ICONS = Object.freeze({
   // Rollups
   Rollup_Builder: 'custom:custom63',
   // Volunteers
+  Log_Hours: 'custom:custom9',
   Skill__c: 'custom:custom69',
   Volunteer_Approve_Hours: 'custom:custom91',
   Volunteer_Hours__c: 'custom:custom3',
