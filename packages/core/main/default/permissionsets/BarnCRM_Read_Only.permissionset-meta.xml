@@ -811,8 +811,8 @@
     <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
-    <viewAllRecords>false</viewAllRecords>
     <object>Account</object>
+    <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
@@ -874,8 +874,8 @@
     <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
-    <viewAllRecords>false</viewAllRecords>
     <object>Contact</object>
+    <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
@@ -928,8 +928,8 @@
     <allowEdit>false</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
-    <viewAllRecords>false</viewAllRecords>
     <object>Household_Member__c</object>
+    <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>

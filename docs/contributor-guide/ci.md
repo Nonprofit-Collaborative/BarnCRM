@@ -195,6 +195,12 @@ Salesforce org is needed for this job. Steps:
    permission sets are assembled by hand at every merge from each branch's integration
    file, so the reference and the metadata can drift apart silently. This ran because
    `BarnCRM_Admin` granted a `Household_Member__c` tab that was never created.
+   Alongside it, `scripts/ci/check-generated-permission-sets.py` (D-200 S9a) fails the build
+   when a role trio's Admin or Read Only set differs from its Staff set plus its delta in
+   `scripts/permission-sets/deltas/<Prefix>.json`. Those two sets are generated: change the
+   Staff set or the delta, then run `python3 scripts/permission-sets/generate.py`. The
+   committed XML stays the deployed source, and ADR-0194's permission model is unchanged.
+   `--bootstrap <Prefix>` writes the delta that reproduces a trio's current sets.
 11. `scripts/ci/check-help-links.py`, failing the build if a Setting Definition's Learn
    more link points at a page that does not exist. `SettingsController` appends
    `Help_Path__c` to a base already ending in `docs/admin-guide/`, so a row storing

@@ -1,0 +1,59 @@
+{
+  "Admin": {
+    "label": "Corporate Hub Admin",
+    "description": ["Everything in Corporate Hub: every document, acknowledgment, obligation, cycle, agreement", "and board record, delete, and Manage Corporate Hub. Given to BarnCRM Admin holders."],
+    "add": {
+      "customPermissions": {
+        "Corporate_Hub_Manage": {"enabled": "true"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Agreement__c.Reminded_For__c": {"editable": "true"},
+        "Compliance_Obligation__c.Reminded_For__c": {"editable": "true"},
+        "Compliance_Obligation__c.Template_Key__c": {"editable": "true"},
+        "Hub_Document__c.Reminded_For__c": {"editable": "true"},
+        "Hub_Document__c.Template_Key__c": {"editable": "true"},
+        "Policy_Acknowledgment__c.Due_Date__c": {"editable": "true"},
+        "Policy_Acknowledgment__c.Person__c": {"editable": "true"},
+        "Policy_Acknowledgment__c.Requested_On__c": {"editable": "true"},
+        "Policy_Acknowledgment__c.User__c": {"editable": "true"},
+        "Processing_Activity__c.Template_Key__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Agreement__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Assessment_Answer__c": {"allowDelete": "true"},
+        "Board_Assessment__c": {"allowDelete": "true"},
+        "Board_Meeting__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Board_Member__c": {"allowDelete": "true"},
+        "Board_Motion__c": {"allowDelete": "true"},
+        "Board_Vote__c": {"allowDelete": "true"},
+        "Board__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Compliance_Cycle__c": {"allowDelete": "true"},
+        "Compliance_Obligation__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Data_Breach__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Data_Subject_Request__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Hub_Document__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Meeting_Action_Item__c": {"allowDelete": "true"},
+        "Meeting_Attendee__c": {"allowDelete": "true"},
+        "Policy_Acknowledgment__c": {"allowCreate": "true", "allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Processing_Activity__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Corporate Hub Read Only",
+    "description": ["Reads library documents, compliance obligations and cycles, and agreements; answers their own", "policy acknowledgments."],
+    "readOnly": true,
+    "set": {
+      "fieldPermissions": {
+        "Policy_Acknowledgment__c.Acknowledged_On__c": {"editable": "true"},
+        "Policy_Acknowledgment__c.Conflict_Disclosed__c": {"editable": "true"},
+        "Policy_Acknowledgment__c.Disclosure__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Policy_Acknowledgment__c": {"allowEdit": "true"}
+      }
+    }
+  }
+}
