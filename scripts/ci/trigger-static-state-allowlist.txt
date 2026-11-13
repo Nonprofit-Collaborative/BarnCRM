@@ -1,0 +1,3 @@
+# Static trigger handler collections a before method resets on purpose (QA review Q4).
+# ClassName.fieldName # reason. Checked by scripts/ci/check-trigger-static-state.py.
+VolunteerPersonDeleteHandler.deleted # rows already purged in this pass, not before-to-after state; reset so a partial-success retry purges the rolled-back rows again
