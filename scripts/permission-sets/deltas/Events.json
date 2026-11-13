@@ -1,0 +1,57 @@
+{
+  "Admin": {
+    "label": "Events Admin",
+    "description": "Everything in Event Management: creates, changes and deletes events and everything on them.",
+    "set": {
+      "fieldPermissions": {
+        "Agenda_Item__c.Contact__c": {"editable": "true"},
+        "Agenda_Item__c.My_Comment__c": {"editable": "true"},
+        "Agenda_Item__c.My_Rating__c": {"editable": "true"},
+        "Agenda_Item__c.Overlaps__c": {"editable": "true"},
+        "Agenda_Item__c.Pick_Key__c": {"editable": "true"},
+        "Agenda_Item__c.Rated__c": {"editable": "true"},
+        "Attendee_Connection__c.Contact_Details__c": {"editable": "true"},
+        "Attendee_Connection__c.Contact__c": {"editable": "true"},
+        "Attendee_Connection__c.Draft_Message__c": {"editable": "true"},
+        "Attendee_Connection__c.Note__c": {"editable": "true"},
+        "Attendee_Connection__c.Other_Attendee__c": {"editable": "true"},
+        "Attendee_Connection__c.Other_Contact__c": {"editable": "true"},
+        "Attendee_Connection__c.Pair_Key__c": {"editable": "true"},
+        "Attendee_Message__c.Body__c": {"editable": "true"},
+        "Attendee_Message__c.From_Contact__c": {"editable": "true"},
+        "Attendee_Message__c.Reply__c": {"editable": "true"},
+        "Attendee_Message__c.Sent_At__c": {"editable": "true"},
+        "Attendee_Message__c.To_Contact__c": {"editable": "true"},
+        "Event_Registration__c.Sample_Data__c": {"editable": "true"},
+        "Event__c.Sample_Data__c": {"editable": "true"},
+        "Sponsor_Lead__c.Badge_Code__c": {"editable": "true"},
+        "Sponsor_Lead__c.Event_Attendee__c": {"editable": "true"},
+        "Sponsor_Lead__c.Interest__c": {"editable": "true"},
+        "Sponsor_Lead__c.Lead_Company__c": {"editable": "true"},
+        "Sponsor_Lead__c.Lead_Email__c": {"editable": "true"},
+        "Sponsor_Lead__c.Lead_Key__c": {"editable": "true"},
+        "Sponsor_Lead__c.Lead_Name__c": {"editable": "true"},
+        "Sponsor_Lead__c.Lead_Title__c": {"editable": "true"},
+        "Sponsor_Lead__c.Notes__c": {"editable": "true"},
+        "Sponsor_Lead__c.Scanned_By__c": {"editable": "true"},
+        "Sponsor_Lead__c.Status__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Agenda_Item__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Attendee_Connection__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Attendee_Message__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Event_Venue__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Event__c": {"allowDelete": "true"},
+        "Sponsor_Lead__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Events Read Only",
+    "description": "Looks at events, their tickets, agenda and speakers.",
+    "readOnly": true,
+    "remove": {
+      "classAccesses": ["EventProposalReview"]
+    }
+  }
+}

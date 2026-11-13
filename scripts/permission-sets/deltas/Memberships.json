@@ -1,0 +1,38 @@
+{
+  "Admin": {
+    "label": "Memberships Admin",
+    "description": ["Sets up membership levels, benefits and certifications, and sees and changes every membership", "and member certification. Given to BarnCRM Admin holders."],
+    "set": {
+      "fieldPermissions": {
+        "Certification__c.Active__c": {"editable": "true"},
+        "Certification__c.Description__c": {"editable": "true"},
+        "Membership_Benefit__c.Description__c": {"editable": "true"},
+        "Membership_Benefit__c.Quantity__c": {"editable": "true"},
+        "Membership_Benefit__c.Sort_Order__c": {"editable": "true"},
+        "Membership_Level__c.Active__c": {"editable": "true"},
+        "Membership_Level__c.Description__c": {"editable": "true"},
+        "Membership_Level__c.Dues__c": {"editable": "true"},
+        "Membership_Level__c.External_Id__c": {"editable": "true"},
+        "Membership_Level__c.Fund_Id__c": {"editable": "true"},
+        "Membership_Level__c.Grace_Days__c": {"editable": "true"},
+        "Membership_Level__c.Term_Months__c": {"editable": "true"},
+        "Membership_Level__c.Tier__c": {"editable": "true"},
+        "Membership_Level__c.Type__c": {"editable": "true"},
+        "Membership_Term__c.Commitment_Id__c": {"editable": "true"},
+        "Membership_Term__c.Gift_Id__c": {"editable": "true"},
+        "Membership_Term__c.Pay_Link__c": {"editable": "true"},
+        "Membership_Term__c.Payment_Id__c": {"editable": "true"},
+        "Membership_Term__c.Reminded_For__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Certification__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Continuing_Credit__c": {"allowDelete": "true"},
+        "Member_Certification__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Membership_Benefit__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Membership_Level__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Membership_Term__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"}
+      }
+    }
+  },
+  "Read_Only": {"label": "Memberships Read Only", "description": "Reads memberships, levels, benefits and certifications. Given to Read Only.", "readOnly": true}
+}

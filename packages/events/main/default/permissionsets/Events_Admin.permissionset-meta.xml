@@ -2,31 +2,13 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
   <label>Events Admin</label>
-  <description>
-    Everything in Event Management: creates, changes and deletes events and everything on them.
-  </description>
+  <description>Everything in Event Management: creates, changes and deletes events and everything on them.</description>
   <classAccesses>
     <apexClass>EventAgendaController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
     <apexClass>EventBudgetController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventDashboardController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventAppointmentsController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventVolunteersController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventSurveyController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -47,6 +29,22 @@
   </classAccesses>
   <classAccesses>
     <apexClass>EventSpeakersController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventDashboardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventAppointmentsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventVolunteersController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventSurveyController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -224,6 +222,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Event_Registration__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Event__c.Public_Page__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -235,11 +238,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Event__c.Public_Seats__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Event_Registration__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
