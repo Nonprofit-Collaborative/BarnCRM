@@ -593,10 +593,12 @@ private class ErrorLoggerTest {
 			List<Error_Log__c> written = [
 				SELECT Message__c, Occurrences__c, Record_Reference__c, Other_Record_Ids__c
 				FROM Error_Log__c
-				ORDER BY Message__c
+				ORDER BY Occurrences__c
 			];
 			Assert.areEqual(2, written.size(), 'One entry per distinct failure.');
+			Assert.areEqual('A different failure.', written[0].Message__c);
 			Assert.areEqual(1, written[0].Occurrences__c, 'The different failure once.');
+			Assert.areEqual('The household is missing.', written[1].Message__c);
 			Assert.areEqual(2001, written[1].Occurrences__c, 'Every repeat is counted.');
 			Assert.areEqual(String.valueOf(userIds[0]), written[1].Record_Reference__c);
 			Integer named = Math.min(userIds.size() - 1, ErrorLogEventHandler.MORE_RECORDS);

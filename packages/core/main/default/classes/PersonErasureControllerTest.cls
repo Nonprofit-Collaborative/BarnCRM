@@ -53,9 +53,16 @@ private class PersonErasureControllerTest {
 
 			Test.stopTest();
 
+			// The two failures read the same way, so they are counted on one entry (R-E7).
+			Decimal failures = (Decimal) [
+					SELECT SUM(Occurrences__c) total
+					FROM Error_Log__c
+					WHERE Context__c = 'PersonErasureController'
+				][0]
+				.get('total');
 			Assert.areEqual(
 				2,
-				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'PersonErasureController'],
+				failures.intValue(),
 				'Each failure is in the Error Log for the administrator'
 			);
 			Assert.areEqual(

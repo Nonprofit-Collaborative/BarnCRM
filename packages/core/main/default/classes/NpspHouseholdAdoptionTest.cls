@@ -141,8 +141,15 @@ private class NpspHouseholdAdoptionTest {
 
 			Assert.areEqual(Label.Core_UnexpectedError, statusMessage, 'Status: the plain error');
 			Assert.areEqual(Label.Core_UnexpectedError, adoptMessage, 'Adopt: the plain error');
+			// Failures that read the same way are counted on one entry (R-E7).
+			Decimal failures = (Decimal) [
+					SELECT SUM(Occurrences__c) total
+					FROM Error_Log__c
+					WITH SYSTEM_MODE
+				][0]
+				.get('total');
 			Assert.isTrue(
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] >= 2,
+				failures != null && failures >= 2,
 				'Both failures are written to the Error Log'
 			);
 		}

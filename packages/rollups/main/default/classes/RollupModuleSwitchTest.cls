@@ -69,19 +69,20 @@ private class RollupModuleSwitchTest {
 		];
 	}
 
+	/** Times the message was logged, counted on its entries: repeats share one entry (R-E7). */
 	private static Integer infoLogsSaying(String message) {
-		Integer count = 0;
+		Decimal count = 0;
 		for (Error_Log__c entry : [
-			SELECT Message__c
+			SELECT Message__c, Occurrences__c
 			FROM Error_Log__c
 			WHERE Severity__c = :ErrorLogger.SEVERITY_INFO
 			WITH SYSTEM_MODE
 		]) {
 			if (entry.Message__c == message) {
-				count++;
+				count += entry.Occurrences__c;
 			}
 		}
-		return count;
+		return count.intValue();
 	}
 
 	/** Giving registers the engine's handler on its own objects, under its own module name. */

@@ -698,17 +698,22 @@ private class GiftImportProcessorTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, publishedAfter - publishedBefore, 'One statement for every failure');
-			Assert.areEqual(
-				3,
-				[
-					SELECT COUNT()
-					FROM Error_Log__c
-					WHERE
-						Context__c = 'GiftImportProcessor.undoTheUnfinished'
-						AND Record_Reference__c IN :giftIds
-				],
-				'Each failure is logged about its own gift'
-			);
+			// Failures that read the same way share one entry that names each gift (R-E7).
+			Decimal failures = 0;
+			Set<String> named = new Set<String>();
+			for (Error_Log__c entry : [
+				SELECT Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				WHERE Context__c = 'GiftImportProcessor.undoTheUnfinished'
+			]) {
+				failures += entry.Occurrences__c;
+				named.add(entry.Record_Reference__c);
+				if (String.isNotBlank(entry.Other_Record_Ids__c)) {
+					named.addAll(entry.Other_Record_Ids__c.split(','));
+				}
+			}
+			Assert.areEqual(3, failures.intValue(), 'Each failure is counted');
+			Assert.isTrue(named.containsAll(giftIds), 'Each failure is logged about its own gift');
 			Assert.isNull(gifts[0].giftId, 'The row no longer claims the gift');
 		}
 	}

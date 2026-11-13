@@ -11,8 +11,11 @@ private class HouseholdWriterTest {
 		TestUsers.admin();
 	}
 
+	/** Failures logged, counted on their entries: repeats share one entry (R-E7). */
 	private static Integer loggedErrors() {
-		return [SELECT COUNT() FROM Error_Log__c];
+		Decimal total = (Decimal) [SELECT SUM(Occurrences__c) total FROM Error_Log__c][0]
+			.get('total');
+		return total == null ? 0 : total.intValue();
 	}
 
 	private static Household_Member__c member(Account household, Contact person) {

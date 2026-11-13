@@ -331,15 +331,27 @@ private class SeasonalAddressServiceTest {
 				publishedAfter - publishedBefore,
 				'Every collision is logged in one statement, not one per household.'
 			);
-			Assert.areEqual(
-				3,
-				[
-					SELECT COUNT()
-					FROM Error_Log__c
-					WHERE
-						Severity__c = :ErrorLogger.SEVERITY_WARNING
-						AND Record_Reference__c IN :firstIds
-				],
+			// Collisions that read the same way share one entry that names each address (R-E7).
+			Decimal collisions = 0;
+			Set<String> named = new Set<String>();
+			for (Error_Log__c entry : [
+				SELECT Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				WHERE Severity__c = :ErrorLogger.SEVERITY_WARNING
+			]) {
+				Set<String> ids = new Set<String>{ entry.Record_Reference__c };
+				if (String.isNotBlank(entry.Other_Record_Ids__c)) {
+					ids.addAll(entry.Other_Record_Ids__c.split(','));
+				}
+				ids.retainAll(firstIds);
+				if (!ids.isEmpty()) {
+					collisions += entry.Occurrences__c;
+					named.addAll(ids);
+				}
+			}
+			Assert.areEqual(3, collisions.intValue(), 'Each household\'s collision is counted.');
+			Assert.isTrue(
+				named.containsAll(firstIds),
 				'Each household\'s collision is reported about its own address.'
 			);
 		}

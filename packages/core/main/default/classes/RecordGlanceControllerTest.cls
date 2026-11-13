@@ -143,16 +143,15 @@ private class RecordGlanceControllerTest {
 			);
 			Test.stopTest();
 		}
-		Assert.areEqual(
-			2,
-			[
-				SELECT COUNT()
+		// Both read as the unexpected error, so they are counted on one entry (R-E7).
+		Decimal logged = (Decimal) [
+				SELECT SUM(Occurrences__c) total
 				FROM Error_Log__c
 				WHERE Context__c = 'RecordGlanceExtensions.resolve'
 				WITH SYSTEM_MODE
-			],
-			'Each unusable class is logged'
-		);
+			][0]
+			.get('total');
+		Assert.areEqual(2, logged.intValue(), 'Each unusable class is logged');
 	}
 
 	/**

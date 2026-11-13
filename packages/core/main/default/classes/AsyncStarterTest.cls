@@ -52,10 +52,17 @@ private class AsyncStarterTest {
 
 			Assert.areEqual(BarnHelp.text('Core', 'Core_AsyncStarter_Busy'), message);
 			Assert.isTrue(queueRefused, 'A queued job is refused too');
+			// The two refusals read the same way, so they are counted on one entry (R-E7).
+			Decimal refusals = (Decimal) [
+					SELECT SUM(Occurrences__c) total
+					FROM Error_Log__c
+					WHERE Context__c = 'AsyncStarterTest'
+				][0]
+				.get('total');
 			Assert.areEqual(
 				2,
-				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AsyncStarterTest'],
-				'One entry per refusal, none for the caller logging it again'
+				refusals.intValue(),
+				'One count per refusal, none for the caller logging it again'
 			);
 		}
 	}
