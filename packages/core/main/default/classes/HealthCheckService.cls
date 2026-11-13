@@ -84,6 +84,7 @@ public with sharing class HealthCheckService {
 	public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
 	public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
 	public static final String FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS = 'rescheduleInactiveOwnerJobs';
+	public static final String FIX_KEY_FILL_MATCH_KEYS = 'fillMatchKeys';
 
 	/**
 	 * What a finding puts between the job names it lists. A job name can hold a comma
@@ -122,6 +123,9 @@ public with sharing class HealthCheckService {
 		}
 		if (FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
 			return ScheduledJobSelector.namesOwnedByInactiveUsers();
+		}
+		if (FIX_KEY_FILL_MATCH_KEYS.equals(fixKey)) {
+			return AddressMatchKeyHandler.unfilledScope();
 		}
 		if (ModuleSetups.FIX_KEY.equals(fixKey)) {
 			return ModuleSetups.pendingLabels();
@@ -659,6 +663,7 @@ public with sharing class HealthCheckService {
 			);
 			// A package copied in by hand, whose setup never ran (FS1).
 			steps.add(new CheckStep('module_setup', new ModuleSetups.SetupCheck()));
+			steps.add(new CheckStep('match_keys', new AddressMatchKeyHandler.FilledCheck()));
 			// The rollup checks are the Rollup Builder module's (RollupsHealthCheckExtension,
 			// ADR-0125), asked with the other extensions after these.
 		}

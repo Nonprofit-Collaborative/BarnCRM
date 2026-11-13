@@ -193,11 +193,21 @@ public with sharing class MatchSourceSelector {
 		Set<String> equalTo,
 		List<Map<String, String>> likeClauses
 	) {
+		return rowsByValues(source, source.valueField, equalTo, likeClauses);
+	}
+
+	/** As above, with `equalTo` compared to `equalField`: an Address source's Match Key (D-200 P6). */
+	public static List<SObject> rowsByValues(
+		MatchSourceService.Source source,
+		String equalField,
+		Set<String> equalTo,
+		List<Map<String, String>> likeClauses
+	) {
 		Map<String, Object> binds = new Map<String, Object>();
 		String filter;
 		if (equalTo != null && !equalTo.isEmpty()) {
 			binds.put('equalTo', equalTo);
-			filter = String.escapeSingleQuotes(source.valueField) + ' IN :equalTo';
+			filter = String.escapeSingleQuotes(equalField) + ' IN :equalTo';
 		} else if (likeClauses != null && !likeClauses.isEmpty()) {
 			// One bind per pattern: a list bound to LIKE is not relied on in dynamic SOQL.
 			List<String> clauses = new List<String>();

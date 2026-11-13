@@ -70,7 +70,7 @@ CAPS = {
     # bootstrap and revisions, SetupObjectSelector, NamespaceUtil.field and describe; the
     # modules shrank by moving their lookups onto Core): 2,233,198 measured, plus about 0.3%.
     # W15 R1.22 (D-200 P5, P7, P12, P13) fit under it: 2,230,377 measured with them; with
-    # AsyncStarter and its call sites (P9), 2,232,757.
+    # AsyncStarter and its call sites (P9), 2,232,757; with address match keys (P6), 2,238,235.
     "core": 2_240_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)

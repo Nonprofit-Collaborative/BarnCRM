@@ -143,7 +143,7 @@ public with sharing class HealthCheckController {
 			throw e;
 		} catch (Exception e) {
 			Database.rollback(beforeFix);
-			throw fixFailed(e, false);
+			throw fixFailed(e, e instanceof AsyncStarter.BusyException);
 		}
 	}
 
@@ -187,12 +187,19 @@ public with sharing class HealthCheckController {
 		if (ModuleSetups.FIX_KEY.equals(fixKey)) {
 			return System.Label.Core_ModuleSetup_FinishButton;
 		}
+		if (HealthCheckService.FIX_KEY_FILL_MATCH_KEYS.equals(fixKey)) {
+			return BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysFix');
+		}
 		HealthCheckFixExtension owner = HealthCheckService.fixOwner(fixKey);
 		return owner == null ? null : owner.fixLabel(fixKey);
 	}
 
 	/** Runs the fix and returns the sentence that says what it did. */
 	private static String runFix(String fixKey, List<String> scope) {
+		if (HealthCheckService.FIX_KEY_FILL_MATCH_KEYS.equals(fixKey)) {
+			AddressMatchKeyBatch.run();
+			return BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysStarted');
+		}
 		if (ModuleSetups.FIX_KEY.equals(fixKey)) {
 			return String.format(
 				BarnHelp.text('Core', 'Core_ModuleSetup_FixOutcome'),
