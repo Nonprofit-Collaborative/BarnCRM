@@ -122,6 +122,7 @@ private class ModuleAccessSyncsTest {
 
 	@IsTest
 	static void theAdminSetsAreThoseGivenToBarnCrmAdminHolders() {
+		// runs-as: deploying user (pure logic over in-memory catalog rows, no DML or SOQL)
 		catalogOf();
 		Assert.areEqual(
 			new List<String>{ 'Example_A_Admin' },
@@ -149,6 +150,7 @@ private class ModuleAccessSyncsTest {
 
 	@IsTest
 	static void theWrittenMapsAreRead() {
+		// runs-as: deploying user (pure parsing of a text value, no data access)
 		Map<String, List<String>> bySet = ModuleExtensions.parseMap(
 			' A_Admin = BarnCRM_Admin ; A_Staff=Program_Staff, Fundraising_Staff;;=Lost'
 		);

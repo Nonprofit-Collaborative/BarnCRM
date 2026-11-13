@@ -57,8 +57,10 @@ private class ProjectsPostInstallTest {
 				'Team Member holds Projects Staff'
 			);
 			Assert.isTrue(
-				ModuleExtensions.forModule(NightlyStepProvider.class, 'Projects') instanceof
-				ProjectsNightlyJobProvider,
+				ModuleExtensions.forModule(
+					NightlyStepProvider.class,
+					'Projects'
+				) instanceof ProjectsNightlyJobProvider,
 				'The catalog registers the provider'
 			);
 			List<NightlyStep> steps = new ProjectsNightlyJobProvider().nightlySteps();

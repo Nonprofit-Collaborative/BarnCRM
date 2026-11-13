@@ -178,6 +178,7 @@ public with sharing class ModuleExtensions {
 		return null;
 	}
 
+	/** The catalog rows, in system mode: they are Core's own shipped wiring, read for everyone. */
 	private static List<BarnCRM_Module__mdt> catalog() {
 		if (catalogOverride != null) {
 			return catalogOverride;
@@ -193,6 +194,7 @@ public with sharing class ModuleExtensions {
 						Access_By_Permission_Set__c,
 						Access_By_Role__c
 					FROM BarnCRM_Module__mdt
+					WITH SYSTEM_MODE
 					ORDER BY Sort_Order__c ASC NULLS LAST, DeveloperName ASC
 					LIMIT 200
 				];

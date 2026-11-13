@@ -3,6 +3,7 @@
  * catalog order, a class that is not installed or does not implement the seam is skipped, and
  * a test's stand-ins take a module's place. Each module's own tests check that its row resolves.
  */
+// runs-as: deploying user (pure logic: resolves classes by name from in-memory catalog rows, no DML or SOQL)
 @IsTest(testFor='ApexClass:ModuleExtensions')
 private class ModuleExtensionsTest {
 	private class FakeProvider implements NightlyStepProvider {
