@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>Enter a gift that has just arrived, from a phone or a desk.</description>
-  <flexiPage>Quick_Gift_Entry</flexiPage>
   <label>Quick Gift Entry</label>
+  <lwcComponent>quickGiftEntry</lwcComponent>
   <motif>Custom40: Creditcard</motif>
 </CustomTab>

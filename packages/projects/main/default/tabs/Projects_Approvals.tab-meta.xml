@@ -4,7 +4,7 @@
     Submitted time and expenses waiting for the project manager: approve or reject by entry or by
     a person's week.
   </description>
-  <flexiPage>Projects_Approvals</flexiPage>
   <label>Approvals</label>
+  <lwcComponent>projectsApprovals</lwcComponent>
   <motif>Custom46: Stamp</motif>
 </CustomTab>

@@ -33,7 +33,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		if (
 			!HealthCheckService.canManageSettings() ||
 			ModuleManagerService.turnedOff()
-				.contains(PaymentsAccessSync.MODULE_NAME.toLowerCase()) ||
+				.contains(PaymentsPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Payment_Event__c.isAccessible()
 		) {
 			return found;

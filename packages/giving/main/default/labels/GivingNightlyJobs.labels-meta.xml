@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
-    <fullName>Giving_NightlyJobs_Title</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: heading</shortDescription>
-    <value>Nightly Jobs</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_TopUpName</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>
@@ -33,14 +25,6 @@
     <value>Donor Levels</value>
   </labels>
   <labels>
-    <fullName>Giving_NightlyJobs_NextRunHeading</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: next run heading</shortDescription>
-    <value>Next Run</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_ScheduleButton</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>
@@ -55,13 +39,5 @@
     <protected>false</protected>
     <shortDescription>Nightly jobs page: button that stops the jobs</shortDescription>
     <value>Stop Nightly Run</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_RunNow</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: button that runs the jobs now</shortDescription>
-    <value>Run the Jobs Now</value>
   </labels>
 </CustomLabels>

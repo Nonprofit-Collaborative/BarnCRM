@@ -29,6 +29,11 @@ Salesforce org is needed for this job. Steps:
    of the rule silently. Without the rule the next edit can pull in the platform and the
    module stops being reusable outside Salesforce or testable without stubs (plan Section
    4.4, portability at near-zero cost).
+   Lint also refuses `toISOString().slice(0, 10)` (and `substring`, `substr`, `split('T')`)
+   anywhere in LWC code, tests included: `toISOString()` is UTC, so an evening user west of
+   Greenwich gets tomorrow (QA review Q11). Use `isoDate()` from `c/barnFormat` for today or
+   any local day, and `utcIsoDate()` for the UTC day of a UTC timestamp; `barnFormat.js` is the
+   one file exempt.
    The next workflow step, `npm run lint:slds`, runs Salesforce's SLDS linter
    (`@salesforce-ux/slds-linter`, pinned in `package.json`) over every component's HTML and
    CSS under `packages/`, failing the build on any SLDS 2 (Cosmos theme) finding: a
@@ -39,7 +44,18 @@ Salesforce org is needed for this job. Steps:
    findings are warnings, so the script passes only when the linter prints "No SLDS
    Violations found". `npx slds-linter lint packages --fix` applies the safe fixes; review
    each one.
-4. `npm run test:unit:coverage`
+4. `npm run test:unit:coverage`. `jest.config.js` sets a `coverageThreshold` (statements 89,
+   branches 79, functions 89, lines 89: about two points under the 2026-11-12 totals), so the
+   step fails when coverage drops below it. Raise the floor as coverage rises; never lower it
+   to land a change. Each component test also calls `expectAccessible(element)` from
+   `barn/a11y` (`packages/core/test/jest-helpers/a11y.js`): it fails on a lightning form
+   control with no label, a button icon or button menu with no alternative text, a button or
+   link with no text, an image with no `alt`, or a positive `tabindex`, and it also runs
+   `@sa11y/jest` (axe-core with Salesforce's rules) whenever that package is installed (it is
+   not a devDependency yet). `scripts/ci/check-jest-a11y.py` fails the build if a component
+   with a template has no test making that call and is not in
+   `scripts/ci/jest-a11y-baseline.txt`, or if a baseline entry now makes it; the baseline only
+   shrinks (QA review Q5).
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
@@ -179,6 +195,12 @@ Salesforce org is needed for this job. Steps:
    permission sets are assembled by hand at every merge from each branch's integration
    file, so the reference and the metadata can drift apart silently. This ran because
    `BarnCRM_Admin` granted a `Household_Member__c` tab that was never created.
+   Alongside it, `scripts/ci/check-generated-permission-sets.py` (D-200 S9a) fails the build
+   when a role trio's Admin or Read Only set differs from its Staff set plus its delta in
+   `scripts/permission-sets/deltas/<Prefix>.json`. Those two sets are generated: change the
+   Staff set or the delta, then run `python3 scripts/permission-sets/generate.py`. The
+   committed XML stays the deployed source, and ADR-0194's permission model is unchanged.
+   `--bootstrap <Prefix>` writes the delta that reproduces a trio's current sets.
 11. `scripts/ci/check-help-links.py`, failing the build if a Setting Definition's Learn
    more link points at a page that does not exist. `SettingsController` appends
    `Help_Path__c` to a base already ending in `docs/admin-guide/`, so a row storing
@@ -280,6 +302,17 @@ Salesforce org is needed for this job. Steps:
    `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
    is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
    below for why.
+   `scripts/ci/check-aura-non-admin-tests.py` fails the build if a class with an
+   `@AuraEnabled` method has no test that calls it and builds a non-admin user
+   (`TestDataFactory.createUser`, `TestUsers.standardUserWith`, `peopleReaderWith`,
+   `minimumAccessUserWith`, or a user on `TestUsers.readOnlyProfileId()` and the like), unless
+   `scripts/ci/aura-non-admin-allowlist.txt` lists it as `# admin only: reason` or as
+   `# not yet`. `TestUsers.admin()` keeps the administrator's profile, so a test run only as an
+   admin cannot see a missing field permission or class grant that breaks the page for staff
+   (QA review Q1: about 5,075 admin test calls against 370 non-admin). The `not yet` entries
+   only shrink: one fails once its class has such a test. Write the staff test as a Standard
+   User holding the package's Staff or Read Only set (`BarnCRM_Staff`, `Giving_Staff`), with
+   records the user owns where the object is private.
    `scripts/ci/check-test-relevance.py` fails the build if a test class (the vendored engine
    excepted) has neither `@IsTest(testFor='...')` nor `@IsTest(critical=true)` and is not in
    `scripts/ci/test-relevance-cross-cutting.txt`, or if a `testFor` names a class or trigger
@@ -300,6 +333,14 @@ Salesforce org is needed for this job. Steps:
    `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
    them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
    `TriggerHandler` reads the platform's own.
+   `scripts/ci/check-trigger-static-state.py` fails the build if a trigger handler's `before`
+   method assigns a new collection to, or clears, one of the handler's static `Map`, `Set` or
+   `List` fields. Such a field carries what the before event noted to the after event, and a
+   save of more than 200 rows (two chunks) or a dispatcher retry runs the before again, so a
+   reset drops the first chunk's state (defect D1, QA review Q4). Add to it keyed by record
+   Id and remove what the after event used; a deliberate reset is listed in
+   `scripts/ci/trigger-static-state-allowlist.txt` with its reason. Each handler holding such
+   state has a test that saves or deletes more than 200 rows at once.
    `scripts/ci/check-global-describe.py` fails the build if packaged Apex other than
    `NamespaceUtil` calls `Schema.getGlobalDescribe()`. The describe costs about 12 ms of CPU in
    a large org and cannot change within a transaction, so every class reads the one copy
@@ -545,9 +586,10 @@ have, and it has DLRS installed for coexistence. `oi-test` (Person Accounts shap
 the release gate.
 
 **Accepted risk of the incremental gate (D-142).** The selection follows direct mentions of a
-changed class and the `testFor` annotations only. It can miss a test that reaches the changed
-code indirectly, and it selects nothing for a change to an object, a flow, a permission set,
-custom metadata or a label that an unselected test depends on. The `testFor` and `critical`
+changed class or changed metadata and the `testFor` annotations only. It can miss a test that
+reaches the changed code or metadata indirectly (a flow that fires on a standard object, a
+field read only through describe), and it selects nothing for a changed label, layout or help
+text. The `testFor` and `critical`
 annotations (see "Relevant tests" below) narrow the gap; the release gate closes it before a
 version ships.
 
@@ -576,7 +618,14 @@ carries):
 - every test class whose `@IsTest(testFor=...)` names a changed class or trigger;
 - every test class that mentions a changed class by name (comments ignored), which includes the
   users of a changed test utility such as `TestDataFactory`;
-- every `critical=true` class, so a batch with no Apex change still runs the smoke tests.
+- every `critical=true` class, so a batch with no Apex change still runs the smoke tests;
+- every test class that names changed metadata (QA review Q9): a changed custom object, or
+  anything under it, by its API name (on a standard object, the changed field's API name); a
+  permission set, permission set group or custom permission by its name; a flow by its name
+  and the custom object it starts on; a custom metadata record by its type (`Type__mdt`) and
+  record name. A test utility that names the metadata (`TestUsers` names `BarnCRM_Admin`)
+  counts as changed, so a change to an admin permission set selects every test that runs as
+  that admin.
 
 The vendored rollup engine's tests are never selected. No coverage is recorded and no floor is
 checked. It posts `Org tests (local)` with a description such as "Incremental on barn-sales:
@@ -602,13 +651,28 @@ same job and also runs the relevant Apex tests.
 
 When a significant version's development is done and integrated:
 
-1. **Run the release gate on both gate orgs in parallel**, each from its own clean detached
-   worktree under its own org lock:
+1. **Run the release gate on every org shape in parallel** (QA review Q2 and Q6, D-200,
+   widening D-142):
 
    ```
-   scripts/org/run-org-tests.sh barn-sales --release
-   scripts/org/run-org-tests.sh oi-test --release
+   scripts/org/release-gate.sh [--multi-currency <alias>]
    ```
+
+   It first runs Code Analyzer over every package with the AppExchange selector and the Graph
+   Engine (`sfge`, needs Java 11 or later), as the security review does, and stops on any High
+   or Critical finding (`--analyzer-only` runs just that). Then it runs
+   `run-org-tests.sh <alias> --release` on each org in `RELEASE_ORGS` (default `barn-sales`,
+   `oi-test`, `barn-platform` for Platform-only, `barn-npsp` for an NPSP-shaped org), each from
+   its own detached worktree at HEAD under its own lock, with logs and results in
+   `test-results/release-gate/`. `--multi-currency <alias>` adds a multi-currency org
+   (`config/scratch-defs/multi-currency.json`), once per version. It never creates an org: an
+   alias not authenticated on the machine stops it before any deploy, so until `barn-npsp`
+   exists (it needs Brandon's approval, and `install-npsp.sh` needs verified package IDs) set
+   `RELEASE_ORGS` to the orgs that do and name the missing shape in the release notes.
+   Then run the OWASP ZAP baseline scan (passive only, Docker) on the test org's Site for the
+   guest surfaces (Forms, Events public pages, Payments webhooks, Portal login):
+   `scripts/org/zap-baseline.sh <site URL> [<form Id>] [<event Id>]`. A FAIL stops the version;
+   each WARN is reviewed against the [security checklist](security-checklist.md).
 
 2. **Re-validate and deploy to `barn-npc`** (Nonprofit Cloud trial, production edition; see the
    gotchas in the root `architecture.md`: Public visibility for custom settings and metadata,
@@ -1176,8 +1240,8 @@ stage the script runs
 post-install script and would otherwise leave the org without the rollup definitions a real
 install creates (ADR-0029). It then runs `TabAccessService.requestSync()` the same way, so the
 tool tabs, which live only in the `BarnCRM_Tab_*` permission sets, reach users without waiting
-for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
-which gives the Rollup Builder permission sets to BarnCRM's roles (ADR-0125 D2). Before the first stage the script fails if a folder under
+for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `ModuleAccessSyncs.requestAll()`,
+which gives every module's permission sets to the BarnCRM roles its catalog row names (ADR-0125 D2, ADR-0131, D-200 S1). Before the first stage the script fails if a folder under
 `packages/core/main/default` is named by no stage: Core's flows were never deployed until
 2026-10-13 because no stage named `flows`.
 

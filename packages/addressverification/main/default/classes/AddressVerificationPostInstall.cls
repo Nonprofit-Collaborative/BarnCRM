@@ -2,15 +2,13 @@
  * What the BarnCRM Address Verification module does at install and at every upgrade (ADR-0209
  * `0209-address-verification-module.md`). Safe to run twice; a failure is logged, never raised:
  * the installer gets Address Verification Admin, then BarnCRM Admin holders do
- * (`AddressVerificationAccessSync`), both queued because an assignment is a setup object write.
+ * (`ModuleAccessSyncs`), both queued because an assignment is a setup object write.
  *
  * No key is set at install and nothing is looked up until the keys are entered on Address
  * Verification Setup.
  */
 @NamespaceAccessible
 public with sharing class AddressVerificationPostInstall implements InstallHandler, ModuleSetup {
-	@TestVisible
-	private static final String ACCESS_CONTEXT = 'AddressVerificationPostInstall.grantInstallerAccess';
 	private static final String SWITCH_CONTEXT = 'AddressVerificationPostInstall.ensureAutomationSwitches';
 
 	/**
@@ -41,59 +39,6 @@ public with sharing class AddressVerificationPostInstall implements InstallHandl
 			SHIPPED_ON_ADDED_IN_UPGRADES
 		);
 		ModuleSetups.markRan(AddressVerifier.MODULE);
-		if (installerId == null) {
-			new AddressVerificationAccessSync().requestSync();
-			return;
-		}
-		try {
-			System.enqueueJob(new InstallerAccess(installerId));
-		} catch (Exception e) {
-			ErrorLogger.log(e, ACCESS_CONTEXT);
-			new AddressVerificationAccessSync().requestSync();
-		}
-	}
-
-	/** Gives the installer the admin set, then BarnCRM Admin holders. System mode: the install user. */
-	public without sharing class InstallerAccess implements Queueable {
-		private final Id installerId;
-
-		public InstallerAccess(Id installerId) {
-			this.installerId = installerId;
-		}
-
-		public void execute(QueueableContext jobContext) {
-			try {
-				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
-					AddressVerificationAccessSync.ADMIN_SET
-				);
-				Database.SaveResult saved = permissionSet == null
-					? null
-					: Database.insert(
-							new PermissionSetAssignment(
-								AssigneeId = installerId,
-								PermissionSetId = permissionSet.Id
-							),
-							false,
-							AccessLevel.SYSTEM_MODE
-					  );
-				// A duplicate means it is held already: what was wanted.
-				for (
-					Database.Error error : saved == null
-						? new List<Database.Error>()
-						: saved.getErrors()
-				) {
-					if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-						ErrorLogger.logMessage(
-							error.getMessage(),
-							ACCESS_CONTEXT,
-							ErrorLogger.SEVERITY_WARNING
-						);
-					}
-				}
-				AddressVerificationAccessSync.syncOnce();
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
+		ModuleAccessSyncs.setUp(AddressVerifier.MODULE, installerId);
 	}
 }

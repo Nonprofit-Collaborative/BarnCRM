@@ -9,6 +9,7 @@ const lwcConfig = require('@salesforce/eslint-config-lwc/recommended');
 // such module to this list; the rule below then keeps it from importing the platform. See
 // docs/contributor-guide/ci.md, static step 3.
 const PURE_MODULES = [
+  'packages/core/main/default/lwc/bugReportText/bugReportText.js',
   'packages/core/main/default/lwc/csvParser/csvParser.js',
   'packages/core/main/default/lwc/filesImportModel/filesImportModel.js',
   'packages/core/main/default/lwc/importWizard/xlsx.js',
@@ -26,6 +27,26 @@ const PLATFORM_IMPORT_MESSAGE =
   'A pure module (eslint.config.js PURE_MODULES) may not import the Salesforce platform. ' +
   'Keep the platform call in the component and pass plain values in.';
 
+// toISOString() is UTC, so cutting its first 10 characters gives tomorrow's date for an evening
+// user west of Greenwich (QA review Q11, defects D3 and D4). Today and any local calendar day
+// come from c/barnFormat isoDate (exported as localIsoDate by findCsv); a UTC day of a UTC
+// timestamp comes from c/barnFormat utcIsoDate, which says so on purpose.
+const UTC_DAY_MESSAGE =
+  'toISOString() is UTC and can be a day off. Use isoDate() from c/barnFormat for a local day ' +
+  '(today), or utcIsoDate() for the UTC day of a UTC timestamp.';
+const UTC_DAY_SYNTAX = [
+  {
+    selector:
+      "CallExpression[callee.property.name=/^(slice|substring|substr)$/][callee.object.callee.property.name='toISOString']",
+    message: UTC_DAY_MESSAGE
+  },
+  {
+    selector:
+      "MemberExpression[object.callee.property.name='split'][object.callee.object.callee.property.name='toISOString']",
+    message: UTC_DAY_MESSAGE
+  }
+];
+
 module.exports = [
   {
     ignores: [
@@ -38,7 +59,16 @@ module.exports = [
   ...lwcConfig,
   {
     files: ['packages/**/lwc/**/*.js'],
-    rules: {}
+    rules: {
+      'no-restricted-syntax': ['error', ...UTC_DAY_SYNTAX]
+    }
+  },
+  {
+    // The one place a UTC day is cut from toISOString, named utcIsoDate so callers choose it.
+    files: ['packages/core/main/default/lwc/barnFormat/barnFormat.js'],
+    rules: {
+      'no-restricted-syntax': 'off'
+    }
   },
   {
     files: PURE_MODULES,
@@ -60,6 +90,10 @@ module.exports = [
       globals: {
         require: 'readonly'
       }
+    },
+    rules: {
+      // expectAccessible (barn/a11y, QA review Q5) asserts, like expect.
+      'jest/expect-expect': ['warn', { assertFunctionNames: ['expect', 'expectAccessible'] }]
     }
   },
   {

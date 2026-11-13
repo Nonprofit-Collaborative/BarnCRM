@@ -145,11 +145,11 @@ describe('c-org-optimizer as an administrator', () => {
     jest.clearAllMocks();
   });
 
-  it('sits in the page shell, with the title kept for screen readers only', async () => {
+  it('sits in the page shell, with its title shown', async () => {
     const element = await render();
 
     const shell = one(element, 'c-barn-page-shell');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBe(false);
     expect(shell.title).toBe('c.Core_OrgOptimizer_Title');
     expect(shell.purpose).toBe('c.Core_OrgOptimizer_Intro');
     expect(one(element, 'lightning-card')).toBeNull();

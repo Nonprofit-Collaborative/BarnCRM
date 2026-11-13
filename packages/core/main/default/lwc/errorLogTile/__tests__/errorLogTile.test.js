@@ -2,6 +2,8 @@ import { createElement } from 'lwc';
 import ErrorLogTile from 'c/errorLogTile';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
+import getBugReport from '@salesforce/apex/ErrorLogController.getBugReport';
+import Toast from 'lightning/toast';
 import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
@@ -34,6 +36,10 @@ jest.mock(
   },
   { virtual: true }
 );
+
+jest.mock('@salesforce/apex/ErrorLogController.getBugReport', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/ErrorLogController.acknowledge', () => ({ default: jest.fn() }), {
   virtual: true
@@ -101,6 +107,68 @@ describe('c-error-log-tile', () => {
 
     expect(acknowledge).toHaveBeenCalledWith({ errorLogId: ENTRY.recordId });
     expect(element.shadowRoot.querySelector('[data-id="new-count"]').label).toBe('2 new');
+  });
+
+  describe('Copy for Bug Report', () => {
+    const REPORT = {
+      context: 'GiftService.save',
+      severity: 'Error',
+      occurredAt: '2026-09-07T09:12:00.000Z',
+      occurrences: 3,
+      objectName: 'Gift__c',
+      technicalDetail:
+        'System.DmlException: FIELD_CUSTOM_VALIDATION_EXCEPTION, Pat Lee pat@example.org\n' +
+        'Class.GiftService.save: line 12, column 1'
+    };
+
+    afterEach(() => {
+      delete navigator.clipboard;
+    });
+
+    it('copies the redacted report and says so', async () => {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText },
+        configurable: true
+      });
+      const toast = jest.spyOn(Toast, 'show').mockImplementation(() => undefined);
+      getBugReport.mockResolvedValue(REPORT);
+      const element = createComponent();
+      getTile.emit(TILE);
+      await flush();
+
+      element.shadowRoot.querySelectorAll('.copy-report-button')[0].click();
+      await flush();
+      await flush();
+
+      expect(getBugReport).toHaveBeenCalledWith({ errorLogId: ENTRY.recordId });
+      const text = writeText.mock.calls[0][0];
+      expect(text).toContain('FIELD_CUSTOM_VALIDATION_EXCEPTION');
+      expect(text).toContain('Class.GiftService.save: line 12, column 1');
+      expect(text).not.toContain('Pat');
+      expect(text).not.toContain('@example.org');
+      expect(toast).toHaveBeenCalled();
+      toast.mockRestore();
+    });
+
+    it('shows the text to copy by hand when the browser refuses', async () => {
+      Object.defineProperty(navigator, 'clipboard', {
+        value: { writeText: jest.fn().mockRejectedValue(new Error('denied')) },
+        configurable: true
+      });
+      getBugReport.mockResolvedValue(REPORT);
+      const element = createComponent();
+      getTile.emit(TILE);
+      await flush();
+
+      element.shadowRoot.querySelectorAll('.copy-report-button')[0].click();
+      await flush();
+      await flush();
+
+      const box = element.shadowRoot.querySelector('[data-id="report-text"]');
+      expect(box.value).toContain('GiftService.save');
+      expect(box.value).not.toContain('Pat');
+    });
   });
 
   it('shows the message the server sends when the action is refused', async () => {

@@ -83,8 +83,10 @@ async function mount(status) {
   return element;
 }
 
+/** Inside the shared c-mirror-page the wrapper renders. */
 function find(element, id) {
-  return element.shadowRoot.querySelector(`[data-id="${id}"]`);
+  const page = element.shadowRoot.querySelector('c-mirror-page');
+  return page.shadowRoot.querySelector(`[data-id="${id}"]`);
 }
 
 describe('c-opportunity-mirror', () => {

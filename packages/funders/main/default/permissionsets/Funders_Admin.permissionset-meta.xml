@@ -384,6 +384,10 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
+    <tab>Funder_Report_Template__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Grant_Calendar</tab>
     <visibility>Visible</visibility>
   </tabSettings>
@@ -405,10 +409,6 @@
   </tabSettings>
   <tabSettings>
     <tab>Grant_Answer__c</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Funder_Report_Template__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

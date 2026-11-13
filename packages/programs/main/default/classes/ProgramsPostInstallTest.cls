@@ -14,7 +14,7 @@ private class ProgramsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :ProgramsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Programs_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -25,7 +25,7 @@ private class ProgramsPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ ProgramsAccessSync.ADMIN_SET }
+					new List<String>{ 'Programs_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -36,8 +36,8 @@ private class ProgramsPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new ProgramsPostInstall(), null);
-			System.enqueueJob(new ProgramsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new ProgramsPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Programs', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Programs', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Programs Admin');
@@ -57,7 +57,7 @@ private class ProgramsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :ProgramsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'ProgramsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -84,7 +84,7 @@ private class ProgramsPostInstallTest {
 
 			Test.startTest();
 			new ProgramsPostInstall().onInstall(null);
-			System.enqueueJob(new ProgramsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Programs', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -92,7 +92,7 @@ private class ProgramsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :ProgramsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'ProgramsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

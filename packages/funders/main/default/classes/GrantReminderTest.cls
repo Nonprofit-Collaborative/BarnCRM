@@ -314,8 +314,11 @@ private class GrantReminderTest {
 				'The batch reminded it'
 			);
 			Assert.isTrue(
-				NightlyJobs.PROVIDER_CLASSES.contains('FundersNightlyJobProvider'),
-				'Core lists the provider'
+				ModuleExtensions.forModule(
+					NightlyStepProvider.class,
+					'Funders'
+				) instanceof FundersNightlyJobProvider,
+				'The catalog registers the provider'
 			);
 		}
 	}

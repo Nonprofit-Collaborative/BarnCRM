@@ -37,8 +37,13 @@ if [[ -z "$ALIAS" ]]; then
 fi
 
 # Ordered list of 04t package version IDs: npe01, npo02, npe03, npe4, npe5, npsp.
-# Left empty deliberately; see comment block above.
-NPSP_PACKAGE_IDS=()
+# PLACEHOLDER (QA review Q2, 2026-11-12): still empty, because no verified IDs are known. Fill
+# it here once verified, or pass them for one run, space separated and in the order above:
+#   NPSP_PACKAGE_IDS="04t... 04t... 04t... 04t... 04t... 04t..." install-npsp.sh barn-npsp
+# The NPSP-shaped release gate org (barn-npsp, scripts/org/release-gate.sh) needs them, or the
+# manual installer below.
+# shellcheck disable=SC2206
+NPSP_PACKAGE_IDS=(${NPSP_PACKAGE_IDS:-})
 
 if [[ ${#NPSP_PACKAGE_IDS[@]} -eq 0 ]]; then
   echo "install-npsp.sh: no verified NPSP package version IDs are recorded yet."

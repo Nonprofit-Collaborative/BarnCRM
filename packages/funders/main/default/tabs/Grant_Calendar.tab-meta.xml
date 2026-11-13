@@ -3,7 +3,7 @@
   <description>
     A month of application deadlines, requirement due dates and expected payments.
   </description>
-  <flexiPage>Grant_Calendar</flexiPage>
   <label>Grant Calendar</label>
+  <lwcComponent>grantCalendar</lwcComponent>
   <motif>Custom82: Whistle</motif>
 </CustomTab>

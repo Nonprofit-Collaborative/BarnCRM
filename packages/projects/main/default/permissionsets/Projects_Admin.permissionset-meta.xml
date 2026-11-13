@@ -55,6 +55,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Project__c.Labor_Cost__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Project__c.Start_Date__c</field>
     <readable>true</readable>
@@ -156,6 +161,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Project_Rate__c.Cost_Rate__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Project_Revenue__c.Cost_Amount__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Project_Task__c.Phase__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -222,6 +237,16 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Project_Assignment__c.End_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Time_Entry__c.Cost_Amount__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Time_Entry__c.Cost_Rate__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -431,11 +456,6 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Project_Rate__c.Cost_Rate__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Project_Rate__c.Effective_To__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -450,18 +470,8 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
-    <editable>true</editable>
-    <field>Time_Entry__c.Cost_Rate__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
     <editable>false</editable>
     <field>Time_Entry__c.Amount__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Time_Entry__c.Cost_Amount__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -646,11 +656,6 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Project_Revenue__c.Cost_Amount__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Project_Revenue__c.Percent_Complete__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -702,11 +707,6 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Project__c.Billable_Amount__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Project__c.Labor_Cost__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -883,6 +883,14 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
+    <tab>Project_Invoice__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Project_Rate__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Projects_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
@@ -896,6 +904,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Project__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Request_Connection__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
@@ -915,19 +927,7 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
-    <tab>Project_Rate__c</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Project_Invoice__c</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
     <tab>Projects_Requests</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Request_Connection__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

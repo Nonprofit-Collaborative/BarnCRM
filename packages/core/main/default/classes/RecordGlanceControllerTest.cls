@@ -154,4 +154,26 @@ private class RecordGlanceControllerTest {
 			'Each unusable class is logged'
 		);
 	}
+
+	/**
+	 * QA review Q1: the glance card is on every person page, so a Read Only user (Standard
+	 * User profile, BarnCRM Read Only) gets the module's card just as an admin does.
+	 */
+	@IsTest
+	static void aReadOnlyUserGetsTheModuleCard() {
+		User reader;
+		System.runAs(TestUsers.admin()) {
+			reader = TestDataFactory.createUser('Reader', new List<String>{ 'BarnCRM_Read_Only' });
+		}
+		List<RecordGlance.Card> cards;
+		Test.startTest();
+		System.runAs(reader) {
+			only(new StubExtension());
+			cards = RecordGlanceController.getCards(FakeIds.of(Contact.SObjectType, 1));
+		}
+		Test.stopTest();
+
+		Assert.areEqual(1, cards.size(), 'The reader sees the module card');
+		Assert.areEqual('Stub Card', cards[0].title, 'As the module built it');
+	}
 }

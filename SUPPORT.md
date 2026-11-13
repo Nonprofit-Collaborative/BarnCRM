@@ -23,7 +23,7 @@ The templates live in `.github/ISSUE_TEMPLATE/`.
 
 - **Steps:** numbered steps that someone else can follow from a fresh org.
 - **Expected:** what you thought would happen.
-- **Actual:** what happened instead, including any error text word for word. If the Error Log recorded a message, paste it.
+- **Actual:** what happened instead, including any error text word for word. If the Error Log recorded the error, click **Copy for Bug Report** on the Error Log card (Org Optimizer, Errors) and paste that: it leaves out the message, names and record values. Do not paste the entry's message, which can name a record.
 - **Version:** the BarnCRM commit or version you are on. Nothing is installable as a package yet, so give the commit of `main` you deployed (`git rev-parse --short HEAD`).
 - **Org shape:** Platform only, Sales or Service Cloud, NPSP installed, or Nonprofit Cloud with Person Accounts.
 - **Edition:** the Salesforce edition (for example Developer, Enterprise, Nonprofit Power of Us).

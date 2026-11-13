@@ -10,7 +10,18 @@ staged deploy. A test class is selected when it is:
   2. a test class whose @IsTest(testFor=...) names a class or trigger changed in that range;
   3. a test class whose source mentions a changed class by name (comments ignored): the test
      calls it directly, or through a changed test utility such as TestDataFactory;
-  4. an @IsTest(critical=true) class, which runs every time.
+  4. an @IsTest(critical=true) class, which runs every time;
+  5. a test class whose source names changed metadata (QA review Q9), so a change with no Apex
+     in it still runs the tests that depend on it:
+       - an object or anything under it (field, validation rule, record type, list view): a
+         custom object (`__c`, `__mdt`, `__e`) by its API name; on a standard object, the
+         changed field's API name, since nearly every test names Contact or Account;
+       - a permission set, permission set group or custom permission: its API name;
+       - a flow: its API name, and the custom object it starts on;
+       - a custom metadata record: its type (`Type__mdt`) and its record name.
+     A test utility (an @IsTest class with no test method, such as TestUsers) that names the
+     metadata counts as changed too, so its users are selected: a change to BarnCRM_Admin
+     reaches every test that runs as TestUsers.admin().
 
 The vendored rollup engine (packages/core/vendor/) is never selected, as in the release run.
 The tree read is the working tree, which the gate has already checked matches HEAD.
@@ -47,9 +58,64 @@ def changed_apex(base, head):
     return [f for f in out.split("\n") if f]
 
 
+CUSTOM_SUFFIX = re.compile(r"__(c|mdt|e)$", re.I)
+FLOW_OBJECT = re.compile(r"<start>.*?<object>(\w+)</object>", re.S)
+
+
+def changed_metadata(base, head):
+    """Changed (added or modified) packaged files other than Apex."""
+    out = subprocess.run(
+        ["git", "diff", "--name-only", "--diff-filter=d", base, head, "--", "packages/"],
+        capture_output=True, text=True, check=True,
+    ).stdout
+    return [
+        f for f in out.split("\n")
+        if f and not f.endswith((".cls", ".trigger", ".cls-meta.xml", ".trigger-meta.xml"))
+        and not f.startswith(VENDOR)
+    ]
+
+
+def metadata_names(path):
+    """The API names a test would use to depend on this changed metadata file."""
+    parts = path.split("/")
+    file_name = parts[-1]
+    stem = file_name.split(".", 1)[0]
+    if "objects" in parts:
+        position = parts.index("objects")
+        if position + 1 >= len(parts):
+            return set()
+        object_name = parts[position + 1]
+        if CUSTOM_SUFFIX.search(object_name):
+            return {object_name}
+        if "fields" in parts and stem.endswith("__c"):
+            return {stem}
+        return set()
+    if "permissionsets" in parts or "permissionsetgroups" in parts or "customPermissions" in parts:
+        return {stem}
+    if "flows" in parts:
+        names = {stem}
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as handle:
+                found = FLOW_OBJECT.search(handle.read())
+            if found and CUSTOM_SUFFIX.search(found.group(1)):
+                names.add(found.group(1))
+        return names
+    if "customMetadata" in parts:
+        type_name, _, record = file_name[: -len(".md-meta.xml")].partition(".")
+        return {type_name + "__mdt", record} - {""}
+    return set()
+
+
 def test_classes():
     """{name: (stripped source, testFor targets, critical)} for every test class with a test method."""
+    return scan()[0]
+
+
+def scan():
+    """The test classes, as test_classes() gives them, and {name: stripped source} of the test
+    utilities (@IsTest classes with no test method)."""
     found = {}
+    utilities = {}
     for path in relevance.tracked("packages/*.cls"):
         name = os.path.basename(path)[:-4]
         with open(path, encoding="utf-8") as handle:
@@ -58,7 +124,8 @@ def test_classes():
         if not match or match.group("name").lower() != name.lower():
             continue
         if not relevance.TEST_METHOD.search(source, match.end()):
-            continue  # a test utility: never run itself, but a change to it selects its users
+            utilities[name] = source  # never run itself, but a change to it selects its users
+            continue
         params = match.group("params") or ""
         targets = set()
         test_for = relevance.TEST_FOR.search(params)
@@ -68,16 +135,27 @@ def test_classes():
                 if parsed:
                     targets.add(parsed.group(2).lower())
         found[name] = (source, targets, bool(relevance.CRITICAL.search(params)))
-    return found
+    return found, utilities
+
+
+def mentioning(names):
+    return re.compile(r"\b(" + "|".join(sorted(map(re.escape, names))) + r")\b", re.I)
 
 
 def select(base, head="HEAD"):
-    tests = test_classes()
+    tests, utilities = scan()
     changed = {os.path.basename(f).rsplit(".", 1)[0] for f in changed_apex(base, head)}
+    metadata = set()
+    for path in changed_metadata(base, head):
+        metadata |= metadata_names(path)
+    if metadata:
+        named = mentioning(metadata)
+        changed |= {name for name, source in utilities.items() if named.search(source)}
+        changed |= metadata
     lowered = {c.lower() for c in changed}
     mention = None
     if changed:
-        mention = re.compile(r"\b(" + "|".join(sorted(map(re.escape, changed))) + r")\b", re.I)
+        mention = mentioning(changed)
     selected = set()
     for name, (source, targets, critical) in tests.items():
         if (

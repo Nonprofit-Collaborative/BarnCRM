@@ -1,0 +1,46 @@
+{
+  "Admin": {
+    "label": "Programs Admin",
+    "description": ["Runs programs: programs, services, enrollments, case notes and service deliveries,", "including deleting a record entered by accident."],
+    "add": {
+      "classAccesses": {
+        "ProgramsSettingsController": {"enabled": "true"}
+      },
+      "fieldPermissions": {
+        "Program__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      },
+      "tabSettings": {
+        "Programs_Settings": {"visibility": "Available"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Program__c.Eligibility_Rules__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Case_Note__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Cohort__c": {"allowDelete": "true"},
+        "Enrollment__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Goal_Step__c": {"allowDelete": "true"},
+        "Goal__c": {"allowDelete": "true"},
+        "Program__c": {"allowDelete": "true"},
+        "Referral__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Service_Count__c": {"allowDelete": "true", "viewAllRecords": "true"},
+        "Service_Delivery__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Service__c": {"allowDelete": "true"},
+        "Session_Schedule__c": {"allowDelete": "true"},
+        "Session__c": {"allowDelete": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Programs Read Only",
+    "description": "Looks at programs, services and enrollments without changing them.",
+    "readOnly": true,
+    "remove": {
+      "fieldPermissions": ["Case_Note__c.Goal__c", "Case_Note__c.Note__c", "Case_Note__c.Subject__c", "Referral__c.Account__c", "Referral__c.Contact__c", "Referral__c.Enrollment__c", "Referral__c.Notes__c", "Referral__c.Other_Organization__c", "Referral__c.Outcome__c", "Referral__c.Partner_Organization__c", "Referral__c.Shared_With_Partner__c"],
+      "objectPermissions": ["Case_Note__c", "Referral__c"],
+      "tabSettings": ["Case_Note__c", "Referral__c"]
+    }
+  }
+}

@@ -6,7 +6,7 @@
 private class EventsEngagementSignalTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Id registerJane(Datetime start) {
@@ -30,7 +30,7 @@ private class EventsEngagementSignalTest {
 
 	@IsTest
 	static void countsAttendedEventsInTheWindowOnly() {
-		System.runAs(TestUsers.adminWith(EventsAccessSync.ADMIN_SET)) {
+		System.runAs(TestUsers.adminWith('Events_Admin')) {
 			registerJane(Datetime.now().addDays(-20));
 			registerJane(Datetime.now().addYears(-2));
 			List<Event_Attendee__c> attendees = [

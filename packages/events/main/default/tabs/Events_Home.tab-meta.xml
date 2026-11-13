@@ -3,7 +3,7 @@
   <description>
     The events coming up and those that are over, with New Event and Repeat Event.
   </description>
-  <flexiPage>Events_Home</flexiPage>
   <label>Events Home</label>
+  <lwcComponent>eventsHome</lwcComponent>
   <motif>Custom81: MusicalNote</motif>
 </CustomTab>

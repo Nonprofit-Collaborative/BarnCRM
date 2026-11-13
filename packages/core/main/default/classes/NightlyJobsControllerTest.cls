@@ -11,12 +11,110 @@ private class NightlyJobsControllerTest {
 	static void grantPermission() {
 		System.runAs(TestUsers.admin()) {
 			SettingsTestPermissions.grantTo('Nightly_Jobs_Panel_Test', UserInfo.getUserId());
+			TestUsers.standardUser('Reader');
 		}
 	}
 
 	private class NoWork implements Schedulable {
 		public void execute(SchedulableContext context) {
 			return;
+		}
+	}
+
+	private static Integer runs = 0;
+
+	private class CountingWork implements Schedulable {
+		public void execute(SchedulableContext context) {
+			runs++;
+		}
+	}
+
+	/** One step with a switch that allows Run Now, and one with neither. */
+	private static void twoSteps() {
+		NightlyJobs.overrideStepsForTest(
+			new List<NightlyStep>{
+				new NightlyStep(STEP_KEY, 'Panel step', 1, 15, new CountingWork())
+					.withSwitch(true)
+					.withSummary('3 payments added')
+					.runnableNow(),
+				new NightlyStep('BarnCRM Panel Plain Step', 'Plain', 2, 0, new NoWork())
+			}
+		);
+	}
+
+	private static String refusal(String key, Boolean isSwitch) {
+		try {
+			if (isSwitch) {
+				NightlyJobsController.setStep(key, false);
+			} else {
+				NightlyJobsController.runStep(key);
+			}
+		} catch (AuraHandledException expected) {
+			return expected.getMessage();
+		}
+		return null;
+	}
+
+	@IsTest
+	static void aManagerSwitchesAStepAndStartsItNow() {
+		System.runAs(TestUsers.admin()) {
+			twoSteps();
+
+			Test.startTest();
+			NightlyJobsController.PanelView afterOff = NightlyJobsController.setStep(
+				STEP_KEY,
+				false
+			);
+			NightlyJobsController.PanelView afterOn = NightlyJobsController.setStep(STEP_KEY, true);
+			NightlyJobsController.runStep(STEP_KEY);
+			Test.stopTest();
+
+			Assert.isFalse(afterOff.steps[0].switchedOn, 'Turned off');
+			Assert.isTrue(afterOn.steps[0].switchedOn, 'Turned on again');
+			Assert.isTrue(afterOn.scheduled, 'Turning on schedules the run');
+			Assert.isTrue(afterOn.steps[0].canRunNow, 'Offers Run Now');
+			Assert.areEqual('3 payments added', afterOn.steps[0].summary, 'Shows its summary');
+			Assert.isFalse(afterOn.steps[1].hasSwitch, 'The plain step has no switch');
+			Assert.areEqual(1, runs, 'Run Now started its work once');
+		}
+	}
+
+	@IsTest
+	static void aStepWithoutASwitchOrRunNowOrThatIsUnknownIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			twoSteps();
+			Test.startTest();
+			String noSwitch = refusal('BarnCRM Panel Plain Step', true);
+			String noRun = refusal('BarnCRM Panel Plain Step', false);
+			String unknown = refusal('BarnCRM Not A Step', false);
+			Test.stopTest();
+
+			Assert.areEqual(BarnHelp.text('Core', 'Core_NightlyJobs_NoSwitch'), noSwitch);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_NightlyJobs_NoRunNow'), noRun);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_NightlyJobs_NoSuchJob'), unknown);
+		}
+	}
+
+	@IsTest
+	static void someoneWhoDoesNotManageSettingsCannotSwitchOrRun() {
+		System.runAs(TestUsers.admin()) {
+			twoSteps();
+			User reader = TestUsers.standardUser('Reader');
+			Test.startTest();
+			System.runAs(reader) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'),
+					refusal(STEP_KEY, true),
+					'Switching needs Manage BarnCRM Settings'
+				);
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'),
+					refusal(STEP_KEY, false),
+					'So does Run Now'
+				);
+			}
+			Test.stopTest();
+			Assert.areEqual(0, runs, 'Nothing ran');
 		}
 	}
 

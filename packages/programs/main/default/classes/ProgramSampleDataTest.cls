@@ -1,14 +1,31 @@
 /**
- * The Programs sample data set: the load builds three programs, five services and 18 enrollments
- * of Core's sample people through the enrollment rules; the removal takes every one of them and
+ * The Programs sample data set, shipped as ProgramsSampleData.json and loaded by Core's
+ * SampleDataFile (D-200 S2): the load builds three programs, five services and 18 enrollments of
+ * Core's sample people through the enrollment rules; the removal takes every one of them and
  * leaves real records alone, keeping a sample program a real person is enrolled in and naming it
- * in the Error Log; and Core finds the module by name. Run as a BarnCRM admin holding Programs
- * Admin, the person who loads sample data. The stages are called directly, because a test runs
- * only the first stage of a batch.
+ * in the Error Log. Run as a BarnCRM admin holding Programs Admin, the person who loads sample
+ * data. The stages are called directly, because a test runs only the first stage of a batch.
  */
-@IsTest(testFor='ApexClass:ProgramsSampleData, ApexClass:ProgramSampleDataLoader')
+@IsTest(testFor='ApexClass:SampleDataFile')
 private class ProgramSampleDataTest {
 	private static final String ADMIN = 'Programs_Admin';
+	private static final String FILE = 'ProgramsSampleData';
+
+	/** The first twelve of Core's sample people, in key order, as the file names them. */
+	private static final List<String> KEYS = new List<String>{
+		'H001-1',
+		'H001-2',
+		'H001-3',
+		'H002-1',
+		'H002-2',
+		'H002-3',
+		'H002-4',
+		'H002-5',
+		'H002-6',
+		'H003-1',
+		'H003-2',
+		'H004-1'
+	};
 
 	@TestSetup
 	static void makeAdmin() {
@@ -29,7 +46,7 @@ private class ProgramSampleDataTest {
 		for (Integer i = 0; i < howMany; i++) {
 			Contact person = HouseholdTestDataFactory.newContact('Sample', 'Person' + i);
 			person.Sample_Data__c = true;
-			person.Sample_Data_Key__c = 'H' + String.valueOf(100 + i) + '-1';
+			person.Sample_Data_Key__c = KEYS[i];
 			people.add(person);
 		}
 		insert people;
@@ -37,22 +54,27 @@ private class ProgramSampleDataTest {
 	}
 
 	private static void loadEverything() {
-		ProgramsSampleData.LoadStages stages = new ProgramsSampleData.LoadStages();
+		SampleDataFile.LoadStages stages = new SampleDataFile.LoadStages(FILE);
 		for (Integer stage = 0; stage < stages.stageCount(); stage++) {
 			stages.runStage(stage);
 		}
 	}
 
 	private static void removeEverything() {
-		ProgramsSampleData.RemoveStages stages = new ProgramsSampleData.RemoveStages();
+		SampleDataFile.RemoveStages stages = new SampleDataFile.RemoveStages(FILE);
 		Integer stageCount = stages.stageCount();
 		for (Integer stage = 0; stage < stageCount; stage++) {
 			stages.runStage(stage);
 		}
+		stages.finish();
 	}
 
 	private static Integer countAt(String stage) {
 		return [SELECT COUNT() FROM Enrollment__c WHERE Stage__c = :stage];
+	}
+
+	private static List<Error_Log__c> keptWarnings() {
+		return [SELECT Message__c FROM Error_Log__c WHERE Context__c = 'SampleDataFile'];
 	}
 
 	@IsTest
@@ -98,9 +120,6 @@ private class ProgramSampleDataTest {
 				1,
 				[SELECT COUNT() FROM Service_Delivery__c WHERE Attendance__c = 'Excused Absence']
 			);
-			Assert.areEqual(4, [SELECT COUNT() FROM Goal__c], 'A goal for each in tutoring.');
-			Assert.areEqual(4, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);
-			Assert.areEqual(8, [SELECT COUNT() FROM Goal_Step__c], 'Two steps each.');
 			Assert.areEqual(
 				0,
 				[
@@ -111,13 +130,18 @@ private class ProgramSampleDataTest {
 				.Quantity__c,
 				'One missed week, which delivered nothing.'
 			);
-			Assert.areEqual(18, new ProgramsSampleData().countLoaded(), 'The card counts them.');
-			Assert.isTrue(new ProgramsSampleData().hasSampleRecords(), 'Sample programs exist.');
+			Assert.areEqual(4, [SELECT COUNT() FROM Goal__c], 'A goal for each in tutoring.');
+			Assert.areEqual(4, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);
+			Assert.areEqual(8, [SELECT COUNT() FROM Goal_Step__c], 'Two steps each.');
+			SampleDataModule module = SampleDataFile.find(FILE);
+			Assert.areEqual('Programs', module.moduleName(), 'The name startAfter looks for.');
+			Assert.areEqual(18, module.countLoaded(), 'The card counts them.');
+			Assert.isTrue(module.hasSampleRecords(), 'Sample programs exist.');
 		}
 	}
 
 	@IsTest
-	static void fewSamplePeopleNeverBreakTheOneOpenEnrollmentRule() {
+	static void fewSamplePeopleAreEnrolledAndTheRestLeftOut() {
 		System.runAs(admin()) {
 			samplePeople(2);
 
@@ -142,7 +166,7 @@ private class ProgramSampleDataTest {
 			Contact person = HouseholdTestDataFactory.newContact('Rita', 'Real');
 			insert person;
 			insert new Enrollment__c(Program__c = real.Id, Contact__c = person.Id);
-			ProgramSampleDataLoader.removeChunkSize = 20;
+			SampleDataFile.removeChunkSize = 20;
 
 			Test.startTest();
 			removeEverything();
@@ -155,8 +179,8 @@ private class ProgramSampleDataTest {
 			Assert.areEqual(0, [SELECT COUNT() FROM Session__c], 'Sessions went.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Cohort__c], 'The cohort went.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Goal__c], 'Goals went with enrollments.');
-			Assert.isFalse(new ProgramsSampleData().hasSampleRecords(), 'Nothing left.');
-			Assert.isNull(ProgramSampleDataLoader.logWhatWasKept(), 'Nothing was kept.');
+			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords(), 'Nothing left.');
+			Assert.isTrue(keptWarnings().isEmpty(), 'Nothing was kept.');
 		}
 	}
 
@@ -172,7 +196,6 @@ private class ProgramSampleDataTest {
 
 			Test.startTest();
 			removeEverything();
-			new ProgramsSampleData.RemoveStages().finish();
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -181,11 +204,7 @@ private class ProgramSampleDataTest {
 				'The pantry stays, with its real enrollment.'
 			);
 			Assert.areEqual(1, [SELECT COUNT() FROM Enrollment__c], 'The real enrollment stays.');
-			List<Error_Log__c> logged = [
-				SELECT Message__c
-				FROM Error_Log__c
-				WHERE Context__c = 'ProgramsSampleData.RemoveStages'
-			];
+			List<Error_Log__c> logged = keptWarnings();
 			Assert.areEqual(1, logged.size(), 'One Warning names it.');
 			Assert.isTrue(logged[0].Message__c.contains('Food pantry'), 'By name.');
 		}
@@ -206,7 +225,6 @@ private class ProgramSampleDataTest {
 
 			Test.startTest();
 			removeEverything();
-			new ProgramsSampleData.RemoveStages().finish();
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -219,69 +237,24 @@ private class ProgramSampleDataTest {
 				[SELECT Name FROM Program__c WHERE Sample_Data__c = TRUE].Name,
 				'Its program stays.'
 			);
-			List<Error_Log__c> logged = [
-				SELECT Message__c
-				FROM Error_Log__c
-				WHERE Context__c = 'ProgramsSampleData.RemoveStages'
-			];
 			Assert.isTrue(
-				logged[0].Message__c.contains('Food pantry'),
+				keptWarnings()[0].Message__c.contains('Food pantry'),
 				'And is named, like a program with real enrollments.'
 			);
 		}
 	}
 
 	@IsTest
-	static void coreFindsTheModuleAndHandsOn() {
+	static void withNoSamplePeopleTheProgramsStillLoad() {
 		System.runAs(admin()) {
-			Object built = Type.forName('ProgramsSampleData').newInstance();
-			Assert.isTrue(built instanceof SampleDataModule, 'Core builds it by its name.');
-			ProgramsSampleData module = (ProgramsSampleData) built;
-			Assert.areEqual('Programs', module.moduleName(), 'The name startAfter looks for.');
-			Assert.isFalse(String.isBlank(module.countLabel()), 'The card has its wording.');
-			Assert.areEqual(0, module.countLoaded(), 'Nothing loaded yet.');
-			Assert.areEqual(
-				'ProgramsSampleData.LoadStages',
-				new ProgramsSampleData.LoadStages().name()
-			);
+			Assert.areEqual(0, SampleDataFile.find(FILE).countLoaded(), 'Nothing loaded yet.');
 
-			// With no sample people the programs still load, and nobody is enrolled.
 			Test.startTest();
 			loadEverything();
-			new ProgramsSampleData.LoadStages().finish();
 			Test.stopTest();
 
 			Assert.areEqual(3, [SELECT COUNT() FROM Program__c], 'The programs load.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Enrollment__c], 'Nobody to enroll.');
-		}
-	}
-
-	@IsTest
-	static void enqueueLoadStartsTheStageBatch() {
-		System.runAs(admin()) {
-			Test.startTest();
-			new ProgramsSampleData().enqueueLoad();
-			Test.stopTest();
-
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataStageBatch']
-			);
-		}
-	}
-
-	@IsTest
-	static void enqueueRemoveStartsTheRemovalBatch() {
-		System.runAs(admin()) {
-			Test.startTest();
-			new ProgramsSampleData().enqueueRemove();
-			Test.stopTest();
-
-			Assert.isTrue(
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'] >=
-				1,
-				'The Programs removal runs in Core\'s removal batch.'
-			);
 		}
 	}
 }
