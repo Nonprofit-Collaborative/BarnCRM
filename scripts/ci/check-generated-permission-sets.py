@@ -18,12 +18,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 def main():
     problems = []
-    # Trios still to move to the generator (D-200 S9a lands in three parts); emptied by the last.
-    pending = {"BarnCRM", "Giving", "Payments", "Programs", "Projects", "Territory", "Volunteers"}
     for staff in sorted(glob.glob(os.path.join(ROOT, "packages", "*", "main", "default", "permissionsets", "*_Staff.permissionset-meta.xml"))):
         prefix = os.path.basename(staff)[: -len("_Staff.permissionset-meta.xml")]
-        if prefix in pending:
-            continue
         if not os.path.isfile(os.path.join(ROOT, "scripts", "permission-sets", "deltas", f"{prefix}.json")):
             problems.append(f"{os.path.relpath(staff, ROOT)}: no scripts/permission-sets/deltas/{prefix}.json")
     for problem in problems:
