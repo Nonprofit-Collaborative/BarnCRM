@@ -6,12 +6,12 @@
 private class SponsorDeliverableTemplateTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	@IsTest
 	static void turnsEachLineIntoAnItemWithAType() {
-		System.runAs(TestUsers.adminWith(EventsAccessSync.ADMIN_SET)) {
+		System.runAs(TestUsers.adminWith('Events_Admin')) {
 			Test.startTest();
 			List<SponsorDeliverableTemplate.Item> items = SponsorDeliverableTemplate.parse(
 				'Logo on the program\r\n\r\n  booth, 10 by 10  \nPasses (4)\nLogo on the program\nThank you post'
@@ -29,7 +29,7 @@ private class SponsorDeliverableTemplateTest {
 
 	@IsTest
 	static void handlesEmptyTextAndCapsTheList() {
-		System.runAs(TestUsers.adminWith(EventsAccessSync.ADMIN_SET)) {
+		System.runAs(TestUsers.adminWith('Events_Admin')) {
 			List<String> lines = new List<String>();
 			for (Integer i = 0; i < 80; i++) {
 				lines.add('Item ' + i + ' ' + 'x'.repeat(100));

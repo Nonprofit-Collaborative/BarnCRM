@@ -24,7 +24,7 @@ private class LwcBuilderPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ LwcBuilderAccessSync.ADMIN_SET }
+					new List<String>{ 'LWC_Builder_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -35,20 +35,12 @@ private class LwcBuilderPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new LwcBuilderPostInstall(), null);
-			System.enqueueJob(new LwcBuilderPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new LwcBuilderPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('LwcBuilder', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('LwcBuilder', alreadyHolding));
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				setsHeldBy(fresh, LwcBuilderAccessSync.ADMIN_SET),
-				'The installer holds it'
-			);
-			Assert.areEqual(
-				1,
-				setsHeldBy(alreadyHolding, LwcBuilderAccessSync.ADMIN_SET),
-				'Never twice'
-			);
+			Assert.areEqual(1, setsHeldBy(fresh, 'LWC_Builder_Admin'), 'The installer holds it');
+			Assert.areEqual(1, setsHeldBy(alreadyHolding, 'LWC_Builder_Admin'), 'Never twice');
 			Assert.areEqual(
 				1,
 				setsHeldBy(member.Id, 'LWC_Builder_Staff'),
@@ -59,7 +51,7 @@ private class LwcBuilderPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :LwcBuilderPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'LwcBuilderPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -75,7 +67,7 @@ private class LwcBuilderPostInstallTest {
 
 			Test.startTest();
 			new LwcBuilderPostInstall().onInstall(null);
-			System.enqueueJob(new LwcBuilderPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('LwcBuilder', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -83,7 +75,7 @@ private class LwcBuilderPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :LwcBuilderPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'LwcBuilderPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

@@ -16,7 +16,7 @@ public with sharing class EventsSampleData implements SampleDataModule {
 	}
 
 	public String moduleName() {
-		return EventsAccessSync.MODULE_NAME;
+		return EventsPostInstall.MODULE_KEY;
 	}
 
 	public String countLabel() {
@@ -67,7 +67,7 @@ public with sharing class EventsSampleData implements SampleDataModule {
 		}
 
 		public void finish() {
-			SampleDataModules.startAfter(EventsAccessSync.MODULE_NAME);
+			SampleDataModules.startAfter(EventsPostInstall.MODULE_KEY);
 		}
 	}
 
@@ -86,7 +86,7 @@ public with sharing class EventsSampleData implements SampleDataModule {
 		}
 
 		public void finish() {
-			SampleDataModules.removeAfter(EventsAccessSync.MODULE_NAME);
+			SampleDataModules.removeAfter(EventsPostInstall.MODULE_KEY);
 		}
 	}
 }

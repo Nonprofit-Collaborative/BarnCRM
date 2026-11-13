@@ -2,9 +2,7 @@
  * Maria installs Project Management: BarnCRM Admin holders get Projects Admin, BarnCRM's roles get
  * their sets, the nightly step is offered, and nothing in the install can fail it.
  */
-@IsTest(
-	testFor='ApexClass:ProjectsPostInstall, ApexClass:ProjectsAccessSync, ApexClass:ProjectsNightlyJobProvider'
-)
+@IsTest(testFor='ApexClass:ProjectsPostInstall, ApexClass:ProjectsNightlyJobProvider')
 private class ProjectsPostInstallTest {
 	@TestSetup
 	static void createTestUser() {
@@ -50,7 +48,7 @@ private class ProjectsPostInstallTest {
 
 			Assert.areEqual(
 				1,
-				held(TestUsers.admin().Id, ProjectsAccessSync.ADMIN_SET),
+				held(TestUsers.admin().Id, 'Projects_Admin'),
 				'BarnCRM Admin holds Projects Admin'
 			);
 			Assert.areEqual(
@@ -58,7 +56,11 @@ private class ProjectsPostInstallTest {
 				held(member.Id, 'Projects_Staff'),
 				'Team Member holds Projects Staff'
 			);
-			Assert.areEqual('Projects', new ProjectsAccessSync().moduleName(), 'Module key');
+			Assert.isTrue(
+				ModuleExtensions.forModule(NightlyStepProvider.class, 'Projects') instanceof
+				ProjectsNightlyJobProvider,
+				'The catalog registers the provider'
+			);
 			List<NightlyStep> steps = new ProjectsNightlyJobProvider().nightlySteps();
 			Assert.areEqual(
 				ProjectHealth.JOB_NAME,

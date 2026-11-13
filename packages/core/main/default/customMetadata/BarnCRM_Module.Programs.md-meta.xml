@@ -44,6 +44,7 @@
   </values>
   <values>
     <field>Extensions__c</field>
-    <value xsi:type="xsd:string">NightlyStepProvider: ProgramsNightlyJobProvider</value>
+    <value xsi:type="xsd:string">NightlyStepProvider: ProgramsNightlyJobProvider
+ModuleAccessStep: ProgramsAccessStep</value>
   </values>
 </CustomMetadata>

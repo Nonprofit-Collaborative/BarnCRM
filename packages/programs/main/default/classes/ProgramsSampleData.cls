@@ -16,7 +16,7 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 	}
 
 	public String moduleName() {
-		return ProgramsAccessSync.MODULE_NAME;
+		return ProgramsPostInstall.MODULE_KEY;
 	}
 
 	public String countLabel() {
@@ -81,7 +81,7 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 		}
 
 		public void finish() {
-			SampleDataModules.startAfter(ProgramsAccessSync.MODULE_NAME);
+			SampleDataModules.startAfter(ProgramsPostInstall.MODULE_KEY);
 		}
 	}
 
@@ -109,7 +109,7 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 				// Naming what was kept is a courtesy; the rest of the removal still runs.
 				ErrorLogger.log(notNamed, name());
 			}
-			SampleDataModules.removeAfter(ProgramsAccessSync.MODULE_NAME);
+			SampleDataModules.removeAfter(ProgramsPostInstall.MODULE_KEY);
 		}
 	}
 }

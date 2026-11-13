@@ -33,7 +33,6 @@ packages/addressverification/main/default/classes/AddressVerificationHandler.cls
 packages/contactpoints/main/default/classes/ContactPointSyncService.cls 1
 packages/core/main/default/classes/FieldAccessRecordJob.cls 2
 packages/core/main/default/classes/MergeSettlement.cls 2
-packages/core/main/default/classes/ModuleAccessSyncBase.cls 2
 packages/core/main/default/classes/ModuleAccessSyncs.cls 2
 packages/core/main/default/classes/PersonErasure.cls 1
 packages/core/main/default/classes/TabAccessService.cls 2
@@ -42,27 +41,11 @@ packages/giving/main/default/classes/HouseholdSoftCreditRecompute.cls 2
 packages/memberships/main/default/classes/MembershipPayments.cls 1
 packages/programs/main/default/classes/ProgramsSharing.cls 2
 packages/programs/main/default/classes/SessionScheduleJob.cls 2
-packages/rollups/main/default/classes/RollupAccessSync.cls 2
 packages/volunteers/main/default/classes/ShiftScheduleGenerator.cls 2
 packages/volunteers/main/default/classes/ShiftScheduleRemovalJob.cls 1
 
 # Post-install steps: an install has no person to tell, and each step logs its own failure.
-packages/addressverification/main/default/classes/AddressVerificationPostInstall.cls 1
-packages/contactpoints/main/default/classes/ContactPointsPostInstall.cls 2
 packages/core/main/default/classes/CorePostInstall.cls 1
-packages/corporatehub/main/default/classes/CorporateHubPostInstall.cls 2
-packages/events/main/default/classes/EventsPostInstall.cls 2
-packages/forms/main/default/classes/FormsPostInstall.cls 2
-packages/funders/main/default/classes/FundersPostInstall.cls 2
-packages/logicmodels/main/default/classes/LogicModelsPostInstall.cls 2
-packages/lwcbuilder/main/default/classes/LwcBuilderPostInstall.cls 2
-packages/memberships/main/default/classes/MembershipsPostInstall.cls 2
-packages/payments/main/default/classes/PaymentsPostInstall.cls 2
-packages/portal/main/default/classes/PortalPostInstall.cls 2
-packages/programs/main/default/classes/ProgramsPostInstall.cls 2
-packages/rollups/main/default/classes/RollupsPostInstall.cls 2
-packages/territory/main/default/classes/TerritoryPostInstall.cls 2
-packages/volunteers/main/default/classes/VolunteersPostInstall.cls 2
 
 # A batch over values rather than records (Batchable<String>, <Integer>, or a custom type),
 # which AsyncStarter.batch does not take.

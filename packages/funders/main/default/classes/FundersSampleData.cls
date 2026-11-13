@@ -16,7 +16,7 @@ public with sharing class FundersSampleData implements SampleDataModule {
 	}
 
 	public String moduleName() {
-		return FundersAccessSync.MODULE_NAME;
+		return FundersPostInstall.MODULE_KEY;
 	}
 
 	public String countLabel() {
@@ -67,7 +67,7 @@ public with sharing class FundersSampleData implements SampleDataModule {
 		}
 
 		public void finish() {
-			SampleDataModules.startAfter(FundersAccessSync.MODULE_NAME);
+			SampleDataModules.startAfter(FundersPostInstall.MODULE_KEY);
 		}
 	}
 
@@ -86,7 +86,7 @@ public with sharing class FundersSampleData implements SampleDataModule {
 		}
 
 		public void finish() {
-			SampleDataModules.removeAfter(FundersAccessSync.MODULE_NAME);
+			SampleDataModules.removeAfter(FundersPostInstall.MODULE_KEY);
 		}
 	}
 }

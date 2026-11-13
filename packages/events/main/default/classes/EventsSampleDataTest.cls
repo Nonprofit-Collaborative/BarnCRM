@@ -11,11 +11,11 @@
 private class EventsSampleDataTest {
 	@TestSetup
 	static void makeAdmin() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User admin() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	/** Core's sample people and three of its sample organizations. */
