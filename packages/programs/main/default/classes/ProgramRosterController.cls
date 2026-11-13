@@ -9,6 +9,12 @@
  */
 public with sharing class ProgramRosterController {
 	private static final String CONTEXT = 'Program roster panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Programs',
+			'Programs_Fail_Roster'
+		)
+		.showingDml();
 	/** The most enrollments listed: a bound on the read; the Enrollments tab lists them all. */
 	public static final Integer MAX_SHOWN = 200;
 	/**
@@ -76,7 +82,7 @@ public with sharing class ProgramRosterController {
 		try {
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
-			throw report(failure, programId);
+			throw ERRORS.wrap(failure, CONTEXT, programId);
 		}
 	}
 
@@ -102,7 +108,7 @@ public with sharing class ProgramRosterController {
 			Database.insert(new List<Enrollment__c>{ enrollment }, true, AccessLevel.USER_MODE);
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
-			throw report(failure, programId);
+			throw ERRORS.wrap(failure, CONTEXT, programId);
 		}
 	}
 
@@ -125,7 +131,7 @@ public with sharing class ProgramRosterController {
 			);
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
-			throw report(failure, enrollmentId);
+			throw ERRORS.wrap(failure, CONTEXT, enrollmentId);
 		}
 	}
 
@@ -216,20 +222,5 @@ public with sharing class ProgramRosterController {
 	/** What staff are told when the roster's work failed (modules-1). */
 	private static String failed() {
 		return BarnHelp.text('Programs', 'Programs_Fail_Roster');
-	}
-
-	/**
-	 * A save a rule refused (a second open enrollment, a person the user may not see) is passed
-	 * on in its own words; anything else is logged first.
-	 */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(failed());
 	}
 }

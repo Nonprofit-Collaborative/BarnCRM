@@ -7,6 +7,12 @@
  */
 public with sharing class CorporateHubController {
 	private static final String CONTEXT = 'CorporateHubController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'CorporateHub',
+			'CorporateHub_Error_Generic'
+		)
+		.showingDml();
 	/** How far ahead the page lists obligations and agreements. */
 	private static final Integer OBLIGATION_DAYS = 60;
 	private static final Integer AGREEMENT_DAYS = 90;
@@ -126,7 +132,7 @@ public with sharing class CorporateHubController {
 			addPrivacy(home);
 			return home;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -214,7 +220,7 @@ public with sharing class CorporateHubController {
 			}
 			return result;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -223,7 +229,7 @@ public with sharing class CorporateHubController {
 		try {
 			return HubPolicy.requestAcknowledgments(documentId, groupName);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -232,7 +238,7 @@ public with sharing class CorporateHubController {
 		try {
 			HubPolicy.publishNewVersion(documentId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -241,7 +247,7 @@ public with sharing class CorporateHubController {
 		try {
 			HubPolicy.markReviewed(documentId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -250,7 +256,7 @@ public with sharing class CorporateHubController {
 		try {
 			HubPolicy.retire(documentId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -260,7 +266,7 @@ public with sharing class CorporateHubController {
 		try {
 			HubPolicy.acknowledge(acknowledgmentId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -274,7 +280,7 @@ public with sharing class CorporateHubController {
 		try {
 			return HubCompliance.completeCycle(obligationId, completedOn, outcome, notes);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -289,7 +295,7 @@ public with sharing class CorporateHubController {
 			}
 			return HubTemplates.loadMissing(null, false);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -309,16 +315,5 @@ public with sharing class CorporateHubController {
 		line.status = status;
 		line.recordId = recordId;
 		return line;
-	}
-
-	/** A refusal or a save's own message as it is; anything else logged, then one message. */
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof HubPolicy.PolicyException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(
-			e,
-			BarnHelp.text('CorporateHub', 'CorporateHub_Error_Generic')
-		);
 	}
 }

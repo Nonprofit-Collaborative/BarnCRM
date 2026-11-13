@@ -10,6 +10,12 @@
  * (Address Card Fields, R-AD10), those this user can read.
  */
 public with sharing class AddressMoveController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Address_MoveFailed'
+	);
+
 	/** Whether the Addresses feature is on: the card shows nothing while it is off (D-185). */
 	@AuraEnabled(cacheable=true)
 	public static Boolean isFeatureOn() {
@@ -112,7 +118,7 @@ public with sharing class AddressMoveController {
 			}
 			return fields;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Addresses card: Address Card Fields');
+			throw ERRORS.wrap(caught, 'Addresses card: Address Card Fields');
 		}
 	}
 
@@ -153,7 +159,7 @@ public with sharing class AddressMoveController {
 			}
 			return context;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Addresses card: household moves');
+			throw ERRORS.wrap(caught, 'Addresses card: household moves');
 		}
 	}
 
@@ -173,7 +179,7 @@ public with sharing class AddressMoveController {
 			preview.withTheirOwn = choicesFor(move.withTheirOwn);
 			return preview;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Addresses card: Update Everyone\'s Address');
+			throw ERRORS.wrap(caught, 'Addresses card: Update Everyone\'s Address');
 		}
 	}
 
@@ -184,7 +190,7 @@ public with sharing class AddressMoveController {
 			AddressService.useForWholeHousehold(new Map<Id, Id>{ addressId => householdId });
 		} catch (Exception caught) {
 			Database.rollback(before);
-			throw asUserError(caught, 'Addresses card: Use for Whole Household');
+			throw ERRORS.wrap(caught, 'Addresses card: Use for Whole Household');
 		}
 	}
 
@@ -199,7 +205,7 @@ public with sharing class AddressMoveController {
 			);
 		} catch (Exception caught) {
 			Database.rollback(before);
-			throw asUserError(caught, 'Addresses card: Update Everyone\'s Address');
+			throw ERRORS.wrap(caught, 'Addresses card: Update Everyone\'s Address');
 		}
 	}
 
@@ -265,18 +271,5 @@ public with sharing class AddressMoveController {
 			);
 		}
 		return name;
-	}
-
-	/**
-	 * A refusal the card can show as it is passes through; anything else, a permission the
-	 * user lacks among them, is logged and shown as one plain sentence.
-	 */
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof AddressService.AddressMoveException,
-			context,
-			BarnHelp.text('Core', 'Core_Address_MoveFailed')
-		);
 	}
 }

@@ -12,6 +12,13 @@
  * definition the Builder saves is one the engine can plan.
  */
 public with sharing class RollupBuilderController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			'RollupBuilderController',
+			'Rollups',
+			'Core_Rollups_UnexpectedError'
+		)
+		.showingDml();
+
 	private static final String KEY_PREFIX = 'Custom_';
 
 	/** The two standard entities Core itself holds, always offered first (R-R7). */
@@ -255,7 +262,7 @@ public with sharing class RollupBuilderController {
 			model.customPermissions = customPermissionOptions();
 			return model;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -286,7 +293,7 @@ public with sharing class RollupBuilderController {
 			}
 			return sorted(options);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -304,7 +311,7 @@ public with sharing class RollupBuilderController {
 			}
 			return options;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -321,7 +328,7 @@ public with sharing class RollupBuilderController {
 			}
 			return sorted(options);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -359,7 +366,7 @@ public with sharing class RollupBuilderController {
 			}
 			return sorted(options);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -383,7 +390,7 @@ public with sharing class RollupBuilderController {
 			}
 			return toDraft(definition);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -433,7 +440,7 @@ public with sharing class RollupBuilderController {
 			}
 			return preview;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -456,7 +463,7 @@ public with sharing class RollupBuilderController {
 			}
 			return samples;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -601,7 +608,7 @@ public with sharing class RollupBuilderController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -1250,18 +1257,5 @@ public with sharing class RollupBuilderController {
 			result.add(byKey.get(key));
 		}
 		return result;
-	}
-
-	/** A message the Builder can show; anything it cannot explain is logged. */
-	private static AuraHandledException asUserError(Exception caught) {
-		if (caught instanceof DmlException) {
-			return UserErrors.message(((DmlException) caught).getDmlMessage(0));
-		}
-		return UserErrors.wrap(
-			caught,
-			caught instanceof RollupService.RollupServiceException,
-			'RollupBuilderController',
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
-		);
 	}
 }

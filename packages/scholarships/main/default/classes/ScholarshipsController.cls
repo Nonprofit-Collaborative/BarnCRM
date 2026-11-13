@@ -7,6 +7,12 @@
  */
 public with sharing class ScholarshipsController {
 	private static final String CONTEXT = 'ScholarshipsController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Scholarships',
+			'Scholarships_Error_Generic'
+		)
+		.showingDml();
 
 	/** One line of a list on the Scholarships and Grants page. */
 	public class Row {
@@ -171,7 +177,7 @@ public with sharing class ScholarshipsController {
 			home.due = ScholarshipAwards.due(30);
 			return home;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -198,7 +204,7 @@ public with sharing class ScholarshipsController {
 			}
 			return board;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -207,7 +213,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipReviews.assign(cycleId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -216,7 +222,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.decide(applicationId, award, amount);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -237,7 +243,7 @@ public with sharing class ScholarshipsController {
 			review.open = ScholarshipReviews.REVIEWABLE.contains(application.Status__c);
 			return review;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -258,7 +264,7 @@ public with sharing class ScholarshipsController {
 				ScholarshipReviews.saveOwn(applicationId, scores, comments, action, reason)
 			);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -279,7 +285,7 @@ public with sharing class ScholarshipsController {
 			panel.canManage = Scholarships.canManage();
 			return panel;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -288,7 +294,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.makeLetter(awardId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -297,7 +303,7 @@ public with sharing class ScholarshipsController {
 		try {
 			ScholarshipAwards.respond(awardId, accepted);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -311,7 +317,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.buildSchedule(awardId, count, firstDate, monthsApart);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -320,7 +326,7 @@ public with sharing class ScholarshipsController {
 		try {
 			ScholarshipAwards.markPaid(paymentId, paidOn, method, reference);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -329,7 +335,7 @@ public with sharing class ScholarshipsController {
 		try {
 			ScholarshipAwards.setRequirement(requirementId, status);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -338,7 +344,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.startRenewal(awardId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -347,7 +353,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.export(fromDate, toDate);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -359,16 +365,5 @@ public with sharing class ScholarshipsController {
 		line.due = due;
 		line.count = count;
 		return line;
-	}
-
-	/** A refusal or a save's own message as it is; anything else logged, then one message. */
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Scholarships.ScholarshipException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(
-			e,
-			BarnHelp.text('Scholarships', 'Scholarships_Error_Generic')
-		);
 	}
 }

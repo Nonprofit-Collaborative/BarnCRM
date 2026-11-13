@@ -339,7 +339,9 @@ public with sharing class PaymentPayPal {
 				}
 				change.reference = PaymentStripe.text(resource.get('custom'));
 				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
-				change.amount = decimalOf(PaymentStripe.mapOf(resource.get('amount')).get('total'));
+				change.amount = SettingsService.toNumber(
+					PaymentStripe.mapOf(resource.get('amount')).get('total')
+				);
 				change.status = PaymentService.PAID;
 				change.subscriptionEvent = PaymentService.CHARGE_SUCCEEDED;
 			}
@@ -368,7 +370,7 @@ public with sharing class PaymentPayPal {
 				if (total.isEmpty()) {
 					total = PaymentStripe.mapOf(resource.get('amount'));
 				}
-				change.amountRefunded = decimalOf(total.get('value'));
+				change.amountRefunded = SettingsService.toNumber(total.get('value'));
 				change.processorPaymentId = refundedCapture(resource);
 				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Refunded');
 			}
@@ -514,13 +516,5 @@ public with sharing class PaymentPayPal {
 			}
 		}
 		return null;
-	}
-
-	private static Decimal decimalOf(Object value) {
-		try {
-			return value == null ? null : Decimal.valueOf(String.valueOf(value));
-		} catch (Exception notANumber) {
-			return null;
-		}
 	}
 }

@@ -3,12 +3,18 @@
  * shapes; the rules and permission checks are in `BackupSetService`.
  */
 public with sharing class BackupSetController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		null,
+		System.Label.Core_UnexpectedError
+	);
+
 	@AuraEnabled
 	public static BackupSetService.Panel getPage() {
 		try {
 			return BackupSetService.page();
 		} catch (Exception e) {
-			throw wrapped(e, 'BackupSetController.getPage');
+			throw ERRORS.wrap(e, 'BackupSetController.getPage');
 		}
 	}
 
@@ -18,7 +24,7 @@ public with sharing class BackupSetController {
 		try {
 			return BackupSetService.allowed() ? BackupSetService.runs() : null;
 		} catch (Exception e) {
-			throw wrapped(e, 'BackupSetController.getRuns');
+			throw ERRORS.wrap(e, 'BackupSetController.getRuns');
 		}
 	}
 
@@ -29,7 +35,7 @@ public with sharing class BackupSetController {
 			BackupSetService.setBackup(queryId, asSet);
 			return BackupSetService.page();
 		} catch (Exception e) {
-			throw wrapped(e, 'BackupSetController.setBackup');
+			throw ERRORS.wrap(e, 'BackupSetController.setBackup');
 		}
 	}
 
@@ -40,11 +46,7 @@ public with sharing class BackupSetController {
 			BackupSetService.run(queryId);
 			return BackupSetService.page();
 		} catch (Exception e) {
-			throw wrapped(e, 'BackupSetController.runNow');
+			throw ERRORS.wrap(e, 'BackupSetController.runNow');
 		}
-	}
-
-	private static AuraHandledException wrapped(Exception e, String context) {
-		return DataJobs.userError(e, context, e instanceof BackupSetService.BackupSetException);
 	}
 }

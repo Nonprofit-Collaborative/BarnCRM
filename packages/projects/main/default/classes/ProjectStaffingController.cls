@@ -6,6 +6,12 @@
  */
 public with sharing class ProjectStaffingController {
 	private static final String CONTEXT = 'ProjectStaffingController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Projects',
+			'Projects_Error_Generic'
+		)
+		.showingDml();
 	private static final Integer MAX_RANGE_DAYS = 182;
 	private static final List<String> NOT_COUNTED = new List<String>{
 		'Open',
@@ -59,7 +65,7 @@ public with sharing class ProjectStaffingController {
 			}
 			return staffing;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -128,7 +134,7 @@ public with sharing class ProjectStaffingController {
 			}
 			return view;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -176,7 +182,7 @@ public with sharing class ProjectStaffingController {
 			);
 			return assignment.Id;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -212,7 +218,7 @@ public with sharing class ProjectStaffingController {
 			upsert as user resource;
 			return resource.Id;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -265,12 +271,5 @@ public with sharing class ProjectStaffingController {
 		if (!ProjectsSettings.resourcesEnabled()) {
 			throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Staffing_Off'));
 		}
-	}
-
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Projects.ProjectsException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(e, BarnHelp.text('Projects', 'Projects_Error_Generic'));
 	}
 }

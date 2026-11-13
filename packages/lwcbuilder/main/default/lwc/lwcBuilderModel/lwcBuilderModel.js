@@ -7,7 +7,7 @@
  * blocks: [block]}]}]}]}`. Every change returns a new definition; nothing is changed in place.
  */
 import { apexFiles, apexNames, CHART_CSS, CHART_HELPER, LIST_HELPER } from 'c/lwcBuilderExportKit';
-import { escapeHtml } from 'c/barnFormat';
+import { escapeHtml, percent as percentOf } from 'c/barnFormat';
 
 export const SCHEMA_VERSION = 1;
 export const MAX_FIELDS = 6;
@@ -441,7 +441,7 @@ export function validate(definition) {
 }
 
 const TONES = 5;
-const percent = (value, max) => `width: ${max > 0 ? Math.round((value / max) * 100) : 0}%`;
+const percent = (value, max) => `width: ${percentOf(value, max)}%`;
 
 /**
  * What a Report Chart block draws (LB-03, LB-07; D-196), from what LwcBuilderController.loadChart

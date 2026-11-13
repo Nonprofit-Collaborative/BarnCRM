@@ -139,9 +139,9 @@ public with sharing class FindRadius {
 		Map<String, Object> radius = (Map<String, Object>) rawRadius;
 		String fieldName = String.valueOf(radius.get('field'));
 		checkField(objectName, fieldName);
-		Decimal miles = number(radius.get('miles'));
-		Decimal latitude = number(radius.get('latitude'));
-		Decimal longitude = number(radius.get('longitude'));
+		Decimal miles = SettingsService.toNumber(radius.get('miles'));
+		Decimal latitude = SettingsService.toNumber(radius.get('latitude'));
+		Decimal longitude = SettingsService.toNumber(radius.get('longitude'));
 		if (
 			miles == null ||
 			miles < MIN_MILES ||
@@ -271,17 +271,6 @@ public with sharing class FindRadius {
 					new List<Object>{ String.valueOf(fieldName).abbreviate(80) }
 				)
 			);
-		}
-	}
-
-	private static Decimal number(Object raw) {
-		if (raw == null) {
-			return null;
-		}
-		try {
-			return Decimal.valueOf(String.valueOf(raw).trim());
-		} catch (Exception notANumber) {
-			return null;
 		}
 	}
 

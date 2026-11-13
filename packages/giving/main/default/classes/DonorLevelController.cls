@@ -9,6 +9,11 @@
  */
 public with sharing class DonorLevelController {
 	private static final String CONTEXT = 'Donor Levels page';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Giving',
+		'Giving_DonorLevels_ActionFailed'
+	);
 
 	public class LadderModel {
 		@AuraEnabled
@@ -65,7 +70,7 @@ public with sharing class DonorLevelController {
 			}
 			return model;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -89,7 +94,7 @@ public with sharing class DonorLevelController {
 				'DonorLevelController'
 			);
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -110,10 +115,5 @@ public with sharing class DonorLevelController {
 			}
 		}
 		return source;
-	}
-
-	private static AuraHandledException report(Exception failure) {
-		ErrorLogger.log(failure, CONTEXT);
-		return UserErrors.message(BarnHelp.text('Giving', 'Giving_DonorLevels_ActionFailed'));
 	}
 }

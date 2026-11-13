@@ -6,6 +6,11 @@
  */
 public with sharing class GiftTransactionMirrorController {
 	private static final String CONTEXT = 'GiftTransactionMirrorController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Mirror',
+		'Mirror_OpportunityMirror_ErrorFailed'
+	);
 	/**
 	 * Held through the Gift Transaction Mirror permission set. Reading the page's status and the
 	 * reconciliation needs it, as the page's entry in the settings console does (ADR-0038).
@@ -46,7 +51,7 @@ public with sharing class GiftTransactionMirrorController {
 		try {
 			return status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -57,7 +62,7 @@ public with sharing class GiftTransactionMirrorController {
 		try {
 			GiftTransactionMirrorBatch.run();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 		current.running = true;
 		return current;
@@ -80,7 +85,7 @@ public with sharing class GiftTransactionMirrorController {
 		try {
 			GiftTransactionMirrorBatch.runRange(fromDate, toDate);
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 		current.running = true;
 		return current;
@@ -94,7 +99,7 @@ public with sharing class GiftTransactionMirrorController {
 			GiftTransactionMirrorSchedulable.schedule();
 			return status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -111,7 +116,7 @@ public with sharing class GiftTransactionMirrorController {
 			GiftTransactionMirrorSchedulable.stop();
 			return status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -127,7 +132,7 @@ public with sharing class GiftTransactionMirrorController {
 		} catch (GiftTransactionMirrorReconciliation.ReconciliationException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -146,7 +151,7 @@ public with sharing class GiftTransactionMirrorController {
 		try {
 			current = status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 		String refusal = refusal(current, scheduling);
 		if (refusal != null) {
@@ -195,11 +200,5 @@ public with sharing class GiftTransactionMirrorController {
 		current.lastRunAt = settings?.Gift_Transaction_Mirror_Last_Run__c;
 		current.lastSummary = settings?.Gift_Transaction_Mirror_Last_Summary__c;
 		return current;
-	}
-
-	private static AuraHandledException failed(Exception unexpected) {
-		ErrorLogger.log(unexpected, CONTEXT);
-		// The shared Mirror page wording, kept once to stay within the org's custom label limit.
-		return UserErrors.message(BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorFailed'));
 	}
 }

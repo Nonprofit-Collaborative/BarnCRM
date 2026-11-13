@@ -119,12 +119,7 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 	@TestVisible
 	private static void refuseCardTesting(Id appealId, Object amount, Callable payments) {
 		Decimal minimum = minimumAmount();
-		Decimal given;
-		try {
-			given = amount == null ? null : Decimal.valueOf(String.valueOf(amount));
-		} catch (TypeException notANumber) {
-			given = null;
-		}
+		Decimal given = SettingsService.toNumber(amount);
 		if (given == null || given < minimum) {
 			throw new DonationPageException(
 				BarnHelp.text(

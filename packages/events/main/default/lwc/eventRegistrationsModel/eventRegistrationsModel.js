@@ -4,6 +4,7 @@
  *
  * An attendee is `{ id, status, registrationId, registrationStatus, amountOwed, paymentStatus }`.
  */
+import { badgeWord } from 'c/barnFormat';
 
 export const REGISTERED = 'Registered';
 export const WAITLISTED = 'Waitlisted';
@@ -42,7 +43,7 @@ const STATUS_WORDS = {
 
 /** The status badge word for a status. */
 export function statusWord(status) {
-  return STATUS_WORDS[status] || 'neutral';
+  return badgeWord(STATUS_WORDS, status);
 }
 
 /**

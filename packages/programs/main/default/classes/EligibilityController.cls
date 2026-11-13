@@ -8,6 +8,12 @@
  */
 public with sharing class EligibilityController {
 	private static final String CONTEXT = 'Eligibility rules panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Programs',
+			'Programs_Fail_Elig'
+		)
+		.showingDml();
 	/** The most enrollments the preview lists, and the most one Screen run changes. */
 	public static final Integer MAX_SHOWN = 200;
 	/** The Eligibility fields screening sets or that decide it, never offered to a rule. */
@@ -127,7 +133,7 @@ public with sharing class EligibilityController {
 			}
 			return state;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -146,7 +152,7 @@ public with sharing class EligibilityController {
 			);
 			return problems;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -215,7 +221,7 @@ public with sharing class EligibilityController {
 			Database.update(changes, AccessLevel.USER_MODE);
 			return summary;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -362,18 +368,6 @@ public with sharing class EligibilityController {
 	/** What staff are told when the panel's work failed (modules-1). */
 	private static String failed() {
 		return BarnHelp.text('Programs', 'Programs_Fail_Elig');
-	}
-
-	/** A refusal is passed on in its own words; a failed save says why; anything else is logged. */
-	private static AuraHandledException report(Exception failure) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT);
-		return UserErrors.message(failed());
 	}
 
 	private static String personName(Enrollment__c enrollment) {

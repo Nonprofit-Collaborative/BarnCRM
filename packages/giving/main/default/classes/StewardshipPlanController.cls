@@ -16,6 +16,11 @@
  */
 public with sharing class StewardshipPlanController {
 	private static final String CONTEXT = 'Stewardship plans page';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Giving',
+		'Giving_Stewardship_ErrorActionFailed'
+	);
 	private static final String PLAN_KEY_FALLBACK = 'plan';
 
 	/** The key field holds 80 characters; this leaves room for a number suffix. */
@@ -112,7 +117,7 @@ public with sharing class StewardshipPlanController {
 			}
 			return model;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -219,7 +224,7 @@ public with sharing class StewardshipPlanController {
 		} catch (DmlException refused) {
 			throw UserErrors.message(readable(refused));
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -257,7 +262,7 @@ public with sharing class StewardshipPlanController {
 		} catch (DmlException refused) {
 			throw UserErrors.message(readable(refused));
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -302,7 +307,7 @@ public with sharing class StewardshipPlanController {
 		} catch (DmlException refused) {
 			throw UserErrors.message(readable(refused));
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -368,10 +373,5 @@ public with sharing class StewardshipPlanController {
 	/** What the platform refused, in the words the rule was written in. */
 	private static String readable(DmlException refused) {
 		return refused.getNumDml() > 0 ? refused.getDmlMessage(0) : refused.getMessage();
-	}
-
-	private static AuraHandledException report(Exception failure) {
-		ErrorLogger.log(failure, CONTEXT);
-		return UserErrors.message(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed'));
 	}
 }

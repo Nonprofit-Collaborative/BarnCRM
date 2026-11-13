@@ -1342,11 +1342,18 @@ core/TriggerHandler.cls | public virtual void afterUpdate()
 core/TriggerHandler.cls | public virtual void beforeDelete()
 core/TriggerHandler.cls | public virtual void beforeInsert()
 core/TriggerHandler.cls | public virtual void beforeUpdate()
+core/UserErrors.cls | public AuraHandledException wrap(Exception)
+core/UserErrors.cls | public AuraHandledException wrap(Exception,String)
+core/UserErrors.cls | public AuraHandledException wrap(Exception,String,Id)
+core/UserErrors.cls | public Screen showingDml()
+core/UserErrors.cls | public Screen(String,String,String)
+core/UserErrors.cls | public class Screen
 core/UserErrors.cls | public class UserErrors
 core/UserErrors.cls | public static AuraHandledException message(String)
 core/UserErrors.cls | public static AuraHandledException wrap(Exception,Boolean,String,Id,String)
 core/UserErrors.cls | public static AuraHandledException wrap(Exception,Boolean,String,String)
 core/UserErrors.cls | public static AuraHandledException wrap(Exception,String,Boolean)
+core/UserErrors.cls | public static AuraHandledException wrap(Exception,String,String)
 core/UserErrors.cls | public static AuraHandledException wrapShowingDml(Exception,String)
 core/WaitlistQueue.cls | public class WaitlistQueue
 core/WaitlistQueue.cls | public static Decimal placesOf(SObject,String)

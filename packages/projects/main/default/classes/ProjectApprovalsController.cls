@@ -8,6 +8,12 @@
  */
 public with sharing class ProjectApprovalsController {
 	private static final String CONTEXT = 'ProjectApprovalsController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Projects',
+			'Projects_Error_Generic'
+		)
+		.showingDml();
 
 	public class Queue {
 		@AuraEnabled
@@ -53,7 +59,7 @@ public with sharing class ProjectApprovalsController {
 			}
 			return queue;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -109,14 +115,7 @@ public with sharing class ProjectApprovalsController {
 			update as user decided;
 			return decided.size();
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
-	}
-
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Projects.ProjectsException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(e, BarnHelp.text('Projects', 'Projects_Error_Generic'));
 	}
 }

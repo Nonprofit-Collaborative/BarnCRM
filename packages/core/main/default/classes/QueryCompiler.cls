@@ -449,12 +449,7 @@ public with sharing class QueryCompiler {
 	}
 
 	private static Integer rowLimit(Object raw) {
-		Decimal rows;
-		try {
-			rows = Decimal.valueOf(String.valueOf(raw).trim());
-		} catch (Exception notANumber) {
-			rows = null;
-		}
+		Decimal rows = SettingsService.toNumber(raw);
 		if (rows == null || rows.stripTrailingZeros().scale() > 0 || rows < 1 || rows > MAX_ROWS) {
 			throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorRowLimit'));
 		}

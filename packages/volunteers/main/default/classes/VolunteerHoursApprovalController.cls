@@ -9,6 +9,11 @@
  */
 public with sharing class VolunteerHoursApprovalController {
 	private static final String CONTEXT = 'Approve Hours screen';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Volunteers',
+		'Volunteers_Approve_ActionFailed'
+	);
 	/** Rows on one page: enough to clear a week's queue, few enough to read on a phone. */
 	public static final Integer PAGE_SIZE = 50;
 	/** The most entries one verb call moves: a guard on what a crafted call can ask for. */
@@ -109,7 +114,7 @@ public with sharing class VolunteerHoursApprovalController {
 			}
 			return page;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -119,7 +124,7 @@ public with sharing class VolunteerHoursApprovalController {
 		try {
 			return resultOf(VolunteerHoursService.approve(ids));
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -135,7 +140,7 @@ public with sharing class VolunteerHoursApprovalController {
 		try {
 			return resultOf(VolunteerHoursService.reject(ids, reason));
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -145,7 +150,7 @@ public with sharing class VolunteerHoursApprovalController {
 		try {
 			return resultOf(VolunteerHoursService.reopen(ids));
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -201,16 +206,6 @@ public with sharing class VolunteerHoursApprovalController {
 			result.refused.add(refusal);
 		}
 		return result;
-	}
-
-	/** A refusal the service names is passed on as it is; anything else is logged first. */
-	private static AuraHandledException report(Exception failure) {
-		return UserErrors.wrap(
-			failure,
-			failure instanceof VolunteerHoursService.VolunteerHoursException,
-			CONTEXT,
-			actionFailed()
-		);
 	}
 
 	/** The screen's failure message, from the Volunteers help catalog (modules-1). */

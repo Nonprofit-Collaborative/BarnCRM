@@ -6,6 +6,7 @@
  * Plain JavaScript in and out, so a WordPress block or Node can use the same module. Dates arrive
  * as ISO date-time strings, the shape the server sends, and series dates go back the same way.
  */
+import { badgeWord } from 'c/barnFormat';
 
 /** The most occurrences one Repeat Event makes (EventsHomeController.MAX_OCCURRENCES). */
 export const MAX_OCCURRENCES = 52;
@@ -122,5 +123,5 @@ export function isMultiDay(start, end, timeZone) {
 
 /** The status vocabulary word for an event status; unknown statuses are neutral. */
 export function statusWord(status) {
-  return STATUS_WORDS[status] || 'neutral';
+  return badgeWord(STATUS_WORDS, status);
 }

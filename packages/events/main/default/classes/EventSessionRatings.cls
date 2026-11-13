@@ -179,17 +179,15 @@ public with sharing class EventSessionRatings {
 
 	@TestVisible
 	private static Integer ratingOf(Object value) {
-		if (value == null) {
+		Decimal given = SettingsService.toNumber(value);
+		if (
+			given == null ||
+			given != given.round(System.RoundingMode.DOWN) ||
+			given < 1 ||
+			given > 5
+		) {
 			return null;
 		}
-		try {
-			Decimal given = Decimal.valueOf(String.valueOf(value).trim());
-			if (given != given.round(System.RoundingMode.DOWN) || given < 1 || given > 5) {
-				return null;
-			}
-			return given.intValue();
-		} catch (Exception notANumber) {
-			return null;
-		}
+		return given.intValue();
 	}
 }

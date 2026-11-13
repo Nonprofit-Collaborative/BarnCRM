@@ -15,6 +15,12 @@
  * template as not available rather than failing.
  */
 public with sharing class RollupTemplates {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		'RollupTemplates',
+		'Rollups',
+		'Core_Rollups_UnexpectedError'
+	);
+
 	@TestVisible
 	private static final String NONPROFIT_STARTER = 'nonprofitStarter';
 	private static final String GIFT = 'Gift__c';
@@ -101,7 +107,7 @@ public with sharing class RollupTemplates {
 			}
 			return new List<Template>{ starter };
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -129,7 +135,7 @@ public with sharing class RollupTemplates {
 			}
 			return outcomes;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -347,14 +353,5 @@ public with sharing class RollupTemplates {
 				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof RollupService.RollupServiceException,
-			'RollupTemplates',
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
-		);
 	}
 }

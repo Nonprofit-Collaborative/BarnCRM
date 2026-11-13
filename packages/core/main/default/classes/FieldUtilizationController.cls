@@ -8,6 +8,12 @@
  * `Manage_BarnCRM_Settings`; the counting itself is in user mode (R-FU3).
  */
 public with sharing class FieldUtilizationController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_FieldUtilization_UnexpectedError'
+	);
+
 	private static final String PERMISSION = 'Manage_BarnCRM_Settings';
 
 	/** The most snapshot rows one save writes, inside the 10,000 row DML limit. */
@@ -152,7 +158,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return options;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field utilization object list');
+			throw ERRORS.wrap(caught, 'Field utilization object list');
 		}
 	}
 
@@ -199,7 +205,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return planned;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field utilization plan');
+			throw ERRORS.wrap(caught, 'Field utilization plan');
 		}
 	}
 
@@ -255,7 +261,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field utilization count');
+			throw ERRORS.wrap(caught, 'Field utilization count');
 		}
 	}
 
@@ -305,7 +311,7 @@ public with sharing class FieldUtilizationController {
 			FieldUtilizationService.save(snapshots, System.now());
 			return snapshots.size();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Save field utilization counts');
+			throw ERRORS.wrap(caught, 'Save field utilization counts');
 		}
 	}
 
@@ -332,7 +338,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return listed;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field utilization history');
+			throw ERRORS.wrap(caught, 'Field utilization history');
 		}
 	}
 
@@ -360,7 +366,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return rows;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field utilization snapshot rows');
+			throw ERRORS.wrap(caught, 'Field utilization snapshot rows');
 		}
 	}
 
@@ -395,7 +401,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return rows.size();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Delete field utilization snapshot');
+			throw ERRORS.wrap(caught, 'Delete field utilization snapshot');
 		}
 	}
 
@@ -502,7 +508,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return planned;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Picklist usage plan');
+			throw ERRORS.wrap(caught, 'Picklist usage plan');
 		}
 	}
 
@@ -581,7 +587,7 @@ public with sharing class FieldUtilizationController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Picklist usage count');
+			throw ERRORS.wrap(caught, 'Picklist usage count');
 		}
 	}
 
@@ -640,7 +646,7 @@ public with sharing class FieldUtilizationController {
 			result.done = scanned.done;
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Picklist usage last used');
+			throw ERRORS.wrap(caught, 'Picklist usage last used');
 		}
 	}
 
@@ -783,15 +789,6 @@ public with sharing class FieldUtilizationController {
 				BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof FieldUtilizationException,
-			context,
-			unexpectedError()
-		);
 	}
 
 	/** The page's catch-all message, from the Core help catalog. */

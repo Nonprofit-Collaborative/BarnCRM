@@ -11,6 +11,12 @@
  */
 public with sharing class GiftAllocationController {
 	private static final String CONTEXT = 'Gift Allocations card';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Giving',
+			'Giving_Gift_UnexpectedError'
+		)
+		.showingDml();
 
 	/** One allocation as the card shows it. */
 	public class AllocationRow {
@@ -53,7 +59,7 @@ public with sharing class GiftAllocationController {
 		try {
 			return stateOf(giftId);
 		} catch (Exception caught) {
-			throw asUserError(caught, giftId);
+			throw ERRORS.wrap(caught, CONTEXT, giftId);
 		}
 	}
 
@@ -78,7 +84,7 @@ public with sharing class GiftAllocationController {
 			return stateOf(gift.Id);
 		} catch (Exception caught) {
 			Database.rollback(before);
-			throw asUserError(caught, giftId);
+			throw ERRORS.wrap(caught, CONTEXT, giftId);
 		} finally {
 			GiftService.deferAllocationTotalCheck = wasDeferred;
 		}
@@ -236,21 +242,5 @@ public with sharing class GiftAllocationController {
 			}
 			Database.delete(spare, AccessLevel.USER_MODE);
 		}
-	}
-
-	/**
-	 * A refusal BarnCRM or a trigger wrote for a person (the lock, the total, a missing fund) is
-	 * shown as written and not logged; anything else is logged and shown as the gift's
-	 * unexpected error.
-	 */
-	private static AuraHandledException asUserError(Exception caught, Id giftId) {
-		if (caught instanceof GiftService.GiftServiceException) {
-			return UserErrors.message(caught.getMessage());
-		}
-		if (caught instanceof DmlException) {
-			return UserErrors.message(((DmlException) caught).getDmlMessage(0));
-		}
-		ErrorLogger.log(caught, CONTEXT, giftId);
-		return UserErrors.message(BarnHelp.text('Giving', 'Giving_Gift_UnexpectedError'));
 	}
 }

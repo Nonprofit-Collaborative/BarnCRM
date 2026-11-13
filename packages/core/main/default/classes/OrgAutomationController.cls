@@ -5,6 +5,12 @@
  * words.
  */
 public with sharing class OrgAutomationController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_AutomationInventory_UnexpectedError'
+	);
+
 	public class OrgAutomationException extends Exception {
 	}
 
@@ -22,7 +28,7 @@ public with sharing class OrgAutomationController {
 			result.snapshots = OrgAutomationDeactivation.recent();
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Automation inventory');
+			throw ERRORS.wrap(caught, 'Automation inventory');
 		}
 	}
 
@@ -45,7 +51,7 @@ public with sharing class OrgAutomationController {
 			}
 			return OrgAutomationDeactivation.start(items);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Deactivate org automation');
+			throw ERRORS.wrap(caught, 'Deactivate org automation');
 		}
 	}
 
@@ -56,7 +62,7 @@ public with sharing class OrgAutomationController {
 			requireConnection();
 			return OrgAutomationDeactivation.restore(snapshotId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Restore org automation');
+			throw ERRORS.wrap(caught, 'Restore org automation');
 		}
 	}
 
@@ -67,7 +73,7 @@ public with sharing class OrgAutomationController {
 			requireConnection();
 			return OrgAutomationScan.start();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Automation inventory scan');
+			throw ERRORS.wrap(caught, 'Automation inventory scan');
 		}
 	}
 
@@ -95,16 +101,5 @@ public with sharing class OrgAutomationController {
 				BarnHelp.text('Core', 'Core_AutomationInventory_ConnectionNeeded')
 			);
 		}
-	}
-
-	@TestVisible
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof OrgAutomationException ||
-			caught instanceof OrgAutomationDeactivation.DeactivationException,
-			context,
-			BarnHelp.text('Core', 'Core_AutomationInventory_UnexpectedError')
-		);
 	}
 }

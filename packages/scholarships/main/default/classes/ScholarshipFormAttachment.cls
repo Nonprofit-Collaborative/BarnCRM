@@ -164,11 +164,7 @@ public with sharing class ScholarshipFormAttachment implements FormAttachmentExt
 		}
 		Object requested = receipt.answers?.get('amountRequested');
 		if (requested != null) {
-			try {
-				filled.Amount_Requested__c = Decimal.valueOf(String.valueOf(requested));
-			} catch (TypeException notANumber) {
-				filled.Amount_Requested__c = null;
-			}
+			filled.Amount_Requested__c = SettingsService.toNumber(requested);
 		}
 		upsert as user filled;
 		return filled.Id;

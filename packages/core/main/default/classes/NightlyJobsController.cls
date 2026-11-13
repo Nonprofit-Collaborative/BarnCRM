@@ -6,6 +6,12 @@
  * Returns plain JSON-shaped wrappers (plan 9.9).
  */
 public with sharing class NightlyJobsController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		null,
+		System.Label.Core_UnexpectedError
+	);
+
 	/** Raised with a message the panel shows as it is. */
 	public class NightlyJobsException extends Exception {
 	}
@@ -53,7 +59,7 @@ public with sharing class NightlyJobsController {
 		try {
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Nightly Jobs panel');
+			throw ERRORS.wrap(caught, 'Nightly Jobs panel');
 		}
 	}
 
@@ -69,7 +75,7 @@ public with sharing class NightlyJobsController {
 			NightlyJobs.scheduleAll();
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Schedule the nightly jobs');
+			throw ERRORS.wrap(caught, 'Schedule the nightly jobs');
 		}
 	}
 
@@ -134,14 +140,5 @@ public with sharing class NightlyJobsController {
 			}
 		}
 		return value;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof NightlyJobsException,
-			context,
-			System.Label.Core_UnexpectedError
-		);
 	}
 }

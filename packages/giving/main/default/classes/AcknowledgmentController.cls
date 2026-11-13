@@ -7,6 +7,12 @@
  * render.
  */
 public with sharing class AcknowledgmentController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Giving',
+		'Giving_Stewardship_ErrorActionFailed'
+	);
+
 	/** The gap between rule numbers after a reorder, and the most rules one reorder renumbers. */
 	private static final Integer ORDER_STEP = 10;
 	private static final Integer MAX_RULES = 500;
@@ -109,7 +115,7 @@ public with sharing class AcknowledgmentController {
 		try {
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'AcknowledgmentController.getPage');
+			throw ERRORS.wrap(failure, 'AcknowledgmentController.getPage');
 		}
 	}
 
@@ -120,7 +126,7 @@ public with sharing class AcknowledgmentController {
 			AcknowledgmentRunService.startEmailRun();
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'AcknowledgmentController.sendEmailsNow');
+			throw ERRORS.wrap(failure, 'AcknowledgmentController.sendEmailsNow');
 		}
 	}
 
@@ -131,7 +137,7 @@ public with sharing class AcknowledgmentController {
 			AcknowledgmentRunService.runLetterMerge();
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'AcknowledgmentController.produceLetters');
+			throw ERRORS.wrap(failure, 'AcknowledgmentController.produceLetters');
 		}
 	}
 
@@ -142,7 +148,7 @@ public with sharing class AcknowledgmentController {
 			AcknowledgmentRunService.markLetterRunSent(runId);
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'AcknowledgmentController.markLettersSent', runId);
+			throw ERRORS.wrap(failure, 'AcknowledgmentController.markLettersSent', runId);
 		}
 	}
 
@@ -158,7 +164,7 @@ public with sharing class AcknowledgmentController {
 			}
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'AcknowledgmentController.setSchedule');
+			throw ERRORS.wrap(failure, 'AcknowledgmentController.setSchedule');
 		}
 	}
 
@@ -197,7 +203,7 @@ public with sharing class AcknowledgmentController {
 			}
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'AcknowledgmentController.reorderRules');
+			throw ERRORS.wrap(failure, 'AcknowledgmentController.reorderRules');
 		}
 	}
 
@@ -338,30 +344,5 @@ public with sharing class AcknowledgmentController {
 				BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception failure, String context) {
-		return asUserError(failure, context, null);
-	}
-
-	/**
-	 * A message the page shows as it is when the feature raised it, and a logged entry plus a
-	 * general apology when something else did. Nothing is swallowed either way.
-	 */
-	private static AuraHandledException asUserError(
-		Exception failure,
-		String context,
-		Id recordId
-	) {
-		Boolean ours =
-			failure instanceof AcknowledgmentService.AcknowledgmentException ||
-			failure instanceof AcknowledgmentRunService.AcknowledgmentRunException;
-		return UserErrors.wrap(
-			failure,
-			ours,
-			context,
-			recordId,
-			BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
-		);
 	}
 }

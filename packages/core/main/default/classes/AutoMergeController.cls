@@ -7,6 +7,12 @@
  * Review), since the pairs come from the review list; undo reads only the journal.
  */
 public with sharing class AutoMergeController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Duplicates_ErrorUnexpected'
+	);
+
 	private static final String JOB_CLASS = 'AutoMergeJob';
 	private static final String SCAN_CLASS = 'DuplicateScanBatch';
 	/** The most pairs a preview lists; the count still covers them all. */
@@ -60,7 +66,7 @@ public with sharing class AutoMergeController {
 			DuplicateController.requirePermission();
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Auto-merge panel');
+			throw ERRORS.wrap(caught, 'Auto-merge panel');
 		}
 	}
 
@@ -77,7 +83,7 @@ public with sharing class AutoMergeController {
 			}
 			return view;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Preview an auto-merge');
+			throw ERRORS.wrap(caught, 'Preview an auto-merge');
 		}
 	}
 
@@ -99,7 +105,7 @@ public with sharing class AutoMergeController {
 			AutoMergeJob.startMerge(refs);
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Start an auto-merge');
+			throw ERRORS.wrap(caught, 'Start an auto-merge');
 		}
 	}
 
@@ -132,7 +138,7 @@ public with sharing class AutoMergeController {
 			AutoMergeJob.startUndo(runId, journalIds);
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Undo an auto-merge');
+			throw ERRORS.wrap(caught, 'Undo an auto-merge');
 		}
 	}
 
@@ -206,14 +212,5 @@ public with sharing class AutoMergeController {
 				BarnHelp.text('Core', 'Core_AutoMerge_ErrorRunning')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof DuplicateService.DuplicateException,
-			context,
-			BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected')
-		);
 	}
 }

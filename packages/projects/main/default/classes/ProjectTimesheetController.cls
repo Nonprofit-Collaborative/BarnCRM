@@ -7,6 +7,12 @@
  */
 public with sharing class ProjectTimesheetController {
 	private static final String CONTEXT = 'ProjectTimesheetController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Projects',
+			'Projects_Error_Generic'
+		)
+		.showingDml();
 	private static final Date A_MONDAY = Date.newInstance(1900, 1, 1);
 
 	public class Week {
@@ -109,7 +115,7 @@ public with sharing class ProjectTimesheetController {
 			);
 			return week;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -128,7 +134,7 @@ public with sharing class ProjectTimesheetController {
 				]
 			);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -177,7 +183,7 @@ public with sharing class ProjectTimesheetController {
 			update as user changed;
 			return added.size() + changed.size();
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -193,7 +199,7 @@ public with sharing class ProjectTimesheetController {
 			}
 			return count;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -203,7 +209,7 @@ public with sharing class ProjectTimesheetController {
 		try {
 			return move(weekStart, new List<String>{ 'Submitted' }, 'Open');
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -232,7 +238,7 @@ public with sharing class ProjectTimesheetController {
 			insert as user expense;
 			return expense.Id;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -284,12 +290,5 @@ public with sharing class ProjectTimesheetController {
 		if (!ProjectsSettings.approvalsEnabled()) {
 			throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Approvals_Off'));
 		}
-	}
-
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Projects.ProjectsException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(e, BarnHelp.text('Projects', 'Projects_Error_Generic'));
 	}
 }

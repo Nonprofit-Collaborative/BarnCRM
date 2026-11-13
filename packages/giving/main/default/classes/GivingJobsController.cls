@@ -8,6 +8,11 @@
  */
 public with sharing class GivingJobsController {
 	private static final String CONTEXT = 'Giving nightly jobs page';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Giving',
+		'Giving_Periods_UnexpectedError'
+	);
 
 	/**
 	 * How long after a job fires its run may still be unrecorded before the page says something
@@ -54,7 +59,7 @@ public with sharing class GivingJobsController {
 		try {
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, CONTEXT);
+			throw ERRORS.wrap(caught, CONTEXT);
 		}
 	}
 
@@ -70,7 +75,7 @@ public with sharing class GivingJobsController {
 			}
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Schedule the Giving nightly jobs');
+			throw ERRORS.wrap(caught, 'Schedule the Giving nightly jobs');
 		}
 	}
 
@@ -85,7 +90,7 @@ public with sharing class GivingJobsController {
 			GivingScheduler.runNow();
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Run the Giving nightly jobs now');
+			throw ERRORS.wrap(caught, 'Run the Giving nightly jobs now');
 		}
 	}
 
@@ -187,14 +192,5 @@ public with sharing class GivingJobsController {
 				BarnHelp.text('Giving', 'Giving_NightlyJobs_PermissionRequired')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof GivingJobsException,
-			context,
-			BarnHelp.text('Giving', 'Giving_Periods_UnexpectedError')
-		);
 	}
 }

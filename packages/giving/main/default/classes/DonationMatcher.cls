@@ -40,10 +40,10 @@ public with sharing class DonationMatcher {
 		String chosen = template == null ? null : template.Payment_Matching__c;
 		behaviour = String.isBlank(chosen) ? MATCH_OR_CREATE : chosen;
 		Decimal days = template == null ? null : template.Match_Date_Window_Days__c;
-		days = days != null ? days : setting(KEY_WINDOW);
+		days = days ?? SettingsService.number(SETTINGS_OBJECT, KEY_WINDOW);
 		windowDays = days == null || days < 0 ? DEFAULT_WINDOW_DAYS : days.intValue();
 		Decimal allowed = template == null ? null : template.Match_Amount_Tolerance__c;
-		allowed = allowed != null ? allowed : setting(KEY_TOLERANCE);
+		allowed = allowed ?? SettingsService.number(SETTINGS_OBJECT, KEY_TOLERANCE);
 		tolerance = allowed == null || allowed < 0 ? DEFAULT_TOLERANCE : allowed;
 	}
 
@@ -110,18 +110,6 @@ public with sharing class DonationMatcher {
 			Integer window = Decimal.valueOf(String.valueOf(days)).intValue();
 			Decimal within = Decimal.valueOf(String.valueOf(allowed));
 			return window < 0 || within < 0 ? null : new DonationMatcher(chosen, window, within);
-		} catch (Exception unreadable) {
-			return null;
-		}
-	}
-
-	private static Decimal setting(String key) {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, key);
-		if (value == null) {
-			return null;
-		}
-		try {
-			return Decimal.valueOf(String.valueOf(value));
 		} catch (Exception unreadable) {
 			return null;
 		}

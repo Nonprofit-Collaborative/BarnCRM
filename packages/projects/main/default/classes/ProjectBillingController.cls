@@ -7,6 +7,12 @@
  */
 public with sharing class ProjectBillingController {
 	private static final String CONTEXT = 'ProjectBillingController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Projects',
+			'Projects_Error_Generic'
+		)
+		.showingDml();
 
 	/**
 	 * What the billing parts show: nothing unless invoices are on. With no project (Projects
@@ -32,7 +38,7 @@ public with sharing class ProjectBillingController {
 				'billingType' => type
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -41,7 +47,7 @@ public with sharing class ProjectBillingController {
 		try {
 			return ProjectBilling.build(projectId, periodStart, periodEnd);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -64,7 +70,7 @@ public with sharing class ProjectBillingController {
 				'online' => enabled && ProjectInvoicePayments.available()
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -73,7 +79,7 @@ public with sharing class ProjectBillingController {
 		try {
 			ProjectBilling.send(invoiceId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -82,7 +88,7 @@ public with sharing class ProjectBillingController {
 		try {
 			ProjectBilling.markPaid(invoiceId, paidDate);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -91,7 +97,7 @@ public with sharing class ProjectBillingController {
 		try {
 			ProjectBilling.voidInvoice(invoiceId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -100,7 +106,7 @@ public with sharing class ProjectBillingController {
 		try {
 			return ProjectInvoiceDocument.print(invoiceId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -109,7 +115,7 @@ public with sharing class ProjectBillingController {
 		try {
 			return ProjectInvoicePayments.sendLink(invoiceId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -174,7 +180,7 @@ public with sharing class ProjectBillingController {
 			update as user stamps;
 			return invoices;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -184,7 +190,7 @@ public with sharing class ProjectBillingController {
 		try {
 			return ProjectFinancials.card(projectId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -194,14 +200,7 @@ public with sharing class ProjectBillingController {
 		try {
 			return ProjectRevenue.recognizeMonth(projectId, month);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
-	}
-
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Projects.ProjectsException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(e, BarnHelp.text('Projects', 'Projects_Error_Generic'));
 	}
 }

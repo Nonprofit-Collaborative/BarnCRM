@@ -9,6 +9,11 @@
  */
 public with sharing class DonorSegmentController {
 	private static final String CONTEXT = 'Donor segments page';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Giving',
+		'Giving_Segments_Unexpected'
+	);
 	private static final String FIND_TAB = 'Find';
 	private static final String SAVED_QUERY_STATE = 'savedQueryId';
 
@@ -35,7 +40,7 @@ public with sharing class DonorSegmentController {
 			requirePermission();
 			return page();
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -49,7 +54,7 @@ public with sharing class DonorSegmentController {
 			model.savedId = saved;
 			return model;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -59,7 +64,7 @@ public with sharing class DonorSegmentController {
 			requirePermission();
 			return DonorSegmentService.countRecords(idOf(segmentId));
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -69,7 +74,7 @@ public with sharing class DonorSegmentController {
 			requirePermission();
 			return DonorSegmentService.listRows(idOf(segmentId));
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -84,7 +89,7 @@ public with sharing class DonorSegmentController {
 			requirePermission();
 			return DonorSegmentService.exportPage(idOf(segmentId), layout, afterId);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -113,18 +118,5 @@ public with sharing class DonorSegmentController {
 				BarnHelp.text('Giving', 'Giving_Segments_ErrorNoPermission')
 			);
 		}
-	}
-
-	/** Anything the person can act on is shown as it is; anything else is logged and summarized. */
-	private static AuraHandledException asUserError(Exception caught) {
-		Boolean shown =
-			caught instanceof DonorSegmentService.SegmentException ||
-			caught instanceof QueryCompiler.QueryCompilerException;
-		return UserErrors.wrap(
-			caught,
-			shown,
-			CONTEXT,
-			BarnHelp.text('Giving', 'Giving_Segments_Unexpected')
-		);
 	}
 }

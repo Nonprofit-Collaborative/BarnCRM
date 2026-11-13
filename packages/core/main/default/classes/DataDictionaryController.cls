@@ -11,6 +11,12 @@
  * What describe does not expose is left out: a field's description is metadata, not describe.
  */
 public with sharing class DataDictionaryController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_DataDictionary_UnexpectedError'
+	);
+
 	private static final String PERMISSION = 'Manage_BarnCRM_Settings';
 
 	/** Longest picklist value text one field carries, to keep a response small. */
@@ -126,7 +132,7 @@ public with sharing class DataDictionaryController {
 			}
 			return options;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Data dictionary object list');
+			throw ERRORS.wrap(caught, 'Data dictionary object list');
 		}
 	}
 
@@ -158,7 +164,7 @@ public with sharing class DataDictionaryController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Data dictionary describe');
+			throw ERRORS.wrap(caught, 'Data dictionary describe');
 		}
 	}
 
@@ -239,7 +245,7 @@ public with sharing class DataDictionaryController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Data dictionary automation inventory');
+			throw ERRORS.wrap(caught, 'Data dictionary automation inventory');
 		}
 	}
 
@@ -327,14 +333,5 @@ public with sharing class DataDictionaryController {
 				BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof DataDictionaryException,
-			context,
-			BarnHelp.text('Core', 'Core_DataDictionary_UnexpectedError')
-		);
 	}
 }

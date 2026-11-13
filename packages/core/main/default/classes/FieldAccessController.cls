@@ -6,6 +6,12 @@
  * (R-FA2), calls `FieldAccessService`, and returns plain JSON shapes (plan Section 9.9).
  */
 public with sharing class FieldAccessController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_FieldAccess_UnexpectedError'
+	);
+
 	private static final Integer CHANGES_LISTED = 20;
 	private static final Integer FAILURES_SHOWN = 20;
 
@@ -151,7 +157,7 @@ public with sharing class FieldAccessController {
 			result.canChange = result.reason == null;
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access status');
+			throw ERRORS.wrap(caught, 'Field access status');
 		}
 	}
 
@@ -174,7 +180,7 @@ public with sharing class FieldAccessController {
 			}
 			return choices;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access permission set search');
+			throw ERRORS.wrap(caught, 'Field access permission set search');
 		}
 	}
 
@@ -244,7 +250,7 @@ public with sharing class FieldAccessController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access fields');
+			throw ERRORS.wrap(caught, 'Field access fields');
 		}
 	}
 
@@ -282,7 +288,7 @@ public with sharing class FieldAccessController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access preview');
+			throw ERRORS.wrap(caught, 'Field access preview');
 		}
 	}
 
@@ -297,7 +303,7 @@ public with sharing class FieldAccessController {
 			FieldAccessService.enforce();
 			return outcomeOf(FieldAccessService.apply(changeJson, confirmedCount));
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access apply');
+			throw ERRORS.wrap(caught, 'Field access apply');
 		}
 	}
 
@@ -316,7 +322,7 @@ public with sharing class FieldAccessController {
 			}
 			return outcomeOf(FieldAccessService.undo(parsed));
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access undo');
+			throw ERRORS.wrap(caught, 'Field access undo');
 		}
 	}
 
@@ -349,7 +355,7 @@ public with sharing class FieldAccessController {
 			}
 			return jobs;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Field access recent changes');
+			throw ERRORS.wrap(caught, 'Field access recent changes');
 		}
 	}
 
@@ -365,14 +371,5 @@ public with sharing class FieldAccessController {
 			result.failures.add(failure);
 		}
 		return result;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof FieldAccessService.FieldAccessException,
-			context,
-			BarnHelp.text('Core', 'Core_FieldAccess_UnexpectedError')
-		);
 	}
 }

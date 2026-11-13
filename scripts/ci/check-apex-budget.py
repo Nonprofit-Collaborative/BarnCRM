@@ -123,7 +123,9 @@ CAPS = {
     # about 0.5%.
     # Lowered at the cut-over cleanup (D-200, release 1.21: the retired Coordinator check gone,
     # settings read through SettingsService): 230,596 measured 2026-11-12, plus about 2%.
-    "volunteers": 235_300,
+    # Lowered for the cleanup leftovers (D-200 S8b, UserErrors.Screen): 230,221 measured, plus
+    # about 2%.
+    "volunteers": 234_900,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
@@ -208,8 +210,8 @@ CAPS = {
     # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
     # Quorum warning and immediate breach bell (CH-21, CH-22): 59,376 measured, plus about 2%.
     # Lowered at the cut-over cleanup (D-200, release 1.21): 59,285 measured 2026-11-12, plus
-    # about 2%.
-    "corporatehub": 60_500,
+    # about 2%. Lowered for the cleanup leftovers (D-200 S8b): 58,777 measured, plus about 2%.
+    "corporatehub": 60_000,
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
@@ -231,13 +233,15 @@ CAPS = {
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
     # about 1%. Release 1.20 review: the chart walk over plain inputs so it can be unit tested:
     # 21,351 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21):
-    # 20,959 measured 2026-11-12, plus about 2%.
-    "lwcbuilder": 21_400,
+    # 20,959 measured 2026-11-12, plus about 2%. Lowered for the cleanup leftovers (D-200 S8b):
+    # 20,784 measured, plus about 2%.
+    "lwcbuilder": 21_200,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, plus the review and requirement DTOs (R1.21 namespace readiness, D-200 N3),
-    # 51,267 measured (Prettier line breaks included), plus about 2%.
-    "scholarships": 52_300,
+    # 51,267 measured (Prettier line breaks included), plus about 2%. Lowered for the cleanup
+    # leftovers (D-200 S8b, S8c): 50,290 measured, plus about 2%.
+    "scholarships": 51_300,
     # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
@@ -266,7 +270,8 @@ CAPS = {
     # 99,230 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21:
     # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%. The
     # ProjectViews DTOs (R1.21 namespace readiness, D-200 N3): 106,037 measured, plus about 2%.
-    "projects": 108_200,
+    # Lowered for the cleanup leftovers (D-200 S8b): 105,537 measured, plus about 2%.
+    "projects": 107_700,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
@@ -280,8 +285,9 @@ CAPS = {
     # 214,101 measured, plus about 0.5%. Release 1.20 review: per-field readable membership
     # reads and the member-count filter: 215,838 measured, plus about 2%. Lowered at the
     # cut-over cleanup (D-200, release 1.21: MirrorAccessSync and the five retired permission
-    # sets removed): 212,177 measured 2026-11-12, plus about 2%.
-    "mirror": 216_500,
+    # sets removed): 212,177 measured 2026-11-12, plus about 2%. Lowered for the cleanup
+    # leftovers (D-200 S8b): 212,112 measured, plus about 2%.
+    "mirror": 216_400,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

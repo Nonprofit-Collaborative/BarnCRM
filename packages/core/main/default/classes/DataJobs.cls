@@ -315,17 +315,4 @@ public with sharing class DataJobs {
 		}
 		return Math.max(0, confirmed.intValue() - (counted == null ? 0 : counted));
 	}
-
-	/**
-	 * Anything the person can fix (`known`, or a query or field refusal, or an import error) is
-	 * shown as it is; anything else is logged and summarized.
-	 */
-	public static AuraHandledException userError(Exception caught, String context, Boolean known) {
-		Boolean shown =
-			known == true ||
-			caught instanceof QueryCompiler.QueryCompilerException ||
-			caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
-			caught instanceof ImportException;
-		return UserErrors.wrap(caught, shown, context, System.Label.Core_UnexpectedError);
-	}
 }

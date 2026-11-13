@@ -16,6 +16,11 @@
  */
 public with sharing class AccountingPeriodController {
 	private static final String CONTEXT = 'Accounting periods page';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Giving',
+		'Giving_Periods_UnexpectedError'
+	);
 	private static final String REOPEN_CONTEXT = 'Posting lock override';
 	private static final String SETTING_NAME = 'Giving_Settings__c.Books_Closed_Through__c';
 
@@ -40,7 +45,7 @@ public with sharing class AccountingPeriodController {
 		try {
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, CONTEXT);
+			throw ERRORS.wrap(caught, CONTEXT);
 		}
 	}
 
@@ -92,7 +97,7 @@ public with sharing class AccountingPeriodController {
 			}
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Close an accounting period');
+			throw ERRORS.wrap(caught, 'Close an accounting period');
 		}
 	}
 
@@ -117,14 +122,5 @@ public with sharing class AccountingPeriodController {
 	/** ISO dates, as the console records every date setting. */
 	private static String asText(Date value) {
 		return value == null ? '' : String.valueOf(value);
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof AccountingPeriodException,
-			context,
-			BarnHelp.text('Giving', 'Giving_Periods_UnexpectedError')
-		);
 	}
 }
