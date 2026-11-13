@@ -220,6 +220,10 @@ Salesforce org is needed for this job. Steps:
    This ran because `BarnCRM.app-meta.xml` carried no `actionOverrides` at all, so the
    household walkthrough failed at step 4 on every fresh install, and because
    `Gift_Record_Page` and `Commitment_Record_Page` were stranded the same way in Fundraising.
+   Beside it, `scripts/ci/check-record-page-copies.py` fails the build if a module copy of
+   Core's `Contact_Record_Page` or `Account_Record_Page` (`<Prefix>_Contact_Record_Page`,
+   ADR-0064) lacks any component Core's page has. A copy may add panels, never drop one; the
+   Programs and Volunteers copies had silently lost four Core components (D-200 R2).
 15. `scripts/ci/check-canonical-model.py`, failing the build if a shipped object or field
    is missing from `docs/architecture/canonical-model.md`. The canonical model is updated
    before an object or a field is added, so this is the gate that keeps it true. It checks
