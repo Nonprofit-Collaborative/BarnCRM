@@ -107,6 +107,48 @@ class SelectOrgTestsTest(unittest.TestCase):
         self.commit("change HouseholdService")
         self.assertNotIn("CommentOnlyTest", self.select())
 
+    def add_metadata_users(self):
+        self.write("GiftFieldTest.cls", self.apex_class("GiftFieldTest", "insert new Gift__c(Amount__c = 1);", test_for="ApexClass:Other"))
+        self.write("RoleFieldTest.cls", self.apex_class("RoleFieldTest", "c.Household_Role__c = 'Head';", test_for="ApexClass:Other"))
+        self.write("StaffTest.cls", self.apex_class("StaffTest", "TestUsers.standardUserWith('S', new List<String>{ 'Giving_Staff' });", test_for="ApexClass:Other"))
+        self.write("TestUsers.cls", "@IsTest public class TestUsers { public static final String CORE_ADMIN = 'BarnCRM_Admin'; public static void admin() {} }")
+        self.write("AdminTest.cls", self.apex_class("AdminTest", "TestUsers.admin();", test_for="ApexClass:Other"))
+        self.write("FlowTest.cls", self.apex_class("FlowTest", "insert new Tribute__c();", test_for="ApexClass:Other"))
+        self.write("SettingTest.cls", self.apex_class("SettingTest", "Match_Rule__mdt.getAll();", test_for="ApexClass:Other"))
+        self.base = self.commit("metadata users")
+
+    def test_a_custom_object_field_selects_the_tests_naming_the_object(self):
+        self.add_metadata_users()
+        self.write("Amount__c.field-meta.xml", "<CustomField/>", folder="packages/giving/main/default/objects/Gift__c/fields")
+        self.commit("change a gift field")
+        self.assertEqual(self.select(), {"SmokeTest", "GiftFieldTest"})
+
+    def test_a_standard_object_field_selects_the_tests_naming_the_field(self):
+        self.add_metadata_users()
+        self.write("Household_Role__c.field-meta.xml", "<CustomField/>", folder="packages/core/main/default/objects/Contact/fields")
+        self.commit("change a contact field")
+        self.assertEqual(self.select(), {"SmokeTest", "RoleFieldTest"})
+
+    def test_a_permission_set_selects_its_tests_and_the_users_of_a_utility_naming_it(self):
+        self.add_metadata_users()
+        self.write("Giving_Staff.permissionset-meta.xml", "<PermissionSet/>", folder="packages/giving/main/default/permissionsets")
+        self.write("BarnCRM_Admin.permissionset-meta.xml", "<PermissionSet/>", folder="packages/core/main/default/permissionsets")
+        self.commit("change two permission sets")
+        self.assertEqual(self.select(), {"SmokeTest", "StaffTest", "AdminTest"})
+
+    def test_a_flow_selects_the_tests_naming_it_or_its_object(self):
+        self.add_metadata_users()
+        flow = "<Flow><start><object>Tribute__c</object></start></Flow>"
+        self.write("Tribute_Notice.flow-meta.xml", flow, folder="packages/giving/main/default/flows")
+        self.commit("change a flow")
+        self.assertEqual(self.select(), {"SmokeTest", "FlowTest"})
+
+    def test_a_custom_metadata_record_selects_the_tests_naming_its_type(self):
+        self.add_metadata_users()
+        self.write("Match_Rule.Email.md-meta.xml", "<CustomMetadata/>", folder="packages/core/main/default/customMetadata")
+        self.commit("change a rule")
+        self.assertEqual(self.select(), {"SmokeTest", "SettingTest"})
+
     def test_deleted_class_selects_nothing_of_its_own(self):
         os.remove(os.path.join(self.repo, CLASSES, "HouseholdService.cls"))
         self.commit("delete HouseholdService")
