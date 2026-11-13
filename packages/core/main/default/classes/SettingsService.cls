@@ -169,7 +169,11 @@ public with sharing class SettingsService {
 		return hasKey(key) ? toNumber(getValue(key)) : null;
 	}
 
-	/** Any value as a number, or null when it is blank or not a number. */
+	/**
+	 * Any value as a number, trimmed, or null when it is null, blank or not a number. The one
+	 * lenient parser every package uses for setting, record and input values (`?? fallback`
+	 * for a default).
+	 */
 	@NamespaceAccessible
 	public static Decimal toNumber(Object value) {
 		try {

@@ -60,8 +60,8 @@ public with sharing class ScholarshipReviews {
 						raw.get('label') == null
 							? String.valueOf(raw.get('key'))
 							: String.valueOf(raw.get('label')),
-						number(raw.get('max'), 10),
-						number(raw.get('weight'), 1)
+						SettingsService.toNumber(raw.get('max')) ?? 10,
+						SettingsService.toNumber(raw.get('weight')) ?? 1
 					);
 					if (String.isNotBlank(one.key)) {
 						criteria.add(one);
@@ -89,7 +89,9 @@ public with sharing class ScholarshipReviews {
 	public static Decimal score(List<Criterion> criteria, Map<String, Object> scores) {
 		Decimal total = 0;
 		for (Criterion one : criteria) {
-			Decimal given = scores == null ? 0 : number(scores.get(one.key), 0);
+			Decimal given = scores == null
+				? 0
+				: (SettingsService.toNumber(scores.get(one.key)) ?? 0);
 			total += Math.max(0, Math.min(given, one.max)) * one.weight;
 		}
 		return total.setScale(2);
@@ -322,16 +324,5 @@ public with sharing class ScholarshipReviews {
 		one.max = max;
 		one.weight = weight;
 		return one;
-	}
-
-	private static Decimal number(Object value, Decimal fallback) {
-		if (value == null) {
-			return fallback;
-		}
-		try {
-			return Decimal.valueOf(String.valueOf(value));
-		} catch (TypeException notANumber) {
-			return fallback;
-		}
 	}
 }
