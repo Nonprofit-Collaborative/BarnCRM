@@ -16,8 +16,9 @@
 @NamespaceAccessible
 public with sharing class SampleDataModules {
 	/**
-	 * Module sample data classes in load order. Each must be public, `@NamespaceAccessible`,
-	 * have a no-argument constructor, and implement SampleDataModule.
+	 * Module sample data sets in load order: a JSON static resource of this name that Core
+	 * loads (SampleDataFile), or a class of this name that is public, `@NamespaceAccessible`,
+	 * has a no-argument constructor, and implements SampleDataModule.
 	 */
 	private static final List<String> MODULE_CLASS_NAMES = new List<String>{
 		'GivingSampleData',
@@ -159,10 +160,13 @@ public with sharing class SampleDataModules {
 	 */
 	@TestVisible
 	private static SampleDataModule resolve(String className) {
-		return (SampleDataModule) NamespaceUtil.build(
+		SampleDataModule module = (SampleDataModule) NamespaceUtil.build(
 			className,
 			SampleDataModule.class,
 			'SampleDataModules.resolve'
 		);
+		// A module that ships its set as JSON has a static resource of that name instead
+		// (D-200 S2), which Core loads itself.
+		return module != null ? module : SampleDataFile.find(className);
 	}
 }

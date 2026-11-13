@@ -391,7 +391,7 @@ private class ModuleDetectionServiceTest {
 			ModuleDetectionService.givingPresentOverride = true;
 			BarnCRM_Module__mdt here = catalogRow('Giving', 'Nonprofit', null, 10);
 			here.Staff_Tabs__c = 'Gift__c; Commitment__c';
-			here.Admin_Tabs__c = 'Giving_Nightly_Jobs;Donor_Levels:Donor Level Ladder';
+			here.Admin_Tabs__c = 'Pledge_Reminders;Donor_Levels:Donor Level Ladder';
 			BarnCRM_Module__mdt notHere = catalogRow('Events', 'Standard;Nonprofit', null, 5);
 			notHere.Staff_Tabs__c = 'Event__c';
 			ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ here, notHere };
@@ -407,7 +407,7 @@ private class ModuleDetectionServiceTest {
 			ModuleDetectionService.ModuleInfo giving = byName.get('Giving');
 			Assert.areEqual('Gifts, Commitment', giving.staffTabs, 'By label, else by name');
 			Assert.areEqual(
-				'Giving Nightly Jobs, Donor Level Ladder',
+				'Pledge Reminders, Donor Level Ladder',
 				giving.adminTabs,
 				'The admin tools too, by the label an entry carries'
 			);

@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Memberships step,
+ * The class Core finds by name (registered in its catalog row) to add the Memberships step,
  * renewals, lapse handling and reminders, to the one nightly run (ADR-0166; ADR-0206
  * `0206-memberships-module.md` decision 5).
  */

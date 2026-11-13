@@ -13,7 +13,7 @@ private class PaymentsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :PaymentsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Payments_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -22,7 +22,7 @@ private class PaymentsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM Error_Log__c
-			WHERE Context__c = :PaymentsPostInstall.ACCESS_CONTEXT
+			WHERE Context__c = 'PaymentsPostInstall.grantInstallerAccess'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -31,10 +31,7 @@ private class PaymentsPostInstallTest {
 	static void theInstallerGetsPaymentsAdminOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id holding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ PaymentsAccessSync.ADMIN_SET }
-				)
+			Id holding = TestDataFactory.createUser('Holder', new List<String>{ 'Payments_Admin' })
 				.Id;
 			User reader = TestUsers.standardUser('Reader');
 			insert new PermissionSetAssignment(
@@ -44,8 +41,8 @@ private class PaymentsPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new PaymentsPostInstall(), null);
-			System.enqueueJob(new PaymentsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new PaymentsPostInstall.InstallerAccess(holding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Payments', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Payments', holding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Payments Admin');
@@ -72,7 +69,7 @@ private class PaymentsPostInstallTest {
 			Test.startTest();
 			new PaymentsPostInstall().onInstall(null);
 			new PaymentsPostInstall().runSetup(null);
-			System.enqueueJob(new PaymentsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Payments', notAUser));
 			Test.stopTest();
 
 			Assert.isTrue(accessErrors() >= 1, 'The refusal is in the Error Log');

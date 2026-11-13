@@ -4,6 +4,8 @@ Scripts for quick manual checks of keyboard use, screen reader labels, dialog fo
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Use a desktop browser (Chrome or Edge) at 100 percent zoom for keyboard scripts, and keep the mouse out of reach. The full device checklist for phones is the [Mobile audit](../contributor-guide/scale-and-mobile-test-plan.md#mobile-audit) in the scale and mobile test plan; T-A11Y-09 is the short version.
 
+These scripts cover what a person has to judge. Missing labels, button icons with no alternative text, images with no `alt` and a positive `tabindex` are caught earlier, by the accessibility assertion in each component's Jest test (see the [CI guide](../contributor-guide/ci.md), static step 4), so a failure there is a build failure, not a test script to run.
+
 ## T-A11Y-01: Keyboard Only in BarnCRM Settings
 
 **Purpose:** Confirm an admin can search, move between sections and change a setting without a mouse, and that **Discard** in the save bar undoes it.

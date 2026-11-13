@@ -14,7 +14,7 @@ private class FundersPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :FundersAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Funders_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -25,7 +25,7 @@ private class FundersPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ FundersAccessSync.ADMIN_SET }
+					new List<String>{ 'Funders_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -36,8 +36,8 @@ private class FundersPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new FundersPostInstall(), null);
-			System.enqueueJob(new FundersPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new FundersPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Funders', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Funders', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Funders Admin');
@@ -57,7 +57,7 @@ private class FundersPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :FundersPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'FundersPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -84,7 +84,7 @@ private class FundersPostInstallTest {
 
 			Test.startTest();
 			new FundersPostInstall().onInstall(null);
-			System.enqueueJob(new FundersPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Funders', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -92,7 +92,7 @@ private class FundersPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :FundersPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'FundersPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

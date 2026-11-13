@@ -27,6 +27,16 @@
                 ></c-barn-notice>
             </template>
 
+            <template lwc:if={reportText}>
+                <lightning-textarea
+                    class="slds-var-m-bottom_small"
+                    data-id="report-text"
+                    label={labels.copyFailed}
+                    value={reportText}
+                    read-only
+                ></lightning-textarea>
+            </template>
+
             <template lwc:if={isEmpty}>
                 <c-barn-empty-state
                     illustration="all-clear"
@@ -57,6 +67,13 @@
                             label={labels.openEntry}
                             variant="base"
                             onclick={handleOpenEntry}
+                        ></lightning-button>
+                        <lightning-button
+                            class="copy-report-button slds-var-m-left_x-small"
+                            data-entry={entry.recordId}
+                            label={labels.copyBugReport}
+                            variant="base"
+                            onclick={handleCopyBugReport}
                         ></lightning-button>
                         <lightning-button
                             class="acknowledge-button slds-var-m-left_x-small"

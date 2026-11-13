@@ -227,6 +227,42 @@ private class ProjectRequestsTest {
 		}
 	}
 
+	/**
+	 * QA review Q4: replies are taken off the rows before update and kept in a static map until
+	 * after update writes them as comments. 205 rows run in two chunks, and every reply becomes
+	 * a comment only while each chunk adds to the map rather than replacing it.
+	 */
+	@IsTest
+	static void repliesOnMoreThanTwoHundredRequestsAllBecomeComments() {
+		System.runAs(ProjectsTestData.admin()) {
+			turnOn(false);
+			List<Project_Request__c> rows = new List<Project_Request__c>();
+			for (Integer i = 0; i < 205; i++) {
+				rows.add(request('Bulk reply ' + i, 'Low', null));
+			}
+			insert rows;
+			List<Project_Request__c> replies = new List<Project_Request__c>();
+			for (Project_Request__c row : rows) {
+				replies.add(new Project_Request__c(Id = row.Id, Reply__c = 'Looking at it'));
+			}
+
+			Test.startTest();
+			update replies;
+			Test.stopTest();
+
+			Assert.areEqual(
+				205,
+				[SELECT COUNT() FROM Project_Request_Comment__c WHERE Request__c IN :rows],
+				'One comment per reply, in both chunks'
+			);
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Project_Request__c WHERE Id IN :rows AND Reply__c != NULL],
+				'Every reply is cleared'
+			);
+		}
+	}
+
 	@IsTest
 	static void twoHundredRequestsSaveTogether() {
 		User owner = ProjectsTestData.staff('Bulk');

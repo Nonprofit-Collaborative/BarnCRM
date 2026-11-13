@@ -422,9 +422,11 @@ private class AskReminderTest {
 	static void theJobIsOneOfTheModulesNightlyJobs() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.clearOrgGivingJobs();
-			Assert.isFalse(GivingScheduler.statuses().get(GivingScheduler.ASK_JOB_NAME).scheduled);
-			GivingScheduler.scheduleJobNamed(GivingScheduler.ASK_JOB_NAME);
-			Assert.isTrue(GivingScheduler.isJobScheduled(GivingScheduler.ASK_JOB_NAME));
+			Assert.isFalse(NightlyJobs.isStepScheduled(GivingScheduler.ASK_JOB_NAME, true));
+			NightlyJobs.turnOn(GivingScheduler.ASK_JOB_NAME);
+			NightlyJobs.forget();
+			ScheduledJobSelector.forget();
+			Assert.isTrue(NightlyJobs.isStepScheduled(GivingScheduler.ASK_JOB_NAME, true));
 		}
 	}
 }

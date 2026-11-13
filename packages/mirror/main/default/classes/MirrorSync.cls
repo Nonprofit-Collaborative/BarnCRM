@@ -8,8 +8,17 @@
  * - `idOf`: a typed identifier, checked against the object it must belong to.
  * - `Warnings`: refusals grouped by the platform's message, written in one statement, so a rule
  *   that refuses every record of a large save costs a handful of Error Log entries (R-OM6).
+ * - What the two gift mirrors share (D-200 S5): their `Result`, storing each gift's new link,
+ *   the after-delete Warnings and whether a run is going. Their runs share `MirrorRunBatch`.
  */
 public with sharing class MirrorSync {
+	private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
+		'Queued',
+		'Preparing',
+		'Processing',
+		'Holding'
+	};
+
 	/** Left over for the other automation running in the same transaction. */
 	public static final Integer SAFETY_MARGIN = 10;
 	/** How many record names a grouped Warning spells out before it says "and N more". */
@@ -241,5 +250,162 @@ public with sharing class MirrorSync {
 			firstRecordByMessage.clear();
 			ErrorLogger.logMessages(messages, recordIds, context, ErrorLogger.SEVERITY_WARNING);
 		}
+	}
+
+	// ------------------------------------------------------------- the two gift mirrors
+
+	/** What one call of a gift mirror did, for the run summary and the tests. */
+	public abstract class Result {
+		public Integer created = 0;
+		public Integer updated = 0;
+		public Integer unchanged = 0;
+		public Integer failed = 0;
+		public Integer skipped = 0;
+		/** The refusals, grouped by message; written by the caller (R-OM6, R-GT7). */
+		public Warnings refusals = new Warnings();
+
+		public virtual void add(Result other) {
+			created += other.created;
+			updated += other.updated;
+			unchanged += other.unchanged;
+			failed += other.failed;
+			skipped += other.skipped;
+			refusals.addAll(other.refusals);
+		}
+
+		/** Keeps one refusal of the gift, in the platform's words. */
+		public void refuse(Gift__c gift, List<Database.Error> errors) {
+			refusals.add(messageOf(errors), nameOf(gift), gift.Id);
+		}
+
+		/** The gift as a refusal names it. */
+		public virtual String nameOf(Gift__c gift) {
+			return gift.Name;
+		}
+
+		/** The wording for a mirrored record that could not be deleted again: {0} it, {1} why. */
+		public abstract String orphanTemplate();
+	}
+
+	/** The platform's messages, joined. */
+	public static String messageOf(List<Database.Error> errors) {
+		List<String> messages = new List<String>();
+		for (Database.Error error : errors) {
+			messages.add(error.getMessage());
+		}
+		return String.join(messages, ' ');
+	}
+
+	/**
+	 * Saves each gift whose link changed, with partial success and the mirror's automation
+	 * bypassed. A gift that is refused is counted as failed, and a record created for it in this
+	 * call is deleted again (R-OM9, R-GT7).
+	 *
+	 * @return the gifts whose new record was deleted again
+	 */
+	public static Set<Id> storeLinks(
+		List<Gift__c> gifts,
+		Schema.SObjectField link,
+		Map<Id, String> linkBefore,
+		Schema.SObjectType target,
+		String automationName,
+		Result result
+	) {
+		Set<Id> unlinked = new Set<Id>();
+		List<Gift__c> links = new List<Gift__c>();
+		List<Gift__c> linkedFor = new List<Gift__c>();
+		for (Gift__c gift : gifts) {
+			if (!same(gift.get(link), linkBefore.get(gift.Id))) {
+				Gift__c changed = new Gift__c(Id = gift.Id);
+				changed.put(link, gift.get(link));
+				links.add(changed);
+				linkedFor.add(gift);
+			}
+		}
+		if (links.isEmpty()) {
+			return unlinked;
+		}
+		List<Database.SaveResult> saved;
+		AutomationControl.bypass(automationName);
+		try {
+			saved = Database.update(links, false, AccessLevel.USER_MODE);
+		} finally {
+			AutomationControl.clearBypass(automationName);
+		}
+		List<SObject> orphans = new List<SObject>();
+		List<Gift__c> orphanedFor = new List<Gift__c>();
+		for (Integer i = 0; i < saved.size(); i++) {
+			if (saved[i].isSuccess()) {
+				continue;
+			}
+			Gift__c gift = linkedFor[i];
+			result.failed++;
+			result.refuse(gift, saved[i].getErrors());
+			if (linkBefore.get(gift.Id) == null) {
+				result.created--;
+				unlinked.add(gift.Id);
+				orphans.add(target.newSObject(Id.valueOf((String) gift.get(link))));
+				orphanedFor.add(gift);
+			}
+		}
+		if (orphans.isEmpty()) {
+			return unlinked;
+		}
+		List<Database.DeleteResult> deleted = Database.delete(
+			orphans,
+			false,
+			AccessLevel.USER_MODE
+		);
+		for (Integer i = 0; i < deleted.size(); i++) {
+			if (!deleted[i].isSuccess()) {
+				result.refusals.add(
+					String.format(
+						result.orphanTemplate(),
+						new List<Object>{
+							String.valueOf(orphans[i].Id),
+							messageOf(deleted[i].getErrors())
+						}
+					),
+					orphanedFor[i].Name,
+					orphanedFor[i].Id
+				);
+			}
+		}
+		return unlinked;
+	}
+
+	/**
+	 * The after-delete Warnings (R-OM9, R-GT8): one per message, naming each deleted gift that
+	 * still names a mirrored record, which is left in place.
+	 */
+	public static void warnLeftBehind(
+		List<Gift__c> deleted,
+		Schema.SObjectField link,
+		String message,
+		String context,
+		String oneTemplate,
+		String manyTemplate
+	) {
+		Warnings warnings = new Warnings();
+		for (Gift__c gift : deleted) {
+			Object linked = gift.get(link);
+			if (linked != null) {
+				warnings.add(message, gift.Name + ' (' + linked + ')', gift.Id);
+			}
+		}
+		warnings.write(context, oneTemplate, manyTemplate);
+	}
+
+	/** True while a run of the batch class is queued or in progress, so only one runs at a time. */
+	public static Boolean isRunning(String className) {
+		Set<String> statuses = RUNNING_JOB_STATUSES;
+		return ![
+				SELECT Id
+				FROM AsyncApexJob
+				WHERE ApexClass.Name = :className AND JobType = 'BatchApex' AND Status IN :statuses
+				WITH USER_MODE
+				LIMIT 1
+			]
+			.isEmpty();
 	}
 }

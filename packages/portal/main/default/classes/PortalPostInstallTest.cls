@@ -14,7 +14,7 @@ private class PortalPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :PortalAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Portal_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -25,14 +25,14 @@ private class PortalPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ PortalAccessSync.ADMIN_SET }
+					new List<String>{ 'Portal_Admin' }
 				)
 				.Id;
 
 			Test.startTest();
 			Test.testInstall(new PortalPostInstall(), null);
-			System.enqueueJob(new PortalPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new PortalPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Portal', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Portal', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds the admin set');
@@ -52,7 +52,7 @@ private class PortalPostInstallTest {
 			Test.startTest();
 			new PortalPostInstall().onInstall(null);
 			new PortalPostInstall().runSetup(null);
-			System.enqueueJob(new PortalPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Portal', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -60,7 +60,7 @@ private class PortalPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :PortalPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'PortalPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

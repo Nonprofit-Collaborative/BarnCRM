@@ -1,0 +1,913 @@
+{
+  "module": "Events",
+  "countLabel": "Events",
+  "count": {
+    "object": "Event__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Event__c",
+      "records": [
+        {
+          "key": "conference",
+          "Name": "Harvest Community Conference",
+          "Status__c": "Open",
+          "Format__c": "In Person",
+          "Start__c": {
+            "days": -1,
+            "time": "08:30"
+          },
+          "End__c": {
+            "days": 1,
+            "time": "17:00"
+          },
+          "Registration_Opens__c": {
+            "days": -40,
+            "time": "09:00"
+          },
+          "Registration_Closes__c": {
+            "days": 0,
+            "time": "17:00"
+          },
+          "Capacity__c": 150,
+          "Venue_Name__c": "Riverside Meeting Hall",
+          "Venue_Address__c": "100 Example Street",
+          "Description__c": "Three days of talks, workshops and panels for small nonprofit teams.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "community",
+          "Name": "Neighborhood Garden Night",
+          "Status__c": "Open",
+          "Format__c": "In Person",
+          "Start__c": {
+            "days": 14,
+            "time": "18:00"
+          },
+          "End__c": {
+            "days": 14,
+            "time": "20:00"
+          },
+          "Capacity__c": 40,
+          "Venue_Name__c": "Community Garden Pavilion",
+          "Venue_Address__c": "25 Example Lane",
+          "Description__c": "An evening to meet the neighbors and plan the planting season.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Event_Track__c",
+      "records": [
+        {
+          "key": "track-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Programs",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "track-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Operations",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "track-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Technology",
+          "Sort_Order__c": 3
+        }
+      ]
+    },
+    {
+      "object": "Ticket_Type__c",
+      "records": [
+        {
+          "key": "general",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "General",
+          "Price__c": 45,
+          "Quantity__c": 120,
+          "Active__c": true,
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "student",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Student",
+          "Price__c": 15,
+          "Quantity__c": 30,
+          "Active__c": true,
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "volunteer",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Volunteer",
+          "Price__c": 0,
+          "Quantity__c": 20,
+          "Active__c": true,
+          "Sort_Order__c": 3
+        },
+        {
+          "key": "free",
+          "Event__c": {
+            "ref": "community"
+          },
+          "Name": "Free Entry",
+          "Price__c": 0,
+          "Active__c": true,
+          "Sort_Order__c": 1
+        }
+      ]
+    },
+    {
+      "object": "Promo_Code__c",
+      "records": [
+        {
+          "key": "code",
+          "Name": "EARLYBIRD",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Discount_Type__c": "Percent",
+          "Discount_Value__c": 20,
+          "Max_Uses__c": 25,
+          "Active__c": true,
+          "Valid_From__c": {
+            "days": -40,
+            "time": "09:00"
+          },
+          "Valid_Until__c": {
+            "days": 30,
+            "time": "17:00"
+          }
+        }
+      ]
+    },
+    {
+      "object": "Event_Speaker__c",
+      "records": [
+        {
+          "key": "speaker-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Name": "Harper Garcia",
+          "Status__c": "Confirmed",
+          "Headline__c": "Executive director and storyteller",
+          "Bio__c": "Has worked with small nonprofit teams for many years."
+        },
+        {
+          "key": "speaker-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Name": "Luis Garcia",
+          "Status__c": "Confirmed",
+          "Headline__c": "Volunteer program manager",
+          "Bio__c": "Has worked with small nonprofit teams for many years."
+        },
+        {
+          "key": "speaker-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Name": "Diego Garcia",
+          "Status__c": "Confirmed",
+          "Headline__c": "Data steward for a neighborhood food bank",
+          "Bio__c": "Has worked with small nonprofit teams for many years."
+        }
+      ]
+    },
+    {
+      "object": "Event_Session__c",
+      "records": [
+        {
+          "key": "session-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Opening Keynote",
+          "Session_Type__c": "Keynote",
+          "Start__c": {
+            "days": -1,
+            "time": "09:00"
+          },
+          "End__c": {
+            "days": -1,
+            "time": "10:00"
+          },
+          "Room__c": "Main Hall",
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Fundraising Without Burnout",
+          "Session_Type__c": "Talk",
+          "Track__c": {
+            "ref": "track-0"
+          },
+          "Start__c": {
+            "days": -1,
+            "time": "10:00"
+          },
+          "End__c": {
+            "days": -1,
+            "time": "11:00"
+          },
+          "Room__c": "Room A",
+          "Capacity__c": 60,
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Volunteer Onboarding Clinic",
+          "Session_Type__c": "Workshop",
+          "Track__c": {
+            "ref": "track-1"
+          },
+          "Start__c": {
+            "days": -1,
+            "time": "10:00"
+          },
+          "End__c": {
+            "days": -1,
+            "time": "12:00"
+          },
+          "Room__c": "Room B",
+          "Capacity__c": 25,
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-3",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Lunch Break",
+          "Session_Type__c": "Break",
+          "Start__c": {
+            "days": -1,
+            "time": "12:00"
+          },
+          "End__c": {
+            "days": -1,
+            "time": "13:00"
+          },
+          "Room__c": "Dining Room",
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-4",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Data Habits for Small Teams",
+          "Session_Type__c": "Talk",
+          "Track__c": {
+            "ref": "track-2"
+          },
+          "Start__c": {
+            "days": 0,
+            "time": "09:00"
+          },
+          "End__c": {
+            "days": 0,
+            "time": "10:00"
+          },
+          "Room__c": "Room A",
+          "Capacity__c": 60,
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-5",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Panel: Lessons from the First Year",
+          "Session_Type__c": "Panel",
+          "Start__c": {
+            "days": 0,
+            "time": "11:00"
+          },
+          "End__c": {
+            "days": 0,
+            "time": "12:00"
+          },
+          "Room__c": "Main Hall",
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-6",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Open Space Afternoon",
+          "Session_Type__c": "Other",
+          "Start__c": {
+            "days": 1,
+            "time": "13:00"
+          },
+          "End__c": {
+            "days": 1,
+            "time": "15:00"
+          },
+          "Room__c": "Main Hall",
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "session-7",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Closing Session",
+          "Session_Type__c": "Talk",
+          "Start__c": {
+            "days": 1,
+            "time": "15:00"
+          },
+          "End__c": {
+            "days": 1,
+            "time": "16:00"
+          },
+          "Room__c": "Main Hall",
+          "Status__c": "Draft"
+        }
+      ]
+    },
+    {
+      "object": "Session_Speaker__c",
+      "records": [
+        {
+          "Event_Session__c": {
+            "ref": "session-0"
+          },
+          "Event_Speaker__c": {
+            "ref": "speaker-0"
+          },
+          "Role__c": "Speaker"
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-1"
+          },
+          "Event_Speaker__c": {
+            "ref": "speaker-1"
+          },
+          "Role__c": "Speaker"
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-2"
+          },
+          "Event_Speaker__c": {
+            "ref": "speaker-2"
+          },
+          "Role__c": "Speaker"
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-4"
+          },
+          "Event_Speaker__c": {
+            "ref": "speaker-2"
+          },
+          "Role__c": "Speaker"
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-5"
+          },
+          "Event_Speaker__c": {
+            "ref": "speaker-0"
+          },
+          "Role__c": "Moderator"
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-5"
+          },
+          "Event_Speaker__c": {
+            "ref": "speaker-1"
+          },
+          "Role__c": "Panelist"
+        }
+      ]
+    },
+    {
+      "object": "Event_Registration__c",
+      "records": [
+        {
+          "key": "registration-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Promo_Code__c": {
+            "ref": "code"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 72.0,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 15,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 45,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-3",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Promo_Code__c": {
+            "ref": "code"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 36.0,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-4",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 0,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-5",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 45,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-6",
+          "Event__c": {
+            "ref": "community"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 0,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-7",
+          "Event__c": {
+            "ref": "community"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 0,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-8",
+          "Event__c": {
+            "ref": "community"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 0,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "registration-9",
+          "Event__c": {
+            "ref": "community"
+          },
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Source__c": "Staff",
+          "Status__c": "Registered",
+          "Amount_Owed__c": 0,
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Event_Attendee__c",
+      "records": [
+        {
+          "Event_Registration__c": {
+            "ref": "registration-0"
+          },
+          "Name": "Harper Garcia",
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Ticket_Type__c": {
+            "ref": "general"
+          },
+          "Price__c": 36.0,
+          "Status__c": "Attended"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-0"
+          },
+          "Name": "Luis Garcia",
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Ticket_Type__c": {
+            "ref": "general"
+          },
+          "Price__c": 36.0,
+          "Status__c": "Attended"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-1"
+          },
+          "Name": "Diego Garcia",
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Ticket_Type__c": {
+            "ref": "student"
+          },
+          "Price__c": 15,
+          "Status__c": "Attended"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-2"
+          },
+          "Name": "Maria Whitfield",
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Ticket_Type__c": {
+            "ref": "general"
+          },
+          "Price__c": 45,
+          "Status__c": "Registered"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-3"
+          },
+          "Name": "David Whitfield",
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Ticket_Type__c": {
+            "ref": "general"
+          },
+          "Price__c": 36.0,
+          "Status__c": "Registered"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-4"
+          },
+          "Name": "Priya Whitfield",
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Ticket_Type__c": {
+            "ref": "volunteer"
+          },
+          "Price__c": 0,
+          "Status__c": "Attended"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-5"
+          },
+          "Name": "Tom Whitfield",
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Ticket_Type__c": {
+            "ref": "general"
+          },
+          "Price__c": 45,
+          "Status__c": "Registered"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-6"
+          },
+          "Name": "David Whitfield",
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Ticket_Type__c": {
+            "ref": "free"
+          },
+          "Price__c": 0,
+          "Status__c": "Registered"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-7"
+          },
+          "Name": "Priya Whitfield",
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Ticket_Type__c": {
+            "ref": "free"
+          },
+          "Price__c": 0,
+          "Status__c": "Registered"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-8"
+          },
+          "Name": "Tom Whitfield",
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Ticket_Type__c": {
+            "ref": "free"
+          },
+          "Price__c": 0,
+          "Status__c": "Registered"
+        },
+        {
+          "Event_Registration__c": {
+            "ref": "registration-9"
+          },
+          "Name": "Jen Whitfield",
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Ticket_Type__c": {
+            "ref": "free"
+          },
+          "Price__c": 0,
+          "Status__c": "Registered"
+        }
+      ]
+    },
+    {
+      "object": "Sponsorship_Level__c",
+      "records": [
+        {
+          "key": "level-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Gold",
+          "Amount__c": 2500,
+          "Sort_Order__c": 1,
+          "Deliverables__c": "Logo on the program\nBooth\nPasses: four conference passes"
+        },
+        {
+          "key": "level-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Silver",
+          "Amount__c": 1000,
+          "Sort_Order__c": 2,
+          "Deliverables__c": "Logo on the program\nPasses: two conference passes"
+        },
+        {
+          "key": "level-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Supporter",
+          "Amount__c": 250,
+          "Sort_Order__c": 3,
+          "Deliverables__c": "Logo on the program"
+        }
+      ]
+    },
+    {
+      "object": "Event_Sponsor__c",
+      "records": [
+        {
+          "key": "sponsor-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Account__c": {
+            "sample": "O022"
+          },
+          "Name": "Ashford Coffee Roasters",
+          "Level__c": {
+            "ref": "level-0"
+          },
+          "Amount__c": 2500,
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "sponsor-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Account__c": {
+            "sample": "O014"
+          },
+          "Name": "Ashford Community College",
+          "Level__c": {
+            "ref": "level-1"
+          },
+          "Amount__c": 1000,
+          "Status__c": "Committed"
+        },
+        {
+          "key": "sponsor-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Account__c": {
+            "sample": "O001"
+          },
+          "Name": "Bayview Hardware",
+          "Level__c": {
+            "ref": "level-2"
+          },
+          "Amount__c": 250,
+          "Status__c": "Prospect"
+        }
+      ]
+    },
+    {
+      "object": "Sponsor_Deliverable__c",
+      "records": [
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0"
+          },
+          "Name": "Logo on the program",
+          "Type__c": "Logo",
+          "Status__c": "Done",
+          "Due_Date__c": {
+            "days": -20
+          }
+        },
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0"
+          },
+          "Name": "Booth",
+          "Type__c": "Booth",
+          "Status__c": "Requested",
+          "Due_Date__c": {
+            "days": -5
+          }
+        },
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0"
+          },
+          "Name": "Passes: four conference passes",
+          "Type__c": "Passes",
+          "Status__c": "Pending",
+          "Due_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 4
+        },
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-1"
+          },
+          "Name": "Logo on the program",
+          "Type__c": "Logo",
+          "Status__c": "Received",
+          "Due_Date__c": {
+            "days": -10
+          }
+        }
+      ]
+    },
+    {
+      "object": "Speaker_Application__c",
+      "records": [
+        {
+          "key": "application",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Name": "Small Teams, Big Data",
+          "Abstract__c": "How a three person team keeps clean records without a data department.",
+          "Track__c": {
+            "ref": "track-2"
+          },
+          "Status__c": "In Review"
+        }
+      ]
+    },
+    {
+      "object": "Speaker_Review__c",
+      "records": [
+        {
+          "Speaker_Application__c": {
+            "ref": "application"
+          },
+          "Reviewer__c": {
+            "currentUser": true
+          },
+          "Score__c": 4,
+          "Notes__c": "Practical and timely."
+        },
+        {
+          "Speaker_Application__c": {
+            "ref": "application"
+          },
+          "Score__c": 5,
+          "Notes__c": "A strong fit for the Technology track."
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Event_Registration__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Event__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

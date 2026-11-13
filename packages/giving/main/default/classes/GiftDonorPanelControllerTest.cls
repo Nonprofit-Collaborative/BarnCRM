@@ -88,4 +88,34 @@ private class GiftDonorPanelControllerTest {
 			Assert.isNull(GiftDonorPanelController.getPanel(null), 'Nor nothing.');
 		}
 	}
+
+	/**
+	 * QA review Q1: the panel as a gift officer sees it, not an admin. A Standard User holding
+	 * BarnCRM Staff and Giving Staff adds a person and a gift, as at the gift table, and the
+	 * panel shows that gift. Gifts are private, so the officer's own records are used.
+	 */
+	@IsTest
+	static void aGiftOfficerSeesTheirDonorsGift() {
+		User officer;
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			officer = TestDataFactory.createUser(
+				'Officer',
+				new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
+			);
+		}
+		GiftDonorPanelController.Panel panel;
+		Test.startTest();
+		System.runAs(officer) {
+			Contact donor = TestDataFactory.person(
+				new Contact(FirstName = 'Rosa', LastName = 'Park')
+			);
+			insert donor;
+			insert GivingTestDataFactory.buildGift(donor.Id, 75);
+			panel = GiftDonorPanelController.getPanel(donor.Id);
+		}
+		Test.stopTest();
+
+		Assert.areEqual(1, panel.gifts.size(), 'The officer sees the gift just entered.');
+		Assert.areEqual(75, panel.gifts[0].amount, 'For 75.');
+	}
 }

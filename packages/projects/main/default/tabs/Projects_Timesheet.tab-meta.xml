@@ -3,7 +3,7 @@
   <description>
     My week of time and expenses, Monday to Sunday: enter hours, submit the week for approval.
   </description>
-  <flexiPage>Projects_Timesheet</flexiPage>
   <label>Timesheet</label>
+  <lwcComponent>projectsTimesheet</lwcComponent>
   <motif>Custom25: Alarmclock</motif>
 </CustomTab>

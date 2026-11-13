@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Programs step to
+ * The class Core finds by name (registered in its catalog row) to add the Programs step to
  * the one nightly run (ADR-0166 nightly-job-dispatcher): the run that keeps repeating session
  * schedules' sessions created to the horizon (R-SS3).
  */

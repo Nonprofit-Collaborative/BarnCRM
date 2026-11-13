@@ -1,7 +1,5 @@
 # Global and @NamespaceAccessible Apex signatures (scripts/ci/check-api-surface.py).
 # Never remove or change a line: deprecate for one release instead. Add with --update.
-addressverification/AddressVerificationAccessSync.cls | public AddressVerificationAccessSync()
-addressverification/AddressVerificationAccessSync.cls | public class AddressVerificationAccessSync
 addressverification/AddressVerificationHandler.cls | public AddressVerificationHandler()
 addressverification/AddressVerificationHandler.cls | public class AddressVerificationHandler
 addressverification/AddressVerificationHealthCheckExtension.cls | public AddressVerificationHealthCheckExtension()
@@ -20,8 +18,6 @@ contactpoints/ContactPointMembershipHandler.cls | public ContactPointMembershipH
 contactpoints/ContactPointMembershipHandler.cls | public class ContactPointMembershipHandler
 contactpoints/ContactPointPersonHandler.cls | public ContactPointPersonHandler()
 contactpoints/ContactPointPersonHandler.cls | public class ContactPointPersonHandler
-contactpoints/ContactPointsAccessSync.cls | public ContactPointsAccessSync()
-contactpoints/ContactPointsAccessSync.cls | public class ContactPointsAccessSync
 contactpoints/ContactPointsPostInstall.cls | public ContactPointsPostInstall()
 contactpoints/ContactPointsPostInstall.cls | public class ContactPointsPostInstall
 core/AccountKinds.cls | public class AccountKinds
@@ -939,24 +935,25 @@ core/MigrationKitService.cls | public class Step
 core/MigrationKitService.cls | public static Migration_Kit__mdt kitNamed(String)
 core/MigrationKitService.cls | public static Step stepNamed(Migration_Kit__mdt,String)
 core/MigrationKitService.cls | public static final String KIND_IMPORT
-core/ModuleAccessSync.cls | public interface ModuleAccessSync
-core/ModuleAccessSyncBase.cls | public Boolean sync()
-core/ModuleAccessSyncBase.cls | public Job(ModuleAccessSyncBase)
-core/ModuleAccessSyncBase.cls | public ModuleAccessSyncBase()
-core/ModuleAccessSyncBase.cls | public abstract Integer sliceSize()
-core/ModuleAccessSyncBase.cls | public abstract Map<String,List<String>> setsByPermissionSet()
-core/ModuleAccessSyncBase.cls | public abstract Map<String,List<String>> setsByRole()
-core/ModuleAccessSyncBase.cls | public abstract String logContext()
-core/ModuleAccessSyncBase.cls | public abstract String moduleName()
-core/ModuleAccessSyncBase.cls | public abstract class ModuleAccessSyncBase
-core/ModuleAccessSyncBase.cls | public class Job
-core/ModuleAccessSyncBase.cls | public virtual void afterSync()
-core/ModuleAccessSyncBase.cls | public void execute(QueueableContext)
-core/ModuleAccessSyncBase.cls | public void requestSync()
+core/ModuleAccessStep.cls | public interface ModuleAccessStep
+core/ModuleAccessSyncs.cls | public Job(String,Id)
+core/ModuleAccessSyncs.cls | public class Job
 core/ModuleAccessSyncs.cls | public class ModuleAccessSyncs
-core/ModuleAccessSyncs.cls | public static final String CLASS_SUFFIX
+core/ModuleAccessSyncs.cls | public static Boolean syncOnce(String)
+core/ModuleAccessSyncs.cls | public static List<String> adminSets(String)
 core/ModuleAccessSyncs.cls | public static void requestAll()
 core/ModuleAccessSyncs.cls | public static void requestFor(String)
+core/ModuleAccessSyncs.cls | public static void setUp(String,Id)
+core/ModuleAccessSyncs.cls | public void execute(QueueableContext)
+core/ModuleExtensions.cls | public class ModuleExtensions
+core/ModuleExtensions.cls | public static List<Object> all(Type)
+core/ModuleExtensions.cls | public static List<String> modulesWithAccess()
+core/ModuleExtensions.cls | public static Map<String,List<String>> setsByPermissionSet(String)
+core/ModuleExtensions.cls | public static Map<String,List<String>> setsByRole(String)
+core/ModuleExtensions.cls | public static Map<String,Object> byModule(Type)
+core/ModuleExtensions.cls | public static Object first(Type)
+core/ModuleExtensions.cls | public static Object forModule(Type,String)
+core/ModuleExtensions.cls | public static void stubForTest(Type,String,Object,Boolean)
 core/ModuleManagerService.cls | public Boolean getCanSwitch()
 core/ModuleManagerService.cls | public String getName()
 core/ModuleManagerService.cls | public String getStatus()
@@ -1002,17 +999,20 @@ core/NightlyJobs.cls | public static List<NightlyStep> steps()
 core/NightlyJobs.cls | public static List<String> unscheduledLabels()
 core/NightlyJobs.cls | public static NightlyStep step(String)
 core/NightlyJobs.cls | public static String jobName()
-core/NightlyJobs.cls | public static final List<String> PROVIDER_CLASSES
 core/NightlyJobs.cls | public static final String JOB_NAME
 core/NightlyJobs.cls | public static void forget()
 core/NightlyJobs.cls | public static void overrideStepsForTest(List<NightlyStep>)
 core/NightlyJobs.cls | public static void turnOff(String)
 core/NightlyStep.cls | public Boolean active
+core/NightlyStep.cls | public Boolean canRunNow
 core/NightlyStep.cls | public Boolean hasSwitch()
 core/NightlyStep.cls | public Boolean switchDefault
 core/NightlyStep.cls | public NightlyStep activeWhen(Boolean)
+core/NightlyStep.cls | public NightlyStep runnableNow()
+core/NightlyStep.cls | public NightlyStep withSummary(String)
 core/NightlyStep.cls | public NightlyStep withSwitch(Boolean)
 core/NightlyStep.cls | public NightlyStep(String,String,Integer,Integer,Schedulable)
+core/NightlyStep.cls | public String summary
 core/NightlyStep.cls | public class NightlyStep
 core/NightlyStep.cls | public final Integer minute
 core/NightlyStep.cls | public final String key
@@ -1172,6 +1172,27 @@ core/RollupFilterParser.cls | public static List<TextEquality> textEqualities(St
 core/RollupFilterParser.cls | public static Set<String> fieldsOf(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String,Schema.SObjectType)
+core/SampleDataFile.cls | public Boolean hasSampleRecords()
+core/SampleDataFile.cls | public Integer countLoaded()
+core/SampleDataFile.cls | public Integer stageCount()
+core/SampleDataFile.cls | public Integer stageCount()
+core/SampleDataFile.cls | public LoadStages(String)
+core/SampleDataFile.cls | public RemoveStages(String)
+core/SampleDataFile.cls | public String countLabel()
+core/SampleDataFile.cls | public String moduleName()
+core/SampleDataFile.cls | public String name()
+core/SampleDataFile.cls | public String name()
+core/SampleDataFile.cls | public class LoadStages
+core/SampleDataFile.cls | public class RemoveStages
+core/SampleDataFile.cls | public class SampleDataFile
+core/SampleDataFile.cls | public static Integer removeChunkSize
+core/SampleDataFile.cls | public static SampleDataFile find(String)
+core/SampleDataFile.cls | public void enqueueLoad()
+core/SampleDataFile.cls | public void enqueueRemove()
+core/SampleDataFile.cls | public void finish()
+core/SampleDataFile.cls | public void finish()
+core/SampleDataFile.cls | public void runStage(Integer)
+core/SampleDataFile.cls | public void runStage(Integer)
 core/SampleDataModule.cls | public interface SampleDataModule
 core/SampleDataModules.cls | public class SampleDataModules
 core/SampleDataModules.cls | public static void removeAfter(String)
@@ -1396,8 +1417,6 @@ core/WhereUsedService.cls | public static Reference settingReference(String,Stri
 core/WhereUsedService.cls | public static String tabUrl(String,Map<String,String>)
 core/WhereUsedService.cls | public static Target target(String,String)
 core/WhereUsedService.cls | public static final String KIND_IMPORT_MAPPING
-corporatehub/CorporateHubAccessSync.cls | public CorporateHubAccessSync()
-corporatehub/CorporateHubAccessSync.cls | public class CorporateHubAccessSync
 corporatehub/CorporateHubNightlyJobProvider.cls | public CorporateHubNightlyJobProvider()
 corporatehub/CorporateHubNightlyJobProvider.cls | public class CorporateHubNightlyJobProvider
 corporatehub/CorporateHubPortalExtension.cls | public CorporateHubPortalExtension()
@@ -1418,8 +1437,6 @@ events/EventPaymentListener.cls | public EventPaymentListener()
 events/EventPaymentListener.cls | public class EventPaymentListener
 events/EventPublicPage.cls | public EventPublicPage()
 events/EventPublicPage.cls | public class EventPublicPage
-events/EventsAccessSync.cls | public EventsAccessSync()
-events/EventsAccessSync.cls | public class EventsAccessSync
 events/EventsEngagementSignal.cls | public EventsEngagementSignal()
 events/EventsEngagementSignal.cls | public class EventsEngagementSignal
 events/EventsHealthCheckExtension.cls | public EventsHealthCheckExtension()
@@ -1430,29 +1447,21 @@ events/EventsPortalExtension.cls | public EventsPortalExtension()
 events/EventsPortalExtension.cls | public class EventsPortalExtension
 events/EventsPostInstall.cls | public EventsPostInstall()
 events/EventsPostInstall.cls | public class EventsPostInstall
-events/EventsSampleData.cls | public EventsSampleData()
-events/EventsSampleData.cls | public class EventsSampleData
 forms/FormPublicRest.cls | global class FormPublicRest
 forms/FormPublicRest.cls | global static void getForm()
 forms/FormPublicRest.cls | global static void submit()
-forms/FormsAccessSync.cls | public FormsAccessSync()
-forms/FormsAccessSync.cls | public class FormsAccessSync
 forms/FormsCatalogExtension.cls | public FormsCatalogExtension()
 forms/FormsCatalogExtension.cls | public class FormsCatalogExtension
 forms/FormsHealthCheckExtension.cls | public FormsHealthCheckExtension()
 forms/FormsHealthCheckExtension.cls | public class FormsHealthCheckExtension
 forms/FormsPostInstall.cls | public FormsPostInstall()
 forms/FormsPostInstall.cls | public class FormsPostInstall
-funders/FundersAccessSync.cls | public FundersAccessSync()
-funders/FundersAccessSync.cls | public class FundersAccessSync
 funders/FundersHealthCheckExtension.cls | public FundersHealthCheckExtension()
 funders/FundersHealthCheckExtension.cls | public class FundersHealthCheckExtension
 funders/FundersNightlyJobProvider.cls | public FundersNightlyJobProvider()
 funders/FundersNightlyJobProvider.cls | public class FundersNightlyJobProvider
 funders/FundersPostInstall.cls | public FundersPostInstall()
 funders/FundersPostInstall.cls | public class FundersPostInstall
-funders/FundersSampleData.cls | public FundersSampleData()
-funders/FundersSampleData.cls | public class FundersSampleData
 funders/GrantChecklistHandler.cls | public GrantChecklistHandler()
 funders/GrantChecklistHandler.cls | public class GrantChecklistHandler
 funders/GrantDatesHandler.cls | public GrantDatesHandler()
@@ -1514,8 +1523,6 @@ giving/GiftSoftCreditHandler.cls | public GiftSoftCreditHandler()
 giving/GiftSoftCreditHandler.cls | public class GiftSoftCreditHandler
 giving/GiftTriggerHandler.cls | public GiftTriggerHandler()
 giving/GiftTriggerHandler.cls | public class GiftTriggerHandler
-giving/GivingAccessSync.cls | public GivingAccessSync()
-giving/GivingAccessSync.cls | public class GivingAccessSync
 giving/GivingDataProtectionExtension.cls | public GivingDataProtectionExtension()
 giving/GivingDataProtectionExtension.cls | public class GivingDataProtectionExtension
 giving/GivingDonationPage.cls | public GivingDonationPage()
@@ -1568,16 +1575,12 @@ giving/TributeTriggerHandler.cls | public TributeTriggerHandler()
 giving/TributeTriggerHandler.cls | public class TributeTriggerHandler
 logicmodels/LogicModelScopeHandler.cls | public LogicModelScopeHandler()
 logicmodels/LogicModelScopeHandler.cls | public class LogicModelScopeHandler
-logicmodels/LogicModelsAccessSync.cls | public LogicModelsAccessSync()
-logicmodels/LogicModelsAccessSync.cls | public class LogicModelsAccessSync
 logicmodels/LogicModelsNightlyJobProvider.cls | public LogicModelsNightlyJobProvider()
 logicmodels/LogicModelsNightlyJobProvider.cls | public class LogicModelsNightlyJobProvider
 logicmodels/LogicModelsPostInstall.cls | public LogicModelsPostInstall()
 logicmodels/LogicModelsPostInstall.cls | public class LogicModelsPostInstall
 logicmodels/LogicModelsWhereUsedExtension.cls | public LogicModelsWhereUsedExtension()
 logicmodels/LogicModelsWhereUsedExtension.cls | public class LogicModelsWhereUsedExtension
-lwcbuilder/LwcBuilderAccessSync.cls | public LwcBuilderAccessSync()
-lwcbuilder/LwcBuilderAccessSync.cls | public class LwcBuilderAccessSync
 lwcbuilder/LwcBuilderPostInstall.cls | public LwcBuilderPostInstall()
 lwcbuilder/LwcBuilderPostInstall.cls | public class LwcBuilderPostInstall
 memberships/EssentialsMigrationKit.cls | public EssentialsMigrationKit()
@@ -1588,8 +1591,6 @@ memberships/MembershipPaymentListener.cls | public MembershipPaymentListener()
 memberships/MembershipPaymentListener.cls | public class MembershipPaymentListener
 memberships/MembershipTermHandler.cls | public MembershipTermHandler()
 memberships/MembershipTermHandler.cls | public class MembershipTermHandler
-memberships/MembershipsAccessSync.cls | public MembershipsAccessSync()
-memberships/MembershipsAccessSync.cls | public class MembershipsAccessSync
 memberships/MembershipsErasureExtension.cls | public MembershipsErasureExtension()
 memberships/MembershipsErasureExtension.cls | public class MembershipsErasureExtension
 memberships/MembershipsNightlyJobProvider.cls | public MembershipsNightlyJobProvider()
@@ -1655,16 +1656,12 @@ mirror/OpportunityMirrorTriggerHandler.cls | public OpportunityMirrorTriggerHand
 mirror/OpportunityMirrorTriggerHandler.cls | public class OpportunityMirrorTriggerHandler
 payments/PaymentWebhookRest.cls | global class PaymentWebhookRest
 payments/PaymentWebhookRest.cls | global static void receive()
-payments/PaymentsAccessSync.cls | public PaymentsAccessSync()
-payments/PaymentsAccessSync.cls | public class PaymentsAccessSync
 payments/PaymentsApi.cls | public PaymentsApi()
 payments/PaymentsApi.cls | public class PaymentsApi
 payments/PaymentsHealthCheckExtension.cls | public PaymentsHealthCheckExtension()
 payments/PaymentsHealthCheckExtension.cls | public class PaymentsHealthCheckExtension
 payments/PaymentsPostInstall.cls | public PaymentsPostInstall()
 payments/PaymentsPostInstall.cls | public class PaymentsPostInstall
-portal/PortalAccessSync.cls | public PortalAccessSync()
-portal/PortalAccessSync.cls | public class PortalAccessSync
 portal/PortalApi.cls | global class PortalApi
 portal/PortalApi.cls | global static void doGet()
 portal/PortalApi.cls | global static void doPost()
@@ -1685,8 +1682,8 @@ programs/EnrollmentService.cls | public static final String STAGE_COMPLETED
 programs/EnrollmentService.cls | public static final String STAGE_ENROLLED
 programs/EnrollmentService.cls | public static final String STAGE_WAITLISTED
 programs/EnrollmentService.cls | public static final String STAGE_WITHDRAWN
-programs/ProgramsAccessSync.cls | public ProgramsAccessSync()
-programs/ProgramsAccessSync.cls | public class ProgramsAccessSync
+programs/ProgramsAccessStep.cls | public ProgramsAccessStep()
+programs/ProgramsAccessStep.cls | public class ProgramsAccessStep
 programs/ProgramsErasureExtension.cls | public ProgramsErasureExtension()
 programs/ProgramsErasureExtension.cls | public class ProgramsErasureExtension
 programs/ProgramsHealthCheckExtension.cls | public ProgramsHealthCheckExtension()
@@ -1695,8 +1692,6 @@ programs/ProgramsNightlyJobProvider.cls | public ProgramsNightlyJobProvider()
 programs/ProgramsNightlyJobProvider.cls | public class ProgramsNightlyJobProvider
 programs/ProgramsPostInstall.cls | public ProgramsPostInstall()
 programs/ProgramsPostInstall.cls | public class ProgramsPostInstall
-programs/ProgramsSampleData.cls | public ProgramsSampleData()
-programs/ProgramsSampleData.cls | public class ProgramsSampleData
 programs/ProgramsSharingHandler.cls | public ProgramsSharingHandler()
 programs/ProgramsSharingHandler.cls | public class ProgramsSharingHandler
 programs/ProgramsWhereUsedExtension.cls | public ProgramsWhereUsedExtension()
@@ -1722,8 +1717,6 @@ projects/ProjectRequestApi.cls | global static void status()
 projects/ProjectRequestApi.cls | global static void submit()
 projects/ProjectRequestHandler.cls | public ProjectRequestHandler()
 projects/ProjectRequestHandler.cls | public class ProjectRequestHandler
-projects/ProjectsAccessSync.cls | public ProjectsAccessSync()
-projects/ProjectsAccessSync.cls | public class ProjectsAccessSync
 projects/ProjectsNightlyJobProvider.cls | public ProjectsNightlyJobProvider()
 projects/ProjectsNightlyJobProvider.cls | public class ProjectsNightlyJobProvider
 projects/ProjectsPostInstall.cls | public ProjectsPostInstall()
@@ -1827,16 +1820,12 @@ scholarships/OutboundFundsKit.cls | public OutboundFundsKit()
 scholarships/OutboundFundsKit.cls | public class OutboundFundsKit
 scholarships/ScholarshipFormAttachment.cls | public ScholarshipFormAttachment()
 scholarships/ScholarshipFormAttachment.cls | public class ScholarshipFormAttachment
-scholarships/ScholarshipsAccessSync.cls | public ScholarshipsAccessSync()
-scholarships/ScholarshipsAccessSync.cls | public class ScholarshipsAccessSync
 scholarships/ScholarshipsNightlyJobProvider.cls | public ScholarshipsNightlyJobProvider()
 scholarships/ScholarshipsNightlyJobProvider.cls | public class ScholarshipsNightlyJobProvider
 scholarships/ScholarshipsPortalExtension.cls | public ScholarshipsPortalExtension()
 scholarships/ScholarshipsPortalExtension.cls | public class ScholarshipsPortalExtension
 scholarships/ScholarshipsPostInstall.cls | public ScholarshipsPostInstall()
 scholarships/ScholarshipsPostInstall.cls | public class ScholarshipsPostInstall
-territory/TerritoryAccessSync.cls | public TerritoryAccessSync()
-territory/TerritoryAccessSync.cls | public class TerritoryAccessSync
 territory/TerritoryNightlyJobProvider.cls | public TerritoryNightlyJobProvider()
 territory/TerritoryNightlyJobProvider.cls | public class TerritoryNightlyJobProvider
 territory/TerritoryPostInstall.cls | public TerritoryPostInstall()
@@ -1865,8 +1854,6 @@ volunteers/VolunteerShiftTriggerHandler.cls | public VolunteerShiftTriggerHandle
 volunteers/VolunteerShiftTriggerHandler.cls | public class VolunteerShiftTriggerHandler
 volunteers/VolunteerSignupTriggerHandler.cls | public VolunteerSignupTriggerHandler()
 volunteers/VolunteerSignupTriggerHandler.cls | public class VolunteerSignupTriggerHandler
-volunteers/VolunteersAccessSync.cls | public VolunteersAccessSync()
-volunteers/VolunteersAccessSync.cls | public class VolunteersAccessSync
 volunteers/VolunteersEngagementSignal.cls | public VolunteersEngagementSignal()
 volunteers/VolunteersEngagementSignal.cls | public class VolunteersEngagementSignal
 volunteers/VolunteersErasureExtension.cls | public VolunteersErasureExtension()

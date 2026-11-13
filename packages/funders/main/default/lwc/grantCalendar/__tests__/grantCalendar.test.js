@@ -105,7 +105,7 @@ describe('c-grant-calendar', () => {
       'Application: Literacy',
       'Grant Payment: Youth Award $17,500.00'
     ]);
-    expect(one(element, '[data-id="shell"]').titleHidden).toBe(true);
+    expect(one(element, '[data-id="shell"]').titleHidden).toBe(false);
     expect(one(element, '[data-id="shell"]').iconName).toBe('custom:custom82');
     // Overdue is said with an icon and words, not red text alone (vis-modules-9).
     expect(items[0].className).toContain('barn-item_overdue');
