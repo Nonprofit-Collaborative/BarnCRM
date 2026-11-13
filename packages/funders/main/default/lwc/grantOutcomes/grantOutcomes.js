@@ -1,4 +1,5 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getOutcomes from '@salesforce/apex/GrantOutcomeController.getOutcomes';
 import setOutcome from '@salesforce/apex/GrantOutcomeController.setOutcome';
@@ -38,6 +39,7 @@ export default class GrantOutcomes extends LightningElement {
   savingId;
   errorMessage;
   isLoading = true;
+  wiredCard;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -45,21 +47,28 @@ export default class GrantOutcomes extends LightningElement {
         this.helpReady = true;
       });
     }
-    this.load();
   }
 
-  async load() {
-    this.isLoading = true;
-    try {
-      this.card = await getOutcomes({ grantId: this.recordId });
+  // Cached read (D-200 P11); Save refreshes it with load().
+  @wire(getOutcomes, { grantId: '$recordId' })
+  receiveOutcomes(result) {
+    this.wiredCard = result;
+    const { data, error } = result;
+    if (data) {
+      this.card = data;
       this.choices = {};
       this.errorMessage = undefined;
-    } catch (error) {
+    } else if (error) {
       this.card = undefined;
       this.errorMessage = messageOf(error, helpText('Funders', 'Funders_Outcomes_ErrorLoad'));
-    } finally {
+    }
+    if (data || error) {
       this.isLoading = false;
     }
+  }
+
+  load() {
+    return refreshApex(this.wiredCard);
   }
 
   get notInstalled() {

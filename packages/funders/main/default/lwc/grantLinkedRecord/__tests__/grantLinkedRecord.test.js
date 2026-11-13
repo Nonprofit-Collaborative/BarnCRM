@@ -5,15 +5,30 @@ import setProgram from '@salesforce/apex/GrantProgramController.setProgram';
 import getFund from '@salesforce/apex/GrantFundController.getFund';
 import setFund from '@salesforce/apex/GrantFundController.setFund';
 
-jest.mock('@salesforce/apex/GrantProgramController.getProgram', () => ({ default: jest.fn() }), {
+import { refreshApex } from '@salesforce/apex';
+
+jest.mock(
+  '@salesforce/apex/GrantProgramController.getProgram',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/GrantProgramController.setProgram', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock('@salesforce/apex/GrantFundController.getFund', () => ({ default: jest.fn() }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/apex/GrantFundController.getFund',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/GrantFundController.setFund', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -92,8 +107,8 @@ describe.each(KINDS)('c-grant-linked-record ($kind)', (k) => {
   }
 
   async function render(card = CARD) {
-    k.get.mockResolvedValue(card);
     const element = create();
+    k.get.emit(card);
     await flush();
     return element;
   }
@@ -123,7 +138,8 @@ describe.each(KINDS)('c-grant-linked-record ($kind)', (k) => {
     await flush();
 
     expect(k.set).toHaveBeenCalledWith({ grantId: GRANT_ID, [k.idKey]: k.recordId });
-    expect(k.get).toHaveBeenCalledTimes(2);
+    expect(refreshApex).toHaveBeenCalledTimes(1);
+    expect(k.get.getLastConfig()).toEqual({ grantId: GRANT_ID });
     expect(toasts[0]).toEqual(expect.objectContaining({ message: k.saved, variant: 'success' }));
   });
 
@@ -160,12 +176,12 @@ describe.each(KINDS)('c-grant-linked-record ($kind)', (k) => {
   });
 
   it('shows the reason when the card cannot load or save', async () => {
-    k.get.mockRejectedValue({ body: { message: 'No access' } });
     const element = create();
+    k.get.error({ message: 'No access' });
     await flush();
     expect(one(element, '[data-id="error-message"]').textContent.trim()).toBe('No access');
+    document.body.removeChild(element);
 
-    k.get.mockResolvedValue(CARD);
     k.set.mockRejectedValue({ body: { message: 'Not allowed' } });
     const saved = await render();
     const toasts = [];

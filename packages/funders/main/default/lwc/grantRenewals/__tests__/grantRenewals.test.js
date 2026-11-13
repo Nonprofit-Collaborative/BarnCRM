@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import GrantRenewals from 'c/grantRenewals';
 import getRenewals from '@salesforce/apex/GrantManagementController.getRenewals';
 import startRenewal from '@salesforce/apex/GrantManagementController.startRenewal';
+import { refreshApex } from '@salesforce/apex';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -21,9 +22,15 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/GrantManagementController.getRenewals',
-  () => ({ default: jest.fn() }),
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
   { virtual: true }
 );
+jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolve()) }), {
+  virtual: true
+});
 jest.mock(
   '@salesforce/apex/GrantManagementController.startRenewal',
   () => ({ default: jest.fn() }),
@@ -39,10 +46,10 @@ const CHAIN = [
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 async function render(card) {
-  getRenewals.mockResolvedValue(card);
   const element = createElement('c-grant-renewals', { is: GrantRenewals });
   element.recordId = 'g2';
   document.body.appendChild(element);
+  getRenewals.emit(card);
   await flush();
   return element;
 }
@@ -65,6 +72,7 @@ describe('c-grant-renewals', () => {
     await flush();
     expect(startRenewal).toHaveBeenCalledWith({ grantId: 'g2' });
     expect(mockNavigate.mock.calls[0][0].attributes.recordId).toBe('g3');
+    expect(refreshApex).toHaveBeenCalledTimes(1);
   });
 
   it('says there is no history for a first-year grant, and offers no start when renewed', async () => {
