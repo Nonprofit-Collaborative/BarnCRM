@@ -5,6 +5,7 @@
  * A slot is `{ id, hostId, start, end, status }` with ISO dates. Statuses are Open, Booked,
  * Completed, No-Show and Cancelled; a cancelled slot takes no time.
  */
+import { badgeWord } from 'c/barnFormat';
 
 export const MAX_SLOTS = 100;
 export const CANCELLED = 'Cancelled';
@@ -19,7 +20,7 @@ const STATUS_WORDS = {
 
 /** The status badge word for a status. */
 export function statusWord(status) {
-  return STATUS_WORDS[status] || 'neutral';
+  return badgeWord(STATUS_WORDS, status);
 }
 
 function localTime(date, hhmm) {

@@ -3,14 +3,11 @@
  * and progress, each phase's bar on the project timeline, utilization percentages and the
  * billable export's columns. No Salesforce imports, so it ports as it is.
  */
+import { percent } from 'c/barnFormat';
+
+export { percent };
 
 const CLOSED = new Set(['Done', 'Cancelled']);
-
-/** Whole percent of done over total, 0 when there is nothing to count. */
-export function percent(done, total) {
-  const whole = Number(total) || 0;
-  return whole > 0 ? Math.round(((Number(done) || 0) * 100) / whole) : 0;
-}
 
 /** A task is open while it is not Done or Cancelled. */
 export function isOpen(task) {

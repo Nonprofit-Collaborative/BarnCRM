@@ -67,3 +67,39 @@ export function escapeHtml(value) {
 export function recordHref(recordId) {
   return recordId ? `/${recordId}` : undefined;
 }
+
+/** A time or date as its UTC calendar day, YYYY-MM-DD. */
+export function utcIsoDate(time) {
+  return new Date(time).toISOString().slice(0, 10);
+}
+
+/** The share `part` is of `whole`, as a whole percent; 0 when the whole is not above 0. */
+export function percent(part, whole) {
+  const total = Number(whole) || 0;
+  return total > 0 ? Math.round(((Number(part) || 0) * 100) / total) : 0;
+}
+
+/** The barnStatusBadge word a map gives a status; `neutral` for a status it does not name. */
+export function badgeWord(words, status) {
+  return (words && words[status]) || 'neutral';
+}
+
+/** Text that is a plain negative decimal and nothing else. */
+const NEGATIVE_NUMBER = /^-\d+(\.\d+)?$/;
+
+/**
+ * One CSV cell: empty for null or undefined, an object as JSON, quoted when it holds a comma, a
+ * quote or a line break. A text value that starts with = + - @ or a tab or carriage return gets
+ * a leading single quote, so a spreadsheet shows it as text and never runs it as a formula; a
+ * real number, and text that is only a negative number such as "-25.00", is left alone.
+ */
+export function csvCell(value) {
+  if (value === undefined || value === null) {
+    return '';
+  }
+  let text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  if (typeof value !== 'number' && /^[=+\-@\t\r]/.test(text) && !NEGATIVE_NUMBER.test(text)) {
+    text = `'${text}`;
+  }
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}

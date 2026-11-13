@@ -4,6 +4,7 @@
  * for a request by skills, role and free capacity. No Salesforce imports, so it ports as it is.
  * Dates are YYYY-MM-DD strings; weeks run Monday to Sunday.
  */
+import { utcIsoDate } from 'c/barnFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 const WORK_WEEK = 5;
@@ -14,10 +15,6 @@ function toTime(value) {
   }
   const time = Date.parse(`${String(value).slice(0, 10)}T00:00:00Z`);
   return Number.isNaN(time) ? null : time;
-}
-
-function toIso(time) {
-  return new Date(time).toISOString().slice(0, 10);
 }
 
 function round(value) {
@@ -39,7 +36,7 @@ function workdays(first, last) {
 /** Monday of the week holding a date, as YYYY-MM-DD; empty for no date. */
 export function mondayOf(value) {
   const time = toTime(value);
-  return time === null ? '' : toIso(time - ((new Date(time).getUTCDay() + 6) % 7) * DAY);
+  return time === null ? '' : utcIsoDate(time - ((new Date(time).getUTCDay() + 6) % 7) * DAY);
 }
 
 /** The first Monday and last Sunday of `count` weeks starting with the week of `start`. */
@@ -47,7 +44,7 @@ export function weekRange(start, count) {
   const first = toTime(mondayOf(start));
   return first === null
     ? null
-    : { from: toIso(first), to: toIso(first + (Math.max(count, 1) * 7 - 1) * DAY) };
+    : { from: utcIsoDate(first), to: utcIsoDate(first + (Math.max(count, 1) * 7 - 1) * DAY) };
 }
 
 /** Mondays of every week from the week of `from` through `to`. */
@@ -57,7 +54,7 @@ export function weekStarts(from, to) {
   const weeks = [];
   if (first !== null && last !== null) {
     for (let time = first; time <= last; time += 7 * DAY) {
-      weeks.push(toIso(time));
+      weeks.push(utcIsoDate(time));
     }
   }
   return weeks;
@@ -109,7 +106,7 @@ function plans(assignments, userId) {
 export function allocation(data, fromDate, toDate) {
   const weeks = weekStarts(fromDate, toDate);
   const span = weeks.length
-    ? { from: weeks[0], to: toIso(toTime(weeks[weeks.length - 1]) + 6 * DAY) }
+    ? { from: weeks[0], to: utcIsoDate(toTime(weeks[weeks.length - 1]) + 6 * DAY) }
     : { from: fromDate, to: toDate };
   const fallback = Number(data.defaultCapacity) || 40;
   const logged = new Map();
@@ -117,7 +114,7 @@ export function allocation(data, fromDate, toDate) {
     const key = `${row.userId}|${mondayOf(row.date)}`;
     logged.set(key, (logged.get(key) || 0) + (Number(row.hours) || 0));
   });
-  const weekEnd = (week) => toIso(toTime(week) + 6 * DAY);
+  const weekEnd = (week) => utcIsoDate(toTime(week) + 6 * DAY);
   const people = (data.resources || [])
     .filter((row) => row.Active__c !== false)
     .map((row) => {

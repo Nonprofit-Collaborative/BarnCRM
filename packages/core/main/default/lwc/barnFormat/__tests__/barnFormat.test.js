@@ -1,4 +1,13 @@
-import { escapeHtml, format, formatDate, isoDate } from 'c/barnFormat';
+import {
+  badgeWord,
+  csvCell,
+  escapeHtml,
+  format,
+  formatDate,
+  isoDate,
+  percent,
+  utcIsoDate
+} from 'c/barnFormat';
 
 describe('c/barnFormat', () => {
   it('fills placeholders in order, more than once', () => {
@@ -42,5 +51,32 @@ describe('c/barnFormat', () => {
     );
     expect(escapeHtml(null)).toBe('');
     expect(escapeHtml(0)).toBe('0');
+  });
+
+  it('writes a time as its UTC calendar day', () => {
+    expect(utcIsoDate(Date.UTC(2026, 10, 12, 23, 30))).toBe('2026-11-12');
+  });
+
+  it('rounds a share to a whole percent and reads no whole as 0', () => {
+    expect(percent(1, 3)).toBe(33);
+    expect(percent(2, 3)).toBe(67);
+    expect(percent(5, 0)).toBe(0);
+    expect(percent(null, 4)).toBe(0);
+    expect(percent(1, -4)).toBe(0);
+  });
+
+  it('gives the badge word a map names, else neutral', () => {
+    expect(badgeWord({ Open: 'active' }, 'Open')).toBe('active');
+    expect(badgeWord({ Open: 'active' }, 'Other')).toBe('neutral');
+    expect(badgeWord(null, 'Open')).toBe('neutral');
+  });
+
+  it('quotes a CSV cell and keeps a spreadsheet from running it', () => {
+    expect(csvCell('a,b')).toBe('"a,b"');
+    expect(csvCell('say "hi"')).toBe('"say ""hi"""');
+    expect(csvCell('=SUM(A1)')).toBe("'=SUM(A1)");
+    expect(csvCell('-5')).toBe('-5');
+    expect(csvCell(-5)).toBe('-5');
+    expect(csvCell(null)).toBe('');
   });
 });

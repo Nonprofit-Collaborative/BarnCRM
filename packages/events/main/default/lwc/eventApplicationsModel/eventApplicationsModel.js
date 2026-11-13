@@ -5,6 +5,7 @@
  *
  * Plain JavaScript in and out, so a WordPress block or Node can use the same module.
  */
+import { badgeWord } from 'c/barnFormat';
 
 /** The statuses an application can still be reviewed and decided in (R-SA4). */
 export const UNDECIDED = Object.freeze(['Submitted', 'In Review']);
@@ -22,7 +23,7 @@ const STATUS_WORDS = Object.freeze({
 
 /** The badge word for an application's status. */
 export function statusWord(status) {
-  return STATUS_WORDS[status] || 'neutral';
+  return badgeWord(STATUS_WORDS, status);
 }
 
 /** Whether the application is still open to scores and a decision. */

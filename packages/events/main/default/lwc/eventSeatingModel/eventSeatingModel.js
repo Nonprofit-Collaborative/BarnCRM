@@ -8,6 +8,7 @@
  * { id, name, capacity, hostName, sponsorId, sponsorName }; a guest is
  * { id, name, partyId, tableId, ticketName, organization, dietary, access }.
  */
+import { csvCell } from 'c/barnFormat';
 
 /** One table's seats taken, seats left and whether it holds more people than it has seats. */
 export function tableCounts(tables, guests) {
@@ -110,15 +111,6 @@ export function suggestSeating(tables, guests) {
     }
   });
   return { seats, unplaced: left };
-}
-
-function csvCell(value) {
-  let text = value === undefined || value === null ? '' : String(value);
-  // A spreadsheet would run a cell that starts with one of these as a formula.
-  if (/^[=+\-@\t\r]/.test(text)) {
-    text = `'${text}`;
-  }
-  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
 /** The seating chart as CSV text: one row per guest, seated guests by table, then unseated ones. */

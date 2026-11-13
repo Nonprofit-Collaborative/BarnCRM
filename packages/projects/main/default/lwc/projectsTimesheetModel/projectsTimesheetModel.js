@@ -5,6 +5,7 @@
  * changes a grid edit sends, and the approval queue grouped by person and week. No Salesforce
  * imports, so it ports as it is.
  */
+import { utcIsoDate } from 'c/barnFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 const LOCKED = new Set(['Submitted', 'Approved']);
@@ -14,10 +15,6 @@ function toUtc(iso) {
   return Date.UTC(year, month - 1, day);
 }
 
-function toIso(utc) {
-  return new Date(utc).toISOString().slice(0, 10);
-}
-
 /** Two decimals at most, without a trailing zero tail: 3.5 stays 3.5, 0.1 + 0.2 is 0.3. */
 export function round2(value) {
   return Math.round((Number(value) || 0) * 100) / 100;
@@ -25,14 +22,14 @@ export function round2(value) {
 
 /** An ISO date `count` days from another. */
 export function addDays(iso, count) {
-  return toIso(toUtc(iso) + count * DAY);
+  return utcIsoDate(toUtc(iso) + count * DAY);
 }
 
 /** The Monday on or before a day (Sunday belongs to the week that began the Monday before). */
 export function mondayOf(iso) {
   const utc = toUtc(iso);
   const sinceMonday = (new Date(utc).getUTCDay() + 6) % 7;
-  return toIso(utc - sinceMonday * DAY);
+  return utcIsoDate(utc - sinceMonday * DAY);
 }
 
 /** The seven days of the week that starts on `monday`, with a short name for the column. */
