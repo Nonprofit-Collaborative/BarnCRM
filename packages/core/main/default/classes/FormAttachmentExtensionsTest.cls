@@ -54,7 +54,9 @@ private class FormAttachmentExtensionsTest {
 		}
 
 		public void received(FormSubmissionReceipt receipt) {
-			insert as user new Account(Name = 'Written Before The Failure');
+			insert as user TestDataFactory.organization(
+				new Account(Name = 'Written Before The Failure')
+			);
 			throw new System.TypeException('The module refused it');
 		}
 	}
@@ -66,7 +68,7 @@ private class FormAttachmentExtensionsTest {
 	}
 
 	private static Account context() {
-		Account record = new Account(Name = 'Spring Gala');
+		Account record = TestDataFactory.organization(new Account(Name = 'Spring Gala'));
 		insert as user record;
 		return record;
 	}

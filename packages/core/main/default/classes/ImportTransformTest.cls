@@ -79,10 +79,12 @@ private class ImportTransformTest {
 				List<Contact> existing = new List<Contact>();
 				for (Integer i = 0; i < ALREADY_THERE; i++) {
 					existing.add(
-						new Contact(
-							FirstName = 'Ana',
-							LastName = 'Old',
-							Email = 'person' + i + '@example.org'
+						TestDataFactory.person(
+							new Contact(
+								FirstName = 'Ana',
+								LastName = 'Old',
+								Email = 'person' + i + '@example.org'
+							)
 						)
 					);
 				}

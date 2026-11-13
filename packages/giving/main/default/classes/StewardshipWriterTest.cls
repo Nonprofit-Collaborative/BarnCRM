@@ -73,7 +73,7 @@ private class StewardshipWriterTest {
 	static void nothingToStartIsNotAnError() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Contact person = new Contact(LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert person;
 
 			Test.startTest();
@@ -97,7 +97,7 @@ private class StewardshipWriterTest {
 	static void plansAndTemplatesThatDoNotLineUpStartNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Contact person = new Contact(LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert person;
 
 			Test.startTest();
@@ -119,7 +119,7 @@ private class StewardshipWriterTest {
 	static void aPlanForAPersonGetsEachStepAsATaskOwnedByThatPersonsOwner() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Contact person = new Contact(LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert person;
 
 			Test.startTest();
@@ -163,7 +163,9 @@ private class StewardshipWriterTest {
 	static void aPlanForAnOrganizationUsesTheOrganizationsOwner() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Account riverside = new Account(Name = 'Riverside Foundation');
+			Account riverside = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation')
+			);
 			insert riverside;
 			Stewardship_Plan__c plan = new Stewardship_Plan__c(
 				Account__c = riverside.Id,
@@ -198,7 +200,9 @@ private class StewardshipWriterTest {
 			Stewardship_Plan_Template__c template = templateWithSteps();
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < TWO_HUNDRED; i++) {
-				people.add(new Contact(FirstName = 'Donor' + i, LastName = 'Plan'));
+				people.add(
+					TestDataFactory.person(new Contact(FirstName = 'Donor' + i, LastName = 'Plan'))
+				);
 			}
 			insert people;
 			List<Stewardship_Plan__c> plans = new List<Stewardship_Plan__c>();
@@ -229,7 +233,7 @@ private class StewardshipWriterTest {
 	static void aPlanThatIsRefusedDoesNotStopTheOthersAndGetsNoTasks() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Contact person = new Contact(LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert person;
 			Stewardship_Plan__c good = planFor(person.Id, template.Id);
 			Stewardship_Plan__c bad = planFor(person.Id, template.Id);
@@ -255,7 +259,7 @@ private class StewardshipWriterTest {
 	static void aListThatCannotBeInsertedIsLoggedAndNothingElseHappens() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c template = templateWithSteps();
-			Contact person = new Contact(LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert person;
 			Stewardship_Plan__c alreadyHasAnId = planFor(person.Id, template.Id);
 			alreadyHasAnId.Id = FakeIds.of(Stewardship_Plan__c.SObjectType, 1);
@@ -280,7 +284,7 @@ private class StewardshipWriterTest {
 				FROM Stewardship_Plan_Template__c
 				WHERE Plan_Key__c = 'every_gift_thanks_writer'
 			];
-			Contact person = new Contact(LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert person;
 
 			Test.startTest();

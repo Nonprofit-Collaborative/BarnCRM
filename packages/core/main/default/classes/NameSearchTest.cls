@@ -45,7 +45,9 @@ private class NameSearchTest {
 	@IsTest
 	static void theSearchReturnsWhatTheIndexHolds() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(FirstName = 'Indra', LastName = 'Searchwell');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Indra', LastName = 'Searchwell')
+			);
 			TestDataFactory.pastDuplicateRules(person);
 			insert person;
 			Test.setFixedSearchResults(new List<Id>{ person.Id });

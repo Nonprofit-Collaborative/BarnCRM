@@ -161,9 +161,15 @@ private class MigrationKitServiceTest {
 			mapping.columns.add(new ImportMapping.Column('Email', 'Record.Email'));
 			ImportTestDataFactory.saveMapping(template.Id, mapping.serialize(), null);
 			insert new List<Contact>{
-				new Contact(FirstName = 'Ana', LastName = LAST_NAME, Email = 'ana@example.invalid'),
-				new Contact(FirstName = 'Ben', LastName = LAST_NAME),
-				new Contact(FirstName = 'Cy', LastName = 'Someoneelse')
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Ana',
+						LastName = LAST_NAME,
+						Email = 'ana@example.invalid'
+					)
+				),
+				TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = LAST_NAME)),
+				TestDataFactory.person(new Contact(FirstName = 'Cy', LastName = 'Someoneelse'))
 			};
 			useKit(
 				importStep(
@@ -325,9 +331,9 @@ private class MigrationKitServiceTest {
 				'Contact'
 			);
 			List<Contact> people = new List<Contact>{
-				new Contact(LastName = 'Source'),
-				new Contact(LastName = 'Moved'),
-				new Contact(LastName = 'Notmoved')
+				TestDataFactory.person(new Contact(LastName = 'Source')),
+				TestDataFactory.person(new Contact(LastName = 'Moved')),
+				TestDataFactory.person(new Contact(LastName = 'Notmoved'))
 			};
 			insert people;
 			Migration_Run__c run = new Migration_Run__c(Kit__c = KIT, Status__c = 'In Progress');
@@ -391,8 +397,8 @@ private class MigrationKitServiceTest {
 			Assert.isNotNull(MigrationController.getKit(KIT).problem, 'Links point backwards only');
 
 			insert new List<Contact>{
-				new Contact(FirstName = 'Keep', LastName = LAST_NAME),
-				new Contact(FirstName = 'Drop', LastName = LAST_NAME)
+				TestDataFactory.person(new Contact(FirstName = 'Keep', LastName = LAST_NAME)),
+				TestDataFactory.person(new Contact(FirstName = 'Drop', LastName = LAST_NAME))
 			};
 			MigrationKitService.Step step = (MigrationKitService.Step) JSON.deserialize(
 				'{"key":"s","kind":"import","source":"Contact","filters":[' +
@@ -448,7 +454,7 @@ private class MigrationKitServiceTest {
 				'Contact'
 			);
 			Import_Batch__c batch = ImportTestDataFactory.batch(template);
-			insert new Contact(LastName = LAST_NAME);
+			insert TestDataFactory.person(new Contact(LastName = LAST_NAME));
 			useKit(importStep(template.Template_Key__c, LAST_NAME, '["Email"]'), null, null);
 
 			MigrationStageBatch job = new MigrationStageBatch(batch.Id, KIT, 'people');

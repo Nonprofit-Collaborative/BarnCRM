@@ -43,7 +43,9 @@ private class StewardshipCommitmentHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
+		);
 		insert person;
 		return person;
 	}
@@ -246,7 +248,11 @@ private class StewardshipCommitmentHandlerTest {
 			activeTemplate();
 			List<Contact> donors = new List<Contact>();
 			for (Integer i = 0; i < 50; i++) {
-				donors.add(new Contact(FirstName = 'Donor', LastName = 'Number ' + i));
+				donors.add(
+					TestDataFactory.person(
+						new Contact(FirstName = 'Donor', LastName = 'Number ' + i)
+					)
+				);
 			}
 			insert donors;
 			List<Commitment__c> pledges = new List<Commitment__c>();

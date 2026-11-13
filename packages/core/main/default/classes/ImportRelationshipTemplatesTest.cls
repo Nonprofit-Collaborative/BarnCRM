@@ -15,17 +15,21 @@ private class ImportRelationshipTemplatesTest {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < ROWS; i++) {
 				people.add(
-					new Contact(
-						FirstName = 'Pat',
-						LastName = 'Rel' + i,
-						Email = 'pat' + i + '@rel.example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Pat',
+							LastName = 'Rel' + i,
+							Email = 'pat' + i + '@rel.example.org'
+						)
 					)
 				);
 				people.add(
-					new Contact(
-						FirstName = 'Quinn',
-						LastName = 'Rel' + i,
-						Email = 'quinn' + i + '@rel.example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Quinn',
+							LastName = 'Rel' + i,
+							Email = 'quinn' + i + '@rel.example.org'
+						)
 					)
 				);
 			}
@@ -33,9 +37,11 @@ private class ImportRelationshipTemplatesTest {
 			List<Account> organizations = new List<Account>();
 			for (Integer i = 0; i < 5; i++) {
 				organizations.add(
-					new Account(
-						Name = 'Rel Org ' + i,
-						RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Rel Org ' + i,
+							RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+						)
 					)
 				);
 			}

@@ -30,7 +30,7 @@ private class PersonErasureTest {
 		Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
 		List<Account> people = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
-			Account person = new Account(RecordTypeId = personType);
+			Account person = TestDataFactory.organization(new Account(RecordTypeId = personType));
 			person.put('FirstName', 'Person' + i); // person field, set by name
 			person.put('LastName', lastName); // person field, set by name
 			people.add(person);
@@ -46,20 +46,24 @@ private class PersonErasureTest {
 		);
 		settings.Delete_Empty_Households__c = deleteEmpty;
 		HouseholdTestDataFactory.save(settings);
-		Contact jordan = new Contact(
-			FirstName = 'Jordan',
-			LastName = 'Lee',
-			Email = 'jordan@example.invalid',
-			Phone = '555-0100',
-			Birthdate = Date.newInstance(1980, 5, 1),
-			Description = 'Met at the gala'
+		Contact jordan = TestDataFactory.person(
+			new Contact(
+				FirstName = 'Jordan',
+				LastName = 'Lee',
+				Email = 'jordan@example.invalid',
+				Phone = '555-0100',
+				Birthdate = Date.newInstance(1980, 5, 1),
+				Description = 'Met at the gala'
+			)
 		);
 		insert jordan;
 		return [SELECT Id, Name, AccountId FROM Contact WHERE Id = :jordan.Id];
 	}
 
 	private static Contact addSam(Id householdId) {
-		Contact sam = new Contact(FirstName = 'Sam', LastName = 'Lee', AccountId = householdId);
+		Contact sam = TestDataFactory.person(
+			new Contact(FirstName = 'Sam', LastName = 'Lee', AccountId = householdId)
+		);
 		insert sam;
 		return sam;
 	}
@@ -440,11 +444,13 @@ private class PersonErasureTest {
 			);
 			HouseholdTestDataFactory.save(settings);
 			Account employer = RelationshipTestDataFactory.organizations(1, 'Union')[0];
-			Contact jordan = new Contact(
-				FirstName = 'Jordan',
-				LastName = 'Lee',
-				Phone = '555-0100',
-				AccountId = employer.Id
+			Contact jordan = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Jordan',
+					LastName = 'Lee',
+					Phone = '555-0100',
+					AccountId = employer.Id
+				)
 			);
 			insert jordan;
 

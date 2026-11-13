@@ -16,7 +16,9 @@ private class RecurringDonorHealthTest {
 	}
 
 	private static Contact donor(String email) {
-		Contact person = new Contact(FirstName = 'Rae', LastName = 'Sustainer', Email = email);
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Rae', LastName = 'Sustainer', Email = email)
+		);
 		insert person;
 		return person;
 	}

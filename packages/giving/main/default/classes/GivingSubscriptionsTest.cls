@@ -17,7 +17,9 @@ private class GivingSubscriptionsTest {
 	private static List<Commitment__c> recurring(Integer count) {
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < count; i++) {
-			people.add(new Contact(FirstName = 'Sam', LastName = 'Zzsub' + i));
+			people.add(
+				TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Zzsub' + i))
+			);
 		}
 		insert as user people;
 		List<Commitment__c> gifts = new List<Commitment__c>();

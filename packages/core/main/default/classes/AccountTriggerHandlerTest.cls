@@ -14,8 +14,8 @@ private class AccountTriggerHandlerTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 
 			Test.startTest();
-			Account household = new Account(
-				RecordTypeId = HouseholdService.householdRecordTypeId()
+			Account household = TestDataFactory.household(
+				new Account(RecordTypeId = HouseholdService.householdRecordTypeId())
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Test.stopTest();
@@ -37,11 +37,13 @@ private class AccountTriggerHandlerTest {
 			);
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			insert new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			insert TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 
 			Test.startTest();
@@ -65,11 +67,13 @@ private class AccountTriggerHandlerTest {
 			);
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			insert new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			insert TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
@@ -118,7 +122,9 @@ private class AccountTriggerHandlerTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 
 			Test.startTest();
-			Account organization = new Account(Name = 'Riverside Community Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Community Trust')
+			);
 			insert organization;
 			update new Account(Id = organization.Id, Custom_Name__c = false);
 			Test.stopTest();
@@ -158,11 +164,11 @@ private class AccountTriggerHandlerTest {
 			};
 
 			Test.startTest();
-			insert new Account(Name = 'Maria Garcia');
+			insert TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			Integer whileTheSettingIsOff = [SELECT COUNT() FROM Household_Member__c];
 			settings.Auto_Create_Households__c = true;
 			HouseholdTestDataFactory.save(settings);
-			insert new Account(Name = 'Wei Lee');
+			insert TestDataFactory.organization(new Account(Name = 'Wei Lee'));
 			Test.stopTest();
 
 			Assert.areEqual(0, whileTheSettingIsOff, 'The setting is off, so nothing was created');
@@ -199,7 +205,7 @@ private class AccountTriggerHandlerTest {
 			};
 
 			Test.startTest();
-			insert new Account(Name = 'Maria Garcia');
+			insert TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			Test.stopTest();
 
 			List<Household_Member__c> memberships = [
@@ -453,7 +459,7 @@ private class AccountTriggerHandlerTest {
 		PersonRecordSelector.personRecordOverride = true;
 		Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 		Database.insert(household, AccessLevel.SYSTEM_MODE);
-		Account person = new Account(Name = 'Maria Garcia');
+		Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 		insert person;
 		insert new Household_Member__c(
 			Household__c = household.Id,

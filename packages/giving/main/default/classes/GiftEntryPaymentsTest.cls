@@ -136,10 +136,8 @@ private class GiftEntryPaymentsTest {
 	static void aPaymentOfSomeoneInTheHouseholdIsOfferedAndAStrangersIsNot() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-			Contact ben = new Contact(
-				FirstName = 'Ben',
-				LastName = 'Ramirez',
-				AccountId = ana.AccountId
+			Contact ben = TestDataFactory.person(
+				new Contact(FirstName = 'Ben', LastName = 'Ramirez', AccountId = ana.AccountId)
 			);
 			insert ben;
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });

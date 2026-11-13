@@ -105,7 +105,9 @@ private class CreatePersonActionTest {
 	static void aRequestThatCannotBeSavedIsAnsweredAndTheOthersAreSaved() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = new Account(Name = 'The Union Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert organization;
 
 			Test.startTest();

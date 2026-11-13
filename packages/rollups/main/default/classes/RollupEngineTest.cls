@@ -16,7 +16,9 @@ private class RollupEngineTest {
 	}
 
 	private static Account organization(String name, Id parentId) {
-		return new Account(Name = name, RecordTypeId = organizationType(), ParentId = parentId);
+		return TestDataFactory.organization(
+			new Account(Name = name, RecordTypeId = organizationType(), ParentId = parentId)
+		);
 	}
 
 	private static Rollup_Definition__c definition(
@@ -86,29 +88,35 @@ private class RollupEngineTest {
 			empty.Anniversary__c = Date.newInstance(2001, 1, 1);
 			insert new List<Account>{ busy, empty };
 			insert new List<Account>{
-				new Account(
-					Name = 'Child A',
-					RecordTypeId = organizationType(),
-					ParentId = busy.Id,
-					NumberOfEmployees = 10,
-					AnnualRevenue = 100,
-					Anniversary__c = Date.newInstance(2020, 3, 1)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Child A',
+						RecordTypeId = organizationType(),
+						ParentId = busy.Id,
+						NumberOfEmployees = 10,
+						AnnualRevenue = 100,
+						Anniversary__c = Date.newInstance(2020, 3, 1)
+					)
 				),
-				new Account(
-					Name = 'Child B',
-					RecordTypeId = organizationType(),
-					ParentId = busy.Id,
-					NumberOfEmployees = 20,
-					AnnualRevenue = 200,
-					Anniversary__c = Date.newInstance(2022, 6, 1)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Child B',
+						RecordTypeId = organizationType(),
+						ParentId = busy.Id,
+						NumberOfEmployees = 20,
+						AnnualRevenue = 200,
+						Anniversary__c = Date.newInstance(2022, 6, 1)
+					)
 				),
-				new Account(
-					Name = 'Child C',
-					RecordTypeId = organizationType(),
-					ParentId = busy.Id,
-					NumberOfEmployees = 30,
-					AnnualRevenue = 300,
-					Anniversary__c = Date.newInstance(2019, 1, 1)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Child C',
+						RecordTypeId = organizationType(),
+						ParentId = busy.Id,
+						NumberOfEmployees = 30,
+						AnnualRevenue = 300,
+						Anniversary__c = Date.newInstance(2019, 1, 1)
+					)
 				)
 			};
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
@@ -145,17 +153,21 @@ private class RollupEngineTest {
 			Account parent = organization('Parent', null);
 			insert parent;
 			insert new List<Account>{
-				new Account(
-					Name = 'Small',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id,
-					NumberOfEmployees = 5
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Small',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id,
+						NumberOfEmployees = 5
+					)
 				),
-				new Account(
-					Name = 'Large',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id,
-					NumberOfEmployees = 50
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Large',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id,
+						NumberOfEmployees = 50
+					)
 				)
 			};
 			Rollup_Definition__c large = fromChildren(
@@ -180,25 +192,31 @@ private class RollupEngineTest {
 			Account parent = organization('Parent', null);
 			insert parent;
 			insert new List<Account>{
-				new Account(
-					Name = 'Older',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id,
-					NumberOfEmployees = 7,
-					Anniversary__c = Date.newInstance(2010, 1, 1)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Older',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id,
+						NumberOfEmployees = 7,
+						Anniversary__c = Date.newInstance(2010, 1, 1)
+					)
 				),
-				new Account(
-					Name = 'Newer',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id,
-					NumberOfEmployees = 9,
-					Anniversary__c = Date.newInstance(2020, 1, 1)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Newer',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id,
+						NumberOfEmployees = 9,
+						Anniversary__c = Date.newInstance(2020, 1, 1)
+					)
 				),
-				new Account(
-					Name = 'Undated',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id,
-					NumberOfEmployees = 1
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Undated',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id,
+						NumberOfEmployees = 1
+					)
 				)
 			};
 			Rollup_Definition__c first = fromChildren(
@@ -242,23 +260,29 @@ private class RollupEngineTest {
 			Account south = organization('South Parent', null);
 			insert new List<Account>{ north, south };
 			insert new List<Account>{
-				new Account(
-					Name = 'N1',
-					RecordTypeId = organizationType(),
-					ParentId = north.Id,
-					NumberOfEmployees = 40
+				TestDataFactory.organization(
+					new Account(
+						Name = 'N1',
+						RecordTypeId = organizationType(),
+						ParentId = north.Id,
+						NumberOfEmployees = 40
+					)
 				),
-				new Account(
-					Name = 'N2',
-					RecordTypeId = organizationType(),
-					ParentId = north.Id,
-					NumberOfEmployees = 60
+				TestDataFactory.organization(
+					new Account(
+						Name = 'N2',
+						RecordTypeId = organizationType(),
+						ParentId = north.Id,
+						NumberOfEmployees = 60
+					)
 				),
-				new Account(
-					Name = 'S1',
-					RecordTypeId = organizationType(),
-					ParentId = south.Id,
-					NumberOfEmployees = 5
+				TestDataFactory.organization(
+					new Account(
+						Name = 'S1',
+						RecordTypeId = organizationType(),
+						ParentId = south.Id,
+						NumberOfEmployees = 5
+					)
 				)
 			};
 			Rollup_Definition__c sum = fromChildren('SUM', 'NumberOfEmployees', 'Member_Count__c');
@@ -292,11 +316,13 @@ private class RollupEngineTest {
 			List<Account> children = new List<Account>();
 			for (Account parent : parents) {
 				children.add(
-					new Account(
-						Name = 'Child',
-						RecordTypeId = organizationType(),
-						ParentId = parent.Id,
-						NumberOfEmployees = 3
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Child',
+							RecordTypeId = organizationType(),
+							ParentId = parent.Id,
+							NumberOfEmployees = 3
+						)
 					)
 				);
 			}
@@ -339,17 +365,21 @@ private class RollupEngineTest {
 			Account blank = organization('Blank', null);
 			insert new List<Account>{ named, blank };
 			insert new List<Account>{
-				new Account(
-					Name = 'C1',
-					RecordTypeId = organizationType(),
-					ParentId = named.Id,
-					NumberOfEmployees = 2
+				TestDataFactory.organization(
+					new Account(
+						Name = 'C1',
+						RecordTypeId = organizationType(),
+						ParentId = named.Id,
+						NumberOfEmployees = 2
+					)
 				),
-				new Account(
-					Name = 'C2',
-					RecordTypeId = organizationType(),
-					ParentId = blank.Id,
-					NumberOfEmployees = 5
+				TestDataFactory.organization(
+					new Account(
+						Name = 'C2',
+						RecordTypeId = organizationType(),
+						ParentId = blank.Id,
+						NumberOfEmployees = 5
+					)
 				)
 			};
 			Rollup_Definition__c plain = fromChildren(
@@ -474,15 +504,19 @@ private class RollupEngineTest {
 	/** Contacts reporting to Ana count towards Ana's household: `ReportsToId > {Household}`. */
 	private static void assertHouseholdToken(Account household, Contact ana) {
 		insert new List<Contact>{
-			new Contact(
-				LastName = 'Older',
-				ReportsToId = ana.Id,
-				Birthdate = Date.newInstance(1980, 1, 1)
+			TestDataFactory.person(
+				new Contact(
+					LastName = 'Older',
+					ReportsToId = ana.Id,
+					Birthdate = Date.newInstance(1980, 1, 1)
+				)
 			),
-			new Contact(
-				LastName = 'Younger',
-				ReportsToId = ana.Id,
-				Birthdate = Date.newInstance(1990, 5, 5)
+			TestDataFactory.person(
+				new Contact(
+					LastName = 'Younger',
+					ReportsToId = ana.Id,
+					Birthdate = Date.newInstance(1990, 5, 5)
+				)
 			)
 		};
 		Rollup_Definition__c latest = definition(
@@ -550,10 +584,12 @@ private class RollupEngineTest {
 			ana.AccountId = household.Id;
 			luis.AccountId = household.Id;
 			insert new List<Contact>{ ana, luis };
-			insert new Contact(
-				LastName = 'Report',
-				ReportsToId = ana.Id,
-				Birthdate = Date.newInstance(1985, 2, 2)
+			insert TestDataFactory.person(
+				new Contact(
+					LastName = 'Report',
+					ReportsToId = ana.Id,
+					Birthdate = Date.newInstance(1985, 2, 2)
+				)
 			);
 			Rollup_Definition__c members = definition(
 				'Contact',
@@ -590,19 +626,23 @@ private class RollupEngineTest {
 			List<Account> children = new List<Account>();
 			for (Account parent : parents) {
 				children.add(
-					new Account(
-						Name = 'C1',
-						RecordTypeId = organizationType(),
-						ParentId = parent.Id,
-						NumberOfEmployees = 3
+					TestDataFactory.organization(
+						new Account(
+							Name = 'C1',
+							RecordTypeId = organizationType(),
+							ParentId = parent.Id,
+							NumberOfEmployees = 3
+						)
 					)
 				);
 				children.add(
-					new Account(
-						Name = 'C2',
-						RecordTypeId = organizationType(),
-						ParentId = parent.Id,
-						NumberOfEmployees = 4
+					TestDataFactory.organization(
+						new Account(
+							Name = 'C2',
+							RecordTypeId = organizationType(),
+							ParentId = parent.Id,
+							NumberOfEmployees = 4
+						)
 					)
 				);
 			}
@@ -642,7 +682,11 @@ private class RollupEngineTest {
 			insert anonymous;
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 5000; i++) {
-				people.add(new Contact(LastName = 'Donor' + i, AccountId = anonymous.Id));
+				people.add(
+					TestDataFactory.person(
+						new Contact(LastName = 'Donor' + i, AccountId = anonymous.Id)
+					)
+				);
 			}
 			// Household upkeep runs once per 200 people saved, 25 times in one test transaction,
 			// which is the platform's limit being tested rather than the engine's. Contact Point

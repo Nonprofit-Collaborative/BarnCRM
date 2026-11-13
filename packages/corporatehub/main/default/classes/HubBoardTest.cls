@@ -31,7 +31,7 @@ private class HubBoardTest {
 		insert as user board;
 		List<Contact> people = new List<Contact>();
 		for (String name : new List<String>{ 'Ade', 'Bea', 'Cy', 'Dee' }) {
-			people.add(new Contact(FirstName = name, LastName = 'Member'));
+			people.add(TestDataFactory.person(new Contact(FirstName = name, LastName = 'Member')));
 		}
 		insert as user people;
 		List<Board_Member__c> seats = new List<Board_Member__c>();
@@ -393,7 +393,7 @@ private class HubBoardTest {
 	@IsTest
 	static void anUnexpectedFailureIsShownAsOneMessage() {
 		System.runAs(maria()) {
-			Contact notABoard = new Contact(LastName = 'Member');
+			Contact notABoard = TestDataFactory.person(new Contact(LastName = 'Member'));
 			insert as user notABoard;
 
 			String message;

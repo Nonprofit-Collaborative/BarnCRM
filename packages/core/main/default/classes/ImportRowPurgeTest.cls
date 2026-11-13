@@ -203,12 +203,16 @@ private class ImportRowPurgeTest {
 				Committed_By__c = UserInfo.getUserId(),
 				Undo_Deadline__c = Datetime.now().addDays(30)
 			);
-			Contact created = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Created_By_Import_Batch__c = batch.Id
+			Contact created = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Ramirez',
+					Created_By_Import_Batch__c = batch.Id
+				)
 			);
-			Contact updated = new Contact(LastName = 'Okafor', MailingCity = 'Portland');
+			Contact updated = TestDataFactory.person(
+				new Contact(LastName = 'Okafor', MailingCity = 'Portland')
+			);
 			insert new List<Contact>{ created, updated };
 			created = [SELECT Id, AccountId FROM Contact WHERE Id = :created.Id];
 			update new Account(Id = created.AccountId, Created_By_Import_Batch__c = batch.Id);

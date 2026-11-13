@@ -32,15 +32,19 @@ private class FuzzyPairingTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Jonathan',
-						LastName = 'Fuzzy',
-						Email = 'jf@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathan',
+							LastName = 'Fuzzy',
+							Email = 'jf@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Jonathon',
-						LastName = 'Fuzzy',
-						Email = 'JF@example.org '
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathon',
+							LastName = 'Fuzzy',
+							Email = 'JF@example.org '
+						)
 					)
 				}
 			);
@@ -62,15 +66,19 @@ private class FuzzyPairingTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Jonathan',
-						LastName = 'Fuzzy',
-						Email = 'one@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathan',
+							LastName = 'Fuzzy',
+							Email = 'one@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Jonathon',
-						LastName = 'Fuzzy',
-						Email = 'two@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathon',
+							LastName = 'Fuzzy',
+							Email = 'two@example.org'
+						)
 					)
 				}
 			);
@@ -85,29 +93,37 @@ private class FuzzyPairingTest {
 			Account home = household('Fuzzy Household');
 			List<Contact> people = insertPeople(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'John',
-						LastName = 'Fuzzy',
-						AccountId = home.Id,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'John',
+							LastName = 'Fuzzy',
+							AccountId = home.Id,
+							MailingPostalCode = '12345'
+						)
 					),
-					new Contact(
-						FirstName = 'JOHN',
-						LastName = 'fuzzy',
-						AccountId = home.Id,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'JOHN',
+							LastName = 'fuzzy',
+							AccountId = home.Id,
+							MailingPostalCode = '12345'
+						)
 					),
-					new Contact(
-						FirstName = 'Daniel',
-						LastName = 'Fuzzy',
-						AccountId = home.Id,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Daniel',
+							LastName = 'Fuzzy',
+							AccountId = home.Id,
+							MailingPostalCode = '12345'
+						)
 					),
-					new Contact(
-						FirstName = 'Danielle',
-						LastName = 'Fuzzy',
-						AccountId = home.Id,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Danielle',
+							LastName = 'Fuzzy',
+							AccountId = home.Id,
+							MailingPostalCode = '12345'
+						)
 					)
 				}
 			);
@@ -125,17 +141,21 @@ private class FuzzyPairingTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Katherine',
-						LastName = 'Fuzzy',
-						AccountId = household('Fuzzy One').Id,
-						MailingPostalCode = '12345-6789'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Katherine',
+							LastName = 'Fuzzy',
+							AccountId = household('Fuzzy One').Id,
+							MailingPostalCode = '12345-6789'
+						)
 					),
-					new Contact(
-						FirstName = 'Katharine',
-						LastName = 'Fuzzy',
-						AccountId = household('Fuzzy Two').Id,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Katharine',
+							LastName = 'Fuzzy',
+							AccountId = household('Fuzzy Two').Id,
+							MailingPostalCode = '12345'
+						)
 					)
 				}
 			);
@@ -155,19 +175,25 @@ private class FuzzyPairingTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Sam',
-						LastName = 'Fuzzy',
-						Phone = '(555) 010-2000',
-						Birthdate = Date.newInstance(1950, 1, 1)
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Sam',
+							LastName = 'Fuzzy',
+							Phone = '(555) 010-2000',
+							Birthdate = Date.newInstance(1950, 1, 1)
+						)
 					),
-					new Contact(
-						FirstName = 'Sam',
-						LastName = 'Fuzzy',
-						Phone = '555.010.2000',
-						Birthdate = Date.newInstance(1980, 1, 1)
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Sam',
+							LastName = 'Fuzzy',
+							Phone = '555.010.2000',
+							Birthdate = Date.newInstance(1980, 1, 1)
+						)
 					),
-					new Contact(FirstName = 'Sam', LastName = 'Fuzzy', Phone = '15550102000')
+					TestDataFactory.person(
+						new Contact(FirstName = 'Sam', LastName = 'Fuzzy', Phone = '15550102000')
+					)
 				}
 			);
 
@@ -225,20 +251,26 @@ private class FuzzyPairingTest {
 			HouseholdTestDataFactory.save(settings);
 			List<Contact> people = insertPeople(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Jonathan',
-						LastName = 'Fuzzy',
-						Email = 'jf@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathan',
+							LastName = 'Fuzzy',
+							Email = 'jf@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Jonathon',
-						LastName = 'Fuzzy',
-						Email = 'jf@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathon',
+							LastName = 'Fuzzy',
+							Email = 'jf@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Jonathan.',
-						LastName = 'FUZZY',
-						Email = 'jf@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jonathan.',
+							LastName = 'FUZZY',
+							Email = 'jf@example.org'
+						)
 					)
 				}
 			);
@@ -256,15 +288,23 @@ private class FuzzyPairingTest {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 251; i++) {
 				people.add(
-					new Contact(
-						FirstName = 'Person' + i,
-						LastName = 'Bulkfuzz',
-						Email = 'p' + i + '@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Person' + i,
+							LastName = 'Bulkfuzz',
+							Email = 'p' + i + '@example.org'
+						)
 					)
 				);
 			}
 			people.add(
-				new Contact(FirstName = 'Person7', LastName = 'Bulkfuzz', Email = 'p7@example.org')
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Person7',
+						LastName = 'Bulkfuzz',
+						Email = 'p7@example.org'
+					)
+				)
 			);
 			insertPeople(people);
 			List<Id> chunk = new List<Id>();
@@ -299,8 +339,12 @@ private class FuzzyPairingTest {
 		System.runAs(TestUsers.admin()) {
 			people = insertPeople(
 				new List<Contact>{
-					new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org'),
-					new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org')
+					TestDataFactory.person(
+						new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org')
+					),
+					TestDataFactory.person(
+						new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org')
+					)
 				}
 			);
 		}
