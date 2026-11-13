@@ -6,6 +6,10 @@
     Reads library documents, compliance obligations and cycles, and agreements; answers their own
     policy acknowledgments.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Corporate_Hub</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>CorporateHubController</apexClass>
     <enabled>true</enabled>

@@ -146,6 +146,11 @@ DEPLOY_FULL="${DEPLOY_FULL:-0}"
 # no coverage, so run-org-tests.sh passes 0 there.
 DEPLOY_APEX_ALWAYS="${DEPLOY_APEX_ALWAYS:-1}"
 DEPLOY_STATE_DIR="${DEPLOY_STATE_DIR:-${HOME}/.local/state/barncrm/deploy-state}"
+# Which module apps the org gets (ADR-NEXT, module apps). auto (the default) leaves the apps
+# listed in scripts/org/capped-org-apps.py out of a scratch or Developer Edition org, which
+# refuses a custom app past about 10, and deploys every app anywhere else; capped and all force
+# either. See "MODULE APPS ON A CAPPED ORG" below.
+MODULE_APPS="${MODULE_APPS:-auto}"
 
 ALIAS="${1:-}"
 if [[ -z "$ALIAS" || "$ALIAS" == --* ]]; then
@@ -172,7 +177,8 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 for setting in "DATA_MODEL_STAGES:per-object|combined" "CONFIG_STAGES:separate|combined" \
-  "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1"; do
+  "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1" \
+  "MODULE_APPS:auto|capped|all"; do
   name="${setting%%:*}"
   if [[ ! "${!name}" =~ ^(${setting#*:})$ ]]; then
     echo "${name} must be one of ${setting#*:}, not ${!name}." >&2
@@ -556,6 +562,22 @@ newest_deploy_request() {
     --query "SELECT Id FROM DeployRequest ORDER BY CreatedDate DESC LIMIT 1"
   jq -r '.result.records[0].Id // empty' "$capture" 2> /dev/null
   rm -f "$capture"
+}
+
+# "capped" when the org refuses a custom app past about 10: a Developer Edition org, or a scratch
+# org (every scratch org has a TrialExpirationDate, whatever its edition). "all" otherwise, and
+# when the lookup fails: a real org must never lose an app, and a capped org then fails on the
+# limit with the platform's own message (ADR-NEXT, module apps).
+org_app_limit() {
+  local capture verdict
+  capture="$(mktemp)"
+  run_capped "$REPORT_TIMEOUT_SECONDS" "$capture" sf data query --target-org "$ALIAS" --json \
+    --query "SELECT OrganizationType, TrialExpirationDate FROM Organization"
+  verdict="$(jq -r '.result.records[0] // empty
+    | if .OrganizationType == "Developer Edition" or .TrialExpirationDate != null
+      then "capped" else "all" end' "$capture" 2> /dev/null)"
+  rm -f "$capture"
+  echo "${verdict:-all}"
 }
 
 deploy_fingerprint() {
@@ -961,9 +983,26 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
+  # MODULE APPS ON A CAPPED ORG (ADR-NEXT, module apps). A scratch or Developer Edition org refuses
+  # a custom app past about 10 (barn-sales and oi-test, 2026-11-07), and the suite ships more. On
+  # such an org the modules capped-org-apps.py lists deploy without their applications and
+  # permissionsets folders, and their permission sets follow in a stage of their own with the
+  # left-out apps' visibilities removed (a set naming a missing app fails). Their tabs still join
+  # the BarnCRM apps below. Every other org gets every app.
+  CAPPED_APP_MODULES=" "
+  [[ "$MODULE_APPS" == "auto" ]] && MODULE_APPS="$(org_app_limit)"
+  if [[ "$MODULE_APPS" == "capped" ]]; then
+    CAPPED_APP_MODULES=" $(python3 scripts/org/capped-org-apps.py modules | paste -sd' ' -) "
+    echo "== Capped org (scratch or Developer Edition): leaving out the apps of${CAPPED_APP_MODULES}=="
+  fi
   module_dirs() {
     if ! package_skipped "$1"; then
-      echo "packages/$1"
+      if [[ "$CAPPED_APP_MODULES" == *" $1 "* ]]; then
+        find "packages/$1/main/default" -mindepth 1 -maxdepth 1 -type d \
+          ! -name applications ! -name permissionsets | sort
+      else
+        echo "packages/$1"
+      fi
     elif [[ "$DEPLOY_APEX_ALWAYS" == "1" ]]; then
       apex_dirs "$1"
     fi
@@ -1005,14 +1044,28 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   restore_scheduled_jobs
   [[ "$status" -eq 0 ]] || exit "$status"
 
+  # The capped org's permission sets for the modules whose apps were left out (see MODULE APPS ON
+  # A CAPPED ORG above). A module unchanged since the last deploy keeps the sets already there.
+  capped_sets=()
+  for module in $CAPPED_APP_MODULES; do
+    package_skipped "$module" || capped_sets+=("$module")
+  done
+  if [[ ${#capped_sets[@]} -gt 0 ]]; then
+    CAPPED_SETS_DIR="$(mktemp -d)"
+    python3 scripts/org/capped-org-apps.py permission-sets "$CAPPED_SETS_DIR" "${capped_sets[@]}" || exit 1
+    deploy_stage "Permission sets without the left-out module apps" --metadata-dir "$CAPPED_SETS_DIR" || exit $?
+    rm -rf "$CAPPED_SETS_DIR"
+  fi
+
   # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. --all writes all four apps every time, so each holds exactly Core plus the
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
-  # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
-  # have no app of their own: these apps are where their tabs live (D-188).
+  # modules add their tabs to the BarnCRM apps). Module tabs stay here even for a module with an
+  # app of its own, which is how a capped org reaches the modules whose apps it does not get
+  # (ADR-NEXT, module apps).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
