@@ -48,11 +48,11 @@ private class RollupPreviewEaseTest {
 	}
 
 	private static Account parentWith(String name, List<String> children) {
-		Account parent = new Account(Name = name);
+		Account parent = TestDataFactory.organization(new Account(Name = name));
 		insert parent;
 		List<Account> kids = new List<Account>();
 		for (String child : children) {
-			kids.add(new Account(Name = child, ParentId = parent.Id));
+			kids.add(TestDataFactory.organization(new Account(Name = child, ParentId = parent.Id)));
 		}
 		insert kids;
 		return parent;
