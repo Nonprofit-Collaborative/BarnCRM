@@ -113,8 +113,8 @@ public with sharing class ModuleSetups {
 
 	/** The revision a marker entry records: the number after the separator, else 1. */
 	private static Integer revisionIn(String entry) {
-		String number = entry.substringAfter(REVISION_SEPARATOR).trim();
-		return number.isNumeric() ? Integer.valueOf(number) : 1;
+		String digits = entry.substringAfter(REVISION_SEPARATOR).trim();
+		return digits.isNumeric() ? Integer.valueOf(digits) : 1;
 	}
 
 	/** The revision the package's setup class declares now, 1 when it declares none. */
