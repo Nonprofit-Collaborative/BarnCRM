@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Request panel: triage a request, read and add comments (internal or shared with the
+    requester), and create a project task or change request from it (D-201).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Projects Request Panel</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Project_Request__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

@@ -8,6 +8,10 @@
     roles.
   </description>
   <classAccesses>
+    <apexClass>ProjectRequestsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ProjectBillingController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -831,6 +835,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Projects_Staffing</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Projects_Requests</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

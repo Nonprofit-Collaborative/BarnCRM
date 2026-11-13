@@ -248,8 +248,10 @@ CAPS = {
     # revenue (PM-11: ProjectFinancials, ProjectRevenue and its nightly step, health with change
     # hours): +12,766. 97,102 measured, plus about 2%. Review fixes (#1237: invoice delete guard,
     # row cap, resources helper) and the release-gate fixes (revenue Chunk queueable, rate query):
-    # 99,230 measured, plus about 2%.
-    "projects": 101_200,
+    # 99,230 measured, plus about 2%. Requests and issues (D-201, ADR-NEXT projects requests):
+    # the request rules and notices (ProjectRequestHandler), the Requests tab controller and the
+    # settings accessors, +19,475: 119,446 measured, plus about 2%.
+    "projects": 121_800,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

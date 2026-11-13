@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Requests: requests and issues by view, mine, open, unassigned, overdue and recently closed,
+    with the request panel beside the list (D-201).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Projects Requests</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

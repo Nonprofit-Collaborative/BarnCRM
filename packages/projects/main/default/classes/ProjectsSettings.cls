@@ -67,6 +67,39 @@ public with sharing class ProjectsSettings {
 		return part('Change_Requests_Enabled__c');
 	}
 
+	/** D-201: requests and issues. Does not need time tracking. */
+	public static Boolean requestsEnabled() {
+		return flag('Requests_Enabled__c');
+	}
+
+	/** D-201: requests from the portal and request connections; needs requests on. */
+	public static Boolean requestsExternalEnabled() {
+		return requestsEnabled() && flag('Requests_External_Enabled__c');
+	}
+
+	/** Weekdays from a request's creation to its due date, by its priority. */
+	public static Integer requestDueDays(String priority) {
+		switch on priority {
+			when 'Urgent' {
+				return number('Request_Days_Urgent__c', 1, 365);
+			}
+			when 'High' {
+				return number('Request_Days_High__c', 2, 365);
+			}
+			when 'Low' {
+				return number('Request_Days_Low__c', 10, 365);
+			}
+			when else {
+				return number('Request_Days_Medium__c', 5, 365);
+			}
+		}
+	}
+
+	private static Boolean flag(String key) {
+		Object stored = read(key);
+		return stored != null && Boolean.valueOf(String.valueOf(stored));
+	}
+
 	/** Days from an invoice's date to its due date. */
 	public static Integer invoiceDueDays() {
 		return number('Invoice_Due_Days__c', 30, 365);

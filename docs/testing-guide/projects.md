@@ -294,3 +294,37 @@ and Track change requests are off (PM-10 to PM-12).
 | 5 | Turn off Track change requests. Add another change request. Open the project. | The new request is refused ("Change requests are turned off..."); the approved one still counts (Change Hours 10). |
 
 **Cleanup:** None.
+
+## T-PM-30: Requests Off at Install, Then Staff Requests
+
+**Purpose:** confirm the switch, R-PM23 and the Requests tab (D-201).
+**Prerequisites:** T-PM-01. A Contact with an email address you can read (the requester).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Requests tab. Try to save a new Request from the Request object. | The tab says requests are off; the save is refused ("Requests are turned off..."). |
+| 2 | Turn on Track requests and issues. As staff A, **New Request**: subject, priority High, the requester. Save. | Saved with Channel Staff, a due date two weekdays from today, Requesting Organization the requester's account. |
+| 3 | On the Requests tab, **My Open**. | The request is listed with its number, status New and due date. |
+| 4 | Open it. Set Status Resolved with no resolution. Save. | Refused: "Enter a resolution before marking the request Resolved." |
+| 5 | Add an internal comment, then a comment with Share with requester checked. | Both in the thread, marked Internal and Shared; the requester gets one email, for the shared comment. |
+| 6 | Enter a Resolution, set Resolved, Save. | Resolved Date set; the requester is emailed the resolution; the request moves to Recently Closed. |
+
+**Cleanup:** Delete the request.
+
+## T-PM-31: Assigning, Queues, Overdue and Linked Work
+
+**Purpose:** confirm assignment notices, the Requests queue, Overdue, Create Task and Create
+Change Request.
+**Prerequisites:** T-PM-30; Track change requests on; a project.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open a request and set its Owner to staff A. Save. | Staff A gets a bell notice "Request REQ-... assigned to you". |
+| 2 | On the request record page, change Owner to the Requests queue. | It appears in **Unassigned**. |
+| 3 | Set a request's Due Date to yesterday, Status In Progress. Then set Status Waiting on Requester. | Listed under **Overdue** with the due date in red; once Waiting on Requester it is no longer Overdue. |
+| 4 | Create Task with no project. | Refused: "Choose the request's project and save first." |
+| 5 | Choose the project, Save, then **Create Task** and **Create Change Request**. | A task named from the subject on the project and a Draft change request, both shown on the panel; a New request moves to In Progress. |
+| 6 | Log time on the project with Request set to this request. | The time entry shows in the request's Time Entries list. |
+| 7 | Run the reports Open Requests, Overdue Requests and Requests Resolved This Month. | Each lists the matching requests. |
+
+**Cleanup:** Delete the requests, task and change request.

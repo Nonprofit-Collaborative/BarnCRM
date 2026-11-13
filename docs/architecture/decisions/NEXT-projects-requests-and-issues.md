@@ -106,7 +106,9 @@ anything arrives; two switches would add a second thing to forget without adding
 - **Before save** (`ProjectRequestHandler`, registry row `Project_Request_Rules`, Always Runs):
   a blank Channel becomes Staff when the saving user can create requests and Portal otherwise
   (only the portal's integration user, which has no object access, saves one without that right);
-  a Portal or Partner Organization request is refused unless both switches are on; a blank Due
+  a Portal or Partner Organization request is refused unless both switches are on, and goes to
+  the shipped **Requests** queue (`Project_Requests`) rather than the integration user that saved
+  it, so its members are told and it shows as Unassigned; a blank Due
   Date becomes today plus the priority's days, counted in weekdays; a blank Requesting
   Organization takes the requester's Account; Resolved or Closed stamps Resolved Date and a
   reopen clears it; a save by a user who cannot edit requests (the portal) keeps Subject,
