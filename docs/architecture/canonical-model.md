@@ -2067,6 +2067,23 @@ missed; it is the mode the packaged giving definitions ship with, because it is 
 combination that keeps the numbers visibly right (Principle 2). Real-time needs a trigger on
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
+Since D-200 P1 the nightly run recalculates every record once a week, on the night
+`Full_Recalc_Day__c` names (Section 14B), and on the other nights a Both definition only where
+something can have changed since the last covered run (R-R4b).
+
+**R-R4b Nightly scope (D-200 P1).** The nightly run recalculates every Scheduled and Both
+definition over every record when no run is covered yet (`Nightly_Covered_From__c` blank), on
+the night `Full_Recalc_Day__c` names (or every night when it says Every_Night), and when all
+automation was paused since the last covered run. On other nights a definition still runs over
+every record when it is Scheduled, never calculated, includes deleted records, has a target
+filter that compares a date with today, is fiscal-year aware on the first night of a fiscal
+year, or filters on this year or last year on the first night of a calendar year. Every other
+Both definition queues only the targets of source records whose `SystemModstamp` is at or after
+the last covered run's start, of source records deleted since then, and, for a source condition
+in the last n days on a date or date and time attribute, of records whose date has moved into
+or out of the window since then. Every night first retries Failed Rollup Queue entries and
+releases held Pending ones. A run whose passes all finish with no chunk stopped stores its start
+in `Nightly_Covered_From__c`.
 
 **R-R4a Bypass by custom permission.** A definition whose Bypass Permission names a custom
 permission the running user holds is left out of every real-time path for that user's saves:
@@ -2703,6 +2720,11 @@ uncharged, and are routed again.
   processor queued with a delay, the time it is due). A processor that died is still found
   missing: by the subscriber's exact check while the stamp is recent, and by the next save once
   it is not. The subscriber, background jobs and the nightly run keep the exact check.
+- **Nightly scope (D-200 P1, R-R4b):** `RollupNightlyBatch` plans each night from
+  `Full_Recalc_Day__c` and `Nightly_Covered_From__c` on `Rollup_Settings__c` (Section 14B):
+  the full run, or one batch pass per source entity that queues the targets of what changed.
+  Each night it first releases held Pending entries (Next Attempt cleared) and retries Failed
+  ones.
 
 ---
 
@@ -2738,6 +2760,8 @@ settings console shows them in its Rollups section as before.
 | `Nightly_Run_Hour__c` | integer(0 to 23) | 2 | The hour the nightly run starts (R-R4), in the time zone of the person who scheduled it, shown as a time (2:00 AM). Blank or out of range means 2. |
 | `Large_Parent_Hours__c` | integer(0 to 24) | 1 | The fewest hours between two large parent runs (R-RQ6, D-200 P2); 0 runs as soon as possible. Blank or out of range means 1. |
 | `Processor_Requested_At__c` | datetime | blank | Not a setting and not in the console: when the Rollup Queue last asked for a processor (D-200 P13, Section 14A). Written by the engine only. |
+| `Full_Recalc_Day__c` | picklist(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Every_Night) | Sunday | The night the nightly run recalculates every Scheduled and Both total over every record (R-R4b, D-200 P1); Every_Night (shown as Every night) does so every night. Stored as text, the values declared on Setting Definition `Rollup_Full_Recalc_Day`. Blank or unknown means Sunday. |
+| `Nightly_Covered_From__c` | datetime | blank | Not a setting and not in the console: the start of the last nightly run that covered every change before it (R-R4b). Blank means the next night recalculates everything. Written by the engine only. |
 
 ---
 
@@ -19044,6 +19068,7 @@ mirrors the primary member).
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
 | 1.55 | 2026-11-12 | Rollups under load (D-200 P2, P10, P13, release 1.22). `Automation_Registry__mdt` gains `Runs_On_Rollup_Writes__c` (Checkbox): during a `RollupWriter` update, Contact and Account run only rows so marked or Always Runs (shipped on donor level and donor score assignment and `Core_Rollups_Contact`). `Rollup_Settings__c` gains `Large_Parent_Hours__c` (Number, default 1, Setting Definition `Rollup_Large_Parent_Hours`) and `Processor_Requested_At__c` (DateTime, engine only); `Rollup_Run_Lock__c` gains `Last_Run_Started__c` (DateTime): a large parent run starts at most once per that many hours, and a save that queues totals finds a processor without a query. No object added. |
+| 1.56 | 2026-11-12 | Nightly rollup scope (D-200 P1, release 1.22; ADR-0082 amendment of 2026-11-12). Rule R-R4b: every record once a week on the night `Full_Recalc_Day__c` names (Text, default Sunday, Setting Definition `Rollup_Full_Recalc_Day`, Every_Night keeps the nightly sweep); other nights only the targets of source records changed or deleted since `Nightly_Covered_From__c` (DateTime, engine only) and of records crossing a last n days window, with the definitions that changes cannot cover still run everywhere. Every night retries Failed and releases held Rollup Queue entries. No object added. |
 
 ---
 ## 32. Entity ownership by package

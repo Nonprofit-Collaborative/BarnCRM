@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Nightly_Covered_From__c</fullName>
+    <description>Not a setting: when the last nightly rollup run that finished started. The next night recalculates the targets of source records changed since then (D-200 P1). Blank means the next night recalculates everything. Written by the engine only; not shown in the settings console.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Used by BarnCRM to know which changes the nightly rollup run has already covered.</inlineHelpText>
+    <label>Nightly Covered From</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

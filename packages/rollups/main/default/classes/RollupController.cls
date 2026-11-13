@@ -88,6 +88,9 @@ public with sharing class RollupController {
 		/** The Large Parent Hours setting: the fewest hours between large parent runs (D-200 P2). */
 		@AuraEnabled
 		public Integer largeParentHours { get; set; }
+		/** The night of the full recalculation, Sunday to Saturday or Every_Night (D-200 P1). */
+		@AuraEnabled
+		public String fullRecalcDay { get; set; }
 		@AuraEnabled
 		public Datetime lastCalculated { get; set; }
 		@AuraEnabled
@@ -410,6 +413,7 @@ public with sharing class RollupController {
 		page.nextRunAt = RollupScheduler.nextRunAt();
 		page.nightlyTime = RollupScheduler.nightlyTime();
 		page.largeParentHours = RollupLargeParentBatch.largeParentHours();
+		page.fullRecalcDay = RollupNightlyBatch.fullRecalcDay();
 		page.lastCalculated = RollupService.lastCalculated();
 		page.stale = RollupService.isStale();
 		page.defaultMode = RollupService.defaultMode();

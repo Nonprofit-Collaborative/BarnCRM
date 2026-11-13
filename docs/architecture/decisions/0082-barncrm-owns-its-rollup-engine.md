@@ -12,6 +12,17 @@ deferred; a Flow action and a developer entry point are `global` besides the tri
 ADR-0138 (`0138-instant-totals-generated-trigger-deployed-by-the-admin.md`): for decision 8,
 the Builder generates the trigger and its test for any object that can carry one, and the
 admin deploys them; the one-click Metadata API deploy is deferred.
+**Amendment 2026-11-12 (D-200 P1), decision 4:** the nightly full recalculation runs once a
+week, on the night the Rollups setting **Night of the full recalculation** names (default
+Sunday; Every night keeps it nightly). On the other nights the safety net covers only what can
+have changed since the last covered run (`Rollup_Settings__c.Nightly_Covered_From__c`): the
+targets of source records whose `SystemModstamp` is since then or that were deleted since, and
+of records crossing a last n days window. Definitions changes cannot cover still run over every
+record that night: Scheduled ones, ones never calculated or counting deleted records, target
+filters comparing a date with today, fiscal-year definitions on the first night of a fiscal
+year, and this year or last year filters on the first night of a calendar year; a pause of all
+automation since the last run makes the whole night full. Every night also retries Failed and
+releases held queue entries. Canonical model rule R-R4b; `RollupNightlyBatch`.
 **Date:** 2026-10-12
 **Source:** owner decision 2026-10-12; plan Section 4.10; builds on ADR-0011, ADR-0015,
 ADR-0021, ADR-0022 and ADR-0040

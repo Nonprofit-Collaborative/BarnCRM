@@ -342,6 +342,28 @@ public without sharing class RollupQueue implements Queueable {
 	}
 
 	/**
+	 * The nightly run's release (D-200 P1): Pending entries held for a later attempt, a refused
+	 * write's wait or a large record's hours, are due now, so none waits past the night.
+	 *
+	 * @return how many entries were released
+	 */
+	public static Integer releaseHeld() {
+		Datetime now = Datetime.now();
+		List<Rollup_Queue__c> held = [
+			SELECT Id
+			FROM Rollup_Queue__c
+			WHERE Status__c = :STATUS_PENDING AND Next_Attempt__c > :now
+			WITH SYSTEM_MODE
+			LIMIT 10000
+		];
+		for (Rollup_Queue__c entry : held) {
+			entry.Next_Attempt__c = null;
+		}
+		Database.update(held, false, AccessLevel.SYSTEM_MODE);
+		return held.size();
+	}
+
+	/**
 	 * Starts a processor when Pending entries wait and none is queued (ROLLUPS-7). A save that
 	 * could not queue a job (its allowance used, or automation paused) leaves its entries for the
 	 * next save that does; the nightly run, the end of a pause and Retry call this so they never
