@@ -27,7 +27,7 @@ private class StewardshipPlanTriggerHandlerTest {
 		if (found.isEmpty()) {
 			insert template;
 		}
-		Contact person = new Contact(LastName = 'Okafor');
+		Contact person = TestDataFactory.person(new Contact(LastName = 'Okafor'));
 		insert person;
 		Stewardship_Plan__c plan = new Stewardship_Plan__c(
 			Contact__c = person.Id,

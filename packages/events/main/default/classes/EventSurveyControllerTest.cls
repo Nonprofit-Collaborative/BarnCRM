@@ -63,10 +63,8 @@ private class EventSurveyControllerTest {
 	}
 
 	private static Event_Attendee__c attendee(Event__c event, String last) {
-		Contact person = new Contact(
-			FirstName = 'A',
-			LastName = last,
-			Email = last + '@example.org'
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'A', LastName = last, Email = last + '@example.org')
 		);
 		insert as user person;
 		EventPersonMatcher.PersonInput input = new EventPersonMatcher.PersonInput();

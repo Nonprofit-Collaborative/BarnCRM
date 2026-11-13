@@ -52,7 +52,7 @@ private class AddressDeleteHandlerTest {
 	static void keepLeavesTheAddresses() {
 		System.runAs(TestUsers.admin()) {
 			SettingsService.saveSystemValue('Address_Delete_Behavior__c', 'Keep');
-			Contact lee = new Contact(LastName = 'Lee');
+			Contact lee = TestDataFactory.person(new Contact(LastName = 'Lee'));
 			Database.insert(lee, AccessLevel.SYSTEM_MODE);
 			Address__c home = addressOf(Address__c.Contact__c, lee.Id, '12 Elm Street');
 
@@ -69,9 +69,15 @@ private class AddressDeleteHandlerTest {
 	@IsTest
 	static void aPersonsAddressGoesWithThemButAMergeKeepsIt() {
 		System.runAs(TestUsers.admin()) {
-			Contact sam = new Contact(LastName = 'Rivera', FirstName = 'Sam');
-			Contact samuel = new Contact(LastName = 'Rivera', FirstName = 'Samuel');
-			Contact ana = new Contact(LastName = 'Ortiz', FirstName = 'Ana');
+			Contact sam = TestDataFactory.person(
+				new Contact(LastName = 'Rivera', FirstName = 'Sam')
+			);
+			Contact samuel = TestDataFactory.person(
+				new Contact(LastName = 'Rivera', FirstName = 'Samuel')
+			);
+			Contact ana = TestDataFactory.person(
+				new Contact(LastName = 'Ortiz', FirstName = 'Ana')
+			);
 			Database.insert(new List<Contact>{ sam, samuel, ana }, AccessLevel.SYSTEM_MODE);
 			Address__c samuels = addressOf(Address__c.Contact__c, samuel.Id, '9 Oak Road');
 			Address__c anas = addressOf(Address__c.Contact__c, ana.Id, '3 Pine Court');

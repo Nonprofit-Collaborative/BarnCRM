@@ -58,7 +58,9 @@ private class HubRemindersTest {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Board__c board = new Board__c(Name = 'Board', Type__c = 'Board', Status__c = 'Active');
 			insert board;
-			Contact ade = new Contact(FirstName = 'Ade', LastName = 'Member');
+			Contact ade = TestDataFactory.person(
+				new Contact(FirstName = 'Ade', LastName = 'Member')
+			);
 			insert ade;
 			Board_Member__c seat = new Board_Member__c(
 				Board__c = board.Id,

@@ -227,11 +227,17 @@ private class RollupPlannerTest {
 	@IsTest
 	static void aRowLimitKeepsTheFirstRowsOfEachParentAndFirstIgnoresTheDirection() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account parent = new Account(Name = 'Parent');
+			Account parent = TestDataFactory.organization(new Account(Name = 'Parent'));
 			insert parent;
-			List<Account> children = new List<Account>{ new Account(Name = 'Kid blank') };
+			List<Account> children = new List<Account>{
+				TestDataFactory.organization(new Account(Name = 'Kid blank'))
+			};
 			for (Integer size : new List<Integer>{ 10, 50, 30, 40 }) {
-				children.add(new Account(Name = 'Kid ' + size, NumberOfEmployees = size));
+				children.add(
+					TestDataFactory.organization(
+						new Account(Name = 'Kid ' + size, NumberOfEmployees = size)
+					)
+				);
 			}
 			for (Account child : children) {
 				child.ParentId = parent.Id;

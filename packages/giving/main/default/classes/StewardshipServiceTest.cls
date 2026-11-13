@@ -45,7 +45,9 @@ private class StewardshipServiceTest {
 	}
 
 	private static Contact donor() {
-		Contact person = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+		);
 		insert person;
 		return person;
 	}
@@ -313,7 +315,11 @@ private class StewardshipServiceTest {
 
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(new Contact(FirstName = 'Donor', LastName = 'Number' + i));
+				people.add(
+					TestDataFactory.person(
+						new Contact(FirstName = 'Donor', LastName = 'Number' + i)
+					)
+				);
 			}
 			insert people;
 			List<Gift__c> gifts = new List<Gift__c>();

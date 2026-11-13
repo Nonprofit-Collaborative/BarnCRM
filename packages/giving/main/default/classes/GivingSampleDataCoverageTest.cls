@@ -13,18 +13,22 @@ private class GivingSampleDataCoverageTest {
 	private static final String PERSON_KEY = 'H001-1';
 
 	private static void insertSamplePerson() {
-		Account household = new Account(
-			Name = 'The Sample Family',
-			Sample_Data__c = true,
-			Sample_Data_Key__c = 'H001'
+		Account household = TestDataFactory.household(
+			new Account(
+				Name = 'The Sample Family',
+				Sample_Data__c = true,
+				Sample_Data_Key__c = 'H001'
+			)
 		);
 		insert household;
-		insert new Contact(
-			FirstName = 'Maria',
-			LastName = 'Sample',
-			AccountId = household.Id,
-			Sample_Data__c = true,
-			Sample_Data_Key__c = PERSON_KEY
+		insert TestDataFactory.person(
+			new Contact(
+				FirstName = 'Maria',
+				LastName = 'Sample',
+				AccountId = household.Id,
+				Sample_Data__c = true,
+				Sample_Data_Key__c = PERSON_KEY
+			)
 		);
 	}
 

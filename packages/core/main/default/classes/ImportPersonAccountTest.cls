@@ -267,9 +267,11 @@ private class ImportPersonAccountTest {
 				return;
 			}
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			Account existing = new Account(
-				RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId(),
-				BillingPostalCode = '97201'
+			Account existing = TestDataFactory.organization(
+				new Account(
+					RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId(),
+					BillingPostalCode = '97201'
+				)
 			);
 			existing.put('FirstName', 'Ana');
 			existing.put('LastName', 'Ramirez');

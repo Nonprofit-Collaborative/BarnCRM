@@ -30,7 +30,9 @@ private class EventApplicationsControllerTest {
 	}
 
 	private static Speaker_Application__c application(Event__c event, String title, String email) {
-		Contact person = new Contact(FirstName = 'Ana', LastName = title, Email = email);
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = title, Email = email)
+		);
 		insert as user person;
 		Speaker_Application__c record = new Speaker_Application__c(
 			Event__c = event.Id,

@@ -50,7 +50,7 @@ private class EventBudgetControllerTest {
 			Expected__c = 800,
 			Received__c = 300
 		);
-		Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+		Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 		insert as user ana;
 		// System mode: Amount Paid is written by the payment listener, never typed by staff.
 		insert as system new Event_Registration__c(

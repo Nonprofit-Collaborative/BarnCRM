@@ -156,7 +156,7 @@ private class OpportunityMirrorCopyTest {
 			if (personType == null) {
 				return; // An org without person accounts has no such path to prove.
 			}
-			SObject person = new Account(RecordTypeId = personType);
+			SObject person = TestDataFactory.organization(new Account(RecordTypeId = personType));
 			person.put('LastName', 'Okafor');
 			insert person;
 			Id personContactId = (Id) Database.query(
@@ -281,10 +281,8 @@ private class OpportunityMirrorCopyTest {
 	static void aNewDonorReplacesThePrimaryContact() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User admin = maria();
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Garcia',
-				AccountId = luis().AccountId
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia', AccountId = luis().AccountId)
 			);
 			insert ana;
 			Gift__c given = gift(100);
@@ -384,12 +382,12 @@ private class OpportunityMirrorCopyTest {
 			System.runAs(new User(Id = UserInfo.getUserId())) {
 				update new User(Id = rosa.Id, ProfileId = readOnly[0].Id);
 			}
-			Account household = new Account(Name = 'The Ruiz Household', OwnerId = rosa.Id);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Ruiz Household', OwnerId = rosa.Id)
+			);
 			insert household;
-			Contact donor = new Contact(
-				LastName = 'Ruiz',
-				AccountId = household.Id,
-				OwnerId = rosa.Id
+			Contact donor = TestDataFactory.person(
+				new Contact(LastName = 'Ruiz', AccountId = household.Id, OwnerId = rosa.Id)
 			);
 			insert donor;
 			List<Gift__c> gifts = GivingTestDataFactory.buildGifts(donor.Id, 2, 10);

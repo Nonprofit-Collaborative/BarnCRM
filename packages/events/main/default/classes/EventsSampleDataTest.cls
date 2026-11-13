@@ -23,12 +23,14 @@ private class EventsSampleDataTest {
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < 9; i++) {
 			people.add(
-				new Contact(
-					FirstName = 'Sample',
-					LastName = 'Person' + i,
-					Email = 'sample' + i + '@example.org',
-					Sample_Data__c = true,
-					Sample_Data_Key__c = 'H' + String.valueOf(100 + i) + '-1'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Sample',
+						LastName = 'Person' + i,
+						Email = 'sample' + i + '@example.org',
+						Sample_Data__c = true,
+						Sample_Data_Key__c = 'H' + String.valueOf(100 + i) + '-1'
+					)
 				)
 			);
 		}
@@ -210,7 +212,7 @@ private class EventsSampleDataTest {
 				End__c = Datetime.now().addDays(20).addHours(2)
 			);
 			insert as user real;
-			Contact person = new Contact(LastName = 'Real Person');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Real Person'));
 			insert as user person;
 			insert as user new Event_Registration__c(
 				Event__c = real.Id,

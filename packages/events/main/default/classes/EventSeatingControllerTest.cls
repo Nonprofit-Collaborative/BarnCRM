@@ -65,7 +65,7 @@ private class EventSeatingControllerTest {
 		System.runAs(staff()) {
 			Event__c event = gala();
 			register(event.Id, 'Rivera', 1);
-			Account sponsorAccount = new Account(Name = 'Acme Co');
+			Account sponsorAccount = TestDataFactory.organization(new Account(Name = 'Acme Co'));
 			insert as user sponsorAccount;
 			Id sponsorId = EventSponsorsController.addSponsor(event.Id, sponsorAccount.Id, null);
 			Test.startTest();

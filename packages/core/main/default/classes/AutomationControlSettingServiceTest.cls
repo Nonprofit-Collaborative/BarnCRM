@@ -133,7 +133,7 @@ private class AutomationControlSettingServiceTest {
 	@IsTest
 	static void theOrganizationRowCannotBeRemovedAndAnUnknownOwnerIsRefused() {
 		System.runAs(TestUsers.admin()) {
-			Account notAnOwner = new Account(Name = 'Not a profile');
+			Account notAnOwner = TestDataFactory.organization(new Account(Name = 'Not a profile'));
 			insert as user notAnOwner;
 			List<String> messages = new List<String>();
 

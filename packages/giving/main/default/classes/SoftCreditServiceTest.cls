@@ -139,7 +139,11 @@ private class SoftCreditServiceTest {
 				.getRecordTypeId();
 			List<Account> households = new List<Account>();
 			for (Integer i = 0; i < 200; i++) {
-				households.add(new Account(Name = 'Household ' + i, RecordTypeId = householdType));
+				households.add(
+					TestDataFactory.household(
+						new Account(Name = 'Household ' + i, RecordTypeId = householdType)
+					)
+				);
 			}
 			Database.insert(households, AccessLevel.SYSTEM_MODE);
 			Account givers = RecognitionTestData.household('The Garcia Family');
@@ -147,9 +151,17 @@ private class SoftCreditServiceTest {
 			RecognitionTestData.gift(ana.Id, null, 500);
 			List<Contact> people = new List<Contact>();
 			for (Account household : households) {
-				people.add(new Contact(LastName = household.Name, AccountId = household.Id));
+				people.add(
+					TestDataFactory.person(
+						new Contact(LastName = household.Name, AccountId = household.Id)
+					)
+				);
 			}
-			people.add(new Contact(FirstName = 'Luis', LastName = 'Garcia', AccountId = givers.Id));
+			people.add(
+				TestDataFactory.person(
+					new Contact(FirstName = 'Luis', LastName = 'Garcia', AccountId = givers.Id)
+				)
+			);
 
 			Test.startTest();
 			insert people;

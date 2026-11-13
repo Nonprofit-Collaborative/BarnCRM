@@ -33,7 +33,11 @@ private class BackupSetServiceTest {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < 30; index++) {
-			people.add(new Contact(LastName = 'Person ' + index, Title = 'Volunteer'));
+			people.add(
+				TestDataFactory.person(
+					new Contact(LastName = 'Person ' + index, Title = 'Volunteer')
+				)
+			);
 		}
 		insert people;
 		Saved_Query__c query = new Saved_Query__c(

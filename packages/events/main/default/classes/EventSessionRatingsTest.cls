@@ -127,7 +127,9 @@ private class EventSessionRatingsTest {
 			event.Session_Rating_Form_Key__c = FORM_KEY;
 			update as user event;
 			Event_Session__c talk = session(event, 'Talk A', 'Confirmed');
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia')
+			);
 			insert as user ana;
 			Id speakerId = EventSpeakersController.addSpeaker(event.Id, ana.Id);
 			EventSpeakersController.assign(talk.Id, speakerId, 'Speaker');

@@ -405,7 +405,7 @@ private class ImportBatchServiceTest {
 				);
 			}
 			List<Import_Row__c> rows = ImportTestDataFactory.rows(batch, values);
-			Contact stale = new Contact(LastName = 'Stale');
+			Contact stale = TestDataFactory.person(new Contact(LastName = 'Stale'));
 			insert stale;
 			for (Import_Row__c row : rows) {
 				row.Status__c = ImportRowProcessor.STATUS_REJECTED;

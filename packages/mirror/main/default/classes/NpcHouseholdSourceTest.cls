@@ -29,7 +29,7 @@ private class NpcHouseholdSourceTest {
 	static void withoutNonprofitCloudNothingIsSelectedOrChecked() {
 		System.runAs(TestUsers.admin()) {
 			NpcHouseholdSource source = new NpcHouseholdSource();
-			Account plain = new Account(Name = 'Npc Source Plain');
+			Account plain = TestDataFactory.organization(new Account(Name = 'Npc Source Plain'));
 			insert plain;
 			List<NpspHouseholdSource.Household> read = source.read(new Set<Id>{ plain.Id });
 			Assert.areEqual(1, read.size(), 'the account is read');
@@ -161,7 +161,7 @@ private class NpcHouseholdSourceTest {
 	static void nothingIsReadOrCountedForNoAccountsOrWithoutTheNativeObjects() {
 		System.runAs(TestUsers.admin()) {
 			NpcHouseholdSource source = new NpcHouseholdSource();
-			Account plain = new Account(Name = 'Npc Source Counted');
+			Account plain = TestDataFactory.organization(new Account(Name = 'Npc Source Counted'));
 			insert plain;
 
 			Assert.isTrue(source.read(null).isEmpty(), 'no accounts asked for');
@@ -233,9 +233,11 @@ private class NpcHouseholdSourceTest {
 			List<Account> back = new List<Account>();
 			for (Integer i = 0; i < 3; i++) {
 				back.add(
-					new Account(
-						Name = 'Drift Back ' + i,
-						Household_Model__c = HouseholdSelector.MODEL_CONVERTED
+					TestDataFactory.household(
+						new Account(
+							Name = 'Drift Back ' + i,
+							Household_Model__c = HouseholdSelector.MODEL_CONVERTED
+						)
 					)
 				);
 			}
@@ -255,15 +257,19 @@ private class NpcHouseholdSourceTest {
 			Account collision = HouseholdTestDataFactory.newHousehold('Drift Collision');
 			Account settled = HouseholdTestDataFactory.newHousehold('Drift Settled');
 			settled.Household_Model__c = HouseholdSelector.MODEL_CONVERTED;
-			Account pinnedNoGroup = new Account(
-				Name = 'Drift Pinned',
-				Household_Model__c = HouseholdSelector.MODEL_NATIVE
+			Account pinnedNoGroup = TestDataFactory.household(
+				new Account(
+					Name = 'Drift Pinned',
+					Household_Model__c = HouseholdSelector.MODEL_NATIVE
+				)
 			);
-			Account convertedBack = new Account(
-				Name = 'Drift Converted Back',
-				Household_Model__c = HouseholdSelector.MODEL_CONVERTED
+			Account convertedBack = TestDataFactory.household(
+				new Account(
+					Name = 'Drift Converted Back',
+					Household_Model__c = HouseholdSelector.MODEL_CONVERTED
+				)
 			);
-			Account waiting = new Account(Name = 'Drift Waiting');
+			Account waiting = TestDataFactory.organization(new Account(Name = 'Drift Waiting'));
 			Database.insert(
 				new List<Account>{ collision, settled, pinnedNoGroup, convertedBack, waiting },
 				AccessLevel.SYSTEM_MODE

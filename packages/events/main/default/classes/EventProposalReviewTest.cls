@@ -18,7 +18,9 @@ private class EventProposalReviewTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = new Contact(FirstName = 'Ana', LastName = lastName);
+		Contact record = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = lastName)
+		);
 		insert as user record;
 		return record;
 	}
@@ -186,7 +188,7 @@ private class EventProposalReviewTest {
 			update as user new Event__c(Id = talk.Event__c, Review_Criteria__c = CRITERIA);
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < EventProposalReview.MAX_PRESENTERS + 1; i++) {
-				people.add(new Contact(LastName = 'Presenter' + i));
+				people.add(TestDataFactory.person(new Contact(LastName = 'Presenter' + i)));
 			}
 			insert as user people;
 

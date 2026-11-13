@@ -758,7 +758,9 @@ private class ImportControllerTest {
 		batch.Completed_At__c = Datetime.now().addMinutes(1);
 		batch.Undo_Deadline__c = Datetime.now().addDays(30);
 		update batch;
-		insert new Contact(LastName = 'Ramirez', Created_By_Import_Batch__c = batch.Id);
+		insert TestDataFactory.person(
+			new Contact(LastName = 'Ramirez', Created_By_Import_Batch__c = batch.Id)
+		);
 		return batch;
 	}
 

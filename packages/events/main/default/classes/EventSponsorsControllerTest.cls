@@ -41,7 +41,7 @@ private class EventSponsorsControllerTest {
 	}
 
 	private static Account organization(String name) {
-		Account record = new Account(Name = name);
+		Account record = TestDataFactory.organization(new Account(Name = name));
 		insert as user record;
 		return record;
 	}
