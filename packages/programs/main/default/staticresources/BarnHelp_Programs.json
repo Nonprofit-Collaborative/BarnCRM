@@ -76,6 +76,8 @@
     "Programs_Log_SessionCancelled": "This session was cancelled, so it takes no attendance.",
     "Programs_Log_UnsavedAsk": "You have unsaved attendance for {0} on {1}. Changing the service or date reloads the list, so save it first or discard it.",
     "Programs_Person_Empty": "Not enrolled in any program.",
+    "Programs_Glance_OpenEnrollments": "Open Enrollments",
+    "Programs_Glance_LastService": "Last Service",
     "Programs_Person_MoreThanShown": "Only the newest 200 are listed. The Enrollments tab lists them all.",
     "Programs_Person_NotAPerson": "Choose a person. An organization or household account cannot be enrolled or receive a service.",
     "Programs_Plan_BadOutcome": "Choose an outcome from the list.",

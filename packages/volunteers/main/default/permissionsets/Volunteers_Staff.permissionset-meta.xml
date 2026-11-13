@@ -476,6 +476,10 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
+    <tab>Log_Hours</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Skill__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

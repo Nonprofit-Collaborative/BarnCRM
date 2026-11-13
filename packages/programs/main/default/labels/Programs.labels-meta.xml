@@ -696,4 +696,20 @@
         <shortDescription>Schedule sessions: weekday choices</shortDescription>
         <value>Days of the Week</value>
     </labels>
+    <labels>
+        <fullName>Programs_Glance_Title</fullName>
+        <categories>Programs, Record pages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs at a Glance card title (D-200 R1)</shortDescription>
+        <value>Programs at a Glance</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Enroll</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that opens a new enrollment for a person (D-200 R1)</shortDescription>
+        <value>Enroll</value>
+    </labels>
 </CustomLabels>

@@ -1,6 +1,15 @@
 <template>
   <template lwc:if={showCard}>
     <lightning-card title={label.title} icon-name="custom:custom60">
+      <template lwc:if={canEnroll}>
+        <lightning-button
+          slot="actions"
+          label={label.enroll}
+          onclick={handleEnroll}
+          class="slds-var-m-right_x-small"
+          data-id="enroll"
+        ></lightning-button>
+      </template>
       <lightning-button-icon
         slot="actions"
         icon-name="utility:refresh"

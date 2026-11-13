@@ -484,6 +484,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Record_Service</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Service_Delivery__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

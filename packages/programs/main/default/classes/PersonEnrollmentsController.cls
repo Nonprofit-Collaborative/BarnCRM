@@ -26,6 +26,9 @@ public with sharing class PersonEnrollmentsController {
 		/** How many Present deliveries the person has, of those the user can see (P-05). */
 		@AuraEnabled
 		public Integer servicesAttended = 0;
+		/** Whether the user may create an enrollment, for the card's Enroll button (D-200 R1). */
+		@AuraEnabled
+		public Boolean canEnroll = false;
 	}
 
 	/** One enrollment of the person. */
@@ -90,6 +93,7 @@ public with sharing class PersonEnrollmentsController {
 			return result;
 		}
 		result.canSee = true;
+		result.canEnroll = Schema.SObjectType.Enrollment__c.isCreateable();
 
 		Map<String, String> stageLabels = stageLabels();
 		List<Row> open = new List<Row>();
