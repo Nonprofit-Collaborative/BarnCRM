@@ -602,13 +602,28 @@ same job and also runs the relevant Apex tests.
 
 When a significant version's development is done and integrated:
 
-1. **Run the release gate on both gate orgs in parallel**, each from its own clean detached
-   worktree under its own org lock:
+1. **Run the release gate on every org shape in parallel** (QA review Q2 and Q6, D-200,
+   widening D-142):
 
    ```
-   scripts/org/run-org-tests.sh barn-sales --release
-   scripts/org/run-org-tests.sh oi-test --release
+   scripts/org/release-gate.sh [--multi-currency <alias>]
    ```
+
+   It first runs Code Analyzer over every package with the AppExchange selector and the Graph
+   Engine (`sfge`, needs Java 11 or later), as the security review does, and stops on any High
+   or Critical finding (`--analyzer-only` runs just that). Then it runs
+   `run-org-tests.sh <alias> --release` on each org in `RELEASE_ORGS` (default `barn-sales`,
+   `oi-test`, `barn-platform` for Platform-only, `barn-npsp` for an NPSP-shaped org), each from
+   its own detached worktree at HEAD under its own lock, with logs and results in
+   `test-results/release-gate/`. `--multi-currency <alias>` adds a multi-currency org
+   (`config/scratch-defs/multi-currency.json`), once per version. It never creates an org: an
+   alias not authenticated on the machine stops it before any deploy, so until `barn-npsp`
+   exists (it needs Brandon's approval, and `install-npsp.sh` needs verified package IDs) set
+   `RELEASE_ORGS` to the orgs that do and name the missing shape in the release notes.
+   Then run the OWASP ZAP baseline scan (passive only, Docker) on the test org's Site for the
+   guest surfaces (Forms, Events public pages, Payments webhooks, Portal login):
+   `scripts/org/zap-baseline.sh <site URL> [<form Id>] [<event Id>]`. A FAIL stops the version;
+   each WARN is reviewed against the [security checklist](security-checklist.md).
 
 2. **Re-validate and deploy to `barn-npc`** (Nonprofit Cloud trial, production edition; see the
    gotchas in the root `architecture.md`: Public visibility for custom settings and metadata,

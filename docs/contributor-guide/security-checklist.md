@@ -16,6 +16,8 @@ scanner false positives and design justifications for the submission are in
 | Zero High or Critical Code Analyzer findings (PMD, ESLint LWC rules, retire-js, Flow scanner) | `sf code-analyzer run --severity-threshold 2` in the workflow |
 | No dependency on objects a Platform-only org lacks | `scripts/ci/check-standard-objects.sh` |
 | Every test runs as a user it creates, so no test passes on access the runner happens to hold | `scripts/ci/check-tests-run-as.py` |
+| Zero High or Critical findings from the AppExchange rule selector and the Graph Engine (data flow: CRUD and FLS on every path, injection), every package, once per version | `scripts/org/release-gate.sh` (release gate) |
+| No FAIL from an OWASP ZAP baseline scan of the guest surfaces (Forms and Events public pages, Payments webhooks, Portal login), once per version on a test org's Site | `scripts/org/zap-baseline.sh` (release gate) |
 
 ## Manual checks
 
