@@ -15,10 +15,8 @@ private class AskDonorDateSyncTest {
 	}
 
 	private static Contact person(Date nextAsk) {
-		Contact donor = new Contact(
-			FirstName = 'Ana',
-			LastName = 'Ramirez',
-			Next_Ask_Date__c = nextAsk
+		Contact donor = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Ramirez', Next_Ask_Date__c = nextAsk)
 		);
 		insert donor;
 		return donor;
@@ -214,7 +212,9 @@ private class AskDonorDateSyncTest {
 	static void deletingTheLastAskClearsAndAnOrganizationDonorIsKeptToo() {
 		System.runAs(staff()) {
 			Date today = Date.today();
-			Account foundation = new Account(Name = 'Rivera Foundation');
+			Account foundation = TestDataFactory.organization(
+				new Account(Name = 'Rivera Foundation')
+			);
 			insert foundation;
 			Ask__c ask = new Ask__c(
 				Donor_Account__c = foundation.Id,
@@ -262,7 +262,11 @@ private class AskDonorDateSyncTest {
 			Date today = Date.today();
 			List<Contact> donors = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				donors.add(new Contact(FirstName = 'Donor', LastName = 'Number ' + i));
+				donors.add(
+					TestDataFactory.person(
+						new Contact(FirstName = 'Donor', LastName = 'Number ' + i)
+					)
+				);
 			}
 			insert donors;
 			List<Ask__c> asks = new List<Ask__c>();

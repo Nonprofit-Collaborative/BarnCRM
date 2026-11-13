@@ -103,10 +103,13 @@ private class RollupAggregatorTest {
 			RollupAggregator.compare(Date.newInstance(2024, 1, 2), Date.newInstance(2024, 1, 1)),
 			'Dates'
 		);
-		Account parent = new Account(Name = 'Parent');
-		Account child = new Account(Name = 'Child');
+		Account parent = TestDataFactory.organization(new Account(Name = 'Parent'));
+		Account child = TestDataFactory.organization(new Account(Name = 'Child'));
 		child.putSObject('Parent', parent);
 		Assert.areEqual('Parent', RollupAggregator.valueAt(child, 'Parent.Name'), 'Through');
-		Assert.isNull(RollupAggregator.valueAt(new Account(), 'Parent.Name'), 'A blank parent');
+		Assert.isNull(
+			RollupAggregator.valueAt(TestDataFactory.organization(new Account()), 'Parent.Name'),
+			'A blank parent'
+		);
 	}
 }

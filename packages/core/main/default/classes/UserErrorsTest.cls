@@ -23,7 +23,7 @@ private class UserErrorsTest {
 		System.runAs(TestUsers.admin()) {
 			Exception failure;
 			try {
-				insert new Contact();
+				insert TestDataFactory.person(new Contact());
 			} catch (DmlException failed) {
 				failure = failed;
 			}
@@ -169,7 +169,7 @@ private class UserErrorsTest {
 		System.runAs(TestUsers.admin()) {
 			DmlException failure;
 			try {
-				insert new Contact();
+				insert TestDataFactory.person(new Contact());
 			} catch (DmlException failed) {
 				failure = failed;
 			}
@@ -204,7 +204,7 @@ private class UserErrorsTest {
 		System.runAs(TestUsers.admin()) {
 			String message;
 			try {
-				insert new Contact();
+				insert TestDataFactory.person(new Contact());
 			} catch (DmlException failed) {
 				message = UserErrors.wrapShowingDml(failed, FALLBACK).getMessage();
 				Assert.areEqual(failed.getDmlMessage(0), message, 'The row message only');

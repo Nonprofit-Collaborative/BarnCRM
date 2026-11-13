@@ -480,7 +480,9 @@ private class CampaignSyncServiceTest {
 			if (!CampaignSyncService.isAvailable()) {
 				return;
 			}
-			Account notACampaign = new Account(Name = 'Riverside Foundation');
+			Account notACampaign = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation')
+			);
 			insert notACampaign;
 			Appeal__c spring = springAppeal();
 			spring.Campaign_Id__c = notACampaign.Id;

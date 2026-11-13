@@ -32,8 +32,8 @@ private class TerritoryControllerTest {
 		System.runAs(TestUsers.adminWith('Territory_Admin')) {
 			northWithRule();
 			insert as user new List<Contact>{
-				new Contact(LastName = 'Alvarez'),
-				new Contact(LastName = 'Brooks')
+				TestDataFactory.person(new Contact(LastName = 'Alvarez')),
+				TestDataFactory.person(new Contact(LastName = 'Brooks'))
 			};
 
 			Map<String, Object> page = TerritoryController.getPage();
@@ -56,7 +56,7 @@ private class TerritoryControllerTest {
 	static void oneRunAtATimeAndAnAssignRunIsUndone() {
 		System.runAs(TestUsers.adminWith('Territory_Admin')) {
 			northWithRule();
-			insert as user new Contact(LastName = 'Alvarez');
+			insert as user TestDataFactory.person(new Contact(LastName = 'Alvarez'));
 
 			Test.startTest();
 			Id runId = TerritoryController.startRun(TerritoryRunBatch.MODE_ASSIGN, false);

@@ -140,17 +140,21 @@ private class HouseholdNamingBatchTest {
 			byHand.Custom_Name__c = true;
 			Database.insert(new List<Account>{ patterned, byHand }, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
-				new Contact(
-					Salutation = 'Ms.',
-					FirstName = 'Maria',
-					LastName = 'Garcia',
-					AccountId = patterned.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Ms.',
+						FirstName = 'Maria',
+						LastName = 'Garcia',
+						AccountId = patterned.Id
+					)
 				),
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = byHand.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Mr.',
+						FirstName = 'John',
+						LastName = 'Smith',
+						AccountId = byHand.Id
+					)
 				)
 			};
 			update new Account(Id = patterned.Id, Name = 'Old name');
@@ -202,17 +206,21 @@ private class HouseholdNamingBatchTest {
 			Account ordinary = HouseholdTestDataFactory.newHousehold('Old ordinary name');
 			Database.insert(new List<Account>{ native, ordinary }, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
-				new Contact(
-					Salutation = 'Ms.',
-					FirstName = 'Maria',
-					LastName = 'Garcia',
-					AccountId = native.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Ms.',
+						FirstName = 'Maria',
+						LastName = 'Garcia',
+						AccountId = native.Id
+					)
 				),
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = ordinary.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Mr.',
+						FirstName = 'John',
+						LastName = 'Smith',
+						AccountId = ordinary.Id
+					)
 				)
 			};
 			update new List<Account>{

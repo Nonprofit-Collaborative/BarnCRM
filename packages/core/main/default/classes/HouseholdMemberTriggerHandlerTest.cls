@@ -229,7 +229,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			setUp();
 			Household_Member__c nobody = membership(john.Id);
 			nobody.Contact__c = null;
-			Account other = new Account(Name = 'Some account');
+			Account other = TestDataFactory.organization(new Account(Name = 'Some account'));
 			insert other;
 			Household_Member__c both = membership(john.Id);
 			both.Account__c = other.Id;

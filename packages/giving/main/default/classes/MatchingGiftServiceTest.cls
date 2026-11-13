@@ -313,11 +313,13 @@ private class MatchingGiftServiceTest {
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
 				people.add(
-					new Contact(
-						FirstName = 'Giver',
-						LastName = 'Number ' + index,
-						AccountId = garcias.Id,
-						Employer__c = riverbend.Id
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Giver',
+							LastName = 'Number ' + index,
+							AccountId = garcias.Id,
+							Employer__c = riverbend.Id
+						)
 					)
 				);
 			}

@@ -44,16 +44,20 @@ private class BulkUpdateServiceTest {
 
 	/** `volunteers` contacts titled Volunteer and `staff` titled Staff, with work emails. */
 	private static void makePeople(Integer volunteers, Integer staff) {
-		Account organization = new Account(Name = 'Springfield Food Bank');
+		Account organization = TestDataFactory.organization(
+			new Account(Name = 'Springfield Food Bank')
+		);
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
 			people.add(
-				new Contact(
-					AccountId = organization.Id,
-					LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
-					Title = index < volunteers ? 'Volunteer' : 'Staff',
-					Work_Email__c = 'person' + index + '@example.org'
+				TestDataFactory.person(
+					new Contact(
+						AccountId = organization.Id,
+						LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
+						Title = index < volunteers ? 'Volunteer' : 'Staff',
+						Work_Email__c = 'person' + index + '@example.org'
+					)
 				)
 			);
 		}

@@ -165,11 +165,13 @@ private class FormIntakeServiceTest {
 	static void processingFindsThePersonAndOnlyFillsTheirBlanks() {
 		System.runAs(admin()) {
 			AccountKindsTestData.useRecordTypeTheUserCanUse();
-			Contact onFile = new Contact(
-				FirstName = 'Sam',
-				LastName = 'Zzpublic',
-				Email = 'sam.zzpublic@example.org',
-				MailingPostalCode = '11111'
+			Contact onFile = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Sam',
+					LastName = 'Zzpublic',
+					Email = 'sam.zzpublic@example.org',
+					MailingPostalCode = '11111'
+				)
 			);
 			insert as user onFile;
 			Form__c form = FormsTestData.publicVolunteerInterest(50);

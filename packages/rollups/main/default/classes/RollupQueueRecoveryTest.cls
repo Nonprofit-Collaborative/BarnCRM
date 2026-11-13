@@ -32,9 +32,11 @@ private class RollupQueueRecoveryTest {
 	}
 
 	private static Account organization() {
-		Account created = new Account(
-			Name = 'Organization',
-			RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+		Account created = TestDataFactory.organization(
+			new Account(
+				Name = 'Organization',
+				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+			)
 		);
 		insert created;
 		return created;
@@ -62,7 +64,9 @@ private class RollupQueueRecoveryTest {
 			insert staffCount();
 			Account organization = organization();
 			AutomationControl.bypass('Core_Rollups_Contact');
-			insert new Contact(LastName = 'Ames', AccountId = organization.Id);
+			insert TestDataFactory.person(
+				new Contact(LastName = 'Ames', AccountId = organization.Id)
+			);
 			AutomationControl.clearBypass('Core_Rollups_Contact');
 			insert new Rollup_Queue__c(
 				Target_Object__c = 'Account',

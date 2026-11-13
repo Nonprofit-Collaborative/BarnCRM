@@ -19,7 +19,9 @@ private class RollupChangesTest {
 	}
 
 	private static Account household(String name) {
-		return new Account(Name = name, RecordTypeId = HouseholdService.householdRecordTypeId());
+		return TestDataFactory.household(
+			new Account(Name = name, RecordTypeId = HouseholdService.householdRecordTypeId())
+		);
 	}
 
 	private static Rollup_Definition__c definition(String source, String path, String filter) {
@@ -165,8 +167,12 @@ private class RollupChangesTest {
 			Account nolan = household('The Nolan Family');
 			Account lee = household('The Lee Family');
 			Database.insert(new List<Account>{ nolan, lee }, AccessLevel.SYSTEM_MODE);
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id);
-			Contact bea = new Contact(FirstName = 'Bea', LastName = 'Lee', AccountId = lee.Id);
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id)
+			);
+			Contact bea = TestDataFactory.person(
+				new Contact(FirstName = 'Bea', LastName = 'Lee', AccountId = lee.Id)
+			);
 			insert new List<Contact>{ ana, bea };
 			Rollup_Definition__c perHousehold = definition(
 				'Affiliation__c',
@@ -201,7 +207,9 @@ private class RollupChangesTest {
 			Account nolan = household('The Nolan Family');
 			Account lee = household('The Lee Family');
 			Database.insert(new List<Account>{ nolan, lee }, AccessLevel.SYSTEM_MODE);
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id);
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id)
+			);
 			insert ana;
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
 				definition('Affiliation__c', 'Contact__c > {Household}', null)
@@ -244,7 +252,9 @@ private class RollupChangesTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account riverbend = organization('Riverbend');
 			insert riverbend;
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Okafor');
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Okafor')
+			);
 			insert ana;
 			insert new Affiliation__c(Contact__c = ana.Id, Organization__c = riverbend.Id);
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
@@ -295,7 +305,9 @@ private class RollupChangesTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account riverbend = organization('Riverbend');
 			insert riverbend;
-			insert new Contact(LastName = 'Okafor', AccountId = riverbend.Id);
+			insert TestDataFactory.person(
+				new Contact(LastName = 'Okafor', AccountId = riverbend.Id)
+			);
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
 				definition('Contact', 'AccountId', filter('Account.Description', 'equals', 'Board'))
 			};

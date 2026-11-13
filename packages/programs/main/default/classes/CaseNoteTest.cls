@@ -151,7 +151,7 @@ private class CaseNoteTest {
 			insert note(enrolled.Id, 'On the contact');
 			// Stands in for a person account and its own contact: erasure reaches an account
 			// only when it is a person record, so its contacts are that person.
-			Account personRecord = new Account(Name = 'Pat Rivera');
+			Account personRecord = TestDataFactory.organization(new Account(Name = 'Pat Rivera'));
 			insert personRecord;
 			update new Contact(Id = enrolled.Contact__c, AccountId = personRecord.Id);
 

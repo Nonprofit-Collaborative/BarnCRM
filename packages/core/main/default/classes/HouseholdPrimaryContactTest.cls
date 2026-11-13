@@ -147,7 +147,7 @@ private class HouseholdPrimaryContactTest {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			HouseholdService.personAccountOverride = true;
 			Account garcias = household('The Garcia Family');
-			Account maria = new Account(Name = 'Maria Garcia');
+			Account maria = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert maria;
 			Contact behindMaria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert behindMaria;
@@ -386,7 +386,7 @@ private class HouseholdPrimaryContactTest {
 	static void anOrganizationsPrimaryContactIsSetByHandInJunctionMode() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			Account shelter = new Account(Name = 'Riverside Shelter');
+			Account shelter = TestDataFactory.organization(new Account(Name = 'Riverside Shelter'));
 			insert shelter;
 			Contact ada = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Nkosi');
 			insert ada;

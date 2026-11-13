@@ -62,11 +62,13 @@ private class CoreHandlerCoverageTest {
 	@IsTest
 	static void anAddressThatCannotBeKeptRefusesTheAccountWithTheAddressMessage() {
 		System.runAs(TestUsers.admin()) {
-			Account unsaved = new Account(
-				Name = 'The Garcia Family',
-				RecordTypeId = HouseholdService.householdRecordTypeId(),
-				BillingStreet = '1 Winter Road',
-				BillingCity = 'Springfield'
+			Account unsaved = TestDataFactory.household(
+				new Account(
+					Name = 'The Garcia Family',
+					RecordTypeId = HouseholdService.householdRecordTypeId(),
+					BillingStreet = '1 Winter Road',
+					BillingCity = 'Springfield'
+				)
 			);
 			TriggerHandler.testNew = new List<SObject>{ unsaved };
 
@@ -116,11 +118,13 @@ private class CoreHandlerCoverageTest {
 	@IsTest
 	static void aHouseholdBillingAddressChangeIsCapturedAsANewAddressOnUpdate() {
 		System.runAs(TestUsers.admin()) {
-			Account household = new Account(
-				Name = 'The Okafor Family',
-				RecordTypeId = HouseholdService.householdRecordTypeId(),
-				BillingStreet = '2 Winter Road',
-				BillingCity = 'Springfield'
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Okafor Family',
+					RecordTypeId = HouseholdService.householdRecordTypeId(),
+					BillingStreet = '2 Winter Road',
+					BillingCity = 'Springfield'
+				)
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Integer keptOnInsert = [
@@ -156,11 +160,13 @@ private class CoreHandlerCoverageTest {
 			List<Account> households = new List<Account>();
 			for (Integer i = 0; i < TWO_HUNDRED; i++) {
 				households.add(
-					new Account(
-						Name = 'The Bulk Family ' + i,
-						RecordTypeId = HouseholdService.householdRecordTypeId(),
-						BillingStreet = i + ' Winter Road',
-						BillingCity = 'Springfield'
+					TestDataFactory.household(
+						new Account(
+							Name = 'The Bulk Family ' + i,
+							RecordTypeId = HouseholdService.householdRecordTypeId(),
+							BillingStreet = i + ' Winter Road',
+							BillingCity = 'Springfield'
+						)
 					)
 				);
 			}

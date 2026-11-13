@@ -58,7 +58,9 @@ private class MembershipServiceTest {
 	}
 
 	private static Contact person() {
-		Contact person = new Contact(LastName = 'Zzmem Member', Email = 'member@example.org');
+		Contact person = TestDataFactory.person(
+			new Contact(LastName = 'Zzmem Member', Email = 'member@example.org')
+		);
 		// An org's duplicate rule must not stop a test person sharing an email.
 		Database.DMLOptions options = new Database.DMLOptions();
 		options.DuplicateRuleHeader.allowSave = true;

@@ -68,12 +68,14 @@ private class HouseholdControllerTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			Contact john = new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id,
-				Household_Role__c = 'Head'
+			Contact john = TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id,
+					Household_Role__c = 'Head'
+				)
 			);
 			insert john;
 			update new Account(Id = household.Id, Primary_Contact__c = john.Id);

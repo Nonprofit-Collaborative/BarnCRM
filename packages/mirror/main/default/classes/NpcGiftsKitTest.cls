@@ -285,7 +285,7 @@ private class NpcGiftsKitTest {
 				'Salesforce_Records_Sync'
 			}
 		)) {
-			Contact ana = new Contact(LastName = 'Giftskit');
+			Contact ana = TestDataFactory.person(new Contact(LastName = 'Giftskit'));
 			insert ana;
 			Assert.areEqual(
 				1,

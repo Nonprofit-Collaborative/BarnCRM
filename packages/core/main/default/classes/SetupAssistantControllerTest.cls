@@ -506,7 +506,7 @@ private class SetupAssistantControllerTest {
 		System.runAs(TestUsers.admin()) {
 			SettingDefinitionSelector.stubbedRows = identityRows();
 			SetupAssistantTestExtension.useThis();
-			Contact chosen = new Contact(LastName = 'Ruiz');
+			Contact chosen = TestDataFactory.person(new Contact(LastName = 'Ruiz'));
 			insert chosen;
 
 			Test.startTest();

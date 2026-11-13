@@ -75,7 +75,7 @@ private class HubDataProtectionTest {
 	static void anErasureWithTheRequestNumberIsLinked() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Data_Subject_Request__c erase = request('Erasure');
-			Contact person = new Contact(LastName = 'Erased');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Erased'));
 			insert person;
 			Erasure__c audit = new Erasure__c(
 				Contact__c = person.Id,

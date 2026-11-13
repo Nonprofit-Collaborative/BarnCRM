@@ -121,7 +121,7 @@ private class PublicPageExtensionsTest {
 	}
 
 	private static Id accountId() {
-		Account record = new Account(Name = 'Spring Gala Venue');
+		Account record = TestDataFactory.organization(new Account(Name = 'Spring Gala Venue'));
 		insert as user record;
 		return record.Id;
 	}
