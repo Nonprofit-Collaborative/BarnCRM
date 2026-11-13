@@ -4,7 +4,7 @@
  * removed again with real grants left alone, and nothing loaded where there are no sample
  * organizations.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataFile')
 private class FundersSampleDataTest {
 	private static final String FILE = 'FundersSampleData';
 
@@ -132,7 +132,11 @@ private class FundersSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			Assert.areEqual(0, [SELECT COUNT() FROM Grant__c], 'No sample organizations, no grants');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Grant__c],
+				'No sample organizations, no grants'
+			);
 			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords());
 		}
 	}

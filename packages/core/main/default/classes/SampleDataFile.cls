@@ -36,9 +36,9 @@
  */
 @NamespaceAccessible
 public with sharing class SampleDataFile implements SampleDataModule {
-	/** Records each removal stage deletes. Tests lower it. */
-	@TestVisible
-	private static Integer removeChunkSize = 200;
+	/** Records each removal stage deletes. Tests, the modules' included, lower it. */
+	@NamespaceAccessible
+	public static Integer removeChunkSize = 200;
 
 	/** Parsed files by resource name, this transaction. Tests put their own here. */
 	@TestVisible
@@ -54,6 +54,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	}
 
 	/** The module file of this static resource name, or null when no such file is installed. */
+	@NamespaceAccessible
 	public static SampleDataFile find(String resourceName) {
 		if (!filesByName.containsKey(resourceName)) {
 			String body = SetupObjectSelector.staticResourceBody(resourceName);
@@ -77,18 +78,22 @@ public with sharing class SampleDataFile implements SampleDataModule {
 
 	// ------------------------------------------------------------------------- SampleDataModule
 
+	@NamespaceAccessible
 	public String moduleName() {
 		return (String) root().get('module');
 	}
 
+	@NamespaceAccessible
 	public String countLabel() {
 		return (String) root().get('countLabel');
 	}
 
+	@NamespaceAccessible
 	public Integer countLoaded() {
 		return countOf((Map<String, Object>) root().get('count'), null);
 	}
 
+	@NamespaceAccessible
 	public Boolean hasSampleRecords() {
 		for (Object entry : listOf('remove')) {
 			if (countOf((Map<String, Object>) entry, 1) > 0) {
@@ -98,10 +103,12 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		return false;
 	}
 
+	@NamespaceAccessible
 	public void enqueueLoad() {
 		SampleDataStageBatch.start(new LoadStages(resourceName));
 	}
 
+	@NamespaceAccessible
 	public void enqueueRemove() {
 		SampleDataRemoveBatch.startRemoval(new RemoveStages(resourceName));
 	}
@@ -109,29 +116,34 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	// ------------------------------------------------------------------------- load
 
 	/** The load, one step per stage. Only the keys inserted so far travel between stages. */
-	public class LoadStages implements SampleDataStages {
+	@NamespaceAccessible
+	public with sharing class LoadStages implements SampleDataStages {
 		private final String resourceName;
-		@TestVisible
 		private Map<String, Id> idsByKey = new Map<String, Id>();
 
+		@NamespaceAccessible
 		public LoadStages(String resourceName) {
 			this.resourceName = resourceName;
 		}
 
+		@NamespaceAccessible
 		public String name() {
 			return resourceName + '.load';
 		}
 
+		@NamespaceAccessible
 		public Integer stageCount() {
 			return find(resourceName).listOf('steps').size();
 		}
 
+		@NamespaceAccessible
 		public void runStage(Integer stage) {
 			Map<String, Object> step = (Map<String, Object>) find(resourceName)
 				.listOf('steps')[stage];
 			idsByKey.putAll(insertStep(step, idsByKey));
 		}
 
+		@NamespaceAccessible
 		public void finish() {
 			SampleDataModules.startAfter(find(resourceName).moduleName());
 		}
@@ -206,7 +218,10 @@ public with sharing class SampleDataFile implements SampleDataModule {
 			Id found = spec.containsKey('ref')
 				? idsByKey.get((String) spec.get('ref'))
 				: sampleIds().get((String) spec.get('sample'));
-			return found == null && spec.get('optional') != true ? new Unresolved() : found;
+			if (found == null && spec.get('optional') != true) {
+				return new Unresolved();
+			}
+			return found;
 		}
 		if (spec.get('currentUser') == true) {
 			return UserInfo.getUserId();
@@ -215,9 +230,13 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		if (field.getType() == Schema.DisplayType.TIME) {
 			return clock;
 		}
-		Date day = today.addDays(toInteger(spec.get('days'))).addMonths(toInteger(spec.get('months')));
+		Date day = today.addDays(toInteger(spec.get('days')))
+			.addMonths(toInteger(spec.get('months')));
 		return field.getType() == Schema.DisplayType.DATETIME
-			? Datetime.newInstance(day, clock == null ? Time.newInstance(0, 0, 0, 0) : clock)
+			? (Object) Datetime.newInstance(
+					day,
+					clock == null ? Time.newInstance(0, 0, 0, 0) : clock
+			  )
 			: (Object) day;
 	}
 
@@ -230,7 +249,10 @@ public with sharing class SampleDataFile implements SampleDataModule {
 			raw instanceof Double
 		) {
 			Decimal value = Decimal.valueOf(String.valueOf(raw));
-			return field.getType() == Schema.DisplayType.INTEGER ? (Object) value.intValue() : value;
+			if (field.getType() == Schema.DisplayType.INTEGER) {
+				return value.intValue();
+			}
+			return value;
 		}
 		return raw;
 	}
@@ -274,20 +296,23 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	// ------------------------------------------------------------------------- removal
 
 	/** The removal, a chunk per stage. The Ids that refused a delete travel between stages. */
-	public class RemoveStages implements SampleDataStages {
+	@NamespaceAccessible
+	public with sharing class RemoveStages implements SampleDataStages {
 		private final String resourceName;
-		@TestVisible
 		private Map<Id, String> kept = new Map<Id, String>();
 
+		@NamespaceAccessible
 		public RemoveStages(String resourceName) {
 			this.resourceName = resourceName;
 		}
 
+		@NamespaceAccessible
 		public String name() {
 			return resourceName + '.remove';
 		}
 
 		/** Each entry's chunks, counted once when the removal starts. */
+		@NamespaceAccessible
 		public Integer stageCount() {
 			Integer stages = 0;
 			for (Object entry : find(resourceName).listOf('remove')) {
@@ -298,6 +323,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		}
 
 		/** Deletes the first entry's next chunk that has one; a refused row is kept. */
+		@NamespaceAccessible
 		public void runStage(Integer stage) {
 			for (Object entry : find(resourceName).listOf('remove')) {
 				List<Id> ids = idsOf((Map<String, Object>) entry, kept.keySet());
@@ -318,6 +344,7 @@ public with sharing class SampleDataFile implements SampleDataModule {
 			}
 		}
 
+		@NamespaceAccessible
 		public void finish() {
 			SampleDataFile file = find(resourceName);
 			logKept(file.moduleName(), kept);

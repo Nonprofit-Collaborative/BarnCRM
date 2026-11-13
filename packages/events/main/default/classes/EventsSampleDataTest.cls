@@ -8,7 +8,7 @@
  * stages are called directly, as the other modules' tests do, because a test runs only the
  * first stage of a batch.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataFile')
 private class EventsSampleDataTest {
 	private static final String FILE = 'EventsSampleData';
 	private static final String CONFERENCE = 'Harvest Community Conference';

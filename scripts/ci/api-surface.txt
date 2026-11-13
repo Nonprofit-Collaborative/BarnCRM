@@ -1172,7 +1172,27 @@ core/RollupFilterParser.cls | public static List<TextEquality> textEqualities(St
 core/RollupFilterParser.cls | public static Set<String> fieldsOf(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String,Schema.SObjectType)
+core/SampleDataFile.cls | public Boolean hasSampleRecords()
+core/SampleDataFile.cls | public Integer countLoaded()
+core/SampleDataFile.cls | public Integer stageCount()
+core/SampleDataFile.cls | public Integer stageCount()
+core/SampleDataFile.cls | public LoadStages(String)
+core/SampleDataFile.cls | public RemoveStages(String)
+core/SampleDataFile.cls | public String countLabel()
+core/SampleDataFile.cls | public String moduleName()
+core/SampleDataFile.cls | public String name()
+core/SampleDataFile.cls | public String name()
+core/SampleDataFile.cls | public class LoadStages
+core/SampleDataFile.cls | public class RemoveStages
 core/SampleDataFile.cls | public class SampleDataFile
+core/SampleDataFile.cls | public static Integer removeChunkSize
+core/SampleDataFile.cls | public static SampleDataFile find(String)
+core/SampleDataFile.cls | public void enqueueLoad()
+core/SampleDataFile.cls | public void enqueueRemove()
+core/SampleDataFile.cls | public void finish()
+core/SampleDataFile.cls | public void finish()
+core/SampleDataFile.cls | public void runStage(Integer)
+core/SampleDataFile.cls | public void runStage(Integer)
 core/SampleDataModule.cls | public interface SampleDataModule
 core/SampleDataModules.cls | public class SampleDataModules
 core/SampleDataModules.cls | public static void removeAfter(String)

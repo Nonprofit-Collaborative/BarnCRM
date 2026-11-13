@@ -6,7 +6,7 @@
  * in the Error Log. Run as a BarnCRM admin holding Programs Admin, the person who loads sample
  * data. The stages are called directly, because a test runs only the first stage of a batch.
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataFile')
 private class ProgramSampleDataTest {
 	private static final String ADMIN = 'Programs_Admin';
 	private static final String FILE = 'ProgramsSampleData';

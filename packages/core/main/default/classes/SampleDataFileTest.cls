@@ -6,9 +6,14 @@
  * themselves are tested in their own packages (FundersSampleDataTest, ProgramSampleDataTest,
  * EventsSampleDataTest).
  */
-@IsTest
+@IsTest(testFor='ApexClass:SampleDataFile, ApexClass:SampleDataModules')
 private class SampleDataFileTest {
 	private static final String FILE = 'TestSampleData';
+
+	@TestSetup
+	static void makeAdmin() {
+		TestUsers.adminWithInstalledModules();
+	}
 
 	private static void injectFile() {
 		SampleDataFile.filesByName.put(
@@ -47,7 +52,10 @@ private class SampleDataFileTest {
 			Test.stopTest();
 
 			Map<String, Saved_Query__c> byName = new Map<String, Saved_Query__c>();
-			for (Saved_Query__c row : [SELECT Id, Name, Object_Name__c, Query_JSON__c FROM Saved_Query__c]) {
+			for (Saved_Query__c row : [
+				SELECT Id, Name, Object_Name__c, Query_JSON__c
+				FROM Saved_Query__c
+			]) {
 				byName.put(row.Name, row);
 			}
 			Assert.areEqual(3, byName.size(), 'The record with an unresolved link is left out');
@@ -57,7 +65,10 @@ private class SampleDataFileTest {
 				'A ref is the Id of the record of that key'
 			);
 			Assert.areEqual(UserInfo.getUserId(), byName.get('Sample second').Query_JSON__c);
-			Assert.isNull(byName.get('Sample optional').Object_Name__c, 'An optional link is blank');
+			Assert.isNull(
+				byName.get('Sample optional').Object_Name__c,
+				'An optional link is blank'
+			);
 
 			SampleDataModule module = SampleDataFile.find(FILE);
 			Assert.areEqual('Testing', module.moduleName());
@@ -86,14 +97,20 @@ private class SampleDataFileTest {
 			Assert.areEqual(0, [SELECT COUNT() FROM Saved_Query__c], 'Every sample row went');
 			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords());
 
-			Saved_Query__c kept = new Saved_Query__c(Name = 'Sample kept', Object_Name__c = 'Contact');
+			Saved_Query__c kept = new Saved_Query__c(
+				Name = 'Sample kept',
+				Object_Name__c = 'Contact'
+			);
 			insert kept;
 			String message = SampleDataFile.logKept(
 				'Testing',
 				new Map<Id, String>{ kept.Id => 'Saved_Query__c' }
 			);
 			Assert.isTrue(message.contains('Sample kept'), 'The Warning names the kept record');
-			Assert.areEqual(1, [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataFile']);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataFile']
+			);
 			Assert.isNull(SampleDataFile.logKept('Testing', new Map<Id, String>()));
 		}
 	}
