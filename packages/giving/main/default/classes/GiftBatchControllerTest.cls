@@ -39,7 +39,9 @@ private class GiftBatchControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User fundraiser = david();
 			System.runAs(fundraiser) {
-				Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+				Contact ana = TestDataFactory.person(
+					new Contact(FirstName = 'Ana', LastName = 'Garcia')
+				);
 				insert ana;
 				Commitment__c pledge = new Commitment__c(
 					Type__c = 'Pledge',
@@ -133,7 +135,9 @@ private class GiftBatchControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User fundraiser = david();
 			System.runAs(fundraiser) {
-				Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+				Contact ana = TestDataFactory.person(
+					new Contact(FirstName = 'Ana', LastName = 'Garcia')
+				);
 				insert ana;
 				Gift_Batch__c tuesday = batch(150);
 				GiftBatchController.BatchView first = GiftBatchController.saveLines(
@@ -201,7 +205,9 @@ private class GiftBatchControllerTest {
 			insert general;
 			User fundraiser = david();
 			System.runAs(fundraiser) {
-				Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+				Contact ana = TestDataFactory.person(
+					new Contact(FirstName = 'Ana', LastName = 'Garcia')
+				);
 				insert ana;
 				Gift_Batch__c tuesday = batch(100);
 				GiftBatchController.saveLines(
@@ -255,7 +261,9 @@ private class GiftBatchControllerTest {
 			);
 			Gift_Batch__c tuesday;
 			System.runAs(fundraiser) {
-				Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+				Contact ana = TestDataFactory.person(
+					new Contact(FirstName = 'Ana', LastName = 'Garcia')
+				);
 				insert ana;
 				tuesday = batch(100);
 				GiftBatchController.saveLines(

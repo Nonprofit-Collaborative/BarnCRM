@@ -27,8 +27,10 @@ private class InboundGiftServiceTest {
 				new Fund__c(Name = 'Old Roof Fund', Active__c = false, Accounting_Code__c = '4999')
 			};
 			insert new Appeal__c(Name = 'Spring Appeal');
-			insert new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = LUIS_EMAIL);
-			insert new Account(Name = 'Riverside Foundation');
+			insert TestDataFactory.person(
+				new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = LUIS_EMAIL)
+			);
+			insert TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 		}
 	}
 
@@ -42,14 +44,18 @@ private class InboundGiftServiceTest {
 	 * donors with it), so a test that runs as that user gives it the donor to own.
 	 */
 	private static void addOwnDonor(User owner) {
-		Account household = new Account(Name = 'The Garcia Household', OwnerId = owner.Id);
+		Account household = TestDataFactory.household(
+			new Account(Name = 'The Garcia Household', OwnerId = owner.Id)
+		);
 		insert household;
-		insert new Contact(
-			FirstName = 'Luis',
-			LastName = 'Garcia',
-			Email = OWN_DONOR_EMAIL,
-			AccountId = household.Id,
-			OwnerId = owner.Id
+		insert TestDataFactory.person(
+			new Contact(
+				FirstName = 'Luis',
+				LastName = 'Garcia',
+				Email = OWN_DONOR_EMAIL,
+				AccountId = household.Id,
+				OwnerId = owner.Id
+			)
 		);
 	}
 
@@ -526,7 +532,7 @@ private class InboundGiftServiceTest {
 			if (personType == null) {
 				return; // An org without person accounts has no such path to prove.
 			}
-			SObject person = new Account(RecordTypeId = personType);
+			SObject person = TestDataFactory.organization(new Account(RecordTypeId = personType));
 			person.put('LastName', 'Okafor');
 			person.put('PersonEmail', 'ada.okafor.inbound@example.org');
 			insert person;

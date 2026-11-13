@@ -27,7 +27,7 @@ private class JobNotifierTest {
 	static void tellsTheRecipientAboutTheJobRecord() {
 		System.runAs(TestUsers.admin()) {
 			notifications(true);
-			Account record = new Account(Name = 'Job record');
+			Account record = TestDataFactory.organization(new Account(Name = 'Job record'));
 			insert record;
 
 			JobNotifier.aboutRecord(UserInfo.getUserId(), 'Bulk update', false, 'Body', record.Id);

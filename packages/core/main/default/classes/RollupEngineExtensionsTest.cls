@@ -257,8 +257,10 @@ private class RollupEngineExtensionsTest {
 	static void mergingAccountsWithoutTheModuleStillMerges() {
 		System.runAs(TestUsers.admin()) {
 			RollupEngineExtensions.noneForTest = true;
-			Account kept = new Account(Name = 'Riverside Food Bank');
-			Account merged = new Account(Name = 'Riverside Food Bank (old)');
+			Account kept = TestDataFactory.organization(new Account(Name = 'Riverside Food Bank'));
+			Account merged = TestDataFactory.organization(
+				new Account(Name = 'Riverside Food Bank (old)')
+			);
 			insert new List<Account>{ kept, merged };
 
 			Test.startTest();

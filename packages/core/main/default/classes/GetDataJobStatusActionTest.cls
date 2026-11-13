@@ -55,7 +55,9 @@ private class GetDataJobStatusActionTest {
 	@IsTest
 	static void anythingElseIsNotFound() {
 		System.runAs(TestUsers.admin()) {
-			Account notAJob = new Account(Name = 'The Union Foundation');
+			Account notAJob = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert notAJob;
 
 			Test.startTest();

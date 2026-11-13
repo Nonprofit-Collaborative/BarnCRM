@@ -10,7 +10,9 @@ private class InboundGiftResourceTest {
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true);
-			insert new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = EMAIL);
+			insert TestDataFactory.person(
+				new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = EMAIL)
+			);
 		}
 	}
 

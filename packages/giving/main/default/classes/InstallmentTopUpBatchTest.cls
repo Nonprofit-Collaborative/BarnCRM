@@ -12,7 +12,9 @@ private class InstallmentTopUpBatchTest {
 	@IsTest
 	static void extendsEveryActiveRecurringCommitmentNotJustTheOldest() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
+			);
 			insert person;
 			List<Commitment__c> recurring = new List<Commitment__c>();
 			for (Integer index = 0; index < 60; index++) {
@@ -87,7 +89,9 @@ private class InstallmentTopUpBatchTest {
 	@IsTest
 	static void leavesAPausedCommitmentAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
+			);
 			insert person;
 			Commitment__c paused = new Commitment__c(
 				Type__c = 'Recurring',

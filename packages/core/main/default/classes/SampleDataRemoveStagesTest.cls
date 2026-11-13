@@ -205,9 +205,13 @@ private class SampleDataRemoveStagesTest {
 	static void testRemovalLeavesRecordsTheLoaderDidNotCreate() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			loadTwoHundredHouseholds();
-			Account ownHousehold = new Account(Name = 'A real household');
+			Account ownHousehold = TestDataFactory.household(
+				new Account(Name = 'A real household')
+			);
 			insert ownHousehold;
-			Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownHousehold.Id);
+			Contact ownPerson = TestDataFactory.person(
+				new Contact(LastName = 'Real', AccountId = ownHousehold.Id)
+			);
 			insert ownPerson;
 
 			SampleDataRemoveStages stages = new SampleDataRemoveStages();
@@ -263,9 +267,13 @@ private class SampleDataRemoveStagesTest {
 				WHERE Sample_Data__c = TRUE
 				LIMIT 1
 			];
-			Account ownHousehold = new Account(Name = 'A real household');
+			Account ownHousehold = TestDataFactory.household(
+				new Account(Name = 'A real household')
+			);
 			insert ownHousehold;
-			Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownHousehold.Id);
+			Contact ownPerson = TestDataFactory.person(
+				new Contact(LastName = 'Real', AccountId = ownHousehold.Id)
+			);
 			insert ownPerson;
 			insert new List<Address__c>{
 				homeAddress(sampleHousehold.Id, null, '1 Sample Household Way'),

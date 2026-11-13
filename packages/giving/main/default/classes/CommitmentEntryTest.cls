@@ -14,7 +14,9 @@ private class CommitmentEntryTest {
 	}
 
 	private static Contact donor() {
-		Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
+		);
 		insert person;
 		return person;
 	}
@@ -138,7 +140,9 @@ private class CommitmentEntryTest {
 				'A commitment needs a donor.'
 			);
 
-			Account organization = new Account(Name = 'Harbor Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Harbor Foundation')
+			);
 			insert organization;
 			CommitmentEntryController.EntryInput both = pledgeInput(donor().Id);
 			both.donorAccountId = organization.Id;

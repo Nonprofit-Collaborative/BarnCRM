@@ -45,9 +45,8 @@ private class MembershipRenewalsTest {
 	}
 
 	private static Contact person(String name) {
-		Contact person = new Contact(
-			LastName = name,
-			Email = name.deleteWhitespace() + '@example.org'
+		Contact person = TestDataFactory.person(
+			new Contact(LastName = name, Email = name.deleteWhitespace() + '@example.org')
 		);
 		insert as user person;
 		return person;

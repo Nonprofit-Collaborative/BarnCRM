@@ -699,11 +699,17 @@ private class SampleDataLoaderTest {
 	static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			loadEverythingIncludingConnections(buildJsonWithConnections());
-			Account ownRecord = new Account(Name = 'A real household');
+			Account ownRecord = TestDataFactory.organization(
+				new Account(Name = 'A real household')
+			);
 			insert ownRecord;
-			Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownRecord.Id);
+			Contact ownPerson = TestDataFactory.person(
+				new Contact(LastName = 'Real', AccountId = ownRecord.Id)
+			);
 			insert ownPerson;
-			Contact ownOtherPerson = new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id);
+			Contact ownOtherPerson = TestDataFactory.person(
+				new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id)
+			);
 			insert ownOtherPerson;
 			Relationship__c ownRelationship = new Relationship__c(
 				Contact__c = ownPerson.Id,

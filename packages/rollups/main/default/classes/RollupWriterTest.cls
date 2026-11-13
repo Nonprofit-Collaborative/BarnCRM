@@ -65,15 +65,11 @@ private class RollupWriterTest {
 	static void onlyRecordsWithAChangedTotalAreSaved() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
-			Account same = new Account(
-				Name = 'Same',
-				RecordTypeId = organizationType,
-				Member_Count__c = 2
+			Account same = TestDataFactory.organization(
+				new Account(Name = 'Same', RecordTypeId = organizationType, Member_Count__c = 2)
 			);
-			Account changed = new Account(
-				Name = 'Changed',
-				RecordTypeId = organizationType,
-				Member_Count__c = 2
+			Account changed = TestDataFactory.organization(
+				new Account(Name = 'Changed', RecordTypeId = organizationType, Member_Count__c = 2)
 			);
 			insert new List<Account>{ same, changed };
 			Set<Id> both = new Set<Id>{ same.Id, changed.Id };

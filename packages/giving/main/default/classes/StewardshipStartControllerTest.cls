@@ -50,7 +50,9 @@ private class StewardshipStartControllerTest {
 	static void startsAPlanOnAPersonAndOnAnOrganization() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
-			Contact person = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+			);
 			insert person;
 			Account organization = GivingTestDataFactory.insertOrganization('Summit Foundation');
 
@@ -81,7 +83,9 @@ private class StewardshipStartControllerTest {
 	static void aDonorThePersonCannotSeeStartsNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
-			Contact gone = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+			Contact gone = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+			);
 			insert gone;
 			delete gone;
 			String refusal;
@@ -111,7 +115,9 @@ private class StewardshipStartControllerTest {
 	static void aSecondStartOnTheSameDonorSaysWhy() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Stewardship_Plan_Template__c major = planWithOneStep('Major gift thanks', true);
-			Contact person = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+			);
 			insert person;
 			StewardshipStartController.startPlan(major.Id, person.Id);
 
@@ -142,7 +148,7 @@ private class StewardshipStartControllerTest {
 		Contact person;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			major = planWithOneStep('Major gift thanks', true);
-			person = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+			person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 			insert person;
 		}
 

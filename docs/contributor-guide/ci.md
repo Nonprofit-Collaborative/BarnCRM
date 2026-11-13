@@ -1018,16 +1018,25 @@ what a test can:
 - **Access:** tests run as a user they create (below), so the org's profiles and permission
   sets do not decide the result.
 
-So build Account and Contact records through the factories (`HouseholdTestDataFactory.newContact`,
-`newHousehold`, `RelationshipTestDataFactory`, `AddressTestDataFactory`), or pass a record built
-by hand through `TestDataFactory.pastDuplicateRules` before inserting it.
+**The rule:** a test class never inserts a bare `new Contact(...)` or `new Account(...)`. Build
+the record through the factories (`HouseholdTestDataFactory.newContact`, `newHousehold`,
+`RelationshipTestDataFactory`, `AddressTestDataFactory`, `AccountKindsTestData.organization`),
+or wrap a record you build by hand, with the field values the test's assertions rely on, in
+`TestDataFactory.person(new Contact(...))`, `TestDataFactory.organization(new Account(...))` or
+`TestDataFactory.household(new Account(...))`. Each returns the same typed record, saved past
+duplicate rules with the org's required fields filled. A bare `new Contact(Id = ...)` used to
+update a row is fine (it sets no required field).
+
+`scripts/ci/check-test-data-factory.py` (part of `run-offline-checks.sh`) counts the bare
+constructions in test classes, outside classes named `*TestData` or `*TestDataFactory`, and
+fails when the count rises above its `BASELINE`. A construction that must stay raw (an
+in-memory record never saved, a test of the factory, a test that must exercise a raw insert)
+carries `// factory-ok: reason` on the line with `new Contact(` or `new Account(`; lower
+`BASELINE` whenever the count falls (`--list` prints every counted line).
 
 What no test can handle, so the install guide and pre-check report it instead: an active
 validation rule (Apex cannot skip one), a required lookup field (no sample record to point
-at), and an org's own record-triggered flow or trigger that fails. About 760 test sites
-(344 `new Account(`, 414 `new Contact(` in test classes on 2026-11-04) still build records by
-hand without the factory; they get the duplicate-rule and required-field help only once moved
-onto it.
+at), and an org's own record-triggered flow or trigger that fails.
 
 ### Tests run as a user they create
 

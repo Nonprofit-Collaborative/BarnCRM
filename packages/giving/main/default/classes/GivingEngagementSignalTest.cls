@@ -10,8 +10,8 @@ private class GivingEngagementSignalTest {
 			TestDataFactory.defaultSettings();
 			GivingTestDataFactory.insertDefaultFund();
 			insert new List<Contact>{
-				new Contact(FirstName = 'Ana', LastName = 'Nolan'),
-				new Contact(FirstName = 'Wei', LastName = 'Lee')
+				TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Nolan')),
+				TestDataFactory.person(new Contact(FirstName = 'Wei', LastName = 'Lee'))
 			};
 		}
 	}
