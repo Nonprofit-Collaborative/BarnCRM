@@ -1,0 +1,80 @@
+# @AuraEnabled classes with no test running as a non-admin user (QA review Q1, D-200).
+# "admin only: reason" when only an administrator reaches the class; "not yet" is the ratchet,
+# which only shrinks. Checked by scripts/ci/check-aura-non-admin-tests.py.
+CampaignSyncController # not yet
+CertificationController # not yet
+CommitmentEntryController # not yet
+CustomMetadataManagerController # admin only: Custom Metadata Manager, needs Manage BarnCRM Metadata
+CustomMetadataManagerService # admin only: called only by CustomMetadataManagerController
+DonorLevelController # not yet
+DonorSegmentController # not yet
+DonorSegmentService # not yet
+DonorSegmentTemplates # not yet
+EligibilityRules # not yet
+EngagementScoreController # not yet
+ErrorLogController # not yet
+EventAgendaController # not yet
+EventApplicationsController # not yet
+EventBadgesController # not yet
+EventCalendarController # not yet
+EventCheckInController # not yet
+EventProposalReview # not yet
+EventRegistrationsController # not yet
+EventSeatingController # not yet
+EventSessionRatings # not yet
+EventSpeakersController # not yet
+EventSponsorsController # not yet
+EventVolunteersController # not yet
+FieldAccessController # admin only: Field Access Manager, an admin console
+FindRelatedRecords # not yet
+FormBuilderController # not yet
+FormIntakeService # not yet
+FormPublicController # not yet
+FormRunnerController # not yet
+FormSubmissionController # not yet
+FormSubmitService # not yet
+FundersBoardController # not yet
+FundersUndoState # not yet
+GenericMergeController # not yet
+GenericMergeService # not yet
+GiftTransactionMirrorController # not yet
+GiftTransactionMirrorReconciliation # not yet
+GivingEmailTemplates # not yet
+GrantOutcomeController # not yet
+GrantReportController # not yet
+HealthCheckLastRun # admin only: Health Check, an admin console
+HouseholdMergeController # not yet
+ImportRowCorrectionController # not yet
+IntegrationAppService # admin only: Integrations panel, an admin console
+MembershipController # not yet
+NpspHouseholdAdoptionController # admin only: NPSP household adoption, a one-time admin migration tool
+NpspHouseholdAdoptionService # admin only: called only by the NPSP household adoption tool
+OpportunityMirrorReconciliation # not yet
+OrgAutomationDeactivation # admin only: Automation page deactivation, an admin console
+OrgOptimizerSetupController # admin only: Org Optimizer, needs Manage BarnCRM Settings
+OrgOptimizerStorageController # admin only: Org Optimizer storage, needs Manage BarnCRM Settings
+PersonErasureController # not yet
+PersonSameNameController # not yet
+PledgeReminderController # not yet
+ProjectApprovalsController # not yet
+ProjectBillingController # not yet
+ProjectReporting # not yet
+ProjectStaffingController # not yet
+ProjectTemplates # not yet
+ProjectTimesheetController # not yet
+ProjectViews # not yet
+ProjectsController # not yet
+QueryFieldCatalog # not yet
+ReceiptController # not yet
+RecurringHealthController # not yet
+ReportSubscriptions # not yet
+SampleDataLoader # admin only: Sample Data page, an admin tool
+ScholarshipAwards # not yet
+ScholarshipReviews # not yet
+ScholarshipsController # not yet
+SetupAssistantController # admin only: Setup Assistant, needs Manage BarnCRM Settings
+SetupAssistantService # admin only: called only by the Setup Assistant
+SetupChangeController # admin only: Setup Changes log, needs Manage BarnCRM Settings
+ShiftScheduleController # not yet
+StewardshipPlanController # not yet
+TerritoryController # not yet

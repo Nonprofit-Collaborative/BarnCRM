@@ -280,6 +280,17 @@ Salesforce org is needed for this job. Steps:
    `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
    is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
    below for why.
+   `scripts/ci/check-aura-non-admin-tests.py` fails the build if a class with an
+   `@AuraEnabled` method has no test that calls it and builds a non-admin user
+   (`TestDataFactory.createUser`, `TestUsers.standardUserWith`, `peopleReaderWith`,
+   `minimumAccessUserWith`, or a user on `TestUsers.readOnlyProfileId()` and the like), unless
+   `scripts/ci/aura-non-admin-allowlist.txt` lists it as `# admin only: reason` or as
+   `# not yet`. `TestUsers.admin()` keeps the administrator's profile, so a test run only as an
+   admin cannot see a missing field permission or class grant that breaks the page for staff
+   (QA review Q1: about 5,075 admin test calls against 370 non-admin). The `not yet` entries
+   only shrink: one fails once its class has such a test. Write the staff test as a Standard
+   User holding the package's Staff or Read Only set (`BarnCRM_Staff`, `Giving_Staff`), with
+   records the user owns where the object is private.
    `scripts/ci/check-test-relevance.py` fails the build if a test class (the vendored engine
    excepted) has neither `@IsTest(testFor='...')` nor `@IsTest(critical=true)` and is not in
    `scripts/ci/test-relevance-cross-cutting.txt`, or if a `testFor` names a class or trigger
