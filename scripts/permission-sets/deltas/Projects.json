@@ -1,0 +1,85 @@
+{
+  "Admin": {
+    "label": "Projects Admin",
+    "description": ["Everything in Project Management, with delete and Manage Projects (Export Billable Time). Given", "to BarnCRM Admin holders."],
+    "add": {
+      "customPermissions": {
+        "Projects_Manage": {"enabled": "true"}
+      },
+      "fieldPermissions": {
+        "Project_Rate__c.Cost_Rate__c": {"editable": "true", "readable": "true"},
+        "Project_Revenue__c.Cost_Amount__c": {"editable": "true", "readable": "true"},
+        "Project__c.Labor_Cost__c": {"editable": "false", "readable": "true"},
+        "Time_Entry__c.Cost_Amount__c": {"editable": "false", "readable": "true"},
+        "Time_Entry__c.Cost_Rate__c": {"editable": "true", "readable": "true"}
+      },
+      "tabSettings": {
+        "Project_Invoice__c": {"visibility": "Visible"},
+        "Project_Rate__c": {"visibility": "Visible"},
+        "Request_Connection__c": {"visibility": "Visible"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Project_Expense__c.Invoice_Line__c": {"editable": "true"},
+        "Project_Invoice_Line__c.Service_Date__c": {"editable": "true"},
+        "Project_Invoice__c.Account__c": {"editable": "true"},
+        "Project_Invoice__c.Amount_Paid__c": {"editable": "true"},
+        "Project_Invoice__c.Contact__c": {"editable": "true"},
+        "Project_Invoice__c.Due_Date__c": {"editable": "true"},
+        "Project_Invoice__c.Exported_Date__c": {"editable": "true"},
+        "Project_Invoice__c.Invoice_Date__c": {"editable": "true"},
+        "Project_Invoice__c.Notes__c": {"editable": "true"},
+        "Project_Invoice__c.Paid_Date__c": {"editable": "true"},
+        "Project_Invoice__c.Payment_Key__c": {"editable": "true"},
+        "Project_Invoice__c.Payment_Link__c": {"editable": "true"},
+        "Project_Invoice__c.Period_End__c": {"editable": "true"},
+        "Project_Invoice__c.Period_Start__c": {"editable": "true"},
+        "Project_Rate__c.Effective_To__c": {"editable": "true"},
+        "Project_Rate__c.Role__c": {"editable": "true"},
+        "Project_Rate__c.User__c": {"editable": "true"},
+        "Project_Request__c.Satisfaction__c": {"editable": "true"},
+        "Project_Revenue__c.Method__c": {"editable": "true"},
+        "Project_Revenue__c.Month_Key__c": {"editable": "true"},
+        "Project_Revenue__c.Percent_Complete__c": {"editable": "true"},
+        "Project_Revenue__c.Recognized_Amount__c": {"editable": "true"},
+        "Project_Task__c.Invoice_Line__c": {"editable": "true"},
+        "Request_Connection__c.Account__c": {"editable": "true"},
+        "Request_Connection__c.Active__c": {"editable": "true"},
+        "Request_Connection__c.Hourly_Limit__c": {"editable": "true"},
+        "Request_Connection__c.Integration_User__c": {"editable": "true"},
+        "Request_Connection__c.Org_Id__c": {"editable": "true"},
+        "Time_Entry__c.Bill_Rate__c": {"editable": "true"},
+        "Time_Entry__c.Invoice_Line__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Project_Assignment__c": {"allowDelete": "true"},
+        "Project_Change_Request__c": {"allowDelete": "true"},
+        "Project_Expense__c": {"allowDelete": "true"},
+        "Project_Invoice_Line__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Project_Invoice__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Project_Phase__c": {"allowDelete": "true"},
+        "Project_Rate__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Project_Request_Comment__c": {"allowDelete": "true"},
+        "Project_Request__c": {"allowDelete": "true"},
+        "Project_Resource__c": {"allowDelete": "true"},
+        "Project_Revenue__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Project_Status_Update__c": {"allowDelete": "true"},
+        "Project_Task__c": {"allowDelete": "true"},
+        "Project__c": {"allowDelete": "true"},
+        "Request_Connection__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Resource_Request__c": {"allowDelete": "true"},
+        "Time_Entry__c": {"allowDelete": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Projects Read Only",
+    "description": ["Read projects, phases, tasks, assignments, time entries and status updates. Given to the Read", "Only role."],
+    "readOnly": true,
+    "remove": {
+      "classAccesses": ["ProjectApprovalsController", "ProjectTimesheetController"],
+      "tabSettings": ["Projects_Approvals", "Projects_Timesheet"]
+    }
+  }
+}
