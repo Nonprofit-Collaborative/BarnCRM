@@ -6,10 +6,6 @@
     Builds and manages logic models, indicators and results, including deleting a whole
     logic model.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Logic_Models</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>LogicModelBuilderController</apexClass>
     <enabled>true</enabled>

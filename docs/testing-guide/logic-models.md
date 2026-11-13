@@ -18,7 +18,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Logic Models** app, **Logic Models** tab, **New**. Name `Reading Program Model`, save. | The record page shows the **Builder** tab (the **Logic Model Builder** panel), a **Details** tab and the related lists in the sidebar. **For** shows `The whole organization`. Seven columns run left to right with a chevron between each; each heading has a `0` count and says `Nothing here yet.` |
+| 1 | Open the **BarnCRM** app, **Logic Models** tab, **New**. (There is no BarnCRM Logic Models app: type `Logic` in the App Launcher and only the **Logic Models** item shows.) Name `Reading Program Model`, save. | The record page shows the **Builder** tab (the **Logic Model Builder** panel), a **Details** tab and the related lists in the sidebar. **For** shows `The whole organization`. Seven columns run left to right with a chevron between each; each heading has a `0` count and says `Nothing here yet.` |
 | 2 | Click **Add to Inputs**, type `Two tutors`, **Save**. | `Two tutors` is under **Inputs**. |
 | 3 | Add `Weekly sessions` to **Activities**, `Sessions held` to **Outputs**, `Reads at home` to **Short Term Outcomes**, `Reads at grade level` to **Impact**. Add `Books` to **Inputs**. | Each part is in its column; `Books` is under `Two tutors`. |
 | 4 | Click `Books`, then **Move Up**. | `Books` is above `Two tutors`. **Move Up** is disabled. |
@@ -88,7 +88,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open `Reading Program Model`. | The record page shows no **Delete** action for the model. Parts still show **Delete**. |
-| 2 | As read-only, open the **BarnCRM Logic Models** app and the model. | The builder shows every column, arrow and indicator, with no **Add to**, **Edit**, **Delete**, **Change** or **Add Arrow** buttons. |
+| 2 | As read-only, open **Logic Models** in the **BarnCRM** app and the model. | The builder shows every column, arrow and indicator, with no **Add to**, **Edit**, **Delete**, **Change** or **Add Arrow** buttons. |
 | 3 | As read-only, open the **Logic Models** tab. | No **New** button. |
 
 **Cleanup:** None.

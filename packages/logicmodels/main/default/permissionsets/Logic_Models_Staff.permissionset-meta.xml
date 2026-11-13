@@ -6,10 +6,6 @@
     Creates and builds logic models: adds, changes and removes parts, arrows, indicators and
     periods. Never deletes a whole logic model.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Logic_Models</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>LogicModelBuilderController</apexClass>
     <enabled>true</enabled>
