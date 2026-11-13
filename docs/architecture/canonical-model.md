@@ -8707,6 +8707,38 @@ range that are dated on or after the start date.
 
 ---
 
+## 29C2. Provider Request
+
+### Definition
+
+A Case this org sent to a service provider running BarnCRM Projects, with the provider's request number, status and resolution (D-201, ADR-0221 `0221-projects-requests-and-issues.md` decision 7). Off until Send Cases to a service provider is on.
+
+### Rules
+
+**R-PR1 Sending.** While `Mirror_Settings__c.Case_Requests_Enabled__c` is on (shipped off) and the org has Case, a Case is posted to the provider's request API (Section 29PM18, R-PM26) through the Named Credential `Barn_Request_Provider`, which the admin creates: by the flow action Send Cases to a Service Provider, or by the nightly step for every open Case whose Type is `Case_Requests_Type__c` (default Service Provider). A Case with a Request Number is never sent again. A refusal is kept in Last Error and the Error Log, and the next run sends the Case again.
+
+**R-PR2 Status.** The nightly step reads the status of every Provider Request with a Request Number not yet Resolved, Closed or Cancelled, 200 per call, and writes Provider Status, Provider Resolution and Last Synced. Written in system mode by the run only; users read.
+
+Case is never named at compile time or given a field: the link is the Case Id held as text (ADR-0013, ADR-0058).
+
+### Salesforce implementation
+
+- **Object:** `Provider_Request__c`, label Provider Request, name field Text (Case Number), sharing Read/Write, packaged in Mirror.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Case Id | `Case_Id__c` | Text(18), unique, external ID |
+| Request Number | `Request_Number__c` | Text(30) |
+| Provider Status | `Status__c` | Text(40) |
+| Provider Resolution | `Resolution__c` | Long Text Area(32768) |
+| Last Synced | `Synced__c` | Date/Time |
+| Last Error | `Error__c` | Text(255) |
+
+- **Settings:** on `Mirror_Settings__c`, `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`).
+- **Access:** read through Salesforce Records Sync; the Provider Requests tab in Mirror's Admin_Tabs.
+
+---
+
 ## 29D. Saved Query (and the query document)
 
 ### Definition
@@ -18158,6 +18190,7 @@ Hours a person worked on a project on one day, optionally on one task, billable 
 | Approved By | `Approved_By__c` | Lookup(User), relationship Approved_Time_Entries |
 | Rejection Reason | `Rejection_Reason__c` | Text(255) |
 | Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null (R-PM12) |
+| Request | `Request__c` | Lookup(Project_Request__c), Set Null, relationship Time_Entries: the request the hours were spent on (29PM16) |
 
 Validation rules: `Hours_In_Range`, `Approval_By_Manager`, `Rejection_Needs_Reason`, `Status_Not_Cleared`, `Locked_When_Submitted_Or_Approved`, `Locked_When_Invoiced`.
 
@@ -18199,7 +18232,8 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Rules
 
-- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-0219 `0219-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-0219 `0219-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, and for requests (ADR-0221 `0221-projects-requests-and-issues.md`, Help Path `projects-requests.md`) `Projects_Requests_Enabled`, `Projects_Requests_External_Enabled`, `Projects_Request_Days_Urgent`, `Projects_Request_Days_High`, `Projects_Request_Days_Medium`, `Projects_Request_Days_Low`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Request switches.** Track requests and issues does not need Track time and budgets. Take requests from outside reads off while Track requests and issues is off.
 - **PSA switches.** Every PSA switch ships off and reads off while Track time and budgets is off. Take invoice payments online also needs Create invoices and the Payments module.
 
 ### Salesforce implementation
@@ -18222,6 +18256,12 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
 | Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
 | Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |
+| Track requests and issues | `Requests_Enabled__c` | Checkbox, default false (D-201) |
+| Take requests from outside | `Requests_External_Enabled__c` | Checkbox, default false (D-201): the portal and request connections |
+| Urgent request due days | `Request_Days_Urgent__c` | Number(3, 0), default 1 (1 to 365), weekdays |
+| High request due days | `Request_Days_High__c` | Number(3, 0), default 2 (1 to 365), weekdays |
+| Medium request due days | `Request_Days_Medium__c` | Number(3, 0), default 5 (1 to 365), weekdays |
+| Low request due days | `Request_Days_Low__c` | Number(3, 0), default 10 (1 to 365), weekdays |
 
 ---
 
@@ -18447,6 +18487,93 @@ A requested change of a project's scope with its hours and amount; approved ones
 | Hours | `Hours__c` | Number(8, 2), history tracked |
 | Amount | `Amount__c` | Currency(16, 2), history tracked |
 | Status | `Status__c` | Picklist (Draft, Submitted, Approved, Rejected), restricted, required, default Draft, history tracked |
+
+## 29PM16. Request
+
+### Definition
+
+A request or issue someone raised with the organization: logged by staff, sent by a requester through the portal, or sent by another organization; triaged, assigned, resolved and linked to the project work it caused (D-201, ADR-0221 `0221-projects-requests-and-issues.md`). Off until Track requests and issues is on.
+
+### Rules
+
+**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on, and one owned by the user saving it goes to the shipped Requests queue (`Project_Requests`). A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rules: `Requests_Turned_On` (no new request while the feature is off), `Resolution_Needed` (Resolved needs a Resolution).
+
+**R-PM24 Requester replies.** A non-blank Reply is moved into a new Request Comment marked From Requester and Shared, and cleared; a Waiting on Requester or Resolved request returns to In Progress.
+
+**R-PM25 Notifications.** A bell notice (type `Projects_Request`) to a new user owner, unless they assigned it to themselves; to the owner on a requester's reply and on a request that arrived from outside. An email to the requester, when they have an email address, on a shared comment from staff and when the request becomes Resolved.
+
+Overdue is true while New or In Progress past the Due Date; Waiting on Requester pauses it. Owner is the assignee, a user or a queue.
+
+### Salesforce implementation
+
+- **Object:** `Project_Request__c`, label Request, name field Auto Number `REQ-{000000}` (Request Number), sharing Read/Write, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Subject | `Subject__c` | Text(255), required |
+| Description | `Description__c` | Long Text Area(32768) |
+| Type | `Type__c` | Picklist (Question, Problem, Service Request, Change), restricted, default Service Request |
+| Category | `Category__c` | Picklist (General, Technology, Data and Reports, Facilities, Other), open, default General |
+| Priority | `Priority__c` | Picklist (Low, Medium, High, Urgent), restricted, required, default Medium, history tracked |
+| Status | `Status__c` | Picklist (New, In Progress, Waiting on Requester, Resolved, Closed, Cancelled), restricted, required, default New, history tracked |
+| Channel | `Channel__c` | Picklist (Staff, Portal, Partner Organization), restricted, set by R-PM23 |
+| Requester | `Requester__c` | Lookup(Contact), Set Null, relationship Requests |
+| Requesting Organization | `Account__c` | Lookup(Account), Set Null, relationship Requests |
+| Project | `Project__c` | Lookup(Project__c), Set Null, relationship Requests |
+| Project Task | `Project_Task__c` | Lookup(Project_Task__c), Set Null, filtered to the request's project |
+| Change Request | `Change_Request__c` | Lookup(Project_Change_Request__c), Set Null |
+| Due Date | `Due_Date__c` | Date |
+| Resolved Date | `Resolved_Date__c` | Date/Time |
+| Resolution | `Resolution__c` | Long Text Area(32768); the requester sees it |
+| Overdue | `Overdue__c` | Formula (Checkbox) |
+| Satisfaction | `Satisfaction__c` | Picklist (Satisfied, Not Satisfied), restricted |
+| Reply | `Reply__c` | Long Text Area(32768); a portal reply, emptied by R-PM24 |
+| Connection | `Connection__c` | Lookup(Request_Connection__c), Set Null, relationship Requests; the organization it came from |
+| External Reference | `External_Reference__c` | Text(80); the sending organization's own reference |
+| External Key | `External_Key__c` | Text(120), unique; connection Id and reference, so a resend never duplicates |
+
+## 29PM17. Request Comment
+
+### Definition
+
+A note on a request, internal unless shared with the requester (D-201).
+
+### Rules
+
+Shared With Requester ships off, so a comment is internal unless staff share it; the portal shows only shared comments of the person's own requests. From Requester is set only by R-PM24. Validation rule `Body_Needed`.
+
+### Salesforce implementation
+
+- **Object:** `Project_Request_Comment__c`, label Request Comment, name field Auto Number `RC-{000000}`, master-detail to Request (`Request__c`, relationship Comments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Request | `Request__c` | Master-Detail(Project_Request__c) |
+| Comment | `Body__c` | Long Text Area(32768) |
+| Shared With Requester | `Shared__c` | Checkbox, default false |
+| From Requester | `From_Requester__c` | Checkbox, default false |
+
+## 29PM18. Request Connection
+
+### Definition
+
+Another organization allowed to send requests in through the request API, as its own integration user (D-201).
+
+### Rules
+
+**R-PM26 Request intake.** A call is served only while Take requests from outside is on and an Active connection names the calling user and the org id the call gives; every other call is refused the same way. A request with a reference the connection already sent answers the existing one. New requests past the Hourly Limit in the last hour are refused. Requests arrive with Channel Partner Organization, Requesting Organization the connection's Account, and the sender's name and email in the description (no Contact is made). Validation rules: `Integration_User_Needed`, `Org_Id_Shape` (15 or 18 characters starting 00D).
+
+### Salesforce implementation
+
+- **Object:** `Request_Connection__c`, label Request Connection, name field Text (Organization Name), sharing Read/Write, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Account | `Account__c` | Lookup(Account), Set Null |
+| Org Id | `Org_Id__c` | Text(18), required, unique |
+| Integration User | `Integration_User__c` | Lookup(User) |
+| Active | `Active__c` | Checkbox, default true, history tracked |
+| Hourly Limit | `Hourly_Limit__c` | Number(4, 0), default 60 |
 
 ## 29AV1. Address Verification Settings
 
@@ -19101,6 +19228,7 @@ mirrors the primary member).
 | 1.56 | 2026-11-12 | Rollups under load (D-200 P2, P10, P13, release 1.22). `Automation_Registry__mdt` gains `Runs_On_Rollup_Writes__c` (Checkbox): during a `RollupWriter` update, Contact and Account run only rows so marked or Always Runs (shipped on donor level and donor score assignment and `Core_Rollups_Contact`). `Rollup_Settings__c` gains `Large_Parent_Hours__c` (Number, default 1, Setting Definition `Rollup_Large_Parent_Hours`) and `Processor_Requested_At__c` (DateTime, engine only); `Rollup_Run_Lock__c` gains `Last_Run_Started__c` (DateTime): a large parent run starts at most once per that many hours, and a save that queues totals finds a processor without a query. No object added. |
 | 1.57 | 2026-11-12 | Nightly rollup scope (D-200 P1, release 1.22; ADR-0082 amendment of 2026-11-12). Rule R-R4b: every record once a week on the night `Full_Recalc_Day__c` names (Text, default Sunday, Setting Definition `Rollup_Full_Recalc_Day`, Every_Night keeps the nightly sweep); other nights only the targets of source records changed or deleted since `Nightly_Covered_From__c` (DateTime, engine only) and of records crossing a last n days window, with the definitions that changes cannot cover still run everywhere. Every night retries Failed and releases held Rollup Queue entries. No object added. |
 | 1.58 | 2026-11-12 | Nightly donor level pass gated (D-200 P1, release 1.22). R-DL6: every donor is re-placed only after a ladder or donor setting change, a fiscal year turnover, with no recalculation recorded, or a week after the last; other nights rescore only donors crossing a recency cutoff. No object or field added. |
+| 1.59 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-0221 `0221-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. New Section 29PM18 Request Connection (`Request_Connection__c`, R-PM26) for the request API; Request gains Connection, External Reference and External Key. New Section 29C2 Provider Request (`Provider_Request__c`, R-PR1, R-PR2) in Mirror for the Case bridge; `Mirror_Settings__c` gains Send Cases to a Service Provider (off) and Case Type to Send. |
 
 ---
 ## 32. Entity ownership by package
@@ -19175,6 +19303,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Wealth screening data (Contact fields) | Giving | release 1.5 (G-32) | 25U |
 | Recurring Gift Event | Giving | release 1.5 (G-27) | 25V |
 | Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
+| Provider Request (the Case bridge) | Mirror | 1.21 (D-201) | 29C2 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
 | Mirror Settings | Mirror | v0.6 | 29B |
@@ -19313,6 +19442,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Project Invoice Line | Project Management | 1.20 (PM-10) | 29PM13 |
 | Project Revenue | Project Management | 1.20 (PM-11) | 29PM14 |
 | Change Request | Project Management | 1.20 (PM-12) | 29PM15 |
+| Request | Project Management | 1.21 (D-201) | 29PM16 |
+| Request Comment | Project Management | 1.21 (D-201) | 29PM17 |
+| Request Connection | Project Management | 1.21 (D-201) | 29PM18 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

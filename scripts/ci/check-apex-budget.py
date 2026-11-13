@@ -279,7 +279,10 @@ CAPS = {
     # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%. The
     # ProjectViews DTOs (R1.21 namespace readiness, D-200 N3): 106,037 measured, plus about 2%.
     # Lowered for the cleanup leftovers (D-200 S8b): 105,537 measured, plus about 2%.
-    "projects": 107_700,
+    # Requests and issues (D-201, ADR-0221 projects requests): the request rules and notices
+    # (ProjectRequestHandler), the Requests tab controller, the settings accessors and the
+    # org-to-org request API (ProjectRequestApi): 133,533 measured, plus about 2%.
+    "projects": 136_200,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
@@ -294,8 +297,10 @@ CAPS = {
     # reads and the member-count filter: 215,838 measured, plus about 2%. Lowered at the
     # cut-over cleanup (D-200, release 1.21: MirrorAccessSync and the five retired permission
     # sets removed): 212,177 measured 2026-11-12, plus about 2%. Lowered for the cleanup
-    # leftovers (D-200 S8b): 212,112 measured, plus about 2%.
-    "mirror": 216_400,
+    # leftovers (D-200 S8b): 212,112 measured, plus about 2%. The Case bridge to a service
+    # provider (D-201: CaseProviderRequests and its flow action): 221,790 measured,
+    # plus about 2%.
+    "mirror": 226_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

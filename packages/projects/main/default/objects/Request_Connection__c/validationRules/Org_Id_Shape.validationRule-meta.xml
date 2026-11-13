@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Org_Id_Shape</fullName>
+    <active>true</active>
+    <description>An org id is 15 or 18 letters and digits starting 00D.</description>
+    <errorConditionFormula>NOT(REGEX(Org_Id__c, '00D[a-zA-Z0-9]{12}([a-zA-Z0-9]{3})?'))</errorConditionFormula>
+    <errorDisplayField>Org_Id__c</errorDisplayField>
+    <errorMessage>Enter the organization's id: 15 or 18 characters starting 00D.</errorMessage>
+</ValidationRule>

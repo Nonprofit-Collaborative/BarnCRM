@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Request__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The request the comment is on.</inlineHelpText>
+  <label>Request</label>
+  <referenceTo>Project_Request__c</referenceTo>
+  <relationshipLabel>Comments</relationshipLabel>
+  <relationshipName>Comments</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

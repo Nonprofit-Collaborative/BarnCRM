@@ -15,6 +15,7 @@ import sponsor from '../templates/sponsor.json';
 import service from '../templates/service.json';
 import partner from '../templates/partner.json';
 import partnerFunders from '../templates/partner-funders.json';
+import requests from '../templates/requests.json';
 
 const PACKAGES = path.join(__dirname, '..', '..', 'packages');
 const BUILT_IN = ['Id', 'Name', 'CreatedDate'];
@@ -55,7 +56,8 @@ const FOLDERS = {
   Scholarships: 'scholarships',
   Memberships: 'memberships',
   Programs: 'programs',
-  Funders: 'funders'
+  Funders: 'funders',
+  Projects: 'projects'
 };
 const ACTION_CLASSES = {
   Volunteers: 'volunteers/main/default/classes/VolunteersPortalExtension.cls',
@@ -105,7 +107,8 @@ function cases() {
     ['sponsor', sponsor],
     ['service', service],
     ['partner', partner],
-    ['partner-funders', partnerFunders]
+    ['partner-funders', partnerFunders],
+    ['requests', requests]
   ].forEach(([name, template]) => {
     template.pages.forEach((page) => out.push([name + ' ' + page.key, template, page]));
   });
@@ -124,7 +127,8 @@ describe('shipped portal templates', () => {
     ['sponsor', sponsor],
     ['service', service],
     ['partner', partner],
-    ['partner-funders', partnerFunders]
+    ['partner-funders', partnerFunders],
+    ['requests', requests]
   ])('%s passes the shape rules and names its module', (name, template) => {
     expect(checkTemplate(template)).toEqual([]);
     expect(template.key).toBe(name);
@@ -268,6 +272,15 @@ describe('shipped portal templates', () => {
       value: 'true'
     });
     expect(directory.fields.map((f) => f.field)).not.toContain('Contact__c');
+  });
+
+  it('the requests template shows only shared updates and never edits status or resolution', () => {
+    const [mine, updates] = requests.pages;
+    mine.fields
+      .filter((f) => f.edit)
+      .forEach((f) => expect(f.field).not.toMatch(/Status__c|Resolution__c|Due_Date__c|Owner/));
+    expect(updates.actions).toEqual([]);
+    expect(updates.where).toContainEqual({ field: 'Shared__c', op: 'equals', value: 'true' });
   });
 
   it('titles and labels are in title case', () => {

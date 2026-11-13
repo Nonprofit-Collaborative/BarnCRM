@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Resolution__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What was done. The requester sees it. Needed to mark it Resolved.</inlineHelpText>
+  <label>Resolution</label>
+  <length>32768</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>4</visibleLines>
+</CustomField>

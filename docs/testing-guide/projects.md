@@ -294,3 +294,73 @@ and Track change requests are off (PM-10 to PM-12).
 | 5 | Turn off Track change requests. Add another change request. Open the project. | The new request is refused ("Change requests are turned off..."); the approved one still counts (Change Hours 10). |
 
 **Cleanup:** None.
+
+## T-PM-30: Requests Off at Install, Then Staff Requests
+
+**Purpose:** confirm the switch, R-PM23 and the Requests tab (D-201).
+**Prerequisites:** T-PM-01. A Contact with an email address you can read (the requester).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Requests tab. Try to save a new Request from the Request object. | The tab says requests are off; the save is refused ("Requests are turned off..."). |
+| 2 | Turn on Track requests and issues. As staff A, **New Request**: subject, priority High, the requester. Save. | Saved with Channel Staff, a due date two weekdays from today, Requesting Organization the requester's account. |
+| 3 | On the Requests tab, **My Open**. | The request is listed with its number, status New and due date. |
+| 4 | Open it. Set Status Resolved with no resolution. Save. | Refused: "Enter a resolution before marking the request Resolved." |
+| 5 | Add an internal comment, then a comment with Share with requester checked. | Both in the thread, marked Internal and Shared; the requester gets one email, for the shared comment. |
+| 6 | Enter a Resolution, set Resolved, Save. | Resolved Date set; the requester is emailed the resolution; the request moves to Recently Closed. |
+
+**Cleanup:** Delete the request.
+
+## T-PM-31: Assigning, Queues, Overdue and Linked Work
+
+**Purpose:** confirm assignment notices, the Requests queue, Overdue, Create Task and Create
+Change Request.
+**Prerequisites:** T-PM-30; Track change requests on; a project.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open a request and set its Owner to staff A. Save. | Staff A gets a bell notice "Request REQ-... assigned to you". |
+| 2 | On the request record page, change Owner to the Requests queue. | It appears in **Unassigned**. |
+| 3 | Set a request's Due Date to yesterday, Status In Progress. Then set Status Waiting on Requester. | Listed under **Overdue** with the due date in red; once Waiting on Requester it is no longer Overdue. |
+| 4 | Create Task with no project. | Refused: "Choose the request's project and save first." |
+| 5 | Choose the project, Save, then **Create Task** and **Create Change Request**. | A task named from the subject on the project and a Draft change request, both shown on the panel; a New request moves to In Progress. |
+| 6 | Log time on the project with Request set to this request. | The time entry shows in the request's Time Entries list. |
+| 7 | Run the reports Open Requests, Overdue Requests and Requests Resolved This Month. | Each lists the matching requests. |
+
+**Cleanup:** Delete the requests, task and change request.
+
+## T-PM-32: Requests From the Portal
+
+**Purpose:** confirm the Requests portal template, R-PM24 and the reply inbox (D-201).
+**Prerequisites:** T-PM-30; BarnCRM Portal Builder set up with a test portal page; the requester
+Contact from T-PM-30.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With Take requests from outside off, paste `requests.json` into a portal and sign in as the requester. Send a new request. | Refused; nothing is saved. |
+| 2 | Turn on Take requests from outside. Send a request: subject, type, priority Medium, details. | Listed under My Requests with its number and status New; in Salesforce it has Channel Portal, Owner the Requests queue, and the queue members get a bell notice. |
+| 3 | In the portal, change the priority to Urgent and save. | The priority stays Medium. |
+| 4 | As staff, add a shared comment and an internal comment, and set Status Waiting on Requester. | The requester is emailed the shared comment; **Updates** in the portal shows only the shared one. |
+| 5 | In the portal, enter Add a Reply and save. | The reply appears in the request's thread as Shared from the requester; Add a Reply is blank again; the status is In Progress. |
+| 6 | Resolve the request with a resolution. In the portal, set Satisfied? to Satisfied. | The portal shows the resolution; Satisfaction is Satisfied on the request. |
+| 7 | Sign in as another person. | Neither the request nor its updates are listed. |
+
+**Cleanup:** Delete the request and the test portal.
+
+## T-PM-33: Requests From Another Organization
+
+**Purpose:** confirm the request API and R-PM26 (D-201).
+**Prerequisites:** T-PM-30; Take requests from outside on; an integration user with Projects
+Request Intake and an External Client App with client credentials run as that user; a REST
+client (Postman, or Workbench REST Explorer signed in as that user).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Without a Request Connection, `POST /services/apexrest/barncrm/requests/v1/requests` with `orgId` your org id, `reference` T-1, `subject`. | `403 not_allowed`; nothing saved. |
+| 2 | On the Request Connections tab, add one: a name, an Account, your org id, the integration user, Hourly Limit 2. Send the same call. | `201` with a number and status New. The request has Channel Partner Organization, the connection's Account, Owner the Requests queue. |
+| 3 | Send it again. | `200` with the same number; still one request. |
+| 4 | Send references T-2 and T-3. | T-2 is `201`; T-3 is `429 too_many`. |
+| 5 | Resolve T-1 with a resolution. `GET ...requests?orgId=<org id>&refs=T-1,T-2`. | Both listed; T-1 Resolved with the resolution. |
+| 6 | Untick Active on the connection and send T-4. Send a body that is not JSON. | `403 not_allowed`; then `400 bad_request`. |
+
+**Cleanup:** Delete the requests and the connection.

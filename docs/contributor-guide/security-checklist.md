@@ -119,7 +119,7 @@ assigns them to a chosen Site's guest user only.
   `Smarty_Auth_Token__c`). In a managed package a Protected setting is unreadable to the
   subscriber's Apex and API; only the packages' own setup pages write them, and those pages
   never send a stored secret back to the browser (at most its last four characters). Why not Named Credentials: see the
-  ADR on provider secrets (ADR-NEXT, `NEXT-provider-secrets-protected-settings.md`).
+  ADR on provider secrets (ADR-0220, `0220-provider-secrets-protected-settings.md`).
 - [ ] `System.debug` only as the last resort when logging itself fails, with the exception
   message and no record contents. No `console.*` in LWC.
 

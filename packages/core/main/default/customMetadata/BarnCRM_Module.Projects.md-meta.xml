@@ -24,11 +24,11 @@
   </values>
   <values>
     <field>Staff_Tabs__c</field>
-    <value xsi:type="xsd:string">Projects_Home:Projects Home;Projects_Timesheet:Timesheet;Projects_Approvals:Approvals;Project__c;Time_Entry__c;Project_Expense__c;Project_Resource__c;Projects_Staffing:Staffing</value>
+    <value xsi:type="xsd:string">Projects_Home:Projects Home;Projects_Timesheet:Timesheet;Projects_Approvals:Approvals;Projects_Requests:Requests;Project__c;Time_Entry__c;Project_Expense__c;Project_Resource__c;Projects_Staffing:Staffing</value>
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:type="xsd:string">Project_Rate__c;Project_Invoice__c</value>
+    <value xsi:type="xsd:string">Project_Rate__c;Project_Invoice__c;Request_Connection__c</value>
   </values>
   <values>
     <field>Probe_Object__c</field>

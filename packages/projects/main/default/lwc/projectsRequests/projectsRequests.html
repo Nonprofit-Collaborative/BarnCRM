@@ -1,0 +1,69 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+
+      <template lwc:if={enabled}>
+        <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-bottom_small">
+          <lightning-button-group class="slds-col">
+            <template for:each={views} for:item="view">
+              <lightning-button key={view.key} label={view.label} variant={view.variant} data-view={view.key} onclick={handleView} data-id="view"></lightning-button>
+            </template>
+          </lightning-button-group>
+          <lightning-button label={labels.newRequest} icon-name="utility:add" onclick={handleNew} data-id="new"></lightning-button>
+        </div>
+        <div class="slds-grid slds-wrap slds-gutters_small">
+          <div class="slds-col slds-size_1-of-1 slds-large-size_7-of-12">
+            <template lwc:if={hasRows}>
+              <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+                <thead>
+                  <tr>
+                    <th scope="col" data-label={labels.number}>{labels.number}</th>
+                    <th scope="col" data-label={labels.subject}>{labels.subject}</th>
+                    <th scope="col" data-label={labels.status}>{labels.status}</th>
+                    <th scope="col" data-label={labels.priority}>{labels.priority}</th>
+                    <th scope="col" data-label={labels.owner}>{labels.owner}</th>
+                    <th scope="col" data-label={labels.due}>{labels.due}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={rows} for:item="row">
+                    <tr key={row.id} data-id="row" aria-selected={row.selected}>
+                      <td data-label={labels.number}>{row.name}</td>
+                      <td data-label={labels.subject}>
+                        <button class="slds-button" data-request={row.id} onclick={handleSelect} data-id="open">{row.subject}</button>
+                        <template lwc:if={row.requester}><p class="slds-text-color_weak">{row.requester}</p></template>
+                      </td>
+                      <td data-label={labels.status}>{row.status}</td>
+                      <td data-label={labels.priority}>{row.priority}</td>
+                      <td data-label={labels.owner}>{row.owner}</td>
+                      <td data-label={labels.due} class={row.rowClass}>
+                        <lightning-formatted-date-time value={row.dueDate} time-zone="UTC"></lightning-formatted-date-time>
+                        <template lwc:if={row.overdue}><span class="slds-badge slds-var-m-left_x-small" data-id="overdue">{labels.overdue}</span></template>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:else><p class="slds-text-color_weak" data-id="empty">{labels.empty}</p></template>
+          </div>
+          <div class="slds-col slds-size_1-of-1 slds-large-size_5-of-12">
+            <template lwc:if={selectedId}>
+              <c-projects-request-panel record-id={selectedId} onchanged={handleChanged} data-id="panel"></c-projects-request-panel>
+            </template>
+          </div>
+        </div>
+      </template>
+      <template lwc:elseif={isLoading}></template>
+      <template lwc:else>
+        <p class="slds-text-color_weak" data-id="off">{labels.off}</p>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

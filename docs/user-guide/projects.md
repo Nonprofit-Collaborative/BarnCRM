@@ -105,3 +105,26 @@ Your admin turns each part on in BarnCRM Settings, Projects.
 - **Change Requests** (project page, Change Requests list): a scope change with the hours and
   amount it adds (or removes, as a negative). The project owner approves or rejects it; approved
   changes add to the budget the project is measured against.
+
+## Requests (When Your Admin Turns Them On)
+
+The **Requests** tab lists the requests and issues people raised with your team. Choose a view:
+**My Open**, **All Open**, **Unassigned** (held by a queue), **Overdue** or **Recently Closed**.
+Overdue requests show their due date in red.
+
+- **New Request** opens a blank request: a subject, what is needed, the type, category and
+  priority, and the requester when it is for someone else. The due date fills in from the
+  priority when you leave it blank.
+- Choose a request to open its panel beside the list. Change its **Status**, **Priority**,
+  **Owner** (a person; use the record page to give it to a queue), **Due Date** or **Project**,
+  then **Save**. **Resolved** needs a **Resolution**: the requester sees it and is emailed.
+- **Comments.** Type a comment and **Add Comment**. It stays internal unless you check **Share
+  with requester**, which shows it in the requester's portal and emails it to them. A requester's
+  reply from the portal appears marked **From Requester** and moves the request back to In
+  Progress.
+- **Create Task** adds a task, named from the subject, to the request's project; **Create Change
+  Request** adds a Draft change request (when your admin tracks change requests). Both are linked
+  on the request. When you log time, the **Request** field on the time entry counts it against the
+  request.
+- You get a bell notice when someone assigns you a request, when a requester replies, and when a
+  request arrives from outside on a queue you belong to.

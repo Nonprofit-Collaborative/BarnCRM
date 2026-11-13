@@ -1600,6 +1600,8 @@ memberships/MembershipsPostInstall.cls | public MembershipsPostInstall()
 memberships/MembershipsPostInstall.cls | public class MembershipsPostInstall
 mirror/CampaignSyncTriggerHandler.cls | public CampaignSyncTriggerHandler()
 mirror/CampaignSyncTriggerHandler.cls | public class CampaignSyncTriggerHandler
+mirror/CaseProviderRequestAction.cls | global class CaseProviderRequestAction
+mirror/CaseProviderRequestAction.cls | global static void send(List<Id>)
 mirror/GiftTransactionMirrorTriggerHandler.cls | public GiftTransactionMirrorTriggerHandler()
 mirror/GiftTransactionMirrorTriggerHandler.cls | public class GiftTransactionMirrorTriggerHandler
 mirror/InboundGift.cls | global Date giftDate
@@ -1715,6 +1717,11 @@ projects/ProjectInvoiceHandler.cls | public ProjectInvoiceHandler()
 projects/ProjectInvoiceHandler.cls | public class ProjectInvoiceHandler
 projects/ProjectInvoicePaymentListener.cls | public ProjectInvoicePaymentListener()
 projects/ProjectInvoicePaymentListener.cls | public class ProjectInvoicePaymentListener
+projects/ProjectRequestApi.cls | global class ProjectRequestApi
+projects/ProjectRequestApi.cls | global static void status()
+projects/ProjectRequestApi.cls | global static void submit()
+projects/ProjectRequestHandler.cls | public ProjectRequestHandler()
+projects/ProjectRequestHandler.cls | public class ProjectRequestHandler
 projects/ProjectsAccessSync.cls | public ProjectsAccessSync()
 projects/ProjectsAccessSync.cls | public class ProjectsAccessSync
 projects/ProjectsNightlyJobProvider.cls | public ProjectsNightlyJobProvider()

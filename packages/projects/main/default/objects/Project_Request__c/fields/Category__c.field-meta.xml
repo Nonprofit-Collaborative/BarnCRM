@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Category__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The area the request is about. Admins can add values.</inlineHelpText>
+  <label>Category</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>false</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>General</fullName>
+        <default>true</default>
+        <label>General</label>
+      </value>
+      <value>
+        <fullName>Technology</fullName>
+        <default>false</default>
+        <label>Technology</label>
+      </value>
+      <value>
+        <fullName>Data and Reports</fullName>
+        <default>false</default>
+        <label>Data and Reports</label>
+      </value>
+      <value>
+        <fullName>Facilities</fullName>
+        <default>false</default>
+        <label>Facilities</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

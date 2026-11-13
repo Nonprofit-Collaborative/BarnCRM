@@ -1,4 +1,4 @@
-# ADR-NEXT: Provider secrets stay in Protected custom settings in the managed packages
+# ADR-0220: Provider secrets stay in Protected custom settings in the managed packages
 
 **Status:** Accepted (builder decision, for Brandon to confirm)
 **Date:** 2026-11-12

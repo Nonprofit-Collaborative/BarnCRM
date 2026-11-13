@@ -67,6 +67,44 @@ public with sharing class ProjectsSettings {
 		return part('Change_Requests_Enabled__c');
 	}
 
+	/** D-201: requests and issues. Does not need time tracking. */
+	public static Boolean requestsEnabled() {
+		return flag('Requests_Enabled__c');
+	}
+
+	/** D-201: requests from the portal and request connections; needs requests on. */
+	public static Boolean requestsExternalEnabled() {
+		return requestsEnabled() && flag('Requests_External_Enabled__c');
+	}
+
+	/** Weekdays from a request's creation to its due date, by its priority. */
+	public static Integer requestDueDays(String priority) {
+		switch on priority {
+			when 'Urgent' {
+				return days('Request_Days_Urgent__c', 1);
+			}
+			when 'High' {
+				return days('Request_Days_High__c', 2);
+			}
+			when 'Low' {
+				return days('Request_Days_Low__c', 10);
+			}
+			when else {
+				return days('Request_Days_Medium__c', 5);
+			}
+		}
+	}
+
+	private static Boolean flag(String key) {
+		return SettingsService.flag(SETTINGS_OBJECT, key);
+	}
+
+	/** A due-day setting, 0 to 365, or the shipped default when unreadable. */
+	private static Integer days(String key, Integer fallback) {
+		Decimal stored = SettingsService.number(SETTINGS_OBJECT, key);
+		return stored == null ? fallback : Math.min(Math.max(stored.intValue(), 0), 365);
+	}
+
 	/** Days from an invoice's date to its due date. */
 	public static Integer invoiceDueDays() {
 		return whole('Invoice_Due_Days__c');

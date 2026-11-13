@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customNotifTypeName>Projects request</customNotifTypeName>
+  <description>
+    Tells a person a request was assigned to them, a requester replied, or a request arrived from
+    the portal or another organization. Sent by Project Management requests and issues.
+  </description>
+  <desktop>true</desktop>
+  <masterLabel>Projects request</masterLabel>
+  <mobile>true</mobile>
+</CustomNotificationType>

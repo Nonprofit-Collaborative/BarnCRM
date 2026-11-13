@@ -250,3 +250,21 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 
 **Cleanup:** set the direction to **Off**; delete the 150 gift (its Gift Transaction stays, and the Error Log has one Warning naming it) and delete that Gift Transaction in Nonprofit Cloud.
 
+## T-MIR-16: Cases Sent to a Service Provider
+
+**Purpose:** confirm the Case bridge, R-PR1 and R-PR2 (D-201).
+**Prerequisites:** a provider org with Project Management, T-PM-33's Request Connection naming
+this org's id, and the client credentials it gave; in this org, the `Barn_Request_Provider`
+Named Credential set up as in the admin guide, a Case Type value Service Provider, Nightly Jobs
+scheduled.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With Send Cases to a service provider off, create a Case of Type Service Provider. In Anonymous Apex run `System.enqueueJob(new CaseProviderRequests());`. | Nothing on the Provider Requests tab. |
+| 2 | Turn the setting on and run the same line. | A Provider Request named by the Case Number, with a Request Number and Provider Status New. The provider org has the request with Channel Partner Organization. |
+| 3 | Run it again. | Still one request at the provider; the row's Last Synced moves on. |
+| 4 | At the provider, resolve the request with a resolution. Run it again. | Provider Status Resolved and the resolution on the row. |
+| 5 | At the provider, untick Active on the connection. Create another Case and run it again. | Its row shows Last Error "The service provider refused the Case (403)..."; the Error Log has a Warning. |
+| 6 | Build a record-triggered flow on Case calling **Send Cases to a Service Provider**, reactivate the connection, create a Case. | The row appears within a minute, without waiting for the night. |
+
+**Cleanup:** delete the Cases, the flow and the Provider Requests; turn the setting off.
