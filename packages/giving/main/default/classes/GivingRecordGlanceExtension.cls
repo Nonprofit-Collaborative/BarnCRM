@@ -67,15 +67,15 @@ public with sharing class GivingRecordGlanceExtension implements RecordGlanceExt
 				'custom:custom41'
 			)
 			.addCurrency(
-				fields.get('Total_Giving__c').getDescribe().getLabel(),
+				NamespaceUtil.field(fields, 'Total_Giving__c').getDescribe().getLabel(),
 				totalGiving == null ? 0 : totalGiving
 			)
 			.addDate(
-				fields.get('Last_Gift_Date__c').getDescribe().getLabel(),
+				NamespaceUtil.field(fields, 'Last_Gift_Date__c').getDescribe().getLabel(),
 				(Date) donor.get('Last_Gift_Date__c')
 			)
 			.addText(
-				fields.get('Donor_Level__c').getDescribe().getLabel(),
+				NamespaceUtil.field(fields, 'Donor_Level__c').getDescribe().getLabel(),
 				levelRecord == null ? null : (String) levelRecord.get('Name')
 			);
 		if (Schema.SObjectType.Gift__c.isCreateable()) {

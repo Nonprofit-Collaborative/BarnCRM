@@ -150,15 +150,21 @@ public with sharing class EventApplicationsController {
 					'Abstract__c'
 				}
 			) {
-				result.fieldLabels.put(name, fields.get(name).getDescribe().getLabel());
+				result.fieldLabels.put(
+					name,
+					NamespaceUtil.field(fields, name).getDescribe().getLabel()
+				);
 			}
 			Map<String, Schema.SObjectField> reviewFields = Schema.SObjectType.Speaker_Review__c.fields.getMap();
 			for (String name : new List<String>{ 'Score__c', 'Notes__c', 'Reviewer__c' }) {
-				result.fieldLabels.put(name, reviewFields.get(name).getDescribe().getLabel());
+				result.fieldLabels.put(
+					name,
+					NamespaceUtil.field(reviewFields, name).getDescribe().getLabel()
+				);
 			}
 			result.fieldLabels.put(
 				'Weighted_Average__c',
-				fields.get('Weighted_Average__c').getDescribe().getLabel()
+				NamespaceUtil.field(fields, 'Weighted_Average__c').getDescribe().getLabel()
 			);
 			result.canEditEvent = Schema.SObjectType.Event__c.fields.Review_Criteria__c.isUpdateable();
 			result.canAssign = Schema.SObjectType.Speaker_Review__c.fields.Reviewer__c.isCreateable();

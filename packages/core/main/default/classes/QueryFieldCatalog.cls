@@ -173,25 +173,17 @@ public with sharing class QueryFieldCatalog {
 		if (objectsRead.containsKey(key)) {
 			return objectsRead.get(key);
 		}
-		List<Schema.DescribeSObjectResult> found;
-		try {
-			found = Schema.describeSObjects(
-				new List<String>{ objectApiName },
-				SObjectDescribeOptions.DEFERRED
-			);
-		} catch (InvalidParameterValueException missing) {
-			throw unknownObject(objectApiName);
-		}
+		Schema.DescribeSObjectResult found = NamespaceUtil.describe(objectApiName);
 		if (
-			found.isEmpty() ||
-			!found[0].isAccessible() ||
-			!found[0].isQueryable() ||
-			isSystemObject(found[0])
+			found == null ||
+			!found.isAccessible() ||
+			!found.isQueryable() ||
+			isSystemObject(found)
 		) {
 			throw unknownObject(objectApiName);
 		}
-		objectsRead.put(key, found[0]);
-		return found[0];
+		objectsRead.put(key, found);
+		return found;
 	}
 
 	/**

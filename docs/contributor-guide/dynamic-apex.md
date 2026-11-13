@@ -170,6 +170,11 @@ fails the build. Never assume there is none either:
   through `SetupObjectSelector`, which adds `NamespacePrefix` (`NamespaceUtil.namespacePrefix()`,
   null with no namespace), so a subscriber's object of the same name is never picked. Email
   templates fall back to the org's own, since a setting may name one (D-200, N9).
+- A field named in code or data is found with `NamespaceUtil.field(type or field map, name)`
+  (its label with `NamespaceUtil.fieldLabel`), never `fields.getMap().get('Amount__c')`: the
+  map is keyed by the full name, so the literal misses once the namespace exists. An object
+  named by a row or query is described with `NamespaceUtil.describe(name)` (null when absent),
+  never `Schema.describeSObjects` with an unprefixed name, which throws (D-200, N10).
 - Lightning components never build these names; Apex returns them.
 
 ## 5. Describe once, never in a loop

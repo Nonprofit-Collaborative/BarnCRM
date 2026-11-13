@@ -126,20 +126,15 @@ public with sharing class FormPublicPolicy {
 		if (!name.endsWith('__c') || FORMS_OBJECTS.contains(name)) {
 			return false;
 		}
-		List<Schema.DescribeSObjectResult> described = Schema.describeSObjects(
-			new List<String>{ objectName },
-			SObjectDescribeOptions.DEFERRED
-		);
-		return !described.isEmpty() && !described[0].isCustomSetting();
+		Schema.DescribeSObjectResult described = NamespaceUtil.describe(objectName);
+		return described != null && !described.isCustomSetting();
 	}
 
 	private static Boolean fieldAllowed(String objectName, String fieldName) {
-		Schema.SObjectField field = Schema.describeSObjects(
-				new List<String>{ objectName },
-				SObjectDescribeOptions.DEFERRED
-			)[0]
-			.fields.getMap()
-			.get(fieldName == null ? '' : fieldName.toLowerCase());
+		Schema.SObjectField field = NamespaceUtil.field(
+			NamespaceUtil.objectType(objectName),
+			fieldName
+		);
 		if (field == null) {
 			return false;
 		}

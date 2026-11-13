@@ -87,9 +87,15 @@ public with sharing class EventAppointmentsController {
 					'Location__c'
 				}
 			) {
-				result.fieldLabels.put(name, fields.get(name).getDescribe().getLabel());
+				result.fieldLabels.put(
+					name,
+					NamespaceUtil.field(fields, name).getDescribe().getLabel()
+				);
 			}
-			result.fieldLabels.put('Start__c', fields.get('Start__c').getDescribe().getLabel());
+			result.fieldLabels.put(
+				'Start__c',
+				NamespaceUtil.field(fields, 'Start__c').getDescribe().getLabel()
+			);
 			for (Event__c record : [
 				SELECT Start__c, End__c
 				FROM Event__c

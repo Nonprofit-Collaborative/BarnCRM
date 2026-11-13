@@ -89,6 +89,52 @@ public with sharing class NamespaceUtil {
 	}
 
 	/**
+	 * A field of an object by its unprefixed name, as `objectType` finds objects (D-200, N10):
+	 * this package's field (`prefix() + name`) first, then the name as written (a standard
+	 * field, or the subscriber's own). A describe field map is keyed by the full name, so a
+	 * literal `fields.getMap().get('Amount__c')` finds nothing once the namespace exists. Null
+	 * when neither is there.
+	 */
+	@NamespaceAccessible
+	public static Schema.SObjectField field(Schema.SObjectType type, String localName) {
+		return type == null
+			? null
+			: field(type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap(), localName);
+	}
+
+	/** The same lookup in a describe field map the caller already holds. */
+	@NamespaceAccessible
+	public static Schema.SObjectField field(
+		Map<String, Schema.SObjectField> fields,
+		String localName
+	) {
+		if (fields == null || String.isBlank(localName)) {
+			return null;
+		}
+		String name = localName.trim();
+		Schema.SObjectField packaged = String.isBlank(prefix()) ? null : fields.get(qualify(name));
+		return packaged != null ? packaged : fields.get(name);
+	}
+
+	/** A field's label, from `field`, or the name given when there is no such field. */
+	@NamespaceAccessible
+	public static String fieldLabel(Schema.SObjectType type, String localName) {
+		Schema.SObjectField found = field(type, localName);
+		return found == null ? localName : found.getDescribe().getLabel();
+	}
+
+	/**
+	 * The describe of an object named by a row, setting or query, found as `objectType` finds
+	 * it, or null when there is none. Use it in place of `Schema.describeSObjects` with a name
+	 * that has no prefix, which throws for a packaged object once the namespace exists.
+	 */
+	@NamespaceAccessible
+	public static Schema.DescribeSObjectResult describe(String apiName) {
+		Schema.SObjectType type = objectType(apiName);
+		return type == null ? null : type.getDescribe(SObjectDescribeOptions.DEFERRED);
+	}
+
+	/**
 	 * The org's global describe, read once per transaction. Building it costs about 12 ms of
 	 * CPU in an org with a thousand objects and one save used to ask for it ten times or more,
 	 * while the objects an org has cannot change within a transaction. A stub always wins.

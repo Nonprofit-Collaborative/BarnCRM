@@ -345,15 +345,7 @@ public with sharing virtual class NpspHouseholdSource {
 
 	/** The object of that name when the org has it, or null. */
 	private static Schema.SObjectType sobjectType(String name) {
-		try {
-			List<Schema.DescribeSObjectResult> found = Schema.describeSObjects(
-				new List<String>{ name },
-				SObjectDescribeOptions.DEFERRED
-			);
-			return found.isEmpty() ? null : found[0].getSObjectType();
-		} catch (InvalidParameterValueException e) {
-			return null;
-		}
+		return NamespaceUtil.objectType(name);
 	}
 
 	/** NPSP's household record type, when the org has it. */

@@ -66,7 +66,10 @@ CAPS = {
     # Raised 2026-11-12 for MIG-02b Nonprofit Cloud household conversion (the adoption service
     # and batch take a source key, join members in Junction mode and undo them; the Household
     # Model guard in HouseholdSelector): 2,221,240 measured, plus about 0.5%.
-    "core": 2_232_000,
+    # Raised 2026-11-12 for R1.21 namespace readiness (D-199, D-200: BarnInstallCheck, the setup
+    # bootstrap and revisions, SetupObjectSelector, NamespaceUtil.field and describe; the
+    # modules shrank by moving their lookups onto Core): 2,233,198 measured, plus about 0.3%.
+    "core": 2_240_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
