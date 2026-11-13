@@ -5,11 +5,10 @@
  * Five things, each safe to run twice and none able to abort an install, since every failure
  * is written to the Error Log instead:
  *
- * 1. Carry over the two rollup settings an org saved on Core's settings object before the
- *    module had its own (decision 6), while the module has saved none, then give an org that
- *    still has no module settings row one holding the shipped defaults (a new rollup starts in
- *    Both, real-time totals are recalculated just after the save), so the Settings console
- *    and every reader of the settings find a row. A row that exists is never touched.
+ * 1. Give an org that has no module settings row one holding the shipped defaults (a new
+ *    rollup starts in Both, real-time totals are recalculated just after the save), so the
+ *    Settings console and every reader of the settings find a row. A row that exists is never
+ *    touched.
  * 2. Create the shipped Rollup Definitions this org does not have yet, so a fresh org has its
  *    totals without anybody pressing a button, and leave every definition already here exactly
  *    as the administrator left it (R-R6, ADR-0029). The module sees only the shipped defaults
@@ -35,25 +34,7 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 	private static final String SWITCH_CONTEXT = 'RollupsPostInstall.ensureAutomationSwitches';
 	private static final String ACCESS_CONTEXT = 'RollupsPostInstall.grantInstallerAccess';
 	@TestVisible
-	private static final String CARRY_CONTEXT = 'RollupsPostInstall.carryOverCoreSettings';
-	@TestVisible
 	private static final String SETTINGS_CONTEXT = 'RollupsPostInstall.ensureSettingsRow';
-
-	/** Core's settings object, where the two rollup settings lived before the module. */
-	private static final String CORE_SETTINGS_OBJECT = 'BarnCRM_Settings__c';
-
-	/** The settings carried over, under the same field name on both objects. */
-	private static final List<String> CARRIED_KEYS = new List<String>{
-		RollupService.MODE_DEFAULT_SETTING,
-		RollupService.PROCESSING_SETTING
-	};
-
-	/**
-	 * Stands in for the old Core fields in a test, keyed like CARRIED_KEYS, since Core no longer
-	 * defines them and a test org cannot have them.
-	 */
-	@TestVisible
-	private static Map<String, Object> oldCoreValuesForTest;
 
 	/** The permission set the installer is given. */
 	public static final String ADMIN_PERMISSION_SET = 'Rollup_Builder_Admin';
@@ -84,7 +65,6 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 	 */
 	public void runSetup(Id installerId) {
 		// The entry points record their own failures and return, so nothing here throws.
-		carryOverCoreSettings();
 		ensureSettingsRow();
 		RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
@@ -98,34 +78,6 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 		} catch (Exception e) {
 			ErrorLogger.log(e, ACCESS_CONTEXT);
 			RollupAccessSync.requestSync();
-		}
-	}
-
-	/**
-	 * Copies the rollup settings an org saved on Core's settings object, before the module had
-	 * its own, to the module's settings object. Does nothing once the module's settings have
-	 * been saved: those win. Each old field is read by name and only when it is still in the
-	 * org, since Core no longer defines it. Blank values are left out, so the shipped defaults
-	 * apply. Also run by `scripts/org/deploy-packages.sh`, since a deployment runs no install
-	 * script. Never throws: a failure goes to the Error Log.
-	 */
-	public static void carryOverCoreSettings() {
-		try {
-			if (Rollup_Settings__c.getOrgDefaults().Id != null) {
-				return;
-			}
-			Map<String, Object> carried = new Map<String, Object>();
-			for (String key : CARRIED_KEYS) {
-				Object value = oldCoreValue(key);
-				if (value != null && String.isNotBlank(String.valueOf(value))) {
-					carried.put(key, value);
-				}
-			}
-			if (!carried.isEmpty()) {
-				SettingsService.saveValues(RollupService.SETTINGS_OBJECT, carried);
-			}
-		} catch (Exception e) {
-			ErrorLogger.log(e, CARRY_CONTEXT);
 		}
 	}
 
@@ -154,17 +106,6 @@ public with sharing class RollupsPostInstall implements InstallHandler, ModuleSe
 		} catch (Exception e) {
 			ErrorLogger.log(e, SETTINGS_CONTEXT);
 		}
-	}
-
-	/** The value an old Core field holds, or null when the field is not in this org. */
-	private static Object oldCoreValue(String key) {
-		if (oldCoreValuesForTest != null) {
-			return oldCoreValuesForTest.get(key);
-		}
-		if (!SettingsService.hasKey(CORE_SETTINGS_OBJECT, key)) {
-			return null;
-		}
-		return SettingsService.getValue(CORE_SETTINGS_OBJECT, key);
 	}
 
 	/**

@@ -44,10 +44,9 @@
  * version reaches an org that already has others. Core adds its own here; each module that
  * ships templates calls the same method from its own script.
  *
- * Alongside these (ADR-0124): a new install starts with every feature off, an edition stored
- * under its old value is renamed (ADR-0143), an upgrade with no
- * edition saved gets the recommended one, and every run schedules the hourly tab access check
- * unless it is already scheduled. When Seasonal Addresses is on and its nightly job is missing,
+ * Alongside these (ADR-0124): a new install starts with every feature off, and every run
+ * schedules the hourly tab access check unless it is already scheduled. The managed release is a
+ * fresh install everywhere (D-199), so no step migrates an older unnamespaced install. When Seasonal Addresses is on and its nightly job is missing,
  * the job is scheduled too; an upgraded org that already runs the job has the switch turned on.
  * A checkbox that ships on and was added in an upgrade is turned on once in an org that saved its
  * settings before it existed (`ShippedDefaultUpgrades`, QA-F2).
@@ -69,12 +68,10 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
 	private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
 	private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
-	private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
 	private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
 	private static final String NIGHTLY_CONTEXT = 'CorePostInstall.scheduleNightlyRun';
 	private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
 	private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
-	private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
 
 	/**
 	 * Core checkboxes that ship on and were added in an upgrade, oldest first: each is turned on
@@ -108,8 +105,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		if (context == null) {
 			return;
 		}
-		Boolean isUpgrade = context.previousVersion() != null;
-		run(!isUpgrade, isUpgrade, context.installerId());
+		run(context.previousVersion() == null, context.installerId());
 	}
 
 	/**
@@ -148,7 +144,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 			// Unsure means existing: marking a working org as new would turn its features off.
 			ErrorLogger.log(e, FEATURE_CONTEXT);
 		}
-		run(!alreadySetUp, alreadySetUp, mayGrantOutsideInstall(installerId) ? installerId : null);
+		run(!alreadySetUp, mayGrantOutsideInstall(installerId) ? installerId : null);
 	}
 
 	/**
@@ -185,10 +181,8 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		return households > 0;
 	}
 
-	private void run(Boolean isNewInstall, Boolean isUpgrade, Id installerId) {
+	private void run(Boolean isNewInstall, Id installerId) {
 		markFeaturesOffOnANewInstall(isNewInstall);
-		renameStoredEdition();
-		saveEditionOnAnUpgrade(isUpgrade);
 		applyRecommendedMode();
 		storeOrganizationRecordType();
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
@@ -200,7 +194,6 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		scheduleTabAccessCheck();
 		alignSeasonalAddresses();
 		scheduleNightlyRunOnANewInstall(isNewInstall);
-		renameDataQualityQueries();
 		ShippedDefaultUpgrades.apply(
 			ModuleSetups.CORE,
 			BarnCRM_Settings__c.SObjectType,
@@ -225,46 +218,6 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, FEATURE_CONTEXT);
-		}
-	}
-
-	/**
-	 * An upgraded org with no edition saved gets the one the Setup Assistant recommends, or the
-	 * Standard Edition when nothing points to the Nonprofit one (what BarnCRM already shows with
-	 * no edition). Its features are all on, so without this the first-run window would stand in
-	 * front of an org that is already working (ADR-0124).
-	 */
-	private void saveEditionOnAnUpgrade(Boolean isUpgrade) {
-		try {
-			if (isUpgrade && String.isBlank(SettingsService.getSettings().Suite__c)) {
-				String suite = SetupAssistantService.recommendedSuite();
-				SettingsService.saveSystemValue(
-					'Suite__c',
-					suite == null ? ModuleDetectionService.SUITE_STANDARD : suite
-				);
-			}
-		} catch (Exception e) {
-			ErrorLogger.log(e, EDITION_CONTEXT);
-		}
-	}
-
-	/**
-	 * Rewrites an edition stored before ADR-0143 (`0143-edition-internal-values.md`): `Community`
-	 * becomes `Standard` and `Impact` becomes `Nonprofit`. Saved as bookkeeping, with no Recent
-	 * Changes row, because nobody changed the edition. Any other value is left alone, so a second
-	 * run changes nothing. Never throws.
-	 */
-	private void renameStoredEdition() {
-		try {
-			String stored = SettingsService.getSettings().Suite__c;
-			String renamed = String.isBlank(stored)
-				? null
-				: ModuleDetectionService.SUITE_BY_OLD_VALUE.get(stored.trim().toLowerCase());
-			if (renamed != null) {
-				SettingsService.saveBookkeeping(new Map<String, Object>{ 'Suite__c' => renamed });
-			}
-		} catch (Exception e) {
-			ErrorLogger.log(e, EDITION_CONTEXT);
 		}
 	}
 
@@ -325,18 +278,6 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 			CoexistenceService.applyRecommendedIfUnset();
 		} catch (Exception e) {
 			ErrorLogger.log(e, MODE_CONTEXT);
-		}
-	}
-
-	/**
-	 * Renames the saved queries "Open in Find" made before the tool was named Data Quality, so
-	 * it keeps updating them (D-140). Finds nothing on a second run. Never throws.
-	 */
-	private void renameDataQualityQueries() {
-		try {
-			DataHygieneService.renameLegacySavedQueries();
-		} catch (Exception e) {
-			ErrorLogger.log(e, SAVED_QUERY_CONTEXT);
 		}
 	}
 
