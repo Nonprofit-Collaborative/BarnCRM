@@ -18,7 +18,6 @@ public with sharing class LwcBuilderController {
 	private static final Integer MAX_ROWS = 200;
 	private static final Integer MAX_MEASURES = 3;
 	private static final Integer MAX_SERIES = 12;
-	private static final Integer DEFAULT_ROWS = 10;
 	private static final Integer MAX_DEFINITION = 131072;
 	private static final Pattern API_NAME = Pattern.compile('[A-Za-z][A-Za-z0-9_.]{0,79}');
 
@@ -480,14 +479,7 @@ public with sharing class LwcBuilderController {
 	/** Rows per List, 1 to 200; blank or unreadable is 10. */
 	@TestVisible
 	private static Integer rowsPerList() {
-		Integer value;
-		try {
-			Object stored = SettingsService.getValue(SETTINGS_OBJECT, 'Rows_Per_List__c');
-			value = stored == null ? null : Decimal.valueOf(String.valueOf(stored)).intValue();
-		} catch (Exception unreadable) {
-			value = null;
-		}
-		return value == null || value < 1 || value > MAX_ROWS ? DEFAULT_ROWS : value;
+		return SettingsService.number(SETTINGS_OBJECT, 'Rows_Per_List__c').intValue();
 	}
 
 	/** A checkbox setting; both ship on, so blank or unreadable is on. */

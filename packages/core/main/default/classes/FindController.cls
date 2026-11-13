@@ -448,18 +448,11 @@ public with sharing class FindController {
 	/** The export limit from BarnCRM Settings, held between 1 and MAX_EXPORT_LIMIT. */
 	@NamespaceAccessible
 	public static Integer exportLimit() {
-		Object configured = SettingsService.hasKey('Find_Export_Row_Limit__c')
-			? SettingsService.getValue('Find_Export_Row_Limit__c')
-			: null;
-		if (configured == null) {
-			return DEFAULT_EXPORT_LIMIT;
-		}
-		try {
-			Integer rows = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return rows < 1 ? DEFAULT_EXPORT_LIMIT : Math.min(rows, MAX_EXPORT_LIMIT);
-		} catch (Exception ignored) {
-			return DEFAULT_EXPORT_LIMIT;
-		}
+		Decimal rows = SettingsService.storedNumber('Find_Export_Row_Limit__c');
+		return rows == null ||
+			rows < 1
+			? DEFAULT_EXPORT_LIMIT
+			: Math.min(rows.intValue(), MAX_EXPORT_LIMIT);
 	}
 
 	private static FindPage currentPage() {

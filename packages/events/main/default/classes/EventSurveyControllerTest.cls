@@ -291,7 +291,7 @@ private class EventSurveyControllerTest {
 			Id surveyTemplate = [
 				SELECT Id
 				FROM EmailTemplate
-				WHERE DeveloperName = :EventsSettings.DEFAULT_SURVEY_TEMPLATE
+				WHERE DeveloperName = :EventsSettings.surveyTemplate()
 				LIMIT 1
 			]
 			.Id;

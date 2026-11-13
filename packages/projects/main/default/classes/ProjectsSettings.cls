@@ -1,30 +1,30 @@
 /**
  * The Project Management settings as the module's code reads them (canonical model 29PM7),
- * through Core's `SettingsService`, which serves an org that never saved them the record its
- * first save would store (ADR-0035). A blank or out of range number reads as its default.
+ * through Core's typed `SettingsService` readers, which serve an org that never saved them the
+ * record its first save would store (ADR-0035). A blank or out of range number reads as the
+ * field's declared default, the range being its Setting Definition's.
  */
 public with sharing class ProjectsSettings {
 	public static final String SETTINGS_OBJECT = 'Projects_Settings__c';
 
 	/** Whether Log Time, budgets, utilization and the billable export show. Ships on. */
 	public static Boolean timeTracking() {
-		Object stored = read('Time_Tracking_Enabled__c');
-		return stored == null ? true : Boolean.valueOf(String.valueOf(stored));
+		return SettingsService.flag(SETTINGS_OBJECT, 'Time_Tracking_Enabled__c');
 	}
 
 	/** Days past due before an open task puts its project At Risk. */
 	public static Integer atRiskDays() {
-		return number('At_Risk_Days__c', 7, 365);
+		return whole('At_Risk_Days__c');
 	}
 
 	/** The share of Budget Hours that, once used, puts a project At Risk. */
 	public static Integer budgetWarningPercent() {
-		return number('Budget_Warning_Percent__c', 90, 100);
+		return whole('Budget_Warning_Percent__c');
 	}
 
 	/** One person's working hours in a week. */
 	public static Integer weeklyCapacity() {
-		return number('Weekly_Capacity_Hours__c', 40, 168);
+		return whole('Weekly_Capacity_Hours__c');
 	}
 
 	/** PM-06: rate cards. Each PSA part ships off and needs time tracking on (ADR-0219 projects-psa). */
@@ -69,7 +69,7 @@ public with sharing class ProjectsSettings {
 
 	/** Days from an invoice's date to its due date. */
 	public static Integer invoiceDueDays() {
-		return number('Invoice_Due_Days__c', 30, 365);
+		return whole('Invoice_Due_Days__c');
 	}
 
 	/**
@@ -77,10 +77,8 @@ public with sharing class ProjectsSettings {
 	 * install (`ProjectsPostInstall`), so the console shows it; read as that address if cleared.
 	 */
 	public static String invoiceReturnUrl() {
-		Object stored = read('Invoice_Return_Url__c');
-		return stored == null || String.isBlank(String.valueOf(stored))
-			? myDomain()
-			: String.valueOf(stored).trim();
+		String stored = SettingsService.text(SETTINGS_OBJECT, 'Invoice_Return_Url__c');
+		return String.isBlank(stored) ? myDomain() : stored;
 	}
 
 	/** The org's My Domain address, the shipped Invoice payment return page. */
@@ -89,27 +87,10 @@ public with sharing class ProjectsSettings {
 	}
 
 	private static Boolean part(String key) {
-		Object stored = read(key);
-		return timeTracking() && stored != null && Boolean.valueOf(String.valueOf(stored));
+		return timeTracking() && SettingsService.flag(SETTINGS_OBJECT, key);
 	}
 
-	private static Integer number(String key, Integer shipped, Integer max) {
-		Object stored = read(key);
-		Integer value;
-		try {
-			value = stored == null ? null : Decimal.valueOf(String.valueOf(stored)).intValue();
-		} catch (TypeException unreadable) {
-			value = null;
-		}
-		return value == null || value < 1 || value > max ? shipped : value;
-	}
-
-	/** A setting that cannot be read is treated as never saved: the shipped value applies. */
-	private static Object read(String key) {
-		try {
-			return SettingsService.getValue(SETTINGS_OBJECT, key);
-		} catch (SettingsService.SettingsException unreadable) {
-			return null;
-		}
+	private static Integer whole(String key) {
+		return SettingsService.number(SETTINGS_OBJECT, key).intValue();
 	}
 }

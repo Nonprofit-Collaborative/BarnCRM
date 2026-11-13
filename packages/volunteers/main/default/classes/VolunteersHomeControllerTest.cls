@@ -49,7 +49,7 @@ private class VolunteersHomeControllerTest {
 			);
 			Assert.areEqual(3, tiles.get('hoursThisMonth').value, 'Only approved hours count.');
 			Assert.areEqual(
-				3 * VolunteerSettings.DEFAULT_HOUR_VALUE,
+				3 * 34.79,
 				tiles.get('hoursValueThisMonth').value,
 				'V-12: hours times the shipped Hour Value, display only.'
 			);

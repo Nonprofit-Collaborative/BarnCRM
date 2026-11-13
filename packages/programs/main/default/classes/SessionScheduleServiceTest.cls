@@ -73,7 +73,7 @@ private class SessionScheduleServiceTest {
 				'Named as the panel names one.'
 			);
 			Assert.areEqual(
-				MONDAY.addDays(7 * SessionScheduleService.DEFAULT_HORIZON_WEEKS),
+				MONDAY.addDays(7 * 8),
 				[SELECT Created_Through__c FROM Session_Schedule__c WITH SYSTEM_MODE]
 				.Created_Through__c
 			);
