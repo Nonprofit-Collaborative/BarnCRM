@@ -42,8 +42,10 @@ indicators. It is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nig
 no switch of its own. If **Health Check** says the nightly run is not scheduled, its **Schedule
 all nightly jobs** fix schedules it.
 
-Then open the **BarnCRM Logic Models** app from the App Launcher. Its tab is **Logic Models**,
-which also joins the BarnCRM apps.
+Then open the **Logic Models** tab, which joins the BarnCRM apps (and is in the App Launcher).
+Logic Models has no app of its own: the two-tab BarnCRM Logic Models app was retired in release
+1.24 (D-200 R6). A logic model opens on its builder page in every app, as the object's default
+record page.
 
 Logic Models has no org-wide settings yet: each logic model is set up on its own record.
 BarnCRM Settings has a **Logic Models** section with one row, **Open Logic Models**, which opens
@@ -342,7 +344,7 @@ record ID, so neither module needs the other. See
 
 Do this as Maria, who holds the Admin role.
 
-1. Open the **BarnCRM Logic Models** app. On **Logic Models** click **New**, name it "Reading
+1. In the **BarnCRM** app, open **Logic Models** and click **New**, name it "Reading
    Program Model" and save. **For** shows **The whole organization**.
 2. In the builder, add "Two tutors" under **Inputs**, "Weekly reading sessions" under
    **Activities**, "Sessions held" under **Outputs**, "Students read more at home" under **Short

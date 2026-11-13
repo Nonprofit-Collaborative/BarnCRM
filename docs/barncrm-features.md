@@ -735,7 +735,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ### 5.2 Logic Models (separate package)
 
-**Edition:** Nonprofit Edition. Depends on Core only; works alongside Programs without referencing it, naming a program by its record identifier (ADR-0154, Logic Models module). Package `packages/logicmodels`, app BarnCRM Logic Models.
+**Edition:** Nonprofit Edition. Depends on Core only; works alongside Programs without referencing it, naming a program by its record identifier (ADR-0154, Logic Models module). Package `packages/logicmodels`, no app of its own: the Logic Models tab is in the BarnCRM apps and the App Launcher, and the Logic Model page is the object's default record page (the BarnCRM Logic Models app retired in release 1.24, D-200 R6; built, not merged, `feature/r1-24-ux-logic-models-app`).
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
