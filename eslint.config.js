@@ -89,6 +89,10 @@ module.exports = [
       globals: {
         require: 'readonly'
       }
+    },
+    rules: {
+      // expectAccessible (barn/a11y, QA review Q5) asserts, like expect.
+      'jest/expect-expect': ['warn', { assertFunctionNames: ['expect', 'expectAccessible'] }]
     }
   },
   {

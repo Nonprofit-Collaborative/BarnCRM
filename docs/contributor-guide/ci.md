@@ -44,7 +44,18 @@ Salesforce org is needed for this job. Steps:
    findings are warnings, so the script passes only when the linter prints "No SLDS
    Violations found". `npx slds-linter lint packages --fix` applies the safe fixes; review
    each one.
-4. `npm run test:unit:coverage`
+4. `npm run test:unit:coverage`. `jest.config.js` sets a `coverageThreshold` (statements 89,
+   branches 79, functions 89, lines 89: about two points under the 2026-11-12 totals), so the
+   step fails when coverage drops below it. Raise the floor as coverage rises; never lower it
+   to land a change. Each component test also calls `expectAccessible(element)` from
+   `barn/a11y` (`packages/core/test/jest-helpers/a11y.js`): it fails on a lightning form
+   control with no label, a button icon or button menu with no alternative text, a button or
+   link with no text, an image with no `alt`, or a positive `tabindex`, and it also runs
+   `@sa11y/jest` (axe-core with Salesforce's rules) whenever that package is installed (it is
+   not a devDependency yet). `scripts/ci/check-jest-a11y.py` fails the build if a component
+   with a template has no test making that call and is not in
+   `scripts/ci/jest-a11y-baseline.txt`, or if a baseline entry now makes it; the baseline only
+   shrinks (QA review Q5).
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
