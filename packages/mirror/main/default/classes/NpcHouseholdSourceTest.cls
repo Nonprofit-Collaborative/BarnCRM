@@ -26,6 +26,17 @@ private class NpcHouseholdSourceTest {
 	}
 
 	@IsTest
+	static void theNativeGroupConditionReadsPartyRelationshipGroup() {
+		System.runAs(TestUsers.admin()) {
+			String has = NpcHouseholdSource.grouped(true);
+			String hasNot = NpcHouseholdSource.grouped(false);
+			Assert.isTrue(has.startsWith('Id IN (SELECT AccountId FROM PartyRelationshipGroup'));
+			Assert.isTrue(hasNot.startsWith('Id NOT IN (SELECT AccountId'), 'the opposite');
+			Assert.isTrue(hasNot.endsWith('WHERE Type = \'Household\')'), 'same group type');
+		}
+	}
+
+	@IsTest
 	static void withoutNonprofitCloudNothingIsSelectedOrChecked() {
 		System.runAs(TestUsers.admin()) {
 			NpcHouseholdSource source = new NpcHouseholdSource();

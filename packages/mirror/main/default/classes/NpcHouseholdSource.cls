@@ -362,6 +362,7 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	}
 
 	/** The condition "carries (or does not carry) a native household group". */
+	@TestVisible
 	private static String grouped(Boolean has) {
 		if (groupedForTest != null) {
 			return has ? 'Id IN :groupedForTest' : 'Id NOT IN :groupedForTest';
