@@ -23,10 +23,7 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		LWC_Builder_Settings__c.Components_Enabled__c,
-		LWC_Builder_Settings__c.Source_Export__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {
@@ -90,20 +87,16 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 
 		private void giveInstaller() {
 			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE Name = :LwcBuilderAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				if (sets.isEmpty()) {
+				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+					LwcBuilderAccessSync.ADMIN_SET
+				);
+				if (permissionSet == null) {
 					return;
 				}
 				Integer held = [
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
+					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
 					WITH SYSTEM_MODE
 				];
 				if (held > 0) {
@@ -112,7 +105,7 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 				Database.SaveResult saved = Database.insert(
 					new PermissionSetAssignment(
 						AssigneeId = installerId,
-						PermissionSetId = sets[0].Id
+						PermissionSetId = permissionSet.Id
 					),
 					false,
 					AccessLevel.SYSTEM_MODE

@@ -40,6 +40,7 @@ import DATA_IMPORT_WIZARD from '@salesforce/label/c.Core_DataManager_DataImportW
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 import { matchTasks } from 'c/dataManagerTasks';
+import { tabPageReference } from 'c/barnTabs';
 
 /** The tabs the tiles open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
 const TABS = {
@@ -374,24 +375,21 @@ export default class DataManager extends NavigationMixin(LightningElement) {
         return;
       }
     }
-    const pageReference = { type: 'standard__navItemPage', attributes: { apiName: TABS[name] } };
+    let state;
     // The bulk tiles open Find with a note saying where the bulk tool is (D-135).
     if (BULK_TOOLS[name] && this.toolStateKey) {
-      pageReference.state = { [this.toolStateKey]: BULK_TOOLS[name] };
+      state = { [this.toolStateKey]: BULK_TOOLS[name] };
     }
     // The Grid tile opens Find's tab on the Grid view: the view key is the tool key's sibling.
     if (name === 'grid' && this.toolStateKey) {
-      pageReference.state = { [this.toolStateKey.replace(/tool$/, 'view')]: 'grid' };
+      state = { [this.toolStateKey.replace(/tool$/, 'view')]: 'grid' };
     }
-    this[NavigationMixin.Navigate](pageReference);
+    this[NavigationMixin.Navigate](await tabPageReference(TABS[name], state));
   }
 
   /** A template is made in Import's One Kind of Record step, so the empty state opens Import. */
-  handleCreateTemplate() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: TABS.import }
-    });
+  async handleCreateTemplate() {
+    this[NavigationMixin.Navigate](await tabPageReference(TABS.import));
   }
 }
 

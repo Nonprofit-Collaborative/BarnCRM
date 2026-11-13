@@ -42,7 +42,7 @@ describe('c-projects-billing-export', () => {
   it('exports the invoices in the range, one row per line', async () => {
     getProjectBilling.mockResolvedValue({ enabled: true, canManage: true });
     exportInvoices.mockResolvedValue([
-      { Name: 'INV-000001', Lines__r: [{ Amount__c: 300 }, { Amount__c: 50 }] }
+      { name: 'INV-000001', lines: [{ amount: 300 }, { amount: 50 }] }
     ]);
     const element = mount();
     await flush();

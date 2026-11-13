@@ -69,7 +69,7 @@ private class RollupListEaseTest {
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupEase_SentenceRecords'),
 					new List<String>{
-						Label.Core_RollupEase_CalcCount,
+						Label.Rollups_RollupEase_CalcCount,
 						describe(Account.SObjectType).getLabelPlural(),
 						label(Account.ParentId).removeEndIgnoreCase(' ID'),
 						label(Account.Member_Count__c),
@@ -98,7 +98,7 @@ private class RollupListEaseTest {
 			System.Assert.isTrue(
 				sentence.startsWith(
 					String.format(
-						Label.Core_RollupEase_CalcSum,
+						Label.Rollups_RollupEase_CalcSum,
 						new List<String>{ label(Account.NumberOfEmployees) }
 					)
 				),
@@ -130,7 +130,7 @@ private class RollupListEaseTest {
 			);
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_LinkHousehold,
+					Label.Rollups_RollupEase_LinkHousehold,
 					new List<String>{ label(Account.Primary_Contact__c).removeEndIgnoreCase(' ID') }
 				),
 				household
@@ -215,7 +215,7 @@ private class RollupListEaseTest {
 
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupEase_StatusWaiting,
+					Label.Rollups_RollupEase_StatusWaiting,
 					new List<String>{ (7).format() }
 				),
 				states.get(named.Id).text,

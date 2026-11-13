@@ -267,16 +267,7 @@ public with sharing class OrgOptimizerSetupController {
 
 	/** A number setting: empty or unreadable reads as the default, out of range as the nearest end. */
 	private static Integer bounded(String key, Integer fallback, Integer minimum, Integer maximum) {
-		Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
-		if (configured == null) {
-			return fallback;
-		}
-		try {
-			Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(minimum, Math.min(value, maximum));
-		} catch (Exception ignored) {
-			return fallback;
-		}
+		return DataJobs.wholeNumberSetting(key, fallback, minimum, maximum);
 	}
 
 	private static String nameOf(SObject row, String field) {

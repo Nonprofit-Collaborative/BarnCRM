@@ -488,18 +488,12 @@ public with sharing class DataHygieneService {
 	 * Empty reads as the default; a value out of range reads as the nearest end (D-40).
 	 */
 	public static Integer staleYears() {
-		Object configured = SettingsService.hasKey('Stale_Record_Years__c')
-			? SettingsService.getValue('Stale_Record_Years__c')
-			: null;
-		if (configured == null) {
-			return DEFAULT_STALE_YEARS;
-		}
-		try {
-			Integer years = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(MIN_STALE_YEARS, Math.min(years, MAX_STALE_YEARS));
-		} catch (Exception ignored) {
-			return DEFAULT_STALE_YEARS;
-		}
+		return DataJobs.wholeNumberSetting(
+			'Stale_Record_Years__c',
+			DEFAULT_STALE_YEARS,
+			MIN_STALE_YEARS,
+			MAX_STALE_YEARS
+		);
 	}
 
 	/** The address and whose it is. */

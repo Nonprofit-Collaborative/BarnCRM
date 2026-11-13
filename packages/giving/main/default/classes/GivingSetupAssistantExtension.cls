@@ -21,7 +21,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
 	private static final String EIN_PATTERN = '[0-9]{2}-[0-9]{7}';
 
 	/** The Giving tab the first gift check opens (ADR-0020: reached by navigation). */
-	private static final String GIFT_ENTRY_TAB = 'Gift_Entry';
+	private static final String GIFT_ENTRY_TAB = 'Quick_Gift_Entry';
 
 	@NamespaceAccessible
 	public GivingSetupAssistantExtension() {
@@ -151,7 +151,7 @@ public with sharing class GivingSetupAssistantExtension implements SetupAssistan
 						null,
 						Label.Giving_SetupAssistant_EnterFirstGiftButton
 					)
-					.withNavigationTarget(GIFT_ENTRY_TAB)
+					.withNavigationTarget(NamespaceUtil.qualify(GIFT_ENTRY_TAB))
 			);
 	}
 }

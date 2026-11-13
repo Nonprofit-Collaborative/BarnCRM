@@ -62,8 +62,6 @@
     "Core_Access_PageDescription": "Give a colleague access by picking their name and a role, and see who holds each role today.",
     "Core_Access_ReadOnlyNotice": "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role.",
     "Core_Access_RemoveSuccess": "{0} no longer has the {1} role.",
-    "Core_Access_RetiredRoleInactive": "{0} is inactive and holds the {1} role, so BarnCRM did not give them {2}. They keep {1}; if they are reactivated, the hourly access check gives them {2}. Nothing to do now.",
-    "Core_Access_RetiredRoleRefused": "{0} holds the {1} role and could not be given {2}. BarnCRM tries again within the hour. If this repeats, give them {2} on the Access page. Salesforce said: {3}",
     "Core_Access_SearchNoResults": "No active users match that search. Check the spelling, or create the user in Setup first.",
     "Core_Access_SelfRemovalWarning": "You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings.",
     "Core_Access_TabRefusalDetail": "(permission set {0}, user {1})",

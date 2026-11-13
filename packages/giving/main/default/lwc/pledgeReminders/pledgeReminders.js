@@ -1,5 +1,10 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import STEP from '@salesforce/schema/Pledge_Reminder_Step__c';
+import STEP_DAYS from '@salesforce/schema/Pledge_Reminder_Step__c.Days_From_Due__c';
+import STEP_ACTIVE from '@salesforce/schema/Pledge_Reminder_Step__c.Active__c';
+import STEP_CHANNEL from '@salesforce/schema/Pledge_Reminder_Step__c.Channel__c';
+import STEP_EMAIL_TEMPLATE from '@salesforce/schema/Pledge_Reminder_Step__c.Email_Template__c';
 import { refreshApex } from '@salesforce/apex';
 import getPage from '@salesforce/apex/PledgeReminderController.getPage';
 import sendNow from '@salesforce/apex/PledgeReminderController.sendNow';
@@ -70,6 +75,13 @@ const TONE_BY_STATUS = { Sent: 'success', Queued: 'queued', Failed: 'failed' };
  */
 export default class PledgeReminders extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Giving');
+  /** The step form's object and fields, from schema imports so they carry any namespace. */
+  stepForm = {
+    object: STEP.objectApiName,
+    daysFromDue: STEP_DAYS.fieldApiName,
+    active: STEP_ACTIVE.fieldApiName,
+    channel: STEP_CHANNEL.fieldApiName
+  };
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -346,7 +358,7 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
       this.template.querySelector('[data-id="step-template"]').reportValidity();
       return;
     }
-    fields.Email_Template__c = this.stepIsEmail ? this.stepTemplate : null;
+    fields[STEP_EMAIL_TEMPLATE.fieldApiName] = this.stepIsEmail ? this.stepTemplate : null;
     this.template.querySelector('lightning-record-edit-form').submit(fields);
   }
 
@@ -361,7 +373,7 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.recordId,
-        objectApiName: 'Pledge_Reminder_Step__c',
+        objectApiName: STEP.objectApiName,
         actionName: 'view'
       }
     });

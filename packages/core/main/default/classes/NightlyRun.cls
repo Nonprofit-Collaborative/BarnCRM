@@ -111,10 +111,9 @@ public with sharing class NightlyRun implements Schedulable {
 	// The run
 	// -------------------------------------------------------------------------------------
 
-	/** Starts tonight's run: adopts any old schedule, then takes over from a run still going. */
+	/** Starts tonight's run, taking over from a run still going. */
 	@TestVisible
 	private void begin() {
-		NightlyJobs.adoptOldSchedules();
 		Datetime now = Datetime.now();
 		runStarted = toSecond(now);
 		List<Nightly_Job__c> changed = new List<Nightly_Job__c>();

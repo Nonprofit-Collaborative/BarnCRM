@@ -10,7 +10,7 @@ private class RollupAccessSyncTest {
 	/** The role each person holds through a permission set group, by last name. */
 	private static final Map<String, String> GROUP_BY_NAME = new Map<String, String>{
 		'Reader' => 'Read_Only',
-		'Coordinator' => 'Volunteer_Coordinator',
+		'Member' => 'Program_Staff',
 		'Boss' => 'BarnCRM_Admin_Group'
 	};
 
@@ -30,7 +30,7 @@ private class RollupAccessSyncTest {
 			FROM User
 			WHERE
 				Username LIKE 'barn-test.%'
-				AND LastName IN ('Staffer', 'Outsider', 'Reader', 'Coordinator', 'Boss')
+				AND LastName IN ('Staffer', 'Outsider', 'Reader', 'Member', 'Boss')
 			WITH SYSTEM_MODE
 		]) {
 			ids.put(person.LastName, person.Id);
@@ -82,7 +82,7 @@ private class RollupAccessSyncTest {
 
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isFalse(again, 'And a second pass finds nothing to give');
-			for (String name : new List<String>{ 'Staffer', 'Reader', 'Coordinator' }) {
+			for (String name : new List<String>{ 'Staffer', 'Reader', 'Member' }) {
 				Assert.areEqual(
 					new Set<String>{ RollupAccessSync.USER_SET },
 					setsOf(ids.get(name)),

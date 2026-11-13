@@ -1,6 +1,6 @@
 /**
  * BarnCRM's roles get the Logic Models sets (ADR-0154 decision 7): BarnCRM Admin holders Logic
- * Models Admin, the Team Member and Coordinator roles Logic Models Staff and the Read Only role Logic Models
+ * Models Admin, the Team Member role Logic Models Staff and the Read Only role Logic Models
  * Read Only, at install, at Turn on and with the hourly access check.
  */
 @IsTest(testFor='ApexClass:LogicModelsAccessSync')
@@ -16,7 +16,6 @@ private class LogicModelsAccessSyncTest {
 			'Outsider' => TestUsers.standardUser('Outsider').Id
 		};
 		Map<String, String> groupByName = new Map<String, String>{
-			'Coordinator' => 'Volunteer_Coordinator',
 			'Member' => 'Program_Staff',
 			'Reader' => 'Read_Only',
 			'Boss' => 'BarnCRM_Admin_Group'
@@ -63,7 +62,6 @@ private class LogicModelsAccessSyncTest {
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isFalse(again, 'And a second pass finds nothing to give');
 			Map<String, String> expected = new Map<String, String>{
-				'Coordinator' => 'Logic_Models_Staff',
 				'Member' => 'Logic_Models_Staff',
 				'Reader' => 'Logic_Models_Read_Only',
 				'Boss' => LogicModelsAccessSync.ADMIN_SET

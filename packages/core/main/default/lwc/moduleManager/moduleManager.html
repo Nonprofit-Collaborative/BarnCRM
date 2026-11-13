@@ -72,18 +72,19 @@
                                     data-id="setup-not-run"
                                 ></c-barn-notice>
                             </template>
+                            <template lwc:if={module.showFinishSetup}>
+                                <div class="slds-var-m-top_x-small">
+                                    <lightning-button
+                                        variant="brand"
+                                        label={labels.finishSetup}
+                                        data-id="finish-setup"
+                                        data-name={module.name}
+                                        onclick={handleFinishSetup}
+                                    ></lightning-button>
+                                </div>
+                            </template>
                             <template lwc:if={canEdit}>
                                 <div class="slds-var-m-top_x-small">
-                                    <template lwc:if={module.setupPending}>
-                                        <lightning-button
-                                            variant="brand"
-                                            class="slds-var-m-right_x-small"
-                                            label={labels.finishSetup}
-                                            data-id="finish-setup"
-                                            data-name={module.name}
-                                            onclick={handleFinishSetup}
-                                        ></lightning-button>
-                                    </template>
                                     <template lwc:if={module.showInstall}>
                                         <a
                                             class="slds-button slds-button_neutral"

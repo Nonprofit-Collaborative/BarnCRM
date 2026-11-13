@@ -7,6 +7,7 @@ import createSessionsNow from '@salesforce/apex/SessionScheduleController.create
 import removeFutureSessions from '@salesforce/apex/SessionScheduleController.removeFutureSessions';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { formatDate as formatDay } from 'c/barnFormat';
 import SESSION_OBJECT from '@salesforce/schema/Session__c';
 import MODIFIED from '@salesforce/schema/Session_Schedule__c.LastModifiedDate';
 
@@ -161,11 +162,5 @@ function messageOf(error) {
 }
 
 function formatDate(isoDate) {
-  if (!isoDate) {
-    return '';
-  }
-  const [year, month, day] = isoDate.split('-').map(Number);
-  return new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(year, month - 1, day))
-  );
+  return formatDay(isoDate, LOCALE) || '';
 }

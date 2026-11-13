@@ -743,7 +743,7 @@ private class RollupBuilderControllerTest {
 			}
 			System.Assert.areEqual(
 				String.format(
-					Label.Core_RollupBuilder_ParentField,
+					Label.Rollups_RollupBuilder_ParentField,
 					new List<String>{
 						Account.ParentId.getDescribe().getLabel().removeEndIgnoreCase(' ID'),
 						Account.Name.getDescribe().getLabel()
@@ -1114,7 +1114,7 @@ private class RollupBuilderControllerTest {
 	static void emptyValuesReadAsEmpty() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			System.Assert.areEqual(
-				Label.Core_RollupBuilder_PreviewEmpty,
+				Label.Rollups_RollupBuilder_PreviewEmpty,
 				RollupBuilderController.display(null)
 			);
 			System.Assert.areEqual(

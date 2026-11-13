@@ -2,6 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import { iconFor } from 'c/barnIcons';
+import { tabPageReference } from 'c/barnTabs';
 import HEADING from '@salesforce/label/c.Core_HubHome_QuickLinksHeading';
 import SETTINGS from '@salesforce/label/c.Core_Settings_Title';
 import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
@@ -91,7 +92,7 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
     return links;
   }
 
-  handleOpen(event) {
+  async handleOpen(event) {
     const name = event.detail.name;
     if (name === PEOPLE_LINK) {
       this[NavigationMixin.Navigate]({
@@ -112,9 +113,6 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
       });
       return;
     }
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: name }
-    });
+    this[NavigationMixin.Navigate](await tabPageReference(name));
   }
 }

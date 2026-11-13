@@ -34,6 +34,7 @@ import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionBut
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
+import { tabPageReference } from 'c/barnTabs';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -375,11 +376,8 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     }
   }
 
-  handleOpenImport() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: IMPORT_TAB }
-    });
+  async handleOpenImport() {
+    this[NavigationMixin.Navigate](await tabPageReference(IMPORT_TAB));
   }
 
   get showNamingPanel() {

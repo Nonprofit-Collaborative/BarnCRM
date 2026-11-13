@@ -19,9 +19,7 @@ public with sharing class ScholarshipsPostInstall implements InstallHandler, Mod
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Scholarships_Settings__c.Reminders_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	@NamespaceAccessible
 	public ScholarshipsPostInstall() {

@@ -1,8 +1,8 @@
 import { LightningElement, api } from 'lwc';
 import explain from '@salesforce/apex/RollupExplainController.explain';
-import TITLE from '@salesforce/label/c.Core_RollupEase_ExplainTitle';
+import TITLE from '@salesforce/label/c.Rollups_RollupEase_ExplainTitle';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
-import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
+import ROWS_HEADING from '@salesforce/label/c.Rollups_RollupEase_RowsHeading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**

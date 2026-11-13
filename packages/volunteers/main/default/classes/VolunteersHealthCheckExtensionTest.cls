@@ -1,7 +1,6 @@
 /**
  * The Volunteers Health Check findings (canonical model Part G, "Health Check"): hours waiting
- * for approval, past shifts still Open, schedules short of the horizon (29T), coordinators
- * missing their set and its fix, and shipped volunteer totals turned off. Each is asked of a
+ * for approval, past shifts still Open, schedules short of the horizon (29T), and shipped volunteer totals turned off. Each is asked of a
  * BarnCRM admin holding Volunteers Admin, the person who runs Health Check; a viewer who may not
  * manage settings, and an org with the module turned off, get none. One test runs Core's whole
  * report to prove Core finds the extension by name.
@@ -163,94 +162,6 @@ private class VolunteersHealthCheckExtensionTest {
 			Assert.isNull(
 				finding('volunteer_schedule_horizon'),
 				'Created through its End Date is as far as it goes'
-			);
-		}
-	}
-
-	@IsTest
-	static void aCoordinatorWithoutTheirSetIsNamedAndTheFixGivesIt() {
-		User coordinator;
-		System.runAs(new User(Id = UserInfo.getUserId())) {
-			List<PermissionSetGroup> groups = [
-				SELECT Id
-				FROM PermissionSetGroup
-				WHERE DeveloperName = 'Volunteer_Coordinator' AND Status = 'Updated'
-				LIMIT 1
-			];
-			if (groups.isEmpty()) {
-				return; // The role is still being computed after a deploy.
-			}
-			coordinator = TestUsers.standardUser('Coordwithoutset');
-			insert new PermissionSetAssignment(
-				AssigneeId = coordinator.Id,
-				PermissionSetGroupId = groups[0].Id
-			);
-		}
-		String name = [SELECT Name FROM User WHERE Id = :coordinator.Id].Name;
-		System.runAs(admin()) {
-			Map<String, Object> missing = finding('volunteer_coordinator_access');
-			Assert.isNotNull(missing, 'The coordinator without the set is reported');
-			Assert.isTrue(((String) missing.get('detail')).contains(name), 'They are named');
-			Assert.isTrue(
-				((String) missing.get('fixTarget'))
-					.endsWith(VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS),
-				'The fix gives the set'
-			);
-			VolunteersHealthCheckExtension extension = new VolunteersHealthCheckExtension();
-			List<String> scope = extension.fixScope(
-				VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS
-			);
-			Assert.isTrue(scope.contains(name), 'The fix scope names them');
-			Assert.isNotNull(
-				extension.fixLabel(VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS),
-				'The fix has a label'
-			);
-			Assert.isNull(extension.fixLabel('someoneElsesFix'), 'Another key is not ours');
-
-			Test.startTest();
-			String outcome = extension.runFix(
-				VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS,
-				scope
-			);
-			Test.stopTest();
-
-			Assert.isTrue(outcome.contains(name), 'The outcome names who is being given it');
-			List<String> after = extension.fixScope(
-				VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS
-			);
-			Assert.isFalse(after.contains(name), 'They hold the set now');
-		}
-	}
-
-	@IsTest
-	static void aCoordinatorHoldingVolunteersAdminIsNotReported() {
-		User coordinator;
-		System.runAs(new User(Id = UserInfo.getUserId())) {
-			List<PermissionSetGroup> groups = [
-				SELECT Id
-				FROM PermissionSetGroup
-				WHERE DeveloperName = 'Volunteer_Coordinator' AND Status = 'Updated'
-				LIMIT 1
-			];
-			if (groups.isEmpty()) {
-				return; // The role is still being computed after a deploy.
-			}
-			coordinator = TestUsers.standardUserWith(
-				'Coordwithadmin',
-				new List<String>{ VolunteersTestData.ADMIN }
-			);
-			insert new PermissionSetAssignment(
-				AssigneeId = coordinator.Id,
-				PermissionSetGroupId = groups[0].Id
-			);
-		}
-		String name = [SELECT Name FROM User WHERE Id = :coordinator.Id].Name;
-		System.runAs(admin()) {
-			List<String> scope = new VolunteersHealthCheckExtension()
-				.fixScope(VolunteersHealthCheckExtension.FIX_KEY_COORDINATOR_ACCESS);
-			Assert.isFalse(
-				scope.contains(name),
-				'Volunteers Admin can approve hours and work with shifts, so they are not missing it'
 			);
 		}
 	}

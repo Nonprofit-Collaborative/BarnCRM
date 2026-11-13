@@ -237,15 +237,6 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	/** The setting, or its default when empty, held between `minimum` and ten years. */
 	private static Integer days(String key, Integer fallback, Integer minimum) {
-		Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
-		if (configured == null) {
-			return fallback;
-		}
-		try {
-			Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(minimum, Math.min(value, 3650));
-		} catch (Exception ignored) {
-			return fallback;
-		}
+		return DataJobs.wholeNumberSetting(key, fallback, minimum, 3650);
 	}
 }

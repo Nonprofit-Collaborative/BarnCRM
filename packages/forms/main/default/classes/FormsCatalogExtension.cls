@@ -67,7 +67,7 @@ public with sharing class FormsCatalogExtension implements FormCatalogExtension 
 		if (!isPublic || urls.isEmpty()) {
 			return null;
 		}
-		String link = urls[0] + '/FormsPublic?form=' + formId;
+		String link = urls[0] + FormsSites.pagePath() + '?form=' + formId;
 		if (contextRecordId == null) {
 			return link;
 		}

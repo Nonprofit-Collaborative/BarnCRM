@@ -1,12 +1,11 @@
 /**
  * The rollup engine's answer to Core's `RollupEngineExtension` (ADR-0125,
  * `0125-rollup-builder-module.md`). It only delegates: each method is the engine call Core made
- * directly before the engine became the BarnCRM Rollup Builder module. `RollupEngineExtensionV2`
- * is the later seam Core's Module Manager calls on Turn on (decision 9), and
- * `RollupEngineExtensionV3` the one Core's settings service calls after a save (ADR-0136).
+ * directly before the engine became the BarnCRM Rollup Builder module, plus the calls Core's
+ * Module Manager makes on Turn on (decision 9) and its settings service after a save (ADR-0136).
  */
 @NamespaceAccessible
-public with sharing class RollupsEngineExtension implements RollupEngineExtension, RollupEngineExtensionV2, RollupEngineExtensionV3 {
+public with sharing class RollupsEngineExtension implements RollupEngineExtension {
 	@NamespaceAccessible
 	public RollupsEngineExtension() {
 		// Built by name from Core (RollupEngineExtensions), so it needs a public constructor.

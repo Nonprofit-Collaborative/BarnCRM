@@ -49,14 +49,14 @@ private class VolunteersHomeControllerTest {
 			);
 			Assert.areEqual(3, tiles.get('hoursThisMonth').value, 'Only approved hours count.');
 			Assert.areEqual(
-				3 * VolunteerSettings.DEFAULT_HOUR_VALUE,
+				3 * 34.79,
 				tiles.get('hoursValueThisMonth').value,
 				'V-12: hours times the shipped Hour Value, display only.'
 			);
 			Assert.isNotNull(tiles.get('hoursValueThisMonth').currencyCode, 'In the org currency.');
 			Assert.areEqual(1, tiles.get('hoursToApprove').value, 'One entry waits.');
 			Assert.areEqual(
-				'Volunteer_Approve_Hours',
+				NamespaceUtil.qualify('Volunteer_Approve_Hours'),
 				tiles.get('hoursToApprove').tabName,
 				'A coordinator goes to Approve Hours.'
 			);

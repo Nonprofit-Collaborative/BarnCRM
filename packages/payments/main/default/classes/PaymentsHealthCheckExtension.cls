@@ -216,20 +216,14 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 			return null;
 		}
 		Set<String> names = new Set<String>(scope == null ? new List<String>() : scope);
-		List<PermissionSet> sets = [
-			SELECT Id
-			FROM PermissionSet
-			WHERE Name = :GUEST_PERMISSION_SET
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
+		PermissionSet permissionSet = SetupObjectSelector.permissionSet(GUEST_PERMISSION_SET);
 		List<PermissionSetAssignment> added = new List<PermissionSetAssignment>();
 		for (PaymentSites.SiteInfo site : PaymentSites.active()) {
-			if (!sets.isEmpty() && names.contains(site.name) && site.guestUserId != null) {
+			if (permissionSet != null && names.contains(site.name) && site.guestUserId != null) {
 				added.add(
 					new PermissionSetAssignment(
 						AssigneeId = site.guestUserId,
-						PermissionSetId = sets[0].Id
+						PermissionSetId = permissionSet.Id
 					)
 				);
 			}

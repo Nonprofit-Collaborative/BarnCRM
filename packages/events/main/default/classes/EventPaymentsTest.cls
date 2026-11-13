@@ -115,7 +115,7 @@ private class EventPaymentsTest {
 		System.runAs(new User(Id = UserInfo.getUserId())) {
 			insert new EmailTemplate(
 				Name = 'Payment link',
-				DeveloperName = EventsSettings.DEFAULT_PAYMENT_LINK_TEMPLATE,
+				DeveloperName = EventsSettings.paymentLinkTemplate(),
 				TemplateType = 'text',
 				FolderId = UserInfo.getUserId(),
 				IsActive = true,

@@ -64,8 +64,6 @@ public with sharing class VolunteersPostInstall implements InstallHandler, Modul
 	 * @param installerId the person to give Volunteers Admin, or null for nobody
 	 */
 	public void runSetup(Id installerId) {
-		// Jobs scheduled on their own before the nightly run become its steps (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		// Each entry point records its own failures and returns, so nothing here throws.
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
 		ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
@@ -111,20 +109,16 @@ public with sharing class VolunteersPostInstall implements InstallHandler, Modul
 
 		private void giveInstaller() {
 			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE Name = :VolunteersAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				if (sets.isEmpty()) {
+				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+					VolunteersAccessSync.ADMIN_SET
+				);
+				if (permissionSet == null) {
 					return;
 				}
 				Integer held = [
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
+					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
 					WITH SYSTEM_MODE
 				];
 				if (held > 0) {
@@ -133,7 +127,7 @@ public with sharing class VolunteersPostInstall implements InstallHandler, Modul
 				Database.SaveResult saved = Database.insert(
 					new PermissionSetAssignment(
 						AssigneeId = installerId,
-						PermissionSetId = sets[0].Id
+						PermissionSetId = permissionSet.Id
 					),
 					false,
 					AccessLevel.SYSTEM_MODE

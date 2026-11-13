@@ -1360,4 +1360,34 @@ private class SettingsServiceTest {
 			);
 		}
 	}
+
+	/** D-200 S8: the typed readers fall back to the declared default, inside the shipped range. */
+	@IsTest
+	static void typedReadersFallBackToTheDeclaredDefault() {
+		System.runAs(TestUsers.admin()) {
+			String core = SettingsService.CORE_SETTINGS_OBJECT;
+			OrgSettingsSystemWriter.save(
+				new Map<Schema.SObjectField, Object>{
+					BarnCRM_Settings__c.Bulk_Chunk_Size__c => 5,
+					BarnCRM_Settings__c.Fuzzy_Match_Threshold__c => 85,
+					BarnCRM_Settings__c.Household_Name_Pattern__c => '  ',
+					BarnCRM_Settings__c.Auto_Create_Households__c => false
+				}
+			);
+			SettingsService.clearCaches();
+
+			Assert.areEqual(200, SettingsService.number(core, 'Bulk_Chunk_Size__c'), 'Below 10');
+			Assert.areEqual(85, SettingsService.number(core, 'Fuzzy_Match_Threshold__c'), 'Kept');
+			Assert.areEqual(
+				'The {LastName} Family',
+				SettingsService.text(core, TEXT_KEY),
+				'Blank reads as the default'
+			);
+			Assert.isFalse(SettingsService.flag(core, CHECKBOX_KEY), 'A stored false stands');
+			Assert.isFalse(SettingsService.flag(core, 'No_Such_Key__c'), 'Unknown reads false');
+			Assert.isNull(SettingsService.number(core, 'No_Such_Key__c'), 'Unknown, no default');
+			Assert.areEqual(5, SettingsService.storedNumber('Bulk_Chunk_Size__c'), 'As stored');
+			Assert.isNull(SettingsService.toNumber('ten'), 'Not a number');
+		}
+	}
 }

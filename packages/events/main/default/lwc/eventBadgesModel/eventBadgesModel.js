@@ -7,6 +7,7 @@
  * Plain JavaScript in and out, so a WordPress block or Node can use the same module. An attendee
  * is { id, name, organization, ticketName, tableName }.
  */
+import { escapeHtml } from 'c/barnFormat';
 
 /** The badge sizes, in inches. `value` is the key a layout picker holds. */
 export const LAYOUTS = Object.freeze([
@@ -28,15 +29,8 @@ export function layoutFor(value) {
   );
 }
 
-/** Text safe to put inside HTML. */
-export function escapeHtml(value) {
-  return String(value === undefined || value === null ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+/** Text safe to put inside HTML, from the shared kit. */
+export { escapeHtml };
 
 /** The attendees whose name or organization holds the term, and who hold the ticket named. */
 export function selectAttendees(attendees, term, ticketName) {

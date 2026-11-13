@@ -128,14 +128,7 @@ public without sharing class ProgramsSharing {
 	}
 
 	private static Id groupId() {
-		List<Group> groups = [
-			SELECT Id
-			FROM Group
-			WHERE DeveloperName = :GROUP_NAME AND Type = 'Regular'
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
-		return groups.isEmpty() ? null : groups[0].Id;
+		return SetupObjectSelector.groupId(GROUP_NAME);
 	}
 
 	private static SObject shareOf(Id recordId, Id groupId) {

@@ -165,7 +165,28 @@ fails the build. Never assume there is none either:
   `SettingsService.typeByName`, which tries the exact name and then the part after a
   namespace.
 - Class lookups use `NamespaceUtil.prefix()` without the trailing `__` (section 3).
-- Lightning components never build these names; Apex returns them.
+- A shipped setup object found by Name or DeveloperName (permission set, permission set
+  group, custom permission, public group, static resource, email template) is looked up only
+  through `SetupObjectSelector`, which adds `NamespacePrefix` (`NamespaceUtil.namespacePrefix()`,
+  null with no namespace), so a subscriber's object of the same name is never picked. Email
+  templates fall back to the org's own, since a setting may name one (D-200, N9).
+- A field named in code or data is found with `NamespaceUtil.field(type or field map, name)`
+  (its label with `NamespaceUtil.fieldLabel`), never `fields.getMap().get('Amount__c')`: the
+  map is keyed by the full name, so the literal misses once the namespace exists. An object
+  named by a row or query is described with `NamespaceUtil.describe(name)` (null when absent),
+  never `Schema.describeSObjects` with an unprefixed name, which throws (D-200, N10).
+- Lightning components never build these names; Apex returns them. A component opens a
+  packaged tab through `c/barnTabs` (`tabPageReference('Find')`), which asks
+  `NamespaceUtil.tabApiNames` once per page; objects and fields come from `@salesforce/schema`
+  imports (`ERROR_LOG.objectApiName`, `FUND_NAME.fieldApiName`); Apex returns DTOs with
+  unprefixed property names, never SObjects, to Lightning. `check-namespace-readiness.py`
+  (rule 4) fails a literal packaged name in navigation, LDS field paths and
+  `field-name`/`object-api-name` attributes.
+- A GraphQL query (`lightning/graphql`) interpolates the same schema imports into `gql` and
+  reads each node by them (ADR-0093 amendment A1).
+- Visualforce and Site links: `FormsPublic.page` loads its Lightning Out app from the namespace
+  `FormPublicController.lightningNamespace` gives (`c` with none), and Apex builds a public
+  link from `FormsSites.pagePath()` (`Page.FormsPublic`), never a literal `/FormsPublic`.
 
 ## 5. Describe once, never in a loop
 

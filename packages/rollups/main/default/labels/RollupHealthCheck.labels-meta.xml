@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_HealthCheck_NightlyOffTitle</fullName>
+        <fullName>Rollups_HealthCheck_NightlyOffTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>Nightly Totals Are Not Scheduled</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RollupsMissingFix</fullName>
+        <fullName>Rollups_HealthCheck_RollupsMissingFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>Restore Shipped Totals</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RollupsMissingTitle</fullName>
+        <fullName>Rollups_HealthCheck_RollupsMissingTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>{0} Shipped Totals Are Missing</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RollupQueueFailedTitle</fullName>
+        <fullName>Rollups_HealthCheck_RollupQueueFailedTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>Some Totals Could Not Be Saved</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RollupQueueStuckTitle</fullName>
+        <fullName>Rollups_HealthCheck_RollupQueueStuckTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Totals Are Waiting Longer Than They Should</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RollupQueueFix</fullName>
+        <fullName>Rollups_HealthCheck_RollupQueueFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>Open Needs Attention</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Phrase</fullName>
+        <fullName>Rollups_RollupFilter_Phrase</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -57,7 +57,7 @@
         <value>{0} {1} {2}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_PhraseNoValue</fullName>
+        <fullName>Rollups_RollupFilter_PhraseNoValue</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

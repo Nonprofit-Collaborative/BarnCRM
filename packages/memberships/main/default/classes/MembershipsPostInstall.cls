@@ -25,9 +25,7 @@ public with sharing class MembershipsPostInstall implements InstallHandler, Modu
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Memberships_Settings__c.Renew_From_Gifts__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {
@@ -87,26 +85,25 @@ public with sharing class MembershipsPostInstall implements InstallHandler, Modu
 		}
 
 		private void giveInstaller() {
-			List<PermissionSet> sets = [
-				SELECT Id
-				FROM PermissionSet
-				WHERE Name = :MembershipsAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-				WITH SYSTEM_MODE
-				LIMIT 1
-			];
+			PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+				MembershipsAccessSync.ADMIN_SET
+			);
 			if (
-				sets.isEmpty() ||
+				permissionSet == null ||
 				[
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
+					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
 					WITH SYSTEM_MODE
 				] > 0
 			) {
 				return;
 			}
 			Database.SaveResult saved = Database.insert(
-				new PermissionSetAssignment(AssigneeId = installerId, PermissionSetId = sets[0].Id),
+				new PermissionSetAssignment(
+					AssigneeId = installerId,
+					PermissionSetId = permissionSet.Id
+				),
 				false,
 				AccessLevel.SYSTEM_MODE
 			);

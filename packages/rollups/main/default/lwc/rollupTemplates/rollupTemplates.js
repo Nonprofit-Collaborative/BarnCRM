@@ -1,9 +1,9 @@
 import { LightningElement, api } from 'lwc';
 import getTemplates from '@salesforce/apex/RollupTemplates.getTemplates';
 import addRollups from '@salesforce/apex/RollupTemplates.addRollups';
-import BUTTON from '@salesforce/label/c.Core_RollupEase_TplButton';
-import ADD from '@salesforce/label/c.Core_RollupEase_TplAdd';
-import OPEN from '@salesforce/label/c.Core_RollupEase_TplOpen';
+import BUTTON from '@salesforce/label/c.Rollups_RollupEase_TplButton';
+import ADD from '@salesforce/label/c.Rollups_RollupEase_TplAdd';
+import OPEN from '@salesforce/label/c.Rollups_RollupEase_TplOpen';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 

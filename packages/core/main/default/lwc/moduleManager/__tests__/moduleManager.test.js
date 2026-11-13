@@ -460,6 +460,14 @@ describe('c-module-manager', () => {
       expect(row(element, 'Giving').querySelector('[data-id="finish-setup"]')).toBeNull();
     });
 
+    it('offers Finish Setup alone while nobody may manage settings yet (bootstrap)', async () => {
+      getState.mockResolvedValue({ ...setupNotRun(false), canFinishSetup: true });
+      const element = await build();
+
+      expect(row(element, 'Giving').querySelector('[data-id="finish-setup"]')).not.toBeNull();
+      expect(row(element, 'Giving').querySelector('[data-id="turn-off"]')).toBeNull();
+    });
+
     it('shows the message when Finish Setup fails', async () => {
       getState.mockResolvedValue(setupNotRun());
       finishSetup.mockRejectedValue({ body: { message: 'The module could not be set up.' } });

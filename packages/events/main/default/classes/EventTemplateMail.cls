@@ -32,21 +32,15 @@ public with sharing class EventTemplateMail {
 		if (developerName == null) {
 			return NO_TEMPLATE;
 		}
-		List<EmailTemplate> templates = [
-			SELECT Id
-			FROM EmailTemplate
-			WHERE DeveloperName = :developerName AND IsActive = TRUE
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
-		if (templates.isEmpty()) {
+		Id templateId = SetupObjectSelector.emailTemplateId(developerName, true);
+		if (templateId == null) {
 			return TEMPLATE_MISSING;
 		}
 		if (personId == null || String.isBlank(email)) {
 			return NO_EMAIL;
 		}
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
-		message.setTemplateId(templates[0].Id);
+		message.setTemplateId(templateId);
 		message.setTargetObjectId(personId);
 		message.setWhatId(whatId);
 		message.setTreatTargetObjectAsRecipient(true);

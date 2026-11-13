@@ -1,7 +1,6 @@
 {
   "languages": ["en"],
   "texts": {
-    "Mirror_Access_RetiredSetInactive": "{0} is inactive and holds the {1} permission set, so BarnCRM did not give them {2}. They keep {1}; if they are reactivated, the hourly access check gives them {2}. Nothing to do now.",
     "Mirror_AccountingExport_ChangedSinceDownload": "Gifts in this range changed since you downloaded the file, so nothing was marked. Click Download File again, import the new file, and then click Mark These Gifts Posted.",
     "Mirror_AccountingExport_ErrorDateOrder": "The To date is before the From date.",
     "Mirror_AccountingExport_ErrorDatesRequired": "Choose a From date and a To date.",

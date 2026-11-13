@@ -10,6 +10,7 @@ import getLeads from '@salesforce/apex/EventSponsorsController.getLeads';
 import { downloadCsv, format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
+import LEVEL from '@salesforce/schema/Sponsorship_Level__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { committedTotal, linkedText, progressText, sponsorWord } from 'c/eventSponsorsModel';
 
@@ -248,7 +249,7 @@ export default class EventSponsors extends LightningElement {
     const saved = await EventRecordModal.open({
       label: helpText('Events', 'Events_Sponsors_AddLevel'),
       size: 'small',
-      objectApiName: 'Sponsorship_Level__c',
+      objectApiName: LEVEL.objectApiName,
       fields: LEVEL_FIELDS,
       defaults: { Event__c: this.recordId }
     });

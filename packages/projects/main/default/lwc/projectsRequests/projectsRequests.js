@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import REQUEST from '@salesforce/schema/Project_Request__c';
 import getRequests from '@salesforce/apex/ProjectRequestsController.getRequests';
 import { messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
@@ -107,7 +108,7 @@ export default class ProjectsRequests extends NavigationMixin(LightningElement) 
   handleNew() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Project_Request__c', actionName: 'new' }
+      attributes: { objectApiName: REQUEST.objectApiName, actionName: 'new' }
     });
   }
 }

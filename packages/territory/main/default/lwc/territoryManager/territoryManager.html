@@ -47,11 +47,11 @@
                     >
                         <lightning-messages></lightning-messages>
                         <lightning-input-field field-name="Name"></lightning-input-field>
-                        <lightning-input-field field-name="Active__c"></lightning-input-field>
-                        <lightning-input-field field-name="Priority__c"></lightning-input-field>
-                        <lightning-input-field field-name="Routing__c"></lightning-input-field>
-                        <lightning-input-field field-name="Owner_User__c"></lightning-input-field>
-                        <lightning-input-field field-name="Description__c"></lightning-input-field>
+                        <lightning-input-field field-name={formFields.territoryActive}></lightning-input-field>
+                        <lightning-input-field field-name={formFields.priority}></lightning-input-field>
+                        <lightning-input-field field-name={formFields.routing}></lightning-input-field>
+                        <lightning-input-field field-name={formFields.ownerUser}></lightning-input-field>
+                        <lightning-input-field field-name={formFields.description}></lightning-input-field>
                         <div class="slds-var-m-top_small">
                             <lightning-button type="submit" variant="brand" label={labels.save}></lightning-button>
                             <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancel}></lightning-button>
@@ -68,10 +68,10 @@
                         onerror={handleFormError}
                     >
                         <lightning-messages></lightning-messages>
-                        <lightning-input-field field-name="Territory__c" value={editor.territoryId} class="slds-hide"></lightning-input-field>
-                        <lightning-input-field field-name="User__c"></lightning-input-field>
-                        <lightning-input-field field-name="Capacity__c"></lightning-input-field>
-                        <lightning-input-field field-name="Active__c"></lightning-input-field>
+                        <lightning-input-field field-name={formFields.memberTerritory} value={editor.territoryId} class="slds-hide"></lightning-input-field>
+                        <lightning-input-field field-name={formFields.memberUser}></lightning-input-field>
+                        <lightning-input-field field-name={formFields.memberCapacity}></lightning-input-field>
+                        <lightning-input-field field-name={formFields.memberActive}></lightning-input-field>
                         <div class="slds-var-m-top_small">
                             <lightning-button type="submit" variant="brand" label={labels.save}></lightning-button>
                             <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancel}></lightning-button>

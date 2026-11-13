@@ -250,21 +250,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 
 **Cleanup:** set the direction to **Off**; delete the 150 gift (its Gift Transaction stays, and the Error Log has one Warning naming it) and delete that Gift Transaction in Nonprofit Cloud.
 
-## T-MIR-16: Retired Mirror Sets Carry Over
-
-**Purpose:** confirm holders of the five retired Mirror sets get Salesforce Records Sync or Inbound Gifts, keep the old set, and an inactive holder is named instead (ADR-0194, simpler permission sets).
-**Prerequisites:** admin; two spare users, one active and one you will deactivate.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | In Setup, give the active user **Opportunity Mirror (Retired)** and the other **Campaign Sync (Retired)**, then deactivate the other. | Saved. |
-| 2 | Run `MirrorAccessSync.logInactiveHolders(); new MirrorAccessSync().requestSync();` in Anonymous Apex. Wait a minute. | The active user holds **Salesforce Records Sync** as well as Opportunity Mirror (Retired). The inactive user holds no new set. |
-| 3 | Open **Error Log**. | One Warning from MirrorAccessSync naming the inactive user, Campaign Sync (Retired) and Salesforce Records Sync. |
-| 4 | Open BarnCRM Settings, **Access**, **Extra Permissions**. | Mirror lists **Salesforce Records Sync**, **Accounting Export** and **Inbound Gifts**; the active user is listed beside Salesforce Records Sync. |
-
-**Cleanup:** remove both sets from the active user; reactivate or leave the other user as it was.
-
-## T-MIR-17: Cases Sent to a Service Provider
+## T-MIR-16: Cases Sent to a Service Provider
 
 **Purpose:** confirm the Case bridge, R-PR1 and R-PR2 (D-201).
 **Prerequisites:** a provider org with Project Management, T-PM-33's Request Connection naming

@@ -8,6 +8,7 @@ import removeSpeaker from '@salesforce/apex/EventSpeakersController.removeSpeake
 import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
+import SPEAKER from '@salesforce/schema/Event_Speaker__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import SPEAKERS from '@salesforce/label/c.Events_EventTab_Speakers';
@@ -228,7 +229,7 @@ export default class EventSpeakers extends LightningElement {
     const saved = await EventRecordModal.open({
       label: `${EDIT}: ${speaker.name}`,
       size: 'small',
-      objectApiName: 'Event_Speaker__c',
+      objectApiName: SPEAKER.objectApiName,
       recordId: speaker.id,
       fields: SPEAKER_FIELDS
     });

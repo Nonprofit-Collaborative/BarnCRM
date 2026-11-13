@@ -2,6 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import { iconFor } from 'c/barnIcons';
+import ERROR_LOG from '@salesforce/schema/Error_Log__c';
 import HEADING from '@salesforce/label/c.Core_HubHome_ErrorTileHeading';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import LINK from '@salesforce/label/c.Core_ErrorLogTile_ViewAll';
@@ -81,7 +82,7 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
   handleOpenErrorLog() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Error_Log__c', actionName: 'list' },
+      attributes: { objectApiName: ERROR_LOG.objectApiName, actionName: 'list' },
       state: { filterName: 'New_Errors' }
     });
   }

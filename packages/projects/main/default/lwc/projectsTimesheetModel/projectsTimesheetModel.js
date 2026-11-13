@@ -58,19 +58,19 @@ export function isEditable(status) {
 export function buildGrid(entries, days) {
   const rows = new Map();
   (entries || []).forEach((entry) => {
-    const key = `${entry.Project__c}|${entry.Task__c || ''}|${entry.Billable__c ? 1 : 0}`;
+    const key = `${entry.projectId}|${entry.taskId || ''}|${entry.billable ? 1 : 0}`;
     if (!rows.has(key)) {
       rows.set(
         key,
         newRow(
-          { Id: entry.Project__c, Name: entry.Project__r && entry.Project__r.Name },
-          entry.Task__c ? { Id: entry.Task__c, Name: entry.Task__r && entry.Task__r.Name } : null,
-          entry.Billable__c === true,
+          { id: entry.projectId, name: entry.projectName },
+          entry.taskId ? { id: entry.taskId, name: entry.taskName } : null,
+          entry.billable === true,
           days
         )
       );
     }
-    const cell = rows.get(key).cells.find((candidate) => candidate.iso === entry.Date__c);
+    const cell = rows.get(key).cells.find((candidate) => candidate.iso === entry.entryDate);
     if (cell) {
       cell.entries.push(entry);
     }
@@ -83,11 +83,11 @@ export function buildGrid(entries, days) {
 /** An empty row for a project, an optional task and a billable flag. */
 export function newRow(project, task, billable, days) {
   return {
-    key: `${project.Id}|${task ? task.Id : ''}|${billable ? 1 : 0}`,
-    projectId: project.Id,
-    projectName: project.Name,
-    taskId: task ? task.Id : null,
-    taskName: task ? task.Name : null,
+    key: `${project.id}|${task ? task.id : ''}|${billable ? 1 : 0}`,
+    projectId: project.id,
+    projectName: project.name,
+    taskId: task ? task.id : null,
+    taskName: task ? task.name : null,
     billable: billable === true,
     cells: days.map((day) => ({ iso: day.iso, weekend: day.weekend, entries: [] })),
     total: 0
@@ -96,13 +96,13 @@ export function newRow(project, task, billable, days) {
 
 function finishRow(row) {
   row.cells.forEach((cell) => {
-    cell.hours = round2(cell.entries.reduce((sum, entry) => sum + (entry.Hours__c || 0), 0));
-    cell.entryId = cell.entries.length === 1 ? cell.entries[0].Id : null;
-    cell.status = cell.entries.length === 1 ? cell.entries[0].Status__c || null : null;
-    cell.reason = cell.entries.length === 1 ? cell.entries[0].Rejection_Reason__c : null;
+    cell.hours = round2(cell.entries.reduce((sum, entry) => sum + (entry.hours || 0), 0));
+    cell.entryId = cell.entries.length === 1 ? cell.entries[0].id : null;
+    cell.status = cell.entries.length === 1 ? cell.entries[0].status || null : null;
+    cell.reason = cell.entries.length === 1 ? cell.entries[0].rejectionReason : null;
     cell.editable =
       cell.entries.length === 0 ||
-      (cell.entries.length === 1 && isEditable(cell.entries[0].Status__c));
+      (cell.entries.length === 1 && isEditable(cell.entries[0].status));
     cell.value = cell.hours || '';
   });
   row.total = round2(row.cells.reduce((sum, cell) => sum + cell.hours, 0));
@@ -128,7 +128,7 @@ export function withTotals(rows, days) {
 export function weekStatus(entries, expenses) {
   const counts = { Open: 0, Rejected: 0, Submitted: 0, Approved: 0, none: 0 };
   [...(entries || []), ...(expenses || [])].forEach((row) => {
-    counts[row.Status__c || 'none'] += 1;
+    counts[row.status || 'none'] += 1;
   });
   return {
     ...counts,

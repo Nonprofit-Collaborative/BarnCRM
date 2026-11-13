@@ -37,6 +37,11 @@ function build(model) {
   return Promise.resolve().then(() => element);
 }
 
+function settle() {
+  // eslint-disable-next-line @lwc/lwc/no-async-operation
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 function tiles(element) {
   return Array.from(element.shadowRoot.querySelectorAll('[data-id="quick-link"]'));
 }
@@ -80,6 +85,7 @@ describe('c-hub-quick-links', () => {
       'BarnCRM_Settings'
     ]);
     select(element, 'Quick_Gift_Entry');
+    await settle();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Quick_Gift_Entry' }
@@ -90,6 +96,7 @@ describe('c-hub-quick-links', () => {
     const element = await build({ canEdit: false });
 
     select(element, 'Organizations');
+    await settle();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Organizations' }

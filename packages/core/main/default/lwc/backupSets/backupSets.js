@@ -6,6 +6,7 @@ import runNow from '@salesforce/apex/BackupSetController.runNow';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { format, messageFrom } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
+import { tabPageReference } from 'c/barnTabs';
 
 /**
  * The Backup Sets panel on Data Manager (C-66, canonical model R-SQ15, admin guide
@@ -170,10 +171,7 @@ export default class BackupSets extends NavigationMixin(LightningElement) {
     );
   }
 
-  handleOpenImport() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: 'Import' }
-    });
+  async handleOpenImport() {
+    this[NavigationMixin.Navigate](await tabPageReference('Import'));
   }
 }

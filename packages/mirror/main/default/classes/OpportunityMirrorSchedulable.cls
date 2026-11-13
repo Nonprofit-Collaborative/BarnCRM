@@ -19,10 +19,6 @@ public with sharing class OpportunityMirrorSchedulable implements Schedulable {
 
 	/** Starts tonight's run, unless the mirror is off or a run is still going. */
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		if (!isRunning()) {
 			OpportunityMirrorBatch.run();
 		}

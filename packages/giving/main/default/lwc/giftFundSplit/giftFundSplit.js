@@ -4,6 +4,9 @@ import { getRecords } from 'lightning/uiRecordApi';
 import LOCALE from '@salesforce/i18n/locale';
 import CURRENCY from '@salesforce/i18n/currency';
 import ALLOCATION_OBJECT from '@salesforce/schema/Gift_Allocation__c';
+import FUND from '@salesforce/schema/Fund__c';
+import FUND_NAME from '@salesforce/schema/Fund__c.Name';
+import FUND_ACTIVE from '@salesforce/schema/Fund__c.Active__c';
 import ADD_FUND from '@salesforce/label/c.Giving_FundSplit_AddFund';
 import REMOVE_ROW from '@salesforce/label/c.Giving_GiftBatch_RemoveLine';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -20,9 +23,8 @@ import {
   toCents
 } from 'c/fundSplitMath';
 
-const FUND_NAME = 'Fund__c.Name';
 const ACTIVE_FUNDS = {
-  criteria: [{ fieldPath: 'Active__c', operator: 'eq', value: true }]
+  criteria: [{ fieldPath: FUND_ACTIVE.fieldApiName, operator: 'eq', value: true }]
 };
 const KEY_STEP = 1;
 const PAGE_STEP = 10;
@@ -48,6 +50,7 @@ function newKey() {
  */
 export default class GiftFundSplit extends LightningElement {
   helpReady = isHelpLoaded('Giving');
+  fundObject = FUND.objectApiName;
 
   rows = [{ key: newKey(), fundId: null, amount: '', percentText: null }];
   givenNames = {};

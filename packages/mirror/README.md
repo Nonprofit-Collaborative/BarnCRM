@@ -30,12 +30,10 @@ Built so far (iteration 0.6):
   record grant).
 - **Accounting export (X-04).** Permission set: `Accounting_Export`, which also reads the gift,
   allocation and fund fields the file shows. See `docs/admin-guide/accounting-export.md`.
-- **Access (ADR-0194, simpler permission sets, D4).** `MirrorAccessSync` (a Core module access
-  sync, found by name) gives `Salesforce_Records_Sync` to holders of the retired `Campaign_Sync`,
-  `Opportunity_Mirror` and `Gift_Transaction_Mirror`, and `Inbound_Gifts` to holders of the
-  retired `Inbound_Gift_API` and `Record_Inbound_Gift_Action`: active users only, at install,
-  upgrade, Turn on and hourly; `MirrorPostInstall` names inactive holders in the Error Log. The
-  retired sets are removed in the next release.
+- **Access (ADR-0194, simpler permission sets, D4).** `Salesforce_Records_Sync` opens the Campaign
+  sync, Opportunity mirror and Gift Transaction mirror pages; `Inbound_Gifts` is the integration
+  user's set, with the Inbound Gift REST class and flow action. Both are Access Add-On rows. The
+  five sets they replaced were removed at the namespaced cut-over (D-199).
 - **Campaign sync (X-02).** The `Campaign_Sync` automation on Appeal (`CampaignSyncTriggerHandler`
   over `CampaignSyncService`) copies each appeal to a Campaign before it is saved, and stores
   the link in `Appeal__c.Campaign_Id__c`, a field Mirror adds to Giving's object.

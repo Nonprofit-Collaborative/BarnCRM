@@ -177,18 +177,8 @@ public with sharing class HubTemplates {
 		if (bodyOverride != null) {
 			return bodyOverride;
 		}
-		String prefix = NamespaceUtil.prefix().removeEnd('__');
-		String namespace = String.isBlank(prefix) ? null : prefix;
-		// System mode, as BarnHelp reads its catalogs: packaged data, never a same-named resource
-		// of the org's own.
-		List<StaticResource> found = [
-			SELECT Body
-			FROM StaticResource
-			WHERE Name = :RESOURCE AND NamespacePrefix = :namespace
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
-		return found.isEmpty() ? '{}' : found[0].Body.toString();
+		String body = SetupObjectSelector.staticResourceBody(RESOURCE);
+		return body == null ? '{}' : body;
 	}
 
 	private static List<Object> entries(Map<String, Object> templates, String name) {

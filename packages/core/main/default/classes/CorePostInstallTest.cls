@@ -419,14 +419,6 @@ private class CorePostInstallTest {
 		];
 	}
 
-	private static Integer oldSwapJobs() {
-		return [
-			SELECT COUNT()
-			FROM CronTrigger
-			WHERE CronJobDetail.Name = :SeasonalAddressScheduler.JOB_NAME
-		];
-	}
-
 	private static Integer allApexJobs() {
 		return [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.JobType = '7'];
 	}
@@ -488,43 +480,6 @@ private class CorePostInstallTest {
 			SettingsService.clearCaches();
 			Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'Off until an admin turns it on');
 			Assert.areEqual(0, swapJobs(), 'So nothing is scheduled');
-		}
-	}
-
-	@IsTest
-	static void anUpgradeTurnsTheSwitchOnForAnOrgThatAlreadyRunsTheSwap() {
-		System.runAs(TestUsers.admin()) {
-			orgWithSeasonalState(false, true);
-			CorePostInstall.adoptSeasonalScheduleInTests = true;
-			NightlyJobs.adoptInTests = true;
-
-			Test.startTest();
-			CorePostInstall.runAsSourceDeploy();
-			Test.stopTest();
-
-			SettingsService.clearCaches();
-			Assert.isTrue(
-				SeasonalAddressScheduler.isEnabled(),
-				'The page says on because the job is running'
-			);
-			Assert.areEqual(0, oldSwapJobs(), 'The swap no longer has a schedule of its own');
-			Assert.areEqual(1, swapJobs(), 'The nightly run does the swap now, scheduled once');
-		}
-	}
-
-	@IsTest
-	static void anUpgradeDoesNotTurnTheSwitchOnForAnOrgThatStoppedTheSwap() {
-		System.runAs(TestUsers.admin()) {
-			orgWithSeasonalState(false, false);
-			CorePostInstall.adoptSeasonalScheduleInTests = true;
-
-			Test.startTest();
-			CorePostInstall.runAsSourceDeploy();
-			Test.stopTest();
-
-			SettingsService.clearCaches();
-			Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'Nothing to adopt');
-			Assert.areEqual(0, swapJobs(), 'And nothing was scheduled');
 		}
 	}
 

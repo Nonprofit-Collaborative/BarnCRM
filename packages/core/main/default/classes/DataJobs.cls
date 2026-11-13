@@ -144,16 +144,8 @@ public with sharing class DataJobs {
 		Integer lowest,
 		Integer highest
 	) {
-		Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
-		if (configured == null) {
-			return fallback;
-		}
-		try {
-			Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(lowest, Math.min(value, highest));
-		} catch (Exception ignored) {
-			return fallback;
-		}
+		Decimal value = SettingsService.storedNumber(key);
+		return value == null ? fallback : Math.max(lowest, Math.min(value.intValue(), highest));
 	}
 
 	public static Integer intOf(Decimal value) {

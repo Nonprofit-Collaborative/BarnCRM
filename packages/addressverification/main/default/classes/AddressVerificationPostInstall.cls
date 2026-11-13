@@ -19,9 +19,7 @@ public with sharing class AddressVerificationPostInstall implements InstallHandl
 	 * `scripts/ci/check-setting-defaults.py` fails the build when one is missing.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Address_Verification_Settings__c.Verify_On_Save__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	public void onInstall(InstallContext context) {
 		if (context != null) {
@@ -65,21 +63,15 @@ public with sharing class AddressVerificationPostInstall implements InstallHandl
 
 		public void execute(QueueableContext jobContext) {
 			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE
-						Name = :AddressVerificationAccessSync.ADMIN_SET
-						AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				Database.SaveResult saved = sets.isEmpty()
+				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+					AddressVerificationAccessSync.ADMIN_SET
+				);
+				Database.SaveResult saved = permissionSet == null
 					? null
 					: Database.insert(
 							new PermissionSetAssignment(
 								AssigneeId = installerId,
-								PermissionSetId = sets[0].Id
+								PermissionSetId = permissionSet.Id
 							),
 							false,
 							AccessLevel.SYSTEM_MODE

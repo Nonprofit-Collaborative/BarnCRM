@@ -26,7 +26,7 @@
             <lightning-combobox class="slds-col slds-size_1-of-2" label={labels.priority} options={priorityOptions} value={value.priority} data-field="priority" onchange={handleField} data-id="priority"></lightning-combobox>
             <lightning-record-picker class="slds-col slds-size_1-of-2" label={labels.owner} object-api-name="User" value={value.ownerId} data-field="ownerId" onchange={handleField} data-id="owner"></lightning-record-picker>
             <lightning-input class="slds-col slds-size_1-of-2" type="date" label={labels.due} value={value.dueDate} data-field="dueDate" onchange={handleField} data-id="due"></lightning-input>
-            <lightning-record-picker class="slds-col slds-size_1-of-1" label={labels.project} object-api-name="Project__c" value={value.projectId} data-field="projectId" onchange={handleField} data-id="project"></lightning-record-picker>
+            <lightning-record-picker class="slds-col slds-size_1-of-1" label={labels.project} object-api-name={projectObject} value={value.projectId} data-field="projectId" onchange={handleField} data-id="project"></lightning-record-picker>
             <lightning-textarea class="slds-col slds-size_1-of-1" label={labels.resolution} value={value.resolution} data-field="resolution" onchange={handleField} data-id="resolution"></lightning-textarea>
           </div>
           <div class="slds-var-m-vertical_small">

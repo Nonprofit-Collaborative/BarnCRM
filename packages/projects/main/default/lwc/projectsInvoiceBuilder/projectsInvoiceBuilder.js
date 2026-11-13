@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import INVOICE from '@salesforce/schema/Project_Invoice__c';
 import getProjectBilling from '@salesforce/apex/ProjectBillingController.getProjectBilling';
 import buildInvoice from '@salesforce/apex/ProjectBillingController.buildInvoice';
 import { messageFrom } from 'c/findCsv';
@@ -72,7 +73,11 @@ export default class ProjectsInvoiceBuilder extends NavigationMixin(LightningEle
       this.errorMessage = undefined;
       this[NavigationMixin.Navigate]({
         type: 'standard__recordPage',
-        attributes: { recordId: invoiceId, objectApiName: 'Project_Invoice__c', actionName: 'view' }
+        attributes: {
+          recordId: invoiceId,
+          objectApiName: INVOICE.objectApiName,
+          actionName: 'view'
+        }
       });
     } catch (error) {
       this.errorMessage = messageFrom(error);

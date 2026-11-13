@@ -71,11 +71,10 @@ public with sharing class EventsHomeController {
 			Home home = new Home();
 			home.canCreate = Schema.SObjectType.Event__c.isCreateable();
 			home.title = Schema.SObjectType.Event__c.getLabelPlural();
-			Map<String, Schema.SObjectField> fields = Schema.SObjectType.Event__c.fields.getMap();
 			for (
 				String name : new List<String>{ 'Name', 'Status__c', 'Format__c', 'Capacity__c' }
 			) {
-				home.fieldLabels.put(name, fields.get(name).getDescribe().getLabel());
+				home.fieldLabels.put(name, NamespaceUtil.fieldLabel(Event__c.SObjectType, name));
 			}
 			Boolean past = view == VIEW_PAST;
 			Map<String, Object> binds = new Map<String, Object>{

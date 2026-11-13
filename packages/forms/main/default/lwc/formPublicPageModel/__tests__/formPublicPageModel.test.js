@@ -109,7 +109,7 @@ describe('c/formPublicPageModel', () => {
       joiner,
       sitePageUrl
     );
-    expect(view.items[0].href).toBe('FormsPublic?record=a01');
+    expect(view.items[0].href).toBe('?record=a01');
     expect(view.items[0].when).toContain('Dec 5, 2026');
     expect(listView(null, 'en-US', joiner, sitePageUrl)).toBeNull();
     expect(listView({}, 'en-US', joiner, sitePageUrl).items).toEqual([]);

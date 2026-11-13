@@ -86,6 +86,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>NamespaceUtil</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>NightlyJobsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

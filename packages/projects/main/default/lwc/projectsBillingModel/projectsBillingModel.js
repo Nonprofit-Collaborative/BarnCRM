@@ -45,31 +45,13 @@ export const INVOICE_COLUMNS = [
 export function invoiceRows(invoices) {
   const rows = [];
   for (const invoice of invoices || []) {
-    const head = {
-      invoice: invoice.Name,
-      status: invoice.Status__c,
-      project: invoice.Project__r?.Name,
-      client: invoice.Account__r?.Name,
-      invoiceDate: invoice.Invoice_Date__c,
-      dueDate: invoice.Due_Date__c,
-      paidDate: invoice.Paid_Date__c,
-      total: invoice.Total__c,
-      amountPaid: invoice.Amount_Paid__c
-    };
-    const lines = invoice.Lines__r || [];
-    if (!lines.length) {
+    const { lines, name, ...rest } = invoice;
+    const head = { invoice: name, ...rest };
+    if (!lines || !lines.length) {
       rows.push(head);
     }
-    for (const line of lines) {
-      rows.push({
-        ...head,
-        lineType: line.Line_Type__c,
-        description: line.Description__c,
-        serviceDate: line.Service_Date__c,
-        quantity: line.Quantity__c,
-        unitPrice: line.Unit_Price__c,
-        amount: line.Amount__c
-      });
+    for (const line of lines || []) {
+      rows.push({ ...head, ...line });
     }
   }
   return rows;

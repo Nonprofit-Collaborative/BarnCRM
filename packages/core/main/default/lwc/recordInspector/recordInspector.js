@@ -3,6 +3,7 @@ import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import pageLink from '@salesforce/apex/RecordInspectorController.pageLink';
 import { iconFor } from 'c/barnIcons';
+import { tabPageReference } from 'c/barnTabs';
 import { fieldSetupPath } from 'c/setupLinks';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
@@ -266,17 +267,13 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
   }
 
   /** Opens Find on this record's object, the same for every field. */
-  handleOpenFind() {
+  async handleOpenFind() {
     const state = {};
     if (this.toolStateKey && this.inspection) {
       state[this.toolStateKey.replace(new RegExp(`${TOOL_STATE_SUFFIX}$`), 'object')] =
         this.inspection.objectApiName;
     }
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: FIND_TAB },
-      state
-    });
+    this[NavigationMixin.Navigate](await tabPageReference(FIND_TAB, state));
   }
 
   get noMatch() {

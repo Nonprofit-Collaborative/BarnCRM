@@ -7,18 +7,12 @@
  * scheduled (`SettingsService` calls `applySwitch`), and saving it off leaves the step out of
  * tonight's run. An install or upgrade with the switch on schedules the run if it is missing
  * (`scheduleIfEnabled`).
- *
- * Still schedulable: an org upgraded from before the nightly run may have this job scheduled on
- * its own, and when it fires it adopts the old schedules (R-NJ5) and does tonight's swap.
  */
 public with sharing class SeasonalAddressScheduler implements Schedulable {
 	/** The name the job was scheduled under, now the step's key. */
 	public static final String JOB_NAME = 'BarnCRM Seasonal Addresses';
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			NightlyJobs.adoptOldSchedules();
-		}
 		Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
 	}
 
@@ -42,19 +36,6 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 	public static void scheduleIfEnabled() {
 		if (isEnabled() && !NightlyJobs.isScheduled()) {
 			start();
-		}
-	}
-
-	/**
-	 * An org upgraded from before the switch existed may still run the swap on its own
-	 * schedule, and its switch would read off while the swap runs. Turns the switch on for such
-	 * an org, so what the page says is what is happening.
-	 */
-	public static void adoptExistingSchedule() {
-		if (!isEnabled() && ScheduledJobSelector.isScheduled(JOB_NAME)) {
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ 'Seasonal_Addresses_Enabled__c' => true }
-			);
 		}
 	}
 

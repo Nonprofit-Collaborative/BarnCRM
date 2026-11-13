@@ -4,7 +4,7 @@ import { RefreshEvent } from 'lightning/refresh';
 import FirstRunModal from 'c/firstRunModal';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/FirstRunController.getState';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
+import { messageFrom as messageOf } from 'c/findCsv';
 import TITLE from '@salesforce/label/c.Core_FirstRun_Title';
 
 const GENERAL_SECTION = 'General';
@@ -61,10 +61,4 @@ export default class FirstRunSetup extends NavigationMixin(LightningElement) {
       this.loadError = messageOf(error);
     }
   }
-}
-
-function messageOf(error) {
-  return (
-    (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR
-  );
 }

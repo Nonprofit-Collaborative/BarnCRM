@@ -30,18 +30,18 @@
             onchange={handlePersonChange}
           ></lightning-record-picker>
         </div>
-        <lightning-input-field field-name="Volunteer_Job__c" value={context.jobId}></lightning-input-field>
+        <lightning-input-field field-name={hoursFields.job} value={context.jobId}></lightning-input-field>
         <lightning-input-field
-          field-name="Volunteer_Shift__c"
+          field-name={hoursFields.shift}
           value={context.shiftId}
         ></lightning-input-field>
         <lightning-input-field
-          field-name="Date_Worked__c"
+          field-name={hoursFields.dateWorked}
           value={context.dateWorked}
           required
         ></lightning-input-field>
-        <lightning-input-field field-name="Hours__c" value={context.hours} required></lightning-input-field>
-        <lightning-input-field field-name="Notes__c"></lightning-input-field>
+        <lightning-input-field field-name={hoursFields.hours} value={context.hours} required></lightning-input-field>
+        <lightning-input-field field-name={hoursFields.notes}></lightning-input-field>
       </lightning-record-edit-form>
     </template>
 

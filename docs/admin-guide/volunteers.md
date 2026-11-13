@@ -89,8 +89,7 @@ each role its Volunteers set:
 Whoever approves hours also needs **Volunteers Coordinator**: everything Staff does, plus see
 and correct everyone's hours to approve or reject them, and manage skills, requirements and
 onboarding steps. It is not a role: give it on the Access page under **Extra Permissions**, on
-top of the person's role (usually Team Member). The Coordinator role is retired; in this
-release its holders keep it, also get Team Member, and keep Volunteers Coordinator.
+top of the person's role (usually Team Member).
 
 When it happens:
 
@@ -799,7 +798,6 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
 | **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-Ups panel, then click **Close Shift** there (or set Status to Cancelled if it did not happen). |
 | **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks Ahead to Create Shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and click **Create Shifts Now**. |
-| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
 ## Erasing a Volunteer

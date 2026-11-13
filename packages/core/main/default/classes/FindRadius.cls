@@ -246,17 +246,8 @@ public with sharing class FindRadius {
 			return tableForTest;
 		}
 		if (table == null) {
-			String prefix = NamespaceUtil.prefix().removeEnd('__');
-			String namespace = String.isBlank(prefix) ? null : prefix;
-			// System mode, as BarnHelp reads its catalogs: packaged text every user may use.
-			List<StaticResource> found = [
-				SELECT Body
-				FROM StaticResource
-				WHERE Name = :RESOURCE AND NamespacePrefix = :namespace
-				WITH SYSTEM_MODE
-				LIMIT 1
-			];
-			table = found.isEmpty() ? ';' : ';' + found[0].Body.toString().trim() + ';';
+			String body = SetupObjectSelector.staticResourceBody(RESOURCE);
+			table = body == null ? ';' : ';' + body.trim() + ';';
 		}
 		return table;
 	}

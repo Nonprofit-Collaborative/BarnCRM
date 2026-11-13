@@ -1,9 +1,8 @@
 /**
  * Gives the Volunteers permission sets to BarnCRM's roles (ADR-0127 `0127-volunteers-module.md`,
  * decision 3): Volunteers Admin to everyone holding BarnCRM Admin, directly or through a role,
- * and each other set to the people assigned its role (a permission set group). The Coordinator
- * and Team Member roles hold the same Core set, so those follow the role itself
- * (`TabAccessService.giveToGroupHolders`, ADR-0131 `0131-module-access-sync-by-role.md`).
+ * and each other set to the people assigned its role (a permission set group), followed
+ * through (`TabAccessService.giveToGroupHolders`, ADR-0131 `0131-module-access-sync-by-role.md`).
  *
  * It only gives, never takes away: a set may also be given by hand. It runs at install
  * (`VolunteersPostInstall`), and Core asks it when a role is given on the Access page, at each
@@ -28,18 +27,16 @@ public with sharing class VolunteersAccessSync extends ModuleAccessSyncBase {
 	/**
 	 * Each other set, and the BarnCRM roles (permission set groups) whose holders get it.
 	 * Fundraising Staff is Giving's role, named as text: a role that is not installed is skipped
-	 * (ADR-0194 D3). Coordinator is retired (D1): its line stays this release so anyone given it
-	 * in Setup still gets Volunteers Coordinator, which is otherwise given per person on the
-	 * Access page (`Access_Add_On.Volunteers_Coordinator`).
+	 * (ADR-0194 D3). Volunteers Coordinator is given per person on the Access page
+	 * (`Access_Add_On.Volunteers_Coordinator`, D1).
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
-		'Volunteers_Coordinator' => new List<String>{ 'Volunteer_Coordinator' },
 		'Volunteers_Staff' => new List<String>{ 'Program_Staff', 'Fundraising_Staff' },
 		'Volunteers_Read_Only' => new List<String>{ 'Read_Only' }
 	};
 
-	/** Assignments one run gives per set: all four together stay inside the 10,000 DML rows. */
+	/** Assignments one run gives per set: all three together stay inside the 10,000 DML rows. */
 	private static final Integer ROWS_PER_SET = 2400;
 
 	@NamespaceAccessible

@@ -1,7 +1,7 @@
 /**
  * Gives the Funders permission sets to BarnCRM's roles (ADR-0161 `0161-funders-module.md`,
  * decision 9): Funders Admin to everyone holding BarnCRM Admin, directly or through a role,
- * Funders Staff to the Team Member, Coordinator and Fundraising Staff roles (the last is Giving's,
+ * Funders Staff to the Team Member and Fundraising Staff roles (the last is Giving's,
  * which Funders depends on), and Funders Read Only to the Read Only role. The roles are permission set groups, followed through
  * `TabAccessService.giveToGroupHolders` (ADR-0131 `0131-module-access-sync-by-role.md`).
  *
@@ -27,11 +27,7 @@ public with sharing class FundersAccessSync extends ModuleAccessSyncBase {
 	/** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
-		'Funders_Staff' => new List<String>{
-			'Program_Staff',
-			'Volunteer_Coordinator',
-			'Fundraising_Staff'
-		},
+		'Funders_Staff' => new List<String>{ 'Program_Staff', 'Fundraising_Staff' },
 		'Funders_Read_Only' => new List<String>{ 'Read_Only' }
 	};
 

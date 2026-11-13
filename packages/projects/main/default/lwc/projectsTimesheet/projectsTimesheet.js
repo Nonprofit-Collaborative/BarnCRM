@@ -152,7 +152,7 @@ export default class ProjectsTimesheet extends LightningElement {
   }
 
   get projectOptions() {
-    return (this.week?.projects || []).map((row) => ({ label: row.Name, value: row.Id }));
+    return (this.week?.projects || []).map((row) => ({ label: row.name, value: row.id }));
   }
 
   get categoryOptions() {
@@ -162,8 +162,7 @@ export default class ProjectsTimesheet extends LightningElement {
   get expenses() {
     return (this.week?.expenses || []).map((row) => ({
       ...row,
-      projectName: row.Project__r?.Name,
-      href: `/lightning/r/${row.Id}/view`
+      href: `/lightning/r/${row.id}/view`
     }));
   }
 
@@ -219,7 +218,7 @@ export default class ProjectsTimesheet extends LightningElement {
     this.rowDraft = { ...this.rowDraft, projectId: event.detail.value, taskId: undefined };
     try {
       const tasks = await getTasks({ projectId: event.detail.value });
-      this.taskOptions = tasks.map((task) => ({ label: task.Name, value: task.Id }));
+      this.taskOptions = tasks.map((task) => ({ label: task.name, value: task.id }));
     } catch (error) {
       this.errorMessage = messageFrom(error);
     }
@@ -227,14 +226,14 @@ export default class ProjectsTimesheet extends LightningElement {
 
   handleAddRow() {
     const d = this.rowDraft;
-    const project = (this.week?.projects || []).find((row) => row.Id === d.projectId);
+    const project = (this.week?.projects || []).find((row) => row.id === d.projectId);
     if (!project) {
       return;
     }
     const task = this.taskOptions.find((option) => option.value === d.taskId);
     this.extraRows = [
       ...this.extraRows,
-      newRow(project, task ? { Id: task.value, Name: task.label } : null, d.billable, this.days)
+      newRow(project, task ? { id: task.value, name: task.label } : null, d.billable, this.days)
     ];
   }
 

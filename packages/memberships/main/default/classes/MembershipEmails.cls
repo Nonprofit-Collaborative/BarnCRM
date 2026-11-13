@@ -10,16 +10,7 @@ public with sharing class MembershipEmails {
 
 	/** The template's id by its unique name, or null when there is none. */
 	public static Id templateId(String developerName) {
-		for (EmailTemplate template : [
-			SELECT Id
-			FROM EmailTemplate
-			WHERE DeveloperName = :developerName AND IsActive = TRUE
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]) {
-			return template.Id;
-		}
-		return null;
+		return SetupObjectSelector.emailTemplateId(developerName, true);
 	}
 
 	/**

@@ -34,10 +34,7 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
 	 * fails the build when a new ship-on checkbox is missing here.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Funders_Settings__c.Reminder_Tasks_Enabled__c,
-		Funders_Settings__c.Grant_Finder_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/**
 	 * Called by the platform after the module is installed or upgraded.
@@ -64,8 +61,6 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
 	 * @param installerId the person to give Funders Admin, or null for nobody
 	 */
 	public void runSetup(Id installerId) {
-		// A job scheduled on its own before the nightly run becomes its step (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		// Each entry point records its own failures and returns, so nothing here throws.
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
 		FunderReportTemplates.installDefaultsDuringInstall();
@@ -113,20 +108,16 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
 
 		private void giveInstaller() {
 			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE Name = :FundersAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				if (sets.isEmpty()) {
+				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+					FundersAccessSync.ADMIN_SET
+				);
+				if (permissionSet == null) {
 					return;
 				}
 				Integer held = [
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
+					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
 					WITH SYSTEM_MODE
 				];
 				if (held > 0) {
@@ -135,7 +126,7 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
 				Database.SaveResult saved = Database.insert(
 					new PermissionSetAssignment(
 						AssigneeId = installerId,
-						PermissionSetId = sets[0].Id
+						PermissionSetId = permissionSet.Id
 					),
 					false,
 					AccessLevel.SYSTEM_MODE

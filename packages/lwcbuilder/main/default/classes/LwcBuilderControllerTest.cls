@@ -465,7 +465,11 @@ private class LwcBuilderControllerTest {
 				noBody = e.getMessage();
 			}
 
-			Assert.areEqual(DEFINITION, saved.get('definition'), 'A text definition is stored');
+			Assert.areEqual(
+				JSON.deserializeUntyped(DEFINITION),
+				JSON.deserializeUntyped((String) saved.get('definition')),
+				'A text definition is stored'
+			);
 			Assert.areEqual(
 				BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Definition'),
 				notJson,

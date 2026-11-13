@@ -68,9 +68,7 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 	 * fails the build when a new ship-on checkbox is missing here.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Giving_Settings__c.Ask_Reminders_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/**
 	 * Called by the platform after the package is installed or upgraded.
@@ -95,8 +93,6 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 	 * @param installerId unused: every step belongs to the org, not to a person
 	 */
 	public void runSetup(Id installerId) {
-		// Giving's jobs scheduled one by one before the nightly run become its steps (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		// Nothing is caught here because nothing can be thrown: the entry point records its own
 		// failure in the Error Log and returns, so an install is never aborted by this step, and
 		// the Rollups page can still create the rows on demand.

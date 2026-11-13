@@ -155,11 +155,12 @@ public with sharing class BackupSetService {
 			throw new BackupSetException(BarnHelp.text('Core', 'Core_BackupSets_ErrorNotSet'));
 		}
 		QueryCompiler.Compiled compiled = QueryCompiler.compile(query.Query_JSON__c);
-		Schema.SObjectType objectType = Schema.describeSObjects(
-				new List<String>{ compiled.objectName },
-				SObjectDescribeOptions.DEFERRED
-			)[0]
-			.getSObjectType();
+		Schema.SObjectType objectType = NamespaceUtil.objectType(compiled.objectName);
+		if (objectType == null) {
+			// Not an object here: the platform's own error, as before.
+			objectType = Schema.describeSObjects(new List<String>{ compiled.objectName })[0]
+				.getSObjectType();
+		}
 		List<String> fields = new List<String>();
 		for (Schema.DescribeFieldResult field : BulkDeleteService.backupFields(objectType)) {
 			fields.add(field.getName());

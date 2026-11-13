@@ -17,4 +17,51 @@ public with sharing class BarnCRMPermissions {
 	public static Boolean canManageSettings() {
 		return FeatureManagement.checkPermission(MANAGE_SETTINGS);
 	}
+
+	/**
+	 * True when the running user may run Finish Setup and the install entry points
+	 * (`BarnInstallCheck`): they may manage settings, or no active user holds that permission
+	 * yet and they have Customize Application. The second case is the bootstrap: setup is what
+	 * assigns the permission, so an org where it never ran (source copied in, a post-install
+	 * that failed) would otherwise have nobody who could press Finish Setup.
+	 */
+	@NamespaceAccessible
+	public static Boolean canRunSetup() {
+		if (canManageSettings()) {
+			return true;
+		}
+		Id userId = UserInfo.getUserId();
+		Boolean customizes =
+			[
+				SELECT COUNT()
+				FROM PermissionSetAssignment
+				WHERE AssigneeId = :userId AND PermissionSet.PermissionsCustomizeApplication = TRUE
+				WITH SYSTEM_MODE
+			] > 0;
+		return customizes && !anyoneManagesSettings();
+	}
+
+	/** Set by tests: a test org always has a real admin who may hold the permission. */
+	@TestVisible
+	private static Boolean anyoneManagesOverride;
+
+	/** True when an active user holds Manage BarnCRM Settings through any permission set. */
+	private static Boolean anyoneManagesSettings() {
+		if (anyoneManagesOverride != null) {
+			return anyoneManagesOverride;
+		}
+		Id permissionId = SetupObjectSelector.customPermissionId(MANAGE_SETTINGS);
+		return [
+				SELECT COUNT()
+				FROM PermissionSetAssignment
+				WHERE
+					Assignee.IsActive = TRUE
+					AND PermissionSetId IN (
+						SELECT ParentId
+						FROM SetupEntityAccess
+						WHERE SetupEntityId = :permissionId
+					)
+				WITH SYSTEM_MODE
+			] > 0;
+	}
 }

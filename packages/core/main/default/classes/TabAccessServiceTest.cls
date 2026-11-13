@@ -266,22 +266,21 @@ private class TabAccessServiceTest {
 	}
 
 	@IsTest
-	static void givesAModuleSetToOneRoleNotAnotherHoldingTheSameSets() {
+	static void givesAModuleSetToOneRoleNotAnother() {
 		System.runAs(TestUsers.admin()) {
-			User coordinator = TestUsers.standardUser('Coordinator');
+			User reader = TestUsers.standardUser('Looker');
 			User member = TestUsers.standardUser('Member');
 			insert new List<PermissionSetAssignment>{
 				new PermissionSetAssignment(
-					AssigneeId = coordinator.Id,
-					PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Volunteer_Coordinator')
-						.Id
+					AssigneeId = reader.Id,
+					PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Read_Only').Id
 				),
 				new PermissionSetAssignment(
 					AssigneeId = member.Id,
 					PermissionSetGroupId = TestDataFactory.prepareRoleGroup('Program_Staff').Id
 				)
 			};
-			List<String> roles = new List<String>{ 'Volunteer_Coordinator' };
+			List<String> roles = new List<String>{ 'Read_Only' };
 			// Core's tests can name no module set, so a tab set stands in for one.
 			TabAccessService.coreSetPrefix = 'Not_Core_';
 
@@ -314,12 +313,12 @@ private class TabAccessServiceTest {
 			Assert.isFalse(missing, 'A set this org lacks is skipped');
 			Assert.isFalse(noRoles, 'No roles gives nothing');
 			Assert.isTrue(
-				tabSetsOf(coordinator.Id).contains(TabAccessService.IMPORT_TAB),
-				'The Coordinator role holder gets the set'
+				tabSetsOf(reader.Id).contains(TabAccessService.IMPORT_TAB),
+				'The Read Only role holder gets the set'
 			);
 			Assert.isFalse(
 				tabSetsOf(member.Id).contains(TabAccessService.IMPORT_TAB),
-				'The Team Member, holding the same Core set, does not'
+				'The Team Member, holding another role, does not'
 			);
 		}
 	}
@@ -327,7 +326,7 @@ private class TabAccessServiceTest {
 	@IsTest
 	static void byRoleSkipsInactivePeopleAndThoseHoldingTheSetThroughAGroup() {
 		System.runAs(TestUsers.admin()) {
-			Id coordinatorRole = TestDataFactory.prepareRoleGroup('Volunteer_Coordinator').Id;
+			Id coordinatorRole = TestDataFactory.prepareRoleGroup('Read_Only').Id;
 			User gone = TestUsers.standardUser('Gone');
 			User grouped = TestUsers.standardUser('Grouped');
 			// A role of the org's own that already includes the stand-in module set.
@@ -368,7 +367,7 @@ private class TabAccessServiceTest {
 			Test.startTest();
 			Boolean more = TabAccessService.giveToGroupHolders(
 				TabAccessService.IMPORT_TAB,
-				new List<String>{ 'Volunteer_Coordinator' },
+				new List<String>{ 'Read_Only' },
 				100,
 				'Test'
 			);

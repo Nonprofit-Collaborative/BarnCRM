@@ -86,6 +86,9 @@ public without sharing class RollupQueue implements Queueable {
 	/** The first entry of this transaction's last insert, and the DML statements counted then. */
 	private static Id lastEntryId;
 	private static Integer dmlStatementsAtLastInsert = 0;
+	/** Entries sent to emptyRecycleBin; a test cannot see the bin emptied before it ends. */
+	@TestVisible
+	private static Integer emptiedForTest = 0;
 
 	/** What was asked for before each insert of this transaction, oldest first. */
 	private static List<Asked> askedBeforeInserts = new List<Asked>();
@@ -1064,6 +1067,7 @@ public without sharing class RollupQueue implements Queueable {
 		}
 		try {
 			Database.emptyRecycleBin(gone);
+			emptiedForTest += gone.size();
 		} catch (DmlException notEmptied) {
 			// The entries are deleted; left in the bin they only wait out the fifteen days.
 			ErrorLogger.log(notEmptied, LOG_CONTEXT);

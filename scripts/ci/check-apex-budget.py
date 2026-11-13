@@ -66,7 +66,10 @@ CAPS = {
     # Raised 2026-11-12 for MIG-02b Nonprofit Cloud household conversion (the adoption service
     # and batch take a source key, join members in Junction mode and undo them; the Household
     # Model guard in HouseholdSelector): 2,221,240 measured, plus about 0.5%.
-    "core": 2_232_000,
+    # Raised 2026-11-12 for R1.21 namespace readiness (D-199, D-200: BarnInstallCheck, the setup
+    # bootstrap and revisions, SetupObjectSelector, NamespaceUtil.field and describe; the
+    # modules shrank by moving their lookups onto Core): 2,233,198 measured, plus about 0.3%.
+    "core": 2_240_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -114,7 +117,9 @@ CAPS = {
     # C-47b brand letters and the C-64 signal: 235,670 measured 2026-11-11, plus about 0.5%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 237,172 measured, plus
     # about 0.5%.
-    "volunteers": 238_400,
+    # Lowered at the cut-over cleanup (D-200, release 1.21: the retired Coordinator check gone,
+    # settings read through SettingsService): 230,596 measured 2026-11-12, plus about 2%.
+    "volunteers": 235_300,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
@@ -134,7 +139,9 @@ CAPS = {
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
     # checklists, documents, budget lines and renewals, plus about 2%.
-    "funders": 126_700,
+    # Lowered at the cut-over cleanup (D-200, release 1.21): 123,925 measured 2026-11-12, plus
+    # about 2%.
+    "funders": 126_500,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -196,7 +203,9 @@ CAPS = {
     # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
     # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
     # Quorum warning and immediate breach bell (CH-21, CH-22): 59,376 measured, plus about 2%.
-    "corporatehub": 60_600,
+    # Lowered at the cut-over cleanup (D-200, release 1.21): 59,285 measured 2026-11-12, plus
+    # about 2%.
+    "corporatehub": 60_500,
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
@@ -217,12 +226,14 @@ CAPS = {
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
     # about 1%. Release 1.20 review: the chart walk over plain inputs so it can be unit tested:
-    # 21,351 measured, plus about 2%.
-    "lwcbuilder": 21_800,
+    # 21,351 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21):
+    # 20,959 measured 2026-11-12, plus about 2%.
+    "lwcbuilder": 21_400,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
-    # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
-    "scholarships": 50_300,
+    # controller, plus the review and requirement DTOs (R1.21 namespace readiness, D-200 N3),
+    # 51,267 measured (Prettier line breaks included), plus about 2%.
+    "scholarships": 52_300,
     # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
@@ -248,11 +259,13 @@ CAPS = {
     # revenue (PM-11: ProjectFinancials, ProjectRevenue and its nightly step, health with change
     # hours): +12,766. 97,102 measured, plus about 2%. Review fixes (#1237: invoice delete guard,
     # row cap, resources helper) and the release-gate fixes (revenue Chunk queueable, rate query):
-    # 99,230 measured, plus about 2%. Requests and issues (D-201, ADR-NEXT projects requests):
-    # the request rules and notices (ProjectRequestHandler), the Requests tab controller and the
-    # settings accessors, +19,475: 119,446 measured, plus about 2%. The request API
-    # (ProjectRequestApi, org-to-org intake), +7,280: 126,726 measured, plus about 2%.
-    "projects": 129_300,
+    # 99,230 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21:
+    # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%. The
+    # ProjectViews DTOs (R1.21 namespace readiness, D-200 N3): 106,037 measured, plus about 2%.
+    # Requests and issues (D-201, ADR-NEXT projects requests): the request rules and notices
+    # (ProjectRequestHandler), the Requests tab controller, the settings accessors and the
+    # org-to-org request API (ProjectRequestApi): 133,533 measured, plus about 2%.
+    "projects": 136_200,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
@@ -264,10 +277,12 @@ CAPS = {
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
     # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
     # 214,101 measured, plus about 0.5%. Release 1.20 review: per-field readable membership
-    # reads and the member-count filter: 215,838 measured, plus about 2%. The Case bridge to a
-    # service provider (D-201: CaseProviderRequests and its flow action), +9,616: 225,454
-    # measured, plus about 2%.
-    "mirror": 230_000,
+    # reads and the member-count filter: 215,838 measured, plus about 2%. Lowered at the
+    # cut-over cleanup (D-200, release 1.21: MirrorAccessSync and the five retired permission
+    # sets removed): 212,177 measured 2026-11-12, plus about 2%. The Case bridge to a service
+    # provider (D-201: CaseProviderRequests and its flow action): 221,790 measured,
+    # plus about 2%.
+    "mirror": 226_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

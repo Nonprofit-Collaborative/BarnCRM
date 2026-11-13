@@ -111,7 +111,9 @@ visibility. To hide a module from a colleague, take away its role on the
 Install BarnCRM and its modules as packages. Each package runs its own setup steps when it is
 installed and at every upgrade: it creates its automation switches, import templates and
 shipped totals, gives the installer its administrator access, and so on. Copying the source
-into an org by hand skips those steps, and the module then works only in part.
+into an org by hand skips those steps, and the module then works only in part. When an upgrade
+adds new setup steps to a module and they did not run (for example, the upgrade's own steps
+failed), the row is flagged again in the same way until they do.
 
 A row whose setup steps never ran says "Its setup steps never ran, which happens when source
 is copied in by hand. Finish Setup runs the steps a package install runs." With the **Manage
@@ -123,6 +125,11 @@ Setup gives it to you only when you also hold Salesforce's **Assign Permission S
 other steps without it. The steps only add what is missing, so pressing it twice does no harm. It is
 recorded under **Recent Changes** in BarnCRM Settings. Health Check reports the same thing (see
 [Health Check](health-check.md#how-a-fix-button-works)).
+
+Setup is what gives anyone the **Manage BarnCRM Settings** permission, so an org where it never
+ran can have nobody who holds it. While no active user in the org holds that permission, a user
+with Salesforce's **Customize Application** permission also sees **Finish Setup** (and nothing
+else changes for them). Once someone holds the permission, only they can press it.
 
 Finish Setup is a recovery step for an org built from copied source, not a way to install
 BarnCRM: install the packages.

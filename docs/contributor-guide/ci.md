@@ -841,7 +841,7 @@ still deleted.
 | | N-1 from a git ref | N-1 from a `04t` file | Post-install |
 |---|---|---|---|
 | `managed` | Refused: a managed beta cannot be upgraded (or installed in production). `--promote-from` promotes each N-1 version after it is built: **promotion is permanent and needs the owner's approval**, and N must then carry a higher major.minor.patch | The ids must be released (promoted) versions | Runs on its own: each package's `postInstallScript` |
-| `unlocked` | Unpromoted versions install in scratch orgs | Any versions | A post-install script runs for managed packages only, so after every install and upgrade the script calls each package's `new <ns>.<Module>PostInstall().runSetup(UserInfo.getUserId())` as the admin itself (`setup-n1` and `setup-n` steps) |
+| `unlocked` | Unpromoted versions install in scratch orgs | Any versions | A post-install script runs for managed packages only, so after every install and upgrade the script calls `<ns>.BarnInstallCheck.finishSetup('<Module>')` for each package as the admin itself (`setup-n1` and `setup-n` steps) |
 
 `--plan` prints which path applies on its "N-1 path" line.
 
@@ -853,15 +853,17 @@ a real run requires to be clean before it creates anything):
 - A Dev Hub linked to that namespace, named with `--devhub` (the CLI default is never used),
   and every package created in it (`sf package create`, by the owner) with its `0Ho` id in
   `packageAliases`.
-- Each dependency with a `versionNumber` (for example `"0.1.0.LATEST"`); for a managed
-  upgrade, `ancestorVersion` (`"HIGHEST"`) or `ancestorId` on every package; for managed, each
-  package's InstallHandler class (`<Module>PostInstall`) named as its `postInstallScript`
-  (ADR-0029 left this to whoever creates the first version).
-- The Apex the checks call from anonymous Apex must be `global`: a subscriber org's
-  anonymous Apex cannot see a package's `public` classes. Today `HealthCheckService`,
-  `SampleDataLoader` and (for unlocked) every `<Module>PostInstall` are `public`. The
-  readiness list names each one; adding a `global` entry point is an owner decision, because a
-  global signature can never change in a managed package.
+- Each dependency with a `versionNumber` and each package's InstallHandler class named as its
+  `postInstallScript`: both are in `sfdx-project.json` now and checked in CI (see "Creating
+  package versions" below). For a managed upgrade, `ancestorVersion` (`"HIGHEST"`) or
+  `ancestorId` on every package, which is added only after the first promoted version.
+- The Apex the checks call from anonymous Apex is `global`: a subscriber org's anonymous Apex
+  cannot see a package's `public` classes. The templates and `seed-sample-data.sh --namespace`
+  call only Core's `BarnInstallCheck` (D-199): `runHealthCheck()` (a map of `findings`,
+  `errors` and `errorFindings`), `loadSampleData()` and `finishSetup(packageKey)`, each
+  delegating to the public service and allowed only to someone who may run setup. Its global
+  signatures are permanent; keep it to these three. The readiness list fails only when a
+  template names a class that is not in the source.
 - **Owner approval for the scratch orgs.** The project's test orgs are fixed; any other org is
   approved first. A real run creates one org per shape and refuses without
   `--yes-create-orgs`, the record of that approval. It prints the count first.
@@ -903,6 +905,92 @@ The script never prints an auth URL or token and never reads `sf org display --v
 **Checks by hand.** Install links, Module Manager's guided installs and the pages after an
 upgrade are in the Testing Guide, [Installing](../testing-guide/installing.md), T-INST-05. The
 plan mode itself is T-INST-04 and `scripts/ci/tests/test_package_upgrade_test.py`.
+
+### Creating package versions
+
+BarnCRM ships as 2GP managed packages from the first pilot, under the namespace `barn` (D-199),
+registered in a Partner Developer Edition org linked to the Partner Business Org Dev Hub. Until
+then `namespace` stays empty in `sfdx-project.json` and no package or version is created. The
+rest of `sfdx-project.json` is ready now (D-200, N5), so setting the namespace and pasting the
+package ids is all that is left:
+
+- **Version numbers.** Every package carries `1.21.0.NEXT` (`versionName` `v1.21`), the release
+  that made the project version-ready. One shared number keeps the dependency pins simple; a
+  package moves to its own number only once it ships a change the others do not.
+- **Dependencies** name `<that package's major.minor.patch>.LATEST`, so a build picks up the
+  newest build of the package it needs. Raising a package's `versionNumber` means raising every
+  pin on it; `check-namespace-readiness.py` fails until they match.
+- **`postInstallScript`** names each package's InstallHandler class (`<Module>PostInstall`).
+  The check fails when a package has an InstallHandler that is not named, or names a class that
+  is not one.
+- **`packageAliases`** is an empty placeholder. `sf package create` (the owner's step, once per
+  package, in the Dev Hub) prints a `0Ho` id; paste it as `"<package name>": "0Ho..."`. The ids
+  are never invented: `create-versions.sh` refuses while one is missing and prints the
+  `sf package create` command for it. Version aliases (`<name>@1.21.0-1`) are not kept here;
+  the run writes the `04t` ids to a file instead.
+- **`ancestorVersion`** is not set until the first version is promoted. From then on each
+  package carries `"ancestorVersion": "HIGHEST"`, which a managed upgrade needs (the install and
+  upgrade test checks it).
+
+**Less common metadata in 2GP managed packages (D-200, N11).** Checked 2026-11-12. The
+Salesforce Metadata Coverage Report and the 2GP "Metadata Components and Attributes" page
+refuse automated reads (HTTP 403), so every row below is **unverified** against the report and
+rests on the packaging guide as last read by hand. Before the first `create-versions.sh` run,
+open the Coverage Report for API 67.0 and tick each row; a type the report does not mark for
+"Second-Generation Managed Packages" fails at version create, not at deploy.
+
+| Type (shipped in) | Expected in 2GP managed | Notes to confirm |
+|---|---|---|
+| `Group` `Programs_Participants` (programs) | Yes | Packaged as a public group; members are subscriber data, never packaged |
+| `PlatformEventSubscriberConfig` (core) | Yes | It names no running user (only the batch size), which is what lets it install |
+| `Prompt` in-app guidance, 3 (core) | Yes | In-App Guidance prompts, not Prompt Builder templates; none of the GenAI types ship |
+| `ExternalCredential` `Barn_Org_Connection` (core) | Yes | Principals and their credentials are set per org after install; check the principal-access permission set entries survive packaging |
+| `CustomNotificationType`, 3 (core, corporatehub, scholarships) | Yes | |
+| `ContentAsset`, 9 (8 packages) | Yes | Asset files; check the subscriber can still use them after an upgrade replaces the file |
+| `GlobalValueSet` (projects) | Yes | Values added by a subscriber stay; values removed in an upgrade are not removed from the org |
+| `ApexPage` `FormsPublic` (forms) | Yes | Its name gains the prefix (`barn__FormsPublic`): the admin guide's Site setup step must name the page as the org shows it |
+| `RemoteSiteSetting`, 6 (addressverification, funders, payments) | Yes | Subscriber may deactivate; the callout then fails with the Error Log entry, not silently |
+
+**The script.** `scripts/packaging/create-versions.sh` builds one version of each chosen package
+in dependency order, read from `sfdx-project.json` through `package-upgrade-helper.py` (the
+reader the install and upgrade test uses). It prints the Dev Hub's `Package2VersionCreates`
+limit first, refuses (exit 2) while the namespace is empty, a `0Ho` id is missing or fewer
+creates are left than it needs, and **never promotes**: promotion is permanent and the owner's
+decision, one `sf package version promote` per version. It writes `<key> <04t id>` lines to
+`test-results/package-versions/<run id>.txt`, the file `package-upgrade-test.sh --from/--to`
+takes.
+
+```
+# What would be built, in what order, with which commands (no org, no Dev Hub):
+scripts/packaging/create-versions.sh --plan --devhub <pbo-devhub>
+
+# Build Core and Giving (and Rollup Builder, which Giving needs):
+scripts/packaging/create-versions.sh --devhub <pbo-devhub> --packages giving
+```
+
+`--no-code-coverage` skips the test run, but a version built that way can never be promoted.
+`scripts/ci/tests/test_create_versions.py` runs the plan mode and the refusals.
+
+### Global and namespace-accessible API
+
+Once a managed version is promoted, a `global` signature can never be removed or changed, and
+an `@NamespaceAccessible` one is what every other BarnCRM package compiles against: a module
+installed at an older version breaks when Core drops one. So the rule is **deprecate for one
+release, never remove**: mark the member `@Deprecated` (for `global`) or say so in its doc
+comment, stop calling it, and keep it working. Keep the `global` surface small (today `BarnInstallCheck`,
+the invocable actions, the REST resources, `InboundGift` and Rollup Builder's `RollupApi` and
+`RollupInstantTrigger`).
+
+`scripts/ci/check-api-surface.py` (D-200, N8) lists every `global` and `@NamespaceAccessible`
+signature in packaged Apex in `scripts/ci/api-surface.txt`, one `<package>/<file> |
+<signature>` line each (annotations, parameter names and bodies left out; a type is its
+access, `virtual` or `abstract`, kind and name). It fails when a snapshot line no longer
+matches the source (removed or changed), and when the source has a signature the snapshot
+lacks. For an addition, run `python3 scripts/ci/check-api-surface.py --update` and commit the
+snapshot with the change; it refuses while anything was removed. A removal the owner approves
+before the first promoted version is made by editing the snapshot by hand in the same pull
+request, so the reviewer sees it. Integrators: after merging branches that each added
+signatures, run `--update` once on the landing branch.
 
 ### Tests survive an org's own customizations
 

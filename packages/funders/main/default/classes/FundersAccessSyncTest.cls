@@ -1,6 +1,6 @@
 /**
  * BarnCRM's roles get the Funders sets (ADR-0161 decision 9): BarnCRM Admin holders Funders
- * Admin, the Team Member, Coordinator and Fundraising Staff roles Funders Staff and the Read Only
+ * Admin, the Team Member and Fundraising Staff roles Funders Staff and the Read Only
  * role Funders Read Only, at install, at Turn on and with the hourly access check.
  */
 @IsTest(testFor='ApexClass:FundersAccessSync')
@@ -16,7 +16,6 @@ private class FundersAccessSyncTest {
 			'Outsider' => TestUsers.standardUser('Outsider').Id
 		};
 		Map<String, String> groupByName = new Map<String, String>{
-			'Coordinator' => 'Volunteer_Coordinator',
 			'Member' => 'Program_Staff',
 			'Fundraiser' => 'Fundraising_Staff',
 			'Reader' => 'Read_Only',
@@ -64,7 +63,6 @@ private class FundersAccessSyncTest {
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isFalse(again, 'And a second pass finds nothing to give');
 			Map<String, String> expected = new Map<String, String>{
-				'Coordinator' => 'Funders_Staff',
 				'Member' => 'Funders_Staff',
 				'Fundraiser' => 'Funders_Staff',
 				'Reader' => 'Funders_Read_Only',

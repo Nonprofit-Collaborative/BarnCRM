@@ -4,18 +4,12 @@
  * console. It sends the digest when one is due, so changing the frequency from daily to weekly
  * never needs the schedule changed. Entries past their retention (R-E6) are deleted by the
  * nightly Record Cleanup step (`RecordRetentionBatch`).
- *
- * Still schedulable: an org upgraded from before the nightly run may have this job scheduled on
- * its own, and when it fires it adopts the old schedules (R-NJ5) and does today's work.
  */
 public with sharing class ErrorDigestScheduler implements Schedulable {
 	/** The name the job was scheduled under, now the step's key. */
 	public static final String JOB_NAME = 'BarnCRM Error Digest';
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			NightlyJobs.adoptOldSchedules();
-		}
 		try {
 			ErrorDigestService.runScheduled();
 		} catch (Exception failed) {

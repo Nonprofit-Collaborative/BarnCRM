@@ -55,7 +55,7 @@ and upgrade test".
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Run `scripts/org/package-upgrade-test.sh --from HEAD --to HEAD`. | "Refusing to run: the namespace in sfdx-project.json is empty." and the exit status is 2. Nothing is created. |
-| 2 | Run it again with `--plan --shapes platform,npc`. | "PLAN ONLY: nothing below is run, created or written." The packages are listed Core first, Rollup Builder before Giving, Volunteers and Mirror, and Giving before Mirror. A Readiness list follows, with MISSING lines (namespace, package aliases, post-install scripts, global entry points). Exit status 0. |
+| 2 | Run it again with `--plan --shapes platform,npc`. | "PLAN ONLY: nothing below is run, created or written." The packages are listed Core first, Rollup Builder before Giving, Volunteers and Mirror, and Giving before Mirror. A Readiness list follows, with MISSING lines (namespace, package aliases). Exit status 0. |
 | 3 | Read the N-1 path line. | "REFUSED for managed (a beta cannot be upgraded)". |
 | 4 | Add `--promote-from` and read the Versions section. | A `promote-n1` step after each `build-n1` step, each with "PROMOTION IS PERMANENT". |
 | 5 | Run with `--plan --type unlocked --packages giving --shapes platform`. | Only Core, Rollup Builder and Giving. A `setup-n1` and a `setup-n` step for each, after the installs and after the upgrades. |

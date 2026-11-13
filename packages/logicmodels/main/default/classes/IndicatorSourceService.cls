@@ -126,10 +126,10 @@ public with sharing class IndicatorSourceService {
 	 */
 	public static Map<String, Object> fields(Id queryId) {
 		QueryCompiler.Compiled compiled = compile(savedQuery(queryId).Query_JSON__c);
-		Schema.DescribeSObjectResult described = Schema.describeSObjects(
-			new List<String>{ compiled.objectName },
-			SObjectDescribeOptions.DEFERRED
-		)[0];
+		Schema.DescribeSObjectResult described = NamespaceUtil.describe(compiled.objectName);
+		if (described == null) {
+			throw new IllegalArgumentException('No object ' + compiled.objectName);
+		}
 		Map<String, Map<String, String>> dateOptions = new Map<String, Map<String, String>>();
 		Map<String, Map<String, String>> numberOptions = new Map<String, Map<String, String>>();
 		Map<String, Map<String, String>> uniqueOptions = new Map<String, Map<String, String>>();

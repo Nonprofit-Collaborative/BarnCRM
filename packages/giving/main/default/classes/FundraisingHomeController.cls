@@ -89,7 +89,7 @@ public with sharing class FundraisingHomeController {
 			);
 			thank.badgeStatus = 'due';
 			thank.objectApiName = Schema.SObjectType.Gift__c.getName();
-			thank.tabName = 'Acknowledgments';
+			thank.tabName = NamespaceUtil.qualify('Acknowledgments');
 			addIfCounted(tiles, thank);
 		}
 		if (Schema.SObjectType.Installment__c.isAccessible()) {

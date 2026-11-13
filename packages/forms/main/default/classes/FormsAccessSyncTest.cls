@@ -1,6 +1,6 @@
 /**
  * BarnCRM's roles get the Forms sets (ADR-0175 `0175-forms-module.md` decision 11): BarnCRM Admin
- * holders Forms Admin, the Team Member and Coordinator roles Forms Staff and the Read Only role
+ * holders Forms Admin, the Team Member role Forms Staff and the Read Only role
  * Forms Read Only, at install, at Turn on and with the hourly access check.
  */
 @IsTest(testFor='ApexClass:FormsAccessSync')
@@ -16,7 +16,6 @@ private class FormsAccessSyncTest {
 			'Outsider' => TestUsers.standardUser('Outsider').Id
 		};
 		Map<String, String> groupByName = new Map<String, String>{
-			'Coordinator' => 'Volunteer_Coordinator',
 			'Member' => 'Program_Staff',
 			'Reader' => 'Read_Only',
 			'Boss' => 'BarnCRM_Admin_Group'
@@ -63,7 +62,6 @@ private class FormsAccessSyncTest {
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isFalse(again, 'And a second pass finds nothing to give');
 			Map<String, String> expected = new Map<String, String>{
-				'Coordinator' => 'Forms_Staff',
 				'Member' => 'Forms_Staff',
 				'Reader' => 'Forms_Read_Only',
 				'Boss' => FormsAccessSync.ADMIN_SET

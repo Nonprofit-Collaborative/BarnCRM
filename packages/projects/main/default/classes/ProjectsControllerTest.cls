@@ -42,7 +42,7 @@ private class ProjectsControllerTest {
 
 			Assert.areEqual(1, board.phases.size(), 'The phase');
 			Assert.areEqual(2, board.tasks.size(), 'Both tasks');
-			Assert.areEqual(1, board.project.Tasks_Done__c, 'One done');
+			Assert.areEqual(1, board.project.tasksDone, 'One done');
 			Assert.isTrue(board.timeTracking, 'Time tracking ships on');
 			Assert.isTrue(board.canCreateTime, 'An admin may log time');
 			Assert.isTrue(board.canCreateExpense, 'An admin may add an expense');
@@ -88,7 +88,7 @@ private class ProjectsControllerTest {
 			ProjectsController.logTime(project.Id, finished.Id, null, 4, true, 'Interviews');
 			ProjectsController.refreshHealth(project.Id);
 			Id updateId = ProjectsController.draftStatusUpdate(project.Id);
-			List<Project__c> atRisk = ProjectsController.getAtRisk(true);
+			List<ProjectViews.Project> atRisk = ProjectsController.getAtRisk(true);
 			Test.stopTest();
 
 			Project_Status_Update__c draft = [

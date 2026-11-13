@@ -43,7 +43,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 
 	public String fixLabel(String fixKey) {
 		return FIX_KEY_RESTORE_ROLLUPS.equals(fixKey)
-			? System.Label.Core_HealthCheck_RollupsMissingFix
+			? System.Label.Rollups_HealthCheck_RollupsMissingFix
 			: null;
 	}
 
@@ -122,14 +122,14 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			}
 			HealthCheckService.Finding finding = new HealthCheckService.Finding(
 					'shipped_rollups_missing',
-					String.format(System.Label.Core_HealthCheck_RollupsMissingTitle, values),
+					String.format(System.Label.Rollups_HealthCheck_RollupsMissingTitle, values),
 					detail,
 					HealthCheckService.SEVERITY_WARNING,
 					HealthCheckService.CATEGORY_SETTINGS
 				)
 				.withScope(missingNames);
 			return finding.withFix(
-				System.Label.Core_HealthCheck_RollupsMissingFix,
+				System.Label.Rollups_HealthCheck_RollupsMissingFix,
 				HealthCheckService.FIX_ACTION_PREFIX + FIX_KEY_RESTORE_ROLLUPS
 			);
 		}
@@ -183,7 +183,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			detail += ' ' + BarnHelp.text('Rollups', 'Core_HealthCheck_NightlyOffFixHint');
 			return new HealthCheckService.Finding(
 				'nightly_rollups_not_scheduled',
-				System.Label.Core_HealthCheck_NightlyOffTitle,
+				System.Label.Rollups_HealthCheck_NightlyOffTitle,
 				detail,
 				nightlyOnly > 0
 					? HealthCheckService.SEVERITY_WARNING
@@ -214,7 +214,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 				if (other != null) {
 					pairs.add(
 						String.format(
-							System.Label.Core_HealthCheck_TwoToolsPair,
+							System.Label.Rollups_HealthCheck_TwoToolsPair,
 							new List<Object>{
 								definition.Target_Object__c +
 								'.' +
@@ -232,7 +232,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			}
 			return new HealthCheckService.Finding(
 					'rollup_two_tools_same_field',
-					System.Label.Core_HealthCheck_TwoToolsTitle,
+					System.Label.Rollups_HealthCheck_TwoToolsTitle,
 					String.format(
 						BarnHelp.text('Rollups', 'Core_HealthCheck_TwoToolsDetail'),
 						new List<Object>{ String.join(pairs, '; ') }
@@ -241,7 +241,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 					HealthCheckService.CATEGORY_SETTINGS
 				)
 				.withFix(
-					System.Label.Core_HealthCheck_TwoToolsFix,
+					System.Label.Rollups_HealthCheck_TwoToolsFix,
 					'/lightning/n/' + NamespaceUtil.qualify('Rollup_Builder')
 				);
 		}
@@ -281,7 +281,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			if (failed > 0) {
 				return new HealthCheckService.Finding(
 						'rollup_queue_failed',
-						System.Label.Core_HealthCheck_RollupQueueFailedTitle,
+						System.Label.Rollups_HealthCheck_RollupQueueFailedTitle,
 						BarnHelp.text(
 							'Rollups',
 							'Core_HealthCheck_RollupQueueFailedDetail',
@@ -290,11 +290,11 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 						HealthCheckService.SEVERITY_WARNING,
 						HealthCheckService.CATEGORY_SETTINGS
 					)
-					.withFix(System.Label.Core_HealthCheck_RollupQueueFix, fixTarget);
+					.withFix(System.Label.Rollups_HealthCheck_RollupQueueFix, fixTarget);
 			}
 			return new HealthCheckService.Finding(
 					'rollup_queue_stuck',
-					System.Label.Core_HealthCheck_RollupQueueStuckTitle,
+					System.Label.Rollups_HealthCheck_RollupQueueStuckTitle,
 					BarnHelp.text(
 						'Rollups',
 						'Core_HealthCheck_RollupQueueStuckDetail',
@@ -303,7 +303,7 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 					HealthCheckService.SEVERITY_WARNING,
 					HealthCheckService.CATEGORY_SETTINGS
 				)
-				.withFix(System.Label.Core_HealthCheck_RollupQueueFix, fixTarget);
+				.withFix(System.Label.Rollups_HealthCheck_RollupQueueFix, fixTarget);
 		}
 	}
 }

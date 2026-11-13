@@ -240,15 +240,6 @@ public with sharing class EventEmailService {
 	}
 
 	private static Id templateIdFor(String developerName) {
-		for (EmailTemplate template : [
-			SELECT Id
-			FROM EmailTemplate
-			WHERE DeveloperName = :developerName
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]) {
-			return template.Id;
-		}
-		return null;
+		return SetupObjectSelector.emailTemplateId(developerName, false);
 	}
 }

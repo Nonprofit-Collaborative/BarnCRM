@@ -144,8 +144,10 @@ describe('c-funders-board', () => {
     expect(grid.groups[0].tiles[2].label).toBe('Grants');
 
     grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Grant__c' } }));
+    await flush();
     expect(getNavigateCalledWith().attributes.objectApiName).toBe('Grant__c');
     grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Grant_Calendar' } }));
+    await flush();
     expect(getNavigateCalledWith().attributes.apiName).toBe('Grant_Calendar');
   });
 

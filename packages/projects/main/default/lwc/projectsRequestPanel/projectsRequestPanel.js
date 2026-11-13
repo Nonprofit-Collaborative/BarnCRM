@@ -7,6 +7,7 @@ import createChangeRequest from '@salesforce/apex/ProjectRequestsController.crea
 import { messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { PRIORITIES, STATUSES, changesBetween, options } from 'c/projectsRequestsModel';
+import PROJECT from '@salesforce/schema/Project__c';
 
 const PKG = 'Projects';
 
@@ -17,6 +18,8 @@ const PKG = 'Projects';
  * Requests tab and placeable on the Request record page. Fires `changed` after any save.
  */
 export default class ProjectsRequestPanel extends LightningElement {
+  projectObject = PROJECT.objectApiName;
+
   @api
   get recordId() {
     return this._recordId;

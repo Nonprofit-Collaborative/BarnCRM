@@ -5,7 +5,6 @@
   <description>
     Opens the Campaign sync, Opportunity mirror and Gift Transaction mirror pages, edits the IDs
     they keep and reads Provider Requests. Salesforce objects need their own access in Setup.
-    Replaces the three retired sets.
   </description>
   <classAccesses>
     <apexClass>CampaignSyncController</apexClass>

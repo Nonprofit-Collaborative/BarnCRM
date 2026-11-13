@@ -118,7 +118,7 @@ describe('c-form-public-page', () => {
     expect(listPages).toHaveBeenCalledWith({ kind: 'events' });
     const links = findAll(element, '[data-id="list-item"] a');
     expect(links).toHaveLength(1);
-    expect(links[0].getAttribute('href')).toBe('FormsPublic?record=a01');
+    expect(links[0].getAttribute('href')).toBe('?record=a01');
     expect(find(element, '[data-id="list-empty"]')).toBeNull();
   });
 

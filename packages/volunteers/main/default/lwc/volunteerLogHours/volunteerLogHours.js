@@ -11,7 +11,14 @@ import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
-const HOURS_OBJECT = 'Volunteer_Hours__c';
+import HOURS from '@salesforce/schema/Volunteer_Hours__c';
+import HOURS_JOB from '@salesforce/schema/Volunteer_Hours__c.Volunteer_Job__c';
+import HOURS_SHIFT from '@salesforce/schema/Volunteer_Hours__c.Volunteer_Shift__c';
+import HOURS_DATE from '@salesforce/schema/Volunteer_Hours__c.Date_Worked__c';
+import HOURS_HOURS from '@salesforce/schema/Volunteer_Hours__c.Hours__c';
+import HOURS_NOTES from '@salesforce/schema/Volunteer_Hours__c.Notes__c';
+import HOURS_ACCOUNT from '@salesforce/schema/Volunteer_Hours__c.Account__c';
+import HOURS_CONTACT from '@salesforce/schema/Volunteer_Hours__c.Contact__c';
 
 /**
  * Log Hours (modules-14): a small hours form on a person, a shift or a job, with one Person
@@ -20,7 +27,15 @@ const HOURS_OBJECT = 'Volunteer_Hours__c';
  */
 export default class VolunteerLogHours extends LightningElement {
   labels = { title: TITLE, person: PERSON, save: SAVE, cancel: CANCEL, loading: LOADING };
-  hoursObject = HOURS_OBJECT;
+  hoursObject = HOURS.objectApiName;
+  /** The form's fields, from schema imports so they carry any namespace. */
+  hoursFields = {
+    job: HOURS_JOB.fieldApiName,
+    shift: HOURS_SHIFT.fieldApiName,
+    dateWorked: HOURS_DATE.fieldApiName,
+    hours: HOURS_HOURS.fieldApiName,
+    notes: HOURS_NOTES.fieldApiName
+  };
 
   context;
   personId;
@@ -94,7 +109,8 @@ export default class VolunteerLogHours extends LightningElement {
   }
 
   get personField() {
-    return this.context && this.context.personObject === 'Account' ? 'Account__c' : 'Contact__c';
+    return (this.context && this.context.personObject === 'Account' ? HOURS_ACCOUNT : HOURS_CONTACT)
+      .fieldApiName;
   }
 
   handlePersonChange(event) {

@@ -5,6 +5,7 @@ import LOCALE from '@salesforce/i18n/locale';
 import getPreview from '@salesforce/apex/ShiftScheduleController.getPreview';
 import createNow from '@salesforce/apex/ShiftScheduleController.createNow';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { formatDate as formatDay } from 'c/barnFormat';
 import SHIFT_OBJECT from '@salesforce/schema/Volunteer_Shift__c';
 import MODIFIED from '@salesforce/schema/Shift_Schedule__c.LastModifiedDate';
 
@@ -121,11 +122,5 @@ function messageOf(error) {
 }
 
 function formatDate(isoDate) {
-  if (!isoDate) {
-    return '';
-  }
-  const [year, month, day] = isoDate.split('-').map(Number);
-  return new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(year, month - 1, day))
-  );
+  return formatDay(isoDate, LOCALE) || '';
 }

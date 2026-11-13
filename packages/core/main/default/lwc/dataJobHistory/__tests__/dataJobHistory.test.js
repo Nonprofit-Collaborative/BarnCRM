@@ -302,6 +302,7 @@ describe('c-data-job-history', () => {
     const element = await render('Update,Delete');
     findToolStateKey.emit('ns__tool');
     one(element, 'open-find').click();
+    await flush();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Find' },
