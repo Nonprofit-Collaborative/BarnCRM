@@ -57,7 +57,9 @@ private class ImportFirstNameMatchTest {
 	}
 
 	private static Contact smith(String firstName) {
-		return new Contact(FirstName = firstName, LastName = 'Smith', MailingPostalCode = '12345');
+		return TestDataFactory.person(
+			new Contact(FirstName = firstName, LastName = 'Smith', MailingPostalCode = '12345')
+		);
 	}
 
 	/** Runs one pass the way the platform drives the batch, in chunks of this size. */
@@ -255,10 +257,12 @@ private class ImportFirstNameMatchTest {
 			List<Contact> elsewhere = new List<Contact>();
 			for (Integer i = 0; i < 3; i++) {
 				elsewhere.add(
-					new Contact(
-						FirstName = 'Al' + i,
-						LastName = 'Smith',
-						MailingPostalCode = '99999'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Al' + i,
+							LastName = 'Smith',
+							MailingPostalCode = '99999'
+						)
 					)
 				);
 			}
@@ -484,7 +488,9 @@ private class ImportFirstNameMatchTest {
 	@IsTest
 	static void aHolderWithNoFirstNameIsNotTakenByARowWithOne() {
 		System.runAs(TestUsers.admin()) {
-			Contact unnamed = new Contact(LastName = 'Smith', MailingPostalCode = '12345');
+			Contact unnamed = TestDataFactory.person(
+				new Contact(LastName = 'Smith', MailingPostalCode = '12345')
+			);
 			insert unnamed;
 
 			Test.startTest();
@@ -595,10 +601,8 @@ private class ImportFirstNameMatchTest {
 	@IsTest
 	static void theEmailRuleCreatesAnotherFirstNameAtASharedEmail() {
 		System.runAs(TestUsers.admin()) {
-			Contact john = new Contact(
-				FirstName = 'John',
-				LastName = 'Smith',
-				Email = 'smiths@example.org'
+			Contact john = TestDataFactory.person(
+				new Contact(FirstName = 'John', LastName = 'Smith', Email = 'smiths@example.org')
 			);
 			insert john;
 			Map<String, String> jane = row('Jane', 'Smith');
@@ -630,10 +634,12 @@ private class ImportFirstNameMatchTest {
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 200; i++) {
 				holders.add(
-					new Contact(
-						FirstName = 'John',
-						LastName = 'Smith' + i,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'John',
+							LastName = 'Smith' + i,
+							MailingPostalCode = '12345'
+						)
 					)
 				);
 				values.add(row(Math.mod(i, 2) == 0 ? 'John' : 'Jane', 'Smith' + i));

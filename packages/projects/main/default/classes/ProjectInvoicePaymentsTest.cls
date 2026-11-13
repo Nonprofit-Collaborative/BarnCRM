@@ -50,10 +50,8 @@ private class ProjectInvoicePaymentsTest {
 
 	/** A Sent invoice of 300 billed to a contact with an email. */
 	private static Project_Invoice__c sentInvoice() {
-		Contact payer = new Contact(
-			FirstName = 'Pat',
-			LastName = 'Client',
-			Email = 'pat@example.org'
+		Contact payer = TestDataFactory.person(
+			new Contact(FirstName = 'Pat', LastName = 'Client', Email = 'pat@example.org')
 		);
 		Database.DMLOptions options = new Database.DMLOptions();
 		options.DuplicateRuleHeader.allowSave = true;

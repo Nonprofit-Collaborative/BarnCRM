@@ -12,13 +12,14 @@ private class RollupChangesCoverageTest {
 	}
 
 	private static Account household(String name) {
-		return new Account(Name = name, RecordTypeId = HouseholdService.householdRecordTypeId());
+		return TestDataFactory.household(
+			new Account(Name = name, RecordTypeId = HouseholdService.householdRecordTypeId())
+		);
 	}
 
 	private static Account organization(String name) {
-		return new Account(
-			Name = name,
-			RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+		return TestDataFactory.organization(
+			new Account(Name = name, RecordTypeId = AccountKindsTestData.organizationRecordTypeId())
 		);
 	}
 
@@ -204,10 +205,8 @@ private class RollupChangesCoverageTest {
 			Account parent = organization('Parent');
 			parent.ParentId = grandparent.Id;
 			insert parent;
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Okafor',
-				AccountId = parent.Id
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Okafor', AccountId = parent.Id)
 			);
 			insert ana;
 			Id affiliationId = FakeIds.of(Affiliation__c.SObjectType, 1);
@@ -250,7 +249,9 @@ private class RollupChangesCoverageTest {
 	@IsTest
 	static void aPathThatCannotBeWalkedMarksNothingAndIsLogged() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Okafor');
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Okafor')
+			);
 			insert ana;
 			Id affiliationId = FakeIds.of(Affiliation__c.SObjectType, 1);
 			Affiliation__c saved = new Affiliation__c(Id = affiliationId, Contact__c = ana.Id);
@@ -291,9 +292,15 @@ private class RollupChangesCoverageTest {
 			Account nolan = household('The Nolan Family');
 			Account lee = household('The Lee Family');
 			Database.insert(new List<Account>{ nolan, lee }, AccessLevel.SYSTEM_MODE);
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id);
-			Contact ben = new Contact(FirstName = 'Ben', LastName = 'Nolan', AccountId = nolan.Id);
-			Contact cal = new Contact(FirstName = 'Cal', LastName = 'Lee', AccountId = lee.Id);
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id)
+			);
+			Contact ben = TestDataFactory.person(
+				new Contact(FirstName = 'Ben', LastName = 'Nolan', AccountId = nolan.Id)
+			);
+			Contact cal = TestDataFactory.person(
+				new Contact(FirstName = 'Cal', LastName = 'Lee', AccountId = lee.Id)
+			);
 			insert new List<Contact>{ ana, ben, cal };
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
 				definition('Affiliation__c', 'Contact__c > {HouseholdMembers}')
@@ -338,10 +345,8 @@ private class RollupChangesCoverageTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account nolan = household('The Nolan Family');
 			Database.insert(nolan, AccessLevel.SYSTEM_MODE);
-			Contact survivor = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Nolan',
-				AccountId = nolan.Id
+			Contact survivor = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id)
 			);
 			insert survivor;
 			Id loserId = FakeIds.of(Contact.SObjectType, 9);
@@ -444,8 +449,12 @@ private class RollupChangesCoverageTest {
 				'A custom reference the entity does not have is dropped too'
 			);
 
-			Account before = new Account(Name = 'Old', NumberOfEmployees = 1);
-			Account after = new Account(Name = 'Old', NumberOfEmployees = 2);
+			Account before = TestDataFactory.organization(
+				new Account(Name = 'Old', NumberOfEmployees = 1)
+			);
+			Account after = TestDataFactory.organization(
+				new Account(Name = 'Old', NumberOfEmployees = 2)
+			);
 			Assert.isFalse(
 				RollupChanges.changed(new Set<String>{ 'name' }, after, before),
 				'The same name is no change'

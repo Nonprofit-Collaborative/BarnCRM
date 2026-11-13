@@ -19,9 +19,13 @@ private class RollupJobNotificationTest {
 			);
 			SettingsService.clearCaches();
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
-			Account organization = new Account(Name = 'Food Bank', RecordTypeId = organizationType);
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Food Bank', RecordTypeId = organizationType)
+			);
 			insert organization;
-			insert new Contact(LastName = 'Volunteer', AccountId = organization.Id);
+			insert TestDataFactory.person(
+				new Contact(LastName = 'Volunteer', AccountId = organization.Id)
+			);
 			Rollup_Definition__c definition = new Rollup_Definition__c(
 				Name = 'People per organization',
 				Definition_Key__c = 'Test_Q04_People_Per_Organization',

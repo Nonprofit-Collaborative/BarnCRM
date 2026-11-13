@@ -65,7 +65,7 @@ private class EnrollmentRulesTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			contactMode();
 			Program__c tutoring = program('Tutoring');
-			Account business = new Account(Name = 'Acme Supply');
+			Account business = TestDataFactory.organization(new Account(Name = 'Acme Supply'));
 			insert business;
 
 			Database.SaveResult inserted = Database.insert(
@@ -100,7 +100,7 @@ private class EnrollmentRulesTest {
 			) {
 				return; // An org without person accounts has no such person.
 			}
-			Account person = new Account();
+			Account person = TestDataFactory.organization(new Account());
 			person.put('LastName', 'Lindqvist');
 			person.put('RecordTypeId', OrgShapeDetector.creatablePersonRecordTypeId());
 			insert person;

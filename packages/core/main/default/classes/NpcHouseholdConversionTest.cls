@@ -49,13 +49,12 @@ private class NpcHouseholdConversionTest {
 
 	private static List<Account> households(FakeNpcSource source) {
 		HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-		Account lee = new Account(Name = 'Npc Convert Lee Household');
-		Account kim = new Account(
-			Name = 'Npc Convert Kim Household',
-			Household_Model__c = 'Automatic'
+		Account lee = TestDataFactory.organization(new Account(Name = 'Npc Convert Lee Household'));
+		Account kim = TestDataFactory.household(
+			new Account(Name = 'Npc Convert Kim Household', Household_Model__c = 'Automatic')
 		);
 		insert new List<Account>{ lee, kim };
-		Contact sam = new Contact(FirstName = 'Sam', LastName = 'Lee');
+		Contact sam = TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Lee'));
 		insert sam;
 		for (Account account : new List<Account>{ lee, kim }) {
 			NpspHouseholdSource.Household household = new NpspHouseholdSource.Household();
@@ -159,7 +158,7 @@ private class NpcHouseholdConversionTest {
 			String leeModelBefore = [SELECT Household_Model__c FROM Account WHERE Id = :lee.Id]
 			.Household_Model__c;
 			NpspHouseholdAdoptionBatch.adopt(runId, true, 2).execute(null, accounts);
-			Contact ann = new Contact(LastName = 'Kim', FirstName = 'Ann');
+			Contact ann = TestDataFactory.person(new Contact(LastName = 'Kim', FirstName = 'Ann'));
 			insert ann;
 			insert new Household_Member__c(Household__c = kim.Id, Contact__c = ann.Id);
 

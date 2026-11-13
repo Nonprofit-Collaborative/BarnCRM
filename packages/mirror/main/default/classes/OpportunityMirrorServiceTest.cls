@@ -305,13 +305,17 @@ private class OpportunityMirrorServiceTest {
 			// Mirror permission set, so he cannot see the Opportunity ID field (R-OM5).
 			User david = TestDataFactory.createUser('David', new List<String>{ 'Giving_Admin' });
 			// David's profile sees only what he owns, so he is given a donor of his own.
-			Account household = new Account(Name = 'The Chen Household', OwnerId = david.Id);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Chen Household', OwnerId = david.Id)
+			);
 			insert household;
-			Contact mei = new Contact(
-				FirstName = 'Mei',
-				LastName = 'Chen',
-				AccountId = household.Id,
-				OwnerId = david.Id
+			Contact mei = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Mei',
+					LastName = 'Chen',
+					AccountId = household.Id,
+					OwnerId = david.Id
+				)
 			);
 			insert mei;
 			Gift__c given = GivingTestDataFactory.buildGift(mei.Id, 10);

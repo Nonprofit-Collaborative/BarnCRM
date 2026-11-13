@@ -73,12 +73,18 @@ private class NpspHouseholdAdoptionTest {
 	private static Fixture fixture() {
 		HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		Fixture f = new Fixture();
-		f.smith = new Account(Name = PREFIX + 'Smith Household');
-		f.jones = new Account(Name = PREFIX + 'Jones Household');
+		f.smith = TestDataFactory.organization(new Account(Name = PREFIX + 'Smith Household'));
+		f.jones = TestDataFactory.organization(new Account(Name = PREFIX + 'Jones Household'));
 		insert new List<Account>{ f.smith, f.jones };
-		f.ann = new Contact(FirstName = 'Ann', LastName = 'Smith', AccountId = f.smith.Id);
-		f.bob = new Contact(FirstName = 'Bob', LastName = 'Smith', AccountId = f.smith.Id);
-		f.cara = new Contact(FirstName = 'Cara', LastName = 'Jones', AccountId = f.jones.Id);
+		f.ann = TestDataFactory.person(
+			new Contact(FirstName = 'Ann', LastName = 'Smith', AccountId = f.smith.Id)
+		);
+		f.bob = TestDataFactory.person(
+			new Contact(FirstName = 'Bob', LastName = 'Smith', AccountId = f.smith.Id)
+		);
+		f.cara = TestDataFactory.person(
+			new Contact(FirstName = 'Cara', LastName = 'Jones', AccountId = f.jones.Id)
+		);
 		insert new List<Contact>{ f.ann, f.bob, f.cara };
 		f.source.add(f.smith, 'Ms. Ann Smith and Mr. Bob Smith', 'Ann and Bob', f.ann.Id, true);
 		f.source.add(f.jones, 'Ms. Cara Jones', 'Cara', f.ann.Id, false);
@@ -262,9 +268,11 @@ private class NpspHouseholdAdoptionTest {
 			// where it has record types), so a probe account saved the same way says what to expect.
 			Id expectedType = was.RecordTypeId;
 			if (expectedType == null) {
-				Account probe = new Account(
-					Name = PREFIX + 'Probe',
-					RecordTypeId = HouseholdService.householdRecordTypeId()
+				Account probe = TestDataFactory.household(
+					new Account(
+						Name = PREFIX + 'Probe',
+						RecordTypeId = HouseholdService.householdRecordTypeId()
+					)
 				);
 				Database.insert(probe, true, AccessLevel.SYSTEM_MODE);
 				Database.update(
@@ -401,7 +409,7 @@ private class NpspHouseholdAdoptionTest {
 	static void realSourceWithoutNpspFindsNothing() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account plain = new Account(Name = PREFIX + 'Plain');
+			Account plain = TestDataFactory.organization(new Account(Name = PREFIX + 'Plain'));
 			insert plain;
 			NpspHouseholdSource source = NpspHouseholdSource.get();
 			List<NpspHouseholdSource.Household> read = source.read(new Set<Id>{ plain.Id });

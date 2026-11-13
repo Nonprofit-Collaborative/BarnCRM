@@ -101,7 +101,13 @@ private class ImportRelatedRecordsTest {
 		List<Account> result = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			result.add(
-				new Account(Name = 'Org ' + i, Phone = '555-0000', RecordTypeId = organizationType)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Org ' + i,
+						Phone = '555-0000',
+						RecordTypeId = organizationType
+					)
+				)
 			);
 		}
 		insert result;
@@ -109,7 +115,9 @@ private class ImportRelatedRecordsTest {
 	}
 
 	private static Contact person() {
-		Contact created = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+		Contact created = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+		);
 		insert created;
 		return created;
 	}

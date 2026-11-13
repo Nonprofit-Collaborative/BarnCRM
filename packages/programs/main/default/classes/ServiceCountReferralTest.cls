@@ -184,7 +184,7 @@ private class ServiceCountReferralTest {
 	static void aReferralNamesExactlyOnePerson() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Contact who = person('Referred');
-			Account org = new Account(Name = 'Partner Org');
+			Account org = TestDataFactory.organization(new Account(Name = 'Partner Org'));
 			insert org;
 
 			Database.SaveResult neither = Database.insert(new Referral__c(), false);

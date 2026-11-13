@@ -40,7 +40,9 @@ private class ModuleManagerServiceTest {
 	private static List<Contact> people(Integer howMany, String batch) {
 		List<Contact> rows = new List<Contact>();
 		for (Integer i = 0; i < howMany; i++) {
-			rows.add(new Contact(FirstName = batch, LastName = 'Volunteer ' + i));
+			rows.add(
+				TestDataFactory.person(new Contact(FirstName = batch, LastName = 'Volunteer ' + i))
+			);
 		}
 		return rows;
 	}

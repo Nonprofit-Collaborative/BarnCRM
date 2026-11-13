@@ -370,19 +370,23 @@ private class HouseholdNamingServiceTest {
 			// given theirs: without a role these two are ordered by the tie breaks that follow
 			// it, and the greeting would name whichever of them those happen to put first.
 			insert new List<Contact>{
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					Household_Role__c = 'Head',
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Mr.',
+						FirstName = 'John',
+						LastName = 'Smith',
+						Household_Role__c = 'Head',
+						AccountId = household.Id
+					)
 				),
-				new Contact(
-					Salutation = 'Mrs.',
-					FirstName = 'Jane',
-					LastName = 'Smith',
-					Household_Role__c = 'Spouse or Partner',
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Mrs.',
+						FirstName = 'Jane',
+						LastName = 'Smith',
+						Household_Role__c = 'Spouse or Partner',
+						AccountId = household.Id
+					)
 				)
 			};
 
@@ -424,11 +428,13 @@ private class HouseholdNamingServiceTest {
 			Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
 			Account elsewhere = HouseholdTestDataFactory.newHousehold('Elsewhere');
 			Database.insert(new List<Account>{ household, elsewhere }, AccessLevel.SYSTEM_MODE);
-			Contact john = new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			Contact john = TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 			insert john;
 			Account named = [
@@ -483,7 +489,9 @@ private class HouseholdNamingServiceTest {
 			HouseholdTestDataFactory.save(settings);
 			Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			Contact john = new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith');
+			Contact john = TestDataFactory.person(
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith')
+			);
 			insert john;
 			Household_Member__c member = new Household_Member__c(
 				Household__c = household.Id,
@@ -537,11 +545,13 @@ private class HouseholdNamingServiceTest {
 			);
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			insert new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			insert TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 
 			Test.startTest();
@@ -711,19 +721,23 @@ private class HouseholdNamingServiceTest {
 		Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
 		Database.insert(household, AccessLevel.SYSTEM_MODE);
 		insert new List<Contact>{
-			new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				Household_Role__c = 'Head',
-				AccountId = household.Id
+			TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					Household_Role__c = 'Head',
+					AccountId = household.Id
+				)
 			),
-			new Contact(
-				Salutation = 'Mrs.',
-				FirstName = 'Jane',
-				LastName = 'Smith',
-				Household_Role__c = 'Spouse or Partner',
-				AccountId = household.Id
+			TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mrs.',
+					FirstName = 'Jane',
+					LastName = 'Smith',
+					Household_Role__c = 'Spouse or Partner',
+					AccountId = household.Id
+				)
 			)
 		};
 		Test.startTest();
@@ -934,11 +948,13 @@ private class HouseholdNamingServiceTest {
 		List<Contact> people = new List<Contact>();
 		for (HouseholdService.Person person : thirtySurnames()) {
 			people.add(
-				new Contact(
-					Salutation = person.salutation,
-					FirstName = person.firstName,
-					LastName = person.lastName,
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = person.salutation,
+						FirstName = person.firstName,
+						LastName = person.lastName,
+						AccountId = household.Id
+					)
 				)
 			);
 		}

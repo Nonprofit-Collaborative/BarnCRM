@@ -39,7 +39,9 @@ private class StewardshipTriggerHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+		);
 		insert person;
 		return person;
 	}

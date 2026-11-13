@@ -34,17 +34,21 @@ private class ContactTriggerHandlerTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			Contact john = new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			Contact john = TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
-			Contact jane = new Contact(
-				Salutation = 'Mrs.',
-				FirstName = 'Jane',
-				LastName = 'Smith',
-				AccountId = household.Id
+			Contact jane = TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mrs.',
+					FirstName = 'Jane',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 			insert new List<Contact>{ john, jane };
 
@@ -391,7 +395,9 @@ private class ContactTriggerHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-			Account employer = new Account(Name = 'Riverside Library');
+			Account employer = TestDataFactory.organization(
+				new Account(Name = 'Riverside Library')
+			);
 			Database.insert(new List<Account>{ household, employer }, AccessLevel.SYSTEM_MODE);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;

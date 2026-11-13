@@ -14,10 +14,14 @@ private class AutoMergeControllerTest {
 		for (Integer i = 0; i < pairs; i++) {
 			String email = firstName.toLowerCase() + i + '@example.org';
 			people.add(
-				new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email)
+				TestDataFactory.person(
+					new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email)
+				)
 			);
 			people.add(
-				new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email)
+				TestDataFactory.person(
+					new Contact(FirstName = firstName + i, LastName = 'Automerge', Email = email)
+				)
 			);
 		}
 		Database.DMLOptions options = new Database.DMLOptions();

@@ -209,7 +209,9 @@ private class GiftImportProcessorTest {
 	static void anExternalIdLoadsOnce() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			// The first row's donor already exists too, so nothing on that row is new.
-			Contact existingDonor = new Contact(LastName = 'Donor0', Email = 'donor0@example.org');
+			Contact existingDonor = TestDataFactory.person(
+				new Contact(LastName = 'Donor0', Email = 'donor0@example.org')
+			);
 			insert existingDonor;
 			Gift__c earlier = GivingTestDataFactory.buildGift(existingDonor.Id, 5);
 			earlier.External_Id__c = 'stripe-1';

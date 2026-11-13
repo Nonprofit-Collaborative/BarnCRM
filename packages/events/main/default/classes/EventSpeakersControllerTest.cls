@@ -36,7 +36,9 @@ private class EventSpeakersControllerTest {
 	}
 
 	private static Contact person() {
-		Contact record = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+		Contact record = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Garcia')
+		);
 		insert as user record;
 		return record;
 	}
