@@ -736,4 +736,12 @@
         <shortDescription>Volunteers Home figure: value of approved hours this month (V-12)</shortDescription>
         <value>Value of Hours This Month</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Glance_Title</fullName>
+        <categories>Volunteers, Record pages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteering at a Glance card title (D-200 R1)</shortDescription>
+        <value>Volunteering at a Glance</value>
+    </labels>
 </CustomLabels>

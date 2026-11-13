@@ -57,5 +57,10 @@ is reused with a new interface rather than a new mechanism.
 - Any module can add a small card to Core's person and organization pages by implementing
   the interface and adding its class name to `RecordGlanceExtensions.EXTENSION_CLASSES`.
 - Each card costs one Apex call per record page view and one query per module.
-- Module copies of Core's pages (Programs, Volunteers) do not yet carry the host component;
-  adding it is a page change for their owners.
+- Module copies of Core's pages (Programs, Volunteers) carry the host component since the U11
+  fix, and `scripts/ci/check-record-page-copies.py` keeps every Core component on them.
+- D-200 R1 (release 1.24) added two more cards on this seam: Volunteers'
+  `VolunteersRecordGlanceExtension` (Volunteering at a Glance, Log Hours on the Log Hours tab
+  with `c__personId`) and Programs' `ProgramsRecordGlanceExtension` (Programs at a Glance,
+  Enroll as a new enrollment with the person filled in, Record Service on the Record Service
+  tab with `c__personId`).

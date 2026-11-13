@@ -1,7 +1,26 @@
 import { createElement } from 'lwc';
 import Toast from 'lightning/toast';
-import VolunteerLogHours from 'c/volunteerLogHours';
+import { CurrentPageReference } from 'lightning/navigation';
+import VolunteerLogHours, { personIdFromState } from 'c/volunteerLogHours';
 import getContext from '@salesforce/apex/VolunteerLogHoursController.getContext';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const { createTestWireAdapter } = require('@salesforce/wire-service-jest-util');
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: createTestWireAdapter(), __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/VolunteerLogHoursController.getContext',
@@ -130,5 +149,39 @@ describe('c-volunteer-log-hours', () => {
     await flush();
 
     expect(find(element, '[data-id="blocker"]').message).toBe('c.Volunteers_LogHours_LoadFailed');
+  });
+
+  it('reads the person from the page state, plain or namespaced', () => {
+    expect(personIdFromState({ state: { c__personId: '003A' } })).toBe('003A');
+    expect(personIdFromState({ state: { barn__personId: '003B' } })).toBe('003B');
+    expect(personIdFromState({ state: {} })).toBeUndefined();
+    expect(personIdFromState(undefined)).toBeUndefined();
+  });
+
+  it('on the Log Hours tab starts on the person and returns to them after the save', async () => {
+    const PERSON_ID = '003000000000007';
+    getContext.mockImplementation(({ recordId }) =>
+      Promise.resolve({ ...FROM_SHIFT, personId: recordId || null })
+    );
+    const element = createElement('c-volunteer-log-hours', { is: VolunteerLogHours });
+    document.body.appendChild(element);
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: { c__personId: PERSON_ID } });
+    await flush();
+
+    expect(getContext).toHaveBeenLastCalledWith({ recordId: PERSON_ID });
+    expect(find(element, '[data-id="person-picker"]').value).toBe(PERSON_ID);
+
+    find(element, 'lightning-record-edit-form').dispatchEvent(
+      new CustomEvent('success', { detail: { id: 'a0H000000000001' } })
+    );
+    await flush();
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'standard__recordPage',
+        attributes: { recordId: PERSON_ID, actionName: 'view' }
+      })
+    );
   });
 });

@@ -1,6 +1,7 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
 import { CloseActionScreenEvent } from 'lightning/actions';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import getContext from '@salesforce/apex/VolunteerLogHoursController.getContext';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -20,12 +21,23 @@ import HOURS_NOTES from '@salesforce/schema/Volunteer_Hours__c.Notes__c';
 import HOURS_ACCOUNT from '@salesforce/schema/Volunteer_Hours__c.Account__c';
 import HOURS_CONTACT from '@salesforce/schema/Volunteer_Hours__c.Contact__c';
 
+/** The person a tab was opened for: `c__personId` (or the namespaced key) in the page state. */
+export function personIdFromState(pageRef) {
+  const state = (pageRef && pageRef.state) || {};
+  const key = Object.keys(state).find((name) => name.endsWith('__personId'));
+  return key ? state[key] : undefined;
+}
+
 /**
  * Log Hours (modules-14): a small hours form on a person, a shift or a job, with one Person
  * picker and the values the record gives prefilled. It saves through the standard record form,
  * so every hours rule and the approval status apply as on New, which stays.
+ *
+ * The same form is the Log Hours tab (D-200 R1, R7): opened with `c__personId` from the
+ * Volunteering at a Glance card it starts on that person, and after a save returns to them;
+ * opened from Home it starts empty and clears itself for the next entry.
  */
-export default class VolunteerLogHours extends LightningElement {
+export default class VolunteerLogHours extends NavigationMixin(LightningElement) {
   labels = { title: TITLE, person: PERSON, save: SAVE, cancel: CANCEL, loading: LOADING };
   hoursObject = HOURS.objectApiName;
   /** The form's fields, from schema imports so they carry any namespace. */
@@ -43,6 +55,10 @@ export default class VolunteerLogHours extends LightningElement {
   saving = false;
   helpReady = isHelpLoaded('Volunteers');
   _recordId;
+  /** The person named in the tab's page state, when the form is the Log Hours tab. */
+  statePersonId;
+  /** Only the latest load applies, whichever of the record and the page state comes last. */
+  loadCount = 0;
 
   @api
   get recordId() {
@@ -52,6 +68,15 @@ export default class VolunteerLogHours extends LightningElement {
     const changed = value !== this._recordId;
     this._recordId = value;
     if (changed) {
+      this.load();
+    }
+  }
+
+  @wire(CurrentPageReference)
+  readPageState(pageRef) {
+    const personId = personIdFromState(pageRef);
+    if (!this._recordId && personId && personId !== this.statePersonId) {
+      this.statePersonId = personId;
       this.load();
     }
   }
@@ -68,12 +93,18 @@ export default class VolunteerLogHours extends LightningElement {
   }
 
   async load() {
+    const count = ++this.loadCount;
     this.loadFailed = false;
     try {
-      this.context = await getContext({ recordId: this._recordId });
-      this.personId = this.context.personId;
+      const context = await getContext({ recordId: this._recordId || this.statePersonId || null });
+      if (count === this.loadCount) {
+        this.context = context;
+        this.personId = context.personId;
+      }
     } catch {
-      this.loadFailed = true;
+      if (count === this.loadCount) {
+        this.loadFailed = true;
+      }
     }
   }
 
@@ -113,11 +144,20 @@ export default class VolunteerLogHours extends LightningElement {
       .fieldApiName;
   }
 
+  /** On the tab rather than in an action window. */
+  get onTab() {
+    return !this._recordId;
+  }
+
   handlePersonChange(event) {
     this.personId = event.detail.recordId;
   }
 
   handleCancel() {
+    if (this.onTab) {
+      this.leaveTab();
+      return;
+    }
     this.dispatchEvent(new CloseActionScreenEvent());
   }
 
@@ -144,10 +184,28 @@ export default class VolunteerLogHours extends LightningElement {
       { label: helpText('Volunteers', 'Volunteers_LogHours_Saved'), variant: 'success' },
       this
     );
-    if (this._recordId) {
-      notifyRecordUpdateAvailable([{ recordId: this._recordId }]);
+    const touched = this._recordId || this.statePersonId;
+    if (touched) {
+      notifyRecordUpdateAvailable([{ recordId: touched }]);
+    }
+    if (this.onTab) {
+      this.leaveTab();
+      return;
     }
     this.dispatchEvent(new CloseActionScreenEvent());
+  }
+
+  /** Back to the person the tab was opened for, or a fresh form for the next entry. */
+  leaveTab() {
+    if (this.statePersonId) {
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId: this.statePersonId, actionName: 'view' }
+      });
+      return;
+    }
+    this.context = undefined;
+    this.load();
   }
 
   handleError() {

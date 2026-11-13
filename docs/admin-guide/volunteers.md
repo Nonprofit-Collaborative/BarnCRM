@@ -682,6 +682,20 @@ lists the job's shifts, schedules and skills in its main column, with the detail
 To add Log Hours to a record page of your own, add the **Log Hours** action of that object
 (Contact, Account, Volunteer Shift or Volunteer Job) to the page's highlights panel.
 
+The same form is also the **Log Hours** tab (in the App Launcher; Volunteers Staff,
+Coordinator and Admin see it). Opened with `c__personId` in the address it starts on that
+person, with today's shift as above, and returns to their page after **Save** or **Cancel**;
+opened on its own it starts empty and clears itself after each save.
+
+### Volunteering at a Glance
+
+In the **BarnCRM** apps a person opens on Core's page, which shows no volunteering. Volunteers
+adds a **Volunteering at a Glance** card to that page's glance area (the record glance seam,
+ADR-0167): **Volunteer Hours This Year** and **Last Volunteer Date** (the rollups already on
+the person), with **Log Hours** (the tab above, on that person) for someone who may create
+hours. Households and organizations get no card, and nor does anyone who cannot read volunteer
+hours. There is nothing to set up: the card shows while Volunteers is installed.
+
 ## Approving Hours
 
 Coordinators and admins (anyone holding **Manage Volunteers**) approve hours on the **Approve
