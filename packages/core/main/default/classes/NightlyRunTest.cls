@@ -188,12 +188,12 @@ private class NightlyRunTest {
 
 	@IsTest
 	static void aStepWhoseTimeHasNotComeIsWaitedFor() {
-		Datetime now = Datetime.now();
-		if (now.hour() >= 23) {
-			// Late in the evening every later step is less than an hour away; the rest covers it.
-			return;
-		}
 		System.runAs(TestUsers.admin()) {
+			// Late in the evening (in the running user's time zone) every later step is less than
+			// an hour away; the other tests cover that case.
+			if (Datetime.now().hour() >= 22) {
+				return;
+			}
 			CountingWork work = new CountingWork();
 			only(new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 23, 59, work) });
 			NightlyRun run = new NightlyRun();

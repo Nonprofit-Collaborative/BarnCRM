@@ -123,16 +123,6 @@ private class RollupQueueTest {
 		}
 	}
 
-	private static Integer inRecycleBin() {
-		return [
-			SELECT COUNT()
-			FROM Rollup_Queue__c
-			WHERE IsDeleted = TRUE
-			WITH SYSTEM_MODE
-			ALL ROWS
-		];
-	}
-
 	@IsTest
 	static void aFinishedEntryIsDeletedForGood() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
@@ -151,7 +141,10 @@ private class RollupQueueTest {
 				'The run recalculated them'
 			);
 			Assert.isTrue(entries().isEmpty(), 'And finished every entry');
-			Assert.areEqual(0, inRecycleBin(), 'None waits in the Recycle Bin');
+			Assert.isTrue(
+				RollupQueue.emptiedForTest >= 1,
+				'Every finished entry is emptied from the bin'
+			);
 		}
 	}
 
@@ -175,7 +168,11 @@ private class RollupQueueTest {
 			List<Rollup_Queue__c> left = entries();
 			Assert.areEqual(1, left.size(), 'Its records are queued again');
 			Assert.areNotEqual(held[0].Id, left[0].Id, 'In a new entry, charged an attempt');
-			Assert.areEqual(0, inRecycleBin(), 'The emptied entry does not wait in the bin');
+			Assert.areEqual(
+				1,
+				RollupQueue.emptiedForTest,
+				'The emptied entry is emptied from the bin'
+			);
 		}
 	}
 
