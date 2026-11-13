@@ -120,7 +120,6 @@ public with sharing class HealthCheckSkew {
 	}
 
 	private static Boolean rowsToSpare() {
-		return Limits.getLimitQueryRows() - Limits.getQueryRows() >
-			skewAt + 1 + ROWS_KEPT_SPARE;
+		return Limits.getLimitQueryRows() - Limits.getQueryRows() > skewAt + 1 + ROWS_KEPT_SPARE;
 	}
 }

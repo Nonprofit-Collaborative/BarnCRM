@@ -195,7 +195,8 @@ global with sharing class FindPeopleAction {
 		Set<Id> result = new Set<Id>();
 		for (Integer start = 0; start < nameTerms.size(); start += SEARCHES_PER_FIND) {
 			List<String> several = new List<String>();
-			for (Integer i = start; i < Math.min(start + SEARCHES_PER_FIND, nameTerms.size()); i++) {
+			Integer stop = Math.min(start + SEARCHES_PER_FIND, nameTerms.size());
+			for (Integer i = start; i < stop; i++) {
 				several.add('(' + nameTerms[i] + ')');
 			}
 			for (

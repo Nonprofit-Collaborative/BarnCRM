@@ -13,7 +13,11 @@ private class NameSearchTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual('garc*', NameSearch.prefixTerm(' garc '));
 			Assert.areEqual('Wei* Lee*', NameSearch.prefixTerm('Wei  Lee'));
-			Assert.areEqual('J Smith*', NameSearch.prefixTerm('J Smith'), 'One letter is kept whole');
+			Assert.areEqual(
+				'J Smith*',
+				NameSearch.prefixTerm('J Smith'),
+				'One letter is kept whole'
+			);
 		}
 	}
 
@@ -29,7 +33,11 @@ private class NameSearchTest {
 	static void reservedCharactersAreSearchedForNotParsed() {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual('O\\\'Brien*', NameSearch.prefixTerm('O\'Brien'));
-			Assert.areEqual('a\\}b*', NameSearch.prefixTerm('a}b'), 'A brace cannot end the search');
+			Assert.areEqual(
+				'a\\}b*',
+				NameSearch.prefixTerm('a}b'),
+				'A brace cannot end the search'
+			);
 			Assert.areEqual('Smith\\-Jones*', NameSearch.prefixTerm('Smith-Jones'));
 		}
 	}

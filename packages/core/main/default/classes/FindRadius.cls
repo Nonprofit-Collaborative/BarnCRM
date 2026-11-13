@@ -232,25 +232,25 @@ public with sharing class FindRadius {
 		String longitudeName = stem + 'Longitude' + suffix;
 		Double centerLatitude = latitude.doubleValue();
 		Double centerLongitude = longitude.doubleValue();
-		Double latitudeSpan = miles.doubleValue() / 68.5d;
+		// 68.5 miles per degree, a touch under the true 69, so the box is never too small.
+		Double latitudeSpan = miles.doubleValue() * 2 / 137;
 		binds.put('boxSouth', centerLatitude - latitudeSpan);
 		binds.put('boxNorth', centerLatitude + latitudeSpan);
 		String clause = latitudeName + ' >= :boxSouth AND ' + latitudeName + ' <= :boxNorth AND ';
-		Double cosine = Math.cos(Math.abs(centerLatitude) * Math.PI / 180d);
-		Double longitudeSpan = cosine <= 0 ? 360d : latitudeSpan / cosine;
+		Double cosine = Math.cos(Math.abs(centerLatitude) * Math.PI / 180);
+		Double longitudeSpan = 360;
+		if (cosine > 0) {
+			longitudeSpan = latitudeSpan / cosine;
+		}
 		if (
-			Math.abs(centerLatitude) + latitudeSpan >= 89d ||
-			Math.abs(centerLongitude) + longitudeSpan >= 180d
+			Math.abs(centerLatitude) + latitudeSpan >= 89 ||
+			Math.abs(centerLongitude) + longitudeSpan >= 180
 		) {
 			return clause;
 		}
 		binds.put('boxWest', centerLongitude - longitudeSpan);
 		binds.put('boxEast', centerLongitude + longitudeSpan);
-		return clause +
-			longitudeName +
-			' >= :boxWest AND ' +
-			longitudeName +
-			' <= :boxEast AND ';
+		return clause + longitudeName + ' >= :boxWest AND ' + longitudeName + ' <= :boxEast AND ';
 	}
 
 	private static Boolean isGeocodable(Schema.DescribeFieldResult field) {

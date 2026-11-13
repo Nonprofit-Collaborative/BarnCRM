@@ -127,7 +127,9 @@ private class FindRadiusTest {
 
 			System.Assert.isTrue(ok.clause.contains('DISTANCE(MailingAddress, GEOLOCATION(:'));
 			System.Assert.isTrue(
-				ok.clause.startsWith('MailingLatitude >= :boxSouth AND MailingLatitude <= :boxNorth'),
+				ok.clause.startsWith(
+					'MailingLatitude >= :boxSouth AND MailingLatitude <= :boxNorth'
+				),
 				'A latitude box narrows the rows first: ' + ok.clause
 			);
 			System.Assert.isTrue(
