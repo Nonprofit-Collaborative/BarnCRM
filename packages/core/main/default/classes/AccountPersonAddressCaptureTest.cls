@@ -20,7 +20,9 @@ private class AccountPersonAddressCaptureTest {
 	}
 
 	private static Account person(String lastName, String street) {
-		Account record = new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId());
+		Account record = TestDataFactory.organization(
+			new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId())
+		);
 		record.put('FirstName', 'Pat');
 		record.put('LastName', lastName);
 		if (street != null) {
@@ -211,7 +213,9 @@ private class AccountPersonAddressCaptureTest {
 			if (OrgShapeDetector.detect().hasPersonAccounts) {
 				return;
 			}
-			Account organization = new Account(Name = 'Acme Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Acme Foundation')
+			);
 			insert organization;
 
 			Integer queriesBefore = Limits.getQueries();
