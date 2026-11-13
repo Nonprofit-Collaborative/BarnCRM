@@ -1695,6 +1695,8 @@ programs/ProgramsNightlyJobProvider.cls | public ProgramsNightlyJobProvider()
 programs/ProgramsNightlyJobProvider.cls | public class ProgramsNightlyJobProvider
 programs/ProgramsPostInstall.cls | public ProgramsPostInstall()
 programs/ProgramsPostInstall.cls | public class ProgramsPostInstall
+programs/ProgramsRecordGlanceExtension.cls | public ProgramsRecordGlanceExtension()
+programs/ProgramsRecordGlanceExtension.cls | public class ProgramsRecordGlanceExtension
 programs/ProgramsSampleData.cls | public ProgramsSampleData()
 programs/ProgramsSampleData.cls | public class ProgramsSampleData
 programs/ProgramsSharingHandler.cls | public ProgramsSharingHandler()
@@ -1883,5 +1885,7 @@ volunteers/VolunteersPortalExtension.cls | public VolunteersPortalExtension()
 volunteers/VolunteersPortalExtension.cls | public class VolunteersPortalExtension
 volunteers/VolunteersPostInstall.cls | public VolunteersPostInstall()
 volunteers/VolunteersPostInstall.cls | public class VolunteersPostInstall
+volunteers/VolunteersRecordGlanceExtension.cls | public VolunteersRecordGlanceExtension()
+volunteers/VolunteersRecordGlanceExtension.cls | public class VolunteersRecordGlanceExtension
 volunteers/VolunteersSampleData.cls | public VolunteersSampleData()
 volunteers/VolunteersSampleData.cls | public class VolunteersSampleData

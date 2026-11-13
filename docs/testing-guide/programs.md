@@ -477,3 +477,19 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | Start **Service Deliveries** again and load. Tick each **Retire the Old App** item. | **Complete**. PMM's records are unchanged. |
 
 **Cleanup:** undo the steps from the last to the first, then delete the PMM test records.
+
+## T-PRG-28: Programs at a Glance, Enroll and the Record Service Tab
+
+**Purpose:** confirm staff in the BarnCRM app see a person's programs and can enroll them or record a service without switching apps (D-200 R1).
+**Prerequisites:** Programs Staff user; a person enrolled in one open program (stage Enrolled) and one completed program, with one Present service delivery; a household.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **BarnCRM** app, open the person. | The sidebar's glance area shows **Programs at a Glance**: **Open Enrollments** 1 and **Last Service** (the delivery's date), with **Enroll** and **Record Service**. |
+| 2 | Click **Record Service**, pick a service and click **Save**. | The **Record Service** tab opens with the person filled in. "Service recorded." and you are back on the person's page. |
+| 3 | Click **Enroll**. | A new enrollment opens with the person filled in. Pick a program and save; back on the person, **Open Enrollments** is 2. |
+| 4 | In the **BarnCRM Programs** app, open the person. | The **Programs** card has an **Enroll** button beside refresh; it opens the same new enrollment. |
+| 5 | Open the household. | No **Programs at a Glance** card. |
+| 6 | As a Programs Read Only user, open the person in the **BarnCRM** app. | The card shows its figures with no **Enroll** and no **Record Service**; the **Programs** card in the Programs app has no **Enroll**. |
+
+**Cleanup:** delete the service delivery and enrollment from steps 2 and 3.

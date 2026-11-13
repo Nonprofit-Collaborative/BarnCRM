@@ -263,6 +263,25 @@ rules. From an enrollment it offers that program's services and links the delive
 enrollment. Programs Staff and Admin can save; Read Only users are told they cannot. On your own
 record pages, add it from Lightning App Builder (dynamic actions on the highlights panel).
 
+The same form is also the **Record Service** tab (in the App Launcher; Programs Staff and Admin
+see it). Opened with `c__personId` in the address it starts on that person and, after **Save**
+or **Cancel**, returns to their page; opened on its own it starts empty and clears itself after
+each save.
+
+### Programs at a Glance
+
+In the **BarnCRM** apps a person opens on Core's page, which shows no programs. Programs adds a
+**Programs at a Glance** card to that page's glance area (the record glance seam, ADR-0167):
+**Open Enrollments** (enrollments the person has that are not completed or withdrawn) and
+**Last Service** (the latest service they attended), with **Enroll** (a new enrollment with the
+person filled in) for someone who may create enrollments and **Record Service** (the tab above,
+on that person) for someone who may record services. Households and organizations get no card,
+and nor does anyone who cannot read enrollments. There is nothing to set up: the card shows
+while Programs is installed.
+
+The **Programs** card on a person's page in the Programs app has the same **Enroll** button
+beside its refresh button, for anyone who may create enrollments.
+
 Rules:
 
 - **One person per delivery**, a contact or an account, as for enrollments.

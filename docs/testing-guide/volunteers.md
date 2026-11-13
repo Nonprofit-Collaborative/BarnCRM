@@ -487,3 +487,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 8 | Read the kit's checklist. | It names the V4S site pages, recurring schedules, tabs and permission sets, and uninstalling. |
 
 **Cleanup:** undo the four steps in reverse order.
+
+## T-VOL-32: Volunteering at a Glance and the Log Hours Tab
+
+**Purpose:** confirm staff in the BarnCRM app see a person's volunteering and can log hours without switching apps (D-200 R1).
+**Prerequisites:** Volunteers Staff user; a person with approved hours this year; an organization.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **BarnCRM** app, open the person. | The sidebar's glance area shows **Volunteering at a Glance**: **Volunteer Hours This Year** and **Last Volunteer Date** from the person, with **Log Hours**. |
+| 2 | Click **Log Hours**, fill in a job, a date and 2 hours, and click **Save**. | The **Log Hours** tab opens with the person filled in. "Hours logged." and you are back on the person's page. |
+| 3 | Open **Log Hours** from the App Launcher. | The form opens empty. Save an entry: the form clears for the next one. |
+| 4 | Open the organization. | No **Volunteering at a Glance** card. |
+| 5 | As a Volunteers Read Only user, open the person. | The card shows its figures with no **Log Hours** button. |
+
+**Cleanup:** delete the hours entries from steps 2 and 3.

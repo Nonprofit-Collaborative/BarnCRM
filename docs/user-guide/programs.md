@@ -57,6 +57,13 @@ cannot be deleted.
 You should see: "Enrollment added." under the figures, the count for the stage goes up by one,
 and the person is listed with today as the Start Date (for Enrolled).
 
+From the person instead: click **Enroll** on their **Programs** card (in the BarnCRM Programs
+app) or on the **Programs at a Glance** card (in the BarnCRM app). A new enrollment opens with
+the person filled in; pick the **Program** and click **Save**. The glance card also shows their
+open enrollments and last service, and its **Record Service** button opens the Record Service
+form on them (see [To Record a Service by Hand](#to-record-a-service-by-hand)); after saving you
+are back on their page.
+
 Enrolling someone who already has an Applied, Enrolled or Waitlisted enrollment in the same
 program is refused, with a message naming the program. Change the enrollment that is there
 instead.
