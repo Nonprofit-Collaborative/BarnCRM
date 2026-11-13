@@ -545,9 +545,10 @@ have, and it has DLRS installed for coexistence. `oi-test` (Person Accounts shap
 the release gate.
 
 **Accepted risk of the incremental gate (D-142).** The selection follows direct mentions of a
-changed class and the `testFor` annotations only. It can miss a test that reaches the changed
-code indirectly, and it selects nothing for a change to an object, a flow, a permission set,
-custom metadata or a label that an unselected test depends on. The `testFor` and `critical`
+changed class or changed metadata and the `testFor` annotations only. It can miss a test that
+reaches the changed code or metadata indirectly (a flow that fires on a standard object, a
+field read only through describe), and it selects nothing for a changed label, layout or help
+text. The `testFor` and `critical`
 annotations (see "Relevant tests" below) narrow the gap; the release gate closes it before a
 version ships.
 
@@ -576,7 +577,14 @@ carries):
 - every test class whose `@IsTest(testFor=...)` names a changed class or trigger;
 - every test class that mentions a changed class by name (comments ignored), which includes the
   users of a changed test utility such as `TestDataFactory`;
-- every `critical=true` class, so a batch with no Apex change still runs the smoke tests.
+- every `critical=true` class, so a batch with no Apex change still runs the smoke tests;
+- every test class that names changed metadata (QA review Q9): a changed custom object, or
+  anything under it, by its API name (on a standard object, the changed field's API name); a
+  permission set, permission set group or custom permission by its name; a flow by its name
+  and the custom object it starts on; a custom metadata record by its type (`Type__mdt`) and
+  record name. A test utility that names the metadata (`TestUsers` names `BarnCRM_Admin`)
+  counts as changed, so a change to an admin permission set selects every test that runs as
+  that admin.
 
 The vendored rollup engine's tests are never selected. No coverage is recorded and no floor is
 checked. It posts `Org tests (local)` with a description such as "Incremental on barn-sales:
