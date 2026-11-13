@@ -123,7 +123,10 @@ private class GivingSetupAssistantExtensionTest {
 				'fields'
 			))[0];
 			System.assertEquals(SetupAssistantService.FIELD_NAVIGATE, button.get('fieldType'));
-			System.assertEquals('Gift_Entry', button.get('navigationTarget'));
+			System.assertEquals(
+				NamespaceUtil.qualify('Quick_Gift_Entry'),
+				button.get('navigationTarget')
+			);
 		}
 	}
 

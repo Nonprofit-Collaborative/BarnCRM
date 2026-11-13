@@ -93,7 +93,7 @@ public with sharing class VolunteersHomeController {
 		waiting.badgeStatus = 'due';
 		waiting.objectApiName = hoursObject;
 		if (VolunteerHoursService.canManage()) {
-			waiting.tabName = 'Volunteer_Approve_Hours';
+			waiting.tabName = NamespaceUtil.qualify('Volunteer_Approve_Hours');
 		} else {
 			waiting.filterName = 'Hours_Awaiting_Approval';
 		}

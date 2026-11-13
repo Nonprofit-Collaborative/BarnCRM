@@ -115,6 +115,7 @@ describe('c-fundraising-home', () => {
     const button = element.shadowRoot.querySelector('[data-id="enter-gift"]');
     expect(button.label).toBe('c.Giving_FundraisingHome_EnterGift');
     button.click();
+    await flush();
     expect(getNavigateCalledWith().pageReference).toEqual({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Quick_Gift_Entry' }
@@ -130,6 +131,7 @@ describe('c-fundraising-home', () => {
     expect(group.tiles[0].iconName).toBe('custom:custom65');
     expect(group.tiles[0].description).toBe('c.Giving_FundraisingHome_DonorLevelsHelp');
     grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Receipts' } }));
+    await flush();
     expect(getNavigateCalledWith().pageReference).toEqual({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Receipts' }

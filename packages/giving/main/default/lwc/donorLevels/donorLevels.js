@@ -1,5 +1,6 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import DONOR_LEVEL from '@salesforce/schema/Donor_Level__c';
 import { refreshApex } from '@salesforce/apex';
 import getLadder from '@salesforce/apex/DonorLevelController.getLadder';
 import recalculate from '@salesforce/apex/DonorLevelController.recalculate';
@@ -139,7 +140,7 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
   handleNewLevel() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Donor_Level__c', actionName: 'new' }
+      attributes: { objectApiName: DONOR_LEVEL.objectApiName, actionName: 'new' }
     });
   }
 
@@ -148,7 +149,7 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.recordId,
-        objectApiName: 'Donor_Level__c',
+        objectApiName: DONOR_LEVEL.objectApiName,
         actionName: 'view'
       }
     });

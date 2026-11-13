@@ -10,6 +10,7 @@ import assignReviewers from '@salesforce/apex/EventProposalReview.assignReviewer
 import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
+import APPLICATION from '@salesforce/schema/Speaker_Application__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import {
   averageText,
@@ -386,7 +387,7 @@ export default class EventApplications extends LightningElement {
     const saved = await EventRecordModal.open({
       label: helpText('Events', 'Events_Applications_Add'),
       size: 'small',
-      objectApiName: 'Speaker_Application__c',
+      objectApiName: APPLICATION.objectApiName,
       fields: NEW_APPLICATION_FIELDS,
       defaults: { Event__c: this.recordId }
     });
@@ -565,7 +566,7 @@ export default class EventApplications extends LightningElement {
     const saved = await EventRecordModal.open({
       label: `${EDIT}: ${application.name}`,
       size: 'small',
-      objectApiName: 'Speaker_Application__c',
+      objectApiName: APPLICATION.objectApiName,
       recordId: application.id,
       fields: APPLICATION_FIELDS
     });

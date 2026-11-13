@@ -13,6 +13,14 @@ deploys put everything in one bucket, so neither deploys nor org tests show thes
 3. Page state keys. LWC JavaScript never writes a literal `c__` state key: inside a managed
    package the prefix is the namespace, so the key comes from Apex (`NamespaceUtil.stateKey`)
    or is matched by its `__name` suffix (`settingsConsole`, `findRecords`).
+4. Packaged API names. LWC never writes a packaged object, field or tab name as a literal:
+   once the namespace is set the name carries the prefix. Flagged: a `__c`, `__r`, `__mdt`,
+   `__e`, `__x` or `__b` name (with no namespace of its own) as a NavigationMixin
+   `objectApiName`, in an `objectApiName` comparison, in a dotted record field path
+   (`getRecord` fields, `getFieldValue`), or in an HTML `field-name` or `object-api-name`
+   attribute; and a packaged tab name (any `tabs/*.tab-meta.xml`) as an `apiName`, written
+   directly or through a `const`. Objects and fields come from `@salesforce/schema` imports,
+   tab names from Apex (`TabNamesController.tabApiNames`).
 
 4. sfdx-project.json is ready for `sf package version create` (docs/contributor-guide/ci.md,
    "Creating package versions"): every package whose source has an InstallHandler class names
@@ -50,6 +58,50 @@ PAGE_TARGETS = {
 
 # path: reason. Components allowed to write a literal `c__` key. None today.
 DEFERRED = {}
+
+# A packaged object or field name: one `__` and a packaged suffix (`npsp__X__c` is someone else's).
+PACKAGED = re.compile(r"^[A-Za-z][A-Za-z0-9_]*?__(?:c|r|mdt|e|x|b)$")
+
+
+def packaged(name):
+    return bool(PACKAGED.match(name)) and name.count("__") == 1
+
+
+def tab_names(sources):
+    return {m.group(1) for p in sources for m in [re.search(r"/tabs/(\w+)\.tab-meta\.xml$", p)] if m}
+
+
+def api_name_problems(path, text, tabs):
+    """[(pos, message)] for rule 4 in one LWC .js (comments blanked) or .html file."""
+    out = []
+    if path.endswith(".html"):
+        for m in re.finditer(r"\b(field-name|object-api-name)\s*=\s*\"([\w.]+)\"", text):
+            if any(packaged(part) for part in m.group(2).split(".")):
+                out.append((m.start(), f"literal packaged name {m.group(2)} in {m.group(1)}"))
+        return out
+    consts = dict(re.findall(r"\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*['\"`](\w+)['\"`]\s*;", text))
+    for m in re.finditer(r"\bobjectApiName\s*:\s*['\"`](\w+)['\"`]", text):
+        if packaged(m.group(1)):
+            out.append((m.start(), f"literal packaged object {m.group(1)} as objectApiName"))
+    compare = r"objectApiName\s*[!=]==?\s*['\"`](\w+)['\"`]|['\"`](\w+)['\"`]\s*[!=]==?\s*[\w$.?]*objectApiName\b"
+    for m in re.finditer(compare, text):
+        name = m.group(1) or m.group(2)
+        if packaged(name):
+            out.append((m.start(), f"literal packaged object {name} in an objectApiName comparison"))
+    # `const TABS = { find: 'Find' }` read as `apiName: TABS.find` or `apiName: TABS[key]`.
+    maps = {}
+    for m in re.finditer(r"\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*\{([^{}]*)\}", text):
+        maps[m.group(1)] = re.findall(r"['\"`](\w+)['\"`]", m.group(2))
+    for m in re.finditer(r"(?<![\w$.])apiName\s*:\s*(?:['\"`](\w+)['\"`]|([A-Za-z_$][\w$]*)\b)", text):
+        names = [m.group(1) or consts.get(m.group(2))] + maps.get(m.group(2), [])
+        for name in sorted({n for n in names if n in tabs}):
+            out.append((m.start(), f"literal packaged tab {name} as apiName"))
+    for m in re.finditer(r"['\"`](\w+(?:\.\w+)+)['\"`]", text):
+        parts = m.group(1).split(".")
+        # A path on another package's object (`npsp__X__c.Y__c`) is not ours.
+        if any(packaged(part) for part in parts) and parts[0].count("__") < 2:
+            out.append((m.start(), f"literal packaged field path {m.group(1)}"))
+    return out
 
 
 def package_of(path):
@@ -116,7 +168,7 @@ def labels(sources):
 
 def check(sources, deps):
     """[(path, line, message)] for every problem in sources ({path: text})."""
-    comps, labs, problems = components(sources), labels(sources), []
+    comps, labs, tabs, problems = components(sources), labels(sources), tab_names(sources), []
 
     def line(text, pos):
         return text.count("\n", 0, pos) + 1
@@ -138,7 +190,9 @@ def check(sources, deps):
             for m in re.finditer(r"['\"`]c__\w+|(?<![\w.])c__\w+\s*:", code):
                 if path not in DEFERRED:
                     problems.append((path, line(code, m.start()), "literal c__ page state key"))
+            problems += [(path, line(code, pos), msg) for pos, msg in api_name_problems(path, code, tabs)]
         if lwc and path.endswith(".html"):
+            problems += [(path, line(text, pos), msg) for pos, msg in api_name_problems(path, text, tabs)]
             refs += [(m.start(), camel(m.group(1)), None) for m in re.finditer(r"<c-([a-z0-9-]+)", text)]
         if path.endswith(".flexipage-meta.xml"):
             page = ElementTree.fromstring(text).findtext("m:type", namespaces=NS)
@@ -224,7 +278,7 @@ def main():
     if problems:
         print(f"{len(problems)} problem(s). See the docstring of {os.path.basename(__file__)}.")
         return 1
-    print(f"Components, labels and page state keys in {len(sources)} files, and sfdx-project.json, are namespace ready.")
+    print(f"Components, labels, page state keys and API names in {len(sources)} files, and sfdx-project.json, are namespace ready.")
     return 0
 
 

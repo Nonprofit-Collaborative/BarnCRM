@@ -175,7 +175,13 @@ fails the build. Never assume there is none either:
   map is keyed by the full name, so the literal misses once the namespace exists. An object
   named by a row or query is described with `NamespaceUtil.describe(name)` (null when absent),
   never `Schema.describeSObjects` with an unprefixed name, which throws (D-200, N10).
-- Lightning components never build these names; Apex returns them.
+- Lightning components never build these names; Apex returns them. A component opens a
+  packaged tab through `c/barnTabs` (`tabPageReference('Find')`), which asks
+  `NamespaceUtil.tabApiNames` once per page; objects and fields come from `@salesforce/schema`
+  imports (`ERROR_LOG.objectApiName`, `FUND_NAME.fieldApiName`); Apex returns DTOs with
+  unprefixed property names, never SObjects, to Lightning. `check-namespace-readiness.py`
+  (rule 4) fails a literal packaged name in navigation, LDS field paths and
+  `field-name`/`object-api-name` attributes.
 
 ## 5. Describe once, never in a loop
 

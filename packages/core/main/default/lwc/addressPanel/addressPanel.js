@@ -26,6 +26,18 @@ import ID_FIELD from '@salesforce/schema/Address__c.Id';
 import IS_DEFAULT_FIELD from '@salesforce/schema/Address__c.Is_Default__c';
 import STATUS_FIELD from '@salesforce/schema/Address__c.Status__c';
 import END_DATE_FIELD from '@salesforce/schema/Address__c.End_Date__c';
+import TYPE_FIELD from '@salesforce/schema/Address__c.Type__c';
+import STREET_FIELD from '@salesforce/schema/Address__c.Street__c';
+import CITY_FIELD from '@salesforce/schema/Address__c.City__c';
+import STATE_FIELD from '@salesforce/schema/Address__c.State__c';
+import POSTAL_CODE_FIELD from '@salesforce/schema/Address__c.Postal_Code__c';
+import COUNTRY_FIELD from '@salesforce/schema/Address__c.Country__c';
+import SEASONAL_START_MONTH_FIELD from '@salesforce/schema/Address__c.Seasonal_Start_Month__c';
+import SEASONAL_START_DAY_FIELD from '@salesforce/schema/Address__c.Seasonal_Start_Day__c';
+import SEASONAL_END_MONTH_FIELD from '@salesforce/schema/Address__c.Seasonal_End_Month__c';
+import SEASONAL_END_DAY_FIELD from '@salesforce/schema/Address__c.Seasonal_End_Day__c';
+import CONTACT_FIELD from '@salesforce/schema/Address__c.Contact__c';
+import ACCOUNT_FIELD from '@salesforce/schema/Address__c.Account__c';
 
 import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Addresses_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
@@ -55,19 +67,19 @@ import MARK_FORMER from '@salesforce/label/c.Core_Address_MarkFormer';
 import MARK_UNDELIVERABLE from '@salesforce/label/c.Core_Address_MarkUndeliverable';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-const ADDRESS_OBJECT = 'Address__c';
+const ADDRESS_OBJECT = ADDRESS_SCHEMA.objectApiName;
 const FORM_FIELDS = [
-  'Type__c',
-  'Street__c',
-  'City__c',
-  'State__c',
-  'Postal_Code__c',
-  'Country__c',
-  'Seasonal_Start_Month__c',
-  'Seasonal_Start_Day__c',
-  'Seasonal_End_Month__c',
-  'Seasonal_End_Day__c'
-];
+  TYPE_FIELD,
+  STREET_FIELD,
+  CITY_FIELD,
+  STATE_FIELD,
+  POSTAL_CODE_FIELD,
+  COUNTRY_FIELD,
+  SEASONAL_START_MONTH_FIELD,
+  SEASONAL_START_DAY_FIELD,
+  SEASONAL_END_MONTH_FIELD,
+  SEASONAL_END_DAY_FIELD
+].map((field) => field.fieldApiName);
 const SEASONAL_TYPE = 'Seasonal';
 const STATUS_CURRENT = 'Current';
 const STATUS_FORMER = 'Former';
@@ -305,6 +317,7 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
 
   addressObject = ADDRESS_OBJECT;
   formFields = FORM_FIELDS;
+  isDefaultField = IS_DEFAULT_FIELD.fieldApiName;
   showForm = false;
   errorMessage;
 
@@ -390,7 +403,7 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
 
   /** The lookup that ties a new address to the record the panel is sitting on. */
   get ownerFieldName() {
-    return this.objectApiName === 'Contact' ? 'Contact__c' : 'Account__c';
+    return (this.objectApiName === 'Contact' ? CONTACT_FIELD : ACCOUNT_FIELD).fieldApiName;
   }
 
   /**

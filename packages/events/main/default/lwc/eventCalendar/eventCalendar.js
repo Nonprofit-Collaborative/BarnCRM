@@ -1,5 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import EVENT from '@salesforce/schema/Event__c';
+import SESSION from '@salesforce/schema/Event_Session__c';
 import LOCALE from '@salesforce/i18n/locale';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
 import FIRST_DAY_OF_WEEK from '@salesforce/i18n/firstDayOfWeek';
@@ -340,10 +342,11 @@ export default class EventCalendar extends NavigationMixin(LightningElement) {
   }
 
   handleOpen(event) {
-    const { recordId, object } = event.currentTarget.dataset;
+    const { recordId, kind } = event.currentTarget.dataset;
+    const objectApiName = (kind === 'session' ? SESSION : EVENT).objectApiName;
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
-      attributes: { recordId, objectApiName: object, actionName: 'view' }
+      attributes: { recordId, objectApiName, actionName: 'view' }
     });
   }
 

@@ -69,7 +69,7 @@ private class FundraisingHomeControllerTest {
 				'It opens the Open Batches list view.'
 			);
 			Assert.areEqual(
-				'Acknowledgments',
+				NamespaceUtil.qualify('Acknowledgments'),
 				tiles.get('giftsToThank').tabName,
 				'Gifts to thank open the Acknowledgment Queue page.'
 			);

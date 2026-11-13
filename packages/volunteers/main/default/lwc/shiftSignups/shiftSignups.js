@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import SIGNUP from '@salesforce/schema/Volunteer_Signup__c';
 import getPanel from '@salesforce/apex/VolunteerShiftSignupsController.getPanel';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
 import setStatus from '@salesforce/apex/VolunteerShiftSignupsController.setStatus';
@@ -298,7 +299,7 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.recordId,
-        objectApiName: 'Volunteer_Signup__c',
+        objectApiName: SIGNUP.objectApiName,
         actionName: 'view'
       }
     });
