@@ -3,6 +3,7 @@
  * the source is deployed without a namespace, so BarnCRM's own rows have no NamespacePrefix and
  * the lookups find them; a name BarnCRM does not ship finds nothing.
  */
+// runs-as: deploying user (the selector runs in system mode, so the runner's permissions do not change what it finds)
 @IsTest(testFor='ApexClass:SetupObjectSelector')
 private class SetupObjectSelectorTest {
 	@IsTest
