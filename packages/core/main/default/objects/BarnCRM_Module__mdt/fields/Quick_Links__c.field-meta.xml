@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Quick_Links__c</fullName>
+  <description>Optional. The module's links for the BarnCRM Home tab's Quick Links, separated by semicolons, each Target:Label:Line. Target is a tab API name unprefixed, or an object unprefixed with .new for its new record form. Shown while the module is installed and turned on (D-200 R7).</description>
+  <externalId>false</externalId>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Quick Links</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

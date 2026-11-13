@@ -34,4 +34,8 @@
     <field>Probe_Object__c</field>
     <value xsi:nil="true" />
   </values>
+  <values>
+    <field>Quick_Links__c</field>
+    <value xsi:type="xsd:string">Enrollment__c.new:Enroll:Start someone in a program.</value>
+  </values>
 </CustomMetadata>
