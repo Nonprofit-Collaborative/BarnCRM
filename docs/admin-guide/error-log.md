@@ -28,11 +28,13 @@ You will find it in three places:
 - **The Org Optimizer tab, Errors section**, the home for working through errors (a link can
   open it directly with `c__section=errors`; see [Org Optimizer](org-optimizer.md)). The
   **Error Log** card shows the count of new
-  entries and the five most recent, each with its message and where it came from, an
+  entries and the five most recent, each with its message and where it came from (and,
+  when it happened more than once, how many times, for example "12 times"), an
   **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs
   the Manage BarnCRM Settings permission (the BarnCRM Admin role).
 - **The Error Log tab** in the BarnCRM app. This is the full list, and you can sort
-  it, filter it, and build reports on it like any other list in Salesforce.
+  it, filter it, and build reports on it like any other list in Salesforce. Its list views
+  (**All Errors**, **My Error Log** and **New**) show each entry's **Occurrences**.
 
 Everyone with the BarnCRM Staff, BarnCRM Admin or BarnCRM Read Only role can read the
 Error Log entries. Only the BarnCRM Admin role can change an entry's status, and only the BarnCRM Admin role sees an
@@ -82,8 +84,10 @@ people who look after it. It is off until you switch it on.
 
 What the email says:
 
-- how many new entries arrived since the last digest, counting only the ones still marked
-  **New**;
+- how many new errors arrived since the last digest, counting only entries still marked
+  **New**. Each entry counts its **Occurrences**, so an entry that says 4 counts as 4. An
+  entry written before the last digest that has gained repeats since is counted again, with
+  all its occurrences;
 - how many came from each source (for example "Household naming: 4") and how many at each
   severity;
 - the 25 newest, each as its entry number with a link that opens it;

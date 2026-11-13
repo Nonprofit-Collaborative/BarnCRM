@@ -114,6 +114,7 @@
                                                 data-id="switch"
                                                 data-key={row.key}
                                                 label={row.switchLabel}
+                                                title={row.switchTitle}
                                                 disabled={busy}
                                                 onclick={handleSwitch}
                                             ></lightning-button>
@@ -123,6 +124,7 @@
                                                 data-id="run-now"
                                                 data-key={row.key}
                                                 label={labels.runNow}
+                                                title={row.runNowTitle}
                                                 disabled={busy}
                                                 onclick={handleRunNow}
                                             ></lightning-button>

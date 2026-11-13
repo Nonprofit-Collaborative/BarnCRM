@@ -477,18 +477,117 @@ public with sharing class HealthCheckService {
 			Limits.getQueryRows() > rowBudget;
 	}
 
-	/** One finding naming the checks that were left for another run. */
+	/** One finding naming, as an administrator reads them, the checks left for another run. */
 	private static Finding notChecked(List<String> keys) {
+		Map<String, String> labels = stepLabels();
+		List<String> names = new List<String>();
+		for (String key : keys) {
+			names.add(labels.containsKey(key) ? labels.get(key) : extensionLabel(key));
+		}
 		return new Finding(
 			'not_checked',
 			BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedTitle'),
 			String.format(
 				BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedDetail'),
-				new List<Object>{ keys.size(), String.join(keys, ', ') }
+				new List<Object>{ keys.size(), String.join(names, ', ') }
 			),
 			SEVERITY_WARNING,
 			CATEGORY_SETTINGS
 		);
+	}
+
+	/** Each of Core's own check steps by the name an administrator reads, keyed by step key. */
+	private static Map<String, String> stepLabels() {
+		return new Map<String, String>{
+			'org_shape' => BarnHelp.text('Core', 'Core_HealthCheck_Step_OrgShape'),
+			'coexistence_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_CoexistenceMode'),
+			'membership_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipMode'),
+			'membership_data' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipData'),
+			'household_creation' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_HouseholdCreation'
+			),
+			'npsp_upkeep_overlap' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_NpspUpkeepOverlap'
+			),
+			'native_households' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NativeHouseholds'),
+			'native_household_collision' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_NativeHouseholdCollision'
+			),
+			'mirror_module' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MirrorModule'),
+			'brand_visibility' => BarnHelp.text('Core', 'Core_HealthCheck_Step_BrandVisibility'),
+			'multi_currency' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MultiCurrency'),
+			'admin_role' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AdminRole'),
+			'users_without_access' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_UsersWithoutAccess'
+			),
+			'access_checks_need_admin' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_AccessChecks'
+			),
+			'automation' => BarnHelp.text('Core', 'Core_HealthCheck_Step_Automation'),
+			'field_history' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FieldHistory'),
+			'fiscal_year' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FiscalYear'),
+			'organization_record_type' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_OrganizationRecordType'
+			),
+			'error_log' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorLog'),
+			'error_digest' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorDigest'),
+			'people_without_household' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_PeopleWithoutHousehold'
+			),
+			'households_without_members' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_HouseholdsWithoutMembers'
+			),
+			'household_ownership_skew' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_HouseholdOwnershipSkew'
+			),
+			'relationships_without_person' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_RelationshipsWithoutPerson'
+			),
+			'affiliations_without_person' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_AffiliationsWithoutPerson'
+			),
+			'automation_switches' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_AutomationSwitches'
+			),
+			'import_templates' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ImportTemplates'),
+			'nightly_jobs' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NightlyJobs'),
+			'jobs_inactive_owner' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_JobsInactiveOwner'
+			),
+			'module_setup' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ModuleSetup'),
+			'match_keys' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MatchKeys')
+		};
+	}
+
+	/**
+	 * A module extension's checks by the module's name (`addressverification_extension` reads
+	 * "Address Verification module checks"), found from the class it is registered under. A key
+	 * that is neither is shown as it is.
+	 */
+	private static String extensionLabel(String key) {
+		for (String className : HealthCheckExtensions.EXTENSION_CLASSES) {
+			String module = className.removeEnd('HealthCheckExtension');
+			if ((module.toLowerCase() + '_extension').equals(key)) {
+				return String.format(
+					BarnHelp.text('Core', 'Core_HealthCheck_Step_Extension'),
+					new List<Object>{ String.join(module.splitByCharacterTypeCamelCase(), ' ') }
+				);
+			}
+		}
+		return key;
 	}
 
 	/**

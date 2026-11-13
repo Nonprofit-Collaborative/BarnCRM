@@ -25,6 +25,7 @@ private class ErrorLogControllerTest {
 			Assert.isNotNull(tile.recent[0].message, 'Each line shows the message.');
 			Assert.isNotNull(tile.recent[0].context, 'And where it came from.');
 			Assert.isNotNull(tile.recent[0].occurredAt, 'And when it happened.');
+			Assert.areEqual(1, tile.recent[0].occurrences, 'And how many times.');
 			Assert.isFalse(tile.newCountCapped, 'Under the cap the count is exact.');
 		}
 	}

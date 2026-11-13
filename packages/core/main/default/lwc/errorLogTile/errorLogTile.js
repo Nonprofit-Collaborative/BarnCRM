@@ -101,8 +101,30 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
     return this.newCount > 0 ? 'warning' : 'success';
   }
 
+  /**
+   * Each entry with how many times it happened (repeats fold onto one entry, R-E7) and, for a
+   * screen reader, button titles that name the entry they act on.
+   */
   get entries() {
-    return this.tile && this.tile.recent ? this.tile.recent : [];
+    const recent = this.tile && this.tile.recent ? this.tile.recent : [];
+    return recent.map((entry) => {
+      const row = entry.name || entry.context || '';
+      return {
+        ...entry,
+        timesText:
+          entry.occurrences > 1
+            ? helpText('Core', 'Core_ErrorLogTile_Times', entry.occurrences)
+            : '',
+        openTitle: helpText('Core', 'Core_ErrorLogTile_RowAction', this.labels.openEntry, row),
+        copyTitle: helpText('Core', 'Core_ErrorLogTile_RowAction', this.labels.copyBugReport, row),
+        acknowledgeTitle: helpText(
+          'Core',
+          'Core_ErrorLogTile_RowAction',
+          this.labels.acknowledge,
+          row
+        )
+      };
+    });
   }
 
   get hasEntries() {

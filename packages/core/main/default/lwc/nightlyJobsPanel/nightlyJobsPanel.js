@@ -116,6 +116,14 @@ export default class NightlyJobsPanel extends LightningElement {
       hasSwitch: step.hasSwitch === true,
       switchLabel: step.switchedOn ? TURN_OFF : TURN_ON,
       switchedOn: step.switchedOn === true,
+      // For a screen reader: which job each button acts on, since every row's reads the same.
+      switchTitle: helpText(
+        'Core',
+        'Core_NightlyJobs_RowAction',
+        step.switchedOn ? TURN_OFF : TURN_ON,
+        step.label
+      ),
+      runNowTitle: helpText('Core', 'Core_NightlyJobs_RowAction', RUN_NOW, step.label),
       canRunNow: step.canRunNow === true,
       summary: step.summary,
       missed: step.missed === true

@@ -36,6 +36,9 @@ public with sharing class ErrorLogController {
 		public String status { get; set; }
 		@AuraEnabled
 		public Datetime occurredAt { get; set; }
+		/** How many times this failure happened: repeats are folded onto one entry (R-E7). */
+		@AuraEnabled
+		public Integer occurrences { get; set; }
 	}
 
 	/**
@@ -155,6 +158,7 @@ public with sharing class ErrorLogController {
 			view.severity = entry.Severity__c;
 			view.status = entry.Status__c;
 			view.occurredAt = entry.Timestamp__c;
+			view.occurrences = entry.Occurrences__c == null ? 1 : entry.Occurrences__c.intValue();
 			tile.recent.add(view);
 		}
 		return tile;

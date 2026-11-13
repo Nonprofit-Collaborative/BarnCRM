@@ -43,17 +43,42 @@ private class AddressMatchKeyTest {
 	@IsTest
 	static void theFillMarksTheKeysFilledAndHealthCheckStopsAsking() {
 		System.runAs(TestUsers.admin()) {
+			// An address saved before the key existed: the trigger keys every save, so the test
+			// says one is left rather than making one.
+			AddressMatchKeyBatch.unfilledForTest = true;
 			Assert.isNotNull(
 				new AddressMatchKeyHandler.FilledCheck().run(),
 				'Not filled yet: Health Check offers the fill'
 			);
+			Assert.isFalse(
+				SettingsService.getSettings().Match_Keys_Filled__c == true,
+				'Not marked while one is left'
+			);
 
 			Test.startTest();
-			AddressMatchKeyBatch.run();
+			Assert.isNotNull(AddressMatchKeyBatch.run(), 'The fill starts');
+			AddressMatchKeyBatch.unfilledForTest = false;
 			Test.stopTest();
 
+			SettingsService.clearCaches();
 			Assert.isTrue(SettingsService.getSettings().Match_Keys_Filled__c, 'Marked filled');
 			Assert.isNull(new AddressMatchKeyHandler.FilledCheck().run(), 'Nothing to offer');
+		}
+	}
+
+	@IsTest
+	static void aNewOrgWithNothingToFillIsMarkedFilled() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isNull(
+				new AddressMatchKeyHandler.FilledCheck().run(),
+				'Every address got its key on save: nothing to offer'
+			);
+			SettingsService.clearCaches();
+			Assert.isTrue(
+				SettingsService.getSettings().Match_Keys_Filled__c,
+				'And the keys are marked filled, so matching reads by them'
+			);
+			Assert.isNull(AddressMatchKeyBatch.run(), 'Nothing to fill: no job starts');
 		}
 	}
 

@@ -1,6 +1,6 @@
 # BarnCRM Overview
 
-Applies to: BarnCRM landing/batch-d-i bf7f0eff1 (the integrated Batch D to I build, on top of v1.0 and Batch C). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-k d2bacab37 (the integrated Batch K build). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## What BarnCRM Is
 

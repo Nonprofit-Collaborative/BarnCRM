@@ -61,11 +61,24 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 		}
 	}
 
-	/** What the fill fixes: the one job, while the keys are not filled. */
+	/**
+	 * What the fill fixes: the one job, while some address still has no key. With none to fill
+	 * (a new org, where every address got its key on save) the keys are marked filled here, so
+	 * the finding does not stay forever and matching reads addresses by their keys.
+	 */
 	public static List<String> unfilledScope() {
-		return SettingsService.getSettings().Match_Keys_Filled__c == true
-			? new List<String>()
-			: new List<String>{ BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysFix') };
+		if (SettingsService.getSettings().Match_Keys_Filled__c == true) {
+			return new List<String>();
+		}
+		try {
+			if (AddressMatchKeyBatch.markFilledIfNoneUnfilled()) {
+				return new List<String>();
+			}
+		} catch (DmlException notSaved) {
+			// The mark is bookkeeping: unsaved, the next Health Check run tries again.
+			return new List<String>();
+		}
+		return new List<String>{ BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysFix') };
 	}
 
 	/**

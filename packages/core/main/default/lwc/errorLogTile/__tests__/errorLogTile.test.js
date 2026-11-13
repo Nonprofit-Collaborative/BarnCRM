@@ -6,9 +6,12 @@ import getBugReport from '@salesforce/apex/ErrorLogController.getBugReport';
 import Toast from 'lightning/toast';
 import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
 import { setHelpTextForTest } from 'c/barnHelpText';
+import { expectAccessible } from 'barn/a11y';
 
 setHelpTextForTest({
-  Core_ErrorLogTile_ReadOnly: 'You can read these entries but not change them.'
+  Core_ErrorLogTile_ReadOnly: 'You can read these entries but not change them.',
+  Core_ErrorLogTile_Times: '{0} times',
+  Core_ErrorLogTile_RowAction: '{0}: entry {1}'
 });
 
 const mockNavigate = jest.fn();
@@ -94,6 +97,26 @@ describe('c-error-log-tile', () => {
     expect(items.length).toBe(2);
     expect(items[0].textContent).toContain('could not be renamed');
     expect(items[0].textContent).toContain('Household naming');
+    expect(items[0].querySelector('[data-id="times"]')).toBeNull();
+  });
+
+  it('says how many times a repeated error happened and names each row for its buttons', async () => {
+    const element = createComponent();
+    getTile.emit({ ...TILE, recent: [{ ...ENTRY, occurrences: 12 }] });
+    await flush();
+
+    const item = element.shadowRoot.querySelector('[data-id="entry-list"] li');
+    expect(item.querySelector('[data-id="times"]').textContent).toContain('12 times');
+    expect(item.querySelector('.open-entry-button').title).toBe(
+      'c.Core_ErrorLogTile_OpenEntry: entry ERR-000001'
+    );
+    expect(item.querySelector('.copy-report-button').title).toBe(
+      'c.Core_ErrorLogTile_CopyBugReport: entry ERR-000001'
+    );
+    expect(item.querySelector('.acknowledge-button').title).toBe(
+      'c.Core_ErrorLogTile_Acknowledge: entry ERR-000001'
+    );
+    await expectAccessible(element);
   });
 
   it('marks an entry acknowledged and shows the updated count', async () => {

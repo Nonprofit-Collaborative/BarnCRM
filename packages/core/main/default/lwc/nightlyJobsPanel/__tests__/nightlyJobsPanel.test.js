@@ -4,6 +4,10 @@ import getPanel from '@salesforce/apex/NightlyJobsController.getPanel';
 import schedule from '@salesforce/apex/NightlyJobsController.schedule';
 import setStep from '@salesforce/apex/NightlyJobsController.setStep';
 import runStep from '@salesforce/apex/NightlyJobsController.runStep';
+import { setHelpTextForTest } from 'c/barnHelpText';
+import { expectAccessible } from 'barn/a11y';
+
+setHelpTextForTest({ Core_NightlyJobs_RowAction: '{0}: {1}' });
 
 jest.mock('@salesforce/apex/NightlyJobsController.setStep', () => ({ default: jest.fn() }), {
   virtual: true
@@ -108,6 +112,12 @@ describe('c-nightly-jobs-panel', () => {
 
     const turnOff = rows[1].querySelector('[data-id="switch"]');
     expect(turnOff.label).toBe('c.Core_NightlyJobs_TurnOff');
+    // Each row's buttons name the job they act on, for a screen reader.
+    expect(turnOff.title).toBe('c.Core_NightlyJobs_TurnOff: Installment top up');
+    expect(rows[1].querySelector('[data-id="run-now"]').title).toBe(
+      'c.Core_NightlyJobs_RunNow: Installment top up'
+    );
+    await expectAccessible(element);
     setStep.mockResolvedValue({
       ...PANEL,
       scheduled: true,

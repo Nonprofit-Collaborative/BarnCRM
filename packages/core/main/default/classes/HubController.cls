@@ -198,7 +198,42 @@ public with sharing class HubController {
 		return links;
 	}
 
-	/** One catalog entry as a link, or null when it is blank or its object cannot be created. */
+	/** Stands in for the tabs the running user can see, by name as written or qualified. */
+	@TestVisible
+	private static Set<String> visibleTabsOverride;
+
+	/** The tabs the running user can see, lower case, read once per transaction. */
+	private static Set<String> visibleTabs;
+
+	/**
+	 * Whether the running user can see the tab: it is in one of the apps Salesforce describes
+	 * for them (Schema.describeTabs), under its name as written or with this org's prefix.
+	 */
+	private static Boolean canSeeTab(String tab) {
+		if (visibleTabs == null) {
+			visibleTabs = new Set<String>();
+			if (visibleTabsOverride != null) {
+				for (String name : visibleTabsOverride) {
+					visibleTabs.add(name.toLowerCase());
+				}
+			} else {
+				for (Schema.DescribeTabSetResult app : Schema.describeTabs()) {
+					for (Schema.DescribeTabResult described : app.getTabs()) {
+						if (described.getName() != null) {
+							visibleTabs.add(described.getName().toLowerCase());
+						}
+					}
+				}
+			}
+		}
+		return visibleTabs.contains(tab.toLowerCase()) ||
+			visibleTabs.contains(NamespaceUtil.qualify(tab).toLowerCase());
+	}
+
+	/**
+	 * One catalog entry as a link, or null when it is blank, its object cannot be created, or
+	 * its tab is one the running user cannot see.
+	 */
 	@TestVisible
 	private static QuickLink quickLink(String entry) {
 		List<String> parts = entry.split(':', 3);
@@ -218,6 +253,9 @@ public with sharing class HubController {
 			}
 			link.objectApiName = described.getName();
 		} else {
+			if (!canSeeTab(target)) {
+				return null;
+			}
 			link.tab = target;
 		}
 		return link;

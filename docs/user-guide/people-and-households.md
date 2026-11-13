@@ -38,8 +38,10 @@ into a household.
 1. Open the household and click the **Connections** tab. Find the **Members** card.
 2. Click **Add Member**. The **Add Member** dialog opens.
 3. Either search under **Add Someone Already in Salesforce** (type in **Search by name**, at
-   least two letters from the start of a first or last name, and
-   choose the person), or fill in **Salutation**, **First Name** and **Last Name** (and,
+   least two letters from the start of a word in their name, and
+   choose the person; the search matches the start of words, so "gar" finds Ana Garcia but
+   "cia" does not, and someone saved in the last few minutes may not be found yet, because
+   Salesforce takes a few minutes to add a new record to search), or fill in **Salutation**, **First Name** and **Last Name** (and,
    if you like, **Email** and **Phone**) under **Or Add Someone New**. If the person you choose is in another
    household, a line names it, for example "Ana Garcia is in The Lopez Family and will move to
    this household." Click **Save** to confirm, or **Cancel** to leave them where they are.

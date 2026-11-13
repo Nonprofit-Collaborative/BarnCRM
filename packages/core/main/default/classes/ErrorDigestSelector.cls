@@ -9,9 +9,14 @@
 public with sharing class ErrorDigestSelector {
 	/** What arrived in one window, counted rather than copied. */
 	public class Window {
-		/** How many entries were counted, never more than the cap. */
+		/**
+		 * How many errors were counted: each entry's Occurrences, since repeats of one failure
+		 * are folded onto one entry (R-E7). Read from at most the cap of entries.
+		 */
 		public Integer total = 0;
-		/** True when there were more than the cap: `total` is then "at least". */
+		/** How many entries were read, never more than the cap. */
+		public Integer rows = 0;
+		/** True when there were more entries than the cap: `total` is then "at least". */
 		public Boolean capped = false;
 		public Map<String, Integer> bySource = new Map<String, Integer>();
 		public Map<String, Integer> bySeverity = new Map<String, Integer>();
@@ -27,25 +32,37 @@ public with sharing class ErrorDigestSelector {
 	 * A grouped count over the whole window would spend a query row per entry, three times
 	 * over, and an Error Log flooded past the transaction's allowance would stop every digest
 	 * for good. Reading `cap + 1` says whether there were more.
+	 *
+	 * Repeats of one failure are folded onto its open entry (R-E7), so an entry created before
+	 * the window can gain repeats inside it: an entry last changed in the window counts too,
+	 * and every count is the sum of Occurrences, not the number of rows. Without a field for
+	 * when each repeat arrived, such an entry counts all its Occurrences, earlier ones included.
 	 */
 	public static Window newEntries(Datetime after, Datetime upTo, Integer listed, Integer cap) {
 		Window window = new Window();
 		String statusNew = ErrorLogger.STATUS_NEW;
 		Integer readUpTo = cap + 1;
 		List<Error_Log__c> rows = [
-			SELECT Id, Name, Context__c, Severity__c, CreatedDate
+			SELECT Id, Name, Context__c, Severity__c, Occurrences__c, CreatedDate
 			FROM Error_Log__c
-			WHERE CreatedDate > :after AND CreatedDate <= :upTo AND Status__c = :statusNew
+			WHERE
+				Status__c = :statusNew
+				AND ((CreatedDate > :after
+				AND CreatedDate <= :upTo)
+				OR (LastModifiedDate > :after
+				AND LastModifiedDate <= :upTo))
 			WITH USER_MODE
-			ORDER BY CreatedDate DESC, Name DESC
+			ORDER BY LastModifiedDate DESC, Name DESC
 			LIMIT :readUpTo
 		];
 		window.capped = rows.size() > cap;
 		for (Integer i = 0; i < rows.size() && i < cap; i++) {
 			Error_Log__c entry = rows[i];
-			window.total++;
-			increment(window.bySource, entry.Context__c);
-			increment(window.bySeverity, String.valueOf(entry.Severity__c));
+			Integer times = occurrences(entry);
+			window.rows++;
+			window.total += times;
+			increment(window.bySource, entry.Context__c, times);
+			increment(window.bySeverity, String.valueOf(entry.Severity__c), times);
 			if (i < listed) {
 				window.newest.add(entry);
 			}
@@ -53,8 +70,16 @@ public with sharing class ErrorDigestSelector {
 		return window;
 	}
 
-	private static void increment(Map<String, Integer> counts, String key) {
-		counts.put(key, counts.containsKey(key) ? counts.get(key) + 1 : 1);
+	/** An entry's Occurrences, at least 1: an entry written before R-E7 holds none. */
+	private static Integer occurrences(Error_Log__c entry) {
+		return entry.Occurrences__c == null ||
+			entry.Occurrences__c < 1
+			? 1
+			: entry.Occurrences__c.intValue();
+	}
+
+	private static void increment(Map<String, Integer> counts, String key, Integer times) {
+		counts.put(key, counts.containsKey(key) ? counts.get(key) + times : times);
 	}
 
 	/** The active internal users among the given Ids, in the order given. */

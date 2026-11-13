@@ -177,12 +177,14 @@ private class HubControllerTest {
 	static void offersNewPersonAndQuickLinksOnlyFromModulesThatAreHere() {
 		System.runAs(TestUsers.admin()) {
 			SetupAssistantTestExtension.useNone();
+			HubController.visibleTabsOverride = new Set<String>{ 'Some_Tab' };
 			ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
 				// Core's own object stands in for a module's probe object, so the row is here.
 				new BarnCRM_Module__mdt(
 					DeveloperName = 'Here',
 					Probe_Object__c = 'Import_Batch__c',
-					Quick_Links__c = 'Some_Tab:Do It:One line.;Import_Batch__c.new:Start One'
+					Quick_Links__c = 'Some_Tab:Do It:One line.;Import_Batch__c.new:Start One;' +
+						'Hidden_Tab:Not Theirs:A tab this person cannot see.'
 				),
 				new BarnCRM_Module__mdt(
 					DeveloperName = 'Absent',
@@ -218,6 +220,10 @@ private class HubControllerTest {
 			Assert.isNull(HubController.quickLink(''), 'Blank');
 			Assert.isNull(HubController.quickLink('Only_A_Target'), 'No label');
 			Assert.isNull(HubController.quickLink('No_Such_Object__c.new:New'), 'No such object');
+			Assert.isNull(
+				HubController.quickLink('No_Such_Tab_Anywhere:Open'),
+				'A tab the person cannot see'
+			);
 		}
 	}
 

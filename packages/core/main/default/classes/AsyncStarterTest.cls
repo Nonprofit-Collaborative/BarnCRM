@@ -66,4 +66,61 @@ private class AsyncStarterTest {
 			);
 		}
 	}
+
+	/**
+	 * A start Salesforce never allows, such as a batch from a batch execute or a future method,
+	 * is a fault in the code: it is not reported as a busy org, and its real message is logged
+	 * as an Error. A refusal for want of room is still busy.
+	 */
+	@IsTest
+	static void aRefusalThatIsNotABusyOrgKeepsItsRealMessage() {
+		System.runAs(TestUsers.admin()) {
+			String notAllowed =
+				'Database.executeBatch cannot be called from a batch start, batch execute, ' +
+				'or future method.';
+			AsyncStarter.refusalForTest = new AsyncException(notAllowed);
+			Exception batchThrown;
+			Exception queueThrown;
+			Exception capacityThrown;
+
+			Test.startTest();
+			try {
+				AsyncStarter.batch(new AsyncStarterTestBatch(), 200, 'AsyncStarterFault');
+			} catch (Exception thrown) {
+				batchThrown = thrown;
+			}
+			try {
+				AsyncStarter.queue(new NothingQueued(), 'AsyncStarterFault');
+			} catch (Exception thrown) {
+				queueThrown = thrown;
+			}
+			AsyncStarter.refusalForTest = new AsyncException(
+				'You have exceeded the limit of 100 jobs in the flex queue.'
+			);
+			try {
+				AsyncStarter.batch(new AsyncStarterTestBatch(), 200, 'AsyncStarterFull');
+			} catch (Exception thrown) {
+				capacityThrown = thrown;
+			}
+			Test.stopTest();
+
+			Assert.isInstanceOfType(batchThrown, AsyncException.class, 'Rethrown as it is');
+			Assert.areEqual(notAllowed, batchThrown.getMessage(), 'With its real message');
+			Assert.isInstanceOfType(queueThrown, AsyncException.class, 'A queued job too');
+			Assert.isInstanceOfType(
+				capacityThrown,
+				AsyncStarter.BusyException.class,
+				'A full queue is still a busy org'
+			);
+			List<Error_Log__c> logged = [
+				SELECT Message__c, Severity__c
+				FROM Error_Log__c
+				WHERE Context__c = 'AsyncStarterFault'
+				WITH SYSTEM_MODE
+			];
+			Assert.isFalse(logged.isEmpty(), 'The fault is logged');
+			Assert.areEqual(ErrorLogger.SEVERITY_ERROR, logged[0].Severity__c, 'As an Error');
+			Assert.areEqual(notAllowed, logged[0].Message__c, 'With the real message');
+		}
+	}
 }

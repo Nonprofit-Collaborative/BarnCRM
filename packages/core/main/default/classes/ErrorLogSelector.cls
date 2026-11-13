@@ -25,6 +25,7 @@ public with sharing class ErrorLogSelector {
 				Message__c,
 				Severity__c,
 				Status__c,
+				Occurrences__c,
 				Object_Name__c,
 				Record_Reference__c
 			FROM Error_Log__c

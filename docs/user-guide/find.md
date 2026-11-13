@@ -19,6 +19,11 @@ A colleague may see more or fewer rows than you for the same query.
 
 You should see: the record open in its own tab (in the **BarnCRM** app).
 
+The name searches in BarnCRM's own screens (such as **Add Member** on a household) match the
+start of words: "gar" finds Ana Garcia, "cia" does not. A record saved in the last few minutes
+may not be found yet, by them or by global search, because Salesforce takes a few minutes to
+add a new record to search. Open it from a list view in the meantime.
+
 ## To Use a List View
 
 1. Open the **Households**, **Organizations** or **Contacts** tab.

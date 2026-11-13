@@ -9,7 +9,41 @@
  * or a field value, so the text is safe to paste into a public GitHub issue.
  */
 
+// A candidate is any ALL_CAPS token with an underscore; only the ones shaped like a Salesforce
+// status code are kept, because a value someone typed in capitals (ANA_ORTIZ) is one too.
 const ERROR_CODE = /\b[A-Z][A-Z0-9]+(?:_[A-Z0-9]+){1,}\b/g;
+const CODE_ENDINGS = ['_EXCEPTION', '_ERROR'];
+const CODE_STARTS = [
+  'INVALID_',
+  'FIELD_',
+  'REQUIRED_',
+  'DUPLICATE_',
+  'UNABLE_',
+  'CANNOT_',
+  'ENTITY_',
+  'STORAGE_',
+  'LIMIT_',
+  'INSUFFICIENT_'
+];
+const KNOWN_CODES = new Set([
+  'MALFORMED_ID',
+  'STRING_TOO_LONG',
+  'NUMBER_OUTSIDE_VALID_RANGE',
+  'MIXED_DML_OPERATION',
+  'CIRCULAR_DEPENDENCY',
+  'REQUEST_RUNNING_TOO_LONG',
+  'TOO_MANY_ENUM_VALUE'
+]);
+
+/** Whether a token is a Salesforce status code rather than a value written in capitals. */
+export function isStatusCode(token) {
+  return (
+    KNOWN_CODES.has(token) ||
+    CODE_ENDINGS.some((ending) => token.endsWith(ending)) ||
+    CODE_STARTS.some((start) => token.startsWith(start))
+  );
+}
+
 const EXCEPTION_TYPE = /\b(?:[A-Z]\w*\.)*[A-Z]\w*Exception\b/g;
 const STACK_LINE = /^\s*((?:Class|Trigger|AnonymousBlock)\.[\w.]+: line \d+, column \d+)\s*$/gm;
 const MAX_STACK_LINES = 15;
@@ -26,7 +60,7 @@ export function safeParts(technicalDetail) {
     stack.push(match[1]);
   }
   return {
-    codes: unique(text.match(ERROR_CODE) || []),
+    codes: unique((text.match(ERROR_CODE) || []).filter(isStatusCode)),
     exceptions: unique(text.match(EXCEPTION_TYPE) || []),
     stack: unique(stack).slice(0, MAX_STACK_LINES)
   };

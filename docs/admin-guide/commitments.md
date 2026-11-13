@@ -192,8 +192,8 @@ Skipped and deletes nothing.
     already marked Overdue is here, with its commitment, its donor, and what was expected.
     A payment is marked Overdue by the overdue pass, so this list fills up the first night
     after you schedule the nightly jobs (see "Switching the nightly jobs on"). If the list
-    is empty and you have just switched the jobs on, choose **Run the Jobs Now** on the
-    Nightly jobs page rather than waiting.
+    is empty and you have just switched the jobs on, choose **Run Now** on the installments
+    overdue row of the **Nightly Jobs** panel (BarnCRM Settings, General) rather than waiting.
 15. Switch to **Upcoming 30 Days** to see what should arrive next, which is the list Jen
     uses when she reconciles the bank statement.
 

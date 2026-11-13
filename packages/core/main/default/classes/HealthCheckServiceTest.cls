@@ -1053,13 +1053,33 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(true, false, false, false);
 			HealthCheckService.queryBudget = -1;
+			HealthCheckExtensions.overrides.put(
+				'AddressVerificationHealthCheckExtension',
+				new FakeExtension(new List<HealthCheckService.Finding>())
+			);
 
 			List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
 			Assert.areEqual(1, findings.size(), 'Only the not checked finding: ' + findings);
 			HealthCheckService.Finding skipped = find(findings, 'not_checked');
 			Assert.isNotNull(skipped, 'The skipped checks are reported');
-			Assert.isTrue(skipped.detail.contains('org_shape'), 'And named: ' + skipped.detail);
+			Assert.isTrue(
+				skipped.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_Step_OrgShape')),
+				'And named as an administrator reads them: ' + skipped.detail
+			);
+			Assert.isFalse(
+				skipped.detail.contains('org_shape') ||
+				skipped.detail.contains('household_ownership_skew'),
+				'Never by internal key: ' + skipped.detail
+			);
+			Assert.isTrue(
+				skipped.detail.contains('Address Verification'),
+				'A module extension by its module name: ' + skipped.detail
+			);
+			Assert.isFalse(
+				skipped.detail.contains('_extension'),
+				'Not by its key: ' + skipped.detail
+			);
 			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, skipped.severity);
 		}
 	}

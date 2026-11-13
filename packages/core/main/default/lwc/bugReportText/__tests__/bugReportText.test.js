@@ -1,4 +1,4 @@
-import { bugReportText, safeParts, utcMinute } from 'c/bugReportText';
+import { bugReportText, isStatusCode, safeParts, utcMinute } from 'c/bugReportText';
 
 const WORDS = {
   heading: 'BarnCRM bug report.',
@@ -61,6 +61,26 @@ describe('c/bugReportText', () => {
     expect(text).toContain('Error codes: none');
     expect(text).toContain('Technical detail: not included.');
     expect(bugReportText(undefined, WORDS)).toContain('Where: none');
+  });
+
+  it('keeps only Salesforce status codes, never a value written in capitals', () => {
+    const parts = safeParts(
+      'first error: INVALID_EMAIL_ADDRESS, STRING_TOO_LONG, UNABLE_TO_LOCK_ROW, ' +
+        'REQUIRED_FIELD_MISSING, INSUFFICIENT_ACCESS_OR_READONLY, LIMIT_EXCEEDED, ' +
+        'APEX_ERROR for ANA_ORTIZ at ACME_CORP_HQ with PO_12345'
+    );
+    expect(parts.codes).toEqual([
+      'INVALID_EMAIL_ADDRESS',
+      'STRING_TOO_LONG',
+      'UNABLE_TO_LOCK_ROW',
+      'REQUIRED_FIELD_MISSING',
+      'INSUFFICIENT_ACCESS_OR_READONLY',
+      'LIMIT_EXCEEDED',
+      'APEX_ERROR'
+    ]);
+    for (const value of ['ANA_ORTIZ', 'ACME_CORP_HQ', 'PO_12345']) {
+      expect(isStatusCode(value)).toBe(false);
+    }
   });
 
   it('gives no time for a missing or unreadable one', () => {

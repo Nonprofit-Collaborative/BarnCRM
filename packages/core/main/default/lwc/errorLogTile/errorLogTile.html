@@ -60,11 +60,15 @@
                                 hour="2-digit"
                                 minute="2-digit"
                             ></lightning-formatted-date-time>
+                            <template lwc:if={entry.timesText}>
+                                <span data-id="times"> {entry.timesText}</span>
+                            </template>
                         </p>
                         <lightning-button
                             class="open-entry-button"
                             data-entry={entry.recordId}
                             label={labels.openEntry}
+                            title={entry.openTitle}
                             variant="base"
                             onclick={handleOpenEntry}
                         ></lightning-button>
@@ -72,6 +76,7 @@
                             class="copy-report-button slds-var-m-left_x-small"
                             data-entry={entry.recordId}
                             label={labels.copyBugReport}
+                            title={entry.copyTitle}
                             variant="base"
                             onclick={handleCopyBugReport}
                         ></lightning-button>
@@ -79,6 +84,7 @@
                             class="acknowledge-button slds-var-m-left_x-small"
                             data-entry={entry.recordId}
                             label={labels.acknowledge}
+                            title={entry.acknowledgeTitle}
                             variant="neutral"
                             disabled={actionsDisabled}
                             onclick={handleAcknowledge}

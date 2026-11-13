@@ -44,7 +44,6 @@ editionSetting
 eligibilityRules
 engagementMeter
 errorDigestJob
-errorLogTile
 eventAgenda
 eventApplications
 eventAppointments
@@ -152,7 +151,6 @@ matchSourceModal
 membershipActions
 migrationAssistant
 moduleManager
-nightlyJobsPanel
 npcHouseholdConversion
 npspHouseholdAdoption
 opportunityMirror

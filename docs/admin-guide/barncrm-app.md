@@ -243,7 +243,8 @@ Admin role.
     **Open the Module Manager** to turn a module on or off.
 11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Import a
     File, each installed module's links (Enter a Gift, Log Hours, Enroll) or BarnCRM Settings
-    without going back to the app launcher.
+    without going back to the app launcher. A module link to a tab shows only to someone who
+    can see that tab.
 12. Click **New Person** under the welcome to add someone; the household is made for them.
     Once setup is finished, the welcome reads "Find someone, add someone new, or pick up
     where you left off."

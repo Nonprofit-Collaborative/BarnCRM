@@ -8,16 +8,44 @@
  * sets the same key on the save. The other address automations see no other field change.
  */
 public without sharing class AddressMatchKeyBatch implements Database.Batchable<SObject> {
-	private static final Integer CHUNK_SIZE = 2000;
+	/** Each address save runs every Address trigger handler, so chunks stay at the usual 200. */
+	private static final Integer CHUNK_SIZE = 200;
 	private static final String CONTEXT = 'AddressMatchKeyBatch';
 
-	/** Starts filling the keys, or refuses when the org is busy (AsyncStarter). */
+	/** Test seam: answers whether any address is unfilled, without one the trigger leaves so. */
+	@TestVisible
+	private static Boolean unfilledForTest;
+
+	/**
+	 * Starts filling the keys, or refuses when the org is busy (AsyncStarter). With nothing to
+	 * fill, as in a new org where every address got its key on save, the keys are marked filled
+	 * at once and no job starts: returns null.
+	 */
 	public static Id run() {
+		if (markFilledIfNoneUnfilled()) {
+			return null;
+		}
 		return AsyncStarter.batch(new AddressMatchKeyBatch(), CHUNK_SIZE, CONTEXT);
+	}
+
+	/**
+	 * Marks the keys filled when no address is left without one, so matching reads addresses
+	 * by their keys. Returns whether there was nothing left to fill. Addresses whose save keeps
+	 * failing stay unfilled, and the keys stay unmarked, as before.
+	 */
+	public static Boolean markFilledIfNoneUnfilled() {
+		if (anyUnfilled()) {
+			return false;
+		}
+		SettingsService.saveBookkeeping(new Map<String, Object>{ 'Match_Keys_Filled__c' => true });
+		return true;
 	}
 
 	/** Whether any address with a street and postal code still has no key. */
 	public static Boolean anyUnfilled() {
+		if (unfilledForTest != null) {
+			return unfilledForTest;
+		}
 		return [
 				SELECT COUNT()
 				FROM Address__c
@@ -62,10 +90,6 @@ public without sharing class AddressMatchKeyBatch implements Database.Batchable<
 	}
 
 	public void finish(Database.BatchableContext context) {
-		if (!anyUnfilled()) {
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ 'Match_Keys_Filled__c' => true }
-			);
-		}
+		markFilledIfNoneUnfilled();
 	}
 }

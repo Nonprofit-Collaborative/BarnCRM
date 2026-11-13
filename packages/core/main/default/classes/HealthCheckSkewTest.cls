@@ -49,4 +49,31 @@ private class HealthCheckSkewTest {
 			);
 		}
 	}
+
+	/** The owner seen most in the sample is counted first, whatever order the User query has. */
+	@IsTest
+	static void theMostSampledOwnersAreCountedFirst() {
+		User admin = TestUsers.admin();
+		User other;
+		User noRole;
+		System.runAs(new User(Id = UserInfo.getUserId())) {
+			Id roleId = [SELECT UserRoleId FROM User WHERE Id = :admin.Id WITH SYSTEM_MODE]
+			.UserRoleId;
+			other = TestDataFactory.createUser('SkewOther', new List<String>());
+			update as system new User(Id = other.Id, UserRoleId = roleId);
+			noRole = TestDataFactory.createUser('SkewNoRole', new List<String>());
+		}
+		System.runAs(admin) {
+			List<User> first = HealthCheckSkew.byMostSampled(
+				new Map<Id, Integer>{ admin.Id => 2, other.Id => 9, noRole.Id => 50 }
+			);
+			List<User> second = HealthCheckSkew.byMostSampled(
+				new Map<Id, Integer>{ admin.Id => 9, other.Id => 2 }
+			);
+
+			Assert.areEqual(2, first.size(), 'Only owners with a role: ' + first);
+			Assert.areEqual(other.Id, first[0].Id, 'The most sampled owner first.');
+			Assert.areEqual(admin.Id, second[0].Id, 'Whichever owner that is.');
+		}
+	}
 }

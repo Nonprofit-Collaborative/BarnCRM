@@ -79,13 +79,9 @@ public with sharing class HealthCheckSkew {
 			sampled.put(owner, sampled.containsKey(owner) ? sampled.get(owner) + 1 : 1);
 		}
 		Integer counted = 0;
-		for (User owner : [
-			SELECT Id, Name
-			FROM User
-			WHERE Id IN :sampled.keySet() AND UserRoleId != NULL
-			WITH SYSTEM_MODE
-			LIMIT 50
-		]) {
+		// The owners most often seen in the sample are the likeliest skewed, so they are
+		// counted first, not whichever the User query happens to return first.
+		for (User owner : byMostSampled(sampled)) {
 			if (counted >= OWNERS_COUNTED || !rowsToSpare()) {
 				break;
 			}
@@ -117,6 +113,42 @@ public with sharing class HealthCheckSkew {
 			}
 		}
 		return null;
+	}
+
+	/** The sampled owners who hold a role, the one with the most sampled records first. */
+	@TestVisible
+	private static List<User> byMostSampled(Map<Id, Integer> sampled) {
+		List<SampledOwner> ranked = new List<SampledOwner>();
+		for (User owner : [
+			SELECT Id, Name
+			FROM User
+			WHERE Id IN :sampled.keySet() AND UserRoleId != NULL
+			WITH SYSTEM_MODE
+			LIMIT :SAMPLE_SIZE
+		]) {
+			ranked.add(new SampledOwner(owner, sampled.get(owner.Id)));
+		}
+		ranked.sort();
+		List<User> owners = new List<User>();
+		for (SampledOwner entry : ranked) {
+			owners.add(entry.owner);
+		}
+		return owners;
+	}
+
+	/** An owner and how many of the sampled records they own, sorted most first. */
+	private class SampledOwner implements Comparable {
+		private final User owner;
+		private final Integer count;
+
+		private SampledOwner(User owner, Integer count) {
+			this.owner = owner;
+			this.count = count == null ? 0 : count;
+		}
+
+		public Integer compareTo(Object other) {
+			return ((SampledOwner) other).count - count;
+		}
 	}
 
 	private static Boolean rowsToSpare() {
