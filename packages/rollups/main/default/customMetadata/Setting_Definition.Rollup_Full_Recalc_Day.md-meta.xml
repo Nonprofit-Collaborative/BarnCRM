@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Night of the full recalculation</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Full_Recalc_Day__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Rollup_Settings__c</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Picklist</value></values>
+    <values><field>Picklist_Values__c</field><value xsi:type="xsd:string">Sunday:Sunday;Monday:Monday;Tuesday:Tuesday;Wednesday:Wednesday;Thursday:Thursday;Friday:Friday;Saturday:Saturday;Every_Night:Every night</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The night the nightly run recalculates every total over every record. The other nights it recalculates only the totals that can have changed since the run before. Every night does the full recalculation each night, which takes longer on a large org. Default Sunday.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">25</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+</CustomMetadata>

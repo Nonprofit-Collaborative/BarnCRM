@@ -112,6 +112,8 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		public Boolean failedIdsComplete = true;
 		/** Who started the run from a page, told when it ends; null for the nightly run (Q-04). */
 		public Id notifyUserId = JobNotifier.starter();
+		/** True for the nightly run's full night, which stores what it covered (D-200 P1). */
+		public Boolean coversTheNight = false;
 	}
 
 	@TestVisible
@@ -148,6 +150,14 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 	 * @return the first pass's job, the running job, or null when nothing started
 	 */
 	public static Id begin(List<Rollup_Definition__c> definitions) {
+		return begin(definitions, false);
+	}
+
+	/**
+	 * As above. With `coversTheNight`, a run that ends with no chunk stopped stores its start as
+	 * the time the nightly run has covered every change up to (`RollupNightlyBatch`, D-200 P1).
+	 */
+	public static Id begin(List<Rollup_Definition__c> definitions, Boolean coversTheNight) {
 		if (RollupService.isTurnedOff()) {
 			ErrorLogger.logMessage(
 				BarnHelp.text('Rollups', 'Core_Rollups_FullRunTurnedOff'),
@@ -180,6 +190,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		if (first == null) {
 			return null;
 		}
+		first.run.coversTheNight = coversTheNight == true;
 		Id started = Database.executeBatch(first, first.scope);
 		startedHere.add(started);
 		return started;
@@ -536,6 +547,9 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		} catch (Exception notStamped) {
 			// A definition deleted while the run was going; the totals are written either way.
 			ErrorLogger.log(notStamped, LOG_CONTEXT);
+		}
+		if (this.run.coversTheNight && this.run.stoppedChunks == 0) {
+			RollupNightlyBatch.markCovered(this.run.startedAt);
 		}
 		if (this.run.failed > 0 || this.run.stoppedChunks > 0) {
 			ErrorLogger.logMessage(

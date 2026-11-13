@@ -685,3 +685,18 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 3 | Open **Error Log**. | No new entries from the save. |
 
 **Cleanup:** delete the test gift.
+
+## T-RB-52: The Nightly Run Recalculates Every Record Once a Week
+
+**Purpose:** confirm the full recalculation night setting, the Rollups page line, and that other nights recalculate only what changed.
+**Prerequisites:** Giving with sample data; the nightly run scheduled; admin user with Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Rollups**. | **Night of the full recalculation** shows **Sunday** with a **Default** badge; the list offers Sunday to Saturday and **Every night**. |
+| 2 | Open the **Rollup Builder** tab. | Under the nightly schedule line: "The nightly run recalculates every Every night and Both total over every record on Sunday nights ...". |
+| 3 | Set the night to tomorrow's day of the week; after tomorrow's run, open **Apex Jobs** in Setup. | The night's rollup job is **RollupFullRecalcBatch**. |
+| 4 | Set the night to another day and add a gift during the day. After the next night's run, open **Apex Jobs**. | The night's rollup job is **RollupNightlyBatch**; the gift's donor shows the new total; donors whose gifts did not change keep their earlier **Rollups last calculated** time. |
+| 5 | Choose **Every night** and save; reopen the Rollup Builder. | The line says each nightly run recalculates every total over every record. |
+
+**Cleanup:** set the night back to Sunday.

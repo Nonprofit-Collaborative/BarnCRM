@@ -54,6 +54,7 @@ into six kinds:
 | RollupClearBatch | Org job | Blanks a rollup field on every target record | ADR-0021 |
 | RollupDependents | Org figure | Source rows under a parent whose attribute changed | ADR-0021 |
 | RollupFullRecalcBatch | Org job | Every record of a target entity, and the queue | ADR-0021 |
+| RollupNightlyBatch | Org job | Source records changed or deleted since the last nightly run, the pause log, and the queue | ADR-0021 |
 | RollupLargeParentBatch | Org job | Every source row of a parent too large for one job | ADR-0021, ADR-0116 |
 | RollupQueue | Upkeep | The engine's own queue, written by any save | ADR-0021 |
 | RollupRecalcErrorHandler | Upkeep | The failed batch's records, handed back to the queue | ADR-0021 |

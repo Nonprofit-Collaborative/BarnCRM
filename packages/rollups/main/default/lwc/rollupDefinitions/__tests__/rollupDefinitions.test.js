@@ -23,7 +23,9 @@ setHelpTextForTest({
   Core_Rollups_RecalculateStarted: 'Recalculation started.',
   Core_Rollups_ScheduleActive: 'Nightly recalculation is scheduled for {0}.',
   Core_Rollups_LargeParentHours: 'At most once every {0} hours.',
-  Core_Rollups_LargeParentOneHour: 'At most once an hour.'
+  Core_Rollups_LargeParentOneHour: 'At most once an hour.',
+  Core_Rollups_NightlyEveryNight: 'Every record, every night.',
+  Core_Rollups_NightlyWeekly: 'Every record on {0} nights.'
 });
 
 jest.mock(
@@ -371,6 +373,22 @@ describe('c-rollup-definitions', () => {
     expect(message().textContent).toBe('At most once every 4 hours.');
 
     getPage.emit({ ...PAGE, largeParentHours: 0 });
+    await flush();
+    expect(message()).toBeNull();
+  });
+
+  it('says which night recalculates every record, only while scheduled', async () => {
+    const element = createComponent();
+    getPage.emit({ ...PAGE, fullRecalcDay: 'Sunday' });
+    await flush();
+    const message = () => element.shadowRoot.querySelector('[data-id="nightly-scope-message"]');
+    expect(message().textContent).toBe('Every record on Sunday nights.');
+
+    getPage.emit({ ...PAGE, fullRecalcDay: 'Every_Night' });
+    await flush();
+    expect(message().textContent).toBe('Every record, every night.');
+
+    getPage.emit({ ...PAGE, scheduled: false, fullRecalcDay: 'Sunday' });
     await flush();
     expect(message()).toBeNull();
   });
