@@ -1172,6 +1172,7 @@ core/RollupFilterParser.cls | public static List<TextEquality> textEqualities(St
 core/RollupFilterParser.cls | public static Set<String> fieldsOf(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String,Schema.SObjectType)
+core/SampleDataFile.cls | public class SampleDataFile
 core/SampleDataModule.cls | public interface SampleDataModule
 core/SampleDataModules.cls | public class SampleDataModules
 core/SampleDataModules.cls | public static void removeAfter(String)
