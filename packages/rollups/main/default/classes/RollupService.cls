@@ -755,14 +755,15 @@ public with sharing class RollupService {
 	}
 
 	/**
-	 * Starts the nightly run now: every active Scheduled and Both definition, over every record
-	 * (R-R4). The nightly job calls this.
+	 * Starts the nightly run now for every active Scheduled and Both definition (R-R4): over
+	 * every record on the night of the full recalculation, otherwise over what can have changed
+	 * since the last run (`RollupNightlyBatch`, D-200 P1). The nightly job calls this.
 	 *
 	 * @return the batch job started, the full run still going when there is one (R-R14), or
 	 *         null when nothing started
 	 */
 	public static Id startNightlyRun() {
-		return RollupFullRecalcBatch.begin(RollupSelector.selectActiveForModes(SCHEDULED_MODES));
+		return RollupNightlyBatch.begin(RollupSelector.selectActiveForModes(SCHEDULED_MODES));
 	}
 
 	/**

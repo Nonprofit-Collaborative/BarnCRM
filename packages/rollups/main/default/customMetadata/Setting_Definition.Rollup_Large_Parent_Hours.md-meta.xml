@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Hours between large record runs</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Large_Parent_Hours__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Rollup_Settings__c</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Number</value></values>
+    <values><field>Min_Value__c</field><value xsi:type="xsd:double">0</value></values>
+    <values><field>Max_Value__c</field><value xsi:type="xsd:double">24</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">A record with very many records under it, such as a fund every gift is allocated to, has its totals recalculated in a background job of its own. This is the fewest hours between two of those jobs: saves made in between wait and are counted together in the next one. 0 recalculates as soon as possible. Default 1.</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">rollups.md</value></values>
+</CustomMetadata>

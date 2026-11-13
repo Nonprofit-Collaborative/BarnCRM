@@ -64,6 +64,7 @@ core/AutomationControl.cls | public static List<String> missingDefaultNames()
 core/AutomationControl.cls | public static Set<Integer> allowedPauseHours()
 core/AutomationControl.cls | public static String pausedBy()
 core/AutomationControl.cls | public static final Integer LONGEST_PAUSE_HOURS
+core/AutomationControl.cls | public static final String PAUSE_SETTING_NAME
 core/AutomationControl.cls | public static void bypass(String)
 core/AutomationControl.cls | public static void catchUp(Boolean)
 core/AutomationControl.cls | public static void clearAllBypasses()
@@ -1166,6 +1167,7 @@ core/RollupFilterParser.cls | public class RollupFilterException
 core/RollupFilterParser.cls | public class RollupFilterParser
 core/RollupFilterParser.cls | public class TextEquality
 core/RollupFilterParser.cls | public static Boolean usesRelativeDate(String)
+core/RollupFilterParser.cls | public static Integer dayCount(Object)
 core/RollupFilterParser.cls | public static List<TextEquality> textEqualities(String,Schema.SObjectType)
 core/RollupFilterParser.cls | public static Set<String> fieldsOf(String)
 core/RollupFilterParser.cls | public static String toWhereClause(String)
@@ -1315,9 +1317,11 @@ core/TriggerDispatcher.cls | public class TriggerDispatcher
 core/TriggerDispatcher.cls | public class TriggerDispatcherException
 core/TriggerDispatcher.cls | public interface Deferred
 core/TriggerDispatcher.cls | public static void afterHandlers(Deferred)
+core/TriggerDispatcher.cls | public static void endRollupWrite()
 core/TriggerDispatcher.cls | public static void run(String)
 core/TriggerDispatcher.cls | public static void run(String,Context)
 core/TriggerDispatcher.cls | public static void run(TriggerHandler,Context)
+core/TriggerDispatcher.cls | public static void startRollupWrite()
 core/TriggerHandler.cls | public List<SObject> newRecords()
 core/TriggerHandler.cls | public List<SObject> oldRecords()
 core/TriggerHandler.cls | public Map<Id,SObject> newRecordsById()

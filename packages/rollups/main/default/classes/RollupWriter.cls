@@ -132,7 +132,14 @@ public without sharing class RollupWriter {
 		if (toSave.isEmpty()) {
 			return result;
 		}
-		List<Database.SaveResult> saved = Database.update(toSave, false, AccessLevel.SYSTEM_MODE);
+		// Only the automations that read totals run on this update (D-200 P10).
+		TriggerDispatcher.startRollupWrite();
+		List<Database.SaveResult> saved;
+		try {
+			saved = Database.update(toSave, false, AccessLevel.SYSTEM_MODE);
+		} finally {
+			TriggerDispatcher.endRollupWrite();
+		}
 		for (Integer i = 0; i < saved.size(); i++) {
 			if (saved[i].isSuccess()) {
 				result.written.add(toSave[i].Id);

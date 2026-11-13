@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Full_Recalc_Day__c</fullName>
+    <defaultValue>"Sunday"</defaultValue>
+    <description>The night the nightly rollup run recalculates every total over every record (D-200 P1): Sunday to Saturday, or Every_Night. Blank or unknown means Sunday. The values are declared on the Rollup_Full_Recalc_Day setting definition.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The night every total is recalculated over every record. The other nights recalculate only what can have changed.</inlineHelpText>
+    <label>Full Recalculation Day</label>
+    <length>20</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

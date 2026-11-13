@@ -178,6 +178,18 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     get scheduleMissing() {
       return helpText('Rollups', 'Core_Rollups_ScheduleMissing');
     },
+    get largeParentHours() {
+      return helpText('Rollups', 'Core_Rollups_LargeParentHours');
+    },
+    get largeParentOneHour() {
+      return helpText('Rollups', 'Core_Rollups_LargeParentOneHour');
+    },
+    get nightlyEveryNight() {
+      return helpText('Rollups', 'Core_Rollups_NightlyEveryNight');
+    },
+    get nightlyWeekly() {
+      return helpText('Rollups', 'Core_Rollups_NightlyWeekly');
+    },
     stopSchedule: STOP_SCHEDULE,
     restoreDefaults: RESTORE_DEFAULTS,
     get emptyList() {
@@ -341,6 +353,28 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     return this.isScheduled
       ? this.labels.scheduleActive.replace('{0}', this.page.nightlyTime || '')
       : this.labels.scheduleMissing;
+  }
+
+  /** How often, at most, a large parent's totals are recalculated (D-200 P2); none at 0. */
+  get largeParentMessage() {
+    const hours = this.page ? this.page.largeParentHours : null;
+    if (!hours) {
+      return null;
+    }
+    return hours === 1
+      ? this.labels.largeParentOneHour
+      : this.labels.largeParentHours.replace('{0}', String(hours));
+  }
+
+  /** What the nightly run covers: every record weekly on the set night, or every night (D-200 P1). */
+  get nightlyScopeMessage() {
+    const day = this.page ? this.page.fullRecalcDay : null;
+    if (!this.isScheduled || !day) {
+      return null;
+    }
+    return day === 'Every_Night'
+      ? this.labels.nightlyEveryNight
+      : this.labels.nightlyWeekly.replace('{0}', day);
   }
 
   get scheduleButtonLabel() {

@@ -657,3 +657,46 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Open **NPSP Settings**, **Customizable Rollups**. | The NPSP rollup is unchanged and still active. |
 
 **Cleanup:** delete the copy (keep values), or deactivate the NPSP rollup if you keep the copy.
+
+## T-RB-50: A Large Fund Is Recalculated at Most Once an Hour
+
+**Purpose:** confirm the large parent throttle setting, its line on the Rollups page, and that saves in between are counted together.
+**Prerequisites:** Giving with sample data; a fund with about 20,000 or more allocations (the scale data generator's default fund); admin user with Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Rollups**. | **Hours between large record runs** shows **1** with a **Default** badge. |
+| 2 | Open the **Rollup Builder** tab. | Under the nightly schedule line: "A record with very many records under it ... at most once an hour ...". |
+| 3 | Add a gift allocated to the large fund, wait five minutes, then add a second. | The fund's **Total Raised** includes the first gift within minutes; the second is not in it yet, and **Needs Attention** shows no Failed entry. |
+| 4 | Wait until an hour after the first recalculation. | **Total Raised** includes both gifts. |
+| 5 | Set the setting to **0** and save; reopen the Rollup Builder. | The large record line is gone; a new gift to the fund is in its total within minutes. |
+
+**Cleanup:** set the setting back to 1; delete the test gifts.
+
+## T-RB-51: A Total Changed by Rollups Runs Only the Automations That Read Totals
+
+**Purpose:** confirm a rollup update of a person runs donor levels and scores but not automations that react to edits.
+**Prerequisites:** Giving with donor levels on and a ladder whose first level starts at 100; a person with no gifts.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Add a 150 gift for the person and wait a minute. | **Total Giving** is 150, the person's donor level is the first level and the donor score is filled. |
+| 2 | With **Total Giving** tracked in **Field History**, open the person's field history. | The total's change is recorded as for any update. |
+| 3 | Open **Error Log**. | No new entries from the save. |
+
+**Cleanup:** delete the test gift.
+
+## T-RB-52: The Nightly Run Recalculates Every Record Once a Week
+
+**Purpose:** confirm the full recalculation night setting, the Rollups page line, and that other nights recalculate only what changed.
+**Prerequisites:** Giving with sample data; the nightly run scheduled; admin user with Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Rollups**. | **Night of the full recalculation** shows **Sunday** with a **Default** badge; the list offers Sunday to Saturday and **Every night**. |
+| 2 | Open the **Rollup Builder** tab. | Under the nightly schedule line: "The nightly run recalculates every Every night and Both total over every record on Sunday nights ...". |
+| 3 | Set the night to tomorrow's day of the week; after tomorrow's run, open **Apex Jobs** in Setup. | The night's rollup job is **RollupFullRecalcBatch**. |
+| 4 | Set the night to another day and add a gift during the day. After the next night's run, open **Apex Jobs**. | The night's rollup job is **RollupNightlyBatch**; the gift's donor shows the new total; donors whose gifts did not change keep their earlier **Rollups last calculated** time. |
+| 5 | Choose **Every night** and save; reopen the Rollup Builder. | The line says each nightly run recalculates every total over every record. |
+
+**Cleanup:** set the night back to Sunday.

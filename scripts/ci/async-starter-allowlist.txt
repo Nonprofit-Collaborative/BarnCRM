@@ -24,6 +24,7 @@ packages/payments/main/default/classes/PaymentEventProcessor.cls 4
 packages/programs/main/default/classes/ProgramsSharingBatch.cls 1
 packages/rollups/main/default/classes/RollupFullRecalcBatch.cls 2
 packages/rollups/main/default/classes/RollupLargeParentBatch.cls 2
+packages/rollups/main/default/classes/RollupNightlyBatch.cls 1
 packages/territory/main/default/classes/TerritoryRunBatch.cls 1
 
 # Started from a trigger, a platform event or a record save, where a refusal must not fail the

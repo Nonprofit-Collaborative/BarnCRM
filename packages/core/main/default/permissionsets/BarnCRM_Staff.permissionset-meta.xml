@@ -670,6 +670,21 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Error_Log__c.Occurrence_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Error_Log__c.Occurrences__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Error_Log__c.Other_Record_Ids__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Error_Log__c.Record_Reference__c</field>
     <readable>true</readable>
   </fieldPermissions>

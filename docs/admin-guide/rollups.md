@@ -163,7 +163,7 @@ Every rollup has a mode.
 |---|---|
 | **Instantly** | A gift saved by a person updates the totals a few seconds after the save: refresh the household a moment later and its total giving already includes it. A bulk change (an import, a data loader run, a big update) goes through the same queue and catches up within minutes, also when many batches or people save at the same moment. A change made by a background job is also queued, and the queue run starts as soon as that job's step is saved, so those totals catch up within minutes too. If that start fails, the next queue run or the nightly run picks them up. |
 | **Every night** | Recalculated in the nightly run (2:00 AM unless you change **Time of the nightly run**), and when you click **Recalculate**. A gift entered this afternoon shows up tomorrow morning. |
-| **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Every shipped total uses this mode. |
+| **Both (recommended)** | Instantly, and checked again every night. The nightly run is the safety net: if anything was missed during the day (an automation switched off, a record changed while automation was paused), the next morning's numbers are right. Most nights it checks only what changed; once a week it checks every record (see [How the Nightly Run Works](#how-the-nightly-run-works)). Every shipped total uses this mode. |
 
 "Instantly" needs BarnCRM to see the change as it happens. It does for gifts, pledges and
 other BarnCRM records. For a total that counts records from any other object (a standard
@@ -205,7 +205,26 @@ hour moves the scheduled run straight away; if the nightly run is not scheduled,
 is used when you schedule it. Pick a quiet hour after the day's data entry and before the
 morning's reports.
 
-The nightly run, **Recalculate** and **Recalculate All** work
+**Every record once a week, what changed the other nights.** Each save already keeps its
+totals right, so most nights the run only checks what a save could have missed. Once a week,
+on Sunday unless you change it, the run recalculates every **Every night** and **Both** total
+over every record. On the other nights it recalculates only:
+
+- the totals of records whose gifts (or other source records) were saved or deleted since the
+  last run, including saves made while automation was paused for one person;
+- totals counting the last so many days, for the records whose date has moved into or out of
+  the window since the last run;
+- year totals on the first night of a year (fiscal year totals on the first night of your
+  fiscal year), and every **Every night** rollup, a rollup that has never been calculated, one
+  that includes deleted records, and one whose target filter compares a date with today.
+
+The first run after an update, and the first one after all automation was paused, recalculate
+everything. Every night also retries the totals waiting in **Needs Attention** and the ones
+waiting for a later try. The Rollups page says which night recalculates everything. To change
+it, open **BarnCRM Settings**, **Rollups** section, **Night of the full recalculation**; choose
+**Every night** to recalculate everything each night, which takes longer on a large org.
+
+The full nightly run, **Recalculate** and **Recalculate All** work
 through every record a rollup writes, one kind of record at a time (all accounts, then all
 contacts, then all funds), and calculate all of a record's totals together:
 
@@ -225,6 +244,12 @@ contacts, then all funds), and calculate all of a record's totals together:
   few minutes after the run finishes; until then it shows among the records waiting. A record
   that has grown since its count was last calculated (a large import into one fund) is caught
   while it is being recalculated and handed on the same way. Nothing to do.
+- **A large record is recalculated at most once an hour.** Every gift saved to a General Fund
+  would otherwise start another long background job for it. So once that job has run, the
+  next waits until an hour has passed, and every gift saved in between is counted in that one
+  job: the fund's totals can lag a save by up to an hour, and the Rollups page says so. To
+  change the hour, open **BarnCRM Settings**, **Rollups** section, **Hours between large record
+  runs** (0 to 24; 0 recalculates as soon as possible).
 - **A record that cannot be saved is tried again.** If someone was editing it, or a
   validation rule refused it, BarnCRM tries again automatically; after five tries it waits
   in the **Needs Attention** list. The next nightly run that saves it takes it off the list.
@@ -362,7 +387,8 @@ user **Rollup Builder Read Only**. People with a BarnCRM role get it at install,
 on** and with each nightly run; until then the same wait applies to them.
 
 The **Rollups** section of **BarnCRM Settings** holds the module's own settings: **Default
-rollup mode**, **When instant totals are calculated**, **Time of the nightly run**, and a
+rollup mode**, **When instant totals are calculated**, **Time of the nightly run**, **Night of
+the full recalculation**, **Hours between large record runs**, and a
 button that opens the Builder.
 The fiscal year is your org's, shown read only in the **General** section.
 
