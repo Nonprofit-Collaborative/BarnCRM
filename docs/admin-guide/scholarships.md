@@ -70,6 +70,10 @@ cycle on its Open Date and moves an Open cycle to Reviewing after its Close Date
 
 ## Programs and Cycles
 
+Until the org has an award program, the **Scholarships and Grants** page opens with **Set Up
+Your First Award Program** for anyone who may create one (D-200 R4). Its **New Award Program**
+button opens the new program form, step 1 below. It goes away once the first program is saved.
+
 1. On **Award Programs**, press **New**: a name, a Type (Scholarship, Grant, Fellowship, Other),
    a public description and, if you like, an award letter template (see Award Letters).
 2. On the program, add an **Award Cycle**: name (for example "2027 Spring"), Open Date, Close

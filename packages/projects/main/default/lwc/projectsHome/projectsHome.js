@@ -79,8 +79,25 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
       exportTitle: helpText('Projects', 'Projects_Export_Title'),
       includeExported: helpText('Projects', 'Projects_Export_Include'),
       exportButton: helpText('Projects', 'Projects_Export_Button'),
-      applyRates: helpText('Projects', 'Projects_Rates_Apply')
+      applyRates: helpText('Projects', 'Projects_Rates_Apply'),
+      firstRunHeading: helpText('Projects', 'Projects_Home_FirstRunHeading'),
+      firstRunMessage: helpText('Projects', 'Projects_Home_FirstRunMessage'),
+      firstRunStart: helpText('Projects', 'Projects_Home_FirstRunStart')
     };
+  }
+
+  /** True before the org's first project, for someone who may create one (D-200 R4). */
+  get firstRun() {
+    return this.home?.firstRun === true;
+  }
+
+  /** The first-run action: the New Project From Template form is on this page, so go to it. */
+  handleStartFirst() {
+    const template = this.template.querySelector('[data-id="template"]');
+    if (template) {
+      template.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+      template.focus();
+    }
   }
 
   get ratesEnabled() {

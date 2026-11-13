@@ -49,12 +49,24 @@ private class CorporateHubControllerTest {
 			CorporateHubController.Home home = CorporateHubController.getHome();
 
 			Assert.isTrue(home.canManage, 'Maria manages the hub');
+			Assert.isTrue(home.firstRun, 'No board yet, and Maria may create one (D-200 R4)');
 			Assert.areEqual(1, home.requests.size(), 'Her own request');
 			Assert.areEqual(document.Id, home.requests[0].recordId, 'Opens the policy');
 			Assert.areEqual(1, home.obligations.size(), 'Only the one due within 60 days');
 			Assert.areEqual('Annual report', home.obligations[0].name, 'The annual report');
 			Assert.areEqual(1, home.agreements.size(), 'The lease');
 			Assert.areEqual(Date.today().addDays(30), home.agreements[0].due, 'By its notice date');
+		}
+	}
+
+	@IsTest
+	static void theFirstRunPanelGoesOnceABoardExists() {
+		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
+			insert new Board__c(Name = 'Board', Type__c = 'Board', Status__c = 'Active');
+			Test.startTest();
+			CorporateHubController.Home home = CorporateHubController.getHome();
+			Test.stopTest();
+			Assert.isFalse(home.firstRun, 'A board exists, so the page opens on its lists');
 		}
 	}
 

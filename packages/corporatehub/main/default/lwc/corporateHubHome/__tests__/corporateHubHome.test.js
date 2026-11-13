@@ -118,6 +118,20 @@ describe('c-corporate-hub-home', () => {
     expect(find(other, 'add-templates')).toBeNull();
   });
 
+  it('offers a first board before any exists, and only then', async () => {
+    getHome.mockResolvedValue({ ...HOME, firstRun: true });
+    let element = mount();
+    await flush();
+    expect(find(element, 'first-run').heading).toBe('c.CorporateHub_Home_FirstRunHeading');
+    expect(find(element, 'first-run-new').label).toBe('c.CorporateHub_Home_FirstRunNew');
+    document.body.removeChild(element);
+
+    getHome.mockResolvedValue(HOME);
+    element = mount();
+    await flush();
+    expect(find(element, 'first-run')).toBeNull();
+  });
+
   it('shows the error when the page cannot load', async () => {
     getHome.mockRejectedValue({ body: { message: 'No access' } });
     const element = mount();

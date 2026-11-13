@@ -16,6 +16,7 @@ Management deployed and the module turned on in BarnCRM Settings, **Modules**. Y
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the BarnCRM app. | Projects Home, Projects and Time Entries tabs, before Error Log. |
+| 1a | Before any project exists (templates do not count), open **Projects Home** as admin. | **Start Your First Project** shows. **Start a Project** moves to **New Project From Template** and puts the cursor in **Template**. After the first project is created and the page reloaded, the panel is gone. |
 | 2 | Open Setup, staff A's permission set assignments. | Projects Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open BarnCRM Settings, Projects. | Track time and budgets on, Days late before at risk 7, Budget warning percent 90, Weekly capacity hours 40. |
 | 4 | As the Read Only user, open the Projects tab and a project. | The records show; New and Edit are not offered. |

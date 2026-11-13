@@ -70,6 +70,27 @@ describe('c-projects-home', () => {
     jest.clearAllMocks();
   });
 
+  it('offers to start the first project, and goes to the template form', async () => {
+    getHome.mockResolvedValue({ ...HOME, timeTracking: false, myTasks: [], firstRun: true });
+    const element = mount();
+    await flush();
+
+    const panel = find(element, 'first-run');
+    expect(panel).not.toBeNull();
+    expect(panel.heading).toBe('c.Projects_Home_FirstRunHeading');
+    const template = find(element, 'template');
+    template.focus = jest.fn();
+    find(element, 'first-run-start').click();
+    expect(template.focus).toHaveBeenCalled();
+  });
+
+  it('leaves the first-run panel out once a project exists', async () => {
+    getHome.mockResolvedValue({ ...HOME, timeTracking: false });
+    const element = mount();
+    await flush();
+    expect(find(element, 'first-run')).toBeNull();
+  });
+
   it('lists my tasks and utilization, marks a task done and creates from a template', async () => {
     getHome.mockResolvedValue(HOME);
     getUtilization.mockResolvedValue([

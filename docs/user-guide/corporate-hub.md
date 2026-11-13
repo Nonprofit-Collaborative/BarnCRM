@@ -6,7 +6,8 @@ page.
 
 ## The Corporate Hub Page
 
-Open the **Corporate Hub** tab. It shows:
+Open the **Corporate Hub** tab. Before your organization's first board or committee, it opens
+with **Set Up Your Board** and a **New Board or Committee** button. It shows:
 
 - **Policies to Acknowledge**: the policies you have been asked to read, with their due dates.
   Open the policy to read its file, then press **I Have Read This**. It disappears from the list.

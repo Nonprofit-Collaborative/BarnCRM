@@ -66,6 +66,11 @@ coordinator, and **Shifts Needing Volunteers**), then the **Approved Hours This 
 chart. A figure the person cannot read is left out; counts stop at 2,000 and show "2,000+".
 To change the chart, edit the page in the Lightning App Builder.
 
+Until the org has a volunteer job, **Volunteers Home** opens on **Set Up Your First Volunteer
+Job** instead of empty figures (D-200 R4), for anyone who may create jobs. It offers **New
+Volunteer Job** and, for someone who may import, **Import a File** (the Import tab, for a file
+of volunteers or past hours). It goes away by itself once the first job is saved.
+
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
 **All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
 from today with places left) and **Past Shifts Still Open** (shifts that ended more than 7 days ago and

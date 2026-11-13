@@ -226,6 +226,10 @@ closed while its risk is Not Yet Assessed.
 A **Data Protection** section lists open data subject requests by due date and breaches not
 yet reported, for the people who can see them. It does not show when there are none.
 
+Until the org has a board or committee, the page opens with **Set Up Your Board** for anyone who
+may create one (D-200 R4). Its **New Board or Committee** button opens the new record form (see
+Boards and Committees below). It goes away once the first board is saved.
+
 ## Board Governance
 
 Board governance (CH-09 to CH-20) lets staff run the board with no portal; board members act on

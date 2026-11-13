@@ -1,9 +1,14 @@
 /**
  * Tests for Volunteers Home (vis-modules-19): the three figures and where each one goes, for an
- * administrator and for a person with no Volunteers access.
+ * administrator and for a person with no Volunteers access; and the first-run panel (D-200 R4).
  */
 @IsTest(testFor='ApexClass:VolunteersHomeController')
 private class VolunteersHomeControllerTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith(VolunteersTestData.ADMIN);
+	}
+
 	private static Map<String, VolunteersHomeController.Tile> byName(
 		List<VolunteersHomeController.Tile> tiles
 	) {
@@ -83,6 +88,37 @@ private class VolunteersHomeControllerTest {
 		}
 		Test.stopTest();
 		Assert.isTrue(tiles.isEmpty(), 'No figure is shown as zero to someone who cannot read it.');
+	}
+
+	@IsTest
+	static void theFirstRunPanelShowsUntilTheFirstJob() {
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			Test.startTest();
+			VolunteersHomeController.FirstRun before = VolunteersHomeController.getFirstRun();
+			VolunteersTestData.job('Food bank sorting');
+			VolunteersHomeController.FirstRun after = VolunteersHomeController.getFirstRun();
+			Test.stopTest();
+
+			Assert.isTrue(before.show, 'No job exists yet, so the first-run panel shows.');
+			Assert.isTrue(before.canImport, 'An administrator may start a file import.');
+			Assert.isFalse(after.show, 'Once a job exists the figures show instead.');
+			Assert.isFalse(after.canImport, 'Import a File belongs to the first-run panel only.');
+		}
+	}
+
+	@IsTest
+	static void someoneWhoCannotCreateJobsNeverSeesTheFirstRunPanel() {
+		User outsider = TestUsers.standardUserWith(
+			'FirstRunOutsider',
+			new List<String>{ VolunteersTestData.CORE_STAFF }
+		);
+		VolunteersHomeController.FirstRun result;
+		Test.startTest();
+		System.runAs(outsider) {
+			result = VolunteersHomeController.getFirstRun();
+		}
+		Test.stopTest();
+		Assert.isFalse(result.show, 'The panel is for someone who can create volunteer jobs.');
 	}
 
 	@IsTest
