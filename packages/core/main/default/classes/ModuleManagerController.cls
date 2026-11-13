@@ -11,6 +11,9 @@ public with sharing class ModuleManagerController {
 	public class ManagerState {
 		@AuraEnabled
 		public Boolean canEdit;
+		/** Finish Setup: canEdit, or the bootstrap (`BarnCRMPermissions.canRunSetup`). */
+		@AuraEnabled
+		public Boolean canFinishSetup;
 		@AuraEnabled
 		public List<ModuleManagerService.ModuleStatus> modules;
 		/** The Show Nonprofit Modules checkbox: false hides the nonprofit modules. */
@@ -77,7 +80,9 @@ public with sharing class ModuleManagerController {
 	 */
 	@AuraEnabled
 	public static ManagerState finishSetup(String moduleName) {
-		requireEdit();
+		if (!BarnCRMPermissions.canRunSetup()) {
+			requireEdit();
+		}
 		try {
 			List<String> done = ModuleSetups.finish(new List<String>{ moduleName });
 			SettingsService.logChange(
@@ -114,6 +119,7 @@ public with sharing class ModuleManagerController {
 	private static ManagerState buildState() {
 		ManagerState state = new ManagerState();
 		state.canEdit = BarnCRMPermissions.canManageSettings();
+		state.canFinishSetup = state.canEdit || BarnCRMPermissions.canRunSetup();
 		state.modules = ModuleManagerService.getModules();
 		state.showNonprofitModules = ModuleManagerService.showNonprofitModules();
 		state.otherRollupTools = new List<String>();

@@ -62,16 +62,8 @@ public with sharing class FieldUtilizationService {
 		if (String.isBlank(objectName)) {
 			return null;
 		}
-		Schema.DescribeSObjectResult described;
-		try {
-			described = Schema.describeSObjects(
-				new List<String>{ objectName.trim() },
-				SObjectDescribeOptions.DEFERRED
-			)[0];
-		} catch (System.InvalidParameterValueException unknown) {
-			return null;
-		}
-		return isCountable(described) ? described : null;
+		Schema.DescribeSObjectResult described = NamespaceUtil.describe(objectName);
+		return described != null && isCountable(described) ? described : null;
 	}
 
 	/** The fields a person can fill in and the runner can read, by API name (R-FU2). */

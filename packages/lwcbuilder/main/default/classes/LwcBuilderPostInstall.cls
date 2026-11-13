@@ -87,20 +87,16 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 
 		private void giveInstaller() {
 			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE Name = :LwcBuilderAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				if (sets.isEmpty()) {
+				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+					LwcBuilderAccessSync.ADMIN_SET
+				);
+				if (permissionSet == null) {
 					return;
 				}
 				Integer held = [
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
+					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
 					WITH SYSTEM_MODE
 				];
 				if (held > 0) {
@@ -109,7 +105,7 @@ public with sharing class LwcBuilderPostInstall implements InstallHandler, Modul
 				Database.SaveResult saved = Database.insert(
 					new PermissionSetAssignment(
 						AssigneeId = installerId,
-						PermissionSetId = sets[0].Id
+						PermissionSetId = permissionSet.Id
 					),
 					false,
 					AccessLevel.SYSTEM_MODE

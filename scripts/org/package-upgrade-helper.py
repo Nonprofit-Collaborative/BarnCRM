@@ -14,6 +14,8 @@ Subcommands (all print to stdout, tab separated, one item per line):
   dependents  --project P --key K --select S    selected packages that need K (any depth)
   shape       --root R NAME                     definition file, edition, org name
   versions    --file F --select S               key and 04t id per selected package
+  aliases     --project P --select S            key, package name, 0Ho id or - (create-versions.sh)
+  limit       NAME                              remaining and max of a limit, from sf limits JSON
   readiness   (see parse_readiness)             OK / MISSING / NOTE lines; exit 1 on MISSING
   render      TEMPLATE OUT --ns NS [--set K=V] [--module KEY --root R]
   jget        PATH                              a value from the JSON on stdin
@@ -45,10 +47,6 @@ COUNTED = {
     "giving": ["Gift__c", "Gift_Allocation__c", "Fund__c"],
     "volunteers": ["Volunteer_Hours__c", "Volunteer_Job__c"],
 }
-
-# Classes the shell script calls from anonymous Apex outside the templates:
-# seed-sample-data.sh --namespace runs <ns>.SampleDataLoader.load().
-EXTRA_ENTRY_POINTS = ["core:SampleDataLoader"]
 
 ID_04T = re.compile(r"^04t[0-9A-Za-z]{12}([0-9A-Za-z]{3})?$")
 NS_REF = re.compile(r"%%NS%%\.([A-Za-z_][A-Za-z0-9_]*)")
@@ -139,15 +137,6 @@ def class_file(root, project, name):
     return None
 
 
-def is_global(root, project, name):
-    path = class_file(root, project, name)
-    if not path:
-        return None
-    with open(path, encoding="utf-8") as handle:
-        text = handle.read()
-    return re.search(r"^\s*global\b[^{;]*\bclass\s+" + re.escape(name) + r"\b", text, re.M) is not None
-
-
 def cmd_namespace(args):
     print(read_project(args.project).get("namespace", ""))
 
@@ -202,6 +191,28 @@ def read_versions(path, keys):
     if missing:
         fail(f"{path} has no 04t id for: " + ", ".join(missing))
     return found
+
+
+def cmd_aliases(args):
+    """Key, package name and its 0Ho id (or -) per selected package, for create-versions.sh."""
+    project = read_project(args.project)
+    keys, _ = select(project, args.select)
+    entries, aliases = dict(directories(project)), project.get("packageAliases", {})
+    for key in keys:
+        name = entries[key].get("package", key)
+        alias = str(aliases.get(name, ""))
+        print("\t".join([key, name, alias if alias.startswith("0Ho") else "-"]))
+
+
+def cmd_limit(args):
+    """'<remaining> <max>' of one Dev Hub limit from `sf limits api display --json` on stdin."""
+    try:
+        rows = json.load(sys.stdin).get("result", [])
+    except (ValueError, AttributeError):
+        return
+    for row in rows if isinstance(rows, list) else []:
+        if row.get("name") == args.name:
+            print(f"{row.get('remaining')} {row.get('max')}")
 
 
 def cmd_versions(args):
@@ -323,17 +334,16 @@ def cmd_readiness(args):
         add("NOTE", "unlocked: post-install scripts run for managed packages only, so this run calls each "
             "package's runSetup as the admin after every install and upgrade")
 
-    entry_points = []
-    for template in templates_for(args.templates, keys, args.uninstall):
-        with open(template, encoding="utf-8") as handle:
-            entry_points += [(os.path.basename(template), name) for name in NS_REF.findall(handle.read())]
-    entry_points += [("seed-sample-data.sh", e.split(":", 1)[1]) for e in EXTRA_ENTRY_POINTS if e.split(":", 1)[0] in keys]
+    # The templates and seed-sample-data.sh reach the packages only through the global Core
+    # class BarnInstallCheck (D-199); a name here with no class in the source is a typo.
+    templates = templates_for(args.templates, keys, args.uninstall)
     if not managed:
-        entry_points += [("post-install.apex", h) for h in (install_handler(args.root, entries[k]["path"]) for k in keys) if h]
-    not_global = sorted({name for _, name in entry_points if is_global(args.root, project, name) is False})
-    unknown = sorted({name for _, name in entry_points if is_global(args.root, project, name) is None})
-    add("MISSING" if not_global else "OK", "not global, so anonymous Apex in a subscriber org cannot call them: " +
-        ", ".join(not_global) if not_global else "every Apex entry point the checks call is global")
+        templates.append(os.path.join(args.templates, "post-install.apex"))
+    entry_points = []
+    for template in templates:
+        with open(template, encoding="utf-8") as handle:
+            entry_points += NS_REF.findall(handle.read())
+    unknown = sorted({name for name in entry_points if class_file(args.root, project, name) is None})
     if unknown:
         add("MISSING", "entry points with no class in the source: " + ", ".join(unknown))
 
@@ -491,6 +501,12 @@ def main(argv):
     p = with_project(sub.add_parser("shape"))
     p.add_argument("name")
     p.set_defaults(run=cmd_shape)
+    p = with_project(sub.add_parser("aliases"))
+    p.add_argument("--select", default="all")
+    p.set_defaults(run=cmd_aliases)
+    p = sub.add_parser("limit")
+    p.add_argument("name")
+    p.set_defaults(run=cmd_limit)
     p = with_project(sub.add_parser("versions"))
     p.add_argument("--select", default="all")
     p.add_argument("--file", required=True)

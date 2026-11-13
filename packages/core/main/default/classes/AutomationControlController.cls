@@ -232,11 +232,8 @@ public with sharing class AutomationControlController {
 			return apiName;
 		}
 		try {
-			Schema.DescribeSObjectResult described = Schema.describeSObjects(
-				new List<String>{ apiName.trim() },
-				SObjectDescribeOptions.DEFERRED
-			)[0];
-			return described.getLabel();
+			Schema.DescribeSObjectResult described = NamespaceUtil.describe(apiName);
+			return described == null ? apiName : described.getLabel();
 		} catch (Exception notAnObject) {
 			return apiName;
 		}

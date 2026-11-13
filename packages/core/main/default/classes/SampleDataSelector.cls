@@ -29,14 +29,7 @@ public with sharing class SampleDataSelector {
 	 * the Body field's toString() to get the JSON text.
 	 */
 	public StaticResource getSampleDataResource() {
-		List<StaticResource> resources = [
-			SELECT Body
-			FROM StaticResource
-			WHERE Name = 'SampleData'
-			WITH USER_MODE
-			LIMIT 1
-		];
-		return resources.isEmpty() ? null : resources[0];
+		return SetupObjectSelector.staticResource('SampleData');
 	}
 
 	public Integer countSampleHouseholds() {

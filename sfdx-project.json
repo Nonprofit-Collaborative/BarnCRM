@@ -7,164 +7,191 @@
       "path": "packages/core",
       "default": true,
       "package": "BarnCRM Core",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT"
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "CorePostInstall"
     },
     {
       "path": "packages/rollups",
       "default": false,
       "package": "BarnCRM Rollup Builder",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "RollupsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/giving",
       "default": false,
       "package": "BarnCRM Giving",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Rollup Builder" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "GivingPostInstall",
+      "dependencies": [
+        { "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" },
+        { "package": "BarnCRM Rollup Builder", "versionNumber": "1.21.0.LATEST" }
+      ]
     },
     {
       "path": "packages/volunteers",
       "default": false,
       "package": "BarnCRM Volunteers",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }, { "package": "BarnCRM Rollup Builder" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "VolunteersPostInstall",
+      "dependencies": [
+        { "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" },
+        { "package": "BarnCRM Rollup Builder", "versionNumber": "1.21.0.LATEST" }
+      ]
     },
     {
       "path": "packages/programs",
       "default": false,
       "package": "BarnCRM Programs",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "ProgramsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/logicmodels",
       "default": false,
       "package": "BarnCRM Logic Models",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "LogicModelsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/funders",
       "default": false,
       "package": "BarnCRM Funders",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "FundersPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/forms",
       "default": false,
       "package": "BarnCRM Forms",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "FormsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/contactpoints",
       "default": false,
       "package": "BarnCRM Contact Point Sync",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "ContactPointsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/events",
       "default": false,
       "package": "BarnCRM Event Management",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "EventsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/portal",
       "default": false,
       "package": "BarnCRM Portal Builder",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "PortalPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/corporatehub",
       "default": false,
       "package": "BarnCRM Corporate Hub",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "CorporateHubPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/payments",
       "default": false,
       "package": "BarnCRM Payments",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "PaymentsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/lwcbuilder",
       "default": false,
       "package": "BarnCRM LWC Builder",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "LwcBuilderPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/scholarships",
       "default": false,
       "package": "BarnCRM Scholarships and Outbound Grants",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "ScholarshipsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/territory",
       "default": false,
       "package": "BarnCRM Territory Management",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "TerritoryPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/memberships",
       "default": false,
       "package": "BarnCRM Memberships",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "MembershipsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/projects",
       "default": false,
       "package": "BarnCRM Project Management",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "ProjectsPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/addressverification",
       "default": false,
       "package": "BarnCRM Address Verification",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
-      "dependencies": [{ "package": "BarnCRM Core" }]
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "AddressVerificationPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
       "path": "packages/mirror",
       "default": false,
       "package": "BarnCRM Mirror",
-      "versionName": "v0.1",
-      "versionNumber": "0.1.0.NEXT",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "MirrorPostInstall",
       "dependencies": [
-        { "package": "BarnCRM Core" },
-        { "package": "BarnCRM Rollup Builder" },
-        { "package": "BarnCRM Giving" }
+        { "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" },
+        { "package": "BarnCRM Rollup Builder", "versionNumber": "1.21.0.LATEST" },
+        { "package": "BarnCRM Giving", "versionNumber": "1.21.0.LATEST" }
       ]
     }
-  ]
+  ],
+  "packageAliases": {}
 }

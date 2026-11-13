@@ -471,25 +471,31 @@ public with sharing class EventSponsorsController {
 				'Deliverables_Total__c'
 			}
 		) {
-			result.fieldLabels.put(name, sponsorFields.get(name).getDescribe().getLabel());
+			result.fieldLabels.put(
+				name,
+				NamespaceUtil.field(sponsorFields, name).getDescribe().getLabel()
+			);
 		}
 		Map<String, Schema.SObjectField> itemFields = Schema.SObjectType.Sponsor_Deliverable__c.fields.getMap();
 		for (String name : new List<String>{ 'Name', 'Type__c', 'Status__c', 'Due_Date__c' }) {
 			result.fieldLabels.put(
 				'Deliverable_' + name,
-				itemFields.get(name).getDescribe().getLabel()
+				NamespaceUtil.field(itemFields, name).getDescribe().getLabel()
 			);
 		}
 		result.fieldLabels.put('Levels', Schema.SObjectType.Sponsorship_Level__c.getLabelPlural());
 		Map<String, Schema.SObjectField> levelFields = Schema.SObjectType.Sponsorship_Level__c.fields.getMap();
-		result.fieldLabels.put('LevelName', levelFields.get('Name').getDescribe().getLabel());
+		result.fieldLabels.put(
+			'LevelName',
+			NamespaceUtil.field(levelFields, 'Name').getDescribe().getLabel()
+		);
 		result.fieldLabels.put(
 			'LevelAmount',
-			levelFields.get('Amount__c').getDescribe().getLabel()
+			NamespaceUtil.field(levelFields, 'Amount__c').getDescribe().getLabel()
 		);
 		result.fieldLabels.put(
 			'LevelBenefits',
-			levelFields.get('Benefits__c').getDescribe().getLabel()
+			NamespaceUtil.field(levelFields, 'Benefits__c').getDescribe().getLabel()
 		);
 		for (
 			Schema.PicklistEntry entry : Schema.SObjectType.Sponsor_Deliverable__c.fields.Status__c.getPicklistValues()

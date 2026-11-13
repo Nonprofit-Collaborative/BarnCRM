@@ -665,17 +665,13 @@ public with sharing class FormSubmitService {
 	}
 
 	private static Schema.SObjectType typeOf(String objectName) {
-		try {
-			return Schema.describeSObjects(
-					new List<String>{ objectName },
-					SObjectDescribeOptions.DEFERRED
-				)[0]
-				.getSObjectType();
-		} catch (Exception unknown) {
+		Schema.SObjectType type = NamespaceUtil.objectType(objectName);
+		if (type == null) {
 			throw new FormException(
 				BarnHelp.text('Forms', 'Forms_Submit_NoObject', new List<Object>{ objectName })
 			);
 		}
+		return type;
 	}
 
 	private static Schema.DescribeFieldResult describedField(
@@ -683,9 +679,7 @@ public with sharing class FormSubmitService {
 		String objectName,
 		String fieldName
 	) {
-		Schema.SObjectField field = fieldName == null
-			? null
-			: fieldMap.get(fieldName.toLowerCase());
+		Schema.SObjectField field = NamespaceUtil.field(fieldMap, fieldName);
 		if (field == null) {
 			throw new FormException(
 				BarnHelp.text(

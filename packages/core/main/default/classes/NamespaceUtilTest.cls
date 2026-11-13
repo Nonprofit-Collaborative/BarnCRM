@@ -79,6 +79,42 @@ private class NamespaceUtilTest {
 	}
 
 	@IsTest
+	static void fieldPrefersThisPackagesFieldThenTheNameAsWritten() {
+		NamespaceUtil.cachedPrefix = OWN;
+		Map<String, Schema.SObjectField> fields = new Map<String, Schema.SObjectField>{
+			OWN + 'Amount__c' => Contact.LastName,
+			'Amount__c' => Contact.FirstName,
+			'Email' => Contact.Email
+		};
+
+		Assert.areEqual(Contact.LastName, NamespaceUtil.field(fields, 'Amount__c'), 'Own first');
+		Assert.areEqual(Contact.Email, NamespaceUtil.field(fields, 'Email'), 'Standard as written');
+		Assert.isNull(NamespaceUtil.field(fields, 'Missing__c'), 'Neither');
+		Assert.isNull(NamespaceUtil.field(fields, ' '), 'No name');
+	}
+
+	@IsTest
+	static void fieldLabelAndDescribeReadTheOrg() {
+		Assert.areEqual(
+			Contact.LastName,
+			NamespaceUtil.field(Contact.SObjectType, 'lastname'),
+			'Any case'
+		);
+		Assert.areEqual(
+			Contact.LastName.getDescribe().getLabel(),
+			NamespaceUtil.fieldLabel(Contact.SObjectType, 'LastName'),
+			'Its label'
+		);
+		Assert.areEqual(
+			'No_Field__c',
+			NamespaceUtil.fieldLabel(Contact.SObjectType, 'No_Field__c'),
+			'Name'
+		);
+		Assert.areEqual('Contact', NamespaceUtil.describe('Contact').getName(), 'Described');
+		Assert.isNull(NamespaceUtil.describe('No_Such_Barn_Object__c'), 'Null, not an exception');
+	}
+
+	@IsTest
 	static void objectTypePrefersThisPackagesObjectOverEveryOther() {
 		stubDescribe(
 			OWN,

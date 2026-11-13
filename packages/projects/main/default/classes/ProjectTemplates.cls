@@ -181,17 +181,8 @@ public with sharing class ProjectTemplates {
 	private static List<Object> shipped() {
 		String body = bodyForTest;
 		if (body == null) {
-			String prefix = NamespaceUtil.prefix().removeEnd('__');
-			String namespace = String.isBlank(prefix) ? null : prefix;
-			// System mode, as BarnHelp reads its catalogs: packaged text every user may use.
-			List<StaticResource> found = [
-				SELECT Body
-				FROM StaticResource
-				WHERE Name = :RESOURCE AND NamespacePrefix = :namespace
-				WITH SYSTEM_MODE
-				LIMIT 1
-			];
-			body = found.isEmpty() ? '{}' : found[0].Body.toString();
+			body = SetupObjectSelector.staticResourceBody(RESOURCE);
+			body = body == null ? '{}' : body;
 		}
 		Object templates = ((Map<String, Object>) JSON.deserializeUntyped(body)).get('templates');
 		return templates == null ? new List<Object>() : (List<Object>) templates;

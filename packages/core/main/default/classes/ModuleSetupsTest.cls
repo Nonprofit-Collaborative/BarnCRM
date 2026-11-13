@@ -25,6 +25,50 @@ private class ModuleSetupsTest {
 		}
 	}
 
+	/** A package whose post-install gained steps: setup revision 2. */
+	private class RevisedSetup implements ModuleSetup, ModuleSetups.Revisioned {
+		public Integer timesRun = 0;
+
+		public void runSetup(Id installerId) {
+			timesRun++;
+		}
+
+		public Integer setupRevision() {
+			return 2;
+		}
+	}
+
+	@IsTest
+	static void anUpgradeThatAddsStepsFlagsFinishSetupAgain() {
+		System.runAs(TestUsers.admin()) {
+			noSetupRunYet();
+			stubbedPackages();
+			RevisedSetup giving = new RevisedSetup();
+			ModuleSetups.overrides.put('Giving', giving);
+			SettingsService.saveBookkeeping(
+				new Map<String, Object>{ 'Modules_Setup_Run__c' => 'Core,Giving' }
+			);
+
+			Boolean pendingBefore = ModuleSetups.isPending('Giving', ModuleSetups.ran());
+			ModuleSetups.finish(new List<String>{ 'Giving' });
+
+			Assert.isTrue(pendingBefore, 'Marked at revision 1, the class is at 2');
+			Assert.areEqual(1, giving.timesRun, 'Finish Setup ran the new steps');
+			Assert.areEqual(
+				'Core,Giving:2',
+				SettingsService.getSettings().Modules_Setup_Run__c,
+				'The marker records the revision and keeps the others'
+			);
+			Assert.isFalse(ModuleSetups.isPending('Giving', ModuleSetups.ran()), 'Current now');
+			ModuleSetups.markRan('Giving');
+			Assert.areEqual(
+				'Core,Giving:2',
+				SettingsService.getSettings().Modules_Setup_Run__c,
+				'Marking again changes nothing'
+			);
+		}
+	}
+
 	/** An upgrade from 1.0 with no installer, so nothing is queued. */
 	private class UpgradeContext implements InstallContext {
 		public Id organizationId() {

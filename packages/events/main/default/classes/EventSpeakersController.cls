@@ -93,7 +93,10 @@ public with sharing class EventSpeakersController {
 			result.canAssign = Schema.SObjectType.Session_Speaker__c.isCreateable();
 			Map<String, Schema.SObjectField> fields = Schema.SObjectType.Event_Speaker__c.fields.getMap();
 			for (String name : new List<String>{ 'Name', 'Headline__c', 'Status__c' }) {
-				result.fieldLabels.put(name, fields.get(name).getDescribe().getLabel());
+				result.fieldLabels.put(
+					name,
+					NamespaceUtil.field(fields, name).getDescribe().getLabel()
+				);
 			}
 			result.fieldLabels.put(
 				'Sessions',

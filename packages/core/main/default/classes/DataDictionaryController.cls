@@ -304,14 +304,7 @@ public with sharing class DataDictionaryController {
 	private static Schema.DescribeSObjectResult requireObject(String objectName) {
 		Schema.DescribeSObjectResult described;
 		if (!String.isBlank(objectName)) {
-			try {
-				described = Schema.describeSObjects(
-					new List<String>{ objectName.trim() },
-					SObjectDescribeOptions.DEFERRED
-				)[0];
-			} catch (System.InvalidParameterValueException unknown) {
-				described = null;
-			}
+			described = NamespaceUtil.describe(objectName);
 		}
 		if (
 			described == null ||

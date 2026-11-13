@@ -98,6 +98,27 @@ class NamespaceReadiness(unittest.TestCase):
         self.assertNotIn("c__gone", out)
         self.assertEqual(out.count("\n"), src.count("\n"))
 
+    def test_project_needs_post_install_scripts_and_pinned_dependencies(self):
+        def project(post, dep_version):
+            core = {"path": "packages/core", "package": "Core", "versionNumber": "1.21.0.NEXT"}
+            if post:
+                core["postInstallScript"] = post
+            mod = {"path": "packages/giving", "package": "Giving", "versionNumber": "1.21.0.NEXT",
+                   "dependencies": [{"package": "Core", "versionNumber": dep_version}, {"package": "04tOutside"}]}
+            return {"packageDirectories": [core, mod]}
+
+        def handler_of(path):
+            return "CorePostInstall" if path == "packages/core" else None
+
+        self.assertEqual(cnr.check_project(project("CorePostInstall", "1.21.0.LATEST"), handler_of), [])
+        found = sorted(m for (_, _, m) in cnr.check_project(project(None, "1.20.0.LATEST"), handler_of))
+        self.assertEqual(found, [
+            "core: postInstallScript must be CorePostInstall, its InstallHandler",
+            "giving: dependency Core needs versionNumber 1.21.0.LATEST",
+        ])
+        found = [m for (_, _, m) in cnr.check_project(project("CorePostInstall", None), lambda p: None)]
+        self.assertIn("core: postInstallScript CorePostInstall is not an InstallHandler here", found)
+
 
 if __name__ == "__main__":
     unittest.main()

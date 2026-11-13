@@ -19,14 +19,7 @@ public with sharing class PermissionSetSelector {
 		if (String.isBlank(permissionSetName)) {
 			return null;
 		}
-		List<PermissionSet> sets = [
-			SELECT Id, Name, Label
-			FROM PermissionSet
-			WHERE Name = :permissionSetName AND IsOwnedByProfile = FALSE
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
-		return sets.isEmpty() ? null : sets[0];
+		return SetupObjectSelector.permissionSet(permissionSetName);
 	}
 
 	/**

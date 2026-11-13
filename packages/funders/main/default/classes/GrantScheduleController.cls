@@ -140,22 +140,31 @@ public with sharing class GrantScheduleController {
 
 	/** Field labels for the headings and the Payment Frequency choices, by describe. */
 	private static void addLabels(Schedule schedule) {
-		Map<String, Schema.SObjectField> grantFields = Schema.SObjectType.Grant__c.fields.getMap();
-		Map<String, Schema.SObjectField> paymentFields = Schema.SObjectType.Grant_Payment__c.fields.getMap();
-		Map<String, Schema.SObjectField> byKey = new Map<String, Schema.SObjectField>{
-			'awarded' => grantFields.get('Amount_Awarded__c'),
-			'scheduled' => grantFields.get('Amount_Scheduled__c'),
-			'received' => grantFields.get('Amount_Received__c'),
-			'frequency' => grantFields.get('Payment_Frequency__c'),
-			'startDate' => grantFields.get('Award_Start_Date__c'),
-			'endDate' => grantFields.get('Award_End_Date__c'),
-			'dueDate' => paymentFields.get('Due_Date__c'),
-			'amount' => paymentFields.get('Amount__c'),
-			'status' => paymentFields.get('Status__c'),
-			'receivedDate' => paymentFields.get('Received_Date__c')
+		Map<String, String> grantFields = new Map<String, String>{
+			'awarded' => 'Amount_Awarded__c',
+			'scheduled' => 'Amount_Scheduled__c',
+			'received' => 'Amount_Received__c',
+			'frequency' => 'Payment_Frequency__c',
+			'startDate' => 'Award_Start_Date__c',
+			'endDate' => 'Award_End_Date__c'
 		};
-		for (String key : byKey.keySet()) {
-			schedule.fieldLabels.put(key, byKey.get(key).getDescribe().getLabel());
+		Map<String, String> paymentFields = new Map<String, String>{
+			'dueDate' => 'Due_Date__c',
+			'amount' => 'Amount__c',
+			'status' => 'Status__c',
+			'receivedDate' => 'Received_Date__c'
+		};
+		for (String key : grantFields.keySet()) {
+			schedule.fieldLabels.put(
+				key,
+				NamespaceUtil.fieldLabel(Grant__c.SObjectType, grantFields.get(key))
+			);
+		}
+		for (String key : paymentFields.keySet()) {
+			schedule.fieldLabels.put(
+				key,
+				NamespaceUtil.fieldLabel(Grant_Payment__c.SObjectType, paymentFields.get(key))
+			);
 		}
 		for (
 			Schema.PicklistEntry entry : Grant__c.Payment_Frequency__c.getDescribe()
