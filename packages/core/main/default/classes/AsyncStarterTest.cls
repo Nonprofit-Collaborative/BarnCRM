@@ -9,18 +9,6 @@ private class AsyncStarterTest {
 		TestUsers.admin();
 	}
 
-	private class Nothing implements Database.Batchable<SObject> {
-		public Database.QueryLocator start(Database.BatchableContext context) {
-			return Database.getQueryLocator([SELECT Id FROM User WHERE Id = NULL WITH SYSTEM_MODE]);
-		}
-		public void execute(Database.BatchableContext context, List<SObject> scope) {
-			return;
-		}
-		public void finish(Database.BatchableContext context) {
-			return;
-		}
-	}
-
 	private class NothingQueued implements Queueable {
 		public void execute(QueueableContext context) {
 			return;
@@ -31,7 +19,7 @@ private class AsyncStarterTest {
 	static void withRoomTheWorkStarts() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			Id batchId = AsyncStarter.batch(new Nothing(), 200, 'AsyncStarterTest');
+			Id batchId = AsyncStarter.batch(new AsyncStarterTestBatch(), 200, 'AsyncStarterTest');
 			Id queuedId = AsyncStarter.queue(new NothingQueued(), 'AsyncStarterTest');
 			Test.stopTest();
 
@@ -48,7 +36,7 @@ private class AsyncStarterTest {
 
 			Test.startTest();
 			try {
-				AsyncStarter.batch(new Nothing(), 200, 'AsyncStarterTest');
+				AsyncStarter.batch(new AsyncStarterTestBatch(), 200, 'AsyncStarterTest');
 			} catch (AsyncStarter.BusyException busy) {
 				message = busy.getMessage();
 				// A caller that logs what it catches does not log the refusal again.

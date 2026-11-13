@@ -2,12 +2,13 @@
  * Setup objects BarnCRM ships, looked up by Name or DeveloperName (D-200, N9).
  *
  * In a managed package a shipped permission set, permission set group, custom permission,
- * public group, static resource or email template carries the package's namespace in
+ * static resource or email template carries the package's namespace in
  * `NamespacePrefix`, and a subscriber may have one of the same name. A lookup by name alone
  * can pick theirs, or another package's. Every lookup here adds `NamespacePrefix` = this
  * package's namespace (`NamespaceUtil.namespacePrefix`, null with no namespace), so it finds
  * BarnCRM's own and nothing else. Email templates are the one exception: a setting may name an
  * org's own template, so the org's (no prefix) is used when BarnCRM ships none of that name.
+ * Public groups have no `NamespacePrefix`; their DeveloperName is unique in the org.
  *
  * System mode: these read names and ids of metadata, never records, and the people whose
  * actions need them (a post-install, a guest-site fix, a send) cannot all view setup.
@@ -74,14 +75,16 @@ public with sharing class SetupObjectSelector {
 		return null;
 	}
 
-	/** The id of this package's public group of that DeveloperName, or null. */
+	/**
+	 * The id of the public group of that DeveloperName, or null. Group has no NamespacePrefix:
+	 * a group's DeveloperName is unique in the org, so the name alone finds it.
+	 */
 	@NamespaceAccessible
 	public static Id groupId(String developerName) {
-		String ns = NamespaceUtil.namespacePrefix();
 		for (Group row : [
 			SELECT Id
 			FROM Group
-			WHERE DeveloperName = :developerName AND Type = 'Regular' AND NamespacePrefix = :ns
+			WHERE DeveloperName = :developerName AND Type = 'Regular'
 			WITH SYSTEM_MODE
 			LIMIT 1
 		]) {
