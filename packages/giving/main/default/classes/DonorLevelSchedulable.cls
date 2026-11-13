@@ -12,6 +12,6 @@ public with sharing class DonorLevelSchedulable implements Schedulable {
 	public void execute(SchedulableContext context) {
 		// Donor scores are kept whether or not levels are on (the Automation page switches them);
 		// the batch places levels only when they are enabled (G-19, R-DT5).
-		Database.executeBatch(new DonorLevelBatch(), CHUNK_SIZE);
+		AsyncStarter.batch(new DonorLevelBatch(), CHUNK_SIZE, 'DonorLevelSchedulable');
 	}
 }

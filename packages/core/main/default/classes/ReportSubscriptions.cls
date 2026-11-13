@@ -127,7 +127,10 @@ public with sharing class ReportSubscriptions {
 					BarnHelp.text('Core', 'Core_ReportSubscriptions_ReportNotFound')
 				);
 			}
-			return System.enqueueJob(new SubscribeJob(chosen, found[0].Name));
+			return AsyncStarter.queue(
+				new SubscribeJob(chosen, found[0].Name),
+				'ReportSubscriptions.subscribe'
+			);
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ReportSubscriptions.subscribe', true);
 		}

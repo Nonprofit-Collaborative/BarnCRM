@@ -104,7 +104,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 		if (isRunning()) {
 			return false;
 		}
-		Database.executeBatch(new SetupChangeCopyJob(), CHUNK_SIZE);
+		AsyncStarter.batch(new SetupChangeCopyJob(), CHUNK_SIZE, 'SetupChangeCopyJob');
 		return true;
 	}
 

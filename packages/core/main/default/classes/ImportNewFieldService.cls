@@ -282,7 +282,7 @@ public with sharing class ImportNewFieldService {
 		request.objectApiName = NamespaceUtil.objectType(request.objectApiName)
 			.getDescribe()
 			.getName();
-		return System.enqueueJob(new CreateFieldJob(request));
+		return AsyncStarter.queue(new CreateFieldJob(request), 'ImportNewFieldService');
 	}
 
 	public with sharing class CreateFieldJob implements Queueable, Database.AllowsCallouts {

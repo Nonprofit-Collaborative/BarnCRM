@@ -203,7 +203,7 @@ public with sharing class AutomationControl {
 		startWaitingRollups();
 		if (recomputeNames == true) {
 			try {
-				Database.executeBatch(new HouseholdNamingBatch(), 200);
+				AsyncStarter.batch(new HouseholdNamingBatch(), 200, RESUME_SCHEDULE_CONTEXT);
 			} catch (Exception failed) {
 				ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
 			}

@@ -200,9 +200,10 @@ public with sharing class NpspHouseholdAdoptionService {
 		String runId = key == NpspHouseholdSource.NPC
 			? key + '-' + UUID.randomUUID().toString().remove('-')
 			: UUID.randomUUID().toString();
-		Database.executeBatch(
+		AsyncStarter.batch(
 			NpspHouseholdAdoptionBatch.adopt(runId, keepNames != false, runCount),
-			NpspHouseholdAdoptionBatch.CHUNK_SIZE
+			NpspHouseholdAdoptionBatch.CHUNK_SIZE,
+			'NpspHouseholdAdoptionService'
 		);
 		return runId;
 	}
@@ -223,9 +224,10 @@ public with sharing class NpspHouseholdAdoptionService {
 				)
 			);
 		}
-		Database.executeBatch(
+		AsyncStarter.batch(
 			NpspHouseholdAdoptionBatch.undo(runId),
-			NpspHouseholdAdoptionBatch.CHUNK_SIZE
+			NpspHouseholdAdoptionBatch.CHUNK_SIZE,
+			'NpspHouseholdAdoptionService'
 		);
 	}
 

@@ -248,7 +248,11 @@ public with sharing class PledgeReminderService {
 		requireEnabled();
 		requireSendPermission();
 		try {
-			return Database.executeBatch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE);
+			return AsyncStarter.batch(
+				new PledgeReminderBatch(),
+				PledgeReminderBatch.SCOPE,
+				'PledgeReminderService'
+			);
 		} catch (Exception queueFailure) {
 			ErrorLogger.log(queueFailure, CONTEXT_START);
 			throw new PledgeReminderException(

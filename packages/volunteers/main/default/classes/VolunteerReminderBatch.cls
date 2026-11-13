@@ -15,7 +15,11 @@ public with sharing class VolunteerReminderBatch implements Database.Batchable<S
 		if (!VolunteerReminderService.isActive()) {
 			return null;
 		}
-		return Database.executeBatch(new VolunteerReminderBatch(), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new VolunteerReminderBatch(),
+			CHUNK_SIZE,
+			'VolunteerReminderBatch'
+		);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

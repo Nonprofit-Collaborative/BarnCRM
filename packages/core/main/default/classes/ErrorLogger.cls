@@ -42,7 +42,8 @@ public with sharing class ErrorLogger {
 
 	@NamespaceAccessible
 	public static void log(Exception thrown, String context, Id recordId) {
-		if (thrown == null) {
+		// A busy refusal was written once where it happened (AsyncStarter, D-200 P9).
+		if (thrown == null || thrown instanceof AsyncStarter.BusyException) {
 			return;
 		}
 		log(new List<Exception>{ thrown }, context, recordId);

@@ -81,6 +81,9 @@ jobs:
       - name: Check the global describe is read only through NamespaceUtil
         run: python3 scripts/ci/check-global-describe.py
 
+      - name: Check background work starts through AsyncStarter
+        run: python3 scripts/ci/check-async-starter.py
+
       - name: Check help texts filled in by String.format have no lone apostrophe
         run: python3 scripts/ci/check-help-text-apostrophes.py
 

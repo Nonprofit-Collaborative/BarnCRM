@@ -128,7 +128,11 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			run.Data_Job_Id__c = job.Id;
 			Database.update(run, AccessLevel.SYSTEM_MODE);
 		}
-		Database.executeBatch(new TerritoryRunBatch(kinds, 0, totals), chunkFor(kinds[0]));
+		AsyncStarter.batch(
+			new TerritoryRunBatch(kinds, 0, totals),
+			chunkFor(kinds[0]),
+			'TerritoryRunBatch'
+		);
 		return run.Id;
 	}
 

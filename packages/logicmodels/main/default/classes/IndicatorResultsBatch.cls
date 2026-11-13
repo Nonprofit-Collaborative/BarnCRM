@@ -60,7 +60,11 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 		if (indicatorIds == null || indicatorIds.isEmpty()) {
 			return null;
 		}
-		return Database.executeBatch(new IndicatorResultsBatch(indicatorIds), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new IndicatorResultsBatch(indicatorIds),
+			CHUNK_SIZE,
+			'IndicatorResultsBatch'
+		);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

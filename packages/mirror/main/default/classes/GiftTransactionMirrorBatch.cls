@@ -56,12 +56,20 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 		if (!GiftTransactionMirrorService.isOn()) {
 			return null;
 		}
-		return Database.executeBatch(new GiftTransactionMirrorBatch(null, null), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new GiftTransactionMirrorBatch(null, null),
+			CHUNK_SIZE,
+			'GiftTransactionMirrorBatch'
+		);
 	}
 
 	/** Copies again every gift of R-GT3 dated in the range. */
 	public static Id runRange(Date fromDate, Date toDate) {
-		return Database.executeBatch(new GiftTransactionMirrorBatch(fromDate, toDate), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new GiftTransactionMirrorBatch(fromDate, toDate),
+			CHUNK_SIZE,
+			'GiftTransactionMirrorBatch'
+		);
 	}
 
 	/** Why a chunk must not work now, or null when it may. */

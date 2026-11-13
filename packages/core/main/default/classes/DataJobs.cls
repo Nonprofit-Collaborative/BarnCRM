@@ -189,7 +189,7 @@ public with sharing class DataJobs {
 
 	/** Starts the job's batch at the chunk size stamped on it, and records the batch's job. */
 	public static Import_Batch__c launch(Database.Batchable<SObject> work, Import_Batch__c job) {
-		Id asyncJobId = Database.executeBatch(work, job.Chunk_Size__c.intValue());
+		Id asyncJobId = AsyncStarter.batch(work, job.Chunk_Size__c.intValue(), 'DataJobs.launch');
 		job.Job_Id__c = asyncJobId;
 		Database.update(
 			new Import_Batch__c(Id = job.Id, Job_Id__c = asyncJobId),

@@ -42,7 +42,7 @@ public with sharing class ShiftScheduleBatch implements Database.Batchable<SObje
 		if (ShiftScheduleService.isTurnedOff()) {
 			return null;
 		}
-		return Database.executeBatch(new ShiftScheduleBatch(), chunkSize());
+		return AsyncStarter.batch(new ShiftScheduleBatch(), chunkSize(), 'ShiftScheduleBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

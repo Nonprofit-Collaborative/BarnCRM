@@ -20,7 +20,11 @@ public with sharing class AskReminderSchedulable implements Schedulable {
 			if (!AskReminderService.isEnabled() || AskReminderService.isRunning()) {
 				return;
 			}
-			Database.executeBatch(new AskReminderBatch(), AskReminderBatch.CHUNK_SIZE);
+			AsyncStarter.batch(
+				new AskReminderBatch(),
+				AskReminderBatch.CHUNK_SIZE,
+				'AskReminderSchedulable'
+			);
 		} catch (Exception jobFailure) {
 			ErrorLogger.log(jobFailure, 'AskReminderSchedulable');
 		}

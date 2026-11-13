@@ -305,6 +305,15 @@ Salesforce org is needed for this job. Steps:
    a large org and cannot change within a transaction, so every class reads the one copy
    `NamespaceUtil.globalDescribe()` keeps per transaction and running user (D-143). Test
    classes are exempt.
+   `scripts/ci/check-async-starter.py` fails the build if packaged Apex calls
+   `Database.executeBatch` or `System.enqueueJob` directly, outside `AsyncStarter` and the
+   allowance `scripts/ci/async-starter-allowlist.txt` gives each file (D-200 P9). A button or
+   nightly step starts its work with `AsyncStarter.batch(work, scope, context)` or
+   `AsyncStarter.queue(work, context)`: it refuses when 95 batch jobs are already waiting or
+   this request may queue no more, logs the refusal once and throws
+   `AsyncStarter.BusyException`, whose message asks the person to try again in a few minutes.
+   The allowlist keeps jobs that chain themselves, starts from a trigger or save, post-install
+   steps and batches over values; its counts must match, so lower one as a call moves over.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

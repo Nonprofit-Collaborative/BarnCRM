@@ -299,9 +299,10 @@ public with sharing class FindController {
 				}
 			}
 			String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
-			Id jobId = Database.executeBatch(
+			Id jobId = AsyncStarter.batch(
 				new FindExportBatch(queryJson, labels, tag, rowLimit),
-				FindExportBatch.SCOPE
+				FindExportBatch.SCOPE,
+				'FindController.startServerExport'
 			);
 			return serverExport(jobId, tag);
 		} catch (Exception caught) {

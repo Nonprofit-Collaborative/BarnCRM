@@ -523,9 +523,10 @@ public with sharing class MigrationKitService {
 			),
 			AccessLevel.USER_MODE
 		);
-		Database.executeBatch(
+		AsyncStarter.batch(
 			new MigrationStageBatch(batch.Id, kitKey, step.key),
-			ImportBatchService.chunkSize()
+			ImportBatchService.chunkSize(),
+			'MigrationKitService'
 		);
 	}
 

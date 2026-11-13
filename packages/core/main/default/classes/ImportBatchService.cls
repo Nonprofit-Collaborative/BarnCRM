@@ -717,11 +717,12 @@ public with sharing class ImportBatchService {
 		}
 		// Enqueued before the write, so the job is recorded with the pass; both roll back
 		// together if the write fails.
-		batch.Job_Id__c = Database.executeBatch(
+		batch.Job_Id__c = AsyncStarter.batch(
 			rowIds == null
 				? new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow)
 				: new ImportProcessorBatch(batch.Id, rowIds),
-			scopeSize(batch.Chunk_Size__c)
+			scopeSize(batch.Chunk_Size__c),
+			'ImportBatchService'
 		);
 		Database.update(passStamp(batch), AccessLevel.USER_MODE);
 		// The pass number, job and template snapshot are the package's bookkeeping, read only

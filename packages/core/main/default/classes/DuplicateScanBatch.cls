@@ -67,9 +67,10 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
 			return null;
 		}
 		String first = toScan.remove(0);
-		return Database.executeBatch(
+		return AsyncStarter.batch(
 			new DuplicateScanBatch(first, toScan),
-			DuplicateService.MAX_RECORDS_PER_CALL
+			DuplicateService.MAX_RECORDS_PER_CALL,
+			'DuplicateScanBatch'
 		);
 	}
 

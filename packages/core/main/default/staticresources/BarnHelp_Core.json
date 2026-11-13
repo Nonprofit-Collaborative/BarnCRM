@@ -3,6 +3,7 @@
   "texts": {
     "Core_AccountListRedirect_OpenHouseholds": "Open Households",
     "Core_AccountListRedirect_OpenOrganizations": "Open Organizations",
+    "Core_AsyncStarter_Busy": "Salesforce is busy with other background jobs in this org, so this could not start. Nothing was changed. Try again in a few minutes.",
     "Core_AccessCompare_Choose": "Choose two to compare.",
     "Core_AccessCompare_Counts": "{0} of {1} rows differ.",
     "Core_AccessCompare_OnlyIn": "Only {0}: {1}.",

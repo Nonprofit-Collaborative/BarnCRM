@@ -48,18 +48,23 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 		if (direction == OpportunityMirrorService.OFF || !OpportunityMirrorService.isAvailable()) {
 			return null;
 		}
-		return Database.executeBatch(new OpportunityMirrorBatch(direction, null, null), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new OpportunityMirrorBatch(direction, null, null),
+			CHUNK_SIZE,
+			'OpportunityMirrorBatch'
+		);
 	}
 
 	/** Copies again every gift in the totals dated in the range (Gifts to Opportunities only). */
 	public static Id runRange(Date fromDate, Date toDate) {
-		return Database.executeBatch(
+		return AsyncStarter.batch(
 			new OpportunityMirrorBatch(
 				OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES,
 				fromDate,
 				toDate
 			),
-			CHUNK_SIZE
+			CHUNK_SIZE,
+			'OpportunityMirrorBatch'
 		);
 	}
 

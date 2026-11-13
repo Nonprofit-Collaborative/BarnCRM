@@ -82,7 +82,7 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 		if (problem != null) {
 			throw new PortalPaymentException(problem);
 		}
-		System.enqueueJob(new GivingPortalPayments(commitment.Id, card));
+		AsyncStarter.queue(new GivingPortalPayments(commitment.Id, card), 'GivingPortalPayments');
 		return card
 			? BarnHelp.text('Giving', 'Giving_UpdateCard_Sent')
 			: BarnHelp.text('Giving', 'Giving_PayOnline_Sent');
