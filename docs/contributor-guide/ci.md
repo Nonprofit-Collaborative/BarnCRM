@@ -932,6 +932,25 @@ package ids is all that is left:
   package carries `"ancestorVersion": "HIGHEST"`, which a managed upgrade needs (the install and
   upgrade test checks it).
 
+**Less common metadata in 2GP managed packages (D-200, N11).** Checked 2026-11-12. The
+Salesforce Metadata Coverage Report and the 2GP "Metadata Components and Attributes" page
+refuse automated reads (HTTP 403), so every row below is **unverified** against the report and
+rests on the packaging guide as last read by hand. Before the first `create-versions.sh` run,
+open the Coverage Report for API 67.0 and tick each row; a type the report does not mark for
+"Second-Generation Managed Packages" fails at version create, not at deploy.
+
+| Type (shipped in) | Expected in 2GP managed | Notes to confirm |
+|---|---|---|
+| `Group` `Programs_Participants` (programs) | Yes | Packaged as a public group; members are subscriber data, never packaged |
+| `PlatformEventSubscriberConfig` (core) | Yes | It names no running user (only the batch size), which is what lets it install |
+| `Prompt` in-app guidance, 3 (core) | Yes | In-App Guidance prompts, not Prompt Builder templates; none of the GenAI types ship |
+| `ExternalCredential` `Barn_Org_Connection` (core) | Yes | Principals and their credentials are set per org after install; check the principal-access permission set entries survive packaging |
+| `CustomNotificationType`, 3 (core, corporatehub, scholarships) | Yes | |
+| `ContentAsset`, 9 (8 packages) | Yes | Asset files; check the subscriber can still use them after an upgrade replaces the file |
+| `GlobalValueSet` (projects) | Yes | Values added by a subscriber stay; values removed in an upgrade are not removed from the org |
+| `ApexPage` `FormsPublic` (forms) | Yes | Its name gains the prefix (`barn__FormsPublic`): the admin guide's Site setup step must name the page as the org shows it |
+| `RemoteSiteSetting`, 6 (addressverification, funders, payments) | Yes | Subscriber may deactivate; the callout then fails with the Error Log entry, not silently |
+
 **The script.** `scripts/packaging/create-versions.sh` builds one version of each chosen package
 in dependency order, read from `sfdx-project.json` through `package-upgrade-helper.py` (the
 reader the install and upgrade test uses). It prints the Dev Hub's `Package2VersionCreates`
