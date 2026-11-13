@@ -381,7 +381,9 @@ private class GiftPostingLockTest {
 	@IsTest
 	static void theOrganizationDonorOfALockedGiftIsNotDeleted() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Account riverside = new Account(Name = 'Riverside Foundation');
+			Account riverside = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation')
+			);
 			insert riverside;
 			Gift__c grant = GivingTestDataFactory.buildGift(null, 500);
 			grant.Donor_Account__c = riverside.Id;

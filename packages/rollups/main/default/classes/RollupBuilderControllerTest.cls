@@ -473,14 +473,14 @@ private class RollupBuilderControllerTest {
 				'The Builder shows what was typed'
 			);
 
-			Account family = new Account(Name = 'Delimiter Family');
+			Account family = TestDataFactory.organization(new Account(Name = 'Delimiter Family'));
 			insert family;
 			// Real-time totals are queued and recalculated just after the save (ADR-0098), so the
 			// queued run finishes at stopTest.
 			Test.startTest();
 			insert new List<Contact>{
-				new Contact(LastName = 'Baker', AccountId = family.Id),
-				new Contact(LastName = 'Ames', AccountId = family.Id)
+				TestDataFactory.person(new Contact(LastName = 'Baker', AccountId = family.Id)),
+				TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = family.Id))
 			};
 			Test.stopTest();
 			System.Assert.areEqual(
@@ -962,7 +962,7 @@ private class RollupBuilderControllerTest {
 	@IsTest
 	static void targetFiltersThatShareARecordOverlapAndOnesThatDoNotAreAllowed() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			insert new Account(Name = 'Alpha Org');
+			insert TestDataFactory.organization(new Account(Name = 'Alpha Org'));
 			insert existing('Alpha count', nameFilter('starts with', 'Alpha'));
 
 			RollupBuilderController.Draft overlapping = childCount();
@@ -1008,11 +1008,15 @@ private class RollupBuilderControllerTest {
 
 	/** A parent organization holding a stale count, with this many child organizations. */
 	private static Account parentWith(Integer children) {
-		Account parent = new Account(Name = 'Parent Org', Member_Count__c = 5);
+		Account parent = TestDataFactory.organization(
+			new Account(Name = 'Parent Org', Member_Count__c = 5)
+		);
 		insert parent;
 		List<Account> kids = new List<Account>();
 		for (Integer i = 0; i < children; i++) {
-			kids.add(new Account(Name = 'Child ' + i, ParentId = parent.Id));
+			kids.add(
+				TestDataFactory.organization(new Account(Name = 'Child ' + i, ParentId = parent.Id))
+			);
 		}
 		insert kids;
 		return parent;

@@ -55,7 +55,7 @@ private class ConnectionHelpersTest {
 				'{"attributes":{"type":"Contact"},"Name":"Garcia"}',
 				Contact.class
 			);
-			Account account = new Account(Name = 'Garcia Household');
+			Account account = TestDataFactory.organization(new Account(Name = 'Garcia Household'));
 			Assert.areEqual('Garcia', PersonReference.nameOf(contact, account, 'Unnamed'));
 			Assert.areEqual('Garcia Household', PersonReference.nameOf(null, account, 'Unnamed'));
 			Assert.areEqual('Unnamed', PersonReference.nameOf(null, null, 'Unnamed'));
@@ -65,9 +65,9 @@ private class ConnectionHelpersTest {
 	@IsTest
 	static void aFailureLeavesAnExistingMessageAlone() {
 		System.runAs(TestUsers.admin()) {
-			Account refused = new Account(Name = 'Refused');
+			Account refused = TestDataFactory.organization(new Account(Name = 'Refused'));
 			refused.addError('Already refused');
-			Account other = new Account(Name = 'Other');
+			Account other = TestDataFactory.organization(new Account(Name = 'Other'));
 
 			new ReportingHandler().fail(new List<SObject>{ refused, other }, 'Sync failed');
 

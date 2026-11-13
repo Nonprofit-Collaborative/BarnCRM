@@ -25,21 +25,25 @@ private class AskReminderTest {
 	}
 
 	private static Contact donorContact(Id ownerId, Date nextAsk) {
-		Contact person = new Contact(
-			FirstName = 'Dana',
-			LastName = 'Donor' + String.valueOf(Math.abs(Crypto.getRandomInteger())),
-			OwnerId = ownerId,
-			Next_Ask_Date__c = nextAsk
+		Contact person = TestDataFactory.person(
+			new Contact(
+				FirstName = 'Dana',
+				LastName = 'Donor' + String.valueOf(Math.abs(Crypto.getRandomInteger())),
+				OwnerId = ownerId,
+				Next_Ask_Date__c = nextAsk
+			)
 		);
 		insert person;
 		return person;
 	}
 
 	private static Account donorAccount(Id ownerId, Date nextAsk) {
-		Account organization = new Account(
-			Name = 'Foundation ' + String.valueOf(Math.abs(Crypto.getRandomInteger())),
-			OwnerId = ownerId,
-			Next_Ask_Date__c = nextAsk
+		Account organization = TestDataFactory.organization(
+			new Account(
+				Name = 'Foundation ' + String.valueOf(Math.abs(Crypto.getRandomInteger())),
+				OwnerId = ownerId,
+				Next_Ask_Date__c = nextAsk
+			)
 		);
 		insert organization;
 		return organization;
@@ -362,14 +366,12 @@ private class AskReminderTest {
 	static void theDecisionAppliesTheWindowAndTheStamp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Date today = System.today();
-			Contact arrived = new Contact(Next_Ask_Date__c = today);
-			Contact stamped = new Contact(
-				Next_Ask_Date__c = today,
-				Ask_Reminder_For_Date__c = today
+			Contact arrived = TestDataFactory.person(new Contact(Next_Ask_Date__c = today));
+			Contact stamped = TestDataFactory.person(
+				new Contact(Next_Ask_Date__c = today, Ask_Reminder_For_Date__c = today)
 			);
-			Contact restamped = new Contact(
-				Next_Ask_Date__c = today,
-				Ask_Reminder_For_Date__c = today.addDays(-5)
+			Contact restamped = TestDataFactory.person(
+				new Contact(Next_Ask_Date__c = today, Ask_Reminder_For_Date__c = today.addDays(-5))
 			);
 			Assert.isTrue(AskReminderService.isDue(arrived, today));
 			Assert.isFalse(
@@ -380,7 +382,7 @@ private class AskReminderTest {
 				AskReminderService.isDue(restamped, today),
 				'Reminded for an older date.'
 			);
-			Assert.isFalse(AskReminderService.isDue(new Contact(), today));
+			Assert.isFalse(AskReminderService.isDue(TestDataFactory.person(new Contact()), today));
 			Assert.areEqual(
 				0,
 				AskReminderService.remindersFor(null, today, new List<SObject>()).size()

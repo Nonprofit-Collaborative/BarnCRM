@@ -83,7 +83,7 @@ private class NpspHouseholdUseTest {
 	@IsTest
 	static void inUseWhileHouseholdsAreNotAdopted() {
 		System.runAs(TestUsers.admin()) {
-			insert as user new Account(Name = NPSP_NAME);
+			insert as user TestDataFactory.organization(new Account(Name = NPSP_NAME));
 			useSource(new FakeSource(true, false));
 
 			Test.startTest();

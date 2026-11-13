@@ -77,7 +77,9 @@ private class EventAgendaControllerTest {
 		System.runAs(staff()) {
 			Datetime start = Datetime.now().addDays(30);
 			Event__c event = conference(start);
-			Contact person = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia')
+			);
 			insert as user person;
 			Event_Speaker__c speaker = new Event_Speaker__c(
 				Event__c = event.Id,

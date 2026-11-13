@@ -127,7 +127,9 @@ private class AddressMatchKeyTest {
 	// ------------------------------------------------------------------ helpers
 
 	private static Contact insertPerson(String firstName, String lastName) {
-		Contact person = new Contact(FirstName = firstName, LastName = lastName);
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = firstName, LastName = lastName)
+		);
 		TestDataFactory.pastDuplicateRules(person);
 		insert person;
 		return person;

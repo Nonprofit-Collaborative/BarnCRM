@@ -16,7 +16,9 @@ private class CommitmentTriggerHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
+		);
 		insert person;
 		return person;
 	}

@@ -117,7 +117,13 @@ private class ImportSeveralObjectsTest {
 		List<Account> result = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			result.add(
-				new Account(Name = 'Org ' + i, Phone = '555-0000', RecordTypeId = organizationType)
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Org ' + i,
+						Phone = '555-0000',
+						RecordTypeId = organizationType
+					)
+				)
 			);
 		}
 		insert result;
@@ -125,7 +131,9 @@ private class ImportSeveralObjectsTest {
 	}
 
 	private static Contact person() {
-		Contact created = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+		Contact created = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+		);
 		insert created;
 		return created;
 	}
@@ -360,10 +368,8 @@ private class ImportSeveralObjectsTest {
 		System.runAs(TestUsers.admin()) {
 			System.runAs(admin()) {
 				List<Account> orgs = organizations(2);
-				Contact ana = new Contact(
-					FirstName = 'Ana',
-					LastName = 'Ramirez',
-					AccountId = orgs[1].Id
+				Contact ana = TestDataFactory.person(
+					new Contact(FirstName = 'Ana', LastName = 'Ramirez', AccountId = orgs[1].Id)
 				);
 				insert ana;
 				ImportMapping mapping = organizationsAndAffiliations();

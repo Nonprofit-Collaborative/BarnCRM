@@ -21,7 +21,9 @@ private class AutoMergeServiceTest {
 	}
 
 	private static Contact person(String firstName, String email) {
-		return new Contact(FirstName = firstName, LastName = 'Automerge', Email = email);
+		return TestDataFactory.person(
+			new Contact(FirstName = firstName, LastName = 'Automerge', Email = email)
+		);
 	}
 
 	/** The person's live membership rows (empty outside junction mode). */
@@ -58,17 +60,21 @@ private class AutoMergeServiceTest {
 	@IsTest
 	static void exactNeedsTheSameNameAndTheRulesValue() {
 		System.runAs(TestUsers.admin()) {
-			Contact a = new Contact(
-				FirstName = 'Ann',
-				LastName = 'Lee',
-				Email = 'ann@example.org',
-				Phone = '555-010-2000'
+			Contact a = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ann',
+					LastName = 'Lee',
+					Email = 'ann@example.org',
+					Phone = '555-010-2000'
+				)
 			);
-			Contact b = new Contact(
-				FirstName = 'ann ',
-				LastName = 'LEE',
-				Email = 'ANN@example.org',
-				Phone = '(555) 010 2000'
+			Contact b = TestDataFactory.person(
+				new Contact(
+					FirstName = 'ann ',
+					LastName = 'LEE',
+					Email = 'ANN@example.org',
+					Phone = '(555) 010 2000'
+				)
 			);
 			Assert.isTrue(AutoMergeService.isExact(a, b, AutoMergeService.NAME_AND_EMAIL));
 			Assert.isTrue(AutoMergeService.isExact(a, b, AutoMergeService.NAME_AND_PHONE));
@@ -86,15 +92,15 @@ private class AutoMergeServiceTest {
 				AutoMergeService.isExact(a, b, AutoMergeService.NAME_AND_PHONE),
 				'Differing birthdates are never exact.'
 			);
-			Contact noFirst = new Contact(LastName = 'Lee', Email = 'ann@example.org');
+			Contact noFirst = TestDataFactory.person(
+				new Contact(LastName = 'Lee', Email = 'ann@example.org')
+			);
 			Assert.isFalse(
 				AutoMergeService.isExact(noFirst, noFirst.clone(), AutoMergeService.NAME_AND_EMAIL),
 				'A first name is needed.'
 			);
-			Contact jon = new Contact(
-				FirstName = 'Jon',
-				LastName = 'Lee',
-				Email = 'ann@example.org'
+			Contact jon = TestDataFactory.person(
+				new Contact(FirstName = 'Jon', LastName = 'Lee', Email = 'ann@example.org')
 			);
 			Assert.isFalse(AutoMergeService.isExact(a, jon, AutoMergeService.NAME_AND_EMAIL));
 		}

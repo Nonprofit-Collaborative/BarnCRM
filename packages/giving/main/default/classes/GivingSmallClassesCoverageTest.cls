@@ -128,7 +128,7 @@ private class GivingSmallClassesCoverageTest {
 	@IsTest
 	static void aStewardshipStarterThatCannotReadItsTemplatesLeavesTheGiftsAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact donor = new Contact(LastName = 'Ramirez');
+			Contact donor = TestDataFactory.person(new Contact(LastName = 'Ramirez'));
 			insert donor;
 			List<Gift__c> gifts = new List<Gift__c>();
 			for (Integer i = 0; i < 200; i++) {
@@ -187,7 +187,11 @@ private class GivingSmallClassesCoverageTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(new Contact(FirstName = 'Donor' + i, LastName = 'Nobody'));
+				people.add(
+					TestDataFactory.person(
+						new Contact(FirstName = 'Donor' + i, LastName = 'Nobody')
+					)
+				);
 			}
 			insert people;
 

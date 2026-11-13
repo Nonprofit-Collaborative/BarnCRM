@@ -750,7 +750,9 @@ private class HouseholdMergeServiceTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-			Account organization = new Account(Name = 'Bay Area Food Bank');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Bay Area Food Bank')
+			);
 			Database.insert(new List<Account>{ household, organization }, AccessLevel.SYSTEM_MODE);
 
 			String message;

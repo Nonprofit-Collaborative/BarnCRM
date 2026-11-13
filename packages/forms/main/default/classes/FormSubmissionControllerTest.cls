@@ -13,8 +13,20 @@ private class FormSubmissionControllerTest {
 	static void showsAnswersByQuestionAndProcessesAHeldOneAgain() {
 		System.runAs(TestUsers.adminWith(FormsTestData.ADMIN)) {
 			List<Contact> twins = new List<Contact>{
-				new Contact(FirstName = 'Pat', LastName = 'Zzpanel', Email = 'twins@example.org'),
-				new Contact(FirstName = 'Pat', LastName = 'Zzpanel', Email = 'twins@example.org')
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Pat',
+						LastName = 'Zzpanel',
+						Email = 'twins@example.org'
+					)
+				),
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Pat',
+						LastName = 'Zzpanel',
+						Email = 'twins@example.org'
+					)
+				)
 			};
 			insert as user twins;
 			Form__c form = FormsTestData.volunteerInterest();
