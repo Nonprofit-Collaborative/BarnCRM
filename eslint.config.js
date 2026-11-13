@@ -9,6 +9,7 @@ const lwcConfig = require('@salesforce/eslint-config-lwc/recommended');
 // such module to this list; the rule below then keeps it from importing the platform. See
 // docs/contributor-guide/ci.md, static step 3.
 const PURE_MODULES = [
+  'packages/core/main/default/lwc/bugReportText/bugReportText.js',
   'packages/core/main/default/lwc/csvParser/csvParser.js',
   'packages/core/main/default/lwc/filesImportModel/filesImportModel.js',
   'packages/core/main/default/lwc/importWizard/xlsx.js',
