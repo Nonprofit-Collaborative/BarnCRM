@@ -16,9 +16,9 @@ This has happened four times in this project, which is why it is a gate rather t
     Issue receipt".
   * commitmentSchedulePreview shipped with G-07 on no page and was never mentioned in its guide.
 
-A component counts as reachable when it is placed on a flexipage, invoked by a quick action,
-nested inside another component's markup, or named in the settings console's own import
-switch. Those are the four ways anything in this package reaches a screen.
+A component counts as reachable when it is placed on a flexipage, named by a component tab,
+invoked by a quick action, nested inside another component's markup, or named in the settings
+console's own import switch. Those are the five ways anything in this package reaches a screen.
 
 The check deliberately says nothing about whether the *page* is reachable in turn: a flexipage
 nobody assigns is a different problem, and `check-record-pages-assigned.py` is the gate for it.
@@ -32,6 +32,7 @@ import sys
 CONSOLE = "packages/core/main/default/lwc/settingsConsole/settingsConsole.js"
 CONSOLE_CASE = re.compile(r"case '([A-Za-z0-9_]+)'")
 COMPONENT_NAME = re.compile(r"<componentName>([A-Za-z0-9_]+)</componentName>")
+TAB_LWC = re.compile(r"<lwcComponent>([A-Za-z0-9_]+)</lwcComponent>")
 QUICK_ACTION_LWC = re.compile(r"<lightningWebComponent>([A-Za-z0-9_]+)</lightningWebComponent>")
 MARKUP_TAG = re.compile(r"<c-([a-z0-9-]+)")
 JS_IMPORT = re.compile(r"from\s+'c/([A-Za-z0-9_]+)'")
@@ -49,6 +50,11 @@ def reachable_names():
     for path in glob.glob("packages/*/main/default/flexipages/*.xml"):
         with open(path, encoding="utf-8") as handle:
             names.update(COMPONENT_NAME.findall(handle.read()))
+
+    # A component tab (ADR-0020 amendment A1) reaches its component directly.
+    for path in glob.glob("packages/*/main/default/tabs/*.tab-meta.xml"):
+        with open(path, encoding="utf-8") as handle:
+            names.update(TAB_LWC.findall(handle.read()))
 
     for path in glob.glob("packages/*/main/default/quickActions/*.xml"):
         with open(path, encoding="utf-8") as handle:

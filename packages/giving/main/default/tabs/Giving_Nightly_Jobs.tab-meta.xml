@@ -4,7 +4,7 @@
     The Giving module's nightly jobs: whether they are scheduled, when each last ran, and what
     it did.
   </description>
-  <flexiPage>Giving_Nightly_Jobs</flexiPage>
   <label>Giving Nightly Jobs</label>
+  <lwcComponent>givingNightlyJobs</lwcComponent>
   <motif>Custom10: Moon</motif>
 </CustomTab>

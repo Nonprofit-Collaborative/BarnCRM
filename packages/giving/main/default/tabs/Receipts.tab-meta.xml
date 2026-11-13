@@ -4,7 +4,7 @@
     The receipt letters donors read, and the button that generates this year's statements. The tax
     wording is added by BarnCRM and is not editable here.
   </description>
-  <flexiPage>Receipts</flexiPage>
   <label>Receipt Letters</label>
+  <lwcComponent>receiptSettings</lwcComponent>
   <motif>Custom27: Laptop</motif>
 </CustomTab>

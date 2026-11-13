@@ -5959,7 +5959,7 @@ read in system mode at send time, so the check does not depend on the sender's f
   pledge reminders), `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
   `AcknowledgmentLetterMerge`, and `AcknowledgmentController` for the page.
 - **Custom permission:** `Send_Acknowledgments`, granted to Giving Admin and Giving Staff.
-- **Page:** LWC `acknowledgments` on the `Acknowledgments` tab and flexipage, reached from
+- **Page:** LWC `acknowledgments` on the `Acknowledgments` component tab, reached from
   the Giving section of the BarnCRM Settings console by navigation (ADR-0020).
 
 ---
@@ -6034,7 +6034,7 @@ which is what the Amount Only For Gift Events rule already enforces at save.
 - **Service:** `StewardshipService`, with `StewardshipSelector` reading and
   `StewardshipWriter` writing, following the pattern the rest of Giving uses.
 - **Settings console:** the Stewardship Plans page, component `stewardshipPlans` with
-  `StewardshipPlanController` behind it, on the `Stewardship_Plans` tab and flexipage and
+  `StewardshipPlanController` behind it, on the `Stewardship_Plans` component tab and
   registered as a `Setting_Definition__mdt` Component row reached by navigation (ADR-0020).
   Templates, their steps, their order and their Active state are all administered there, so
   no part of setting a plan up needs Setup or a raw object tab.
