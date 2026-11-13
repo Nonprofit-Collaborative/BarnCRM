@@ -49,12 +49,12 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 		if (isComment()) {
 			return;
 		}
-		Boolean staff = Schema.SObjectType.Project_Request__c.isCreateable();
+		Boolean canCreate = Schema.SObjectType.Project_Request__c.isCreateable();
 		List<Project_Request__c> needAccount = new List<Project_Request__c>();
 		Id me = UserInfo.getUserId();
 		for (Project_Request__c row : (List<Project_Request__c>) newRecords()) {
 			if (row.Channel__c == null) {
-				row.Channel__c = staff ? STAFF : PORTAL;
+				row.Channel__c = canCreate ? STAFF : PORTAL;
 			}
 			if (row.Channel__c != STAFF) {
 				if (!ProjectsSettings.requestsExternalEnabled()) {
@@ -87,11 +87,11 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 		if (isComment()) {
 			return;
 		}
-		Boolean staff = Schema.SObjectType.Project_Request__c.isUpdateable();
+		Boolean canEdit = Schema.SObjectType.Project_Request__c.isUpdateable();
 		Map<Id, SObject> before = oldRecordsById();
 		for (Project_Request__c row : (List<Project_Request__c>) newRecords()) {
 			Project_Request__c old = (Project_Request__c) before.get(row.Id);
-			if (!staff) {
+			if (!canEdit) {
 				for (String field : SENT_FIELDS) {
 					row.put(field, old.get(field));
 				}
@@ -136,7 +136,7 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 		Map<Id, SObject> before = oldRecordsById();
 		Map<Id, String> titles = new Map<Id, String>();
 		List<Project_Request_Comment__c> fromRequesters = new List<Project_Request_Comment__c>();
-		Set<Id> resolved = new Set<Id>();
+		Set<Id> nowResolved = new Set<Id>();
 		for (Project_Request__c row : (List<Project_Request__c>) newRecords()) {
 			Project_Request__c old = (Project_Request__c) before.get(row.Id);
 			String reply = replies.remove(row.Id);
@@ -160,15 +160,15 @@ public with sharing class ProjectRequestHandler extends TriggerHandler {
 				);
 			}
 			if (row.Status__c == RESOLVED && old.Status__c != RESOLVED) {
-				resolved.add(row.Id);
+				nowResolved.add(row.Id);
 			}
 		}
 		if (!fromRequesters.isEmpty()) {
 			new Elevated().insertComments(fromRequesters);
 		}
 		notifyOwners(titles, (List<Project_Request__c>) newRecords());
-		if (!resolved.isEmpty()) {
-			emailRequesters(resolved, null);
+		if (!nowResolved.isEmpty()) {
+			emailRequesters(nowResolved, null);
 		}
 	}
 
