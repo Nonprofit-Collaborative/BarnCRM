@@ -164,4 +164,37 @@ private class ProjectRequestApiTest {
 		}
 		Assert.areEqual(0, [SELECT COUNT() FROM Project_Request__c], 'Nothing saved');
 	}
+
+	/**
+	 * The same request sent twice at once: the second save is refused by the unique key, and
+	 * answers the request the first saved, as a repeat does, not a save failure.
+	 */
+	@IsTest
+	static void twoCallsAtOnceAnswerTheSameRequest() {
+		User caller = intake();
+		connect(caller, true, 60);
+		String org = UserInfo.getOrganizationId();
+		System.runAs(caller) {
+			Assert.areEqual(201, post(send('C-1', org)), 'The first saves it');
+			Object firstNumber = answer().get('number');
+			ProjectRequestApi.raceForTest = true;
+			Assert.areEqual(200, post(send('C-1', org)), 'The second finds it');
+			Assert.areEqual(firstNumber, answer().get('number'), 'The same request');
+		}
+		System.runAs(ProjectsTestData.admin()) {
+			Assert.areEqual(1, [SELECT COUNT() FROM Project_Request__c], 'Saved once');
+		}
+	}
+
+	/** An unexpected fault is the receiving org's, answered 500, not a bad request. */
+	@IsTest
+	static void anUnexpectedFaultAnswers500() {
+		User caller = intake();
+		connect(caller, true, 60);
+		System.runAs(caller) {
+			ProjectRequestApi.faultForTest = true;
+			Assert.areEqual(500, post(send('D-1', UserInfo.getOrganizationId())), 'Our fault');
+			Assert.areEqual('internal_error', answer().get('error'), 'Short code');
+		}
+	}
 }

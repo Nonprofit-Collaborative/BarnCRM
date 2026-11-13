@@ -118,8 +118,14 @@ public with sharing class FormPublicPolicy {
 		return null;
 	}
 
+	/**
+	 * Whether a public form may save to this object. The Forms objects are refused by the name
+	 * as written and by the object it resolves to, with and without a prefix, so a name
+	 * written with the package prefix cannot slip past the list.
+	 */
+	@TestVisible
 	private static Boolean objectAllowed(String objectName) {
-		String name = objectName == null ? '' : objectName.toLowerCase();
+		String name = objectName == null ? '' : objectName.trim().toLowerCase();
 		if (name == 'contact' || name == 'account') {
 			return true;
 		}
@@ -127,7 +133,16 @@ public with sharing class FormPublicPolicy {
 			return false;
 		}
 		Schema.DescribeSObjectResult described = NamespaceUtil.describe(objectName);
-		return described != null && !described.isCustomSetting();
+		if (described == null) {
+			return false;
+		}
+		if (
+			FORMS_OBJECTS.contains(described.getName().toLowerCase()) ||
+			FORMS_OBJECTS.contains(described.getLocalName().toLowerCase())
+		) {
+			return false;
+		}
+		return !described.isCustomSetting();
 	}
 
 	private static Boolean fieldAllowed(String objectName, String fieldName) {

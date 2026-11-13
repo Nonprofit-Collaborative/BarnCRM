@@ -81,7 +81,10 @@ CAPS = {
     # 2,256,617 measured with S2, raised by what they add (about 8,000) plus about 0.1%; the
     # modules shrank by about 50,000 together. D-200 R7 (release 1.24): Home quick links read
     # from the module catalog (HubController): 2,259,870 measured, plus about 0.1%.
-    "core": 2_262_100,
+    # Raised 2026-11-13 for the Batch K QA fixes (digest occurrences, Health Check step labels,
+    # skew ranking, AsyncStarter refusal kinds, quick link tab visibility, match key mark):
+    # 2,267,169 measured, plus about 0.1%.
+    "core": 2_269_400,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

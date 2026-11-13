@@ -46,6 +46,7 @@ PACKAGES = os.path.join(ROOT, "packages")
 # Apex system and namespace types that the patterns below can pick up. Not objects.
 SYSTEM_TYPES = {
     "AggregateResult",
+    "AsyncException",
     "AuraHandledException",
     "Blob",
     "Boolean",

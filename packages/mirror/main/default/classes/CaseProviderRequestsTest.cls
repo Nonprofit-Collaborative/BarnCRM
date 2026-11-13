@@ -20,6 +20,8 @@ private class CaseProviderRequestsTest {
 		Integer sendCode;
 		List<Object> statuses;
 		List<HttpRequest> received = new List<HttpRequest>();
+		/** Bodies sent instead of the usual answer, one per send in turn; null for the usual. */
+		List<String> rawBodies = new List<String>();
 		Provider(Integer sendCode, List<Object> statuses) {
 			this.sendCode = sendCode;
 			this.statuses = statuses;
@@ -36,6 +38,11 @@ private class CaseProviderRequestsTest {
 				request.getBody()
 			);
 			response.setStatusCode(sendCode);
+			String raw = rawBodies.isEmpty() ? null : rawBodies.remove(0);
+			if (raw != null) {
+				response.setBody(raw);
+				return response;
+			}
 			response.setBody(
 				sendCode == 201
 					? JSON.serialize(
@@ -217,6 +224,110 @@ private class CaseProviderRequestsTest {
 			Assert.isNotNull(row.Synced__c, 'Synced');
 			Assert.areEqual(1, provider.received.size(), 'One status call, no second send');
 			Assert.areEqual('GET', provider.received[0].getMethod(), 'Status call');
+		}
+	}
+
+	/**
+	 * The nightly sweep leaves out Cases the provider already accepted in its query, so an org
+	 * with many accepted Cases still open still sends its new ones.
+	 */
+	@IsTest
+	static void theSweepLeavesOutAcceptedCases() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (CaseProviderRequests.caseType() == null) {
+				return;
+			}
+			turnOn(true);
+			SObject accepted = newCase();
+			SObject refused = newCase();
+			SObject fresh = newCase();
+			insert as system new List<Provider_Request__c>{
+				new Provider_Request__c(
+					Name = (String) accepted.get('CaseNumber'),
+					Case_Id__c = accepted.Id,
+					Request_Number__c = 'REQ-000042',
+					Status__c = 'In Progress'
+				),
+				new Provider_Request__c(
+					Name = (String) refused.get('CaseNumber'),
+					Case_Id__c = refused.Id,
+					Error__c = 'Earlier failure'
+				)
+			};
+
+			Test.startTest();
+			List<Id> pending = CaseProviderRequests.unsent();
+			Test.stopTest();
+
+			Assert.isFalse(pending.contains(accepted.Id), 'Accepted: not read again');
+			Assert.isTrue(pending.contains(refused.Id), 'Refused: sent again');
+			Assert.isTrue(pending.contains(fresh.Id), 'New: sent');
+		}
+	}
+
+	/** An answer that is not a JSON object is kept as that Case's error; the others still save. */
+	@IsTest
+	static void anUnreadableAnswerCostsOnlyItsOwnCase() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (CaseProviderRequests.caseType() == null) {
+				return;
+			}
+			turnOn(true);
+			SObject first = newCase();
+			SObject second = newCase();
+			Provider provider = new Provider(201, new List<Object>());
+			provider.rawBodies.add('["not", "an", "object"]');
+			Test.setMock(HttpCalloutMock.class, provider);
+
+			Test.startTest();
+			new CaseProviderRequests(new List<Id>{ first.Id, second.Id }, false)
+				.execute((QueueableContext) null);
+			Test.stopTest();
+
+			Assert.areEqual(2, provider.received.size(), 'Both were sent');
+			Integer accepted = 0;
+			Integer unreadable = 0;
+			for (Provider_Request__c row : [
+				SELECT Request_Number__c, Error__c
+				FROM Provider_Request__c
+				WITH SYSTEM_MODE
+			]) {
+				if (row.Request_Number__c != null) {
+					accepted++;
+				} else if (row.Error__c != null) {
+					unreadable++;
+				}
+			}
+			Assert.areEqual(1, accepted, 'The readable answer is kept');
+			Assert.areEqual(1, unreadable, 'The unreadable one is kept as an error');
+		}
+	}
+
+	/** Out of callouts, the job sends what it can and leaves the rest for the next job. */
+	@IsTest
+	static void outOfCalloutsTheRestWaits() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (CaseProviderRequests.caseType() == null) {
+				return;
+			}
+			turnOn(true);
+			SObject first = newCase();
+			SObject second = newCase();
+			Provider provider = new Provider(201, new List<Object>());
+			Test.setMock(HttpCalloutMock.class, provider);
+			CaseProviderRequests.calloutsLeftForTest = 1;
+
+			Test.startTest();
+			new CaseProviderRequests(new List<Id>{ first.Id, second.Id }, false)
+				.execute((QueueableContext) null);
+			Test.stopTest();
+
+			Assert.areEqual(1, provider.received.size(), 'One callout, as allowed');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Provider_Request__c WITH SYSTEM_MODE],
+				'Only the Case sent is kept; the other waits, not marked failed'
+			);
 		}
 	}
 }

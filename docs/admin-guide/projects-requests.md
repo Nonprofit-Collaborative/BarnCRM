@@ -118,11 +118,13 @@ The API: `POST /services/apexrest/barncrm/requests/v1/requests` with JSON `orgId
 `subject`, `description`, `type`, `priority`, `category`, `requesterName`, `requesterEmail`;
 `reference` and `subject` are required. It answers `201` with `reference`, `number`, `status`,
 `priority`, `dueDate` and `resolution`; sending the same `reference` again answers `200` with the
-same request. A type, priority or category your org does not have becomes Service Request,
+same request, even when the two arrive at the same moment. A type, priority or category your org does not have becomes Service Request,
 Medium or General. `GET /services/apexrest/barncrm/requests/v1/requests?orgId=...&refs=A,B` (up
 to 200 references) answers `requests`, the same fields for that organization's own requests.
 Any refusal answers `403 not_allowed`, too many new requests in an hour `429 too_many`, and a
-body over 32 KB or not valid JSON `400 bad_request`.
+body over 32 KB or not valid JSON `400 bad_request`, a request that could not be saved
+`422 save_failed`, and an unexpected fault on the receiving org `500 internal_error` (it is in
+that org's Error Log; send again later).
 
 ## Sending Your Cases to a Service Provider (BarnCRM Mirror)
 

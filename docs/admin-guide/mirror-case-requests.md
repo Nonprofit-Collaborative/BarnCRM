@@ -46,7 +46,9 @@ The secret stays in Salesforce's credential store. BarnCRM keeps no secret in it
 ## How Cases Go
 
 - **Every night** at 1:40 AM, every open Case of the chosen Type that the provider has not yet
-  accepted is sent, oldest first.
+  accepted is sent, oldest first, up to 1,000 a night; Cases already accepted are left out
+  first, so they never crowd out new ones. A job sends what Salesforce's callout limits allow
+  and leaves the rest for the next job.
 - **At once**, if you want it: build a record-triggered flow on Case (after save, for example
   when Type equals Service Provider) that calls the action **Send Cases to a Service Provider**
   with the Case's Id. It sends in the background.
@@ -71,6 +73,8 @@ Cancelled. Reports can use the Provider Requests object.
 - **Last Error says the provider could not be reached.** The Named Credential is missing, not
   named `Barn_Request_Provider`, or the running user has no access to its principal. The Error
   Log has the details.
+- **Last Error says the answer could not be read.** The provider answered with something other
+  than a request. Only that Case is affected; the next run sends it again.
 - **429 in the Error Log.** More new Cases in an hour than the provider's Hourly Limit. The next
   run sends the rest.
 - **Nothing is sent.** Check the setting, the Case Type value, and that Nightly Jobs is

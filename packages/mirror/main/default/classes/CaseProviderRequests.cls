@@ -33,10 +33,23 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 	private static final String CONTEXT = 'CaseProviderRequests';
 	@TestVisible
 	private static Boolean unavailableForTest = false;
+	/** Each callout waits at most this long. */
+	private static final Integer CALLOUT_TIMEOUT_MS = 20000;
+	/** Salesforce's cap on the time one transaction may spend waiting on callouts. */
+	private static final Long CALLOUT_TIME_LIMIT_MS = 120000;
+	/** The most accepted requests read to keep their Cases out of the nightly sweep. */
+	private static final Integer ACCEPTED_READ = 40000;
+	/** Set by a test: how many more callouts this job may make. */
+	@TestVisible
+	private static Integer calloutsLeftForTest;
 
 	private final List<Id> toSend;
 	private final Boolean readStatus;
 	private final List<String> failures = new List<String>();
+	/** Time spent waiting on callouts in this job. */
+	private Long calloutMillis = 0;
+	/** Cases left unsent because the job ran out of callouts or callout time. */
+	private final List<Id> leftOver = new List<Id>();
 
 	/** The nightly run: sweep for unsent Cases, then read status. */
 	public CaseProviderRequests() {
@@ -111,6 +124,8 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		for (Provider_Request__c row : sendAll(now)) {
 			changed.put(row.Case_Id__c, row);
 		}
+		// Out of callouts or callout time: the rest waits for the next job.
+		later.addAll(leftOver);
 		if (readStatus) {
 			for (Provider_Request__c row : readAll()) {
 				changed.put(row.Case_Id__c, row);
@@ -130,15 +145,36 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		}
 	}
 
-	/** Open Cases of the chosen Type, oldest first (1,000 a night). */
+	/**
+	 * Open Cases of the chosen Type the provider has not accepted, oldest first (1,000 a night).
+	 * The accepted ones are left out in the query, not after it: an org with 1,000 accepted
+	 * Cases still open would otherwise read only those, and never send a new one.
+	 */
+	@TestVisible
 	private static List<Id> unsent() {
+		Set<Id> acceptedIds = new Set<Id>();
+		for (Provider_Request__c row : [
+			SELECT Case_Id__c
+			FROM Provider_Request__c
+			WHERE Request_Number__c != NULL AND Error__c = NULL
+			WITH SYSTEM_MODE
+			ORDER BY Synced__c DESC NULLS LAST
+			LIMIT :ACCEPTED_READ
+		]) {
+			try {
+				acceptedIds.add(Id.valueOf(row.Case_Id__c));
+			} catch (StringException notAnId) {
+				continue;
+			}
+		}
 		List<Id> ids = new List<Id>();
 		for (
 			SObject row : Database.queryWithBinds(
 				'SELECT Id FROM ' +
 					CASE_OBJECT +
-					' WHERE Type = :caseType AND IsClosed = FALSE ORDER BY CreatedDate LIMIT 1000',
-				new Map<String, Object>{ 'caseType' => chosenType() },
+					' WHERE Type = :caseType AND IsClosed = FALSE AND Id NOT IN :acceptedIds' +
+					' ORDER BY CreatedDate LIMIT 1000',
+				new Map<String, Object>{ 'caseType' => chosenType(), 'acceptedIds' => acceptedIds },
 				AccessLevel.USER_MODE
 			)
 		) {
@@ -191,6 +227,10 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 				'requesterName' => contact?.get('Name') ?? record.get('SuppliedName'),
 				'requesterEmail' => contact?.get('Email') ?? record.get('SuppliedEmail')
 			};
+			if (!roomForCallout()) {
+				leftOver.add(record.Id);
+				continue;
+			}
 			Provider_Request__c row = new Provider_Request__c(
 				Name = caseNumber,
 				Case_Id__c = record.Id,
@@ -200,14 +240,61 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 			if (
 				answer != null && (answer.getStatusCode() == 200 || answer.getStatusCode() == 201)
 			) {
-				keep(row, (Map<String, Object>) JSON.deserializeUntyped(answer.getBody()));
-				row.Error__c = null;
+				Map<String, Object> accepted = objectIn(answer, caseNumber);
+				if (accepted == null) {
+					row.Error__c = BarnHelp.text('Mirror', 'Mirror_CaseRequests_ErrorUnreadable')
+						.abbreviate(255);
+				} else {
+					keep(row, accepted);
+					row.Error__c = null;
+				}
 			} else {
 				row.Error__c = refusal(answer);
 			}
 			rows.add(row);
 		}
 		return rows;
+	}
+
+	/**
+	 * The JSON object a response holds, or null, with the reason kept for the Error Log, when
+	 * it holds something else: one Case's unreadable answer never costs the others their saves.
+	 */
+	private Map<String, Object> objectIn(HttpResponse answer, String what) {
+		try {
+			Object parsed = JSON.deserializeUntyped(answer.getBody());
+			if (parsed instanceof Map<String, Object>) {
+				return (Map<String, Object>) parsed;
+			}
+			failures.add(
+				BarnHelp.text(
+					'Mirror',
+					'Mirror_CaseRequests_Unreadable',
+					new List<Object>{ what, answer.getStatusCode() }
+				)
+			);
+		} catch (JSONException unreadable) {
+			failures.add(
+				BarnHelp.text(
+					'Mirror',
+					'Mirror_CaseRequests_Unreadable',
+					new List<Object>{ what, unreadable.getMessage() }
+				)
+			);
+		}
+		return null;
+	}
+
+	/**
+	 * Whether this job may make another callout: under Salesforce's callout count, and with a
+	 * full timeout's wait still inside its cap on callout time. What is left goes to the next job.
+	 */
+	private Boolean roomForCallout() {
+		if (calloutsLeftForTest != null) {
+			return calloutsLeftForTest > 0;
+		}
+		return Limits.getCallouts() < Limits.getLimitCallouts() &&
+			calloutMillis + CALLOUT_TIMEOUT_MS <= CALLOUT_TIME_LIMIT_MS;
 	}
 
 	/** Asks for the status of every sent request not yet finished, 200 a call. */
@@ -228,11 +315,15 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		for (String caseNumber : byNumber.keySet()) {
 			batch.add(caseNumber);
 			if (batch.size() == PER_STATUS_CALL) {
+				if (!roomForCallout()) {
+					// The rest are read by the next run, oldest synced first.
+					return rows;
+				}
 				rows.addAll(read(batch, byNumber));
 				batch = new List<String>();
 			}
 		}
-		if (!batch.isEmpty()) {
+		if (!batch.isEmpty() && roomForCallout()) {
 			rows.addAll(read(batch, byNumber));
 		}
 		return rows;
@@ -257,10 +348,27 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		if (answer == null || answer.getStatusCode() != 200) {
 			return rows;
 		}
-		Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(answer.getBody());
+		String what = BarnHelp.text('Mirror', 'Mirror_CaseRequests_StatusCall');
+		Map<String, Object> body = objectIn(answer, what);
+		if (body == null) {
+			return rows;
+		}
+		if (!(body.get('requests') instanceof List<Object>)) {
+			failures.add(
+				BarnHelp.text(
+					'Mirror',
+					'Mirror_CaseRequests_Unreadable',
+					new List<Object>{ what, 'requests' }
+				)
+			);
+			return rows;
+		}
 		for (Object item : (List<Object>) body.get('requests')) {
+			if (!(item instanceof Map<String, Object>)) {
+				continue;
+			}
 			Map<String, Object> request = (Map<String, Object>) item;
-			Provider_Request__c known = byNumber.get((String) request.get('reference'));
+			Provider_Request__c known = byNumber.get(String.valueOf(request.get('reference')));
 			if (known != null) {
 				Provider_Request__c row = new Provider_Request__c(
 					Case_Id__c = known.Case_Id__c,
@@ -290,12 +398,17 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		request.setMethod(method);
 		request.setEndpoint(endpoint);
 		request.setHeader('Content-Type', 'application/json');
-		request.setTimeout(20000);
+		request.setTimeout(CALLOUT_TIMEOUT_MS);
 		if (body != null) {
 			request.setBody(body);
 		}
+		if (calloutsLeftForTest != null) {
+			calloutsLeftForTest--;
+		}
+		Long startedAt = System.currentTimeMillis();
 		try {
 			HttpResponse answer = new Http().send(request);
+			calloutMillis += System.currentTimeMillis() - startedAt;
 			if (answer.getStatusCode() >= 300) {
 				failures.add(
 					BarnHelp.text(
@@ -307,6 +420,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 			}
 			return answer;
 		} catch (Exception failed) {
+			calloutMillis += System.currentTimeMillis() - startedAt;
 			failures.add(
 				BarnHelp.text(
 					'Mirror',

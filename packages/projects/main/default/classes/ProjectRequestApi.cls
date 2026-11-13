@@ -20,6 +20,15 @@ global with sharing class ProjectRequestApi {
 	private static final Integer MAX_BYTES = 32768;
 	private static final Integer MAX_REFS = 200;
 	private static final String CONTEXT = 'ProjectRequestApi';
+	/** Set by a test: the first look for the key misses, as when two calls arrive at once. */
+	@TestVisible
+	private static Boolean raceForTest = false;
+	/** Set by a test: the intake fails as an unexpected fault would. */
+	@TestVisible
+	private static Boolean faultForTest = false;
+
+	private class FaultForTestException extends Exception {
+	}
 
 	/** One answer: the status code and the JSON body. */
 	@TestVisible
@@ -102,20 +111,12 @@ global with sharing class ProjectRequestApi {
 					return refusal(400, 'bad_request');
 				}
 				String key = connection.Id + ':' + reference;
-				List<Project_Request__c> existing = [
-					SELECT
-						Id,
-						Name,
-						Status__c,
-						Priority__c,
-						Due_Date__c,
-						Resolution__c,
-						External_Reference__c
-					FROM Project_Request__c
-					WHERE External_Key__c = :key
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
+				if (faultForTest) {
+					throw new FaultForTestException();
+				}
+				List<Project_Request__c> existing = raceForTest
+					? new List<Project_Request__c>()
+					: byKey(key);
 				if (!existing.isEmpty()) {
 					return new Answer(200, view(existing[0]));
 				}
@@ -164,6 +165,14 @@ global with sharing class ProjectRequestApi {
 					AccessLevel.SYSTEM_MODE
 				);
 				if (!saved.isSuccess()) {
+					// The same request sent twice at once: the other call saved it first, and
+					// the unique key refused this one. Answer as a repeat does.
+					List<Project_Request__c> sentTwice = isDuplicate(saved)
+						? byKey(key)
+						: new List<Project_Request__c>();
+					if (!sentTwice.isEmpty()) {
+						return new Answer(200, view(sentTwice[0]));
+					}
 					ErrorLogger.logMessage(
 						saved.getErrors()[0].getMessage(),
 						CONTEXT + '.submit',
@@ -192,9 +201,38 @@ global with sharing class ProjectRequestApi {
 			} catch (JSONException notJson) {
 				return refusal(400, 'bad_request');
 			} catch (Exception failed) {
+				// A fault here, not in what was sent: the sender may try again later.
 				ErrorLogger.log(failed, CONTEXT + '.submit');
-				return refusal(400, 'bad_request');
+				return refusal(500, 'internal_error');
 			}
+		}
+
+		/** The request already saved under this connection's key, if there is one. */
+		List<Project_Request__c> byKey(String key) {
+			return [
+				SELECT
+					Id,
+					Name,
+					Status__c,
+					Priority__c,
+					Due_Date__c,
+					Resolution__c,
+					External_Reference__c
+				FROM Project_Request__c
+				WHERE External_Key__c = :key
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
+		}
+
+		/** Whether the save was refused because the unique key is already taken. */
+		Boolean isDuplicate(Database.SaveResult saved) {
+			for (Database.Error error : saved.getErrors()) {
+				if (error.getStatusCode() == StatusCode.DUPLICATE_VALUE) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		Answer status(RestRequest call) {
@@ -229,7 +267,7 @@ global with sharing class ProjectRequestApi {
 				return new Answer(200, new Map<String, Object>{ 'requests' => found });
 			} catch (Exception failed) {
 				ErrorLogger.log(failed, CONTEXT + '.status');
-				return refusal(400, 'bad_request');
+				return refusal(500, 'internal_error');
 			}
 		}
 
