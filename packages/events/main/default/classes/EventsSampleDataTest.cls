@@ -38,12 +38,14 @@ private class EventsSampleDataTest {
 		};
 		for (Integer i = 0; i < keys.size(); i++) {
 			people.add(
-				new Contact(
-					FirstName = 'Sample',
-					LastName = 'Person' + i,
-					Email = 'sample' + i + '@example.org',
-					Sample_Data__c = true,
-					Sample_Data_Key__c = keys[i]
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Sample',
+						LastName = 'Person' + i,
+						Email = 'sample' + i + '@example.org',
+						Sample_Data__c = true,
+						Sample_Data_Key__c = keys[i]
+					)
 				)
 			);
 		}
@@ -227,7 +229,7 @@ private class EventsSampleDataTest {
 				End__c = Datetime.now().addDays(20).addHours(2)
 			);
 			insert as user real;
-			Contact person = new Contact(LastName = 'Real Person');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Real Person'));
 			insert as user person;
 			insert as user new Event_Registration__c(
 				Event__c = real.Id,

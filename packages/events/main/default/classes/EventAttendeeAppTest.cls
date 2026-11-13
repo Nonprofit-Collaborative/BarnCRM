@@ -36,8 +36,12 @@ private class EventAttendeeAppTest {
 			End__c = start.addHours(8)
 		);
 		insert as user result.event;
-		result.ana = new Contact(FirstName = 'Ana', LastName = 'Garcia', Email = 'ana@example.org');
-		result.ben = new Contact(FirstName = 'Ben', LastName = 'Okafor', Email = 'ben@example.org');
+		result.ana = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Garcia', Email = 'ana@example.org')
+		);
+		result.ben = TestDataFactory.person(
+			new Contact(FirstName = 'Ben', LastName = 'Okafor', Email = 'ben@example.org')
+		);
 		insert as user new List<Contact>{ result.ana, result.ben };
 		result.anaRow = attend(result.event, result.ana, 'ana.garcia@example.org');
 		result.benRow = attend(result.event, result.ben, 'Ben on the conference chat');

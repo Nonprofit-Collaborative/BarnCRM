@@ -334,13 +334,17 @@ private class ImportObjectLoaderTest {
 	}
 
 	private static Account organization(String name) {
-		Account created = new Account(Name = name, RecordTypeId = organizationType());
+		Account created = TestDataFactory.organization(
+			new Account(Name = name, RecordTypeId = organizationType())
+		);
 		insert created;
 		return created;
 	}
 
 	private static Contact person(String lastName) {
-		Contact created = new Contact(FirstName = 'Ana', LastName = lastName);
+		Contact created = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = lastName)
+		);
 		insert created;
 		return created;
 	}

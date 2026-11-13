@@ -76,7 +76,7 @@ private class FormPublicPageTest {
 	}
 
 	private static Id venue() {
-		Account record = new Account(Name = 'Grange Hall');
+		Account record = TestDataFactory.organization(new Account(Name = 'Grange Hall'));
 		insert as user record;
 		return record.Id;
 	}

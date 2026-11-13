@@ -34,14 +34,18 @@ private class RollupsStaffSaveTest {
 		Account organization;
 
 		System.runAs(staff) {
-			organization = new Account(
-				Name = 'Food Bank',
-				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+			organization = TestDataFactory.organization(
+				new Account(
+					Name = 'Food Bank',
+					RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+				)
 			);
 			insert organization;
 
 			Test.startTest();
-			insert new Contact(LastName = 'Volunteer', AccountId = organization.Id);
+			insert TestDataFactory.person(
+				new Contact(LastName = 'Volunteer', AccountId = organization.Id)
+			);
 			Test.getEventBus().deliver();
 			Test.stopTest();
 		}
@@ -70,7 +74,9 @@ private class RollupsStaffSaveTest {
 		}
 
 		public void execute(QueueableContext context) {
-			insert new Contact(LastName = 'Queued Volunteer', AccountId = organizationId);
+			insert TestDataFactory.person(
+				new Contact(LastName = 'Queued Volunteer', AccountId = organizationId)
+			);
 			// Asserted here, where the job's own transaction state is: a Queueable leaves the
 			// processor job to its caller and announces the entries with the ready event.
 			Assert.areEqual(
@@ -106,9 +112,11 @@ private class RollupsStaffSaveTest {
 		Account organization;
 
 		System.runAs(person) {
-			organization = new Account(
-				Name = 'Shelter',
-				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+			organization = TestDataFactory.organization(
+				new Account(
+					Name = 'Shelter',
+					RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+				)
 			);
 			insert organization;
 

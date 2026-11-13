@@ -46,7 +46,9 @@ private class DonorLevelAssignmentTest {
 	@IsTest
 	static void aHouseholdIsPlacedInTheSaveThatGivesItAGivingTotal() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Account household = new Account(Name = 'The Nolan Family', Total_Giving__c = 2500);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Nolan Family', Total_Giving__c = 2500)
+			);
 
 			Test.startTest();
 			insert household;
@@ -78,10 +80,8 @@ private class DonorLevelAssignmentTest {
 	@IsTest
 	static void aPersonMovesUpAndDownWithTheirOwnTotalAndKeepsTheRungTheyLeft() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Garcia',
-				Total_Giving__c = 600
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia', Total_Giving__c = 600)
 			);
 			insert person;
 
@@ -131,7 +131,9 @@ private class DonorLevelAssignmentTest {
 	@IsTest
 	static void aDonorWhoseTotalFallsBelowTheLadderIsLeftOnNoLevel() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Account household = new Account(Name = 'The Okafor Family', Total_Giving__c = 1200);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Okafor Family', Total_Giving__c = 1200)
+			);
 			insert household;
 
 			Test.startTest();
@@ -162,7 +164,11 @@ private class DonorLevelAssignmentTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Account> households = new List<Account>();
 			for (Integer index = 0; index < 25; index++) {
-				households.add(new Account(Name = 'Household ' + index, Total_Giving__c = 3000));
+				households.add(
+					TestDataFactory.household(
+						new Account(Name = 'Household ' + index, Total_Giving__c = 3000)
+					)
+				);
 			}
 			insert households;
 			Assert.areEqual(
@@ -204,7 +210,7 @@ private class DonorLevelAssignmentTest {
 	@IsTest
 	static void recalculationStampsWhenItFinished() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			insert new Contact(LastName = 'Reyes', Total_Giving__c = 2000);
+			insert TestDataFactory.person(new Contact(LastName = 'Reyes', Total_Giving__c = 2000));
 
 			Test.startTest();
 			Database.executeBatch(new DonorLevelBatch(DonorLevelBatch.CONTACTS), 200);
@@ -226,7 +232,9 @@ private class DonorLevelAssignmentTest {
 			SettingsService.clearCaches();
 
 			Test.startTest();
-			Account household = new Account(Name = 'The Reyes Family', Total_Giving__c = 9000);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Reyes Family', Total_Giving__c = 9000)
+			);
 			insert household;
 			Test.stopTest();
 
@@ -243,7 +251,11 @@ private class DonorLevelAssignmentTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
-				people.add(new Contact(LastName = 'Donor ' + index, Total_Giving__c = 5500));
+				people.add(
+					TestDataFactory.person(
+						new Contact(LastName = 'Donor ' + index, Total_Giving__c = 5500)
+					)
+				);
 			}
 
 			Test.startTest();

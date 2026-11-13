@@ -62,7 +62,9 @@ private class RollupCurrencyTest {
 	static void aTotalIsInTheTargetRecordsCurrency() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
-			Account parent = new Account(Name = 'Parent', RecordTypeId = organizationType);
+			Account parent = TestDataFactory.organization(
+				new Account(Name = 'Parent', RecordTypeId = organizationType)
+			);
 			String corporate;
 			String parentCurrency;
 			Decimal parentRate = 1;
@@ -83,17 +85,21 @@ private class RollupCurrencyTest {
 			}
 			insert parent;
 			List<Account> children = new List<Account>{
-				new Account(
-					Name = 'A',
-					RecordTypeId = organizationType,
-					ParentId = parent.Id,
-					AnnualRevenue = 100
+				TestDataFactory.organization(
+					new Account(
+						Name = 'A',
+						RecordTypeId = organizationType,
+						ParentId = parent.Id,
+						AnnualRevenue = 100
+					)
 				),
-				new Account(
-					Name = 'B',
-					RecordTypeId = organizationType,
-					ParentId = parent.Id,
-					AnnualRevenue = 50
+				TestDataFactory.organization(
+					new Account(
+						Name = 'B',
+						RecordTypeId = organizationType,
+						ParentId = parent.Id,
+						AnnualRevenue = 50
+					)
 				)
 			};
 			for (Account child : children) {

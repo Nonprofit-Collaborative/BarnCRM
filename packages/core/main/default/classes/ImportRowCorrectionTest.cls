@@ -375,10 +375,12 @@ private class ImportRowCorrectionTest {
 			// Rows Retried By is the package's bookkeeping, read only to everyone.
 			Database.update(batch, AccessLevel.SYSTEM_MODE);
 		}
-		Contact person = new Contact(
-			FirstName = 'Ana',
-			LastName = 'Byretrier',
-			Created_By_Import_Batch__c = batch.Id
+		Contact person = TestDataFactory.person(
+			new Contact(
+				FirstName = 'Ana',
+				LastName = 'Byretrier',
+				Created_By_Import_Batch__c = batch.Id
+			)
 		);
 		System.runAs(importer) {
 			Database.insert(person, AccessLevel.SYSTEM_MODE);

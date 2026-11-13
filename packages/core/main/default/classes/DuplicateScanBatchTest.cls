@@ -32,8 +32,12 @@ private class DuplicateScanBatchTest {
 		String email = firstName.toLowerCase() + '.dupscan@example.org';
 		return (List<Contact>) insertAllowingDuplicates(
 			new List<Contact>{
-				new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email),
-				new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
+				TestDataFactory.person(
+					new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
+				),
+				TestDataFactory.person(
+					new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
+				)
 			}
 		);
 	}
@@ -177,7 +181,7 @@ private class DuplicateScanBatchTest {
 				new List<Account>{
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
-					new Account(Name = 'The Dupscan Family')
+					TestDataFactory.household(new Account(Name = 'The Dupscan Family'))
 				}
 			);
 			DuplicateService.stubMatches = new List<DuplicateService.Pair>{
@@ -215,7 +219,7 @@ private class DuplicateScanBatchTest {
 				new List<Account>{
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
-					new Account(Name = 'Dupscan Hardware')
+					TestDataFactory.household(new Account(Name = 'Dupscan Hardware'))
 				}
 			);
 			matcherAnswers(accounts[0].Id, accounts[1].Id);
@@ -262,15 +266,19 @@ private class DuplicateScanBatchTest {
 			// similar names (R-DP7) pair only with a shared email, phone or postal code.
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Lena',
-						LastName = 'Dupscan',
-						Email = 'lena.one@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Lena',
+							LastName = 'Dupscan',
+							Email = 'lena.one@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Lena',
-						LastName = 'Dupscan',
-						Email = 'lena.two@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Lena',
+							LastName = 'Dupscan',
+							Email = 'lena.two@example.org'
+						)
 					)
 				}
 			);
@@ -387,8 +395,8 @@ private class DuplicateScanBatchTest {
 		};
 		List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 			new List<Contact>{
-				new Contact(FirstName = 'Wen', LastName = 'Sourcepair'),
-				new Contact(FirstName = 'Wendy', LastName = 'Source-Pair')
+				TestDataFactory.person(new Contact(FirstName = 'Wen', LastName = 'Sourcepair')),
+				TestDataFactory.person(new Contact(FirstName = 'Wendy', LastName = 'Source-Pair'))
 			}
 		);
 		insert new List<Address__c>{

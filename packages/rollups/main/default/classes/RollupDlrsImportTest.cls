@@ -620,12 +620,16 @@ private class RollupDlrsImportTest {
 			RollupDlrsFake.use(
 				new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) }
 			);
-			Account parent = new Account(Name = 'Parent Org', Member_Count__c = 2);
-			Account stale = new Account(Name = 'Stale Org', Member_Count__c = 7);
+			Account parent = TestDataFactory.organization(
+				new Account(Name = 'Parent Org', Member_Count__c = 2)
+			);
+			Account stale = TestDataFactory.organization(
+				new Account(Name = 'Stale Org', Member_Count__c = 7)
+			);
 			insert new List<Account>{ parent, stale };
 			insert new List<Account>{
-				new Account(Name = 'Child 1', ParentId = parent.Id),
-				new Account(Name = 'Child 2', ParentId = parent.Id)
+				TestDataFactory.organization(new Account(Name = 'Child 1', ParentId = parent.Id)),
+				TestDataFactory.organization(new Account(Name = 'Child 2', ParentId = parent.Id))
 			};
 			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0]
 				.recordId;

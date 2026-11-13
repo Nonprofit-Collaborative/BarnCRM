@@ -18,10 +18,12 @@ private class EventSponsorLeadsTest {
 	}
 
 	private static Contact person(String first, String last) {
-		Contact record = new Contact(
-			FirstName = first,
-			LastName = last,
-			Email = first.toLowerCase() + '@example.org'
+		Contact record = TestDataFactory.person(
+			new Contact(
+				FirstName = first,
+				LastName = last,
+				Email = first.toLowerCase() + '@example.org'
+			)
 		);
 		insert as user record;
 		return record;

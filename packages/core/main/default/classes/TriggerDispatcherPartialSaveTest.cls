@@ -25,7 +25,9 @@ private class TriggerDispatcherPartialSaveTest {
 	private static List<Contact> people(List<String> lastNames) {
 		List<Contact> result = new List<Contact>();
 		for (String lastName : lastNames) {
-			result.add(new Contact(FirstName = 'Test', LastName = lastName));
+			result.add(
+				TestDataFactory.person(new Contact(FirstName = 'Test', LastName = lastName))
+			);
 		}
 		return result;
 	}

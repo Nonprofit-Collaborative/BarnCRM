@@ -114,7 +114,9 @@ private class GetHouseholdSummaryActionTest {
 	static void anythingElseIsAnsweredInPlainWords() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			Account organization = new Account(Name = 'The Union Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert organization;
 			Contact loner = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Stone');
 			insert loner;

@@ -47,7 +47,9 @@ private class TestDataFactoryTest {
 
 	@IsTest
 	static void aValueTheTestSetIsKept() {
-		Contact person = new Contact(LastName = 'Keepme', FirstName = 'Ann');
+		Contact person = TestDataFactory.person(
+			new Contact(LastName = 'Keepme', FirstName = 'Ann')
+		);
 		Contact same = (Contact) TestDataFactory.pastDuplicateRules(person);
 		Assert.areEqual(person, same, 'The same record comes back.');
 		Assert.areEqual('Keepme', same.LastName);

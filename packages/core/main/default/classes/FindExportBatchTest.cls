@@ -35,15 +35,19 @@ private class FindExportBatchTest {
 
 	private static void makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = new Account(Name = 'Springfield, "Food" Bank');
+		Account organization = TestDataFactory.organization(
+			new Account(Name = 'Springfield, "Food" Bank')
+		);
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
 			people.add(
-				new Contact(
-					AccountId = organization.Id,
-					LastName = index == 0 ? '=SUM(A1)' : 'Person ' + index,
-					Title = index < volunteers ? 'Volunteer' : 'Staff'
+				TestDataFactory.person(
+					new Contact(
+						AccountId = organization.Id,
+						LastName = index == 0 ? '=SUM(A1)' : 'Person ' + index,
+						Title = index < volunteers ? 'Volunteer' : 'Staff'
+					)
 				)
 			);
 		}
