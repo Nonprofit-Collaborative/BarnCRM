@@ -27,6 +27,9 @@ default allocations, installment schedules, automatic household soft credits), a
 - `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
   module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
   by Core's `SampleDataFile` with no loader Apex in the module.
+- `FormsSampleData.json`, `PortalSampleData.json` and `TerritorySampleData.json` (release 1.25):
+  three example forms with versions and submissions; one Inactive, invite-only portal with its
+  accesses; three state territories with rules and a member.
 
 ### Module files (D-200 S2)
 

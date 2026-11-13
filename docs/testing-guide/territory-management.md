@@ -82,3 +82,18 @@ households and organizations with addresses).
 | 3 | Switch the step off. | Off. |
 
 **Cleanup:** Undo the step 2 run.
+
+## T-TM-06: Sample Data
+
+**Purpose:** confirm the Territory sample data loads three regions with rules and takes away only itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; one territory of your own.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Territories** count of `3`. |
+| 2 | Open **Territory Management**. | **Minnesota Region** (Keep Owner), **Georgia Region** (Territory Owner, you) and **Ohio Region** (Round Robin, you as a member) beside your own territory, each with a household rule and a people rule. |
+| 3 | Run **Preview**. | Sample households and people in MN, GA and OH would move to their regions. Nothing is assigned until you run Assign. |
+| 4 | Run **Assign**, then open a sample Ohio household. | Its Territory is **Ohio Region**. |
+| 5 | **Remove Sample Data**. | The three sample territories, their rules and the member are gone, as is every sample record; your own territory stays. |
+
+**Cleanup:** None.

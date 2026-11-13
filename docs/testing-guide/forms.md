@@ -135,3 +135,19 @@ steps 6 and 7 done; an inbox you can read.
 | 10 | In the private window, **Save and Finish Later** to one email address four times within an hour (reload the form between). | Three emails arrive; the fourth time the page says to try again later and no email is sent. |
 
 **Cleanup:** delete the submissions and files, remove the file question, republish.
+
+## T-FORM-08: Sample Data
+
+**Purpose:** confirm the Forms sample data loads three example forms with submissions and takes away only itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; one form of your own with a submission.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Forms** count of `3`. |
+| 2 | Open **Forms**. | **Volunteer Sign-Up** and **Event Registration** are Published, **Contact Us** is a Draft, beside your own form. None is public. |
+| 3 | Open **Volunteer Sign-Up**, **Builder**. | Three steps; a **Parent or Guardian** step shown only for an age under 18; a person, an employer and an affiliation to write. |
+| 4 | Open **Form Submissions**. | Five sample submissions: two Processed (linked to sample people), one Needs Review, two Received. |
+| 5 | Fill in **Event Registration** on its **Fill In** tab. | Tick the meal question and the meal notes question appears. |
+| 6 | **Remove Sample Data**. | The three sample forms with their versions and submissions are gone; your own form and its submission stay. |
+
+**Cleanup:** None.

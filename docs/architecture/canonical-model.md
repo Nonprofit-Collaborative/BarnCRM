@@ -13792,6 +13792,7 @@ and gives the new version its signing key.
 | Definition | `Definition__c` | Long Text Area(131072) |
 | Published Version | `Published_Version__c` | Number(6, 0) |
 | Public | `Public__c` | Checkbox, default false |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the form, its versions and its submissions (children go with it by master-detail) |
 
 - **Engine:** framework-free modules `formDefinition.js` (parse, check, defaults), `formRules.js`
   (conditions, visibility, answer checks, step order) and `formMapping.js` (what a submission
@@ -15714,6 +15715,7 @@ offered after sign-in. Off: never asked.
 | Session Hours | `Session_Hours__c` | Number(3, 0), default 8 |
 | Sender Address | `Sender_Address__c` | Email |
 | Template | `Template__c` | Long Text Area(131072) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the portal and its accesses (master-detail) |
 
 ---
 
@@ -17691,6 +17693,7 @@ owner, counted as No Room.
 | Territory Owner | `Owner_User__c` | Lookup(User) |
 | Next Member | `Next_Member__c` | Number(6, 0) |
 | Description | `Description__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the territory, its rules and members (master-detail) and clears the Territory of any record assigned to it (Clear on delete) |
 
 - **Account:** households and organizations.
 

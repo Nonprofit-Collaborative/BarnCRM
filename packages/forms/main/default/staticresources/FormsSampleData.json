@@ -1,0 +1,151 @@
+{
+  "module": "Forms",
+  "countLabel": "Forms",
+  "count": {
+    "object": "Form__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Form__c",
+      "records": [
+        {
+          "key": "volunteer",
+          "Name": "Volunteer Sign-Up",
+          "Description__c": "Collects a volunteer's details, where they would like to help and when they are free. Writes the person, their employer and an affiliation between them, and shows a guardian step for anyone under 18.",
+          "Status__c": "Published",
+          "Definition__c": "{\"schemaVersion\":1,\"steps\":[{\"key\":\"you\",\"title\":\"About You\",\"fields\":[{\"key\":\"first\",\"label\":\"First Name\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"FirstName\"}},{\"key\":\"last\",\"label\":\"Last Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"LastName\"}},{\"key\":\"email\",\"label\":\"Email\",\"type\":\"email\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Email\"}},{\"key\":\"phone\",\"label\":\"Phone\",\"type\":\"phone\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"Phone\"}},{\"key\":\"postal\",\"label\":\"Postal Code\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"MailingPostalCode\"}},{\"key\":\"employer\",\"label\":\"Where do you work?\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"employer\",\"field\":\"Name\"},\"help\":\"Optional. We use it to note your employer on your record.\"},{\"key\":\"age\",\"label\":\"Your age\",\"type\":\"number\",\"required\":false,\"min\":5,\"max\":110}]},{\"key\":\"guardian\",\"title\":\"Parent or Guardian\",\"showWhen\":{\"all\":[{\"field\":\"age\",\"op\":\"lessThan\",\"value\":18}]},\"fields\":[{\"key\":\"guardian\",\"label\":\"Parent or guardian name and phone\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Description\"}}]},{\"key\":\"interests\",\"title\":\"How You Would Like to Help\",\"fields\":[{\"key\":\"area\",\"label\":\"Where would you like to help?\",\"type\":\"picklist\",\"required\":true,\"options\":[{\"value\":\"Food pantry\",\"label\":\"Food pantry\"},{\"value\":\"Community garden\",\"label\":\"Community garden\"},{\"value\":\"Events\",\"label\":\"Events\"},{\"value\":\"Office help\",\"label\":\"Office help\"}]},{\"key\":\"start\",\"label\":\"When can you start?\",\"type\":\"date\",\"required\":false},{\"key\":\"availability\",\"label\":\"When are you usually free?\",\"type\":\"textarea\",\"required\":false,\"maxLength\":500},{\"key\":\"agree\",\"label\":\"I agree to be contacted about volunteer shifts\",\"type\":\"checkbox\",\"required\":true}]}],\"records\":[{\"key\":\"person\",\"kind\":\"person\",\"matching\":{\"rule\":\"emailThenNamePostal\",\"onMatch\":\"fillBlanks\"}},{\"key\":\"employer\",\"kind\":\"organization\",\"matching\":{\"rule\":\"name\",\"onMatch\":\"fillBlanks\"}},{\"key\":\"role\",\"kind\":\"related\",\"object\":\"Affiliation__c\",\"links\":{\"Contact__c\":\"person\",\"Organization__c\":\"employer\"},\"values\":{\"Status__c\":\"Current\",\"Role__c\":\"Employee\"}}]}",
+          "Public__c": false,
+          "Sample_Data__c": true,
+          "Published_Version__c": 1
+        },
+        {
+          "key": "registration",
+          "Name": "Event Registration",
+          "Description__c": "A simple sign-up for a one-day open house: contact details, the session, guests and a meal question that shows only when needed.",
+          "Status__c": "Published",
+          "Definition__c": "{\"schemaVersion\":1,\"steps\":[{\"key\":\"attendee\",\"title\":\"Your Details\",\"fields\":[{\"key\":\"first\",\"label\":\"First Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"FirstName\"}},{\"key\":\"last\",\"label\":\"Last Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"LastName\"}},{\"key\":\"email\",\"label\":\"Email\",\"type\":\"email\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Email\"}},{\"key\":\"phone\",\"label\":\"Phone\",\"type\":\"phone\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"MobilePhone\"}}]},{\"key\":\"visit\",\"title\":\"Your Visit\",\"fields\":[{\"key\":\"session\",\"label\":\"Which session will you attend?\",\"type\":\"picklist\",\"required\":true,\"options\":[{\"value\":\"Morning\",\"label\":\"Morning\"},{\"value\":\"Afternoon\",\"label\":\"Afternoon\"},{\"value\":\"Both\",\"label\":\"Both\"}]},{\"key\":\"guests\",\"label\":\"How many guests are coming with you?\",\"type\":\"number\",\"required\":false,\"min\":0,\"max\":10},{\"key\":\"diet\",\"label\":\"Does anyone need a special meal?\",\"type\":\"checkbox\",\"required\":false},{\"key\":\"diet_notes\",\"label\":\"Tell us about the meal\",\"type\":\"textarea\",\"required\":true,\"maxLength\":300,\"showWhen\":{\"all\":[{\"field\":\"diet\",\"op\":\"equals\",\"value\":true}]}}]}],\"records\":[{\"key\":\"person\",\"kind\":\"person\",\"matching\":{\"rule\":\"emailThenNamePostal\",\"onMatch\":\"fillBlanks\"}}]}",
+          "Public__c": false,
+          "Sample_Data__c": true,
+          "Published_Version__c": 1
+        },
+        {
+          "key": "contact",
+          "Name": "Contact Us",
+          "Description__c": "A short message form, still a draft so you can see how a form looks before it is published.",
+          "Status__c": "Draft",
+          "Definition__c": "{\"schemaVersion\":1,\"steps\":[{\"key\":\"message\",\"title\":\"Contact Us\",\"fields\":[{\"key\":\"first\",\"label\":\"First Name\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"FirstName\"}},{\"key\":\"last\",\"label\":\"Last Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"LastName\"}},{\"key\":\"email\",\"label\":\"Email\",\"type\":\"email\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Email\"}},{\"key\":\"topic\",\"label\":\"What is your message about?\",\"type\":\"picklist\",\"required\":true,\"options\":[{\"value\":\"A question\",\"label\":\"A question\"},{\"value\":\"A donation\",\"label\":\"A donation\"},{\"value\":\"Volunteering\",\"label\":\"Volunteering\"},{\"value\":\"Something else\",\"label\":\"Something else\"}]},{\"key\":\"body\",\"label\":\"Your message\",\"type\":\"textarea\",\"required\":true,\"maxLength\":2000}]}],\"records\":[{\"key\":\"person\",\"kind\":\"person\",\"matching\":{\"rule\":\"emailThenNamePostal\",\"onMatch\":\"fillBlanks\"}}]}",
+          "Public__c": false,
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Form_Version__c",
+      "records": [
+        {
+          "key": "volunteer-v1",
+          "Form__c": {
+            "ref": "volunteer"
+          },
+          "Version__c": 1,
+          "Definition__c": "{\"schemaVersion\":1,\"steps\":[{\"key\":\"you\",\"title\":\"About You\",\"fields\":[{\"key\":\"first\",\"label\":\"First Name\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"FirstName\"}},{\"key\":\"last\",\"label\":\"Last Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"LastName\"}},{\"key\":\"email\",\"label\":\"Email\",\"type\":\"email\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Email\"}},{\"key\":\"phone\",\"label\":\"Phone\",\"type\":\"phone\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"Phone\"}},{\"key\":\"postal\",\"label\":\"Postal Code\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"MailingPostalCode\"}},{\"key\":\"employer\",\"label\":\"Where do you work?\",\"type\":\"text\",\"required\":false,\"target\":{\"record\":\"employer\",\"field\":\"Name\"},\"help\":\"Optional. We use it to note your employer on your record.\"},{\"key\":\"age\",\"label\":\"Your age\",\"type\":\"number\",\"required\":false,\"min\":5,\"max\":110}]},{\"key\":\"guardian\",\"title\":\"Parent or Guardian\",\"showWhen\":{\"all\":[{\"field\":\"age\",\"op\":\"lessThan\",\"value\":18}]},\"fields\":[{\"key\":\"guardian\",\"label\":\"Parent or guardian name and phone\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Description\"}}]},{\"key\":\"interests\",\"title\":\"How You Would Like to Help\",\"fields\":[{\"key\":\"area\",\"label\":\"Where would you like to help?\",\"type\":\"picklist\",\"required\":true,\"options\":[{\"value\":\"Food pantry\",\"label\":\"Food pantry\"},{\"value\":\"Community garden\",\"label\":\"Community garden\"},{\"value\":\"Events\",\"label\":\"Events\"},{\"value\":\"Office help\",\"label\":\"Office help\"}]},{\"key\":\"start\",\"label\":\"When can you start?\",\"type\":\"date\",\"required\":false},{\"key\":\"availability\",\"label\":\"When are you usually free?\",\"type\":\"textarea\",\"required\":false,\"maxLength\":500},{\"key\":\"agree\",\"label\":\"I agree to be contacted about volunteer shifts\",\"type\":\"checkbox\",\"required\":true}]}],\"records\":[{\"key\":\"person\",\"kind\":\"person\",\"matching\":{\"rule\":\"emailThenNamePostal\",\"onMatch\":\"fillBlanks\"}},{\"key\":\"employer\",\"kind\":\"organization\",\"matching\":{\"rule\":\"name\",\"onMatch\":\"fillBlanks\"}},{\"key\":\"role\",\"kind\":\"related\",\"object\":\"Affiliation__c\",\"links\":{\"Contact__c\":\"person\",\"Organization__c\":\"employer\"},\"values\":{\"Status__c\":\"Current\",\"Role__c\":\"Employee\"}}]}"
+        },
+        {
+          "key": "registration-v1",
+          "Form__c": {
+            "ref": "registration"
+          },
+          "Version__c": 1,
+          "Definition__c": "{\"schemaVersion\":1,\"steps\":[{\"key\":\"attendee\",\"title\":\"Your Details\",\"fields\":[{\"key\":\"first\",\"label\":\"First Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"FirstName\"}},{\"key\":\"last\",\"label\":\"Last Name\",\"type\":\"text\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"LastName\"}},{\"key\":\"email\",\"label\":\"Email\",\"type\":\"email\",\"required\":true,\"target\":{\"record\":\"person\",\"field\":\"Email\"}},{\"key\":\"phone\",\"label\":\"Phone\",\"type\":\"phone\",\"required\":false,\"target\":{\"record\":\"person\",\"field\":\"MobilePhone\"}}]},{\"key\":\"visit\",\"title\":\"Your Visit\",\"fields\":[{\"key\":\"session\",\"label\":\"Which session will you attend?\",\"type\":\"picklist\",\"required\":true,\"options\":[{\"value\":\"Morning\",\"label\":\"Morning\"},{\"value\":\"Afternoon\",\"label\":\"Afternoon\"},{\"value\":\"Both\",\"label\":\"Both\"}]},{\"key\":\"guests\",\"label\":\"How many guests are coming with you?\",\"type\":\"number\",\"required\":false,\"min\":0,\"max\":10},{\"key\":\"diet\",\"label\":\"Does anyone need a special meal?\",\"type\":\"checkbox\",\"required\":false},{\"key\":\"diet_notes\",\"label\":\"Tell us about the meal\",\"type\":\"textarea\",\"required\":true,\"maxLength\":300,\"showWhen\":{\"all\":[{\"field\":\"diet\",\"op\":\"equals\",\"value\":true}]}}]}],\"records\":[{\"key\":\"person\",\"kind\":\"person\",\"matching\":{\"rule\":\"emailThenNamePostal\",\"onMatch\":\"fillBlanks\"}}]}"
+        }
+      ]
+    },
+    {
+      "object": "Form_Submission__c",
+      "records": [
+        {
+          "key": "s1",
+          "Form__c": {
+            "ref": "volunteer"
+          },
+          "Status__c": "Processed",
+          "Source__c": "Staff",
+          "Answers__c": "{\"first\":\"Harper\",\"last\":\"Garcia\",\"email\":\"harper.garcia1@example.org\",\"phone\":\"(555) 010-0101\",\"postal\":\"62756\",\"employer\":\"Bayview Hardware\",\"age\":41,\"area\":\"Food pantry\",\"start\":\"2026-01-10\",\"availability\":\"Saturday mornings\",\"agree\":true}",
+          "Form_Version__c": {
+            "ref": "volunteer-v1"
+          },
+          "Person__c": {
+            "sample": "H001-1",
+            "optional": true
+          },
+          "Organization__c": {
+            "sample": "O001",
+            "optional": true
+          },
+          "Message__c": "Added to the matching person's record."
+        },
+        {
+          "key": "s2",
+          "Form__c": {
+            "ref": "volunteer"
+          },
+          "Status__c": "NeedsReview",
+          "Source__c": "Public",
+          "Answers__c": "{\"first\":\"Maria\",\"last\":\"Whitfield\",\"email\":\"m.whitfield@example.com\",\"postal\":\"78728\",\"age\":16,\"guardian\":\"David Whitfield, (555) 010-0102\",\"area\":\"Community garden\",\"availability\":\"After school\",\"agree\":true}",
+          "Form_Version__c": {
+            "ref": "volunteer-v1"
+          },
+          "Message__c": "Held for review: more than one person could match. Choose the person, then process it again."
+        },
+        {
+          "key": "s3",
+          "Form__c": {
+            "ref": "volunteer"
+          },
+          "Status__c": "Received",
+          "Source__c": "Public",
+          "Answers__c": "{\"first\":\"Jordan\",\"last\":\"Lee\",\"email\":\"jordan.lee@example.org\",\"age\":29,\"area\":\"Events\",\"agree\":true}",
+          "Form_Version__c": {
+            "ref": "volunteer-v1"
+          }
+        },
+        {
+          "key": "s4",
+          "Form__c": {
+            "ref": "registration"
+          },
+          "Status__c": "Processed",
+          "Source__c": "Staff",
+          "Answers__c": "{\"first\":\"Gabriel\",\"last\":\"Alvarez\",\"email\":\"gabriel.alvarez10@example.org\",\"session\":\"Both\",\"guests\":2,\"diet\":true,\"diet_notes\":\"One vegetarian meal\"}",
+          "Form_Version__c": {
+            "ref": "registration-v1"
+          },
+          "Person__c": {
+            "sample": "H003-1",
+            "optional": true
+          },
+          "Message__c": "Added to the matching person's record."
+        },
+        {
+          "key": "s5",
+          "Form__c": {
+            "ref": "registration"
+          },
+          "Status__c": "Received",
+          "Source__c": "Public",
+          "Answers__c": "{\"first\":\"Sam\",\"last\":\"Rivera\",\"email\":\"sam.rivera@example.org\",\"session\":\"Morning\",\"guests\":0,\"diet\":false}",
+          "Form_Version__c": {
+            "ref": "registration-v1"
+          }
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Form__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

@@ -22,6 +22,11 @@
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>
+    <editable>true</editable>
+    <field>Form__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>false</editable>
     <field>Form_Draft__c.Answers__c</field>
     <readable>true</readable>

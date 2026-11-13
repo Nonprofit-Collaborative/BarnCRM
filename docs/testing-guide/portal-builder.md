@@ -268,3 +268,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | With `partner-funders.json`, GET `grants` and `reports`. | Kim's grant; the submitted report, not the task. |
 
 **Cleanup:** restore the referral.
+
+## T-PB-17: Sample Data
+
+**Purpose:** confirm the Portal Builder sample data loads an inactive portal and takes away only itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; one portal of your own with an access.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Portals** count of `1`. |
+| 2 | Open **Portals**. | **Sample Supporter Portal** is **Inactive**, Invited, second factor Off, beside your own portal. |
+| 3 | Open the portal's **Portal Accesses**. | Three accesses for Core's sample people: two Active, one Suspended. |
+| 4 | **Remove Sample Data**. | The sample portal and its accesses are gone; your own portal and its access stay. |
+
+**Cleanup:** None.
