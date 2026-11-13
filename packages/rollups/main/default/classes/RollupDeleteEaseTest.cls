@@ -55,7 +55,9 @@ private class RollupDeleteEaseTest {
 	@IsTest
 	static void keepingTheValuesLeavesThemAndStartsNothing() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account org = new Account(Name = 'Alpha Org', Member_Count__c = 4);
+			Account org = TestDataFactory.organization(
+				new Account(Name = 'Alpha Org', Member_Count__c = 4)
+			);
 			insert org;
 			Rollup_Definition__c mine = rollup('Alpha count', null, true);
 			insert mine;
@@ -75,8 +77,12 @@ private class RollupDeleteEaseTest {
 	@IsTest
 	static void clearingBlanksTheFieldOnTheRecordsTheRollupFillsOnly() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account alpha = new Account(Name = 'Alpha Org', Member_Count__c = 4);
-			Account beta = new Account(Name = 'Beta Org', Member_Count__c = 7);
+			Account alpha = TestDataFactory.organization(
+				new Account(Name = 'Alpha Org', Member_Count__c = 4)
+			);
+			Account beta = TestDataFactory.organization(
+				new Account(Name = 'Beta Org', Member_Count__c = 7)
+			);
 			insert new List<Account>{ alpha, beta };
 			Rollup_Definition__c mine = rollup('Alpha count', nameStartsWith('Alpha'), true);
 			insert mine;

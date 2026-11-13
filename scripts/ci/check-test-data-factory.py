@@ -28,7 +28,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from apex_source import is_test_class, strip  # noqa: E402
 
-BASELINE = 154
+BASELINE = 66
 CONSTRUCTION = re.compile(r"\bnew\s+(Contact|Account)\s*\(")
 FACTORY_NAME = re.compile(r"TestData(Factory)?\.cls$")
 UPDATE_STUB = re.compile(r"\s*Id\s*=")

@@ -52,19 +52,20 @@ private class RollupLargeParentBatchTest {
 
 	/** A parent with this many children, each with revenue 10; its stored count is `stored`. */
 	private static Account parentWith(Integer children, Integer stored) {
-		Account parent = new Account(
-			Name = 'Large parent ' + children,
-			RecordTypeId = organizationType()
+		Account parent = TestDataFactory.organization(
+			new Account(Name = 'Large parent ' + children, RecordTypeId = organizationType())
 		);
 		insert parent;
 		List<Account> rows = new List<Account>();
 		for (Integer i = 0; i < children; i++) {
 			rows.add(
-				new Account(
-					Name = 'Child ' + i,
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id,
-					AnnualRevenue = 10
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Child ' + i,
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id,
+						AnnualRevenue = 10
+					)
 				)
 			);
 		}
@@ -533,18 +534,22 @@ private class RollupLargeParentBatchTest {
 	@IsTest
 	static void chunksMergeSumsAveragesFiltersAndFirstValues() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account parent = new Account(Name = 'Parent', RecordTypeId = organizationType());
+			Account parent = TestDataFactory.organization(
+				new Account(Name = 'Parent', RecordTypeId = organizationType())
+			);
 			insert parent;
 			List<Account> children = new List<Account>();
 			for (Integer i = 0; i < 7; i++) {
 				children.add(
-					new Account(
-						Name = 'Child ' + i,
-						RecordTypeId = organizationType(),
-						ParentId = parent.Id,
-						AnnualRevenue = i * 10,
-						// Ties on the order attribute, broken by record Id across chunks.
-						NumberOfEmployees = Math.mod(i, 3) + 1
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Child ' + i,
+							RecordTypeId = organizationType(),
+							ParentId = parent.Id,
+							AnnualRevenue = i * 10,
+							// Ties on the order attribute, broken by record Id across chunks.
+							NumberOfEmployees = Math.mod(i, 3) + 1
+						)
 					)
 				);
 			}
@@ -593,16 +598,20 @@ private class RollupLargeParentBatchTest {
 	@IsTest
 	static void chunksMergeLastValues() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account parent = new Account(Name = 'Parent', RecordTypeId = organizationType());
+			Account parent = TestDataFactory.organization(
+				new Account(Name = 'Parent', RecordTypeId = organizationType())
+			);
 			insert parent;
 			List<Account> children = new List<Account>();
 			for (Integer i = 0; i < 5; i++) {
 				children.add(
-					new Account(
-						Name = 'Child ' + i,
-						RecordTypeId = organizationType(),
-						ParentId = parent.Id,
-						NumberOfEmployees = 7
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Child ' + i,
+							RecordTypeId = organizationType(),
+							ParentId = parent.Id,
+							NumberOfEmployees = 7
+						)
 					)
 				);
 			}
@@ -629,15 +638,19 @@ private class RollupLargeParentBatchTest {
 	@IsTest
 	static void chunksMergeDistinctCountsAndTextLists() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account parent = new Account(Name = 'Parent', RecordTypeId = organizationType());
+			Account parent = TestDataFactory.organization(
+				new Account(Name = 'Parent', RecordTypeId = organizationType())
+			);
 			insert parent;
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 8; i >= 0; i--) {
 				people.add(
-					new Contact(
-						LastName = 'P' + i,
-						Title = i == 4 ? null : 'Role ' + Math.mod(i, 3),
-						AccountId = parent.Id
+					TestDataFactory.person(
+						new Contact(
+							LastName = 'P' + i,
+							Title = i == 4 ? null : 'Role ' + Math.mod(i, 3),
+							AccountId = parent.Id
+						)
 					)
 				);
 			}
