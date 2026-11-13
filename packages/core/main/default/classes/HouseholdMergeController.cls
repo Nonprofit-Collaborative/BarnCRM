@@ -11,6 +11,12 @@
  * (ADR-0134).
  */
 public with sharing class HouseholdMergeController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Households_ErrorUnexpected'
+	);
+
 	/**
 	 * Whether this person may change this household at all, so that the screen can show a
 	 * read only notice rather than buttons that would fail.
@@ -35,7 +41,7 @@ public with sharing class HouseholdMergeController {
 			}
 			return HouseholdMergeService.preview(survivorId, victimId);
 		} catch (Exception e) {
-			throw asUserError(e, survivorId);
+			throw ERRORS.wrap(e, Label.Core_HouseholdMerge_ErrorContext, survivorId);
 		}
 	}
 
@@ -57,7 +63,7 @@ public with sharing class HouseholdMergeController {
 				new HouseholdMergeService.MergeChoices(fieldChoices)
 			);
 		} catch (Exception e) {
-			throw asUserError(e, survivorId);
+			throw ERRORS.wrap(e, Label.Core_HouseholdMerge_ErrorContext, survivorId);
 		}
 	}
 
@@ -74,14 +80,9 @@ public with sharing class HouseholdMergeController {
 			}
 			return HouseholdMergeService.split(householdId, people, targetHouseholdId);
 		} catch (Exception e) {
-			throw asUserError(e, householdId);
+			throw ERRORS.wrap(e, Label.Core_HouseholdMerge_ErrorContext, householdId);
 		}
 	}
 
 	// ------------------------------------------------------------------ helpers
-
-	/** What the screen is told, logged under the merge's own context. */
-	private static AuraHandledException asUserError(Exception e, Id recordId) {
-		return HouseholdException.forScreen(e, Label.Core_HouseholdMerge_ErrorContext, recordId);
-	}
 }

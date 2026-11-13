@@ -69,7 +69,11 @@ public with sharing class SetupAssistantController {
 		try {
 			return buildState();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
+			);
 		}
 	}
 
@@ -80,7 +84,11 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.markComplete(stepKey);
 			return buildState();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
+			);
 		}
 	}
 
@@ -91,7 +99,11 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.markSkipped(stepKey);
 			return buildState();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
+			);
 		}
 	}
 
@@ -102,7 +114,11 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.reset();
 			return buildState();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
+			);
 		}
 	}
 
@@ -120,7 +136,11 @@ public with sharing class SetupAssistantController {
 		try {
 			return editionModel();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
+			);
 		}
 	}
 
@@ -136,7 +156,11 @@ public with sharing class SetupAssistantController {
 			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
 			return editionModel();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage')
+			);
 		}
 	}
 
@@ -174,7 +198,11 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.markComplete('coexistence');
 			return buildState();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage')
+			);
 		}
 	}
 
@@ -207,7 +235,11 @@ public with sharing class SetupAssistantController {
 		} catch (Exception e) {
 			Database.rollback(beforeSave);
 			SettingsService.clearCaches();
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage')
+			);
 		}
 		return buildState();
 	}
@@ -261,7 +293,11 @@ public with sharing class SetupAssistantController {
 			AccessService.assignRole(userId, roleDeveloperName);
 			return buildState();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_SetupAssistant_AccessErrorMessage'));
+			throw UserErrors.wrap(
+				e,
+				ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_SetupAssistant_AccessErrorMessage')
+			);
 		}
 	}
 
@@ -374,15 +410,6 @@ public with sharing class SetupAssistantController {
 			);
 		}
 		return String.valueOf(recordId);
-	}
-
-	/** Logs what went wrong and gives the page one message Maria can act on. */
-	private static AuraHandledException logged(Exception e, String fallback) {
-		ErrorLogger.log(e, ERROR_CONTEXT);
-		Boolean speaksForItself =
-			e instanceof SetupAssistantService.SetupStepException ||
-			e instanceof SettingsService.SettingsException;
-		return UserErrors.message(speaksForItself ? e.getMessage() : fallback);
 	}
 
 	private static void requireEdit() {

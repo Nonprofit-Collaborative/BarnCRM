@@ -6,6 +6,12 @@
  * message that names the permission.
  */
 public with sharing class AutomationControlController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		null,
+		Label.Core_Automation_UnexpectedError
+	);
+
 	/**
 	 * One row in the list: what it does, and whether it is running.
 	 */
@@ -73,7 +79,7 @@ public with sharing class AutomationControlController {
 		try {
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Automation page');
+			throw ERRORS.wrap(caught, 'Automation page');
 		}
 	}
 
@@ -84,7 +90,7 @@ public with sharing class AutomationControlController {
 			AutomationControl.pauseAll(hours);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Pause all automation');
+			throw ERRORS.wrap(caught, 'Pause all automation');
 		}
 	}
 
@@ -95,7 +101,7 @@ public with sharing class AutomationControlController {
 			AutomationControl.resumeAll();
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Resume automation');
+			throw ERRORS.wrap(caught, 'Resume automation');
 		}
 	}
 
@@ -111,7 +117,7 @@ public with sharing class AutomationControlController {
 			AutomationControl.setEnabled(automationName, enabled == true);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Switch an automation');
+			throw ERRORS.wrap(caught, 'Switch an automation');
 		}
 	}
 
@@ -122,7 +128,7 @@ public with sharing class AutomationControlController {
 			AutomationControlSettingService.save(ownerId, pauseAll, bypass);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Save Automation Control');
+			throw ERRORS.wrap(caught, 'Save Automation Control');
 		}
 	}
 
@@ -133,7 +139,7 @@ public with sharing class AutomationControlController {
 			AutomationControlSettingService.add(ownerId);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Add Automation Control');
+			throw ERRORS.wrap(caught, 'Add Automation Control');
 		}
 	}
 
@@ -144,7 +150,7 @@ public with sharing class AutomationControlController {
 			AutomationControlSettingService.remove(ownerId);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Remove Automation Control');
+			throw ERRORS.wrap(caught, 'Remove Automation Control');
 		}
 	}
 
@@ -155,7 +161,7 @@ public with sharing class AutomationControlController {
 			AutomationControlSettingService.addFlow(apiName);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'List a flow');
+			throw ERRORS.wrap(caught, 'List a flow');
 		}
 	}
 
@@ -166,7 +172,7 @@ public with sharing class AutomationControlController {
 			AutomationControlSettingService.removeFlow(automationName);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Remove a listed flow');
+			throw ERRORS.wrap(caught, 'Remove a listed flow');
 		}
 	}
 
@@ -177,7 +183,7 @@ public with sharing class AutomationControlController {
 			AutomationControlSettingService.catchUpNow();
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Catch up now');
+			throw ERRORS.wrap(caught, 'Catch up now');
 		}
 	}
 
@@ -251,18 +257,5 @@ public with sharing class AutomationControlController {
 				Label.Core_Automation_NoPermission
 			);
 		}
-	}
-
-	/**
-	 * Turns anything that went wrong into a message the page can show, and records the ones the
-	 * page cannot explain.
-	 */
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof AutomationControl.AutomationControlException,
-			context,
-			Label.Core_Automation_UnexpectedError
-		);
 	}
 }

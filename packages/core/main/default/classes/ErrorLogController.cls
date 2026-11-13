@@ -6,6 +6,12 @@
  * changes.
  */
 public with sharing class ErrorLogController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_ErrorLog_ActionFailed'
+	);
+
 	private static final Integer DEFAULT_ROWS = 5;
 
 	/** The tile counts this many and then says "more". A test lowers it. */
@@ -52,7 +58,7 @@ public with sharing class ErrorLogController {
 		try {
 			return currentTile(rowCount);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Error Log tile');
+			throw ERRORS.wrap(caught, 'Error Log tile');
 		}
 	}
 
@@ -66,7 +72,7 @@ public with sharing class ErrorLogController {
 			}
 			return currentTile(DEFAULT_ROWS);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Mark an error acknowledged');
+			throw ERRORS.wrap(caught, 'Mark an error acknowledged');
 		}
 	}
 
@@ -118,15 +124,6 @@ public with sharing class ErrorLogController {
 			tile.recent.add(view);
 		}
 		return tile;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof ErrorLogControllerException,
-			context,
-			BarnHelp.text('Core', 'Core_ErrorLog_ActionFailed')
-		);
 	}
 
 	public class ErrorLogControllerException extends Exception {

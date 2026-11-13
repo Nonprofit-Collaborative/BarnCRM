@@ -4,13 +4,19 @@
  * unexpected into the generic message, logged.
  */
 public with sharing class PersonErasureController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Households_ErrorUnexpected'
+	);
+
 	/** What erasing this person would change, with nothing changed. */
 	@AuraEnabled
 	public static PersonErasure.Result preview(Id personId) {
 		try {
 			return PersonErasure.preview(personId);
 		} catch (Exception failed) {
-			throw asUserError(failed, personId);
+			throw ERRORS.wrap(failed, 'PersonErasureController', personId);
 		}
 	}
 
@@ -24,17 +30,7 @@ public with sharing class PersonErasureController {
 		try {
 			return PersonErasure.erase(personId, typedName, requestReference);
 		} catch (Exception failed) {
-			throw asUserError(failed, personId);
+			throw ERRORS.wrap(failed, 'PersonErasureController', personId);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception failed, Id personId) {
-		return UserErrors.wrap(
-			failed,
-			failed instanceof PersonErasure.ErasureException,
-			'PersonErasureController',
-			personId,
-			BarnHelp.text('Core', 'Core_Households_ErrorUnexpected')
-		);
 	}
 }

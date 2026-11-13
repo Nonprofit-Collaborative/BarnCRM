@@ -5,13 +5,19 @@
  * BarnCRM Settings, checked in `MigrationKitService`.
  */
 public with sharing class MigrationController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		'MigrationController',
+		null,
+		Label.Core_UnexpectedError
+	);
+
 	/** Not cacheable, so Refresh reads the run and the source again. */
 	@AuraEnabled
 	public static MigrationKitService.KitView getKit(String kitKey) {
 		try {
 			return MigrationKitService.view(kitKey);
 		} catch (Exception e) {
-			throw asUserError(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -22,7 +28,7 @@ public with sharing class MigrationController {
 			MigrationKitService.startStep(kitKey, stepKey);
 			return MigrationKitService.view(kitKey);
 		} catch (Exception e) {
-			throw asUserError(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -37,7 +43,7 @@ public with sharing class MigrationController {
 			MigrationKitService.markToolStep(kitKey, stepKey, done);
 			return MigrationKitService.view(kitKey);
 		} catch (Exception e) {
-			throw asUserError(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -52,18 +58,7 @@ public with sharing class MigrationController {
 			MigrationKitService.tick(kitKey, itemKey, ticked);
 			return MigrationKitService.view(kitKey);
 		} catch (Exception e) {
-			throw asUserError(e);
+			throw ERRORS.wrap(e);
 		}
-	}
-
-	/** A refusal is shown as written and not logged; anything else is logged. */
-	private static AuraHandledException asUserError(Exception caught) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof MigrationKitService.MigrationException ||
-			caught instanceof ImportException,
-			'MigrationController',
-			Label.Core_UnexpectedError
-		);
 	}
 }

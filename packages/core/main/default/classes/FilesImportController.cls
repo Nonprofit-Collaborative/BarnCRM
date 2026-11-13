@@ -3,13 +3,19 @@
  * shapes; the rules and permission checks are in `FilesImportService`.
  */
 public with sharing class FilesImportController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		null,
+		System.Label.Core_UnexpectedError
+	);
+
 	/** The record Ids among those given that name no record the person can see (R-FI2). */
 	@AuraEnabled
 	public static List<String> check(List<String> recordIds) {
 		try {
 			return FilesImportService.unseen(recordIds);
 		} catch (Exception e) {
-			throw wrapped(e, 'FilesImportController.check');
+			throw ERRORS.wrap(e, 'FilesImportController.check');
 		}
 	}
 
@@ -19,7 +25,7 @@ public with sharing class FilesImportController {
 		try {
 			return FilesImportService.start(fileName, rowCount).Id;
 		} catch (Exception e) {
-			throw wrapped(e, 'FilesImportController.start');
+			throw ERRORS.wrap(e, 'FilesImportController.start');
 		}
 	}
 
@@ -32,7 +38,7 @@ public with sharing class FilesImportController {
 		try {
 			return FilesImportService.addFiles(jobId, files);
 		} catch (Exception e) {
-			throw wrapped(e, 'FilesImportController.addFiles');
+			throw ERRORS.wrap(e, 'FilesImportController.addFiles');
 		}
 	}
 
@@ -42,7 +48,7 @@ public with sharing class FilesImportController {
 		try {
 			return FilesImportService.finish(jobId);
 		} catch (Exception e) {
-			throw wrapped(e, 'FilesImportController.finish');
+			throw ERRORS.wrap(e, 'FilesImportController.finish');
 		}
 	}
 
@@ -52,7 +58,7 @@ public with sharing class FilesImportController {
 		try {
 			return FilesImportService.undo(jobId, confirmedFiles);
 		} catch (Exception e) {
-			throw wrapped(e, 'FilesImportController.undo');
+			throw ERRORS.wrap(e, 'FilesImportController.undo');
 		}
 	}
 
@@ -62,11 +68,7 @@ public with sharing class FilesImportController {
 		try {
 			return FilesImportService.allowed() ? FilesImportService.jobs() : null;
 		} catch (Exception e) {
-			throw wrapped(e, 'FilesImportController.getJobs');
+			throw ERRORS.wrap(e, 'FilesImportController.getJobs');
 		}
-	}
-
-	private static AuraHandledException wrapped(Exception e, String context) {
-		return DataJobs.userError(e, context, e instanceof FilesImportService.FilesImportException);
 	}
 }

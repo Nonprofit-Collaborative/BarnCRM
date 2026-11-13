@@ -9,6 +9,12 @@
  * settings save and its permission check.
  */
 public with sharing class SeasonalAddressController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_SeasonalAddress_UnexpectedError'
+	);
+
 	/** Raised with a message the panel shows as it is. */
 	public class SeasonalAddressException extends Exception {
 	}
@@ -36,7 +42,7 @@ public with sharing class SeasonalAddressController {
 		try {
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Seasonal address swap page');
+			throw ERRORS.wrap(caught, 'Seasonal address swap page');
 		}
 	}
 
@@ -51,7 +57,7 @@ public with sharing class SeasonalAddressController {
 			SeasonalAddressScheduler.runNow();
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Run the seasonal address swap now');
+			throw ERRORS.wrap(caught, 'Run the seasonal address swap now');
 		}
 	}
 
@@ -77,14 +83,5 @@ public with sharing class SeasonalAddressController {
 				BarnHelp.text('Core', 'Core_SeasonalAddress_PermissionRequired')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof SeasonalAddressException,
-			context,
-			BarnHelp.text('Core', 'Core_SeasonalAddress_UnexpectedError')
-		);
 	}
 }

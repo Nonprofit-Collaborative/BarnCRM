@@ -28,7 +28,11 @@ public with sharing class CustomMetadataManagerController {
 		try {
 			return CustomMetadataManagerService.getTypes();
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_LoadError'));
+			throw UserErrors.wrap(
+				e,
+				CustomMetadataDeployCallback.ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_CmdtManager_LoadError')
+			);
 		}
 	}
 
@@ -39,7 +43,11 @@ public with sharing class CustomMetadataManagerController {
 		try {
 			return CustomMetadataManagerService.save(typeName, input);
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_SaveError'));
+			throw UserErrors.wrap(
+				e,
+				CustomMetadataDeployCallback.ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_CmdtManager_SaveError')
+			);
 		}
 	}
 
@@ -49,7 +57,11 @@ public with sharing class CustomMetadataManagerController {
 		try {
 			return CustomMetadataManagerService.setArchived(typeName, developerName, archived);
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_SaveError'));
+			throw UserErrors.wrap(
+				e,
+				CustomMetadataDeployCallback.ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_CmdtManager_SaveError')
+			);
 		}
 	}
 
@@ -76,18 +88,12 @@ public with sharing class CustomMetadataManagerController {
 			}
 			return outcome;
 		} catch (Exception e) {
-			throw logged(e, BarnHelp.text('Core', 'Core_CmdtManager_LoadError'));
+			throw UserErrors.wrap(
+				e,
+				CustomMetadataDeployCallback.ERROR_CONTEXT,
+				BarnHelp.text('Core', 'Core_CmdtManager_LoadError')
+			);
 		}
-	}
-
-	/** A refusal the service explains is shown as it is; anything else is logged first. */
-	private static AuraHandledException logged(Exception e, String fallback) {
-		return UserErrors.wrap(
-			e,
-			e instanceof CustomMetadataManagerService.CustomMetadataManagerException,
-			CustomMetadataDeployCallback.ERROR_CONTEXT,
-			fallback
-		);
 	}
 
 	private static void requirePermission() {

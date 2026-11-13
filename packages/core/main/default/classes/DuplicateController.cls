@@ -16,6 +16,12 @@
  * there is nothing else, rather than failing (ADR-0013, ADR-0050).
  */
 public with sharing class DuplicateController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Duplicates_ErrorUnexpected'
+	);
+
 	private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
 	private static final String SCAN_CLASS = 'DuplicateScanBatch';
 	private static final Integer MAX_SUGGESTIONS = 50;
@@ -121,7 +127,7 @@ public with sharing class DuplicateController {
 		try {
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Duplicates panel');
+			throw ERRORS.wrap(caught, 'Duplicates panel');
 		}
 	}
 
@@ -147,7 +153,7 @@ public with sharing class DuplicateController {
 			}
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Start a duplicate scan');
+			throw ERRORS.wrap(caught, 'Start a duplicate scan');
 		}
 	}
 
@@ -160,7 +166,7 @@ public with sharing class DuplicateController {
 			DuplicateService.dismiss(duplicateRecordSetId, reason);
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Dismiss a duplicate suggestion');
+			throw ERRORS.wrap(caught, 'Dismiss a duplicate suggestion');
 		}
 	}
 
@@ -171,7 +177,7 @@ public with sharing class DuplicateController {
 			requirePermission();
 			return HouseholdMergeService.preview(survivorId, victimId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Preview a household merge from the Duplicates panel');
+			throw ERRORS.wrap(caught, 'Preview a household merge from the Duplicates panel');
 		}
 	}
 
@@ -202,7 +208,7 @@ public with sharing class DuplicateController {
 			DuplicateService.closeSet(duplicateRecordSetId);
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Merge two households from the Duplicates panel');
+			throw ERRORS.wrap(caught, 'Merge two households from the Duplicates panel');
 		}
 	}
 
@@ -471,21 +477,5 @@ public with sharing class DuplicateController {
 				BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired')
 			);
 		}
-	}
-
-	/**
-	 * Anything the person can act on is shown as it is. Anything else is logged and answered
-	 * with one sentence, because a stack trace in a toast helps nobody (plan Section 7.2).
-	 */
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		Boolean expected =
-			caught instanceof DuplicateService.DuplicateException ||
-			caught instanceof HouseholdException;
-		return UserErrors.wrap(
-			caught,
-			expected,
-			context,
-			BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected')
-		);
 	}
 }

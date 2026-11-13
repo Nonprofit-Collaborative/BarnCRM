@@ -12,6 +12,12 @@
  */
 @NamespaceAccessible
 public with sharing class FindController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Find_UnexpectedError'
+	);
+
 	/** Raised for anything the person can fix; the message is shown as it is. */
 	public class FindException extends Exception {
 	}
@@ -101,7 +107,7 @@ public with sharing class FindController {
 			requirePermission();
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Find page');
+			throw ERRORS.wrap(caught, 'Find page');
 		}
 	}
 
@@ -131,7 +137,7 @@ public with sharing class FindController {
 			}
 			return options;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Find object list');
+			throw ERRORS.wrap(caught, 'Find object list');
 		}
 	}
 
@@ -142,7 +148,7 @@ public with sharing class FindController {
 			requirePermission();
 			return QueryCompiler.compile(queryJson).display;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Find preview');
+			throw ERRORS.wrap(caught, 'Find preview');
 		}
 	}
 
@@ -155,7 +161,7 @@ public with sharing class FindController {
 			requirePermission();
 			return FindRelatedRecords.childOptions(objectApiName);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Find related records');
+			throw ERRORS.wrap(caught, 'Find related records');
 		}
 	}
 
@@ -178,7 +184,7 @@ public with sharing class FindController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Run a Find query');
+			throw ERRORS.wrap(caught, 'Run a Find query');
 		}
 	}
 
@@ -189,7 +195,7 @@ public with sharing class FindController {
 			requirePermission();
 			return FindRadius.fieldOptions(objectApiName);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Find radius fields');
+			throw ERRORS.wrap(caught, 'Find radius fields');
 		}
 	}
 
@@ -204,7 +210,7 @@ public with sharing class FindController {
 			requirePermission();
 			return FindRadius.resolveCenter(text);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Find radius center');
+			throw ERRORS.wrap(caught, 'Find radius center');
 		}
 	}
 
@@ -215,7 +221,7 @@ public with sharing class FindController {
 			requirePermission();
 			return FindSummary.summarize(queryJson);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Summarize a Find query');
+			throw ERRORS.wrap(caught, 'Summarize a Find query');
 		}
 	}
 
@@ -235,7 +241,7 @@ public with sharing class FindController {
 			}
 			return FindInlineEditService.save(objectApiName, editsJson);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Save edits in Find');
+			throw ERRORS.wrap(caught, 'Save edits in Find');
 		}
 	}
 
@@ -306,7 +312,7 @@ public with sharing class FindController {
 			);
 			return serverExport(jobId, tag);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Export a Find query to Files');
+			throw ERRORS.wrap(caught, 'Export a Find query to Files');
 		}
 	}
 
@@ -320,7 +326,7 @@ public with sharing class FindController {
 			}
 			return serverExport(Id.valueOf(jobId), tag);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Read an export to Files');
+			throw ERRORS.wrap(caught, 'Read an export to Files');
 		}
 	}
 
@@ -386,7 +392,7 @@ public with sharing class FindController {
 				: String.valueOf(result.rows[result.rows.size() - 1].Id);
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Export a Find query');
+			throw ERRORS.wrap(caught, 'Export a Find query');
 		}
 	}
 
@@ -430,7 +436,7 @@ public with sharing class FindController {
 			page.savedId = query.Id;
 			return page;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Save a Find query');
+			throw ERRORS.wrap(caught, 'Save a Find query');
 		}
 	}
 
@@ -442,7 +448,7 @@ public with sharing class FindController {
 			Database.delete(requireOwn(recordId), AccessLevel.USER_MODE);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Delete a Find query');
+			throw ERRORS.wrap(caught, 'Delete a Find query');
 		}
 	}
 
@@ -537,21 +543,5 @@ public with sharing class FindController {
 		if (!FeatureManagement.checkPermission(PERMISSION)) {
 			throw new FindException(BarnHelp.text('Core', 'Core_Find_ErrorNoPermission'));
 		}
-	}
-
-	/** Anything the person can fix is shown as it is; anything else is logged and summarized. */
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		Boolean shown =
-			caught instanceof FindException ||
-			caught instanceof QueryCompiler.QueryCompilerException ||
-			caught instanceof FindRadius.FindRadiusException ||
-			caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
-			caught instanceof BulkUpdateFields.BulkUpdateException;
-		return UserErrors.wrap(
-			caught,
-			shown,
-			context,
-			BarnHelp.text('Core', 'Core_Find_UnexpectedError')
-		);
 	}
 }
