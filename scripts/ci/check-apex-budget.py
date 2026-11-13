@@ -308,8 +308,9 @@ CAPS = {
     # sets removed): 212,177 measured 2026-11-12, plus about 2%. Lowered for the cleanup
     # leftovers (D-200 S8b): 212,112 measured, plus about 2%. The Case bridge to a service
     # provider (D-201: CaseProviderRequests and its flow action): 221,790 measured,
-    # plus about 2%.
-    "mirror": 226_200,
+    # plus about 2%. Lowered for the shared gift mirror base (D-200 S5, release 1.23:
+    # MirrorRunBatch, MirrorSync.Result and storeLinks): 221,165 measured, plus about 2%.
+    "mirror": 225_600,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 
