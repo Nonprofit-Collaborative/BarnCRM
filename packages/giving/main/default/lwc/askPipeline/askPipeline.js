@@ -62,6 +62,7 @@ import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
 import REOPEN_ASK from '@salesforce/label/c.Giving_AskPipeline_ReopenAsk';
 import RECENTLY_CLOSED from '@salesforce/label/c.Giving_AskPipeline_RecentlyClosed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { messageFrom } from 'c/findCsv';
 
 const ACTION_OPEN = 'open';
 const ACTION_CLOSE = 'close';
@@ -76,9 +77,7 @@ const format = (template, ...values) =>
   values.reduce((text, value, index) => text.replace(`{${index}}`, value), template);
 
 const messageOf = (error) =>
-  (error && error.body && error.body.message) ||
-  (error && error.message) ||
-  helpText('Giving', 'Giving_AskPipeline_ErrorAction');
+  messageFrom(error, helpText('Giving', 'Giving_AskPipeline_ErrorAction'));
 
 /**
  * The Ask Pipeline (G-26, canonical model Section 25R): every open ask by stage as a board or a

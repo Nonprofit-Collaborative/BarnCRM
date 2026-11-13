@@ -19,6 +19,7 @@ import { createDragController } from 'c/barnDrag';
 import { dragInstructions, dragMessages } from 'c/barnDragText';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
+import { recordHref } from 'c/recordRows';
 import GrantAwardModal from 'c/grantAwardModal';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';
@@ -54,9 +55,6 @@ const STAGE_AWARDED = 'Awarded';
 const HELP_PACKAGES = ['Funders', 'Core'];
 
 const messageOf = (error) => messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved'));
-
-/** A record's page in Lightning, for a link's href; a click navigates in place instead. */
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /**
  * The Grant Pipeline tab (F-01, canonical model 29ZH): the open grants by stage as a board, the

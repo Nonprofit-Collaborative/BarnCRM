@@ -17,6 +17,7 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { PRIVATE, picklistRows, privacyOptions, storedPrivacy } from './settingsRows';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
+import { bodyMessage as messageOf } from 'c/findCsv';
 
 /**
  * The Programs module's settings page, reached from the Programs section of BarnCRM Settings:
@@ -130,8 +131,4 @@ export default class ProgramsSettings extends LightningElement {
         this.saving = false;
       });
   }
-}
-
-function messageOf(error, fallback) {
-  return error && error.body && error.body.message ? error.body.message : fallback;
 }

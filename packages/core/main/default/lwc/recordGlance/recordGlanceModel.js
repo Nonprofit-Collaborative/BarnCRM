@@ -2,6 +2,7 @@
  * Turns the cards modules return (RecordGlanceController) into what the glance card draws.
  * Framework free, so it ports with the rest of the record page logic (plan 9.9).
  */
+import { formatDate } from 'c/barnFormat';
 
 /** One tile's value and format for c-barn-stat-tile: a number keeps its number, a date is text. */
 export function tileView(tile, index, locale) {
@@ -23,24 +24,8 @@ export function tileView(tile, index, locale) {
   return view;
 }
 
-/** A date as the person's locale writes it; the ISO text when the locale cannot. */
-export function formatDate(isoDate, locale) {
-  if (!isoDate) {
-    return null;
-  }
-  const [year, month, day] = String(isoDate).split('-').map(Number);
-  if (!year || !month || !day) {
-    return String(isoDate);
-  }
-  try {
-    return new Intl.DateTimeFormat(locale || undefined, {
-      dateStyle: 'medium',
-      timeZone: 'UTC'
-    }).format(new Date(Date.UTC(year, month - 1, day)));
-  } catch {
-    return String(isoDate);
-  }
-}
+/** A date as the person's locale writes it, from the shared kit. */
+export { formatDate };
 
 /** The cards ready to draw: tiles without a value are left out, and actions keep their page reference. */
 export function cardViews(cards, locale) {

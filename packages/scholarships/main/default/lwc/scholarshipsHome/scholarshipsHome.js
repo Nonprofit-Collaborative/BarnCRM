@@ -5,9 +5,9 @@ import { localIsoDate, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { toCsv } from 'c/scholarshipsModel';
+import { recordHref } from 'c/recordRows';
 
 const PKG = 'Scholarships';
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /**
  * The Scholarships and Grants page (SG-03, SG-05, SG-10): my reviews to do, cycles open or in

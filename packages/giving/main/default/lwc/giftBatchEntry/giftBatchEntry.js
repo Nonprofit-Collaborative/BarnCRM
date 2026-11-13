@@ -44,6 +44,7 @@ import unsaved from '@salesforce/label/c.Core_Shared_UnsavedChanges';
 import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
 import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import { iconFor } from 'c/barnIcons';
+import { bodyMessage as messageOf } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FIELDS = [CONTROL_TOTAL, STATUS];
@@ -597,8 +598,4 @@ export default class GiftBatchEntry extends LightningElement {
   toast(message, variant) {
     Toast.show({ label: message, variant }, this);
   }
-}
-
-function messageOf(error, fallback) {
-  return error?.body?.message || fallback;
 }

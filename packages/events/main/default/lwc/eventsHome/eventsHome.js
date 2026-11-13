@@ -8,6 +8,7 @@ import repeatEvent from '@salesforce/apex/EventsHomeController.repeatEvent';
 import { statusWord, whenText } from 'c/eventsModel';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
+import { recordHref } from 'c/recordRows';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRepeatModal from 'c/eventRepeatModal';
 
@@ -28,9 +29,6 @@ const ACTION_OPEN = 'open';
 const ACTION_REPEAT = 'repeat';
 const VIEW_UPCOMING = 'upcoming';
 const VIEW_PAST = 'past';
-
-/** A record's page in Lightning, for a link's href; a click navigates in place instead. */
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /**
  * The Events page (EV-01, canonical model 29EV1): the events coming up, soonest first, or those

@@ -5,13 +5,11 @@ import acknowledge from '@salesforce/apex/CorporateHubController.acknowledge';
 import addMissingTemplates from '@salesforce/apex/CorporateHubController.addMissingTemplates';
 import { messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
+import { recordHref } from 'c/recordRows';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { DUE_NONE, DUE_OVERDUE, DUE_TODAY, dueState, todayIso } from 'c/corporateHubModel';
 
 const HELP_PACKAGES = ['CorporateHub'];
-
-/** A record's page in Lightning. */
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /** When a line is due, in words. */
 function dueText(dateIso, today) {
