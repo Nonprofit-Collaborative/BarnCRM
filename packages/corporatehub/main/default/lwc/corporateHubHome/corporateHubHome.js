@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getHome from '@salesforce/apex/CorporateHubController.getHome';
+import BOARD from '@salesforce/schema/Board__c';
 import acknowledge from '@salesforce/apex/CorporateHubController.acknowledge';
 import addMissingTemplates from '@salesforce/apex/CorporateHubController.addMissingTemplates';
 import { messageFrom } from 'c/findCsv';
@@ -78,7 +79,7 @@ export default class CorporateHubHome extends NavigationMixin(LightningElement) 
   handleNewBoard() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Board__c', actionName: 'new' }
+      attributes: { objectApiName: BOARD.objectApiName, actionName: 'new' }
     });
   }
 

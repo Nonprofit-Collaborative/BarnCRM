@@ -1,9 +1,14 @@
 /**
  * Tests for Volunteers Home (vis-modules-19): the three figures and where each one goes, for an
- * administrator and for a person with no Volunteers access.
+ * administrator and for a person with no Volunteers access; and the first-run panel (D-200 R4).
  */
 @IsTest(testFor='ApexClass:VolunteersHomeController')
 private class VolunteersHomeControllerTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith(VolunteersTestData.ADMIN);
+	}
+
 	private static Map<String, VolunteersHomeController.Tile> byName(
 		List<VolunteersHomeController.Tile> tiles
 	) {

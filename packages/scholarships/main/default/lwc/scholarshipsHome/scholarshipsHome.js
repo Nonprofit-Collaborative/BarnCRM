@@ -1,6 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHome from '@salesforce/apex/ScholarshipsController.getHome';
+import AWARD_PROGRAM from '@salesforce/schema/Award_Program__c';
 import exportDisbursements from '@salesforce/apex/ScholarshipsController.exportDisbursements';
 import { localIsoDate, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
@@ -71,7 +72,7 @@ export default class ScholarshipsHome extends NavigationMixin(LightningElement) 
   handleNewProgram() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Award_Program__c', actionName: 'new' }
+      attributes: { objectApiName: AWARD_PROGRAM.objectApiName, actionName: 'new' }
     });
   }
 

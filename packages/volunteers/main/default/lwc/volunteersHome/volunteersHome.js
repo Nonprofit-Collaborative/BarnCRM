@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
 import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
+import VOLUNTEER_JOB from '@salesforce/schema/Volunteer_Job__c';
 import { iconFor } from 'c/barnIcons';
 import { tabPageReference } from 'c/barnTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -89,7 +90,7 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   handleNewJob() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Volunteer_Job__c', actionName: 'new' }
+      attributes: { objectApiName: VOLUNTEER_JOB.objectApiName, actionName: 'new' }
     });
   }
 
