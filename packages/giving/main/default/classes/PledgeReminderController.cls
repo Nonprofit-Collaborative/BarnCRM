@@ -6,6 +6,12 @@
  * shapes a component can render.
  */
 public with sharing class PledgeReminderController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Giving',
+		'Giving_Stewardship_ErrorActionFailed'
+	);
+
 	/** One step, flattened, with the template resolved to the label an administrator knows. */
 	public class StepView {
 		@AuraEnabled
@@ -91,7 +97,7 @@ public with sharing class PledgeReminderController {
 		try {
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'PledgeReminderController.getPage');
+			throw ERRORS.wrap(failure, 'PledgeReminderController.getPage');
 		}
 	}
 
@@ -102,7 +108,7 @@ public with sharing class PledgeReminderController {
 			PledgeReminderService.startRun();
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'PledgeReminderController.sendNow');
+			throw ERRORS.wrap(failure, 'PledgeReminderController.sendNow');
 		}
 	}
 
@@ -113,7 +119,7 @@ public with sharing class PledgeReminderController {
 			PledgeReminderService.produceLetters();
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'PledgeReminderController.produceLetters');
+			throw ERRORS.wrap(failure, 'PledgeReminderController.produceLetters');
 		}
 	}
 
@@ -124,7 +130,7 @@ public with sharing class PledgeReminderController {
 			PledgeReminderService.markLettersSent();
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'PledgeReminderController.markLettersSent');
+			throw ERRORS.wrap(failure, 'PledgeReminderController.markLettersSent');
 		}
 	}
 
@@ -144,7 +150,7 @@ public with sharing class PledgeReminderController {
 			}
 			return currentView();
 		} catch (Exception failure) {
-			throw asUserError(failure, 'PledgeReminderController.setSchedule');
+			throw ERRORS.wrap(failure, 'PledgeReminderController.setSchedule');
 		}
 	}
 
@@ -220,21 +226,5 @@ public with sharing class PledgeReminderController {
 			views.add(view);
 		}
 		return views;
-	}
-
-	/**
-	 * A message the page shows as it is when the feature raised it, and a logged entry plus a
-	 * general apology when something else did. Nothing is swallowed either way.
-	 */
-	private static AuraHandledException asUserError(Exception failure, String context) {
-		Boolean ours =
-			failure instanceof PledgeReminderService.PledgeReminderException ||
-			failure instanceof AcknowledgmentService.AcknowledgmentException;
-		return UserErrors.wrap(
-			failure,
-			ours,
-			context,
-			BarnHelp.text('Giving', 'Giving_Stewardship_ErrorActionFailed')
-		);
 	}
 }

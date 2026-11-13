@@ -8,6 +8,12 @@
  * Definition row that puts it in the Rollups section names it in `Component__c`.
  */
 public with sharing class RollupController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Rollups',
+		'Core_Rollups_UnexpectedError'
+	);
+
 	/** One rollup, as the administrator reads it. */
 	public class RollupView {
 		@AuraEnabled
@@ -116,7 +122,7 @@ public with sharing class RollupController {
 		try {
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Rollups page');
+			throw ERRORS.wrap(caught, 'Rollups page');
 		}
 	}
 
@@ -128,7 +134,7 @@ public with sharing class RollupController {
 			RollupService.ensureDefaults();
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Restore shipped rollups');
+			throw ERRORS.wrap(caught, 'Restore shipped rollups');
 		}
 	}
 
@@ -182,7 +188,7 @@ public with sharing class RollupController {
 			}
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Switch a rollup');
+			throw ERRORS.wrap(caught, 'Switch a rollup');
 		}
 	}
 
@@ -213,7 +219,7 @@ public with sharing class RollupController {
 			RollupWriter.saveAsUser(new Rollup_Definition__c(Id = definition.Id, Mode__c = mode));
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Change a rollup mode');
+			throw ERRORS.wrap(caught, 'Change a rollup mode');
 		}
 	}
 
@@ -257,7 +263,7 @@ public with sharing class RollupController {
 			}
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Delete a rollup');
+			throw ERRORS.wrap(caught, 'Delete a rollup');
 		}
 	}
 
@@ -272,7 +278,7 @@ public with sharing class RollupController {
 			RollupService.recalculate(definitionId);
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Recalculate a rollup');
+			throw ERRORS.wrap(caught, 'Recalculate a rollup');
 		}
 	}
 
@@ -286,7 +292,7 @@ public with sharing class RollupController {
 			RollupService.startFullRunOfEveryDefinition();
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Recalculate all rollups');
+			throw ERRORS.wrap(caught, 'Recalculate all rollups');
 		}
 	}
 
@@ -302,7 +308,7 @@ public with sharing class RollupController {
 			}
 			return currentPage();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Schedule the nightly rollups');
+			throw ERRORS.wrap(caught, 'Schedule the nightly rollups');
 		}
 	}
 
@@ -365,7 +371,7 @@ public with sharing class RollupController {
 			estimate.workingHours = weekday <= 5 && hour >= 8 && hour < 18;
 			return estimate;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Estimate the full recalculation');
+			throw ERRORS.wrap(caught, 'Estimate the full recalculation');
 		}
 	}
 
@@ -396,7 +402,7 @@ public with sharing class RollupController {
 				nightly
 			);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Recalculate all rollups tonight');
+			throw ERRORS.wrap(caught, 'Recalculate all rollups tonight');
 		}
 	}
 
@@ -551,18 +557,5 @@ public with sharing class RollupController {
 				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
 			);
 		}
-	}
-
-	/**
-	 * Turns anything that went wrong into a message the page can show, and records the ones the
-	 * page cannot explain.
-	 */
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof RollupService.RollupServiceException,
-			context,
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
-		);
 	}
 }

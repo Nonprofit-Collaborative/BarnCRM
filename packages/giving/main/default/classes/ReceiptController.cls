@@ -7,6 +7,13 @@
  * into messages a person can read and their records into shapes a component can render.
  */
 public with sharing class ReceiptController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			null,
+			'Giving',
+			'Giving_Receipt_UnexpectedError'
+		)
+		.showingDml();
+
 	/** One receipt, flattened for a component. */
 	public class ReceiptView {
 		@AuraEnabled
@@ -87,7 +94,7 @@ public with sharing class ReceiptController {
 			state.receipts = viewsOf(ReceiptSelector.forGift(giftId));
 			return state;
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.getGiftReceiptState', giftId);
+			throw ERRORS.wrap(failure, 'ReceiptController.getGiftReceiptState', giftId);
 		}
 	}
 
@@ -102,7 +109,7 @@ public with sharing class ReceiptController {
 		try {
 			return viewOf(ReceiptService.issueForGift(giftId));
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.issue', giftId);
+			throw ERRORS.wrap(failure, 'ReceiptController.issue', giftId);
 		}
 	}
 
@@ -111,7 +118,7 @@ public with sharing class ReceiptController {
 		try {
 			return viewOf(ReceiptService.voidReceipt(receiptId, reason));
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.voidReceipt', receiptId);
+			throw ERRORS.wrap(failure, 'ReceiptController.voidReceipt', receiptId);
 		}
 	}
 
@@ -120,7 +127,7 @@ public with sharing class ReceiptController {
 		try {
 			return viewOf(ReceiptService.voidAndReissue(receiptId, reason));
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.voidAndReissue', receiptId);
+			throw ERRORS.wrap(failure, 'ReceiptController.voidAndReissue', receiptId);
 		}
 	}
 
@@ -140,7 +147,7 @@ public with sharing class ReceiptController {
 		try {
 			return viewsOfTemplates(ReceiptSelector.allTemplates());
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.getTemplates', null);
+			throw ERRORS.wrap(failure, 'ReceiptController.getTemplates', null);
 		}
 	}
 
@@ -160,7 +167,7 @@ public with sharing class ReceiptController {
 			ReceiptTemplateService.restoreDefaults();
 			return viewsOfTemplates(ReceiptSelector.allTemplates());
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.restoreDefaultTemplates', null);
+			throw ERRORS.wrap(failure, 'ReceiptController.restoreDefaultTemplates', null);
 		}
 	}
 
@@ -169,7 +176,7 @@ public with sharing class ReceiptController {
 		try {
 			ReceiptTemplateService.saveBody(templateId, body);
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.saveTemplate', templateId);
+			throw ERRORS.wrap(failure, 'ReceiptController.saveTemplate', templateId);
 		}
 	}
 
@@ -182,7 +189,7 @@ public with sharing class ReceiptController {
 		try {
 			return ReceiptTemplateService.preview(receiptType, body);
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.previewTemplate', null);
+			throw ERRORS.wrap(failure, 'ReceiptController.previewTemplate', null);
 		}
 	}
 
@@ -191,7 +198,7 @@ public with sharing class ReceiptController {
 		try {
 			ReceiptTemplateService.activate(templateId);
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.activateTemplate', templateId);
+			throw ERRORS.wrap(failure, 'ReceiptController.activateTemplate', templateId);
 		}
 	}
 
@@ -215,7 +222,7 @@ public with sharing class ReceiptController {
 			}
 			return views;
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.getRuns', null);
+			throw ERRORS.wrap(failure, 'ReceiptController.getRuns', null);
 		}
 	}
 
@@ -239,7 +246,7 @@ public with sharing class ReceiptController {
 			view.errors = 0;
 			return view;
 		} catch (Exception failure) {
-			throw asUserError(failure, 'ReceiptController.startStatementRun', null);
+			throw ERRORS.wrap(failure, 'ReceiptController.startStatementRun', null);
 		}
 	}
 
@@ -283,21 +290,5 @@ public with sharing class ReceiptController {
 
 	private static Integer intOf(Decimal value) {
 		return value == null ? 0 : value.intValue();
-	}
-
-	/**
-	 * The Error Log gets the stack; the person gets the sentence. An unexpected failure still
-	 * says something they can act on rather than a class name and a line number.
-	 */
-	private static AuraHandledException asUserError(
-		Exception failure,
-		String context,
-		Id recordId
-	) {
-		ErrorLogger.log(failure, context, recordId);
-		return UserErrors.wrapShowingDml(
-			failure,
-			BarnHelp.text('Giving', 'Giving_Receipt_UnexpectedError')
-		);
 	}
 }

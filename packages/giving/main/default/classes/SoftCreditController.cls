@@ -7,6 +7,11 @@
  */
 public with sharing class SoftCreditController {
 	private static final String CONTEXT = 'Soft credits panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Giving',
+		'Giving_SoftCredits_ActionFailed'
+	);
 
 	/**
 	 * One line of the panel.
@@ -52,7 +57,7 @@ public with sharing class SoftCreditController {
 		try {
 			return panelFor(giftId);
 		} catch (Exception failure) {
-			throw report(failure, giftId);
+			throw ERRORS.wrap(failure, CONTEXT, giftId);
 		}
 	}
 
@@ -90,7 +95,7 @@ public with sharing class SoftCreditController {
 			Database.insert(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);
 			return panelFor(giftId);
 		} catch (Exception failure) {
-			throw report(failure, giftId);
+			throw ERRORS.wrap(failure, CONTEXT, giftId);
 		}
 	}
 
@@ -125,7 +130,7 @@ public with sharing class SoftCreditController {
 		} catch (AuraHandledException refused) {
 			throw refused;
 		} catch (Exception failure) {
-			throw report(failure, softCreditId);
+			throw ERRORS.wrap(failure, CONTEXT, softCreditId);
 		}
 	}
 
@@ -155,10 +160,5 @@ public with sharing class SoftCreditController {
 			panel.credits.add(view);
 		}
 		return panel;
-	}
-
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 	}
 }

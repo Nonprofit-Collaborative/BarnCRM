@@ -7,6 +7,11 @@
  */
 public with sharing class GiftPostingController {
 	private static final String CONTEXT = 'Gift posting card';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Giving',
+		'Giving_Periods_UnexpectedError'
+	);
 
 	/** The card, in one round trip. */
 	public class PostingState {
@@ -31,7 +36,7 @@ public with sharing class GiftPostingController {
 		try {
 			return stateOf(giftId);
 		} catch (Exception caught) {
-			throw asUserError(caught, CONTEXT);
+			throw ERRORS.wrap(caught, CONTEXT);
 		}
 	}
 
@@ -41,7 +46,7 @@ public with sharing class GiftPostingController {
 			GiftPostingService.unpost(giftId, reason);
 			return stateOf(giftId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Unpost a gift');
+			throw ERRORS.wrap(caught, 'Unpost a gift');
 		}
 	}
 
@@ -66,14 +71,5 @@ public with sharing class GiftPostingController {
 			GiftPostingLock.isInClosedPeriod(gift.Gift_Date__c, state.closedThrough);
 		state.canUnpost = state.posted && GiftPostingService.canPost();
 		return state;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof GiftPostingService.GiftPostingException,
-			context,
-			BarnHelp.text('Giving', 'Giving_Periods_UnexpectedError')
-		);
 	}
 }

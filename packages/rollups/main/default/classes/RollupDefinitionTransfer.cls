@@ -13,6 +13,12 @@
  * check; one that fails a check is not saved at all. Nothing is recalculated by an import.
  */
 public with sharing class RollupDefinitionTransfer {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		'RollupDefinitionTransfer',
+		'Rollups',
+		'Core_Rollups_UnexpectedError'
+	);
+
 	@TestVisible
 	private static final String FORMAT = 'BarnCRM rollups';
 	@TestVisible
@@ -76,7 +82,7 @@ public with sharing class RollupDefinitionTransfer {
 				}
 			);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -159,7 +165,7 @@ public with sharing class RollupDefinitionTransfer {
 			}
 			return rows;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -245,15 +251,5 @@ public with sharing class RollupDefinitionTransfer {
 		if (!BarnCRMPermissions.canManageSettings()) {
 			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
-	}
-
-	/** A message the page can show; anything it cannot explain is logged. */
-	private static AuraHandledException asUserError(Exception caught) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof RollupService.RollupServiceException,
-			'RollupDefinitionTransfer',
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
-		);
 	}
 }
