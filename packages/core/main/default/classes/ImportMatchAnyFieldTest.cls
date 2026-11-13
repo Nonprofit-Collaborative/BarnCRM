@@ -114,10 +114,12 @@ private class ImportMatchAnyFieldTest {
 	}
 
 	private static Account organization(String name, String phone) {
-		Account created = new Account(
-			Name = name,
-			Phone = phone,
-			RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+		Account created = TestDataFactory.organization(
+			new Account(
+				Name = name,
+				Phone = phone,
+				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+			)
 		);
 		insert created;
 		return created;
@@ -140,7 +142,9 @@ private class ImportMatchAnyFieldTest {
 	}
 
 	private static Contact person(String lastName, String email) {
-		Contact created = new Contact(FirstName = 'Ana', LastName = lastName, Email = email);
+		Contact created = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = lastName, Email = email)
+		);
 		insert created;
 		return created;
 	}

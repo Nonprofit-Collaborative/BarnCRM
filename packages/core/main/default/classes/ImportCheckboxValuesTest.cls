@@ -154,13 +154,15 @@ private class ImportCheckboxValuesTest {
 	static void anUnreadableValueSkipsThatFieldAndTheRestOfTheRowLoads() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
-			insert new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org',
-				MailingCity = 'Salem',
-				HasOptedOutOfEmail = true,
-				DoNotCall = true
+			insert TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Ramirez',
+					Email = 'ana@example.org',
+					MailingCity = 'Salem',
+					HasOptedOutOfEmail = true,
+					DoNotCall = true
+				)
 			);
 			given(new List<Map<String, String>>{ row('ana@example.org', 'maybe', '') });
 

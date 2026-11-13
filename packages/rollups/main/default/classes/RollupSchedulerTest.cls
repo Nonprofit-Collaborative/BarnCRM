@@ -32,10 +32,12 @@ private class RollupSchedulerTest {
 	}
 
 	private static Account organization(String name, Id parentId) {
-		return new Account(
-			Name = name,
-			ParentId = parentId,
-			RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+		return TestDataFactory.organization(
+			new Account(
+				Name = name,
+				ParentId = parentId,
+				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+			)
 		);
 	}
 

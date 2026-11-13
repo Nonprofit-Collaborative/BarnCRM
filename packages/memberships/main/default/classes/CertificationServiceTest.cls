@@ -21,7 +21,7 @@ private class CertificationServiceTest {
 			Valid_Months__c = months
 		);
 		insert as user certification;
-		Contact person = new Contact(LastName = 'Trainer');
+		Contact person = TestDataFactory.person(new Contact(LastName = 'Trainer'));
 		insert as user person;
 		Member_Certification__c holding = new Member_Certification__c(
 			Certification__c = certification.Id,

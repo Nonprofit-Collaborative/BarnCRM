@@ -76,10 +76,12 @@ private class ImportUndoTest {
 
 	/** A person the import created, and the household it created for them, both tagged. */
 	private static Contact importedPerson(Import_Batch__c batch, String lastName) {
-		Contact person = new Contact(
-			FirstName = 'Ana',
-			LastName = lastName,
-			Created_By_Import_Batch__c = batch.Id
+		Contact person = TestDataFactory.person(
+			new Contact(
+				FirstName = 'Ana',
+				LastName = lastName,
+				Created_By_Import_Batch__c = batch.Id
+			)
 		);
 		insert person;
 		person = [SELECT Id, AccountId FROM Contact WHERE Id = :person.Id];
@@ -88,10 +90,12 @@ private class ImportUndoTest {
 	}
 
 	private static Account importedOrganization(Import_Batch__c batch) {
-		Account organization = new Account(
-			Name = 'Rose City Rotary',
-			RecordTypeId = AccountKindsTestData.organizationRecordTypeId(),
-			Created_By_Import_Batch__c = batch.Id
+		Account organization = TestDataFactory.organization(
+			new Account(
+				Name = 'Rose City Rotary',
+				RecordTypeId = AccountKindsTestData.organizationRecordTypeId(),
+				Created_By_Import_Batch__c = batch.Id
+			)
 		);
 		insert organization;
 		return organization;
@@ -273,7 +277,7 @@ private class ImportUndoTest {
 			importedPerson(batch, 'Ramirez');
 			importedPerson(batch, 'Lee');
 			importedOrganization(batch);
-			insert new Contact(FirstName = 'Sam', LastName = 'Okafor');
+			insert TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Okafor'));
 
 			ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
 
@@ -291,7 +295,9 @@ private class ImportUndoTest {
 			Import_Batch__c batch = committedBatch();
 			Contact imported = importedPerson(batch, 'Ramirez');
 			Account organization = importedOrganization(batch);
-			Contact existing = new Contact(FirstName = 'Sam', LastName = 'Okafor');
+			Contact existing = TestDataFactory.person(
+				new Contact(FirstName = 'Sam', LastName = 'Okafor')
+			);
 			insert existing;
 
 			undo(batch);
@@ -357,7 +363,9 @@ private class ImportUndoTest {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = committedBatch();
 			Account organization = importedOrganization(batch);
-			Account later = new Account(Name = 'Okafor', Primary_Affiliation__c = organization.Id);
+			Account later = TestDataFactory.organization(
+				new Account(Name = 'Okafor', Primary_Affiliation__c = organization.Id)
+			);
 			insert later;
 			Test.setCreatedDate(later.Id, Datetime.now().addHours(1));
 
@@ -659,10 +667,12 @@ private class ImportUndoTest {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = committedBatch();
 			Contact imported = importedPerson(batch, 'Ramirez');
-			Contact joined = new Contact(
-				FirstName = 'Luis',
-				LastName = 'Ramirez',
-				AccountId = imported.AccountId
+			Contact joined = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Luis',
+					LastName = 'Ramirez',
+					AccountId = imported.AccountId
+				)
 			);
 			insert joined;
 
@@ -708,10 +718,12 @@ private class ImportUndoTest {
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < howMany; i++) {
 			people.add(
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Bulk' + i,
-					Created_By_Import_Batch__c = batch.Id
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Ana',
+						LastName = 'Bulk' + i,
+						Created_By_Import_Batch__c = batch.Id
+					)
 				)
 			);
 		}
@@ -893,9 +905,15 @@ private class ImportUndoTest {
 	static void undoPutsBackOnlyTheValuesNobodyHasChangedSince() {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = committedBatch();
-			Contact untouched = new Contact(LastName = 'Ramirez', MailingCity = 'Portland');
-			Contact corrected = new Contact(LastName = 'Lee', MailingCity = 'Eugene');
-			Contact alreadyBack = new Contact(LastName = 'Okafor', MailingCity = 'Salem');
+			Contact untouched = TestDataFactory.person(
+				new Contact(LastName = 'Ramirez', MailingCity = 'Portland')
+			);
+			Contact corrected = TestDataFactory.person(
+				new Contact(LastName = 'Lee', MailingCity = 'Eugene')
+			);
+			Contact alreadyBack = TestDataFactory.person(
+				new Contact(LastName = 'Okafor', MailingCity = 'Salem')
+			);
 			insert new List<Contact>{ untouched, corrected, alreadyBack };
 			ImportJournalService.write(
 				batch.Id,
@@ -1056,7 +1074,7 @@ private class ImportUndoTest {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = committedBatch();
 			Contact ana = importedPerson(batch, 'Ramirez');
-			Account home = new Account(Name = 'Ramirez Home');
+			Account home = TestDataFactory.household(new Account(Name = 'Ramirez Home'));
 			insert home;
 			ImportJournalService.write(
 				batch.Id,

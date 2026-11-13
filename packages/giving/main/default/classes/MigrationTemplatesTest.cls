@@ -309,10 +309,12 @@ private class MigrationTemplatesTest {
 	static void giftTransactionsLoadWithTheirDesignations() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Okafor',
-				Email = 'ana.okafor@example.org'
+			Contact ana = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Okafor',
+					Email = 'ana.okafor@example.org'
+				)
 			);
 			insert ana;
 			fund('General Fund', true);
@@ -648,7 +650,7 @@ private class MigrationTemplatesTest {
 				return;
 			}
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			Account ana = new Account();
+			Account ana = TestDataFactory.organization(new Account());
 			ana.put('RecordTypeId', personType);
 			ana.put('FirstName', 'Ana');
 			ana.put('LastName', 'Okafor');
@@ -822,10 +824,12 @@ private class MigrationTemplatesTest {
 	static void npspPaymentsBecomeGiftsWithTheirTributes() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
-			insert new Contact(
-				FirstName = 'Ana',
-				LastName = 'Okafor',
-				Email = 'ana.okafor@example.org'
+			insert TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Okafor',
+					Email = 'ana.okafor@example.org'
+				)
 			);
 			fund('General Fund', true);
 			Appeal__c yearEnd = new Appeal__c(Name = 'Year End 2024', Active__c = true);

@@ -65,10 +65,12 @@ private class RollupMarkedDefinitionsTest {
 		List<Account> created = new List<Account>();
 		for (Integer i = 0; i < ORGANIZATIONS; i++) {
 			created.add(
-				new Account(
-					Name = 'Organization ' + i,
-					RecordTypeId = organizationType,
-					AnnualRevenue = UNTOUCHED
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Organization ' + i,
+						RecordTypeId = organizationType,
+						AnnualRevenue = UNTOUCHED
+					)
 				)
 			);
 		}
@@ -80,9 +82,11 @@ private class RollupMarkedDefinitionsTest {
 		List<Contact> created = new List<Contact>();
 		for (Integer i = 0; i < PEOPLE; i++) {
 			created.add(
-				new Contact(
-					LastName = 'Person ' + i,
-					AccountId = employers[Math.mod(i, ORGANIZATIONS)].Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Person ' + i,
+						AccountId = employers[Math.mod(i, ORGANIZATIONS)].Id
+					)
 				)
 			);
 		}

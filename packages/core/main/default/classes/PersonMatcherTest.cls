@@ -9,23 +9,29 @@ private class PersonMatcherTest {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
 			insert new List<Contact>{
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Ramirez',
-					Email = 'family@example.org',
-					MailingPostalCode = '97201'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Ana',
+						LastName = 'Ramirez',
+						Email = 'family@example.org',
+						MailingPostalCode = '97201'
+					)
 				),
-				new Contact(
-					FirstName = 'Luis',
-					LastName = 'Ramirez',
-					Email = 'family@example.org',
-					MailingPostalCode = '97201'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Luis',
+						LastName = 'Ramirez',
+						Email = 'family@example.org',
+						MailingPostalCode = '97201'
+					)
 				),
-				new Contact(
-					FirstName = 'Ben',
-					LastName = 'Okafor',
-					Email = 'ben@example.org',
-					MailingPostalCode = '97202'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Ben',
+						LastName = 'Okafor',
+						Email = 'ben@example.org',
+						MailingPostalCode = '97202'
+					)
 				)
 			};
 		}

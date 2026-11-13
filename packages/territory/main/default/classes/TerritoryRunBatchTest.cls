@@ -59,8 +59,8 @@ private class TerritoryRunBatchTest {
 			rule(north, lastNameIs('Alvarez'));
 			rule(wide, null);
 			insert as user new List<Contact>{
-				new Contact(LastName = 'Alvarez'),
-				new Contact(LastName = 'Brooks')
+				TestDataFactory.person(new Contact(LastName = 'Alvarez')),
+				TestDataFactory.person(new Contact(LastName = 'Brooks'))
 			};
 
 			Test.startTest();
@@ -97,8 +97,8 @@ private class TerritoryRunBatchTest {
 			update as user north;
 			rule(north, lastNameIs('Alvarez'));
 			insert as user new List<Contact>{
-				new Contact(LastName = 'Alvarez'),
-				new Contact(LastName = 'Brooks')
+				TestDataFactory.person(new Contact(LastName = 'Alvarez')),
+				TestDataFactory.person(new Contact(LastName = 'Brooks'))
 			};
 
 			Test.startTest();
@@ -173,7 +173,7 @@ private class TerritoryRunBatchTest {
 			List<Contact> people = new List<Contact>();
 			// One chunk: a test method may run only one executeBatch scope.
 			for (Integer i = 0; i < TerritoryRunBatch.CHUNK_MANY_RULES; i++) {
-				people.add(new Contact(LastName = 'Person' + i));
+				people.add(TestDataFactory.person(new Contact(LastName = 'Person' + i)));
 			}
 			insert as user people;
 			Assert.areEqual(
@@ -222,7 +222,9 @@ private class TerritoryRunBatchTest {
 				Capacity__c = 5,
 				Active__c = true
 			);
-			insert as user new Contact(LastName = 'Alvarez', Territory__c = north.Id);
+			insert as user TestDataFactory.person(
+				new Contact(LastName = 'Alvarez', Territory__c = north.Id)
+			);
 
 			TerritoryRouting.Pool pool = TerritoryRunBatch.loadPools().get(north.Id);
 

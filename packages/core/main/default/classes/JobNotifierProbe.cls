@@ -7,6 +7,8 @@
 public class JobNotifierProbe implements Schedulable {
 	public void execute(SchedulableContext context) {
 		Id starter = JobNotifier.starter();
-		insert new Account(Name = starter == null ? 'Starter: none' : 'Starter: ' + starter);
+		insert TestDataFactory.organization(
+			new Account(Name = starter == null ? 'Starter: none' : 'Starter: ' + starter)
+		);
 	}
 }

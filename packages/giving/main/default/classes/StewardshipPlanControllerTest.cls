@@ -64,7 +64,9 @@ private class StewardshipPlanControllerTest {
 				step(welcome.Id, 2, 'Send the packet'),
 				step(welcome.Id, 1, 'Call to say thank you')
 			};
-			Contact person = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+			);
 			insert person;
 			insert new Stewardship_Plan__c(
 				Stewardship_Plan_Template__c = welcome.Id,

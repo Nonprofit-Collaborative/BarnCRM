@@ -130,8 +130,8 @@ private class NpspGivingKitTest {
 	static void namesReadOneFieldOfEveryRecordAndNothingWithoutTheObject() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Account>{
-				new Account(Name = 'Kit One'),
-				new Account(Name = 'Kit Two')
+				TestDataFactory.organization(new Account(Name = 'Kit One')),
+				TestDataFactory.organization(new Account(Name = 'Kit Two'))
 			};
 			Set<String> found = NpspGivingKit.names(
 				'SELECT Name FROM Account WHERE Name LIKE \'Kit %\'',

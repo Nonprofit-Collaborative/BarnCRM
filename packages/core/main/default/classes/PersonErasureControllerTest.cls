@@ -88,7 +88,9 @@ private class PersonErasureControllerTest {
 
 	private static Contact jordan() {
 		HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-		Contact person = new Contact(FirstName = 'Jordan', LastName = 'Lee');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Jordan', LastName = 'Lee')
+		);
 		insert person;
 		return person;
 	}

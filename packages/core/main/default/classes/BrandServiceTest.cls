@@ -201,7 +201,7 @@ private class BrandServiceTest {
 			Account household = HouseholdTestDataFactory.insertHouseholds(
 				new List<Account>{ HouseholdTestDataFactory.newHousehold('Zztest Parent') }
 			)[0];
-			Contact person = new Contact(LastName = 'Zztest Parent');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Zztest Parent'));
 			insert person;
 			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
 				new Brand_Assignment__c(Account__c = household.Id),
@@ -232,7 +232,7 @@ private class BrandServiceTest {
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Brand__c chapter = brand('Chapter', null, false);
-			Contact person = new Contact(LastName = 'Zztest Alone');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Zztest Alone'));
 			insert person;
 			Assert.isNull(
 				[SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId,

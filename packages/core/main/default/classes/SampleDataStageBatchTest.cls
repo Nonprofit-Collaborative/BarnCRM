@@ -62,7 +62,10 @@ private class SampleDataStageBatchTest {
 		}
 
 		public void runStage(Integer stage) {
-			Database.insert(new Account(Name = 'Stage ' + stage), AccessLevel.USER_MODE);
+			Database.insert(
+				TestDataFactory.organization(new Account(Name = 'Stage ' + stage)),
+				AccessLevel.USER_MODE
+			);
 			if (stage == failAt) {
 				throw new SampleDataException('stage ' + stage + ' failed');
 			}

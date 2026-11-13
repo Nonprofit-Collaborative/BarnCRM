@@ -233,6 +233,45 @@ public class TestDataFactory {
 		return fillOrgRequiredFields(record);
 	}
 
+	/**
+	 * A person the test is about to save, past duplicate rules with the org's required custom
+	 * fields filled (D-200 S3; scripts/ci/check-test-data-factory.py). Tests build every
+	 * Contact through this, with the field values the test relies on set as usual:
+	 * `TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ortiz'))`.
+	 *
+	 * @param record the Contact, unsaved
+	 * @return the same Contact
+	 */
+	@NamespaceAccessible
+	public static Contact person(Contact record) {
+		return (Contact) pastDuplicateRules(record);
+	}
+
+	/**
+	 * An organization (or any non-household Account) the test is about to save, handled as
+	 * person() does.
+	 *
+	 * @param record the Account, unsaved
+	 * @return the same Account
+	 */
+	@NamespaceAccessible
+	public static Account organization(Account record) {
+		return (Account) pastDuplicateRules(record);
+	}
+
+	/**
+	 * A household Account the test is about to save, handled as person() does. The record type
+	 * and the other values stay the test's own (HouseholdTestDataFactory.newHousehold builds a
+	 * ready household).
+	 *
+	 * @param record the Account, unsaved
+	 * @return the same Account
+	 */
+	@NamespaceAccessible
+	public static Account household(Account record) {
+		return (Account) pastDuplicateRules(record);
+	}
+
 	private static Map<Schema.SObjectType, List<Schema.DescribeFieldResult>> requiredByType = new Map<Schema.SObjectType, List<Schema.DescribeFieldResult>>();
 
 	/**

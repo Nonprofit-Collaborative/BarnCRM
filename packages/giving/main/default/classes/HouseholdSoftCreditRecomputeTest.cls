@@ -22,7 +22,11 @@ private class HouseholdSoftCreditRecomputeTest {
 			.getRecordTypeId();
 		List<Account> households = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
-			households.add(new Account(Name = 'Household ' + i, RecordTypeId = householdType));
+			households.add(
+				TestDataFactory.household(
+					new Account(Name = 'Household ' + i, RecordTypeId = householdType)
+				)
+			);
 		}
 		Database.insert(households, AccessLevel.SYSTEM_MODE);
 		List<Gift__c> gifts = new List<Gift__c>();

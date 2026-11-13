@@ -18,15 +18,19 @@ private class BulkUpdateSuperTransformTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-			Account organization = new Account(Name = 'Shelbyville Pantry');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Shelbyville Pantry')
+			);
 			insert organization;
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < HOW_MANY; index++) {
 				people.add(
-					new Contact(
-						AccountId = organization.Id,
-						LastName = 'Transformtest ' + index,
-						Title = index < ALREADY ? 'Coordinator' : 'Volunteer'
+					TestDataFactory.person(
+						new Contact(
+							AccountId = organization.Id,
+							LastName = 'Transformtest ' + index,
+							Title = index < ALREADY ? 'Coordinator' : 'Volunteer'
+						)
 					)
 				);
 			}

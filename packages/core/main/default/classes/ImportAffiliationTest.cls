@@ -107,22 +107,25 @@ private class ImportAffiliationTest {
 	@IsTest
 	static void thePreviewCountsWhatTheCommitDoes() {
 		System.runAs(TestUsers.admin()) {
-			Account employer = new Account(
-				Name = 'Rose City',
-				RecordTypeId = organizationRecordTypeId()
+			Account employer = TestDataFactory.organization(
+				new Account(Name = 'Rose City', RecordTypeId = organizationRecordTypeId())
 			);
 			insert employer;
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org',
-				MailingCity = 'Portland'
+			Contact ana = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Ramirez',
+					Email = 'ana@example.org',
+					MailingCity = 'Portland'
+				)
 			);
-			Contact ben = new Contact(
-				FirstName = 'Ben',
-				LastName = 'Okafor',
-				Email = 'ben@example.org',
-				MailingCity = 'Portland'
+			Contact ben = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ben',
+					LastName = 'Okafor',
+					Email = 'ben@example.org',
+					MailingCity = 'Portland'
+				)
 			);
 			insert new List<Contact>{ ana, ben };
 			insert new Affiliation__c(Contact__c = ana.Id, Organization__c = employer.Id);

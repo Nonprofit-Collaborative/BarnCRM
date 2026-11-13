@@ -38,7 +38,9 @@ private class MembershipPaymentsTest {
 			Term_Months__c = 12
 		);
 		insert as user level;
-		Contact member = new Contact(LastName = 'Zzmem Payer', Email = email);
+		Contact member = TestDataFactory.person(
+			new Contact(LastName = 'Zzmem Payer', Email = email)
+		);
 		insert as user member;
 		Membership_Term__c term = new Membership_Term__c(
 			Level__c = level.Id,
@@ -331,7 +333,7 @@ private class MembershipPaymentsTest {
 				'the link is on its way'
 			);
 			Test.stopTest();
-			Contact stranger = new Contact(LastName = 'Zzmem Stranger');
+			Contact stranger = TestDataFactory.person(new Contact(LastName = 'Zzmem Stranger'));
 			insert as user stranger;
 			try {
 				portal.run(MembershipsPortalExtension.PAY_DUES, stranger.Id, current.Id);
