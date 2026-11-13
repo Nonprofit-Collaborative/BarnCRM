@@ -1,0 +1,1863 @@
+# Global and @NamespaceAccessible Apex signatures (scripts/ci/check-api-surface.py).
+# Never remove or change a line: deprecate for one release instead. Add with --update.
+addressverification/AddressVerificationAccessSync.cls | public AddressVerificationAccessSync()
+addressverification/AddressVerificationAccessSync.cls | public class AddressVerificationAccessSync
+addressverification/AddressVerificationHandler.cls | public AddressVerificationHandler()
+addressverification/AddressVerificationHandler.cls | public class AddressVerificationHandler
+addressverification/AddressVerificationHealthCheckExtension.cls | public AddressVerificationHealthCheckExtension()
+addressverification/AddressVerificationHealthCheckExtension.cls | public class AddressVerificationHealthCheckExtension
+addressverification/AddressVerificationNightlyJobProvider.cls | public AddressVerificationNightlyJobProvider()
+addressverification/AddressVerificationNightlyJobProvider.cls | public class AddressVerificationNightlyJobProvider
+addressverification/AddressVerificationPostInstall.cls | public AddressVerificationPostInstall()
+addressverification/AddressVerificationPostInstall.cls | public class AddressVerificationPostInstall
+contactpoints/ContactPointAccountHandler.cls | public ContactPointAccountHandler()
+contactpoints/ContactPointAccountHandler.cls | public class ContactPointAccountHandler
+contactpoints/ContactPointAddressHandler.cls | public ContactPointAddressHandler()
+contactpoints/ContactPointAddressHandler.cls | public class ContactPointAddressHandler
+contactpoints/ContactPointErasureExtension.cls | public ContactPointErasureExtension()
+contactpoints/ContactPointErasureExtension.cls | public class ContactPointErasureExtension
+contactpoints/ContactPointMembershipHandler.cls | public ContactPointMembershipHandler()
+contactpoints/ContactPointMembershipHandler.cls | public class ContactPointMembershipHandler
+contactpoints/ContactPointPersonHandler.cls | public ContactPointPersonHandler()
+contactpoints/ContactPointPersonHandler.cls | public class ContactPointPersonHandler
+contactpoints/ContactPointsAccessSync.cls | public ContactPointsAccessSync()
+contactpoints/ContactPointsAccessSync.cls | public class ContactPointsAccessSync
+contactpoints/ContactPointsPostInstall.cls | public ContactPointsPostInstall()
+contactpoints/ContactPointsPostInstall.cls | public class ContactPointsPostInstall
+core/AccountKinds.cls | public class AccountKinds
+core/AccountKinds.cls | public static Boolean isCandidate(String)
+core/AccountKinds.cls | public static Boolean isOrganization(Id)
+core/AccountKinds.cls | public static Boolean isOrganizationRecordTypeName(String)
+core/AccountKinds.cls | public static Boolean noRecordTypeAllowed()
+core/AccountKinds.cls | public static Boolean organizationRecordTypeUsable()
+core/AccountKinds.cls | public static Id organizationRecordTypeId()
+core/AccountKinds.cls | public static List<Schema.RecordTypeInfo> candidateRecordTypes()
+core/AccountKinds.cls | public static List<Schema.RecordTypeInfo> organizationChoices()
+core/AccountKinds.cls | public static String detectOrganizationRecordType()
+core/AccountKinds.cls | public static String organizationRecordTypeLabel()
+core/AccountKinds.cls | public static String organizationRecordTypeName()
+core/AccountKinds.cls | public static final String KEY_ORGANIZATION_RECORD_TYPE
+core/AccountKinds.cls | public static final String NO_RECORD_TYPE
+core/AccountKinds.cls | public static final String SHIPPED_RECORD_TYPE
+core/AccountKinds.cls | public static void storeDetectedIfBlank()
+core/AutomationControl.cls | public class AutomationControl
+core/AutomationControl.cls | public class AutomationControlException
+core/AutomationControl.cls | public static Boolean canManage()
+core/AutomationControl.cls | public static Boolean isBypassed(String)
+core/AutomationControl.cls | public static Boolean isEnabled(String)
+core/AutomationControl.cls | public static Boolean isOffForRunningUser()
+core/AutomationControl.cls | public static Boolean isPauseWithoutResume()
+core/AutomationControl.cls | public static Boolean isPaused()
+core/AutomationControl.cls | public static Boolean isPausedForEveryone()
+core/AutomationControl.cls | public static Boolean resumeExpiredPause()
+core/AutomationControl.cls | public static Boolean resumeExpiredPause(Datetime)
+core/AutomationControl.cls | public static Datetime pauseAll(Integer)
+core/AutomationControl.cls | public static Datetime pausedUntil()
+core/AutomationControl.cls | public static Integer ensureDefaults()
+core/AutomationControl.cls | public static Integer ensureDefaultsDuringInstall(String)
+core/AutomationControl.cls | public static List<String> missingDefaultNames()
+core/AutomationControl.cls | public static Set<Integer> allowedPauseHours()
+core/AutomationControl.cls | public static String pausedBy()
+core/AutomationControl.cls | public static final Integer LONGEST_PAUSE_HOURS
+core/AutomationControl.cls | public static void bypass(String)
+core/AutomationControl.cls | public static void catchUp(Boolean)
+core/AutomationControl.cls | public static void clearAllBypasses()
+core/AutomationControl.cls | public static void clearBypass(String)
+core/AutomationControl.cls | public static void clearCache()
+core/AutomationControl.cls | public static void ensureSwitch(String,String,String,String)
+core/AutomationControl.cls | public static void resumeAll()
+core/AutomationControl.cls | public static void setEnabled(String,Boolean)
+core/AutomationRegistrySelector.cls | public class AutomationRegistrySelector
+core/AutomationRegistrySelector.cls | public static List<Automation_Registry__mdt> selectForFramework()
+core/BarnCRMPermissions.cls | public class BarnCRMPermissions
+core/BarnCRMPermissions.cls | public static Boolean canManageSettings()
+core/BarnCRMPermissions.cls | public static Boolean canRunSetup()
+core/BarnCRMPermissions.cls | public static final String MANAGE_SETTINGS
+core/BarnHelp.cls | public class BarnHelp
+core/BarnHelp.cls | public static String text(String,String)
+core/BarnHelp.cls | public static String text(String,String,List<Object>)
+core/BarnInstallCheck.cls | global class BarnInstallCheck
+core/BarnInstallCheck.cls | global static List<String> finishSetup(String)
+core/BarnInstallCheck.cls | global static Map<String,Object> runHealthCheck()
+core/BarnInstallCheck.cls | global static void loadSampleData()
+core/BrandService.cls | public Id brandId
+core/BrandService.cls | public Id legalEntityId
+core/BrandService.cls | public List<String> addressLines
+core/BrandService.cls | public String brandName
+core/BrandService.cls | public String brandReceiptPrefix
+core/BrandService.cls | public String entityReceiptPrefix
+core/BrandService.cls | public String legalName
+core/BrandService.cls | public String logoDocumentId
+core/BrandService.cls | public String phone
+core/BrandService.cls | public String primaryColor
+core/BrandService.cls | public String secondaryColor
+core/BrandService.cls | public String senderEmail
+core/BrandService.cls | public String signature
+core/BrandService.cls | public String taxId
+core/BrandService.cls | public String website
+core/BrandService.cls | public class BrandService
+core/BrandService.cls | public class Profile
+core/BrandService.cls | public static Boolean isEnabled()
+core/BrandService.cls | public static Boolean visibilityOn()
+core/BrandService.cls | public static Id defaultBrandId()
+core/BrandService.cls | public static Id userBrandId(Id)
+core/BrandService.cls | public static Map<Id,Id> senderIdsFor(Set<Id>)
+core/BrandService.cls | public static Map<Id,Profile> profilesFor(Set<Id>)
+core/BrandService.cls | public static Profile profileFor(Id)
+core/BrandService.cls | public static String logoPath(String)
+core/BrandService.cls | public static final String BRAND_FIELD
+core/BrandService.cls | public static void applyDefaults(List<SObject>,String)
+core/CheckAutomationAction.cls | global Boolean run
+core/CheckAutomationAction.cls | global String automationName
+core/CheckAutomationAction.cls | global String reason
+core/CheckAutomationAction.cls | global class CheckAutomationAction
+core/CheckAutomationAction.cls | global class Request
+core/CheckAutomationAction.cls | global class Result
+core/CheckAutomationAction.cls | global static List<Result> check(List<Request>)
+core/CoexistenceService.cls | public class CoexistenceService
+core/CoexistenceService.cls | public static void applyMode(String)
+core/CreatePersonAction.cls | global String email
+core/CreatePersonAction.cls | global String errorMessage
+core/CreatePersonAction.cls | global String firstName
+core/CreatePersonAction.cls | global String householdId
+core/CreatePersonAction.cls | global String householdId
+core/CreatePersonAction.cls | global String lastName
+core/CreatePersonAction.cls | global String personId
+core/CreatePersonAction.cls | global class CreatePersonAction
+core/CreatePersonAction.cls | global class Request
+core/CreatePersonAction.cls | global class Result
+core/CreatePersonAction.cls | global static List<Result> create(List<Request>)
+core/CustomPermissionSelector.cls | public Boolean readable
+core/CustomPermissionSelector.cls | public Holders()
+core/CustomPermissionSelector.cls | public Integer total
+core/CustomPermissionSelector.cls | public List<String> names
+core/CustomPermissionSelector.cls | public class CustomPermissionSelector
+core/CustomPermissionSelector.cls | public class Holders
+core/CustomPermissionSelector.cls | public static Holders holders(String)
+core/DataProtectedFields.cls | public class DataProtectedFields
+core/DataProtectedFields.cls | public static Boolean isBookkeeping(Schema.SObjectType)
+core/DataProtectedFields.cls | public static Boolean isKeptByThePackage(Schema.SObjectType,Schema.DescribeFieldResult)
+core/DataProtectedFields.cls | public static Boolean isProtected(Schema.SObjectType,String)
+core/DataProtectedFields.cls | public static Boolean isProtectedOnRecord(Schema.SObjectType,String,Id)
+core/DataProtectedFields.cls | public static Boolean isSetup(Schema.SObjectType)
+core/DataProtectedFields.cls | public static Set<String> fieldNames(Schema.SObjectType)
+core/DataProtectedFields.cls | public static String objectRefusal(Schema.SObjectType)
+core/DataProtectionExtension.cls | public interface DataProtectionExtension
+core/DataProtectionExtensions.cls | public class DataProtectionExtensions
+core/DataProtectionExtensions.cls | public static Set<Schema.SObjectType> protectedObjects()
+core/DataProtectionExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/DataTransform.cls | public Pair()
+core/DataTransform.cls | public Pair(String,String)
+core/DataTransform.cls | public Step()
+core/DataTransform.cls | public Step(String)
+core/DataTransform.cls | public class DataTransform
+core/DataTransform.cls | public class Pair
+core/DataTransform.cls | public class Step
+core/DataTransform.cls | public static List<Step> parse(String)
+core/DataTransform.cls | public static List<String> problems(List<Step>)
+core/DataTransform.cls | public static String apply(List<Step>,String,Map<String,String>)
+core/DataTransform.cls | public static String asDate(String,String)
+core/DataTransform.cls | public static String formatDigits(String,String,String)
+core/DataTransform.cls | public static String key(String)
+core/DataTransform.cls | public static String problemWith(Step)
+core/DataTransform.cls | public static final Integer DOCUMENT_VERSION
+core/DataTransform.cls | public static final Integer MAX_COLUMNS
+core/DataTransform.cls | public static final Integer MAX_COUNTRY
+core/DataTransform.cls | public static final Integer MAX_DIGITS_VALUE
+core/DataTransform.cls | public static final Integer MAX_PAIRS
+core/DataTransform.cls | public static final Integer MAX_PATTERN
+core/DataTransform.cls | public static final Integer MAX_POSITION
+core/DataTransform.cls | public static final Integer MAX_SEPARATOR
+core/DataTransform.cls | public static final Integer MAX_SHIFT_DAYS
+core/DataTransform.cls | public static final Integer MAX_SHIFT_MONTHS
+core/DataTransform.cls | public static final Integer MAX_SLOTS
+core/DataTransform.cls | public static final Integer MAX_STEPS
+core/DataTransform.cls | public static final Integer MAX_TEXT
+core/DataTransform.cls | public static final List<String> OPERATIONS
+core/DataTransform.cls | public static final Set<String> DATE_ORDERS
+core/DataTransform.cls | public static final Set<String> TESTS
+core/DataTransform.cls | public static final Set<String> UNITS
+core/DataTransform.cls | public static final String OP_APPEND
+core/DataTransform.cls | public static final String OP_DATE
+core/DataTransform.cls | public static final String OP_DIGITS
+core/DataTransform.cls | public static final String OP_FIRST
+core/DataTransform.cls | public static final String OP_IF_BLANK
+core/DataTransform.cls | public static final String OP_IF_THEN
+core/DataTransform.cls | public static final String OP_LAST
+core/DataTransform.cls | public static final String OP_LOWER
+core/DataTransform.cls | public static final String OP_MAP
+core/DataTransform.cls | public static final String OP_PART
+core/DataTransform.cls | public static final String OP_PROPER
+core/DataTransform.cls | public static final String OP_REPLACE
+core/DataTransform.cls | public static final String OP_SHIFT_DATE
+core/DataTransform.cls | public static final String OP_TODAY
+core/DataTransform.cls | public static final String OP_TRIM
+core/DataTransform.cls | public static final String OP_UPPER
+core/EmailSendOutcome.cls | public Boolean sent
+core/EmailSendOutcome.cls | public String error
+core/EmailSendOutcome.cls | public class EmailSendOutcome
+core/EmailSendOutcome.cls | public static EmailSendOutcome failed(String)
+core/EmailSendOutcome.cls | public static EmailSendOutcome succeeded()
+core/EmailSender.cls | public interface EmailSender
+core/EngagementSignalExtension.cls | public interface EngagementSignalExtension
+core/ErrorLogCountSelector.cls | public class ErrorLogCountSelector
+core/ErrorLogCountSelector.cls | public static String listViewUrl()
+core/ErrorLogger.cls | public class ErrorLogger
+core/ErrorLogger.cls | public static final String SEVERITY_ERROR
+core/ErrorLogger.cls | public static final String SEVERITY_INFO
+core/ErrorLogger.cls | public static final String SEVERITY_WARNING
+core/ErrorLogger.cls | public static void log(Exception,String)
+core/ErrorLogger.cls | public static void log(Exception,String,Id)
+core/ErrorLogger.cls | public static void log(List<Exception>,String)
+core/ErrorLogger.cls | public static void log(List<Exception>,String,Id)
+core/ErrorLogger.cls | public static void logEach(List<Exception>,List<Id>,String)
+core/ErrorLogger.cls | public static void logFailures(List<Database.SaveResult>,List<Id>,String,String)
+core/ErrorLogger.cls | public static void logMessage(String,String,String)
+core/ErrorLogger.cls | public static void logMessage(String,String,String,Id)
+core/ErrorLogger.cls | public static void logMessages(List<String>,List<Id>,String,String)
+core/ErrorLogger.cls | public static void logMessages(List<String>,String,String)
+core/ErrorLogger.cls | public static void logWithMessage(Exception,String,String)
+core/EventVolunteerExtension.cls | public interface EventVolunteerExtension
+core/EventVolunteerExtensions.cls | public class EventVolunteerExtensions
+core/EventVolunteerExtensions.cls | public static Boolean isAvailable()
+core/EventVolunteerExtensions.cls | public static Id createJob(String,String,String)
+core/EventVolunteerExtensions.cls | public static Id createShift(Id,Datetime,Datetime,Integer)
+core/EventVolunteerExtensions.cls | public static List<EventVolunteerJob> jobsFor(String)
+core/EventVolunteerExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/EventVolunteerJob.cls | public Boolean active
+core/EventVolunteerJob.cls | public EventVolunteerJob()
+core/EventVolunteerJob.cls | public Id id
+core/EventVolunteerJob.cls | public List<EventVolunteerShift> shifts
+core/EventVolunteerJob.cls | public String name
+core/EventVolunteerJob.cls | public class EventVolunteerJob
+core/EventVolunteerShift.cls | public Datetime endTime
+core/EventVolunteerShift.cls | public Datetime startTime
+core/EventVolunteerShift.cls | public EventVolunteerShift()
+core/EventVolunteerShift.cls | public Id id
+core/EventVolunteerShift.cls | public Integer filled
+core/EventVolunteerShift.cls | public Integer needed
+core/EventVolunteerShift.cls | public String status
+core/EventVolunteerShift.cls | public class EventVolunteerShift
+core/FindController.cls | public class FindController
+core/FindController.cls | public static Integer exportLimit()
+core/FindController.cls | public static final String PERMISSION
+core/FindPeopleAction.cls | global Integer maxResults
+core/FindPeopleAction.cls | global List<PersonMatch> matches
+core/FindPeopleAction.cls | global String email
+core/FindPeopleAction.cls | global String errorMessage
+core/FindPeopleAction.cls | global String householdId
+core/FindPeopleAction.cls | global String householdName
+core/FindPeopleAction.cls | global String name
+core/FindPeopleAction.cls | global String personId
+core/FindPeopleAction.cls | global String searchText
+core/FindPeopleAction.cls | global class FindPeopleAction
+core/FindPeopleAction.cls | global class PersonMatch
+core/FindPeopleAction.cls | global class Request
+core/FindPeopleAction.cls | global class Result
+core/FindPeopleAction.cls | global static List<Result> find(List<Request>)
+core/FiscalYearSelector.cls | public class FiscalYearSelector
+core/FiscalYearSelector.cls | public static Integer fiscalYearStartMonth()
+core/FiscalYearSelector.cls | public static void setTestStartMonth(Integer)
+core/FormAttachmentExtension.cls | public interface FormAttachmentExtension
+core/FormAttachmentExtensions.cls | public class FormAttachmentExtensions
+core/FormAttachmentExtensions.cls | public static Boolean signedClaimRequired(Id)
+core/FormAttachmentExtensions.cls | public static Id formFor(Id)
+core/FormAttachmentExtensions.cls | public static List<FormAttachmentExtension> installed()
+core/FormAttachmentExtensions.cls | public static List<String> notify(FormSubmissionReceipt)
+core/FormAttachmentExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/FormCatalogEntry.cls | public FormCatalogEntry()
+core/FormCatalogEntry.cls | public String key
+core/FormCatalogEntry.cls | public String kind
+core/FormCatalogEntry.cls | public String label
+core/FormCatalogEntry.cls | public class FormCatalogEntry
+core/FormCatalogExtension.cls | public interface FormCatalogExtension
+core/FormCatalogExtensions.cls | public class FormCatalogExtensions
+core/FormCatalogExtensions.cls | public static Boolean isAvailable()
+core/FormCatalogExtensions.cls | public static List<FormCatalogEntry> publicForms()
+core/FormCatalogExtensions.cls | public static List<FormCatalogEntry> questions(Id)
+core/FormCatalogExtensions.cls | public static String publicLink(Id,Id)
+core/FormCatalogExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/FormSubmissionReceipt.cls | public FormSubmissionReceipt()
+core/FormSubmissionReceipt.cls | public Id contextRecordId
+core/FormSubmissionReceipt.cls | public Id formId
+core/FormSubmissionReceipt.cls | public Id organizationId
+core/FormSubmissionReceipt.cls | public Id personId
+core/FormSubmissionReceipt.cls | public Id submissionId
+core/FormSubmissionReceipt.cls | public Map<String,Id> recordIds
+core/FormSubmissionReceipt.cls | public Map<String,Object> answers
+core/FormSubmissionReceipt.cls | public String formName
+core/FormSubmissionReceipt.cls | public class FormSubmissionReceipt
+core/GetDataJobStatusAction.cls | global Boolean isDryRun
+core/GetDataJobStatusAction.cls | global Datetime completedAt
+core/GetDataJobStatusAction.cls | global Datetime startedAt
+core/GetDataJobStatusAction.cls | global Datetime undoDeadline
+core/GetDataJobStatusAction.cls | global Integer rowCount
+core/GetDataJobStatusAction.cls | global Integer rowsCreated
+core/GetDataJobStatusAction.cls | global Integer rowsMatched
+core/GetDataJobStatusAction.cls | global Integer rowsRejected
+core/GetDataJobStatusAction.cls | global Integer rowsUpdated
+core/GetDataJobStatusAction.cls | global String errorMessage
+core/GetDataJobStatusAction.cls | global String fileName
+core/GetDataJobStatusAction.cls | global String jobId
+core/GetDataJobStatusAction.cls | global String jobId
+core/GetDataJobStatusAction.cls | global String name
+core/GetDataJobStatusAction.cls | global String operation
+core/GetDataJobStatusAction.cls | global String status
+core/GetDataJobStatusAction.cls | global class GetDataJobStatusAction
+core/GetDataJobStatusAction.cls | global class Request
+core/GetDataJobStatusAction.cls | global class Result
+core/GetDataJobStatusAction.cls | global static List<Result> getStatus(List<Request>)
+core/GetHouseholdSummaryAction.cls | global Boolean isDeceased
+core/GetHouseholdSummaryAction.cls | global Boolean isPrimary
+core/GetHouseholdSummaryAction.cls | global Integer memberCount
+core/GetHouseholdSummaryAction.cls | global List<Member> members
+core/GetHouseholdSummaryAction.cls | global String errorMessage
+core/GetHouseholdSummaryAction.cls | global String formalGreeting
+core/GetHouseholdSummaryAction.cls | global String householdId
+core/GetHouseholdSummaryAction.cls | global String informalGreeting
+core/GetHouseholdSummaryAction.cls | global String mailingAddress
+core/GetHouseholdSummaryAction.cls | global String name
+core/GetHouseholdSummaryAction.cls | global String name
+core/GetHouseholdSummaryAction.cls | global String personId
+core/GetHouseholdSummaryAction.cls | global String primaryContactName
+core/GetHouseholdSummaryAction.cls | global String recordId
+core/GetHouseholdSummaryAction.cls | global String role
+core/GetHouseholdSummaryAction.cls | global class GetHouseholdSummaryAction
+core/GetHouseholdSummaryAction.cls | global class Member
+core/GetHouseholdSummaryAction.cls | global class Request
+core/GetHouseholdSummaryAction.cls | global class Result
+core/GetHouseholdSummaryAction.cls | global static List<Result> summarize(List<Request>)
+core/HealthCheckController.cls | public class HealthCheckController
+core/HealthCheckController.cls | public static HealthCheckService.Report applyFixFor(String,List<String>)
+core/HealthCheckExtension.cls | public interface HealthCheckExtension
+core/HealthCheckExtensions.cls | public class HealthCheckExtensions
+core/HealthCheckExtensions.cls | public static List<HealthCheckFixExtension> fixExtensions()
+core/HealthCheckExtensions.cls | public static Map<String,HealthCheckExtension> findAll()
+core/HealthCheckExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/HealthCheckFixExtension.cls | public interface HealthCheckFixExtension
+core/HealthCheckService.cls | public Finding withFix(String,String)
+core/HealthCheckService.cls | public Finding withLinks(List<Link>)
+core/HealthCheckService.cls | public Finding withScope(List<String>)
+core/HealthCheckService.cls | public Finding(String,String,String,String,String)
+core/HealthCheckService.cls | public Link(SObject)
+core/HealthCheckService.cls | public List<Finding> getFindings()
+core/HealthCheckService.cls | public List<String> getFixScope()
+core/HealthCheckService.cls | public String getDetail()
+core/HealthCheckService.cls | public String getFixOutcome()
+core/HealthCheckService.cls | public String getFixTarget()
+core/HealthCheckService.cls | public String getKey()
+core/HealthCheckService.cls | public String getSeverity()
+core/HealthCheckService.cls | public class Finding
+core/HealthCheckService.cls | public class HealthCheckService
+core/HealthCheckService.cls | public class Link
+core/HealthCheckService.cls | public class Report
+core/HealthCheckService.cls | public static Boolean canManageSettings()
+core/HealthCheckService.cls | public static Finding checkFailed(String,Exception)
+core/HealthCheckService.cls | public static List<Finding> run()
+core/HealthCheckService.cls | public static String forCount(Integer,String,String,List<Object>)
+core/HealthCheckService.cls | public static final String CATEGORY_ACCESS
+core/HealthCheckService.cls | public static final String CATEGORY_ORG_SHAPE
+core/HealthCheckService.cls | public static final String CATEGORY_SETTINGS
+core/HealthCheckService.cls | public static final String FIX_ACTION_PREFIX
+core/HealthCheckService.cls | public static final String FIX_CUSTOM_PERMISSIONS_URL
+core/HealthCheckService.cls | public static final String SEVERITY_ERROR
+core/HealthCheckService.cls | public static final String SEVERITY_INFO
+core/HealthCheckService.cls | public static final String SEVERITY_WARNING
+core/HouseholdDependentsExtension.cls | public interface HouseholdDependentsExtension
+core/HouseholdDependentsExtensions.cls | public class HouseholdDependentsExtensions
+core/HouseholdDependentsExtensions.cls | public static Set<Id> householdsWithDependents(Set<Id>)
+core/HouseholdDependentsExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/HouseholdMergeService.cls | public MergeChoices(Map<String,String>)
+core/HouseholdMergeService.cls | public class FieldChoice
+core/HouseholdMergeService.cls | public class HouseholdMergeService
+core/HouseholdMergeService.cls | public class MemberChoice
+core/HouseholdMergeService.cls | public class MergeChoices
+core/HouseholdMergeService.cls | public class MergePreview
+core/HouseholdMergeService.cls | public class MergeResult
+core/HouseholdMergeService.cls | public static Id split(Id,Set<Id>,Id)
+core/HouseholdMergeService.cls | public static MergePreview preview(Id,Id)
+core/HouseholdMergeService.cls | public static MergeResult mergeHouseholds(Id,Id,MergeChoices)
+core/HouseholdMergeService.cls | public static final String KEEP_SURVIVOR
+core/HouseholdMergeService.cls | public static final String KEEP_VICTIM
+core/HouseholdNamingService.cls | public Boolean apply(Account,List<HouseholdService.Person>,Id,Account)
+core/HouseholdNamingService.cls | public Wording()
+core/HouseholdNamingService.cls | public class HouseholdNamingService
+core/HouseholdNamingService.cls | public class Wording
+core/HouseholdNamingService.cls | public static Boolean fillBlankGreetings(Account,List<HouseholdService.Person>,Id,Account)
+core/HouseholdNamingService.cls | public static Integer applyNaming(Set<Id>)
+core/HouseholdNamingService.cls | public static Integer applyNaming(Set<Id>,Set<Id>)
+core/HouseholdNamingService.cls | public static String computeFormalGreeting(List<HouseholdService.Person>,String)
+core/HouseholdNamingService.cls | public static String computeFormalGreeting(List<HouseholdService.Person>,String,Boolean)
+core/HouseholdNamingService.cls | public static String computeInformalGreeting(List<HouseholdService.Person>,String)
+core/HouseholdNamingService.cls | public static String computeName(List<HouseholdService.Person>,String)
+core/HouseholdNamingService.cls | public static String computeName(List<HouseholdService.Person>,String,Boolean)
+core/HouseholdNamingService.cls | public static String storedLabel(String,String)
+core/HouseholdSelector.cls | public class HouseholdSelector
+core/HouseholdSelector.cls | public static Database.QueryLocator getHouseholdsForRecomputeLocator()
+core/HouseholdSelector.cls | public static Integer nativeHouseholdCollisionCount()
+core/HouseholdSelector.cls | public static List<Account> getAccountRecordTypes(Set<Id>)
+core/HouseholdSelector.cls | public static List<Account> getHouseholdsByIds(Set<Id>)
+core/HouseholdSelector.cls | public static List<Account> getHouseholdsForMerge(Set<Id>)
+core/HouseholdSelector.cls | public static List<Contact> getContactsByHouseholdIds(Set<Id>)
+core/HouseholdSelector.cls | public static List<Contact> getContactsByHouseholdIdsForDisplay(Set<Id>)
+core/HouseholdSelector.cls | public static List<Contact> getContactsByIds(Set<Id>)
+core/HouseholdSelector.cls | public static List<Contact> getContactsByIdsForDisplay(Set<Id>)
+core/HouseholdSelector.cls | public static List<Contact> getContactsWithHouseholds(Set<Id>)
+core/HouseholdSelector.cls | public static List<Household_Member__c> getAllMembershipsForPeople(Set<Id>)
+core/HouseholdSelector.cls | public static List<Household_Member__c> getDeletedMembershipsForPeople(Set<Id>)
+core/HouseholdSelector.cls | public static List<Household_Member__c> getMemberships(Set<Id>)
+core/HouseholdSelector.cls | public static List<Household_Member__c> getMembershipsForDisplay(Set<Id>)
+core/HouseholdSelector.cls | public static List<Household_Member__c> getMembershipsForPeople(Set<Id>)
+core/HouseholdSelector.cls | public static List<NativeMembership> nativeMembershipRows(Set<Id>,Set<Id>)
+core/HouseholdSelector.cls | public static Set<Id> accountsWithNativeHouseholdGroups(Set<Id>)
+core/HouseholdSelector.cls | public static Set<Id> getAccountsWithNativeDependents(Set<Id>)
+core/HouseholdSelector.cls | public static Set<Id> getEditableIds(Set<Id>)
+core/HouseholdSelector.cls | public static Set<Id> householdsWithAnyContact(Set<Id>)
+core/HouseholdSelector.cls | public static Set<Id> nativeHouseholdAccountsAmong(Set<Id>)
+core/HouseholdSelector.cls | public static final String MODEL_CONVERTED
+core/HouseholdSelector.cls | public static final String MODEL_NATIVE
+core/HouseholdService.cls | public Boolean excludeFromGreetings
+core/HouseholdService.cls | public Boolean excludeFromName
+core/HouseholdService.cls | public Boolean isDeceased
+core/HouseholdService.cls | public Boolean isPrimary
+core/HouseholdService.cls | public Datetime createdDate
+core/HouseholdService.cls | public Id id
+core/HouseholdService.cls | public Integer compareTo(Object)
+core/HouseholdService.cls | public Person copy()
+core/HouseholdService.cls | public Person()
+core/HouseholdService.cls | public Person(Contact)
+core/HouseholdService.cls | public Person(SObject,String)
+core/HouseholdService.cls | public Set<Id> householdIds
+core/HouseholdService.cls | public Set<Id> personIds
+core/HouseholdService.cls | public String firstName
+core/HouseholdService.cls | public String fullName()
+core/HouseholdService.cls | public String lastName
+core/HouseholdService.cls | public String preferredName
+core/HouseholdService.cls | public String role
+core/HouseholdService.cls | public String salutation
+core/HouseholdService.cls | public String sourceObject
+core/HouseholdService.cls | public class HouseholdService
+core/HouseholdService.cls | public class MembershipChange
+core/HouseholdService.cls | public class Person
+core/HouseholdService.cls | public static Boolean isJunctionMode()
+core/HouseholdService.cls | public static Boolean isPersonAccountOrg()
+core/HouseholdService.cls | public static Id createEmptyHousehold()
+core/HouseholdService.cls | public static Id createHouseholdFor(List<Person>,Set<Id>)
+core/HouseholdService.cls | public static Id householdRecordTypeId()
+core/HouseholdService.cls | public static Integer collapseDuplicateMemberships(Set<Id>)
+core/HouseholdService.cls | public static List<Household_Member__c> endMembershipsFor(Set<Id>)
+core/HouseholdService.cls | public static List<Household_Member__c> membershipsFor(Set<Id>)
+core/HouseholdService.cls | public static List<Household_Member__c> takeDeparting(Map<Id,List<Household_Member__c>>,List<SObject>)
+core/HouseholdService.cls | public static List<Person> toPersons(List<Contact>)
+core/HouseholdService.cls | public static Map<Id,Id> getHouseholdIdsFor(Set<Id>)
+core/HouseholdService.cls | public static Map<Id,List<Household_Member__c>> removeMembershipsWithoutUpkeep(Set<Id>)
+core/HouseholdService.cls | public static Map<Id,List<Person>> getMembers(Set<Id>)
+core/HouseholdService.cls | public static Map<Id,List<Person>> getMembersAsUser(Set<Id>)
+core/HouseholdService.cls | public static Map<Id,Set<Id>> currentHouseholdIdsByPerson(Set<Id>)
+core/HouseholdService.cls | public static Map<Id,Set<Id>> getMemberPersonIds(Set<Id>)
+core/HouseholdService.cls | public static MembershipChange membershipChangeOf(List<SObject>,Map<Id,SObject>)
+core/HouseholdService.cls | public static Set<Id> addMembers(Map<Id,Set<Id>>)
+core/HouseholdService.cls | public static Set<Id> householdIdsForPeople(Set<Id>)
+core/HouseholdService.cls | public static Set<Id> householdsOf(List<Household_Member__c>)
+core/HouseholdService.cls | public static Set<Id> moveMembers(Set<Id>,Id)
+core/HouseholdService.cls | public static Set<Id> moveMembers(Set<Id>,Id,Id)
+core/HouseholdService.cls | public static Set<Id> moveMembersWithoutUpkeep(Set<Id>,Id,Id,Boolean)
+core/HouseholdService.cls | public static Set<Id> moveMembershipsToSurvivors(List<Household_Member__c>,Map<Id,Id>)
+core/HouseholdService.cls | public static Set<Id> moveMembershipsToSurvivorsWithoutUpkeep(List<Household_Member__c>,Map<Id,Id>)
+core/HouseholdService.cls | public static Set<Id> removeMembershipsFor(Set<Id>)
+core/HouseholdService.cls | public static Set<Id> restoreMembershipsFor(Set<Id>)
+core/HouseholdService.cls | public static final String MODE_JUNCTION
+core/HouseholdService.cls | public static final String RECORD_TYPE_HOUSEHOLD
+core/HouseholdService.cls | public static final String ROLE_HEAD
+core/HouseholdService.cls | public static final String SOURCE_ACCOUNT
+core/HouseholdService.cls | public static final String SOURCE_CONTACT
+core/HouseholdService.cls | public static void afterMembershipChange(Set<Id>)
+core/HouseholdService.cls | public static void afterMembershipChange(Set<Id>,Boolean)
+core/HouseholdService.cls | public static void afterPeopleDeleted(Set<Id>)
+core/HouseholdService.cls | public static void catchUpPersonAccounts(Set<Id>)
+core/HouseholdService.cls | public static void createHouseholdsForNewContacts(List<Contact>)
+core/HouseholdService.cls | public static void createHouseholdsForPersonAccounts(List<SObject>)
+core/HouseholdService.cls | public static void deleteEmptyHouseholds(Set<Id>)
+core/HouseholdService.cls | public static void enableAutomaticHouseholds()
+core/HouseholdService.cls | public static void ensureHouseholds(List<Contact>)
+core/HouseholdService.cls | public static void greetCustomNamedHouseholds(Set<Id>)
+core/HouseholdService.cls | public static void joinHouseholdsNamedOnNewContacts(List<Contact>)
+core/HouseholdService.cls | public static void moveContact(Id,Id)
+core/HouseholdService.cls | public static void moveContact(Id,Id,Id)
+core/HouseholdService.cls | public static void recalculateMemberCounts(Set<Id>)
+core/HouseholdService.cls | public static void refuseHandSetPrimaryContacts(List<Account>,Map<Id,Account>)
+core/HouseholdService.cls | public static void resumeAutomaticCreation()
+core/HouseholdService.cls | public static void seedMissingPrimaryContacts(Map<Id,Id>)
+core/HouseholdService.cls | public static void seedPrimaryContactsOfNewHouseholds(List<Contact>)
+core/HouseholdService.cls | public static void settlePrimaryContacts(Set<Id>)
+core/HouseholdService.cls | public static void suspendAutomaticCreation()
+core/ImportBatchSelector.cls | public class ImportBatchSelector
+core/ImportBatchSelector.cls | public static Decimal selectLastRowNumber(Id)
+core/ImportBatchSelector.cls | public static Decimal selectRowNumberAt(Id,Integer)
+core/ImportBatchSelector.cls | public static Import_Batch__c selectById(Id)
+core/ImportBatchSelector.cls | public static List<Import_Batch__c> selectByIds(Set<Id>)
+core/ImportBatchSelector.cls | public static List<Import_Batch__c> selectRecent(Integer)
+core/ImportBatchSelector.cls | public static Map<String,Integer> countRelatedByStatus(Id)
+core/ImportBatchSelector.cls | public static Map<String,Integer> countRowsByStatus(Id)
+core/ImportBatchSelector.cls | public static Map<String,Integer> countRowsByStatus(Id,Decimal)
+core/ImportBatchSelector.cls | public static Map<String,Integer> countRowsByStatusAfter(Id,Decimal)
+core/ImportBatchSelector.cls | public static String selectTemplateSnapshot(Id)
+core/ImportBatchService.cls | public class ImportBatchService
+core/ImportBatchService.cls | public static AsyncApexJob asyncJobOf(Import_Batch__c)
+core/ImportBatchService.cls | public static Boolean controlTotalsAgree(Import_Batch__c)
+core/ImportBatchService.cls | public static Boolean isRetrying(Import_Batch__c)
+core/ImportBatchService.cls | public static Boolean isRunning(Import_Batch__c)
+core/ImportBatchService.cls | public static Boolean isRunning(Import_Batch__c,AsyncApexJob)
+core/ImportBatchService.cls | public static Datetime jobEndedAt(Import_Batch__c)
+core/ImportBatchService.cls | public static Id startCommit(Id)
+core/ImportBatchService.cls | public static Id startDryRun(Id)
+core/ImportBatchService.cls | public static Id startRowRetry(Id,Set<Id>)
+core/ImportBatchService.cls | public static Id startTrial(Id,Integer)
+core/ImportBatchService.cls | public static Import_Batch__c create(Id,String,String,Integer,Decimal,List<ImportMapping.Assignment>,Boolean)
+core/ImportBatchService.cls | public static Import_Batch__c finish(Id,Boolean,Boolean,List<String>,Decimal,String)
+core/ImportBatchService.cls | public static Import_Batch__c finish(Id,Boolean,Boolean,List<String>,Decimal,String,Boolean)
+core/ImportBatchService.cls | public static Import_Batch__c finish(Id,Boolean,Boolean,List<String>,Decimal,String,Boolean,Boolean)
+core/ImportBatchService.cls | public static Import_Batch__c openRetry(Id)
+core/ImportBatchService.cls | public static Import_Template__c templateFor(Import_Batch__c)
+core/ImportBatchService.cls | public static Integer chunkSize()
+core/ImportBatchService.cls | public static Integer rowRetentionDays()
+core/ImportBatchService.cls | public static Integer stageRows(Id,List<Map<String,Object>>,Integer)
+core/ImportBatchService.cls | public static Integer trialRows()
+core/ImportBatchService.cls | public static Integer undoWindowDays()
+core/ImportBatchService.cls | public static Set<Id> fixedRowIds(Id,Set<Id>)
+core/ImportBatchService.cls | public static Set<Id> retriedBy(Id)
+core/ImportBatchService.cls | public static Set<Id> retriersIn(String)
+core/ImportBatchService.cls | public static String retryRefusal(Import_Batch__c)
+core/ImportBatchService.cls | public static String rowRetryRefusal(Import_Batch__c)
+core/ImportBatchService.cls | public static final Integer DEFAULT_CHUNK_SIZE
+core/ImportBatchService.cls | public static final Integer DEFAULT_TRIAL_ROWS
+core/ImportBatchService.cls | public static final Integer MAX_RETRY_ROWS
+core/ImportBatchService.cls | public static final Integer MAX_TRIAL_ROWS
+core/ImportBatchService.cls | public static final Integer UNDO_WINDOW_DAYS
+core/ImportBatchService.cls | public static final Set<String> RUNNING_JOB_STATUSES
+core/ImportBatchService.cls | public static final String ROWS_AFTER_30_DAYS
+core/ImportBatchService.cls | public static final String ROWS_AFTER_90_DAYS
+core/ImportBatchService.cls | public static final String ROWS_NEVER
+core/ImportBatchService.cls | public static final String ROWS_ONCE_COMPLETE
+core/ImportBatchService.cls | public static final String ROW_STATUS_RETRIED
+core/ImportBatchService.cls | public static final String STATUS_COMMITTING
+core/ImportBatchService.cls | public static final String STATUS_COMPLETE
+core/ImportBatchService.cls | public static final String STATUS_DRAFT
+core/ImportBatchService.cls | public static final String STATUS_DRY_RUN
+core/ImportBatchService.cls | public static final String STATUS_DRY_RUN_COMPLETE
+core/ImportBatchService.cls | public static final String STATUS_FAILED
+core/ImportBatchService.cls | public static final String STATUS_PARSING
+core/ImportBatchService.cls | public static final String STATUS_RETRYING
+core/ImportBatchService.cls | public static final String STATUS_TRIAL_COMPLETE
+core/ImportBatchService.cls | public static final String STATUS_UNDOING
+core/ImportBatchService.cls | public static final String STATUS_UNDONE
+core/ImportBatchService.cls | public static final String STATUS_UNDO_FAILED
+core/ImportBatchService.cls | public static void beginPass(Id)
+core/ImportColumnLibrary.cls | public class ImportColumnLibrary
+core/ImportColumnLibrary.cls | public static ImportMapping suggestMapping(List<String>)
+core/ImportColumnLibrary.cls | public static String normalize(String)
+core/ImportColumnLibrary.cls | public static String suggest(String)
+core/ImportDuplicateRuleMatcher.cls | public class ImportDuplicateRuleMatcher
+core/ImportDuplicateRuleMatcher.cls | public static Boolean hasActiveRule(Schema.SObjectType)
+core/ImportDuplicateRuleMatcher.cls | public static Boolean hasActiveRule(Schema.SObjectType,Boolean)
+core/ImportDuplicateRuleMatcher.cls | public static Boolean lastAskFailed()
+core/ImportDuplicateRuleMatcher.cls | public static List<List<SObject>> matchesBySources(Schema.SObjectType,List<Map<String,String>>,Set<Id>)
+core/ImportDuplicateRuleMatcher.cls | public static List<List<SObject>> matchesFor(List<SObject>,Set<Id>)
+core/ImportDuplicateRuleMatcher.cls | public static SObject mostRecent(List<SObject>)
+core/ImportDuplicateRuleMatcher.cls | public static SObject probe(Schema.SObjectType,Map<String,String>,Id)
+core/ImportDuplicateRuleMatcher.cls | public static final Integer MAX_RECORDS_PER_CALL
+core/ImportEntityProcessor.cls | public interface ImportEntityProcessor
+core/ImportEntityProcessors.cls | public class ImportEntityProcessors
+core/ImportEntityProcessors.cls | public static ImportEntityProcessor find()
+core/ImportEntityProcessors.cls | public static List<Schema.SObjectType> taggedTypes()
+core/ImportEntityProcessors.cls | public static String carriedState
+core/ImportEntityProcessors.cls | public static final String CLASS_NAME
+core/ImportEntityProcessors.cls | public static final String TAG_FIELD
+core/ImportEntityResult.cls | public Decimal fileAmount
+core/ImportEntityResult.cls | public ImportEntityResult()
+core/ImportEntityResult.cls | public ImportEntityResult(String,Decimal)
+core/ImportEntityResult.cls | public String note
+core/ImportEntityResult.cls | public String settings
+core/ImportEntityResult.cls | public class ImportEntityResult
+core/ImportException.cls | public class ImportException
+core/ImportHeaderParser.cls | public Boolean guessed
+core/ImportHeaderParser.cls | public Boolean guessed
+core/ImportHeaderParser.cls | public Found(String,Boolean)
+core/ImportHeaderParser.cls | public Resolved(String,String)
+core/ImportHeaderParser.cls | public String fieldName
+core/ImportHeaderParser.cls | public String name
+core/ImportHeaderParser.cls | public String objectName
+core/ImportHeaderParser.cls | public class Found
+core/ImportHeaderParser.cls | public class ImportHeaderParser
+core/ImportHeaderParser.cls | public class Resolved
+core/ImportHeaderParser.cls | public interface FieldKeys
+core/ImportHeaderParser.cls | public static Boolean namesObject(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static Found find(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static Found objectOfFileNameOrGuess(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static Found objectOfNameOrGuess(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static Resolved resolve(String,Map<String,String>,FieldKeys)
+core/ImportHeaderParser.cls | public static Resolved resolveOrGuess(String,Map<String,String>,FieldKeys)
+core/ImportHeaderParser.cls | public static String clean(String)
+core/ImportHeaderParser.cls | public static String guess(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static String match(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static String objectOfFileName(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static String objectOfHeaders(List<String>,Map<String,String>,FieldKeys)
+core/ImportHeaderParser.cls | public static String objectOfName(String,Map<String,String>)
+core/ImportHeaderParser.cls | public static final Double GUESS_THRESHOLD
+core/ImportHeaderParser.cls | public static final String AMBIGUOUS
+core/ImportHeaderParser.cls | public static void putKey(Map<String,String>,String,String)
+core/ImportJournalService.cls | public class ImportJournalService
+core/ImportJournalService.cls | public static Boolean fitsOnAPage(Map<String,Object>)
+core/ImportJournalService.cls | public static Boolean write(Id,String,List<Map<String,Object>>)
+core/ImportJournalService.cls | public static Integer actionCount(Id,String,String)
+core/ImportJournalService.cls | public static Integer entryCount(Id,String)
+core/ImportJournalService.cls | public static List<Import_Journal__c> pages(Id,String,Integer)
+core/ImportJournalService.cls | public static List<Map<String,Object>> entries(Import_Journal__c)
+core/ImportJournalService.cls | public static List<Map<String,Object>> firstWithAction(Id,String,String,Integer)
+core/ImportJournalService.cls | public static Map<String,Integer> countsByObject(Id,String)
+core/ImportJournalService.cls | public static Map<String,Object> created(String,Id,Integer)
+core/ImportJournalService.cls | public static Map<String,Object> deleted(String,Id,String)
+core/ImportJournalService.cls | public static Map<String,Object> failed(String,Id,String)
+core/ImportJournalService.cls | public static Map<String,Object> kept(String,Id,String,String)
+core/ImportJournalService.cls | public static Map<String,Object> notRestored(String,Id,String,String)
+core/ImportJournalService.cls | public static Map<String,Object> updated(String,Id,Integer,Map<String,Object>,Map<String,Object>)
+core/ImportJournalService.cls | public static final Integer MAX_PAGES_READ
+core/ImportJournalService.cls | public static final String ACTION_CREATED
+core/ImportJournalService.cls | public static final String ACTION_DELETED
+core/ImportJournalService.cls | public static final String ACTION_FAILED
+core/ImportJournalService.cls | public static final String ACTION_KEPT
+core/ImportJournalService.cls | public static final String ACTION_NOT_RESTORED
+core/ImportJournalService.cls | public static final String ACTION_UPDATED
+core/ImportJournalService.cls | public static final String PHASE_COMMIT
+core/ImportJournalService.cls | public static final String PHASE_CREATED
+core/ImportJournalService.cls | public static final String PHASE_UNDO
+core/ImportMapping.cls | public Assignment()
+core/ImportMapping.cls | public Assignment(String,String)
+core/ImportMapping.cls | public Boolean identifiesSomebody()
+core/ImportMapping.cls | public Boolean loadsSeveralObjects()
+core/ImportMapping.cls | public Column()
+core/ImportMapping.cls | public Column(String,String)
+core/ImportMapping.cls | public ImportMapping forEntity(String)
+core/ImportMapping.cls | public ImportMapping withFileValues(String)
+core/ImportMapping.cls | public ImportMapping()
+core/ImportMapping.cls | public List<Assignment> getDefaults()
+core/ImportMapping.cls | public List<Column> getColumns()
+core/ImportMapping.cls | public List<String> transformProblems()
+core/ImportMapping.cls | public Map<String,List<DataTransform.Step>> transformsBySourceKey()
+core/ImportMapping.cls | public Map<String,String> lookupFieldsByAttribute()
+core/ImportMapping.cls | public Map<String,String> lookupFieldsByAttribute(String)
+core/ImportMapping.cls | public Map<String,String> targetsBySourceKey()
+core/ImportMapping.cls | public ObjectStep()
+core/ImportMapping.cls | public ObjectStep(String,String,String)
+core/ImportMapping.cls | public Set<String> attributesOf(String)
+core/ImportMapping.cls | public Set<String> clearingAttributes()
+core/ImportMapping.cls | public Set<String> deferredEntities()
+core/ImportMapping.cls | public Set<String> ignoredSourceKeys()
+core/ImportMapping.cls | public Set<String> mappedEntities()
+core/ImportMapping.cls | public Set<String> recordAttributes()
+core/ImportMapping.cls | public SkipRule()
+core/ImportMapping.cls | public String getSource()
+core/ImportMapping.cls | public String getTarget()
+core/ImportMapping.cls | public String serialize()
+core/ImportMapping.cls | public Target(String,String)
+core/ImportMapping.cls | public class Assignment
+core/ImportMapping.cls | public class Column
+core/ImportMapping.cls | public class ImportMapping
+core/ImportMapping.cls | public class ObjectStep
+core/ImportMapping.cls | public class SkipRule
+core/ImportMapping.cls | public class Target
+core/ImportMapping.cls | public static Boolean isIgnored(String)
+core/ImportMapping.cls | public static Boolean namesAPerson(String,String)
+core/ImportMapping.cls | public static ImportMapping parse(String)
+core/ImportMapping.cls | public static ImportMapping parse(String,String)
+core/ImportMapping.cls | public static String attributeOf(String)
+core/ImportMapping.cls | public static String entityOf(String)
+core/ImportMapping.cls | public static String key(String)
+core/ImportMapping.cls | public static final Set<String> DEFERRED_ENTITIES
+core/ImportMapping.cls | public static final String ATTRIBUTE_FULL_NAME
+core/ImportMapping.cls | public static final String ENTITY_AFFILIATION
+core/ImportMapping.cls | public static final String ENTITY_CONTACT_1
+core/ImportMapping.cls | public static final String ENTITY_CONTACT_2
+core/ImportMapping.cls | public static final String ENTITY_HOUSEHOLD
+core/ImportMapping.cls | public static final String ENTITY_ORGANIZATION
+core/ImportMapping.cls | public static final String ENTITY_RECORD
+core/ImportMapping.cls | public static final String ENTITY_RELATED
+core/ImportMapping.cls | public static final String TARGET_IGNORE
+core/ImportMatcher.cls | public class ImportMatcher
+core/ImportMatcher.cls | public static Boolean accountHasField(String)
+core/ImportMatcher.cls | public static Boolean isHeldByMany(String)
+core/ImportMatcher.cls | public static Boolean wasCutOff(String)
+core/ImportMatcher.cls | public static List<Schema.DescribeFieldResult> matchableFields(Schema.SObjectType)
+core/ImportMatcher.cls | public static Map<String,Id> accountsByName(Set<String>,Id)
+core/ImportMatcher.cls | public static Map<String,Id> byExternalId(Schema.SObjectType,Set<String>)
+core/ImportMatcher.cls | public static Map<String,Id> byMatchField(Schema.SObjectType,String,Set<String>,Set<Id>)
+core/ImportMatcher.cls | public static Map<String,Id> contactsByEmail(Set<String>)
+core/ImportMatcher.cls | public static Map<String,Id> contactsByNameAndPostalCode(Set<String>)
+core/ImportMatcher.cls | public static Map<String,Id> personAccountsByEmail(Set<String>,Set<Id>)
+core/ImportMatcher.cls | public static Map<String,Id> personAccountsByNameAndPostalCode(Set<String>,Set<Id>)
+core/ImportMatcher.cls | public static Set<String> unreadableFields()
+core/ImportMatcher.cls | public static String baseKey(String)
+core/ImportMatcher.cls | public static String comparableFirstName(String)
+core/ImportMatcher.cls | public static String emailKey(String)
+core/ImportMatcher.cls | public static String externalIdField(Schema.SObjectType)
+core/ImportMatcher.cls | public static String firstNameKey(String,String)
+core/ImportMatcher.cls | public static String matchField(Schema.SObjectType,String)
+core/ImportMatcher.cls | public static String nameAndPostalKey(String,String)
+core/ImportMatcher.cls | public static String nameKey(String)
+core/ImportMatcher.cls | public static final Integer MAX_KEYS_PER_QUERY
+core/ImportMatcher.cls | public static void forgetHeldKeys()
+core/ImportMatcher.cls | public static void keepMostRecent(Boolean)
+core/ImportObjectLoader.cls | public class ImportObjectLoader
+core/ImportObjectLoader.cls | public static ImportRowProcessor.Outcome process(Import_Batch__c,Import_Template__c,ImportMapping,List<Import_Row__c>,Boolean)
+core/ImportObjectLoader.cls | public static List<String> relatedLines(Id,Boolean)
+core/ImportObjectSchema.cls | public Boolean suggestedGuessed
+core/ImportObjectSchema.cls | public List<Boolean> guessedBySheet
+core/ImportObjectSchema.cls | public List<List<String>> namedBySheet
+core/ImportObjectSchema.cls | public List<String> bySheet
+core/ImportObjectSchema.cls | public Map<String,String> labels
+core/ImportObjectSchema.cls | public String suggested
+core/ImportObjectSchema.cls | public class Detection
+core/ImportObjectSchema.cls | public class ImportObjectSchema
+core/ImportObjectSchema.cls | public static Boolean checkbox(String)
+core/ImportObjectSchema.cls | public static Boolean isIndexed(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static Boolean isWritable(Schema.SObjectType,Schema.DescribeFieldResult)
+core/ImportObjectSchema.cls | public static Boolean leavesLookupEmpty(Import_Template__c)
+core/ImportObjectSchema.cls | public static Boolean loadsOneObject(Import_Template__c)
+core/ImportObjectSchema.cls | public static Boolean loadsRelated(Import_Template__c)
+core/ImportObjectSchema.cls | public static Boolean mapsField(Set<String>,String)
+core/ImportObjectSchema.cls | public static Boolean neverCreates(String)
+core/ImportObjectSchema.cls | public static Boolean updatesOnly(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static Detection detectObject(String,List<String>,List<List<String>>)
+core/ImportObjectSchema.cls | public static ImportMapping suggestMapping(Schema.SObjectType,List<String>)
+core/ImportObjectSchema.cls | public static ImportMapping suggestSeveralMapping(List<Schema.SObjectType>,Schema.SObjectType,List<String>)
+core/ImportObjectSchema.cls | public static List<ImportMapping.Target> keyFields(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static List<ImportMapping.Target> loadableObjects()
+core/ImportObjectSchema.cls | public static List<ImportMapping.Target> matchFields(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static List<ImportMapping.Target> parentFields(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static List<ImportMapping.Target> relatedOptions(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static List<ImportMapping.Target> writableFields(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static List<String> operationsFor(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static Map<String,Schema.SObjectField> fieldsOf(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static Object typed(String,Schema.DescribeFieldResult)
+core/ImportObjectSchema.cls | public static Schema.SObjectField fieldNamed(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static Schema.SObjectType parentOf(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static Schema.SObjectType relatedTypeOf(Import_Template__c)
+core/ImportObjectSchema.cls | public static Schema.SObjectType typeNamed(String)
+core/ImportObjectSchema.cls | public static Schema.SObjectType typeOf(Import_Template__c)
+core/ImportObjectSchema.cls | public static String deleteRefusal(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static String insertRefusal(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static String keyField(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static String keyFieldOf(Import_Template__c)
+core/ImportObjectSchema.cls | public static String labelOf(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static String linkField(Schema.SObjectType,Schema.SObjectType)
+core/ImportObjectSchema.cls | public static String localName(String)
+core/ImportObjectSchema.cls | public static String matchField(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static String nameFieldOf(Schema.SObjectType)
+core/ImportObjectSchema.cls | public static String operationFor(Schema.SObjectType,Import_Template__c)
+core/ImportObjectSchema.cls | public static String operationOf(Import_Template__c)
+core/ImportObjectSchema.cls | public static String parentField(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static String refusal(Import_Template__c,ImportMapping)
+core/ImportObjectSchema.cls | public static String relatedParentField(Schema.SObjectType,Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static String severalObjectsProblem(ImportMapping)
+core/ImportObjectSchema.cls | public static String unreadable(String,Schema.DescribeFieldResult)
+core/ImportObjectSchema.cls | public static String unselective(Schema.SObjectType,String)
+core/ImportObjectSchema.cls | public static final Integer LARGE_OBJECT_ROWS
+core/ImportObjectSchema.cls | public static final Set<Schema.DisplayType> TEXT_TYPES
+core/ImportObjectSchema.cls | public static final String ID_ATTRIBUTE
+core/ImportObjectSchema.cls | public static final String LOOKUP_LEAVE_EMPTY
+core/ImportObjectSchema.cls | public static final String LOOKUP_REJECT
+core/ImportObjectSchema.cls | public static final String OPERATION_DELETE
+core/ImportObjectSchema.cls | public static final String OPERATION_INSERT
+core/ImportObjectSchema.cls | public static final String OPERATION_UPDATE
+core/ImportObjectSchema.cls | public static final String OPERATION_UPDATE_BY_FIELD
+core/ImportObjectSchema.cls | public static final String OPERATION_UPSERT
+core/ImportProcessorBatch.cls | public Database.QueryLocator start(Database.BatchableContext)
+core/ImportProcessorBatch.cls | public ImportProcessorBatch(Id,Boolean)
+core/ImportProcessorBatch.cls | public class ImportProcessorBatch
+core/ImportProcessorBatch.cls | public void execute(Database.BatchableContext,List<Import_Row__c>)
+core/ImportProcessorBatch.cls | public void finish(Database.BatchableContext)
+core/ImportRowProcessor.cls | public Decimal fileAmount
+core/ImportRowProcessor.cls | public Integer cleared
+core/ImportRowProcessor.cls | public Integer created
+core/ImportRowProcessor.cls | public Integer matched
+core/ImportRowProcessor.cls | public Integer rejected
+core/ImportRowProcessor.cls | public Integer skipped
+core/ImportRowProcessor.cls | public Integer updated
+core/ImportRowProcessor.cls | public List<Map<String,Object>> journal
+core/ImportRowProcessor.cls | public Set<String> notes
+core/ImportRowProcessor.cls | public String processorSettings
+core/ImportRowProcessor.cls | public class ImportRowProcessor
+core/ImportRowProcessor.cls | public class Outcome
+core/ImportRowProcessor.cls | public static Database.DMLOptions saveOptions()
+core/ImportRowProcessor.cls | public static List<List<String>> changedValues(Import_Row__c,ImportMapping)
+core/ImportRowProcessor.cls | public static Map<String,Map<String,String>> valuesByEntity(Import_Row__c,ImportMapping)
+core/ImportRowProcessor.cls | public static Outcome process(Import_Batch__c,Import_Template__c,ImportMapping,List<Import_Row__c>,Boolean)
+core/ImportRowProcessor.cls | public static String message(Database.SaveResult)
+core/ImportRowProcessor.cls | public static final String STATUS_CREATED
+core/ImportRowProcessor.cls | public static final String STATUS_MATCHED
+core/ImportRowProcessor.cls | public static final String STATUS_PENDING
+core/ImportRowProcessor.cls | public static final String STATUS_REJECTED
+core/ImportRowProcessor.cls | public static final String STATUS_SKIPPED
+core/ImportRowProcessor.cls | public static final String STATUS_UPDATED
+core/ImportRowProcessor.cls | public static void saveRows(List<Import_Row__c>,Outcome,String)
+core/ImportRowProcessor.cls | public static void startPass(Import_Row__c,Decimal)
+core/ImportRowSelector.cls | public class ImportRowSelector
+core/ImportRowSelector.cls | public static Database.PaginationCursor openCursor(Id,String)
+core/ImportRowSelector.cls | public static Decimal passOf(Import_Batch__c)
+core/ImportRowSelector.cls | public static List<Import_Row__c> selectFirstPage(Id)
+core/ImportRowSelector.cls | public static Map<String,Boolean> resultingRecordsWrittenEarlier(Import_Batch__c,Set<String>)
+core/ImportRowSelector.cls | public static Map<String,Integer> createdDigestCounts(Import_Batch__c,Set<String>)
+core/ImportRowSelector.cls | public static Set<String> affiliationPairsWrittenEarlier(Import_Batch__c,Set<String>,Set<String>)
+core/ImportRowSelector.cls | public static Set<String> createdDigestsWrittenEarlier(Import_Batch__c,Set<String>)
+core/ImportRowSelector.cls | public static Set<String> processorDigestsWrittenEarlier(Import_Batch__c,Set<String>)
+core/ImportRowSelector.cls | public static final Integer MAX_CURSOR_ROWS
+core/ImportRowSelector.cls | public static final Integer PAGE_SIZE
+core/ImportTemplateSelector.cls | public class ImportTemplateSelector
+core/ImportTemplateSelector.cls | public static Import_Template__c selectById(Id)
+core/ImportTemplateSelector.cls | public static List<Import_Template_Default__mdt> selectShippedDefaults()
+core/ImportTemplateSelector.cls | public static List<Import_Template__c> selectActive()
+core/ImportTemplateSelector.cls | public static Map<String,Import_Template__c> selectByKeys(Set<String>)
+core/ImportTemplateService.cls | public Boolean savePaymentMatching
+core/ImportTemplateService.cls | public Boolean useDuplicateRules
+core/ImportTemplateService.cls | public Decimal matchAmountTolerance
+core/ImportTemplateService.cls | public Integer matchDateWindowDays
+core/ImportTemplateService.cls | public LoadChoices load
+core/ImportTemplateService.cls | public MatchingChoices matching
+core/ImportTemplateService.cls | public String lookupNotFound
+core/ImportTemplateService.cls | public String mappingDocument
+core/ImportTemplateService.cls | public String matchField
+core/ImportTemplateService.cls | public String matchingRule
+core/ImportTemplateService.cls | public String operation
+core/ImportTemplateService.cls | public String organizationMatchField
+core/ImportTemplateService.cls | public String organizationRule
+core/ImportTemplateService.cls | public String paymentMatching
+core/ImportTemplateService.cls | public String personMatchField
+core/ImportTemplateService.cls | public String personRule
+core/ImportTemplateService.cls | public String related
+core/ImportTemplateService.cls | public String severalMatches
+core/ImportTemplateService.cls | public String severalMatches
+core/ImportTemplateService.cls | public class ImportTemplateService
+core/ImportTemplateService.cls | public class LoadChoices
+core/ImportTemplateService.cls | public class MatchingChoices
+core/ImportTemplateService.cls | public class UploadChoices
+core/ImportTemplateService.cls | public static Boolean isPersonAccountMode(Import_Template__c)
+core/ImportTemplateService.cls | public static Boolean usesMostRecent(Import_Template__c)
+core/ImportTemplateService.cls | public static Import_Template__c copyTemplate(Id,String)
+core/ImportTemplateService.cls | public static Import_Template__c createObjectTemplate(String,String)
+core/ImportTemplateService.cls | public static Import_Template__c createSeveralObjectsTemplate(String,List<String>)
+core/ImportTemplateService.cls | public static Import_Template__c saveRecurring(Id,Boolean,String)
+core/ImportTemplateService.cls | public static Import_Template__c saveUpload(Id,UploadChoices)
+core/ImportTemplateService.cls | public static Integer materializeDefaults()
+core/ImportTemplateService.cls | public static Integer materializeDefaultsDuringInstall(String)
+core/ImportTemplateService.cls | public static List<Import_Template__c> listActive()
+core/ImportTemplateService.cls | public static List<Import_Template__c> recurringSources()
+core/ImportTemplateService.cls | public static List<String> missingDefaultNames()
+core/ImportTemplateService.cls | public static Schema.SObjectType personType(Import_Template__c)
+core/ImportTemplateService.cls | public static String defaultPersonMode()
+core/ImportTemplateService.cls | public static String normalizedOrganizationRule(String)
+core/ImportTemplateService.cls | public static String normalizedRule(String)
+core/ImportTemplateService.cls | public static String normalizedSeveralMatches(String)
+core/ImportTemplateService.cls | public static final List<String> PAYMENT_MATCHING_VALUES
+core/ImportTemplateService.cls | public static final String ORGANIZATION_RULE_EXTERNAL_ID
+core/ImportTemplateService.cls | public static final String ORGANIZATION_RULE_NAME
+core/ImportTemplateService.cls | public static final String PERSON_MODE_CONTACTS
+core/ImportTemplateService.cls | public static final String PERSON_MODE_PERSON_ACCOUNTS
+core/ImportTemplateService.cls | public static final String RULE_EMAIL
+core/ImportTemplateService.cls | public static final String RULE_EXTERNAL_ID
+core/ImportTemplateService.cls | public static final String RULE_NAME_POSTAL
+core/ImportTemplateService.cls | public static final String SEVERAL_MOST_RECENT
+core/ImportTemplateService.cls | public static final String SEVERAL_REJECT
+core/ImportTemplateService.cls | public static void recordImport(Id,Date)
+core/ImportUndoBatch.cls | public class ImportUndoBatch
+core/ImportUndoBatch.cls | public static Id run(Id,Integer)
+core/ImportUndoService.cls | public Integer getTotal()
+core/ImportUndoService.cls | public class ImportUndoService
+core/ImportUndoService.cls | public class Preview
+core/ImportUndoService.cls | public class TaggedCount
+core/ImportUndoService.cls | public static Id start(Id,Integer)
+core/ImportUndoService.cls | public static Preview preview(Id)
+core/ImportUndoService.cls | public static String effectiveStatus(Import_Batch__c)
+core/ImportUndoService.cls | public static String effectiveStatus(Import_Batch__c,Boolean)
+core/ImportUndoService.cls | public static String refusal(Import_Batch__c)
+core/ImportUndoService.cls | public static String refusal(Import_Batch__c,String)
+core/ImportUndoService.cls | public static void finish(Id,Integer,Integer,Boolean,Integer)
+core/ImportValues.cls | public class ImportValues
+core/ImportValues.cls | public static Boolean same(Object,Object)
+core/ImportValues.cls | public static Decimal number(String)
+core/ImportValues.cls | public static Id idOrNull(String)
+core/ImportValues.cls | public static Integer rowNumber(Import_Row__c)
+core/ImportValues.cls | public static List<List<String>> slices(Set<String>,Integer)
+core/ImportValues.cls | public static String digest(String,String)
+core/ImportValues.cls | public static final Integer KEYS_PER_QUERY
+core/JobNotifier.cls | public Id recipientId
+core/JobNotifier.cls | public Id targetId
+core/JobNotifier.cls | public String section
+core/JobNotifier.cls | public String title
+core/JobNotifier.cls | public class JobNotifier
+core/JobNotifier.cls | public class Notice
+core/JobNotifier.cls | public static Id starter()
+core/JobNotifier.cls | public static List<Notice> sentNotices()
+core/JobNotifier.cls | public static final String SECTION_ROLLUPS
+core/JobNotifier.cls | public static void aboutRecord(Id,String,Boolean,String,Id)
+core/JobNotifier.cls | public static void aboutSettings(Id,String,Boolean,String,String)
+core/JobNotifier.cls | public static void ownType(String,Set<String>,String,String,Id,String)
+core/LinkedRecords.cls | public String label
+core/LinkedRecords.cls | public String objectLabel
+core/LinkedRecords.cls | public class Link
+core/LinkedRecords.cls | public class LinkedRecords
+core/LinkedRecords.cls | public static Map<String,Link> resolve(List<String>)
+core/MessagingEmailSender.cls | public List<EmailSendOutcome> send(List<Messaging.SingleEmailMessage>)
+core/MessagingEmailSender.cls | public class MessagingEmailSender
+core/MigrationCheck.cls | public Integer done
+core/MigrationCheck.cls | public Integer source
+core/MigrationCheck.cls | public MigrationCheck(Integer,Integer)
+core/MigrationCheck.cls | public class MigrationCheck
+core/MigrationKitExtension.cls | public interface MigrationKitExtension
+core/MigrationKitService.cls | public List<Link> links
+core/MigrationKitService.cls | public List<Map<String,Object>> rows(List<SObject>)
+core/MigrationKitService.cls | public List<String> fields
+core/MigrationKitService.cls | public Source(Step)
+core/MigrationKitService.cls | public String column
+core/MigrationKitService.cls | public String key
+core/MigrationKitService.cls | public String kind
+core/MigrationKitService.cls | public String step
+core/MigrationKitService.cls | public String templateKey
+core/MigrationKitService.cls | public class Link
+core/MigrationKitService.cls | public class MigrationKitService
+core/MigrationKitService.cls | public class Source
+core/MigrationKitService.cls | public class Step
+core/MigrationKitService.cls | public static Migration_Kit__mdt kitNamed(String)
+core/MigrationKitService.cls | public static Step stepNamed(Migration_Kit__mdt,String)
+core/MigrationKitService.cls | public static final String KIND_IMPORT
+core/ModuleAccessSync.cls | public interface ModuleAccessSync
+core/ModuleAccessSyncBase.cls | public Boolean sync()
+core/ModuleAccessSyncBase.cls | public Job(ModuleAccessSyncBase)
+core/ModuleAccessSyncBase.cls | public ModuleAccessSyncBase()
+core/ModuleAccessSyncBase.cls | public abstract Integer sliceSize()
+core/ModuleAccessSyncBase.cls | public abstract Map<String,List<String>> setsByPermissionSet()
+core/ModuleAccessSyncBase.cls | public abstract Map<String,List<String>> setsByRole()
+core/ModuleAccessSyncBase.cls | public abstract String logContext()
+core/ModuleAccessSyncBase.cls | public abstract String moduleName()
+core/ModuleAccessSyncBase.cls | public abstract class ModuleAccessSyncBase
+core/ModuleAccessSyncBase.cls | public class Job
+core/ModuleAccessSyncBase.cls | public virtual void afterSync()
+core/ModuleAccessSyncBase.cls | public void execute(QueueableContext)
+core/ModuleAccessSyncBase.cls | public void requestSync()
+core/ModuleAccessSyncs.cls | public class ModuleAccessSyncs
+core/ModuleAccessSyncs.cls | public static final String CLASS_SUFFIX
+core/ModuleAccessSyncs.cls | public static void requestAll()
+core/ModuleAccessSyncs.cls | public static void requestFor(String)
+core/ModuleManagerService.cls | public Boolean getCanSwitch()
+core/ModuleManagerService.cls | public String getName()
+core/ModuleManagerService.cls | public String getStatus()
+core/ModuleManagerService.cls | public class ModuleManagerService
+core/ModuleManagerService.cls | public class ModuleStatus
+core/ModuleManagerService.cls | public static List<ModuleStatus> getModules()
+core/ModuleManagerService.cls | public static Set<String> turnedOff()
+core/ModuleManagerService.cls | public static final String STATUS_OFF
+core/ModuleManagerService.cls | public static final String STATUS_ON
+core/ModuleManagerService.cls | public static void turnOff(String)
+core/ModuleManagerService.cls | public static void turnOn(String)
+core/ModuleSetup.cls | public interface ModuleSetup
+core/ModuleSetups.cls | public class ModuleSetups
+core/ModuleSetups.cls | public interface Revisioned
+core/ModuleSetups.cls | public static Set<String> ran()
+core/ModuleSetups.cls | public static final String CLASS_SUFFIX
+core/ModuleSetups.cls | public static final String CORE
+core/ModuleSetups.cls | public static void markRan(String)
+core/NamespaceUtil.cls | public class NamespaceUtil
+core/NamespaceUtil.cls | public static Map<String,Schema.SObjectType> globalDescribe()
+core/NamespaceUtil.cls | public static Object build(String,Type,String)
+core/NamespaceUtil.cls | public static Schema.DescribeSObjectResult describe(String)
+core/NamespaceUtil.cls | public static Schema.SObjectField field(Map<String,Schema.SObjectField>,String)
+core/NamespaceUtil.cls | public static Schema.SObjectField field(Schema.SObjectType,String)
+core/NamespaceUtil.cls | public static Schema.SObjectType objectType(String)
+core/NamespaceUtil.cls | public static Schema.SObjectType packagedObjectType(String)
+core/NamespaceUtil.cls | public static String fieldLabel(Schema.SObjectType,String)
+core/NamespaceUtil.cls | public static String namespacePrefix()
+core/NamespaceUtil.cls | public static String prefix()
+core/NamespaceUtil.cls | public static String qualify(String)
+core/NamespaceUtil.cls | public static String stateKey(String)
+core/NamespaceUtil.cls | public static Type resolveType(String)
+core/NightlyJobs.cls | public class NightlyJobs
+core/NightlyJobs.cls | public static Boolean adoptOldSchedules()
+core/NightlyJobs.cls | public static Boolean isOn(NightlyStep)
+core/NightlyJobs.cls | public static Boolean isScheduled()
+core/NightlyJobs.cls | public static Boolean isStepScheduled(String,Boolean)
+core/NightlyJobs.cls | public static Boolean isSwitchedOn(String,Boolean)
+core/NightlyJobs.cls | public static Datetime lastStarted(String)
+core/NightlyJobs.cls | public static Datetime nextRunAt(NightlyStep)
+core/NightlyJobs.cls | public static Id start()
+core/NightlyJobs.cls | public static Id turnOn(String)
+core/NightlyJobs.cls | public static List<NightlyStep> steps()
+core/NightlyJobs.cls | public static List<String> unscheduledLabels()
+core/NightlyJobs.cls | public static NightlyStep step(String)
+core/NightlyJobs.cls | public static String jobName()
+core/NightlyJobs.cls | public static final List<String> PROVIDER_CLASSES
+core/NightlyJobs.cls | public static final String JOB_NAME
+core/NightlyJobs.cls | public static void forget()
+core/NightlyJobs.cls | public static void overrideStepsForTest(List<NightlyStep>)
+core/NightlyJobs.cls | public static void turnOff(String)
+core/NightlyStep.cls | public Boolean active
+core/NightlyStep.cls | public Boolean hasSwitch()
+core/NightlyStep.cls | public Boolean switchDefault
+core/NightlyStep.cls | public NightlyStep activeWhen(Boolean)
+core/NightlyStep.cls | public NightlyStep withSwitch(Boolean)
+core/NightlyStep.cls | public NightlyStep(String,String,Integer,Integer,Schedulable)
+core/NightlyStep.cls | public class NightlyStep
+core/NightlyStep.cls | public final Integer minute
+core/NightlyStep.cls | public final String key
+core/NightlyStep.cls | public final String label
+core/NightlyStep.cls | public void run()
+core/NightlyStepProvider.cls | public interface NightlyStepProvider
+core/NpspHouseholdSource.cls | public Boolean customNaming
+core/NpspHouseholdSource.cls | public Boolean isPrimary
+core/NpspHouseholdSource.cls | public Date endDate
+core/NpspHouseholdSource.cls | public Date startDate
+core/NpspHouseholdSource.cls | public Id accountId
+core/NpspHouseholdSource.cls | public Id contactId
+core/NpspHouseholdSource.cls | public Id primaryContactId
+core/NpspHouseholdSource.cls | public Id recordTypeId
+core/NpspHouseholdSource.cls | public List<Member> members
+core/NpspHouseholdSource.cls | public NpspHouseholdSource()
+core/NpspHouseholdSource.cls | public String formalGreeting
+core/NpspHouseholdSource.cls | public String informalGreeting
+core/NpspHouseholdSource.cls | public String name
+core/NpspHouseholdSource.cls | public String role
+core/NpspHouseholdSource.cls | public class Household
+core/NpspHouseholdSource.cls | public class Member
+core/NpspHouseholdSource.cls | public static NpspHouseholdSource forKey(String)
+core/NpspHouseholdSource.cls | public static String keyOfRun(String)
+core/NpspHouseholdSource.cls | public static final String NPC
+core/NpspHouseholdSource.cls | public static final String NPSP
+core/NpspHouseholdSource.cls | public virtual Boolean available()
+core/NpspHouseholdSource.cls | public virtual Boolean createsHouseholds()
+core/NpspHouseholdSource.cls | public virtual Boolean unadoptedHouseholdsExist()
+core/NpspHouseholdSource.cls | public virtual List<Household> read(Set<Id>)
+core/NpspHouseholdSource.cls | public virtual Map<Id,Integer> memberCounts(Set<Id>)
+core/NpspHouseholdSource.cls | public virtual Map<String,Object> binds()
+core/NpspHouseholdSource.cls | public virtual String condition()
+core/NpspHouseholdSource.cls | public virtual String key()
+core/NpspHouseholdSource.cls | public virtual class NpspHouseholdSource
+core/OrgSettingsSystemWriter.cls | public class OrgSettingsException
+core/OrgSettingsSystemWriter.cls | public class OrgSettingsSystemWriter
+core/OrgSettingsSystemWriter.cls | public static BarnCRM_Settings__c lockStored()
+core/OrgSettingsSystemWriter.cls | public static SObject lockStored(Schema.SObjectType)
+core/OrgSettingsSystemWriter.cls | public static void save(Map<Schema.SObjectField,Object>)
+core/OrgSettingsSystemWriter.cls | public static void save(Schema.SObjectType,Map<Schema.SObjectField,Object>)
+core/OrgSettingsSystemWriter.cls | public static void saveOver(Schema.SObjectType,SObject,Map<Schema.SObjectField,Object>)
+core/OrgShapeDetector.cls | public class OrgShapeDetector
+core/OrgShapeDetector.cls | public static Boolean hasPersonAccounts()
+core/OrgShapeDetector.cls | public static Id creatablePersonRecordTypeId()
+core/OrgShapeDetector.cls | public static Set<Id> personAccountRecordTypeIds()
+core/OrganizationAddress.cls | public class OrganizationAddress
+core/OrganizationAddress.cls | public static List<String> lines()
+core/OrganizationAddress.cls | public static List<String> lines(BarnCRM_Settings__c)
+core/OrganizationAddress.cls | public static String oneLine()
+core/OrganizationAddress.cls | public static String oneLine(BarnCRM_Settings__c)
+core/OtherRollupTools.cls | public class OtherRollupTools
+core/OtherRollupTools.cls | public static Boolean hasDlrs()
+core/OtherRollupTools.cls | public static Boolean hasRollupHelper()
+core/OtherRollupTools.cls | public static List<String> notices()
+core/OtherRollupTools.cls | public static final String DLRS_NAMESPACE
+core/OtherRollupTools.cls | public static final String ROLLUP_HELPER_NAMESPACE
+core/OtherRollupTools.cls | public static void overrideForTest(Set<String>)
+core/PersonErasure.cls | public Change(String,String,Integer,String)
+core/PersonErasure.cls | public Change(String,String,List<Id>,List<String>)
+core/PersonErasure.cls | public List<Change> getChanges()
+core/PersonErasure.cls | public String getAction()
+core/PersonErasure.cls | public String getObjectLabel()
+core/PersonErasure.cls | public class Change
+core/PersonErasure.cls | public class ErasureException
+core/PersonErasure.cls | public class PersonErasure
+core/PersonErasure.cls | public class Result
+core/PersonErasure.cls | public static Result erase(Id,String,String)
+core/PersonErasure.cls | public static Result preview(Id)
+core/PersonErasure.cls | public static final String CLEARED
+core/PersonErasure.cls | public static final String DELETED
+core/PersonErasure.cls | public static final String ENDED
+core/PersonErasure.cls | public static final String KEPT
+core/PersonErasure.cls | public static final String PERMISSION
+core/PersonErasure.cls | public static final String UPDATED
+core/PersonErasureExtension.cls | public interface PersonErasureExtension
+core/PersonErasureExtensions.cls | public class PersonErasureExtensions
+core/PersonErasureExtensions.cls | public static List<PersonErasureExtension> installed()
+core/PersonErasureExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/PersonErasureStartExtension.cls | public interface PersonErasureStartExtension
+core/PersonMatcher.cls | public Boolean byNameAndPostalCode
+core/PersonMatcher.cls | public Map<String,String> duplicateRuleValues
+core/PersonMatcher.cls | public String email
+core/PersonMatcher.cls | public String firstName
+core/PersonMatcher.cls | public String lastName
+core/PersonMatcher.cls | public String postalCode
+core/PersonMatcher.cls | public class AmbiguousException
+core/PersonMatcher.cls | public class Person
+core/PersonMatcher.cls | public class PersonMatcher
+core/PersonMatcher.cls | public static Id find(Person)
+core/PersonRecordSelector.cls | public class PersonRecordSelector
+core/PersonRecordSelector.cls | public static Boolean isPersonRecord(SObject)
+core/PersonRecordSelector.cls | public static Map<Id,Id> getAccountsBehindPersonContacts(Set<Id>)
+core/PersonRecordSelector.cls | public static Map<Id,Id> getPersonContactIds(Set<Id>)
+core/PersonReference.cls | public class PersonReference
+core/PersonReference.cls | public static Boolean isAmbiguous(Id,Id)
+core/PersonReference.cls | public static Boolean isComplete(Id,Id)
+core/PersonReference.cls | public static Boolean isSamePerson(Id,Id,Id,Id)
+core/PersonReference.cls | public static Id idOf(Id,Id)
+core/PersonReference.cls | public static String keyOf(Id,Id)
+core/PersonReference.cls | public static String nameOf(Contact,Account,String)
+core/PortalActionExtension.cls | public interface PortalActionExtension
+core/PortalActionExtensions.cls | public class PortalActionExtensions
+core/PortalActionExtensions.cls | public static PortalActionExtension forAction(String)
+core/PortalActionExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/PublicCheckoutExtension.cls | public interface PublicCheckoutExtension
+core/PublicPageExtension.cls | public interface PublicPageExtension
+core/PublicPageExtensions.cls | public class PublicPageExtensions
+core/PublicPageExtensions.cls | public static Boolean hostInstalled()
+core/PublicPageExtensions.cls | public static Boolean isSignedRequest()
+core/PublicPageExtensions.cls | public static Map<String,Object> listPage(String)
+core/PublicPageExtensions.cls | public static Map<String,Object> page(Id)
+core/PublicPageExtensions.cls | public static Map<String,Object> page(Id,Boolean)
+core/PublicPageExtensions.cls | public static Map<String,Object> startCheckout(Id,Map<String,Object>,String)
+core/PublicPageExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/PublicPageExtensions.cls | public static void setHostInstalledForTest(Boolean)
+core/PublicPageExtensions.cls | public static void useForTest(PublicPageExtension)
+core/QueryCompiler.cls | public Map<String,Object> binds
+core/QueryCompiler.cls | public String fromWhere
+core/QueryCompiler.cls | public String objectName
+core/QueryCompiler.cls | public class Compiled
+core/QueryCompiler.cls | public class QueryCompiler
+core/QueryCompiler.cls | public class QueryCompilerException
+core/QueryCompiler.cls | public static Compiled compile(String)
+core/QueryCompiler.cls | public static Compiled compileExportPage(String,Id)
+core/QueryCompiler.cls | public static Compiled compileSelection(String,Set<String>,Set<Id>)
+core/QueryCompiler.cls | public static Integer count(String,Integer)
+core/QueryCompiler.cls | public static List<SObject> run(Compiled)
+core/QueryCompiler.cls | public static Schema.DescribeFieldResult resolve(String,String)
+core/QueryCompiler.cls | public static final Integer EXPORT_PAGE_SIZE
+core/RecordGlance.cls | public Card addAction(String,Map<String,Object>)
+core/RecordGlance.cls | public Card addCurrency(String,Decimal)
+core/RecordGlance.cls | public Card addDate(String,Date)
+core/RecordGlance.cls | public Card addNumber(String,Decimal)
+core/RecordGlance.cls | public Card addText(String,String)
+core/RecordGlance.cls | public Card(String,String,String)
+core/RecordGlance.cls | public class Card
+core/RecordGlance.cls | public class RecordGlance
+core/RecordGlanceExtension.cls | public interface RecordGlanceExtension
+core/RecordGlanceExtensions.cls | public class RecordGlanceExtensions
+core/RecordGlanceExtensions.cls | public static List<RecordGlance.Card> cardsFor(Id)
+core/RecordGlanceExtensions.cls | public static List<RecordGlanceExtension> installed()
+core/RecordGlanceExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/RollupEngineExtension.cls | public interface RollupEngineExtension
+core/RollupEngineExtensionV2.cls | public interface RollupEngineExtensionV2
+core/RollupEngineExtensionV3.cls | public interface RollupEngineExtensionV3
+core/RollupEngineExtensions.cls | public class RollupEngineExtensions
+core/RollupEngineExtensions.cls | public static RollupEngineExtension find()
+core/RollupEngineExtensions.cls | public static RollupEngineExtensionV2 findV2()
+core/RollupEngineExtensions.cls | public static RollupEngineExtensionV3 findV3()
+core/RollupEngineExtensions.cls | public static final String EXTENSION_CLASS
+core/RollupFilterParser.cls | public Boolean negated
+core/RollupFilterParser.cls | public String field
+core/RollupFilterParser.cls | public String value
+core/RollupFilterParser.cls | public class RollupFilterException
+core/RollupFilterParser.cls | public class RollupFilterParser
+core/RollupFilterParser.cls | public class TextEquality
+core/RollupFilterParser.cls | public static Boolean usesRelativeDate(String)
+core/RollupFilterParser.cls | public static List<TextEquality> textEqualities(String,Schema.SObjectType)
+core/RollupFilterParser.cls | public static Set<String> fieldsOf(String)
+core/RollupFilterParser.cls | public static String toWhereClause(String)
+core/RollupFilterParser.cls | public static String toWhereClause(String,Schema.SObjectType)
+core/SampleDataModule.cls | public interface SampleDataModule
+core/SampleDataModules.cls | public class SampleDataModules
+core/SampleDataModules.cls | public static void removeAfter(String)
+core/SampleDataModules.cls | public static void startAfter(String)
+core/SampleDataRemoveBatch.cls | public SampleDataRemoveBatch(SampleDataStages)
+core/SampleDataRemoveBatch.cls | public class SampleDataRemoveBatch
+core/SampleDataRemoveBatch.cls | public static Id startRemoval(SampleDataStages)
+core/SampleDataStageBatch.cls | public SampleDataStageBatch(SampleDataStages)
+core/SampleDataStageBatch.cls | public static Id start(SampleDataStages)
+core/SampleDataStageBatch.cls | public static void noteStarted(SampleDataStages)
+core/SampleDataStageBatch.cls | public virtual class SampleDataStageBatch
+core/SampleDataStages.cls | public interface SampleDataStages
+core/ScheduledJobSelector.cls | public class ScheduledJobSelector
+core/ScheduledJobSelector.cls | public static Boolean isScheduled(String)
+core/ScheduledJobSelector.cls | public static Datetime nextFireTime(String)
+core/ScheduledJobSelector.cls | public static Datetime startTime(String)
+core/ScheduledJobSelector.cls | public static Id ensure(String,String,Schedulable)
+core/ScheduledJobSelector.cls | public static Id schedule(String,String,Schedulable)
+core/ScheduledJobSelector.cls | public static Id triggerIdByName(String)
+core/ScheduledJobSelector.cls | public static List<String> namesOwnedByInactiveUsers()
+core/ScheduledJobSelector.cls | public static String cronExpressionByName(String)
+core/ScheduledJobSelector.cls | public static String nameKey(String)
+core/ScheduledJobSelector.cls | public static void abort(Id)
+core/ScheduledJobSelector.cls | public static void forget()
+core/ScheduledJobSelector.cls | public static void stopNamed(String)
+core/SettingSections.cls | public class SettingSections
+core/SettingSections.cls | public static Boolean isKnown(String)
+core/SettingSections.cls | public static List<String> all()
+core/SettingSections.cls | public static String pageFor(String)
+core/SettingSections.cls | public static final String ACCESS
+core/SettingSections.cls | public static final String ADDRESSES
+core/SettingSections.cls | public static final String AUTOMATION
+core/SettingSections.cls | public static final String CONTACT_POINTS
+core/SettingSections.cls | public static final String CORPORATE_HUB
+core/SettingSections.cls | public static final String DUPLICATE_MATCHING
+core/SettingSections.cls | public static final String ERROR_LOG
+core/SettingSections.cls | public static final String EVENTS
+core/SettingSections.cls | public static final String FIELD_HISTORY
+core/SettingSections.cls | public static final String FORMS
+core/SettingSections.cls | public static final String FUNDERS
+core/SettingSections.cls | public static final String GENERAL
+core/SettingSections.cls | public static final String GIVING
+core/SettingSections.cls | public static final String HEALTH
+core/SettingSections.cls | public static final String HOUSEHOLDS
+core/SettingSections.cls | public static final String HOUSEHOLD_NAMES
+core/SettingSections.cls | public static final String IMPORTING
+core/SettingSections.cls | public static final String INTEGRATIONS
+core/SettingSections.cls | public static final String LOGIC_MODELS
+core/SettingSections.cls | public static final String LWC_BUILDER
+core/SettingSections.cls | public static final String MEMBERSHIPS
+core/SettingSections.cls | public static final String MODULES
+core/SettingSections.cls | public static final String ORGANIZATION
+core/SettingSections.cls | public static final String ORG_OPTIMIZER
+core/SettingSections.cls | public static final String PAYMENTS
+core/SettingSections.cls | public static final String PEOPLE
+core/SettingSections.cls | public static final String PEOPLE_AND_HOUSEHOLDS
+core/SettingSections.cls | public static final String PORTALS
+core/SettingSections.cls | public static final String PROGRAMS
+core/SettingSections.cls | public static final String PROJECTS
+core/SettingSections.cls | public static final String RECEIPTS
+core/SettingSections.cls | public static final String RELATIONSHIPS
+core/SettingSections.cls | public static final String ROLLUPS
+core/SettingSections.cls | public static final String SCHOLARSHIPS
+core/SettingSections.cls | public static final String TERRITORY
+core/SettingSections.cls | public static final String VOLUNTEERS
+core/SettingsController.cls | public Boolean getCanEdit()
+core/SettingsController.cls | public class ChangeModel
+core/SettingsController.cls | public class ConsoleModel
+core/SettingsController.cls | public class SettingsController
+core/SettingsController.cls | public static ConsoleModel save(Map<String,Object>)
+core/SettingsService.cls | public class SettingsException
+core/SettingsService.cls | public class SettingsService
+core/SettingsService.cls | public static BarnCRM_Settings__c firstSaveRecord()
+core/SettingsService.cls | public static BarnCRM_Settings__c getSettings()
+core/SettingsService.cls | public static BarnCRM_Settings__c saveSystemValue(String,Object)
+core/SettingsService.cls | public static BarnCRM_Settings__c saveValues(Map<String,Object>)
+core/SettingsService.cls | public static Boolean hasKey(String)
+core/SettingsService.cls | public static Boolean hasKey(String,String)
+core/SettingsService.cls | public static Object getEffectiveValue(String,String,String)
+core/SettingsService.cls | public static Object getValue(String)
+core/SettingsService.cls | public static Object getValue(String,String)
+core/SettingsService.cls | public static SObject blanksAfterFirstSave(SObject)
+core/SettingsService.cls | public static SObject firstSaveRecord(Schema.SObjectType)
+core/SettingsService.cls | public static SObject saveValues(String,Map<String,Object>)
+core/SettingsService.cls | public static Schema.SObjectType typeByName(String)
+core/SettingsService.cls | public static String householdMembershipMode()
+core/SettingsService.cls | public static final String COEXISTENCE_MODE_DEFAULT
+core/SettingsService.cls | public static final String CORE_SETTINGS_OBJECT
+core/SettingsService.cls | public static final String MEMBERSHIP_MODE_DEFAULT
+core/SettingsService.cls | public static void clearCaches()
+core/SettingsService.cls | public static void logChange(String,String,String)
+core/SettingsService.cls | public static void saveBookkeeping(Map<String,Object>)
+core/SetupAssistantExtension.cls | public interface SetupAssistantExtension
+core/SetupAssistantExtensions.cls | public class SetupAssistantExtensions
+core/SetupAssistantExtensions.cls | public static List<SetupAssistantExtension> findAll()
+core/SetupAssistantExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/SetupAssistantService.cls | public Step advancingOnSave()
+core/SetupAssistantService.cls | public Step completedBy(String,String)
+core/SetupAssistantService.cls | public Step withField(StepField)
+core/SetupAssistantService.cls | public Step withTarget(String)
+core/SetupAssistantService.cls | public Step(String,Integer,String,String)
+core/SetupAssistantService.cls | public StepField withLimits(Integer,String,String)
+core/SetupAssistantService.cls | public StepField withNavigationTarget(String)
+core/SetupAssistantService.cls | public StepField withObject(String)
+core/SetupAssistantService.cls | public StepField withPreviewAlt(String)
+core/SetupAssistantService.cls | public StepField(String,Integer,String,String,String)
+core/SetupAssistantService.cls | public class SetupAssistantService
+core/SetupAssistantService.cls | public class Step
+core/SetupAssistantService.cls | public class StepField
+core/SetupAssistantService.cls | public static List<Step> getSteps()
+core/SetupAssistantService.cls | public static Step findStep(String)
+core/SetupAssistantService.cls | public static final String FIELD_ADDRESS
+core/SetupAssistantService.cls | public static final String FIELD_FILE
+core/SetupAssistantService.cls | public static final String FIELD_NAVIGATE
+core/SetupAssistantService.cls | public static final String FIELD_RECORD
+core/SetupAssistantService.cls | public static final String FIELD_TEXT
+core/SetupAssistantService.cls | public static final String RULE_ACTION
+core/SetupAssistantService.cls | public static final String RULE_SETTING
+core/SetupObjectSelector.cls | public class SetupObjectSelector
+core/SetupObjectSelector.cls | public static Id customPermissionId(String)
+core/SetupObjectSelector.cls | public static Id emailTemplateId(String,Boolean)
+core/SetupObjectSelector.cls | public static Id groupId(String)
+core/SetupObjectSelector.cls | public static Map<String,Id> emailTemplateIds(Set<String>,Boolean)
+core/SetupObjectSelector.cls | public static Map<String,PermissionSet> permissionSets(Set<String>)
+core/SetupObjectSelector.cls | public static Map<String,PermissionSetGroup> permissionSetGroups(Set<String>)
+core/SetupObjectSelector.cls | public static PermissionSet permissionSet(String)
+core/SetupObjectSelector.cls | public static StaticResource staticResource(String)
+core/SetupObjectSelector.cls | public static String staticResourceBody(String)
+core/ShippedDefaultUpgrades.cls | public class ShippedDefaultUpgrades
+core/ShippedDefaultUpgrades.cls | public static final String CONTEXT
+core/ShippedDefaultUpgrades.cls | public static void apply(String,Schema.SObjectType,List<Schema.SObjectField>)
+core/TabAccessService.cls | public class TabAccessService
+core/TabAccessService.cls | public static Boolean giveToGroupHolders(String,List<String>,Integer,String)
+core/TabAccessService.cls | public static Boolean giveToHolders(String,List<String>,Integer,String)
+core/TriggerDispatcher.cls | public Context(System.TriggerOperation,List<SObject>,Map<Id,SObject>,List<SObject>,Map<Id,SObject>)
+core/TriggerDispatcher.cls | public class Context
+core/TriggerDispatcher.cls | public class TriggerDispatcher
+core/TriggerDispatcher.cls | public class TriggerDispatcherException
+core/TriggerDispatcher.cls | public interface Deferred
+core/TriggerDispatcher.cls | public static void afterHandlers(Deferred)
+core/TriggerDispatcher.cls | public static void run(String)
+core/TriggerDispatcher.cls | public static void run(String,Context)
+core/TriggerDispatcher.cls | public static void run(TriggerHandler,Context)
+core/TriggerHandler.cls | public List<SObject> newRecords()
+core/TriggerHandler.cls | public List<SObject> oldRecords()
+core/TriggerHandler.cls | public Map<Id,SObject> newRecordsById()
+core/TriggerHandler.cls | public Map<Id,SObject> oldRecordsById()
+core/TriggerHandler.cls | public Scope(List<SObject>,Map<Id,SObject>,List<SObject>,Map<Id,SObject>)
+core/TriggerHandler.cls | public Set<Id> claimRunFor(String,Set<Id>)
+core/TriggerHandler.cls | public class Scope
+core/TriggerHandler.cls | public static Map<String,Set<Id>> copyRunClaims()
+core/TriggerHandler.cls | public static void clearRunClaims()
+core/TriggerHandler.cls | public static void enterRun()
+core/TriggerHandler.cls | public static void leaveRun()
+core/TriggerHandler.cls | public static void narrowRun(Scope)
+core/TriggerHandler.cls | public static void noteTriggerProgress()
+core/TriggerHandler.cls | public static void restoreRunClaims(Map<String,Set<Id>>)
+core/TriggerHandler.cls | public static void setTestRecords(List<SObject>,Map<Id,SObject>)
+core/TriggerHandler.cls | public virtual String getName()
+core/TriggerHandler.cls | public virtual class TriggerHandler
+core/TriggerHandler.cls | public virtual void afterDelete()
+core/TriggerHandler.cls | public virtual void afterInsert()
+core/TriggerHandler.cls | public virtual void afterUndelete()
+core/TriggerHandler.cls | public virtual void afterUpdate()
+core/TriggerHandler.cls | public virtual void beforeDelete()
+core/TriggerHandler.cls | public virtual void beforeInsert()
+core/TriggerHandler.cls | public virtual void beforeUpdate()
+core/UserErrors.cls | public class UserErrors
+core/UserErrors.cls | public static AuraHandledException message(String)
+core/UserErrors.cls | public static AuraHandledException wrap(Exception,Boolean,String,Id,String)
+core/UserErrors.cls | public static AuraHandledException wrap(Exception,Boolean,String,String)
+core/UserErrors.cls | public static AuraHandledException wrap(Exception,String,Boolean)
+core/UserErrors.cls | public static AuraHandledException wrapShowingDml(Exception,String)
+core/WaitlistQueue.cls | public class WaitlistQueue
+core/WaitlistQueue.cls | public static Decimal placesOf(SObject,String)
+core/WaitlistQueue.cls | public static List<SObject> fitting(Map<Id,Decimal>,List<SObject>,String,String)
+core/WhereUsedExtension.cls | public interface WhereUsedExtension
+core/WhereUsedExtensions.cls | public class WhereUsedExtensions
+core/WhereUsedExtensions.cls | public static Map<String,WhereUsedExtension> findAll()
+core/WhereUsedExtensions.cls | public static final List<String> EXTENSION_CLASSES
+core/WhereUsedService.cls | public Boolean isObject()
+core/WhereUsedService.cls | public Boolean isObject(String)
+core/WhereUsedService.cls | public Boolean matchesField(String,String)
+core/WhereUsedService.cls | public Boolean matchesFilter(String,Object)
+core/WhereUsedService.cls | public Boolean matchesPath(String,String)
+core/WhereUsedService.cls | public List<String> getParts()
+core/WhereUsedService.cls | public Reference addPart(String)
+core/WhereUsedService.cls | public Reference withBreaks(String)
+core/WhereUsedService.cls | public Reference withEdit(String,Map<String,String>)
+core/WhereUsedService.cls | public Reference withRecordEdit(Id)
+core/WhereUsedService.cls | public Reference(String,String,String,Id)
+core/WhereUsedService.cls | public String fieldLabel
+core/WhereUsedService.cls | public String fieldName
+core/WhereUsedService.cls | public String getBreaks()
+core/WhereUsedService.cls | public String getEditTab()
+core/WhereUsedService.cls | public String getName()
+core/WhereUsedService.cls | public String objectLabel
+core/WhereUsedService.cls | public String objectName
+core/WhereUsedService.cls | public String objectOfLookup(String,String)
+core/WhereUsedService.cls | public class Reference
+core/WhereUsedService.cls | public class Target
+core/WhereUsedService.cls | public class WhereUsedException
+core/WhereUsedService.cls | public class WhereUsedService
+core/WhereUsedService.cls | public static List<Object> listOf(Object)
+core/WhereUsedService.cls | public static List<Reference> importColumnReferences(Target,Map<String,String>)
+core/WhereUsedService.cls | public static Map<String,Object> parsed(String)
+core/WhereUsedService.cls | public static Reference settingReference(String,String,String)
+core/WhereUsedService.cls | public static String tabUrl(String,Map<String,String>)
+core/WhereUsedService.cls | public static Target target(String,String)
+core/WhereUsedService.cls | public static final String KIND_IMPORT_MAPPING
+corporatehub/CorporateHubAccessSync.cls | public CorporateHubAccessSync()
+corporatehub/CorporateHubAccessSync.cls | public class CorporateHubAccessSync
+corporatehub/CorporateHubNightlyJobProvider.cls | public CorporateHubNightlyJobProvider()
+corporatehub/CorporateHubNightlyJobProvider.cls | public class CorporateHubNightlyJobProvider
+corporatehub/CorporateHubPortalExtension.cls | public CorporateHubPortalExtension()
+corporatehub/CorporateHubPortalExtension.cls | public class CorporateHubPortalExtension
+corporatehub/CorporateHubPostInstall.cls | public CorporateHubPostInstall()
+corporatehub/CorporateHubPostInstall.cls | public class CorporateHubPostInstall
+corporatehub/DataBreachHandler.cls | public DataBreachHandler()
+corporatehub/DataBreachHandler.cls | public class DataBreachHandler
+corporatehub/DataSubjectRequestHandler.cls | public DataSubjectRequestHandler()
+corporatehub/DataSubjectRequestHandler.cls | public class DataSubjectRequestHandler
+events/EventFormAttachment.cls | public EventFormAttachment()
+events/EventFormAttachment.cls | public class EventFormAttachment
+events/EventKeyHandler.cls | public EventKeyHandler()
+events/EventKeyHandler.cls | public class EventKeyHandler
+events/EventOperationsHandler.cls | public EventOperationsHandler()
+events/EventOperationsHandler.cls | public class EventOperationsHandler
+events/EventPaymentListener.cls | public EventPaymentListener()
+events/EventPaymentListener.cls | public class EventPaymentListener
+events/EventPublicPage.cls | public EventPublicPage()
+events/EventPublicPage.cls | public class EventPublicPage
+events/EventsAccessSync.cls | public EventsAccessSync()
+events/EventsAccessSync.cls | public class EventsAccessSync
+events/EventsEngagementSignal.cls | public EventsEngagementSignal()
+events/EventsEngagementSignal.cls | public class EventsEngagementSignal
+events/EventsHealthCheckExtension.cls | public EventsHealthCheckExtension()
+events/EventsHealthCheckExtension.cls | public class EventsHealthCheckExtension
+events/EventsNightlyJobProvider.cls | public EventsNightlyJobProvider()
+events/EventsNightlyJobProvider.cls | public class EventsNightlyJobProvider
+events/EventsPortalExtension.cls | public EventsPortalExtension()
+events/EventsPortalExtension.cls | public class EventsPortalExtension
+events/EventsPostInstall.cls | public EventsPostInstall()
+events/EventsPostInstall.cls | public class EventsPostInstall
+events/EventsSampleData.cls | public EventsSampleData()
+events/EventsSampleData.cls | public class EventsSampleData
+forms/FormPublicRest.cls | global class FormPublicRest
+forms/FormPublicRest.cls | global static void getForm()
+forms/FormPublicRest.cls | global static void submit()
+forms/FormsAccessSync.cls | public FormsAccessSync()
+forms/FormsAccessSync.cls | public class FormsAccessSync
+forms/FormsCatalogExtension.cls | public FormsCatalogExtension()
+forms/FormsCatalogExtension.cls | public class FormsCatalogExtension
+forms/FormsHealthCheckExtension.cls | public FormsHealthCheckExtension()
+forms/FormsHealthCheckExtension.cls | public class FormsHealthCheckExtension
+forms/FormsPostInstall.cls | public FormsPostInstall()
+forms/FormsPostInstall.cls | public class FormsPostInstall
+funders/FundersAccessSync.cls | public FundersAccessSync()
+funders/FundersAccessSync.cls | public class FundersAccessSync
+funders/FundersHealthCheckExtension.cls | public FundersHealthCheckExtension()
+funders/FundersHealthCheckExtension.cls | public class FundersHealthCheckExtension
+funders/FundersNightlyJobProvider.cls | public FundersNightlyJobProvider()
+funders/FundersNightlyJobProvider.cls | public class FundersNightlyJobProvider
+funders/FundersPostInstall.cls | public FundersPostInstall()
+funders/FundersPostInstall.cls | public class FundersPostInstall
+funders/FundersSampleData.cls | public FundersSampleData()
+funders/FundersSampleData.cls | public class FundersSampleData
+funders/GrantChecklistHandler.cls | public GrantChecklistHandler()
+funders/GrantChecklistHandler.cls | public class GrantChecklistHandler
+funders/GrantDatesHandler.cls | public GrantDatesHandler()
+funders/GrantDatesHandler.cls | public class GrantDatesHandler
+funders/GrantPaymentReceivedHandler.cls | public GrantPaymentReceivedHandler()
+funders/GrantPaymentReceivedHandler.cls | public class GrantPaymentReceivedHandler
+funders/GrantRenewalHandler.cls | public GrantRenewalHandler()
+funders/GrantRenewalHandler.cls | public class GrantRenewalHandler
+funders/GrantRequirementDatesHandler.cls | public GrantRequirementDatesHandler()
+funders/GrantRequirementDatesHandler.cls | public class GrantRequirementDatesHandler
+funders/GrantRequirementRulesHandler.cls | public GrantRequirementRulesHandler()
+funders/GrantRequirementRulesHandler.cls | public class GrantRequirementRulesHandler
+funders/GrantRulesHandler.cls | public GrantRulesHandler()
+funders/GrantRulesHandler.cls | public class GrantRulesHandler
+giving/AppealTriggerHandler.cls | public AppealTriggerHandler()
+giving/AppealTriggerHandler.cls | public class AppealTriggerHandler
+giving/AskNextAskDateHandler.cls | public AskNextAskDateHandler()
+giving/AskNextAskDateHandler.cls | public class AskNextAskDateHandler
+giving/AskTriggerHandler.cls | public AskTriggerHandler()
+giving/AskTriggerHandler.cls | public class AskTriggerHandler
+giving/CommitmentTriggerHandler.cls | public CommitmentTriggerHandler()
+giving/CommitmentTriggerHandler.cls | public class CommitmentTriggerHandler
+giving/DonorLevelTriggerHandler.cls | public DonorLevelTriggerHandler()
+giving/DonorLevelTriggerHandler.cls | public class DonorLevelTriggerHandler
+giving/DonorScoreTriggerHandler.cls | public DonorScoreTriggerHandler()
+giving/DonorScoreTriggerHandler.cls | public class DonorScoreTriggerHandler
+giving/FundTriggerHandler.cls | public FundTriggerHandler()
+giving/FundTriggerHandler.cls | public class FundTriggerHandler
+giving/GiftAcknowledgmentHandler.cls | public GiftAcknowledgmentHandler()
+giving/GiftAcknowledgmentHandler.cls | public class GiftAcknowledgmentHandler
+giving/GiftAllocationPostingLockHandler.cls | public GiftAllocationPostingLockHandler()
+giving/GiftAllocationPostingLockHandler.cls | public class GiftAllocationPostingLockHandler
+giving/GiftAllocationTriggerHandler.cls | public GiftAllocationTriggerHandler()
+giving/GiftAllocationTriggerHandler.cls | public class GiftAllocationTriggerHandler
+giving/GiftCommitmentHandler.cls | public GiftCommitmentHandler()
+giving/GiftCommitmentHandler.cls | public class GiftCommitmentHandler
+giving/GiftDonorDeleteGuardHandler.cls | public GiftDonorDeleteGuardHandler()
+giving/GiftDonorDeleteGuardHandler.cls | public class GiftDonorDeleteGuardHandler
+giving/GiftImportProcessor.cls | public GiftImportProcessor()
+giving/GiftImportProcessor.cls | public class GiftImportProcessor
+giving/GiftMatchingGiftHandler.cls | public GiftMatchingGiftHandler()
+giving/GiftMatchingGiftHandler.cls | public class GiftMatchingGiftHandler
+giving/GiftPostingLockHandler.cls | public GiftPostingLockHandler()
+giving/GiftPostingLockHandler.cls | public class GiftPostingLockHandler
+giving/GiftPostingService.cls | public class GiftPostingException
+giving/GiftPostingService.cls | public class GiftPostingService
+giving/GiftPostingService.cls | public static Boolean canPost()
+giving/GiftPostingService.cls | public static Integer markPosted(Set<Id>)
+giving/GiftPostingService.cls | public static final Integer MAX_GIFTS_PER_MARK
+giving/GiftPostingService.cls | public static final String POST_PERMISSION
+giving/GiftPostingService.cls | public static void unpost(Id,String)
+giving/GiftReceiptLockHandler.cls | public GiftReceiptLockHandler()
+giving/GiftReceiptLockHandler.cls | public class GiftReceiptLockHandler
+giving/GiftService.cls | public class GiftService
+giving/GiftService.cls | public static Id refund(Id,Decimal,String)
+giving/GiftService.cls | public static Map<Id,String> applyChosenFundsEach(List<Gift__c>,Map<Id,Id>)
+giving/GiftService.cls | public static Set<Id> applyChosenFunds(List<Gift__c>,Map<Id,Id>)
+giving/GiftSoftCreditHandler.cls | public GiftSoftCreditHandler()
+giving/GiftSoftCreditHandler.cls | public class GiftSoftCreditHandler
+giving/GiftTriggerHandler.cls | public GiftTriggerHandler()
+giving/GiftTriggerHandler.cls | public class GiftTriggerHandler
+giving/GivingAccessSync.cls | public GivingAccessSync()
+giving/GivingAccessSync.cls | public class GivingAccessSync
+giving/GivingDataProtectionExtension.cls | public GivingDataProtectionExtension()
+giving/GivingDataProtectionExtension.cls | public class GivingDataProtectionExtension
+giving/GivingDonationPage.cls | public GivingDonationPage()
+giving/GivingDonationPage.cls | public class GivingDonationPage
+giving/GivingDonations.cls | public GivingDonations()
+giving/GivingDonations.cls | public class GivingDonations
+giving/GivingEngagementSignal.cls | public GivingEngagementSignal()
+giving/GivingEngagementSignal.cls | public class GivingEngagementSignal
+giving/GivingHealthCheckExtension.cls | public GivingHealthCheckExtension()
+giving/GivingHealthCheckExtension.cls | public class GivingHealthCheckExtension
+giving/GivingHouseholdDependentsExtension.cls | public GivingHouseholdDependentsExtension()
+giving/GivingHouseholdDependentsExtension.cls | public class GivingHouseholdDependentsExtension
+giving/GivingNightlyJobProvider.cls | public GivingNightlyJobProvider()
+giving/GivingNightlyJobProvider.cls | public class GivingNightlyJobProvider
+giving/GivingPersonErasureExtension.cls | public GivingPersonErasureExtension()
+giving/GivingPersonErasureExtension.cls | public class GivingPersonErasureExtension
+giving/GivingPortalPayments.cls | public GivingPortalPayments()
+giving/GivingPortalPayments.cls | public class GivingPortalPayments
+giving/GivingPostInstall.cls | public GivingPostInstall()
+giving/GivingPostInstall.cls | public class GivingPostInstall
+giving/GivingRecordGlanceExtension.cls | public GivingRecordGlanceExtension()
+giving/GivingRecordGlanceExtension.cls | public class GivingRecordGlanceExtension
+giving/GivingSampleData.cls | public GivingSampleData()
+giving/GivingSampleData.cls | public class GivingSampleData
+giving/GivingSetupAssistantExtension.cls | public GivingSetupAssistantExtension()
+giving/GivingSetupAssistantExtension.cls | public class GivingSetupAssistantExtension
+giving/GivingWhereUsedExtension.cls | public GivingWhereUsedExtension()
+giving/GivingWhereUsedExtension.cls | public class GivingWhereUsedExtension
+giving/HouseholdSoftCreditHandler.cls | public HouseholdSoftCreditHandler()
+giving/HouseholdSoftCreditHandler.cls | public class HouseholdSoftCreditHandler
+giving/InstallmentTriggerHandler.cls | public InstallmentTriggerHandler()
+giving/InstallmentTriggerHandler.cls | public class InstallmentTriggerHandler
+giving/NpspGivingKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+giving/NpspGivingKit.cls | public MigrationCheck verify(String)
+giving/NpspGivingKit.cls | public NpspGivingKit()
+giving/NpspGivingKit.cls | public class NpspGivingKit
+giving/ReceiptRenderer.cls | public interface ReceiptRenderer
+giving/RecurringGiftEventHandler.cls | public RecurringGiftEventHandler()
+giving/RecurringGiftEventHandler.cls | public class RecurringGiftEventHandler
+giving/SoftCreditTriggerHandler.cls | public SoftCreditTriggerHandler()
+giving/SoftCreditTriggerHandler.cls | public class SoftCreditTriggerHandler
+giving/StewardshipCommitmentHandler.cls | public StewardshipCommitmentHandler()
+giving/StewardshipCommitmentHandler.cls | public class StewardshipCommitmentHandler
+giving/StewardshipPlanTriggerHandler.cls | public StewardshipPlanTriggerHandler()
+giving/StewardshipPlanTriggerHandler.cls | public class StewardshipPlanTriggerHandler
+giving/StewardshipPlanTriggerHandler.cls | public static void syncCompletedDates(List<SObject>)
+giving/StewardshipTriggerHandler.cls | public StewardshipTriggerHandler()
+giving/StewardshipTriggerHandler.cls | public class StewardshipTriggerHandler
+giving/TributeTriggerHandler.cls | public TributeTriggerHandler()
+giving/TributeTriggerHandler.cls | public class TributeTriggerHandler
+logicmodels/LogicModelScopeHandler.cls | public LogicModelScopeHandler()
+logicmodels/LogicModelScopeHandler.cls | public class LogicModelScopeHandler
+logicmodels/LogicModelsAccessSync.cls | public LogicModelsAccessSync()
+logicmodels/LogicModelsAccessSync.cls | public class LogicModelsAccessSync
+logicmodels/LogicModelsNightlyJobProvider.cls | public LogicModelsNightlyJobProvider()
+logicmodels/LogicModelsNightlyJobProvider.cls | public class LogicModelsNightlyJobProvider
+logicmodels/LogicModelsPostInstall.cls | public LogicModelsPostInstall()
+logicmodels/LogicModelsPostInstall.cls | public class LogicModelsPostInstall
+logicmodels/LogicModelsWhereUsedExtension.cls | public LogicModelsWhereUsedExtension()
+logicmodels/LogicModelsWhereUsedExtension.cls | public class LogicModelsWhereUsedExtension
+lwcbuilder/LwcBuilderAccessSync.cls | public LwcBuilderAccessSync()
+lwcbuilder/LwcBuilderAccessSync.cls | public class LwcBuilderAccessSync
+lwcbuilder/LwcBuilderPostInstall.cls | public LwcBuilderPostInstall()
+lwcbuilder/LwcBuilderPostInstall.cls | public class LwcBuilderPostInstall
+memberships/EssentialsMigrationKit.cls | public EssentialsMigrationKit()
+memberships/EssentialsMigrationKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+memberships/EssentialsMigrationKit.cls | public MigrationCheck verify(String)
+memberships/EssentialsMigrationKit.cls | public class EssentialsMigrationKit
+memberships/MembershipPaymentListener.cls | public MembershipPaymentListener()
+memberships/MembershipPaymentListener.cls | public class MembershipPaymentListener
+memberships/MembershipTermHandler.cls | public MembershipTermHandler()
+memberships/MembershipTermHandler.cls | public class MembershipTermHandler
+memberships/MembershipsAccessSync.cls | public MembershipsAccessSync()
+memberships/MembershipsAccessSync.cls | public class MembershipsAccessSync
+memberships/MembershipsErasureExtension.cls | public MembershipsErasureExtension()
+memberships/MembershipsErasureExtension.cls | public class MembershipsErasureExtension
+memberships/MembershipsNightlyJobProvider.cls | public MembershipsNightlyJobProvider()
+memberships/MembershipsNightlyJobProvider.cls | public class MembershipsNightlyJobProvider
+memberships/MembershipsPortalExtension.cls | public MembershipsPortalExtension()
+memberships/MembershipsPortalExtension.cls | public class MembershipsPortalExtension
+memberships/MembershipsPostInstall.cls | public MembershipsPostInstall()
+memberships/MembershipsPostInstall.cls | public class MembershipsPostInstall
+mirror/CampaignSyncTriggerHandler.cls | public CampaignSyncTriggerHandler()
+mirror/CampaignSyncTriggerHandler.cls | public class CampaignSyncTriggerHandler
+mirror/GiftTransactionMirrorTriggerHandler.cls | public GiftTransactionMirrorTriggerHandler()
+mirror/GiftTransactionMirrorTriggerHandler.cls | public class GiftTransactionMirrorTriggerHandler
+mirror/InboundGift.cls | global Date giftDate
+mirror/InboundGift.cls | global Decimal amount
+mirror/InboundGift.cls | global InboundGift()
+mirror/InboundGift.cls | global String appealId
+mirror/InboundGift.cls | global String donorEmail
+mirror/InboundGift.cls | global String donorId
+mirror/InboundGift.cls | global String externalId
+mirror/InboundGift.cls | global String fundCode
+mirror/InboundGift.cls | global String fundId
+mirror/InboundGift.cls | global String paymentMethod
+mirror/InboundGift.cls | global String paymentReference
+mirror/InboundGift.cls | global class InboundGift
+mirror/InboundGiftAction.cls | global class InboundGiftAction
+mirror/InboundGiftAction.cls | global static List<InboundGiftResult> record(List<InboundGift>)
+mirror/InboundGiftResource.cls | global class InboundGiftResource
+mirror/InboundGiftResource.cls | global static void create()
+mirror/InboundGiftResult.cls | global Id giftId
+mirror/InboundGiftResult.cls | global String errorCode
+mirror/InboundGiftResult.cls | global String message
+mirror/InboundGiftResult.cls | global String outcome
+mirror/InboundGiftResult.cls | global class InboundGiftResult
+mirror/MirrorAccessSync.cls | public MirrorAccessSync()
+mirror/MirrorAccessSync.cls | public class MirrorAccessSync
+mirror/MirrorHealthCheckExtension.cls | public MirrorHealthCheckExtension()
+mirror/MirrorHealthCheckExtension.cls | public class MirrorHealthCheckExtension
+mirror/MirrorNightlyJobProvider.cls | public MirrorNightlyJobProvider()
+mirror/MirrorNightlyJobProvider.cls | public class MirrorNightlyJobProvider
+mirror/MirrorPostInstall.cls | public MirrorPostInstall()
+mirror/MirrorPostInstall.cls | public class MirrorPostInstall
+mirror/NpcGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+mirror/NpcGiftsKit.cls | public MigrationCheck verify(String)
+mirror/NpcGiftsKit.cls | public NpcGiftsKit()
+mirror/NpcGiftsKit.cls | public class NpcGiftsKit
+mirror/NpcHouseholdSource.cls | public Integer count
+mirror/NpcHouseholdSource.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+mirror/NpcHouseholdSource.cls | public List<String> names
+mirror/NpcHouseholdSource.cls | public MigrationCheck verify(String)
+mirror/NpcHouseholdSource.cls | public NpcHouseholdSource()
+mirror/NpcHouseholdSource.cls | public class Drift
+mirror/NpcHouseholdSource.cls | public class NpcHouseholdSource
+mirror/NpcHouseholdSource.cls | public static Drift drift(Integer)
+mirror/NpcRelationsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+mirror/NpcRelationsKit.cls | public MigrationCheck verify(String)
+mirror/NpcRelationsKit.cls | public NpcRelationsKit()
+mirror/NpcRelationsKit.cls | public class NpcRelationsKit
+mirror/NpspGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+mirror/NpspGiftsKit.cls | public MigrationCheck verify(String)
+mirror/NpspGiftsKit.cls | public NpspGiftsKit()
+mirror/NpspGiftsKit.cls | public class NpspGiftsKit
+mirror/OpportunityMirrorTriggerHandler.cls | public OpportunityMirrorTriggerHandler()
+mirror/OpportunityMirrorTriggerHandler.cls | public class OpportunityMirrorTriggerHandler
+payments/PaymentWebhookRest.cls | global class PaymentWebhookRest
+payments/PaymentWebhookRest.cls | global static void receive()
+payments/PaymentsAccessSync.cls | public PaymentsAccessSync()
+payments/PaymentsAccessSync.cls | public class PaymentsAccessSync
+payments/PaymentsApi.cls | public PaymentsApi()
+payments/PaymentsApi.cls | public class PaymentsApi
+payments/PaymentsHealthCheckExtension.cls | public PaymentsHealthCheckExtension()
+payments/PaymentsHealthCheckExtension.cls | public class PaymentsHealthCheckExtension
+payments/PaymentsPostInstall.cls | public PaymentsPostInstall()
+payments/PaymentsPostInstall.cls | public class PaymentsPostInstall
+portal/PortalAccessSync.cls | public PortalAccessSync()
+portal/PortalAccessSync.cls | public class PortalAccessSync
+portal/PortalApi.cls | global class PortalApi
+portal/PortalApi.cls | global static void doGet()
+portal/PortalApi.cls | global static void doPost()
+portal/PortalPostInstall.cls | public PortalPostInstall()
+portal/PortalPostInstall.cls | public class PortalPostInstall
+programs/EnrollmentCapacity.cls | public EnrollmentCapacity()
+programs/EnrollmentCapacity.cls | public class EnrollmentCapacity
+programs/EnrollmentDatesHandler.cls | public EnrollmentDatesHandler()
+programs/EnrollmentDatesHandler.cls | public class EnrollmentDatesHandler
+programs/EnrollmentRulesHandler.cls | public EnrollmentRulesHandler()
+programs/EnrollmentRulesHandler.cls | public class EnrollmentRulesHandler
+programs/EnrollmentService.cls | public class EnrollmentService
+programs/EnrollmentService.cls | public static Boolean isOpen(String)
+programs/EnrollmentService.cls | public static final List<String> STAGES
+programs/EnrollmentService.cls | public static final Set<String> OPEN_STAGES
+programs/EnrollmentService.cls | public static final String STAGE_APPLIED
+programs/EnrollmentService.cls | public static final String STAGE_COMPLETED
+programs/EnrollmentService.cls | public static final String STAGE_ENROLLED
+programs/EnrollmentService.cls | public static final String STAGE_WAITLISTED
+programs/EnrollmentService.cls | public static final String STAGE_WITHDRAWN
+programs/ProgramsAccessSync.cls | public ProgramsAccessSync()
+programs/ProgramsAccessSync.cls | public class ProgramsAccessSync
+programs/ProgramsErasureExtension.cls | public ProgramsErasureExtension()
+programs/ProgramsErasureExtension.cls | public class ProgramsErasureExtension
+programs/ProgramsHealthCheckExtension.cls | public ProgramsHealthCheckExtension()
+programs/ProgramsHealthCheckExtension.cls | public class ProgramsHealthCheckExtension
+programs/ProgramsNightlyJobProvider.cls | public ProgramsNightlyJobProvider()
+programs/ProgramsNightlyJobProvider.cls | public class ProgramsNightlyJobProvider
+programs/ProgramsPostInstall.cls | public ProgramsPostInstall()
+programs/ProgramsPostInstall.cls | public class ProgramsPostInstall
+programs/ProgramsSampleData.cls | public ProgramsSampleData()
+programs/ProgramsSampleData.cls | public class ProgramsSampleData
+programs/ProgramsSharingHandler.cls | public ProgramsSharingHandler()
+programs/ProgramsSharingHandler.cls | public class ProgramsSharingHandler
+programs/ProgramsWhereUsedExtension.cls | public ProgramsWhereUsedExtension()
+programs/ProgramsWhereUsedExtension.cls | public class ProgramsWhereUsedExtension
+programs/ServiceDeliveryRulesHandler.cls | public ServiceDeliveryRulesHandler()
+programs/ServiceDeliveryRulesHandler.cls | public class ServiceDeliveryRulesHandler
+programs/ServiceDeliveryService.cls | public class ServiceDeliveryService
+programs/ServiceDeliveryService.cls | public static final String EXCUSED_ABSENCE
+programs/ServiceDeliveryService.cls | public static final String PRESENT
+programs/ServiceDeliveryService.cls | public static final String UNEXCUSED_ABSENCE
+programs/ServicePlanDatesHandler.cls | public ServicePlanDatesHandler()
+programs/ServicePlanDatesHandler.cls | public class ServicePlanDatesHandler
+programs/SessionScheduleTriggerHandler.cls | public SessionScheduleTriggerHandler()
+programs/SessionScheduleTriggerHandler.cls | public class SessionScheduleTriggerHandler
+projects/ProjectEntryHandler.cls | public ProjectEntryHandler()
+projects/ProjectEntryHandler.cls | public class ProjectEntryHandler
+projects/ProjectInvoiceHandler.cls | public ProjectInvoiceHandler()
+projects/ProjectInvoiceHandler.cls | public class ProjectInvoiceHandler
+projects/ProjectInvoicePaymentListener.cls | public ProjectInvoicePaymentListener()
+projects/ProjectInvoicePaymentListener.cls | public class ProjectInvoicePaymentListener
+projects/ProjectsAccessSync.cls | public ProjectsAccessSync()
+projects/ProjectsAccessSync.cls | public class ProjectsAccessSync
+projects/ProjectsNightlyJobProvider.cls | public ProjectsNightlyJobProvider()
+projects/ProjectsNightlyJobProvider.cls | public class ProjectsNightlyJobProvider
+projects/ProjectsPostInstall.cls | public ProjectsPostInstall()
+projects/ProjectsPostInstall.cls | public class ProjectsPostInstall
+rollups/RollupApi.cls | global class RollupApi
+rollups/RollupApi.cls | global static void recalculate(Set<Id>)
+rollups/RollupApi.cls | global static void recalculateChanges(List<SObject>,Map<Id,SObject>,Boolean)
+rollups/RollupCurrency.cls | public class RollupCurrency
+rollups/RollupCurrency.cls | public static Boolean isMultiCurrency()
+rollups/RollupCurrency.cls | public static Decimal toCorporate(Decimal,String)
+rollups/RollupCurrency.cls | public static final String ISO_FIELD
+rollups/RollupDefinitionValidationHandler.cls | public RollupDefinitionValidationHandler()
+rollups/RollupDefinitionValidationHandler.cls | public class RollupDefinitionValidationHandler
+rollups/RollupEngine.cls | public Boolean admitted
+rollups/RollupEngine.cls | public Boolean planned
+rollups/RollupEngine.cls | public List<Rollup_Definition__c> ran
+rollups/RollupEngine.cls | public List<Rollup_Definition__c> refused
+rollups/RollupEngine.cls | public Map<Id,String> failed
+rollups/RollupEngine.cls | public Object calculated
+rollups/RollupEngine.cls | public Object current
+rollups/RollupEngine.cls | public Set<Id> written
+rollups/RollupEngine.cls | public class Preview
+rollups/RollupEngine.cls | public class Result
+rollups/RollupEngine.cls | public class RollupEngine
+rollups/RollupEngine.cls | public static Preview preview(Rollup_Definition__c,Id)
+rollups/RollupEngine.cls | public static Result recalculate(Set<Id>,List<Rollup_Definition__c>)
+rollups/RollupEngine.cls | public static Result recalculate(Set<Id>,Schema.SObjectType)
+rollups/RollupEngine.cls | public static final Integer RECORDS_PER_PASS
+rollups/RollupInstantTrigger.cls | global class RollupInstantTrigger
+rollups/RollupInstantTrigger.cls | global static Boolean hasRun()
+rollups/RollupInstantTrigger.cls | global static void run()
+rollups/RollupQueue.cls | public class RollupQueue
+rollups/RollupQueue.cls | public static final String STATUS_FAILED
+rollups/RollupQueue.cls | public static final String STATUS_PENDING
+rollups/RollupRecalcAction.cls | global Boolean deleting
+rollups/RollupRecalcAction.cls | global SObject priorRecord
+rollups/RollupRecalcAction.cls | global SObject record
+rollups/RollupRecalcAction.cls | global class Request
+rollups/RollupRecalcAction.cls | global class RollupRecalcAction
+rollups/RollupRecalcAction.cls | global static void recalculate(List<Request>)
+rollups/RollupRecalcRecordAction.cls | global Id recordId
+rollups/RollupRecalcRecordAction.cls | global String rollup
+rollups/RollupRecalcRecordAction.cls | global class Request
+rollups/RollupRecalcRecordAction.cls | global class RollupRecalcRecordAction
+rollups/RollupRecalcRecordAction.cls | global static void recalculate(List<Request>)
+rollups/RollupService.cls | public class RollupService
+rollups/RollupService.cls | public class RollupServiceException
+rollups/RollupService.cls | public static Boolean hasInstantUpdates(String)
+rollups/RollupService.cls | public static Boolean isStale()
+rollups/RollupService.cls | public static Boolean isStopped()
+rollups/RollupService.cls | public static Boolean isTurnedOff()
+rollups/RollupService.cls | public static Boolean recalculatesInTheSave()
+rollups/RollupService.cls | public static Datetime lastCalculated()
+rollups/RollupService.cls | public static Integer ensureDefaults()
+rollups/RollupService.cls | public static Integer ensureDefaultsDuringInstall(String)
+rollups/RollupService.cls | public static Integer plannedQueries(Map<String,List<Rollup_Definition__c>>)
+rollups/RollupService.cls | public static Integer runFullRecalculation(List<Rollup_Definition__c>)
+rollups/RollupService.cls | public static List<String> missingDefaultNames()
+rollups/RollupService.cls | public static List<String> skippedDefaultNames()
+rollups/RollupService.cls | public static Set<String> everyMode()
+rollups/RollupService.cls | public static Set<String> recalculateTargets(Set<Id>,String)
+rollups/RollupService.cls | public static Set<String> scheduledModes()
+rollups/RollupService.cls | public static String defaultMode()
+rollups/RollupService.cls | public static final Integer STALE_AFTER_HOURS
+rollups/RollupService.cls | public static final String FRESHNESS_FIELD
+rollups/RollupService.cls | public static final String MODE_BOTH
+rollups/RollupService.cls | public static final String MODE_DEFAULT_SETTING
+rollups/RollupService.cls | public static final String MODE_REAL_TIME
+rollups/RollupService.cls | public static final String MODE_SCHEDULED
+rollups/RollupService.cls | public static final String MODULE_NAME
+rollups/RollupService.cls | public static final String PROCESSING_BACKGROUND
+rollups/RollupService.cls | public static final String PROCESSING_IN_SAVE
+rollups/RollupService.cls | public static final String PROCESSING_SETTING
+rollups/RollupService.cls | public static final String SETTINGS_OBJECT
+rollups/RollupService.cls | public static void catchUpAfterTurnedOn()
+rollups/RollupService.cls | public static void recalculate(Id)
+rollups/RollupService.cls | public static void runAfterDelete(String,List<SObject>)
+rollups/RollupService.cls | public static void runAfterMerge(String,List<SObject>)
+rollups/RollupService.cls | public static void runForFlow(String,List<SObject>,Map<Id,SObject>,Boolean)
+rollups/RollupService.cls | public static void runForSurvivors(String,Set<Id>)
+rollups/RollupService.cls | public static void runRealTime(String,List<SObject>,Map<Id,SObject>)
+rollups/RollupService.cls | public static void startQueuedRecalculation()
+rollups/RollupTriggerHandler.cls | public RollupTriggerHandler()
+rollups/RollupTriggerHandler.cls | public class RollupTriggerHandler
+rollups/RollupsEngineExtension.cls | public RollupsEngineExtension()
+rollups/RollupsEngineExtension.cls | public class RollupsEngineExtension
+rollups/RollupsHealthCheckExtension.cls | public RollupsHealthCheckExtension()
+rollups/RollupsHealthCheckExtension.cls | public class RollupsHealthCheckExtension
+rollups/RollupsHealthCheckExtension.cls | public static final String FIX_KEY_RESTORE_ROLLUPS
+rollups/RollupsNightlyJobProvider.cls | public RollupsNightlyJobProvider()
+rollups/RollupsNightlyJobProvider.cls | public class RollupsNightlyJobProvider
+rollups/RollupsPostInstall.cls | public RollupsPostInstall()
+rollups/RollupsPostInstall.cls | public class RollupsPostInstall
+rollups/RollupsWhereUsedExtension.cls | public RollupsWhereUsedExtension()
+rollups/RollupsWhereUsedExtension.cls | public class RollupsWhereUsedExtension
+scholarships/AwardPaymentRulesHandler.cls | public AwardPaymentRulesHandler()
+scholarships/AwardPaymentRulesHandler.cls | public class AwardPaymentRulesHandler
+scholarships/OutboundFundsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+scholarships/OutboundFundsKit.cls | public MigrationCheck verify(String)
+scholarships/OutboundFundsKit.cls | public OutboundFundsKit()
+scholarships/OutboundFundsKit.cls | public class OutboundFundsKit
+scholarships/ScholarshipFormAttachment.cls | public ScholarshipFormAttachment()
+scholarships/ScholarshipFormAttachment.cls | public class ScholarshipFormAttachment
+scholarships/ScholarshipsAccessSync.cls | public ScholarshipsAccessSync()
+scholarships/ScholarshipsAccessSync.cls | public class ScholarshipsAccessSync
+scholarships/ScholarshipsNightlyJobProvider.cls | public ScholarshipsNightlyJobProvider()
+scholarships/ScholarshipsNightlyJobProvider.cls | public class ScholarshipsNightlyJobProvider
+scholarships/ScholarshipsPortalExtension.cls | public ScholarshipsPortalExtension()
+scholarships/ScholarshipsPortalExtension.cls | public class ScholarshipsPortalExtension
+scholarships/ScholarshipsPostInstall.cls | public ScholarshipsPostInstall()
+scholarships/ScholarshipsPostInstall.cls | public class ScholarshipsPostInstall
+territory/TerritoryAccessSync.cls | public TerritoryAccessSync()
+territory/TerritoryAccessSync.cls | public class TerritoryAccessSync
+territory/TerritoryNightlyJobProvider.cls | public TerritoryNightlyJobProvider()
+territory/TerritoryNightlyJobProvider.cls | public class TerritoryNightlyJobProvider
+territory/TerritoryPostInstall.cls | public TerritoryPostInstall()
+territory/TerritoryPostInstall.cls | public class TerritoryPostInstall
+volunteers/ShiftScheduleTriggerHandler.cls | public ShiftScheduleTriggerHandler()
+volunteers/ShiftScheduleTriggerHandler.cls | public class ShiftScheduleTriggerHandler
+volunteers/V4sMigrationKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+volunteers/V4sMigrationKit.cls | public MigrationCheck verify(String)
+volunteers/V4sMigrationKit.cls | public V4sMigrationKit()
+volunteers/V4sMigrationKit.cls | public class V4sMigrationKit
+volunteers/VolunteerFormAttachment.cls | public VolunteerFormAttachment()
+volunteers/VolunteerFormAttachment.cls | public class VolunteerFormAttachment
+volunteers/VolunteerHoursDeleteGuardHandler.cls | public VolunteerHoursDeleteGuardHandler()
+volunteers/VolunteerHoursDeleteGuardHandler.cls | public class VolunteerHoursDeleteGuardHandler
+volunteers/VolunteerHoursTriggerHandler.cls | public VolunteerHoursTriggerHandler()
+volunteers/VolunteerHoursTriggerHandler.cls | public class VolunteerHoursTriggerHandler
+volunteers/VolunteerJobTriggerHandler.cls | public VolunteerJobTriggerHandler()
+volunteers/VolunteerJobTriggerHandler.cls | public class VolunteerJobTriggerHandler
+volunteers/VolunteerLetterTemplateTriggerHandler.cls | public VolunteerLetterTemplateTriggerHandler()
+volunteers/VolunteerLetterTemplateTriggerHandler.cls | public class VolunteerLetterTemplateTriggerHandler
+volunteers/VolunteerPersonDeleteHandler.cls | public VolunteerPersonDeleteHandler()
+volunteers/VolunteerPersonDeleteHandler.cls | public class VolunteerPersonDeleteHandler
+volunteers/VolunteerPublicPage.cls | public VolunteerPublicPage()
+volunteers/VolunteerPublicPage.cls | public class VolunteerPublicPage
+volunteers/VolunteerShiftTriggerHandler.cls | public VolunteerShiftTriggerHandler()
+volunteers/VolunteerShiftTriggerHandler.cls | public class VolunteerShiftTriggerHandler
+volunteers/VolunteerSignupTriggerHandler.cls | public VolunteerSignupTriggerHandler()
+volunteers/VolunteerSignupTriggerHandler.cls | public class VolunteerSignupTriggerHandler
+volunteers/VolunteersAccessSync.cls | public VolunteersAccessSync()
+volunteers/VolunteersAccessSync.cls | public class VolunteersAccessSync
+volunteers/VolunteersEngagementSignal.cls | public VolunteersEngagementSignal()
+volunteers/VolunteersEngagementSignal.cls | public class VolunteersEngagementSignal
+volunteers/VolunteersErasureExtension.cls | public VolunteersErasureExtension()
+volunteers/VolunteersErasureExtension.cls | public class VolunteersErasureExtension
+volunteers/VolunteersEventExtension.cls | public VolunteersEventExtension()
+volunteers/VolunteersEventExtension.cls | public class VolunteersEventExtension
+volunteers/VolunteersHealthCheckExtension.cls | public VolunteersHealthCheckExtension()
+volunteers/VolunteersHealthCheckExtension.cls | public class VolunteersHealthCheckExtension
+volunteers/VolunteersHealthCheckExtension.cls | public static final String FIX_KEY_COORDINATOR_ACCESS
+volunteers/VolunteersHouseholdDependentsExtension.cls | public VolunteersHouseholdDependentsExtension()
+volunteers/VolunteersHouseholdDependentsExtension.cls | public class VolunteersHouseholdDependentsExtension
+volunteers/VolunteersNightlyJobProvider.cls | public VolunteersNightlyJobProvider()
+volunteers/VolunteersNightlyJobProvider.cls | public class VolunteersNightlyJobProvider
+volunteers/VolunteersPortalExtension.cls | public VolunteersPortalExtension()
+volunteers/VolunteersPortalExtension.cls | public class VolunteersPortalExtension
+volunteers/VolunteersPostInstall.cls | public VolunteersPostInstall()
+volunteers/VolunteersPostInstall.cls | public class VolunteersPostInstall
+volunteers/VolunteersSampleData.cls | public VolunteersSampleData()
+volunteers/VolunteersSampleData.cls | public class VolunteersSampleData

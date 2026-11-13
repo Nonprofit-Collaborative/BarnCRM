@@ -952,6 +952,27 @@ scripts/packaging/create-versions.sh --devhub <pbo-devhub> --packages giving
 `--no-code-coverage` skips the test run, but a version built that way can never be promoted.
 `scripts/ci/tests/test_create_versions.py` runs the plan mode and the refusals.
 
+### Global and namespace-accessible API
+
+Once a managed version is promoted, a `global` signature can never be removed or changed, and
+an `@NamespaceAccessible` one is what every other BarnCRM package compiles against: a module
+installed at an older version breaks when Core drops one. So the rule is **deprecate for one
+release, never remove**: mark the member `@Deprecated` (for `global`) or say so in its doc
+comment, stop calling it, and keep it working. Keep the `global` surface small (today `BarnInstallCheck`,
+the invocable actions, the REST resources, `InboundGift` and Rollup Builder's `RollupApi` and
+`RollupInstantTrigger`).
+
+`scripts/ci/check-api-surface.py` (D-200, N8) lists every `global` and `@NamespaceAccessible`
+signature in packaged Apex in `scripts/ci/api-surface.txt`, one `<package>/<file> |
+<signature>` line each (annotations, parameter names and bodies left out; a type is its
+access, `virtual` or `abstract`, kind and name). It fails when a snapshot line no longer
+matches the source (removed or changed), and when the source has a signature the snapshot
+lacks. For an addition, run `python3 scripts/ci/check-api-surface.py --update` and commit the
+snapshot with the change; it refuses while anything was removed. A removal the owner approves
+before the first promoted version is made by editing the snapshot by hand in the same pull
+request, so the reviewer sees it. Integrators: after merging branches that each added
+signatures, run `--update` once on the landing branch.
+
 ### Tests survive an org's own customizations
 
 BarnCRM installs as source with no namespace, so its tests are the org's local tests: they run
