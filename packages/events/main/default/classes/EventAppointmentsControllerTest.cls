@@ -27,7 +27,9 @@ private class EventAppointmentsControllerTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = new Contact(FirstName = 'Test', LastName = lastName);
+		Contact record = TestDataFactory.person(
+			new Contact(FirstName = 'Test', LastName = lastName)
+		);
 		insert as user record;
 		return record;
 	}

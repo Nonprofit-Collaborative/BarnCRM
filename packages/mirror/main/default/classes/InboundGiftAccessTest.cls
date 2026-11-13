@@ -28,31 +28,36 @@ private class InboundGiftAccessTest {
 				)
 			};
 			insert new Appeal__c(Name = 'Spring Appeal');
-			Account household = new Account(
-				Name = 'The Garcia Household',
-				RecordTypeId = HouseholdService.householdRecordTypeId(),
-				OwnerId = integration.Id
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Garcia Household',
+					RecordTypeId = HouseholdService.householdRecordTypeId(),
+					OwnerId = integration.Id
+				)
 			);
-			Account riverside = new Account(
-				Name = 'Riverside Foundation',
-				OwnerId = integration.Id
+			Account riverside = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation', OwnerId = integration.Id)
 			);
 			Database.insert(new List<Account>{ household, riverside }, AccessLevel.SYSTEM_MODE);
 			// Two people in one household, so a gift from Luis earns Maria an automatic household
 			// soft credit (R-SC3, on by default), which the integration user's save creates.
 			insert new List<Contact>{
-				new Contact(
-					FirstName = 'Luis',
-					LastName = 'Garcia',
-					Email = EMAIL,
-					AccountId = household.Id,
-					OwnerId = integration.Id
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Luis',
+						LastName = 'Garcia',
+						Email = EMAIL,
+						AccountId = household.Id,
+						OwnerId = integration.Id
+					)
 				),
-				new Contact(
-					FirstName = 'Maria',
-					LastName = 'Garcia',
-					AccountId = household.Id,
-					OwnerId = integration.Id
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Maria',
+						LastName = 'Garcia',
+						AccountId = household.Id,
+						OwnerId = integration.Id
+					)
 				)
 			};
 			BarnCRM_Settings__c running = TestDataFactory.defaultSettings();

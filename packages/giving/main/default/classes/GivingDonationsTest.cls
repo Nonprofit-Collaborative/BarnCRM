@@ -72,7 +72,9 @@ private class GivingDonationsTest {
 	}
 
 	private static Contact donor() {
-		Contact person = new Contact(FirstName = 'Dana', LastName = 'Zzdonor');
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Dana', LastName = 'Zzdonor')
+		);
 		insert as user person;
 		return person;
 	}

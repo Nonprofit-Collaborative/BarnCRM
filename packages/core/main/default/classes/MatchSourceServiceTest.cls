@@ -208,8 +208,8 @@ private class MatchSourceServiceTest {
 			};
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
-					new Contact(FirstName = 'Ana', LastName = 'Ruiz'),
-					new Contact(FirstName = 'Ben', LastName = 'Okafor')
+					TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ruiz')),
+					TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = 'Okafor'))
 				}
 			);
 
@@ -271,9 +271,11 @@ private class MatchSourceServiceTest {
 			};
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
-					new Contact(FirstName = 'Ana', LastName = 'Ruiz'),
-					new Contact(FirstName = 'Anna', LastName = 'Ruiz-Lopez'),
-					new Contact(FirstName = 'Ben', LastName = 'Okafor')
+					TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ruiz')),
+					TestDataFactory.person(
+						new Contact(FirstName = 'Anna', LastName = 'Ruiz-Lopez')
+					),
+					TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = 'Okafor'))
 				}
 			);
 			insert new List<Address__c>{
@@ -396,7 +398,9 @@ private class MatchSourceServiceTest {
 					'Address'
 				)
 			};
-			Contact person = new Contact(FirstName = 'Ida', LastName = 'Nobody');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ida', LastName = 'Nobody')
+			);
 			insert person;
 
 			Test.startTest();
@@ -451,9 +455,11 @@ private class MatchSourceServiceTest {
 				emailByIndividual()
 			};
 			List<Contact> people = new List<Contact>{
-				new Contact(LastName = 'Ivy', Email = 'ivy@example.org'),
-				new Contact(LastName = 'Ivy-Lane', Email = 'IVY@example.org'),
-				new Contact(LastName = 'Other', Email = 'other@example.org')
+				TestDataFactory.person(new Contact(LastName = 'Ivy', Email = 'ivy@example.org')),
+				TestDataFactory.person(
+					new Contact(LastName = 'Ivy-Lane', Email = 'IVY@example.org')
+				),
+				TestDataFactory.person(new Contact(LastName = 'Other', Email = 'other@example.org'))
 			};
 			for (Integer index = 0; index < people.size(); index++) {
 				people[index].put('IndividualId', ivys[index].Id);
@@ -493,8 +499,8 @@ private class MatchSourceServiceTest {
 			};
 			List<Account> people = new List<Account>();
 			for (Integer index = 0; index < 2; index++) {
-				Account person = new Account(
-					RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+				Account person = TestDataFactory.organization(
+					new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId())
 				);
 				person.put('LastName', 'Ivy' + index);
 				person.put('PersonEmail', 'ivy.person@example.org');
@@ -596,8 +602,8 @@ private class MatchSourceServiceTest {
 			};
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
-					new Contact(LastName = 'Capped'),
-					new Contact(LastName = 'Capped-Too')
+					TestDataFactory.person(new Contact(LastName = 'Capped')),
+					TestDataFactory.person(new Contact(LastName = 'Capped-Too'))
 				}
 			);
 			insert new List<Address__c>{
@@ -710,7 +716,9 @@ private class MatchSourceServiceTest {
 				row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
 			};
 			List<Account> homes = householdsSharing('pair@example.org', 2);
-			Contact incoming = new Contact(LastName = 'Desk', Email = 'pair@example.org');
+			Contact incoming = TestDataFactory.person(
+				new Contact(LastName = 'Desk', Email = 'pair@example.org')
+			);
 
 			Test.startTest();
 			// The message catalog is read once per transaction; count only the sources' queries.

@@ -9,17 +9,21 @@ private class ImportMatcherTest {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
 			insert new List<Contact>{
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Ramirez',
-					Email = 'ana@example.org',
-					MailingPostalCode = '97201'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Ana',
+						LastName = 'Ramirez',
+						Email = 'ana@example.org',
+						MailingPostalCode = '97201'
+					)
 				),
-				new Contact(
-					FirstName = 'Ben',
-					LastName = 'Okafor',
-					Email = 'ben@example.org',
-					MailingPostalCode = '97202'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Ben',
+						LastName = 'Okafor',
+						Email = 'ben@example.org',
+						MailingPostalCode = '97202'
+					)
 				)
 			};
 		}
@@ -137,9 +141,8 @@ private class ImportMatcherTest {
 	static void matchesOrganizationsByNameWithinTheirRecordType() {
 		System.runAs(TestUsers.admin()) {
 			Id organizationRecordType = AccountKindsTestData.organizationRecordTypeId();
-			insert new Account(
-				Name = 'Rose City Foundation',
-				RecordTypeId = organizationRecordType
+			insert TestDataFactory.organization(
+				new Account(Name = 'Rose City Foundation', RecordTypeId = organizationRecordType)
 			);
 
 			Test.startTest();
@@ -208,7 +211,9 @@ private class ImportMatcherTest {
 			Database.DMLOptions options = new Database.DMLOptions();
 			options.DuplicateRuleHeader.AllowSave = true;
 			Database.insert(
-				new Contact(LastName = 'Noreadramirez', Email = 'noread.ana@example.org'),
+				TestDataFactory.person(
+					new Contact(LastName = 'Noreadramirez', Email = 'noread.ana@example.org')
+				),
 				options
 			);
 			User reader = new User(

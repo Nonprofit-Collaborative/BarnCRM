@@ -18,7 +18,7 @@ private class BulkJobSupportTest {
 		System.runAs(TestUsers.admin()) {
 			// No last name: the platform refuses, and nothing is saved.
 			Database.SaveResult refused = Database.insert(
-				new Contact(),
+				TestDataFactory.person(new Contact()),
 				false,
 				AccessLevel.USER_MODE
 			);

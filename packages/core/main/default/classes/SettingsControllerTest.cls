@@ -930,7 +930,9 @@ private class SettingsControllerTest {
 					Sort_Order__c = 1
 				)
 			};
-			Account account = new Account(Name = 'Riverside Test Trust');
+			Account account = TestDataFactory.organization(
+				new Account(Name = 'Riverside Test Trust')
+			);
 			insert account;
 			// A well formed Account Id that no record has (the local `account` shadows the Account type).
 			String gone = String.valueOf(account.Id).left(3) + '000000000001';

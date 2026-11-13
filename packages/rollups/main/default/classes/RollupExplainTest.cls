@@ -58,12 +58,20 @@ private class RollupExplainTest {
 
 	/** The organization and its children, owned by this person so they can open them. */
 	private static Account parent(Id ownerId) {
-		Account parent = new Account(Name = 'Parent Org', Member_Count__c = 2, OwnerId = ownerId);
+		Account parent = TestDataFactory.organization(
+			new Account(Name = 'Parent Org', Member_Count__c = 2, OwnerId = ownerId)
+		);
 		insert parent;
 		insert new List<Account>{
-			new Account(Name = 'Kid One', ParentId = parent.Id, OwnerId = ownerId),
-			new Account(Name = 'Kid Two', ParentId = parent.Id, OwnerId = ownerId),
-			new Account(Name = 'Other', ParentId = parent.Id, OwnerId = ownerId)
+			TestDataFactory.organization(
+				new Account(Name = 'Kid One', ParentId = parent.Id, OwnerId = ownerId)
+			),
+			TestDataFactory.organization(
+				new Account(Name = 'Kid Two', ParentId = parent.Id, OwnerId = ownerId)
+			),
+			TestDataFactory.organization(
+				new Account(Name = 'Other', ParentId = parent.Id, OwnerId = ownerId)
+			)
 		};
 		return parent;
 	}
@@ -164,7 +172,7 @@ private class RollupExplainTest {
 			System.runAs(maria()) {
 				insert kidCount(null, true);
 				// Deleted after the page loaded: the record query finds nothing to read.
-				Account gone = new Account(Name = 'Gone Org');
+				Account gone = TestDataFactory.organization(new Account(Name = 'Gone Org'));
 				insert gone;
 				delete gone;
 				explained = RollupExplainController.explain(gone.Id);

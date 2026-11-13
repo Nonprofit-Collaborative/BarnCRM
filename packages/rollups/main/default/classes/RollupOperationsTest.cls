@@ -63,15 +63,17 @@ private class RollupOperationsTest {
 		List<Account> created = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			created.add(
-				new Account(
-					Name = 'Organization ' + i,
-					RecordTypeId = organizationType,
-					// Targets are attributes BarnCRM Admin grants: a standard one such as Site
-					// may be hidden by the profile, and then the engine cannot write it.
-					Preferred_Name__c = 'stale',
-					Sample_Data_Key__c = 'stale',
-					Sample_Data__c = true,
-					Exclude_From_Greetings__c = false
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Organization ' + i,
+						RecordTypeId = organizationType,
+						// Targets are attributes BarnCRM Admin grants: a standard one such as Site
+						// may be hidden by the profile, and then the engine cannot write it.
+						Preferred_Name__c = 'stale',
+						Sample_Data_Key__c = 'stale',
+						Sample_Data__c = true,
+						Exclude_From_Greetings__c = false
+					)
 				)
 			);
 		}
@@ -88,12 +90,14 @@ private class RollupOperationsTest {
 		for (Integer i = 0; i < organizations.size(); i++) {
 			for (Integer j = 0; j < PEOPLE_EACH; j++) {
 				created.add(
-					new Contact(
-						LastName = 'P' + String.valueOf(j).leftPad(2, '0'),
-						Title = Math.mod(j, 5) == 4 ? null : 'Role ' + Math.mod(j, 4),
-						Department = Math.mod(i, 2) == 0 && j == 0 ? 'Board' : 'Staff',
-						Birthdate = Date.newInstance(1980, 1, 1).addDays(j),
-						AccountId = organizations[i].Id
+					TestDataFactory.person(
+						new Contact(
+							LastName = 'P' + String.valueOf(j).leftPad(2, '0'),
+							Title = Math.mod(j, 5) == 4 ? null : 'Role ' + Math.mod(j, 4),
+							Department = Math.mod(i, 2) == 0 && j == 0 ? 'Board' : 'Staff',
+							Birthdate = Date.newInstance(1980, 1, 1).addDays(j),
+							AccountId = organizations[i].Id
+						)
 					)
 				);
 			}
@@ -178,18 +182,22 @@ private class RollupOperationsTest {
 			Account joining = organizations[1];
 			Date born = Date.newInstance(1990, 1, 1);
 			List<Contact> staff = new List<Contact>{
-				new Contact(
-					LastName = 'Ames',
-					Title = 'Role 1',
-					Birthdate = born,
-					AccountId = leaving.Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Ames',
+						Title = 'Role 1',
+						Birthdate = born,
+						AccountId = leaving.Id
+					)
 				),
-				new Contact(
-					LastName = 'Baker',
-					Title = 'Role 2',
-					Department = 'Board',
-					Birthdate = born.addDays(1),
-					AccountId = leaving.Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Baker',
+						Title = 'Role 2',
+						Department = 'Board',
+						Birthdate = born.addDays(1),
+						AccountId = leaving.Id
+					)
 				)
 			};
 			insert staff;
@@ -265,20 +273,26 @@ private class RollupOperationsTest {
 			List<Account> organizations = organizations(1);
 			Date sameDay = Date.newInstance(1990, 5, 5);
 			insert new List<Contact>{
-				new Contact(
-					LastName = 'Alpha',
-					Birthdate = sameDay,
-					AccountId = organizations[0].Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Alpha',
+						Birthdate = sameDay,
+						AccountId = organizations[0].Id
+					)
 				),
-				new Contact(
-					LastName = 'Beta',
-					Birthdate = sameDay,
-					AccountId = organizations[0].Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Beta',
+						Birthdate = sameDay,
+						AccountId = organizations[0].Id
+					)
 				),
-				new Contact(
-					LastName = 'Gamma',
-					Birthdate = sameDay,
-					AccountId = organizations[0].Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Gamma',
+						Birthdate = sameDay,
+						AccountId = organizations[0].Id
+					)
 				)
 			};
 			Rollup_Definition__c first = definition(
@@ -315,10 +329,12 @@ private class RollupOperationsTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Account> organizations = organizations(1);
 			insert new List<Contact>{
-				new Contact(
-					LastName = 'Abcdefghijklmnopqrstuvwxyz',
-					Birthdate = Date.newInstance(1970, 3, 1),
-					AccountId = organizations[0].Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Abcdefghijklmnopqrstuvwxyz',
+						Birthdate = Date.newInstance(1970, 3, 1),
+						AccountId = organizations[0].Id
+					)
 				)
 			};
 			Rollup_Definition__c birthday = definition(
@@ -417,7 +433,9 @@ private class RollupOperationsTest {
 	static void aPicklistIsFilledWithItsOwnValueAndOneItLacksIsLeftOut() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Account> organizations = organizations(1);
-			Contact person = new Contact(LastName = 'child', AccountId = organizations[0].Id);
+			Contact person = TestDataFactory.person(
+				new Contact(LastName = 'child', AccountId = organizations[0].Id)
+			);
 			insert person;
 			Rollup_Definition__c role = definition(
 				'LAST',

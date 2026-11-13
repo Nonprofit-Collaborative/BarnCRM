@@ -80,9 +80,8 @@ private class GiftTriggerHandlerTest {
 			if (householdTypes.isEmpty()) {
 				return;
 			}
-			Account household = new Account(
-				Name = 'The Okafor Family',
-				RecordTypeId = householdTypes[0].Id
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Okafor Family', RecordTypeId = householdTypes[0].Id)
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 
@@ -111,7 +110,7 @@ private class GiftTriggerHandlerTest {
 			if (personType == null) {
 				return;
 			}
-			Account person = new Account();
+			Account person = TestDataFactory.organization(new Account());
 			person.put('LastName', 'Okafor');
 			person.put('RecordTypeId', personType);
 			insert person;

@@ -25,7 +25,9 @@ private class AskRulesTest {
 	}
 
 	private static Contact person() {
-		Contact donor = new Contact(FirstName = 'Ana', LastName = 'Ramirez');
+		Contact donor = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
+		);
 		insert donor;
 		return donor;
 	}
@@ -168,7 +170,9 @@ private class AskRulesTest {
 	static void aPersonAccountsContactBecomesTheDonorAccount() {
 		System.runAs(staff()) {
 			Contact behind = person();
-			Contact plain = new Contact(FirstName = 'Lee', LastName = 'Chen');
+			Contact plain = TestDataFactory.person(
+				new Contact(FirstName = 'Lee', LastName = 'Chen')
+			);
 			insert plain;
 			Account personAccount = GivingTestDataFactory.insertOrganization('Ana Ramirez');
 			AskRules.accountsBehindForTest = new Map<Id, Id>{ behind.Id => personAccount.Id };

@@ -23,31 +23,39 @@ private class GivingSampleDataTest {
 
 	/** A household, two people and an organization, flagged and keyed as Core's loader leaves them. */
 	private static void insertSamplePeople() {
-		Account household = new Account(
-			Name = 'The Sample Family',
-			Sample_Data__c = true,
-			Sample_Data_Key__c = 'H001'
+		Account household = TestDataFactory.household(
+			new Account(
+				Name = 'The Sample Family',
+				Sample_Data__c = true,
+				Sample_Data_Key__c = 'H001'
+			)
 		);
-		Account organization = new Account(
-			Name = 'Cedar Valley Foundation',
-			Sample_Data__c = true,
-			Sample_Data_Key__c = ORGANIZATION_KEY
+		Account organization = TestDataFactory.organization(
+			new Account(
+				Name = 'Cedar Valley Foundation',
+				Sample_Data__c = true,
+				Sample_Data_Key__c = ORGANIZATION_KEY
+			)
 		);
 		insert new List<Account>{ household, organization };
 		insert new List<Contact>{
-			new Contact(
-				FirstName = 'Maria',
-				LastName = 'Sample',
-				AccountId = household.Id,
-				Sample_Data__c = true,
-				Sample_Data_Key__c = PERSON_KEY
+			TestDataFactory.person(
+				new Contact(
+					FirstName = 'Maria',
+					LastName = 'Sample',
+					AccountId = household.Id,
+					Sample_Data__c = true,
+					Sample_Data_Key__c = PERSON_KEY
+				)
 			),
-			new Contact(
-				FirstName = 'David',
-				LastName = 'Sample',
-				AccountId = household.Id,
-				Sample_Data__c = true,
-				Sample_Data_Key__c = SECOND_PERSON_KEY
+			TestDataFactory.person(
+				new Contact(
+					FirstName = 'David',
+					LastName = 'Sample',
+					AccountId = household.Id,
+					Sample_Data__c = true,
+					Sample_Data_Key__c = SECOND_PERSON_KEY
+				)
 			)
 		};
 	}

@@ -150,15 +150,19 @@ private class DuplicateControllerTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Ana',
-						LastName = 'Dupview',
-						Email = 'ana.dupview@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Ana',
+							LastName = 'Dupview',
+							Email = 'ana.dupview@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Anna',
-						LastName = 'Dupview',
-						Email = 'anna.dupview@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Anna',
+							LastName = 'Dupview',
+							Email = 'anna.dupview@example.org'
+						)
 					)
 				}
 			);
@@ -379,8 +383,8 @@ private class DuplicateControllerTest {
 			for (Integer index = 0; index < 3; index++) {
 				List<Account> bakeries = (List<Account>) insertAllowingDuplicates(
 					new List<Account>{
-						new Account(Name = 'Dupview Bakery ' + index),
-						new Account(Name = 'Dupview Bakery ' + index)
+						TestDataFactory.organization(new Account(Name = 'Dupview Bakery ' + index)),
+						TestDataFactory.organization(new Account(Name = 'Dupview Bakery ' + index))
 					}
 				);
 				suggest(bakeries[0].Id, bakeries[1].Id);
@@ -402,7 +406,7 @@ private class DuplicateControllerTest {
 			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
 				new List<Account>{
 					HouseholdTestDataFactory.newHousehold('The Dupview Family'),
-					new Account(Name = 'Dupview Bakery')
+					TestDataFactory.household(new Account(Name = 'Dupview Bakery'))
 				}
 			);
 			suggest(accounts[0].Id, accounts[1].Id);

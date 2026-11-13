@@ -34,16 +34,22 @@ private class RollupQueueTest {
 	private static Set<Id> parentsWithOneChild(Integer count) {
 		List<Account> parents = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
-			parents.add(new Account(Name = 'Parent ' + i, RecordTypeId = organizationType()));
+			parents.add(
+				TestDataFactory.organization(
+					new Account(Name = 'Parent ' + i, RecordTypeId = organizationType())
+				)
+			);
 		}
 		insert parents;
 		List<Account> children = new List<Account>();
 		for (Account parent : parents) {
 			children.add(
-				new Account(
-					Name = parent.Name + ' child',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id
+				TestDataFactory.organization(
+					new Account(
+						Name = parent.Name + ' child',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id
+					)
 				)
 			);
 		}

@@ -21,7 +21,7 @@ private class RollupAttentionControllerTest {
 	@IsTest
 	static void staffSeeTheBuilderWithoutTheQueueBeingRead() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account household = new Account(Name = 'Staff Household');
+			Account household = TestDataFactory.household(new Account(Name = 'Staff Household'));
 			insert household;
 			insert entry(RollupQueue.STATUS_FAILED, new List<Id>{ household.Id }, 5);
 			User david = TestDataFactory.createUser(
@@ -64,8 +64,8 @@ private class RollupAttentionControllerTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			User admin = maria();
 			List<Account> households = new List<Account>{
-				new Account(Name = 'Rivera Household'),
-				new Account(Name = 'Chen Household')
+				TestDataFactory.organization(new Account(Name = 'Rivera Household')),
+				TestDataFactory.organization(new Account(Name = 'Chen Household'))
 			};
 			System.runAs(admin) {
 				insert households;
@@ -126,7 +126,7 @@ private class RollupAttentionControllerTest {
 	@IsTest
 	static void retryPutsBackOnlyTheSelectedEntries() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account household = new Account(Name = 'Okafor Household');
+			Account household = TestDataFactory.household(new Account(Name = 'Okafor Household'));
 			insert household;
 			List<Rollup_Queue__c> failed = new List<Rollup_Queue__c>{
 				entry(RollupQueue.STATUS_FAILED, new List<Id>{ household.Id }, 5),
@@ -152,7 +152,7 @@ private class RollupAttentionControllerTest {
 	@IsTest
 	static void retryAllPutsBackTwoHundredEntriesWithinLimits() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account household = new Account(Name = 'Bulk Household');
+			Account household = TestDataFactory.household(new Account(Name = 'Bulk Household'));
 			insert household;
 			List<Rollup_Queue__c> failed = new List<Rollup_Queue__c>();
 			for (Integer i = 0; i < 200; i++) {
@@ -179,7 +179,7 @@ private class RollupAttentionControllerTest {
 	@IsTest
 	static void staffCannotRetry() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account household = new Account(Name = 'Staff Household');
+			Account household = TestDataFactory.household(new Account(Name = 'Staff Household'));
 			insert household;
 			insert entry(RollupQueue.STATUS_FAILED, new List<Id>{ household.Id }, 5);
 			String message;

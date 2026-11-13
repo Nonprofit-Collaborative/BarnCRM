@@ -27,7 +27,7 @@ private class PortalDataTest {
 		f.pat = PortalTestData.person('Zzdata', EMAIL);
 		f.other = PortalTestData.person('Zzother', 'other.zzdata@example.org');
 		PortalTestData.access(portal, f.pat);
-		Account org = new Account(Name = 'Zzdata Foundation');
+		Account org = TestDataFactory.organization(new Account(Name = 'Zzdata Foundation'));
 		insert org;
 		f.current = new Affiliation__c(
 			Contact__c = f.pat.Id,
@@ -317,7 +317,9 @@ private class PortalDataTest {
 	static void aScopedCatalogShowsOnlyRecordsTiedToThePerson() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
 			Fixture f = fixture();
-			Account elsewhere = new Account(Name = 'Zzdata Elsewhere');
+			Account elsewhere = TestDataFactory.organization(
+				new Account(Name = 'Zzdata Elsewhere')
+			);
 			insert elsewhere;
 			Affiliation__c stranger = new Affiliation__c(
 				Contact__c = f.other.Id,

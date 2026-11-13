@@ -17,9 +17,8 @@ private class ContactPointMoveTest {
 	}
 
 	private static Account household(String name, String street) {
-		Account household = new Account(
-			Name = name,
-			RecordTypeId = HouseholdService.householdRecordTypeId()
+		Account household = TestDataFactory.household(
+			new Account(Name = name, RecordTypeId = HouseholdService.householdRecordTypeId())
 		);
 		Database.insert(household, AccessLevel.SYSTEM_MODE);
 		Database.insert(
@@ -196,7 +195,9 @@ private class ContactPointMoveTest {
 	}
 
 	private static Account personAccount(String lastName, String email) {
-		Account record = new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId());
+		Account record = TestDataFactory.organization(
+			new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId())
+		);
 		record.put('FirstName', 'Pat');
 		record.put('LastName', lastName);
 		record.put('PersonEmail', email);
@@ -281,7 +282,7 @@ private class ContactPointMoveTest {
 				return;
 			}
 			Test.startTest();
-			Account organization = new Account(Name = 'Plain Org');
+			Account organization = TestDataFactory.organization(new Account(Name = 'Plain Org'));
 			insert organization;
 			organization.Name = 'Plain Org Renamed';
 			update organization;
