@@ -327,6 +327,14 @@ Salesforce org is needed for this job. Steps:
    `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
    them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
    `TriggerHandler` reads the platform's own.
+   `scripts/ci/check-trigger-static-state.py` fails the build if a trigger handler's `before`
+   method assigns a new collection to, or clears, one of the handler's static `Map`, `Set` or
+   `List` fields. Such a field carries what the before event noted to the after event, and a
+   save of more than 200 rows (two chunks) or a dispatcher retry runs the before again, so a
+   reset drops the first chunk's state (defect D1, QA review Q4). Add to it keyed by record
+   Id and remove what the after event used; a deliberate reset is listed in
+   `scripts/ci/trigger-static-state-allowlist.txt` with its reason. Each handler holding such
+   state has a test that saves or deletes more than 200 rows at once.
    `scripts/ci/check-global-describe.py` fails the build if packaged Apex other than
    `NamespaceUtil` calls `Schema.getGlobalDescribe()`. The describe costs about 12 ms of CPU in
    a large org and cannot change within a transaction, so every class reads the one copy

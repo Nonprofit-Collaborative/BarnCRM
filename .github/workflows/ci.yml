@@ -78,6 +78,9 @@ jobs:
       - name: Check trigger handlers read their records only through the accessors
         run: python3 scripts/ci/check-trigger-handler-records.py
 
+      - name: Check trigger handlers add to, never replace, their static before-to-after state
+        run: python3 scripts/ci/check-trigger-static-state.py
+
       - name: Check the global describe is read only through NamespaceUtil
         run: python3 scripts/ci/check-global-describe.py
 
