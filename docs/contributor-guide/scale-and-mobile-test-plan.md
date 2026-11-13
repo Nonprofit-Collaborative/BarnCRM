@@ -176,6 +176,40 @@ bash scripts/org/scale-test-tier1.sh cleanup oi-test    # hard delete, children 
   permission on the running user (off by default, even for System Administrators); without it
   the log says so. `SCALE_TEST_SOFT_DELETE=1` deletes to the Recycle Bin instead.
 
+### Remaining scale cases (QA review Q8, D-200)
+
+Two load shapes the first tier 1 run did not cover. Each is its own run: clean up between them,
+and check `DataStorageMB` first (both load more than tier 1's 30,000 gifts).
+
+| Case | How to start it | Pass when |
+| --- | --------------- | --------- |
+| Parent skew: 60,000 gifts on one household | `SCALE_TEST_GENERATOR_ARGS="--gifts 5000 --skew-gifts 60000" bash scripts/org/scale-test-tier1.sh oi-test` (the first contact and its household get the 60,000) | Load finishes with lock errors under 0.1% that clear on retry; the household's totals match a SOQL aggregate after the Rollup Queue drains; the household and the contact open in under 5 seconds; **Recalculate All** and **Recalculate Now** (donor levels) finish with no failed batches |
+| Parallel load: 50,000 gifts in two jobs at once | `SCALE_TEST_GENERATOR_ARGS="--gifts 50000" SCALE_TEST_PARALLEL=1 bash scripts/org/scale-test-tier1.sh oi-test` (alternate rows to each job, so both touch every household) | Both jobs finish; `UNABLE_TO_LOCK_ROW` under 0.1% of rows and gone on retry; totals match a SOQL aggregate once the queue drains |
+
+**Save budgets.** `CoreSaveBudgetTest` (people, organizations, addresses) and
+`GivingSaveBudgetTest` (gifts, soft credits) pin what one save of 1 and of 200 rows costs with
+every trigger running: at most 50 SOQL queries (half the limit, the rest left for the
+organization's own automation), 10 more for 200 rows than the ceiling for 1, and 5 seconds of
+CPU. They run in every release gate; a failure names the figure it measured.
+
+**Tier 1 cases for the modules added since v0.11.** Each runs on the tier 1 data above, with the
+module installed and turned on, and records the same figures as the runs table.
+
+| Module | Run | Pass when |
+| --- | --- | --- |
+| Forms | 2,000 public submissions through the forms REST endpoint (`/services/apexrest/barncrm/forms/v1/`), 200 a minute, half matching an existing person | Every submission processed or held with a reason; matching under 2 seconds a submission; no Error Log limit rows |
+| Events | One event with 3,000 registrations (Registrations tab import or Bulk API on the registration object), then check in 500 | Capacity and waitlist counts exact; the Check-In tab opens in under 5 seconds; reminder batch finishes |
+| Payments | 5,000 webhook posts (signed test events) in 30 minutes | Every event stored once (no duplicates on retry); per-processor hourly cap holds; gifts created match the events |
+| Portal | 500 portal logins and 2,000 portal reads in an hour | No limit errors; each read under 2 seconds |
+| Projects | 200 projects, 20,000 timesheet rows, 2,000 requests | Billing export and At Risk views open in under 5 seconds; request triage list pages without `Too many query rows` |
+| Memberships | 10,000 memberships with renewals due across a year | Renewal batch finishes with no failed batches; rollups match |
+| Scholarships | 3,000 applications, 5 reviewers each | Review board opens in under 5 seconds; award totals match |
+| Territory | Assign 10,000 contacts | Assignment batch finishes; no CPU limit errors |
+| Address Verification | Verify 10,000 addresses (mock provider in the test org) | Batch finishes within the callout limits; failures logged once per batch, not per row |
+| Contact Point Sync | Bulk sync of the 10,000 tier 1 contacts | Finishes; no duplicate contact points |
+
+These are not run yet; the release notes of the version that runs them carry the figures.
+
 ## Mobile audit
 
 Run on `oi-test` with the Salesforce mobile app on one iPhone and one Android phone (or the

@@ -15,7 +15,8 @@ Modes:
         200 gifts). Tier 1 is the default and the only tier: 4,000 households, 10,000
         contacts, 30,000 gifts, 10% of gifts with a soft credit, 5% split across two funds
         (70% to the automatic default allocation, 30% to a second fund). Override with
-        --households, --contacts and --gifts to shrink a run. The "Scale test General" fund
+        --households, --contacts and --gifts to shrink a run; --skew-gifts N gives the first
+        contact N more gifts (the 60,000-gift parent skew case). The "Scale test General" fund
         is written as the default fund (Is_Default__c true) so the load works on an org
         with no sample data; --no-default-fund leaves the flag off for an org that already
         has a default fund (marking a second one would move the org's default).
@@ -327,6 +328,9 @@ def generate_tier1(args):
             contact_household.append(h)
 
     counts = gift_counts(rng, args.contacts, args.gifts)
+    # The skew case (QA review Q8): one donor, and so one household, gets this many gifts on top,
+    # the parent skew that locks and slows a rollup when 10,000 or more children share a parent.
+    counts[0] += getattr(args, "skew_gifts", 0) or 0
     gift_rows, gift_ids, gift_amounts, gift_donor = [], [], [], []
     for donor, count in enumerate(counts):
         for _ in range(count):
@@ -534,6 +538,9 @@ def main():
     p.add_argument("--households", type=int, default=4000)
     p.add_argument("--contacts", type=int, default=10000)
     p.add_argument("--gifts", type=int, default=30000)
+    p.add_argument("--skew-gifts", type=int, default=0, metavar="N",
+                   help="the first contact (and its household) gets N more gifts: the parent "
+                        "skew case, 60000 in scale-test-cases.sh skew")
     p.add_argument("--acknowledge-every", type=int, default=10, metavar="N",
                    help="every Nth gift loads as 'To acknowledge' so AcknowledgmentBatch has "
                         "work (default 10, so 3,000 gifts); 0 leaves every gift 'Not required'")
