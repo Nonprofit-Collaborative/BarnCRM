@@ -158,7 +158,11 @@ public with sharing class BackupSetService {
 		Schema.SObjectType objectType = NamespaceUtil.objectType(compiled.objectName);
 		if (objectType == null) {
 			// Not an object here: the platform's own error, as before.
-			objectType = Schema.describeSObjects(new List<String>{ compiled.objectName })[0]
+			// DEFERRED: no child relationships are read. NOPMD: the rule flags DEFERRED too.
+			objectType = Schema.describeSObjects( // NOPMD
+					new List<String>{ compiled.objectName },
+					Schema.SObjectDescribeOptions.DEFERRED
+				)[0]
 				.getSObjectType();
 		}
 		List<String> fields = new List<String>();

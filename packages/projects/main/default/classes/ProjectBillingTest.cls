@@ -375,9 +375,11 @@ private class ProjectBillingTest {
 	}
 
 	private static Id missingInvoiceId() {
-		return Id.valueOf(
-			Project_Invoice__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+		// DEFERRED: no child relationships are read. NOPMD: the rule flags DEFERRED too.
+		Schema.DescribeSObjectResult invoice = Project_Invoice__c.SObjectType.getDescribe( // NOPMD
+			Schema.SObjectDescribeOptions.DEFERRED
 		);
+		return Id.valueOf(invoice.getKeyPrefix() + '000000000001');
 	}
 
 	@IsTest

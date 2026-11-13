@@ -99,12 +99,16 @@ public with sharing class HealthCheckGivingChecks {
 			return lookupSkewFinding();
 		}
 		if (check == CHECK_GIFT_OWNERSHIP_SKEW) {
+			// DEFERRED: no child relationships are read. NOPMD: the rule flags DEFERRED too.
+			Schema.DescribeSObjectResult gift = Gift__c.SObjectType.getDescribe( // NOPMD
+				Schema.SObjectDescribeOptions.DEFERRED
+			);
 			return HealthCheckSkew.ownership(
 				CHECK_GIFT_OWNERSHIP_SKEW,
-				Gift__c.SObjectType.getDescribe().getName(),
+				gift.getName(),
 				null,
 				null,
-				Gift__c.SObjectType.getDescribe().getLabelPlural()
+				gift.getLabelPlural()
 			);
 		}
 		return receiptGenerationFinding();
