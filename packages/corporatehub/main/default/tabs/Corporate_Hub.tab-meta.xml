@@ -3,7 +3,7 @@
   <description>
     Policies to acknowledge, compliance obligations due and agreements to act on.
   </description>
-  <flexiPage>Corporate_Hub</flexiPage>
   <label>Corporate Hub</label>
+  <lwcComponent>corporateHubHome</lwcComponent>
   <motif>Custom72: Helicopter</motif>
 </CustomTab>

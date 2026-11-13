@@ -16,7 +16,10 @@ public with sharing class ScholarshipReminders implements Schedulable {
 	@TestVisible
 	private static Integer maxReminders = 200;
 
-	/** The step as BarnCRM's nightly run lists it, with a switch that ships on. */
+	/**
+	 * The step as BarnCRM's nightly run lists it, with a switch that ships on. It can be started
+	 * now from the Nightly Jobs panel: a second run the same day reminds no one twice.
+	 */
 	public static NightlyStep step() {
 		return new NightlyStep(
 				JOB_NAME,
@@ -25,7 +28,8 @@ public with sharing class ScholarshipReminders implements Schedulable {
 				50,
 				new ScholarshipReminders()
 			)
-			.withSwitch(true);
+			.withSwitch(true)
+			.runnableNow();
 	}
 
 	public void execute(SchedulableContext jobContext) {

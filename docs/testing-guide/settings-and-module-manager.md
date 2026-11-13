@@ -513,8 +513,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Nightly Jobs and Accounting Periods**, then **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
-| 2 | In an org where they were never scheduled, choose **Schedule**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
+| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
+| 2 | In an org where they were never scheduled, choose **Schedule Nightly Jobs**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
 | 3 | Open **Data Manager**, select **Import a File**, and open the **Template** picker. | Template names are in title casing, for example "Generic Gift List" and "NPSP: Opportunities and Payments". A template you renamed keeps your name. |
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 

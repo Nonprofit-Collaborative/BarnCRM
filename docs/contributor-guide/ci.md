@@ -195,6 +195,12 @@ Salesforce org is needed for this job. Steps:
    permission sets are assembled by hand at every merge from each branch's integration
    file, so the reference and the metadata can drift apart silently. This ran because
    `BarnCRM_Admin` granted a `Household_Member__c` tab that was never created.
+   Alongside it, `scripts/ci/check-generated-permission-sets.py` (D-200 S9a) fails the build
+   when a role trio's Admin or Read Only set differs from its Staff set plus its delta in
+   `scripts/permission-sets/deltas/<Prefix>.json`. Those two sets are generated: change the
+   Staff set or the delta, then run `python3 scripts/permission-sets/generate.py`. The
+   committed XML stays the deployed source, and ADR-0194's permission model is unchanged.
+   `--bootstrap <Prefix>` writes the delta that reproduces a trio's current sets.
 11. `scripts/ci/check-help-links.py`, failing the build if a Setting Definition's Learn
    more link points at a page that does not exist. `SettingsController` appends
    `Help_Path__c` to a base already ending in `docs/admin-guide/`, so a row storing
@@ -1234,8 +1240,8 @@ stage the script runs
 post-install script and would otherwise leave the org without the rollup definitions a real
 install creates (ADR-0029). It then runs `TabAccessService.requestSync()` the same way, so the
 tool tabs, which live only in the `BarnCRM_Tab_*` permission sets, reach users without waiting
-for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
-which gives the Rollup Builder permission sets to BarnCRM's roles (ADR-0125 D2). Before the first stage the script fails if a folder under
+for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `ModuleAccessSyncs.requestAll()`,
+which gives every module's permission sets to the BarnCRM roles its catalog row names (ADR-0125 D2, ADR-0131, D-200 S1). Before the first stage the script fails if a folder under
 `packages/core/main/default` is named by no stage: Core's flows were never deployed until
 2026-10-13 because no stage named `flows`.
 

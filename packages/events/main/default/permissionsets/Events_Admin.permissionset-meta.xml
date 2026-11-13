@@ -14,22 +14,6 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
-    <apexClass>EventDashboardController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventAppointmentsController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventVolunteersController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventSurveyController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
     <apexClass>EventRegistrationsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -47,6 +31,22 @@
   </classAccesses>
   <classAccesses>
     <apexClass>EventSpeakersController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventDashboardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventAppointmentsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventVolunteersController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventSurveyController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -224,6 +224,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Event_Registration__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Event__c.Public_Page__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -235,11 +240,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Event__c.Public_Seats__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Event_Registration__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

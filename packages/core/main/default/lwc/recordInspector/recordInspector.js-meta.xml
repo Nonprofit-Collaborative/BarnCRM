@@ -10,6 +10,7 @@
   <masterLabel>Record Inspector</masterLabel>
   <targets>
     <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
     <target>lightning__RecordPage</target>
   </targets>
 </LightningComponentBundle>

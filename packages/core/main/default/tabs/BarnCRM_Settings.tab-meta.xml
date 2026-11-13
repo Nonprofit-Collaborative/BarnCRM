@@ -3,7 +3,7 @@
   <description>
     Every BarnCRM setting on one page, grouped into sections and searchable.
   </description>
-  <flexiPage>BarnCRM_Settings</flexiPage>
   <label>BarnCRM Settings</label>
+  <lwcComponent>settingsConsole</lwcComponent>
   <motif>Custom67: Gears</motif>
 </CustomTab>

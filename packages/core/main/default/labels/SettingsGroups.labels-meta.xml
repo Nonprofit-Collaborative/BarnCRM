@@ -77,8 +77,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Settings console, Giving page: box heading for nightly jobs and periods</shortDescription>
-        <value>Nightly Jobs and Accounting Periods</value>
+        <shortDescription>Settings console, Giving page: box heading for accounting periods</shortDescription>
+        <value>Accounting Periods</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_HoursAndShifts</fullName>

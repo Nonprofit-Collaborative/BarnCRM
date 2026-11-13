@@ -58,6 +58,9 @@
                         <th scope="col">{labels.status}</th>
                         <th scope="col">{labels.lastRun}</th>
                         <th scope="col">{labels.result}</th>
+                        <template lwc:if={canManage}>
+                            <th scope="col">{labels.actions}</th>
+                        </template>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,7 +95,41 @@
                                 <template lwc:if={row.message}>
                                     <span class="slds-text-body_small slds-text-color_weak"> {row.message}</span>
                                 </template>
+                                <template lwc:if={row.missed}>
+                                    <c-barn-status-badge
+                                        data-id="missed"
+                                        status="warning"
+                                        label={labels.missed}
+                                    ></c-barn-status-badge>
+                                </template>
+                                <template lwc:if={row.summary}>
+                                    <p class="slds-text-body_small" data-id="summary">{row.summary}</p>
+                                </template>
                             </td>
+                            <template lwc:if={canManage}>
+                                <td data-label={labels.actions}>
+                                    <lightning-button-group>
+                                        <template lwc:if={row.hasSwitch}>
+                                            <lightning-button
+                                                data-id="switch"
+                                                data-key={row.key}
+                                                label={row.switchLabel}
+                                                disabled={busy}
+                                                onclick={handleSwitch}
+                                            ></lightning-button>
+                                        </template>
+                                        <template lwc:if={row.canRunNow}>
+                                            <lightning-button
+                                                data-id="run-now"
+                                                data-key={row.key}
+                                                label={labels.runNow}
+                                                disabled={busy}
+                                                onclick={handleRunNow}
+                                            ></lightning-button>
+                                        </template>
+                                    </lightning-button-group>
+                                </td>
+                            </template>
                         </tr>
                     </template>
                 </tbody>

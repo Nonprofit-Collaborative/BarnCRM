@@ -79,3 +79,27 @@ else.**
 - Three of the five nightly jobs BarnCRM ships are now started this way. If a fourth
   appears, the shared shape is worth extracting; two is a coincidence and three is a pattern
   worth naming, not yet worth a framework.
+
+## Note, 2026-11-13: one shared nightly card (D-200 S6)
+
+Amended in release 1.23. The shared shape this ADR held back on now exists: every nightly job is
+a step of Core's one nightly run (ADR-0166), and Core's Nightly Jobs panel on the General page
+of BarnCRM Settings lists every module's steps. The Giving Nightly Jobs page, its tab, its
+settings console entry and `GivingJobsController` are retired, and the panel does what the page
+did, for every module:
+
+- **Switching.** Each step with a switch has **Turn On** and **Turn Off** on its row
+  (`NightlyJobsController.setStep`), so Giving's five jobs are switched one at a time rather
+  than all together; the panel's **Schedule Nightly Jobs** schedules the run. Each switch is
+  still org-wide, and a job's own page (Pledge Reminders, Acknowledgments) keeps its switch.
+- **Run Now.** A step opts in (`NightlyStep.runnableNow`) when a second run the same day does no
+  harm: the top up, the overdue pass and both reminder passes, as the page's Run now started, and
+  Corporate Hub and Scholarships reminders. Donor levels still offer no Run Now here, for the
+  reason above: the Donor Levels page has Recalculate Now.
+- **What it did.** A step carries its own one sentence summary of its last run
+  (`NightlyStep.withSummary`), the `*_Last_Run_Summary__c` values this ADR added.
+- **Stale.** The 36 hour stale warning becomes **Missed Last Run**: a step that is on and did not
+  start with a run that began more than two hours ago.
+
+Scheduling, switching and Run Now need Manage BarnCRM Settings, as before; without it the
+panel is read only.

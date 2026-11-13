@@ -4,7 +4,7 @@
     The follow-up your organization repeats: the plans, their steps, and whether each one is
     switched on.
   </description>
-  <flexiPage>Stewardship_Plans</flexiPage>
   <label>Stewardship Plan Setup</label>
+  <lwcComponent>stewardshipPlans</lwcComponent>
   <motif>Custom4: Hexagon</motif>
 </CustomTab>

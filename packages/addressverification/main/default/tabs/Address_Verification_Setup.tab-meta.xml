@@ -4,7 +4,7 @@
     Connects the org's own address service account: the write-only keys and Verify Waiting
     Addresses.
   </description>
-  <flexiPage>Address_Verification_Setup</flexiPage>
   <label>Address Verification Setup</label>
+  <lwcComponent>addressVerificationSetup</lwcComponent>
   <motif>Custom73: HighwaySign</motif>
 </CustomTab>

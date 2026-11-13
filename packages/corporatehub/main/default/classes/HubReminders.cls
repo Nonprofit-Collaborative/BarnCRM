@@ -31,7 +31,10 @@ public with sharing class HubReminders implements Schedulable {
 	private Date today;
 	private Integer settingDays;
 
-	/** The step as BarnCRM's nightly run lists it, with a switch that ships on. */
+	/**
+	 * The step as BarnCRM's nightly run lists it, with a switch that ships on. It can be started
+	 * now from the Nightly Jobs panel: a second run the same day sends no second bell.
+	 */
 	public static NightlyStep step() {
 		return new NightlyStep(
 				JOB_NAME,
@@ -40,7 +43,8 @@ public with sharing class HubReminders implements Schedulable {
 				45,
 				new HubReminders()
 			)
-			.withSwitch(true);
+			.withSwitch(true)
+			.runnableNow();
 	}
 
 	public void execute(SchedulableContext jobContext) {

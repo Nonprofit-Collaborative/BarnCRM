@@ -127,7 +127,7 @@ private class ProgramsHealthCheckExtensionTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			enrollmentsInEndedPrograms();
 			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
-			settings.Modules_Turned_Off__c = ProgramsAccessSync.MODULE_NAME;
+			settings.Modules_Turned_Off__c = 'Programs';
 			TestDataFactory.saveSettings(settings);
 
 			Assert.isTrue(

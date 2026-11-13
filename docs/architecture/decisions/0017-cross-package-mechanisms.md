@@ -70,3 +70,25 @@ were left open by the plan once real code existed:
   "`@NamespaceAccessible` public services".
 - Canonical model Section 12 (Nonprofit Settings) is annotated: the v0.3 Giving keys move to
   `Giving_Settings__c`.
+
+## Note, 2026-11-13: module wiring is catalog data too (D-200 S1)
+
+Decision 3's registry pattern now covers the rest of a module's wiring into Core. Each module's
+row of the module catalog (`BarnCRM_Module__mdt`, shipped by Core) carries three maps:
+
+- `Extensions__c`: the module's class for each Core extension seam, one line per seam as
+  `Seam: Class`, the seam being the Core interface's name. One Core class, `ModuleExtensions`,
+  reads the lines and builds the classes by namespace and name, in catalog order (Sort Order,
+  then name), once per transaction; a class that is not installed is skipped. It replaces each
+  seam's hard-coded list of module class names, starting with the nightly step providers
+  (`NightlyJobs`, which named every module: review defect SD6).
+- `Access_By_Permission_Set__c` and `Access_By_Role__c`: the permission sets Core's access sync
+  gives (ADR-0131). One generic sync in `ModuleAccessSyncs` replaces each module's
+  `<Module>AccessSync` class, and its `setUp(moduleKey, installerId)` replaces each module's
+  copy of the installer grant: the installer gets the sets the row gives `BarnCRM_Admin`
+  holders. A module that needs its own step after a pass registers a `ModuleAccessStep`.
+
+A module adds or changes wiring by editing its catalog row, never Core's code. Behavior is
+unchanged: the same sets, roles, steps, times and switches. The slice one pass gives is now
+derived from the number of sets (9,000 assignments a pass, at most 5,000 a set) instead of a
+constant per module; it changes how many passes a large org takes, not what is given.

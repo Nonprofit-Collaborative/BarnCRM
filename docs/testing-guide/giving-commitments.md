@@ -110,20 +110,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-COM-07: Nightly Jobs and Overdue Payments
 
-**Purpose:** confirm the five Giving jobs (the pledge reminders among them, G-37) switch on as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run), run on demand, and fill the Overdue list view.
+**Purpose:** confirm the five Giving jobs (the pledge reminders among them, G-37) switch on and off one at a time as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run) from the shared Nightly Jobs panel, run on demand, and fill the Overdue list view (1.23, D-200: the panel replaced the Giving Nightly Jobs page).
 **Prerequisites:** admin; **Send Pledge Reminders** off (as shipped).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Nightly Jobs**, **Open**. | Card **Nightly Jobs** with "The nightly jobs are not scheduled, so no schedule is being extended and no payment will turn Overdue on its own." and **Schedule Nightly Run**. Five jobs are listed: **Payment Schedule Top Up**, **Overdue Pass**, **Donor Levels**, **Pledge Reminders** and **Ask Reminders**. |
-| 2 | Click **Schedule Nightly Run**. | "The nightly jobs are scheduled." Each job shows a **Next Run**. **Stop Nightly Run** and **Run the Jobs Now** show. |
-| 2a | Open **Pledge Reminders**. | **Run every night** is on, and the page still says reminders are off: scheduling sends nothing while **Send Pledge Reminders** is off. |
-| 2b | On **Pledge Reminders**, turn **Run every night** off, then go back to **Nightly Jobs**. | The page still says the nightly jobs are scheduled: stopping the reminders leaves the other four running. Turn **Run every night** on again. |
-| 3 | Click **Run the Jobs Now**. | "The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did." No pledge reminder is sent or logged. |
-| 4 | Refresh after a minute. | **Last Run** for the top up and the overdue pass shows a time and a result line (for example a count of payments marked overdue, or that none were). |
+| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | With the run not scheduled: "The nightly jobs are not scheduled, so none of them runs. Schedule them to run as you." and **Schedule Nightly Jobs**. Giving's five jobs are rows of the panel: **Payment Schedule Top Up**, **Overdue Pass**, **Donor Levels**, **Pledge Reminders** and **Ask Reminders**, each with **Turn On** or **Turn Off**; every one but **Donor Levels** also has **Run Now**. There is no **Giving Nightly Jobs** tab or Giving **Nightly Jobs** page. |
+| 2 | Click **Schedule Nightly Jobs**. | "The nightly jobs are scheduled to run as you." The top up, overdue pass, donor levels and ask reminders show **On**; **Pledge Reminders** shows **Off** (as shipped). |
+| 2a | Click **Turn On** on **Pledge Reminders**, then open the **Pledge Reminders** page. | "Saved for the whole organization." **Run every night** is on, and the page still says reminders are off: the step sends nothing while **Send Pledge Reminders** is off. |
+| 2b | On **Pledge Reminders**, turn **Run every night** off, then go back to the panel. | **Pledge Reminders** shows **Off** and the other four still show **On**: one switch leaves the others as they were. |
+| 2c | Click **Turn Off** on **Overdue Pass**, then **Turn On** (undo). | It shows **Off**, then **On**; no other row changes. |
+| 3 | Click **Run Now** on **Payment Schedule Top Up**, then on **Overdue Pass**. | "The job has started. Refresh this page in a minute to see what it did." each time. No pledge reminder is sent or logged. |
+| 4 | Refresh after a minute. | The top up and the overdue pass each show a last start time, **Done**, and a summary line (for example a count of payments marked overdue, or that none were). |
 | 5 | Open the **Scheduled Payments** tab, list view **Overdue**. | Lists payments with **Status** Overdue, including the sample monthly donor's three overdue payments. Each is more than the grace days (5) past due. |
 | 6 | Switch to **Upcoming 30 Days**. | Payments due in the next 30 days. |
-| 7 | Back on **Nightly Jobs**, click **Stop Nightly Run** (undo). | The not-scheduled message returns. Payments already Overdue stay Overdue. |
+| 7 | As a user with Giving Admin but without Manage BarnCRM Settings, open the panel. | The rows, results and summaries show; no **Turn On**, **Turn Off**, **Run Now** or **Schedule Nightly Jobs** button does. |
 
 **Cleanup:** schedule the jobs again if later scripts need them.
 

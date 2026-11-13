@@ -14,7 +14,7 @@ private class ContactPointsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :ContactPointsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Contact_Point_Sync_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -25,14 +25,14 @@ private class ContactPointsPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ ContactPointsAccessSync.ADMIN_SET }
+					new List<String>{ 'Contact_Point_Sync_Admin' }
 				)
 				.Id;
 
 			Test.startTest();
 			Test.testInstall(new ContactPointsPostInstall(), null);
-			System.enqueueJob(new ContactPointsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new ContactPointsPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('ContactPoints', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('ContactPoints', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds the admin set');
@@ -42,7 +42,7 @@ private class ContactPointsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :ContactPointsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'ContactPointsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -63,7 +63,7 @@ private class ContactPointsPostInstallTest {
 			Test.startTest();
 			new ContactPointsPostInstall().onInstall(null);
 			new ContactPointsPostInstall().runSetup(null);
-			System.enqueueJob(new ContactPointsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('ContactPoints', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -71,7 +71,7 @@ private class ContactPointsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :ContactPointsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'ContactPointsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

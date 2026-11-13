@@ -4,7 +4,7 @@
     Duplicate Matching: review possible duplicate people and households, and manage the
     matching logic that pairs them alongside the org's duplicate rules (ADR-0139).
   </description>
-  <flexiPage>Duplicate_Matching</flexiPage>
   <label>Duplicate Matching</label>
+  <lwcComponent>duplicateMatching</lwcComponent>
   <motif>Custom90: Scales</motif>
 </CustomTab>

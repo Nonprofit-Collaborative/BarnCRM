@@ -4,7 +4,7 @@
     Find exactly the records you need on any object you can see, save and share the query, and
     export the results to CSV.
   </description>
-  <flexiPage>Find</flexiPage>
   <label>Find</label>
+  <lwcComponent>findPage</lwcComponent>
   <motif>Custom39: Telescope</motif>
 </CustomTab>

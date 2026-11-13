@@ -1,45 +1,30 @@
 /**
- * A run of the Opportunity mirror (feature X-01, R-OM8), as the person who started or scheduled
- * it, in chunks. What it does follows the chosen direction:
+ * A run of the Opportunity mirror (feature X-01, R-OM8), in the shape `MirrorRunBatch` gives both
+ * gift mirrors' runs. What it does follows the chosen direction:
  *
  * - Gifts to Opportunities: copies every gift in the totals that has no Opportunity yet, or, from
  *   the reconciliation page, every gift in the totals dated in a range (R-OM11).
  * - Opportunities to Gifts: makes a gift from every won Opportunity closed on or after the start
  *   date that no gift names (R-OM7).
  *
- * Refusals are gathered across the chunks and written when the run ends, one Warning per distinct
- * reason, with a summary at Info (R-OM6), so a nightly run over a refused rule writes one entry
- * rather than one per gift, and none per chunk.
- *
- * While automation is paused, or the Opportunity mirror is switched off on the Automation page, a
- * run does nothing and says so in one Info entry; the check is made when it starts and again for
- * each chunk (R-OM8). A run that is not a range records when it started and its summary on
- * Mirror Settings, for the page, for Health Check, and as the point from which the next run
- * rechecks linked gifts changed since.
+ * Refusals are written when the run ends, one Warning per distinct reason (R-OM6), so a nightly
+ * run over a refused rule writes one entry rather than one per gift, and none per chunk. A chunk
+ * is left when the direction changed since the run started.
  */
-public with sharing class OpportunityMirrorBatch implements Database.Batchable<SObject>, Database.Stateful {
+public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 	public static final String CLASS_NAME = 'OpportunityMirrorBatch';
 	/** Smaller than Campaign sync's: the org's own Opportunity automation runs on each chunk. */
 	@TestVisible
 	private static final Integer CHUNK_SIZE = 100;
 	private static final String LOG_CONTEXT = 'Opportunity mirror: run';
-	// Core's constant for this severity is not namespace accessible, so its value is repeated.
-	private static final String SEVERITY_INFO = 'Info';
 
 	private final String direction;
-	private final Date fromDate;
-	private final Date toDate;
 	private final OpportunityMirrorService.Result totals = new OpportunityMirrorService.Result();
-	private Datetime startedAt;
-	/** Why chunks were left, when automation was paused or switched off during the run. */
-	private String skipReason;
-	private Boolean skippedAtStart = false;
 
 	@TestVisible
 	private OpportunityMirrorBatch(String direction, Date fromDate, Date toDate) {
+		super(fromDate, toDate);
 		this.direction = direction;
-		this.fromDate = fromDate;
-		this.toDate = toDate;
 	}
 
 	/** Starts a run in the chosen direction and returns its job id, or null when it is off. */
@@ -68,64 +53,38 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 		);
 	}
 
-	/** Why a run must not work now, or null when it may. */
-	private static String skipReason() {
-		if (AutomationControl.isPaused()) {
-			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_RunPaused');
-		}
-		if (!AutomationControl.isEnabled(OpportunityMirrorService.AUTOMATION_NAME)) {
-			return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_RunSwitchedOff');
-		}
-		return null;
+	protected override String automationName() {
+		return OpportunityMirrorService.AUTOMATION_NAME;
 	}
 
-	public Database.QueryLocator start(Database.BatchableContext context) {
-		startedAt = System.now();
-		skipReason = skipReason();
-		if (skipReason != null) {
-			skippedAtStart = true;
-			return nothing();
-		}
-		if (direction == OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS) {
-			Date startDate = OpportunityGiftService.startDate();
-			Set<Id> recordTypeIds = OpportunityGiftService.recordTypeIds();
-			List<String> unknown = OpportunityGiftService.unknownRecordTypes();
-			if (!unknown.isEmpty()) {
-				// Once a run: a mistyped name otherwise matches nothing without a word.
-				ErrorLogger.logMessage(
-					String.format(
-						BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_UnknownRecordTypes'),
-						new List<Object>{ String.join(unknown, ', ') }
-					),
-					LOG_CONTEXT,
-					ErrorLogger.SEVERITY_WARNING
-				);
-			}
-			if (OpportunityGiftService.listsMasterRecordType()) {
-				// Master is a real name, so it is not unknown, yet it matches no Opportunity.
-				ErrorLogger.logMessage(
-					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_MasterRecordType'),
-					LOG_CONTEXT,
-					ErrorLogger.SEVERITY_WARNING
-				);
-			}
-			if (recordTypeIds != null && recordTypeIds.isEmpty()) {
-				// Nothing listed exists, and an org without record types has no field to filter.
-				return nothing();
-			}
-			return Database.getQueryLocatorWithBinds(
-				OpportunityMirrorSelector.wonOpportunitiesQuery(
-					OpportunityMirrorService.opportunityType().getDescribe().getName(),
-					OpportunityGiftService.opportunityFields(),
-					recordTypeIds != null
-				),
-				// No start date, no Opportunity: a date no Opportunity closes on or after.
-				new Map<String, Object>{
-					'startDate' => startDate == null ? Date.newInstance(4000, 12, 31) : startDate,
-					'recordTypeIds' => recordTypeIds
-				},
-				AccessLevel.USER_MODE
-			);
+	protected override String logContext() {
+		return LOG_CONTEXT;
+	}
+
+	protected override String pausedText() {
+		return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_RunPaused');
+	}
+
+	protected override String switchedOffText() {
+		return BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_RunSwitchedOff');
+	}
+
+	protected override MirrorSync.Result runTotals() {
+		return totals;
+	}
+
+	protected override Boolean stillOn() {
+		// The direction may have changed since the run started; a run never works against it.
+		return OpportunityMirrorService.direction() == direction;
+	}
+
+	private Boolean makesGifts() {
+		return direction == OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS;
+	}
+
+	protected override Database.QueryLocator locator() {
+		if (makesGifts()) {
+			return wonOpportunities();
 		}
 		Datetime lastRun = Mirror_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c;
 		return Database.getQueryLocatorWithBinds(
@@ -140,37 +99,65 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 		);
 	}
 
-	private static Database.QueryLocator nothing() {
-		return Database.getQueryLocator([SELECT Id FROM Gift__c WHERE Id = NULL WITH USER_MODE]);
+	/** Opportunities to Gifts: the won Opportunities closed on or after the start date. */
+	private Database.QueryLocator wonOpportunities() {
+		Date startDate = OpportunityGiftService.startDate();
+		Set<Id> recordTypeIds = OpportunityGiftService.recordTypeIds();
+		List<String> unknown = OpportunityGiftService.unknownRecordTypes();
+		if (!unknown.isEmpty()) {
+			// Once a run: a mistyped name otherwise matches nothing without a word.
+			ErrorLogger.logMessage(
+				String.format(
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_UnknownRecordTypes'),
+					new List<Object>{ String.join(unknown, ', ') }
+				),
+				LOG_CONTEXT,
+				ErrorLogger.SEVERITY_WARNING
+			);
+		}
+		if (OpportunityGiftService.listsMasterRecordType()) {
+			// Master is a real name, so it is not unknown, yet it matches no Opportunity.
+			ErrorLogger.logMessage(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_MasterRecordType'),
+				LOG_CONTEXT,
+				ErrorLogger.SEVERITY_WARNING
+			);
+		}
+		if (recordTypeIds != null && recordTypeIds.isEmpty()) {
+			// Nothing listed exists, and an org without record types has no field to filter.
+			return nothing();
+		}
+		return Database.getQueryLocatorWithBinds(
+			OpportunityMirrorSelector.wonOpportunitiesQuery(
+				OpportunityMirrorService.opportunityType().getDescribe().getName(),
+				OpportunityGiftService.opportunityFields(),
+				recordTypeIds != null
+			),
+			// No start date, no Opportunity: a date no Opportunity closes on or after.
+			new Map<String, Object>{
+				'startDate' => startDate == null ? Date.newInstance(4000, 12, 31) : startDate,
+				'recordTypeIds' => recordTypeIds
+			},
+			AccessLevel.USER_MODE
+		);
 	}
 
-	public void execute(Database.BatchableContext context, List<SObject> scope) {
-		// The direction may have changed since the run started; a run never works against it.
-		String reason = skipReason();
-		if (reason != null || OpportunityMirrorService.direction() != direction) {
-			totals.skipped += scope.size();
-			skipReason = skipReason == null ? reason : skipReason;
-			return;
-		}
+	protected override void work(List<SObject> scope) {
 		totals.add(
-			direction == OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS
+			makesGifts()
 				? OpportunityGiftService.makeGifts(scope)
 				: OpportunityMirrorService.syncSaved((List<Gift__c>) scope)
 		);
 	}
 
-	public void finish(Database.BatchableContext context) {
-		if (skippedAtStart) {
-			ErrorLogger.logMessage(skipReason, LOG_CONTEXT, SEVERITY_INFO);
-			return;
-		}
-		if (direction == OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS) {
+	protected override String report() {
+		if (makesGifts()) {
 			totals.writeOpportunityRefusals();
 		} else {
 			totals.writeRefusals();
 		}
-		String summary = String.format(
-			direction == OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS
+		return String.format(
+			makesGifts()
 				? BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogRunGifts')
 				: BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_LogRunOpportunities'),
 			new List<Object>{
@@ -181,13 +168,9 @@ public with sharing class OpportunityMirrorBatch implements Database.Batchable<S
 				totals.skipped
 			}
 		);
-		ErrorLogger.logMessage(
-			skipReason == null ? summary : summary + ' ' + skipReason,
-			LOG_CONTEXT,
-			SEVERITY_INFO
-		);
-		if (fromDate == null && skipReason == null) {
-			MirrorSettingsWriter.recordOpportunityMirrorRun(startedAt, summary);
-		}
+	}
+
+	protected override void recordRun(Datetime startedAt, String summary) {
+		MirrorSettingsWriter.recordOpportunityMirrorRun(startedAt, summary);
 	}
 }

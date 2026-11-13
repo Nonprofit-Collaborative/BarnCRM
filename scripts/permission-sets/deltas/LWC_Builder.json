@@ -1,0 +1,31 @@
+{
+  "Admin": {
+    "label": "LWC Builder Admin",
+    "description": ["The LWC Builder tab: create, edit, delete and export built components, and see them where", "they are placed. Given to BarnCRM Admin holders."],
+    "add": {
+      "classAccesses": {
+        "LwcBuilderComponentPicklist": {"enabled": "true"}
+      },
+      "tabSettings": {
+        "LWC_Builder": {"visibility": "Visible"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Built_Component__c.Active__c": {"editable": "true"},
+        "Built_Component__c.Definition__c": {"editable": "true"},
+        "Built_Component__c.Description__c": {"editable": "true"},
+        "Built_Component__c.Object_Name__c": {"editable": "true"},
+        "Built_Component__c.Version__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Built_Component__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true", "modifyAllRecords": "true", "viewAllRecords": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "LWC Builder Read Only",
+    "description": ["Sees the components built in the LWC Builder where they are placed on Lightning pages.", "Given to Read Only holders."],
+    "readOnly": true
+  }
+}
