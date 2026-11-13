@@ -48,7 +48,6 @@
         "Request_Connection__c.Active__c": {"editable": "true"},
         "Request_Connection__c.Hourly_Limit__c": {"editable": "true"},
         "Request_Connection__c.Integration_User__c": {"editable": "true"},
-        "Request_Connection__c.Org_Id__c": {"editable": "true"},
         "Time_Entry__c.Bill_Rate__c": {"editable": "true"},
         "Time_Entry__c.Invoice_Line__c": {"editable": "true"}
       },

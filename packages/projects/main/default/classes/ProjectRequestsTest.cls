@@ -255,11 +255,14 @@ private class ProjectRequestsTest {
 				[SELECT COUNT() FROM Project_Request_Comment__c WHERE Request__c IN :rows],
 				'One comment per reply, in both chunks'
 			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Project_Request__c WHERE Id IN :rows AND Reply__c != NULL],
-				'Every reply is cleared'
-			);
+			// Reply__c is long text, which SOQL cannot filter on, so it is checked row by row.
+			for (Project_Request__c row : [
+				SELECT Reply__c
+				FROM Project_Request__c
+				WHERE Id IN :rows
+			]) {
+				Assert.isNull(row.Reply__c, 'Every reply is cleared');
+			}
 		}
 	}
 

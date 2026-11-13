@@ -253,11 +253,6 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
-    <field>Request_Connection__c.Org_Id__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
     <field>Request_Connection__c.Integration_User__c</field>
     <readable>true</readable>
   </fieldPermissions>
