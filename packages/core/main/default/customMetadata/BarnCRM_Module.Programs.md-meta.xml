@@ -47,4 +47,8 @@
     <value xsi:type="xsd:string">NightlyStepProvider: ProgramsNightlyJobProvider
 ModuleAccessStep: ProgramsAccessStep</value>
   </values>
+  <values>
+    <field>Quick_Links__c</field>
+    <value xsi:type="xsd:string">Enrollment__c.new:Enroll:Start someone in a program.</value>
+  </values>
 </CustomMetadata>

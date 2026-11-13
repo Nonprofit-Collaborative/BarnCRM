@@ -50,4 +50,8 @@
     <field>Extensions__c</field>
     <value xsi:type="xsd:string">NightlyStepProvider: VolunteersNightlyJobProvider</value>
   </values>
+  <values>
+    <field>Quick_Links__c</field>
+    <value xsi:type="xsd:string">Log_Hours:Log Hours:Hours a volunteer worked, in one short form.</value>
+  </values>
 </CustomMetadata>

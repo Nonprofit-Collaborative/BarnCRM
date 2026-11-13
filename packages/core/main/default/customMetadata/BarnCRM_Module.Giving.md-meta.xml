@@ -42,4 +42,8 @@
     <field>Extensions__c</field>
     <value xsi:type="xsd:string">NightlyStepProvider: GivingNightlyJobProvider</value>
   </values>
+  <values>
+    <field>Quick_Links__c</field>
+    <value xsi:type="xsd:string">Quick_Gift_Entry:Enter a Gift:Record a gift in a few keystrokes.</value>
+  </values>
 </CustomMetadata>

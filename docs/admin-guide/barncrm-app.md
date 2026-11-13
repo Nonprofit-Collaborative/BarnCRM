@@ -149,7 +149,8 @@ person what they can act on:
 | **Modules** | Administrators |
 | **Files That Arrive Regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
 | **Quick Links**: People, Households, Organizations and Find | Everyone |
-| **Quick Gift Entry** quick link | Everyone, when Giving is installed and turned on in the Module Manager |
+| **Import a File** quick link | Anyone who can run an import (create Import Batches) |
+| Module quick links: **Enter a Gift** (Giving), **Log Hours** (Volunteers), **Enroll** (Programs, for someone who can create enrollments) | Everyone, while that module is installed and turned on in the Module Manager. Each module's links come from its row in the module catalog (`Quick_Links__c` on BarnCRM Module), never from module code |
 | **BarnCRM Settings** quick link | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
@@ -239,8 +240,9 @@ Admin role.
     Giving, that is Giving), each with its app's logo, and says for each whether it is on or
     installed and off. Click
     **Open the Module Manager** to turn a module on or off.
-11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Quick
-    Gift Entry (with Giving) or BarnCRM Settings without going back to the app launcher.
+11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Import a
+    File, each installed module's links (Enter a Gift, Log Hours, Enroll) or BarnCRM Settings
+    without going back to the app launcher.
 12. Click **New Person** under the welcome to add someone; the household is made for them.
     Once setup is finished, the welcome reads "Find someone, add someone new, or pick up
     where you left off."

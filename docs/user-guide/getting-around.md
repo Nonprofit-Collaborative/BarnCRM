@@ -126,8 +126,8 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
 - **Quick Links**: icon tiles for **People**, **Households**, **Organizations** and **Find**,
-  plus **Quick Gift Entry** when Giving is installed and turned on, and **BarnCRM Settings**
-  for administrators. Each has a one-line description and the same icon as its tab, and opens
+  plus **Import a File** if you can import, the links of each module your organization uses
+  (**Enter a Gift**, **Log Hours**, **Enroll**), and **BarnCRM Settings** for administrators. Each has a one-line description and the same icon as its tab, and opens
   without going back to the App Launcher.
   **Households** opens the households list even on your first day, before the **Households**
   tab has been added for you.
