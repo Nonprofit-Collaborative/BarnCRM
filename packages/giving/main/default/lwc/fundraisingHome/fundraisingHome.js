@@ -12,17 +12,30 @@ import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 const QUICK_GIFT_ENTRY = 'Quick_Gift_Entry';
 /** Core's Import tab, opened by name: the first-run panel's second action. */
 const IMPORT_TAB = 'Import';
-/** The help key for each More tile's one line. */
-const MORE_HELP = {
-  Ask__c: 'Giving_FundraisingHome_AsksHelp',
-  Installment__c: 'Giving_FundraisingHome_InstallmentsHelp',
-  Fund__c: 'Giving_FundraisingHome_FundsHelp',
-  Appeal__c: 'Giving_FundraisingHome_AppealsHelp',
-  Tribute__c: 'Giving_FundraisingHome_TributesHelp',
-  Donor_Segments: 'Giving_FundraisingHome_DonorSegmentsHelp',
-  Recurring_Donor_Health: 'Giving_FundraisingHome_RecurringDonorHealthHelp',
-  Dashboard: 'Giving_FundraisingHome_DashboardsHelp'
-};
+
+/** One line for each More tile, by tile name. */
+function moreDescription(name) {
+  switch (name) {
+    case 'Ask__c':
+      return helpText('Giving', 'Giving_FundraisingHome_AsksHelp');
+    case 'Installment__c':
+      return helpText('Giving', 'Giving_FundraisingHome_InstallmentsHelp');
+    case 'Fund__c':
+      return helpText('Giving', 'Giving_FundraisingHome_FundsHelp');
+    case 'Appeal__c':
+      return helpText('Giving', 'Giving_FundraisingHome_AppealsHelp');
+    case 'Tribute__c':
+      return helpText('Giving', 'Giving_FundraisingHome_TributesHelp');
+    case 'Donor_Segments':
+      return helpText('Giving', 'Giving_FundraisingHome_DonorSegmentsHelp');
+    case 'Recurring_Donor_Health':
+      return helpText('Giving', 'Giving_FundraisingHome_RecurringDonorHealthHelp');
+    case 'Dashboard':
+      return helpText('Giving', 'Giving_FundraisingHome_DashboardsHelp');
+    default:
+      return undefined;
+  }
+}
 
 /**
  * Fundraising Home (people-giving-22): five "today" figures that open their lists, Enter a Gift,
@@ -115,7 +128,7 @@ export default class FundraisingHome extends NavigationMixin(LightningElement) {
     const more = (home.moreTiles || []).map((tile) => ({
       name: tile.name,
       label: tile.label,
-      description: MORE_HELP[tile.name] ? helpText('Giving', MORE_HELP[tile.name]) : undefined,
+      description: moreDescription(tile.name),
       iconName: iconFor(tile.name, 'standard:dashboard')
     }));
     if (more.length) {
