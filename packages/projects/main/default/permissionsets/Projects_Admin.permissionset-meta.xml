@@ -724,6 +724,21 @@
     <field>Project__c.Recognized_Revenue__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Project__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Project_Resource__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Project_Request__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>

@@ -332,6 +332,17 @@ Corporate Hub also ships the report types **Board Members**, **Board Meeting Att
 **Policy Acknowledgments**, and four reports in the **BarnCRM Corporate Hub** folder: Current
 Board Roster, Terms Ending Next 90 Days, Attendance This Year and Open Board Disclosures.
 
+## Sample Data
+
+**Load Sample Data** in BarnCRM Settings also loads a small, complete governance set: five
+Library Documents (three active, one draft, one retired) with three acknowledgments, five
+compliance obligations with three past cycles, five agreements with Core's sample organizations,
+two processing activities, a Board of Directors and a Finance Committee with seven seats held by
+Core's sample people, three meetings with attendees, two motions (one passed with votes, one
+tabled) and three action items. Data subject requests and breaches are not loaded.
+
+**Remove Sample Data** deletes them. Your own documents, obligations, agreements and boards stay.
+
 ## Removing the Module
 
 Uninstalling deletes every Library Document, acknowledgment, obligation, cycle and agreement

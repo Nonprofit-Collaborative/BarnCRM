@@ -15981,6 +15981,7 @@ Every (Months). Retire sets Status Retired and Retired On; a retired document as
 | Retired On | `Retired_On__c` | Date |
 | Template Key | `Template_Key__c` | Text(80), unique, external ID |
 | Reminded For | `Reminded_For__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks records the sample data loader made (release 1.25) |
 
 ---
 
@@ -16105,6 +16106,7 @@ months); a One Time obligation becomes Done instead. A month end due date stays 
 | Last Completed | `Last_Completed_On__c` | Date |
 | Reminded For | `Reminded_For__c` | Date |
 | Days Until Due | `Days_Until_Due__c` | Formula (Number), `Due_Date__c - TODAY()` |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks records the sample data loader made (release 1.25) |
 
 ---
 
@@ -16197,6 +16199,7 @@ passed becomes Expired. End Date is on or after Start Date (validation rule `End
 | Terms | `Terms__c` | Long Text Area(32768) |
 | Reminder Days | `Reminder_Days__c` | Number(3, 0) |
 | Reminded For | `Reminded_For__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks agreements the sample data loader made (release 1.25) |
 
 ---
 
@@ -16289,6 +16292,7 @@ its meetings and votes, its action items and its self-assessments.
 | Quorum (Percent) | `Quorum_Percent__c` | Number(3, 0), default 51 |
 | Skills Wanted | `Needed_Skills__c` | Multi-Select Picklist (the Skills values of 29CH8) |
 | Description | `Description__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks boards the sample data loader made (release 1.25) |
 
 ---
 
@@ -16739,6 +16743,7 @@ is an edit: set DPIA Last Reviewed and move Next DPIA Review on.
 | Next DPIA Review | `DPIA_Review_Date__c` | Date |
 | Template Key | `Template_Key__c` | Text(80), unique, external ID |
 | Reminded For | `Reminded_For__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks records the sample data loader made (release 1.25) |
 
 ---
 
@@ -18073,6 +18078,7 @@ A piece of work with a start, a target date and an outcome: a Salesforce impleme
 | Change Hours | `Change_Hours__c` | Roll-Up Summary (SUM Project_Change_Request__c.Hours__c, Status__c equals Approved; PM-12) |
 | Change Amount | `Change_Amount__c` | Roll-Up Summary (SUM Project_Change_Request__c.Amount__c, Status__c equals Approved) |
 | Recognized Revenue | `Recognized_Revenue__c` | Roll-Up Summary (SUM Project_Revenue__c.Recognized_Amount__c; PM-11) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks projects the sample data loader made (release 1.25) |
 
 The project manager, who approves time, expenses and change requests (R-PM11, R-PM20), is the project's owner (`OwnerId`). With change requests, the budget measured against is Budget Hours plus Change Hours and Budget Amount plus Change Amount; R-PM2 compares Actual Hours with Budget Hours plus Change Hours.
 
@@ -18351,6 +18357,7 @@ A person who can be staffed on projects, with skills, weekly capacity and a defa
 | Weekly Capacity Hours | `Weekly_Capacity_Hours__c` | Number(3, 0) |
 | Default Role | `Default_Role__c` | Text(80) |
 | Active | `Active__c` | Checkbox, default true |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks resources the sample data loader made (release 1.25) |
 
 ---
 
@@ -18539,6 +18546,7 @@ Overdue is true while New or In Progress past the Due Date; Waiting on Requester
 | Connection | `Connection__c` | Lookup(Request_Connection__c), Set Null, relationship Requests; the organization it came from |
 | External Reference | `External_Reference__c` | Text(80); the sending organization's own reference |
 | External Key | `External_Key__c` | Text(120), unique; connection Id and reference, so a resend never duplicates |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks requests the sample data loader made (release 1.25) |
 
 ## 29PM17. Request Comment
 

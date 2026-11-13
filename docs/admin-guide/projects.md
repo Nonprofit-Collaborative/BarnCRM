@@ -142,6 +142,20 @@ Month and Billable Time Last Month, on the Projects, Project Tasks and Time Entr
   Fill in Assigned To and the assignments.
 - Utilization shows nobody: no time was logged in the range, or Track time and budgets is off.
 
+## Sample Data
+
+**Load Sample Data** in BarnCRM Settings also loads four projects: Client Intake
+Implementation (active, on track), Volunteer Program Launch (active, at risk), Annual Report
+Website Refresh (completed) and Data Migration Planning (planned). They carry phases, tasks and
+milestones, about ten time entries (approved, submitted and open, logged by you), three expenses,
+three status updates, assignments, a resource row for you and two open resource requests. With
+Track requests and issues on it adds three requests; with Track change requests on, two change
+requests. Both settings are off by default, so a fresh install loads neither. Recognized revenue
+and invoices are not loaded.
+
+**Remove Sample Data** deletes the sample projects with everything on them, the sample resource
+and the sample requests. Your own projects, resources and requests stay.
+
 ## Removing the Module
 
 Turn it off in BarnCRM Settings, **Modules**: the health check stops and the records stay.

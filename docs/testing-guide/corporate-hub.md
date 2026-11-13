@@ -241,3 +241,21 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 9 | On the Automations page turn off **Data Breach: Bell When Logged**, then create a breach "Phishing email" with Risk **Risk**. | No bell on saving. Run **Corporate Hub reminders**: one bell for "Phishing email". Turn the row back on. |
 
 **Cleanup:** Delete the three breaches; set the activity back to Draft and untick DPIA Required.
+
+## T-CH-16: Sample Data
+
+**Purpose:** confirm the Corporate Hub sample data loads for the sample people and takes away only
+itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; a Library Document of your own.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Documents** count of `5`. |
+| 2 | Open **Library Documents** and **Compliance Obligations**. | Five sample documents and five obligations beside your own. |
+| 3 | Open the Conflict of Interest Policy. | One acknowledgment Acknowledged and one Requested. |
+| 4 | Open **Boards**, then the Board of Directors. | Five seats (Chair, Treasurer, Secretary, two Members) and a Finance Committee under it. |
+| 5 | Open the past Quarterly Board Meeting. | Four Present, one Excused, quorum met, minutes Approved; the budget motion Passed with three For and one Abstain. |
+| 6 | **Remove Sample Data**. | Every sample record above is gone; your own document stays. |
+
+**Cleanup:** None.
