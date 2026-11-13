@@ -939,6 +939,7 @@ core/MigrationKitService.cls | public class Step
 core/MigrationKitService.cls | public static Migration_Kit__mdt kitNamed(String)
 core/MigrationKitService.cls | public static Step stepNamed(Migration_Kit__mdt,String)
 core/MigrationKitService.cls | public static final String KIND_IMPORT
+core/ModuleAccessStep.cls | public interface ModuleAccessStep
 core/ModuleAccessSync.cls | public interface ModuleAccessSync
 core/ModuleAccessSyncBase.cls | public Boolean sync()
 core/ModuleAccessSyncBase.cls | public Job(ModuleAccessSyncBase)
@@ -953,10 +954,24 @@ core/ModuleAccessSyncBase.cls | public class Job
 core/ModuleAccessSyncBase.cls | public virtual void afterSync()
 core/ModuleAccessSyncBase.cls | public void execute(QueueableContext)
 core/ModuleAccessSyncBase.cls | public void requestSync()
+core/ModuleAccessSyncs.cls | public Job(String,Id)
+core/ModuleAccessSyncs.cls | public class Job
 core/ModuleAccessSyncs.cls | public class ModuleAccessSyncs
-core/ModuleAccessSyncs.cls | public static final String CLASS_SUFFIX
+core/ModuleAccessSyncs.cls | public static Boolean syncOnce(String)
+core/ModuleAccessSyncs.cls | public static List<String> adminSets(String)
 core/ModuleAccessSyncs.cls | public static void requestAll()
 core/ModuleAccessSyncs.cls | public static void requestFor(String)
+core/ModuleAccessSyncs.cls | public static void setUp(String,Id)
+core/ModuleAccessSyncs.cls | public void execute(QueueableContext)
+core/ModuleExtensions.cls | public class ModuleExtensions
+core/ModuleExtensions.cls | public static List<Object> all(Type)
+core/ModuleExtensions.cls | public static List<String> modulesWithAccess()
+core/ModuleExtensions.cls | public static Map<String,List<String>> setsByPermissionSet(String)
+core/ModuleExtensions.cls | public static Map<String,List<String>> setsByRole(String)
+core/ModuleExtensions.cls | public static Map<String,Object> byModule(Type)
+core/ModuleExtensions.cls | public static Object first(Type)
+core/ModuleExtensions.cls | public static Object forModule(Type,String)
+core/ModuleExtensions.cls | public static void stubForTest(Type,String,Object,Boolean)
 core/ModuleManagerService.cls | public Boolean getCanSwitch()
 core/ModuleManagerService.cls | public String getName()
 core/ModuleManagerService.cls | public String getStatus()
@@ -1002,7 +1017,6 @@ core/NightlyJobs.cls | public static List<NightlyStep> steps()
 core/NightlyJobs.cls | public static List<String> unscheduledLabels()
 core/NightlyJobs.cls | public static NightlyStep step(String)
 core/NightlyJobs.cls | public static String jobName()
-core/NightlyJobs.cls | public static final List<String> PROVIDER_CLASSES
 core/NightlyJobs.cls | public static final String JOB_NAME
 core/NightlyJobs.cls | public static void forget()
 core/NightlyJobs.cls | public static void overrideStepsForTest(List<NightlyStep>)

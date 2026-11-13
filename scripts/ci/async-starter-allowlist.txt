@@ -34,6 +34,7 @@ packages/contactpoints/main/default/classes/ContactPointSyncService.cls 1
 packages/core/main/default/classes/FieldAccessRecordJob.cls 2
 packages/core/main/default/classes/MergeSettlement.cls 2
 packages/core/main/default/classes/ModuleAccessSyncBase.cls 2
+packages/core/main/default/classes/ModuleAccessSyncs.cls 2
 packages/core/main/default/classes/PersonErasure.cls 1
 packages/core/main/default/classes/TabAccessService.cls 2
 packages/events/main/default/classes/EventPayments.cls 1

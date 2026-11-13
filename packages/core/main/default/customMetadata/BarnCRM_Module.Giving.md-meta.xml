@@ -34,4 +34,12 @@
     <field>Requires__c</field>
     <value xsi:type="xsd:string">Rollups</value>
   </values>
+  <values>
+    <field>Access_By_Permission_Set__c</field>
+    <value xsi:type="xsd:string">Giving_Admin=BarnCRM_Admin</value>
+  </values>
+  <values>
+    <field>Extensions__c</field>
+    <value xsi:type="xsd:string">NightlyStepProvider: GivingNightlyJobProvider</value>
+  </values>
 </CustomMetadata>
