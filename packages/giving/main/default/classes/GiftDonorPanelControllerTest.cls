@@ -106,7 +106,9 @@ private class GiftDonorPanelControllerTest {
 		GiftDonorPanelController.Panel panel;
 		Test.startTest();
 		System.runAs(officer) {
-			Contact donor = new Contact(FirstName = 'Rosa', LastName = 'Park');
+			Contact donor = TestDataFactory.person(
+				new Contact(FirstName = 'Rosa', LastName = 'Park')
+			);
 			insert donor;
 			insert GivingTestDataFactory.buildGift(donor.Id, 75);
 			panel = GiftDonorPanelController.getPanel(donor.Id);
