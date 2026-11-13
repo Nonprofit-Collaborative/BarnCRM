@@ -379,7 +379,7 @@ describe('c-quick-gift-entry', () => {
     expect(toast.mock.calls[0][0].messageLinks[0].url).toContain('004000000000000AAA');
   });
 
-  it('clears the donor and the amount after save and new, and keeps the date and fund', async () => {
+  it('clears the donor and the amount after save and new, and keeps the date, fund and payment method', async () => {
     const element = build();
     await settle();
 
@@ -391,6 +391,7 @@ describe('c-quick-gift-entry', () => {
     expect(pick(element, 'donor-person').value).toBeUndefined();
     expect(pick(element, 'gift-date').value).toBe(DEFAULTS.giftDate);
     expect(pick(element, 'fund').value).toBe(DEFAULTS.defaultFundId);
+    expect(pick(element, 'gift-type').value).toBe('Check');
   });
 
   it('shows what went wrong when the save itself fails', async () => {

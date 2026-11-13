@@ -87,7 +87,7 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 | 2 | Leave **Donor** empty. Tab to **Amount**, type `50`. Tab to **Payment Method**, press Enter, choose **Check**, press Enter. | The values show in the fields. |
 | 3 | Tab to **Save** and press Enter. | Nothing is saved. Under **Donor** the message **Choose the person or organization who gave this gift.** shows, and focus is in the **Donor** box. |
 | 4 | Type `Garc`, press Down Arrow to **Harper Garcia**, press Enter. | Harper Garcia stays in the box and the error under **Donor** is cleared on the next save. |
-| 5 | Tab to **Save and New** and press Enter. | A success toast and the message **Gift G-... saved** show. The form clears amount and payment method, keeps the date, and focus is back in the **Donor** box. |
+| 5 | Tab to **Save and New** and press Enter. | A success toast and the message **Gift G-... saved** show. The form clears the amount, keeps the date and payment method, and focus is back in the **Donor** box. |
 | 6 | With **Donor** empty again, press Shift+Tab. | Focus moves to **Who gave this gift**. Left and Right Arrow switch between **Person** and **Organization**; the donor box label changes to match. |
 
 **Cleanup:** Delete the gift created in step 5 (as admin, from the **Gifts** tab).
@@ -138,10 +138,10 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 
 **Cleanup:** Set browser zoom back to 100 percent.
 
-## T-A11Y-09: Household and Gift Pages on the Salesforce Mobile App
+## T-A11Y-09: Household and Gift Pages and Staff Quick Actions on the Salesforce Mobile App
 
-**Purpose:** Confirm household and gift record pages are readable and editable on a phone.
-**Prerequisites:** staff user with Giving Staff, signed in to the Salesforce mobile app on a phone (or a device simulator, and say so in your results); sample data loaded.
+**Purpose:** Confirm household and gift record pages are readable and editable on a phone, and that the quick actions staff use in the field (Enter a Gift, Log Hours, Record Service, Event Check-In) fit and save there (D-200).
+**Prerequisites:** staff user with Giving Staff, signed in to the Salesforce mobile app on a phone (or a device simulator, and say so in your results); sample data loaded. For steps 6 to 9, the Volunteers, Programs and Events modules installed and the user holding their Staff sets; skip a step whose module is not installed and say so.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -149,9 +149,13 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 | 2 | Scroll the page. | Details, related lists and the **Members** panel open and render; nothing overlaps. |
 | 3 | Open a gift from the household's gifts related list. | The gift page shows **Amount**, **Gift Date** and the donor, and the **Soft Credits** panel renders. |
 | 4 | Edit **Payment Reference**, type `A11Y1`, save. | The value saves and shows on the page. |
-| 5 | Record device, OS and app version as the [Mobile audit](../contributor-guide/scale-and-mobile-test-plan.md#mobile-audit) asks. For the full set of mobile screens, run that audit. | Results recorded per [Record results](before-you-test.md#record-results). |
+| 5 | Open a person from the household and tap **Enter a Gift**. Enter `10`, **Payment Method** `Cash`, tap **Save and New**, then close the window. | The form opens full width with the person chosen as donor; every field and both buttons show without sideways scrolling and buttons wrap rather than overlap. The gift saves and the form keeps **Cash** for the next gift. |
+| 6 | On a person signed up for a shift today, tap **Log Hours** and **Save**. | The form fits the screen with the person, job and shift filled in; the on-screen keyboard does not hide **Save**. "Hours logged." and the form closes. |
+| 7 | On an enrollment, tap **Record Service**, pick a service and **Save**. | The form fits the screen with the person and program filled in; date and number fields open the phone's own pickers. The service saves. |
+| 8 | Open a published event's **Check-In** tab, search for a registrant and tap **Check In**, then **Undo Check-In**. | The search box, the count line and each row's button fit without sideways scrolling; each button is at least a fingertip wide. The count goes up, then back down. |
+| 9 | Record device, OS and app version as the [Mobile audit](../contributor-guide/scale-and-mobile-test-plan.md#mobile-audit) asks. For the full set of mobile screens, run that audit. | Results recorded per [Record results](before-you-test.md#record-results). |
 
-**Cleanup:** Clear **Payment Reference** on the gift from step 4.
+**Cleanup:** Clear **Payment Reference** on the gift from step 4; delete the gift from step 5, the hours from step 6 and the service from step 7.
 
 ## T-A11Y-10: Status and Messages Never by Color Alone
 

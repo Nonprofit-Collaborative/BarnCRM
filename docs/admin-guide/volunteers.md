@@ -670,8 +670,10 @@ say why, and the coordinator decides.
 Hours can be entered with **New** on the **Volunteer Hours** tab, as always, or with the **Log
 Hours** action at the top of a person (contact or person account), a shift or a job in the
 BarnCRM Volunteers app. Log Hours opens a short form with one **Person** picker (person accounts
-only, in an org that has them) and the record's values filled in: a person fills the person, a
-job fills the job, and a shift fills the job, the shift, the date and the shift's length. On a
+only, in an org that has them) and the record's values filled in: a person fills the person
+(and, when they are signed up for a shift today that is not cancelled, waitlisted or a no
+show, that shift as below), a job fills the job, and a shift fills the job, the shift, the
+date and the shift's length. On a
 household or organization, pick the person. It saves like **New**, so every hours rule applies
 and the entry waits as Submitted when approval is required. Anyone who can create hours
 entries can use it; others see a note saying their role cannot enter hours. The job page also

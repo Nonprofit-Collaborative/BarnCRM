@@ -26,7 +26,8 @@ BarnCRM records hours for the length of the shift. See
 
 1. Open the person, the shift or the job in the **BarnCRM Volunteers** app.
 2. Click **Log Hours** in the actions at the top of the record.
-3. Check what is filled in: a person fills **Person**; a job fills **Job**; a shift fills
+3. Check what is filled in: a person fills **Person**, plus the shift they are signed up for
+   today if they have one; a job fills **Job**; a shift fills
    **Job**, **Volunteer Shift**, **Date Worked** and **Hours** (the shift's length). Fill in the
    rest, and change anything that differs, for example someone who left early.
 4. Add **Notes** if useful and click **Save**.

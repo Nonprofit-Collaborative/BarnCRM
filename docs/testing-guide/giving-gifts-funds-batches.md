@@ -69,7 +69,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the **Quick Gift Entry** tab. | Card **Quick Gift Entry**. **Who gave this gift** is on **Person**; **Gift Date** is today; **Appeal** shows Annual Fund; **Fund** shows General Fund. |
 | 2 | In **Donor** type `Garc` and pick **Luis Garcia**. Enter **Amount** `50`, **Payment Method** `Check`, **Check or reference number** `1042`. | Values stay as typed. No **Pays a scheduled payment** list appears (Luis owes no pledge payment). |
-| 3 | Click **Save and New**. | "Gift G-... saved" with an **Open This Gift** link. The donor, amount, payment method and check number clear; the date, appeal and fund stay. |
+| 3 | Click **Save and New**. | "Gift G-... saved" with an **Open This Gift** link. The donor, amount and check number clear; the date, appeal, fund and payment method stay. |
 | 4 | Switch to **Organization**, pick **Founders Consulting Group**, **Amount** `25`, **Payment Method** `Cash`. Click **Save**. | Saved message with link. **Save** and **Save and New** are now greyed out. |
 | 5 | Change the amount to `30`. | **Save** and **Save and New** are enabled again. Do not save. |
 | 6 | Click **Open This Gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
