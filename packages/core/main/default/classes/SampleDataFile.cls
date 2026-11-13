@@ -314,10 +314,13 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		/** Each entry's chunks, counted once when the removal starts. */
 		@NamespaceAccessible
 		public Integer stageCount() {
+			// One spare stage per entry: a row an entry leaves out at the start (a cohort a
+			// sample session still uses) can go once an earlier entry has been removed. A spare
+			// stage with nothing left to remove deletes nothing.
 			Integer stages = 0;
 			for (Object entry : find(resourceName).listOf('remove')) {
 				Integer rows = countOf((Map<String, Object>) entry, null);
-				stages += (rows + removeChunkSize - 1) / removeChunkSize;
+				stages += (rows + removeChunkSize - 1) / removeChunkSize + 1;
 			}
 			return stages;
 		}

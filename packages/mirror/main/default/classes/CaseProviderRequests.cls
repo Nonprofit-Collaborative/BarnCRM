@@ -14,7 +14,7 @@
  * come before any save, as the platform requires; failures are kept on the Provider Request and
  * in the Error Log, and a failed Case is sent again by the next run.
  */
-public with sharing class CaseProviderRequests implements Queueable, Database.AllowsCallouts, Schedulable {
+public with sharing class CaseProviderRequests implements Queueable, Database.AllowsCallouts {
 	/** The step's key in the nightly run. */
 	public static final String JOB_NAME = 'BarnCRM Mirror: Case requests';
 	@TestVisible
@@ -75,7 +75,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 				BarnHelp.text('Mirror', 'Mirror_CaseRequests_Title'),
 				1,
 				40,
-				new CaseProviderRequests()
+				new CaseProviderRequestsNightly()
 			)
 			.withSwitch(true)
 			.activeWhen(isOn());
@@ -87,7 +87,8 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		return settings != null && settings.Case_Requests_Enabled__c == true && caseType() != null;
 	}
 
-	public void execute(SchedulableContext schedule) {
+	/** The nightly run (`CaseProviderRequestsNightly`): queued while the setting is on. */
+	public static void startNightly() {
 		if (isOn()) {
 			start(new CaseProviderRequests());
 		}

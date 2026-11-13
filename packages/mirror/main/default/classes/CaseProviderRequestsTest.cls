@@ -4,7 +4,9 @@
  * the nightly run reads the status of requests not yet finished and sends nothing twice. Case is
  * reached by name, as the class does, so the test compiles where Case is not available.
  */
-@IsTest(testFor='ApexClass:CaseProviderRequests, ApexClass:CaseProviderRequestAction')
+@IsTest(
+	testFor='ApexClass:CaseProviderRequests, ApexClass:CaseProviderRequestAction, ApexClass:CaseProviderRequestsNightly'
+)
 private class CaseProviderRequestsTest {
 	private static final String CASE_OBJECT = 'Case';
 
@@ -86,6 +88,21 @@ private class CaseProviderRequestsTest {
 	}
 
 	@IsTest
+	static void theNightlyStepQueuesTheRunWhileOn() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (CaseProviderRequests.caseType() == null) {
+				return;
+			}
+			turnOn(true);
+			Test.setMock(HttpCalloutMock.class, new Provider(201, new List<Object>()));
+			Test.startTest();
+			new CaseProviderRequestsNightly().execute(null);
+			Assert.areEqual(1, Limits.getQueueableJobs(), 'On: the run is queued');
+			Test.stopTest();
+		}
+	}
+
+	@IsTest
 	static void nothingIsSentWhileOff() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			if (CaseProviderRequests.caseType() == null) {
@@ -95,6 +112,7 @@ private class CaseProviderRequestsTest {
 			SObject record = newCase();
 			Test.startTest();
 			CaseProviderRequestAction.send(new List<Id>{ record.Id });
+			new CaseProviderRequestsNightly().execute(null);
 			Assert.areEqual(0, Limits.getQueueableJobs(), 'Off: nothing queued');
 			Test.stopTest();
 			Assert.isFalse(CaseProviderRequests.step().active, 'Off: not in tonight run');

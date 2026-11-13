@@ -93,7 +93,7 @@ private class SampleDataFileTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(2, stageCount, 'Three rows in chunks of two');
+			Assert.areEqual(3, stageCount, 'Three rows in chunks of two, and one spare stage');
 			Assert.areEqual(0, [SELECT COUNT() FROM Saved_Query__c], 'Every sample row went');
 			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords());
 

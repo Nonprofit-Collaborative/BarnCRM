@@ -1,4 +1,4 @@
-# ADR-NEXT: Packaged dashboards run as a specified user, not the logged-in user
+# ADR-0222: Packaged dashboards run as a specified user, not the logged-in user
 
 **Status:** Accepted (owner decision)
 **Date:** 2026-11-13

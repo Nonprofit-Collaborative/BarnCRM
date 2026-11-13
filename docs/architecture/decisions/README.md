@@ -230,6 +230,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0219](0219-projects-psa.md) | Projects PSA: rate cards, approvals, resource management, invoices, recognized revenue and change requests, each behind its own setting | Accepted (builder decision, for Brandon to confirm) |
 | [0220](0220-provider-secrets-protected-settings.md) | Provider secrets stay in Protected custom settings in the managed packages | Accepted (builder decision, for Brandon to confirm) |
 | [0221](0221-projects-requests-and-issues.md) | Projects requests and issues: staff triage, a portal template for requesters, an org-to-org intake API and a Mirror Case bridge, each off until turned on | Accepted (builder decision, for Brandon to confirm) |
+| [0222](0222-dashboards-run-as-a-specified-user.md) | Packaged dashboards run as a specified user, not the logged-in user; viewer-aware dashboards return in the planned Advanced Reporting module (D-202) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions
