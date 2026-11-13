@@ -29,6 +29,11 @@ Salesforce org is needed for this job. Steps:
    of the rule silently. Without the rule the next edit can pull in the platform and the
    module stops being reusable outside Salesforce or testable without stubs (plan Section
    4.4, portability at near-zero cost).
+   Lint also refuses `toISOString().slice(0, 10)` (and `substring`, `substr`, `split('T')`)
+   anywhere in LWC code, tests included: `toISOString()` is UTC, so an evening user west of
+   Greenwich gets tomorrow (QA review Q11). Use `isoDate()` from `c/barnFormat` for today or
+   any local day, and `utcIsoDate()` for the UTC day of a UTC timestamp; `barnFormat.js` is the
+   one file exempt.
    The next workflow step, `npm run lint:slds`, runs Salesforce's SLDS linter
    (`@salesforce-ux/slds-linter`, pinned in `package.json`) over every component's HTML and
    CSS under `packages/`, failing the build on any SLDS 2 (Cosmos theme) finding: a
