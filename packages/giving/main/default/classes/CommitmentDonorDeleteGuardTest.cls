@@ -138,7 +138,11 @@ private class CommitmentDonorDeleteGuardTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 199; i++) {
-				people.add(new Contact(FirstName = 'Donor' + i, LastName = 'Nobody'));
+				people.add(
+					TestDataFactory.person(
+						new Contact(FirstName = 'Donor' + i, LastName = 'Nobody')
+					)
+				);
 			}
 			insert people;
 			pledgeFrom(people[0].Id, null, 'Cancelled');

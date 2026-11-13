@@ -13,8 +13,12 @@ private class DonorLevelWriterTest {
 	@IsTest
 	static void onlyChangedValuesOfChangedRecordsAreWritten() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact still = new Contact(LastName = 'Nguyen', RFM_Score__c = 3);
-			Contact moved = new Contact(LastName = 'Okafor', RFM_Score__c = 3);
+			Contact still = TestDataFactory.person(
+				new Contact(LastName = 'Nguyen', RFM_Score__c = 3)
+			);
+			Contact moved = TestDataFactory.person(
+				new Contact(LastName = 'Okafor', RFM_Score__c = 3)
+			);
 			insert new List<Contact>{ still, moved };
 			List<Contact> read = [
 				SELECT Id, LastName, RFM_Score__c, Account.Name

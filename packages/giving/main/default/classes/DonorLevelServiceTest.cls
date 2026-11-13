@@ -160,10 +160,12 @@ private class DonorLevelServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Account household = new Account(
-				Name = 'The Nolan Family',
-				Total_Giving__c = 6000,
-				Donor_Level__c = rungs.get(SUSTAINER).Id
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Nolan Family',
+					Total_Giving__c = 6000,
+					Donor_Level__c = rungs.get(SUSTAINER).Id
+				)
 			);
 
 			Boolean moved = DonorLevelService.assign(
@@ -196,10 +198,12 @@ private class DonorLevelServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Contact person = new Contact(
-				LastName = 'Nolan',
-				Total_Giving__c = 1200,
-				Donor_Level__c = rungs.get(LEADERSHIP).Id
+			Contact person = TestDataFactory.person(
+				new Contact(
+					LastName = 'Nolan',
+					Total_Giving__c = 1200,
+					Donor_Level__c = rungs.get(LEADERSHIP).Id
+				)
 			);
 
 			Boolean moved = DonorLevelService.assign(
@@ -226,7 +230,9 @@ private class DonorLevelServiceTest {
 	static void placingADonorTwiceChangesNothingTheSecondTime() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
-			Account household = new Account(Name = 'The Garcia Family', Total_Giving__c = 2500);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Garcia Family', Total_Giving__c = 2500)
+			);
 			List<Donor_Level__c> ladder = DonorLevelSelector.selectActiveLevels();
 			String source = DonorLevelService.DEFAULT_SOURCE_FIELD;
 
@@ -252,10 +258,12 @@ private class DonorLevelServiceTest {
 			upsert settings;
 			SettingsService.clearCaches();
 			Donor_Level__c held = [SELECT Id FROM Donor_Level__c WHERE Name = :FRIEND];
-			Account household = new Account(
-				Name = 'The Okafor Family',
-				Total_Giving__c = 9000,
-				Donor_Level__c = held.Id
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Okafor Family',
+					Total_Giving__c = 9000,
+					Donor_Level__c = held.Id
+				)
 			);
 
 			List<SObject> moved = DonorLevelService.assignAll(new List<SObject>{ household });
@@ -299,10 +307,12 @@ private class DonorLevelServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn('Giving_This_Year__c');
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Account household = new Account(
-				Name = 'The Reyes Family',
-				Total_Giving__c = 20000,
-				Giving_This_Year__c = 300
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Reyes Family',
+					Total_Giving__c = 20000,
+					Giving_This_Year__c = 300
+				)
 			);
 
 			DonorLevelService.assignAll(new List<SObject>{ household });
@@ -323,7 +333,9 @@ private class DonorLevelServiceTest {
 			}
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Account household = new Account(Name = 'The Okafor Family', Total_Giving__c = 999.99);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Okafor Family', Total_Giving__c = 999.99)
+			);
 
 			DonorLevelService.assignAll(new List<SObject>{ household });
 
@@ -353,7 +365,9 @@ private class DonorLevelServiceTest {
 					byName.get(LEADERSHIP).Id => 'EUR'
 				}
 			);
-			Account household = new Account(Name = 'The Weber Family', Total_Giving__c = 600);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Weber Family', Total_Giving__c = 600)
+			);
 
 			Boolean moved = DonorLevelService.assign(
 				household,

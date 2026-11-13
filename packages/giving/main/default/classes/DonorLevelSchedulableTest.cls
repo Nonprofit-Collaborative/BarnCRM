@@ -88,17 +88,21 @@ private class DonorLevelSchedulableTest {
 			List<Account> steady = new List<Account>();
 			for (Integer i = 0; i < 200; i++) {
 				crossing.add(
-					new Account(
-						Name = 'Crossing ' + i,
-						RecordTypeId = organizationType,
-						Last_Gift_Date__c = Date.today().addDays(-91)
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Crossing ' + i,
+							RecordTypeId = organizationType,
+							Last_Gift_Date__c = Date.today().addDays(-91)
+						)
 					)
 				);
 				steady.add(
-					new Account(
-						Name = 'Steady ' + i,
-						RecordTypeId = organizationType,
-						Last_Gift_Date__c = Date.today().addDays(-50)
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Steady ' + i,
+							RecordTypeId = organizationType,
+							Last_Gift_Date__c = Date.today().addDays(-50)
+						)
 					)
 				);
 			}
