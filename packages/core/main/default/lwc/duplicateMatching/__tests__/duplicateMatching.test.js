@@ -56,11 +56,11 @@ describe('c-duplicate-matching for an administrator', () => {
     }
   });
 
-  it('leaves the page name to the App Page header, with no card around the page', async () => {
+  it('shows the page name in its shell, on its tab, with no card around the page', async () => {
     const element = await render();
 
     const shell = element.shadowRoot.querySelector('c-barn-page-shell');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBe(false);
     expect(shell.title).toBe('c.Core_DuplicateMatching_Title');
     expect(shell.purpose).toBe('c.Core_DuplicateMatching_Intro');
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
@@ -94,10 +94,10 @@ describe('c-duplicate-matching for an administrator', () => {
     expect(tab.label).toBe('c.Core_DuplicateMatching_Review');
   });
 
-  it('sits in the page shell with the title for screen readers only', async () => {
+  it('sits in the page shell with its title shown', async () => {
     const element = await render();
     const shell = element.shadowRoot.querySelector('c-barn-page-shell');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBe(false);
     expect(shell.title).toBe('c.Core_DuplicateMatching_Title');
     expect(shell.purpose).toBe('c.Core_DuplicateMatching_Intro');
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();

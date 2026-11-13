@@ -49,14 +49,6 @@
         <value>{0} Grant Applications Are Past Their Deadline</value>
     </labels>
     <labels>
-        <fullName>Funders_SampleData_CountLabel</fullName>
-        <categories>SampleData</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Sample data card: what the Funders number counts</shortDescription>
-        <value>Grants</value>
-    </labels>
-    <labels>
         <fullName>Funders_Pipeline_Title</fullName>
         <categories>GrantPipeline</categories>
         <language>en_US</language>

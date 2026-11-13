@@ -36,7 +36,7 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
 		if (
 			!HealthCheckService.canManageSettings() ||
 			ModuleManagerService.turnedOff()
-				.contains(FundersAccessSync.MODULE_NAME.toLowerCase()) ||
+				.contains(FundersPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Grant__c.isAccessible()
 		) {
 			return found;

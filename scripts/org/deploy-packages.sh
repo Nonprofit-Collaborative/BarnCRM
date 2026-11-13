@@ -1073,150 +1073,16 @@ if ! printf '%s\n' 'TabAccessService.requestSync();' | sf apex run --target-org 
 fi
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
-  # The same gap for the Rollup Builder permission sets (ADR-0125 D2): RollupsPostInstall gives
-  # Rollup_Builder_Admin to BarnCRM_Admin holders and Rollup_Builder_User to BarnCRM_Staff and
-  # BarnCRM_Read_Only holders, and a deployment runs no post-install, so administrators could not
-  # open the Rollup Builder until the nightly run. requestSync() queues that sync and never
-  # throws. --core-only leaves the module out, so it leaves this out too.
+  # The same gap for every module's permission sets (ADR-0131, D-200 S1): each module's install
+  # gives its sets to the BarnCRM roles its catalog row names, and a deployment runs no
+  # post-install, so people could not open a module until the hourly access check. One call
+  # queues every module's sync (ModuleAccessSyncs, a module turned off is skipped) and never
+  # throws. --core-only leaves the modules out, so it leaves this out too.
   echo ""
-  echo "== Queueing the Rollup Builder access sync =="
-  if ! printf '%s\n' 'RollupAccessSync.requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Rollup Builder access sync was not queued. Nothing else is affected: the nightly run"
-    echo "syncs the access."
-  fi
-
-  # The same gap for the Volunteers permission sets (ADR-0127 decision 3): VolunteersPostInstall
-  # gives each to its BarnCRM role, and a deployment runs no post-install.
-  if volunteers_has_metadata; then
-    echo ""
-    echo "== Queueing the Volunteers access sync =="
-    if ! printf '%s\n' 'new VolunteersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-      echo "The Volunteers access sync was not queued. Nothing else is affected: the nightly access"
-      echo "check syncs the access."
-    fi
-  fi
-
-  # The same gap for the Programs permission sets (ADR-0151, programs module, decision 7).
-  echo ""
-  echo "== Queueing the Programs access sync =="
-  if ! printf '%s\n' 'new ProgramsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Programs access sync was not queued. Nothing else is affected: the hourly access"
+  echo "== Queueing the module access syncs =="
+  if ! printf '%s\n' 'ModuleAccessSyncs.requestAll();' | sf apex run --target-org "$ALIAS"; then
+    echo "The module access syncs were not queued. Nothing else is affected: the hourly access"
     echo "check syncs the access."
-  fi
-
-  # The same gap for the Logic Models permission sets (ADR-0154, logic models module, decision 7).
-  echo ""
-  echo "== Queueing the Logic Models access sync =="
-  if ! printf '%s\n' 'new LogicModelsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Logic Models access sync was not queued. Nothing else is affected: the hourly access"
-    echo "check syncs the access."
-  fi
-
-  # The same gap for the Funders permission sets (ADR-0161, funders module, decision 9).
-  echo ""
-  echo "== Queueing the Funders access sync =="
-  if ! printf '%s\n' 'new FundersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Funders access sync was not queued. Nothing else is affected: the hourly access"
-    echo "check syncs the access."
-  fi
-
-  # The same gap for the Forms permission sets (ADR-0175, forms module, decision 11).
-  echo ""
-  echo "== Queueing the Forms access sync =="
-  if ! printf '%s\n' 'new FormsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Forms access sync was not queued. Nothing else is affected: the hourly access"
-    echo "check syncs the access."
-  fi
-
-  # The same gap for the Contact Point Sync permission set (ADR-0176 contact point sync module,
-  # decision 12).
-  echo ""
-  echo "== Queueing the Contact Point Sync access sync =="
-  if ! printf '%s\n' 'new ContactPointsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Contact Point Sync access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Event Management permission sets (ADR-0177, events module, decision 7).
-  echo ""
-  echo "== Queueing the Event Management access sync =="
-  if ! printf '%s\n' 'new EventsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Event Management access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Portal Builder admin set (ADR-0185, portal builder, decision 10).
-  echo ""
-  echo "== Queueing the Portal Builder access sync =="
-  if ! printf '%s\n' 'new PortalAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Portal Builder access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Corporate Hub permission sets (ADR-0196, corporate hub module, decision 10).
-  echo ""
-  echo "== Queueing the Corporate Hub access sync =="
-  if ! printf '%s\n' 'new CorporateHubAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Corporate Hub access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Payments permission sets (ADR-0201 payments module, decision 9).
-  echo ""
-  echo "== Queueing the Payments access sync =="
-  if ! printf '%s\n' 'new PaymentsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Payments access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the LWC Builder permission sets (ADR-0203, lwc builder module, decision 9).
-  echo ""
-  echo "== Queueing the LWC Builder access sync =="
-  if ! printf '%s\n' 'new LwcBuilderAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The LWC Builder access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Scholarships permission sets (ADR-0204, scholarships module, decision 13).
-  echo ""
-  echo "== Queueing the Scholarships access sync =="
-  if ! printf '%s\n' 'new ScholarshipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Scholarships access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Territory Management permission sets (ADR-0205, territory management
-  # module, decision 7).
-  echo ""
-  echo "== Queueing the Territory Management access sync =="
-  if ! printf '%s\n' 'new TerritoryAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Territory Management access sync was not queued. Nothing else is affected: the"
-    echo "hourly access check syncs the access."
-  fi
-
-  # The same gap for the Memberships permission sets (ADR-0206 memberships module, decision 10).
-  echo ""
-  echo "== Queueing the Memberships access sync =="
-  if ! printf '%s\n' 'new MembershipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Memberships access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Project Management permission sets (ADR-0208, project management
-  # module, decision 9).
-  echo ""
-  echo "== Queueing the Project Management access sync =="
-  if ! printf '%s\n' 'new ProjectsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Project Management access sync was not queued. Nothing else is affected: the"
-    echo "hourly access check syncs the access."
-  fi
-
-  # The same gap for the Address Verification permission set (ADR-0209 address verification).
-  echo ""
-  echo "== Queueing the Address Verification access sync =="
-  if ! printf '%s\n' 'new AddressVerificationAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Address Verification access sync was not queued. Nothing else is affected: the"
-    echo "hourly access check syncs the access."
   fi
 fi
 

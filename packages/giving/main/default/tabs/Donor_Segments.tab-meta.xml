@@ -4,7 +4,7 @@
     Donor segments: named lists of people or organizations chosen by their giving, counted,
     listed and exported for an email tool (G-28).
   </description>
-  <flexiPage>Donor_Segments</flexiPage>
   <label>Donor Segments</label>
+  <lwcComponent>donorSegments</lwcComponent>
   <motif>Custom68: Globe</motif>
 </CustomTab>

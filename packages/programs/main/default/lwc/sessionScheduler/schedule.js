@@ -4,7 +4,7 @@
  * panel's sentences. Dates are ISO strings ("2027-03-01") read and written in UTC, so no time
  * zone moves a day.
  */
-import { format } from 'c/barnFormat';
+import { format, utcIsoDate } from 'c/barnFormat';
 
 /** The most sessions created in one action; the server checks it again. */
 export const MAX_SESSIONS = 200;
@@ -31,7 +31,7 @@ export function parseIsoDate(value) {
 
 /** A UTC timestamp as an ISO date. */
 export function toIsoDate(time) {
-  return new Date(time).toISOString().slice(0, 10);
+  return utcIsoDate(time);
 }
 
 /** The weekday choices, Monday first, named in this locale. */

@@ -38,4 +38,8 @@
     <field>Requires__c</field>
     <value xsi:nil="true" />
   </values>
+  <values>
+    <field>Access_By_Permission_Set__c</field>
+    <value xsi:type="xsd:string">Portal_Admin=BarnCRM_Admin</value>
+  </values>
 </CustomMetadata>

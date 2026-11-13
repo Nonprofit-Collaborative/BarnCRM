@@ -94,4 +94,41 @@ private class AddressDeleteHandlerTest {
 			Assert.isTrue(reread(anas.Id).IsDeleted, 'Ana\'s address went with her');
 		}
 	}
+
+	/**
+	 * QA review Q4: the marks noted before delete are kept in a static map until after delete.
+	 * A delete of 205 records runs the trigger in two chunks, so the second chunk's before
+	 * must add to the map, not replace it, or the first chunk's addresses stay behind.
+	 */
+	@IsTest
+	static void deletingMoreThanTwoHundredOrganizationsTakesEveryAddress() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> funders = new List<Account>();
+			for (Integer i = 0; i < 205; i++) {
+				funders.add(AddressTestDataFactory.newOrganization('Foundation ' + i));
+			}
+			Database.insert(funders, AccessLevel.SYSTEM_MODE);
+			List<Address__c> offices = new List<Address__c>();
+			for (Account funder : funders) {
+				offices.add(
+					new Address__c(
+						Account__c = funder.Id,
+						Street__c = '1 Main Street',
+						Is_Default__c = true
+					)
+				);
+			}
+			Database.insert(offices, AccessLevel.SYSTEM_MODE);
+
+			Test.startTest();
+			Database.delete(funders, AccessLevel.SYSTEM_MODE);
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Address__c WHERE Id IN :offices WITH SYSTEM_MODE],
+				'Every address went with its organization, in both chunks'
+			);
+		}
+	}
 }

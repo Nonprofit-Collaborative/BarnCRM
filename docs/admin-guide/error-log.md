@@ -54,6 +54,26 @@ Once you mark an entry Acknowledged, Resolved or Ignored, or an hour has passed 
 first written, the next repeat starts a new entry, so a problem that comes back after you
 dealt with it is never hidden in an old count.
 
+### Copy for Bug Report
+
+Each entry on the **Error Log** card has a **Copy for Bug Report** button. It copies a short
+report you can paste into a new issue on BarnCRM's GitHub page (see
+[SUPPORT.md](../../SUPPORT.md)). The report holds only:
+
+- where it happened, the object, the severity, when (in UTC) and how many times;
+- the error codes and exception names Salesforce raised, for example
+  `FIELD_CUSTOM_VALIDATION_EXCEPTION`;
+- the lines of code it passed through (up to 15).
+
+It leaves out the message, the records, and any names, emails, phone numbers, amounts or
+field values, even when the technical detail contains them, because GitHub issues are public.
+Only the BarnCRM Admin role's report includes the code lines; anyone else's says the technical
+detail was left out. Read the copied text before you post it, and add what you were doing when
+it happened.
+
+If your browser does not allow copying, the report appears in a box on the card: select it and
+copy it yourself.
+
 ## The Error Digest Email
 
 If nobody opens the BarnCRM home page for a few days, nobody sees the tile. The error digest fixes that:
@@ -170,8 +190,9 @@ Maria has heard from a colleague that "something did not save this morning."
 6. Come back to the Error Log entry and set **Status** to **Resolved**, then save. It
    drops out of the "New" count on the home page tile.
 7. If you cannot fix an entry yourself, set **Status** to **Acknowledged** instead, so
-   your colleagues know someone has seen it, and send the **Technical detail** to whoever
-   supports your Salesforce. That section is the part written for a developer.
+   your colleagues know someone has seen it. To report it as a BarnCRM bug, click
+   **Copy for Bug Report** on the card and paste the text into a new GitHub issue; it
+   leaves out every name and value from your records.
 8. Go back to the home page. The **Errors to Review** count has gone down by one.
 
 ## Common Mistakes
@@ -193,8 +214,8 @@ Maria has heard from a colleague that "something did not save this morning."
   Resolved keeps the history, which is what you want the next time the same thing happens,
   and it keeps the tile count accurate either way.
 - **Reading the technical detail first.** The message at the top is the one written for
-  you. The technical detail underneath is for a bug report on GitHub (see [SUPPORT.md](../../SUPPORT.md); remove names,
-  emails and amounts first), and it will not tell you
+  you. The technical detail underneath is for a bug report on GitHub (see [SUPPORT.md](../../SUPPORT.md);
+  **Copy for Bug Report** copies it with names, emails and amounts already removed), and it will not tell you
   anything about your data that the message does not already say.
 - **Expecting an entry for a mistake you made in a spreadsheet.** The Error Log records
   failures inside BarnCRM, not every data problem. A person imported with the wrong

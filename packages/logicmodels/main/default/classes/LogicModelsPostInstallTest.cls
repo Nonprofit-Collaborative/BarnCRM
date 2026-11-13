@@ -14,7 +14,7 @@ private class LogicModelsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :LogicModelsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Logic_Models_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -25,7 +25,7 @@ private class LogicModelsPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ LogicModelsAccessSync.ADMIN_SET }
+					new List<String>{ 'Logic_Models_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -36,8 +36,8 @@ private class LogicModelsPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new LogicModelsPostInstall(), null);
-			System.enqueueJob(new LogicModelsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new LogicModelsPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('LogicModels', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('LogicModels', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Logic Models Admin');
@@ -57,7 +57,7 @@ private class LogicModelsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :LogicModelsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'LogicModelsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -84,7 +84,7 @@ private class LogicModelsPostInstallTest {
 
 			Test.startTest();
 			new LogicModelsPostInstall().onInstall(null);
-			System.enqueueJob(new LogicModelsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('LogicModels', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -92,7 +92,7 @@ private class LogicModelsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :LogicModelsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'LogicModelsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

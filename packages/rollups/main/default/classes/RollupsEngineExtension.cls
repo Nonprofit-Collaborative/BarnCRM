@@ -13,9 +13,8 @@ public with sharing class RollupsEngineExtension implements RollupEngineExtensio
 
 	public void afterModuleTurnedOn(String moduleName) {
 		if (RollupService.MODULE_NAME.equalsIgnoreCase(moduleName)) {
+			// Core's Turn on also queues the module's access sync from its catalog row (D2).
 			RollupService.catchUpAfterTurnedOn();
-			// People given a BarnCRM role while it was off get their sets now (D2).
-			RollupAccessSync.requestSync();
 		}
 	}
 

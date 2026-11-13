@@ -4,7 +4,7 @@
     Mirrors gifts and Salesforce Opportunities: direction, Run Now, the nightly schedule and the
     reconciliation.
   </description>
-  <flexiPage>Opportunity_Mirror</flexiPage>
   <label>Opportunity Mirror</label>
+  <lwcComponent>opportunityMirror</lwcComponent>
   <motif>Custom30: Radardish</motif>
 </CustomTab>

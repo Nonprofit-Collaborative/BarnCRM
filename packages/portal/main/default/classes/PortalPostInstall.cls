@@ -7,16 +7,14 @@
  *
  * 1. Queue the job that gives the installer Portal Builder Admin (a permission set assignment is
  *    a setup object write).
- * 2. Give the set to BarnCRM Admin holders (`PortalAccessSync`), queued for the same reason; the
+ * 2. Give the set to BarnCRM Admin holders (`ModuleAccessSyncs`), queued for the same reason; the
  *    installer's job runs it after its own grant.
  *
  * Nothing is switched on: Portal Sign-In ships off, and no portal exists until an admin adds one.
  */
 @NamespaceAccessible
 public with sharing class PortalPostInstall implements InstallHandler, ModuleSetup {
-	private static final String MODULE_KEY = 'Portal';
-	@TestVisible
-	private static final String ACCESS_CONTEXT = 'PortalPostInstall.grantInstallerAccess';
+	public static final String MODULE_KEY = 'Portal';
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {
@@ -38,79 +36,6 @@ public with sharing class PortalPostInstall implements InstallHandler, ModuleSet
 	 */
 	public void runSetup(Id installerId) {
 		ModuleSetups.markRan(MODULE_KEY);
-		if (installerId == null) {
-			new PortalAccessSync().requestSync();
-			return;
-		}
-		try {
-			System.enqueueJob(new InstallerAccess(installerId));
-		} catch (Exception e) {
-			ErrorLogger.log(e, ACCESS_CONTEXT);
-			new PortalAccessSync().requestSync();
-		}
-	}
-
-	/**
-	 * Gives the installer Portal Builder Admin, unless they hold it already, then BarnCRM Admin
-	 * holders theirs. System mode: the install runs as the platform's package user.
-	 */
-	public without sharing class InstallerAccess implements Queueable {
-		private final Id installerId;
-
-		public InstallerAccess(Id installerId) {
-			this.installerId = installerId;
-		}
-
-		public void execute(QueueableContext jobContext) {
-			giveInstaller();
-			try {
-				// A test cannot chain one queued job from another.
-				if (PortalAccessSync.syncOnce() && !Test.isRunningTest()) {
-					System.enqueueJob(new ModuleAccessSyncBase.Job(new PortalAccessSync()));
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
-
-		private void giveInstaller() {
-			try {
-				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
-					PortalAccessSync.ADMIN_SET
-				);
-				if (permissionSet == null) {
-					return;
-				}
-				Integer held = [
-					SELECT COUNT()
-					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :permissionSet.Id
-					WITH SYSTEM_MODE
-				];
-				if (held > 0) {
-					return;
-				}
-				Database.SaveResult saved = Database.insert(
-					new PermissionSetAssignment(
-						AssigneeId = installerId,
-						PermissionSetId = permissionSet.Id
-					),
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
-				// A duplicate means another job gave it a moment before: what was wanted.
-				for (Database.Error error : saved.getErrors()) {
-					if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-						ErrorLogger.logMessage(
-							error.getMessage(),
-							ACCESS_CONTEXT,
-							ErrorLogger.SEVERITY_WARNING
-						);
-					}
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
+		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}
 }

@@ -78,6 +78,9 @@ jobs:
       - name: Check trigger handlers read their records only through the accessors
         run: python3 scripts/ci/check-trigger-handler-records.py
 
+      - name: Check trigger handlers add to, never replace, their static before-to-after state
+        run: python3 scripts/ci/check-trigger-static-state.py
+
       - name: Check the global describe is read only through NamespaceUtil
         run: python3 scripts/ci/check-global-describe.py
 
@@ -153,8 +156,14 @@ jobs:
       - name: Check every Apex test runs as a user it creates, not as the deploying user
         run: python3 scripts/ci/check-tests-run-as.py
 
+      - name: Check every Apex controller has a test running as a non-admin user (ratchet)
+        run: python3 scripts/ci/check-aura-non-admin-tests.py
+
       - name: Check every Apex test class names what it tests, for the incremental org gate
         run: python3 scripts/ci/check-test-relevance.py
+
+      - name: Check every component test asserts accessibility (baseline only shrinks)
+        run: python3 scripts/ci/check-jest-a11y.py
 
       - name: Check every LWC call to Apex names that method's parameters
         run: python3 scripts/ci/check-lwc-apex-params.py

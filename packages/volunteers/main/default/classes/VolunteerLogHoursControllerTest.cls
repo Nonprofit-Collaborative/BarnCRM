@@ -57,4 +57,37 @@ private class VolunteerLogHoursControllerTest {
 			Assert.areEqual('Contact', fromPerson.personObject, 'Picked as a contact.');
 		}
 	}
+
+	/**
+	 * QA review Q1: Log Hours as the people who use it. Volunteers Staff may log hours and
+	 * Volunteers Read Only may not, so the window offers the form to one and not the other.
+	 */
+	@IsTest
+	static void staffMayLogHoursAndReadOnlyMayNot() {
+		User staff;
+		User reader;
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			staff = TestDataFactory.createUser(
+				'Staff',
+				new List<String>{ 'BarnCRM_Staff', 'Volunteers_Staff' }
+			);
+			reader = TestDataFactory.createUser(
+				'Reader',
+				new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' }
+			);
+		}
+		VolunteerLogHoursController.Context forStaff;
+		VolunteerLogHoursController.Context forReader;
+		Test.startTest();
+		System.runAs(staff) {
+			forStaff = VolunteerLogHoursController.getContext(null);
+		}
+		System.runAs(reader) {
+			forReader = VolunteerLogHoursController.getContext(null);
+		}
+		Test.stopTest();
+
+		Assert.isTrue(forStaff.canCreate, 'Staff may log hours.');
+		Assert.isFalse(forReader.canCreate, 'Read Only may not.');
+	}
 }

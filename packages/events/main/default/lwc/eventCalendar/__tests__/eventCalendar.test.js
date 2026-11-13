@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import EventCalendar from 'c/eventCalendar';
 import getCalendar from '@salesforce/apex/EventCalendarController.getCalendar';
+import { utcIsoDate } from 'c/barnFormat';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -31,7 +32,7 @@ jest.mock('@salesforce/label/c.Core_Address_DateRange', () => ({ default: '{0} t
 const NOW = new Date();
 const day = (dayOfMonth, hour) =>
   new Date(Date.UTC(NOW.getUTCFullYear(), NOW.getUTCMonth(), dayOfMonth, hour)).toISOString();
-const TODAY = NOW.toISOString().slice(0, 10);
+const TODAY = utcIsoDate(NOW);
 
 const CALENDAR = {
   today: TODAY,

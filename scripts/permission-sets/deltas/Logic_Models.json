@@ -1,0 +1,17 @@
+{
+  "Admin": {
+    "label": "Logic Models Admin",
+    "description": ["Builds and manages logic models, indicators and results, including deleting a whole", "logic model."],
+    "set": {
+      "fieldPermissions": {
+        "Indicator__c.Source_Definition__c": {"editable": "true"},
+        "Indicator__c.Source_Query__c": {"editable": "true"},
+        "Indicator__c.Source__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Logic_Model__c": {"allowDelete": "true"}
+      }
+    }
+  },
+  "Read_Only": {"label": "Logic Models Read Only", "description": "Looks at logic models, indicators and results without changing them.", "readOnly": true}
+}

@@ -3,7 +3,7 @@
   <description>
     Open federal funding listings from Grants.gov, saved to the pipeline in one click.
   </description>
-  <flexiPage>Grant_Finder</flexiPage>
   <label>Grant Finder</label>
+  <lwcComponent>grantFinder</lwcComponent>
   <motif>Custom80: Motorcycle</motif>
 </CustomTab>

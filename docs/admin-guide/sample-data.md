@@ -99,10 +99,10 @@ Removal takes the sample people's service deliveries and enrollments in the samp
 programs and their services. A sample program one of your own people is enrolled
 in, or has a service delivery in, stays with those records, and so does a sample program with
 a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
-Warning in the [Error Log](error-log.md) names it: "Sample data removal kept the sample
-programs {names}, because people of your own are enrolled in them or have services recorded in
-them, or a sample enrollment in them has case notes. Move or delete those enrollments, service
-deliveries and case notes, then select Remove Sample Data again."
+Warning in the [Error Log](error-log.md) names each kept record by kind: "Sample data removal
+kept some Programs sample records, because records of your own point at them: Programs (Food
+pantry). Move or delete your records, then remove sample data again." The same Warning covers
+any module whose sample set ships as a data file (Programs, Funders and Events).
 
 ### With Funders Installed
 

@@ -79,11 +79,11 @@ describe('c-data-manager', () => {
     jest.clearAllMocks();
   });
 
-  it('leaves the page name to the App Page header, and leads with the purpose', async () => {
+  it('shows the page name in its shell, on its tab, and leads with the purpose', async () => {
     const element = await render();
 
     const shell = one(element, 'shell');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBe(false);
     expect(shell.title).toBe('c.Core_DataManager_Title');
     expect(shell.purpose).toBe('c.Core_DataManager_Intro');
     expect(shell.iconName).toBeUndefined();

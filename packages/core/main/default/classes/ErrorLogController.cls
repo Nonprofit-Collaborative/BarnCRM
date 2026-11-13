@@ -76,14 +76,48 @@ public with sharing class ErrorLogController {
 		}
 	}
 
-	private static Error_Log__c validatedEntry(String errorLogId) {
+	/**
+	 * What "Copy for Bug Report" turns into text (QA review Q10): where and when it happened,
+	 * how often, and, for someone who may read it, the technical detail. Never the message or
+	 * the record: c/bugReportText keeps only error codes and stack lines from the detail, so
+	 * the copied text holds no names, emails or record data.
+	 */
+	@AuraEnabled
+	public static Map<String, Object> getBugReport(String errorLogId) {
+		try {
+			Error_Log__c entry = ErrorLogSelector.selectForBugReport(entryIdOf(errorLogId));
+			if (entry == null) {
+				throw new ErrorLogControllerException(
+					BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
+				);
+			}
+			return new Map<String, Object>{
+				'context' => entry.Context__c,
+				'severity' => entry.Severity__c,
+				'occurredAt' => entry.Timestamp__c,
+				'occurrences' => entry.Occurrences__c,
+				'objectName' => entry.Object_Name__c,
+				'technicalDetail' => entry.getPopulatedFieldsAsMap().get('Technical_Detail__c')
+			};
+		} catch (Exception caught) {
+			throw ERRORS.wrap(caught, 'Copy an error for a bug report');
+		}
+	}
+
+	private static Id entryIdOf(String errorLogId) {
 		Id entryId = asRecordId(errorLogId);
 		if (entryId == null || entryId.getSObjectType() != Error_Log__c.SObjectType) {
 			throw new ErrorLogControllerException(
 				BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
 			);
 		}
-		List<Error_Log__c> found = ErrorLogSelector.selectByIds(new Set<Id>{ entryId });
+		return entryId;
+	}
+
+	private static Error_Log__c validatedEntry(String errorLogId) {
+		List<Error_Log__c> found = ErrorLogSelector.selectByIds(
+			new Set<Id>{ entryIdOf(errorLogId) }
+		);
 		if (found.isEmpty()) {
 			throw new ErrorLogControllerException(
 				BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
