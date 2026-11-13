@@ -37,9 +37,9 @@
             <p class="slds-var-m-top_x-small" data-id="hours">{hoursText}</p>
             <template lwc:if={hasBudgetAmount}>
               <p data-id="budget">
-                <lightning-formatted-number value={project.Actual_Cost__c} format-style="currency"></lightning-formatted-number>
+                <lightning-formatted-number value={project.actualCost} format-style="currency"></lightning-formatted-number>
                 /
-                <lightning-formatted-number value={project.Budget_Amount__c} format-style="currency"></lightning-formatted-number>
+                <lightning-formatted-number value={project.budgetAmount} format-style="currency"></lightning-formatted-number>
               </p>
             </template>
           </template>
@@ -87,17 +87,17 @@
             <template lwc:if={group.hasTasks}>
               <ul class="slds-has-dividers_bottom-space">
                 <template for:each={group.tasks} for:item="task">
-                  <li key={task.Id} class="slds-item slds-grid slds-wrap slds-grid_vertical-align-center" data-id="task">
+                  <li key={task.id} class="slds-item slds-grid slds-wrap slds-grid_vertical-align-center" data-id="task">
                     <span class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
-                      <a href={task.href}>{task.Name}</a>
-                      <template lwc:if={task.Milestone__c}><span class="slds-badge slds-var-m-left_x-small">{labels.milestone}</span></template>
+                      <a href={task.href}>{task.name}</a>
+                      <template lwc:if={task.milestone}><span class="slds-badge slds-var-m-left_x-small">{labels.milestone}</span></template>
                       <span class="slds-text-color_weak slds-var-m-left_x-small">{task.owner}</span>
                     </span>
                     <span class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-                      <template lwc:if={task.late}><span class="slds-text-color_error">{task.Due_Date__c}</span></template>
-                      <template lwc:else>{task.Due_Date__c}</template>
+                      <template lwc:if={task.late}><span class="slds-text-color_error">{task.dueDate}</span></template>
+                      <template lwc:else>{task.dueDate}</template>
                     </span>
-                    <lightning-combobox class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4" label={labels.status} variant="label-hidden" value={task.Status__c} options={task.options} data-task={task.Id} onchange={handleStatus} disabled={isWorking}></lightning-combobox>
+                    <lightning-combobox class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4" label={labels.status} variant="label-hidden" value={task.status} options={task.options} data-task={task.id} onchange={handleStatus} disabled={isWorking}></lightning-combobox>
                   </li>
                 </template>
               </ul>

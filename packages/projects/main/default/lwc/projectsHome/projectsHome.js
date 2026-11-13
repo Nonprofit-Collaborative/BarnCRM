@@ -115,9 +115,8 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
   get tasks() {
     return (this.home?.myTasks || []).map((row) => ({
       ...row,
-      href: `/lightning/r/${row.Id}/view`,
-      projectHref: `/lightning/r/${row.Project__c}/view`,
-      projectName: row.Project__r?.Name
+      href: `/lightning/r/${row.id}/view`,
+      projectHref: `/lightning/r/${row.projectId}/view`
     }));
   }
 

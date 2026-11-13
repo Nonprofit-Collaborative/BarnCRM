@@ -231,8 +231,9 @@ CAPS = {
     "lwcbuilder": 21_400,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
-    # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
-    "scholarships": 50_300,
+    # controller, plus the review and requirement DTOs (R1.21 namespace readiness, D-200 N3),
+    # 51,267 measured (Prettier line breaks included), plus about 2%.
+    "scholarships": 52_300,
     # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
@@ -259,8 +260,9 @@ CAPS = {
     # hours): +12,766. 97,102 measured, plus about 2%. Review fixes (#1237: invoice delete guard,
     # row cap, resources helper) and the release-gate fixes (revenue Chunk queueable, rate query):
     # 99,230 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21:
-    # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%.
-    "projects": 100_600,
+    # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%. The
+    # ProjectViews DTOs (R1.21 namespace readiness, D-200 N3): 106,037 measured, plus about 2%.
+    "projects": 108_200,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

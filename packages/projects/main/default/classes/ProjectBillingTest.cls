@@ -312,17 +312,17 @@ private class ProjectBillingTest {
 
 			Test.startTest();
 			Id documentId = ProjectBillingController.printInvoice(invoiceId);
-			List<Project_Invoice__c> first = ProjectBillingController.exportInvoices(
+			List<ProjectViews.Invoice> first = ProjectBillingController.exportInvoices(
 				Date.today(),
 				Date.today(),
 				false
 			);
-			List<Project_Invoice__c> again = ProjectBillingController.exportInvoices(
+			List<ProjectViews.Invoice> again = ProjectBillingController.exportInvoices(
 				Date.today(),
 				Date.today(),
 				false
 			);
-			List<Project_Invoice__c> included = ProjectBillingController.exportInvoices(
+			List<ProjectViews.Invoice> included = ProjectBillingController.exportInvoices(
 				Date.today(),
 				Date.today(),
 				true
@@ -368,7 +368,7 @@ private class ProjectBillingTest {
 			Assert.isTrue(html.contains('Net 30 &lt;thanks&gt;'), 'Values are escaped');
 			Assert.isTrue(html.contains('200.00'), 'The total');
 			Assert.areEqual(1, first.size(), 'The sent invoice');
-			Assert.areEqual(1, first[0].Lines__r.size(), 'With its lines');
+			Assert.areEqual(1, first[0].lines.size(), 'With its lines');
 			Assert.areEqual(0, again.size(), 'Exported once');
 			Assert.areEqual(1, included.size(), 'Unless asked');
 		}

@@ -21,7 +21,7 @@ const REVIEW = {
     { key: 'need', label: 'Need', max: 10, weight: 2 },
     { key: 'essay', label: 'Essay', max: 10, weight: 1 }
   ],
-  mine: { Status__c: 'Assigned', Scores__c: '{"need":8}' }
+  mine: { status: 'Assigned', scores: '{"need":8}' }
 };
 
 function mount() {
@@ -72,7 +72,7 @@ describe('c-application-review', () => {
     const reason = find(element, 'reason');
     reason.value = 'My niece';
     reason.dispatchEvent(new CustomEvent('change'));
-    getReview.mockResolvedValue({ ...REVIEW, mine: { Status__c: 'Recused' } });
+    getReview.mockResolvedValue({ ...REVIEW, mine: { status: 'Recused' } });
     find(element, 'confirm-recuse').click();
     await flush();
     await flush();

@@ -42,38 +42,38 @@ const BOARD = {
   canCreateTime: true,
   canCreateExpense: true,
   project: {
-    Id: 'a01000000000001AAA',
-    Health__c: 'At Risk',
-    Health_Reasons__c: 'Data mapping was due 1/1/2027.',
-    Start_Date__c: '2027-01-01',
-    Target_Date__c: '2027-01-10',
-    Tasks__c: 2,
-    Tasks_Done__c: 1,
-    Actual_Hours__c: 4,
-    Estimated_Hours__c: 20,
-    Budget_Hours__c: 30
+    id: 'a01000000000001AAA',
+    health: 'At Risk',
+    healthReasons: 'Data mapping was due 1/1/2027.',
+    startDate: '2027-01-01',
+    targetDate: '2027-01-10',
+    taskCount: 2,
+    tasksDone: 1,
+    actualHours: 4,
+    estimatedHours: 20,
+    budgetHours: 30
   },
   phases: [
     {
-      Id: 'a02000000000001AAA',
-      Name: 'Build',
-      Start_Date__c: '2027-01-01',
-      End_Date__c: '2027-01-05'
+      id: 'a02000000000001AAA',
+      name: 'Build',
+      startDate: '2027-01-01',
+      endDate: '2027-01-05'
     }
   ],
   tasks: [
     {
-      Id: 'a03000000000001AAA',
-      Name: 'Configure',
-      Phase__c: 'a02000000000001AAA',
-      Status__c: 'Done'
+      id: 'a03000000000001AAA',
+      name: 'Configure',
+      phaseId: 'a02000000000001AAA',
+      status: 'Done'
     },
     {
-      Id: 'a03000000000002AAA',
-      Name: 'Go-Live',
-      Phase__c: 'a02000000000001AAA',
-      Status__c: 'Not Started',
-      Milestone__c: true
+      id: 'a03000000000002AAA',
+      name: 'Go-Live',
+      phaseId: 'a02000000000001AAA',
+      status: 'Not Started',
+      milestone: true
     }
   ]
 };
@@ -200,7 +200,7 @@ describe('c-project-board', () => {
 
   it('adds approved change hours to the budget (R-PM20)', async () => {
     setHelpTextForTest({ Projects_Board_HoursLine: 'Budget: {2} hours' });
-    getBoard.mockResolvedValue({ ...BOARD, project: { ...BOARD.project, Change_Hours__c: 10 } });
+    getBoard.mockResolvedValue({ ...BOARD, project: { ...BOARD.project, changeHours: 10 } });
     const element = mount();
     await flush();
     expect(find(element, 'hours').textContent).toContain('Budget: 40 hours');

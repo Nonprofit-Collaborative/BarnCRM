@@ -17,11 +17,11 @@ public with sharing class ProjectTimesheetController {
 		@AuraEnabled
 		public Boolean expensesEnabled = false;
 		@AuraEnabled
-		public List<Time_Entry__c> entries = new List<Time_Entry__c>();
+		public List<ProjectViews.WeekRow> entries = new List<ProjectViews.WeekRow>();
 		@AuraEnabled
-		public List<Project_Expense__c> expenses = new List<Project_Expense__c>();
+		public List<ProjectViews.WeekRow> expenses = new List<ProjectViews.WeekRow>();
 		@AuraEnabled
-		public List<Project__c> projects = new List<Project__c>();
+		public List<ProjectViews.Named> projects = new List<ProjectViews.Named>();
 	}
 
 	/** One grid cell: an existing entry to change (id) or a new one for a project and day. */
@@ -54,7 +54,7 @@ public with sharing class ProjectTimesheetController {
 			}
 			Id me = UserInfo.getUserId();
 			week.expensesEnabled = ProjectsSettings.expensesEnabled();
-			week.entries = [
+			for (Time_Entry__c entry : [
 				SELECT
 					Id,
 					Project__c,
@@ -72,9 +72,11 @@ public with sharing class ProjectTimesheetController {
 				WITH USER_MODE
 				ORDER BY Project__r.Name, Date__c
 				LIMIT 500
-			];
+			]) {
+				week.entries.add(new ProjectViews.WeekRow(entry));
+			}
 			if (week.expensesEnabled) {
-				week.expenses = [
+				for (Project_Expense__c expense : [
 					SELECT
 						Id,
 						Project__c,
@@ -91,16 +93,20 @@ public with sharing class ProjectTimesheetController {
 					WITH USER_MODE
 					ORDER BY Date__c
 					LIMIT 200
-				];
+				]) {
+					week.expenses.add(new ProjectViews.WeekRow(expense));
+				}
 			}
-			week.projects = [
-				SELECT Id, Name
-				FROM Project__c
-				WHERE Status__c IN ('Planned', 'Active') AND Is_Template__c = FALSE
-				WITH USER_MODE
-				ORDER BY Name
-				LIMIT 200
-			];
+			week.projects = ProjectViews.named(
+				[
+					SELECT Id, Name
+					FROM Project__c
+					WHERE Status__c IN ('Planned', 'Active') AND Is_Template__c = FALSE
+					WITH USER_MODE
+					ORDER BY Name
+					LIMIT 200
+				]
+			);
 			return week;
 		} catch (Exception e) {
 			throw failure(e);
@@ -109,16 +115,18 @@ public with sharing class ProjectTimesheetController {
 
 	/** The open tasks of a project, for a new timesheet row. */
 	@AuraEnabled
-	public static List<Project_Task__c> getTasks(Id projectId) {
+	public static List<ProjectViews.Named> getTasks(Id projectId) {
 		try {
-			return [
-				SELECT Id, Name
-				FROM Project_Task__c
-				WHERE Project__c = :projectId AND Status__c NOT IN ('Done', 'Cancelled')
-				WITH USER_MODE
-				ORDER BY Sort_Order__c NULLS LAST, Name
-				LIMIT 200
-			];
+			return ProjectViews.named(
+				[
+					SELECT Id, Name
+					FROM Project_Task__c
+					WHERE Project__c = :projectId AND Status__c NOT IN ('Done', 'Cancelled')
+					WITH USER_MODE
+					ORDER BY Sort_Order__c NULLS LAST, Name
+					LIMIT 200
+				]
+			);
 		} catch (Exception e) {
 			throw failure(e);
 		}

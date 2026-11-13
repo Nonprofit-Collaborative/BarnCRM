@@ -60,19 +60,19 @@
         <template lwc:if={hasRequirements}>
           <ul class="slds-has-dividers_bottom-space" data-id="requirements">
             <template for:each={requirements} for:item="r">
-              <li key={r.Id} class="slds-item">
-                <a href={r.href}>{r.Name}</a>
-                <span class="slds-var-m-left_x-small">{r.Type__c}</span>
-                <span class="slds-var-m-left_x-small">{r.Status__c}</span>
-                <lightning-formatted-date-time value={r.Due_Date__c} class="slds-var-m-left_x-small"></lightning-formatted-date-time>
+              <li key={r.id} class="slds-item">
+                <a href={r.href}>{r.name}</a>
+                <span class="slds-var-m-left_x-small">{r.type}</span>
+                <span class="slds-var-m-left_x-small">{r.status}</span>
+                <lightning-formatted-date-time value={r.dueDate} class="slds-var-m-left_x-small"></lightning-formatted-date-time>
                 <span class="slds-var-m-left_x-small slds-text-color_weak">{r.blocks}</span>
-                <template lwc:if={r.Form_Link__c}>
-                  <a href={r.Form_Link__c} target="_blank" class="slds-var-m-left_x-small">{labels.reportLink}</a>
+                <template lwc:if={r.formLink}>
+                  <a href={r.formLink} target="_blank" class="slds-var-m-left_x-small">{labels.reportLink}</a>
                 </template>
                 <template lwc:if={r.isOpen}>
-                  <lightning-button class="slds-var-m-left_x-small" data-row-id={r.Id} data-status="Met" data-id="met" label={labels.met} disabled={isWorking} onclick={handleRequirement}></lightning-button>
+                  <lightning-button class="slds-var-m-left_x-small" data-row-id={r.id} data-status="Met" data-id="met" label={labels.met} disabled={isWorking} onclick={handleRequirement}></lightning-button>
                   <template lwc:if={canManage}>
-                    <lightning-button class="slds-var-m-left_x-small" data-row-id={r.Id} data-status="Waived" data-id="waive" label={labels.waive} disabled={isWorking} onclick={handleRequirement}></lightning-button>
+                    <lightning-button class="slds-var-m-left_x-small" data-row-id={r.id} data-status="Waived" data-id="waive" label={labels.waive} disabled={isWorking} onclick={handleRequirement}></lightning-button>
                   </template>
                 </template>
               </li>

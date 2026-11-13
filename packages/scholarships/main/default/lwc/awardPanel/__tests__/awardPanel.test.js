@@ -41,7 +41,7 @@ const PANEL = {
     { id: 'a01000000000002AAA', name: 'DSB-2', amount: 500, status: 'Scheduled', held: false }
   ],
   requirements: [
-    { Id: 'a02000000000001AAA', Name: 'Enrollment', Type__c: 'Condition', Status__c: 'Open' }
+    { id: 'a02000000000001AAA', name: 'Enrollment', type: 'Condition', status: 'Open' }
   ]
 };
 

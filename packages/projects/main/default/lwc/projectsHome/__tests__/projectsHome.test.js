@@ -46,10 +46,10 @@ const HOME = {
   ],
   myTasks: [
     {
-      Id: 'a03000000000001AAA',
-      Name: 'Interviews',
-      Project__c: 'a01000000000001AAA',
-      Project__r: { Name: 'Rollout' }
+      id: 'a03000000000001AAA',
+      name: 'Interviews',
+      projectId: 'a01000000000001AAA',
+      projectName: 'Rollout'
     }
   ]
 };

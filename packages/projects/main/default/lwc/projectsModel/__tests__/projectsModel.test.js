@@ -17,32 +17,32 @@ describe('c-projects-model', () => {
   });
 
   it('treats Done and Cancelled as closed', () => {
-    expect(isOpen({ Status__c: 'Blocked' })).toBe(true);
-    expect(isOpen({ Status__c: 'Done' })).toBe(false);
-    expect(isOpen({ Status__c: 'Cancelled' })).toBe(false);
+    expect(isOpen({ status: 'Blocked' })).toBe(true);
+    expect(isOpen({ status: 'Done' })).toBe(false);
+    expect(isOpen({ status: 'Cancelled' })).toBe(false);
   });
 
   it('groups tasks under their phases, leaves cancelled ones out of the count, and keeps loose ones last', () => {
     const groups = groupTasks(
-      [{ Id: 'p1', Name: 'Build' }],
+      [{ id: 'p1', name: 'Build' }],
       [
-        { Id: 't1', Phase__c: 'p1', Status__c: 'Done' },
-        { Id: 't2', Phase__c: 'p1', Status__c: 'In Progress' },
-        { Id: 't3', Phase__c: 'p1', Status__c: 'Cancelled' },
-        { Id: 't4', Phase__c: null, Status__c: 'Not Started' }
+        { id: 't1', phaseId: 'p1', status: 'Done' },
+        { id: 't2', phaseId: 'p1', status: 'In Progress' },
+        { id: 't3', phaseId: 'p1', status: 'Cancelled' },
+        { id: 't4', phaseId: null, status: 'Not Started' }
       ]
     );
     expect(groups).toHaveLength(2);
-    expect(groups[0]).toMatchObject({ Id: 'p1', done: 1, total: 2, percent: 50 });
+    expect(groups[0]).toMatchObject({ id: 'p1', done: 1, total: 2, percent: 50 });
     expect(groups[0].tasks).toHaveLength(3);
-    expect(groups[1]).toMatchObject({ Id: null, total: 1, percent: 0 });
+    expect(groups[1]).toMatchObject({ id: null, total: 1, percent: 0 });
   });
 
   it('places phase bars on the project span and marks today', () => {
-    const project = { Start_Date__c: '2027-01-01', Target_Date__c: '2027-01-10' };
+    const project = { startDate: '2027-01-01', targetDate: '2027-01-10' };
     const phases = [
-      { Start_Date__c: '2027-01-01', End_Date__c: '2027-01-05' },
-      { Start_Date__c: '2027-01-06' }
+      { startDate: '2027-01-01', endDate: '2027-01-05' },
+      { startDate: '2027-01-06' }
     ];
     const span = timelineSpan(project, phases);
     expect(bar(phases[0], span)).toEqual({ left: 0, width: 50 });
