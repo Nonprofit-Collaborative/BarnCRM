@@ -73,11 +73,14 @@ CAPS = {
     # AsyncStarter and its call sites (P9), 2,232,757; with address match keys (P6), 2,238,235.
     # With D-200 P4 and P10 (Error Log repeats coalesced, refused rows logged once, the rollup
     # write flag): 2,243,035 measured, raised by what they add plus about 0.1%.
+    # Raised 2026-11-13 for D-200 S2, the generic JSON sample data loader (SampleDataFile, about
+    # 10,200), which let Programs, Funders and Events drop about 41,000 of loader Apex (their caps
+    # lowered to match): 2,248,668 measured, plus about 0.1%.
     # D-200 S1 and S6 (release 1.23): module wiring as catalog data (ModuleExtensions,
     # ModuleAccessSyncs, the catalog fields) and the one nightly card's switch and Run Now:
-    # 2,245,836 measured, raised by what they add plus about 0.1%; the modules shrank by about
-    # 50,000 together.
-    "core": 2_248_100,
+    # 2,256,617 measured with S2, raised by what they add (about 8,000) plus about 0.1%; the
+    # modules shrank by about 50,000 together.
+    "core": 2_258_900,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -152,9 +155,11 @@ CAPS = {
     # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 177,950 measured, plus
     # about 0.5%.
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 160,756
+    # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
-    # catalog data): 173,333 measured, plus about 2%.
-    "programs": 176_800,
+    # catalog data): 157,934 measured with S2, plus about 2%.
+    "programs": 161_100,
     # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
     # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
     # 66,645 measured 2026-11-11, plus about 0.5%.
@@ -169,9 +174,11 @@ CAPS = {
     # checklists, documents, budget lines and renewals, plus about 2%.
     # Lowered at the cut-over cleanup (D-200, release 1.21): 123,925 measured 2026-11-12, plus
     # about 2%.
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 116,807
+    # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
-    # catalog data): 120,898 measured, plus about 2%.
-    "funders": 123_400,
+    # catalog data): 115,433 measured with S2, plus about 2%.
+    "funders": 117_800,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -216,9 +223,11 @@ CAPS = {
     # Releases 1.11 to 1.13 EVT-B (branches feature/evt-b-*): 247,001 measured (EV-22 attendee
     # app actions, EV-23 budget, EV-24 venue and room fills, EV-25 speaker checklist, EV-28
     # booth scans, EV-29 agenda picks and ratings), plus about 2%.
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 228,605
+    # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
-    # catalog data): 244,374 measured, plus about 2%.
-    "events": 249_300,
+    # catalog data): 227,251 measured with S2, plus about 1.5%.
+    "events": 231_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
