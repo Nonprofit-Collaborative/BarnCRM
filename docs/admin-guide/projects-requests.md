@@ -127,7 +127,9 @@ body over 32 KB or not valid JSON `400 bad_request`.
 ## Sending Your Cases to a Service Provider (BarnCRM Mirror)
 
 An org that uses Salesforce Cases and has **BarnCRM Mirror** installed can send a Case to a
-provider org running BarnCRM Projects.
+provider org running BarnCRM Projects, and follow its status on its Provider Requests tab: set
+up a Request Connection for it as above, then see
+[Cases Sent to a Service Provider](mirror-case-requests.md) for its side.
 
 ## Reports
 

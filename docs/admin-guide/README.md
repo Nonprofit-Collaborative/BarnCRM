@@ -221,6 +221,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Mirror |
 | X-07 Gift Transaction mirror | [gift-transaction-mirror.md](gift-transaction-mirror.md) | Mirror |
+| D-201 Cases sent to a service provider: the named credential, the setting, the nightly run and flow action, Provider Requests | [mirror-case-requests.md](mirror-case-requests.md) | Mirror |
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Mirror |
 | X-03, X-06 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Mirror |
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Mirror |

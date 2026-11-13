@@ -8637,6 +8637,38 @@ range that are dated on or after the start date.
 
 ---
 
+## 29C2. Provider Request
+
+### Definition
+
+A Case this org sent to a service provider running BarnCRM Projects, with the provider's request number, status and resolution (D-201, ADR-NEXT `NEXT-projects-requests-and-issues.md` decision 7). Off until Send Cases to a service provider is on.
+
+### Rules
+
+**R-PR1 Sending.** While `Mirror_Settings__c.Case_Requests_Enabled__c` is on (shipped off) and the org has Case, a Case is posted to the provider's request API (Section 29PM18, R-PM26) through the Named Credential `Barn_Request_Provider`, which the admin creates: by the flow action Send Cases to a Service Provider, or by the nightly step for every open Case whose Type is `Case_Requests_Type__c` (default Service Provider). A Case with a Request Number is never sent again. A refusal is kept in Last Error and the Error Log, and the next run sends the Case again.
+
+**R-PR2 Status.** The nightly step reads the status of every Provider Request with a Request Number not yet Resolved, Closed or Cancelled, 200 per call, and writes Provider Status, Provider Resolution and Last Synced. Written in system mode by the run only; users read.
+
+Case is never named at compile time or given a field: the link is the Case Id held as text (ADR-0013, ADR-0058).
+
+### Salesforce implementation
+
+- **Object:** `Provider_Request__c`, label Provider Request, name field Text (Case Number), sharing Read/Write, packaged in Mirror.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Case Id | `Case_Id__c` | Text(18), unique, external ID |
+| Request Number | `Request_Number__c` | Text(30) |
+| Provider Status | `Status__c` | Text(40) |
+| Provider Resolution | `Resolution__c` | Long Text Area(32768) |
+| Last Synced | `Synced__c` | Date/Time |
+| Last Error | `Error__c` | Text(255) |
+
+- **Settings:** on `Mirror_Settings__c`, `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`).
+- **Access:** read through Salesforce Records Sync; the Provider Requests tab in Mirror's Admin_Tabs.
+
+---
+
 ## 29D. Saved Query (and the query document)
 
 ### Definition
@@ -19123,7 +19155,7 @@ mirrors the primary member).
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
-| 1.54 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-NEXT `NEXT-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. New Section 29PM18 Request Connection (`Request_Connection__c`, R-PM26) for the request API; Request gains Connection, External Reference and External Key. |
+| 1.54 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-NEXT `NEXT-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. New Section 29PM18 Request Connection (`Request_Connection__c`, R-PM26) for the request API; Request gains Connection, External Reference and External Key. New Section 29C2 Provider Request (`Provider_Request__c`, R-PR1, R-PR2) in Mirror for the Case bridge; `Mirror_Settings__c` gains Send Cases to a Service Provider (off) and Case Type to Send. |
 
 ---
 ## 32. Entity ownership by package
@@ -19198,6 +19230,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Wealth screening data (Contact fields) | Giving | release 1.5 (G-32) | 25U |
 | Recurring Gift Event | Giving | release 1.5 (G-27) | 25V |
 | Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
+| Provider Request (the Case bridge) | Mirror | 1.21 (D-201) | 29C2 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
 | Mirror Settings | Mirror | v0.6 | 29B |

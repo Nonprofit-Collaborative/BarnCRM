@@ -139,6 +139,7 @@ const ICONS = Object.freeze({
   Request_Connection__c: 'custom:custom68',
   // Mirror
   Accounting_Export: 'custom:custom21',
+  Provider_Request__c: 'custom:custom68',
   Campaign_Sync: 'custom:custom35',
   Gift_Transaction_Mirror: 'custom:custom31',
   Opportunity_Mirror: 'custom:custom30',

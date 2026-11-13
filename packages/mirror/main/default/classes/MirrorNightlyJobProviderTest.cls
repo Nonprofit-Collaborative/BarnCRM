@@ -29,9 +29,11 @@ private class MirrorNightlyJobProviderTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<NightlyStep> steps = new MirrorNightlyJobProvider().nightlySteps();
 
-			Assert.areEqual(2, steps.size(), 'The Opportunity and Gift Transaction mirrors.');
+			Assert.areEqual(3, steps.size(), 'The two mirrors and the Case requests run.');
 			Assert.areEqual(90, steps[0].minute, '1:30');
 			Assert.areEqual(95, steps[1].minute, '1:35');
+			Assert.areEqual(100, steps[2].minute, '1:40');
+			Assert.isFalse(steps[2].active, 'Case requests are off at install.');
 			Assert.areEqual(System.Label.Mirror_OpportunityMirror_Title, steps[0].label);
 			Assert.isTrue(steps[0].switchDefault, 'Shipped on.');
 		}

@@ -185,18 +185,25 @@ Case is a standard object, so the submitting side is in `packages/mirror` (ADR-0
 default:
 
 - `Mirror_Settings__c.Case_Requests_Enabled__c` (Setting Definition `Mirror_Case_Requests`,
-  default off).
-- Case gains Send to Service Provider (checkbox), Provider Request Number, Provider Request
-  Status, Provider Resolution and Provider Synced.
-- A Case trigger through the Core dispatcher (registry row `Case_Provider_Request`) queues the
-  send when Send to Service Provider is checked and no number is stored, while the setting is on.
-  The queued job posts the Case (reference the Case Number, subject, description, priority
-  mapped High, Medium, Low, requester the Case's contact) to `callout:Barn_Request_Provider` and
-  writes back the number and status. A failure is written to the Error Log and the Case stays
-  unsent, so unchecking and checking again retries.
-- Status comes back by pull, never push: a nightly Mirror step (`CaseRequests.step()`, ADR-0166)
-  asks for the status of every sent Case not yet Resolved, Closed or Cancelled, 200 per call, and
-  writes Status, Resolution and Synced. Pull needs one credential, in one direction.
+  default off) and `Case_Requests_Type__c` (`Mirror_Case_Requests_Type`, default Service
+  Provider: the Case Type the nightly run sends).
+- **Nothing on Case, no Case trigger.** Mirror may name Case only by string through describe and
+  may not declare fields on it (`check-standard-objects.sh`, ADR-0013, ADR-0058), the rule that
+  made `Appeal__c.Campaign_Id__c` a Text field. So what the provider answers is kept on a Mirror
+  object, Provider Request (`Provider_Request__c`, canonical model 29C2), keyed by the Case Id in
+  a unique Text field, and read from the Provider Requests tab and reports.
+- **Sending.** `CaseProviderRequests` (queueable, callouts) posts each Case (reference the Case
+  Number, subject, description, priority, requester the Case's contact or its web name and
+  email) to `callout:Barn_Request_Provider` and keeps the number and status, or the refusal
+  (Last Error, and the Error Log). Two ways in: the flow action **Send Cases to a Service
+  Provider** (`CaseProviderRequestAction`, taking Case Ids) for an admin's record-triggered flow,
+  at once; and the nightly step, which sends every open Case of the chosen Type not yet accepted.
+  A Case the provider accepted is never sent again, and the API's reference key makes a resend
+  harmless anyway. 50 sends per job, the rest chained.
+- Status comes back by pull, never push: the same nightly Mirror step
+  (`CaseProviderRequests.step()`, 01:40, ADR-0166) asks for the status of every request not yet
+  Resolved, Closed or Cancelled, 200 per call, and writes Status, Resolution and Last Synced.
+  Pull needs one credential, in one direction.
 - **Credential.** The admin creates the External Credential (OAuth 2.0 client credentials to the
   provider's External Client App) and the Named Credential `Barn_Request_Provider` (the provider's
   My Domain) in Setup, and grants its principal to the users who send Cases and to the user the

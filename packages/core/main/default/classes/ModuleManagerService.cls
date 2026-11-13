@@ -75,7 +75,7 @@ public with sharing class ModuleManagerService {
 			'Tribute__c'
 		},
 		'Rollups' => new List<String>{ 'Rollup_Definition__c', 'Rollup_Queue__c' },
-		'Mirror' => new List<String>(),
+		'Mirror' => new List<String>{ 'Provider_Request__c' },
 		'Volunteers' => new List<String>{
 			'Job_Skill__c',
 			'Shift_Schedule__c',

@@ -264,8 +264,10 @@ CAPS = {
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
     # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
     # 214,101 measured, plus about 0.5%. Release 1.20 review: per-field readable membership
-    # reads and the member-count filter: 215,838 measured, plus about 2%.
-    "mirror": 220_200,
+    # reads and the member-count filter: 215,838 measured, plus about 2%. The Case bridge to a
+    # service provider (D-201: CaseProviderRequests and its flow action), +9,616: 225,454
+    # measured, plus about 2%.
+    "mirror": 230_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 
