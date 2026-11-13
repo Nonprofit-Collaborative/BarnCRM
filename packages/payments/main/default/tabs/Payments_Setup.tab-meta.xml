@@ -4,7 +4,7 @@
     Connects the org's own Stripe or PayPal account: the receiver addresses and the write-only
     keys.
   </description>
-  <flexiPage>Payments_Setup</flexiPage>
   <label>Payments Setup</label>
+  <lwcComponent>paymentsSetup</lwcComponent>
   <motif>Custom70: Handsaw</motif>
 </CustomTab>

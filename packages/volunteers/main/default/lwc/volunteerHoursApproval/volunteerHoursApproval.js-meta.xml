@@ -9,5 +9,6 @@
   <masterLabel>Approve Volunteer Hours</masterLabel>
   <targets>
     <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
   </targets>
 </LightningComponentBundle>

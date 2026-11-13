@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Volunteers steps to
+ * The class Core finds by name (registered in its catalog row) to add the Volunteers steps to
  * the one nightly run (ADR-0166 nightly-job-dispatcher, ADR-0128): the run that keeps recurring
  * schedules' shifts created to the horizon, the morning shift reminders and nudges, and the
  * thank-you tasks (V-13).

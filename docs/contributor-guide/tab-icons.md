@@ -63,7 +63,6 @@ Rules:
 | giving | Gift_Batch__c | Custom13: Box |
 | giving | Gift__c | Custom41: Cash |
 | giving | Giving_Accounting_Periods | Custom55: Books |
-| giving | Giving_Nightly_Jobs | Custom10: Moon |
 | giving | Installment__c | Custom45: Ticket |
 | giving | Pledge_Reminder_Step__c | Custom79: MeasuringTape |
 | giving | Pledge_Reminder__c | Custom25: Alarmclock |

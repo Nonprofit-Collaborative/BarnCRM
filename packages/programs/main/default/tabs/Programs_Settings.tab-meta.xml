@@ -4,7 +4,7 @@
     The Programs module's settings page: the participant privacy preset and the intake and
     eligibility picklists.
   </description>
-  <flexiPage>Programs_Settings</flexiPage>
   <label>Programs Settings</label>
+  <lwcComponent>programsSettings</lwcComponent>
   <motif>Custom73: HighwaySign</motif>
 </CustomTab>

@@ -1,0 +1,32 @@
+{
+  "Admin": {
+    "label": "Funders Admin",
+    "description": "Manages grants and their requirements, including deleting a grant.",
+    "set": {
+      "fieldPermissions": {
+        "Funder_Report_Template__c.Active__c": {"editable": "true"},
+        "Funder_Report_Template__c.Body__c": {"editable": "true"},
+        "Funder_Report_Template__c.Template_Key__c": {"editable": "true"},
+        "Grant_Checklist_Item__c.Active__c": {"editable": "true"},
+        "Grant_Checklist_Item__c.Assigned_To__c": {"editable": "true"},
+        "Grant_Checklist_Item__c.Days_Before_Deadline__c": {"editable": "true"},
+        "Grant_Checklist_Item__c.Instructions__c": {"editable": "true"},
+        "Grant_Fund_Entry__c.Grant_Payment__c": {"editable": "true"},
+        "Grant_Requirement__c.Checklist_Item__c": {"editable": "true"},
+        "Grant_Requirement__c.Reminder_Sent_For__c": {"editable": "true"},
+        "Grant__c.Sample_Data__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Funder_Report_Template__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Grant_Checklist_Item__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Grant__c": {"allowDelete": "true"}
+      }
+    },
+    "add": {
+      "tabSettings": {
+        "Funder_Report_Template__c": {"visibility": "Visible"}
+      }
+    }
+  },
+  "Read_Only": {"label": "Funders Read Only", "description": "Looks at grants, their requirements and the Grant Pipeline.", "readOnly": true}
+}

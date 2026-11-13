@@ -1,7 +1,7 @@
 <template>
   <template lwc:if={helpReady}>
-    <!-- The Programs app's home (vis-modules-19). The App Page prints the name above, so the shell's title is for screen readers only. -->
-    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icons.dashboard} title-hidden data-id="shell">
+    <!-- The Programs app's home (vis-modules-19). -->
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icons.dashboard} data-id="shell">
       <div slot="actions">
         <lightning-combobox
           name="period"

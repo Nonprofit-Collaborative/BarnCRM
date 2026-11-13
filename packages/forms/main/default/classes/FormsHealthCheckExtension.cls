@@ -31,7 +31,7 @@ public with sharing class FormsHealthCheckExtension implements HealthCheckExtens
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		if (
 			!HealthCheckService.canManageSettings() ||
-			ModuleManagerService.turnedOff().contains(FormsAccessSync.MODULE_NAME.toLowerCase()) ||
+			ModuleManagerService.turnedOff().contains(FormsPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Form__c.isAccessible()
 		) {
 			return found;

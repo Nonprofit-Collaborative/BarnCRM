@@ -217,7 +217,7 @@ private class ProgramsSharingTest {
 		// Someone puts All Internal Users back by hand; the hourly check takes them out again.
 		System.runAs(admin()) {
 			insert new GroupMember(GroupId = groupId(), UserOrGroupId = everyone());
-			ProgramsAccessSync.syncOnce();
+			ModuleAccessSyncs.syncOnce('Programs');
 		}
 		Assert.areEqual(0, everyoneInGroup(), 'Back in step with Private.');
 	}

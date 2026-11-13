@@ -54,7 +54,7 @@
 @NamespaceAccessible
 public with sharing class GivingPostInstall implements InstallHandler, ModuleSetup {
 	/** The module's key in the module catalog and the setup marker. */
-	private static final String MODULE_KEY = 'Giving';
+	public static final String MODULE_KEY = 'Giving';
 	private static final String ROLLUP_CONTEXT = 'GivingPostInstall.ensureRollupDefaults';
 	private static final String TEMPLATE_CONTEXT = 'GivingPostInstall.installReceiptTemplates';
 	private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
@@ -108,7 +108,7 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 		);
 		// BarnCRM Admin holders get Giving Admin (ADR-0194 D2); queued, since it writes setup
 		// objects, and it never throws.
-		new GivingAccessSync().requestSync();
+		ModuleAccessSyncs.requestFor(MODULE_KEY);
 		ModuleSetups.markRan(MODULE_KEY);
 	}
 }

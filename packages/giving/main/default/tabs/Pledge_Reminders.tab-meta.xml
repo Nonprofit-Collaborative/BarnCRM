@@ -4,7 +4,7 @@
     Reminders for upcoming and overdue pledge installments: your steps, what is due to go, the
     buttons that send it, and the log.
   </description>
-  <flexiPage>Pledge_Reminders</flexiPage>
   <label>Pledge Reminders</label>
+  <lwcComponent>pledgeReminders</lwcComponent>
   <motif>Custom95: Stopwatch</motif>
 </CustomTab>

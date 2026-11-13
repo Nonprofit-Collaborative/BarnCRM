@@ -136,14 +136,10 @@ private class ModuleManagerServiceTest {
 	 * An engine recording the modules it is told are on again, that also
 	 * stands in for the module's access sync.
 	 */
-	private class TurnOnEngine implements RollupEngineExtension, ModuleAccessSync {
+	private class TurnOnEngine implements RollupEngineExtension {
 		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
 		}
 		public List<String> turnedOn = new List<String>();
-		public Integer syncsAsked = 0;
-		public void requestSync() {
-			syncsAsked++;
-		}
 		public void afterModuleTurnedOn(String moduleName) {
 			turnedOn.add(moduleName);
 		}
@@ -172,7 +168,12 @@ private class ModuleManagerServiceTest {
 			volunteersInstalled();
 			TurnOnEngine engine = new TurnOnEngine();
 			RollupEngineExtensions.extensionOverride = engine;
-			ModuleAccessSyncs.overrides.put(MODULE, engine);
+			ModuleExtensions.catalogOverride = new List<BarnCRM_Module__mdt>{
+				new BarnCRM_Module__mdt(
+					DeveloperName = MODULE,
+					Access_By_Role__c = 'Volunteers_Staff=Program_Staff'
+				)
+			};
 			ModuleManagerService.turnOff(MODULE);
 
 			Test.startTest();
@@ -184,7 +185,11 @@ private class ModuleManagerServiceTest {
 				engine.turnedOn,
 				'Turn on tells the engine which module is on again, so it can catch up'
 			);
-			Assert.areEqual(1, engine.syncsAsked, 'And asks the module to give its sets');
+			Assert.areEqual(
+				new List<String>{ MODULE },
+				ModuleAccessSyncs.requested,
+				'And asks the module to give its sets'
+			);
 			Assert.isTrue(ModuleManagerService.turnedOff().isEmpty(), 'And the module is on');
 		}
 	}

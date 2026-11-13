@@ -26,4 +26,8 @@
     <field>Requires__c</field>
     <value xsi:type="xsd:string">Rollups;Giving</value>
   </values>
+  <values>
+    <field>Extensions__c</field>
+    <value xsi:type="xsd:string">NightlyStepProvider: MirrorNightlyJobProvider</value>
+  </values>
 </CustomMetadata>

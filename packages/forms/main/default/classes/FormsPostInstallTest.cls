@@ -13,7 +13,7 @@ private class FormsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :FormsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Forms_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -24,7 +24,7 @@ private class FormsPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ FormsAccessSync.ADMIN_SET }
+					new List<String>{ 'Forms_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -35,8 +35,8 @@ private class FormsPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new FormsPostInstall(), null);
-			System.enqueueJob(new FormsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new FormsPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Forms', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Forms', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Forms Admin');
@@ -56,7 +56,7 @@ private class FormsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :FormsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'FormsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'Nothing failed'
@@ -73,7 +73,7 @@ private class FormsPostInstallTest {
 
 			Test.startTest();
 			new FormsPostInstall().onInstall(null);
-			System.enqueueJob(new FormsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Forms', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -81,7 +81,7 @@ private class FormsPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :FormsPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'FormsPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

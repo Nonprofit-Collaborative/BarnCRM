@@ -3,7 +3,7 @@
   <description>
     Copies appeals to Salesforce Campaigns: status, counts and Sync all appeals.
   </description>
-  <flexiPage>Campaign_Sync</flexiPage>
   <label>Campaign Sync</label>
+  <lwcComponent>campaignSync</lwcComponent>
   <motif>Custom35: Microphone</motif>
 </CustomTab>
