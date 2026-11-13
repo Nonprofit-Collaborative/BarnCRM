@@ -495,16 +495,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 ## T-SET-21: An Upgrade Turns On New Settings Once
 
-**Purpose:** confirm that an upgrade turns on a setting that ships on (Send Weekly Admin Summary, Ask Reminders) in an org that saved its settings before the setting existed, once, and never overrides the admin's choice after.
-**Prerequisites:** an org upgraded or deployed from a version before 0.15 whose BarnCRM Settings and Giving settings had been saved.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | After the upgrade, open **BarnCRM Settings** and find **Send weekly admin summary**. | It is on, and its description starts "On by default." |
-| 2 | Choose the **Giving** section and find **Ask Reminders**. | It is on. |
-| 3 | Switch both off and save. Run the upgrade or the source deploy again. | Both stay off. |
-
-**Cleanup:** set both back to what they were.
+**Not run at present.** The namespaced release is a fresh install everywhere (D-199), so the cut-over cleanup (D-200 S4) emptied the list of ship-on settings added in an upgrade (Send Weekly Admin Summary, Ask Reminders). The step stays for the first ship-on setting added after that release; this test returns with it, naming that setting. Apex test `ShippedDefaultUpgradesTest` covers the mechanism.
 
 ## T-SET-22: Nightly Job Names, Template Names and Descriptions
 
