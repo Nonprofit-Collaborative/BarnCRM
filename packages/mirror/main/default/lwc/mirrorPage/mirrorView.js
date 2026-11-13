@@ -1,5 +1,5 @@
 /**
- * What the Gift Transaction mirror page shows, worked out from the controller's plain status and
+ * What a gift mirror's page shows, worked out from the controller's plain status and
  * comparison values. Framework-free and browser-safe (plan 9.9), so the same logic serves a page
  * built on another platform.
  */
@@ -60,15 +60,21 @@ export function differenceTextOf(comparison, labels) {
     : fill(labels.differenceCountAll, count);
 }
 
-/** The datatable rows: links to the gift and the Gift Transaction, named when they have names. */
-export function rowsOf(comparison) {
+/**
+ * The datatable rows: links to the gift and its mirrored record, named when they have names.
+ * `linked` is the mirrored record's field prefix: `opportunity` or `giftTransaction`.
+ */
+export function rowsOf(comparison, linked) {
   if (!comparison) {
     return [];
   }
-  return comparison.differences.map((row) => ({
-    ...row,
-    giftUrl: row.giftId ? `/${row.giftId}` : undefined,
-    giftTransactionUrl: row.giftTransactionId ? `/${row.giftTransactionId}` : undefined,
-    giftTransactionLabel: row.giftTransactionName || row.giftTransactionId
-  }));
+  return comparison.differences.map((row) => {
+    const id = row[`${linked}Id`];
+    return {
+      ...row,
+      giftUrl: row.giftId ? `/${row.giftId}` : undefined,
+      [`${linked}Url`]: id ? `/${id}` : undefined,
+      [`${linked}Label`]: row[`${linked}Name`] || id
+    };
+  });
 }
