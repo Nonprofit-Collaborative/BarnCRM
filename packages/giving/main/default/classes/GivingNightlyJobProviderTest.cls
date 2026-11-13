@@ -1,6 +1,6 @@
 /**
- * Giving's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the five jobs switched
- * together (four shipped on, the pledge reminders shipped off, G-37), then the acknowledgment
+ * Giving's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the five jobs, each
+ * switched on its own (four shipped on, the pledge reminders shipped off, G-37), then the acknowledgment
  * send, shipped off because it emails donors. Switching is checked under the test name of the run, so nothing
  * depends on what the org has scheduled.
  */
@@ -43,56 +43,60 @@ private class GivingNightlyJobProviderTest {
 		}
 	}
 
+	/** The shared Nightly Jobs card offers Run Now and shows summaries as the old page did. */
 	@IsTest
-	static void scheduleAllSwitchesTheFiveOnAndStopAllOff() {
+	static void theCardOffersRunNowWhereTheOldPageDidAndShowsEachSummary() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			noRun();
-			Boolean before = GivingScheduler.isScheduled();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
+			settings.Installment_Top_Up_Last_Run_Summary__c = '3 payments added';
+			Database.upsert(settings, AccessLevel.SYSTEM_MODE);
 
-			GivingScheduler.scheduleAll();
-			NightlyJobs.forget();
-			ScheduledJobSelector.forget();
-			Boolean after = GivingScheduler.isScheduled();
-			Boolean remindersOn = PledgeReminderScheduler.isScheduled();
-			Datetime next = GivingScheduler.nextRunAt();
-			PledgeReminderScheduler.stop();
-			NightlyJobs.forget();
-			Boolean afterRemindersStopped = GivingScheduler.isScheduled();
-			GivingScheduler.stopAll();
-			NightlyJobs.forget();
+			Map<String, NightlyStep> byKey = new Map<String, NightlyStep>();
+			for (NightlyStep step : new GivingNightlyJobProvider().nightlySteps()) {
+				byKey.put(step.key, step);
+			}
 
-			Assert.isFalse(before, 'Nothing runs before the run is scheduled.');
-			Assert.isTrue(after, 'All on, with the run scheduled.');
-			Assert.isTrue(remindersOn, 'Schedule switches the pledge reminders on too (G-37).');
-			Assert.isTrue(
-				afterRemindersStopped,
-				'Stopping the reminders on their own page leaves the other four counted as on.'
+			Assert.areEqual(
+				'3 payments added',
+				byKey.get(GivingScheduler.TOP_UP_JOB_NAME).summary,
+				'The top up shows its own summary.'
 			);
-			Assert.isFalse(PledgeReminderService.isEnabled(), 'Sending stays off (D-162).');
-			Assert.isNotNull(next, 'With the next of them.');
-			Assert.isFalse(GivingScheduler.isScheduled(), 'Stopped.');
+			for (
+				String key : new List<String>{
+					GivingScheduler.TOP_UP_JOB_NAME,
+					GivingScheduler.OVERDUE_JOB_NAME,
+					GivingScheduler.PLEDGE_JOB_NAME,
+					GivingScheduler.ASK_JOB_NAME
+				}
+			) {
+				Assert.isTrue(byKey.get(key).canRunNow, key + ' can be started now.');
+			}
 			Assert.isFalse(
-				GivingScheduler.isJobScheduled(GivingScheduler.LEVELS_JOB_NAME),
-				'Each one is off.'
+				byKey.get(GivingScheduler.LEVELS_JOB_NAME).canRunNow,
+				'Donor levels keep their own Recalculate Now (ADR-0038).'
 			);
-			Assert.isTrue(NightlyJobs.isScheduled(), 'The run stays for the other steps.');
+			Assert.isFalse(
+				byKey.get(AcknowledgmentScheduler.JOB_NAME).canRunNow,
+				'Acknowledgments are sent from their own page.'
+			);
 		}
 	}
 
 	@IsTest
-	static void schedulingOneJobLeavesTheOthersAsTheyWere() {
+	static void switchingOneJobLeavesTheOthersAsTheyWere() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			noRun();
-			GivingScheduler.stopAll();
-			GivingScheduler.scheduleJobNamed(GivingScheduler.OVERDUE_JOB_NAME);
-			GivingScheduler.scheduleJobNamed('BarnCRM Giving: not a job');
+			NightlyJobs.turnOff(GivingScheduler.TOP_UP_JOB_NAME);
+			NightlyJobs.turnOn(GivingScheduler.OVERDUE_JOB_NAME);
 			NightlyJobs.forget();
 			ScheduledJobSelector.forget();
 
-			Assert.isTrue(GivingScheduler.isJobScheduled(GivingScheduler.OVERDUE_JOB_NAME));
-			Assert.isFalse(GivingScheduler.isJobScheduled(GivingScheduler.TOP_UP_JOB_NAME));
-			Assert.isFalse(GivingScheduler.isJobScheduled('BarnCRM Giving: not a job'));
-			Assert.isFalse(GivingScheduler.isScheduled(), 'One of four is not on.');
+			Assert.isTrue(NightlyJobs.isStepScheduled(GivingScheduler.OVERDUE_JOB_NAME, true));
+			Assert.isFalse(NightlyJobs.isStepScheduled(GivingScheduler.TOP_UP_JOB_NAME, true));
+			Assert.isTrue(
+				NightlyJobs.isStepScheduled(GivingScheduler.LEVELS_JOB_NAME, true),
+				'A job never switched keeps its shipped value.'
+			);
 		}
 	}
 

@@ -4924,7 +4924,7 @@ Section 26.
   `Installment_Top_Up_Last_Run__c`, `Installment_Top_Up_Last_Run_Summary__c`.
 - **Service:** `CommitmentService`, `CommitmentSelector`, `CommitmentTriggerHandler`,
   `GiftCommitmentHandler`, `InstallmentTopUpSchedulable`, `InstallmentTopUpBatch`,
-  `GivingScheduler`, `GivingJobsController`.
+  `GivingScheduler` (the five steps; switched, started and summarized on Core's Nightly Jobs panel, `NightlyJobsController`).
 
 ---
 
@@ -4979,13 +4979,14 @@ report a year later.
 
 **R-IN5 The nightly passes are switched on in the console and visible there.** Nothing in
 the Giving module marks an installment Overdue or extends a recurring schedule until an
-administrator schedules the nightly jobs from the Nightly Jobs page of the Nonprofit
-Settings console, and the same page stops them (ADR-0031). Since the nightly run (R-NJ1),
-Schedule and Stop turn the four Giving steps' switches on and off (R-NJ4). Each pass records when it last
+administrator schedules the nightly run from the Nightly Jobs panel of the Nonprofit
+Settings console (ADR-0031). Since the nightly run (R-NJ1) each Giving step has its own
+switch (R-NJ4), turned on and off on its row of that panel, which since 1.23 (D-200 S6) also
+replaces the Giving Nightly Jobs page. Each pass records when it last
 finished and one sentence saying what it did, whether or not it changed anything, so a
 pass that ran and found nothing overdue reads differently from a pass that never ran. The
-console warns that a pass is stale only when the jobs are scheduled: an org that has not
-switched them on is told that instead, because it has not missed a run that was never
+panel marks a pass Missed Last Run only when its step is on and the run started without it:
+an org that has not scheduled the run is told that instead, because it has not missed a run that was never
 going to happen. A failure inside a pass goes to the Error Log and the rest of the run
 carries on (R-E1).
 
@@ -9626,7 +9627,7 @@ knows, so the profile is a set of person attributes the module ships on Contact 
 Every attribute here, the person attributes included, is shipped by Volunteers, never by Core.
 
 **Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
-BarnCRM role by `VolunteersAccessSync`, which never takes one away. Reviewed By, Reviewed Date,
+BarnCRM role by Core's `ModuleAccessSyncs` from the module's catalog row (D-200 S1), which never takes one away. Reviewed By, Reviewed Date,
 Household, a schedule's Created Through, Shifts Kept and Rebuild Pending, and every rollup total are read only in
 each. Staff and Read Only delete nothing; the Coordinator deletes only hours, since the platform
 gives Modify All only with Delete.
@@ -11415,7 +11416,7 @@ R-EN2, and is not counted as open on the dashboard or the person card. Cohorts h
   `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
   always run), sets the group's All Internal Users member (queued, as a group member is a setup
   object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
-  and when the preset is saved). `ProgramsAccessSync` sets the member hourly.
+  and when the preset is saved). `ProgramsAccessStep` sets the member hourly, after Core's access sync (D-200 S1).
 - **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4),
   `Cohort_In_Program` (R-EN8).
 - **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
@@ -19233,6 +19234,7 @@ mirrors the primary member).
 | 1.58 | 2026-11-12 | Nightly donor level pass gated (D-200 P1, release 1.22). R-DL6: every donor is re-placed only after a ladder or donor setting change, a fiscal year turnover, with no recalculation recorded, or a week after the last; other nights rescore only donors crossing a recency cutoff. No object or field added. |
 | 1.59 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-0221 `0221-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. New Section 29PM18 Request Connection (`Request_Connection__c`, R-PM26) for the request API; Request gains Connection, External Reference and External Key. New Section 29C2 Provider Request (`Provider_Request__c`, R-PR1, R-PR2) in Mirror for the Case bridge; `Mirror_Settings__c` gains Send Cases to a Service Provider (off) and Case Type to Send. |
 | 1.60 | 2026-11-13 | Module wiring as data (D-200 S1, release 1.23; ADR-0017 note of 2026-11-13). `BarnCRM_Module__mdt` gains Access By Permission Set, Access By Role and Extensions: each module's access sync sets, installer set and extension classes (nightly step providers first) are catalog data read by Core, replacing the per-module access sync and installer classes and the nightly provider list. |
+| 1.61 | 2026-11-13 | One nightly card (D-200 S6, release 1.23; ADR-0038 note of 2026-11-13). No object or field added. The Giving Nightly Jobs page, tab and `GivingJobsController` are retired: Core's Nightly Jobs panel switches each step on its own, offers Run Now where a step allows it, and shows each step's own summary of its last run (R-IN5 updated). The settings group Nightly Jobs and Accounting Periods becomes Accounting Periods. |
 
 ---
 ## 32. Entity ownership by package
@@ -19482,18 +19484,18 @@ so nothing below that is nonprofit-specific ships in Core.
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
-| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
-| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
-| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
-| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-0177 `0177-events-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Events Home, Event Calendar, Events and Event Speakers tabs join BarnCRM and BarnCRM Console at deploy; the Event record page, the object's org default, carries the event's tabs |
+| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and its catalog row's access maps (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
+| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and its catalog row's access maps (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
+| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and its catalog row's access maps (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
+| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Events Home, Event Calendar, Events and Event Speakers tabs join BarnCRM and BarnCRM Console at deploy; the Event record page, the object's org default, carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
-| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
+| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
-| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-0196 `0196-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
-| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and `PaymentsAccessSync` (ADR-0201 `0201-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
+| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
+| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and its catalog row's access maps (ADR-0201 `0201-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
 | Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-0201 `0201-payments-module.md` decision 8) |
-| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, `TerritoryAccessSync` and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
-| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and `MembershipsAccessSync` (ADR-0206 `0206-memberships-module.md`). No app (ADR-0192) |
+| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, its catalog row's access maps and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
+| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and its catalog row's access maps (ADR-0206 `0206-memberships-module.md`). No app (ADR-0192) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

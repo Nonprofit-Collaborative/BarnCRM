@@ -1004,11 +1004,15 @@ core/NightlyJobs.cls | public static void forget()
 core/NightlyJobs.cls | public static void overrideStepsForTest(List<NightlyStep>)
 core/NightlyJobs.cls | public static void turnOff(String)
 core/NightlyStep.cls | public Boolean active
+core/NightlyStep.cls | public Boolean canRunNow
 core/NightlyStep.cls | public Boolean hasSwitch()
 core/NightlyStep.cls | public Boolean switchDefault
 core/NightlyStep.cls | public NightlyStep activeWhen(Boolean)
+core/NightlyStep.cls | public NightlyStep runnableNow()
+core/NightlyStep.cls | public NightlyStep withSummary(String)
 core/NightlyStep.cls | public NightlyStep withSwitch(Boolean)
 core/NightlyStep.cls | public NightlyStep(String,String,Integer,Integer,Schedulable)
+core/NightlyStep.cls | public String summary
 core/NightlyStep.cls | public class NightlyStep
 core/NightlyStep.cls | public final Integer minute
 core/NightlyStep.cls | public final String key
