@@ -225,6 +225,12 @@ contacts, then all funds), and calculate all of a record's totals together:
   few minutes after the run finishes; until then it shows among the records waiting. A record
   that has grown since its count was last calculated (a large import into one fund) is caught
   while it is being recalculated and handed on the same way. Nothing to do.
+- **A large record is recalculated at most once an hour.** Every gift saved to a General Fund
+  would otherwise start another long background job for it. So once that job has run, the
+  next waits until an hour has passed, and every gift saved in between is counted in that one
+  job: the fund's totals can lag a save by up to an hour, and the Rollups page says so. To
+  change the hour, open **BarnCRM Settings**, **Rollups** section, **Hours between large record
+  runs** (0 to 24; 0 recalculates as soon as possible).
 - **A record that cannot be saved is tried again.** If someone was editing it, or a
   validation rule refused it, BarnCRM tries again automatically; after five tries it waits
   in the **Needs Attention** list. The next nightly run that saves it takes it off the list.

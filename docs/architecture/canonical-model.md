@@ -1580,6 +1580,7 @@ Automation Setting records (Section 10) on install and on upgrade.
 | `Object_Name__c` | text | The object whose trigger this automation runs on. |
 | `Execution_Order__c` | integer | The order in which handlers run for that object. |
 | `Module__c` | text (40) | The module that ships this automation, for example Giving or Mirror; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
+| `Runs_On_Rollup_Writes__c` | boolean, default false | Whether this automation runs when the rollup engine updates a person's or organization's totals (D-200 P10). `RollupWriter` marks its update as a rollup write, and the dispatcher then runs, for Contact and Account updates, only the rows marked this way or `Always_Runs__c`; field history is kept as for any update. Shipped on: donor level and donor score assignment (Account and Contact) and the person rollup row (`Core_Rollups_Contact`, so a definition of the administrator's that reads a person's total still sees it change). Not copied to Automation Setting. |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized
@@ -2698,13 +2699,25 @@ uncharged, and are routed again.
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
-- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, no fields. Its one org-level
-  record is the row a large parent run locks before it starts (R-RQ6); the code creates it the
-  first time and nothing else reads or writes it.
+- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, one field,
+  `Last_Run_Started__c` (DateTime). Its one org-level record is the row a large parent run locks
+  before it starts (R-RQ6); the code creates it the first time and nothing else reads or writes
+  it. **Throttle (D-200 P2):** under the lock, a run starts only when `Large_Parent_Hours__c`
+  (Section 14B, default 1) has passed since `Last_Run_Started__c`, which the run stamps as it
+  starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
+  the saves queued in between merge into that one run. The Rollup Builder page says how often.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
+- **Processor request stamp (D-200 P13):** a save that queues entries runs no query to find a
+  processor. It reads `Processor_Requested_At__c` on `Rollup_Settings__c` (from the platform's
+  cache):
+  within the last ten minutes it publishes the Ready event, whose subscriber checks the job list
+  exactly after commit; otherwise it queues a processor and stamps the time (for a chained
+  processor queued with a delay, the time it is due). A processor that died is still found
+  missing: by the subscriber's exact check while the stamp is recent, and by the next save once
+  it is not. The subscriber, background jobs and the nightly run keep the exact check.
 
 ---
 
@@ -2738,6 +2751,8 @@ settings console shows them in its Rollups section as before.
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 | `Nightly_Run_Hour__c` | integer(0 to 23) | 2 | The hour the nightly run starts (R-R4), in the time zone of the person who scheduled it, shown as a time (2:00 AM). Blank or out of range means 2. |
+| `Large_Parent_Hours__c` | integer(0 to 24) | 1 | The fewest hours between two large parent runs (R-RQ6, D-200 P2); 0 runs as soon as possible. Blank or out of range means 1. |
+| `Processor_Requested_At__c` | datetime | blank | Not a setting and not in the console: when the Rollup Queue last asked for a processor (D-200 P13, Section 14A). Written by the engine only. |
 
 ---
 
@@ -19054,6 +19069,7 @@ mirrors the primary member).
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
 | 1.54 | 2026-11-12 | Cut-over cleanup (D-199, D-200 S4; ADR-0194 note of 2026-11-12). No object or field added. Removed, since the namespaced managed release is a fresh install everywhere: the Coordinator permission set group (`Volunteer_Coordinator`) and `RetiredRoleMigration`; the five retired Mirror sets (`Campaign_Sync`, `Opportunity_Mirror`, `Gift_Transaction_Mirror`, `Inbound_Gift_API`, `Record_Inbound_Gift_Action`) and `MirrorAccessSync`; the Volunteers Health Check finding `volunteer_coordinator_access` and its fix. `Volunteers_Coordinator` stays as an extra permission.  Also removed: R-NJ5's adoption of old schedules (`NightlyJobs.adoptOldSchedules`, `SeasonalAddressScheduler.adoptExistingSchedule`, the `ImportRowPurgeScheduler` shell); `RollupEngineExtensionV2` and `V3` merged into `RollupEngineExtension`. |
 | 1.55 | 2026-11-12 | Error Log under load (D-200 P4, release 1.22). `Error_Log__c` gains `Occurrences__c` (Number, default 1), `Other_Record_Ids__c` (Text(255)) and `Occurrence_Key__c` (Text(64), external ID for its index); rule R-E7: the subscriber counts a repeat of a New entry's Context, Message and Severity within an hour on that entry, naming up to ten more records, and code logs a partial save's refused rows once after the loop (`check-log-in-loop.py`). No object added. |
+| 1.56 | 2026-11-12 | Rollups under load (D-200 P2, P10, P13, release 1.22). `Automation_Registry__mdt` gains `Runs_On_Rollup_Writes__c` (Checkbox): during a `RollupWriter` update, Contact and Account run only rows so marked or Always Runs (shipped on donor level and donor score assignment and `Core_Rollups_Contact`). `Rollup_Settings__c` gains `Large_Parent_Hours__c` (Number, default 1, Setting Definition `Rollup_Large_Parent_Hours`) and `Processor_Requested_At__c` (DateTime, engine only); `Rollup_Run_Lock__c` gains `Last_Run_Started__c` (DateTime): a large parent run starts at most once per that many hours, and a save that queues totals finds a processor without a query. No object added. |
 
 ---
 ## 32. Entity ownership by package

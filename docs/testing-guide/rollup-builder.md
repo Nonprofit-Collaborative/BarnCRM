@@ -657,3 +657,31 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 6 | Open **NPSP Settings**, **Customizable Rollups**. | The NPSP rollup is unchanged and still active. |
 
 **Cleanup:** delete the copy (keep values), or deactivate the NPSP rollup if you keep the copy.
+
+## T-RB-50: A Large Fund Is Recalculated at Most Once an Hour
+
+**Purpose:** confirm the large parent throttle setting, its line on the Rollups page, and that saves in between are counted together.
+**Prerequisites:** Giving with sample data; a fund with about 20,000 or more allocations (the scale data generator's default fund); admin user with Manage BarnCRM Settings.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Rollups**. | **Hours between large record runs** shows **1** with a **Default** badge. |
+| 2 | Open the **Rollup Builder** tab. | Under the nightly schedule line: "A record with very many records under it ... at most once an hour ...". |
+| 3 | Add a gift allocated to the large fund, wait five minutes, then add a second. | The fund's **Total Raised** includes the first gift within minutes; the second is not in it yet, and **Needs Attention** shows no Failed entry. |
+| 4 | Wait until an hour after the first recalculation. | **Total Raised** includes both gifts. |
+| 5 | Set the setting to **0** and save; reopen the Rollup Builder. | The large record line is gone; a new gift to the fund is in its total within minutes. |
+
+**Cleanup:** set the setting back to 1; delete the test gifts.
+
+## T-RB-51: A Total Changed by Rollups Runs Only the Automations That Read Totals
+
+**Purpose:** confirm a rollup update of a person runs donor levels and scores but not automations that react to edits.
+**Prerequisites:** Giving with donor levels on and a ladder whose first level starts at 100; a person with no gifts.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Add a 150 gift for the person and wait a minute. | **Total Giving** is 150, the person's donor level is the first level and the donor score is filled. |
+| 2 | With **Total Giving** tracked in **Field History**, open the person's field history. | The total's change is recorded as for any update. |
+| 3 | Open **Error Log**. | No new entries from the save. |
+
+**Cleanup:** delete the test gift.

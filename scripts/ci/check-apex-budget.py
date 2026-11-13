@@ -78,7 +78,9 @@ CAPS = {
     # before the kit check, plus about 1%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 386,438 measured, plus
     # about 0.5%.
-    "rollups": 388_400,
+    # Raised 2026-11-12 for D-200 P2 and P13 (the large parent throttle and the processor
+    # request stamp, so a save queues totals without a query): 390,436 measured, plus about 0.5%.
+    "rollups": 392_400,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and

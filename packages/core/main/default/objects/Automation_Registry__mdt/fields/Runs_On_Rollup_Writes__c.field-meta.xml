@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Runs_On_Rollup_Writes__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether this automation runs when the rollup engine updates a person or organization's totals. Only rows marked this way, and those that always run, run on such an update; the rest have nothing to do when only totals change (D-200 P10). Field history is kept either way.</description>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <inlineHelpText>Check this when the automation reads rollup totals, so it must run when the rollup engine changes them.</inlineHelpText>
+  <label>Runs On Rollup Writes</label>
+  <type>Checkbox</type>
+</CustomField>

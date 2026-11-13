@@ -68,6 +68,37 @@ public with sharing class TriggerDispatcher {
 	@TestVisible
 	private static Boolean noRoomForTest = false;
 
+	/** The objects whose rollup writes run only some automations (D-200 P10). */
+	private static final Set<String> ROLLUP_WRITE_OBJECTS = new Set<String>{ 'account', 'contact' };
+
+	/** How many rollup writes are under way in this transaction (nested writes count too). */
+	private static Integer rollupWrites = 0;
+
+	/**
+	 * The rollup engine is about to update records' totals (D-200 P10). Until `endRollupWrite`,
+	 * an update of a person or organization runs only the registry rows marked
+	 * `Runs_On_Rollup_Writes__c` or `Always_Runs__c`: the others react to edits a person makes,
+	 * and a total changing gives them nothing to do. Field history is kept as for any update.
+	 */
+	@NamespaceAccessible
+	public static void startRollupWrite() {
+		rollupWrites++;
+	}
+
+	/** The rollup write `startRollupWrite` began is over. */
+	@NamespaceAccessible
+	public static void endRollupWrite() {
+		rollupWrites = Math.max(0, rollupWrites - 1);
+	}
+
+	@TestVisible
+	private static Boolean isRollupWrite(String objectApiName, System.TriggerOperation operation) {
+		return rollupWrites > 0 &&
+			(operation == System.TriggerOperation.BEFORE_UPDATE ||
+			operation == System.TriggerOperation.AFTER_UPDATE) &&
+			ROLLUP_WRITE_OBJECTS.contains(objectApiName.toLowerCase());
+	}
+
 	/**
 	 * The trigger context, passed explicitly so that a handler can be dispatched from a test or
 	 * from a bulk operation without a real trigger.
@@ -126,12 +157,20 @@ public with sharing class TriggerDispatcher {
 		if (String.isBlank(objectApiName) || context == null || context.operation == null) {
 			return;
 		}
+		Boolean totalsOnly = isRollupWrite(objectApiName, context.operation);
 		List<Registered> handlers = new List<Registered>();
 		for (
 			Automation_Registry__mdt entry : AutomationRegistrySelector.selectForObject(
 				objectApiName
 			)
 		) {
+			if (
+				totalsOnly &&
+				entry.Always_Runs__c != true &&
+				entry.Runs_On_Rollup_Writes__c != true
+			) {
+				continue;
+			}
 			TriggerHandler handler = instantiate(entry, objectApiName);
 			if (handler != null) {
 				handlers.add(

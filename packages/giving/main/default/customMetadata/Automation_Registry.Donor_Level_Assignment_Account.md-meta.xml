@@ -26,4 +26,8 @@
     <field>Module__c</field>
     <value xsi:type="xsd:string">Giving</value>
   </values>
+  <values>
+    <field>Runs_On_Rollup_Writes__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
 </CustomMetadata>

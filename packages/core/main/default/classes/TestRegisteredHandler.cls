@@ -32,4 +32,9 @@ public class TestRegisteredHandler extends TriggerHandler {
 			handledIds.addAll(claimRunFor('afterInsert', records.keySet()));
 		}
 	}
+
+	/** Counted, for the rollup write tests (D-200 P10). */
+	public override void afterUpdate() {
+		runCount++;
+	}
 }

@@ -461,7 +461,103 @@ public without sharing class RollupQueue implements Queueable {
 			announceReady();
 			return;
 		}
+		if (insertedEntries) {
+			startProcessorForSave();
+			return;
+		}
 		startProcessor();
+	}
+
+	/**
+	 * How long after a processor was asked for a save takes it to be still coming (D-200 P13):
+	 * the longest delay a chained processor waits, so a recent request is never taken as gone.
+	 */
+	@TestVisible
+	private static final Integer REQUEST_FRESH_MINUTES = LONGEST_DELAY_MINUTES;
+
+	/**
+	 * `startProcessor` for a save that has just queued entries, without a query (D-200 P13): the
+	 * save knows entries are pending, and when a processor was asked for within the last
+	 * `REQUEST_FRESH_MINUTES` (Rollup Settings `Processor_Requested_At__c`, read from the
+	 * platform's cache) it publishes the Ready event, whose subscriber checks exactly once this
+	 * commits, as when one waits. Otherwise it queues one. A processor that died, or one asked
+	 * for that has finished, is still found missing: by the subscriber's exact check while the
+	 * request is recent, and by the next save once it is not.
+	 */
+	private static void startProcessorForSave() {
+		processorRequested = true;
+		if (noQueueableJobsLeft() || requestedRecently()) {
+			askAgainAfterCommit();
+			return;
+		}
+		enqueueProcessor(new RollupQueue(), 0);
+	}
+
+	private static Boolean noQueueableJobsLeft() {
+		return noQueueableJobsLeftForTest == true ||
+			Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs();
+	}
+
+	/** Test seam: stands in for the stamp; null reads it. */
+	@TestVisible
+	private static Datetime requestedAtForTest;
+
+	/**
+	 * Test seam: a test reads the stored stamp only when it says so, so the stamp an earlier
+	 * step of a test wrote never stands in for the waiting processors other tests set.
+	 */
+	@TestVisible
+	private static Boolean readStampInTests = false;
+
+	@TestVisible
+	private static Boolean requestedRecently() {
+		if (requestedAtForTest == null && Test.isRunningTest() && readStampInTests != true) {
+			return false;
+		}
+		Datetime requestedAt = requestedAtForTest != null
+			? requestedAtForTest
+			: Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c;
+		return requestedAt != null &&
+			requestedAt > Datetime.now().addMinutes(-REQUEST_FRESH_MINUTES);
+	}
+
+	/** Queues a processor and notes when it is due, so saves can tell one is coming. */
+	private static void enqueueProcessor(RollupQueue job, Integer delayMinutes) {
+		if (delayMinutes > 0) {
+			System.enqueueJob(job, delayMinutes);
+		} else {
+			System.enqueueJob(job);
+		}
+		processorComing = true;
+		noteRequested(Datetime.now().addMinutes(delayMinutes));
+	}
+
+	/**
+	 * Stamps the request on the org-level Rollup Settings record: one update of that one field,
+	 * partial, so a busy moment's lock never fails the save that asked. With no record yet the
+	 * first one is written through Core's settings writer.
+	 */
+	private static void noteRequested(Datetime dueAt) {
+		try {
+			Id stored = Rollup_Settings__c.getOrgDefaults().Id;
+			if (stored == null) {
+				OrgSettingsSystemWriter.save(
+					Rollup_Settings__c.SObjectType,
+					new Map<Schema.SObjectField, Object>{
+						Rollup_Settings__c.Processor_Requested_At__c => dueAt
+					}
+				);
+				return;
+			}
+			Database.update(
+				new Rollup_Settings__c(Id = stored, Processor_Requested_At__c = dueAt),
+				false,
+				AccessLevel.SYSTEM_MODE
+			);
+		} catch (Exception notNoted) {
+			// The stamp only saves a query later; without it the next save queues a processor.
+			ErrorLogger.log(notNoted, LOG_CONTEXT);
+		}
 	}
 
 	/**
@@ -507,10 +603,7 @@ public without sharing class RollupQueue implements Queueable {
 			return;
 		}
 		processorRequested = true;
-		if (
-			noQueueableJobsLeftForTest == true ||
-			Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()
-		) {
+		if (noQueueableJobsLeft()) {
 			askAgainAfterCommit();
 			return;
 		}
@@ -536,8 +629,7 @@ public without sharing class RollupQueue implements Queueable {
 					WITH SYSTEM_MODE
 			  ];
 		if (waiting == 0) {
-			System.enqueueJob(new RollupQueue());
-			processorComing = true;
+			enqueueProcessor(new RollupQueue(), 0);
 		} else {
 			askAgainAfterCommit();
 		}
@@ -911,7 +1003,7 @@ public without sharing class RollupQueue implements Queueable {
 		if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
 			return;
 		}
-		System.enqueueJob(job, delayMinutes);
+		enqueueProcessor(job, delayMinutes == null ? 0 : delayMinutes);
 	}
 
 	/**
