@@ -10,7 +10,9 @@ private class WaitlistQueueTest {
 	private static final Id OPEN_PARENT = Id.valueOf('001000000000002');
 
 	private static Account candidate(Id parentId, Integer size) {
-		return new Account(ParentId = parentId, NumberOfEmployees = size);
+		return TestDataFactory.organization(
+			new Account(ParentId = parentId, NumberOfEmployees = size)
+		);
 	}
 
 	@IsTest

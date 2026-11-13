@@ -10,11 +10,13 @@ private class FindRadiusTest {
 	}
 
 	private static Contact contact(String lastName, Decimal latitude, Decimal longitude) {
-		return new Contact(
-			LastName = lastName,
-			MailingPostalCode = '02134',
-			MailingLatitude = latitude,
-			MailingLongitude = longitude
+		return TestDataFactory.person(
+			new Contact(
+				LastName = lastName,
+				MailingPostalCode = '02134',
+				MailingLatitude = latitude,
+				MailingLongitude = longitude
+			)
 		);
 	}
 
@@ -89,7 +91,7 @@ private class FindRadiusTest {
 		System.runAs(TestUsers.admin()) {
 			Contact geocoded = contact('Geocoded', 41.5, -72.5);
 			Contact postalOnly = contact('PostalOnly', null, null);
-			Contact neither = new Contact(LastName = 'Neither');
+			Contact neither = TestDataFactory.person(new Contact(LastName = 'Neither'));
 			insert new List<Contact>{ geocoded, postalOnly, neither };
 
 			FindRadius.Center own = FindRadius.resolveCenter(geocoded.Id);
@@ -219,7 +221,7 @@ private class FindRadiusTest {
 				contact('Near', 42.31, -71.05),
 				contact('Far', 34.05, -118.24),
 				contact('Ungeocoded', null, null),
-				new Contact(LastName = 'NoAddress')
+				TestDataFactory.person(new Contact(LastName = 'NoAddress'))
 			};
 
 			QueryCompiler.Compiled compiled = QueryCompiler.compile(document(25));

@@ -745,11 +745,13 @@ private class AddressServiceTest {
 	@IsTest
 	static void onlyCopiesThatChangeAStoredValueAreWritten() {
 		System.runAs(TestUsers.admin()) {
-			Contact elena = new Contact(
-				FirstName = 'Elena',
-				LastName = 'Garcia',
-				MailingStreet = HOME_STREET,
-				MailingCity = HOME_CITY
+			Contact elena = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Elena',
+					LastName = 'Garcia',
+					MailingStreet = HOME_STREET,
+					MailingCity = HOME_CITY
+				)
 			);
 			insert as user elena;
 			Contact held = [

@@ -13,7 +13,9 @@ private class LinkedRecordsTest {
 	@IsTest
 	static void labelsARecordOfASupportedObject() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+			Contact person = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia')
+			);
 			insert as user person;
 			// Contact stands in for a supported module object: the seam is the same.
 			LinkedRecords.supported = new List<String>{ 'Contact' };
@@ -33,9 +35,9 @@ private class LinkedRecordsTest {
 	@IsTest
 	static void leavesOutWhateverItCannotLabel() {
 		System.runAs(TestUsers.admin()) {
-			Account other = new Account(Name = 'Not Supported');
+			Account other = TestDataFactory.organization(new Account(Name = 'Not Supported'));
 			insert as user other;
-			Contact person = new Contact(LastName = 'Gone');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Gone'));
 			insert as user person;
 			Id deleted = person.Id;
 			delete as user person;
@@ -56,7 +58,7 @@ private class LinkedRecordsTest {
 	@IsTest
 	static void labelsNothingWhenTheModuleIsAbsent() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(LastName = 'Present');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Present'));
 			insert as user person;
 			LinkedRecords.supported = new List<String>{ 'Gift_Not_In_This_Org__c' };
 

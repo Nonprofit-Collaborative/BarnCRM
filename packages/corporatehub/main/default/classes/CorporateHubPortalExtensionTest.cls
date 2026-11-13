@@ -30,8 +30,8 @@ private class CorporateHubPortalExtensionTest {
 		Board_Meeting__c meeting;
 		Board_Motion__c motion;
 		System.runAs(staff()) {
-			ade = new Contact(FirstName = 'Ade', LastName = 'Member');
-			bea = new Contact(FirstName = 'Bea', LastName = 'Member');
+			ade = TestDataFactory.person(new Contact(FirstName = 'Ade', LastName = 'Member'));
+			bea = TestDataFactory.person(new Contact(FirstName = 'Bea', LastName = 'Member'));
 			insert as user new List<Contact>{ ade, bea };
 			Board__c board = new Board__c(Name = 'Board', Type__c = 'Board', Status__c = 'Active');
 			insert as user board;

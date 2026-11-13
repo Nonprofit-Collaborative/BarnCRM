@@ -47,7 +47,9 @@ private class GivingPortalPaymentsTest {
 	}
 
 	private static Contact donor(String email) {
-		Contact person = new Contact(FirstName = 'Pat', LastName = 'Zzpledge', Email = email);
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Pat', LastName = 'Zzpledge', Email = email)
+		);
 		insert as user person;
 		return person;
 	}

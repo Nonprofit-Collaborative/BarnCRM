@@ -35,10 +35,12 @@ private class RollupFullRecalcBatchTest {
 		List<Account> organizations = new List<Account>();
 		for (Integer i = 0; i < storedCounts.size(); i++) {
 			organizations.add(
-				new Account(
-					Name = 'Organization ' + i,
-					RecordTypeId = organizationType,
-					NumberOfEmployees = storedCounts[i]
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Organization ' + i,
+						RecordTypeId = organizationType,
+						NumberOfEmployees = storedCounts[i]
+					)
 				)
 			);
 		}
@@ -47,7 +49,9 @@ private class RollupFullRecalcBatchTest {
 		for (Integer i = 0; i < organizations.size(); i++) {
 			for (Integer j = 0; j < people[i]; j++) {
 				contacts.add(
-					new Contact(LastName = 'Person ' + j, AccountId = organizations[i].Id)
+					TestDataFactory.person(
+						new Contact(LastName = 'Person ' + j, AccountId = organizations[i].Id)
+					)
 				);
 			}
 		}
@@ -251,11 +255,13 @@ private class RollupFullRecalcBatchTest {
 			List<Account> children = new List<Account>();
 			for (Integer i = 0; i < 31; i++) {
 				children.add(
-					new Account(
-						Name = 'Child ' + i,
-						ParentId = organizations[i == 30 ? 1 : 0].Id,
-						RecordTypeId = organizations[0].RecordTypeId,
-						AnnualRevenue = 10
+					TestDataFactory.organization(
+						new Account(
+							Name = 'Child ' + i,
+							ParentId = organizations[i == 30 ? 1 : 0].Id,
+							RecordTypeId = organizations[0].RecordTypeId,
+							AnnualRevenue = 10
+						)
 					)
 				);
 			}

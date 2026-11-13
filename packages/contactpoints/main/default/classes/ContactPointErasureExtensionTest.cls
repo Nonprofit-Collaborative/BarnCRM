@@ -23,9 +23,11 @@ private class ContactPointErasureExtensionTest {
 
 	/** Ana and Sam in one household, each with an email; Ana also has an address of her own. */
 	private static List<Contact> household(String lastName) {
-		Account home = new Account(
-			Name = lastName + ' Household',
-			RecordTypeId = HouseholdService.householdRecordTypeId()
+		Account home = TestDataFactory.household(
+			new Account(
+				Name = lastName + ' Household',
+				RecordTypeId = HouseholdService.householdRecordTypeId()
+			)
 		);
 		Database.insert(home, AccessLevel.SYSTEM_MODE);
 		Database.insert(

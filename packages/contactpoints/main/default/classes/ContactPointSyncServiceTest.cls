@@ -245,9 +245,11 @@ private class ContactPointSyncServiceTest {
 			if (!ready()) {
 				return;
 			}
-			Account household = new Account(
-				Name = 'Rivera Household',
-				RecordTypeId = HouseholdService.householdRecordTypeId()
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'Rivera Household',
+					RecordTypeId = HouseholdService.householdRecordTypeId()
+				)
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact ana = person('Rivera', null, null);

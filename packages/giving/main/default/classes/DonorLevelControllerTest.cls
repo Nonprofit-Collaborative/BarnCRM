@@ -47,10 +47,14 @@ private class DonorLevelControllerTest {
 	static void theLadderComesBackLowestFirstWithItsDonorCounts() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Account>{
-				new Account(Name = 'The Nolan Family', Total_Giving__c = 2500),
-				new Account(Name = 'The Garcia Family', Total_Giving__c = 1200)
+				TestDataFactory.organization(
+					new Account(Name = 'The Nolan Family', Total_Giving__c = 2500)
+				),
+				TestDataFactory.organization(
+					new Account(Name = 'The Garcia Family', Total_Giving__c = 1200)
+				)
 			};
-			insert new Contact(LastName = 'Reyes', Total_Giving__c = 300);
+			insert TestDataFactory.person(new Contact(LastName = 'Reyes', Total_Giving__c = 300));
 
 			Test.startTest();
 			DonorLevelController.LadderModel model = DonorLevelController.getLadder();
@@ -114,7 +118,9 @@ private class DonorLevelControllerTest {
 	@IsTest
 	static void recalculationStartsAJobAndCanBeSeenToHaveRun() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			insert new Account(Name = 'The Okafor Family', Total_Giving__c = 4000);
+			insert TestDataFactory.organization(
+				new Account(Name = 'The Okafor Family', Total_Giving__c = 4000)
+			);
 
 			Test.startTest();
 			Id jobId = DonorLevelController.recalculate();

@@ -20,7 +20,7 @@ private class BulkUpdateBatchTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			noRollupTargets();
-			Account organization = new Account(Name = ORGANIZATION);
+			Account organization = TestDataFactory.organization(new Account(Name = ORGANIZATION));
 			insert organization;
 			insert people(organization.Id, 0, VOLUNTEER_COUNT, 'Volunteer');
 			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
@@ -72,11 +72,13 @@ private class BulkUpdateBatchTest {
 		List<Contact> people = new List<Contact>();
 		for (Integer index = first; index < first + count; index++) {
 			people.add(
-				new Contact(
-					AccountId = organizationId,
-					LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
-					Title = title,
-					Work_Email__c = 'person' + index + '@example.org'
+				TestDataFactory.person(
+					new Contact(
+						AccountId = organizationId,
+						LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
+						Title = title,
+						Work_Email__c = 'person' + index + '@example.org'
+					)
 				)
 			);
 		}

@@ -197,7 +197,9 @@ private class RollupRegressionHouseholdsTest {
 				'Ana',
 				'Nolan'
 			);
-			insert new Contact(FirstName = 'Luis', LastName = 'Nolan', AccountId = ana.AccountId);
+			insert TestDataFactory.person(
+				new Contact(FirstName = 'Luis', LastName = 'Nolan', AccountId = ana.AccountId)
+			);
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
 			insert gift;
 			GiftService.refund(gift.Id, 200, 'Part returned');

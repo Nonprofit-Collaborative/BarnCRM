@@ -181,7 +181,7 @@ private class PersonEnrollmentsControllerTest {
 			) {
 				return; // An org without person accounts has no such person.
 			}
-			Account person = new Account();
+			Account person = TestDataFactory.organization(new Account());
 			person.put('LastName', 'Lindqvist');
 			person.put('RecordTypeId', OrgShapeDetector.creatablePersonRecordTypeId());
 			insert person;

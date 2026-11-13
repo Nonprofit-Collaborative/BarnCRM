@@ -72,7 +72,9 @@ private class VolunteerSuggestionControllerTest {
 			Volunteer_Shift__c shift = theShift();
 			Contact person = volunteer('Person', 'Active', null);
 			Contact plain = volunteer('Plain', 'Active', null);
-			Account personAccount = new Account(Name = 'Person Account Stand In');
+			Account personAccount = TestDataFactory.organization(
+				new Account(Name = 'Person Account Stand In')
+			);
 			insert personAccount;
 			VolunteerSuggestionController.accountsBehindForTest = new Map<Id, Id>{
 				person.Id => personAccount.Id
