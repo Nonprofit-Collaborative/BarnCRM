@@ -45,7 +45,9 @@ private class HouseholdOfPersonControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			HouseholdService.suspendAutomaticCreation();
-			Account organization = new Account(Name = 'The Union Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert organization;
 			Contact harper = HouseholdTestDataFactory.newContact('Ms.', 'Harper', 'Garcia');
 			harper.AccountId = organization.Id;
@@ -255,8 +257,8 @@ private class HouseholdOfPersonControllerTest {
 				return;
 			}
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			Account person = new Account(
-				RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+			Account person = TestDataFactory.organization(
+				new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId())
 			);
 			person.put('FirstName', 'Quillon');
 			person.put('LastName', 'Vantrees');
@@ -326,7 +328,9 @@ private class HouseholdOfPersonControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			HouseholdService.suspendAutomaticCreation();
-			Account organization = new Account(Name = 'The Union Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert organization;
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
@@ -454,7 +458,9 @@ private class HouseholdOfPersonControllerTest {
 	static void theSearchOffersContactsWhereThereAreNoPersonAccounts() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = false;
-			Contact found = new Contact(FirstName = 'Zelda', LastName = 'Searchable');
+			Contact found = TestDataFactory.person(
+				new Contact(FirstName = 'Zelda', LastName = 'Searchable')
+			);
 			TestDataFactory.pastDuplicateRules(found);
 			insert found;
 			Test.setFixedSearchResults(new List<Id>{ found.Id });

@@ -52,7 +52,9 @@ private class RollupNightlyBatchTest {
 		List<Account> organizations = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			organizations.add(
-				new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
+				TestDataFactory.organization(
+					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
+				)
 			);
 		}
 		insert organizations;
@@ -60,10 +62,12 @@ private class RollupNightlyBatchTest {
 		for (Account organization : organizations) {
 			for (Integer j = 0; j < people; j++) {
 				contacts.add(
-					new Contact(
-						LastName = 'Person ' + j,
-						AccountId = organization.Id,
-						Birthdate = birthdate
+					TestDataFactory.person(
+						new Contact(
+							LastName = 'Person ' + j,
+							AccountId = organization.Id,
+							Birthdate = birthdate
+						)
 					)
 				);
 			}

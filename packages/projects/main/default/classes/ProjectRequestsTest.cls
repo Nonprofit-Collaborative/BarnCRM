@@ -24,10 +24,8 @@ private class ProjectRequestsTest {
 	}
 
 	private static Contact requester() {
-		Contact person = new Contact(
-			FirstName = 'Rae',
-			LastName = 'Asker',
-			Email = 'rae@example.org'
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Rae', LastName = 'Asker', Email = 'rae@example.org')
 		);
 		Database.DMLOptions options = new Database.DMLOptions();
 		options.DuplicateRuleHeader.allowSave = true;

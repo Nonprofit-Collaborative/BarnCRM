@@ -25,12 +25,14 @@ private class ImportMatcherStandInFieldsTest {
 	}
 
 	private static Account account(String name, String site, String shipping, String billing) {
-		return new Account(
-			Name = name,
-			Website = site,
-			ShippingPostalCode = shipping,
-			BillingPostalCode = billing,
-			RecordTypeId = organizationType()
+		return TestDataFactory.organization(
+			new Account(
+				Name = name,
+				Website = site,
+				ShippingPostalCode = shipping,
+				BillingPostalCode = billing,
+				RecordTypeId = organizationType()
+			)
 		);
 	}
 

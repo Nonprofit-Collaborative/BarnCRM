@@ -108,11 +108,13 @@ private class FormSubmitServiceTest {
 	@IsTest
 	static void thePersonOnFileHasOnlyBlanksFilledUnlessTheFormOverwrites() {
 		System.runAs(admin()) {
-			Contact onFile = new Contact(
-				FirstName = 'Pat',
-				LastName = 'Zzform',
-				Email = 'pat.zzform@example.org',
-				Description = 'Keep this'
+			Contact onFile = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Pat',
+					LastName = 'Zzform',
+					Email = 'pat.zzform@example.org',
+					Description = 'Keep this'
+				)
 			);
 			insert as user onFile;
 			Map<String, Object> answers = pat();
@@ -168,9 +170,15 @@ private class FormSubmitServiceTest {
 	static void aSharedEmailIsHeldForReviewAndProcessedAgain() {
 		System.runAs(admin()) {
 			List<Contact> couple = new List<Contact>{
-				new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org'),
-				new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org'),
-				new Contact(FirstName = 'Sam', LastName = 'Zzform', Email = 'home@example.org')
+				TestDataFactory.person(
+					new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org')
+				),
+				TestDataFactory.person(
+					new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org')
+				),
+				TestDataFactory.person(
+					new Contact(FirstName = 'Sam', LastName = 'Zzform', Email = 'home@example.org')
+				)
 			};
 			insert as user couple;
 			Form__c form = FormsTestData.volunteerInterest();

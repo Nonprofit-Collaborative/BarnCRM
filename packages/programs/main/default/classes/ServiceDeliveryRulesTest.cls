@@ -163,7 +163,7 @@ private class ServiceDeliveryRulesTest {
 			Program__c pantry = new Program__c(Name = 'Pantry');
 			insert pantry;
 			Service__c meal = serviceIn(pantry);
-			Account business = new Account(Name = 'Acme Supply');
+			Account business = TestDataFactory.organization(new Account(Name = 'Acme Supply'));
 			insert business;
 
 			Database.SaveResult result = Database.insert(

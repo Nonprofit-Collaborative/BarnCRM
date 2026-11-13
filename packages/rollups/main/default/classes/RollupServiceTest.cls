@@ -361,23 +361,27 @@ private class RollupServiceTest {
 	static void aMergeRecalculatesOnlyTheRealTimeTotalsOnTheSurvivors() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
-			Account survivor = new Account(
-				Name = 'Survivor',
-				RecordTypeId = organizationType,
-				Member_Count__c = 7
+			Account survivor = TestDataFactory.organization(
+				new Account(Name = 'Survivor', RecordTypeId = organizationType, Member_Count__c = 7)
 			);
-			Account untouched = new Account(Name = 'Untouched', RecordTypeId = organizationType);
+			Account untouched = TestDataFactory.organization(
+				new Account(Name = 'Untouched', RecordTypeId = organizationType)
+			);
 			insert new List<Account>{ survivor, untouched };
 			insert new List<Account>{
-				new Account(
-					Name = 'Child',
-					RecordTypeId = organizationType,
-					ParentId = survivor.Id
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Child',
+						RecordTypeId = organizationType,
+						ParentId = survivor.Id
+					)
 				),
-				new Account(
-					Name = 'Other',
-					RecordTypeId = organizationType,
-					ParentId = untouched.Id
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Other',
+						RecordTypeId = organizationType,
+						ParentId = untouched.Id
+					)
 				)
 			};
 			insert new List<Rollup_Definition__c>{
@@ -399,7 +403,7 @@ private class RollupServiceTest {
 			};
 			RollupService.runAfterMerge(
 				'Account',
-				new List<SObject>{ new Account(Name = 'Deleted') }
+				new List<SObject>{ TestDataFactory.organization(new Account(Name = 'Deleted')) }
 			);
 			System.Assert.isNull(
 				RollupService.lastParentIds,

@@ -53,15 +53,19 @@ private class DuplicateServiceTest {
 	private static List<Contact> twoPeople() {
 		return (List<Contact>) insertAllowingDuplicates(
 			new List<Contact>{
-				new Contact(
-					FirstName = 'Maria',
-					LastName = 'Dupcheck',
-					Email = 'maria.dupcheck@example.org'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Maria',
+						LastName = 'Dupcheck',
+						Email = 'maria.dupcheck@example.org'
+					)
 				),
-				new Contact(
-					FirstName = 'Mariah',
-					LastName = 'Dupcheck',
-					Email = 'mariah.dupcheck@example.org'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Mariah',
+						LastName = 'Dupcheck',
+						Email = 'mariah.dupcheck@example.org'
+					)
 				)
 			}
 		);
@@ -91,12 +95,14 @@ private class DuplicateServiceTest {
 	}
 
 	private static Account home(String name, String street, String city, String postalCode) {
-		return new Account(
-			Name = name,
-			BillingStreet = street,
-			BillingCity = city,
-			BillingState = 'OH',
-			BillingPostalCode = postalCode
+		return TestDataFactory.organization(
+			new Account(
+				Name = name,
+				BillingStreet = street,
+				BillingCity = city,
+				BillingState = 'OH',
+				BillingPostalCode = postalCode
+			)
 		);
 	}
 
@@ -135,7 +141,10 @@ private class DuplicateServiceTest {
 				'Different names in one postal code are not enough.'
 			);
 			Assert.isFalse(
-				DuplicateService.householdsShareEvidence(new Account(), new Account()),
+				DuplicateService.householdsShareEvidence(
+					TestDataFactory.household(new Account()),
+					TestDataFactory.household(new Account())
+				),
 				'Two blank households share nothing.'
 			);
 			Assert.isFalse(DuplicateService.householdsShareEvidence(hall, null), 'Half a pair.');
@@ -440,7 +449,7 @@ private class DuplicateServiceTest {
 				new List<Account>{
 					HouseholdTestDataFactory.newHousehold('The Dupcheck Family'),
 					HouseholdTestDataFactory.newHousehold('The Dupcheck Household'),
-					new Account(Name = 'Dupcheck Hardware')
+					TestDataFactory.household(new Account(Name = 'Dupcheck Hardware'))
 				}
 			);
 			List<DuplicateService.Pair> pairs = new List<DuplicateService.Pair>{
@@ -736,15 +745,19 @@ private class DuplicateServiceTest {
 			}
 			List<Contact> twins = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
-					new Contact(
-						FirstName = 'Dana',
-						LastName = 'Dupcheck',
-						Email = 'dana.dupcheck@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Dana',
+							LastName = 'Dupcheck',
+							Email = 'dana.dupcheck@example.org'
+						)
 					),
-					new Contact(
-						FirstName = 'Dana',
-						LastName = 'Dupcheck',
-						Email = 'dana.dupcheck@example.org'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Dana',
+							LastName = 'Dupcheck',
+							Email = 'dana.dupcheck@example.org'
+						)
 					)
 				}
 			);

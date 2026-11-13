@@ -191,8 +191,8 @@ private class MatchSourceControllerTest {
 			Database.DMLOptions options = new Database.DMLOptions();
 			options.DuplicateRuleHeader.allowSave = true;
 			List<Contact> people = new List<Contact>{
-				new Contact(FirstName = 'Ana', LastName = 'Ruiz'),
-				new Contact(FirstName = 'Ben', LastName = 'Okafor')
+				TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ruiz')),
+				TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = 'Okafor'))
 			};
 			Database.insert(people, options);
 			insert new List<Address__c>{

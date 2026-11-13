@@ -172,7 +172,7 @@ private class VolunteersPostInstallTest {
 	static void aGrantThePlatformRefusesIsLoggedAsAWarning() {
 		System.runAs(TestUsers.admin()) {
 			// An Id that is no user, so the insert is refused for a reason other than a duplicate.
-			Account notAUser = new Account(Name = 'Not a user');
+			Account notAUser = TestDataFactory.organization(new Account(Name = 'Not a user'));
 			insert notAUser;
 
 			Test.startTest();

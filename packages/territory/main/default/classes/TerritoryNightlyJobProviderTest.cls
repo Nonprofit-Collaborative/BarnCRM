@@ -41,7 +41,7 @@ private class TerritoryNightlyJobProviderTest {
 				Applies_To__c = TerritoryRunBatch.KIND_PEOPLE,
 				Active__c = true
 			);
-			insert as user new Contact(LastName = 'Alvarez');
+			insert as user TestDataFactory.person(new Contact(LastName = 'Alvarez'));
 			new TerritoryNightlyJobProvider.Assign().execute(null);
 			Test.stopTest();
 

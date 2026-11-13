@@ -72,13 +72,17 @@ private class VolunteerHoursImportTest {
 			String email = 'vol' + i + '@example.org';
 			emails.add(email);
 			if (accountsHoldPeople(shipped)) {
-				Account person = new Account();
+				Account person = TestDataFactory.organization(new Account());
 				person.put('LastName', 'Unteer' + i);
 				person.put('RecordTypeId', OrgShapeDetector.creatablePersonRecordTypeId());
 				person.put('PersonEmail', email);
 				records.add(person);
 			} else {
-				records.add(new Contact(FirstName = 'Vol', LastName = 'Unteer' + i, Email = email));
+				records.add(
+					TestDataFactory.person(
+						new Contact(FirstName = 'Vol', LastName = 'Unteer' + i, Email = email)
+					)
+				);
 			}
 		}
 		insert records;

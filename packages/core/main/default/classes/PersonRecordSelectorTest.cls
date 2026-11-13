@@ -14,7 +14,9 @@ private class PersonRecordSelectorTest {
 	static void nothingIsReadWhenTheOrgDoesNotStorePeopleAsAccounts() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = false;
-			Account organization = new Account(Name = 'Riverside Community Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Community Trust')
+			);
 			insert organization;
 
 			Test.startTest();
@@ -53,7 +55,7 @@ private class PersonRecordSelectorTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = true;
 			User staff = HouseholdTestDataFactory.standardUser('upk');
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			// Saved by the same user who reads it back, so that what this measures is field
 			// level access and not the org's sharing model.
 			System.runAs(staff) {
@@ -84,7 +86,7 @@ private class PersonRecordSelectorTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = true;
 			User staff = HouseholdTestDataFactory.standardUser('disp');
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			System.runAs(staff) {
 				insert person;
 			}
@@ -120,7 +122,7 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void aRecordIsTurnedIntoAPersonWithoutNamingFieldsThatMayNotExist() {
 		System.runAs(TestUsers.admin()) {
-			Account record = new Account(Name = 'Maria Garcia');
+			Account record = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert record;
 
 			Test.startTest();
@@ -142,7 +144,9 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void anOrganizationIsNeverTakenForAPerson() {
 		System.runAs(TestUsers.admin()) {
-			Account organization = new Account(Name = 'Riverside Community Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Community Trust')
+			);
 			insert organization;
 
 			Test.startTest();
@@ -172,7 +176,7 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void aListOfRecordsIsTurnedIntoPeople() {
 		System.runAs(TestUsers.admin()) {
-			Account record = new Account(Name = 'Maria Garcia');
+			Account record = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert record;
 
 			Test.startTest();
@@ -204,8 +208,8 @@ private class PersonRecordSelectorTest {
 			Test.startTest();
 			Map<String, Boolean> noticed = new Map<String, Boolean>();
 			for (String fieldName : changes.keySet()) {
-				Account previous = new Account(Name = 'Maria Garcia');
-				Account record = new Account(Name = 'Maria Garcia');
+				Account previous = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
+				Account record = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 				record.put(fieldName, changes.get(fieldName));
 				noticed.put(fieldName, PersonRecordSelector.namingChanged(record, previous));
 			}
@@ -223,12 +227,16 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void aChangeTheWordingIsNotBuiltFromIsIgnored() {
 		System.runAs(TestUsers.admin()) {
-			Account previous = new Account(Name = 'Maria Garcia', Deceased__c = false);
-			Account record = new Account(
-				Name = 'Maria Garcia',
-				Deceased__c = false,
-				BillingCity = 'Riverside',
-				Description = 'Met at the gala'
+			Account previous = TestDataFactory.organization(
+				new Account(Name = 'Maria Garcia', Deceased__c = false)
+			);
+			Account record = TestDataFactory.organization(
+				new Account(
+					Name = 'Maria Garcia',
+					Deceased__c = false,
+					BillingCity = 'Riverside',
+					Description = 'Met at the gala'
+				)
 			);
 
 			Test.startTest();
@@ -244,8 +252,12 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void aChangeBackAgainIsNotAChange() {
 		System.runAs(TestUsers.admin()) {
-			Account previous = new Account(Name = 'Maria Garcia', Household_Role__c = 'Head');
-			Account record = new Account(Name = 'Maria Garcia', Household_Role__c = 'Head');
+			Account previous = TestDataFactory.household(
+				new Account(Name = 'Maria Garcia', Household_Role__c = 'Head')
+			);
+			Account record = TestDataFactory.household(
+				new Account(Name = 'Maria Garcia', Household_Role__c = 'Head')
+			);
 
 			Test.startTest();
 			Boolean noticed = PersonRecordSelector.namingChanged(record, previous);
@@ -259,11 +271,17 @@ private class PersonRecordSelectorTest {
 	static void nothingToCompareIsNotAChange() {
 		System.runAs(TestUsers.admin()) {
 			Assert.isFalse(
-				PersonRecordSelector.namingChanged(null, new Account(Name = 'Maria Garcia')),
+				PersonRecordSelector.namingChanged(
+					null,
+					TestDataFactory.organization(new Account(Name = 'Maria Garcia'))
+				),
 				'No record means nothing changed'
 			);
 			Assert.isFalse(
-				PersonRecordSelector.namingChanged(new Account(Name = 'Maria Garcia'), null),
+				PersonRecordSelector.namingChanged(
+					TestDataFactory.organization(new Account(Name = 'Maria Garcia')),
+					null
+				),
 				'No previous version means nothing to compare with'
 			);
 		}

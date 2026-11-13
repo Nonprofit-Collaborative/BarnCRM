@@ -14,15 +14,19 @@ private class BulkUpdateControllerTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			noRollupTargets();
-			Account organization = new Account(Name = 'Springfield Food Bank');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Springfield Food Bank')
+			);
 			insert organization;
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
 				people.add(
-					new Contact(
-						AccountId = organization.Id,
-						LastName = 'Person ' + index,
-						Title = 'Volunteer'
+					TestDataFactory.person(
+						new Contact(
+							AccountId = organization.Id,
+							LastName = 'Person ' + index,
+							Title = 'Volunteer'
+						)
 					)
 				);
 			}
