@@ -106,8 +106,8 @@ private class EventDashboardControllerTest {
 	static void countsSpeakersByStatus() {
 		System.runAs(staff()) {
 			Event__c event = conference();
-			Contact ana = new Contact(LastName = 'Garcia');
-			Contact sam = new Contact(LastName = 'Lee');
+			Contact ana = TestDataFactory.person(new Contact(LastName = 'Garcia'));
+			Contact sam = TestDataFactory.person(new Contact(LastName = 'Lee'));
 			insert as user new List<Contact>{ ana, sam };
 			insert as user new List<Event_Speaker__c>{
 				new Event_Speaker__c(

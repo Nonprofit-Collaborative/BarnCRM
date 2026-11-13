@@ -70,10 +70,8 @@ private class EventPaymentsTest {
 			Price__c = price,
 			Active__c = true
 		);
-		Contact jane = new Contact(
-			FirstName = 'Jane',
-			LastName = 'Payer',
-			Email = 'jane@example.org'
+		Contact jane = TestDataFactory.person(
+			new Contact(FirstName = 'Jane', LastName = 'Payer', Email = 'jane@example.org')
 		);
 		// An org's duplicate rule must not stop a test person sharing an email.
 		Database.DMLOptions options = new Database.DMLOptions();
