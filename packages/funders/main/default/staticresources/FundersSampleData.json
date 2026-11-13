@@ -1,0 +1,126 @@
+{
+  "module": "Funders",
+  "countLabel": "Grants",
+  "count": { "object": "Grant__c", "where": "Sample_Data__c = TRUE" },
+  "steps": [
+    {
+      "object": "Grant__c",
+      "records": [
+        {
+          "key": "prospect",
+          "Name": "Capacity Building Grant",
+          "Funder__c": { "sample": "O022" },
+          "Stage__c": "Prospect",
+          "Amount_Requested__c": 10000,
+          "Application_Deadline__c": { "days": 30 },
+          "Next_Step__c": "Call the program officer about fit",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "applied",
+          "Name": "Community Literacy Grant",
+          "Funder__c": { "sample": "O014" },
+          "Stage__c": "Applied",
+          "Amount_Requested__c": 25000,
+          "Application_Deadline__c": { "days": -20 },
+          "Submitted_Date__c": { "days": -21 },
+          "Decision_Date__c": { "days": 40 },
+          "Purpose__c": "Reading support for 120 students in grades 3 to 5.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "award",
+          "Name": "Youth Programs Award",
+          "Funder__c": { "sample": "O001" },
+          "Stage__c": "Awarded",
+          "Amount_Requested__c": 40000,
+          "Amount_Awarded__c": 35000,
+          "Application_Deadline__c": { "days": -120 },
+          "Submitted_Date__c": { "days": -121 },
+          "Decision_Date__c": { "days": -60 },
+          "Award_Start_Date__c": { "days": -30 },
+          "Award_End_Date__c": { "days": 334 },
+          "Purpose__c": "After-school tutoring for one year, restricted to tutor stipends.",
+          "Restricted__c": true,
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Grant_Requirement__c",
+      "records": [
+        {
+          "Grant__c": { "ref": "award" },
+          "Name": "Site visit",
+          "Type__c": "Site Visit",
+          "Due_Date__c": { "days": -10 },
+          "Status__c": "Accepted"
+        },
+        {
+          "Grant__c": { "ref": "award" },
+          "Name": "Quarter 1 financial report",
+          "Type__c": "Financial Report",
+          "Due_Date__c": { "days": 10 },
+          "Status__c": "In Progress"
+        },
+        {
+          "Grant__c": { "ref": "award" },
+          "Name": "Interim narrative report",
+          "Type__c": "Narrative Report",
+          "Due_Date__c": { "days": 75 },
+          "Status__c": "Not Started"
+        }
+      ]
+    },
+    {
+      "object": "Grant_Payment__c",
+      "records": [
+        {
+          "Grant__c": { "ref": "award" },
+          "Due_Date__c": { "days": -30 },
+          "Amount__c": 17500,
+          "Status__c": "Received",
+          "Received_Date__c": { "days": -30 }
+        },
+        {
+          "Grant__c": { "ref": "award" },
+          "Due_Date__c": { "days": -30, "months": 6 },
+          "Amount__c": 17500,
+          "Status__c": "Expected"
+        }
+      ]
+    },
+    {
+      "object": "Grant_Budget_Line__c",
+      "records": [
+        {
+          "key": "stipends",
+          "Grant__c": { "ref": "award" },
+          "Name": "Tutor stipends",
+          "Amount_Requested__c": 30000,
+          "Amount_Awarded__c": 28000
+        },
+        {
+          "Grant__c": { "ref": "award" },
+          "Name": "Books and supplies",
+          "Amount_Requested__c": 10000,
+          "Amount_Awarded__c": 7000
+        }
+      ]
+    },
+    {
+      "object": "Grant_Fund_Entry__c",
+      "records": [
+        {
+          "Grant__c": { "ref": "award" },
+          "Budget_Line__c": { "ref": "stipends", "optional": true },
+          "Type__c": "Spent",
+          "Amount__c": 6000,
+          "Entry_Date__c": { "days": -5 },
+          "Description__c": "Tutor stipends"
+        }
+      ]
+    }
+  ],
+  "remove": [{ "object": "Grant__c", "where": "Sample_Data__c = TRUE" }]
+}

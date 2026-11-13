@@ -24,6 +24,54 @@ default allocations, installment schedules, automatic household soft credits), a
   `GivingSampleData` in the Giving package: funds, appeals, gifts with their allocations,
   commitments, soft credits, tributes. It ships with Giving, so an org without Giving never
   carries it.
+- `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
+  module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
+  by Core's `SampleDataFile` with no loader Apex in the module.
+
+### Module files (D-200 S2)
+
+A module ships its set as a static resource named as `SampleDataModules` lists it (for
+example `FundersSampleData`); Core loads it when no class of that name is installed:
+
+```json
+{
+  "module": "Funders",
+  "countLabel": "Grants",
+  "count": { "object": "Grant__c", "where": "Sample_Data__c = TRUE" },
+  "steps": [
+    {
+      "object": "Grant__c",
+      "records": [
+        {
+          "key": "award",
+          "Name": "Youth Programs Award",
+          "Funder__c": { "sample": "O001" },
+          "Award_Start_Date__c": { "days": -30 },
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    { "object": "Grant_Payment__c", "records": [{ "Grant__c": { "ref": "award" }, "Amount__c": 17500 }] }
+  ],
+  "remove": [{ "object": "Grant__c", "where": "Sample_Data__c = TRUE" }]
+}
+```
+
+- Each step is one insert, in user mode, in its own transaction, in file order. A record is its
+  field values by API name, plus an optional `key`.
+- A value is a literal, `{ "ref": key }` (a record this file inserted earlier), `{ "sample":
+  key }` (Core's sample person, household or organization by `Sample_Data_Key__c`),
+  `{ "currentUser": true }`, or `{ "days": n, "months": m, "time": "HH:mm" }` (today moved, as a
+  date, a local date and time, or a time).
+- A record whose `ref` or `sample` does not resolve is left out unless the value says
+  `"optional": true`. A step or field the loader cannot create is skipped.
+- `count` is the status card's number. `remove` entries are deleted in order, in chunks, with
+  partial success: a record the organization's own records point at is kept and named in one
+  Warning in the Error Log. `hasSampleRecords` is true while any `remove` entry matches.
+- The Funders, Programs and Events files reproduce the records their former loader classes
+  built. Giving and Volunteers keep their loader classes for now: their loads run module rules
+  a file cannot express yet (the org's default fund, suppressed default allocations, ask
+  stages, overdue installments, approval verbs on hours).
 
 Both files are generated, not hand-edited, by
 `scripts/data/generate-sample-data.py` (Python 3, standard library only, no dependencies to

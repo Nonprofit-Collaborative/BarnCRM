@@ -97,14 +97,6 @@
         <value>{0} Enrollments Are Still Open in Programs That Have Ended</value>
     </labels>
     <labels>
-        <fullName>Programs_SampleData_CountLabel</fullName>
-        <categories>SampleData</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Sample data card: what the Programs number counts</shortDescription>
-        <value>Program enrollments</value>
-    </labels>
-    <labels>
         <fullName>Programs_Log_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
