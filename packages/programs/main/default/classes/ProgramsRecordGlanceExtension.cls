@@ -66,7 +66,9 @@ public with sharing class ProgramsRecordGlanceExtension implements RecordGlanceE
 				'actionName' => 'new'
 			},
 			'state' => new Map<String, Object>{
-				'defaultFieldValues' => personField.getDescribe().getName() + '=' + personId
+				'defaultFieldValues' => personField.getDescribe().getName() +
+				'=' +
+				personId
 			}
 		};
 	}

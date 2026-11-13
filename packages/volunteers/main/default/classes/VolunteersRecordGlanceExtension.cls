@@ -60,7 +60,9 @@ public with sharing class VolunteersRecordGlanceExtension implements RecordGlanc
 				'custom:custom3'
 			)
 			.addNumber(
-				NamespaceUtil.field(fields, 'Volunteer_Hours_This_Year__c').getDescribe().getLabel(),
+				NamespaceUtil.field(fields, 'Volunteer_Hours_This_Year__c')
+					.getDescribe()
+					.getLabel(),
 				hours == null ? 0 : hours
 			)
 			.addDate(
@@ -68,7 +70,10 @@ public with sharing class VolunteersRecordGlanceExtension implements RecordGlanc
 				(Date) person.get('Last_Volunteer_Date__c')
 			);
 		if (Schema.SObjectType.Volunteer_Hours__c.isCreateable()) {
-			card.addAction(Label.Volunteers_LogHours_Title, logHoursReference((Id) person.get('Id')));
+			card.addAction(
+				Label.Volunteers_LogHours_Title,
+				logHoursReference((Id) person.get('Id'))
+			);
 		}
 		return card;
 	}

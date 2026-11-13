@@ -165,6 +165,7 @@ describe('c-volunteer-log-hours', () => {
     );
     const element = createElement('c-volunteer-log-hours', { is: VolunteerLogHours });
     document.body.appendChild(element);
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
     CurrentPageReference.emit({ type: 'standard__navItemPage', state: { c__personId: PERSON_ID } });
     await flush();
 

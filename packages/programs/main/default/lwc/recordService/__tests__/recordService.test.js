@@ -178,6 +178,7 @@ describe('c-record-service', () => {
     record.mockResolvedValue('a0B000000000001AAA');
     const element = createElement('c-record-service', { is: RecordService });
     document.body.appendChild(element);
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
     CurrentPageReference.emit({ type: 'standard__navItemPage', state: { c__personId: BEN } });
     await flush();
 
