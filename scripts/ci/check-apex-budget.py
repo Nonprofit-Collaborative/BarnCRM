@@ -73,7 +73,10 @@ CAPS = {
     # AsyncStarter and its call sites (P9), 2,232,757; with address match keys (P6), 2,238,235.
     # With D-200 P4 and P10 (Error Log repeats coalesced, refused rows logged once, the rollup
     # write flag): 2,243,035 measured, raised by what they add plus about 0.1%.
-    "core": 2_245_300,
+    # Raised 2026-11-13 for D-200 S2, the generic JSON sample data loader (SampleDataFile, about
+    # 10,200), which let Programs, Funders and Events drop about 41,000 of loader Apex (their caps
+    # lowered to match): 2,248,668 measured, plus about 0.1%.
+    "core": 2_251_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -142,7 +145,9 @@ CAPS = {
     # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 177,950 measured, plus
     # about 0.5%.
-    "programs": 178_900,
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 160,756
+    # measured, plus about 1%.
+    "programs": 162_400,
     # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
     # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
     # 66,645 measured 2026-11-11, plus about 0.5%.
@@ -155,7 +160,9 @@ CAPS = {
     # checklists, documents, budget lines and renewals, plus about 2%.
     # Lowered at the cut-over cleanup (D-200, release 1.21): 123,925 measured 2026-11-12, plus
     # about 2%.
-    "funders": 126_500,
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 116,807
+    # measured, plus about 1%.
+    "funders": 118_000,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -196,7 +203,9 @@ CAPS = {
     # Releases 1.11 to 1.13 EVT-B (branches feature/evt-b-*): 247,001 measured (EV-22 attendee
     # app actions, EV-23 budget, EV-24 venue and room fills, EV-25 speaker checklist, EV-28
     # booth scans, EV-29 agenda picks and ratings), plus about 2%.
-    "events": 252_000,
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 228,605
+    # measured, plus about 1%.
+    "events": 231_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.

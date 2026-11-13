@@ -1,7 +1,6 @@
 {
   "languages": ["en"],
   "texts": {
-    "Events_SampleData_CountLabel": "Events",
     "Events_Public_Agenda": "Agenda",
     "Events_Public_Format": "Format",
     "Events_Public_Free": "Free",

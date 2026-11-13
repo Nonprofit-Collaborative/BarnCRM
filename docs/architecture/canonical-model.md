@@ -11484,8 +11484,10 @@ while the module is turned off:
 | `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
 | `nonprofit_cloud_program_management_present` | Info (category OrgShape) | The org has the Nonprofit Cloud `Program` and `ProgramEnrollment` objects, found by describe only (QA-F5). Programs never reads or writes them, so the two share no records. | None: choose one for each program. The Integrations page lists Nonprofit Cloud Program Management as an Alternative (Integration App row `Nonprofit_Cloud_Program_Management`, detected by `Program`, shown only when installed). |
 
-**Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
-`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, five stages, builds three
+**Sample data.** The static resource `ProgramsSampleData.json`, loaded by Core's generic
+`SampleDataFile` since D-200 S2 (format in data/sample/README.md), is registered in
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers; the removal is the file's `remove`
+entries with partial success, naming what it kept in one Warning. Its load builds three
 programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
 enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
 (release 0.13, P-02) 40 service deliveries (29ZB) to the people Enrolled in the two Active
@@ -12826,7 +12828,8 @@ second one. The renewal history is the chain of Renewal Of links both ways, at m
   (plain JSON; `restrictedFunds` is the F-03 integration point), the `fundersBoard` component on
   the `Funders_Board` tab, shares and flags in `fundersBoardModel.js`.
 - **Health Check:** `FundersHealthCheckExtension` (R-GN7, R-GQ5). **Sample data:**
-  `FundersSampleData` (three grants to Core's sample organizations, flagged `Sample_Data__c`).
+  `FundersSampleData.json`, loaded by Core's `SampleDataFile` (D-200 S2): three grants to
+  Core's sample organizations, flagged `Sample_Data__c`.
 
 ---
 

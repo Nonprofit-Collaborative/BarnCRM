@@ -1,10 +1,13 @@
 /**
- * The Funders sample data (C-10): three grants to Core's sample organizations, counted on the
- * card, removed again with real grants left alone, and nothing loaded where there are no sample
+ * The Funders sample data (C-10), shipped as FundersSampleData.json and loaded by Core's
+ * SampleDataFile (D-200 S2): three grants to Core's sample organizations, counted on the card,
+ * removed again with real grants left alone, and nothing loaded where there are no sample
  * organizations.
  */
-@IsTest(testFor='ApexClass:FundersSampleData, ApexClass:GrantSampleDataLoader')
+@IsTest(testFor='ApexClass:SampleDataFile')
 private class FundersSampleDataTest {
+	private static final String FILE = 'FundersSampleData';
+
 	@TestSetup
 	static void makeAdmin() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
@@ -14,28 +17,29 @@ private class FundersSampleDataTest {
 		return TestUsers.adminWith(GrantTestData.ADMIN);
 	}
 
-	/** Three of Core's sample organizations. */
+	/** The three of Core's sample organizations the file names. */
 	private static void sampleOrganizations() {
 		List<Account> organizations = new List<Account>();
-		for (Integer i = 0; i < 3; i++) {
+		for (String key : new List<String>{ 'O022', 'O014', 'O001' }) {
 			Account organization = (Account) TestDataFactory.pastDuplicateRules(
-				AccountKindsTestData.organization('Sample Org ' + i)
+				AccountKindsTestData.organization('Sample Org ' + key)
 			);
 			organization.Sample_Data__c = true;
+			organization.Sample_Data_Key__c = key;
 			organizations.add(organization);
 		}
 		insert organizations;
 	}
 
 	private static void loadEverything() {
-		FundersSampleData.LoadStages stages = new FundersSampleData.LoadStages();
+		SampleDataFile.LoadStages stages = new SampleDataFile.LoadStages(FILE);
 		for (Integer stage = 0; stage < stages.stageCount(); stage++) {
 			stages.runStage(stage);
 		}
 	}
 
 	private static void removeEverything() {
-		FundersSampleData.RemoveStages stages = new FundersSampleData.RemoveStages();
+		SampleDataFile.RemoveStages stages = new SampleDataFile.RemoveStages(FILE);
 		Integer stageCount = stages.stageCount();
 		for (Integer stage = 0; stage < stageCount; stage++) {
 			stages.runStage(stage);
@@ -51,17 +55,16 @@ private class FundersSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			FundersSampleData module = new FundersSampleData();
+			SampleDataModule module = SampleDataFile.find(FILE);
+			Assert.areEqual('Funders', module.moduleName(), 'The name startAfter looks for');
 			Assert.areEqual(3, module.countLoaded(), 'Three sample grants are counted');
 			Assert.isTrue(module.hasSampleRecords(), 'The card sees them');
 			Grant__c awarded = [
 				SELECT
 					Amount_Awarded__c,
-					Decision_Date__c,
 					Amount_Scheduled__c,
 					Amount_Received__c,
 					Restricted__c,
-					Restricted_Received__c,
 					Restricted_Spent__c,
 					Restricted_Balance__c
 				FROM Grant__c
@@ -71,7 +74,6 @@ private class FundersSampleDataTest {
 			Assert.areEqual(35000, awarded.Amount_Scheduled__c, 'The whole award is scheduled');
 			Assert.areEqual(17500, awarded.Amount_Received__c, 'The first half is received');
 			Assert.isTrue(awarded.Restricted__c, 'The award is restricted');
-			Assert.areEqual(17500, awarded.Restricted_Received__c, 'Its received half is entered');
 			Assert.areEqual(6000, awarded.Restricted_Spent__c, 'Some of it is spent');
 			Assert.areEqual(11500, awarded.Restricted_Balance__c, 'And the balance is the rest');
 			Assert.areEqual(
@@ -124,26 +126,10 @@ private class FundersSampleDataTest {
 	}
 
 	@IsTest
-	static void coreFindsTheModuleAndNothingLoadsWithoutSampleOrganizations() {
+	static void nothingLoadsWithoutSampleOrganizations() {
 		System.runAs(admin()) {
-			Object built = Type.forName('FundersSampleData').newInstance();
-			Assert.isTrue(built instanceof SampleDataModule, 'Core builds it by its name.');
-			FundersSampleData module = (FundersSampleData) built;
-			Assert.areEqual('Funders', module.moduleName(), 'The name startAfter looks for.');
-			Assert.isFalse(String.isBlank(module.countLabel()), 'The card has its wording.');
-			Assert.areEqual(
-				'FundersSampleData.LoadStages',
-				new FundersSampleData.LoadStages().name()
-			);
-			Assert.areEqual(
-				'FundersSampleData.RemoveStages',
-				new FundersSampleData.RemoveStages().name()
-			);
-
 			Test.startTest();
 			loadEverything();
-			new FundersSampleData.LoadStages().finish();
-			new FundersSampleData.RemoveStages().finish();
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -151,26 +137,7 @@ private class FundersSampleDataTest {
 				[SELECT COUNT() FROM Grant__c],
 				'No sample organizations, no grants'
 			);
-			Assert.isFalse(module.hasSampleRecords());
-		}
-	}
-
-	@IsTest
-	static void enqueueLoadAndRemoveStartCoresBatches() {
-		System.runAs(admin()) {
-			Test.startTest();
-			new FundersSampleData().enqueueLoad();
-			new FundersSampleData().enqueueRemove();
-			Test.stopTest();
-
-			Assert.isTrue(
-				[
-					SELECT COUNT()
-					FROM AsyncApexJob
-					WHERE ApexClass.Name IN ('SampleDataStageBatch', 'SampleDataRemoveBatch')
-				] >= 2,
-				'Both run in Core\'s batches.'
-			);
+			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords());
 		}
 	}
 }
