@@ -58,7 +58,8 @@ The **Volunteers** dashboard shows one chart for each: **Approved hours this yea
 ## To Open a Dashboard
 
 1. Open the **BarnCRM Fundraising** app (giving) or the **BarnCRM Volunteers** app (volunteering).
-2. Click the **Dashboards** tab.
+2. Click the **Dashboards** tab. In BarnCRM Fundraising it is the **Dashboards** tile under
+   **More** on **Fundraising Home**.
 3. Open the **BarnCRM Giving** or **BarnCRM Volunteers** folder.
 4. Click **Giving Overview** or **Volunteers**.
 5. Click **Refresh** at the top right to bring the numbers up to date.

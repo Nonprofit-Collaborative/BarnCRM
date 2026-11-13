@@ -33,10 +33,12 @@ If the card says **No Payments Yet**, click **Generate Now**.
 
 ## To See What Is Overdue or Coming Up
 
-The payments are on the **Scheduled Payments** tab of the BarnCRM Fundraising app. The overdue
-count is also on **Fundraising Home**; click it to open the **Overdue** list.
+The payments are on the **Scheduled Payments** tab, a tile under **More** on **Fundraising
+Home** and in the App Launcher. The overdue count is also on Fundraising Home; click it to open
+the **Overdue** list.
 
-1. In **BarnCRM Fundraising**, open the **Scheduled Payments** tab.
+1. In **BarnCRM Fundraising**, open **Fundraising Home** and click **Scheduled Payments** under
+   **More**.
 2. Choose the list view **Overdue**, or **Upcoming 30 Days**. Salesforce opens the list you chose last time from then on.
 
 You should see: each payment with its commitment and what was expected. A payment turns **Overdue** a few days after its due date, overnight.
