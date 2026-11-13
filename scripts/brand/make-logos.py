@@ -14,7 +14,7 @@ color (no error red, warning orange or yellow), so a launcher tile never reads a
   BarnCRM_Fundraising_Logo  giving       heart             #A3175F  BarnCRM Fundraising
   BarnCRM_Volunteers_Logo   volunteers   person            #2E844A  BarnCRM Volunteers
   BarnCRM_Programs_Logo     programs     sprout            #7526A8  BarnCRM Programs
-  BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Funders
+  BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Grants
   BarnCRM_Logic_Models_Logo logicmodels  flow arrows       #3B44B5  BarnCRM Logic Models
   BarnCRM_Forms_Logo        forms        form page         #0B5C7A  BarnCRM Forms
   BarnCRM_Events_Logo       events       calendar          #0B6B6B  BarnCRM Events

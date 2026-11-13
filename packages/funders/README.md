@@ -1,4 +1,4 @@
-# BarnCRM Funders
+# BarnCRM Funders (the BarnCRM Grants app)
 
 ## Purpose
 

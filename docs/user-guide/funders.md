@@ -4,7 +4,7 @@ This page covers tracking grants in BarnCRM: the requests you send to foundation
 government funders, how far along each one is, the deadlines coming up, and the reports an award
 requires.
 
-**Before you start:** open the **BarnCRM Funders** app from the App Launcher. Fundraising Staff,
+**Before you start:** open the **BarnCRM Grants** app from the App Launcher. Fundraising Staff,
 Team Members add grants and move them through the stages, but cannot delete a
 grant. Admins can also delete one. Read Only users can look but change nothing. If you need more
 access, ask your admin (see the [Funders admin guide](../admin-guide/funders.md#roles-and-permission-sets)).
@@ -98,7 +98,7 @@ you. Click **Print** to print the month without the app's header and navigation.
 
 ## To Show the Board Where the Money Comes From
 
-1. Open the **BarnCRM Funders** app. It opens on the **Board Dashboard**, its home: tiles for
+1. Open the **BarnCRM Grants** app. It opens on the **Board Dashboard**, its home: tiles for
    this fiscal year's revenue and awards, then a tile for each Funders tab.
 2. Read the three parts, all for this fiscal year:
    - **Revenue Mix**: grants awarded by funding source and, if you use Giving, gifts to funds,
