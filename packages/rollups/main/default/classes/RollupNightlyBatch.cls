@@ -130,7 +130,13 @@ public without sharing class RollupNightlyBatch implements Database.Batchable<SO
 		if (plan.passes.isEmpty()) {
 			return full;
 		}
-		Id first = Database.executeBatch(new RollupNightlyBatch(plan, 0), CHUNK_SIZE);
+		Id first;
+		try {
+			first = AsyncStarter.batch(new RollupNightlyBatch(plan, 0), CHUNK_SIZE, LOG_CONTEXT);
+		} catch (AsyncStarter.BusyException busy) {
+			// Nothing is stored as covered, so the next night covers these changes too.
+			ErrorLogger.log(busy, LOG_CONTEXT);
+		}
 		return full == null ? first : full;
 	}
 
