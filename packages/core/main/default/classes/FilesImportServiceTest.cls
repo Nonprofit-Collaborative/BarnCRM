@@ -38,9 +38,9 @@ private class FilesImportServiceTest {
 	@IsTest
 	static void theCheckListsIdsThatAreNotIdsOrNameNoRecord() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(LastName = 'Smith');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Smith'));
 			insert person;
-			Contact other = new Contact(LastName = 'Jones');
+			Contact other = TestDataFactory.person(new Contact(LastName = 'Jones'));
 			insert other;
 			delete other;
 			List<String> unseen = FilesImportController.check(
@@ -55,7 +55,7 @@ private class FilesImportServiceTest {
 	@IsTest
 	static void aLoadSavesEachFileLinkedToItsRecordAndJournalsIt() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(LastName = 'Smith');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Smith'));
 			insert person;
 			Id jobId = FilesImportController.start('letters.zip', 3);
 			Import_Batch__c started = job(jobId);
@@ -111,7 +111,7 @@ private class FilesImportServiceTest {
 	@IsTest
 	static void undoDeletesTheDocumentsAndKeepsOneChangedSince() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(LastName = 'Smith');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Smith'));
 			insert person;
 			Id jobId = FilesImportController.start('letters.zip', 2);
 			FilesImportController.addFiles(
@@ -163,7 +163,7 @@ private class FilesImportServiceTest {
 	@IsTest
 	static void aGroupMustBeSmallAndTheJobStillLoading() {
 		System.runAs(TestUsers.admin()) {
-			Contact person = new Contact(LastName = 'Smith');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Smith'));
 			insert person;
 			Id jobId = FilesImportController.start('letters.zip', 25);
 			List<FilesImportService.IncomingFile> tooMany = new List<FilesImportService.IncomingFile>();

@@ -54,13 +54,11 @@ private class SummitEventsAdapterTest {
 	@IsTest
 	static void importsRegistrantsWithoutDuplicates() {
 		System.runAs(staff()) {
-			Contact jane = new Contact(
-				FirstName = 'Jane',
-				LastName = 'Doe',
-				Email = 'jane@example.org'
+			Contact jane = TestDataFactory.person(
+				new Contact(FirstName = 'Jane', LastName = 'Doe', Email = 'jane@example.org')
 			);
 			insert as user jane;
-			Contact sam = new Contact(FirstName = 'Sam', LastName = 'Lee');
+			Contact sam = TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Lee'));
 			insert as user sam;
 			summitInstance();
 			Map<String, Object> samRow = row('REG2', 'Attended', null, null, null);

@@ -100,10 +100,8 @@ private class ImportRecordIdMatchTest {
 	@IsTest
 	static void aRecordIdLoadsThatRecordWhateverTheRuleSays() {
 		System.runAs(TestUsers.admin()) {
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Lopez',
-				Email = 'ana@old.test'
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Lopez', Email = 'ana@old.test')
 			);
 			insert ana;
 			Import_Batch__c batch = ImportTestDataFactory.batch(template());
@@ -137,7 +135,7 @@ private class ImportRecordIdMatchTest {
 	@IsTest
 	static void anIdNotFoundRejectsTheRowAndCreatesNothing() {
 		System.runAs(TestUsers.admin()) {
-			Contact gone = new Contact(LastName = 'Gone');
+			Contact gone = TestDataFactory.person(new Contact(LastName = 'Gone'));
 			insert gone;
 			Id goneId = gone.Id;
 			delete gone;
@@ -166,12 +164,11 @@ private class ImportRecordIdMatchTest {
 	static void anIdOfTheWrongKindOrNoIdAtAllRejectsTheRow() {
 		System.runAs(TestUsers.admin()) {
 			Account organization = AccountKindsTestData.organization('Harbor Trust');
-			Account household = new Account(
-				Name = 'Lopez Household',
-				RecordTypeId = recordTypeId('Household')
+			Account household = TestDataFactory.household(
+				new Account(Name = 'Lopez Household', RecordTypeId = recordTypeId('Household'))
 			);
 			Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
-			Contact ana = new Contact(LastName = 'Lopez');
+			Contact ana = TestDataFactory.person(new Contact(LastName = 'Lopez'));
 			insert ana;
 			Map<String, String> personIsAnAccount = row(organization.Id, 'Lopez', null);
 			Map<String, String> organizationIsAContact = row(null, 'Lopez', null);
@@ -231,10 +228,8 @@ private class ImportRecordIdMatchTest {
 		System.runAs(TestUsers.admin()) {
 			Account organization = AccountKindsTestData.organization('Harbor Trust');
 			insert organization;
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Lopez',
-				Email = 'ana@example.test'
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Lopez', Email = 'ana@example.test')
 			);
 			insert ana;
 			Map<String, String> values = row('  ', 'Lopez', 'ana@example.test');
@@ -274,10 +269,8 @@ private class ImportRecordIdMatchTest {
 	@IsTest
 	static void matchOnlyRejectsRowsThatMatchNobody() {
 		System.runAs(TestUsers.admin()) {
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Lopez',
-				Email = 'ana@example.test'
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Lopez', Email = 'ana@example.test')
 			);
 			insert ana;
 			Import_Template__c template = template();
@@ -333,7 +326,9 @@ private class ImportRecordIdMatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(new Contact(FirstName = 'Ana', LastName = 'Lopez' + i));
+				people.add(
+					TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Lopez' + i))
+				);
 			}
 			insert people;
 			List<Map<String, String>> values = new List<Map<String, String>>();
@@ -369,10 +364,12 @@ private class ImportRecordIdMatchTest {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 100; i++) {
 				people.add(
-					new Contact(
-						FirstName = 'Ana',
-						LastName = 'Lopez',
-						Email = 'ana' + i + '@a.test'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Ana',
+							LastName = 'Lopez',
+							Email = 'ana' + i + '@a.test'
+						)
 					)
 				);
 			}

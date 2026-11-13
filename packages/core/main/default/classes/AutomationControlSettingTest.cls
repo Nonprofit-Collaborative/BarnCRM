@@ -33,7 +33,10 @@ private class AutomationControlSettingTest {
 	}
 
 	private static void saveOnePerson() {
-		Database.insert(new Contact(FirstName = 'Test', LastName = 'Avery'), true);
+		Database.insert(
+			TestDataFactory.person(new Contact(FirstName = 'Test', LastName = 'Avery')),
+			true
+		);
 	}
 
 	@IsTest

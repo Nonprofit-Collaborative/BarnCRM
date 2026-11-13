@@ -28,7 +28,7 @@ private class HouseholdCatchUpBatchTest {
 		Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
 		List<Account> people = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
-			Account person = new Account(RecordTypeId = personType);
+			Account person = TestDataFactory.organization(new Account(RecordTypeId = personType));
 			person.put('FirstName', 'Person' + i); // person field, set by name
 			person.put('LastName', lastName); // person field, set by name
 			people.add(person);

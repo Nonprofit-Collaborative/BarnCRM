@@ -27,7 +27,7 @@ private class PaymentServiceTest {
 	/** A consumer's listener that writes, then fails. */
 	public class FailingListener implements Callable {
 		public Object call(String action, Map<String, Object> args) {
-			insert new Contact(LastName = 'Zzpay Listener');
+			insert TestDataFactory.person(new Contact(LastName = 'Zzpay Listener'));
 			throw new System.IllegalArgumentException('consumer failed');
 		}
 	}

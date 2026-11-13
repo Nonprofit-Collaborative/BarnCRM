@@ -47,14 +47,16 @@ private class RollupTextListsTest {
 		List<Account> created = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			created.add(
-				new Account(
-					Name = 'Organization ' + i,
-					RecordTypeId = organizationType,
-					NumberOfEmployees = 99,
-					Description = 'stale',
-					// A target BarnCRM Admin grants: a standard one such as AccountNumber may be
-					// hidden by the profile, and then the engine cannot write it.
-					Preferred_Name__c = 'stale'
+				TestDataFactory.organization(
+					new Account(
+						Name = 'Organization ' + i,
+						RecordTypeId = organizationType,
+						NumberOfEmployees = 99,
+						Description = 'stale',
+						// A target BarnCRM Admin grants: a standard one such as AccountNumber may be
+						// hidden by the profile, and then the engine cannot write it.
+						Preferred_Name__c = 'stale'
+					)
 				)
 			);
 		}
@@ -68,10 +70,12 @@ private class RollupTextListsTest {
 		for (Account organization : organizations) {
 			for (Integer j = PEOPLE_EACH - 1; j >= 0; j--) {
 				created.add(
-					new Contact(
-						LastName = 'P' + String.valueOf(j).leftPad(2, '0'),
-						Title = Math.mod(j, 5) == 4 ? null : 'Role ' + Math.mod(j, 4),
-						AccountId = organization.Id
+					TestDataFactory.person(
+						new Contact(
+							LastName = 'P' + String.valueOf(j).leftPad(2, '0'),
+							Title = Math.mod(j, 5) == 4 ? null : 'Role ' + Math.mod(j, 4),
+							AccountId = organization.Id
+						)
 					)
 				);
 			}
@@ -152,9 +156,15 @@ private class RollupTextListsTest {
 			Account leaving = organizations[0];
 			Account joining = organizations[1];
 			List<Contact> staff = new List<Contact>{
-				new Contact(LastName = 'Ames', Title = 'Role 1', AccountId = leaving.Id),
-				new Contact(LastName = 'Baker', Title = 'Role 2', AccountId = leaving.Id),
-				new Contact(LastName = 'Cole', Title = 'Role 2', AccountId = leaving.Id)
+				TestDataFactory.person(
+					new Contact(LastName = 'Ames', Title = 'Role 1', AccountId = leaving.Id)
+				),
+				TestDataFactory.person(
+					new Contact(LastName = 'Baker', Title = 'Role 2', AccountId = leaving.Id)
+				),
+				TestDataFactory.person(
+					new Contact(LastName = 'Cole', Title = 'Role 2', AccountId = leaving.Id)
+				)
 			};
 			insert staff;
 
@@ -216,13 +226,23 @@ private class RollupTextListsTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Account> organizations = organizations(1);
 			insert new List<Contact>{
-				new Contact(
-					LastName = 'A',
-					Title = 'Chair, Board',
-					AccountId = organizations[0].Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'A',
+						Title = 'Chair, Board',
+						AccountId = organizations[0].Id
+					)
 				),
-				new Contact(LastName = 'B', Title = null, AccountId = organizations[0].Id),
-				new Contact(LastName = 'C', Title = 'Treasurer', AccountId = organizations[0].Id)
+				TestDataFactory.person(
+					new Contact(LastName = 'B', Title = null, AccountId = organizations[0].Id)
+				),
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'C',
+						Title = 'Treasurer',
+						AccountId = organizations[0].Id
+					)
+				)
 			};
 
 			Test.startTest();
@@ -255,9 +275,15 @@ private class RollupTextListsTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			List<Account> organizations = organizations(1);
 			insert new List<Contact>{
-				new Contact(LastName = 'Aaaaaaaaaa', AccountId = organizations[0].Id),
-				new Contact(LastName = 'Bbbbbbbbbb', AccountId = organizations[0].Id),
-				new Contact(LastName = 'Cccccccccc', AccountId = organizations[0].Id)
+				TestDataFactory.person(
+					new Contact(LastName = 'Aaaaaaaaaa', AccountId = organizations[0].Id)
+				),
+				TestDataFactory.person(
+					new Contact(LastName = 'Bbbbbbbbbb', AccountId = organizations[0].Id)
+				),
+				TestDataFactory.person(
+					new Contact(LastName = 'Cccccccccc', AccountId = organizations[0].Id)
+				)
 			};
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
 				definition(
@@ -291,35 +317,45 @@ private class RollupTextListsTest {
 			Id organizationId = organizations[0].Id;
 			Date start = Date.newInstance(1970, 1, 1);
 			insert new List<Contact>{
-				new Contact(
-					LastName = 'W',
-					Title = 'Gold',
-					Birthdate = start.addDays(1),
-					AccountId = organizationId
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'W',
+						Title = 'Gold',
+						Birthdate = start.addDays(1),
+						AccountId = organizationId
+					)
 				),
-				new Contact(
-					LastName = 'X',
-					Title = 'gold',
-					Birthdate = start.addDays(2),
-					AccountId = organizationId
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'X',
+						Title = 'gold',
+						Birthdate = start.addDays(2),
+						AccountId = organizationId
+					)
 				),
-				new Contact(
-					LastName = 'Y',
-					Title = 'Gold',
-					Birthdate = start.addDays(3),
-					AccountId = organizationId
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Y',
+						Title = 'Gold',
+						Birthdate = start.addDays(3),
+						AccountId = organizationId
+					)
 				),
-				new Contact(
-					LastName = 'Z',
-					Title = 'Silver',
-					Birthdate = start,
-					AccountId = organizationId
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Z',
+						Title = 'Silver',
+						Birthdate = start,
+						AccountId = organizationId
+					)
 				),
-				new Contact(
-					LastName = 'V',
-					Title = 'Bronze',
-					Birthdate = null,
-					AccountId = organizationId
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'V',
+						Title = 'Bronze',
+						Birthdate = null,
+						AccountId = organizationId
+					)
 				)
 			};
 			Rollup_Definition__c ordered = definition(
@@ -359,23 +395,29 @@ private class RollupTextListsTest {
 	@IsTest
 	static void aValueSharedByTwoHouseholdMembersIsCountedOnce() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Account household = new Account(
-				Name = 'Rivera Household',
-				RecordTypeId = HouseholdService.householdRecordTypeId()
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'Rivera Household',
+					RecordTypeId = HouseholdService.householdRecordTypeId()
+				)
 			);
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
-				new Contact(
-					LastName = 'Rivera',
-					FirstName = 'Ana',
-					Title = 'Gold',
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Rivera',
+						FirstName = 'Ana',
+						Title = 'Gold',
+						AccountId = household.Id
+					)
 				),
-				new Contact(
-					LastName = 'Rivera',
-					FirstName = 'Luis',
-					Title = 'Gold',
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						LastName = 'Rivera',
+						FirstName = 'Luis',
+						Title = 'Gold',
+						AccountId = household.Id
+					)
 				)
 			};
 			Rollup_Definition__c titles = definition(
@@ -464,8 +506,8 @@ private class RollupTextListsTest {
 			List<Account> organizations = organizations(1);
 			Id organizationId = organizations[0].Id;
 			List<Contact> people = new List<Contact>{
-				new Contact(LastName = 'Kept', AccountId = organizationId),
-				new Contact(LastName = 'Gone', AccountId = organizationId)
+				TestDataFactory.person(new Contact(LastName = 'Kept', AccountId = organizationId)),
+				TestDataFactory.person(new Contact(LastName = 'Gone', AccountId = organizationId))
 			};
 			insert people;
 			delete people[1];

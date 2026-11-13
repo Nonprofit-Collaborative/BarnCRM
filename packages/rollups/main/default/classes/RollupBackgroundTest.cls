@@ -34,7 +34,11 @@ private class RollupBackgroundTest {
 		Id organizationType = AccountKindsTestData.organizationRecordTypeId();
 		List<Account> created = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
-			created.add(new Account(Name = 'Organization ' + i, RecordTypeId = organizationType));
+			created.add(
+				TestDataFactory.organization(
+					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
+				)
+			);
 		}
 		insert created;
 		return created;
@@ -101,7 +105,9 @@ private class RollupBackgroundTest {
 			Account organization = organizations(1)[0];
 
 			Test.startTest();
-			insert new Contact(LastName = 'Ames', AccountId = organization.Id);
+			insert TestDataFactory.person(
+				new Contact(LastName = 'Ames', AccountId = organization.Id)
+			);
 			Integer countInTheSave = countsOn(new List<Account>{ organization })
 				.get(organization.Id);
 			Integer queuedInTheSave = pending();
@@ -133,9 +139,11 @@ private class RollupBackgroundTest {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
 				people.add(
-					new Contact(
-						LastName = 'Person ' + i,
-						AccountId = employers[Math.mod(i, EMPLOYER_COUNT)].Id
+					TestDataFactory.person(
+						new Contact(
+							LastName = 'Person ' + i,
+							AccountId = employers[Math.mod(i, EMPLOYER_COUNT)].Id
+						)
 					)
 				);
 			}

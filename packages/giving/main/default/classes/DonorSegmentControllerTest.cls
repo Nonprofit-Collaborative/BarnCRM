@@ -11,12 +11,14 @@ private class DonorSegmentControllerTest {
 
 	/** A person with giving rollups set as the engine would leave them. */
 	private static Contact donor(String lastName, Decimal lastYear, Decimal thisYear) {
-		return new Contact(
-			FirstName = 'Pat',
-			LastName = lastName,
-			Email = lastName.toLowerCase() + '@example.org',
-			Giving_Last_Year__c = lastYear,
-			Giving_This_Year__c = thisYear
+		return TestDataFactory.person(
+			new Contact(
+				FirstName = 'Pat',
+				LastName = lastName,
+				Email = lastName.toLowerCase() + '@example.org',
+				Giving_Last_Year__c = lastYear,
+				Giving_This_Year__c = thisYear
+			)
 		);
 	}
 

@@ -85,7 +85,9 @@ private class ImportDuplicateRuleMatchTest {
 				List<Contact> existing = new List<Contact>();
 				for (Integer i = 0; i < MANY; i++) {
 					existing.add(
-						new Contact(LastName = 'Dup' + i, Email = 'old' + i + '@example.org')
+						TestDataFactory.person(
+							new Contact(LastName = 'Dup' + i, Email = 'old' + i + '@example.org')
+						)
 					);
 				}
 				insert existing;
@@ -131,8 +133,10 @@ private class ImportDuplicateRuleMatchTest {
 	@IsTest
 	static void aPersonTheRuleFindsIsNeverAskedAbout() {
 		System.runAs(TestUsers.admin()) {
-			Contact byEmail = new Contact(LastName = 'Exact', Email = 'exact@example.org');
-			Contact other = new Contact(LastName = 'Other');
+			Contact byEmail = TestDataFactory.person(
+				new Contact(LastName = 'Exact', Email = 'exact@example.org')
+			);
+			Contact other = TestDataFactory.person(new Contact(LastName = 'Other'));
 			insert new List<Contact>{ byEmail, other };
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
 				'exact' => new List<Id>{ other.Id }
@@ -150,8 +154,8 @@ private class ImportDuplicateRuleMatchTest {
 	@IsTest
 	static void severalMatchesAreRejectedByDefault() {
 		System.runAs(TestUsers.admin()) {
-			Contact one = new Contact(LastName = 'Twin');
-			Contact two = new Contact(LastName = 'Twin');
+			Contact one = TestDataFactory.person(new Contact(LastName = 'Twin'));
+			Contact two = TestDataFactory.person(new Contact(LastName = 'Twin'));
 			insert new List<Contact>{ one, two };
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
 				'twin' => new List<Id>{ one.Id, two.Id }
@@ -174,8 +178,8 @@ private class ImportDuplicateRuleMatchTest {
 	@IsTest
 	static void severalMatchesCanTakeTheMostRecentlyChanged() {
 		System.runAs(TestUsers.admin()) {
-			Contact older = new Contact(LastName = 'Twin');
-			Contact newer = new Contact(LastName = 'Twin');
+			Contact older = TestDataFactory.person(new Contact(LastName = 'Twin'));
+			Contact newer = TestDataFactory.person(new Contact(LastName = 'Twin'));
 			insert new List<Contact>{ older, newer };
 			Test.setCreatedDate(older.Id, Datetime.now().addDays(-10));
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
@@ -198,7 +202,7 @@ private class ImportDuplicateRuleMatchTest {
 	@IsTest
 	static void bothPeopleMatchedToOneRecordRejectTheRow() {
 		System.runAs(TestUsers.admin()) {
-			Contact shared = new Contact(LastName = 'Rivera');
+			Contact shared = TestDataFactory.person(new Contact(LastName = 'Rivera'));
 			insert shared;
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
 				'rivera' => new List<Id>{ shared.Id }
@@ -219,12 +223,11 @@ private class ImportDuplicateRuleMatchTest {
 	@IsTest
 	static void anOrganizationTheRulesMatchIsUsedAndAHouseholdNeverIs() {
 		System.runAs(TestUsers.admin()) {
-			Account church = new Account(
-				Name = 'First Baptist Church',
-				RecordTypeId = organizationType()
+			Account church = TestDataFactory.organization(
+				new Account(Name = 'First Baptist Church', RecordTypeId = organizationType())
 			);
 			insert church;
-			Contact member = new Contact(LastName = 'Okafor');
+			Contact member = TestDataFactory.person(new Contact(LastName = 'Okafor'));
 			insert member;
 			Id household = [SELECT AccountId FROM Contact WHERE Id = :member.Id].AccountId;
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
@@ -279,7 +282,7 @@ private class ImportDuplicateRuleMatchTest {
 	@IsTest
 	static void aTemplateNotUsingTheRulesNeverAsksThem() {
 		System.runAs(TestUsers.admin()) {
-			Contact other = new Contact(LastName = 'Asked');
+			Contact other = TestDataFactory.person(new Contact(LastName = 'Asked'));
 			insert other;
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
 				'asked' => new List<Id>{ other.Id }
@@ -457,10 +460,12 @@ private class ImportDuplicateRuleMatchTest {
 				);
 				return;
 			}
-			Contact existing = new Contact(
-				FirstName = 'Canary',
-				LastName = 'Matchtest',
-				Email = 'canary.matchtest@example.org'
+			Contact existing = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Canary',
+					LastName = 'Matchtest',
+					Email = 'canary.matchtest@example.org'
+				)
 			);
 			insert existing;
 			List<SObject> probes = new List<SObject>();
@@ -595,7 +600,7 @@ private class ImportDuplicateRuleMatchTest {
 	private static Contact okonkwoAtHarborRoad() {
 		addressSourceOnly();
 		ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
-		Contact existing = new Contact(LastName = 'Okonkwo');
+		Contact existing = TestDataFactory.person(new Contact(LastName = 'Okonkwo'));
 		insert existing;
 		insert new Address__c(
 			Contact__c = existing.Id,
@@ -668,7 +673,9 @@ private class ImportDuplicateRuleMatchTest {
 		System.runAs(TestUsers.admin()) {
 			addressSourceOnly();
 			ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>();
-			Contact john = new Contact(FirstName = 'John', LastName = 'Smith');
+			Contact john = TestDataFactory.person(
+				new Contact(FirstName = 'John', LastName = 'Smith')
+			);
 			insert john;
 			insert new Address__c(
 				Contact__c = john.Id,
@@ -734,10 +741,8 @@ private class ImportDuplicateRuleMatchTest {
 					Match_Source__mdt.class
 				)
 			};
-			Contact john = new Contact(
-				FirstName = 'John',
-				LastName = 'Smith',
-				Phone = '(555) 201-3344'
+			Contact john = TestDataFactory.person(
+				new Contact(FirstName = 'John', LastName = 'Smith', Phone = '(555) 201-3344')
 			);
 			john.put('IndividualId', ivy.Id);
 			insert john;
@@ -777,7 +782,7 @@ private class ImportDuplicateRuleMatchTest {
 			Integer count = 200;
 			List<Contact> existing = new List<Contact>();
 			for (Integer index = 0; index < count; index++) {
-				existing.add(new Contact(LastName = 'Bulkperson' + index));
+				existing.add(TestDataFactory.person(new Contact(LastName = 'Bulkperson' + index)));
 			}
 			insert existing;
 			List<Address__c> addresses = new List<Address__c>();
@@ -823,7 +828,7 @@ private class ImportDuplicateRuleMatchTest {
 	static void withoutLooserMatchingTheSourcesAreNotAsked() {
 		System.runAs(TestUsers.admin()) {
 			addressSourceOnly();
-			Contact existing = new Contact(LastName = 'Okonkwo');
+			Contact existing = TestDataFactory.person(new Contact(LastName = 'Okonkwo'));
 			insert existing;
 			insert new Address__c(
 				Contact__c = existing.Id,

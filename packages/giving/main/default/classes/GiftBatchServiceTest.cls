@@ -51,13 +51,13 @@ private class GiftBatchServiceTest {
 	}
 
 	private static Contact person() {
-		Contact donor = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+		Contact donor = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 		insert donor;
 		return donor;
 	}
 
 	private static Account organization() {
-		Account donor = new Account(Name = 'Riverside Foundation');
+		Account donor = TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 		insert donor;
 		return donor;
 	}
@@ -508,7 +508,9 @@ private class GiftBatchServiceTest {
 			}
 			fund('General', true);
 			User fundraiser = david();
-			Contact hidden = new Contact(FirstName = 'Private', LastName = 'Donor');
+			Contact hidden = TestDataFactory.person(
+				new Contact(FirstName = 'Private', LastName = 'Donor')
+			);
 			insert hidden;
 			Gift_Batch__c yearEnd;
 			Contact ana;

@@ -181,10 +181,8 @@ private class DonationMatcherTest {
 	static void aPaymentOfSomeoneInTheHouseholdIsFound() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-			Contact ben = new Contact(
-				FirstName = 'Ben',
-				LastName = 'Ramirez',
-				AccountId = ana.AccountId
+			Contact ben = TestDataFactory.person(
+				new Contact(FirstName = 'Ben', LastName = 'Ramirez', AccountId = ana.AccountId)
 			);
 			insert ben;
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
@@ -263,10 +261,8 @@ private class DonationMatcherTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org'
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org')
 			);
 			insert ana;
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 14 => 100 });
@@ -338,10 +334,8 @@ private class DonationMatcherTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org'
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org')
 			);
 			insert ana;
 			// One payment of the whole 1200, so the imported gift completes the pledge.
@@ -473,10 +467,8 @@ private class DonationMatcherTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org'
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org')
 			);
 			insert ana;
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 14 => 100 });
@@ -546,7 +538,9 @@ private class DonationMatcherTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			GivingTestDataFactory.insertDefaultFund();
-			insert new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org');
+			insert TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org')
+			);
 			ImportMapping mapping = new ImportMapping();
 			Map<String, String> row = new Map<String, String>{
 				'Contact1.Email' => 'ana@example.org',

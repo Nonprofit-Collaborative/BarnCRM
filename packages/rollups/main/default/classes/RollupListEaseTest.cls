@@ -266,7 +266,7 @@ private class RollupListEaseTest {
 	@IsTest
 	static void differentRecordsAreFineAndTheSameCalculationIsADuplicate() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			insert new Account(Name = 'Only A');
+			insert TestDataFactory.organization(new Account(Name = 'Only A'));
 			Rollup_Definition__c forA = rollup('For A', 'Member_Count__c', true);
 			forA.Target_Filter_JSON__c = nameIs('Only A');
 			Rollup_Definition__c forB = rollup('For B', 'Member_Count__c', true);

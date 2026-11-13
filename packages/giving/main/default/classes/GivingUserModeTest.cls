@@ -51,7 +51,7 @@ private class GivingUserModeTest {
 			// no automatic household soft credits. This class is about the controllers, not about
 			// recognition, and a second household member would drag recognition into every
 			// assertion.
-			insert new Contact(FirstName = 'Ana', LastName = 'Garcia');
+			insert TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 		}
 	}
 
@@ -326,7 +326,9 @@ private class GivingUserModeTest {
 			User tom = boardMember();
 			defaultFund();
 			Contact ana = donor();
-			Contact luis = new Contact(FirstName = 'Luis', LastName = 'Garcia');
+			Contact luis = TestDataFactory.person(
+				new Contact(FirstName = 'Luis', LastName = 'Garcia')
+			);
 			insert luis;
 			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
 			insert gift;

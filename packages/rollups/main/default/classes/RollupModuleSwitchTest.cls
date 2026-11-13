@@ -32,9 +32,11 @@ private class RollupModuleSwitchTest {
 	}
 
 	private static Account organization() {
-		Account created = new Account(
-			Name = 'Organization',
-			RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+		Account created = TestDataFactory.organization(
+			new Account(
+				Name = 'Organization',
+				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+			)
 		);
 		insert created;
 		return created;
@@ -110,7 +112,9 @@ private class RollupModuleSwitchTest {
 			ModuleManagerService.turnOff(RollupService.MODULE_NAME);
 
 			Test.startTest();
-			Contact person = new Contact(LastName = 'Ames', AccountId = employer.Id);
+			Contact person = TestDataFactory.person(
+				new Contact(LastName = 'Ames', AccountId = employer.Id)
+			);
 			insert person;
 			RollupRecalcAction.Request request = new RollupRecalcAction.Request();
 			request.record = person;
@@ -225,7 +229,7 @@ private class RollupModuleSwitchTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			insert staffCount();
 			Account employer = organization();
-			insert new Contact(LastName = 'Ames', AccountId = employer.Id);
+			insert TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = employer.Id));
 			Integer queued = pending();
 			ModuleManagerService.turnOff(RollupService.MODULE_NAME);
 
@@ -251,7 +255,7 @@ private class RollupModuleSwitchTest {
 				new Map<Id, String>{ employer.Id => 'Locked' },
 				RollupQueue.MAX_ATTEMPTS - 1
 			);
-			insert new Contact(LastName = 'Ames', AccountId = employer.Id);
+			insert TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = employer.Id));
 
 			Test.startTest();
 			RollupAttentionController.retry(null);
@@ -272,8 +276,8 @@ private class RollupModuleSwitchTest {
 			ModuleManagerService.turnOff(RollupService.MODULE_NAME);
 			// Saved while off: nothing records them, so only a full recalculation counts them.
 			insert new List<Contact>{
-				new Contact(LastName = 'Ames', AccountId = employer.Id),
-				new Contact(LastName = 'Baker', AccountId = other.Id)
+				TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = employer.Id)),
+				TestDataFactory.person(new Contact(LastName = 'Baker', AccountId = other.Id))
 			};
 			// An entry that waited while off (a merge's survivors, for one).
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Set<Id>{ employer.Id } });
@@ -302,7 +306,7 @@ private class RollupModuleSwitchTest {
 			ModuleManagerService.turnOn(RollupService.MODULE_NAME);
 
 			Test.startTest();
-			insert new Contact(LastName = 'Ames', AccountId = employer.Id);
+			insert TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = employer.Id));
 			Test.stopTest();
 
 			Assert.isFalse(RollupService.isTurnedOff(), 'The module is on');

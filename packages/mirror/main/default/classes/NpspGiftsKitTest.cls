@@ -196,7 +196,7 @@ private class NpspGiftsKitTest {
 	@IsTest
 	static void aReadReturnsOnlyWhatTheObjectHoldsAndNothingWithoutIdsOrTheObject() {
 		System.runAs(TestUsers.admin()) {
-			Contact ana = new Contact(LastName = 'Giftskit');
+			Contact ana = TestDataFactory.person(new Contact(LastName = 'Giftskit'));
 			insert ana;
 			String query = 'SELECT Id FROM Contact WHERE Id IN :ids';
 			Assert.areEqual(

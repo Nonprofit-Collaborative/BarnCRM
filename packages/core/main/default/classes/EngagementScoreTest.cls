@@ -215,7 +215,7 @@ private class EngagementScoreTest {
 			Assert.isTrue(EngagementScoreController.isFeatureOn(), 'The meter shows while on');
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 20; i++) {
-				people.add(new Contact(LastName = 'Scored' + i));
+				people.add(TestDataFactory.person(new Contact(LastName = 'Scored' + i)));
 			}
 			insert people;
 			Contact unchanged = people[0];
@@ -253,7 +253,7 @@ private class EngagementScoreTest {
 		System.runAs(TestUsers.admin()) {
 			signals(new Map<String, EngagementSignalExtension>{ GIVING => new FailingSignal() });
 			turnOn(null);
-			insert new Contact(LastName = 'Unscored');
+			insert TestDataFactory.person(new Contact(LastName = 'Unscored'));
 
 			Test.startTest();
 			Database.executeBatch(new EngagementScoreJob(), EngagementScoreJob.CHUNK_SIZE);

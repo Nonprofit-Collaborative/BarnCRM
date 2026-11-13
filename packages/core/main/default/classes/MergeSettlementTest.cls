@@ -740,7 +740,9 @@ private class MergeSettlementTest {
 	}
 
 	private static Account personWithMailing(String lastName, String street, String city) {
-		Account record = new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId());
+		Account record = TestDataFactory.organization(
+			new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId())
+		);
 		record.put('FirstName', 'Pat');
 		record.put('LastName', lastName);
 		record.put('PersonMailingStreet', street);

@@ -39,10 +39,14 @@ private class ArchiveByQueryTest {
 	private static void makePeople(Integer volunteers) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
 		List<Contact> people = new List<Contact>{
-			new Contact(LastName = 'Staff Person', Title = 'Staff')
+			TestDataFactory.person(new Contact(LastName = 'Staff Person', Title = 'Staff'))
 		};
 		for (Integer index = 0; index < volunteers; index++) {
-			people.add(new Contact(LastName = 'Archived ' + index, Title = 'Volunteer'));
+			people.add(
+				TestDataFactory.person(
+					new Contact(LastName = 'Archived ' + index, Title = 'Volunteer')
+				)
+			);
 		}
 		insert people;
 	}

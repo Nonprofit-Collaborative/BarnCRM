@@ -42,15 +42,19 @@ private class BulkDeleteServiceTest {
 	/** `volunteers` contacts titled Volunteer and `staff` titled Staff. */
 	private static void makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = new Account(Name = 'Springfield Food Bank');
+		Account organization = TestDataFactory.organization(
+			new Account(Name = 'Springfield Food Bank')
+		);
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
 			people.add(
-				new Contact(
-					AccountId = organization.Id,
-					LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
-					Title = index < volunteers ? 'Volunteer' : 'Staff'
+				TestDataFactory.person(
+					new Contact(
+						AccountId = organization.Id,
+						LastName = 'Person ' + String.valueOf(index).leftPad(4, '0'),
+						Title = index < volunteers ? 'Volunteer' : 'Staff'
+					)
 				)
 			);
 		}

@@ -244,7 +244,9 @@ private class HouseholdServiceTest {
 	static void aPersonSavedAgainstAnOrganizationInJunctionModeDoesNotJoinIt() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			Account employer = new Account(Name = 'Riverside Library');
+			Account employer = TestDataFactory.organization(
+				new Account(Name = 'Riverside Library')
+			);
 			insert employer;
 
 			Test.startTest();
@@ -751,7 +753,9 @@ private class HouseholdServiceTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
-			Account organization = new Account(Name = 'Riverside Community Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Community Trust')
+			);
 			insert organization;
 			String message = '';
 
@@ -778,7 +782,7 @@ private class HouseholdServiceTest {
 			HouseholdService.personAccountOverride = false;
 
 			Test.startTest();
-			insert new Account(Name = 'Riverside Community Trust');
+			insert TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -794,7 +798,7 @@ private class HouseholdServiceTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			HouseholdService.personAccountOverride = true;
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert person;
 
 			Test.startTest();
@@ -824,17 +828,21 @@ private class HouseholdServiceTest {
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert new List<Contact>{
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Mr.',
+						FirstName = 'John',
+						LastName = 'Smith',
+						AccountId = household.Id
+					)
 				),
-				new Contact(
-					Salutation = 'Mrs.',
-					FirstName = 'Jane',
-					LastName = 'Smith',
-					AccountId = household.Id
+				TestDataFactory.person(
+					new Contact(
+						Salutation = 'Mrs.',
+						FirstName = 'Jane',
+						LastName = 'Smith',
+						AccountId = household.Id
+					)
 				)
 			};
 			update new Account(Id = household.Id, Member_Count__c = 99);
@@ -859,7 +867,9 @@ private class HouseholdServiceTest {
 			insert maria;
 			Id household = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
 			Contact atWork = HouseholdTestDataFactory.newContact('Mr.', 'Tom', 'Rivera');
-			Account organization = new Account(Name = 'Riverside Community Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Community Trust')
+			);
 			insert organization;
 			atWork.AccountId = organization.Id;
 			insert atWork;
@@ -1037,11 +1047,13 @@ private class HouseholdServiceTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			Contact john = new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			Contact john = TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 			insert john;
 
@@ -1110,7 +1122,7 @@ private class HouseholdServiceTest {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			HouseholdService.personAccountOverride = true;
 			PersonRecordSelector.personRecordOverride = true;
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert person;
 			List<Account> households = new List<Account>{
 				HouseholdTestDataFactory.newHousehold('The Garcia Family'),
@@ -1152,7 +1164,7 @@ private class HouseholdServiceTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			HouseholdService.personAccountOverride = true;
 			PersonRecordSelector.personRecordOverride = true;
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert person;
 			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
@@ -1179,13 +1191,17 @@ private class HouseholdServiceTest {
 	static void anOrganizationNeverGetsAMemberCount() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = new Account(Name = 'Riverside Community Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Community Trust')
+			);
 			insert organization;
-			insert new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'Tom',
-				LastName = 'Rivera',
-				AccountId = organization.Id
+			insert TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'Tom',
+					LastName = 'Rivera',
+					AccountId = organization.Id
+				)
 			);
 
 			Test.startTest();
@@ -1320,10 +1336,8 @@ private class HouseholdServiceTest {
 			Account household = HouseholdTestDataFactory.newHousehold('Placeholder');
 			household.OwnerId = staff.Id;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			Account person = new Account(
-				Name = 'Maria Garcia',
-				Deceased__c = false,
-				OwnerId = staff.Id
+			Account person = TestDataFactory.organization(
+				new Account(Name = 'Maria Garcia', Deceased__c = false, OwnerId = staff.Id)
 			);
 			insert person;
 			String failure = '';
@@ -1374,7 +1388,7 @@ private class HouseholdServiceTest {
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			// Saved by the same user who will read it back, so that what this test measures is
 			// field level access and nothing else, exactly as the contact test above explains.
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			System.runAs(staff) {
 				insert person;
 			}
@@ -1474,8 +1488,8 @@ private class HouseholdServiceTest {
 			HouseholdService.personAccountOverride = true;
 			PersonRecordSelector.personRecordOverride = true;
 			List<Account> people = new List<Account>{
-				new Account(Name = 'Maria Garcia'),
-				new Account(Name = 'Wei Lee')
+				TestDataFactory.organization(new Account(Name = 'Maria Garcia')),
+				TestDataFactory.organization(new Account(Name = 'Wei Lee'))
 			};
 			insert people;
 			List<Account> households = new List<Account>{
@@ -1777,7 +1791,9 @@ private class HouseholdServiceTest {
 	static void anOrganizationKeepsItsPrimaryContactWhenSomebodyLeaves() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = new Account(Name = 'Riverside Shelter');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Shelter')
+			);
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 			Database.insert(new List<Account>{ organization, household }, AccessLevel.SYSTEM_MODE);
 			Contact staff = HouseholdTestDataFactory.newContact('Ms.', 'Ada', 'Nkosi');
@@ -1905,7 +1921,9 @@ private class HouseholdServiceTest {
 	static void joiningAnOrganizationIsRefused() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account organization = new Account(Name = 'Riverside Trust');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Riverside Trust')
+			);
 			insert organization;
 			Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
 			insert john;
@@ -2089,7 +2107,7 @@ private class HouseholdServiceTest {
 				return;
 			}
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account acme = new Account(Name = 'Acme Corp');
+			Account acme = TestDataFactory.organization(new Account(Name = 'Acme Corp'));
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 			Database.insert(new List<Account>{ acme, household }, AccessLevel.SYSTEM_MODE);
 			Contact ana = HouseholdTestDataFactory.newContact('Ms.', 'Ana', 'Ruiz');
@@ -2353,17 +2371,21 @@ private class HouseholdServiceTest {
 	static void aContactAlreadyLinkedToANativeHouseholdGetsNoNewHouseholdInJunctionMode() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			Account native = new Account(Name = 'Native household account');
+			Account native = TestDataFactory.organization(
+				new Account(Name = 'Native household account')
+			);
 			insert native;
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
 			OrgShapeDetector.overrideShape = shape;
 			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{ native.Id };
-			Contact maria = new Contact(
-				Salutation = 'Ms.',
-				FirstName = 'Maria',
-				LastName = 'Garcia',
-				AccountId = native.Id
+			Contact maria = TestDataFactory.person(
+				new Contact(
+					Salutation = 'Ms.',
+					FirstName = 'Maria',
+					LastName = 'Garcia',
+					AccountId = native.Id
+				)
 			);
 
 			Test.startTest();
@@ -2387,7 +2409,7 @@ private class HouseholdServiceTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			HouseholdService.personAccountOverride = true;
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			insert person;
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
@@ -2416,7 +2438,7 @@ private class HouseholdServiceTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			HouseholdService.personAccountOverride = true;
-			Account person = new Account(Name = 'Maria Garcia');
+			Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Household');
 			Database.insert(new List<Account>{ person, household }, AccessLevel.SYSTEM_MODE);
 			Contact behind = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -2622,11 +2644,13 @@ private class HouseholdServiceTest {
 			OrgShapeDetector.overrideShape = shapeWithoutNativeHouseholds();
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			insert new Contact(
-				Salutation = 'Mr.',
-				FirstName = 'John',
-				LastName = 'Smith',
-				AccountId = household.Id
+			insert TestDataFactory.person(
+				new Contact(
+					Salutation = 'Mr.',
+					FirstName = 'John',
+					LastName = 'Smith',
+					AccountId = household.Id
+				)
 			);
 			Set<Id> householdIds = new Set<Id>{ household.Id };
 			// A first pass settles the household and fills every per-transaction cache, so

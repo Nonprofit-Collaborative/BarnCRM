@@ -28,7 +28,9 @@ private class EventsPortalExtensionTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = new Contact(FirstName = 'Ana', LastName = lastName);
+		Contact record = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = lastName)
+		);
 		insert as user record;
 		return record;
 	}
