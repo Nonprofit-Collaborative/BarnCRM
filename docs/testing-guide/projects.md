@@ -328,3 +328,21 @@ Change Request.
 | 7 | Run the reports Open Requests, Overdue Requests and Requests Resolved This Month. | Each lists the matching requests. |
 
 **Cleanup:** Delete the requests, task and change request.
+
+## T-PM-32: Requests From the Portal
+
+**Purpose:** confirm the Requests portal template, R-PM24 and the reply inbox (D-201).
+**Prerequisites:** T-PM-30; BarnCRM Portal Builder set up with a test portal page; the requester
+Contact from T-PM-30.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With Take requests from outside off, paste `requests.json` into a portal and sign in as the requester. Send a new request. | Refused; nothing is saved. |
+| 2 | Turn on Take requests from outside. Send a request: subject, type, priority Medium, details. | Listed under My Requests with its number and status New; in Salesforce it has Channel Portal, Owner the Requests queue, and the queue members get a bell notice. |
+| 3 | In the portal, change the priority to Urgent and save. | The priority stays Medium. |
+| 4 | As staff, add a shared comment and an internal comment, and set Status Waiting on Requester. | The requester is emailed the shared comment; **Updates** in the portal shows only the shared one. |
+| 5 | In the portal, enter Add a Reply and save. | The reply appears in the request's thread as Shared from the requester; Add a Reply is blank again; the status is In Progress. |
+| 6 | Resolve the request with a resolution. In the portal, set Satisfied? to Satisfied. | The portal shows the resolution; Satisfaction is Satisfied on the request. |
+| 7 | Sign in as another person. | Neither the request nor its updates are listed. |
+
+**Cleanup:** Delete the request and the test portal.

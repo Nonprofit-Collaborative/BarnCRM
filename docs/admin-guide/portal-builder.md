@@ -217,6 +217,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Attendee App | `attendee.json`, Event Management | My Events (networking choices), Agenda (Add to My Agenda), My Agenda (Add to Calendar, rate, Remove), Attendees (searchable, Connect), Connections (Accept, Decline, Send Message), Messages (Reply), Sent, Announcements, Sponsors, Event Info, My Details |
 | Sponsor Portal | `sponsor.json`, Event Management | My Sponsorships, My Leads (Scan to add, notes and interest, Download CSV), My Details |
 | Service Portal | `service.json`, Programs | My Programs, My Services, Upcoming Sessions, My Goals, My Referrals, My Details |
+| Requests | `requests.json`, Project Management | My Requests (send a request, reply, satisfaction), Updates (comments your staff shared). See [Requests and Issues](projects-requests.md) |
 | Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Funders | Shared Referrals, My Organizations, My Details; with Funders also My Grants and Grant Reports |
 
 **Attendee and Sponsor.** See [Event Management, Attendee App](events.md#attendee-app): the
