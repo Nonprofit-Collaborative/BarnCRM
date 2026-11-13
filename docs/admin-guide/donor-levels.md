@@ -55,7 +55,11 @@ Everything is in the app. You never open Setup.
 
 From then on it looks after itself. A gift updates the donor's giving total, and the level
 is worked out in the same moment. A nightly pass catches the two things a gift does not
-announce: your fiscal year turning over, and a ladder you edited.
+announce: your fiscal year turning over, and a ladder you edited. It places every donor
+again only on those nights, after a change to a donor level or donor score setting, and at
+least once a week; on the other nights it only refreshes the donor scores of donors whose
+days since their last gift just crossed a recency cutoff, and **Donors last placed** keeps the
+time of the last full pass.
 
 ## A Five-Minute Walkthrough
 

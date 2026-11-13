@@ -181,6 +181,8 @@ For every script on this page:
 | 6 | Open the 7777 gift and select **Refund or Write Off**. Refund 5000 with reason `Level test`. Open the household again after a few seconds. | **Total Giving** 2777, **Donor Level** `Sustainer`. |
 | 7 | On the **Households** tab choose the list view **Donor Level Changed This Month** and find the household. | **Donor Level** `Sustainer`, **Previous Donor Level** `Leadership Circle`, **Donor Level Changed** today. The **Contacts** tab has a list view of the same name for people. |
 | 8 | As read-only, open the Donor Levels page. | The ladder shows; **Recalculate Now** is disabled. |
+| 9 | As admin, note **Donors last placed**, then wait for the next nightly run without changing a level or a donor setting. | **Donors last placed** is unchanged: a quiet night only rescores donors crossing a recency cutoff. |
+| 10 | Edit the `Friend` level's **Minimum Amount** to 150 and wait for the next nightly run. | **Donors last placed** shows that night's time: a ladder change places every donor again. |
 
 **Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Turn on donor levels** off. Clear **Active** on the three test levels.
 

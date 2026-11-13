@@ -5280,7 +5280,12 @@ organization that awards a level permanently records that on the donor, not here
 Real time: assignment happens in the save that changes the source total, which includes
 the save the rollup engine itself makes when a gift lands, and it runs before the record
 is written so it costs no second update. Scheduled: a nightly pass re-places every donor,
-which is what catches a fiscal year turning over and a ladder edited yesterday. On demand:
+which is what catches a fiscal year turning over and a ladder edited yesterday. Since D-200 P1
+it re-places every donor only when no recalculation is recorded, a `Donor_Level__c` row or a
+setting change naming Donor was saved since `Donor_Levels_Last_Recalculated__c`, a fiscal year
+started since, or that time is more than seven days old; otherwise, with donor scores switched
+on, it rescores only the donors whose last gift date crossed a recency cutoff since then, and
+records no recalculation. On demand:
 the Recalculate button on the Donor Levels page does the scheduled pass now. Assignment is
 idempotent in all three: running it twice over unchanged data writes nothing the second
 time.
@@ -19095,6 +19100,7 @@ mirrors the primary member).
 | 1.55 | 2026-11-12 | Error Log under load (D-200 P4, release 1.22). `Error_Log__c` gains `Occurrences__c` (Number, default 1), `Other_Record_Ids__c` (Text(255)) and `Occurrence_Key__c` (Text(64), external ID for its index); rule R-E7: the subscriber counts a repeat of a New entry's Context, Message and Severity within an hour on that entry, naming up to ten more records, and code logs a partial save's refused rows once after the loop (`check-log-in-loop.py`). No object added. |
 | 1.56 | 2026-11-12 | Rollups under load (D-200 P2, P10, P13, release 1.22). `Automation_Registry__mdt` gains `Runs_On_Rollup_Writes__c` (Checkbox): during a `RollupWriter` update, Contact and Account run only rows so marked or Always Runs (shipped on donor level and donor score assignment and `Core_Rollups_Contact`). `Rollup_Settings__c` gains `Large_Parent_Hours__c` (Number, default 1, Setting Definition `Rollup_Large_Parent_Hours`) and `Processor_Requested_At__c` (DateTime, engine only); `Rollup_Run_Lock__c` gains `Last_Run_Started__c` (DateTime): a large parent run starts at most once per that many hours, and a save that queues totals finds a processor without a query. No object added. |
 | 1.57 | 2026-11-12 | Nightly rollup scope (D-200 P1, release 1.22; ADR-0082 amendment of 2026-11-12). Rule R-R4b: every record once a week on the night `Full_Recalc_Day__c` names (Text, default Sunday, Setting Definition `Rollup_Full_Recalc_Day`, Every_Night keeps the nightly sweep); other nights only the targets of source records changed or deleted since `Nightly_Covered_From__c` (DateTime, engine only) and of records crossing a last n days window, with the definitions that changes cannot cover still run everywhere. Every night retries Failed and releases held Rollup Queue entries. No object added. |
+| 1.58 | 2026-11-12 | Nightly donor level pass gated (D-200 P1, release 1.22). R-DL6: every donor is re-placed only after a ladder or donor setting change, a fiscal year turnover, with no recalculation recorded, or a week after the last; other nights rescore only donors crossing a recency cutoff. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

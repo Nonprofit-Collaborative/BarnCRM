@@ -143,4 +143,53 @@ public with sharing class DonorLevelSelector {
 			]
 		);
 	}
+
+	/** The attributes the passes read, as `accountLocator` and `contactLocator` select them. */
+	private static final List<String> DONOR_FIELDS = new List<String>{
+		'Id',
+		'Total_Giving__c',
+		'Giving_This_Year__c',
+		'Giving_Last_Year__c',
+		'Largest_Gift__c',
+		'Donor_Level__c',
+		'Previous_Donor_Level__c',
+		'Donor_Level_Changed_Date__c',
+		'Last_Gift_Date__c',
+		'Recent_Gift_Count__c',
+		'Recent_Giving__c',
+		'RFM_Recency_Score__c',
+		'RFM_Frequency_Score__c',
+		'RFM_Monetary_Score__c',
+		'RFM_Score__c',
+		'RFM_Segment__c'
+	};
+
+	/**
+	 * The donors of `Account` or `Contact` whose last gift date lies in one of these ranges, for
+	 * the nightly pass that only rescores donors crossing a recency cutoff (D-200 P1).
+	 *
+	 * @param objectName `Account` or `Contact`
+	 * @param edges start and end dates, inclusive, in pairs
+	 */
+	public static Database.QueryLocator recencyEdgeLocator(String objectName, List<Date> edges) {
+		List<String> ranges = new List<String>();
+		Map<String, Object> binds = new Map<String, Object>();
+		for (Integer i = 0; i + 1 < edges.size(); i += 2) {
+			ranges.add(
+				'(Last_Gift_Date__c >= :from' + i + ' AND Last_Gift_Date__c <= :to' + i + ')'
+			);
+			binds.put('from' + i, edges[i]);
+			binds.put('to' + i, edges[i + 1]);
+		}
+		return Database.getQueryLocatorWithBinds(
+			'SELECT ' +
+				String.join(DONOR_FIELDS, ', ') +
+				' FROM ' +
+				(objectName == 'Contact' ? 'Contact' : 'Account') +
+				' WHERE ' +
+				(ranges.isEmpty() ? 'Id = null' : String.join(ranges, ' OR ')),
+			binds,
+			AccessLevel.SYSTEM_MODE
+		);
+	}
 }

@@ -71,7 +71,9 @@ CAPS = {
     # modules shrank by moving their lookups onto Core): 2,233,198 measured, plus about 0.3%.
     # W15 R1.22 (D-200 P5, P7, P12, P13) fit under it: 2,230,377 measured with them; with
     # AsyncStarter and its call sites (P9), 2,232,757; with address match keys (P6), 2,238,235.
-    "core": 2_240_000,
+    # With D-200 P4 and P10 (Error Log repeats coalesced, refused rows logged once, the rollup
+    # write flag): 2,243,035 measured, raised by what they add plus about 0.1%.
+    "core": 2_245_300,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -80,7 +82,9 @@ CAPS = {
     # about 0.5%.
     # Raised 2026-11-12 for D-200 P2 and P13 (the large parent throttle and the processor
     # request stamp, so a save queues totals without a query): 390,436 measured, plus about 0.5%.
-    "rollups": 392_400,
+    # D-200 P1 (RollupNightlyBatch: the weekly full sweep and the nightly pass over what changed)
+    # on the batch-k AsyncStarter call sites: 403,678 measured, plus about 0.5%.
+    "rollups": 405_700,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and
@@ -106,7 +110,9 @@ CAPS = {
     # deletes in one statement (ErrorLogger.logEach). Plus 1,680 for W15 R1.22 (D-200 P12):
     # Health Check lookup skew on funds and appeals, gift ownership skew. Plus 270 for D-200
     # P9: buttons and nightly steps start their jobs through AsyncStarter.
-    "giving": 674_290,
+    # D-200 P1: the nightly donor pass runs in full only when needed and otherwise rescores
+    # donors crossing a recency cutoff; 676,573 measured, raised by the 2,283 added plus 2%.
+    "giving": 676_620,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
