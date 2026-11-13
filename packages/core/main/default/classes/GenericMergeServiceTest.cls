@@ -300,11 +300,12 @@ private class GenericMergeServiceTest {
 			Import_Template__c template = mapping('Gifts 2025', null);
 			Import_Batch__c earlier = ImportTestDataFactory.batch(template);
 			Import_Batch__c to = ImportTestDataFactory.batch(template);
-			Account org = new Account(Name = 'Moves', Created_By_Import_Batch__c = earlier.Id);
+			Account org = TestDataFactory.organization(
+				new Account(Name = 'Moves', Created_By_Import_Batch__c = earlier.Id)
+			);
 			insert org;
-			Contact person = new Contact(
-				LastName = 'Moves',
-				Created_By_Import_Batch__c = earlier.Id
+			Contact person = TestDataFactory.person(
+				new Contact(LastName = 'Moves', Created_By_Import_Batch__c = earlier.Id)
 			);
 			insert person;
 			Test.startTest();

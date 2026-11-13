@@ -439,11 +439,13 @@ private class ImportProcessorBatchTest {
 				: new List<Map<String, String>>{ couple }
 		);
 		if (johnExists) {
-			insert new Contact(
-				FirstName = 'John',
-				LastName = 'Smith',
-				MailingPostalCode = '12345',
-				Email = 'smiths@example.org'
+			insert TestDataFactory.person(
+				new Contact(
+					FirstName = 'John',
+					LastName = 'Smith',
+					MailingPostalCode = '12345',
+					Email = 'smiths@example.org'
+				)
 			);
 		}
 
@@ -627,7 +629,7 @@ private class ImportProcessorBatchTest {
 			// Only the first row reports to an account, which a contact cannot, so only the row
 			// that creates Ana fails to save; the two after it name her and share that failure. (A
 			// value too long for its field is shortened to fit, so it cannot make a save fail.)
-			Account notAPerson = new Account(Name = 'Not a person');
+			Account notAPerson = TestDataFactory.organization(new Account(Name = 'Not a person'));
 			insert notAPerson;
 			List<Map<String, String>> rows = new List<Map<String, String>>();
 			for (Integer i = 0; i < 3; i++) {

@@ -46,7 +46,9 @@ private class ImportMatchingRulesTest {
 	}
 
 	private static Contact smith(String firstName) {
-		return new Contact(FirstName = firstName, LastName = 'Smith', MailingPostalCode = '12345');
+		return TestDataFactory.person(
+			new Contact(FirstName = firstName, LastName = 'Smith', MailingPostalCode = '12345')
+		);
 	}
 
 	private static Id organizationRecordTypeId() {
@@ -180,8 +182,12 @@ private class ImportMatchingRulesTest {
 		System.runAs(TestUsers.admin()) {
 			Id organizationType = organizationRecordTypeId();
 			insert new List<Account>{
-				new Account(Name = 'First Baptist', RecordTypeId = organizationType),
-				new Account(Name = 'First Baptist', RecordTypeId = organizationType)
+				TestDataFactory.organization(
+					new Account(Name = 'First Baptist', RecordTypeId = organizationType)
+				),
+				TestDataFactory.organization(
+					new Account(Name = 'First Baptist', RecordTypeId = organizationType)
+				)
 			};
 			Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
 			Map<String, String> values = smithRow('Ana');
@@ -207,9 +213,8 @@ private class ImportMatchingRulesTest {
 	static void anOrganizationIsMatchedByNameOnlyAmongOrganizations() {
 		System.runAs(TestUsers.admin()) {
 			Id organizationType = organizationRecordTypeId();
-			Account organization = new Account(
-				Name = 'Harbor Trust',
-				RecordTypeId = organizationType
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'Harbor Trust', RecordTypeId = organizationType)
 			);
 			insert organization;
 			Import_Batch__c batch = ImportTestDataFactory.batch(template(null));
@@ -324,17 +329,21 @@ private class ImportMatchingRulesTest {
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 200; i++) {
 				couples.add(
-					new Contact(
-						FirstName = 'John',
-						LastName = 'Smith' + i,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'John',
+							LastName = 'Smith' + i,
+							MailingPostalCode = '12345'
+						)
 					)
 				);
 				couples.add(
-					new Contact(
-						FirstName = 'Jane',
-						LastName = 'Smith' + i,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jane',
+							LastName = 'Smith' + i,
+							MailingPostalCode = '12345'
+						)
 					)
 				);
 				values.add(
@@ -373,17 +382,21 @@ private class ImportMatchingRulesTest {
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 200; i++) {
 				couples.add(
-					new Contact(
-						FirstName = 'John',
-						LastName = 'Smith' + i,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'John',
+							LastName = 'Smith' + i,
+							MailingPostalCode = '12345'
+						)
 					)
 				);
 				couples.add(
-					new Contact(
-						FirstName = 'Jane',
-						LastName = 'Smith' + i,
-						MailingPostalCode = '12345'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Jane',
+							LastName = 'Smith' + i,
+							MailingPostalCode = '12345'
+						)
 					)
 				);
 				values.add(

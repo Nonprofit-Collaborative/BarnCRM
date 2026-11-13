@@ -123,13 +123,15 @@ private class ImportRowProcessorTest {
 	static void reImportingAnUnchangedCheckboxChangesNothing() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
-			insert new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org',
-				MailingCity = 'Portland',
-				HasOptedOutOfEmail = true,
-				DoNotCall = false
+			insert TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Ramirez',
+					Email = 'ana@example.org',
+					MailingCity = 'Portland',
+					HasOptedOutOfEmail = true,
+					DoNotCall = false
+				)
 			);
 			ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
 			mapping.columns.add(
@@ -191,7 +193,9 @@ private class ImportRowProcessorTest {
 	@IsTest
 	static void matchesAnExistingPersonInsteadOfDuplicatingThem() {
 		System.runAs(TestUsers.admin()) {
-			insert new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org');
+			insert TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org')
+			);
 			given(
 				new List<Map<String, String>>{
 					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', null)
@@ -547,13 +551,15 @@ private class ImportRowProcessorTest {
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 200; i++) {
 				existing.add(
-					new Contact(
-						FirstName = 'Person' + i,
-						LastName = 'Surname' + i,
-						Email = 'person' + i + '@example.org',
-						MailingCity = 'Portland',
-						Birthdate = Date.newInstance(1980, 1, 5),
-						Title = Math.mod(i, 2) == 0 ? 'treasurer' : 'Treasurer'
+					TestDataFactory.person(
+						new Contact(
+							FirstName = 'Person' + i,
+							LastName = 'Surname' + i,
+							Email = 'person' + i + '@example.org',
+							MailingCity = 'Portland',
+							Birthdate = Date.newInstance(1980, 1, 5),
+							Title = Math.mod(i, 2) == 0 ? 'treasurer' : 'Treasurer'
+						)
 					)
 				);
 				values.add(bornRow(i, '1980-1-5', 'Treasurer'));
@@ -989,11 +995,13 @@ private class ImportRowProcessorTest {
 	static void anUpdateToAMatchedPersonIsJournaledWithTheValueItReplaced() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
-			insert new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Email = 'ana@example.org',
-				MailingCity = 'Salem'
+			insert TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Ramirez',
+					Email = 'ana@example.org',
+					MailingCity = 'Salem'
+				)
 			);
 			given(
 				new List<Map<String, String>>{
@@ -1035,7 +1043,9 @@ private class ImportRowProcessorTest {
 	static void renamingAnExistingHouseholdIsJournaledWithTheOldName() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
-			insert new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org');
+			insert TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org')
+			);
 			Account household = [
 				SELECT Id, Name, Custom_Name__c
 				FROM Account
@@ -1247,7 +1257,9 @@ private class ImportRowProcessorTest {
 		) {
 			if (throwOnResolve) {
 				// Something saved before the failure, as a gift would be, must not survive it.
-				insert as user new Account(Name = 'Saved before the failure');
+				insert as user TestDataFactory.organization(
+					new Account(Name = 'Saved before the failure')
+				);
 				throw new IllegalArgumentException('stub failed');
 			}
 			sawDryRun = dryRun;
