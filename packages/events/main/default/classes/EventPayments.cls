@@ -162,7 +162,8 @@ public with sharing class EventPayments {
 
 	/**
 	 * Where the payer returns: the event's public page on the Site its registration form uses
-	 * (`FormsPublic?record=<event>`), else the org's own address (ADR decision 3).
+	 * (`FormsPublic?record=<event>`), else the org's own address (ADR decision 3). The page is
+	 * whatever the form's own link names, so the package prefix comes with it.
 	 */
 	@TestVisible
 	private static String returnUrl(Event__c event) {
@@ -175,8 +176,8 @@ public with sharing class EventPayments {
 		} catch (Exception noForm) {
 			link = null;
 		}
-		return link != null && link.contains('/FormsPublic')
-			? link.substringBefore('/FormsPublic') + '/FormsPublic?record=' + event.Id
+		return link != null && link.contains('FormsPublic?')
+			? link.substringBefore('?') + '?record=' + event.Id
 			: Url.getOrgDomainUrl().toExternalForm() + '/' + event.Id;
 	}
 

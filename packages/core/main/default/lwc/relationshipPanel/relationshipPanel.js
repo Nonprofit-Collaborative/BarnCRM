@@ -14,7 +14,14 @@ import { initialsOf, opensElsewhere, recordHref } from 'c/recordRows';
 import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import RELATIONSHIP_SCHEMA from '@salesforce/schema/Relationship__c';
+import CONTACT_FIELD from '@salesforce/schema/Relationship__c.Contact__c';
+import DESCRIPTION_FIELD from '@salesforce/schema/Relationship__c.Description__c';
 import END_DATE_FIELD from '@salesforce/schema/Relationship__c.End_Date__c';
+import PERSON_ACCOUNT_FIELD from '@salesforce/schema/Relationship__c.Person_Account__c';
+import RELATED_ACCOUNT_FIELD from '@salesforce/schema/Relationship__c.Related_Person_Account__c';
+import RELATED_CONTACT_FIELD from '@salesforce/schema/Relationship__c.Related_Contact__c';
+import START_DATE_FIELD from '@salesforce/schema/Relationship__c.Start_Date__c';
+import STATUS_FIELD from '@salesforce/schema/Relationship__c.Status__c';
 import TYPE_FIELD from '@salesforce/schema/Relationship__c.Type__c';
 
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
@@ -31,24 +38,39 @@ import REMOVE_BUTTON from '@salesforce/label/c.Core_Find_Remove';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-const RELATIONSHIP_OBJECT = 'Relationship__c';
+// Every name comes from a schema import, so the card works with or without the namespace.
+const RELATIONSHIP_OBJECT = RELATIONSHIP_SCHEMA.objectApiName;
 // Type is a picker of its own, so a type the administrator turned off is not offered.
-const FORM_FIELDS = ['Status__c', 'Start_Date__c', 'End_Date__c', 'Description__c'];
+const FORM_FIELDS = [STATUS_FIELD, START_DATE_FIELD, END_DATE_FIELD, DESCRIPTION_FIELD].map(
+  (field) => field.fieldApiName
+);
 const CURRENT_STATUS = 'Current';
+
+/** A lookup's relationship name, the way GraphQL reaches the parent through it. */
+const parentOf = (field) => field.fieldApiName.replace(/__c$/, '__r');
+const RELATED_CONTACT = parentOf(RELATED_CONTACT_FIELD);
+const RELATED_ACCOUNT = parentOf(RELATED_ACCOUNT_FIELD);
+const TYPE = TYPE_FIELD.fieldApiName;
+const STATUS = STATUS_FIELD.fieldApiName;
+const DESCRIPTION = DESCRIPTION_FIELD.fieldApiName;
 
 /**
  * The relationships described from this person's side, read as the user through the
  * platform, so field security and sharing apply. The person is a contact (Contact__c) or an
  * account (Person_Account__c); both lookups exist in every org. At most 2,000, the most a
- * query returns at once.
+ * query returns at once. Built from the schema imports (a dynamic query, lightning/graphql at
+ * API 65 or later, ADR-0093 amendment), so the names carry the namespace once it is set.
  */
 const RELATIONSHIPS_QUERY = gql`
   query relationshipPanel($personId: ID) {
     uiapi {
       query {
-        Relationship__c(
+        ${RELATIONSHIP_OBJECT}(
           where: {
-            or: [{ Contact__c: { eq: $personId } }, { Person_Account__c: { eq: $personId } }]
+            or: [
+              { ${CONTACT_FIELD.fieldApiName}: { eq: $personId } }
+              { ${PERSON_ACCOUNT_FIELD.fieldApiName}: { eq: $personId } }
+            ]
           }
           orderBy: { CreatedDate: { order: DESC } }
           first: 2000
@@ -56,24 +78,24 @@ const RELATIONSHIPS_QUERY = gql`
           edges {
             node {
               Id
-              Related_Contact__r {
+              ${RELATED_CONTACT} {
                 Name {
                   value
                 }
               }
-              Related_Person_Account__r {
+              ${RELATED_ACCOUNT} {
                 Name {
                   value
                 }
               }
-              Type__c {
+              ${TYPE} {
                 value
                 displayValue
               }
-              Status__c {
+              ${STATUS} {
                 value
               }
-              Description__c {
+              ${DESCRIPTION} {
                 value
               }
             }
@@ -94,14 +116,14 @@ function nameOf(parent) {
 
 /** One relationship as the card draws it, from this person's side. */
 function toView(node) {
-  const type = node.Type__c || {};
+  const type = node[TYPE] || {};
   return {
     id: node.Id,
     relatedPersonName:
-      nameOf(node.Related_Contact__r) || nameOf(node.Related_Person_Account__r) || UNNAMED_PERSON,
+      nameOf(node[RELATED_CONTACT]) || nameOf(node[RELATED_ACCOUNT]) || UNNAMED_PERSON,
     relationshipType: type.displayValue || type.value || null,
-    isFormer: read(node.Status__c) !== CURRENT_STATUS,
-    description: read(node.Description__c)
+    isFormer: read(node[STATUS]) !== CURRENT_STATUS,
+    description: read(node[DESCRIPTION])
   };
 }
 
@@ -170,7 +192,9 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
       this.errorMessage = helpText('Core', 'Core_Relationship_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
-      const views = result.data.uiapi.query.Relationship__c.edges.map((edge) => toView(edge.node));
+      const views = result.data.uiapi.query[RELATIONSHIP_OBJECT].edges.map((edge) =>
+        toView(edge.node)
+      );
       // Current ones first, then newest first (a stable sort keeps the query's order).
       views.sort((a, b) => Number(a.isFormer) - Number(b.isFormer));
       this.relationships = views.map((relationship) => this.decorate(relationship));
@@ -300,12 +324,13 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
 
   /** The lookup that ties this side of a new relationship to the record the card sits on. */
   get personFieldName() {
-    return this.objectApiName === 'Contact' ? 'Contact__c' : 'Person_Account__c';
+    return (this.objectApiName === 'Contact' ? CONTACT_FIELD : PERSON_ACCOUNT_FIELD).fieldApiName;
   }
 
   /** The lookup for the other person, on the same object as this one. */
   get relatedPersonFieldName() {
-    return this.objectApiName === 'Contact' ? 'Related_Contact__c' : 'Related_Person_Account__c';
+    return (this.objectApiName === 'Contact' ? RELATED_CONTACT_FIELD : RELATED_ACCOUNT_FIELD)
+      .fieldApiName;
   }
 
   decorate(relationship) {

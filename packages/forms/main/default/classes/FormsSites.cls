@@ -96,4 +96,12 @@ public with sharing class FormsSites {
 		}
 		return urls;
 	}
+
+	/**
+	 * The public form page's path on a Site: `/FormsPublic`, or with the package prefix once
+	 * there is one, as the platform names the page.
+	 */
+	public static String pagePath() {
+		return '/' + Page.FormsPublic.getUrl().substringAfterLast('/');
+	}
 }

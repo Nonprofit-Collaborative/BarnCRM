@@ -5,6 +5,7 @@
   applyHtmlTag="false"
   applyBodyTag="false"
   docType="html-5.0"
+  controller="FormPublicController"
 >
   <!--
     The public form page for a Salesforce Site (C-42b; ADR-0184 public forms on a Salesforce
@@ -12,8 +13,9 @@
     module attached to a record, or &resume=<token> from a save-for-later email (C-42c). With
     record=<id> and no form, a module's public page for that record, such as an event, with its
     form; with list=<kind>, a module's public list, such as list=events (EV-16; ADR-0190 public
-    event pages, decision 7). It only hosts c:formPublic or c:formPublicPage through Lightning
-    Out; FormPublicController decides everything on the server. The page writes its own html and
+    event pages, decision 7). It only hosts formPublic or formPublicPage through Lightning Out,
+    from the namespace FormPublicController names (c until the package has one); the controller
+    decides everything on the server. The page writes its own html and
     head so phones get a viewport (no zoomed-out desktop layout) and screen readers get the
     language; the one main landmark is the element the component fills.
   -->
@@ -33,9 +35,10 @@
           var listKind = '{!JSENCODE($CurrentPage.parameters.list)}';
           var payment = '{!JSENCODE($CurrentPage.parameters.payment)}';
           var isPage = !formId && (recordId || listKind);
-          $Lightning.use('c:formsPublicApp', function () {
+          var ns = '{!JSENCODE(lightningNamespace)}';
+          $Lightning.use(ns + ':formsPublicApp', function () {
             $Lightning.createComponent(
-              isPage ? 'c:formPublicPage' : 'c:formPublic',
+              ns + (isPage ? ':formPublicPage' : ':formPublic'),
               isPage
                 ? { recordId: recordId, listKind: listKind, payment: payment }
                 : {

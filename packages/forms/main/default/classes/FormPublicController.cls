@@ -7,6 +7,18 @@ public with sharing class FormPublicController {
 	private static final String CONTEXT = 'FormPublicController';
 
 	/**
+	 * The Lightning namespace the `FormsPublic` page loads `formsPublicApp` and its components
+	 * from: the package's once it has one, `c` before (the page's controller, so the guest user
+	 * needs no other class).
+	 */
+	public String lightningNamespace {
+		get {
+			String prefix = NamespaceUtil.prefix();
+			return String.isBlank(prefix) ? 'c' : prefix.removeEnd('__');
+		}
+	}
+
+	/**
 	 * The form to fill in, or null when it is not published or not public. With an emailed resume
 	 * token, the form with the answers saved behind it, or null when the link no longer works.
 	 */

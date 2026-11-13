@@ -38,6 +38,8 @@ import SEASONAL_END_MONTH_FIELD from '@salesforce/schema/Address__c.Seasonal_End
 import SEASONAL_END_DAY_FIELD from '@salesforce/schema/Address__c.Seasonal_End_Day__c';
 import CONTACT_FIELD from '@salesforce/schema/Address__c.Contact__c';
 import ACCOUNT_FIELD from '@salesforce/schema/Address__c.Account__c';
+import PERSON_ACCOUNT_FIELD from '@salesforce/schema/Address__c.Person_Account__c';
+import START_DATE_FIELD from '@salesforce/schema/Address__c.Start_Date__c';
 
 import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Addresses_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Address_AddButton';
@@ -88,6 +90,27 @@ const MOVE_FOR_HOUSEHOLD = 'household';
 const MOVE_FOR_EVERYONE = 'everyone';
 const EDIT = 'edit';
 
+// The query's field names, from the schema imports, so they carry the namespace once it is set.
+const F = {
+  account: ACCOUNT_FIELD.fieldApiName,
+  contact: CONTACT_FIELD.fieldApiName,
+  personAccount: PERSON_ACCOUNT_FIELD.fieldApiName,
+  type: TYPE_FIELD.fieldApiName,
+  street: STREET_FIELD.fieldApiName,
+  city: CITY_FIELD.fieldApiName,
+  state: STATE_FIELD.fieldApiName,
+  postalCode: POSTAL_CODE_FIELD.fieldApiName,
+  country: COUNTRY_FIELD.fieldApiName,
+  isDefault: IS_DEFAULT_FIELD.fieldApiName,
+  startMonth: SEASONAL_START_MONTH_FIELD.fieldApiName,
+  startDay: SEASONAL_START_DAY_FIELD.fieldApiName,
+  endMonth: SEASONAL_END_MONTH_FIELD.fieldApiName,
+  endDay: SEASONAL_END_DAY_FIELD.fieldApiName,
+  status: STATUS_FIELD.fieldApiName,
+  startDate: START_DATE_FIELD.fieldApiName,
+  endDate: END_DATE_FIELD.fieldApiName
+};
+
 /**
  * The record's addresses, read as the user through the platform, so field security and
  * sharing apply and the card picks up edits made elsewhere on the page. The record is a
@@ -95,18 +118,19 @@ const EDIT = 'edit';
  * person stored as an account (Person_Account__c); all three lookups exist in every org.
  * At most 2,000, the most a query returns at once. Status, start date and end date are
  * @optional: a user without read on one still gets the card, with that value null or absent
- * (a missing status counts as Current, a missing date as blank).
+ * (a missing status counts as Current, a missing date as blank). Built from the schema
+ * imports (a dynamic query, lightning/graphql at API 65 or later, ADR-0093 amendment).
  */
 const ADDRESSES_QUERY = gql`
   query addressPanel($ownerId: ID) {
     uiapi {
       query {
-        Address__c(
+        ${ADDRESS_OBJECT}(
           where: {
             or: [
-              { Account__c: { eq: $ownerId } }
-              { Contact__c: { eq: $ownerId } }
-              { Person_Account__c: { eq: $ownerId } }
+              { ${F.account}: { eq: $ownerId } }
+              { ${F.contact}: { eq: $ownerId } }
+              { ${F.personAccount}: { eq: $ownerId } }
             ]
           }
           orderBy: { CreatedDate: { order: DESC } }
@@ -115,50 +139,50 @@ const ADDRESSES_QUERY = gql`
           edges {
             node {
               Id
-              Account__c {
+              ${F.account} {
                 value
               }
-              Type__c {
+              ${F.type} {
                 value
                 displayValue
               }
-              Street__c {
+              ${F.street} {
                 value
               }
-              City__c {
+              ${F.city} {
                 value
               }
-              State__c {
+              ${F.state} {
                 value
               }
-              Postal_Code__c {
+              ${F.postalCode} {
                 value
               }
-              Country__c {
+              ${F.country} {
                 value
               }
-              Is_Default__c {
+              ${F.isDefault} {
                 value
               }
-              Seasonal_Start_Month__c {
+              ${F.startMonth} {
                 value
               }
-              Seasonal_Start_Day__c {
+              ${F.startDay} {
                 value
               }
-              Seasonal_End_Month__c {
+              ${F.endMonth} {
                 value
               }
-              Seasonal_End_Day__c {
+              ${F.endDay} {
                 value
               }
-              Status__c @optional {
+              ${F.status} @optional {
                 value
               }
-              Start_Date__c @optional {
+              ${F.startDate} @optional {
                 value
               }
-              End_Date__c @optional {
+              ${F.endDate} @optional {
                 value
               }
             }
@@ -186,28 +210,25 @@ function monthAndDay(month, day) {
 
 /** One address as the card draws it. */
 function toView(node) {
-  const type = node.Type__c || {};
+  const type = node[F.type] || {};
   return {
     id: node.Id,
     addressType: type.displayValue || type.value || null,
-    street: read(node.Street__c),
-    city: read(node.City__c),
-    state: read(node.State__c),
-    postalCode: read(node.Postal_Code__c),
-    country: read(node.Country__c),
-    isDefault: read(node.Is_Default__c) === true,
+    street: read(node[F.street]),
+    city: read(node[F.city]),
+    state: read(node[F.state]),
+    postalCode: read(node[F.postalCode]),
+    country: read(node[F.country]),
+    isDefault: read(node[F.isDefault]) === true,
     isSeasonal: type.value === SEASONAL_TYPE,
     // An address with no household or organization is a person's own (R-AD1).
-    isPersonal: !read(node.Account__c),
-    seasonalStart: monthAndDay(
-      read(node.Seasonal_Start_Month__c),
-      read(node.Seasonal_Start_Day__c)
-    ),
-    seasonalEnd: monthAndDay(read(node.Seasonal_End_Month__c), read(node.Seasonal_End_Day__c)),
+    isPersonal: !read(node[F.account]),
+    seasonalStart: monthAndDay(read(node[F.startMonth]), read(node[F.startDay])),
+    seasonalEnd: monthAndDay(read(node[F.endMonth]), read(node[F.endDay])),
     // A blank status, on an address saved before statuses existed, is Current (R-AD10).
-    status: read(node.Status__c) || STATUS_CURRENT,
-    startDate: read(node.Start_Date__c),
-    endDate: read(node.End_Date__c)
+    status: read(node[F.status]) || STATUS_CURRENT,
+    startDate: read(node[F.startDate]),
+    endDate: read(node[F.endDate])
   };
 }
 
@@ -337,7 +358,7 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
       this.errorMessage = helpText('Core', 'Core_Address_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
-      const views = result.data.uiapi.query.Address__c.edges.map((edge) => toView(edge.node));
+      const views = result.data.uiapi.query[ADDRESS_OBJECT].edges.map((edge) => toView(edge.node));
       // The address in use first, then newest first (a stable sort keeps the query's order).
       views.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
       this.addresses = views.map((address) => this.decorate(address));

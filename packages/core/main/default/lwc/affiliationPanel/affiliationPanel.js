@@ -15,6 +15,13 @@ import AFFILIATION_SCHEMA from '@salesforce/schema/Affiliation__c';
 import ID_FIELD from '@salesforce/schema/Affiliation__c.Id';
 import IS_PRIMARY_FIELD from '@salesforce/schema/Affiliation__c.Is_Primary__c';
 import END_DATE_FIELD from '@salesforce/schema/Affiliation__c.End_Date__c';
+import CONTACT_FIELD from '@salesforce/schema/Affiliation__c.Contact__c';
+import DESCRIPTION_FIELD from '@salesforce/schema/Affiliation__c.Description__c';
+import ORGANIZATION_FIELD from '@salesforce/schema/Affiliation__c.Organization__c';
+import PERSON_ACCOUNT_FIELD from '@salesforce/schema/Affiliation__c.Person_Account__c';
+import ROLE_FIELD from '@salesforce/schema/Affiliation__c.Role__c';
+import START_DATE_FIELD from '@salesforce/schema/Affiliation__c.Start_Date__c';
+import STATUS_FIELD from '@salesforce/schema/Affiliation__c.Status__c';
 import isFeatureOn from '@salesforce/apex/AffiliationController.isFeatureOn';
 import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 
@@ -33,14 +40,24 @@ import PRIMARY_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primar
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-const AFFILIATION_OBJECT = 'Affiliation__c';
+// Every name comes from a schema import, so the card works with or without the namespace.
+const AFFILIATION_OBJECT = AFFILIATION_SCHEMA.objectApiName;
+const CONTACT = CONTACT_FIELD.fieldApiName;
+const PERSON_ACCOUNT = PERSON_ACCOUNT_FIELD.fieldApiName;
+const ORGANIZATION = ORGANIZATION_FIELD.fieldApiName;
+const ROLE = ROLE_FIELD.fieldApiName;
+const STATUS = STATUS_FIELD.fieldApiName;
+const IS_PRIMARY = IS_PRIMARY_FIELD.fieldApiName;
+const DESCRIPTION = DESCRIPTION_FIELD.fieldApiName;
+/** A lookup's relationship name, the way GraphQL reaches the parent through it. */
+const parentOf = (fieldApiName) => fieldApiName.replace(/__c$/, '__r');
 const FORM_FIELDS = [
-  'Role__c',
-  'Status__c',
-  'Is_Primary__c',
-  'Start_Date__c',
-  'End_Date__c',
-  'Description__c'
+  ROLE,
+  STATUS,
+  IS_PRIMARY,
+  START_DATE_FIELD.fieldApiName,
+  END_DATE_FIELD.fieldApiName,
+  DESCRIPTION
 ];
 const CURRENT_STATUS = 'Current';
 
@@ -48,18 +65,20 @@ const CURRENT_STATUS = 'Current';
  * Every affiliation naming the record, read as the user through the platform, so field
  * security and sharing apply. The record is the person (Contact__c, or Person_Account__c
  * where people are accounts; both lookups exist in every org) or the organization
- * (Organization__c). At most 2,000, the most a query returns at once.
+ * (Organization__c). At most 2,000, the most a query returns at once. Built from the schema
+ * imports (a dynamic query, lightning/graphql at API 65 or later, ADR-0093 amendment), so the
+ * names carry the namespace once it is set.
  */
 const AFFILIATIONS_QUERY = gql`
   query affiliationPanel($recordId: ID) {
     uiapi {
       query {
-        Affiliation__c(
+        ${AFFILIATION_OBJECT}(
           where: {
             or: [
-              { Contact__c: { eq: $recordId } }
-              { Person_Account__c: { eq: $recordId } }
-              { Organization__c: { eq: $recordId } }
+              { ${CONTACT}: { eq: $recordId } }
+              { ${PERSON_ACCOUNT}: { eq: $recordId } }
+              { ${ORGANIZATION}: { eq: $recordId } }
             ]
           }
           orderBy: { CreatedDate: { order: DESC } }
@@ -68,40 +87,40 @@ const AFFILIATIONS_QUERY = gql`
           edges {
             node {
               Id
-              Contact__c {
+              ${CONTACT} {
                 value
               }
-              Contact__r {
+              ${parentOf(CONTACT)} {
                 Name {
                   value
                 }
               }
-              Person_Account__c {
+              ${PERSON_ACCOUNT} {
                 value
               }
-              Person_Account__r {
+              ${parentOf(PERSON_ACCOUNT)} {
                 Name {
                   value
                 }
               }
-              Organization__c {
+              ${ORGANIZATION} {
                 value
               }
-              Organization__r {
+              ${parentOf(ORGANIZATION)} {
                 Name {
                   value
                 }
               }
-              Role__c {
+              ${ROLE} {
                 value
               }
-              Status__c {
+              ${STATUS} {
                 value
               }
-              Is_Primary__c {
+              ${IS_PRIMARY} {
                 value
               }
-              Description__c {
+              ${DESCRIPTION} {
                 value
               }
             }
@@ -127,19 +146,20 @@ function sameId(left, right) {
 
 /** One affiliation as the card draws it, read from the end the record is not. */
 function toView(node, recordId) {
-  const status = read(node.Status__c);
+  const status = read(node[STATUS]);
   return {
     id: node.Id,
-    personId: read(node.Contact__c) || read(node.Person_Account__c),
-    personName: nameOf(node.Contact__r) || nameOf(node.Person_Account__r) || UNNAMED_PERSON,
-    organizationId: read(node.Organization__c),
-    organizationName: nameOf(node.Organization__r),
-    role: read(node.Role__c),
+    personId: read(node[CONTACT]) || read(node[PERSON_ACCOUNT]),
+    personName:
+      nameOf(node[parentOf(CONTACT)]) || nameOf(node[parentOf(PERSON_ACCOUNT)]) || UNNAMED_PERSON,
+    organizationId: read(node[ORGANIZATION]),
+    organizationName: nameOf(node[parentOf(ORGANIZATION)]),
+    role: read(node[ROLE]),
     status,
     isFormer: status !== CURRENT_STATUS,
-    isPrimary: read(node.Is_Primary__c) === true,
-    description: read(node.Description__c),
-    readFromOrganization: sameId(read(node.Organization__c), recordId)
+    isPrimary: read(node[IS_PRIMARY]) === true,
+    description: read(node[DESCRIPTION]),
+    readFromOrganization: sameId(read(node[ORGANIZATION]), recordId)
   };
 }
 
@@ -231,7 +251,7 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
       this.errorMessage = helpText('Core', 'Core_Affiliation_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
-      const views = result.data.uiapi.query.Affiliation__c.edges.map((edge) =>
+      const views = result.data.uiapi.query[AFFILIATION_OBJECT].edges.map((edge) =>
         toView(edge.node, this.recordId)
       );
       views.sort(byCardOrder);
@@ -320,7 +340,7 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
     if (context) {
       return context.ownerField;
     }
-    return this.objectApiName === 'Contact' ? 'Contact__c' : 'Organization__c';
+    return this.objectApiName === 'Contact' ? CONTACT : ORGANIZATION;
   }
 
   /** The lookup for the other end of a new affiliation. */
@@ -329,7 +349,7 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
     if (context) {
       return context.otherEndField;
     }
-    return this.ownerFieldName === 'Organization__c' ? 'Contact__c' : 'Organization__c';
+    return this.ownerFieldName === ORGANIZATION ? CONTACT : ORGANIZATION;
   }
 
   decorate(affiliation) {

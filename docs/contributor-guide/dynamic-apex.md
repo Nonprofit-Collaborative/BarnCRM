@@ -182,6 +182,11 @@ fails the build. Never assume there is none either:
   unprefixed property names, never SObjects, to Lightning. `check-namespace-readiness.py`
   (rule 4) fails a literal packaged name in navigation, LDS field paths and
   `field-name`/`object-api-name` attributes.
+- A GraphQL query (`lightning/graphql`) interpolates the same schema imports into `gql` and
+  reads each node by them (ADR-0093 amendment A1).
+- Visualforce and Site links: `FormsPublic.page` loads its Lightning Out app from the namespace
+  `FormPublicController.lightningNamespace` gives (`c` with none), and Apex builds a public
+  link from `FormsSites.pagePath()` (`Page.FormsPublic`), never a literal `/FormsPublic`.
 
 ## 5. Describe once, never in a loop
 

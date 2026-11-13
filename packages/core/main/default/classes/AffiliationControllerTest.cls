@@ -4,6 +4,10 @@
  */
 @IsTest(testFor='ApexClass:AffiliationController')
 private class AffiliationControllerTest {
+	// The lookups by the names the card's form needs, with the namespace once it is set.
+	private static final String CONTACT = NamespaceUtil.qualify('Contact__c');
+	private static final String ORGANIZATION = NamespaceUtil.qualify('Organization__c');
+	private static final String PERSON_ACCOUNT = NamespaceUtil.qualify('Person_Account__c');
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.admin();
@@ -41,8 +45,8 @@ private class AffiliationControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual('Contact__c', context.ownerField, 'The contact is the person end');
-			Assert.areEqual('Organization__c', context.otherEndField, 'An organization is added');
+			Assert.areEqual(CONTACT, context.ownerField, 'The contact is the person end');
+			Assert.areEqual(ORGANIZATION, context.otherEndField, 'An organization is added');
 		}
 	}
 
@@ -62,9 +66,9 @@ private class AffiliationControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual('Organization__c', context.ownerField, 'The organization end');
+			Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end');
 			Assert.areEqual(
-				HouseholdService.isPersonAccountOrg() ? 'Person_Account__c' : 'Contact__c',
+				HouseholdService.isPersonAccountOrg() ? PERSON_ACCOUNT : CONTACT,
 				context.otherEndField,
 				'The person end is the lookup this org stores people through'
 			);
@@ -93,8 +97,8 @@ private class AffiliationControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual('Person_Account__c', context.ownerField, 'The person account is owner');
-			Assert.areEqual('Organization__c', context.otherEndField, 'An organization is added');
+			Assert.areEqual(PERSON_ACCOUNT, context.ownerField, 'The person account is owner');
+			Assert.areEqual(ORGANIZATION, context.otherEndField, 'An organization is added');
 		}
 	}
 
@@ -115,8 +119,8 @@ private class AffiliationControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual('Organization__c', context.ownerField, 'The organization end');
-			Assert.areEqual('Person_Account__c', context.otherEndField, 'People are accounts here');
+			Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end');
+			Assert.areEqual(PERSON_ACCOUNT, context.otherEndField, 'People are accounts here');
 		}
 	}
 
@@ -134,8 +138,8 @@ private class AffiliationControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual('Organization__c', context.ownerField, 'The organization end');
-			Assert.areEqual('Contact__c', context.otherEndField, 'People are contacts here');
+			Assert.areEqual(ORGANIZATION, context.ownerField, 'The organization end');
+			Assert.areEqual(CONTACT, context.otherEndField, 'People are contacts here');
 		}
 	}
 
@@ -144,8 +148,8 @@ private class AffiliationControllerTest {
 		System.runAs(TestUsers.admin()) {
 			AffiliationController.CardContext context = AffiliationController.getCardContext(null);
 
-			Assert.areEqual('Contact__c', context.ownerField, 'The default is the person end');
-			Assert.areEqual('Organization__c', context.otherEndField, 'An organization is added');
+			Assert.areEqual(CONTACT, context.ownerField, 'The default is the person end');
+			Assert.areEqual(ORGANIZATION, context.otherEndField, 'An organization is added');
 		}
 	}
 }

@@ -786,8 +786,9 @@ describe('c-address-panel', () => {
       // read on one of these fields gets an error for the whole query.
       // eslint-disable-next-line no-undef
       const source = readFileSync(join(__dirname, '..', 'addressPanel.js'), 'utf8');
-      ['Status__c', 'Start_Date__c', 'End_Date__c'].forEach((field) => {
-        expect(source).toContain(`${field} @optional {`);
+      // The query names its fields through the schema imports (ADR-0093 amendment).
+      ['status', 'startDate', 'endDate'].forEach((field) => {
+        expect(source).toContain(`\${F.${field}} @optional {`);
       });
     });
 
