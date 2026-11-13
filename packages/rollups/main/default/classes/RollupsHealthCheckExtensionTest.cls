@@ -316,7 +316,10 @@ private class RollupsHealthCheckExtensionTest {
 					'The nightly jobs finding names the nightly run, which does the rollups.'
 				);
 
-				// No startTest: the scheduled run must not execute inside the test.
+				// startTest gives the re-run report its own query budget: two full Health Check
+				// runs with every module installed (barn-npc) pass 100 queries. No stopTest: the
+				// scheduled run must not execute inside the test.
+				Test.startTest();
 				HealthCheckService.Report report = press(jobs);
 				assertPressingAgainIsRefused(jobs);
 
