@@ -8,7 +8,10 @@ private class HealthCheckSkewTest {
 	static void createTestUser() {
 		User admin = TestUsers.admin();
 		System.runAs(new User(Id = UserInfo.getUserId())) {
-			UserRole role = new UserRole(Name = 'Skew Test Role', DeveloperName = 'Skew_Test_Role');
+			// Built by name so the package does not compile against the role object (ADR-0013).
+			SObject role = Schema.getGlobalDescribe().get('User' + 'Role').newSObject();
+			role.put('Name', 'Skew Test Role');
+			role.put('DeveloperName', 'Skew_Test_Role');
 			insert as system role;
 			update as system new User(Id = admin.Id, UserRoleId = role.Id);
 		}
