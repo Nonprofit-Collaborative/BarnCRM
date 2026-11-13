@@ -18,7 +18,7 @@ Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer 
 8. Check **Appeal** and **Fund**. They start at your organization's defaults; change them if the donor said otherwise. To split the gift across two or more funds (for example half to the building fund), open **Split Across Funds** and add a row per fund; **Fund** is then turned off, and **Save** needs the rows to add up to the amount.
 9. Click **Save**, or **Save and New** to start the next gift straight away.
 
-You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal and the fund, and clears the rest.
+You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal, the fund and the payment method, and clears the rest.
 
 If the donor still owes a pledge or recurring payment, a **Pays a scheduled payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
 

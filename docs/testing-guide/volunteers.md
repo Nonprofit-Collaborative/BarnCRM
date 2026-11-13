@@ -297,6 +297,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Open the job and click **Log Hours**. | Only **Job** is filled. Click **Save** without a person: **Person** is required. |
 | 4 | Open the person and click **Log Hours**. | **Person** is filled with them. Fill in a job, a date and 2 hours and save: the entry is theirs. |
 | 5 | As a Read Only user, open the shift and click **Log Hours**. | A note says your role cannot enter volunteer hours; no form. |
+| 6 | Sign the person up for a shift that starts today, open the person and click **Log Hours**. | **Person**, **Job**, **Volunteer Shift**, **Date Worked** (today) and **Hours** (the shift's length) are filled. Cancel the sign-up and repeat: only **Person** is filled. |
 
 **Cleanup:** delete the hours entries.
 

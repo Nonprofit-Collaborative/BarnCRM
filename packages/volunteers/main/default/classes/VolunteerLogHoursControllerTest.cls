@@ -57,4 +57,34 @@ private class VolunteerLogHoursControllerTest {
 			Assert.areEqual('Contact', fromPerson.personObject, 'Picked as a contact.');
 		}
 	}
+
+	@IsTest
+	static void aPersonSignedUpTodayFillsThatShift() {
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			Volunteer_Job__c job = [SELECT Id FROM Volunteer_Job__c LIMIT 1];
+			Volunteer_Shift__c shift = VolunteersTestData.shift(job.Id);
+			List<Contact> people = VolunteersTestData.contacts(2);
+			insert VolunteersTestData.newSignup(shift.Id, people[0].Id);
+			Volunteer_Signup__c cancelled = VolunteersTestData.newSignup(shift.Id, people[1].Id);
+			cancelled.Status__c = 'Cancelled';
+			insert cancelled;
+			ShiftScheduleService.nowOverride = VolunteersTestData.SHIFT_START.addHours(4);
+
+			Test.startTest();
+			VolunteerLogHoursController.Context signedUp = VolunteerLogHoursController.getContext(
+				people[0].Id
+			);
+			VolunteerLogHoursController.Context notComing = VolunteerLogHoursController.getContext(
+				people[1].Id
+			);
+			Test.stopTest();
+
+			Assert.areEqual(people[0].Id, signedUp.personId, 'The person is filled.');
+			Assert.areEqual(shift.Id, signedUp.shiftId, 'Today\'s shift is filled.');
+			Assert.areEqual(job.Id, signedUp.jobId, 'With its job.');
+			Assert.areEqual(3, signedUp.hours, 'And its three hours.');
+			Assert.isNull(notComing.shiftId, 'A cancelled sign-up fills nothing.');
+			Assert.isNull(notComing.jobId, 'Nor a job.');
+		}
+	}
 }
