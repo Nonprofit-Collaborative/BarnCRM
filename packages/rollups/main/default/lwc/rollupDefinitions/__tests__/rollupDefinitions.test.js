@@ -34,12 +34,20 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportWillCreate', () => ({ default: 'New' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_RollupBuilder_ImportRefused', () => ({ default: 'Refused' }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/label/c.Rollups_RollupBuilder_ImportWillCreate',
+  () => ({ default: 'New' }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/label/c.Rollups_RollupBuilder_ImportRefused',
+  () => ({ default: 'Refused' }),
+  {
+    virtual: true
+  }
+);
 jest.mock('@salesforce/label/c.Core_Import_ResultCreated', () => ({ default: 'Created' }), {
   virtual: true
 });
@@ -118,7 +126,7 @@ jest.mock(
 );
 
 jest.mock(
-  '@salesforce/label/c.Core_Rollups_CountsSeparatedBy',
+  '@salesforce/label/c.Rollups_Rollups_CountsSeparatedBy',
   () => ({ default: 'separated by {0}' }),
   { virtual: true }
 );

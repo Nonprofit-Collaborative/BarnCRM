@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getEdition from '@salesforce/apex/SetupAssistantController.getEdition';
 import changeEdition from '@salesforce/apex/SetupAssistantController.changeEdition';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
+import { messageFrom as messageOf } from 'c/findCsv';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
 import CHANGE_TOGGLE from '@salesforce/label/c.Core_Edition_ChangeToggle';
@@ -116,10 +116,4 @@ export default class EditionSetting extends LightningElement {
       this.isSaving = false;
     }
   }
-}
-
-function messageOf(error) {
-  return (
-    (error && error.body && error.body.message) || (error && error.message) || UNEXPECTED_ERROR
-  );
 }

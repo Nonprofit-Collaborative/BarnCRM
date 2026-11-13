@@ -43,10 +43,8 @@ so it is listed only where Giving is installed, which makes four:
 | Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus each installed module's staff access (programs, volunteer shifts and hours, and so on) |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
 
-**Coordinator is retired.** It gave exactly what Team Member gives. BarnCRM gives everyone who
-held it the Team Member role automatically, within the hour, and takes nothing away; the
-Coordinator role itself is removed in the next release. Someone who approves volunteer hours
-keeps that through the **Volunteers Coordinator** permission set.
+Someone who approves volunteer hours gets that through the **Volunteers Coordinator** extra
+permission, given on top of their role.
 
 The role names fit any organization, nonprofit or not. In Setup, Team Member keeps its original
 API name, `Program_Staff`, and BarnCRM Admin its `BarnCRM_Admin_Group`, so that upgrades keep
@@ -198,13 +196,12 @@ A module's sets are listed after them, only where that module is installed:
 | Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
 | Salesforce Records Sync | Mirror | Open the Campaign Sync, Opportunity Mirror and Gift Transaction Mirror pages and edit the IDs they keep. Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in Setup (and, for Campaigns, the Marketing User box on the person's user). Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror: BarnCRM gives it to everyone who held one of them, who keep the old set until the next release. |
 | Accounting Export | Mirror | Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no Giving set beside it. Which gifts appear still follows your org's sharing. |
-| Inbound Gifts | Mirror | For an integration, flow or AI assistant user only: record gifts another system sends, through the Inbound Gift API or the Record Inbound Gift action. It needs nothing else from BarnCRM. Replaces Inbound Gift API and Record Inbound Gift Action, given the same way. |
+| Inbound Gifts | Mirror | For an integration, flow or AI assistant user only: record gifts another system sends, through the Inbound Gift API or the Record Inbound Gift action. It needs nothing else from BarnCRM. |
 
 The other module sets (Volunteers Admin, Staff and Read Only, Rollup Builder, and every other
 module's) are not listed, because they follow the roles automatically (see the top of this page):
 removing one here would only be undone within the hour. The same holds for Giving Admin given to
-a BarnCRM Admin, and, this release only, for Volunteers Coordinator held by someone who still has
-the retired Coordinator role.
+a BarnCRM Admin.
 
 These are the only permissions this section gives. It never lists or assigns any other
 permission set in your org, including one you created yourself with the same name as one of
@@ -312,12 +309,6 @@ so it was not given to the person who installed BarnCRM. They already have the B
 Admin permission set, so BarnCRM Settings works. To finish, open BarnCRM Settings, then
 Access, and give them the BarnCRM Admin role.", with the number of attempts in place of
 {0}. Do what it says: on this page, give the installer the BarnCRM Admin role.
-
-**The Error Log names someone who "is inactive and holds the Coordinator (Retired) role".** After
-an upgrade BarnCRM gives every active Coordinator the Team Member role. It does not try for a
-deactivated user, because Salesforce may refuse, and writes this Warning instead, one per person.
-Nothing to do: they keep Coordinator, and if you reactivate them the hourly check gives them Team
-Member. If an entry says someone "could not be given Team Member", give it to them on this page.
 
 **You edited one of the shipped roles in Setup and now an upgrade has undone your change.**
 The shipped roles (three with BarnCRM Core, and Fundraising Staff with the Giving module)

@@ -9,6 +9,7 @@
  *   indicators: [{ id, elementId, betterWhen, baselineValue, periods: [{ startDate, endDate,
  *   targetValue, resultValue }] }] }
  */
+import { escapeHtml } from 'c/barnFormat';
 
 /**
  * The seven columns, in order, as configuration. `rank` matches the Stage_Rank__c formula on
@@ -477,20 +478,8 @@ export function reportCsv(built, words) {
   return { columns: csvColumns, rows };
 }
 
-const HTML_ESCAPES = Object.freeze({
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;'
-});
-
-/** Text made safe to place in HTML. */
-export function escapeHtml(value) {
-  return value === undefined || value === null
-    ? ''
-    : String(value).replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
-}
+/** Text made safe to place in HTML, from the shared kit. */
+export { escapeHtml };
 
 /**
  * The report as one printable HTML page, with its own styles and no scripts, to open in a

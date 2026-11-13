@@ -31,7 +31,7 @@ private class GiftTransactionMirrorServiceTest {
 	private static User maria() {
 		return TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Gift_Transaction_Mirror' }
+			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 

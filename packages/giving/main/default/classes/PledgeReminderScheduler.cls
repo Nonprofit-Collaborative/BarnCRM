@@ -14,10 +14,6 @@ public with sharing class PledgeReminderScheduler implements Schedulable {
 	private static final String LOG_CONTEXT = 'PledgeReminderScheduler.execute';
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		try {
 			if (!PledgeReminderService.isEnabled()) {
 				// Switched off since the schedule was started. Nothing to do, and nothing wrong.

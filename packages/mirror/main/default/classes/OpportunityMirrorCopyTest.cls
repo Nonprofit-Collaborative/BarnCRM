@@ -23,7 +23,7 @@ private class OpportunityMirrorCopyTest {
 		// Built once for the class rather than in every test that runs as her.
 		TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+			new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 
@@ -202,7 +202,7 @@ private class OpportunityMirrorCopyTest {
 			// Maria here also links appeals to Campaigns, which the Campaign Sync set grants.
 			User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Maria',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror', 'Campaign_Sync' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
@@ -379,7 +379,7 @@ private class OpportunityMirrorCopyTest {
 			// The link field comes with the permission set; Opportunity create does not.
 			User rosa = TestDataFactory.createUser(
 				'Rosa',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			System.runAs(new User(Id = UserInfo.getUserId())) {
 				update new User(Id = rosa.Id, ProfileId = readOnly[0].Id);
@@ -516,7 +516,7 @@ private class OpportunityMirrorCopyTest {
 			// Ana links appeals to Campaigns; Maria sees Campaigns but not the appeal's Campaign ID.
 			User ana = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Ana',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror', 'Campaign_Sync' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			User admin = maria();
 			if (!OpportunityMirrorService.isAvailable()) {

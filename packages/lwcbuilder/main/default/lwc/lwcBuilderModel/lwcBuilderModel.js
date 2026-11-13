@@ -7,6 +7,7 @@
  * blocks: [block]}]}]}]}`. Every change returns a new definition; nothing is changed in place.
  */
 import { apexFiles, apexNames, CHART_CSS, CHART_HELPER, LIST_HELPER } from 'c/lwcBuilderExportKit';
+import { escapeHtml } from 'c/barnFormat';
 
 export const SCHEMA_VERSION = 1;
 export const MAX_FIELDS = 6;
@@ -554,13 +555,6 @@ export function bundleName(key) {
     .join('');
   return /^[a-z]/.test(camel) ? camel : `c${camel}`;
 }
-
-const escapeHtml = (value) =>
-  String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
 // A comment may not hold "--", which would end it early.
 const comment = (value) => `<!-- ${String(value).replace(/-{2,}/g, '-')} -->`;
 

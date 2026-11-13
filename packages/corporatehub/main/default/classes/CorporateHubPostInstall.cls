@@ -28,9 +28,7 @@ public with sharing class CorporateHubPostInstall implements InstallHandler, Mod
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Corporate_Hub_Settings__c.Reminders_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {

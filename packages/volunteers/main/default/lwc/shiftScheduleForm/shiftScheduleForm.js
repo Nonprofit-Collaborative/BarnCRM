@@ -5,6 +5,7 @@ import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import LOCALE from '@salesforce/i18n/locale';
 import getFormSettings from '@salesforce/apex/ShiftScheduleController.getFormSettings';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { formatDate as formatDay } from 'c/barnFormat';
 import { shiftPreview } from './preview';
 
 import NEW_TITLE from '@salesforce/label/c.Volunteers_ScheduleForm_New';
@@ -170,11 +171,5 @@ export default class ShiftScheduleForm extends LightningElement {
 }
 
 function formatDate(isoDate) {
-  if (!isoDate) {
-    return '';
-  }
-  const [year, month, day] = isoDate.split('-').map(Number);
-  return new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(year, month - 1, day))
-  );
+  return formatDay(isoDate, LOCALE) || '';
 }

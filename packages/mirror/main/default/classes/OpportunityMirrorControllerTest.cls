@@ -16,7 +16,7 @@ private class OpportunityMirrorControllerTest {
 		// Built once for the class rather than in every test that runs as her.
 		TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Opportunity_Mirror' }
+			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 
@@ -275,7 +275,7 @@ private class OpportunityMirrorControllerTest {
 			}
 			User rosa = TestDataFactory.createUser(
 				'Rosa',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			System.runAs(new User(Id = UserInfo.getUserId())) {
 				update new User(Id = rosa.Id, ProfileId = minimum[0].Id);
@@ -302,7 +302,7 @@ private class OpportunityMirrorControllerTest {
 			choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 			User fundraiser = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Ana',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			Test.startTest();
 			System.runAs(fundraiser) {

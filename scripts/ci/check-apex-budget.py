@@ -114,7 +114,9 @@ CAPS = {
     # C-47b brand letters and the C-64 signal: 235,670 measured 2026-11-11, plus about 0.5%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 237,172 measured, plus
     # about 0.5%.
-    "volunteers": 238_400,
+    # Lowered at the cut-over cleanup (D-200, release 1.21: the retired Coordinator check gone,
+    # settings read through SettingsService): 230,596 measured 2026-11-12, plus about 2%.
+    "volunteers": 235_300,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
@@ -134,7 +136,9 @@ CAPS = {
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
     # checklists, documents, budget lines and renewals, plus about 2%.
-    "funders": 126_700,
+    # Lowered at the cut-over cleanup (D-200, release 1.21): 123,925 measured 2026-11-12, plus
+    # about 2%.
+    "funders": 126_500,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -196,7 +200,9 @@ CAPS = {
     # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
     # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
     # Quorum warning and immediate breach bell (CH-21, CH-22): 59,376 measured, plus about 2%.
-    "corporatehub": 60_600,
+    # Lowered at the cut-over cleanup (D-200, release 1.21): 59,285 measured 2026-11-12, plus
+    # about 2%.
+    "corporatehub": 60_500,
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
@@ -217,8 +223,9 @@ CAPS = {
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
     # about 1%. Release 1.20 review: the chart walk over plain inputs so it can be unit tested:
-    # 21,351 measured, plus about 2%.
-    "lwcbuilder": 21_800,
+    # 21,351 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21):
+    # 20,959 measured 2026-11-12, plus about 2%.
+    "lwcbuilder": 21_400,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
@@ -248,8 +255,9 @@ CAPS = {
     # revenue (PM-11: ProjectFinancials, ProjectRevenue and its nightly step, health with change
     # hours): +12,766. 97,102 measured, plus about 2%. Review fixes (#1237: invoice delete guard,
     # row cap, resources helper) and the release-gate fixes (revenue Chunk queueable, rate query):
-    # 99,230 measured, plus about 2%.
-    "projects": 101_200,
+    # 99,230 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21:
+    # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%.
+    "projects": 100_600,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
@@ -261,8 +269,10 @@ CAPS = {
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
     # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
     # 214,101 measured, plus about 0.5%. Release 1.20 review: per-field readable membership
-    # reads and the member-count filter: 215,838 measured, plus about 2%.
-    "mirror": 220_200,
+    # reads and the member-count filter: 215,838 measured, plus about 2%. Lowered at the
+    # cut-over cleanup (D-200, release 1.21: MirrorAccessSync and the five retired permission
+    # sets removed): 212,177 measured 2026-11-12, plus about 2%.
+    "mirror": 216_500,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

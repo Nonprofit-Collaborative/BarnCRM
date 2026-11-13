@@ -33,7 +33,7 @@ private class InboundGiftServiceTest {
 	}
 
 	private static User integrationUser() {
-		return TestDataFactory.createUser('Integration', new List<String>{ 'Inbound_Gift_API' });
+		return TestDataFactory.createUser('Integration', new List<String>{ 'Inbound_Gifts' });
 	}
 
 	/**

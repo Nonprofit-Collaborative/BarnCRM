@@ -1,7 +1,6 @@
 /**
- * BarnCRM's roles get the Volunteers sets (ADR-0127 decision 3): the Coordinator role gets
- * Volunteers Coordinator and the Team Member role Volunteers Staff, though both hold the same
- * Core set, the Read Only role Volunteers Read Only and BarnCRM Admin holders Volunteers Admin,
+ * BarnCRM's roles get the Volunteers sets (ADR-0127 decision 3): the Team Member role gets
+ * Volunteers Staff, the Read Only role Volunteers Read Only and BarnCRM Admin holders Volunteers Admin,
  * at install, at Turn on and with the hourly access check.
  */
 @IsTest(testFor='ApexClass:VolunteersAccessSync')
@@ -17,7 +16,6 @@ private class VolunteersAccessSyncTest {
 			'Outsider' => TestUsers.standardUser('Outsider').Id
 		};
 		Map<String, String> groupByName = new Map<String, String>{
-			'Coordinator' => 'Volunteer_Coordinator',
 			'Member' => 'Program_Staff',
 			'Reader' => 'Read_Only',
 			'Boss' => 'BarnCRM_Admin_Group'
@@ -64,7 +62,6 @@ private class VolunteersAccessSyncTest {
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isFalse(again, 'And a second pass finds nothing to give');
 			Map<String, String> expected = new Map<String, String>{
-				'Coordinator' => 'Volunteers_Coordinator',
 				'Member' => 'Volunteers_Staff',
 				'Reader' => 'Volunteers_Read_Only',
 				'Boss' => VolunteersAccessSync.ADMIN_SET
@@ -95,7 +92,7 @@ private class VolunteersAccessSyncTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				setsOf(ids.get('Coordinator')).contains('Volunteers_Coordinator'),
+				setsOf(ids.get('Member')).contains('Volunteers_Staff'),
 				'Someone given a role while it was off gets the set once it is on'
 			);
 		}
@@ -127,11 +124,6 @@ private class VolunteersAccessSyncTest {
 			Test.stopTest();
 
 			Assert.isTrue(roles.contains('Fundraising_Staff'), 'Fundraisers log hours');
-			Assert.isTrue(
-				VolunteersAccessSync.BY_ROLE.get('Volunteers_Coordinator')
-					.contains('Volunteer_Coordinator'),
-				'The retired Coordinator role still leads to Volunteers Coordinator this release'
-			);
 		}
 	}
 }

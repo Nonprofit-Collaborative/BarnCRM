@@ -180,7 +180,7 @@ private class RollupsHealthCheckExtensionTest {
 					'The fix is recorded once in the change history.'
 				);
 				Assert.areEqual(
-					'Health Check: ' + System.Label.Core_HealthCheck_RollupsMissingFix,
+					'Health Check: ' + System.Label.Rollups_HealthCheck_RollupsMissingFix,
 					logged[0].Setting_Name__c,
 					'Under the name of the button that made it.'
 				);

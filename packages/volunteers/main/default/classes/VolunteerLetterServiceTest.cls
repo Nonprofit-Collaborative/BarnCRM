@@ -193,8 +193,8 @@ private class VolunteerLetterServiceTest {
 		Assert.isTrue(body.startsWith('Barn &amp; &lt;Co&gt;|'), body);
 		Assert.isTrue(body.contains('&lt;b&gt;Ruiz&lt;/b&gt;'), 'The name is escaped: ' + body);
 		Assert.isTrue(body.contains('|{Hours}|2|'), 'A value is never merged twice: ' + body);
-		String hoursValue = VolunteerLetterService.money(2 * VolunteerSettings.DEFAULT_HOUR_VALUE);
-		String hourValue = VolunteerLetterService.money(VolunteerSettings.DEFAULT_HOUR_VALUE);
+		String hoursValue = VolunteerLetterService.money(2 * 34.79);
+		String hourValue = VolunteerLetterService.money(34.79);
 		Assert.isTrue(
 			body.contains('|2|' + hoursValue.escapeHtml4() + '|' + hourValue.escapeHtml4() + '|'),
 			'V-12: {HoursValue} is the hours times Hour Value, {HourValue} the rate: ' + body

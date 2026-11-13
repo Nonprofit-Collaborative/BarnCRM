@@ -1,4 +1,4 @@
-import { format, isoDate } from 'c/barnFormat';
+import { escapeHtml, format, formatDate, isoDate } from 'c/barnFormat';
 
 describe('c/barnFormat', () => {
   it('fills placeholders in order, more than once', () => {
@@ -28,5 +28,19 @@ describe('c/barnFormat', () => {
     expect(isoDate(new Date(2026, 0, 5))).toBe('2026-01-05');
     expect(isoDate(new Date(2026, 11, 31, 23, 59))).toBe('2026-12-31');
     expect(isoDate()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('formats a calendar day in the locale, keeping text that is not a date', () => {
+    expect(formatDate('2026-03-01', 'en-US')).toBe('Mar 1, 2026');
+    expect(formatDate(null, 'en-US')).toBeNull();
+    expect(formatDate('soon', 'en-US')).toBe('soon');
+  });
+
+  it('escapes every HTML special character and reads null as empty text', () => {
+    expect(escapeHtml(`<a href="x">Tom & Jo's</a>`)).toBe(
+      '&lt;a href=&quot;x&quot;&gt;Tom &amp; Jo&#39;s&lt;/a&gt;'
+    );
+    expect(escapeHtml(null)).toBe('');
+    expect(escapeHtml(0)).toBe('0');
   });
 });

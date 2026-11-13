@@ -60,23 +60,23 @@ private class RollupsWhereUsedExtensionTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				new List<String>{ System.Label.Core_RollupBuilder_WhereUsedSourceFilter },
+				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedSourceFilter },
 				filter
 			);
 			Assert.areEqual(
-				new List<String>{ System.Label.Core_RollupBuilder_WhereUsedPath },
+				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedPath },
 				path
 			);
 			Assert.areEqual(
-				new List<String>{ System.Label.Core_RollupBuilder_WhereUsedTargetField },
+				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedTargetField },
 				result
 			);
 			Assert.areEqual(
-				new List<String>{ System.Label.Core_RollupBuilder_WhereUsedCounts },
+				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedCounts },
 				counted
 			);
 			Assert.isTrue(
-				written.contains(System.Label.Core_RollupBuilder_WhereUsedWrites),
+				written.contains(System.Label.Rollups_RollupBuilder_WhereUsedWrites),
 				String.valueOf(written)
 			);
 			Assert.isTrue(none.isEmpty(), 'A field the rollup does not name finds nothing.');

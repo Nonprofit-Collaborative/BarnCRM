@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_RollupBuilder_ParentField</fullName>
+        <fullName>Rollups_RollupBuilder_ParentField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>{0} &gt; {1}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_SourceBy</fullName>
+        <fullName>Rollups_RollupBuilder_SourceBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>{0}, by {1}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_SourceByHousehold</fullName>
+        <fullName>Rollups_RollupBuilder_SourceByHousehold</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>{0}, by {1} (their household)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Operator</fullName>
+        <fullName>Rollups_RollupFilter_Operator</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>Comparison</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Logic</fullName>
+        <fullName>Rollups_RollupFilter_Logic</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Combine conditions</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Whose</fullName>
+        <fullName>Rollups_RollupFilter_Whose</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>{0} whose {1}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_And</fullName>
+        <fullName>Rollups_RollupFilter_And</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -57,7 +57,7 @@
         <value>and</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Or</fullName>
+        <fullName>Rollups_RollupFilter_Or</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -65,7 +65,7 @@
         <value>or</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Not</fullName>
+        <fullName>Rollups_RollupFilter_Not</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -73,7 +73,7 @@
         <value>not</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_OpEquals</fullName>
+        <fullName>Rollups_RollupFilter_OpEquals</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -81,7 +81,7 @@
         <value>is</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_OpNotEquals</fullName>
+        <fullName>Rollups_RollupFilter_OpNotEquals</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -89,7 +89,7 @@
         <value>is not</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_OpNotIn</fullName>
+        <fullName>Rollups_RollupFilter_OpNotIn</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -97,7 +97,7 @@
         <value>is none of</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Step1</fullName>
+        <fullName>Rollups_RollupBuilder_Step1</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -105,7 +105,7 @@
         <value>Where should the number appear?</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Step2</fullName>
+        <fullName>Rollups_RollupBuilder_Step2</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -113,7 +113,7 @@
         <value>What should be counted?</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Step3</fullName>
+        <fullName>Rollups_RollupBuilder_Step3</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -121,7 +121,7 @@
         <value>How should it be calculated?</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Step4</fullName>
+        <fullName>Rollups_RollupBuilder_Step4</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -129,7 +129,7 @@
         <value>Which records count?</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Step5</fullName>
+        <fullName>Rollups_RollupBuilder_Step5</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -137,7 +137,7 @@
         <value>Check and save</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TargetObject</fullName>
+        <fullName>Rollups_RollupBuilder_TargetObject</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -145,7 +145,7 @@
         <value>Record that shows the total</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TargetField</fullName>
+        <fullName>Rollups_RollupBuilder_TargetField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -153,7 +153,7 @@
         <value>Field that shows the total</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TargetSearch</fullName>
+        <fullName>Rollups_RollupBuilder_TargetSearch</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -161,7 +161,7 @@
         <value>Find another object</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_FilledBy</fullName>
+        <fullName>Rollups_RollupBuilder_FilledBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -169,7 +169,7 @@
         <value>{0} (filled by {1})</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Source</fullName>
+        <fullName>Rollups_RollupBuilder_Source</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -177,7 +177,7 @@
         <value>Records to count</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Aggregate</fullName>
+        <fullName>Rollups_RollupBuilder_Aggregate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -185,7 +185,7 @@
         <value>Calculation</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_SourceField</fullName>
+        <fullName>Rollups_RollupBuilder_SourceField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -193,7 +193,7 @@
         <value>Field to calculate</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_OrderBy</fullName>
+        <fullName>Rollups_RollupBuilder_OrderBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -201,7 +201,7 @@
         <value>Which record comes first, by</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_OrderDirection</fullName>
+        <fullName>Rollups_RollupBuilder_OrderDirection</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -209,7 +209,7 @@
         <value>Order</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_RowLimit</fullName>
+        <fullName>Rollups_RollupBuilder_RowLimit</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -217,7 +217,7 @@
         <value>Only the first N records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_CustomDelimiter</fullName>
+        <fullName>Rollups_RollupBuilder_CustomDelimiter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -225,7 +225,7 @@
         <value>Custom delimiter</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_IncludeDeleted</fullName>
+        <fullName>Rollups_RollupBuilder_IncludeDeleted</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -233,7 +233,7 @@
         <value>Include deleted and archived records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Delimiter</fullName>
+        <fullName>Rollups_RollupBuilder_Delimiter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -241,7 +241,7 @@
         <value>Separate the values with</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Window</fullName>
+        <fullName>Rollups_RollupBuilder_Window</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -249,7 +249,7 @@
         <value>Time window</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WindowAll</fullName>
+        <fullName>Rollups_RollupBuilder_WindowAll</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -257,7 +257,7 @@
         <value>All time</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WindowThisYear</fullName>
+        <fullName>Rollups_RollupBuilder_WindowThisYear</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -265,7 +265,7 @@
         <value>This fiscal year</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WindowLastYear</fullName>
+        <fullName>Rollups_RollupBuilder_WindowLastYear</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -273,7 +273,7 @@
         <value>Last fiscal year</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WindowTwoYears</fullName>
+        <fullName>Rollups_RollupBuilder_WindowTwoYears</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -281,7 +281,7 @@
         <value>Two fiscal years ago</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WindowDate</fullName>
+        <fullName>Rollups_RollupBuilder_WindowDate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -289,7 +289,7 @@
         <value>Date that decides the year</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TargetFilter</fullName>
+        <fullName>Rollups_RollupBuilder_TargetFilter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -297,7 +297,7 @@
         <value>Only for some records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Description</fullName>
+        <fullName>Rollups_RollupBuilder_Description</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -305,7 +305,7 @@
         <value>What this number means</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_BypassPermission</fullName>
+        <fullName>Rollups_RollupBuilder_BypassPermission</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -313,7 +313,7 @@
         <value>Skip for people with this custom permission (optional)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_SaveAndCalculate</fullName>
+        <fullName>Rollups_RollupBuilder_SaveAndCalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -321,7 +321,7 @@
         <value>Save and Calculate Now</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_New</fullName>
+        <fullName>Rollups_RollupBuilder_New</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -329,7 +329,7 @@
         <value>New Rollup</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_PreviewRecord</fullName>
+        <fullName>Rollups_RollupBuilder_PreviewRecord</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -337,7 +337,7 @@
         <value>See it on a record</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_PreviewEmpty</fullName>
+        <fullName>Rollups_RollupBuilder_PreviewEmpty</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -345,7 +345,7 @@
         <value>(empty)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_StartNow</fullName>
+        <fullName>Rollups_RollupBuilder_StartNow</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -353,7 +353,7 @@
         <value>Start Now</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_RunTonight</fullName>
+        <fullName>Rollups_RollupBuilder_RunTonight</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -361,7 +361,7 @@
         <value>Run Tonight</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_FailedTitle</fullName>
+        <fullName>Rollups_RollupBuilder_FailedTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -369,7 +369,7 @@
         <value>Could Not Be Saved</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ColumnError</fullName>
+        <fullName>Rollups_RollupBuilder_ColumnError</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -377,7 +377,7 @@
         <value>What Went Wrong</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ColumnTries</fullName>
+        <fullName>Rollups_RollupBuilder_ColumnTries</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -385,7 +385,7 @@
         <value>Tries</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Retry</fullName>
+        <fullName>Rollups_RollupBuilder_Retry</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -393,7 +393,7 @@
         <value>Retry</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_RetryAll</fullName>
+        <fullName>Rollups_RollupBuilder_RetryAll</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -401,7 +401,7 @@
         <value>Retry All</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Advanced</fullName>
+        <fullName>Rollups_RollupBuilder_Advanced</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -409,7 +409,7 @@
         <value>Advanced</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Export</fullName>
+        <fullName>Rollups_RollupBuilder_Export</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -417,7 +417,7 @@
         <value>Export to a File</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ExportSelect</fullName>
+        <fullName>Rollups_RollupBuilder_ExportSelect</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -425,7 +425,7 @@
         <value>Include in the export</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportFile</fullName>
+        <fullName>Rollups_RollupBuilder_ImportFile</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -433,7 +433,7 @@
         <value>Import From a File</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportApply</fullName>
+        <fullName>Rollups_RollupBuilder_ImportApply</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -441,7 +441,7 @@
         <value>Import These Rollups</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportWillCreate</fullName>
+        <fullName>Rollups_RollupBuilder_ImportWillCreate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -449,7 +449,7 @@
         <value>New: will be created</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportWillUpdate</fullName>
+        <fullName>Rollups_RollupBuilder_ImportWillUpdate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -457,7 +457,7 @@
         <value>Will replace the rollup here with the same Definition Key</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportRefused</fullName>
+        <fullName>Rollups_RollupBuilder_ImportRefused</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -465,7 +465,7 @@
         <value>Not saved</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantSwitchName</fullName>
+        <fullName>Rollups_RollupBuilder_InstantSwitchName</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

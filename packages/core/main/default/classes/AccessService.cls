@@ -25,23 +25,6 @@ public with sharing class AccessService {
 	};
 
 	/**
-	 * Retired roles, each with the role that replaces it (ADR-0194, simpler permission sets,
-	 * D1). The page no longer offers them, but a person may still hold one until the next
-	 * release removes it, so Access Explorer still names it as a role and `RetiredRoleMigration`
-	 * gives its holders the successor.
-	 */
-	public static final Map<String, String> RETIRED_ROLES = new Map<String, String>{
-		'Volunteer_Coordinator' => 'Program_Staff'
-	};
-
-	/** Every packaged role a person may hold: the offered ones and the retired ones. */
-	public static Set<String> knownRoles() {
-		Set<String> names = new Set<String>(ROLE_DEVELOPER_NAMES);
-		names.addAll(RETIRED_ROLES.keySet());
-		return names;
-	}
-
-	/**
 	 * Core's add-on permission sets, in the order the page shows them: the packaged Core
 	 * permission sets that no role includes (or, for Find and Export, that only BarnCRM Admin
 	 * includes). Each is resolved by API name in the package's own namespace at runtime,

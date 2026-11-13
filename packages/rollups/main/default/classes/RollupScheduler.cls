@@ -32,9 +32,8 @@ public with sharing class RollupScheduler implements Schedulable {
 
 	/** The hour the nightly run starts, 0 to 23, in the scheduling user's time zone. */
 	public static Integer nightlyHour() {
-		Object stored = SettingsService.getValue(RollupService.SETTINGS_OBJECT, HOUR_SETTING);
-		Integer hour = stored == null ? null : Decimal.valueOf(String.valueOf(stored)).intValue();
-		return hour == null || hour < 0 || hour > 23 ? DEFAULT_HOUR : hour;
+		Decimal hour = SettingsService.number(RollupService.SETTINGS_OBJECT, HOUR_SETTING);
+		return hour == null || hour < 0 || hour > 23 ? DEFAULT_HOUR : hour.intValue();
 	}
 
 	/** The nightly run's hour as the person reading it writes a time, for example 2:00 AM. */
@@ -68,10 +67,6 @@ public with sharing class RollupScheduler implements Schedulable {
 	 * (`RollupAccessSync`, D2).
 	 */
 	public void execute(SchedulableContext context) {
-		if (context != null && this.everyDefinition != true) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		if (RollupService.isTurnedOff()) {
 			ErrorLogger.logMessage(
 				BarnHelp.text('Rollups', 'Core_Rollups_ScheduledRunTurnedOff'),

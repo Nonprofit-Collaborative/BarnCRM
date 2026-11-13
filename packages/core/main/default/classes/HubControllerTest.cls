@@ -274,6 +274,10 @@ private class HubControllerTest {
 
 	/** Stands in for the Rollup Builder module's engine, which Core cannot name. */
 	private class StubEngine implements RollupEngineExtension {
+		public void afterModuleTurnedOn(String moduleName) {
+		}
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		}
 		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
 		}
 		public void forSurvivors(String targetObject, Set<Id> survivorIds) {

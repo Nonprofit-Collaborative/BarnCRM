@@ -140,7 +140,6 @@ Nothing is broken today.
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
 | Settings | With Mirror, in an org with Nonprofit Cloud fundraising: the same question for the Gift Transaction mirror. |
 | Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
-| Access | With Volunteers: whether anyone holding the Coordinator role is missing the Volunteers Coordinator permission set. |
 | Settings | With Programs: enrollments still open in a program that has ended. See [Programs, Health Check](programs.md#health-check). |
 | Your Org | With Programs: whether your org also has Nonprofit Cloud Program Management. Information only: choose one for each program. See [Programs, Health Check](programs.md#health-check). |
 
@@ -202,7 +201,6 @@ undone on their own page:
 | **Scheduled Jobs Belong to a Deactivated Person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
 | **Setup never ran for** a package (Core or a module) | Runs the setup steps the package's install runs, for every package the finding names, with you standing in for the installer, then records that they ran: for Core, its automation switches, import templates, coexistence mode, hourly tab access check and your BarnCRM Admin access; for a module, its own switches, templates, shipped totals and records, and its administrator access. The panel says **Done. Setup steps ran for:** and the names. This is a recovery step for source copied into an org by hand: install BarnCRM as packages, which run these steps themselves. The same button is on the module's row on the Modules page. | Each step only adds what is missing, so there is nothing to undo; switch off anything you do not want on its own page. |
 | **Coexistence Mode Is Not Confirmed**, **Household Membership Does Not Fit Person Accounts**, **No New Person Is Getting a Household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
-| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (with Volunteers) | Gives each person the finding names the Volunteers set their role calls for, in the background, within about a minute. | Remove the permission set assignment in Setup. The hourly access check gives it back while the person holds the role, so take the role away on the Access page instead. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
 should be a BarnCRM Admin when nobody is, whether paused automation should resume, what

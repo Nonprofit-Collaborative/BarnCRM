@@ -93,7 +93,7 @@ public with sharing class RollupTemplates {
 			Map<String, String> filledBy = filledBy();
 			Template starter = new Template();
 			starter.key = NONPROFIT_STARTER;
-			starter.name = Label.Core_RollupEase_TplStarter;
+			starter.name = Label.Rollups_RollupEase_TplStarter;
 			starter.description = BarnHelp.text('Rollups', 'Core_RollupEase_TplStarterHelp');
 			starter.items = new List<Item>();
 			for (Spec spec : nonprofitStarter()) {
@@ -243,11 +243,17 @@ public with sharing class RollupTemplates {
 	private static List<Spec> nonprofitStarter() {
 		List<Spec> specs = new List<Spec>();
 		specs.add(
-			giftSpec('averageGift', Label.Core_RollupEase_TplAverageGift, 'CURRENCY', PERSON, 'AVG')
+			giftSpec(
+				'averageGift',
+				Label.Rollups_RollupEase_TplAverageGift,
+				'CURRENCY',
+				PERSON,
+				'AVG'
+			)
 		);
 		Spec firstAmount = giftSpec(
 			'firstGiftAmount',
-			Label.Core_RollupEase_TplFirstGiftAmount,
+			Label.Rollups_RollupEase_TplFirstGiftAmount,
 			'CURRENCY',
 			PERSON,
 			'FIRST'
@@ -256,7 +262,7 @@ public with sharing class RollupTemplates {
 		specs.add(firstAmount);
 		Spec lastAmount = giftSpec(
 			'lastGiftAmount',
-			Label.Core_RollupEase_TplLastGiftAmount,
+			Label.Rollups_RollupEase_TplLastGiftAmount,
 			'CURRENCY',
 			PERSON,
 			'LAST'
@@ -266,7 +272,7 @@ public with sharing class RollupTemplates {
 		specs.add(
 			giftSpec(
 				'smallestGift',
-				Label.Core_RollupEase_TplSmallestGift,
+				Label.Rollups_RollupEase_TplSmallestGift,
 				'CURRENCY',
 				PERSON,
 				'MIN'
@@ -274,7 +280,7 @@ public with sharing class RollupTemplates {
 		);
 		Spec thisYear = giftSpec(
 			'giftsThisYear',
-			Label.Core_RollupEase_TplGiftsThisYear,
+			Label.Rollups_RollupEase_TplGiftsThisYear,
 			'NUMBER',
 			PERSON,
 			'COUNT'
@@ -287,7 +293,7 @@ public with sharing class RollupTemplates {
 		specs.add(
 			giftSpec(
 				'appealAverageGift',
-				Label.Core_RollupEase_TplAppealAverageGift,
+				Label.Rollups_RollupEase_TplAppealAverageGift,
 				'CURRENCY',
 				APPEAL,
 				'AVG'
@@ -295,7 +301,7 @@ public with sharing class RollupTemplates {
 		);
 		Spec donors = giftSpec(
 			'appealDonors',
-			Label.Core_RollupEase_TplAppealDonors,
+			Label.Rollups_RollupEase_TplAppealDonors,
 			'NUMBER',
 			APPEAL,
 			'COUNT_DISTINCT'

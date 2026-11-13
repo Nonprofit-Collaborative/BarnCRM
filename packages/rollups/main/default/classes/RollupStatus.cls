@@ -54,7 +54,7 @@ public with sharing class RollupStatus {
 		Decimal failed
 	) {
 		if (definition.Active__c != true) {
-			return new State(LEVEL_OFF, Label.Core_RollupEase_StatusOff);
+			return new State(LEVEL_OFF, Label.Rollups_RollupEase_StatusOff);
 		}
 		if (failed != null && failed > 0) {
 			return new State(
@@ -75,12 +75,12 @@ public with sharing class RollupStatus {
 			return new State(
 				LEVEL_WAITING,
 				String.format(
-					Label.Core_RollupEase_StatusWaiting,
+					Label.Rollups_RollupEase_StatusWaiting,
 					new List<String>{ waiting.format() }
 				)
 			);
 		}
-		return new State(LEVEL_CLEAR, Label.Core_RollupEase_StatusClear);
+		return new State(LEVEL_CLEAR, Label.Rollups_RollupEase_StatusClear);
 	}
 
 	/** Adds each queue entry's record count to every definition it is for. */

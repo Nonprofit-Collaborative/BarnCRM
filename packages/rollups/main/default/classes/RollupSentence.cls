@@ -9,18 +9,18 @@ public with sharing class RollupSentence {
 
 	/** The calculation's words by aggregate; {0} is the counted field's label. */
 	private static final Map<String, String> CALCULATION = new Map<String, String>{
-		'SUM' => Label.Core_RollupEase_CalcSum,
-		'COUNT' => Label.Core_RollupEase_CalcCount,
-		'MIN' => Label.Core_RollupEase_CalcMin,
-		'MAX' => Label.Core_RollupEase_CalcMax,
-		'AVG' => Label.Core_RollupEase_CalcAvg,
-		'FIRST' => Label.Core_RollupEase_CalcFirst,
-		'LAST' => Label.Core_RollupEase_CalcLast,
-		'COUNT_DISTINCT' => Label.Core_RollupEase_CalcCountDistinct,
-		'ANY' => Label.Core_RollupEase_CalcAny,
-		'NONE' => Label.Core_RollupEase_CalcNone,
-		'TEXT_LIST' => Label.Core_RollupEase_CalcTextList,
-		'TEXT_LIST_DISTINCT' => Label.Core_RollupEase_CalcTextListDistinct
+		'SUM' => Label.Rollups_RollupEase_CalcSum,
+		'COUNT' => Label.Rollups_RollupEase_CalcCount,
+		'MIN' => Label.Rollups_RollupEase_CalcMin,
+		'MAX' => Label.Rollups_RollupEase_CalcMax,
+		'AVG' => Label.Rollups_RollupEase_CalcAvg,
+		'FIRST' => Label.Rollups_RollupEase_CalcFirst,
+		'LAST' => Label.Rollups_RollupEase_CalcLast,
+		'COUNT_DISTINCT' => Label.Rollups_RollupEase_CalcCountDistinct,
+		'ANY' => Label.Rollups_RollupEase_CalcAny,
+		'NONE' => Label.Rollups_RollupEase_CalcNone,
+		'TEXT_LIST' => Label.Rollups_RollupEase_CalcTextList,
+		'TEXT_LIST_DISTINCT' => Label.Rollups_RollupEase_CalcTextListDistinct
 	};
 
 	/** The whole sentence, with what limits the records counted after it. */
@@ -91,7 +91,7 @@ public with sharing class RollupSentence {
 		} catch (RollupPath.RollupPathException unreadable) {
 			return path;
 		}
-		return String.join(branches, ' ' + Label.Core_RollupFilter_Or + ' ');
+		return String.join(branches, ' ' + Label.Rollups_RollupFilter_Or + ' ');
 	}
 
 	private static String branchLabel(Schema.SObjectType sourceType, List<String> segments) {
@@ -101,8 +101,8 @@ public with sharing class RollupSentence {
 			if (RollupPath.isToken(segment)) {
 				text = String.format(
 					segment == RollupPath.TOKEN_HOUSEHOLD
-						? Label.Core_RollupEase_LinkHousehold
-						: Label.Core_RollupEase_LinkHouseholdMembers,
+						? Label.Rollups_RollupEase_LinkHousehold
+						: Label.Rollups_RollupEase_LinkHouseholdMembers,
 					new List<String>{ text }
 				);
 				reached = null;

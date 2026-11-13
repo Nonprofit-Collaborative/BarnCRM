@@ -41,13 +41,7 @@ public with sharing class MirrorPostInstall implements InstallHandler, ModuleSet
 	 * @param installerId unused: the switches belong to the org, not to a person
 	 */
 	public void runSetup(Id installerId) {
-		// The mirrors' runs scheduled on their own before the nightly run become steps (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-		// Holders of the retired Mirror sets get their successors, queued (ADR-0194, D4); each
-		// inactive holder is named in the Error Log instead. Neither throws.
-		new MirrorAccessSync().requestSync();
-		MirrorAccessSync.logInactiveHolders();
 		ModuleSetups.markRan(MODULE_KEY);
 	}
 }

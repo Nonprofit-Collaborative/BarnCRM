@@ -19,10 +19,6 @@ public with sharing class IndicatorResultsScheduler implements Schedulable {
 	private static final Integer MAX_INDICATORS = 10000;
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		refreshAll();
 	}
 

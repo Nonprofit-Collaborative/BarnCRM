@@ -11,6 +11,7 @@ import startCommit from '@salesforce/apex/ImportController.startCommit';
 import previewUndo from '@salesforce/apex/ImportController.previewUndo';
 import startUndo from '@salesforce/apex/ImportController.startUndo';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import { bodyMessage as messageOf } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** Every word the page shows, from the Core help catalog (read once it has loaded). */
@@ -64,10 +65,6 @@ const TONES = {
 
 /** The rejected rows the results table shows; the rest are on the data job's rows. */
 const RESULT_ROWS = 50;
-
-function messageOf(error, fallback) {
-  return error && error.body && error.body.message ? error.body.message : fallback;
-}
 
 function count(label, value, id) {
   return { key: id, label, value: value === null || value === undefined ? 0 : value };

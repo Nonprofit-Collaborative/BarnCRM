@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Rollups_PageTitle</fullName>
+        <fullName>Rollups_Rollups_PageTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>Rollups</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ColumnRollup</fullName>
+        <fullName>Rollups_Rollups_ColumnRollup</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>Rollup</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ColumnCounts</fullName>
+        <fullName>Rollups_Rollups_ColumnCounts</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>What It Counts</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_CountsSeparatedBy</fullName>
+        <fullName>Rollups_Rollups_CountsSeparatedBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>separated by {0}</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ColumnMode</fullName>
+        <fullName>Rollups_Rollups_ColumnMode</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Mode</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ColumnLastCalculated</fullName>
+        <fullName>Rollups_Rollups_ColumnLastCalculated</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>Last Calculated</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_RecalculateAll</fullName>
+        <fullName>Rollups_Rollups_RecalculateAll</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -57,7 +57,7 @@
         <value>Recalculate All</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_ScheduleNightly</fullName>
+        <fullName>Rollups_Rollups_ScheduleNightly</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -65,7 +65,7 @@
         <value>Schedule Nightly Recalculation</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_Recalculate</fullName>
+        <fullName>Rollups_Rollups_Recalculate</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -73,7 +73,7 @@
         <value>Recalculate</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_StopSchedule</fullName>
+        <fullName>Rollups_Rollups_StopSchedule</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -81,7 +81,7 @@
         <value>Stop the Nightly Recalculation</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_RestoreDefaults</fullName>
+        <fullName>Rollups_Rollups_RestoreDefaults</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -89,7 +89,7 @@
         <value>Restore Shipped Rollups</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_NeverCalculated</fullName>
+        <fullName>Rollups_Rollups_NeverCalculated</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

@@ -10,7 +10,6 @@ public with sharing class RecurringHealthController {
 	private static final String CONTEXT = 'Recurring donor health page';
 	private static final String SETTINGS_OBJECT = 'Giving_Settings__c';
 	private static final String KEY_EXPIRY_DAYS = 'Recurring_Card_Expiry_Days__c';
-	private static final Integer DEFAULT_EXPIRY_DAYS = 60;
 	private static final Integer MAX_ROWS = 200;
 	/** Unmatched events are counted up to this many; the page shows it as "10,000+". */
 	private static final Integer UNMATCHED_CAP = 10000;
@@ -265,13 +264,6 @@ public with sharing class RecurringHealthController {
 	/** The Recurring Card Expiry Days setting, 0 to 365; 60 when unset or unreadable. */
 	@TestVisible
 	private static Integer expiryDays() {
-		Object value = SettingsService.getValue(SETTINGS_OBJECT, KEY_EXPIRY_DAYS);
-		Integer days;
-		try {
-			days = value == null ? null : Decimal.valueOf(String.valueOf(value).trim()).intValue();
-		} catch (TypeException unreadable) {
-			days = null;
-		}
-		return days == null || days < 0 || days > 365 ? DEFAULT_EXPIRY_DAYS : days;
+		return SettingsService.number(SETTINGS_OBJECT, KEY_EXPIRY_DAYS).intValue();
 	}
 }
