@@ -12,7 +12,6 @@ DonorSegmentService # not yet
 DonorSegmentTemplates # not yet
 EligibilityRules # not yet
 EngagementScoreController # not yet
-ErrorLogController # not yet
 EventAgendaController # not yet
 EventApplicationsController # not yet
 EventBadgesController # not yet
