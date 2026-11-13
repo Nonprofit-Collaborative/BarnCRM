@@ -214,9 +214,14 @@ private class HubControllerTest {
 
 	@IsTest
 	static void aBlankOrUncreatableEntryIsNoLink() {
-		Assert.isNull(HubController.quickLink(''), 'Blank');
-		Assert.isNull(HubController.quickLink('Only_A_Target'), 'No label');
-		Assert.isNull(HubController.quickLink('No_Such_Object__c.new:New'), 'No such object');
+		System.runAs(TestUsers.admin()) {
+			Assert.isNull(HubController.quickLink(''), 'Blank');
+			Assert.isNull(HubController.quickLink('Only_A_Target'), 'No label');
+			Assert.isNull(
+				HubController.quickLink('No_Such_Object__c.new:New'),
+				'No such object'
+			);
+		}
 	}
 
 	@IsTest
