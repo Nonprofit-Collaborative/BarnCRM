@@ -4,7 +4,7 @@
     Copies people's email, phone and addresses to Salesforce Contact Points: status, preview
     count and Run Backfill.
   </description>
-  <flexiPage>Contact_Point_Sync</flexiPage>
   <label>Contact Point Sync</label>
+  <lwcComponent>contactPointSync</lwcComponent>
   <motif>Custom59: Can</motif>
 </CustomTab>

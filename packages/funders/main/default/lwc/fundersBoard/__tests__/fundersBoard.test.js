@@ -66,7 +66,7 @@ describe('c-funders-board', () => {
   it('opens on the shell with the year as tiles', async () => {
     const element = await render(BOARD);
     const shell = one(element, '[data-id="shell"]');
-    expect(shell.titleHidden).toBe(true);
+    expect(shell.titleHidden).toBe(false);
     expect(shell.iconName).toBe('custom:custom100');
     expect(one(element, '[data-id="revenue"]').value).toBe(100000);
     expect(one(element, '[data-id="revenue"]').formatStyle).toBe('currency');

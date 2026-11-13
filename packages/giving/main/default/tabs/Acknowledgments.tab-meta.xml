@@ -3,7 +3,7 @@
   <description>
     The Thank-Yous page: what is waiting to be thanked, the buttons that send it, and the rules.
   </description>
-  <flexiPage>Acknowledgments</flexiPage>
   <label>Thank-Yous</label>
+  <lwcComponent>acknowledgments</lwcComponent>
   <motif>Custom71: Headset</motif>
 </CustomTab>

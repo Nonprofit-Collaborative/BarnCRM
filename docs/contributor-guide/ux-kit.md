@@ -59,7 +59,7 @@ Help and guidance prose (an intro, a description, an explanation, an empty-state
 
 Notes:
 
-- On a Lightning App Page the platform already prints the page name above the component. Pass `title-hidden` to the shell so the name is not printed twice; the `h1` stays for screen readers.
+- A page with one component is a Lightning component tab (ADR-0020 amendment A1), which prints no header, so the shell shows its title. Pass `title-hidden` only on a Lightning App Page, where the platform already prints the page name above the component; the `h1` stays for screen readers.
 - The About This Tool region opens on a person's first visit and stays closed after that. With `help-storage-key` the person's own choice is remembered in their browser only; it is a convenience, not a setting.
 - A disabled tile stays focusable so a screen reader reads why it is disabled.
 - Every link that opens a new tab goes through `c-barn-help` or copies its pattern: `rel="noopener noreferrer"`, the new-window icon, and "(opens in a new tab)" for screen readers. A link tile does this with `new-tab` (a grid tile with `newTab: true`), as Data Manager's Salesforce's Own Tools do.
