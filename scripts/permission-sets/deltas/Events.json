@@ -1,7 +1,7 @@
 {
   "Admin": {
     "label": "Events Admin",
-    "description": "Everything in Event Management: creates, changes and deletes events and everything on them.",
+    "description": ["Everything in Event Management: creates, changes and deletes events and everything on them."],
     "set": {
       "fieldPermissions": {
         "Agenda_Item__c.Contact__c": {"editable": "true"},

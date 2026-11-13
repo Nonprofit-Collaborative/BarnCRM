@@ -80,7 +80,7 @@ def parse(path):
         elif tag in HEADER:
             # A wrapped description keeps its lines, so regenerating never rewraps it.
             lines = [line.strip() for line in body.split("\n") if line.strip()]
-            header[tag] = unescape(lines[0]) if len(lines) == 1 else [unescape(l) for l in lines]
+            header[tag] = [unescape(l) for l in lines] if "\n" in body else unescape(body)
         else:
             raise SystemExit(f"{path}: unexpected element {tag}")
     return header, sections

@@ -19,5 +19,9 @@
       }
     }
   },
-  "Read_Only": {"label": "Scholarships Read Only", "description": "Read every Scholarships and Outbound Grants record. Given to the Read Only role.", "readOnly": true}
+  "Read_Only": {
+    "label": "Scholarships Read Only",
+    "description": ["Read every Scholarships and Outbound Grants record. Given to the Read Only role."],
+    "readOnly": true
+  }
 }

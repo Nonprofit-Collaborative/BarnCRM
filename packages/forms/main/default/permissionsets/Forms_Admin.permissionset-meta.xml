@@ -2,7 +2,9 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
   <label>Forms Admin</label>
-  <description>Builds, publishes and deletes forms, fills them in and works their submissions.</description>
+  <description>
+    Builds, publishes and deletes forms, fills them in and works their submissions.
+  </description>
   <classAccesses>
     <apexClass>FormBuilderController</apexClass>
     <enabled>true</enabled>

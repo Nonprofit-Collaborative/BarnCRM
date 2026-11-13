@@ -34,5 +34,9 @@
       }
     }
   },
-  "Read_Only": {"label": "Memberships Read Only", "description": "Reads memberships, levels, benefits and certifications. Given to Read Only.", "readOnly": true}
+  "Read_Only": {
+    "label": "Memberships Read Only",
+    "description": ["Reads memberships, levels, benefits and certifications. Given to Read Only."],
+    "readOnly": true
+  }
 }

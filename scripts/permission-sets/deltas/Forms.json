@@ -1,7 +1,7 @@
 {
   "Admin": {
     "label": "Forms Admin",
-    "description": "Builds, publishes and deletes forms, fills them in and works their submissions.",
+    "description": ["Builds, publishes and deletes forms, fills them in and works their submissions."],
     "add": {
       "classAccesses": {
         "FormBuilderController": {"enabled": "true"}
