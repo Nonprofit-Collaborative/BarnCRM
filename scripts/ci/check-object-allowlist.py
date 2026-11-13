@@ -141,6 +141,7 @@ ALLOWED = {
     # Setup objects. These are how a package inspects or assigns its own access.
     "PermissionSet": "the packaged permission sets, plan Section 4.8.",
     "PermissionSetAssignment": "assigning them, and asserting the assignment in tests.",
+    "PermissionSetTabSetting": "the tabs the running user's permission sets show (Hub quick links).",
     "PermissionSetGroup": "the packaged groups, C-06.",
     "PermissionSetGroupComponent": "what a packaged group contains, asserted in tests.",
     "UserPermissionAccess": "the running user's effective Assign Permission Sets, checked before the Access page gives an add-on. Every edition.",

@@ -206,8 +206,13 @@ public with sharing class HubController {
 	private static Set<String> visibleTabs;
 
 	/**
-	 * Whether the running user can see the tab: it is in one of the apps Salesforce describes
-	 * for them (Schema.describeTabs), under its name as written or with this org's prefix.
+	 * Whether the running user can see the tab: a permission set they hold (their profile's
+	 * included) makes it Default On or Default Off, under its name as written or with this org's
+	 * prefix. Not Schema.describeTabs: it describes Classic apps only, so it leaves out every
+	 * custom tab of a Lightning app (barn-platform, 2026-11-13).
+	 *
+	 * System mode: reads the running user's own tab settings, which a person without View Setup
+	 * cannot query.
 	 */
 	private static Boolean canSeeTab(String tab) {
 		if (visibleTabs == null) {
@@ -217,12 +222,19 @@ public with sharing class HubController {
 					visibleTabs.add(name.toLowerCase());
 				}
 			} else {
-				for (Schema.DescribeTabSetResult app : Schema.describeTabs()) {
-					for (Schema.DescribeTabResult described : app.getTabs()) {
-						if (described.getName() != null) {
-							visibleTabs.add(described.getName().toLowerCase());
-						}
-					}
+				Id me = UserInfo.getUserId();
+				for (PermissionSetTabSetting setting : [
+					SELECT Name
+					FROM PermissionSetTabSetting
+					WHERE
+						ParentId IN (
+							SELECT PermissionSetId
+							FROM PermissionSetAssignment
+							WHERE AssigneeId = :me
+						)
+					WITH SYSTEM_MODE
+				]) {
+					visibleTabs.add(setting.Name.toLowerCase());
 				}
 			}
 		}
