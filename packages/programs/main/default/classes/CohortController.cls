@@ -10,6 +10,12 @@
  */
 public with sharing class CohortController {
 	private static final String CONTEXT = 'Cohort members panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Programs',
+			'Programs_Fail_Cohort'
+		)
+		.showingDml();
 	/** The most people listed, and the most added in one action. */
 	public static final Integer MAX_SHOWN = 200;
 	/** As ProgramRosterController: offered to the record picker only in a person account org. */
@@ -72,7 +78,7 @@ public with sharing class CohortController {
 		try {
 			return membersOf(checkedCohort(cohortId));
 		} catch (Exception failure) {
-			throw report(failure, cohortId);
+			throw ERRORS.wrap(failure, CONTEXT, cohortId);
 		}
 	}
 
@@ -112,7 +118,7 @@ public with sharing class CohortController {
 			}
 			return result;
 		} catch (Exception failure) {
-			throw report(failure, cohortId);
+			throw ERRORS.wrap(failure, CONTEXT, cohortId);
 		}
 	}
 
@@ -136,7 +142,7 @@ public with sharing class CohortController {
 			CohortService.removeMember(cohort.Id, enrollmentId);
 			return membersOf(cohort);
 		} catch (Exception failure) {
-			throw report(failure, cohortId);
+			throw ERRORS.wrap(failure, CONTEXT, cohortId);
 		}
 	}
 
@@ -186,17 +192,5 @@ public with sharing class CohortController {
 		member.startDate = enrollment.Start_Date__c;
 		member.personName = CohortService.personNameOf(enrollment);
 		return member;
-	}
-
-	/** A refusal is passed on in its own words; anything else is logged first. */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(BarnHelp.text('Programs', 'Programs_Fail_Cohort'));
 	}
 }

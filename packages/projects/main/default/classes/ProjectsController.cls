@@ -7,6 +7,12 @@
  */
 public with sharing class ProjectsController {
 	private static final String CONTEXT = 'ProjectsController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Projects',
+			'Projects_Error_Generic'
+		)
+		.showingDml();
 
 	public class Board {
 		@AuraEnabled
@@ -111,7 +117,7 @@ public with sharing class ProjectsController {
 			board.canCreateExpense = Schema.SObjectType.Project_Expense__c.isCreateable();
 			return board;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -125,7 +131,7 @@ public with sharing class ProjectsController {
 				Completed_Date__c = status == Projects.DONE ? Date.today() : null
 			);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -152,7 +158,7 @@ public with sharing class ProjectsController {
 			insert as user task;
 			return task.Id;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -182,7 +188,7 @@ public with sharing class ProjectsController {
 			insert as user entry;
 			return entry.Id;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -191,7 +197,7 @@ public with sharing class ProjectsController {
 		try {
 			ProjectHealth.refresh(projectId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -200,7 +206,7 @@ public with sharing class ProjectsController {
 		try {
 			return ProjectReporting.draftStatusUpdate(projectId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -240,7 +246,7 @@ public with sharing class ProjectsController {
 			);
 			return home;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -286,7 +292,7 @@ public with sharing class ProjectsController {
 			}
 			return rows;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -301,7 +307,7 @@ public with sharing class ProjectsController {
 		try {
 			return ProjectTemplates.create(templateKey, name, startDate, accountId, contactId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -310,7 +316,7 @@ public with sharing class ProjectsController {
 		try {
 			return ProjectReporting.utilization(fromDate, toDate);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -320,7 +326,7 @@ public with sharing class ProjectsController {
 		try {
 			return ProjectRates.applyRates();
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -333,14 +339,7 @@ public with sharing class ProjectsController {
 		try {
 			return ProjectReporting.exportBillable(fromDate, toDate, includeExported);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
-	}
-
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Projects.ProjectsException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(e, BarnHelp.text('Projects', 'Projects_Error_Generic'));
 	}
 }

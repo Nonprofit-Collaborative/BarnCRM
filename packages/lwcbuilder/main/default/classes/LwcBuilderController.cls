@@ -10,6 +10,12 @@
  */
 public with sharing class LwcBuilderController {
 	private static final String CONTEXT = 'LwcBuilderController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'LwcBuilder',
+			'LwcBuilder_Error_Generic'
+		)
+		.showingDml();
 	@TestVisible
 	private static final String SETTINGS_OBJECT = 'LWC_Builder_Settings__c';
 	@TestVisible
@@ -54,7 +60,7 @@ public with sharing class LwcBuilderController {
 				'canEdit' => Schema.SObjectType.Built_Component__c.isUpdateable()
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -128,7 +134,7 @@ public with sharing class LwcBuilderController {
 			}
 			return shape(row);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -166,7 +172,7 @@ public with sharing class LwcBuilderController {
 			}
 			return result;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -277,7 +283,7 @@ public with sharing class LwcBuilderController {
 				'rows' => Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -363,7 +369,7 @@ public with sharing class LwcBuilderController {
 				'groups' => rows
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -592,16 +598,5 @@ public with sharing class LwcBuilderController {
 
 	private static LwcBuilderException refusal(String message) {
 		return new LwcBuilderException(message);
-	}
-
-	/** A refusal or a save's own message as it is; anything else logged, then one message. */
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof LwcBuilderException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(
-			e,
-			BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Generic')
-		);
 	}
 }
