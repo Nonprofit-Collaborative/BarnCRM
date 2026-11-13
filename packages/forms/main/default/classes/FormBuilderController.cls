@@ -211,7 +211,7 @@ public with sharing class FormBuilderController {
 		result.isPublic = form.Public__c == true && form.Status__c == 'Published';
 		if (result.isPublic) {
 			for (String base : FormsSites.activeSiteUrls()) {
-				result.publicLinks.add(base + '/FormsPublic?form=' + form.Id);
+				result.publicLinks.add(base + FormsSites.pagePath() + '?form=' + form.Id);
 			}
 		}
 		return result;

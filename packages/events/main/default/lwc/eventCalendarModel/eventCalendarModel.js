@@ -6,7 +6,7 @@
  * day of the week, 0 for Sunday to 6 for Saturday. A moment is an ISO date and time as the
  * server reports it, and the day it falls on is worked out in the person's time zone.
  *
- * An entry is what the calendar draws: `{ key, kind: 'event' | 'session', recordId, objectApiName,
+ * An entry is what the calendar draws: `{ key, kind: 'event' | 'session', recordId,
  * name, eventId, eventName, status, filterStatus, filterFormat, startsAt, endsAt, startDay,
  * endDay, place, typeLabel, onlineLink, description }`.
  */
@@ -126,7 +126,6 @@ export function entriesFrom(calendar, timeZone) {
       key: `event-${row.id}`,
       kind: 'event',
       recordId: row.id,
-      objectApiName: 'Event__c',
       name: row.name || '',
       eventId: row.id,
       eventName: row.name || '',
@@ -155,7 +154,6 @@ export function entriesFrom(calendar, timeZone) {
       key: `session-${row.id}`,
       kind: 'session',
       recordId: row.id,
-      objectApiName: 'Event_Session__c',
       name: row.name || '',
       eventId: row.eventId,
       eventName: row.eventName || '',

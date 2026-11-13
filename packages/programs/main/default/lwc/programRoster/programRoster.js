@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import ENROLLMENT from '@salesforce/schema/Enrollment__c';
 import getRoster from '@salesforce/apex/ProgramRosterController.getRoster';
 import enroll from '@salesforce/apex/ProgramRosterController.enroll';
 import setStage from '@salesforce/apex/ProgramRosterController.setStage';
@@ -229,7 +230,7 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.recordId,
-        objectApiName: 'Enrollment__c',
+        objectApiName: ENROLLMENT.objectApiName,
         actionName: 'view'
       }
     });

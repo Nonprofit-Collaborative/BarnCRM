@@ -102,9 +102,9 @@ export default class AwardPanel extends LightningElement {
   get requirements() {
     return (this.panel?.requirements || []).map((r) => ({
       ...r,
-      href: `/lightning/r/${r.Id}/view`,
-      blocks: r.Disbursement__r ? r.Disbursement__r.Name : '',
-      isOpen: r.Status__c === 'Open' || r.Status__c === 'Submitted'
+      href: `/lightning/r/${r.id}/view`,
+      blocks: r.blocks || '',
+      isOpen: r.status === 'Open' || r.status === 'Submitted'
     }));
   }
 

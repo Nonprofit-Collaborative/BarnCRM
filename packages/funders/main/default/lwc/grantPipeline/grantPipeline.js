@@ -1,5 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import GRANT from '@salesforce/schema/Grant__c';
+import REQUIREMENT from '@salesforce/schema/Grant_Requirement__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
 import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
@@ -180,7 +182,7 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
         return {
           ...row,
           ...this.urgency(row.daysLeft),
-          objectApiName: isRequirement ? 'Grant_Requirement__c' : 'Grant__c',
+          objectApiName: (isRequirement ? REQUIREMENT : GRANT).objectApiName,
           whatText: isRequirement
             ? `${row.requirementType || ''}: ${row.grantName || ''}`
             : KIND_APPLICATION_LABEL,
@@ -336,7 +338,7 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   handleNewGrant() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Grant__c', actionName: 'new' }
+      attributes: { objectApiName: GRANT.objectApiName, actionName: 'new' }
     });
   }
 

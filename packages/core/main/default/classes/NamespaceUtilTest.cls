@@ -67,6 +67,24 @@ private class NamespaceUtilTest {
 		System.assertEquals(null, NamespaceUtil.stateKey(null), 'Nothing keys to nothing.');
 	}
 
+	@IsTest
+	static void tabNamesComeBackQualifiedByTheNameAsWritten() {
+		NamespaceUtil.cachedPrefix = 'example__';
+
+		Map<String, String> names = NamespaceUtil.tabApiNames(new List<String>{ 'Find', 'Import' });
+
+		Assert.areEqual(
+			'example__Find',
+			names.get('Find'),
+			'Lightning opens the tab by its qualified name.'
+		);
+		Assert.areEqual('example__Import', names.get('Import'), 'Every tab asked for is answered.');
+		Assert.isTrue(
+			NamespaceUtil.tabApiNames(null).isEmpty(),
+			'Nothing asked for, nothing answered.'
+		);
+	}
+
 	/** This package's prefix and another package's, kept apart from the names they go on. */
 	private static final String OWN = 'barn__';
 	private static final String OTHER = 'npsp__';

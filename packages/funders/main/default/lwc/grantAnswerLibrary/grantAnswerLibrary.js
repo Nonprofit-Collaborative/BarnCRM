@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import ANSWER from '@salesforce/schema/Grant_Answer__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getLibrary from '@salesforce/apex/GrantAnswerController.getLibrary';
 import markUsed from '@salesforce/apex/GrantAnswerController.markUsed';
@@ -149,7 +150,7 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.id,
-        objectApiName: 'Grant_Answer__c',
+        objectApiName: ANSWER.objectApiName,
         actionName: 'view'
       }
     });
@@ -158,7 +159,7 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
   handleNew() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Grant_Answer__c', actionName: 'new' }
+      attributes: { objectApiName: ANSWER.objectApiName, actionName: 'new' }
     });
   }
 

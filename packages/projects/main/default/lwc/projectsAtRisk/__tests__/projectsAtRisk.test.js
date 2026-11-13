@@ -29,11 +29,11 @@ describe('c-projects-at-risk', () => {
   it('lists projects with their reasons and reloads for Only Mine', async () => {
     getAtRisk.mockResolvedValue([
       {
-        Id: 'a01000000000001AAA',
-        Name: 'Rollout',
-        Health__c: 'Off Track',
-        Health_Reasons__c: 'Late\nOver budget',
-        Owner: { Name: 'Ann' }
+        id: 'a01000000000001AAA',
+        name: 'Rollout',
+        health: 'Off Track',
+        healthReasons: 'Late\nOver budget',
+        ownerName: 'Ann'
       }
     ]);
     const element = mount();

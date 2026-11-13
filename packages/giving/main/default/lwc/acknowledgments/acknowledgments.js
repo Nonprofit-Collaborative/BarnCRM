@@ -1,5 +1,16 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import RULE from '@salesforce/schema/Acknowledgment_Rule__c';
+import RULE_ORDER from '@salesforce/schema/Acknowledgment_Rule__c.Order__c';
+import RULE_ACTIVE from '@salesforce/schema/Acknowledgment_Rule__c.Active__c';
+import RULE_CHANNEL from '@salesforce/schema/Acknowledgment_Rule__c.Channel__c';
+import RULE_MINIMUM from '@salesforce/schema/Acknowledgment_Rule__c.Minimum_Amount__c';
+import RULE_MAXIMUM from '@salesforce/schema/Acknowledgment_Rule__c.Maximum_Amount__c';
+import RULE_GIFT_TYPE from '@salesforce/schema/Acknowledgment_Rule__c.Gift_Type__c';
+import RULE_APPEAL from '@salesforce/schema/Acknowledgment_Rule__c.Appeal__c';
+import RULE_FIRST_GIFT_ONLY from '@salesforce/schema/Acknowledgment_Rule__c.First_Gift_Only__c';
+import RULE_DESCRIPTION from '@salesforce/schema/Acknowledgment_Rule__c.Description__c';
+import RULE_EMAIL_TEMPLATE from '@salesforce/schema/Acknowledgment_Rule__c.Email_Template__c';
 import { refreshApex } from '@salesforce/apex';
 import getPage from '@salesforce/apex/AcknowledgmentController.getPage';
 import sendEmailsNow from '@salesforce/apex/AcknowledgmentController.sendEmailsNow';
@@ -97,6 +108,19 @@ const RUN_STATUS_WORDS = {
  */
 export default class Acknowledgments extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded(['Core', 'Giving']);
+  /** The rule form's object and fields, from schema imports so they carry any namespace. */
+  ruleForm = {
+    object: RULE.objectApiName,
+    order: RULE_ORDER.fieldApiName,
+    active: RULE_ACTIVE.fieldApiName,
+    channel: RULE_CHANNEL.fieldApiName,
+    minimum: RULE_MINIMUM.fieldApiName,
+    maximum: RULE_MAXIMUM.fieldApiName,
+    giftType: RULE_GIFT_TYPE.fieldApiName,
+    appeal: RULE_APPEAL.fieldApiName,
+    firstGiftOnly: RULE_FIRST_GIFT_ONLY.fieldApiName,
+    description: RULE_DESCRIPTION.fieldApiName
+  };
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -488,7 +512,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       this.template.querySelector('[data-id="rule-template"]').reportValidity();
       return;
     }
-    fields.Email_Template__c = this.ruleIsEmail ? this.ruleTemplate : null;
+    fields[RULE_EMAIL_TEMPLATE.fieldApiName] = this.ruleIsEmail ? this.ruleTemplate : null;
     this.template.querySelector('lightning-record-edit-form').submit(fields);
   }
 
@@ -503,7 +527,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.recordId,
-        objectApiName: 'Acknowledgment_Rule__c',
+        objectApiName: RULE.objectApiName,
         actionName: 'view'
       }
     });

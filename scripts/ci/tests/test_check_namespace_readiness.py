@@ -90,6 +90,40 @@ class NamespaceReadiness(unittest.TestCase):
         found = problems({f"{ROLLUPS}/lwc/x/x.js": js, f"{ROLLUPS}/lwc/x/__tests__/x.test.js": "s = { c__a: 1 };"})
         self.assertEqual(found, ["literal c__ page state key"] * 2)
 
+    def test_literal_packaged_api_names_fail_in_navigation_lds_and_forms(self):
+        tab = {f"{CORE}/tabs/Find.tab-meta.xml": "<CustomTab/>"}
+        js = (
+            "const FIND_TAB = 'Find';\nconst TABS = { find: 'Find' };\n"
+            "a = { attributes: { objectApiName: 'Gift__c', actionName: 'new' } };\n"
+            "b = { attributes: { apiName: 'Find' } };\nc = { attributes: { apiName: FIND_TAB } };\n"
+            "d = { attributes: { apiName: TABS[name] } };\n"
+            "if (row.objectApiName === 'Fund__c') {}\nconst f = getFieldValue(r, 'Fund__c.Name');\n"
+            "ok = { objectApiName: 'Contact', fields: ['Contact.Name', 'npsp__X__c.Y__c'] };\n"
+            "ok2 = { objectApiName: GIFT.objectApiName }; ok3 = tabPageReference(FIND_TAB);\n"
+        )
+        html = (
+            '<template><lightning-record-edit-form object-api-name="Gift__c">'
+            '<lightning-input-field field-name="Amount__c"></lightning-input-field>'
+            '<lightning-input-field field-name="Name"></lightning-input-field>'
+            "<lightning-input-field field-name={fields.amount}></lightning-input-field>"
+            "</lightning-record-edit-form></template>"
+        )
+        extra = {f"{ROLLUPS}/lwc/x/x.js": js, f"{ROLLUPS}/lwc/x/x.html": html, **tab}
+        extra[f"{ROLLUPS}/lwc/x/__tests__/x.test.js"] = "a = { objectApiName: 'Gift__c' };"
+        self.assertEqual(
+            problems(extra),
+            [
+                "literal packaged field path Fund__c.Name",
+                "literal packaged name Amount__c in field-name",
+                "literal packaged name Gift__c in object-api-name",
+                "literal packaged object Fund__c in an objectApiName comparison",
+                "literal packaged object Gift__c as objectApiName",
+                "literal packaged tab Find as apiName",
+                "literal packaged tab Find as apiName",
+                "literal packaged tab Find as apiName",
+            ],
+        )
+
     def test_strip_js_keeps_strings_and_lines(self):
         src = "a = 'http://x'; // c__gone\nb = `/* kept */`;\n"
         out = cnr.strip_js(src)

@@ -15,7 +15,22 @@ import {
 const MONDAY = '2026-11-09';
 const days = weekDays(MONDAY);
 
+// A week row as ProjectTimesheetController returns it (ProjectViews.WeekRow).
 const entry = (id, iso, hours, extra = {}) => ({
+  id,
+  projectId: 'p1',
+  projectName: 'Rollout',
+  taskId: 't1',
+  taskName: 'Build',
+  billable: true,
+  entryDate: iso,
+  hours,
+  status: 'Open',
+  ...extra
+});
+
+// A time entry record as the approvals queue returns it.
+const record = (id, iso, hours) => ({
   Id: id,
   Project__c: 'p1',
   Project__r: { Name: 'Rollout' },
@@ -24,8 +39,7 @@ const entry = (id, iso, hours, extra = {}) => ({
   Billable__c: true,
   Date__c: iso,
   Hours__c: hours,
-  Status__c: 'Open',
-  ...extra
+  Status__c: 'Open'
 });
 
 describe('c-projects-timesheet-model week math', () => {
@@ -61,7 +75,7 @@ describe('c-projects-timesheet-model grid', () => {
       [
         entry('e1', MONDAY, 4),
         entry('e2', '2026-11-10', 3.5),
-        entry('e3', MONDAY, 1, { Task__c: null, Task__r: null, Billable__c: false })
+        entry('e3', MONDAY, 1, { taskId: null, taskName: null, billable: false })
       ],
       days
     );
@@ -75,11 +89,11 @@ describe('c-projects-timesheet-model grid', () => {
   it('locks Submitted and Approved cells and a cell holding two entries', () => {
     const grid = buildGrid(
       [
-        entry('e1', MONDAY, 4, { Status__c: 'Submitted' }),
-        entry('e2', '2026-11-10', 2, { Status__c: 'Approved' }),
+        entry('e1', MONDAY, 4, { status: 'Submitted' }),
+        entry('e2', '2026-11-10', 2, { status: 'Approved' }),
         entry('e3', '2026-11-11', 1),
         entry('e4', '2026-11-11', 2),
-        entry('e5', '2026-11-12', 2, { Status__c: 'Rejected', Rejection_Reason__c: 'Wrong task' })
+        entry('e5', '2026-11-12', 2, { status: 'Rejected', rejectionReason: 'Wrong task' })
       ],
       days
     );
@@ -94,7 +108,7 @@ describe('c-projects-timesheet-model grid', () => {
   });
 
   it('adds an empty row and totals it', () => {
-    const row = newRow({ Id: 'p2', Name: 'Other' }, null, true, days);
+    const row = newRow({ id: 'p2', name: 'Other' }, null, true, days);
     const grid = withTotals([row], days);
     expect(row.key).toBe('p2||1');
     expect(grid.total).toBe(0);
@@ -108,8 +122,8 @@ describe('c-projects-timesheet-model status and edits', () => {
     expect(none.canSubmit).toBe(false);
     expect(none.canRecall).toBe(false);
     const mixed = weekStatus(
-      [entry('a', MONDAY, 1), entry('b', MONDAY, 1, { Status__c: 'Submitted' })],
-      [{ Status__c: 'Rejected' }, { Status__c: null }]
+      [entry('a', MONDAY, 1), entry('b', MONDAY, 1, { status: 'Submitted' })],
+      [{ status: 'Rejected' }, { status: null }]
     );
     expect(mixed).toMatchObject({ Open: 1, Submitted: 1, Rejected: 1, none: 1 });
     expect(mixed.canSubmit).toBe(true);
@@ -120,7 +134,7 @@ describe('c-projects-timesheet-model status and edits', () => {
     const grid = buildGrid(
       [
         entry('e1', MONDAY, 4),
-        entry('e2', '2026-11-10', 2, { Status__c: 'Submitted' }),
+        entry('e2', '2026-11-10', 2, { status: 'Submitted' }),
         entry('e3', '2026-11-11', 2)
       ],
       days
@@ -164,9 +178,9 @@ describe('c-projects-timesheet-model approvals', () => {
     const user = (id, name) => ({ User__c: id, User__r: { Name: name } });
     const groups = groupApprovals(
       [
-        { ...entry('a', '2026-11-12', 2), ...user('u1', 'Zed') },
-        { ...entry('b', '2026-11-09', 1.5), ...user('u1', 'Zed') },
-        { ...entry('c', '2026-11-03', 3), ...user('u2', 'Amy'), Project__r: { Name: 'Other' } }
+        { ...record('a', '2026-11-12', 2), ...user('u1', 'Zed') },
+        { ...record('b', '2026-11-09', 1.5), ...user('u1', 'Zed') },
+        { ...record('c', '2026-11-03', 3), ...user('u2', 'Amy'), Project__r: { Name: 'Other' } }
       ],
       [
         {

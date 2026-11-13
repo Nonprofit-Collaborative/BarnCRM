@@ -18,6 +18,7 @@ import {
 import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRecordModal from 'c/eventRecordModal';
+import APPOINTMENT from '@salesforce/schema/Event_Appointment__c';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import APPOINTMENTS from '@salesforce/label/c.Events_EventTab_Appointments';
@@ -306,7 +307,7 @@ export default class EventAppointments extends LightningElement {
     const saved = await EventRecordModal.open({
       label: `${EDIT}: ${slot.name}`,
       size: 'small',
-      objectApiName: 'Event_Appointment__c',
+      objectApiName: APPOINTMENT.objectApiName,
       recordId: slot.id,
       fields: SLOT_FIELDS
     });

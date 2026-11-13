@@ -118,7 +118,7 @@ public with sharing class ProjectBillingController {
 	 * asked, each with its lines; stamps Exported Date. The CSV is built in the browser.
 	 */
 	@AuraEnabled
-	public static List<Project_Invoice__c> exportInvoices(
+	public static List<ProjectViews.Invoice> exportInvoices(
 		Date fromDate,
 		Date toDate,
 		Boolean includeExported
@@ -129,7 +129,7 @@ public with sharing class ProjectBillingController {
 				throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Range_Invalid'));
 			}
 			List<String> billed = new List<String>{ ProjectBilling.SENT, ProjectBilling.PAID };
-			List<Project_Invoice__c> invoices = new List<Project_Invoice__c>();
+			List<ProjectViews.Invoice> invoices = new List<ProjectViews.Invoice>();
 			List<Project_Invoice__c> stamps = new List<Project_Invoice__c>();
 			for (Project_Invoice__c invoice : [
 				SELECT
@@ -165,7 +165,7 @@ public with sharing class ProjectBillingController {
 				LIMIT 2000
 			]) {
 				if (includeExported == true || invoice.Exported_Date__c == null) {
-					invoices.add(invoice);
+					invoices.add(new ProjectViews.Invoice(invoice));
 					stamps.add(
 						new Project_Invoice__c(Id = invoice.Id, Exported_Date__c = Date.today())
 					);

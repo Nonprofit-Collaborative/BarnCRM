@@ -37,15 +37,15 @@ const flush = () =>
   new Promise((resolve) => setTimeout(resolve, 0));
 
 const entry = (id, date, hours, status) => ({
-  Id: id,
-  Project__c: 'a01000000000001AAA',
-  Project__r: { Name: 'Rollout' },
-  Task__c: 'a03000000000001AAA',
-  Task__r: { Name: 'Build' },
-  Billable__c: true,
-  Date__c: date,
-  Hours__c: hours,
-  Status__c: status
+  id,
+  projectId: 'a01000000000001AAA',
+  projectName: 'Rollout',
+  taskId: 'a03000000000001AAA',
+  taskName: 'Build',
+  billable: true,
+  entryDate: date,
+  hours,
+  status
 });
 
 const WEEK = (status = 'Open') => ({
@@ -53,7 +53,7 @@ const WEEK = (status = 'Open') => ({
   expensesEnabled: true,
   entries: [entry('e1', '2026-11-09', 4, status), entry('e2', '2026-11-10', 3, status)],
   expenses: [],
-  projects: [{ Id: 'a01000000000001AAA', Name: 'Rollout' }]
+  projects: [{ id: 'a01000000000001AAA', name: 'Rollout' }]
 });
 
 function mount() {
@@ -136,7 +136,7 @@ describe('c-projects-timesheet', () => {
 
   it('adds a row for a project and task and adds an expense', async () => {
     getWeek.mockResolvedValue({ ...WEEK(), entries: [] });
-    getTasks.mockResolvedValue([{ Id: 'a03000000000001AAA', Name: 'Build' }]);
+    getTasks.mockResolvedValue([{ id: 'a03000000000001AAA', name: 'Build' }]);
     addExpense.mockResolvedValue('a09000000000001AAA');
     const element = mount();
     await flush();

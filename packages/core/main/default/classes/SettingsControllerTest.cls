@@ -330,7 +330,11 @@ private class SettingsControllerTest {
 				}
 			}
 			Assert.isNotNull(row, 'The row arrives');
-			Assert.areEqual('Data_Hygiene', row.navigationTarget, 'It names the tab it opens');
+			Assert.areEqual(
+				NamespaceUtil.qualify('Data_Hygiene'),
+				row.navigationTarget,
+				'It names the tab it opens, qualified'
+			);
 			Assert.areEqual('Org Optimizer', row.navigationLabel, 'And the name of that page');
 		}
 	}

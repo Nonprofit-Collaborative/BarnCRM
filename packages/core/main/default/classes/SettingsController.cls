@@ -753,7 +753,8 @@ public with sharing class SettingsController {
 			? ''
 			: SettingSections.pageFor(definition.Section__c);
 		setting.component = definition.Component__c;
-		setting.navigationTarget = definition.Navigation_Target__c;
+		// Rows name a packaged tab or object as written; Lightning needs it qualified.
+		setting.navigationTarget = NamespaceUtil.qualify(definition.Navigation_Target__c);
 		setting.navigationLabel = definition.Navigation_Label__c;
 		setting.helpUrl = String.isBlank(definition.Help_Path__c)
 			? null

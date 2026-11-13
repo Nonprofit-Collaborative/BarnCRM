@@ -30,9 +30,13 @@ public with sharing class AffiliationController {
 	 */
 	@AuraEnabled(cacheable=true)
 	public static CardContext getCardContext(Id recordId) {
+		// Field names as the card's form needs them, with the namespace once it is set.
+		String contact = NamespaceUtil.qualify('Contact__c');
+		String personAccount = NamespaceUtil.qualify('Person_Account__c');
+		String organization = NamespaceUtil.qualify('Organization__c');
 		CardContext context = new CardContext();
-		context.ownerField = 'Contact__c';
-		context.otherEndField = 'Organization__c';
+		context.ownerField = contact;
+		context.otherEndField = organization;
 		if (recordId == null || recordId.getSObjectType() != Account.SObjectType) {
 			return context;
 		}
@@ -42,15 +46,13 @@ public with sharing class AffiliationController {
 				Account record : HouseholdSelector.getAccountRecordTypes(new Set<Id>{ recordId })
 			) {
 				if (personTypes.contains(record.RecordTypeId)) {
-					context.ownerField = 'Person_Account__c';
+					context.ownerField = personAccount;
 					return context;
 				}
 			}
 		}
-		context.ownerField = 'Organization__c';
-		context.otherEndField = HouseholdService.isPersonAccountOrg()
-			? 'Person_Account__c'
-			: 'Contact__c';
+		context.ownerField = organization;
+		context.otherEndField = HouseholdService.isPersonAccountOrg() ? personAccount : contact;
 		return context;
 	}
 }

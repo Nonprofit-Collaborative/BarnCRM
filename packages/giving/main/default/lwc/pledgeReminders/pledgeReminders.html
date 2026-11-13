@@ -199,18 +199,18 @@
         <div data-id="step-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
           <h3 class="slds-text-heading_small slds-var-m-bottom_small">{stepFormHeading}</h3>
           <lightning-record-edit-form
-            object-api-name="Pledge_Reminder_Step__c"
+            object-api-name={stepForm.object}
             record-id={editingStepId}
             onsubmit={handleStepSubmit}
             onsuccess={handleStepSaved}
           >
             <lightning-messages></lightning-messages>
             <lightning-input-field field-name="Name"></lightning-input-field>
-            <lightning-input-field field-name="Days_From_Due__c"></lightning-input-field>
-            <lightning-input-field field-name="Active__c"></lightning-input-field>
+            <lightning-input-field field-name={stepForm.daysFromDue}></lightning-input-field>
+            <lightning-input-field field-name={stepForm.active}></lightning-input-field>
             <lightning-input-field
               data-id="step-channel"
-              field-name="Channel__c"
+              field-name={stepForm.channel}
               onchange={handleChannelChange}
             ></lightning-input-field>
             <template lwc:if={stepIsEmail}>

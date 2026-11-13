@@ -1,6 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
+import { tabPageReference } from 'c/barnTabs';
 import HEADING from '@salesforce/label/c.Core_HubHome_RecurringHeading';
 import NEVER from '@salesforce/label/c.Core_HubHome_RecurringNever';
 import LINK from '@salesforce/label/c.Core_HubHome_RecurringLink';
@@ -27,10 +28,7 @@ export default class HubRecurringFiles extends NavigationMixin(LightningElement)
     return this.sources.length > 0;
   }
 
-  handleOpenImport() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: IMPORT_TAB }
-    });
+  async handleOpenImport() {
+    this[NavigationMixin.Navigate](await tabPageReference(IMPORT_TAB));
   }
 }

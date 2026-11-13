@@ -1,5 +1,14 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import ASK from '@salesforce/schema/Ask__c';
+import GIFT from '@salesforce/schema/Gift__c';
+import GIFT_DATE from '@salesforce/schema/Gift__c.Gift_Date__c';
+import GIFT_AMOUNT from '@salesforce/schema/Gift__c.Amount__c';
+import GIFT_DONOR_CONTACT from '@salesforce/schema/Gift__c.Donor_Contact__c';
+import GIFT_DONOR_ACCOUNT from '@salesforce/schema/Gift__c.Donor_Account__c';
+import PLEDGE from '@salesforce/schema/Commitment__c';
+import PLEDGE_START from '@salesforce/schema/Commitment__c.Start_Date__c';
+import PLEDGE_TOTAL from '@salesforce/schema/Commitment__c.Expected_Total__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/AskPipelineController.getBoard';
 import moveStage from '@salesforce/apex/AskPipelineController.moveStage';
@@ -186,11 +195,15 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
   ];
 
   /** The display info every record picker in the suite carries, so two look-alikes differ. */
-  giftDisplayInfo = { primaryField: 'Name', additionalFields: ['Gift_Date__c', 'Amount__c'] };
+  giftDisplayInfo = {
+    primaryField: 'Name',
+    additionalFields: [GIFT_DATE.fieldApiName, GIFT_AMOUNT.fieldApiName]
+  };
   pledgeDisplayInfo = {
     primaryField: 'Name',
-    additionalFields: ['Start_Date__c', 'Expected_Total__c']
+    additionalFields: [PLEDGE_START.fieldApiName, PLEDGE_TOTAL.fieldApiName]
   };
+  pickerObjects = { gift: GIFT.objectApiName, pledge: PLEDGE.objectApiName };
 
   board;
   columns = [];
@@ -428,14 +441,14 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
   handleNewAsk() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Ask__c', actionName: 'new' }
+      attributes: { objectApiName: ASK.objectApiName, actionName: 'new' }
     });
   }
 
   openRecord(recordId) {
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
-      attributes: { recordId, objectApiName: 'Ask__c', actionName: 'view' }
+      attributes: { recordId, objectApiName: ASK.objectApiName, actionName: 'view' }
     });
   }
 
@@ -596,7 +609,9 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     if (!donorId) {
       return undefined;
     }
-    const fieldPath = donorId.startsWith(CONTACT_PREFIX) ? 'Donor_Contact__c' : 'Donor_Account__c';
+    // Gifts and pledges name their donor fields alike, so one import serves both pickers.
+    const fieldPath = (donorId.startsWith(CONTACT_PREFIX) ? GIFT_DONOR_CONTACT : GIFT_DONOR_ACCOUNT)
+      .fieldApiName;
     return { criteria: [{ fieldPath, operator: 'eq', value: donorId }] };
   }
 

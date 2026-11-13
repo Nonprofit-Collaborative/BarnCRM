@@ -76,7 +76,7 @@ export default class ApplicationReview extends LightningElement {
   }
 
   get status() {
-    return this.review?.mine?.Status__c;
+    return this.review?.mine?.status;
   }
 
   get isOpen() {
@@ -91,8 +91,8 @@ export default class ApplicationReview extends LightningElement {
     try {
       this.review = await getReview({ applicationId: this.recordId });
       const mine = this.review.mine;
-      this.scores = mine?.Scores__c ? JSON.parse(mine.Scores__c) : {};
-      this.comments = mine?.Comments__c;
+      this.scores = mine?.scores ? JSON.parse(mine.scores) : {};
+      this.comments = mine?.comments;
       this.errorMessage = undefined;
     } catch (error) {
       this.errorMessage = messageFrom(error);

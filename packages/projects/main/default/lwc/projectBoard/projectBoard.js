@@ -103,27 +103,27 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
   }
 
   get healthClass() {
-    return `slds-badge ${HEALTH_CLASS[this.project.Health__c] || ''}`;
+    return `slds-badge ${HEALTH_CLASS[this.project.health] || ''}`;
   }
 
   get healthLabel() {
-    return this.project.Health__c || this.labels.noHealth;
+    return this.project.health || this.labels.noHealth;
   }
 
   get reasons() {
-    return (this.project.Health_Reasons__c || '').split('\n').filter((line) => line);
+    return (this.project.healthReasons || '').split('\n').filter((line) => line);
   }
 
   get progressPercent() {
-    return percent(this.project.Tasks_Done__c, this.project.Tasks__c);
+    return percent(this.project.tasksDone, this.project.taskCount);
   }
 
   get progressText() {
     return helpText(
       'Projects',
       'Projects_Board_Progress',
-      this.project.Tasks_Done__c || 0,
-      this.project.Tasks__c || 0,
+      this.project.tasksDone || 0,
+      this.project.taskCount || 0,
       this.progressPercent
     );
   }
@@ -134,20 +134,20 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
 
   get hoursText() {
     const p = this.project;
-    const hasBudget = p.Budget_Hours__c !== undefined && p.Budget_Hours__c !== null;
+    const hasBudget = p.budgetHours !== undefined && p.budgetHours !== null;
     // R-PM20: approved change requests add their hours to the budget.
-    const budget = hasBudget ? p.Budget_Hours__c + (p.Change_Hours__c || 0) : '-';
+    const budget = hasBudget ? p.budgetHours + (p.changeHours || 0) : '-';
     return helpText(
       'Projects',
       'Projects_Board_HoursLine',
-      p.Actual_Hours__c || 0,
-      p.Estimated_Hours__c || 0,
+      p.actualHours || 0,
+      p.estimatedHours || 0,
       budget
     );
   }
 
   get hasBudgetAmount() {
-    return this.project.Budget_Amount__c !== undefined && this.project.Budget_Amount__c !== null;
+    return this.project.budgetAmount !== undefined && this.project.budgetAmount !== null;
   }
 
   get span() {
@@ -165,16 +165,16 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       const place = bar(group, span);
       return {
         ...group,
-        key: group.Id || 'none',
-        name: group.Name || this.labels.noPhase,
+        key: group.id || 'none',
+        name: group.name || this.labels.noPhase,
         barStyle: place ? `left: ${place.left}%; width: ${place.width}%` : null,
-        isAdding: this.addingPhase === (group.Id || 'none'),
+        isAdding: this.addingPhase === (group.id || 'none'),
         hasTasks: group.tasks.length > 0,
         tasks: group.tasks.map((task) => ({
           ...task,
-          href: `/lightning/r/${task.Id}/view`,
-          owner: task.Assigned_To__r?.Name,
-          late: isOpen(task) && task.Due_Date__c && task.Due_Date__c < localIsoDate(),
+          href: `/lightning/r/${task.id}/view`,
+          owner: task.assignedToName,
+          late: isOpen(task) && task.dueDate && task.dueDate < localIsoDate(),
           options: STATUSES.map((value) => ({ label: value, value }))
         }))
       };
@@ -183,7 +183,7 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
 
   get taskOptions() {
     return [{ label: '', value: '' }].concat(
-      (this.board?.tasks || []).filter(isOpen).map((task) => ({ label: task.Name, value: task.Id }))
+      (this.board?.tasks || []).filter(isOpen).map((task) => ({ label: task.name, value: task.id }))
     );
   }
 

@@ -21,6 +21,7 @@ import MORE_THAN from '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEAR_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_NearLimit';
 import { format } from 'c/findCsv';
+import { tabPageReference } from 'c/barnTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** A limit used to this percentage or more carries a Near Limit badge. */
@@ -66,12 +67,10 @@ export default class OptimizerStorage extends NavigationMixin(LightningElement) 
     );
   }
 
-  handleArchive() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: 'Find' },
-      state: { [this.toolStateKey.data]: 'archive' }
-    });
+  async handleArchive() {
+    this[NavigationMixin.Navigate](
+      await tabPageReference('Find', { [this.toolStateKey.data]: 'archive' })
+    );
   }
 
   columns = [

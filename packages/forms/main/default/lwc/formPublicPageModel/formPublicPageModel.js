@@ -144,9 +144,12 @@ export function listView(list, locale, joiner, pageUrl) {
   return { title: list.title || '', empty: list.empty || '', items };
 }
 
-/** The Site address of one record's page, beside the current page: `FormsPublic?record=<id>`. */
+/**
+ * The Site address of one record's page on the current page: `?record=<id>`. A link that is
+ * only a query keeps the page's own name, so it holds with or without the package prefix.
+ */
 export function sitePageUrl(recordId) {
-  return `FormsPublic?record=${encodeURIComponent(recordId)}`;
+  return `?record=${encodeURIComponent(recordId)}`;
 }
 
 /**

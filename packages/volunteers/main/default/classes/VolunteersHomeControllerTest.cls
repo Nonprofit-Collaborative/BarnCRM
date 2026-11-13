@@ -56,7 +56,7 @@ private class VolunteersHomeControllerTest {
 			Assert.isNotNull(tiles.get('hoursValueThisMonth').currencyCode, 'In the org currency.');
 			Assert.areEqual(1, tiles.get('hoursToApprove').value, 'One entry waits.');
 			Assert.areEqual(
-				'Volunteer_Approve_Hours',
+				NamespaceUtil.qualify('Volunteer_Approve_Hours'),
 				tiles.get('hoursToApprove').tabName,
 				'A coordinator goes to Approve Hours.'
 			);

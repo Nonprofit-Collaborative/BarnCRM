@@ -268,7 +268,7 @@ public without sharing class FormIntakeService {
 			Map<String, Object> started = PublicPageExtensions.startCheckout(
 				contextId,
 				counted,
-				base == null ? null : base + '/FormsPublic?record=' + contextId
+				base == null ? null : base + FormsSites.pagePath() + '?record=' + contextId
 			);
 			if (started != null) {
 				counted.put(PAYMENT_KEY, String.valueOf(started.get('paymentId')));
@@ -342,7 +342,7 @@ public without sharing class FormIntakeService {
 			Step__c = step == null || step < 0 ? 0 : step
 		);
 		Database.insert(draft, AccessLevel.SYSTEM_MODE);
-		lastLink = base + '/FormsPublic?form=' + version.Form__c + '&resume=' + token;
+		lastLink = base + FormsSites.pagePath() + '?form=' + version.Form__c + '&resume=' + token;
 		try {
 			Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
 			mail.setToAddresses(new List<String>{ address });

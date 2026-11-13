@@ -182,7 +182,7 @@ private class ScholarshipsControllerTest {
 
 			Test.startTest();
 			ScholarshipsController.Board board = ScholarshipsController.getBoard(cycle.Id);
-			Application_Review__c saved = ScholarshipsController.saveReview(
+			ScholarshipsController.MyReview saved = ScholarshipsController.saveReview(
 				application.Id,
 				null,
 				'Thoughtful essay',
@@ -198,7 +198,7 @@ private class ScholarshipsControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(board.formLink.contains(String.valueOf(cycle.Id)), 'The form link');
-			Assert.areEqual('Thoughtful essay', saved.Comments__c, 'The comment is kept');
+			Assert.areEqual('Thoughtful essay', saved.comments, 'The comment is kept');
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Assign_NoPanel'),
 				noPanel,

@@ -7,22 +7,43 @@ import getFormSettings from '@salesforce/apex/ShiftScheduleController.getFormSet
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { formatDate as formatDay } from 'c/barnFormat';
 import { shiftPreview } from './preview';
+import SCHEDULE from '@salesforce/schema/Shift_Schedule__c';
+import JOB from '@salesforce/schema/Shift_Schedule__c.Job__c';
+import LOCATION from '@salesforce/schema/Shift_Schedule__c.Location__c';
+import NEEDED from '@salesforce/schema/Shift_Schedule__c.Volunteers_Needed__c';
+import WEEKDAYS from '@salesforce/schema/Shift_Schedule__c.Weekdays__c';
+import EVERY_N_WEEKS from '@salesforce/schema/Shift_Schedule__c.Every_N_Weeks__c';
+import START_TIME from '@salesforce/schema/Shift_Schedule__c.Start_Time__c';
+import END_TIME from '@salesforce/schema/Shift_Schedule__c.End_Time__c';
+import START_DATE from '@salesforce/schema/Shift_Schedule__c.Start_Date__c';
+import END_DATE from '@salesforce/schema/Shift_Schedule__c.End_Date__c';
+import ACTIVE from '@salesforce/schema/Shift_Schedule__c.Active__c';
 
 import NEW_TITLE from '@salesforce/label/c.Volunteers_ScheduleForm_New';
 import EDIT_TITLE from '@salesforce/label/c.Volunteers_ScheduleForm_Edit';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 
-const SCHEDULE_OBJECT = 'Shift_Schedule__c';
-/** The fields the preview reads, by field name. */
-const PATTERN_FIELDS = {
-  Weekdays__c: 'weekdays',
-  Every_N_Weeks__c: 'everyNWeeks',
-  Start_Time__c: 'startTime',
-  Start_Date__c: 'startDate',
-  End_Date__c: 'endDate',
-  Active__c: 'active'
+/** The form's fields by key, from schema imports so they carry any namespace. */
+const FIELDS = {
+  job: JOB.fieldApiName,
+  location: LOCATION.fieldApiName,
+  needed: NEEDED.fieldApiName,
+  weekdays: WEEKDAYS.fieldApiName,
+  everyNWeeks: EVERY_N_WEEKS.fieldApiName,
+  startTime: START_TIME.fieldApiName,
+  endTime: END_TIME.fieldApiName,
+  startDate: START_DATE.fieldApiName,
+  endDate: END_DATE.fieldApiName,
+  active: ACTIVE.fieldApiName
 };
+/** The fields the preview reads, by field name. */
+const PATTERN_FIELDS = Object.fromEntries(
+  ['weekdays', 'everyNWeeks', 'startTime', 'startDate', 'endDate', 'active'].map((key) => [
+    FIELDS[key],
+    key
+  ])
+);
 
 /**
  * New Shift Schedule on a job and Edit Schedule on a shift schedule (modules-24, D-183): the
@@ -36,7 +57,8 @@ export default class ShiftScheduleForm extends LightningElement {
   @api objectApiName;
 
   labels = { save: SAVE, cancel: CANCEL };
-  scheduleObject = SCHEDULE_OBJECT;
+  scheduleObject = SCHEDULE.objectApiName;
+  fields = FIELDS;
   pattern = { weekdays: '', everyNWeeks: 1, startDate: null, endDate: null, active: true };
   settings;
   saving = false;
@@ -59,7 +81,7 @@ export default class ShiftScheduleForm extends LightningElement {
   }
 
   get isEdit() {
-    return this.objectApiName === SCHEDULE_OBJECT;
+    return this.objectApiName === SCHEDULE.objectApiName;
   }
 
   get title() {

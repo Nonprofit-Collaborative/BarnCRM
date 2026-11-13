@@ -76,11 +76,11 @@
             <template lwc:if={hasExpenses}>
               <ul class="slds-has-dividers_bottom-space">
                 <template for:each={expenses} for:item="row">
-                  <li key={row.Id} class="slds-item" data-id="expense">
-                    <a href={row.href}>{row.Date__c} {row.Category__c}</a>
+                  <li key={row.id} class="slds-item" data-id="expense">
+                    <a href={row.href}>{row.entryDate} {row.category}</a>
                     <span class="slds-var-m-left_x-small">{row.projectName}</span>
-                    <lightning-formatted-number class="slds-var-m-left_x-small" value={row.Amount__c} format-style="currency"></lightning-formatted-number>
-                    <span class="slds-var-m-left_x-small slds-text-color_weak" title={row.Rejection_Reason__c}>{row.Status__c}</span>
+                    <lightning-formatted-number class="slds-var-m-left_x-small" value={row.amount} format-style="currency"></lightning-formatted-number>
+                    <span class="slds-var-m-left_x-small slds-text-color_weak" title={row.rejectionReason}>{row.status}</span>
                   </li>
                 </template>
               </ul>

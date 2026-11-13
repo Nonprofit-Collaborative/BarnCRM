@@ -47,6 +47,20 @@ public with sharing class NamespaceUtil {
 		return String.isBlank(apiName) ? apiName : prefix() + apiName;
 	}
 
+	/**
+	 * Packaged tab names as this org needs them, keyed by the name as written (`Find`), for the
+	 * `c/barnTabs` module every package's Lightning components open tabs through. Every package
+	 * shares one namespace (ADR-0017), so one prefix serves Core's tabs and modules' alike.
+	 */
+	@AuraEnabled(cacheable=true)
+	public static Map<String, String> tabApiNames(List<String> tabs) {
+		Map<String, String> names = new Map<String, String>();
+		for (String tab : tabs == null ? new List<String>() : tabs) {
+			names.put(tab, qualify(tab));
+		}
+		return names;
+	}
+
 	/** Stands in for the org's global describe in tests, keyed by lower-case API name. */
 	@TestVisible
 	private static Map<String, Schema.SObjectType> describeOverride;

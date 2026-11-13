@@ -19,30 +19,30 @@ describe('c/projectsBillingModel', () => {
   it('writes one CSV row per invoice line with the invoice columns', () => {
     const rows = invoiceRows([
       {
-        Name: 'INV-000001',
-        Status__c: 'Sent',
-        Project__r: { Name: 'Rollout' },
-        Account__r: { Name: 'Acme' },
-        Invoice_Date__c: '2026-11-01',
-        Total__c: 350,
-        Lines__r: [
+        name: 'INV-000001',
+        status: 'Sent',
+        project: 'Rollout',
+        client: 'Acme',
+        invoiceDate: '2026-11-01',
+        total: 350,
+        lines: [
           {
-            Line_Type__c: 'Time',
-            Description__c: 'Ann',
-            Quantity__c: 3,
-            Unit_Price__c: 100,
-            Amount__c: 300
+            lineType: 'Time',
+            description: 'Ann',
+            quantity: 3,
+            unitPrice: 100,
+            amount: 300
           },
           {
-            Line_Type__c: 'Expense',
-            Description__c: 'Taxi',
-            Quantity__c: 1,
-            Unit_Price__c: 50,
-            Amount__c: 50
+            lineType: 'Expense',
+            description: 'Taxi',
+            quantity: 1,
+            unitPrice: 50,
+            amount: 50
           }
         ]
       },
-      { Name: 'INV-000002', Status__c: 'Paid' }
+      { name: 'INV-000002', status: 'Paid', lines: [] }
     ]);
     expect(rows).toHaveLength(3);
     expect(rows[1]).toMatchObject({

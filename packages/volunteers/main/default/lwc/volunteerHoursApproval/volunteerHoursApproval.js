@@ -1,5 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import HOURS_OBJECT from '@salesforce/schema/Volunteer_Hours__c';
+import JOB_OBJECT from '@salesforce/schema/Volunteer_Job__c';
 import Toast from 'lightning/toast';
 import VolunteerLettersModal from 'c/volunteerLettersModal';
 import LETTERS from '@salesforce/label/c.Volunteers_Letters_Title';
@@ -64,6 +66,7 @@ function readableDate(value) {
  */
 export default class VolunteerHoursApproval extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Volunteers');
+  jobObject = JOB_OBJECT.objectApiName;
 
   labels = {
     title: TITLE,
@@ -263,7 +266,7 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
       type: 'standard__recordPage',
       attributes: {
         recordId: event.currentTarget.dataset.recordId,
-        objectApiName: 'Volunteer_Hours__c',
+        objectApiName: HOURS_OBJECT.objectApiName,
         actionName: 'view'
       }
     });

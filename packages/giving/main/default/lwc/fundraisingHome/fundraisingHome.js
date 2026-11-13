@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHome from '@salesforce/apex/FundraisingHomeController.getHome';
 import { iconFor } from 'c/barnIcons';
+import { tabPageReference } from 'c/barnTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { pageReferenceFor, toTiles } from 'c/fundraisingHomeModel';
 import ENTER_GIFT from '@salesforce/label/c.Giving_FundraisingHome_EnterGift';
@@ -104,20 +105,14 @@ export default class FundraisingHome extends NavigationMixin(LightningElement) {
     }
   }
 
-  handleSetupSelect(event) {
+  async handleSetupSelect(event) {
     const name = event.detail && event.detail.name;
     if (name) {
-      this[NavigationMixin.Navigate]({
-        type: 'standard__navItemPage',
-        attributes: { apiName: name }
-      });
+      this[NavigationMixin.Navigate](await tabPageReference(name));
     }
   }
 
-  handleEnterGift() {
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: QUICK_GIFT_ENTRY }
-    });
+  async handleEnterGift() {
+    this[NavigationMixin.Navigate](await tabPageReference(QUICK_GIFT_ENTRY));
   }
 }

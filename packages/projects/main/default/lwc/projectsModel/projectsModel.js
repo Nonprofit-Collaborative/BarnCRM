@@ -14,7 +14,7 @@ export function percent(done, total) {
 
 /** A task is open while it is not Done or Cancelled. */
 export function isOpen(task) {
-  return !CLOSED.has(task && task.Status__c);
+  return !CLOSED.has(task && task.status);
 }
 
 /**
@@ -23,15 +23,15 @@ export function isOpen(task) {
  */
 export function groupTasks(phases, tasks) {
   const groups = (phases || []).map((phase) => ({ ...phase, tasks: [] }));
-  const byId = new Map(groups.map((group) => [group.Id, group]));
-  const loose = { Id: null, Name: null, tasks: [] };
+  const byId = new Map(groups.map((group) => [group.id, group]));
+  const loose = { id: null, name: null, tasks: [] };
   (tasks || []).forEach((task) => {
-    (byId.get(task.Phase__c) || loose).tasks.push(task);
+    (byId.get(task.phaseId) || loose).tasks.push(task);
   });
   const all = loose.tasks.length ? [...groups, loose] : groups;
   return all.map((group) => {
-    const counted = group.tasks.filter((task) => task.Status__c !== 'Cancelled');
-    const done = counted.filter((task) => task.Status__c === 'Done').length;
+    const counted = group.tasks.filter((task) => task.status !== 'Cancelled');
+    const done = counted.filter((task) => task.status === 'Done').length;
     return { ...group, done, total: counted.length, percent: percent(done, counted.length) };
   });
 }
@@ -51,8 +51,8 @@ function toTime(value) {
  * date. Null when there are no dates at all.
  */
 export function timelineSpan(project, phases) {
-  const times = [project && project.Start_Date__c, project && project.Target_Date__c];
-  (phases || []).forEach((phase) => times.push(phase.Start_Date__c, phase.End_Date__c));
+  const times = [project && project.startDate, project && project.targetDate];
+  (phases || []).forEach((phase) => times.push(phase.startDate, phase.endDate));
   const known = times.map(toTime).filter((time) => time !== null);
   if (!known.length) {
     return null;
@@ -65,8 +65,8 @@ export function timelineSpan(project, phases) {
  * one-day phase still shows. Null when the phase or the span has no dates.
  */
 export function bar(phase, span) {
-  const start = toTime(phase && (phase.Start_Date__c || phase.End_Date__c));
-  const end = toTime(phase && (phase.End_Date__c || phase.Start_Date__c));
+  const start = toTime(phase && (phase.startDate || phase.endDate));
+  const end = toTime(phase && (phase.endDate || phase.startDate));
   if (!span || start === null || end === null) {
     return null;
   }

@@ -46,6 +46,18 @@ private class FormsSitesTest {
 	}
 
 	@IsTest
+	static void thePublicPageIsNamedWithThePackagePrefix() {
+		// runs-as: deploying user (names only, no DML or SOQL)
+		String prefix = NamespaceUtil.prefix();
+		Assert.areEqual('/' + prefix + 'FormsPublic', FormsSites.pagePath(), 'The page path');
+		Assert.areEqual(
+			String.isBlank(prefix) ? 'c' : prefix.removeEnd('__'),
+			new FormPublicController().lightningNamespace,
+			'The Lightning namespace the page loads its components from'
+		);
+	}
+
+	@IsTest
 	static void aSiteWithoutAnAddressGivesNoLink() {
 		// runs-as: deploying user (pure logic over in-memory Site details, no DML or SOQL)
 		FormsSites.SiteInfo withUrl = new FormsSites.SiteInfo();

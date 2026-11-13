@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import EVENT from '@salesforce/schema/Event__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import LOCALE from '@salesforce/i18n/locale';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
@@ -159,7 +160,7 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
   handleNewEvent() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Event__c', actionName: 'new' }
+      attributes: { objectApiName: EVENT.objectApiName, actionName: 'new' }
     });
   }
 
@@ -172,7 +173,7 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
   openRecord(recordId) {
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
-      attributes: { recordId, objectApiName: 'Event__c', actionName: 'view' }
+      attributes: { recordId, objectApiName: EVENT.objectApiName, actionName: 'view' }
     });
   }
 

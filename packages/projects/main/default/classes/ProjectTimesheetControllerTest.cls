@@ -95,11 +95,11 @@ private class ProjectTimesheetControllerTest {
 			ProjectTimesheetController.Week week = ProjectTimesheetController.getWeek(Date.today());
 			Assert.areEqual(2, saved, 'Two new entries');
 			Assert.areEqual(2, week.entries.size(), 'Both are on the page');
-			Assert.areEqual('Open', week.entries[0].Status__c, 'New time is Open');
+			Assert.areEqual('Open', week.entries[0].status, 'New time is Open');
 			Assert.areEqual(1, week.projects.size(), 'The project to log to');
 
 			ProjectTimesheetController.Cell edit = cell(project.Id, monday, 5);
-			edit.id = week.entries[0].Id;
+			edit.id = week.entries[0].id;
 			Assert.areEqual(
 				1,
 				ProjectTimesheetController.saveWeek(
@@ -181,7 +181,7 @@ private class ProjectTimesheetControllerTest {
 			);
 			ProjectTimesheetController.Week week = ProjectTimesheetController.getWeek(Date.today());
 			Assert.areEqual(1, week.expenses.size(), 'On the page');
-			Assert.areEqual('Open', week.expenses[0].Status__c, 'Open (R-PM13)');
+			Assert.areEqual('Open', week.expenses[0].status, 'Open (R-PM13)');
 			Assert.areEqual(
 				1,
 				ProjectTimesheetController.submitWeek(Date.today()),

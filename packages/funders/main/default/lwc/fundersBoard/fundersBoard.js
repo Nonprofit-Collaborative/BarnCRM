@@ -7,6 +7,11 @@ import { showMoney } from 'c/grantReportModel';
 import { messageFrom as messageOf } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { printPage } from 'c/fundersPrint';
+import { tabPageReference } from 'c/barnTabs';
+import GRANT from '@salesforce/schema/Grant__c';
+import REQUIREMENT from '@salesforce/schema/Grant_Requirement__c';
+import ANSWER from '@salesforce/schema/Grant_Answer__c';
+import TEMPLATE from '@salesforce/schema/Funder_Report_Template__c';
 
 import TITLE from '@salesforce/label/c.Funders_Board_Title';
 import MIX from '@salesforce/label/c.Funders_Board_Mix';
@@ -26,16 +31,35 @@ import PIPELINE from '@salesforce/label/c.Funders_Pipeline_Title';
 import CALENDAR from '@salesforce/label/c.Funders_Calendar_Title';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-/** The Funders tabs the home lists, in the app's order; objects are named by their plural. */
+/**
+ * The Funders tabs the home lists, in the app's order; objects are named by their plural. A
+ * tile's name is the tab as written (its icon key); the object comes from its schema import.
+ */
 const TOOL_TABS = [
-  { name: 'Grant_Pipeline', page: true },
-  { name: 'Grant_Calendar', page: true },
-  { name: 'Grant__c' },
-  { name: 'Grant_Requirement__c' },
-  { name: 'Grant_Answer__c' },
-  { name: 'Funder_Report_Template__c' }
+  { name: 'Grant_Pipeline', help: () => helpText('Funders', 'Funders_Home_PipelineTile') },
+  { name: 'Grant_Calendar', help: () => helpText('Funders', 'Funders_Home_CalendarTile') },
+  {
+    name: 'Grant__c',
+    object: GRANT,
+    help: () => helpText('Funders', 'Funders_Home_GrantsTile')
+  },
+  {
+    name: 'Grant_Requirement__c',
+    object: REQUIREMENT,
+    help: () => helpText('Funders', 'Funders_Home_RequirementsTile')
+  },
+  {
+    name: 'Grant_Answer__c',
+    object: ANSWER,
+    help: () => helpText('Funders', 'Funders_Home_AnswersTile')
+  },
+  {
+    name: 'Funder_Report_Template__c',
+    object: TEMPLATE,
+    help: () => helpText('Funders', 'Funders_Home_TemplatesTile')
+  }
 ];
-const OBJECT_NAMES = TOOL_TABS.filter((tab) => !tab.page).map((tab) => tab.name);
+const OBJECT_NAMES = TOOL_TABS.filter((tab) => tab.object).map((tab) => tab.object.objectApiName);
 
 const sumOf = (slices) =>
   (slices || []).reduce((sum, slice) => sum + (Number(slice.amount) || 0), 0);
@@ -202,37 +226,28 @@ export default class FundersBoard extends NavigationMixin(LightningElement) {
     if (tab.name === 'Grant_Calendar') {
       return CALENDAR;
     }
-    const info = this.objectInfos[tab.name];
+    const info = this.objectInfos[tab.object.objectApiName];
     return info ? info.labelPlural : '';
   }
 
   toolDescription(name) {
-    switch (name) {
-      case 'Grant_Pipeline':
-        return helpText('Funders', 'Funders_Home_PipelineTile');
-      case 'Grant_Calendar':
-        return helpText('Funders', 'Funders_Home_CalendarTile');
-      case 'Grant__c':
-        return helpText('Funders', 'Funders_Home_GrantsTile');
-      case 'Grant_Requirement__c':
-        return helpText('Funders', 'Funders_Home_RequirementsTile');
-      case 'Grant_Answer__c':
-        return helpText('Funders', 'Funders_Home_AnswersTile');
-      default:
-        return helpText('Funders', 'Funders_Home_TemplatesTile');
-    }
+    const tab = TOOL_TABS.find((candidate) => candidate.name === name);
+    return tab.help();
   }
 
-  handleTool(event) {
+  async handleTool(event) {
     const name = event.detail.name;
     const tab = TOOL_TABS.find((candidate) => candidate.name === name);
     if (!tab) {
       return;
     }
     this[NavigationMixin.Navigate](
-      tab.page
-        ? { type: 'standard__navItemPage', attributes: { apiName: name } }
-        : { type: 'standard__objectPage', attributes: { objectApiName: name, actionName: 'home' } }
+      tab.object
+        ? {
+            type: 'standard__objectPage',
+            attributes: { objectApiName: tab.object.objectApiName, actionName: 'home' }
+          }
+        : await tabPageReference(name)
     );
   }
 

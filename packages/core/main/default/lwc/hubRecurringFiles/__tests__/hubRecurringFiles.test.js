@@ -69,6 +69,7 @@ describe('c-hub-recurring-files', () => {
     expect(sources[1].querySelector('lightning-formatted-date-time')).not.toBeNull();
 
     element.shadowRoot.querySelector('[data-id="open-import"]').click();
+    await settle();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Import' }
