@@ -19,5 +19,9 @@ packages/**/lwc/**/*.html
 packages/core/main/default/staticresources/SampleData.json
 packages/giving/main/default/staticresources/GivingSampleData.json
 
+# Permission set deltas keep one line per entry, the shape generate.py --bootstrap writes
+# (D-200 S9a); Prettier would fold or split them by width.
+scripts/permission-sets/deltas/*.json
+
 # Third-party library shipped unmodified (MIT, listed in NOTICE); reformatting would modify it.
 packages/events/main/default/staticresources/BarnQrCode.js
