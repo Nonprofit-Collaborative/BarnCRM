@@ -12,14 +12,7 @@ public with sharing class GivingSampleDataSelector {
 	 * The GivingSampleData static resource, or null when it has not been deployed.
 	 */
 	public StaticResource getSampleDataResource() {
-		List<StaticResource> resources = [
-			SELECT Body
-			FROM StaticResource
-			WHERE Name = 'GivingSampleData'
-			WITH USER_MODE
-			LIMIT 1
-		];
-		return resources.isEmpty() ? null : resources[0];
+		return SetupObjectSelector.staticResource('GivingSampleData');
 	}
 
 	/** Every sample person by the key the generator gave them. */

@@ -38,19 +38,9 @@ public with sharing class GivingEmailTemplates {
 
 	/** The template ids behind these developer names; a name with no template is left out. */
 	public static Map<String, Id> idsByDeveloperName(Set<String> developerNames) {
-		Map<String, Id> byName = new Map<String, Id>();
-		if (developerNames.isEmpty()) {
-			return byName;
-		}
-		for (EmailTemplate template : [
-			SELECT Id, DeveloperName
-			FROM EmailTemplate
-			WHERE DeveloperName IN :developerNames
-			WITH SYSTEM_MODE
-		]) {
-			byName.put(template.DeveloperName, template.Id);
-		}
-		return byName;
+		return developerNames.isEmpty()
+			? new Map<String, Id>()
+			: SetupObjectSelector.emailTemplateIds(developerNames, false);
 	}
 
 	/**

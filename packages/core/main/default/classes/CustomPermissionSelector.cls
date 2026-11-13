@@ -145,16 +145,8 @@ public with sharing class CustomPermissionSelector {
 
 	/** The named custom permission, or nothing at all in an org without the package. */
 	private static Set<Id> customPermissionIds(String developerName) {
-		Set<Id> permissionIds = new Set<Id>();
-		for (CustomPermission permission : [
-			SELECT Id
-			FROM CustomPermission
-			WHERE DeveloperName = :developerName
-			WITH USER_MODE
-		]) {
-			permissionIds.add(permission.Id);
-		}
-		return permissionIds;
+		Id permissionId = SetupObjectSelector.customPermissionId(developerName);
+		return permissionId == null ? new Set<Id>() : new Set<Id>{ permissionId };
 	}
 
 	/**

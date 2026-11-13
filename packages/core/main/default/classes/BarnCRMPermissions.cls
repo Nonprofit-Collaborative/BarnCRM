@@ -50,16 +50,7 @@ public with sharing class BarnCRMPermissions {
 		if (anyoneManagesOverride != null) {
 			return anyoneManagesOverride;
 		}
-		String ns = NamespaceUtil.namespacePrefix();
-		Set<Id> permissionIds = new Map<Id, CustomPermission>(
-				[
-					SELECT Id
-					FROM CustomPermission
-					WHERE DeveloperName = :MANAGE_SETTINGS AND NamespacePrefix = :ns
-					WITH SYSTEM_MODE
-				]
-			)
-			.keySet();
+		Id permissionId = SetupObjectSelector.customPermissionId(MANAGE_SETTINGS);
 		return [
 				SELECT COUNT()
 				FROM PermissionSetAssignment
@@ -68,7 +59,7 @@ public with sharing class BarnCRMPermissions {
 					AND PermissionSetId IN (
 						SELECT ParentId
 						FROM SetupEntityAccess
-						WHERE SetupEntityId IN :permissionIds
+						WHERE SetupEntityId = :permissionId
 					)
 				WITH SYSTEM_MODE
 			] > 0;

@@ -65,21 +65,15 @@ public with sharing class AddressVerificationPostInstall implements InstallHandl
 
 		public void execute(QueueableContext jobContext) {
 			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE
-						Name = :AddressVerificationAccessSync.ADMIN_SET
-						AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				Database.SaveResult saved = sets.isEmpty()
+				PermissionSet permissionSet = SetupObjectSelector.permissionSet(
+					AddressVerificationAccessSync.ADMIN_SET
+				);
+				Database.SaveResult saved = permissionSet == null
 					? null
 					: Database.insert(
 							new PermissionSetAssignment(
 								AssigneeId = installerId,
-								PermissionSetId = sets[0].Id
+								PermissionSetId = permissionSet.Id
 							),
 							false,
 							AccessLevel.SYSTEM_MODE
