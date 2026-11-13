@@ -787,19 +787,21 @@ without changing what everyone else sees. The Volunteers report type reads peopl
 the **Lapsing volunteers** report can show no rows in an org whose people are person accounts;
 that org builds its own lapsing report on an account-based report type.
 
-**Who sees what.** The dashboard reads as **The dashboard viewer**, so each person sees only
-the hours and sign-ups they are allowed to see: hours are private, so a Coordinator sees them all
-and a Team Member sees the hours they can open. The folders ship public read only, and all four
+**Who sees what.** The dashboard runs as one specified user, the admin who installed or deployed
+the package, so everyone who opens it sees the hours and sign-ups that user can see, not their own
+view. Hours are private, so share the folder only with people who are allowed to see all volunteer
+hours, such as Coordinators. The folders ship public read only, and all four
 Volunteers permission sets can run and view the reports and dashboards. Only **Volunteers Admin**
 can also create reports and dashboards of their own, and change the shipped ones by saving a copy
 into a folder they can write to. No Volunteers set edits or deletes everything in public folders:
 to let someone change the shipped folders themselves, share those folders with them as Manager in
 Salesforce.
 
-**How to change the running user.** If your edition does not offer the dashboard viewer, or your
-org has used up its allowance of dashboards that read that way, open the dashboard, choose
-**Edit**, and in **View dashboard as** choose a person who can see all volunteer hours, for
-example a coordinator. Everyone then sees that person's view, so choose carefully. Save.
+**How to change the running user.** The running user is the admin who installed or deployed the
+package. To change it, open the dashboard, choose **Edit**, open the dashboard's properties, and in
+**View dashboard as** choose a person who can see all volunteer hours, for example a coordinator.
+Everyone then sees that person's view, so choose carefully. Save. A dashboard that reads as each
+viewer is planned for the Advanced Reporting module.
 
 **How to add it to the home page.** Open the Home page, choose the gear and **Edit Page**, drag a
 **Dashboard** component on, choose **Volunteers** in the BarnCRM Volunteers folder, and save and

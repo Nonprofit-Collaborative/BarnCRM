@@ -4,7 +4,7 @@
   <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
   <backgroundStartColor>#FFFFFF</backgroundStartColor>
   <chartTheme>light</chartTheme>
-  <dashboardType>LoggedInUser</dashboardType>
+  <dashboardType>SpecifiedUser</dashboardType>
   <description>
     Where the hours went this year, which hours still need approving, which shifts in the next two
     weeks still need people, and which volunteers have gone quiet.

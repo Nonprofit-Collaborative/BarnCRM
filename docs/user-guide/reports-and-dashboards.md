@@ -147,7 +147,9 @@ report and choose **Subscribe** again.
 ## Common Problems
 
 - Problem: the dashboard shows "The running user for this dashboard doesn't have permission to
-  run reports." Why and what to do: you lack report or gift access. Ask your admin (see
+  run reports." Why and what to do: the dashboard shows what its running user (set by your
+  admin, usually the person who installed BarnCRM) can see, not what you can see, and that
+  person lost report or gift access. Ask your admin (see
   [Giving dashboard](../admin-guide/giving-dashboard.md)).
 - Problem: a giving total looks too small. Why and what to do: Pending and Cancelled gifts are
   left out on purpose. Open **Recent Gifts** and check the status column.

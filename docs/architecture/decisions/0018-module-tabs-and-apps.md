@@ -96,6 +96,8 @@ module apps rather than absorbing their tabs.**
   page. Until C-03 ships it, the app launcher is the path between apps, and the Giving admin
   guide says so in plain words.
 - A packaged dashboard has to say who it reads as, and it cannot name a subscriber's user.
+  (Amended 2026-11-13 by ADR-NEXT: dashboards now ship as `SpecifiedUser`; the text below
+  is the original decision.)
   `Giving_Overview` therefore ships with `dashboardType` set to `LoggedInUser`, so it reads
   as whoever opens it and arrives working with no post-install step. The cost is that
   dashboards of this kind are capped per edition; an org that has used its allowance sets a

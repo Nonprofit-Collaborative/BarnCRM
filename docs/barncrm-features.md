@@ -610,7 +610,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Fund and appeal totals | Minor | Total raised, this year, gift count and last gift date on funds; total raised and gift count on appeals. | Shipped | G-02 |
 | In-kind gifts report | Minor | In-kind Gifts This Year, counting only gifts in the books. | Shipped | G-18 |
 | Donors with Giving report type | Minor | A report type whose rows are donors, used by the retention reports. | Shipped | G-16 |
-| Dashboard runs as the viewer | Minor | Each person sees only the gifts they may see. | Shipped | G-06 |
+| Dashboard runs as a specified user | Minor | Each packaged dashboard (Giving, Volunteers, Scholarships and Grants, Board Governance) runs as one user, the admin who installs or deploys it, so it takes no dynamic dashboard allowance and installs in Developer Edition. Everyone who opens it sees what that user can see, so access is by the folder's sharing; the running user can be changed in the dashboard's properties. | Shipped | G-06, ADR-NEXT (D-202) |
 | Refund-correct totals | Minor | A refunded gift stays in the count and leaves the total; a fully refunded donor shows zero, not blank. | Shipped | ADR-0022 |
 | Giving totals update on save | Minor | Totals on donors move when a gift or commitment is saved, not only overnight (see Core 1.6, Instant totals from gifts and pledges). | Shipped | G-02 (rollup slice S1) |
 
@@ -956,6 +956,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Multi-currency | Not supported in v1; Health Check warns when present. BarnCRM's own rollup engine already totals in the record's currency. | Planned (post-1.0) | plan 4.2, 6.1 |
 | Professional Edition | Not a target. | Not planned | plan 11.2 item 11 |
 | Open source license | Apache 2.0. | Shipped | ADR-0008 |
+| Advanced Reporting module | Major | Dashboards that read as each viewer, reproducing the packaged dashboards without a specified running user. | Planned | plan 6.1 item 22, D-202 |
 
 ## 13. Forms
 

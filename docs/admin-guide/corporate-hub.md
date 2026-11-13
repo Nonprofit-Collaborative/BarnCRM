@@ -315,6 +315,12 @@ ending in the next 90 days, attendance this year and open board disclosures. Giv
 participation is on each board's panel, not the dashboard, so the dashboard never depends on
 Giving.
 
+The dashboard runs as one specified user, the admin who installed or deployed the package, so
+everyone who opens it sees what that user can see. Share the folder only with people who are
+allowed to see board records and disclosures. To change the running user, open the dashboard,
+choose **Edit**, open the dashboard's properties, and in **View dashboard as** choose another
+person. A dashboard that reads as each viewer is planned for the Advanced Reporting module.
+
 ## Reports
 
 Build reports on Library Documents with Policy Acknowledgments, Compliance Obligations with

@@ -92,7 +92,7 @@ For every script on this page:
 
 ## T-GRD-06: Dashboard and Reports as Staff and Read-Only
 
-**Purpose:** Confirm the dashboard runs as the viewer and the shared folder is read only.
+**Purpose:** Confirm the dashboard runs as its specified user (the installing admin), shows every viewer that user's view, and the shared folder is read only.
 **Prerequisites:** staff, read-only, then admin and staff for steps 5 to 6.
 
 | Step | Action | Expected result |
@@ -102,7 +102,8 @@ For every script on this page:
 | 3 | As read-only, open **Reports**, folder **BarnCRM Giving**, **Giving by Month**. | The report runs. The folder is shared read only, so the report cannot be saved over. |
 | 4 | As staff, open the same report. | The report runs: Giving Staff, like Giving Read Only, carries Salesforce's **Run Reports**. |
 | 5 | As admin, in Setup, remove **Giving Staff** from the staff user. | Saved. |
-| 6 | As staff, open **Giving Overview**. | The components show an error or no data: without a Giving permission set the user cannot read gifts. |
+| 6 | As staff, open **Giving Overview**. | The components still show numbers: the dashboard runs as its specified user, not as the viewer. The staff user still cannot open gifts or run the reports themselves. |
+| 7 | As admin, open **Giving Overview**, **Edit**, open the dashboard's properties and read **View dashboard as**. | It names the admin who deployed the package. |
 
 **Cleanup:** Give the staff user **Giving Staff** again.
 

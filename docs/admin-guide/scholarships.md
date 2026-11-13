@@ -193,6 +193,12 @@ The **BarnCRM Scholarships** folder holds Applications by Cycle and Status, Appl
 Score, Awards by Program, Disbursements Due Next 30 Days and Recipient Reports Due, and the
 **Scholarships and Grants** dashboard. Copy them to change them.
 
+The dashboard runs as one specified user, the admin who installed or deployed the package, so
+everyone who opens it sees what that user can see. Share the folder only with people who are
+allowed to see all applications and awards. To change the running user, open the dashboard,
+choose **Edit**, open the dashboard's properties, and in **View dashboard as** choose another
+person. A dashboard that reads as each viewer is planned for the Advanced Reporting module.
+
 ## Moving From Outbound Funds
 
 When the Outbound Funds Module (the free Salesforce.org package for grants you give) is installed

@@ -16,12 +16,15 @@ else sees.
 
 1. Open the **BarnCRM Fundraising** app from the app launcher. Tap **Dashboards**, open the
    **BarnCRM Giving** folder, and open **Giving Overview**.
-2. Check who the dashboard reads as. It ships set to **The dashboard viewer**, so every
-   person sees the gifts they are allowed to see and nothing needs changing. If your
-   edition does not offer the dashboard viewer, or your org has used up its allowance of
-   dashboards that read that way, open the dashboard, choose **Edit**, and in **View
-   dashboard as** choose a person who can see all gifts, usually the person who installed
-   the package.
+2. Check who the dashboard reads as. It ships set to run as one specified user, and the
+   running user is the admin who installed or deployed the package. Every person who opens
+   it sees the gifts that user can see, whatever their own access to gifts, so share the
+   **BarnCRM Giving** folder only with people who are allowed to see that data. To change
+   the running user, open the dashboard, choose **Edit**, open the dashboard's properties,
+   and in **View dashboard as** choose a person who can see all gifts. Save. (A dashboard
+   that reads as each viewer is not shipped: Salesforce caps those per edition, and a full
+   install exceeds the cap in Developer Edition. A viewer-aware version is planned for the
+   Advanced Reporting module.)
 3. Give people access. In BarnCRM Settings, open **Access** and assign the
    **Fundraising Staff** role, which includes the Giving module's **Giving Staff**
    permission set. Someone who should only look gets the **Read Only** role and, in
