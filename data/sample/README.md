@@ -24,6 +24,10 @@ default allocations, installment schedules, automatic household soft credits), a
   `GivingSampleData` in the Giving package: funds, appeals, gifts with their allocations,
   commitments, soft credits, tributes. It ships with Giving, so an org without Giving never
   carries it.
+- `MembershipsSampleData.json` (levels, benefits, memberships) and `ScholarshipsSampleData.json`
+  (programs, cycles, applications, reviews, awards, disbursements, requirements), in the same
+  format (release 1.25). Payments has no set: its records are made only by the checkout and the
+  webhook receiver.
 - `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
   module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
   by Core's `SampleDataFile` with no loader Apex in the module.

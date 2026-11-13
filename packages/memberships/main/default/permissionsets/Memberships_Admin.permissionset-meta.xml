@@ -126,6 +126,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Membership_Level__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Membership_Level__c.Term_Months__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -242,6 +247,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Membership_Term__c.Reminded_For__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Membership_Term__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

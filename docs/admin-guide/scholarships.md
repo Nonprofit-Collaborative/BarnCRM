@@ -228,6 +228,18 @@ The Outbound Funds names the kit reads come from its public repository, not from
 package version: if your version differs, the step stops before reading anything and names the
 field it could not find.
 
+## Sample Data
+
+**BarnCRM Settings**, **Load Sample Data** (see [Sample Data](sample-data.md)) adds a small
+example of Scholarships and Outbound Grants after Core's people and organizations are loaded:
+the Harvest Community Scholarship (a decided cycle, Last Spring, and an open one, This Fall) and
+Neighborhood Small Grants (a cycle in review). Fourteen applications sit at every stage (Draft,
+Submitted, Eligible, Ineligible, In Review, Awarded, Declined, Withdrawn) with scored, unscored
+and recused reviews; three awards (Active, Completed, Accepted) carry five disbursements (two
+paid) and four requirements, one an open condition that holds the next payment back. Reviews are
+all assigned to the person who loads the set. **Remove Sample Data** deletes only the sample
+programs and everything under them; your own programs stay.
+
 ## Removing the Module
 
 Turn it off in BarnCRM Settings, **Modules**; the records stay. Uninstalling deletes the seven

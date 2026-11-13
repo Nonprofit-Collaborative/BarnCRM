@@ -125,6 +125,24 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 
 **Cleanup:** None.
 
+## T-SG-10: Sample Data
+
+**Purpose:** confirm the Scholarships sample data loads for the sample people and organizations and takes away only itself.
+
+**Prerequisites:** admin with Manage Scholarships; Core's sample data not yet loaded; one award program of your own with a cycle.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Scholarships** count of `2`. |
+| 2 | Open **Scholarships and Grants**, **Award Programs**. | Harvest Community Scholarship and Neighborhood Small Grants beside your own program. |
+| 3 | Open the Harvest Community Scholarship. | Cycles Last Spring (Decided) and This Fall (Open). |
+| 4 | Open **This Fall** applications. | Five applications: Draft, Submitted, Eligible, In Review (one scored, one assigned) and Ineligible with its eligibility note. |
+| 5 | Open **Last Spring** awards. | Three awards (Active, Completed, Accepted) with five disbursements (two Paid) and requirements; the Accepted award has an open Proof of Enrollment condition holding its first disbursement. |
+| 6 | Open **Neighborhood Round**. | Four organization applications, one with a recused review. |
+| 7 | **Remove Sample Data**. | Both sample programs and every cycle, application, review, award, disbursement and requirement under them are gone; your own program and cycle stay. |
+
+**Cleanup:** None.
+
 ## T-SG-09: Moving From Outbound Funds
 
 **Purpose:** confirm the Outbound Funds kit copies programs, requests, awards, disbursements and requirements with their links, and never changes Outbound Funds.
