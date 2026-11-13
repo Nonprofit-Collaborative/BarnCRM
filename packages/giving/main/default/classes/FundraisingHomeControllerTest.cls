@@ -143,6 +143,8 @@ private class FundraisingHomeControllerTest {
 				new Contact(FirstName = 'Ada', LastName = 'First')
 			);
 			insert donor;
+			// A gift saves only with a default fund to allocate it to.
+			GivingTestDataFactory.ensureDefaultFund();
 			insert new Gift__c(
 				Donor_Contact__c = donor.Id,
 				Gift_Date__c = Date.today(),

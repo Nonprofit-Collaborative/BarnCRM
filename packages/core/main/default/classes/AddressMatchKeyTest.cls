@@ -110,8 +110,16 @@ private class AddressMatchKeyTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(1, pairs.size(), 'Only the two at the same address: ' + pairs);
-			Assert.areEqual(DuplicateService.pairKey(first.Id, second.Id), pairs[0].key);
+			// Each side of a pair can find it; the scan folds pairs by key (pairsToRecord).
+			Set<String> keys = new Set<String>();
+			for (DuplicateService.Pair pair : pairs) {
+				keys.add(pair.key);
+			}
+			Assert.areEqual(
+				new Set<String>{ DuplicateService.pairKey(first.Id, second.Id) },
+				keys,
+				'Only the two at the same address: ' + pairs
+			);
 		}
 	}
 

@@ -81,6 +81,28 @@ private class NpcHouseholdConversionTest {
 		];
 	}
 
+	/**
+	 * What this org gives an Account whose record type is set blank on update (its default
+	 * where it has record types), found with a probe saved the way undo saves (as
+	 * NpspHouseholdAdoptionTest.undoPutsAccountsBack does).
+	 */
+	private static Id blankRecordTypeOnUpdate() {
+		Account probe = TestDataFactory.household(
+			new Account(
+				Name = 'Npc Convert Probe',
+				RecordTypeId = HouseholdService.householdRecordTypeId()
+			)
+		);
+		Database.insert(probe, true, AccessLevel.SYSTEM_MODE);
+		Database.update(
+			new Account(Id = probe.Id, RecordTypeId = null),
+			true,
+			AccessLevel.SYSTEM_MODE
+		);
+		return [SELECT RecordTypeId FROM Account WHERE Id = :probe.Id WITH SYSTEM_MODE]
+		.RecordTypeId;
+	}
+
 	private static Map<Id, Account> read(List<Account> accounts) {
 		return new Map<Id, Account>(
 			[
@@ -155,8 +177,12 @@ private class NpcHouseholdConversionTest {
 			Account lee = accounts[0];
 			Account kim = accounts[1];
 			String runId = 'NPC-' + '0'.repeat(32);
-			String leeModelBefore = [SELECT Household_Model__c FROM Account WHERE Id = :lee.Id]
-			.Household_Model__c;
+			Account leeBefore = [
+				SELECT RecordTypeId, Household_Model__c
+				FROM Account
+				WHERE Id = :lee.Id
+			];
+			String leeModelBefore = leeBefore.Household_Model__c;
 			NpspHouseholdAdoptionBatch.adopt(runId, true, 2).execute(null, accounts);
 			Contact ann = TestDataFactory.person(new Contact(LastName = 'Kim', FirstName = 'Ann'));
 			insert ann;
@@ -167,10 +193,16 @@ private class NpcHouseholdConversionTest {
 			Test.stopTest();
 
 			Map<Id, Account> after = read(accounts);
-			Assert.areNotEqual(
-				HouseholdService.householdRecordTypeId(),
+			Id expectedType = leeBefore.RecordTypeId == null
+				? blankRecordTypeOnUpdate()
+				: leeBefore.RecordTypeId;
+			// Lee is no longer a household, except where the org gives a blank record type on
+			// update its default and that default is the household type (a Platform org with
+			// no organization type): the record type it had is put back either way.
+			Assert.areEqual(
+				expectedType,
 				after.get(lee.Id).RecordTypeId,
-				'Lee is no longer a household'
+				'Lee gets the record type it had before the run'
 			);
 			Assert.areEqual(
 				leeModelBefore,

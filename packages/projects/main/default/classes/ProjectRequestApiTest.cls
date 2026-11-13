@@ -103,14 +103,18 @@ private class ProjectRequestApiTest {
 		}
 		System.runAs(ProjectsTestData.admin()) {
 			Project_Request__c saved = [
-				SELECT Channel__c, Type__c, Priority__c, Description__c, Owner.Type, Connection__c
+				SELECT Channel__c, Type__c, Priority__c, Description__c, OwnerId, Connection__c
 				FROM Project_Request__c
 			];
 			Assert.areEqual(ProjectRequestHandler.PARTNER, saved.Channel__c, 'Partner channel');
 			Assert.areEqual('Service Request', saved.Type__c, 'Unknown type falls back');
 			Assert.areEqual('High', saved.Priority__c, 'Known priority kept');
 			Assert.isTrue(saved.Description__c.contains('pat@example.org'), 'Who asked');
-			Assert.areEqual('Queue', saved.Owner.Type, 'Lands in the Requests queue');
+			Assert.areEqual(
+				ProjectsTestData.requestsQueueId(),
+				saved.OwnerId,
+				'Lands in the Requests queue'
+			);
 			Assert.isNotNull(saved.Connection__c, 'Connection linked');
 		}
 	}

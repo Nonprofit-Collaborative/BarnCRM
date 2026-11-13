@@ -511,12 +511,17 @@ private class OpportunityMirrorCopyTest {
 	@IsTest
 	static void aSaverWhoCannotReadTheAppealsCampaignLeavesTheOpportunitysCampaign() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			// Ana links appeals to Campaigns; Maria sees Campaigns but not the appeal's Campaign ID.
+			// Ana links appeals to Campaigns; Mia sees Campaigns but not the appeal's Campaign ID.
+			// Salesforce Records Sync grants that field, so Mia holds Giving Admin and only the
+			// gift's Opportunity ID (Maria holds the whole set).
 			User ana = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Ana',
 				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
-			User admin = maria();
+			User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
+				'Mia',
+				new List<String>{ 'Giving_Admin' }
+			);
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
 				return;
@@ -525,6 +530,24 @@ private class OpportunityMirrorCopyTest {
 				return; // Without Campaign there is no appeal Campaign to copy.
 			}
 			System.runAs(new User(Id = UserInfo.getUserId())) {
+				PermissionSet link = new PermissionSet(
+					Name = 'Zztest_Gift_Opportunity_Link',
+					Label = 'Zztest Gift Opportunity Link'
+				);
+				insert link;
+				insert new FieldPermissions(
+					ParentId = link.Id,
+					SobjectType = String.valueOf(Gift__c.SObjectType),
+					Field = String.valueOf(Gift__c.SObjectType) +
+						'.' +
+						NamespaceUtil.qualify('Opportunity_Id__c'),
+					PermissionsRead = true,
+					PermissionsEdit = true
+				);
+				insert new PermissionSetAssignment(
+					AssigneeId = admin.Id,
+					PermissionSetId = link.Id
+				);
 				update new List<User>{
 					new User(Id = ana.Id, UserPermissionsMarketingUser = true),
 					new User(Id = admin.Id, UserPermissionsMarketingUser = true)

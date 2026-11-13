@@ -34,7 +34,10 @@ private class BarnInstallCheckTest {
 			System.runAs(maria) {
 				Integer expected = HealthCheckService.run().size();
 
+				// Its own limits: a second run in the same budget would leave checks for later.
+				Test.startTest();
 				Map<String, Object> summary = BarnInstallCheck.runHealthCheck();
+				Test.stopTest();
 
 				Assert.areEqual(expected, summary.get('findings'), 'Every finding counted');
 				List<String> errors = (List<String>) summary.get('errorFindings');
@@ -61,7 +64,8 @@ private class BarnInstallCheckTest {
 	@IsTest
 	static void everyEntryPointNeedsSetupAccess() {
 		System.runAs(TestUsers.admin()) {
-			User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+			// The standard profile: one on the running admin's profile has Customize Application.
+			User priya = TestUsers.standardUser('Priya');
 			StubSetup giving = stubbedGiving();
 			BarnCRMPermissions.anyoneManagesOverride = false;
 			Integer refused = 0;

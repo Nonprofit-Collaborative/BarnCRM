@@ -72,11 +72,16 @@ private class CaseProviderRequestsTest {
 		)[0];
 	}
 
+	/**
+	 * The row the class kept. Read in system mode, as the class writes it: the test user holds
+	 * no Mirror permission set, so field access on Provider Request is not this test's subject.
+	 */
 	private static Provider_Request__c kept(Id caseId) {
 		return [
 			SELECT Name, Request_Number__c, Status__c, Resolution__c, Error__c, Synced__c
 			FROM Provider_Request__c
 			WHERE Case_Id__c = :caseId
+			WITH SYSTEM_MODE
 		];
 	}
 
@@ -93,7 +98,11 @@ private class CaseProviderRequestsTest {
 			Assert.areEqual(0, Limits.getQueueableJobs(), 'Off: nothing queued');
 			Test.stopTest();
 			Assert.isFalse(CaseProviderRequests.step().active, 'Off: not in tonight run');
-			Assert.areEqual(0, [SELECT COUNT() FROM Provider_Request__c], 'Nothing kept');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Provider_Request__c WITH SYSTEM_MODE],
+				'Nothing kept'
+			);
 		}
 	}
 
@@ -137,7 +146,7 @@ private class CaseProviderRequestsTest {
 			}
 			turnOn(true);
 			SObject record = newCase();
-			insert new Provider_Request__c(
+			insert as system new Provider_Request__c(
 				Name = (String) record.get('CaseNumber'),
 				Case_Id__c = record.Id,
 				Error__c = 'Earlier failure'
@@ -163,7 +172,7 @@ private class CaseProviderRequestsTest {
 			turnOn(true);
 			SObject record = newCase();
 			String caseNumber = (String) record.get('CaseNumber');
-			insert new Provider_Request__c(
+			insert as system new Provider_Request__c(
 				Name = caseNumber,
 				Case_Id__c = record.Id,
 				Request_Number__c = 'REQ-000042',

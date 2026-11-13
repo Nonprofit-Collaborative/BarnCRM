@@ -416,13 +416,20 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		if (!readable(entry, true)) {
 			return ids;
 		}
+		// A semi-join must sit at the top level of the WHERE, never inside parentheses, and
+		// it cannot be ORed, so a clause with one is already a plain AND list; any other
+		// clause is wrapped so an OR in it stays apart from the kept rows.
+		String condition = (String) entry.get('where');
+		if (!condition.toUpperCase().contains('SELECT ')) {
+			condition = '(' + condition + ')';
+		}
 		for (
 			SObject row : Database.queryWithBinds(
 				'SELECT Id FROM ' +
 					(String) entry.get('object') +
-					' WHERE (' +
-					(String) entry.get('where') +
-					') AND Id NOT IN :kept LIMIT :chunk',
+					' WHERE ' +
+					condition +
+					' AND Id NOT IN :kept LIMIT :chunk',
 				new Map<String, Object>{ 'kept' => kept, 'chunk' => removeChunkSize },
 				AccessLevel.USER_MODE
 			)

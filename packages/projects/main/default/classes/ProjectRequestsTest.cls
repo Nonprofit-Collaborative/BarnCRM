@@ -151,12 +151,16 @@ private class ProjectRequestsTest {
 		}
 		System.runAs(ProjectsTestData.admin()) {
 			Project_Request__c saved = [
-				SELECT Channel__c, Owner.Type
+				SELECT Channel__c, OwnerId
 				FROM Project_Request__c
 				WHERE Id = :incoming.Id
 			];
 			Assert.areEqual('Portal', saved.Channel__c, 'Portal channel');
-			Assert.areEqual('Queue', saved.Owner.Type, 'Lands in the Requests queue');
+			Assert.areEqual(
+				ProjectsTestData.requestsQueueId(),
+				saved.OwnerId,
+				'Lands in the Requests queue'
+			);
 			update new Project_Request__c(
 				Id = incoming.Id,
 				OwnerId = owner.Id,

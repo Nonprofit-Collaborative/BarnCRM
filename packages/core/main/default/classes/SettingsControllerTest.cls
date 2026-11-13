@@ -1161,9 +1161,15 @@ private class SettingsControllerTest {
 			Assert.isNotNull(row, 'General always shows the record type for organizations');
 			Assert.areEqual(SettingsService.RECORD_TYPE, row.dataType, 'One record type');
 			Integer candidates = AccountKinds.candidateRecordTypes().size();
+			// The candidates, or with none Core's own record type when it is active (R-O4a).
+			Integer choices = AccountKinds.organizationChoices().size();
 			SettingsController.Option last = row.options[row.options.size() - 1];
 			if (candidates == 0) {
-				Assert.areEqual(1, row.options.size(), 'No candidate: only No record type');
+				Assert.areEqual(
+					choices + 1,
+					row.options.size(),
+					'No candidate: Core\'s own record type where active, then No record type'
+				);
 				Assert.areEqual(AccountKinds.NO_RECORD_TYPE, last.value, 'Stored as Master');
 				Assert.areEqual(
 					System.Label.Core_Settings_NoRecordType,
@@ -1172,7 +1178,7 @@ private class SettingsControllerTest {
 				);
 			} else {
 				Assert.areEqual(
-					candidates,
+					choices,
 					row.options.size(),
 					'The candidates only: No record type would not work here'
 				);

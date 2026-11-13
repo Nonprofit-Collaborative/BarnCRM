@@ -107,6 +107,8 @@ private class SampleDataFileTest {
 				new Map<Id, String>{ kept.Id => 'Saved_Query__c' }
 			);
 			Assert.isTrue(message.contains('Sample kept'), 'The Warning names the kept record');
+			// The entry travels as a platform event; after stopTest it must be delivered.
+			Test.getEventBus().deliver();
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'SampleDataFile']
