@@ -62,3 +62,8 @@ export function escapeHtml(value) {
     ? ''
     : String(value).replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
 }
+
+/** The plain record path, which works as a link's address everywhere until a click is handled. */
+export function recordHref(recordId) {
+  return recordId ? `/${recordId}` : undefined;
+}

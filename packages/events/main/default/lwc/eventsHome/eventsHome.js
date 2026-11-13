@@ -8,7 +8,7 @@ import repeatEvent from '@salesforce/apex/EventsHomeController.repeatEvent';
 import { statusWord, whenText } from 'c/eventsModel';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
-import { recordHref } from 'c/recordRows';
+import { recordHref } from 'c/barnFormat';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRepeatModal from 'c/eventRepeatModal';
 

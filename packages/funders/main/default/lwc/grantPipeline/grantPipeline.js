@@ -19,7 +19,7 @@ import { createDragController } from 'c/barnDrag';
 import { dragInstructions, dragMessages } from 'c/barnDragText';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
-import { recordHref } from 'c/recordRows';
+import { recordHref } from 'c/barnFormat';
 import GrantAwardModal from 'c/grantAwardModal';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';

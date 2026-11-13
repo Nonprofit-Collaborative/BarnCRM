@@ -5,7 +5,7 @@ import { localIsoDate, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { toCsv } from 'c/scholarshipsModel';
-import { recordHref } from 'c/recordRows';
+import { recordHref } from 'c/barnFormat';
 
 const PKG = 'Scholarships';
 

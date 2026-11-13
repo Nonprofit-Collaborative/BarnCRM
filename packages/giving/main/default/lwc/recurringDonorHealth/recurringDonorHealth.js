@@ -4,7 +4,7 @@ import getPage from '@salesforce/apex/RecurringHealthController.getPage';
 import createFollowUp from '@salesforce/apex/RecurringHealthController.createFollowUp';
 import { messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
-import { recordHref } from 'c/recordRows';
+import { recordHref } from 'c/barnFormat';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import {
   REASON_CANCELLED,
