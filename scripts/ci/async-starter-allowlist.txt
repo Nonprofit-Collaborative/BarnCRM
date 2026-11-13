@@ -65,6 +65,7 @@ packages/volunteers/main/default/classes/VolunteersPostInstall.cls 2
 # A batch over values rather than records (Batchable<String>, <Integer>, or a custom type),
 # which AsyncStarter.batch does not take.
 packages/core/main/default/classes/AutoMergeJob.cls 2
+packages/core/main/default/classes/SampleDataRemoveBatch.cls 1
 packages/core/main/default/classes/SampleDataStageBatch.cls 1
 packages/volunteers/main/default/classes/VolunteerLetterBatch.cls 2
 

@@ -40,6 +40,11 @@ core/AccountKinds.cls | public static final String KEY_ORGANIZATION_RECORD_TYPE
 core/AccountKinds.cls | public static final String NO_RECORD_TYPE
 core/AccountKinds.cls | public static final String SHIPPED_RECORD_TYPE
 core/AccountKinds.cls | public static void storeDetectedIfBlank()
+core/AsyncStarter.cls | public class AsyncStarter
+core/AsyncStarter.cls | public class BusyException
+core/AsyncStarter.cls | public static Id batch(Database.Batchable<SObject>,Integer,String)
+core/AsyncStarter.cls | public static Id queue(Queueable,Integer,String)
+core/AsyncStarter.cls | public static Id queue(Queueable,String)
 core/AutomationControl.cls | public class AutomationControl
 core/AutomationControl.cls | public class AutomationControlException
 core/AutomationControl.cls | public static Boolean canManage()
