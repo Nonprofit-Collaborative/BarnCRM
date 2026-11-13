@@ -73,6 +73,30 @@ describe('c-scholarships-home', () => {
     }
   });
 
+  it('offers a first award program before any exists', async () => {
+    getHome.mockResolvedValue({
+      canManage: true,
+      reviews: [],
+      cycles: [],
+      due: [],
+      firstRun: true
+    });
+    const element = mount();
+    await flush();
+    await flush();
+    const panel = find(element, 'first-run');
+    expect(panel.heading).toBe('c.Scholarships_Home_FirstRunHeading');
+    expect(find(element, 'first-run-new').label).toBe('c.Scholarships_Home_FirstRunNew');
+  });
+
+  it('leaves the first-run panel out once a program exists', async () => {
+    getHome.mockResolvedValue({ canManage: true, reviews: [], cycles: [], due: [] });
+    const element = mount();
+    await flush();
+    await flush();
+    expect(find(element, 'first-run')).toBeNull();
+  });
+
   it('hides the export from staff and shows an error', async () => {
     getHome.mockRejectedValue({ body: { message: 'No access' } });
     const element = mount();

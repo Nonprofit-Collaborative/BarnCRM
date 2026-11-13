@@ -1,4 +1,5 @@
 import { LightningElement } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getHome from '@salesforce/apex/CorporateHubController.getHome';
 import acknowledge from '@salesforce/apex/CorporateHubController.acknowledge';
@@ -30,9 +31,10 @@ function dueText(dateIso, today) {
  * The Corporate Hub page (CH-01 to CH-03, CH-08): the policies the person is asked to read, with
  * I Have Read This; the compliance obligations due in the next 60 days; the agreements whose
  * notice or end date is in the next 90; and, for a holder of Manage Corporate Hub, Add Missing
- * Templates. The lists come from `CorporateHubController.getHome`.
+ * Templates. The lists come from `CorporateHubController.getHome`. Before the first board or
+ * committee, a first-run panel offers New Board or Committee (D-200 R4).
  */
-export default class CorporateHubHome extends LightningElement {
+export default class CorporateHubHome extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded(HELP_PACKAGES);
   icon = iconFor('Corporate_Hub');
   home;
@@ -61,8 +63,23 @@ export default class CorporateHubHome extends LightningElement {
       noAgreements: helpText('CorporateHub', 'CorporateHub_Home_NoAgreements'),
       privacy: helpText('CorporateHub', 'CorporateHub_Home_Privacy'),
       haveRead: helpText('CorporateHub', 'CorporateHub_Home_HaveRead'),
-      addTemplates: helpText('CorporateHub', 'CorporateHub_Home_AddTemplates')
+      addTemplates: helpText('CorporateHub', 'CorporateHub_Home_AddTemplates'),
+      firstRunHeading: helpText('CorporateHub', 'CorporateHub_Home_FirstRunHeading'),
+      firstRunMessage: helpText('CorporateHub', 'CorporateHub_Home_FirstRunMessage'),
+      firstRunNew: helpText('CorporateHub', 'CorporateHub_Home_FirstRunNew')
     };
+  }
+
+  /** True before the org's first board or committee, for someone who may create one. */
+  get firstRun() {
+    return this.home?.firstRun === true;
+  }
+
+  handleNewBoard() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Board__c', actionName: 'new' }
+    });
   }
 
   async load() {

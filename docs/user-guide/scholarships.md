@@ -6,7 +6,8 @@ Guide's [Scholarships and Outbound Grants](../admin-guide/scholarships.md) page.
 
 ## The Scholarships and Grants Page
 
-Open the **Scholarships and Grants** tab. It shows:
+Open the **Scholarships and Grants** tab. Before your organization's first award program, it
+opens with **Set Up Your First Award Program** and a **New Award Program** button. It shows:
 
 - **My Reviews**: applications assigned to you that you have not submitted. Open one to review it.
 - **Open Cycles**: cycles taking applications or in review, with their close dates and how many

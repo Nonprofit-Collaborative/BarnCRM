@@ -61,6 +61,17 @@ private class ProjectsControllerTest {
 				home.myTasks.size(),
 				'Assigned task is done; the added one has no owner'
 			);
+			Assert.isFalse(home.firstRun, 'A project exists, so there is no first-run panel.');
+		}
+	}
+
+	@IsTest
+	static void theFirstRunPanelShowsBeforeTheFirstProject() {
+		System.runAs(ProjectsTestData.admin()) {
+			Test.startTest();
+			ProjectsController.Home home = ProjectsController.getHome();
+			Test.stopTest();
+			Assert.isTrue(home.firstRun, 'No project exists yet, and an admin may create one.');
 		}
 	}
 

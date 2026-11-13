@@ -59,6 +59,34 @@ public with sharing class VolunteersHomeController {
 		}
 	}
 
+	/** The first-run panel (D-200 R4): whether it shows, and whether it offers a file import. */
+	public class FirstRun {
+		/** True when the person may create volunteer jobs and none exists yet. */
+		@AuraEnabled
+		public Boolean show = false;
+		@AuraEnabled
+		public Boolean canImport = false;
+	}
+
+	/**
+	 * Whether Volunteers Home opens on its first-run panel: no volunteer job exists yet and the
+	 * person may create one. A separate call, so getHome keeps its list of figures.
+	 */
+	@AuraEnabled
+	public static FirstRun getFirstRun() {
+		try {
+			FirstRun result = new FirstRun();
+			result.show =
+				Schema.SObjectType.Volunteer_Job__c.isCreateable() &&
+				[SELECT Id FROM Volunteer_Job__c WITH USER_MODE LIMIT 1]
+				.isEmpty();
+			result.canImport = result.show && Schema.SObjectType.Import_Batch__c.isCreateable();
+			return result;
+		} catch (Exception caught) {
+			throw UserErrors.wrap(caught, 'Volunteers Home', true);
+		}
+	}
+
 	private static void addHoursTiles(List<Tile> tiles) {
 		String hoursObject = Schema.SObjectType.Volunteer_Hours__c.getName();
 		Schema.DescribeFieldResult status = Schema.SObjectType.Volunteer_Hours__c.fields.Status__c;

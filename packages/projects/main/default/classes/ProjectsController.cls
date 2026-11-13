@@ -44,6 +44,9 @@ public with sharing class ProjectsController {
 		public Boolean timeTracking = false;
 		@AuraEnabled
 		public Boolean ratesEnabled = false;
+		/** True when the person may create projects and none exists yet (D-200 R4). */
+		@AuraEnabled
+		public Boolean firstRun = false;
 	}
 
 	@AuraEnabled
@@ -218,6 +221,16 @@ public with sharing class ProjectsController {
 			home.timeTracking = ProjectsSettings.timeTracking();
 			home.ratesEnabled = ProjectsSettings.ratesEnabled();
 			home.templates = ProjectTemplates.available();
+			home.firstRun =
+				Schema.SObjectType.Project__c.isCreateable() &&
+				[
+					SELECT Id
+					FROM Project__c
+					WHERE Is_Template__c = FALSE
+					WITH USER_MODE
+					LIMIT 1
+				]
+				.isEmpty();
 			home.myTasks = ProjectViews.tasks(
 				[
 					SELECT

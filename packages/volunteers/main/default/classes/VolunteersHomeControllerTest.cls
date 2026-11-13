@@ -86,6 +86,37 @@ private class VolunteersHomeControllerTest {
 	}
 
 	@IsTest
+	static void theFirstRunPanelShowsUntilTheFirstJob() {
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			Test.startTest();
+			VolunteersHomeController.FirstRun before = VolunteersHomeController.getFirstRun();
+			VolunteersTestData.job('Food bank sorting');
+			VolunteersHomeController.FirstRun after = VolunteersHomeController.getFirstRun();
+			Test.stopTest();
+
+			Assert.isTrue(before.show, 'No job exists yet, so the first-run panel shows.');
+			Assert.isTrue(before.canImport, 'An administrator may start a file import.');
+			Assert.isFalse(after.show, 'Once a job exists the figures show instead.');
+			Assert.isFalse(after.canImport, 'Import a File belongs to the first-run panel only.');
+		}
+	}
+
+	@IsTest
+	static void someoneWhoCannotCreateJobsNeverSeesTheFirstRunPanel() {
+		User outsider = TestUsers.standardUserWith(
+			'FirstRunOutsider',
+			new List<String>{ VolunteersTestData.CORE_STAFF }
+		);
+		VolunteersHomeController.FirstRun result;
+		Test.startTest();
+		System.runAs(outsider) {
+			result = VolunteersHomeController.getFirstRun();
+		}
+		Test.stopTest();
+		Assert.isFalse(result.show, 'The panel is for someone who can create volunteer jobs.');
+	}
+
+	@IsTest
 	static void aPicklistValueWithoutAnEntryKeepsItsName() {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(

@@ -1,4 +1,5 @@
 import { LightningElement } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import getHome from '@salesforce/apex/ScholarshipsController.getHome';
 import exportDisbursements from '@salesforce/apex/ScholarshipsController.exportDisbursements';
 import { localIsoDate, messageFrom } from 'c/findCsv';
@@ -12,9 +13,10 @@ const PKG = 'Scholarships';
 /**
  * The Scholarships and Grants page (SG-03, SG-05, SG-10): my reviews to do, cycles open or in
  * review, disbursements due in 30 days with any held back, and, for a holder of Manage
- * Scholarships, Export Disbursements as a CSV built here (`c/scholarshipsModel`).
+ * Scholarships, Export Disbursements as a CSV built here (`c/scholarshipsModel`). Before the
+ * first award program, a first-run panel offers New Award Program (D-200 R4).
  */
-export default class ScholarshipsHome extends LightningElement {
+export default class ScholarshipsHome extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded([PKG]);
   icon = iconFor('Scholarships');
   home;
@@ -50,12 +52,27 @@ export default class ScholarshipsHome extends LightningElement {
       exportTitle: helpText('Scholarships', 'Scholarships_Export_Title'),
       from: helpText('Scholarships', 'Scholarships_Export_From'),
       to: helpText('Scholarships', 'Scholarships_Export_To'),
-      exportButton: helpText('Scholarships', 'Scholarships_Export_Button')
+      exportButton: helpText('Scholarships', 'Scholarships_Export_Button'),
+      firstRunHeading: helpText('Scholarships', 'Scholarships_Home_FirstRunHeading'),
+      firstRunMessage: helpText('Scholarships', 'Scholarships_Home_FirstRunMessage'),
+      firstRunNew: helpText('Scholarships', 'Scholarships_Home_FirstRunNew')
     };
   }
 
   get canManage() {
     return this.home?.canManage === true;
+  }
+
+  /** True before the org's first award program, for someone who may create one. */
+  get firstRun() {
+    return this.home?.firstRun === true;
+  }
+
+  handleNewProgram() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Award_Program__c', actionName: 'new' }
+    });
   }
 
   get reviews() {

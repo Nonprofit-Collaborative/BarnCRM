@@ -37,6 +37,9 @@ public with sharing class ScholarshipsController {
 		public List<ScholarshipAwards.Payment> due = new List<ScholarshipAwards.Payment>();
 		@AuraEnabled
 		public Boolean canManage = false;
+		/** True when the person may create award programs and none exists yet (D-200 R4). */
+		@AuraEnabled
+		public Boolean firstRun = false;
 	}
 
 	public class Board {
@@ -132,6 +135,10 @@ public with sharing class ScholarshipsController {
 		try {
 			Home home = new Home();
 			home.canManage = Scholarships.canManage();
+			home.firstRun =
+				Schema.SObjectType.Award_Program__c.isCreateable() &&
+				[SELECT Id FROM Award_Program__c WITH USER_MODE LIMIT 1]
+				.isEmpty();
 			for (Application_Review__c review : [
 				SELECT
 					Application__c,

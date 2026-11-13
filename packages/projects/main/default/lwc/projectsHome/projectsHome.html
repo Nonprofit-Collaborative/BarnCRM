@@ -11,6 +11,23 @@
         <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.firstRunHeading}
+          message={labels.firstRunMessage}
+          heading-level="2"
+          data-id="first-run"
+        >
+          <lightning-button
+            variant="brand"
+            label={labels.firstRunStart}
+            onclick={handleStartFirst}
+            data-id="first-run-start"
+          ></lightning-button>
+        </c-barn-empty-state>
+      </template>
+
       <c-projects-at-risk class="slds-var-m-bottom_medium" data-id="at-risk"></c-projects-at-risk>
 
       <section class="slds-var-m-vertical_medium" data-id="my-tasks">

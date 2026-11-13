@@ -5,6 +5,9 @@ Entries in the BarnCRM app. Setup detail: [Project Management](../admin-guide/pr
 
 ## Projects Home
 
+Before your organization's first project, the page opens with **Start Your First Project**;
+click **Start a Project** to go to **New Project From Template**.
+
 - **Projects at Risk**: active projects that are At Risk or Off Track, with the reasons. Check
   **Only Mine** to see only projects you own.
 - **My Open Tasks**: tasks assigned to you that are not Done or Cancelled, soonest due first.

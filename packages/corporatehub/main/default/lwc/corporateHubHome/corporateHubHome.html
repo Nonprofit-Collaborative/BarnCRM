@@ -25,6 +25,23 @@
         ></c-barn-notice>
       </template>
 
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.firstRunHeading}
+          message={labels.firstRunMessage}
+          heading-level="2"
+          data-id="first-run"
+        >
+          <lightning-button
+            variant="brand"
+            label={labels.firstRunNew}
+            onclick={handleNewBoard}
+            data-id="first-run-new"
+          ></lightning-button>
+        </c-barn-empty-state>
+      </template>
+
       <section class="slds-var-m-bottom_medium" data-id="requests">
         <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.requests}</h2>
         <template lwc:if={hasRequests}>

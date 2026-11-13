@@ -47,6 +47,9 @@ public with sharing class CorporateHubController {
 		public List<Row> privacy = new List<Row>();
 		@AuraEnabled
 		public Boolean canManage = false;
+		/** True when the person may create a board or committee and none exists yet (D-200 R4). */
+		@AuraEnabled
+		public Boolean firstRun = false;
 	}
 
 	/** The document panel: its version and who has and has not acknowledged it. */
@@ -74,6 +77,10 @@ public with sharing class CorporateHubController {
 		try {
 			Home home = new Home();
 			home.canManage = HubPolicy.canManage();
+			home.firstRun =
+				Schema.SObjectType.Board__c.isCreateable() &&
+				[SELECT Id FROM Board__c WITH USER_MODE LIMIT 1]
+				.isEmpty();
 			for (Policy_Acknowledgment__c request : HubPolicy.myRequests()) {
 				home.requests.add(
 					row(
