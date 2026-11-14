@@ -24,9 +24,9 @@ file's source and processing).
    BarnCRM Standard, `BarnCRM_Patch_Admin_Logo` (the circular badge) for the two admin apps, and
    a module badge in each module's own package (`BarnCRM_Patch_Fundraising_Logo`, `_Volunteers_`,
    `_Programs_`, `_Funders_` for BarnCRM Grants, `_Logic_Models_` for its Module Manager tile,
-   `_Forms_`, `_Events_`, `_Projects_`, `_Portal_`). Corporate Hub ships
-   `BarnCRM_Patch_Corporate_Hub_Logo` with the face mark until its module master is cut again
-   (the current crop takes in part of the source sheet's caption).
+   `_Forms_`, `_Events_`, `_Projects_`, `_Portal_`, `_Corporate_Hub_`). The Corporate Hub master
+   was repaired before first release: the source caption overlapped its tie tip, so the tip was
+   redrawn in the art's own colors (recorded in the masters' manifest).
 2. **New names, old ones removed.** Redeploying a ContentAsset under its old name keeps the
    org's existing image, so the Patch logos have new API names. The barn assets
    (`BarnCRM_Logo`, `BarnCRM_Admin_Logo`, `BarnCRM_Fundraising_Logo`, `BarnCRM_Volunteers_Logo`,

@@ -21,7 +21,7 @@ recolored or stretched (every master is square, and the welcome pose keeps its a
   BarnCRM_Patch_Forms_Logo           forms         modules/forms-logo            BarnCRM Forms
   BarnCRM_Patch_Events_Logo          events        modules/event-management-logo BarnCRM Events
   BarnCRM_Patch_Projects_Logo        projects      modules/project-management-logo BarnCRM Projects
-  BarnCRM_Patch_Corporate_Hub_Logo   corporatehub  marks/barncrm-icon (for now)  BarnCRM Corporate Hub
+  BarnCRM_Patch_Corporate_Hub_Logo   corporatehub  modules/corporate-hub-logo    BarnCRM Corporate Hub
   BarnCRM_Patch_Portal_Logo          portal        modules/portal-builder-logo   BarnCRM Portal Builder
 
 Plus Core's static resource `BarnPatchWelcome` (hires/poses/hi-im-patch, 400 px wide), shown by
@@ -61,10 +61,7 @@ LOGOS = [
     ("forms", "BarnCRM_Patch_Forms_Logo", "forms", "modules/forms-logo.png"),
     ("events", "BarnCRM_Patch_Events_Logo", "events", "modules/event-management-logo.png"),
     ("projects", "BarnCRM_Patch_Projects_Logo", "projects", "modules/project-management-logo.png"),
-    # The corporate-hub-logo master's crop takes in part of the source sheet's caption (black
-    # "rat" over the tie), so Corporate Hub uses the main mark until the master is cut again;
-    # the re-cut image then needs a new asset name.
-    ("corporatehub", "BarnCRM_Patch_Corporate_Hub_Logo", "corporate-hub", "marks/barncrm-icon.png"),
+    ("corporatehub", "BarnCRM_Patch_Corporate_Hub_Logo", "corporate-hub", "modules/corporate-hub-logo.png"),
     ("portal", "BarnCRM_Patch_Portal_Logo", "portal", "modules/portal-builder-logo.png"),
 ]
 WELCOME = ("core", "BarnPatchWelcome", "poses/hi-im-patch.png")
