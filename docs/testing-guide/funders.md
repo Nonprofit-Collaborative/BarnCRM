@@ -18,7 +18,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Funders** app. | It opens on **Board Dashboard** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
+| 1 | Open the **BarnCRM Grants** app. | It opens on **Board Dashboard** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
 | 2 | **Grants**, **New**. Name `2027 Literacy Grant`, leave **Funder** empty, **Save**. | Refused: **Funder** is required. |
 | 3 | Funder `Lakeside Foundation`, Funder Contact `Pat Rivera`, Amount Requested `25,000`, Application Deadline 10 days from today, **Save**. | The grant's page opens on **Overview** (details, and the **Program** card with Programs), with tabs **Money**, **Reporting**, **Writing** and **Related**; on a phone the same tabs. **Money** holds the Award Schedule, Payments and Restricted Fund Entries; **Reporting** the Requirements list, Logic Model Outcomes and Funder Report; **Writing** the Answer Library. **Stage** is **Prospect**; **Submitted Date** and **Decision Date** are empty. |
 | 4 | **Edit**, Stage **Applied**, **Save**. | **Submitted Date** is today. |
@@ -93,7 +93,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 3 | As read-only, open **Grant Pipeline**. | `You can look at the pipeline but not change it.`; card menus offer only **Open**; no **New Grant**. |
 | 4 | As the admin, open **Health Check**. | `1 grant application is past its deadline`, linked to `Arts Grant`. |
 | 5 | Move `Arts Grant` to **Applied** and run Health Check again. | The finding is gone. |
-| 6 | **BarnCRM Settings**, **Load Sample Data**. | Three sample grants on the sample organizations: one Prospect, one Applied, one Awarded. |
+| 6 | **BarnCRM Settings**, **Load Sample Data**. | Eight sample grants on the sample organizations: two Prospect, one Letter of Inquiry, one Invited to Apply, one Applied, two Awarded (Youth Programs Award and Summer Reading Sponsorship), one Declined. The Grant Pipeline, Grant Calendar and Board Dashboard tabs show them. |
 | 7 | **Remove Sample Data**. | The sample grants are gone; your own grants stay. |
 
 **Cleanup:** Delete the test grants as the admin.
@@ -198,7 +198,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open the **Grant Calendar** tab in **BarnCRM Funders**. | This month, today in bold. `Application: Calendar Test` on its day; the sample requirements and the sample award's expected payment on theirs if they fall this month. The tab is next to **Grant Pipeline**. |
+| 1 | As staff, open the **Grant Calendar** tab in **BarnCRM Grants**. | This month, today in bold. `Application: Calendar Test` on its day; the sample requirements and the sample award's expected payment on theirs if they fall this month. The tab is next to **Grant Pipeline**. |
 | 2 | Open **Grant Pipeline**. | Every application and requirement under **Upcoming Deadlines** that falls this month is on the calendar too; when overdue it has a red badge on the pipeline and is marked with the warning icon and **Overdue** on the calendar (see step 10). |
 | 3 | Click **Next Month** until the sample award's second payment shows. | `Grant Payment: Youth Programs Award $17,500.00` (in your currency) on its due date. |
 | 3a | Click **Print**. | The print preview shows the month without the app's header, navigation or buttons. |
@@ -278,7 +278,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | As the admin, add a template `Short` with body `<p>{GrantName} for {FunderName} {Unknown}</p>`. As staff, reload the grant, choose `Short` and download. | The file shows `Youth Grant for` the funder's name, and `{Unknown}` as typed. |
 | 5 | As the admin, rename the grant `Youth <Grant>` and download again as staff. | The name shows as typed, not as markup. |
 | 6 | As the admin, clear **Active** on both templates; reload the grant as staff. | The card says no active template is available. |
-| 7 | Make **Grant report** active again. As read-only, open the **BarnCRM Funders** app, then `Youth Grant`. | No **Funder Report Templates** tab; the **Funder Report** card still downloads the report. |
+| 7 | Make **Grant report** active again. As read-only, open the **BarnCRM Grants** app, then `Youth Grant`. | No **Funder Report Templates** tab; the **Funder Report** card still downloads the report. |
 
 **Cleanup:** delete `Short`, rename the grant `Youth Grant`.
 
@@ -289,7 +289,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff with Giving access, open the **BarnCRM Funders** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Funders tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
+| 1 | As staff with Giving access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Funders tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
 | 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`, each with a bar; one amber notice holding the two warnings: Lakeside gives 35% (above 25 percent), and the five largest give more than half. |
 | 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
 | 4 | As staff without Giving access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |

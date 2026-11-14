@@ -13187,7 +13187,7 @@ the date is then not stamped.
 ### Salesforce implementation
 
 - **Object:** `Grant_Answer__c`, name field Text, label Answer Title, sharing Public Read/Write,
-  tab Grant Answers in the BarnCRM Funders app.
+  tab Grant Answers in the BarnCRM Grants app.
 
 | Attribute | API name | Type |
 |---|---|---|

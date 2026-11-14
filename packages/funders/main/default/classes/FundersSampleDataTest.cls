@@ -1,8 +1,8 @@
 /**
  * The Funders sample data (C-10), shipped as FundersSampleData.json and loaded by Core's
- * SampleDataFile (D-200 S2): three grants to Core's sample organizations, counted on the card,
- * removed again with real grants left alone, and nothing loaded where there are no sample
- * organizations.
+ * SampleDataFile (D-200 S2): eight grants across every pipeline stage to Core's sample
+ * organizations, counted on the card, removed again with real grants left alone, and nothing
+ * loaded where there are no sample organizations.
  */
 @IsTest(testFor='ApexClass:SampleDataFile')
 private class FundersSampleDataTest {
@@ -17,10 +17,12 @@ private class FundersSampleDataTest {
 		return TestUsers.adminWith(GrantTestData.ADMIN);
 	}
 
-	/** The three of Core's sample organizations the file names. */
+	/** The seven of Core's sample organizations the file names. */
 	private static void sampleOrganizations() {
 		List<Account> organizations = new List<Account>();
-		for (String key : new List<String>{ 'O022', 'O014', 'O001' }) {
+		for (
+			String key : new List<String>{ 'O022', 'O014', 'O001', 'O006', 'O016', 'O003', 'O018' }
+		) {
 			Account organization = (Account) TestDataFactory.pastDuplicateRules(
 				AccountKindsTestData.organization('Sample Org ' + key)
 			);
@@ -57,7 +59,17 @@ private class FundersSampleDataTest {
 
 			SampleDataModule module = SampleDataFile.find(FILE);
 			Assert.areEqual('Funders', module.moduleName(), 'The name startAfter looks for');
-			Assert.areEqual(3, module.countLoaded(), 'Three sample grants are counted');
+			Assert.areEqual(8, module.countLoaded(), 'Eight sample grants are counted');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Grant_Requirement__c
+					WHERE Grant__r.Name = 'Summer Reading Sponsorship' AND Status__c = 'Submitted'
+					WITH SYSTEM_MODE
+				],
+				'The second award has a report already submitted'
+			);
 			Assert.isTrue(module.hasSampleRecords(), 'The card sees them');
 			Grant__c awarded = [
 				SELECT
@@ -68,7 +80,7 @@ private class FundersSampleDataTest {
 					Restricted_Spent__c,
 					Restricted_Balance__c
 				FROM Grant__c
-				WHERE Stage__c = :GrantService.STAGE_AWARDED
+				WHERE Name = 'Youth Programs Award'
 			];
 			Assert.areEqual(35000, awarded.Amount_Awarded__c, 'The award is filled in');
 			Assert.areEqual(35000, awarded.Amount_Scheduled__c, 'The whole award is scheduled');
@@ -108,12 +120,15 @@ private class FundersSampleDataTest {
 
 			Assert.areEqual(
 				new Map<String, Integer>{
-					GrantService.STAGE_PROSPECT => 1,
+					GrantService.STAGE_PROSPECT => 2,
+					GrantService.STAGE_INQUIRY => 1,
+					GrantService.STAGE_INVITED => 1,
 					GrantService.STAGE_APPLIED => 1,
-					GrantService.STAGE_AWARDED => 1
+					GrantService.STAGE_AWARDED => 2,
+					GrantService.STAGE_DECLINED => 1
 				},
 				byStage,
-				'One grant at each point of the pipeline'
+				'Grants across the whole pipeline'
 			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Grant__c WHERE Sample_Data__c = TRUE]);
 			Assert.areEqual(1, [SELECT COUNT() FROM Grant__c], 'The real grant stays');
