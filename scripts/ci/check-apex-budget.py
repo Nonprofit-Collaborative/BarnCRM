@@ -63,14 +63,43 @@ CAPS = {
     # measured, plus about 0.5%.
     # Raised 2026-11-11 for C-64 engagement score (EngagementScore, EngagementScoreJob, the
     # EngagementSignalExtension seam, EngagementScoreController): 2,175,829 measured, plus about 2%.
-    "core": 2_219_000,
+    # Raised 2026-11-12 for MIG-02b Nonprofit Cloud household conversion (the adoption service
+    # and batch take a source key, join members in Junction mode and undo them; the Household
+    # Model guard in HouseholdSelector): 2,221,240 measured, plus about 0.5%.
+    # Raised 2026-11-12 for R1.21 namespace readiness (D-199, D-200: BarnInstallCheck, the setup
+    # bootstrap and revisions, SetupObjectSelector, NamespaceUtil.field and describe; the
+    # modules shrank by moving their lookups onto Core): 2,233,198 measured, plus about 0.3%.
+    # W15 R1.22 (D-200 P5, P7, P12, P13) fit under it: 2,230,377 measured with them; with
+    # AsyncStarter and its call sites (P9), 2,232,757; with address match keys (P6), 2,238,235.
+    # With D-200 P4 and P10 (Error Log repeats coalesced, refused rows logged once, the rollup
+    # write flag): 2,243,035 measured, raised by what they add plus about 0.1%.
+    # Raised 2026-11-13 for D-200 S2, the generic JSON sample data loader (SampleDataFile, about
+    # 10,200), which let Programs, Funders and Events drop about 41,000 of loader Apex (their caps
+    # lowered to match): 2,248,668 measured, plus about 0.1%.
+    # D-200 S1 and S6 (release 1.23): module wiring as catalog data (ModuleExtensions,
+    # ModuleAccessSyncs, the catalog fields) and the one nightly card's switch and Run Now:
+    # 2,256,617 measured with S2, raised by what they add (about 8,000) plus about 0.1%; the
+    # modules shrank by about 50,000 together. D-200 R7 (release 1.24): Home quick links read
+    # from the module catalog (HubController): 2,259,870 measured, plus about 0.1%.
+    # Raised 2026-11-13 for the Batch K QA fixes (digest occurrences, Health Check step labels,
+    # skew ranking, AsyncStarter refusal kinds, quick link tab visibility, match key mark):
+    # 2,267,169 measured, plus about 0.1%. Raised again 2026-11-13 for release 1.25 sample data
+    # (CoreSampleData's loader support: whenSetting steps, the find value, one-query preload of
+    # the module files): 2,269,708 measured, plus about 0.1%.
+    "core": 2_272_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
     # before the kit check, plus about 1%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 386,438 measured, plus
     # about 0.5%.
-    "rollups": 388_400,
+    # Raised 2026-11-12 for D-200 P2 and P13 (the large parent throttle and the processor
+    # request stamp, so a save queues totals without a query): 390,436 measured, plus about 0.5%.
+    # D-200 P1 (RollupNightlyBatch: the weekly full sweep and the nightly pass over what changed)
+    # on the batch-k AsyncStarter call sites: 403,678 measured, plus about 0.5%.
+    # Lowered for D-200 S1 (release 1.23: RollupAccessSync became Core's catalog data): 398,428
+    # measured, plus about 0.5%.
+    "rollups": 400_500,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and
@@ -88,7 +117,19 @@ CAPS = {
     # Giving and Money review fixes (bulk payment listener, status stepping, card-testing
     # limits, portal payment guard, donation form Health Check): 663,899 measured 2026-11-12,
     # plus about 0.5%.
-    "giving": 667_300,
+    # PAY-04 (D-196): the subscriptions listener and Update Card / automatic Pay Online,
+    # 669,581 measured 2026-11-12, plus a small margin; both reuse the PAY-03 classes.
+    # W14 QA defect D6: donor levels compare totals and rungs in the corporate currency in a
+    # multi-currency org (reusing RollupCurrency), 672,127 measured 2026-11-12; raised by the
+    # 2,546 added, plus about 2%. Plus 140 for PD3: the gift import's undo logs its failed
+    # deletes in one statement (ErrorLogger.logEach). Plus 1,680 for W15 R1.22 (D-200 P12):
+    # Health Check lookup skew on funds and appeals, gift ownership skew. Plus 270 for D-200
+    # P9: buttons and nightly steps start their jobs through AsyncStarter.
+    # D-200 P1: the nightly donor pass runs in full only when needed and otherwise rescores
+    # donors crossing a recency cutoff; 676,573 measured, raised by the 2,283 added plus 2%.
+    # Lowered for D-200 S1 and S6 (release 1.23: the access sync became Core's catalog data and
+    # the Nightly Jobs page Core's nightly card): 667,059 measured, plus about 0.5%.
+    "giving": 670_400,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -105,7 +146,16 @@ CAPS = {
     # C-47b brand letters and the C-64 signal: 235,670 measured 2026-11-11, plus about 0.5%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 237,172 measured, plus
     # about 0.5%.
-    "volunteers": 238_400,
+    # Lowered at the cut-over cleanup (D-200, release 1.21: the retired Coordinator check gone,
+    # settings read through SettingsService): 230,596 measured 2026-11-12, plus about 2%.
+    # Lowered for the cleanup leftovers (D-200 S8b, UserErrors.Screen): 230,221 measured, plus
+    # about 2%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 227,250 measured, plus about 2%.
+    # Raised for the release 1.25 sample volunteer profiles (VolunteerSampleDataLoader
+    # updateProfiles, so suggestions and nudges have active volunteers to name): 232,331
+    # measured, plus about 0.5%.
+    "volunteers": 233_500,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
@@ -114,18 +164,30 @@ CAPS = {
     # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 177,950 measured, plus
     # about 0.5%.
-    "programs": 178_900,
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 160,756
+    # measured, plus about 1%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 157,934 measured with S2, plus about 2%.
+    "programs": 161_100,
     # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
     # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
     # 66,645 measured 2026-11-11, plus about 0.5%.
     # AR-01 (D-172): messages read with BarnHelp.text instead of Label; 67,478 measured, plus
     # about 0.5%.
-    "logicmodels": 67_800,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 64,360 measured, plus about 2%.
+    "logicmodels": 65_700,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
     # checklists, documents, budget lines and renewals, plus about 2%.
-    "funders": 126_700,
+    # Lowered at the cut-over cleanup (D-200, release 1.21): 123,925 measured 2026-11-12, plus
+    # about 2%.
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 116,807
+    # measured, plus about 1%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 115,433 measured with S2, plus about 2%.
+    "funders": 117_800,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -138,7 +200,9 @@ CAPS = {
     # Batch C review: 91,118 measured (save-for-later caps per address and per form, REST
     # failures logged and answered Failed), plus about 2%. Batch C review landing: 91,142
     # measured with every review branch merged; 93,000 still leaves about 2%.
-    "forms": 93_000,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 88,989 measured, plus about 2%.
+    "forms": 90_800,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
@@ -151,7 +215,9 @@ CAPS = {
     # measured (one address sync per erasure), plus about 2%. Batch C review landing: 61,454
     # measured with every review branch merged (QA's per-values claim, perf's watched-field
     # reads, the erasure start seam), plus about 2%.
-    "contactpoints": 62_700,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 59,404 measured, plus about 2%.
+    "contactpoints": 60_600,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
@@ -166,7 +232,11 @@ CAPS = {
     # Releases 1.11 to 1.13 EVT-B (branches feature/evt-b-*): 247,001 measured (EV-22 attendee
     # app actions, EV-23 budget, EV-24 venue and room fills, EV-25 speaker checklist, EV-28
     # booth scans, EV-29 agenda picks and ratings), plus about 2%.
-    "events": 252_000,
+    # Lowered 2026-11-13 for D-200 S2 (the sample set is a data file Core loads): 228,605
+    # measured, plus about 1%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 227,251 measured with S2, plus about 1.5%.
+    "events": 231_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
@@ -179,34 +249,64 @@ CAPS = {
     # Releases 1.11 to 1.13 EVT-B (branch feature/evt-b-r1-11-portal-engine): 59,734 measured
     # (personScope catalogs read and checked in Apex, calendar, download and scan options), plus
     # about 2%.
-    "portal": 61_000,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 57,973 measured, plus about 2%.
+    "portal": 59_200,
     # Corporate Hub (CH-01 to CH-08, ADR-0196 corporate hub module): access sync, post-install,
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
     # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
     # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
     # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
-    "corporatehub": 58_300,
+    # Quorum warning and immediate breach bell (CH-21, CH-22): 59,376 measured, plus about 2%.
+    # Lowered at the cut-over cleanup (D-200, release 1.21): 59,285 measured 2026-11-12, plus
+    # about 2%. Lowered for the cleanup leftovers (D-200 S8b): 58,777 measured, plus about 2%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 55,808 measured, plus about 2%.
+    "corporatehub": 57_000,
     # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
     # Giving and Money review fixes (bulk listener call, abandon job, callout-time budget,
     # countRecent, PayPal refund capture, Schedule button): 55,965 measured 2026-11-12, plus
     # about 0.5%.
-    "payments": 56_300,
+    # PAY-04 subscriptions (D-196, ADR-0218 payments subscriptions): Stripe and PayPal
+    # subscription checkouts, renewals, subscription news to listeners and Update Card:
+    # 69,202 measured 2026-11-12, plus about 0.5%.
+    # PayPal plan reuse (D-198, ADR-0218 amendment): one shared product, plans found by key and
+    # replaced when PayPal refuses them, 72,087 measured 2026-11-12; raised by the 2,702 added,
+    # plus about 2%.
+    # W14 QA defect D2: the PayPal receiver refuses posts while PayPal is not set up, checks
+    # the resource and event type before storing, and caps per processor, 72,846 measured
+    # 2026-11-12; raised by the 759 added, plus about 2%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 69,664 measured, plus about 2%.
+    "payments": 71_100,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
-    # about 2%.
-    "lwcbuilder": 17_700,
+    # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
+    # about 1%. Release 1.20 review: the chart walk over plain inputs so it can be unit tested:
+    # 21,351 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21):
+    # 20,959 measured 2026-11-12, plus about 2%. Lowered for the cleanup leftovers (D-200 S8b):
+    # 20,784 measured, plus about 2%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 17,825 measured, plus about 2%.
+    "lwcbuilder": 18_200,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
-    # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
+    # controller, plus the review and requirement DTOs (R1.21 namespace readiness, D-200 N3),
+    # 51,267 measured (Prettier line breaks included), plus about 2%. Lowered for the cleanup
+    # leftovers (D-200 S8b, S8c): 50,290 measured, plus about 2%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 49,228 measured, plus about 2%.
     "scholarships": 50_300,
     # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
     # W10: chunk size by rule count, 31,845 measured, plus about 0.5%.
-    "territory": 32_000,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 28,876 measured, plus about 2%.
+    "territory": 29_500,
     # Memberships (G-22a to G-22d, PAY-02, ADR-0206 memberships module): terms, renewals, the
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
@@ -214,22 +314,52 @@ CAPS = {
     # nightly expiry hooks): 47,443 measured, plus about 1 percent. Raised 2026-11-12 for the
     # erasure extension's system-mode find and access check (d96088f3d): 49,088 measured, plus
     # about 0.5 percent.
-    "memberships": 49_340,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 45,390 measured, plus about 2%.
+    "memberships": 46_300,
     # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
-    # plus about 2%.
-    "projects": 33_300,
+    # plus about 2%. PSA model (D-197, ADR-0219 projects PSA): the PSA settings accessors,
+    # 34,147 measured; each PSA builder raises it by what its own classes measure. Builder B
+    # (PM-09 ProjectStaffingController and the utilization change): 7,751 measured. Builder A
+    # (PM-06 to PM-08: rates, entry handler, timesheet and approvals): 17,221 measured. 59,119 in
+    # all. Builder C billing (PM-10: ProjectBilling, ProjectBillingController,
+    # ProjectInvoiceDocument, the return page default): +17,760. Pay Online through Payments by
+    # name (ProjectInvoicePayments and its listener, R-PM22): +7,302. Financials and recognized
+    # revenue (PM-11: ProjectFinancials, ProjectRevenue and its nightly step, health with change
+    # hours): +12,766. 97,102 measured, plus about 2%. Review fixes (#1237: invoice delete guard,
+    # row cap, resources helper) and the release-gate fixes (revenue Chunk queueable, rate query):
+    # 99,230 measured, plus about 2%. Lowered at the cut-over cleanup (D-200, release 1.21:
+    # settings read through SettingsService): 98,588 measured 2026-11-12, plus about 2%. The
+    # ProjectViews DTOs (R1.21 namespace readiness, D-200 N3): 106,037 measured, plus about 2%.
+    # Lowered for the cleanup leftovers (D-200 S8b): 105,537 measured, plus about 2%.
+    # Requests and issues (D-201, ADR-0221 projects requests): the request rules and notices
+    # (ProjectRequestHandler), the Requests tab controller, the settings accessors and the
+    # org-to-org request API (ProjectRequestApi): 133,533 measured, plus about 2%.
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 132,129 measured, plus about 2%.
+    "projects": 134_800,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
-    "addressverification": 25_300,
+    # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
+    # catalog data): 22,528 measured, plus about 2%.
+    "addressverification": 23_000,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
     # AR-01 (D-172): Opportunity mirror messages read with BarnHelp.text instead of Label;
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
-    # about 0.5%.
-    "mirror": 205_600,
+    # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
+    # 214,101 measured, plus about 0.5%. Release 1.20 review: per-field readable membership
+    # reads and the member-count filter: 215,838 measured, plus about 2%. Lowered at the
+    # cut-over cleanup (D-200, release 1.21: MirrorAccessSync and the five retired permission
+    # sets removed): 212,177 measured 2026-11-12, plus about 2%. Lowered for the cleanup
+    # leftovers (D-200 S8b): 212,112 measured, plus about 2%. The Case bridge to a service
+    # provider (D-201: CaseProviderRequests and its flow action): 221,790 measured,
+    # plus about 2%. Lowered for the shared gift mirror base (D-200 S5, release 1.23:
+    # MirrorRunBatch, MirrorSync.Result and storeLinks): 221,165 measured, plus about 2%.
+    "mirror": 225_600,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

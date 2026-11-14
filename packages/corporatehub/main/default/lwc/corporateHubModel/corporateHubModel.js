@@ -4,6 +4,7 @@
  * help key that says so, and the outcomes a completed cycle can have. No Salesforce imports, so
  * a browser page outside Salesforce can use it as it is.
  */
+export { percent } from 'c/barnFormat';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -96,10 +97,4 @@ export function expiringSeats(seats, today, days) {
     const left = daysUntil(seat.due, today);
     return left !== null && left <= (Number(days) || 0);
   });
-}
-
-/** A whole-number percent of part in whole, 0 when whole is 0 (CH-13). */
-export function percent(part, whole) {
-  const total = Number(whole) || 0;
-  return total === 0 ? 0 : Math.round(((Number(part) || 0) * 100) / total);
 }

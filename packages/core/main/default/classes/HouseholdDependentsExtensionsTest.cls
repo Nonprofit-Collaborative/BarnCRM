@@ -81,16 +81,15 @@ private class HouseholdDependentsExtensionsTest {
 			'A class that cannot be built keeps every household'
 		);
 		Test.stopTest();
-		Assert.areEqual(
-			2,
-			[
-				SELECT COUNT()
+		// Both read as the unexpected error, so they are counted on one entry (R-E7).
+		Decimal logged = (Decimal) [
+				SELECT SUM(Occurrences__c) total
 				FROM Error_Log__c
 				WHERE Context__c LIKE 'HouseholdDependentsExtensions.resolve'
 				WITH SYSTEM_MODE
-			],
-			'Each unusable class is logged'
-		);
+			][0]
+			.get('total');
+		Assert.areEqual(2, logged.intValue(), 'Each unusable class is logged');
 	}
 
 	private static void onlyThisExtension(HouseholdDependentsExtension extension) {

@@ -4,6 +4,7 @@
  * rule the server uses (canonical model R-SSC1 and R-SSC2). Dates are ISO strings read and
  * written in UTC, so no time zone moves a day.
  */
+import { utcIsoDate } from 'c/barnFormat';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** The multi-select's values, Monday first, as R-SSC1 counts them. */
@@ -12,10 +13,6 @@ const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satu
 function parse(value) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
   return match ? Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : null;
-}
-
-function toIso(time) {
-  return new Date(time).toISOString().slice(0, 10);
 }
 
 /** 0 for Monday to 6 for Sunday. */
@@ -73,5 +70,5 @@ export function shiftPreview(pattern, today, horizonWeeks, nowTime) {
       count++;
     }
   }
-  return { count, through: toIso(through), problem: null };
+  return { count, through: utcIsoDate(through), problem: null };
 }

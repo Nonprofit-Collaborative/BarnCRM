@@ -169,23 +169,61 @@ private class HubControllerTest {
 	}
 
 	/**
-	 * Home (people-giving-7): New Person for someone who can create contacts, and Quick Gift
-	 * Entry in Quick Links only while Giving is installed, read from the module catalog.
+	 * Home (people-giving-7, D-200 R7): New Person for someone who can create contacts, and
+	 * Quick Links from the catalog rows of the modules that are here, nothing for one that
+	 * is not.
 	 */
 	@IsTest
-	static void offersNewPersonAndGiftEntryOnlyWhenGivingIsThere() {
+	static void offersNewPersonAndQuickLinksOnlyFromModulesThatAreHere() {
 		System.runAs(TestUsers.admin()) {
 			SetupAssistantTestExtension.useNone();
+			HubController.visibleTabsOverride = new Set<String>{ 'Some_Tab' };
+			ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+				// Core's own object stands in for a module's probe object, so the row is here.
+				new BarnCRM_Module__mdt(
+					DeveloperName = 'Here',
+					Probe_Object__c = 'Import_Batch__c',
+					Quick_Links__c = 'Some_Tab:Do It:One line.;Import_Batch__c.new:Start One;' +
+						'Hidden_Tab:Not Theirs:A tab this person cannot see.'
+				),
+				new BarnCRM_Module__mdt(
+					DeveloperName = 'Absent',
+					Probe_Object__c = 'No_Such_Object__c',
+					Quick_Links__c = 'Other_Tab:Never Shown:No.'
+				)
+			};
 			Test.startTest();
-			ModuleDetectionService.givingPresentOverride = false;
-			HubController.HomeModel withoutGiving = HubController.getHomeModel();
-			ModuleDetectionService.givingPresentOverride = true;
-			HubController.HomeModel withGiving = HubController.getHomeModel();
+			HubController.HomeModel model = HubController.getHomeModel();
 			Test.stopTest();
 
-			Assert.isTrue(withoutGiving.canCreatePerson, 'The admin can create people');
-			Assert.isFalse(withoutGiving.giftEntryAvailable, 'No Giving, no Quick Gift Entry');
-			Assert.isTrue(withGiving.giftEntryAvailable, 'Giving installed and on offers it');
+			Assert.isTrue(model.canCreatePerson, 'The admin can create people');
+			Assert.areEqual(
+				2,
+				model.quickLinks.size(),
+				'Only the module that is here: ' + model.quickLinks
+			);
+			Assert.areEqual('Some_Tab', model.quickLinks[0].tab, 'A tab link keeps its name');
+			Assert.areEqual('Do It', model.quickLinks[0].label, 'With its label');
+			Assert.areEqual('One line.', model.quickLinks[0].line, 'And its line');
+			Assert.areEqual(
+				Schema.SObjectType.Import_Batch__c.getName(),
+				model.quickLinks[1].objectApiName,
+				'A .new link opens the qualified object'
+			);
+			Assert.isNull(model.quickLinks[1].line, 'A line is optional');
+		}
+	}
+
+	@IsTest
+	static void aBlankOrUncreatableEntryIsNoLink() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isNull(HubController.quickLink(''), 'Blank');
+			Assert.isNull(HubController.quickLink('Only_A_Target'), 'No label');
+			Assert.isNull(HubController.quickLink('No_Such_Object__c.new:New'), 'No such object');
+			Assert.isNull(
+				HubController.quickLink('No_Such_Tab_Anywhere:Open'),
+				'A tab the person cannot see'
+			);
 		}
 	}
 
@@ -274,6 +312,10 @@ private class HubControllerTest {
 
 	/** Stands in for the Rollup Builder module's engine, which Core cannot name. */
 	private class StubEngine implements RollupEngineExtension {
+		public void afterModuleTurnedOn(String moduleName) {
+		}
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		}
 		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
 		}
 		public void forSurvivors(String targetObject, Set<Id> survivorIds) {

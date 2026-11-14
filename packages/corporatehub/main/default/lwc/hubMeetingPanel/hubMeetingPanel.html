@@ -90,6 +90,9 @@
                 <div class="slds-col">
                   {motion.name}
                   <div class="slds-text-color_weak">{motion.status}: {motion.tally}</div>
+                  <template lwc:if={motion.noQuorum}>
+                    <div class="slds-text-color_error" data-id="no-quorum">{labels.noQuorum}</div>
+                  </template>
                 </div>
                 <template lwc:if={motion.canOpen}>
                   <lightning-button

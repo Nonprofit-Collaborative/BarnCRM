@@ -14,10 +14,14 @@ color (no error red, warning orange or yellow), so a launcher tile never reads a
   BarnCRM_Fundraising_Logo  giving       heart             #A3175F  BarnCRM Fundraising
   BarnCRM_Volunteers_Logo   volunteers   person            #2E844A  BarnCRM Volunteers
   BarnCRM_Programs_Logo     programs     sprout            #7526A8  BarnCRM Programs
-  BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Funders
+  BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Grants
   BarnCRM_Logic_Models_Logo logicmodels  flow arrows       #3B44B5  BarnCRM Logic Models
   BarnCRM_Forms_Logo        forms        form page         #0B5C7A  BarnCRM Forms
   BarnCRM_Events_Logo       events       calendar          #0B6B6B  BarnCRM Events
+  BarnCRM_Projects_Logo     projects     task board        #0B57D0  BarnCRM Projects
+  BarnCRM_Corporate_Hub_Logo
+                            corporatehub office building   #4A5568  BarnCRM Corporate Hub
+  BarnCRM_Portal_Logo       portal       arched doorway    #6E4B8B  BarnCRM Portal Builder
 
 Fundraising was red (#C23934) until 2026-11-04 (owner decision: red means error in the UI, the
 reason D-58 declined red for the brand). The asset was renamed from Fundraising_Logo then:
@@ -58,6 +62,9 @@ VARIANTS = [
     ("logicmodels", "BarnCRM_Logic_Models_Logo", "logic-models", (0x3B, 0x44, 0xB5), "flow"),
     ("forms", "BarnCRM_Forms_Logo", "forms", (0x0B, 0x5C, 0x7A), "form"),
     ("events", "BarnCRM_Events_Logo", "events", (0x0B, 0x6B, 0x6B), "calendar"),
+    ("projects", "BarnCRM_Projects_Logo", "projects", (0x0B, 0x57, 0xD0), "kanban"),
+    ("corporatehub", "BarnCRM_Corporate_Hub_Logo", "corporate-hub", (0x4A, 0x55, 0x68), "building"),
+    ("portal", "BarnCRM_Portal_Logo", "portal", (0x6E, 0x4B, 0x8B), "door"),
 ]
 BRAND_DIR = "docs/brand"
 
@@ -258,7 +265,44 @@ def in_calendar(x, y):
     return any(abs(x - cx) <= 0.09 and abs(y - cy) <= 0.07 for cx, cy in cells)
 
 
+def in_kanban(x, y):
+    """Projects: a task board, three columns of cards, fewer cards as work moves right."""
+    for cx, count in ((-0.38, 3), (0.0, 2), (0.38, 1)):
+        for i in range(count):
+            top = -0.50 + i * 0.36
+            if abs(x - cx) <= 0.15 and top <= y <= top + 0.28:
+                return True
+    return False
+
+
+def in_building(x, y):
+    """Corporate Hub: an office building, windows in rows and a door (the organization itself)."""
+    if not (abs(x) <= 0.38 and -0.56 <= y <= 0.56):
+        return False
+    if abs(x) <= 0.10 and y >= 0.30:
+        return False  # the door
+    for wx in (-0.21, 0.0, 0.21):
+        for wy in (-0.40, -0.20, 0.0):
+            if abs(x - wx) <= 0.06 and abs(y - wy) <= 0.06:
+                return False
+    for wx in (-0.21, 0.21):
+        if abs(x - wx) <= 0.06 and abs(y - 0.20) <= 0.06:
+            return False
+    return True
+
+
+def in_door(x, y):
+    """Portal Builder: an arched door, a way in from outside."""
+    arch = (abs(x) <= 0.34 and -0.16 <= y <= 0.58) or math.hypot(x, y + 0.16) <= 0.34
+    if not arch:
+        return False
+    return math.hypot(x - 0.16, y - 0.20) > 0.06  # the door knob
+
+
 GLYPHS = {
+    "kanban": in_kanban,
+    "building": in_building,
+    "door": in_door,
     "form": in_form,
     "calendar": in_calendar,
     "gear": in_gear,

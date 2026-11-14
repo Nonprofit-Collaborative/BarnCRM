@@ -57,4 +57,67 @@ private class VolunteerLogHoursControllerTest {
 			Assert.areEqual('Contact', fromPerson.personObject, 'Picked as a contact.');
 		}
 	}
+
+	@IsTest
+	static void aPersonSignedUpTodayFillsThatShift() {
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			Volunteer_Job__c job = [SELECT Id FROM Volunteer_Job__c LIMIT 1];
+			Volunteer_Shift__c shift = VolunteersTestData.shift(job.Id);
+			List<Contact> people = VolunteersTestData.contacts(2);
+			insert VolunteersTestData.newSignup(shift.Id, people[0].Id);
+			Volunteer_Signup__c cancelled = VolunteersTestData.newSignup(shift.Id, people[1].Id);
+			cancelled.Status__c = 'Cancelled';
+			insert cancelled;
+			ShiftScheduleService.nowOverride = VolunteersTestData.SHIFT_START.addHours(4);
+
+			Test.startTest();
+			VolunteerLogHoursController.Context signedUp = VolunteerLogHoursController.getContext(
+				people[0].Id
+			);
+			VolunteerLogHoursController.Context notComing = VolunteerLogHoursController.getContext(
+				people[1].Id
+			);
+			Test.stopTest();
+
+			Assert.areEqual(people[0].Id, signedUp.personId, 'The person is filled.');
+			Assert.areEqual(shift.Id, signedUp.shiftId, 'Today\'s shift is filled.');
+			Assert.areEqual(job.Id, signedUp.jobId, 'With its job.');
+			Assert.areEqual(3, signedUp.hours, 'And its three hours.');
+			Assert.isNull(notComing.shiftId, 'A cancelled sign-up fills nothing.');
+			Assert.isNull(notComing.jobId, 'Nor a job.');
+		}
+	}
+
+	/**
+	 * QA review Q1: Log Hours as the people who use it. Volunteers Staff may log hours and
+	 * Volunteers Read Only may not, so the window offers the form to one and not the other.
+	 */
+	@IsTest
+	static void staffMayLogHoursAndReadOnlyMayNot() {
+		User staff;
+		User reader;
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			staff = TestDataFactory.createUser(
+				'Staff',
+				new List<String>{ 'BarnCRM_Staff', 'Volunteers_Staff' }
+			);
+			reader = TestDataFactory.createUser(
+				'Reader',
+				new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' }
+			);
+		}
+		VolunteerLogHoursController.Context forStaff;
+		VolunteerLogHoursController.Context forReader;
+		Test.startTest();
+		System.runAs(staff) {
+			forStaff = VolunteerLogHoursController.getContext(null);
+		}
+		System.runAs(reader) {
+			forReader = VolunteerLogHoursController.getContext(null);
+		}
+		Test.stopTest();
+
+		Assert.isTrue(forStaff.canCreate, 'Staff may log hours.');
+		Assert.isFalse(forReader.canCreate, 'Read Only may not.');
+	}
 }

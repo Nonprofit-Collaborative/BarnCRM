@@ -17,7 +17,7 @@ private class CampaignSyncServiceTest {
 		// Built once for the class rather than in every test that runs as her.
 		User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'Giving_Admin', 'Campaign_Sync' }
+			new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 		System.runAs(new User(Id = UserInfo.getUserId())) {
 			update new User(Id = maria.Id, UserPermissionsMarketingUser = true);
@@ -480,7 +480,9 @@ private class CampaignSyncServiceTest {
 			if (!CampaignSyncService.isAvailable()) {
 				return;
 			}
-			Account notACampaign = new Account(Name = 'Riverside Foundation');
+			Account notACampaign = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation')
+			);
 			insert notACampaign;
 			Appeal__c spring = springAppeal();
 			spring.Campaign_Id__c = notACampaign.Id;

@@ -44,7 +44,7 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 			Status__c = STATUS_RUNNING
 		);
 		insert as user snapshot;
-		System.enqueueJob(new OrgAutomationScan(snapshot.Id));
+		AsyncStarter.queue(new OrgAutomationScan(snapshot.Id), 'OrgAutomationScan');
 		return snapshot.Id;
 	}
 

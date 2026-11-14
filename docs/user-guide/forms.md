@@ -6,7 +6,8 @@ BarnCRM admin builds the forms (see [Forms](../admin-guide/forms.md) in the Admi
 
 ## To Fill In a Form
 
-1. Open the **BarnCRM** (or **BarnCRM Console**) app, the **Forms** tab, and the form.
+1. Open the **BarnCRM Forms** app (or **BarnCRM**, or **BarnCRM Console**), the **Forms** tab,
+   and the form.
 2. Select the **Fill In** tab.
 3. Answer the questions on the first step and select **Next**. A question you must answer, or an
    answer BarnCRM cannot take (an email without an `@`, a date that is not a date), says what to

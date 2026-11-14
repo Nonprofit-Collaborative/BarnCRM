@@ -9,11 +9,11 @@
 private class EventSpeakersControllerTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c conference(String name) {
@@ -36,7 +36,9 @@ private class EventSpeakersControllerTest {
 	}
 
 	private static Contact person() {
-		Contact record = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+		Contact record = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = 'Garcia')
+		);
 		insert as user record;
 		return record;
 	}

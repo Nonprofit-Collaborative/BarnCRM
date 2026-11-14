@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Requests_Turned_On</fullName>
+    <active>true</active>
+    <description>New requests need the Projects setting Track requests and issues (D-201). Saved requests can still be worked.</description>
+    <errorConditionFormula>ISNEW() &amp;&amp; NOT($Setup.Projects_Settings__c.Requests_Enabled__c)</errorConditionFormula>
+    <errorMessage>Requests are turned off. An admin can turn on Track requests and issues in BarnCRM Settings, Projects.</errorMessage>
+</ValidationRule>

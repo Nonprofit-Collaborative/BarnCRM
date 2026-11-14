@@ -41,6 +41,9 @@ FAKE_SF = textwrap.dedent(
     elif args[:3] == ["org", "assign", "permset"]:
         event("assign", args[args.index("--name") + 1])
         out({})
+    elif args[:2] == ["data", "query"] and "FROM Organization" in args[args.index("--query") + 1]:
+        out({"records": [{"OrganizationType": os.environ.get("FAKE_ORG_TYPE", "Enterprise Edition"),
+                          "TrialExpirationDate": None}]})
     elif args[:2] == ["data", "query"] and "AsyncApexJob" in args[args.index("--query") + 1]:
         jobs = []
         if os.environ.get("FAKE_SCHEDULED_JOB"):
@@ -215,6 +218,27 @@ class DeploySkipUnchanged(unittest.TestCase):
             f.write("\n")
         self.assertIn(OBJECTS, self.sent())
         self.assertFalse(os.path.exists(self.record()))
+
+    def test_a_capped_org_gets_the_modules_without_the_left_out_apps(self):
+        # ADR-0223 (module apps): a Developer Edition or scratch org refuses apps past about 10.
+        requests = self.deploy(FAKE_ORG_TYPE="Developer Edition")
+        sent = [d for r in requests for d in r]
+        self.assertNotIn("packages/events", sent)
+        self.assertIn("packages/events/main/default/classes", sent)
+        self.assertNotIn("packages/events/main/default/applications", sent)
+        self.assertNotIn("packages/events/main/default/permissionsets", sent)
+        self.assertIn("packages/funders", sent)
+        modules = [r for r in requests if "packages/giving" in r][0]
+        later = requests[requests.index(modules) + 1 :]
+        # The permission sets without the left-out apps, then the module tabs in the BarnCRM apps.
+        self.assertEqual(sum(1 for r in later if not r[0].startswith("packages/")), 2, later)
+
+        requests = self.deploy("--full")
+        sent = [d for r in requests for d in r]
+        self.assertIn("packages/events", sent)
+        modules = [r for r in requests if "packages/giving" in r][0]
+        later = requests[requests.index(modules) + 1 :]
+        self.assertEqual(sum(1 for r in later if not r[0].startswith("packages/")), 1, later)
 
     def events(self):
         with open(os.path.join(self.fake, "events.jsonl"), encoding="utf-8") as f:

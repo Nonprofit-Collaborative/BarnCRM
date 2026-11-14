@@ -50,9 +50,11 @@ No module is installed with Core or by first-run setup: a module is installed on
 install it from this section. An installed module's row links to its own app, where it has
 one. Rollup Builder has no app of its own: its **Rollup Builder** tab is in the **BarnCRM
 Admin** apps, and so is Contact Point Sync's **Contact Point Sync** tab. Forms, Event
-Management and Portal Builder have no app of their own either (D-188): Forms' and Event
-Management's tabs are in the everyday **BarnCRM** apps, Portal Builder's in the **BarnCRM
-Admin** apps. Volunteers has a Settings tab in its app, where its settings live; Giving's
+Management, Portal Builder, Corporate Hub and Project Management each have an app of their own
+(**BarnCRM Forms**, **BarnCRM Events**, **BarnCRM Portal Builder**, **BarnCRM Corporate Hub**,
+**BarnCRM Projects**), and their tabs are also in the everyday **BarnCRM** apps (Portal
+Builder's in the **BarnCRM Admin** apps); a scratch or Developer Edition org gets the tabs
+only. Volunteers has a Settings tab in its app, where its settings live; Giving's
 BarnCRM Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
 still show in BarnCRM Settings for now; they move to the module's app in a later release.) Core's own
 features are turned on in General instead (see
@@ -111,7 +113,9 @@ visibility. To hide a module from a colleague, take away its role on the
 Install BarnCRM and its modules as packages. Each package runs its own setup steps when it is
 installed and at every upgrade: it creates its automation switches, import templates and
 shipped totals, gives the installer its administrator access, and so on. Copying the source
-into an org by hand skips those steps, and the module then works only in part.
+into an org by hand skips those steps, and the module then works only in part. When an upgrade
+adds new setup steps to a module and they did not run (for example, the upgrade's own steps
+failed), the row is flagged again in the same way until they do.
 
 A row whose setup steps never ran says "Its setup steps never ran, which happens when source
 is copied in by hand. Finish Setup runs the steps a package install runs." With the **Manage
@@ -123,6 +127,11 @@ Setup gives it to you only when you also hold Salesforce's **Assign Permission S
 other steps without it. The steps only add what is missing, so pressing it twice does no harm. It is
 recorded under **Recent Changes** in BarnCRM Settings. Health Check reports the same thing (see
 [Health Check](health-check.md#how-a-fix-button-works)).
+
+Setup is what gives anyone the **Manage BarnCRM Settings** permission, so an org where it never
+ran can have nobody who holds it. While no active user in the org holds that permission, a user
+with Salesforce's **Customize Application** permission also sees **Finish Setup** (and nothing
+else changes for them). Once someone holds the permission, only they can press it.
 
 Finish Setup is a recovery step for an org built from copied source, not a way to install
 BarnCRM: install the packages.

@@ -7,6 +7,7 @@ import preview from '@salesforce/apex/CommitmentEntryController.preview';
 import save from '@salesforce/apex/CommitmentEntryController.save';
 import FUND_OBJECT from '@salesforce/schema/Fund__c';
 import APPEAL_OBJECT from '@salesforce/schema/Appeal__c';
+import COMMITMENT_OBJECT from '@salesforce/schema/Commitment__c';
 
 import TITLE from '@salesforce/label/c.Giving_CommitmentNew_Title';
 import RECURRING_GIFT from '@salesforce/label/c.Giving_CommitmentNew_RecurringGift';
@@ -401,7 +402,7 @@ export default class CommitmentNew extends NavigationMixin(LightningElement) {
     }
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Commitment__c', actionName: 'home' }
+      attributes: { objectApiName: COMMITMENT_OBJECT.objectApiName, actionName: 'home' }
     });
   }
 }

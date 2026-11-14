@@ -24,6 +24,79 @@ default allocations, installment schedules, automatic household soft credits), a
   `GivingSampleData` in the Giving package: funds, appeals, gifts with their allocations,
   commitments, soft credits, tributes. It ships with Giving, so an org without Giving never
   carries it.
+- `ProjectsSampleData.json` and `CorporateHubSampleData.json`, in the Project Management and
+  Corporate Hub packages' `staticresources`: four projects with their work, and a board with its
+  library, calendar and agreements. Same generic format and loader as the files below.
+- `MembershipsSampleData.json` (levels, benefits, memberships) and `ScholarshipsSampleData.json`
+  (programs, cycles, applications, reviews, awards, disbursements, requirements), in the same
+  format (release 1.25). Payments has no set: its records are made only by the checkout and the
+  webhook receiver.
+- `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
+  module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
+  by Core's `SampleDataFile` with no loader Apex in the module.
+- `LogicModelsSampleData.json` in `packages/logicmodels/main/default/staticresources`: logic
+  models for the Programs sample programs After-school tutoring and Food pantry, with every
+  column, arrows with assumptions and evidence, and indicators with targets and results. It
+  names each program with `find`, so it loads after Programs and loads nothing without it.
+- `FormsSampleData.json`, `PortalSampleData.json` and `TerritorySampleData.json` (release 1.25):
+  three example forms with versions and submissions; one Inactive, invite-only portal with its
+  accesses; three state territories with rules and a member.
+- `packages/core/main/default/staticresources/CoreSampleData.json`, in the same generic format
+  (module `Core`), loaded first after Core's own set: three saved Find queries (one a Backup
+  Set), two seasonal addresses and three interaction notes on Core's sample records. Hand
+  written, not generated.
+
+### Module files (D-200 S2)
+
+A module ships its set as a static resource named as `SampleDataModules` lists it (for
+example `FundersSampleData`); Core loads it when no class of that name is installed:
+
+```json
+{
+  "module": "Funders",
+  "countLabel": "Grants",
+  "count": { "object": "Grant__c", "where": "Sample_Data__c = TRUE" },
+  "steps": [
+    {
+      "object": "Grant__c",
+      "records": [
+        {
+          "key": "award",
+          "Name": "Youth Programs Award",
+          "Funder__c": { "sample": "O001" },
+          "Award_Start_Date__c": { "days": -30 },
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    { "object": "Grant_Payment__c", "records": [{ "Grant__c": { "ref": "award" }, "Amount__c": 17500 }] }
+  ],
+  "remove": [{ "object": "Grant__c", "where": "Sample_Data__c = TRUE" }]
+}
+```
+
+- Each step is one insert, in user mode, in its own transaction, in file order. A record is its
+  field values by API name, plus an optional `key`.
+- A value is a literal, `{ "ref": key }` (a record this file inserted earlier), `{ "sample":
+  key }` (Core's sample person, household or organization by `Sample_Data_Key__c`),
+  `{ "find": object, "where": clause }` (the newest record of another module's object the clause
+  matches, such as a sample program an earlier module's set loaded), `{ "currentUser": true }`,
+  or `{ "days": n, "months": m, "time": "HH:mm" }` (today moved, as a date, a local date and
+  time, or a time).
+- A record whose `ref`, `sample` or `find` does not resolve is left out unless the value says
+  `"optional": true`. A step or field the loader cannot create is skipped.
+- A step with `"whenSetting": { "object": settings object, "field": checkbox }` runs only while
+  that setting is on, for a feature that is off by default and whose rules refuse its records
+  while off (Projects requests and change requests).
+- A record's `ref` names a key from an earlier step only: a record that points at another record
+  of its own step (a committee and its parent board) goes in a step of its own after it.
+- `count` is the status card's number. `remove` entries are deleted in order, in chunks, with
+  partial success: a record the organization's own records point at is kept and named in one
+  Warning in the Error Log. `hasSampleRecords` is true while any `remove` entry matches.
+- The Funders, Programs and Events files reproduce the records their former loader classes
+  built. Giving and Volunteers keep their loader classes for now: their loads run module rules
+  a file cannot express yet (the org's default fund, suppressed default allocations, ask
+  stages, overdue installments, approval verbs on hours).
 
 Both files are generated, not hand-edited, by
 `scripts/data/generate-sample-data.py` (Python 3, standard library only, no dependencies to
@@ -147,7 +220,11 @@ still has gifts in the current year and the retention reports, the fiscal-year r
 the dashboard all have something true to show. A gift that reverses another names it by key
 in `originalGift` and carries the `refundReason`; nothing in the file carries a receipt
 number, because a receipted gift cannot be deleted (ADR-0024) and the set has to stay
-removable.
+removable. An employer's matching gift names the employee's gift by key in `matchedGift` and
+loads after it, so the matching rules link both sides; removal deletes the employer's gift
+before the employee's. A stock gift carries `stockSymbol` and `stockShares`, and a gift that
+came through a donor-advised fund or a family foundation carries `giftSource` and, for a
+named fund, `giftSourceName`.
 
 `name` is `null` for every household except the roughly three with `customName: true`
 (and the staff household), because household name, formal greeting, and informal greeting

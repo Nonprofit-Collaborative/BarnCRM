@@ -293,46 +293,6 @@ private class GivingPostInstallTest {
 		}
 	}
 
-	/**
-	 * QA-F2: an org that saved Giving Settings before Ask Reminders existed has it stored false;
-	 * the upgrade turns it on once, and an administrator who turns it off afterwards keeps it off.
-	 */
-	@IsTest
-	static void upgradingTurnsOnAskRemindersOnceInAnOrgThatSavedBeforeIt() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			delete [SELECT Id FROM Giving_Settings__c WITH SYSTEM_MODE];
-			delete [SELECT Id FROM BarnCRM_Settings__c WITH SYSTEM_MODE];
-			insert as system new Giving_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Ask_Reminders_Enabled__c = false
-			);
-			SettingsService.clearCaches();
-
-			new GivingPostInstall().runSetup(null);
-			Assert.isTrue(askRemindersStored().Ask_Reminders_Enabled__c, 'turned on once');
-
-			update as system new Giving_Settings__c(
-				Id = askRemindersStored().Id,
-				Ask_Reminders_Enabled__c = false
-			);
-			SettingsService.clearCaches();
-			new GivingPostInstall().runSetup(null);
-			Assert.isFalse(
-				askRemindersStored().Ask_Reminders_Enabled__c,
-				'the administrator turned it off afterwards'
-			);
-		}
-	}
-
-	private static Giving_Settings__c askRemindersStored() {
-		return [
-			SELECT Id, Ask_Reminders_Enabled__c
-			FROM Giving_Settings__c
-			WHERE SetupOwnerId = :UserInfo.getOrganizationId()
-			WITH SYSTEM_MODE
-		];
-	}
-
 	private static Map<String, Automation_Setting__c> switchesByName() {
 		Map<String, Automation_Setting__c> byName = new Map<String, Automation_Setting__c>();
 		for (Automation_Setting__c setting : [

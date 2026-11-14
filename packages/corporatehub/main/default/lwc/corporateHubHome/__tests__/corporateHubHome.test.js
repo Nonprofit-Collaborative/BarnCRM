@@ -59,9 +59,7 @@ describe('c-corporate-hub-home', () => {
     await flush();
 
     const request = find(element, 'requests');
-    expect(request.querySelector('a').getAttribute('href')).toBe(
-      '/lightning/r/a02000000000001AAA/view'
-    );
+    expect(request.querySelector('a').getAttribute('href')).toBe('/a02000000000001AAA');
     expect(request.textContent).toContain('c.CorporateHub_Due_Overdue');
     expect(request.querySelector('div.slds-text-color_error')).not.toBeNull();
     expect(find(element, 'obligations').textContent).toContain('Annual report');
@@ -88,9 +86,7 @@ describe('c-corporate-hub-home', () => {
     const privacy = find(element, 'privacy');
     expect(privacy.textContent).toContain('c.CorporateHub_Home_Privacy');
     expect(privacy.textContent).toContain('DSR-00001');
-    expect(privacy.querySelector('a').getAttribute('href')).toBe(
-      '/lightning/r/a05000000000001AAA/view'
-    );
+    expect(privacy.querySelector('a').getAttribute('href')).toBe('/a05000000000001AAA');
     expect(privacy.querySelector('div.slds-text-color_error')).not.toBeNull();
   });
 
@@ -120,6 +116,20 @@ describe('c-corporate-hub-home', () => {
     const other = mount();
     await flush();
     expect(find(other, 'add-templates')).toBeNull();
+  });
+
+  it('offers a first board before any exists, and only then', async () => {
+    getHome.mockResolvedValue({ ...HOME, firstRun: true });
+    let element = mount();
+    await flush();
+    expect(find(element, 'first-run').heading).toBe('c.CorporateHub_Home_FirstRunHeading');
+    expect(find(element, 'first-run-new').label).toBe('c.CorporateHub_Home_FirstRunNew');
+    document.body.removeChild(element);
+
+    getHome.mockResolvedValue(HOME);
+    element = mount();
+    await flush();
+    expect(find(element, 'first-run')).toBeNull();
   });
 
   it('shows the error when the page cannot load', async () => {

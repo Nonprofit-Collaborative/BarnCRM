@@ -31,8 +31,8 @@ public with sharing class GrantFundController {
 		public List<GrantProgramController.Option> options = new List<GrantProgramController.Option>();
 	}
 
-	/** The card for one grant. */
-	@AuraEnabled
+	/** The card for one grant. Cached; the card refreshes it after a save. */
+	@AuraEnabled(cacheable=true)
 	public static FundCard getFund(Id grantId) {
 		try {
 			FundCard card = new FundCard();

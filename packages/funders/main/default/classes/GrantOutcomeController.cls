@@ -43,8 +43,8 @@ public with sharing class GrantOutcomeController {
 		public Boolean missing = false;
 	}
 
-	/** The card for one grant. */
-	@AuraEnabled
+	/** The card for one grant. Cached; the card refreshes it after a save. */
+	@AuraEnabled(cacheable=true)
 	public static OutcomeCard getOutcomes(Id grantId) {
 		try {
 			OutcomeCard card = new OutcomeCard();

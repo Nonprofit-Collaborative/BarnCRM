@@ -11,6 +11,23 @@
         <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.firstRunHeading}
+          message={labels.firstRunMessage}
+          heading-level="2"
+          data-id="first-run"
+        >
+          <lightning-button
+            variant="brand"
+            label={labels.firstRunStart}
+            onclick={handleStartFirst}
+            data-id="first-run-start"
+          ></lightning-button>
+        </c-barn-empty-state>
+      </template>
+
       <c-projects-at-risk class="slds-var-m-bottom_medium" data-id="at-risk"></c-projects-at-risk>
 
       <section class="slds-var-m-vertical_medium" data-id="my-tasks">
@@ -18,13 +35,13 @@
         <template lwc:if={hasTasks}>
           <ul class="slds-has-dividers_bottom-space">
             <template for:each={tasks} for:item="row">
-              <li key={row.Id} class="slds-item slds-grid slds-grid_vertical-align-center" data-id="task">
+              <li key={row.id} class="slds-item slds-grid slds-grid_vertical-align-center" data-id="task">
                 <span class="slds-col">
-                  <a href={row.href}>{row.Name}</a>
+                  <a href={row.href}>{row.name}</a>
                   <a href={row.projectHref} class="slds-var-m-left_x-small slds-text-color_weak">{row.projectName}</a>
-                  <span class="slds-var-m-left_x-small">{row.Due_Date__c}</span>
+                  <span class="slds-var-m-left_x-small">{row.dueDate}</span>
                 </span>
-                <lightning-button class="slds-col_bump-left" label={labels.done} data-task={row.Id} disabled={isWorking} onclick={handleDone} data-id="done"></lightning-button>
+                <lightning-button class="slds-col_bump-left" label={labels.done} data-task={row.id} disabled={isWorking} onclick={handleDone} data-id="done"></lightning-button>
               </li>
             </template>
           </ul>
@@ -86,6 +103,9 @@
               <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
                 <lightning-input class="slds-col" type="checkbox" label={labels.includeExported} checked={includeExported} data-field="includeExported" onchange={handleRange}></lightning-input>
                 <lightning-button class="slds-col" label={labels.exportButton} disabled={isWorking} onclick={handleExport} data-id="export-button"></lightning-button>
+                <template lwc:if={ratesEnabled}>
+                  <lightning-button class="slds-col" label={labels.applyRates} disabled={isWorking} onclick={handleApplyRates} data-id="apply-rates"></lightning-button>
+                </template>
               </div>
             </div>
           </template>

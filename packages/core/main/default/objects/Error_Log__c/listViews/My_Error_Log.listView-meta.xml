@@ -4,6 +4,7 @@
   <columns>NAME</columns>
   <columns>Timestamp__c</columns>
   <columns>Severity__c</columns>
+  <columns>Occurrences__c</columns>
   <columns>Status__c</columns>
   <columns>Context__c</columns>
   <columns>Message__c</columns>

@@ -60,7 +60,11 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 		if (indicatorIds == null || indicatorIds.isEmpty()) {
 			return null;
 		}
-		return Database.executeBatch(new IndicatorResultsBatch(indicatorIds), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new IndicatorResultsBatch(indicatorIds),
+			CHUNK_SIZE,
+			'IndicatorResultsBatch'
+		);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
@@ -242,18 +246,16 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 			indicator.Source_Status__c = null;
 		}
 		changes.add(indicator);
+		List<String> refusals = new List<String>();
 		for (Database.SaveResult saved : Database.update(changes, false, AccessLevel.SYSTEM_MODE)) {
 			for (Database.Error error : saved.getErrors()) {
 				// A period or the indicator deleted while the run read its records.
 				if (error.getStatusCode() != StatusCode.ENTITY_IS_DELETED) {
-					ErrorLogger.logMessage(
-						error.getMessage(),
-						ERROR_CONTEXT,
-						ErrorLogger.SEVERITY_WARNING
-					);
+					refusals.add(error.getMessage());
 				}
 			}
 		}
+		ErrorLogger.logMessages(refusals, ERROR_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 	}
 
 	/** A date, or a date-time's date in the running user's time zone, or null. */

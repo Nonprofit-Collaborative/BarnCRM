@@ -32,6 +32,10 @@ Everything is in the app. You never open Setup.
    - a **description**, optional, for what this level means and what a donor at it is
      offered;
    - **active**, which is on for a new rung.
+
+   In an org with more than one currency, a donor's total and a rung's amounts are each
+   converted to your corporate currency, at your static conversion rates, before they are
+   compared, so a rung entered in euros and a donor whose totals are in dollars still match.
 4. Repeat until your ladder is complete. There is no limit and no required number of
    rungs; four or five is usual.
 5. Back in **BarnCRM Settings**, then **Giving**, set **Donor level source**. This is
@@ -51,7 +55,11 @@ Everything is in the app. You never open Setup.
 
 From then on it looks after itself. A gift updates the donor's giving total, and the level
 is worked out in the same moment. A nightly pass catches the two things a gift does not
-announce: your fiscal year turning over, and a ladder you edited.
+announce: your fiscal year turning over, and a ladder you edited. It places every donor
+again only on those nights, after a change to a donor level or donor score setting, and at
+least once a week; on the other nights it only refreshes the donor scores of donors whose
+days since their last gift just crossed a recency cutoff, and **Donors last placed** keeps the
+time of the last full pass.
 
 ## A Five-Minute Walkthrough
 

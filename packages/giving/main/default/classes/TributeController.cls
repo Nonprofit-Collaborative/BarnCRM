@@ -7,6 +7,11 @@
  */
 public with sharing class TributeController {
 	private static final String CONTEXT = 'Tribute panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Giving',
+		'Giving_SoftCredits_ActionFailed'
+	);
 
 	public class TributeView {
 		@AuraEnabled
@@ -46,7 +51,7 @@ public with sharing class TributeController {
 		try {
 			return viewFor(giftId);
 		} catch (Exception failure) {
-			throw report(failure, giftId);
+			throw ERRORS.wrap(failure, CONTEXT, giftId);
 		}
 	}
 
@@ -70,7 +75,7 @@ public with sharing class TributeController {
 		} catch (AuraHandledException refused) {
 			throw refused;
 		} catch (Exception failure) {
-			throw report(failure, tributeId);
+			throw ERRORS.wrap(failure, CONTEXT, tributeId);
 		}
 	}
 
@@ -120,10 +125,5 @@ public with sharing class TributeController {
 			return second;
 		}
 		return String.isBlank(third) ? null : third;
-	}
-
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(BarnHelp.text('Giving', 'Giving_SoftCredits_ActionFailed'));
 	}
 }

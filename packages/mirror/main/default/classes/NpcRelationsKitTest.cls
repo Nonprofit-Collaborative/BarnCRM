@@ -134,11 +134,11 @@ private class NpcRelationsKitTest {
 	@IsTest
 	static void barnRecordsAloneAreNotCountedAsCopiedAndReadsAreBoundedByTheObject() {
 		System.runAs(TestUsers.admin()) {
-			Account org = new Account(Name = 'Relkit Org');
+			Account org = TestDataFactory.organization(new Account(Name = 'Relkit Org'));
 			insert org;
 			List<Contact> people = new List<Contact>{
-				new Contact(LastName = 'Relkit One'),
-				new Contact(LastName = 'Relkit Two')
+				TestDataFactory.person(new Contact(LastName = 'Relkit One')),
+				TestDataFactory.person(new Contact(LastName = 'Relkit Two'))
 			};
 			insert people;
 			insert new Relationship__c(

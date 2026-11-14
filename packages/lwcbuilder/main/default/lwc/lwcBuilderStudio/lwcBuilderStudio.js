@@ -104,6 +104,7 @@ export default class LwcBuilderStudio extends LightningElement {
   helpReady = isHelpLoaded(HELP_PACKAGES);
   components = [];
   sourceExport = true;
+  rowsPerList;
   canEdit = false;
   selectedId = NEW;
   details = this.blankDetails();
@@ -137,6 +138,7 @@ export default class LwcBuilderStudio extends LightningElement {
       const studio = await getStudio();
       this.components = studio.components || [];
       this.sourceExport = studio.sourceExport !== false;
+      this.rowsPerList = studio.rowsPerList;
       this.canEdit = studio.canEdit === true;
       this.errorMessage = undefined;
     } catch (error) {
@@ -189,6 +191,8 @@ export default class LwcBuilderStudio extends LightningElement {
       descending: helpText('LwcBuilder', 'LwcBuilder_Prop_Descending'),
       report: helpText('LwcBuilder', 'LwcBuilder_Prop_Report'),
       reportHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_ReportHelp'),
+      stacked: helpText('LwcBuilder', 'LwcBuilder_Prop_Stacked'),
+      stackedHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_StackedHelp'),
       body: helpText('LwcBuilder', 'LwcBuilder_Prop_Body'),
       url: helpText('LwcBuilder', 'LwcBuilder_Prop_Url'),
       urlHelp: helpText('LwcBuilder', 'LwcBuilder_Prop_UrlHelp'),
@@ -272,8 +276,10 @@ export default class LwcBuilderStudio extends LightningElement {
         layout: layoutOf(row),
         isFirst: rowIndex === 0,
         isLast: rowIndex === rows.length - 1,
-        columns: row.columns.map((column) => ({
+        columns: row.columns.map((column, columnIndex) => ({
           id: column.id,
+          zoneLabel: helpText('LwcBuilder', 'LwcBuilder_Studio_ColumnLabel', columnIndex + 1),
+          isSelected: column.id === this.selectedColumnId,
           css: `slds-col slds-size_${column.width}-of-12 slds-var-p-around_xx-small`,
           zoneCss: `slds-box slds-box_x-small lb-zone${column.id === this.selectedColumnId ? ' lb-zone_selected' : ''}`,
           isEmpty: column.blocks.length === 0,
@@ -324,6 +330,7 @@ export default class LwcBuilderStudio extends LightningElement {
       fieldsText: (block.fields || []).join(', '),
       isTwoColumns: block.columns === 2,
       isDescending: block.direction === 'desc',
+      isStacked: block.display === 'stacked',
       isFields: block.type === 'fields',
       isRelatedList: block.type === 'relatedList',
       isList: block.type === 'relatedList' || block.type === 'recordList',
@@ -443,6 +450,17 @@ export default class LwcBuilderStudio extends LightningElement {
     this.selectedColumnId = event.currentTarget.dataset.column;
   }
 
+  /** Enter or Space on the column itself selects it; keys pressed inside a block are its own. */
+  handleColumnKey(event) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectedColumnId = event.currentTarget.dataset.column;
+    }
+  }
+
   handleSelectBlock(event) {
     event.stopPropagation();
     this.selectedBlockId = event.currentTarget.dataset.block;
@@ -524,6 +542,8 @@ export default class LwcBuilderStudio extends LightningElement {
       value = value ? 2 : 1;
     } else if (prop === 'direction') {
       value = value ? 'desc' : 'asc';
+    } else if (prop === 'display') {
+      value = value ? 'stacked' : 'grouped';
     }
     this.change(updateItem(this.definition, this.selectedBlockId, { [prop]: value }));
   }
@@ -604,7 +624,10 @@ export default class LwcBuilderStudio extends LightningElement {
   }
 
   handleExport() {
-    const { files } = exportSource(this.definition, this.details);
+    const { files } = exportSource(this.definition, {
+      ...this.details,
+      rowLimit: this.rowsPerList
+    });
     this.exportFiles = files.map((file) => ({ ...file, key: file.name }));
   }
 

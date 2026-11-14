@@ -53,30 +53,52 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Gifts and everything around them (Giving module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
-| Forms and form submissions (Forms module) | **BarnCRM** or **BarnCRM Console** (no app of its own) |
-| Events and speakers (Event Management module) | **BarnCRM** or **BarnCRM Console** (no app of its own) |
-| Portals (Portal Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** (no app of its own) |
+| Forms and form submissions (Forms module) | The **BarnCRM Forms** app, and **BarnCRM** or **BarnCRM Console** |
+| Events, speakers and venues (Event Management module) | The **BarnCRM Events** app, and **BarnCRM** or **BarnCRM Console** |
+| Portals (Portal Builder module) | The **BarnCRM Portal Builder** app, and **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Library, compliance, agreements and boards (Corporate Hub module) | The **BarnCRM Corporate Hub** app, and **BarnCRM** or **BarnCRM Console** |
+| Projects, time and expenses (Project Management module) | The **BarnCRM Projects** app, and **BarnCRM** or **BarnCRM Console** |
 
 The home page's **Modules** list names each installed module, marked **On** or **Off** (turned
 off in BarnCRM Settings, Modules), with an **Open the App** link for a module that has an app
-of its own. Rollup Builder, Mirror, Forms, Event Management and Portal Builder have no app of
-their own (D-188 keeps the org under Salesforce's custom app limit): their pages are in the
-BarnCRM apps.
+of its own. Rollup Builder, Mirror and the smaller modules have no app of their own: their
+pages are in the BarnCRM apps.
+
+### The Module Apps
+
+Each module app is a console app with the module's own logo, every page of the module,
+**Reports**, and **Error Log** last. The module's permission sets show the app, so whoever has
+the module's Staff, Admin or Read Only set (Portal Builder: its Admin set) sees it in the App
+Launcher.
+
+| App | Pages |
+|---|---|
+| **BarnCRM Events** | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
+| **BarnCRM Forms** | Forms, Form Submissions, Reports, Error Log |
+| **BarnCRM Portal Builder** | Portals, Portal Accesses, Reports, Error Log |
+| **BarnCRM Corporate Hub** | Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
+| **BarnCRM Projects** | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
+
+Test and developer orgs (scratch and Developer Edition orgs) allow only about 10 custom apps, so
+`scripts/org/deploy-packages.sh` leaves these five apps out of such an org; every page is still
+in the BarnCRM apps there (ADR-0223). A production org or sandbox gets every app.
 
 ### A Module's Pages in the BarnCRM Apps
 
-Giving and Volunteers keep their own apps, and their pages can also sit in the BarnCRM apps
-so you need not switch apps. The modules with no app have their pages only here:
+The modules with their own app keep it, and their pages also sit in the BarnCRM apps so you
+need not switch apps. The modules with no app have their pages only here:
 
 | Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
 |---|---|---|
 | Rollup Builder | | Rollup Builder |
-| Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters |
+| Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters |
 | Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Campaign Sync, Opportunity Mirror, Accounting Export |
 | Forms | Forms, Form Submissions | |
-| Event Management | Events Home, Event Calendar, Events, Event Speakers | |
+| Event Management | Events Home, Event Calendar, Events, Event Speakers, Venues | |
 | Portal Builder | | Portals, Portal Accesses |
+| Corporate Hub | Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings | |
+| Project Management | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing | Project Rates, Project Invoices, Request Connections |
 
 A module's pages go after **Data Manager** in the everyday apps and before **Error Log** in
 the admin apps, so Error Log stays last. A form, form submission or event opens on its own
@@ -149,7 +171,8 @@ person what they can act on:
 | **Modules** | Administrators |
 | **Files That Arrive Regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
 | **Quick Links**: People, Households, Organizations and Find | Everyone |
-| **Quick Gift Entry** quick link | Everyone, when Giving is installed and turned on in the Module Manager |
+| **Import a File** quick link | Anyone who can run an import (create Import Batches) |
+| Module quick links: **Enter a Gift** (Giving), **Log Hours** (Volunteers), **Enroll** (Programs, for someone who can create enrollments) | Everyone, while that module is installed and turned on in the Module Manager. Each module's links come from its row in the module catalog (`Quick_Links__c` on BarnCRM Module), never from module code |
 | **BarnCRM Settings** quick link | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
@@ -165,8 +188,9 @@ Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add
 badge to it and have a navy header, so you can tell at a glance which app you are in; every other
 app, the module apps included, has the BarnCRM teal header (#007A9E). A module's
 app adds its own badge (a berry heart for **BarnCRM Fundraising**, a green person for **BarnCRM
-Volunteers**, a purple sprout for **BarnCRM Programs**, a bronze award ribbon for **BarnCRM
-Funders** and indigo flow arrows for **BarnCRM Logic Models**). No badge uses red, orange or
+Volunteers**, a purple sprout for **BarnCRM Programs** and a bronze award ribbon for **BarnCRM
+Funders**; Logic Models has no app since release 1.24, and its indigo flow arrows badge marks
+its tile under **Modules** on the BarnCRM home page). No badge uses red, orange or
 yellow, because those colors mean an error or a warning elsewhere in BarnCRM.
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,
@@ -239,8 +263,10 @@ Admin role.
     Giving, that is Giving), each with its app's logo, and says for each whether it is on or
     installed and off. Click
     **Open the Module Manager** to turn a module on or off.
-11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Quick
-    Gift Entry (with Giving) or BarnCRM Settings without going back to the app launcher.
+11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Import a
+    File, each installed module's links (Enter a Gift, Log Hours, Enroll) or BarnCRM Settings
+    without going back to the app launcher. A module link to a tab shows only to someone who
+    can see that tab.
 12. Click **New Person** under the welcome to add someone; the household is made for them.
     Once setup is finished, the welcome reads "Find someone, add someone new, or pick up
     where you left off."

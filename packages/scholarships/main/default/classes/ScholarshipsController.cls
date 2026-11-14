@@ -7,6 +7,12 @@
  */
 public with sharing class ScholarshipsController {
 	private static final String CONTEXT = 'ScholarshipsController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Scholarships',
+			'Scholarships_Error_Generic'
+		)
+		.showingDml();
 
 	/** One line of a list on the Scholarships and Grants page. */
 	public class Row {
@@ -31,6 +37,9 @@ public with sharing class ScholarshipsController {
 		public List<ScholarshipAwards.Payment> due = new List<ScholarshipAwards.Payment>();
 		@AuraEnabled
 		public Boolean canManage = false;
+		/** True when the person may create award programs and none exists yet (D-200 R4). */
+		@AuraEnabled
+		public Boolean firstRun = false;
 	}
 
 	public class Board {
@@ -52,18 +61,71 @@ public with sharing class ScholarshipsController {
 		@AuraEnabled
 		public List<ScholarshipReviews.Criterion> criteria;
 		@AuraEnabled
-		public Application_Review__c mine;
+		public MyReview mine;
 		@AuraEnabled
 		public Boolean blind = false;
 		@AuraEnabled
 		public Boolean open = false;
 	}
 
+	/** The running user's own review, by unprefixed names (works namespaced or not). */
+	public class MyReview {
+		@AuraEnabled
+		public Id id;
+		@AuraEnabled
+		public String status;
+		@AuraEnabled
+		public String scores;
+		@AuraEnabled
+		public Decimal score;
+		@AuraEnabled
+		public String comments;
+		@AuraEnabled
+		public String recusalReason;
+
+		public MyReview(Application_Review__c review) {
+			id = review.Id;
+			status = review.Status__c;
+			scores = review.Scores__c;
+			score = review.Score__c;
+			comments = review.Comments__c;
+			recusalReason = review.Recusal_Reason__c;
+		}
+	}
+
+	/** One requirement on an award, by unprefixed names. */
+	public class Requirement {
+		@AuraEnabled
+		public Id id;
+		@AuraEnabled
+		public String name;
+		@AuraEnabled
+		public String type;
+		@AuraEnabled
+		public Date dueDate;
+		@AuraEnabled
+		public String status;
+		@AuraEnabled
+		public String formLink;
+		@AuraEnabled
+		public String blocks;
+
+		public Requirement(Award_Requirement__c requirement) {
+			id = requirement.Id;
+			name = requirement.Name;
+			type = requirement.Type__c;
+			dueDate = requirement.Due_Date__c;
+			status = requirement.Status__c;
+			formLink = requirement.Form_Link__c;
+			blocks = requirement.Disbursement__r?.Name;
+		}
+	}
+
 	public class AwardPanel {
 		@AuraEnabled
 		public List<ScholarshipAwards.Payment> payments;
 		@AuraEnabled
-		public List<Award_Requirement__c> requirements;
+		public List<Requirement> requirements = new List<Requirement>();
 		@AuraEnabled
 		public Boolean canManage = false;
 	}
@@ -73,6 +135,10 @@ public with sharing class ScholarshipsController {
 		try {
 			Home home = new Home();
 			home.canManage = Scholarships.canManage();
+			home.firstRun =
+				Schema.SObjectType.Award_Program__c.isCreateable() &&
+				[SELECT Id FROM Award_Program__c WITH USER_MODE LIMIT 1]
+				.isEmpty();
 			for (Application_Review__c review : [
 				SELECT
 					Application__c,
@@ -118,7 +184,7 @@ public with sharing class ScholarshipsController {
 			home.due = ScholarshipAwards.due(30);
 			return home;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -145,7 +211,7 @@ public with sharing class ScholarshipsController {
 			}
 			return board;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -154,7 +220,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipReviews.assign(cycleId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -163,7 +229,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.decide(applicationId, award, amount);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -178,18 +244,19 @@ public with sharing class ScholarshipsController {
 			];
 			Review review = new Review();
 			review.criteria = ScholarshipReviews.rubric(application.Cycle__r.Rubric__c);
-			review.mine = ScholarshipReviews.own(applicationId);
+			Application_Review__c mine = ScholarshipReviews.own(applicationId);
+			review.mine = mine == null ? null : new MyReview(mine);
 			review.blind = application.Cycle__r.Blind_Review__c && !Scholarships.canManage();
 			review.open = ScholarshipReviews.REVIEWABLE.contains(application.Status__c);
 			return review;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
 	/** `action` is save, submit or recuse; `scoresJson` maps each criterion key to its score. */
 	@AuraEnabled
-	public static Application_Review__c saveReview(
+	public static MyReview saveReview(
 		Id applicationId,
 		String scoresJson,
 		String comments,
@@ -200,9 +267,11 @@ public with sharing class ScholarshipsController {
 			Map<String, Object> scores = String.isBlank(scoresJson)
 				? new Map<String, Object>()
 				: (Map<String, Object>) JSON.deserializeUntyped(scoresJson);
-			return ScholarshipReviews.saveOwn(applicationId, scores, comments, action, reason);
+			return new MyReview(
+				ScholarshipReviews.saveOwn(applicationId, scores, comments, action, reason)
+			);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -211,17 +280,19 @@ public with sharing class ScholarshipsController {
 		try {
 			AwardPanel panel = new AwardPanel();
 			panel.payments = ScholarshipAwards.payments(awardId);
-			panel.requirements = [
+			for (Award_Requirement__c requirement : [
 				SELECT Id, Name, Type__c, Due_Date__c, Status__c, Form_Link__c, Disbursement__r.Name
 				FROM Award_Requirement__c
 				WHERE Award__c = :awardId
 				WITH USER_MODE
 				ORDER BY Due_Date__c NULLS LAST, Name
-			];
+			]) {
+				panel.requirements.add(new Requirement(requirement));
+			}
 			panel.canManage = Scholarships.canManage();
 			return panel;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -230,7 +301,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.makeLetter(awardId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -239,7 +310,7 @@ public with sharing class ScholarshipsController {
 		try {
 			ScholarshipAwards.respond(awardId, accepted);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -253,7 +324,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.buildSchedule(awardId, count, firstDate, monthsApart);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -262,7 +333,7 @@ public with sharing class ScholarshipsController {
 		try {
 			ScholarshipAwards.markPaid(paymentId, paidOn, method, reference);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -271,7 +342,7 @@ public with sharing class ScholarshipsController {
 		try {
 			ScholarshipAwards.setRequirement(requirementId, status);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -280,7 +351,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.startRenewal(awardId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -289,7 +360,7 @@ public with sharing class ScholarshipsController {
 		try {
 			return ScholarshipAwards.export(fromDate, toDate);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -301,16 +372,5 @@ public with sharing class ScholarshipsController {
 		line.due = due;
 		line.count = count;
 		return line;
-	}
-
-	/** A refusal or a save's own message as it is; anything else logged, then one message. */
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof Scholarships.ScholarshipException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(
-			e,
-			BarnHelp.text('Scholarships', 'Scholarships_Error_Generic')
-		);
 	}
 }

@@ -3,6 +3,10 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Forms Read Only</label>
   <description>Reads forms and their submissions. Changes nothing.</description>
+  <applicationVisibilities>
+    <application>BarnCRM_Forms</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>FormSubmissionController</apexClass>
     <enabled>true</enabled>

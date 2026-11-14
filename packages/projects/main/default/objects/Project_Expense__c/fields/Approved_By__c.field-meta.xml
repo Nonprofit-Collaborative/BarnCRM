@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Approved_By__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>Who approved or rejected the expense.</inlineHelpText>
+  <label>Approved By</label>
+  <referenceTo>User</referenceTo>
+  <relationshipLabel>Approved Project Expenses</relationshipLabel>
+  <relationshipName>Approved_Project_Expenses</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

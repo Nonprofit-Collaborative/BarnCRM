@@ -671,9 +671,15 @@ public with sharing class SettingsController {
 	@TestVisible
 	private static final String NPSP_ADOPTION_ROW = 'NPSP_Household_Adoption';
 
+	/** The row that converts Nonprofit Cloud households (MIG-02b), shown only where it applies. */
+	@TestVisible
+	private static final String NPC_CONVERSION_ROW = 'NPC_Household_Conversion';
+
 	private static Boolean isHiddenByProduct(Setting_Definition__mdt definition) {
 		return NPSP_ADOPTION_ROW.equals(definition.DeveloperName) &&
-			!NpspHouseholdAdoptionService.isOffered();
+			!NpspHouseholdAdoptionService.isOffered() ||
+			NPC_CONVERSION_ROW.equals(definition.DeveloperName) &&
+			!NpspHouseholdAdoptionService.isNpcOffered();
 	}
 
 	/** Rows that open Org Optimizer, for those who can open it (admin-14). */
@@ -747,7 +753,8 @@ public with sharing class SettingsController {
 			? ''
 			: SettingSections.pageFor(definition.Section__c);
 		setting.component = definition.Component__c;
-		setting.navigationTarget = definition.Navigation_Target__c;
+		// Rows name a packaged tab or object as written; Lightning needs it qualified.
+		setting.navigationTarget = NamespaceUtil.qualify(definition.Navigation_Target__c);
 		setting.navigationLabel = definition.Navigation_Label__c;
 		setting.helpUrl = String.isBlank(definition.Help_Path__c)
 			? null

@@ -2,7 +2,7 @@
 
 ## What It Does
 
-The BarnCRM Funders module tracks the grants your organization asks for and wins. Each **grant**
+The BarnCRM Funders module (its app is named **BarnCRM Grants**) tracks the grants your organization asks for and wins. Each **grant**
 is one request to one **funder** (a foundation, company or government body, stored as an
 organization): how much you asked for, its **stage** from first idea to the decision, the
 application deadline, the decision date, how much was awarded and the award period. The **Grant
@@ -50,7 +50,7 @@ finishes, BarnCRM does three things on its own:
 2. Gives you, the person who installed it, the **Funders Admin** permission set.
 3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
 
-Then open the **BarnCRM Funders** app from the App Launcher. It opens on the **Board Dashboard**,
+Then open the **BarnCRM Grants** app from the App Launcher. It opens on the **Board Dashboard**,
 the module's home. Its tabs are **Board Dashboard**, **Grant Pipeline**, **Grant Calendar**,
 **Grant Finder**, **Grants**, **Grant Requirements**, **Grant Answers**,
 **Funder Report Templates** (admins only), **Grant Checklist**, **Reports** and **Error Log**; Grant Pipeline and
@@ -521,8 +521,11 @@ without the app's header and navigation.
 
 ## Sample Data
 
-**Load Sample Data** in BarnCRM Settings also loads three sample grants to Core's sample
-organizations (one Applied, one Awarded, one Prospect), three requirements on the award, a
+**Load Sample Data** in BarnCRM Settings also loads eight sample grants to Core's sample
+organizations across the pipeline (two Prospect, one Letter of Inquiry, one Invited to Apply, one
+Applied, two Awarded, one Declined), with an application or report requirement on most of them
+(so the Grant Pipeline and Grant Calendar tabs and the Board Dashboard all show data), three
+requirements on the main award, a
 two-payment schedule with the first payment received, and a restricted ledger with that payment's
 Received entry and one Spent entry, and two budget lines on the award (the Spent entry is on
 the first). **Remove Sample Data** takes them away again. See
@@ -540,7 +543,7 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
 1. On the [Access](access.md) page, give Dana the **Fundraising Staff** role.
 2. In Setup, open Dana's user record and look at **Permission Set Assignments**. Within a minute
    she holds **Funders Staff**.
-3. Open the **BarnCRM Funders** app. On **Grants**, create "2027 Literacy Grant" for any
+3. Open the **BarnCRM Grants** app. On **Grants**, create "2027 Literacy Grant" for any
    organization, **Amount Requested** 25,000, **Application Deadline** two weeks from today.
 4. Open **Grant Pipeline**. The grant is in the **Prospect** column, and in **Upcoming
    Deadlines**.

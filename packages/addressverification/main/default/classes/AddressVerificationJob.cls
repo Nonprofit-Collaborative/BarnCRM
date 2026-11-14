@@ -30,7 +30,11 @@ public with sharing class AddressVerificationJob implements Database.Batchable<S
 		if (!AddressVerifier.isOn() || !AddressVerifier.isReady() || limitTonight() <= 0) {
 			return null;
 		}
-		return Database.executeBatch(new AddressVerificationJob(), AddressVerifier.PER_TRANSACTION);
+		return AsyncStarter.batch(
+			new AddressVerificationJob(),
+			AddressVerifier.PER_TRANSACTION,
+			'AddressVerificationJob'
+		);
 	}
 
 	public void execute(SchedulableContext context) {

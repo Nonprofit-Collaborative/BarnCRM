@@ -4,7 +4,7 @@
     Copies gifts to Nonprofit Cloud Gift Transactions: Run Now, the nightly schedule and the
     reconciliation.
   </description>
-  <flexiPage>Gift_Transaction_Mirror</flexiPage>
   <label>Gift Transaction Mirror</label>
+  <lwcComponent>giftTransactionMirror</lwcComponent>
   <motif>Custom31: Car</motif>
 </CustomTab>

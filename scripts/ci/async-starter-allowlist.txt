@@ -1,0 +1,61 @@
+# Direct Database.executeBatch and System.enqueueJob calls allowed outside AsyncStarter
+# (D-200 P9, scripts/ci/check-async-starter.py). One line per file: path, then the number of
+# direct calls it may make. Lower a count as call sites move to AsyncStarter; never raise one
+# without a reason that fits a group below.
+
+# A job chaining its next step from inside its own execute or finish: it already runs inside
+# the limits AsyncStarter checks, and a refusal there has no person to tell.
+packages/core/main/default/classes/BrandShareJob.cls 3
+packages/core/main/default/classes/CorePostInstallRetryQueueable.cls 1
+packages/core/main/default/classes/DuplicateRulesStarter.cls 1
+packages/core/main/default/classes/DuplicateScanBatch.cls 1
+packages/core/main/default/classes/ImportNewFieldService.cls 1
+packages/core/main/default/classes/ImportUndoBatch.cls 1
+packages/core/main/default/classes/NightlyRun.cls 1
+packages/core/main/default/classes/OrgAutomationDeactivation.cls 1
+packages/core/main/default/classes/RecordRetentionBatch.cls 1
+packages/core/main/default/classes/SetupChangeCopyJob.cls 1
+packages/events/main/default/classes/EventCheckoutJob.cls 1
+packages/forms/main/default/classes/FormPublicProcessor.cls 2
+packages/giving/main/default/classes/AskReminderBatch.cls 1
+packages/giving/main/default/classes/DonorLevelBatch.cls 1
+packages/mirror/main/default/classes/CampaignSyncBatch.cls 1
+packages/payments/main/default/classes/PaymentEventProcessor.cls 4
+packages/programs/main/default/classes/ProgramsSharingBatch.cls 1
+packages/rollups/main/default/classes/RollupFullRecalcBatch.cls 2
+packages/rollups/main/default/classes/RollupLargeParentBatch.cls 2
+packages/rollups/main/default/classes/RollupNightlyBatch.cls 1
+packages/territory/main/default/classes/TerritoryRunBatch.cls 1
+
+# Started from a trigger, a platform event or a record save, where a refusal must not fail the
+# save; each has its own fallback (a nightly catch-up, a queue row, a retry).
+packages/addressverification/main/default/classes/AddressVerificationHandler.cls 1
+packages/contactpoints/main/default/classes/ContactPointSyncService.cls 1
+packages/core/main/default/classes/FieldAccessRecordJob.cls 2
+packages/core/main/default/classes/MergeSettlement.cls 2
+packages/core/main/default/classes/ModuleAccessSyncs.cls 2
+packages/core/main/default/classes/PersonErasure.cls 1
+packages/core/main/default/classes/TabAccessService.cls 2
+packages/events/main/default/classes/EventPayments.cls 1
+packages/giving/main/default/classes/HouseholdSoftCreditRecompute.cls 2
+packages/memberships/main/default/classes/MembershipPayments.cls 1
+packages/programs/main/default/classes/ProgramsSharing.cls 2
+packages/programs/main/default/classes/SessionScheduleJob.cls 2
+packages/volunteers/main/default/classes/ShiftScheduleGenerator.cls 2
+packages/volunteers/main/default/classes/ShiftScheduleRemovalJob.cls 1
+
+# Post-install steps: an install has no person to tell, and each step logs its own failure.
+packages/core/main/default/classes/CorePostInstall.cls 1
+
+# A batch over values rather than records (Batchable<String>, <Integer>, or a custom type),
+# which AsyncStarter.batch does not take.
+packages/core/main/default/classes/AutoMergeJob.cls 2
+packages/core/main/default/classes/SampleDataRemoveBatch.cls 1
+packages/core/main/default/classes/SampleDataStageBatch.cls 1
+packages/volunteers/main/default/classes/VolunteerLetterBatch.cls 2
+
+# Owned by another workstream in Batch K (the rollup engine, Projects); to move later.
+packages/projects/main/default/classes/ProjectRevenue.cls 2
+packages/rollups/main/default/classes/RollupClearBatch.cls 1
+packages/rollups/main/default/classes/RollupQueue.cls 2
+packages/rollups/main/default/classes/RollupService.cls 1

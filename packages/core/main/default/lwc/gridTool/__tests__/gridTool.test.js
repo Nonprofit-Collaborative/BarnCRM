@@ -153,6 +153,7 @@ describe('c-grid-tool', () => {
     expect(JSON.parse(saved.queryJson).grid).toEqual({ version: 1 });
 
     element.shadowRoot.querySelector('[data-id="open-in-find"]').click();
+    await flush();
     expect(mockNavigate.mock.calls[0][0].state).toEqual({ c__savedQueryId: 'a01000000000002' });
   });
 });

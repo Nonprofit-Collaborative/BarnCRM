@@ -32,7 +32,9 @@ private class RollupRecalcErrorHandlerTest {
 		List<Account> organizations = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			organizations.add(
-				new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
+				TestDataFactory.organization(
+					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
+				)
 			);
 		}
 		insert organizations;
@@ -160,15 +162,14 @@ private class RollupRecalcErrorHandlerTest {
 				],
 				'One run, not three'
 			);
-			Assert.areEqual(
-				2,
-				[
-					SELECT COUNT()
+			// Both refusals read the same way, so they are counted on one entry (R-E7).
+			Decimal refusals = (Decimal) [
+					SELECT SUM(Occurrences__c) total
 					FROM Error_Log__c
 					WHERE Context__c = 'RollupFullRecalcBatch' AND Severity__c = 'Info'
-				],
-				'Each refused start says which run is going'
-			);
+				][0]
+				.get('total');
+			Assert.areEqual(2, refusals.intValue(), 'Each refused start says which run is going');
 			Assert.isNull(RollupFullRecalcBatch.runningJobId(), 'Nothing runs once it finished');
 		}
 	}

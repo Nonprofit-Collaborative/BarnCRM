@@ -8,6 +8,12 @@
  * console can read the panel.
  */
 public with sharing class ErrorDigestController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_ErrorDigest_UnexpectedError'
+	);
+
 	/** Raised with a message the panel shows as it is. */
 	public class ErrorDigestException extends Exception {
 	}
@@ -37,7 +43,7 @@ public with sharing class ErrorDigestController {
 		try {
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Error digest page');
+			throw ERRORS.wrap(caught, 'Error digest page');
 		}
 	}
 
@@ -53,7 +59,7 @@ public with sharing class ErrorDigestController {
 			}
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Schedule the error digest');
+			throw ERRORS.wrap(caught, 'Schedule the error digest');
 		}
 	}
 
@@ -65,7 +71,7 @@ public with sharing class ErrorDigestController {
 			ErrorDigestService.sendNow();
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Send the error digest now');
+			throw ERRORS.wrap(caught, 'Send the error digest now');
 		}
 	}
 
@@ -95,14 +101,5 @@ public with sharing class ErrorDigestController {
 				BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof ErrorDigestException,
-			context,
-			BarnHelp.text('Core', 'Core_ErrorDigest_UnexpectedError')
-		);
 	}
 }

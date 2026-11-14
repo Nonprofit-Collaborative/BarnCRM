@@ -38,7 +38,7 @@ public with sharing class HouseholdSelector {
 	// exclusion decision (product-plan Section 11.2 item 9) exists to prevent. A second query
 	// text, never concatenated, the same shape as the others in this class.
 	private static final String NATIVE_HOUSEHOLD_GROUP_TYPE = 'PartyRelationshipGroup'; // detection-only: describe key, so Health Check's collision count can tell whether the object exists before it asks about it
-	private static final String NATIVE_HOUSEHOLD_COLLISION_COUNT_QUERY = 'SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId AND Id IN (SELECT AccountId FROM PartyRelationshipGroup WHERE Type = \'Household\')'; // detection-only: counts Accounts that are a BarnCRM household and a native Nonprofit Cloud household at once
+	private static final String NATIVE_HOUSEHOLD_COLLISION_COUNT_QUERY = 'SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId AND Household_Model__c != \'Converted\' AND Id IN (SELECT AccountId FROM PartyRelationshipGroup WHERE Type = \'Household\')'; // detection-only: counts Accounts that are a BarnCRM household and a native Nonprofit Cloud household at once, leaving out the ones converted on purpose (R-H15)
 
 	/**
 	 * Set only by tests, so the collision count can be exercised on an org where the native
@@ -422,6 +422,12 @@ public with sharing class HouseholdSelector {
 	 * already computed once per transaction, and an org it reports as having no native
 	 * groups at all needs no per-record probe, so every caller of this method pays for the
 	 * query only in an org where it can matter.
+	 *
+	 * Then each Account's Household Model decides before detection (canonical model R-H15,
+	 * ADR-0216 `0216-household-model-coexistence.md`): Converted is BarnCRM's, so never native;
+	 * Nonprofit Cloud is native whatever the probe finds; Automatic or blank asks detection. An
+	 * upkeep read (ADR-0021) in system mode: the answer decides what BarnCRM writes, never what
+	 * anybody sees.
 	 */
 	@NamespaceAccessible
 	public static Set<Id> nativeHouseholdAccountsAmong(Set<Id> accountIds) {
@@ -431,7 +437,52 @@ public with sharing class HouseholdSelector {
 		if (OrgShapeDetector.hasNativeHouseholdGroups() != true) {
 			return new Set<Id>();
 		}
-		return getAccountsWithNativeDependents(accountIds);
+		Map<Id, String> models = householdModels(accountIds);
+		if (models.isEmpty()) {
+			return getAccountsWithNativeDependents(accountIds);
+		}
+		Set<Id> undecided = new Set<Id>(accountIds);
+		undecided.removeAll(models.keySet());
+		Set<Id> natives = undecided.isEmpty()
+			? new Set<Id>()
+			: new Set<Id>(getAccountsWithNativeDependents(undecided));
+		natives.removeAll(models.keySet());
+		for (Id accountId : models.keySet()) {
+			if (models.get(accountId) == MODEL_NATIVE) {
+				natives.add(accountId);
+			}
+		}
+		return natives;
+	}
+
+	/** The Household Model values Core reads (R-H15); Automatic and blank are neither. */
+	@NamespaceAccessible
+	public static final String MODEL_NATIVE = 'Nonprofit Cloud';
+	@NamespaceAccessible
+	public static final String MODEL_CONVERTED = 'Converted';
+
+	/** The Accounts among these Ids whose Household Model is Nonprofit Cloud or Converted. */
+	private static Map<Id, String> householdModels(Set<Id> ids) {
+		Set<Id> accountIds = new Set<Id>();
+		for (Id candidate : ids) {
+			if (candidate != null && candidate.getSObjectType() == Account.SObjectType) {
+				accountIds.add(candidate);
+			}
+		}
+		Map<Id, String> models = new Map<Id, String>();
+		if (accountIds.isEmpty()) {
+			return models;
+		}
+		for (Account account : [
+			SELECT Id, Household_Model__c
+			FROM Account
+			WHERE Id IN :accountIds AND Household_Model__c IN (:MODEL_NATIVE, :MODEL_CONVERTED)
+			WITH SYSTEM_MODE
+			LIMIT 10000
+		]) {
+			models.put(account.Id, account.Household_Model__c);
+		}
+		return models;
 	}
 
 	/**

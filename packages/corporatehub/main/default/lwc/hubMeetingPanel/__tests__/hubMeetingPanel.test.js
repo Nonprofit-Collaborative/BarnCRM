@@ -5,6 +5,7 @@ import inviteBoard from '@salesforce/apex/HubBoardController.inviteBoard';
 import setAttendance from '@salesforce/apex/HubBoardController.setAttendance';
 import setMinutesStatus from '@salesforce/apex/HubBoardController.setMinutesStatus';
 import openVoting from '@salesforce/apex/HubBoardController.openVoting';
+import closeVoting from '@salesforce/apex/HubBoardController.closeVoting';
 import chooseTime from '@salesforce/apex/HubBoardController.chooseTime';
 
 jest.mock('@salesforce/apex/HubBoardController.getMeeting', () => ({ default: jest.fn() }), {
@@ -131,5 +132,38 @@ describe('c-hub-meeting-panel', () => {
     expect(find(element, 'approve')).toBeNull();
     expect(find(element, 'no-attendees')).not.toBeNull();
     expect(find(element, 'no-carried')).not.toBeNull();
+  });
+
+  it('warns when voting closes without quorum and marks the motion', async () => {
+    getMeeting.mockResolvedValue({
+      ...VIEW,
+      motions: [
+        { id: 'v1', name: 'Approve the budget', status: 'Voting Open', values: ['1', '0', '0'] }
+      ]
+    });
+    closeVoting.mockResolvedValue({ outcome: 'Passed', warning: 'No quorum.' });
+    const element = mount();
+    const toasts = [];
+    element.addEventListener('lightning__showtoast', (event) => toasts.push(event.detail));
+    await flush();
+    expect(find(element, 'no-quorum')).toBeNull();
+    getMeeting.mockResolvedValue({
+      ...VIEW,
+      motions: [
+        {
+          id: 'v1',
+          name: 'Approve the budget',
+          status: 'Passed',
+          values: ['1', '0', '0'],
+          flag: true
+        }
+      ]
+    });
+    find(element, 'close-voting').click();
+    await flush();
+    expect(closeVoting).toHaveBeenCalledWith({ motionId: 'v1' });
+    expect(toasts.map((toast) => toast.variant)).toEqual(['success', 'warning']);
+    expect(toasts[1].message).toBe('No quorum.');
+    expect(find(element, 'no-quorum')).not.toBeNull();
   });
 });

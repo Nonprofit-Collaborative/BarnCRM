@@ -32,7 +32,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Choose **Why they are recognized** `Other` and enter **Amount** `500`, leave **Your own wording** empty, click **Save**. | Refused: "Type your own wording in Custom Role, or choose one of the roles in the list." |
 | 4 | Choose `Solicitor` again, **Amount** `500`, click **Save**. | Maria Whitfield, Solicitor, 500.00, with no **Automatic** badge and a **Remove** button. |
 | 5 | Edit the gift **Amount** to `600`, save. | The automatic credits read 600.00; Maria's stays 500.00. |
-| 6 | Click **Remove** beside Maria's credit. | It is gone. The automatic credits stay. |
+| 6 | Click **Remove** beside Maria's credit. Choose **Cancel** in the **Remove Soft Credit** window, then click **Remove** again and confirm. | **Cancel** leaves the credit in place. Confirming removes it. The automatic credits stay. |
 
 **Cleanup:** none.
 
@@ -151,6 +151,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the T-CRED-01 gift. | **Soft Credits** lists the credits; **Add Credit** is disabled and no **Remove** buttons show. |
 | 2 | Open the second gift from T-CRED-06 (tribute not sent). | The **Tribute** panel shows the summary; no **Mark Notification Sent** button. |
-| 3 | Open the **Tributes** tab in the BarnCRM Fundraising app. | No **New** button. |
+| 3 | In the BarnCRM Fundraising app, open **Fundraising Home** and click **Tributes** under **More**. | No **New** button. |
+
+**Cleanup:** none.
+
+## T-CRED-11: Sample Matching Gifts, Stock and Gift Sources
+
+**Purpose:** confirm the Giving sample data shows matching gifts, stock details and gift sources, and removes them cleanly.
+**Prerequisites:** admin with Giving Admin; sample data not loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Sample Data**, **Load Sample Data**, wait for it to finish. | The load finishes. |
+| 2 | Open **Founders Consulting Group** and its **Gifts**; open the Received check. | **Matched Gift** names an employee's gift, and **Soft Credits** lists that employee as **Matched donor**. Open the employee's gift: its **Matched Gift** names the company's gift. |
+| 3 | On **Gifts**, filter **Type** equals Stock and open one. | **Stock Symbol** (EXMP, SMPL or DEMO) and **Shares** are filled in. |
+| 4 | Filter **Gift Source** equals Donor-Advised Fund and open one. | **Gift Source Name** names the giving account. |
+| 5 | **Remove Sample Data**, wait for **Not loaded**. | No sample gift is left, and the Error Log has no new error from the removal. |
 
 **Cleanup:** none.

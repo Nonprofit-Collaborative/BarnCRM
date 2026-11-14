@@ -24,18 +24,18 @@ private class TerritoryPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ TerritoryAccessSync.ADMIN_SET }
+					new List<String>{ 'Territory_Admin' }
 				)
 				.Id;
 
 			Test.startTest();
 			Test.testInstall(new TerritoryPostInstall(), null);
-			System.enqueueJob(new TerritoryPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new TerritoryPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Territory', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Territory', alreadyHolding));
 			Test.stopTest();
 
-			Assert.areEqual(1, setsHeldBy(fresh, TerritoryAccessSync.ADMIN_SET), 'Installer');
-			Assert.areEqual(1, setsHeldBy(alreadyHolding, TerritoryAccessSync.ADMIN_SET), 'Once');
+			Assert.areEqual(1, setsHeldBy(fresh, 'Territory_Admin'), 'Installer');
+			Assert.areEqual(1, setsHeldBy(alreadyHolding, 'Territory_Admin'), 'Once');
 			Assert.isTrue(ModuleSetups.ran().contains('territory'), 'Setup is marked as run');
 		}
 	}
@@ -48,7 +48,7 @@ private class TerritoryPostInstallTest {
 
 			Test.startTest();
 			new TerritoryPostInstall().onInstall(null);
-			System.enqueueJob(new TerritoryPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Territory', notAUser));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -56,7 +56,7 @@ private class TerritoryPostInstallTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE Context__c = :TerritoryPostInstall.ACCESS_CONTEXT
+					WHERE Context__c = 'TerritoryPostInstall.grantInstallerAccess'
 					WITH SYSTEM_MODE
 				],
 				'The refusal is in the Error Log'

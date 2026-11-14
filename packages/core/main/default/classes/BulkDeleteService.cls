@@ -423,9 +423,10 @@ public with sharing class BulkDeleteService {
 			fields.add(field.getName());
 		}
 		String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
-		job.Job_Id__c = Database.executeBatch(
+		job.Job_Id__c = AsyncStarter.batch(
 			FindExportBatch.forArchive(queryJson, fields, tag, confirmedCount, job.Id),
-			BACKUP_PAGE_SIZE
+			BACKUP_PAGE_SIZE,
+			'BulkDeleteService'
 		);
 		Database.update(
 			new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c),
@@ -870,7 +871,11 @@ public with sharing class BulkDeleteService {
 			);
 		}
 		ImportUndoService.latch(jobId);
-		return Database.executeBatch(new BulkDeleteUndoBatch(jobId, view.records), 1);
+		return AsyncStarter.batch(
+			new BulkDeleteUndoBatch(jobId, view.records),
+			1,
+			'BulkDeleteService'
+		);
 	}
 
 	/** An archive that emptied the Recycle Bin, so has nothing to undelete (R-BD9). */

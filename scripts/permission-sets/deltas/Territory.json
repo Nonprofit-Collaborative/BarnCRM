@@ -1,0 +1,56 @@
+{
+  "Admin": {
+    "label": "Territory Admin",
+    "description": ["Sets up territories, rules and members, previews and runs assignments and undoes them, and", "edits the Territory of people, households and organizations."],
+    "add": {
+      "classAccesses": {
+        "TerritoryController": {"enabled": "true"}
+      },
+      "fieldPermissions": {
+        "Territory_Rule__c.Filter_JSON__c": {"editable": "true", "readable": "true"},
+        "Territory_Run__c.Changes__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Checked__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Completed_At__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Data_Job_Id__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Failed__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Message__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Only_Unassigned__c": {"editable": "false", "readable": "true"},
+        "Territory_Run__c.Summary_JSON__c": {"editable": "false", "readable": "true"},
+        "Territory__c.Next_Member__c": {"editable": "true", "readable": "true"},
+        "Territory__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      },
+      "objectPermissions": {
+        "Territory_Run__c": {"allowCreate": "false", "allowDelete": "true", "allowEdit": "true", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "true"}
+      },
+      "tabSettings": {
+        "Territory_Management": {"visibility": "Visible"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Territory_Member__c.Active__c": {"editable": "true"},
+        "Territory_Member__c.Capacity__c": {"editable": "true"},
+        "Territory_Member__c.User__c": {"editable": "true"},
+        "Territory_Rule__c.Active__c": {"editable": "true"},
+        "Territory_Rule__c.Summary__c": {"editable": "true"},
+        "Territory__c.Active__c": {"editable": "true"},
+        "Territory__c.Description__c": {"editable": "true"},
+        "Territory__c.Owner_User__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Territory_Member__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Territory_Rule__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Territory__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true", "modifyAllRecords": "true", "viewAllRecords": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Territory Read Only",
+    "description": ["Reads territories and the Territory of people, households and organizations."],
+    "readOnly": true,
+    "remove": {
+      "fieldPermissions": ["Territory_Member__c.Active__c", "Territory_Member__c.Capacity__c", "Territory_Member__c.User__c", "Territory_Rule__c.Active__c", "Territory_Rule__c.Summary__c"],
+      "objectPermissions": ["Territory_Member__c", "Territory_Rule__c"]
+    }
+  }
+}

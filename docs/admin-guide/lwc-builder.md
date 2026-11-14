@@ -81,12 +81,32 @@ properties (up, down, previous column, next column).
 | Record Fields | Fields of the record the page is for | Record pages only. A field the viewer cannot read is left out. Choose one or two columns. |
 | Related List | Records whose lookup points at the page record | Name the child object and its lookup field. Up to six fields; sort by any field. |
 | Record List | Records of any object | Up to six fields, one optional filter (a field equals, or does not equal, a value), a sort. |
-| Report Chart | Bars for a standard summary or matrix report's first grouping and first summary | Enter the report's API name (Report Unique Name). The report runs as the viewer. Tabular reports cannot be charted. Only the first grouping and first summary are drawn, and a chart exports as a placeholder. |
+| Report Chart | Bars for a standard summary or matrix report, by up to two groupings with up to three totals | Enter the report's API name (Report Unique Name). The report runs as the viewer. Tabular reports cannot be charted. See Report Charts below. |
 | Text | Formatted text | Bold, italic, lists and links. Scripts are removed. |
 | Image | A picture | Use a Salesforce address (for example `/resource/YourLogo`) or an `https` address listed in Setup, Trusted URLs. Always fill in the alternative text. |
 | Button | Opens a quick action or runs a screen flow | See Buttons below. |
 
 Row and list counts stop at **Rows per list**. A Name field in a list links to the record.
+
+## Report Charts
+
+Build the chart's groupings and totals in the report, then name the report in the block
+(release 1.20, D-196).
+
+- **Groupings.** A summary report's first two row groupings, or a matrix report's row grouping
+  and column grouping. For example, an Opportunities report grouped by Stage and then by Fiscal
+  Year draws a group for each stage with a bar for each year. Up to 200 groups and 12 values of
+  the second grouping are drawn.
+- **Totals.** Up to three of the report's summaries, in the report's order, for example Sum of
+  Amount and Record Count. Each total has its own bars and its own scale.
+- **Stack the second grouping.** Ticked, each group shows one bar per total, split by the
+  second grouping (a stacked bar); a legend names the colors. Unticked (the default), each
+  value of the second grouping has its own bar.
+- **Show Table.** Every chart carries a table of the same values for screen readers; viewers
+  can press **Show Table** to see it instead of the bars.
+
+The report runs once each time the block loads, as the viewer, so each person sees totals from
+the records they can open.
 
 ## Buttons
 
@@ -116,11 +136,17 @@ record can still see its data elsewhere. Use permission sets and sharing to rest
 ## Export as LWC Source
 
 In the builder, **Export** turns the open component into an LWC bundle: an HTML file, a
-JavaScript file and a `js-meta.xml` file, to download or copy. Record Fields, Text, Image and
-Button blocks export as working markup. Related List, Record List and Report Chart blocks
-export as a card with a comment saying what to connect, because their data comes from this
-module. Visibility rules export as comments. The exported bundle is for a developer to finish,
-deploy and maintain; BarnCRM does not deploy it.
+JavaScript file and a `js-meta.xml` file, to download or copy. Every block exports working.
+
+When the component has a Related List, Record List or Report Chart block (release 1.20,
+D-196), the export also holds a small Apex controller named after the component (for example
+`DonorSnapshotController`) with its test class, and a CSS file when there is a chart. The
+blocks read through that controller as the viewer, with the same fields, filter, sort and
+report, and as many rows as **Rows per list** allows when you export. The bundle does not
+depend on BarnCRM: deploy the controller and its test with it.
+
+Visibility rules export as comments. The exported bundle is for a developer to deploy and
+maintain; BarnCRM does not deploy it.
 
 ## Moving a Component Between Orgs
 
@@ -137,7 +163,9 @@ change set keeps finding its component.
 - **"This field is not on the object"** in a list block: a field was renamed or deleted; open
   the block and choose it again.
 - **A chart says the report cannot be charted.** Use a summary or matrix report with at least
-  one grouping.
+  one grouping and one summary.
+- **A chart is missing a grouping or total.** Only the first two groupings and first three
+  summaries are drawn; reorder them in the report.
 - **An image does not load.** Add its site to Setup, Trusted URLs (Content Security Policy), or
   upload it as a static resource.
 

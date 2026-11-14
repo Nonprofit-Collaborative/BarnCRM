@@ -68,7 +68,6 @@ const ICONS = Object.freeze({
   Gift_Batch__c: 'custom:custom13',
   Gift__c: 'custom:custom41',
   Giving_Accounting_Periods: 'custom:custom55',
-  Giving_Nightly_Jobs: 'custom:custom10',
   Installment__c: 'custom:custom45',
   Pledge_Reminder_Step__c: 'custom:custom79',
   Pledge_Reminder__c: 'custom:custom25',
@@ -127,9 +126,19 @@ const ICONS = Object.freeze({
   // Project Management
   Project__c: 'custom:custom62',
   Projects_Home: 'custom:custom64',
+  Projects_Timesheet: 'custom:custom25',
+  Projects_Approvals: 'custom:custom46',
+  Projects_Requests: 'custom:custom23',
   Time_Entry__c: 'custom:custom95',
+  Project_Expense__c: 'custom:custom93',
+  Project_Invoice__c: 'custom:custom41',
+  Project_Rate__c: 'custom:custom17',
+  Project_Resource__c: 'custom:custom47',
+  Projects_Staffing: 'custom:custom84',
+  Request_Connection__c: 'custom:custom68',
   // Mirror
   Accounting_Export: 'custom:custom21',
+  Provider_Request__c: 'custom:custom68',
   Campaign_Sync: 'custom:custom35',
   Gift_Transaction_Mirror: 'custom:custom31',
   Opportunity_Mirror: 'custom:custom30',
@@ -141,6 +150,7 @@ const ICONS = Object.freeze({
   Program__c: 'custom:custom88',
   Programs_Dashboard: 'custom:custom9',
   Programs_Settings: 'custom:custom73',
+  Record_Service: 'custom:custom8',
   Referral__c: 'custom:custom85',
   Service_Count__c: 'custom:custom6',
   Service_Delivery__c: 'custom:custom16',
@@ -148,6 +158,7 @@ const ICONS = Object.freeze({
   // Rollups
   Rollup_Builder: 'custom:custom63',
   // Volunteers
+  Log_Hours: 'custom:custom9',
   Skill__c: 'custom:custom69',
   Volunteer_Approve_Hours: 'custom:custom91',
   Volunteer_Hours__c: 'custom:custom3',

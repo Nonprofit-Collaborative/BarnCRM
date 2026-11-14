@@ -1,0 +1,43 @@
+{
+  "Admin": {
+    "label": "Forms Admin",
+    "description": ["Builds, publishes and deletes forms, fills them in and works their submissions."],
+    "add": {
+      "classAccesses": {
+        "FormBuilderController": {"enabled": "true"}
+      },
+      "fieldPermissions": {
+        "Form__c.Sample_Data__c": {"editable": "true", "readable": "true"},
+        "Form_Draft__c.Answers__c": {"editable": "false", "readable": "true"},
+        "Form_Draft__c.Expires__c": {"editable": "false", "readable": "true"},
+        "Form_Draft__c.Form_Version__c": {"editable": "false", "readable": "true"},
+        "Form_Draft__c.Step__c": {"editable": "false", "readable": "true"}
+      },
+      "objectPermissions": {
+        "Form_Draft__c": {"allowCreate": "false", "allowDelete": "true", "allowEdit": "true", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "false"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Form_Version__c.Definition__c": {"editable": "true"},
+        "Form__c.Definition__c": {"editable": "true"},
+        "Form__c.Description__c": {"editable": "true"},
+        "Form__c.Public__c": {"editable": "true"},
+        "Form__c.Published_Version__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Form_Submission__c": {"allowDelete": "true"},
+        "Form_Version__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Form__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Forms Read Only",
+    "description": "Reads forms and their submissions. Changes nothing.",
+    "readOnly": true,
+    "remove": {
+      "classAccesses": ["FormPublicRest", "FormRunnerController"]
+    }
+  }
+}

@@ -459,16 +459,8 @@ public with sharing class ImportBatchService {
 	/** How many rows a trial imports, from the org's setting unless the wizard gave a number. */
 	@NamespaceAccessible
 	public static Integer trialRows() {
-		Object configured = SettingsService.hasKey('Import_Trial_Rows__c')
-			? SettingsService.getValue('Import_Trial_Rows__c')
-			: null;
-		try {
-			return clampTrial(
-				configured == null ? null : Decimal.valueOf(String.valueOf(configured)).intValue()
-			);
-		} catch (Exception ignored) {
-			return DEFAULT_TRIAL_ROWS;
-		}
+		Decimal configured = SettingsService.storedNumber('Import_Trial_Rows__c');
+		return clampTrial(configured == null ? null : configured.intValue());
 	}
 
 	private static Integer clampTrial(Integer rows) {
@@ -725,11 +717,12 @@ public with sharing class ImportBatchService {
 		}
 		// Enqueued before the write, so the job is recorded with the pass; both roll back
 		// together if the write fails.
-		batch.Job_Id__c = Database.executeBatch(
+		batch.Job_Id__c = AsyncStarter.batch(
 			rowIds == null
 				? new ImportProcessorBatch(batch.Id, dryRun, trialRows, afterRow)
 				: new ImportProcessorBatch(batch.Id, rowIds),
-			scopeSize(batch.Chunk_Size__c)
+			scopeSize(batch.Chunk_Size__c),
+			'ImportBatchService'
 		);
 		Database.update(passStamp(batch), AccessLevel.USER_MODE);
 		// The pass number, job and template snapshot are the package's bookkeeping, read only
@@ -1128,18 +1121,11 @@ public with sharing class ImportBatchService {
 	 */
 	@NamespaceAccessible
 	public static Integer undoWindowDays() {
-		Object configured = SettingsService.hasKey('Import_Undo_Retention_Days__c')
-			? SettingsService.getValue('Import_Undo_Retention_Days__c')
-			: null;
-		if (configured == null) {
-			return UNDO_WINDOW_DAYS;
-		}
-		try {
-			Integer days = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return days < 1 ? UNDO_WINDOW_DAYS : Math.min(days, MAX_UNDO_WINDOW_DAYS);
-		} catch (Exception ignored) {
-			return UNDO_WINDOW_DAYS;
-		}
+		Decimal days = SettingsService.storedNumber('Import_Undo_Retention_Days__c');
+		return days == null ||
+			days < 1
+			? UNDO_WINDOW_DAYS
+			: Math.min(days.intValue(), MAX_UNDO_WINDOW_DAYS);
 	}
 
 	/** The stored values of the Import setting Delete Import Rows (R-IR5). */
@@ -1195,17 +1181,7 @@ public with sharing class ImportBatchService {
 	/** The org's chunk size, clamped to something the platform will accept. */
 	@NamespaceAccessible
 	public static Integer chunkSize() {
-		Object configured = SettingsService.hasKey('Import_Chunk_Size__c')
-			? SettingsService.getValue('Import_Chunk_Size__c')
-			: null;
-		if (configured == null) {
-			return DEFAULT_CHUNK_SIZE;
-		}
-		try {
-			return scopeSize(Decimal.valueOf(String.valueOf(configured)));
-		} catch (Exception ignored) {
-			return DEFAULT_CHUNK_SIZE;
-		}
+		return scopeSize(SettingsService.storedNumber('Import_Chunk_Size__c'));
 	}
 
 	private static Integer scopeSize(Decimal configured) {

@@ -17,10 +17,13 @@ program launch, internal work or client work.
 - **Time and budgets** (PM-04): time entries (billable or not), people assigned to a project
   with a role and planned hours, budget hours and amount against actual hours and cost,
   utilization by person, and a CSV of billable time for your own accounting or invoicing system.
-  **BarnCRM makes no invoices and takes no payments.**
 - **Health and status updates** (PM-05): each active project is On Track, At Risk or Off Track
   by a rule you tune, with its reasons; a status update drafted from the project for you to edit;
   a Projects at Risk card for any home page; and four reports.
+- **PSA** (PM-06 to PM-12, release 1.20): rate cards, timesheets and approvals, expenses,
+  resource management, invoices (with Pay Online through BarnCRM Payments when installed),
+  financials and recognized revenue, and change requests, each behind its own setting and off
+  until you turn it on. See [Project Management PSA](projects-psa.md).
 
 ## Install and Turn On
 
@@ -31,6 +34,12 @@ program launch, internal work or client work.
    Read Only.
 4. The Projects Home, Projects and Time Entries tabs appear in BarnCRM and BarnCRM Console, before
    Error Log.
+5. The **BarnCRM Projects** app appears in the App Launcher for everyone with a Projects
+   permission set: Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries,
+   Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request
+   Connections, Reports and Error Log. A scratch or Developer Edition org gets no BarnCRM
+   Projects app, only the tabs in the BarnCRM apps (see
+   [The Module Apps](barncrm-app.md#the-module-apps)).
 
 ## Access
 
@@ -61,7 +70,9 @@ Settings, **Automation**, Nightly Jobs, where it can be switched off).
 ## Projects, Phases and Tasks
 
 Create a project from **Projects Home**, **New Project From Template**, or with **New** on the
-Projects tab. A project's page shows:
+Projects tab. Until the org has a project (templates do not count), Projects Home opens with
+**Start Your First Project** for anyone who may create one (D-200 R4); its **Start a Project**
+button goes to the New Project From Template form. A project's page shows:
 
 - the health badge and its reasons, with **Refresh Health**;
 - progress: tasks done of tasks, the percent complete, and, with time tracking on, Estimated,
@@ -136,6 +147,20 @@ Month and Billable Time Last Month, on the Projects, Project Tasks and Time Entr
 - A new project from a template has no people on its tasks: templates copy roles, not people.
   Fill in Assigned To and the assignments.
 - Utilization shows nobody: no time was logged in the range, or Track time and budgets is off.
+
+## Sample Data
+
+**Load Sample Data** in BarnCRM Settings also loads four projects: Client Intake
+Implementation (active, on track), Volunteer Program Launch (active, at risk), Annual Report
+Website Refresh (completed) and Data Migration Planning (planned). They carry phases, tasks and
+milestones, about ten time entries (approved, submitted and open, logged by you), three expenses,
+three status updates, assignments, a resource row for you and two open resource requests. With
+Track requests and issues on it adds three requests; with Track change requests on, two change
+requests. Both settings are off by default, so a fresh install loads neither. Recognized revenue
+and invoices are not loaded.
+
+**Remove Sample Data** deletes the sample projects with everything on them, the sample resource
+and the sample requests. Your own projects, resources and requests stay.
 
 ## Removing the Module
 

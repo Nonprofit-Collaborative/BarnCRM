@@ -43,6 +43,10 @@ org. These kits ship:
 - **NPC Relationships and Affiliations** (Mirror): copies relationships between
   people and links to organizations (not households). See
   [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md#the-nonprofit-cloud-relationships-and-affiliations-kit).
+- **NPC Households** (Mirror): one step, **Convert Nonprofit Cloud Households** on BarnCRM
+  Settings, **General**, which makes each Nonprofit Cloud household a BarnCRM household on the
+  same account, with its members, and can be undone there. See
+  [Nonprofit Cloud Households](nonprofit-cloud-households.md).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them

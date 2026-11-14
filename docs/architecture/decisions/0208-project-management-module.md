@@ -2,6 +2,9 @@
 
 **Status:** Accepted (builder decision, for Brandon to confirm)
 **Date:** 2026-11-11
+**Amended:** 2026-11-12, D-197: decisions 6 and 7 are superseded where they conflict by ADR-0219
+`0219-projects-psa.md` (the full PSA: rates, approvals, expenses, resources, invoices, revenue
+and change requests, each behind its own setting).
 **Source:** plan Section 6.0a release 1.18 (PM-01 to PM-05), D-175, D-38 (Core, universal, then
 nonprofit modules), Section 1.5 (BarnCRM moves no money, no services); builds on ADR-0013,
 ADR-0017, ADR-0131 (module access sync), ADR-0164 (help text JSON), ADR-0166 (nightly

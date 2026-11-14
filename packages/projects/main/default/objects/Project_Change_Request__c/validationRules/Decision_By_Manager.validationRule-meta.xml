@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Decision_By_Manager</fullName>
+  <active>true</active>
+  <description>R-PM20: only the project owner or Projects Admin decides.</description>
+  <errorConditionFormula>AND(OR(ISNEW(), ISCHANGED(Status__c)), OR(ISPICKVAL(Status__c, "Approved"), ISPICKVAL(Status__c, "Rejected")), Project__r.OwnerId &lt;&gt; $User.Id, NOT($Permission.Projects_Manage))</errorConditionFormula>
+  <errorDisplayField>Status__c</errorDisplayField>
+  <errorMessage>Only the project's owner or a Projects admin can approve or reject a change request.</errorMessage>
+</ValidationRule>

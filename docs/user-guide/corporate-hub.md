@@ -4,9 +4,13 @@ Corporate Hub keeps your organization's policies, filings and contracts in one p
 turns it on; the setup is in the Admin Guide's [Corporate Hub](../admin-guide/corporate-hub.md)
 page.
 
+Every Corporate Hub page is in the **BarnCRM Corporate Hub** app (open it from the App
+Launcher), and the everyday ones are also in the **BarnCRM** (or **BarnCRM Console**) app.
+
 ## The Corporate Hub Page
 
-Open the **Corporate Hub** tab. It shows:
+Open the **Corporate Hub** tab. Before your organization's first board or committee, it opens
+with **Set Up Your Board** and a **New Board or Committee** button. It shows:
 
 - **Policies to Acknowledge**: the policies you have been asked to read, with their due dates.
   Open the policy to read its file, then press **I Have Read This**. It disappears from the list.
@@ -62,7 +66,9 @@ Create a meeting from the **Board Meetings** tab, then on its page:
 4. Type the minutes, then press **Submit Minutes for Approval**. Members approve them in the
    board portal; an admin marks them approved once the board has.
 5. Add motions on the meeting. **Open Voting** lets members vote in the portal; **Close Voting**
-   records whether it passed, and works only on a motion whose voting is open.
+   records whether it passed, and works only on a motion whose voting is open. If the meeting
+   did not reach quorum, you get a warning to check your bylaws before relying on the vote, and
+   the motion is marked "Closed without quorum".
 
 Open action items from earlier meetings are listed on each later meeting until someone marks
 them Done. To find a time before scheduling, leave Start blank, fill in up to three Poll Times
@@ -70,7 +76,7 @@ and press **Send Poll**; then press **Choose This Time** on the time that suits 
 
 ## Data Protection
 
-Open these from the App Launcher:
+Open these in the **BarnCRM Corporate Hub** app, or from the App Launcher:
 
 - **Data Subject Requests**: when someone asks to see, correct, delete or move their data, or
   objects to how it is used, create a request with its type and the person. The due date is 30
@@ -88,8 +94,10 @@ Open these from the App Launcher:
 
 When you own an obligation, agreement or document, a bell notification reminds you before it is
 due (30 days by default). One reminder goes per due date. When you own a board, you are reminded
-once before each member's term ends. When you own a data subject request, a breach not yet
-reported, or a processing activity with a DPIA review date, you are reminded before its date.
+once before each member's term ends. When you own a data subject request or a processing
+activity with a DPIA review date, you are reminded before its date. When you own a breach not yet
+reported, you are told the moment it is logged, with the deadline in the notification, and not a
+second time for the same deadline.
 
 > Templates and starter policies are general guidance, not legal advice. Check with your
 > organization's counsel or accountant.

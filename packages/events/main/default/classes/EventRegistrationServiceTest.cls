@@ -10,11 +10,11 @@
 private class EventRegistrationServiceTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c gala(Integer capacity) {
@@ -66,10 +66,8 @@ private class EventRegistrationServiceTest {
 		System.runAs(staff()) {
 			Event__c event = gala(null);
 			ticket(event, 'General', 50, null);
-			Contact jane = new Contact(
-				FirstName = 'Jane',
-				LastName = 'Doe',
-				Email = 'jane@example.org'
+			Contact jane = TestDataFactory.person(
+				new Contact(FirstName = 'Jane', LastName = 'Doe', Email = 'jane@example.org')
 			);
 			insert as user jane;
 
@@ -206,7 +204,9 @@ private class EventRegistrationServiceTest {
 	static void neverRegistersAPersonTwiceAndMarksAttendance() {
 		System.runAs(staff()) {
 			Event__c event = gala(null);
-			Contact jane = new Contact(FirstName = 'Jane', LastName = 'Doe');
+			Contact jane = TestDataFactory.person(
+				new Contact(FirstName = 'Jane', LastName = 'Doe')
+			);
 			insert as user jane;
 			EventPersonMatcher.PersonInput chosen = new EventPersonMatcher.PersonInput();
 			chosen.contactId = jane.Id;
@@ -243,7 +243,9 @@ private class EventRegistrationServiceTest {
 			Event__c event = gala(null);
 			ticket(event, 'General', 5, null);
 			ticket(event, 'Student', 2, null);
-			Contact jane = new Contact(FirstName = 'Jane', LastName = 'Doe');
+			Contact jane = TestDataFactory.person(
+				new Contact(FirstName = 'Jane', LastName = 'Doe')
+			);
 			insert as user jane;
 			EventFormAttachment attachment = new EventFormAttachment();
 			FormSubmissionReceipt receipt = new FormSubmissionReceipt();

@@ -209,7 +209,9 @@ private class GiftImportProcessorTest {
 	static void anExternalIdLoadsOnce() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			// The first row's donor already exists too, so nothing on that row is new.
-			Contact existingDonor = new Contact(LastName = 'Donor0', Email = 'donor0@example.org');
+			Contact existingDonor = TestDataFactory.person(
+				new Contact(LastName = 'Donor0', Email = 'donor0@example.org')
+			);
 			insert existingDonor;
 			Gift__c earlier = GivingTestDataFactory.buildGift(existingDonor.Id, 5);
 			earlier.External_Id__c = 'stripe-1';
@@ -667,6 +669,52 @@ private class GiftImportProcessorTest {
 				keep.get(giftIds.get(20))
 			);
 			Assert.isFalse(keep.containsKey(giftIds.get(30)), 'An open, unposted gift can go');
+		}
+	}
+
+	@IsTest
+	static void giftsThatCannotBeUndoneAreLoggedInOneStatement() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			// Gift ids that name no gift: deleting them fails, row by row.
+			String prefix = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+				.getKeyPrefix();
+			List<GiftImportRow> gifts = new List<GiftImportRow>();
+			Set<String> giftIds = new Set<String>();
+			for (Integer i = 1; i <= 3; i++) {
+				GiftImportRow item = new GiftImportRow(
+					new Import_Row__c(),
+					new Map<String, Map<String, String>>()
+				);
+				item.error = 'Its allocation could not be saved.';
+				item.giftId = Id.valueOf(prefix + String.valueOf(i).leftPad(12, '0'));
+				giftIds.add(String.valueOf(item.giftId));
+				gifts.add(item);
+			}
+
+			Test.startTest();
+			Integer publishedBefore = Limits.getPublishImmediateDML();
+			GiftImportProcessor.undoTheUnfinished(gifts);
+			Integer publishedAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Assert.areEqual(1, publishedAfter - publishedBefore, 'One statement for every failure');
+			// Failures that read the same way share one entry that names each gift (R-E7).
+			Decimal failures = 0;
+			Set<String> named = new Set<String>();
+			for (Error_Log__c entry : [
+				SELECT Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				WHERE Context__c = 'GiftImportProcessor.undoTheUnfinished'
+			]) {
+				failures += entry.Occurrences__c;
+				named.add(entry.Record_Reference__c);
+				if (String.isNotBlank(entry.Other_Record_Ids__c)) {
+					named.addAll(entry.Other_Record_Ids__c.split(','));
+				}
+			}
+			Assert.areEqual(3, failures.intValue(), 'Each failure is counted');
+			Assert.isTrue(named.containsAll(giftIds), 'Each failure is logged about its own gift');
+			Assert.isNull(gifts[0].giftId, 'The row no longer claims the gift');
 		}
 	}
 }

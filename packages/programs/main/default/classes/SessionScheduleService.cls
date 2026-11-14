@@ -16,8 +16,6 @@
  */
 public with sharing class SessionScheduleService {
 	public static final String MODULE_NAME = 'Programs';
-	/** Weeks Ahead to Create Sessions when never saved, blank or out of range (R-SS2). */
-	public static final Integer DEFAULT_HORIZON_WEEKS = 8;
 	private static final String SETTINGS_OBJECT = 'Programs_Settings__c';
 	private static Integer horizonWeeks;
 
@@ -50,22 +48,8 @@ public with sharing class SessionScheduleService {
 	/** How far ahead an active schedule keeps sessions: Weeks Ahead to Create Sessions, 1 to 26. */
 	public static Integer horizonWeeks() {
 		if (horizonWeeks == null) {
-			horizonWeeks = DEFAULT_HORIZON_WEEKS;
-			try {
-				Object stored = SettingsService.getValue(
-					SETTINGS_OBJECT,
-					'Session_Horizon_Weeks__c'
-				);
-				Integer weeks = stored == null
-					? null
-					: Decimal.valueOf(String.valueOf(stored)).intValue();
-				if (weeks != null && weeks >= 1 && weeks <= 26) {
-					horizonWeeks = weeks;
-				}
-			} catch (Exception unreadable) {
-				// Never saved or unreadable: the shipped value applies.
-				horizonWeeks = DEFAULT_HORIZON_WEEKS;
-			}
+			horizonWeeks = SettingsService.number(SETTINGS_OBJECT, 'Session_Horizon_Weeks__c')
+				.intValue();
 		}
 		return horizonWeeks;
 	}

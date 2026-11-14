@@ -13,7 +13,7 @@ private class MembershipsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :MembershipsAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Memberships_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -22,7 +22,7 @@ private class MembershipsPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM Error_Log__c
-			WHERE Context__c = :MembershipsPostInstall.ACCESS_CONTEXT
+			WHERE Context__c = 'MembershipsPostInstall.grantInstallerAccess'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -33,7 +33,7 @@ private class MembershipsPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id holding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ MembershipsAccessSync.ADMIN_SET }
+					new List<String>{ 'Memberships_Admin' }
 				)
 				.Id;
 			User reader = TestUsers.standardUser('Reader');
@@ -44,8 +44,8 @@ private class MembershipsPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new MembershipsPostInstall(), null);
-			System.enqueueJob(new MembershipsPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new MembershipsPostInstall.InstallerAccess(holding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Memberships', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Memberships', holding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Memberships Admin');
@@ -72,7 +72,7 @@ private class MembershipsPostInstallTest {
 			Test.startTest();
 			new MembershipsPostInstall().onInstall(null);
 			new MembershipsPostInstall().runSetup(null);
-			System.enqueueJob(new MembershipsPostInstall.InstallerAccess(notAUser));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Memberships', notAUser));
 			Test.stopTest();
 
 			Assert.isTrue(accessErrors() >= 1, 'The refusal is in the Error Log');

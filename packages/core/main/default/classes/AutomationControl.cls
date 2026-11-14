@@ -20,6 +20,7 @@
  */
 @NamespaceAccessible
 public with sharing class AutomationControl {
+	@NamespaceAccessible
 	public static final String PAUSE_SETTING_NAME = 'Automation Paused Until';
 	// Bare, and correctly so: a custom permission defined in the same package resolves without a
 	// namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
@@ -203,7 +204,7 @@ public with sharing class AutomationControl {
 		startWaitingRollups();
 		if (recomputeNames == true) {
 			try {
-				Database.executeBatch(new HouseholdNamingBatch(), 200);
+				AsyncStarter.batch(new HouseholdNamingBatch(), 200, RESUME_SCHEDULE_CONTEXT);
 			} catch (Exception failed) {
 				ErrorLogger.log(failed, RESUME_SCHEDULE_CONTEXT);
 			}

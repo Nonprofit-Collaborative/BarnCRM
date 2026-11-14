@@ -1,8 +1,9 @@
 /**
- * The Giving module's five nightly jobs, switched on and off together from the Nightly Jobs page
- * of the BarnCRM Settings console (ADR-0038). Each is a step of Core's one nightly run (ADR-0166
- * nightly-job-dispatcher), keyed by the name it was once scheduled under, so an upgrade adopts
- * the old schedule (R-NJ5).
+ * The Giving module's five nightly jobs as steps of Core's one nightly run (ADR-0166
+ * nightly-job-dispatcher), keyed by the name each was once scheduled under. Each is switched on
+ * and off on its own, and started now where that is safe, from the shared Nightly Jobs card of
+ * BarnCRM Settings (ADR-0038 as amended by D-200 S6), which also shows each job's own summary
+ * of its last run.
  *
  * The pledge reminders joined the other four in 1.5 (G-37). Scheduling them sends nothing on its
  * own: like the ask reminders, the step does nothing while its setting is off, and
@@ -11,7 +12,9 @@
  *
  * All five are safe to run twice on the same day: topping up a schedule adds only the
  * installments that are missing, marking overdue and placing donors on their giving level are
- * recalculations, and both reminder passes skip a donor or payment already reminded.
+ * recalculations, and both reminder passes skip a donor or payment already reminded. Donor
+ * levels offer no Run Now on the card: the Donor Levels page has its own Recalculate Now, and a
+ * second button for the same work is a second thing to keep true (ADR-0038).
  */
 public with sharing class GivingScheduler {
 	/** The names the jobs were scheduled under, now their step keys. */
@@ -20,19 +23,6 @@ public with sharing class GivingScheduler {
 	public static final String LEVELS_JOB_NAME = 'BarnCRM Giving Donor Levels';
 	public static final String ASK_JOB_NAME = 'BarnCRM Giving Ask Reminders';
 	public static final String PLEDGE_JOB_NAME = PledgeReminderScheduler.JOB_NAME;
-
-	/** What the settings page knows about one of the five jobs. */
-	public class JobStatus {
-		public String jobName;
-		public Boolean scheduled = false;
-		public Datetime nextRunAt;
-		/**
-		 * When the nightly run last started this job, which is not when the job last finished.
-		 * The two together are how the page tells "started and recorded nothing" from "never
-		 * started".
-		 */
-		public Datetime previousFireTime;
-	}
 
 	/**
 	 * The five jobs as steps of the nightly run. The times, and why they are these times: the
@@ -43,6 +33,7 @@ public with sharing class GivingScheduler {
 	 * the one before it has finished.
 	 */
 	public static List<NightlyStep> steps() {
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		return new List<NightlyStep>{
 			new NightlyStep(
 					TOP_UP_JOB_NAME,
@@ -51,7 +42,9 @@ public with sharing class GivingScheduler {
 					15,
 					new InstallmentTopUpSchedulable()
 				)
-				.withSwitch(true),
+				.withSwitch(true)
+				.withSummary(settings.Installment_Top_Up_Last_Run_Summary__c)
+				.runnableNow(),
 			new NightlyStep(
 					OVERDUE_JOB_NAME,
 					System.Label.Giving_NightlyJobs_OverdueName,
@@ -59,7 +52,9 @@ public with sharing class GivingScheduler {
 					45,
 					new InstallmentSchedulable()
 				)
-				.withSwitch(true),
+				.withSwitch(true)
+				.withSummary(settings.Installment_Overdue_Last_Run_Summary__c)
+				.runnableNow(),
 			new NightlyStep(
 					LEVELS_JOB_NAME,
 					System.Label.Giving_NightlyJobs_LevelsName,
@@ -68,7 +63,9 @@ public with sharing class GivingScheduler {
 					new DonorLevelSchedulable()
 				)
 				.withSwitch(true),
-			PledgeReminderScheduler.step(),
+			PledgeReminderScheduler.step()
+				.withSummary(settings.Pledge_Reminders_Last_Run_Summary__c)
+				.runnableNow(),
 			new NightlyStep(
 					ASK_JOB_NAME,
 					System.Label.Giving_NightlyJobs_AskRemindersName,
@@ -77,115 +74,8 @@ public with sharing class GivingScheduler {
 					new AskReminderSchedulable()
 				)
 				.withSwitch(true)
-		};
-	}
-
-	/**
-	 * Switches all five jobs on and makes sure the nightly run is scheduled. Returns the run's
-	 * trigger Id, once.
-	 */
-	public static List<Id> scheduleAll() {
-		Id runId;
-		for (String jobName : jobNames()) {
-			runId = NightlyJobs.turnOn(jobName);
-		}
-		return runId == null ? new List<Id>() : new List<Id>{ runId };
-	}
-
-	/** True when the job with this name is switched on and the nightly run is scheduled. */
-	public static Boolean isJobScheduled(String jobName) {
-		return jobNames().contains(jobName) &&
-			NightlyJobs.isStepScheduled(jobName, jobName != PLEDGE_JOB_NAME);
-	}
-
-	/**
-	 * Switches just the one job with this name on, doing nothing for a name that is not one of
-	 * the five.
-	 */
-	public static void scheduleJobNamed(String jobName) {
-		if (jobNames().contains(jobName)) {
-			NightlyJobs.turnOn(jobName);
-		}
-	}
-
-	/**
-	 * Switches all five jobs off. Nothing already generated, marked Overdue, placed on a level or
-	 * logged as reminded is changed. The nightly run stays scheduled for the other steps.
-	 */
-	public static void stopAll() {
-		for (String jobName : jobNames()) {
-			NightlyJobs.turnOff(jobName);
-		}
-	}
-
-	/**
-	 * True when the four jobs that keep giving data moving are all on. Three out of four is not
-	 * "on": the overdue pass without the top up marks payments overdue on a schedule nothing is
-	 * extending, so the page offers Schedule in that state and `scheduleAll` switches on
-	 * whichever job is off. The pledge reminders are left out of the test, because an
-	 * administrator may stop them on their own page while the rest keep running.
-	 */
-	public static Boolean isScheduled() {
-		for (JobStatus status : statuses().values()) {
-			if (status.jobName != PLEDGE_JOB_NAME && status.scheduled != true) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/** When the next of the five jobs is due, or null when none of them is on. */
-	public static Datetime nextRunAt() {
-		Datetime earliest = null;
-		for (JobStatus status : statuses().values()) {
-			if (status.nextRunAt == null) {
-				continue;
-			}
-			if (earliest == null || status.nextRunAt < earliest) {
-				earliest = status.nextRunAt;
-			}
-		}
-		return earliest;
-	}
-
-	/**
-	 * Starts the top up, the overdue pass and both reminder passes now, without waiting for
-	 * tonight. Donor levels are not included: that pass has its own Recalculate now button on the
-	 * Donor Levels page, and a second button for the same work is a second thing to keep true
-	 * (ADR-0038).
-	 */
-	public static void runNow() {
-		new InstallmentTopUpSchedulable().execute(null);
-		new InstallmentSchedulable().execute(null);
-		// Both are safe to repeat: a payment or donor already reminded for its date is skipped,
-		// and each does nothing while its setting is off (G-29, G-30).
-		new PledgeReminderScheduler().execute(null);
-		new AskReminderSchedulable().execute(null);
-	}
-
-	/** Each of the five jobs by name: whether it is on, when it runs next and last started. */
-	public static Map<String, JobStatus> statuses() {
-		Map<String, JobStatus> byName = new Map<String, JobStatus>();
-		Boolean runScheduled = NightlyJobs.isScheduled();
-		for (NightlyStep step : steps()) {
-			JobStatus status = new JobStatus();
-			status.jobName = step.key;
-			status.scheduled =
-				runScheduled && NightlyJobs.isSwitchedOn(step.key, step.switchDefault);
-			status.nextRunAt = status.scheduled ? NightlyJobs.nextRunAt(step) : null;
-			status.previousFireTime = NightlyJobs.lastStarted(step.key);
-			byName.put(step.key, status);
-		}
-		return byName;
-	}
-
-	private static List<String> jobNames() {
-		return new List<String>{
-			TOP_UP_JOB_NAME,
-			OVERDUE_JOB_NAME,
-			LEVELS_JOB_NAME,
-			PLEDGE_JOB_NAME,
-			ASK_JOB_NAME
+				.withSummary(settings.Ask_Reminders_Last_Run_Summary__c)
+				.runnableNow()
 		};
 	}
 }

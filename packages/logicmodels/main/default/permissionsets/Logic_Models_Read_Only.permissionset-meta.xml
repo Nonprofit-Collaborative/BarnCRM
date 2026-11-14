@@ -3,10 +3,6 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Logic Models Read Only</label>
   <description>Looks at logic models, indicators and results without changing them.</description>
-  <applicationVisibilities>
-    <application>BarnCRM_Logic_Models</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>LogicModelBuilderController</apexClass>
     <enabled>true</enabled>

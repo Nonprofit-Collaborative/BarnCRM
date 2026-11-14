@@ -42,8 +42,10 @@ private class ProjectsControllerTest {
 
 			Assert.areEqual(1, board.phases.size(), 'The phase');
 			Assert.areEqual(2, board.tasks.size(), 'Both tasks');
-			Assert.areEqual(1, board.project.Tasks_Done__c, 'One done');
+			Assert.areEqual(1, board.project.tasksDone, 'One done');
 			Assert.isTrue(board.timeTracking, 'Time tracking ships on');
+			Assert.isTrue(board.canCreateTime, 'An admin may log time');
+			Assert.isTrue(board.canCreateExpense, 'An admin may add an expense');
 			Project_Task__c done = [
 				SELECT Completed_Date__c
 				FROM Project_Task__c
@@ -59,6 +61,17 @@ private class ProjectsControllerTest {
 				home.myTasks.size(),
 				'Assigned task is done; the added one has no owner'
 			);
+			Assert.isFalse(home.firstRun, 'A project exists, so there is no first-run panel.');
+		}
+	}
+
+	@IsTest
+	static void theFirstRunPanelShowsBeforeTheFirstProject() {
+		System.runAs(ProjectsTestData.admin()) {
+			Test.startTest();
+			ProjectsController.Home home = ProjectsController.getHome();
+			Test.stopTest();
+			Assert.isTrue(home.firstRun, 'No project exists yet, and an admin may create one.');
 		}
 	}
 
@@ -86,7 +99,7 @@ private class ProjectsControllerTest {
 			ProjectsController.logTime(project.Id, finished.Id, null, 4, true, 'Interviews');
 			ProjectsController.refreshHealth(project.Id);
 			Id updateId = ProjectsController.draftStatusUpdate(project.Id);
-			List<Project__c> atRisk = ProjectsController.getAtRisk(true);
+			List<ProjectViews.Project> atRisk = ProjectsController.getAtRisk(true);
 			Test.stopTest();
 
 			Project_Status_Update__c draft = [

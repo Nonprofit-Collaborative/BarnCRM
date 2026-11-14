@@ -3,7 +3,7 @@
   <description>
     Territories, their rules and members, and the runs that assign records to them (C-40, C-40b).
   </description>
-  <flexiPage>Territory_Management</flexiPage>
   <label>Territory Management</label>
+  <lwcComponent>territoryManager</lwcComponent>
   <motif>Custom34: Insect</motif>
 </CustomTab>

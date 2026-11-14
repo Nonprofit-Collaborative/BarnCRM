@@ -609,6 +609,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 	}
 
 	/** Deletes each gift whose row failed after it was saved (R-GI7). */
+	@TestVisible
 	private static void undoTheUnfinished(List<GiftImportRow> gifts) {
 		List<Gift__c> unfinished = new List<Gift__c>();
 		for (GiftImportRow item : gifts) {
@@ -624,15 +625,16 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 				false,
 				AccessLevel.USER_MODE
 			);
-			for (Database.DeleteResult result : results) {
-				if (!result.isSuccess()) {
-					ErrorLogger.log(
-						new DmlException(failure(result.getErrors())),
-						'GiftImportProcessor.undoTheUnfinished',
-						result.getId()
-					);
+			// Logged together, in one statement; a failed result carries no Id, so the gift's.
+			List<Exception> failed = new List<Exception>();
+			List<Id> ids = new List<Id>();
+			for (Integer i = 0; i < results.size(); i++) {
+				if (!results[i].isSuccess()) {
+					failed.add(new DmlException(failure(results[i].getErrors())));
+					ids.add(unfinished[i].Id);
 				}
 			}
+			ErrorLogger.logEach(failed, ids, 'GiftImportProcessor.undoTheUnfinished');
 		}
 	}
 

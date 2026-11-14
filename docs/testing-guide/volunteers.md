@@ -13,6 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open **BarnCRM Volunteers**. | It opens on **Volunteers Home** with three figures: **Hours This Month** (badge **Approved**), **Volunteer Hours** (badge **Submitted**, 4) and **Shifts Needing Volunteers**, and the **Approved Hours This Year by Job** chart. Clicking **Volunteer Hours** opens **Approve Hours**; clicking **Shifts Needing Volunteers** opens that list view. The tabs **Volunteers Home**, **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
+| 1a | On an org with Volunteers and no volunteer job yet (before sample data), open **Volunteers Home** as admin. | **Set Up Your First Volunteer Job** shows instead of the figures, with **New Volunteer Job** and **Import a File**. **New Volunteer Job** opens the new job form; **Import a File** opens the **Import** tab. Save a job and reload: the panel is gone and the figures show. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
 | 3 | Open **Volunteer Shifts**, list view **Shifts Needing Volunteers**. | Upcoming Open shifts of **Front desk** and **Community garden** are listed, each named from its job and start (for example "Front desk: 28 Oct 2026, 9:00 AM"). |
 | 3a | Open **Volunteer Sign-Ups**, list view **All Sign-Ups**. | The sample sign-ups are listed with their shift, person and status. |
@@ -297,6 +298,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Open the job and click **Log Hours**. | Only **Job** is filled. Click **Save** without a person: **Person** is required. |
 | 4 | Open the person and click **Log Hours**. | **Person** is filled with them. Fill in a job, a date and 2 hours and save: the entry is theirs. |
 | 5 | As a Read Only user, open the shift and click **Log Hours**. | A note says your role cannot enter volunteer hours; no form. |
+| 6 | Sign the person up for a shift that starts today, open the person and click **Log Hours**. | **Person**, **Job**, **Volunteer Shift**, **Date Worked** (today) and **Hours** (the shift's length) are filled. Cancel the sign-up and repeat: only **Person** is filled. |
 
 **Cleanup:** delete the hours entries.
 
@@ -487,3 +489,33 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 8 | Read the kit's checklist. | It names the V4S site pages, recurring schedules, tabs and permission sets, and uninstalling. |
 
 **Cleanup:** undo the four steps in reverse order.
+
+## T-VOL-32: Volunteering at a Glance and the Log Hours Tab
+
+**Purpose:** confirm staff in the BarnCRM app see a person's volunteering and can log hours without switching apps (D-200 R1).
+**Prerequisites:** Volunteers Staff user; a person with approved hours this year; an organization.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **BarnCRM** app, open the person. | The sidebar's glance area shows **Volunteering at a Glance**: **Volunteer Hours This Year** and **Last Volunteer Date** from the person, with **Log Hours**. |
+| 2 | Click **Log Hours**, fill in a job, a date and 2 hours, and click **Save**. | The **Log Hours** tab opens with the person filled in. "Hours logged." and you are back on the person's page. |
+| 3 | Open **Log Hours** from the App Launcher. | The form opens empty. Save an entry: the form clears for the next one. |
+| 4 | Open the organization. | No **Volunteering at a Glance** card. |
+| 5 | As a Volunteers Read Only user, open the person. | The card shows its figures with no **Log Hours** button. |
+
+**Cleanup:** delete the hours entries from steps 2 and 3.
+
+## T-VOL-33: Sample Data
+
+**Purpose:** confirm the Volunteers sample data loads jobs, shifts, sign-ups, hours and volunteer profiles, and takes away only itself.
+**Prerequisites:** admin with Volunteers Admin; sample data not loaded; one volunteer job of your own.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Sample Data**, **Load Sample Data**, wait for it to finish. | The card shows a Volunteers count of `60` hours entries. |
+| 2 | Open **Volunteer Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** beside your own job. |
+| 3 | Open an upcoming **Front desk** shift. | Two sign-ups (one Confirmed, one Signed up), and **Suggested Volunteers** lists active sample volunteers with their reasons (for example "Available on Saturdays"); none of the two Inactive ones. |
+| 4 | Open a sample volunteer from a sign-up. | **Volunteer Status** Active, a **Volunteer Since** date, **Availability Days** and **Availability Times**. |
+| 5 | **Remove Sample Data**. | The sample jobs, shifts, sign-ups and hours are gone; your own job stays. |
+
+**Cleanup:** None.

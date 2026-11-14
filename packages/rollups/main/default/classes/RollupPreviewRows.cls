@@ -274,11 +274,11 @@ public with sharing class RollupPreviewRows {
 			if (row.counted && limitLeft != null && limitLeft <= 0) {
 				row.counted = false;
 				row.reason = String.format(
-					Label.Core_RollupEase_RowBeyondLimit,
+					Label.Rollups_RollupEase_RowBeyondLimit,
 					new List<String>{ query.measures[0].rowLimit.format() }
 				);
 			} else if (row.counted) {
-				row.reason = Label.Core_RollupEase_RowCounted;
+				row.reason = Label.Rollups_RollupEase_RowCounted;
 				limitLeft = limitLeft == null ? null : limitLeft - 1;
 			} else {
 				row.reason = whyLeftOut(source, query, sourceType, failed.get(source.Id));
@@ -386,7 +386,7 @@ public with sharing class RollupPreviewRows {
 	) {
 		if (failed != null && !failed.isEmpty()) {
 			return String.format(
-				Label.Core_RollupEase_RowFails,
+				Label.Rollups_RollupEase_RowFails,
 				new List<String>{ String.join(failed, ', ') }
 			);
 		}
@@ -395,11 +395,11 @@ public with sharing class RollupPreviewRows {
 			RollupAggregator.valueAt(row, query.orderBy) == null
 		) {
 			return String.format(
-				Label.Core_RollupEase_RowNoOrder,
+				Label.Rollups_RollupEase_RowNoOrder,
 				new List<String>{ fieldLabel(sourceType, query.orderBy) }
 			);
 		}
-		return Label.Core_RollupEase_RowOutsideWindow;
+		return Label.Rollups_RollupEase_RowOutsideWindow;
 	}
 
 	/** A field's label, or the path as written when it walks to another entity. */

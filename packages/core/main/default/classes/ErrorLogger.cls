@@ -42,7 +42,8 @@ public with sharing class ErrorLogger {
 
 	@NamespaceAccessible
 	public static void log(Exception thrown, String context, Id recordId) {
-		if (thrown == null) {
+		// A busy refusal was written once where it happened (AsyncStarter, D-200 P9).
+		if (thrown == null || thrown instanceof AsyncStarter.BusyException) {
 			return;
 		}
 		log(new List<Exception>{ thrown }, context, recordId);
@@ -55,14 +56,27 @@ public with sharing class ErrorLogger {
 
 	@NamespaceAccessible
 	public static void log(List<Exception> thrown, String context, Id recordId) {
-		logAll(thrown, context, recordId, null);
+		logAll(thrown, context, recordId, null, null);
 	}
 
-	/** Each failure as one entry, read under `message`, or the generic message when blank. */
+	/**
+	 * Many failures, each about its own record, in one statement. `recordIds` runs alongside
+	 * `thrown` as it does alongside the messages of `logMessages`.
+	 */
+	@NamespaceAccessible
+	public static void logEach(List<Exception> thrown, List<Id> recordIds, String context) {
+		logAll(thrown, context, null, recordIds == null ? new List<Id>() : recordIds, null);
+	}
+
+	/**
+	 * Each failure as one entry, read under `message`, or the generic message when blank; about
+	 * `recordId`, or about its own record in `recordIds` when that is given.
+	 */
 	private static void logAll(
 		List<Exception> thrown,
 		String context,
 		Id recordId,
+		List<Id> recordIds,
 		String message
 	) {
 		if (thrown == null || thrown.isEmpty()) {
@@ -70,17 +84,17 @@ public with sharing class ErrorLogger {
 		}
 		List<Error_Log__c> entries = new List<Error_Log__c>();
 		try {
-			for (Exception failure : thrown) {
-				if (failure == null) {
+			for (Integer i = 0; i < thrown.size(); i++) {
+				if (thrown[i] == null) {
 					continue;
 				}
 				entries.add(
 					buildEntry(
 						String.isBlank(message) ? friendlyMessage(context) : message,
-						technicalDetail(failure),
+						technicalDetail(thrown[i]),
 						context,
 						SEVERITY_ERROR,
-						recordId
+						recordIds == null ? recordId : (i < recordIds.size() ? recordIds[i] : null)
 					)
 				);
 			}
@@ -106,7 +120,7 @@ public with sharing class ErrorLogger {
 		if (thrown == null) {
 			return;
 		}
-		logAll(new List<Exception>{ thrown }, context, null, message);
+		logAll(new List<Exception>{ thrown }, context, null, null, message);
 	}
 
 	@NamespaceAccessible
@@ -162,6 +176,28 @@ public with sharing class ErrorLogger {
 			entries.add(buildEntry(messages[i], null, context, severity, recordId));
 		}
 		ErrorLogWriter.write(entries);
+	}
+
+	/**
+	 * The rows a partial save could not write, each under its first error, in one statement.
+	 * `recordIds` runs alongside `results` as it does in `logMessages`.
+	 */
+	@NamespaceAccessible
+	public static void logFailures(
+		List<Database.SaveResult> results,
+		List<Id> recordIds,
+		String context,
+		String severity
+	) {
+		List<String> messages = new List<String>();
+		List<Id> ids = new List<Id>();
+		for (Integer i = 0; results != null && i < results.size(); i++) {
+			if (!results[i].isSuccess()) {
+				messages.add(results[i].getErrors()[0].getMessage());
+				ids.add(recordIds == null || i >= recordIds.size() ? null : recordIds[i]);
+			}
+		}
+		logMessages(messages, ids, context, severity);
 	}
 
 	private static Error_Log__c buildEntry(

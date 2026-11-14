@@ -3,9 +3,8 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Salesforce Records Sync</label>
   <description>
-    Opens the Campaign sync, Opportunity mirror and Gift Transaction mirror pages and edits the IDs
-    they keep. The Salesforce objects need their own access in Setup. Replaces Campaign Sync,
-    Opportunity Mirror and Gift Transaction Mirror.
+    Opens the Campaign sync, Opportunity mirror and Gift Transaction mirror pages, edits the IDs
+    they keep and reads Provider Requests. Salesforce objects need their own access in Setup.
   </description>
   <classAccesses>
     <apexClass>CampaignSyncController</apexClass>
@@ -47,6 +46,49 @@
     <field>Gift__c.Opportunity_Id__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Case_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Error__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Request_Number__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Resolution__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Provider_Request__c.Synced__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Provider_Request__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <tabSettings>
+    <tab>Provider_Request__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Campaign_Sync</tab>
     <visibility>Visible</visibility>

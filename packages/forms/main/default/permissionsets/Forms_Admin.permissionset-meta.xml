@@ -5,6 +5,10 @@
   <description>
     Builds, publishes and deletes forms, fills them in and works their submissions.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Forms</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>FormBuilderController</apexClass>
     <enabled>true</enabled>
@@ -21,6 +25,11 @@
     <apexClass>FormSubmissionController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Form__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
     <field>Form_Draft__c.Answers__c</field>

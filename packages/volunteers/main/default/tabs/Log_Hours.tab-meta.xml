@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Log volunteer hours for a person; opened with c__personId it starts on that person.
+  </description>
+  <label>Log Hours</label>
+  <lwcComponent>volunteerLogHours</lwcComponent>
+  <motif>Custom9: Lightning</motif>
+</CustomTab>

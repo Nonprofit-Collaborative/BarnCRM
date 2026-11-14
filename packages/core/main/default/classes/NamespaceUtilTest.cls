@@ -67,6 +67,24 @@ private class NamespaceUtilTest {
 		System.assertEquals(null, NamespaceUtil.stateKey(null), 'Nothing keys to nothing.');
 	}
 
+	@IsTest
+	static void tabNamesComeBackQualifiedByTheNameAsWritten() {
+		NamespaceUtil.cachedPrefix = 'example__';
+
+		Map<String, String> names = NamespaceUtil.tabApiNames(new List<String>{ 'Find', 'Import' });
+
+		Assert.areEqual(
+			'example__Find',
+			names.get('Find'),
+			'Lightning opens the tab by its qualified name.'
+		);
+		Assert.areEqual('example__Import', names.get('Import'), 'Every tab asked for is answered.');
+		Assert.isTrue(
+			NamespaceUtil.tabApiNames(null).isEmpty(),
+			'Nothing asked for, nothing answered.'
+		);
+	}
+
 	/** This package's prefix and another package's, kept apart from the names they go on. */
 	private static final String OWN = 'barn__';
 	private static final String OTHER = 'npsp__';
@@ -76,6 +94,42 @@ private class NamespaceUtilTest {
 		NamespaceUtil.cachedPrefix = prefix;
 		NamespaceUtil.describeOverride = objects;
 		NamespaceUtil.typesByName.clear();
+	}
+
+	@IsTest
+	static void fieldPrefersThisPackagesFieldThenTheNameAsWritten() {
+		NamespaceUtil.cachedPrefix = OWN;
+		Map<String, Schema.SObjectField> fields = new Map<String, Schema.SObjectField>{
+			OWN + 'Amount__c' => Contact.LastName,
+			'Amount__c' => Contact.FirstName,
+			'Email' => Contact.Email
+		};
+
+		Assert.areEqual(Contact.LastName, NamespaceUtil.field(fields, 'Amount__c'), 'Own first');
+		Assert.areEqual(Contact.Email, NamespaceUtil.field(fields, 'Email'), 'Standard as written');
+		Assert.isNull(NamespaceUtil.field(fields, 'Missing__c'), 'Neither');
+		Assert.isNull(NamespaceUtil.field(fields, ' '), 'No name');
+	}
+
+	@IsTest
+	static void fieldLabelAndDescribeReadTheOrg() {
+		Assert.areEqual(
+			Contact.LastName,
+			NamespaceUtil.field(Contact.SObjectType, 'lastname'),
+			'Any case'
+		);
+		Assert.areEqual(
+			Contact.LastName.getDescribe().getLabel(),
+			NamespaceUtil.fieldLabel(Contact.SObjectType, 'LastName'),
+			'Its label'
+		);
+		Assert.areEqual(
+			'No_Field__c',
+			NamespaceUtil.fieldLabel(Contact.SObjectType, 'No_Field__c'),
+			'Name'
+		);
+		Assert.areEqual('Contact', NamespaceUtil.describe('Contact').getName(), 'Described');
+		Assert.isNull(NamespaceUtil.describe('No_Such_Barn_Object__c'), 'Null, not an exception');
 	}
 
 	@IsTest

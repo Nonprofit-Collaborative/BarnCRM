@@ -5,6 +5,14 @@ import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import addTask from '@salesforce/apex/ProjectsController.addTask';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
+import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+jest.mock(
+  '@salesforce/apex/ProjectTimesheetController.addExpense',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/ProjectsController.getBoard', () => ({ default: jest.fn() }), {
   virtual: true
@@ -31,39 +39,41 @@ const flush = () =>
 
 const BOARD = {
   timeTracking: true,
+  canCreateTime: true,
+  canCreateExpense: true,
   project: {
-    Id: 'a01000000000001AAA',
-    Health__c: 'At Risk',
-    Health_Reasons__c: 'Data mapping was due 1/1/2027.',
-    Start_Date__c: '2027-01-01',
-    Target_Date__c: '2027-01-10',
-    Tasks__c: 2,
-    Tasks_Done__c: 1,
-    Actual_Hours__c: 4,
-    Estimated_Hours__c: 20,
-    Budget_Hours__c: 30
+    id: 'a01000000000001AAA',
+    health: 'At Risk',
+    healthReasons: 'Data mapping was due 1/1/2027.',
+    startDate: '2027-01-01',
+    targetDate: '2027-01-10',
+    taskCount: 2,
+    tasksDone: 1,
+    actualHours: 4,
+    estimatedHours: 20,
+    budgetHours: 30
   },
   phases: [
     {
-      Id: 'a02000000000001AAA',
-      Name: 'Build',
-      Start_Date__c: '2027-01-01',
-      End_Date__c: '2027-01-05'
+      id: 'a02000000000001AAA',
+      name: 'Build',
+      startDate: '2027-01-01',
+      endDate: '2027-01-05'
     }
   ],
   tasks: [
     {
-      Id: 'a03000000000001AAA',
-      Name: 'Configure',
-      Phase__c: 'a02000000000001AAA',
-      Status__c: 'Done'
+      id: 'a03000000000001AAA',
+      name: 'Configure',
+      phaseId: 'a02000000000001AAA',
+      status: 'Done'
     },
     {
-      Id: 'a03000000000002AAA',
-      Name: 'Go-Live',
-      Phase__c: 'a02000000000001AAA',
-      Status__c: 'Not Started',
-      Milestone__c: true
+      id: 'a03000000000002AAA',
+      name: 'Go-Live',
+      phaseId: 'a02000000000001AAA',
+      status: 'Not Started',
+      milestone: true
     }
   ]
 };
@@ -135,11 +145,64 @@ describe('c-project-board', () => {
     expect(find(element, 'error-message').message).toBe('Enter more than 0 and at most 24 hours.');
   });
 
+  it('shows Add Expense only when expenses are on and adds one', async () => {
+    getBoard.mockResolvedValue(BOARD);
+    let element = mount();
+    await flush();
+    expect(find(element, 'add-expense')).toBeNull();
+    document.body.removeChild(element);
+
+    getBoard.mockResolvedValue({ ...BOARD, expensesEnabled: true });
+    addExpense.mockResolvedValue('a09000000000001AAA');
+    element = mount();
+    await flush();
+    find(element, 'add-expense').click();
+    await flush();
+    const amount = element.shadowRoot.querySelector(
+      '[data-id="expense-form"] lightning-input[data-field="amount"]'
+    );
+    amount.value = '42.5';
+    amount.dispatchEvent(new CustomEvent('change'));
+    find(element, 'save-expense').click();
+    await flush();
+    expect(addExpense).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: 'a01000000000001AAA',
+        amount: 42.5,
+        category: 'Travel',
+        billable: false
+      })
+    );
+    expect(find(element, 'expense-form')).toBeNull();
+  });
+
   it('hides Log Time and the hours when time tracking is off', async () => {
     getBoard.mockResolvedValue({ ...BOARD, timeTracking: false });
     const element = mount();
     await flush();
     expect(find(element, 'log-time')).toBeNull();
     expect(find(element, 'hours')).toBeNull();
+  });
+
+  it('hides Log Time and Add Expense from someone who cannot create them', async () => {
+    getBoard.mockResolvedValue({
+      ...BOARD,
+      expensesEnabled: true,
+      canCreateTime: false,
+      canCreateExpense: false
+    });
+    const element = mount();
+    await flush();
+    expect(find(element, 'log-time')).toBeNull();
+    expect(find(element, 'add-expense')).toBeNull();
+    expect(find(element, 'hours')).not.toBeNull();
+  });
+
+  it('adds approved change hours to the budget (R-PM20)', async () => {
+    setHelpTextForTest({ Projects_Board_HoursLine: 'Budget: {2} hours' });
+    getBoard.mockResolvedValue({ ...BOARD, project: { ...BOARD.project, changeHours: 10 } });
+    const element = mount();
+    await flush();
+    expect(find(element, 'hours').textContent).toContain('Budget: 40 hours');
   });
 });

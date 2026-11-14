@@ -6,6 +6,12 @@
  */
 public with sharing class HubBoardController {
 	private static final String CONTEXT = 'HubBoardController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'CorporateHub',
+			'CorporateHub_Error_Generic'
+		)
+		.showingDml();
 
 	/** One person or record line on a panel. */
 	public class Line {
@@ -113,7 +119,7 @@ public with sharing class HubBoardController {
 			}
 			return view;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -148,7 +154,14 @@ public with sharing class HubBoardController {
 				view.attendees.add(line);
 			}
 			for (Board_Motion__c motion : [
-				SELECT Id, Name, Status__c, Votes_For__c, Votes_Against__c, Abstentions__c
+				SELECT
+					Id,
+					Name,
+					Status__c,
+					Votes_For__c,
+					Votes_Against__c,
+					Abstentions__c,
+					Closed_Without_Quorum__c
 				FROM Board_Motion__c
 				WHERE Meeting__c = :meetingId
 				WITH USER_MODE
@@ -161,6 +174,7 @@ public with sharing class HubBoardController {
 					count(motion.Votes_Against__c),
 					count(motion.Abstentions__c)
 				};
+				line.flag = motion.Closed_Without_Quorum__c;
 				view.motions.add(line);
 			}
 			for (Meeting_Action_Item__c item : HubBoard.carriedItems(view.meeting)) {
@@ -178,7 +192,7 @@ public with sharing class HubBoardController {
 			}
 			return view;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -187,7 +201,7 @@ public with sharing class HubBoardController {
 		try {
 			return HubBoard.inviteBoard(meetingId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -196,7 +210,7 @@ public with sharing class HubBoardController {
 		try {
 			HubBoard.setAttendance(attendeeId, attendance);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -205,7 +219,7 @@ public with sharing class HubBoardController {
 		try {
 			HubBoard.setMinutesStatus(meetingId, status);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -214,16 +228,16 @@ public with sharing class HubBoardController {
 		try {
 			return HubBoard.openVoting(motionId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
 	@AuraEnabled
-	public static String closeVoting(Id motionId) {
+	public static HubBoard.CloseResult closeVoting(Id motionId) {
 		try {
 			return HubBoard.closeVoting(motionId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -232,7 +246,7 @@ public with sharing class HubBoardController {
 		try {
 			HubBoard.sendPoll(meetingId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -241,7 +255,7 @@ public with sharing class HubBoardController {
 		try {
 			HubBoard.chooseTime(meetingId, option);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -250,7 +264,7 @@ public with sharing class HubBoardController {
 		try {
 			return HubPolicy.requestFromBoard(documentId, boardId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -259,7 +273,7 @@ public with sharing class HubBoardController {
 		try {
 			return HubBoard.startAssessment(boardId);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -288,16 +302,5 @@ public with sharing class HubBoardController {
 
 	private static String count(Decimal value) {
 		return String.valueOf(value == null ? 0 : value.intValue());
-	}
-
-	/** A refusal or a save's own message as it is; anything else logged, then one message. */
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof HubPolicy.PolicyException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(
-			e,
-			BarnHelp.text('CorporateHub', 'CorporateHub_Error_Generic')
-		);
 	}
 }

@@ -7,6 +7,12 @@
  * ADR-0087 `0087-whats-new-from-packaged-release-notes.md`).
  */
 public with sharing class WhatsNewController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_WhatsNew_Failed'
+	);
+
 	// At most four parts of at most four digits: 19 characters, within Last_Seen_Version__c.
 	private static final Pattern VERSION_SHAPE = Pattern.compile('^\\d{1,4}(\\.\\d{1,4}){0,3}$');
 
@@ -44,7 +50,7 @@ public with sharing class WhatsNewController {
 			Whats_New_Seen__c row = Whats_New_Seen__c.getValues(UserInfo.getUserId());
 			return unseen(shippedNotes(), row == null ? null : row.Last_Seen_Version__c);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'What\'s new');
+			throw ERRORS.wrap(caught, 'What\'s new');
 		}
 	}
 
@@ -57,7 +63,7 @@ public with sharing class WhatsNewController {
 				WhatsNewSeenWriter.markSeen(entries[0].note.Version__c.trim());
 			}
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Dismiss What\'s new');
+			throw ERRORS.wrap(caught, 'Dismiss What\'s new');
 		}
 	}
 
@@ -185,10 +191,5 @@ public with sharing class WhatsNewController {
 			WITH SYSTEM_MODE
 			LIMIT 2000
 		];
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		ErrorLogger.log(caught, context);
-		return UserErrors.message(BarnHelp.text('Core', 'Core_WhatsNew_Failed'));
 	}
 }

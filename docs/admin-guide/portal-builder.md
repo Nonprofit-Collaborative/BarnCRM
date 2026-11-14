@@ -102,9 +102,10 @@ licenses (where your organization has them) may be simpler than a portal.
    working within a day. The plugin's small stylesheet puts one field per line and fits a
    phone, in your theme's own fonts and colors. For any other website, the
    `portal-client/README.md` explains the small server piece you need.
-8. **Add a portal.** In the **BarnCRM Admin** (or **BarnCRM Admin Console**) app, where Portal
-   Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
-   its own, D-188), Portals, New: a name people see, a
+8. **Add a portal.** In the **BarnCRM Portal Builder** app (or **BarnCRM Admin** or **BarnCRM
+   Admin Console**, where Portal Builder's **Portals** and **Portal Accesses** tabs sit before
+   **Error Log**; a scratch or Developer Edition org has only these), Portals, New: a name
+   people see, a
    **Key** matching the shortcode, **Access Mode**, **Second Factor**, **Session Hours**,
    **Sender Address**, and the **Template** (below). Set **Status** to Active. With brands on
    ([Brands and Legal Entities](brands.md)), also pick the portal's **Brand**: the portal shows
@@ -217,6 +218,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Attendee App | `attendee.json`, Event Management | My Events (networking choices), Agenda (Add to My Agenda), My Agenda (Add to Calendar, rate, Remove), Attendees (searchable, Connect), Connections (Accept, Decline, Send Message), Messages (Reply), Sent, Announcements, Sponsors, Event Info, My Details |
 | Sponsor Portal | `sponsor.json`, Event Management | My Sponsorships, My Leads (Scan to add, notes and interest, Download CSV), My Details |
 | Service Portal | `service.json`, Programs | My Programs, My Services, Upcoming Sessions, My Goals, My Referrals, My Details |
+| Requests | `requests.json`, Project Management | My Requests (send a request, reply, satisfaction), Updates (comments your staff shared). See [Requests and Issues](projects-requests.md) |
 | Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Funders | Shared Referrals, My Organizations, My Details; with Funders also My Grants and Grant Reports |
 
 **Attendee and Sponsor.** See [Event Management, Attendee App](events.md#attendee-app): the
@@ -270,9 +272,18 @@ pledge balance) on your own Stripe or PayPal checkout page. BarnCRM holds no mon
 a card. It needs the **Payments** module with your keys entered; without them the donor is told
 paying online isn't available. When the processor reports the payment, a **Received** gift
 appears on the pledge, dated the day it was paid, and is linked to the payment it covers. A
-refund at the processor sets it to **Refunded**. Changing the card on a recurring gift is not
-offered: each payment is paid through Pay Online. A portal saved before this release keeps its
+refund at the processor sets it to **Refunded**. A portal saved before this release keeps its
 template: paste the new `donor.json` to add the button.
+
+**Automatic payments and Update Card (donor template, PAY-04).** With **Automatic Recurring
+Payments** on in the Payments settings, **Pay Online** on a recurring gift sets up automatic
+payments for the gift's amount and frequency instead of one payment: the processor saves the
+card and charges it each period, and each charge becomes a **Received** gift (see
+[Payments](payments.md#automatic-recurring-payments)). Pay Online is then refused on that gift.
+**Update Card**, on the same list, emails the donor a link to your processor's own page to change
+the card (Stripe) or the PayPal funding source; it works only on an Active recurring gift with a
+Processor Subscription Id, and for Stripe a Processor Customer Id. With the setting off, Pay
+Online works as above and Update Card is refused. Paste the new `donor.json` to add the button.
 
 **Board.** For board and committee members (Corporate Hub board governance). My Meetings lists
 the meetings the person is invited to, with the agenda and the meeting's Packet Link shown as
@@ -333,6 +344,15 @@ visitor's own address (most hosts set this up); otherwise every visitor shares o
 - **Stop a portal or all portals:** set the portal Inactive, or turn Portal sign-in off.
 - **Stop the website entirely:** revoke the External Client App's tokens or deactivate the
   integration user.
+
+## Sample Data
+
+**Load Sample Data** on BarnCRM Settings adds one example portal, **Sample Supporter Portal**,
+so you can see how a portal is set up. It uses the **My Account** template (a My Details page and
+a My Roles page), invites people only, has the second factor off, and is left **Inactive**, so
+nothing is open to anyone and no one can sign in. Three of Core's sample people have a Portal
+Access, one of them Suspended. Nothing public is created. **Remove Sample Data** deletes the
+portal and its accesses; your own portals stay.
 
 ## Common Mistakes
 

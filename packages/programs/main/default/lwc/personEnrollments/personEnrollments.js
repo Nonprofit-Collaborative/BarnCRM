@@ -9,14 +9,24 @@ import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import LAST_SERVICE from '@salesforce/label/c.Programs_Person_LastService';
 import SERVICES_ATTENDED from '@salesforce/label/c.Programs_Person_ServicesAttended';
+import ENROLL from '@salesforce/label/c.Programs_Enroll';
+import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
+import ENROLLMENT from '@salesforce/schema/Enrollment__c';
+import ENROLLMENT_CONTACT from '@salesforce/schema/Enrollment__c.Contact__c';
+import ENROLLMENT_ACCOUNT from '@salesforce/schema/Enrollment__c.Account__c';
 
 import { canShow, enrollmentRows, lastService } from './enrollmentRows';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
+/** Contact ids start with this key prefix; any other person is a person account. */
+const CONTACT_PREFIX = '003';
+
 /**
  * The Programs card on a person (P-01): every enrollment they have, open ones first, with the
- * program, stage and dates. Read only. A household, an organization, or a user who cannot read
+ * program, stage and dates. A household, an organization, or a user who cannot read
  * enrollments gets no card; a failed load shows a short message, never the error's own text.
+ * Enroll (D-200 R1), for someone who may create enrollments, opens a new enrollment with the
+ * person filled in.
  */
 export default class PersonEnrollments extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Programs');
@@ -35,7 +45,8 @@ export default class PersonEnrollments extends NavigationMixin(LightningElement)
       return helpText('Programs', 'Programs_Person_MoreThanShown');
     },
     loading: LOADING,
-    lastService: LAST_SERVICE
+    lastService: LAST_SERVICE,
+    enroll: ENROLL
   };
 
   result;
@@ -93,6 +104,23 @@ export default class PersonEnrollments extends NavigationMixin(LightningElement)
 
   handleRefresh() {
     return this.load();
+  }
+
+  get canEnroll() {
+    return !!(this.result && this.result.canSee && this.result.canEnroll);
+  }
+
+  handleEnroll() {
+    const personField = String(this.recordId).startsWith(CONTACT_PREFIX)
+      ? ENROLLMENT_CONTACT
+      : ENROLLMENT_ACCOUNT;
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: ENROLLMENT.objectApiName, actionName: 'new' },
+      state: {
+        defaultFieldValues: encodeDefaultFieldValues({ [personField.fieldApiName]: this.recordId })
+      }
+    });
   }
 
   handleOpen(event) {

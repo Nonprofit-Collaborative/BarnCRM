@@ -381,7 +381,7 @@
               <lightning-record-picker
                 data-field="linkedId"
                 label={labels.fieldLinkGift}
-                object-api-name="Gift__c"
+                object-api-name={pickerObjects.gift}
                 filter={donorFilter}
                 display-info={giftDisplayInfo}
                 onchange={handleFormChange}
@@ -389,7 +389,7 @@
               <lightning-record-picker
                 data-field="linkedId"
                 label={labels.fieldLinkPledge}
-                object-api-name="Commitment__c"
+                object-api-name={pickerObjects.pledge}
                 filter={donorFilter}
                 display-info={pledgeDisplayInfo}
                 onchange={handleFormChange}

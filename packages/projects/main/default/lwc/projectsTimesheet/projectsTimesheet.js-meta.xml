@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Timesheet: a person's week of time and expenses, Monday to Sunday, with Save, Submit Week and
+    Recall (PM-07, PM-08).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Projects Timesheet</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+    <target>lightning__Tab</target>
+  </targets>
+</LightningComponentBundle>

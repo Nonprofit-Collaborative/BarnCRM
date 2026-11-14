@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Billing_Locked_When_Invoiced</fullName>
+  <active>true</active>
+  <description>R-PM18: an invoiced milestone keeps its amount.</description>
+  <errorConditionFormula>AND(NOT(ISBLANK(PRIORVALUE(Invoice_Line__c))), NOT(ISCHANGED(Invoice_Line__c)), OR(ISCHANGED(Billing_Amount__c), ISCHANGED(Milestone__c)))</errorConditionFormula>
+  <errorDisplayField>Billing_Amount__c</errorDisplayField>
+  <errorMessage>This milestone is on an invoice. Void the invoice to change its billing.</errorMessage>
+</ValidationRule>

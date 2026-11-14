@@ -535,6 +535,9 @@ private class SampleDataLoaderTest {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			SettingsService.clearCaches();
+			// Core's own set only: each installed module's file adds its queries to this one
+			// transaction, which in an org is spread across the batch's.
+			SampleDataModules.moduleOverride = new List<SampleDataModule>();
 			loadEverything(buildJson(2, 2, false));
 
 			SampleDataLoader.Counts before = SampleDataLoader.status();
@@ -699,11 +702,17 @@ private class SampleDataLoaderTest {
 	static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			loadEverythingIncludingConnections(buildJsonWithConnections());
-			Account ownRecord = new Account(Name = 'A real household');
+			Account ownRecord = TestDataFactory.organization(
+				new Account(Name = 'A real household')
+			);
 			insert ownRecord;
-			Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownRecord.Id);
+			Contact ownPerson = TestDataFactory.person(
+				new Contact(LastName = 'Real', AccountId = ownRecord.Id)
+			);
 			insert ownPerson;
-			Contact ownOtherPerson = new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id);
+			Contact ownOtherPerson = TestDataFactory.person(
+				new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id)
+			);
 			insert ownOtherPerson;
 			Relationship__c ownRelationship = new Relationship__c(
 				Contact__c = ownPerson.Id,

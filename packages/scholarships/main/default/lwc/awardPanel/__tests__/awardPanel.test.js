@@ -41,7 +41,7 @@ const PANEL = {
     { id: 'a01000000000002AAA', name: 'DSB-2', amount: 500, status: 'Scheduled', held: false }
   ],
   requirements: [
-    { Id: 'a02000000000001AAA', Name: 'Enrollment', Type__c: 'Condition', Status__c: 'Open' }
+    { id: 'a02000000000001AAA', name: 'Enrollment', type: 'Condition', status: 'Open' }
   ]
 };
 
@@ -87,6 +87,26 @@ describe('c-award-panel', () => {
     find(element, 'letter').click();
     await flush();
     expect(makeLetter).toHaveBeenCalled();
+  });
+
+  it('starts the paid date on the local day, not the UTC day', async () => {
+    jest.useFakeTimers({
+      now: new Date(2026, 10, 12, 23, 30),
+      doNotFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate']
+    });
+    try {
+      getAward.mockResolvedValue(PANEL);
+      markPaid.mockResolvedValue();
+      const element = mount();
+      await flush();
+      find(element, 'mark-paid').click();
+      await flush();
+      find(element, 'save-paid').click();
+      await flush();
+      expect(markPaid).toHaveBeenCalledWith(expect.objectContaining({ paidOn: '2026-11-12' }));
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it('builds a schedule and shows a refusal', async () => {

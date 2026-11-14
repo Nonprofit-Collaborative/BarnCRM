@@ -10,13 +10,20 @@
  */
 public with sharing class LwcBuilderController {
 	private static final String CONTEXT = 'LwcBuilderController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'LwcBuilder',
+			'LwcBuilder_Error_Generic'
+		)
+		.showingDml();
 	@TestVisible
 	private static final String SETTINGS_OBJECT = 'LWC_Builder_Settings__c';
 	@TestVisible
 	private static final Integer SCHEMA_VERSION = 1;
 	private static final Integer MAX_COLUMNS = 6;
 	private static final Integer MAX_ROWS = 200;
-	private static final Integer DEFAULT_ROWS = 10;
+	private static final Integer MAX_MEASURES = 3;
+	private static final Integer MAX_SERIES = 12;
 	private static final Integer MAX_DEFINITION = 131072;
 	private static final Pattern API_NAME = Pattern.compile('[A-Za-z][A-Za-z0-9_.]{0,79}');
 
@@ -49,10 +56,11 @@ public with sharing class LwcBuilderController {
 			return new Map<String, Object>{
 				'components' => rows,
 				'sourceExport' => flag('Source_Export__c'),
+				'rowsPerList' => rowsPerList(),
 				'canEdit' => Schema.SObjectType.Built_Component__c.isUpdateable()
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -126,7 +134,7 @@ public with sharing class LwcBuilderController {
 			}
 			return shape(row);
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -164,7 +172,7 @@ public with sharing class LwcBuilderController {
 			}
 			return result;
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
@@ -275,14 +283,17 @@ public with sharing class LwcBuilderController {
 				'rows' => Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
 	}
 
 	/**
-	 * A Report Chart block (LB-03): the first grouping and first summary of a standard summary
-	 * or matrix report, by its API name, run as the user. Returns `{title, measure, bars:
-	 * [{label, value}]}`.
+	 * A Report Chart block (LB-03, LB-07; D-196): a standard summary or matrix report, by its API
+	 * name, run once as the user. Up to two groupings (a summary report's first two row
+	 * groupings, or a matrix report's first row and first column grouping) and its first three
+	 * summaries. Returns `{title, measures, series, groups: [{label, cells}]}`: `cells` holds one
+	 * list per series (one list with a single grouping) of `{value, label}` per measure. At most
+	 * 200 groups and 12 series; `lwcBuilderModel.chartView` lays them out.
 	 */
 	@AuraEnabled
 	public static Map<String, Object> loadChart(String reportName) {
@@ -322,39 +333,159 @@ public with sharing class LwcBuilderController {
 					)
 				);
 			}
-			String aggregate = metadata.getAggregates()[0];
-			List<Map<String, Object>> bars = new List<Map<String, Object>>();
-			for (Reports.GroupingValue grouping : groups) {
-				Reports.ReportFact fact = results.getFactMap().get(grouping.getKey() + '!T');
-				Object value = fact == null ? null : fact.getAggregates()[0].getValue();
-				bars.add(
-					new Map<String, Object>{ 'label' => grouping.getLabel(), 'value' => value }
-				);
+			List<String> measures = new List<String>();
+			for (String aggregate : metadata.getAggregates()) {
+				if (measures.size() < MAX_MEASURES) {
+					measures.add(
+						results.getReportExtendedMetadata()
+							.getAggregateColumnInfo()
+							.get(aggregate)
+							.getLabel()
+					);
+				}
 			}
+			// The second grouping: a matrix report's first column grouping, or a summary
+			// report's second row grouping. Series are named in the order they first appear.
+			Map<String, Reports.ReportFact> facts = results.getFactMap();
+			List<String> series = new List<String>();
+			List<Reports.GroupingValue> across = metadata.getReportFormat() ==
+				Reports.ReportFormat.MATRIX
+				? results.getGroupingsAcross().getGroupings()
+				: null;
+			Map<String, List<Object>> cellsByKey = new Map<String, List<Object>>();
+			for (String key : facts.keySet()) {
+				cellsByKey.put(key, cell(facts.get(key), measures.size()));
+			}
+			List<Map<String, Object>> rows = chartRows(
+				plainGroupings(groups),
+				plainGroupings(across),
+				cellsByKey,
+				series
+			);
 			return new Map<String, Object>{
 				'title' => title,
-				'measure' => results.getReportExtendedMetadata()
-					.getAggregateColumnInfo()
-					.get(aggregate)
-					.getLabel(),
-				'bars' => bars
+				'measures' => measures,
+				'series' => series,
+				'groups' => rows
 			};
 		} catch (Exception e) {
-			throw failure(e);
+			throw ERRORS.wrap(e);
 		}
+	}
+
+	/** Report groupings as plain maps `{key, label, children}`, with one level of children. */
+	private static List<Map<String, Object>> plainGroupings(List<Reports.GroupingValue> values) {
+		List<Map<String, Object>> result = new List<Map<String, Object>>();
+		for (
+			Reports.GroupingValue value : values == null
+				? new List<Reports.GroupingValue>()
+				: values
+		) {
+			List<Map<String, Object>> children = new List<Map<String, Object>>();
+			for (
+				Reports.GroupingValue child : value.getGroupings() == null
+					? new List<Reports.GroupingValue>()
+					: value.getGroupings()
+			) {
+				children.add(
+					new Map<String, Object>{ 'key' => child.getKey(), 'label' => child.getLabel() }
+				);
+			}
+			result.add(
+				new Map<String, Object>{
+					'key' => value.getKey(),
+					'label' => value.getLabel(),
+					'children' => children
+				}
+			);
+		}
+		return result;
+	}
+
+	/**
+	 * The chart's rows from plain inputs: the groupings down and across as `{key, label,
+	 * children}` and each fact's cells by fact key. A matrix's columns are the series (up to 12);
+	 * otherwise a second grouping's values are, added to `series` as they are first met. At most
+	 * 200 rows. A fact with no cells gives an empty cell.
+	 */
+	@TestVisible
+	private static List<Map<String, Object>> chartRows(
+		List<Map<String, Object>> groups,
+		List<Map<String, Object>> across,
+		Map<String, List<Object>> cellsByKey,
+		List<String> series
+	) {
+		List<Map<String, Object>> columns = new List<Map<String, Object>>();
+		for (
+			Map<String, Object> column : across == null ? new List<Map<String, Object>>() : across
+		) {
+			if (columns.size() < MAX_SERIES) {
+				columns.add(column);
+				series.add((String) column.get('label'));
+			}
+		}
+		List<Map<String, Object>> rows = new List<Map<String, Object>>();
+		for (Map<String, Object> grouping : groups) {
+			if (rows.size() == MAX_ROWS) {
+				break;
+			}
+			List<Object> cells = new List<Object>();
+			List<Map<String, Object>> children = (List<Map<String, Object>>) grouping.get(
+				'children'
+			);
+			if (!columns.isEmpty()) {
+				for (Map<String, Object> column : columns) {
+					cells.add(cellFor(cellsByKey, grouping.get('key') + '!' + column.get('key')));
+				}
+			} else if (children != null && !children.isEmpty()) {
+				for (Map<String, Object> child : children) {
+					Integer lane = series.indexOf((String) child.get('label'));
+					if (lane < 0 && series.size() < MAX_SERIES) {
+						series.add((String) child.get('label'));
+						lane = series.size() - 1;
+					}
+					while (lane >= 0 && cells.size() <= lane) {
+						cells.add(null);
+					}
+					if (lane >= 0) {
+						cells[lane] = cellFor(cellsByKey, child.get('key') + '!T');
+					}
+				}
+			} else {
+				cells.add(cellFor(cellsByKey, grouping.get('key') + '!T'));
+			}
+			rows.add(new Map<String, Object>{ 'label' => grouping.get('label'), 'cells' => cells });
+		}
+		return rows;
+	}
+
+	private static List<Object> cellFor(Map<String, List<Object>> cellsByKey, Object key) {
+		List<Object> cells = cellsByKey.get(String.valueOf(key));
+		return cells == null ? new List<Object>() : cells;
+	}
+
+	/** One report cell as `[{value, label}]`, one per measure; an empty cell is an empty list. */
+	@TestVisible
+	private static List<Object> cell(Reports.ReportFact fact, Integer measures) {
+		List<Object> values = new List<Object>();
+		List<Reports.SummaryValue> summaries = fact == null
+			? new List<Reports.SummaryValue>()
+			: fact.getAggregates();
+		for (Integer m = 0; m < measures && m < summaries.size(); m++) {
+			values.add(
+				new Map<String, Object>{
+					'value' => summaries[m].getValue(),
+					'label' => summaries[m].getLabel()
+				}
+			);
+		}
+		return values;
 	}
 
 	/** Rows per List, 1 to 200; blank or unreadable is 10. */
 	@TestVisible
 	private static Integer rowsPerList() {
-		Integer value;
-		try {
-			Object stored = SettingsService.getValue(SETTINGS_OBJECT, 'Rows_Per_List__c');
-			value = stored == null ? null : Decimal.valueOf(String.valueOf(stored)).intValue();
-		} catch (Exception unreadable) {
-			value = null;
-		}
-		return value == null || value < 1 || value > MAX_ROWS ? DEFAULT_ROWS : value;
+		return SettingsService.number(SETTINGS_OBJECT, 'Rows_Per_List__c').intValue();
 	}
 
 	/** A checkbox setting; both ship on, so blank or unreadable is on. */
@@ -467,16 +598,5 @@ public with sharing class LwcBuilderController {
 
 	private static LwcBuilderException refusal(String message) {
 		return new LwcBuilderException(message);
-	}
-
-	/** A refusal or a save's own message as it is; anything else logged, then one message. */
-	private static AuraHandledException failure(Exception e) {
-		if (!(e instanceof LwcBuilderException) && !(e instanceof DmlException)) {
-			ErrorLogger.log(e, CONTEXT);
-		}
-		return UserErrors.wrapShowingDml(
-			e,
-			BarnHelp.text('LwcBuilder', 'LwcBuilder_Error_Generic')
-		);
 	}
 }

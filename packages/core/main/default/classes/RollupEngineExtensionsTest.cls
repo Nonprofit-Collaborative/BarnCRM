@@ -12,6 +12,10 @@ private class RollupEngineExtensionsTest {
 	/** Records what Core asked of the engine. */
 	private virtual class RecordingEngine implements RollupEngineExtension {
 		public List<String> calls = new List<String>();
+		public void afterModuleTurnedOn(String moduleName) {
+		}
+		public virtual void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		}
 		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
 			calls.add('afterMerge ' + targetObject);
 		}
@@ -36,10 +40,10 @@ private class RollupEngineExtensionsTest {
 		}
 	}
 
-	/** An engine with the settings seam (V3), which can be told to fail. */
-	private class SettingsListeningEngine extends RecordingEngine implements RollupEngineExtensionV3 {
+	/** An engine that records settings saves, and can be told to fail. */
+	private class SettingsListeningEngine extends RecordingEngine {
 		public Boolean fail = false;
-		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		public override void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
 			calls.add('afterSettingsSaved ' + settingsObject + ' ' + changedKeys);
 			if (fail) {
 				throw new System.IllegalArgumentException('The engine failed');
@@ -86,21 +90,6 @@ private class RollupEngineExtensionsTest {
 				),
 				'The setting is saved all the same'
 			);
-		}
-	}
-
-	@IsTest
-	static void anEngineWithoutTheSettingsSeamIsNotAsked() {
-		System.runAs(TestUsers.admin()) {
-			RecordingEngine engine = new RecordingEngine();
-			RollupEngineExtensions.extensionOverride = engine;
-
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
-			);
-
-			Assert.isNull(RollupEngineExtensions.findV3(), 'No third seam');
-			Assert.isTrue(engine.calls.isEmpty(), 'Nothing asked');
 		}
 	}
 
@@ -210,6 +199,12 @@ private class RollupEngineExtensionsTest {
 
 	/** A module whose engine fails whatever Core asks of it. */
 	private class FailingEngine implements RollupEngineExtension {
+		public void afterModuleTurnedOn(String moduleName) {
+			throw new IllegalArgumentException('afterModuleTurnedOn failed');
+		}
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+			throw new IllegalArgumentException('afterSettingsSaved failed');
+		}
 		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
 			throw new IllegalArgumentException('afterMerge failed');
 		}
@@ -262,8 +257,10 @@ private class RollupEngineExtensionsTest {
 	static void mergingAccountsWithoutTheModuleStillMerges() {
 		System.runAs(TestUsers.admin()) {
 			RollupEngineExtensions.noneForTest = true;
-			Account kept = new Account(Name = 'Riverside Food Bank');
-			Account merged = new Account(Name = 'Riverside Food Bank (old)');
+			Account kept = TestDataFactory.organization(new Account(Name = 'Riverside Food Bank'));
+			Account merged = TestDataFactory.organization(
+				new Account(Name = 'Riverside Food Bank (old)')
+			);
 			insert new List<Account>{ kept, merged };
 
 			Test.startTest();

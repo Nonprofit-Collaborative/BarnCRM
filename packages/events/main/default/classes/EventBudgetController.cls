@@ -172,7 +172,7 @@ public with sharing class EventBudgetController {
 		) {
 			result.fieldLabels.put(
 				'Expense_' + name,
-				expenseFields.get(name).getDescribe().getLabel()
+				NamespaceUtil.field(expenseFields, name).getDescribe().getLabel()
 			);
 		}
 		Map<String, Schema.SObjectField> fundingFields = Schema.SObjectType.Event_Funding__c.fields.getMap();
@@ -188,7 +188,7 @@ public with sharing class EventBudgetController {
 		) {
 			result.fieldLabels.put(
 				'Funding_' + name,
-				fundingFields.get(name).getDescribe().getLabel()
+				NamespaceUtil.field(fundingFields, name).getDescribe().getLabel()
 			);
 		}
 	}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Match_Keys_Filled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>True once every address with a street and postal code has its Match Key (D-200 P6). Until then duplicate matching on addresses searches every street, and Health Check offers to fill the keys. Written by BarnCRM only.</description>
+  <label>Match Keys Filled</label>
+  <type>Checkbox</type>
+</CustomField>

@@ -25,6 +25,7 @@ private class ErrorLogControllerTest {
 			Assert.isNotNull(tile.recent[0].message, 'Each line shows the message.');
 			Assert.isNotNull(tile.recent[0].context, 'And where it came from.');
 			Assert.isNotNull(tile.recent[0].occurredAt, 'And when it happened.');
+			Assert.areEqual(1, tile.recent[0].occurrences, 'And how many times.');
 			Assert.isFalse(tile.newCountCapped, 'Under the cap the count is exact.');
 		}
 	}
@@ -103,6 +104,65 @@ private class ErrorLogControllerTest {
 				}
 			}
 			Test.stopTest();
+		}
+	}
+
+	@IsTest
+	static void anAdministratorsBugReportCarriesTheTechnicalDetail() {
+		System.runAs(TestUsers.admin()) {
+			Error_Log__c entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
+
+			Test.startTest();
+			Map<String, Object> report = ErrorLogController.getBugReport(entry.Id);
+			Test.stopTest();
+
+			Assert.areEqual('Test context 0', report.get('context'), 'Where it happened.');
+			Assert.areEqual(ErrorLogger.SEVERITY_ERROR, report.get('severity'), 'How bad it was.');
+			Assert.areEqual(
+				'TestException: number 0',
+				report.get('technicalDetail'),
+				'The page redacts the detail; the server hands it over for that.'
+			);
+			Assert.isFalse(report.containsKey('message'), 'The message never leaves the org.');
+		}
+	}
+
+	@IsTest
+	static void staffGetABugReportWithoutTheTechnicalDetail() {
+		Error_Log__c entry;
+		User staff;
+		System.runAs(TestUsers.admin()) {
+			entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
+			staff = TestUsers.standardUserWith(
+				'BugReportStaff',
+				new List<String>{ 'BarnCRM_Staff' }
+			);
+		}
+
+		System.runAs(staff) {
+			Test.startTest();
+			Map<String, Object> report = ErrorLogController.getBugReport(entry.Id);
+			try {
+				ErrorLogController.getBugReport('not-an-id');
+				Assert.fail('A value that is not an entry is refused.');
+			} catch (AuraHandledException expected) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound'),
+					expected.getMessage(),
+					'Staff are told to refresh the page.'
+				);
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				'Test context 0',
+				report.get('context'),
+				'Staff see where it happened.'
+			);
+			Assert.isNull(
+				report.get('technicalDetail'),
+				'Staff may not read Technical Detail, so the report leaves it out.'
+			);
 		}
 	}
 

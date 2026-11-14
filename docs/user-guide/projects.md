@@ -1,9 +1,13 @@
 # Projects
 
 Your admin turns on BarnCRM Project Management. You then see Projects Home, Projects and Time
-Entries in the BarnCRM app. Setup detail: [Project Management](../admin-guide/projects.md).
+Entries in the BarnCRM app, and every Project Management page in the **BarnCRM Projects** app
+(open it from the App Launcher). Setup detail: [Project Management](../admin-guide/projects.md).
 
 ## Projects Home
+
+Before your organization's first project, the page opens with **Start Your First Project**;
+click **Start a Project** to go to **New Project From Template**.
 
 - **Projects at Risk**: active projects that are At Risk or Off Track, with the reasons. Check
   **Only Mine** to see only projects you own.
@@ -36,3 +40,95 @@ owner when work starts; only active projects get a health.
 
 The Time Entries tab lists every entry; the This Week view shows the current week. Edit an entry
 to fix its hours or task. Hours are more than 0 and at most 24 in a day.
+
+## Staffing and Allocation (When Your Admin Manages Resources)
+
+- A **Resource Request** on a project says what it needs: a role, skills, hours and dates.
+- The **Staffing** tab lists open requests. **Fill** shows who could do the work, best first:
+  people with every requested skill, then those whose Default Role is the requested role, then
+  those with the most free capacity in the request's dates. People with only some of the skills
+  are listed too, with how many they have. **Assign** creates the Project Assignment for that
+  person and marks the request Filled.
+- **People Who Can Be Staffed** holds each person's skills, weekly capacity (blank uses the
+  organization's standard week, so a part-time person can have less) and default role. Mark
+  someone inactive to take them off the lists.
+- **Weekly Allocation** shows, for 4 to 26 weeks, each person's planned hours against capacity.
+  An assignment's hours are spread over its working days (Monday to Friday); over capacity shows
+  in red, point at a cell to see the hours logged, and the last row is the hours of requests not
+  yet filled. Only approved time counts as logged when your organization approves time.
+
+
+## Timesheet and Approvals (When Your Admin Turns Them On)
+
+**Timesheet** shows your week, Monday to Sunday. Add a row for a project (and a task), type hours
+in the day cells, then **Save**. When the week is done, **Submit Week**: Open and Rejected time
+and expenses become Submitted and are locked while the project's owner decides. **Recall Week**
+puts them back to Open if you need to change something before they are decided. A rejected entry
+shows the reason; fix it and submit again. A cell cannot be emptied (staff cannot delete time):
+change the hours, or ask a Projects admin to remove the entry. A cell with two or more entries
+shows their total and is changed where they were logged.
+
+Time you log from the project's **Log Time** is saved as Open too, and goes with the week when
+you submit it.
+
+**Approvals** is for project owners (Projects admins see every project). Time and expenses
+submitted on your projects are grouped by person and week: **Approve** or **Reject** a whole
+week, or open **Details** and decide one line. A rejection needs a reason, typed in the week's
+Rejection Reason box. Approved time is locked and is the only time that counts in a project's
+hours, cost, billable export and invoices.
+
+## Expenses (When Your Admin Turns Them On)
+
+**Add Expense** on a project, or on the Timesheet, records the date, category, amount, whether it
+is billable and a description. Attach the receipt as a file on the expense when the Timesheet
+prompts you, or from the expense's Files list. With approvals on, expenses are submitted, approved or rejected with the
+week, like time.
+
+## Rates (Admins)
+
+With rate cards on, each time entry keeps the bill rate it was logged at, from the person's rate,
+else their role's, else the project's Hourly Rate. Changing a rate card later does not change
+time already logged. On Projects Home, **Apply Rates** gives rates to time logged before rate
+cards were turned on.
+
+## Invoices, Financials and Change Requests (When Your Admin Turns Them On)
+
+Your admin turns each part on in BarnCRM Settings, Projects.
+
+- **New Invoice** (admins, on the project page): choose a period and a Draft invoice is built from
+  the project's approved billable time, expenses, Done milestones or retainer months. Check the
+  lines on the invoice, then **Send**. **Print** saves a PDF to the invoice's Files. **Mark Paid**
+  records a payment the client made directly; **Void** cancels an invoice and frees its work to
+  bill again. Only a Draft invoice can be deleted: Void the others. With BarnCRM Payments, **Send Payment Link** emails the client a link to pay online,
+  and the invoice turns Paid when the payment goes through.
+- **Export Invoices** (admins, Projects Home): a CSV of sent and paid invoices with their lines for
+  your accounting system.
+- **Financials** (project page): budget with approved changes, revenue to date, invoiced and
+  unbilled, and recognized revenue month by month. Admins also see cost and margin, and can
+  **Recognize Revenue** for a closed month again after correcting it.
+- **Change Requests** (project page, Change Requests list): a scope change with the hours and
+  amount it adds (or removes, as a negative). The project owner approves or rejects it; approved
+  changes add to the budget the project is measured against.
+
+## Requests (When Your Admin Turns Them On)
+
+The **Requests** tab lists the requests and issues people raised with your team. Choose a view:
+**My Open**, **All Open**, **Unassigned** (held by a queue), **Overdue** or **Recently Closed**.
+Overdue requests show their due date in red.
+
+- **New Request** opens a blank request: a subject, what is needed, the type, category and
+  priority, and the requester when it is for someone else. The due date fills in from the
+  priority when you leave it blank.
+- Choose a request to open its panel beside the list. Change its **Status**, **Priority**,
+  **Owner** (a person; use the record page to give it to a queue), **Due Date** or **Project**,
+  then **Save**. **Resolved** needs a **Resolution**: the requester sees it and is emailed.
+- **Comments.** Type a comment and **Add Comment**. It stays internal unless you check **Share
+  with requester**, which shows it in the requester's portal and emails it to them. A requester's
+  reply from the portal appears marked **From Requester** and moves the request back to In
+  Progress.
+- **Create Task** adds a task, named from the subject, to the request's project; **Create Change
+  Request** adds a Draft change request (when your admin tracks change requests). Both are linked
+  on the request. When you log time, the **Request** field on the time entry counts it against the
+  request.
+- You get a bell notice when someone assigns you a request, when a requester replies, and when a
+  request arrives from outside on a queue you belong to.

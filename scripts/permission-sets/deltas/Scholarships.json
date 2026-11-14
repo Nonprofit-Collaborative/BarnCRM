@@ -1,0 +1,30 @@
+{
+  "Admin": {
+    "label": "Scholarships Admin",
+    "description": ["Everything in Scholarships and Outbound Grants, delete, and Manage Scholarships (decide", "awards, assign reviewers, mark disbursements paid). Given to BarnCRM Admin holders."],
+    "add": {
+      "fieldPermissions": {
+        "Award_Program__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      },
+      "customPermissions": {
+        "Scholarships_Manage": {"enabled": "true"}
+      }
+    },
+    "set": {
+      "objectPermissions": {
+        "Application_Review__c": {"allowDelete": "true"},
+        "Award_Application__c": {"allowDelete": "true"},
+        "Award_Cycle__c": {"allowDelete": "true"},
+        "Award_Payment__c": {"allowDelete": "true"},
+        "Award_Program__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Award_Requirement__c": {"allowDelete": "true"},
+        "Award__c": {"allowDelete": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Scholarships Read Only",
+    "description": ["Read every Scholarships and Outbound Grants record. Given to the Read Only role."],
+    "readOnly": true
+  }
+}

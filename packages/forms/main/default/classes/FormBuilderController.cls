@@ -98,10 +98,10 @@ public with sharing class FormBuilderController {
 	public static List<Choice> getFields(String objectName) {
 		try {
 			List<Choice> choices = new List<Choice>();
-			Schema.DescribeSObjectResult described = Schema.describeSObjects(
-				new List<String>{ objectName },
-				SObjectDescribeOptions.DEFERRED
-			)[0];
+			Schema.DescribeSObjectResult described = NamespaceUtil.describe(objectName);
+			if (described == null) {
+				throw new IllegalArgumentException('No object ' + objectName);
+			}
 			for (Schema.SObjectField field : described.fields.getMap().values()) {
 				Schema.DescribeFieldResult about = field.getDescribe();
 				if (about.isCreateable() && about.isAccessible()) {
@@ -211,7 +211,7 @@ public with sharing class FormBuilderController {
 		result.isPublic = form.Public__c == true && form.Status__c == 'Published';
 		if (result.isPublic) {
 			for (String base : FormsSites.activeSiteUrls()) {
-				result.publicLinks.add(base + '/FormsPublic?form=' + form.Id);
+				result.publicLinks.add(base + FormsSites.pagePath() + '?form=' + form.Id);
 			}
 		}
 		return result;

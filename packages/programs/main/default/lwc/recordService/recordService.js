@@ -1,6 +1,7 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
 import { CloseActionScreenEvent } from 'lightning/actions';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import getForm from '@salesforce/apex/RecordServiceController.getForm';
 import record from '@salesforce/apex/RecordServiceController.record';
 
@@ -29,8 +30,11 @@ function today() {
  * delivery by hand with a single Person picker, filled in from the record it was opened from
  * (an enrollment also fills in the program's services and links the delivery to it). The
  * standard New form stays for anyone who prefers it.
+ *
+ * The same form is the Record Service tab (D-200 R1): opened with `c__personId` from the
+ * Programs at a Glance card it starts on that person, and Save or Cancel returns to them.
  */
-export default class RecordService extends LightningElement {
+export default class RecordService extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Programs');
 
   @api recordId;
@@ -59,6 +63,21 @@ export default class RecordService extends LightningElement {
   quantity = 1;
   loadError;
   working = false;
+  /** The person named in the tab's page state (`c__personId`, or the namespaced key). */
+  statePersonId;
+  /** Only the latest load applies, whichever of the record and the page state comes last. */
+  loadCount = 0;
+
+  @wire(CurrentPageReference)
+  readPageState(pageRef) {
+    const state = (pageRef && pageRef.state) || {};
+    const key = Object.keys(state).find((name) => name.endsWith('__personId'));
+    const personId = key ? state[key] : undefined;
+    if (!this.recordId && personId && personId !== this.statePersonId) {
+      this.statePersonId = personId;
+      this.load();
+    }
+  }
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -70,8 +89,12 @@ export default class RecordService extends LightningElement {
   }
 
   load() {
-    return getForm({ recordId: this.recordId })
+    const count = ++this.loadCount;
+    return getForm({ recordId: this.recordId || this.statePersonId || null })
       .then((form) => {
+        if (count !== this.loadCount) {
+          return;
+        }
         this.form = form;
         this.personId = form.personId;
         this.serviceId = form.serviceId;
@@ -176,6 +199,19 @@ export default class RecordService extends LightningElement {
   }
 
   close() {
+    if (!this.recordId && this.statePersonId) {
+      // The Record Service tab: back to the person it was opened for.
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId: this.statePersonId, actionName: 'view' }
+      });
+      return;
+    }
+    if (!this.recordId) {
+      // The tab opened from Home: a fresh form for the next service.
+      this.load();
+      return;
+    }
     this.dispatchEvent(new CloseActionScreenEvent());
   }
 }

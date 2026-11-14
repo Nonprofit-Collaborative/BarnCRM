@@ -54,14 +54,10 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	// -------------------------------------------------------------------------------------
 
 	/**
-	 * The nightly start, as a step of the nightly run (or, in an org upgraded from before it,
-	 * from its own old schedule, which it adopts first: R-NJ5). Skipped when a copy started by
+	 * The nightly start, as a step of the nightly run. Skipped when a copy started by
 	 * hand is still waiting or running.
 	 */
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			NightlyJobs.adoptOldSchedules();
-		}
 		runNow();
 	}
 
@@ -108,7 +104,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 		if (isRunning()) {
 			return false;
 		}
-		Database.executeBatch(new SetupChangeCopyJob(), CHUNK_SIZE);
+		AsyncStarter.batch(new SetupChangeCopyJob(), CHUNK_SIZE, 'SetupChangeCopyJob');
 		return true;
 	}
 
@@ -119,17 +115,12 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 
 	/** Days to Keep Setup Changes: empty or unreadable reads as 730, out of range as the nearest end. */
 	public static Integer retentionDays() {
-		String key = 'Setup_Change_Retention_Days__c';
-		Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
-		if (configured == null) {
-			return DEFAULT_RETENTION_DAYS;
-		}
-		try {
-			Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(MIN_RETENTION_DAYS, Math.min(value, MAX_RETENTION_DAYS));
-		} catch (Exception ignored) {
-			return DEFAULT_RETENTION_DAYS;
-		}
+		return DataJobs.wholeNumberSetting(
+			'Setup_Change_Retention_Days__c',
+			DEFAULT_RETENTION_DAYS,
+			MIN_RETENTION_DAYS,
+			MAX_RETENTION_DAYS
+		);
 	}
 
 	// -------------------------------------------------------------------------------------

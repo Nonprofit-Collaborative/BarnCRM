@@ -21,11 +21,12 @@ private class GivingPortalPaymentsTest {
 	private class FakePayments implements Callable {
 		Map<String, Object> asked;
 		Integer recent = 0;
+		Boolean recurring = false;
 
 		public Object call(String action, Map<String, Object> args) {
 			switch on action {
 				when 'isReady' {
-					return true;
+					return args?.get('recurring') != true || recurring;
 				}
 				when 'countRecent' {
 					return recent;
@@ -37,7 +38,8 @@ private class GivingPortalPaymentsTest {
 					asked = args;
 					return new Map<String, Object>{
 						'paymentId' => 'pay-9',
-						'checkoutUrl' => 'https://checkout.example.com/9'
+						'checkoutUrl' => 'https://checkout.example.com/9',
+						'url' => 'https://card.example.com/1'
 					};
 				}
 			}
@@ -45,7 +47,9 @@ private class GivingPortalPaymentsTest {
 	}
 
 	private static Contact donor(String email) {
-		Contact person = new Contact(FirstName = 'Pat', LastName = 'Zzpledge', Email = email);
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'Pat', LastName = 'Zzpledge', Email = email)
+		);
 		insert as user person;
 		return person;
 	}
@@ -64,6 +68,108 @@ private class GivingPortalPaymentsTest {
 		);
 		insert as user record;
 		return record;
+	}
+
+	private static Commitment__c recurringGift(Id donorId, String subscriptionId) {
+		Commitment__c record = new Commitment__c(
+			Type__c = 'Recurring',
+			Status__c = 'Active',
+			Donor_Contact__c = donorId,
+			Amount__c = 20,
+			Frequency__c = 'Quarterly',
+			Start_Date__c = Date.today(),
+			Processor_Subscription_Id__c = subscriptionId,
+			Processor_Customer_Id__c = subscriptionId == null ? null : 'cus_1'
+		);
+		insert as user record;
+		return record;
+	}
+
+	@IsTest
+	static void updateCardEmailsTheProcessorsOwnPage() {
+		System.runAs(admin()) {
+			FakePayments payments = new FakePayments();
+			GivingDonations.paymentsForTest = payments;
+			RecordingEmailSender sender = new RecordingEmailSender();
+			GivingPortalPayments.emailSender = sender;
+			Contact person = donor('pat.zzpledge@example.org');
+			Commitment__c record = recurringGift(person.Id, 'sub_1');
+
+			Test.startTest();
+			String message = new GivingPortalPayments()
+				.run(GivingPortalPayments.UPDATE_CARD, person.Id, record.Id);
+			Test.stopTest();
+
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_UpdateCard_Sent'), message);
+			Assert.areEqual('sub_1', payments.asked.get('subscriptionId'));
+			Assert.areEqual('cus_1', payments.asked.get('customerId'));
+			Assert.areEqual(1, sender.received.size(), 'One email');
+			Assert.isTrue(
+				sender.received[0].getPlainTextBody().contains('https://card.example.com/1'),
+				'With the processor page'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_UpdateCard_EmailSubject'),
+				sender.received[0].getSubject()
+			);
+		}
+	}
+
+	@IsTest
+	static void eachActionIsRefusedOnTheOtherKindOfGift() {
+		System.runAs(admin()) {
+			GivingDonations.paymentsForTest = new FakePayments();
+			Contact person = donor('pat.zzpledge@example.org');
+			Commitment__c manual = recurringGift(person.Id, null);
+			Commitment__c automatic = recurringGift(person.Id, 'sub_2');
+			List<String> refused = new List<String>();
+			List<String> actions = new List<String>{
+				GivingPortalPayments.UPDATE_CARD,
+				GivingPortalPayments.PAY_ONLINE
+			};
+			List<Id> gifts = new List<Id>{ manual.Id, automatic.Id };
+			for (Integer i = 0; i < 2; i++) {
+				try {
+					new GivingPortalPayments().run(actions[i], person.Id, gifts[i]);
+				} catch (GivingPortalPayments.PortalPaymentException expected) {
+					refused.add(expected.getMessage());
+				}
+			}
+
+			Assert.areEqual(
+				new List<String>{
+					BarnHelp.text('Giving', 'Giving_UpdateCard_NoSubscription'),
+					BarnHelp.text('Giving', 'Giving_PayOnline_Automatic')
+				},
+				refused
+			);
+			Assert.areEqual(0, Limits.getQueueableJobs(), 'Nothing queued');
+		}
+	}
+
+	@IsTest
+	static void payOnlineSetsUpAutomaticPaymentsWhenPaymentsAllowsIt() {
+		System.runAs(admin()) {
+			FakePayments payments = new FakePayments();
+			payments.recurring = true;
+			GivingDonations.paymentsForTest = payments;
+			RecordingEmailSender sender = new RecordingEmailSender();
+			GivingPortalPayments.emailSender = sender;
+			Contact person = donor('pat.zzpledge@example.org');
+			Commitment__c record = recurringGift(person.Id, null);
+
+			Test.startTest();
+			new GivingPortalPayments().run(GivingPortalPayments.PAY_ONLINE, person.Id, record.Id);
+			Test.stopTest();
+
+			Assert.areEqual('month', payments.asked.get('interval'), 'Quarterly');
+			Assert.areEqual(3, payments.asked.get('intervalCount'));
+			Assert.isTrue((Decimal) payments.asked.get('amount') == 20, 'The gift amount');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_AutoPay_EmailSubject'),
+				sender.received[0].getSubject()
+			);
+		}
 	}
 
 	@IsTest

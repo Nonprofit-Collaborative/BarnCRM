@@ -14,11 +14,11 @@ private class EventPublicPageTest {
 
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c gala(Boolean published, Boolean speakers, Boolean seats) {
@@ -61,8 +61,12 @@ private class EventPublicPageTest {
 				Active__c = false
 			)
 		};
-		Contact pat = new Contact(FirstName = 'Pat', LastName = 'Lee', Email = 'pat@example.org');
-		Contact sam = new Contact(FirstName = 'Sam', LastName = 'Ray', Email = 'sam@example.org');
+		Contact pat = TestDataFactory.person(
+			new Contact(FirstName = 'Pat', LastName = 'Lee', Email = 'pat@example.org')
+		);
+		Contact sam = TestDataFactory.person(
+			new Contact(FirstName = 'Sam', LastName = 'Ray', Email = 'sam@example.org')
+		);
 		insert as user new List<Contact>{ pat, sam };
 		Event_Speaker__c confirmed = new Event_Speaker__c(
 			Event__c = record.Id,

@@ -70,6 +70,87 @@ public with sharing class UserErrors {
 	}
 
 	/**
+	 * One call for a controller's catch block. A failure written for a person is shown as it is
+	 * and not logged: a BarnCRM exception, or an AuraHandledException already worded for the
+	 * screen. Anything else is logged and replaced by the fallback text.
+	 * @param caught the failure
+	 * @param context where it happened, for the Error Log
+	 * @param fallbackText what the screen shows for anything else
+	 */
+	@NamespaceAccessible
+	public static AuraHandledException wrap(Exception caught, String context, String fallbackText) {
+		return new Screen(context, null, fallbackText).wrap(caught);
+	}
+
+	/**
+	 * One screen's catch blocks, kept as a static final on its controller so that each catch is
+	 * a single `throw ERRORS.wrap(e)` and no controller carries its own forwarding helper. What
+	 * it shows and logs is the three-argument `wrap` above. The fallback is help text read only
+	 * when a failure needs it, or a label's text.
+	 */
+	@NamespaceAccessible
+	public with sharing class Screen {
+		private final String context;
+		private final String helpPackage;
+		private final String fallback;
+		private Boolean showsDml = false;
+
+		/**
+		 * @param context where its failures happen, for the Error Log, when a call names none
+		 * @param helpPackage the package whose help text holds the fallback, or null when the
+		 *   fallback is the text itself (a label)
+		 * @param fallback the help key, or the text, shown for an unexpected failure
+		 */
+		@NamespaceAccessible
+		public Screen(String context, String helpPackage, String fallback) {
+			this.context = context;
+			this.helpPackage = helpPackage;
+			this.fallback = fallback;
+		}
+
+		/**
+		 * A failed save also shows the platform's first message for the row (a validation
+		 * rule's own wording, for example) and is not logged.
+		 */
+		@NamespaceAccessible
+		public Screen showingDml() {
+			showsDml = true;
+			return this;
+		}
+
+		/** The failure as the screen shows it, logged under the screen's context. */
+		@NamespaceAccessible
+		public AuraHandledException wrap(Exception caught) {
+			return this.wrap(caught, context, (Id) null);
+		}
+
+		/** As above, logged under the given context. */
+		@NamespaceAccessible
+		public AuraHandledException wrap(Exception caught, String logContext) {
+			return this.wrap(caught, logContext, (Id) null);
+		}
+
+		/** As above, with the record the failure is about, for the Error Log. */
+		@NamespaceAccessible
+		public AuraHandledException wrap(Exception caught, String logContext, Id recordId) {
+			if (caught instanceof AuraHandledException) {
+				return (AuraHandledException) caught;
+			}
+			Boolean known = UserErrors.isKnown(caught);
+			if (showsDml && !known && caught instanceof DmlException && caught.getNumDml() > 0) {
+				return UserErrors.message(caught.getDmlMessage(0));
+			}
+			return UserErrors.wrap(
+				caught,
+				known,
+				logContext,
+				recordId,
+				helpPackage == null ? fallback : BarnHelp.text(helpPackage, fallback)
+			);
+		}
+	}
+
+	/**
 	 * Not logged (the caller logs first). A BarnCRM exception is shown as written, a failed save
 	 * shows the first message the platform gives for the row (a validation rule's own wording,
 	 * for example), and anything else becomes the feature's label.

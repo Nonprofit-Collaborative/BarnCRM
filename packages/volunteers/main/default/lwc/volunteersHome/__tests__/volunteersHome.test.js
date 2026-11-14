@@ -19,10 +19,14 @@ jest.mock(
 );
 import VolunteersHome from 'c/volunteersHome';
 import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
+import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
 import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
 import { badgeStatusFor, pageReferenceFor, valueFor } from '../volunteersHomeModel';
 
 jest.mock('@salesforce/apex/VolunteersHomeController.getHome', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/VolunteersHomeController.getFirstRun', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -62,7 +66,44 @@ function build() {
 
 describe('c-volunteers-home', () => {
   beforeEach(() => {
-    setHelpTextForTest({ Volunteers_Home_LoadError: 'The figures were not loaded.' });
+    setHelpTextForTest({
+      Volunteers_Home_LoadError: 'The figures were not loaded.',
+      Volunteers_Home_FirstRunHeading: 'Set Up Your First Volunteer Job',
+      Volunteers_Home_FirstRunNewJob: 'New Volunteer Job',
+      Volunteers_Home_FirstRunImport: 'Import a File'
+    });
+    getFirstRun.mockResolvedValue({ show: false, canImport: false });
+  });
+
+  it('offers a first job and a file import before any job exists', async () => {
+    getHome.mockResolvedValue(TILES);
+    getFirstRun.mockResolvedValue({ show: true, canImport: true });
+    const element = build();
+    await flush();
+
+    const panel = element.shadowRoot.querySelector('[data-id="first-run"]');
+    expect(panel.heading).toBe('Set Up Your First Volunteer Job');
+    expect(element.shadowRoot.querySelector('[data-id="tiles"]')).toBeNull();
+    element.shadowRoot.querySelector('[data-id="first-run-job"]').click();
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Volunteer_Job__c', actionName: 'new' }
+    });
+    element.shadowRoot.querySelector('[data-id="first-run-import"]').click();
+    await flush();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Import' }
+    });
+  });
+
+  it('shows the figures when the first-run state cannot be read', async () => {
+    getHome.mockResolvedValue(TILES);
+    getFirstRun.mockRejectedValue({ body: { message: 'no' } });
+    const element = build();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="first-run"]')).toBeNull();
+    expect(element.shadowRoot.querySelectorAll('c-barn-stat-tile')).toHaveLength(2);
   });
 
   afterEach(() => {

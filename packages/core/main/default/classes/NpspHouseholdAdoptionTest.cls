@@ -73,12 +73,18 @@ private class NpspHouseholdAdoptionTest {
 	private static Fixture fixture() {
 		HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		Fixture f = new Fixture();
-		f.smith = new Account(Name = PREFIX + 'Smith Household');
-		f.jones = new Account(Name = PREFIX + 'Jones Household');
+		f.smith = TestDataFactory.organization(new Account(Name = PREFIX + 'Smith Household'));
+		f.jones = TestDataFactory.organization(new Account(Name = PREFIX + 'Jones Household'));
 		insert new List<Account>{ f.smith, f.jones };
-		f.ann = new Contact(FirstName = 'Ann', LastName = 'Smith', AccountId = f.smith.Id);
-		f.bob = new Contact(FirstName = 'Bob', LastName = 'Smith', AccountId = f.smith.Id);
-		f.cara = new Contact(FirstName = 'Cara', LastName = 'Jones', AccountId = f.jones.Id);
+		f.ann = TestDataFactory.person(
+			new Contact(FirstName = 'Ann', LastName = 'Smith', AccountId = f.smith.Id)
+		);
+		f.bob = TestDataFactory.person(
+			new Contact(FirstName = 'Bob', LastName = 'Smith', AccountId = f.smith.Id)
+		);
+		f.cara = TestDataFactory.person(
+			new Contact(FirstName = 'Cara', LastName = 'Jones', AccountId = f.jones.Id)
+		);
 		insert new List<Contact>{ f.ann, f.bob, f.cara };
 		f.source.add(f.smith, 'Ms. Ann Smith and Mr. Bob Smith', 'Ann and Bob', f.ann.Id, true);
 		f.source.add(f.jones, 'Ms. Cara Jones', 'Cara', f.ann.Id, false);
@@ -122,12 +128,12 @@ private class NpspHouseholdAdoptionTest {
 
 			Test.startTest();
 			try {
-				NpspHouseholdAdoptionController.getStatus();
+				NpspHouseholdAdoptionController.getStatus(null);
 			} catch (AuraHandledException e) {
 				statusMessage = e.getMessage();
 			}
 			try {
-				NpspHouseholdAdoptionController.adopt(true, 1);
+				NpspHouseholdAdoptionController.adopt(null, true, 1);
 			} catch (AuraHandledException e) {
 				adoptMessage = e.getMessage();
 			}
@@ -135,8 +141,15 @@ private class NpspHouseholdAdoptionTest {
 
 			Assert.areEqual(Label.Core_UnexpectedError, statusMessage, 'Status: the plain error');
 			Assert.areEqual(Label.Core_UnexpectedError, adoptMessage, 'Adopt: the plain error');
+			// Failures that read the same way are counted on one entry (R-E7).
+			Decimal failures = (Decimal) [
+					SELECT SUM(Occurrences__c) total
+					FROM Error_Log__c
+					WITH SYSTEM_MODE
+				][0]
+				.get('total');
 			Assert.isTrue(
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] >= 2,
+				failures != null && failures >= 2,
 				'Both failures are written to the Error Log'
 			);
 		}
@@ -146,7 +159,9 @@ private class NpspHouseholdAdoptionTest {
 	static void previewCountsAndSamplesCandidates() {
 		System.runAs(TestUsers.admin()) {
 			Fixture f = fixture();
-			NpspHouseholdAdoptionService.Status status = NpspHouseholdAdoptionController.getStatus();
+			NpspHouseholdAdoptionService.Status status = NpspHouseholdAdoptionController.getStatus(
+				null
+			);
 			Assert.isTrue(status.available, 'the fake source has households');
 			Assert.areEqual(2, status.candidateCount, 'both households are candidates');
 			Assert.isFalse(status.moreThanLimit, 'two is under the run limit');
@@ -171,7 +186,7 @@ private class NpspHouseholdAdoptionTest {
 			Fixture f = fixture();
 			Id original = accounts(f).get(f.smith.Id).RecordTypeId;
 			Test.startTest();
-			String runId = NpspHouseholdAdoptionController.adopt(true, 2);
+			String runId = NpspHouseholdAdoptionController.adopt(null, true, 2);
 			Test.stopTest();
 
 			Map<Id, Account> after = accounts(f);
@@ -260,9 +275,11 @@ private class NpspHouseholdAdoptionTest {
 			// where it has record types), so a probe account saved the same way says what to expect.
 			Id expectedType = was.RecordTypeId;
 			if (expectedType == null) {
-				Account probe = new Account(
-					Name = PREFIX + 'Probe',
-					RecordTypeId = HouseholdService.householdRecordTypeId()
+				Account probe = TestDataFactory.household(
+					new Account(
+						Name = PREFIX + 'Probe',
+						RecordTypeId = HouseholdService.householdRecordTypeId()
+					)
 				);
 				Database.insert(probe, true, AccessLevel.SYSTEM_MODE);
 				Database.update(
@@ -350,7 +367,7 @@ private class NpspHouseholdAdoptionTest {
 				'no permission'
 			);
 			try {
-				NpspHouseholdAdoptionController.getStatus();
+				NpspHouseholdAdoptionController.getStatus(null);
 				Assert.fail('status needs the permission too');
 			} catch (AuraHandledException e) {
 				Assert.areEqual(
@@ -383,7 +400,7 @@ private class NpspHouseholdAdoptionTest {
 
 	private static void assertRefused(String expected, Integer confirmed, String why) {
 		try {
-			NpspHouseholdAdoptionController.adopt(true, confirmed);
+			NpspHouseholdAdoptionController.adopt(null, true, confirmed);
 			Assert.fail('refused: ' + why);
 		} catch (AuraHandledException e) {
 			Assert.areEqual(expected, e.getMessage(), why);
@@ -399,7 +416,7 @@ private class NpspHouseholdAdoptionTest {
 	static void realSourceWithoutNpspFindsNothing() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account plain = new Account(Name = PREFIX + 'Plain');
+			Account plain = TestDataFactory.organization(new Account(Name = PREFIX + 'Plain'));
 			insert plain;
 			NpspHouseholdSource source = NpspHouseholdSource.get();
 			List<NpspHouseholdSource.Household> read = source.read(new Set<Id>{ plain.Id });

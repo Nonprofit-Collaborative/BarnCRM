@@ -1,6 +1,6 @@
 /**
  * BarnCRM's nightly run as everything but the run itself sees it (ADR-0166
- * nightly-job-dispatcher, R-NJ1 to R-NJ5): the steps in order, their switches, the one schedule,
+ * nightly-job-dispatcher, R-NJ1 to R-NJ4): the steps in order, their switches, the one schedule,
  * Health Check's view of it, and adopting the separate schedules of an earlier version. Every
  * test supplies its module steps in memory and schedules under the test name of the run, so none
  * depends on what the org it runs in has installed or scheduled.
@@ -41,11 +41,18 @@ private class NightlyJobsTest {
 
 	/** Every module provider replaced: the first gives `steps`, the second throws. */
 	private static void modulesGive(List<NightlyStep> steps) {
-		for (String className : NightlyJobs.PROVIDER_CLASSES) {
-			NightlyJobs.providerOverrides.put(className, new FakeProvider(new List<NightlyStep>()));
-		}
-		NightlyJobs.providerOverrides.put(NightlyJobs.PROVIDER_CLASSES[0], new FakeProvider(steps));
-		NightlyJobs.providerOverrides.put(NightlyJobs.PROVIDER_CLASSES[1], new BrokenProvider());
+		ModuleExtensions.stubForTest(
+			NightlyStepProvider.class,
+			'Example_A',
+			new FakeProvider(steps),
+			true
+		);
+		ModuleExtensions.stubForTest(
+			NightlyStepProvider.class,
+			'Example_B',
+			new BrokenProvider(),
+			true
+		);
 		NightlyJobs.forget();
 	}
 
@@ -134,46 +141,6 @@ private class NightlyJobsTest {
 			Assert.isFalse(NightlyJobs.isOn(null), 'No step');
 			Assert.isTrue(switchedOff.hasSwitch(), 'Has a switch');
 			Assert.areEqual(60, always.minute, 'One in the morning is minute 60');
-		}
-	}
-
-	@IsTest
-	static void oldSchedulesAreReplacedByTheRunAndKeepTheirSwitchOn() {
-		System.runAs(TestUsers.admin()) {
-			TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
-			NightlyJobs.overrideStepsForTest(
-				new List<NightlyStep>{
-					new NightlyStep(OLD_A, 'A', 1, 0, new CountingWork()).withSwitch(false),
-					new NightlyStep(OLD_B, 'B', 2, 0, new CountingWork())
-				}
-			);
-			NightlyJobs.adoptInTests = true;
-			NightlyRun.chain = false;
-			ScheduledJobSelector.schedule(OLD_A, '0 0 1 * * ?', new ErrorDigestScheduler());
-			ScheduledJobSelector.schedule(OLD_B, '0 0 2 * * ?', new ErrorDigestScheduler());
-
-			Test.startTest();
-			Boolean adopted = NightlyJobs.adoptOldSchedules();
-			Boolean again = NightlyJobs.adoptOldSchedules();
-			Test.stopTest();
-
-			NightlyJobs.forget();
-			Assert.isTrue(adopted, 'Something was adopted');
-			Assert.isFalse(again, 'And nothing is left the second time');
-			Assert.isFalse(ScheduledJobSelector.isScheduled(OLD_A), 'The old job is gone');
-			Assert.isFalse(ScheduledJobSelector.isScheduled(OLD_B), 'So is the other');
-			Assert.isTrue(NightlyJobs.isScheduled(), 'The nightly run took their place');
-			Assert.isTrue(
-				NightlyJobs.isSwitchedOn(OLD_A, false),
-				'A step shipped off that was running stays on'
-			);
-		}
-	}
-
-	@IsTest
-	static void adoptingDoesNothingInATestThatDidNotAskForIt() {
-		System.runAs(TestUsers.admin()) {
-			Assert.isFalse(NightlyJobs.adoptOldSchedules(), 'The org\'s real jobs are left alone');
 		}
 	}
 

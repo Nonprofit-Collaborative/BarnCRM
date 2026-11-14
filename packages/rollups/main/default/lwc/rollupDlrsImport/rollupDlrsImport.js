@@ -5,29 +5,30 @@ import importRollups from '@salesforce/apex/RollupDlrsImport.importRollups';
 import compare from '@salesforce/apex/RollupDlrsImport.compare';
 import turnOn from '@salesforce/apex/RollupDlrsImport.turnOn';
 
-import TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
-import STEP_CHOOSE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepChoose';
+import TITLE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportTitle';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import STEP_CHOOSE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStepChoose';
 import STEP_REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
-import STEP_COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepCompare';
-import STEP_TURN_ON from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepTurnOn';
-import CAN_COPY from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCanCopy';
-import STAYS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStays';
-import FILLS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFills';
-import COPY from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCopy';
+import STEP_COMPARE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStepCompare';
+import STEP_TURN_ON from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStepTurnOn';
+import CAN_COPY from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportCanCopy';
+import STAYS from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportStays';
+import FILLS from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportFills';
+import COPY from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportCopy';
 import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import BACK from '@salesforce/label/c.Core_Kit_Back';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
-import COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
+import COMPARE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportCompare';
 import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
-import ACTIVE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportActive';
+import ACTIVE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportActive';
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
-import VALUE_NOW from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueNow';
-import VALUE_BARN from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueBarn';
+import VALUE_NOW from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportValueNow';
+import VALUE_BARN from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportValueBarn';
 import RESULT from '@salesforce/label/c.Core_Find_Result';
-import SAME from '@salesforce/label/c.Core_RollupBuilder_DlrsImportSame';
-import NPSP_TITLE from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
-import CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
+import SAME from '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportSame';
+import NPSP_TITLE from '@salesforce/label/c.Rollups_RollupBuilder_NpspImportTitle';
+import CONFIRM_TITLE from '@salesforce/label/c.Rollups_RollupBuilder_DlrsConfirmTitle';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CHOOSE_STEP = 'choose';
@@ -71,6 +72,7 @@ export default class RollupDlrsImport extends LightningElement {
 
   labels = {
     npsp: false,
+    loading: LOADING,
     get title() {
       return this.npsp ? NPSP_TITLE : TITLE;
     },

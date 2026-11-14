@@ -1,28 +1,20 @@
 /**
- * A run of the Gift Transaction mirror (feature X-07, R-GT6), as the person who started or
- * scheduled it, in chunks. It copies every gift of R-GT3 that has no Gift Transaction yet, and
+ * A run of the Gift Transaction mirror (feature X-07, R-GT6), in the shape `MirrorRunBatch` gives
+ * both gift mirrors' runs. It copies every gift of R-GT3 that has no Gift Transaction yet, and
  * every linked one changed since the last completed run started, or, from the reconciliation
- * page, every gift of R-GT3 dated in a range.
+ * page, every gift of R-GT3 dated in a range. Refusals are written when the run ends (R-GT7).
  *
- * Refusals are gathered across the chunks and written when the run ends, one Warning per distinct
- * reason, with a summary at Info (R-GT7).
- *
- * A run does nothing, and says so in one entry, while the mirror is unavailable (R-GT1), while its
- * paid status or start date is missing or unknown (R-GT2), while the person running it lacks the
- * access it needs, or while automation is paused or the Gift Transaction mirror is switched off on
- * the Automation page. The pause and the switch are checked again for each chunk, and so is the
- * headroom a chunk needs. A run that is not a range records when it started and its summary on
- * Mirror Settings, for the page, for Health Check, and as the point from which the next run
- * rechecks linked gifts changed since.
+ * Besides a pause or the switch, a run does nothing, and says so in one Warning, while the mirror
+ * is unavailable (R-GT1), while its paid status or start date is missing or unknown (R-GT2), or
+ * while the person running it lacks the access it needs. Each chunk also checks the headroom it
+ * needs. A run that left or failed a gift is not recorded.
  */
-public with sharing class GiftTransactionMirrorBatch implements Database.Batchable<SObject>, Database.Stateful {
+public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 	public static final String CLASS_NAME = 'GiftTransactionMirrorBatch';
 	/** Nonprofit Cloud's own fundraising automation runs on each chunk. */
 	@TestVisible
 	private static final Integer CHUNK_SIZE = 100;
 	public static final String LOG_CONTEXT = 'Gift Transaction mirror: run';
-	// Core's constant for this severity is not namespace accessible, so its value is repeated.
-	private static final String SEVERITY_INFO = 'Info';
 
 	/**
 	 * What one chunk costs at most: four reads (the linked records, the designations already
@@ -34,21 +26,13 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 	private static final Decimal CPU_SHARE_NEEDED = 0.4;
 	private static final Decimal LIMIT_SHARE_NEEDED = 0.5;
 
-	private final Date fromDate;
-	private final Date toDate;
 	@TestVisible
 	private final GiftTransactionMirrorService.Result totals = new GiftTransactionMirrorService.Result();
-	private Datetime startedAt;
-	/** Why chunks were left, when automation was paused or switched off during the run. */
-	private String skipReason;
-	private Boolean skippedAtStart = false;
-	private String skipSeverity = SEVERITY_INFO;
 	private Boolean noHeadroom = false;
 
 	@TestVisible
 	private GiftTransactionMirrorBatch(Date fromDate, Date toDate) {
-		this.fromDate = fromDate;
-		this.toDate = toDate;
+		super(fromDate, toDate);
 	}
 
 	/** Starts a run and returns its job id, or null when the mirror is off. */
@@ -56,27 +40,47 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 		if (!GiftTransactionMirrorService.isOn()) {
 			return null;
 		}
-		return Database.executeBatch(new GiftTransactionMirrorBatch(null, null), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new GiftTransactionMirrorBatch(null, null),
+			CHUNK_SIZE,
+			'GiftTransactionMirrorBatch'
+		);
 	}
 
 	/** Copies again every gift of R-GT3 dated in the range. */
 	public static Id runRange(Date fromDate, Date toDate) {
-		return Database.executeBatch(new GiftTransactionMirrorBatch(fromDate, toDate), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new GiftTransactionMirrorBatch(fromDate, toDate),
+			CHUNK_SIZE,
+			'GiftTransactionMirrorBatch'
+		);
 	}
 
-	/** Why a chunk must not work now, or null when it may. */
-	private static String pauseReason() {
-		if (AutomationControl.isPaused()) {
-			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunPaused');
-		}
-		if (!AutomationControl.isEnabled(GiftTransactionMirrorService.AUTOMATION_NAME)) {
-			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunSwitchedOff');
-		}
-		return null;
+	protected override String automationName() {
+		return GiftTransactionMirrorService.AUTOMATION_NAME;
 	}
 
-	/** Why the run cannot copy anything at all, or null when it can. */
-	private String notReadyReason() {
+	protected override String logContext() {
+		return LOG_CONTEXT;
+	}
+
+	protected override String pausedText() {
+		return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunPaused');
+	}
+
+	protected override String switchedOffText() {
+		return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunSwitchedOff');
+	}
+
+	protected override MirrorSync.Result runTotals() {
+		return totals;
+	}
+
+	protected override Boolean stillOn() {
+		return GiftTransactionMirrorService.isOn();
+	}
+
+	protected override String notReadyReason() {
 		if (!GiftTransactionMirrorService.isAvailable()) {
 			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable');
 		}
@@ -92,17 +96,7 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 			  );
 	}
 
-	public Database.QueryLocator start(Database.BatchableContext context) {
-		startedAt = System.now();
-		skipReason = pauseReason();
-		if (skipReason == null) {
-			skipReason = notReadyReason();
-			skipSeverity = skipReason == null ? SEVERITY_INFO : ErrorLogger.SEVERITY_WARNING;
-		}
-		if (skipReason != null) {
-			skippedAtStart = true;
-			return nothing();
-		}
+	protected override Database.QueryLocator locator() {
 		Datetime lastRun = Mirror_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c;
 		return Database.getQueryLocatorWithBinds(
 			GiftTransactionMirrorSelector.giftsToCopyQuery(fromDate != null, lastRun != null),
@@ -118,18 +112,7 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 		);
 	}
 
-	private static Database.QueryLocator nothing() {
-		return Database.getQueryLocator([SELECT Id FROM Gift__c WHERE Id = NULL WITH USER_MODE]);
-	}
-
-	public void execute(Database.BatchableContext context, List<SObject> scope) {
-		// The direction may have changed since the run started; a run never works against it.
-		String reason = pauseReason();
-		if (reason != null || !GiftTransactionMirrorService.isOn()) {
-			totals.skipped += scope.size();
-			skipReason = skipReason == null ? reason : skipReason;
-			return;
-		}
+	protected override void work(List<SObject> scope) {
 		if (!hasHeadroom(scope.size())) {
 			totals.skipped += scope.size();
 			noHeadroom = true;
@@ -153,11 +136,7 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 		);
 	}
 
-	public void finish(Database.BatchableContext context) {
-		if (skippedAtStart) {
-			ErrorLogger.logMessage(skipReason, LOG_CONTEXT, skipSeverity);
-			return;
-		}
+	protected override String report() {
 		totals.writeRefusals();
 		if (noHeadroom) {
 			ErrorLogger.logMessage(
@@ -166,17 +145,19 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 				ErrorLogger.SEVERITY_WARNING
 			);
 		}
-		String summary = summaryOf(totals);
-		ErrorLogger.logMessage(
-			skipReason == null ? summary : summary + ' ' + skipReason,
-			LOG_CONTEXT,
-			SEVERITY_INFO
-		);
-		// A run that left or failed a gift is not recorded, so the next run reads that gift again
-		// (only gifts changed since the last recorded run are reread).
-		if (fromDate == null && skipReason == null && totals.skipped == 0 && totals.failed == 0) {
-			MirrorSettingsWriter.recordGiftTransactionMirrorRun(startedAt, summary);
-		}
+		return summaryOf(totals);
+	}
+
+	/**
+	 * A run that left or failed a gift is not recorded, so the next run reads that gift again
+	 * (only gifts changed since the last recorded run are reread).
+	 */
+	protected override Boolean recorded() {
+		return totals.skipped == 0 && totals.failed == 0;
+	}
+
+	protected override void recordRun(Datetime startedAt, String summary) {
+		MirrorSettingsWriter.recordGiftTransactionMirrorRun(startedAt, summary);
 	}
 
 	/** The run's summary line, with its designation counts (R-GT5). */

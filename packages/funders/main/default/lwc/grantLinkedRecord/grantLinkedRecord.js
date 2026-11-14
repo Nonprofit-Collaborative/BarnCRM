@@ -1,4 +1,5 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { messageFrom } from 'c/findCsv';
 import getProgram from '@salesforce/apex/GrantProgramController.getProgram';
@@ -30,7 +31,6 @@ const KINDS = {
     icon: 'custom:custom88',
     dataId: 'program',
     title: () => PROGRAM_TITLE,
-    load: (grantId) => getProgram({ grantId }),
     save: (grantId, id) => setProgram({ grantId, programId: id }),
     idOf: (card) => card.programId,
     nameOf: (card) => card.programName,
@@ -46,7 +46,6 @@ const KINDS = {
     icon: 'custom:custom42',
     dataId: 'fund',
     title: (card) => (card && card.title) || '',
-    load: (grantId) => getFund({ grantId }),
     save: (grantId, id) => setFund({ grantId, fundId: id }),
     idOf: (card) => card.fundId,
     nameOf: (card) => card.fundName,
@@ -80,6 +79,7 @@ export default class GrantLinkedRecord extends LightningElement {
   errorMessage;
   isLoading = true;
   isSaving = false;
+  wiredCard;
 
   get config() {
     return KINDS[this.kind] || KINDS.Program;
@@ -111,21 +111,46 @@ export default class GrantLinkedRecord extends LightningElement {
         this.helpReady = true;
       });
     }
-    this.load();
   }
 
-  async load() {
-    this.isLoading = true;
-    try {
-      this.card = await this.config.load(this.recordId);
+  // Cached reads (D-200 P11). Only the wire for this card's kind gets a grant id, so only it runs.
+  get programGrantId() {
+    return this.config === KINDS.Program ? this.recordId : undefined;
+  }
+
+  get fundGrantId() {
+    return this.config === KINDS.Fund ? this.recordId : undefined;
+  }
+
+  @wire(getProgram, { grantId: '$programGrantId' })
+  receiveProgram(result) {
+    this.receive(result);
+  }
+
+  @wire(getFund, { grantId: '$fundGrantId' })
+  receiveFund(result) {
+    this.receive(result);
+  }
+
+  receive(result) {
+    const { data, error } = result;
+    if (data) {
+      this.wiredCard = result;
+      this.card = data;
       this.value = this.savedId;
       this.errorMessage = undefined;
-    } catch (error) {
+    } else if (error) {
+      this.wiredCard = result;
       this.card = undefined;
       this.errorMessage = messageOf(error);
-    } finally {
+    }
+    if (data || error) {
       this.isLoading = false;
     }
+  }
+
+  load() {
+    return refreshApex(this.wiredCard);
   }
 
   get notInstalled() {

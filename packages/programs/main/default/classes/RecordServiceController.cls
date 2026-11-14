@@ -8,6 +8,12 @@
  */
 public with sharing class RecordServiceController {
 	private static final String CONTEXT = 'Record Service action';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Programs',
+			'Programs_Fail_RecordService'
+		)
+		.showingDml();
 	private static final String PERSON_ACCOUNT_FILTER_FIELD = 'IsPersonAccount'; // detection-only: a record picker filter field, sent only after isPersonAccountOrg found person accounts
 	/** The most services the form offers when opened from a person. */
 	public static final Integer MAX_SERVICES = 200;
@@ -84,7 +90,7 @@ public with sharing class RecordServiceController {
 			addAttendance(form);
 			return form;
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -124,7 +130,7 @@ public with sharing class RecordServiceController {
 			Database.insert(delivery, AccessLevel.USER_MODE);
 			return delivery.Id;
 		} catch (Exception failure) {
-			throw report(failure, personId);
+			throw ERRORS.wrap(failure, CONTEXT, personId);
 		}
 	}
 
@@ -173,17 +179,5 @@ public with sharing class RecordServiceController {
 
 	private static String failed() {
 		return BarnHelp.text('Programs', 'Programs_Fail_RecordService');
-	}
-
-	/** A refusal is passed on in its own words; anything else is logged first. */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(failed());
 	}
 }

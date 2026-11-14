@@ -6,7 +6,7 @@ A **Backup Set** is a saved [Find](find.md) query that you can save to a file wh
 copy of its records: before a big cleanup, before a bulk update, or as a monthly habit. Each run
 saves every record the query returns, with every field you can see, as a CSV file in your
 **Files**. The files are the same kind [Archive by Query](archive-by-query.md) writes, so you can
-put values back later with **Load one object** on the Import tab.
+put values back later with **Load one object** on the **Super Importer** tab.
 
 Nothing is deleted. A Backup Set only reads records and writes files you own.
 

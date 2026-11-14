@@ -1,0 +1,356 @@
+{
+  "module": "Memberships",
+  "countLabel": "Memberships",
+  "count": {
+    "object": "Membership_Term__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Membership_Level__c",
+      "records": [
+        {
+          "key": "individual",
+          "Name": "Individual Member",
+          "Type__c": "Individual",
+          "Tier__c": 1,
+          "Dues__c": 45,
+          "Term_Months__c": 12,
+          "Grace_Days__c": 30,
+          "Active__c": true,
+          "Description__c": "One person, one year. Includes the newsletter and member pricing on events.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "family",
+          "Name": "Family Member",
+          "Type__c": "Household",
+          "Tier__c": 2,
+          "Dues__c": 75,
+          "Term_Months__c": 12,
+          "Grace_Days__c": 30,
+          "Active__c": true,
+          "Description__c": "Everyone in one household, one year.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "supporter",
+          "Name": "Supporter",
+          "Type__c": "Individual",
+          "Tier__c": 3,
+          "Dues__c": 150,
+          "Term_Months__c": 12,
+          "Grace_Days__c": 45,
+          "Active__c": true,
+          "Description__c": "A higher level for members who want to give more. The extra goes to the community fund.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "business",
+          "Name": "Business Member",
+          "Type__c": "Organization",
+          "Tier__c": 4,
+          "Dues__c": 300,
+          "Term_Months__c": 12,
+          "Grace_Days__c": 30,
+          "Active__c": true,
+          "Description__c": "A local business or club, one year, with a listing in the member directory.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "lifetime",
+          "Name": "Lifetime Member",
+          "Type__c": "Individual",
+          "Tier__c": 5,
+          "Dues__c": 1000,
+          "Term_Months__c": 0,
+          "Grace_Days__c": 0,
+          "Active__c": true,
+          "Description__c": "Paid once. A term with no end date never lapses.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Membership_Benefit__c",
+      "records": [
+        {
+          "Level__c": { "ref": "individual" },
+          "Description__c": "Monthly newsletter",
+          "Sort_Order__c": 1
+        },
+        {
+          "Level__c": { "ref": "individual" },
+          "Description__c": "Member pricing on events",
+          "Sort_Order__c": 2
+        },
+        {
+          "Level__c": { "ref": "family" },
+          "Description__c": "Monthly newsletter",
+          "Sort_Order__c": 1
+        },
+        {
+          "Level__c": { "ref": "family" },
+          "Description__c": "Member pricing on events",
+          "Sort_Order__c": 2
+        },
+        {
+          "Level__c": { "ref": "family" },
+          "Description__c": "Free admission to the harvest festival",
+          "Quantity__c": 4,
+          "Sort_Order__c": 3
+        },
+        {
+          "Level__c": { "ref": "supporter" },
+          "Description__c": "Monthly newsletter",
+          "Sort_Order__c": 1
+        },
+        {
+          "Level__c": { "ref": "supporter" },
+          "Description__c": "Member pricing on events",
+          "Sort_Order__c": 2
+        },
+        {
+          "Level__c": { "ref": "supporter" },
+          "Description__c": "Guest passes to member events",
+          "Quantity__c": 2,
+          "Sort_Order__c": 3
+        },
+        {
+          "Level__c": { "ref": "business" },
+          "Description__c": "Listing in the member directory",
+          "Sort_Order__c": 1
+        },
+        {
+          "Level__c": { "ref": "business" },
+          "Description__c": "Logo on the annual report",
+          "Sort_Order__c": 2
+        },
+        {
+          "Level__c": { "ref": "lifetime" },
+          "Description__c": "Every member benefit, for life",
+          "Sort_Order__c": 1
+        }
+      ]
+    },
+    {
+      "object": "Membership_Term__c",
+      "records": [
+        {
+          "key": "harper-last",
+          "Level__c": { "ref": "family" },
+          "Contact__c": { "sample": "H001-1" },
+          "Account__c": { "sample": "H001", "optional": true },
+          "Status__c": "Renewed",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -16 },
+          "End_Date__c": { "months": -4, "days": -1 },
+          "Member_Since__c": { "months": -16 },
+          "Amount_Paid__c": 75,
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Membership_Term__c",
+      "records": [
+        {
+          "key": "harper",
+          "Level__c": { "ref": "family" },
+          "Contact__c": { "sample": "H001-1" },
+          "Account__c": { "sample": "H001", "optional": true },
+          "Previous_Term__c": { "ref": "harper-last" },
+          "Status__c": "Current",
+          "Origin__c": "Renewal",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -4 },
+          "End_Date__c": { "months": 8, "days": -1 },
+          "Member_Since__c": { "months": -16 },
+          "Amount_Paid__c": 75,
+          "Directory_Opt_In__c": true,
+          "Directory_Location__c": "Riverside",
+          "Directory_Bio__c": "Gardeners and volunteers since the first harvest festival.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "gabriel",
+          "Level__c": { "ref": "individual" },
+          "Contact__c": { "sample": "H003-1" },
+          "Status__c": "Current",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -7 },
+          "End_Date__c": { "months": 5, "days": -1 },
+          "Member_Since__c": { "months": -7 },
+          "Amount_Paid__c": 45,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "priya",
+          "Level__c": { "ref": "individual" },
+          "Contact__c": { "sample": "H004-1" },
+          "Status__c": "Current",
+          "Origin__c": "Renewal",
+          "Source__c": "Online Payment",
+          "Start_Date__c": { "months": -12, "days": 20 },
+          "End_Date__c": { "days": 20 },
+          "Member_Since__c": { "months": -36 },
+          "Amount_Paid__c": 45,
+          "Notes__c": "Due for renewal in about three weeks.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "mateo",
+          "Level__c": { "ref": "family" },
+          "Contact__c": { "sample": "H005-1" },
+          "Account__c": { "sample": "H005", "optional": true },
+          "Status__c": "Current",
+          "Origin__c": "Renewal",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -12, "days": 10 },
+          "End_Date__c": { "days": 10 },
+          "Member_Since__c": { "months": -24 },
+          "Amount_Paid__c": 75,
+          "Notes__c": "Due for renewal in ten days.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "camila",
+          "Level__c": { "ref": "family" },
+          "Contact__c": { "sample": "H006-1" },
+          "Account__c": { "sample": "H006", "optional": true },
+          "Status__c": "Grace",
+          "Origin__c": "Renewal",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -12, "days": -10 },
+          "End_Date__c": { "days": -10 },
+          "Member_Since__c": { "months": -48 },
+          "Amount_Paid__c": 75,
+          "Notes__c": "Past the end date, inside the grace period.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "susan",
+          "Level__c": { "ref": "individual" },
+          "Contact__c": { "sample": "H007-1" },
+          "Status__c": "Lapsed",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -15 },
+          "End_Date__c": { "months": -3, "days": -1 },
+          "Member_Since__c": { "months": -15 },
+          "Amount_Paid__c": 45,
+          "Notes__c": "Lapsed. A rejoin starts a new term.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "rosa",
+          "Level__c": { "ref": "supporter" },
+          "Contact__c": { "sample": "H009-1" },
+          "Status__c": "Current",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -2 },
+          "End_Date__c": { "months": 10, "days": -1 },
+          "Member_Since__c": { "months": -2 },
+          "Amount_Paid__c": 150,
+          "Directory_Opt_In__c": true,
+          "Directory_Location__c": "Northgate",
+          "Directory_Bio__c": "Happy to help new members find their way around.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "emma",
+          "Level__c": { "ref": "lifetime" },
+          "Contact__c": { "sample": "H010-1" },
+          "Status__c": "Current",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -30 },
+          "Member_Since__c": { "months": -30 },
+          "Amount_Paid__c": 1000,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "wei",
+          "Level__c": { "ref": "individual" },
+          "Contact__c": { "sample": "H013-2" },
+          "Status__c": "Pending",
+          "Origin__c": "New",
+          "Source__c": "Online Payment",
+          "Start_Date__c": { "days": 0 },
+          "Notes__c": "Applied online. Becomes Current when the payment arrives.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "olivia",
+          "Level__c": { "ref": "individual" },
+          "Contact__c": { "sample": "H014-3" },
+          "Status__c": "Cancelled",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -5 },
+          "End_Date__c": { "months": 7, "days": -1 },
+          "Member_Since__c": { "months": -5 },
+          "Amount_Paid__c": 45,
+          "Notes__c": "Cancelled at the member's request.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "bayview",
+          "Level__c": { "ref": "business" },
+          "Account__c": { "sample": "O001" },
+          "Status__c": "Current",
+          "Origin__c": "Renewal",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -9 },
+          "End_Date__c": { "months": 3, "days": -1 },
+          "Member_Since__c": { "months": -33 },
+          "Amount_Paid__c": 300,
+          "Directory_Opt_In__c": true,
+          "Directory_Location__c": "Bayview",
+          "Directory_Bio__c": "Your neighborhood hardware store.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "rotary",
+          "Level__c": { "ref": "business" },
+          "Account__c": { "sample": "O007" },
+          "Status__c": "Current",
+          "Origin__c": "Renewal",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -12, "days": 25 },
+          "End_Date__c": { "days": 25 },
+          "Member_Since__c": { "months": -60 },
+          "Amount_Paid__c": 300,
+          "Notes__c": "Due for renewal in about a month.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "church",
+          "Level__c": { "ref": "business" },
+          "Account__c": { "sample": "O011" },
+          "Status__c": "Lapsed",
+          "Origin__c": "New",
+          "Source__c": "Staff",
+          "Start_Date__c": { "months": -18 },
+          "End_Date__c": { "months": -6, "days": -1 },
+          "Member_Since__c": { "months": -18 },
+          "Amount_Paid__c": 300,
+          "Sample_Data__c": true
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Membership_Term__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Membership_Level__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

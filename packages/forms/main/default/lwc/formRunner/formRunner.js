@@ -1,5 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import FORM_OBJECT from '@salesforce/schema/Form__c';
 import getPublishedForms from '@salesforce/apex/FormRunnerController.getPublishedForms';
 import getForm from '@salesforce/apex/FormRunnerController.getForm';
 import submit from '@salesforce/apex/FormRunnerController.submit';
@@ -73,7 +74,7 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
   }
 
   get onFormPage() {
-    return this.objectApiName === 'Form__c';
+    return this.objectApiName === FORM_OBJECT.objectApiName;
   }
 
   /** The form to open at once: the one set, or the form whose page this is. */

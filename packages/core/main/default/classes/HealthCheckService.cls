@@ -84,6 +84,7 @@ public with sharing class HealthCheckService {
 	public static final String FIX_KEY_RESTORE_IMPORT_TEMPLATES = 'restoreImportTemplates';
 	public static final String FIX_KEY_SCHEDULE_NIGHTLY_JOBS = 'scheduleNightlyJobs';
 	public static final String FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS = 'rescheduleInactiveOwnerJobs';
+	public static final String FIX_KEY_FILL_MATCH_KEYS = 'fillMatchKeys';
 
 	/**
 	 * What a finding puts between the job names it lists. A job name can hold a comma
@@ -122,6 +123,9 @@ public with sharing class HealthCheckService {
 		}
 		if (FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS.equals(fixKey)) {
 			return ScheduledJobSelector.namesOwnedByInactiveUsers();
+		}
+		if (FIX_KEY_FILL_MATCH_KEYS.equals(fixKey)) {
+			return AddressMatchKeyHandler.unfilledScope();
 		}
 		if (ModuleSetups.FIX_KEY.equals(fixKey)) {
 			return ModuleSetups.pendingLabels();
@@ -162,8 +166,6 @@ public with sharing class HealthCheckService {
 	 * The developer names of the packaged permission set groups (the roles the Access page
 	 * assigns) that mean "this person uses BarnCRM", and the permission set that means
 	 * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
-	 * Coordinator (`Volunteer_Coordinator`) is retired (`AccessService.RETIRED_ROLES`) but still
-	 * counts while anyone holds it, until the next release removes it.
 	 */
 	public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
 	public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';
@@ -171,7 +173,6 @@ public with sharing class HealthCheckService {
 		GROUP_ADMIN,
 		'Fundraising_Staff',
 		'Program_Staff',
-		'Volunteer_Coordinator',
 		'Read_Only'
 	};
 
@@ -205,6 +206,18 @@ public with sharing class HealthCheckService {
 
 	@TestVisible
 	private static Exception loggerFault;
+
+	/**
+	 * Past these, the remaining checks are left for another run (D-200 P7): about 80 of the
+	 * 100 queries, 7 of the 10 seconds of CPU, 40,000 of the 50,000 query rows. A test
+	 * lowers them.
+	 */
+	@TestVisible
+	private static Integer queryBudget = 80;
+	@TestVisible
+	private static Integer cpuBudget = 7000;
+	@TestVisible
+	private static Integer rowBudget = 40000;
 
 	/**
 	 * Where the two access counts come from. Injected in tests so that the findings are
@@ -427,8 +440,13 @@ public with sharing class HealthCheckService {
 	@NamespaceAccessible
 	public static List<Finding> run() {
 		List<Finding> findings = new List<Finding>();
+		List<String> skipped = new List<String>();
 
 		for (CheckStep step : steps()) {
+			if (!skipped.isEmpty() || nearLimits()) {
+				skipped.add(step.key);
+				continue;
+			}
 			try {
 				Finding finding = step.check.run();
 				if (finding != null) {
@@ -439,9 +457,137 @@ public with sharing class HealthCheckService {
 			}
 		}
 
-		findings.addAll(extensionFindings());
+		findings.addAll(extensionFindings(skipped));
+		if (!skipped.isEmpty()) {
+			findings.add(notChecked(skipped));
+		}
 
 		return findings;
+	}
+
+	/**
+	 * Whether the run has used so much of this transaction's limits that the next check could
+	 * hit one. A limit exception cannot be caught, so it would lose the whole report rather
+	 * than one finding (D-200 P7). Public so an extension can stop between its own checks.
+	 */
+	@NamespaceAccessible
+	public static Boolean nearLimits() {
+		return Limits.getQueries() > queryBudget ||
+			Limits.getCpuTime() > cpuBudget ||
+			Limits.getQueryRows() > rowBudget;
+	}
+
+	/** One finding naming, as an administrator reads them, the checks left for another run. */
+	private static Finding notChecked(List<String> keys) {
+		Map<String, String> labels = stepLabels();
+		List<String> names = new List<String>();
+		for (String key : keys) {
+			names.add(labels.containsKey(key) ? labels.get(key) : extensionLabel(key));
+		}
+		return new Finding(
+			'not_checked',
+			BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedTitle'),
+			String.format(
+				BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedDetail'),
+				new List<Object>{ keys.size(), String.join(names, ', ') }
+			),
+			SEVERITY_WARNING,
+			CATEGORY_SETTINGS
+		);
+	}
+
+	/** Each of Core's own check steps by the name an administrator reads, keyed by step key. */
+	private static Map<String, String> stepLabels() {
+		return new Map<String, String>{
+			'org_shape' => BarnHelp.text('Core', 'Core_HealthCheck_Step_OrgShape'),
+			'coexistence_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_CoexistenceMode'),
+			'membership_mode' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipMode'),
+			'membership_data' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MembershipData'),
+			'household_creation' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_HouseholdCreation'
+			),
+			'npsp_upkeep_overlap' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_NpspUpkeepOverlap'
+			),
+			'native_households' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NativeHouseholds'),
+			'native_household_collision' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_NativeHouseholdCollision'
+			),
+			'mirror_module' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MirrorModule'),
+			'brand_visibility' => BarnHelp.text('Core', 'Core_HealthCheck_Step_BrandVisibility'),
+			'multi_currency' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MultiCurrency'),
+			'admin_role' => BarnHelp.text('Core', 'Core_HealthCheck_Step_AdminRole'),
+			'users_without_access' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_UsersWithoutAccess'
+			),
+			'access_checks_need_admin' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_AccessChecks'
+			),
+			'automation' => BarnHelp.text('Core', 'Core_HealthCheck_Step_Automation'),
+			'field_history' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FieldHistory'),
+			'fiscal_year' => BarnHelp.text('Core', 'Core_HealthCheck_Step_FiscalYear'),
+			'organization_record_type' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_OrganizationRecordType'
+			),
+			'error_log' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorLog'),
+			'error_digest' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ErrorDigest'),
+			'people_without_household' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_PeopleWithoutHousehold'
+			),
+			'households_without_members' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_HouseholdsWithoutMembers'
+			),
+			'household_ownership_skew' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_HouseholdOwnershipSkew'
+			),
+			'relationships_without_person' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_RelationshipsWithoutPerson'
+			),
+			'affiliations_without_person' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_AffiliationsWithoutPerson'
+			),
+			'automation_switches' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_AutomationSwitches'
+			),
+			'import_templates' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ImportTemplates'),
+			'nightly_jobs' => BarnHelp.text('Core', 'Core_HealthCheck_Step_NightlyJobs'),
+			'jobs_inactive_owner' => BarnHelp.text(
+				'Core',
+				'Core_HealthCheck_Step_JobsInactiveOwner'
+			),
+			'module_setup' => BarnHelp.text('Core', 'Core_HealthCheck_Step_ModuleSetup'),
+			'match_keys' => BarnHelp.text('Core', 'Core_HealthCheck_Step_MatchKeys')
+		};
+	}
+
+	/**
+	 * A module extension's checks by the module's name (`addressverification_extension` reads
+	 * "Address Verification module checks"), found from the class it is registered under. A key
+	 * that is neither is shown as it is.
+	 */
+	private static String extensionLabel(String key) {
+		for (String className : HealthCheckExtensions.EXTENSION_CLASSES) {
+			String module = className.removeEnd('HealthCheckExtension');
+			if ((module.toLowerCase() + '_extension').equals(key)) {
+				return String.format(
+					BarnHelp.text('Core', 'Core_HealthCheck_Step_Extension'),
+					new List<Object>{ String.join(module.splitByCharacterTypeCamelCase(), ' ') }
+				);
+			}
+		}
+		return key;
 	}
 
 	/**
@@ -450,10 +596,14 @@ public with sharing class HealthCheckService {
 	 * stands, and the failure is written to the Error Log rather than shown as this package's
 	 * own answer.
 	 */
-	private static List<Finding> extensionFindings() {
+	private static List<Finding> extensionFindings(List<String> skipped) {
 		List<Finding> all = new List<Finding>();
 		Map<String, HealthCheckExtension> byKey = HealthCheckExtensions.findAll();
 		for (String key : byKey.keySet()) {
+			if (!skipped.isEmpty() || nearLimits()) {
+				skipped.add(key);
+				continue;
+			}
 			try {
 				List<Finding> extra = byKey.get(key).findings();
 				if (extra != null) {
@@ -573,6 +723,12 @@ public with sharing class HealthCheckService {
 			);
 			steps.add(
 				new CheckStep(
+					'household_ownership_skew',
+					new HealthCheckSkew.HouseholdOwnershipCheck()
+				)
+			);
+			steps.add(
+				new CheckStep(
 					'relationships_without_person',
 					new HealthCheckHouseholdChecks.RelationshipsWithoutPersonCheck()
 				)
@@ -606,6 +762,7 @@ public with sharing class HealthCheckService {
 			);
 			// A package copied in by hand, whose setup never ran (FS1).
 			steps.add(new CheckStep('module_setup', new ModuleSetups.SetupCheck()));
+			steps.add(new CheckStep('match_keys', new AddressMatchKeyHandler.FilledCheck()));
 			// The rollup checks are the Rollup Builder module's (RollupsHealthCheckExtension,
 			// ADR-0125), asked with the other extensions after these.
 		}

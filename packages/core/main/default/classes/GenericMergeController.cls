@@ -4,6 +4,12 @@
  * Manage BarnCRM Settings, as auto-merge does, and the Merge Records setting on.
  */
 public with sharing class GenericMergeController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_Duplicates_ErrorUnexpected'
+	);
+
 	private static final Integer MAX_SHOWN = 20;
 
 	/** One recent merge, as the list shows it. */
@@ -43,7 +49,7 @@ public with sharing class GenericMergeController {
 			DuplicateController.requirePermission();
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Merge records panel');
+			throw ERRORS.wrap(caught, 'Merge records panel');
 		}
 	}
 
@@ -57,7 +63,7 @@ public with sharing class GenericMergeController {
 			DuplicateController.requirePermission();
 			return GenericMergeService.compare(objectName, firstId, secondId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Compare two records');
+			throw ERRORS.wrap(caught, 'Compare two records');
 		}
 	}
 
@@ -114,7 +120,7 @@ public with sharing class GenericMergeController {
 			AutoMergeService.undo(journals);
 			return currentView();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Undo a merge');
+			throw ERRORS.wrap(caught, 'Undo a merge');
 		}
 	}
 
@@ -166,14 +172,5 @@ public with sharing class GenericMergeController {
 			view.merges.add(row);
 		}
 		return view;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof DuplicateService.DuplicateException,
-			context,
-			BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected')
-		);
 	}
 }

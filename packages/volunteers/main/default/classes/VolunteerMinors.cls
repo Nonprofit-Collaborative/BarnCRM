@@ -131,13 +131,11 @@ public inherited sharing class VolunteerMinors {
 			);
 		}
 		Integer made = 0;
-		for (Database.SaveResult result : Database.insert(steps, false, AccessLevel.SYSTEM_MODE)) {
-			if (result.isSuccess()) {
-				made++;
-			} else {
-				ErrorLogger.logMessage(result.getErrors()[0].getMessage(), LOG_CONTEXT, 'Warning');
-			}
+		List<Database.SaveResult> results = Database.insert(steps, false, AccessLevel.SYSTEM_MODE);
+		for (Database.SaveResult result : results) {
+			made += result.isSuccess() ? 1 : 0;
 		}
+		ErrorLogger.logFailures(results, null, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		return made;
 	}
 

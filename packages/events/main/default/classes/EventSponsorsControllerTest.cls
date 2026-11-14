@@ -8,11 +8,11 @@
 private class EventSponsorsControllerTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c conference(String name) {
@@ -41,7 +41,7 @@ private class EventSponsorsControllerTest {
 	}
 
 	private static Account organization(String name) {
-		Account record = new Account(Name = name);
+		Account record = TestDataFactory.organization(new Account(Name = name));
 		insert as user record;
 		return record;
 	}

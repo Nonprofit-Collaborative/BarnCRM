@@ -1,11 +1,16 @@
 /**
  * The org's own PayPal account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Orders with an approve link, PayPal's own webhook verification, and capture of an approved
- * order. Every callout here runs before any write of the transaction it is in.
+ * order; subscriptions on one shared product and shared plans (ADR-0218
+ * `0218-payments-subscriptions.md`, amended for D-198). Every callout here runs before any write
+ * of the transaction it is in; the one write here, a new shared product's id, follows the last.
  */
 public with sharing class PaymentPayPal {
 	public static final String LIVE_BASE = 'https://api-m.paypal.com';
 	public static final String TEST_BASE = 'https://api-m.sandbox.paypal.com';
+	/** Where a payer changes the funding source of their automatic payments (Update Card). */
+	public static final String AUTOPAY = 'https://www.paypal.com/myaccount/autopay/';
+	public static final String AUTOPAY_TEST = 'https://www.sandbox.paypal.com/myaccount/autopay/';
 	/** The headers PayPal signs an event with, kept on the event for verification. */
 	public static final List<String> HEADERS = new List<String>{
 		'paypal-auth-algo',
@@ -14,7 +19,21 @@ public with sharing class PaymentPayPal {
 		'paypal-transmission-sig',
 		'paypal-transmission-time'
 	};
+	/** The event types `read` acts on: the receiver stores no other. Kept beside its switch. */
+	public static final Set<String> EVENT_TYPES = new Set<String>{
+		'CHECKOUT.ORDER.APPROVED',
+		'PAYMENT.CAPTURE.COMPLETED',
+		'PAYMENT.SALE.COMPLETED',
+		'BILLING.SUBSCRIPTION.PAYMENT.FAILED',
+		'BILLING.SUBSCRIPTION.CANCELLED',
+		'PAYMENT.CAPTURE.DENIED',
+		'PAYMENT.CAPTURE.DECLINED',
+		'PAYMENT.CAPTURE.REFUNDED',
+		'PAYMENT.CAPTURE.REVERSED'
+	};
 	private static final String CONTEXT = 'PaymentPayPal';
+	private static final String PLANS = '/v1/billing/plans';
+	private static final String SUBSCRIPTIONS = '/v1/billing/subscriptions';
 	/** One access token per transaction. */
 	private static String token;
 
@@ -22,11 +41,30 @@ public with sharing class PaymentPayPal {
 		return PaymentService.mode() == PaymentService.LIVE ? LIVE_BASE : TEST_BASE;
 	}
 
-	/** Creates the Order and sets its id and approve link on the payment. */
-	public static void startCheckout(Payment__c payment, String successUrl, String cancelUrl) {
+	/**
+	 * Creates the Order, or with an interval the payer's subscription on a shared plan
+	 * (R-PAY7), and sets its id and approve link on the payment.
+	 */
+	public static void startCheckout(
+		Payment__c payment,
+		String successUrl,
+		String cancelUrl,
+		String interval,
+		Integer intervalCount
+	) {
 		String value = PaymentService.noDecimals(payment.Currency_Code__c)
 			? String.valueOf(payment.Amount__c.setScale(0))
 			: String.valueOf(payment.Amount__c.setScale(2));
+		String ref = payment.Reference__c;
+		if (interval != null) {
+			subscribe(
+				payment,
+				new Terms(payment, value, interval.toUpperCase(), intervalCount),
+				successUrl,
+				cancelUrl
+			);
+			return;
+		}
 		Map<String, Object> order = new Map<String, Object>{
 			'intent' => 'CAPTURE',
 			'purchase_units' => new List<Object>{
@@ -51,11 +89,173 @@ public with sharing class PaymentPayPal {
 				}
 			}
 		};
-		HttpResponse response = send(
-			'/v2/checkout/orders',
-			JSON.serialize(order),
-			payment.Reference__c
-		);
+		approve(payment, send('/v2/checkout/orders', JSON.serialize(order), ref));
+	}
+
+	/**
+	 * The payer's own subscription on the shared plan for this mode, currency, amount and interval
+	 * (R-PAY7, D-198): the plan of the newest payment with the same key, else a new one, which this
+	 * payment then carries. A remembered plan or product PayPal refuses (missing, inactive, another
+	 * account) is replaced once. PayPal-Request-Id is keyed by the plan key, so checkouts at the
+	 * same moment make one plan. Every callout comes first; the product id is written last.
+	 */
+	private static void subscribe(
+		Payment__c payment,
+		Terms plan,
+		String successUrl,
+		String cancelUrl
+	) {
+		String ref = payment.Reference__c;
+		String planId = new PlanReader().latest(plan.key);
+		Boolean remembered = planId != null;
+		HttpResponse answer = remembered
+			? send(SUBSCRIPTIONS, plan.subscription(planId, ref, successUrl, cancelUrl), ref)
+			: null;
+		Payment_Keys__c keys = PaymentService.keys();
+		String product = keys.PayPal_Product_Id__c;
+		if (answer == null || refused(answer)) {
+			String fresh = remembered ? '-' + ref : '';
+			HttpResponse made = product == null
+				? null
+				: send(PLANS, plan.body(product), 'plan-' + plan.key + '-' + product + fresh);
+			if (made == null || refused(made)) {
+				// No product yet, or one this account does not have (new keys, the other mode).
+				product = idOf(
+					send(
+						'/v1/catalogs/products',
+						JSON.serialize(
+							new Map<String, Object>{
+								'name' => BarnHelp.text(
+										'Payments',
+										'Payments_PayPal_ProductName',
+										new List<Object>{ UserInfo.getOrganizationName() }
+									)
+									.abbreviate(127),
+								'type' => 'SERVICE'
+							}
+						),
+						'product-' + PaymentService.mode() + (product == null ? '' : '-' + ref)
+					)
+				);
+				made = send(PLANS, plan.body(product), 'plan-' + plan.key + '-' + product + fresh);
+			}
+			planId = idOf(made);
+			answer = send(
+				SUBSCRIPTIONS,
+				plan.subscription(planId, ref, successUrl, cancelUrl),
+				remembered ? ref + '-2' : ref
+			);
+		}
+		approve(payment, answer);
+		payment.Subscription_Id__c = payment.Checkout_Id__c;
+		payment.Plan_Key__c = plan.key;
+		payment.Plan_Id__c = planId;
+		if (product != null && !product.equals(keys.PayPal_Product_Id__c)) {
+			keys.PayPal_Product_Id__c = product;
+			update as system keys;
+		}
+	}
+
+	/** PayPal refused the request itself (4xx), as for a plan or product it does not have. */
+	private static Boolean refused(HttpResponse response) {
+		return response.getStatusCode() >= 400 && response.getStatusCode() < 500;
+	}
+
+	/** What a shared PayPal billing plan charges (R-PAY7): its key and the bodies that use it. */
+	private class Terms {
+		String key;
+		String currencyCode;
+		String value;
+		String unit;
+		Integer every;
+
+		Terms(Payment__c payment, String value, String unit, Integer every) {
+			this.currencyCode = payment.Currency_Code__c;
+			this.value = value;
+			this.unit = unit;
+			this.every = every;
+			key = String.join(
+				new List<Object>{ PaymentService.mode(), currencyCode, value, unit, every },
+				':'
+			);
+		}
+
+		String body(String product) {
+			String period = unit.toLowerCase();
+			return JSON.serialize(
+				new Map<String, Object>{
+					'product_id' => product,
+					'name' => BarnHelp.text(
+						'Payments',
+						'Payments_PayPal_PlanName',
+						new List<Object>{
+							value,
+							currencyCode,
+							every == 1 ? period : String.valueOf(every) + ' ' + period + 's'
+						}
+					),
+					'billing_cycles' => new List<Object>{
+						new Map<String, Object>{
+							'frequency' => new Map<String, Object>{
+								'interval_unit' => unit,
+								'interval_count' => every
+							},
+							'tenure_type' => 'REGULAR',
+							'sequence' => 1,
+							'total_cycles' => 0,
+							'pricing_scheme' => new Map<String, Object>{
+								'fixed_price' => new Map<String, Object>{
+									'value' => value,
+									'currency_code' => currencyCode
+								}
+							}
+						}
+					},
+					'payment_preferences' => new Map<String, Object>{
+						'payment_failure_threshold' => 3
+					}
+				}
+			);
+		}
+
+		String subscription(String planId, String ref, String successUrl, String cancelUrl) {
+			return JSON.serialize(
+				new Map<String, Object>{
+					'plan_id' => planId,
+					'custom_id' => ref,
+					'application_context' => new Map<String, Object>{
+						'return_url' => successUrl,
+						'cancel_url' => cancelUrl,
+						'user_action' => 'SUBSCRIBE_NOW',
+						'shipping_preference' => 'NO_SHIPPING'
+					}
+				}
+			);
+		}
+	}
+
+	/**
+	 * Reads a shared plan's id past sharing: a donor page's guest or a portal person starts
+	 * checkouts and can see no other payment. One Plan Id by its key, nothing else (R-PAY7).
+	 */
+	private without sharing class PlanReader {
+		String latest(String key) {
+			for (Payment__c first : [
+				SELECT Plan_Id__c
+				FROM Payment__c
+				WHERE Plan_Key__c = :key AND Plan_Id__c != NULL
+				WITH SYSTEM_MODE
+				ORDER BY CreatedDate DESC, Id DESC
+				LIMIT 1
+			]) {
+				return first.Plan_Id__c;
+			}
+			return null;
+		}
+	}
+
+	/** Sets the order's or subscription's id and approve link on the payment, or refuses. */
+	private static void approve(Payment__c payment, HttpResponse response) {
 		Map<String, Object> body = PaymentStripe.parse(response.getBody());
 		String link;
 		for (
@@ -69,20 +269,33 @@ public with sharing class PaymentPayPal {
 			}
 		}
 		if (response.getStatusCode() > 201 || link == null) {
-			ErrorLogger.logMessage(
-				'PayPal answered ' +
-					response.getStatusCode() +
-					': ' +
-					response.getBody().abbreviate(200),
-				CONTEXT + '.startCheckout',
-				ErrorLogger.SEVERITY_ERROR
-			);
-			throw PaymentService.problem(
-				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ 'PayPal' })
-			);
+			refuse(response);
 		}
 		payment.Checkout_Id__c = PaymentStripe.text(body.get('id'));
 		payment.Checkout_Url__c = link;
+	}
+
+	/** The id PayPal gave a created product or plan, or refuses. */
+	private static String idOf(HttpResponse response) {
+		String id = PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('id'));
+		if (id == null) {
+			refuse(response);
+		}
+		return id;
+	}
+
+	private static void refuse(HttpResponse response) {
+		ErrorLogger.logMessage(
+			'PayPal answered ' +
+				response.getStatusCode() +
+				': ' +
+				response.getBody().abbreviate(200),
+			CONTEXT + '.startCheckout',
+			ErrorLogger.SEVERITY_ERROR
+		);
+		throw PaymentService.problem(
+			BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ 'PayPal' })
+		);
 	}
 
 	/**
@@ -102,6 +315,7 @@ public with sharing class PaymentPayPal {
 		Map<String, Object> resource = PaymentStripe.mapOf(body.get('resource'));
 		PaymentService.Change change = new PaymentService.Change();
 		change.reference = PaymentStripe.text(resource.get('custom_id'));
+		// Every type handled here is in EVENT_TYPES, which the receiver stores by.
 		switch on PaymentStripe.text(body.get('event_type')) {
 			when 'CHECKOUT.ORDER.APPROVED' {
 				List<Object> units = resource.get('purchase_units') instanceof List<Object>
@@ -116,6 +330,30 @@ public with sharing class PaymentPayPal {
 			when 'PAYMENT.CAPTURE.COMPLETED' {
 				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
 				change.status = PaymentService.PAID;
+			}
+			when 'PAYMENT.SALE.COMPLETED' {
+				// A subscription's charge (R-PAY6): the sale names its subscription and reference.
+				change.subscriptionId = PaymentStripe.text(resource.get('billing_agreement_id'));
+				if (change.subscriptionId == null) {
+					return outcome;
+				}
+				change.reference = PaymentStripe.text(resource.get('custom'));
+				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
+				change.amount = SettingsService.toNumber(
+					PaymentStripe.mapOf(resource.get('amount')).get('total')
+				);
+				change.status = PaymentService.PAID;
+				change.subscriptionEvent = PaymentService.CHARGE_SUCCEEDED;
+			}
+			when 'BILLING.SUBSCRIPTION.PAYMENT.FAILED' {
+				change.subscriptionId = PaymentStripe.text(resource.get('id'));
+				change.subscriptionEvent = PaymentService.CHARGE_FAILED;
+				change.detail = BarnHelp.text('Payments', 'Payments_Detail_ChargeFailed');
+			}
+			when 'BILLING.SUBSCRIPTION.CANCELLED' {
+				change.subscriptionId = PaymentStripe.text(resource.get('id'));
+				change.subscriptionEvent = PaymentService.SUBSCRIPTION_CANCELLED;
+				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Cancelled');
 			}
 			when 'PAYMENT.CAPTURE.DENIED', 'PAYMENT.CAPTURE.DECLINED' {
 				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
@@ -132,7 +370,7 @@ public with sharing class PaymentPayPal {
 				if (total.isEmpty()) {
 					total = PaymentStripe.mapOf(resource.get('amount'));
 				}
-				change.amountRefunded = decimalOf(total.get('value'));
+				change.amountRefunded = SettingsService.toNumber(total.get('value'));
 				change.processorPaymentId = refundedCapture(resource);
 				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Refunded');
 			}
@@ -278,13 +516,5 @@ public with sharing class PaymentPayPal {
 			}
 		}
 		return null;
-	}
-
-	private static Decimal decimalOf(Object value) {
-		try {
-			return value == null ? null : Decimal.valueOf(String.valueOf(value));
-		} catch (Exception notANumber) {
-			return null;
-		}
 	}
 }

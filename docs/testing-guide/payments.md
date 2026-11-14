@@ -120,3 +120,49 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | 2 | As the Read Only user, the same. | The same. |
 
 **Cleanup:** None.
+
+## T-PAY-09: Automatic Recurring Payments With Stripe
+
+**Purpose:** confirm a subscription's first payment, a renewal, a failed charge, a card update and a cancellation (PAY-04, D-196).
+**Prerequisites:** admin; T-PAY-03's Stripe webhook with `invoice.paid`, `invoice.payment_failed` and `customer.subscription.deleted` added; **Automatic Recurring Payments** on in BarnCRM Settings, Payments.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Run the snippet with `'interval' => 'month', 'intervalCount' => 1` added. Open the `checkoutUrl`. | Stripe's page says the amount is charged monthly. |
+| 2 | Pay with `4242 4242 4242 4242` and process. | The payment is **Paid** with a **Subscription Id** (`sub_...`) and a **Processor Payment Id**. Payment Events shows `checkout.session.completed` and `invoice.paid` **Applied**. |
+| 3 | In Stripe, open the subscription and use a test clock (or **Update subscription**, **Reset billing cycle**) to bill the next period; process. | A second **Paid** payment for 25.00 with the same Subscription Id and its own Reference. |
+| 4 | In Execute Anonymous: `System.debug(api.call('updateCard', new Map<String, Object>{ 'subscriptionId' => '<sub id>', 'customerId' => '<cus id from Stripe>', 'returnUrl' => 'https://example.org/thanks' }));` Open the `url`. | Stripe's page asks for a card and charges nothing. |
+| 5 | Enter `4000 0000 0000 0341` (attaches, then fails when charged), expiry 12/34; process. | In Stripe the subscription's default payment method is the new card. Payment Events shows `checkout.session.completed` **Applied**. |
+| 6 | Bill the next period again; process. | No new payment; Payment Events shows `invoice.payment_failed` **Applied**. |
+| 7 | Run with `'subscriptionId' => 'I-NOTSTRIPE'` and no customer. | A `url` on `paypal.com/myaccount/autopay` (sandbox in Test mode). |
+| 8 | Cancel the subscription in Stripe; process. | Payment Events shows `customer.subscription.deleted` **Applied**; no payment changes. |
+| 9 | Turn **Automatic Recurring Payments** off and repeat step 1. | A one-off checkout: Stripe's page shows no "monthly". |
+
+**Cleanup:** turn Automatic Recurring Payments off.
+
+## T-PAY-10: Automatic Recurring Payments With PayPal
+
+**Purpose:** confirm a PayPal subscription's approval, first payment and renewals (PAY-04).
+**Prerequisites:** admin; T-PAY-06's PayPal webhook with **Payment sale completed**, **Billing subscription payment failed** and **Billing subscription cancelled** added; Automatic Recurring Payments on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Run the snippet with `'processor' => 'PayPal', 'interval' => 'month', 'intervalCount' => 1`. | A `checkoutUrl` on `sandbox.paypal.com`; the payment's **Subscription Id** and **Checkout Id** are the same `I-...`. |
+| 2 | Open it, sign in as the sandbox buyer and agree to the subscription; process. | The payment is **Paid**; Payment Events shows `PAYMENT.SALE.COMPLETED` **Applied**. |
+| 3 | In the sandbox merchant account, cancel the subscription; process. | `BILLING.SUBSCRIPTION.CANCELLED` **Applied**; no payment changes. |
+
+**Cleanup:** turn Automatic Recurring Payments off.
+
+## T-PAY-11: PayPal Payers Share One Plan
+
+**Purpose:** confirm that PayPal subscriptions reuse one product and one plan per amount and schedule, while each payer keeps a subscription of their own (D-198).
+**Prerequisites:** T-PAY-10's setup; Automatic Recurring Payments on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Run the snippet twice with `'processor' => 'PayPal', 'interval' => 'month', 'intervalCount' => 1` (amount 25), the second time with `'payerEmail' => 'tester2@example.org'`. Open each payment. | Two payments with the same **Plan Id** (`P-...`) and two different **Subscription Id** values (`I-...`). In the PayPal sandbox merchant account, **Subscriptions**, **Plans** shows one plan, "25.00 USD every month". |
+| 2 | Open each `checkoutUrl`, agree as the sandbox buyer, and process. | Each payment is **Paid** by its own `PAYMENT.SALE.COMPLETED` event. |
+| 3 | Run the snippet again with `'amount' => 30` and the same interval. | A third payment with a new **Plan Id**; PayPal shows a second plan, "30.00 USD every month", under the same product. |
+| 4 | In PayPal, deactivate the 25.00 plan, then repeat step 1 once. | The checkout still starts. The new payment has a new **Plan Id**, and the next 25.00 monthly checkout uses that new plan. |
+
+**Cleanup:** cancel the sandbox subscriptions; turn Automatic Recurring Payments off.

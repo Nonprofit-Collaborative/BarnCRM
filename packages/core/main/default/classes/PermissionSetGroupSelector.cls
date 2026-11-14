@@ -30,13 +30,7 @@ public with sharing class PermissionSetGroupSelector {
 		if (developerNames == null || developerNames.isEmpty()) {
 			return new List<PermissionSetGroup>();
 		}
-		return [
-			SELECT Id, DeveloperName, MasterLabel, Description, Status
-			FROM PermissionSetGroup
-			WHERE DeveloperName IN :developerNames
-			WITH USER_MODE
-			ORDER BY MasterLabel
-		];
+		return SetupObjectSelector.permissionSetGroups(developerNames).values();
 	}
 
 	/**
@@ -56,14 +50,15 @@ public with sharing class PermissionSetGroupSelector {
 		if (systemModeOverride != null) {
 			return systemModeOverride;
 		}
-		List<PermissionSetGroup> groups = [
-			SELECT Id, DeveloperName, MasterLabel, Description, Status
-			FROM PermissionSetGroup
-			WHERE DeveloperName = :developerName
-			WITH SYSTEM_MODE
-			LIMIT 1
-		];
-		return groups.isEmpty() ? null : groups[0];
+		for (
+			PermissionSetGroup found : SetupObjectSelector.permissionSetGroups(
+					new Set<String>{ developerName }
+				)
+				.values()
+		) {
+			return found;
+		}
+		return null;
 	}
 
 	/**

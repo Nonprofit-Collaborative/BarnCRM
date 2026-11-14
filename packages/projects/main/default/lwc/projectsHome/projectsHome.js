@@ -5,6 +5,7 @@ import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTemplate';
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
+import applyRates from '@salesforce/apex/ProjectsController.applyRates';
 import { fileName, localIsoDate, messageFrom, toCsv } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -77,8 +78,43 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
       noTime: helpText('Projects', 'Projects_Home_NoTime'),
       exportTitle: helpText('Projects', 'Projects_Export_Title'),
       includeExported: helpText('Projects', 'Projects_Export_Include'),
-      exportButton: helpText('Projects', 'Projects_Export_Button')
+      exportButton: helpText('Projects', 'Projects_Export_Button'),
+      applyRates: helpText('Projects', 'Projects_Rates_Apply'),
+      firstRunHeading: helpText('Projects', 'Projects_Home_FirstRunHeading'),
+      firstRunMessage: helpText('Projects', 'Projects_Home_FirstRunMessage'),
+      firstRunStart: helpText('Projects', 'Projects_Home_FirstRunStart')
     };
+  }
+
+  /** True before the org's first project, for someone who may create one (D-200 R4). */
+  get firstRun() {
+    return this.home?.firstRun === true;
+  }
+
+  /** The first-run action: the New Project From Template form is on this page, so go to it. */
+  handleStartFirst() {
+    const template = this.template.querySelector('[data-id="template"]');
+    if (template) {
+      template.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+      template.focus();
+    }
+  }
+
+  get ratesEnabled() {
+    return this.home?.ratesEnabled === true;
+  }
+
+  async handleApplyRates() {
+    this.isWorking = true;
+    try {
+      const count = await applyRates();
+      this.notice = helpText('Projects', 'Projects_Rates_Applied', count);
+      this.errorMessage = undefined;
+    } catch (error) {
+      this.errorMessage = messageFrom(error);
+    } finally {
+      this.isWorking = false;
+    }
   }
 
   get canManage() {
@@ -96,9 +132,8 @@ export default class ProjectsHome extends NavigationMixin(LightningElement) {
   get tasks() {
     return (this.home?.myTasks || []).map((row) => ({
       ...row,
-      href: `/lightning/r/${row.Id}/view`,
-      projectHref: `/lightning/r/${row.Project__c}/view`,
-      projectName: row.Project__r?.Name
+      href: `/lightning/r/${row.id}/view`,
+      projectHref: `/lightning/r/${row.projectId}/view`
     }));
   }
 

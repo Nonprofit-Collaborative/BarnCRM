@@ -81,6 +81,9 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 		public void execute(QueueableContext context) {
 			List<Payment_Event__c> batch = waiting(PER_RUN + 1);
 			List<PaymentService.Outcome> outcomes = new List<PaymentService.Outcome>();
+			// Logged after the last callout: the Error Log's direct-insert fallback is DML, and DML
+			// before a callout in the same transaction is refused.
+			Map<Id, Exception> readFailures = new Map<Id, Exception>();
 			Long started = System.currentTimeMillis();
 			Boolean more = batch.size() > PER_RUN;
 			for (Integer i = 0; i < Math.min(PER_RUN, batch.size()); i++) {
@@ -100,9 +103,9 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 							: PaymentStripe.read(event)
 					);
 				} catch (CalloutException e) {
-					ErrorLogger.log(e, CONTEXT + '.read', event.Id);
+					readFailures.put(event.Id, e);
 				} catch (Exception e) {
-					ErrorLogger.log(e, CONTEXT + '.read', event.Id);
+					readFailures.put(event.Id, e);
 					outcomes.add(
 						new PaymentService.Outcome(event)
 							.nothing(
@@ -115,6 +118,9 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 							)
 					);
 				}
+			}
+			for (Id eventId : readFailures.keySet()) {
+				ErrorLogger.log(readFailures.get(eventId), CONTEXT + '.read', eventId);
 			}
 			if (outcomes.isEmpty()) {
 				// Every read failed in transport: the next scheduled run tries again.

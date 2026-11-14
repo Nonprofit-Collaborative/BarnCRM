@@ -1,0 +1,621 @@
+{
+  "module": "Projects",
+  "countLabel": "Projects",
+  "count": {
+    "object": "Project__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Project__c",
+      "records": [
+        {
+          "key": "caseMgmt",
+          "Name": "Client Intake Implementation",
+          "Type__c": "Salesforce Implementation",
+          "Status__c": "Active",
+          "Health__c": "On Track",
+          "Billing_Type__c": "Time and Materials",
+          "Hourly_Rate__c": 150,
+          "Budget_Hours__c": 300,
+          "Budget_Amount__c": 45000,
+          "Start_Date__c": { "days": -60 },
+          "Target_Date__c": { "days": 45 },
+          "Account__c": { "sample": "O006", "optional": true },
+          "Description__c": "Set up case management for a foundation partner: intake, service plans and outcome reporting.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "volunteer",
+          "Name": "Volunteer Program Launch",
+          "Type__c": "Program",
+          "Status__c": "Active",
+          "Health__c": "At Risk",
+          "Health_Reasons__c": "The orientation date moved twice and two tasks are behind.",
+          "Billing_Type__c": "Fixed Fee",
+          "Budget_Hours__c": 120,
+          "Budget_Amount__c": 18000,
+          "Start_Date__c": { "days": -45 },
+          "Target_Date__c": { "days": 10 },
+          "Account__c": { "sample": "O010", "optional": true },
+          "Description__c": "Launch a volunteer program with a partner college: recruiting, orientation and a first shift calendar.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "website",
+          "Name": "Annual Report Website Refresh",
+          "Type__c": "Internal",
+          "Status__c": "Completed",
+          "Health__c": "On Track",
+          "Billing_Type__c": "Not Billed",
+          "Budget_Hours__c": 60,
+          "Start_Date__c": { "days": -120 },
+          "Target_Date__c": { "days": -25 },
+          "Completed_Date__c": { "days": -20 },
+          "Description__c": "Move the annual report to the website with a story page for each program.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "migration",
+          "Name": "Data Migration Planning",
+          "Type__c": "Client",
+          "Status__c": "Planned",
+          "Billing_Type__c": "Retainer",
+          "Retainer_Amount__c": 2500,
+          "Start_Date__c": { "days": 14 },
+          "Target_Date__c": { "days": 90 },
+          "Account__c": { "sample": "O002", "optional": true },
+          "Description__c": "Plan the move of a client's records from spreadsheets into BarnCRM.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Project_Phase__c",
+      "records": [
+        {
+          "key": "cmDiscover",
+          "Name": "Discovery",
+          "Project__c": { "ref": "caseMgmt" },
+          "Sort_Order__c": 1,
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -35 }
+        },
+        {
+          "key": "cmBuild",
+          "Name": "Build",
+          "Project__c": { "ref": "caseMgmt" },
+          "Sort_Order__c": 2,
+          "Start_Date__c": { "days": -34 },
+          "End_Date__c": { "days": 14 }
+        },
+        {
+          "key": "cmLaunch",
+          "Name": "Training and Launch",
+          "Project__c": { "ref": "caseMgmt" },
+          "Sort_Order__c": 3,
+          "Start_Date__c": { "days": 15 },
+          "End_Date__c": { "days": 45 }
+        },
+        {
+          "key": "vpPlan",
+          "Name": "Planning",
+          "Project__c": { "ref": "volunteer" },
+          "Sort_Order__c": 1,
+          "Start_Date__c": { "days": -45 },
+          "End_Date__c": { "days": -20 }
+        },
+        {
+          "key": "vpLaunch",
+          "Name": "Recruit and Launch",
+          "Project__c": { "ref": "volunteer" },
+          "Sort_Order__c": 2,
+          "Start_Date__c": { "days": -19 },
+          "End_Date__c": { "days": 10 }
+        },
+        {
+          "key": "webAll",
+          "Name": "Design and Publish",
+          "Project__c": { "ref": "website" },
+          "Sort_Order__c": 1,
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -25 }
+        }
+      ]
+    },
+    {
+      "object": "Project_Task__c",
+      "records": [
+        {
+          "key": "cmT1",
+          "Name": "Interview staff about intake",
+          "Project__c": { "ref": "caseMgmt" },
+          "Phase__c": { "ref": "cmDiscover" },
+          "Status__c": "Done",
+          "Assigned_To__c": { "currentUser": true },
+          "Sort_Order__c": 1,
+          "Estimated_Hours__c": 16,
+          "Start_Date__c": { "days": -60 },
+          "Due_Date__c": { "days": -50 },
+          "Completed_Date__c": { "days": -51 }
+        },
+        {
+          "key": "cmT2",
+          "Name": "Sign off requirements",
+          "Project__c": { "ref": "caseMgmt" },
+          "Phase__c": { "ref": "cmDiscover" },
+          "Status__c": "Done",
+          "Milestone__c": true,
+          "Assigned_To__c": { "currentUser": true },
+          "Sort_Order__c": 2,
+          "Due_Date__c": { "days": -35 },
+          "Completed_Date__c": { "days": -36 }
+        },
+        {
+          "key": "cmT3",
+          "Name": "Configure intake form and service plans",
+          "Project__c": { "ref": "caseMgmt" },
+          "Phase__c": { "ref": "cmBuild" },
+          "Status__c": "In Progress",
+          "Assigned_To__c": { "currentUser": true },
+          "Sort_Order__c": 3,
+          "Estimated_Hours__c": 60,
+          "Start_Date__c": { "days": -30 },
+          "Due_Date__c": { "days": 5 }
+        },
+        {
+          "key": "cmT4",
+          "Name": "Build outcome reports",
+          "Project__c": { "ref": "caseMgmt" },
+          "Phase__c": { "ref": "cmBuild" },
+          "Status__c": "Not Started",
+          "Sort_Order__c": 4,
+          "Estimated_Hours__c": 40,
+          "Start_Date__c": { "days": 6 },
+          "Due_Date__c": { "days": 14 }
+        },
+        {
+          "key": "cmT5",
+          "Name": "Train case managers",
+          "Project__c": { "ref": "caseMgmt" },
+          "Phase__c": { "ref": "cmLaunch" },
+          "Status__c": "Not Started",
+          "Sort_Order__c": 5,
+          "Estimated_Hours__c": 24,
+          "Start_Date__c": { "days": 20 },
+          "Due_Date__c": { "days": 35 }
+        },
+        {
+          "key": "cmT6",
+          "Name": "Go live",
+          "Project__c": { "ref": "caseMgmt" },
+          "Phase__c": { "ref": "cmLaunch" },
+          "Status__c": "Not Started",
+          "Milestone__c": true,
+          "Billing_Amount__c": 5000,
+          "Sort_Order__c": 6,
+          "Due_Date__c": { "days": 45 }
+        },
+        {
+          "key": "vpT1",
+          "Name": "Write volunteer role descriptions",
+          "Project__c": { "ref": "volunteer" },
+          "Phase__c": { "ref": "vpPlan" },
+          "Status__c": "Done",
+          "Assigned_To__c": { "currentUser": true },
+          "Sort_Order__c": 1,
+          "Estimated_Hours__c": 12,
+          "Due_Date__c": { "days": -30 },
+          "Completed_Date__c": { "days": -31 }
+        },
+        {
+          "key": "vpT2",
+          "Name": "Plan orientation session",
+          "Project__c": { "ref": "volunteer" },
+          "Phase__c": { "ref": "vpPlan" },
+          "Status__c": "Blocked",
+          "Assigned_To__c": { "currentUser": true },
+          "Sort_Order__c": 2,
+          "Estimated_Hours__c": 10,
+          "Due_Date__c": { "days": -8 }
+        },
+        {
+          "key": "vpT3",
+          "Name": "Recruit the first 20 volunteers",
+          "Project__c": { "ref": "volunteer" },
+          "Phase__c": { "ref": "vpLaunch" },
+          "Status__c": "In Progress",
+          "Assigned_To__c": { "currentUser": true },
+          "Sort_Order__c": 3,
+          "Estimated_Hours__c": 30,
+          "Due_Date__c": { "days": 3 }
+        },
+        {
+          "key": "vpT4",
+          "Name": "Volunteer program kickoff",
+          "Project__c": { "ref": "volunteer" },
+          "Phase__c": { "ref": "vpLaunch" },
+          "Status__c": "Not Started",
+          "Milestone__c": true,
+          "Billing_Amount__c": 9000,
+          "Sort_Order__c": 4,
+          "Due_Date__c": { "days": 10 }
+        },
+        {
+          "key": "webT1",
+          "Name": "Collect program stories",
+          "Project__c": { "ref": "website" },
+          "Phase__c": { "ref": "webAll" },
+          "Status__c": "Done",
+          "Sort_Order__c": 1,
+          "Estimated_Hours__c": 20,
+          "Due_Date__c": { "days": -80 },
+          "Completed_Date__c": { "days": -82 }
+        },
+        {
+          "key": "webT2",
+          "Name": "Publish the report page",
+          "Project__c": { "ref": "website" },
+          "Phase__c": { "ref": "webAll" },
+          "Status__c": "Done",
+          "Milestone__c": true,
+          "Sort_Order__c": 2,
+          "Due_Date__c": { "days": -25 },
+          "Completed_Date__c": { "days": -20 }
+        }
+      ]
+    },
+    {
+      "object": "Time_Entry__c",
+      "records": [
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Task__c": { "ref": "cmT1" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -55 },
+          "Hours__c": 6,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Intake interviews, first round"
+        },
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Task__c": { "ref": "cmT1" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -52 },
+          "Hours__c": 8,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Intake interviews, second round and notes"
+        },
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Task__c": { "ref": "cmT3" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -20 },
+          "Hours__c": 7.5,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Intake form fields and page layouts"
+        },
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Task__c": { "ref": "cmT3" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -9 },
+          "Hours__c": 6,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Submitted",
+          "Notes__c": "Service plan templates"
+        },
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Task__c": { "ref": "cmT3" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -2 },
+          "Hours__c": 4,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Open",
+          "Notes__c": "Validation rules for service plans"
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Task__c": { "ref": "vpT1" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -38 },
+          "Hours__c": 5,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Role descriptions drafted with the college"
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Task__c": { "ref": "vpT2" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -14 },
+          "Hours__c": 3.5,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Orientation outline and room booking"
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Task__c": { "ref": "vpT3" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -5 },
+          "Hours__c": 6,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Submitted",
+          "Notes__c": "Recruiting emails and campus table"
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Task__c": { "ref": "vpT3" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -1 },
+          "Hours__c": 2,
+          "Billable__c": true,
+          "Bill_Rate__c": 150,
+          "Cost_Rate__c": 70,
+          "Status__c": "Open",
+          "Notes__c": "Follow-up with interested volunteers"
+        },
+        {
+          "Project__c": { "ref": "website" },
+          "Task__c": { "ref": "webT1" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -85 },
+          "Hours__c": 8,
+          "Billable__c": false,
+          "Bill_Rate__c": 0,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Collecting stories from program staff"
+        },
+        {
+          "Project__c": { "ref": "website" },
+          "Task__c": { "ref": "webT2" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -22 },
+          "Hours__c": 7,
+          "Billable__c": false,
+          "Bill_Rate__c": 0,
+          "Cost_Rate__c": 70,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Notes__c": "Page build and launch checks"
+        }
+      ]
+    },
+    {
+      "object": "Project_Expense__c",
+      "records": [
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -40 },
+          "Category__c": "Software",
+          "Amount__c": 240,
+          "Billable__c": true,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Description__c": "Form builder subscription for the intake prototype"
+        },
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -33 },
+          "Category__c": "Travel",
+          "Amount__c": 86.5,
+          "Billable__c": true,
+          "Status__c": "Submitted",
+          "Description__c": "Train fare to the on-site workshop"
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "User__c": { "currentUser": true },
+          "Date__c": { "days": -12 },
+          "Category__c": "Supplies",
+          "Amount__c": 64.25,
+          "Billable__c": false,
+          "Status__c": "Approved",
+          "Approved_By__c": { "currentUser": true },
+          "Description__c": "Name tags and sign-in sheets for orientation"
+        }
+      ]
+    },
+    {
+      "object": "Project_Status_Update__c",
+      "records": [
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Report_Date__c": { "days": -30 },
+          "Health__c": "On Track",
+          "Percent_Complete__c": 20,
+          "Summary__c": "Discovery is done and requirements are signed off.",
+          "Accomplishments__c": "Interviewed six staff. Requirements approved by the director.",
+          "Next_Steps__c": "Start configuring the intake form.",
+          "Risks__c": "None yet."
+        },
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Report_Date__c": { "days": -3 },
+          "Health__c": "On Track",
+          "Percent_Complete__c": 40,
+          "Summary__c": "Build is on schedule.",
+          "Accomplishments__c": "Intake form and service plan templates are in review.",
+          "Next_Steps__c": "Finish validation rules, then start the outcome reports.",
+          "Risks__c": "Reviewers are slow to answer; a reminder goes out this week."
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Report_Date__c": { "days": -6 },
+          "Health__c": "At Risk",
+          "Percent_Complete__c": 35,
+          "Summary__c": "Recruiting started but orientation is blocked.",
+          "Accomplishments__c": "Role descriptions are final. Twelve people signed up to hear more.",
+          "Next_Steps__c": "Confirm a room with the college and send the orientation invitations.",
+          "Risks__c": "The orientation date moved twice and the kickoff is ten days out."
+        }
+      ]
+    },
+    {
+      "object": "Project_Assignment__c",
+      "records": [
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Resource__c": { "currentUser": true },
+          "Role__c": "Project Manager",
+          "Planned_Hours__c": 20,
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": 45 }
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Resource__c": { "currentUser": true },
+          "Role__c": "Program Designer",
+          "Planned_Hours__c": 8,
+          "Start_Date__c": { "days": -45 },
+          "End_Date__c": { "days": 10 }
+        }
+      ]
+    },
+    {
+      "object": "Project_Resource__c",
+      "records": [
+        {
+          "Name": "Project Manager",
+          "User__c": { "currentUser": true },
+          "Active__c": true,
+          "Default_Role__c": "Project Manager",
+          "Weekly_Capacity_Hours__c": 32,
+          "Skills__c": "Project Management;Business Analysis;Salesforce Administration",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Resource_Request__c",
+      "records": [
+        {
+          "Project__c": { "ref": "caseMgmt" },
+          "Role__c": "Salesforce Developer",
+          "Hours__c": 40,
+          "Start_Date__c": { "days": 6 },
+          "End_Date__c": { "days": 20 },
+          "Skills__c": "Salesforce Development;Integration",
+          "Status__c": "Open",
+          "Notes__c": "Help build the outcome reports."
+        },
+        {
+          "Project__c": { "ref": "volunteer" },
+          "Role__c": "Communications Coordinator",
+          "Hours__c": 12,
+          "Start_Date__c": { "days": 1 },
+          "End_Date__c": { "days": 8 },
+          "Skills__c": "Communications",
+          "Status__c": "Open",
+          "Notes__c": "Write the orientation invitations and a thank-you page."
+        }
+      ]
+    },
+    {
+      "object": "Project_Change_Request__c",
+      "whenSetting": { "object": "Projects_Settings__c", "field": "Change_Requests_Enabled__c" },
+      "records": [
+        {
+          "Name": "Add a referral tracking page",
+          "Project__c": { "ref": "caseMgmt" },
+          "Status__c": "Approved",
+          "Hours__c": 20,
+          "Amount__c": 3000,
+          "Description__c": "The partner asked to track outside referrals from the intake form."
+        },
+        {
+          "Name": "Add a bilingual intake form",
+          "Project__c": { "ref": "caseMgmt" },
+          "Status__c": "Submitted",
+          "Hours__c": 16,
+          "Amount__c": 2400,
+          "Description__c": "A Spanish version of the intake form, waiting on the partner's decision."
+        }
+      ]
+    },
+    {
+      "object": "Project_Request__c",
+      "whenSetting": { "object": "Projects_Settings__c", "field": "Requests_Enabled__c" },
+      "records": [
+        {
+          "Subject__c": "Intake form is slow to open on tablets",
+          "Type__c": "Problem",
+          "Priority__c": "High",
+          "Status__c": "In Progress",
+          "Category__c": "Technology",
+          "Channel__c": "Staff",
+          "Project__c": { "ref": "caseMgmt" },
+          "Description__c": "Staff report a long wait when the intake form opens on a tablet.",
+          "Sample_Data__c": true
+        },
+        {
+          "Subject__c": "Add the college logo to volunteer name tags",
+          "Type__c": "Service Request",
+          "Priority__c": "Low",
+          "Status__c": "New",
+          "Category__c": "General",
+          "Channel__c": "Staff",
+          "Project__c": { "ref": "volunteer" },
+          "Description__c": "The partner college would like its logo on the orientation name tags.",
+          "Sample_Data__c": true
+        },
+        {
+          "Subject__c": "How do I run the volunteer hours report?",
+          "Type__c": "Question",
+          "Priority__c": "Medium",
+          "Status__c": "Resolved",
+          "Category__c": "Data and Reports",
+          "Channel__c": "Staff",
+          "Resolution__c": "Open the Reports tab, choose Volunteer Hours, and set the date range.",
+          "Resolved_Date__c": { "days": -3, "time": "14:00" },
+          "Satisfaction__c": "Satisfied",
+          "Sample_Data__c": true
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Project_Request__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Project_Resource__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Project__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

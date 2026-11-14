@@ -157,6 +157,25 @@ private class VolunteerSampleDataTest {
 		Assert.areEqual(60, new VolunteersSampleData().countLoaded(), 'The card counts entries');
 		Assert.areEqual(24, [SELECT COUNT() FROM Volunteer_Skill__c]);
 		Assert.areEqual(8, [SELECT COUNT() FROM Volunteer_Requirement__c]);
+		Assert.areEqual(
+			22,
+			[
+				SELECT COUNT()
+				FROM Contact
+				WHERE
+					Sample_Data__c = TRUE
+					AND Volunteer_Status__c = 'Active'
+					AND Volunteer_Since__c != NULL
+					AND Availability_Days__c != NULL
+				WITH SYSTEM_MODE
+			],
+			'Every sample volunteer but two is Active, with a start date and free days'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Contact WHERE Volunteer_Status__c = 'Inactive' WITH SYSTEM_MODE],
+			'Two have stopped'
+		);
 	}
 
 	@IsTest

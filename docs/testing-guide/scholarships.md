@@ -18,6 +18,7 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the BarnCRM app. | Scholarships and Grants, Award Programs, Award Applications and Awards tabs, before Error Log. |
+| 1a | Before any award program exists, open **Scholarships and Grants** as admin. | **Set Up Your First Award Program** shows. **New Award Program** opens the new program form. After the first program is saved and the page reloaded, the panel is gone. |
 | 2 | Open Setup, reviewer A's permission set assignments. | Scholarships Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open BarnCRM Settings, Scholarships and Grants. | Send Scholarships reminders on, Days before to remind 14, Email recipients about reports off. |
 
@@ -121,6 +122,24 @@ two users with the Team Member role (reviewer A and reviewer B), and a public gr
 | 4 | On My Awards press **Accept Award** on an Offered award. | It shows Accepted. |
 | 5 | As admin set an application of the applicant to Ineligible. As the applicant press **Withdraw** on it. | "This application has been decided and cannot be withdrawn." Its status stays Ineligible. |
 | 6 | Delete a cycle after the applicant has its page open, then press **Apply** on it. | "This cycle is not taking applications." and no error page. |
+
+**Cleanup:** None.
+
+## T-SG-10: Sample Data
+
+**Purpose:** confirm the Scholarships sample data loads for the sample people and organizations and takes away only itself.
+
+**Prerequisites:** admin with Manage Scholarships; Core's sample data not yet loaded; one award program of your own with a cycle.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Scholarships** count of `2`. |
+| 2 | Open **Scholarships and Grants**, **Award Programs**. | Harvest Community Scholarship and Neighborhood Small Grants beside your own program. |
+| 3 | Open the Harvest Community Scholarship. | Cycles Last Spring (Decided) and This Fall (Open). |
+| 4 | Open **This Fall** applications. | Five applications: Draft, Submitted, Eligible, In Review (one scored, one assigned) and Ineligible with its eligibility note. |
+| 5 | Open **Last Spring** awards. | Three awards (Active, Completed, Accepted) with five disbursements (two Paid) and requirements; the Accepted award has an open Proof of Enrollment condition holding its first disbursement. |
+| 6 | Open **Neighborhood Round**. | Four organization applications, one with a recused review. |
+| 7 | **Remove Sample Data**. | Both sample programs and every cycle, application, review, award, disbursement and requirement under them are gone; your own program and cycle stay. |
 
 **Cleanup:** None.
 

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "key": "requests",
+  "title": "My Requests",
+  "requiresModules": ["Projects"],
+  "pages": [
+    {
+      "key": "requests",
+      "title": "My Requests",
+      "kind": "related",
+      "object": "Project_Request__c",
+      "personField": "Requester__c",
+      "fields": [
+        { "field": "Name", "label": "Number" },
+        { "field": "Subject__c", "label": "Subject", "edit": true, "required": true },
+        { "field": "Type__c", "label": "Type", "edit": true },
+        { "field": "Category__c", "label": "Category", "edit": true },
+        { "field": "Priority__c", "label": "Priority", "edit": true },
+        { "field": "Description__c", "label": "Details", "edit": true },
+        { "field": "Status__c", "label": "Status" },
+        { "field": "Due_Date__c", "label": "Due" },
+        { "field": "Resolution__c", "label": "Resolution" },
+        { "field": "Reply__c", "label": "Add a Reply", "edit": true },
+        { "field": "Satisfaction__c", "label": "Satisfied?", "edit": true }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 100,
+      "actions": ["create", "update"]
+    },
+    {
+      "key": "updates",
+      "title": "Updates",
+      "kind": "related",
+      "object": "Project_Request_Comment__c",
+      "personField": "Request__r.Requester__c",
+      "fields": [
+        { "field": "Request__r.Name", "label": "Request" },
+        { "field": "Request__r.Subject__c", "label": "Subject" },
+        { "field": "Body__c", "label": "Update" },
+        { "field": "CreatedDate", "label": "Date" }
+      ],
+      "where": [{ "field": "Shared__c", "op": "equals", "value": "true" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 100,
+      "actions": []
+    }
+  ]
+}

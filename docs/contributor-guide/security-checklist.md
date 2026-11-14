@@ -16,6 +16,8 @@ scanner false positives and design justifications for the submission are in
 | Zero High or Critical Code Analyzer findings (PMD, ESLint LWC rules, retire-js, Flow scanner) | `sf code-analyzer run --severity-threshold 2` in the workflow |
 | No dependency on objects a Platform-only org lacks | `scripts/ci/check-standard-objects.sh` |
 | Every test runs as a user it creates, so no test passes on access the runner happens to hold | `scripts/ci/check-tests-run-as.py` |
+| Zero High or Critical findings from the AppExchange rule selector and the Graph Engine (data flow: CRUD and FLS on every path, injection), every package, once per version | `scripts/org/release-gate.sh` (release gate) |
+| No FAIL from an OWASP ZAP baseline scan of the guest surfaces (Forms and Events public pages, Payments webhooks, Portal login), once per version on a test org's Site | `scripts/org/zap-baseline.sh` (release gate) |
 
 ## Manual checks
 
@@ -67,10 +69,40 @@ scanner false positives and design justifications for the submission are in
 
 ### 6. Callouts and external resources
 
-- [ ] No `Http` callouts, Named or External Credentials, Remote Site Settings or CSP Trusted
-  Sites. The only outbound traffic is `Messaging.sendEmail` (acknowledgments, digest) and
-  `Metadata.Operations.enqueueDeployment` (custom metadata manager, rollup triggers).
+Checked 2026-11-12 (D-200, N12). Every callout site, its endpoint and how it is allowed:
+
+| Site (`setEndpoint`) | Endpoint | Allowed by | Credential |
+|---|---|---|---|
+| `PaymentStripe.cls:96` | `https://api.stripe.com/v1/` | Remote Site `Barn_Stripe_Api` | Stripe secret key, `Authorization: Bearer` header |
+| `PaymentPayPal.cls:462`, `:482` | PayPal live or sandbox API | Remote Sites `Barn_PayPal_Api`, `Barn_PayPal_Sandbox_Api` | OAuth client credentials (client id and secret, Basic header) for a short-lived token |
+| `AddressVerifier.cls:242` | `https://us-street.api.smarty.com/street-address` | Remote Site `Barn_Smarty_Api` | Smarty auth id and token in the query string (Smarty's only server-side scheme) |
+| `AddressVerifier.cls:301` | `https://addressvalidation.googleapis.com/v1:validateAddress` | Remote Site `Barn_Google_Address_Api` | Google API key in the query string |
+| `GrantFinder.cls:66` | `https://api.grants.gov/v1/api/search2` | Remote Site `BarnCRM_Grants_Gov` | None (public API) |
+| `ImportNewFieldService.cls:350` | `callout:Barn_Org_Connection` (the org's own Metadata API) | Named credential over External Credential `Barn_Org_Connection` | The admin's own OAuth principal |
+| `OrgMetadataApi.cls:31`, `OrgToolingApi.cls:69` | The org's own Metadata and Tooling APIs | Same org | The running admin's session id (`UserInfo.getSessionId`), see below |
+
+- [ ] Every endpoint is a constant or the org's own domain; nothing builds a host from input.
+- [ ] Every response body is parsed, never logged; failures log the status code and our label.
+- [ ] Session id: `OrgMetadataApi`, `OrgToolingApi` and `ImportNewFieldService` send the
+  running user's session id to the org's own APIs only, never off the org, never stored or
+  logged, and only for admin tools (verify each caller's permission check at review). Say so in
+  the review submission; the reviewer's rule is that a session id never leaves Salesforce.
 - [ ] No third-party JavaScript. Static resources hold data (sample data JSON), not code.
+
+**Inbound endpoints (`@RestResource`).** All `global` because the platform requires it.
+
+| Class | URL mapping | Who calls it | Gate |
+|---|---|---|---|
+| `FormPublicRest` (forms) | `/barncrm/forms/v1/*` | An integration user (Portal Builder, off-platform pages) | Class access through a Forms permission set; the form's `ticket`; honeypot `trap` |
+| `PortalApi` (portal) | `/barncrm/portal/v1/*` | The portal's integration user | Class access; every route but sign-in needs the `X-Barn-Portal-Session` token |
+| `PaymentWebhookRest` (payments) | `/barncrm/payments/v1/*` | Stripe and PayPal, as the Site guest user (`Payments_Webhook_Guest`) | Stripe: `Stripe-Signature` HMAC verified with the webhook secret before anything is stored; PayPal: verified by a call back to PayPal. Stores one Payment Event in system mode, nothing else |
+| `InboundGiftResource` (mirror) | `/v1/gifts` | An integration user | Class access in the Inbound Gifts set, user-mode CRUD (open item below) |
+
+**Guest Sites.** BarnCRM ships no Site. `FormsSites` and `PaymentSites` only read the org's
+active Salesforce Sites (system mode, Experience Cloud left out, ADR-0009) for Health Check and
+the public links. The guest permission sets (`Forms_Public_Guest`, `Payments_Webhook_Guest`)
+grant class access to the public page or webhook and no object access; Health Check's fix
+assigns them to a chosen Site's guest user only.
 
 ### 7. LWC rendering
 
@@ -82,7 +114,14 @@ scanner false positives and design justifications for the submission are in
 
 ### 8. Secrets and debug output
 
-- [ ] No passwords, keys or tokens in source, custom metadata or custom settings.
+- [ ] No passwords, keys or tokens in source or custom metadata. Provider secrets live only
+  in the two Protected hierarchy custom settings, org defaults only: `Payment_Keys__c`
+  (`Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Secret__c`, plus the
+  PayPal client id) and `Address_Verification_Keys__c` (`Google_Api_Key__c`,
+  `Smarty_Auth_Token__c`). In a managed package a Protected setting is unreadable to the
+  subscriber's Apex and API; only the packages' own setup pages write them, and those pages
+  never send a stored secret back to the browser (at most its last four characters). Why not Named Credentials: see the
+  ADR on provider secrets (ADR-0220, `0220-provider-secrets-protected-settings.md`).
 - [ ] `System.debug` only as the last resort when logging itself fails, with the exception
   message and no record contents. No `console.*` in LWC.
 

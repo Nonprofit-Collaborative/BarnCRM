@@ -23,31 +23,39 @@ private class GivingSampleDataTest {
 
 	/** A household, two people and an organization, flagged and keyed as Core's loader leaves them. */
 	private static void insertSamplePeople() {
-		Account household = new Account(
-			Name = 'The Sample Family',
-			Sample_Data__c = true,
-			Sample_Data_Key__c = 'H001'
+		Account household = TestDataFactory.household(
+			new Account(
+				Name = 'The Sample Family',
+				Sample_Data__c = true,
+				Sample_Data_Key__c = 'H001'
+			)
 		);
-		Account organization = new Account(
-			Name = 'Cedar Valley Foundation',
-			Sample_Data__c = true,
-			Sample_Data_Key__c = ORGANIZATION_KEY
+		Account organization = TestDataFactory.organization(
+			new Account(
+				Name = 'Cedar Valley Foundation',
+				Sample_Data__c = true,
+				Sample_Data_Key__c = ORGANIZATION_KEY
+			)
 		);
 		insert new List<Account>{ household, organization };
 		insert new List<Contact>{
-			new Contact(
-				FirstName = 'Maria',
-				LastName = 'Sample',
-				AccountId = household.Id,
-				Sample_Data__c = true,
-				Sample_Data_Key__c = PERSON_KEY
+			TestDataFactory.person(
+				new Contact(
+					FirstName = 'Maria',
+					LastName = 'Sample',
+					AccountId = household.Id,
+					Sample_Data__c = true,
+					Sample_Data_Key__c = PERSON_KEY
+				)
 			),
-			new Contact(
-				FirstName = 'David',
-				LastName = 'Sample',
-				AccountId = household.Id,
-				Sample_Data__c = true,
-				Sample_Data_Key__c = SECOND_PERSON_KEY
+			TestDataFactory.person(
+				new Contact(
+					FirstName = 'David',
+					LastName = 'Sample',
+					AccountId = household.Id,
+					Sample_Data__c = true,
+					Sample_Data_Key__c = SECOND_PERSON_KEY
+				)
 			)
 		};
 	}
@@ -359,6 +367,94 @@ private class GivingSampleDataTest {
 				'Card charged twice at the gala.',
 				reversal.Refund_Reason__c,
 				'the reason is held on the negative gift rather than by editing the original'
+			);
+		}
+	}
+
+	/**
+	 * The test payload with a business matching the person's G0003 (G-10), and stock details
+	 * and a donor-advised fund on the organization's G0002.
+	 */
+	private static GivingSampleDataSet loadWithMatchAndDetails() {
+		Map<String, Object> root = (Map<String, Object>) JSON.deserializeUntyped(buildJson());
+		List<Object> gifts = (List<Object>) root.get('gifts');
+		Map<String, Object> stock = (Map<String, Object>) gifts[1];
+		stock.put('type', 'Stock');
+		stock.put('stockSymbol', 'EXMP');
+		stock.put('stockShares', 59.3472);
+		stock.put('giftSource', 'Donor-Advised Fund');
+		stock.put('giftSourceName', 'Example Charitable Giving Account');
+		Map<String, Object> match = gift('G0006', ORGANIZATION_KEY, 20, 75, 'Received');
+		match.put('matchedGift', 'G0003');
+		gifts.add(match);
+		GivingSampleDataSet data = GivingSampleDataSet.parse(JSON.serialize(root));
+		Map<String, Id> idsByKey = GivingSampleDataLoader.loadReferenceData(data);
+		for (Integer chunk = 0; chunk < data.chunkCount(); chunk++) {
+			GivingSampleDataLoader.loadGiftChunk(data, chunk, idsByKey);
+		}
+		return data;
+	}
+
+	@IsTest
+	static void testAMatchingGiftIsLinkedBothWaysAndStockDetailsLoad() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			insertSamplePeople();
+
+			Test.startTest();
+			loadWithMatchAndDetails();
+			Test.stopTest();
+
+			Gift__c employee = [
+				SELECT Id, Matched_Gift__c
+				FROM Gift__c
+				WHERE External_Id__c = 'SAMPLE-G0003'
+			];
+			Gift__c employer = [
+				SELECT Id, Matched_Gift__c
+				FROM Gift__c
+				WHERE External_Id__c = 'SAMPLE-G0006'
+			];
+			System.assertEquals(employee.Id, employer.Matched_Gift__c, 'the match names the gift');
+			System.assertEquals(
+				employer.Id,
+				employee.Matched_Gift__c,
+				'the matching rules wrote the other side of the link'
+			);
+			System.assertEquals(
+				1,
+				[SELECT COUNT() FROM Soft_Credit__c WHERE Gift__c = :employer.Id],
+				'the employee is credited on the match'
+			);
+			Gift__c stock = [
+				SELECT Stock_Symbol__c, Stock_Shares__c, Gift_Source__c, Gift_Source_Name__c
+				FROM Gift__c
+				WHERE External_Id__c = 'SAMPLE-G0002'
+			];
+			System.assertEquals('EXMP', stock.Stock_Symbol__c);
+			System.assertEquals(59.3472, stock.Stock_Shares__c);
+			System.assertEquals('Donor-Advised Fund', stock.Gift_Source__c);
+			System.assertEquals('Example Charitable Giving Account', stock.Gift_Source_Name__c);
+		}
+	}
+
+	@IsTest
+	static void testRemovalTakesTheMatchBeforeTheGiftItMatches() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			insertSamplePeople();
+			loadWithMatchAndDetails();
+
+			Test.startTest();
+			Integer removed;
+			do {
+				removed = GivingSampleDataLoader.removeNext();
+			} while (removed > 0);
+			Test.stopTest();
+
+			System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'both halves of the pair went');
+			System.assertEquals(
+				0,
+				[SELECT COUNT() FROM Soft_Credit__c],
+				'and the credit with them'
 			);
 		}
 	}

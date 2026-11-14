@@ -6,7 +6,7 @@ import buildSchedule from '@salesforce/apex/ScholarshipsController.buildSchedule
 import markPaid from '@salesforce/apex/ScholarshipsController.markPaid';
 import setRequirement from '@salesforce/apex/ScholarshipsController.setRequirement';
 import startRenewal from '@salesforce/apex/ScholarshipsController.startRenewal';
-import { messageFrom } from 'c/findCsv';
+import { localIsoDate, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PKG = 'Scholarships';
@@ -50,7 +50,7 @@ export default class AwardPanel extends LightningElement {
         this.helpReady = true;
       });
     }
-    this.firstDate = new Date().toISOString().slice(0, 10);
+    this.firstDate = localIsoDate();
     this.load();
   }
 
@@ -102,9 +102,9 @@ export default class AwardPanel extends LightningElement {
   get requirements() {
     return (this.panel?.requirements || []).map((r) => ({
       ...r,
-      href: `/lightning/r/${r.Id}/view`,
-      blocks: r.Disbursement__r ? r.Disbursement__r.Name : '',
-      isOpen: r.Status__c === 'Open' || r.Status__c === 'Submitted'
+      href: `/lightning/r/${r.id}/view`,
+      blocks: r.blocks || '',
+      isOpen: r.status === 'Open' || r.status === 'Submitted'
     }));
   }
 
@@ -184,7 +184,7 @@ export default class AwardPanel extends LightningElement {
 
   handleStartPaid(event) {
     this.payingId = event.target.dataset.rowId;
-    this.paidOn = new Date().toISOString().slice(0, 10);
+    this.paidOn = localIsoDate();
   }
 
   handlePaid() {

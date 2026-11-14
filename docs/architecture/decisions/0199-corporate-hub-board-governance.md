@@ -2,6 +2,10 @@
 
 **Status:** Accepted (builder decision; reversible calls listed under Consequences)
 **Date:** 2026-11-11
+**Amended 2026-11-12 (D-196, CH-21):** Close Voting still records Passed or Failed by For
+against Against, but when the meeting's Quorum Met is false it returns a warning and sets
+`Board_Motion__c.Closed_Without_Quorum__c`, which the meeting panel shows under the motion.
+Quorum never changes the outcome (canonical model R-MO1).
 **Source:** plan Section 5.8 (CH-09 to CH-20), Section 5.9 (PB-02), Section 6.0a releases 1.10,
 1.11, 1.14 and 1.17, D-118, D-156, D-178, D-186, D-187; builds on ADR-0196
 `0196-corporate-hub-module.md` (its extension points), ADR-0185 (Portal Builder), ADR-0191

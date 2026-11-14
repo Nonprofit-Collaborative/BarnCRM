@@ -132,25 +132,6 @@ private class CorePostInstallTest {
 	}
 
 	@IsTest
-	static void anUpgradeWithNoEditionSavesTheRecommendedOne() {
-		System.runAs(TestUsers.admin()) {
-			String recommended = SetupAssistantService.recommendedSuite();
-			String expected = recommended == null
-				? ModuleDetectionService.SUITE_STANDARD
-				: recommended;
-
-			new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
-
-			Assert.areEqual(
-				expected,
-				ModuleDetectionService.chosenSuite(),
-				'An upgraded org is not stopped by the first-run window'
-			);
-			Assert.isFalse(FirstRunController.getState().needsSetup, 'So the window never shows');
-		}
-	}
-
-	@IsTest
 	static void installAndSourceDeployStoreTheOrganizationRecordTypeAndNeverReplaceIt() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
@@ -197,48 +178,6 @@ private class CorePostInstallTest {
 			Assert.isNull(
 				ModuleDetectionService.chosenSuite(),
 				'A new install leaves the edition to first-run setup'
-			);
-		}
-	}
-
-	@IsTest
-	static void everyRunRenamesAnEditionStoredUnderItsOldValueOnce() {
-		System.runAs(TestUsers.admin()) {
-			SettingsService.saveSystemValue('Suite__c', 'Impact');
-			new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
-			SettingsService.clearCaches();
-			String fromImpact = BarnCRM_Settings__c.getOrgDefaults().Suite__c;
-			new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
-			SettingsService.clearCaches();
-			String rerun = BarnCRM_Settings__c.getOrgDefaults().Suite__c;
-			SettingsService.saveSystemValue('Suite__c', 'community');
-			CorePostInstall.runAsSourceDeploy();
-			SettingsService.clearCaches();
-			Set<String> loggedValues = new Set<String>();
-			for (Setting_Change__c change : [SELECT New_Value__c FROM Setting_Change__c]) {
-				loggedValues.add(change.New_Value__c);
-			}
-
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_NONPROFIT,
-				fromImpact,
-				'Impact is renamed'
-			);
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_NONPROFIT,
-				rerun,
-				'A second run changes nothing'
-			);
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_STANDARD,
-				BarnCRM_Settings__c.getOrgDefaults().Suite__c,
-				'Community is renamed by a source deploy too'
-			);
-			Assert.isTrue(loggedValues.contains('community'), 'The test setting itself was logged');
-			Assert.isFalse(
-				loggedValues.contains(ModuleDetectionService.SUITE_STANDARD) ||
-				loggedValues.contains(ModuleDetectionService.SUITE_NONPROFIT),
-				'Nobody changed the edition, so Recent Changes lists no rename'
 			);
 		}
 	}
@@ -419,14 +358,6 @@ private class CorePostInstallTest {
 		];
 	}
 
-	private static Integer oldSwapJobs() {
-		return [
-			SELECT COUNT()
-			FROM CronTrigger
-			WHERE CronJobDetail.Name = :SeasonalAddressScheduler.JOB_NAME
-		];
-	}
-
 	private static Integer allApexJobs() {
 		return [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.JobType = '7'];
 	}
@@ -488,43 +419,6 @@ private class CorePostInstallTest {
 			SettingsService.clearCaches();
 			Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'Off until an admin turns it on');
 			Assert.areEqual(0, swapJobs(), 'So nothing is scheduled');
-		}
-	}
-
-	@IsTest
-	static void anUpgradeTurnsTheSwitchOnForAnOrgThatAlreadyRunsTheSwap() {
-		System.runAs(TestUsers.admin()) {
-			orgWithSeasonalState(false, true);
-			CorePostInstall.adoptSeasonalScheduleInTests = true;
-			NightlyJobs.adoptInTests = true;
-
-			Test.startTest();
-			CorePostInstall.runAsSourceDeploy();
-			Test.stopTest();
-
-			SettingsService.clearCaches();
-			Assert.isTrue(
-				SeasonalAddressScheduler.isEnabled(),
-				'The page says on because the job is running'
-			);
-			Assert.areEqual(0, oldSwapJobs(), 'The swap no longer has a schedule of its own');
-			Assert.areEqual(1, swapJobs(), 'The nightly run does the swap now, scheduled once');
-		}
-	}
-
-	@IsTest
-	static void anUpgradeDoesNotTurnTheSwitchOnForAnOrgThatStoppedTheSwap() {
-		System.runAs(TestUsers.admin()) {
-			orgWithSeasonalState(false, false);
-			CorePostInstall.adoptSeasonalScheduleInTests = true;
-
-			Test.startTest();
-			CorePostInstall.runAsSourceDeploy();
-			Test.stopTest();
-
-			SettingsService.clearCaches();
-			Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'Nothing to adopt');
-			Assert.areEqual(0, swapJobs(), 'And nothing was scheduled');
 		}
 	}
 

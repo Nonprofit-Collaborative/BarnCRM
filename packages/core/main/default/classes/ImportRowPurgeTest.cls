@@ -5,7 +5,7 @@
  * the import keeps its counts, a batch whose rows are gone is refused rather than run over
  * nothing, and undo still works once the rows are gone (R-IR8).
  */
-@IsTest(testFor='ApexClass:RecordRetentionBatch, ApexClass:ImportRowPurgeScheduler')
+@IsTest(testFor='ApexClass:RecordRetentionBatch')
 private class ImportRowPurgeTest {
 	/** More rows than one chunk of 200, so the cleanup is bulk tested. */
 	private static final Integer ROWS = 251;
@@ -203,12 +203,16 @@ private class ImportRowPurgeTest {
 				Committed_By__c = UserInfo.getUserId(),
 				Undo_Deadline__c = Datetime.now().addDays(30)
 			);
-			Contact created = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Ramirez',
-				Created_By_Import_Batch__c = batch.Id
+			Contact created = TestDataFactory.person(
+				new Contact(
+					FirstName = 'Ana',
+					LastName = 'Ramirez',
+					Created_By_Import_Batch__c = batch.Id
+				)
 			);
-			Contact updated = new Contact(LastName = 'Okafor', MailingCity = 'Portland');
+			Contact updated = TestDataFactory.person(
+				new Contact(LastName = 'Okafor', MailingCity = 'Portland')
+			);
 			insert new List<Contact>{ created, updated };
 			created = [SELECT Id, AccountId FROM Contact WHERE Id = :created.Id];
 			update new Account(Id = created.AccountId, Created_By_Import_Batch__c = batch.Id);
@@ -304,56 +308,6 @@ private class ImportRowPurgeTest {
 			Assert.isTrue(
 				entries[0].Message__c.contains(String.valueOf(rows[0].Id)),
 				'It names the first row not removed: ' + entries[0].Message__c
-			);
-		}
-	}
-
-	@IsTest
-	static void anOldScheduleThatFiresStartsNothingItself() {
-		System.runAs(TestUsers.admin()) {
-			Test.startTest();
-			// A real schedule hands execute a context, so the shell hands over to the nightly run.
-			Id triggerId = System.schedule(
-				'ImportRowPurgeTest old schedule',
-				'0 0 3 * * ?',
-				new ImportRowPurgeScheduler()
-			);
-			Test.stopTest();
-
-			Assert.isNotNull(triggerId, 'The old class can still be scheduled');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'RecordRetentionBatch'],
-				'Firing it starts no cleanup of its own.'
-			);
-			Assert.areEqual(
-				'BarnCRM Import Row Cleanup',
-				ImportRowPurgeScheduler.JOB_NAME,
-				'The name the nightly run adopts'
-			);
-		}
-	}
-
-	@IsTest
-	static void theCleanupIsAPassOfRecordCleanupAndTheOldScheduleIsAShell() {
-		System.runAs(TestUsers.admin()) {
-			Assert.isNull(
-				NightlyJobs.step(ImportRowPurgeScheduler.JOB_NAME),
-				'The cleanup is no step of its own.'
-			);
-			Assert.isNotNull(
-				NightlyJobs.step(RecordRetentionBatch.JOB_NAME),
-				'It is a pass of the Record Cleanup step.'
-			);
-
-			Test.startTest();
-			new ImportRowPurgeScheduler().execute(null);
-			Test.stopTest();
-
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'RecordRetentionBatch'],
-				'The shell starts nothing: the nightly run does the work.'
 			);
 		}
 	}

@@ -7,11 +7,11 @@
 private class EventBudgetControllerTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c conference() {
@@ -50,7 +50,7 @@ private class EventBudgetControllerTest {
 			Expected__c = 800,
 			Received__c = 300
 		);
-		Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
+		Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 		insert as user ana;
 		// System mode: Amount Paid is written by the payment listener, never typed by staff.
 		insert as system new Event_Registration__c(

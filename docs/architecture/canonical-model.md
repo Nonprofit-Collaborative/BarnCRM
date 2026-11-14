@@ -376,6 +376,21 @@ queued; the batch runs in the background and reports neither progress nor comple
 the console, and its counts are written to the debug log only. On households with Custom
 Name set, recomputation only fills a blank greeting (R-H8).
 
+**R-H15 One household model per Account (D-196, ADR-0216
+`0216-household-model-coexistence.md`).** Household Model says which household model owns an
+Account: Automatic (the default; blank reads the same) leaves it to detection, Nonprofit Cloud
+keeps it a native household, Converted means BarnCRM owns it although its native household
+group is still there. The mutual exclusion guards (naming, automatic household creation,
+address propagation, person erasure) read it before detection, only in an org where native
+household groups can exist: Converted is never native, Nonprofit Cloud always is, Automatic
+asks detection. The delete guard (R-H12, ADR-0036) and the merge and duplicate guards (R-H13,
+R-DP2) do not read it: they protect the native rows, which a converted Account still has.
+Converted is written only by the Nonprofit Cloud household conversion and put back by its undo
+(Section 29ZQ, R-HA7 to R-HA9); Nonprofit Cloud, and Converted on a BarnCRM household that also
+carries a native group, are set by an administrator by hand. No automation reads a change of
+the field as an instruction, and Core reads no native object for it. Health Check's collision
+warning leaves out Converted Accounts.
+
 ### Salesforce implementation
 
 - **Object:** Account, record type `Household`, which ships active with a compact layout.
@@ -403,6 +418,7 @@ Name set, recomputation only fills a blank greeting (R-H8).
 | Sample Data | `Sample_Data__c` | Checkbox |
 | Sample Data Key | `Sample_Data_Key__c` | Text(20) (v0.4) |
 | Emptied By Deletion | `Emptied_By_Deletion__c` | Date (R-H12a) |
+| Household Model | `Household_Model__c` | Picklist, restricted: Automatic (default), Nonprofit Cloud, Converted (R-H15). Admin edits; Staff and Read Only read. |
 
 - **Person attributes on Account.** The five person attributes listed under Contact
   (Section 7) are present on Account as well, with the same API names and the same
@@ -845,13 +861,18 @@ the app rather than in debug logs (plan Sections 2.3 and 4.8).
 | Technical Detail | long text | no | Exception type, stack trace, and query or DML detail, for a developer or a bug report. |
 | Severity | picklist(Info, Warning, Error, Critical) | yes | How badly the failure affects the org's data or operations. |
 | Status | picklist(New, Acknowledged, Resolved, Ignored) | yes | Where the admin has got to with this error. |
+| Occurrences | integer, default 1 | no | How many times the same failure happened within an hour of the first, counted on this one entry (R-E7). |
+| Other Records | text(255) | no | Up to ten more records the same failure happened on, comma separated, after Record Reference (R-E7). |
+| Occurrence Key | text(64) | no | A SHA-256 hash of Context, Severity and Message, by which a repeat finds its entry (R-E7). Indexed, not unique. |
 
 ### Rules
 
 **R-E1** Every caught exception in packaged code writes an Error Log record with a
 message an administrator can act on. A silent catch is a review failure.
 **R-E2** Error Log writing never itself throws; a failure to log is swallowed rather
-than masking the original error.
+than masking the original error. Nor does it spend the caller's last statements: with two or
+fewer DML statements or immediate publishes left, the entry goes to the debug log, since a
+limit exception there could not be caught and would roll back the save being reported.
 **R-E3** The Hub shows a tile of unresolved errors, and an optional digest email goes to
 the administrators (feature C-23, v0.6, R-E5).
 **R-E4 The entry outlives the transaction it documents.** Most failures worth recording
@@ -882,6 +903,15 @@ its passes, deletes every entry, whatever its Status, created more than
 `Error_Log_Retention_Days__c` days before (default 180, 0 keeps every entry). The delete is
 package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
 setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
+**R-E7 A repeat is counted, not written again (D-200 P4).** The subscriber writes one entry
+per distinct failure: an event whose Context, Message and Severity match a New entry first
+written within the last hour adds its count to that entry's Occurrences and names its record
+in Other Records while fewer than ten are named; repeats inside one delivery fold together
+first. An entry an administrator has acknowledged, resolved or ignored, or one first written
+over an hour before, is never added to: the next repeat starts a new entry. Code that saves
+with partial success logs the refused rows once, after the loop over the results
+(`ErrorLogger.logFailures`, `logMessages` or one summary), never one call per row;
+`scripts/ci/check-log-in-loop.py` enforces it, with an allowlist that names its reasons.
 
 ### Salesforce implementation
 
@@ -890,7 +920,9 @@ setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
 - **Fields:** `Timestamp__c` (DateTime), `User__c` (Lookup to User), `Context__c` (Text),
   `Record_Reference__c` (Text), `Object_Name__c` (Text), `Message__c` (Long Text Area),
   `Technical_Detail__c` (Long Text Area), `Severity__c` (Picklist: Info, Warning, Error,
-  Critical), `Status__c` (Picklist: New, Acknowledged, Resolved, Ignored).
+  Critical), `Status__c` (Picklist: New, Acknowledged, Resolved, Ignored),
+  `Occurrences__c` (Number, default 1), `Other_Record_Ids__c` (Text 255),
+  `Occurrence_Key__c` (Text 64, External ID for its index, not unique).
 - **Event:** `Error_Log_Event__e`, a platform event with publish behavior Publish
   Immediately, carrying the same values so that they survive a rollback (rule R-E4):
   `Message__c`, `Technical_Detail__c` (Long Text Area), `Context__c`,
@@ -1288,8 +1320,9 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 | `Features_Turned_On__c` | text (255) | empty | The comma separated keys of the Core features turned on (`DataManager`, `DuplicateReview`, `OrgOptimizer`, `HouseholdUpkeep`, `Addresses`, `Relationships`, `Affiliations`, `PreferredEmail`). Empty means every feature is on: an org upgraded from before features existed. A new install stores `None` (every feature off) until first-run setup; finishing it with every feature unticked stores `NoneChosen` (every feature off, setup done). A key once added is never removed: features are one-way. While a key is missing, its tabs' BarnCRM Tab permission sets are held by nobody, its rows are hidden in BarnCRM Settings, and its group's automations do not run. Written by General, Features and first-run setup, not edited as a setting (ADR-0124, `0124-edition-gates-visibility.md`). |
 | `Relationship_Types_Turned_Off__c` | text (255) | empty | The comma separated DeveloperNames of the shipped Relationship Type rows the administrator turned off on the Custom Metadata page (ADR-0170). A listed row's Type is not offered for a new relationship, and a new relationship or a change of type to it is refused; its reciprocal mapping still applies, so existing relationships of that type keep working and display. Listing a row never changes the row itself, so a package upgrade that updates its label or reciprocal leaves it off. Only rows with `Is_Shipped__c` true are listed; the organization's own rows are archived instead. Written by `CustomMetadataManagerService` (Manage BarnCRM Metadata), audited, not edited as a Setting Definition row; empty means every shipped type is on, so it needs no `SHIPPED_DEFAULTS` entry. |
 | `Match_Sources_Turned_Off__c` | text (255) | empty | The comma separated DeveloperNames of the shipped Match Source rows the administrator turned off in Duplicate Matching, Matching Logic (D-184, ADR-0172). A listed source is not used by the duplicate scan or import matching. Listing a row never changes the row itself, so a package upgrade leaves it off. Only rows with `Is_Shipped__c` true are listed; the organization's own rows are archived instead. Written by `CustomMetadataManagerService` (Manage BarnCRM Metadata), audited, not edited as a Setting Definition row; empty means every shipped source is on, so it needs no `SHIPPED_DEFAULTS` entry. |
+| `Match_Keys_Filled__c` | boolean | false | True once `AddressMatchKeyBatch` has given every address with a street and postal code its `Address__c.Match_Key__c` (D-200 P6). While false, matching on the Address sources falls back to the LIKE read and Health Check shows **Match Keys Not Filled**. Bookkeeping written by the batch, without an audit row; not a setting a person edits. |
 | `Hide_Nonprofit_Modules__c` | boolean | false | Whether the Module Manager hides the nonprofit modules: the modules in the module catalog whose `Editions__c` does not name the Standard edition (`Standard`), so only the Nonprofit Edition offers them. Stored as the opposite of the page's Show Nonprofit Modules checkbox (checked when this is false) so that a settings row saved before the field existed, or a blank value, shows the modules: only a deliberate tick hides. When true, the Modules section keeps its Show Nonprofit Modules checkbox, shows a count of installed nonprofit modules that are hidden, and lists no nonprofit module. Org-wide; it hides rows only and installs, removes and turns off nothing. Written by the Module Manager's checkbox through `ModuleManagerService`, which checks Manage BarnCRM Settings; not edited as a Setting Definition row. Ships off, so it needs no `SHIPPED_DEFAULTS` entry (ADR-0035). |
-| `Modules_Setup_Run__c` | text (255) | empty | The comma separated keys (`Core` and the module catalog's names, such as `Giving`) of the packages whose setup steps have run in this org. Each package's post-install class adds its own key at the end of its steps, at every install and upgrade, when `scripts/org/deploy-packages.sh` runs those steps, and when an administrator presses Finish Setup (FS1). A package that is here, ships setup steps (its post-install class implements `ModuleSetup`) and is not listed gets a Health Check finding and a notice on the Modules page. Bookkeeping written by `ModuleSetups` with no audit row; not edited as a Setting Definition row. Empty until the first setup runs, so it needs no `SHIPPED_DEFAULTS` entry. |
+| `Modules_Setup_Run__c` | text (255) | empty | The comma separated keys (`Core` and the module catalog's names, such as `Giving`) of the packages whose setup steps have run in this org, each with its setup revision after a colon when above 1 (`Core,Giving:2`; D-200, N4). Each package's post-install class adds its own key at the end of its steps, at every install and upgrade, when `scripts/org/deploy-packages.sh` runs those steps, and when an administrator presses Finish Setup (FS1). A package that is here, ships setup steps (its post-install class implements `ModuleSetup`) and is not listed, or is listed at a lower revision than its class now declares (`ModuleSetups.Revisioned`), gets a Health Check finding and a notice on the Modules page. Bookkeeping written by `ModuleSetups` with no audit row; not edited as a Setting Definition row. Empty until the first setup runs, so it needs no `SHIPPED_DEFAULTS` entry. |
 | `Shipped_Defaults_Applied__c` | text (255) | empty | How many entries of each package's `SHIPPED_ON_ADDED_IN_UPGRADES` list (the checkbox settings that ship on and were added in an upgrade, in its post-install class) this org has had turned on once, as lower case `package:count` pairs (`core:1,giving:1`) (QA-F2). The setup steps (`ShippedDefaultUpgrades`) set each entry past the count to true on a stored settings record, so an org that saved its settings before the field existed gets the shipped value, then raise the count; an org that never saved those settings is only counted, since its shipped default already applies. A setting turned off afterwards stays off. Bookkeeping with no audit row; not edited as a Setting Definition row. |
 
 ### Field utilization keys
@@ -1547,6 +1580,7 @@ Automation Setting records (Section 10) on install and on upgrade.
 | `Object_Name__c` | text | The object whose trigger this automation runs on. |
 | `Execution_Order__c` | integer | The order in which handlers run for that object. |
 | `Module__c` | text (40) | The module that ships this automation, for example Giving or Mirror; blank means Core. The Module Manager turns a module's automations off by this name (C-24). |
+| `Runs_On_Rollup_Writes__c` | boolean, default false | Whether this automation runs when the rollup engine updates a person's or organization's totals (D-200 P10). `RollupWriter` marks its update as a rollup write, and the dispatcher then runs, for Contact and Account updates, only the rows marked this way or `Always_Runs__c`; field history is kept as for any update. Shipped on: donor level and donor score assignment (Account and Contact) and the person rollup row (`Core_Rollups_Contact`, so a definition of the administrator's that reads a person's total still sees it change). Not copied to Automation Setting. |
 
 The custom field API names are given here because two of the plain names in the original
 draft ("Object" and "Order") are platform reserved words, and because the materialized
@@ -1753,9 +1787,13 @@ names the modules a module's package needs installed first (ADR-0125
 | Sort Order | `Sort_Order__c` | number | The order modules are listed in, lowest first, after Core. |
 | Probe Object | `Probe_Object__c` | text (80) | Optional. An object of the module's own, unprefixed (for example `Rollup_Definition__c`): when this package's object by that name exists, the module counts as installed. Only for a module whose code still ships in Core or that announces no settings rows (Rollup Builder today); empty means detection by announcement alone. Forms and Logic Models ship one Setting Definition row each (`Forms_Page`, `Logic_Models_Page`, C-72) and have no probe. While the namespace is deferred a subscriber's own object can share a module object's name, so a module that ships Setting Definition rows naming itself has no probe. |
 | App Name | `App_Name__c` | text (80) | Optional. The developer name of the module's own Lightning app, unprefixed (for example `Fundraising`), where its Settings tab lives. The Modules section links an installed module to it by the app's DurableId (`06m`, found once through `AppDefinition`, matching this name and the package namespace), or by `c__Name` (`namespace__Name` when namespaced) when the app is not found; empty means no link yet. The home page's Modules list and the Module Manager link to it. |
+| Access By Permission Set | `Access_By_Permission_Set__c` | text (255) | Optional. Each module permission set Core's access sync gives (`ModuleAccessSyncs`, ADR-0131), with the Core permission sets whose holders get it: `Set=Holder,Holder`, entries separated by semicolons (for example `Giving_Admin=BarnCRM_Admin`). A set given to `BarnCRM_Admin` holders is the module's admin set, which its install also gives the installer. Empty means none (D-200 S1). |
+| Access By Role | `Access_By_Role__c` | text (255) | Optional. The same for the BarnCRM roles (permission set groups), for example `Giving_Staff=Program_Staff,Fundraising_Staff;Giving_Read_Only=Read_Only`. One pass gives at most 9,000 assignments across all the module's sets, 5,000 for one set. Empty means none (D-200 S1). |
+| Extensions | `Extensions__c` | long text (4000) | Optional. The module's classes Core builds by name for its extension seams, one per line as `Seam: Class` (for example `NightlyStepProvider: GivingNightlyJobProvider`), the seam being the Core interface the class implements. `ModuleExtensions` asks the modules in Sort Order, then name, and skips a class that is not installed; it reads the catalog with SOQL, since a long text field is cut short by `getAll`. Core names no module class in code (ADR-0017 as extended by D-200 S1). Empty means none. |
 | Staff Tabs | `Staff_Tabs__c` | text (255) | Optional. The module's tabs for everyday work, by tab API name unprefixed, separated by semicolons (for example `Gift__c;Commitment__c`), that belong in the BarnCRM and BarnCRM Console apps (ADR-0137). A page tab whose label is not its name with spaces is written `Name:Label` (for example `Donor_Levels:Donor Level Ladder`), so the Setup Assistant names it as App Manager does; an object tab is labelled from its object. A CI test holds both to the shipped tabs. Core cannot name a module tab in its own apps, so `scripts/org/deploy-packages.sh` adds them on a source deploy, and the Setup Assistant's modules step lists them for an installed package. Empty means none. |
 | Admin Tabs | `Admin_Tabs__c` | text (255) | Optional. The same for the module's admin tools and settings pages, which belong in the BarnCRM Admin and BarnCRM Admin Console apps (for example `Rollup_Builder`). Empty means none. |
 | Requires | `Requires__c` | text (255) | Optional. The modules this module's package needs installed first, as their DeveloperNames separated by semicolons, in install order (for example `Rollups` for Giving and Volunteers, `Rollups;Giving` for Mirror). While one of them is not installed, the module's row in the Modules section and the Setup Assistant says to install it first. Empty means none. |
+| Quick Links | `Quick_Links__c` | text (255) | Optional. The module's links for the BarnCRM Home tab's Quick Links (D-200 R7), separated by semicolons, each `Target:Label:Line`. Target is a tab API name unprefixed (for example `Quick_Gift_Entry`), or an object unprefixed with `.new` (for example `Enrollment__c.new`) for its new record form, shown only to someone who can create that object. Label is the tile's title in title case; Line is its one-line description (no colon or semicolon in either). Shown while the module is installed and turned on, after Core's own links. Empty means none. |
 
 ### Integration App
 
@@ -2048,6 +2086,23 @@ missed; it is the mode the packaged giving definitions ship with, because it is 
 combination that keeps the numbers visibly right (Principle 2). Real-time needs a trigger on
 the source entity (R-R12); where there is none, the definition is recalculated only by the
 nightly run and on demand. The stored values are unchanged; only what the admin reads is.
+Since D-200 P1 the nightly run recalculates every record once a week, on the night
+`Full_Recalc_Day__c` names (Section 14B), and on the other nights a Both definition only where
+something can have changed since the last covered run (R-R4b).
+
+**R-R4b Nightly scope (D-200 P1).** The nightly run recalculates every Scheduled and Both
+definition over every record when no run is covered yet (`Nightly_Covered_From__c` blank), on
+the night `Full_Recalc_Day__c` names (or every night when it says Every_Night), and when all
+automation was paused since the last covered run. On other nights a definition still runs over
+every record when it is Scheduled, never calculated, includes deleted records, has a target
+filter that compares a date with today, is fiscal-year aware on the first night of a fiscal
+year, or filters on this year or last year on the first night of a calendar year. Every other
+Both definition queues only the targets of source records whose `SystemModstamp` is at or after
+the last covered run's start, of source records deleted since then, and, for a source condition
+in the last n days on a date or date and time attribute, of records whose date has moved into
+or out of the window since then. Every night first retries Failed Rollup Queue entries and
+releases held Pending ones. A run whose passes all finish with no chunk stopped stores its start
+in `Nightly_Covered_From__c`.
 
 **R-R4a Bypass by custom permission.** A definition whose Bypass Permission names a custom
 permission the running user holds is left out of every real-time path for that user's saves:
@@ -2665,13 +2720,30 @@ uncharged, and are routed again.
   finalizer); the Rollup Builder's Needs attention list reads and retries entries.
 - **Batch:** `RollupLargeParentBatch`, the large parent route (R-RQ6): a batch over the source
   rows of each planned query, Ids only, chained query by query and entity by entity.
-- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, no fields. Its one org-level
-  record is the row a large parent run locks before it starts (R-RQ6); the code creates it the
-  first time and nothing else reads or writes it.
+- **Custom setting:** `Rollup_Run_Lock__c`, hierarchy, protected, one field,
+  `Last_Run_Started__c` (DateTime). Its one org-level record is the row a large parent run locks
+  before it starts (R-RQ6); the code creates it the first time and nothing else reads or writes
+  it. **Throttle (D-200 P2):** under the lock, a run starts only when `Large_Parent_Hours__c`
+  (Section 14B, default 1) has passed since `Last_Run_Started__c`, which the run stamps as it
+  starts; otherwise the entries routed to it wait, uncharged, until then (Next Attempt), and
+  the saves queued in between merge into that one run. The Rollup Builder page says how often.
 - **Event:** `Rollup_Queue_Ready__e`, a platform event with no fields, publish behavior Publish
   After Commit, published at most once per transaction by a save inside a Queueable job, or by
   one that queued entries and no processor (R-RQ3).
   `RollupQueueReadyTrigger` subscribes and starts the processor.
+- **Processor request stamp (D-200 P13):** a save that queues entries runs no query to find a
+  processor. It reads `Processor_Requested_At__c` on `Rollup_Settings__c` (from the platform's
+  cache):
+  within the last ten minutes it publishes the Ready event, whose subscriber checks the job list
+  exactly after commit; otherwise it queues a processor and stamps the time (for a chained
+  processor queued with a delay, the time it is due). A processor that died is still found
+  missing: by the subscriber's exact check while the stamp is recent, and by the next save once
+  it is not. The subscriber, background jobs and the nightly run keep the exact check.
+- **Nightly scope (D-200 P1, R-R4b):** `RollupNightlyBatch` plans each night from
+  `Full_Recalc_Day__c` and `Nightly_Covered_From__c` on `Rollup_Settings__c` (Section 14B):
+  the full run, or one batch pass per source entity that queues the targets of what changed.
+  Each night it first releases held Pending entries (Next Attempt cleared) and retries Failed
+  ones.
 
 ---
 
@@ -2696,7 +2768,7 @@ settings console shows them in its Rollups section as before.
   row, since a custom setting cannot hold a picklist. The nightly job, Run tonight and the
   Rollup Builder page's schedule line all use it. A save that changes it moves the scheduled
   nightly run at once: Core's settings service hands every changed key to the engine through
-  the third engine seam (`RollupEngineExtensionV3.afterSettingsSaved`, ADR-0125 decision 4),
+  the third engine seam (`RollupEngineExtension.afterSettingsSaved`, ADR-0125 decision 4),
   and `RollupScheduler.reschedule` replaces the job when one is scheduled and starts nothing
   when none is.
 
@@ -2705,6 +2777,10 @@ settings console shows them in its Rollups section as before.
 | `Rollup_Mode_Default__c` | picklist(Real-time, Scheduled, Both) | Both | The mode a new rollup definition takes unless the admin changes it. Shown as Instantly, Every night and Both (recommended), as on the definition (R-R4). |
 | `Rollup_Processing__c` | picklist(Background, In_Save) | Background | When Real-time and Both totals are recalculated (R-R4): Background (shown as After the save (recommended)) queues them in the save and the Rollup Queue recalculates them just after it; In_Save (shown as During the save) recalculates a normal save's totals in it. Blank means Background. |
 | `Nightly_Run_Hour__c` | integer(0 to 23) | 2 | The hour the nightly run starts (R-R4), in the time zone of the person who scheduled it, shown as a time (2:00 AM). Blank or out of range means 2. |
+| `Large_Parent_Hours__c` | integer(0 to 24) | 1 | The fewest hours between two large parent runs (R-RQ6, D-200 P2); 0 runs as soon as possible. Blank or out of range means 1. |
+| `Processor_Requested_At__c` | datetime | blank | Not a setting and not in the console: when the Rollup Queue last asked for a processor (D-200 P13, Section 14A). Written by the engine only. |
+| `Full_Recalc_Day__c` | picklist(Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Every_Night) | Sunday | The night the nightly run recalculates every Scheduled and Both total over every record (R-R4b, D-200 P1); Every_Night (shown as Every night) does so every night. Stored as text, the values declared on Setting Definition `Rollup_Full_Recalc_Day`. Blank or unknown means Sunday. |
+| `Nightly_Covered_From__c` | datetime | blank | Not a setting and not in the console: the start of the last nightly run that covered every change before it (R-R4b). Blank means the next night recalculates everything. Written by the engine only. |
 
 ---
 
@@ -4849,7 +4925,7 @@ Section 26.
   `Installment_Top_Up_Last_Run__c`, `Installment_Top_Up_Last_Run_Summary__c`.
 - **Service:** `CommitmentService`, `CommitmentSelector`, `CommitmentTriggerHandler`,
   `GiftCommitmentHandler`, `InstallmentTopUpSchedulable`, `InstallmentTopUpBatch`,
-  `GivingScheduler`, `GivingJobsController`.
+  `GivingScheduler` (the five steps; switched, started and summarized on Core's Nightly Jobs panel, `NightlyJobsController`).
 
 ---
 
@@ -4904,13 +4980,14 @@ report a year later.
 
 **R-IN5 The nightly passes are switched on in the console and visible there.** Nothing in
 the Giving module marks an installment Overdue or extends a recurring schedule until an
-administrator schedules the nightly jobs from the Nightly Jobs page of the Nonprofit
-Settings console, and the same page stops them (ADR-0031). Since the nightly run (R-NJ1),
-Schedule and Stop turn the four Giving steps' switches on and off (R-NJ4). Each pass records when it last
+administrator schedules the nightly run from the Nightly Jobs panel of the Nonprofit
+Settings console (ADR-0031). Since the nightly run (R-NJ1) each Giving step has its own
+switch (R-NJ4), turned on and off on its row of that panel, which since 1.23 (D-200 S6) also
+replaces the Giving Nightly Jobs page. Each pass records when it last
 finished and one sentence saying what it did, whether or not it changed anything, so a
 pass that ran and found nothing overdue reads differently from a pass that never ran. The
-console warns that a pass is stale only when the jobs are scheduled: an org that has not
-switched them on is told that instead, because it has not missed a run that was never
+panel marks a pass Missed Last Run only when its step is on and the run started without it:
+an org that has not scheduled the run is told that instead, because it has not missed a run that was never
 going to happen. A failure inside a pass goes to the Error Log and the rest of the run
 carries on (R-E1).
 
@@ -5208,7 +5285,12 @@ organization that awards a level permanently records that on the donor, not here
 Real time: assignment happens in the save that changes the source total, which includes
 the save the rollup engine itself makes when a gift lands, and it runs before the record
 is written so it costs no second update. Scheduled: a nightly pass re-places every donor,
-which is what catches a fiscal year turning over and a ladder edited yesterday. On demand:
+which is what catches a fiscal year turning over and a ladder edited yesterday. Since D-200 P1
+it re-places every donor only when no recalculation is recorded, a `Donor_Level__c` row or a
+setting change naming Donor was saved since `Donor_Levels_Last_Recalculated__c`, a fiscal year
+started since, or that time is more than seven days old; otherwise, with donor scores switched
+on, it rescores only the donors whose last gift date crossed a recency cutoff since then, and
+records no recalculation. On demand:
 the Recalculate button on the Donor Levels page does the scheduled pass now. Assignment is
 idempotent in all three: running it twice over unchanged data writes nothing the second
 time.
@@ -5882,7 +5964,7 @@ read in system mode at send time, so the check does not depend on the sender's f
   pledge reminders), `AcknowledgmentBatch`, `AcknowledgmentScheduler`,
   `AcknowledgmentLetterMerge`, and `AcknowledgmentController` for the page.
 - **Custom permission:** `Send_Acknowledgments`, granted to Giving Admin and Giving Staff.
-- **Page:** LWC `acknowledgments` on the `Acknowledgments` tab and flexipage, reached from
+- **Page:** LWC `acknowledgments` on the `Acknowledgments` component tab, reached from
   the Giving section of the BarnCRM Settings console by navigation (ADR-0020).
 
 ---
@@ -5957,7 +6039,7 @@ which is what the Amount Only For Gift Events rule already enforces at save.
 - **Service:** `StewardshipService`, with `StewardshipSelector` reading and
   `StewardshipWriter` writing, following the pattern the rest of Giving uses.
 - **Settings console:** the Stewardship Plans page, component `stewardshipPlans` with
-  `StewardshipPlanController` behind it, on the `Stewardship_Plans` tab and flexipage and
+  `StewardshipPlanController` behind it, on the `Stewardship_Plans` component tab and
   registered as a `Setting_Definition__mdt` Component row reached by navigation (ADR-0020).
   Templates, their steps, their order and their Active state are all administered there, so
   no part of setting a plan up needs Setup or a raw object tab.
@@ -7096,6 +7178,13 @@ data: a card is known only by its expiry month.
   year / 6, Yearly / 12) in the page's framework-free model; at-risk revenue is the same sum over
   the R-RH3 list; and the Received gifts on recurring gifts for this month and the eleven before,
   by calendar month. Read as the person.
+- **R-RH5 Payments subscriptions** (PAY-04, D-196; ADR-0218 `0218-payments-subscriptions.md`).
+  When Payments tells Giving's listener of a subscription change on a commitment
+  (`subscriptionsChanged`), the commitment's Processor Subscription Id and Processor Customer Id
+  are filled when blank, and one Recurring Gift Event per change is upserted by External Id (the
+  processor event's key): chargeSucceeded is Charge Succeeded, chargeFailed Charge Failed,
+  cardUpdated Card Updated (with Card Expires), cancelled Cancelled. R-RH1 and R-RH2 then apply
+  it. User mode, as the Payments processing administrator.
 
 ### Salesforce implementation
 
@@ -7115,11 +7204,13 @@ data: a card is known only by its expiry month.
 | External Id | `External_Id__c` | Text(100), unique, external ID |
 | Match Status | `Match_Status__c` | Picklist (Unmatched, Matched), restricted |
 
-- **Fields on `Commitment__c`** (Giving Admin edits them; Staff edit only the subscription id):
+- **Fields on `Commitment__c`** (Giving Admin edits them; Staff edit only the subscription id
+  and read the customer id):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Processor Subscription Id | `Processor_Subscription_Id__c` | Text(100), unique, external ID |
+| Processor Customer Id | `Processor_Customer_Id__c` | Text(100), external ID: the processor's customer (Stripe `cus_...`), filled by R-RH5 or by an admin; Update Card needs it for Stripe |
 | Failed Charges | `Failed_Charges__c` | Number(3, 0) |
 | Last Failed Charge | `Last_Failed_Charge__c` | Date |
 | Card Expires | `Card_Expires__c` | Date |
@@ -7804,7 +7895,18 @@ works for many records in one save, and keeps what it replaces as history (R-AD7
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
 | Deleted With | `Deleted_With__c` | Text (40) |
+| Match Key | `Match_Key__c` | Text (100), External ID (indexed), not unique |
 
+- **Match key (D-200 P6):** `Match_Key__c` holds the normalized postal code, a bar, and the
+  first street word that normalization leaves as written (usually the house number), for
+  example `02139|77`. Set before every insert and update by `AddressMatchKeyHandler`, an
+  automation that always runs (registry row `Address_Match_Key`), so no pause or bypass leaves
+  it stale; never edited by a person. The duplicate scan and import matching read the Address
+  match sources by `Match_Key__c IN :keys`, an index read, instead of a LIKE over every
+  address, and compare the rows exactly as before. Only once `Match_Keys_Filled__c` is true:
+  until then they fall back to the LIKE read. `AddressMatchKeyBatch` fills the keys of
+  addresses saved before the field existed; Health Check's **Match Keys Not Filled** finding
+  starts it.
 - **Standard fields written:** `Account.BillingStreet`, `BillingCity`, `BillingState`,
   `BillingPostalCode`, `BillingCountry`; `Contact.MailingStreet`, `MailingCity`,
   `MailingState`, `MailingPostalCode`, `MailingCountry`.
@@ -8610,6 +8712,38 @@ range that are dated on or after the start date.
 
 ---
 
+## 29C2. Provider Request
+
+### Definition
+
+A Case this org sent to a service provider running BarnCRM Projects, with the provider's request number, status and resolution (D-201, ADR-0221 `0221-projects-requests-and-issues.md` decision 7). Off until Send Cases to a service provider is on.
+
+### Rules
+
+**R-PR1 Sending.** While `Mirror_Settings__c.Case_Requests_Enabled__c` is on (shipped off) and the org has Case, a Case is posted to the provider's request API (Section 29PM18, R-PM26) through the Named Credential `Barn_Request_Provider`, which the admin creates: by the flow action Send Cases to a Service Provider, or by the nightly step for every open Case whose Type is `Case_Requests_Type__c` (default Service Provider). A Case with a Request Number is never sent again. A refusal is kept in Last Error and the Error Log, and the next run sends the Case again.
+
+**R-PR2 Status.** The nightly step reads the status of every Provider Request with a Request Number not yet Resolved, Closed or Cancelled, 200 per call, and writes Provider Status, Provider Resolution and Last Synced. Written in system mode by the run only; users read.
+
+Case is never named at compile time or given a field: the link is the Case Id held as text (ADR-0013, ADR-0058).
+
+### Salesforce implementation
+
+- **Object:** `Provider_Request__c`, label Provider Request, name field Text (Case Number), sharing Read/Write, packaged in Mirror.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Case Id | `Case_Id__c` | Text(18), unique, external ID |
+| Request Number | `Request_Number__c` | Text(30) |
+| Provider Status | `Status__c` | Text(40) |
+| Provider Resolution | `Resolution__c` | Long Text Area(32768) |
+| Last Synced | `Synced__c` | Date/Time |
+| Last Error | `Error__c` | Text(255) |
+
+- **Settings:** on `Mirror_Settings__c`, `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`).
+- **Access:** read through Salesforce Records Sync; the Provider Requests tab in Mirror's Admin_Tabs.
+
+---
+
 ## 29D. Saved Query (and the query document)
 
 ### Definition
@@ -8627,6 +8761,7 @@ access to none: whoever runs it sees what their own access allows.
 | Object | text (255) | yes | API name of the object the query reads, copied from the document so the list can show and filter it without parsing JSON. |
 | Query | long text | yes | The query document (R-SQ1). |
 | Shared | boolean | no | True when everyone who uses Find can open it (R-SQ4). Default false. |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 | Owner | reference(User) | yes | The person who saved it; only they can change, share or delete it. |
 
 ### Rules
@@ -8816,6 +8951,7 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
 | Object | `Object_Name__c` | Text (255) |
 | Query | `Query_JSON__c` | Long Text Area (131072) |
 | Shared | `Shared__c` | Checkbox, default false |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 - **Apex sharing reason:** `Shared_With_Find_Users__c` (Apex sharing reason API names end in `__c`).
 - **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
@@ -9494,7 +9630,7 @@ knows, so the profile is a set of person attributes the module ships on Contact 
 Every attribute here, the person attributes included, is shipped by Volunteers, never by Core.
 
 **Access.** Four permission sets the module ships (ADR-0127, decision 3), each given to a
-BarnCRM role by `VolunteersAccessSync`, which never takes one away. Reviewed By, Reviewed Date,
+BarnCRM role by Core's `ModuleAccessSyncs` from the module's catalog row (D-200 S1), which never takes one away. Reviewed By, Reviewed Date,
 Household, a schedule's Created Through, Shifts Kept and Rebuild Pending, and every rollup total are read only in
 each. Staff and Read Only delete nothing; the Coordinator deletes only hours, since the platform
 gives Modify All only with Delete.
@@ -9502,7 +9638,7 @@ gives Modify All only with Delete.
 | Permission set | Given to | Job, Shift, Sign-up, Shift Schedule | Hours | Person attributes |
 |---|---|---|---|---|
 | `Volunteers_Admin` | holders of `BarnCRM_Admin` | create, edit, delete | create, edit, delete; view and modify all; Household editable | edit |
-| `Volunteers_Coordinator` | per person on the Access page (Access Add-On row `Volunteers_Coordinator`, ADR-0194 D1), and holders of the retired Coordinator role (`Volunteer_Coordinator`) until the next release | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
+| `Volunteers_Coordinator` | per person on the Access page (Access Add-On row `Volunteers_Coordinator`, ADR-0194 D1) | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
 | `Volunteers_Staff` | the Team Member role (`Program_Staff`) and Giving's Fundraising Staff role (`Fundraising_Staff`, ADR-0194 D3) | create, edit | create, edit their own entries (sharing Private) | edit |
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
@@ -9544,7 +9680,6 @@ reads in the singular: each finding has a one-item label beside its many-item la
 | `volunteer_hours_waiting` | Warning | Hours still Submitted that were entered more than 14 days ago (R-VG5): they count in no total or letter. | Opens the Approve Hours tab. |
 | `volunteer_past_shifts_open` | Info | Shifts still Open whose End Time is more than 7 days ago: nothing closes a shift, so attendance was usually never marked (R-VU3). | Opens the shift list view `Past_Shifts_Still_Open` (Status Open, End Time before `N_DAYS_AGO:7`, so it shows what the finding counts), shipped with the module. |
 | `volunteer_schedule_horizon` | Warning | Active schedules whose Created Through is more than two days short of the horizon, or of End Date when sooner (29T). | Links each schedule; the nightly jobs finding schedules the run. |
-| `volunteer_coordinator_access` | Warning | Active holders of the Coordinator role (`Volunteer_Coordinator`) who hold neither `Volunteers_Coordinator` nor `Volunteers_Admin` (which grants all the coordinator set does), directly or through a group, read in the same one query plus one for the group holders it leaves out. | Queues `VolunteersAccessSync` (`HealthCheckFixExtension`, key `giveVolunteersCoordinatorAccess`, scope the names). |
 | `volunteer_rollups_off` | Info | Shipped volunteer totals (29O) whose definition is inactive. A missing one is Rollup Builder's `shipped_rollups_missing` finding, not reported twice. | Opens Rollup Builder. |
 
 **Sample data.** `VolunteersSampleData` implements Core's `SampleDataModule` and is registered in
@@ -11284,7 +11419,7 @@ R-EN2, and is not counted as open on the dashboard or the person card. Cohorts h
   `ProgramsSharingHandler`, registry rows `Enrollment_Sharing` and `Service_Delivery_Sharing`,
   always run), sets the group's All Internal Users member (queued, as a group member is a setup
   object), and shares records that have no share yet (`ProgramsSharingBatch`, run at install
-  and when the preset is saved). `ProgramsAccessSync` sets the member hourly.
+  and when the preset is saved). `ProgramsAccessStep` sets the member hourly, after Core's access sync (D-200 S1).
 - **Validation rules:** `Exactly_One_Person` (R-EN1), `End_After_Start` (R-EN4),
   `Cohort_In_Program` (R-EN8).
 - **Service:** `EnrollmentService` (the stage values and the roster panel's reads and writes),
@@ -11356,18 +11491,25 @@ while the module is turned off:
 | `program_enrollments_open_after_end` | Info | Open enrollments (Applied or Enrolled) in a program that is Completed or whose End Date is past: they still count as open (R-EN2) and in the roster. | Links the first five enrollments. |
 | `nonprofit_cloud_program_management_present` | Info (category OrgShape) | The org has the Nonprofit Cloud `Program` and `ProgramEnrollment` objects, found by describe only (QA-F5). Programs never reads or writes them, so the two share no records. | None: choose one for each program. The Integrations page lists Nonprofit Cloud Program Management as an Alternative (Integration App row `Nonprofit_Cloud_Program_Management`, detected by `Program`, shown only when installed). |
 
-**Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
-`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, five stages, builds three
+**Sample data.** The static resource `ProgramsSampleData.json`, loaded by Core's generic
+`SampleDataFile` since D-200 S2 (format in data/sample/README.md), is registered in
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers; the removal is the file's `remove`
+entries with partial success, naming what it kept in one Warning. Its load builds three
 programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
 enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
 (release 0.13, P-02) 40 service deliveries (29ZB) to the people Enrolled in the two Active
 programs, then (release 1.19, P-11) one Active cohort (29ZA5) of the people Enrolled in tutoring
 with three sessions (29ZA6) of its Homework club service (two Held, with eight attendance deliveries, one
 an Excused Absence; one Scheduled), then (P-10) one In Progress goal (29ZA3) with two steps (29ZA4) per
-person Enrolled in tutoring. Its removal, before Volunteers', Giving's and Core's, deletes one
+person Enrolled in tutoring. Release 1.25 adds a Completed cohort, Summer reading circle, holding
+the four who completed summer reading; an active repeating session schedule (29ZA7) for the
+homework club, Tuesdays and Thursdays for the next 60 days, whose save queues the run that
+creates its sessions (R-SS3); a description and the loading person as Assigned To on every goal,
+one tutoring goal with its review overdue, an Achieved goal in summer reading and an In Progress
+goal in the pantry, each with two steps. Its removal, before Volunteers', Giving's and Core's, deletes one
 chunk per stage: the sample people's service deliveries and enrollments in sample programs (goals
-and steps go with them), then sample program sessions no delivery names and cohorts no session or
-schedule names, then the sample programs with no enrollment, cohort or delivery left (their
+and steps go with them), then sample program sessions no delivery names, the sample programs'
+session schedules, and cohorts no session or schedule names, then the sample programs with no enrollment, cohort or delivery left (their
 services go with them). A sample program a real person
 is enrolled in, or has a delivery in, is kept, and so is a sample program with a sample
 enrollment that has a case note (whoever wrote it, even a note the remover cannot see: that
@@ -12110,6 +12252,7 @@ per program.
 | Program | record identifier (text) | no | The program the model is for, when it is not the organization's. A record identifier, not a reference: Logic Models never depends on Programs (R-LM2). |
 | Scope Key | text | yes (set by BarnCRM) | `Organization`, or the program's identifier. Unique, so a scope has one model. |
 | Periods | long text (JSON) | no | The model's shared reporting periods (v1.0, modules-23, R-LM4): `{"version": 1, "periods": [{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}]}`. |
+| Sample Data | checkbox | no (default false) | Marks a model the sample data loader created (release 1.25), so Remove Sample Data deletes it with its parts. |
 
 ### Relationships
 
@@ -12153,9 +12296,22 @@ in `Periods__c` (plan 9.9).
 | Program | `Program_Id__c` | Text(18) |
 | Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
 | Periods | `Periods__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25) |
 
 - **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
   (R-LM1, R-LM2), reading every model without sharing through `LogicModelIntegritySelector`.
+
+**Sample data (release 1.25).** The static resource `LogicModelsSampleData.json`, loaded by
+Core's `SampleDataFile` (format in data/sample/README.md), loads after Programs' set. It builds
+two models flagged `Sample_Data__c`, one for each of the Programs sample programs After-school
+tutoring and Food pantry, naming the program with a `find` value; a model whose program does
+not resolve is left out with its parts, so the set never creates an organization model that
+R-LM1 would refuse. Tutoring: 15 elements in every column, 14 links with assumptions, six pieces
+of assumption evidence (every strength), seven indicators (one Better When Lower, one Imported)
+with 19 periods carrying targets and results, so Things to Look At shows the all-clear. Pantry:
+10 elements, 10 links, two pieces of evidence, four indicators with 12 periods, and a long term
+outcome with no indicator, so Things to Look At lists one reminder. Its removal deletes the
+flagged models; R-LM3 takes their parts.
 
 ---
 
@@ -12698,7 +12854,8 @@ second one. The renewal history is the chain of Renewal Of links both ways, at m
   (plain JSON; `restrictedFunds` is the F-03 integration point), the `fundersBoard` component on
   the `Funders_Board` tab, shares and flags in `fundersBoardModel.js`.
 - **Health Check:** `FundersHealthCheckExtension` (R-GN7, R-GQ5). **Sample data:**
-  `FundersSampleData` (three grants to Core's sample organizations, flagged `Sample_Data__c`).
+  `FundersSampleData.json`, loaded by Core's `SampleDataFile` (D-200 S2): three grants to
+  Core's sample organizations, flagged `Sample_Data__c`.
 
 ---
 
@@ -13032,7 +13189,7 @@ the date is then not stamped.
 ### Salesforce implementation
 
 - **Object:** `Grant_Answer__c`, name field Text, label Answer Title, sharing Public Read/Write,
-  tab Grant Answers in the BarnCRM Funders app.
+  tab Grant Answers in the BarnCRM Grants app.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -13357,6 +13514,35 @@ answer is no. While in use, turning on Household Upkeep is refused with the reas
 setup leaves it out instead of failing, and its Features row shows the reason whether it is on
 or off. Nothing BarnCRM or NPSP stores is changed.
 
+**R-HA7 Nonprofit Cloud households are a second source (MIG-02b, D-196, ADR-0217
+`0217-npc-household-conversion.md`).** The same preview, run, journal and undo convert
+Nonprofit Cloud households when Mirror is installed: Core finds Mirror's `NpcHouseholdSource`
+by class name, and without it, or without the native group object, that source is not
+available. Its candidates are Accounts carrying a `PartyRelationshipGroup` of type Household,
+read in the running user's access, whose record type is not Household and whose
+`Household_Model__c` is neither Converted nor Nonprofit Cloud. An NPC run's Run ID is `NPC-`
+followed by 32 hexadecimal characters, and each source's panel shows and undoes only its own
+runs. R-HA2's Junction refusal applies to NPSP only.
+
+**R-HA8 What an NPC conversion writes.** As R-HA3, except: `Household_Model__c` becomes
+Converted; both greetings are blank (Nonprofit Cloud has none, upkeep fills them);
+`Primary_Contact__c` is the member whose `AccountContactRelation.IsPrimaryMember` is true when
+that contact's Account is the household, else blank. In Junction mode, in the same savepoint,
+each membership row on the household (except one inactive with no End Date) joins its person
+through `HouseholdService.addMembers` (R-M5), the person account standing in for its own
+contact, and each new `Household_Member__c` row takes `Is_Primary__c` from `IsPrimaryMember`,
+`Role__c` from the first of `Roles` that maps (Husband, Wife to Spouse or Partner; Son,
+Daughter to Child; Father, Mother to Head; Other to Other) and `Start_Date__c` and
+`End_Date__c` from `StartDate` and `EndDate`; in Contact mode nobody is moved. Previous Values
+also holds the previous `Household_Model__c` and, under `members`, the ids of the membership
+rows the run created. No native row or field is written, and nothing is deleted.
+
+**R-HA9 Undo of an NPC conversion.** Undo also puts back `Household_Model__c` when Previous
+Values holds it (NPSP rows do not), then removes the membership rows the run created, after the
+record type is back so the emptied Account is never tidied away. An Account with any other
+Household Member row is Not Restored with the reason, because a household with members cannot
+stop being one.
+
 ### Salesforce implementation
 
 - **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
@@ -13381,6 +13567,15 @@ or off. Nothing BarnCRM or NPSP stores is changed.
   (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
   panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
   NPSP is detected, the coexistence mode is NPSP, or rows exist.
+- **Nonprofit Cloud source (R-HA7):** Mirror's `NpcHouseholdSource` extends
+  `NpspHouseholdSource` and is also the extension of Mirror's kit `NPC_Households`, whose one
+  tool step `households` opens this panel and whose check counts native household Accounts
+  against converted ones. It also answers Mirror's Health Check drift report (R-H15). Native
+  names read as text, never written: `PartyRelationshipGroup` (`AccountId`, `Type`) and
+  `AccountContactRelation`
+  (`AccountId`, `ContactId`, `IsPrimaryMember`, `Roles`, `IsActive`, `StartDate`, `EndDate`). The
+  same panel with the NPC source is the General settings row `NPC_Household_Conversion`, shown
+  only when that source is available or NPC rows exist.
 
 ---
 
@@ -13417,11 +13612,16 @@ name, so Core names no module. Steps run one at a time, ordered by time of day (
 order registered). Each starts at its time of day or when the step before has finished,
 whichever is later.
 
-**R-NJ3 When a step has finished.** When no batch, queueable or future job the run's user
-started since the step began is holding, queued, preparing or processing. Checked every two
-minutes; after six hours the step is recorded Gave Up Waiting and the run moves on. A step whose
-jobs failed or reported errors is Done With Errors; a step whose start threw is Failed, with the
-error logged and in Last Message.
+**R-NJ3 When a step has finished.** The link that starts a step notes the Apex classes of the
+batch, queueable and future jobs its work started (the run user's jobs that exist after the work
+and did not before). The step has finished when no job of those classes the run's user started
+since the step began is holding, queued, preparing or processing, so a job it chains of the same
+class counts and unrelated work in the org does not. A step that started none is finished at the
+first check. A run that takes over a step left running cannot know what it started, so it waits
+on the classes of every such job of the run's user still unfinished since that step began.
+Checked every two minutes; after six hours the step is recorded Gave Up Waiting and the run moves
+on. A step whose own jobs failed or reported errors is Done With Errors; a step whose start threw
+is Failed, with the error logged and in Last Message.
 
 **R-NJ4 Switches.** A step whose on/off was its own schedule (Error Digest, Rollups, the four
 Giving jobs, Acknowledgments, Pledge Reminders, the Opportunity and Gift Transaction mirrors) has
@@ -13429,10 +13629,9 @@ a switch, set by the Schedule and Stop buttons on its own page, org-wide. Shippe
 Acknowledgments and Pledge Reminders (shipped off). A step whose on/off is a setting reads that
 setting. A step that is off is recorded Skipped.
 
-**R-NJ5 Adopting old schedules.** Every scheduled job named by a step's key is aborted; a step
-with a switch whose job was scheduled has its switch turned On; when anything was adopted, the
-nightly run is scheduled. Run at install, upgrade and Finish Setup by Core and by each module, at
-the start of each nightly run, by Health Check's fix, and when an old job fires. Never throws.
+**R-NJ5 Adopting old schedules.** Removed at the namespaced cut-over (D-199, D-200): the managed
+release is a fresh install everywhere, so no org has a separate schedule of an earlier version to
+adopt.
 
 **R-NJ6 A run still going at midnight.** The new run supersedes it: the old run stops at its
 next check, and the new run's first step waits for the work the old step started.
@@ -13605,7 +13804,7 @@ and gives the new version its signing key.
 ### Salesforce implementation
 
 - **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
-  edits), tab Forms in the BarnCRM apps (no module app, D-188).
+  edits), tab Forms in the BarnCRM Forms app and the BarnCRM apps (D-188, ADR-0223 module apps).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -13614,6 +13813,7 @@ and gives the new version its signing key.
 | Definition | `Definition__c` | Long Text Area(131072) |
 | Published Version | `Published_Version__c` | Number(6, 0) |
 | Public | `Public__c` | Checkbox, default false |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the form, its versions and its submissions (children go with it by master-detail) |
 
 - **Engine:** framework-free modules `formDefinition.js` (parse, check, defaults), `formRules.js`
   (conditions, visibility, answer checks, step order) and `formMapping.js` (what a submission
@@ -13989,7 +14189,8 @@ registration form is shown while the status is Open and now is inside the regist
 ### Salesforce implementation
 
 - **Object:** `Event__c`, name field Text, label Event Name, sharing Public Read/Write, tab Events
-  (the object) and the Events page (`Events_Home`) in the BarnCRM apps (no module app, D-188).
+  (the object) and the Events page (`Events_Home`) in the BarnCRM Events app and the BarnCRM apps
+  (D-188, ADR-0223 module apps).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -15120,6 +15321,7 @@ A place events are held, kept once and picked on each event (EV-24, ADR-0215
 | Capacity | number | no | The most people the venue holds. |
 | Map Link | URL | no | A map or floor plan, shown in the attendee app. |
 | Notes | long text | no | Parking, access, loading and contacts. |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
 ### Rules
 
@@ -15140,6 +15342,7 @@ events already saved.
 | Capacity | `Capacity__c` | Number(7, 0) |
 | Map Link | `Map_URL__c` | URL(255) |
 | Notes | `Notes__c` | Long Text Area(5000) |
+| Sample Data | `Sample_Data__c` | Checkbox |
 
 ---
 
@@ -15536,6 +15739,7 @@ offered after sign-in. Off: never asked.
 | Session Hours | `Session_Hours__c` | Number(3, 0), default 8 |
 | Sender Address | `Sender_Address__c` | Email |
 | Template | `Template__c` | Long Text Area(131072) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the portal and its accesses (master-detail) |
 
 ---
 
@@ -15803,6 +16007,7 @@ Every (Months). Retire sets Status Retired and Retired On; a retired document as
 | Retired On | `Retired_On__c` | Date |
 | Template Key | `Template_Key__c` | Text(80), unique, external ID |
 | Reminded For | `Reminded_For__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks records the sample data loader made (release 1.25) |
 
 ---
 
@@ -15927,6 +16132,7 @@ months); a One Time obligation becomes Done instead. A month end due date stays 
 | Last Completed | `Last_Completed_On__c` | Date |
 | Reminded For | `Reminded_For__c` | Date |
 | Days Until Due | `Days_Until_Due__c` | Formula (Number), `Due_Date__c - TODAY()` |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks records the sample data loader made (release 1.25) |
 
 ---
 
@@ -16019,6 +16225,7 @@ passed becomes Expired. End Date is on or after Start Date (validation rule `End
 | Terms | `Terms__c` | Long Text Area(32768) |
 | Reminder Days | `Reminder_Days__c` | Number(3, 0) |
 | Reminded For | `Reminded_For__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks agreements the sample data loader made (release 1.25) |
 
 ---
 
@@ -16111,6 +16318,7 @@ its meetings and votes, its action items and its self-assessments.
 | Quorum (Percent) | `Quorum_Percent__c` | Number(3, 0), default 51 |
 | Skills Wanted | `Needed_Skills__c` | Multi-Select Picklist (the Skills values of 29CH8) |
 | Description | `Description__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks boards the sample data loader made (release 1.25) |
 
 ---
 
@@ -16316,13 +16524,17 @@ its outcome.
 | Status | picklist | yes | Proposed, Voting Open, Passed, Failed, Tabled or Withdrawn. Default Proposed. |
 | Resolution Number | text | no | The organization's own numbering. |
 | Decided On | date | no | When it passed or failed. |
+| Closed Without Quorum | checkbox | no | Set when voting was closed while the meeting had not reached quorum (R-MO1, D-196). Default false. |
 | For, Against, Abstentions | number (roll-up) | no | The votes recorded (R-MO1). |
 
 ### Rules
 
 **R-MO1 Voting.** Open Voting sets Voting Open and adds one Board Vote, blank, per voting
 attendee. Close Voting sets Passed when For is greater than Against, otherwise Failed, and sets
-Decided On to today. Close Voting is refused unless the motion's Status is Voting Open.
+Decided On to today. Close Voting is refused unless the motion's Status is Voting Open. The
+outcome does not depend on quorum, but when the meeting's Quorum Met is false at close, Closed
+Without Quorum is set and the result carries a warning to check the bylaws (D-196, CH-21);
+otherwise it is cleared.
 
 ### Salesforce implementation
 
@@ -16338,6 +16550,7 @@ Decided On to today. Close Voting is refused unless the motion's Status is Votin
 | Status | `Status__c` | Picklist (values above), restricted, required |
 | Resolution Number | `Resolution_Number__c` | Text(40) |
 | Decided On | `Decided_On__c` | Date |
+| Closed Without Quorum | `Closed_Without_Quorum__c` | Checkbox, default false |
 | For | `Votes_For__c` | Roll-Up Summary (COUNT Board Vote, Vote For) |
 | Against | `Votes_Against__c` | Roll-Up Summary (COUNT Board Vote, Vote Against) |
 | Abstentions | `Abstentions__c` | Roll-Up Summary (COUNT Board Vote, Vote Abstain) |
@@ -16556,6 +16769,7 @@ is an edit: set DPIA Last Reviewed and move Next DPIA Review on.
 | Next DPIA Review | `DPIA_Review_Date__c` | Date |
 | Template Key | `Template_Key__c` | Text(80), unique, external ID |
 | Reminded For | `Reminded_For__c` | Date |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks records the sample data loader made (release 1.25) |
 
 ---
 
@@ -16653,8 +16867,11 @@ and the people were told, or why not. Every breach is logged, reported or not.
 
 **R-DB1 Deadline reminders.** The nightly step reminds the owner of an Open or Contained breach
 whose risk is not Unlikely to Result in Risk and whose Authority Notified At is blank, once for
-its Authority Deadline date (within the reminder days, so on the first night). A Closed breach
-has its risk assessed (`Closed_Needs_Assessment`).
+its Authority Deadline date (within the reminder days, so on the first night). The same bell goes
+the moment such a breach is logged (CH-22, D-196), by the registry automation `Data_Breach_Bell`
+on insert when reminders are on; it stores the deadline date in Reminded For, so the nightly step
+sends no second bell for that date. A Closed breach has its risk assessed
+(`Closed_Needs_Assessment`).
 
 ### Salesforce implementation
 
@@ -16705,9 +16922,12 @@ the money or any card or account number.
 | Listener | text | no | The consumer's class told of each change (ADR-0201 payments module, decision 8). |
 | Reference | text | yes | A random identifier sent to the processor and matched on its events; unique. |
 | Checkout Id | text | no | The Stripe Checkout Session id or the PayPal Order id. |
-| Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture id, once known. |
+| Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture or sale id, once known (a Stripe renewal whose invoice has no payment intent: the invoice id). |
 | Checkout Url | long text | no | The hosted checkout page address. |
 | Paid At | datetime | no | When the processor reported the money captured. |
+| Subscription Id | text | no | The processor's subscription (Stripe `sub_...`, PayPal `I-...`) this payment started or renewed (R-PAY6). |
+| Plan Key | text | no | For a PayPal subscription's first payment: the mode, currency, amount and interval its billing plan charges, such as `Test:USD:25.00:MONTH:1` (R-PAY7). |
+| Plan Id | text | no | For a PayPal subscription's first payment: the PayPal billing plan (`P-...`) its subscription uses (R-PAY7). |
 | Detail | text | no | The last failure, refund or cancellation reason the processor gave; until then, what the consumer passed as `detail` (Giving: the scheduled payment charged). |
 
 ### Rules
@@ -16730,6 +16950,26 @@ fails, is told one payment at a time (`paymentChanged`), each failure rolled bac
 
 **R-PAY4 No card data.** No field holds a card, bank account or PayPal sign-in; the processor's
 page takes them.
+
+**R-PAY6 Subscriptions** (PAY-04, D-196; ADR-0218 `0218-payments-subscriptions.md`). With
+Automatic Recurring Payments on, a checkout started with an interval is a processor subscription;
+its first payment gains the Subscription Id. A paid charge on a subscription is matched by its
+Processor Payment Id; failing that, the subscription's first payment (by reference, else by
+Subscription Id) takes it while it has no Processor Payment Id; otherwise a new Paid payment is
+written, copied from the first payment (person, source record, listener, description, currency,
+mode; never its detail), with a new reference and the charged amount. A failed charge, a card
+update and a cancellation change no payment; with each paid charge they are told to the first
+payment's listener as `subscriptionsChanged`, once per run, inside a savepoint.
+
+**R-PAY7 PayPal plans reused** (D-198; ADR-0218 amendment of 2026-11-12). A PayPal subscription
+checkout reuses one catalog product per PayPal account (Payment Keys' PayPal Product Id) and one
+billing plan per Plan Key; each payer still gets a subscription of their own, so renewals,
+failures, cancellations and Update Card track to their own first payment as before. The plan is
+the Plan Id of the newest payment with the same Plan Key, read past sharing (a donor page's
+guest starts checkouts). With none, or when PayPal refuses a subscription on the remembered plan
+(missing or inactive), a new plan is made and this payment carries it, so it replaces the old one
+from then on; a product PayPal refuses a plan for is replaced the same way. Every PayPal callout
+comes first; the payment and the product id are written after.
 
 ### Salesforce implementation
 
@@ -16754,6 +16994,9 @@ page takes them.
 | Processor Payment Id | `Processor_Payment_Id__c` | Text(255), external ID |
 | Checkout Url | `Checkout_Url__c` | Long Text Area(2048) |
 | Paid At | `Paid_At__c` | DateTime |
+| Subscription Id | `Subscription_Id__c` | Text(100), external ID |
+| Plan Key | `Plan_Key__c` | Text(50), external ID (indexed: the plan is found by it) |
+| Plan Id | `Plan_Id__c` | Text(50) |
 | Detail | `Detail__c` | Text(255) |
 
 ---
@@ -16826,6 +17069,7 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 |---|---|---|---|
 | Processor | text | yes (defaults Stripe) | Stripe or PayPal: used when a module does not name one. |
 | Mode | text | yes (defaults Test) | Test or Live. Test takes no real money. |
+| Automatic Recurring Payments | checkbox | yes (defaults off) | A checkout started with an interval is a processor subscription (R-PAY6). |
 | Currency | text | yes (defaults USD) | The three-letter currency used when a module does not name one. |
 
 ### Salesforce implementation
@@ -16837,9 +17081,10 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | Processor | `Processor__c` | Text(20), default "Stripe" |
 | Mode | `Mode__c` | Text(10), default "Test" |
 | Currency | `Currency__c` | Text(3), default "USD" |
+| Automatic Recurring Payments | `Recurring_Payments__c` | Checkbox, default false |
 
 - **Setting Definitions:** `Payments_Processor`, `Payments_Mode`, `Payments_Currency`,
-  `Payments_Setup_Page`, section Payments.
+  `Payments_Recurring`, `Payments_Setup_Page`, section Payments.
 
 ---
 
@@ -16848,7 +17093,8 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 ### Definition
 
 The organization's own processor keys, written on the Payments Setup page and never shown again
-(only whether each is set and its last four characters).
+(only whether each is set and its last four characters), and the PayPal catalog product the
+account's subscription plans share (R-PAY7).
 
 ### Attributes
 
@@ -16859,6 +17105,7 @@ The organization's own processor keys, written on the Payments Setup page and ne
 | PayPal Client Id | text | for PayPal | The REST app's client id. |
 | PayPal Client Secret | text | for PayPal | The REST app's secret. |
 | PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. |
+| PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
 
 ### Rules
 
@@ -16876,6 +17123,7 @@ and the setup page never returns a key.
 | PayPal Client Id | `PayPal_Client_Id__c` | Text(255) |
 | PayPal Client Secret | `PayPal_Client_Secret__c` | Text(255) |
 | PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
+| PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
 
 ---
 
@@ -17117,10 +17365,12 @@ deployed metadata.
 columns: [{id, width, blocks: [block]}]}]}]}`. A row's column widths are twelfths and add up to
 12. A block is `{id, type, title, visibility}` plus its type's properties: `fields` (page
 record fields), `relatedList` (object, parent field, fields, sort), `recordList` (object,
-fields, one optional filter, sort), `chart` (report API name), `text` (rich text), `image`
-(address, alternative text) and `action` (quick action or screen flow). Ids are unique within
-the document. The `lwcBuilderModel` module validates it; Apex checks only that it is a JSON
-object with a known schema version.
+fields, one optional filter, sort), `chart` (report API name; optional `display`, `grouped` or
+`stacked`, blank read as `grouped`), `text` (rich text), `image` (address, alternative text) and
+`action` (quick action or screen flow). Ids are unique within the document. The
+`lwcBuilderModel` module validates it; Apex checks only that it is a JSON object with a known
+schema version. A property added later with a default that keeps old documents meaning what
+they meant (such as `display`) does not raise the schema version.
 
 **R-LB2 Reads are the viewer's.** Every block reads in user mode or through Lightning Data
 Service, so object, field and record access apply. List queries name only fields the schema
@@ -17195,6 +17445,7 @@ A scholarship, fellowship or outbound grant program the organization gives (SG-0
 | Active | `Active__c` | Checkbox, default true |
 | Description | `Description__c` | Long Text Area(32768) |
 | Award Letter Template | `Letter_Template__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 ---
 
@@ -17472,6 +17723,7 @@ owner, counted as No Room.
 | Territory Owner | `Owner_User__c` | Lookup(User) |
 | Next Member | `Next_Member__c` | Number(6, 0) |
 | Description | `Description__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25); set by the sample data loader so Remove Sample Data finds the territory, its rules and members (master-detail) and clears the Territory of any record assigned to it (Clear on delete) |
 
 - **Account:** households and organizations.
 
@@ -17623,6 +17875,7 @@ lasts and how long a lapsed member stays in grace (G-22a, Memberships module, AD
 | Fund Id | text | no | The Giving fund whose gifts pay for this level (R-MEM6), as a record id. |
 | Description | long text | no | What the level is, for staff and members. |
 | External Id | text | no | The record's id in the system it was imported from; unique. |
+| Sample Data | boolean | no | True when the sample data loader created the level. Default false. |
 
 ### Salesforce implementation
 
@@ -17639,6 +17892,7 @@ lasts and how long a lapsed member stays in grace (G-22a, Memberships module, AD
 | Fund Id | `Fund_Id__c` | Text(18) |
 | Description | `Description__c` | Long Text Area(4000) |
 | External Id | `External_Id__c` | Text(255), unique, external ID |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 ---
 
@@ -17708,6 +17962,7 @@ renews.
 | Is Active | formula | no | True while Current or Grace. |
 | External Id | text | no | The record's id in the system it was imported from; unique. |
 | Notes | long text | no | Staff notes. |
+| Sample Data | boolean | no | True when the sample data loader created the term, so the set can be removed in one action. Default false. |
 
 ### Rules
 
@@ -17777,6 +18032,7 @@ their Member Name, level, Directory Location and Directory Bio.
 | Is Active | `Is_Active__c` | Formula (Checkbox) |
 | External Id | `External_Id__c` | Text(255), unique, external ID |
 | Notes | `Notes__c` | Long Text Area(4000) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 ---
 
@@ -17841,10 +18097,22 @@ A piece of work with a start, a target date and an outcome: a Salesforce impleme
 | Tasks Done | `Tasks_Done__c` | Roll-Up Summary (COUNT Project_Task__c, Status__c equals Done) |
 | Percent Complete | `Percent_Complete__c` | Formula (Percent): `IF(Tasks__c = 0, 0, Tasks_Done__c / Tasks__c)` |
 | Estimated Hours | `Estimated_Hours__c` | Roll-Up Summary (SUM Project_Task__c.Estimated_Hours__c, Status__c not equal to Cancelled) |
-| Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c) |
-| Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true) |
-| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c)` |
-| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+| Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, counted: Status__c not equal to Open, Submitted, Rejected; R-PM10) |
+| Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true, counted) |
+| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))` |
+| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+| Billing Type | `Billing_Type__c` | Picklist (Time and Materials, Fixed Fee, Retainer, Not Billed), restricted, default Time and Materials; blank reads as Time and Materials (PM-10) |
+| Retainer Amount | `Retainer_Amount__c` | Currency(16, 2): Retainer, billed each month |
+| Time Amount | `Time_Amount__c` | Roll-Up Summary (SUM Time_Entry__c.Amount__c, counted; PM-06) |
+| Billable Amount | `Billable_Amount__c` | Roll-Up Summary (SUM Time_Entry__c.Amount__c, Billable__c equals true, counted) |
+| Labor Cost | `Labor_Cost__c` | Roll-Up Summary (SUM Time_Entry__c.Cost_Amount__c, counted); Projects Admin only |
+| Expense Amount | `Expense_Amount__c` | Roll-Up Summary (SUM Project_Expense__c.Amount__c, counted; PM-08) |
+| Change Hours | `Change_Hours__c` | Roll-Up Summary (SUM Project_Change_Request__c.Hours__c, Status__c equals Approved; PM-12) |
+| Change Amount | `Change_Amount__c` | Roll-Up Summary (SUM Project_Change_Request__c.Amount__c, Status__c equals Approved) |
+| Recognized Revenue | `Recognized_Revenue__c` | Roll-Up Summary (SUM Project_Revenue__c.Recognized_Amount__c; PM-11) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks projects the sample data loader made (release 1.25) |
+
+The project manager, who approves time, expenses and change requests (R-PM11, R-PM20), is the project's owner (`OwnerId`). With change requests, the budget measured against is Budget Hours plus Change Hours and Budget Amount plus Change Amount; R-PM2 compares Actual Hours with Budget Hours plus Change Hours.
 
 ---
 
@@ -17894,6 +18162,10 @@ One piece of work in a project, with an owner, dates, an estimate and a status (
 | Estimated Hours | `Estimated_Hours__c` | Number(6, 2) |
 | Order | `Sort_Order__c` | Number(4, 0) |
 | Description | `Description__c` | Long Text Area(32768) |
+| Billing Amount | `Billing_Amount__c` | Currency(16, 2): Fixed Fee, billed once the milestone is Done (R-PM18) |
+| Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null: filled means invoiced (R-PM12) |
+
+**R-PM18 Milestone billing.** Billing Amount is 0 or more and only on a milestone (validation rule `Billing_Amount_On_Milestone`); once on an invoice line, Billing Amount and Milestone do not change until the invoice is voided (`Billing_Locked_When_Invoiced`).
 
 ---
 
@@ -17932,7 +18204,15 @@ Hours a person worked on a project on one day, optionally on one task, billable 
 
 **R-PM6 Hours.** Hours must be more than 0 and at most 24 (validation rule). The task lookup accepts only a task of the same project.
 
-**R-PM7 Billable export.** Export Billable Time (Manage Projects) returns the billable entries dated in a range, not yet exported unless asked, as CSV rows built in the browser, and stamps Exported Date with today. BarnCRM makes no invoice and takes no payment.
+**R-PM7 Billable export.** Export Billable Time (Manage Projects) returns the counted (R-PM10) billable entries dated in a range, not yet exported unless asked, as CSV rows built in the browser, and stamps Exported Date with today.
+
+**R-PM9 Rate resolution (PM-06).** With Use rate cards on, an entry's Bill Rate and Cost Rate are written on insert, and again when its Date, Person, Project or Task changes while it is neither Approved nor invoiced, each resolved separately for the entry's person and date: (1) the person's Project Rate whose Effective From is on or before the date and whose Effective To is blank or on or after it (latest Effective From wins); else (2) the role's rate, for the person's Project Assignment role on that project (the assignment covering the date, else any), else their Project Resource's Default Role; else (3) the project's Hourly Rate as Bill Rate, with no Cost Rate. A rate is never re-resolved because a Project Rate changed. Apply Rates (Manage Projects) fills entries whose Bill Rate is blank and that are not invoiced. With rate cards off nothing is written.
+
+**R-PM10 Counted.** An entry or expense counts as actual, billable, exportable and invoiceable when Status is blank (logged while approvals were off, or before 1.20) or Approved. Open, Submitted and Rejected do not count; the roll-ups filter Status not equal to Open, Submitted, Rejected.
+
+**R-PM11 Approval (PM-07).** With approvals on, a new entry with a blank Status is saved Open (entry handler). The person submits a week (Open and Rejected entries of that Monday to Sunday week become Submitted) and may recall it (Submitted to Open). Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Approval_By_Manager`), stamping Approved By; Rejected needs a Rejection Reason (`Rejection_Needs_Reason`). Status is never set back to blank (`Status_Not_Cleared`). A Submitted entry's Hours, Date, Person, Task, Billable and (once set) rates change only by the project owner or Manage Projects; an Approved entry's, and its Status, only by Manage Projects (`Locked_When_Submitted_Or_Approved`). A rate written where it was blank passes both locks.
+
+**R-PM12 Invoiced.** An entry, expense or milestone whose Invoice Line is filled is invoiced. It does not change (Status, the fields in R-PM11) until the Invoice Line is cleared, by anyone (`Locked_When_Invoiced`). Deleting the line (deleting a Draft invoice) clears it by Set Null; voiding the invoice clears it (R-PM17).
 
 ### Salesforce implementation
 
@@ -17948,6 +18228,17 @@ Hours a person worked on a project on one day, optionally on one task, billable 
 | Billable | `Billable__c` | Checkbox, default false |
 | Notes | `Notes__c` | Text(255) |
 | Exported Date | `Exported_Date__c` | Date |
+| Status | `Status__c` | Picklist (Open, Submitted, Approved, Rejected), restricted, not required, no default (R-PM10, R-PM11) |
+| Bill Rate | `Bill_Rate__c` | Currency(16, 2), written by R-PM9 |
+| Cost Rate | `Cost_Rate__c` | Currency(16, 2), written by R-PM9; Projects Admin only |
+| Amount | `Amount__c` | Formula (Currency): `Hours__c * Bill_Rate__c` |
+| Cost Amount | `Cost_Amount__c` | Formula (Currency): `Hours__c * Cost_Rate__c`; Projects Admin only |
+| Approved By | `Approved_By__c` | Lookup(User), relationship Approved_Time_Entries |
+| Rejection Reason | `Rejection_Reason__c` | Text(255) |
+| Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null (R-PM12) |
+| Request | `Request__c` | Lookup(Project_Request__c), Set Null, relationship Time_Entries: the request the hours were spent on (29PM16) |
+
+Validation rules: `Hours_In_Range`, `Approval_By_Manager`, `Rejection_Needs_Reason`, `Status_Not_Cleared`, `Locked_When_Submitted_Or_Approved`, `Locked_When_Invoiced`.
 
 ---
 
@@ -17987,7 +18278,9 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Rules
 
-- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-0219 `0219-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, and for requests (ADR-0221 `0221-projects-requests-and-issues.md`, Help Path `projects-requests.md`) `Projects_Requests_Enabled`, `Projects_Requests_External_Enabled`, `Projects_Request_Days_Urgent`, `Projects_Request_Days_High`, `Projects_Request_Days_Medium`, `Projects_Request_Days_Low`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Request switches.** Track requests and issues does not need Track time and budgets. Take requests from outside reads off while Track requests and issues is off.
+- **PSA switches.** Every PSA switch ships off and reads off while Track time and budgets is off. Take invoice payments online also needs Create invoices and the Payments module.
 
 ### Salesforce implementation
 
@@ -17999,6 +18292,337 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Days late before at risk | `At_Risk_Days__c` | Number(3, 0), default 7 (1 to 365) |
 | Budget warning percent | `Budget_Warning_Percent__c` | Number(3, 0), default 90 (1 to 100) |
 | Weekly capacity hours | `Weekly_Capacity_Hours__c` | Number(3, 0), default 40 (1 to 168) |
+| Use rate cards | `Rates_Enabled__c` | Checkbox, default false (PM-06) |
+| Approve time and expenses | `Approvals_Enabled__c` | Checkbox, default false (PM-07) |
+| Track expenses | `Expenses_Enabled__c` | Checkbox, default false (PM-08) |
+| Manage resources | `Resources_Enabled__c` | Checkbox, default false (PM-09) |
+| Create invoices | `Billing_Enabled__c` | Checkbox, default false (PM-10) |
+| Take invoice payments online | `Online_Payments_Enabled__c` | Checkbox, default false (PM-10, R-PM22) |
+| Invoice payment return page | `Invoice_Return_Url__c` | URL(255); filled with the org's My Domain address at install while blank (`ProjectsPostInstall`), so it is never blank; read as that address if cleared |
+| Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
+| Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
+| Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |
+| Track requests and issues | `Requests_Enabled__c` | Checkbox, default false (D-201) |
+| Take requests from outside | `Requests_External_Enabled__c` | Checkbox, default false (D-201): the portal and request connections |
+| Urgent request due days | `Request_Days_Urgent__c` | Number(3, 0), default 1 (1 to 365), weekdays |
+| High request due days | `Request_Days_High__c` | Number(3, 0), default 2 (1 to 365), weekdays |
+| Medium request due days | `Request_Days_Medium__c` | Number(3, 0), default 5 (1 to 365), weekdays |
+| Low request due days | `Request_Days_Low__c` | Number(3, 0), default 10 (1 to 365), weekdays |
+
+---
+
+## 29PM8. Project Rate
+
+### Definition
+
+A bill rate and an optional cost rate for one person or one role, from a date (PM-06, ADR-0219 `0219-projects-psa.md`, D-197). Org-wide; resolved for each time entry by R-PM9 (29PM5).
+
+### Rules
+
+- Person or Role, never both and never neither (validation rule `Person_Or_Role`); Effective To blank or on or after Effective From (`Dates_In_Order`); rates 0 or more (`Rates_Not_Negative`).
+- Cost Rate is readable only with Projects Admin.
+
+### Salesforce implementation
+
+- **Object:** `Project_Rate__c`, label Project Rate, name field Auto Number (`RATE-{00000}`, Rate Number), sharing Public Read/Write (edited only with Projects Admin's object access).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Person | `User__c` | Lookup(User), relationship Project_Rates |
+| Role | `Role__c` | Text(80), as on Project Assignments |
+| Bill Rate | `Bill_Rate__c` | Currency(16, 2), required |
+| Cost Rate | `Cost_Rate__c` | Currency(16, 2) |
+| Effective From | `Effective_From__c` | Date, required |
+| Effective To | `Effective_To__c` | Date |
+
+---
+
+## 29PM9. Project Expense
+
+### Definition
+
+Money spent on a project by a person, billable or not, with the receipt as a file on the record (PM-08).
+
+### Rules
+
+**R-PM13 Expenses.** Amount more than 0 (`Amount_Positive`). Status, approval, locks and invoicing follow R-PM10 to R-PM12 with Amount, Date, Person, Category and Billable as the locked fields (validation rules `Approval_By_Manager`, `Rejection_Needs_Reason`, `Status_Not_Cleared`, `Locked_When_Submitted_Or_Approved`, `Locked_When_Invoiced`). The receipt is a Salesforce File linked to the expense.
+
+### Salesforce implementation
+
+- **Object:** `Project_Expense__c`, label Project Expense, name field Auto Number (`EXP-{000000}`, Expense Number), master-detail to Project (`Project__c`, relationship Expenses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Person | `User__c` | Lookup(User), relationship Project_Expenses |
+| Date | `Date__c` | Date, required |
+| Category | `Category__c` | Picklist (Travel, Lodging, Meals, Mileage, Software, Supplies, Other), not restricted |
+| Amount | `Amount__c` | Currency(16, 2), required |
+| Billable | `Billable__c` | Checkbox, default false |
+| Description | `Description__c` | Text(255) |
+| Status | `Status__c` | Picklist (Open, Submitted, Approved, Rejected), restricted, not required |
+| Approved By | `Approved_By__c` | Lookup(User), relationship Approved_Project_Expenses |
+| Rejection Reason | `Rejection_Reason__c` | Text(255) |
+| Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null |
+
+---
+
+## 29PM10. Project Resource
+
+### Definition
+
+A person who can be staffed on projects, with skills, weekly capacity and a default role (PM-09). One per person: the Staffing page edits the existing row; if a second is made by hand, the oldest wins.
+
+### Rules
+
+**R-PM14 Allocation (computed, not stored).** For each active resource and each week (Monday to Sunday) in a range: Allocated Hours are the sum over their Project Assignments of Planned Hours times the assignment's working days (Monday to Friday, Start Date to End Date, else the range) in the week over its working days in all; Capacity is Weekly Capacity Hours, else the Weekly capacity hours setting; Logged Hours are their counted time entries in the week. Open Resource Requests show as unfilled demand by week, spread the same way. Worked out in the browser in a framework-free module. Weekly Capacity Hours is blank or 1 to 168 (`Capacity_In_Range`).
+
+### Salesforce implementation
+
+- **Object:** `Project_Resource__c`, label Project Resource, name field Text (Resource Name), sharing Public Read/Write.
+- **Value set:** global value set `Project_Skills` (Project Skills), edited in Setup, used by both Skills fields.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Person | `User__c` | Lookup(User), relationship Project_Resources, delete rule Set Null; required by the validation rule `Resource_Needs_User` (a required lookup to User is not allowed) |
+| Skills | `Skills__c` | Multi-Select Picklist (`Project_Skills`) |
+| Weekly Capacity Hours | `Weekly_Capacity_Hours__c` | Number(3, 0) |
+| Default Role | `Default_Role__c` | Text(80) |
+| Active | `Active__c` | Checkbox, default true |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks resources the sample data loader made (release 1.25) |
+
+---
+
+## 29PM11. Resource Request
+
+### Definition
+
+A project's need for a role with skills, for some hours between two dates, filled by a Project Assignment (PM-09).
+
+### Rules
+
+**R-PM15 Filling.** Fill (Staffing page) lists active resources, those whose Skills include every requested skill first, then those whose Default Role equals the request's Role (ignoring case), then by free capacity in the dates (Weekly Capacity Hours for the request's working days less the Planned Hours of their assignments in those days, spread as R-PM14), then by name; the ranking is worked out in the browser and the chosen person gets a new Project Assignment with the request's Role, Hours as Planned Hours, and dates; the request links it and becomes Filled. End Date on or after Start Date (`Dates_In_Order`); Hours more than 0 (`Hours_Positive`). The Assignment lookup accepts only an assignment on the same project.
+
+### Salesforce implementation
+
+- **Object:** `Resource_Request__c`, label Resource Request, name field Auto Number (`RR-{00000}`, Request Number), master-detail to Project (`Project__c`, relationship Resource_Requests), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Role | `Role__c` | Text(80), required |
+| Skills | `Skills__c` | Multi-Select Picklist (`Project_Skills`) |
+| Hours | `Hours__c` | Number(8, 2), required |
+| Start Date | `Start_Date__c` | Date, required |
+| End Date | `End_Date__c` | Date, required |
+| Status | `Status__c` | Picklist (Open, Filled, Cancelled), restricted, required, default Open |
+| Assignment | `Assignment__c` | Lookup(Project_Assignment__c), filtered to the same project, Set Null |
+| Notes | `Notes__c` | Long Text Area(32768) |
+
+---
+
+## 29PM12. Project Invoice
+
+### Definition
+
+An invoice record for one project, for the organization's own accounting (PM-10). Projects processes no payment; with the Payments module installed, the client may pay online through Payments' hosted checkout (R-PM22).
+
+### Rules
+
+**R-PM16 Building.** New Invoice (Manage Projects) for a project that is not Not Billed and a period adds a Draft invoice with Bill To and Bill To Contact from the project's client and lines: Time and Materials (or blank): counted billable time entries dated in the period with no Invoice Line, one Time line per person and Bill Rate (Quantity the hours, Unit Price the rate; an entry with no Bill Rate uses the project's Hourly Rate); Fixed Fee: each milestone that is Done, has a Billing Amount, a Completed Date on or before Period End and no Invoice Line, one Milestone line each; Retainer: one Retainer line per calendar month of the period with no Retainer line of that Service Date on an invoice that is not Void, at the Retainer Amount; and for every billing type, counted billable expenses dated in the period with no Invoice Line, one Expense line each. Each source record's Invoice Line is filled with its line. Period End on or after Period Start (`Period_In_Order`).
+
+**R-PM17 Status.** Draft, then Send (Invoice Date today and Due Date Invoice Date plus Invoice due days, each when blank), then Paid (Mark Paid with a Paid Date, which also sets Amount Paid to the Total, or R-PM22), or Void from any of them. Only a Draft can be deleted (registry row `Project_Invoice_Delete_Guard`, before delete, Always Runs), so deleting a Sent, Paid or Void invoice, or a project that has one, is refused and Void is the way to free work. New Invoice refuses a period whose invoice, lines and marked sources would pass 9,000 rows, before any save, and asks for a shorter period. Void clears the Invoice Line of every time entry, expense and milestone on its lines, so the work can be billed again, and keeps the lines. A Void invoice never changes status again (`Void_Is_Final`). Lines are added, changed or removed only while Draft (29PM13). Export Invoices (Manage Projects) returns Sent and Paid invoices with an Invoice Date in a range, not yet exported unless asked, and their lines (up to 500 each), as CSV built in the browser, and stamps Exported Date.
+
+**R-PM22 Online payment (D-197 as amended 2026-11-12).** With the Payments module installed and Take invoice payments online on, Send Payment Link (Manage Projects) on a Sent invoice with Total less Amount Paid more than 0 calls Payments' `startCheckout` by name (`PaymentsApi`, built with `NamespaceUtil.build`; the action is hidden when it is null) with that amount, `sourceRecordId` the invoice, `listener` `ProjectInvoicePaymentListener`, the Bill To Contact as payer and the Invoice payment return page (else the My Domain address) as success and cancel address; it stores the payment's id in Payment Key and the checkout address in Payment Link, then emails the link to the Bill To Contact. A new link replaces the key, so a report about an older payment changes nothing. Payments reports changes to the listener (`paymentsChanged`): for the invoice's current Payment Key only, Paid adds the amount to Amount Paid and, once Amount Paid reaches Total, sets Status Paid and Paid Date to the payment's paid date; a refund lowers Amount Paid by the refunded amount and sets a Paid invoice whose Amount Paid falls below Total back to Sent; Failed and Cancelled change nothing. A Void invoice is never changed by a report. Projects names no Payments class or object.
+
+### Salesforce implementation
+
+- **Object:** `Project_Invoice__c`, label Project Invoice, name field Auto Number (`INV-{000000}`, Invoice Number), master-detail to Project (`Project__c`, relationship Invoices), sharing Controlled by Parent, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Bill To | `Account__c` | Lookup(Account), relationship Project_Invoices |
+| Bill To Contact | `Contact__c` | Lookup(Contact), relationship Project_Invoices |
+| Status | `Status__c` | Picklist (Draft, Sent, Paid, Void), restricted, required, default Draft, history tracked |
+| Invoice Date | `Invoice_Date__c` | Date |
+| Due Date | `Due_Date__c` | Date |
+| Period Start | `Period_Start__c` | Date |
+| Period End | `Period_End__c` | Date |
+| Paid Date | `Paid_Date__c` | Date |
+| Exported Date | `Exported_Date__c` | Date |
+| Notes | `Notes__c` | Long Text Area(32768), printed |
+| Amount Paid | `Amount_Paid__c` | Currency(16, 2), written by R-PM22 |
+| Payment Key | `Payment_Key__c` | Text(18): the current Payments payment's record id, as text |
+| Payment Link | `Payment_Link__c` | Long Text Area(1000): the processor's hosted checkout address |
+| Total | `Total__c` | Roll-Up Summary (SUM Project_Invoice_Line__c.Amount__c) |
+
+---
+
+## 29PM13. Project Invoice Line
+
+### Definition
+
+One line of a project invoice: time, an expense, a milestone, a retainer month or anything else (PM-10).
+
+### Rules
+
+- Added, changed or removed only while the invoice is Draft (validation rule `Draft_Invoice_Only` on add and change; Staff cannot delete). Time entries, expenses and milestone tasks point to their line through Invoice Line (R-PM12).
+
+### Salesforce implementation
+
+- **Object:** `Project_Invoice_Line__c`, label Project Invoice Line, name field Auto Number (`IL-{000000}`, Line Number), master-detail to Project Invoice (`Invoice__c`, relationship Lines), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Invoice | `Invoice__c` | Master-Detail(Project_Invoice__c) |
+| Type | `Line_Type__c` | Picklist (Time, Expense, Milestone, Retainer, Other), restricted, required, default Other |
+| Description | `Description__c` | Text(255), required |
+| Service Date | `Service_Date__c` | Date: the work's date, or a retainer month's first day |
+| Quantity | `Quantity__c` | Number(10, 2), required, default 1 |
+| Unit Price | `Unit_Price__c` | Currency(16, 2), required |
+| Amount | `Amount__c` | Formula (Currency): `Quantity__c * Unit_Price__c` |
+
+---
+
+## 29PM14. Project Revenue
+
+### Definition
+
+Revenue and cost recognized for a project in one closed month, stored so a closed month does not move (PM-11).
+
+### Rules
+
+**R-PM19 Recognition.** For a project that is not Not Billed and a closed month M: Recognized Amount is revenue earned through M's last day, as counted at the run, less the Recognized Amount of every earlier row; Cost Amount is labor cost (time entries' Cost Amount) and counted expenses dated through M's last day, less every earlier row's Cost Amount. Earned: Time and Materials, counted billable time Amount and counted billable expenses dated through the month end; Fixed Fee, (Budget Amount plus Change Amount) times Percent Complete at the run, plus counted billable expenses; Retainer, Retainer Amount for each month from Start Date's month to M (to Completed Date's month when set), plus counted billable expenses. Late approved time and a falling percent complete land in the next closed month (a negative amount is allowed). Rows are written by the nightly step Project revenue (6:42 AM, its own switch) on its first run of a month for Active and On Hold projects and those Completed in M, up to 2,000 projects (an Error Log warning past it), or by Recognize Revenue on the project; Month Key (project id, `-`, `YYYY-MM`) makes a rerun update the row. The open month is computed on the financials card, never stored. Cost Amount is readable only with Projects Admin.
+
+**R-PM21 Financials (computed).** The project's financials card shows budget (Budget Amount plus Change Amount), revenue to date (as R-PM19's earned, through today), cost (Labor Cost plus Expense Amount, Projects Admin only), margin and margin percent, invoiced (Total of Sent and Paid invoices), unbilled (revenue less invoiced), and a table of the stored months plus the open month.
+
+### Salesforce implementation
+
+- **Object:** `Project_Revenue__c`, label Project Revenue, name field Auto Number (`REV-{000000}`, Revenue Number), master-detail to Project (`Project__c`, relationship Revenue), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Month | `Month__c` | Date, required: the month's first day |
+| Method | `Method__c` | Picklist (Time and Materials, Fixed Fee, Retainer), restricted |
+| Recognized Amount | `Recognized_Amount__c` | Currency(16, 2) |
+| Cost Amount | `Cost_Amount__c` | Currency(16, 2) |
+| Percent Complete | `Percent_Complete__c` | Percent(5, 2): Fixed Fee, at the run |
+| Month Key | `Month_Key__c` | Text(40), unique (case insensitive), external ID |
+
+---
+
+## 29PM15. Change Request
+
+### Definition
+
+A requested change of a project's scope with its hours and amount; approved ones add to the budget the project is measured against (PM-12).
+
+### Rules
+
+**R-PM20 Change requests.** Status Draft, Submitted, Approved or Rejected. Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Decision_By_Manager`). An Approved request's Status, Hours and Amount change only with Manage Projects (`Approved_Locked`). Approved requests are summed into the project's Change Hours and Change Amount (29PM1), so approval and its undoing move the budget with no Apex; Budget Hours and Budget Amount stay the original budget. Hours and Amount may be negative. Field history tracks Status, Hours and Amount.
+
+### Salesforce implementation
+
+- **Object:** `Project_Change_Request__c`, label Change Request, name field Text (Change Title), master-detail to Project (`Project__c`, relationship Change_Requests), sharing Controlled by Parent, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Description | `Description__c` | Long Text Area(32768) |
+| Hours | `Hours__c` | Number(8, 2), history tracked |
+| Amount | `Amount__c` | Currency(16, 2), history tracked |
+| Status | `Status__c` | Picklist (Draft, Submitted, Approved, Rejected), restricted, required, default Draft, history tracked |
+
+## 29PM16. Request
+
+### Definition
+
+A request or issue someone raised with the organization: logged by staff, sent by a requester through the portal, or sent by another organization; triaged, assigned, resolved and linked to the project work it caused (D-201, ADR-0221 `0221-projects-requests-and-issues.md`). Off until Track requests and issues is on.
+
+### Rules
+
+**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on, and one owned by the user saving it goes to the shipped Requests queue (`Project_Requests`). A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rules: `Requests_Turned_On` (no new request while the feature is off), `Resolution_Needed` (Resolved needs a Resolution).
+
+**R-PM24 Requester replies.** A non-blank Reply is moved into a new Request Comment marked From Requester and Shared, and cleared; a Waiting on Requester or Resolved request returns to In Progress.
+
+**R-PM25 Notifications.** A bell notice (type `Projects_Request`) to a new user owner, unless they assigned it to themselves; to the owner on a requester's reply and on a request that arrived from outside. An email to the requester, when they have an email address, on a shared comment from staff and when the request becomes Resolved.
+
+Overdue is true while New or In Progress past the Due Date; Waiting on Requester pauses it. Owner is the assignee, a user or a queue.
+
+### Salesforce implementation
+
+- **Object:** `Project_Request__c`, label Request, name field Auto Number `REQ-{000000}` (Request Number), sharing Read/Write, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Subject | `Subject__c` | Text(255), required |
+| Description | `Description__c` | Long Text Area(32768) |
+| Type | `Type__c` | Picklist (Question, Problem, Service Request, Change), restricted, default Service Request |
+| Category | `Category__c` | Picklist (General, Technology, Data and Reports, Facilities, Other), open, default General |
+| Priority | `Priority__c` | Picklist (Low, Medium, High, Urgent), restricted, required, default Medium, history tracked |
+| Status | `Status__c` | Picklist (New, In Progress, Waiting on Requester, Resolved, Closed, Cancelled), restricted, required, default New, history tracked |
+| Channel | `Channel__c` | Picklist (Staff, Portal, Partner Organization), restricted, set by R-PM23 |
+| Requester | `Requester__c` | Lookup(Contact), Set Null, relationship Requests |
+| Requesting Organization | `Account__c` | Lookup(Account), Set Null, relationship Requests |
+| Project | `Project__c` | Lookup(Project__c), Set Null, relationship Requests |
+| Project Task | `Project_Task__c` | Lookup(Project_Task__c), Set Null, filtered to the request's project |
+| Change Request | `Change_Request__c` | Lookup(Project_Change_Request__c), Set Null |
+| Due Date | `Due_Date__c` | Date |
+| Resolved Date | `Resolved_Date__c` | Date/Time |
+| Resolution | `Resolution__c` | Long Text Area(32768); the requester sees it |
+| Overdue | `Overdue__c` | Formula (Checkbox) |
+| Satisfaction | `Satisfaction__c` | Picklist (Satisfied, Not Satisfied), restricted |
+| Reply | `Reply__c` | Long Text Area(32768); a portal reply, emptied by R-PM24 |
+| Connection | `Connection__c` | Lookup(Request_Connection__c), Set Null, relationship Requests; the organization it came from |
+| External Reference | `External_Reference__c` | Text(80); the sending organization's own reference |
+| External Key | `External_Key__c` | Text(120), unique; connection Id and reference, so a resend never duplicates |
+| Sample Data | `Sample_Data__c` | Checkbox, default false; marks requests the sample data loader made (release 1.25) |
+
+## 29PM17. Request Comment
+
+### Definition
+
+A note on a request, internal unless shared with the requester (D-201).
+
+### Rules
+
+Shared With Requester ships off, so a comment is internal unless staff share it; the portal shows only shared comments of the person's own requests. From Requester is set only by R-PM24. Validation rule `Body_Needed`.
+
+### Salesforce implementation
+
+- **Object:** `Project_Request_Comment__c`, label Request Comment, name field Auto Number `RC-{000000}`, master-detail to Request (`Request__c`, relationship Comments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Request | `Request__c` | Master-Detail(Project_Request__c) |
+| Comment | `Body__c` | Long Text Area(32768) |
+| Shared With Requester | `Shared__c` | Checkbox, default false |
+| From Requester | `From_Requester__c` | Checkbox, default false |
+
+## 29PM18. Request Connection
+
+### Definition
+
+Another organization allowed to send requests in through the request API, as its own integration user (D-201).
+
+### Rules
+
+**R-PM26 Request intake.** A call is served only while Take requests from outside is on and an Active connection names the calling user and the org id the call gives; every other call is refused the same way. A request with a reference the connection already sent answers the existing one. New requests past the Hourly Limit in the last hour are refused. Requests arrive with Channel Partner Organization, Requesting Organization the connection's Account, and the sender's name and email in the description (no Contact is made). Validation rules: `Integration_User_Needed`, `Org_Id_Shape` (15 or 18 characters starting 00D).
+
+### Salesforce implementation
+
+- **Object:** `Request_Connection__c`, label Request Connection, name field Text (Organization Name), sharing Read/Write, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Account | `Account__c` | Lookup(Account), Set Null |
+| Org Id | `Org_Id__c` | Text(18), required, unique |
+| Integration User | `Integration_User__c` | Lookup(User) |
+| Active | `Active__c` | Checkbox, default true, history tracked |
+| Hourly Limit | `Hourly_Limit__c` | Number(4, 0), default 60 |
+
 ## 29AV1. Address Verification Settings
 
 ### Definition
@@ -18641,6 +19265,23 @@ mirrors the primary member).
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 | 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
 | 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
+| 1.48 | 2026-11-12 | Corporate Hub quorum warning and immediate breach bell (CH-21, CH-22, D-196). `Board_Motion__c.Closed_Without_Quorum__c` (Checkbox, default false); R-MO1 sets it when Close Voting finds Quorum Met false. R-DB1: registry automation `Data_Breach_Bell` sends the breach bell on insert. |
+| 1.49 | 2026-11-12 | LWC Builder charts with two groupings and three totals (LB-07, D-196; ADR-0203 amendment of 2026-11-12). No object or field added. R-LB1: a `chart` block gains the optional `display` property (`grouped` or `stacked`, blank read as `grouped`); the definition stays schema version 1, and an additive property with a meaning-keeping default does not raise it. |
+| 1.50 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-0216 `0216-household-model-coexistence.md`, ADR-0217 `0217-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, Junction members joined with primary, role and dates, `Household_Model__c` and the new membership rows journaled and undone. Mirror ships kit `NPC_Households` (one tool step) and a Health Check drift report. No object added. |
+| 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
+| 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
+| 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
+| 1.54 | 2026-11-12 | Cut-over cleanup (D-199, D-200 S4; ADR-0194 note of 2026-11-12). No object or field added. Removed, since the namespaced managed release is a fresh install everywhere: the Coordinator permission set group (`Volunteer_Coordinator`) and `RetiredRoleMigration`; the five retired Mirror sets (`Campaign_Sync`, `Opportunity_Mirror`, `Gift_Transaction_Mirror`, `Inbound_Gift_API`, `Record_Inbound_Gift_Action`) and `MirrorAccessSync`; the Volunteers Health Check finding `volunteer_coordinator_access` and its fix. `Volunteers_Coordinator` stays as an extra permission.  Also removed: R-NJ5's adoption of old schedules (`NightlyJobs.adoptOldSchedules`, `SeasonalAddressScheduler.adoptExistingSchedule`, the `ImportRowPurgeScheduler` shell); `RollupEngineExtensionV2` and `V3` merged into `RollupEngineExtension`. |
+| 1.55 | 2026-11-12 | Error Log under load (D-200 P4, release 1.22). `Error_Log__c` gains `Occurrences__c` (Number, default 1), `Other_Record_Ids__c` (Text(255)) and `Occurrence_Key__c` (Text(64), external ID for its index); rule R-E7: the subscriber counts a repeat of a New entry's Context, Message and Severity within an hour on that entry, naming up to ten more records, and code logs a partial save's refused rows once after the loop (`check-log-in-loop.py`). No object added. |
+| 1.56 | 2026-11-12 | Rollups under load (D-200 P2, P10, P13, release 1.22). `Automation_Registry__mdt` gains `Runs_On_Rollup_Writes__c` (Checkbox): during a `RollupWriter` update, Contact and Account run only rows so marked or Always Runs (shipped on donor level and donor score assignment and `Core_Rollups_Contact`). `Rollup_Settings__c` gains `Large_Parent_Hours__c` (Number, default 1, Setting Definition `Rollup_Large_Parent_Hours`) and `Processor_Requested_At__c` (DateTime, engine only); `Rollup_Run_Lock__c` gains `Last_Run_Started__c` (DateTime): a large parent run starts at most once per that many hours, and a save that queues totals finds a processor without a query. No object added. |
+| 1.57 | 2026-11-12 | Nightly rollup scope (D-200 P1, release 1.22; ADR-0082 amendment of 2026-11-12). Rule R-R4b: every record once a week on the night `Full_Recalc_Day__c` names (Text, default Sunday, Setting Definition `Rollup_Full_Recalc_Day`, Every_Night keeps the nightly sweep); other nights only the targets of source records changed or deleted since `Nightly_Covered_From__c` (DateTime, engine only) and of records crossing a last n days window, with the definitions that changes cannot cover still run everywhere. Every night retries Failed and releases held Rollup Queue entries. No object added. |
+| 1.58 | 2026-11-12 | Nightly donor level pass gated (D-200 P1, release 1.22). R-DL6: every donor is re-placed only after a ladder or donor setting change, a fiscal year turnover, with no recalculation recorded, or a week after the last; other nights rescore only donors crossing a recency cutoff. No object or field added. |
+| 1.59 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-0221 `0221-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. New Section 29PM18 Request Connection (`Request_Connection__c`, R-PM26) for the request API; Request gains Connection, External Reference and External Key. New Section 29C2 Provider Request (`Provider_Request__c`, R-PR1, R-PR2) in Mirror for the Case bridge; `Mirror_Settings__c` gains Send Cases to a Service Provider (off) and Case Type to Send. |
+| 1.60 | 2026-11-13 | Module wiring as data (D-200 S1, release 1.23; ADR-0017 note of 2026-11-13). `BarnCRM_Module__mdt` gains Access By Permission Set, Access By Role and Extensions: each module's access sync sets, installer set and extension classes (nightly step providers first) are catalog data read by Core, replacing the per-module access sync and installer classes and the nightly provider list. |
+| 1.61 | 2026-11-13 | One nightly card (D-200 S6, release 1.23; ADR-0038 note of 2026-11-13). No object or field added. The Giving Nightly Jobs page, tab and `GivingJobsController` are retired: Core's Nightly Jobs panel switches each step on its own, offers Run Now where a step allows it, and shows each step's own summary of its last run (R-IN5 updated). The settings group Nightly Jobs and Accounting Periods becomes Accounting Periods. |
+| 1.62 | 2026-11-13 | Home quick links from the module catalog (D-200 R7, release 1.24). `BarnCRM_Module__mdt` gains Quick Links (`Quick_Links__c`): Giving's Enter a Gift, Volunteers' Log Hours and Programs' Enroll replace the hard-coded Quick Gift Entry tile. |
+| 1.63 | 2026-11-13 | BarnCRM Logic Models app retired (D-200 R6, release 1.24; D-130 amended). No object or field added. The `BarnCRM_Logic_Models` app and its permission set visibilities go; the Logic Model record page becomes the object's org default (Large and Small); the module's catalog row has no App Name. The Logic Models tab stays in the BarnCRM apps and the App Launcher. |
+| 1.64 | 2026-11-13 | Sample data for Memberships and Scholarships (release 1.25). `Membership_Level__c`, `Membership_Term__c` and `Award_Program__c` each gain `Sample_Data__c` (Checkbox, default false), the mark the sample data loader sets so the set is counted and removed in one action; children go with their parent. No other object or rule changes. |
 
 ---
 ## 32. Entity ownership by package
@@ -18715,6 +19356,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Wealth screening data (Contact fields) | Giving | release 1.5 (G-32) | 25U |
 | Recurring Gift Event | Giving | release 1.5 (G-27) | 25V |
 | Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
+| Provider Request (the Case bridge) | Mirror | 1.21 (D-201) | 29C2 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |
 | Mirror Settings | Mirror | v0.6 | 29B |
@@ -18845,6 +19487,17 @@ included; standard objects the packages extend are named by the entity that gove
 | Time Entry | Project Management | 1.18 (PM-04) | 29PM5 |
 | Project Status Update | Project Management | 1.18 (PM-05) | 29PM6 |
 | Projects Settings | Project Management | 1.18 (PM-02) | 29PM7 |
+| Project Rate | Project Management | 1.20 (PM-06) | 29PM8 |
+| Project Expense | Project Management | 1.20 (PM-08) | 29PM9 |
+| Project Resource | Project Management | 1.20 (PM-09) | 29PM10 |
+| Resource Request | Project Management | 1.20 (PM-09) | 29PM11 |
+| Project Invoice | Project Management | 1.20 (PM-10) | 29PM12 |
+| Project Invoice Line | Project Management | 1.20 (PM-10) | 29PM13 |
+| Project Revenue | Project Management | 1.20 (PM-11) | 29PM14 |
+| Change Request | Project Management | 1.20 (PM-12) | 29PM15 |
+| Request | Project Management | 1.21 (D-201) | 29PM16 |
+| Request Comment | Project Management | 1.21 (D-201) | 29PM17 |
+| Request Connection | Project Management | 1.21 (D-201) | 29PM18 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -18873,23 +19526,23 @@ so nothing below that is nonprofit-specific ships in Core.
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
 | Health Check: household, access, settings, org shape findings | Core | `HealthCheckService` |
 | Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
-| Roles: BarnCRM Admin (`BarnCRM_Admin_Group`), Team Member (`Program_Staff`), Read Only; Coordinator (`Volunteer_Coordinator`) retired, its holders given Team Member by `RetiredRoleMigration` (ADR-0194 D1) | Core | Permission set groups |
+| Roles: BarnCRM Admin (`BarnCRM_Admin_Group`), Team Member (`Program_Staff`), Read Only (ADR-0194 D1: the Coordinator role was removed at the namespaced cut-over, D-199) | Core | Permission set groups |
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
 | Volunteers app, permission sets, custom permission Manage Volunteers, coordinator dashboard and reports | Volunteers | Metadata (ADR-0127). Dashboard `Volunteers` and four reports in public read only folders `BarnCRM_Volunteers`; report types Volunteer Hours with Job and Shift, Volunteer Shifts with Job, Volunteer Sign-ups, Volunteers (Contact); `standard-Dashboard` and `standard-report` tabs in the app; report and dashboard user permissions in the four permission sets (V-03) |
-| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
-| Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
-| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
-| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-0177 `0177-events-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Events Home, Event Calendar, Events and Event Speakers tabs join BarnCRM and BarnCRM Console at deploy; the Event record page, the object's org default, carries the event's tabs |
+| Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and its catalog row's access maps (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
+| Logic Models tab, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and its catalog row's access maps (ADR-0154 `0154-logic-models-module.md`). No app of its own since release 1.24 (D-200 R6): the Logic Models tab joins the BarnCRM apps, and the Logic Model record page, which carries the builder panel (`logicModelBuilder`), is the object's org default |
+| Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and its catalog row's access maps (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
+| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). App `BarnCRM_Events` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Events Home, Event Calendar, Events, Event Speakers and Venues tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Event record page, the object's org default, carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
-| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
+| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). App `BarnCRM_Forms` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Forms and Form Submissions tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
-| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-0196 `0196-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
-| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and `PaymentsAccessSync` (ADR-0201 `0201-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
+| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). App `BarnCRM_Corporate_Hub` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs also join BarnCRM and BarnCRM Console (ADR-0192) |
+| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and its catalog row's access maps (ADR-0201 `0201-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
 | Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-0201 `0201-payments-module.md` decision 8) |
-| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, `TerritoryAccessSync` and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
-| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and `MembershipsAccessSync` (ADR-0206 `0206-memberships-module.md`). No app (ADR-0192) |
+| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, its catalog row's access maps and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
+| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and its catalog row's access maps (ADR-0206 `0206-memberships-module.md`). No app (ADR-0192) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

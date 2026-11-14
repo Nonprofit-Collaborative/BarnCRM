@@ -1,8 +1,27 @@
 import { createElement } from 'lwc';
 import Toast from 'lightning/toast';
+import { CurrentPageReference } from 'lightning/navigation';
 import RecordService from 'c/recordService';
 import getForm from '@salesforce/apex/RecordServiceController.getForm';
 import record from '@salesforce/apex/RecordServiceController.record';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const { createTestWireAdapter } = require('@salesforce/wire-service-jest-util');
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: createTestWireAdapter(), __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock('@salesforce/apex/RecordServiceController.getForm', () => ({ default: jest.fn() }), {
   virtual: true
@@ -150,5 +169,28 @@ describe('c-record-service', () => {
     getForm.mockRejectedValue({});
     const failed = await render();
     expect(q(failed, 'load-error').message).toBe('c.Programs_Fail_RecordService');
+  });
+
+  it('on the Record Service tab starts on the person and returns to them after the save', async () => {
+    getForm.mockImplementation(({ recordId }) =>
+      Promise.resolve(formOf({ personId: recordId, enrollmentId: null }))
+    );
+    record.mockResolvedValue('a0B000000000001AAA');
+    const element = createElement('c-record-service', { is: RecordService });
+    document.body.appendChild(element);
+    // eslint-disable-next-line @lwc/lwc/no-unexpected-wire-adapter-usages
+    CurrentPageReference.emit({ type: 'standard__navItemPage', state: { c__personId: BEN } });
+    await flush();
+
+    expect(getForm).toHaveBeenLastCalledWith({ recordId: BEN });
+    expect(q(element, 'person').value).toBe(BEN);
+
+    q(element, 'save').click();
+    await flush();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__recordPage',
+      attributes: { recordId: BEN, actionName: 'view' }
+    });
   });
 });

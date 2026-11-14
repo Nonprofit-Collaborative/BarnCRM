@@ -325,18 +325,18 @@
               <div data-id="rule-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
                 <h3 class="slds-text-heading_small slds-var-m-bottom_small">{ruleFormHeading}</h3>
                 <lightning-record-edit-form
-                  object-api-name="Acknowledgment_Rule__c"
+                  object-api-name={ruleForm.object}
                   record-id={editingRuleId}
                   onsubmit={handleRuleSubmit}
                   onsuccess={handleRuleSaved}
                 >
                   <lightning-messages></lightning-messages>
                   <lightning-input-field field-name="Name"></lightning-input-field>
-                  <lightning-input-field field-name="Order__c"></lightning-input-field>
-                  <lightning-input-field field-name="Active__c"></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.order}></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.active}></lightning-input-field>
                   <lightning-input-field
                     data-id="rule-channel"
-                    field-name="Channel__c"
+                    field-name={ruleForm.channel}
                     onchange={handleChannelChange}
                   ></lightning-input-field>
                   <template lwc:if={ruleIsEmail}>
@@ -352,12 +352,12 @@
                       onchange={handleRuleTemplateChange}
                     ></lightning-combobox>
                   </template>
-                  <lightning-input-field field-name="Minimum_Amount__c"></lightning-input-field>
-                  <lightning-input-field field-name="Maximum_Amount__c"></lightning-input-field>
-                  <lightning-input-field field-name="Gift_Type__c"></lightning-input-field>
-                  <lightning-input-field field-name="Appeal__c"></lightning-input-field>
-                  <lightning-input-field field-name="First_Gift_Only__c"></lightning-input-field>
-                  <lightning-input-field field-name="Description__c"></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.minimum}></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.maximum}></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.giftType}></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.appeal}></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.firstGiftOnly}></lightning-input-field>
+                  <lightning-input-field field-name={ruleForm.description}></lightning-input-field>
                   <div class="slds-var-m-top_small">
                     <lightning-button
                       data-id="rule-cancel"

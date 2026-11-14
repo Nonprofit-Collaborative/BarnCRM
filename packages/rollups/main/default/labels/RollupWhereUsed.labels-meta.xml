@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedCounts</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedCounts</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>Counts this object</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedWrites</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedWrites</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>Writes to this object</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedSourceField</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedSourceField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>Counted field, sort or fiscal date</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedSourceFilter</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedSourceFilter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>Filter on counted records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedPath</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedPath</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Relationship path</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedTargetField</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedTargetField</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>Result field</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_WhereUsedTargetFilter</fullName>
+        <fullName>Rollups_RollupBuilder_WhereUsedTargetFilter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

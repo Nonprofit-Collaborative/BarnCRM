@@ -432,13 +432,9 @@ public with sharing class RollupFilterParser {
 	}
 
 	/** The day count of `last n days`: a whole number from 1 to MAX_DAYS, or a refusal. */
+	@NamespaceAccessible
 	public static Integer dayCount(Object rawValue) {
-		Decimal days;
-		try {
-			days = rawValue == null ? null : Decimal.valueOf(String.valueOf(rawValue).trim());
-		} catch (TypeException notANumber) {
-			days = null;
-		}
+		Decimal days = SettingsService.toNumber(rawValue);
 		if (days == null || days.stripTrailingZeros().scale() > 0 || days < 1 || days > MAX_DAYS) {
 			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
 		}

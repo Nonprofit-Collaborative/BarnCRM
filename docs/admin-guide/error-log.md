@@ -28,11 +28,13 @@ You will find it in three places:
 - **The Org Optimizer tab, Errors section**, the home for working through errors (a link can
   open it directly with `c__section=errors`; see [Org Optimizer](org-optimizer.md)). The
   **Error Log** card shows the count of new
-  entries and the five most recent, each with its message and where it came from, an
+  entries and the five most recent, each with its message and where it came from (and,
+  when it happened more than once, how many times, for example "12 times"), an
   **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs
   the Manage BarnCRM Settings permission (the BarnCRM Admin role).
 - **The Error Log tab** in the BarnCRM app. This is the full list, and you can sort
-  it, filter it, and build reports on it like any other list in Salesforce.
+  it, filter it, and build reports on it like any other list in Salesforce. Its list views
+  (**All Errors**, **My Error Log** and **New**) show each entry's **Occurrences**.
 
 Everyone with the BarnCRM Staff, BarnCRM Admin or BarnCRM Read Only role can read the
 Error Log entries. Only the BarnCRM Admin role can change an entry's status, and only the BarnCRM Admin role sees an
@@ -42,6 +44,38 @@ that a colleague's own access would not show them.
 Errors are recorded whatever else is happening: turning an automation off, or pausing all
 automation, never stops the Error Log from recording a problem.
 
+### Repeats Are Counted on One Entry
+
+When the same thing goes wrong again and again (the same place, the same message, the same
+severity), BarnCRM does not write a new entry each time. Within an hour of the first one, it
+adds to that entry's **Occurrences** count and lists the first ten more records it happened
+on under **Other Records**. A spreadsheet that fails the same way on 10,000 rows leaves one
+entry that says 10,000, not 10,000 entries to read.
+
+Once you mark an entry Acknowledged, Resolved or Ignored, or an hour has passed since it was
+first written, the next repeat starts a new entry, so a problem that comes back after you
+dealt with it is never hidden in an old count.
+
+### Copy for Bug Report
+
+Each entry on the **Error Log** card has a **Copy for Bug Report** button. It copies a short
+report you can paste into a new issue on BarnCRM's GitHub page (see
+[SUPPORT.md](../../SUPPORT.md)). The report holds only:
+
+- where it happened, the object, the severity, when (in UTC) and how many times;
+- the error codes and exception names Salesforce raised, for example
+  `FIELD_CUSTOM_VALIDATION_EXCEPTION`;
+- the lines of code it passed through (up to 15).
+
+It leaves out the message, the records, and any names, emails, phone numbers, amounts or
+field values, even when the technical detail contains them, because GitHub issues are public.
+Only the BarnCRM Admin role's report includes the code lines; anyone else's says the technical
+detail was left out. Read the copied text before you post it, and add what you were doing when
+it happened.
+
+If your browser does not allow copying, the report appears in a box on the card: select it and
+copy it yourself.
+
 ## The Error Digest Email
 
 If nobody opens the BarnCRM home page for a few days, nobody sees the tile. The error digest fixes that:
@@ -50,8 +84,10 @@ people who look after it. It is off until you switch it on.
 
 What the email says:
 
-- how many new entries arrived since the last digest, counting only the ones still marked
-  **New**;
+- how many new errors arrived since the last digest, counting only entries still marked
+  **New**. Each entry counts its **Occurrences**, so an entry that says 4 counts as 4. An
+  entry written before the last digest that has gained repeats since is counted again, with
+  all its occurrences;
 - how many came from each source (for example "Household naming: 4") and how many at each
   severity;
 - the 25 newest, each as its entry number with a link that opens it;
@@ -158,8 +194,9 @@ Maria has heard from a colleague that "something did not save this morning."
 6. Come back to the Error Log entry and set **Status** to **Resolved**, then save. It
    drops out of the "New" count on the home page tile.
 7. If you cannot fix an entry yourself, set **Status** to **Acknowledged** instead, so
-   your colleagues know someone has seen it, and send the **Technical detail** to whoever
-   supports your Salesforce. That section is the part written for a developer.
+   your colleagues know someone has seen it. To report it as a BarnCRM bug, click
+   **Copy for Bug Report** on the card and paste the text into a new GitHub issue; it
+   leaves out every name and value from your records.
 8. Go back to the home page. The **Errors to Review** count has gone down by one.
 
 ## Common Mistakes
@@ -181,8 +218,8 @@ Maria has heard from a colleague that "something did not save this morning."
   Resolved keeps the history, which is what you want the next time the same thing happens,
   and it keeps the tile count accurate either way.
 - **Reading the technical detail first.** The message at the top is the one written for
-  you. The technical detail underneath is for a bug report on GitHub (see [SUPPORT.md](../../SUPPORT.md); remove names,
-  emails and amounts first), and it will not tell you
+  you. The technical detail underneath is for a bug report on GitHub (see [SUPPORT.md](../../SUPPORT.md);
+  **Copy for Bug Report** copies it with names, emails and amounts already removed), and it will not tell you
   anything about your data that the message does not already say.
 - **Expecting an entry for a mistake you made in a spreadsheet.** The Error Log records
   failures inside BarnCRM, not every data problem. A person imported with the wrong

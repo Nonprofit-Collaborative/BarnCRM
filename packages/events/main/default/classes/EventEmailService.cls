@@ -32,7 +32,7 @@ public with sharing class EventEmailService {
 	/** Whether the module is on. */
 	public static Boolean moduleOn() {
 		return !ModuleManagerService.turnedOff()
-			.contains(EventsAccessSync.MODULE_NAME.toLowerCase());
+			.contains(EventsPostInstall.MODULE_KEY.toLowerCase());
 	}
 
 	/** Whether a phase has work to do tonight: the module and its setting are on. */
@@ -240,15 +240,6 @@ public with sharing class EventEmailService {
 	}
 
 	private static Id templateIdFor(String developerName) {
-		for (EmailTemplate template : [
-			SELECT Id
-			FROM EmailTemplate
-			WHERE DeveloperName = :developerName
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]) {
-			return template.Id;
-		}
-		return null;
+		return SetupObjectSelector.emailTemplateId(developerName, false);
 	}
 }

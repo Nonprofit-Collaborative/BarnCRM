@@ -54,5 +54,7 @@ general guidance, not legal advice.
   reports and the `Board_Governance` dashboard in the folders `BarnCRM_Corporate_Hub` (CH-14).
 - Tabs: Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and
   Committees and Board Meetings; Processing Activities, Data Subject Requests and Data Breaches
-  (App Launcher only, not in the catalog row). No app of its own (ADR-0192):
-  the tabs join BarnCRM and BarnCRM Console through the catalog row's `Staff_Tabs__c`.
+  (not in the catalog row). App `BarnCRM_Corporate_Hub` (BarnCRM Corporate Hub, logo
+  `BarnCRM_Corporate_Hub_Logo`) holds every tab, visible through the Corporate Hub permission
+  sets; left out of scratch and Developer Edition orgs (ADR-0223, module apps). The catalog row's
+  tabs also join BarnCRM and BarnCRM Console through its `Staff_Tabs__c`.

@@ -115,6 +115,7 @@ describe('c-fundraising-home', () => {
     const button = element.shadowRoot.querySelector('[data-id="enter-gift"]');
     expect(button.label).toBe('c.Giving_FundraisingHome_EnterGift');
     button.click();
+    await flush();
     expect(getNavigateCalledWith().pageReference).toEqual({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Quick_Gift_Entry' }
@@ -130,6 +131,7 @@ describe('c-fundraising-home', () => {
     expect(group.tiles[0].iconName).toBe('custom:custom65');
     expect(group.tiles[0].description).toBe('c.Giving_FundraisingHome_DonorLevelsHelp');
     grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Receipts' } }));
+    await flush();
     expect(getNavigateCalledWith().pageReference).toEqual({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Receipts' }
@@ -141,6 +143,86 @@ describe('c-fundraising-home', () => {
     expect(element.shadowRoot.querySelector('[data-id="enter-gift"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="setup"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="tiles"]')).toBeNull();
+  });
+
+  it('lists the lists that left the menu under More, and opens each by object or tab', async () => {
+    const element = await render({
+      ...HOME,
+      moreTiles: [
+        { name: 'Fund__c', label: 'Funds', objectApiName: 'Fund__c' },
+        { name: 'Donor_Segments', label: 'Donor Segments' },
+        { name: 'Dashboard', label: 'Dashboards', objectApiName: 'Dashboard' }
+      ]
+    });
+    const grid = element.shadowRoot.querySelector('[data-id="setup"]');
+    const more = grid.groups[1];
+    expect(more.label).toBe('c.Giving_FundraisingHome_MoreGroup');
+    expect(more.tiles.map((tile) => tile.name)).toEqual(['Fund__c', 'Donor_Segments', 'Dashboard']);
+    expect(more.tiles[0].iconName).toBe('custom:custom42');
+    expect(more.tiles[0].description).toBe('c.Giving_FundraisingHome_FundsHelp');
+    expect(more.tiles[2].iconName).toBe('standard:dashboard');
+
+    grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Fund__c' } }));
+    await flush();
+    expect(getNavigateCalledWith().pageReference).toEqual({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Fund__c', actionName: 'list' }
+    });
+    grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Dashboard' } }));
+    await flush();
+    expect(getNavigateCalledWith().pageReference).toEqual({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Dashboard', actionName: 'home' }
+    });
+    grid.dispatchEvent(new CustomEvent('select', { detail: { name: 'Donor_Segments' } }));
+    await flush();
+    expect(getNavigateCalledWith().pageReference).toEqual({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Donor_Segments' }
+    });
+  });
+
+  it('shows More alone to someone with no setup pages', async () => {
+    const element = await render({
+      canEnterGift: false,
+      tiles: [],
+      setupTiles: [],
+      moreTiles: [{ name: 'Fund__c', label: 'Funds', objectApiName: 'Fund__c' }]
+    });
+    const grid = element.shadowRoot.querySelector('[data-id="setup"]');
+    expect(grid.groups.map((group) => group.name)).toEqual(['more']);
+  });
+
+  it('offers a first gift and a file import before any gift exists', async () => {
+    const element = await render({ ...HOME, firstRun: true, canImport: true });
+    const panel = element.shadowRoot.querySelector('[data-id="first-run"]');
+    expect(panel.heading).toBe('c.Giving_FundraisingHome_FirstRunHeading');
+    expect(panel.message).toBe('c.Giving_FundraisingHome_FirstRunMessage');
+    expect(element.shadowRoot.querySelector('[data-id="tiles"]')).toBeNull();
+
+    element.shadowRoot.querySelector('[data-id="first-run-import"]').click();
+    await flush();
+    expect(getNavigateCalledWith().pageReference).toEqual({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Import' }
+    });
+    element.shadowRoot.querySelector('[data-id="first-run-gift"]').click();
+    await flush();
+    expect(getNavigateCalledWith().pageReference).toEqual({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Quick_Gift_Entry' }
+    });
+  });
+
+  it('leaves Import a File out for someone who cannot import, and the panel out once gifts exist', async () => {
+    let element = await render({ ...HOME, firstRun: true, canImport: false });
+    expect(element.shadowRoot.querySelector('[data-id="first-run"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="first-run-import"]')).toBeNull();
+    document.body.removeChild(element);
+
+    element = await render(HOME);
+    expect(element.shadowRoot.querySelector('[data-id="first-run"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="tiles"]')).not.toBeNull();
   });
 
   it('says so in an error notice when the page cannot load', async () => {

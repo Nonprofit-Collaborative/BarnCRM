@@ -146,6 +146,11 @@ DEPLOY_FULL="${DEPLOY_FULL:-0}"
 # no coverage, so run-org-tests.sh passes 0 there.
 DEPLOY_APEX_ALWAYS="${DEPLOY_APEX_ALWAYS:-1}"
 DEPLOY_STATE_DIR="${DEPLOY_STATE_DIR:-${HOME}/.local/state/barncrm/deploy-state}"
+# Which module apps the org gets (ADR-0223, module apps). auto (the default) leaves the apps
+# listed in scripts/org/capped-org-apps.py out of a scratch or Developer Edition org, which
+# refuses a custom app past about 10, and deploys every app anywhere else; capped and all force
+# either. See "MODULE APPS ON A CAPPED ORG" below.
+MODULE_APPS="${MODULE_APPS:-auto}"
 
 ALIAS="${1:-}"
 if [[ -z "$ALIAS" || "$ALIAS" == --* ]]; then
@@ -172,7 +177,8 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 for setting in "DATA_MODEL_STAGES:per-object|combined" "CONFIG_STAGES:separate|combined" \
-  "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1"; do
+  "MODULE_STAGES:separate|combined" "DEPLOY_APEX_ALWAYS:0|1" "DEPLOY_FULL:0|1" \
+  "MODULE_APPS:auto|capped|all"; do
   name="${setting%%:*}"
   if [[ ! "${!name}" =~ ^(${setting#*:})$ ]]; then
     echo "${name} must be one of ${setting#*:}, not ${!name}." >&2
@@ -556,6 +562,22 @@ newest_deploy_request() {
     --query "SELECT Id FROM DeployRequest ORDER BY CreatedDate DESC LIMIT 1"
   jq -r '.result.records[0].Id // empty' "$capture" 2> /dev/null
   rm -f "$capture"
+}
+
+# "capped" when the org refuses a custom app past about 10: a Developer Edition org, or a scratch
+# org (every scratch org has a TrialExpirationDate, whatever its edition). "all" otherwise, and
+# when the lookup fails: a real org must never lose an app, and a capped org then fails on the
+# limit with the platform's own message (ADR-0223, module apps).
+org_app_limit() {
+  local capture verdict
+  capture="$(mktemp)"
+  run_capped "$REPORT_TIMEOUT_SECONDS" "$capture" sf data query --target-org "$ALIAS" --json \
+    --query "SELECT OrganizationType, TrialExpirationDate FROM Organization"
+  verdict="$(jq -r '.result.records[0] // empty
+    | if .OrganizationType == "Developer Edition" or .TrialExpirationDate != null
+      then "capped" else "all" end' "$capture" 2> /dev/null)"
+  rm -f "$capture"
+  echo "${verdict:-all}"
 }
 
 deploy_fingerprint() {
@@ -961,9 +983,26 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
+  # MODULE APPS ON A CAPPED ORG (ADR-0223, module apps). A scratch or Developer Edition org refuses
+  # a custom app past about 10 (barn-sales and oi-test, 2026-11-07), and the suite ships more. On
+  # such an org the modules capped-org-apps.py lists deploy without their applications and
+  # permissionsets folders, and their permission sets follow in a stage of their own with the
+  # left-out apps' visibilities removed (a set naming a missing app fails). Their tabs still join
+  # the BarnCRM apps below. Every other org gets every app.
+  CAPPED_APP_MODULES=" "
+  [[ "$MODULE_APPS" == "auto" ]] && MODULE_APPS="$(org_app_limit)"
+  if [[ "$MODULE_APPS" == "capped" ]]; then
+    CAPPED_APP_MODULES=" $(python3 scripts/org/capped-org-apps.py modules | paste -sd' ' -) "
+    echo "== Capped org (scratch or Developer Edition): leaving out the apps of${CAPPED_APP_MODULES}=="
+  fi
   module_dirs() {
     if ! package_skipped "$1"; then
-      echo "packages/$1"
+      if [[ "$CAPPED_APP_MODULES" == *" $1 "* ]]; then
+        find "packages/$1/main/default" -mindepth 1 -maxdepth 1 -type d \
+          ! -name applications ! -name permissionsets | sort
+      else
+        echo "packages/$1"
+      fi
     elif [[ "$DEPLOY_APEX_ALWAYS" == "1" ]]; then
       apex_dirs "$1"
     fi
@@ -1005,14 +1044,28 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   restore_scheduled_jobs
   [[ "$status" -eq 0 ]] || exit "$status"
 
+  # The capped org's permission sets for the modules whose apps were left out (see MODULE APPS ON
+  # A CAPPED ORG above). A module unchanged since the last deploy keeps the sets already there.
+  capped_sets=()
+  for module in $CAPPED_APP_MODULES; do
+    package_skipped "$module" || capped_sets+=("$module")
+  done
+  if [[ ${#capped_sets[@]} -gt 0 ]]; then
+    CAPPED_SETS_DIR="$(mktemp -d)"
+    python3 scripts/org/capped-org-apps.py permission-sets "$CAPPED_SETS_DIR" "${capped_sets[@]}" || exit 1
+    deploy_stage "Permission sets without the left-out module apps" --metadata-dir "$CAPPED_SETS_DIR" || exit $?
+    rm -rf "$CAPPED_SETS_DIR"
+  fi
+
   # Core may not name a module's tab in its own apps (a Core-only deploy would fail on the
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. --all writes all four apps every time, so each holds exactly Core plus the
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
-  # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
-  # have no app of their own: these apps are where their tabs live (D-188).
+  # modules add their tabs to the BarnCRM apps). Module tabs stay here even for a module with an
+  # app of its own, which is how a capped org reaches the modules whose apps it does not get
+  # (ADR-0223, module apps).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
@@ -1024,14 +1077,12 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # definitions would not exist in a development org (ADR-0029). This is the same call
   # RollupsPostInstall and GivingPostInstall make, run once the last stage is in, so a
   # development org holds the rollups a real install would have. It creates only what is
-  # missing. A Core-only org has no engine, so there is nothing to call. The same step carries
-  # over the rollup settings an org saved on Core before the module had its own settings object,
-  # as RollupsPostInstall does at install, and gives an org with no Rollup Settings row one
-  # holding the shipped defaults (Default Rollup Mode Both, processing Background).
+  # missing. A Core-only org has no engine, so there is nothing to call. The same step gives an
+  # org with no Rollup Settings row one holding the shipped defaults (Default Rollup Mode Both,
+  # processing Background), as RollupsPostInstall does at install.
   echo ""
   echo "== Creating the shipped rollup definitions =="
-  if ! printf '%s\n' 'RollupsPostInstall.carryOverCoreSettings();' \
-    'RollupsPostInstall.ensureSettingsRow();' 'RollupService.ensureDefaults();' |
+  if ! printf '%s\n' 'RollupsPostInstall.ensureSettingsRow();' 'RollupService.ensureDefaults();' |
     sf apex run --target-org "$ALIAS"; then
     echo "The rollup definitions were not created. Nothing else is affected: the Restore shipped"
     echo "rollups button in the Rollup Builder runs exactly the same step."
@@ -1075,150 +1126,16 @@ if ! printf '%s\n' 'TabAccessService.requestSync();' | sf apex run --target-org 
 fi
 
 if [[ "$CORE_ONLY" -eq 0 ]]; then
-  # The same gap for the Rollup Builder permission sets (ADR-0125 D2): RollupsPostInstall gives
-  # Rollup_Builder_Admin to BarnCRM_Admin holders and Rollup_Builder_User to BarnCRM_Staff and
-  # BarnCRM_Read_Only holders, and a deployment runs no post-install, so administrators could not
-  # open the Rollup Builder until the nightly run. requestSync() queues that sync and never
-  # throws. --core-only leaves the module out, so it leaves this out too.
+  # The same gap for every module's permission sets (ADR-0131, D-200 S1): each module's install
+  # gives its sets to the BarnCRM roles its catalog row names, and a deployment runs no
+  # post-install, so people could not open a module until the hourly access check. One call
+  # queues every module's sync (ModuleAccessSyncs, a module turned off is skipped) and never
+  # throws. --core-only leaves the modules out, so it leaves this out too.
   echo ""
-  echo "== Queueing the Rollup Builder access sync =="
-  if ! printf '%s\n' 'RollupAccessSync.requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Rollup Builder access sync was not queued. Nothing else is affected: the nightly run"
-    echo "syncs the access."
-  fi
-
-  # The same gap for the Volunteers permission sets (ADR-0127 decision 3): VolunteersPostInstall
-  # gives each to its BarnCRM role, and a deployment runs no post-install.
-  if volunteers_has_metadata; then
-    echo ""
-    echo "== Queueing the Volunteers access sync =="
-    if ! printf '%s\n' 'new VolunteersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-      echo "The Volunteers access sync was not queued. Nothing else is affected: the nightly access"
-      echo "check syncs the access."
-    fi
-  fi
-
-  # The same gap for the Programs permission sets (ADR-0151, programs module, decision 7).
-  echo ""
-  echo "== Queueing the Programs access sync =="
-  if ! printf '%s\n' 'new ProgramsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Programs access sync was not queued. Nothing else is affected: the hourly access"
+  echo "== Queueing the module access syncs =="
+  if ! printf '%s\n' 'ModuleAccessSyncs.requestAll();' | sf apex run --target-org "$ALIAS"; then
+    echo "The module access syncs were not queued. Nothing else is affected: the hourly access"
     echo "check syncs the access."
-  fi
-
-  # The same gap for the Logic Models permission sets (ADR-0154, logic models module, decision 7).
-  echo ""
-  echo "== Queueing the Logic Models access sync =="
-  if ! printf '%s\n' 'new LogicModelsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Logic Models access sync was not queued. Nothing else is affected: the hourly access"
-    echo "check syncs the access."
-  fi
-
-  # The same gap for the Funders permission sets (ADR-0161, funders module, decision 9).
-  echo ""
-  echo "== Queueing the Funders access sync =="
-  if ! printf '%s\n' 'new FundersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Funders access sync was not queued. Nothing else is affected: the hourly access"
-    echo "check syncs the access."
-  fi
-
-  # The same gap for the Forms permission sets (ADR-0175, forms module, decision 11).
-  echo ""
-  echo "== Queueing the Forms access sync =="
-  if ! printf '%s\n' 'new FormsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Forms access sync was not queued. Nothing else is affected: the hourly access"
-    echo "check syncs the access."
-  fi
-
-  # The same gap for the Contact Point Sync permission set (ADR-0176 contact point sync module,
-  # decision 12).
-  echo ""
-  echo "== Queueing the Contact Point Sync access sync =="
-  if ! printf '%s\n' 'new ContactPointsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Contact Point Sync access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Event Management permission sets (ADR-0177, events module, decision 7).
-  echo ""
-  echo "== Queueing the Event Management access sync =="
-  if ! printf '%s\n' 'new EventsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Event Management access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Portal Builder admin set (ADR-0185, portal builder, decision 10).
-  echo ""
-  echo "== Queueing the Portal Builder access sync =="
-  if ! printf '%s\n' 'new PortalAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Portal Builder access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Corporate Hub permission sets (ADR-0196, corporate hub module, decision 10).
-  echo ""
-  echo "== Queueing the Corporate Hub access sync =="
-  if ! printf '%s\n' 'new CorporateHubAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Corporate Hub access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Payments permission sets (ADR-0201 payments module, decision 9).
-  echo ""
-  echo "== Queueing the Payments access sync =="
-  if ! printf '%s\n' 'new PaymentsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Payments access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the LWC Builder permission sets (ADR-0203, lwc builder module, decision 9).
-  echo ""
-  echo "== Queueing the LWC Builder access sync =="
-  if ! printf '%s\n' 'new LwcBuilderAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The LWC Builder access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Scholarships permission sets (ADR-0204, scholarships module, decision 13).
-  echo ""
-  echo "== Queueing the Scholarships access sync =="
-  if ! printf '%s\n' 'new ScholarshipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Scholarships access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Territory Management permission sets (ADR-0205, territory management
-  # module, decision 7).
-  echo ""
-  echo "== Queueing the Territory Management access sync =="
-  if ! printf '%s\n' 'new TerritoryAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Territory Management access sync was not queued. Nothing else is affected: the"
-    echo "hourly access check syncs the access."
-  fi
-
-  # The same gap for the Memberships permission sets (ADR-0206 memberships module, decision 10).
-  echo ""
-  echo "== Queueing the Memberships access sync =="
-  if ! printf '%s\n' 'new MembershipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Memberships access sync was not queued. Nothing else is affected: the hourly"
-    echo "access check syncs the access."
-  fi
-
-  # The same gap for the Project Management permission sets (ADR-0208, project management
-  # module, decision 9).
-  echo ""
-  echo "== Queueing the Project Management access sync =="
-  if ! printf '%s\n' 'new ProjectsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Project Management access sync was not queued. Nothing else is affected: the"
-    echo "hourly access check syncs the access."
-  fi
-
-  # The same gap for the Address Verification permission set (ADR-0209 address verification).
-  echo ""
-  echo "== Queueing the Address Verification access sync =="
-  if ! printf '%s\n' 'new AddressVerificationAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
-    echo "The Address Verification access sync was not queued. Nothing else is affected: the"
-    echo "hourly access check syncs the access."
   fi
 fi
 

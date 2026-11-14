@@ -66,6 +66,11 @@ coordinator, and **Shifts Needing Volunteers**), then the **Approved Hours This 
 chart. A figure the person cannot read is left out; counts stop at 2,000 and show "2,000+".
 To change the chart, edit the page in the Lightning App Builder.
 
+Until the org has a volunteer job, **Volunteers Home** opens on **Set Up Your First Volunteer
+Job** instead of empty figures (D-200 R4), for anyone who may create jobs. It offers **New
+Volunteer Job** and, for someone who may import, **Import a File** (the Import tab, for a file
+of volunteers or past hours). It goes away by itself once the first job is saved.
+
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
 **All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts
 from today with places left) and **Past Shifts Still Open** (shifts that ended more than 7 days ago and
@@ -89,8 +94,7 @@ each role its Volunteers set:
 Whoever approves hours also needs **Volunteers Coordinator**: everything Staff does, plus see
 and correct everyone's hours to approve or reject them, and manage skills, requirements and
 onboarding steps. It is not a role: give it on the Access page under **Extra Permissions**, on
-top of the person's role (usually Team Member). The Coordinator role is retired; in this
-release its holders keep it, also get Team Member, and keep Volunteers Coordinator.
+top of the person's role (usually Team Member).
 
 When it happens:
 
@@ -671,8 +675,10 @@ say why, and the coordinator decides.
 Hours can be entered with **New** on the **Volunteer Hours** tab, as always, or with the **Log
 Hours** action at the top of a person (contact or person account), a shift or a job in the
 BarnCRM Volunteers app. Log Hours opens a short form with one **Person** picker (person accounts
-only, in an org that has them) and the record's values filled in: a person fills the person, a
-job fills the job, and a shift fills the job, the shift, the date and the shift's length. On a
+only, in an org that has them) and the record's values filled in: a person fills the person
+(and, when they are signed up for a shift today that is not cancelled, waitlisted or a no
+show, that shift as below), a job fills the job, and a shift fills the job, the shift, the
+date and the shift's length. On a
 household or organization, pick the person. It saves like **New**, so every hours rule applies
 and the entry waits as Submitted when approval is required. Anyone who can create hours
 entries can use it; others see a note saying their role cannot enter hours. The job page also
@@ -680,6 +686,20 @@ lists the job's shifts, schedules and skills in its main column, with the detail
 
 To add Log Hours to a record page of your own, add the **Log Hours** action of that object
 (Contact, Account, Volunteer Shift or Volunteer Job) to the page's highlights panel.
+
+The same form is also the **Log Hours** tab (in the App Launcher; Volunteers Staff,
+Coordinator and Admin see it). Opened with `c__personId` in the address it starts on that
+person, with today's shift as above, and returns to their page after **Save** or **Cancel**;
+opened on its own it starts empty and clears itself after each save.
+
+### Volunteering at a Glance
+
+In the **BarnCRM** apps a person opens on Core's page, which shows no volunteering. Volunteers
+adds a **Volunteering at a Glance** card to that page's glance area (the record glance seam,
+ADR-0167): **Volunteer Hours This Year** and **Last Volunteer Date** (the rollups already on
+the person), with **Log Hours** (the tab above, on that person) for someone who may create
+hours. Households and organizations get no card, and nor does anyone who cannot read volunteer
+hours. There is nothing to set up: the card shows while Volunteers is installed.
 
 ## Approving Hours
 
@@ -767,19 +787,21 @@ without changing what everyone else sees. The Volunteers report type reads peopl
 the **Lapsing volunteers** report can show no rows in an org whose people are person accounts;
 that org builds its own lapsing report on an account-based report type.
 
-**Who sees what.** The dashboard reads as **The dashboard viewer**, so each person sees only
-the hours and sign-ups they are allowed to see: hours are private, so a Coordinator sees them all
-and a Team Member sees the hours they can open. The folders ship public read only, and all four
+**Who sees what.** The dashboard runs as one specified user, the admin who installed or deployed
+the package, so everyone who opens it sees the hours and sign-ups that user can see, not their own
+view. Hours are private, so share the folder only with people who are allowed to see all volunteer
+hours, such as Coordinators. The folders ship public read only, and all four
 Volunteers permission sets can run and view the reports and dashboards. Only **Volunteers Admin**
 can also create reports and dashboards of their own, and change the shipped ones by saving a copy
 into a folder they can write to. No Volunteers set edits or deletes everything in public folders:
 to let someone change the shipped folders themselves, share those folders with them as Manager in
 Salesforce.
 
-**How to change the running user.** If your edition does not offer the dashboard viewer, or your
-org has used up its allowance of dashboards that read that way, open the dashboard, choose
-**Edit**, and in **View dashboard as** choose a person who can see all volunteer hours, for
-example a coordinator. Everyone then sees that person's view, so choose carefully. Save.
+**How to change the running user.** The running user is the admin who installed or deployed the
+package. To change it, open the dashboard, choose **Edit**, open the dashboard's properties, and in
+**View dashboard as** choose a person who can see all volunteer hours, for example a coordinator.
+Everyone then sees that person's view, so choose carefully. Save. A dashboard that reads as each
+viewer is planned for the Advanced Reporting module.
 
 **How to add it to the home page.** Open the Home page, choose the gear and **Edit Page**, drag a
 **Dashboard** component on, choose **Volunteers** in the BarnCRM Volunteers folder, and save and
@@ -799,7 +821,6 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
 | **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-Ups panel, then click **Close Shift** there (or set Status to Cancelled if it did not happen). |
 | **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks Ahead to Create Shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and click **Create Shifts Now**. |
-| **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
 ## Erasing a Volunteer
@@ -871,7 +892,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Importing Volunteer Hours
 
-To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the Import tab.
+To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the **Super Importer** tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
 Volunteer Hours record per row, using the Core import's **One Kind of Record** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
@@ -918,7 +939,7 @@ they are kept and listed in the import's journal. With **Require hours approval*
 imported entry is Approved at once, so check the file before you import: taking one back means
 a coordinator reopens it (back to Submitted) and then deletes it.
 
-To import, a person needs the BarnCRM Admin role (for the Import tab) and a Volunteers role
+To import, a person needs the BarnCRM Admin role (for the **Super Importer** tab) and a Volunteers role
 that enters hours (Team Member, Coordinator or Admin), since the load runs with that person's
 own permissions.
 

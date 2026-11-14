@@ -38,12 +38,12 @@ export default class ProjectsAtRisk extends LightningElement {
   get projects() {
     return this.rows.map((row) => ({
       ...row,
-      href: `/lightning/r/${row.Id}/view`,
+      href: `/lightning/r/${row.id}/view`,
       badgeClass:
-        row.Health__c === 'Off Track'
+        row.health === 'Off Track'
           ? 'slds-badge slds-theme_error'
           : 'slds-badge slds-theme_warning',
-      reasons: (row.Health_Reasons__c || '')
+      reasons: (row.healthReasons || '')
         .split('\n')
         .filter((line) => line)
         .join('; ')

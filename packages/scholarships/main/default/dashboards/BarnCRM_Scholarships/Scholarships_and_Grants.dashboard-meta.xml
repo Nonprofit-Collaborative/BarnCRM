@@ -4,7 +4,7 @@
   <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
   <backgroundStartColor>#FFFFFF</backgroundStartColor>
   <chartTheme>light</chartTheme>
-  <dashboardType>LoggedInUser</dashboardType>
+  <dashboardType>SpecifiedUser</dashboardType>
   <description>
     Where applications stand in each cycle, how much each program has awarded and paid, which
     applications score highest, which disbursements are due, and which recipient reports are owed.

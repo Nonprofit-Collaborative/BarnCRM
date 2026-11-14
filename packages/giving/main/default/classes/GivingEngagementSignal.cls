@@ -18,6 +18,11 @@ public without sharing class GivingEngagementSignal implements EngagementSignalE
 		return 'Gifts';
 	}
 
+	/**
+	 * In a multi-currency org the platform answers SUM of a currency field in the corporate
+	 * currency, whatever each gift was entered in (ADR-0083), so the totals are already in one
+	 * currency, the one the Gifts target is set in; nothing is converted here.
+	 */
 	public Map<Id, Decimal> totals(Set<Id> contactIds, Date since) {
 		Map<Id, Decimal> totals = new Map<Id, Decimal>();
 		for (AggregateResult row : [

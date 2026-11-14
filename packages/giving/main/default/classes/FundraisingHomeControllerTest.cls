@@ -1,6 +1,6 @@
 /**
- * Tests for Fundraising Home (people-giving-22): the figures, Enter a Gift, and the Fundraising
- * Setup tiles, for an administrator and for a reader.
+ * Tests for Fundraising Home (people-giving-22): the figures, Enter a Gift, the Fundraising
+ * Setup and More tiles, and the first-run panel (D-200), for an administrator and a reader.
  */
 @IsTest(testFor='ApexClass:FundraisingHomeController')
 private class FundraisingHomeControllerTest {
@@ -69,7 +69,7 @@ private class FundraisingHomeControllerTest {
 				'It opens the Open Batches list view.'
 			);
 			Assert.areEqual(
-				'Acknowledgments',
+				NamespaceUtil.qualify('Acknowledgments'),
 				tiles.get('giftsToThank').tabName,
 				'Gifts to thank open the Acknowledgment Queue page.'
 			);
@@ -94,6 +94,71 @@ private class FundraisingHomeControllerTest {
 				setupNames(view),
 				'An administrator with Manage BarnCRM Settings sees every setup tile.'
 			);
+			Map<String, FundraisingHomeController.SetupTile> more = moreByName(view);
+			Assert.areEqual(
+				new Set<String>{
+					'Ask__c',
+					'Installment__c',
+					'Fund__c',
+					'Appeal__c',
+					'Tribute__c',
+					'Donor_Segments',
+					'Recurring_Donor_Health',
+					'Dashboard'
+				},
+				more.keySet(),
+				'Every list that left the app menu is a More tile for an administrator.'
+			);
+			Assert.areEqual(
+				Schema.SObjectType.Fund__c.getName(),
+				more.get('Fund__c').objectApiName,
+				'An object tile opens its list by object.'
+			);
+			Assert.areEqual(
+				Schema.SObjectType.Fund__c.getLabelPlural(),
+				more.get('Fund__c').label,
+				'An object tile is named by the object label.'
+			);
+			Assert.isNull(more.get('Donor_Segments').objectApiName, 'A page tile opens its tab.');
+			Assert.isTrue(view.firstRun, 'No gift exists yet, so the first-run panel shows.');
+			Assert.isTrue(view.canImport, 'An administrator may start a file import.');
+		}
+	}
+
+	private static Map<String, FundraisingHomeController.SetupTile> moreByName(
+		FundraisingHomeController.HomeView view
+	) {
+		Map<String, FundraisingHomeController.SetupTile> tiles = new Map<String, FundraisingHomeController.SetupTile>();
+		for (FundraisingHomeController.SetupTile tile : view.moreTiles) {
+			Assert.isTrue(String.isNotBlank(tile.label), 'Each More tile carries a label.');
+			tiles.put(tile.name, tile);
+		}
+		return tiles;
+	}
+
+	@IsTest
+	static void theFirstRunPanelGoesOnceAGiftExists() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact donor = TestDataFactory.person(
+				new Contact(FirstName = 'Ada', LastName = 'First')
+			);
+			insert donor;
+			// A gift saves only with a default fund to allocate it to.
+			GivingTestDataFactory.ensureDefaultFund();
+			insert new Gift__c(
+				Donor_Contact__c = donor.Id,
+				Gift_Date__c = Date.today(),
+				Amount__c = 25,
+				Type__c = 'Check',
+				Status__c = 'Received'
+			);
+
+			Test.startTest();
+			FundraisingHomeController.HomeView view = FundraisingHomeController.getHome();
+			Test.stopTest();
+
+			Assert.isFalse(view.firstRun, 'A gift exists, so the figures show instead.');
+			Assert.isFalse(view.canImport, 'Import a File belongs to the first-run panel only.');
 		}
 	}
 
@@ -119,6 +184,11 @@ private class FundraisingHomeControllerTest {
 				'A reader may open the pages that list what they can read.'
 			);
 			Assert.isFalse(view.tiles.isEmpty(), 'A reader still sees the figures they can read.');
+			Assert.isFalse(
+				view.firstRun,
+				'The first-run panel is for someone who can enter gifts.'
+			);
+			Assert.isFalse(view.moreTiles.isEmpty(), 'A reader sees the More lists they can read.');
 		}
 	}
 

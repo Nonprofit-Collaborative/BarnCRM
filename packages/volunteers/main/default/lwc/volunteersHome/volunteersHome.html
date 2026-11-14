@@ -7,6 +7,30 @@
       <template lwc:if={showError}>
         <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
       </template>
+      <template lwc:if={firstRun}>
+        <c-barn-empty-state
+          illustration="no-data"
+          heading={firstRunText.heading}
+          message={firstRunText.message}
+          heading-level="2"
+          data-id="first-run"
+        >
+          <lightning-button
+            variant="brand"
+            label={firstRunText.newJob}
+            onclick={handleNewJob}
+            data-id="first-run-job"
+          ></lightning-button>
+          <template lwc:if={canImport}>
+            <lightning-button
+              class="slds-var-m-left_x-small"
+              label={firstRunText.importFile}
+              onclick={handleImport}
+              data-id="first-run-import"
+            ></lightning-button>
+          </template>
+        </c-barn-empty-state>
+      </template>
       <template lwc:if={hasTiles}>
         <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="tiles">
           <template for:each={tiles} for:item="tile">

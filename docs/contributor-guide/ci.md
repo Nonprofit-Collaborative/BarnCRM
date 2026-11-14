@@ -29,6 +29,11 @@ Salesforce org is needed for this job. Steps:
    of the rule silently. Without the rule the next edit can pull in the platform and the
    module stops being reusable outside Salesforce or testable without stubs (plan Section
    4.4, portability at near-zero cost).
+   Lint also refuses `toISOString().slice(0, 10)` (and `substring`, `substr`, `split('T')`)
+   anywhere in LWC code, tests included: `toISOString()` is UTC, so an evening user west of
+   Greenwich gets tomorrow (QA review Q11). Use `isoDate()` from `c/barnFormat` for today or
+   any local day, and `utcIsoDate()` for the UTC day of a UTC timestamp; `barnFormat.js` is the
+   one file exempt.
    The next workflow step, `npm run lint:slds`, runs Salesforce's SLDS linter
    (`@salesforce-ux/slds-linter`, pinned in `package.json`) over every component's HTML and
    CSS under `packages/`, failing the build on any SLDS 2 (Cosmos theme) finding: a
@@ -39,7 +44,18 @@ Salesforce org is needed for this job. Steps:
    findings are warnings, so the script passes only when the linter prints "No SLDS
    Violations found". `npx slds-linter lint packages --fix` applies the safe fixes; review
    each one.
-4. `npm run test:unit:coverage`
+4. `npm run test:unit:coverage`. `jest.config.js` sets a `coverageThreshold` (statements 89,
+   branches 79, functions 89, lines 89: about two points under the 2026-11-12 totals), so the
+   step fails when coverage drops below it. Raise the floor as coverage rises; never lower it
+   to land a change. Each component test also calls `expectAccessible(element)` from
+   `barn/a11y` (`packages/core/test/jest-helpers/a11y.js`): it fails on a lightning form
+   control with no label, a button icon or button menu with no alternative text, a button or
+   link with no text, an image with no `alt`, or a positive `tabindex`, and it also runs
+   `@sa11y/jest` (axe-core with Salesforce's rules) whenever that package is installed (it is
+   not a devDependency yet). `scripts/ci/check-jest-a11y.py` fails the build if a component
+   with a template has no test making that call and is not in
+   `scripts/ci/jest-a11y-baseline.txt`, or if a baseline entry now makes it; the baseline only
+   shrinks (QA review Q5).
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
@@ -179,6 +195,12 @@ Salesforce org is needed for this job. Steps:
    permission sets are assembled by hand at every merge from each branch's integration
    file, so the reference and the metadata can drift apart silently. This ran because
    `BarnCRM_Admin` granted a `Household_Member__c` tab that was never created.
+   Alongside it, `scripts/ci/check-generated-permission-sets.py` (D-200 S9a) fails the build
+   when a role trio's Admin or Read Only set differs from its Staff set plus its delta in
+   `scripts/permission-sets/deltas/<Prefix>.json`. Those two sets are generated: change the
+   Staff set or the delta, then run `python3 scripts/permission-sets/generate.py`. The
+   committed XML stays the deployed source, and ADR-0194's permission model is unchanged.
+   `--bootstrap <Prefix>` writes the delta that reproduces a trio's current sets.
 11. `scripts/ci/check-help-links.py`, failing the build if a Setting Definition's Learn
    more link points at a page that does not exist. `SettingsController` appends
    `Help_Path__c` to a base already ending in `docs/admin-guide/`, so a row storing
@@ -220,6 +242,10 @@ Salesforce org is needed for this job. Steps:
    This ran because `BarnCRM.app-meta.xml` carried no `actionOverrides` at all, so the
    household walkthrough failed at step 4 on every fresh install, and because
    `Gift_Record_Page` and `Commitment_Record_Page` were stranded the same way in Fundraising.
+   Beside it, `scripts/ci/check-record-page-copies.py` fails the build if a module copy of
+   Core's `Contact_Record_Page` or `Account_Record_Page` (`<Prefix>_Contact_Record_Page`,
+   ADR-0064) lacks any component Core's page has. A copy may add panels, never drop one; the
+   Programs and Volunteers copies had silently lost four Core components (D-200 R2).
 15. `scripts/ci/check-canonical-model.py`, failing the build if a shipped object or field
    is missing from `docs/architecture/canonical-model.md`. The canonical model is updated
    before an object or a field is added, so this is the gate that keeps it true. It checks
@@ -280,6 +306,17 @@ Salesforce org is needed for this job. Steps:
    `TestUsers` is fine), or if a `TestUsers` call made in two or more test methods of a class
    is not also made in a `@TestSetup` of that class. See "Tests run as a user they create"
    below for why.
+   `scripts/ci/check-aura-non-admin-tests.py` fails the build if a class with an
+   `@AuraEnabled` method has no test that calls it and builds a non-admin user
+   (`TestDataFactory.createUser`, `TestUsers.standardUserWith`, `peopleReaderWith`,
+   `minimumAccessUserWith`, or a user on `TestUsers.readOnlyProfileId()` and the like), unless
+   `scripts/ci/aura-non-admin-allowlist.txt` lists it as `# admin only: reason` or as
+   `# not yet`. `TestUsers.admin()` keeps the administrator's profile, so a test run only as an
+   admin cannot see a missing field permission or class grant that breaks the page for staff
+   (QA review Q1: about 5,075 admin test calls against 370 non-admin). The `not yet` entries
+   only shrink: one fails once its class has such a test. Write the staff test as a Standard
+   User holding the package's Staff or Read Only set (`BarnCRM_Staff`, `Giving_Staff`), with
+   records the user owns where the object is private.
    `scripts/ci/check-test-relevance.py` fails the build if a test class (the vendored engine
    excepted) has neither `@IsTest(testFor='...')` nor `@IsTest(critical=true)` and is not in
    `scripts/ci/test-relevance-cross-cutting.txt`, or if a `testFor` names a class or trigger
@@ -300,11 +337,28 @@ Salesforce org is needed for this job. Steps:
    `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
    them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
    `TriggerHandler` reads the platform's own.
+   `scripts/ci/check-trigger-static-state.py` fails the build if a trigger handler's `before`
+   method assigns a new collection to, or clears, one of the handler's static `Map`, `Set` or
+   `List` fields. Such a field carries what the before event noted to the after event, and a
+   save of more than 200 rows (two chunks) or a dispatcher retry runs the before again, so a
+   reset drops the first chunk's state (defect D1, QA review Q4). Add to it keyed by record
+   Id and remove what the after event used; a deliberate reset is listed in
+   `scripts/ci/trigger-static-state-allowlist.txt` with its reason. Each handler holding such
+   state has a test that saves or deletes more than 200 rows at once.
    `scripts/ci/check-global-describe.py` fails the build if packaged Apex other than
    `NamespaceUtil` calls `Schema.getGlobalDescribe()`. The describe costs about 12 ms of CPU in
    a large org and cannot change within a transaction, so every class reads the one copy
    `NamespaceUtil.globalDescribe()` keeps per transaction and running user (D-143). Test
    classes are exempt.
+   `scripts/ci/check-async-starter.py` fails the build if packaged Apex calls
+   `Database.executeBatch` or `System.enqueueJob` directly, outside `AsyncStarter` and the
+   allowance `scripts/ci/async-starter-allowlist.txt` gives each file (D-200 P9). A button or
+   nightly step starts its work with `AsyncStarter.batch(work, scope, context)` or
+   `AsyncStarter.queue(work, context)`: it refuses when 95 batch jobs are already waiting or
+   this request may queue no more, logs the refusal once and throws
+   `AsyncStarter.BusyException`, whose message asks the person to try again in a few minutes.
+   The allowlist keeps jobs that chain themselves, starts from a trigger or save, post-install
+   steps and batches over values; its counts must match, so lower one as a call moves over.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.
@@ -536,9 +590,10 @@ have, and it has DLRS installed for coexistence. `oi-test` (Person Accounts shap
 the release gate.
 
 **Accepted risk of the incremental gate (D-142).** The selection follows direct mentions of a
-changed class and the `testFor` annotations only. It can miss a test that reaches the changed
-code indirectly, and it selects nothing for a change to an object, a flow, a permission set,
-custom metadata or a label that an unselected test depends on. The `testFor` and `critical`
+changed class or changed metadata and the `testFor` annotations only. It can miss a test that
+reaches the changed code or metadata indirectly (a flow that fires on a standard object, a
+field read only through describe), and it selects nothing for a changed label, layout or help
+text. The `testFor` and `critical`
 annotations (see "Relevant tests" below) narrow the gap; the release gate closes it before a
 version ships.
 
@@ -567,7 +622,14 @@ carries):
 - every test class whose `@IsTest(testFor=...)` names a changed class or trigger;
 - every test class that mentions a changed class by name (comments ignored), which includes the
   users of a changed test utility such as `TestDataFactory`;
-- every `critical=true` class, so a batch with no Apex change still runs the smoke tests.
+- every `critical=true` class, so a batch with no Apex change still runs the smoke tests;
+- every test class that names changed metadata (QA review Q9): a changed custom object, or
+  anything under it, by its API name (on a standard object, the changed field's API name); a
+  permission set, permission set group or custom permission by its name; a flow by its name
+  and the custom object it starts on; a custom metadata record by its type (`Type__mdt`) and
+  record name. A test utility that names the metadata (`TestUsers` names `BarnCRM_Admin`)
+  counts as changed, so a change to an admin permission set selects every test that runs as
+  that admin.
 
 The vendored rollup engine's tests are never selected. No coverage is recorded and no floor is
 checked. It posts `Org tests (local)` with a description such as "Incremental on barn-sales:
@@ -593,13 +655,28 @@ same job and also runs the relevant Apex tests.
 
 When a significant version's development is done and integrated:
 
-1. **Run the release gate on both gate orgs in parallel**, each from its own clean detached
-   worktree under its own org lock:
+1. **Run the release gate on every org shape in parallel** (QA review Q2 and Q6, D-200,
+   widening D-142):
 
    ```
-   scripts/org/run-org-tests.sh barn-sales --release
-   scripts/org/run-org-tests.sh oi-test --release
+   scripts/org/release-gate.sh [--multi-currency <alias>]
    ```
+
+   It first runs Code Analyzer over every package with the AppExchange selector and the Graph
+   Engine (`sfge`, needs Java 11 or later), as the security review does, and stops on any High
+   or Critical finding (`--analyzer-only` runs just that). Then it runs
+   `run-org-tests.sh <alias> --release` on each org in `RELEASE_ORGS` (default `barn-sales`,
+   `oi-test`, `barn-platform` for Platform-only, `barn-npsp` for an NPSP-shaped org), each from
+   its own detached worktree at HEAD under its own lock, with logs and results in
+   `test-results/release-gate/`. `--multi-currency <alias>` adds a multi-currency org
+   (`config/scratch-defs/multi-currency.json`), once per version. It never creates an org: an
+   alias not authenticated on the machine stops it before any deploy, so until `barn-npsp`
+   exists (it needs Brandon's approval, and `install-npsp.sh` needs verified package IDs) set
+   `RELEASE_ORGS` to the orgs that do and name the missing shape in the release notes.
+   Then run the OWASP ZAP baseline scan (passive only, Docker) on the test org's Site for the
+   guest surfaces (Forms, Events public pages, Payments webhooks, Portal login):
+   `scripts/org/zap-baseline.sh <site URL> [<form Id>] [<event Id>]`. A FAIL stops the version;
+   each WARN is reviewed against the [security checklist](security-checklist.md).
 
 2. **Re-validate and deploy to `barn-npc`** (Nonprofit Cloud trial, production edition; see the
    gotchas in the root `architecture.md`: Public visibility for custom settings and metadata,
@@ -792,6 +869,206 @@ Records, the settings saved in BarnCRM Settings, and components the organization
 are kept. The Admin Guide (Installing BarnCRM, Upgrading) tells administrators to clone a
 shipped component rather than edit it.
 
+### Package install and upgrade test
+
+`scripts/org/package-upgrade-test.sh` installs real package versions into new scratch orgs,
+one per org shape (plan Section 4.2), and upgrades them: the test the source deploys above
+cannot be. It is written now and run later: package versions wait for the namespace, Dev Hub
+and steward entity (D-87), and D-173 places the first run after the v1.0 test cycle and
+before the first production pilot, as a sandbox-only managed beta. Until the namespace is in
+`sfdx-project.json` it exits 2 unless `--plan` is given.
+
+**What one run does.** It reads the namespace, the packages and their dependency order from
+`sfdx-project.json` (nothing is hard-coded), then:
+
+1. Builds version N-1 from `--from` and version N from `--to`, each in a temporary detached
+   worktree, with `sf package version create --code-coverage --installation-key-bypass
+   --wait`, in dependency order. A file of existing `04t` ids (one `<package key> <04t>` per
+   line, `#` comments allowed) skips the build for that side.
+2. For each shape (`--shapes platform,sales,npsp,npc`, default all four, mapped to
+   `config/scratch-defs/platform-only.json`, `sales-cloud.json`, `npsp.json` and
+   `nonprofit-cloud.json`): creates a scratch org with `--no-namespace` (a subscriber org),
+   installs NPSP for the `npsp` shape with `scripts/org/install-npsp.sh`, and installs N-1 in
+   dependency order (`sf package install --wait --publish-wait --security-type AdminsOnly
+   --no-prompt`).
+3. Checks N-1 as the installing admin: the installed versions (`sf package installed list`),
+   Health Check with no error finding (`health-check.apex`), and no Error Log row since the org
+   was created.
+4. Loads the sample data (`scripts/org/seed-sample-data.sh <alias> --namespace <ns>`) and
+   records the counts of the records it writes (households and contacts, members,
+   relationships, affiliations, gifts, allocations, funds, volunteer hours and jobs).
+5. Upgrades every package to N in dependency order and checks again: versions are N, Health
+   Check, Error Log, the counts unchanged, and the smoke assertions in
+   `scripts/org/package-upgrade-test/smoke-<package>.apex` (a new person gets a named
+   household; a gift moves Total Giving; approved volunteer hours post to the total), each run
+   as the admin and rolled back with a savepoint.
+6. With `--uninstall-check[=<key>]` (default `volunteers`; a module nothing chosen depends
+   on): uninstalls it, checks it is gone, that none of its classes, objects or Core automation
+   switches remain (`uninstall-check.apex`, plan Principle 3), and that Health Check and the
+   Core smoke assertion still pass.
+7. Deletes each org unless `--keep-orgs`, and writes the report.
+
+After a failed step the rest of that shape is skipped and the next shape runs; the org is
+still deleted.
+
+**Managed or unlocked.** `--type` says how the packages are registered in the Dev Hub
+(`sf package create` fixes that; the run checks it with `sf package list`). Default `managed`
+(D-173).
+
+| | N-1 from a git ref | N-1 from a `04t` file | Post-install |
+|---|---|---|---|
+| `managed` | Refused: a managed beta cannot be upgraded (or installed in production). `--promote-from` promotes each N-1 version after it is built: **promotion is permanent and needs the owner's approval**, and N must then carry a higher major.minor.patch | The ids must be released (promoted) versions | Runs on its own: each package's `postInstallScript` |
+| `unlocked` | Unpromoted versions install in scratch orgs | Any versions | A post-install script runs for managed packages only, so after every install and upgrade the script calls `<ns>.BarnInstallCheck.finishSetup('<Module>')` for each package as the admin itself (`setup-n1` and `setup-n` steps) |
+
+`--plan` prints which path applies on its "N-1 path" line.
+
+**Before it can run** (each is a MISSING line in the readiness list, which `--plan` prints and
+a real run requires to be clean before it creates anything):
+
+- The namespace registered and set in `sfdx-project.json` (D-87), at `--from` and `--to` too:
+  build only from commits after it is set.
+- A Dev Hub linked to that namespace, named with `--devhub` (the CLI default is never used),
+  and every package created in it (`sf package create`, by the owner) with its `0Ho` id in
+  `packageAliases`.
+- Each dependency with a `versionNumber` and each package's InstallHandler class named as its
+  `postInstallScript`: both are in `sfdx-project.json` now and checked in CI (see "Creating
+  package versions" below). For a managed upgrade, `ancestorVersion` (`"HIGHEST"`) or
+  `ancestorId` on every package, which is added only after the first promoted version.
+- The Apex the checks call from anonymous Apex is `global`: a subscriber org's anonymous Apex
+  cannot see a package's `public` classes. The templates and `seed-sample-data.sh --namespace`
+  call only Core's `BarnInstallCheck` (D-199): `runHealthCheck()` (a map of `findings`,
+  `errors` and `errorFindings`), `loadSampleData()` and `finishSetup(packageKey)`, each
+  delegating to the public service and allowed only to someone who may run setup. Its global
+  signatures are permanent; keep it to these three. The readiness list fails only when a
+  template names a class that is not in the source.
+- **Owner approval for the scratch orgs.** The project's test orgs are fixed; any other org is
+  approved first. A real run creates one org per shape and refuses without
+  `--yes-create-orgs`, the record of that approval. It prints the count first.
+- **Limits.** One scratch org per shape counts against the Dev Hub's active and daily scratch
+  org limits, and building from refs creates two versions per package (40 for all 20
+  packages) against the daily package version limit. Check with `sf limits api display
+  --target-org <devhub>` (`ActiveScratchOrgs`, `DailyScratchOrgs`, `Package2VersionCreates`),
+  and narrow with `--packages` or `--shapes`. Builds with `--code-coverage` run every test and
+  take long.
+- The `npsp` shape needs verified NPSP ids in `scripts/org/install-npsp.sh`; the `npc` shape
+  needs a Dev Hub entitled to Nonprofit Cloud (see [Scratch orgs](scratch-orgs.md)).
+
+**Commands.**
+
+```
+# See what a run would do (no org, no Dev Hub, no files):
+scripts/org/package-upgrade-test.sh --plan --from v0.18 --to main --shapes platform,npc
+
+# Managed, N-1 already released, N built from main, all four shapes:
+scripts/org/package-upgrade-test.sh --devhub <devhub> --from released-n1.txt --to main \
+  --yes-create-orgs --uninstall-check
+
+# Unlocked, a few packages, one shape, keep the org for the manual checks (T-INST-05):
+scripts/org/package-upgrade-test.sh --devhub <devhub> --type unlocked --from <ref> --to main \
+  --packages giving,volunteers --shapes platform --keep-orgs --yes-create-orgs
+```
+
+`--packages` takes package keys (folder names under `packages/`) and adds what they need.
+
+**Reading the report.** `--report <dir>` (default `test-results/package-upgrade/<run id>`,
+ignored by git) gets `summary.md` and `summary.json`: one section per shape (plus `build`),
+each step with PASS, FAIL or SKIP, its seconds and a detail (the `04t` id built, the
+username created, the counts, or the first part of the error). `logs/<shape>-<step>.log` holds
+the sf JSON of each step. Read the first FAIL in a shape: everything after it says SKIP.
+Exit status 0 means every step passed, 1 means a step failed, 2 means it refused to start.
+The script never prints an auth URL or token and never reads `sf org display --verbose`: from
+`sf org create scratch --json` it keeps only the username.
+
+**Checks by hand.** Install links, Module Manager's guided installs and the pages after an
+upgrade are in the Testing Guide, [Installing](../testing-guide/installing.md), T-INST-05. The
+plan mode itself is T-INST-04 and `scripts/ci/tests/test_package_upgrade_test.py`.
+
+### Creating package versions
+
+BarnCRM ships as 2GP managed packages from the first pilot, under the namespace `barn` (D-199),
+registered in a Partner Developer Edition org linked to the Partner Business Org Dev Hub. Until
+then `namespace` stays empty in `sfdx-project.json` and no package or version is created. The
+rest of `sfdx-project.json` is ready now (D-200, N5), so setting the namespace and pasting the
+package ids is all that is left:
+
+- **Version numbers.** Every package carries `1.21.0.NEXT` (`versionName` `v1.21`), the release
+  that made the project version-ready. One shared number keeps the dependency pins simple; a
+  package moves to its own number only once it ships a change the others do not.
+- **Dependencies** name `<that package's major.minor.patch>.LATEST`, so a build picks up the
+  newest build of the package it needs. Raising a package's `versionNumber` means raising every
+  pin on it; `check-namespace-readiness.py` fails until they match.
+- **`postInstallScript`** names each package's InstallHandler class (`<Module>PostInstall`).
+  The check fails when a package has an InstallHandler that is not named, or names a class that
+  is not one.
+- **`packageAliases`** is an empty placeholder. `sf package create` (the owner's step, once per
+  package, in the Dev Hub) prints a `0Ho` id; paste it as `"<package name>": "0Ho..."`. The ids
+  are never invented: `create-versions.sh` refuses while one is missing and prints the
+  `sf package create` command for it. Version aliases (`<name>@1.21.0-1`) are not kept here;
+  the run writes the `04t` ids to a file instead.
+- **`ancestorVersion`** is not set until the first version is promoted. From then on each
+  package carries `"ancestorVersion": "HIGHEST"`, which a managed upgrade needs (the install and
+  upgrade test checks it).
+
+**Less common metadata in 2GP managed packages (D-200, N11).** Checked 2026-11-12. The
+Salesforce Metadata Coverage Report and the 2GP "Metadata Components and Attributes" page
+refuse automated reads (HTTP 403), so every row below is **unverified** against the report and
+rests on the packaging guide as last read by hand. Before the first `create-versions.sh` run,
+open the Coverage Report for API 67.0 and tick each row; a type the report does not mark for
+"Second-Generation Managed Packages" fails at version create, not at deploy.
+
+| Type (shipped in) | Expected in 2GP managed | Notes to confirm |
+|---|---|---|
+| `Group` `Programs_Participants` (programs) | Yes | Packaged as a public group; members are subscriber data, never packaged |
+| `PlatformEventSubscriberConfig` (core) | Yes | It names no running user (only the batch size), which is what lets it install |
+| `Prompt` in-app guidance, 3 (core) | Yes | In-App Guidance prompts, not Prompt Builder templates; none of the GenAI types ship |
+| `ExternalCredential` `Barn_Org_Connection` (core) | Yes | Principals and their credentials are set per org after install; check the principal-access permission set entries survive packaging |
+| `CustomNotificationType`, 3 (core, corporatehub, scholarships) | Yes | |
+| `ContentAsset`, 9 (8 packages) | Yes | Asset files; check the subscriber can still use them after an upgrade replaces the file |
+| `GlobalValueSet` (projects) | Yes | Values added by a subscriber stay; values removed in an upgrade are not removed from the org |
+| `ApexPage` `FormsPublic` (forms) | Yes | Its name gains the prefix (`barn__FormsPublic`): the admin guide's Site setup step must name the page as the org shows it |
+| `RemoteSiteSetting`, 6 (addressverification, funders, payments) | Yes | Subscriber may deactivate; the callout then fails with the Error Log entry, not silently |
+
+**The script.** `scripts/packaging/create-versions.sh` builds one version of each chosen package
+in dependency order, read from `sfdx-project.json` through `package-upgrade-helper.py` (the
+reader the install and upgrade test uses). It prints the Dev Hub's `Package2VersionCreates`
+limit first, refuses (exit 2) while the namespace is empty, a `0Ho` id is missing or fewer
+creates are left than it needs, and **never promotes**: promotion is permanent and the owner's
+decision, one `sf package version promote` per version. It writes `<key> <04t id>` lines to
+`test-results/package-versions/<run id>.txt`, the file `package-upgrade-test.sh --from/--to`
+takes.
+
+```
+# What would be built, in what order, with which commands (no org, no Dev Hub):
+scripts/packaging/create-versions.sh --plan --devhub <pbo-devhub>
+
+# Build Core and Giving (and Rollup Builder, which Giving needs):
+scripts/packaging/create-versions.sh --devhub <pbo-devhub> --packages giving
+```
+
+`--no-code-coverage` skips the test run, but a version built that way can never be promoted.
+`scripts/ci/tests/test_create_versions.py` runs the plan mode and the refusals.
+
+### Global and namespace-accessible API
+
+Once a managed version is promoted, a `global` signature can never be removed or changed, and
+an `@NamespaceAccessible` one is what every other BarnCRM package compiles against: a module
+installed at an older version breaks when Core drops one. So the rule is **deprecate for one
+release, never remove**: mark the member `@Deprecated` (for `global`) or say so in its doc
+comment, stop calling it, and keep it working. Keep the `global` surface small (today `BarnInstallCheck`,
+the invocable actions, the REST resources, `InboundGift` and Rollup Builder's `RollupApi` and
+`RollupInstantTrigger`).
+
+`scripts/ci/check-api-surface.py` (D-200, N8) lists every `global` and `@NamespaceAccessible`
+signature in packaged Apex in `scripts/ci/api-surface.txt`, one `<package>/<file> |
+<signature>` line each (annotations, parameter names and bodies left out; a type is its
+access, `virtual` or `abstract`, kind and name). It fails when a snapshot line no longer
+matches the source (removed or changed), and when the source has a signature the snapshot
+lacks. For an addition, run `python3 scripts/ci/check-api-surface.py --update` and commit the
+snapshot with the change; it refuses while anything was removed. A removal the owner approves
+before the first promoted version is made by editing the snapshot by hand in the same pull
+request, so the reviewer sees it. Integrators: after merging branches that each added
+signatures, run `--update` once on the landing branch.
+
 ### Tests survive an org's own customizations
 
 BarnCRM installs as source with no namespace, so its tests are the org's local tests: they run
@@ -809,16 +1086,25 @@ what a test can:
 - **Access:** tests run as a user they create (below), so the org's profiles and permission
   sets do not decide the result.
 
-So build Account and Contact records through the factories (`HouseholdTestDataFactory.newContact`,
-`newHousehold`, `RelationshipTestDataFactory`, `AddressTestDataFactory`), or pass a record built
-by hand through `TestDataFactory.pastDuplicateRules` before inserting it.
+**The rule:** a test class never inserts a bare `new Contact(...)` or `new Account(...)`. Build
+the record through the factories (`HouseholdTestDataFactory.newContact`, `newHousehold`,
+`RelationshipTestDataFactory`, `AddressTestDataFactory`, `AccountKindsTestData.organization`),
+or wrap a record you build by hand, with the field values the test's assertions rely on, in
+`TestDataFactory.person(new Contact(...))`, `TestDataFactory.organization(new Account(...))` or
+`TestDataFactory.household(new Account(...))`. Each returns the same typed record, saved past
+duplicate rules with the org's required fields filled. A bare `new Contact(Id = ...)` used to
+update a row is fine (it sets no required field).
+
+`scripts/ci/check-test-data-factory.py` (part of `run-offline-checks.sh`) counts the bare
+constructions in test classes, outside classes named `*TestData` or `*TestDataFactory`, and
+fails when the count rises above its `BASELINE`. A construction that must stay raw (an
+in-memory record never saved, a test of the factory, a test that must exercise a raw insert)
+carries `// factory-ok: reason` on the line with `new Contact(` or `new Account(`; lower
+`BASELINE` whenever the count falls (`--list` prints every counted line).
 
 What no test can handle, so the install guide and pre-check report it instead: an active
 validation rule (Apex cannot skip one), a required lookup field (no sample record to point
-at), and an org's own record-triggered flow or trigger that fails. About 760 test sites
-(344 `new Account(`, 414 `new Contact(` in test classes on 2026-11-04) still build records by
-hand without the factory; they get the duplicate-rule and required-field help only once moved
-onto it.
+at), and an org's own record-triggered flow or trigger that fails.
 
 ### Tests run as a user they create
 
@@ -958,8 +1244,8 @@ stage the script runs
 post-install script and would otherwise leave the org without the rollup definitions a real
 install creates (ADR-0029). It then runs `TabAccessService.requestSync()` the same way, so the
 tool tabs, which live only in the `BarnCRM_Tab_*` permission sets, reach users without waiting
-for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `RollupAccessSync.requestSync()`,
-which gives the Rollup Builder permission sets to BarnCRM's roles (ADR-0125 D2). Before the first stage the script fails if a folder under
+for the nightly sync. Unless `--core-only` is given (and `SOURCE_POST_INSTALL` is not 0, which the test gate sets, because the Apex tests assume an org with no funds) it also runs each deployed module's `runSetup` (`RollupsPostInstall`, `GivingPostInstall`, `VolunteersPostInstall`, `MirrorPostInstall`), exactly the steps its install runs (Giving's among them create the starting General Fund when the org has no fund and no default fund set), each recording the module in the setup marker `Modules_Setup_Run__c` so Health Check offers no Finish Setup there (FS1). Unless `--core-only` is given it then queues `ModuleAccessSyncs.requestAll()`,
+which gives every module's permission sets to the BarnCRM roles its catalog row names (ADR-0125 D2, ADR-0131, D-200 S1). Before the first stage the script fails if a folder under
 `packages/core/main/default` is named by no stage: Core's flows were never deployed until
 2026-10-13 because no stage named `flows`.
 

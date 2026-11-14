@@ -52,7 +52,7 @@ private class AddressDeleteHandlerTest {
 	static void keepLeavesTheAddresses() {
 		System.runAs(TestUsers.admin()) {
 			SettingsService.saveSystemValue('Address_Delete_Behavior__c', 'Keep');
-			Contact lee = new Contact(LastName = 'Lee');
+			Contact lee = TestDataFactory.person(new Contact(LastName = 'Lee'));
 			Database.insert(lee, AccessLevel.SYSTEM_MODE);
 			Address__c home = addressOf(Address__c.Contact__c, lee.Id, '12 Elm Street');
 
@@ -69,9 +69,15 @@ private class AddressDeleteHandlerTest {
 	@IsTest
 	static void aPersonsAddressGoesWithThemButAMergeKeepsIt() {
 		System.runAs(TestUsers.admin()) {
-			Contact sam = new Contact(LastName = 'Rivera', FirstName = 'Sam');
-			Contact samuel = new Contact(LastName = 'Rivera', FirstName = 'Samuel');
-			Contact ana = new Contact(LastName = 'Ortiz', FirstName = 'Ana');
+			Contact sam = TestDataFactory.person(
+				new Contact(LastName = 'Rivera', FirstName = 'Sam')
+			);
+			Contact samuel = TestDataFactory.person(
+				new Contact(LastName = 'Rivera', FirstName = 'Samuel')
+			);
+			Contact ana = TestDataFactory.person(
+				new Contact(LastName = 'Ortiz', FirstName = 'Ana')
+			);
 			Database.insert(new List<Contact>{ sam, samuel, ana }, AccessLevel.SYSTEM_MODE);
 			Address__c samuels = addressOf(Address__c.Contact__c, samuel.Id, '9 Oak Road');
 			Address__c anas = addressOf(Address__c.Contact__c, ana.Id, '3 Pine Court');
@@ -86,6 +92,43 @@ private class AddressDeleteHandlerTest {
 			Assert.areEqual(sam.Id, merged.Contact__c, 'It moved to the survivor');
 			Assert.isNull(merged.Deleted_With__c, 'Its mark is cleared');
 			Assert.isTrue(reread(anas.Id).IsDeleted, 'Ana\'s address went with her');
+		}
+	}
+
+	/**
+	 * QA review Q4: the marks noted before delete are kept in a static map until after delete.
+	 * A delete of 205 records runs the trigger in two chunks, so the second chunk's before
+	 * must add to the map, not replace it, or the first chunk's addresses stay behind.
+	 */
+	@IsTest
+	static void deletingMoreThanTwoHundredOrganizationsTakesEveryAddress() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> funders = new List<Account>();
+			for (Integer i = 0; i < 205; i++) {
+				funders.add(AddressTestDataFactory.newOrganization('Foundation ' + i));
+			}
+			Database.insert(funders, AccessLevel.SYSTEM_MODE);
+			List<Address__c> offices = new List<Address__c>();
+			for (Account funder : funders) {
+				offices.add(
+					new Address__c(
+						Account__c = funder.Id,
+						Street__c = '1 Main Street',
+						Is_Default__c = true
+					)
+				);
+			}
+			Database.insert(offices, AccessLevel.SYSTEM_MODE);
+
+			Test.startTest();
+			Database.delete(funders, AccessLevel.SYSTEM_MODE);
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Address__c WHERE Id IN :offices WITH SYSTEM_MODE],
+				'Every address went with its organization, in both chunks'
+			);
 		}
 	}
 }

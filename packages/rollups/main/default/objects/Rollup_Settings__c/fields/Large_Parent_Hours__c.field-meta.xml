@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Large_Parent_Hours__c</fullName>
+    <defaultValue>1</defaultValue>
+    <description>The fewest hours between two recalculations of totals on records with very many records under them (the large parent route, R-RQ6), 0 to 24. Saves in between wait and share the next run. Blank or out of range means 1; 0 recalculates as soon as possible (D-200 P2).</description>
+    <externalId>false</externalId>
+    <inlineHelpText>How often, at most, totals on a record with very many records under it (a fund every gift goes to) are recalculated.</inlineHelpText>
+    <label>Large Parent Hours</label>
+    <precision>2</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

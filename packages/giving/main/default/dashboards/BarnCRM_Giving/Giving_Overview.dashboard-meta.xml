@@ -4,7 +4,7 @@
   <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
   <backgroundStartColor>#FFFFFF</backgroundStartColor>
   <chartTheme>light</chartTheme>
-  <dashboardType>LoggedInUser</dashboardType>
+  <dashboardType>SpecifiedUser</dashboardType>
   <description>
     How much came in this month, which funds and appeals it came through, and who gave the most this
     year.

@@ -34,16 +34,22 @@ private class RollupQueueTest {
 	private static Set<Id> parentsWithOneChild(Integer count) {
 		List<Account> parents = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
-			parents.add(new Account(Name = 'Parent ' + i, RecordTypeId = organizationType()));
+			parents.add(
+				TestDataFactory.organization(
+					new Account(Name = 'Parent ' + i, RecordTypeId = organizationType())
+				)
+			);
 		}
 		insert parents;
 		List<Account> children = new List<Account>();
 		for (Account parent : parents) {
 			children.add(
-				new Account(
-					Name = parent.Name + ' child',
-					RecordTypeId = organizationType(),
-					ParentId = parent.Id
+				TestDataFactory.organization(
+					new Account(
+						Name = parent.Name + ' child',
+						RecordTypeId = organizationType(),
+						ParentId = parent.Id
+					)
 				)
 			);
 		}
@@ -120,6 +126,59 @@ private class RollupQueueTest {
 			}
 			Assert.areEqual(250, stillWaiting, 'The records past the first slice wait');
 			Assert.areEqual(0, RollupQueue.lastChainDelay, 'The next run is asked for now');
+		}
+	}
+
+	@IsTest
+	static void aFinishedEntryIsDeletedForGood() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			insertChildCount();
+			Set<Id> parents = parentsWithOneChild(5);
+
+			Test.startTest();
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => parents });
+			// The processor runs as its own transaction would, with no insert of its own.
+			RollupQueue.newTransactionForTest();
+			Test.stopTest();
+
+			Assert.areEqual(
+				5,
+				[SELECT COUNT() FROM Account WHERE Id IN :parents AND NumberOfEmployees = 1],
+				'The run recalculated them'
+			);
+			Assert.isTrue(entries().isEmpty(), 'And finished every entry');
+			Assert.isTrue(
+				RollupQueue.emptiedForTest >= 1,
+				'Every finished entry is emptied from the bin'
+			);
+		}
+	}
+
+	@IsTest
+	static void anEntryARunThatStoppedEmptiedIsDeletedForGood() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			List<Rollup_Queue__c> held = new List<Rollup_Queue__c>{
+				new Rollup_Queue__c(
+					Target_Object__c = 'Account',
+					Record_Ids__c = String.join(new List<Id>(fakeAccountIds(2)), ','),
+					Record_Count__c = 2,
+					Attempts__c = 0
+				)
+			};
+			insert held;
+
+			Test.startTest();
+			RollupQueue.stopped(held, new Set<Id>(), 'Apex CPU time limit exceeded');
+			Test.stopTest();
+
+			List<Rollup_Queue__c> left = entries();
+			Assert.areEqual(1, left.size(), 'Its records are queued again');
+			Assert.areNotEqual(held[0].Id, left[0].Id, 'In a new entry, charged an attempt');
+			Assert.areEqual(
+				1,
+				RollupQueue.emptiedForTest,
+				'The emptied entry is emptied from the bin'
+			);
 		}
 	}
 
@@ -509,9 +568,10 @@ private class RollupQueueTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Test.startTest();
 			RollupQueue.queueableForTest = false;
-			RollupQueue.waitingForTest = 1;
+			// D-200 P13: the save reads when a processor was last asked for, not the job list.
+			RollupQueue.requestedAtForTest = Datetime.now().addMinutes(-1);
 			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(10) });
-			Assert.areEqual(0, processorsQueued(), 'One waits already');
+			Assert.areEqual(0, processorsQueued(), 'One was asked for a minute ago');
 			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'Asks again after commit');
 
 			// The waiting processor ran without these entries; the subscriber is a new transaction.
@@ -521,6 +581,40 @@ private class RollupQueueTest {
 
 			Assert.areEqual(1, processorsQueued(), 'The subscriber starts one for them');
 			Assert.areEqual(0, RollupQueue.readyEventsPublished, 'And asks nothing more');
+			Test.stopTest();
+		}
+	}
+
+	/**
+	 * D-200 P13: a save that queues entries runs no query to find a processor. The first one
+	 * queues a processor and stamps when; the next, while the stamp is recent, leaves the exact
+	 * check to the subscriber; once the stamp is old (a processor that died), a save queues one.
+	 */
+	@IsTest
+	static void aSaveRunsNoQueryAndReadsTheStampOfTheLastProcessorAskedFor() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			Test.startTest();
+			RollupQueue.queueableForTest = false;
+			RollupQueue.readStampInTests = true;
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+			Assert.areEqual(1, processorsQueued(), 'Nothing recent, so it queues one');
+			Assert.isNotNull(
+				Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c,
+				'And stamps when'
+			);
+
+			RollupQueue.newTransactionForTest();
+			Integer queriesBefore = Limits.getQueries();
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+			Assert.areEqual(0, Limits.getQueries() - queriesBefore, 'No query in the save');
+			Assert.areEqual(1, processorsQueued(), 'Recent: it queues no second one');
+			Assert.areEqual(1, RollupQueue.readyEventsPublished, 'The subscriber checks exactly');
+
+			RollupQueue.newTransactionForTest();
+			RollupQueue.requestedAtForTest = Datetime.now()
+				.addMinutes(-RollupQueue.REQUEST_FRESH_MINUTES - 1);
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => fakeAccountIds(5) });
+			Assert.areEqual(2, processorsQueued(), 'Old: the one asked for may be gone');
 			Test.stopTest();
 		}
 	}

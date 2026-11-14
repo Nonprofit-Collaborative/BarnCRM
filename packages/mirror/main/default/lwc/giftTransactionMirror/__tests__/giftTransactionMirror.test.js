@@ -5,7 +5,7 @@ import getStatus from '@salesforce/apex/GiftTransactionMirrorController.getStatu
 import runNow from '@salesforce/apex/GiftTransactionMirrorController.runNow';
 import compare from '@salesforce/apex/GiftTransactionMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/GiftTransactionMirrorController.copyRangeAgain';
-import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from '../mirrorView';
+import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from '../../mirrorPage/mirrorView';
 
 setHelpTextForTest({
   Mirror_GiftTransactionMirror_DirectionGifts:
@@ -87,8 +87,10 @@ async function mount(status) {
   return element;
 }
 
+/** Inside the shared c-mirror-page the wrapper renders. */
 function find(element, id) {
-  return element.shadowRoot.querySelector(`[data-id="${id}"]`);
+  const page = element.shadowRoot.querySelector('c-mirror-page');
+  return page.shadowRoot.querySelector(`[data-id="${id}"]`);
 }
 
 describe('c-gift-transaction-mirror', () => {
@@ -154,8 +156,8 @@ describe('c-gift-transaction-mirror', () => {
     await flush();
     expect(find(element, 'gift-count').value).toBe(2);
     expect(find(element, 'gift-total').value).toBe(150);
-    expect(find(element, 'gift-transaction-count').value).toBe(1);
-    expect(find(element, 'gift-transaction-total').value).toBe(100);
+    expect(find(element, 'linked-count').value).toBe(1);
+    expect(find(element, 'linked-total').value).toBe(100);
     expect(find(element, 'difference-count').message).toBe('Differences found: 1. All are listed.');
     find(element, 'copy-again').click();
     await flush();
@@ -197,9 +199,15 @@ describe('mirrorView', () => {
     };
     expect(differenceTextOf(undefined, labels)).toBe('None');
     expect(differenceTextOf({ differenceCount: 3, differences: [{}] }, labels)).toBe('3 of 1');
-    const [row] = rowsOf({ differences: [{ giftTransactionId: '6gt' }] });
+    const [row] = rowsOf({ differences: [{ giftTransactionId: '6gt' }] }, 'giftTransaction');
     expect(row.giftTransactionUrl).toBe('/6gt');
     expect(row.giftTransactionLabel).toBe('6gt');
-    expect(rowsOf(undefined)).toEqual([]);
+    const [opportunity] = rowsOf(
+      { differences: [{ opportunityId: '006', opportunityName: 'Luis gift' }] },
+      'opportunity'
+    );
+    expect(opportunity.opportunityUrl).toBe('/006');
+    expect(opportunity.opportunityLabel).toBe('Luis gift');
+    expect(rowsOf(undefined, 'opportunity')).toEqual([]);
   });
 });

@@ -17,10 +17,6 @@ public with sharing class GrantReminderScheduler implements Schedulable {
 	private static String jobNameInUse = JOB_NAME;
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		GrantReminderBatch.startMorning();
 	}
 

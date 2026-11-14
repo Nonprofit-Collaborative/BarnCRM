@@ -202,16 +202,16 @@ public with sharing class AddressVerifier {
 				false,
 				AccessLevel.USER_MODE
 			);
-			for (Integer i = 0; i < results.size(); i++) {
-				if (!results[i].isSuccess()) {
-					ErrorLogger.logMessage(
-						results[i].getErrors()[0].getMessage(),
-						CONTEXT + '.write',
-						ErrorLogger.SEVERITY_WARNING,
-						changes[i].Id
-					);
-				}
+			List<Id> changedIds = new List<Id>();
+			for (SObject change : changes) {
+				changedIds.add(change.Id);
 			}
+			ErrorLogger.logFailures(
+				results,
+				changedIds,
+				CONTEXT + '.write',
+				ErrorLogger.SEVERITY_WARNING
+			);
 		} finally {
 			writing = false;
 		}

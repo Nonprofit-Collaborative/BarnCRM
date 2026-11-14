@@ -15,7 +15,11 @@ public without sharing class ContactPointBackfillBatch implements Database.Batch
 
 	/** Starts the backfill and returns its job ID. */
 	public static Id start() {
-		return Database.executeBatch(new ContactPointBackfillBatch(), CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new ContactPointBackfillBatch(),
+			CHUNK_SIZE,
+			'ContactPointBackfillBatch'
+		);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

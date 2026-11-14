@@ -126,6 +126,87 @@ public with sharing class SettingsService {
 		return orgDefault(type).get(fieldFor(type, key));
 	}
 
+	// Typed readers (D-200 S8): every module reads its settings through these, so the shipped
+	// value is the field's declared default and the range is its Setting Definition's, each
+	// stated once. None throws: a setting that cannot be read is treated as never saved.
+
+	/** A checkbox setting: the stored value, else the field's declared default, else false. */
+	@NamespaceAccessible
+	public static Boolean flag(String settingsObject, String key) {
+		Object value = storedValue(settingsObject, key);
+		value = value == null ? declaredValue(settingsObject, key) : value;
+		return value == null ? false : Boolean.valueOf(String.valueOf(value));
+	}
+
+	/**
+	 * A number setting: the stored value, or the field's declared default when it is blank,
+	 * not a number, or outside the Min and Max of its Setting Definition row.
+	 */
+	@NamespaceAccessible
+	public static Decimal number(String settingsObject, String key) {
+		Decimal value = toNumber(storedValue(settingsObject, key));
+		Setting_Definition__mdt row = value == null
+			? null
+			: definitionsByKey(objectName(settingsObject)).get(key.trim().toLowerCase());
+		Boolean outside =
+			row != null &&
+			((row.Min_Value__c != null && value < row.Min_Value__c) ||
+			(row.Max_Value__c != null &&
+			value > row.Max_Value__c));
+		return value == null || outside ? toNumber(declaredValue(settingsObject, key)) : value;
+	}
+
+	/** A text setting, trimmed: the stored value, or the field's declared default when blank. */
+	@NamespaceAccessible
+	public static String text(String settingsObject, String key) {
+		String value = asText(storedValue(settingsObject, key)).trim();
+		return String.isBlank(value) ? asText(declaredValue(settingsObject, key)).trim() : value;
+	}
+
+	/** A Core number setting as stored, or null when it is blank, unknown or not a number. */
+	@NamespaceAccessible
+	public static Decimal storedNumber(String key) {
+		return hasKey(key) ? toNumber(getValue(key)) : null;
+	}
+
+	/**
+	 * Any value as a number, trimmed, or null when it is null, blank or not a number. The one
+	 * lenient parser every package uses for setting, record and input values (`?? fallback`
+	 * for a default).
+	 */
+	@NamespaceAccessible
+	public static Decimal toNumber(Object value) {
+		try {
+			return value == null ? null : Decimal.valueOf(String.valueOf(value).trim());
+		} catch (TypeException notANumber) {
+			return null;
+		}
+	}
+
+	private static Object storedValue(String settingsObject, String key) {
+		try {
+			return getValue(settingsObject, key);
+		} catch (Exception unreadable) {
+			return null;
+		}
+	}
+
+	/** The declared defaults of each settings object, built once per transaction. */
+	private static Map<String, SObject> declaredDefaults = new Map<String, SObject>();
+
+	private static Object declaredValue(String settingsObject, String key) {
+		try {
+			Schema.SObjectType type = settingsType(settingsObject);
+			String name = String.valueOf(type);
+			if (!declaredDefaults.containsKey(name)) {
+				declaredDefaults.put(name, type.newSObject(null, true));
+			}
+			return declaredDefaults.get(name).get(fieldFor(type, key));
+		} catch (Exception unknown) {
+			return null;
+		}
+	}
+
 	/**
 	 * The Core settings whose blank means "nobody has chosen yet", so the stored value has to
 	 * stay blank (CoexistenceService reads a blank coexistence mode as unconfirmed and a blank
@@ -138,6 +219,14 @@ public with sharing class SettingsService {
 	private static final String COEXISTENCE_FIELD = 'coexistence_mode__c';
 	private static final Set<String> SHOWN_AS_STORED = new Set<String>{
 		'household_membership_mode__c'
+	};
+	/**
+	 * Text settings that show the org's My Domain address while blank, as `object.field` in
+	 * lower case: the address is known only at run time, so no declared default can hold it.
+	 * A module's install fills the stored value too; this covers an org it never ran in.
+	 */
+	private static final Set<String> SHOWN_AS_MY_DOMAIN = new Set<String>{
+		'projects_settings__c.invoice_return_url__c'
 	};
 
 	/**
@@ -177,6 +266,13 @@ public with sharing class SettingsService {
 		}
 		if (isCoreSettings(type) && SHOWN_AS_STORED.contains(name)) {
 			return stored;
+		}
+		if (
+			SHOWN_AS_MY_DOMAIN.contains(
+				type.getDescribe().getLocalName().toLowerCase() + '.' + name
+			)
+		) {
+			return Url.getOrgDomainUrl().toExternalForm();
 		}
 		Object declared = type.newSObject(null, true).get(field);
 		return declared == null ? stored : declared;
@@ -324,7 +420,7 @@ public with sharing class SettingsService {
 		String objectName,
 		Map<Schema.SObjectField, Object> changed
 	) {
-		RollupEngineExtensionV3 engine = RollupEngineExtensions.findV3();
+		RollupEngineExtension engine = RollupEngineExtensions.find();
 		if (engine == null) {
 			return;
 		}

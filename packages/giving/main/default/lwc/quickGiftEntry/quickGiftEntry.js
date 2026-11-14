@@ -935,13 +935,15 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     }
   }
 
-  /** Keeps the date, the appeal and the fund, clears what changes gift to gift. */
+  /**
+   * Keeps the date, the appeal, the fund and the payment method (a stack of checks stays a
+   * stack of checks), clears what changes gift to gift.
+   */
   startAnotherGift() {
     this.entrySaved = false;
     this.donorId = this.prefilledDonorId;
     this.donorKind = this.prefilledDonorKind || PERSON;
     this.amount = undefined;
-    this.giftType = undefined;
     this.inKindDescription = undefined;
     this.fairMarketValue = undefined;
     this.paymentReference = undefined;

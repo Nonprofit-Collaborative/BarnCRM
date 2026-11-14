@@ -54,7 +54,7 @@
 @NamespaceAccessible
 public with sharing class GivingPostInstall implements InstallHandler, ModuleSetup {
 	/** The module's key in the module catalog and the setup marker. */
-	private static final String MODULE_KEY = 'Giving';
+	public static final String MODULE_KEY = 'Giving';
 	private static final String ROLLUP_CONTEXT = 'GivingPostInstall.ensureRollupDefaults';
 	private static final String TEMPLATE_CONTEXT = 'GivingPostInstall.installReceiptTemplates';
 	private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
@@ -68,9 +68,7 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 	 * fails the build when a new ship-on checkbox is missing here.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Giving_Settings__c.Ask_Reminders_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/**
 	 * Called by the platform after the package is installed or upgraded.
@@ -95,8 +93,6 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 	 * @param installerId unused: every step belongs to the org, not to a person
 	 */
 	public void runSetup(Id installerId) {
-		// Giving's jobs scheduled one by one before the nightly run become its steps (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		// Nothing is caught here because nothing can be thrown: the entry point records its own
 		// failure in the Error Log and returns, so an install is never aborted by this step, and
 		// the Rollups page can still create the rows on demand.
@@ -112,7 +108,7 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
 		);
 		// BarnCRM Admin holders get Giving Admin (ADR-0194 D2); queued, since it writes setup
 		// objects, and it never throws.
-		new GivingAccessSync().requestSync();
+		ModuleAccessSyncs.requestFor(MODULE_KEY);
 		ModuleSetups.markRan(MODULE_KEY);
 	}
 }

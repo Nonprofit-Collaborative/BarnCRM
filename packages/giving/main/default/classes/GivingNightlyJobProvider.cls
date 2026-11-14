@@ -1,5 +1,5 @@
 /**
- * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add Giving's steps to the
+ * The class Core finds by name (registered in its catalog row) to add Giving's steps to the
  * one nightly run (ADR-0166 nightly-job-dispatcher): the five jobs `GivingScheduler` switches
  * together (the pledge reminders among them, shipped off because they email donors, G-37), then
  * the acknowledgment send, switched on its own page and shipped off for the same reason.
@@ -16,7 +16,12 @@ public with sharing class GivingNightlyJobProvider implements NightlyStepProvide
 
 	public List<NightlyStep> nightlySteps() {
 		List<NightlyStep> steps = GivingScheduler.steps();
-		steps.add(AcknowledgmentScheduler.step());
+		steps.add(
+			AcknowledgmentScheduler.step()
+				.withSummary(
+					Giving_Settings__c.getOrgDefaults().Acknowledgments_Last_Run_Summary__c
+				)
+		);
 		return steps;
 	}
 }

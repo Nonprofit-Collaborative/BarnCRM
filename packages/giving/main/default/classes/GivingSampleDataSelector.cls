@@ -12,14 +12,7 @@ public with sharing class GivingSampleDataSelector {
 	 * The GivingSampleData static resource, or null when it has not been deployed.
 	 */
 	public StaticResource getSampleDataResource() {
-		List<StaticResource> resources = [
-			SELECT Body
-			FROM StaticResource
-			WHERE Name = 'GivingSampleData'
-			WITH USER_MODE
-			LIMIT 1
-		];
-		return resources.isEmpty() ? null : resources[0];
+		return SetupObjectSelector.staticResource('GivingSampleData');
 	}
 
 	/** Every sample person by the key the generator gave them. */
@@ -92,14 +85,20 @@ public with sharing class GivingSampleDataSelector {
 
 	/**
 	 * The sample refunds and write-offs: the negative gifts that point back at an original. They
-	 * go before the rest, because a gift a reversal points at refuses to be deleted.
+	 * go before the rest, because a gift a reversal points at refuses to be deleted. The
+	 * employers' matching gifts go with them: deleting one unlinks the employee's gift, which
+	 * must not be in the same delete, because the unlink writes to it.
 	 */
 	public List<Id> sampleReversalIds() {
 		List<Id> ids = new List<Id>();
 		for (Gift__c gift : [
 			SELECT Id
 			FROM Gift__c
-			WHERE Sample_Data__c = TRUE AND Original_Gift__c != NULL
+			WHERE
+				Sample_Data__c = TRUE
+				AND (Original_Gift__c != NULL
+				OR (Matched_Gift__c != NULL
+				AND Donor_Account__c != NULL))
 			WITH USER_MODE
 		]) {
 			ids.add(gift.Id);

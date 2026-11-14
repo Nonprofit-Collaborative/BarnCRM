@@ -139,9 +139,9 @@ public with sharing class FindRadius {
 		Map<String, Object> radius = (Map<String, Object>) rawRadius;
 		String fieldName = String.valueOf(radius.get('field'));
 		checkField(objectName, fieldName);
-		Decimal miles = number(radius.get('miles'));
-		Decimal latitude = number(radius.get('latitude'));
-		Decimal longitude = number(radius.get('longitude'));
+		Decimal miles = SettingsService.toNumber(radius.get('miles'));
+		Decimal latitude = SettingsService.toNumber(radius.get('latitude'));
+		Decimal longitude = SettingsService.toNumber(radius.get('longitude'));
 		if (
 			miles == null ||
 			miles < MIN_MILES ||
@@ -167,6 +167,7 @@ public with sharing class FindRadius {
 		}
 		FindRelatedRecords.Rendered rendered = new FindRelatedRecords.Rendered();
 		rendered.clause =
+			boundingBox(fieldName, rendered.binds, latitude, longitude, miles) +
 			'DISTANCE(' +
 			fieldName +
 			', GEOLOCATION(:radiusLatitude, :radiusLongitude), \'mi\') < :radiusMiles';
@@ -209,6 +210,49 @@ public with sharing class FindRadius {
 
 	// ------------------------------------------------------------------------------ helpers
 
+	/**
+	 * Latitude and longitude ranges that hold the whole circle, ANDed ahead of DISTANCE so
+	 * the query narrows on plain number comparisons before measuring each row (D-200 P13).
+	 * One degree of latitude is about 69 miles; a degree of longitude shrinks by the cosine
+	 * of the latitude. Near a pole or across the date line the longitude range is left off,
+	 * and DISTANCE alone decides, as before.
+	 */
+	private static String boundingBox(
+		String fieldName,
+		Map<String, Object> binds,
+		Decimal latitude,
+		Decimal longitude,
+		Decimal miles
+	) {
+		String stem = fieldName.endsWith('__c')
+			? fieldName.removeEnd('__c') + '__'
+			: fieldName.removeEnd('Address');
+		String suffix = fieldName.endsWith('__c') ? '__s' : '';
+		String latitudeName = stem + 'Latitude' + suffix;
+		String longitudeName = stem + 'Longitude' + suffix;
+		Double centerLatitude = latitude.doubleValue();
+		Double centerLongitude = longitude.doubleValue();
+		// 68.5 miles per degree, a touch under the true 69, so the box is never too small.
+		Double latitudeSpan = miles.doubleValue() * 2 / 137;
+		binds.put('boxSouth', centerLatitude - latitudeSpan);
+		binds.put('boxNorth', centerLatitude + latitudeSpan);
+		String clause = latitudeName + ' >= :boxSouth AND ' + latitudeName + ' <= :boxNorth AND ';
+		Double cosine = Math.cos(Math.abs(centerLatitude) * Math.PI / 180);
+		Double longitudeSpan = 360;
+		if (cosine > 0) {
+			longitudeSpan = latitudeSpan / cosine;
+		}
+		if (
+			Math.abs(centerLatitude) + latitudeSpan >= 89 ||
+			Math.abs(centerLongitude) + longitudeSpan >= 180
+		) {
+			return clause;
+		}
+		binds.put('boxWest', centerLongitude - longitudeSpan);
+		binds.put('boxEast', centerLongitude + longitudeSpan);
+		return clause + longitudeName + ' >= :boxWest AND ' + longitudeName + ' <= :boxEast AND ';
+	}
+
 	private static Boolean isGeocodable(Schema.DescribeFieldResult field) {
 		Schema.DisplayType type = field.getType();
 		return (type == Schema.DisplayType.ADDRESS || type == Schema.DisplayType.LOCATION) &&
@@ -230,33 +274,13 @@ public with sharing class FindRadius {
 		}
 	}
 
-	private static Decimal number(Object raw) {
-		if (raw == null) {
-			return null;
-		}
-		try {
-			return Decimal.valueOf(String.valueOf(raw).trim());
-		} catch (Exception notANumber) {
-			return null;
-		}
-	}
-
 	private static String table() {
 		if (tableForTest != null) {
 			return tableForTest;
 		}
 		if (table == null) {
-			String prefix = NamespaceUtil.prefix().removeEnd('__');
-			String namespace = String.isBlank(prefix) ? null : prefix;
-			// System mode, as BarnHelp reads its catalogs: packaged text every user may use.
-			List<StaticResource> found = [
-				SELECT Body
-				FROM StaticResource
-				WHERE Name = :RESOURCE AND NamespacePrefix = :namespace
-				WITH SYSTEM_MODE
-				LIMIT 1
-			];
-			table = found.isEmpty() ? ';' : ';' + found[0].Body.toString().trim() + ';';
+			String body = SetupObjectSelector.staticResourceBody(RESOURCE);
+			table = body == null ? ';' : ';' + body.trim() + ';';
 		}
 		return table;
 	}

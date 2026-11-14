@@ -9,6 +9,7 @@ import { format, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import EventRecordModal from 'c/eventRecordModal';
+import ATTENDEE from '@salesforce/schema/Event_Attendee__c';
 import {
   actionsFor,
   buildRequest,
@@ -319,7 +320,7 @@ export default class EventRegistrations extends LightningElement {
       const saved = await EventRecordModal.open({
         label: `${actionLabel('editBadge')}: ${attendee.name}`,
         size: 'small',
-        objectApiName: 'Event_Attendee__c',
+        objectApiName: ATTENDEE.objectApiName,
         recordId: attendee.id,
         fields: BADGE_FIELDS
       });

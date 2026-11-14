@@ -7,19 +7,13 @@
  * scheduled (`SettingsService` calls `applySwitch`), and saving it off leaves the step out of
  * tonight's run. An install or upgrade with the switch on schedules the run if it is missing
  * (`scheduleIfEnabled`).
- *
- * Still schedulable: an org upgraded from before the nightly run may have this job scheduled on
- * its own, and when it fires it adopts the old schedules (R-NJ5) and does tonight's swap.
  */
 public with sharing class SeasonalAddressScheduler implements Schedulable {
 	/** The name the job was scheduled under, now the step's key. */
 	public static final String JOB_NAME = 'BarnCRM Seasonal Addresses';
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			NightlyJobs.adoptOldSchedules();
-		}
-		Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
+		runNow();
 	}
 
 	/** True when the Seasonal Addresses switch is on. */
@@ -45,19 +39,6 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 		}
 	}
 
-	/**
-	 * An org upgraded from before the switch existed may still run the swap on its own
-	 * schedule, and its switch would read off while the swap runs. Turns the switch on for such
-	 * an org, so what the page says is what is happening.
-	 */
-	public static void adoptExistingSchedule() {
-		if (!isEnabled() && ScheduledJobSelector.isScheduled(JOB_NAME)) {
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ 'Seasonal_Addresses_Enabled__c' => true }
-			);
-		}
-	}
-
 	/** Makes sure the nightly run, which does the swap, is scheduled. */
 	public static Id start() {
 		return NightlyJobs.start();
@@ -65,7 +46,11 @@ public with sharing class SeasonalAddressScheduler implements Schedulable {
 
 	/** Runs the swap now, without waiting for tonight. */
 	public static Id runNow() {
-		return Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
+		return AsyncStarter.batch(
+			new SeasonalAddressBatch(),
+			SeasonalAddressBatch.CHUNK_SIZE,
+			'SeasonalAddressScheduler'
+		);
 	}
 
 	/** True when the switch is on and the nightly run is scheduled. */

@@ -8,6 +8,12 @@
  * FindController.saveQuery, so it is compiled, checked and stored exactly as Find stores one.
  */
 public with sharing class DataHygieneController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_DataHygiene_CheckFailed'
+	);
+
 	private static final String FIND_TAB = 'Find';
 	private static final String SAVED_QUERY_STATE = 'savedQueryId';
 
@@ -33,7 +39,7 @@ public with sharing class DataHygieneController {
 			requirePermission();
 			return DataHygieneService.runAll();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Data Quality checks');
+			throw ERRORS.wrap(caught, 'Data Quality checks');
 		}
 	}
 
@@ -61,7 +67,7 @@ public with sharing class DataHygieneController {
 		} catch (AuraHandledException alreadyForThePerson) {
 			throw alreadyForThePerson;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Open a Data Quality check in Find');
+			throw ERRORS.wrap(caught, 'Open a Data Quality check in Find');
 		}
 	}
 
@@ -84,15 +90,5 @@ public with sharing class DataHygieneController {
 				BarnHelp.text('Core', 'Core_DataHygiene_ErrorNoPermission')
 			);
 		}
-	}
-
-	/** Anything the person can act on is shown as it is; anything else is logged and summarized. */
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof DataHygieneService.DataHygieneException,
-			context,
-			BarnHelp.text('Core', 'Core_DataHygiene_CheckFailed')
-		);
 	}
 }

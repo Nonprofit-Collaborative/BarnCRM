@@ -63,7 +63,6 @@ Rules:
 | giving | Gift_Batch__c | Custom13: Box |
 | giving | Gift__c | Custom41: Cash |
 | giving | Giving_Accounting_Periods | Custom55: Books |
-| giving | Giving_Nightly_Jobs | Custom10: Moon |
 | giving | Installment__c | Custom45: Ticket |
 | giving | Pledge_Reminder_Step__c | Custom79: MeasuringTape |
 | giving | Pledge_Reminder__c | Custom25: Alarmclock |
@@ -203,8 +202,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | projects | projectsAtRisk | custom:custom62 | Project__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |
-| mirror | giftTransactionMirror | custom:custom31 | Gift_Transaction_Mirror |
-| mirror | opportunityMirror | custom:custom30 | Opportunity_Mirror |
+| mirror | mirrorPage | custom:custom31 | Gift_Transaction_Mirror |
+| mirror | mirrorPage | custom:custom30 | Opportunity_Mirror |
 | programs | cohortMembers | custom:custom50 | Cohort__c |
 | programs | personEnrollments | custom:custom60 | Enrollment__c |
 | programs | programDashboard | custom:custom9 | Programs_Dashboard |

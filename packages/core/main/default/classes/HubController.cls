@@ -12,8 +12,8 @@
  */
 public with sharing class HubController {
 	private static final String ERROR_CONTEXT = 'BarnCRM home';
-	/** The Giving module's catalog name (BarnCRM_Module.Giving). */
-	private static final String GIVING_MODULE = 'Giving';
+	/** A quick link target that opens an object's new record form (`Enrollment__c.new`). */
+	private static final String NEW_RECORD = '.new';
 
 	/**
 	 * The tile counts this many new errors and then says "more", so a flooded Error Log costs
@@ -65,13 +65,29 @@ public with sharing class HubController {
 		/** True when this person may create a contact, so New Person is shown. */
 		@AuraEnabled
 		public Boolean canCreatePerson;
+		/** True when this person may run an import, so Quick Links offers Import a File. */
+		@AuraEnabled
+		public Boolean canImport;
 		/**
-		 * True when the Giving module is installed and on, so Quick Links offers Quick Gift
-		 * Entry. Read from the module catalog, never from Giving's code, so Core has no
-		 * dependency on Giving.
+		 * The links installed and turned-on modules add to Quick Links, from their catalog rows
+		 * (`Quick_Links__c`, D-200 R7), never from module code, so Core depends on no module.
 		 */
 		@AuraEnabled
-		public Boolean giftEntryAvailable;
+		public List<QuickLink> quickLinks;
+	}
+
+	/** One module quick link: a tab, or an object's new record form, with its words. */
+	public class QuickLink {
+		/** The tab API name as written in the catalog; the page qualifies it. */
+		@AuraEnabled
+		public String tab;
+		/** The object whose new record form the link opens, qualified for this org. */
+		@AuraEnabled
+		public String objectApiName;
+		@AuraEnabled
+		public String label;
+		@AuraEnabled
+		public String line;
 	}
 
 	/** One file that arrives regularly, and when it was last imported (R-IT6). */
@@ -123,7 +139,10 @@ public with sharing class HubController {
 		HomeModel model = new HomeModel();
 		model.canCreateHousehold = HouseholdWriter.canCreateHouseholds();
 		model.canCreatePerson = Schema.SObjectType.Contact.isCreateable();
-		model.giftEntryAvailable = readGiftEntryAvailable();
+		model.canImport =
+			ModuleDetectionService.isImportPresent() &&
+			Schema.SObjectType.Import_Batch__c.isCreateable();
+		model.quickLinks = readQuickLinks();
 		model.canEdit = BarnCRMPermissions.canManageSettings();
 		model.automationPaused = readAutomationPaused();
 		model.recurringSources = readRecurringSources();
@@ -149,14 +168,109 @@ public with sharing class HubController {
 		return model;
 	}
 
-	private static Boolean readGiftEntryAvailable() {
+	/**
+	 * Each installed, turned-on module's quick links, in catalog order. An entry is
+	 * `Target:Label:Line`; a target ending `.new` opens that object's new record form and is
+	 * offered only to someone who can create the object. A failure costs the page its module
+	 * links, never the page.
+	 */
+	@TestVisible
+	private static List<QuickLink> readQuickLinks() {
+		List<QuickLink> links = new List<QuickLink>();
 		try {
-			return ModuleDetectionService.isGivingPresent() &&
-				!ModuleManagerService.turnedOff().contains(GIVING_MODULE.toLowerCase());
+			Set<String> off = ModuleManagerService.turnedOff();
+			for (BarnCRM_Module__mdt row : ModuleDetectionService.installedCatalog()) {
+				if (off.contains(row.DeveloperName.toLowerCase())) {
+					continue;
+				}
+				for (
+					String entry : (row.Quick_Links__c == null ? '' : row.Quick_Links__c).split(';')
+				) {
+					QuickLink link = quickLink(entry);
+					if (link != null) {
+						links.add(link);
+					}
+				}
+			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
-			return false;
 		}
+		return links;
+	}
+
+	/** Stands in for the tabs the running user can see, by name as written or qualified. */
+	@TestVisible
+	private static Set<String> visibleTabsOverride;
+
+	/** The tabs the running user can see, lower case, read once per transaction. */
+	private static Set<String> visibleTabs;
+
+	/**
+	 * Whether the running user can see the tab: a permission set they hold (their profile's
+	 * included) makes it Default On or Default Off, under its name as written or with this org's
+	 * prefix. Not Schema.describeTabs: it describes Classic apps only, so it leaves out every
+	 * custom tab of a Lightning app (barn-platform, 2026-11-13).
+	 *
+	 * System mode: reads the running user's own tab settings, which a person without View Setup
+	 * cannot query.
+	 */
+	private static Boolean canSeeTab(String tab) {
+		if (visibleTabs == null) {
+			visibleTabs = new Set<String>();
+			if (visibleTabsOverride != null) {
+				for (String name : visibleTabsOverride) {
+					visibleTabs.add(name.toLowerCase());
+				}
+			} else {
+				Id me = UserInfo.getUserId();
+				for (PermissionSetTabSetting setting : [
+					SELECT Name
+					FROM PermissionSetTabSetting
+					WHERE
+						ParentId IN (
+							SELECT PermissionSetId
+							FROM PermissionSetAssignment
+							WHERE AssigneeId = :me
+						)
+					WITH SYSTEM_MODE
+				]) {
+					visibleTabs.add(setting.Name.toLowerCase());
+				}
+			}
+		}
+		return visibleTabs.contains(tab.toLowerCase()) ||
+			visibleTabs.contains(NamespaceUtil.qualify(tab).toLowerCase());
+	}
+
+	/**
+	 * One catalog entry as a link, or null when it is blank, its object cannot be created, or
+	 * its tab is one the running user cannot see.
+	 */
+	@TestVisible
+	private static QuickLink quickLink(String entry) {
+		List<String> parts = entry.split(':', 3);
+		if (String.isBlank(entry) || parts.size() < 2 || String.isBlank(parts[0])) {
+			return null;
+		}
+		QuickLink link = new QuickLink();
+		String target = parts[0].trim();
+		link.label = parts[1].trim();
+		link.line = parts.size() > 2 ? parts[2].trim() : null;
+		if (target.endsWith(NEW_RECORD)) {
+			Schema.DescribeSObjectResult described = NamespaceUtil.describe(
+				target.removeEnd(NEW_RECORD)
+			);
+			if (described == null || !described.isCreateable()) {
+				return null;
+			}
+			link.objectApiName = described.getName();
+		} else {
+			if (!canSeeTab(target)) {
+				return null;
+			}
+			link.tab = target;
+		}
+		return link;
 	}
 
 	private static Boolean readAutomationPaused() {

@@ -261,7 +261,7 @@ private class RollupControllerTest {
 			insert definition();
 			List<Account> accounts = new List<Account>();
 			for (Integer i = 0; i < 200; i++) {
-				accounts.add(new Account(Name = 'Household ' + i));
+				accounts.add(TestDataFactory.organization(new Account(Name = 'Household ' + i)));
 			}
 			insert accounts;
 			User admin = maria();
@@ -299,7 +299,7 @@ private class RollupControllerTest {
 			insert instantly;
 			List<Account> accounts = new List<Account>();
 			for (Integer i = 0; i < 200; i++) {
-				accounts.add(new Account(Name = 'Household ' + i));
+				accounts.add(TestDataFactory.organization(new Account(Name = 'Household ' + i)));
 			}
 			insert accounts;
 			User admin = maria();

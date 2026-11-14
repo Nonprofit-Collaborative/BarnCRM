@@ -1,0 +1,121 @@
+{
+  "module": "Core",
+  "countLabel": "Saved Queries",
+  "count": {
+    "object": "Saved_Query__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Saved_Query__c",
+      "records": [
+        {
+          "Name": "Sample: People in Rochester",
+          "Object_Name__c": "Contact",
+          "Query_JSON__c": "{\"version\":1,\"object\":\"Contact\",\"fields\":[\"Name\",\"Email\",\"Phone\",\"MailingCity\",\"MailingState\"],\"filter\":{\"version\":1,\"conditions\":[{\"field\":\"MailingCity\",\"operator\":\"equals\",\"value\":\"Rochester\",\"id\":1}]},\"orderBy\":[{\"field\":\"LastName\",\"direction\":\"ASC\"}],\"limit\":200}",
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Sample: People Born Before 1960",
+          "Object_Name__c": "Contact",
+          "Query_JSON__c": "{\"version\":1,\"object\":\"Contact\",\"fields\":[\"Name\",\"Birthdate\",\"Email\",\"MailingCity\"],\"filter\":{\"version\":1,\"conditions\":[{\"field\":\"Birthdate\",\"operator\":\"less than\",\"value\":\"1960-01-01\",\"id\":1}]},\"orderBy\":[{\"field\":\"Birthdate\",\"direction\":\"ASC\"}],\"limit\":200}",
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Sample: Organizations Backup",
+          "Object_Name__c": "Account",
+          "Query_JSON__c": "{\"version\":1,\"object\":\"Account\",\"fields\":[\"Name\",\"Website\",\"Phone\",\"BillingCity\"],\"filter\":{\"version\":1,\"conditions\":[{\"field\":\"Website\",\"operator\":\"is not null\",\"id\":1}]},\"orderBy\":[{\"field\":\"Name\",\"direction\":\"ASC\"}],\"limit\":200,\"backup\":{\"version\":1}}",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Address__c",
+      "records": [
+        {
+          "Account__c": {
+            "sample": "H007"
+          },
+          "Type__c": "Seasonal",
+          "Status__c": "Current",
+          "Street__c": "410 Example Street",
+          "City__c": "Naples",
+          "State__c": "FL",
+          "Postal_Code__c": "34102",
+          "Country__c": "United States",
+          "Seasonal_Start_Month__c": 12,
+          "Seasonal_Start_Day__c": 1,
+          "Seasonal_End_Month__c": 3,
+          "Seasonal_End_Day__c": 31
+        },
+        {
+          "Account__c": {
+            "sample": "H008"
+          },
+          "Type__c": "Seasonal",
+          "Status__c": "Current",
+          "Street__c": "2215 Example Street",
+          "City__c": "Tucson",
+          "State__c": "AZ",
+          "Postal_Code__c": "85719",
+          "Country__c": "United States",
+          "Seasonal_Start_Month__c": 12,
+          "Seasonal_Start_Day__c": 1,
+          "Seasonal_End_Month__c": 3,
+          "Seasonal_End_Day__c": 31
+        }
+      ]
+    },
+    {
+      "object": "Task",
+      "records": [
+        {
+          "WhoId": {
+            "sample": "H002-1"
+          },
+          "Subject": "Coffee about the spring appeal",
+          "Type": "Meeting",
+          "Status": "Completed",
+          "ActivityDate": {
+            "days": -12
+          },
+          "Description": "Talked through the spring appeal. Interested in a matching challenge; follow up in two weeks."
+        },
+        {
+          "WhoId": {
+            "sample": "H004-1"
+          },
+          "Subject": "Program tour",
+          "Type": "Meeting",
+          "Status": "Completed",
+          "ActivityDate": {
+            "days": -30
+          },
+          "Description": "Priya toured the tutoring program and asked how volunteers are trained."
+        },
+        {
+          "WhoId": {
+            "sample": "H007-1"
+          },
+          "Subject": "Call before the winter move",
+          "Type": "Meeting",
+          "Status": "Completed",
+          "ActivityDate": {
+            "days": -5
+          },
+          "Description": "Leaving for Naples on December 1; mail goes to the winter address until spring."
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Saved_Query__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Address__c",
+      "where": "Type__c = 'Seasonal' AND Account__r.Sample_Data__c = TRUE"
+    }
+  ]
+}

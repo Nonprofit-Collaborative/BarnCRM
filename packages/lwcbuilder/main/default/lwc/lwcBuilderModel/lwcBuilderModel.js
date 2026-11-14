@@ -1,14 +1,17 @@
 /**
- * The LWC Builder's definition document (LB-01 to LB-06; ADR-0203 `0203-lwc-builder-module.md`,
+ * The LWC Builder's definition document (LB-01 to LB-07; ADR-0203 `0203-lwc-builder-module.md`,
  * decision 3; canonical model R-LB1), with no Salesforce dependency so the same logic can serve
  * another platform (plan 9.9).
  *
  * A definition is `{schemaVersion, sections: [{id, title, rows: [{id, columns: [{id, width,
  * blocks: [block]}]}]}]}`. Every change returns a new definition; nothing is changed in place.
  */
+import { apexFiles, apexNames, CHART_CSS, CHART_HELPER, LIST_HELPER } from 'c/lwcBuilderExportKit';
+import { escapeHtml, percent as percentOf } from 'c/barnFormat';
 
 export const SCHEMA_VERSION = 1;
 export const MAX_FIELDS = 6;
+export const MAX_MEASURES = 3;
 export const BLOCK_TYPES = [
   'fields',
   'relatedList',
@@ -188,7 +191,7 @@ export function newBlock(id, type) {
         direction: 'asc'
       };
     case 'chart':
-      return { ...block, report: '' };
+      return { ...block, report: '', display: 'grouped' };
     case 'text':
       return { ...block, body: '' };
     case 'image':
@@ -437,6 +440,97 @@ export function validate(definition) {
   return problems;
 }
 
+const TONES = 5;
+const percent = (value, max) => `width: ${percentOf(value, max)}%`;
+
+/**
+ * What a Report Chart block draws (LB-03, LB-07; D-196), from what LwcBuilderController.loadChart
+ * returns: `{title, measures: [label], series: [label], groups: [{label, cells: [[{value,
+ * label}]]}]}`, where `cells` holds one list per series (one list when the report has a single
+ * grouping) of one value per measure. Up to three measures, each scaled to its own largest
+ * value. `display` 'stacked' draws a group's series as one bar per measure; 'grouped' (the
+ * default, and the only way with one grouping) one bar per series. `table` is the same data as
+ * rows and columns, for screen readers and the Show Table view.
+ */
+export function chartView(result, display) {
+  const data = result || {};
+  const measures = (Array.isArray(data.measures) ? data.measures : []).slice(0, MAX_MEASURES);
+  const series = Array.isArray(data.series) ? data.series : [];
+  const groups = Array.isArray(data.groups) ? data.groups : [];
+  const lanes = series.length ? series : [''];
+  const stacked = display === 'stacked' && series.length > 0;
+  const cellOf = (group, lane, measure) => ((group.cells || [])[lane] || [])[measure];
+  const size = (cell) => Math.abs(Number(cell && cell.value) || 0);
+  const shown = (cell) => {
+    if (!cell || cell.value === null || cell.value === undefined) return '';
+    return cell.label === null || cell.label === undefined ? String(cell.value) : cell.label;
+  };
+  const total = (group, m) =>
+    lanes.reduce((sum, name, lane) => sum + size(cellOf(group, lane, m)), 0);
+  const largest = (group, m) => {
+    if (stacked) return total(group, m);
+    return Math.max(...lanes.map((name, lane) => size(cellOf(group, lane, m))));
+  };
+  const max = measures.map((label, m) => Math.max(0, ...groups.map((group) => largest(group, m))));
+  const tone = (lane) => (series.length ? `segment tone${lane % TONES}` : 'segment');
+  const segment = (key, group, lane, m) => ({
+    key,
+    css: tone(lane),
+    style: percent(size(cellOf(group, lane, m)), max[m])
+  });
+  return {
+    title: data.title || '',
+    caption: measures.length === 1 ? `${data.title || ''}: ${measures[0]}` : data.title || '',
+    showMeasureNames: measures.length > 1,
+    legend: series.map((label, lane) => ({
+      key: `s${lane}`,
+      label,
+      swatch: `swatch tone${lane % TONES}`
+    })),
+    groups: groups.map((group, g) => ({
+      key: `g${g}`,
+      label: group.label,
+      measures: measures.map((label, m) => ({
+        key: `g${g}m${m}`,
+        label,
+        tracks: stacked
+          ? [
+              {
+                key: `g${g}m${m}t`,
+                label: '',
+                value: total(group, m).toLocaleString(),
+                segments: series.map((name, lane) => segment(`g${g}m${m}s${lane}`, group, lane, m))
+              }
+            ]
+          : lanes.map((name, lane) => ({
+              key: `g${g}m${m}l${lane}`,
+              label: name,
+              value: shown(cellOf(group, lane, m)),
+              segments: [segment(`g${g}m${m}l${lane}s`, group, lane, m)]
+            }))
+      }))
+    })),
+    table: {
+      headers: lanes.flatMap((name, lane) =>
+        measures.map((label, m) => ({
+          key: `h${lane}m${m}`,
+          label: [name, label].filter(Boolean).join(': ')
+        }))
+      ),
+      rows: groups.map((group, g) => ({
+        key: `r${g}`,
+        label: group.label,
+        cells: lanes.flatMap((name, lane) =>
+          measures.map((label, m) => ({
+            key: `r${g}l${lane}m${m}`,
+            value: shown(cellOf(group, lane, m))
+          }))
+        )
+      }))
+    }
+  };
+}
+
 /** A component key from its name: Donor Snapshot becomes Donor_Snapshot. */
 export function keyFromName(name) {
   const key = String(name || '')
@@ -461,13 +555,6 @@ export function bundleName(key) {
     .join('');
   return /^[a-z]/.test(camel) ? camel : `c${camel}`;
 }
-
-const escapeHtml = (value) =>
-  String(value || '')
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
 // A comment may not hold "--", which would end it early.
 const comment = (value) => `<!-- ${String(value).replace(/-{2,}/g, '-')} -->`;
 
@@ -480,6 +567,12 @@ function ruleNote(rule) {
   }
   return '';
 }
+
+// A block id as a template property name: b3 stays b3.
+const refOf = (block) => {
+  const ref = String(block.id || '').replace(/[^A-Za-z0-9_]/g, '_');
+  return /^[A-Za-z]/.test(ref) ? ref : `b${ref}`;
+};
 
 function blockMarkup(block, pad, js) {
   const lines = [];
@@ -531,30 +624,182 @@ function blockMarkup(block, pad, js) {
         lines.push(`${pad}</template>`);
       }
       break;
-    default: {
-      const what =
-        block.type === 'chart'
-          ? `Report Chart block: report ${block.report}. Run the report through your own Apex (Reports.ReportManager) and draw it here.`
-          : `${block.type === 'relatedList' ? 'Related List' : 'Record List'} block: ${block.object}${
-              block.parentField ? ` by ${block.parentField}` : ''
-            }, fields ${(block.fields || []).join(', ')}. Wire getRelatedListRecords or your own Apex here.`;
-      lines.push(`${pad}${comment(what)}`);
-      lines.push(`${pad}<div class="slds-box slds-box_x-small"></div>`);
+    case 'relatedList':
+    case 'recordList': {
+      const ref = refOf(block);
+      js.lists[ref] = {
+        object: block.object,
+        fields: block.fields || [],
+        parentField: block.type === 'relatedList' ? block.parentField : '',
+        filterField: block.type === 'recordList' ? block.filterField || '' : '',
+        filterOperator: block.filterOperator || 'equals',
+        filterValue: block.type === 'recordList' ? block.filterValue || '' : '',
+        orderBy: block.orderBy || '',
+        direction: block.direction || 'asc',
+        rowLimit: js.rowLimit
+      };
+      lines.push(
+        `${pad}<template lwc:if={lists.${ref}.error}><p class="slds-text-color_error">{lists.${ref}.error}</p></template>`,
+        `${pad}<lightning-datatable key-field="Id" data={lists.${ref}.rows} columns={lists.${ref}.columns} hide-checkbox-column></lightning-datatable>`
+      );
+      break;
     }
+    case 'chart': {
+      const ref = refOf(block);
+      js.charts[ref] = { report: block.report, display: block.display || 'grouped' };
+      lines.push(...chartMarkup(`charts.${ref}`, pad));
+      break;
+    }
+    default:
+      lines.push(`${pad}${comment(`${block.type} block: not exported`)}`);
   }
   return lines;
 }
 
+/** A Report Chart block's exported markup: the bars (hidden from screen readers) and a table. */
+function chartMarkup(chart, pad) {
+  return [
+    `<p class="slds-text-color_weak slds-var-m-bottom_x-small">{${chart}.caption}</p>`,
+    `<template lwc:if={${chart}.error}><p class="slds-text-color_error">{${chart}.error}</p></template>`,
+    '<div aria-hidden="true">',
+    '    <ul class="slds-list_horizontal slds-wrap slds-var-m-bottom_x-small">',
+    `        <template for:each={${chart}.legend} for:item="entry">`,
+    '            <li key={entry.key} class="slds-var-m-right_small"><span class={entry.swatch}></span>{entry.label}</li>',
+    '        </template>',
+    '    </ul>',
+    `    <template for:each={${chart}.groups} for:item="group">`,
+    '        <div key={group.key} class="slds-var-m-bottom_small">',
+    '            <p class="slds-text-title_bold">{group.label}</p>',
+    '            <template for:each={group.measures} for:item="measure">',
+    '                <div key={measure.key}>',
+    `                    <template lwc:if={${chart}.showMeasureNames}><p class="slds-text-body_small slds-text-color_weak">{measure.label}</p></template>`,
+    '                    <template for:each={measure.tracks} for:item="track">',
+    '                        <div key={track.key} class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_xx-small">',
+    '                            <span class="lane slds-truncate slds-size_1-of-4">{track.label}</span>',
+    '                            <span class="track slds-col">',
+    '                                <template for:each={track.segments} for:item="segment">',
+    '                                    <span key={segment.key} class={segment.css} style={segment.style}></span>',
+    '                                </template>',
+    '                            </span>',
+    '                            <span class="slds-var-p-left_x-small">{track.value}</span>',
+    '                        </div>',
+    '                    </template>',
+    '                </div>',
+    '            </template>',
+    '        </div>',
+    '    </template>',
+    '</div>',
+    '<table class="slds-assistive-text">',
+    '    <thead>',
+    '        <tr>',
+    `            <th scope="col">{${chart}.title}</th>`,
+    `            <template for:each={${chart}.table.headers} for:item="header">`,
+    '                <th key={header.key} scope="col">{header.label}</th>',
+    '            </template>',
+    '        </tr>',
+    '    </thead>',
+    '    <tbody>',
+    `        <template for:each={${chart}.table.rows} for:item="row">`,
+    '            <tr key={row.key}>',
+    '                <th scope="row">{row.label}</th>',
+    '                <template for:each={row.cells} for:item="cell">',
+    '                    <td key={cell.key}>{cell.value}</td>',
+    '                </template>',
+    '            </tr>',
+    '        </template>',
+    '    </tbody>',
+    '</table>'
+  ].map((line) => pad + line);
+}
+
+/** The exported JavaScript that loads list and chart blocks through the exported controller. */
+function dataSource(js, controller) {
+  const hasLists = Object.keys(js.lists).length > 0;
+  const hasCharts = Object.keys(js.charts).length > 0;
+  const indent = (value) => JSON.stringify(value, null, 4).replace(/\n/g, '\n    ');
+  const lists = {};
+  const charts = {};
+  Object.keys(js.lists).forEach((ref) => {
+    lists[ref] = { columns: [], rows: [], error: '' };
+  });
+  Object.keys(js.charts).forEach((ref) => {
+    charts[ref] = { ...chartView({}), error: '' };
+  });
+  return {
+    imports: [
+      ...(hasLists ? [`import records from '@salesforce/apex/${controller}.records';`] : []),
+      ...(hasCharts ? [`import chart from '@salesforce/apex/${controller}.chart';`] : [])
+    ],
+    helpers: [
+      '',
+      `const LISTS = ${JSON.stringify(js.lists, null, 4)};`,
+      `const CHARTS = ${JSON.stringify(js.charts, null, 4)};`,
+      '',
+      ...(hasLists ? [LIST_HELPER] : []),
+      ...(hasCharts ? [CHART_HELPER] : []),
+      'function messageOf(error) {',
+      "    return (error && error.body && error.body.message) || 'This block could not load.';",
+      '}'
+    ],
+    fields: [`    lists = ${indent(lists)};`, `    charts = ${indent(charts)};`],
+    methods: [
+      '',
+      '    connectedCallback() {',
+      '        this.loadBlocks();',
+      '    }',
+      '',
+      '    // Each list and chart block reads through the controller, as the user.',
+      '    async loadBlocks() {',
+      ...(hasLists
+        ? [
+            '        for (const [ref, list] of Object.entries(LISTS)) {',
+            '            if (list.parentField && !this.recordId) continue;',
+            '            try {',
+            '                const result = await records({ requestJson: JSON.stringify({ ...list, recordId: this.recordId }) });',
+            '                this.lists = { ...this.lists, [ref]: listView(result) };',
+            '            } catch (error) {',
+            '                this.lists = { ...this.lists, [ref]: { columns: [], rows: [], error: messageOf(error) } };',
+            '            }',
+            '        }'
+          ]
+        : []),
+      ...(hasCharts
+        ? [
+            '        for (const [ref, block] of Object.entries(CHARTS)) {',
+            '            try {',
+            '                const result = await chart({ reportName: block.report });',
+            "                this.charts = { ...this.charts, [ref]: { ...chartView(result, block.display), error: '' } };",
+            '            } catch (error) {',
+            '                this.charts = { ...this.charts, [ref]: { ...this.charts[ref], error: messageOf(error) } };',
+            '            }',
+            '        }'
+          ]
+        : []),
+      '    }'
+    ]
+  };
+}
+
 /**
- * The definition as an LWC bundle for a developer (LB-06; ADR-0203 decision 8):
- * `{bundle, files: [{name, content}]}`. Record Fields, Text, Image and Button blocks become
- * working markup; list and chart blocks a placeholder with a comment, since their data comes
- * from this module's Apex; visibility rules become comments. Nothing is deployed.
+ * The definition as an LWC bundle for a developer (LB-06, LB-07; ADR-0203 decision 8 and its
+ * 2026-11-12 amendment): `{bundle, files: [{name, content}]}`. Every block becomes working
+ * markup. List and chart blocks read through an exported Apex controller of their own (with its
+ * test, `c/lwcBuilderExportKit`), with the same fields, filter, sort, row limit (`rowLimit`, the
+ * Rows per List setting) and report; a bundle with neither has no Apex. Visibility rules become
+ * comments. Nothing is deployed.
  */
-export function exportSource(definition, { name, key, objectName } = {}) {
+export function exportSource(definition, { name, key, objectName, rowLimit } = {}) {
   const bundle = bundleName(key || keyFromName(name));
   const className = bundle.charAt(0).toUpperCase() + bundle.slice(1);
-  const js = { text: {}, flowInputs: {}, quickAction: false, flow: false };
+  const js = {
+    text: {},
+    flowInputs: {},
+    quickAction: false,
+    flow: false,
+    lists: {},
+    charts: {},
+    rowLimit: Math.min(200, Math.max(1, Number(rowLimit) || 10))
+  };
   const html = ['<template>'];
   for (const section of normalize(definition).sections) {
     html.push(`    <lightning-card title="${escapeHtml(section.title)}">`);
@@ -580,18 +825,26 @@ export function exportSource(definition, { name, key, objectName } = {}) {
   html.push('</template>', '');
 
   const usesNavigation = js.quickAction;
+  const usesData = Object.keys(js.lists).length > 0 || Object.keys(js.charts).length > 0;
+  const names = apexNames(className);
+  const data = usesData ? dataSource(js, names.controller) : null;
   const source = [
     "import { LightningElement, api } from 'lwc';",
     ...(usesNavigation ? ["import { NavigationMixin } from 'lightning/navigation';"] : []),
+    ...(data ? data.imports : []),
     '',
     `// Exported from the BarnCRM LWC Builder (${escapeHtml(name || bundle)}). This bundle is yours to change,`,
-    '// deploy and maintain; it does not depend on BarnCRM.',
+    `// deploy and maintain; it does not depend on BarnCRM.${data ? ` Deploy ${names.controller} with it.` : ''}`,
+    ...(data ? data.helpers : []),
+    '',
     `export default class ${className} extends ${usesNavigation ? 'NavigationMixin(LightningElement)' : 'LightningElement'} {`,
     '    @api recordId;',
     '    @api objectApiName;',
     `    richText = ${JSON.stringify(js.text, null, 4).replace(/\n/g, '\n    ')};`,
     '    openFlows = {};',
-    '    noInput = [];'
+    '    noInput = [];',
+    ...(data ? data.fields : []),
+    ...(data ? data.methods : [])
   ];
   if (js.flow) {
     source.push(
@@ -640,7 +893,9 @@ export function exportSource(definition, { name, key, objectName } = {}) {
     files: [
       { name: `${bundle}.html`, content: html.join('\n') },
       { name: `${bundle}.js`, content: source.join('\n') },
-      { name: `${bundle}.js-meta.xml`, content: meta.join('\n') }
+      { name: `${bundle}.js-meta.xml`, content: meta.join('\n') },
+      ...(Object.keys(js.charts).length ? [{ name: `${bundle}.css`, content: CHART_CSS }] : []),
+      ...(usesData ? apexFiles(className, bundle) : [])
     ]
   };
 }

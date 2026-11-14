@@ -145,6 +145,8 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. In the simple way of belonging, **Primary Contact** names its first person, and so does every other sample household's (a list view with a Primary Contact column shows none blank). |
 | 7 | With Giving, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
 | 8 | On an org where **Households** is **Off** (for example one where first-run setup left it unticked), load sample data, then open the **Accounts** tab and search for "Garcia". | **The Garcia Family** is named from its people, with both greetings and a member count filled in. No sample household is named just "Household". |
+| 9 | Back on **Sample Data**, read the tiles; then open **Find**, **Saved Queries**, and **Data Manager**, **Backup Sets**. | A **Saved Queries** tile shows 3. Find lists **Sample: People in Rochester**, **Sample: People Born Before 1960** and **Sample: Organizations Backup**, and each runs. Backup Sets lists **Sample: Organizations Backup**. |
+| 10 | Open Susan Patel's household, then Susan Patel. | The household's addresses include a **Seasonal** address in Naples, FL from 1 December to 31 March. Susan's activity history holds the completed meeting **Call before the winter move**. |
 
 **Cleanup:** None (leave sample data loaded).
 

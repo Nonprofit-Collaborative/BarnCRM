@@ -10,6 +10,12 @@
  */
 public with sharing class ServiceDeliveryLogController {
 	private static final String CONTEXT = 'Service delivery log panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Programs',
+			'Programs_Fail_Log'
+		)
+		.showingDml();
 	/** The most people listed: a bound on the read; the Service Deliveries tab lists them all. */
 	public static final Integer MAX_SHOWN = 200;
 
@@ -129,7 +135,7 @@ public with sharing class ServiceDeliveryLogController {
 			log.saved = 1;
 			return log;
 		} catch (Exception failure) {
-			throw report(failure, programId);
+			throw ERRORS.wrap(failure, CONTEXT, programId);
 		}
 	}
 
@@ -145,7 +151,7 @@ public with sharing class ServiceDeliveryLogController {
 		try {
 			return logFor(programId, serviceId, deliveryDate);
 		} catch (Exception failure) {
-			throw report(failure, programId);
+			throw ERRORS.wrap(failure, CONTEXT, programId);
 		}
 	}
 
@@ -200,7 +206,7 @@ public with sharing class ServiceDeliveryLogController {
 			log.saved = toInsert.size() + toUpdate.size() + toChangeHidden.size();
 			return log;
 		} catch (Exception failure) {
-			throw report(failure, programId);
+			throw ERRORS.wrap(failure, CONTEXT, programId);
 		}
 	}
 
@@ -216,7 +222,7 @@ public with sharing class ServiceDeliveryLogController {
 		try {
 			return SessionAttendance.logFor(sessionId);
 		} catch (Exception failure) {
-			throw report(failure, sessionId);
+			throw ERRORS.wrap(failure, CONTEXT, sessionId);
 		}
 	}
 
@@ -236,7 +242,7 @@ public with sharing class ServiceDeliveryLogController {
 			log.saved = saved;
 			return log;
 		} catch (Exception failure) {
-			throw report(failure, sessionId);
+			throw ERRORS.wrap(failure, CONTEXT, sessionId);
 		}
 	}
 
@@ -402,17 +408,5 @@ public with sharing class ServiceDeliveryLogController {
 	/** What staff are told when the log's work failed (modules-1); SessionAttendance uses it too. */
 	public static String failed() {
 		return BarnHelp.text('Programs', 'Programs_Fail_Log');
-	}
-
-	/** A refusal is passed on in its own words; anything else is logged first. */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(failed());
 	}
 }

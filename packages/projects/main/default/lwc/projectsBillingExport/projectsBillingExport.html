@@ -1,0 +1,20 @@
+<template>
+  <template lwc:if={isShown}>
+    <lightning-card title={labels.title} icon-name={icon} data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice variant="success" message={notice} data-id="notice"></c-barn-notice>
+        </template>
+        <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-gutters_x-small">
+          <lightning-input class="slds-col" type="date" label={labels.from} value={period.start} data-field="start" onchange={handleField} data-id="from"></lightning-input>
+          <lightning-input class="slds-col" type="date" label={labels.to} value={period.end} data-field="end" onchange={handleField} data-id="to"></lightning-input>
+          <lightning-input class="slds-col" type="checkbox" label={labels.include} checked={includeExported} data-field="includeExported" onchange={handleField} data-id="include"></lightning-input>
+          <lightning-button class="slds-col" label={labels.button} disabled={isWorking} onclick={handleExport} data-id="export"></lightning-button>
+        </div>
+      </div>
+    </lightning-card>
+  </template>
+</template>

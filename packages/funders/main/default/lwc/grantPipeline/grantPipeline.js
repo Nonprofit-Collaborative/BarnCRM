@@ -1,5 +1,7 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import GRANT from '@salesforce/schema/Grant__c';
+import REQUIREMENT from '@salesforce/schema/Grant_Requirement__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/GrantPipelineController.getBoard';
 import moveStage from '@salesforce/apex/GrantPipelineController.moveStage';
@@ -19,6 +21,7 @@ import { createDragController } from 'c/barnDrag';
 import { dragInstructions, dragMessages } from 'c/barnDragText';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
+import { recordHref } from 'c/barnFormat';
 import GrantAwardModal from 'c/grantAwardModal';
 
 import TITLE from '@salesforce/label/c.Funders_Pipeline_Title';
@@ -54,9 +57,6 @@ const STAGE_AWARDED = 'Awarded';
 const HELP_PACKAGES = ['Funders', 'Core'];
 
 const messageOf = (error) => messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved'));
-
-/** A record's page in Lightning, for a link's href; a click navigates in place instead. */
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /**
  * The Grant Pipeline tab (F-01, canonical model 29ZH): the open grants by stage as a board, the
@@ -182,7 +182,7 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
         return {
           ...row,
           ...this.urgency(row.daysLeft),
-          objectApiName: isRequirement ? 'Grant_Requirement__c' : 'Grant__c',
+          objectApiName: (isRequirement ? REQUIREMENT : GRANT).objectApiName,
           whatText: isRequirement
             ? `${row.requirementType || ''}: ${row.grantName || ''}`
             : KIND_APPLICATION_LABEL,
@@ -338,7 +338,7 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   handleNewGrant() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Grant__c', actionName: 'new' }
+      attributes: { objectApiName: GRANT.objectApiName, actionName: 'new' }
     });
   }
 

@@ -19,10 +19,8 @@ export function initialsOf(name) {
   return `${first}${last}`.toUpperCase();
 }
 
-/** The plain record path, which works as a link's address everywhere until a click is handled. */
-export function recordHref(recordId) {
-  return recordId ? `/${recordId}` : undefined;
-}
+/** The plain record path, from the shared kit. */
+export { recordHref } from 'c/barnFormat';
 
 /** True when the click asks for a new tab or window (a modifier key or a middle click). */
 export function opensElsewhere(event) {

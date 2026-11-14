@@ -63,3 +63,7 @@ Error Log. The three Batch C rows already name their tabs.
 - An org that already has a module app keeps it until the release's destructive manifest
   deletes it (`build-destructive-manifest.py` lists the removed `CustomApplication`).
 - The Home hub shows no Open the App link for these modules, as for Rollups and Mirror.
+
+**Amended by ADR-0223 (2026-11-13):** Events, Forms, Portal Builder, Corporate Hub and Projects
+ship their own apps again, their tabs stay in the BarnCRM apps, and scratch and Developer Edition
+orgs are deployed without those five apps.

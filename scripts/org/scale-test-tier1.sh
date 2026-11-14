@@ -26,7 +26,9 @@
 #
 # Environment: SCALE_TEST_DIR (default scale-test-data/ in the repo, git-ignored),
 #              SCALE_TEST_WAIT_MINUTES (per load, default 120),
-#              SCALE_TEST_GENERATOR_ARGS (for example "--gifts 20000" to shrink the run),
+#              SCALE_TEST_GENERATOR_ARGS (for example "--gifts 20000" to shrink the run, or
+#              "--skew-gifts 60000" for the parent skew case),
+#              SCALE_TEST_PARALLEL=1 (the gifts in two Bulk jobs at once: the parallel case),
 #              SCALE_TEST_SOFT_DELETE=1 (cleanup without --hard-delete, to the Recycle Bin,
 #              for a user without the Bulk API Hard Delete permission),
 #              SCALE_TEST_HARD_DELETE=1 (force hard delete; fail instead of falling back),
@@ -243,14 +245,16 @@ export_to() {
 
 # load <label> <sobject> <csv>: one Bulk API 2.0 ingest job, recorded in the results file.
 load() {
-  local label="$1" sobject="$2" file="$3" start end outfile
-  outfile="$DIR/work/last-load.json"
+  local label="$1" sobject="$2" file="$3" start end outfile slug
+  # One file per load, so two loads running at once (SCALE_TEST_PARALLEL) never share one.
+  slug="${label//[^A-Za-z0-9]/-}"
+  outfile="$DIR/work/load-$slug.json"
   log ""
   log "Load: $label ($sobject, $(($(wc -l <"$file") - 1)) rows in file)"
   start="$(date +%s)"
   # A partial failure exits nonzero but still prints the job in .data; both are read below.
   sf data import bulk --sobject "$sobject" --file "$file" --target-org "$ALIAS" \
-    --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/last-load.err" </dev/null
+    --wait "$WAIT" --json >"$outfile" 2>"$DIR/work/load-$slug.err" </dev/null
   end="$(date +%s)"
   job_report "$label" "$outfile"
   log "  elapsed: $((end - start)) s"
@@ -429,7 +433,23 @@ run() {
     "$DIR/work/contact-ids.csv"
   resolve "$DIR/gifts.csv" --out "$DIR/work/gifts.csv" --map "$DIR/work/contact-ids.csv" \
     --key-col Contact_Key --id-col Donor_Contact__c
-  load "gifts" Gift__c "$DIR/work/gifts.csv"
+  if [[ "${SCALE_TEST_PARALLEL:-}" == "1" ]]; then
+    # The parallel case (QA review Q8): the gifts in two Bulk jobs at once, as two staff
+    # imports or an import beside an integration would run, so both jobs' triggers contend for
+    # the same households, funds and rollup rows. Alternate rows go to each half, so both
+    # halves touch every household. Pass when lock errors stay under 0.1% and clear on retry.
+    local header
+    header="$(head -n 1 "$DIR/work/gifts.csv")"
+    { echo "$header"; tail -n +2 "$DIR/work/gifts.csv" | awk 'NR % 2 == 1'; } >"$DIR/work/gifts-a.csv"
+    { echo "$header"; tail -n +2 "$DIR/work/gifts.csv" | awk 'NR % 2 == 0'; } >"$DIR/work/gifts-b.csv"
+    log ""
+    log "Parallel: two gift loads started together"
+    load "gifts A (parallel)" Gift__c "$DIR/work/gifts-a.csv" &
+    load "gifts B (parallel)" Gift__c "$DIR/work/gifts-b.csv" &
+    wait
+  else
+    load "gifts" Gift__c "$DIR/work/gifts.csv"
+  fi
 
   # Soft credits only for gifts that loaded (and contacts that loaded); the split scripts
   # find their gifts by External_Id__c and skip any that are missing.

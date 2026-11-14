@@ -266,19 +266,7 @@ public with sharing class EventDashboardController {
 		if (templatesForTest != null) {
 			return templatesForTest;
 		}
-		String prefix = NamespaceUtil.prefix().removeEnd('__');
-		String namespace = String.isBlank(prefix) ? null : prefix;
-		// System mode: a static resource is packaged text every user may read, and reading
-		// StaticResource in user mode needs a setup permission (the BarnHelp reasoning).
-		for (StaticResource resource : [
-			SELECT Body
-			FROM StaticResource
-			WHERE Name = :TEMPLATES_RESOURCE AND NamespacePrefix = :namespace
-			WITH SYSTEM_MODE
-			LIMIT 1
-		]) {
-			return resource.Body.toString();
-		}
-		return '{"templates":[]}';
+		String body = SetupObjectSelector.staticResourceBody(TEMPLATES_RESOURCE);
+		return body == null ? '{"templates":[]}' : body;
 	}
 }

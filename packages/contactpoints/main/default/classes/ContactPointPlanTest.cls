@@ -137,13 +137,21 @@ private class ContactPointPlanTest {
 		Assert.isFalse(ContactPointPlan.changed(null, null));
 		Assert.isTrue(ContactPointPlan.changed('x', null));
 		List<String> compared = new List<String>{ 'Email', 'Phone' };
-		Contact lower = new Contact(Email = 'a@b.example');
+		Contact lower = TestDataFactory.person(new Contact(Email = 'a@b.example'));
 		Assert.isTrue(
-			ContactPointPlan.anyChanged(new Contact(Email = 'A@b.example'), lower, compared),
+			ContactPointPlan.anyChanged(
+				TestDataFactory.person(new Contact(Email = 'A@b.example')),
+				lower,
+				compared
+			),
 			'Values differing only in capitals are a change'
 		);
 		Assert.isFalse(
-			ContactPointPlan.anyChanged(new Contact(Email = 'a@b.example'), lower, compared),
+			ContactPointPlan.anyChanged(
+				TestDataFactory.person(new Contact(Email = 'a@b.example')),
+				lower,
+				compared
+			),
 			'The same values are not'
 		);
 		Assert.areEqual(

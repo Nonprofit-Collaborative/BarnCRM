@@ -36,7 +36,7 @@ public with sharing class CampaignSyncBatch implements Database.Batchable<SObjec
 
 	/** Starts the first pass and returns its job id. */
 	public static Id start() {
-		return Database.executeBatch(new CampaignSyncBatch(), CHUNK_SIZE);
+		return AsyncStarter.batch(new CampaignSyncBatch(), CHUNK_SIZE, 'CampaignSyncBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

@@ -5,6 +5,11 @@ import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import createFromTemplate from '@salesforce/apex/ProjectsController.createFromTemplate';
 import getUtilization from '@salesforce/apex/ProjectsController.getUtilization';
 import exportBillable from '@salesforce/apex/ProjectsController.exportBillable';
+import applyRates from '@salesforce/apex/ProjectsController.applyRates';
+
+jest.mock('@salesforce/apex/ProjectsController.applyRates', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/ProjectsController.getHome', () => ({ default: jest.fn() }), {
   virtual: true
@@ -41,10 +46,10 @@ const HOME = {
   ],
   myTasks: [
     {
-      Id: 'a03000000000001AAA',
-      Name: 'Interviews',
-      Project__c: 'a01000000000001AAA',
-      Project__r: { Name: 'Rollout' }
+      id: 'a03000000000001AAA',
+      name: 'Interviews',
+      projectId: 'a01000000000001AAA',
+      projectName: 'Rollout'
     }
   ]
 };
@@ -63,6 +68,27 @@ describe('c-projects-home', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('offers to start the first project, and goes to the template form', async () => {
+    getHome.mockResolvedValue({ ...HOME, timeTracking: false, myTasks: [], firstRun: true });
+    const element = mount();
+    await flush();
+
+    const panel = find(element, 'first-run');
+    expect(panel).not.toBeNull();
+    expect(panel.heading).toBe('c.Projects_Home_FirstRunHeading');
+    const template = find(element, 'template');
+    template.focus = jest.fn();
+    find(element, 'first-run-start').click();
+    expect(template.focus).toHaveBeenCalled();
+  });
+
+  it('leaves the first-run panel out once a project exists', async () => {
+    getHome.mockResolvedValue({ ...HOME, timeTracking: false });
+    const element = mount();
+    await flush();
+    expect(find(element, 'first-run')).toBeNull();
   });
 
   it('lists my tasks and utilization, marks a task done and creates from a template', async () => {
@@ -109,6 +135,26 @@ describe('c-projects-home', () => {
     expect(exportBillable).toHaveBeenCalledWith(
       expect.objectContaining({ includeExported: false })
     );
+    expect(find(element, 'notice')).not.toBeNull();
+  });
+
+  it('shows Apply Rates to a manager only with rate cards on, and applies them', async () => {
+    getHome.mockResolvedValue(HOME);
+    getUtilization.mockResolvedValue([]);
+    let element = mount();
+    await flush();
+    await flush();
+    expect(find(element, 'apply-rates')).toBeNull();
+    document.body.removeChild(element);
+
+    getHome.mockResolvedValue({ ...HOME, ratesEnabled: true });
+    applyRates.mockResolvedValue(12);
+    element = mount();
+    await flush();
+    await flush();
+    find(element, 'apply-rates').click();
+    await flush();
+    expect(applyRates).toHaveBeenCalledTimes(1);
     expect(find(element, 'notice')).not.toBeNull();
   });
 

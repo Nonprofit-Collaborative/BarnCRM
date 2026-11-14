@@ -14,7 +14,7 @@ public with sharing class VolunteerNudgeBatch implements Database.Batchable<SObj
 		if (!VolunteerNudgeService.isActive()) {
 			return null;
 		}
-		return Database.executeBatch(new VolunteerNudgeBatch(), CHUNK_SIZE);
+		return AsyncStarter.batch(new VolunteerNudgeBatch(), CHUNK_SIZE, 'VolunteerNudgeBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

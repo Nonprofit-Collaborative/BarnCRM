@@ -1,9 +1,9 @@
 # Scratch orgs
 
 BarnCRM is verified against five org shapes, matching the license and package
-configurations described in the product plan (Section 4.2). Each shape has a scratch org
-definition in `config/scratch-defs/`. Four of them any Dev Hub can create; the fifth needs
-an entitlement, and is described below.
+configurations described in the product plan (Section 4.2), and against multiple currencies.
+Each has a scratch org definition in `config/scratch-defs/`. Any Dev Hub can create all but
+Nonprofit Cloud, which needs an entitlement, described below.
 
 ## The shapes
 
@@ -14,6 +14,15 @@ an entitlement, and is described below.
 | NPSP installed  | `config/scratch-defs/npsp.json`            | Sales Cloud plus NPSP installed; NPSP coexistence mode (Section 4.5).                                                                        |
 | Person Accounts | `config/scratch-defs/person-accounts.json` | Person Accounts enabled, simulating the Agentforce Nonprofit shape; junction household mode is required here.                                |
 | Nonprofit Cloud | `config/scratch-defs/nonprofit-cloud.json` | The real Agentforce Nonprofit shape, with the Nonprofit Cloud objects present. Needs an entitled Dev Hub: see below.                          |
+| Multi-currency  | `config/scratch-defs/multi-currency.json`  | Multiple currencies on: amounts, rollups and donor levels in an org whose records carry different currencies. Run once per version (release gate). |
+
+The release gate (`scripts/org/release-gate.sh`, see the [CI guide](ci.md), "The release gate")
+runs every test on one long-lived org per shape: `barn-sales` (Sales Cloud), `oi-test` (Person
+Accounts), `barn-platform` (Platform only) and `barn-npsp` (NPSP installed), plus a
+multi-currency org once per version. Creating `barn-npsp` or a multi-currency scratch org needs
+Brandon's approval first. `scripts/org/install-npsp.sh` still has no verified NPSP package
+version IDs (`NPSP_PACKAGE_IDS` is a placeholder); pass them in that variable, or use the
+manual installer it describes.
 
 ### The Nonprofit Cloud shape needs an entitled Dev Hub
 

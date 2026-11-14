@@ -1,0 +1,815 @@
+{
+  "module": "Logic Models",
+  "countLabel": "Logic models",
+  "count": { "object": "Logic_Model__c", "where": "Sample_Data__c = TRUE" },
+  "steps": [
+    {
+      "object": "Logic_Model__c",
+      "records": [
+        {
+          "key": "tutoring",
+          "Name": "After-school tutoring logic model",
+          "Description__c": "How weekly tutoring, the homework club and family reading nights help students at our two partner schools become confident readers who move up a grade on time.",
+          "Program_Id__c": {
+            "find": "Program__c",
+            "where": "Sample_Data__c = TRUE AND Name = 'After-school tutoring'"
+          },
+          "Sample_Data__c": true
+        },
+        {
+          "key": "pantry",
+          "Name": "Food pantry logic model",
+          "Description__c": "How weekly groceries and help applying for SNAP benefits move county households from skipping meals toward lasting food security.",
+          "Program_Id__c": {
+            "find": "Program__c",
+            "where": "Sample_Data__c = TRUE AND Name = 'Food pantry'"
+          },
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Logic_Model_Element__c",
+      "records": [
+        {
+          "key": "t-tutors",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Volunteer tutors",
+          "Description__c": "About 25 trained volunteers, each giving one hour a week for the school year.",
+          "Type__c": "Input",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "t-staff",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Program coordinator and site leads",
+          "Description__c": "One full-time coordinator and a site lead at each partner school.",
+          "Type__c": "Input",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "t-space",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Classrooms at two partner schools",
+          "Type__c": "Input",
+          "Sort_Order__c": 3
+        },
+        {
+          "key": "t-funds",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Grant and donor funding",
+          "Description__c": "Pays for books, snacks and the coordinator.",
+          "Type__c": "Input",
+          "Sort_Order__c": 4
+        },
+        {
+          "key": "t-tutoring",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Weekly one-to-one tutoring",
+          "Description__c": "Each student meets the same tutor every week for a 60-minute reading session.",
+          "Type__c": "Activity",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "t-homework",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Homework club sessions",
+          "Description__c": "Twice a week after school, with a site lead and volunteers on hand.",
+          "Type__c": "Activity",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "t-nights",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Family reading nights",
+          "Description__c": "Once a month, families read together and take home free books.",
+          "Type__c": "Activity",
+          "Sort_Order__c": 3
+        },
+        {
+          "key": "t-hours",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Tutoring hours delivered",
+          "Type__c": "Output",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "t-regulars",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Students attending regularly",
+          "Type__c": "Output",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "t-families",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Families at reading nights",
+          "Type__c": "Output",
+          "Sort_Order__c": 3
+        },
+        {
+          "key": "t-confidence",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Students read with more confidence",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Short Term",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "t-ontime",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Homework turned in on time",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Short Term",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "t-level",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Students read at or above grade level",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Intermediate Term",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "t-promoted",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Students move up a grade on time",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Long Term",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "t-impact",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "Name": "Every child at our partner schools leaves 8th grade a confident reader",
+          "Type__c": "Impact",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-food",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Donated and purchased food",
+          "Description__c": "From the regional food bank, grocery partners and food drives.",
+          "Type__c": "Input",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-volunteers",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Pantry volunteers",
+          "Type__c": "Input",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "p-distribution",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Weekly grocery distribution",
+          "Description__c": "Every Saturday morning, a bag of groceries for each household.",
+          "Type__c": "Activity",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-benefits",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Help applying for SNAP benefits",
+          "Type__c": "Activity",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "p-bags",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Grocery bags distributed",
+          "Type__c": "Output",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-applications",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "SNAP applications submitted",
+          "Type__c": "Output",
+          "Sort_Order__c": 2
+        },
+        {
+          "key": "p-enough",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Households have enough food each week",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Short Term",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-budget",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Food budgets stretch further",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Intermediate Term",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-secure",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "Fewer county households face food insecurity",
+          "Description__c": "No indicator yet: the county survey we plan to use reports every two years.",
+          "Type__c": "Outcome",
+          "Outcome_Term__c": "Long Term",
+          "Sort_Order__c": 1
+        },
+        {
+          "key": "p-impact",
+          "Logic_Model__c": { "ref": "pantry" },
+          "Name": "No family in the county goes hungry",
+          "Type__c": "Impact",
+          "Sort_Order__c": 1
+        }
+      ]
+    },
+    {
+      "object": "Logic_Model_Link__c",
+      "records": [
+        {
+          "key": "t-tutors-tutoring",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-tutors" },
+          "To_Element__c": { "ref": "t-tutoring" },
+          "Assumption__c": "Enough volunteers commit to a full school year, so each student keeps the same tutor."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-staff" },
+          "To_Element__c": { "ref": "t-homework" },
+          "Assumption__c": "A site lead at each school keeps the homework club running when volunteers are away."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-space" },
+          "To_Element__c": { "ref": "t-homework" },
+          "Assumption__c": "Holding the club at school means students do not need transport."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-funds" },
+          "To_Element__c": { "ref": "t-nights" },
+          "Assumption__c": "Free books and a meal make it easier for working families to come."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-tutoring" },
+          "To_Element__c": { "ref": "t-hours" },
+          "Assumption__c": "Students come to most of their weekly sessions."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-homework" },
+          "To_Element__c": { "ref": "t-regulars" },
+          "Assumption__c": "A snack and a quiet room keep students coming after a long school day."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-nights" },
+          "To_Element__c": { "ref": "t-families" },
+          "Assumption__c": "Families hear about reading nights through the school and their child."
+        },
+        {
+          "key": "t-hours-confidence",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-hours" },
+          "To_Element__c": { "ref": "t-confidence" },
+          "Assumption__c": "Regular one-to-one time with a caring adult builds a student's confidence in reading."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-regulars" },
+          "To_Element__c": { "ref": "t-ontime" },
+          "Assumption__c": "Students who attend the club finish their homework there."
+        },
+        {
+          "key": "t-families-confidence",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-families" },
+          "To_Element__c": { "ref": "t-confidence" },
+          "Assumption__c": "Children who read with their families at home read more and enjoy it more."
+        },
+        {
+          "key": "t-confidence-level",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-confidence" },
+          "To_Element__c": { "ref": "t-level" },
+          "Assumption__c": "Students who enjoy reading read more often, and their reading level rises."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-ontime" },
+          "To_Element__c": { "ref": "t-level" },
+          "Assumption__c": "Steady homework habits support progress in class."
+        },
+        {
+          "key": "t-level-promoted",
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-level" },
+          "To_Element__c": { "ref": "t-promoted" },
+          "Assumption__c": "Reading at grade level is the strongest predictor of moving up a grade on time."
+        },
+        {
+          "Logic_Model__c": { "ref": "tutoring" },
+          "From_Element__c": { "ref": "t-promoted" },
+          "To_Element__c": { "ref": "t-impact" },
+          "Assumption__c": "Year after year, on-time promotion adds up to confident readers leaving 8th grade."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-food" },
+          "To_Element__c": { "ref": "p-distribution" },
+          "Assumption__c": "The food bank and our grocery partners keep supply steady through the year."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-volunteers" },
+          "To_Element__c": { "ref": "p-distribution" },
+          "Assumption__c": "Enough volunteers come every Saturday to pack and hand out bags."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-volunteers" },
+          "To_Element__c": { "ref": "p-benefits" },
+          "Assumption__c": "Two volunteers trained in SNAP applications are on hand at each distribution."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-distribution" },
+          "To_Element__c": { "ref": "p-bags" },
+          "Assumption__c": "Households can get to the pantry on Saturday mornings."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-benefits" },
+          "To_Element__c": { "ref": "p-applications" },
+          "Assumption__c": "Households trust us with the paperwork."
+        },
+        {
+          "key": "p-bags-enough",
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-bags" },
+          "To_Element__c": { "ref": "p-enough" },
+          "Assumption__c": "A weekly bag covers the gap at the end of the month when money runs out."
+        },
+        {
+          "key": "p-applications-budget",
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-applications" },
+          "To_Element__c": { "ref": "p-budget" },
+          "Assumption__c": "Most households that apply are approved and keep their benefits."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-enough" },
+          "To_Element__c": { "ref": "p-secure" },
+          "Assumption__c": "Meeting weekly need steadily lowers food insecurity over time."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-budget" },
+          "To_Element__c": { "ref": "p-secure" },
+          "Assumption__c": "Money saved on food goes to rent and bills that would otherwise force hard choices."
+        },
+        {
+          "Logic_Model__c": { "ref": "pantry" },
+          "From_Element__c": { "ref": "p-secure" },
+          "To_Element__c": { "ref": "p-impact" },
+          "Assumption__c": "Working with other county pantries, lower food insecurity reaches every household."
+        }
+      ]
+    },
+    {
+      "object": "Assumption_Evidence__c",
+      "records": [
+        {
+          "Link__c": { "ref": "t-hours-confidence" },
+          "Summary__c": "A review of tutoring studies found one-to-one tutoring gives some of the largest reading gains of any school program.",
+          "Source__c": "Education research review",
+          "Source_Url__c": "https://example.org/research/tutoring-review",
+          "Evidence_Date__c": { "days": -400 },
+          "Strength__c": "Strong"
+        },
+        {
+          "Link__c": { "ref": "t-hours-confidence" },
+          "Summary__c": "In our spring survey, students with weekly tutoring rated their reading confidence higher than in the fall.",
+          "Source__c": "Program survey",
+          "Evidence_Date__c": { "days": -30 },
+          "Strength__c": "Moderate"
+        },
+        {
+          "Link__c": { "ref": "t-families-confidence" },
+          "Summary__c": "Site leads notice that children whose families come to reading nights talk more about books.",
+          "Source__c": "Staff observation",
+          "Evidence_Date__c": { "days": -20 },
+          "Strength__c": "Limited"
+        },
+        {
+          "Link__c": { "ref": "t-confidence-level" },
+          "Summary__c": "District reading data shows students who read for fun progress faster on the fall and spring assessments.",
+          "Source__c": "Partner school district",
+          "Source_Url__c": "https://example.org/district/reading-data",
+          "Evidence_Date__c": { "days": -200 },
+          "Strength__c": "Moderate"
+        },
+        {
+          "Link__c": { "ref": "t-level-promoted" },
+          "Summary__c": "Long-term studies show students reading at grade level by 3rd grade are far more likely to stay on track.",
+          "Source__c": "National longitudinal study",
+          "Source_Url__c": "https://example.org/research/grade-level-reading",
+          "Evidence_Date__c": { "days": -700 },
+          "Strength__c": "Strong"
+        },
+        {
+          "Link__c": { "ref": "t-tutors-tutoring" },
+          "Summary__c": "Two tutors left in the middle of last year, and three students went a month without a tutor.",
+          "Source__c": "Coordinator notes",
+          "Evidence_Date__c": { "days": -150 },
+          "Strength__c": "Challenges"
+        },
+        {
+          "Link__c": { "ref": "p-bags-enough" },
+          "Summary__c": "Households that use a pantry every week report fewer skipped meals than occasional visitors.",
+          "Source__c": "Regional food bank research brief",
+          "Source_Url__c": "https://example.org/research/pantry-use",
+          "Evidence_Date__c": { "days": -500 },
+          "Strength__c": "Strong"
+        },
+        {
+          "Link__c": { "ref": "p-applications-budget" },
+          "Summary__c": "Households we helped enroll say they spend about 30 dollars less of their own money on food each week.",
+          "Source__c": "Pantry exit survey",
+          "Evidence_Date__c": { "days": -45 },
+          "Strength__c": "Moderate"
+        }
+      ]
+    },
+    {
+      "object": "Indicator__c",
+      "records": [
+        {
+          "key": "i-hours",
+          "Element__c": { "ref": "t-hours" },
+          "Name": "Tutoring hours delivered",
+          "Description__c": "One-to-one tutoring hours recorded in the term.",
+          "Unit__c": "hours",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 0,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-regulars",
+          "Element__c": { "ref": "t-regulars" },
+          "Name": "Students at 80 percent or more of sessions",
+          "Unit__c": "students",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 0,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-families",
+          "Element__c": { "ref": "t-families" },
+          "Name": "Families at reading nights",
+          "Description__c": "From the sign-in sheets, imported with the Indicator Results template.",
+          "Unit__c": "families",
+          "Better_When__c": "Higher",
+          "Source__c": "Import",
+          "Baseline_Value__c": 0,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-confidence",
+          "Element__c": { "ref": "t-confidence" },
+          "Name": "Students who say they enjoy reading",
+          "Description__c": "From the student survey each term.",
+          "Unit__c": "percent",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 42,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-late",
+          "Element__c": { "ref": "t-ontime" },
+          "Name": "Homework assignments turned in late",
+          "Description__c": "Reported by classroom teachers.",
+          "Unit__c": "percent",
+          "Better_When__c": "Lower",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 30,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-level",
+          "Element__c": { "ref": "t-level" },
+          "Name": "Students reading at or above grade level",
+          "Description__c": "From the school's reading assessment.",
+          "Unit__c": "percent",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 35,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-promoted",
+          "Element__c": { "ref": "t-promoted" },
+          "Name": "Students promoted on time",
+          "Description__c": "Counted once a year, when promotions are announced.",
+          "Unit__c": "percent",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 88,
+          "Baseline_Date__c": { "days": -120 }
+        },
+        {
+          "key": "i-bags",
+          "Element__c": { "ref": "p-bags" },
+          "Name": "Grocery bags distributed",
+          "Unit__c": "bags",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 1000,
+          "Baseline_Date__c": { "days": -270 }
+        },
+        {
+          "key": "i-applications",
+          "Element__c": { "ref": "p-applications" },
+          "Name": "SNAP applications submitted",
+          "Unit__c": "applications",
+          "Better_When__c": "Higher",
+          "Source__c": "Import",
+          "Baseline_Value__c": 6,
+          "Baseline_Date__c": { "days": -270 }
+        },
+        {
+          "key": "i-skipped",
+          "Element__c": { "ref": "p-enough" },
+          "Name": "Households that skipped a meal in the past month",
+          "Description__c": "From the pantry survey each quarter.",
+          "Unit__c": "percent",
+          "Better_When__c": "Lower",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 38,
+          "Baseline_Date__c": { "days": -270 }
+        },
+        {
+          "key": "i-enrolled",
+          "Element__c": { "ref": "p-budget" },
+          "Name": "Households receiving SNAP",
+          "Unit__c": "households",
+          "Better_When__c": "Higher",
+          "Source__c": "Manual",
+          "Baseline_Value__c": 20,
+          "Baseline_Date__c": { "days": -270 }
+        }
+      ]
+    },
+    {
+      "object": "Indicator_Period__c",
+      "records": [
+        {
+          "Indicator__c": { "ref": "i-hours" },
+          "Name": "First term",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -61 },
+          "Target_Value__c": 300,
+          "Result_Value__c": 284
+        },
+        {
+          "Indicator__c": { "ref": "i-hours" },
+          "Name": "Second term",
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 360,
+          "Result_Value__c": 371
+        },
+        {
+          "Indicator__c": { "ref": "i-hours" },
+          "Name": "Third term",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 400
+        },
+        {
+          "Indicator__c": { "ref": "i-regulars" },
+          "Name": "First term",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -61 },
+          "Target_Value__c": 20,
+          "Result_Value__c": 18
+        },
+        {
+          "Indicator__c": { "ref": "i-regulars" },
+          "Name": "Second term",
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 24,
+          "Result_Value__c": 23
+        },
+        {
+          "Indicator__c": { "ref": "i-regulars" },
+          "Name": "Third term",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 28
+        },
+        {
+          "Indicator__c": { "ref": "i-families" },
+          "Name": "First term",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -61 },
+          "Target_Value__c": 15,
+          "Result_Value__c": 11,
+          "Notes__c": "One reading night was snowed out."
+        },
+        {
+          "Indicator__c": { "ref": "i-families" },
+          "Name": "Second term",
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 15,
+          "Result_Value__c": 17
+        },
+        {
+          "Indicator__c": { "ref": "i-families" },
+          "Name": "Third term",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 20
+        },
+        {
+          "Indicator__c": { "ref": "i-confidence" },
+          "Name": "First term",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -61 },
+          "Target_Value__c": 50,
+          "Result_Value__c": 51
+        },
+        {
+          "Indicator__c": { "ref": "i-confidence" },
+          "Name": "Second term",
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 60,
+          "Result_Value__c": 58
+        },
+        {
+          "Indicator__c": { "ref": "i-confidence" },
+          "Name": "Third term",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 65
+        },
+        {
+          "Indicator__c": { "ref": "i-late" },
+          "Name": "First term",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -61 },
+          "Target_Value__c": 25,
+          "Result_Value__c": 24
+        },
+        {
+          "Indicator__c": { "ref": "i-late" },
+          "Name": "Second term",
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 20,
+          "Result_Value__c": 21
+        },
+        {
+          "Indicator__c": { "ref": "i-late" },
+          "Name": "Third term",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 15
+        },
+        {
+          "Indicator__c": { "ref": "i-level" },
+          "Name": "First term",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": -61 },
+          "Target_Value__c": 40,
+          "Result_Value__c": 38
+        },
+        {
+          "Indicator__c": { "ref": "i-level" },
+          "Name": "Second term",
+          "Start_Date__c": { "days": -60 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 45,
+          "Result_Value__c": 47
+        },
+        {
+          "Indicator__c": { "ref": "i-level" },
+          "Name": "Third term",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 50
+        },
+        {
+          "Indicator__c": { "ref": "i-promoted" },
+          "Name": "School year",
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": 59 },
+          "Target_Value__c": 95
+        },
+        {
+          "Indicator__c": { "ref": "i-bags" },
+          "Name": "Two quarters ago",
+          "Start_Date__c": { "days": -180 },
+          "End_Date__c": { "days": -91 },
+          "Target_Value__c": 1200,
+          "Result_Value__c": 1150
+        },
+        {
+          "Indicator__c": { "ref": "i-bags" },
+          "Name": "Last quarter",
+          "Start_Date__c": { "days": -90 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 1200,
+          "Result_Value__c": 1260
+        },
+        {
+          "Indicator__c": { "ref": "i-bags" },
+          "Name": "This quarter",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 89 },
+          "Target_Value__c": 1300
+        },
+        {
+          "Indicator__c": { "ref": "i-applications" },
+          "Name": "Two quarters ago",
+          "Start_Date__c": { "days": -180 },
+          "End_Date__c": { "days": -91 },
+          "Target_Value__c": 15,
+          "Result_Value__c": 12
+        },
+        {
+          "Indicator__c": { "ref": "i-applications" },
+          "Name": "Last quarter",
+          "Start_Date__c": { "days": -90 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 15,
+          "Result_Value__c": 18
+        },
+        {
+          "Indicator__c": { "ref": "i-applications" },
+          "Name": "This quarter",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 89 },
+          "Target_Value__c": 20
+        },
+        {
+          "Indicator__c": { "ref": "i-skipped" },
+          "Name": "Two quarters ago",
+          "Start_Date__c": { "days": -180 },
+          "End_Date__c": { "days": -91 },
+          "Target_Value__c": 30,
+          "Result_Value__c": 31
+        },
+        {
+          "Indicator__c": { "ref": "i-skipped" },
+          "Name": "Last quarter",
+          "Start_Date__c": { "days": -90 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 25,
+          "Result_Value__c": 26
+        },
+        {
+          "Indicator__c": { "ref": "i-skipped" },
+          "Name": "This quarter",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 89 },
+          "Target_Value__c": 22
+        },
+        {
+          "Indicator__c": { "ref": "i-enrolled" },
+          "Name": "Two quarters ago",
+          "Start_Date__c": { "days": -180 },
+          "End_Date__c": { "days": -91 },
+          "Target_Value__c": 35,
+          "Result_Value__c": 33
+        },
+        {
+          "Indicator__c": { "ref": "i-enrolled" },
+          "Name": "Last quarter",
+          "Start_Date__c": { "days": -90 },
+          "End_Date__c": { "days": -1 },
+          "Target_Value__c": 45,
+          "Result_Value__c": 47
+        },
+        {
+          "Indicator__c": { "ref": "i-enrolled" },
+          "Name": "This quarter",
+          "Start_Date__c": { "days": 0 },
+          "End_Date__c": { "days": 89 },
+          "Target_Value__c": 55
+        }
+      ]
+    }
+  ],
+  "remove": [{ "object": "Logic_Model__c", "where": "Sample_Data__c = TRUE" }]
+}

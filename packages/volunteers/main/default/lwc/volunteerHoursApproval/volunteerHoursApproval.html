@@ -5,7 +5,6 @@
       icon-name="custom:custom91"
       title={labels.title}
       purpose={labels.intro}
-      title-hidden
     >
       <template lwc:if={canManage}>
         <lightning-button
@@ -48,7 +47,7 @@
             <lightning-record-picker
               data-id="job-filter"
               label={labels.job}
-              object-api-name="Volunteer_Job__c"
+              object-api-name={jobObject}
               onchange={handleJobChange}
             ></lightning-record-picker>
           </div>

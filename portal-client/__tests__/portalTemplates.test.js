@@ -15,6 +15,7 @@ import sponsor from '../templates/sponsor.json';
 import service from '../templates/service.json';
 import partner from '../templates/partner.json';
 import partnerFunders from '../templates/partner-funders.json';
+import requests from '../templates/requests.json';
 
 const PACKAGES = path.join(__dirname, '..', '..', 'packages');
 const BUILT_IN = ['Id', 'Name', 'CreatedDate'];
@@ -55,7 +56,8 @@ const FOLDERS = {
   Scholarships: 'scholarships',
   Memberships: 'memberships',
   Programs: 'programs',
-  Funders: 'funders'
+  Funders: 'funders',
+  Projects: 'projects'
 };
 const ACTION_CLASSES = {
   Volunteers: 'volunteers/main/default/classes/VolunteersPortalExtension.cls',
@@ -105,7 +107,8 @@ function cases() {
     ['sponsor', sponsor],
     ['service', service],
     ['partner', partner],
-    ['partner-funders', partnerFunders]
+    ['partner-funders', partnerFunders],
+    ['requests', requests]
   ].forEach(([name, template]) => {
     template.pages.forEach((page) => out.push([name + ' ' + page.key, template, page]));
   });
@@ -124,7 +127,8 @@ describe('shipped portal templates', () => {
     ['sponsor', sponsor],
     ['service', service],
     ['partner', partner],
-    ['partner-funders', partnerFunders]
+    ['partner-funders', partnerFunders],
+    ['requests', requests]
   ])('%s passes the shape rules and names its module', (name, template) => {
     expect(checkTemplate(template)).toEqual([]);
     expect(template.key).toBe(name);
@@ -216,8 +220,9 @@ describe('shipped portal templates', () => {
       });
   });
 
-  it('the donor template edits only contact details and pays only through Pay Online on pledges', () => {
-    const text = JSON.stringify(donor);
+  it('the donor template edits only contact details and pays only through Pay Online and Update Card on pledges', () => {
+    // No card field and no create: the card is only ever typed on the processor's page.
+    const text = JSON.stringify(donor).replace('"Giving.UpdateCard","label":"Update Card"', '');
     expect(text).not.toMatch(/Card|create/);
     donor.pages.forEach((page) => {
       const updates = page.actions.filter((a) => a === 'update');
@@ -227,9 +232,10 @@ describe('shipped portal templates', () => {
         expect(page.kind).toBe('person');
         expect(page.key).toBe('contact');
       }
-      // PAY-03 (ADR-0210 donor portal payments): the one module action, on pledges only.
+      // PAY-03 (ADR-0210) and PAY-04 (ADR-0218 payments subscriptions): the two module
+      // actions, on pledges only.
       modules.forEach((action) => {
-        expect(action.extension).toBe('Giving.PayOnline');
+        expect(['Giving.PayOnline', 'Giving.UpdateCard']).toContain(action.extension);
         expect(page.key).toBe('pledges');
       });
     });
@@ -266,6 +272,15 @@ describe('shipped portal templates', () => {
       value: 'true'
     });
     expect(directory.fields.map((f) => f.field)).not.toContain('Contact__c');
+  });
+
+  it('the requests template shows only shared updates and never edits status or resolution', () => {
+    const [mine, updates] = requests.pages;
+    mine.fields
+      .filter((f) => f.edit)
+      .forEach((f) => expect(f.field).not.toMatch(/Status__c|Resolution__c|Due_Date__c|Owner/));
+    expect(updates.actions).toEqual([]);
+    expect(updates.where).toContainEqual({ field: 'Shared__c', op: 'equals', value: 'true' });
   });
 
   it('titles and labels are in title case', () => {

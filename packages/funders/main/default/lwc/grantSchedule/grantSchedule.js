@@ -1,4 +1,5 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
 import LANGUAGE from '@salesforce/i18n/lang';
@@ -57,6 +58,7 @@ export default class GrantSchedule extends LightningElement {
   errorMessage;
   isLoading = true;
   isSaving = false;
+  wiredSchedule;
   /** What the last Mark Received replaced, while its Undo is offered. */
   lastReceived;
 
@@ -66,21 +68,28 @@ export default class GrantSchedule extends LightningElement {
         this.helpReady = true;
       });
     }
-    this.load();
   }
 
-  async load() {
-    this.isLoading = true;
-    try {
-      this.schedule = await getSchedule({ grantId: this.recordId });
-      this.frequency = (this.schedule && this.schedule.frequency) || DEFAULT_FREQUENCY;
+  // Cached read (D-200 P11); every save below refreshes it through refresh().
+  @wire(getSchedule, { grantId: '$recordId' })
+  receiveSchedule(result) {
+    this.wiredSchedule = result;
+    const { data, error } = result;
+    if (data) {
+      this.schedule = data;
+      this.frequency = data.frequency || DEFAULT_FREQUENCY;
       this.errorMessage = undefined;
-    } catch (error) {
+    } else if (error) {
       this.schedule = undefined;
       this.errorMessage = messageOf(error);
-    } finally {
+    }
+    if (data || error) {
       this.isLoading = false;
     }
+  }
+
+  load() {
+    return refreshApex(this.wiredSchedule);
   }
 
   get hasSchedule() {

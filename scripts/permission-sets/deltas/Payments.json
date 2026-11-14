@@ -1,0 +1,48 @@
+{
+  "Admin": {
+    "label": "Payments Admin",
+    "description": ["Sees every payment and processor event and lets the processing job, which runs as the admin", "who scheduled it, record their status. Payment status is never edited by hand: the layouts", "are read only."],
+    "add": {
+      "classAccesses": {
+        "PaymentsSetupController": {"enabled": "true"}
+      },
+      "fieldPermissions": {
+        "Payment_Event__c.Event_Id__c": {"editable": "true", "readable": "true"},
+        "Payment_Event__c.Event_Key__c": {"editable": "true", "readable": "true"},
+        "Payment_Event__c.Event_Type__c": {"editable": "true", "readable": "true"},
+        "Payment_Event__c.Headers__c": {"editable": "false", "readable": "true"},
+        "Payment_Event__c.Message__c": {"editable": "true", "readable": "true"},
+        "Payment_Event__c.Payload__c": {"editable": "false", "readable": "true"},
+        "Payment_Event__c.Payment__c": {"editable": "true", "readable": "true"},
+        "Payment_Event__c.Processor__c": {"editable": "true", "readable": "true"},
+        "Payment_Event__c.Status__c": {"editable": "true", "readable": "true"},
+        "Payment__c.Checkout_Id__c": {"editable": "true", "readable": "true"},
+        "Payment__c.Checkout_Url__c": {"editable": "true", "readable": "true"},
+        "Payment__c.Listener__c": {"editable": "false", "readable": "true"},
+        "Payment__c.Plan_Key__c": {"editable": "false", "readable": "true"},
+        "Payment__c.Reference__c": {"editable": "false", "readable": "true"}
+      },
+      "objectPermissions": {
+        "Payment_Event__c": {"allowCreate": "false", "allowDelete": "true", "allowEdit": "true", "allowRead": "true", "modifyAllRecords": "true", "viewAllRecords": "true"}
+      },
+      "tabSettings": {
+        "Payment_Event__c": {"visibility": "Visible"},
+        "Payments_Setup": {"visibility": "Visible"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Payment__c.Amount_Refunded__c": {"editable": "true"},
+        "Payment__c.Detail__c": {"editable": "true"},
+        "Payment__c.Paid_At__c": {"editable": "true"},
+        "Payment__c.Processor_Payment_Id__c": {"editable": "true"},
+        "Payment__c.Status__c": {"editable": "true"},
+        "Payment__c.Subscription_Id__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Payment__c": {"allowEdit": "true"}
+      }
+    }
+  },
+  "Read_Only": {"label": "Payments Read Only", "description": "Reads payments. Changes nothing.", "readOnly": true}
+}

@@ -25,6 +25,7 @@ public with sharing class ErrorLogSelector {
 				Message__c,
 				Severity__c,
 				Status__c,
+				Occurrences__c,
 				Object_Name__c,
 				Record_Reference__c
 			FROM Error_Log__c
@@ -54,5 +55,38 @@ public with sharing class ErrorLogSelector {
 			WITH USER_MODE
 			LIMIT 200
 		];
+	}
+
+	/**
+	 * One entry with what "Copy for Bug Report" uses (QA review Q10). Technical Detail is read
+	 * only by someone who may see it (BarnCRM Admin); for anyone else it is left out of the
+	 * query, which user mode would otherwise refuse.
+	 */
+	public static Error_Log__c selectForBugReport(Id errorLogId) {
+		List<Error_Log__c> found;
+		if (Schema.SObjectType.Error_Log__c.fields.Technical_Detail__c.isAccessible()) {
+			found = [
+				SELECT
+					Context__c,
+					Severity__c,
+					Timestamp__c,
+					Occurrences__c,
+					Object_Name__c,
+					Technical_Detail__c
+				FROM Error_Log__c
+				WHERE Id = :errorLogId
+				WITH USER_MODE
+				LIMIT 1
+			];
+		} else {
+			found = [
+				SELECT Context__c, Severity__c, Timestamp__c, Occurrences__c, Object_Name__c
+				FROM Error_Log__c
+				WHERE Id = :errorLogId
+				WITH USER_MODE
+				LIMIT 1
+			];
+		}
+		return found.isEmpty() ? null : found[0];
 	}
 }

@@ -46,10 +46,13 @@ page, does three things, each safe to run again:
 
 The **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**,
 **Boards and Committees** and **Board Meetings** tabs join the BarnCRM and BarnCRM Console apps
-before Error Log. Corporate Hub has no app of its own. The **Processing Activities**, **Data
-Subject Requests** and **Data Breaches** tabs are not added to the apps' menus (most
-organizations open them rarely): find them in the App Launcher, or add them to an app's
-navigation yourself.
+before Error Log. Corporate Hub also has its own app, **BarnCRM Corporate Hub**, shown to
+everyone with a Corporate Hub permission set: those six tabs, then **Processing Activities**,
+**Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards** and **Error Log**.
+The three data protection tabs are not added to the BarnCRM apps' menus (most organizations
+open them rarely): open them in BarnCRM Corporate Hub or the App Launcher. A scratch or
+Developer Edition org gets no BarnCRM Corporate Hub app, only the tabs in the BarnCRM apps (see
+[The Module Apps](barncrm-app.md#the-module-apps)).
 
 ## Access
 
@@ -82,8 +85,12 @@ BarnCRM Settings, **Corporate Hub**:
 | Show board demographics | Off | Whether the Board panel shows the optional age range and gender of current seats. |
 
 The reminder step is **Corporate Hub reminders** on the Nightly Jobs page, at 6:45 AM, with its
-own switch. It runs once a night, so a breach logged during the day gets its first reminder with
-the next 6:45 AM run.
+own switch. It runs once a night, but a breach is different: its bell goes the moment the breach
+is logged (D-196), and the 6:45 AM run then sends no second bell for the same deadline date. The
+**Data Breach: Bell When Logged** row on the Automations page turns the immediate bell off, and
+**Send Corporate Hub reminders** turns off both; with either off, the first bell comes with the
+6:45 AM run. A breach logged in a bulk load tells its owner at once for the first 50 only; the
+6:45 AM run sends the rest.
 
 ## Templates
 
@@ -165,8 +172,9 @@ history.
 An Agreement records the other party (an organization and a contact), dates, **Auto-Renews** with
 its renewal term, **Notice Days** (the **Notice Date** is worked out), value, terms, and the
 signed copy in Files. The owner is reminded before the notice date (or the end date when no notice
-is set). Each night an Active, auto-renewing agreement past its end date moves on by its term,
-and any other Active agreement past its end date becomes Expired.
+is set). Each night an Active, auto-renewing agreement past its end date moves on by its term
+(an end date on the last day of a month stays on the last day: 31 January, then 28 February,
+then 31 March), and any other Active agreement past its end date becomes Expired.
 
 ## Data Protection
 
@@ -212,14 +220,18 @@ Log every personal data breach as a **Data Breach**, even one you will not repor
 the **Risk** (Not Yet Assessed, Unlikely to Result in Risk, Risk or High Risk), the decision on
 notifying and the actions taken. **Authority Deadline** is 72 hours after discovery. Until you
 record **Authority Notified At**, the owner of an open breach whose risk is not Unlikely to
-Result in Risk gets a bell reminder before the deadline, and the breach shows on the Corporate
-Hub page. Record **People Notified At** when you tell the people affected. A breach cannot be
+Result in Risk gets a bell reminder as soon as the breach is logged (D-196), and the breach
+shows on the Corporate Hub page. Record **People Notified At** when you tell the people affected. A breach cannot be
 closed while its risk is Not Yet Assessed.
 
 ### On the Corporate Hub Page
 
 A **Data Protection** section lists open data subject requests by due date and breaches not
 yet reported, for the people who can see them. It does not show when there are none.
+
+Until the org has a board or committee, the page opens with **Set Up Your Board** for anyone who
+may create one (D-200 R4). Its **New Board or Committee** button opens the new record form (see
+Boards and Committees below). It goes away once the first board is saved.
 
 ## Board Governance
 
@@ -271,8 +283,12 @@ On the **Meeting** panel:
   meetings, until each is Done or Dropped.
 - **Motions**: add a Board Motion to the meeting. **Open Voting** gives each voting attendee a
   vote to cast in the portal; staff can also fill in votes. **Close Voting** records Passed (more
-  For than Against) or Failed and the date. A vote cannot change once voting closes, except by an
-  admin recording a vote taken by voice.
+  For than Against) or Failed and the date. When the meeting has not reached quorum, the outcome
+  is recorded the same way, a warning says to check your bylaws before relying on the vote, and
+  the motion's **Closed Without Quorum** box is ticked and shown under the motion in the panel
+  (D-196). A meeting with no attendance recorded has not reached quorum, so closing voting on it
+  always warns and ticks **Closed Without Quorum**: record attendance before closing. A vote
+  cannot change once voting closes, except by an admin recording a vote taken by voice.
 - **Availability Poll**: before the time is fixed, leave Start blank, fill in up to three Poll
   Times and use **Send Poll** (it invites the board first if needed). Members answer Yes, If
   Needed or No for each time in the portal; **Choose This Time** sets the start and closes the
@@ -302,6 +318,12 @@ ending in the next 90 days, attendance this year and open board disclosures. Giv
 participation is on each board's panel, not the dashboard, so the dashboard never depends on
 Giving.
 
+The dashboard runs as one specified user, the admin who installed or deployed the package, so
+everyone who opens it sees what that user can see. Share the folder only with people who are
+allowed to see board records and disclosures. To change the running user, open the dashboard,
+choose **Edit**, open the dashboard's properties, and in **View dashboard as** choose another
+person. A dashboard that reads as each viewer is planned for the Advanced Reporting module.
+
 ## Reports
 
 Build reports on Library Documents with Policy Acknowledgments, Compliance Obligations with
@@ -312,6 +334,17 @@ Requested and Version equal to the document's version (outstanding), Days Until 
 Corporate Hub also ships the report types **Board Members**, **Board Meeting Attendees** and
 **Policy Acknowledgments**, and four reports in the **BarnCRM Corporate Hub** folder: Current
 Board Roster, Terms Ending Next 90 Days, Attendance This Year and Open Board Disclosures.
+
+## Sample Data
+
+**Load Sample Data** in BarnCRM Settings also loads a small, complete governance set: five
+Library Documents (three active, one draft, one retired) with three acknowledgments, five
+compliance obligations with three past cycles, five agreements with Core's sample organizations,
+two processing activities, a Board of Directors and a Finance Committee with seven seats held by
+Core's sample people, three meetings with attendees, two motions (one passed with votes, one
+tabled) and three action items. Data subject requests and breaches are not loaded.
+
+**Remove Sample Data** deletes them. Your own documents, obligations, agreements and boards stay.
 
 ## Removing the Module
 

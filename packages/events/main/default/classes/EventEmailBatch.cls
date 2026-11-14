@@ -25,7 +25,7 @@ public with sharing class EventEmailBatch implements Database.Batchable<SObject>
 		if (phase == null) {
 			return null;
 		}
-		return Database.executeBatch(new EventEmailBatch(phase), CHUNK_SIZE);
+		return AsyncStarter.batch(new EventEmailBatch(phase), CHUNK_SIZE, 'EventEmailBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

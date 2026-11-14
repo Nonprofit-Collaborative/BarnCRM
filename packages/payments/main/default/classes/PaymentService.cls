@@ -2,8 +2,15 @@
  * Payments' one status flow (canonical model 29PAY1, R-PAY1 to R-PAY3; ADR-0201
  * `0201-payments-module.md`, decisions 3, 6 and 8): starting a checkout, applying what a
  * processor reported, cancelling abandoned checkouts and telling each payment's listener.
+ * Subscriptions, renewals and Update Card: R-PAY6, ADR-0218 `0218-payments-subscriptions.md`.
  */
 public with sharing class PaymentService {
+	/** Subscription news told to listeners (`subscriptionsChanged`, event). */
+	public static final String CHARGE_SUCCEEDED = 'chargeSucceeded';
+	public static final String CHARGE_FAILED = 'chargeFailed';
+	public static final String CARD_UPDATED = 'cardUpdated';
+	public static final String SUBSCRIPTION_CANCELLED = 'cancelled';
+	private static final Set<String> INTERVALS = new Set<String>{ 'week', 'month', 'year' };
 	public static final String PENDING = 'Pending';
 	public static final String PAID = 'Paid';
 	public static final String FAILED = 'Failed';
@@ -49,6 +56,13 @@ public with sharing class PaymentService {
 		public Decimal amountRefunded;
 		public Datetime paidAt;
 		public String detail;
+		/** Subscriptions (R-PAY6): the news, if any, and what the processor said with it. */
+		public String subscriptionId;
+		public String customerId;
+		public String subscriptionEvent;
+		/** A renewal's charged amount. */
+		public Decimal amount;
+		public Date cardExpires;
 	}
 
 	/** One event read by its processor: what to change, or why nothing, ready to be applied. */
@@ -161,11 +175,18 @@ public with sharing class PaymentService {
 			Detail__c = text(args, 'detail')?.abbreviate(255),
 			Reference__c = newReference()
 		);
+		// R-PAY6: an interval makes a subscription only while Automatic Recurring Payments is on.
+		String interval = text(args, 'interval')?.toLowerCase();
+		Object count = args.get('intervalCount');
+		Integer every = count instanceof Integer ? Math.max(1, Math.min(12, (Integer) count)) : 1;
+		if (settings().Recurring_Payments__c != true || !INTERVALS.contains(interval)) {
+			interval = null;
+		}
 		try {
 			if (processor == PAYPAL) {
-				PaymentPayPal.startCheckout(payment, successUrl, cancelUrl);
+				PaymentPayPal.startCheckout(payment, successUrl, cancelUrl, interval, every);
 			} else {
-				PaymentStripe.startCheckout(payment, successUrl, cancelUrl);
+				PaymentStripe.startCheckout(payment, successUrl, cancelUrl, interval, every);
 			}
 		} catch (CalloutException e) {
 			ErrorLogger.log(e, CONTEXT + '.startCheckout');
@@ -175,6 +196,39 @@ public with sharing class PaymentService {
 		}
 		Database.insert(payment, AccessLevel.SYSTEM_MODE);
 		return payment;
+	}
+
+	/**
+	 * The processor's own page for a subscription's new card (ADR-0218 payments subscriptions,
+	 * decision 5): Stripe (`sub_...`) needs the customer; any other id is PayPal's.
+	 */
+	public static String updateCard(Map<String, Object> args) {
+		String subscription = text(args, 'subscriptionId');
+		String customer = text(args, 'customerId');
+		String back = text(args, 'returnUrl');
+		String processor = subscription?.startsWith('sub_') == true ? STRIPE : PAYPAL;
+		if (String.isBlank(subscription) || (processor == STRIPE && String.isBlank(customer))) {
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_NoSubscription'));
+		}
+		if (!isHttps(back)) {
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_BadUrl'));
+		}
+		if (!isReady(processor)) {
+			throw problem(
+				BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor })
+			);
+		}
+		if (processor == PAYPAL) {
+			return mode() == LIVE ? PaymentPayPal.AUTOPAY : PaymentPayPal.AUTOPAY_TEST;
+		}
+		try {
+			return PaymentStripe.updateCardUrl(customer, subscription, back);
+		} catch (CalloutException e) {
+			ErrorLogger.log(e, CONTEXT + '.updateCard');
+			throw problem(
+				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor })
+			);
+		}
 	}
 
 	/** The amount in the processor's smallest unit (cents), and back. */
@@ -206,12 +260,14 @@ public with sharing class PaymentService {
 		Set<String> refs = new Set<String>();
 		Set<String> checkoutIds = new Set<String>();
 		Set<String> paymentIds = new Set<String>();
+		Set<String> subscriptions = new Set<String>();
 		Set<String> keys = new Set<String>();
 		for (Outcome o : outcomes) {
 			if (o.change != null) {
 				addIfSet(refs, o.change.reference);
 				addIfSet(checkoutIds, o.change.checkoutId);
 				addIfSet(paymentIds, o.change.processorPaymentId);
+				addIfSet(subscriptions, o.change.subscriptionId);
 			}
 			if (o.event.Event_Key__c != null && o.event.Id != null) {
 				keys.add(o.event.Event_Key__c);
@@ -234,18 +290,27 @@ public with sharing class PaymentService {
 				Person__c,
 				Currency_Code__c,
 				Processor__c,
-				Mode__c
+				Mode__c,
+				Subscription_Id__c,
+				Description__c,
+				Payer_Name__c,
+				Payer_Email__c
 			FROM Payment__c
 			WHERE
 				Reference__c IN :refs
 				OR Checkout_Id__c IN :checkoutIds
 				OR Processor_Payment_Id__c IN :paymentIds
+				OR Subscription_Id__c IN :subscriptions
 			WITH USER_MODE
+			ORDER BY CreatedDate ASC, Id ASC
 		];
 		Map<Id, Payment__c> touched = new Map<Id, Payment__c>();
 		Map<Id, String> previous = new Map<Id, String>();
 		Map<Id, Decimal> previousRefunded = new Map<Id, Decimal>();
 		Set<String> seen = new Set<String>();
+		List<Payment__c> renewals = new List<Payment__c>();
+		// Charges first recorded in this run: a resent charge is not news again.
+		Set<String> newCharges = new Set<String>();
 		for (Outcome o : outcomes) {
 			if (
 				o.event.Event_Key__c != null &&
@@ -255,10 +320,36 @@ public with sharing class PaymentService {
 				o.event.Event_Key__c = null;
 				o.nothing('Ignored', BarnHelp.text('Payments', 'Payments_Event_Duplicate'));
 			}
-			if (o.status != null || o.change == null) {
-				if (o.status == null) {
-					o.nothing('Ignored', BarnHelp.text('Payments', 'Payments_Event_NotUsed'));
-				}
+			if (o.status == null && o.change == null) {
+				o.nothing('Ignored', BarnHelp.text('Payments', 'Payments_Event_NotUsed'));
+			}
+			Payment__c first = o.status == null ? match(found, o.change) : null;
+			if (
+				first == null ||
+				o.change.status != PAID ||
+				o.change.subscriptionId == null ||
+				o.change.processorPaymentId == null
+			) {
+				continue;
+			}
+			if (String.isBlank(first.Processor_Payment_Id__c)) {
+				// The subscription's first charge: its first payment takes it (applyTo agrees).
+				first.Processor_Payment_Id__c = o.change.processorPaymentId;
+				newCharges.add(o.change.processorPaymentId);
+			} else if (first.Processor_Payment_Id__c != o.change.processorPaymentId) {
+				// R-PAY6: a later charge on a subscription whose first payment is settled.
+				Payment__c renewal = renewalOf(first, o.change);
+				renewals.add(renewal);
+				found.add(renewal);
+				newCharges.add(o.change.processorPaymentId);
+			}
+		}
+		// System mode: the processing administrator edits payments but creates none, and a
+		// renewal comes only from a verified processor event (ADR-0218 payments subscriptions, 2).
+		Database.insert(renewals, AccessLevel.SYSTEM_MODE);
+		Map<String, List<Map<String, Object>>> news = new Map<String, List<Map<String, Object>>>();
+		for (Outcome o : outcomes) {
+			if (o.status != null) {
 				continue;
 			}
 			Payment__c payment = match(found, o.change);
@@ -271,31 +362,44 @@ public with sharing class PaymentService {
 				previousRefunded.put(payment.Id, payment.Amount_Refunded__c);
 			}
 			o.event.Payment__c = payment.Id;
-			String refusal = applyTo(payment, o.change);
+			// Subscription news with no status (a failed charge, a card, a cancellation) changes
+			// no payment.
+			Boolean newsOnly = o.change.status == null && o.change.subscriptionEvent != null;
+			String refusal = newsOnly ? null : applyTo(payment, o.change);
 			o.status = refusal == null ? 'Applied' : 'Ignored';
 			o.message = refusal;
 			if (refusal == null) {
-				touched.put(payment.Id, payment);
+				if (!newsOnly) {
+					touched.put(payment.Id, payment);
+				}
+				if (
+					o.change.subscriptionEvent != null &&
+					payment.Listener__c != null &&
+					(newsOnly || newCharges.remove(o.change.processorPaymentId))
+				) {
+					if (!news.containsKey(payment.Listener__c)) {
+						news.put(payment.Listener__c, new List<Map<String, Object>>());
+					}
+					news.get(payment.Listener__c).add(newsOf(o, payment));
+				}
 			}
 		}
 		update as user touched.values();
 		List<Payment_Event__c> events = new List<Payment_Event__c>();
+		List<Id> eventIds = new List<Id>();
 		for (Outcome o : outcomes) {
 			o.event.Status__c = o.status;
 			o.event.Message__c = o.message?.abbreviate(255);
 			events.add(o.event);
+			eventIds.add(o.event.Id);
 		}
-		List<Database.SaveResult> saved = Database.update(events, false, AccessLevel.USER_MODE);
-		for (Integer i = 0; i < saved.size(); i++) {
-			if (!saved[i].isSuccess()) {
-				ErrorLogger.logMessage(
-					saved[i].getErrors()[0].getMessage(),
-					CONTEXT + '.apply',
-					ErrorLogger.SEVERITY_WARNING,
-					events[i].Id
-				);
-			}
-		}
+		// Events that cannot be saved are logged together, in one statement.
+		ErrorLogger.logFailures(
+			Database.update(events, false, AccessLevel.USER_MODE),
+			eventIds,
+			CONTEXT + '.apply',
+			ErrorLogger.SEVERITY_WARNING
+		);
 		List<Payment__c> changed = new List<Payment__c>();
 		for (Payment__c payment : touched.values()) {
 			if (
@@ -306,6 +410,64 @@ public with sharing class PaymentService {
 			}
 		}
 		notifyAll(changed, previous);
+		tellSubscriptions(news);
+	}
+
+	/** A later charge on a subscription, copied from its first payment, never its detail. */
+	private static Payment__c renewalOf(Payment__c first, Change change) {
+		return new Payment__c(
+			Status__c = PENDING,
+			Processor__c = first.Processor__c,
+			Mode__c = first.Mode__c,
+			Amount__c = change.amount ?? first.Amount__c,
+			Amount_Refunded__c = 0,
+			Currency_Code__c = first.Currency_Code__c,
+			Description__c = first.Description__c,
+			Payer_Name__c = first.Payer_Name__c,
+			Payer_Email__c = first.Payer_Email__c,
+			Person__c = first.Person__c,
+			Source_Record_Id__c = first.Source_Record_Id__c,
+			Listener__c = first.Listener__c,
+			Subscription_Id__c = change.subscriptionId,
+			Processor_Payment_Id__c = change.processorPaymentId,
+			Reference__c = newReference()
+		);
+	}
+
+	/** One subscription change as the seam passes it (`subscriptionsChanged`). */
+	private static Map<String, Object> newsOf(Outcome o, Payment__c payment) {
+		Change c = o.change;
+		Map<String, Object> news = toMap(payment);
+		news.putAll(
+			new Map<String, Object>{
+				'subscriptionId' => c.subscriptionId ?? payment.Subscription_Id__c,
+				'customerId' => c.customerId,
+				'event' => c.subscriptionEvent,
+				'eventKey' => o.event.Event_Key__c,
+				'eventDate' => (c.paidAt ?? Datetime.now()).date(),
+				'amount' => c.amount,
+				'cardExpires' => c.cardExpires,
+				'detail' => c.detail
+			}
+		);
+		return news;
+	}
+
+	/** Tells each listener its subscription news once per run, in a savepoint (R-PAY6). */
+	private static void tellSubscriptions(Map<String, List<Map<String, Object>>> news) {
+		for (String name : news.keySet()) {
+			System.Savepoint before = Database.setSavepoint();
+			try {
+				((Callable) NamespaceUtil.build(name, Callable.class, CONTEXT + '.notify'))
+					?.call(
+						'subscriptionsChanged',
+						new Map<String, Object>{ 'changes' => news.get(name) }
+					);
+			} catch (Exception e) {
+				Database.rollback(before);
+				ErrorLogger.log(e, CONTEXT + '.notify');
+			}
+		}
 	}
 
 	/** Keys already taken by an earlier event (PayPal keys are set only once verified). */
@@ -326,20 +488,32 @@ public with sharing class PaymentService {
 		return used;
 	}
 
+	/**
+	 * The payment with the change's processor payment id; failing that, the first (oldest) with
+	 * its reference, checkout or subscription, which for a subscription is its first payment.
+	 */
 	private static Payment__c match(List<Payment__c> found, Change change) {
+		Payment__c first;
 		for (Payment__c p : found) {
 			if (
-				(change.reference != null &&
-				p.Reference__c == change.reference) ||
-				(change.checkoutId != null &&
-				p.Checkout_Id__c == change.checkoutId) ||
-				(change.processorPaymentId != null &&
-				p.Processor_Payment_Id__c == change.processorPaymentId)
+				change.processorPaymentId != null &&
+				p.Processor_Payment_Id__c == change.processorPaymentId
 			) {
 				return p;
 			}
+			if (
+				first == null &&
+				((change.reference != null &&
+				p.Reference__c == change.reference) ||
+				(change.checkoutId != null &&
+				p.Checkout_Id__c == change.checkoutId) ||
+				(change.subscriptionId != null &&
+				p.Subscription_Id__c == change.subscriptionId))
+			) {
+				first = p;
+			}
 		}
-		return null;
+		return first;
 	}
 
 	/** Applies one change to the payment in memory; returns why it was refused, or null. */
@@ -370,6 +544,9 @@ public with sharing class PaymentService {
 		}
 		if (String.isBlank(payment.Checkout_Id__c)) {
 			payment.Checkout_Id__c = change.checkoutId;
+		}
+		if (String.isBlank(payment.Subscription_Id__c)) {
+			payment.Subscription_Id__c = change.subscriptionId;
 		}
 		if (payment.Status__c == PAID && payment.Paid_At__c == null) {
 			payment.Paid_At__c = change.paidAt == null ? Datetime.now() : change.paidAt;

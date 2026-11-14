@@ -18,7 +18,6 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 	/** Checkouts one appeal's page may start in an hour (card-testing guard). */
 	@TestVisible
 	private static final Integer CHECKOUTS_PER_HOUR = 30;
-	private static final Decimal DEFAULT_MINIMUM = 5;
 
 	@NamespaceAccessible
 	public GivingDonationPage() {
@@ -120,12 +119,7 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 	@TestVisible
 	private static void refuseCardTesting(Id appealId, Object amount, Callable payments) {
 		Decimal minimum = minimumAmount();
-		Decimal given;
-		try {
-			given = amount == null ? null : Decimal.valueOf(String.valueOf(amount));
-		} catch (TypeException notANumber) {
-			given = null;
-		}
+		Decimal given = SettingsService.toNumber(amount);
 		if (given == null || given < minimum) {
 			throw new DonationPageException(
 				BarnHelp.text(
@@ -146,16 +140,7 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 
 	/** The Donation Page Minimum Amount setting; 5 when unset, unreadable or below 0. */
 	private static Decimal minimumAmount() {
-		Object value = SettingsService.getValue(
-			'Giving_Settings__c',
-			'Donation_Page_Minimum_Amount__c'
-		);
-		try {
-			Decimal minimum = value == null ? null : Decimal.valueOf(String.valueOf(value).trim());
-			return minimum == null || minimum < 0 ? DEFAULT_MINIMUM : minimum;
-		} catch (TypeException unreadable) {
-			return DEFAULT_MINIMUM;
-		}
+		return SettingsService.number('Giving_Settings__c', 'Donation_Page_Minimum_Amount__c');
 	}
 
 	/** A checkout the page refuses; Forms logs it and answers Failed. */

@@ -26,10 +26,14 @@ private class AccountingExportServiceTest {
 				Accounting_Code__c = '4100'
 			);
 			insert new List<Fund__c>{ general, building };
-			Contact ana = new Contact(FirstName = 'Ana', LastName = 'Garcia');
-			Contact formula = new Contact(LastName = '=SUM(A1)');
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia')
+			);
+			Contact formula = TestDataFactory.person(new Contact(LastName = '=SUM(A1)'));
 			insert new List<Contact>{ ana, formula };
-			Account riverside = new Account(Name = 'Riverside Foundation');
+			Account riverside = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation')
+			);
 			insert riverside;
 
 			Gift__c check = gift(ana.Id, null, 100, 'Check', Date.newInstance(2026, 8, 5));

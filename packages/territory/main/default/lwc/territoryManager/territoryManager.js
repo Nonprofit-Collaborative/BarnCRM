@@ -14,6 +14,15 @@ import RULE_APPLIES_TO from '@salesforce/schema/Territory_Rule__c.Applies_To__c'
 import RULE_FILTER from '@salesforce/schema/Territory_Rule__c.Filter_JSON__c';
 import RULE_SUMMARY from '@salesforce/schema/Territory_Rule__c.Summary__c';
 import RULE_ACTIVE from '@salesforce/schema/Territory_Rule__c.Active__c';
+import TERRITORY_ACTIVE from '@salesforce/schema/Territory__c.Active__c';
+import TERRITORY_PRIORITY from '@salesforce/schema/Territory__c.Priority__c';
+import TERRITORY_ROUTING from '@salesforce/schema/Territory__c.Routing__c';
+import TERRITORY_OWNER_USER from '@salesforce/schema/Territory__c.Owner_User__c';
+import TERRITORY_DESCRIPTION from '@salesforce/schema/Territory__c.Description__c';
+import MEMBER_TERRITORY from '@salesforce/schema/Territory_Member__c.Territory__c';
+import MEMBER_USER from '@salesforce/schema/Territory_Member__c.User__c';
+import MEMBER_CAPACITY from '@salesforce/schema/Territory_Member__c.Capacity__c';
+import MEMBER_ACTIVE from '@salesforce/schema/Territory_Member__c.Active__c';
 import { iconFor } from 'c/barnIcons';
 import { messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -43,6 +52,18 @@ export default class TerritoryManager extends LightningElement {
   iconName = iconFor('Territory_Management');
   territoryObject = TERRITORY.objectApiName;
   memberObject = MEMBER.objectApiName;
+  /** The editors' fields, from schema imports so they carry any namespace. */
+  formFields = {
+    territoryActive: TERRITORY_ACTIVE.fieldApiName,
+    priority: TERRITORY_PRIORITY.fieldApiName,
+    routing: TERRITORY_ROUTING.fieldApiName,
+    ownerUser: TERRITORY_OWNER_USER.fieldApiName,
+    description: TERRITORY_DESCRIPTION.fieldApiName,
+    memberTerritory: MEMBER_TERRITORY.fieldApiName,
+    memberUser: MEMBER_USER.fieldApiName,
+    memberCapacity: MEMBER_CAPACITY.fieldApiName,
+    memberActive: MEMBER_ACTIVE.fieldApiName
+  };
 
   page;
   busy = false;

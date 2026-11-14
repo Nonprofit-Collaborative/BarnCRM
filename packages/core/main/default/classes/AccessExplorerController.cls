@@ -13,6 +13,12 @@
  * object's grants, one page of people), so a large org is never read whole.
  */
 public with sharing class AccessExplorerController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_AccessExplorer_UnexpectedError'
+	);
+
 	private static final String PERMISSION = 'Manage_BarnCRM_Settings';
 
 	/** People listed per page on the By Kind of Record view. */
@@ -264,7 +270,7 @@ public with sharing class AccessExplorerController {
 	}
 
 	/**
-	 * People whose name contains the term, active first.
+	 * People with a name word starting with each word of the term, active first.
 	 * @param term at least two characters of a name
 	 * @return up to 20 people
 	 */
@@ -273,14 +279,18 @@ public with sharing class AccessExplorerController {
 		try {
 			requirePermission();
 			List<Choice> choices = new List<Choice>();
-			String pattern = likePattern(term);
-			if (pattern == null) {
+			String searchText = NameSearch.prefixTerm(term);
+			if (searchText == null) {
 				return choices;
 			}
+			// The search index finds the people (D-200 P5); one read by id orders them.
+			Map<Id, SObject> found = new Map<Id, SObject>(
+				NameSearch.find(searchText, 'User(Id LIMIT 200)')[0]
+			);
 			for (User person : [
 				SELECT Id, Name, IsActive, Profile.Name
 				FROM User
-				WHERE Name LIKE :pattern
+				WHERE Id IN :found.keySet()
 				WITH USER_MODE
 				ORDER BY IsActive DESC, Name
 				LIMIT :SEARCH_LIMIT
@@ -294,7 +304,7 @@ public with sharing class AccessExplorerController {
 			}
 			return choices;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer people search');
+			throw ERRORS.wrap(caught, 'Access explorer people search');
 		}
 	}
 
@@ -329,7 +339,7 @@ public with sharing class AccessExplorerController {
 			}
 			return choices;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer permission set search');
+			throw ERRORS.wrap(caught, 'Access explorer permission set search');
 		}
 	}
 
@@ -396,7 +406,7 @@ public with sharing class AccessExplorerController {
 			result.objects = sortedRows(rows.values());
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer access');
+			throw ERRORS.wrap(caught, 'Access explorer access');
 		}
 	}
 
@@ -448,7 +458,7 @@ public with sharing class AccessExplorerController {
 			}
 			return sortedRows(rows);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer fields');
+			throw ERRORS.wrap(caught, 'Access explorer fields');
 		}
 	}
 
@@ -477,7 +487,7 @@ public with sharing class AccessExplorerController {
 			}
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer object');
+			throw ERRORS.wrap(caught, 'Access explorer object');
 		}
 	}
 
@@ -565,7 +575,7 @@ public with sharing class AccessExplorerController {
 			page.rows = rows.values();
 			return page;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer people');
+			throw ERRORS.wrap(caught, 'Access explorer people');
 		}
 	}
 
@@ -582,7 +592,7 @@ public with sharing class AccessExplorerController {
 			String namespace = NamespaceUtil.prefix().removeEnd('__');
 			Map<String, Object> binds = new Map<String, Object>{
 				'prefix' => String.isBlank(namespace) ? null : namespace,
-				'roles' => AccessService.knownRoles()
+				'roles' => AccessService.ROLE_DEVELOPER_NAMES
 			};
 			Map<Id, Grant> roles = new Map<Id, Grant>();
 			Map<Id, Grant> sets = new Map<Id, Grant>();
@@ -612,7 +622,7 @@ public with sharing class AccessExplorerController {
 			);
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer overview');
+			throw ERRORS.wrap(caught, 'Access explorer overview');
 		}
 	}
 
@@ -686,7 +696,7 @@ public with sharing class AccessExplorerController {
 			result.objects = holderRows(permissions, holders);
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer modify all report');
+			throw ERRORS.wrap(caught, 'Access explorer modify all report');
 		}
 	}
 
@@ -710,7 +720,7 @@ public with sharing class AccessExplorerController {
 				SECTION_NAME;
 			return link;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Access explorer link');
+			throw ERRORS.wrap(caught, 'Access explorer link');
 		}
 	}
 
@@ -1076,7 +1086,7 @@ public with sharing class AccessExplorerController {
 			: permissionSet.PermissionSetGroup;
 		if (owner != null) {
 			return sameNamespace(owner.NamespacePrefix, namespace) &&
-				AccessService.knownRoles().contains(owner.DeveloperName)
+				AccessService.ROLE_DEVELOPER_NAMES.contains(owner.DeveloperName)
 				? BARN_ROLE
 				: null;
 		}
@@ -1229,14 +1239,5 @@ public with sharing class AccessExplorerController {
 				BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired')
 			);
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof AccessExplorerException,
-			context,
-			BarnHelp.text('Core', 'Core_AccessExplorer_UnexpectedError')
-		);
 	}
 }

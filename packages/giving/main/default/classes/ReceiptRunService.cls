@@ -38,9 +38,10 @@ public with sharing class ReceiptRunService {
 		ReceiptWriter.insertRun(run);
 
 		try {
-			Id jobId = Database.executeBatch(
+			Id jobId = AsyncStarter.batch(
 				new ReceiptStatementBatch(year, run.Id),
-				ReceiptStatementBatch.SCOPE
+				ReceiptStatementBatch.SCOPE,
+				'ReceiptRunService'
 			);
 			run.Async_Job_Id__c = jobId;
 			run.Status__c = STATUS_RUNNING;

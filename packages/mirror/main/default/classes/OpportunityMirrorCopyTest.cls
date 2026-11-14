@@ -23,7 +23,7 @@ private class OpportunityMirrorCopyTest {
 		// Built once for the class rather than in every test that runs as her.
 		TestDataFactory.createUserOnTheRunningUsersProfile(
 			'Maria',
-			new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+			new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 
@@ -156,7 +156,7 @@ private class OpportunityMirrorCopyTest {
 			if (personType == null) {
 				return; // An org without person accounts has no such path to prove.
 			}
-			SObject person = new Account(RecordTypeId = personType);
+			SObject person = TestDataFactory.organization(new Account(RecordTypeId = personType));
 			person.put('LastName', 'Okafor');
 			insert person;
 			Id personContactId = (Id) Database.query(
@@ -202,7 +202,7 @@ private class OpportunityMirrorCopyTest {
 			// Maria here also links appeals to Campaigns, which the Campaign Sync set grants.
 			User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Maria',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror', 'Campaign_Sync' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
@@ -281,10 +281,8 @@ private class OpportunityMirrorCopyTest {
 	static void aNewDonorReplacesThePrimaryContact() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User admin = maria();
-			Contact ana = new Contact(
-				FirstName = 'Ana',
-				LastName = 'Garcia',
-				AccountId = luis().AccountId
+			Contact ana = TestDataFactory.person(
+				new Contact(FirstName = 'Ana', LastName = 'Garcia', AccountId = luis().AccountId)
 			);
 			insert ana;
 			Gift__c given = gift(100);
@@ -379,17 +377,17 @@ private class OpportunityMirrorCopyTest {
 			// The link field comes with the permission set; Opportunity create does not.
 			User rosa = TestDataFactory.createUser(
 				'Rosa',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
 			System.runAs(new User(Id = UserInfo.getUserId())) {
 				update new User(Id = rosa.Id, ProfileId = readOnly[0].Id);
 			}
-			Account household = new Account(Name = 'The Ruiz Household', OwnerId = rosa.Id);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Ruiz Household', OwnerId = rosa.Id)
+			);
 			insert household;
-			Contact donor = new Contact(
-				LastName = 'Ruiz',
-				AccountId = household.Id,
-				OwnerId = rosa.Id
+			Contact donor = TestDataFactory.person(
+				new Contact(LastName = 'Ruiz', AccountId = household.Id, OwnerId = rosa.Id)
 			);
 			insert donor;
 			List<Gift__c> gifts = GivingTestDataFactory.buildGifts(donor.Id, 2, 10);
@@ -513,12 +511,17 @@ private class OpportunityMirrorCopyTest {
 	@IsTest
 	static void aSaverWhoCannotReadTheAppealsCampaignLeavesTheOpportunitysCampaign() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			// Ana links appeals to Campaigns; Maria sees Campaigns but not the appeal's Campaign ID.
+			// Ana links appeals to Campaigns; Mia sees Campaigns but not the appeal's Campaign ID.
+			// Salesforce Records Sync grants that field, so Mia holds Giving Admin and only the
+			// gift's Opportunity ID (Maria holds the whole set).
 			User ana = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Ana',
-				new List<String>{ 'Giving_Admin', 'Opportunity_Mirror', 'Campaign_Sync' }
+				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
-			User admin = maria();
+			User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
+				'Mia',
+				new List<String>{ 'Giving_Admin' }
+			);
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
 				return;
@@ -527,6 +530,24 @@ private class OpportunityMirrorCopyTest {
 				return; // Without Campaign there is no appeal Campaign to copy.
 			}
 			System.runAs(new User(Id = UserInfo.getUserId())) {
+				PermissionSet link = new PermissionSet(
+					Name = 'Zztest_Gift_Opportunity_Link',
+					Label = 'Zztest Gift Opportunity Link'
+				);
+				insert link;
+				insert new FieldPermissions(
+					ParentId = link.Id,
+					SobjectType = String.valueOf(Gift__c.SObjectType),
+					Field = String.valueOf(Gift__c.SObjectType) +
+						'.' +
+						NamespaceUtil.qualify('Opportunity_Id__c'),
+					PermissionsRead = true,
+					PermissionsEdit = true
+				);
+				insert new PermissionSetAssignment(
+					AssigneeId = admin.Id,
+					PermissionSetId = link.Id
+				);
 				update new List<User>{
 					new User(Id = ana.Id, UserPermissionsMarketingUser = true),
 					new User(Id = admin.Id, UserPermissionsMarketingUser = true)

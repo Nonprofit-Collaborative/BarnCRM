@@ -4,6 +4,7 @@ import getPage from '@salesforce/apex/RecurringHealthController.getPage';
 import createFollowUp from '@salesforce/apex/RecurringHealthController.createFollowUp';
 import { messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
+import { recordHref } from 'c/barnFormat';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import {
   REASON_CANCELLED,
@@ -17,8 +18,6 @@ import {
 
 const HELP = 'Giving';
 const UNMATCHED_CAP = 10000;
-
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 const number = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 2,

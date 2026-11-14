@@ -1,0 +1,605 @@
+{
+  "module": "CorporateHub",
+  "countLabel": "Documents",
+  "count": {
+    "object": "Hub_Document__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Hub_Document__c",
+      "records": [
+        {
+          "key": "coi",
+          "Name": "Conflict of Interest Policy",
+          "Type__c": "Policy",
+          "Status__c": "Active",
+          "Version__c": 2,
+          "Requires_Acknowledgment__c": true,
+          "Annual__c": true,
+          "Effective_Date__c": { "days": -200 },
+          "Last_Reviewed_On__c": { "days": -200 },
+          "Review_Months__c": 12,
+          "Review_Date__c": { "days": 165 },
+          "Summary__c": "Board members and staff disclose any interest that could affect a decision, and step back from it.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "bylaws",
+          "Name": "Bylaws",
+          "Type__c": "Governing Document",
+          "Status__c": "Active",
+          "Version__c": 3,
+          "Effective_Date__c": { "days": -400 },
+          "Last_Reviewed_On__c": { "days": -400 },
+          "Review_Months__c": 24,
+          "Review_Date__c": { "days": 330 },
+          "Summary__c": "How the board is chosen, how it meets and how it decides.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "whistle",
+          "Name": "Whistleblower Policy",
+          "Type__c": "Policy",
+          "Status__c": "Active",
+          "Version__c": 1,
+          "Requires_Acknowledgment__c": true,
+          "Effective_Date__c": { "days": -300 },
+          "Summary__c": "How to raise a concern about the organization without fear of retaliation.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "retention",
+          "Name": "Records Retention Procedure",
+          "Type__c": "Procedure",
+          "Status__c": "Draft",
+          "Version__c": 1,
+          "Summary__c": "How long each kind of record is kept and who destroys it. Waiting on board review.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "travel",
+          "Name": "Travel Reimbursement Policy (2019)",
+          "Type__c": "Policy",
+          "Status__c": "Retired",
+          "Version__c": 1,
+          "Effective_Date__c": { "days": -1500 },
+          "Retired_On__c": { "days": -380 },
+          "Summary__c": "Replaced by the expense policy in the staff handbook.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Policy_Acknowledgment__c",
+      "records": [
+        {
+          "Document__c": { "ref": "coi" },
+          "User__c": { "currentUser": true },
+          "Version__c": 2,
+          "Status__c": "Acknowledged",
+          "Requested_On__c": { "days": -30 },
+          "Acknowledged_On__c": { "days": -28, "time": "10:15" },
+          "Conflict_Disclosed__c": false
+        },
+        {
+          "Document__c": { "ref": "coi" },
+          "Person__c": { "sample": "H001-1" },
+          "Version__c": 2,
+          "Status__c": "Requested",
+          "Requested_On__c": { "days": -5 },
+          "Due_Date__c": { "days": 25 }
+        },
+        {
+          "Document__c": { "ref": "whistle" },
+          "Person__c": { "sample": "H002-1" },
+          "Version__c": 1,
+          "Status__c": "Requested",
+          "Requested_On__c": { "days": -5 },
+          "Due_Date__c": { "days": 25 }
+        }
+      ]
+    },
+    {
+      "object": "Compliance_Obligation__c",
+      "records": [
+        {
+          "key": "annualReport",
+          "Name": "State Annual Report",
+          "Category__c": "Corporate Filing",
+          "Recurrence__c": "Yearly",
+          "Status__c": "Active",
+          "Due_Date__c": { "days": 60 },
+          "Last_Completed_On__c": { "days": -305 },
+          "Reminder_Days__c": 30,
+          "Jurisdiction__c": "Example State",
+          "Instructions__c": "File online with the Secretary of State. The registered agent receives the notice.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "form990",
+          "Name": "Federal Form 990",
+          "Category__c": "Tax Filing",
+          "Recurrence__c": "Yearly",
+          "Status__c": "Active",
+          "Due_Date__c": { "days": 18 },
+          "Last_Completed_On__c": { "days": -340 },
+          "Reminder_Days__c": 30,
+          "Jurisdiction__c": "Federal",
+          "Instructions__c": "Treasurer reviews the draft with the accountant before the board sees it.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "charity",
+          "Name": "Charitable Solicitation Registration",
+          "Category__c": "Charitable Registration",
+          "Recurrence__c": "Yearly",
+          "Status__c": "Active",
+          "Due_Date__c": { "days": 140 },
+          "Reminder_Days__c": 45,
+          "Jurisdiction__c": "Example State",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "insurance",
+          "Name": "General Liability Insurance Renewal",
+          "Category__c": "Insurance",
+          "Recurrence__c": "Yearly",
+          "Status__c": "Active",
+          "Due_Date__c": { "days": 200 },
+          "Reminder_Days__c": 60,
+          "Sample_Data__c": true
+        },
+        {
+          "key": "audit",
+          "Name": "Annual Financial Review",
+          "Category__c": "Financial Review",
+          "Recurrence__c": "One Time",
+          "Status__c": "Done",
+          "Last_Completed_On__c": { "days": -90 },
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Compliance_Cycle__c",
+      "records": [
+        {
+          "Obligation__c": { "ref": "annualReport" },
+          "Outcome__c": "Done",
+          "Due_Date__c": { "days": -305 },
+          "Completed_On__c": { "days": -310 },
+          "Completed_By__c": { "currentUser": true },
+          "Notes__c": "Filed online, confirmation saved to the library."
+        },
+        {
+          "Obligation__c": { "ref": "form990" },
+          "Outcome__c": "Done Late",
+          "Due_Date__c": { "days": -347 },
+          "Completed_On__c": { "days": -340 },
+          "Completed_By__c": { "currentUser": true },
+          "Notes__c": "Filed on extension."
+        },
+        {
+          "Obligation__c": { "ref": "audit" },
+          "Outcome__c": "Done",
+          "Due_Date__c": { "days": -95 },
+          "Completed_On__c": { "days": -90 },
+          "Completed_By__c": { "currentUser": true }
+        }
+      ]
+    },
+    {
+      "object": "Agreement__c",
+      "records": [
+        {
+          "Name": "Consulting Services Agreement",
+          "Type__c": "Service Agreement",
+          "Status__c": "Active",
+          "Organization__c": { "sample": "O002", "optional": true },
+          "Start_Date__c": { "days": -180 },
+          "End_Date__c": { "days": 185 },
+          "Value__c": 24000,
+          "Auto_Renews__c": true,
+          "Renewal_Months__c": 12,
+          "Notice_Days__c": 60,
+          "Reminder_Days__c": 30,
+          "Terms__c": "Quarterly strategy sessions and one year-end report.",
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Partnership Memorandum of Understanding",
+          "Type__c": "Memorandum of Understanding",
+          "Status__c": "Active",
+          "Organization__c": { "sample": "O010", "optional": true },
+          "Start_Date__c": { "days": -90 },
+          "End_Date__c": { "days": 275 },
+          "Reminder_Days__c": 45,
+          "Terms__c": "The college hosts volunteer orientation; the nonprofit places student volunteers.",
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Operating Grant Agreement",
+          "Type__c": "Grant Agreement",
+          "Status__c": "Active",
+          "Organization__c": { "sample": "O006", "optional": true },
+          "Start_Date__c": { "days": -120 },
+          "End_Date__c": { "days": 245 },
+          "Value__c": 50000,
+          "Reminder_Days__c": 60,
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Office Lease",
+          "Type__c": "Lease",
+          "Status__c": "Active",
+          "Organization__c": { "sample": "O023", "optional": true },
+          "Start_Date__c": { "months": -20 },
+          "End_Date__c": { "days": 40 },
+          "Value__c": 36000,
+          "Auto_Renews__c": false,
+          "Notice_Days__c": 60,
+          "Reminder_Days__c": 60,
+          "Terms__c": "Renewal needs a decision before the notice date.",
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Event Venue Vendor Contract",
+          "Type__c": "Vendor Contract",
+          "Status__c": "Draft",
+          "Organization__c": { "sample": "O017", "optional": true },
+          "Start_Date__c": { "days": 30 },
+          "End_Date__c": { "days": 32 },
+          "Value__c": 3500,
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Processing_Activity__c",
+      "records": [
+        {
+          "Name": "Donor Records",
+          "Status__c": "Active",
+          "Lawful_Basis__c": "Legitimate Interests",
+          "Purpose__c": "Record gifts, send receipts and thank donors.",
+          "Data_Subjects__c": "Donors and prospective donors",
+          "Data_Categories__c": "Name, address, email, gift history",
+          "Recipients__c": "Development staff, the accountant",
+          "Retention__c": "Seven years after the last gift",
+          "Security_Measures__c": "Role-based access, multi-factor sign-in",
+          "Sample_Data__c": true
+        },
+        {
+          "Name": "Volunteer Applications",
+          "Status__c": "Active",
+          "Lawful_Basis__c": "Consent",
+          "Purpose__c": "Review applications and match volunteers to shifts.",
+          "Data_Subjects__c": "Volunteer applicants",
+          "Data_Categories__c": "Name, contact details, availability, background check result",
+          "Retention__c": "Two years after the last shift",
+          "Special_Category__c": false,
+          "DPIA_Required__c": false,
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Board__c",
+      "records": [
+        {
+          "key": "board",
+          "Name": "Board of Directors",
+          "Type__c": "Board",
+          "Status__c": "Active",
+          "Quorum_Percent__c": 51,
+          "Term_Months__c": 36,
+          "Term_Limit__c": 2,
+          "Needed_Skills__c": "Finance;Legal;Fundraising",
+          "Description__c": "Governs the organization and hires the executive director.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Board__c",
+      "records": [
+        {
+          "key": "finance",
+          "Name": "Finance Committee",
+          "Type__c": "Committee",
+          "Status__c": "Active",
+          "Parent_Board__c": { "ref": "board" },
+          "Quorum_Percent__c": 51,
+          "Description__c": "Reviews the budget, the financial statements and the annual review.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Board_Member__c",
+      "records": [
+        {
+          "Board__c": { "ref": "board" },
+          "Person__c": { "sample": "H001-1" },
+          "Role__c": "Chair",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -14 },
+          "Term_End__c": { "months": 22 },
+          "Term_Number__c": 1,
+          "Skills__c": "Governance;Community Connections"
+        },
+        {
+          "Board__c": { "ref": "board" },
+          "Person__c": { "sample": "H002-1" },
+          "Role__c": "Treasurer",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -14 },
+          "Term_End__c": { "months": 22 },
+          "Term_Number__c": 1,
+          "Skills__c": "Finance"
+        },
+        {
+          "Board__c": { "ref": "board" },
+          "Person__c": { "sample": "H003-1" },
+          "Role__c": "Secretary",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -26 },
+          "Term_End__c": { "months": 10 },
+          "Term_Number__c": 1,
+          "Skills__c": "Legal"
+        },
+        {
+          "Board__c": { "ref": "board" },
+          "Person__c": { "sample": "H004-1" },
+          "Role__c": "Member",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -8 },
+          "Term_End__c": { "months": 28 },
+          "Term_Number__c": 1,
+          "Skills__c": "Fundraising;Marketing and Communications"
+        },
+        {
+          "Board__c": { "ref": "board" },
+          "Person__c": { "sample": "H005-1" },
+          "Role__c": "Member",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -8 },
+          "Term_End__c": { "months": 28 },
+          "Term_Number__c": 1,
+          "Skills__c": "Program Expertise;Lived Experience"
+        },
+        {
+          "Board__c": { "ref": "finance" },
+          "Person__c": { "sample": "H002-1" },
+          "Role__c": "Chair",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -14 },
+          "Term_End__c": { "months": 10 },
+          "Term_Number__c": 1,
+          "Skills__c": "Finance"
+        },
+        {
+          "Board__c": { "ref": "finance" },
+          "Person__c": { "sample": "H004-1" },
+          "Role__c": "Member",
+          "Voting__c": true,
+          "Term_Start__c": { "months": -8 },
+          "Term_End__c": { "months": 10 },
+          "Term_Number__c": 1,
+          "Skills__c": "Fundraising"
+        }
+      ]
+    },
+    {
+      "object": "Board_Meeting__c",
+      "records": [
+        {
+          "key": "pastMeeting",
+          "Name": "Quarterly Board Meeting",
+          "Board__c": { "ref": "board" },
+          "Status__c": "Held",
+          "Start__c": { "days": -30, "time": "18:00" },
+          "Location__c": "Riverside Meeting Hall",
+          "Agenda__c": "1. Welcome and quorum\n2. Approve the annual budget\n3. Conflict of interest policy\n4. Committee reports",
+          "Minutes_Status__c": "Approved",
+          "Minutes_Approved_On__c": { "days": -2 },
+          "Minutes__c": "Quorum was present. The board approved the annual budget and tabled the records retention procedure for review."
+        },
+        {
+          "key": "nextMeeting",
+          "Name": "Quarterly Board Meeting",
+          "Board__c": { "ref": "board" },
+          "Status__c": "Planned",
+          "Start__c": { "days": 20, "time": "18:00" },
+          "Location__c": "Riverside Meeting Hall",
+          "Agenda__c": "1. Welcome and quorum\n2. Records retention procedure\n3. Audit results\n4. Lease renewal",
+          "Minutes_Status__c": "Draft"
+        },
+        {
+          "key": "financeMeeting",
+          "Name": "Finance Committee Meeting",
+          "Board__c": { "ref": "finance" },
+          "Status__c": "Held",
+          "Start__c": { "days": -12, "time": "17:00" },
+          "Location__c": "Video call",
+          "Agenda__c": "1. Review financial statements\n2. Audit scope",
+          "Minutes_Status__c": "Submitted for Approval",
+          "Minutes__c": "Statements reviewed. The committee asked the accountant to attend the next meeting."
+        }
+      ]
+    },
+    {
+      "object": "Meeting_Attendee__c",
+      "records": [
+        {
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Person__c": { "sample": "H001-1" },
+          "Attendance__c": "Present",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Person__c": { "sample": "H002-1" },
+          "Attendance__c": "Present",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Person__c": { "sample": "H003-1" },
+          "Attendance__c": "Present",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Person__c": { "sample": "H004-1" },
+          "Attendance__c": "Present",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Person__c": { "sample": "H005-1" },
+          "Attendance__c": "Excused",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "nextMeeting" },
+          "Person__c": { "sample": "H001-1" },
+          "Attendance__c": "Invited",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "nextMeeting" },
+          "Person__c": { "sample": "H002-1" },
+          "Attendance__c": "Invited",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "financeMeeting" },
+          "Person__c": { "sample": "H002-1" },
+          "Attendance__c": "Present",
+          "Voting__c": true
+        },
+        {
+          "Meeting__c": { "ref": "financeMeeting" },
+          "Person__c": { "sample": "H004-1" },
+          "Attendance__c": "Present",
+          "Voting__c": true
+        }
+      ]
+    },
+    {
+      "object": "Board_Motion__c",
+      "records": [
+        {
+          "key": "budgetMotion",
+          "Name": "Approve the annual budget",
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Status__c": "Passed",
+          "Resolution_Number__c": "R-1",
+          "Moved_By__c": { "sample": "H002-1" },
+          "Seconded_By__c": { "sample": "H003-1" },
+          "Decided_On__c": { "days": -30 },
+          "Text__c": "The board approves the annual operating budget as presented by the treasurer."
+        },
+        {
+          "Name": "Adopt the records retention procedure",
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Status__c": "Tabled",
+          "Moved_By__c": { "sample": "H003-1" },
+          "Seconded_By__c": { "sample": "H004-1" },
+          "Text__c": "The board adopts the records retention procedure. Tabled until the next meeting for review."
+        }
+      ]
+    },
+    {
+      "object": "Board_Vote__c",
+      "records": [
+        {
+          "Motion__c": { "ref": "budgetMotion" },
+          "Person__c": { "sample": "H001-1" },
+          "Vote__c": "For",
+          "Voted_On__c": { "days": -30, "time": "18:40" }
+        },
+        {
+          "Motion__c": { "ref": "budgetMotion" },
+          "Person__c": { "sample": "H002-1" },
+          "Vote__c": "For",
+          "Voted_On__c": { "days": -30, "time": "18:40" }
+        },
+        {
+          "Motion__c": { "ref": "budgetMotion" },
+          "Person__c": { "sample": "H003-1" },
+          "Vote__c": "For",
+          "Voted_On__c": { "days": -30, "time": "18:41" }
+        },
+        {
+          "Motion__c": { "ref": "budgetMotion" },
+          "Person__c": { "sample": "H004-1" },
+          "Vote__c": "Abstain",
+          "Voted_On__c": { "days": -30, "time": "18:41" }
+        }
+      ]
+    },
+    {
+      "object": "Meeting_Action_Item__c",
+      "records": [
+        {
+          "Name": "Send the revised retention procedure to the board",
+          "Board__c": { "ref": "board" },
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Assigned_To__c": { "sample": "H003-1" },
+          "Status__c": "Open",
+          "Due_Date__c": { "days": 10 }
+        },
+        {
+          "Name": "Collect conflict of interest forms",
+          "Board__c": { "ref": "board" },
+          "Meeting__c": { "ref": "pastMeeting" },
+          "Assigned_To__c": { "sample": "H001-1" },
+          "Status__c": "Done",
+          "Due_Date__c": { "days": -10 },
+          "Closed_On__c": { "days": -12 }
+        },
+        {
+          "Name": "Invite the accountant to the next finance meeting",
+          "Board__c": { "ref": "finance" },
+          "Meeting__c": { "ref": "financeMeeting" },
+          "Assigned_To__c": { "sample": "H002-1" },
+          "Status__c": "Open",
+          "Due_Date__c": { "days": 14 }
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Policy_Acknowledgment__c",
+      "where": "Document__r.Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Hub_Document__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Compliance_Obligation__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Agreement__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Processing_Activity__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Board_Meeting__c",
+      "where": "Board__r.Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Board__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

@@ -34,11 +34,11 @@ private class EventPaymentsTest {
 
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static FakePayments online(Boolean turnedOn) {
@@ -70,10 +70,8 @@ private class EventPaymentsTest {
 			Price__c = price,
 			Active__c = true
 		);
-		Contact jane = new Contact(
-			FirstName = 'Jane',
-			LastName = 'Payer',
-			Email = 'jane@example.org'
+		Contact jane = TestDataFactory.person(
+			new Contact(FirstName = 'Jane', LastName = 'Payer', Email = 'jane@example.org')
 		);
 		// An org's duplicate rule must not stop a test person sharing an email.
 		Database.DMLOptions options = new Database.DMLOptions();
@@ -115,7 +113,7 @@ private class EventPaymentsTest {
 		System.runAs(new User(Id = UserInfo.getUserId())) {
 			insert new EmailTemplate(
 				Name = 'Payment link',
-				DeveloperName = EventsSettings.DEFAULT_PAYMENT_LINK_TEMPLATE,
+				DeveloperName = EventsSettings.paymentLinkTemplate(),
 				TemplateType = 'text',
 				FolderId = UserInfo.getUserId(),
 				IsActive = true,

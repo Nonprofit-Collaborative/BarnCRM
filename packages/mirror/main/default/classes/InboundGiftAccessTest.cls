@@ -1,5 +1,5 @@
 /**
- * The Inbound Gift API permission set is all the integration user needs (X-03, ADR-0051): every
+ * The Inbound Gifts permission set is all the integration user needs (X-03, ADR-0051): every
  * test here runs as a user holding that set and nothing else, on the Standard User profile, and
  * records gifts through both entry points.
  *
@@ -16,7 +16,7 @@ private class InboundGiftAccessTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User integration = TestDataFactory.createUser(
 				'InboundOnly',
-				new List<String>{ 'Inbound_Gift_API' }
+				new List<String>{ 'Inbound_Gifts' }
 			);
 			TestDataFactory.pausedSettings(1);
 			insert new List<Fund__c>{
@@ -28,31 +28,36 @@ private class InboundGiftAccessTest {
 				)
 			};
 			insert new Appeal__c(Name = 'Spring Appeal');
-			Account household = new Account(
-				Name = 'The Garcia Household',
-				RecordTypeId = HouseholdService.householdRecordTypeId(),
-				OwnerId = integration.Id
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Garcia Household',
+					RecordTypeId = HouseholdService.householdRecordTypeId(),
+					OwnerId = integration.Id
+				)
 			);
-			Account riverside = new Account(
-				Name = 'Riverside Foundation',
-				OwnerId = integration.Id
+			Account riverside = TestDataFactory.organization(
+				new Account(Name = 'Riverside Foundation', OwnerId = integration.Id)
 			);
 			Database.insert(new List<Account>{ household, riverside }, AccessLevel.SYSTEM_MODE);
 			// Two people in one household, so a gift from Luis earns Maria an automatic household
 			// soft credit (R-SC3, on by default), which the integration user's save creates.
 			insert new List<Contact>{
-				new Contact(
-					FirstName = 'Luis',
-					LastName = 'Garcia',
-					Email = EMAIL,
-					AccountId = household.Id,
-					OwnerId = integration.Id
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Luis',
+						LastName = 'Garcia',
+						Email = EMAIL,
+						AccountId = household.Id,
+						OwnerId = integration.Id
+					)
 				),
-				new Contact(
-					FirstName = 'Maria',
-					LastName = 'Garcia',
-					AccountId = household.Id,
-					OwnerId = integration.Id
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Maria',
+						LastName = 'Garcia',
+						AccountId = household.Id,
+						OwnerId = integration.Id
+					)
 				)
 			};
 			BarnCRM_Settings__c running = TestDataFactory.defaultSettings();
@@ -193,28 +198,6 @@ private class InboundGiftAccessTest {
 				2,
 				[SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__r.Name = 'General Fund']
 			);
-		}
-	}
-
-	@IsTest
-	static void theActionSetOpensOnlyTheFlowAction() {
-		System.runAs(TestUsers.admin()) {
-			List<SetupEntityAccess> grants = [
-				SELECT SetupEntityId
-				FROM SetupEntityAccess
-				WHERE Parent.Name = 'Record_Inbound_Gift_Action' AND SetupEntityType = 'ApexClass'
-				WITH SYSTEM_MODE
-			];
-			List<ApexClass> action = [
-				SELECT Id
-				FROM ApexClass
-				WHERE Name = 'InboundGiftAction'
-				WITH SYSTEM_MODE
-			];
-
-			Assert.areEqual(1, action.size(), 'The action class is in the org');
-			Assert.areEqual(1, grants.size(), 'The set opens one class and nothing else');
-			Assert.areEqual(action[0].Id, grants[0].SetupEntityId, 'That class is the action');
 		}
 	}
 }

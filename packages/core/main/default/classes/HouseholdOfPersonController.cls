@@ -9,7 +9,7 @@
  * way for the same reason.
  */
 public with sharing class HouseholdOfPersonController {
-	private static final String CONTACT_SEARCH_WITHOUT_PERSON_ACCOUNTS = 'SELECT Id, Name FROM Contact WHERE Name LIKE :likeTerm AND IsPersonAccount = false ORDER BY Name LIMIT 10'; // detection-only: used only after isPersonAccountOrg found person accounts, so each such person is offered once, as the account
+	private static final String CONTACTS_WITHOUT_PERSON_ACCOUNTS = 'Contact(Id, Name WHERE IsPersonAccount = false ORDER BY Name LIMIT 10)'; // detection-only: used only after isPersonAccountOrg found person accounts, so each such person is offered once, as the account
 
 	/**
 	 * One household as the panel on a person's record shows it.
@@ -116,17 +116,16 @@ public with sharing class HouseholdOfPersonController {
 	@AuraEnabled(cacheable=true)
 	public static List<PersonResult> searchPeople(String searchTerm) {
 		List<PersonResult> result = new List<PersonResult>();
-		String trimmed = searchTerm == null ? '' : searchTerm.trim();
-		if (trimmed.length() < 2) {
+		String term = NameSearch.prefixTerm(searchTerm);
+		if (term == null) {
 			return result;
 		}
 		try {
-			String likeTerm = '%' + trimmed + '%';
 			if (HouseholdService.isPersonAccountOrg()) {
-				result.addAll(searchContactsWithoutPersonAccounts(likeTerm));
-				result.addAll(searchPersonAccounts(likeTerm));
+				result.addAll(searchContacts(term, CONTACTS_WITHOUT_PERSON_ACCOUNTS));
+				result.addAll(searchPersonAccounts(term));
 			} else {
-				result.addAll(searchContacts(likeTerm));
+				result.addAll(searchContacts(term, 'Contact(Id, Name ORDER BY Name LIMIT 10)'));
 			}
 			return result;
 		} catch (Exception e) {
@@ -277,36 +276,15 @@ public with sharing class HouseholdOfPersonController {
 		];
 	}
 
-	private static List<PersonResult> searchContacts(String likeTerm) {
-		List<PersonResult> result = new List<PersonResult>();
-		for (Contact record : [
-			SELECT Id, Name
-			FROM Contact
-			WHERE Name LIKE :likeTerm
-			WITH USER_MODE
-			ORDER BY Name
-			LIMIT 10
-		]) {
-			result.add(toPersonResult(record.Id, record.Name));
-		}
-		return result;
-	}
-
 	/**
-	 * Contacts that are people in their own right, in an org that also stores people as
-	 * accounts. The contact the platform keeps behind each such account is left out, because
-	 * that person is offered as the account (PEOPLE-7) and joins by the account side.
+	 * Contacts matched by name through the search index (D-200 P5). In an org that also
+	 * stores people as accounts, the contact the platform keeps behind each such account is
+	 * left out by the returning clause, because that person is offered as the account
+	 * (PEOPLE-7) and joins by the account side.
 	 */
-	private static List<PersonResult> searchContactsWithoutPersonAccounts(String likeTerm) {
+	private static List<PersonResult> searchContacts(String term, String returning) {
 		List<PersonResult> result = new List<PersonResult>();
-		Map<String, Object> binds = new Map<String, Object>{ 'likeTerm' => likeTerm };
-		for (
-			SObject record : Database.queryWithBinds(
-				CONTACT_SEARCH_WITHOUT_PERSON_ACCOUNTS,
-				binds,
-				AccessLevel.USER_MODE
-			)
-		) {
+		for (SObject record : NameSearch.find(term, returning)[0]) {
 			result.add(toPersonResult(record.Id, (String) record.get('Name')));
 		}
 		return result;
@@ -318,21 +296,19 @@ public with sharing class HouseholdOfPersonController {
 	 * it. A surname filter cannot: the platform matches LastName != NULL on business
 	 * accounts too.
 	 */
-	private static List<PersonResult> searchPersonAccounts(String likeTerm) {
+	private static List<PersonResult> searchPersonAccounts(String term) {
 		List<PersonResult> result = new List<PersonResult>();
 		Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
 		if (!Schema.SObjectType.Account.isAccessible() || personTypes.isEmpty()) {
 			return result;
 		}
-		for (Account record : [
-			SELECT Id, Name
-			FROM Account
-			WHERE Name LIKE :likeTerm AND RecordTypeId IN :personTypes
-			WITH USER_MODE
-			ORDER BY Name
-			LIMIT 10
-		]) {
-			result.add(toPersonResult(record.Id, record.Name));
+		// Record type ids are platform ids, never user input, so they are safe inline.
+		String returning =
+			'Account(Id, Name WHERE RecordTypeId IN (\'' +
+			String.join(new List<Id>(personTypes), '\',\'') +
+			'\') ORDER BY Name LIMIT 10)';
+		for (SObject record : NameSearch.find(term, returning)[0]) {
+			result.add(toPersonResult(record.Id, (String) record.get('Name')));
 		}
 		return result;
 	}

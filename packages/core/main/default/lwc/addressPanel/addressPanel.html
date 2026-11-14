@@ -180,7 +180,7 @@
             ></lightning-input-field>
             <template lwc:if={isFirstAddress}>
               <lightning-input-field
-                field-name="Is_Default__c"
+                field-name={isDefaultField}
                 value={isFirstAddress}
                 class="slds-hide"
                 data-id="first-address-default"
@@ -189,7 +189,7 @@
             <template lwc:else>
               <!-- A new address saved as the primary is a move: it ends the old one (R-AD10). -->
               <lightning-input-field
-                field-name="Is_Default__c"
+                field-name={isDefaultField}
                 data-id="new-address-primary"
               ></lightning-input-field>
             </template>

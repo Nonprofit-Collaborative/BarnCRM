@@ -78,7 +78,9 @@ private class DataJobsTest {
 				Undo_Deadline__c = Datetime.now().addDays(1)
 			);
 			insert job;
-			Contact changed = new Contact(LastName = 'Okafor', MailingCity = 'Portland');
+			Contact changed = TestDataFactory.person(
+				new Contact(LastName = 'Okafor', MailingCity = 'Portland')
+			);
 			insert changed;
 			ImportJournalService.write(
 				job.Id,

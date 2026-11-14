@@ -45,6 +45,16 @@
   </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Cohort__c.End_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Cohort__c.Start_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Enrollment__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -283,16 +293,15 @@
     <field>Service_Count__c.Note__c</field>
     <readable>true</readable>
   </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Cohort__c.End_Date__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Cohort__c.Start_Date__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Cohort__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
@@ -374,15 +383,10 @@
     <object>Service_Count__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
-  <objectPermissions>
-    <allowCreate>false</allowCreate>
-    <allowDelete>false</allowDelete>
-    <allowEdit>false</allowEdit>
-    <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
-    <object>Cohort__c</object>
-    <viewAllRecords>false</viewAllRecords>
-  </objectPermissions>
+  <tabSettings>
+    <tab>Cohort__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Enrollment__c</tab>
     <visibility>Visible</visibility>
@@ -400,6 +404,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Record_Service</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Service_Delivery__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
@@ -409,10 +417,6 @@
   </tabSettings>
   <tabSettings>
     <tab>Service_Count__c</tab>
-    <visibility>Visible</visibility>
-  </tabSettings>
-  <tabSettings>
-    <tab>Cohort__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

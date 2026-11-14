@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Submitted time and expenses waiting for the project manager: approve or reject by entry or by
+    a person's week.
+  </description>
+  <label>Approvals</label>
+  <lwcComponent>projectsApprovals</lwcComponent>
+  <motif>Custom46: Stamp</motif>
+</CustomTab>

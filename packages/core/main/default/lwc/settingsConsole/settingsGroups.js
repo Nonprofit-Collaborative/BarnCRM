@@ -173,9 +173,9 @@ const PAGE_GROUPS = {
       ]
     },
     {
-      id: 'Nightly Jobs and Accounting Periods',
+      id: 'Accounting Periods',
       label: GIVING_JOBS,
-      keys: ['Giving_Nightly_Jobs', 'Giving_Accounting_Periods']
+      keys: ['Giving_Accounting_Periods']
     },
     {
       id: 'BarnCRM Mirror',
@@ -228,7 +228,13 @@ const PAGE_GROUPS = {
       id: 'Rollup Processing',
       label: ROLLUP_PROCESSING,
       fallback: true,
-      keys: ['Rollup_Mode_Default__c', 'Rollup_Processing__c', 'Nightly_Run_Hour__c']
+      keys: [
+        'Rollup_Mode_Default__c',
+        'Rollup_Processing__c',
+        'Nightly_Run_Hour__c',
+        'Full_Recalc_Day__c',
+        'Large_Parent_Hours__c'
+      ]
     },
     { id: 'Rollup Builder', label: ROLLUP_BUILDER, keys: ['Rollup_Definitions'] }
   ],

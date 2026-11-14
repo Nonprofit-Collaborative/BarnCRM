@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Billing_Amount_On_Milestone</fullName>
+  <active>true</active>
+  <description>R-PM18: a billing amount is 0 or more, on a milestone.</description>
+  <errorConditionFormula>AND(NOT(ISBLANK(Billing_Amount__c)), OR(NOT(Milestone__c), Billing_Amount__c &lt; 0))</errorConditionFormula>
+  <errorDisplayField>Billing_Amount__c</errorDisplayField>
+  <errorMessage>A Billing Amount goes on a milestone and cannot be negative.</errorMessage>
+</ValidationRule>

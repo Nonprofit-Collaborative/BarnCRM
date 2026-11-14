@@ -11,10 +11,10 @@
         <template lwc:if={hasProjects}>
           <ul class="slds-has-dividers_bottom-space">
             <template for:each={projects} for:item="row">
-              <li key={row.Id} class="slds-item" data-id="row">
-                <a href={row.href}>{row.Name}</a>
-                <span class={row.badgeClass}>{row.Health__c}</span>
-                <span class="slds-text-color_weak slds-var-m-left_x-small">{row.Owner.Name}</span>
+              <li key={row.id} class="slds-item" data-id="row">
+                <a href={row.href}>{row.name}</a>
+                <span class={row.badgeClass}>{row.health}</span>
+                <span class="slds-text-color_weak slds-var-m-left_x-small">{row.ownerName}</span>
                 <p class="slds-text-color_weak">{row.reasons}</p>
               </li>
             </template>

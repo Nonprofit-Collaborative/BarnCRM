@@ -115,7 +115,13 @@ the line "This automation enforces a rule, so it always runs. It cannot be switc
 here and a pause does not suspend it." Clicking the switch does nothing, and if a change
 somehow reaches the server it is refused with the same explanation.
 
-Three ship today, all with the Giving module, so an org with Core alone has none:
+Core ships one, which keeps something correct rather than refusing anything:
+
+- **Address match key** keeps each address's Match Key in step with its street and postal
+  code, so duplicate matching finds addresses through an index. A key a pause left stale
+  would hide a duplicate, so it always runs. See [Duplicates](duplicates.md).
+
+Three more ship with the Giving module:
 
 - **Gift: receipt lock** refuses a change to the amount, the date, the donor or the receipt
   number of a gift that carries a receipt number, and refuses to delete such a gift. That

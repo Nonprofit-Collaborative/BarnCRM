@@ -18,6 +18,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the BarnCRM app. | Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs, before Error Log. |
+| 1a | Before any board or committee exists, open the **Corporate Hub** page as admin. | **Set Up Your Board** shows. **New Board or Committee** opens the new record form. After the first board is saved and the page reloaded, the panel is gone. |
 | 2 | Open Setup, the staff user's permission set assignments. | Corporate Hub Staff is assigned (within the hour, or after Finish Setup). |
 | 3 | Open the Compliance Obligations tab, All. | Eight template obligations, each Status Off, including Annual tax return (US: IRS Form 990 series) and the two Data Protection ones. |
 | 4 | Open the Library Documents tab, All. | Eight Draft policies: conflict of interest, whistleblower, document retention and destruction, gift acceptance, data protection, privacy notice, data subject request procedure, personal data breach response procedure. Each summary says it is not legal advice. |
@@ -170,8 +171,10 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 3 | As the staff user change a vote. | Refused: "Voting on this motion is closed." As the admin it saves. |
 | 4 | Press **Close Voting** again on the closed motion. | Refused: "Voting is not open on this motion, so it cannot be closed." Status and Decided On are unchanged. |
 | 5 | On a motion that was never opened, press **Close Voting**. | The same refusal. |
+| 6 | Confirm step 2 gave no warning and Closed Without Quorum is unticked on that motion (Ade and Bea were Present). | No warning toast; no "Closed without quorum" under the motion. |
+| 7 | On a second meeting where nobody is Present, add a motion, press **Open Voting**, cast one vote For, press **Close Voting** (CH-21, D-196). | "Voting closed: Passed." plus a warning: "This meeting did not reach quorum. Check your bylaws before relying on this vote." The motion shows "Closed without quorum" and its Closed Without Quorum box is ticked. |
 
-**Cleanup:** None.
+**Cleanup:** Delete the second meeting.
 
 ## T-CH-12: Disclosures and Self-Assessment
 
@@ -227,13 +230,32 @@ Admin) and a second user with the Team Member role, called the staff user below.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open **Data Breaches** and create one: Breach Title "Lost laptop". | Status Open, Risk Not Yet Assessed, Discovered At now, Authority Deadline 72 hours later. |
+| 1 | From the App Launcher, open **Data Breaches** and create one: Breach Title "Lost laptop". | Status Open, Risk Not Yet Assessed, Discovered At now, Authority Deadline 72 hours later. The owner gets a bell at once ("Breach Lost laptop: report to the authority by ...") and Reminded For is the deadline date (CH-22, D-196). |
 | 2 | Set Status Closed and save. | Refused while the risk is Not Yet Assessed. Set Status back to Open. |
 | 3 | Open the Corporate Hub page. | Data Protection lists "Breach not yet reported: Lost laptop". |
-| 4 | Create a second breach with Risk **Unlikely to Result in Risk**. | It is not listed on the Corporate Hub page. |
+| 4 | Create a second breach with Risk **Unlikely to Result in Risk**. | It is not listed on the Corporate Hub page, and no bell is sent. |
 | 5 | Open the Processing Activity "Donor records and fundraising": tick DPIA Required, DPIA Review Date in 10 days, Status Active. | Saved. |
-| 6 | Run **Corporate Hub reminders** now. | Two bell notifications: the first breach ("report to the authority by ...") and the DPIA review. None for the low-risk breach. |
+| 6 | Run **Corporate Hub reminders** now. | One bell notification: the DPIA review. None for the first breach (already told in step 1) or the low-risk breach. |
 | 7 | Run it again. | No new notification. |
 | 8 | Fill in Authority Notified At on the first breach. | It leaves the Corporate Hub page. |
+| 9 | On the Automations page turn off **Data Breach: Bell When Logged**, then create a breach "Phishing email" with Risk **Risk**. | No bell on saving. Run **Corporate Hub reminders**: one bell for "Phishing email". Turn the row back on. |
 
-**Cleanup:** Delete the two breaches; set the activity back to Draft and untick DPIA Required.
+**Cleanup:** Delete the three breaches; set the activity back to Draft and untick DPIA Required.
+
+## T-CH-16: Sample Data
+
+**Purpose:** confirm the Corporate Hub sample data loads for the sample people and takes away only
+itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; a Library Document of your own.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Documents** count of `5`. |
+| 2 | Open **Library Documents** and **Compliance Obligations**. | Five sample documents and five obligations beside your own. |
+| 3 | Open the Conflict of Interest Policy. | One acknowledgment Acknowledged and one Requested. |
+| 4 | Open **Boards**, then the Board of Directors. | Five seats (Chair, Treasurer, Secretary, two Members) and a Finance Committee under it. |
+| 5 | Open the past Quarterly Board Meeting. | Four Present, one Excused, quorum met, minutes Approved; the budget motion Passed with three For and one Abstain. |
+| 6 | **Remove Sample Data**. | Every sample record above is gone; your own document stays. |
+
+**Cleanup:** None.

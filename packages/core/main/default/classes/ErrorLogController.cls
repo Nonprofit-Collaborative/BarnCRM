@@ -6,6 +6,12 @@
  * changes.
  */
 public with sharing class ErrorLogController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		'Core',
+		'Core_ErrorLog_ActionFailed'
+	);
+
 	private static final Integer DEFAULT_ROWS = 5;
 
 	/** The tile counts this many and then says "more". A test lowers it. */
@@ -30,6 +36,9 @@ public with sharing class ErrorLogController {
 		public String status { get; set; }
 		@AuraEnabled
 		public Datetime occurredAt { get; set; }
+		/** How many times this failure happened: repeats are folded onto one entry (R-E7). */
+		@AuraEnabled
+		public Integer occurrences { get; set; }
 	}
 
 	/**
@@ -52,7 +61,7 @@ public with sharing class ErrorLogController {
 		try {
 			return currentTile(rowCount);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Error Log tile');
+			throw ERRORS.wrap(caught, 'Error Log tile');
 		}
 	}
 
@@ -66,18 +75,52 @@ public with sharing class ErrorLogController {
 			}
 			return currentTile(DEFAULT_ROWS);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Mark an error acknowledged');
+			throw ERRORS.wrap(caught, 'Mark an error acknowledged');
 		}
 	}
 
-	private static Error_Log__c validatedEntry(String errorLogId) {
+	/**
+	 * What "Copy for Bug Report" turns into text (QA review Q10): where and when it happened,
+	 * how often, and, for someone who may read it, the technical detail. Never the message or
+	 * the record: c/bugReportText keeps only error codes and stack lines from the detail, so
+	 * the copied text holds no names, emails or record data.
+	 */
+	@AuraEnabled
+	public static Map<String, Object> getBugReport(String errorLogId) {
+		try {
+			Error_Log__c entry = ErrorLogSelector.selectForBugReport(entryIdOf(errorLogId));
+			if (entry == null) {
+				throw new ErrorLogControllerException(
+					BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
+				);
+			}
+			return new Map<String, Object>{
+				'context' => entry.Context__c,
+				'severity' => entry.Severity__c,
+				'occurredAt' => entry.Timestamp__c,
+				'occurrences' => entry.Occurrences__c,
+				'objectName' => entry.Object_Name__c,
+				'technicalDetail' => entry.getPopulatedFieldsAsMap().get('Technical_Detail__c')
+			};
+		} catch (Exception caught) {
+			throw ERRORS.wrap(caught, 'Copy an error for a bug report');
+		}
+	}
+
+	private static Id entryIdOf(String errorLogId) {
 		Id entryId = asRecordId(errorLogId);
 		if (entryId == null || entryId.getSObjectType() != Error_Log__c.SObjectType) {
 			throw new ErrorLogControllerException(
 				BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
 			);
 		}
-		List<Error_Log__c> found = ErrorLogSelector.selectByIds(new Set<Id>{ entryId });
+		return entryId;
+	}
+
+	private static Error_Log__c validatedEntry(String errorLogId) {
+		List<Error_Log__c> found = ErrorLogSelector.selectByIds(
+			new Set<Id>{ entryIdOf(errorLogId) }
+		);
 		if (found.isEmpty()) {
 			throw new ErrorLogControllerException(
 				BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
@@ -115,18 +158,10 @@ public with sharing class ErrorLogController {
 			view.severity = entry.Severity__c;
 			view.status = entry.Status__c;
 			view.occurredAt = entry.Timestamp__c;
+			view.occurrences = entry.Occurrences__c == null ? 1 : entry.Occurrences__c.intValue();
 			tile.recent.add(view);
 		}
 		return tile;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof ErrorLogControllerException,
-			context,
-			BarnHelp.text('Core', 'Core_ErrorLog_ActionFailed')
-		);
 	}
 
 	public class ErrorLogControllerException extends Exception {

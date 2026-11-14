@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>PayPal_Product_Id__c</fullName>
+  <description>The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout (canonical model R-PAY7). Written by Payments only; not a secret.</description>
+  <externalId>false</externalId>
+  <label>PayPal Product Id</label>
+  <length>50</length>
+  <required>false</required>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

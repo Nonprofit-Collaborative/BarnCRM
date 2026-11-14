@@ -1,8 +1,9 @@
 /**
  * What the Setup Changes section works out without the server or the framework (plan 9.9): the
  * table and CSV columns, the summary line and the filter values sent to the server. Labels,
- * the locale and the time zone are passed in, so this module imports nothing.
+ * the locale and the time zone are passed in, so this module imports only the pure c/barnFormat.
  */
+import { utcIsoDate } from 'c/barnFormat';
 
 /** The table's columns: When, who, logged in as, where, and Salesforce's own sentence. */
 export function tableColumns(labels) {
@@ -56,7 +57,7 @@ export function dayText(value, locale, timeZone) {
   try {
     return new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone }).format(when);
   } catch {
-    return when.toISOString().slice(0, 10);
+    return utcIsoDate(when);
   }
 }
 

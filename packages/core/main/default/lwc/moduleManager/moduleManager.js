@@ -135,6 +135,10 @@ export default class ModuleManager extends LightningElement {
         isOn: module.canSwitch && module.status === 'On',
         isOff: module.canSwitch && module.status === 'Off',
         setupPending: module.status !== 'NotInstalled' && module.setupPending === true,
+        showFinishSetup:
+          module.status !== 'NotInstalled' &&
+          module.setupPending === true &&
+          Boolean(this.state && (this.state.canEdit || this.state.canFinishSetup)),
         showInstall: module.status === 'NotInstalled' && Boolean(module.installUrl),
         noInstallLink: module.status === 'NotInstalled' && !module.installUrl,
         installFirstText:

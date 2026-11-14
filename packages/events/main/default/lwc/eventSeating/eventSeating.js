@@ -5,6 +5,7 @@ import saveTable from '@salesforce/apex/EventSeatingController.saveTable';
 import deleteTable from '@salesforce/apex/EventSeatingController.deleteTable';
 import assignSeats from '@salesforce/apex/EventSeatingController.assignSeats';
 import saveNeeds from '@salesforce/apex/EventSeatingController.saveNeeds';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { localIsoDate, messageFrom, saveBlob } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import {
@@ -325,6 +326,18 @@ export default class EventSeating extends LightningElement {
 
   async handleDeleteTable(event) {
     const id = event.currentTarget.dataset.id;
+    const table = this.tables.find((candidate) => candidate.id === id);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Events', 'Events_Seating_RemoveTitle'),
+      message: helpText('Events', 'Events_Seating_RemoveConfirm', table ? table.name : ''),
+      confirmLabel: helpText('Events', 'Events_Seating_Remove'),
+      confirmVariant: 'destructive',
+      cancelLabel: helpText('Events', 'Events_Seating_Cancel')
+    });
+    if (!confirmed) {
+      return;
+    }
     await this.run(() => deleteTable({ tableId: id }));
   }
 

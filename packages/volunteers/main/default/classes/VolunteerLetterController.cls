@@ -5,6 +5,11 @@
  */
 public with sharing class VolunteerLetterController {
 	private static final String CONTEXT = 'Volunteer letter action';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Volunteers',
+		'Volunteers_Letter_ActionFailed'
+	);
 
 	/** What the action shows when it opens. */
 	@AuraEnabled(cacheable=true)
@@ -72,7 +77,7 @@ public with sharing class VolunteerLetterController {
 			VolunteerLetterBatch.startFor(templateId, fromDate, toDate, new List<Id>(people));
 			return people.size();
 		} catch (Exception failure) {
-			throw report(failure, templateId);
+			throw ERRORS.wrap(failure, CONTEXT, templateId);
 		}
 	}
 
@@ -125,7 +130,7 @@ public with sharing class VolunteerLetterController {
 				'skipReason' => letter.skipReason
 			};
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -149,7 +154,7 @@ public with sharing class VolunteerLetterController {
 				'skipReason' => outcome.skipped.get(recordId)
 			};
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -163,16 +168,5 @@ public with sharing class VolunteerLetterController {
 			labels.put(entry.getValue(), entry.getLabel());
 		}
 		return labels;
-	}
-
-	/** A refusal the service names is passed on as it is; anything else is logged first. */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		return UserErrors.wrap(
-			failure,
-			failure instanceof VolunteerLetterService.VolunteerLetterException,
-			CONTEXT,
-			recordId,
-			BarnHelp.text('Volunteers', 'Volunteers_Letter_ActionFailed')
-		);
 	}
 }

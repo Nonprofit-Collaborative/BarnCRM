@@ -7,5 +7,6 @@
     <values><field>Execution_Order__c</field><value xsi:type="xsd:double">90</value></values>
     <values><field>Enabled_By_Default__c</field><value xsi:type="xsd:boolean">true</value></values>
     <values><field>Module__c</field><value xsi:type="xsd:string">Rollups</value></values>
+    <values><field>Runs_On_Rollup_Writes__c</field><value xsi:type="xsd:boolean">true</value></values>
     <values><field>Description__c</field><value xsi:type="xsd:string">Keeps household and person totals current when a person is added, changed, moved to another household, or removed.</value></values>
 </CustomMetadata>

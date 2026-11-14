@@ -18,6 +18,13 @@
  * written back from describe, so nothing typed reaches the code or the package files.
  */
 public with sharing class RollupInstantTotals {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			'RollupInstantTotals',
+			'Rollups',
+			'Core_Rollups_UnexpectedError'
+		)
+		.showingDml();
+
 	public static final String STATUS_BUILT_IN = 'builtIn';
 	public static final String STATUS_ON = 'on';
 	public static final String STATUS_OFF = 'off';
@@ -120,7 +127,7 @@ public with sharing class RollupInstantTotals {
 			}
 			return sortedByLabel(states);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -130,7 +137,7 @@ public with sharing class RollupInstantTotals {
 		try {
 			return stateOf(requireType(objectApiName));
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -190,7 +197,7 @@ public with sharing class RollupInstantTotals {
 			code.removalPackage = EncodingUtil.base64Encode(removalPackage(name));
 			return code;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -210,7 +217,7 @@ public with sharing class RollupInstantTotals {
 			AutomationControl.ensureSwitch(
 				automationName,
 				String.format(
-					Label.Core_RollupBuilder_InstantSwitchName,
+					Label.Rollups_RollupBuilder_InstantSwitchName,
 					new List<Object>{ objectLabel }
 				),
 				name,
@@ -222,7 +229,7 @@ public with sharing class RollupInstantTotals {
 			AutomationControl.setEnabled(automationName, turnedOn == true);
 			return stateOf(type);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -549,20 +556,5 @@ public with sharing class RollupInstantTotals {
 			sorted.add(byKey.get(key));
 		}
 		return sorted;
-	}
-
-	private static AuraHandledException asUserError(Exception caught) {
-		Boolean shown =
-			caught instanceof RollupService.RollupServiceException ||
-			caught instanceof AutomationControl.AutomationControlException;
-		if (!shown && caught instanceof DmlException) {
-			return UserErrors.message(((DmlException) caught).getDmlMessage(0));
-		}
-		return UserErrors.wrap(
-			caught,
-			shown,
-			'RollupInstantTotals',
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
-		);
 	}
 }

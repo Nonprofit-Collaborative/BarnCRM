@@ -14,6 +14,12 @@
  * `NPSP_` and the NPSP rollup's name. NPSP is never changed either.
  */
 public with sharing class RollupDlrsImport {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		'RollupDlrsImport',
+		'Rollups',
+		'Core_Rollups_UnexpectedError'
+	);
+
 	/** What a copy's Definition Key starts with, before the DLRS rollup's name. */
 	public static final String KEY_PREFIX = 'DLRS_';
 	/** The same for a copy of an NPSP customizable rollup. */
@@ -137,7 +143,7 @@ public with sharing class RollupDlrsImport {
 			requirePermission();
 			return candidates(null, tool == TOOL_NPSP);
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -164,7 +170,7 @@ public with sharing class RollupDlrsImport {
 			}
 			return rows;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -183,7 +189,7 @@ public with sharing class RollupDlrsImport {
 			}
 			return comparisons;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -217,7 +223,7 @@ public with sharing class RollupDlrsImport {
 			row.outcome = ACTIVE;
 			return row;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -790,15 +796,5 @@ public with sharing class RollupDlrsImport {
 		if (!BarnCRMPermissions.canManageSettings()) {
 			throw refusal(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
-	}
-
-	/** A message the page can show; anything it cannot explain is logged. */
-	private static AuraHandledException asUserError(Exception caught) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof RollupService.RollupServiceException,
-			'RollupDlrsImport',
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
-		);
 	}
 }

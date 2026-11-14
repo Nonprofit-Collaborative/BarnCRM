@@ -211,12 +211,23 @@ public with sharing class BrandShareJob implements Queueable {
 			return;
 		}
 		Set<String> wanted = new Set<String>();
-		for (Brand_Assignment__c row : [
+		// Two queries, each on one indexed lookup, merged here: an OR across the Account and
+		// the Contact's Account cannot use either index and scans every assignment (D-200 P13).
+		List<Brand_Assignment__c> rows = [
 			SELECT Brand__c, Account__c, Contact__r.AccountId
 			FROM Brand_Assignment__c
-			WHERE Account__c IN :accountIds OR Contact__r.AccountId IN :accountIds
+			WHERE Account__c IN :accountIds
 			WITH SYSTEM_MODE
-		]) {
+		];
+		rows.addAll(
+			[
+				SELECT Brand__c, Account__c, Contact__r.AccountId
+				FROM Brand_Assignment__c
+				WHERE Contact__r.AccountId IN :accountIds AND Account__c = NULL
+				WITH SYSTEM_MODE
+			]
+		);
+		for (Brand_Assignment__c row : rows) {
 			Id groupId = groups.get(row.Brand__c);
 			Id accountId = row.Account__c != null ? row.Account__c : row.Contact__r.AccountId;
 			if (groupId != null && accountIds.contains(accountId)) {

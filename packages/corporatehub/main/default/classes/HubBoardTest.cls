@@ -31,7 +31,7 @@ private class HubBoardTest {
 		insert as user board;
 		List<Contact> people = new List<Contact>();
 		for (String name : new List<String>{ 'Ade', 'Bea', 'Cy', 'Dee' }) {
-			people.add(new Contact(FirstName = name, LastName = 'Member'));
+			people.add(TestDataFactory.person(new Contact(FirstName = name, LastName = 'Member')));
 		}
 		insert as user people;
 		List<Board_Member__c> seats = new List<Board_Member__c>();
@@ -131,25 +131,61 @@ private class HubBoardTest {
 			votes[1].Vote__c = 'For';
 			votes[2].Vote__c = 'Against';
 			update as user votes;
-			Assert.areEqual(
-				'Passed',
-				HubBoardController.closeVoting(motion.Id),
-				'Two for, one against'
-			);
+			HubBoard.CloseResult result = HubBoardController.closeVoting(motion.Id);
+			Assert.areEqual('Passed', result.outcome, 'Two for, one against');
 			Board_Motion__c closed = [
-				SELECT Decided_On__c, Votes_For__c
+				SELECT Decided_On__c, Votes_For__c, Closed_Without_Quorum__c
 				FROM Board_Motion__c
 				WHERE Id = :motion.Id
 				WITH USER_MODE
 			];
 			Assert.areEqual(Date.today(), closed.Decided_On__c, 'Decided today');
 			Assert.areEqual(2, closed.Votes_For__c, 'Counted by roll-up');
+			// CH-21: nobody was marked present, so the vote still counts but warns.
+			Assert.isNotNull(result.warning, 'No quorum warns');
+			Assert.isTrue(closed.Closed_Without_Quorum__c, 'The motion records it');
 			try {
 				HubBoard.closeVoting(motion.Id);
 				Assert.fail('A closed motion cannot be closed again');
 			} catch (HubPolicy.PolicyException expected) {
 				Assert.isNotNull(expected.getMessage(), 'Told why');
 			}
+		}
+	}
+
+	@IsTest
+	static void closingWithQuorumGivesNoWarning() {
+		System.runAs(maria()) {
+			Board_Meeting__c meeting = meeting(board().Id, 0);
+			HubBoard.inviteBoard(meeting.Id);
+			for (Meeting_Attendee__c attendee : [
+				SELECT Id
+				FROM Meeting_Attendee__c
+				WHERE Meeting__c = :meeting.Id
+				WITH USER_MODE
+			]) {
+				HubBoardController.setAttendance(attendee.Id, 'Present');
+			}
+			Board_Motion__c motion = new Board_Motion__c(
+				Meeting__c = meeting.Id,
+				Name = 'Approve the budget',
+				Status__c = 'Proposed'
+			);
+			insert as user motion;
+			HubBoard.openVoting(motion.Id);
+			HubBoard.CloseResult result = HubBoard.closeVoting(motion.Id);
+			Assert.areEqual('Failed', result.outcome, 'No votes were cast');
+			Assert.isNull(result.warning, 'Quorum was met');
+			Assert.isFalse(
+				[
+					SELECT Closed_Without_Quorum__c
+					FROM Board_Motion__c
+					WHERE Id = :motion.Id
+					WITH USER_MODE
+				]
+				.Closed_Without_Quorum__c,
+				'Not flagged'
+			);
 		}
 	}
 
@@ -357,7 +393,7 @@ private class HubBoardTest {
 	@IsTest
 	static void anUnexpectedFailureIsShownAsOneMessage() {
 		System.runAs(maria()) {
-			Contact notABoard = new Contact(LastName = 'Member');
+			Contact notABoard = TestDataFactory.person(new Contact(LastName = 'Member'));
 			insert as user notABoard;
 
 			String message;

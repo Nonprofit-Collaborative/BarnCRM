@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_RollupBuilder_InstantTitle</fullName>
+        <fullName>Rollups_RollupBuilder_InstantTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -9,7 +9,7 @@
         <value>Instant Totals</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantTurnOn</fullName>
+        <fullName>Rollups_RollupBuilder_InstantTurnOn</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -17,7 +17,7 @@
         <value>Turn On Instant Totals</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantTurnOff</fullName>
+        <fullName>Rollups_RollupBuilder_InstantTurnOff</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -25,7 +25,7 @@
         <value>Turn Off Instant Totals</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantRemove</fullName>
+        <fullName>Rollups_RollupBuilder_InstantRemove</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -33,7 +33,7 @@
         <value>Remove the Trigger</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantCopied</fullName>
+        <fullName>Rollups_RollupBuilder_InstantCopied</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -41,7 +41,7 @@
         <value>Copied.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantDownloadDeploy</fullName>
+        <fullName>Rollups_RollupBuilder_InstantDownloadDeploy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -49,7 +49,7 @@
         <value>Download Deploy Package</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantDownloadRemoval</fullName>
+        <fullName>Rollups_RollupBuilder_InstantDownloadRemoval</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -57,7 +57,7 @@
         <value>Download Removal Package</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantSetupTitle</fullName>
+        <fullName>Rollups_RollupBuilder_InstantSetupTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -65,7 +65,7 @@
         <value>Turn On Instant Totals for {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantRemoveTitle</fullName>
+        <fullName>Rollups_RollupBuilder_InstantRemoveTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -73,7 +73,7 @@
         <value>Remove the Trigger for {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantTriggerHeading</fullName>
+        <fullName>Rollups_RollupBuilder_InstantTriggerHeading</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
@@ -81,7 +81,7 @@
         <value>Trigger</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantTestHeading</fullName>
+        <fullName>Rollups_RollupBuilder_InstantTestHeading</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>

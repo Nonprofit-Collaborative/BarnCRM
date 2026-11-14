@@ -37,8 +37,11 @@ into a household.
 
 1. Open the household and click the **Connections** tab. Find the **Members** card.
 2. Click **Add Member**. The **Add Member** dialog opens.
-3. Either search under **Add Someone Already in Salesforce** (type in **Search by name** and
-   choose the person), or fill in **Salutation**, **First Name** and **Last Name** (and,
+3. Either search under **Add Someone Already in Salesforce** (type in **Search by name**, at
+   least two letters from the start of a word in their name, and
+   choose the person; the search matches the start of words, so "gar" finds Ana Garcia but
+   "cia" does not, and someone saved in the last few minutes may not be found yet, because
+   Salesforce takes a few minutes to add a new record to search), or fill in **Salutation**, **First Name** and **Last Name** (and,
    if you like, **Email** and **Phone**) under **Or Add Someone New**. If the person you choose is in another
    household, a line names it, for example "Ana Garcia is in The Lopez Family and will move to
    this household." Click **Save** to confirm, or **Cancel** to leave them where they are.
@@ -173,6 +176,12 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: in an org that also has NPSP, a household's name and greetings are the ones NPSP
   had, and **Custom Name** is ticked. Your admin adopted NPSP's households and kept their
   wording. Untick **Custom Name** if you want BarnCRM to name it from its members.
+- Problem: in an org with Nonprofit Cloud, BarnCRM does not rename a household, change its
+  greetings or address, or add its people to another household. Its **Household Model** reads
+  **Nonprofit Cloud**, or it is still a Nonprofit Cloud household nobody has converted. Keep
+  it up to date in Nonprofit Cloud, or ask your admin to convert it. A household whose
+  **Household Model** reads **Converted** is a BarnCRM household now: change it in BarnCRM,
+  because changes no longer flow between the two.
 - Problem: there is no **Households** tab. Your organization has not turned households on
   yet. Ask your admin.
 - Problem: **Household** is not offered when you click **New**. That is expected: use **New

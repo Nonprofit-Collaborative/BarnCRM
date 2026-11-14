@@ -13,6 +13,12 @@
  */
 public with sharing class SessionScheduleController {
 	private static final String CONTEXT = 'Schedule sessions panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Programs',
+			'Programs_Fail_Schedule'
+		)
+		.showingDml();
 	/** The most sessions created in one action. */
 	public static final Integer MAX_SESSIONS = 200;
 	private static final Integer NAME_LENGTH = 80;
@@ -84,7 +90,7 @@ public with sharing class SessionScheduleController {
 		try {
 			return scheduleFor(recordId);
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -105,7 +111,7 @@ public with sharing class SessionScheduleController {
 			days.sort();
 			return days;
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -179,7 +185,7 @@ public with sharing class SessionScheduleController {
 			schedule.created = sessions.size();
 			return schedule;
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -222,7 +228,7 @@ public with sharing class SessionScheduleController {
 			schedule.created = SessionScheduleService.run(new Set<Id>{ saved.Id });
 			return schedule;
 		} catch (Exception failure) {
-			throw report(failure, recordId);
+			throw ERRORS.wrap(failure, CONTEXT, recordId);
 		}
 	}
 
@@ -232,7 +238,7 @@ public with sharing class SessionScheduleController {
 		try {
 			return previewOf(scheduleId);
 		} catch (Exception failure) {
-			throw report(failure, scheduleId);
+			throw ERRORS.wrap(failure, CONTEXT, scheduleId);
 		}
 	}
 
@@ -248,7 +254,7 @@ public with sharing class SessionScheduleController {
 			preview.created = created;
 			return preview;
 		} catch (Exception failure) {
-			throw report(failure, scheduleId);
+			throw ERRORS.wrap(failure, CONTEXT, scheduleId);
 		}
 	}
 
@@ -264,7 +270,7 @@ public with sharing class SessionScheduleController {
 			preview.removed = removed;
 			return preview;
 		} catch (Exception failure) {
-			throw report(failure, scheduleId);
+			throw ERRORS.wrap(failure, CONTEXT, scheduleId);
 		}
 	}
 
@@ -365,17 +371,5 @@ public with sharing class SessionScheduleController {
 	/** What staff are told when scheduling failed (modules-1). */
 	private static String failed() {
 		return BarnHelp.text('Programs', 'Programs_Fail_Schedule');
-	}
-
-	/** A refusal is passed on in its own words; anything else is logged first. */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(failed());
 	}
 }

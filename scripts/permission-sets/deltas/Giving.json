@@ -1,0 +1,98 @@
+{
+  "Admin": {
+    "label": "Giving Admin",
+    "description": ["Maria configures giving and fixes mistakes: funds, appeals, gifts, refunds and", "write-offs, including deleting a record entered by accident."],
+    "add": {
+      "classAccesses": {
+        "AccountingPeriodController": {"enabled": "true"}
+      },
+      "customPermissions": {
+        "Post_Gifts": {"enabled": "true"}
+      },
+      "fieldPermissions": {
+        "Appeal__c.Sample_Data__c": {"editable": "true", "readable": "true"},
+        "Ask__c.Sample_Data__c": {"editable": "true", "readable": "true"},
+        "Commitment__c.Sample_Data__c": {"editable": "true", "readable": "true"},
+        "Fund__c.Sample_Data__c": {"editable": "true", "readable": "true"},
+        "Gift__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      },
+      "tabSettings": {
+        "Donor_Levels": {"visibility": "Visible"},
+        "Giving_Accounting_Periods": {"visibility": "Visible"},
+        "Stewardship_Plans": {"visibility": "Visible"}
+      },
+      "userPermissions": {
+        "CreateCustomizeDashboards": {"enabled": "true"},
+        "CreateCustomizeReports": {"enabled": "true"},
+        "EditMyDashboards": {"enabled": "true"},
+        "EditMyReports": {"enabled": "true"}
+      }
+    },
+    "set": {
+      "fieldPermissions": {
+        "Acknowledgment_Rule__c.Active__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.Appeal__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.Description__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.Email_Template__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.First_Gift_Only__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.Gift_Type__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.Maximum_Amount__c": {"editable": "true"},
+        "Acknowledgment_Rule__c.Minimum_Amount__c": {"editable": "true"},
+        "Ask__c.Closed_Date__c": {"editable": "true"},
+        "Ask__c.Stage_Changed_Date__c": {"editable": "true"},
+        "Commitment__c.Card_Expires__c": {"editable": "true"},
+        "Commitment__c.Failed_Charges__c": {"editable": "true"},
+        "Commitment__c.Last_Failed_Charge__c": {"editable": "true"},
+        "Commitment__c.Processor_Cancelled__c": {"editable": "true"},
+        "Commitment__c.Processor_Customer_Id__c": {"editable": "true"},
+        "Donor_Level__c.Active__c": {"editable": "true"},
+        "Donor_Level__c.Description__c": {"editable": "true"},
+        "Donor_Level__c.Maximum_Amount__c": {"editable": "true"},
+        "Pledge_Reminder_Step__c.Active__c": {"editable": "true"},
+        "Pledge_Reminder_Step__c.Email_Template__c": {"editable": "true"},
+        "Receipt_Template__c.Active__c": {"editable": "true"},
+        "Receipt_Template__c.Body__c": {"editable": "true"},
+        "Stewardship_Plan_Step__c.Assigned_User__c": {"editable": "true"},
+        "Stewardship_Plan_Step__c.Comments__c": {"editable": "true"},
+        "Stewardship_Plan_Template__c.Active__c": {"editable": "true"},
+        "Stewardship_Plan_Template__c.Description__c": {"editable": "true"},
+        "Stewardship_Plan_Template__c.Minimum_Amount__c": {"editable": "true"}
+      },
+      "objectPermissions": {
+        "Acknowledgment_Rule__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Appeal__c": {"allowDelete": "true"},
+        "Ask__c": {"allowDelete": "true"},
+        "Commitment__c": {"allowDelete": "true"},
+        "Donor_Level__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Fund__c": {"allowDelete": "true"},
+        "Gift_Batch__c": {"allowDelete": "true"},
+        "Gift__c": {"allowDelete": "true"},
+        "Installment__c": {"allowDelete": "true"},
+        "Pledge_Reminder_Step__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Receipt_Template__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Recurring_Gift_Event__c": {"allowDelete": "true", "modifyAllRecords": "true", "viewAllRecords": "true"},
+        "Stewardship_Plan_Step__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Stewardship_Plan_Template__c": {"allowCreate": "true", "allowDelete": "true", "allowEdit": "true"},
+        "Stewardship_Plan__c": {"allowDelete": "true"},
+        "Tribute__c": {"allowDelete": "true"}
+      }
+    }
+  },
+  "Read_Only": {
+    "label": "Giving Read Only",
+    "description": ["Tom and Jen look at the giving numbers without being able to change them. The Gift panel", "loads, and every action on it fails, because the package writes in user mode."],
+    "readOnly": true,
+    "remove": {
+      "classAccesses": ["CommitmentEntryController", "GiftDonorPanelController", "QuickGiftEntryController", "SoftCreditController", "TributeController"],
+      "customPermissions": ["Issue_Receipts", "Send_Acknowledgments"],
+      "fieldPermissions": ["Contact.Affinity_Rating__c", "Contact.Capacity_Rating__c", "Contact.Screening_Date__c", "Contact.Screening_Score__c", "Contact.Screening_Source__c"],
+      "tabSettings": ["Quick_Gift_Entry"]
+    },
+    "set": {
+      "tabSettings": {
+        "Soft_Credit__c": {"visibility": "Available"},
+        "Tribute__c": {"visibility": "Available"}
+      }
+    }
+  }
+}

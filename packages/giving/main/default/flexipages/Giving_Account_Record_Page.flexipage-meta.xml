@@ -1254,6 +1254,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>recordInspectorButton</componentName>
+        <identifier>recordInspectorButton</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>recordGlance</componentName>
         <identifier>recordGlance</identifier>
       </componentInstance>

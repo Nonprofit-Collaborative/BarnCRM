@@ -11,8 +11,11 @@ private class HouseholdWriterTest {
 		TestUsers.admin();
 	}
 
+	/** Failures logged, counted on their entries: repeats share one entry (R-E7). */
 	private static Integer loggedErrors() {
-		return [SELECT COUNT() FROM Error_Log__c];
+		Decimal total = (Decimal) [SELECT SUM(Occurrences__c) total FROM Error_Log__c][0]
+			.get('total');
+		return total == null ? 0 : total.intValue();
 	}
 
 	private static Household_Member__c member(Account household, Contact person) {
@@ -264,7 +267,9 @@ private class HouseholdWriterTest {
 			Integer before = loggedErrors();
 
 			Test.startTest();
-			HouseholdWriter.deleteHouseholds(new List<Account>{ new Account() });
+			HouseholdWriter.deleteHouseholds(
+				new List<Account>{ TestDataFactory.organization(new Account()) }
+			);
 			HouseholdWriter.deleteMemberships(
 				new List<Household_Member__c>{ new Household_Member__c() }
 			);
@@ -329,7 +334,9 @@ private class HouseholdWriterTest {
 	static void aPersonWhoMayCreateAccountsGetsAHouseholdOfTheHouseholdRecordType() {
 		System.runAs(TestUsers.admin()) {
 			User maria = staff('Hwstaff');
-			Account household = new Account(Name = 'Asked For Household', Member_Count__c = 0);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'Asked For Household', Member_Count__c = 0)
+			);
 			List<Database.SaveResult> saves;
 
 			Test.startTest();
@@ -456,7 +463,11 @@ private class HouseholdWriterTest {
 			Test.startTest();
 			System.runAs(maria) {
 				message = refusalFor(
-					new List<Account>{ new Account(Name = 'Other Type', RecordTypeId = other) },
+					new List<Account>{
+						TestDataFactory.organization(
+							new Account(Name = 'Other Type', RecordTypeId = other)
+						)
+					},
 					null
 				);
 			}

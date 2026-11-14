@@ -10,11 +10,13 @@ private class FindRadiusTest {
 	}
 
 	private static Contact contact(String lastName, Decimal latitude, Decimal longitude) {
-		return new Contact(
-			LastName = lastName,
-			MailingPostalCode = '02134',
-			MailingLatitude = latitude,
-			MailingLongitude = longitude
+		return TestDataFactory.person(
+			new Contact(
+				LastName = lastName,
+				MailingPostalCode = '02134',
+				MailingLatitude = latitude,
+				MailingLongitude = longitude
+			)
 		);
 	}
 
@@ -89,7 +91,7 @@ private class FindRadiusTest {
 		System.runAs(TestUsers.admin()) {
 			Contact geocoded = contact('Geocoded', 41.5, -72.5);
 			Contact postalOnly = contact('PostalOnly', null, null);
-			Contact neither = new Contact(LastName = 'Neither');
+			Contact neither = TestDataFactory.person(new Contact(LastName = 'Neither'));
 			insert new List<Contact>{ geocoded, postalOnly, neither };
 
 			FindRadius.Center own = FindRadius.resolveCenter(geocoded.Id);
@@ -125,8 +127,34 @@ private class FindRadiusTest {
 				)
 			);
 
-			System.Assert.isTrue(ok.clause.startsWith('DISTANCE(MailingAddress, GEOLOCATION(:'));
-			System.Assert.areEqual(3, ok.binds.size(), 'Latitude, longitude and miles are binds.');
+			System.Assert.isTrue(ok.clause.contains('DISTANCE(MailingAddress, GEOLOCATION(:'));
+			System.Assert.isTrue(
+				ok.clause.startsWith(
+					'MailingLatitude >= :boxSouth AND MailingLatitude <= :boxNorth'
+				),
+				'A latitude box narrows the rows first: ' + ok.clause
+			);
+			System.Assert.isTrue(
+				ok.clause.contains('MailingLongitude >= :boxWest'),
+				'And a longitude box: ' + ok.clause
+			);
+			System.Assert.areEqual(
+				7,
+				ok.binds.size(),
+				'Latitude, longitude, miles and the four box edges are binds.'
+			);
+			Decimal north = Decimal.valueOf((Double) ok.binds.get('boxNorth'));
+			System.Assert.isTrue(north > 42.6 && north < 42.7, 'About 25 miles north: ' + north);
+			FindRelatedRecords.Rendered polar = FindRadius.condition(
+				'Contact',
+				JSON.deserializeUntyped(
+					'{"field": "MailingAddress", "miles": 100, "latitude": 88.5, "longitude": 10}'
+				)
+			);
+			System.Assert.isFalse(
+				polar.clause.contains('boxWest'),
+				'Near a pole the longitude range is left off: ' + polar.clause
+			);
 			System.Assert.isTrue(ok.display.contains('< 25'), ok.display);
 			for (
 				String bad : new List<String>{
@@ -193,7 +221,7 @@ private class FindRadiusTest {
 				contact('Near', 42.31, -71.05),
 				contact('Far', 34.05, -118.24),
 				contact('Ungeocoded', null, null),
-				new Contact(LastName = 'NoAddress')
+				TestDataFactory.person(new Contact(LastName = 'NoAddress'))
 			};
 
 			QueryCompiler.Compiled compiled = QueryCompiler.compile(document(25));

@@ -10,6 +10,12 @@
  * read from its AsyncApexJob in system mode, filtered by the job identifier the job record holds.
  */
 public with sharing class BulkUpdateController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		null,
+		System.Label.Core_UnexpectedError
+	);
+
 	public static final String PERMISSION = 'Bulk_Update_Records';
 	private static final Integer RECENT_JOBS = 10;
 	/** Query rows left free for the reads around Super Transformer's count. */
@@ -101,7 +107,7 @@ public with sharing class BulkUpdateController {
 			}
 			return page;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Bulk update page');
+			throw ERRORS.wrap(caught, 'Bulk update page');
 		}
 	}
 
@@ -112,7 +118,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return BulkUpdateFields.targets(objectName);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Bulk update fields');
+			throw ERRORS.wrap(caught, 'Bulk update fields');
 		}
 	}
 
@@ -126,7 +132,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return BulkUpdateFields.copySources(objectName, fieldName);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Bulk update copy sources');
+			throw ERRORS.wrap(caught, 'Bulk update copy sources');
 		}
 	}
 
@@ -160,7 +166,7 @@ public with sharing class BulkUpdateController {
 			}
 			return writable;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer objects');
+			throw ERRORS.wrap(caught, 'Super Transformer objects');
 		}
 	}
 
@@ -182,7 +188,7 @@ public with sharing class BulkUpdateController {
 			result.objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 			return result;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer count');
+			throw ERRORS.wrap(caught, 'Super Transformer count');
 		}
 	}
 
@@ -193,7 +199,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return SavedTransformService.listAll();
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer saved lists');
+			throw ERRORS.wrap(caught, 'Super Transformer saved lists');
 		}
 	}
 
@@ -204,7 +210,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return SavedTransformService.load(recordId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer load list');
+			throw ERRORS.wrap(caught, 'Super Transformer load list');
 		}
 	}
 
@@ -218,7 +224,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return SavedTransformService.save(name, definitionJson);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer save list');
+			throw ERRORS.wrap(caught, 'Super Transformer save list');
 		}
 	}
 
@@ -229,7 +235,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return SavedTransformService.rename(recordId, name);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer rename list');
+			throw ERRORS.wrap(caught, 'Super Transformer rename list');
 		}
 	}
 
@@ -240,7 +246,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			SavedTransformService.remove(recordId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer delete list');
+			throw ERRORS.wrap(caught, 'Super Transformer delete list');
 		}
 	}
 
@@ -258,7 +264,7 @@ public with sharing class BulkUpdateController {
 				BulkUpdateService.MAX_SAMPLE_SIZE
 			);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Super Transformer preview');
+			throw ERRORS.wrap(caught, 'Super Transformer preview');
 		}
 	}
 
@@ -269,7 +275,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return BulkUpdateService.preview(queryJson, changesJson);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Bulk update preview');
+			throw ERRORS.wrap(caught, 'Bulk update preview');
 		}
 	}
 
@@ -285,7 +291,7 @@ public with sharing class BulkUpdateController {
 			);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Start a bulk update');
+			throw ERRORS.wrap(caught, 'Start a bulk update');
 		}
 	}
 
@@ -296,7 +302,7 @@ public with sharing class BulkUpdateController {
 			requirePermission();
 			return toView(requireJob(jobId), true);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Read a bulk update');
+			throw ERRORS.wrap(caught, 'Read a bulk update');
 		}
 	}
 
@@ -327,7 +333,7 @@ public with sharing class BulkUpdateController {
 			ImportUndoService.start(job.Id, undoPreview.total);
 			return toView(requireJob(job.Id), false);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Undo a bulk update');
+			throw ERRORS.wrap(caught, 'Undo a bulk update');
 		}
 	}
 
@@ -408,13 +414,5 @@ public with sharing class BulkUpdateController {
 		} catch (Exception unreadable) {
 			return null;
 		}
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return DataJobs.userError(
-			caught,
-			context,
-			caught instanceof BulkUpdateFields.BulkUpdateException
-		);
 	}
 }

@@ -23,9 +23,11 @@ private class ContactPointErasureExtensionTest {
 
 	/** Ana and Sam in one household, each with an email; Ana also has an address of her own. */
 	private static List<Contact> household(String lastName) {
-		Account home = new Account(
-			Name = lastName + ' Household',
-			RecordTypeId = HouseholdService.householdRecordTypeId()
+		Account home = TestDataFactory.household(
+			new Account(
+				Name = lastName + ' Household',
+				RecordTypeId = HouseholdService.householdRecordTypeId()
+			)
 		);
 		Database.insert(home, AccessLevel.SYSTEM_MODE);
 		Database.insert(
@@ -124,25 +126,26 @@ private class ContactPointErasureExtensionTest {
 	 * answers how many address syncs she was in. Checks the end state is settled: a full sync
 	 * of both people afterwards changes nothing, so the copies left are exactly what the final
 	 * records make, the same with the hold as without it.
+	 *
+	 * Called inside `System.runAs(eraser())`, so the erasure and the check share one user and
+	 * one time zone: a membership the erasure ends today (in the eraser's zone) still reads as
+	 * current to a user whose date is a day behind, such as a deploying user in a US zone in
+	 * the evening, and that user's sync would copy the household address back.
 	 */
 	private static Integer eraseAna(Boolean hold, String lastName) {
-		List<Contact> people;
-		Integer syncs;
-		System.runAs(eraser()) {
-			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			people = household(lastName);
-			String name = nameOf(people[0].Id);
-			ContactPointSyncService.holdingForTest = hold;
-			ContactPointSyncService.addressSyncsForTest.clear();
+		HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+		List<Contact> people = household(lastName);
+		String name = nameOf(people[0].Id);
+		ContactPointSyncService.holdingForTest = hold;
+		ContactPointSyncService.addressSyncsForTest.clear();
 
-			Test.startTest();
-			PersonErasure.erase(people[0].Id, name, null);
-			Test.stopTest();
+		Test.startTest();
+		PersonErasure.erase(people[0].Id, name, null);
+		Test.stopTest();
 
-			Integer counted = ContactPointSyncService.addressSyncsForTest.get(people[0].Id);
-			syncs = counted == null ? 0 : counted;
-			ContactPointSyncService.holdingForTest = true;
-		}
+		Integer counted = ContactPointSyncService.addressSyncsForTest.get(people[0].Id);
+		Integer syncs = counted == null ? 0 : counted;
+		ContactPointSyncService.holdingForTest = true;
 		ContactPointSyncService.Result again = ContactPointSyncService.syncPeople(
 			new Set<Id>{ people[0].Id, people[1].Id },
 			null
@@ -161,24 +164,26 @@ private class ContactPointErasureExtensionTest {
 
 	@IsTest
 	static void anErasureCopiesAnErasedPersonsAddressesOnce() {
-		// runs-as: deploying user (eraseAna runs the erasure as an eraser with System.runAs)
 		if (!ready()) {
 			return;
 		}
-		Assert.areEqual(1, eraseAna(true, 'Alder'), 'One address sync, from the final state');
+		System.runAs(eraser()) {
+			Assert.areEqual(1, eraseAna(true, 'Alder'), 'One address sync, from the final state');
+		}
 	}
 
 	@IsTest
 	static void beforeTheHoldAnErasureCopiedThemTwiceAndEndedTheSame() {
-		// runs-as: deploying user (eraseAna runs the erasure as an eraser with System.runAs)
 		if (!ready()) {
 			return;
 		}
-		Integer syncs = eraseAna(false, 'Birch');
-		Assert.isTrue(
-			syncs >= 2,
-			'Deleting the address and ending the membership each synced: ' + syncs
-		);
+		System.runAs(eraser()) {
+			Integer syncs = eraseAna(false, 'Birch');
+			Assert.isTrue(
+				syncs >= 2,
+				'Deleting the address and ending the membership each synced: ' + syncs
+			);
+		}
 	}
 
 	@IsTest

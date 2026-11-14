@@ -7,9 +7,16 @@
  *                    payerName?, payerEmail?, personId?, sourceRecordId?, listener?, detail? }
  *                  returns { paymentId, checkoutUrl, status, reference }
  *   getPayment     { paymentId } returns the payment map, or null
- *   isReady        { processor? } returns true when that processor's keys are entered
+ *   isReady        { processor?, recurring? } returns true when that processor's keys are
+ *                  entered (and, with recurring true, Automatic Recurring Payments is on)
+ *   updateCard     { subscriptionId, customerId?, returnUrl } returns { url }, the processor's
+ *                  own page for a new card (ADR-0218 `0218-payments-subscriptions.md`)
  *   countRecent    { sourceRecordId, minutes?, status? } returns how many payments for that
  *                  record were started in the last minutes (default 60), of that status if given
+ *
+ * startCheckout also takes interval (week, month, year) and intervalCount (1 to 12): a
+ * subscription when Automatic Recurring Payments is on. A listener with subscriptions is told
+ * `subscriptionsChanged { changes: [...] }` once per run (the module README).
  *
  * A listener named on a payment is told `paymentsChanged { payments: [payment map, ...] }`
  * once per run and answers true when it handled them; otherwise it is told
@@ -95,10 +102,15 @@ public with sharing class PaymentsApi implements Callable {
 			when 'isReady' {
 				Object processor = given.get('processor');
 				return PaymentService.isReady(
-					processor == null
-						? PaymentService.defaultProcessor()
-						: String.valueOf(processor)
-				);
+						processor == null
+							? PaymentService.defaultProcessor()
+							: String.valueOf(processor)
+					) &&
+					(given.get('recurring') != true ||
+					PaymentService.settings().Recurring_Payments__c == true);
+			}
+			when 'updateCard' {
+				return new Map<String, Object>{ 'url' => PaymentService.updateCard(given) };
 			}
 			when else {
 				throw new PaymentException(

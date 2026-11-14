@@ -2,6 +2,24 @@ import { createElement } from 'lwc';
 import PersonEnrollments from 'c/personEnrollments';
 import getEnrollments from '@salesforce/apex/PersonEnrollmentsController.getEnrollments';
 import { canShow, enrollmentRows, lastService, stageStatusWord } from '../enrollmentRows';
+import { encodeDefaultFieldValues } from 'lightning/pageReferenceUtils';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, __esModule: true };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/PersonEnrollmentsController.getEnrollments',
@@ -120,6 +138,30 @@ describe('c-person-enrollments', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+  });
+
+  it('offers Enroll to someone who may enroll, opening a new enrollment for the person', async () => {
+    encodeDefaultFieldValues.mockReturnValue('Contact__c=003000000000001AAA');
+    getEnrollments.mockResolvedValue({ canSee: true, canEnroll: true, enrollments: [OPEN] });
+    const element = mount();
+    await flush();
+
+    one(element, 'enroll').click();
+
+    expect(encodeDefaultFieldValues).toHaveBeenCalledWith({ Contact__c: '003000000000001AAA' });
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Enrollment__c', actionName: 'new' },
+      state: { defaultFieldValues: 'Contact__c=003000000000001AAA' }
+    });
+  });
+
+  it('hides Enroll from someone who may not enroll', async () => {
+    getEnrollments.mockResolvedValue({ canSee: true, canEnroll: false, enrollments: [OPEN] });
+    const element = mount();
+    await flush();
+
+    expect(one(element, 'enroll')).toBeNull();
   });
 
   it('says so when the person has no enrollment', async () => {

@@ -378,3 +378,14 @@ lines. Release slots: PRs 1 to 3 in the next open release's batch, PR 4 in the b
 - Plan Section 5 C-06 and the Access page user stories name four roles.
 - If any of D1 to D5 is declined, the rest still stands; the mapping row for a declined item
   reverts to "Unchanged".
+
+## Note, 2026-11-12: contract step done at the cut-over (D-199, D-200)
+
+The namespaced managed release is a fresh install in every org (D-199), so no org carries the
+old group or sets into it and release N+1's carry-over and removal steps are not needed. The
+removal planned above happened at the cut-over instead (D-200 S4): the `Volunteer_Coordinator`
+group, `RetiredRoleMigration` and the retired-role branches in `AccessService`,
+`TabAccessService` and `HealthCheckService`; the five retired Mirror sets and
+`MirrorAccessSync`; the Coordinator lines in the module access syncs; and the Volunteers
+Health Check coordinator finding and its fix. `Volunteers_Coordinator` stays, given per person
+on the Access page (D1). No destructive manifest is needed, since no org upgrades in place.

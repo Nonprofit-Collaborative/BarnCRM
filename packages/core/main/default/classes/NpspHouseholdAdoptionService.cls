@@ -8,6 +8,10 @@
  * hands the work to `NpspHouseholdAdoptionBatch`. NPSP is read only through
  * `NpspHouseholdSource`, so nothing here names NPSP and an org without it simply has nothing to
  * adopt. Every method requires Manage BarnCRM Settings (R-HA5).
+ *
+ * The same preview, run, journal and undo convert Nonprofit Cloud households (R-HA7, ADR-0217
+ * `0217-npc-household-conversion.md`): each method takes a source key, NPSP when blank, and an
+ * NPC run's id carries its key so each panel shows and undoes only its own runs.
  */
 public with sharing class NpspHouseholdAdoptionService {
 	/** Accounts one run adopts at most, as a bulk update's ceiling (R-BU2). */
@@ -103,23 +107,61 @@ public with sharing class NpspHouseholdAdoptionService {
 		if (CoexistenceService.MODE_NPSP.equals(CoexistenceService.getCurrentMode())) {
 			return true;
 		}
-		return [SELECT COUNT() FROM Household_Adoption__c WITH SYSTEM_MODE LIMIT 1] > 0;
+		return [
+				SELECT COUNT()
+				FROM Household_Adoption__c
+				WHERE NOT Run_Id__c LIKE :NPC_RUNS
+				WITH SYSTEM_MODE
+				LIMIT 1
+			] > 0;
+	}
+
+	/** Run ids of the NPC source (R-HA7), as a LIKE pattern. */
+	private static final String NPC_RUNS = NpspHouseholdSource.NPC + '-%';
+
+	/**
+	 * True when the Nonprofit Cloud panel belongs on the settings page: Mirror's source is
+	 * installed and finds the native objects, or something was converted earlier.
+	 */
+	public static Boolean isNpcOffered() {
+		NpspHouseholdSource source = NpspHouseholdSource.forKey(NpspHouseholdSource.NPC);
+		if (source != null && source.available()) {
+			return true;
+		}
+		return [
+				SELECT COUNT()
+				FROM Household_Adoption__c
+				WHERE Run_Id__c LIKE :NPC_RUNS
+				WITH SYSTEM_MODE
+				LIMIT 1
+			] > 0;
 	}
 
 	public static Status getStatus() {
+		return getStatus(null);
+	}
+
+	public static Status getStatus(String sourceKey) {
 		requirePermission();
+		String key = keyOf(sourceKey);
 		Status status = new Status();
-		NpspHouseholdSource source = NpspHouseholdSource.get();
-		status.available = source.available();
-		status.blockedReason = blockedReason();
+		NpspHouseholdSource source = NpspHouseholdSource.forKey(key);
+		status.available = source != null && source.available();
+		status.blockedReason = blockedReason(key);
 		status.running = isRunning();
 		if (status.available) {
 			status.candidateCount = countCandidates(source);
 			status.moreThanLimit = status.candidateCount > RUN_LIMIT;
 			status.sample = sample(source);
 		}
-		status.lastRun = lastRun();
+		status.lastRun = lastRun(key);
 		return status;
+	}
+
+	private static String keyOf(String sourceKey) {
+		return sourceKey == NpspHouseholdSource.NPC
+			? NpspHouseholdSource.NPC
+			: NpspHouseholdSource.NPSP;
 	}
 
 	/**
@@ -128,14 +170,19 @@ public with sharing class NpspHouseholdAdoptionService {
 	 * counted now are no more than `confirmedCount` (R-HA2).
 	 */
 	public static String start(Boolean keepNames, Integer confirmedCount) {
+		return start(null, keepNames, confirmedCount);
+	}
+
+	public static String start(String sourceKey, Boolean keepNames, Integer confirmedCount) {
 		requirePermission();
-		String blocked = blockedReason();
+		String key = keyOf(sourceKey);
+		String blocked = blockedReason(key);
 		if (blocked != null) {
 			throw UserErrors.message(blocked);
 		}
 		requireNotRunning();
-		NpspHouseholdSource source = NpspHouseholdSource.get();
-		Integer count = source.available() ? countCandidates(source) : 0;
+		NpspHouseholdSource source = NpspHouseholdSource.forKey(key);
+		Integer count = source != null && source.available() ? countCandidates(source) : 0;
 		if (count == 0) {
 			throw UserErrors.message(
 				BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt')
@@ -150,10 +197,13 @@ public with sharing class NpspHouseholdAdoptionService {
 				)
 			);
 		}
-		String runId = UUID.randomUUID().toString();
-		Database.executeBatch(
+		String runId = key == NpspHouseholdSource.NPC
+			? key + '-' + UUID.randomUUID().toString().remove('-')
+			: UUID.randomUUID().toString();
+		AsyncStarter.batch(
 			NpspHouseholdAdoptionBatch.adopt(runId, keepNames != false, runCount),
-			NpspHouseholdAdoptionBatch.CHUNK_SIZE
+			NpspHouseholdAdoptionBatch.CHUNK_SIZE,
+			'NpspHouseholdAdoptionService'
 		);
 		return runId;
 	}
@@ -174,19 +224,24 @@ public with sharing class NpspHouseholdAdoptionService {
 				)
 			);
 		}
-		Database.executeBatch(
+		AsyncStarter.batch(
 			NpspHouseholdAdoptionBatch.undo(runId),
-			NpspHouseholdAdoptionBatch.CHUNK_SIZE
+			NpspHouseholdAdoptionBatch.CHUNK_SIZE,
+			'NpspHouseholdAdoptionService'
 		);
 	}
 
-	/** Why a run cannot start, or null. */
+	/** Why a run cannot start, or null. Junction membership stops NPSP only (R-HA7). */
 	@TestVisible
 	private static String blockedReason() {
+		return blockedReason(NpspHouseholdSource.NPSP);
+	}
+
+	private static String blockedReason(String key) {
 		if (HouseholdService.householdRecordTypeId() == null) {
 			return BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing');
 		}
-		if (HouseholdService.isJunctionMode()) {
+		if (key == NpspHouseholdSource.NPSP && HouseholdService.isJunctionMode()) {
 			return BarnHelp.text('Core', 'Core_NpspAdoption_ErrorJunctionMode');
 		}
 		return null;
@@ -250,16 +305,7 @@ public with sharing class NpspHouseholdAdoptionService {
 		Map<Id, Contact> primaries = new Map<Id, Contact>(
 			[SELECT Id, Name FROM Contact WHERE Id IN :primaryIds WITH USER_MODE]
 		);
-		Map<Id, Integer> contactCounts = new Map<Id, Integer>();
-		for (AggregateResult row : [
-			SELECT AccountId, COUNT(Id) n
-			FROM Contact
-			WHERE AccountId IN :ids
-			WITH USER_MODE
-			GROUP BY AccountId
-		]) {
-			contactCounts.put((Id) row.get('AccountId'), (Integer) row.get('n'));
-		}
+		Map<Id, Integer> contactCounts = source.memberCounts(ids);
 		for (NpspHouseholdSource.Household household : households) {
 			Candidate candidate = new Candidate();
 			candidate.accountId = household.accountId;
@@ -278,13 +324,28 @@ public with sharing class NpspHouseholdAdoptionService {
 	/** The newest run and its counts, read in system mode: the journal is the package's own. */
 	@TestVisible
 	private static Run lastRun() {
-		List<Household_Adoption__c> newest = [
-			SELECT Run_Id__c, CreatedDate
-			FROM Household_Adoption__c
-			WITH SYSTEM_MODE
-			ORDER BY CreatedDate DESC, Id DESC
-			LIMIT 1
-		];
+		return lastRun(NpspHouseholdSource.NPSP);
+	}
+
+	/** The same, for one source's runs only (R-HA7). */
+	private static Run lastRun(String key) {
+		List<Household_Adoption__c> newest = key == NpspHouseholdSource.NPC
+			? [
+					SELECT Run_Id__c, CreatedDate
+					FROM Household_Adoption__c
+					WHERE Run_Id__c LIKE :NPC_RUNS
+					WITH SYSTEM_MODE
+					ORDER BY CreatedDate DESC, Id DESC
+					LIMIT 1
+			  ]
+			: [
+					SELECT Run_Id__c, CreatedDate
+					FROM Household_Adoption__c
+					WHERE NOT Run_Id__c LIKE :NPC_RUNS
+					WITH SYSTEM_MODE
+					ORDER BY CreatedDate DESC, Id DESC
+					LIMIT 1
+			  ];
 		if (newest.isEmpty()) {
 			return null;
 		}

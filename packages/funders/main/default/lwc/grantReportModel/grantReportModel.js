@@ -3,6 +3,7 @@
  * ADR-0163 `0163-funders-reporting-links.md`, plan Section 9.9). Plain JavaScript in and out, so a
  * WordPress block or Node can use the same module. Dates arrive as ISO date strings.
  */
+import { escapeHtml } from 'c/barnFormat';
 
 /** The tokens a funder report template may use (R-FT2), each a plain value but the last two. */
 export const VALUE_TOKENS = [
@@ -29,15 +30,8 @@ const MONEY_TOKENS = new Set(['AmountRequested', 'AmountAwarded']);
 const DATE_TOKENS = new Set(['Today', 'ApplicationDeadline', 'AwardStartDate', 'AwardEndDate']);
 const TOKEN = /\{(\w+)\}/g;
 
-/** Text made safe inside HTML. */
-export function escapeHtml(value) {
-  return String(value === null || value === undefined ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+/** Text made safe inside HTML, from the shared kit. */
+export { escapeHtml };
 
 /** An ISO date ("2026-11-02") in the locale, read as a calendar day; blank when there is none. */
 export function showDate(iso, locale) {

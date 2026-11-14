@@ -4,7 +4,6 @@
       title={title}
       purpose={labels.intro}
       icon-name={icon}
-      title-hidden
       data-id="shell"
     >
       <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap barn-print-hide">
@@ -129,7 +128,6 @@
                               data-id="item"
                               data-kind={item.kind}
                               data-record-id={item.recordId}
-                              data-object={item.objectApiName}
                               class={item.itemClass}
                               title={item.title}
                               onclick={handleOpen}
@@ -160,7 +158,6 @@
                         data-id="item"
                         data-kind={item.kind}
                         data-record-id={item.recordId}
-                        data-object={item.objectApiName}
                         class={item.itemClass}
                         title={item.title}
                         onclick={handleOpen}
@@ -194,7 +191,6 @@
                           data-id="item"
                           data-kind={item.kind}
                           data-record-id={item.recordId}
-                          data-object={item.objectApiName}
                           aria-label={item.openLabel}
                           onclick={handleOpen}
                         >

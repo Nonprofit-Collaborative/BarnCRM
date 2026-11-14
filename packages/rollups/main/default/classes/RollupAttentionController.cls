@@ -9,6 +9,12 @@
  * which writes entries in system mode (R-RQ5).
  */
 public with sharing class RollupAttentionController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		'RollupAttentionController',
+		'Rollups',
+		'Core_Rollups_UnexpectedError'
+	);
+
 	/** Failed records shown at most, so a long list stays one screen's worth of reading. */
 	@TestVisible
 	private static final Integer RECORDS_SHOWN = 200;
@@ -66,7 +72,7 @@ public with sharing class RollupAttentionController {
 			attention.lastRun = lastRun(RollupFullRecalcBatch.progress());
 			return attention;
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -89,7 +95,7 @@ public with sharing class RollupAttentionController {
 			);
 			return getAttention();
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -111,7 +117,7 @@ public with sharing class RollupAttentionController {
 			RollupQueue.processPending();
 			return getAttention();
 		} catch (Exception caught) {
-			throw asUserError(caught);
+			throw ERRORS.wrap(caught);
 		}
 	}
 
@@ -236,15 +242,6 @@ public with sharing class RollupAttentionController {
 				progress.finishedAt == null ? '' : progress.finishedAt.format(),
 				progress.chunksStopped.format()
 			}
-		);
-	}
-
-	private static AuraHandledException asUserError(Exception caught) {
-		return UserErrors.wrap(
-			caught,
-			caught instanceof RollupService.RollupServiceException,
-			'RollupAttentionController',
-			BarnHelp.text('Rollups', 'Core_Rollups_UnexpectedError')
 		);
 	}
 }

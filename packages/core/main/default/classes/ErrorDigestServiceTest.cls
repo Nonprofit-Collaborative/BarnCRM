@@ -71,8 +71,13 @@ private class ErrorDigestServiceTest {
 					ErrorLogger.STATUS_NEW
 				),
 				entry('Already looked at', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_RESOLVED),
-				entry('Last week', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW)
+				entry('Older failure', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW)
 			};
+			// Repeats folded onto one entry (R-E7) count as the errors they are.
+			logs[0].Occurrences__c = 2;
+			// Created before the window, with repeats folded onto it inside the window: it was
+			// last changed now, so its repeats are counted.
+			logs[6].Occurrences__c = 4;
 			insert logs;
 			Test.setCreatedDate(logs[6].Id, System.now().addDays(-3));
 			ErrorDigestService.emailSender = MAIL;
@@ -85,7 +90,11 @@ private class ErrorDigestServiceTest {
 			}
 
 			Assert.isTrue(outcome.sent, 'Something was new, so a digest went out.');
-			Assert.areEqual(5, outcome.entries, 'Five new: not the resolved one, not last week.');
+			Assert.areEqual(
+				10,
+				outcome.entries,
+				'Every occurrence: 4 + 2 + 4, not the resolved one.'
+			);
 			List<Messaging.SingleEmailMessage> sent = MAIL.received;
 			Assert.areEqual(1, sent.size(), 'One message, to the one listed user.');
 			Assert.areEqual(
@@ -94,13 +103,14 @@ private class ErrorDigestServiceTest {
 				'Addressed to Jen, found by email.'
 			);
 			Assert.isFalse(sent[0].getSaveAsActivity(), 'No activity is logged against Jen.');
-			Assert.isTrue(sent[0].getSubject().contains('5'), 'The subject gives the count.');
+			Assert.isTrue(sent[0].getSubject().contains('10'), 'The subject gives the count.');
 
 			String body = sent[0].getPlainTextBody();
-			Assert.isTrue(body.contains('Household naming: 3'), 'Counted by source.');
+			Assert.isTrue(body.contains('Household naming: 4'), 'Counted by source.');
 			Assert.isTrue(body.contains('Seasonal address swap: 2'), 'Every source.');
+			Assert.isTrue(body.contains('Older failure: 4'), 'Repeats in the window count.');
 			Assert.isTrue(
-				body.contains('Error: 3') && body.contains('Warning: 2'),
+				body.contains('Error: 8') && body.contains('Warning: 2'),
 				'And by severity.'
 			);
 			Assert.isTrue(body.contains('/' + logs[0].Id), 'Each listed entry links to itself.');
@@ -116,7 +126,7 @@ private class ErrorDigestServiceTest {
 			Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'The window moved on.');
 			Assert.isNotNull(after.Error_Digest_Last_Run__c, 'The run is recorded.');
 			Assert.areEqual(
-				String.format(Label.Core_ErrorDigest_SummarySent, new List<Object>{ '5', '1' }),
+				String.format(Label.Core_ErrorDigest_SummarySent, new List<Object>{ '10', '1' }),
 				after.Error_Digest_Last_Run_Summary__c,
 				'And says what it did.'
 			);

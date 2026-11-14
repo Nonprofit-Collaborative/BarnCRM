@@ -2,28 +2,31 @@ import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import { iconFor } from 'c/barnIcons';
+import { tabPageReference } from 'c/barnTabs';
 import HEADING from '@salesforce/label/c.Core_HubHome_QuickLinksHeading';
 import SETTINGS from '@salesforce/label/c.Core_Settings_Title';
 import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
 import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
 import ORGANIZATIONS from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
 import FIND from '@salesforce/label/c.Core_Find_Title';
-import GIFT_ENTRY from '@salesforce/label/c.Core_HubHome_QuickLinkGiftEntry';
+import IMPORT_FILE from '@salesforce/label/c.Core_HubHome_QuickLinkImport';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PEOPLE_LINK = 'People';
 const HOUSEHOLDS_TAB = 'Households';
 /** The Account list view the Households tab shows (objects/Account/listViews). */
 const HOUSEHOLDS_LIST_VIEW = 'Households';
-/** Giving's tab, opened by name only: Core has no dependency on Giving (people-giving-7). */
-const GIFT_ENTRY_TAB = 'Quick_Gift_Entry';
+const IMPORT_TAB = 'Import';
 const SETTINGS_TAB = 'BarnCRM_Settings';
+/** A module link that opens an object's new record form is named by this prefix and the object. */
+const NEW_RECORD = 'new:';
 
 /**
  * The places people go most from the BarnCRM home page, as icon tiles (c-barn-tool-tile),
  * opened by page reference rather than by URL: People, Households, Organizations and Find for
- * everyone; Quick Gift Entry while the Giving module is installed and on (the home model reads
- * the module catalog); BarnCRM Settings only for people with Manage BarnCRM Settings.
+ * everyone; Import a File for someone who may import; then each installed, turned-on module's
+ * own links from the module catalog (Enter a Gift, Log Hours, Enroll; D-200 R7), so Core names
+ * no module; BarnCRM Settings only for people with Manage BarnCRM Settings.
  */
 export default class HubQuickLinks extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
@@ -72,14 +75,22 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
         iconName: iconFor('Find')
       }
     ];
-    if (model.giftEntryAvailable) {
+    if (model.canImport) {
       links.push({
-        tab: GIFT_ENTRY_TAB,
-        label: GIFT_ENTRY,
-        line: helpText('Core', 'Core_HubHome_QuickLinkGiftEntryLine'),
-        iconName: iconFor(GIFT_ENTRY_TAB)
+        tab: IMPORT_TAB,
+        label: IMPORT_FILE,
+        line: helpText('Core', 'Core_HubHome_QuickLinkImportLine'),
+        iconName: iconFor(IMPORT_TAB)
       });
     }
+    (model.quickLinks || []).forEach((link) => {
+      links.push({
+        tab: link.objectApiName ? NEW_RECORD + link.objectApiName : link.tab,
+        label: link.label,
+        line: link.line,
+        iconName: iconFor(link.objectApiName || link.tab)
+      });
+    });
     if (model.canEdit) {
       links.push({
         tab: SETTINGS_TAB,
@@ -91,8 +102,15 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
     return links;
   }
 
-  handleOpen(event) {
+  async handleOpen(event) {
     const name = event.detail.name;
+    if (name && name.startsWith(NEW_RECORD)) {
+      this[NavigationMixin.Navigate]({
+        type: 'standard__objectPage',
+        attributes: { objectApiName: name.slice(NEW_RECORD.length), actionName: 'new' }
+      });
+      return;
+    }
     if (name === PEOPLE_LINK) {
       this[NavigationMixin.Navigate]({
         type: 'standard__objectPage',
@@ -112,9 +130,6 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
       });
       return;
     }
-    this[NavigationMixin.Navigate]({
-      type: 'standard__navItemPage',
-      attributes: { apiName: name }
-    });
+    this[NavigationMixin.Navigate](await tabPageReference(name));
   }
 }

@@ -3,7 +3,8 @@
  * (FS1). Core asks for them through `ModuleSetups` when an administrator presses Finish Setup,
  * for a package whose source was copied into an org by hand, so no install ever ran them. The
  * class is the package's post-install class, found by name, so it needs a public no-argument
- * constructor.
+ * constructor. When the steps gain something an org that already ran them needs, the class also
+ * implements `ModuleSetups.Revisioned` and raises its revision, so Finish Setup is offered again.
  */
 @NamespaceAccessible
 public interface ModuleSetup {

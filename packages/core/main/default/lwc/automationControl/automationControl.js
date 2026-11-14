@@ -45,6 +45,8 @@ import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
 import FLOW from '@salesforce/label/c.Core_DataDictionary_TypeFlow';
 import TURN_OFF from '@salesforce/label/c.Core_ModuleManager_TurnOffButton';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -370,8 +372,27 @@ export default class AutomationControl extends LightningElement {
     this.runAction(saveControl({ ownerId: org.ownerId, pauseAll: false, bypass: org.bypass }));
   }
 
-  handleRemoveControl(event) {
-    this.runAction(removeControl({ ownerId: event.target.dataset.owner }));
+  async handleRemoveControl(event) {
+    const ownerId = event.target.dataset.owner;
+    const row = this.controlRows.find((candidate) => candidate.ownerId === ownerId);
+    const confirmed = await this.confirmRemoval(
+      helpText('Core', 'Core_AutomationControl_RemoveControlTitle'),
+      helpText('Core', 'Core_AutomationControl_RemoveControlConfirm', row ? row.name : '')
+    );
+    if (confirmed) {
+      this.runAction(removeControl({ ownerId }));
+    }
+  }
+
+  confirmRemoval(label, message) {
+    return BarnConfirmModal.open({
+      size: 'small',
+      label,
+      message,
+      confirmLabel: REMOVE,
+      confirmVariant: 'destructive',
+      cancelLabel: CANCEL
+    });
   }
 
   handleAddKind(event) {
@@ -409,8 +430,16 @@ export default class AutomationControl extends LightningElement {
     });
   }
 
-  handleRemoveFlow(event) {
-    this.runAction(removeFlow({ automationName: event.target.dataset.automation }));
+  async handleRemoveFlow(event) {
+    const automationName = event.target.dataset.automation;
+    const row = this.automations.find((candidate) => candidate.automationName === automationName);
+    const confirmed = await this.confirmRemoval(
+      helpText('Core', 'Core_AutomationControl_RemoveFlowTitle'),
+      helpText('Core', 'Core_AutomationControl_RemoveFlowConfirm', row ? row.label : '')
+    );
+    if (confirmed) {
+      this.runAction(removeFlow({ automationName }));
+    }
   }
 
   handleCatchUp() {

@@ -70,6 +70,10 @@ a field).
 | 3 | Change the Record List field to `Not_A_Field__c`. | The block says the field is not on the object; the rest of the component still shows. |
 | 4 | Add a Report Chart block with the summary report's API name. | One bar per grouping with its value. |
 | 5 | Enter a tabular report's API name. | The block says the report cannot be charted. |
+| 6 | Point the chart at a summary report grouped by two fields (for example Stage, then Fiscal Year) with two summaries (for example Sum of Amount and Record Count). | Each group shows each total by name, with one bar per value of the second grouping and a legend; each total has its own scale. |
+| 7 | Tick **Stack the second grouping**. | Each total is one bar per group, split into colored parts that match the legend; the total shows at its end. |
+| 8 | Press **Show Table**, then **Show Chart**. | A table with a row per group and a column per second-grouping value and total, with the report's formatted values; then the bars again. |
+| 9 | Use a matrix report (rows by one field, columns by another). | Rows are the groups and columns the bars or stacked parts. |
 
 **Cleanup:** Fix the Record List field.
 
@@ -106,8 +110,10 @@ a field).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Press **Export**. | Three files: `donorSnapshot.html`, `donorSnapshot.js`, `donorSnapshot.js-meta.xml`, each with Download. |
-| 2 | Read the HTML. | `lightning-output-field` for each Record Fields field; a comment for each list or chart block. |
-| 3 | Turn **Allow source export** off in Settings and reload the builder. | No Export button. Turn it back on. |
+| 1 | Press **Export** (the component has the list and chart blocks from T-LB-04). | `donorSnapshot.html`, `donorSnapshot.js`, `donorSnapshot.js-meta.xml`, `donorSnapshot.css`, `DonorSnapshotController.cls`, `DonorSnapshotControllerTest.cls` and their `cls-meta.xml` files, each with Download. |
+| 2 | Read the HTML and JavaScript. | `lightning-output-field` for each Record Fields field; a `lightning-datatable` for each list block and bars with a table for the chart; the JavaScript names each list's object, fields, filter and sort, the report, and a row limit equal to **Rows per list**. |
+| 3 | In a scratch org or sandbox of your own, deploy the downloaded files (bundle in `lwc/donorSnapshot`, classes in `classes`), run `DonorSnapshotControllerTest`, and place the component on a contact page. | The test passes; the lists and the chart show the same rows and totals as the built component for the same user. |
+| 4 | Remove the list and chart blocks from a copy of the component and export it. | Only the three bundle files; no Apex. |
+| 5 | Turn **Allow source export** off in Settings and reload the builder. | No Export button. Turn it back on. |
 
 **Cleanup:** None.

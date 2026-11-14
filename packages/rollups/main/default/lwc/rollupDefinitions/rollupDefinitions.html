@@ -88,6 +88,12 @@
                     ></c-barn-notice>
                 </template>
                 <p data-id="schedule-message">{scheduleMessage}</p>
+                <template lwc:if={nightlyScopeMessage}>
+                    <p class="slds-var-m-top_xx-small" data-id="nightly-scope-message">{nightlyScopeMessage}</p>
+                </template>
+                <template lwc:if={largeParentMessage}>
+                    <p class="slds-var-m-top_xx-small" data-id="large-parent-message">{largeParentMessage}</p>
+                </template>
                 <div class="slds-var-m-top_x-small">
                     <lightning-button
                         data-id="schedule-button"

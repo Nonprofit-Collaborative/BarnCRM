@@ -143,15 +143,36 @@ private class RecordGlanceControllerTest {
 			);
 			Test.stopTest();
 		}
-		Assert.areEqual(
-			2,
-			[
-				SELECT COUNT()
+		// Both read as the unexpected error, so they are counted on one entry (R-E7).
+		Decimal logged = (Decimal) [
+				SELECT SUM(Occurrences__c) total
 				FROM Error_Log__c
 				WHERE Context__c = 'RecordGlanceExtensions.resolve'
 				WITH SYSTEM_MODE
-			],
-			'Each unusable class is logged'
-		);
+			][0]
+			.get('total');
+		Assert.areEqual(2, logged.intValue(), 'Each unusable class is logged');
+	}
+
+	/**
+	 * QA review Q1: the glance card is on every person page, so a Read Only user (Standard
+	 * User profile, BarnCRM Read Only) gets the module's card just as an admin does.
+	 */
+	@IsTest
+	static void aReadOnlyUserGetsTheModuleCard() {
+		User reader;
+		System.runAs(TestUsers.admin()) {
+			reader = TestDataFactory.createUser('Reader', new List<String>{ 'BarnCRM_Read_Only' });
+		}
+		List<RecordGlance.Card> cards;
+		Test.startTest();
+		System.runAs(reader) {
+			only(new StubExtension());
+			cards = RecordGlanceController.getCards(FakeIds.of(Contact.SObjectType, 1));
+		}
+		Test.stopTest();
+
+		Assert.areEqual(1, cards.size(), 'The reader sees the module card');
+		Assert.areEqual('Stub Card', cards[0].title, 'As the module built it');
 	}
 }

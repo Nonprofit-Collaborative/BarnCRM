@@ -12,11 +12,11 @@ private class EventSurveyControllerTest {
 
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	/** A catalog with one public form, two questions and an address for any record. */
@@ -63,10 +63,8 @@ private class EventSurveyControllerTest {
 	}
 
 	private static Event_Attendee__c attendee(Event__c event, String last) {
-		Contact person = new Contact(
-			FirstName = 'A',
-			LastName = last,
-			Email = last + '@example.org'
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'A', LastName = last, Email = last + '@example.org')
 		);
 		insert as user person;
 		EventPersonMatcher.PersonInput input = new EventPersonMatcher.PersonInput();
@@ -291,7 +289,7 @@ private class EventSurveyControllerTest {
 			Id surveyTemplate = [
 				SELECT Id
 				FROM EmailTemplate
-				WHERE DeveloperName = :EventsSettings.DEFAULT_SURVEY_TEMPLATE
+				WHERE DeveloperName = :EventsSettings.surveyTemplate()
 				LIMIT 1
 			]
 			.Id;

@@ -1,5 +1,6 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import EVENT from '@salesforce/schema/Event__c';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import LOCALE from '@salesforce/i18n/locale';
 import TIME_ZONE from '@salesforce/i18n/timeZone';
@@ -8,6 +9,7 @@ import repeatEvent from '@salesforce/apex/EventsHomeController.repeatEvent';
 import { statusWord, whenText } from 'c/eventsModel';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
+import { recordHref } from 'c/barnFormat';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import EventRepeatModal from 'c/eventRepeatModal';
 
@@ -28,9 +30,6 @@ const ACTION_OPEN = 'open';
 const ACTION_REPEAT = 'repeat';
 const VIEW_UPCOMING = 'upcoming';
 const VIEW_PAST = 'past';
-
-/** A record's page in Lightning, for a link's href; a click navigates in place instead. */
-const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
 
 /**
  * The Events page (EV-01, canonical model 29EV1): the events coming up, soonest first, or those
@@ -161,7 +160,7 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
   handleNewEvent() {
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
-      attributes: { objectApiName: 'Event__c', actionName: 'new' }
+      attributes: { objectApiName: EVENT.objectApiName, actionName: 'new' }
     });
   }
 
@@ -174,7 +173,7 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
   openRecord(recordId) {
     this[NavigationMixin.Navigate]({
       type: 'standard__recordPage',
-      attributes: { recordId, objectApiName: 'Event__c', actionName: 'view' }
+      attributes: { recordId, objectApiName: EVENT.objectApiName, actionName: 'view' }
     });
   }
 

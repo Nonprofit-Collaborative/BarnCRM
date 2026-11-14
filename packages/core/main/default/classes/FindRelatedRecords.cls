@@ -216,12 +216,8 @@ public with sharing class FindRelatedRecords {
 	}
 
 	private static Integer wholeNumber(Object raw) {
-		try {
-			Decimal value = Decimal.valueOf(String.valueOf(raw).trim());
-			return value.stripTrailingZeros().scale() > 0 ? null : value.intValue();
-		} catch (Exception notANumber) {
-			return null;
-		}
+		Decimal value = SettingsService.toNumber(raw);
+		return value == null || value.stripTrailingZeros().scale() > 0 ? null : value.intValue();
 	}
 
 	private static QueryCompiler.QueryCompilerException refusedRelated(String name) {

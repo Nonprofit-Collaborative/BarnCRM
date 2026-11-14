@@ -23,7 +23,7 @@ private class UserErrorsTest {
 		System.runAs(TestUsers.admin()) {
 			Exception failure;
 			try {
-				insert new Contact();
+				insert TestDataFactory.person(new Contact());
 			} catch (DmlException failed) {
 				failure = failed;
 			}
@@ -115,6 +115,80 @@ private class UserErrorsTest {
 	}
 
 	@IsTest
+	static void aScreenShowsWhatIsWrittenForAPersonAndLogsNothing() {
+		System.runAs(TestUsers.admin()) {
+			UserErrors.Screen screen = new UserErrors.Screen('UserErrorsTest', null, FALLBACK);
+			AuraHandledException worded = UserErrors.message('Pick a date.');
+
+			String known = screen.wrap(new ImportException('Pick a file first.')).getMessage();
+			AuraHandledException passed = screen.wrap(worded);
+			String viaStatic = UserErrors.wrap(new ImportException('Again.'), 'X', FALLBACK)
+				.getMessage();
+
+			Assert.areEqual('Pick a file first.', known, 'A BarnCRM message is shown');
+			Assert.areEqual(worded, passed, 'A worded exception is passed on as it is');
+			Assert.areEqual('Again.', viaStatic, 'The static form behaves the same');
+			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c], 'Nothing logged');
+		}
+	}
+
+	@IsTest
+	static void aScreenLogsAnythingElseWithItsRecordAndShowsTheFallback() {
+		System.runAs(TestUsers.admin()) {
+			UserErrors.Screen screen = new UserErrors.Screen(
+				'UserErrorsTest.screen',
+				'Core',
+				'Core_Find_UnexpectedError'
+			);
+			Id recordId = UserInfo.getUserId();
+
+			Test.startTest();
+			String plain = screen.wrap(new NullPointerException()).getMessage();
+			String withRecord = screen.wrap(new NullPointerException(), 'Other', recordId)
+				.getMessage();
+			Test.stopTest();
+
+			String expected = BarnHelp.text('Core', 'Core_Find_UnexpectedError');
+			Assert.areEqual(expected, plain, 'The help text fallback');
+			Assert.areEqual(expected, withRecord, 'Whatever the context');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'UserErrorsTest.screen'],
+				'Logged under the screen context'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Other'],
+				'And under the context a call names'
+			);
+		}
+	}
+
+	@IsTest
+	static void aScreenShowingDmlShowsTheRowMessageOnlyWhenAsked() {
+		System.runAs(TestUsers.admin()) {
+			DmlException failure;
+			try {
+				insert TestDataFactory.person(new Contact());
+			} catch (DmlException failed) {
+				failure = failed;
+			}
+			Assert.isNotNull(failure, 'The insert failed');
+
+			String shown = new UserErrors.Screen('UserErrorsTest.dml', null, FALLBACK)
+				.showingDml()
+				.wrap(failure)
+				.getMessage();
+			String hidden = new UserErrors.Screen('UserErrorsTest.dml', null, FALLBACK)
+				.wrap(failure)
+				.getMessage();
+
+			Assert.areEqual(failure.getDmlMessage(0), shown, 'The row message');
+			Assert.areEqual(FALLBACK, hidden, 'Otherwise the fallback');
+		}
+	}
+
+	@IsTest
 	static void wrapShowingDmlKeepsABarnCrmMessage() {
 		System.runAs(TestUsers.admin()) {
 			Exception known = new ImportException('Choose a gift first.');
@@ -130,7 +204,7 @@ private class UserErrorsTest {
 		System.runAs(TestUsers.admin()) {
 			String message;
 			try {
-				insert new Contact();
+				insert TestDataFactory.person(new Contact());
 			} catch (DmlException failed) {
 				message = UserErrors.wrapShowingDml(failed, FALLBACK).getMessage();
 				Assert.areEqual(failed.getDmlMessage(0), message, 'The row message only');

@@ -10,7 +10,7 @@
  *    installer: obligations Off, policies Draft. An upgrade adds new templates only.
  * 2. Queue the job that gives the installer Corporate Hub Admin (a permission set assignment is a
  *    setup object write, and this transaction may already have written ordinary records).
- * 3. Give the Corporate Hub sets to BarnCRM's roles (`CorporateHubAccessSync`), queued for the
+ * 3. Give the Corporate Hub sets to BarnCRM's roles (`ModuleAccessSyncs`), queued for the
  *    same reason; the installer's job runs it after its own grant.
  *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what Finish
@@ -18,9 +18,7 @@
  */
 @NamespaceAccessible
 public with sharing class CorporateHubPostInstall implements InstallHandler, ModuleSetup {
-	private static final String MODULE_KEY = 'CorporateHub';
-	@TestVisible
-	private static final String ACCESS_CONTEXT = 'CorporateHubPostInstall.grantInstallerAccess';
+	public static final String MODULE_KEY = 'CorporateHub';
 	private static final String TEMPLATE_CONTEXT = 'CorporateHubPostInstall.loadTemplates';
 
 	/**
@@ -28,9 +26,7 @@ public with sharing class CorporateHubPostInstall implements InstallHandler, Mod
 	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
 	 */
 	@TestVisible
-	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Corporate_Hub_Settings__c.Reminders_Enabled__c
-	};
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{};
 
 	/** Called by the platform after the module is installed or upgraded. */
 	public void onInstall(InstallContext context) {
@@ -62,83 +58,6 @@ public with sharing class CorporateHubPostInstall implements InstallHandler, Mod
 			ErrorLogger.log(e, TEMPLATE_CONTEXT);
 		}
 		ModuleSetups.markRan(MODULE_KEY);
-		if (installerId == null) {
-			new CorporateHubAccessSync().requestSync();
-			return;
-		}
-		try {
-			System.enqueueJob(new InstallerAccess(installerId));
-		} catch (Exception e) {
-			ErrorLogger.log(e, ACCESS_CONTEXT);
-			new CorporateHubAccessSync().requestSync();
-		}
-	}
-
-	/**
-	 * Gives the installer Corporate Hub Admin, unless they hold it already, then BarnCRM's roles
-	 * their sets. System mode: the install runs as the platform's package user.
-	 */
-	public without sharing class InstallerAccess implements Queueable {
-		private final Id installerId;
-
-		public InstallerAccess(Id installerId) {
-			this.installerId = installerId;
-		}
-
-		public void execute(QueueableContext jobContext) {
-			giveInstaller();
-			try {
-				// A test cannot chain one queued job from another.
-				if (CorporateHubAccessSync.syncOnce() && !Test.isRunningTest()) {
-					System.enqueueJob(new ModuleAccessSyncBase.Job(new CorporateHubAccessSync()));
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
-
-		private void giveInstaller() {
-			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE Name = :CorporateHubAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				if (sets.isEmpty()) {
-					return;
-				}
-				Integer held = [
-					SELECT COUNT()
-					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
-					WITH SYSTEM_MODE
-				];
-				if (held > 0) {
-					return;
-				}
-				Database.SaveResult saved = Database.insert(
-					new PermissionSetAssignment(
-						AssigneeId = installerId,
-						PermissionSetId = sets[0].Id
-					),
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
-				// A duplicate means another job gave it a moment before: what was wanted.
-				for (Database.Error error : saved.getErrors()) {
-					if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-						ErrorLogger.logMessage(
-							error.getMessage(),
-							ACCESS_CONTEXT,
-							ErrorLogger.SEVERITY_WARNING
-						);
-					}
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
+		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}
 }

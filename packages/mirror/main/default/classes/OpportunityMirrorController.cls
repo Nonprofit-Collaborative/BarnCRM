@@ -5,6 +5,11 @@
  */
 public with sharing class OpportunityMirrorController {
 	private static final String CONTEXT = 'OpportunityMirrorController';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Mirror',
+		'Mirror_OpportunityMirror_ErrorFailed'
+	);
 	/**
 	 * Held through the Opportunity Mirror permission set. Reading the page's status and the
 	 * reconciliation needs it, as the page's entry in the settings console does (ADR-0038).
@@ -40,7 +45,7 @@ public with sharing class OpportunityMirrorController {
 		try {
 			return status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -51,7 +56,7 @@ public with sharing class OpportunityMirrorController {
 		try {
 			OpportunityMirrorBatch.run();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 		current.running = true;
 		return current;
@@ -79,7 +84,7 @@ public with sharing class OpportunityMirrorController {
 		try {
 			OpportunityMirrorBatch.runRange(fromDate, toDate);
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 		current.running = true;
 		return current;
@@ -93,7 +98,7 @@ public with sharing class OpportunityMirrorController {
 			OpportunityMirrorSchedulable.schedule();
 			return status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -109,7 +114,7 @@ public with sharing class OpportunityMirrorController {
 			OpportunityMirrorSchedulable.stop();
 			return status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -122,7 +127,7 @@ public with sharing class OpportunityMirrorController {
 		} catch (OpportunityMirrorReconciliation.ReconciliationException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 	}
 
@@ -140,7 +145,7 @@ public with sharing class OpportunityMirrorController {
 		try {
 			current = status();
 		} catch (Exception unexpected) {
-			throw failed(unexpected);
+			throw ERRORS.wrap(unexpected);
 		}
 		String refusal = refusal(current, scheduling);
 		if (refusal != null) {
@@ -199,10 +204,5 @@ public with sharing class OpportunityMirrorController {
 			Schema.SObjectType.Gift__c.isCreateable() &&
 			link.isAccessible() &&
 			link.isCreateable();
-	}
-
-	private static AuraHandledException failed(Exception unexpected) {
-		ErrorLogger.log(unexpected, CONTEXT);
-		return UserErrors.message(BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_ErrorFailed'));
 	}
 }

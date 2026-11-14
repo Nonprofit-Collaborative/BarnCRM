@@ -193,6 +193,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Skill__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Volunteer_Hours__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -303,6 +308,56 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Volunteer_Requirement__c.Account__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Completed_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Entry_Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Expires__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Guardian__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Volunteer_Requirement__c.Is_Current__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Notes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Provider__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Volunteer_Requirement__c.Reference_ID__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Volunteer_Shift__c.Location__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -408,26 +463,6 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Volunteer_Requirement__c.Entry_Source__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Guardian__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Provider__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Reference_ID__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Volunteer_Signup__c.Reminder_Sent_On__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -443,47 +478,12 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Skill__c.Sample_Data__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Volunteer_Skill__c.Account__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
     <field>Volunteer_Skill__c.Contact__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Account__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Completed_Date__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Contact__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Expires__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>false</editable>
-    <field>Volunteer_Requirement__c.Is_Current__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Volunteer_Requirement__c.Notes__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <objectPermissions>
@@ -520,6 +520,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
     <object>Volunteer_Letter_Template__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Volunteer_Requirement__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
@@ -567,15 +576,10 @@
     <object>Volunteer_Skill__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
-  <objectPermissions>
-    <allowCreate>true</allowCreate>
-    <allowDelete>true</allowDelete>
-    <allowEdit>true</allowEdit>
-    <allowRead>true</allowRead>
-    <modifyAllRecords>true</modifyAllRecords>
-    <object>Volunteer_Requirement__c</object>
-    <viewAllRecords>true</viewAllRecords>
-  </objectPermissions>
+  <tabSettings>
+    <tab>Log_Hours</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
   <tabSettings>
     <tab>Skill__c</tab>
     <visibility>Visible</visibility>

@@ -9,6 +9,11 @@
  */
 public with sharing class DonorLevelController {
 	private static final String CONTEXT = 'Donor Levels page';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		CONTEXT,
+		'Giving',
+		'Giving_DonorLevels_ActionFailed'
+	);
 
 	public class LadderModel {
 		@AuraEnabled
@@ -65,7 +70,7 @@ public with sharing class DonorLevelController {
 			}
 			return model;
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -83,9 +88,13 @@ public with sharing class DonorLevelController {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_DonorLevels_TurnOnFirst'));
 		}
 		try {
-			return Database.executeBatch(new DonorLevelBatch(), DonorLevelSchedulable.CHUNK_SIZE);
+			return AsyncStarter.batch(
+				new DonorLevelBatch(),
+				DonorLevelSchedulable.CHUNK_SIZE,
+				'DonorLevelController'
+			);
 		} catch (Exception failure) {
-			throw report(failure);
+			throw ERRORS.wrap(failure);
 		}
 	}
 
@@ -106,10 +115,5 @@ public with sharing class DonorLevelController {
 			}
 		}
 		return source;
-	}
-
-	private static AuraHandledException report(Exception failure) {
-		ErrorLogger.log(failure, CONTEXT);
-		return UserErrors.message(BarnHelp.text('Giving', 'Giving_DonorLevels_ActionFailed'));
 	}
 }

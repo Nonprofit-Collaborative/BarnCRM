@@ -48,11 +48,11 @@ private class RollupPreviewEaseTest {
 	}
 
 	private static Account parentWith(String name, List<String> children) {
-		Account parent = new Account(Name = name);
+		Account parent = TestDataFactory.organization(new Account(Name = name));
 		insert parent;
 		List<Account> kids = new List<Account>();
 		for (String child : children) {
-			kids.add(new Account(Name = child, ParentId = parent.Id));
+			kids.add(TestDataFactory.organization(new Account(Name = child, ParentId = parent.Id)));
 		}
 		insert kids;
 		return parent;
@@ -79,10 +79,13 @@ private class RollupPreviewEaseTest {
 				byName.put(row.name, row);
 			}
 			System.Assert.isTrue(byName.get('Kid One').counted);
-			System.Assert.areEqual(Label.Core_RollupEase_RowCounted, byName.get('Kid One').reason);
+			System.Assert.areEqual(
+				Label.Rollups_RollupEase_RowCounted,
+				byName.get('Kid One').reason
+			);
 			System.Assert.isFalse(byName.get('Other').counted);
 			System.Assert.areEqual(
-				String.format(Label.Core_RollupEase_RowFails, new List<String>{ '1' }),
+				String.format(Label.Rollups_RollupEase_RowFails, new List<String>{ '1' }),
 				byName.get('Other').reason,
 				'Condition 1 is the one it does not meet'
 			);
@@ -156,7 +159,7 @@ private class RollupPreviewEaseTest {
 			System.Assert.areEqual(
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_PreviewResult'),
-					new List<String>{ (2).format(), Label.Core_RollupBuilder_PreviewEmpty }
+					new List<String>{ (2).format(), Label.Rollups_RollupBuilder_PreviewEmpty }
 				),
 				byId.get(first.Id).result,
 				'Two children counted, next to the empty field'

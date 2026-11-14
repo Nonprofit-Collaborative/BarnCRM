@@ -299,7 +299,7 @@ public with sharing class ErrorDigestService {
 					entry.Id
 			);
 		}
-		Integer unlisted = window.total - window.newest.size();
+		Integer unlisted = window.rows - window.newest.size();
 		if (unlisted > 0) {
 			lines.add(
 				String.format(

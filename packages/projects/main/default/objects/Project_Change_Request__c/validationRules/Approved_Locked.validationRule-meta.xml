@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Approved_Locked</fullName>
+  <active>true</active>
+  <description>R-PM20: an approved change request changes only by Projects Admin.</description>
+  <errorConditionFormula>AND(ISPICKVAL(PRIORVALUE(Status__c), "Approved"), NOT($Permission.Projects_Manage), OR(ISCHANGED(Status__c), ISCHANGED(Hours__c), ISCHANGED(Amount__c)))</errorConditionFormula>
+  <errorMessage>This change request is approved. Ask a Projects admin to change it.</errorMessage>
+</ValidationRule>

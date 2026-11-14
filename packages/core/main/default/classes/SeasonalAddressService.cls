@@ -180,7 +180,9 @@ public with sharing class SeasonalAddressService {
 	 * One owner at a time, and one saved DML per owner, because a swap is a pair of writes and
 	 * a half-saved pair would leave a household with no default address and so with nothing in
 	 * its standard address fields. An owner whose save fails is written to the Error Log with
-	 * the reason and counted as a failure; the rest of the run carries on (R-AD8).
+	 * the reason and counted as a failure; the rest of the run carries on (R-AD8). Warnings and
+	 * failures are logged together once the owners are done, so logging costs two statements
+	 * however many owners there are.
 	 */
 	public static RunSummary swapOwners(Set<Id> ownerIds, Date today) {
 		RunSummary summary = new RunSummary();
@@ -191,35 +193,45 @@ public with sharing class SeasonalAddressService {
 		Map<Id, List<Address__c>> byOwner = groupByOwner(
 			SeasonalAddressSelector.selectAllForOwners(ownerIds)
 		);
-
-		for (Id ownerId : byOwner.keySet()) {
-			Plan plan = planFor(byOwner.get(ownerId), today);
-			if (plan.collidingAddressId != null) {
-				ErrorLogger.logMessage(
-					BarnHelp.text('Core', 'Core_SeasonalAddress_CollisionWarning'),
-					LOG_CONTEXT,
-					ErrorLogger.SEVERITY_WARNING,
-					plan.collidingAddressId
-				);
-			}
-			if (plan.updates.isEmpty()) {
-				continue;
-			}
-			Boolean movesWereChosen = AddressService.chooseHouseholdMoves(true);
-			try {
-				SeasonalAddressWriter.save(plan.updates);
-				if (plan.movedIn) {
-					summary.movedIn++;
+		List<String> warnings = new List<String>();
+		List<Id> collidingIds = new List<Id>();
+		List<Exception> failures = new List<Exception>();
+		List<Id> failedOwnerIds = new List<Id>();
+		try {
+			for (Id ownerId : byOwner.keySet()) {
+				Plan plan = planFor(byOwner.get(ownerId), today);
+				if (plan.collidingAddressId != null) {
+					warnings.add(BarnHelp.text('Core', 'Core_SeasonalAddress_CollisionWarning'));
+					collidingIds.add(plan.collidingAddressId);
 				}
-				if (plan.movedBack) {
-					summary.movedBack++;
+				if (plan.updates.isEmpty()) {
+					continue;
 				}
-			} catch (Exception saveFailed) {
-				summary.failed++;
-				ErrorLogger.log(saveFailed, LOG_CONTEXT, ownerId);
-			} finally {
-				AddressService.chooseHouseholdMoves(movesWereChosen);
+				Boolean movesWereChosen = AddressService.chooseHouseholdMoves(true);
+				try {
+					SeasonalAddressWriter.save(plan.updates);
+					if (plan.movedIn) {
+						summary.movedIn++;
+					}
+					if (plan.movedBack) {
+						summary.movedBack++;
+					}
+				} catch (Exception saveFailed) {
+					summary.failed++;
+					failures.add(saveFailed);
+					failedOwnerIds.add(ownerId);
+				} finally {
+					AddressService.chooseHouseholdMoves(movesWereChosen);
+				}
 			}
+		} finally {
+			ErrorLogger.logMessages(
+				warnings,
+				collidingIds,
+				LOG_CONTEXT,
+				ErrorLogger.SEVERITY_WARNING
+			);
+			ErrorLogger.logEach(failures, failedOwnerIds, LOG_CONTEXT);
 		}
 		return summary;
 	}

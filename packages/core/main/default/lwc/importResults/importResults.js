@@ -1,5 +1,6 @@
 import { LightningElement, api } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import IMPORT_BATCH from '@salesforce/schema/Import_Batch__c';
 import seeEveryRow from '@salesforce/label/c.Core_Import_SeeEveryRow';
 
 import previewWouldCreate from '@salesforce/label/c.Core_Import_PreviewWouldCreate';
@@ -77,7 +78,7 @@ export default class ImportResults extends NavigationMixin(LightningElement) {
       type: 'standard__recordRelationshipPage',
       attributes: {
         recordId: this.batch.id,
-        objectApiName: 'Import_Batch__c',
+        objectApiName: IMPORT_BATCH.objectApiName,
         relationshipApiName: 'Import_Rows',
         actionName: 'view'
       }

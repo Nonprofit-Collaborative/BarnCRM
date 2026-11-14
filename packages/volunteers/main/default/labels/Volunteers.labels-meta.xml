@@ -537,30 +537,6 @@
         <value>{0} Shift Schedule Has Not Created Shifts Far Enough Ahead</value>
     </labels>
     <labels>
-        <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Coordinators missing their set title; {0} is the count</shortDescription>
-        <value>{0} Volunteer Coordinators Do Not Have the Volunteers Coordinator Permission Set</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_CoordinatorAccessTitleOne</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One coordinator missing their set title; {0} is 1</shortDescription>
-        <value>{0} Volunteer Coordinator Does Not Have the Volunteers Coordinator Permission Set</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_CoordinatorAccessFix</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: button that gives coordinators their set</shortDescription>
-        <value>Give Volunteers Coordinator now</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_HealthCheck_RollupsOffTitle</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -759,5 +735,13 @@
         <protected>true</protected>
         <shortDescription>Volunteers Home figure: value of approved hours this month (V-12)</shortDescription>
         <value>Value of Hours This Month</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Glance_Title</fullName>
+        <categories>Volunteers, Record pages</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteering at a Glance card title (D-200 R1)</shortDescription>
+        <value>Volunteering at a Glance</value>
     </labels>
 </CustomLabels>

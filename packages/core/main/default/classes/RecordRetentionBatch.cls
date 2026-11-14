@@ -84,7 +84,11 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	/** As a step of the nightly run: starts the first pass. */
 	public void execute(SchedulableContext context) {
-		Database.executeBatch(new RecordRetentionBatch(SETTING_CHANGES), CHUNK_SIZE);
+		AsyncStarter.batch(
+			new RecordRetentionBatch(SETTING_CHANGES),
+			CHUNK_SIZE,
+			'RecordRetentionBatch'
+		);
 	}
 
 	/** The step: twenty past one. No switch. The import row cleanup is its pass 7. */
@@ -237,15 +241,6 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	/** The setting, or its default when empty, held between `minimum` and ten years. */
 	private static Integer days(String key, Integer fallback, Integer minimum) {
-		Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
-		if (configured == null) {
-			return fallback;
-		}
-		try {
-			Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(minimum, Math.min(value, 3650));
-		} catch (Exception ignored) {
-			return fallback;
-		}
+		return DataJobs.wholeNumberSetting(key, fallback, minimum, 3650);
 	}
 }

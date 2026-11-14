@@ -2,9 +2,7 @@
  * Maria installs Project Management: BarnCRM Admin holders get Projects Admin, BarnCRM's roles get
  * their sets, the nightly step is offered, and nothing in the install can fail it.
  */
-@IsTest(
-	testFor='ApexClass:ProjectsPostInstall, ApexClass:ProjectsAccessSync, ApexClass:ProjectsNightlyJobProvider'
-)
+@IsTest(testFor='ApexClass:ProjectsPostInstall, ApexClass:ProjectsNightlyJobProvider')
 private class ProjectsPostInstallTest {
 	@TestSetup
 	static void createTestUser() {
@@ -18,6 +16,21 @@ private class ProjectsPostInstallTest {
 			WHERE AssigneeId = :userId AND PermissionSet.Name = :setName
 			WITH SYSTEM_MODE
 		];
+	}
+
+	@IsTest
+	static void anUnsavedReturnPageShowsTheMyDomainAddressInTheConsole() {
+		System.runAs(TestUsers.admin()) {
+			Assert.areEqual(
+				ProjectsSettings.myDomain(),
+				SettingsService.getEffectiveValue(
+					ProjectsSettings.SETTINGS_OBJECT,
+					'Invoice_Return_Url__c',
+					'Text'
+				),
+				'Never blank, on an org the install never ran in'
+			);
+		}
 	}
 
 	@IsTest
@@ -35,7 +48,7 @@ private class ProjectsPostInstallTest {
 
 			Assert.areEqual(
 				1,
-				held(TestUsers.admin().Id, ProjectsAccessSync.ADMIN_SET),
+				held(TestUsers.admin().Id, 'Projects_Admin'),
 				'BarnCRM Admin holds Projects Admin'
 			);
 			Assert.areEqual(
@@ -43,7 +56,13 @@ private class ProjectsPostInstallTest {
 				held(member.Id, 'Projects_Staff'),
 				'Team Member holds Projects Staff'
 			);
-			Assert.areEqual('Projects', new ProjectsAccessSync().moduleName(), 'Module key');
+			Assert.isTrue(
+				ModuleExtensions.forModule(
+					NightlyStepProvider.class,
+					'Projects'
+				) instanceof ProjectsNightlyJobProvider,
+				'The catalog registers the provider'
+			);
 			List<NightlyStep> steps = new ProjectsNightlyJobProvider().nightlySteps();
 			Assert.areEqual(
 				ProjectHealth.JOB_NAME,
@@ -51,6 +70,38 @@ private class ProjectsPostInstallTest {
 				'The health step joins the nightly run'
 			);
 			Assert.areEqual(400, steps[0].minute, 'At 6:40 AM');
+			SettingsService.clearCaches();
+			Assert.areEqual(
+				Url.getOrgDomainUrl().toExternalForm(),
+				String.valueOf(
+					SettingsService.getValue(
+						ProjectsSettings.SETTINGS_OBJECT,
+						'Invoice_Return_Url__c'
+					)
+				),
+				'The return page is filled with My Domain, never blank'
+			);
+		}
+	}
+
+	@IsTest
+	static void aReturnPageTheAdminChoseIsKept() {
+		System.runAs(TestUsers.admin()) {
+			OrgSettingsSystemWriter.save(
+				Projects_Settings__c.SObjectType,
+				new Map<Schema.SObjectField, Object>{
+					Projects_Settings__c.Invoice_Return_Url__c => 'https://example.org/thanks'
+				}
+			);
+			Test.startTest();
+			new ProjectsPostInstall().runSetup(null);
+			Test.stopTest();
+			SettingsService.clearCaches();
+			Assert.areEqual(
+				'https://example.org/thanks',
+				ProjectsSettings.invoiceReturnUrl(),
+				'A saved page is never replaced'
+			);
 		}
 	}
 }

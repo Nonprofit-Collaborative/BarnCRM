@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import AutomationControl from 'c/automationControl';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getPage from '@salesforce/apex/AutomationControlController.getPage';
 import saveControl from '@salesforce/apex/AutomationControlController.saveControl';
 import addControl from '@salesforce/apex/AutomationControlController.addControl';
@@ -208,8 +209,17 @@ describe('c-automation-control: Automation Control rows, own flows, Catch Up Now
     await flush();
     expect(addControl).toHaveBeenCalledWith({ ownerId: PROFILE_ID });
 
+    BarnConfirmModal.open.mockResolvedValue(false);
     one(element, 'remove-control').click();
     await flush();
+    expect(removeControl).not.toHaveBeenCalled();
+
+    BarnConfirmModal.open.mockResolvedValue(true);
+    one(element, 'remove-control').click();
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
     expect(removeControl).toHaveBeenCalledWith({ ownerId: PROFILE_ID });
   });
 
@@ -244,6 +254,12 @@ describe('c-automation-control: Automation Control rows, own flows, Catch Up Now
     await flush();
     expect(addFlow).toHaveBeenCalledWith({ apiName: 'Other_Flow' });
 
+    BarnConfirmModal.open.mockResolvedValue(false);
+    one(element, 'remove-flow').click();
+    await flush();
+    expect(removeFlow).not.toHaveBeenCalled();
+
+    BarnConfirmModal.open.mockResolvedValue(true);
     one(element, 'remove-flow').click();
     await flush();
     expect(removeFlow).toHaveBeenCalledWith({ automationName: 'Flow:My_Gift_Flow' });

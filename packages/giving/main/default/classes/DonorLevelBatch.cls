@@ -23,25 +23,44 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 	private Integer moved = 0;
 	/** Who pressed Recalculate now, told when the run ends; null for the nightly run (Q-04). */
 	private Id notifyUserId;
+	/**
+	 * Last gift date ranges in pairs, for a pass over only the donors crossing a recency cutoff
+	 * (D-200 P1); null for every donor.
+	 */
+	@TestVisible
+	private final List<Date> edges;
 
 	/** A run that starts with accounts and chains to contacts. */
 	public DonorLevelBatch() {
-		this(ACCOUNTS, JobNotifier.starter(), 0);
+		this(ACCOUNTS, JobNotifier.starter(), 0, null);
 	}
 
 	@TestVisible
 	private DonorLevelBatch(String scopeObject) {
-		this(scopeObject, JobNotifier.starter(), 0);
+		this(scopeObject, JobNotifier.starter(), 0, null);
 	}
 
-	/** A pass that carries who to tell and what the passes before it moved. */
-	private DonorLevelBatch(String scopeObject, Id notifyUserId, Integer moved) {
+	/** A pass that carries who to tell, what the passes before it moved, and its ranges. */
+	private DonorLevelBatch(String scopeObject, Id notifyUserId, Integer moved, List<Date> edges) {
 		this.scopeObject = scopeObject;
 		this.notifyUserId = notifyUserId;
 		this.moved = moved;
+		this.edges = edges;
+	}
+
+	/**
+	 * A run over only the donors whose last gift date lies in these ranges: the night's donor
+	 * scores move only where days since the last gift cross a recency cutoff. It neither records
+	 * a recalculation nor sends a notice.
+	 */
+	public static DonorLevelBatch recencyEdges(List<Date> edges) {
+		return new DonorLevelBatch(ACCOUNTS, null, 0, edges);
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
+		if (edges != null) {
+			return DonorLevelSelector.recencyEdgeLocator(scopeObject, edges);
+		}
 		return ACCOUNTS.equals(scopeObject)
 			? DonorLevelSelector.accountLocator()
 			: DonorLevelSelector.contactLocator();
@@ -72,8 +91,14 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 		try {
 			if (ACCOUNTS.equals(scopeObject)) {
 				if (!Test.isRunningTest()) {
-					Database.executeBatch(new DonorLevelBatch(CONTACTS, notifyUserId, moved), 200);
+					Database.executeBatch(
+						new DonorLevelBatch(CONTACTS, notifyUserId, moved, edges),
+						200
+					);
 				}
+				return;
+			}
+			if (edges != null) {
 				return;
 			}
 			DonorLevelService.recordRecalculation(System.now());

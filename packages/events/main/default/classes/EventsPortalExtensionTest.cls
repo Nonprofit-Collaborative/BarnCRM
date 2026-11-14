@@ -7,11 +7,11 @@
 private class EventsPortalExtensionTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c event(String status, Integer startsInDays) {
@@ -28,7 +28,9 @@ private class EventsPortalExtensionTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = new Contact(FirstName = 'Ana', LastName = lastName);
+		Contact record = TestDataFactory.person(
+			new Contact(FirstName = 'Ana', LastName = lastName)
+		);
 		insert as user record;
 		return record;
 	}

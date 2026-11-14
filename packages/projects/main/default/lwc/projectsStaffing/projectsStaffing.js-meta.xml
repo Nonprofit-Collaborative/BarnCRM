@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Staffing page: open resource requests with Fill (people ranked by skills, role and free
+    capacity) and the people who can be staffed (PM-09, R-PM15).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Projects Staffing</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

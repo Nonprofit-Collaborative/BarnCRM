@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM landing/batch-d-i bf7f0eff1 (the integrated Batch D to I build, on top of v1.0 and Batch C). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM landing/batch-k d2bacab37 (the integrated Batch K build). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -103,6 +103,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | Installing BarnCRM: supported editions, room needed, install pre-check, production install, upgrades | [installing.md](installing.md) | Every package |
+| Pilot checklist: set up, first weeks, reporting what you find | [pilot-checklist.md](pilot-checklist.md) | Every package |
 | C-03 BarnCRM Apps, Navigation and Setup Checklist | [barncrm-app.md](barncrm-app.md) | Core |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
 | C-30 Editions | [editions.md](editions.md) | Core |
@@ -128,7 +129,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-02 Household names and greetings | [household-naming.md](household-naming.md) | Core |
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core |
 | C-07 Coexistence mode | [coexistence-mode.md](coexistence-mode.md) | Core |
-| X-09 Nonprofit Cloud households | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core, only in an org with Nonprofit Cloud |
+| X-09 Nonprofit Cloud households, MIG-02b Household Model and conversion | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core (guards, Household Model, the conversion section) and Mirror (conversion source, kit, drift report), only in an org with Nonprofit Cloud |
 | X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | Core, only in an org with NPSP |
 | C-15 Relationships | [relationships.md](relationships.md) | Core |
 | C-16 Affiliations | [affiliations.md](affiliations.md) | Core |
@@ -221,6 +222,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Mirror |
 | X-07 Gift Transaction mirror | [gift-transaction-mirror.md](gift-transaction-mirror.md) | Mirror |
+| D-201 Cases sent to a service provider: the named credential, the setting, the nightly run and flow action, Provider Requests | [mirror-case-requests.md](mirror-case-requests.md) | Mirror |
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Mirror |
 | X-03, X-06 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Mirror |
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Mirror |
@@ -297,6 +299,8 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | PM-01 to PM-05 Project Management: install, access, settings, projects, phases, tasks and milestones, templates (Salesforce Implementation, Program Launch, your own), time entries, assignments, budgets, utilization, Export Billable Time, health, status updates, the Projects at Risk card, reports | [projects.md](projects.md) | BarnCRM Project Management |
+| PM-06 to PM-12 Project Management PSA: settings per part, who approves, rate cards, timesheets and approvals, expenses, resources and staffing, billing types and invoices, Pay Online through BarnCRM Payments, financials and recognized revenue, change requests | [projects-psa.md](projects-psa.md) | BarnCRM Project Management |
+| D-201 Project Management requests and issues: settings, assigning and queues, the request life cycle, shared and internal comments, Create Task and Create Change Request, requesters in the portal, requests from another organization, reports | [projects-requests.md](projects-requests.md) | BarnCRM Project Management |
 
 ### Scholarships and Outbound Grants
 

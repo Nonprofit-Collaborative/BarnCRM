@@ -4,10 +4,9 @@
  * model R-NJ1 to R-NJ7). `NightlyRun` runs the steps; this class is everything else, and what
  * every page, Health Check and the install steps call.
  *
- * Steps are Core's own plus those of each dependent package that registers a
- * `NightlyStepProvider`, found by class name as `HealthCheckExtensions` finds an extension: a
- * class name takes no `__` prefix, so it is tried with this package's namespace and then
- * without. A provider that is missing, cannot be built or throws is skipped and logged.
+ * Steps are Core's own plus those of each module whose catalog row registers a
+ * `NightlyStepProvider` (`ModuleExtensions`, D-200 S1), asked in catalog order. A provider that
+ * is missing or cannot be built is skipped; one that throws is skipped and logged.
  *
  * Switches and results are rows of `Nightly_Job__c`, one per step key plus one for the run,
  * read once per transaction and written in system mode (ADR-0021): they are the package's own
@@ -38,46 +37,11 @@ public with sharing class NightlyJobs {
 	public static final String SKIPPED = 'Skipped';
 	public static final String GAVE_UP = 'Gave Up Waiting';
 
-	/** The provider classes dependent packages register, in the order they are asked. */
-	@NamespaceAccessible
-	public static final List<String> PROVIDER_CLASSES = new List<String>{
-		'RollupsNightlyJobProvider',
-		'GivingNightlyJobProvider',
-		'MirrorNightlyJobProvider',
-		'VolunteersNightlyJobProvider',
-		'ProgramsNightlyJobProvider',
-		'LogicModelsNightlyJobProvider',
-		'FundersNightlyJobProvider',
-		'EventsNightlyJobProvider',
-		'CorporateHubNightlyJobProvider',
-		'ScholarshipsNightlyJobProvider',
-		'TerritoryNightlyJobProvider',
-		'MembershipsNightlyJobProvider',
-		'ProjectsNightlyJobProvider',
-		'AddressVerificationNightlyJobProvider'
-	};
-
-	/** Separate schedules of steps that became part of another step: adopted, then aborted. */
-	private static final List<String> RETIRED_KEYS = new List<String>{
-		ImportRowPurgeScheduler.JOB_NAME
-	};
-
 	private static final String ERROR_CONTEXT = 'NightlyJobs';
 
 	/** Set by a test to the whole list, so no test depends on which modules are installed. */
 	@TestVisible
 	private static List<NightlyStep> stepsOverride;
-
-	/** Injected by Core's tests by class name, since no other package is there to resolve. */
-	@TestVisible
-	private static Map<String, NightlyStepProvider> providerOverrides = new Map<String, NightlyStepProvider>();
-
-	/**
-	 * True lets a test adopt old schedules. Off in tests by default, because a test sees the
-	 * org's real scheduled jobs and an abort would not be rolled back.
-	 */
-	@TestVisible
-	private static Boolean adoptInTests = false;
 
 	/** The rows by key, read once per transaction; null until asked. */
 	private static Map<String, Nightly_Job__c> rowsByKey;
@@ -121,8 +85,8 @@ public with sharing class NightlyJobs {
 			registered.addAll(stepsOverride);
 		} else {
 			registered.addAll(coreSteps());
-			for (String className : PROVIDER_CLASSES) {
-				registered.addAll(providedBy(className));
+			for (Object provider : ModuleExtensions.all(NightlyStepProvider.class)) {
+				registered.addAll(providedBy((NightlyStepProvider) provider));
 			}
 		}
 		builtSteps = inOrder(registered);
@@ -173,27 +137,14 @@ public with sharing class NightlyJobs {
 		return ordered;
 	}
 
-	private static List<NightlyStep> providedBy(String className) {
+	private static List<NightlyStep> providedBy(NightlyStepProvider provider) {
 		try {
-			NightlyStepProvider provider = providerOverrides.containsKey(className)
-				? providerOverrides.get(className)
-				: resolve(className);
-			List<NightlyStep> provided = provider == null ? null : provider.nightlySteps();
+			List<NightlyStep> provided = provider.nightlySteps();
 			return provided == null ? new List<NightlyStep>() : provided;
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, ERROR_CONTEXT);
 			return new List<NightlyStep>();
 		}
-	}
-
-	private static NightlyStepProvider resolve(String className) {
-		Type providerType = NamespaceUtil.resolveType(className);
-		if (providerType == null) {
-			return null;
-		}
-		Object candidate = providerType.newInstance();
-		// A module still on its provider from before the nightly run (mid-upgrade) is skipped.
-		return candidate instanceof NightlyStepProvider ? (NightlyStepProvider) candidate : null;
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -294,54 +245,6 @@ public with sharing class NightlyJobs {
 	}
 
 	// -------------------------------------------------------------------------------------
-	// Adopting the old schedules (R-NJ5)
-	// -------------------------------------------------------------------------------------
-
-	/**
-	 * Replaces every separate schedule a known step used to have with the nightly run: aborts
-	 * each, turns on the switch of a step that has one, and schedules the run when anything was
-	 * adopted. Returns true when something was. Never throws.
-	 */
-	@NamespaceAccessible
-	public static Boolean adoptOldSchedules() {
-		if (Test.isRunningTest() && !adoptInTests) {
-			return false;
-		}
-		try {
-			List<Nightly_Job__c> switched = new List<Nightly_Job__c>();
-			Boolean adopted = false;
-			for (String retired : RETIRED_KEYS) {
-				Id gone = ScheduledJobSelector.triggerIdByName(retired);
-				if (gone != null) {
-					ScheduledJobSelector.abort(gone);
-					adopted = true;
-				}
-			}
-			for (NightlyStep candidate : steps()) {
-				Id old = ScheduledJobSelector.triggerIdByName(candidate.key);
-				if (old == null) {
-					continue;
-				}
-				ScheduledJobSelector.abort(old);
-				adopted = true;
-				if (candidate.hasSwitch()) {
-					Nightly_Job__c row = rowFor(candidate.key);
-					row.Switch__c = SWITCH_ON;
-					switched.add(row);
-				}
-			}
-			save(switched);
-			if (adopted) {
-				start();
-			}
-			return adopted;
-		} catch (Exception failed) {
-			ErrorLogger.log(failed, ERROR_CONTEXT);
-			return false;
-		}
-	}
-
-	// -------------------------------------------------------------------------------------
 	// Health Check
 	// -------------------------------------------------------------------------------------
 
@@ -359,12 +262,11 @@ public with sharing class NightlyJobs {
 	}
 
 	/**
-	 * Adopts any old schedule, then schedules the nightly run and the hourly check where they
+	 * Schedules the nightly run and the hourly check where they
 	 * are missing. Returns the labels of those that were missing.
 	 */
 	public static List<String> scheduleAll() {
 		List<String> scheduled = unscheduledLabels();
-		adoptOldSchedules();
 		start();
 		TabAccessScheduler.start();
 		return scheduled;

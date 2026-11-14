@@ -74,6 +74,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 **Steps:** 1. As the admin, create a Certification with Credits Required 10 and Valid Months 24. 2. As staff, create a Member Certification for the contact. 3. Press Grant. 4. Add a Continuing Credit of 6. 5. Add another of 4, then press Renew. 6. Press Revoke, then Grant.
 **Expected:** 2. Status Pending; the panel shows Grant only. 3. Active, Earned On today, Expires On 24 months on. 4. Credits toward renewal 6 of 10; no Renew, the panel says 6 earned, 10 needed. 5. Expires On moves 24 months past the old date; both credits Used; credits toward renewal 0 of 10. 6. Revoked, then Active again. A Memberships Read Only user sees the panel with no buttons.
 
+## T-MEM-12: Sample Data
+
+**Purpose:** confirm the Memberships sample data loads for the sample people and takes away only itself.
+**Prerequisites:** an admin; Core's sample data not yet loaded; one level and one membership of your own.
+**Steps:** 1. **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. 2. Open **Memberships**, list the memberships and the levels. 3. Open Harper Garcia's membership. 4. **Remove Sample Data**.
+**Expected:** 1. The Sample Data card shows a **Memberships** count of `14`. 2. Five sample levels with benefits; memberships Current, Grace (one), Lapsed (two), Pending, Cancelled and Renewed, three of them due within a month, and one Lifetime with no end date. 3. A Current Family Member term that points to a Renewed earlier term. 4. Every sample level and membership is gone; your own level and membership stay.
+**Cleanup:** None.
+
 ## T-MEM-11: Certification Expiry
 
 **Purpose:** confirm the nightly run expires certifications (R-MEM12).

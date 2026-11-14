@@ -10,18 +10,20 @@
 private class EventSponsorLeadsTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Contact person(String first, String last) {
-		Contact record = new Contact(
-			FirstName = first,
-			LastName = last,
-			Email = first.toLowerCase() + '@example.org'
+		Contact record = TestDataFactory.person(
+			new Contact(
+				FirstName = first,
+				LastName = last,
+				Email = first.toLowerCase() + '@example.org'
+			)
 		);
 		insert as user record;
 		return record;

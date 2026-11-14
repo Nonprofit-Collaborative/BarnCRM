@@ -23,13 +23,15 @@ private class QuickGiftEntryControllerTest {
 	}
 
 	private static Contact makeContact() {
-		Contact donor = new Contact(FirstName = 'Maria', LastName = 'Alvarez');
+		Contact donor = TestDataFactory.person(
+			new Contact(FirstName = 'Maria', LastName = 'Alvarez')
+		);
 		insert donor;
 		return donor;
 	}
 
 	private static Account makeAccount() {
-		Account donor = new Account(Name = 'Riverside Foundation');
+		Account donor = TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 		insert donor;
 		return donor;
 	}
@@ -460,7 +462,9 @@ private class QuickGiftEntryControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			makeFund();
 			Contact donor = makeContact();
-			Contact someoneElse = new Contact(FirstName = 'Kim', LastName = 'Lee');
+			Contact someoneElse = TestDataFactory.person(
+				new Contact(FirstName = 'Kim', LastName = 'Lee')
+			);
 			insert someoneElse;
 			Installment__c payment = pledgePaymentDueToday(someoneElse.Id);
 			QuickGiftEntryController.GiftInput input = baseInput();
@@ -509,7 +513,9 @@ private class QuickGiftEntryControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			makeFund();
 			Contact donor = makeContact();
-			Contact widow = new Contact(FirstName = 'Elena', LastName = 'Ruiz');
+			Contact widow = TestDataFactory.person(
+				new Contact(FirstName = 'Elena', LastName = 'Ruiz')
+			);
 			insert widow;
 			QuickGiftEntryController.GiftInput input = baseInput();
 			input.donorContactId = donor.Id;

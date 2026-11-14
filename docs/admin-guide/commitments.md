@@ -60,12 +60,13 @@ create or change; existing schedules are left alone until you edit them.
 Commitments need jobs to run overnight, and until you switch them on none of them
 runs. This is the step that makes a payment turn Overdue on its own.
 
-Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly Jobs**.
-The page opens with a line for each job, then one button.
-
-Choose **Schedule Nightly Run**. Five jobs are switched on at once, as steps of
-[BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run (the button also schedules that
-run when it is not scheduled yet):
+Open **BarnCRM Settings**, choose **General**, and find the **Nightly Jobs** panel
+([BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run). It lists every module's steps,
+Giving's five among them, each on its own row. Four of the five ship on and the pledge
+reminders ship off; the steps run only once the nightly run is scheduled, so choose
+**Schedule Nightly Jobs** on the panel if it says the run is not scheduled. **Turn On** or **Turn Off** on a
+row switches that one job and leaves the others as they were (1.23, D-200; the Giving Nightly
+Jobs page that switched all five together is retired).
 
 | Job | Runs at | What it does |
 |---|---|---|
@@ -75,10 +76,8 @@ run when it is not scheduled yet):
 | Pledge reminders | 03:15 | Sends the [pledge reminder](pledge-reminders.md) steps that are due. Sends nothing while **Send Pledge Reminders** is off, which is how it ships (D-162) |
 | Ask reminders | 03:30 | Creates a task when a donor's Next Ask Date arrives ([Ask Cadence](ask-cadence.md)); nothing while Ask Reminders is off |
 
-The pledge reminders line is on this page since 1.5 (G-37), with its last run, what it
-sent and a warning when a scheduled run recorded nothing. The Pledge Reminders page keeps
-its own **Run every night** switch for that one step; stopping it there leaves the other
-four running, and this page still reads as scheduled.
+The Pledge Reminders page keeps its own **Run every night** switch for that one step, the
+same switch as its row on the panel; stopping it there leaves the other four running.
 
 The times are fixed and are chosen to keep out of the way of the two other nightly jobs
 BarnCRM ships: the seasonal address swap at 00:30 and the rollups at 02:00. The top up
@@ -86,39 +85,37 @@ runs before the overdue pass so that the overdue pass sees every payment, and th
 levels run an hour after the rollups start so that the totals the ladder reads have
 settled.
 
-Nothing else has to be done. If you have just switched the jobs on and do not want to wait
-for tonight, choose **Run the Jobs Now**: the top up, the overdue pass and both reminder
-passes (each only while its setting is on) start immediately, and the page shows what they did once they finish. (Donor levels have their
-own **Recalculate Now** button on the Donor Levels page.)
+Nothing else has to be done. If you have just switched a job on and do not want to wait
+for tonight, choose **Run Now** on its row: the top up, the overdue pass and both reminder
+passes (each reminder pass only while its setting is on) start immediately, and the row shows
+what it did once it finishes. (Donor levels have their own **Recalculate Now** button on the
+Donor Levels page.)
 
 ### Checking They Are Running
 
-The same page is where you check on them afterwards. Each job shows when it last finished
-and what it did, for example "Marked 4 payments overdue." A job that ran and had nothing to
-do says so ("No payments were overdue.") rather than staying blank. A job that has not run
-at all reads **Never run**.
+The same panel is where you check on them afterwards. Each job shows when it last started,
+how that went, and what it did, for example "Marked 4 payments overdue." A job that ran and
+had nothing to do says so ("No payments were overdue.") rather than staying blank.
 
-Three things the page can tell you:
+Three things the panel can tell you:
 
-- **Not scheduled.** Nobody has switched the jobs on in this org. Nothing is late, because
-  nothing was ever going to run. The button under the line says **Schedule Nightly Run**.
-- **Scheduled, with a last run and a next run.** This is the normal state.
-- **Scheduled but has not run in more than 36 hours.** A yellow warning sits under the job.
-  Something stopped the job. Open the
-  **Error Log** in BarnCRM Settings: a job that fails writes there and carries on with
-  the rest of its work rather than stopping, so the log tells you which commitment or which
-  payment is the problem.
+- **Not scheduled.** Nobody has scheduled the nightly run in this org. Nothing is late,
+  because nothing was ever going to run. Choose **Schedule Nightly Jobs**.
+- **Scheduled, with a last result on each job.** This is the normal state.
+- **Missed Last Run** on a job that is on. The nightly run started more than two hours ago and
+  this job did not start with it. Open the **Error Log** in BarnCRM Settings: a job that fails
+  writes there and carries on with the rest of its work rather than stopping, so the log tells
+  you which commitment or which payment is the problem.
 
-**Stop Nightly Run** unschedules all three. Nothing already generated or already
-marked Overdue is changed; the schedules simply stop being extended and payments stop
-turning Overdue.
+**Turn Off** on a row stops that job. Nothing already generated or already marked Overdue is
+changed; the schedules simply stop being extended, or payments stop turning Overdue.
 
-Scheduling and stopping need the **Manage BarnCRM Settings** permission, which comes with
-the BarnCRM Admin permission set. The jobs run as the person who scheduled them and reach
-only the commitments that person can see and edit, so schedule them as a system
-administrator. Commitments are private, like gifts, and Giving Admin does not give View All
-on them (see [Access](access.md)). Somebody who has the Giving Admin permission set without
-it can open the page and see whether the jobs are running; the buttons are disabled.
+Scheduling, switching and Run Now need the **Manage BarnCRM Settings** permission, which
+comes with the BarnCRM Admin permission set. The jobs run as the person who scheduled the
+nightly run and reach only the commitments that person can see and edit, so schedule it as a
+system administrator. Commitments are private, like gifts, and Giving Admin does not give View
+All on them (see [Access](access.md)). Somebody without that permission can open the panel and
+see whether the jobs are running; the buttons are not shown.
 
 The **payment schedule** card lives on a commitment's record page, and BarnCRM ships a
 page called **Commitment Record Page** with the card already on it. The BarnCRM Fundraising app
@@ -195,8 +192,8 @@ Skipped and deletes nothing.
     already marked Overdue is here, with its commitment, its donor, and what was expected.
     A payment is marked Overdue by the overdue pass, so this list fills up the first night
     after you schedule the nightly jobs (see "Switching the nightly jobs on"). If the list
-    is empty and you have just switched the jobs on, choose **Run the Jobs Now** on the
-    Nightly jobs page rather than waiting.
+    is empty and you have just switched the jobs on, choose **Run Now** on the installments
+    overdue row of the **Nightly Jobs** panel (BarnCRM Settings, General) rather than waiting.
 15. Switch to **Upcoming 30 Days** to see what should arrive next, which is the list Jen
     uses when she reconciles the bank statement.
 

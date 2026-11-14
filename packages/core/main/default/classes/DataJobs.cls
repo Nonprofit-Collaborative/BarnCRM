@@ -144,16 +144,8 @@ public with sharing class DataJobs {
 		Integer lowest,
 		Integer highest
 	) {
-		Object configured = SettingsService.hasKey(key) ? SettingsService.getValue(key) : null;
-		if (configured == null) {
-			return fallback;
-		}
-		try {
-			Integer value = Decimal.valueOf(String.valueOf(configured)).intValue();
-			return Math.max(lowest, Math.min(value, highest));
-		} catch (Exception ignored) {
-			return fallback;
-		}
+		Decimal value = SettingsService.storedNumber(key);
+		return value == null ? fallback : Math.max(lowest, Math.min(value.intValue(), highest));
 	}
 
 	public static Integer intOf(Decimal value) {
@@ -197,7 +189,7 @@ public with sharing class DataJobs {
 
 	/** Starts the job's batch at the chunk size stamped on it, and records the batch's job. */
 	public static Import_Batch__c launch(Database.Batchable<SObject> work, Import_Batch__c job) {
-		Id asyncJobId = Database.executeBatch(work, job.Chunk_Size__c.intValue());
+		Id asyncJobId = AsyncStarter.batch(work, job.Chunk_Size__c.intValue(), 'DataJobs.launch');
 		job.Job_Id__c = asyncJobId;
 		Database.update(
 			new Import_Batch__c(Id = job.Id, Job_Id__c = asyncJobId),
@@ -322,18 +314,5 @@ public with sharing class DataJobs {
 			return 0;
 		}
 		return Math.max(0, confirmed.intValue() - (counted == null ? 0 : counted));
-	}
-
-	/**
-	 * Anything the person can fix (`known`, or a query or field refusal, or an import error) is
-	 * shown as it is; anything else is logged and summarized.
-	 */
-	public static AuraHandledException userError(Exception caught, String context, Boolean known) {
-		Boolean shown =
-			known == true ||
-			caught instanceof QueryCompiler.QueryCompilerException ||
-			caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
-			caught instanceof ImportException;
-		return UserErrors.wrap(caught, shown, context, System.Label.Core_UnexpectedError);
 	}
 }

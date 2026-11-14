@@ -61,6 +61,24 @@ private class FormPublicPolicyTest {
 		}
 	}
 
+	/**
+	 * A Forms object is refused however its name is written: with spaces around it (which the
+	 * describe would still resolve) or with the package prefix, which the list is checked
+	 * against after resolving the name.
+	 */
+	@IsTest
+	static void aFormsObjectIsRefusedUnderAnyName() {
+		System.runAs(admin()) {
+			Assert.isFalse(FormPublicPolicy.objectAllowed('Form_Submission__c'), 'As written');
+			Assert.isFalse(FormPublicPolicy.objectAllowed(' Form_Draft__c'), 'With a space');
+			Assert.isFalse(
+				FormPublicPolicy.objectAllowed(NamespaceUtil.qualify('Form__c')),
+				'With the prefix, where the package has one'
+			);
+			Assert.isTrue(FormPublicPolicy.objectAllowed('Contact'), 'A person still may');
+		}
+	}
+
 	@IsTest
 	static void theGuestCopyHasNoRecordsOrTargets() {
 		System.runAs(admin()) {

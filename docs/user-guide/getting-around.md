@@ -18,6 +18,8 @@ Admin). If you cannot find the apps, ask your admin. See
 | **BarnCRM Admin Console** | The same as **BarnCRM Admin** (admins only) | Console navigation |
 | **BarnCRM Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
 | **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
+| **BarnCRM Programs** | Programs, the services they offer and the people enrolled in them (with the Programs module) | A console, like BarnCRM Console |
+| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (with the Funders module) | A console, like BarnCRM Console |
 
 **Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
 hold the same things and differ only in how records open, so pick the one you like and star it.
@@ -58,26 +60,30 @@ its own kind of record if the template loads several. The
 Admin Guide's Importing page has the detail.
 
 The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
-**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Scheduled
-Payments** (each payment a commitment expects), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
-**Tributes**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Donor
-Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
-bottom of the screen.
+**Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Ask Pipeline**,
+**Gift Batches**, **Receipts**, **Stewardship Plans**, **Thank-Yous** and **Reports**, plus
+**Quick Gift Entry** in the utility bar at the bottom of the screen. **Asks**, **Scheduled
+Payments** (each payment a commitment expects), **Funds**, **Appeals**, **Tributes**, **Donor
+Segments**, **Recurring Donor Health** and **Dashboards** are tiles under **More** on
+Fundraising Home, and are in the App Launcher.
 
 **Fundraising Home** shows five figures, each a link to its list: gifts waiting for a thank
 you, overdue scheduled payments, your asks due this month, open gift batches and running
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
 setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
-also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
-click a chart to open its report.
+also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Before
+the first gift is saved, **Record Your First Gift** offers **Enter a Gift** and **Import a
+File**. Below are two charts, **Giving by Month** and **Open Asks by Stage**; click a chart to
+open its report.
 
 The **BarnCRM Volunteers** app has **Volunteers Home**, **Volunteer Jobs**, **Volunteer
 Shifts**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**,
 **Volunteer Requirements**, **Dashboards** and **Reports**. It opens on **Volunteers Home**:
 approved hours this month, hours waiting for approval and shifts that still need people, each
-a figure you click to open its list, above a chart of this year's hours by job. The module's
-settings are the **Volunteers** section of **BarnCRM Settings**.
+a figure you click to open its list, above a chart of this year's hours by job. Before the first
+volunteer job, it opens with **Set Up Your First Volunteer Job** (**New Volunteer Job**, **Import
+a File**) instead. The module's settings are the **Volunteers** section of **BarnCRM Settings**.
 
 Your admin may also have added the module pages you use most to the BarnCRM apps: **Quick Gift
 Entry**, **Gifts**, **Commitments** and **Gift Batches**, or **Volunteer Shifts** and
@@ -123,8 +129,8 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   replaced automatically once you add a member. You see this button only if you can create
   and edit accounts.
 - **Quick Links**: icon tiles for **People**, **Households**, **Organizations** and **Find**,
-  plus **Quick Gift Entry** when Giving is installed and turned on, and **BarnCRM Settings**
-  for administrators. Each has a one-line description and the same icon as its tab, and opens
+  plus **Import a File** if you can import, the links of each module your organization uses
+  (**Enter a Gift**, **Log Hours**, **Enroll**), and **BarnCRM Settings** for administrators. Each has a one-line description and the same icon as its tab, and opens
   without going back to the App Launcher.
   **Households** opens the households list even on your first day, before the **Households**
   tab has been added for you.
@@ -218,7 +224,9 @@ loads with **Import Files** show in each record's **Files** list, owned by that 
   Log." Refresh. If it keeps happening, tell your admin.
 - Problem: "Something went wrong while BarnCRM was updating this record, so it was not saved."
   Only that record was refused; anything else you saved at the same time went ahead. Try
-  again; if it repeats, tell your admin, who will find the reason in the Error Log.
+  again; if it repeats, tell your admin, who will find the reason in the Error Log. If it
+  looks like a BarnCRM bug, your admin can copy a report with no names or record details in
+  it (**Copy for Bug Report**) to post on BarnCRM's GitHub page.
 - Problem: no notification arrived. Check that you have not muted notifications in your own
   Salesforce settings. The job still finished; open its record to check.
 - Problem: "An administrator needs to finish setting up BarnCRM." BarnCRM has not been set up

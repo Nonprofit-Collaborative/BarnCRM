@@ -18,6 +18,7 @@ private class FindPeopleActionTest {
 			maria.Email = 'maria.garcia@example.org';
 			insert maria;
 			Id householdId = [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId;
+			indexContacts();
 
 			Test.startTest();
 			List<FindPeopleAction.Result> results = FindPeopleAction.find(
@@ -45,6 +46,7 @@ private class FindPeopleActionTest {
 			Contact other = HouseholdTestDataFactory.newContact('Mr.', 'Mario', 'Garcia');
 			other.Email = 'mario.garcia@example.org';
 			insert new List<Contact>{ maria, other };
+			indexContacts();
 
 			Test.startTest();
 			List<FindPeopleAction.Result> results = FindPeopleAction.find(
@@ -76,6 +78,7 @@ private class FindPeopleActionTest {
 				Is_Primary__c = true,
 				Start_Date__c = Date.today()
 			);
+			indexContacts();
 
 			Test.startTest();
 			List<FindPeopleAction.Result> results = FindPeopleAction.find(
@@ -98,6 +101,7 @@ private class FindPeopleActionTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			insert HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			indexContacts();
 
 			Test.startTest();
 			List<FindPeopleAction.Result> results = FindPeopleAction.find(
@@ -127,6 +131,7 @@ private class FindPeopleActionTest {
 			three.maxResults = 3;
 			FindPeopleAction.Request tooMany = request('Okafor');
 			tooMany.maxResults = 500;
+			indexContacts();
 
 			Test.startTest();
 			List<FindPeopleAction.Result> results = FindPeopleAction.find(
@@ -150,6 +155,7 @@ private class FindPeopleActionTest {
 			for (Integer i = 0; i < 200; i++) {
 				requests.add(request('Person' + i + ' Bulk' + i));
 			}
+			indexContacts();
 
 			Test.startTest();
 			Integer queriesBefore = Limits.getQueries();
@@ -178,6 +184,7 @@ private class FindPeopleActionTest {
 		}
 		User restricted = minimumAccessUser();
 		List<FindPeopleAction.Result> results;
+		indexContacts();
 
 		Test.startTest();
 		System.runAs(restricted) {
@@ -195,6 +202,13 @@ private class FindPeopleActionTest {
 	}
 
 	// ------------------------------------------------------------------ helpers
+
+	/** Name searches go through the search index, which a test fills by hand (D-200 P5). */
+	private static void indexContacts() {
+		Test.setFixedSearchResults(
+			new List<Id>(new Map<Id, Contact>([SELECT Id FROM Contact]).keySet())
+		);
+	}
 
 	private static FindPeopleAction.Request request(String searchText) {
 		FindPeopleAction.Request result = new FindPeopleAction.Request();

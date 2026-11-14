@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Packaged tab names as the org needs them, qualified in Apex once the namespace is set:
+    loadTabNames, tabApiName and tabPageReference for every component that opens a BarnCRM tab.
+    Exposed so module packages can import it.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>

@@ -13,7 +13,7 @@ private class VolunteersPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSet.Name = :VolunteersAccessSync.ADMIN_SET
+			WHERE AssigneeId = :userId AND PermissionSet.Name = 'Volunteers_Admin'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -22,7 +22,7 @@ private class VolunteersPostInstallTest {
 		return [
 			SELECT COUNT()
 			FROM Error_Log__c
-			WHERE Context__c = :VolunteersPostInstall.ACCESS_CONTEXT
+			WHERE Context__c = 'VolunteersPostInstall.grantInstallerAccess'
 			WITH SYSTEM_MODE
 		];
 	}
@@ -33,7 +33,7 @@ private class VolunteersPostInstallTest {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
 			Id alreadyHolding = TestDataFactory.createUser(
 					'Holder',
-					new List<String>{ VolunteersAccessSync.ADMIN_SET }
+					new List<String>{ 'Volunteers_Admin' }
 				)
 				.Id;
 			User member = TestUsers.standardUser('Member');
@@ -44,8 +44,8 @@ private class VolunteersPostInstallTest {
 
 			Test.startTest();
 			Test.testInstall(new VolunteersPostInstall(), null);
-			System.enqueueJob(new VolunteersPostInstall.InstallerAccess(fresh));
-			System.enqueueJob(new VolunteersPostInstall.InstallerAccess(alreadyHolding));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Volunteers', fresh));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Volunteers', alreadyHolding));
 			Test.stopTest();
 
 			Assert.areEqual(1, adminSetsHeldBy(fresh), 'The installer holds Volunteers Admin');
@@ -172,17 +172,17 @@ private class VolunteersPostInstallTest {
 	static void aGrantThePlatformRefusesIsLoggedAsAWarning() {
 		System.runAs(TestUsers.admin()) {
 			// An Id that is no user, so the insert is refused for a reason other than a duplicate.
-			Account notAUser = new Account(Name = 'Not a user');
+			Account notAUser = TestDataFactory.organization(new Account(Name = 'Not a user'));
 			insert notAUser;
 
 			Test.startTest();
-			System.enqueueJob(new VolunteersPostInstall.InstallerAccess(notAUser.Id));
+			System.enqueueJob(new ModuleAccessSyncs.Job('Volunteers', notAUser.Id));
 			Test.stopTest();
 
 			List<Error_Log__c> logged = [
 				SELECT Severity__c
 				FROM Error_Log__c
-				WHERE Context__c = :VolunteersPostInstall.ACCESS_CONTEXT
+				WHERE Context__c = 'VolunteersPostInstall.grantInstallerAccess'
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual(1, logged.size(), 'The refusal is in the Error Log');

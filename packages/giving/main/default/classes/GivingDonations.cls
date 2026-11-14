@@ -19,6 +19,13 @@ public with sharing class GivingDonations implements Callable {
 	private static final String REFUNDED = 'Refunded';
 	private static final String CANCELLED = 'Cancelled';
 	private static final String CONTEXT = 'GivingDonations';
+	/** Payments' subscription news as Recurring Gift Event types (R-RH5). */
+	private static final Map<String, String> EVENT_TYPES = new Map<String, String>{
+		'chargeSucceeded' => 'Charge Succeeded',
+		'chargeFailed' => 'Charge Failed',
+		'cardUpdated' => 'Card Updated',
+		'cancelled' => 'Cancelled'
+	};
 
 	/** Stands in for BarnCRM Payments in tests. */
 	@TestVisible
@@ -88,17 +95,26 @@ public with sharing class GivingDonations implements Callable {
 
 	/**
 	 * The Payments listener (ADR-0201 `0201-payments-module.md`, decision 8): `paymentsChanged` with every
-	 * changed payment of a run at once (answers true), or `paymentChanged` with one.
+	 * changed payment of a run at once (answers true), or `paymentChanged` with one; and
+	 * `subscriptionsChanged` with a run's subscription news (R-RH5).
 	 */
 	public Object call(String action, Map<String, Object> args) {
 		List<Map<String, Object>> told = new List<Map<String, Object>>();
-		if (action == 'paymentsChanged' && args?.get('payments') instanceof List<Object>) {
-			for (Object one : (List<Object>) args.get('payments')) {
+		String key = action == 'subscriptionsChanged' ? 'changes' : 'payments';
+		if (
+			(action == 'paymentsChanged' || action == 'subscriptionsChanged') &&
+			args?.get(key) instanceof List<Object>
+		) {
+			for (Object one : (List<Object>) args.get(key)) {
 				if (one instanceof Map<String, Object>) {
 					told.add((Map<String, Object>) one);
 				}
 			}
-			paymentsChanged(told);
+			if (key == 'changes') {
+				subscriptionsChanged(told);
+			} else {
+				paymentsChanged(told);
+			}
 			return true;
 		}
 		if (action == 'paymentChanged' && args != null) {
@@ -235,6 +251,66 @@ public with sharing class GivingDonations implements Callable {
 			gifts.add(gift);
 		}
 		insert as user gifts;
+	}
+
+	/**
+	 * Payments subscriptions (PAY-04, R-RH5; ADR-0218 `0218-payments-subscriptions.md`, decision
+	 * 4): fills each commitment's processor ids when blank and records each change once as a
+	 * Recurring Gift Event (upsert by its event key), which G-27's rules then apply.
+	 */
+	private static void subscriptionsChanged(List<Map<String, Object>> changes) {
+		Set<Id> sources = new Set<Id>();
+		for (Map<String, Object> change : changes) {
+			sources.add(idOf(change.get('sourceRecordId')));
+		}
+		Map<Id, Commitment__c> commitments = new Map<Id, Commitment__c>(
+			[
+				SELECT Id, Processor_Subscription_Id__c, Processor_Customer_Id__c
+				FROM Commitment__c
+				WHERE Id IN :sources
+				WITH USER_MODE
+			]
+		);
+		Map<Id, Commitment__c> filled = new Map<Id, Commitment__c>();
+		Map<String, Recurring_Gift_Event__c> events = new Map<String, Recurring_Gift_Event__c>();
+		for (Map<String, Object> change : changes) {
+			Commitment__c commitment = commitments.get(idOf(change.get('sourceRecordId')));
+			String type = EVENT_TYPES.get(String.valueOf(change.get('event')));
+			String eventKey = (String) change.get('eventKey');
+			if (commitment == null) {
+				continue;
+			}
+			String subscription = (String) change.get('subscriptionId');
+			String customer = (String) change.get('customerId');
+			if (
+				(commitment.Processor_Subscription_Id__c == null && subscription != null) ||
+				(commitment.Processor_Customer_Id__c == null &&
+				customer != null)
+			) {
+				commitment.Processor_Subscription_Id__c = commitment.Processor_Subscription_Id__c ??
+					subscription;
+				commitment.Processor_Customer_Id__c = commitment.Processor_Customer_Id__c ??
+					customer;
+				filled.put(commitment.Id, commitment);
+			}
+			if (type != null && eventKey != null) {
+				events.put(
+					eventKey.left(100),
+					new Recurring_Gift_Event__c(
+						Commitment__c = commitment.Id,
+						Event_Type__c = type,
+						Event_Date__c = (Date) change.get('eventDate'),
+						Subscription_Id__c = subscription?.left(100),
+						Card_Expires__c = (Date) change.get('cardExpires'),
+						Amount__c = (Decimal) change.get('amount'),
+						Detail__c = ((String) change.get('detail'))?.abbreviate(255),
+						External_Id__c = eventKey.left(100)
+					)
+				);
+			}
+		}
+		update as user filled.values();
+		upsert as user events.values() Recurring_Gift_Event__c.External_Id__c;
 	}
 
 	/**

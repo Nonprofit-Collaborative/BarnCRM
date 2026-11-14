@@ -57,10 +57,15 @@ LOADER_FILES = (
     "packages/core/main/default/lwc/barnHelpCatalog/",
     "packages/core/main/default/classes/BarnHelp.cls",
     "packages/core/main/default/classes/BarnHelpTest.cls",
+    # UserErrors.Screen reads its fallback key only when a failure needs it (D-200 S8b).
+    "packages/core/main/default/classes/UserErrors.cls",
     "packages/core/test/jest-mocks/",
 )
 JS_CALL = re.compile(r"\bhelpText\(\s*([^,)]*?)\s*,\s*([^,)]*?)\s*[,)]")
 APEX_CALL = re.compile(r"\bBarnHelp\.text\(\s*([^,)]*?)\s*,\s*([^,)]*?)\s*[,)]")
+# new UserErrors.Screen(context, '<Package>', '<key>'): the key read on failure; a null package
+# means the fallback is a label's text, not help text.
+SCREEN_CALL = re.compile(r"\bnew UserErrors\.Screen\(\s*[^,()]*?,\s*([^,)]*?)\s*,\s*([^,)]*?)\s*[,)]")
 MARKUP = re.compile(r"<c-barn-help\b[^>]*>", re.S)
 LITERAL = re.compile(r"^'([A-Za-z0-9_]+)'$")
 
@@ -132,7 +137,9 @@ def references(problems):
         if path.endswith(".js"):
             calls = JS_CALL.findall(text)
         elif path.endswith(".cls"):
-            calls = APEX_CALL.findall(text)
+            calls = APEX_CALL.findall(text) + [
+                (pkg, key) for pkg, key in SCREEN_CALL.findall(text) if pkg != "null"
+            ]
         for pkg, key in calls:
             p, k = LITERAL.match(pkg), LITERAL.match(key)
             if p and k:

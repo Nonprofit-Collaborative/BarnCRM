@@ -217,6 +217,23 @@ class RealCatalogTest(unittest.TestCase):
                     label = ET.parse(path).getroot().findtext("m:label", namespaces=NS)
                     self.assertEqual(written or name.replace("_", " "), label, f"{folder} {name}")
 
+    def test_every_quick_link_opens_a_shipped_tab_or_object(self):
+        """Quick_Links__c (D-200 R7): each Target:Label:Line names a tab the module ships, or
+        one of its objects with .new, and carries a label."""
+        root = os.path.join(HERE, "..", "..", "..")
+        for row in mat.catalog(root):
+            folder = row.get("Package_Folder__c")
+            for entry in [p.strip() for p in (row.get("Quick_Links__c") or "").split(";") if p.strip()]:
+                parts = [part.strip() for part in entry.split(":")]
+                self.assertTrue(2 <= len(parts) <= 3 and parts[1], f"{folder}: {entry} needs Target:Label[:Line]")
+                target = parts[0]
+                if target.endswith(".new"):
+                    path = os.path.join(root, "packages", folder, "main/default/objects", target[: -len(".new")])
+                    self.assertTrue(os.path.isdir(path), f"{folder} ships no object {target}")
+                else:
+                    path = os.path.join(root, "packages", folder, "main/default/tabs", target + ".tab-meta.xml")
+                    self.assertTrue(os.path.exists(path), f"{folder} ships no tab {target}")
+
 
 class CoreAppsTest(unittest.TestCase):
     """The four Core apps between them hold every tab Core ships, and only tabs that exist, so a

@@ -70,6 +70,10 @@ cycle on its Open Date and moves an Open cycle to Reviewing after its Close Date
 
 ## Programs and Cycles
 
+Until the org has an award program, the **Scholarships and Grants** page opens with **Set Up
+Your First Award Program** for anyone who may create one (D-200 R4). Its **New Award Program**
+button opens the new program form, step 1 below. It goes away once the first program is saved.
+
 1. On **Award Programs**, press **New**: a name, a Type (Scholarship, Grant, Fellowship, Other),
    a public description and, if you like, an award letter template (see Award Letters).
 2. On the program, add an **Award Cycle**: name (for example "2027 Spring"), Open Date, Close
@@ -189,6 +193,12 @@ The **BarnCRM Scholarships** folder holds Applications by Cycle and Status, Appl
 Score, Awards by Program, Disbursements Due Next 30 Days and Recipient Reports Due, and the
 **Scholarships and Grants** dashboard. Copy them to change them.
 
+The dashboard runs as one specified user, the admin who installed or deployed the package, so
+everyone who opens it sees what that user can see. Share the folder only with people who are
+allowed to see all applications and awards. To change the running user, open the dashboard,
+choose **Edit**, open the dashboard's properties, and in **View dashboard as** choose another
+person. A dashboard that reads as each viewer is planned for the Advanced Reporting module.
+
 ## Moving From Outbound Funds
 
 When the Outbound Funds Module (the free Salesforce.org package for grants you give) is installed
@@ -217,6 +227,18 @@ Funds' reviews, notes and files are not copied.
 The Outbound Funds names the kit reads come from its public repository, not from a current
 package version: if your version differs, the step stops before reading anything and names the
 field it could not find.
+
+## Sample Data
+
+**BarnCRM Settings**, **Load Sample Data** (see [Sample Data](sample-data.md)) adds a small
+example of Scholarships and Outbound Grants after Core's people and organizations are loaded:
+the Harvest Community Scholarship (a decided cycle, Last Spring, and an open one, This Fall) and
+Neighborhood Small Grants (a cycle in review). Fourteen applications sit at every stage (Draft,
+Submitted, Eligible, Ineligible, In Review, Awarded, Declined, Withdrawn) with scored, unscored
+and recused reviews; three awards (Active, Completed, Accepted) carry five disbursements (two
+paid) and four requirements, one an open condition that holds the next payment back. Reviews are
+all assigned to the person who loads the set. **Remove Sample Data** deletes only the sample
+programs and everything under them; your own programs stay.
 
 ## Removing the Module
 

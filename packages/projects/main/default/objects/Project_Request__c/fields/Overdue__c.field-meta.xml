@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Overdue__c</fullName>
+  <externalId>false</externalId>
+  <formula>AND(NOT(ISBLANK(Due_Date__c)), Due_Date__c &lt; TODAY(), OR(ISPICKVAL(Status__c, 'New'), ISPICKVAL(Status__c, 'In Progress')))</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Past its due date while New or In Progress. Waiting on Requester pauses it.</inlineHelpText>
+  <label>Overdue</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

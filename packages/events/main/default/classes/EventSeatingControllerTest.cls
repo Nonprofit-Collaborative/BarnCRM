@@ -6,11 +6,11 @@
 private class EventSeatingControllerTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static Event__c gala() {
@@ -65,7 +65,7 @@ private class EventSeatingControllerTest {
 		System.runAs(staff()) {
 			Event__c event = gala();
 			register(event.Id, 'Rivera', 1);
-			Account sponsorAccount = new Account(Name = 'Acme Co');
+			Account sponsorAccount = TestDataFactory.organization(new Account(Name = 'Acme Co'));
 			insert as user sponsorAccount;
 			Id sponsorId = EventSponsorsController.addSponsor(event.Id, sponsorAccount.Id, null);
 			Test.startTest();

@@ -18,7 +18,7 @@ Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer 
 8. Check **Appeal** and **Fund**. They start at your organization's defaults; change them if the donor said otherwise. To split the gift across two or more funds (for example half to the building fund), open **Split Across Funds** and add a row per fund; **Fund** is then turned off, and **Save** needs the rows to add up to the amount.
 9. Click **Save**, or **Save and New** to start the next gift straight away.
 
-You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal and the fund, and clears the rest.
+You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal, the fund and the payment method, and clears the rest.
 
 If the donor still owes a pledge or recurring payment, a **Pays a scheduled payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
 
@@ -171,6 +171,15 @@ tried on the same appeal in an hour, is refused before checkout, so no gift is w
 A donor who pays a pledge with **Pay Online** in the donor portal gets the same kind of gift, on
 the pledge instead of an appeal: it appears as **Received** once the payment is confirmed and
 counts against the pledge's next payment.
+
+When your admin has turned on automatic recurring payments, a donor who chooses Pay Online on a
+recurring gift is charged automatically each period by Stripe or PayPal. Each charge appears as
+a **Received** gift on the recurring gift without anyone entering it. The recurring gift shows
+**Processor Subscription Id**, and a failed charge, a new card or a cancellation at the processor
+shows in **Failed Charges**, **Card Expires** and **Cancelled at Processor**, as on the Recurring
+Donor Health page. A donor fixes a failed or expiring card with **Update Card** in the donor
+portal; nobody at your organization handles the card. To stop the charges, cancel the
+subscription in Stripe or PayPal, then set the gift's Status yourself.
 
 ## Common Problems
 

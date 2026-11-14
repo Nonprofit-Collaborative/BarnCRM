@@ -105,15 +105,15 @@ private class ShippedDefaultUpgradesTest {
 	}
 
 	@IsTest
-	static void corePostInstallAppliesCoresList() {
+	static void corePostInstallAppliesCoresEmptyListWithoutChangingAnything() {
 		System.runAs(TestUsers.admin()) {
 			savedBeforeTheField(null);
 			CorePostInstall.runAsSourceDeploy();
-			Assert.isTrue(stored().Error_Digest_Include_Admin_Summary__c);
-			Assert.areEqual(
-				'core:' + CorePostInstall.SHIPPED_ON_ADDED_IN_UPGRADES.size(),
-				stored().Shipped_Defaults_Applied__c
-			);
+			// The list was reset at the namespaced cut-over (D-199, D-200): a fresh install has
+			// every shipped default already, so nothing is turned on and nothing is marked.
+			Assert.isTrue(CorePostInstall.SHIPPED_ON_ADDED_IN_UPGRADES.isEmpty());
+			Assert.isFalse(stored().Error_Digest_Include_Admin_Summary__c);
+			Assert.isNull(stored().Shipped_Defaults_Applied__c);
 		}
 	}
 }

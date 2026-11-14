@@ -118,28 +118,38 @@ public with sharing class FormPublicPolicy {
 		return null;
 	}
 
+	/**
+	 * Whether a public form may save to this object. The Forms objects are refused by the name
+	 * as written and by the object it resolves to, with and without a prefix, so a name
+	 * written with the package prefix cannot slip past the list.
+	 */
+	@TestVisible
 	private static Boolean objectAllowed(String objectName) {
-		String name = objectName == null ? '' : objectName.toLowerCase();
+		String name = objectName == null ? '' : objectName.trim().toLowerCase();
 		if (name == 'contact' || name == 'account') {
 			return true;
 		}
 		if (!name.endsWith('__c') || FORMS_OBJECTS.contains(name)) {
 			return false;
 		}
-		List<Schema.DescribeSObjectResult> described = Schema.describeSObjects(
-			new List<String>{ objectName },
-			SObjectDescribeOptions.DEFERRED
-		);
-		return !described.isEmpty() && !described[0].isCustomSetting();
+		Schema.DescribeSObjectResult described = NamespaceUtil.describe(objectName);
+		if (described == null) {
+			return false;
+		}
+		if (
+			FORMS_OBJECTS.contains(described.getName().toLowerCase()) ||
+			FORMS_OBJECTS.contains(described.getLocalName().toLowerCase())
+		) {
+			return false;
+		}
+		return !described.isCustomSetting();
 	}
 
 	private static Boolean fieldAllowed(String objectName, String fieldName) {
-		Schema.SObjectField field = Schema.describeSObjects(
-				new List<String>{ objectName },
-				SObjectDescribeOptions.DEFERRED
-			)[0]
-			.fields.getMap()
-			.get(fieldName == null ? '' : fieldName.toLowerCase());
+		Schema.SObjectField field = NamespaceUtil.field(
+			NamespaceUtil.objectType(objectName),
+			fieldName
+		);
 		if (field == null) {
 			return false;
 		}

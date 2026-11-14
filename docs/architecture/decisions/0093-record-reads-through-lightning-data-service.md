@@ -53,3 +53,20 @@ serial calls when it opens.
   `affiliationPanel` and `relationshipPanel` need the prefix with the rest of that pass.
 - The GraphQL queries cannot be checked offline (the Jest stub ignores the query); a deploy
   and a look at each card in a Contact-household org and a Person Account org confirm them.
+
+## Amendment A1, 2026-11-12: the queries are built from schema imports (D-200 N13)
+
+The namespace readiness pass (release 1.21) settles the prefix question above without a
+second copy of each query and without moving the reads back to Apex.
+
+1. **Dynamic queries.** `lightning/graphql` (API 65 or later; the cards are at 67) accepts
+   `${}` interpolation inside `gql`. Each card builds its query from `@salesforce/schema`
+   imports: the object from `objectApiName`, each field from `fieldApiName`, and each parent
+   relationship from its lookup's name with `__c` changed to `__r`. The platform resolves the
+   imports with the prefix once the namespace is set, so one query serves both.
+2. **Reads by the same names.** The cards read each node and the result list by those same
+   constants (`node[STATUS]`, `query[ADDRESS_OBJECT]`), never by a literal field name.
+3. **Not chosen: a cacheable Apex DTO read.** It would have brought back the three
+   controllers this ADR removed, and the stale Apex cache with them.
+4. **Trade-off.** A dynamic query loses the compiler's check that each field exists. The
+   schema imports keep that check: a renamed or deleted field fails the import at deploy.

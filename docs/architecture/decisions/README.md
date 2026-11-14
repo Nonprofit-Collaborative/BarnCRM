@@ -224,6 +224,14 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0213](0213-backup-sets.md) | Backup Sets are saved Find queries exported to Files on demand | Proposed (builder decision) |
 | [0214](0214-files-import.md) | Files import loads a zip with a manifest into Files, in the browser | Proposed (builder decision) |
 | [0215](0215-events-attendee-app-operations-portal-templates.md) | Event Management attendee app, personal agenda, event operations, and the service and partner portal templates | Accepted (builder decision) |
+| [0216](0216-household-model-coexistence.md) | One Household Model per Account, recorded in Household Model | Proposed |
+| [0217](0217-npc-household-conversion.md) | Nonprofit Cloud households are converted in place, once, supervised and reversible | Proposed |
+| [0218](0218-payments-subscriptions.md) | Payments subscriptions: the processor's own subscription, renewals and failures told to Giving, Update Card on the processor's page | Accepted (builder decision) |
+| [0219](0219-projects-psa.md) | Projects PSA: rate cards, approvals, resource management, invoices, recognized revenue and change requests, each behind its own setting | Accepted (builder decision, for Brandon to confirm) |
+| [0220](0220-provider-secrets-protected-settings.md) | Provider secrets stay in Protected custom settings in the managed packages | Accepted (builder decision, for Brandon to confirm) |
+| [0221](0221-projects-requests-and-issues.md) | Projects requests and issues: staff triage, a portal template for requesters, an org-to-org intake API and a Mirror Case bridge, each off until turned on | Accepted (builder decision, for Brandon to confirm) |
+| [0222](0222-dashboards-run-as-a-specified-user.md) | Packaged dashboards run as a specified user, not the logged-in user; viewer-aware dashboards return in the planned Advanced Reporting module (D-202) | Accepted (owner decision) |
+| [0223](0223-module-apps.md) | Events, Forms, Portal Builder, Corporate Hub and Projects ship their own apps again, tabs also in the BarnCRM apps; scratch and Developer Edition orgs get them left out automatically (amends ADR-0192) | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

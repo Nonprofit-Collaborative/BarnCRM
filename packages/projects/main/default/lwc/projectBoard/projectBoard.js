@@ -4,6 +4,7 @@ import getBoard from '@salesforce/apex/ProjectsController.getBoard';
 import setTaskStatus from '@salesforce/apex/ProjectsController.setTaskStatus';
 import addTask from '@salesforce/apex/ProjectsController.addTask';
 import logTime from '@salesforce/apex/ProjectsController.logTime';
+import addExpense from '@salesforce/apex/ProjectTimesheetController.addExpense';
 import refreshHealth from '@salesforce/apex/ProjectsController.refreshHealth';
 import draftStatusUpdate from '@salesforce/apex/ProjectsController.draftStatusUpdate';
 import { localIsoDate, messageFrom } from 'c/findCsv';
@@ -36,6 +37,8 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
   newTask = {};
   logging = false;
   entry = {};
+  spending = false;
+  expense = {};
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -68,8 +71,31 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       notes: helpText('Projects', 'Projects_Board_Notes'),
       save: helpText('Projects', 'Projects_Board_Save'),
       cancel: helpText('Projects', 'Projects_Board_Cancel'),
-      today: helpText('Projects', 'Projects_Board_Today')
+      today: helpText('Projects', 'Projects_Board_Today'),
+      addExpense: helpText('Projects', 'Projects_Expense_Add'),
+      category: helpText('Projects', 'Projects_Expense_Category'),
+      amount: helpText('Projects', 'Projects_Expense_Amount'),
+      description: helpText('Projects', 'Projects_Expense_Description')
     };
+  }
+
+  // Add Expense and Log Time show only to someone who may create those records.
+  get expensesEnabled() {
+    return (
+      this.timeTracking &&
+      this.board?.expensesEnabled === true &&
+      this.board?.canCreateExpense === true
+    );
+  }
+
+  get canLogTime() {
+    return this.timeTracking && this.board?.canCreateTime === true;
+  }
+
+  get categoryOptions() {
+    return ['Travel', 'Lodging', 'Meals', 'Mileage', 'Software', 'Supplies', 'Other'].map(
+      (value) => ({ label: value, value })
+    );
   }
 
   get project() {
@@ -77,27 +103,27 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
   }
 
   get healthClass() {
-    return `slds-badge ${HEALTH_CLASS[this.project.Health__c] || ''}`;
+    return `slds-badge ${HEALTH_CLASS[this.project.health] || ''}`;
   }
 
   get healthLabel() {
-    return this.project.Health__c || this.labels.noHealth;
+    return this.project.health || this.labels.noHealth;
   }
 
   get reasons() {
-    return (this.project.Health_Reasons__c || '').split('\n').filter((line) => line);
+    return (this.project.healthReasons || '').split('\n').filter((line) => line);
   }
 
   get progressPercent() {
-    return percent(this.project.Tasks_Done__c, this.project.Tasks__c);
+    return percent(this.project.tasksDone, this.project.taskCount);
   }
 
   get progressText() {
     return helpText(
       'Projects',
       'Projects_Board_Progress',
-      this.project.Tasks_Done__c || 0,
-      this.project.Tasks__c || 0,
+      this.project.tasksDone || 0,
+      this.project.taskCount || 0,
       this.progressPercent
     );
   }
@@ -108,17 +134,20 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
 
   get hoursText() {
     const p = this.project;
+    const hasBudget = p.budgetHours !== undefined && p.budgetHours !== null;
+    // R-PM20: approved change requests add their hours to the budget.
+    const budget = hasBudget ? p.budgetHours + (p.changeHours || 0) : '-';
     return helpText(
       'Projects',
       'Projects_Board_HoursLine',
-      p.Actual_Hours__c || 0,
-      p.Estimated_Hours__c || 0,
-      p.Budget_Hours__c ?? '-'
+      p.actualHours || 0,
+      p.estimatedHours || 0,
+      budget
     );
   }
 
   get hasBudgetAmount() {
-    return this.project.Budget_Amount__c !== undefined && this.project.Budget_Amount__c !== null;
+    return this.project.budgetAmount !== undefined && this.project.budgetAmount !== null;
   }
 
   get span() {
@@ -136,16 +165,16 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
       const place = bar(group, span);
       return {
         ...group,
-        key: group.Id || 'none',
-        name: group.Name || this.labels.noPhase,
+        key: group.id || 'none',
+        name: group.name || this.labels.noPhase,
         barStyle: place ? `left: ${place.left}%; width: ${place.width}%` : null,
-        isAdding: this.addingPhase === (group.Id || 'none'),
+        isAdding: this.addingPhase === (group.id || 'none'),
         hasTasks: group.tasks.length > 0,
         tasks: group.tasks.map((task) => ({
           ...task,
-          href: `/lightning/r/${task.Id}/view`,
-          owner: task.Assigned_To__r?.Name,
-          late: isOpen(task) && task.Due_Date__c && task.Due_Date__c < localIsoDate(),
+          href: `/lightning/r/${task.id}/view`,
+          owner: task.assignedToName,
+          late: isOpen(task) && task.dueDate && task.dueDate < localIsoDate(),
           options: STATUSES.map((value) => ({ label: value, value }))
         }))
       };
@@ -154,7 +183,7 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
 
   get taskOptions() {
     return [{ label: '', value: '' }].concat(
-      (this.board?.tasks || []).filter(isOpen).map((task) => ({ label: task.Name, value: task.Id }))
+      (this.board?.tasks || []).filter(isOpen).map((task) => ({ label: task.name, value: task.id }))
     );
   }
 
@@ -242,6 +271,40 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
   handleCancel() {
     this.addingPhase = undefined;
     this.logging = false;
+    this.spending = false;
+  }
+
+  handleStartExpense() {
+    this.spending = true;
+    this.expense = { date: localIsoDate(), category: 'Travel', billable: false };
+  }
+
+  handleExpense(event) {
+    const field = event.target.dataset.field;
+    const value =
+      event.target.type === 'checkbox'
+        ? event.target.checked
+        : (event.detail?.value ?? event.target.value);
+    this.expense = { ...this.expense, [field]: value };
+  }
+
+  async handleSaveExpense() {
+    const e = this.expense;
+    const saved = await this.run(
+      () =>
+        addExpense({
+          projectId: this.recordId,
+          workDate: e.date,
+          category: e.category,
+          amount: e.amount === undefined || e.amount === '' ? null : Number(e.amount),
+          billable: e.billable === true,
+          description: e.description
+        }),
+      helpText('Projects', 'Projects_Timesheet_ExpenseAdded')
+    );
+    if (saved) {
+      this.spending = false;
+    }
   }
 
   handleStartLog() {
@@ -270,7 +333,10 @@ export default class ProjectBoard extends NavigationMixin(LightningElement) {
           billable: e.billable === true,
           notes: e.notes
         }),
-      helpText('Projects', 'Projects_Board_TimeLogged')
+      // With approvals on a new entry is Open until the week is submitted (R-PM11).
+      this.board?.approvalsEnabled
+        ? helpText('Projects', 'Projects_Board_TimeLoggedOpen')
+        : helpText('Projects', 'Projects_Board_TimeLogged')
     );
     if (saved) {
       this.logging = false;

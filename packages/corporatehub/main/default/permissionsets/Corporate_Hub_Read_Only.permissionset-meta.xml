@@ -6,6 +6,10 @@
     Reads library documents, compliance obligations and cycles, and agreements; answers their own
     policy acknowledgments.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Corporate_Hub</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>CorporateHubController</apexClass>
     <enabled>true</enabled>
@@ -446,6 +450,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Board_Motion__c.Closed_Without_Quorum__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Board_Motion__c.Decided_On__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -747,6 +756,31 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Data_Breach__c.Reminded_For__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Hub_Document__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Compliance_Obligation__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Agreement__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Board__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Processing_Activity__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <objectPermissions>

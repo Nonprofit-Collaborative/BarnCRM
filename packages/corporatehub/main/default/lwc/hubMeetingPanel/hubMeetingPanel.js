@@ -78,6 +78,7 @@ export default class HubMeetingPanel extends LightningElement {
       motions: helpText('CorporateHub', 'CorporateHub_Meeting_Motions'),
       openVoting: helpText('CorporateHub', 'CorporateHub_Meeting_OpenVoting'),
       closeVoting: helpText('CorporateHub', 'CorporateHub_Meeting_CloseVoting'),
+      noQuorum: helpText('CorporateHub', 'CorporateHub_Board_NoQuorumNote'),
       poll: helpText('CorporateHub', 'CorporateHub_Meeting_Poll'),
       sendPoll: helpText('CorporateHub', 'CorporateHub_Meeting_SendPoll'),
       choose: helpText('CorporateHub', 'CorporateHub_Meeting_Choose')
@@ -144,7 +145,8 @@ export default class HubMeetingPanel extends LightningElement {
       ...row,
       tally: helpText('CorporateHub', 'CorporateHub_Meeting_Tally', ...row.values),
       canOpen: row.status === 'Proposed',
-      canClose: row.status === VOTING_OPEN
+      canClose: row.status === VOTING_OPEN,
+      noQuorum: row.flag === true
     }));
   }
 
@@ -209,7 +211,7 @@ export default class HubMeetingPanel extends LightningElement {
     const motionId = event.target.dataset.rowId;
     return this.run(
       () => closeVoting({ motionId }),
-      (result) => helpText('CorporateHub', 'CorporateHub_Meeting_VotingClosed', result)
+      (result) => helpText('CorporateHub', 'CorporateHub_Meeting_VotingClosed', result.outcome)
     );
   }
 
@@ -234,6 +236,11 @@ export default class HubMeetingPanel extends LightningElement {
     try {
       const result = await call();
       this.dispatchEvent(new ShowToastEvent({ message: success(result), variant: 'success' }));
+      if (result && result.warning) {
+        this.dispatchEvent(
+          new ShowToastEvent({ message: result.warning, variant: 'warning', mode: 'sticky' })
+        );
+      }
       notifyRecordUpdateAvailable([{ recordId: this.recordId }]);
       await this.load();
     } catch (error) {

@@ -43,6 +43,7 @@ private class ScholarshipsControllerTest {
 			Assert.areEqual(1, home.reviews.size(), 'My review to do');
 			Assert.areEqual(1, home.cycles.size(), 'The open cycle');
 			Assert.isTrue(home.canManage, 'Admin manages');
+			Assert.isFalse(home.firstRun, 'A program exists, so there is no first-run panel.');
 			Assert.isTrue(review.open, 'Reviewable');
 			Assert.areEqual('overall', review.criteria[0].key, 'Default rubric');
 			Assert.areEqual(7, board.rows[0].average, 'Scored');
@@ -53,6 +54,16 @@ private class ScholarshipsControllerTest {
 				ScholarshipsController.getHome().due.size(),
 				'The first payment is due within 30 days'
 			);
+		}
+	}
+
+	@IsTest
+	static void theFirstRunPanelShowsBeforeTheFirstProgram() {
+		System.runAs(ScholarshipsTestData.admin()) {
+			Test.startTest();
+			ScholarshipsController.Home home = ScholarshipsController.getHome();
+			Test.stopTest();
+			Assert.isTrue(home.firstRun, 'No program exists yet, and an admin may create one.');
 		}
 	}
 
@@ -182,7 +193,7 @@ private class ScholarshipsControllerTest {
 
 			Test.startTest();
 			ScholarshipsController.Board board = ScholarshipsController.getBoard(cycle.Id);
-			Application_Review__c saved = ScholarshipsController.saveReview(
+			ScholarshipsController.MyReview saved = ScholarshipsController.saveReview(
 				application.Id,
 				null,
 				'Thoughtful essay',
@@ -198,7 +209,7 @@ private class ScholarshipsControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(board.formLink.contains(String.valueOf(cycle.Id)), 'The form link');
-			Assert.areEqual('Thoughtful essay', saved.Comments__c, 'The comment is kept');
+			Assert.areEqual('Thoughtful essay', saved.comments, 'The comment is kept');
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Assign_NoPanel'),
 				noPanel,

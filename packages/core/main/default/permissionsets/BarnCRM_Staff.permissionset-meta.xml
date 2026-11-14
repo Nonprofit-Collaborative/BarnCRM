@@ -99,6 +99,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>NamespaceUtil</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>NightlyJobsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -335,6 +339,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Household_Model__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Account.Household_Role__c</field>
     <readable>true</readable>
@@ -407,6 +416,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Address__c.Latest_Verified_Date__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Address__c.Match_Key__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -652,6 +666,21 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Error_Log__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Error_Log__c.Occurrence_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Error_Log__c.Occurrences__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Error_Log__c.Other_Record_Ids__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

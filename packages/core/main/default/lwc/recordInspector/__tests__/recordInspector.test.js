@@ -210,6 +210,9 @@ describe('c-record-inspector', () => {
     await open(element);
 
     q(element, '[data-id="open-find"]').click();
+    await flush();
+    await flush();
+    await flush();
 
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',

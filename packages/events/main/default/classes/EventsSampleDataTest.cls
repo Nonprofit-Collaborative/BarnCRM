@@ -4,55 +4,73 @@
  * events left alone, and nothing loaded where there are no sample people. Run as a BarnCRM admin
  * holding Events Admin, the person who loads sample data.
  *
- * The stages are called directly, as the other modules' tests do, because a test runs only the
+ * The set ships as EventsSampleData.json and Core's SampleDataFile loads it (D-200 S2). The
+ * stages are called directly, as the other modules' tests do, because a test runs only the
  * first stage of a batch.
  */
-@IsTest(testFor='ApexClass:EventsSampleData, ApexClass:EventSampleDataLoader')
+@IsTest(testFor='ApexClass:SampleDataFile')
 private class EventsSampleDataTest {
+	private static final String FILE = 'EventsSampleData';
+	private static final String CONFERENCE = 'Harvest Community Conference';
+	private static final String COMMUNITY = 'Neighborhood Garden Night';
+
 	@TestSetup
 	static void makeAdmin() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User admin() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	/** Core's sample people and three of its sample organizations. */
 	private static void samplePeopleAndOrganizations() {
 		List<Contact> people = new List<Contact>();
-		for (Integer i = 0; i < 9; i++) {
+		List<String> keys = new List<String>{
+			'H001-1',
+			'H001-2',
+			'H001-3',
+			'H002-1',
+			'H002-2',
+			'H002-3',
+			'H002-4',
+			'H002-5'
+		};
+		for (Integer i = 0; i < keys.size(); i++) {
 			people.add(
-				new Contact(
-					FirstName = 'Sample',
-					LastName = 'Person' + i,
-					Email = 'sample' + i + '@example.org',
-					Sample_Data__c = true,
-					Sample_Data_Key__c = 'H' + String.valueOf(100 + i) + '-1'
+				TestDataFactory.person(
+					new Contact(
+						FirstName = 'Sample',
+						LastName = 'Person' + i,
+						Email = 'sample' + i + '@example.org',
+						Sample_Data__c = true,
+						Sample_Data_Key__c = keys[i]
+					)
 				)
 			);
 		}
 		insert people;
 		List<Account> organizations = new List<Account>();
-		for (Integer i = 0; i < 3; i++) {
+		for (String key : new List<String>{ 'O022', 'O014', 'O001' }) {
 			Account organization = (Account) TestDataFactory.pastDuplicateRules(
-				AccountKindsTestData.organization('Sample Org ' + i)
+				AccountKindsTestData.organization('Sample Org ' + key)
 			);
 			organization.Sample_Data__c = true;
+			organization.Sample_Data_Key__c = key;
 			organizations.add(organization);
 		}
 		insert organizations;
 	}
 
 	private static void loadEverything() {
-		EventsSampleData.LoadStages stages = new EventsSampleData.LoadStages();
+		SampleDataFile.LoadStages stages = new SampleDataFile.LoadStages(FILE);
 		for (Integer stage = 0; stage < stages.stageCount(); stage++) {
 			stages.runStage(stage);
 		}
 	}
 
 	private static void removeEverything() {
-		EventsSampleData.RemoveStages stages = new EventsSampleData.RemoveStages();
+		SampleDataFile.RemoveStages stages = new SampleDataFile.RemoveStages(FILE);
 		Integer stageCount = stages.stageCount();
 		for (Integer stage = 0; stage < stageCount; stage++) {
 			stages.runStage(stage);
@@ -68,13 +86,14 @@ private class EventsSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			EventsSampleData module = new EventsSampleData();
+			SampleDataModule module = SampleDataFile.find(FILE);
+			Assert.areEqual('Events', module.moduleName(), 'The name startAfter looks for');
 			Assert.areEqual(2, module.countLoaded(), 'Two sample events are counted');
 			Assert.isTrue(module.hasSampleRecords(), 'The card sees them');
 			Event__c conference = [
 				SELECT Id
 				FROM Event__c
-				WHERE Name = :EventSampleDataLoader.CONFERENCE
+				WHERE Name = :CONFERENCE
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual(
@@ -190,12 +209,92 @@ private class EventsSampleDataTest {
 				[
 					SELECT COUNT()
 					FROM Event_Registration__c
-					WHERE Event__r.Name = :EventSampleDataLoader.COMMUNITY
+					WHERE Event__r.Name = :COMMUNITY
 					WITH SYSTEM_MODE
 				],
 				'Four community registrations'
 			);
+			assertOperations(conference.Id);
 		}
+	}
+
+	/** The venue and rooms, seating, budget, ratings, survey, appointments and agenda picks. */
+	private static void assertOperations(Id conferenceId) {
+		Event__c conference = [
+			SELECT Venue__c, Venue__r.Name
+			FROM Event__c
+			WHERE Id = :conferenceId
+			WITH SYSTEM_MODE
+		];
+		Assert.areEqual('Riverside Meeting Hall', conference.Venue__r.Name, 'Held at the venue');
+		Assert.areEqual(
+			4,
+			[
+				SELECT COUNT()
+				FROM Event_Room__c
+				WHERE Venue__c = :conference.Venue__c
+				WITH SYSTEM_MODE
+			],
+			'Four rooms'
+		);
+		Assert.areEqual(
+			8,
+			[
+				SELECT COUNT()
+				FROM Event_Session__c
+				WHERE Event__c = :conferenceId AND Venue_Room__c != NULL
+				WITH SYSTEM_MODE
+			],
+			'Every session is in one of the venue rooms'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Event_Table__c WHERE Event__c = :conferenceId WITH SYSTEM_MODE],
+			'Two dinner tables'
+		);
+		Assert.areEqual(
+			5,
+			[SELECT COUNT() FROM Event_Attendee__c WHERE Event_Table__c != NULL WITH SYSTEM_MODE],
+			'Five guests are seated'
+		);
+		Assert.areEqual(
+			4,
+			[SELECT COUNT() FROM Event_Expense__c WHERE Event__c = :conferenceId WITH SYSTEM_MODE],
+			'Four budget lines'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Event_Funding__c WHERE Event__c = :conferenceId WITH SYSTEM_MODE],
+			'Two funding lines'
+		);
+		Event_Session__c keynote = [
+			SELECT Rating_Count__c, Room__c
+			FROM Event_Session__c
+			WHERE Event__c = :conferenceId AND Name = 'Opening Keynote'
+			WITH SYSTEM_MODE
+		];
+		Assert.areEqual(2, keynote.Rating_Count__c, 'The keynote has two ratings');
+		Assert.areEqual('Main Hall', keynote.Room__c, 'The room names the session');
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Event_Survey_Response__c WITH SYSTEM_MODE],
+			'Two survey responses'
+		);
+		Assert.areEqual(
+			2,
+			[
+				SELECT COUNT()
+				FROM Event_Appointment__c
+				WHERE Event__c = :conferenceId
+				WITH SYSTEM_MODE
+			],
+			'One booked and one open appointment'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Agenda_Item__c WITH SYSTEM_MODE],
+			'Two personal agenda picks'
+		);
 	}
 
 	@IsTest
@@ -210,7 +309,7 @@ private class EventsSampleDataTest {
 				End__c = Datetime.now().addDays(20).addHours(2)
 			);
 			insert as user real;
-			Contact person = new Contact(LastName = 'Real Person');
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Real Person'));
 			insert as user person;
 			insert as user new Event_Registration__c(
 				Event__c = real.Id,
@@ -221,7 +320,7 @@ private class EventsSampleDataTest {
 
 			Test.startTest();
 			loadEverything();
-			EventSampleDataLoader.removeChunkSize = 3;
+			SampleDataFile.removeChunkSize = 3;
 			removeEverything();
 			Test.stopTest();
 
@@ -242,52 +341,30 @@ private class EventsSampleDataTest {
 				[SELECT COUNT() FROM Event_Track__c WITH SYSTEM_MODE],
 				'The sample tracks went with their event'
 			);
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Event_Venue__c WITH SYSTEM_MODE],
+				'The sample venue and its rooms went too'
+			);
 		}
 	}
 
 	@IsTest
-	static void coreFindsTheModuleAndNothingLoadsWithoutSamplePeople() {
+	static void withoutSamplePeopleNobodyIsRegistered() {
 		System.runAs(admin()) {
-			Object built = Type.forName('EventsSampleData').newInstance();
-			Assert.isTrue(built instanceof SampleDataModule, 'Core builds it by its name.');
-			EventsSampleData module = (EventsSampleData) built;
-			Assert.areEqual('Events', module.moduleName(), 'The name startAfter looks for.');
-			Assert.isFalse(String.isBlank(module.countLabel()), 'The card has its wording.');
-			Assert.areEqual(
-				'EventsSampleData.LoadStages',
-				new EventsSampleData.LoadStages().name()
-			);
-			Assert.areEqual(
-				'EventsSampleData.RemoveStages',
-				new EventsSampleData.RemoveStages().name()
-			);
-
 			Test.startTest();
 			loadEverything();
-			new EventsSampleData.LoadStages().finish();
-			new EventsSampleData.RemoveStages().finish();
 			Test.stopTest();
 
-			Assert.areEqual(0, [SELECT COUNT() FROM Event__c], 'No sample people, no events');
-			Assert.isFalse(module.hasSampleRecords());
-		}
-	}
-
-	@IsTest
-	static void enqueueLoadAndRemoveStartCoresBatches() {
-		System.runAs(admin()) {
-			Test.startTest();
-			new EventsSampleData().enqueueLoad();
-			new EventsSampleData().enqueueRemove();
-			Test.stopTest();
-
-			Assert.isTrue(
-				[
-					SELECT COUNT()
-					FROM AsyncApexJob
-					WHERE ApexClass.Name IN ('SampleDataStageBatch', 'SampleDataRemoveBatch')
-				] >= 2,
-				'Both run in Core\'s batches.'
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Event_Registration__c WITH SYSTEM_MODE],
+				'No sample people, no registrations'
+			);
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Event_Sponsor__c WITH SYSTEM_MODE],
+				'No sample organizations, no sponsors'
 			);
 		}
 	}

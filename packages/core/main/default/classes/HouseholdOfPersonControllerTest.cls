@@ -45,7 +45,9 @@ private class HouseholdOfPersonControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			HouseholdService.suspendAutomaticCreation();
-			Account organization = new Account(Name = 'The Union Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert organization;
 			Contact harper = HouseholdTestDataFactory.newContact('Ms.', 'Harper', 'Garcia');
 			harper.AccountId = organization.Id;
@@ -230,6 +232,7 @@ private class HouseholdOfPersonControllerTest {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
 			insert wei;
+			Test.setFixedSearchResults(new List<Id>{ wei.Id });
 
 			Test.startTest();
 			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
@@ -254,12 +257,18 @@ private class HouseholdOfPersonControllerTest {
 				return;
 			}
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			Account person = new Account(
-				RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+			Account person = TestDataFactory.organization(
+				new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId())
 			);
 			person.put('FirstName', 'Quillon');
 			person.put('LastName', 'Vantrees');
 			insert person;
+			// The index finds both the account and the contact the platform keeps behind it.
+			List<Id> indexed = new List<Id>{ person.Id };
+			for (Contact behind : [SELECT Id FROM Contact WHERE AccountId = :person.Id]) {
+				indexed.add(behind.Id);
+			}
+			Test.setFixedSearchResults(indexed);
 
 			Test.startTest();
 			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
@@ -319,7 +328,9 @@ private class HouseholdOfPersonControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			HouseholdService.suspendAutomaticCreation();
-			Account organization = new Account(Name = 'The Union Foundation');
+			Account organization = TestDataFactory.organization(
+				new Account(Name = 'The Union Foundation')
+			);
 			insert organization;
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
@@ -447,9 +458,12 @@ private class HouseholdOfPersonControllerTest {
 	static void theSearchOffersContactsWhereThereAreNoPersonAccounts() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = false;
-			Contact found = new Contact(FirstName = 'Zelda', LastName = 'Searchable');
+			Contact found = TestDataFactory.person(
+				new Contact(FirstName = 'Zelda', LastName = 'Searchable')
+			);
 			TestDataFactory.pastDuplicateRules(found);
 			insert found;
+			Test.setFixedSearchResults(new List<Id>{ found.Id });
 
 			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
 				'Searchable'

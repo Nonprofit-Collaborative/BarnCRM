@@ -17,6 +17,10 @@ private class PersonAccountMergeTest {
 
 	/** Records which survivors Core asked the engine to recalculate. */
 	private class RecordingEngine implements RollupEngineExtension {
+		public void afterModuleTurnedOn(String moduleName) {
+		}
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		}
 		public Map<String, Set<Id>> survivorsByObject = new Map<String, Set<Id>>();
 		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
 			return;
@@ -46,8 +50,8 @@ private class PersonAccountMergeTest {
 		System.runAs(TestUsers.admin()) {
 			settingsThatTidyEmptyHouseholds();
 			overridePeople();
-			Account ana = new Account(Name = 'Ana Okafor');
-			Account bea = new Account(Name = 'Bea Lindqvist');
+			Account ana = TestDataFactory.organization(new Account(Name = 'Ana Okafor'));
+			Account bea = TestDataFactory.organization(new Account(Name = 'Bea Lindqvist'));
 			insert new List<Account>{ ana, bea };
 			Map<Id, Id> contactBehind = contactsBehind(ana, bea);
 			Account hers = household('The Okafor Household');
@@ -76,8 +80,8 @@ private class PersonAccountMergeTest {
 		System.runAs(TestUsers.admin()) {
 			settingsThatTidyEmptyHouseholds();
 			overridePeople();
-			Account ana = new Account(Name = 'Ana Okafor');
-			Account bea = new Account(Name = 'Bea Lindqvist');
+			Account ana = TestDataFactory.organization(new Account(Name = 'Ana Okafor'));
+			Account bea = TestDataFactory.organization(new Account(Name = 'Bea Lindqvist'));
 			insert new List<Account>{ ana, bea };
 			Map<Id, Id> contactBehind = contactsBehind(ana, bea);
 			Account theirs = household('The Lindqvist Household');
@@ -104,8 +108,8 @@ private class PersonAccountMergeTest {
 		System.runAs(TestUsers.admin()) {
 			settingsThatTidyEmptyHouseholds();
 			overridePeople();
-			Account ana = new Account(Name = 'Ana Okafor');
-			Account bea = new Account(Name = 'Bea Lindqvist');
+			Account ana = TestDataFactory.organization(new Account(Name = 'Ana Okafor'));
+			Account bea = TestDataFactory.organization(new Account(Name = 'Bea Lindqvist'));
 			insert new List<Account>{ ana, bea };
 			Map<Id, Id> contactBehind = contactsBehind(ana, bea);
 			RecordingEngine engine = new RecordingEngine();

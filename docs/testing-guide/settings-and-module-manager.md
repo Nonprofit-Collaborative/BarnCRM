@@ -158,7 +158,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 4 | Select **Remove** on Sam's row, then **Catch Up Now**. Wait a minute and open `Test Bypassed`. | Sam's row is gone and the page says the catch-up has started. Selecting **Catch Up Now** again at once says "A catch-up is already running." `Test Bypassed` now has a household. |
 | 5 | Tick **Pause All** on **Whole Organization**. | A yellow bar at the top says automation is paused for everyone, with **Turn Off**. Create a person: no household. |
 | 6 | Add your own profile, untick its **Bypass**, and create a person. | The person gets a household: your profile's row (both off) replaces the organization's for you. |
-| 7 | Remove your profile's row and select **Turn Off** in the yellow bar. | The bar is gone and **Pause All** is off on **Whole Organization**. |
+| 7 | Select **Remove** on your profile's row, choose **Cancel** in the **Remove Automation Settings** window (the row stays), then **Remove** again and confirm. Select **Turn Off** in the yellow bar. | The bar is gone and **Pause All** is off on **Whole Organization**. |
 | 8 | As a user without **Manage BarnCRM Settings**, open the page. | The rows show, but the boxes, **Add**, **Remove** and **Catch Up Now** are disabled. |
 
 **Cleanup:** delete the test people and their households.
@@ -173,7 +173,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 1 | Open **BarnCRM Settings**, **Automation**. Under **Your Own Flows**, pick `My_Test_Flow` and select **Add**. | The flow joins the automation list, switched on, with a description naming `Flow:My_Test_Flow`, and a **Remove** button. It is no longer offered in the picker. |
 | 2 | Save a record the flow runs on. | The flow sets its field. |
 | 3 | Switch the flow's row **Off** and save another record. | The flow does not set its field. |
-| 4 | Select **Remove** on the row. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
+| 4 | Select **Remove** on the row. In the **Remove Flow** window choose **Cancel** (the row stays), then **Remove** again and confirm. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
 
 **Cleanup:** deactivate or delete `My_Test_Flow`.
 
@@ -323,6 +323,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 3 | Click **Open This Entry**. | The Error Log record opens (as a subtab in the console). **Status** is **New**. |
 | 4 | Back on the tile, click **Mark Acknowledged**. | The badge count drops by one (the entry stays in the recent list). The record's **Status** reads **Acknowledged**. On **Home**, **Errors to Review** drops by one after a reload. |
 | 5 | As staff, open the **Error Log** tab and the entry. | The entry is readable. **Status** cannot be edited and **Technical Detail** is not shown. |
+| 6 | As admin, on the **Error Log** card click **Copy for Bug Report** on **Testing guide entry**, then paste into a text editor. | A toast says it was copied. The text starts "BarnCRM bug report." and names **Testing guide**, **Error** and the time in UTC; it does not contain "Testing guide entry" (the message). If the browser blocks copying, a box on the card shows the same text. |
 
 **Cleanup:** set the entry's **Status** to **Resolved** as admin.
 
@@ -466,6 +467,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 7 | Open **Modules**. | No row says "Its setup steps never ran". |
 | 8 | Repeat step 2, then in **Modules** click **Finish Setup** on the **BarnCRM Giving** row. | The sentence and the button go away. No error shows, although Giving's steps had already run once: they only add what is missing, so the org has one General Fund and one of each receipt letter, not two. |
 | 9 | Open **General** and scroll to **Recent Changes**. | **Finish Setup** and **Health Check: Finish Setup** each list **BarnCRM Giving**, with your name. |
+| 10 | In a scratch org where nobody holds **Manage BarnCRM Settings** (remove BarnCRM Admin from every user), repeat step 2, then open **Modules** as a System Administrator. | **Finish Setup** shows on the **BarnCRM Giving** row (no other button does). Click it: the steps run and the notice goes away. Give BarnCRM Admin back to one user: a System Administrator without it no longer sees the button. |
 
 **Cleanup:** None: **Modules Setup Run** lists Giving again.
 
@@ -493,16 +495,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 ## T-SET-21: An Upgrade Turns On New Settings Once
 
-**Purpose:** confirm that an upgrade turns on a setting that ships on (Send Weekly Admin Summary, Ask Reminders) in an org that saved its settings before the setting existed, once, and never overrides the admin's choice after.
-**Prerequisites:** an org upgraded or deployed from a version before 0.15 whose BarnCRM Settings and Giving settings had been saved.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | After the upgrade, open **BarnCRM Settings** and find **Send weekly admin summary**. | It is on, and its description starts "On by default." |
-| 2 | Choose the **Giving** section and find **Ask Reminders**. | It is on. |
-| 3 | Switch both off and save. Run the upgrade or the source deploy again. | Both stay off. |
-
-**Cleanup:** set both back to what they were.
+**Not run at present.** The namespaced release is a fresh install everywhere (D-199), so the cut-over cleanup (D-200 S4) emptied the list of ship-on settings added in an upgrade (Send Weekly Admin Summary, Ask Reminders). The step stays for the first ship-on setting added after that release; this test returns with it, naming that setting. Apex test `ShippedDefaultUpgradesTest` covers the mechanism.
 
 ## T-SET-22: Nightly Job Names, Template Names and Descriptions
 
@@ -511,8 +504,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Nightly Jobs and Accounting Periods**, then **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
-| 2 | In an org where they were never scheduled, choose **Schedule**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
+| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
+| 2 | In an org where they were never scheduled, choose **Schedule Nightly Jobs**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
 | 3 | Open **Data Manager**, select **Import a File**, and open the **Template** picker. | Template names are in title casing, for example "Generic Gift List" and "NPSP: Opportunities and Payments". A template you renamed keeps your name. |
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 
@@ -582,21 +575,6 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 2 | Choose another value and save. | The save succeeds and the page keeps the choice. Recent changes lists it. |
 | 3 | In Setup, make that Status value inactive; reload the setting. | The dropdown still shows the saved value, and saving the section keeps it. |
 | 4 | In an org without Nonprofit Cloud, open the same setting. | A text box showing `Paid`; any text saves. |
-
-## T-SET-27: Coordinator Holders Become Team Members
-
-**Purpose:** confirm the retired Coordinator role carries over to Team Member without taking anything away, and an inactive holder is named in the Error Log instead.
-**Prerequisites:** admin user with permission to run anonymous Apex; the staff user and a third user, Gone Tester, neither holding Team Member. Not on mwdbdevsb.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | In Setup, **Users**, open Staff Tester, **Permission Set Group Assignments**, and add **Coordinator (Retired)**. Do the same for Gone Tester, then deactivate Gone Tester. | Both hold the group. |
-| 2 | Open **BarnCRM Settings**, **Access**. | No **Coordinator** card; neither person is on the **Team Member** card. |
-| 3 | In the Developer Console, run `TabAccessService.requestSync();` as anonymous Apex. Wait a minute and reload **Access**. | **Staff Tester** is on the **Team Member** card. In Setup, Staff Tester still holds **Coordinator (Retired)**. Gone Tester holds no Team Member. |
-| 4 | Run `CorePostInstall.runAsSourceDeploy();` as anonymous Apex, then open the **Error Log**. | A Warning: "Gone Tester is inactive and holds the Coordinator (Retired) role, so BarnCRM did not give them Team Member. ..." The run finished without an error. |
-| 5 | Open **Org Optimizer**, **Access Explorer**, and choose Staff Tester. | **Coordinator (Retired)** is listed as a BarnCRM role beside **Team Member**. |
-
-**Cleanup:** remove **Coordinator (Retired)** and **Team Member** from Staff Tester in Setup; remove the group from Gone Tester (reactivate first if Salesforce asks).
 
 ## T-SET-28: Forms and Logic Models Are Found by Their Settings Rows
 

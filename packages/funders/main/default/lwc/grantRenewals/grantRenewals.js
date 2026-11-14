@@ -1,4 +1,5 @@
-import { LightningElement, api } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getRenewals from '@salesforce/apex/GrantManagementController.getRenewals';
@@ -20,6 +21,7 @@ export default class GrantRenewals extends NavigationMixin(LightningElement) {
   errorMessage;
   isLoading = true;
   starting = false;
+  wiredCard;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -27,18 +29,21 @@ export default class GrantRenewals extends NavigationMixin(LightningElement) {
         this.helpReady = true;
       });
     }
-    this.load();
   }
 
-  async load() {
-    this.isLoading = true;
-    try {
-      this.card = await getRenewals({ grantId: this.recordId });
+  // Cached read (D-200 P11); Start Renewal refreshes it so this grant no longer offers it.
+  @wire(getRenewals, { grantId: '$recordId' })
+  receiveRenewals(result) {
+    this.wiredCard = result;
+    const { data, error } = result;
+    if (data) {
+      this.card = data;
       this.errorMessage = undefined;
-    } catch (error) {
+    } else if (error) {
       this.card = undefined;
       this.errorMessage = messageFrom(error, helpText('Funders', 'Funders_Manage_LoadFailed'));
-    } finally {
+    }
+    if (data || error) {
       this.isLoading = false;
     }
   }
@@ -74,6 +79,7 @@ export default class GrantRenewals extends NavigationMixin(LightningElement) {
     this.starting = true;
     try {
       const grantId = await startRenewal({ grantId: this.recordId });
+      refreshApex(this.wiredCard);
       this.dispatchEvent(
         new ShowToastEvent({
           message: helpText('Funders', 'Funders_Renewals_Started'),

@@ -14,16 +14,16 @@ public with sharing class PledgeReminderScheduler implements Schedulable {
 	private static final String LOG_CONTEXT = 'PledgeReminderScheduler.execute';
 
 	public void execute(SchedulableContext context) {
-		if (context != null) {
-			// Still scheduled on its own from before the nightly run (R-NJ5).
-			NightlyJobs.adoptOldSchedules();
-		}
 		try {
 			if (!PledgeReminderService.isEnabled()) {
 				// Switched off since the schedule was started. Nothing to do, and nothing wrong.
 				return;
 			}
-			Database.executeBatch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE);
+			AsyncStarter.batch(
+				new PledgeReminderBatch(),
+				PledgeReminderBatch.SCOPE,
+				'PledgeReminderScheduler'
+			);
 		} catch (Exception nightlyFailure) {
 			// A scheduled job's exception goes nowhere a person will ever look, so it goes here.
 			ErrorLogger.log(nightlyFailure, LOG_CONTEXT);

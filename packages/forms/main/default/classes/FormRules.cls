@@ -115,17 +115,7 @@ public with sharing class FormRules {
 	}
 
 	private static Decimal asNumber(Object value) {
-		if (isBlank(value) || value instanceof Boolean) {
-			return null;
-		}
-		if (value instanceof Decimal) {
-			return (Decimal) value;
-		}
-		try {
-			return Decimal.valueOf(String.valueOf(value).trim());
-		} catch (Exception notANumber) {
-			return null;
-		}
+		return isBlank(value) || value instanceof Boolean ? null : SettingsService.toNumber(value);
 	}
 
 	/** -1, 0 or 1 for numbers or dates, null for anything else. */

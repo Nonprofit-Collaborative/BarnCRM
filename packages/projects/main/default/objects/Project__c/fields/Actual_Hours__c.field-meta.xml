@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Actual_Hours__c</fullName>
-  <inlineHelpText>Every hour logged on the project.</inlineHelpText>
+  <inlineHelpText>Every hour logged on the project that counts: with approvals on, approved hours only.</inlineHelpText>
   <label>Actual Hours</label>
   <summarizedField>Time_Entry__c.Hours__c</summarizedField>
+  <summaryFilterItems>
+    <field>Time_Entry__c.Status__c</field>
+    <operation>notEqual</operation>
+    <value>Open, Submitted, Rejected</value>
+  </summaryFilterItems>
   <summaryForeignKey>Time_Entry__c.Project__c</summaryForeignKey>
   <summaryOperation>sum</summaryOperation>
   <trackTrending>false</trackTrending>

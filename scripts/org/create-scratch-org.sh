@@ -18,6 +18,8 @@
 #                      an ordinary Developer Edition Dev Hub cannot create this shape, and
 #                      says so by listing the features it can grant. See
 #                      docs/contributor-guide/scratch-orgs.md before using it.
+#   multi-currency      Developer edition with multiple currencies on, for the release gate
+#                      once per version (scripts/org/release-gate.sh --multi-currency).
 
 set -euo pipefail
 
@@ -32,7 +34,7 @@ usage() {
   echo "               Edition org instead. See docs/contributor-guide/scratch-orgs.md." >&2
   echo "  --replace    Delete an existing scratch org with the same alias first, so a" >&2
   echo "               refresh does not leave the old one consuming an active org slot." >&2
-  echo "  shape: platform-only | sales-cloud | npsp | person-accounts | nonprofit-cloud" >&2
+  echo "  shape: platform-only | sales-cloud | npsp | person-accounts | nonprofit-cloud | multi-currency" >&2
   exit 1
 }
 
@@ -82,7 +84,7 @@ done
 
 DEF_FILE="config/scratch-defs/${SHAPE}.json"
 if [[ ! -f "$DEF_FILE" ]]; then
-  echo "Unknown shape '${SHAPE}'. Expected one of: platform-only, sales-cloud, npsp, person-accounts, nonprofit-cloud" >&2
+  echo "Unknown shape '${SHAPE}'. Expected one of: platform-only, sales-cloud, npsp, person-accounts, nonprofit-cloud, multi-currency" >&2
   echo "(no scratch-def file found at ${DEF_FILE})" >&2
   exit 1
 fi

@@ -246,6 +246,18 @@ public with sharing class ModuleDetectionService {
 		return String.isNotBlank(row.Probe_Object__c) && objectExists(row.Probe_Object__c.trim());
 	}
 
+	/** The catalog rows of the modules installed here, in catalog order (D-200 R7). */
+	public static List<BarnCRM_Module__mdt> installedCatalog() {
+		Set<String> announced = announcedModules();
+		List<BarnCRM_Module__mdt> here = new List<BarnCRM_Module__mdt>();
+		for (BarnCRM_Module__mdt row : catalog()) {
+			if (isPresent(row, announced)) {
+				here.add(row);
+			}
+		}
+		return here;
+	}
+
 	/** True when the catalog says the chosen edition (Standard before one is chosen) offers it. */
 	public static Boolean isOffered(String moduleName) {
 		String edition = chosenSuite() == null ? SUITE_STANDARD : chosenSuite();

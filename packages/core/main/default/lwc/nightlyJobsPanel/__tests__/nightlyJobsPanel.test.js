@@ -2,7 +2,19 @@ import { createElement } from 'lwc';
 import NightlyJobsPanel, { timeOfDay } from 'c/nightlyJobsPanel';
 import getPanel from '@salesforce/apex/NightlyJobsController.getPanel';
 import schedule from '@salesforce/apex/NightlyJobsController.schedule';
+import setStep from '@salesforce/apex/NightlyJobsController.setStep';
+import runStep from '@salesforce/apex/NightlyJobsController.runStep';
+import { setHelpTextForTest } from 'c/barnHelpText';
+import { expectAccessible } from 'barn/a11y';
 
+setHelpTextForTest({ Core_NightlyJobs_RowAction: '{0}: {1}' });
+
+jest.mock('@salesforce/apex/NightlyJobsController.setStep', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/NightlyJobsController.runStep', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock('@salesforce/apex/NightlyJobsController.getPanel', () => ({ default: jest.fn() }), {
   virtual: true
@@ -77,6 +89,56 @@ describe('c-nightly-jobs-panel', () => {
     expect(off.label).toBe('c.Core_Feature_Off');
     expect(pending.label).toBe('c.Core_NightlyJobs_StateNotScheduled');
     expect(pending.status).toBe('warning');
+  });
+
+  it('switches a step with a switch and starts one that allows it, from its row', async () => {
+    const giving = {
+      key: 'BarnCRM Giving Installment Top Up',
+      label: 'Installment top up',
+      minute: 75,
+      isOn: true,
+      hasSwitch: true,
+      switchedOn: true,
+      canRunNow: true,
+      summary: '3 payments added',
+      missed: true
+    };
+    const element = await render({ ...PANEL, scheduled: true, steps: [PANEL.steps[0], giving] });
+    const rows = element.shadowRoot.querySelectorAll('tbody tr');
+    expect(rows[0].querySelector('[data-id="switch"]')).toBeNull();
+    expect(rows[0].querySelector('[data-id="run-now"]')).toBeNull();
+    expect(rows[1].querySelector('[data-id="summary"]').textContent).toBe('3 payments added');
+    expect(rows[1].querySelector('[data-id="missed"]').label).toBe('c.Core_NightlyJobs_Missed');
+
+    const turnOff = rows[1].querySelector('[data-id="switch"]');
+    expect(turnOff.label).toBe('c.Core_NightlyJobs_TurnOff');
+    // Each row's buttons name the job they act on, for a screen reader.
+    expect(turnOff.title).toBe('c.Core_NightlyJobs_TurnOff: Installment top up');
+    expect(rows[1].querySelector('[data-id="run-now"]').title).toBe(
+      'c.Core_NightlyJobs_RunNow: Installment top up'
+    );
+    await expectAccessible(element);
+    setStep.mockResolvedValue({
+      ...PANEL,
+      scheduled: true,
+      steps: [PANEL.steps[0], { ...giving, isOn: false, switchedOn: false, missed: false }]
+    });
+    turnOff.click();
+    await flush();
+    expect(setStep).toHaveBeenCalledWith({ key: giving.key, turnOn: false });
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toContain(
+      'c.Core_NightlyJobs_SwitchSaved'
+    );
+    const turnOn = element.shadowRoot.querySelectorAll('tbody tr')[1];
+    expect(turnOn.querySelector('[data-id="switch"]').label).toBe('c.Core_NightlyJobs_TurnOn');
+
+    runStep.mockResolvedValue({ ...PANEL, scheduled: true, steps: [giving] });
+    turnOn.querySelector('[data-id="run-now"]').click();
+    await flush();
+    expect(runStep).toHaveBeenCalledWith({ key: giving.key });
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toContain(
+      'c.Core_NightlyJobs_RunStarted'
+    );
   });
 
   it('says the run is not scheduled and offers to schedule it', async () => {

@@ -27,13 +27,13 @@ jest.mock('@salesforce/apex/RollupDlrsImport.turnOn', () => ({ default: jest.fn(
   virtual: true
 });
 jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DlrsImportFills',
+  '@salesforce/label/c.Rollups_RollupBuilder_DlrsImportFills',
   () => ({ default: 'Fills {0} by {1}' }),
   {
     virtual: true
   }
 );
-jest.mock('@salesforce/label/c.Core_RollupBuilder_DlrsImportSame', () => ({ default: 'Same' }), {
+jest.mock('@salesforce/label/c.Rollups_RollupBuilder_DlrsImportSame', () => ({ default: 'Same' }), {
   virtual: true
 });
 
@@ -105,6 +105,17 @@ describe('c-rollup-dlrs-import', () => {
     jest.clearAllMocks();
   });
 
+  it('names the spinner while the candidates load', async () => {
+    getCandidates.mockReturnValue(new Promise(() => {}));
+    const element = createElement('c-rollup-dlrs-import', { is: RollupDlrsImport });
+    element.model = MODEL;
+    document.body.appendChild(element);
+    await flush();
+
+    const spinner = element.shadowRoot.querySelector('lightning-spinner');
+    expect(spinner.alternativeText).toBe('c.Core_AccessExplorer_Loading');
+  });
+
   it('lists what can be copied, ticked, and what stays in DLRS with why', async () => {
     const element = await build();
 
@@ -142,7 +153,7 @@ describe('c-rollup-dlrs-import', () => {
     await flush();
 
     expect(getCandidates).toHaveBeenCalledWith({ tool: 'npsp' });
-    expect($(element, 'title').textContent).toBe('c.Core_RollupBuilder_NpspImportTitle');
+    expect($(element, 'title').textContent).toBe('c.Rollups_RollupBuilder_NpspImportTitle');
     await copied(element);
     expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'], tool: 'npsp' });
   });

@@ -115,9 +115,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Program enrollments** with 18. |
 | 2 | Open **Programs**, list view **All Programs**. | **After-school tutoring** and **Food pantry** (Active) and **Summer reading** (Completed) are listed. |
-| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. The **Cohorts** tab lists **Fall homework club** (Active) with 4 members and 3 sessions: Homework club 1 and 2 Held, each with 4 attendance marks (one Excused Absence among them), and Homework club 3 Scheduled. The **Goals** tab lists 4 goals "Read one grade level higher" (In Progress), each with 2 steps, one Done. |
+| 3 | Open **After-school tutoring**. | The roster shows **Applied** 1, **Enrolled** 4, **Withdrawn** 1, and the services Tutoring hour and Homework club session. Open **Tutoring hour**: its **Service Deliveries** list shows 8 deliveries of 2. The **Cohorts** tab lists **Fall homework club** (Active) with 4 members and 3 sessions: Homework club 1 and 2 Held, each with 4 attendance marks (one Excused Absence among them), and Homework club 3 Scheduled, plus the Scheduled sessions of the session schedule **Homework club twice a week** (active, Tuesdays and Thursdays, from tomorrow), which appear within a minute of the load. **Summer reading** has the cohort **Summer reading circle** (Completed) with its 4 members. The **Goals** tab lists 6 goals, each assigned to you with 2 steps: 4 "Read one grade level higher" (In Progress, one of them under **Reviews Due**), "Finish five books from the summer list" (Achieved, both steps Done) and "Apply for SNAP benefits" (In Progress, in the food pantry). |
 | 4 | Create a contact "Rita Real" and enroll her in **Food pantry**. | Accepted. |
-| 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone, with the cohort, its sessions and the goals. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
+| 5 | Select **Remove Sample Data** and wait. | **Summer reading** and **After-school tutoring** are gone, with both cohorts, the session schedule, its sessions and the goals. **Food pantry** stays, with only Rita's enrollment, and the [Error Log](../admin-guide/error-log.md) holds one Warning naming it. The card still offers **Remove Sample Data**. |
 | 6 | Delete Rita's enrollment, then select **Remove Sample Data** again. | **Food pantry** is gone. |
 | 7 | Load the sample data again, add a case note to one sample enrollment in **Summer reading**, then select **Remove Sample Data**. | **Summer reading** stays with that enrollment, and the Error Log Warning names it: "Sample data removal kept the sample programs Summer reading, because people of your own are enrolled in them or have services recorded in them, or a sample enrollment in them has case notes. Move or delete those enrollments, service deliveries and case notes, then select Remove Sample Data again." |
 | 8 | Delete that case note, then select **Remove Sample Data** again. | **Summer reading** is gone. |
@@ -365,7 +365,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 1 | As the staff user, open the program and, in **Cohorts**, click **New**. Name it "Spring", Start Date the first of next month, End Date two weeks later. Save. | The cohort opens with **Members** (the **Cohort Members** panel, "Members (0)"), **Schedule** (the **Schedule Sessions** panel) and **Details** tabs in the main column and its related lists in the sidebar. An End Date before the Start Date is refused. |
 | 2 | Under **Add People**, tick Ana and Ben. Pick Cara under the person picker and click **Add to List**. Click **Add to Cohort**. | "3 people added." All three are members; Cara now has an Enrolled enrollment in the program, in the cohort. |
 | 3 | Pick Ana again, add her to the list and click **Add to Cohort**. | Ana is listed under **Not Added** with the reason; nobody is added twice. |
-| 4 | Click **Remove** by Ben. | Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |
+| 4 | Click **Remove** by Ben. Choose **Cancel** in the **Remove Member** window, then click **Remove** again and confirm. | **Cancel** keeps Ben as a member. Confirming: Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |
 | 4a | Drag Ben by the handle beside his name onto the member list (mouse). Remove him again; on a phone, press and hold the handle and drag; remove him again; by keyboard, Tab to his handle, press Space, Left Arrow, Space. | Each time the member list is outlined while Ben is over it, and dropping adds him ("1 person added." or similar). Dropping him back on the enrolled list, or Escape, adds nobody. A screen reader hears each step. Ticks, **Select All** and **Add to Cohort** still work. |
 | 5 | On an enrollment in another program, set **Cohort** to Spring. | Refused: the cohort must belong to the enrollment's program. |
 | 6 | In **Schedule Sessions**, pick Tutoring, keep the cohort's dates, tick Monday and Wednesday, set a Start Time of 18:00 and an End Time of 17:00. Then change the End Time to 19:30. | With 17:00 the line asks for an end time after the start time and **Schedule** is off. With 19:30 the line gives the number of sessions (4 for a range starting on a Monday). Click **Schedule**: "4 sessions scheduled.", listed under the cohort's **Sessions** with Start Time and End Time, each named "Tutoring (date)". |
@@ -477,3 +477,19 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | Start **Service Deliveries** again and load. Tick each **Retire the Old App** item. | **Complete**. PMM's records are unchanged. |
 
 **Cleanup:** undo the steps from the last to the first, then delete the PMM test records.
+
+## T-PRG-28: Programs at a Glance, Enroll and the Record Service Tab
+
+**Purpose:** confirm staff in the BarnCRM app see a person's programs and can enroll them or record a service without switching apps (D-200 R1).
+**Prerequisites:** Programs Staff user; a person enrolled in one open program (stage Enrolled) and one completed program, with one Present service delivery; a household.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **BarnCRM** app, open the person. | The sidebar's glance area shows **Programs at a Glance**: **Open Enrollments** 1 and **Last Service** (the delivery's date), with **Enroll** and **Record Service**. |
+| 2 | Click **Record Service**, pick a service and click **Save**. | The **Record Service** tab opens with the person filled in. "Service recorded." and you are back on the person's page. |
+| 3 | Click **Enroll**. | A new enrollment opens with the person filled in. Pick a program and save; back on the person, **Open Enrollments** is 2. |
+| 4 | In the **BarnCRM Programs** app, open the person. | The **Programs** card has an **Enroll** button beside refresh; it opens the same new enrollment. |
+| 5 | Open the household. | No **Programs at a Glance** card. |
+| 6 | As a Programs Read Only user, open the person in the **BarnCRM** app. | The card shows its figures with no **Enroll** and no **Record Service**; the **Programs** card in the Programs app has no **Enroll**. |
+
+**Cleanup:** delete the service delivery and enrollment from steps 2 and 3.

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Week math, the timesheet grid, week status and the approval queue grouping for the Timesheet
+    and Approvals pages: plain JavaScript with no Salesforce imports (PM-07, plan Section 9.9).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -1,0 +1,123 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+      <template lwc:if={notice}>
+        <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+
+      <template lwc:if={enabled}>
+        <section class="slds-var-m-bottom_medium" data-id="requests">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.requests}</h2>
+          <template lwc:if={hasRequests}>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+              <thead>
+                <tr>
+                  <th scope="col">{labels.project}</th>
+                  <th scope="col">{labels.role}</th>
+                  <th scope="col">{labels.skills}</th>
+                  <th scope="col">{labels.hours}</th>
+                  <th scope="col">{labels.dates}</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={requests} for:item="row">
+                  <tr key={row.Id} data-id="request">
+                    <td data-label={labels.project}><a href={row.href}>{row.projectName}</a></td>
+                    <td data-label={labels.role}>{row.Role__c}</td>
+                    <td data-label={labels.skills}>{row.skills}</td>
+                    <td data-label={labels.hours}>{row.Hours__c}</td>
+                    <td data-label={labels.dates}>{row.dates}</td>
+                    <td><lightning-button label={labels.fill} data-id={row.Id} disabled={isWorking} onclick={handleFill} class="fill"></lightning-button></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </template>
+          <template lwc:else><p class="slds-text-color_weak">{labels.noRequests}</p></template>
+        </section>
+
+        <template lwc:if={filling}>
+          <section class="slds-box slds-var-m-bottom_medium" data-id="candidates">
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{fillTitle}</h2>
+            <p class="slds-text-color_weak slds-var-m-bottom_small">{labels.candidatesHelp}</p>
+            <template lwc:if={hasCandidates}>
+              <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+                <thead>
+                  <tr>
+                    <th scope="col">{labels.person}</th>
+                    <th scope="col">{labels.skillsMatched}</th>
+                    <th scope="col">{labels.roleMatch}</th>
+                    <th scope="col">{labels.free}</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={people} for:item="row">
+                    <tr key={row.id} class={row.className} data-id="candidate">
+                      <td data-label={labels.person}>{row.name}</td>
+                      <td data-label={labels.skillsMatched}>{row.match}</td>
+                      <td data-label={labels.roleMatch}>{row.roleText}</td>
+                      <td data-label={labels.free}>{row.free}</td>
+                      <td><lightning-button label={labels.assign} data-user={row.userId} data-name={row.name} disabled={isWorking} onclick={handleAssign} class="assign"></lightning-button></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <template lwc:else><p class="slds-text-color_weak">{labels.noCandidates}</p></template>
+            <lightning-button class="slds-var-m-top_small" label={labels.close} onclick={handleClose} data-id="close"></lightning-button>
+          </section>
+        </template>
+
+        <section class="slds-var-m-bottom_medium" data-id="resources">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.resources}</h2>
+          <template lwc:if={hasResources}>
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
+              <thead>
+                <tr>
+                  <th scope="col">{labels.person}</th>
+                  <th scope="col">{labels.skills}</th>
+                  <th scope="col">{labels.capacity}</th>
+                  <th scope="col">{labels.defaultRole}</th>
+                  <th scope="col">{labels.active}</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={resources} for:item="row">
+                  <tr key={row.Id} data-id="resource">
+                    <td data-label={labels.person}>{row.name}</td>
+                    <td data-label={labels.skills}>{row.skills}</td>
+                    <td data-label={labels.capacity}>{row.capacity}</td>
+                    <td data-label={labels.defaultRole}>{row.Default_Role__c}</td>
+                    <td data-label={labels.active}>{row.activeText}</td>
+                    <td><lightning-button label={labels.edit} data-id={row.Id} onclick={handleEdit} class="edit"></lightning-button></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </template>
+          <template lwc:else><p class="slds-text-color_weak">{labels.noResources}</p></template>
+
+          <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-var-m-top_small" data-id="form">
+            <lightning-record-picker class="slds-col" label={labels.person} object-api-name="User" value={draft.userId} data-field="userId" onchange={handleDraft}></lightning-record-picker>
+            <lightning-dual-listbox class="slds-col" label={labels.skills} options={skillOptions} value={draft.skills} data-field="skills" onchange={handleDraft}></lightning-dual-listbox>
+            <lightning-input class="slds-col" type="number" min="1" max="168" label={labels.capacity} value={draft.capacity} data-field="capacity" onchange={handleDraft}></lightning-input>
+            <lightning-input class="slds-col" label={labels.defaultRole} max-length="80" value={draft.role} data-field="role" onchange={handleDraft}></lightning-input>
+            <lightning-input class="slds-col" type="checkbox" label={labels.active} checked={draft.active} data-field="active" onchange={handleDraft}></lightning-input>
+            <lightning-button class="slds-col" variant="brand" label={labels.save} disabled={isWorking} onclick={handleSave} data-id="save"></lightning-button>
+            <lightning-button class="slds-col" label={labels.newResource} onclick={handleNew} data-id="new"></lightning-button>
+          </div>
+        </section>
+      </template>
+      <template lwc:elseif={isOff}><p class="slds-text-color_weak" data-id="off">{labels.off}</p></template>
+    </c-barn-page-shell>
+  </template>
+</template>

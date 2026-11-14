@@ -10,7 +10,7 @@
  * 2. Queue the job that gives the installer the Logic Models Admin permission set. Queued because a
  *    permission set assignment is a setup object write, and this transaction has already written
  *    ordinary records (mixed DML).
- * 3. Give the Logic Models sets to BarnCRM's roles (`LogicModelsAccessSync`), queued for the same
+ * 3. Give the Logic Models sets to BarnCRM's roles (`ModuleAccessSyncs`), queued for the same
  *    reason. The installer's job runs it after its own grant, so the two never insert the
  *    installer's Logic Models Admin at the same moment; with no installer it is queued alone.
  *
@@ -20,11 +20,9 @@
 @NamespaceAccessible
 public with sharing class LogicModelsPostInstall implements InstallHandler, ModuleSetup {
 	/** The module's key in the module catalog and the setup marker. */
-	private static final String MODULE_KEY = 'LogicModels';
+	public static final String MODULE_KEY = 'LogicModels';
 	private static final String SWITCH_CONTEXT = 'LogicModelsPostInstall.ensureAutomationSwitches';
 	private static final String IMPORT_CONTEXT = 'LogicModelsPostInstall.materializeImportTemplates';
-	@TestVisible
-	private static final String ACCESS_CONTEXT = 'LogicModelsPostInstall.grantInstallerAccess';
 
 	/**
 	 * Called by the platform after the module is installed or upgraded.
@@ -51,90 +49,10 @@ public with sharing class LogicModelsPostInstall implements InstallHandler, Modu
 	 * @param installerId the person to give Logic Models Admin, or null for nobody
 	 */
 	public void runSetup(Id installerId) {
-		// A job scheduled on its own before the nightly run becomes its step (R-NJ5).
-		NightlyJobs.adoptOldSchedules();
 		// Each entry point records its own failures and returns, so nothing here throws.
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
 		ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
 		ModuleSetups.markRan(MODULE_KEY);
-		if (installerId == null) {
-			new LogicModelsAccessSync().requestSync();
-			return;
-		}
-		try {
-			System.enqueueJob(new InstallerAccess(installerId));
-		} catch (Exception e) {
-			ErrorLogger.log(e, ACCESS_CONTEXT);
-			new LogicModelsAccessSync().requestSync();
-		}
-	}
-
-	/**
-	 * Gives the installer the Logic Models Admin permission set, unless they hold it already, then
-	 * BarnCRM's roles their sets (`LogicModelsAccessSync`), which then skips the installer. System
-	 * mode: the install runs as the platform's package user, who holds no BarnCRM set.
-	 */
-	public without sharing class InstallerAccess implements Queueable {
-		private final Id installerId;
-
-		public InstallerAccess(Id installerId) {
-			this.installerId = installerId;
-		}
-
-		public void execute(QueueableContext jobContext) {
-			giveInstaller();
-			try {
-				// A test cannot chain one queued job from another.
-				if (LogicModelsAccessSync.syncOnce() && !Test.isRunningTest()) {
-					System.enqueueJob(new ModuleAccessSyncBase.Job(new LogicModelsAccessSync()));
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
-
-		private void giveInstaller() {
-			try {
-				List<PermissionSet> sets = [
-					SELECT Id
-					FROM PermissionSet
-					WHERE Name = :LogicModelsAccessSync.ADMIN_SET AND IsOwnedByProfile = FALSE
-					WITH SYSTEM_MODE
-					LIMIT 1
-				];
-				if (sets.isEmpty()) {
-					return;
-				}
-				Integer held = [
-					SELECT COUNT()
-					FROM PermissionSetAssignment
-					WHERE AssigneeId = :installerId AND PermissionSetId = :sets[0].Id
-					WITH SYSTEM_MODE
-				];
-				if (held > 0) {
-					return;
-				}
-				Database.SaveResult saved = Database.insert(
-					new PermissionSetAssignment(
-						AssigneeId = installerId,
-						PermissionSetId = sets[0].Id
-					),
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
-				// A duplicate means another job gave it a moment before: what was wanted.
-				for (Database.Error error : saved.getErrors()) {
-					if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-						ErrorLogger.logMessage(
-							error.getMessage(),
-							ACCESS_CONTEXT,
-							ErrorLogger.SEVERITY_WARNING
-						);
-					}
-				}
-			} catch (Exception e) {
-				ErrorLogger.log(e, ACCESS_CONTEXT);
-			}
-		}
+		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}
 }

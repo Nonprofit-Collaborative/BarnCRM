@@ -23,14 +23,15 @@
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
-    The BarnCRM Funders module: grants applied for and awarded, and what each award requires.
+    BarnCRM Grants: grants applied for and awarded, and what each award requires (the Funders
+    module).
   </description>
   <formFactors>Large</formFactors>
   <formFactors>Small</formFactors>
   <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
   <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
-  <label>BarnCRM Funders</label>
+  <label>BarnCRM Grants</label>
   <navType>Console</navType>
   <tabs>Funders_Board</tabs>
   <tabs>Grant_Pipeline</tabs>

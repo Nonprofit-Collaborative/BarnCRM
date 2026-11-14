@@ -7,9 +7,12 @@
  *   not come is waited for; one that is off is recorded Skipped; the first that is due is
  *   marked Running.
  * - RUN starts that step's work and nothing else, so the step's own writes (some touch setup
- *   objects) never share a transaction with the run's bookkeeping.
- * - WAIT checks every two minutes whether a batch, queueable or future job the run's user
- *   started since the step began is still unfinished, and gives up after six hours (R-NJ3).
+ *   objects) never share a transaction with the run's bookkeeping. It notes the classes of the
+ *   batch, queueable and future jobs the work started.
+ * - WAIT checks every two minutes whether a job of those classes the run's user started since
+ *   the step began (the step's own jobs and the ones they chain) is still unfinished, and
+ *   gives up after six hours (R-NJ3). Only those jobs make the step Done with errors, so other
+ *   work in the org neither holds a step up nor marks it. A step that started none is done.
  *
  * A wait over ten minutes, a queue already full (a step that enqueued its own job) and a chain
  * the platform will not extend (the Developer Edition depth) all resume through the one-time
@@ -76,6 +79,9 @@ public with sharing class NightlyRun implements Schedulable {
 	private Integer polls = 0;
 	@TestVisible
 	private String failure;
+	/** The classes of the jobs the step being waited for started. */
+	@TestVisible
+	private Set<Id> stepClassIds = new Set<Id>();
 
 	/** The nightly trigger fires with no run started; a continuation carries its run. */
 	public void execute(SchedulableContext context) {
@@ -105,12 +111,11 @@ public with sharing class NightlyRun implements Schedulable {
 	// The run
 	// -------------------------------------------------------------------------------------
 
-	/** Starts tonight's run: adopts any old schedule, then takes over from a run still going. */
+	/** Starts tonight's run, taking over from a run still going. */
 	@TestVisible
 	private void begin() {
-		NightlyJobs.adoptOldSchedules();
 		Datetime now = Datetime.now();
-		runStarted = Datetime.newInstance(now.getTime() - Math.mod(now.getTime(), 1000));
+		runStarted = toSecond(now);
 		List<Nightly_Job__c> changed = new List<Nightly_Job__c>();
 		Datetime unfinishedStep;
 		for (Nightly_Job__c row : NightlyJobs.rows().values()) {
@@ -138,10 +143,15 @@ public with sharing class NightlyRun implements Schedulable {
 		}
 		cursor = 0;
 		polls = 0;
+		stepClassIds = new Set<Id>();
 		if (unfinishedStep != null) {
 			cursor = -1;
 			phase = WAIT;
 			stepStarted = unfinishedStep;
+			// What that step started is not known here, so every class still at work since.
+			for (AsyncApexJob job : unfinishedSince(unfinishedStep)) {
+				stepClassIds.add(job.ApexClassId);
+			}
 			next(POLL_MINUTES);
 		} else {
 			phase = PLAN;
@@ -180,11 +190,16 @@ public with sharing class NightlyRun implements Schedulable {
 			run.Last_Started__c.getTime() != runStarted.getTime();
 	}
 
-	/** Starts the step's work, and nothing else in this transaction. */
+	/**
+	 * Starts the step's work, and nothing else in this transaction, then notes the classes of
+	 * the jobs it started: the jobs there are now that there were not before it ran.
+	 */
 	private void runStep() {
 		Boolean inPlan = cursor >= 0 && cursor < planned.size();
 		NightlyStep step = inPlan ? NightlyJobs.step(planned[cursor]) : null;
 		failure = null;
+		Datetime started = Datetime.now();
+		Set<Id> earlier = new Map<Id, AsyncApexJob>(unfinishedSince(started)).keySet();
 		try {
 			if (step != null) {
 				step.run();
@@ -192,6 +207,12 @@ public with sharing class NightlyRun implements Schedulable {
 		} catch (Exception thrown) {
 			ErrorLogger.log(thrown, CONTEXT + ' ' + planned[cursor]);
 			failure = thrown.getMessage();
+		}
+		stepClassIds = new Set<Id>();
+		for (AsyncApexJob job : unfinishedSince(started)) {
+			if (!earlier.contains(job.Id)) {
+				stepClassIds.add(job.ApexClassId);
+			}
 		}
 		phase = WAIT;
 		polls = 0;
@@ -284,16 +305,19 @@ public with sharing class NightlyRun implements Schedulable {
 	// What the step started
 	// -------------------------------------------------------------------------------------
 
+	/** The step's unfinished jobs: its classes' jobs since it began. */
 	private Integer unfinishedJobs() {
 		if (busyOverride != null) {
 			return busyOverride;
 		}
+		Set<Id> classIds = stepClassIds == null ? new Set<Id>() : stepClassIds;
 		return [
 			SELECT COUNT()
 			FROM AsyncApexJob
 			WHERE
 				CreatedById = :UserInfo.getUserId()
-				AND CreatedDate >= :stepStarted
+				AND CreatedDate >= :toSecond(stepStarted)
+				AND ApexClassId IN :classIds
 				AND JobType IN :ASYNC_TYPES
 				AND Status IN :UNFINISHED
 				AND ApexClass.Name != :CONTEXT
@@ -301,22 +325,47 @@ public with sharing class NightlyRun implements Schedulable {
 		];
 	}
 
+	/** The step's jobs that failed or reported errors, read as `unfinishedJobs` reads. */
 	private Integer failedJobs() {
 		if (busyOverride != null) {
 			return 0;
 		}
+		Set<Id> classIds = stepClassIds == null ? new Set<Id>() : stepClassIds;
 		return [
 			SELECT COUNT()
 			FROM AsyncApexJob
 			WHERE
 				CreatedById = :UserInfo.getUserId()
-				AND CreatedDate >= :stepStarted
+				AND CreatedDate >= :toSecond(stepStarted)
+				AND ApexClassId IN :classIds
 				AND JobType IN :ASYNC_TYPES
 				AND (Status = 'Failed'
 				OR NumberOfErrors > 0)
 				AND ApexClass.Name != :CONTEXT
 			WITH SYSTEM_MODE
 		];
+	}
+
+	/** The run user's batch, queueable and future jobs started since `since` and not done. */
+	private static List<AsyncApexJob> unfinishedSince(Datetime since) {
+		return [
+			SELECT Id, ApexClassId
+			FROM AsyncApexJob
+			WHERE
+				CreatedById = :UserInfo.getUserId()
+				AND CreatedDate >= :toSecond(since)
+				AND JobType IN :ASYNC_TYPES
+				AND Status IN :UNFINISHED
+				AND ApexClass.Name != :CONTEXT
+			WITH SYSTEM_MODE
+		];
+	}
+
+	/** `value` without its milliseconds: a job's CreatedDate is kept to the second. */
+	private static Datetime toSecond(Datetime value) {
+		return value == null
+			? null
+			: Datetime.newInstance(value.getTime() - Math.mod(value.getTime(), 1000));
 	}
 
 	// -------------------------------------------------------------------------------------

@@ -51,6 +51,9 @@ public with sharing class FundraisingHomeController {
 		public String name;
 		@AuraEnabled
 		public String label;
+		/** The object whose list the tile opens, for a More tile on an object (D-200 R5). */
+		@AuraEnabled
+		public String objectApiName;
 	}
 
 	/** The page, in one round trip. */
@@ -61,7 +64,22 @@ public with sharing class FundraisingHomeController {
 		public Boolean canEnterGift = false;
 		@AuraEnabled
 		public List<SetupTile> setupTiles = new List<SetupTile>();
+		/** The lists that left the app's menu (D-200 R5), each still in the App Launcher. */
+		@AuraEnabled
+		public List<SetupTile> moreTiles = new List<SetupTile>();
+		/** True when the person may enter gifts and no gift exists yet (D-200 R4). */
+		@AuraEnabled
+		public Boolean firstRun = false;
+		/** True when the person may start a file import, the first-run page's second action. */
+		@AuraEnabled
+		public Boolean canImport = false;
 	}
+
+	/** The page tabs among the More tiles, shown with the gifts they are about. */
+	private static final List<String> MORE_PAGE_TABS = new List<String>{
+		'Donor_Segments',
+		'Recurring_Donor_Health'
+	};
 
 	@AuraEnabled
 	public static HomeView getHome() {
@@ -70,6 +88,10 @@ public with sharing class FundraisingHomeController {
 			addTiles(view.tiles);
 			view.canEnterGift = Schema.SObjectType.Gift__c.isCreateable();
 			view.setupTiles = setupTiles();
+			view.moreTiles = moreTiles();
+			view.firstRun =
+				view.canEnterGift && [SELECT Id FROM Gift__c WITH USER_MODE LIMIT 1].isEmpty();
+			view.canImport = view.firstRun && Schema.SObjectType.Import_Batch__c.isCreateable();
 			return view;
 		} catch (Exception caught) {
 			throw UserErrors.wrap(caught, 'Fundraising Home', true);
@@ -89,7 +111,7 @@ public with sharing class FundraisingHomeController {
 			);
 			thank.badgeStatus = 'due';
 			thank.objectApiName = Schema.SObjectType.Gift__c.getName();
-			thank.tabName = 'Acknowledgments';
+			thank.tabName = NamespaceUtil.qualify('Acknowledgments');
 			addIfCounted(tiles, thank);
 		}
 		if (Schema.SObjectType.Installment__c.isAccessible()) {
@@ -310,6 +332,56 @@ public with sharing class FundraisingHomeController {
 			}
 		}
 		return tiles;
+	}
+
+	/**
+	 * The More tiles (D-200 R5): the lists and pages that left the Fundraising app's menu, each
+	 * shown only to someone who can read what it lists. Object lists are named by their object.
+	 */
+	private static List<SetupTile> moreTiles() {
+		List<SetupTile> tiles = new List<SetupTile>();
+		for (
+			Schema.DescribeSObjectResult described : new List<Schema.DescribeSObjectResult>{
+				Schema.SObjectType.Ask__c,
+				Schema.SObjectType.Installment__c,
+				Schema.SObjectType.Fund__c,
+				Schema.SObjectType.Appeal__c,
+				Schema.SObjectType.Tribute__c
+			}
+		) {
+			if (described.isAccessible()) {
+				tiles.add(
+					moreTile(
+						described.getLocalName(),
+						described.getLabelPlural(),
+						described.getName()
+					)
+				);
+			}
+		}
+		if (Schema.SObjectType.Gift__c.isAccessible()) {
+			Map<String, String> labels = tabLabels(MORE_PAGE_TABS);
+			for (String name : MORE_PAGE_TABS) {
+				if (labels.containsKey(name)) {
+					tiles.add(moreTile(name, labels.get(name), null));
+				}
+			}
+		}
+		if (Schema.SObjectType.Dashboard.isAccessible()) {
+			tiles.add(
+				moreTile('Dashboard', Schema.SObjectType.Dashboard.getLabelPlural(), 'Dashboard')
+			);
+		}
+		return tiles;
+	}
+
+	/** A More tile; the object is set for a list opened by object, null for a page tab. */
+	private static SetupTile moreTile(String name, String label, String objectApiName) {
+		SetupTile tile = new SetupTile();
+		tile.name = name;
+		tile.label = label;
+		tile.objectApiName = objectApiName;
+		return tile;
 	}
 
 	private static Map<String, String> tabLabels(List<String> names) {

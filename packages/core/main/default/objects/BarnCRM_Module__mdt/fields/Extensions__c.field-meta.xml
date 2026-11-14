@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Extensions__c</fullName>
+  <description>Optional. The module's classes Core builds by name for its extension seams, one per line as Seam: Class (for example NightlyStepProvider: followed by the module's provider class), the seam being the Core interface the class implements. Core asks the modules in catalog order; a class that is not installed is skipped (ModuleExtensions, ADR-0017 as extended by D-200 S1).</description>
+  <fieldManageability>DeveloperControlled</fieldManageability>
+  <label>Extensions</label>
+  <length>4000</length>
+  <type>LongTextArea</type>
+  <visibleLines>6</visibleLines>
+</CustomField>

@@ -21,7 +21,8 @@ needs a change in Setup" below).
 
 No module has a settings tab of its own: a module's settings are a section of this page, for
 example **Rollups** and **Volunteers**. The **Rollups** section holds **Default rollup
-mode**, **When instant totals are calculated** and **Time of the nightly run**. Saving a new
+mode**, **When instant totals are calculated**, **Time of the nightly run**, **Night of the
+full recalculation** and **Hours between large record runs**. Saving a new
 **Time of the nightly run** moves the scheduled nightly rollup run at once (see
 [Rollups](rollups.md#how-the-nightly-run-works)).
 
@@ -282,7 +283,7 @@ section's name.
 | Organization | Organization Details (the rest); Organization Address; Receipt Logo and Signature |
 | People and Households | People; Households (the rest); Household Names and Greetings; Relationships |
 | Addresses | Address Updates (the rest); Address Card; Seasonal Addresses |
-| Giving | Gift Defaults (the rest); Commitments and Installments; Donor Levels; Acknowledgments and Stewardship; Nightly Jobs and Accounting Periods; BarnCRM Mirror |
+| Giving | Gift Defaults (the rest); Commitments and Installments; Donor Levels; Acknowledgments and Stewardship; Accounting Periods; BarnCRM Mirror |
 | Receipts | Receipt Details (the rest); Receipt Printing; Receipt Letters and Year End Statements |
 | Rollups | Rollup Processing (the rest); Rollup Builder |
 | Volunteers | Hours and Shifts |

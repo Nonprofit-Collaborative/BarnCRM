@@ -345,7 +345,8 @@ registration.
 | 3 | Open the conference, **Check-In**. | Four attendees are **Attended**, three still **Registered**. |
 | 4 | **Agenda**, **Speakers**, **Applications**, **Sponsors**. | Eight sessions in three tracks, three speakers, one In Review application `Small Teams, Big Data` with two scores (average `4.5`), three sponsors at three levels with deliverables. |
 | 5 | **Tickets**. | General, Student and Volunteer, and the code `EARLYBIRD`. |
-| 6 | **Remove Sample Data**. | Both sample events and every registration under them are gone; your own event and its registration stay. |
+| 5a | **Seating**, **Appointments**, then the **Budget** panel on **Details**; then open **Venues**. | Dinner Table 1 and 2 with five guests seated; one booked and one open appointment; four expenses and two funding lines; **Riverside Meeting Hall** with four rooms. On **Agenda**, the Opening Keynote is in Main Hall with two ratings. |
+| 6 | **Remove Sample Data**. | Both sample events and every registration under them are gone, and so is **Riverside Meeting Hall**; your own event and its registration stay. |
 
 **Cleanup:** None.
 
@@ -369,7 +370,7 @@ sponsor `Acme` added on the Sponsors tab.
 | 7 | Type `Vegetarian` in Sam's **Dietary Needs**, click elsewhere. | Saved; reload and it is still there; it shows beside Sam on the chart once seated. |
 | 8 | Click **Suggest Seating**. | Sam is seated at the first table with room; no one is placed at Acme Table. |
 | 9 | Click **Export Seating Chart**. | A CSV downloads with a header row, one row per guest, `Vegetarian` in Sam's row, and the table, host and sponsor columns filled. Opening it in a spreadsheet shows no formula. |
-| 10 | **Remove** Table 2. | The card goes; its guests remain in the list with **No Table**. |
+| 10 | **Remove** Table 2. In the **Remove Table** window choose **Cancel** (nothing changes), then **Remove** again and confirm. | The card goes; its guests remain in the list with **No Table**. |
 | 11 | As read-only, open **Seating**. | The chart and export show; no **Add Table**, **Suggest Seating**, **Edit** or **Remove**, and the **Table** menus cannot save. |
 
 **Cleanup:** None.

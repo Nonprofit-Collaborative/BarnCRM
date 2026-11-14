@@ -203,7 +203,9 @@ private class ErrorLoggerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, statementsAfter - statementsBefore, 'Still one statement.');
-			Assert.areEqual(2, [SELECT COUNT() FROM Error_Log__c], 'The empty entry is skipped.');
+			List<Error_Log__c> written = [SELECT Occurrences__c FROM Error_Log__c];
+			Assert.areEqual(1, written.size(), 'The same failure twice is one entry (R-E7).');
+			Assert.areEqual(2, written[0].Occurrences__c, 'The empty entry is skipped.');
 		}
 	}
 
@@ -463,6 +465,206 @@ private class ErrorLoggerTest {
 				ErrorLogSelector.selectByIds(null).size(),
 				'Asking for null queries nothing.'
 			);
+		}
+	}
+
+	private static Database.SaveResult saveResult(Boolean success, String message) {
+		Map<String, Object> result = new Map<String, Object>{ 'success' => success };
+		if (!success) {
+			result.put(
+				'errors',
+				new List<Object>{
+					new Map<String, Object>{
+						'statusCode' => 'FIELD_CUSTOM_VALIDATION_EXCEPTION',
+						'message' => message,
+						'fields' => new List<String>()
+					}
+				}
+			);
+		}
+		return (Database.SaveResult) JSON.deserialize(
+			JSON.serialize(result),
+			Database.SaveResult.class
+		);
+	}
+
+	@IsTest
+	static void theFailedRowsOfAPartialSaveCostOneStatement() {
+		System.runAs(TestUsers.admin()) {
+			Id aboutMe = UserInfo.getUserId();
+			List<Database.SaveResult> results = new List<Database.SaveResult>();
+			List<Id> recordIds = new List<Id>();
+			for (Integer i = 0; i < 50; i++) {
+				results.add(saveResult(Math.mod(i, 5) != 0, 'Row ' + i + ' was refused.'));
+				recordIds.add(aboutMe);
+			}
+
+			Test.startTest();
+			Integer statementsBefore = Limits.getPublishImmediateDML();
+			ErrorLogger.logFailures(
+				results,
+				recordIds,
+				'Partial save',
+				ErrorLogger.SEVERITY_WARNING
+			);
+			ErrorLogger.logFailures(null, null, 'Partial save', ErrorLogger.SEVERITY_WARNING);
+			Integer statementsAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Assert.areEqual(1, statementsAfter - statementsBefore, 'One statement for them all.');
+			Assert.areEqual(
+				10,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE
+						Context__c = 'Partial save'
+						AND Record_Reference__c = :String.valueOf(aboutMe)
+				],
+				'Each failed row is recorded about its own record, and no row that saved is.'
+			);
+		}
+	}
+
+	@IsTest
+	static void manyFailuresAboutTheirOwnRecordsCostOneStatement() {
+		System.runAs(TestUsers.admin()) {
+			Id aboutMe = UserInfo.getUserId();
+			List<Exception> failures = new List<Exception>();
+			for (Integer i = 0; i < 30; i++) {
+				failures.add(new DmlException('Owner ' + i + ' could not be saved.'));
+			}
+
+			Test.startTest();
+			Integer statementsBefore = Limits.getPublishImmediateDML();
+			ErrorLogger.logEach(failures, new List<Id>{ aboutMe, null, aboutMe }, 'Each owner');
+			Integer statementsAfter = Limits.getPublishImmediateDML();
+			Test.stopTest();
+
+			Assert.areEqual(1, statementsAfter - statementsBefore, 'One statement for them all.');
+			List<Error_Log__c> written = [
+				SELECT Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				WHERE Context__c = 'Each owner'
+			];
+			Assert.areEqual(1, written.size(), 'One message read the same way is one entry.');
+			Assert.areEqual(30, written[0].Occurrences__c, 'Every failure is counted.');
+			Assert.areEqual(
+				String.valueOf(aboutMe),
+				written[0].Record_Reference__c,
+				'It names the record; the same record is not named twice.'
+			);
+			Assert.isNull(written[0].Other_Record_Ids__c, 'No other record was given.');
+		}
+	}
+
+	private static Error_Log_Event__e event(String message, Id recordId) {
+		return new Error_Log_Event__e(
+			Message__c = message,
+			Context__c = 'Bulk load',
+			Severity__c = 'Warning',
+			Record_Reference__c = recordId == null ? null : String.valueOf(recordId)
+		);
+	}
+
+	@IsTest
+	static void repeatsWithinTheHourAreCountedOnOneEntryNamingTheFirstRecords() {
+		System.runAs(TestUsers.admin()) {
+			List<Id> userIds = new List<Id>();
+			for (User someone : [SELECT Id FROM User LIMIT 15]) {
+				userIds.add(someone.Id);
+			}
+			List<Error_Log_Event__e> events = new List<Error_Log_Event__e>();
+			for (Integer i = 0; i < 2000; i++) {
+				events.add(
+					event('The household is missing.', userIds[Math.mod(i, userIds.size())])
+				);
+			}
+			events.add(event('A different failure.', null));
+
+			Test.startTest();
+			ErrorLogEventHandler.handle(events);
+			// A later delivery of the same failure adds to the entry already written.
+			ErrorLogEventHandler.handle(
+				new List<Error_Log_Event__e>{ event('The household is missing.', null) }
+			);
+			Test.stopTest();
+
+			List<Error_Log__c> written = [
+				SELECT Message__c, Occurrences__c, Record_Reference__c, Other_Record_Ids__c
+				FROM Error_Log__c
+				ORDER BY Occurrences__c
+			];
+			Assert.areEqual(2, written.size(), 'One entry per distinct failure.');
+			Assert.areEqual('A different failure.', written[0].Message__c);
+			Assert.areEqual(1, written[0].Occurrences__c, 'The different failure once.');
+			Assert.areEqual('The household is missing.', written[1].Message__c);
+			Assert.areEqual(2001, written[1].Occurrences__c, 'Every repeat is counted.');
+			Assert.areEqual(String.valueOf(userIds[0]), written[1].Record_Reference__c);
+			Integer named = Math.min(userIds.size() - 1, ErrorLogEventHandler.MORE_RECORDS);
+			Assert.areEqual(
+				named,
+				written[1].Other_Record_Ids__c.split(',').size(),
+				'The first records it happened on are named, up to the limit.'
+			);
+		}
+	}
+
+	@IsTest
+	static void anEntryReadOrAnHourOldStartsAFreshOne() {
+		System.runAs(TestUsers.admin()) {
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('Refused.', null) });
+			Error_Log__c first = [SELECT Id FROM Error_Log__c LIMIT 1];
+			update new Error_Log__c(Id = first.Id, Status__c = ErrorLogger.STATUS_ACKNOWLEDGED);
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('Refused.', null) });
+			Error_Log__c second = [SELECT Id FROM Error_Log__c WHERE Id != :first.Id LIMIT 1];
+			update new Error_Log__c(
+				Id = second.Id,
+				Timestamp__c = Datetime.now().addMinutes(-ErrorLogEventHandler.WINDOW_MINUTES - 1)
+			);
+
+			Test.startTest();
+			ErrorLogEventHandler.handle(new List<Error_Log_Event__e>{ event('Refused.', null) });
+			Test.stopTest();
+
+			Assert.areEqual(
+				3,
+				[SELECT COUNT() FROM Error_Log__c WHERE Occurrences__c = 1],
+				'An acknowledged entry, or one first written over an hour ago, is not added to.'
+			);
+		}
+	}
+
+	@IsTest
+	static void withNoStatementsLeftAnEntryNeverEndsTheSaveItReports() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			// Stands for a transaction that has spent its statements: none are left to log with.
+			ErrorLogWriter.reserve = Limits.getLimitDmlStatements();
+			Integer publishedBefore = Limits.getPublishImmediateDML();
+			Integer statementsBefore = Limits.getDmlStatements();
+			ErrorLogger.logMessage('Out of room.', 'No room', ErrorLogger.SEVERITY_ERROR);
+			Integer publishedAfter = Limits.getPublishImmediateDML();
+			Integer statementsAfter = Limits.getDmlStatements();
+			ErrorLogWriter.reserve = 2;
+			Test.stopTest();
+
+			Assert.areEqual(publishedBefore, publishedAfter, 'Nothing is published.');
+			Assert.areEqual(statementsBefore, statementsAfter, 'Nothing is inserted.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'No room'],
+				'The entry goes to the debug log, and the caller keeps its statements.'
+			);
+		}
+	}
+
+	@IsTest
+	static void loggingAlwaysLeavesTheReserveToTheCaller() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isTrue(ErrorLogWriter.hasRoom(147, 150), 'Three left: one to log, two kept.');
+			Assert.isFalse(ErrorLogWriter.hasRoom(148, 150), 'Two left: both are the caller\'s.');
+			Assert.isFalse(ErrorLogWriter.hasRoom(150, 150), 'None left: nothing is spent.');
 		}
 	}
 }

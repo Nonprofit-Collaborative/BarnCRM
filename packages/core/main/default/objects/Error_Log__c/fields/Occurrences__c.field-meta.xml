@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Occurrences__c</fullName>
+  <defaultValue>1</defaultValue>
+  <description>How many times this same failure (same Context, Message and Severity) happened within an hour of the first one. Later ones are counted here instead of writing a row each (R-E7).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>How many times this same error happened within an hour of the first one.</inlineHelpText>
+  <label>Occurrences</label>
+  <precision>9</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

@@ -42,8 +42,10 @@ indicators. It is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nig
 no switch of its own. If **Health Check** says the nightly run is not scheduled, its **Schedule
 all nightly jobs** fix schedules it.
 
-Then open the **BarnCRM Logic Models** app from the App Launcher. Its tab is **Logic Models**,
-which also joins the BarnCRM apps.
+Then open the **Logic Models** tab, which joins the BarnCRM apps (and is in the App Launcher).
+Logic Models has no app of its own: the two-tab BarnCRM Logic Models app was retired in release
+1.24 (D-200 R6). A logic model opens on its builder page in every app, as the object's default
+record page.
 
 Logic Models has no org-wide settings yet: each logic model is set up on its own record.
 BarnCRM Settings has a **Logic Models** section with one row, **Open Logic Models**, which opens
@@ -342,7 +344,7 @@ record ID, so neither module needs the other. See
 
 Do this as Maria, who holds the Admin role.
 
-1. Open the **BarnCRM Logic Models** app. On **Logic Models** click **New**, name it "Reading
+1. In the **BarnCRM** app, open **Logic Models** and click **New**, name it "Reading
    Program Model" and save. **For** shows **The whole organization**.
 2. In the builder, add "Two tutors" under **Inputs**, "Weekly reading sessions" under
    **Activities**, "Sessions held" under **Outputs**, "Students read more at home" under **Short
@@ -371,6 +373,20 @@ Do this as Maria, who holds the Admin role.
 12. Scroll to **Logic Model Report**. Each indicator has a row with its baseline, and each chosen
     period its target, result and progress. Untick a period: its columns go. Click **Download
     Printable Report**, open the file and print it, then click **Download PDF** and open the PDF.
+
+## Sample Data
+
+With Programs also installed, **Load Sample Data** in BarnCRM Settings loads two worked
+examples after the Programs sample: **After-school tutoring logic model** and **Food pantry
+logic model**, each for its sample program. They fill every column from inputs to impact, with
+descriptions, arrows and their assumptions, evidence of every strength, and indicators with
+baselines, targets and results over three periods, so the builder, the evidence log and the
+Logic Model Report all have something to show. The tutoring model is complete, so **Things to
+Look At** shows the all-clear; the pantry model has one long term outcome without an indicator,
+so it lists that reminder. Without the Programs sample programs nothing is loaded, so the sample
+never takes the organization's own model. **Remove Sample Data** deletes the two sample models
+with all their parts; your own models are never touched. See
+[Sample data](sample-data.md#with-logic-models-installed).
 
 ## Common Mistakes
 

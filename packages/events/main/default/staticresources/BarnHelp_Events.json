@@ -1,7 +1,6 @@
 {
   "languages": ["en"],
   "texts": {
-    "Events_SampleData_CountLabel": "Events",
     "Events_Public_Agenda": "Agenda",
     "Events_Public_Format": "Format",
     "Events_Public_Free": "Free",
@@ -281,6 +280,8 @@
     "Events_Seating_OverWarning": "{0} now holds more people than it has seats. The guests are seated; add seats or move someone.",
     "Events_Seating_OtherEvent": "Choose guests and tables of this event only.",
     "Events_Seating_Remove": "Remove",
+    "Events_Seating_RemoveConfirm": "{0} will be removed and everyone seated there will be unseated. They stay on the event.",
+    "Events_Seating_RemoveTitle": "Remove Table",
     "Events_Seating_Save": "Save Table",
     "Events_Seating_SeatsOf": "{0} of {1} seats",
     "Events_Seating_Sponsor": "Sponsor",

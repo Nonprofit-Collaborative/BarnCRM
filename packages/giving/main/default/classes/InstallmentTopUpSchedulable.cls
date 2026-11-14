@@ -10,7 +10,11 @@
 public with sharing class InstallmentTopUpSchedulable implements Schedulable {
 	public void execute(SchedulableContext context) {
 		try {
-			Database.executeBatch(new InstallmentTopUpBatch(), InstallmentTopUpBatch.CHUNK_SIZE);
+			AsyncStarter.batch(
+				new InstallmentTopUpBatch(),
+				InstallmentTopUpBatch.CHUNK_SIZE,
+				'InstallmentTopUpSchedulable'
+			);
 		} catch (Exception jobFailure) {
 			ErrorLogger.log(jobFailure, 'InstallmentTopUpSchedulable');
 		}

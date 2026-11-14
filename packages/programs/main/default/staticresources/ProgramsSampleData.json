@@ -1,0 +1,1402 @@
+{
+  "module": "Programs",
+  "countLabel": "Program enrollments",
+  "count": {
+    "object": "Enrollment__c",
+    "where": "Program__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Program__c",
+      "records": [
+        {
+          "key": "tutoring",
+          "Name": "After-school tutoring",
+          "Status__c": "Active",
+          "Target_Population__c": "Students in grades 3 to 8 at our two partner schools.",
+          "Start_Date__c": {
+            "days": -120
+          },
+          "Sample_Data__c": true
+        },
+        {
+          "key": "pantry",
+          "Name": "Food pantry",
+          "Status__c": "Active",
+          "Target_Population__c": "Households in the county living on less than twice the poverty line.",
+          "Start_Date__c": {
+            "days": -365
+          },
+          "Sample_Data__c": true
+        },
+        {
+          "key": "reading",
+          "Name": "Summer reading",
+          "Status__c": "Completed",
+          "Target_Population__c": "Children aged 6 to 11 over the summer break.",
+          "Start_Date__c": {
+            "days": -150
+          },
+          "End_Date__c": {
+            "days": -90
+          },
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Service__c",
+      "records": [
+        {
+          "key": "tutoring-hour",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Name": "Tutoring hour",
+          "Unit_Of_Measure__c": "hours"
+        },
+        {
+          "key": "homework",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Name": "Homework club session",
+          "Unit_Of_Measure__c": "sessions"
+        },
+        {
+          "key": "grocery",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Name": "Grocery bag",
+          "Unit_Of_Measure__c": "bags"
+        },
+        {
+          "key": "meal",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Name": "Hot meal",
+          "Unit_Of_Measure__c": "meals"
+        },
+        {
+          "key": "circle",
+          "Program__c": {
+            "ref": "reading"
+          },
+          "Name": "Reading circle",
+          "Unit_Of_Measure__c": "sessions"
+        }
+      ]
+    },
+    {
+      "object": "Cohort__c",
+      "records": [
+        {
+          "key": "cohort",
+          "Name": "Fall homework club",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Status__c": "Active",
+          "Start_Date__c": {
+            "days": -30
+          }
+        },
+        {
+          "key": "reading-cohort",
+          "Name": "Summer reading circle",
+          "Program__c": {
+            "ref": "reading"
+          },
+          "Status__c": "Completed",
+          "Start_Date__c": {
+            "days": -150
+          },
+          "End_Date__c": {
+            "days": -90
+          }
+        }
+      ]
+    },
+    {
+      "object": "Session__c",
+      "records": [
+        {
+          "key": "session-0",
+          "Name": "Homework club 1",
+          "Cohort__c": {
+            "ref": "cohort"
+          },
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session_Date__c": {
+            "days": -14
+          },
+          "Start_Time__c": {
+            "time": "16:00"
+          },
+          "End_Time__c": {
+            "time": "17:30"
+          },
+          "Status__c": "Held"
+        },
+        {
+          "key": "session-1",
+          "Name": "Homework club 2",
+          "Cohort__c": {
+            "ref": "cohort"
+          },
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session_Date__c": {
+            "days": -7
+          },
+          "Start_Time__c": {
+            "time": "16:00"
+          },
+          "End_Time__c": {
+            "time": "17:30"
+          },
+          "Status__c": "Held"
+        },
+        {
+          "key": "session-2",
+          "Name": "Homework club 3",
+          "Cohort__c": {
+            "ref": "cohort"
+          },
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session_Date__c": {
+            "days": 0
+          },
+          "Start_Time__c": {
+            "time": "16:00"
+          },
+          "End_Time__c": {
+            "time": "17:30"
+          },
+          "Status__c": "Scheduled"
+        }
+      ]
+    },
+    {
+      "object": "Session_Schedule__c",
+      "records": [
+        {
+          "Name": "Homework club twice a week",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Cohort__c": {
+            "ref": "cohort"
+          },
+          "Weekdays__c": "Tuesday;Thursday",
+          "Every_N_Weeks__c": 1,
+          "Start_Date__c": {
+            "days": 1
+          },
+          "End_Date__c": {
+            "days": 60
+          },
+          "Start_Time__c": {
+            "time": "16:00"
+          },
+          "End_Time__c": {
+            "time": "17:30"
+          },
+          "Active__c": true
+        }
+      ]
+    },
+    {
+      "object": "Enrollment__c",
+      "records": [
+        {
+          "key": "tutoring-0",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -110
+          },
+          "Cohort__c": {
+            "ref": "cohort"
+          }
+        },
+        {
+          "key": "tutoring-1",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -103
+          },
+          "Cohort__c": {
+            "ref": "cohort"
+          }
+        },
+        {
+          "key": "tutoring-2",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -96
+          },
+          "Cohort__c": {
+            "ref": "cohort"
+          }
+        },
+        {
+          "key": "tutoring-3",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -89
+          },
+          "Cohort__c": {
+            "ref": "cohort"
+          }
+        },
+        {
+          "key": "tutoring-4",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Stage__c": "Applied"
+        },
+        {
+          "key": "tutoring-5",
+          "Program__c": {
+            "ref": "tutoring"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Stage__c": "Withdrawn",
+          "Start_Date__c": {
+            "days": -100
+          },
+          "End_Date__c": {
+            "days": -30
+          }
+        },
+        {
+          "key": "pantry-4",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -220
+          }
+        },
+        {
+          "key": "pantry-5",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -200
+          }
+        },
+        {
+          "key": "pantry-6",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -180
+          }
+        },
+        {
+          "key": "pantry-7",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -160
+          }
+        },
+        {
+          "key": "pantry-8",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H002-6"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -140
+          }
+        },
+        {
+          "key": "pantry-9",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H003-1"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -120
+          }
+        },
+        {
+          "key": "pantry-10",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H003-2"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -100
+          }
+        },
+        {
+          "key": "pantry-11",
+          "Program__c": {
+            "ref": "pantry"
+          },
+          "Contact__c": {
+            "sample": "H004-1"
+          },
+          "Stage__c": "Enrolled",
+          "Start_Date__c": {
+            "days": -80
+          }
+        },
+        {
+          "key": "reading-0",
+          "Program__c": {
+            "ref": "reading"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Stage__c": "Completed",
+          "Cohort__c": {
+            "ref": "reading-cohort"
+          },
+          "Start_Date__c": {
+            "days": -150
+          },
+          "End_Date__c": {
+            "days": -90
+          }
+        },
+        {
+          "key": "reading-1",
+          "Program__c": {
+            "ref": "reading"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Stage__c": "Completed",
+          "Cohort__c": {
+            "ref": "reading-cohort"
+          },
+          "Start_Date__c": {
+            "days": -150
+          },
+          "End_Date__c": {
+            "days": -90
+          }
+        },
+        {
+          "key": "reading-2",
+          "Program__c": {
+            "ref": "reading"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Stage__c": "Completed",
+          "Cohort__c": {
+            "ref": "reading-cohort"
+          },
+          "Start_Date__c": {
+            "days": -150
+          },
+          "End_Date__c": {
+            "days": -90
+          }
+        },
+        {
+          "key": "reading-3",
+          "Program__c": {
+            "ref": "reading"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Stage__c": "Completed",
+          "Cohort__c": {
+            "ref": "reading-cohort"
+          },
+          "Start_Date__c": {
+            "days": -150
+          },
+          "End_Date__c": {
+            "days": -90
+          }
+        }
+      ]
+    },
+    {
+      "object": "Service_Delivery__c",
+      "records": [
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "tutoring-hour"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 2
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-2"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-3"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-4"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1,
+          "Attendance__c": "Unexcused Absence"
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-5"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-6"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-6"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-6"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H002-6"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-1"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-1"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-1"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-1"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-2"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-2"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-2"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H003-2"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H004-1"
+          },
+          "Delivery_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H004-1"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H004-1"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "grocery"
+          },
+          "Contact__c": {
+            "sample": "H004-1"
+          },
+          "Delivery_Date__c": {
+            "days": -21
+          },
+          "Quantity__c": 1
+        }
+      ]
+    },
+    {
+      "object": "Service_Delivery__c",
+      "records": [
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-0"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-1"
+          },
+          "Contact__c": {
+            "sample": "H001-1"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Attendance__c": "Excused Absence",
+          "Quantity__c": 0
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-0"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-1"
+          },
+          "Contact__c": {
+            "sample": "H001-2"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-0"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-1"
+          },
+          "Contact__c": {
+            "sample": "H001-3"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-0"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Delivery_Date__c": {
+            "days": -14
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        },
+        {
+          "Service__c": {
+            "ref": "homework"
+          },
+          "Session__c": {
+            "ref": "session-1"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          },
+          "Delivery_Date__c": {
+            "days": -7
+          },
+          "Attendance__c": "Present",
+          "Quantity__c": 1
+        }
+      ]
+    },
+    {
+      "object": "Goal__c",
+      "records": [
+        {
+          "key": "goal-0",
+          "Name": "Read one grade level higher",
+          "Enrollment__c": {
+            "ref": "tutoring-0"
+          },
+          "Description__c": "Move from a grade 3 to a grade 4 reading level on the fall assessment, with weekly tutoring and reading at home.",
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 90
+          },
+          "Last_Review_Date__c": {
+            "days": -14
+          },
+          "Next_Review_Date__c": {
+            "days": 16
+          }
+        },
+        {
+          "key": "goal-1",
+          "Name": "Read one grade level higher",
+          "Enrollment__c": {
+            "ref": "tutoring-1"
+          },
+          "Description__c": "Read one grade level higher by the end of the term, with weekly tutoring and reading at home.",
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 90
+          },
+          "Last_Review_Date__c": {
+            "days": -14
+          },
+          "Next_Review_Date__c": {
+            "days": 16
+          }
+        },
+        {
+          "key": "goal-2",
+          "Name": "Read one grade level higher",
+          "Enrollment__c": {
+            "ref": "tutoring-2"
+          },
+          "Description__c": "Read one grade level higher by the end of the term, with weekly tutoring and reading at home.",
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 90
+          },
+          "Last_Review_Date__c": {
+            "days": -14
+          },
+          "Next_Review_Date__c": {
+            "days": 16
+          }
+        },
+        {
+          "key": "goal-3",
+          "Name": "Read one grade level higher",
+          "Enrollment__c": {
+            "ref": "tutoring-3"
+          },
+          "Description__c": "Read one grade level higher by the end of the term. Review the plan with the family at the next reading night.",
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 90
+          },
+          "Last_Review_Date__c": {
+            "days": -100
+          },
+          "Next_Review_Date__c": {
+            "days": -10
+          }
+        },
+        {
+          "key": "goal-reading",
+          "Name": "Finish five books from the summer list",
+          "Enrollment__c": {
+            "ref": "reading-0"
+          },
+          "Description__c": "Choose five books from the summer reading list and finish them before school starts.",
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "Achieved",
+          "Target_Date__c": {
+            "days": -90
+          },
+          "Closed_Date__c": {
+            "days": -95
+          },
+          "Last_Review_Date__c": {
+            "days": -95
+          }
+        },
+        {
+          "key": "goal-pantry",
+          "Name": "Apply for SNAP benefits",
+          "Enrollment__c": {
+            "ref": "pantry-4"
+          },
+          "Description__c": "Apply for SNAP with help from pantry staff, so the household's food budget stretches further.",
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 21
+          },
+          "Last_Review_Date__c": {
+            "days": -7
+          },
+          "Next_Review_Date__c": {
+            "days": 14
+          }
+        }
+      ]
+    },
+    {
+      "object": "Goal_Step__c",
+      "records": [
+        {
+          "Name": "Take the reading assessment",
+          "Goal__c": {
+            "ref": "goal-0"
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -21
+          }
+        },
+        {
+          "Name": "Read 20 minutes each school day",
+          "Goal__c": {
+            "ref": "goal-0"
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 30
+          }
+        },
+        {
+          "Name": "Take the reading assessment",
+          "Goal__c": {
+            "ref": "goal-1"
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -21
+          }
+        },
+        {
+          "Name": "Read 20 minutes each school day",
+          "Goal__c": {
+            "ref": "goal-1"
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 30
+          }
+        },
+        {
+          "Name": "Take the reading assessment",
+          "Goal__c": {
+            "ref": "goal-2"
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -21
+          }
+        },
+        {
+          "Name": "Read 20 minutes each school day",
+          "Goal__c": {
+            "ref": "goal-2"
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 30
+          }
+        },
+        {
+          "Name": "Take the reading assessment",
+          "Goal__c": {
+            "ref": "goal-3"
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -21
+          }
+        },
+        {
+          "Name": "Read 20 minutes each school day",
+          "Goal__c": {
+            "ref": "goal-3"
+          },
+          "Status__c": "In Progress",
+          "Target_Date__c": {
+            "days": 30
+          }
+        },
+        {
+          "Name": "Choose five books from the list",
+          "Goal__c": {
+            "ref": "goal-reading"
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -145
+          }
+        },
+        {
+          "Name": "Finish the fifth book",
+          "Goal__c": {
+            "ref": "goal-reading"
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -95
+          }
+        },
+        {
+          "Name": "Gather pay stubs and identification",
+          "Goal__c": {
+            "ref": "goal-pantry"
+          },
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "Done",
+          "Completed_Date__c": {
+            "days": -3
+          }
+        },
+        {
+          "Name": "Submit the application with pantry staff",
+          "Goal__c": {
+            "ref": "goal-pantry"
+          },
+          "Assigned_To__c": {
+            "currentUser": true
+          },
+          "Status__c": "Not Started",
+          "Target_Date__c": {
+            "days": 7
+          }
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Service_Delivery__c",
+      "where": "Service__r.Program__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Enrollment__c",
+      "where": "Program__r.Sample_Data__c = TRUE AND Contact__r.Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Session__c",
+      "where": "Service__r.Program__r.Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Session_Schedule__c",
+      "where": "Program__r.Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Cohort__c",
+      "where": "Program__r.Sample_Data__c = TRUE AND Id NOT IN (SELECT Cohort__c FROM Session__c) AND Id NOT IN (SELECT Cohort__c FROM Session_Schedule__c)"
+    },
+    {
+      "object": "Program__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

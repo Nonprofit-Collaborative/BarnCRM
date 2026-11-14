@@ -160,10 +160,12 @@ private class DonorLevelServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Account household = new Account(
-				Name = 'The Nolan Family',
-				Total_Giving__c = 6000,
-				Donor_Level__c = rungs.get(SUSTAINER).Id
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Nolan Family',
+					Total_Giving__c = 6000,
+					Donor_Level__c = rungs.get(SUSTAINER).Id
+				)
 			);
 
 			Boolean moved = DonorLevelService.assign(
@@ -196,10 +198,12 @@ private class DonorLevelServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Contact person = new Contact(
-				LastName = 'Nolan',
-				Total_Giving__c = 1200,
-				Donor_Level__c = rungs.get(LEADERSHIP).Id
+			Contact person = TestDataFactory.person(
+				new Contact(
+					LastName = 'Nolan',
+					Total_Giving__c = 1200,
+					Donor_Level__c = rungs.get(LEADERSHIP).Id
+				)
 			);
 
 			Boolean moved = DonorLevelService.assign(
@@ -226,7 +230,9 @@ private class DonorLevelServiceTest {
 	static void placingADonorTwiceChangesNothingTheSecondTime() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
-			Account household = new Account(Name = 'The Garcia Family', Total_Giving__c = 2500);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Garcia Family', Total_Giving__c = 2500)
+			);
 			List<Donor_Level__c> ladder = DonorLevelSelector.selectActiveLevels();
 			String source = DonorLevelService.DEFAULT_SOURCE_FIELD;
 
@@ -252,10 +258,12 @@ private class DonorLevelServiceTest {
 			upsert settings;
 			SettingsService.clearCaches();
 			Donor_Level__c held = [SELECT Id FROM Donor_Level__c WHERE Name = :FRIEND];
-			Account household = new Account(
-				Name = 'The Okafor Family',
-				Total_Giving__c = 9000,
-				Donor_Level__c = held.Id
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Okafor Family',
+					Total_Giving__c = 9000,
+					Donor_Level__c = held.Id
+				)
 			);
 
 			List<SObject> moved = DonorLevelService.assignAll(new List<SObject>{ household });
@@ -299,10 +307,12 @@ private class DonorLevelServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			turnLevelsOn('Giving_This_Year__c');
 			Map<String, Donor_Level__c> rungs = ladderByName();
-			Account household = new Account(
-				Name = 'The Reyes Family',
-				Total_Giving__c = 20000,
-				Giving_This_Year__c = 300
+			Account household = TestDataFactory.household(
+				new Account(
+					Name = 'The Reyes Family',
+					Total_Giving__c = 20000,
+					Giving_This_Year__c = 300
+				)
 			);
 
 			DonorLevelService.assignAll(new List<SObject>{ household });
@@ -311,6 +321,75 @@ private class DonorLevelServiceTest {
 				rungs.get(FRIEND).Id,
 				household.Donor_Level__c,
 				'A long standing donor who has given 300 this year is a Friend on an annual ladder.'
+			);
+		}
+	}
+
+	@IsTest
+	static void inASingleCurrencyOrgAmountsAreComparedAsEntered() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (UserInfo.isMultiCurrencyOrganization()) {
+				return;
+			}
+			turnLevelsOn(DonorLevelService.DEFAULT_SOURCE_FIELD);
+			Map<String, Donor_Level__c> rungs = ladderByName();
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Okafor Family', Total_Giving__c = 999.99)
+			);
+
+			DonorLevelService.assignAll(new List<SObject>{ household });
+
+			Assert.areEqual(
+				rungs.get(FRIEND).Id,
+				household.Donor_Level__c,
+				'999.99 is still below the Sustainer minimum of 1000: nothing was converted.'
+			);
+			Assert.areEqual(
+				100,
+				DonorLevelService.ladder()[0].Minimum_Amount__c,
+				'The rungs keep the bounds as entered.'
+			);
+		}
+	}
+
+	@IsTest
+	static void inAMultiCurrencyOrgTotalsAndRungsAreComparedInTheCorporateCurrency() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Map<String, Donor_Level__c> byName = ladderByName();
+			DonorLevelService.testRates = new Map<String, Decimal>{ 'USD' => 1, 'EUR' => 0.5 };
+			List<Donor_Level__c> rungs = DonorLevelService.inCorporate(
+				DonorLevelSelector.selectActiveLevels(),
+				new Map<Id, String>{
+					byName.get(FRIEND).Id => 'USD',
+					byName.get(SUSTAINER).Id => 'USD',
+					byName.get(LEADERSHIP).Id => 'EUR'
+				}
+			);
+			Account household = TestDataFactory.household(
+				new Account(Name = 'The Weber Family', Total_Giving__c = 600)
+			);
+
+			Boolean moved = DonorLevelService.assign(
+				household,
+				rungs,
+				DonorLevelService.DEFAULT_SOURCE_FIELD,
+				'EUR'
+			);
+
+			Assert.isTrue(moved, 'Placed');
+			Assert.areEqual(
+				byName.get(SUSTAINER).Id,
+				household.Donor_Level__c,
+				'600 EUR is 1,200 USD: Sustainer, not the Friend that 600 as entered would be.'
+			);
+			Assert.isNull(
+				DonorLevelService.levelFor(9999, rungs),
+				'Leadership Circle\'s 5,000 EUR minimum is 10,000 USD, above the Sustainer band.'
+			);
+			Assert.areEqual(
+				byName.get(LEADERSHIP).Id,
+				DonorLevelService.levelFor(10000, rungs),
+				'And 10,000 USD reaches it.'
 			);
 		}
 	}

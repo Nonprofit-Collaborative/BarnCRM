@@ -31,11 +31,14 @@ Install it from **Module Manager** (see [Module Manager](module-manager.md)). Wh
 finishes, BarnCRM gives you, the person who installed it, the **Forms Admin** permission set,
 and gives everyone who already has a BarnCRM role their Forms permission set (see below).
 
-Forms has no app of its own (D-188): its **Forms** and **Form Submissions** tabs are in the
-**BarnCRM** and **BarnCRM Console** apps, after **Data Manager**. A source install puts them
-there itself; after a package install, add them once in App Manager (see
-[The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). A form or submission
-opens on its own record page from any app.
+Forms has its own app, **BarnCRM Forms** (**Forms**, **Form Submissions**, **Reports** and
+**Error Log**), shown to everyone with a Forms permission set. Its **Forms** and **Form
+Submissions** tabs are also in the **BarnCRM** and **BarnCRM Console** apps, after **Data
+Manager**. A source install puts them there itself; after a package install, add them once in
+App Manager (see [The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). A
+scratch or Developer Edition org gets no BarnCRM Forms app, only the tabs in the BarnCRM apps
+(see [The Module Apps](barncrm-app.md#the-module-apps)). A form or submission opens on its own
+record page from any app.
 
 Forms has no org-wide settings: each form is set up on its own record. BarnCRM Settings has a
 **Forms** section with one row, **Open Forms**, which opens the Forms tab. That row is also how
@@ -241,6 +244,17 @@ Failed), its **Source** (Staff or Public), the
 answers, the **Person** and **Organization** it matched or added, and the version of the form it
 was filled in from. Its record page shows the answers by question and the records written,
 each linked. Reports on Form Submissions work like any other.
+
+## Sample Data
+
+**Load Sample Data** on BarnCRM Settings adds three example forms so you can see how a form is
+built before you build your own. **Volunteer Sign-Up** and **Event Registration** are published;
+**Contact Us** is a draft. The sign-up form writes a person, their employer and an affiliation
+between them, and shows a **Parent or Guardian** step for anyone under 18. The registration form
+shows its meal question only when meals are needed. None of the forms is public. Five submissions
+show each state: two Processed (linked to Core's sample people), one Needs Review and two
+Received. **Remove Sample Data** deletes the three forms with their versions and submissions; your
+own forms stay.
 
 ## Limits
 

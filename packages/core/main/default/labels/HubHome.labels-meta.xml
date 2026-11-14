@@ -9,12 +9,12 @@
         <value>Errors to Review</value>
     </labels>
     <labels>
-        <fullName>Core_HubHome_QuickLinkGiftEntry</fullName>
+        <fullName>Core_HubHome_QuickLinkImport</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: Quick Links tile for the Giving Quick Gift Entry tab</shortDescription>
-        <value>Quick Gift Entry</value>
+        <shortDescription>Hub home: Quick Links tile for the Super Importer (D-200 R7)</shortDescription>
+        <value>Import a File</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinkOrganizations</fullName>

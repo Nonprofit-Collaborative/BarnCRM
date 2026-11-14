@@ -37,6 +37,11 @@ function build(model) {
   return Promise.resolve().then(() => element);
 }
 
+function settle() {
+  // eslint-disable-next-line @lwc/lwc/no-async-operation
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
 function tiles(element) {
   return Array.from(element.shadowRoot.querySelectorAll('[data-id="quick-link"]'));
 }
@@ -55,7 +60,7 @@ describe('c-hub-quick-links', () => {
   });
 
   it('shows staff People, Households, Organizations and Find, without Settings', async () => {
-    const element = await build({ canEdit: false, giftEntryAvailable: false });
+    const element = await build({ canEdit: false, canImport: false, quickLinks: [] });
 
     expect(tiles(element).map((tile) => tile.name)).toEqual([
       'People',
@@ -68,21 +73,37 @@ describe('c-hub-quick-links', () => {
     );
   });
 
-  it('adds Quick Gift Entry while Giving is there, and Settings for administrators', async () => {
-    const element = await build({ canEdit: true, giftEntryAvailable: true });
+  it('adds Import a File, the catalog links of modules, and Settings last for administrators', async () => {
+    const element = await build({
+      canEdit: true,
+      canImport: true,
+      quickLinks: [
+        { tab: 'Quick_Gift_Entry', label: 'Enter a Gift', line: 'Record a gift.' },
+        { objectApiName: 'Enrollment__c', label: 'Enroll', line: 'Start someone.' }
+      ]
+    });
 
     expect(tiles(element).map((tile) => tile.name)).toEqual([
       'People',
       'Households',
       'Organizations',
       'Find',
+      'Import',
       'Quick_Gift_Entry',
+      'new:Enrollment__c',
       'BarnCRM_Settings'
     ]);
+    expect(tiles(element)[5].label).toBe('Enter a Gift');
     select(element, 'Quick_Gift_Entry');
+    await settle();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Quick_Gift_Entry' }
+    });
+    select(element, 'new:Enrollment__c');
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Enrollment__c', actionName: 'new' }
     });
   });
 
@@ -90,6 +111,7 @@ describe('c-hub-quick-links', () => {
     const element = await build({ canEdit: false });
 
     select(element, 'Organizations');
+    await settle();
     expect(mockNavigate).toHaveBeenCalledWith({
       type: 'standard__navItemPage',
       attributes: { apiName: 'Organizations' }

@@ -27,10 +27,14 @@ public with sharing class HubReminders implements Schedulable {
 	private static List<String> sentTitles = new List<String>();
 
 	private Integer sent = 0;
+	@TestVisible
 	private Date today;
 	private Integer settingDays;
 
-	/** The step as BarnCRM's nightly run lists it, with a switch that ships on. */
+	/**
+	 * The step as BarnCRM's nightly run lists it, with a switch that ships on. It can be started
+	 * now from the Nightly Jobs panel: a second run the same day sends no second bell.
+	 */
 	public static NightlyStep step() {
 		return new NightlyStep(
 				JOB_NAME,
@@ -39,7 +43,8 @@ public with sharing class HubReminders implements Schedulable {
 				45,
 				new HubReminders()
 			)
-			.withSwitch(true);
+			.withSwitch(true)
+			.runnableNow();
 	}
 
 	public void execute(SchedulableContext jobContext) {
@@ -68,6 +73,45 @@ public with sharing class HubReminders implements Schedulable {
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT);
 		}
+	}
+
+	/** The most bells one logging transaction sends; the nightly run sends the rest. */
+	@TestVisible
+	private static final Integer MAX_LOGGED_BELLS = 50;
+
+	/**
+	 * R-DB1 (CH-22, D-196): the breach bell goes the moment a breach is logged, through the same
+	 * `send` and title as the nightly run, and the deadline date is stored in Reminded For so the
+	 * nightly run sends none for that date. A breach the nightly run would not remind (Closed,
+	 * unlikely to be a risk, already reported, or owned by a queue) gets no bell here either.
+	 */
+	public static void bellLogged(List<Data_Breach__c> logged) {
+		HubReminders bell = new HubReminders();
+		bell.today = Date.today();
+		String title = BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_BreachTitle');
+		List<Data_Breach__c> stamped = new List<Data_Breach__c>();
+		for (Data_Breach__c row : logged) {
+			if (
+				bell.sent >= MAX_LOGGED_BELLS ||
+				row.Status__c == 'Closed' ||
+				row.Risk__c == 'Unlikely' ||
+				row.Authority_Notified_At__c != null ||
+				row.Discovered_At__c == null
+			) {
+				continue;
+			}
+			Date target = row.Discovered_At__c.addDays(3).date();
+			if (
+				bell.send(
+					row.OwnerId,
+					String.format(title, new List<Object>{ row.Name, target.format() }),
+					row.Id
+				)
+			) {
+				stamped.add(new Data_Breach__c(Id = row.Id, Reminded_For__c = target));
+			}
+		}
+		update as system stamped;
 	}
 
 	/** R-AG1, then R-CR1 for agreements: the rows changed, renewed, expired or reminded. */
@@ -120,7 +164,10 @@ public with sharing class HubReminders implements Schedulable {
 		return changed;
 	}
 
-	/** An agreement past its end date renews by its term, or expires. True when it changed. */
+	/**
+	 * An agreement past its end date renews by its term, or expires. True when it changed. A
+	 * month end stays a month end, so 31 January renews to 28 February, then 31 March.
+	 */
 	@TestVisible
 	private Boolean renew(Agreement__c row) {
 		if (row.End_Date__c >= today) {
@@ -132,7 +179,7 @@ public with sharing class HubReminders implements Schedulable {
 			return true;
 		}
 		while (row.End_Date__c < today) {
-			row.End_Date__c = row.End_Date__c.addMonths(months);
+			row.End_Date__c = HubCompliance.nextDue(row.End_Date__c, months);
 		}
 		return true;
 	}

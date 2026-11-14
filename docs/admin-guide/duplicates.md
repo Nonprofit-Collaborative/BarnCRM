@@ -20,6 +20,12 @@ listed too, with a line saying why, for example "Same email on Contact Point Ema
 sources are listed, added, deactivated and tried out in the tool's **Matching Logic** area;
 see [Matching Logic](#matching-logic).
 
+BarnCRM addresses are read by their **Match Key**, a field BarnCRM fills on every save with the
+postal code and house number, so a large org's scan does not search every street. Addresses
+saved before version 1.22 get their key when you choose **Fill Match Keys** on Health Check's
+**Match Keys Not Filled** finding; until it finishes, matching on addresses works as before,
+only slower.
+
 The scan also compares **people's names**, ignoring case, spacing and punctuation, so "Jonathan
 Smith" and "Jonathon Smith" are noticed. A similar name is never enough on its own, and the
 scan knows about households; see [Similar Names](#similar-names).

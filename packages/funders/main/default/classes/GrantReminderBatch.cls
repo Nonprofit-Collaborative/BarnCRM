@@ -14,7 +14,7 @@ public with sharing class GrantReminderBatch implements Database.Batchable<SObje
 		if (!GrantReminderService.isActive()) {
 			return null;
 		}
-		return Database.executeBatch(new GrantReminderBatch(), CHUNK_SIZE);
+		return AsyncStarter.batch(new GrantReminderBatch(), CHUNK_SIZE, 'GrantReminderBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {

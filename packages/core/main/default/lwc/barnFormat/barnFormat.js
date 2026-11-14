@@ -25,3 +25,81 @@ export function isoDate(date = new Date()) {
   const two = (number) => String(number).padStart(2, '0');
   return `${date.getFullYear()}-${two(date.getMonth() + 1)}-${two(date.getDate())}`;
 }
+
+/**
+ * A YYYY-MM-DD date as the locale writes it (medium style), read as a calendar day; null for
+ * none, and the text as given when it is not a date or the locale cannot format it.
+ */
+export function formatDate(iso, locale) {
+  if (!iso) {
+    return null;
+  }
+  const [year, month, day] = String(iso).split('-').map(Number);
+  if (!year || !month || !day) {
+    return String(iso);
+  }
+  try {
+    return new Intl.DateTimeFormat(locale || undefined, {
+      dateStyle: 'medium',
+      timeZone: 'UTC'
+    }).format(new Date(Date.UTC(year, month - 1, day)));
+  } catch {
+    return String(iso);
+  }
+}
+
+const HTML_ESCAPES = Object.freeze({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+});
+
+/** A value made safe to place in HTML text or an attribute; empty text for null or undefined. */
+export function escapeHtml(value) {
+  return value === undefined || value === null
+    ? ''
+    : String(value).replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
+}
+
+/** The plain record path, which works as a link's address everywhere until a click is handled. */
+export function recordHref(recordId) {
+  return recordId ? `/${recordId}` : undefined;
+}
+
+/** A time or date as its UTC calendar day, YYYY-MM-DD. */
+export function utcIsoDate(time) {
+  return new Date(time).toISOString().slice(0, 10);
+}
+
+/** The share `part` is of `whole`, as a whole percent; 0 when the whole is not above 0. */
+export function percent(part, whole) {
+  const total = Number(whole) || 0;
+  return total > 0 ? Math.round(((Number(part) || 0) * 100) / total) : 0;
+}
+
+/** The barnStatusBadge word a map gives a status; `neutral` for a status it does not name. */
+export function badgeWord(words, status) {
+  return (words && words[status]) || 'neutral';
+}
+
+/** Text that is a plain negative decimal and nothing else. */
+const NEGATIVE_NUMBER = /^-\d+(\.\d+)?$/;
+
+/**
+ * One CSV cell: empty for null or undefined, an object as JSON, quoted when it holds a comma, a
+ * quote or a line break. A text value that starts with = + - @ or a tab or carriage return gets
+ * a leading single quote, so a spreadsheet shows it as text and never runs it as a formula; a
+ * real number, and text that is only a negative number such as "-25.00", is left alone.
+ */
+export function csvCell(value) {
+  if (value === undefined || value === null) {
+    return '';
+  }
+  let text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  if (typeof value !== 'number' && /^[=+\-@\t\r]/.test(text) && !NEGATIVE_NUMBER.test(text)) {
+    text = `'${text}`;
+  }
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}

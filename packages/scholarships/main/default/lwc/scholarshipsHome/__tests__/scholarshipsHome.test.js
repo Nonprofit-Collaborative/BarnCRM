@@ -51,6 +51,52 @@ describe('c-scholarships-home', () => {
     expect(exportDisbursements).toHaveBeenCalled();
   });
 
+  it('starts the export range on the local day, not the UTC day', async () => {
+    jest.useFakeTimers({
+      now: new Date(2026, 10, 12, 23, 30),
+      doNotFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate']
+    });
+    try {
+      getHome.mockResolvedValue({ canManage: true, reviews: [], cycles: [], due: [] });
+      exportDisbursements.mockResolvedValue([]);
+      const element = mount();
+      await flush();
+      await flush();
+      find(element, 'export-button').click();
+      await flush();
+      expect(exportDisbursements).toHaveBeenCalledWith({
+        fromDate: '2026-11-01',
+        toDate: '2026-11-12'
+      });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('offers a first award program before any exists', async () => {
+    getHome.mockResolvedValue({
+      canManage: true,
+      reviews: [],
+      cycles: [],
+      due: [],
+      firstRun: true
+    });
+    const element = mount();
+    await flush();
+    await flush();
+    const panel = find(element, 'first-run');
+    expect(panel.heading).toBe('c.Scholarships_Home_FirstRunHeading');
+    expect(find(element, 'first-run-new').label).toBe('c.Scholarships_Home_FirstRunNew');
+  });
+
+  it('leaves the first-run panel out once a program exists', async () => {
+    getHome.mockResolvedValue({ canManage: true, reviews: [], cycles: [], due: [] });
+    const element = mount();
+    await flush();
+    await flush();
+    expect(find(element, 'first-run')).toBeNull();
+  });
+
   it('hides the export from staff and shows an error', async () => {
     getHome.mockRejectedValue({ body: { message: 'No access' } });
     const element = mount();

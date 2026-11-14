@@ -75,7 +75,7 @@ public with sharing class ModuleManagerService {
 			'Tribute__c'
 		},
 		'Rollups' => new List<String>{ 'Rollup_Definition__c', 'Rollup_Queue__c' },
-		'Mirror' => new List<String>(),
+		'Mirror' => new List<String>{ 'Provider_Request__c' },
 		'Volunteers' => new List<String>{
 			'Job_Skill__c',
 			'Shift_Schedule__c',
@@ -205,9 +205,20 @@ public with sharing class ModuleManagerService {
 		'Projects' => new List<String>{
 			'Project__c',
 			'Project_Assignment__c',
+			'Project_Change_Request__c',
+			'Project_Expense__c',
+			'Project_Invoice__c',
+			'Project_Invoice_Line__c',
 			'Project_Phase__c',
+			'Project_Rate__c',
+			'Project_Request__c',
+			'Project_Request_Comment__c',
+			'Project_Resource__c',
+			'Project_Revenue__c',
 			'Project_Status_Update__c',
 			'Project_Task__c',
+			'Request_Connection__c',
+			'Resource_Request__c',
 			'Time_Entry__c'
 		}
 	};
@@ -390,7 +401,7 @@ public with sharing class ModuleManagerService {
 	/** Tells the rollup engine a module is on again; a failure is logged, never in the way. */
 	private static void afterTurnedOn(String moduleName) {
 		try {
-			RollupEngineExtensionV2 engine = RollupEngineExtensions.findV2();
+			RollupEngineExtension engine = RollupEngineExtensions.find();
 			if (engine != null) {
 				engine.afterModuleTurnedOn(moduleName);
 			}
@@ -411,26 +422,20 @@ public with sharing class ModuleManagerService {
 		if (String.isBlank(setName)) {
 			return false;
 		}
-		List<PermissionSet> sets = [
-			SELECT Id
-			FROM PermissionSet
-			WHERE Name = :setName AND IsOwnedByProfile = FALSE
-			WITH USER_MODE
-			LIMIT 1
-		];
-		if (sets.isEmpty()) {
+		PermissionSet adminSet = SetupObjectSelector.permissionSet(setName);
+		if (adminSet == null) {
 			return false;
 		}
 		Id userId = UserInfo.getUserId();
 		Integer held = [
 			SELECT COUNT()
 			FROM PermissionSetAssignment
-			WHERE AssigneeId = :userId AND PermissionSetId = :sets[0].Id
+			WHERE AssigneeId = :userId AND PermissionSetId = :adminSet.Id
 			WITH USER_MODE
 		];
 		if (held == 0) {
 			Database.insert(
-				new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = sets[0].Id),
+				new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = adminSet.Id),
 				AccessLevel.USER_MODE
 			);
 		}

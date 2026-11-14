@@ -10,6 +10,12 @@
  */
 public with sharing class VolunteerShiftSignupsController {
 	private static final String CONTEXT = 'Shift sign-ups panel';
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+			CONTEXT,
+			'Volunteers',
+			'Volunteers_Signups_ActionFailed'
+		)
+		.showingDml();
 	private static final String STATUS_SHIFT_OPEN = 'Open';
 	private static final String STATUS_SHIFT_COMPLETED = 'Completed';
 	private static final String STATUS_NO_SHOW = 'No show';
@@ -96,7 +102,7 @@ public with sharing class VolunteerShiftSignupsController {
 		try {
 			return panelFor(shiftId);
 		} catch (Exception failure) {
-			throw report(failure, shiftId);
+			throw ERRORS.wrap(failure, CONTEXT, shiftId);
 		}
 	}
 
@@ -124,7 +130,7 @@ public with sharing class VolunteerShiftSignupsController {
 			Database.insert(new List<Volunteer_Signup__c>{ signup }, true, AccessLevel.USER_MODE);
 			return panelFor(shiftId);
 		} catch (Exception failure) {
-			throw report(failure, shiftId);
+			throw ERRORS.wrap(failure, CONTEXT, shiftId);
 		}
 	}
 
@@ -159,7 +165,7 @@ public with sharing class VolunteerShiftSignupsController {
 		} catch (AuraHandledException refused) {
 			throw refused;
 		} catch (Exception failure) {
-			throw report(failure, signupId);
+			throw ERRORS.wrap(failure, CONTEXT, signupId);
 		}
 	}
 
@@ -200,7 +206,7 @@ public with sharing class VolunteerShiftSignupsController {
 			return panelFor(shiftId);
 		} catch (Exception failure) {
 			Database.rollback(before);
-			throw report(failure, shiftId);
+			throw ERRORS.wrap(failure, CONTEXT, shiftId);
 		}
 	}
 
@@ -292,20 +298,5 @@ public with sharing class VolunteerShiftSignupsController {
 			}
 		}
 		throw UserErrors.message(actionFailed());
-	}
-
-	/**
-	 * A save a rule refused (a second sign-up, a person the user may not book) is passed on in
-	 * its own words; anything else is logged first.
-	 */
-	private static AuraHandledException report(Exception failure, Id recordId) {
-		if (failure instanceof AuraHandledException) {
-			return (AuraHandledException) failure;
-		}
-		if (failure instanceof DmlException) {
-			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
-		}
-		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(actionFailed());
 	}
 }

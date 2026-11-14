@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The source text Export as LWC Source adds for list and chart blocks: an Apex controller, its
+    test, the list and chart helpers and the chart styles, framework-free (LB-07).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

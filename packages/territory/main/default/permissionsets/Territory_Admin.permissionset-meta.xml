@@ -22,6 +22,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Territory__c.Next_Member__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Territory__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Territory_Member__c.Active__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -48,6 +58,21 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Territory_Rule__c.Summary__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Territory__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Territory__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Territory__c.Owner_User__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -90,26 +115,6 @@
     <field>Territory_Run__c.Summary_JSON__c</field>
     <readable>true</readable>
   </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Territory__c.Active__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Territory__c.Description__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Territory__c.Next_Member__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Territory__c.Owner_User__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>
@@ -129,21 +134,21 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>
-    <allowCreate>false</allowCreate>
-    <allowDelete>true</allowDelete>
-    <allowEdit>true</allowEdit>
-    <allowRead>true</allowRead>
-    <modifyAllRecords>false</modifyAllRecords>
-    <object>Territory_Run__c</object>
-    <viewAllRecords>true</viewAllRecords>
-  </objectPermissions>
-  <objectPermissions>
     <allowCreate>true</allowCreate>
     <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
     <object>Territory__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Territory_Run__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <tabSettings>

@@ -96,6 +96,22 @@ describe('c-lwc-builder-studio', () => {
     expect(find(element, 'key').value).toBe('Donor_Snapshot');
   });
 
+  it('selects a column from the keyboard', async () => {
+    const element = await mount();
+    find(element, 'add-section').click();
+    await flush();
+    const column = find(element, 'column');
+    expect(column.getAttribute('tabindex')).toBe('0');
+    expect(column.getAttribute('role')).toBe('button');
+
+    const space = new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true });
+    column.dispatchEvent(space);
+    await flush();
+
+    expect(space.defaultPrevented).toBe(true);
+    expect(find(element, 'column').getAttribute('aria-pressed')).toBe('true');
+  });
+
   it('drags a block from the list onto a column', async () => {
     const element = await mount();
     find(element, 'add-section').click();

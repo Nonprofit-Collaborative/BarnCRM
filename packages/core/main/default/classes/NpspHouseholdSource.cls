@@ -9,8 +9,59 @@
  *
  * This is the seam the tests replace (`instance`): no test org has NPSP, so the tests subclass
  * it to name ordinary Accounts as NPSP households and to hand back NPSP values.
+ *
+ * It is also the base of a second source (R-HA7, ADR-0217 `0217-npc-household-conversion.md`):
+ * Mirror's `NpcHouseholdSource` overrides `key()`, the selection and the reads for Nonprofit
+ * Cloud households, and `forKey` finds it by class name (ADR-0057), so Core names no native
+ * object here.
  */
+@NamespaceAccessible
 public with sharing virtual class NpspHouseholdSource {
+	/** The two sources (R-HA7): NPSP is this class, NPC is Mirror's subclass. */
+	@NamespaceAccessible
+	public static final String NPSP = 'NPSP';
+	@NamespaceAccessible
+	public static final String NPC = 'NPC';
+	@TestVisible
+	private static final String NPC_CLASS = 'NpcHouseholdSource';
+
+	/** Test seam: the NPC source in use, where Mirror is not installed. */
+	@TestVisible
+	private static NpspHouseholdSource npcInstance;
+
+	/** The source of that key (NPSP when blank), or null when it is not installed. */
+	@NamespaceAccessible
+	public static NpspHouseholdSource forKey(String key) {
+		if (key != NPC) {
+			return get();
+		}
+		if (npcInstance == null) {
+			npcInstance = (NpspHouseholdSource) NamespaceUtil.build(
+				NPC_CLASS,
+				NpspHouseholdSource.class,
+				'NpspHouseholdSource'
+			);
+		}
+		return npcInstance;
+	}
+
+	/** The source a run belongs to: an NPC run's id starts with its key and a dash. */
+	@NamespaceAccessible
+	public static String keyOfRun(String runId) {
+		return runId != null && runId.startsWith(NPC + '-') ? NPC : NPSP;
+	}
+
+	/** This source's key. */
+	@NamespaceAccessible
+	public virtual String key() {
+		return NPSP;
+	}
+
+	/** Needed by subclasses in other packages, which call it implicitly. */
+	@NamespaceAccessible
+	public NpspHouseholdSource() {
+		return;
+	}
 	private static final String SEPARATOR = '__';
 	private static final String CONTACTS_AND_ORGS = 'npe01';
 	private static final String HOUSEHOLDS = 'npo02';
@@ -54,18 +105,66 @@ public with sharing virtual class NpspHouseholdSource {
 	}
 
 	/** One NPSP household as adoption needs it. Values NPSP does not have are null. */
+	@NamespaceAccessible
 	public class Household {
+		@NamespaceAccessible
 		public Id accountId;
+		@NamespaceAccessible
 		public String name;
+		@NamespaceAccessible
 		public Id recordTypeId;
+		@NamespaceAccessible
 		public String formalGreeting;
+		@NamespaceAccessible
 		public String informalGreeting;
+		@NamespaceAccessible
 		public Id primaryContactId;
 		/** True when NPSP recorded that staff typed the name or a greeting by hand. */
+		@NamespaceAccessible
 		public Boolean customNaming = false;
+		/** The people a source holds outside Contact.AccountId, joined in Junction mode (R-HA8). */
+		@NamespaceAccessible
+		public List<Member> members = new List<Member>();
+	}
+
+	/** One person a source names as a member, with what BarnCRM's membership row can hold. */
+	@NamespaceAccessible
+	public class Member {
+		/** The contact, or the contact behind a person account. */
+		@NamespaceAccessible
+		public Id contactId;
+		@NamespaceAccessible
+		public Boolean isPrimary = false;
+		/** A Household Member Role value, or null. */
+		@NamespaceAccessible
+		public String role;
+		@NamespaceAccessible
+		public Date startDate;
+		@NamespaceAccessible
+		public Date endDate;
+	}
+
+	/**
+	 * How many people each of these Accounts has, for the preview: Contacts whose Account it is.
+	 * A source whose members are held elsewhere counts them there.
+	 */
+	@NamespaceAccessible
+	public virtual Map<Id, Integer> memberCounts(Set<Id> accountIds) {
+		Map<Id, Integer> counts = new Map<Id, Integer>();
+		for (AggregateResult row : [
+			SELECT AccountId, COUNT(Id) n
+			FROM Contact
+			WHERE AccountId IN :accountIds
+			WITH USER_MODE
+			GROUP BY AccountId
+		]) {
+			counts.put((Id) row.get('AccountId'), (Integer) row.get('n'));
+		}
+		return counts;
 	}
 
 	/** True when the org has either NPSP household marker, so there can be something to adopt. */
+	@NamespaceAccessible
 	public virtual Boolean available() {
 		return accountField(ACCOUNT_TYPE_FIELD) != null || npspRecordTypeId() != null;
 	}
@@ -74,6 +173,7 @@ public with sharing virtual class NpspHouseholdSource {
 	 * The WHERE clause that selects NPSP households not yet BarnCRM households, with its binds
 	 * in `binds()`. Blank when `available()` is false.
 	 */
+	@NamespaceAccessible
 	public virtual String condition() {
 		List<String> markers = new List<String>();
 		if (accountField(ACCOUNT_TYPE_FIELD) != null) {
@@ -89,6 +189,7 @@ public with sharing virtual class NpspHouseholdSource {
 	}
 
 	/** The binds `condition()` names, and no others. */
+	@NamespaceAccessible
 	public virtual Map<String, Object> binds() {
 		Map<String, Object> result = new Map<String, Object>{
 			'barnHousehold' => HouseholdService.householdRecordTypeId()
@@ -103,6 +204,7 @@ public with sharing virtual class NpspHouseholdSource {
 	}
 
 	/** The NPSP values of these Accounts, read as the running user. */
+	@NamespaceAccessible
 	public virtual List<Household> read(Set<Id> accountIds) {
 		List<Household> result = new List<Household>();
 		if (accountIds == null || accountIds.isEmpty()) {
@@ -200,6 +302,7 @@ public with sharing virtual class NpspHouseholdSource {
 	 * default row means NPSP's own default, Household Account. Read in system mode: it is
 	 * NPSP configuration, not people's data, and the answer must not depend on the viewer.
 	 */
+	@NamespaceAccessible
 	public virtual Boolean createsHouseholds() {
 		Schema.SObjectType settingType = sobjectType(ACCOUNT_MODEL_SETTING);
 		if (settingType == null) {
@@ -230,6 +333,7 @@ public with sharing virtual class NpspHouseholdSource {
 	 * Whether any NPSP household not yet a BarnCRM household exists. Read in system mode so
 	 * the answer does not depend on which records the viewer can see; no row is returned.
 	 */
+	@NamespaceAccessible
 	public virtual Boolean unadoptedHouseholdsExist() {
 		String filter = available() ? condition() : '';
 		if (String.isBlank(filter)) {
@@ -241,15 +345,7 @@ public with sharing virtual class NpspHouseholdSource {
 
 	/** The object of that name when the org has it, or null. */
 	private static Schema.SObjectType sobjectType(String name) {
-		try {
-			List<Schema.DescribeSObjectResult> found = Schema.describeSObjects(
-				new List<String>{ name },
-				SObjectDescribeOptions.DEFERRED
-			);
-			return found.isEmpty() ? null : found[0].getSObjectType();
-		} catch (InvalidParameterValueException e) {
-			return null;
-		}
+		return NamespaceUtil.objectType(name);
 	}
 
 	/** NPSP's household record type, when the org has it. */

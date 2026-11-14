@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The project invoice page: its details and lines, with Send, Mark Paid, Send Payment Link, Print
+    and Void beside them (PM-10).
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>force:highlightsPanel</componentName>
+        <identifier>invoiceHighlightsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>header</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>force:detailPanel</componentName>
+        <identifier>invoiceDetailPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>force:relatedListContainer</componentName>
+        <identifier>invoiceRelatedLists</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>projectsInvoiceActions</componentName>
+        <identifier>projectsInvoiceActions</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>sidebar</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Project Invoice Record Page</masterLabel>
+  <sobjectType>Project_Invoice__c</sobjectType>
+  <template>
+    <name>flexipage:recordHomeTemplateDesktop</name>
+  </template>
+  <type>RecordPage</type>
+</FlexiPage>

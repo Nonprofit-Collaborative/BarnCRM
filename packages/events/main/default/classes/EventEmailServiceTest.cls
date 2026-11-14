@@ -8,11 +8,11 @@
 private class EventEmailServiceTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		TestUsers.adminWith('Events_Admin');
 	}
 
 	private static User staff() {
-		return TestUsers.adminWith(EventsAccessSync.ADMIN_SET);
+		return TestUsers.adminWith('Events_Admin');
 	}
 
 	private static void settings(Boolean reminders, Boolean followUps, Boolean noShows) {
@@ -41,10 +41,8 @@ private class EventEmailServiceTest {
 	}
 
 	private static Event_Attendee__c attendee(Event__c event, String last, String status) {
-		Contact person = new Contact(
-			FirstName = 'A',
-			LastName = last,
-			Email = last + '@example.org'
+		Contact person = TestDataFactory.person(
+			new Contact(FirstName = 'A', LastName = last, Email = last + '@example.org')
 		);
 		insert as user person;
 		EventPersonMatcher.PersonInput input = new EventPersonMatcher.PersonInput();

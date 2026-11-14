@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Requests and issues: log, triage, assign and resolve requests, with comments and the tasks and
+    change requests they become (D-201).
+  </description>
+  <label>Requests</label>
+  <lwcComponent>projectsRequests</lwcComponent>
+  <motif>Custom23: Envelope</motif>
+</CustomTab>

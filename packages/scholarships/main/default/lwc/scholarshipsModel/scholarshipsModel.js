@@ -2,6 +2,9 @@
  * Scholarships' shared logic in plain JavaScript (plan Section 9.9): a review's weighted total as
  * the reviewer types (Apex recomputes it on save, R-SG6) and the disbursement export as CSV.
  */
+import { csvCell } from 'c/barnFormat';
+
+export { csvCell };
 
 /** Each criterion's score, between 0 and its max, times its weight, added together. */
 export function weightedTotal(criteria, scores) {
@@ -13,18 +16,6 @@ export function weightedTotal(criteria, scores) {
     total += capped * Number(criterion.weight ?? 1);
   });
   return Math.round(total * 100) / 100;
-}
-
-/** One CSV cell: quoted when it holds a comma, quote or line break; a leading = + - @ is neutralized. */
-export function csvCell(value) {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  let text = String(value);
-  if (/^[=+\-@]/.test(text) && Number.isNaN(Number(text))) {
-    text = "'" + text;
-  }
-  return /[",\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
 }
 
 /** The export's columns: the row key and its heading. */

@@ -1,15 +1,22 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import getHome from '@salesforce/apex/VolunteersHomeController.getHome';
+import getFirstRun from '@salesforce/apex/VolunteersHomeController.getFirstRun';
+import VOLUNTEER_JOB from '@salesforce/schema/Volunteer_Job__c';
 import { iconFor } from 'c/barnIcons';
+import { tabPageReference } from 'c/barnTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { pageReferenceFor, toTiles } from './volunteersHomeModel';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
+/** Core's Import tab, opened by name: the first-run panel's second action. */
+const IMPORT_TAB = 'Import';
+
 /**
  * Volunteers Home (vis-modules-19): the app's first tab. Three figures that open their lists
  * (approved hours this month, hours to approve, shifts needing people), with the Volunteers
- * report charts beside them on the same page.
+ * report charts beside them on the same page. Before the first volunteer job, a first-run
+ * panel offers New Volunteer Job and Import a File instead of empty figures (D-200 R4).
  */
 export default class VolunteersHome extends NavigationMixin(LightningElement) {
   labels = { loading: LOADING };
@@ -17,6 +24,7 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   loading = true;
   failed = false;
   home = [];
+  firstRunState;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -30,7 +38,13 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
   async load() {
     this.loading = true;
     try {
-      this.home = (await getHome()) || [];
+      const [home, firstRun] = await Promise.all([
+        getHome(),
+        // The first-run panel is a nicety: if it cannot be read, the figures still show.
+        getFirstRun().catch(() => undefined)
+      ]);
+      this.home = home || [];
+      this.firstRunState = firstRun;
       this.failed = false;
     } catch {
       this.home = [];
@@ -52,8 +66,36 @@ export default class VolunteersHome extends NavigationMixin(LightningElement) {
     return toTiles(this.home, iconFor);
   }
 
+  get firstRun() {
+    return Boolean(this.helpReady && this.firstRunState && this.firstRunState.show);
+  }
+
+  get canImport() {
+    return Boolean(this.firstRunState && this.firstRunState.canImport);
+  }
+
+  get firstRunText() {
+    return {
+      heading: helpText('Volunteers', 'Volunteers_Home_FirstRunHeading'),
+      message: helpText('Volunteers', 'Volunteers_Home_FirstRunMessage'),
+      newJob: helpText('Volunteers', 'Volunteers_Home_FirstRunNewJob'),
+      importFile: helpText('Volunteers', 'Volunteers_Home_FirstRunImport')
+    };
+  }
+
   get hasTiles() {
-    return this.tiles.length > 0;
+    return !this.firstRun && this.tiles.length > 0;
+  }
+
+  handleNewJob() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: VOLUNTEER_JOB.objectApiName, actionName: 'new' }
+    });
+  }
+
+  async handleImport() {
+    this[NavigationMixin.Navigate](await tabPageReference(IMPORT_TAB));
   }
 
   handleTileSelect(event) {

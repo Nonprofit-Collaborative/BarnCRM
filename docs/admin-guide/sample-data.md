@@ -22,6 +22,9 @@ What loads, exactly:
 | Organizations | 25 | Local businesses, schools and a college, Rotary clubs, two foundations and a church |
 | Connections | 60 | Parents, siblings, friends, colleagues and grandparents in different households, a few marked Former; the other side of each one is created by the connection rules, as it would be for a connection you enter |
 | Affiliations | 80 | Board members, employees, volunteers and owners, one primary each, a quarter of them Former |
+| Saved Find queries | 3 | **Sample: People in Rochester**, **Sample: People Born Before 1960** and **Sample: Organizations Backup**, saved under your name in [Find](find.md); the last is marked as a [Backup Set](backup-sets.md), so Data Manager's Backup Sets panel has one to run. They are private to you, as any saved query is |
+| Seasonal addresses | 2 | Winter addresses (1 December to 31 March) for the Patel household in Naples, Florida and the Ortiz household in Tucson, Arizona ([Addresses](addresses.md)) |
+| Interaction notes | 3 | Completed meetings logged on Maria Whitfield, Priya Nguyen and Susan Patel, as **Log an Interaction** records them ([Interaction notes](interaction-notes.md)) |
 
 ### With Giving Installed
 
@@ -37,6 +40,8 @@ With the **Giving** package installed, the same action also loads:
 | Asks | 11 | Seven open asks across every default stage of the [Ask Pipeline](ask-pipeline.md) (one past its target date, one for an organization), one declined, one withdrawn, and two won as pledges |
 | Soft credits | 30 entered by hand | Solicitors and influencers on the larger gifts, on top of the household member credits the automatic rule writes for every gift |
 | Tributes | 24 | In memory of and in honour of, with a message, notified to somebody other than the person being remembered |
+| Matching gifts | 3 | Three businesses (Founders Consulting Group, Evergreen Consulting Group and Founders Family Dental) each match one employee's gift, linked both ways with the employee credited as **Matched donor** ([Matching gifts](matching-gifts.md)) |
+| Stock and gift sources | About 50 | Every stock gift names a symbol and its shares, and eight larger gifts came through a donor-advised fund or a family foundation ([Stock, planned and DAF gifts](stock-planned-and-daf-gifts.md)) |
 
 The giving history is shaped so the reports have something to say: donors who have given in
 each of the last three years, donors who lapsed more than eighteen months ago, donors whose
@@ -67,6 +72,7 @@ there:
 | Hours | 60 | One entry for each attendance and one garden entry for each of 24 sample people. The newest four wait for approval, the next two are Rejected with a reason, and the rest are Approved |
 | Volunteer skills | 24 | One skill or interest on each of the 24 people |
 | Requirements | 8 | Six completed background checks and two orientations in progress |
+| Volunteer profiles | 24 | The same 24 people get a volunteer profile: 22 **Active** and two **Inactive**, each with a **Volunteer Since** date and the days and times they are free, so **Suggested Volunteers** on a shift and the unfilled shift nudges have people to name |
 
 The hours get their statuses the way a coordinator gives them, so loading needs the **Manage
 Volunteers** permission (Volunteers Admin includes it). Without it the hours keep the status
@@ -88,21 +94,43 @@ there:
 | Services | 5 | Tutoring hour and Homework club session; Grocery bag and Hot meal; Reading circle |
 | Enrollments | 18 | Six in tutoring (four Enrolled, one Applied, one Withdrawn), eight Enrolled in the pantry and four Completed in summer reading, among 12 sample people |
 | Service deliveries | 40 | A grocery bag a week for the last four weeks to each person in the pantry (one week missed, as an Unexcused Absence), and two tutoring sessions of two hours to each person Enrolled in tutoring |
-| Cohorts | 1 | **Fall homework club**, Active, in tutoring, holding the four people Enrolled there |
-| Sessions | 3 | Homework club 1 and 2 (Held, in the last two weeks) and Homework club 3 (Scheduled, next week), 4:00 PM to 5:30 PM |
+| Cohorts | 2 | **Fall homework club**, Active, in tutoring, holding the four people Enrolled there, and **Summer reading circle**, Completed, holding the four who completed summer reading |
+| Sessions | 3 | Homework club 1 and 2 (Held, in the last two weeks) and Homework club 3 (Scheduled, today), 4:00 PM to 5:30 PM |
+| Session schedule | 1 | **Homework club twice a week**, active, for the Fall homework club: Tuesdays and Thursdays, 4:00 PM to 5:30 PM, from tomorrow for 60 days. Its sessions (Scheduled) appear within a minute of the load, up to the **Weeks Ahead to Create Sessions** setting. |
 | Attendance | 8 | Each cohort member at each Held session: Present, except one Excused Absence |
-| Goals | 4 | "Read one grade level higher", In Progress, for each person Enrolled in tutoring, with a review due in about two weeks |
-| Goal steps | 8 | Two per goal: "Take the reading assessment" (Done) and "Read 20 minutes each school day" (In Progress) |
+| Goals | 6 | "Read one grade level higher", In Progress, for each person Enrolled in tutoring (one with its review overdue, so it shows under **Reviews Due**); "Finish five books from the summer list", Achieved, in summer reading; "Apply for SNAP benefits", In Progress, in the food pantry. Each has a description and is assigned to you. |
+| Goal steps | 12 | Two per goal, for example "Take the reading assessment" (Done) and "Read 20 minutes each school day" (In Progress) |
 
 Removal takes the sample people's service deliveries and enrollments in the sample programs
-(their goals and steps go with them), then the sample sessions and cohorts, then the sample
-programs and their services. A sample program one of your own people is enrolled
+(their goals and steps go with them), then the sample sessions, the session schedule and the
+cohorts, then the sample programs and their services. A sample program one of your own people is enrolled
 in, or has a service delivery in, stays with those records, and so does a sample program with
 a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
-Warning in the [Error Log](error-log.md) names it: "Sample data removal kept the sample
-programs {names}, because people of your own are enrolled in them or have services recorded in
-them, or a sample enrollment in them has case notes. Move or delete those enrollments, service
-deliveries and case notes, then select Remove Sample Data again."
+Warning in the [Error Log](error-log.md) names each kept record by kind: "Sample data removal
+kept some Programs sample records, because records of your own point at them: Programs (Food
+pantry). Move or delete your records, then remove sample data again." The same Warning covers
+any module whose sample set ships as a data file (Programs, Logic Models, Funders and Events).
+
+### With Logic Models Installed
+
+With the **Logic Models** package installed, the same action also loads, after Programs, a
+logic model for each of the Programs sample programs. It needs those programs: with Programs not
+installed, nothing is loaded for Logic Models, so the sample never takes the organization's own
+model.
+
+| Records | How many | What is in them |
+|---|---|---|
+| Logic models | 2 | **After-school tutoring logic model** and **Food pantry logic model**, each for its sample program, with a description |
+| Parts | 25 | Tutoring: 4 inputs, 3 activities, 3 outputs, short, intermediate and long term outcomes, and an impact. Pantry: the same columns with 10 parts |
+| Arrows | 24 | Every part joined forward, each with its assumption |
+| Assumption evidence | 8 | On five tutoring arrows and two pantry arrows, of every strength (Strong, Moderate, Limited and Challenges), some with a source link |
+| Indicators | 11 | On outputs and outcomes, with a unit and a baseline; two where lower is better and two whose results are imported |
+| Indicator periods | 31 | Three terms (tutoring) or quarters (pantry): targets and results for the two past ones, a target for the current one; one school year target for on-time promotion |
+
+The tutoring model is complete, so **Things to Look At** shows the all-clear; the pantry model
+has a long term outcome with no indicator yet, so it lists that one reminder. Removal deletes
+the two sample models with their parts, arrows, evidence, indicators and periods; your own
+models are never touched.
 
 ### With Funders Installed
 
@@ -132,9 +160,14 @@ is there, for the sample people (and the sample organizations, for sponsors):
 | Registrations | 10 | 6 for the conference (one with a guest, two using EARLYBIRD) with 4 of the 7 attendees checked in (**Attended**), and 4 for the garden night, all **Registered**; amounts owed follow the ticket and code |
 | Sponsorship | 3 levels, 3 sponsors, 4 deliverables | Gold, Silver and Supporter levels; three sample organizations as sponsors (Confirmed, Committed, Prospect) with their deliverables in different statuses |
 | Speaker application | 1 with 2 reviews | **Small Teams, Big Data** (In Review, Technology track), scored 4 by you and 5 by another reviewer |
+| Venue and rooms | 1 venue, 4 rooms | **Riverside Meeting Hall** with Main Hall, Room A, Room B and Dining Room; the conference is held there and every session is in one of its rooms |
+| Seating | 2 tables | **Dinner Table 1** (hosted by Harper Garcia for the Gold sponsor) and **Dinner Table 2**, with five conference guests seated |
+| Budget | 4 expenses, 2 funding lines | Hall rental, catering, sound and printing in different statuses (sound over budget), the Gold sponsorship received and a foundation grant half received |
+| Feedback | 4 session ratings, 2 survey responses | Ratings on the Opening Keynote and Fundraising Without Burnout, and two post-event survey answers from checked-in attendees |
+| Appointments and agenda | 2 appointments, 2 agenda picks | An **Ask the speaker** slot with Harper Garcia booked by Maria Whitfield and one still open, and two sessions on Maria's personal agenda |
 
-Removal deletes the sample registrations first and then the sample events with everything under
-them; your own events and registrations are never touched. Nothing is loaded for Events when the
+Removal deletes the sample registrations first, then the sample events with everything under
+them, then the sample venue with its rooms; your own events, venues and registrations are never touched. Nothing is loaded for Events when the
 core sample people are not there.
 
 ## 2. How to Turn It On
@@ -282,6 +315,10 @@ household records, names, greetings, member counts, and Members panel.
   or job skills) point at sample data, the Warning may not name every kept record; nothing of
   yours is deleted either way, and running the removal again after you move them logs a new
   Warning naming whatever is still kept.
+- **Removing sample data loaded by someone else.** The three sample Find queries belong to the
+  person who loaded the set and are private to them, as any saved query is. When another admin
+  removes the set, those three stay; the person who loaded it can delete them in **Find**, or
+  select **Remove Sample Data** again.
 - **Not having the permission.** If the **Load Sample Data** button does not appear, you
   are missing **Manage BarnCRM Settings**. Ask an administrator to grant it from the
   **Access** page, not from Setup.
@@ -293,6 +330,8 @@ household records, names, greetings, member counts, and Members panel.
 | Sample Data checkbox on households, contacts, and organizations | `Sample_Data__c` on Account and Contact |
 | Sample Data checkbox on connections and affiliations | `Sample_Data__c` on `Relationship__c` and `Affiliation__c` |
 | Sample Data checkbox on gifts, funds, appeals, commitments and asks (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c` and `Ask__c` |
+| Sample Data checkbox on saved Find queries | `Sample_Data__c` on `Saved_Query__c`; the seasonal addresses are found through their sample household, and the interaction notes go with the sample people they are logged on |
+| Sample Data checkbox on event venues (with Event Management) | `Sample_Data__c` on `Event_Venue__c`; its rooms go with it |
 | Sample Data checkbox on volunteer jobs and skills (with Volunteers) | `Sample_Data__c` on `Volunteer_Job__c` and `Skill__c`; shifts, schedules, sign-ups and hours are found through their job |
 | The key that ties a sample gift to the person who gave it | `Sample_Data_Key__c` on Account and Contact |
 | Addresses BarnCRM made for sample people and households | `Address__c`, found through the sample owner (no checkbox of their own) and removed before it; addresses on records you entered stay |

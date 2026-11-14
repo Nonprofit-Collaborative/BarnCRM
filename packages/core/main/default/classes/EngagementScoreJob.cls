@@ -30,7 +30,7 @@ public with sharing class EngagementScoreJob implements Database.Batchable<SObje
 	}
 
 	public void execute(SchedulableContext context) {
-		Database.executeBatch(new EngagementScoreJob(), CHUNK_SIZE);
+		AsyncStarter.batch(new EngagementScoreJob(), CHUNK_SIZE, 'EngagementScoreJob');
 	}
 
 	/** Every person, or none while scoring is off. */

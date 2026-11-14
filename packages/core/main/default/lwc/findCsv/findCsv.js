@@ -8,10 +8,7 @@
  * holds every value as text, and nothing in it can run).
  */
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
-import { format, isoDate } from 'c/barnFormat';
-
-/** Text that is a plain negative decimal and nothing else. */
-const NEGATIVE_NUMBER = /^-\d+(\.\d+)?$/;
+import { csvCell, format, isoDate } from 'c/barnFormat';
 
 // Written as a code point so the source holds no invisible character.
 export const BYTE_ORDER_MARK = String.fromCharCode(0xfeff);
@@ -26,17 +23,8 @@ export function valueAt(row, path) {
     );
 }
 
-/** One CSV cell. */
-export function cell(value) {
-  if (value === undefined || value === null) {
-    return '';
-  }
-  let text = typeof value === 'object' ? JSON.stringify(value) : String(value);
-  if (typeof value !== 'number' && /^[=+\-@\t\r]/.test(text) && !NEGATIVE_NUMBER.test(text)) {
-    text = `'${text}`;
-  }
-  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
+/** One CSV cell (`csvCell` in c/barnFormat, which framework-free modules import directly). */
+export const cell = csvCell;
 
 /** The CSV text: header row of labels, then one line per row, lines ending CRLF. */
 export function toCsv(columns, rows) {

@@ -28,6 +28,7 @@ into six kinds:
 | AffiliationUpkeepWriter | Upkeep | The person's primary affiliation fields and their other affiliations, which the saver may not be able to edit | ADR-0021 category 2 |
 | BrandShareWriter | Platform | Brand groups, their members and Account shares granted to them, which a staff member assigning a brand cannot create; one default brand and entity and one primary assignment cleared on rows the saver may not edit | ADR-0021, ADR-0202 brand management and visibility |
 | AutomationSettingsWriter | Platform | The automation pause on the protected org settings and the Automation Setting rows from the shipped registry | ADR-0021 |
+| AddressMatchKeyBatch | Org job | Every address without its Match Key, given one so duplicate matching reads addresses through the index; a key it cannot see would hide a duplicate | ADR-0021, D-200 P6 |
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
 | ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
 | ErrorLogEventHandler | Upkeep | Writes the Error Log entry from the event, whoever raised it | ADR-0021 |
@@ -53,6 +54,7 @@ into six kinds:
 | RollupClearBatch | Org job | Blanks a rollup field on every target record | ADR-0021 |
 | RollupDependents | Org figure | Source rows under a parent whose attribute changed | ADR-0021 |
 | RollupFullRecalcBatch | Org job | Every record of a target entity, and the queue | ADR-0021 |
+| RollupNightlyBatch | Org job | Source records changed or deleted since the last nightly run, the pause log, and the queue | ADR-0021 |
 | RollupLargeParentBatch | Org job | Every source row of a parent too large for one job | ADR-0021, ADR-0116 |
 | RollupQueue | Upkeep | The engine's own queue, written by any save | ADR-0021 |
 | RollupRecalcErrorHandler | Upkeep | The failed batch's records, handed back to the queue | ADR-0021 |

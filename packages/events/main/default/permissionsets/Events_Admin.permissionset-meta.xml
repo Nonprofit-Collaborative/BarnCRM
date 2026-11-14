@@ -5,28 +5,16 @@
   <description>
     Everything in Event Management: creates, changes and deletes events and everything on them.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Events</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>EventAgendaController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
     <apexClass>EventBudgetController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventDashboardController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventAppointmentsController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventVolunteersController</apexClass>
-    <enabled>true</enabled>
-  </classAccesses>
-  <classAccesses>
-    <apexClass>EventSurveyController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -47,6 +35,22 @@
   </classAccesses>
   <classAccesses>
     <apexClass>EventSpeakersController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventDashboardController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventAppointmentsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventVolunteersController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>EventSurveyController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -224,6 +228,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Event_Registration__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Event__c.Public_Page__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -235,11 +244,6 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Event__c.Public_Seats__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
-    <field>Event_Registration__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -730,6 +734,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Event_Venue__c.Notes__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Event_Venue__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

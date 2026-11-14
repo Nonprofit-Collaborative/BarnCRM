@@ -12,6 +12,12 @@
  * job record holds.
  */
 public with sharing class BulkDeleteController {
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
+		null,
+		null,
+		System.Label.Core_UnexpectedError
+	);
+
 	public static final String PERMISSION = 'Bulk_Delete_Records';
 	private static final Integer RECENT_JOBS = 10;
 	private static final String JOB_FIELDS =
@@ -93,7 +99,7 @@ public with sharing class BulkDeleteController {
 			}
 			return page;
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Bulk delete page');
+			throw ERRORS.wrap(caught, 'Bulk delete page');
 		}
 	}
 
@@ -104,7 +110,7 @@ public with sharing class BulkDeleteController {
 			requirePermission();
 			return BulkDeleteService.preview(queryJson);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Bulk delete preview');
+			throw ERRORS.wrap(caught, 'Bulk delete preview');
 		}
 	}
 
@@ -116,7 +122,7 @@ public with sharing class BulkDeleteController {
 			Import_Batch__c started = BulkDeleteService.start(queryJson, confirmedCount);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Start a bulk delete');
+			throw ERRORS.wrap(caught, 'Start a bulk delete');
 		}
 	}
 
@@ -139,7 +145,7 @@ public with sharing class BulkDeleteController {
 			);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Start an archive');
+			throw ERRORS.wrap(caught, 'Start an archive');
 		}
 	}
 
@@ -153,7 +159,7 @@ public with sharing class BulkDeleteController {
 			requireDeletePermission();
 			return BulkDeleteService.filePreview(Id.valueOf(batchId));
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Delete by file preview');
+			throw ERRORS.wrap(caught, 'Delete by file preview');
 		}
 	}
 
@@ -175,7 +181,7 @@ public with sharing class BulkDeleteController {
 			requireDeletePermission();
 			return BulkDeleteService.backupPage(null, Id.valueOf(batchId), afterId);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Download records before a bulk delete');
+			throw ERRORS.wrap(caught, 'Download records before a bulk delete');
 		}
 	}
 
@@ -190,7 +196,7 @@ public with sharing class BulkDeleteController {
 			);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Start a delete by file');
+			throw ERRORS.wrap(caught, 'Start a delete by file');
 		}
 	}
 
@@ -201,7 +207,7 @@ public with sharing class BulkDeleteController {
 			requireDeletePermission();
 			return toView(requireJob(jobId), true);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Read a bulk delete');
+			throw ERRORS.wrap(caught, 'Read a bulk delete');
 		}
 	}
 
@@ -214,7 +220,7 @@ public with sharing class BulkDeleteController {
 			BulkDeleteService.undo(job.Id, confirmedRecords);
 			return toView(requireJob(job.Id), false);
 		} catch (Exception caught) {
-			throw asUserError(caught, 'Undo a bulk delete');
+			throw ERRORS.wrap(caught, 'Undo a bulk delete');
 		}
 	}
 
@@ -289,13 +295,5 @@ public with sharing class BulkDeleteController {
 			? DataJobs.failures(job.Id)
 			: new List<DataJobs.Failure>();
 		return view;
-	}
-
-	private static AuraHandledException asUserError(Exception caught, String context) {
-		return DataJobs.userError(
-			caught,
-			context,
-			caught instanceof BulkDeleteService.BulkDeleteException
-		);
 	}
 }
