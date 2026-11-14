@@ -55,6 +55,6 @@ general guidance, not legal advice.
 - Tabs: Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and
   Committees and Board Meetings; Processing Activities, Data Subject Requests and Data Breaches
   (not in the catalog row). App `BarnCRM_Corporate_Hub` (BarnCRM Corporate Hub, logo
-  `BarnCRM_Corporate_Hub_Logo`) holds every tab, visible through the Corporate Hub permission
+  `BarnCRM_Patch_Corporate_Hub_Logo`) holds every tab, visible through the Corporate Hub permission
   sets; left out of scratch and Developer Edition orgs (ADR-0223, module apps). The catalog row's
   tabs also join BarnCRM and BarnCRM Console through its `Staff_Tabs__c`.

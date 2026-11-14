@@ -98,6 +98,16 @@ describe('c-hub-welcome', () => {
     expect(message(element)).not.toContain('Everyday');
   });
 
+  it('shows Patch beside the welcome, with alt text', async () => {
+    const element = build();
+    getHomeModel.emit(model());
+    await settle();
+
+    const patch = element.shadowRoot.querySelector('[data-id="patch"]');
+    expect(patch.getAttribute('src')).toContain('BarnPatchWelcome');
+    expect(patch.alt).toContain('Core_HubHome_PatchAlt');
+  });
+
   it('says what the page is for once setup is done', async () => {
     const element = build();
     getHomeModel.emit(model({ stepsCompleted: 2, stepsTotal: 2 }));

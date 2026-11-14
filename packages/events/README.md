@@ -34,7 +34,7 @@ used. Paid registration (EV-20) reaches the optional BarnCRM Payments module onl
   `EventsHomeController`.
 - The event record page `Event_Record_Page`: Core's header, main and sidebar template with tabs,
   assigned as `Event__c`'s org default.
-- App `BarnCRM_Events` (BarnCRM Events, logo `BarnCRM_Events_Logo`), visible through the Events
+- App `BarnCRM_Events` (BarnCRM Events, logo `BarnCRM_Patch_Events_Logo`), visible through the Events
   permission sets; left out of scratch and Developer Edition orgs (ADR-0223, module apps). The
   Events Home, Event Calendar, Events, Event Speakers and Venues tabs also join BarnCRM and
   BarnCRM Console through the catalog row's `Staff_Tabs__c` and `scripts/org/module-app-tabs.py`.

@@ -28,7 +28,7 @@ No other module is referenced. Standard objects used: Account, Contact and User 
 - Static resources `Projects_Templates` (the shipped templates) and `BarnHelp_Projects` (help
   text).
 - One nightly step, `ProjectHealth` at 6:40 AM; no trigger.
-- App `BarnCRM_Projects` (BarnCRM Projects, logo `BarnCRM_Projects_Logo`) holds every tab,
+- App `BarnCRM_Projects` (BarnCRM Projects, logo `BarnCRM_Patch_Projects_Logo`) holds every tab,
   visible through the Projects permission sets; left out of scratch and Developer Edition orgs
   (ADR-0223, module apps). The catalog row's tabs also join the BarnCRM apps before Error Log:
   `Staff_Tabs__c` in BarnCRM and BarnCRM Console, `Admin_Tabs__c` in the admin apps.

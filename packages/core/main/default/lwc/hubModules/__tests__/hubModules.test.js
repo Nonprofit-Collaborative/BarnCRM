@@ -137,7 +137,7 @@ describe('c-hub-modules', () => {
     expect(links[0].getAttribute('href')).toBe('/lightning/app/06m000000000001');
     expect(links[0].textContent).toContain('c.Core_ModuleManager_OpenApp');
     const logos = all(element, 'module-logo');
-    expect(logos[1].src).toBe('/file-asset/BarnCRM_Fundraising_Logo');
+    expect(logos[1].src).toBe('/file-asset/BarnCRM_Patch_Fundraising_Logo');
     expect(logos[2].src).toBeUndefined();
     expect(logos[2].fallbackIconName).toBe('standard:apps');
   });
