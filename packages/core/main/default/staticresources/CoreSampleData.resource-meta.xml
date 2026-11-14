@@ -3,8 +3,7 @@
   <cacheControl>Private</cacheControl>
   <contentType>application/json</contentType>
   <description>
-    C-10 sample data, Core tools: three saved Find queries (one a Backup Set), two seasonal
-    addresses and three interaction notes on Core's sample people, loaded by SampleDataFile
-    (D-200 S2) right after Core's own set. Format: data/sample/README.md.
+    C-10 sample data, Core tools: saved Find queries (one a Backup Set), seasonal addresses
+    and interaction notes, loaded right after Core's own set. Format: data/sample/README.md.
   </description>
 </StaticResource>
