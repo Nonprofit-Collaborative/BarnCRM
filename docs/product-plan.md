@@ -786,6 +786,8 @@ This subsection is the schedule for every open, approved item. Where Sections 6.
 | G | 1.13, 1.14, 1.15 | Gala seating, multi-brand management, LWC Builder start, Address Verification and online donations (moved later by Brandon, D-177) |
 | H | 1.16, 1.17 | LWC Builder complete, Territory Management, Grid tool; Backup Sets and files import last (D-157) |
 | I | 1.18 | Project Management module, possibly a PSA tool (D-175); later by Brandon's direction |
+| K | 1.20, 1.21, 1.22, 1.23, 1.24 | Batch D to I review decisions and the full PSA (1.20); pilot readiness: requests and namespace readiness, performance, simplify, UX and testing (1.21 to 1.24). Landed 2026-11-14 inside batch L |
+| L | 1.25 (on batch K) | Sample data for every module (1.25, D-203), module apps (ADR-0223, D-204), the Funders app labelled Grants (D-205). Landed 2026-11-14 with batch K: squash `f69141c1c`, PR #1317 (#1316 closed as landed); release gate passed on `barn-platform` (6,099 of 6,099 tests, 93% coverage, 0 classes under the floor); Core deployed to `mwdbdevsb` at `2c0bb9378` (check-only first, D-192) |
 
 Portals into Batch C (Brandon, 2026-11-04, "Yes", D-178): C-46 Address Verification is no longer a Portal Builder or Corporate Hub prerequisite, so Portal Builder (PB-01) and the volunteer, speaker and donor portal templates (PB-03, PB-07, PB-08) are in release 1.3. PB-01 still starts only after the item 30 terms check confirms option B; if it does not, the Portal Builder items are re-slotted.
 
@@ -1208,6 +1210,8 @@ Brandon (2026-11-04): "Please also add to the roadmap for later a PM Module whic
 
 #### Release 1.19 (Batch I): Remaining approved items
 
+Status (2026-11-14): Landed. Every item below is on `main`: built and landed with the batch D to I landing (#1235, `2efde31d4`) and carried through batches K and L, which landed 2026-11-14 (`f69141c1c`, PR #1317). The Planned and Built cells in the table predate the build.
+
 Added 2026-11-11 by the integrator so the combined build (Brandon's goal, 2026-11-11: build all remaining batches, then test once) covers every approved item that had no release: the AR-01 module part and the Later items from Batch B. Built last, after every module build is integrated, so AR-01 also covers the labels those builds add.
 
 | ID | Item | Size | Status | Source |
@@ -1222,7 +1226,7 @@ Added 2026-11-11 by the integrator so the combined build (Brandon's goal, 2026-1
 
 #### Release 1.20 (after Batch I): Batch D to I review decisions
 
-Status (2026-11-13): Built (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12) and carried into `landing/batch-k`, where it passed the release gate with releases 1.21 to 1.24; the Planned cells below predate the build.
+Status (2026-11-14): Landed on `main` with batches K and L (`f69141c1c`, PR #1317). Earlier (2026-11-13): Built (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12) and carried into `landing/batch-k`, where it passed the release gate with releases 1.21 to 1.24; the Planned cells below predate the build.
 
 Added 2026-11-12 (D-196). Built now on their own branches, outside the Batch D to I landing; tested and deployed after the current batches are completely done.
 
@@ -1252,6 +1256,20 @@ Status (2026-11-13): built and integrated on `landing/batch-k` with release 1.20
 | 1.23 Simplify | S1 module wiring as data; S2 one sample data loader; S3 test factory finish; S5 shared mirror base; S6 one nightly jobs card; S9a generated permission sets; S11 optional Migration package; S12 component tabs | Major |
 | 1.24 UX and testing | UX R1 to R7, R11, R12; QA Q1, Q2, Q4 to Q6, Q8 to Q11; Q3 Playwright smoke tests once Playwright is available | Major |
 | M-2 | Namespace, PBO Dev Hub, first managed betas, proving run, install and upgrade test, first promoted version (waits for Brandon's Partner Program signup) | Major |
+
+Status (2026-11-14): releases 1.20 to 1.24 (batch K) landed on `main` inside landing batch L: squash `f69141c1c`, PR #1317 (#1316 closed as landed). M-2 stays open.
+
+#### Release 1.25 (Batch L): sample data for every module, module apps
+
+Status (2026-11-14): Landed on `main` with batch K (`f69141c1c`, PR #1317; #1316 closed as landed). Release gate passed on `barn-platform`: 6,099 of 6,099 tests, 93% coverage, 0 classes under the floor. Core deployed to `mwdbdevsb` at `2c0bb9378` (check-only first, D-192). The `barn-platform` Tab Access Check was rescheduled after a manual abort.
+
+Owner request (Brandon): "run sample data for everything so someone can load the sample data" (D-203).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| SD-01 | Sample data for every module and feature, loadable and removable from the app: packaged JSON sample sets read by Core's generic loader (`SampleDataFile`, D-200 S2), with sets for Forms, Portal Builder, Territory Management, Memberships, Scholarships, Projects, Corporate Hub, Logic Models and Programs (goals, cohorts, schedule), richer Funders data, and the Core, Giving, Volunteers and Events gaps filled; a fixed load order (Logic Models after Programs, then Memberships, Scholarships, Projects, Corporate Hub, Forms, Portal Builder and Territory) | Major | Landed | D-203 |
+| SD-02 | Module apps (ADR-0223, amends ADR-0192): BarnCRM Events, Forms, Portal Builder, Corporate Hub and Projects ship their own console apps; capped orgs (Developer Edition, scratch, trial) leave them out (`MODULE_APPS=auto`, overridable with `capped` or `all`) | Major | Landed | D-204 |
+| SD-03 | Funders app labelled BarnCRM Grants (app label only) | Minor | Landed | D-205 |
 
 #### Held
 
@@ -2026,6 +2044,12 @@ The pre-batch review (9.8) checks new work against this list; existing code is m
 43. (modules-21, usability review) One Core person panel listing every installed module (Giving, Volunteers, Programs and others) instead of each module adding its own. Raised 2026-11-04. It may reverse D-03. **Resolved 2026-11-04 (Brandon): recorded as Decision D-171; no, each module keeps its own panel (D-03).**
 44. (admin-22, usability review) Move the raw Import Rows tab out of the Admin app navigation. Raised 2026-11-04. It may reverse the Admin app navigation set in D-144. **Resolved 2026-11-04 (Brandon): recorded as Decision D-171; yes, the raw Import Rows tab leaves the Admin app navigation and stays reachable from Super Importer.**
 45. (admin-24, usability review) Retitle Field Utilization. Raised 2026-11-04. It may reverse a recorded tool name. **Resolved 2026-11-04 (Brandon): recorded as Decision D-171; yes, Field Utilization is retitled "Field Use".**
+46. (Core dates) How Core date rules behave across user time zones. Raised 2026-11-14 at landing batch L. Recommendation: one org-wide date for Core date rules, as a later fix.
+47. (Forms) Whether a Form with submissions can be deleted: `Form_Submission__c.Form_Version__c` is a Restrict lookup, so a Form whose versions have submissions cannot be deleted today. Raised 2026-11-14. Recommendation: keep it (the submissions stay intact; retire the form instead).
+48. (Funders naming) Rename the Funders module to BarnCRM Grants everywhere (Setup Assistant, Module Manager, docs), beyond the app label (D-205). Raised 2026-11-14.
+49. (Advanced Reporting) Build Advanced Reporting in this batch, or keep it in the backlog as D-202 placed it (Section 6.1 item 22). Raised 2026-11-14.
+50. (Module apps) Own apps for Scholarships and Memberships, beyond the ADR-0223 apps (D-206). Raised 2026-11-14; proposed, awaiting Brandon.
+51. (Module apps) How Brandon previews the new module apps, which capped orgs leave out (D-204): a full-suite sandbox, or `barn-npc` deployed with `MODULE_APPS=all`. Raised 2026-11-14.
 
 ### 11.3 Parking lot (good ideas, deliberately not now)
 
@@ -2343,6 +2367,10 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-200 | Whole-solution review approved (Brandon, 2026-11-12: "all recommended except the three mentioned"). Approved: QA Q1 to Q11, UX R1 to R12, Namespace N1 to N13, Performance P1 to P13, Simplify S1 to S12, slotted into releases from 1.21. Exceptions: P2's add-and-subtract option for large parents (not now; the hourly throttle is approved), S7 JSON-string controller returns only where code is touched anyway, S9b admin sets as a delta (no; generated sets with a CI compare are approved). Amends ADR-0082 decision 4 (nightly full sweep becomes weekly, P1), ADR-0038 (Giving Nightly Jobs page retired for one shared card, S6), ADR-0155 and ADR-0197 (one-time migration tooling moves to an optional uninstallable Migration package, S11), ADR-0020 (single-component app pages become component tabs, S12), D-130 (the two-tab Logic Models app retires; the object, tab and record page stay and the tab is reached from the BarnCRM app and App Launcher, UX R6) | Present the reviews only | Smaller footprint (about 400K Apex characters), measured performance, staff-user and multi-shape testing before pilots |
 | D-201 | Projects requests and issues (Brandon, 2026-11-12: "add an option to enable a requests/issues management feature with internal and optionally (with setting enabled) external via a portal site"; "would also allow for other orgs to submit a request (via a standard Salesforce Case perhaps) that are logged back to the case management org"). An optional Projects feature, off by default: staff log and work internal requests and issues; with a second setting, outside people submit and follow them through the portal; other orgs submit through an org-to-org connection, including from a standard Case in their own org through the Mirror package (standard objects stay in Mirror, ADR-0013). Research and ADR on the build branch | None | Lets a provider or shared-services org run intake, triage and delivery in the same place as its projects |
 | D-202 | Packaged dashboards run as a specified user; Advanced Reporting module in the backlog (Brandon, 2026-11-13: "The logged-in-user dashboards need to be converted to non-logged-in-user Salesforce dashboards but they can be reproduced in the Advanced Reporting module's dashboards"; "Add this to a backlog but do not start building it now"). The four packaged dashboards (Corporate Hub Board Governance, Giving Overview, Scholarships and Grants, Volunteers) change from `LoggedInUser` to `SpecifiedUser`, in the current batch. Amends ADR-0018 (Giving_Overview runs as the viewer, G-06). Advanced Reporting is Section 6.1 item 22, not built now | Keep dynamic dashboards: a full install used 4 of Enterprise Edition's 5 dynamic dashboards and could not deploy to a Developer Edition org (3) | Each dashboard shows every viewer what its running user (the installing or deploying admin unless an admin changes it) can see, so access is controlled by the dashboard folder's sharing; viewer-aware dashboards return in Advanced Reporting |
+| D-203 | Sample data for every module and feature (Brandon: "run sample data for everything so someone can load the sample data"). Every module and feature ships sample data an admin can load and remove from the app, as packaged JSON files read by one generic loader in Core (`SampleDataFile`, D-200 S2). Release 1.25; landed 2026-11-14 in landing batch L (`f69141c1c`, PR #1317) | A loader per module in Apex (the pattern D-200 S2 retired); sample data only for the older modules | One loader and data as JSON: a new module adds a file, not code, and the data ports toward BarnCRM for WordPress (Section 9.9); anyone can load a full demo and remove it again |
+| D-204 | Module apps (ADR-0223, amends ADR-0192 decision 1). The bigger modules ship their own Lightning console app: BarnCRM Events, Forms, Portal Builder, Corporate Hub and Projects; their tabs stay in the BarnCRM apps. Capped orgs (Developer Edition, scratch and trial orgs) leave the module apps out: `deploy-packages.sh` runs with `MODULE_APPS=auto`, looks up the org type, and deploys those modules without their apps (`capped` or `all` overrides the lookup); a CI budget allows 9 suite apps on a capped org | No module apps (ADR-0192 as it was); leave out only the apps that do not fit (the limit is not queryable); a separate permission set per app for visibility | The app limit belongs to scratch and Developer Edition orgs, which every test org is; real orgs and managed packages are not limited, so they get the apps the owner asked for, and the five apps are tested on a real org (`mwdbdevsb`) |
+| D-205 | The Funders module's app is labelled "BarnCRM Grants" (app label only; landed in batch L). Renaming the module itself in Setup Assistant, Module Manager and the docs is an open question for the owner (Section 11.2 item 48) | Keep the app labelled Funders | Chosen with the owner; the app label changes without touching API names or the module name |
+| D-206 | First module apps, chosen with the owner: Grants (the Funders app, relabelled), Portal Builder and Forms, plus the other ADR-0223 apps, Events, Corporate Hub and Projects. Own apps for Scholarships and Memberships are proposed and wait on the owner (Section 11.2 item 50) | Apps for every module now | Start with the modules big enough to need their own navigation; each further app either fits the capped-org budget or joins the left-out list (ADR-0223 decision 5) |
 
 ---
 
