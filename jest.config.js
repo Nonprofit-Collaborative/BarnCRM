@@ -27,6 +27,10 @@ module.exports = {
     // test that emits a tab id or checks openSubtab sees the module the component imported.
     '^lightning/platformWorkspaceApi$':
       '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/platformWorkspaceApi/platformWorkspaceApi.js',
+    // Same reason: c/fundersPrint's test mocks loadStyle, and lost to the unmocked stub in a
+    // worker where another component importing it ran first (2026-11-14).
+    '^lightning/platformResourceLoader$':
+      '<rootDir>/node_modules/@salesforce/sfdx-lwc-jest/src/lightning-stubs/platformResourceLoader/platformResourceLoader.js',
     // The accessibility assertion each component test makes (QA review Q5).
     '^barn/a11y$': '<rootDir>/packages/core/test/jest-helpers/a11y.js'
   },
