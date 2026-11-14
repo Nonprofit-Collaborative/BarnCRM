@@ -182,6 +182,7 @@ private class SampleDataFileTest {
 	}
 
 	@IsTest
+	// runs-as: deploying user (reads one setting through SettingsService, no records or access)
 	static void aStepRunsOnlyWhileItsSettingIsOn() {
 		Assert.isTrue(
 			SampleDataFile.settingAllows(new Map<String, Object>()),
@@ -201,6 +202,7 @@ private class SampleDataFileTest {
 	}
 
 	@IsTest
+	// runs-as: deploying user (counts queries against static resources, read in system mode)
 	static void preloadReadsEveryFileInOneQuery() {
 		Integer before = Limits.getQueries();
 		SampleDataFile.preload(new List<String>{ 'NoSuchSampleDataA', 'NoSuchSampleDataB' });

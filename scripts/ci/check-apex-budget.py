@@ -83,8 +83,10 @@ CAPS = {
     # from the module catalog (HubController): 2,259,870 measured, plus about 0.1%.
     # Raised 2026-11-13 for the Batch K QA fixes (digest occurrences, Health Check step labels,
     # skew ranking, AsyncStarter refusal kinds, quick link tab visibility, match key mark):
-    # 2,267,169 measured, plus about 0.1%.
-    "core": 2_269_400,
+    # 2,267,169 measured, plus about 0.1%. Raised again 2026-11-13 for release 1.25 sample data
+    # (CoreSampleData's loader support: whenSetting steps, the find value, one-query preload of
+    # the module files): 2,269,708 measured, plus about 0.1%.
+    "core": 2_272_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

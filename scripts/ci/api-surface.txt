@@ -1187,6 +1187,7 @@ core/SampleDataFile.cls | public class RemoveStages
 core/SampleDataFile.cls | public class SampleDataFile
 core/SampleDataFile.cls | public static Integer removeChunkSize
 core/SampleDataFile.cls | public static SampleDataFile find(String)
+core/SampleDataFile.cls | public static void preload(List<String>)
 core/SampleDataFile.cls | public void enqueueLoad()
 core/SampleDataFile.cls | public void enqueueRemove()
 core/SampleDataFile.cls | public void finish()
@@ -1323,6 +1324,7 @@ core/SetupObjectSelector.cls | public static Id groupId(String)
 core/SetupObjectSelector.cls | public static Map<String,Id> emailTemplateIds(Set<String>,Boolean)
 core/SetupObjectSelector.cls | public static Map<String,PermissionSet> permissionSets(Set<String>)
 core/SetupObjectSelector.cls | public static Map<String,PermissionSetGroup> permissionSetGroups(Set<String>)
+core/SetupObjectSelector.cls | public static Map<String,String> staticResourceBodies(Set<String>)
 core/SetupObjectSelector.cls | public static PermissionSet permissionSet(String)
 core/SetupObjectSelector.cls | public static StaticResource staticResource(String)
 core/SetupObjectSelector.cls | public static String staticResourceBody(String)
