@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM landing/batch-k d2bacab37 (the integrated Batch K build). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main f69141c1c (landing batch L, with batch K). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
