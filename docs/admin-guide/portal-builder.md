@@ -219,7 +219,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Sponsor Portal | `sponsor.json`, Event Management | My Sponsorships, My Leads (Scan to add, notes and interest, Download CSV), My Details |
 | Service Portal | `service.json`, Programs | My Programs, My Services, Upcoming Sessions, My Goals, My Referrals, My Details |
 | Requests | `requests.json`, Project Management | My Requests (send a request, reply, satisfaction), Updates (comments your staff shared). See [Requests and Issues](projects-requests.md) |
-| Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Funders | Shared Referrals, My Organizations, My Details; with Funders also My Grants and Grant Reports |
+| Partner Portal | `partner.json`, Programs; `partner-funders.json`, Programs and Grants | Shared Referrals, My Organizations, My Details; with Grants also My Grants and Grant Reports |
 
 **Attendee and Sponsor.** See [Event Management, Attendee App](events.md#attendee-app): the
 attendee list, connections, messages and agenda, and how sponsor lead scanning works. Every page
@@ -235,9 +235,9 @@ address. See [Programs](programs.md).
 **Partner.** For staff of partner organizations. A person sees the referrals whose **Partner
 Organization** is an organization they have a Current affiliation with, and only those with
 **Shared With Partner** on (off by default), without notes. My Organizations lists their current
-affiliations. `partner-funders.json` adds, where Funders is installed, My Grants (grants whose
+affiliations. `partner-funders.json` adds, where Grants is installed, My Grants (grants whose
 Funder Contact is the person) and Grant Reports (those grants' report, application and other
-document requirements once submitted). Use `partner.json` where Funders is not installed: a
+document requirements once submitted). Use `partner.json` where Grants is not installed: a
 template naming a missing module's object fails whole.
 
 **Member.** Pay Dues emails the member a payment link for the membership's dues, once Payments

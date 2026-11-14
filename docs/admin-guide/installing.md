@@ -34,7 +34,7 @@ stop mattering once BarnCRM is on AppExchange.
 | Volunteers | 202,668 | 151 | 11 |
 | Programs | 181,195 | 203 | 12 |
 | Logic Models | 58,027 | 106 | 5 |
-| Funders | 116,136 | 100 | 7 |
+| Grants | 116,136 | 100 | 7 |
 | Mirror | 221,010 | 170 | 1 |
 | Contact Point Sync | 43,980 | 2 | 2 |
 | **Every package** | **4,324,007** | **4,122** | **89** |

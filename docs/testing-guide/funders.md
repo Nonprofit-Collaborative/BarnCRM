@@ -1,12 +1,12 @@
-# Funders
+# Grants
 
-Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03), the Grant Calendar (F-08), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06), the board dashboard (F-07), the Grant Finder (F-09), application checklists (F-10), grant documents (F-11), budget versus awarded (F-12) and renewals (F-13). Setup detail: [Funders](../admin-guide/funders.md).
+Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03), the Grant Calendar (F-08), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06), the board dashboard (F-07), the Grant Finder (F-09), application checklists (F-10), grant documents (F-11), budget versus awarded (F-12) and renewals (F-13). Setup detail: [Grants](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
-and Funders deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
-Giving for their second halves. Funders
+and Grants deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
+Giving for their second halves. Grants
 works on the platform-only shape. Give the testers their roles on the **Access** page: admin
-(Admin role), staff (Fundraising Staff role) and read-only (Read Only role). Each gets its Funders
+(Admin role), staff (Fundraising Staff role) and read-only (Read Only role). Each gets its Grants
 permission set from the role. Have one organization, `Lakeside Foundation`, with a contact,
 `Pat Rivera`.
 
@@ -88,7 +88,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In Setup, look at each tester's **Permission Set Assignments**. | Staff holds **Funders Staff**, read-only **Funders Read Only**, the admin **Funders Admin**. |
+| 1 | In Setup, look at each tester's **Permission Set Assignments**. | Staff holds **Grants Staff**, read-only **Grants Read Only**, the admin **Grants Admin**. |
 | 2 | As staff, try to delete a grant. | No **Delete** is offered. |
 | 3 | As read-only, open **Grant Pipeline**. | `You can look at the pipeline but not change it.`; card menus offer only **Open**; no **New Grant**. |
 | 4 | As the admin, open **Health Check**. | `1 grant application is past its deadline`, linked to `Arts Grant`. |
@@ -122,7 +122,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **BarnCRM Settings**, **Funders** (under Fundraising). | **Create reminder tasks** on, **Email reminders** off, **Days before a deadline to remind** 14. Turn **Email reminders** on and save. |
+| 1 | **BarnCRM Settings**, **Grants** (under Fundraising). | **Create reminder tasks** on, **Email reminders** off, **Days before a deadline to remind** 14. Turn **Email reminders** on and save. |
 | 2 | BarnCRM Settings, General, Nightly Jobs panel. | **Grant Requirement Reminders** is listed as a step of the scheduled nightly run. |
 | 3 | In the Developer Console run `GrantReminderBatch.startMorning();`, or wait until the next morning. | The staff user has a task `Year 1 report due for Youth Grant` on the grant, due on the due date, and an email with a link to the grant. **Reminder Sent For** on the requirement shows the due date. |
 | 4 | Run it again. | No second task or email. |
@@ -289,7 +289,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff with Giving access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Funders tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
+| 1 | As staff with Giving access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
 | 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`, each with a bar; one amber notice holding the two warnings: Lakeside gives 35% (above 25 percent), and the five largest give more than half. |
 | 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
 | 4 | As staff without Giving access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
@@ -312,7 +312,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 3 | Search `literacy` again. | The same result shows **Saved**, not **Save to Pipeline**. |
 | 4 | Search `zzqqxxnothing`. | `No open opportunities match. Try other words.` |
 | 5 | As read-only, open the tab and search. | Results show; no **Save to Pipeline** buttons. |
-| 6 | As the admin, turn **Grant Finder** off in BarnCRM Settings, Funders; reload the tab as staff. | The tab says the Grant Finder is off and shows no search. Turn it back on. |
+| 6 | As the admin, turn **Grant Finder** off in BarnCRM Settings, Grants; reload the tab as staff. | The tab says the Grant Finder is off and shows no search. Turn it back on. |
 
 **Cleanup:** delete the saved grant and the organization it made.
 
@@ -376,3 +376,16 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 5 | As the admin, set **Days before an award ends to renew** to 0 in Settings. | Refused: from 1 to 365. |
 
 **Cleanup:** delete the renewal grant.
+
+## T-FUN-22: The Module Is Named Grants
+
+**Purpose:** confirm the module is called BarnCRM Grants (short name Grants) everywhere a person sees it (D-208).
+**Prerequisites:** admin; Grants deployed.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Modules**. | The row reads **BarnCRM Grants**, not BarnCRM Funders. In Setup Assistant step 7 the same name shows. |
+| 2 | **BarnCRM Settings**: read the Fundraising group. | It lists **Giving**, **Receipts** and **Grants**; **Grants** shows the five reminder, Grant Finder and renewal settings. |
+| 3 | In Setup, **Permission Sets**. | The three sets read **Grants Admin**, **Grants Staff** and **Grants Read Only**; Setup, **Custom Settings** lists **Grants Settings**. |
+| 4 | Open the **BarnCRM Grants** app, then **Grant Finder** with the Grant Finder setting off. | The tab says to turn it on in **BarnCRM Settings, Grants**. |
+| 5 | In App Builder, find the Board Dashboard component. | It is named **Grants Board Dashboard**. |

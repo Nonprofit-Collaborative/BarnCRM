@@ -12978,7 +12978,7 @@ version number. Uploading needs edit access to the requirement.
 
 ### Definition
 
-The Funders module's org-wide settings (F-02), edited in the Funders section of BarnCRM Settings.
+The Grants module's (renamed from Funders, D-208) org-wide settings (F-02), edited in the Grants section of BarnCRM Settings. The custom setting's label is Grants Settings; its API name stays `Funders_Settings__c`.
 
 ### Attributes
 
@@ -13013,7 +13013,7 @@ searches nothing. A blank or out of range renewal lead time reads as 90.
 
 - **Setting Definitions:** `Funders_Reminder_Tasks_Enabled`, `Funders_Reminder_Emails_Enabled`,
   `Funders_Reminder_Lead_Days`, `Funders_Grant_Finder_Enabled`, `Funders_Renewal_Lead_Days`,
-  section Funders.
+  section Grants (module `Funders`).
 
 ---
 

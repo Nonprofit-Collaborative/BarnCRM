@@ -1,8 +1,8 @@
-# Funders
+# Grants
 
 ## What It Does
 
-The BarnCRM Funders module (its app is named **BarnCRM Grants**) tracks the grants your organization asks for and wins. Each **grant**
+The BarnCRM Grants module (its app is also named **BarnCRM Grants**) tracks the grants your organization asks for and wins. Each **grant**
 is one request to one **funder** (a foundation, company or government body, stored as an
 organization): how much you asked for, its **stage** from first idea to the decision, the
 application deadline, the decision date, how much was awarded and the award period. The **Grant
@@ -35,7 +35,7 @@ year's application from it.
 
 ## Before You Install
 
-- Funders is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
+- Grants is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
 - It needs only BarnCRM Core installed first.
 - It does not need the Programs, Giving or Logic Models modules. With Programs installed, a grant
   can name a program; with Giving installed, it can name the Giving fund its money is booked to,
@@ -47,8 +47,8 @@ Install it from **Module Manager** (see [Module Manager](module-manager.md)). Wh
 finishes, BarnCRM does three things on its own:
 
 1. Creates the switch rows for the module's automations on the **Automation** page.
-2. Gives you, the person who installed it, the **Funders Admin** permission set.
-3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
+2. Gives you, the person who installed it, the **Grants Admin** permission set.
+3. Gives everyone who already has a BarnCRM role their Grants permission set (see below).
 
 Then open the **BarnCRM Grants** app from the App Launcher. It opens on the **Board Dashboard**,
 the module's home. Its tabs are **Board Dashboard**, **Grant Pipeline**, **Grant Calendar**,
@@ -61,22 +61,22 @@ the nightly run is not scheduled, run its **Schedule all nightly jobs** fix once
 
 ## Roles and Permission Sets
 
-You never assign the Funders permission sets by hand. Give people their BarnCRM role on the
+You never assign the Grants permission sets by hand. Give people their BarnCRM role on the
 [Access](access.md) page as usual, and the module gives each role its set:
 
-| BarnCRM role | Funders set they get | What they can do |
+| BarnCRM role | Grants set they get | What they can do |
 |---|---|---|
-| Admin (anyone holding BarnCRM Admin) | Funders Admin | Everything, including deleting a grant |
-| Fundraising Staff (Giving) | Funders Staff | Create and edit grants and move them through the stages; add, change and remove requirements, payments and restricted fund entries; never delete a grant |
-| Team Member | Funders Staff | The same as Fundraising Staff |
-| Read Only | Funders Read Only | Look at grants, the pipeline and the calendar |
+| Admin (anyone holding BarnCRM Admin) | Grants Admin | Everything, including deleting a grant |
+| Fundraising Staff (Giving) | Grants Staff | Create and edit grants and move them through the stages; add, change and remove requirements, payments and restricted fund entries; never delete a grant |
+| Team Member | Grants Staff | The same as Fundraising Staff |
+| Read Only | Grants Read Only | Look at grants, the pipeline and the calendar |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when
 you turn the module back on, and every hour with BarnCRM's access check, for roles given in
-Setup. The module only ever gives a set; if someone leaves a role, remove their Funders set in
+Setup. The module only ever gives a set; if someone leaves a role, remove their Grants set in
 Setup under **Users**, **Permission Set Assignments**.
 
-Grants are shared with everyone who has a Funders set (Public Read/Write), because a small team
+Grants are shared with everyone who has a Grants set (Public Read/Write), because a small team
 works one pipeline together. To keep each person's grants to themselves, set **Grant** to
 Private in Setup, **Sharing Settings**; the board's **Everyone** view then shows only the grants
 each person can see.
@@ -163,7 +163,7 @@ With the Programs module installed, the grant's page has a **Program** card. Cho
 from the list and click **Save**; choose **No program** to clear it. Without Programs the card
 is not shown at all (staff cannot install a module, so the page does not ask them to). The
 Giving Fund and Logic Model Outcomes cards do the same without their module. The grant stores the
-program's record ID, so Funders works without Programs; if the program is later deleted, the card
+program's record ID, so Grants works without Programs; if the program is later deleted, the card
 says the program cannot be found and you can choose another.
 
 ### Outcomes a Requirement Reports On
@@ -177,11 +177,11 @@ the grant's award period (every period when the grant has no award period yet), 
 glance what you will report.
 
 Any requirement type can name an outcome; Deliverable and Narrative Report are the usual ones. The
-requirement stores the outcome's record ID in **Logic Model Outcome**, so Funders and Logic Models
+requirement stores the outcome's record ID in **Logic Model Outcome**, so Grants and Logic Models
 never need each other: without Logic Models the card is not shown, and if the outcome
 is later deleted the card says it cannot be found. The automation **Requirement: outcome is an
 outcome** always runs and refuses anything in that field that is not one. Choosing an
-outcome needs edit access to requirements (Funders Staff or Admin) and read access to Logic
+outcome needs edit access to requirements (Grants Staff or Admin) and read access to Logic
 Models; the outcomes and results shown follow each person's own Logic Models access.
 
 ## The Grant Pipeline Tab
@@ -213,11 +213,11 @@ Submitted** only to people who can change requirements.
 
 ## The Board Dashboard Tab
 
-The **Board Dashboard** tab is the Funders app's home and answers the questions a board asks
-about money, for the current fiscal year. Everyone with a Funders set sees it; it only reads, and
+The **Board Dashboard** tab is the Grants app's home and answers the questions a board asks
+about money, for the current fiscal year. Everyone with a Grants set sees it; it only reads, and
 it stores nothing. At the top, tiles show **Revenue This Fiscal Year**, **Awarded This Fiscal
 Year**, with Giving **Gifts to funds**, and, with restricted fund tracking, **Restricted Grants:
-Balance**. Under them, a tile for each Funders tab the person can open (Grant Pipeline, Grant
+Balance**. Under them, a tile for each Grants tab the person can open (Grant Pipeline, Grant
 Calendar, Grants, Grant Requirements, Grant Answers and, for admins, Funder Report Templates).
 
 - **Revenue Mix**: grants awarded this fiscal year (stage Awarded, decision date this fiscal year)
@@ -267,7 +267,7 @@ Not Started and In Progress are open; Submitted, Accepted, Waived and Done are d
 Submitted Date; switch it off while you load past requirements with their own dates.
 
 A requirement belongs to its grant: whoever can see the grant sees its requirements, and deleting
-the grant deletes them. Funders Staff can create, edit and delete requirements.
+the grant deletes them. Grants Staff can create, edit and delete requirements.
 
 ## Reminders
 
@@ -286,7 +286,7 @@ still lists the requirement once it is overdue.
 
 The job is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and shows on
 the Nightly Jobs panel as **Grant Requirement Reminders** (6:00 AM). It has no switch of its own;
-Health Check's **Schedule all nightly jobs** fix schedules the run if it is not. It does nothing while Funders is turned off or both reminder
+Health Check's **Schedule all nightly jobs** fix schedules the run if it is not. It does nothing while Grants is turned off or both reminder
 settings are off.
 
 ## Answer Library
@@ -309,9 +309,9 @@ topics you typed, and each answer with its topics, word count and last used date
 the answer on the clipboard and sets its **Last Used Date** to today, so answers nobody has used
 for a year stand out for a refresh. The card lists up to 500 answers, by title.
 
-Funders Admin and Funders Staff add, edit and delete answers; Funders Read Only can search and
+Grants Admin and Grants Staff add, edit and delete answers; Grants Read Only can search and
 copy them (their copies do not change the last used date). Answers are shared with everyone who
-has a Funders set. Topics are typed, not a picklist, so there is nothing to set up in Setup.
+has a Grants set. Topics are typed, not a picklist, so there is nothing to set up in Setup.
 
 ## Funder Report Templates
 
@@ -322,7 +322,7 @@ in a browser to print it or save it as a PDF, or in a word processor to edit it 
 it. Nothing is saved in BarnCRM.
 
 BarnCRM ships one template, **Grant report**, copied in at install. To change it or add your own,
-open the **Funder Report Templates** tab (Funders Admin only):
+open the **Funder Report Templates** tab (Grants Admin only):
 
 | Field | What to put |
 |---|---|
@@ -361,7 +361,7 @@ Grants.gov page.
 **Application Deadline**, **Funding Source** Federal, the agency as **Federal Agency** and the
 first assistance listing number. The funder is the organization with the agency's exact name, or
 a new organization when you have none. A result already saved shows **Saved** with a link to its
-grant. Saving needs permission to create grants (Funders Admin or Staff).
+grant. Saving needs permission to create grants (Grants Admin or Staff).
 
 Only the words you search leave your org. BarnCRM installs the Remote Site Setting
 **BarnCRM_Grants_Gov** (`https://api.grants.gov`) so the search works without a Setup step; keep
@@ -407,7 +407,7 @@ Personnel, Supplies), each with **Amount Requested** and, once awarded, **Amount
 **Spent** restricted fund entry can name its **Budget Line**. The **Budget** card shows each
 line's requested, awarded, spent and remaining amounts, the line totals against the grant's
 Amount Requested and Amount Awarded (flagged when they differ), and spending not on a line.
-Funders Admin and Staff add and change lines; Read Only sees them.
+Grants Admin and Staff add and change lines; Read Only sees them.
 
 ## Renewals
 
@@ -425,7 +425,7 @@ grant in the chain, earlier and later, with its award period and amounts.
 
 ## Settings
 
-Open **BarnCRM Settings**, **Funders** (under Fundraising). Each setting saves for the whole
+Open **BarnCRM Settings**, **Grants** (under Fundraising). Each setting saves for the whole
 organization.
 
 | Setting | Default | What it does |
@@ -442,8 +442,8 @@ until you turn it on.
 
 ## Health Check
 
-With Funders installed, [Health Check](health-check.md) asks two more questions, shown only to
-people who can manage BarnCRM Settings and not while Funders is turned off:
+With Grants installed, [Health Check](health-check.md) asks two more questions, shown only to
+people who can manage BarnCRM Settings and not while Grants is turned off:
 
 | Finding | Severity | What it means | What to do |
 |---|---|---|---|
@@ -505,7 +505,7 @@ import past payments and entries.
 
 With the Giving module installed, the grant's page has a **Giving Fund** card. Choose the fund the
 organization books this money to in Giving and click **Save**. Like the program, the grant stores
-the fund's record ID, so Funders works without Giving; without Giving the card is not shown. Funders
+the fund's record ID, so Grants works without Giving; without Giving the card is not shown. Grants
 reads only the fund's name: Giving's own fund totals count the gifts you record in Giving, and the
 grant's restricted ledger counts its entries, so nothing is counted twice.
 
@@ -533,8 +533,8 @@ the first). **Remove Sample Data** takes them away again. See
 
 ## Turning It Off
 
-Turning Funders off in Module Manager stops its automations, its reminders and its Health Check
-questions; the records stay. No Funders set is given while it is off.
+Turning Grants off in Module Manager stops its automations, its reminders and its Health Check
+questions; the records stay. No Grants set is given while it is off.
 
 ## A Five-Minute Walkthrough
 
@@ -542,7 +542,7 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
 
 1. On the [Access](access.md) page, give Dana the **Fundraising Staff** role.
 2. In Setup, open Dana's user record and look at **Permission Set Assignments**. Within a minute
-   she holds **Funders Staff**.
+   she holds **Grants Staff**.
 3. Open the **BarnCRM Grants** app. On **Grants**, create "2027 Literacy Grant" for any
    organization, **Amount Requested** 25,000, **Application Deadline** two weeks from today.
 4. Open **Grant Pipeline**. The grant is in the **Prospect** column, and in **Upcoming

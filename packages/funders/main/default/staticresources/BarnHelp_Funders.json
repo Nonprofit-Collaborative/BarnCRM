@@ -42,7 +42,7 @@
     "Funders_Finder_Intro": "Search open federal funding listings on Grants.gov. Only the words you search are sent. Save a listing to add it to the pipeline as a prospect.",
     "Funders_Finder_Listing": "Assistance listing",
     "Funders_Finder_Number": "Listing number",
-    "Funders_Finder_Off": "The Grant Finder is turned off. An admin can turn it on in BarnCRM Settings, Funders.",
+    "Funders_Finder_Off": "The Grant Finder is turned off. An admin can turn it on in BarnCRM Settings, Grants.",
     "Funders_Finder_Opens": "Opens",
     "Funders_Finder_Posted": "Posted",
     "Funders_Finder_Save": "Save to Pipeline",
@@ -101,7 +101,7 @@
     "Funders_Outcomes_NoIndicators": "No indicator results for the award period yet.",
     "Funders_Outcomes_NoRequirements": "This grant has no requirements yet. Add one under Requirements, then link it to an outcome here.",
     "Funders_Pipeline_ColumnEmpty": "No grants at this stage.",
-    "Funders_Pipeline_ErrorNoPermission": "You do not have permission to change grants. Ask your admin for a Funders role.",
+    "Funders_Pipeline_ErrorNoPermission": "You do not have permission to change grants. Ask your admin for a Grants role.",
     "Funders_Pipeline_ErrorStage": "Choose one of the grant stages.",
     "Funders_Pipeline_ErrorUnexpected": "Something went wrong and the change was not saved. Try again, or ask your admin to look at the Error Log.",
     "Funders_Pipeline_ReadOnly": "You can look at the pipeline but not change it.",
@@ -114,7 +114,7 @@
     "Funders_Reminder_TaskFailed": "{0} of {1} grant requirement reminder tasks could not be saved and will be tried again tomorrow: {2}",
     "Funders_Reminder_TaskSubject": "{0} due for {1}",
     "Funders_Report_ErrorLoad": "The report could not be prepared. Reload the page; if it happens again, tell your BarnCRM admin.",
-    "Funders_Report_NoTemplates": "No active report template. A Funders admin adds one on the Funder Report Templates tab.",
+    "Funders_Report_NoTemplates": "No active report template. A Grants admin adds one on the Funder Report Templates tab.",
     "Funders_Schedule_CannotBuild": "To build a schedule, the grant must be Awarded, with an Amount Awarded, an Award Start Date and an Award End Date, and have no expected or received payments.",
     "Funders_Schedule_ErrorRows": "Each payment needs a due date within the award period and an amount above zero, and together they must add up to the amount awarded."
   }

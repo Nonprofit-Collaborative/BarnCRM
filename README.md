@@ -40,14 +40,14 @@ BarnCRM is a Core package plus optional module packages that depend on Core.
 | Mirror | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Nonprofit Cloud, planned), inbound gift REST API, accounting export | Core, Giving | v0.6 |
 | Volunteers | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core | v0.7 |
 | Programs | Programs, services, enrollments, attendance, service deliveries, light case notes, outcomes | Core | v0.8 |
-| Funders | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields | Core, Giving | v0.9 |
+| Grants | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields | Core, Giving | v0.9 |
 | Events | Simple event registration and attendance for non-fundraising events | Core | post-1.0 |
 
 ## Runs on
 
 Supported org shapes. Today CI's Apex gate runs on one long-lived test org (Person Accounts shape, `oi-test`); the others are tested by hand from the [Testing Guide](docs/testing-guide/README.md) in scratch orgs and sandboxes, so treat them as supported, not as a CI matrix:
 
-- Platform only (Salesforce Platform or Lightning Platform Plus licenses, no Opportunity, Campaign, Case, or Lead objects). This is the floor: Core, Giving, Volunteers, Programs, and Funders all work here.
+- Platform only (Salesforce Platform or Lightning Platform Plus licenses, no Opportunity, Campaign, Case, or Lead objects). This is the floor: Core, Giving, Volunteers, Programs, and Grants all work here.
 - Sales and Service Cloud (Enterprise Edition via Power of Us).
 - An org with NPSP installed (coexistence mode: adopt existing NPSP household accounts, optionally mirror gifts to Opportunities).
 - Agentforce Nonprofit (Person Accounts likely enabled; household junction mode; the Gift Transaction mirror, X-07, is planned and not built).

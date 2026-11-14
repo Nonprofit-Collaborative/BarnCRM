@@ -99,7 +99,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core** and **BarnCRM Rollup Builder** first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Funders** and **BarnCRM Mirror**. Deployed modules say **Installed**; Programs and Funders say **Not installed**. Every row has **What this module does**. |
+| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core** and **BarnCRM Rollup Builder** first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Grants** and **BarnCRM Mirror**. Deployed modules say **Installed**; Programs and Grants say **Not installed**. Every row has **What this module does**. |
 | 2 | Look at a **Not installed** row. | "No install link is published for this module yet." (no module has a published install version on main). |
 | 3 | Look at the **Core** row. | **Installed**, with no **Turn Off** button. |
 | 4 | On the **BarnCRM Volunteers** row, click **Turn Off**. | The row says **Installed and off**. **Turn On** replaces **Turn Off**. |
@@ -272,8 +272,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 2 | Click **Change Edition**. | It opens: "The edition decides which modules BarnCRM shows and offers to everyone. Changing it installs, removes and turns off nothing, and changes no records." and a **Switch to the Standard Edition** button. |
 | 3 | Click **Switch to the Standard Edition**. | A dialog "Change the Edition?" says modules already installed stay listed and keep working, with **Change Edition** and **Cancel**. |
 | 4 | Click **Change Edition**. | "Edition changed. Reload open BarnCRM pages to see the new module lists." **Edition** reads **Standard Edition**. |
-| 5 | Reload and open **Modules**. | **BarnCRM Programs** and **BarnCRM Funders** (not installed) are gone. Installed modules are still listed. |
-| 6 | Switch back to the Nonprofit Edition the same way. | **Edition** reads **Nonprofit Edition**; after a reload Programs and Funders are listed again. **Recent Changes** lists both edition changes as **Edition**, with old and new values that read **Nonprofit Edition** and **Standard Edition** (never the stored codes "Standard" or "Nonprofit" alone, nor the old codes "Community" or "Impact"). |
+| 5 | Reload and open **Modules**. | **BarnCRM Programs** and **BarnCRM Grants** (not installed) are gone. Installed modules are still listed. |
+| 6 | Switch back to the Nonprofit Edition the same way. | **Edition** reads **Nonprofit Edition**; after a reload Programs and Grants are listed again. **Recent Changes** lists both edition changes as **Edition**, with old and new values that read **Nonprofit Edition** and **Standard Edition** (never the stored codes "Standard" or "Nonprofit" alone, nor the old codes "Community" or "Impact"). |
 
 **Cleanup:** leave the Nonprofit Edition.
 

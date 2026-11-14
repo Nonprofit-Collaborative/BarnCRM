@@ -6,6 +6,6 @@
     ADR-0017 gives each package its own settings object.
   </description>
   <enableFeeds>false</enableFeeds>
-  <label>Funders Settings</label>
+  <label>Grants Settings</label>
   <visibility>Protected</visibility>
 </CustomObject>

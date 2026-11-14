@@ -93,7 +93,7 @@ example `FundersSampleData`); Core loads it when no class of that name is instal
 - `count` is the status card's number. `remove` entries are deleted in order, in chunks, with
   partial success: a record the organization's own records point at is kept and named in one
   Warning in the Error Log. `hasSampleRecords` is true while any `remove` entry matches.
-- The Funders, Programs and Events files reproduce the records their former loader classes
+- The Grants, Programs and Events files reproduce the records their former loader classes
   built. Giving and Volunteers keep their loader classes for now: their loads run module rules
   a file cannot express yet (the org's default fund, suppressed default allocations, ask
   stages, overdue installments, approval verbs on hours).

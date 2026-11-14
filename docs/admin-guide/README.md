@@ -245,20 +245,20 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | L-01 to L-04 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period, results typed in, imported or computed from a saved query, the Logic Model Report | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
 
-### Funders
+### Grants
 
 | Feature | Page | Package |
 |---|---|---|
-| F-01 Funders: install, roles, grants and their stages, the program a grant pays for, the Grant Pipeline tab | [funders.md](funders.md) | BarnCRM Funders |
-| F-02 Reporting requirements and deadlines: grant requirements, morning reminder tasks and emails, the Funders settings, overdue requirements in Health Check | [funders.md](funders.md#grant-requirements) | BarnCRM Funders |
-| F-05 Multi-year award schedules: payments, Build Schedule, Mark Received | [funders.md](funders.md#award-schedules) | BarnCRM Funders |
-| F-03 Restricted fund tracking: the restricted ledger, its balance, received payments entered for you, the Giving fund a grant is booked to | [funders.md](funders.md#restricted-funds) | BarnCRM Funders |
-| F-08 Deadline calendar: the Grant Calendar tab | [funders.md](funders.md#the-grant-calendar-tab) | BarnCRM Funders |
-| F-04 Government award fields: funding source, federal agency, Assistance Listing number, award number, indirect cost rate, match | [funders.md](funders.md#government-awards) | BarnCRM Funders |
-| F-14 Answer and boilerplate library: Grant Answers | [funders.md](funders.md#answer-library) | BarnCRM Funders |
-| L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Funders |
-| F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Funders |
-| F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Funders |
+| F-01 Grants: install, roles, grants and their stages, the program a grant pays for, the Grant Pipeline tab | [funders.md](funders.md) | BarnCRM Grants |
+| F-02 Reporting requirements and deadlines: grant requirements, morning reminder tasks and emails, the Grants settings, overdue requirements in Health Check | [funders.md](funders.md#grant-requirements) | BarnCRM Grants |
+| F-05 Multi-year award schedules: payments, Build Schedule, Mark Received | [funders.md](funders.md#award-schedules) | BarnCRM Grants |
+| F-03 Restricted fund tracking: the restricted ledger, its balance, received payments entered for you, the Giving fund a grant is booked to | [funders.md](funders.md#restricted-funds) | BarnCRM Grants |
+| F-08 Deadline calendar: the Grant Calendar tab | [funders.md](funders.md#the-grant-calendar-tab) | BarnCRM Grants |
+| F-04 Government award fields: funding source, federal agency, Assistance Listing number, award number, indirect cost rate, match | [funders.md](funders.md#government-awards) | BarnCRM Grants |
+| F-14 Answer and boilerplate library: Grant Answers | [funders.md](funders.md#answer-library) | BarnCRM Grants |
+| L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Grants |
+| F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Grants |
+| F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Grants |
 | C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, the backfill | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
 | C-46 Address Verification: the org's own Smarty or Google key, checks on save and nightly, corrections, the nightly limit, Health Check | [address-verification.md](address-verification.md) | BarnCRM Address Verification |
 

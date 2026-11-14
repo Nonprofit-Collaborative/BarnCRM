@@ -19,7 +19,7 @@ Admin). If you cannot find the apps, ask your admin. See
 | **BarnCRM Fundraising** | Gifts and everything around them (with the Giving module) | A standard app: each record replaces the page |
 | **BarnCRM Volunteers** | Jobs, shifts and volunteer hours (with the Volunteers module) | A console, like BarnCRM Console |
 | **BarnCRM Programs** | Programs, the services they offer and the people enrolled in them (with the Programs module) | A console, like BarnCRM Console |
-| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (with the Funders module) | A console, like BarnCRM Console |
+| **BarnCRM Grants** | Grants applied for and awarded, and what each award requires (with the Grants module) | A console, like BarnCRM Console |
 
 **Which one should I open?** For everyday work, open **BarnCRM** or **BarnCRM Console**: they
 hold the same things and differ only in how records open, so pick the one you like and star it.

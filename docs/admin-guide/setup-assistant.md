@@ -296,7 +296,7 @@ GitHub). A module that is not installed and has a published version also has an
   nonprofit modules.
 - With the Nonprofit Edition chosen, it shows Core and every module, among them BarnCRM Rollup
   Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
-  Funders, and BarnCRM Mirror.
+  Grants, and BarnCRM Mirror.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means

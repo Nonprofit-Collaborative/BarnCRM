@@ -109,7 +109,7 @@ a sample enrollment that has a case note (whoever wrote it, even a note you cann
 Warning in the [Error Log](error-log.md) names each kept record by kind: "Sample data removal
 kept some Programs sample records, because records of your own point at them: Programs (Food
 pantry). Move or delete your records, then remove sample data again." The same Warning covers
-any module whose sample set ships as a data file (Programs, Logic Models, Funders and Events).
+any module whose sample set ships as a data file (Programs, Logic Models, Grants and Events).
 
 ### With Logic Models Installed
 
@@ -132,9 +132,9 @@ has a long term outcome with no indicator yet, so it lists that one reminder. Re
 the two sample models with their parts, arrows, evidence, indicators and periods; your own
 models are never touched.
 
-### With Funders Installed
+### With Grants Installed
 
-With the **Funders** package installed, the same action also loads, after Programs if it is
+With the **Grants** package installed, the same action also loads, after Programs if it is
 there:
 
 | Records | How many | What is in them |
@@ -146,11 +146,11 @@ there:
 | Grant budget lines | 2 | On the same award: Tutor stipends (30,000 requested, 28,000 awarded), which the Spent entry is on, and Books and supplies (10,000 requested, 7,000 awarded). |
 
 Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
-Funders when the core sample organizations are not there.
+Grants when the core sample organizations are not there.
 
 ### With Event Management Installed
 
-With the **Event Management** package installed, the same action also loads, after Funders if it
+With the **Event Management** package installed, the same action also loads, after Grants if it
 is there, for the sample people (and the sample organizations, for sponsors):
 
 | Records | How many | What is in them |

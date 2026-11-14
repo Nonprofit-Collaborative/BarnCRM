@@ -1,4 +1,4 @@
-# BarnCRM Funders (the BarnCRM Grants app)
+# BarnCRM Grants (package folder `funders`)
 
 ## Purpose
 
@@ -46,6 +46,6 @@ and a Giving fund by record identifier (text), resolved by describe only where a
   `GrantOutcomeService`), resolved by describe only where Logic Models is installed.
 - `Funder_Report_Template__c` (29ZO) and its shipped defaults, merged in the browser by the
   Funder Report card (`grantReport`, framework-free `grantReportModel`, `GrantReportController`).
-- The **Funders Board** tab (`fundersBoard`, framework-free `fundersBoardModel`,
+- The **Board Dashboard** tab (`Funders_Board`, `fundersBoard`, framework-free `fundersBoardModel`,
   `FundersBoardController`).
-- Permission sets Funders Admin, Staff and Read Only, given by role through `FundersAccessSync`.
+- Permission sets Grants Admin, Staff and Read Only, given by role through `FundersAccessSync`.

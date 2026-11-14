@@ -186,7 +186,7 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Click **Source** under `Tutoring sessions` and choose **Computed**. | **Template** shows **People Served by a Service** first, then **Services Delivered**, **Approved Volunteer Hours**, and **Saved Query** last (**Grants Awarded** too where Funders is installed). A **Service** box is required; **Save** is disabled until one is chosen. |
+| 1 | Click **Source** under `Tutoring sessions` and choose **Computed**. | **Template** shows **People Served by a Service** first, then **Services Delivered**, **Approved Volunteer Hours**, and **Saved Query** last (**Grants Awarded** too where Grants is installed). A **Service** box is required; **Save** is disabled until one is chosen. |
 | 2 | Choose **Services Delivered**, **Service** `Tutoring`, **Save**. | `Working out results` shows, then this year's result: the deliveries of Tutoring that are not absences. The source line names the query `Services Delivered: Tutoring`. |
 | 3 | Open **Find**. | A private saved query `Services Delivered: Tutoring` on Service Deliveries, filtered to Tutoring and leaving out both absence values, with no date filter. |
 | 4 | Back on the indicator, click **Source**. | **Template** shows **Saved Query** with the new query picked. |

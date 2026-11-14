@@ -465,7 +465,7 @@
     "Core_Duplicates_ShowingCount": "Showing {0} of {1} suggestions, newest first.",
     "Core_Duplicates_ShowingCountMore": "Showing {0} of more than {1} suggestions, newest first.",
     "Core_Edition_ChangeIntro": "The edition decides which modules BarnCRM shows and offers to everyone. Changing it installs, removes and turns off nothing, and changes no records.",
-    "Core_Edition_ConfirmToNonprofit": "BarnCRM will show and offer the nonprofit modules (Giving, Volunteers, Programs, Logic Models, Funders and Mirror) in the Setup Assistant, Module Manager and home page, to every admin and user. Nothing is installed: you install each module yourself.",
+    "Core_Edition_ConfirmToNonprofit": "BarnCRM will show and offer the nonprofit modules (Giving, Volunteers, Programs, Logic Models, Grants and Mirror) in the Setup Assistant, Module Manager and home page, to every admin and user. Nothing is installed: you install each module yourself.",
     "Core_Edition_ConfirmToStandard": "BarnCRM will stop showing and offering nonprofit modules that are not installed, to every admin and user. Modules already installed stay listed and keep working. Nothing is removed.",
     "Core_Edition_NotChosen": "Not chosen yet. Choose it in first-run setup, or with Change edition below.",
     "Core_Edition_Saved": "Edition changed. Reload open BarnCRM pages to see the new module lists.",

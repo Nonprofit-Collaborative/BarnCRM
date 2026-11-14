@@ -31,11 +31,11 @@ Which modules are listed depends on the edition chosen in first-run setup (see
 Core, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event
 Management and BarnCRM Portal Builder. The Nonprofit Edition lists all twelve: Core, BarnCRM Rollup Builder, BarnCRM Forms,
 BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
-Funders and BarnCRM Mirror. A module that is installed is always listed, whatever the edition. See
+Grants and BarnCRM Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
 The modules that only the Nonprofit Edition offers (Giving, Volunteers, Programs, Logic Models,
-Funders and Mirror; the module catalog decides, not a fixed list) are grouped in their own section at the
+Grants and Mirror; the module catalog decides, not a fixed list) are grouped in their own section at the
 bottom of the list, titled **Nonprofit Modules**. Core and the modules both editions offer come
 first. The section has a **Show Nonprofit Modules** checkbox, ticked by default. Clear it and
 the nonprofit modules are hidden from the list; the checkbox stays so you can tick it again.
