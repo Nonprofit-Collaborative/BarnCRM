@@ -8761,6 +8761,7 @@ access to none: whoever runs it sees what their own access allows.
 | Object | text (255) | yes | API name of the object the query reads, copied from the document so the list can show and filter it without parsing JSON. |
 | Query | long text | yes | The query document (R-SQ1). |
 | Shared | boolean | no | True when everyone who uses Find can open it (R-SQ4). Default false. |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 | Owner | reference(User) | yes | The person who saved it; only they can change, share or delete it. |
 
 ### Rules
@@ -8950,6 +8951,7 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
 | Object | `Object_Name__c` | Text (255) |
 | Query | `Query_JSON__c` | Long Text Area (131072) |
 | Shared | `Shared__c` | Checkbox, default false |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 - **Apex sharing reason:** `Shared_With_Find_Users__c` (Apex sharing reason API names end in `__c`).
 - **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
@@ -15298,6 +15300,7 @@ A place events are held, kept once and picked on each event (EV-24, ADR-0215
 | Capacity | number | no | The most people the venue holds. |
 | Map Link | URL | no | A map or floor plan, shown in the attendee app. |
 | Notes | long text | no | Parking, access, loading and contacts. |
+| Sample Data | boolean | yes (defaults false) | True when the record was created by the sample data loader so it can be removed in one action. |
 
 ### Rules
 
@@ -15318,6 +15321,7 @@ events already saved.
 | Capacity | `Capacity__c` | Number(7, 0) |
 | Map Link | `Map_URL__c` | URL(255) |
 | Notes | `Notes__c` | Long Text Area(5000) |
+| Sample Data | `Sample_Data__c` | Checkbox |
 
 ---
 

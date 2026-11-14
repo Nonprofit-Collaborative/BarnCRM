@@ -214,7 +214,87 @@ private class EventsSampleDataTest {
 				],
 				'Four community registrations'
 			);
+			assertOperations(conference.Id);
 		}
+	}
+
+	/** The venue and rooms, seating, budget, ratings, survey, appointments and agenda picks. */
+	private static void assertOperations(Id conferenceId) {
+		Event__c conference = [
+			SELECT Venue__c, Venue__r.Name
+			FROM Event__c
+			WHERE Id = :conferenceId
+			WITH SYSTEM_MODE
+		];
+		Assert.areEqual('Riverside Meeting Hall', conference.Venue__r.Name, 'Held at the venue');
+		Assert.areEqual(
+			4,
+			[
+				SELECT COUNT()
+				FROM Event_Room__c
+				WHERE Venue__c = :conference.Venue__c
+				WITH SYSTEM_MODE
+			],
+			'Four rooms'
+		);
+		Assert.areEqual(
+			8,
+			[
+				SELECT COUNT()
+				FROM Event_Session__c
+				WHERE Event__c = :conferenceId AND Venue_Room__c != NULL
+				WITH SYSTEM_MODE
+			],
+			'Every session is in one of the venue rooms'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Event_Table__c WHERE Event__c = :conferenceId WITH SYSTEM_MODE],
+			'Two dinner tables'
+		);
+		Assert.areEqual(
+			5,
+			[SELECT COUNT() FROM Event_Attendee__c WHERE Event_Table__c != NULL WITH SYSTEM_MODE],
+			'Five guests are seated'
+		);
+		Assert.areEqual(
+			4,
+			[SELECT COUNT() FROM Event_Expense__c WHERE Event__c = :conferenceId WITH SYSTEM_MODE],
+			'Four budget lines'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Event_Funding__c WHERE Event__c = :conferenceId WITH SYSTEM_MODE],
+			'Two funding lines'
+		);
+		Event_Session__c keynote = [
+			SELECT Rating_Count__c, Room__c
+			FROM Event_Session__c
+			WHERE Event__c = :conferenceId AND Name = 'Opening Keynote'
+			WITH SYSTEM_MODE
+		];
+		Assert.areEqual(2, keynote.Rating_Count__c, 'The keynote has two ratings');
+		Assert.areEqual('Main Hall', keynote.Room__c, 'The room names the session');
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Event_Survey_Response__c WITH SYSTEM_MODE],
+			'Two survey responses'
+		);
+		Assert.areEqual(
+			2,
+			[
+				SELECT COUNT()
+				FROM Event_Appointment__c
+				WHERE Event__c = :conferenceId
+				WITH SYSTEM_MODE
+			],
+			'One booked and one open appointment'
+		);
+		Assert.areEqual(
+			2,
+			[SELECT COUNT() FROM Agenda_Item__c WITH SYSTEM_MODE],
+			'Two personal agenda picks'
+		);
 	}
 
 	@IsTest
@@ -260,6 +340,11 @@ private class EventsSampleDataTest {
 				0,
 				[SELECT COUNT() FROM Event_Track__c WITH SYSTEM_MODE],
 				'The sample tracks went with their event'
+			);
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Event_Venue__c WITH SYSTEM_MODE],
+				'The sample venue and its rooms went too'
 			);
 		}
 	}

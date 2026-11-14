@@ -1507,6 +1507,85 @@ def build_asks(adults, giving_households, organizations, commitments):
     return asks
 
 
+# Gift details added after the rest of the set was settled (release 1.25), drawn from their own
+# seed and applied after every other gift is built, so that every gift, credit and tribute
+# generated before them is byte for byte what it was.
+GIFT_DETAILS_SEED = 20261113
+STOCK_SYMBOLS = [("EXMP", 84.25), ("SMPL", 131.5), ("DEMO", 47.8)]
+GIFT_SOURCES = [
+    ("Donor-Advised Fund", "Example Community Foundation Giving Fund"),
+    ("Donor-Advised Fund", "Example Charitable Giving Account"),
+    ("Family Foundation", None),
+]
+GIFT_SOURCE_COUNT = 8
+MATCHING_EMPLOYERS = ["O002", "O009", "O005"]
+
+
+def add_gift_details(builder, organizations, tributes, soft_credits):
+    """Stock details, gift sources and three employer matches (G-10, G-36, G-37).
+
+    Every Stock gift gets a symbol and a share count that its amount implies. Eight of the
+    larger person gifts arrive through a donor-advised fund or a family foundation, named
+    where the fund is a giving account. Three businesses match an employee's gift: each match
+    is a new gift appended to the file, from the business, naming the employee's gift in
+    `matchedGift`, so the matching rules link both sides and credit the employee.
+    """
+    rng = random.Random(GIFT_DETAILS_SEED)
+    by_name = {organization["key"]: organization for organization in organizations}
+    for gift in builder.gifts:
+        if gift["type"] == "Stock" and gift["amount"] > 0:
+            symbol, price = STOCK_SYMBOLS[rng.randrange(len(STOCK_SYMBOLS))]
+            gift["stockSymbol"] = symbol
+            gift["stockShares"] = round(gift["amount"] / price, 4)
+
+    linked = {row["gift"] for row in tributes} | {row["gift"] for row in soft_credits}
+    candidates = [
+        gift
+        for gift in builder.gifts
+        if gift["donor"].startswith("H")
+        and gift["status"] == "Received"
+        and gift["type"] in ("Check", "ACH", "Card")
+        and gift["commitment"] is None
+        and gift["key"] not in linked
+        and not gift["donor"].startswith("H001")
+    ]
+    sources = [gift for gift in candidates if gift["amount"] >= 1000]
+    for gift in rng.sample(sources, min(GIFT_SOURCE_COUNT, len(sources))):
+        source, name = GIFT_SOURCES[rng.randrange(len(GIFT_SOURCES))]
+        gift["giftSource"] = source
+        if name:
+            gift["giftSourceName"] = name
+
+    employees = [
+        gift
+        for gift in candidates
+        if 100 <= gift["amount"] <= 1000 and 45 <= gift["daysAgo"] <= 330 and "giftSource" not in gift
+    ]
+    for employer, employee_gift in zip(MATCHING_EMPLOYERS, rng.sample(employees, len(MATCHING_EMPLOYERS))):
+        if employer not in by_name:
+            continue
+        sequence = len(builder.gifts) + 1
+        days_ago = employee_gift["daysAgo"] - 30
+        builder.gifts.append(
+            {
+                "key": "G{0:04d}".format(sequence),
+                "donor": employer,
+                "daysAgo": days_ago,
+                "amount": employee_gift["amount"],
+                "type": "Check",
+                "status": "Received",
+                "appeal": employee_gift["appeal"],
+                "acknowledgmentStatus": acknowledgment_for(days_ago, employee_gift["amount"]),
+                "paymentReference": payment_reference("Check", sequence),
+                "commitment": None,
+                "matchedGift": employee_gift["key"],
+                "allocations": [
+                    {"fund": employee_gift["allocations"][0]["fund"], "amount": employee_gift["amount"]}
+                ],
+            }
+        )
+
+
 def build_giving(rng, households, organizations):
     """The whole Giving payload, built against the households the Core set creates."""
     funds = [
@@ -1580,6 +1659,7 @@ def build_giving(rng, households, organizations):
     tributes = build_tributes(rng, builder, households)
     soft_credits = build_soft_credits(rng, builder, adults, giving_households)
     asks = build_asks(adults, giving_households, organizations, commitments)
+    add_gift_details(builder, organizations, tributes, soft_credits)
 
     return {
         "funds": funds,

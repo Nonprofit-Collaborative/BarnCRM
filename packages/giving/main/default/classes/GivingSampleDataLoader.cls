@@ -240,10 +240,16 @@ public with sharing class GivingSampleDataLoader {
 		// The refunds go in second. A negative gift must name the gift it reverses (rule
 		// R-G3, enforced by a validation rule), and in this file a reversal sits directly
 		// after the gift it reverses, so its original is usually still unsaved at this point.
+		// An employer's matching gift goes in second too, naming the employee's gift it
+		// matches (G-10), so the matching rules write the other side of the link and the
+		// matched donor credit as they would for a match entered on screen.
 		List<Map<String, Object>> originals = new List<Map<String, Object>>();
 		List<Map<String, Object>> reversals = new List<Map<String, Object>>();
 		for (Map<String, Object> row : chunk) {
-			if (String.isBlank(GivingSampleDataSet.asString(row.get('originalGift')))) {
+			if (
+				String.isBlank(GivingSampleDataSet.asString(row.get('originalGift'))) &&
+				String.isBlank(GivingSampleDataSet.asString(row.get('matchedGift')))
+			) {
 				originals.add(row);
 			} else {
 				reversals.add(row);
@@ -354,7 +360,14 @@ public with sharing class GivingSampleDataLoader {
 			Refund_Reason__c = GivingSampleDataSet.asString(row.get('refundReason')),
 			Original_Gift__c = originalsByKey.get(
 				GivingSampleDataSet.asString(row.get('originalGift'))
-			)
+			),
+			Matched_Gift__c = originalsByKey.get(
+				GivingSampleDataSet.asString(row.get('matchedGift'))
+			),
+			Stock_Symbol__c = GivingSampleDataSet.asString(row.get('stockSymbol')),
+			Stock_Shares__c = GivingSampleDataSet.toDecimal(row.get('stockShares')),
+			Gift_Source__c = GivingSampleDataSet.asString(row.get('giftSource')),
+			Gift_Source_Name__c = GivingSampleDataSet.asString(row.get('giftSourceName'))
 		);
 		if ('Acknowledged'.equals(acknowledgment)) {
 			gift.Acknowledgment_Date__c = giftDate == null ? null : giftDate.addDays(4);
@@ -363,10 +376,11 @@ public with sharing class GivingSampleDataLoader {
 	}
 
 	/**
-	 * The gifts that the negative gifts in this chunk reverse. They are almost always in the
-	 * same chunk, and the file puts a reversal directly after its original, but a chunk
-	 * boundary between the two is a matter of how many gifts the file happens to hold, so
-	 * the originals already inserted are looked up rather than assumed.
+	 * The gifts that the negative gifts in this chunk reverse, and the employee gifts its
+	 * matching gifts match. They are almost always in the same chunk, and the file puts a
+	 * reversal directly after its original, but a chunk boundary between the two is a matter of
+	 * how many gifts the file happens to hold, so the originals already inserted are looked up
+	 * rather than assumed.
 	 */
 	private static Map<String, Id> originalsFor(
 		List<Map<String, Object>> chunk,
@@ -374,9 +388,11 @@ public with sharing class GivingSampleDataLoader {
 	) {
 		Set<String> externalIds = new Set<String>();
 		for (Map<String, Object> row : chunk) {
-			String originalKey = GivingSampleDataSet.asString(row.get('originalGift'));
-			if (String.isNotBlank(originalKey)) {
-				externalIds.add(GivingSampleData.EXTERNAL_ID_PREFIX + originalKey);
+			for (String link : new List<String>{ 'originalGift', 'matchedGift' }) {
+				String originalKey = GivingSampleDataSet.asString(row.get(link));
+				if (String.isNotBlank(originalKey)) {
+					externalIds.add(GivingSampleData.EXTERNAL_ID_PREFIX + originalKey);
+				}
 			}
 		}
 		Map<String, Id> byKey = new Map<String, Id>();

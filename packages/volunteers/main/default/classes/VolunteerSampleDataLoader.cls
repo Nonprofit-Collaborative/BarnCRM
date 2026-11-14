@@ -3,7 +3,8 @@
  * data"). The set is small and built in code rather than read from a static resource: three
  * jobs, four skills, one recurring schedule, a month of past shifts with attendance, a few
  * upcoming shifts with bookings, hours in each of the three statuses, skills and interests on
- * the people, and a few requirements.
+ * the people, a few requirements, and each person's volunteer profile (status, start date and
+ * availability).
  *
  * Every record goes through the module's own rules, as an administrator's would: sign-ups and
  * hours are inserted in user mode, attendance writes hours when Volunteer Settings says so, and
@@ -176,6 +177,29 @@ public with sharing class VolunteerSampleDataLoader {
 		Database.insert(hours, AccessLevel.USER_MODE);
 
 		insertSkillsAndRequirements(people, today);
+		updateProfiles(people, today);
+	}
+
+	/**
+	 * Each sample volunteer's profile: Active (the last two Inactive), since when and when they
+	 * are free, so suggestions, nudges and recognition have people to find. Saved past a
+	 * duplicate rule that only alerts, as Core saved these people; a person the org's own rules
+	 * refuse keeps a blank profile rather than stopping the load.
+	 */
+	private static void updateProfiles(List<Contact> people, Date today) {
+		List<String> days = 'Saturday,Monday;Wednesday,Tuesday;Thursday,Friday'.split(',');
+		Integer count = people.size();
+		for (Integer i = 0; i < count; i++) {
+			Contact person = people[i];
+			person.Volunteer_Status__c = i < count - 2 || count < 5 ? 'Active' : 'Inactive';
+			person.Volunteer_Since__c = today.addDays(-120 - 45 * i);
+			person.Availability_Days__c = days[Math.mod(i, 4)];
+			person.Availability_Times__c = Math.mod(i, 2) == 0 ? 'Morning' : 'Afternoon';
+		}
+		Database.DMLOptions options = new Database.DMLOptions();
+		options.DuplicateRuleHeader.allowSave = true;
+		options.OptAllOrNone = false;
+		Database.update(people, options, AccessLevel.USER_MODE);
 	}
 
 	/** Entries for attended sign-ups whose hours attendance did not write. */

@@ -7,6 +7,65 @@
   },
   "steps": [
     {
+      "object": "Event_Venue__c",
+      "records": [
+        {
+          "key": "venue",
+          "Name": "Riverside Meeting Hall",
+          "Venue_Address__c": "100 Example Street",
+          "Capacity__c": 200,
+          "Map_URL__c": "https://www.example.org/riverside-meeting-hall/map",
+          "Notes__c": "Parking for 80 cars behind the hall. The loading dock is on the north side; ask at the front desk for the key.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Event_Room__c",
+      "records": [
+        {
+          "key": "room-main",
+          "Venue__c": {
+            "ref": "venue"
+          },
+          "Name": "Main Hall",
+          "Capacity__c": 150,
+          "Setup__c": "Theater",
+          "Location__c": "Ground floor"
+        },
+        {
+          "key": "room-a",
+          "Venue__c": {
+            "ref": "venue"
+          },
+          "Name": "Room A",
+          "Capacity__c": 60,
+          "Setup__c": "Classroom",
+          "Location__c": "First floor, east wing"
+        },
+        {
+          "key": "room-b",
+          "Venue__c": {
+            "ref": "venue"
+          },
+          "Name": "Room B",
+          "Capacity__c": 25,
+          "Setup__c": "U-Shape",
+          "Location__c": "First floor, west wing"
+        },
+        {
+          "key": "room-dining",
+          "Venue__c": {
+            "ref": "venue"
+          },
+          "Name": "Dining Room",
+          "Capacity__c": 120,
+          "Setup__c": "Banquet",
+          "Location__c": "Ground floor"
+        }
+      ]
+    },
+    {
       "object": "Event__c",
       "records": [
         {
@@ -31,6 +90,10 @@
             "time": "17:00"
           },
           "Capacity__c": 150,
+          "Venue__c": {
+            "ref": "venue",
+            "optional": true
+          },
           "Venue_Name__c": "Riverside Meeting Hall",
           "Venue_Address__c": "100 Example Street",
           "Description__c": "Three days of talks, workshops and panels for small nonprofit teams.",
@@ -221,6 +284,10 @@
             "time": "10:00"
           },
           "Room__c": "Main Hall",
+          "Venue_Room__c": {
+            "ref": "room-main",
+            "optional": true
+          },
           "Status__c": "Confirmed"
         },
         {
@@ -242,6 +309,10 @@
             "time": "11:00"
           },
           "Room__c": "Room A",
+          "Venue_Room__c": {
+            "ref": "room-a",
+            "optional": true
+          },
           "Capacity__c": 60,
           "Status__c": "Confirmed"
         },
@@ -264,6 +335,10 @@
             "time": "12:00"
           },
           "Room__c": "Room B",
+          "Venue_Room__c": {
+            "ref": "room-b",
+            "optional": true
+          },
           "Capacity__c": 25,
           "Status__c": "Confirmed"
         },
@@ -283,6 +358,10 @@
             "time": "13:00"
           },
           "Room__c": "Dining Room",
+          "Venue_Room__c": {
+            "ref": "room-dining",
+            "optional": true
+          },
           "Status__c": "Confirmed"
         },
         {
@@ -304,6 +383,10 @@
             "time": "10:00"
           },
           "Room__c": "Room A",
+          "Venue_Room__c": {
+            "ref": "room-a",
+            "optional": true
+          },
           "Capacity__c": 60,
           "Status__c": "Confirmed"
         },
@@ -323,6 +406,10 @@
             "time": "12:00"
           },
           "Room__c": "Main Hall",
+          "Venue_Room__c": {
+            "ref": "room-main",
+            "optional": true
+          },
           "Status__c": "Confirmed"
         },
         {
@@ -341,6 +428,10 @@
             "time": "15:00"
           },
           "Room__c": "Main Hall",
+          "Venue_Room__c": {
+            "ref": "room-main",
+            "optional": true
+          },
           "Status__c": "Confirmed"
         },
         {
@@ -359,6 +450,10 @@
             "time": "16:00"
           },
           "Room__c": "Main Hall",
+          "Venue_Room__c": {
+            "ref": "room-main",
+            "optional": true
+          },
           "Status__c": "Draft"
         }
       ]
@@ -419,6 +514,170 @@
             "ref": "speaker-1"
           },
           "Role__c": "Panelist"
+        }
+      ]
+    },
+    {
+      "object": "Sponsorship_Level__c",
+      "records": [
+        {
+          "key": "level-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Gold",
+          "Amount__c": 2500,
+          "Sort_Order__c": 1,
+          "Deliverables__c": "Logo on the program\nBooth\nPasses: four conference passes"
+        },
+        {
+          "key": "level-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Silver",
+          "Amount__c": 1000,
+          "Sort_Order__c": 2,
+          "Deliverables__c": "Logo on the program\nPasses: two conference passes"
+        },
+        {
+          "key": "level-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Supporter",
+          "Amount__c": 250,
+          "Sort_Order__c": 3,
+          "Deliverables__c": "Logo on the program"
+        }
+      ]
+    },
+    {
+      "object": "Event_Sponsor__c",
+      "records": [
+        {
+          "key": "sponsor-0",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Account__c": {
+            "sample": "O022"
+          },
+          "Name": "Ashford Coffee Roasters",
+          "Level__c": {
+            "ref": "level-0"
+          },
+          "Amount__c": 2500,
+          "Status__c": "Confirmed"
+        },
+        {
+          "key": "sponsor-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Account__c": {
+            "sample": "O014"
+          },
+          "Name": "Ashford Community College",
+          "Level__c": {
+            "ref": "level-1"
+          },
+          "Amount__c": 1000,
+          "Status__c": "Committed"
+        },
+        {
+          "key": "sponsor-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Account__c": {
+            "sample": "O001"
+          },
+          "Name": "Bayview Hardware",
+          "Level__c": {
+            "ref": "level-2"
+          },
+          "Amount__c": 250,
+          "Status__c": "Prospect"
+        }
+      ]
+    },
+    {
+      "object": "Sponsor_Deliverable__c",
+      "records": [
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0"
+          },
+          "Name": "Logo on the program",
+          "Type__c": "Logo",
+          "Status__c": "Done",
+          "Due_Date__c": {
+            "days": -20
+          }
+        },
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0"
+          },
+          "Name": "Booth",
+          "Type__c": "Booth",
+          "Status__c": "Requested",
+          "Due_Date__c": {
+            "days": -5
+          }
+        },
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0"
+          },
+          "Name": "Passes: four conference passes",
+          "Type__c": "Passes",
+          "Status__c": "Pending",
+          "Due_Date__c": {
+            "days": 0
+          },
+          "Quantity__c": 4
+        },
+        {
+          "Event_Sponsor__c": {
+            "ref": "sponsor-1"
+          },
+          "Name": "Logo on the program",
+          "Type__c": "Logo",
+          "Status__c": "Received",
+          "Due_Date__c": {
+            "days": -10
+          }
+        }
+      ]
+    },
+    {
+      "object": "Event_Table__c",
+      "records": [
+        {
+          "key": "table-1",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Dinner Table 1",
+          "Capacity__c": 8,
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0",
+            "optional": true
+          },
+          "Host__c": {
+            "sample": "H001-1",
+            "optional": true
+          }
+        },
+        {
+          "key": "table-2",
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Dinner Table 2",
+          "Capacity__c": 8
         }
       ]
     },
@@ -567,6 +826,7 @@
       "object": "Event_Attendee__c",
       "records": [
         {
+          "key": "attendee-0",
           "Event_Registration__c": {
             "ref": "registration-0"
           },
@@ -578,9 +838,14 @@
             "ref": "general"
           },
           "Price__c": 36.0,
-          "Status__c": "Attended"
+          "Status__c": "Attended",
+          "Event_Table__c": {
+            "ref": "table-1",
+            "optional": true
+          }
         },
         {
+          "key": "attendee-1",
           "Event_Registration__c": {
             "ref": "registration-0"
           },
@@ -592,9 +857,14 @@
             "ref": "general"
           },
           "Price__c": 36.0,
-          "Status__c": "Attended"
+          "Status__c": "Attended",
+          "Event_Table__c": {
+            "ref": "table-1",
+            "optional": true
+          }
         },
         {
+          "key": "attendee-2",
           "Event_Registration__c": {
             "ref": "registration-1"
           },
@@ -606,9 +876,14 @@
             "ref": "student"
           },
           "Price__c": 15,
-          "Status__c": "Attended"
+          "Status__c": "Attended",
+          "Event_Table__c": {
+            "ref": "table-1",
+            "optional": true
+          }
         },
         {
+          "key": "attendee-3",
           "Event_Registration__c": {
             "ref": "registration-2"
           },
@@ -620,9 +895,14 @@
             "ref": "general"
           },
           "Price__c": 45,
-          "Status__c": "Registered"
+          "Status__c": "Registered",
+          "Event_Table__c": {
+            "ref": "table-2",
+            "optional": true
+          }
         },
         {
+          "key": "attendee-4",
           "Event_Registration__c": {
             "ref": "registration-3"
           },
@@ -634,9 +914,14 @@
             "ref": "general"
           },
           "Price__c": 36.0,
-          "Status__c": "Registered"
+          "Status__c": "Registered",
+          "Event_Table__c": {
+            "ref": "table-2",
+            "optional": true
+          }
         },
         {
+          "key": "attendee-5",
           "Event_Registration__c": {
             "ref": "registration-4"
           },
@@ -651,6 +936,7 @@
           "Status__c": "Attended"
         },
         {
+          "key": "attendee-6",
           "Event_Registration__c": {
             "ref": "registration-5"
           },
@@ -665,6 +951,7 @@
           "Status__c": "Registered"
         },
         {
+          "key": "attendee-7",
           "Event_Registration__c": {
             "ref": "registration-6"
           },
@@ -679,6 +966,7 @@
           "Status__c": "Registered"
         },
         {
+          "key": "attendee-8",
           "Event_Registration__c": {
             "ref": "registration-7"
           },
@@ -693,6 +981,7 @@
           "Status__c": "Registered"
         },
         {
+          "key": "attendee-9",
           "Event_Registration__c": {
             "ref": "registration-8"
           },
@@ -707,6 +996,7 @@
           "Status__c": "Registered"
         },
         {
+          "key": "attendee-10",
           "Event_Registration__c": {
             "ref": "registration-9"
           },
@@ -723,137 +1013,27 @@
       ]
     },
     {
-      "object": "Sponsorship_Level__c",
+      "object": "Event_Survey_Response__c",
       "records": [
         {
-          "key": "level-0",
-          "Event__c": {
-            "ref": "conference"
+          "Attendee__c": {
+            "ref": "attendee-0"
           },
-          "Name": "Gold",
-          "Amount__c": 2500,
-          "Sort_Order__c": 1,
-          "Deliverables__c": "Logo on the program\nBooth\nPasses: four conference passes"
+          "Submitted_On__c": {
+            "days": 0,
+            "time": "08:15"
+          },
+          "Answers__c": "{\"How would you rate the conference overall?\": \"5\", \"What should we change next year?\": \"More time between sessions to talk.\"}"
         },
         {
-          "key": "level-1",
-          "Event__c": {
-            "ref": "conference"
+          "Attendee__c": {
+            "ref": "attendee-2"
           },
-          "Name": "Silver",
-          "Amount__c": 1000,
-          "Sort_Order__c": 2,
-          "Deliverables__c": "Logo on the program\nPasses: two conference passes"
-        },
-        {
-          "key": "level-2",
-          "Event__c": {
-            "ref": "conference"
+          "Submitted_On__c": {
+            "days": 0,
+            "time": "08:40"
           },
-          "Name": "Supporter",
-          "Amount__c": 250,
-          "Sort_Order__c": 3,
-          "Deliverables__c": "Logo on the program"
-        }
-      ]
-    },
-    {
-      "object": "Event_Sponsor__c",
-      "records": [
-        {
-          "key": "sponsor-0",
-          "Event__c": {
-            "ref": "conference"
-          },
-          "Account__c": {
-            "sample": "O022"
-          },
-          "Name": "Ashford Coffee Roasters",
-          "Level__c": {
-            "ref": "level-0"
-          },
-          "Amount__c": 2500,
-          "Status__c": "Confirmed"
-        },
-        {
-          "key": "sponsor-1",
-          "Event__c": {
-            "ref": "conference"
-          },
-          "Account__c": {
-            "sample": "O014"
-          },
-          "Name": "Ashford Community College",
-          "Level__c": {
-            "ref": "level-1"
-          },
-          "Amount__c": 1000,
-          "Status__c": "Committed"
-        },
-        {
-          "key": "sponsor-2",
-          "Event__c": {
-            "ref": "conference"
-          },
-          "Account__c": {
-            "sample": "O001"
-          },
-          "Name": "Bayview Hardware",
-          "Level__c": {
-            "ref": "level-2"
-          },
-          "Amount__c": 250,
-          "Status__c": "Prospect"
-        }
-      ]
-    },
-    {
-      "object": "Sponsor_Deliverable__c",
-      "records": [
-        {
-          "Event_Sponsor__c": {
-            "ref": "sponsor-0"
-          },
-          "Name": "Logo on the program",
-          "Type__c": "Logo",
-          "Status__c": "Done",
-          "Due_Date__c": {
-            "days": -20
-          }
-        },
-        {
-          "Event_Sponsor__c": {
-            "ref": "sponsor-0"
-          },
-          "Name": "Booth",
-          "Type__c": "Booth",
-          "Status__c": "Requested",
-          "Due_Date__c": {
-            "days": -5
-          }
-        },
-        {
-          "Event_Sponsor__c": {
-            "ref": "sponsor-0"
-          },
-          "Name": "Passes: four conference passes",
-          "Type__c": "Passes",
-          "Status__c": "Pending",
-          "Due_Date__c": {
-            "days": 0
-          },
-          "Quantity__c": 4
-        },
-        {
-          "Event_Sponsor__c": {
-            "ref": "sponsor-1"
-          },
-          "Name": "Logo on the program",
-          "Type__c": "Logo",
-          "Status__c": "Received",
-          "Due_Date__c": {
-            "days": -10
-          }
+          "Answers__c": "{\"How would you rate the conference overall?\": \"4\", \"What should we change next year?\": \"A student meetup at lunch.\"}"
         }
       ]
     },
@@ -898,6 +1078,200 @@
           "Notes__c": "A strong fit for the Technology track."
         }
       ]
+    },
+    {
+      "object": "Event_Expense__c",
+      "records": [
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Hall rental",
+          "Category__c": "Venue",
+          "Vendor__c": "Riverside Meeting Hall",
+          "Budgeted__c": 3000,
+          "Actual__c": 3000,
+          "Status__c": "Paid",
+          "Due_Date__c": {
+            "days": -30
+          }
+        },
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Lunches and dinner",
+          "Category__c": "Food and Beverage",
+          "Vendor__c": "Example Catering Co.",
+          "Budgeted__c": 4500,
+          "Actual__c": 4200,
+          "Status__c": "Committed",
+          "Due_Date__c": {
+            "days": 5
+          }
+        },
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Sound and projection",
+          "Category__c": "Audio Visual",
+          "Vendor__c": "Example AV Services",
+          "Budgeted__c": 1200,
+          "Actual__c": 1350,
+          "Status__c": "Paid",
+          "Due_Date__c": {
+            "days": -1
+          }
+        },
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Programs and badges",
+          "Category__c": "Printing",
+          "Budgeted__c": 400,
+          "Status__c": "Planned",
+          "Due_Date__c": {
+            "days": 10
+          }
+        }
+      ]
+    },
+    {
+      "object": "Event_Funding__c",
+      "records": [
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Ashford Coffee Roasters sponsorship",
+          "Type__c": "Sponsorship",
+          "Event_Sponsor__c": {
+            "ref": "sponsor-0",
+            "optional": true
+          },
+          "Account__c": {
+            "sample": "O022",
+            "optional": true
+          },
+          "Expected__c": 2500,
+          "Received__c": 2500
+        },
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Summit Foundation event grant",
+          "Type__c": "Grant",
+          "Account__c": {
+            "sample": "O006",
+            "optional": true
+          },
+          "Expected__c": 3000,
+          "Received__c": 1500
+        }
+      ]
+    },
+    {
+      "object": "Session_Rating__c",
+      "records": [
+        {
+          "Event_Session__c": {
+            "ref": "session-0"
+          },
+          "Rating__c": 5,
+          "Comment__c": "A great start to the day."
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-0"
+          },
+          "Rating__c": 4
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-1"
+          },
+          "Rating__c": 5,
+          "Comment__c": "Practical ideas we can use next week."
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-1"
+          },
+          "Rating__c": 3,
+          "Comment__c": "The room was too warm."
+        }
+      ]
+    },
+    {
+      "object": "Event_Appointment__c",
+      "records": [
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Ask the speaker: storytelling",
+          "Host__c": {
+            "sample": "H001-1"
+          },
+          "Contact__c": {
+            "sample": "H002-1",
+            "optional": true
+          },
+          "Start__c": {
+            "days": 0,
+            "time": "14:00"
+          },
+          "End__c": {
+            "days": 0,
+            "time": "14:30"
+          },
+          "Location__c": "Room B",
+          "Status__c": "Booked"
+        },
+        {
+          "Event__c": {
+            "ref": "conference"
+          },
+          "Name": "Ask the speaker: storytelling",
+          "Host__c": {
+            "sample": "H001-1"
+          },
+          "Start__c": {
+            "days": 0,
+            "time": "14:30"
+          },
+          "End__c": {
+            "days": 0,
+            "time": "15:00"
+          },
+          "Location__c": "Room B",
+          "Status__c": "Open"
+        }
+      ]
+    },
+    {
+      "object": "Agenda_Item__c",
+      "records": [
+        {
+          "Event_Session__c": {
+            "ref": "session-4"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          }
+        },
+        {
+          "Event_Session__c": {
+            "ref": "session-5"
+          },
+          "Contact__c": {
+            "sample": "H002-1"
+          }
+        }
+      ]
     }
   ],
   "remove": [
@@ -907,6 +1281,10 @@
     },
     {
       "object": "Event__c",
+      "where": "Sample_Data__c = TRUE"
+    },
+    {
+      "object": "Event_Venue__c",
       "where": "Sample_Data__c = TRUE"
     }
   ]

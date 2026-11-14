@@ -150,7 +150,10 @@ CAPS = {
     # about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 227,250 measured, plus about 2%.
-    "volunteers": 231_800,
+    # Raised for the release 1.25 sample volunteer profiles (VolunteerSampleDataLoader
+    # updateProfiles, so suggestions and nudges have active volunteers to name): 232,331
+    # measured, plus about 0.5%.
+    "volunteers": 233_500,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
