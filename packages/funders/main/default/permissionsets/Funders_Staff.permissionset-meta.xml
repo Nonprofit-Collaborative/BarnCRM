@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Funders Staff</label>
+  <label>Grants Staff</label>
   <description>
     Creates and edits grants and moves them through the stages; adds, changes and removes a grant's
     requirements. Never deletes a grant.

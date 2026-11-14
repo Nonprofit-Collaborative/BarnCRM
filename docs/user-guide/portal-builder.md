@@ -59,7 +59,7 @@ Whatever the portal, a person sees and changes only their own records.
 - **Service portal.** People in your programs see their enrollments, services, upcoming sessions,
   goals and referrals, and update their phone and address. They never see case notes.
 - **Partner portal.** Staff of partner organizations see the referrals you shared with their
-  organization, and, where your organization uses Funders, the grants they are the contact for and
+  organization, and, where your organization uses Grants, the grants they are the contact for and
   the reports you submitted.
 
 ## When Someone Cannot Sign In

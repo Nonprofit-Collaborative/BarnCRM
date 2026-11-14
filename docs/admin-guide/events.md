@@ -18,7 +18,7 @@ own Stripe or PayPal checkout page and recorded on the registration (see Paid Re
 ### Before You Install
 
 - Event Management is offered in both editions (see [Editions](editions.md)).
-- It needs BarnCRM Core and nothing else. Nothing here needs Volunteers, Giving, Funders or
+- It needs BarnCRM Core and nothing else. Nothing here needs Volunteers, Giving, Grants or
   Programs.
 
 ### Installing
@@ -287,8 +287,8 @@ adds up the amounts of **Committed** and **Confirmed** sponsors.
 | Declined | Said no; not counted. |
 
 BarnCRM takes no payments: the amount is what the sponsor has agreed to give. To tie a sponsorship
-to the money, paste the record identifier of the Giving gift or commitment, or the Funders award,
-into **Linked Record** on the sponsor (**Edit**). When Giving or Funders is installed and you can
+to the money, paste the record identifier of the Giving gift or commitment, or the Grants award,
+into **Linked Record** on the sponsor (**Edit**). When Giving or Grants is installed and you can
 read that record, its name shows under the sponsor; otherwise nothing shows. Sponsorship needs
 neither module. Removing a level leaves its sponsors with no level, keeping their amounts and
 checklists.

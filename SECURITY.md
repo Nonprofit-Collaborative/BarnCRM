@@ -24,7 +24,7 @@ If you cannot use private vulnerability reporting, say so in a GitHub issue that
 The more of this you can give us, the faster we can confirm and fix:
 
 - What the issue is and what an attacker could do with it.
-- Which package and which component (Core, Giving, Volunteers, Programs, Funders, Mirror; object, Apex class, LWC, permission set, REST endpoint).
+- Which package and which component (Core, Giving, Volunteers, Programs, Grants, Mirror; object, Apex class, LWC, permission set, REST endpoint).
 - The org shape you saw it on: Platform only, Sales and Service Cloud, NPSP installed, or Person Accounts enabled.
 - Steps to reproduce, ideally in a fresh scratch org created with `scripts/org/create-scratch-org.sh`.
 - The commit or version you tested.

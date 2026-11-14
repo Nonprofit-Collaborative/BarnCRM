@@ -257,7 +257,7 @@ offers the starters your org can use, then **Saved Query**:
 | **People Served by a Service** | Each person once (Count Unique of Contact), by Delivery Date, leaving out absences | The service (required) | Programs is installed |
 | **Services Delivered** | Service deliveries, by Delivery Date, leaving out absences | The service (required) | Programs is installed |
 | **Approved Volunteer Hours** | The total of Hours on approved volunteer hours, by Date Worked | A volunteer job, or **All** | Volunteers is installed |
-| **Grants Awarded** | Grants at the Awarded stage, by Decision Date | A program, or **All** (where Programs is installed) | Funders is installed |
+| **Grants Awarded** | Grants at the Awarded stage, by Decision Date | A program, or **All** (where Programs is installed) | Grants is installed |
 
 Pick the template and the record it is about, then **Save**. BarnCRM writes the saved query in
 **Find** for you, named after the template and the record (for example "Services Delivered:
@@ -331,9 +331,9 @@ you choose, the target, the result and the progress (**Met** or a percent).
 Everyone who can open the model can see and download its report, including Read Only users. The
 report shows only what the person can read and stores nothing. Nothing needs setting up.
 
-## With the Funders Module
+## With the Grants Module
 
-When the Funders module is installed too, each grant requirement (a report or deliverable a
+When the Grants module is installed too, each grant requirement (a report or deliverable a
 funder expects) can name the outcome or output it reports on, from a **Logic Model Outcomes** card
 on the grant's page; the card shows that outcome's indicators with their targets and results for
 the award period. Nothing changes in your logic models: the link is kept on the requirement, by

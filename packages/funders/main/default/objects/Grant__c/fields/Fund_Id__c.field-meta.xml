@@ -5,7 +5,7 @@
   <length>18</length>
   <required>false</required>
   <unique>false</unique>
-  <inlineHelpText>The Giving fund the money is booked to, chosen on the Giving Fund card. Holds the fund's record ID, so Funders works without Giving.</inlineHelpText>
+  <inlineHelpText>The Giving fund the money is booked to, chosen on the Giving Fund card. Holds the fund's record ID, so Grants works without Giving.</inlineHelpText>
   <label>Giving Fund</label>
   <trackTrending>false</trackTrending>
   <type>Text</type>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    BarnCRM Funders Grant Finder: the free, public Grants.gov search API (no account or key). Only
+    BarnCRM Grants Grant Finder: the free, public Grants.gov search API (no account or key). Only
     the words searched are sent.
   </description>
   <disableProtocolSecurity>false</disableProtocolSecurity>

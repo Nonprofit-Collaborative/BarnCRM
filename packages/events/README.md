@@ -16,7 +16,7 @@ speakers).
 
 - BarnCRM Core
 
-Nothing in this package references Volunteers, Giving, Funders, Programs, Forms or Portal
+Nothing in this package references Volunteers, Giving, Grants, Programs, Forms or Portal
 Builder; those links go through Core extension points when their items are built. No Campaign is
 used. Paid registration (EV-20) reaches the optional BarnCRM Payments module only by name:
 `EventPayments` builds `PaymentsApi` with `NamespaceUtil.build`, and Payments builds

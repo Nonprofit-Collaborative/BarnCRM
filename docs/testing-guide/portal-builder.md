@@ -257,7 +257,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-PB-16: Partner Portal Template
 
 **Purpose:** confirm partner staff see only referrals shared with their organization (PB-05).
-**Prerequisites:** admin; Programs; organization `Zz Partners` with Kim's Current affiliation; two referrals with Partner Organization Zz Partners, one with Shared With Partner on; a portal with key `partner`, Active, Invited, the template `portal-client/templates/partner.json`; Kim signed in. For step 4, Funders installed, a grant whose Funder Contact is Kim with a submitted Narrative Report requirement and a Task, and the portal's template `partner-funders.json`.
+**Prerequisites:** admin; Programs; organization `Zz Partners` with Kim's Current affiliation; two referrals with Partner Organization Zz Partners, one with Shared With Partner on; a portal with key `partner`, Active, Invited, the template `portal-client/templates/partner.json`; Kim signed in. For step 4, Grants installed, a grant whose Funder Contact is Kim with a submitted Narrative Report requirement and a Task, and the portal's template `partner-funders.json`.
 **Smoke:** no
 
 | Step | Action | Expected result |

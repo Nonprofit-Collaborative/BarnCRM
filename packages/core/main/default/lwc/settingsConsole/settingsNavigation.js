@@ -51,7 +51,7 @@ const GROUPS = [
     sections: [
       ['Giving', 'utility:moneybag'],
       ['Receipts', 'utility:email'],
-      ['Funders', 'utility:trophy'],
+      ['Grants', 'utility:trophy'],
       ['Scholarships and Grants', 'utility:education']
     ]
   },

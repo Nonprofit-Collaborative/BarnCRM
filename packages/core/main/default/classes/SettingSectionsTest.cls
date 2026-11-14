@@ -29,7 +29,7 @@ private class SettingSectionsTest {
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.FUNDERS),
-				'Funders is a section the Funders module ships rows into'
+				'Grants is a section the Grants module ships rows into'
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.INTEGRATIONS),

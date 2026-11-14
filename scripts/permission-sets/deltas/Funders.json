@@ -1,6 +1,6 @@
 {
   "Admin": {
-    "label": "Funders Admin",
+    "label": "Grants Admin",
     "description": "Manages grants and their requirements, including deleting a grant.",
     "set": {
       "fieldPermissions": {
@@ -28,5 +28,5 @@
       }
     }
   },
-  "Read_Only": {"label": "Funders Read Only", "description": "Looks at grants, their requirements and the Grant Pipeline.", "readOnly": true}
+  "Read_Only": {"label": "Grants Read Only", "description": "Looks at grants, their requirements and the Grant Pipeline.", "readOnly": true}
 }

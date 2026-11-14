@@ -6,7 +6,7 @@
     balances, from grants and, when installed, Giving (F-07, canonical model 29ZH R-GN9).
   </description>
   <isExposed>true</isExposed>
-  <masterLabel>Funders Board Dashboard</masterLabel>
+  <masterLabel>Grants Board Dashboard</masterLabel>
   <targets>
     <target>lightning__AppPage</target>
     <target>lightning__Tab</target>

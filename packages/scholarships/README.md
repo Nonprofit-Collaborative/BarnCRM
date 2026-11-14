@@ -16,7 +16,7 @@ Release **1.12** (SG-01 to SG-06, SG-08, SG-09, PB-06), with SG-10 from release 
 - BarnCRM Core
 
 Forms and Portal Builder are used when installed, through Core's `FormAttachmentExtension` and
-`PortalActionExtension` seams; this package references neither. Giving and Funders are not
+`PortalActionExtension` seams; this package references neither. Giving and Grants are not
 referenced.
 
 ## Contents

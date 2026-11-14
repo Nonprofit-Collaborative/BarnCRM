@@ -184,7 +184,7 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
   release.)
 
 The modules are BarnCRM Rollup Builder (both editions), and BarnCRM Giving, BarnCRM
-Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Funders and BarnCRM Mirror
+Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and BarnCRM Mirror
 (Nonprofit Edition). The
 Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
 Builder ships as its own package, installed from this section like the others. See the
@@ -200,7 +200,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
    **People** (People and Households, Addresses, Contact Points, Forms, Portals), **Data** (Import,
-   Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Funders),
+   Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Grants),
    **Programs** (Programs, Logic Models, Volunteers, Events) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
@@ -209,7 +209,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    section's first heading. Each section's settings sit in bordered boxes with a heading, such as **People** and
    **Households** on People and Households. You only see
    the ones that have something in them, and a feature that is off hides its sections: Giving and
-   Receipts come with the Giving module, Funders with the Funders module, and Giving also adds the receipt details to the
+   Receipts come with the Giving module, Grants with the Grants module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
    **Change Edition** link under it is the way to change it later (see

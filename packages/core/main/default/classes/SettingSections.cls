@@ -55,9 +55,9 @@ public with sharing class SettingSections {
 	/** Receipts, which Giving ships: its own section because a receipt run is its own job. */
 	@NamespaceAccessible
 	public static final String RECEIPTS = 'Receipts';
-	/** The Funders module's grant reminder settings, listed under Fundraising. */
+	/** The Grants module's (BarnCRM Funders package) grant reminder settings, listed under Fundraising. */
 	@NamespaceAccessible
-	public static final String FUNDERS = 'Funders';
+	public static final String FUNDERS = 'Grants';
 	/**
 	 * The Event Management module's settings (speaker notice templates, EV-06; reminder,
 	 * follow-up and No-Show settings, EV-14), listed after Funders.
