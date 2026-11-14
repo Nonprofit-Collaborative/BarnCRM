@@ -128,18 +128,18 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | UX-V1 | Shared visual kit: status badge, notice, stat tile formats, progress meter, icon registry, visual standard in ux-kit.md | Major | Built (#856, #860); landing B | D-170 |
-| UX-V2 | Usability fixes: admin and data tools | Major | In progress (merged #862, #863, #866, #869, #870, #877, #885, #889 to #892); landing B | D-170 |
-| UX-V3 | Usability fixes: people, households and Giving | Major | In progress (people and Fundraising Home merged: #861, #864, #872, #873, #882; Giving workstreams and #879, #880 on hold) | D-170 |
-| UX-V4 | Usability fixes: Volunteers, Programs, Logic Models, Funders (absorbs UX-F4) | Major | In progress (Logic Models merged: #883, #884; the rest on hold) | D-170 |
-| UX-V5 | Record page tabs suite-wide | Minor | In progress | D-170 |
+| UX-V2 | Usability fixes: admin and data tools | Major | Landed (in main: #862, #866, #869, #870, #885, #891, #892; stacked PRs #863, #877, #889, #890 landed through them; Batch B finished, released to `barn-npc` and `mwdbdevsb`) | D-170 |
+| UX-V3 | Usability fixes: people, households and Giving | Major | Landed (in main: people #864, #873, Fundraising Home #882; stacked #861, #872 landed through #873; Giving workstreams #949 to #957 in #958; #879 and #880 closed, superseded by #949 to #957; released to `barn-npc`) | D-170 |
+| UX-V4 | Usability fixes: Volunteers, Programs, Logic Models, Funders (absorbs UX-F4) | Major | Landed (in main: Logic Models #884, #935; Programs #945 to #947, Volunteers #933, #934, #936, #937, #948, Funders #938 to #942, all in #958; follow-ups in #968, #979; released to `barn-npc`) | D-170 |
+| UX-V5 | Record page tabs suite-wide | Minor | Landed (in main: tabbed record pages on Account, Contact, Gift, Commitment, Program, Enrollment, Session, Cohort, Grant, Logic Model, Shift, Event and Form pages; #958, #979; released to `barn-npc`) | D-170 |
 | UX-V6 | App logos for Programs, Funders and Logic Models; Fundraising badge recolored; brand color #007A9E | Minor | Built (#854, #855); landing B | D-170 |
-| UX-V7 | Drag and drop on existing controls | Minor | In progress (c/barnDrag #860; transform steps #862; Find #891; Super Importer #892) | D-170 |
+| UX-V7 | Drag and drop on existing controls | Minor | Landed (in main: c/barnDrag #860, transform steps #862, Find #891, Super Importer #892, Logic Models #935, Grant Pipeline, Ask Pipeline and rules in #958; released to `barn-npc`) | D-170 |
 | UX-V8 | Help text in English JSON help catalogs per package, label cap 4,150 | Major | Built (#858, #859); landing B | D-171, D-172 |
-| AR-01 | Messages move from labels to the help catalogs (about 2,400 labels after) | Major | Planned | D-172 |
+| AR-01 | Messages move from labels to the help catalogs (about 2,400 labels after) | Major | Landed (Core #907: 943 moved; modules AR-01b #1195 to #1207, #1235; suite about 2,424 labels across packages, matching the target; released to `barn-npc`) | D-172 |
 | AR-02 | Install pre-check: edition, Apex room, label room, name collisions | Major | Built (#874 to #876); landing B | D-173 |
-| AR-03 | Per-package Apex size budget in CI, plus a character trim pass on Apex | Major | In progress (budget built #874 to #876; trim pass planned) | D-173 |
+| AR-03 | Per-package Apex size budget in CI, plus a character trim pass on Apex | Major | Landed (#876 budget; #908 trims and #909 tabs landed through #912: suite 4.39M to 3.52M characters, Core 1.94M at Batch B; regrown by releases 1.1 to 1.25 to 4.99M and Core 2.27M at 71617318c, above the 3.6M and 2.0M targets; no further trim pass scheduled) | D-173 |
 | AR-04 | Install guide | Minor | Built (#874 to #876); landing B | D-173 |
-| AR-05 | Purge defaults for Merge Journal, Setting Change, Import Batch and Journal, Field Utilization Snapshot | Minor | In progress (record retention defaults and Record Cleanup, #897) | D-173 |
+| AR-05 | Purge defaults for Merge Journal, Setting Change, Import Batch and Journal, Field Utilization Snapshot | Minor | Landed (#897; #908 adds abandoned imports and absorbs the import row purge and Error Log retention, landed through #912; `RecordRetentionBatch` purges all five objects; released to `barn-npc`) | D-173 |
 | AR-06 | A per-release destructive manifest | Minor | Built (#874 to #876); landing B | D-173 |
 | AR-07 | One nightly job dispatcher plus the hourly check | Major | Built (#894, #895, #897, #898); landing B | D-173 |
 | AR-08 | BarnCRM Automation Control hierarchy custom setting; own flows on the Automation page | Major | Built (#887, #893, #896); landing B | D-173, D-174 |
