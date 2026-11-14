@@ -535,6 +535,9 @@ private class SampleDataLoaderTest {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			SettingsService.clearCaches();
+			// Core's own set only: each installed module's file adds its queries to this one
+			// transaction, which in an org is spread across the batch's.
+			SampleDataModules.moduleOverride = new List<SampleDataModule>();
 			loadEverything(buildJson(2, 2, false));
 
 			SampleDataLoader.Counts before = SampleDataLoader.status();

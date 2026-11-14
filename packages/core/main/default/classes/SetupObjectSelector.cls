@@ -116,6 +116,22 @@ public with sharing class SetupObjectSelector {
 		return row == null ? null : row.Body.toString();
 	}
 
+	/** The bodies of this package's static resources of those Names, as text, by Name. */
+	@NamespaceAccessible
+	public static Map<String, String> staticResourceBodies(Set<String> names) {
+		String ns = NamespaceUtil.namespacePrefix();
+		Map<String, String> bodies = new Map<String, String>();
+		for (StaticResource row : [
+			SELECT Name, Body
+			FROM StaticResource
+			WHERE Name IN :names AND NamespacePrefix = :ns
+			WITH SYSTEM_MODE
+		]) {
+			bodies.put(row.Name, row.Body.toString());
+		}
+		return bodies;
+	}
+
 	/**
 	 * Email template ids by DeveloperName: BarnCRM's own, else the org's own (no prefix), never
 	 * another package's. Names with neither are left out.

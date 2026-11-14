@@ -90,7 +90,7 @@
           "Form__c": {
             "ref": "volunteer"
           },
-          "Status__c": "NeedsReview",
+          "Status__c": "Needs Review",
           "Source__c": "Public",
           "Answers__c": "{\"first\":\"Maria\",\"last\":\"Whitfield\",\"email\":\"m.whitfield@example.com\",\"postal\":\"78728\",\"age\":16,\"guardian\":\"David Whitfield, (555) 010-0102\",\"area\":\"Community garden\",\"availability\":\"After school\",\"agree\":true}",
           "Form_Version__c": {
@@ -143,6 +143,10 @@
     }
   ],
   "remove": [
+    {
+      "object": "Form_Submission__c",
+      "where": "Form__r.Sample_Data__c = TRUE"
+    },
     {
       "object": "Form__c",
       "where": "Sample_Data__c = TRUE"

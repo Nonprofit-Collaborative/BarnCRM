@@ -180,4 +180,32 @@ private class SampleDataFileTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void aStepRunsOnlyWhileItsSettingIsOn() {
+		Assert.isTrue(
+			SampleDataFile.settingAllows(new Map<String, Object>()),
+			'A step without whenSetting always runs'
+		);
+		Assert.isFalse(
+			SampleDataFile.settingAllows(
+				new Map<String, Object>{
+					'whenSetting' => new Map<String, Object>{
+						'object' => 'BarnCRM_Settings__c',
+						'field' => 'No_Such_Setting__c'
+					}
+				}
+			),
+			'A setting that cannot be read counts as off, so the step is skipped'
+		);
+	}
+
+	@IsTest
+	static void preloadReadsEveryFileInOneQuery() {
+		Integer before = Limits.getQueries();
+		SampleDataFile.preload(new List<String>{ 'NoSuchSampleDataA', 'NoSuchSampleDataB' });
+		Assert.areEqual(1, Limits.getQueries() - before, 'One query for both names');
+		Assert.isNull(SampleDataFile.find('NoSuchSampleDataA'), 'No such file');
+		Assert.areEqual(1, Limits.getQueries() - before, 'find reads what preload read');
+	}
 }

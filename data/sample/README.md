@@ -85,6 +85,11 @@ example `FundersSampleData`); Core loads it when no class of that name is instal
   time, or a time).
 - A record whose `ref`, `sample` or `find` does not resolve is left out unless the value says
   `"optional": true`. A step or field the loader cannot create is skipped.
+- A step with `"whenSetting": { "object": settings object, "field": checkbox }` runs only while
+  that setting is on, for a feature that is off by default and whose rules refuse its records
+  while off (Projects requests and change requests).
+- A record's `ref` names a key from an earlier step only: a record that points at another record
+  of its own step (a committee and its parent board) goes in a step of its own after it.
 - `count` is the status card's number. `remove` entries are deleted in order, in chunks, with
   partial success: a record the organization's own records point at is kept and named in one
   Warning in the Error Log. `hasSampleRecords` is true while any `remove` entry matches.

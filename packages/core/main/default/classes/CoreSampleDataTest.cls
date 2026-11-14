@@ -111,7 +111,9 @@ private class CoreSampleDataTest {
 				[
 					SELECT COUNT()
 					FROM Task
-					WHERE Type = 'Meeting' AND Status = 'Completed'
+					// Not by Type: a field the loading person cannot set is left out, and the
+					// test admin's permission sets do not grant Task Type.
+					WHERE Status = 'Completed' AND Who.Name LIKE 'Sample Person H%'
 					WITH SYSTEM_MODE
 				],
 				'Three interaction notes'

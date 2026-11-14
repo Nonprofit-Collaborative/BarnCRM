@@ -543,6 +543,7 @@
     },
     {
       "object": "Project_Change_Request__c",
+      "whenSetting": { "object": "Projects_Settings__c", "field": "Change_Requests_Enabled__c" },
       "records": [
         {
           "Name": "Add a referral tracking page",
@@ -564,6 +565,7 @@
     },
     {
       "object": "Project_Request__c",
+      "whenSetting": { "object": "Projects_Settings__c", "field": "Requests_Enabled__c" },
       "records": [
         {
           "Subject__c": "Intake form is slow to open on tablets",

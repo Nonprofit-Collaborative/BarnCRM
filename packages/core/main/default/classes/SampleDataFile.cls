@@ -48,6 +48,30 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	@TestVisible
 	private static Map<String, Map<String, Object>> filesByName = new Map<String, Map<String, Object>>();
 
+	/** Unparsed bodies read by preload, null for a name with no resource, this transaction. */
+	private static Map<String, String> bodiesByName = new Map<String, String>();
+
+	/**
+	 * Reads the named files in one query, so resolving every module's set costs one query
+	 * instead of one each (the status card resolves them all on every poll). Parsing stays lazy.
+	 */
+	@NamespaceAccessible
+	public static void preload(List<String> resourceNames) {
+		Set<String> unread = new Set<String>();
+		for (String name : resourceNames) {
+			if (!filesByName.containsKey(name) && !bodiesByName.containsKey(name)) {
+				unread.add(name);
+			}
+		}
+		if (unread.isEmpty()) {
+			return;
+		}
+		Map<String, String> bodies = SetupObjectSelector.staticResourceBodies(unread);
+		for (String name : unread) {
+			bodiesByName.put(name, bodies.get(name));
+		}
+	}
+
 	/** Core's sample records by Sample_Data_Key__c, read once per transaction. */
 	private static Map<String, Id> sampleIdsByKey;
 
@@ -61,7 +85,9 @@ public with sharing class SampleDataFile implements SampleDataModule {
 	@NamespaceAccessible
 	public static SampleDataFile find(String resourceName) {
 		if (!filesByName.containsKey(resourceName)) {
-			String body = SetupObjectSelector.staticResourceBody(resourceName);
+			String body = bodiesByName.containsKey(resourceName)
+				? bodiesByName.get(resourceName)
+				: SetupObjectSelector.staticResourceBody(resourceName);
 			filesByName.put(
 				resourceName,
 				String.isBlank(body) ? null : (Map<String, Object>) JSON.deserializeUntyped(body)
@@ -153,12 +179,25 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		}
 	}
 
+	/**
+	 * Whether a step's `whenSetting` checkbox setting is on, so a step for a feature that is off
+	 * by default (its records refused by a rule while it is off) is skipped, never failed:
+	 * `"whenSetting": { "object": "Projects_Settings__c", "field": "Requests_Enabled__c" }`.
+	 * A step without one always runs.
+	 */
+	@TestVisible
+	private static Boolean settingAllows(Map<String, Object> step) {
+		Map<String, Object> setting = (Map<String, Object>) step.get('whenSetting');
+		return setting == null ||
+			SettingsService.flag((String) setting.get('object'), (String) setting.get('field'));
+	}
+
 	/** Inserts one step's records and returns their keys mapped to the Ids they were given. */
 	@TestVisible
 	private static Map<String, Id> insertStep(Map<String, Object> step, Map<String, Id> idsByKey) {
 		Map<String, Id> inserted = new Map<String, Id>();
 		Schema.SObjectType type = NamespaceUtil.objectType((String) step.get('object'));
-		if (type == null || !type.getDescribe().isCreateable()) {
+		if (type == null || !type.getDescribe().isCreateable() || !settingAllows(step)) {
 			return inserted;
 		}
 		List<SObject> rows = new List<SObject>();

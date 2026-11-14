@@ -51,6 +51,10 @@ public with sharing class SampleDataModules {
 			return moduleOverride;
 		}
 		List<SampleDataModule> modules = new List<SampleDataModule>();
+		if (!found.keySet().containsAll(MODULE_CLASS_NAMES)) {
+			// One query for every module's file, not one per module.
+			SampleDataFile.preload(MODULE_CLASS_NAMES);
+		}
 		for (String className : MODULE_CLASS_NAMES) {
 			if (!found.containsKey(className)) {
 				found.put(className, resolve(className));

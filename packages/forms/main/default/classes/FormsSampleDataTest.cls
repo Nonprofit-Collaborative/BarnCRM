@@ -128,7 +128,7 @@ private class FormsSampleDataTest {
 				[
 					SELECT COUNT()
 					FROM Form_Submission__c
-					WHERE Status__c = 'NeedsReview'
+					WHERE Status__c = 'Needs Review'
 					WITH SYSTEM_MODE
 				],
 				'One waits for review'

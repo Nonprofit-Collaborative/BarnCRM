@@ -298,7 +298,12 @@
           "Needed_Skills__c": "Finance;Legal;Fundraising",
           "Description__c": "Governs the organization and hires the executive director.",
           "Sample_Data__c": true
-        },
+        }
+      ]
+    },
+    {
+      "object": "Board__c",
+      "records": [
         {
           "key": "finance",
           "Name": "Finance Committee",
