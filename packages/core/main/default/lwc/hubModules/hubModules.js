@@ -18,13 +18,13 @@ const NOT_INSTALLED = 'NotInstalled';
 // Each module app's logo, a content asset its own package ships (vis-core-12). A module with
 // no app of its own shows the avatar's fallback icon.
 const LOGOS = {
-  Giving: 'BarnCRM_Fundraising_Logo',
-  Volunteers: 'BarnCRM_Volunteers_Logo',
-  Programs: 'BarnCRM_Programs_Logo',
-  Funders: 'BarnCRM_Funders_Logo',
-  LogicModels: 'BarnCRM_Logic_Models_Logo',
-  Forms: 'BarnCRM_Forms_Logo',
-  Events: 'BarnCRM_Events_Logo'
+  Giving: 'BarnCRM_Patch_Fundraising_Logo',
+  Volunteers: 'BarnCRM_Patch_Volunteers_Logo',
+  Programs: 'BarnCRM_Patch_Programs_Logo',
+  Funders: 'BarnCRM_Patch_Funders_Logo',
+  LogicModels: 'BarnCRM_Patch_Logic_Models_Logo',
+  Forms: 'BarnCRM_Patch_Forms_Logo',
+  Events: 'BarnCRM_Patch_Events_Logo'
 };
 
 function logoUrl(name) {

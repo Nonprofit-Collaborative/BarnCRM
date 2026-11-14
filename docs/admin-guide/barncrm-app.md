@@ -184,14 +184,16 @@ administrator tile to staff, it shows nothing to count.
 
 ## How Records Open: Tabs in a Console
 
-Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
-badge to it and have a navy header, so you can tell at a glance which app you are in; every other
-app, the module apps included, has the BarnCRM teal header (#007A9E). A module's
-app adds its own badge (a berry heart for **BarnCRM Fundraising**, a green person for **BarnCRM
-Volunteers**, a purple sprout for **BarnCRM Programs** and a bronze award ribbon for **BarnCRM
-Funders**; Logic Models has no app since release 1.24, and its indigo flow arrows badge marks
-its tile under **Modules** on the BarnCRM home page). No badge uses red, orange or
-yellow, because those colors mean an error or a warning elsewhere in BarnCRM.
+Every BarnCRM app shows Patch, the BarnCRM highland cow, in the app launcher, and every app has
+the same Barn Navy header (#1E2A3A), so you always know you are in BarnCRM. The logo tells the
+apps apart: **BarnCRM** and **BarnCRM Console** show Patch's face on a sage circle, the admin apps
+show Patch standing in a round badge, and each module app shows Patch with its module's prop (a
+heart for **BarnCRM Fundraising**, a safety vest for **BarnCRM Volunteers**, a cap and clipboard
+for **BarnCRM Programs**, a monocle for **BarnCRM Grants**, a pencil and tool belt for **BarnCRM
+Forms**, a party hat for **BarnCRM Events**, a hard hat for **BarnCRM Projects** and a tool belt
+for **BarnCRM Portal Builder**; **BarnCRM Corporate Hub** shows Patch's face for now). Logic
+Models has no app since release 1.24; Patch with building blocks marks its tile under
+**Modules** on the BarnCRM home page.
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,
 they keep the records you are working on open side by side in tabs across the top. In
@@ -224,7 +226,7 @@ Admin role.
 
 1. Open the app launcher, type `BarnCRM`, and choose **BarnCRM** (or **BarnCRM Console**). The home page
    opens with the heading **Welcome to BarnCRM** and the sentence "Start with the setup
-   checklist below."
+   checklist below.", with Patch waving hello beside it (on a wide screen).
 2. Read the **Setup Checklist**. It lists every step with a progress ring and a **Done**,
    **Skipped** or **To Do** badge, opens the first step you have not finished, and counts how
    far you have got, for example "3 of 9 steps done" (eight steps with Core alone, nine with

@@ -14,12 +14,12 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the App Launcher and type `BarnCRM`. | **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** are listed, each with the blue barn logo; the two admin apps' barn carries a navy gear badge. With the modules deployed, **BarnCRM Fundraising** shows the barn with a berry heart badge, **BarnCRM Volunteers** a green person badge, **BarnCRM Programs** a purple sprout badge and **BarnCRM Grants** a bronze award ribbon badge. There is no **BarnCRM Logic Models** app (retired in release 1.24). No app shows a generic initials tile. |
-| 2 | Open **BarnCRM**. | Standard navigation (tabs across the top, no workspace tabs). Tabs: **Home**, **Contacts**, **Households**, **Organizations**, **Data Manager**. **Find** is not in the navigation. |
+| 1 | As admin, open the App Launcher and type `BarnCRM`. | **BarnCRM**, **BarnCRM Console**, **BarnCRM Admin** and **BarnCRM Admin Console** are listed: the first two with Patch's face on a sage circle, the two admin apps with Patch standing in a round badge. With the modules deployed, **BarnCRM Fundraising** shows Patch holding a heart, **BarnCRM Volunteers** Patch in a safety vest, **BarnCRM Programs** Patch with a cap and clipboard and **BarnCRM Grants** Patch with a monocle. No app shows the old barn logo. There is no **BarnCRM Logic Models** app (retired in release 1.24). No app shows a generic initials tile. |
+| 2 | Open **BarnCRM**. | Standard navigation (tabs across the top, no workspace tabs), with a Barn Navy (#1E2A3A) header. Tabs: **Home**, **Contacts**, **Households**, **Organizations**, **Data Manager**. **Find** is not in the navigation. On a wide window, Patch waves beside **Welcome to BarnCRM** on **Home**; its alternative text (a screen reader reads it) is "Patch, the BarnCRM highland cow, waving hello". |
 | 3 | Open a household. | It replaces the page and shows the BarnCRM household page. |
 | 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**. |
 | 5 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
-| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Automation**, **Error Log** (last). **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
+| 6 | Open **BarnCRM Admin**. | Standard navigation, with the same Barn Navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Automation**, **Error Log** (last). **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
 | 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same five tabs, opening as workspace tabs, with **Error Log** last. With a module deployed (for example the Rollup Builder), its admin tabs come before **Error Log**. |
 | 8 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM** and **BarnCRM Console** are listed. **BarnCRM Admin** and **BarnCRM Admin Console** are not. |
 | 9 | As admin, on **BarnCRM Settings**, **Access**, remove the staff user's role. Wait a minute; as staff, reload and open the App Launcher. | No BarnCRM app is listed. |
@@ -146,8 +146,8 @@ five apps (T-APP-13). In each, the module is installed and on, and its access sy
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the App Launcher and type `Events`. | **BarnCRM Events** is listed with the barn and a teal calendar badge. |
-| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Events Home**, **Event Calendar**, **Events**, **Event Speakers**, **Venues**, **Reports**, **Error Log** (last). |
+| 1 | As admin, open the App Launcher and type `Events`. | **BarnCRM Events** is listed with Patch in a party hat. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Events Home**, **Event Calendar**, **Events**, **Event Speakers**, **Venues**, **Reports**, **Error Log** (last). |
 | 3 | Open an event from **Events**. | It opens as a workspace tab on the event record page (with its tabs), the same page as in **BarnCRM**. |
 | 4 | Open **BarnCRM**. | **Events Home**, **Event Calendar**, **Events**, **Event Speakers** and **Venues** are still there, after **Data Manager**. |
 | 5 | As staff, open the App Launcher and type `Events`. | **BarnCRM Events** is listed. A user with no Events permission set does not see it. |
@@ -159,8 +159,8 @@ five apps (T-APP-13). In each, the module is installed and on, and its access sy
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the App Launcher and type `Forms`. | **BarnCRM Forms** is listed with the barn and a blue form page badge. |
-| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Forms**, **Form Submissions**, **Reports**, **Error Log** (last). |
+| 1 | As admin, open the App Launcher and type `Forms`. | **BarnCRM Forms** is listed with Patch holding a pencil, in a tool belt. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Forms**, **Form Submissions**, **Reports**, **Error Log** (last). |
 | 3 | Open a form. | It opens on the form record page with its builder, the same page as in **BarnCRM**. |
 | 4 | Open **BarnCRM**. | **Forms** and **Form Submissions** are still there, after **Data Manager**. |
 | 5 | As staff, open the App Launcher and type `Forms`. | **BarnCRM Forms** is listed. |
@@ -172,8 +172,8 @@ five apps (T-APP-13). In each, the module is installed and on, and its access sy
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is listed with the barn and a purple door badge. |
-| 2 | Open it and its navigation menu. | Console navigation with the navy admin header. Tabs: **Portals**, **Portal Accesses**, **Reports**, **Error Log** (last). |
+| 1 | As admin, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is listed with Patch in a tool belt. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Portals**, **Portal Accesses**, **Reports**, **Error Log** (last). |
 | 3 | Open **BarnCRM Admin**. | **Portals** and **Portal Accesses** are still there, before **Error Log**. |
 | 4 | As staff, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is not listed (only Portal Builder Admin shows it). |
 
@@ -184,8 +184,8 @@ five apps (T-APP-13). In each, the module is installed and on, and its access sy
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed with the barn and a slate office building badge. |
-| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**, **Boards and Committees**, **Board Meetings**, **Processing Activities**, **Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards**, **Error Log** (last). |
+| 1 | As admin, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed with Patch's face on a sage circle (the BarnCRM logo, until its own Patch logo is ready). |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**, **Boards and Committees**, **Board Meetings**, **Processing Activities**, **Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards**, **Error Log** (last). |
 | 3 | Open **Board Meetings** and a meeting. | It opens on the Board Meeting record page with its panel. |
 | 4 | Open **BarnCRM**. | The first six tabs are still there after **Data Manager**; the three data protection tabs are not. |
 | 5 | As staff, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed. |
@@ -197,8 +197,8 @@ five apps (T-APP-13). In each, the module is installed and on, and its access sy
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open the App Launcher and type `Projects`. | **BarnCRM Projects** is listed with the barn and a blue task board badge. |
-| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Projects Home**, **Timesheet**, **Approvals**, **Requests**, **Projects**, **Time Entries**, **Project Expenses**, **Project Resources**, **Staffing**, **Project Rates**, **Project Invoices**, **Request Connections**, **Reports**, **Error Log** (last). |
+| 1 | As admin, open the App Launcher and type `Projects`. | **BarnCRM Projects** is listed with Patch in a hard hat, holding a clipboard. |
+| 2 | Open it and its navigation menu. | Console navigation with the Barn Navy header. Tabs: **Projects Home**, **Timesheet**, **Approvals**, **Requests**, **Projects**, **Time Entries**, **Project Expenses**, **Project Resources**, **Staffing**, **Project Rates**, **Project Invoices**, **Request Connections**, **Reports**, **Error Log** (last). |
 | 3 | Open a project. | It opens on the project record page with its board. |
 | 4 | Open **BarnCRM**. | The Project Management tabs are still there, after **Data Manager**. |
 | 5 | As staff, open the App Launcher and type `Projects`. | **BarnCRM Projects** is listed. |

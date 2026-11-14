@@ -138,11 +138,24 @@ class IconRegistry(unittest.TestCase):
 
 class AppHeaderColor(unittest.TestCase):
     def test_every_app_uses_the_barncrm_header_colors(self):
-        # D-58: everyday apps #007A9E, admin apps #032D60, so switching apps stays in BarnCRM.
+        # ADR-NEXT (Patch brand): every app, admin and module apps included, has the Barn Navy
+        # header #1E2A3A, so switching apps stays in BarnCRM; the logo says which app.
         pattern = os.path.join(ROOT, "packages", "*", "main", "default", "applications", "*.app-meta.xml")
         for path in sorted(glob.glob(pattern)):
             color = ET.parse(path).getroot().findtext("m:brand/m:headerColor", namespaces=NS)
-            self.assertIn(color, ("#007A9E", "#032D60"), os.path.basename(path))
+            self.assertEqual(color, "#1E2A3A", os.path.basename(path))
+
+    def test_every_app_logo_is_a_shipped_patch_asset(self):
+        # A changed image needs a new ContentAsset name, so every logo is a Patch asset that
+        # the app's own package ships.
+        pattern = os.path.join(ROOT, "packages", "*", "main", "default", "applications", "*.app-meta.xml")
+        for path in sorted(glob.glob(pattern)):
+            logo = ET.parse(path).getroot().findtext("m:brand/m:logo", namespaces=NS)
+            self.assertTrue(logo.startswith("BarnCRM_Patch_"), os.path.basename(path))
+            assets = os.path.join(os.path.dirname(os.path.dirname(path)), "contentassets")
+            self.assertTrue(
+                os.path.isfile(os.path.join(assets, logo + ".asset-meta.xml")), os.path.basename(path)
+            )
 
 
 class CoreAppOrder(unittest.TestCase):
