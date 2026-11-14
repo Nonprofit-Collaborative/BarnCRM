@@ -7,6 +7,7 @@ import NEW_HOUSEHOLD from '@salesforce/label/c.Core_HubHomeActions_NewHousehold'
 import NEW_PERSON from '@salesforce/label/c.Core_HubHomeActions_NewPerson';
 import RESUME from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
+import PATCH_WELCOME from '@salesforce/resourceUrl/BarnPatchWelcome';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -28,11 +29,16 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
     get pausedBanner() {
       return helpText('Core', 'Core_HubHome_AutomationPausedBanner');
     },
+    get patchAlt() {
+      return helpText('Core', 'Core_HubHome_PatchAlt');
+    },
     newHousehold: NEW_HOUSEHOLD,
     newPerson: NEW_PERSON
   };
 
   iconName = iconFor('BarnCRM_Home');
+  // Patch, the BarnCRM mascot, waving beside the welcome (ADR-0224); hidden on small screens.
+  patchUrl = PATCH_WELCOME;
   helpReady = isHelpLoaded('Core');
   model;
   errorMessage;

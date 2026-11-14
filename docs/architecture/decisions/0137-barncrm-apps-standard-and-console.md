@@ -1,6 +1,7 @@
 # ADR-0137: Four BarnCRM Apps, Everyday and Admin, Each in Standard and Console Navigation
 
-**Status:** Accepted (owner decision, 2026-10-26)
+**Status:** Accepted (owner decision, 2026-10-26); decision 5's barn images and header colors
+superseded by ADR-0224 (Patch brand)
 **Date:** 2026-10-26
 **Source:** Brandon, 2026-10-26: two app families, "BarnCRM" for everyday staff and "BarnCRM
 Admin" for administrators, and "Please include a classic and a console version of each app so

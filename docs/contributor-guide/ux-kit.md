@@ -8,6 +8,7 @@ Rules for any screen:
 - Title Case for every title, heading, tab, tile and button; sentence case for body text and field labels.
 - One card level. Never a card inside a card.
 - No hard-coded colors or sizes. CSS uses SLDS 2 styling hooks (`--slds-g-*`) with a fallback, and `npm run lint:slds` must report no violations.
+- The Patch brand palette ([Brand](../brand/README.md)) is for logos, app headers (Barn Navy `#1E2A3A`) and images, not screen CSS. If a screen ever needs a brand color, Barn Navy carries text and buttons; Patch Rust (`#D35400`) is for large decorative accents only, never small text.
 - Every UI string and message comes from a custom label; every help and guidance sentence comes from the package's help catalog (see Help Text below). Never add help prose as a label.
 
 ## Help Text

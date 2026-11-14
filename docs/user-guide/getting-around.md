@@ -122,7 +122,8 @@ Open the **BarnCRM** app and choose **Home**. As a staff member you see:
   lines for each change. Read it, then click **Dismiss**. It comes back only when a later
   upgrade brings something new. Dismissing hides it for you, not for your colleagues.
 - **Welcome to BarnCRM**: a short line saying "Find someone, add someone new, or pick up
-  where you left off."
+  where you left off." On a wide screen, Patch, the BarnCRM highland cow, waves hello beside
+  it. Patch is also the logo on every BarnCRM app in the app launcher.
 - **New Person**: opens the new person form. Fill in the name and address and save; BarnCRM
   makes the household for you. You see this button only if you can create contacts.
 - **New Household**: creates a household with a placeholder name and opens it. The name is
