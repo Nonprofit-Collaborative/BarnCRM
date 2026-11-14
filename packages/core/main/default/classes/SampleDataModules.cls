@@ -8,8 +8,9 @@
  *
  * Loading is one module at a time on purpose. Core's stage batch finishes by starting the
  * first module, and each module's own load finishes by calling `startAfter` with its name,
- * which starts the module after it (Giving, then Volunteers, then Programs, then Funders, then Events), so a module never needs to know
- * which modules come after it. A module runs its stages through
+ * which starts the module after it (the order of MODULE_CLASS_NAMES below; Logic Models
+ * follows Programs because its models name the Programs sample programs), so a module never
+ * needs to know which modules come after it. A module runs its stages through
  * SampleDataStageBatch (see SampleDataStages), because a queueable chain stops after five
  * jobs in Developer Edition, trial and scratch orgs.
  */
@@ -24,8 +25,16 @@ public with sharing class SampleDataModules {
 		'GivingSampleData',
 		'VolunteersSampleData',
 		'ProgramsSampleData',
+		'LogicModelsSampleData',
 		'FundersSampleData',
-		'EventsSampleData'
+		'EventsSampleData',
+		'MembershipsSampleData',
+		'ScholarshipsSampleData',
+		'ProjectsSampleData',
+		'CorporateHubSampleData',
+		'FormsSampleData',
+		'PortalSampleData',
+		'TerritorySampleData'
 	};
 
 	/** Injected by the tests, which have no other package to resolve a real module from. */
