@@ -46,10 +46,13 @@ Nothing is set up in Salesforce Setup.
 
 ## The Events Page
 
-Event Management has no app of its own (D-188): its **Events Home**, **Event Calendar**,
-**Events** and **Event Speakers** tabs are in the **BarnCRM** and **BarnCRM Console** apps, after **Data Manager** (see
-[The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). An event opens on its
-own record page from any app.
+Event Management has its own app, **BarnCRM Events** (**Events Home**, **Event Calendar**,
+**Events**, **Event Speakers**, **Venues**, **Reports** and **Error Log**), shown to everyone
+with an Events permission set. The same tabs, without Reports and Error Log, are also in the
+**BarnCRM** and **BarnCRM Console** apps, after **Data Manager** (see
+[The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). A scratch or Developer
+Edition org gets no BarnCRM Events app, only the tabs in the BarnCRM apps. An event opens on
+its own record page from any app.
 
 The **Events Home** tab lists the events still to come,
 soonest first, with their dates, status, format and place; **Past** lists those that ended or

@@ -46,10 +46,13 @@ page, does three things, each safe to run again:
 
 The **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**,
 **Boards and Committees** and **Board Meetings** tabs join the BarnCRM and BarnCRM Console apps
-before Error Log. Corporate Hub has no app of its own. The **Processing Activities**, **Data
-Subject Requests** and **Data Breaches** tabs are not added to the apps' menus (most
-organizations open them rarely): find them in the App Launcher, or add them to an app's
-navigation yourself.
+before Error Log. Corporate Hub also has its own app, **BarnCRM Corporate Hub**, shown to
+everyone with a Corporate Hub permission set: those six tabs, then **Processing Activities**,
+**Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards** and **Error Log**.
+The three data protection tabs are not added to the BarnCRM apps' menus (most organizations
+open them rarely): open them in BarnCRM Corporate Hub or the App Launcher. A scratch or
+Developer Edition org gets no BarnCRM Corporate Hub app, only the tabs in the BarnCRM apps (see
+[The Module Apps](barncrm-app.md#the-module-apps)).
 
 ## Access
 

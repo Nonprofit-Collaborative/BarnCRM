@@ -13783,7 +13783,7 @@ and gives the new version its signing key.
 ### Salesforce implementation
 
 - **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
-  edits), tab Forms in the BarnCRM apps (no module app, D-188).
+  edits), tab Forms in the BarnCRM Forms app and the BarnCRM apps (D-188, ADR-NEXT module apps).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -14167,7 +14167,8 @@ registration form is shown while the status is Open and now is inside the regist
 ### Salesforce implementation
 
 - **Object:** `Event__c`, name field Text, label Event Name, sharing Public Read/Write, tab Events
-  (the object) and the Events page (`Events_Home`) in the BarnCRM apps (no module app, D-188).
+  (the object) and the Events page (`Events_Home`) in the BarnCRM Events app and the BarnCRM apps
+  (D-188, ADR-NEXT module apps).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -19493,11 +19494,11 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and its catalog row's access maps (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models tab, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and its catalog row's access maps (ADR-0154 `0154-logic-models-module.md`). No app of its own since release 1.24 (D-200 R6): the Logic Models tab joins the BarnCRM apps, and the Logic Model record page, which carries the builder panel (`logicModelBuilder`), is the object's org default |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and its catalog row's access maps (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
-| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Events Home, Event Calendar, Events and Event Speakers tabs join BarnCRM and BarnCRM Console at deploy; the Event record page, the object's org default, carries the event's tabs |
+| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). App `BarnCRM_Events` (ADR-NEXT module apps, left out of scratch and Developer Edition orgs); the Events Home, Event Calendar, Events, Event Speakers and Venues tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Event record page, the object's org default, carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
-| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
+| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). App `BarnCRM_Forms` (ADR-NEXT module apps, left out of scratch and Developer Edition orgs); the Forms and Form Submissions tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
-| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
+| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). App `BarnCRM_Corporate_Hub` (ADR-NEXT module apps, left out of scratch and Developer Edition orgs); the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs also join BarnCRM and BarnCRM Console (ADR-0192) |
 | Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and its catalog row's access maps (ADR-0201 `0201-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
 | Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-0201 `0201-payments-module.md` decision 8) |
 | Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, its catalog row's access maps and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |

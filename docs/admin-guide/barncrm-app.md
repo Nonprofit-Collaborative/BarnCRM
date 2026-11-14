@@ -53,20 +53,40 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Gifts and everything around them (Giving module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
-| Forms and form submissions (Forms module) | **BarnCRM** or **BarnCRM Console** (no app of its own) |
-| Events and speakers (Event Management module) | **BarnCRM** or **BarnCRM Console** (no app of its own) |
-| Portals (Portal Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** (no app of its own) |
+| Forms and form submissions (Forms module) | The **BarnCRM Forms** app, and **BarnCRM** or **BarnCRM Console** |
+| Events, speakers and venues (Event Management module) | The **BarnCRM Events** app, and **BarnCRM** or **BarnCRM Console** |
+| Portals (Portal Builder module) | The **BarnCRM Portal Builder** app, and **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Library, compliance, agreements and boards (Corporate Hub module) | The **BarnCRM Corporate Hub** app, and **BarnCRM** or **BarnCRM Console** |
+| Projects, time and expenses (Project Management module) | The **BarnCRM Projects** app, and **BarnCRM** or **BarnCRM Console** |
 
 The home page's **Modules** list names each installed module, marked **On** or **Off** (turned
 off in BarnCRM Settings, Modules), with an **Open the App** link for a module that has an app
-of its own. Rollup Builder, Mirror, Forms, Event Management and Portal Builder have no app of
-their own (D-188 keeps the org under Salesforce's custom app limit): their pages are in the
-BarnCRM apps.
+of its own. Rollup Builder, Mirror and the smaller modules have no app of their own: their
+pages are in the BarnCRM apps.
+
+### The Module Apps
+
+Each module app is a console app with the module's own logo, every page of the module,
+**Reports**, and **Error Log** last. The module's permission sets show the app, so whoever has
+the module's Staff, Admin or Read Only set (Portal Builder: its Admin set) sees it in the App
+Launcher.
+
+| App | Pages |
+|---|---|
+| **BarnCRM Events** | Events Home, Event Calendar, Events, Event Speakers, Venues, Reports, Error Log |
+| **BarnCRM Forms** | Forms, Form Submissions, Reports, Error Log |
+| **BarnCRM Portal Builder** | Portals, Portal Accesses, Reports, Error Log |
+| **BarnCRM Corporate Hub** | Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings, Processing Activities, Data Subject Requests, Data Breaches, Reports, Dashboards, Error Log |
+| **BarnCRM Projects** | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request Connections, Reports, Error Log |
+
+Test and developer orgs (scratch and Developer Edition orgs) allow only about 10 custom apps, so
+`scripts/org/deploy-packages.sh` leaves these five apps out of such an org; every page is still
+in the BarnCRM apps there (ADR-NEXT). A production org or sandbox gets every app.
 
 ### A Module's Pages in the BarnCRM Apps
 
-Giving and Volunteers keep their own apps, and their pages can also sit in the BarnCRM apps
-so you need not switch apps. The modules with no app have their pages only here:
+The modules with their own app keep it, and their pages also sit in the BarnCRM apps so you
+need not switch apps. The modules with no app have their pages only here:
 
 | Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
 |---|---|---|
@@ -75,8 +95,10 @@ so you need not switch apps. The modules with no app have their pages only here:
 | Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Campaign Sync, Opportunity Mirror, Accounting Export |
 | Forms | Forms, Form Submissions | |
-| Event Management | Events Home, Event Calendar, Events, Event Speakers | |
+| Event Management | Events Home, Event Calendar, Events, Event Speakers, Venues | |
 | Portal Builder | | Portals, Portal Accesses |
+| Corporate Hub | Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and Committees, Board Meetings | |
+| Project Management | Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries, Project Expenses, Project Resources, Staffing | Project Rates, Project Invoices, Request Connections |
 
 A module's pages go after **Data Manager** in the everyday apps and before **Error Log** in
 the admin apps, so Error Log stays last. A form, form submission or event opens on its own

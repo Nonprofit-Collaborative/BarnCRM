@@ -1,7 +1,9 @@
 # Events
 
-The **Events Home**, **Event Calendar** and **Events** tabs in the **BarnCRM** (or **BarnCRM Console**) app are
-where you plan your organization's events. You need the Events
+The **Events Home**, **Event Calendar** and **Events** tabs are
+where you plan your organization's events. They are in the **BarnCRM Events** app (open it from
+the App Launcher; it also has **Event Speakers**, **Venues** and **Reports**) and in the
+**BarnCRM** (or **BarnCRM Console**) app, so use whichever you prefer. You need the Events
 Staff or Events Admin permission set to create and change events; with Events Read Only you can
 look at them.
 
