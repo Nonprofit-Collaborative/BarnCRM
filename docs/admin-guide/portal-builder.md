@@ -344,6 +344,15 @@ visitor's own address (most hosts set this up); otherwise every visitor shares o
 - **Stop the website entirely:** revoke the External Client App's tokens or deactivate the
   integration user.
 
+## Sample Data
+
+**Load Sample Data** on BarnCRM Settings adds one example portal, **Sample Supporter Portal**,
+so you can see how a portal is set up. It uses the **My Account** template (a My Details page and
+a My Roles page), invites people only, has the second factor off, and is left **Inactive**, so
+nothing is open to anyone and no one can sign in. Three of Core's sample people have a Portal
+Access, one of them Suspended. Nothing public is created. **Remove Sample Data** deletes the
+portal and its accesses; your own portals stay.
+
 ## Common Mistakes
 
 **Nobody gets a code.** Check Deliverability is All email, the Sender Address is a verified

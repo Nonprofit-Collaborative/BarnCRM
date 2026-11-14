@@ -16,7 +16,8 @@
         "Territory_Run__c.Message__c": {"editable": "false", "readable": "true"},
         "Territory_Run__c.Only_Unassigned__c": {"editable": "false", "readable": "true"},
         "Territory_Run__c.Summary_JSON__c": {"editable": "false", "readable": "true"},
-        "Territory__c.Next_Member__c": {"editable": "true", "readable": "true"}
+        "Territory__c.Next_Member__c": {"editable": "true", "readable": "true"},
+        "Territory__c.Sample_Data__c": {"editable": "true", "readable": "true"}
       },
       "objectPermissions": {
         "Territory_Run__c": {"allowCreate": "false", "allowDelete": "true", "allowEdit": "true", "allowRead": "true", "modifyAllRecords": "false", "viewAllRecords": "true"}

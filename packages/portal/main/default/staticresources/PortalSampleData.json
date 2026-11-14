@@ -1,0 +1,67 @@
+{
+  "module": "Portal",
+  "countLabel": "Portals",
+  "count": {
+    "object": "Portal__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Portal__c",
+      "records": [
+        {
+          "key": "supporters",
+          "Name": "Sample Supporter Portal",
+          "Key__c": "sample-supporters",
+          "Status__c": "Inactive",
+          "Access_Mode__c": "Invited",
+          "Second_Factor__c": "Off",
+          "Session_Hours__c": 8,
+          "Template__c": "{\"schemaVersion\":1,\"key\":\"sample\",\"title\":\"My Account\",\"pages\":[{\"key\":\"profile\",\"title\":\"My Details\",\"kind\":\"person\",\"fields\":[{\"field\":\"FirstName\"},{\"field\":\"LastName\"},{\"field\":\"MobilePhone\",\"label\":\"Mobile\",\"edit\":true},{\"field\":\"Description\",\"edit\":true}],\"actions\":[\"update\"]},{\"key\":\"roles\",\"title\":\"My Roles\",\"kind\":\"related\",\"object\":\"Affiliation__c\",\"personField\":\"Contact__c\",\"fields\":[{\"field\":\"Organization__r.Name\",\"label\":\"Organization\"},{\"field\":\"Role__c\",\"edit\":true,\"required\":true},{\"field\":\"Status__c\"}],\"where\":[{\"field\":\"Status__c\",\"op\":\"equals\",\"value\":\"Current\"}],\"orderBy\":\"Role__c ASC\",\"actions\":[\"update\"]}]}",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Portal_Access__c",
+      "records": [
+        {
+          "key": "a1",
+          "Portal__c": {
+            "ref": "supporters"
+          },
+          "Person__c": {
+            "sample": "H001-1"
+          },
+          "Status__c": "Active"
+        },
+        {
+          "key": "a2",
+          "Portal__c": {
+            "ref": "supporters"
+          },
+          "Person__c": {
+            "sample": "H002-1"
+          },
+          "Status__c": "Active"
+        },
+        {
+          "key": "a3",
+          "Portal__c": {
+            "ref": "supporters"
+          },
+          "Person__c": {
+            "sample": "H003-1"
+          },
+          "Status__c": "Suspended"
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Portal__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

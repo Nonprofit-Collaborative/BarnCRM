@@ -1,0 +1,132 @@
+{
+  "module": "Territory",
+  "countLabel": "Territories",
+  "count": {
+    "object": "Territory__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Territory__c",
+      "records": [
+        {
+          "key": "mn",
+          "Name": "Minnesota Region",
+          "Active__c": true,
+          "Priority__c": 10,
+          "Routing__c": "Keep Owner",
+          "Description__c": "Households and people in Minnesota. Keeps whoever already owns each record.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "ga",
+          "Name": "Georgia Region",
+          "Active__c": true,
+          "Priority__c": 20,
+          "Routing__c": "Territory Owner",
+          "Description__c": "Households and people in Georgia. Every record goes to the territory owner.",
+          "Sample_Data__c": true,
+          "Owner_User__c": {
+            "currentUser": true
+          }
+        },
+        {
+          "key": "oh",
+          "Name": "Ohio Region",
+          "Active__c": true,
+          "Priority__c": 30,
+          "Routing__c": "Round Robin",
+          "Description__c": "Households and people in Ohio. Members take new records in turn.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Territory_Rule__c",
+      "records": [
+        {
+          "key": "mn-h",
+          "Territory__c": {
+            "ref": "mn"
+          },
+          "Applies_To__c": "Households",
+          "Active__c": true,
+          "Filter_JSON__c": "{\"version\":1,\"conditions\":[{\"id\":1,\"field\":\"BillingState\",\"operator\":\"equals\",\"value\":\"MN\"}]}",
+          "Summary__c": "Billing state is MN"
+        },
+        {
+          "key": "mn-p",
+          "Territory__c": {
+            "ref": "mn"
+          },
+          "Applies_To__c": "People",
+          "Active__c": true,
+          "Filter_JSON__c": "{\"version\":1,\"conditions\":[{\"id\":1,\"field\":\"MailingState\",\"operator\":\"equals\",\"value\":\"MN\"}]}",
+          "Summary__c": "Mailing state is MN"
+        },
+        {
+          "key": "ga-h",
+          "Territory__c": {
+            "ref": "ga"
+          },
+          "Applies_To__c": "Households",
+          "Active__c": true,
+          "Filter_JSON__c": "{\"version\":1,\"conditions\":[{\"id\":1,\"field\":\"BillingState\",\"operator\":\"equals\",\"value\":\"GA\"}]}",
+          "Summary__c": "Billing state is GA"
+        },
+        {
+          "key": "ga-p",
+          "Territory__c": {
+            "ref": "ga"
+          },
+          "Applies_To__c": "People",
+          "Active__c": true,
+          "Filter_JSON__c": "{\"version\":1,\"conditions\":[{\"id\":1,\"field\":\"MailingState\",\"operator\":\"equals\",\"value\":\"GA\"}]}",
+          "Summary__c": "Mailing state is GA"
+        },
+        {
+          "key": "oh-h",
+          "Territory__c": {
+            "ref": "oh"
+          },
+          "Applies_To__c": "Households",
+          "Active__c": true,
+          "Filter_JSON__c": "{\"version\":1,\"conditions\":[{\"id\":1,\"field\":\"BillingState\",\"operator\":\"equals\",\"value\":\"OH\"}]}",
+          "Summary__c": "Billing state is OH"
+        },
+        {
+          "key": "oh-p",
+          "Territory__c": {
+            "ref": "oh"
+          },
+          "Applies_To__c": "People",
+          "Active__c": true,
+          "Filter_JSON__c": "{\"version\":1,\"conditions\":[{\"id\":1,\"field\":\"MailingState\",\"operator\":\"equals\",\"value\":\"OH\"}]}",
+          "Summary__c": "Mailing state is OH"
+        }
+      ]
+    },
+    {
+      "object": "Territory_Member__c",
+      "records": [
+        {
+          "key": "m1",
+          "Territory__c": {
+            "ref": "oh"
+          },
+          "User__c": {
+            "currentUser": true
+          },
+          "Active__c": true,
+          "Capacity__c": 150
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Territory__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

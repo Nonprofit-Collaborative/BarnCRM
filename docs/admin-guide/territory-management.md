@@ -108,6 +108,16 @@ overnight. Its switch ships **off**, because it changes owners; turn it on there
 user the nightly run is scheduled under. Each night's run is its own data job, with its own
 Undo.
 
+## Sample Data
+
+**Load Sample Data** on BarnCRM Settings adds three example territories: **Minnesota Region**
+(Keep Owner), **Georgia Region** (Territory Owner, you as the owner) and **Ohio Region** (Round
+Robin, you as its one member). Each has a household rule (billing state) and a people rule
+(mailing state) matching Core's sample households and people in that state. Nothing is assigned
+when the sample loads: open Territory Management and use **Preview** and **Assign** to see the
+rules place the sample records. **Remove Sample Data** deletes the territories, rules and member,
+and clears the Territory of any record assigned to them; your own territories stay.
+
 ## Limits and Notes
 
 - Capacity counts the records of the territory each member owns when the run first needs that

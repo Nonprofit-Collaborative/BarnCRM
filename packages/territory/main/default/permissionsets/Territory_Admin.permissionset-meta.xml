@@ -27,6 +27,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Territory__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Territory_Member__c.Active__c</field>
     <readable>true</readable>
   </fieldPermissions>

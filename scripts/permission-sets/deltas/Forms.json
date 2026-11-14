@@ -7,6 +7,7 @@
         "FormBuilderController": {"enabled": "true"}
       },
       "fieldPermissions": {
+        "Form__c.Sample_Data__c": {"editable": "true", "readable": "true"},
         "Form_Draft__c.Answers__c": {"editable": "false", "readable": "true"},
         "Form_Draft__c.Expires__c": {"editable": "false", "readable": "true"},
         "Form_Draft__c.Form_Version__c": {"editable": "false", "readable": "true"},

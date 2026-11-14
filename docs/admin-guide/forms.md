@@ -242,6 +242,17 @@ answers, the **Person** and **Organization** it matched or added, and the versio
 was filled in from. Its record page shows the answers by question and the records written,
 each linked. Reports on Form Submissions work like any other.
 
+## Sample Data
+
+**Load Sample Data** on BarnCRM Settings adds three example forms so you can see how a form is
+built before you build your own. **Volunteer Sign-Up** and **Event Registration** are published;
+**Contact Us** is a draft. The sign-up form writes a person, their employer and an affiliation
+between them, and shows a **Parent or Guardian** step for anyone under 18. The registration form
+shows its meal question only when meals are needed. None of the forms is public. Five submissions
+show each state: two Processed (linked to Core's sample people), one Needs Review and two
+Received. **Remove Sample Data** deletes the three forms with their versions and submissions; your
+own forms stay.
+
 ## Limits
 
 A form has at most 20 steps, 100 questions and 10 records to write, and a picklist at most 200

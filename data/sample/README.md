@@ -38,6 +38,9 @@ default allocations, installment schedules, automatic household soft credits), a
   models for the Programs sample programs After-school tutoring and Food pantry, with every
   column, arrows with assumptions and evidence, and indicators with targets and results. It
   names each program with `find`, so it loads after Programs and loads nothing without it.
+- `FormsSampleData.json`, `PortalSampleData.json` and `TerritorySampleData.json` (release 1.25):
+  three example forms with versions and submissions; one Inactive, invite-only portal with its
+  accesses; three state territories with rules and a member.
 
 ### Module files (D-200 S2)
 
