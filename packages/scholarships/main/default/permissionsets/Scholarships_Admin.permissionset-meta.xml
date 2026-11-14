@@ -291,6 +291,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Award_Program__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Award_Requirement__c.Due_Date__c</field>
     <readable>true</readable>
   </fieldPermissions>

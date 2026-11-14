@@ -17438,6 +17438,7 @@ A scholarship, fellowship or outbound grant program the organization gives (SG-0
 | Active | `Active__c` | Checkbox, default true |
 | Description | `Description__c` | Long Text Area(32768) |
 | Award Letter Template | `Letter_Template__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 ---
 
@@ -17866,6 +17867,7 @@ lasts and how long a lapsed member stays in grace (G-22a, Memberships module, AD
 | Fund Id | text | no | The Giving fund whose gifts pay for this level (R-MEM6), as a record id. |
 | Description | long text | no | What the level is, for staff and members. |
 | External Id | text | no | The record's id in the system it was imported from; unique. |
+| Sample Data | boolean | no | True when the sample data loader created the level. Default false. |
 
 ### Salesforce implementation
 
@@ -17882,6 +17884,7 @@ lasts and how long a lapsed member stays in grace (G-22a, Memberships module, AD
 | Fund Id | `Fund_Id__c` | Text(18) |
 | Description | `Description__c` | Long Text Area(4000) |
 | External Id | `External_Id__c` | Text(255), unique, external ID |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 ---
 
@@ -17951,6 +17954,7 @@ renews.
 | Is Active | formula | no | True while Current or Grace. |
 | External Id | text | no | The record's id in the system it was imported from; unique. |
 | Notes | long text | no | Staff notes. |
+| Sample Data | boolean | no | True when the sample data loader created the term, so the set can be removed in one action. Default false. |
 
 ### Rules
 
@@ -18020,6 +18024,7 @@ their Member Name, level, Directory Location and Directory Bio.
 | Is Active | `Is_Active__c` | Formula (Checkbox) |
 | External Id | `External_Id__c` | Text(255), unique, external ID |
 | Notes | `Notes__c` | Long Text Area(4000) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false |
 
 ---
 
@@ -19268,6 +19273,7 @@ mirrors the primary member).
 | 1.61 | 2026-11-13 | One nightly card (D-200 S6, release 1.23; ADR-0038 note of 2026-11-13). No object or field added. The Giving Nightly Jobs page, tab and `GivingJobsController` are retired: Core's Nightly Jobs panel switches each step on its own, offers Run Now where a step allows it, and shows each step's own summary of its last run (R-IN5 updated). The settings group Nightly Jobs and Accounting Periods becomes Accounting Periods. |
 | 1.62 | 2026-11-13 | Home quick links from the module catalog (D-200 R7, release 1.24). `BarnCRM_Module__mdt` gains Quick Links (`Quick_Links__c`): Giving's Enter a Gift, Volunteers' Log Hours and Programs' Enroll replace the hard-coded Quick Gift Entry tile. |
 | 1.63 | 2026-11-13 | BarnCRM Logic Models app retired (D-200 R6, release 1.24; D-130 amended). No object or field added. The `BarnCRM_Logic_Models` app and its permission set visibilities go; the Logic Model record page becomes the object's org default (Large and Small); the module's catalog row has no App Name. The Logic Models tab stays in the BarnCRM apps and the App Launcher. |
+| 1.64 | 2026-11-13 | Sample data for Memberships and Scholarships (release 1.25). `Membership_Level__c`, `Membership_Term__c` and `Award_Program__c` each gain `Sample_Data__c` (Checkbox, default false), the mark the sample data loader sets so the set is counted and removed in one action; children go with their parent. No other object or rule changes. |
 
 ---
 ## 32. Entity ownership by package

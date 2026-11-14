@@ -2,6 +2,12 @@
   "Admin": {
     "label": "Memberships Admin",
     "description": ["Sets up membership levels, benefits and certifications, and sees and changes every membership", "and member certification. Given to BarnCRM Admin holders."],
+    "add": {
+      "fieldPermissions": {
+        "Membership_Level__c.Sample_Data__c": {"editable": "true", "readable": "true"},
+        "Membership_Term__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      }
+    },
     "set": {
       "fieldPermissions": {
         "Certification__c.Active__c": {"editable": "true"},

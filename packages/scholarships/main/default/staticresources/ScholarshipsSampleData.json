@@ -1,0 +1,447 @@
+{
+  "module": "Scholarships",
+  "countLabel": "Programs",
+  "count": {
+    "object": "Award_Program__c",
+    "where": "Sample_Data__c = TRUE"
+  },
+  "steps": [
+    {
+      "object": "Award_Program__c",
+      "records": [
+        {
+          "key": "scholarship",
+          "Name": "Harvest Community Scholarship",
+          "Type__c": "Scholarship",
+          "Active__c": true,
+          "Description__c": "Helps local students pay for tuition and books. Two review scores per application, then awards paid in installments.",
+          "Sample_Data__c": true
+        },
+        {
+          "key": "grants",
+          "Name": "Neighborhood Small Grants",
+          "Type__c": "Grant",
+          "Active__c": true,
+          "Description__c": "Small grants to local clubs, congregations and businesses for community projects.",
+          "Sample_Data__c": true
+        }
+      ]
+    },
+    {
+      "object": "Award_Cycle__c",
+      "records": [
+        {
+          "key": "spring",
+          "Program__c": { "ref": "scholarship" },
+          "Name": "Last Spring",
+          "Status__c": "Decided",
+          "Open_Date__c": { "days": -150 },
+          "Close_Date__c": { "days": -100 },
+          "Budget__c": 10000,
+          "Award_Count__c": 3,
+          "Reviewers_Per_Application__c": 2,
+          "Eligibility__c": "Open to residents enrolled at least half time in a college or trade program.",
+          "Blind_Review__c": false
+        },
+        {
+          "key": "fall",
+          "Program__c": { "ref": "scholarship" },
+          "Name": "This Fall",
+          "Status__c": "Open",
+          "Open_Date__c": { "days": -20 },
+          "Close_Date__c": { "days": 25 },
+          "Budget__c": 12000,
+          "Award_Count__c": 4,
+          "Reviewers_Per_Application__c": 2,
+          "Eligibility__c": "Open to residents enrolled at least half time in a college or trade program.",
+          "Blind_Review__c": true
+        },
+        {
+          "key": "round",
+          "Program__c": { "ref": "grants" },
+          "Name": "Neighborhood Round",
+          "Status__c": "Reviewing",
+          "Open_Date__c": { "days": -45 },
+          "Close_Date__c": { "days": -5 },
+          "Budget__c": 15000,
+          "Award_Count__c": 3,
+          "Reviewers_Per_Application__c": 2,
+          "Eligibility__c": "Open to nonprofit organizations and local businesses serving this community."
+        }
+      ]
+    },
+    {
+      "object": "Award_Application__c",
+      "records": [
+        {
+          "key": "a1",
+          "Cycle__c": { "ref": "spring" },
+          "Contact__c": { "sample": "H002-3", "optional": true },
+          "Title__c": "Nursing program tuition",
+          "Status__c": "Awarded",
+          "Amount_Requested__c": 2500,
+          "Submitted_Date__c": { "days": -140 },
+          "Summary__c": "Second-year nursing student asking for help with tuition."
+        },
+        {
+          "key": "a2",
+          "Cycle__c": { "ref": "spring" },
+          "Contact__c": { "sample": "H005-2", "optional": true },
+          "Title__c": "Welding certificate",
+          "Status__c": "Awarded",
+          "Amount_Requested__c": 2500,
+          "Submitted_Date__c": { "days": -138 },
+          "Summary__c": "Evening welding certificate at the community college."
+        },
+        {
+          "key": "a3",
+          "Cycle__c": { "ref": "spring" },
+          "Contact__c": { "sample": "H014-1", "optional": true },
+          "Title__c": "Textbooks and lab fees",
+          "Status__c": "Awarded",
+          "Amount_Requested__c": 2500,
+          "Submitted_Date__c": { "days": -135 },
+          "Summary__c": "Biology degree, third year."
+        },
+        {
+          "key": "a4",
+          "Cycle__c": { "ref": "spring" },
+          "Contact__c": { "sample": "H014-2", "optional": true },
+          "Title__c": "Part-time degree tuition",
+          "Status__c": "Declined",
+          "Amount_Requested__c": 2500,
+          "Submitted_Date__c": { "days": -130 },
+          "Summary__c": "Part-time accounting degree."
+        },
+        {
+          "key": "a5",
+          "Cycle__c": { "ref": "spring" },
+          "Contact__c": { "sample": "H016-4", "optional": true },
+          "Title__c": "Design school tuition",
+          "Status__c": "Withdrawn",
+          "Amount_Requested__c": 2000,
+          "Submitted_Date__c": { "days": -128 },
+          "Summary__c": "Withdrawn after the applicant took a full scholarship elsewhere."
+        },
+        {
+          "key": "b1",
+          "Cycle__c": { "ref": "fall" },
+          "Contact__c": { "sample": "H013-1", "optional": true },
+          "Title__c": "Teaching credential",
+          "Status__c": "Draft",
+          "Amount_Requested__c": 2500,
+          "Summary__c": "Started, not yet submitted."
+        },
+        {
+          "key": "b2",
+          "Cycle__c": { "ref": "fall" },
+          "Contact__c": { "sample": "H012-1", "optional": true },
+          "Title__c": "Nursing refresher course",
+          "Status__c": "Submitted",
+          "Amount_Requested__c": 1800,
+          "Submitted_Date__c": { "days": -3 },
+          "Summary__c": "Returning to nursing after a career break."
+        },
+        {
+          "key": "b3",
+          "Cycle__c": { "ref": "fall" },
+          "Contact__c": { "sample": "H003-2", "optional": true },
+          "Title__c": "Culinary arts program",
+          "Status__c": "Eligible",
+          "Amount_Requested__c": 2200,
+          "Submitted_Date__c": { "days": -9 },
+          "Summary__c": "Passed the eligibility rules and waiting for reviewers."
+        },
+        {
+          "key": "b4",
+          "Cycle__c": { "ref": "fall" },
+          "Contact__c": { "sample": "H016-3", "optional": true },
+          "Title__c": "Computer science degree",
+          "Status__c": "In Review",
+          "Amount_Requested__c": 2500,
+          "Submitted_Date__c": { "days": -14 },
+          "Summary__c": "Evening degree while working full time."
+        },
+        {
+          "key": "b5",
+          "Cycle__c": { "ref": "fall" },
+          "Contact__c": { "sample": "H012-2", "optional": true },
+          "Title__c": "Woodworking classes",
+          "Status__c": "Ineligible",
+          "Amount_Requested__c": 900,
+          "Submitted_Date__c": { "days": -12 },
+          "Eligibility_Notes__c": "Not enrolled in a college or trade program."
+        },
+        {
+          "key": "c1",
+          "Cycle__c": { "ref": "round" },
+          "Organization__c": { "sample": "O007", "optional": true },
+          "Title__c": "Park bench replacement",
+          "Status__c": "In Review",
+          "Amount_Requested__c": 5000,
+          "Submitted_Date__c": { "days": -30 },
+          "Summary__c": "Replace twelve benches along the river trail."
+        },
+        {
+          "key": "c2",
+          "Cycle__c": { "ref": "round" },
+          "Organization__c": { "sample": "O011", "optional": true },
+          "Title__c": "Community meal program",
+          "Status__c": "In Review",
+          "Amount_Requested__c": 4000,
+          "Submitted_Date__c": { "days": -28 },
+          "Summary__c": "A weekly meal for seniors."
+        },
+        {
+          "key": "c3",
+          "Cycle__c": { "ref": "round" },
+          "Organization__c": { "sample": "O015", "optional": true },
+          "Title__c": "Youth league equipment",
+          "Status__c": "Eligible",
+          "Amount_Requested__c": 3500,
+          "Submitted_Date__c": { "days": -20 },
+          "Summary__c": "Uniforms and nets for the youth league."
+        },
+        {
+          "key": "c4",
+          "Cycle__c": { "ref": "round" },
+          "Organization__c": { "sample": "O018", "optional": true },
+          "Title__c": "Library reading garden",
+          "Status__c": "Submitted",
+          "Amount_Requested__c": 6000,
+          "Submitted_Date__c": { "days": -8 },
+          "Summary__c": "An outdoor reading space at the branch library."
+        }
+      ]
+    },
+    {
+      "object": "Application_Review__c",
+      "records": [
+        {
+          "Application__c": { "ref": "a1" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 9,
+          "Comments__c": "Clear plan and strong references."
+        },
+        {
+          "Application__c": { "ref": "a1" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 8,
+          "Comments__c": "Excellent fit for the program."
+        },
+        {
+          "Application__c": { "ref": "a2" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 8,
+          "Comments__c": "Good need and a clear job outcome."
+        },
+        {
+          "Application__c": { "ref": "a2" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 9
+        },
+        {
+          "Application__c": { "ref": "a3" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 8
+        },
+        {
+          "Application__c": { "ref": "a3" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 7
+        },
+        {
+          "Application__c": { "ref": "a4" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 5,
+          "Comments__c": "Budget did not match the request."
+        },
+        {
+          "Application__c": { "ref": "a4" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 6
+        },
+        {
+          "Application__c": { "ref": "b4" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 8,
+          "Comments__c": "Strong, scored on the application alone."
+        },
+        {
+          "Application__c": { "ref": "b4" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Assigned"
+        },
+        {
+          "Application__c": { "ref": "c1" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 7
+        },
+        {
+          "Application__c": { "ref": "c1" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 9
+        },
+        {
+          "Application__c": { "ref": "c2" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Submitted",
+          "Score__c": 6
+        },
+        {
+          "Application__c": { "ref": "c2" },
+          "Reviewer__c": { "currentUser": true },
+          "Status__c": "Recused",
+          "Recusal_Reason__c": "Serves on the applicant's board."
+        }
+      ]
+    },
+    {
+      "object": "Award__c",
+      "records": [
+        {
+          "key": "aw1",
+          "Cycle__c": { "ref": "spring" },
+          "Application__c": { "ref": "a1" },
+          "Contact__c": { "sample": "H002-3", "optional": true },
+          "Status__c": "Active",
+          "Amount__c": 2500,
+          "Decision_Date__c": { "days": -95 },
+          "Letter_Sent_Date__c": { "days": -92 },
+          "Accepted_Date__c": { "days": -90 },
+          "Renewable__c": true,
+          "Conditions__c": "Stay enrolled at least half time and send one progress report."
+        },
+        {
+          "key": "aw2",
+          "Cycle__c": { "ref": "spring" },
+          "Application__c": { "ref": "a2" },
+          "Contact__c": { "sample": "H005-2", "optional": true },
+          "Status__c": "Completed",
+          "Amount__c": 2500,
+          "Decision_Date__c": { "days": -95 },
+          "Letter_Sent_Date__c": { "days": -92 },
+          "Accepted_Date__c": { "days": -91 }
+        },
+        {
+          "key": "aw3",
+          "Cycle__c": { "ref": "spring" },
+          "Application__c": { "ref": "a3" },
+          "Contact__c": { "sample": "H014-1", "optional": true },
+          "Status__c": "Accepted",
+          "Amount__c": 2500,
+          "Decision_Date__c": { "days": -95 },
+          "Letter_Sent_Date__c": { "days": -92 },
+          "Accepted_Date__c": { "days": -85 },
+          "Conditions__c": "Send proof of enrollment before the first payment."
+        }
+      ]
+    },
+    {
+      "object": "Award_Payment__c",
+      "records": [
+        {
+          "key": "d1",
+          "Award__c": { "ref": "aw1" },
+          "Status__c": "Paid",
+          "Amount__c": 1250,
+          "Scheduled_Date__c": { "days": -60 },
+          "Paid_Date__c": { "days": -58 },
+          "Payment_Method__c": "Bank Transfer",
+          "Reference__c": "EX-1001"
+        },
+        {
+          "key": "d2",
+          "Award__c": { "ref": "aw1" },
+          "Status__c": "Scheduled",
+          "Amount__c": 1250,
+          "Scheduled_Date__c": { "days": 60 },
+          "Payment_Method__c": "Bank Transfer"
+        },
+        {
+          "key": "d3",
+          "Award__c": { "ref": "aw2" },
+          "Status__c": "Paid",
+          "Amount__c": 2500,
+          "Scheduled_Date__c": { "days": -80 },
+          "Paid_Date__c": { "days": -78 },
+          "Payment_Method__c": "Check",
+          "Reference__c": "EX-1002"
+        },
+        {
+          "key": "d4",
+          "Award__c": { "ref": "aw3" },
+          "Status__c": "Scheduled",
+          "Amount__c": 1250,
+          "Scheduled_Date__c": { "days": 30 },
+          "Payment_Method__c": "Check"
+        },
+        {
+          "key": "d5",
+          "Award__c": { "ref": "aw3" },
+          "Status__c": "Scheduled",
+          "Amount__c": 1250,
+          "Scheduled_Date__c": { "days": 120 },
+          "Payment_Method__c": "Check"
+        }
+      ]
+    },
+    {
+      "object": "Award_Requirement__c",
+      "records": [
+        {
+          "Award__c": { "ref": "aw1" },
+          "Name": "Proof of Enrollment",
+          "Type__c": "Condition",
+          "Status__c": "Met",
+          "Due_Date__c": { "days": -85 },
+          "Submitted_Date__c": { "days": -88 },
+          "Instructions__c": "Upload the enrollment letter from the school."
+        },
+        {
+          "Award__c": { "ref": "aw1" },
+          "Name": "Mid-Year Progress Report",
+          "Type__c": "Progress Report",
+          "Status__c": "Open",
+          "Due_Date__c": { "days": 45 },
+          "Disbursement__c": { "ref": "d2" },
+          "Instructions__c": "A short note on classes taken and grades so far."
+        },
+        {
+          "Award__c": { "ref": "aw2" },
+          "Name": "Final Report",
+          "Type__c": "Final Report",
+          "Status__c": "Met",
+          "Due_Date__c": { "days": -70 },
+          "Submitted_Date__c": { "days": -72 }
+        },
+        {
+          "Award__c": { "ref": "aw3" },
+          "Name": "Proof of Enrollment",
+          "Type__c": "Condition",
+          "Status__c": "Open",
+          "Due_Date__c": { "days": 20 },
+          "Disbursement__c": { "ref": "d4" },
+          "Instructions__c": "Open conditions hold the next payment back until they are met."
+        }
+      ]
+    }
+  ],
+  "remove": [
+    {
+      "object": "Award_Program__c",
+      "where": "Sample_Data__c = TRUE"
+    }
+  ]
+}

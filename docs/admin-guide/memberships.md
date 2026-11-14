@@ -231,6 +231,18 @@ step of the nightly run.
 | Memberships Staff | Read | Create, edit |
 | Memberships Read Only | Read | Read |
 
+## Sample Data
+
+**BarnCRM Settings**, **Load Sample Data** (see [Sample Data](sample-data.md)) adds a small
+example of Memberships after Core's people are loaded: five levels (Individual, Family,
+Supporter, Business and Lifetime) with their benefits, and fourteen memberships for the sample
+people, households and organizations. They show a renewal that points back to the term it
+renewed, memberships due for renewal in 10 to 25 days, one in grace, two lapsed, one pending,
+one cancelled, a lifetime membership with no end date, and three members listed in the
+directory. The sample is not linked to Giving gifts. **Remove Sample Data** deletes only the
+levels and memberships the loader created (they carry a Sample Data checkbox); your own levels
+and memberships stay.
+
 ## Erasing a Person
 
 When you erase a person (see [Erase a Person](erase-a-person.md)), their memberships stay (as gifts

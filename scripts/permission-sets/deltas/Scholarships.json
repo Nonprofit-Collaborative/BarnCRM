@@ -3,6 +3,9 @@
     "label": "Scholarships Admin",
     "description": ["Everything in Scholarships and Outbound Grants, delete, and Manage Scholarships (decide", "awards, assign reviewers, mark disbursements paid). Given to BarnCRM Admin holders."],
     "add": {
+      "fieldPermissions": {
+        "Award_Program__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      },
       "customPermissions": {
         "Scholarships_Manage": {"enabled": "true"}
       }

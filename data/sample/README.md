@@ -27,6 +27,10 @@ default allocations, installment schedules, automatic household soft credits), a
 - `ProjectsSampleData.json` and `CorporateHubSampleData.json`, in the Project Management and
   Corporate Hub packages' `staticresources`: four projects with their work, and a board with its
   library, calendar and agreements. Same generic format and loader as the files below.
+- `MembershipsSampleData.json` (levels, benefits, memberships) and `ScholarshipsSampleData.json`
+  (programs, cycles, applications, reviews, awards, disbursements, requirements), in the same
+  format (release 1.25). Payments has no set: its records are made only by the checkout and the
+  webhook receiver.
 - `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
   module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
   by Core's `SampleDataFile` with no loader Apex in the module.
