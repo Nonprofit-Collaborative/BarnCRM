@@ -1618,6 +1618,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Saved_Query__c.Sample_Data__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Saved_Query__c.Shared__c</field>
     <readable>true</readable>
   </fieldPermissions>

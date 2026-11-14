@@ -133,6 +133,7 @@
         "Relationship__c.Sample_Data__c": {"editable": "true", "readable": "true"},
         "Saved_Query__c.Object_Name__c": {"editable": "true", "readable": "true"},
         "Saved_Query__c.Query_JSON__c": {"editable": "true", "readable": "true"},
+        "Saved_Query__c.Sample_Data__c": {"editable": "true", "readable": "true"},
         "Saved_Query__c.Shared__c": {"editable": "true", "readable": "true"},
         "Saved_Transform__c.Definition_JSON__c": {"editable": "true", "readable": "true"},
         "Saved_Transform__c.Object_Name__c": {"editable": "true", "readable": "true"},

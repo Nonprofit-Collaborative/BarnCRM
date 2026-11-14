@@ -504,3 +504,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 5 | As a Volunteers Read Only user, open the person. | The card shows its figures with no **Log Hours** button. |
 
 **Cleanup:** delete the hours entries from steps 2 and 3.
+
+## T-VOL-33: Sample Data
+
+**Purpose:** confirm the Volunteers sample data loads jobs, shifts, sign-ups, hours and volunteer profiles, and takes away only itself.
+**Prerequisites:** admin with Volunteers Admin; sample data not loaded; one volunteer job of your own.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Sample Data**, **Load Sample Data**, wait for it to finish. | The card shows a Volunteers count of `60` hours entries. |
+| 2 | Open **Volunteer Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** beside your own job. |
+| 3 | Open an upcoming **Front desk** shift. | Two sign-ups (one Confirmed, one Signed up), and **Suggested Volunteers** lists active sample volunteers with their reasons (for example "Available on Saturdays"); none of the two Inactive ones. |
+| 4 | Open a sample volunteer from a sign-up. | **Volunteer Status** Active, a **Volunteer Since** date, **Availability Days** and **Availability Times**. |
+| 5 | **Remove Sample Data**. | The sample jobs, shifts, sign-ups and hours are gone; your own job stays. |
+
+**Cleanup:** None.

@@ -154,3 +154,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | In the BarnCRM Fundraising app, open **Fundraising Home** and click **Tributes** under **More**. | No **New** button. |
 
 **Cleanup:** none.
+
+## T-CRED-11: Sample Matching Gifts, Stock and Gift Sources
+
+**Purpose:** confirm the Giving sample data shows matching gifts, stock details and gift sources, and removes them cleanly.
+**Prerequisites:** admin with Giving Admin; sample data not loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Sample Data**, **Load Sample Data**, wait for it to finish. | The load finishes. |
+| 2 | Open **Founders Consulting Group** and its **Gifts**; open the Received check. | **Matched Gift** names an employee's gift, and **Soft Credits** lists that employee as **Matched donor**. Open the employee's gift: its **Matched Gift** names the company's gift. |
+| 3 | On **Gifts**, filter **Type** equals Stock and open one. | **Stock Symbol** (EXMP, SMPL or DEMO) and **Shares** are filled in. |
+| 4 | Filter **Gift Source** equals Donor-Advised Fund and open one. | **Gift Source Name** names the giving account. |
+| 5 | **Remove Sample Data**, wait for **Not loaded**. | No sample gift is left, and the Error Log has no new error from the removal. |
+
+**Cleanup:** none.

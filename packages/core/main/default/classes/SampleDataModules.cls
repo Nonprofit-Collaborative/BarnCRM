@@ -22,6 +22,7 @@ public with sharing class SampleDataModules {
 	 * has a no-argument constructor, and implements SampleDataModule.
 	 */
 	private static final List<String> MODULE_CLASS_NAMES = new List<String>{
+		'CoreSampleData',
 		'GivingSampleData',
 		'VolunteersSampleData',
 		'ProgramsSampleData',

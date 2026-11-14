@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Private</cacheControl>
+  <contentType>application/json</contentType>
+  <description>
+    C-10 sample data, Core tools: three saved Find queries (one a Backup Set), two seasonal
+    addresses and three interaction notes on Core's sample people, loaded by SampleDataFile
+    (D-200 S2) right after Core's own set. Format: data/sample/README.md.
+  </description>
+</StaticResource>

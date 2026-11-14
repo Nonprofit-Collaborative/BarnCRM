@@ -41,6 +41,10 @@ default allocations, installment schedules, automatic household soft credits), a
 - `FormsSampleData.json`, `PortalSampleData.json` and `TerritorySampleData.json` (release 1.25):
   three example forms with versions and submissions; one Inactive, invite-only portal with its
   accesses; three state territories with rules and a member.
+- `packages/core/main/default/staticresources/CoreSampleData.json`, in the same generic format
+  (module `Core`), loaded first after Core's own set: three saved Find queries (one a Backup
+  Set), two seasonal addresses and three interaction notes on Core's sample records. Hand
+  written, not generated.
 
 ### Module files (D-200 S2)
 
@@ -211,7 +215,11 @@ still has gifts in the current year and the retention reports, the fiscal-year r
 the dashboard all have something true to show. A gift that reverses another names it by key
 in `originalGift` and carries the `refundReason`; nothing in the file carries a receipt
 number, because a receipted gift cannot be deleted (ADR-0024) and the set has to stay
-removable.
+removable. An employer's matching gift names the employee's gift by key in `matchedGift` and
+loads after it, so the matching rules link both sides; removal deletes the employer's gift
+before the employee's. A stock gift carries `stockSymbol` and `stockShares`, and a gift that
+came through a donor-advised fund or a family foundation carries `giftSource` and, for a
+named fund, `giftSourceName`.
 
 `name` is `null` for every household except the roughly three with `customName: true`
 (and the staff household), because household name, formal greeting, and informal greeting

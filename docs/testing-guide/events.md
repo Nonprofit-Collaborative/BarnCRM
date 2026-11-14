@@ -345,7 +345,8 @@ registration.
 | 3 | Open the conference, **Check-In**. | Four attendees are **Attended**, three still **Registered**. |
 | 4 | **Agenda**, **Speakers**, **Applications**, **Sponsors**. | Eight sessions in three tracks, three speakers, one In Review application `Small Teams, Big Data` with two scores (average `4.5`), three sponsors at three levels with deliverables. |
 | 5 | **Tickets**. | General, Student and Volunteer, and the code `EARLYBIRD`. |
-| 6 | **Remove Sample Data**. | Both sample events and every registration under them are gone; your own event and its registration stay. |
+| 5a | **Seating**, **Appointments**, then the **Budget** panel on **Details**; then open **Venues**. | Dinner Table 1 and 2 with five guests seated; one booked and one open appointment; four expenses and two funding lines; **Riverside Meeting Hall** with four rooms. On **Agenda**, the Opening Keynote is in Main Hall with two ratings. |
+| 6 | **Remove Sample Data**. | Both sample events and every registration under them are gone, and so is **Riverside Meeting Hall**; your own event and its registration stay. |
 
 **Cleanup:** None.
 
