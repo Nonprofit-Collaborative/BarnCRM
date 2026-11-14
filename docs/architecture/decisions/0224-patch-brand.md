@@ -1,4 +1,4 @@
-# ADR-NEXT: Patch the Highland Cow Is the BarnCRM Brand
+# ADR-0224: Patch the Highland Cow Is the BarnCRM Brand
 
 **Status:** Accepted (owner decision, 2026-11-14)
 **Date:** 2026-11-14

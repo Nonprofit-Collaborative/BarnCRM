@@ -1,6 +1,6 @@
 # BarnCRM Brand
 
-Patch, the highland cow, is BarnCRM's mascot and logo (ADR-NEXT, Patch brand).
+Patch, the highland cow, is BarnCRM's mascot and logo (ADR-0224, Patch brand).
 
 ## Palette
 

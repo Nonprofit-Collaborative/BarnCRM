@@ -37,7 +37,7 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
   };
 
   iconName = iconFor('BarnCRM_Home');
-  // Patch, the BarnCRM mascot, waving beside the welcome (ADR-NEXT); hidden on small screens.
+  // Patch, the BarnCRM mascot, waving beside the welcome (ADR-0224); hidden on small screens.
   patchUrl = PATCH_WELCOME;
   helpReady = isHelpLoaded('Core');
   model;

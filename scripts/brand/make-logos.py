@@ -3,7 +3,7 @@
 
     python3 scripts/brand/make-logos.py --source <patch-assets folder> [--out DIR]
 
-Patch, the highland cow, is BarnCRM's mascot (ADR-NEXT, replacing the drawn barn of ADR-0102).
+Patch, the highland cow, is BarnCRM's mascot (ADR-0224, replacing the drawn barn of ADR-0102).
 The masters are cut-out transparent PNGs kept outside the repository, in the brand folder's
 `patch-assets/` (its `manifest.md` records each file's source and processing). This script only
 scales them: each logo is the master's 1024 x 1024 `hires/` file downscaled to 256 x 256 RGBA

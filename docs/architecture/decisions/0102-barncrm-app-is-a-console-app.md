@@ -1,6 +1,6 @@
 # ADR-0102: The BarnCRM app is a Lightning console app with a packaged logo
 
-**Status:** Accepted (owner request); decision 4 (logo and brand color) superseded by ADR-NEXT
+**Status:** Accepted (owner request); decision 4 (logo and brand color) superseded by ADR-0224
 (Patch brand)
 **Date:** 2026-10-13
 **Source:** Brandon, 2026-10-13: "I'd like the BarnCRM app to be a console app and to have some
