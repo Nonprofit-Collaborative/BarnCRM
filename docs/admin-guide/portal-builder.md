@@ -102,9 +102,10 @@ licenses (where your organization has them) may be simpler than a portal.
    working within a day. The plugin's small stylesheet puts one field per line and fits a
    phone, in your theme's own fonts and colors. For any other website, the
    `portal-client/README.md` explains the small server piece you need.
-8. **Add a portal.** In the **BarnCRM Admin** (or **BarnCRM Admin Console**) app, where Portal
-   Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
-   its own, D-188), Portals, New: a name people see, a
+8. **Add a portal.** In the **BarnCRM Portal Builder** app (or **BarnCRM Admin** or **BarnCRM
+   Admin Console**, where Portal Builder's **Portals** and **Portal Accesses** tabs sit before
+   **Error Log**; a scratch or Developer Edition org has only these), Portals, New: a name
+   people see, a
    **Key** matching the shortcode, **Access Mode**, **Second Factor**, **Session Hours**,
    **Sender Address**, and the **Template** (below). Set **Status** to Active. With brands on
    ([Brands and Legal Entities](brands.md)), also pick the portal's **Brand**: the portal shows

@@ -3,6 +3,10 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Events Read Only</label>
   <description>Looks at events, their tickets, agenda and speakers.</description>
+  <applicationVisibilities>
+    <application>BarnCRM_Events</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>EventAgendaController</apexClass>
     <enabled>true</enabled>

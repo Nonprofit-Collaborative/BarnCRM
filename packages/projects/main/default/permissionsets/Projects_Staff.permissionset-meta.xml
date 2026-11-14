@@ -7,6 +7,10 @@
     updates, without delete or Manage Projects. Given to the Team Member and Fundraising Staff
     roles.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Projects</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ProjectRequestsController</apexClass>
     <enabled>true</enabled>

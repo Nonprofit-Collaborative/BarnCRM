@@ -6,6 +6,10 @@
     Read projects, phases, tasks, assignments, time entries and status updates. Given to the Read
     Only role.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Projects</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ProjectRequestsController</apexClass>
     <enabled>true</enabled>

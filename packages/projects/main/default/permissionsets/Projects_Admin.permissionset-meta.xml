@@ -6,6 +6,10 @@
     Everything in Project Management, with delete and Manage Projects (Export Billable Time). Given
     to BarnCRM Admin holders.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Projects</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <classAccesses>
     <apexClass>ProjectRequestsController</apexClass>
     <enabled>true</enabled>

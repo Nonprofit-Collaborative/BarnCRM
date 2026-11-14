@@ -1,6 +1,6 @@
 # Apps and Navigation
 
-Scripts for the four BarnCRM apps and the **App Navigation Style** setting. Setup detail:
+Scripts for the four BarnCRM apps, the module apps and the **App Navigation Style** setting. Setup detail:
 [The BarnCRM Apps and Navigation](../admin-guide/barncrm-app.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with the staff user from
@@ -130,3 +130,88 @@ household and an organization owned by that user.
 | 6 | As admin, choose **Organization and Household Tabs** and save; wait; as staff, reload. | Back to step 2: no **Accounts** tab. |
 
 **Cleanup:** leave **Account Tabs** on **Organization and Household Tabs**.
+
+## The Module Apps (T-APP-08 to T-APP-13)
+
+Event Management, Forms, Portal Builder, Corporate Hub and Project Management each have an app
+of their own, and their tabs stay in the BarnCRM apps too. Run T-APP-08 to T-APP-12 on a
+production org or sandbox (`mwdbdevsb`): a scratch or Developer Edition org does not get these
+five apps (T-APP-13). In each, the module is installed and on, and its access sync has run
+(**Finish Setup**, or wait an hour).
+
+## T-APP-08: BarnCRM Events
+
+**Purpose:** confirm the Event Management app, its tabs and who sees it.
+**Prerequisites:** admin user; staff user with the Team Member role (so Events Staff).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Events`. | **BarnCRM Events** is listed with the barn and a teal calendar badge. |
+| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Events Home**, **Event Calendar**, **Events**, **Event Speakers**, **Venues**, **Reports**, **Error Log** (last). |
+| 3 | Open an event from **Events**. | It opens as a workspace tab on the event record page (with its tabs), the same page as in **BarnCRM**. |
+| 4 | Open **BarnCRM**. | **Events Home**, **Event Calendar**, **Events**, **Event Speakers** and **Venues** are still there, after **Data Manager**. |
+| 5 | As staff, open the App Launcher and type `Events`. | **BarnCRM Events** is listed. A user with no Events permission set does not see it. |
+
+## T-APP-09: BarnCRM Forms
+
+**Purpose:** confirm the Forms app, its tabs and who sees it.
+**Prerequisites:** admin user; staff user with the Team Member role (so Forms Staff).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Forms`. | **BarnCRM Forms** is listed with the barn and a blue form page badge. |
+| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Forms**, **Form Submissions**, **Reports**, **Error Log** (last). |
+| 3 | Open a form. | It opens on the form record page with its builder, the same page as in **BarnCRM**. |
+| 4 | Open **BarnCRM**. | **Forms** and **Form Submissions** are still there, after **Data Manager**. |
+| 5 | As staff, open the App Launcher and type `Forms`. | **BarnCRM Forms** is listed. |
+
+## T-APP-10: BarnCRM Portal Builder
+
+**Purpose:** confirm the Portal Builder app is an admin app with its tabs.
+**Prerequisites:** admin user; staff user without the BarnCRM Admin role.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is listed with the barn and a purple door badge. |
+| 2 | Open it and its navigation menu. | Console navigation with the navy admin header. Tabs: **Portals**, **Portal Accesses**, **Reports**, **Error Log** (last). |
+| 3 | Open **BarnCRM Admin**. | **Portals** and **Portal Accesses** are still there, before **Error Log**. |
+| 4 | As staff, open the App Launcher and type `Portal`. | **BarnCRM Portal Builder** is not listed (only Portal Builder Admin shows it). |
+
+## T-APP-11: BarnCRM Corporate Hub
+
+**Purpose:** confirm the Corporate Hub app holds every Corporate Hub page.
+**Prerequisites:** admin user; staff user with the Team Member role (so Corporate Hub Staff).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed with the barn and a slate office building badge. |
+| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**, **Boards and Committees**, **Board Meetings**, **Processing Activities**, **Data Subject Requests**, **Data Breaches**, **Reports**, **Dashboards**, **Error Log** (last). |
+| 3 | Open **Board Meetings** and a meeting. | It opens on the Board Meeting record page with its panel. |
+| 4 | Open **BarnCRM**. | The first six tabs are still there after **Data Manager**; the three data protection tabs are not. |
+| 5 | As staff, open the App Launcher and type `Corporate`. | **BarnCRM Corporate Hub** is listed. |
+
+## T-APP-12: BarnCRM Projects
+
+**Purpose:** confirm the Project Management app holds every Project Management page.
+**Prerequisites:** admin user; staff user with the Team Member role (so Projects Staff).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open the App Launcher and type `Projects`. | **BarnCRM Projects** is listed with the barn and a blue task board badge. |
+| 2 | Open it and its navigation menu. | Console navigation with the blue header. Tabs: **Projects Home**, **Timesheet**, **Approvals**, **Requests**, **Projects**, **Time Entries**, **Project Expenses**, **Project Resources**, **Staffing**, **Project Rates**, **Project Invoices**, **Request Connections**, **Reports**, **Error Log** (last). |
+| 3 | Open a project. | It opens on the project record page with its board. |
+| 4 | Open **BarnCRM**. | The Project Management tabs are still there, after **Data Manager**. |
+| 5 | As staff, open the App Launcher and type `Projects`. | **BarnCRM Projects** is listed. |
+
+## T-APP-13: A Scratch or Developer Edition Org Gets No Module Apps
+
+**Purpose:** confirm a capped org deploys without the five module apps and keeps their tabs.
+**Prerequisites:** a scratch org deployed with `scripts/org/deploy-packages.sh` (for example
+`barn-sales`).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Read the deploy output. | It says "Capped org (scratch or Developer Edition): leaving out the apps of events forms portal corporatehub projects", and a "Permission sets without the left-out module apps" stage succeeds. |
+| 2 | As admin, open the App Launcher and type `BarnCRM`. | No **BarnCRM Events**, **BarnCRM Forms**, **BarnCRM Portal Builder**, **BarnCRM Corporate Hub** or **BarnCRM Projects**. The other BarnCRM apps are listed. |
+| 3 | Open **BarnCRM**, then **BarnCRM Admin**. | The Event Management, Forms, Corporate Hub and Project Management tabs are in **BarnCRM**; **Portals** and **Portal Accesses** are in **BarnCRM Admin**. |
+| 4 | As staff, open **Events Home**. | It opens: the Events permission sets deployed without the app. |

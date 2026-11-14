@@ -34,6 +34,12 @@ program launch, internal work or client work.
    Read Only.
 4. The Projects Home, Projects and Time Entries tabs appear in BarnCRM and BarnCRM Console, before
    Error Log.
+5. The **BarnCRM Projects** app appears in the App Launcher for everyone with a Projects
+   permission set: Projects Home, Timesheet, Approvals, Requests, Projects, Time Entries,
+   Project Expenses, Project Resources, Staffing, Project Rates, Project Invoices, Request
+   Connections, Reports and Error Log. A scratch or Developer Edition org gets no BarnCRM
+   Projects app, only the tabs in the BarnCRM apps (see
+   [The Module Apps](barncrm-app.md#the-module-apps)).
 
 ## Access
 

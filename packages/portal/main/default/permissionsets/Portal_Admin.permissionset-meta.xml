@@ -6,6 +6,10 @@
     Sets up portals and their templates, invites and suspends people, and signs sessions out.
     Never shows sign-in codes, tokens or authenticator secrets.
   </description>
+  <applicationVisibilities>
+    <application>BarnCRM_Portal_Builder</application>
+    <visible>true</visible>
+  </applicationVisibilities>
   <fieldPermissions>
     <editable>true</editable>
     <field>Portal__c.Session_Hours__c</field>

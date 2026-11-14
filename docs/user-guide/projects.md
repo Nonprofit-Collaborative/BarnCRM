@@ -1,7 +1,8 @@
 # Projects
 
 Your admin turns on BarnCRM Project Management. You then see Projects Home, Projects and Time
-Entries in the BarnCRM app. Setup detail: [Project Management](../admin-guide/projects.md).
+Entries in the BarnCRM app, and every Project Management page in the **BarnCRM Projects** app
+(open it from the App Launcher). Setup detail: [Project Management](../admin-guide/projects.md).
 
 ## Projects Home
 
