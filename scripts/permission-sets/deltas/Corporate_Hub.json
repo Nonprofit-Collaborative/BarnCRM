@@ -10,14 +10,19 @@
     "set": {
       "fieldPermissions": {
         "Agreement__c.Reminded_For__c": {"editable": "true"},
+        "Agreement__c.Sample_Data__c": {"editable": "true"},
+        "Board__c.Sample_Data__c": {"editable": "true"},
         "Compliance_Obligation__c.Reminded_For__c": {"editable": "true"},
+        "Compliance_Obligation__c.Sample_Data__c": {"editable": "true"},
         "Compliance_Obligation__c.Template_Key__c": {"editable": "true"},
         "Hub_Document__c.Reminded_For__c": {"editable": "true"},
+        "Hub_Document__c.Sample_Data__c": {"editable": "true"},
         "Hub_Document__c.Template_Key__c": {"editable": "true"},
         "Policy_Acknowledgment__c.Due_Date__c": {"editable": "true"},
         "Policy_Acknowledgment__c.Person__c": {"editable": "true"},
         "Policy_Acknowledgment__c.Requested_On__c": {"editable": "true"},
         "Policy_Acknowledgment__c.User__c": {"editable": "true"},
+        "Processing_Activity__c.Sample_Data__c": {"editable": "true"},
         "Processing_Activity__c.Template_Key__c": {"editable": "true"}
       },
       "objectPermissions": {

@@ -365,3 +365,21 @@ client (Postman, or Workbench REST Explorer signed in as that user).
 | 6 | Untick Active on the connection and send T-4. Send a body that is not JSON. | `403 not_allowed`; then `400 bad_request`. |
 
 **Cleanup:** Delete the requests and the connection.
+
+## T-PM-34: Sample Data
+
+**Purpose:** confirm the Project Management sample data loads and takes away only itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; a project of your own; Track requests
+and issues on.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows a **Projects** count of `4`. |
+| 2 | Open **Projects**. | Client Intake Implementation (Active), Volunteer Program Launch (Active, At Risk), Annual Report Website Refresh (Completed) and Data Migration Planning (Planned) beside your own project. |
+| 3 | Open Client Intake Implementation. | Three phases with six tasks, two of them milestones; hours logged against budget; two status updates. |
+| 4 | Open **Timesheet** and **Approvals**. | Your sample hours appear, Submitted ones in Approvals. |
+| 5 | Open **Requests**. | Three sample requests (New, In Progress, Resolved). |
+| 6 | **Remove Sample Data**. | All four sample projects, their tasks, hours and expenses, and the sample requests are gone; your own project stays. |
+
+**Cleanup:** None.

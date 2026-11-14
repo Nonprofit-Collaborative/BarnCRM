@@ -24,6 +24,9 @@ default allocations, installment schedules, automatic household soft credits), a
   `GivingSampleData` in the Giving package: funds, appeals, gifts with their allocations,
   commitments, soft credits, tributes. It ships with Giving, so an org without Giving never
   carries it.
+- `ProjectsSampleData.json` and `CorporateHubSampleData.json`, in the Project Management and
+  Corporate Hub packages' `staticresources`: four projects with their work, and a board with its
+  library, calendar and agreements. Same generic format and loader as the files below.
 - `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
   module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
   by Core's `SampleDataFile` with no loader Apex in the module.
