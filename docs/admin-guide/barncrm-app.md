@@ -81,7 +81,7 @@ Launcher.
 
 Test and developer orgs (scratch and Developer Edition orgs) allow only about 10 custom apps, so
 `scripts/org/deploy-packages.sh` leaves these five apps out of such an org; every page is still
-in the BarnCRM apps there (ADR-NEXT). A production org or sandbox gets every app.
+in the BarnCRM apps there (ADR-0223). A production org or sandbox gets every app.
 
 ### A Module's Pages in the BarnCRM Apps
 

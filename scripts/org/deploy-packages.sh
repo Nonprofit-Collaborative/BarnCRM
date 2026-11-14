@@ -146,7 +146,7 @@ DEPLOY_FULL="${DEPLOY_FULL:-0}"
 # no coverage, so run-org-tests.sh passes 0 there.
 DEPLOY_APEX_ALWAYS="${DEPLOY_APEX_ALWAYS:-1}"
 DEPLOY_STATE_DIR="${DEPLOY_STATE_DIR:-${HOME}/.local/state/barncrm/deploy-state}"
-# Which module apps the org gets (ADR-NEXT, module apps). auto (the default) leaves the apps
+# Which module apps the org gets (ADR-0223, module apps). auto (the default) leaves the apps
 # listed in scripts/org/capped-org-apps.py out of a scratch or Developer Edition org, which
 # refuses a custom app past about 10, and deploys every app anywhere else; capped and all force
 # either. See "MODULE APPS ON A CAPPED ORG" below.
@@ -567,7 +567,7 @@ newest_deploy_request() {
 # "capped" when the org refuses a custom app past about 10: a Developer Edition org, or a scratch
 # org (every scratch org has a TrialExpirationDate, whatever its edition). "all" otherwise, and
 # when the lookup fails: a real org must never lose an app, and a capped org then fails on the
-# limit with the platform's own message (ADR-NEXT, module apps).
+# limit with the platform's own message (ADR-0223, module apps).
 org_app_limit() {
   local capture verdict
   capture="$(mktemp)"
@@ -983,7 +983,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
-  # MODULE APPS ON A CAPPED ORG (ADR-NEXT, module apps). A scratch or Developer Edition org refuses
+  # MODULE APPS ON A CAPPED ORG (ADR-0223, module apps). A scratch or Developer Edition org refuses
   # a custom app past about 10 (barn-sales and oi-test, 2026-11-07), and the suite ships more. On
   # such an org the modules capped-org-apps.py lists deploy without their applications and
   # permissionsets folders, and their permission sets follow in a stage of their own with the
@@ -1065,7 +1065,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
   # modules add their tabs to the BarnCRM apps). Module tabs stay here even for a module with an
   # app of its own, which is how a capped org reaches the modules whose apps it does not get
-  # (ADR-NEXT, module apps).
+  # (ADR-0223, module apps).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments lwcbuilder scholarships territory memberships projects addressverification)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"

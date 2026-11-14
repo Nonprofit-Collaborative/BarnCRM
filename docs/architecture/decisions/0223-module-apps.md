@@ -1,4 +1,4 @@
-# ADR-NEXT: The big modules ship their own apps, left out of capped test orgs
+# ADR-0223: The big modules ship their own apps, left out of capped test orgs
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-13

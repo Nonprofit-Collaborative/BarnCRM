@@ -32,7 +32,7 @@ class CappedOrgApps(unittest.TestCase):
             len(kept),
             coa.CAPPED_ORG_APP_BUDGET,
             f"A scratch or Developer Edition org would get {len(kept)} apps ({', '.join(sorted(kept))}); "
-            "add the new app's folder to LEFT_OUT in scripts/org/capped-org-apps.py (ADR-NEXT)",
+            "add the new app's folder to LEFT_OUT in scripts/org/capped-org-apps.py (ADR-0223)",
         )
 
     def test_only_left_out_folders_grant_a_left_out_app(self):

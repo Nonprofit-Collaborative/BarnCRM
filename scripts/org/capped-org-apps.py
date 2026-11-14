@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Leaves some module apps out of a deploy to an org with a low custom app limit (ADR-NEXT).
+"""Leaves some module apps out of a deploy to an org with a low custom app limit (ADR-0223).
 
     python3 scripts/org/capped-org-apps.py modules
     python3 scripts/org/capped-org-apps.py permission-sets OUT_DIR FOLDER [FOLDER ...]

@@ -220,7 +220,7 @@ class DeploySkipUnchanged(unittest.TestCase):
         self.assertFalse(os.path.exists(self.record()))
 
     def test_a_capped_org_gets_the_modules_without_the_left_out_apps(self):
-        # ADR-NEXT (module apps): a Developer Edition or scratch org refuses apps past about 10.
+        # ADR-0223 (module apps): a Developer Edition or scratch org refuses apps past about 10.
         requests = self.deploy(FAKE_ORG_TYPE="Developer Edition")
         sent = [d for r in requests for d in r]
         self.assertNotIn("packages/events", sent)
