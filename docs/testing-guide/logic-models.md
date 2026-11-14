@@ -6,7 +6,7 @@ detail:
 [Logic Models](../admin-guide/logic-models.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Logic Models
-deployed. Programs is optional; T-LM-04 needs it. Logic Models works on the platform-only shape.
+deployed. Programs is optional; T-LM-04 and T-LM-14 need it. Logic Models works on the platform-only shape.
 Give the testers their roles on the **Access** page: admin (Admin role), staff (Program Staff
 role) and read-only (Read Only role). Each gets its Logic Models permission set from the role.
 
@@ -229,3 +229,22 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 7 | As staff, remove the arrow. | The arrow and its evidence are gone. |
 
 **Cleanup:** Add the arrow back if later scripts need it.
+
+## T-LM-14: Logic Models Sample Data
+
+**Purpose:** confirm the sample load adds a worked logic model for each Programs sample program and the removal takes them away, leaving your own model (release 1.25).
+**Prerequisites:** an org with Core, Programs and Logic Models deployed and no sample data loaded; the admin user; the organization model `Reading Program Model` from T-LM-01, or any model of your own.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In **BarnCRM Settings**, **Sample Data**, select **Load Sample Data** and wait for **Loaded**. | The card lists **Logic models** with 2, after **Program enrollments**. |
+| 2 | Open the **Logic Models** tab, list view **All**. | **After-school tutoring logic model** and **Food pantry logic model** are listed beside your own model. |
+| 3 | Open **After-school tutoring logic model**. | **For** shows **After-school tutoring**. Every column has parts: 4 inputs, 3 activities, 3 outputs, 2 short term, 1 intermediate term and 1 long term outcome, and 1 impact. **Things to Look At** shows the green all-clear. |
+| 4 | Select `Students read with more confidence`. | Under **Comes From**, two arrows with their assumptions; the arrow from `Tutoring hours delivered` shows **Assumption Evidence (2)**, one Strong with a source link and one Moderate. Its indicator `Students who say they enjoy reading` has a baseline of 42 and three periods: First term (Met), Second term (a percent) and Third term (a target only). |
+| 5 | Select `Weekly one-to-one tutoring` and open the evidence on the arrow from `Volunteer tutors`. | One piece of **Challenges** evidence. |
+| 6 | Scroll to **Logic Model Report**. | Seven rows; `Homework assignments turned in late` reads lower is better, and its Second term result of 21 against a target of 20 is not Met. |
+| 7 | Open **Food pantry logic model**. | **For** shows **Food pantry**. **Things to Look At** lists one reminder: `Fewer county households face food insecurity` has no indicator. |
+| 8 | Select **Remove Sample Data** and wait. | Both sample models are gone with their parts; your own model and its parts are unchanged. |
+
+Note: without Programs, or with its sample programs removed before the load, nothing is loaded for Logic Models.

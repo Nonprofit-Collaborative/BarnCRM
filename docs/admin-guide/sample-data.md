@@ -88,21 +88,43 @@ there:
 | Services | 5 | Tutoring hour and Homework club session; Grocery bag and Hot meal; Reading circle |
 | Enrollments | 18 | Six in tutoring (four Enrolled, one Applied, one Withdrawn), eight Enrolled in the pantry and four Completed in summer reading, among 12 sample people |
 | Service deliveries | 40 | A grocery bag a week for the last four weeks to each person in the pantry (one week missed, as an Unexcused Absence), and two tutoring sessions of two hours to each person Enrolled in tutoring |
-| Cohorts | 1 | **Fall homework club**, Active, in tutoring, holding the four people Enrolled there |
-| Sessions | 3 | Homework club 1 and 2 (Held, in the last two weeks) and Homework club 3 (Scheduled, next week), 4:00 PM to 5:30 PM |
+| Cohorts | 2 | **Fall homework club**, Active, in tutoring, holding the four people Enrolled there, and **Summer reading circle**, Completed, holding the four who completed summer reading |
+| Sessions | 3 | Homework club 1 and 2 (Held, in the last two weeks) and Homework club 3 (Scheduled, today), 4:00 PM to 5:30 PM |
+| Session schedule | 1 | **Homework club twice a week**, active, for the Fall homework club: Tuesdays and Thursdays, 4:00 PM to 5:30 PM, from tomorrow for 60 days. Its sessions (Scheduled) appear within a minute of the load, up to the **Weeks Ahead to Create Sessions** setting. |
 | Attendance | 8 | Each cohort member at each Held session: Present, except one Excused Absence |
-| Goals | 4 | "Read one grade level higher", In Progress, for each person Enrolled in tutoring, with a review due in about two weeks |
-| Goal steps | 8 | Two per goal: "Take the reading assessment" (Done) and "Read 20 minutes each school day" (In Progress) |
+| Goals | 6 | "Read one grade level higher", In Progress, for each person Enrolled in tutoring (one with its review overdue, so it shows under **Reviews Due**); "Finish five books from the summer list", Achieved, in summer reading; "Apply for SNAP benefits", In Progress, in the food pantry. Each has a description and is assigned to you. |
+| Goal steps | 12 | Two per goal, for example "Take the reading assessment" (Done) and "Read 20 minutes each school day" (In Progress) |
 
 Removal takes the sample people's service deliveries and enrollments in the sample programs
-(their goals and steps go with them), then the sample sessions and cohorts, then the sample
-programs and their services. A sample program one of your own people is enrolled
+(their goals and steps go with them), then the sample sessions, the session schedule and the
+cohorts, then the sample programs and their services. A sample program one of your own people is enrolled
 in, or has a service delivery in, stays with those records, and so does a sample program with
 a sample enrollment that has a case note (whoever wrote it, even a note you cannot see). One
 Warning in the [Error Log](error-log.md) names each kept record by kind: "Sample data removal
 kept some Programs sample records, because records of your own point at them: Programs (Food
 pantry). Move or delete your records, then remove sample data again." The same Warning covers
-any module whose sample set ships as a data file (Programs, Funders and Events).
+any module whose sample set ships as a data file (Programs, Logic Models, Funders and Events).
+
+### With Logic Models Installed
+
+With the **Logic Models** package installed, the same action also loads, after Programs, a
+logic model for each of the Programs sample programs. It needs those programs: with Programs not
+installed, nothing is loaded for Logic Models, so the sample never takes the organization's own
+model.
+
+| Records | How many | What is in them |
+|---|---|---|
+| Logic models | 2 | **After-school tutoring logic model** and **Food pantry logic model**, each for its sample program, with a description |
+| Parts | 25 | Tutoring: 4 inputs, 3 activities, 3 outputs, short, intermediate and long term outcomes, and an impact. Pantry: the same columns with 10 parts |
+| Arrows | 24 | Every part joined forward, each with its assumption |
+| Assumption evidence | 8 | On five tutoring arrows and two pantry arrows, of every strength (Strong, Moderate, Limited and Challenges), some with a source link |
+| Indicators | 11 | On outputs and outcomes, with a unit and a baseline; two where lower is better and two whose results are imported |
+| Indicator periods | 31 | Three terms (tutoring) or quarters (pantry): targets and results for the two past ones, a target for the current one; one school year target for on-time promotion |
+
+The tutoring model is complete, so **Things to Look At** shows the all-clear; the pantry model
+has a long term outcome with no indicator yet, so it lists that one reminder. Removal deletes
+the two sample models with their parts, arrows, evidence, indicators and periods; your own
+models are never touched.
 
 ### With Funders Installed
 

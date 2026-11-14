@@ -1,7 +1,8 @@
 /**
  * The Programs sample data set, shipped as ProgramsSampleData.json and loaded by Core's
  * SampleDataFile (D-200 S2): the load builds three programs, five services and 18 enrollments of
- * Core's sample people through the enrollment rules; the removal takes every one of them and
+ * Core's sample people through the enrollment rules, with two cohorts, sessions, a repeating
+ * session schedule and service plan goals; the removal takes every one of them and
  * leaves real records alone, keeping a sample program a real person is enrolled in and naming it
  * in the Error Log. Run as a BarnCRM admin holding Programs Admin, the person who loads sample
  * data. The stages are called directly, because a test runs only the first stage of a batch.
@@ -109,8 +110,44 @@ private class ProgramSampleDataTest {
 			];
 			Assert.areEqual('Active', cohort.Status__c, 'One active cohort.');
 			Assert.areEqual(4, cohort.Enrollments__r.size(), 'Holding the four in tutoring.');
-			Assert.areEqual(3, [SELECT COUNT() FROM Session__c WHERE Cohort__c = :cohort.Id]);
-			Assert.areEqual(1, [SELECT COUNT() FROM Session__c WHERE Status__c = 'Scheduled']);
+			Assert.areEqual(
+				3,
+				[
+					SELECT COUNT()
+					FROM Session__c
+					WHERE Cohort__c = :cohort.Id AND Session_Schedule__c = NULL
+				],
+				'Three sessions set by hand.'
+			);
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Session__c
+					WHERE Status__c = 'Scheduled' AND Session_Schedule__c = NULL
+				]
+			);
+			Session_Schedule__c schedule = [
+				SELECT Id, Active__c, Cohort__c
+				FROM Session_Schedule__c
+			];
+			Assert.isTrue(schedule.Active__c, 'One active repeating schedule.');
+			Assert.areEqual(cohort.Id, schedule.Cohort__c, 'For the homework club.');
+			Assert.isTrue(
+				[
+					SELECT COUNT()
+					FROM Session__c
+					WHERE Session_Schedule__c = :schedule.Id AND Status__c = 'Scheduled'
+				] > 0,
+				'Its save queued a run that created the coming sessions.'
+			);
+			Cohort__c circle = [
+				SELECT Id, Status__c, (SELECT Id FROM Enrollments__r)
+				FROM Cohort__c
+				WHERE Name = 'Summer reading circle'
+			];
+			Assert.areEqual('Completed', circle.Status__c, 'One completed cohort.');
+			Assert.areEqual(4, circle.Enrollments__r.size(), 'Holding the four who completed.');
 			Assert.areEqual(
 				8,
 				[SELECT COUNT() FROM Service_Delivery__c WHERE Session__c != NULL],
@@ -130,9 +167,25 @@ private class ProgramSampleDataTest {
 				.Quantity__c,
 				'One missed week, which delivered nothing.'
 			);
-			Assert.areEqual(4, [SELECT COUNT() FROM Goal__c], 'A goal for each in tutoring.');
-			Assert.areEqual(4, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);
-			Assert.areEqual(8, [SELECT COUNT() FROM Goal_Step__c], 'Two steps each.');
+			Assert.areEqual(
+				6,
+				[SELECT COUNT() FROM Goal__c],
+				'A goal for each in tutoring, one in summer reading and one in the pantry.'
+			);
+			Assert.areEqual(
+				6,
+				[SELECT COUNT() FROM Goal__c WHERE Assigned_To__c = :UserInfo.getUserId()],
+				'Each assigned to the person who loaded them.'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Goal__c WHERE Next_Review_Date__c < TODAY],
+				'One review is due.'
+			);
+			Goal__c achieved = [SELECT Closed_Date__c FROM Goal__c WHERE Status__c = 'Achieved'];
+			Assert.areEqual(Date.today().addDays(-95), achieved.Closed_Date__c, 'Kept as loaded.');
+			Assert.areEqual(7, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);
+			Assert.areEqual(12, [SELECT COUNT() FROM Goal_Step__c], 'Two steps each.');
 			SampleDataModule module = SampleDataFile.find(FILE);
 			Assert.areEqual('Programs', module.moduleName(), 'The name startAfter looks for.');
 			Assert.areEqual(18, module.countLoaded(), 'The card counts them.');
@@ -177,7 +230,8 @@ private class ProgramSampleDataTest {
 			Assert.areEqual(1, [SELECT COUNT() FROM Enrollment__c], 'Only the real one is left.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c], 'Deliveries went first.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Session__c], 'Sessions went.');
-			Assert.areEqual(0, [SELECT COUNT() FROM Cohort__c], 'The cohort went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Session_Schedule__c], 'The schedule went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Cohort__c], 'The cohorts went.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Goal__c], 'Goals went with enrollments.');
 			Assert.isFalse(SampleDataFile.find(FILE).hasSampleRecords(), 'Nothing left.');
 			Assert.isTrue(keptWarnings().isEmpty(), 'Nothing was kept.');

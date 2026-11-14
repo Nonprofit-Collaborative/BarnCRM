@@ -118,6 +118,44 @@ private class SampleDataFileTest {
 	}
 
 	@IsTest
+	static void aFindNamesARecordAnotherSetLoaded() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			insert new Saved_Query__c(Name = 'Loaded earlier', Object_Name__c = 'Contact');
+			SampleDataFile.filesByName.put(
+				'FindSampleData',
+				(Map<String, Object>) JSON.deserializeUntyped(
+					'{"module": "Finding", "steps": [{"object": "Saved_Query__c", "records": [' +
+						' {"Name": "Sample found", "Object_Name__c":' +
+						'  {"find": "Saved_Query__c", "where": "Name = \'Loaded earlier\'"}},' +
+						' {"Name": "Sample not found", "Object_Name__c":' +
+						'  {"find": "Saved_Query__c", "where": "Name = \'Nowhere\'"}},' +
+						' {"Name": "Sample not installed", "Object_Name__c":' +
+						'  {"find": "No_Such_Object__c", "where": "Name = \'x\'", "optional": true}}]}]}'
+				)
+			);
+
+			Test.startTest();
+			new SampleDataFile.LoadStages('FindSampleData').runStage(0);
+			Test.stopTest();
+
+			Map<String, Saved_Query__c> byName = new Map<String, Saved_Query__c>();
+			for (Saved_Query__c row : [SELECT Name, Object_Name__c FROM Saved_Query__c]) {
+				byName.put(row.Name, row);
+			}
+			Assert.areEqual(
+				(String) [SELECT Id FROM Saved_Query__c WHERE Name = 'Loaded earlier'].Id,
+				byName.get('Sample found').Object_Name__c,
+				'A find is the Id of the record the clause matches'
+			);
+			Assert.isFalse(byName.containsKey('Sample not found'), 'No match leaves it out');
+			Assert.isNull(
+				byName.get('Sample not installed').Object_Name__c,
+				'An optional find of an object not installed is blank'
+			);
+		}
+	}
+
+	@IsTest
 	static void theSeamStartsCoresBatchesAndAMissingFileIsNoModule() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			injectFile();

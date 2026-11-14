@@ -27,6 +27,10 @@ default allocations, installment schedules, automatic household soft credits), a
 - `FundersSampleData.json`, `ProgramsSampleData.json` and `EventsSampleData.json`, in each
   module's `staticresources`: the module sets in Core's generic format below (D-200 S2), loaded
   by Core's `SampleDataFile` with no loader Apex in the module.
+- `LogicModelsSampleData.json` in `packages/logicmodels/main/default/staticresources`: logic
+  models for the Programs sample programs After-school tutoring and Food pantry, with every
+  column, arrows with assumptions and evidence, and indicators with targets and results. It
+  names each program with `find`, so it loads after Programs and loads nothing without it.
 
 ### Module files (D-200 S2)
 
@@ -61,9 +65,11 @@ example `FundersSampleData`); Core loads it when no class of that name is instal
   field values by API name, plus an optional `key`.
 - A value is a literal, `{ "ref": key }` (a record this file inserted earlier), `{ "sample":
   key }` (Core's sample person, household or organization by `Sample_Data_Key__c`),
-  `{ "currentUser": true }`, or `{ "days": n, "months": m, "time": "HH:mm" }` (today moved, as a
-  date, a local date and time, or a time).
-- A record whose `ref` or `sample` does not resolve is left out unless the value says
+  `{ "find": object, "where": clause }` (the newest record of another module's object the clause
+  matches, such as a sample program an earlier module's set loaded), `{ "currentUser": true }`,
+  or `{ "days": n, "months": m, "time": "HH:mm" }` (today moved, as a date, a local date and
+  time, or a time).
+- A record whose `ref`, `sample` or `find` does not resolve is left out unless the value says
   `"optional": true`. A step or field the loader cannot create is skipped.
 - `count` is the status card's number. `remove` entries are deleted in order, in chunks, with
   partial success: a record the organization's own records point at is kept and named in one

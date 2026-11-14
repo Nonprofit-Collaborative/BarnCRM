@@ -2,6 +2,11 @@
   "Admin": {
     "label": "Logic Models Admin",
     "description": ["Builds and manages logic models, indicators and results, including deleting a whole", "logic model."],
+    "add": {
+      "fieldPermissions": {
+        "Logic_Model__c.Sample_Data__c": {"editable": "true", "readable": "true"}
+      }
+    },
     "set": {
       "fieldPermissions": {
         "Indicator__c.Source_Definition__c": {"editable": "true"},

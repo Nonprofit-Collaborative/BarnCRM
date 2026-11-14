@@ -11499,10 +11499,15 @@ enrollments of up to 12 of Core's sample people (contacts), through the enrollme
 programs, then (release 1.19, P-11) one Active cohort (29ZA5) of the people Enrolled in tutoring
 with three sessions (29ZA6) of its Homework club service (two Held, with eight attendance deliveries, one
 an Excused Absence; one Scheduled), then (P-10) one In Progress goal (29ZA3) with two steps (29ZA4) per
-person Enrolled in tutoring. Its removal, before Volunteers', Giving's and Core's, deletes one
+person Enrolled in tutoring. Release 1.25 adds a Completed cohort, Summer reading circle, holding
+the four who completed summer reading; an active repeating session schedule (29ZA7) for the
+homework club, Tuesdays and Thursdays for the next 60 days, whose save queues the run that
+creates its sessions (R-SS3); a description and the loading person as Assigned To on every goal,
+one tutoring goal with its review overdue, an Achieved goal in summer reading and an In Progress
+goal in the pantry, each with two steps. Its removal, before Volunteers', Giving's and Core's, deletes one
 chunk per stage: the sample people's service deliveries and enrollments in sample programs (goals
-and steps go with them), then sample program sessions no delivery names and cohorts no session or
-schedule names, then the sample programs with no enrollment, cohort or delivery left (their
+and steps go with them), then sample program sessions no delivery names, the sample programs'
+session schedules, and cohorts no session or schedule names, then the sample programs with no enrollment, cohort or delivery left (their
 services go with them). A sample program a real person
 is enrolled in, or has a delivery in, is kept, and so is a sample program with a sample
 enrollment that has a case note (whoever wrote it, even a note the remover cannot see: that
@@ -12245,6 +12250,7 @@ per program.
 | Program | record identifier (text) | no | The program the model is for, when it is not the organization's. A record identifier, not a reference: Logic Models never depends on Programs (R-LM2). |
 | Scope Key | text | yes (set by BarnCRM) | `Organization`, or the program's identifier. Unique, so a scope has one model. |
 | Periods | long text (JSON) | no | The model's shared reporting periods (v1.0, modules-23, R-LM4): `{"version": 1, "periods": [{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}]}`. |
+| Sample Data | checkbox | no (default false) | Marks a model the sample data loader created (release 1.25), so Remove Sample Data deletes it with its parts. |
 
 ### Relationships
 
@@ -12288,9 +12294,22 @@ in `Periods__c` (plan 9.9).
 | Program | `Program_Id__c` | Text(18) |
 | Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
 | Periods | `Periods__c` | Long Text Area(32768) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false (release 1.25) |
 
 - **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
   (R-LM1, R-LM2), reading every model without sharing through `LogicModelIntegritySelector`.
+
+**Sample data (release 1.25).** The static resource `LogicModelsSampleData.json`, loaded by
+Core's `SampleDataFile` (format in data/sample/README.md), loads after Programs' set. It builds
+two models flagged `Sample_Data__c`, one for each of the Programs sample programs After-school
+tutoring and Food pantry, naming the program with a `find` value; a model whose program does
+not resolve is left out with its parts, so the set never creates an organization model that
+R-LM1 would refuse. Tutoring: 15 elements in every column, 14 links with assumptions, six pieces
+of assumption evidence (every strength), seven indicators (one Better When Lower, one Imported)
+with 19 periods carrying targets and results, so Things to Look At shows the all-clear. Pantry:
+10 elements, 10 links, two pieces of evidence, four indicators with 12 periods, and a long term
+outcome with no indicator, so Things to Look At lists one reminder. Its removal deletes the
+flagged models; R-LM3 takes their parts.
 
 ---
 

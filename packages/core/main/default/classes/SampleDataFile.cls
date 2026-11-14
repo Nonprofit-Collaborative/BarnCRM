@@ -19,11 +19,15 @@
  *
  * - `{ "ref": "award" }`: the record of that key this file inserted earlier.
  * - `{ "sample": "H001-1" }`: Core's sample person, household or organization of that key.
+ * - `{ "find": "Program__c", "where": "Sample_Data__c = TRUE AND Name = '...'" }`: the newest
+ *   record of another module's object the clause matches, read in user mode, so a set can name
+ *   a record an earlier module's set loaded; it does not resolve when that object is not
+ *   installed or nothing matches.
  * - `{ "currentUser": true }`: the person loading the set.
  * - `{ "days": -30, "months": 6, "time": "08:30" }`: today moved by days then months, as a date,
  *   or a date and time (local) for a Date/Time field; `{ "time": "16:00" }` alone for a Time field.
  *
- * A record whose `ref` or `sample` does not resolve is left out, unless the value also says
+ * A record whose `ref`, `sample` or `find` does not resolve is left out, unless the value says
  * `"optional": true`, which leaves that field blank instead: one module never breaks the load
  * because the set it builds on is smaller. A step whose object the person loading cannot create
  * is skipped, and so is a field they cannot set, as the module loaders did. Every insert is in
@@ -214,10 +218,12 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		Map<String, Id> idsByKey,
 		Date today
 	) {
-		if (spec.containsKey('ref') || spec.containsKey('sample')) {
+		if (spec.containsKey('ref') || spec.containsKey('sample') || spec.containsKey('find')) {
 			Id found = spec.containsKey('ref')
 				? idsByKey.get((String) spec.get('ref'))
-				: sampleIds().get((String) spec.get('sample'));
+				: spec.containsKey('sample')
+						? sampleIds().get((String) spec.get('sample'))
+						: newestMatch((String) spec.get('find'), (String) spec.get('where'));
 			if (found == null && spec.get('optional') != true) {
 				return new Unresolved();
 			}
@@ -267,6 +273,28 @@ public with sharing class SampleDataFile implements SampleDataModule {
 		}
 		List<String> parts = value.split(':');
 		return Time.newInstance(Integer.valueOf(parts[0]), Integer.valueOf(parts[1]), 0, 0);
+	}
+
+	/**
+	 * The newest record of an object the clause matches, or null when the object is not in the
+	 * org, the person cannot read it, or nothing matches. The clause is the module's, never a
+	 * user's.
+	 */
+	private static Id newestMatch(String objectName, String condition) {
+		Schema.DescribeSObjectResult described = NamespaceUtil.describe(objectName);
+		if (described == null || !described.isAccessible() || String.isBlank(condition)) {
+			return null;
+		}
+		List<SObject> rows = Database.queryWithBinds(
+			'SELECT Id FROM ' +
+				objectName +
+				' WHERE ' +
+				condition +
+				' ORDER BY CreatedDate DESC, Id DESC LIMIT 1',
+			new Map<String, Object>(),
+			AccessLevel.USER_MODE
+		);
+		return rows.isEmpty() ? null : rows[0].Id;
 	}
 
 	/** Core's sample people and accounts by key; a person wins over an account of the same key. */

@@ -374,6 +374,20 @@ Do this as Maria, who holds the Admin role.
     period its target, result and progress. Untick a period: its columns go. Click **Download
     Printable Report**, open the file and print it, then click **Download PDF** and open the PDF.
 
+## Sample Data
+
+With Programs also installed, **Load Sample Data** in BarnCRM Settings loads two worked
+examples after the Programs sample: **After-school tutoring logic model** and **Food pantry
+logic model**, each for its sample program. They fill every column from inputs to impact, with
+descriptions, arrows and their assumptions, evidence of every strength, and indicators with
+baselines, targets and results over three periods, so the builder, the evidence log and the
+Logic Model Report all have something to show. The tutoring model is complete, so **Things to
+Look At** shows the all-clear; the pantry model has one long term outcome without an indicator,
+so it lists that reminder. Without the Programs sample programs nothing is loaded, so the sample
+never takes the organization's own model. **Remove Sample Data** deletes the two sample models
+with all their parts; your own models are never touched. See
+[Sample data](sample-data.md#with-logic-models-installed).
+
 ## Common Mistakes
 
 - **Adding indicators to an activity.** Indicators measure outputs and outcomes. Count the
