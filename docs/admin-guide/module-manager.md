@@ -7,6 +7,11 @@ is doing and the one thing you can do next with it: install it, turn it on, turn
 see what removing it would delete. It lives in BarnCRM Settings, so you never have to look for
 a module's state in Salesforce Setup.
 
+Every module is in Beta right now (D-211). A **Beta** badge shows beside each module's name,
+here, in the Setup Assistant and on the Home page Modules card; Core has none. The badge comes
+from the **Beta** checkbox on the module's record in the module catalog (BarnCRM Module custom
+metadata): clear it on a record and that module's badge goes away.
+
 Every module is a separate package. A module that is not installed leaves nothing behind in
 your org. BarnCRM never installs or removes a package for you: Salesforce does not let one
 app do that, and you should see and approve what goes into your org.

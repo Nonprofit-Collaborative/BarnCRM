@@ -77,6 +77,18 @@ describe('c-setup-step-modules', () => {
     expect(Array.from(names).map((name) => name.textContent)).toEqual(['Core', 'BarnCRM Giving']);
   });
 
+  it('shows a Beta badge beside a beta module only', () => {
+    const element = createElement('c-setup-step-modules', { is: SetupStepModules });
+    element.modules = [MODULES[0], { ...MODULES[1], beta: true }];
+    document.body.appendChild(element);
+
+    const badges = element.shadowRoot.querySelectorAll('[data-id="beta"]');
+    expect(badges).toHaveLength(1);
+    expect(badges[0].label).toBe('c.Core_ModuleManager_Beta');
+    const coreItem = element.shadowRoot.querySelectorAll('li')[0];
+    expect(coreItem.querySelector('[data-id="beta"]')).toBeNull();
+  });
+
   it('says which modules to install first for one that is not here', () => {
     const element = createElement('c-setup-step-modules', { is: SetupStepModules });
     element.modules = [

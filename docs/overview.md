@@ -27,6 +27,8 @@ Both editions include the full core suite of tools: people, households, relation
 | **Standard Edition** | Any organization on Salesforce, including businesses and clubs | BarnCRM Core alone. No nonprofit wording or module is shown. |
 | **Nonprofit Edition** | Nonprofits (any organization may choose it) | Core plus the nonprofit tools: Giving first, then the other modules as you turn them on. |
 
+Every module is in Beta right now (D-211): a **Beta** badge shows beside each module's name in the Module Manager, the Setup Assistant and the Home page Modules card. Core is not marked.
+
 You choose the edition once, in the first-run setup window; the Setup Assistant shows that answer. You can change it later: see [Editions](admin-guide/editions.md). A module you never install leaves nothing behind in your org.
 
 ## Packages and Their State on Main

@@ -84,6 +84,9 @@ public with sharing class ModuleDetectionService {
 		 */
 		@AuraEnabled
 		public Boolean nonprofitOnly;
+		/** True when the catalog marks the module as in beta (`Beta__c`, D-211); false for Core. */
+		@AuraEnabled
+		public Boolean beta;
 		/**
 		 * For a module that is here, its tabs that belong in the BarnCRM and BarnCRM Console apps
 		 * (`Staff_Tabs__c`) and in the two admin apps (`Admin_Tabs__c`), by label and comma
@@ -345,6 +348,7 @@ public with sharing class ModuleDetectionService {
 		info.label = labelOf(row);
 		info.present = present;
 		info.nonprofitOnly = isNonprofitOnly(row);
+		info.beta = row.Beta__c == true;
 		info.docsUrl = DOCS_BASE + row.Package_Folder__c + '/README.md';
 		info.installUrl = present ? null : installUrl(row.Install_Version_Id__c);
 		info.appUrl = present && String.isNotBlank(row.App_Name__c)

@@ -115,6 +115,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 **Cleanup:** make sure Volunteers is **Installed** (on) and **Show Nonprofit Modules** is ticked.
 
+## T-SET-06A: Beta Badge on Every Module
+
+**Purpose:** confirm every module shows a Beta badge and Core does not, and that the catalog's Beta checkbox controls it (D-211, N-14).
+**Prerequisites:** admin user. At least one module installed.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Modules**. | A **Beta** badge shows beside the name of every module row (installed or not). The **Core** row has none. A screen reader reads the badge as "Beta". |
+| 2 | Open the **Home** tab and find the **Modules** card. | Each installed module's name is followed by a **Beta** badge; Core's is not. |
+| 3 | Open the Setup Assistant's modules step. | Each module in the list has a **Beta** badge beside its name; Core has none. |
+| 4 | In Setup, open **Custom Metadata Types**, **BarnCRM Module**, **Manage Records**, and clear **Beta** on one module's record. Reload the three places above. | That module's badge is gone everywhere; every other module still has it. |
+| 5 | Tick **Beta** on the record again. | The badge returns. |
+
+**Cleanup:** make sure **Beta** is ticked on every module record.
+
 ## T-SET-07: Pause Automation and Switch One Off
 
 **Purpose:** confirm the timed pause, its banners, Resume, and a single automation switch.

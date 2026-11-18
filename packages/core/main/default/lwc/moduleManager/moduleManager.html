@@ -43,6 +43,9 @@
                         <li key={module.name} class="slds-item slds-var-p-vertical_x-small" data-module={module.name}>
                             <div>
                                 <span class="slds-text-heading_x-small" data-id="name">{module.displayName}</span>
+                                <template lwc:if={module.beta}>
+                                    <lightning-badge class="slds-var-m-left_x-small" label={labels.beta} data-id="beta"></lightning-badge>
+                                </template>
                                 <c-barn-status-badge
                                     class="slds-var-m-left_x-small"
                                     status={module.badgeStatus}

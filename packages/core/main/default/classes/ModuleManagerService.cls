@@ -280,6 +280,9 @@ public with sharing class ModuleManagerService {
 		/** True when only the Nonprofit Edition offers it, so the page groups it under Nonprofit Modules. */
 		@AuraEnabled
 		public Boolean nonprofitOnly;
+		/** True when the catalog marks it as in beta, so the page shows a Beta badge (D-211). */
+		@AuraEnabled
+		public Boolean beta;
 		/** True when it is here but its setup steps never ran, so the page offers Finish Setup (FS1). */
 		@AuraEnabled
 		public Boolean setupPending;
@@ -326,6 +329,7 @@ public with sharing class ModuleManagerService {
 			row.appUrl = info.appUrl;
 			row.installFirst = info.installFirst;
 			row.nonprofitOnly = info.nonprofitOnly == true;
+			row.beta = info.beta == true;
 			row.setupPending = info.present == true && ModuleSetups.isPending(info.name, setupRan);
 			row.canSwitch = info.present == true && info.name != CORE;
 			row.status = info.present != true

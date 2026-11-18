@@ -3,6 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import HEADING from '@salesforce/label/c.Core_HubModules_Title';
+import BETA from '@salesforce/label/c.Core_ModuleManager_Beta';
 import LINK from '@salesforce/label/c.Core_HubModules_ManagerLink';
 // Every module on this card is installed, so the badge says only On or Off: "Installed and off"
 // read as "Installed" at a glance (owner QA, 2026-11-05).
@@ -61,7 +62,7 @@ function fallbackIcon(name) {
 export default class HubModules extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
 
-  labels = { heading: HEADING, link: LINK, openApp: OPEN_APP };
+  labels = { heading: HEADING, link: LINK, openApp: OPEN_APP, beta: BETA };
 
   rows = [];
   errorMessage;
@@ -80,6 +81,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
         .map((module) => ({
           name: module.name,
           displayName: module.label || module.name,
+          beta: module.beta === true,
           appUrl: module.appUrl,
           logoUrl: logoUrl(module.name),
           fallbackIcon: fallbackIcon(module.name),

@@ -7,6 +7,9 @@
                 <span class="slds-text-heading_x-small slds-var-m-left_x-small" data-id="module-name"
                     >{module.displayName}</span
                 >
+                <template lwc:if={module.beta}>
+                    <lightning-badge class="slds-var-m-left_x-small" label={labels.beta} data-id="beta"></lightning-badge>
+                </template>
                 <a class="slds-var-m-left_small" href={module.docsUrl} target="_blank" rel="noopener noreferrer"
                     >{labels.learnMore}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
                     >
