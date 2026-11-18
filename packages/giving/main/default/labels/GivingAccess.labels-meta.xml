@@ -5,7 +5,7 @@
     <categories>Access</categories>
     <language>en_US</language>
     <protected>true</protected>
-    <shortDescription>Access page: what Giving Admin grants</shortDescription>
+    <shortDescription>Access page: what Fundraising Admin grants</shortDescription>
     <value>Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident.</value>
   </labels>
   <labels>
@@ -13,7 +13,7 @@
     <categories>Access</categories>
     <language>en_US</language>
     <protected>true</protected>
-    <shortDescription>Access page: what Giving Staff grants</shortDescription>
+    <shortDescription>Access page: what Fundraising Staff Access grants</shortDescription>
     <value>Enter gifts, record refunds, and set up funds and appeals, without deleting anything. The Fundraising Staff role already includes it.</value>
   </labels>
   <labels>
@@ -21,7 +21,7 @@
     <categories>Access</categories>
     <language>en_US</language>
     <protected>true</protected>
-    <shortDescription>Access page: what Giving Read Only grants</shortDescription>
+    <shortDescription>Access page: what Fundraising Read Only grants</shortDescription>
     <value>See gifts, funds, appeals and receipts without changing them.</value>
   </labels>
 </CustomLabels>

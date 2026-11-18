@@ -6,7 +6,7 @@ A free, open source suite of Salesforce managed packages that gives small and me
 
 BarnCRM is a set of free apps that install into your organization's Salesforce account and turn it into a working nonprofit database. It is built for small and medium nonprofits: roughly $250K to $10M in annual revenue, 2 to 50 staff, one to ten Salesforce users, and no full-time Salesforce administrator. The person who sets it up is a development director, an operations manager, or an executive director who is comfortable with spreadsheets and modern web apps. If that is you (in our documentation we call you Maria), you are the person this product is designed for, and you should not need a consultant to use it.
 
-BarnCRM is one suite of tools that comes in two editions. Both editions have the full core suite of tools: people, households, relationships, addresses, imports with undo, Find and bulk update, duplicate review, Org Optimizer, Health Check, settings and the rest of Core. The **Standard Edition** is that core suite for any Salesforce org. The **Nonprofit Edition** is the Standard Edition plus the nonprofit tools: Giving and the other nonprofit modules.
+BarnCRM is one suite of tools that comes in two editions. Both editions have the full core suite of tools: people, households, relationships, addresses, imports with undo, Find and bulk update, duplicate review, Org Optimizer, Health Check, settings and the rest of Core. The **Standard Edition** is that core suite for any Salesforce org. The **Nonprofit Edition** is the Standard Edition plus the nonprofit tools: Fundraising and the other nonprofit modules.
 
 Nonprofits on Salesforce are currently stuck between two options, and neither one fits a small team. The Nonprofit Success Pack (NPSP), which thousands of organizations run on, stopped being developed in March 2023, and since December 2025 it is no longer bundled for new Power of Us applicants. Its replacement, Agentforce Nonprofit, is more capable underneath but is widely reported as hard to set up and hard to administer: rollup totals run through scheduled batch processing rather than anything an admin can adjust, the permission model requires cloning managed permission sets that get overwritten at every release, and it does not carry over NPSP's household conventions, address history, or donor levels. Organizations without an implementation budget are left between a frozen product and an over-engineered one. BarnCRM exists to give them a third option.
 
@@ -21,7 +21,7 @@ BarnCRM is in development. Core is nearing its pilot, but nothing is installable
 ## Status
 
 - Phase 0 (planning and repository setup) complete.
-- Core is nearing its pilot; Giving and Mirror are built alongside it, and the other modules are planned (see docs/barncrm-features.md for each feature's status).
+- Core is nearing its pilot; Fundraising and Mirror are built alongside it, and the other modules are planned (see docs/barncrm-features.md for each feature's status).
 - Not on AppExchange.
 - No releases yet. No package versions exist and nothing is installable.
 - Namespace pending: development is namespace-agnostic until the namespace is registered.
@@ -36,18 +36,18 @@ BarnCRM is a Core package plus optional module packages that depend on Core.
 |---|---|---|---|
 | Core | Constituent model (Contacts, Accounts, Households, Relationships, Affiliations, Addresses), the BarnCRM app, Settings framework and UI, Module Manager, permission sets, trigger framework, error log, Import framework, health check | (none) | v0.1 |
 | Rollup Builder | The rollup engine and the Rollup Builder page where you manage totals | Core | not yet versioned |
-| Giving | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core, Rollup Builder | v0.2 |
-| Mirror | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Nonprofit Cloud, planned), inbound gift REST API, accounting export | Core, Giving | v0.6 |
+| Fundraising | Gifts, funds and allocations, commitments and installments, soft credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and dashboards, gift batches | Core, Rollup Builder | v0.2 |
+| Mirror | Adapters: Opportunity mirror (NPSP and Sales Cloud), Campaign sync, Gift Transaction mirror (Nonprofit Cloud, planned), inbound gift REST API, accounting export | Core, Fundraising | v0.6 |
 | Volunteers | Volunteer profiles, jobs, shifts, sign-ups, hours, skills | Core | v0.7 |
 | Programs | Programs, services, enrollments, attendance, service deliveries, light case notes, outcomes | Core | v0.8 |
-| Grants | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields | Core, Giving | v0.9 |
+| Grants | Funder pipeline (grants received and applied for), reporting deadlines, restricted fund tracking, government award compliance fields | Core, Fundraising | v0.9 |
 | Events | Simple event registration and attendance for non-fundraising events | Core | post-1.0 |
 
 ## Runs on
 
 Supported org shapes. Today CI's Apex gate runs on one long-lived test org (Person Accounts shape, `oi-test`); the others are tested by hand from the [Testing Guide](docs/testing-guide/README.md) in scratch orgs and sandboxes, so treat them as supported, not as a CI matrix:
 
-- Platform only (Salesforce Platform or Lightning Platform Plus licenses, no Opportunity, Campaign, Case, or Lead objects). This is the floor: Core, Giving, Volunteers, Programs, and Grants all work here.
+- Platform only (Salesforce Platform or Lightning Platform Plus licenses, no Opportunity, Campaign, Case, or Lead objects). This is the floor: Core, Fundraising, Volunteers, Programs, and Grants all work here.
 - Sales and Service Cloud (Enterprise Edition via Power of Us).
 - An org with NPSP installed (coexistence mode: adopt existing NPSP household accounts, optionally mirror gifts to Opportunities).
 - Agentforce Nonprofit (Person Accounts likely enabled; household junction mode; the Gift Transaction mirror, X-07, is planned and not built).

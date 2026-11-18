@@ -25,7 +25,7 @@ everyone with a Programs permission set (the default), or only the people who ne
 ## Before You Install
 
 - Programs is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
-- It needs BarnCRM Core and nothing else: not Giving, not Rollup Builder.
+- It needs BarnCRM Core and nothing else: not Fundraising, not Rollup Builder.
 - If the Program Management Module (PMM) is installed in your org, BarnCRM lists it on the
   **Integrations** page as an alternative. Use one or the other for the same programs, not both.
   To move PMM's records into BarnCRM, use the PMM migration kit ([Moving From PMM](#moving-from-pmm)).

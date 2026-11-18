@@ -83,7 +83,11 @@ private class GivingJobNotificationPathsTest {
 				title(System.Label.Giving_JobNotice_DonorLevels)
 			);
 			Assert.isNull(notice.targetId, 'No record');
-			Assert.areEqual('Giving', notice.section, 'Opening the Giving section');
+			Assert.areEqual(
+				SettingSections.GIVING,
+				notice.section,
+				'Opening the Fundraising section'
+			);
 		}
 	}
 

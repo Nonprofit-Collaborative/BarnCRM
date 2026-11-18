@@ -17,7 +17,7 @@ public with sharing class DonorLevelBatch implements Database.Batchable<SObject>
 	@TestVisible
 	private static final String CONTACTS = 'Contact';
 	/** The settings console section the Donor Levels page is in. */
-	private static final String GIVING_SECTION = 'Giving';
+	private static final String GIVING_SECTION = SettingSections.GIVING;
 
 	private final String scopeObject;
 	private Integer moved = 0;

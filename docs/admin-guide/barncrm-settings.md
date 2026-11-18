@@ -179,13 +179,13 @@ modules your edition offers (see [Editions](editions.md)), plus any module alrea
   Salesforce's installer, and **What this module does**.
 - An installed module shows **Installed** and a link to its own app, where it has one.
   No module app has a Settings tab: the Rollup Builder's settings are in the **Rollups**
-  section and Volunteers' in the **Volunteers** section of BarnCRM Settings; Giving's BarnCRM Fundraising app has no Settings tab, and Mirror has no app. (Some module
+  section and Volunteers' in the **Volunteers** section of BarnCRM Settings; Fundraising's BarnCRM Fundraising app has no Settings tab, and Mirror has no app. (Some module
   sections still show in BarnCRM Settings for now; they move to the module's app in a later
   release.)
 
 The modules are BarnCRM Rollup Builder and BarnCRM Mirror (both editions), and BarnCRM
-Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and
-BarnCRM Mirror for Giving (Nonprofit Edition). The
+Fundraising, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models and BarnCRM Grants
+(Nonprofit Edition). The
 Standard Edition lists no Nonprofit Edition module that is not installed. BarnCRM Rollup
 Builder ships as its own package, installed from this section like the others. See the
 [Module Manager](module-manager.md) for what else you can do with an installed module.
@@ -200,7 +200,7 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
    **People** (People and Households, Addresses, Contact Points, Forms, Portals), **Data** (Import,
-   Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Grants),
+   Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Fundraising, Receipts, Grants),
    **Programs** (Programs, Logic Models, Volunteers, Events) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
@@ -208,8 +208,8 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    **Section** box at the top of the page: choose a section there, and the page moves to that
    section's first heading. Each section's settings sit in bordered boxes with a heading, such as **People** and
    **Households** on People and Households. You only see
-   the ones that have something in them, and a feature that is off hides its sections: Giving and
-   Receipts come with the Giving module, Grants with the Grants module, and Giving also adds the receipt details to the
+   the ones that have something in them, and a feature that is off hides its sections: Fundraising and
+   Receipts come with the Fundraising module, Grants with the Grants module, and Fundraising also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
    **Change Edition** link under it is the way to change it later (see
@@ -283,7 +283,7 @@ section's name.
 | Organization | Organization Details (the rest); Organization Address; Receipt Logo and Signature |
 | People and Households | People; Households (the rest); Household Names and Greetings; Relationships |
 | Addresses | Address Updates (the rest); Address Card; Seasonal Addresses |
-| Giving | Gift Defaults (the rest); Commitments and Installments; Donor Levels; Acknowledgments and Stewardship; Accounting Periods; BarnCRM Mirror for Giving |
+| Fundraising | Gift Defaults (the rest); Commitments and Installments; Donor Levels; Acknowledgments and Stewardship; Accounting Periods; Gift Mirrors and Exports |
 | Receipts | Receipt Details (the rest); Receipt Printing; Receipt Letters and Year End Statements |
 | Rollups | Rollup Processing (the rest); Rollup Builder |
 | Volunteers | Hours and Shifts |
@@ -353,7 +353,7 @@ parts separated by commas.
 ### Record Type for Organizations
 
 **General** always shows **Record type for organizations**, whether or not Households is
-on, because import, addresses and Giving use organizations either way. Accounts of the record
+on, because import, addresses and Fundraising use organizations either way. Accounts of the record
 type chosen here are your organizations: they appear on the **Organizations** tab, get the
 organization parts of the record page, are matched as organizations by import, and an import
 creates new organizations with it. **No record type** is offered only when your org has no
@@ -421,10 +421,10 @@ Setup. Do one of these:
 No setting asks you for a record ID, an API name or a developer name. Where a setting points
 at something, you choose it:
 
-- **A record**, such as the default fund or the default appeal with Giving, is chosen with a
+- **A record**, such as the default fund or the default appeal with Fundraising, is chosen with a
   search box. Start typing the record's name and pick it from the list. The box shows the
   name; clearing it leaves the setting empty.
-- **Record types**, such as which kinds of Opportunity become gifts with BarnCRM Mirror for Giving, are
+- **Record types**, such as which kinds of Opportunity become gifts with the Fundraising Opportunity mirror, are
   a list of checkboxes, one per active record type in your org, by the name you see in Setup.
   Ticking none means every record type.
 - **One record type**, such as **Record type for organizations**, is a dropdown of your active
@@ -466,8 +466,8 @@ A text setting that is blank says what the blank means, in grey in its empty box
 - **Digest recipients** (Error Log) reads **Everyone with the Manage BarnCRM Settings
   permission**, which is who gets the digest while it is blank.
 - The organization details on **Organization** (the legal name, the address parts, and with
-  Giving the tax identification number and receipt details) read **Not set**: a blank detail
-  is left off letters and receipts, and Giving will not produce a receipt without a legal
+  Fundraising the tax identification number and receipt details) read **Not set**: a blank detail
+  is left off letters and receipts, and Fundraising will not produce a receipt without a legal
   name.
 
 When Salesforce Setup's Company Information has a value BarnCRM can use, the blank setting
@@ -531,7 +531,7 @@ those the button opens the list and the first step says which one to click.
 | Duplicate Matching | To review duplicates: keep the standard duplicate rules active. The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | Duplicate Rules | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it | Object Manager (click the object, then Fields & Relationships, New) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Access level: All email) | Deliverability | Yes, with Check Again |
-| Access | Assign a module permission set this page does not list under Extra Permissions. Giving, Mirror and Mirror for Giving permission sets, such as Giving Staff, Provider Requests or Salesforce Records Sync, and Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a User in Setup** link on the page itself | Permission Sets (click the set, then Manage Assignments) | No |
+| Access | Assign a module permission set this page does not list under Extra Permissions. Fundraising and Mirror permission sets, such as Fundraising Staff, Salesforce Records Sync or Provider Requests, and Core's own extra permissions (Find and Export, Bulk Update, Bulk Delete, Erase People, Duplicate Review, Metadata Admin) are given on the page itself; see [Erase a person](erase-a-person.md) for who should have Erase People. Creating the user is the **Create a User in Setup** link on the page itself | Permission Sets (click the set, then Manage Assignments) | No |
 
 If the check cannot be read (for example, your Salesforce did not answer), the note shows the
 instruction without Not done yet.
@@ -541,16 +541,16 @@ form at the top of that page:
 
 | Page | What to change in Setup | Open in Setup opens | Checked by BarnCRM |
 |---|---|---|---|
-| Giving, Acknowledgments | Add and verify the shared From address | Organization-Wide Addresses | No |
-| Giving, Acknowledgments | Allow the org to send email (Access level: All email) | Deliverability | Yes, with Check Again |
-| Giving, Acknowledgments | Write or change the thank you wording in an email template, folder BarnCRM Acknowledgments | Classic Email Templates | No |
-| Receipts | Assign **Gift Record Page** as the org default for Gift, and **Giving Contact Record Page** and **Giving Account Record Page** to the BarnCRM app | Lightning App Builder (click Edit next to the page, then Activation) | No |
-| Giving, Campaign Sync (BarnCRM Mirror for Giving) | Campaign create and edit for the people who create appeals | Permission Sets (click the set, then Object Settings, Campaigns) | No |
-| Giving, Campaign Sync (BarnCRM Mirror for Giving) | **Marketing User** ticked on the user of each person who creates appeals | Users | No |
-| Giving, Opportunity Mirror (BarnCRM Mirror for Giving) | Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | Permission Sets (click the set, then Object Settings, Opportunities) | No |
+| Fundraising, Acknowledgments | Add and verify the shared From address | Organization-Wide Addresses | No |
+| Fundraising, Acknowledgments | Allow the org to send email (Access level: All email) | Deliverability | Yes, with Check Again |
+| Fundraising, Acknowledgments | Write or change the thank you wording in an email template, folder BarnCRM Acknowledgments | Classic Email Templates | No |
+| Receipts | Assign **Gift Record Page** as the org default for Gift, and **Fundraising Contact Record Page** and **Fundraising Account Record Page** to the BarnCRM app | Lightning App Builder (click Edit next to the page, then Activation) | No |
+| Fundraising, Campaign Sync | Campaign create and edit for the people who create appeals | Permission Sets (click the set, then Object Settings, Campaigns) | No |
+| Fundraising, Campaign Sync | **Marketing User** ticked on the user of each person who creates appeals | Users | No |
+| Fundraising, Opportunity Mirror | Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | Permission Sets (click the set, then Object Settings, Opportunities) | No |
 
-Giving Staff, Giving Admin and Giving Read Only, Mirror's Provider Requests, and Mirror for
-Giving's Salesforce Records Sync and Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
+Fundraising Staff Access, Fundraising Admin and Fundraising Read Only, Mirror's Provider Requests, and Mirror for
+Fundraising's Salesforce Records Sync and Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
 no note. Accounting Export has no Setup note.
 
 ## Common Mistakes
@@ -568,7 +568,7 @@ no note. Accounting Export has no Setup note.
   replaced.
 - **Wondering whether a nightly job or another page changed your settings.** A job saves only
   its own run details (when it ran and what it did), and a page such as Accounting Periods
-  saves only its own setting. A setting that ships switched on (with Giving, for example,
+  saves only its own setting. A setting that ships switched on (with Fundraising, for example,
   printing the logo on receipts) stays on until someone switches it off, even when a job was
   the first thing ever to save your settings.
 - **Looking for a setting in Setup because it is not in the section you expected.** Use the
@@ -595,7 +595,7 @@ changes.
 
 | What you see | Where it is stored |
 |---|---|
-| A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Giving brings its own. |
+| A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Fundraising brings its own. |
 | A row in Recent Changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
 | Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; `NoneChosen` when first-run setup was finished with every feature unticked; empty, on an org upgraded from before features existed, means all on) |

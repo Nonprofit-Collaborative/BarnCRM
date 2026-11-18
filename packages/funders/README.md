@@ -19,7 +19,7 @@ links follow in 0.17.
 
 - BarnCRM Core
 
-Nothing in this package references Giving or Programs (ADR-0162
+Nothing in this package references Fundraising or Programs (ADR-0162
 `0162-funders-restricted-funds-schedules-calendar.md` decision 1): a grant may name a program
 and a Giving fund by record identifier (text), resolved by describe only where a `Program__c` or
 `Fund__c` object exists.

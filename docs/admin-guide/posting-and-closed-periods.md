@@ -27,15 +27,15 @@ gifts. Those gifts are not in the books until Jen exports them and marks them po
 
 ## How to Turn It On
 
-Posting and closed periods arrive with the Giving module. Nothing is locked until someone marks
+Posting and closed periods arrive with the Fundraising module. Nothing is locked until someone marks
 a gift posted or closes a period.
 
-- **Marking gifts posted** is on the Accounting Export page, which needs the Mirror for Giving module (see
+- **Marking gifts posted** is on the Accounting Export page, which is part of the Fundraising module (see
   [Accounting Export](accounting-export.md)). The **Accounting Export** permission set includes
-  the **Post Gifts** permission, so Jen can mark gifts posted and unpost them. **Giving Admin**
+  the **Post Gifts** permission, so Jen can mark gifts posted and unpost them. **Fundraising Admin**
   includes it too.
-- **Closing a period** is in **BarnCRM Settings**, **Giving**, **Accounting Periods**, for
-  anyone with the **Manage BarnCRM Settings** permission and the **Giving Admin** permission
+- **Closing a period** is in **BarnCRM Settings**, **Fundraising**, **Accounting Periods**, for
+  anyone with the **Manage BarnCRM Settings** permission and the **Fundraising Admin** permission
   set. Choose **Open**, and the Accounting Periods page shows the date the books are closed
   through. The latest date it takes is the day before yesterday: a refund is dated today, and
   today has to stay open for it in every time zone your staff work in.
@@ -47,7 +47,7 @@ than fill something in. See [Automation control](automation-control.md).
 ## A Five-Minute Walkthrough
 
 You need the sample data, Jen with the **Accounting Export** permission set (with or without
-**Giving Read Only**), and David with **Giving Staff**.
+**Fundraising Read Only**), and David with **Fundraising Staff Access**.
 
 1. As Jen, open **Accounting Export**, set **From** and **To** to the first and last day of last
    month, and click **Download File**.
@@ -62,7 +62,7 @@ You need the sample data, Jen with the **Accounting Export** permission set (wit
    saves.
 6. As David, click **Refund or Write Off** on the gift and refund 10. It works: the refund is a
    new gift dated today and is not posted. It will be in this month's export.
-7. As Maria, open **BarnCRM Settings**, **Giving**, **Accounting Periods**, **Open**. Set **Books
+7. As Maria, open **BarnCRM Settings**, **Fundraising**, **Accounting Periods**, **Open**. Set **Books
    closed through** to the last day of last month (on the 1st or 2nd, the month before) and click
    **Save**. The page shows the new date.
 8. As David, open **Quick Gift Entry** and enter a gift dated in last month. BarnCRM refuses:
@@ -91,7 +91,7 @@ one, so nothing Jen holds changes. See
 [Refunds and write-offs](refunds.md#cancelling-a-pending-gift).
 
 **Unpost is not on the Posting card.** You need the **Post Gifts** permission, which comes with
-the **Accounting Export** and **Giving Admin** permission sets.
+the **Accounting Export** and **Fundraising Admin** permission sets.
 
 **Mark these gifts posted says the gifts changed.** Someone added, changed or refunded a gift in
 that range after you downloaded the file. Download it again, import that file, and mark again.

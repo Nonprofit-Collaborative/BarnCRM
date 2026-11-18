@@ -1,8 +1,8 @@
-# Giving: Donor Scoring
+# Fundraising: Donor Scoring
 
 Scripts for the recency, frequency and monetary scores, the cutoff settings, the segment and the two score-based donor segment templates. Setup detail: [Donor scoring](../admin-guide/donor-scoring.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Giving deployed and sample data loaded.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Fundraising deployed and sample data loaded.
 
 ## T-RFM-01: A Donor Is Scored From Their Gifts
 
@@ -28,7 +28,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, open **Donor Levels and Scores**. | Three cutoff settings show `90,180,365,730`, `6,4,2,1` and `5000,1000,250,50`. None is blank. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, open **Donor Levels and Scores**. | Three cutoff settings show `90,180,365,730`, `6,4,2,1` and `5000,1000,250,50`. None is blank. |
 | 2 | Set **Donor Score Monetary Amount** to `200,100,50,10` and save. | Saved. |
 | 3 | Open **Nightly Jobs** and select **Run now** for the Donor Levels job; refresh Pat after a minute. | Pat's **Amount Score** is 5 (300 reaches 200). **Giving Pattern** is still Loyal (frequency is 3). |
 | 4 | Set the same setting to `abc` and save, then run the job again. | Saved. Pat's **Amount Score** is back to 3, as with the default. |
@@ -38,7 +38,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-RFM-03: Score-Based Donor Segments and Find
 
 **Purpose:** Confirm the Champions and Slipping Donors templates and Find use the scores.
-**Prerequisites:** admin or Giving staff with Find; at least one Champion and one At Risk donor.
+**Prerequisites:** admin or Fundraising staff with Find; at least one Champion and one At Risk donor.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -52,7 +52,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-RFM-04: Wealth Screening Fields and Import Template
 
 **Purpose:** Confirm the five wealth screening fields, who sees them, and that the Wealth Screening template updates people found by email and adds nobody (G-32).
-**Prerequisites:** admin; staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded. A CSV with headings **Email**, **Capacity Rating**, **Affinity Rating**, **Screening Score**, **Screening Date**, **Screening Source** and two rows: Luis Garcia's email with `250,000 to 499,999`, `High`, `87.5`, today, `Example Screening Co`; and `nobody@example.invalid` with any values.
+**Prerequisites:** admin; staff (Fundraising Staff Access); a read-only user with Fundraising Read Only; sample data loaded. A CSV with headings **Email**, **Capacity Rating**, **Affinity Rating**, **Screening Score**, **Screening Date**, **Screening Source** and two rows: Luis Garcia's email with `250,000 to 499,999`, `High`, `87.5`, today, `Example Screening Co`; and `nobody@example.invalid` with any values.
 
 | Step | Action | Expected result |
 |---|---|---|

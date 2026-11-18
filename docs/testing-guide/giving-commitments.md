@@ -1,8 +1,8 @@
-# Giving: Commitments
+# Fundraising: Commitments
 
 Scripts for pledges and recurring gifts: payment schedules, paying a payment with a gift, pausing, cancelling, refunds and the overdue pass. Setup detail: [Commitments: pledges and recurring gifts](../admin-guide/commitments.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Giving: gifts, funds and batches](giving-gifts-funds-batches.md)). The payment records' tab is labelled **Scheduled Payments** (once it is in the app's navigation; until then open it from the app launcher). Leave the **Import** settings **Days either side of a payment's due date** (7) and **Amount difference allowed** (0) at their defaults.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Fundraising deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app. A default fund must be set (script T-GIFT-01 in [Fundraising: gifts, funds and batches](giving-gifts-funds-batches.md)). The payment records' tab is labelled **Scheduled Payments** (once it is in the app's navigation; until then open it from the app launcher). Leave the **Import** settings **Days either side of a payment's due date** (7) and **Amount difference allowed** (0) at their defaults.
 
 ## T-COM-01: Create a Pledge and See Its Schedule
 
@@ -110,12 +110,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-COM-07: Nightly Jobs and Overdue Payments
 
-**Purpose:** confirm the five Giving jobs (the pledge reminders among them, G-37) switch on and off one at a time as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run) from the shared Nightly Jobs panel, run on demand, and fill the Overdue list view (1.23, D-200: the panel replaced the Giving Nightly Jobs page).
+**Purpose:** confirm the five Fundraising jobs (the pledge reminders among them, G-37) switch on and off one at a time as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run) from the shared Nightly Jobs panel, run on demand, and fill the Overdue list view (1.23, D-200: the panel replaced the Fundraising Nightly Jobs page).
 **Prerequisites:** admin; **Send Pledge Reminders** off (as shipped).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | With the run not scheduled: "The nightly jobs are not scheduled, so none of them runs. Schedule them to run as you." and **Schedule Nightly Jobs**. Giving's five jobs are rows of the panel: **Payment Schedule Top Up**, **Overdue Pass**, **Donor Levels**, **Pledge Reminders** and **Ask Reminders**, each with **Turn On** or **Turn Off**; every one but **Donor Levels** also has **Run Now**. There is no **Giving Nightly Jobs** tab or Giving **Nightly Jobs** page. |
+| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | With the run not scheduled: "The nightly jobs are not scheduled, so none of them runs. Schedule them to run as you." and **Schedule Nightly Jobs**. Fundraising's five jobs are rows of the panel: **Payment Schedule Top Up**, **Overdue Pass**, **Donor Levels**, **Pledge Reminders** and **Ask Reminders**, each with **Turn On** or **Turn Off**; every one but **Donor Levels** also has **Run Now**. There is no **Fundraising Nightly Jobs** tab or Fundraising **Nightly Jobs** page. |
 | 2 | Click **Schedule Nightly Jobs**. | "The nightly jobs are scheduled to run as you." The top up, overdue pass, donor levels and ask reminders show **On**; **Pledge Reminders** shows **Off** (as shipped). |
 | 2a | Click **Turn On** on **Pledge Reminders**, then open the **Pledge Reminders** page. | "Saved for the whole organization." **Run every night** is on, and the page still says reminders are off: the step sends nothing while **Send Pledge Reminders** is off. |
 | 2b | On **Pledge Reminders**, turn **Run every night** off, then go back to the panel. | **Pledge Reminders** shows **Off** and the other four still show **On**: one switch leaves the others as they were. |
@@ -124,7 +124,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Refresh after a minute. | The top up and the overdue pass each show a last start time, **Done**, and a summary line (for example a count of payments marked overdue, or that none were). |
 | 5 | Open the **Scheduled Payments** tab, list view **Overdue**. | Lists payments with **Status** Overdue, including the sample monthly donor's three overdue payments. Each is more than the grace days (5) past due. |
 | 6 | Switch to **Upcoming 30 Days**. | Payments due in the next 30 days. |
-| 7 | As a user with Giving Admin but without Manage BarnCRM Settings, open the panel. | The rows, results and summaries show; no **Turn On**, **Turn Off**, **Run Now** or **Schedule Nightly Jobs** button does. |
+| 7 | As a user with Fundraising Admin but without Manage BarnCRM Settings, open the panel. | The rows, results and summaries show; no **Turn On**, **Turn Off**, **Run Now** or **Schedule Nightly Jobs** button does. |
 
 **Cleanup:** schedule the jobs again if later scripts need them.
 
@@ -143,8 +143,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-COM-09: Commitment Access by Permission Set
 
-**Purpose:** confirm staff cannot delete commitments, read-only users cannot create or change them, and Giving Admin gives no View All on commitments.
-**Prerequisites:** staff, then read-only. For step 5, a user on the **Standard User** profile (not System Administrator) with **BarnCRM Admin** and **Giving Admin**, and no role above the sample data's owner.
+**Purpose:** confirm staff cannot delete commitments, read-only users cannot create or change them, and Fundraising Admin gives no View All on commitments.
+**Prerequisites:** staff, then read-only. For step 5, a user on the **Standard User** profile (not System Administrator) with **BarnCRM Admin** and **Fundraising Admin**, and no role above the sample data's owner.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -177,7 +177,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Commitments and Installments**. | **Send Pledge Reminders** is off, and **Pledge Reminders** is listed below it. |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, **Commitments and Installments**. | **Send Pledge Reminders** is off, and **Pledge Reminders** is listed below it. |
 | 2 | Open **Pledge Reminders**. | A warning notice says reminders are off. **Send Reminders Now** is disabled. The **No Steps Yet** empty state shows, and the log shows **No Reminders Yet**. The counts show as tiles. |
 | 3 | Choose **New Step**. Name `Week late`, **Days From Due Date** `7`, **Channel** `Email`, choose **BarnCRM: pledge installment overdue**. Save. | The step is listed with timing `7 days after the due date` and its template name. |
 | 4 | Choose **New Step** again. Name `Final letter`, **Days From Due Date** `30`, **Channel** `Letter`. Save. | Listed with timing `30 days after the due date`; the template column is empty. |

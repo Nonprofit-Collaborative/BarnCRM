@@ -42,22 +42,22 @@ already exported turns up in her next file instead of being missed.
 
 ## How to Turn It On
 
-The Mirror for Giving module has to be installed. Then give the person who runs the export the
+The BarnCRM Fundraising module has to be installed. Then give the person who runs the export the
 **Accounting Export** permission set on the Access page, under Extra Permissions. It reads the
-gift, allocation and fund fields the file shows, so the person needs no Giving set beside it.
+gift, allocation and fund fields the file shows, so the person needs no other Fundraising set beside it.
 
 **The file holds the gifts the person running it can see**, the same as any report. Gifts
 are private by default, so check that Jen can see all of them: export the same month once
 as yourself and once as Jen, and compare the totals the page shows. If hers is lower, her visibility is a sharing
 setting in Setup (her role, or the organization-wide default for gifts), not something BarnCRM can change. The page says this beside the button.
 
-Open it from **BarnCRM Settings**, **Giving**, **Accounting Export**, or search the App
+Open it from **BarnCRM Settings**, **Fundraising**, **Accounting Export**, or search the App
 Launcher for **Accounting Export**. There are no settings.
 
 The **Accounting Export** permission set includes **Export Accounting**, the permission the
 page checks before it builds or marks a file. Someone without it who opens the page, or calls
 the export from elsewhere, is told they need the Accounting Export permission set and gets no
-file. Giving Admin alone does not include it, so give the administrator the Accounting Export
+file. Fundraising Admin alone does not include it, so give the administrator the Accounting Export
 permission set as well if they run the export.
 
 It also includes **Post Gifts**, which shows the **Mark these

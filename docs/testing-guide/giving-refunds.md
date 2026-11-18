@@ -1,13 +1,13 @@
-# Giving: Refunds and Write-Offs
+# Fundraising: Refunds and Write-Offs
 
 Scripts for recording money that went back as a linked negative gift, and for what that does to totals. Setup detail: [Refunds and write-offs](../admin-guide/refunds.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Giving deployed and sample data loaded unless a script says otherwise.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Fundraising deployed and sample data loaded unless a script says otherwise.
 
 For every script on this page:
 
 - Open gifts from the **BarnCRM Fundraising** app, so they open on the packaged **Gift Record Page**, which carries the **Refund or Write Off** action and the **Refunds and Write-Offs** list.
-- In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
+- In **BarnCRM Settings**, **Fundraising**, set **Default fund** to **General Fund** and save.
 - "Enter a gift" means: in **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**.
 - Totals are recalculated a few seconds after a save. Refresh the record page before reading a total.
 - **Rosa Hall** has no gifts in the sample data, so her totals start empty. If an earlier page's scripts gave her gifts, note her totals first and read each expected total as a change from that.
@@ -83,7 +83,7 @@ For every script on this page:
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As read-only, open **Rosa Hall**'s 80 gift. | The gift opens. **Refunds and Write-Offs** and the refund fields are readable. |
-| 2 | Select **Refund or Write Off**. | The dialog says "You can see this gift but not record money going back. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set." It offers no reason box and no **Record It**, only **Cancel**. Select **Cancel**; no negative gift is added to **Refunds and Write-Offs**. |
+| 2 | Select **Refund or Write Off**. | The dialog says "You can see this gift but not record money going back. Ask your BarnCRM admin for the Fundraising Staff role, together with the Fundraising Staff Access permission set." It offers no reason box and no **Record It**, only **Cancel**. Select **Cancel**; no negative gift is added to **Refunds and Write-Offs**. |
 | 3 | Open the **Refunds and Write-Offs** list view on the **Gifts** tab. | The refunds from T-REF-01 and T-REF-02 are listed. |
 
 **Cleanup:** None.

@@ -64,8 +64,8 @@ anyone with the permission to erase people ([Erase a person](erase-a-person.md))
 
 **Where the pages are used.** They are assigned to the **BarnCRM** app, so a record opened
 in that app uses them. A record opened in another app, or on a page your organization
-assigned itself, uses that page instead. With Giving installed, the **BarnCRM Fundraising** app opens
-people, households and organizations on Giving's own pages, which add giving (see
+assigned itself, uses that page instead. With Fundraising installed, the **BarnCRM Fundraising** app opens
+people, households and organizations on Fundraising's own pages, which add giving (see
 [A donor's giving on their record](donor-records.md)).
 
 **Your own pages win.** BarnCRM never replaces a record page you assigned yourself. If you

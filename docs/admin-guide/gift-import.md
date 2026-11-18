@@ -14,10 +14,10 @@ is **donation matching** (section 5).
 
 ## 2. How to Turn It On
 
-Nothing to turn on once the Giving module is installed. You need the **Manage BarnCRM
-Settings** permission to import, and the Giving admin role to create gifts; the **Access**
-page gives both to a BarnCRM Admin. The importer must also be able to delete gifts (Giving
-Admin can; Giving Staff cannot), because a row is saved whole or not at all: when a gift's soft
+Nothing to turn on once the Fundraising module is installed. You need the **Manage BarnCRM
+Settings** permission to import, and the Fundraising admin role to create gifts; the **Access**
+page gives both to a BarnCRM Admin. The importer must also be able to delete gifts (Fundraising
+Admin can; Fundraising Staff Access cannot), because a row is saved whole or not at all: when a gift's soft
 credit or tribute is refused, the import removes the gift it had just made. Without that right
 every gift row is rejected, in the preview too, saying so.
 

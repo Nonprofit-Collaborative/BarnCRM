@@ -10,14 +10,14 @@ next term and marks the old one Renewed, so you keep each year's history and pay
 - **Levels** are what you sell: a type and tier (Individual, Family Gold, Corporate Partner), the
   dues, how many months a term lasts, and how many grace days a member keeps after it ends.
 - **Benefits** are listed on each level (free admission, a newsletter, two guest passes).
-- **Renewals** come from staff, from Giving gifts to the level's fund when Giving is installed,
+- **Renewals** come from staff, from Fundraising gifts to the level's fund when Fundraising is installed,
   from a recurring gift that keeps a membership going, or from dues paid online through BarnCRM
   Payments.
 - **Lapse handling** runs each morning: an ended membership goes to Grace, then Lapsed.
 - **Reminders** can email members before their membership ends (off until you turn them on).
 - **A member directory** on your website lists members who opt in, through Portal Builder.
 
-Memberships does not use Opportunities and does not need Giving or Payments; it uses them when
+Memberships does not use Opportunities and does not need Fundraising or Payments; it uses them when
 they are installed.
 
 ## How to Turn It On
@@ -25,7 +25,7 @@ they are installed.
 ### Before You Install
 
 - Memberships is offered in **both editions** (see [Editions](editions.md)).
-- It needs BarnCRM Core only. Giving (renewals from gifts) and Payments (dues paid online) are
+- It needs BarnCRM Core only. Fundraising (renewals from gifts) and Payments (dues paid online) are
   optional.
 
 ### Installing
@@ -95,9 +95,9 @@ Online Payment or Import.
 On a membership, click **Renew** in the membership panel and choose the level (the same one by
 default). BarnCRM adds the next term and marks this one Renewed.
 
-### From Giving Gifts (When Giving Is Installed)
+### From Fundraising Gifts (When Fundraising Is Installed)
 
-1. On each level that gifts should pay for, enter the **Giving Fund ID**: open the fund in Giving,
+1. On each level that gifts should pay for, enter the **Giving Fund ID**: open the fund in Fundraising,
    copy the record ID from the address bar (the 18 characters after `/Fund__c/`) and paste it.
 2. Leave **Renew memberships from gifts** on in **BarnCRM Settings**, **Memberships** (it ships
    on).
@@ -243,7 +243,7 @@ Supporter, Business and Lifetime) with their benefits, and fourteen memberships 
 people, households and organizations. They show a renewal that points back to the term it
 renewed, memberships due for renewal in 10 to 25 days, one in grace, two lapsed, one pending,
 one cancelled, a lifetime membership with no end date, and three members listed in the
-directory. The sample is not linked to Giving gifts. **Remove Sample Data** deletes only the
+directory. The sample is not linked to Fundraising gifts. **Remove Sample Data** deletes only the
 levels and memberships the loader created (they carry a Sample Data checkbox); your own levels
 and memberships stay.
 

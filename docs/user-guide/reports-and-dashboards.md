@@ -5,11 +5,11 @@ answer common questions without building anything. This page lists what each one
 to open, filter and save your own copy. It also explains the totals you see on a donor's or a
 volunteer's record.
 
-**Before you start:** giving reports are in the **BarnCRM Fundraising** app and need a Giving permission
-set (it comes with the Fundraising Staff role, or with Read Only plus **Giving Read Only**).
+**Before you start:** giving reports are in the **BarnCRM Fundraising** app and need a Fundraising permission
+set (it comes with the Fundraising Staff role, or with Read Only plus **Fundraising Read Only**).
 Volunteer reports are in the **BarnCRM Volunteers** app and need a Volunteers permission set,
 which comes with your BarnCRM role. If a report or dashboard is empty or refuses to open, ask
-your admin (see [Giving dashboard](../admin-guide/giving-dashboard.md) and
+your admin (see [Fundraising dashboard](../admin-guide/giving-dashboard.md) and
 [Volunteers](../admin-guide/volunteers.md#the-volunteers-dashboard-and-reports)).
 
 **You see what you are allowed to see.** Both dashboards run as the person viewing them. Two
@@ -19,7 +19,7 @@ while a coordinator's count everyone's.
 
 ## What Ships
 
-**Giving** (folder **BarnCRM Giving**, dashboard **Giving Overview**):
+**Fundraising** (folder **BarnCRM Fundraising**, dashboard **Giving Overview**):
 
 | Report | What it shows |
 |---|---|
@@ -60,7 +60,7 @@ The **Volunteers** dashboard shows one chart for each: **Approved hours this yea
 1. Open the **BarnCRM Fundraising** app (giving) or the **BarnCRM Volunteers** app (volunteering).
 2. Click the **Dashboards** tab. In BarnCRM Fundraising it is the **Dashboards** tile under
    **More** on **Fundraising Home**.
-3. Open the **BarnCRM Giving** or **BarnCRM Volunteers** folder.
+3. Open the **BarnCRM Fundraising** or **BarnCRM Volunteers** folder.
 4. Click **Giving Overview** or **Volunteers**.
 5. Click **Refresh** at the top right to bring the numbers up to date.
 
@@ -72,7 +72,7 @@ To have the dashboard emailed to you on a schedule, click **Subscribe** on the o
 ## To Open a Report
 
 1. In the same app, click the **Reports** tab.
-2. Open the **BarnCRM Giving** or **BarnCRM Volunteers** folder (under **All Folders**).
+2. Open the **BarnCRM Fundraising** or **BarnCRM Volunteers** folder (under **All Folders**).
 3. Click the report name.
 
 You should see: the report, already filtered. Click a record name in a row to open it.
@@ -150,7 +150,7 @@ report and choose **Subscribe** again.
   run reports." Why and what to do: the dashboard shows what its running user (set by your
   admin, usually the person who installed BarnCRM) can see, not what you can see, and that
   person lost report or gift access. Ask your admin (see
-  [Giving dashboard](../admin-guide/giving-dashboard.md)).
+  [Fundraising dashboard](../admin-guide/giving-dashboard.md)).
 - Problem: a giving total looks too small. Why and what to do: Pending and Cancelled gifts are
   left out on purpose. Open **Recent Gifts** and check the status column.
 - Problem: a report's "this year" number differs from **Giving This Year** or **Volunteer Hours
@@ -178,7 +178,7 @@ report and choose **Subscribe** again.
 - [Volunteer hours](volunteer-hours.md)
 - [Volunteer jobs, shifts and sign-ups](volunteer-shifts.md)
 - [Find](find.md): lists and exports of people
-- Admin Guide: [Giving dashboard](../admin-guide/giving-dashboard.md),
+- Admin Guide: [Fundraising dashboard](../admin-guide/giving-dashboard.md),
   [Retention reports](../admin-guide/retention-reports.md),
   [A donor's giving on their record](../admin-guide/donor-records.md),
   [Rollups](../admin-guide/rollups.md),

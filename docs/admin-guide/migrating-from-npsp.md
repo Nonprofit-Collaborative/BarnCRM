@@ -1,6 +1,6 @@
 # Migrating From NPSP
 
-**Package:** Core and Giving | **Iteration:** v0.5
+**Package:** Core and Fundraising | **Iteration:** v0.5
 
 ## 1. What It Does
 
@@ -38,7 +38,7 @@ kit's **Start Migration** button. Run the kits in the order listed.
 The retire checklist then reminds you to stop NPSP creating the other side of relationships,
 affiliations, household addresses and household names, so the two apps never both do it.
 
-**NPSP Funds, Levels, Recurring Donations** (BarnCRM Giving):
+**NPSP Funds, Levels, Recurring Donations** (BarnCRM Fundraising):
 
 | Step | What it does |
 |---|---|
@@ -62,7 +62,7 @@ What NPSP does in these three areas, and where it lives in BarnCRM after the kit
 
 | NPSP | BarnCRM | What to do |
 |---|---|---|
-| Levels on contacts or accounts, with a minimum and maximum | Donor levels, one ladder ([Donor Levels](donor-levels.md)) | Copied by **Donor Levels**. Choose what the ladder is measured on in Giving settings. |
+| Levels on contacts or accounts, with a minimum and maximum | Donor levels, one ladder ([Donor Levels](donor-levels.md)) | Copied by **Donor Levels**. Choose what the ladder is measured on in Fundraising settings. |
 | A level's source field (any rollup field) | The ladder's measure: total giving, giving this or last fiscal year, or largest single gift | Pick the measure closest to your NPSP source field. A level on another field has no counterpart. |
 | More than one ladder (contacts and accounts, or several fields) | One ladder | Keep the main ladder; recreate others as a rollup plus a report if you need them. |
 | Previous level field | **Previous donor level** on the person | Kept by BarnCRM from now on; NPSP's history is not copied. |
@@ -72,7 +72,7 @@ What NPSP does in these three areas, and where it lives in BarnCRM after the kit
 | Engagement plans already applied to records, and their open tasks | Plans started in BarnCRM | Not copied: the open NPSP tasks stay as ordinary tasks. |
 | Customizable rollups | Rollup Builder ([Rollups](rollups.md)) | The **NPSP Customizable Rollups** kit copies them and checks each. What Rollup Builder cannot express (soft credit, contact role and payment paths, fiscal years, Years Donated, Donor Streak, Best Year, more than one year back, filter rules on another object) stays in NPSP, named with its reason. |
 
-**NPSP Gifts and Soft Credits** (BarnCRM Mirror for Giving, because it reads Opportunities and Campaigns).
+**NPSP Gifts and Soft Credits** (BarnCRM Fundraising; it reads Opportunities and Campaigns).
 Run it after the two kits above, so the people, households and funds are already there:
 
 | Step | What it does |
@@ -85,11 +85,11 @@ Run it after the two kits above, so the people, households and funds are already
 
 Before you run it:
 
-- Install BarnCRM Mirror and BarnCRM Mirror for Giving and give yourself the **Salesforce Records Sync** permission set on the
+- Install BarnCRM Fundraising and give yourself the **Salesforce Records Sync** permission set on the
   Access page (it lets you write each gift's Opportunity ID and each appeal's Campaign ID).
 - Leave **Opportunity mirror direction** at **Off** while the gifts load, so no Opportunity is
   written to. Switch it on afterwards if you want.
-- Switch **Send gift acknowledgments** off (BarnCRM Settings, Giving, Acknowledgments) so donors
+- Switch **Send gift acknowledgments** off (BarnCRM Settings, Fundraising, Acknowledgments) so donors
   are not thanked again for old gifts, and switch it back on after the Gifts step is done.
 
 What the gifts step leaves to you, each shown in the preview so you can correct the row on
@@ -102,7 +102,7 @@ NPSP's separate Tribute records, beyond the one on the Opportunity, are not copi
 
 ## 2. How to Turn It On
 
-BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
+BarnCRM brings the contacts template, and the Fundraising module brings the two payment templates.
 Each package adds its templates when it is installed, and an upgrade adds any template a later
 version ships, so the **Import** tab normally lists them already. An upgrade never changes a
 template you have edited. A shipped template you deleted comes back on the next upgrade: switch

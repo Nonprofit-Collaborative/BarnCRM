@@ -20,7 +20,7 @@ Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 4. Confirm the merge.
 
 You should see: one person. This is Salesforce's own merge: it keeps the activities and files
-of both (and, with Giving, their gifts). Salesforce lets you merge people only if you may
+of both (and, with Fundraising, their gifts). Salesforce lets you merge people only if you may
 delete people. The staff roles do not include that on purpose, so if you cannot, ask your
 admin. Merging two households with **Merge or Split** needs no such permission.
 

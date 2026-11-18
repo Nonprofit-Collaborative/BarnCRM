@@ -101,7 +101,7 @@ you. Click **Print** to print the month without the app's header and navigation.
 1. Open the **BarnCRM Grants** app. It opens on the **Board Dashboard**, its home: tiles for
    this fiscal year's revenue and awards, then a tile for each Grants tab.
 2. Read the three parts, all for this fiscal year:
-   - **Revenue Mix**: grants awarded by funding source and, if you use Giving, gifts to funds,
+   - **Revenue Mix**: grants awarded by funding source and, if you use Fundraising, gifts to funds,
      each with its amount and share as a bar.
    - **Concentration**: the five organizations giving the most, with a warning when one gives
      more than 25 percent or the five together more than half.
@@ -112,7 +112,7 @@ You should see: amounts in your currency and shares as percents, or `Nothing to 
 fiscal year yet.` To print it for a board packet, click **Print**. If a line says
 **Not set**, those grants have no **Funding Source**; fill it in on each grant.
 
-If your organization also enters a grant's payments as Giving gifts, that money is counted twice:
+If your organization also enters a grant's payments as Fundraising gifts, that money is counted twice:
 once in the grant lines and once in the gifts line, and in that funder's share. Ask your
 administrator which one your organization records awards in.
 
@@ -228,7 +228,7 @@ reimbursement grant.
 
 ## To Name the Giving Fund
 
-With Giving installed, choose the fund the money is booked to on the grant's **Giving Fund**
+With Fundraising installed, choose the fund the money is booked to on the grant's **Giving Fund**
 card and click **Save**.
 
 You should see: `Saved.` and the fund's name on the card.

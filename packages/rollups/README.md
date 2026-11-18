@@ -12,7 +12,7 @@ with Instantly, Every night or Both modes, a queue with retry, and a full nightl
 
 - BarnCRM Core
 
-Giving depends on this module. Offered in both editions.
+Fundraising depends on this module. Offered in both editions.
 
 ## What is here
 
@@ -45,7 +45,7 @@ Admin guide: [rollups](../../docs/admin-guide/rollups.md).
 the shipped Rollup Definitions the org does not have yet, leaving every existing definition
 as the administrator left it (R-R6, ADR-0029), creates the Automation page switch rows for
 the module's automations, and queues a job that gives the installer `Rollup_Builder_Admin`.
-It never throws; failures go to the Error Log. Giving makes the same defaults call from
+It never throws; failures go to the Error Log. Fundraising makes the same defaults call from
 `GivingPostInstall` for its own rows.
 
 Once package versions exist, `sfdx-project.json` names it for this package directory:

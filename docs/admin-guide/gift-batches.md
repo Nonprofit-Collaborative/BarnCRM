@@ -13,7 +13,7 @@ that does not balance creates nothing, and neither does one with an unfinished l
 gifts are created (the batch **Status** then reads Posted), a batch cannot create them again,
 be changed or be added to: it is the record of what went
 to the bank, and each line links to the gift it became. One gap to know about: someone with
-the Giving Staff or Giving Admin permission set can still delete a line of such a batch
+the Fundraising Staff Access or Fundraising Admin permission set can still delete a line of such a batch
 from outside this screen (a report, a data tool or the API). Its gift is untouched; only the
 batch's record of the deposit loses that line.
 
@@ -23,15 +23,15 @@ gift entered on Quick Gift Entry does.
 
 ## How to Turn It On
 
-Nothing to install and no Setup step. Gift batches arrive with the Giving package.
+Nothing to install and no Setup step. Gift batches arrive with the Fundraising package.
 
 1. Open the **BarnCRM Fundraising** app from the app launcher. **Gift Batches** is one of its tabs.
-2. Check that a default fund is set: **BarnCRM Settings**, then **Giving**, **Default
+2. Check that a default fund is set: **BarnCRM Settings**, then **Fundraising**, **Default
    fund**. A line with no fund of its own, in a batch with no fund, goes to that fund, and
    without one the batch cannot create its gifts.
-3. The people who type batches need the **Giving Staff** permission set, the same one Quick
+3. The people who type batches need the **Fundraising Staff Access** permission set, the same one Quick
    Gift Entry needs. The **Fundraising Staff** role includes it. Deleting a batch is kept to
-   **Giving Admin**.
+   **Fundraising Admin**.
 
 There are no settings for batches themselves.
 
@@ -152,6 +152,6 @@ phone, Quick Gift Entry is quicker.
 screen at a time, or split the stack into two batches.
 
 **No Add Line, Save or Create Gifts buttons.** The grid says **You can see this batch but
-not change it or create its gifts.** You have read access only: the Giving Read Only permission set, or
-someone else's batch shared with you to read. Ask for the Giving Staff permission set, or
+not change it or create its gifts.** You have read access only: the Fundraising Read Only permission set, or
+someone else's batch shared with you to read. Ask for the Fundraising Staff Access permission set, or
 ask the batch's owner (or an administrator, who can change its owner) for edit access.

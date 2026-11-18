@@ -26,7 +26,7 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 ## T-ERASE-02: Erase a Person in a Shared Household
 
 **Purpose:** Confirm the erasure empties the person, keeps the anonymous record and its totals, recounts the household and writes an Erasure record.
-**Prerequisites:** admin. Note **Luis Garcia**'s household totals (with Giving) before you start.
+**Prerequisites:** admin. Note **Luis Garcia**'s household totals (with Fundraising) before you start.
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -38,7 +38,7 @@ The admin user holds **BarnCRM Erase People** from the create script. It is in n
 | 5 | Click **Open the Erasure Record**. | The **Erasure** record: **Request Reference** `TEST-001`, **Contact** pointing at the erased record, **Erased Record Id**, and **Details** listing the same rows in the same words. **Details** holds no name, email or other erased value. |
 | 6 | Open the erased contact. | Name **Erased person**. Email, phone, mailing address and birth date are empty. **Email Opt Out** is ticked. |
 | 7 | Open **The Garcia Family**. | Only Harper and Diego are current members. The household's name and greetings are made from them. |
-| 8 | With Giving: check the erased record's and the household's giving totals and gifts. | Gifts and totals are kept, credited to **Erased person**. |
+| 8 | With Fundraising: check the erased record's and the household's giving totals and gifts. | Gifts and totals are kept, credited to **Erased person**. |
 
 **Cleanup:** None (an erasure cannot be undone). Recreate the org before another full run if you need Luis.
 

@@ -44,7 +44,7 @@ usual reason to touch it, leaves every check running.
 
 To let your team see and manage relationships, make sure they have one of the packaged
 access levels (BarnCRM Admin or Team Member, or Fundraising Staff
-with Giving) on the **Access** page
+with Fundraising) on the **Access** page
 in BarnCRM Settings. Read Only users see relationships and cannot change them: the
 Relationships card shows them no **Add Relationship** button and no row menu. A line's menu
 offers **Edit** to people who can edit relationships, **End It** to people who can also edit

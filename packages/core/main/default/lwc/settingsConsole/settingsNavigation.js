@@ -49,7 +49,7 @@ const GROUPS = [
     name: 'fundraising',
     label: FUNDRAISING,
     sections: [
-      ['Giving', 'utility:moneybag'],
+      ['Fundraising', 'utility:moneybag'],
       ['Receipts', 'utility:email'],
       ['Grants', 'utility:trophy'],
       ['Scholarships and Grants', 'utility:education']

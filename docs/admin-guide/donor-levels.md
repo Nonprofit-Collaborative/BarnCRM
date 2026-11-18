@@ -20,7 +20,7 @@ printed next to it can never disagree.
 
 Everything is in the app. You never open Setup.
 
-1. Open **BarnCRM Settings**, then **Giving**.
+1. Open **BarnCRM Settings**, then **Fundraising**.
 2. Open **Donor Levels**. This is the page that shows your ladder.
 3. Choose **New Level** and create your first rung. Each rung has:
    - a **name**, the one you use with donors and on your donor wall;
@@ -38,14 +38,14 @@ Everything is in the app. You never open Setup.
    compared, so a rung entered in euros and a donor whose totals are in dollars still match.
 4. Repeat until your ladder is complete. There is no limit and no required number of
    rungs; four or five is usual.
-5. Back in **BarnCRM Settings**, then **Giving**, set **Donor level source**. This is
+5. Back in **BarnCRM Settings**, then **Fundraising**, set **Donor level source**. This is
    the total your ladder is measured on:
    - **Total giving, everything ever given**, everything the donor has ever given. This is
      the default and the safe choice: it never resets.
-   - **Giving this fiscal year**, the current fiscal year only. Choose this for an annual
+   - **Fundraising this fiscal year**, the current fiscal year only. Choose this for an annual
      society, and know that on the first day of your new fiscal year every donor starts
      again from nothing, which is what an annual society means.
-   - **Giving last fiscal year**, the fiscal year before this one.
+   - **Fundraising last fiscal year**, the fiscal year before this one.
    - **Largest single gift**, the single biggest gift the donor has given, for a ladder
      built on one gift rather than on a total.
 6. Turn **Turn on donor levels** on in the same section.
@@ -65,13 +65,13 @@ time of the last full pass.
 
 Start with the sample data loaded (BarnCRM Settings, then Sample Data).
 
-1. Open **BarnCRM Settings**, then **Giving**, then **Donor Levels**. The ladder is
+1. Open **BarnCRM Settings**, then **Fundraising**, then **Donor Levels**. The ladder is
    empty.
 2. Choose **New Level**. Name it `Friend`, minimum `100`, maximum `1000`. Save.
 3. Choose **New Level** again. Name it `Sustainer`, minimum `1000`, maximum `5000`. Save.
 4. Choose **New Level** once more. Name it `Leadership Circle`, minimum `5000`, leave
    maximum empty. Save. You now have three rungs and the page lists them lowest first.
-5. Go back to **Giving** and turn **Turn on donor levels** on. Leave the source as **Total
+5. Go back to **Fundraising** and turn **Turn on donor levels** on. Leave the source as **Total
    giving, everything ever given**.
 6. Open **Donor Levels** again and choose **Recalculate Now**. Each rung now shows a donor
    count, and the page says when the recalculation finished.
@@ -124,7 +124,7 @@ that name from every donor's current and previous level, and there is no undo. T
 rung, clear its **active** box instead: donors already on it keep the name, and nobody new
 is assigned to it.
 
-**Choosing "Giving this fiscal year" and being surprised in July.** A fiscal year source empties
+**Choosing "Fundraising this fiscal year" and being surprised in July.** A fiscal year source empties
 everybody's level on the first day of the new fiscal year, because nobody has given
 anything in it yet. That is correct for an annual society and startling if you did not
 mean it. If you want a ladder that never resets, the source is **Total giving, everything ever given**.

@@ -13,7 +13,7 @@ at runtime.
 
 | Reached from | Target | Example | Decision |
 | --- | --- | --- | --- |
-| Mirror for Giving (Mirror: Case, through `CaseProviderRequests`) | Campaign, Opportunity, Gift Transaction and its designations | `CampaignSyncService`, `OpportunityMirrorContext`, `GiftTransactionMirrorSchema` (which also checks the field types it relies on, and which tests point at stand-in objects of the same shape) | ADR-0056, ADR-0058, ADR-0157 (Gift Transaction mirror) |
+| Fundraising's gift mirror classes, string literals only (Mirror: Case, through `CaseProviderRequests`) | Campaign, Opportunity, Gift Transaction and its designations | `CampaignSyncService`, `OpportunityMirrorContext`, `GiftTransactionMirrorSchema` (which also checks the field types it relies on, and which tests point at stand-in objects of the same shape) | ADR-0056, ADR-0058, ADR-0157 (Gift Transaction mirror) |
 | Core | Person Account fields (`PersonEmail`, `PersonMailingPostalCode`, `...__pc`) | `ImportMatcher`, `ImportRowProcessor.storedName` | ADR-0013 |
 | Core | Giving behaviour (classes) | `ImportEntityProcessors`, `SampleDataModules`, `HealthCheckExtensions`, `SetupAssistantExtensions` | ADR-0017, ADR-0057, ADR-0059 |
 | Core | Industries, NPSP, Sales Cloud detection | `OrgShapeDetector` | ADR-0013 |

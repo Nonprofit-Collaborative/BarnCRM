@@ -2,7 +2,7 @@
 
 Scripts for building, calculating, changing and switching off your own rollups, and for who may do it. Setup detail: [Rollups](../admin-guide/rollups.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Rollup Builder deployed and sample data loaded unless a script says otherwise. Giving is not needed: these scripts use a rollup you build yourself, so the shipped giving totals are left alone.
+Before you start: an org from [Before you test](before-you-test.md), with Core and BarnCRM Rollup Builder deployed and sample data loaded unless a script says otherwise. Fundraising is not needed: these scripts use a rollup you build yourself, so the shipped giving totals are left alone.
 
 Every script after T-RB-02 uses the rollup T-RB-02 builds, **Test children per household**: a count of the people in a household whose **Household Role** is **Child**. In the sample data, **The Garcia Family** has three people: Harper (Head), Luis (Spouse or Partner) and Diego (Child), so the expected total is 1.
 
@@ -352,7 +352,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-24: Delete a Rollup You Made, and Not a Shipped One
 
 **Purpose:** confirm Delete says what happens, removes an admin-made rollup and leaves its values, and refuses a shipped rollup with the reason.
-**Prerequisites:** admin user; T-RB-02 done. Step 6 needs Giving deployed (it ships rollups); skip it otherwise.
+**Prerequisites:** admin user; T-RB-02 done. Step 6 needs Fundraising deployed (it ships rollups); skip it otherwise.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -598,7 +598,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | With Giving deployed, open **The Garcia Family** as admin. (Without Giving: click the gear, **Edit Page**, drag **Explain These Totals** onto the page and save.) | The **Explain These Totals** card shows in the sidebar. |
+| 1 | With Fundraising deployed, open **The Garcia Family** as admin. (Without Fundraising: click the gear, **Edit Page**, drag **Explain These Totals** onto the page and save.) | The **Explain These Totals** card shows in the sidebar. |
 | 2 | Read the entry for **Test Children Count**. | "Test Children Count: 1", the sentence "Number of Contacts ... shown in Test Children Count on each Account." (with its condition note), "1 of the 3 records read count; 2 are left out.", and "Last calculated ..." or "Not calculated yet." |
 | 3 | Read **Records Read for This Record**. | Harper, Luis and Diego linked: Diego **Counted**, Harper and Luis "Left out: does not meet condition 1". |
 | 4 | Read the admin line. | "For admins, recalculated now without saving: Calculated: 1. On the record now: 1." |
@@ -612,7 +612,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-47: Starter Templates Add Only What You Tick, Switched Off
 
 **Purpose:** confirm Starter Templates adds nothing by default, adds only ticked rollups and adds them switched off, and opens a rollup prefilled with Create a Field ready.
-**Prerequisites:** admin user; Giving deployed; a staff user without Manage BarnCRM Settings.
+**Prerequisites:** admin user; Fundraising deployed; a staff user without Manage BarnCRM Settings.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -661,7 +661,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-50: A Large Fund Is Recalculated at Most Once an Hour
 
 **Purpose:** confirm the large parent throttle setting, its line on the Rollups page, and that saves in between are counted together.
-**Prerequisites:** Giving with sample data; a fund with about 20,000 or more allocations (the scale data generator's default fund); admin user with Manage BarnCRM Settings.
+**Prerequisites:** Fundraising with sample data; a fund with about 20,000 or more allocations (the scale data generator's default fund); admin user with Manage BarnCRM Settings.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -676,7 +676,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-51: A Total Changed by Rollups Runs Only the Automations That Read Totals
 
 **Purpose:** confirm a rollup update of a person runs donor levels and scores but not automations that react to edits.
-**Prerequisites:** Giving with donor levels on and a ladder whose first level starts at 100; a person with no gifts.
+**Prerequisites:** Fundraising with donor levels on and a ladder whose first level starts at 100; a person with no gifts.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -689,7 +689,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 ## T-RB-52: The Nightly Run Recalculates Every Record Once a Week
 
 **Purpose:** confirm the full recalculation night setting, the Rollups page line, and that other nights recalculate only what changed.
-**Prerequisites:** Giving with sample data; the nightly run scheduled; admin user with Manage BarnCRM Settings.
+**Prerequisites:** Fundraising with sample data; the nightly run scheduled; admin user with Manage BarnCRM Settings.
 
 | Step | Action | Expected result |
 |---|---|---|

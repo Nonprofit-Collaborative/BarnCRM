@@ -1,13 +1,13 @@
-# Giving: Receipts and Acknowledgments
+# Fundraising: Receipts and Acknowledgments
 
 Scripts for gift receipts, year-end statements, the receipt lock, receipt letters, thank-you acknowledgments, donor levels and stewardship plans. Setup detail: [Receipts and year-end statements](../admin-guide/receipts.md), [Acknowledgments](../admin-guide/acknowledgments.md), [Donor levels](../admin-guide/donor-levels.md), [Stewardship plans](../admin-guide/stewardship-plans.md), [Email addresses](../admin-guide/emails.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Giving deployed and sample data loaded unless a script says otherwise.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Fundraising deployed and sample data loaded unless a script says otherwise.
 
 For every script on this page:
 
 - Open gifts from the **BarnCRM Fundraising** app, so they open on the packaged **Gift Record Page** with its **Receipts** panel. Outside that app, assign the page as the org default for Gift first ([Receipts](../admin-guide/receipts.md), step 2).
-- In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
+- In **BarnCRM Settings**, **Fundraising**, set **Default fund** to **General Fund** and save.
 - "Enter a gift" means: in the **BarnCRM Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**. A **Gift Saved** toast names the new gift number.
 - **Rosa Hall** and **Susan Ortiz** have no gifts in the sample data, so their totals start empty.
 
@@ -111,19 +111,19 @@ For every script on this page:
 
 ## T-RCPT-07: Who Can Issue and Who Can Open Receipt Files
 
-**Purpose:** Confirm read-only users cannot issue, and users without a Giving permission set cannot open receipt files.
+**Purpose:** Confirm read-only users cannot issue, and users without a Fundraising permission set cannot open receipt files.
 **Prerequisites:** read-only, admin and staff. The gift from T-RCPT-02 (with two receipts).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As read-only, open the gift. | The **Receipts** panel lists both receipts with **View PDF**, and shows no **Issue Receipt**, no void reason box and no **Void and Reissue**. |
-| 2 | Select **View PDF** on 000002. | The PDF opens: Giving Read Only may read receipts. |
+| 2 | Select **View PDF** on 000002. | The PDF opens: Fundraising Read Only may read receipts. |
 | 3 | As admin, open receipt 000002 from **Receipts** and copy its browser address. Open **Rosa Hall**'s household and look at its **Files**. | The receipt PDF is not in the household's files. |
-| 4 | As admin, in Setup, **Users**, open the staff user, **Permission Set Assignments**, and remove **Giving Staff**. | The staff user now holds BarnCRM Staff only. |
+| 4 | As admin, in Setup, **Users**, open the staff user, **Permission Set Assignments**, and remove **Fundraising Staff Access**. | The staff user now holds BarnCRM Staff only. |
 | 5 | As staff, open **Rosa Hall**. | The contact opens. |
 | 6 | As staff, paste the receipt address from step 3. | Salesforce says you do not have access to the record; the receipt and its file do not open. |
 
-**Cleanup:** Give the staff user **Giving Staff** again.
+**Cleanup:** Give the staff user **Fundraising Staff Access** again.
 
 ## T-RCPT-08: Acknowledgment Rules and an Emailed Thank You
 
@@ -133,7 +133,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, turn on **Send Gift Acknowledgments** and select **Save**. On the **Acknowledgments** row select **Open Thank-Yous**. | The **Thank-Yous** page opens with **Waiting to Go**, then **Recent Runs**, then **Rules (Admin)**, which is open for an admin. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, turn on **Send Gift Acknowledgments** and select **Save**. On the **Acknowledgments** row select **Open Thank-Yous**. | The **Thank-Yous** page opens with **Waiting to Go**, then **Recent Runs**, then **Rules (Admin)**, which is open for an admin. |
 | 2 | Select **New Rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
 | 3 | Select **New Rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
@@ -173,10 +173,10 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on the **Donor Levels** row select **Open Donor Level Ladder**. | The **Donor Levels** page. With no rungs: the **No Levels Yet** empty state reading "You have not created any levels yet. Choose New Level to add the first rung of your ladder." An inactive level shows an **Inactive** badge. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, on the **Donor Levels** row select **Open Donor Level Ladder**. | The **Donor Levels** page. With no rungs: the **No Levels Yet** empty state reading "You have not created any levels yet. Choose New Level to add the first rung of your ladder." An inactive level shows an **Inactive** badge. |
 | 2 | Select **New Level**: **Level Name** `Friend`, **Minimum Amount** 100, **Maximum Amount** 1000, **Active** on. Save. Repeat for `Sustainer` 1000 to 5000 and `Leadership Circle` 5000 with no maximum. | The page lists three rungs, lowest first; the top one reads "and above". |
 | 3 | Try a fourth level with **Minimum Amount** 500 and **Maximum Amount** 200. | Refused: "The maximum amount has to be greater than the minimum amount. Leave the maximum empty for the top level of your ladder." Cancel. |
-| 4 | In **BarnCRM Settings**, **Giving**, turn on **Turn on donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate Now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
+| 4 | In **BarnCRM Settings**, **Fundraising**, turn on **Turn on donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate Now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
 | 5 | Open Susan Ortiz's household. | **Donor Level** reads `Leadership Circle` (total giving 7777). |
 | 6 | Open the 7777 gift and select **Refund or Write Off**. Refund 5000 with reason `Level test`. Open the household again after a few seconds. | **Total Giving** 2777, **Donor Level** `Sustainer`. |
 | 7 | On the **Households** tab choose the list view **Donor Level Changed This Month** and find the household. | **Donor Level** `Sustainer`, **Previous Donor Level** `Leadership Circle`, **Donor Level Changed** today. The **Contacts** tab has a list view of the same name for people. |
@@ -184,7 +184,7 @@ For every script on this page:
 | 9 | As admin, note **Donors last placed**, then wait for the next nightly run without changing a level or a donor setting. | **Donors last placed** is unchanged: a quiet night only rescores donors crossing a recency cutoff. |
 | 10 | Edit the `Friend` level's **Minimum Amount** to 150 and wait for the next nightly run. | **Donors last placed** shows that night's time: a ladder change places every donor again. |
 
-**Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Turn on donor levels** off. Clear **Active** on the three test levels.
+**Cleanup:** In **BarnCRM Settings**, **Fundraising**, turn **Turn on donor levels** off. Clear **Active** on the three test levels.
 
 ## T-RCPT-11: A Stewardship Plan Lays Out Tasks on a First Gift
 
@@ -193,7 +193,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. Select **New Plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
+| 1 | In **BarnCRM Settings**, **Fundraising**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. Select **New Plan**: **Plan name** `First gift welcome`, **What Starts It** Manual, **Smallest gift that starts it** 100. **Save**. | Refused: "A minimum amount applies only to the First gift and Gift received events. Clear it, or choose one of those events." |
 | 2 | Change **What Starts It** to **First gift**, clear the minimum, leave **On** off. **Save**. | "Saved." The plan is listed with **On** Off, **Steps** 0, **Running Now** 0. |
 | 3 | Select the plan, then **Add Step**: **Subject** `Call to say thank you`, **Days after start** 1, **Assign to** Specific user, no **Assigned user**. **Save**. | Refused: "Choose the person this task goes to, or change Assign To." |
 | 4 | Change **Assign to** to **Record owner**, **Save**. Add `Send the welcome packet`, 7 days, Record owner. | Two steps listed in order; **Move Up** and **Move Down**, dragging a step by its handle, and Space, arrow keys and Enter on a focused step each reorder them, and each move is announced ("... is now step 1 of 2."). |
@@ -215,13 +215,13 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. **New Plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
+| 1 | In **BarnCRM Settings**, **Fundraising**, on **Stewardship Plans** select **Open Stewardship Plan Setup**. **New Plan**: `After a meeting`, **What Starts It** Manual, a **description** `Use after a donor meeting`. **Save**, add one step `Send a note`, 2 days, Record owner, then **Turn On**. | The plan is listed with **On** On. |
 | 2 | As staff, open **Harper Garcia** in the BarnCRM Fundraising app and select **Start Stewardship Plan**. | The **Start a Stewardship Plan** window lists the plans that are on, including `After a meeting`. |
 | 3 | Select **Start Plan** without choosing. | Toast "Choose the plan to start." Nothing starts. |
 | 4 | Choose `After a meeting`. | "Use after a donor meeting" shows under the list. Select **Start Plan**. Toast "The plan has started. Its tasks are in the task lists of the people they are assigned to." |
 | 5 | Refresh Harper Garcia. | Her **Stewardship Plans** list shows the plan, **Status** Running. Start the same plan again: toast says it is already running for her. |
 | 6 | Open **The Summit Foundation** and start `After a meeting` there. | Started; the organization's **Stewardship Plans** list shows it. |
-| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your BarnCRM admin for the Fundraising Staff role, together with the Giving Staff permission set." No **Start Plan** button. |
+| 7 | As read-only, open Harper Garcia and select **Start Stewardship Plan**. | "You can see stewardship plans but not start one. Ask your BarnCRM admin for the Fundraising Staff role, together with the Fundraising Staff Access permission set." No **Start Plan** button. |
 | 8 | Covered by `StewardshipStartControllerTest` rather than on screen: starting a plan on a donor the person cannot see (for example a deleted person) is refused with "You cannot see this donor, so no plan was started." | Nothing starts. |
 
 **Cleanup:** As admin, set both plans' **Status** to Cancelled and select **Turn Off** on `After a meeting`.
@@ -261,7 +261,7 @@ For every script on this page:
 ## T-RCPT-15: One-Step Actions on Gift and Plan Pages
 
 **Purpose:** confirm Cancel Pending Gift, Thank Again, Do Not Thank and Mark Plan Complete change one field after a confirm, and show only where they apply (people-giving-19).
-**Prerequisites:** a user with Giving Staff; a Pending gift; a Received gift whose **Acknowledgment Status** is **Acknowledged**; a Running stewardship plan.
+**Prerequisites:** a user with Fundraising Staff Access; a Pending gift; a Received gift whose **Acknowledgment Status** is **Acknowledged**; a Running stewardship plan.
 
 | Step | Action | Expected result |
 |---|---|---|

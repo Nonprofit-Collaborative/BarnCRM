@@ -131,7 +131,7 @@ const PAGE_GROUPS = {
       keys: ['Seasonal_Addresses_Enabled__c', 'Seasonal_Address_Job']
     }
   ],
-  giving: [
+  fundraising: [
     {
       id: 'Gift Defaults',
       label: GIFT_DEFAULTS,
@@ -178,7 +178,7 @@ const PAGE_GROUPS = {
       keys: ['Giving_Accounting_Periods']
     },
     {
-      id: 'BarnCRM Mirror',
+      id: 'Gift Mirrors and Exports',
       label: MIRROR,
       keys: [
         'Mirror_Accounting_Export',

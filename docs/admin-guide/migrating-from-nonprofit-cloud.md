@@ -1,6 +1,6 @@
 # Migrating From Nonprofit Cloud
 
-**Package:** Core and Giving | **Iteration:** v0.5
+**Package:** Core and Fundraising | **Iteration:** v0.5
 
 ## 1. What It Does
 
@@ -16,7 +16,7 @@ Nonprofit Cloud is in.
 
 ## 2. How to Turn It On
 
-BarnCRM brings the person accounts template, and the Giving module brings the three gift
+BarnCRM brings the person accounts template, and the Fundraising module brings the three gift
 templates. Each package adds its templates when it is installed, and an upgrade adds any template
 a later version ships, so the **Import** tab normally lists them already. An upgrade never
 changes a template you have edited. A shipped template you deleted comes back on the next
@@ -230,7 +230,7 @@ that keeps people as person accounts:
 
 ### The Nonprofit Cloud Gifts and Soft Credits Kit
 
-With BarnCRM Giving, BarnCRM Mirror and BarnCRM Mirror for Giving installed in the same org,
+With BarnCRM Fundraising installed in the same org,
 you need no files at all.
 On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: Nonprofit Cloud
 Gifts and Soft Credits**. The Migration Assistant ([Migration Assistant](migration-assistant.md))
@@ -246,7 +246,7 @@ runs these steps in order, each with a preview and an undo:
 
 Before you run it:
 
-- Assign yourself the **Salesforce Records Sync** permission set (Mirror for Giving) and the Giving admin
+- Assign yourself the **Salesforce Records Sync** permission set and the Fundraising Admin
   permission set.
 - Set the Gift Transaction mirror ([Gift Transaction Mirror](gift-transaction-mirror.md)) to
   **Off** while the kit runs.

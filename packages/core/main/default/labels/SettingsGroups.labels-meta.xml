@@ -5,7 +5,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Settings console, Giving page: box heading for thank yous and plans</shortDescription>
+        <shortDescription>Settings console, Fundraising page: box heading for thank yous and plans</shortDescription>
         <value>Acknowledgments and Stewardship</value>
     </labels>
     <labels>
@@ -29,7 +29,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Settings console, Giving page: box heading for donor levels</shortDescription>
+        <shortDescription>Settings console, Fundraising page: box heading for donor levels</shortDescription>
         <value>Donor Levels and Scores</value>
     </labels>
     <labels>
@@ -61,7 +61,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Settings console, Giving page: box heading for gift defaults</shortDescription>
+        <shortDescription>Settings console, Fundraising page: box heading for gift defaults</shortDescription>
         <value>Gift Defaults</value>
     </labels>
     <labels>
@@ -77,7 +77,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Settings console, Giving page: box heading for accounting periods</shortDescription>
+        <shortDescription>Settings console, Fundraising page: box heading for accounting periods</shortDescription>
         <value>Accounting Periods</value>
     </labels>
     <labels>
@@ -117,7 +117,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Settings console, Giving page: box heading for pledges and payments</shortDescription>
+        <shortDescription>Settings console, Fundraising page: box heading for pledges and payments</shortDescription>
         <value>Commitments and Installments</value>
     </labels>
     <labels>
@@ -125,8 +125,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Settings console, Giving page: box heading for Mirror for Giving</shortDescription>
-        <value>BarnCRM Mirror for Giving</value>
+        <shortDescription>Settings console, Fundraising page: box heading for the gift mirrors and exports</shortDescription>
+        <value>Gift Mirrors and Exports</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_OrganizationDetails</fullName>

@@ -59,8 +59,9 @@ Salesforce org is needed for this job. Steps:
 5. `scripts/ci/check-namespace.sh`, failing the build if a hard-coded namespace prefix
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
-   object is referenced outside `packages/mirror` and `packages/mirrorgiving` (Mirror for
-   Giving, split from Mirror by ADR-NEXT mirror independence, under the same rule), and separately if any Apex or metadata
+   object is referenced outside `packages/mirror` and the gift mirror classes of
+   `packages/giving` (ADR-NEXT mirror independence: there only in string literals, checked with
+   comments and strings blanked, so a static reference still fails), and separately if any Apex or metadata
    file names a Nonprofit Cloud object. The second half covers the fundraising objects, the
    objects a household is actually built out of there (`PartyRelationshipGroup`, whose Type
    of Household is what makes an Account a native household, and `AccountContactRelation`,
@@ -69,8 +70,8 @@ Salesforce org is needed for this job. Steps:
    our own component names are the same words. This half was added after an audit found the
    gate matched `GiftTransaction` alone, so Core could have named the two objects Nonprofit
    Cloud households are made of and the build would have passed.
-   It also checks Mirror's and Mirror for Giving's object and field declarations (everything
-   under `packages/mirror/**/objects/` and `packages/mirrorgiving/**/objects/`): their Apex may name Campaign or Opportunity as strings,
+   It also checks Mirror's and Fundraising's object and field declarations (everything
+   under `packages/mirror/**/objects/` and `packages/giving/**/objects/`): their Apex may name Campaign or Opportunity as strings,
    but a lookup, formula or field declared on one of those objects is resolved at deploy time
    and refuses the install where the object is absent. A folder named after a denied object
    fails, and so does a denied name in the file outside its prose (label, description, help
@@ -801,7 +802,7 @@ testing on the same org, run Core's setup once, then each module's setup that th
 
 ```
 echo 'CorePostInstall.runAsSourceDeploy();' | sf apex run -o <alias>
-for m in Rollups Giving Volunteers Programs LogicModels Funders Mirror MirrorGiving; do
+for m in Rollups Giving Volunteers Programs LogicModels Funders Mirror; do
   echo "new ${m}PostInstall().runSetup(UserInfo.getUserId());" | sf apex run -o <alias>
 done
 ```
@@ -1230,7 +1231,7 @@ The deploy goes in stages through `scripts/org/deploy-packages.sh`: Core (one st
 custom metadata, then labels, then static resources with custom permissions, then Apex, then
 flows, then everything that wires the two together: permission sets and groups, layouts, flexipages,
 applications, tabs, quick actions, Lightning components), then Giving, then Volunteers (a no-op while `packages/volunteers` holds
-no metadata, and left out by `--core-only`), then Programs (left out by `--core-only`), then Logic Models (left out by `--core-only`), then Funders (left out by `--core-only`), then Mirror, then Mirror for Giving. A failed stage asks the
+no metadata, and left out by `--core-only`), then Programs (left out by `--core-only`), then Logic Models (left out by `--core-only`), then Funders (left out by `--core-only`), then Mirror. A failed stage asks the
 org for the component level report, by job id, in human form and then as JSON. Once Core's last
 stage is in, the script runs `CorePostInstall.runAsSourceDeploy()` as anonymous Apex: the steps
 Core's install handler runs, which a deployment never triggers (first-run setup on a fresh org,
@@ -1393,7 +1394,7 @@ clean, so both are now the defaults:
   back to the three old stages only when it fails with no component error. `separate` always
   uses the three stages.
 - `MODULE_STAGES` defaults to `combined` (2026-10-28): Rollup Builder, Giving, Volunteers (when it
-  holds metadata), Mirror and Mirror for Giving in one request, falling back to one module per stage, in dependency
+  holds metadata) and Mirror in one request, falling back to one module per stage, in dependency
   order, only when it fails with no component error. `separate` always deploys one per stage.
 
 If the opaque fault comes back, run with `STAGE_PAUSE_SECONDS=15 DATA_MODEL_STAGES=per-object

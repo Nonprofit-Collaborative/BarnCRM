@@ -32,10 +32,10 @@ class CreateVersionsTest(unittest.TestCase):
         cls.tmp.cleanup()
 
     def test_plan_builds_in_dependency_order_and_never_promotes(self):
-        result = run("--plan", "--project", self.ready, "--devhub", "hub", "--packages", "mirrorgiving")
+        result = run("--plan", "--project", self.ready, "--devhub", "hub", "--packages", "giving")
         self.assertEqual(result.returncode, 0, result.stderr)
         built = re.findall(r"^\s+\[(\w+)\] \$ sf package version create", result.stdout, re.M)
-        self.assertEqual(built, ["core", "rollups", "giving", "mirror", "mirrorgiving"])
+        self.assertEqual(built, ["core", "rollups", "giving"])
         self.assertIn("Package2VersionCreates", result.stdout)
         self.assertLess(result.stdout.index("Package2VersionCreates"), result.stdout.index("[core]"))
         self.assertNotIn("Not ready", result.stdout)

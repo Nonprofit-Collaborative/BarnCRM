@@ -117,7 +117,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-PB-08: Donor Portal Template
 
 **Purpose:** confirm a donor sees only their own giving, with no edits beyond contact details (Pay Online is T-PB-12).
-**Prerequisites:** admin; Giving installed with sample data; a portal with key `donor`, Active, Invited, the template `portal-client/templates/donor.json`; Pat Tester signed in with two gifts (one Cancelled), a pledge and an issued receipt; another donor with gifts.
+**Prerequisites:** admin; Fundraising installed with sample data; a portal with key `donor`, Active, Invited, the template `portal-client/templates/donor.json`; Pat Tester signed in with two gifts (one Cancelled), a pledge and an issued receipt; another donor with gifts.
 
 | Step | Action | Expected result |
 |---|---|---|

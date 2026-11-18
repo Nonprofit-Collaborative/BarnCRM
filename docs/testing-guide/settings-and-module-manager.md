@@ -15,7 +15,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM Admin** app and click the **BarnCRM Settings** tab. | The page name **BarnCRM Settings** shows once, in the page header, with the line "Choose how BarnCRM works for your whole organization." under it. A **Search settings** box and the section list are on the left; the first section shows on the right. No read-only notice is shown. |
-| 2 | Read the section list. | Sections sit under group headings, each with an icon: **Organization** (**General**, **Organization**), **People** (**People and Households**, **Addresses**), **Data** (**Import**, **Duplicate Matching**, **Rollups** with Rollup Builder installed, **Org Optimizer**), **Fundraising** (**Giving** and **Receipts** with Giving installed), **Programs** (**Volunteers** with Volunteers installed) and **System** (**Modules**, **Access**, **Automation**, **Integrations**, **Health**, **Error Log**). **Error Log** is the last item. A Core-only org has no Fundraising or Programs group. |
+| 2 | Read the section list. | Sections sit under group headings, each with an icon: **Organization** (**General**, **Organization**), **People** (**People and Households**, **Addresses**), **Data** (**Import**, **Duplicate Matching**, **Rollups** with Rollup Builder installed, **Org Optimizer**), **Fundraising** (**Fundraising** and **Receipts** with Fundraising installed), **Programs** (**Volunteers** with Volunteers installed) and **System** (**Modules**, **Access**, **Automation**, **Integrations**, **Health**, **Error Log**). **Error Log** is the last item. A Core-only org has no Fundraising or Programs group. |
 | 3 | Click **General**. | **Edition**, **Features**, **Sample Data**, **Custom Metadata** and the setting rows show. No description is printed under a row: each row has an info icon, and clicking it shows the plain description. Unless a Custom Metadata save has already worked here, a **Needs a Change in Setup** note at the top shows one line, an **Open in Setup** button and **Show Steps** (T-SET-20). No note asks you to match a fiscal year: **Fiscal year start month** is a read-only row (T-SET-15). In **Features**, no description says "tab" or "Data Hygiene". |
 | 4 | Click **Learn More** beside the info icon of any setting. | **Learn More** stands apart from any text, with a new-window icon. A new browser tab opens the matching admin-guide page on GitHub. The console tab is unchanged. |
 | 5 | Scroll to the bottom of the page. | A **Recent Changes** heading with a table (columns **Setting**, **Old Value**, **New Value**, **Changed By**, **Changed At**), or "No settings have been changed yet. Every change you make is listed here." |
@@ -63,7 +63,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Access**. | A card titled **Access** shows one card per role: **BarnCRM Admin**, **Team Member**, **Read Only**, and **Fundraising Staff** with Giving. No **Coordinator** card. Each heading ends with a count in brackets. |
+| 1 | Open **BarnCRM Settings**, **Access**. | A card titled **Access** shows one card per role: **BarnCRM Admin**, **Team Member**, **Read Only**, and **Fundraising Staff** with Fundraising. No **Coordinator** card. Each heading ends with a count in brackets. |
 | 2 | In **Find a person**, type `Staff`. | **Staff Tester** is listed with an email address. |
 | 3 | Choose **Staff Tester**. In **Role**, choose **Read Only**. Click **Give Access**. | A dialog titled **Give Access** asks "Give Staff Tester the Read Only role?" with **Give Access** and **Cancel**. |
 | 4 | Click **Cancel**. | The dialog closes and nothing changes. |
@@ -82,7 +82,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Access**. Scroll to **Extra Permissions**. | One card each for **BarnCRM Find and Export**, **BarnCRM Bulk Update**, **BarnCRM Bulk Delete**, **BarnCRM Erase People**, **BarnCRM Duplicate Review** and **BarnCRM Metadata Admin**, then the Giving, Mirror (**Provider Requests**) and Mirror for Giving sets. Bulk Delete and Erase People carry the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
+| 1 | Open **BarnCRM Settings**, **Access**. Scroll to **Extra Permissions**. | One card each for **BarnCRM Find and Export**, **BarnCRM Bulk Update**, **BarnCRM Bulk Delete**, **BarnCRM Erase People**, **BarnCRM Duplicate Review** and **BarnCRM Metadata Admin**, then the Fundraising sets (with **Salesforce Records Sync**, **Accounting Export** and **Inbound Gifts**) and the Mirror set (**Provider Requests**). Bulk Delete and Erase People carry the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
 | 2 | Choose **Staff Tester** in **Find a person**. In **Extra permission**, choose **BarnCRM Bulk Delete**. | Under the picker: "Delete many records at once from a Find query, with undo from the Recycle Bin. Includes Find and Export, so nothing else is needed." and the remove-data warning. |
 | 3 | Click **Give Permission**. | The dialog asks "Give Staff Tester the BarnCRM Bulk Delete permission?" and repeats the warning. |
 | 4 | Confirm with **Give Permission**. | "Staff Tester now has the BarnCRM Bulk Delete permission." The name appears on the **BarnCRM Bulk Delete** card. |
@@ -99,7 +99,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core**, **BarnCRM Rollup Builder** and **BarnCRM Mirror** (offered in both editions) first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Giving**, **BarnCRM Volunteers**, **BarnCRM Programs**, **BarnCRM Grants** and **BarnCRM Mirror for Giving**. Deployed modules say **Installed**; Programs and Grants say **Not installed**. Every row has **What this module does**. |
+| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core**, **BarnCRM Rollup Builder** and **BarnCRM Mirror** (offered in both editions) first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Fundraising**, **BarnCRM Volunteers**, **BarnCRM Programs** and **BarnCRM Grants**. There is no **BarnCRM Mirror for Giving** row. Deployed modules say **Installed**; Programs and Grants say **Not installed**. Every row has **What this module does**. |
 | 2 | Look at a **Not installed** row. | "No install link is published for this module yet." (no module has a published install version on main). |
 | 3 | Look at the **Core** row. | **Installed**, with no **Turn Off** button. |
 | 4 | On the **BarnCRM Volunteers** row, click **Turn Off**. | The row says **Installed and off**. **Turn On** replaces **Turn Off**. |
@@ -108,8 +108,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 7 | Click **What an Uninstall Deletes** on the Volunteers row. | A box starts "Uninstalling this module deletes these records, and the fields it added to people, households and organizations. Export what you need first." and lists each object with a count (a `+` means at least that many), then **Open Installed Packages**. |
 | 8 | Click **Check again**. | The report box closes and the list reloads with the same statuses. |
 | 9 | Read the line under the list. | "Turning a module off stops its automation and keeps its records. It does not hide its tabs: to hide a module from someone, change their role on the Access page." |
-| 10 | In the **Nonprofit Modules** section, look at **Show Nonprofit Modules**. | It is ticked (it is ticked on every org until someone clears it, including an org that saved its settings earlier) and the five nonprofit modules are listed under it. No "Installed nonprofit modules hidden" line shows. |
-| 11 | Clear **Show Nonprofit Modules**. | The five nonprofit rows disappear; **Core**, **BarnCRM Rollup Builder** and **BarnCRM Mirror** stay, and the checkbox stays, now clear. A line under it reads "Installed nonprofit modules hidden: 3" (Giving, Volunteers and Mirror for Giving are the installed ones in a test org; the number is however many nonprofit modules are installed). No error shows. |
+| 10 | In the **Nonprofit Modules** section, look at **Show Nonprofit Modules**. | It is ticked (it is ticked on every org until someone clears it, including an org that saved its settings earlier) and the four nonprofit modules are listed under it. No "Installed nonprofit modules hidden" line shows. |
+| 11 | Clear **Show Nonprofit Modules**. | The four nonprofit rows disappear; **Core**, **BarnCRM Rollup Builder** and **BarnCRM Mirror** stay, and the checkbox stays, now clear. A line under it reads "Installed nonprofit modules hidden: 2" (Fundraising and Volunteers are the installed ones in a test org; the number is however many nonprofit modules are installed). No error shows. |
 | 12 | Reload the page. | The checkbox is still clear and the nonprofit rows are still hidden: the choice is saved for the whole org. |
 | 13 | Tick **Show Nonprofit Modules**. | The nonprofit rows are back in the **Nonprofit Modules** section and the "hidden" line is gone. **Recent changes** in General lists both changes. |
 
@@ -375,7 +375,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 7 | Search the console for `zip`, and click the **Organization zip code** result. | The console opens **Organization** and focuses the **Organization Address** block, not a separate row. |
 | 8 | As read-only (T-SET-13), open **Organization**. | The address boxes are greyed out and there is no **Save Address** button. |
 | 9 | Open **BarnCRM Settings**, **Organization** and clear all six boxes. Click **Save Address**. | "Organization address saved." A blank address is allowed. |
-| 10 | Enter a Street 2 `Suite 3` and the four required parts again and save. Issue a receipt (see [Giving receipts and acknowledgments](giving-receipts-and-acknowledgments.md)) or make a volunteer hours letter, and open the document. | The receipt letterhead shows the address as `14 Bridge Street`, `Suite 3`, `Springfield, IL 62701` on separate lines. A letter using `{OrganizationAddress}` shows `14 Bridge Street, Suite 3, Springfield, IL 62701` on one line. |
+| 10 | Enter a Street 2 `Suite 3` and the four required parts again and save. Issue a receipt (see [Fundraising receipts and acknowledgments](giving-receipts-and-acknowledgments.md)) or make a volunteer hours letter, and open the document. | The receipt letterhead shows the address as `14 Bridge Street`, `Suite 3`, `Springfield, IL 62701` on separate lines. A letter using `{OrganizationAddress}` shows `14 Bridge Street, Suite 3, Springfield, IL 62701` on one line. |
 
 **Cleanup:** restore the address you noted in the prerequisites (or clear it) and save.
 
@@ -427,7 +427,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create households automatically**), **Households** (**Delete empty households**, **Keep households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
 | 3 | Tick **Keep households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
 | 4 | Back on **People and Households**, click **Update All Household Names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
-| 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
+| 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Fundraising**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
 | 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
 | 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
 | 8 | Open **Setup Assistant** on the Home page, go to **Confirm how households are named** and click **Where This Lives in Settings**. | **People and Households** opens at the **Household Names and Greetings** box. |
@@ -460,7 +460,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Error Log**. | **Digest recipients** is empty, reads **Everyone with the Manage BarnCRM Settings permission** in grey inside the box, and has a **Default** badge with no **Keep This Setting** button. |
-| 2 | Open **Organization**. | **Organization legal name** reads **Not set** in grey, with a **Default** badge and, under the box, "Company Information in Salesforce Setup has (your company name)." with **Use This Value**. Every empty address box reads **Not set**. Above the address, "No address is saved yet. Company Information in Salesforce Setup has (the address)." with **Use This Address**. With Giving, the tax identification number and receipt rows read **Not set** too. |
+| 2 | Open **Organization**. | **Organization legal name** reads **Not set** in grey, with a **Default** badge and, under the box, "Company Information in Salesforce Setup has (your company name)." with **Use This Value**. Every empty address box reads **Not set**. Above the address, "No address is saved yet. Company Information in Salesforce Setup has (the address)." with **Use This Address**. With Fundraising, the tax identification number and receipt rows read **Not set** too. |
 | 3 | Click **Use This Value**. | The legal name box holds the company name; the offer is gone; the save bar says "1 unsaved change". Nothing is saved yet. Click **Discard**: the box reads **Not set** again. |
 | 4 | Click **Use This Address**, then **Save Address**. | The address boxes hold the company address (a second street line in **Street 2**), "Organization address saved.", and the offer does not come back after a reload. |
 | 5 | Sign in as the read-only user and open **Organization**. | The **Not set** text and badges show; there is no **Use This Value** or **Use This Address**. |
@@ -476,21 +476,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Modules**. | No row says "Its setup steps never ran". |
 | 2 | Imitate a module copied in by hand: in Setup, open **Custom Settings**, **BarnCRM Settings**, **Manage**, **Edit** the org default, remove `Giving` from **Modules Setup Run** (leave the rest, comma separated) and save. | Saved. |
-| 3 | Back in **Modules**, click **Check again**. | Only the **BarnCRM Giving** row says "Its setup steps never ran, which happens when source is copied in by hand. Finish Setup runs the steps a package install runs." and has a **Finish Setup** button. |
-| 4 | As the read-only user, open **Modules**. | The same sentence on **BarnCRM Giving**, with no **Finish Setup** button. |
-| 5 | As admin, open **BarnCRM Settings**, **Health** and run Health Check. | A warning **Setup Never Ran for BarnCRM Giving** names the module and has **Finish Setup**. |
-| 6 | Click **Finish Setup**, then **Confirm**. | **Done. Setup steps ran for: BarnCRM Giving.**, and the report re-runs without the warning. |
+| 3 | Back in **Modules**, click **Check again**. | Only the **BarnCRM Fundraising** row says "Its setup steps never ran, which happens when source is copied in by hand. Finish Setup runs the steps a package install runs." and has a **Finish Setup** button. |
+| 4 | As the read-only user, open **Modules**. | The same sentence on **BarnCRM Fundraising**, with no **Finish Setup** button. |
+| 5 | As admin, open **BarnCRM Settings**, **Health** and run Health Check. | A warning **Setup Never Ran for BarnCRM Fundraising** names the module and has **Finish Setup**. |
+| 6 | Click **Finish Setup**, then **Confirm**. | **Done. Setup steps ran for: BarnCRM Fundraising.**, and the report re-runs without the warning. |
 | 7 | Open **Modules**. | No row says "Its setup steps never ran". |
-| 8 | Repeat step 2, then in **Modules** click **Finish Setup** on the **BarnCRM Giving** row. | The sentence and the button go away. No error shows, although Giving's steps had already run once: they only add what is missing, so the org has one General Fund and one of each receipt letter, not two. |
-| 9 | Open **General** and scroll to **Recent Changes**. | **Finish Setup** and **Health Check: Finish Setup** each list **BarnCRM Giving**, with your name. |
-| 10 | In a scratch org where nobody holds **Manage BarnCRM Settings** (remove BarnCRM Admin from every user), repeat step 2, then open **Modules** as a System Administrator. | **Finish Setup** shows on the **BarnCRM Giving** row (no other button does). Click it: the steps run and the notice goes away. Give BarnCRM Admin back to one user: a System Administrator without it no longer sees the button. |
+| 8 | Repeat step 2, then in **Modules** click **Finish Setup** on the **BarnCRM Fundraising** row. | The sentence and the button go away. No error shows, although Fundraising's steps had already run once: they only add what is missing, so the org has one General Fund and one of each receipt letter, not two. |
+| 9 | Open **General** and scroll to **Recent Changes**. | **Finish Setup** and **Health Check: Finish Setup** each list **BarnCRM Fundraising**, with your name. |
+| 10 | In a scratch org where nobody holds **Manage BarnCRM Settings** (remove BarnCRM Admin from every user), repeat step 2, then open **Modules** as a System Administrator. | **Finish Setup** shows on the **BarnCRM Fundraising** row (no other button does). Click it: the steps run and the notice goes away. Give BarnCRM Admin back to one user: a System Administrator without it no longer sees the button. |
 
-**Cleanup:** None: **Modules Setup Run** lists Giving again.
+**Cleanup:** None: **Modules Setup Run** lists Fundraising again.
 
 ## T-SET-20: Needs a Change in Setup Opens the Right Setup Page
 
 **Purpose:** confirm every **Needs a Change in Setup** note gives one sentence on why, numbered steps, and an **Open in Setup** button that opens the right Setup page in a new tab, and that **Check Again** re-reads a check.
-**Prerequisites:** an admin user with **BarnCRM Admin**, and a second user with settings access (Manage BarnCRM Settings) but neither BarnCRM Admin nor **BarnCRM Metadata Admin** (for step 1). Deliverability **Access level** is **All email**. Giving and Mirror installed for steps 7 to 10 (skip them on a Core-only org). A note whose change is already made is not shown at all.
+**Prerequisites:** an admin user with **BarnCRM Admin**, and a second user with settings access (Manage BarnCRM Settings) but neither BarnCRM Admin nor **BarnCRM Metadata Admin** (for step 1). Deliverability **Access level** is **All email**. Fundraising and Mirror installed for steps 7 to 10 (skip them on a Core-only org). A note whose change is already made is not shown at all.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -502,10 +502,10 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 4 | Click **Error Log**. | No email note: the org already sends all email. |
 | 5 | In Setup, **Deliverability**, set **Access level** to **System email only** and save. Back in BarnCRM, reload and click **Error Log**, then **Open in Setup** on the note. | The note shows **Not done yet** and **Check Again**; a new tab opens **Deliverability**. Set **Access level** back to **All email**, save, click **Check Again**: the note goes without reloading. |
 | 6 | Click **Access**, then **Open in Setup** on the note. | A new tab opens **Permission Sets**. |
-| 7 | Open **Giving**, **Acknowledgments**. Click **Open in Setup** on each note in turn. | The From address note opens **Organization-Wide Addresses** and the template note opens **Classic Email Templates**. There is no email note while the org sends all email; with **System email only** it shows, opens **Deliverability** and has **Check Again**. |
-| 8 | Open **Receipts**, then **Open in Setup** on the note. | A new tab opens **Lightning App Builder** (the Lightning Pages list). There is no note about Giving permission sets. |
-| 9 | Open **Giving**, **Campaign Sync**. Click **Open in Setup** on each of the two notes. | The Campaign access note opens **Permission Sets**; the Marketing User note opens **Users**. |
-| 10 | Open **Giving**, **Opportunity Mirror**, then **Open in Setup**; then open **Accounting Export**. | **Permission Sets** opens. **Accounting Export** shows no **Needs a Change in Setup** note. |
+| 7 | Open **Fundraising**, **Acknowledgments**. Click **Open in Setup** on each note in turn. | The From address note opens **Organization-Wide Addresses** and the template note opens **Classic Email Templates**. There is no email note while the org sends all email; with **System email only** it shows, opens **Deliverability** and has **Check Again**. |
+| 8 | Open **Receipts**, then **Open in Setup** on the note. | A new tab opens **Lightning App Builder** (the Lightning Pages list). There is no note about Fundraising permission sets. |
+| 9 | Open **Fundraising**, **Campaign Sync**. Click **Open in Setup** on each of the two notes. | The Campaign access note opens **Permission Sets**; the Marketing User note opens **Users**. |
+| 10 | Open **Fundraising**, **Opportunity Mirror**, then **Open in Setup**; then open **Accounting Export**. | **Permission Sets** opens. **Accounting Export** shows no **Needs a Change in Setup** note. |
 
 **Cleanup:** None, if Deliverability is back to **All email**.
 
@@ -516,7 +516,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 ## T-SET-22: Nightly Job Names, Template Names and Descriptions
 
 **Purpose:** confirm nightly jobs are named in one style and a job scheduled under its earlier name is still recognized, and that shipped names read in title casing.
-**Prerequisites:** the admin user; Giving and Programs installed; ideally an org whose Giving nightly jobs were scheduled before 0.15.
+**Prerequisites:** the admin user; Fundraising and Programs installed; ideally an org whose Fundraising nightly jobs were scheduled before 0.15.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -548,18 +548,18 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 ## T-SET-24: Module Turn Off Confirmation, First-Run Feature List and Household Name Parts
 
 **Purpose:** confirm Turn Off asks first, the first-run window names the default features, and the name pattern parts insert by click and by drag.
-**Prerequisites:** admin user; an installed module that is on (Giving); for step 3, a fresh org where first-run setup has not run (or read the window in a scratch org).
+**Prerequisites:** admin user; an installed module that is on (Fundraising); for step 3, a fresh org where first-run setup has not run (or read the window in a scratch org).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **BarnCRM Settings**, **Modules**, on **BarnCRM Giving** click **Turn Off**, then **Cancel**. | A window titled "Turn Off BarnCRM Giving?" says its automation stops, its records stay, and its tabs stay visible (change a role on the Access page to hide them). After **Cancel** Giving is still on. |
+| 1 | **BarnCRM Settings**, **Modules**, on **BarnCRM Fundraising** click **Turn Off**, then **Cancel**. | A window titled "Turn Off BarnCRM Fundraising?" says its automation stops, its records stay, and its tabs stay visible (change a role on the Access page to hide them). After **Cancel** Fundraising is still on. |
 | 2 | Click **Turn Off** again and confirm with **Turn Off**. Then **Turn On**. | The row reads **Installed and off**, then back on. |
 | 3 | In the first-run window, leave **Turn on all the default core features** chosen. | Each default feature is listed by name with one plain line, and a warning reads "You can turn more features on later in BarnCRM Settings, General. A feature you turn on stays on, so if you are unsure, leave it off for now." |
 | 4 | **People and Households**, household naming panel: click in **Household name pattern** before `Family`, then click the `{FirstName}` part under it. | `{FirstName}` is added at the cursor with spaces around it, the preview updates, and a screen reader hears "Added {FirstName} to Household name pattern." |
 | 5 | Drag the `and` part (on a touch screen, press and hold, then drag) onto the formal greeting box and let go between two words. | `and` is added where you let go and the preview updates. Do not save. |
 | 6 | Reload the page. | The patterns are back to their saved values. |
 
-**Cleanup:** turn Giving back on if step 2 left it off.
+**Cleanup:** turn Fundraising back on if step 2 left it off.
 
 ## T-SET-25: One Nightly Run
 
@@ -583,11 +583,11 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 ## T-SET-26: A Setting That Picks From Another Field's Values
 
 **Purpose:** confirm a Picklist From Field setting offers only active values, keeps a retired saved value, and falls back to a text box when the field is absent.
-**Prerequisites:** the admin user; BarnCRM Mirror for Giving installed. For steps 1 to 3, an org with Nonprofit Cloud (Gift Transaction Status); for step 4, an org without it.
+**Prerequisites:** the admin user; BarnCRM Fundraising installed. For steps 1 to 3, an org with Nonprofit Cloud (Gift Transaction Status); for step 4, an org without it.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **BarnCRM Mirror for Giving**. | **Gift Transaction mirror paid status** is a dropdown showing `Paid` (the default, with the Default badge); it lists only the active Gift Transaction Status values. |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, **Gift Mirrors and Exports**. | **Gift Transaction mirror paid status** is a dropdown showing `Paid` (the default, with the Default badge); it lists only the active Gift Transaction Status values. |
 | 2 | Choose another value and save. | The save succeeds and the page keeps the choice. Recent changes lists it. |
 | 3 | In Setup, make that Status value inactive; reload the setting. | The dropdown still shows the saved value, and saving the section keeps it. |
 | 4 | In an org without Nonprofit Cloud, open the same setting. | A text box showing `Paid`; any text saves. |

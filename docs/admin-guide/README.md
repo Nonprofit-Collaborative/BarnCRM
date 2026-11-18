@@ -71,10 +71,10 @@ these pages, so that everyone is talking about the same person.
 - **Plain language, not Salesforce language.** Use the words the reader's organization
   uses: "household" and "person", not "Account" and "Contact record". A Core page is
   neutral, because Core alone serves organizations that are not nonprofits: no gifts,
-  donors, receipts or fundraising unless the passage is marked as applying with Giving, and
+  donors, receipts or fundraising unless the passage is marked as applying with Fundraising, and
   no Salesforce product name (NPSP, Nonprofit Cloud) unless the passage is marked as
   applying when that product is in the org (ADR-0062,
-  `0062-core-names-other-products-only-when-detected.md`). Giving pages use giving
+  `0062-core-names-other-products-only-when-detected.md`). Fundraising pages use giving
   language: "Gift" not "Donation Transaction", "Fund" not "General Accounting Unit",
   "Appeal" not "Campaign" (plan Sections 7.1 and 13).
 - **No API names in prose.** Maria never needs to know one (plan Section 2.3). Say "the
@@ -96,7 +96,7 @@ these pages, so that everyone is talking about the same person.
 
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
-The Package column says what has to be installed for the page to apply. BarnCRM Core on its own is the Standard Edition, the full core suite of tools for any organization, so a Core page describes only what every organization has: its wording is neutral, and anything about gifts, donors or receipts on a Core page is marked as coming from Giving (C-29), and anything about NPSP or Nonprofit Cloud is marked as applying only when that product is in the org.
+The Package column says what has to be installed for the page to apply. BarnCRM Core on its own is the Standard Edition, the full core suite of tools for any organization, so a Core page describes only what every organization has: its wording is neutral, and anything about gifts, donors or receipts on a Core page is marked as coming from Fundraising (C-29), and anything about NPSP or Nonprofit Cloud is marked as applying only when that product is in the org.
 
 ### Set Up BarnCRM
 
@@ -105,20 +105,20 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Installing BarnCRM: supported editions, room needed, install pre-check, production install, upgrades | [installing.md](installing.md) | Every package |
 | Pilot checklist: set up, first weeks, reporting what you find | [pilot-checklist.md](pilot-checklist.md) | Every package |
 | C-03 BarnCRM Apps, Navigation and Setup Checklist | [barncrm-app.md](barncrm-app.md) | Core |
-| C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
+| C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Fundraising |
 | C-30 Editions | [editions.md](editions.md) | Core |
 | C-24 Module Manager | [module-manager.md](module-manager.md) | Core |
 | Integrations roadmap page, detected apps and migration links (MIG-10) | [integrations.md](integrations.md) | Core |
 | MIG-01 Migration Assistant: kits from another app in the same org, ordered steps, verification, undo, retire checklist; adding a kit | [migration-assistant.md](migration-assistant.md) | Core, kits in modules |
 | C-03 BarnCRM Settings console | [barncrm-settings.md](barncrm-settings.md) | Core |
 | Plan 6.1 item 9 Custom metadata (CMDT Manager) | [custom-metadata.md](custom-metadata.md) | Core |
-| C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Giving) |
-| Q-09 Automatic access | [automatic-access.md](automatic-access.md) | Core, with policies for Giving |
+| C-06 Access | [access.md](access.md) | Core (the Fundraising Staff role comes with Fundraising) |
+| Q-09 Automatic access | [automatic-access.md](automatic-access.md) | Core, with policies for Fundraising |
 | C-10 Sample data loader | [sample-data.md](sample-data.md) | Core |
 | C-08 Record pages | [record-pages.md](record-pages.md) | Core |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core |
-| C-47 Brands and Legal Entities: brand records, assignments, brand-aware receipts, receipt numbering per brand, optional brand-restricted visibility | [brands.md](brands.md) | Core, with brand fields in Giving, Volunteers, Programs and Portal Builder |
+| C-47 Brands and Legal Entities: brand records, assignments, brand-aware receipts, receipt numbering per brand, optional brand-restricted visibility | [brands.md](brands.md) | Core, with brand fields in Fundraising, Volunteers, Programs and Portal Builder |
 
 ### People, Households and Relationships
 
@@ -137,8 +137,8 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-25 Multiple email addresses on a person | [emails.md](emails.md) | Core |
 | C-25, C-43 Preferred phone on a person | [preferred-phone.md](preferred-phone.md) | Core |
 | C-39 Interaction notes | [interaction-notes.md](interaction-notes.md) | Core |
-| C-64 Engagement score (a nightly 0 to 100 score and meter from gifts, hours, events and activity, admin-weighted) | [engagement-score.md](engagement-score.md) | Core (Giving, Volunteers and Event Management add their parts) |
-| Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Giving extension) |
+| C-64 Engagement score (a nightly 0 to 100 score and meter from gifts, hours, events and activity, admin-weighted) | [engagement-score.md](engagement-score.md) | Core (Fundraising, Volunteers and Event Management add their parts) |
+| Erase a person | [erase-a-person.md](erase-a-person.md) | Core (Fundraising extension) |
 
 ### Data Tools
 
@@ -177,55 +177,55 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | ADR-0040 Your own version of an automation | [flow-templates.md](flow-templates.md) | Core |
 | C-13 Rollups | [rollups.md](rollups.md) | BarnCRM Rollup Builder (Core until ADR-0125) |
 | C-05, C-23 Error Log and error digest | [error-log.md](error-log.md) | Core |
-| C-11, C-21 Health Check | [health-check.md](health-check.md) | Core, with findings from Giving, Mirror, Mirror for Giving, Rollup Builder and Volunteers |
+| C-11, C-21 Health Check | [health-check.md](health-check.md) | Core, with findings from Fundraising, Mirror, Rollup Builder and Volunteers |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core |
 | RT-10 Nightly jobs | [nightly-jobs.md](nightly-jobs.md) | Core, with jobs from every module |
-| X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Mirror for Giving |
+| X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Fundraising |
 
-### Giving
+### Fundraising
 
 | Feature | Page | Package |
 |---|---|---|
-| G-01 Gifts | [gifts.md](gifts.md) | Giving |
-| G-01 Funds | [funds.md](funds.md) | Giving |
-| G-03 Quick gift entry | [quick-gift-entry.md](quick-gift-entry.md) | Giving |
-| G-17 Gift batches | [gift-batches.md](gift-batches.md) | Giving |
-| G-04 Refunds and write-offs | [refunds.md](refunds.md) | Giving |
-| G-18 In-kind gifts | [in-kind-gifts.md](in-kind-gifts.md) | Giving |
-| G-21, G-31 Stock, planned and donor-advised fund gifts | [stock-planned-and-daf-gifts.md](stock-planned-and-daf-gifts.md) | Giving |
-| G-07, G-11 Commitments | [commitments.md](commitments.md) | Giving |
-| G-08 Soft credits | [soft-credits.md](soft-credits.md) | Giving |
-| G-09 Tributes | [tributes.md](tributes.md) | Giving |
-| G-10 Matching gifts | [matching-gifts.md](matching-gifts.md) | Giving |
-| G-05 Appeals | [appeals.md](appeals.md) | Giving |
-| G-12 Acknowledgments | [acknowledgments.md](acknowledgments.md) | Giving |
-| G-30 Pledge reminders | [pledge-reminders.md](pledge-reminders.md) | Giving |
-| G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Giving |
-| G-14 Donor levels | [donor-levels.md](donor-levels.md) | Giving |
-| G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Giving |
-| G-26 Ask pipeline | [ask-pipeline.md](ask-pipeline.md) | Giving |
-| G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Giving |
-| G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
-| G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
-| G-27 Recurring donor health | [recurring-donor-health.md](recurring-donor-health.md) | Giving |
-| G-19 Donor scoring | [donor-scoring.md](donor-scoring.md) | Giving |
-| G-32 Wealth screening data | [wealth-screening.md](wealth-screening.md) | Giving |
-| G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
-| G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |
-| G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |
-| pg-22, vis-core-18 Fundraising Home and report charts | [fundraising-home.md](fundraising-home.md) | Giving |
-| G-23, G-24 Importing gifts and donation matching | [gift-import.md](gift-import.md) | Giving |
+| G-01 Gifts | [gifts.md](gifts.md) | Fundraising |
+| G-01 Funds | [funds.md](funds.md) | Fundraising |
+| G-03 Quick gift entry | [quick-gift-entry.md](quick-gift-entry.md) | Fundraising |
+| G-17 Gift batches | [gift-batches.md](gift-batches.md) | Fundraising |
+| G-04 Refunds and write-offs | [refunds.md](refunds.md) | Fundraising |
+| G-18 In-kind gifts | [in-kind-gifts.md](in-kind-gifts.md) | Fundraising |
+| G-21, G-31 Stock, planned and donor-advised fund gifts | [stock-planned-and-daf-gifts.md](stock-planned-and-daf-gifts.md) | Fundraising |
+| G-07, G-11 Commitments | [commitments.md](commitments.md) | Fundraising |
+| G-08 Soft credits | [soft-credits.md](soft-credits.md) | Fundraising |
+| G-09 Tributes | [tributes.md](tributes.md) | Fundraising |
+| G-10 Matching gifts | [matching-gifts.md](matching-gifts.md) | Fundraising |
+| G-05 Appeals | [appeals.md](appeals.md) | Fundraising |
+| G-12 Acknowledgments | [acknowledgments.md](acknowledgments.md) | Fundraising |
+| G-30 Pledge reminders | [pledge-reminders.md](pledge-reminders.md) | Fundraising |
+| G-13 Receipts and year-end statements | [receipts.md](receipts.md) | Fundraising |
+| G-14 Donor levels | [donor-levels.md](donor-levels.md) | Fundraising |
+| G-15 Stewardship plans | [stewardship-plans.md](stewardship-plans.md) | Fundraising |
+| G-26 Ask pipeline | [ask-pipeline.md](ask-pipeline.md) | Fundraising |
+| G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Fundraising |
+| G-16 Retention reports | [retention-reports.md](retention-reports.md) | Fundraising |
+| G-28 Donor segments | [donor-segments.md](donor-segments.md) | Fundraising |
+| G-27 Recurring donor health | [recurring-donor-health.md](recurring-donor-health.md) | Fundraising |
+| G-19 Donor scoring | [donor-scoring.md](donor-scoring.md) | Fundraising |
+| G-32 Wealth screening data | [wealth-screening.md](wealth-screening.md) | Fundraising |
+| G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Fundraising |
+| G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Fundraising |
+| G-06 Fundraising dashboard | [giving-dashboard.md](giving-dashboard.md) | Fundraising |
+| pg-22, vis-core-18 Fundraising Home and report charts | [fundraising-home.md](fundraising-home.md) | Fundraising |
+| G-23, G-24 Importing gifts and donation matching | [gift-import.md](gift-import.md) | Fundraising |
 
 ### Mirror (Connections to Other Systems)
 
 | Feature | Page | Package |
 |---|---|---|
-| X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Mirror for Giving |
-| X-07 Gift Transaction mirror | [gift-transaction-mirror.md](gift-transaction-mirror.md) | Mirror for Giving |
+| X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Fundraising |
+| X-07 Gift Transaction mirror | [gift-transaction-mirror.md](gift-transaction-mirror.md) | Fundraising |
 | D-201, N-09, N-10 Cases sent to a service provider: Core only, the named credential, the setting, the hourly check and flow action, Provider Requests | [mirror-case-requests.md](mirror-case-requests.md) | Mirror |
-| X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Mirror for Giving |
-| X-03, X-06 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Mirror for Giving |
-| X-04 Accounting export | [accounting-export.md](accounting-export.md) | Mirror for Giving |
+| X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Fundraising |
+| X-03, X-06 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Fundraising |
+| X-04 Accounting export | [accounting-export.md](accounting-export.md) | Fundraising |
 
 ### Volunteers
 
@@ -286,7 +286,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
-| MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Giving gifts | [online-giving-zapier.md](online-giving-zapier.md) | Giving (Mirror for Giving for recipe B) |
+| MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Fundraising gifts | [online-giving-zapier.md](online-giving-zapier.md) | Fundraising |
 
 ### LWC Builder
 
@@ -318,15 +318,15 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Giving gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Giving, Payments and Portal Builder optional) |
+| G-22a to G-22e, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Fundraising gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, certifications and continuing credits, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Fundraising, Payments and Portal Builder optional) |
 
 ### Moving From Another System
 
 | Feature | Page | Package |
 |---|---|---|
-| NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Giving |
-| Nonprofit Cloud import templates | [migrating-from-nonprofit-cloud.md](migrating-from-nonprofit-cloud.md) | Giving |
-| DonorPerfect, Bloomerang, Little Green Light, Neon, CiviCRM and Raiser's Edge NXT gift templates | [moving-from-another-crm.md](moving-from-another-crm.md) | Giving |
+| NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Fundraising |
+| Nonprofit Cloud import templates | [migrating-from-nonprofit-cloud.md](migrating-from-nonprofit-cloud.md) | Fundraising |
+| DonorPerfect, Bloomerang, Little Green Light, Neon, CiviCRM and Raiser's Edge NXT gift templates | [moving-from-another-crm.md](moving-from-another-crm.md) | Fundraising |
 | Moving rollups from Rollup Helper by hand | [moving-from-rollup-helper.md](moving-from-rollup-helper.md) | BarnCRM Rollup Builder |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package |
 

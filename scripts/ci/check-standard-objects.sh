@@ -8,21 +8,36 @@
 # references, as whole
 # words, case-sensitive: Opportunity, Campaign, Lead, Case, OpportunityContactRole,
 # CampaignMember, PersonAccount, IsPersonAccount, or any Industries GiftTransaction / __dlm
-# name. Those objects and fields may only be referenced from packages/mirror and
-# packages/mirrorgiving (BarnCRM Mirror for Giving, which holds the gift mirrors since N-09,
-# ADR-NEXT mirror independence), and even there behind dynamic Apex (see docs/product-plan.md
-# Section 4.2). Neither package is in DIRS below; the rule for both is the same.
+# name. Those objects and fields may only be referenced from packages/mirror, and even there
+# behind dynamic Apex (see docs/product-plan.md Section 4.2), and from the gift mirror files of
+# packages/giving under the stricter rule below. packages/mirror is not in DIRS below.
+#
+# Fundraising's gift mirrors (packages/giving, ADR-NEXT mirror independence)
+# ---------------------------------------------------------------------------
+# BarnCRM Fundraising (the giving package) holds the Opportunity mirror, Campaign sync, the Gift
+# Transaction mirror, the inbound gift API, the accounting export and the NPSP and Nonprofit
+# Cloud gift kits, and must still install on a Platform-only org. grep cannot tell a dynamic
+# reference from a static one, so giving stays in DIRS and two narrow exceptions apply there,
+# by path only:
+# - The Apex classes whose names match GIVING_MIRROR_APEX may hold these names in string
+#   literals and comments, and nowhere else: each is read with its comments and strings blanked
+#   (apex_source.strip), and any name left over (a static query, an SObject type, a field
+#   token) fails. Every other giving class is checked exactly as every other package is.
+# - The files matching GIVING_MIRROR_TEXT (the mirror pages, labels, help catalog, settings
+#   rows, tabs and permission sets) hold the names as text a person reads, which refuses no
+#   deployment. Its object and field files are checked as Mirror's are, below.
 #
 # Mirror's object and field declarations
 # ---------------------------------------
-# Mirror's and Mirror for Giving's Apex may name these objects, as strings resolved through
-# describe, but their metadata may not: a lookup to Campaign, a formula through Opportunity, or
-# a field declared on Opportunity is resolved at deploy time and refuses the install on an org
-# without the object (ADR-0013, ADR-0056, ADR-0058). So everything under
-# packages/mirror/**/objects/ and packages/mirrorgiving/**/objects/ is checked too: a folder named after one of these objects fails, and so does one of these
-# names anywhere in an object, field or list view file outside its prose (label, description,
-# help text, and other human-readable values, which are text, not references). This is why
-# Appeal__c.Campaign_Id__c is a Text field, not a lookup.
+# Mirror's and Fundraising's gift mirror Apex may name these objects, as strings resolved
+# through describe, but their metadata may not: a lookup to Campaign, a formula through
+# Opportunity, or a field declared on Opportunity is resolved at deploy time and refuses the
+# install on an org without the object (ADR-0013, ADR-0056, ADR-0058). So everything under
+# packages/mirror/**/objects/ and packages/giving/**/objects/ is checked too: a folder named
+# after one of these objects fails, and so does one of these names anywhere in an object, field
+# or list view file outside its prose (label, description, help text, and other human-readable
+# values, which are text, not references). This is why Appeal__c.Campaign_Id__c is a Text
+# field, not a lookup.
 #
 # A second pattern covers the Nonprofit Cloud surface: the fundraising objects, the objects a
 # household is actually built out of there (PartyRelationshipGroup and AccountContactRelation),
@@ -110,6 +125,12 @@ CONTACT_POINT_DIR=packages/contactpoints
 CONTACT_POINT_NAMES='ContactPointAddress|ContactPointEmail|ContactPointPhone'
 CONTACT_POINT_NPC_PATTERN="${NPC_PATTERN//|ContactPointAddress|ContactPointEmail|ContactPointPhone|/|}"
 
+# Fundraising's gift mirror files (see the note at the top). Paths are relative to the repo.
+GIVING_DIR=packages/giving
+GIVING_MIRROR_APEX='^packages/giving/main/default/classes/(CampaignSync|OpportunityMirror|OpportunityGiftService|GiftTransactionMirror|GiftMirror|MirrorSync|MirrorRunBatch|MirrorSettingsWriter|InboundGift|AccountingExport|NpspGiftsKit|NpcGiftsKit)[A-Za-z]*\.cls$'
+GIVING_MIRROR_TEXT='^packages/giving/main/default/(labels/Mirror[A-Za-z]+\.labels-meta\.xml|lwc/(campaignSync|opportunityMirror|giftTransactionMirror|accountingExport|mirrorPage)/.*|customMetadata/(Setting_Definition\.Mirror_[A-Za-z_]+|Migration_Kit\.(NPSP|NPC)_Gifts|Automation_Registry\.(Campaign_Sync|Opportunity_Mirror|Gift_Transaction_Mirror)|Access_Add_On\.(Salesforce_Records_Sync|Inbound_Gifts|Accounting_Export))\.md-meta\.xml|tabs/(Campaign_Sync|Opportunity_Mirror|Gift_Transaction_Mirror|Accounting_Export)\.tab-meta\.xml|permissionsets/(Salesforce_Records_Sync|Inbound_Gifts|Accounting_Export)\.permissionset-meta\.xml|customPermissions/Use_(Opportunity|Gift_Transaction)_Mirror\.customPermission-meta\.xml|staticresources/BarnHelp_Giving\.json|objects/.*)$'
+GIVING_TEXT=()
+
 MARKER='// detection-only:'
 TEMPLATE_HEADINGS='/customMetadata/Import_Template_Default.'
 MATCH_SOURCES='/customMetadata/Match_Source.'
@@ -138,6 +159,11 @@ for DIR in "${DIRS[@]}"; do
     FILE="${LINE%%:*}"
     if [[ "$FILE" == *.cls || "$FILE" == *.trigger ]] && [[ "$LINE" == *"$MARKER"* ]]; then
       EXEMPTED+=("$LINE")
+    elif [[ "$DIR" == "$GIVING_DIR" ]] && [[ "$FILE" =~ $GIVING_MIRROR_APEX ]]; then
+      # Checked with comments and strings blanked, below.
+      :
+    elif [[ "$DIR" == "$GIVING_DIR" ]] && [[ "$FILE" =~ $GIVING_MIRROR_TEXT ]]; then
+      GIVING_TEXT+=("$FILE")
     elif [[ "$FILE" == *"$TEMPLATE_HEADINGS"*.md-meta.xml ||
       "$FILE" == *"$MATCH_SOURCES"*.md-meta.xml ||
       "$FILE" == *"$INTEGRATION_APPS"*.md-meta.xml ]]; then
@@ -163,6 +189,37 @@ if [[ "${#HEADINGS[@]}" -gt 0 ]]; then
   printf '%s\n' "${HEADINGS[@]}" | sort -u
 fi
 
+if [[ "${#GIVING_TEXT[@]}" -gt 0 ]]; then
+  echo "== Fundraising gift mirror text (pages, labels, help, settings rows), not references =="
+  printf '%s\n' "${GIVING_TEXT[@]}" | sort -u
+fi
+
+# Fundraising's gift mirror classes: a name outside a string literal or comment is a static
+# reference (an SObject type, a static query, a field token) and fails.
+GIVING_STATIC=$(
+  PATTERN="$PATTERN" NPC_PATTERN="$NPC_PATTERN" APEX="$GIVING_MIRROR_APEX" python3 - <<'PY'
+import glob, os, re, sys
+sys.path.insert(0, "scripts/ci")
+from apex_source import strip
+names = re.compile(os.environ["PATTERN"] + "|" + os.environ["NPC_PATTERN"])
+apex = re.compile(os.environ["APEX"])
+for path in sorted(glob.glob("packages/giving/main/default/classes/*.cls")):
+    if " 2." in path or not apex.match(path):
+        continue
+    with open(path, encoding="utf-8") as handle:
+        text = handle.read()
+    for number, line in enumerate(strip(text).split("\n"), start=1):
+        if names.search(line):
+            print("%s:%d:%s" % (path, number, text.split("\n")[number - 1].strip()))
+PY
+)
+if [[ -n "$GIVING_STATIC" ]]; then
+  printf '%s\n' "$GIVING_STATIC"
+  echo "FAIL: a Fundraising gift mirror class names a standard/Industries object outside a string." >&2
+  echo "  Name it only in a string resolved through describe or dynamic SOQL." >&2
+  FAILED=1
+fi
+
 if [[ "${#VIOLATIONS[@]}" -gt 0 ]]; then
   printf '%s\n' "${VIOLATIONS[@]}"
   echo "FAIL: forbidden standard/Industries object reference(s) found above." >&2
@@ -184,9 +241,7 @@ prose = re.compile(
 comment = re.compile(r"<!--.*?-->", re.DOTALL)
 def blank(match):
     return re.sub(r"[^\n]", " ", match.group(0))
-walked = [
-    os.walk(root) for root in ("packages/mirror", "packages/mirrorgiving", "packages/contactpoints")
-]
+walked = [os.walk(root) for root in ("packages/mirror", "packages/giving", "packages/contactpoints")]
 for directory, subdirs, files in (entry for walk in walked for entry in walk):
     subdirs.sort()
     parts = directory.split(os.sep)
@@ -211,7 +266,7 @@ PY
 )
 if [[ -n "$MIRROR_DECLARATIONS" ]]; then
   printf '%s\n' "$MIRROR_DECLARATIONS"
-  echo "FAIL: a Mirror, Mirror for Giving or Contact Point Sync object or field declaration names a" >&2
+  echo "FAIL: a Mirror, Fundraising or Contact Point Sync object or field declaration names a" >&2
   echo "  standard/Industries object above." >&2
   echo "  Store the record ID as text and reach the object through dynamic Apex." >&2
   FAILED=1

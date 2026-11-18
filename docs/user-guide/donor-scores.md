@@ -4,7 +4,7 @@ Every donor with a gift has a score for how recently they gave, how often and ho
 a giving pattern that sums them up. You see them on the donor's record and can list donors by them.
 Nobody types them in: they update by themselves as gifts arrive and as time passes.
 
-**Before you start:** you need a Giving permission set. Your admin sets the cutoffs (see
+**Before you start:** you need a Fundraising permission set. Your admin sets the cutoffs (see
 [Donor scoring](../admin-guide/donor-scoring.md)).
 
 ## To See a Donor's Score
@@ -32,8 +32,8 @@ A donor with no gifts has no score.
 If your organization has loaded a wealth screening, a person's **Giving Details** section also
 shows **Capacity Rating**, **Affinity Rating**, **Screening Score**, **Screening Date** and
 **Screening Source**, as the screening vendor gave them. They are separate from the donor
-score, which uses giving only. You see them with the Giving Admin or Giving Staff permission
-set, not with Giving Read Only (see [Wealth screening data](../admin-guide/wealth-screening.md)).
+score, which uses giving only. You see them with the Fundraising Admin or Fundraising Staff Access permission
+set, not with Fundraising Read Only (see [Wealth screening data](../admin-guide/wealth-screening.md)).
 
 ## To Make a List of Donors by Score
 

@@ -18,8 +18,8 @@ packages/core/main/default/classes/SetupChangeCopyJob.cls 1
 packages/events/main/default/classes/EventCheckoutJob.cls 1
 packages/forms/main/default/classes/FormPublicProcessor.cls 2
 packages/giving/main/default/classes/AskReminderBatch.cls 1
+packages/giving/main/default/classes/CampaignSyncBatch.cls 1
 packages/giving/main/default/classes/DonorLevelBatch.cls 1
-packages/mirrorgiving/main/default/classes/CampaignSyncBatch.cls 1
 packages/payments/main/default/classes/PaymentEventProcessor.cls 4
 packages/programs/main/default/classes/ProgramsSharingBatch.cls 1
 packages/rollups/main/default/classes/RollupFullRecalcBatch.cls 2

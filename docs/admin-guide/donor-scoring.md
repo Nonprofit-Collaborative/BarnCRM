@@ -18,7 +18,7 @@ so Find can filter, sort and show them, and donor segments can use them.
 |---|---|---|
 | Recency | Days since the donor's last gift | **Days Since Last Gift**, from **Last Gift Date** |
 | Frequency | Gifts in the recent window | **Recent Gift Count**, a rollup of gifts in the last 730 days |
-| Amount | Giving in the recent window | **Recent Giving**, a rollup of gifts in the last 730 days |
+| Amount | Fundraising in the recent window | **Recent Giving**, a rollup of gifts in the last 730 days |
 
 A donor with no gift has no scores and no segment.
 
@@ -47,7 +47,7 @@ The segment is the first line that fits, with R, F and M the three scores:
 
 Everything is in the app. You never open Setup.
 
-1. Open **BarnCRM Settings**, then **Giving**.
+1. Open **BarnCRM Settings**, then **Fundraising**.
 2. Open **Donor Levels and Scores**.
 3. Change any of the three cutoff settings. Each is four numbers separated by commas:
    - **Donor score recency days**, default `90,180,365,730`. Numbers rise.

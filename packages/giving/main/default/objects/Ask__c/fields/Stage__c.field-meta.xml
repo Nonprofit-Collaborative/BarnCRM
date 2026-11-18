@@ -7,7 +7,7 @@
   </description>
   <externalId>false</externalId>
   <inlineHelpText>
-    Where this ask stands. Your stages are set in BarnCRM Settings, Giving, Ask Stages. Leave it
+    Where this ask stands. Your stages are set in BarnCRM Settings, Fundraising, Ask Stages. Leave it
     empty to start at the first stage.
   </inlineHelpText>
   <label>Stage</label>

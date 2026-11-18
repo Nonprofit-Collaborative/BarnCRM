@@ -265,6 +265,18 @@ private class GivingPostInstallTest {
 				byName.get('Gift_Receipt_Lock').Always_Runs__c,
 				'The receipt lock is listed as always running, so the page can say why (ADR-0024).'
 			);
+			for (
+				String mirror : new List<String>{
+					CampaignSyncService.AUTOMATION_NAME,
+					OpportunityMirrorService.AUTOMATION_NAME,
+					GiftTransactionMirrorService.AUTOMATION_NAME
+				}
+			) {
+				Assert.isTrue(
+					byName.get(mirror).Enabled__c,
+					mirror + ' arrives on; its Fundraising setting is what is off (ADR-0056).'
+				);
+			}
 		}
 	}
 

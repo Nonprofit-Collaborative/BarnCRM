@@ -16,7 +16,7 @@ L-04 the logic model report).
 
 - BarnCRM Core
 
-Nothing in this package references Programs, Volunteers or Giving. A model may name a program by
+Nothing in this package references Programs, Volunteers or Fundraising. A model may name a program by
 its record identifier (text), resolved by describe only where a `Program__c` object exists.
 
 ## Contents

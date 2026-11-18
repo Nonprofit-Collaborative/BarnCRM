@@ -112,8 +112,8 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 ## T-MIG-08: NPSP Gifts and Soft Credits Copies Won Opportunities Once
 
-**Purpose:** confirm the NPSP Gifts and Soft Credits kit (Mirror for Giving) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
-**Prerequisites:** the NPSP org of T-MIG-07 with Giving, Mirror and Mirror for Giving deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
+**Purpose:** confirm the NPSP Gifts and Soft Credits kit (Fundraising) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
+**Prerequisites:** the NPSP org of T-MIG-07 with Fundraising deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -128,8 +128,8 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 ## T-MIG-09: Nonprofit Cloud Gifts and Soft Credits Copies Paid Gift Transactions Once
 
-**Purpose:** confirm the Nonprofit Cloud Gifts and Soft Credits kit (Mirror for Giving) copies designations, commitments, paid gift transactions and soft credits with the right donors, and that neither a rerun nor the Gift Transaction mirror duplicates a gift.
-**Prerequisites:** an org with Nonprofit Cloud Fundraising (person accounts on) and Core, Giving, Mirror and Mirror for Giving deployed; admin user with **Salesforce Records Sync** and the Giving admin permission set; Gift Transaction mirror **Off**; **Send gift acknowledgments** off; a fund **General Fund** in BarnCRM. In Nonprofit Cloud: a Campaign **Spring Appeal**; gift designations **General Fund** and **Building Fund**; person account Ana with a recurring gift commitment of 25 every month; a paid gift transaction of 300 from Ana on Spring Appeal, designated 200 Building Fund and 100 General Fund, with a memorial tribute for "Grace" and a soft credit to person account Ben (role Solicitor, no amount); a paid gift transaction of 500 from business account **Test Org**; an unpaid gift transaction.
+**Purpose:** confirm the Nonprofit Cloud Gifts and Soft Credits kit (Fundraising) copies designations, commitments, paid gift transactions and soft credits with the right donors, and that neither a rerun nor the Gift Transaction mirror duplicates a gift.
+**Prerequisites:** an org with Nonprofit Cloud Fundraising (person accounts on) and Core, Rollup Builder and Fundraising deployed; admin user with **Salesforce Records Sync** and the Fundraising admin permission set; Gift Transaction mirror **Off**; **Send gift acknowledgments** off; a fund **General Fund** in BarnCRM. In Nonprofit Cloud: a Campaign **Spring Appeal**; gift designations **General Fund** and **Building Fund**; person account Ana with a recurring gift commitment of 25 every month; a paid gift transaction of 300 from Ana on Spring Appeal, designated 200 Building Fund and 100 General Fund, with a memorial tribute for "Grace" and a soft credit to person account Ben (role Solicitor, no amount); a paid gift transaction of 500 from business account **Test Org**; an unpaid gift transaction.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -144,7 +144,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 ## T-MIG-10: Nonprofit Cloud Relationships and Affiliations Copies Each Pair Once and Skips Households
 
 **Purpose:** confirm the Nonprofit Cloud Relationships and Affiliations kit (Mirror) copies relationships once per pair of people and affiliations with organizations only.
-**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed (no Giving needed); admin user with **BarnCRM Admin**. In Nonprofit Cloud: person accounts Ana and Ben related as Wife and Husband; Ana linked to business account **Test Org** with roles Employee and Board Member; Ana a member of a household account that has a Party Relationship Group of type Household.
+**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed (no Fundraising needed); admin user with **BarnCRM Admin**. In Nonprofit Cloud: person accounts Ana and Ben related as Wife and Husband; Ana linked to business account **Test Org** with roles Employee and Board Member; Ana a member of a household account that has a Party Relationship Group of type Household.
 
 | Step | Action | Expected result |
 |---|---|---|

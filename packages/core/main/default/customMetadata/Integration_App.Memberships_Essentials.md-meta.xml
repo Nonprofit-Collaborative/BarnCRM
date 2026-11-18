@@ -42,7 +42,7 @@
     <field>Compatibility__c</field>
     <value
       xsi:type="xsd:string"
-    >Use one or the other for the same members, not both. BarnCRM Memberships uses its own objects, so the two install side by side without a clash, and its Memberships Essentials migration kit copies levels and memberships across; not yet tested against a live Essentials org. Essentials needs Opportunities and Products, so it will not run on a Platform-only org, and it books dues as Opportunities, outside BarnCRM Giving totals.</value>
+    >Use one or the other for the same members, not both. BarnCRM Memberships uses its own objects, so the two install side by side without a clash, and its Memberships Essentials migration kit copies levels and memberships across; not yet tested against a live Essentials org. Essentials needs Opportunities and Products, so it will not run on a Platform-only org, and it books dues as Opportunities, outside BarnCRM Fundraising totals.</value>
   </values>
   <values>
     <field>Sort_Order__c</field>

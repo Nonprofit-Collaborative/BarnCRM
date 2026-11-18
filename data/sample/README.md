@@ -4,7 +4,7 @@
 
 Tracked as **C-10** in the product plan: 200 realistic households (440 contacts), 25
 organizations, 60 connections between people in different households and 80 affiliations,
-plus, where the Giving package is installed, three years of gifts against 8 funds and 7
+plus, where the Fundraising package is installed, three years of gifts against 8 funds and 7
 appeals, 24 pledges and recurring commitments with their installments, 11 asks across the
 pipeline's stages and outcomes (two won as pledges), 30 soft credits and
 24 tributes. A contributor or reviewer sees the product working immediately, with numbers
@@ -21,8 +21,8 @@ default allocations, installment schedules, automatic household soft credits), a
 - `packages/core/main/default/staticresources/SampleData.json`, read by `SampleDataLoader`:
   households, people, organizations, connections, affiliations.
 - `packages/giving/main/default/staticresources/GivingSampleData.json`, read by
-  `GivingSampleData` in the Giving package: funds, appeals, gifts with their allocations,
-  commitments, soft credits, tributes. It ships with Giving, so an org without Giving never
+  `GivingSampleData` in the Fundraising package: funds, appeals, gifts with their allocations,
+  commitments, soft credits, tributes. It ships with Fundraising, so an org without Fundraising never
   carries it.
 - `ProjectsSampleData.json` and `CorporateHubSampleData.json`, in the Project Management and
   Corporate Hub packages' `staticresources`: four projects with their work, and a board with its
@@ -94,7 +94,7 @@ example `FundersSampleData`); Core loads it when no class of that name is instal
   partial success: a record the organization's own records point at is kept and named in one
   Warning in the Error Log. `hasSampleRecords` is true while any `remove` entry matches.
 - The Grants, Programs and Events files reproduce the records their former loader classes
-  built. Giving and Volunteers keep their loader classes for now: their loads run module rules
+  built. Fundraising and Volunteers keep their loader classes for now: their loads run module rules
   a file cannot express yet (the org's default fund, suppressed default allocations, ask
   stages, overdue installments, approval verbs on hours).
 
@@ -161,11 +161,11 @@ The JSON shape:
 
 Every member carries a `key` of the form `H001-1`, and every household and organization
 carries its own (`H001`, `O005`). The loader writes these to `Sample_Data_Key__c` on the
-Account and the Contact, which is the whole join between the two files: the Giving payload
+Account and the Contact, which is the whole join between the two files: the Fundraising payload
 names its donors by the same keys, so a gift finds its donor in a later transaction without
 depending on names or on the order records were inserted in.
 
-The Giving payload:
+The Fundraising payload:
 
 ```json
 {
@@ -214,7 +214,7 @@ date, a next ask date). A won ask names the sample pledge that closed it in `com
 asks load in the reference data stage with the commitments. A stage the org has removed from
 its stage list loads blank and the ask takes the org's first stage.
 
-Giving dates are day offsets (`daysAgo`, `startDaysAgo`, `endDaysAgo`), not calendar dates.
+Fundraising dates are day offsets (`daysAgo`, `startDaysAgo`, `endDaysAgo`), not calendar dates.
 The loader counts them back from the day the set is loaded, so a set loaded a year from now
 still has gifts in the current year and the retention reports, the fiscal-year rollups and
 the dashboard all have something true to show. A gift that reverses another names it by key
@@ -269,7 +269,7 @@ unexpectedly is caught at generation time, not in review.
 `SampleDataStageBatch`, which runs one stage per execute: households and organizations
 first (record types by DeveloperName, `Sample_Data__c` true, `Sample_Data_Key__c` set),
 then contacts in chunks of 100, then the connections and affiliations. Its finish starts
-any module sample set. Giving is one: `GivingSampleData` implements the Core
+any module sample set. Fundraising is one: `GivingSampleData` implements the Core
 `SampleDataModule` interface, Core finds it by name at runtime (ADR-0017), and its own
 stages (`GivingSampleData.LoadStages`, run by the same batch class) insert the funds, appeals
 and commitments and then the gifts in chunks of 100. Batch Apex rather than a queueable

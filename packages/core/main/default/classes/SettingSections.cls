@@ -50,9 +50,10 @@ public with sharing class SettingSections {
 	public static final String FIELD_HISTORY = 'Field History';
 	@NamespaceAccessible
 	public static final String ORGANIZATION = 'Organization';
+	/** The Fundraising module's (BarnCRM Giving package) settings, gift mirrors included. */
 	@NamespaceAccessible
-	public static final String GIVING = 'Giving';
-	/** Receipts, which Giving ships: its own section because a receipt run is its own job. */
+	public static final String GIVING = 'Fundraising';
+	/** Receipts, which Fundraising ships: its own section because a receipt run is its own job. */
 	@NamespaceAccessible
 	public static final String RECEIPTS = 'Receipts';
 	/** The Grants module's (BarnCRM Funders package) grant reminder settings, listed under Fundraising. */

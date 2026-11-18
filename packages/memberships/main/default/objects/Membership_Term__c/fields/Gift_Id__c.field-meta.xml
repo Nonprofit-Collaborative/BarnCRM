@@ -6,7 +6,7 @@
   <required>false</required>
   <caseSensitive>false</caseSensitive>
   <unique>true</unique>
-  <inlineHelpText>The Giving gift that paid this term, when one did.</inlineHelpText>
+  <inlineHelpText>The gift that paid this term, when one did.</inlineHelpText>
   <label>Gift ID</label>
   <type>Text</type>
 </CustomField>

@@ -294,7 +294,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-20: Merge Records Merges Two Funds and Moves Their Gifts
 
 **Purpose:** Confirm Merge Records compares two records of one BarnCRM object, starts each field from the merge rules, moves the related records, sends the other record to the Recycle Bin and lists the merge.
-**Prerequisites:** admin. Giving installed. Two funds: `Zztest Fund A` with **Description** blank, and `Zztest Fund B` with Description `Merge test`, one gift on it and one file (`Zztest merge file.txt`) in its **Files**. In a Core-only org use two import mappings instead (Data Manager, Import, save a mapping twice) with one import job on the second.
+**Prerequisites:** admin. Fundraising installed. Two funds: `Zztest Fund A` with **Description** blank, and `Zztest Fund B` with Description `Merge test`, one gift on it and one file (`Zztest merge file.txt`) in its **Files**. In a Core-only org use two import mappings instead (Data Manager, Import, save a mapping twice) with one import job on the second.
 
 | Step | Action | Expected result |
 |---|---|---|

@@ -28,7 +28,7 @@ fair market value for your board and your auditor; it never reaches the donor's 
 ## How to Turn It On
 
 There is nothing to turn on and no setting to choose. In-kind is one of the gift types the
-package has always shipped, and everything on this page works as soon as Giving is installed.
+package has always shipped, and everything on this page works as soon as Fundraising is installed.
 
 Two things are worth doing once, so that the numbers are visible where people look for them.
 
@@ -39,12 +39,12 @@ Two things are worth doing once, so that the numbers are visible where people lo
    fields but does not place them for you. Put them next to total giving rather than under it. A
    reader who sees one number without the other reads the one they see as everything the
    donor gave, which is the whole mistake this feature exists to prevent.
-2. Open **BarnCRM Settings**, then **Giving**, then **Rollups**, and choose **Recalculate
+2. Open **BarnCRM Settings**, then **Fundraising**, then **Rollups**, and choose **Recalculate
    now** after your first in-kind gifts are entered, unless you are content to wait for the
    nightly run. In-kind value and in-kind gift count are maintained by the same rollup engine
    as every other total on those records.
 
-If you want in-kind gifts on paper, the report **In-kind Gifts This Year** is in the Giving
+If you want in-kind gifts on paper, the report **In-kind Gifts This Year** is in the Fundraising
 reports folder. It lists each gift with its description, its fair market value and its donor,
 which is the list a finance team asks for at year end. It counts gifts in the books only:
 Pending and Cancelled gifts are left out.

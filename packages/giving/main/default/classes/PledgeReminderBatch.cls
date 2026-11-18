@@ -15,7 +15,7 @@ public with sharing class PledgeReminderBatch implements Database.Batchable<SObj
 
 	private static final String LOG_CONTEXT = 'PledgeReminderBatch.execute';
 	/** The settings console section a finished run's notice opens, as the donor level run does. */
-	private static final String GIVING_SECTION = 'Giving';
+	private static final String GIVING_SECTION = SettingSections.GIVING;
 
 	private PledgeReminderService.Counts totals = new PledgeReminderService.Counts();
 	/** Who pressed Send now, told when the run ends; null for the nightly run. */

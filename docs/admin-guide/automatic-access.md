@@ -18,7 +18,7 @@ There are two kinds of policy on this page:
 | Policy | What it does | When it runs |
 |---|---|---|
 | New staff get a role | A new user with your staff profile gets a BarnCRM role (for example Team Member) the moment the user is created | Automatically, when a user is created |
-| Module access follows the role (with Giving) | Anyone who holds a BarnCRM role also gets the matching Giving permission set: BarnCRM Admin gets Giving Admin, Fundraising Staff gets Giving Staff, Read Only gets Giving Read Only | Once, when you click **Apply Policy**, and again whenever a matching user record is edited |
+| Module access follows the role (with Fundraising) | Anyone who holds a BarnCRM role also gets the matching Fundraising permission set: BarnCRM Admin gets Fundraising Admin, Fundraising Staff gets Fundraising Staff Access, Read Only gets Fundraising Read Only | Once, when you click **Apply Policy**, and again whenever a matching user record is edited |
 
 The second kind fills the gap described on the Access page: a role carries what Core
 provides, and nothing a module adds.
@@ -53,7 +53,7 @@ Maria's organization takes on new staff every few months. Every new hire gets th
    holds the Team Member role straight away. Maria checks on the Access page: the new name
    is on the Team Member card.
 
-If your org has Giving, Maria does not need Policy 2: BarnCRM gives Giving Admin to everyone
+If your org has Fundraising, Maria does not need Policy 2: BarnCRM gives Fundraising Admin to everyone
 who holds BarnCRM Admin within the hour. She can still create it to make that instant.
 
 ## The Policy Definitions
@@ -76,20 +76,20 @@ are in brackets.
 
 The API names in brackets are the roles' original names and never change, so a policy keeps
 working across upgrades. Change the role to suit: **Read Only**
-(`Read_Only`), **BarnCRM Admin** (`BarnCRM_Admin_Group`) or, with Giving, **Fundraising
-Staff** (`Fundraising_Staff`). With Giving, add a second action to the same policy so the new
+(`Read_Only`), **BarnCRM Admin** (`BarnCRM_Admin_Group`) or, with Fundraising, **Fundraising
+Staff** (`Fundraising_Staff`). With Fundraising, add a second action to the same policy so the new
 user gets the module's permission set at the same time, for example Grant, Permission Set,
-**Giving Staff** (`Giving_Staff`) alongside Fundraising Staff. One policy per staff profile.
+**Fundraising Staff Access** (`Giving_Staff`) alongside Fundraising Staff. One policy per staff profile.
 
-### Policies 2 to 4: Module Access Follows the Role (with Giving)
+### Policies 2 to 4: Module Access Follows the Role (with Fundraising)
 
-These apply only when the Giving module is installed.
+These apply only when the Fundraising module is installed.
 
 | Policy | Filter 1 | Action | Order |
 |---|---|---|---|
-| 2. BarnCRM: admins also get Giving Admin (optional: BarnCRM gives it within the hour) | Permission Set Group equals **BarnCRM Admin** (`BarnCRM_Admin_Group`) | Grant, Permission Set, **Giving Admin** (`Giving_Admin`) | 20 |
-| 3. BarnCRM: fundraising staff also get Giving Staff | Permission Set Group equals **Fundraising Staff** (`Fundraising_Staff`) | Grant, Permission Set, **Giving Staff** (`Giving_Staff`) | 30 |
-| 4. BarnCRM: read only also get Giving Read Only | Permission Set Group equals **Read Only** (`Read_Only`) | Grant, Permission Set, **Giving Read Only** (`Giving_Read_Only`) | 40 |
+| 2. BarnCRM: admins also get Fundraising Admin (optional: BarnCRM gives it within the hour) | Permission Set Group equals **BarnCRM Admin** (`BarnCRM_Admin_Group`) | Grant, Permission Set, **Fundraising Admin** (`Giving_Admin`) | 20 |
+| 3. BarnCRM: fundraising staff also get Fundraising Staff Access | Permission Set Group equals **Fundraising Staff** (`Fundraising_Staff`) | Grant, Permission Set, **Fundraising Staff Access** (`Giving_Staff`) | 30 |
+| 4. BarnCRM: read only also get Fundraising Read Only | Permission Set Group equals **Read Only** (`Read_Only`) | Grant, Permission Set, **Fundraising Read Only** (`Giving_Read_Only`) | 40 |
 
 For each one, also add the user field filter Active (`IsActive`) equals `true`, and set the
 trigger to **when a user is created or updated**.

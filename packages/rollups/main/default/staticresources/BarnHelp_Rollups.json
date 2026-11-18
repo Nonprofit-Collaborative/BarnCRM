@@ -197,7 +197,7 @@
     "Core_RollupEase_TplNeedsField": "Needs a field labelled {0} on {1}: click Open in Builder, then Create a Field.",
     "Core_RollupEase_TplNeedsObject": "Needs {0}, which this org does not have.",
     "Core_RollupEase_TplReady": "Ready to add, switched off.",
-    "Core_RollupEase_TplStarterHelp": "Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Giving.",
+    "Core_RollupEase_TplStarterHelp": "Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Fundraising.",
     "Core_RollupFilter_ErrorIncomplete": "Condition {0} needs a field, a comparison and a value. Fill it in or remove it.",
     "Core_RollupFilter_ErrorLogic": "Combine conditions can use only the numbers 1 to {0}, AND, OR, NOT and brackets.",
     "Core_RollupFilter_EveryRecord": "Every record counts.",

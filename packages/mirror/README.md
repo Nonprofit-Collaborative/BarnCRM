@@ -5,13 +5,13 @@
 Bridges from BarnCRM to standard Salesforce objects and other orgs that need no nonprofit
 module: Cases sent to a service provider running BarnCRM Project Management, and the Nonprofit
 Cloud households and relationships migration kits. References to Case and Industries objects
-live only here (and in BarnCRM Mirror for Giving, `packages/mirrorgiving`), and only behind
-dynamic Apex, so Mirror installs cleanly where those objects do not exist and degrades
+live only here (and, for the gift mirrors, in BarnCRM Fundraising, `packages/giving`), and only
+behind dynamic Apex, so Mirror installs cleanly where those objects do not exist and degrades
 gracefully.
 
 The gift features (Opportunity mirror, Campaign sync, Gift Transaction mirror, the inbound gift
-API, the accounting export and the gift migration kits) are in **BarnCRM Mirror for Giving**
-since release 1.27 (N-09, ADR-NEXT mirror independence).
+API, the accounting export and the gift migration kits) are part of **BarnCRM Fundraising**
+(`packages/giving`) since release 1.27 (N-09, N-15, ADR-NEXT mirror independence).
 
 ## First ships in
 
@@ -40,8 +40,8 @@ required"). Offered in both editions.
   conversion's source and the drift finding in `MirrorHealthCheckExtension`) and
   `NpcRelationsKit`, with the `NPC_Households` and `NPC_Relations` migration kits and their two
   import templates. See `docs/admin-guide/nonprofit-cloud-households.md`.
-- **Settings.** `Mirror_Settings__c` holds every Mirror and Mirror for Giving setting, so stored
-  values stay where they were; Mirror for Giving reads its own fields through its dependency.
+- **Settings.** `Mirror_Settings__c` holds the Case request settings only. The gift mirror
+  settings are fields of Fundraising's `Giving_Settings__c`.
 - `MirrorPostInstall` marks the module's setup as run.
 
 ## How to test it alone
@@ -49,4 +49,4 @@ required"). Offered in both editions.
 Deploy Core and then Mirror (`sf project deploy start --source-dir packages/mirror`), then run
 `CaseProviderRequestsTest`, `CaseProviderRequestsHourlyTest`, `NpcHouseholdSourceTest`,
 `NpcRelationsKitTest` (which also covers `MirrorHealthCheckExtension`) and
-`MirrorPostInstallTest`. None needs Giving or Rollup Builder.
+`MirrorPostInstallTest`. None needs Fundraising or Rollup Builder.

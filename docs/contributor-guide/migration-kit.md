@@ -18,14 +18,15 @@ Nothing in the kit is packaged, and it never creates a package version.
 
 ## The mapping
 
-`build_mapping.py --packages core,rollups,giving,mirror,mirrorgiving --output mapping.json` collects, for each
+`build_mapping.py --packages core,rollups,giving,mirror --output mapping.json` collects, for each
 listed package:
 
 - every custom object, with its fields, except formula fields, auto-number fields, and objects
   that hold no records (custom metadata types, platform events);
 - the package's fields on Account and Contact, and their record types;
-- a field added to another package's object (Mirror for Giving's fields on `Gift__c` and `Appeal__c`)
-  joins that object's entry.
+- a field added to another package's object joins that object's entry (none ships today:
+  the gift mirror fields on `Gift__c` and `Appeal__c` are Fundraising's own, ADR-NEXT mirror
+  independence).
 
 Each object records its kind (`custom`, `standard`, or `setting` for a hierarchy custom
 setting), its fields, its lookups and their targets, whether its Name is typed or

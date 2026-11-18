@@ -8199,21 +8199,22 @@ The Mirror package is the only place a standard Salesforce object such as Campai
 Opportunity may be named (plan Section 4.2), and even there only through dynamic Apex, so
 Mirror installs on an org where the object is absent and its feature says it is unavailable.
 The inbound gift API and the accounting export add nothing to the model (Section 30). Campaign
-sync (X-02) adds one attribute to Appeal and Mirror's own settings object. The Opportunity
-mirror (X-01) adds one attribute to Gift and two keys to that settings object. The Gift
+sync (X-02) adds one attribute to Appeal and one key to a settings object. The Opportunity
+mirror (X-01) adds one attribute to Gift and five keys to that settings object. The Gift
 Transaction mirror (X-07, Section 29C1) adds one attribute to Gift, one to Fund and five keys to
 that settings object, and is the only place a Nonprofit Cloud object is named, by string,
 through describe.
 
-Since release 1.27 (N-09, ADR-NEXT mirror independence) these are two packages, under the same
-rule. **Mirror** (`packages/mirror`, depends on Core only) keeps the settings object
-`Mirror_Settings__c` with every key, Provider Request (Section 29C2) and the Nonprofit Cloud
-households and relationships kits. **Mirror for Giving** (`packages/mirrorgiving`, depends on
-Core, Rollup Builder, Giving and Mirror) ships every attribute and list view this part adds to
-Giving's Appeal, Gift and Fund, and the Campaign sync, Opportunity mirror, Gift Transaction
-mirror, inbound gift API and accounting export code and permission sets. Where a section below
-says "shipped by Mirror" for an attribute on a Giving object, read Mirror for Giving. No
-attribute, key or object changed.
+Since release 1.27 (N-09, N-15, D-210, ADR-NEXT mirror independence) **Mirror**
+(`packages/mirror`, depends on Core only) keeps `Mirror_Settings__c` with the Case request keys
+only, Provider Request (Section 29C2) and the Nonprofit Cloud households and relationships kits.
+**Fundraising** (`packages/giving`, never depending on Mirror) ships every attribute and list
+view this part adds to Appeal, Gift and Fund, every gift mirror key (now on `Giving_Settings__c`,
+Section 26), and the Campaign sync, Opportunity mirror, Gift Transaction mirror, inbound gift API
+and accounting export code and permission sets, naming standard and Nonprofit Cloud objects only
+in string literals. Where a section below says "shipped by Mirror" for an attribute on a
+Fundraising object, read Fundraising. No attribute or object changed; the eleven gift mirror
+keys moved from `Mirror_Settings__c` to `Giving_Settings__c` with their names and types.
 
 ---
 
@@ -8309,14 +8310,14 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 
 ### Salesforce implementation
 
-- **Attribute on `Appeal__c`, shipped by Mirror for Giving** (in `packages/mirrorgiving`, not Giving):
+- **Attribute on `Appeal__c`, shipped by Fundraising** (`packages/giving`):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Campaign ID | `Campaign_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Custom setting:** `Mirror_Settings__c`, hierarchy, protected, Mirror's own under
-  ADR-0017.
+- **Custom setting:** `Giving_Settings__c` (Section 26), hierarchy, protected, Fundraising's
+  own under ADR-0017 (on `Mirror_Settings__c` until N-15).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -8324,7 +8325,7 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 
 - **Automation:** `Automation_Registry__mdt` row `Campaign_Sync` on `Appeal__c`, order 50,
   enabled by default, handler `CampaignSyncTriggerHandler`, running before insert and before
-  update. Its switch row is created by `MirrorPostInstall`, which Mirror gains for this.
+  update. Its switch row is created by `GivingPostInstall`.
 - **Service:** `CampaignSyncService` (the copy), `CampaignSyncSelector` (appeal and Campaign
   reads, Campaign by dynamic query only), `CampaignSyncBatch` (R-CS6),
   `CampaignSyncController` and the `campaignSync` page reached from the Giving section of
@@ -8492,13 +8493,13 @@ only, because a gift is never edited from its Opportunity.
 
 ### Salesforce implementation
 
-- **Attribute on `Gift__c`, shipped by Mirror for Giving** (in `packages/mirrorgiving`, not Giving):
+- **Attribute on `Gift__c`, shipped by Fundraising** (`packages/giving`):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Opportunity ID | `Opportunity_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Custom setting `Mirror_Settings__c`** (Section 29B) gains:
+- **Custom setting `Giving_Settings__c`** (Sections 26 and 29B) gains:
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -8524,7 +8525,7 @@ only, because a gift is never edited from its Opportunity.
   release, ADR-0194 D4), which also carries the custom permission
   `Use_Opportunity_Mirror`: the page's reads require it, and the console shows the page's row
   only to someone who has it (the Setting Definition's `Required_Permission__c`).
-- **List view** `Gifts_And_Opportunities` on Gift, shipped by Mirror for Giving, where Opportunity ID is
+- **List view** `Gifts_And_Opportunities` on Gift, shipped by Fundraising, where Opportunity ID is
   typed or cleared (R-OM10).
 
 ---
@@ -8540,8 +8541,8 @@ Transactions only, so an organization that records its gifts in BarnCRM turns th
 keep those features seeing its giving. A reconciliation page shows where the two sides disagree.
 
 The mirror is not an entity of its own. It is one attribute on Gift and one on Fund, held by
-Mirror for Giving because no other package may name a Nonprofit Cloud object, and five keys on Mirror
-Settings. There is no link object, for the reason Section 29C gives (ADR-0058). Every Nonprofit
+Fundraising's gift mirror classes, the only place outside Mirror that may name a Nonprofit Cloud
+object (by string only), and five keys on Giving Settings. There is no link object, for the reason Section 29C gives (ADR-0058). Every Nonprofit
 Cloud object and field is reached through describe, by name, never at compile time; the names
 used are those of `docs/architecture/reference/nonprofit-cloud-data-model.md` Sections 3.1 to
 3.3, and the types it marks as inferred are checked at run time (R-GT1).
@@ -8681,19 +8682,19 @@ range that are dated on or after the start date.
 
 ### Salesforce implementation
 
-- **Attribute on `Gift__c`, shipped by Mirror for Giving** (in `packages/mirrorgiving`):
+- **Attribute on `Gift__c`, shipped by Fundraising** (`packages/giving`):
 
 | Attribute | API name | Type |
 |---|---|---|
 | Gift Transaction ID | `Gift_Transaction_Id__c` | Text(18), unique, external ID, case sensitive |
 
-- **Attribute on `Fund__c`, shipped by Mirror for Giving**:
+- **Attribute on `Fund__c`, shipped by Fundraising**:
 
 | Attribute | API name | Type |
 |---|---|---|
 | Gift Designation ID | `Gift_Designation_Id__c` | Text(18) |
 
-- **Custom setting `Mirror_Settings__c`** (Section 29B) gains:
+- **Custom setting `Giving_Settings__c`** (Sections 26 and 29B) gains:
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -8726,15 +8727,15 @@ range that are dated on or after the start date.
   `GiftTransactionMirrorController` and the `giftTransactionMirror` page reached from the Giving
   section of BarnCRM Settings. Shared with the Opportunity mirror: `MirrorSync`,
   `MirrorSettingsWriter` (the runs' record of their last completed run),
-  `MirrorGivingHealthCheckExtension` (the stale run finding) and
-  `MirrorGivingNightlyJobProvider` (the nightly jobs list), all in Mirror for Giving. Permission set: `Salesforce_Records_Sync` (retired `Gift_Transaction_Mirror`
+  `GiftMirrorHealthChecks` (the stale run finding, through `GivingHealthCheckExtension`) and
+  `GivingNightlyJobProvider` (the nightly jobs list), all in Fundraising. Permission set: `Salesforce_Records_Sync` (retired `Gift_Transaction_Mirror`
   until the next release, ADR-0194 D4), which also carries the custom
   permission `Use_Gift_Transaction_Mirror`: the page's reads require it, and the console shows
   the page's row only to someone who has it. It is offered on the Access page through an
   `Access_Add_On__mdt` row.
 - **List views** `Gifts_And_Gift_Transactions` on Gift, where Gift Transaction ID is typed or
   cleared (R-GT9), and `Funds_And_Gift_Designations` on Fund, where Gift Designation ID is typed
-  (R-GT5), both shipped by Mirror for Giving.
+  (R-GT5), both shipped by Fundraising.
 
 ---
 
@@ -8768,7 +8769,7 @@ Case is never named at compile time or given a field: the link is the Case Id he
 | Last Error | `Error__c` | Text(255) |
 
 - **Settings:** on `Mirror_Settings__c`, `Case_Requests_Enabled__c` (Checkbox, default false, Setting Definition `Mirror_Case_Requests`) and `Case_Requests_Type__c` (Text(80), default Service Provider, `Mirror_Case_Requests_Type`).
-- **Access:** read through Mirror's `Provider_Requests` permission set (an Access Add-On row; N-09 moved it out of Salesforce Records Sync, which is Mirror for Giving's); the Provider Requests tab in Mirror's Admin_Tabs.
+- **Access:** read through Mirror's `Provider_Requests` permission set (an Access Add-On row; N-09 moved it out of Salesforce Records Sync, which is Fundraising's); the Provider Requests tab in Mirror's Admin_Tabs.
 
 ---
 
@@ -19332,6 +19333,7 @@ mirrors the primary member).
 | 1.64 | 2026-11-13 | Sample data for Memberships and Scholarships (release 1.25). `Membership_Level__c`, `Membership_Term__c` and `Award_Program__c` each gain `Sample_Data__c` (Checkbox, default false), the mark the sample data loader sets so the set is counted and removed in one action; children go with their parent. No other object or rule changes. |
 | 1.65 | 2026-11-14 | Forms with submissions deletable by Forms administrators only (N-04, D-208, release 1.27; ADR-NEXT `NEXT-forms-delete-with-submissions.md`). Form Submission (29ZY): Form becomes Lookup(Form), set null on delete (was master-detail), sharing Public Read/Write; Form Version becomes set null on delete (was restrict); new Form Name (`Form_Name__c`, Text(80)) and Version Number (`Version_Number__c`, Number(6, 0)), rule R-FS8. Form (29ZW): rule R-FM4 and the Forms custom permission Manage Forms (`Forms_Manage`). |
 | 1.66 | 2026-11-14 | Fewer custom objects (D-208, N-11; ADR-NEXT `NEXT-fewer-custom-objects.md`). Four Core objects removed, 203 to 199 in the suite. `Merge_Journal__c` becomes the Admin Journal (Section 10A, R-AJ1) with `Kind__c` (Merge, Scan, Deactivation, Migration, Household Adoption) and takes the rows and fields of `Automation_Snapshot__c` (`Items__c`, `Message__c`, `Restored_At__c`), `Migration_Run__c` (`Kit__c`, `State_JSON__c`) and `Household_Adoption__c` (`Account_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`; its note moves to `Notes__c`); `Status__c` carries every kind's values with no default. Import Batch's `Migration_Run__c` is replaced by `Migration_Journal__c`. `Duplicate_Reason__c` is removed: a match reason is a `Duplicate_Dismissal__c` row with the new `Kind__c` Match Reason, keyed by the set in `Pair_Key__c`. |
+| 1.67 | 2026-11-14 | Gift mirrors folded into Fundraising (N-15, D-210, release 1.27; ADR-NEXT `NEXT-mirror-independence.md`). The Mirror for Giving package is removed: its attributes on Appeal, Gift and Fund, list views, code and permission sets ship in Fundraising (`packages/giving`, the Giving module renamed BarnCRM Fundraising). The eleven gift mirror keys (Campaign sync, Opportunity mirror and Gift Transaction mirror) move from `Mirror_Settings__c` to `Giving_Settings__c` with unchanged names and types; `Mirror_Settings__c` keeps the Case request keys only. No object added or removed. |
 
 ---
 ## 32. Entity ownership by package
