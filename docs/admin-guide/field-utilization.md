@@ -1,7 +1,6 @@
 # Field Use
 
-Field Use was called Field Utilization until v1.0; its records keep that name (**Field
-Utilization Snapshot**).
+Field Use saves its results as **Field Utilization Snapshot** records.
 
 ## What It Does
 

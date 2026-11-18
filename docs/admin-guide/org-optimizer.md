@@ -6,7 +6,7 @@
 ## 1. What It Does
 
 **Org Optimizer** is one page that answers "what in my org needs attention?" It brings
-together the checks that used to live in several places: the record checks (**Data
+together the record checks (**Data
 Quality**), Field Use, and Health Check. (Duplicate review has its own tab,
 **Duplicate Matching**; see [Duplicates](duplicates.md).) Each one
 is a section of the page, and nothing in a section runs until you open it, so the page itself
@@ -25,7 +25,7 @@ the section, so a screen reader reads its name and you can Tab straight into it.
 |---|---|---|
 | **Overview** | A tile for each section, grouped under **Check Your Data** and **Check Your Setup**. A tile's badge gives its state at a glance (see below). Select a tile to open its section. | Everyone who can open the page |
 | **Data Quality** | Which records need tidying up: people with no household, empty households, orphaned memberships and addresses, incomplete or failed primary addresses, people nobody can reach, deceased people who can still be emailed, and people not changed for years. Each check shows its count, a **Needs Attention** or **All Clear** badge, and **Open in Find**. See [Data Quality](data-hygiene.md). | Anyone with **Find and Export Records** |
-| **Field Use** | How often each field of a kind of record is filled in, by record type, with saved counts for trends (called Field Utilization before v1.0). See [Field Use](field-utilization.md). | Administrators |
+| **Field Use** | How often each field of a kind of record is filled in, by record type, with saved counts for trends. See [Field Use](field-utilization.md). | Administrators |
 | **Data Dictionary** | Every field you can see on the kinds of record you choose, with type, length, required, unique, picklist values, help text and formula, and optionally a fill rate, as a table and a CSV download. See [Data Dictionary](data-dictionary.md). | Administrators |
 | **AI-Readiness Export** | One zip for an AI tool you choose: a plain-language README, a schema.json of your kinds of record, fields and relationships, the data dictionary, data quality notes and, if you want, record files with sensitive fields left out or masked. BarnCRM calls no AI service. See [AI-Readiness Export](ai-readiness-export.md). | Administrators |
 | **Health Check** | Whether BarnCRM is set up the way it should be, with a fix for some findings. Runs only when you ask: opening it shows the last full run (when it ran and its counts, with **Run Again**), or **Run Health Check** when it has never run. See [Health Check](health-check.md). | Administrators |
@@ -78,7 +78,7 @@ hidden for everyone.
    the tab. Staff with Find and Export see **Overview** and **Data Quality**; administrators
    see every section.
 
-Duplicates are no longer a section here: they are on the **Duplicate Matching** tab, which
+Duplicates are not a section here: they are on the **Duplicate Matching** tab, which
 the **Duplicate Matching** section of **BarnCRM Settings** opens.
 
 ## 3. A Five-Minute Walkthrough (as Maria)
@@ -170,7 +170,7 @@ what it covers and leaves the rest to Setup. Open **Setup**, **Flows**, **Apex C
 
 - **Looking for a separate data-quality tab.** The record checks are the **Data Quality**
   section of **Org Optimizer**.
-- **Looking for duplicates here.** Duplicate review moved to its own tab, **Duplicate
+- **Looking for duplicates here.** Duplicate review has its own tab, **Duplicate
   Matching**. The **Duplicate Matching** section of BarnCRM Settings opens it.
 - **Seeing only two sections.** The others are for administrators. Ask whoever set up your
   org for the **BarnCRM Admin** role on the **Access** page.

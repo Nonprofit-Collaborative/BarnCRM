@@ -109,7 +109,7 @@ group, a housing program), so you choose:
 
 | Preset | Who sees enrollments and service deliveries |
 |---|---|
-| **Shared** (the default) | Everyone with a Programs permission set, as before this setting existed. |
+| **Shared** (the default) | Everyone with a Programs permission set. |
 | **Private** | The person who created the record (its owner), the people above them in the role hierarchy, and Programs Admin. |
 
 Choose one under **Participant Privacy** and click **Save** on the bar that appears at the

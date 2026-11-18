@@ -9,8 +9,7 @@ each job in turn, one at a time, at its usual time or as soon as the job before 
 finished, whichever is later. A job never starts while the one before it is still working, so
 the jobs never compete with each other for the platform's limits.
 
-Before this version each job had its own schedule, up to about 19 of them. There is now one,
-plus the hourly tab access check Health Check keeps.
+There is one schedule for every job, plus the hourly tab access check Health Check keeps.
 
 The jobs in the run, by time of night:
 
@@ -81,8 +80,7 @@ People who can manage BarnCRM Settings also see, on each job's row:
   acknowledgment emails have no **Run Now** here: the Donor Levels page has its own
   **Recalculate Now**, and acknowledgments are sent from the Acknowledgments page.
 
-This panel replaces the Fundraising module's own **Nightly Jobs** page and tab, which earlier versions
-had: every module's jobs, Fundraising's included, are on this one panel.
+Every module's jobs, Fundraising's included, are on this one panel.
 
 ## How to Turn It On
 
@@ -90,8 +88,6 @@ The nightly run is scheduled for you when:
 
 - BarnCRM is installed new (the install schedules it; a schedule that already exists is kept and
   no job's switch is changed), or you finish first-run setup;
-- you upgrade from a version that had any job scheduled on its own (the old schedules are
-  replaced by the one run, and each job that was scheduled stays on);
 - you switch on a job that has its own switch, such as **Turn On Seasonal Addresses** or the
   Error Log's **Schedule Daily Run**;
 - you press **Schedule Nightly Jobs** on the panel, or Health Check's **Schedule All Nightly

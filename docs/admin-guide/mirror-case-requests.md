@@ -97,4 +97,4 @@ service provider** off also removes it. Scheduling again never makes a second jo
   scheduled, and that the step's summary on the Nightly Jobs card says the hourly check is
   scheduled.
 - **Someone cannot see the Provider Requests tab.** Give them the Provider Requests extra
-  permission; Salesforce Records Sync no longer includes it.
+  permission; Salesforce Records Sync does not include it.

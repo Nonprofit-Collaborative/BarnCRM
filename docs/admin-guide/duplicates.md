@@ -496,7 +496,7 @@ naming the kept records and the reason. Open each record named and correct it by
 appears a minute or so after either is given. Scanning, dismissing and merging from it need
 the Manage BarnCRM Settings permission, which the BarnCRM Admin permission set grants, and
 access to duplicate record sets, which the BarnCRM Duplicate Review permission set grants.
-Duplicates are no longer in **Org Optimizer**.
+Duplicates are not part of **Org Optimizer**.
 
 **The panel says suggestions need access to duplicate record sets.** The person
 viewing it does not have BarnCRM Duplicate Review, or has a license that cannot have it.

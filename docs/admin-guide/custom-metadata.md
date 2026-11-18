@@ -146,7 +146,7 @@ What turning off does:
 
 ## Match Sources
 
-Match sources are no longer on this page. They are listed, added, deactivated and tried out
+Match sources are not on this page. They are listed, added, deactivated and tried out
 in the **Matching Logic** area of the **Duplicate Matching** tab; see
 [Duplicates](duplicates.md#matching-logic). The permission to save
 (BarnCRM Admin, or **BarnCRM Metadata Admin**) and the Setup step above apply there too.

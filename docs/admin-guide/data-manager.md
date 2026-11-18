@@ -133,12 +133,12 @@ only once. A job that can no longer be undone is still listed, with its counts.
 
 ## 5. Common Mistakes
 
-- **Looking for the Super Importer or Find tab in the navigation.** They moved into Data
+- **Looking for the Super Importer or Find tab in the navigation.** They are part of Data
   Manager: choose the **Super Importer** or **Find** tile, or type the task in **What do you
   want to do?**.
-- **Looking for the Import Rows tab.** It left the admin apps' navigation: open an import's
-  results in Super Importer, or type **Import Rows** in the App Launcher. The tab and its list
-  views are unchanged.
+- **Looking for the Import Rows tab.** It is not in the admin apps' navigation: open an import's
+  results in Super Importer, or type **Import Rows** in the App Launcher, which opens the tab
+  and its list views.
 - **A job is missing from the list.** Each person sees the kinds of jobs they may run: imports
   need the BarnCRM Admin role, Super Transformer runs and bulk deletes their own permission sets. The list
   shows the ten most recent jobs of each kind; report on **Data Jobs** for older ones.

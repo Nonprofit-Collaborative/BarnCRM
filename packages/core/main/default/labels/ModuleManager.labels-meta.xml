@@ -13,7 +13,7 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Badge beside the name of a module that is in beta (Module Manager, Setup Assistant, Home Modules)</shortDescription>
+        <shortDescription>Beta badge beside a module name (Module Manager, Setup Assistant, Home)</shortDescription>
         <value>Beta</value>
     </labels>
     <labels>

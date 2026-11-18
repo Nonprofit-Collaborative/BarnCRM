@@ -199,7 +199,7 @@ for **BarnCRM Programs**, a monocle for **BarnCRM Grants**, a pencil and tool be
 Forms**, a party hat for **BarnCRM Events**, a hard hat for **BarnCRM Projects**, a tool belt
 for **BarnCRM Portal Builder**, a Member sash for **BarnCRM Memberships** and a graduation cap
 and diploma for **BarnCRM Scholarships**; **BarnCRM Corporate Hub** shows Patch's face for now). Logic
-Models has no app since release 1.24; Patch with building blocks marks its tile under
+Models has no app; Patch with building blocks marks its tile under
 **Modules** on the BarnCRM home page.
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,

@@ -78,8 +78,8 @@ expires by itself.
 ## How Long a Pause Lasts
 
 You choose the length when you pause: 1, 2, 4, 8 or 24 hours. Two hours is already
-selected, because most spreadsheet loads are done in less. There is no longer choice and no
-"until I say so": a pause always ends by itself.
+selected, because most spreadsheet loads are done in less. Nothing longer than 24 hours is
+offered, and there is no "until I say so": a pause always ends by itself.
 
 When the time is up, automation starts again at that moment, whether or not anybody has the
 page open. BarnCRM also writes the end of the pause into the list of recent changes at the

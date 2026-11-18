@@ -3,7 +3,7 @@
 ## What It Does
 
 **Fundraising Home** is the first tab of the **BarnCRM Fundraising** app. It answers "what needs
-me today" in one look, so a fundraiser no longer starts on a menu of twenty tabs:
+me today" in one look, so a fundraiser starts on one page rather than a menu of tabs:
 
 - Five figures, each a link to the list behind it:
   - **Gifts** with **To acknowledge**: received gifts waiting for a thank you. Opens the

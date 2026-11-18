@@ -195,7 +195,7 @@ A module's sets are listed after them, only where that module is installed:
 | Fundraising Staff Access | Fundraising | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
 | Fundraising Read Only | Fundraising | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
 | Provider Requests | Mirror | See the Provider Requests tab: the Cases sent to a service provider, with the provider's request number, status and resolution (read only). See [Cases Sent to a Service Provider](mirror-case-requests.md). |
-| Salesforce Records Sync | Fundraising | Open the Campaign Sync, Opportunity Mirror and Gift Transaction Mirror pages and edit the IDs they keep. Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in Setup (and, for Campaigns, the Marketing User box on the person's user). Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror: BarnCRM gives it to everyone who held one of them, who keep the old set until the next release. It no longer includes the Provider Requests tab: give Provider Requests for that. |
+| Salesforce Records Sync | Fundraising | Open the Campaign Sync, Opportunity Mirror and Gift Transaction Mirror pages and edit the IDs they keep. Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in Setup (and, for Campaigns, the Marketing User box on the person's user). It does not include the Provider Requests tab: give Provider Requests for that. |
 | Accounting Export | Fundraising | Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no other Fundraising set beside it. Which gifts appear still follows your org's sharing. |
 | Inbound Gifts | Fundraising | For an integration, flow or AI assistant user only: record gifts another system sends, through the Inbound Gift API or the Record Inbound Gift action. It needs nothing else from BarnCRM. |
 
@@ -242,7 +242,7 @@ Error Log when it works.
 
 Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
 General, Features: Data Manager, Import, Find, Super Transformer and Org Optimizer. So no role or
-extra permission grants them any more. Each comes from its own permission set, **BarnCRM Auto:
+extra permission grants them. Each comes from its own permission set, **BarnCRM Auto:
 (tab name) Tab**, which BarnCRM gives automatically to the people who should see it once its
 feature is on:
 

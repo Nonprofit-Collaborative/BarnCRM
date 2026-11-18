@@ -2,21 +2,20 @@
 
 The package is `BarnCRM Giving` in `sfdx-project.json` and lives in `packages/giving`; every
 user-visible place calls the module BarnCRM Fundraising (short name Fundraising, D-210). API
-names, class names and the `Giving` developer names are unchanged.
+names, class names and developer names use `Giving`.
 
 ## Purpose
 
 Gifts, funds and allocations, commitments (pledges and recurring gifts) and installments, soft
 credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and
-dashboards, and gift batches. Since release 1.27 (N-15, ADR-NEXT mirror independence) also the
-gift bridges to standard Salesforce and Nonprofit Cloud objects and outside systems: the
-Opportunity mirror, Campaign sync, the Gift Transaction mirror, the inbound gift REST API, the
-accounting export and the NPSP and Nonprofit Cloud gift migration kits. They were briefly a
-separate package (N-09) and before that part of BarnCRM Mirror.
+dashboards, and gift batches. Also the gift bridges to standard Salesforce and Nonprofit Cloud
+objects and outside systems (N-15, ADR-NEXT mirror independence): the Opportunity mirror,
+Campaign sync, the Gift Transaction mirror, the inbound gift REST API, the accounting export
+and the NPSP and Nonprofit Cloud gift migration kits.
 
 ## First ships in
 
-Iteration **0.2**. The gift bridges first shipped in Mirror, iteration 0.6.
+Iteration **0.2**.
 
 ## Depends on
 
