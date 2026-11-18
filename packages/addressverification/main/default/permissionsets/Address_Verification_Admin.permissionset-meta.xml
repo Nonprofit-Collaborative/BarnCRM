@@ -3,14 +3,24 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Address Verification Admin</label>
   <description>
-    Opens Address Verification Setup: whether each provider key is set, Save Keys, Clear and
-    Verify Waiting Addresses. Saving keys also needs the Manage BarnCRM Settings permission. The
-    keys themselves are granted to no one.
+    Opens Address Verification Setup (its buttons also need Manage BarnCRM Settings). Principal
+    access to the Smarty and Google credentials, never their values, so lookups on save and the
+    nightly step run.
   </description>
   <classAccesses>
     <apexClass>AddressVerificationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>
+      Barn_Google_Address-Barn_Google_Address_Key
+    </externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Smarty-Barn_Smarty_Key</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
   <tabSettings>
     <tab>Address_Verification_Setup</tab>
     <visibility>Visible</visibility>

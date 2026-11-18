@@ -1,33 +1,17 @@
 /**
- * The Payments Setup page (ADR-0201 `0201-payments-module.md`, decision 7): the receiver address
- * of each active Site, for each processor, and whether each key is entered, showing only its
- * last four characters. Keys are write-only: a saved key is never returned. Thin: plain JSON and
- * every text the page shows (plan 9.9).
+ * The Payments Setup page (ADR-0201 `0201-payments-module.md`, decision 7, as amended by ADR-NEXT
+ * `NEXT-provider-secrets-named-credentials.md`): the receiver address of each active Site, for
+ * each processor; where each processor's secrets go in Setup (External Credential, principal and
+ * parameter names, qualified for this org); whether each processor is connected, with Check
+ * Connection; and the PayPal webhook id, the one value still typed here (not a secret, shown by
+ * its last four characters only). Thin: plain JSON and every text the page shows (plan 9.9).
  *
- * Opened by holders of Payments Admin (class access). Saving or clearing keys also needs Manage
- * BarnCRM Settings, and writes the protected setting in system mode, since no permission set
- * grants the protected setting's fields.
+ * Opened by holders of Payments Admin (class access). Saving, clearing and checking also need
+ * Manage BarnCRM Settings, and write the protected setting in system mode.
  */
 public with sharing class PaymentsSetupController {
 	private static final String CONTEXT = 'PaymentsSetupController';
-
-	/** The keys the page can save, by the name the page sends. */
-	@TestVisible
-	private static final Map<String, Schema.SObjectField> FIELDS = new Map<String, Schema.SObjectField>{
-		'stripeSecretKey' => Payment_Keys__c.Stripe_Secret_Key__c,
-		'stripeWebhookSecret' => Payment_Keys__c.Stripe_Webhook_Secret__c,
-		'payPalClientId' => Payment_Keys__c.PayPal_Client_Id__c,
-		'payPalClientSecret' => Payment_Keys__c.PayPal_Client_Secret__c,
-		'payPalWebhookId' => Payment_Keys__c.PayPal_Webhook_Id__c
-	};
-	private static final Map<String, List<String>> BY_PROCESSOR = new Map<String, List<String>>{
-		PaymentService.STRIPE => new List<String>{ 'stripeSecretKey', 'stripeWebhookSecret' },
-		PaymentService.PAYPAL => new List<String>{
-			'payPalClientId',
-			'payPalClientSecret',
-			'payPalWebhookId'
-		}
-	};
+	private static final String WEBHOOK_ID = 'payPalWebhookId';
 
 	public class KeyStatus {
 		@AuraEnabled
@@ -37,6 +21,22 @@ public with sharing class PaymentsSetupController {
 		/** Null when not entered; otherwise the last four characters only. */
 		@AuraEnabled
 		public String lastFour;
+	}
+
+	/** Where one processor's secrets are entered in Setup; names only, never a value. */
+	public class Credential {
+		@AuraEnabled
+		public String processor;
+		@AuraEnabled
+		public Boolean connected;
+		@AuraEnabled
+		public String externalCredential;
+		@AuraEnabled
+		public String principal;
+		@AuraEnabled
+		public String parameters;
+		@AuraEnabled
+		public String namedCredentials;
 	}
 
 	public class Receiver {
@@ -62,6 +62,13 @@ public with sharing class PaymentsSetupController {
 		public List<Receiver> receivers = new List<Receiver>();
 		@AuraEnabled
 		public List<KeyStatus> keys = new List<KeyStatus>();
+		@AuraEnabled
+		public List<Credential> credentials = new List<Credential>();
+		/** The outcome of the Check Connection just made; null otherwise. */
+		@AuraEnabled
+		public String checkMessage;
+		@AuraEnabled
+		public Boolean checkOk;
 	}
 
 	@AuraEnabled
@@ -73,35 +80,91 @@ public with sharing class PaymentsSetupController {
 		}
 	}
 
-	/** Saves the keys typed; a blank box keeps the key saved before. */
+	/** Saves the PayPal webhook id typed; a blank box keeps the one saved before. */
 	@AuraEnabled
 	public static Setup saveKeys(Map<String, String> keys) {
 		refuseUnlessManager();
-		Payment_Keys__c stored = stored();
-		for (String name : (keys == null ? new Map<String, String>() : keys).keySet()) {
-			String value = keys.get(name)?.trim();
-			if (FIELDS.containsKey(name) && String.isNotBlank(value)) {
-				stored.put(
-					FIELDS.get(name),
-					value.left(FIELDS.get(name).getDescribe().getLength())
-				);
-			}
+		Payments_Settings__c stored = stored();
+		String value = (keys == null ? new Map<String, String>() : keys).get(WEBHOOK_ID)?.trim();
+		if (String.isNotBlank(value)) {
+			stored.PayPal_Webhook_Id__c = value.left(
+				Payments_Settings__c.PayPal_Webhook_Id__c.getDescribe().getLength()
+			);
 		}
 		return write(stored);
 	}
 
-	/** Removes every key of one processor. */
+	/**
+	 * Forgets one processor's connection (and PayPal's webhook id), so it is not used until it
+	 * is checked again. The secrets themselves are removed in Setup, on the External Credential.
+	 */
 	@AuraEnabled
 	public static Setup clearKeys(String processor) {
 		refuseUnlessManager();
-		if (!BY_PROCESSOR.containsKey(processor)) {
+		Payments_Settings__c stored = stored();
+		if (processor == PaymentService.STRIPE) {
+			stored.Stripe_Connected__c = false;
+		} else if (processor == PaymentService.PAYPAL) {
+			stored.PayPal_Connected__c = false;
+			stored.PayPal_Webhook_Id__c = null;
+		} else {
 			throw UserErrors.message(BarnHelp.text('Payments', 'Payments_Error_BadProcessor'));
 		}
-		Payment_Keys__c stored = stored();
-		for (String name : BY_PROCESSOR.get(processor)) {
-			stored.put(FIELDS.get(name), null);
-		}
 		return write(stored);
+	}
+
+	/**
+	 * Calls the processor through its Named Credential as the person checking (Stripe: the
+	 * balance; PayPal: a sign-in in the current mode) and records whether it answered. The
+	 * callout comes before the write, as Salesforce requires.
+	 */
+	@AuraEnabled
+	public static Setup checkConnection(String processor) {
+		refuseUnlessManager();
+		Payments_Settings__c stored = stored();
+		PaymentStripe.Connection found;
+		if (processor == PaymentService.STRIPE) {
+			found = PaymentStripe.checkConnection();
+			stored.Stripe_Connected__c = found.ok;
+		} else if (processor == PaymentService.PAYPAL) {
+			found = PaymentPayPal.checkConnection();
+			stored.PayPal_Connected__c = found.ok;
+		} else {
+			throw UserErrors.message(BarnHelp.text('Payments', 'Payments_Error_BadProcessor'));
+		}
+		Setup result = write(stored);
+		if (found.failure != null) {
+			ErrorLogger.log(found.failure, CONTEXT + '.checkConnection');
+		}
+		result.checkOk = found.ok;
+		result.checkMessage = found.ok
+			? connected(processor, found.live)
+			: BarnHelp.text(
+					'Payments',
+					'Payments_Setup_CheckFailed',
+					new List<Object>{
+						processor,
+						found.statusCode == null ? '-' : String.valueOf(found.statusCode)
+					}
+			  );
+		return result;
+	}
+
+	/** Connected; for Stripe, says so plainly when the key is for the other mode. */
+	private static String connected(String processor, Boolean live) {
+		Boolean liveMode = PaymentService.mode() == PaymentService.LIVE;
+		if (live != null && live != liveMode) {
+			return BarnHelp.text(
+				'Payments',
+				'Payments_Health_ModeMismatchDetail',
+				new List<Object>{ PaymentService.mode() }
+			);
+		}
+		return BarnHelp.text(
+			'Payments',
+			'Payments_Setup_Connected',
+			new List<Object>{ processor, PaymentService.mode() }
+		);
 	}
 
 	/** Schedules event processing as the person choosing it, as the Health Check fix does. */
@@ -122,13 +185,13 @@ public with sharing class PaymentsSetupController {
 		}
 	}
 
-	private static Payment_Keys__c stored() {
-		Payment_Keys__c stored = Payment_Keys__c.getOrgDefaults();
+	private static Payments_Settings__c stored() {
+		Payments_Settings__c stored = PaymentService.settings();
 		stored.SetupOwnerId = UserInfo.getOrganizationId();
 		return stored;
 	}
 
-	private static Setup write(Payment_Keys__c stored) {
+	private static Setup write(Payments_Settings__c stored) {
 		try {
 			upsert as system stored;
 			return setup();
@@ -139,6 +202,7 @@ public with sharing class PaymentsSetupController {
 
 	private static Setup setup() {
 		Setup result = new Setup();
+		Payments_Settings__c stored = PaymentService.settings();
 		result.processor = PaymentService.defaultProcessor();
 		result.mode = PaymentService.mode();
 		result.canManage = HealthCheckService.canManageSettings();
@@ -152,17 +216,53 @@ public with sharing class PaymentsSetupController {
 				result.receivers.add(receiver);
 			}
 		}
-		Payment_Keys__c stored = PaymentService.keys();
-		for (String processor : BY_PROCESSOR.keySet()) {
-			for (String name : BY_PROCESSOR.get(processor)) {
-				KeyStatus key = new KeyStatus();
-				key.name = name;
-				key.processor = processor;
-				String value = (String) stored.get(FIELDS.get(name));
-				key.lastFour = String.isBlank(value) ? null : value.right(4);
-				result.keys.add(key);
-			}
-		}
+		KeyStatus webhook = new KeyStatus();
+		webhook.name = WEBHOOK_ID;
+		webhook.processor = PaymentService.PAYPAL;
+		webhook.lastFour = String.isBlank(stored.PayPal_Webhook_Id__c)
+			? null
+			: stored.PayPal_Webhook_Id__c.right(4);
+		result.keys.add(webhook);
+		result.credentials.add(
+			credential(
+				PaymentService.STRIPE,
+				stored.Stripe_Connected__c == true,
+				PaymentStripe.CREDENTIAL,
+				'Barn_Stripe_Key',
+				'SecretKey',
+				PaymentStripe.CREDENTIAL
+			)
+		);
+		result.credentials.add(
+			credential(
+				PaymentService.PAYPAL,
+				stored.PayPal_Connected__c == true,
+				PaymentPayPal.CREDENTIAL,
+				'Barn_PayPal_App',
+				'ClientId, ClientSecret',
+				PaymentPayPal.LIVE_BASE.removeStart('callout:') +
+					', ' +
+					PaymentPayPal.TEST_BASE.removeStart('callout:')
+			)
+		);
 		return result;
+	}
+
+	private static Credential credential(
+		String processor,
+		Boolean connected,
+		String externalCredential,
+		String principal,
+		String parameters,
+		String namedCredentials
+	) {
+		Credential c = new Credential();
+		c.processor = processor;
+		c.connected = connected;
+		c.externalCredential = externalCredential;
+		c.principal = principal;
+		c.parameters = parameters;
+		c.namedCredentials = namedCredentials;
+		return c;
 	}
 }

@@ -1,6 +1,6 @@
 /**
- * Payments' Health Check (ADR-0201 payments module, decision 7): it reports keys not entered, a
- * Stripe key for the other mode, no Site, a guest user without the receiver set (and gives it),
+ * Payments' Health Check (ADR-0201 payments module, decision 7): it reports a processor not
+ * connected, a Stripe credential that fails a test call or holds a key for the other mode, no Site, a guest user without the receiver set (and gives it),
  * processing not scheduled (and schedules it) and events waiting; it is quiet when Payments is
  * turned off.
  */
@@ -62,21 +62,39 @@ private class PaymentsHealthCheckExtensionTest {
 	static void aStripeKeyForTheOtherModeIsReported() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			Assert.isFalse(
-				PaymentsHealthCheckExtension.stripeKeyMismatch(),
-				'A test key in Test mode'
-			);
 			Payments_Settings__c live = Payments_Settings__c.getOrgDefaults();
 			live.Mode__c = PaymentService.LIVE;
 			update live;
+			PaymentsTestData.Processors mock = PaymentsTestData.processors()
+				.answer('balance', 200, '{"object":"balance","livemode":false}');
+
+			Test.startTest();
+			Set<String> found = keys(new PaymentsHealthCheckExtension().findings());
+			Test.stopTest();
+
+			Assert.isTrue(found.contains('payments_mode_mismatch'), 'A test key in Live mode');
+			Assert.isFalse(found.contains('payments_connection_failed'), 'It answered');
 			Assert.isTrue(
-				PaymentsHealthCheckExtension.stripeKeyMismatch(),
-				'A test key in Live mode'
+				mock.last('balance').getEndpoint().startsWith(PaymentStripe.ENDPOINT),
+				'A test call through the Named Credential'
 			);
-			Assert.isTrue(
-				keys(new PaymentsHealthCheckExtension().findings())
-					.contains('payments_mode_mismatch')
-			);
+		}
+	}
+
+	@IsTest
+	static void aStripeCredentialThatStoppedWorkingIsReported() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.STRIPE);
+			PaymentsTestData.processors()
+				.answer('balance', 401, '{"error":{"message":"Invalid API Key"}}');
+
+			Test.startTest();
+			Set<String> found = keys(new PaymentsHealthCheckExtension().findings());
+			Test.stopTest();
+
+			Assert.isTrue(found.contains('payments_connection_failed'), 'Reported: ' + found);
+			Assert.isFalse(found.contains('payments_keys_missing'), 'It is connected');
+			Assert.isFalse(found.contains('payments_mode_mismatch'), 'Nothing to compare');
 		}
 	}
 

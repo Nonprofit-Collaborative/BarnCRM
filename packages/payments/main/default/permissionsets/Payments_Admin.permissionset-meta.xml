@@ -11,6 +11,14 @@
     <apexClass>PaymentsSetupController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_PayPal-Barn_PayPal_App</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Stripe-Barn_Stripe_Key</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Payment__c.Amount_Refunded__c</field>

@@ -3,7 +3,9 @@
  * decision 7; ADR-0057's extension seam). Core finds this class by name
  * (`HealthCheckExtensions.EXTENSION_CLASSES`). Asked only while the module is on, of a viewer
  * who may manage settings:
- * - the chosen provider's keys not entered (warning);
+ * - the chosen provider not connected: Check Connection on the setup page has not succeeded
+ *   through its Named Credential (warning; R-AV4). No test lookup is made here, since each one
+ *   counts against the organization's provider account;
  * - Current addresses still Unverified 30 days after they were last changed (info, the count).
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it

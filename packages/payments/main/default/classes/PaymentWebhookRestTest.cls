@@ -1,12 +1,11 @@
 /**
- * The webhook receiver (ADR-0201 payments module, decisions 4 and 5; R-PEV1, R-PEV3): a Stripe
- * event is stored only with a good, recent signature and only once; a PayPal event is stored
- * with its transmission headers for verification later; anything else is refused.
+ * The webhook receiver (ADR-0201 payments module, decisions 4 and 5; R-PEV1 to R-PEV3): a Stripe
+ * event is stored once, by its id, for the processing job to fetch back from Stripe, with no
+ * callout and no secret; a PayPal event is stored with its transmission headers for verification
+ * later; a post to an unconnected processor, or one that cannot be an event, is refused.
  */
 @IsTest(testFor='ApexClass:PaymentWebhookRest')
 private class PaymentWebhookRestTest {
-	private static final Long NOW = 1800000000L;
-
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.adminWith(PaymentsTestData.ADMIN);
@@ -23,11 +22,8 @@ private class PaymentWebhookRestTest {
 		return request;
 	}
 
-	private static Integer stripe(String body, String signature) {
-		return PaymentWebhookRest.store(
-			request('stripe', body, new Map<String, String>{ 'Stripe-Signature' => signature }),
-			NOW
-		);
+	private static Integer stripe(String body) {
+		return PaymentWebhookRest.store(request('stripe', body, new Map<String, String>()));
 	}
 
 	private static Integer storedEvents() {
@@ -35,18 +31,18 @@ private class PaymentWebhookRestTest {
 	}
 
 	@IsTest
-	static void aSignedStripeEventIsStoredOnce() {
+	static void aStripeEventIsStoredOnceWithNoCallout() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
+			PaymentsTestData.Processors mock = PaymentsTestData.processors();
 			String body = PaymentsTestData.stripeEvent(
 				'evt_9',
 				'checkout.session.completed',
 				new Map<String, Object>()
 			);
-			String signature = PaymentsTestData.stripeSignature(body, NOW - 30);
 
-			Assert.areEqual(200, stripe(body, signature), 'Stored');
-			Assert.areEqual(200, stripe(body, signature), 'A resend is answered as received');
+			Assert.areEqual(200, stripe(body), 'Stored');
+			Assert.areEqual(200, stripe(body), 'A resend is answered as received');
 
 			List<Payment_Event__c> stored = [
 				SELECT Event_Key__c, Event_Type__c, Status__c
@@ -57,39 +53,39 @@ private class PaymentWebhookRestTest {
 			Assert.areEqual('stripe:evt_9', stored[0].Event_Key__c, 'Keyed');
 			Assert.areEqual('checkout.session.completed', stored[0].Event_Type__c, 'Its type');
 			Assert.areEqual('Received', stored[0].Status__c, 'Waits for processing');
+			Assert.isTrue(mock.requests.isEmpty(), 'The guest makes no callout');
 		}
 	}
 
 	@IsTest
-	static void badSignaturesOldEventsAndOtherPathsAreRefused() {
+	static void postsThatCannotBeAStripeEventAreRefused() {
 		System.runAs(PaymentsTestData.admin()) {
-			PaymentsTestData.connect(PaymentService.STRIPE);
 			String body = PaymentsTestData.stripeEvent(
 				'evt_8',
 				'charge.refunded',
 				new Map<String, Object>()
 			);
+			Assert.areEqual(400, stripe(body), 'Refused while Stripe is not connected');
+			PaymentsTestData.connect(PaymentService.STRIPE);
 
+			Assert.areEqual(400, stripe('{"type":"charge.refunded"}'), 'No event id');
 			Assert.areEqual(
 				400,
-				stripe(body, PaymentsTestData.stripeSignature(body + ' ', NOW)),
-				'Changed body'
+				stripe('{"id":"ch_1","type":"charge.refunded"}'),
+				'Not an event id'
 			);
+			Assert.areEqual(400, stripe('not json'), 'Not an event');
 			Assert.areEqual(
-				400,
-				stripe(body, PaymentsTestData.stripeSignature(body, NOW - 301)),
-				'Too old'
+				200,
+				stripe(PaymentsTestData.stripeEvent('evt_7', 'customer.created', null)),
+				'A type the job does not act on is acknowledged, so Stripe stops sending it'
 			);
-			Assert.areEqual(400, stripe(body, 't=abc,v1=00'), 'Not a time');
-			Assert.areEqual(400, stripe(body, null), 'No signature');
-			Assert.areEqual(400, stripe('{"type":"x"}', 't=1,v1=0'), 'No event id');
 			Assert.areEqual(
 				404,
-				PaymentWebhookRest.store(request('square', body, new Map<String, String>()), NOW),
+				PaymentWebhookRest.store(request('square', body, new Map<String, String>())),
 				'Not a processor'
 			);
 			Assert.areEqual(0, storedEvents(), 'Nothing stored');
-			Assert.isFalse(PaymentStripe.sameText('abc', 'abd'), 'Compared in full');
 		}
 	}
 
@@ -111,12 +107,12 @@ private class PaymentWebhookRestTest {
 
 			Assert.areEqual(
 				400,
-				PaymentWebhookRest.store(request('paypal', body, partial), NOW),
+				PaymentWebhookRest.store(request('paypal', body, partial)),
 				'Unsigned'
 			);
 			Assert.areEqual(
 				200,
-				PaymentWebhookRest.store(request('paypal', body, headers), NOW),
+				PaymentWebhookRest.store(request('paypal', body, headers)),
 				'Kept'
 			);
 
@@ -142,11 +138,11 @@ private class PaymentWebhookRestTest {
 	}
 
 	private static Integer payPal(String body) {
-		return PaymentWebhookRest.store(request('paypal', body, payPalHeaders()), NOW);
+		return PaymentWebhookRest.store(request('paypal', body, payPalHeaders()));
 	}
 
 	@IsTest
-	static void nothingIsStoredForPayPalUntilItsKeysAreSaved() {
+	static void nothingIsStoredForPayPalUntilItIsConnected() {
 		System.runAs(PaymentsTestData.admin()) {
 			String body = PaymentsTestData.payPalEvent(
 				'WH-6',
@@ -219,7 +215,7 @@ private class PaymentWebhookRestTest {
 			);
 			Assert.areEqual(
 				200,
-				stripe(stripeBody, PaymentsTestData.stripeSignature(stripeBody, NOW - 30)),
+				stripe(stripeBody),
 				'Stripe events still arrive while PayPal posts fill PayPal\'s cap'
 			);
 		}

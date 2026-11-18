@@ -137,9 +137,9 @@ private class PaymentPayPalTest {
 	static void withoutAWebhookIdEveryEventIsRejected() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.PAYPAL);
-			Payment_Keys__c keys = Payment_Keys__c.getOrgDefaults();
-			keys.PayPal_Webhook_Id__c = null;
-			update keys;
+			Payments_Settings__c stored = Payments_Settings__c.getOrgDefaults();
+			stored.PayPal_Webhook_Id__c = null;
+			update stored;
 			verifying();
 
 			Test.startTest();

@@ -45,60 +45,55 @@
                     <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManage} data-id="no-manage"></c-barn-notice>
                 </template>
                 <div class="slds-grid slds-wrap slds-gutters">
-                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="stripe">
-                        <template for:each={stripeKeys} for:item="key">
-                            <lightning-input
-                                key={key.name}
-                                type="password"
-                                autocomplete="off"
-                                label={key.label}
-                                field-level-help={key.status}
-                                placeholder={key.status}
-                                value={key.value}
-                                data-name={key.name}
+                    <template for:each={credentials} for:item="credential">
+                        <div key={credential.processor} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id={credential.dataId}>
+                            <h2 class="slds-text-title_bold slds-var-m-bottom_x-small">{credential.processor}</h2>
+                            <p class="slds-var-m-bottom_x-small" data-id={credential.statusId}>{credential.status}</p>
+                            <p class="slds-var-m-bottom_small slds-text-body_small" data-id={credential.stepsId}>{credential.steps}</p>
+                            <template lwc:if={credential.isPayPal}>
+                                <template for:each={payPalKeys} for:item="key">
+                                    <lightning-input
+                                        key={key.name}
+                                        autocomplete="off"
+                                        label={key.label}
+                                        field-level-help={key.status}
+                                        placeholder={key.status}
+                                        value={key.value}
+                                        data-name={key.name}
+                                        disabled={locked}
+                                        onchange={handleType}
+                                    ></lightning-input>
+                                </template>
+                                <lightning-button
+                                    class="slds-var-m-top_small slds-var-m-right_small"
+                                    label={labels.saveKeys}
+                                    onclick={handleSave}
+                                    disabled={locked}
+                                    data-id="save"
+                                ></lightning-button>
+                            </template>
+                            <lightning-button
+                                class="slds-var-m-top_small slds-var-m-right_small"
+                                variant="brand"
+                                label={labels.check}
+                                data-processor={credential.processor}
+                                data-id={credential.checkId}
                                 disabled={locked}
-                                onchange={handleType}
-                            ></lightning-input>
-                        </template>
-                        <lightning-button
-                            class="slds-var-m-top_small"
-                            label={labels.clear}
-                            data-processor="Stripe"
-                            data-id="clear-stripe"
-                            disabled={locked}
-                            onclick={handleClear}
-                        ></lightning-button>
-                    </div>
-                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2" data-id="paypal">
-                        <template for:each={payPalKeys} for:item="key">
-                            <lightning-input
-                                key={key.name}
-                                type="password"
-                                autocomplete="off"
-                                label={key.label}
-                                field-level-help={key.status}
-                                placeholder={key.status}
-                                value={key.value}
-                                data-name={key.name}
+                                onclick={handleCheck}
+                            ></lightning-button>
+                            <lightning-button
+                                class="slds-var-m-top_small"
+                                label={labels.clear}
+                                data-processor={credential.processor}
+                                data-id={credential.clearId}
                                 disabled={locked}
-                                onchange={handleType}
-                            ></lightning-input>
-                        </template>
-                        <lightning-button
-                            class="slds-var-m-top_small"
-                            label={labels.clear}
-                            data-processor="PayPal"
-                            data-id="clear-paypal"
-                            disabled={locked}
-                            onclick={handleClear}
-                        ></lightning-button>
-                    </div>
+                                onclick={handleClear}
+                            ></lightning-button>
+                        </div>
+                    </template>
                 </div>
-                <div class="slds-var-m-vertical_medium">
-                    <lightning-button variant="brand" label={labels.saveKeys} onclick={handleSave} disabled={locked} data-id="save"></lightning-button>
-                </div>
-                <template lwc:if={savedShown}>
-                    <c-barn-notice class="slds-var-m-bottom_medium" variant="success" message={labels.saved} data-id="saved"></c-barn-notice>
+                <template lwc:if={notice}>
+                    <c-barn-notice class="slds-var-m-vertical_medium" variant={notice.variant} message={notice.message} data-id="saved"></c-barn-notice>
                 </template>
             </template>
             <template lwc:if={error}>

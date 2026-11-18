@@ -7,8 +7,8 @@
  *                    payerName?, payerEmail?, personId?, sourceRecordId?, listener?, detail? }
  *                  returns { paymentId, checkoutUrl, status, reference }
  *   getPayment     { paymentId } returns the payment map, or null
- *   isReady        { processor?, recurring? } returns true when that processor's keys are
- *                  entered (and, with recurring true, Automatic Recurring Payments is on)
+ *   isReady        { processor?, recurring? } returns true when that processor is connected
+ *                  (and, with recurring true, Automatic Recurring Payments is on)
  *   updateCard     { subscriptionId, customerId?, returnUrl } returns { url }, the processor's
  *                  own page for a new card (ADR-0218 `0218-payments-subscriptions.md`)
  *   countRecent    { sourceRecordId, minutes?, status? } returns how many payments for that

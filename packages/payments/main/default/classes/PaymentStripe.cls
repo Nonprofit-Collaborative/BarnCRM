@@ -1,22 +1,39 @@
 /**
  * The org's own Stripe account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
- * Checkout Sessions, the Stripe-Signature check on arrival, and reading a verified event into a
+ * Checkout Sessions, fetching each received event back from Stripe and reading that copy into a
  * `PaymentService.Change`; subscriptions and the setup-mode card update (ADR-0218
  * `0218-payments-subscriptions.md`). Stripe API version: the account's default.
+ *
+ * Every call goes through the `Barn_Stripe` Named Credential; the secret key is its External
+ * Credential's principal parameter, merged into the header by Salesforce, never read by Apex
+ * (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`, amending ADR-0220).
  */
 public with sharing class PaymentStripe {
-	public static final String ENDPOINT = 'https://api.stripe.com/v1/';
-	/** How far the signed time may be from now, in seconds (Stripe's own default). */
-	@TestVisible
-	private static final Integer TOLERANCE_SECONDS = 300;
+	public static final String CREDENTIAL = NamespaceUtil.qualify('Barn_Stripe');
+	public static final String ENDPOINT = 'callout:' + CREDENTIAL + '/v1/';
+	/** The event types `read` acts on: the receiver stores no other. Kept beside its switch. */
+	public static final Set<String> EVENT_TYPES = new Set<String>{
+		'invoice.paid',
+		'invoice.payment_failed',
+		'customer.subscription.deleted',
+		'checkout.session.completed',
+		'checkout.session.async_payment_succeeded',
+		'checkout.session.async_payment_failed',
+		'checkout.session.expired',
+		'payment_intent.payment_failed',
+		'charge.refunded'
+	};
 	private static final String CONTEXT = 'PaymentStripe';
 
-	/**
-	 * Starts a Checkout Session and sets its id and page address on the payment. The org's own
-	 * secret key comes from the protected setting Payment_Keys__c, not a Named Credential
-	 * (ADR-0201 payments module, decision 7): its signing secret must be readable by Apex for
-	 * the HMAC check, so both Stripe keys are kept in the one write-only place.
-	 */
+	/** What a connection check found: whether Stripe answered, and in which mode the key is. */
+	public class Connection {
+		public Boolean ok = false;
+		public Boolean live;
+		public Integer statusCode;
+		public Exception failure;
+	}
+
+	/** Starts a Checkout Session and sets its id and page address on the payment. */
 	public static void startCheckout(
 		Payment__c payment,
 		String successUrl,
@@ -80,23 +97,27 @@ public with sharing class PaymentStripe {
 	}
 
 	/**
-	 * One Stripe API call with the org's own secret key, from the protected setting
-	 * Payment_Keys__c, not a Named Credential (ADR-0201 payments module, decision 7): its signing
-	 * secret must be readable by Apex for the HMAC check, so both Stripe keys are kept in the one
-	 * write-only place. Throws a PaymentException unless Stripe answers 200 with an id.
+	 * The request for one Stripe API call through the Named Credential. The Authorization header
+	 * is a merge field Salesforce fills from the External Credential's principal, so Apex never
+	 * holds the key; the running user needs principal access (a Payments permission set).
 	 */
-	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
+	private static HttpRequest request(String method, String path) {
+		HttpRequest request = new HttpRequest();
+		request.setEndpoint(ENDPOINT + path);
+		request.setMethod(method);
+		request.setTimeout(20000);
+		request.setHeader('Authorization', 'Bearer {!$Credential.' + CREDENTIAL + '.SecretKey}');
+		return request;
+	}
+
+	/** One Stripe API call. Throws a PaymentException unless Stripe answers 200 with an id. */
 	private static Map<String, Object> send(
 		String method,
 		String path,
 		Map<String, String> form,
 		String idempotencyKey
 	) {
-		HttpRequest request = new HttpRequest();
-		request.setEndpoint(ENDPOINT + path);
-		request.setMethod(method);
-		request.setTimeout(20000);
-		request.setHeader('Authorization', 'Bearer ' + PaymentService.keys().Stripe_Secret_Key__c);
+		HttpRequest request = request(method, path);
 		if (form != null) {
 			List<String> pairs = new List<String>();
 			for (String key : form.keySet()) {
@@ -128,68 +149,64 @@ public with sharing class PaymentStripe {
 	}
 
 	/**
-	 * True when the Stripe-Signature header (`t=...,v1=...`) signs this exact body with the
-	 * endpoint's secret, within the tolerance of now (in seconds since 1970).
+	 * The event as Stripe has it (`GET /v1/events/{id}`), or null when Stripe has no such event in
+	 * this account (404, or an id that cannot be one). Any other answer throws a CalloutException,
+	 * so the processing job logs it and leaves the event Received for its next run (R-PEV4).
 	 */
-	public static Boolean verify(String rawBody, String header, Long nowSeconds) {
-		String secret = PaymentService.keys().Stripe_Webhook_Secret__c;
-		if (String.isBlank(secret) || String.isBlank(header) || rawBody == null) {
-			return false;
-		}
-		String signedAt;
-		List<String> signatures = new List<String>();
-		for (String part : header.split(',')) {
-			String name = part.substringBefore('=').trim();
-			String value = part.substringAfter('=').trim();
-			if (name == 't') {
-				signedAt = value;
-			} else if (name == 'v1') {
-				signatures.add(value);
-			}
-		}
-		if (
-			signedAt == null ||
-			!signedAt.isNumeric() ||
-			signedAt.length() > 12 ||
-			signatures.isEmpty()
-		) {
-			return false;
-		}
-		if (Math.abs(nowSeconds - Long.valueOf(signedAt)) > TOLERANCE_SECONDS) {
-			return false;
-		}
-		String expected = EncodingUtil.convertToHex(
-			Crypto.generateMac(
-				'hmacSHA256',
-				Blob.valueOf(signedAt + '.' + rawBody),
-				Blob.valueOf(secret)
-			)
-		);
-		for (String signature : signatures) {
-			if (sameText(expected, signature)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/** Compares in time that does not depend on where the first difference is. */
 	@TestVisible
-	private static Boolean sameText(String a, String b) {
-		if (a == null || b == null || a.length() != b.length()) {
-			return false;
+	private static Map<String, Object> fetch(String eventId) {
+		if (String.isBlank(eventId) || !eventId.startsWith('evt_')) {
+			return null;
 		}
-		Integer difference = 0;
-		for (Integer i = 0; i < a.length(); i++) {
-			difference |= a.charAt(i) ^ b.charAt(i);
+		HttpResponse response = new Http()
+			.send(request('GET', 'events/' + EncodingUtil.urlEncode(eventId, 'UTF-8')));
+		Map<String, Object> body = parse(response.getBody());
+		if (response.getStatusCode() == 404) {
+			return null;
 		}
-		return difference == 0;
+		if (response.getStatusCode() != 200 || text(body.get('id')) != eventId) {
+			throw new CalloutException(
+				'Stripe answered ' + response.getStatusCode() + ': ' + errorOf(body)
+			);
+		}
+		return body;
 	}
 
-	/** Reads a verified event; no callout. */
+	/**
+	 * A test call through the Named Credential (`GET /v1/balance`, which reads nothing private
+	 * and says whether the key is live). Never throws and writes nothing, so a caller can still
+	 * write after it: a failure is `ok` false with Stripe's status, or with the exception (no
+	 * principal access, or no key entered on the principal) for the caller to log.
+	 */
+	public static Connection checkConnection() {
+		Connection result = new Connection();
+		try {
+			HttpResponse response = new Http().send(request('GET', 'balance'));
+			result.statusCode = response.getStatusCode();
+			Map<String, Object> body = parse(response.getBody());
+			result.ok = result.statusCode == 200 && body.get('livemode') instanceof Boolean;
+			result.live = result.ok ? (Boolean) body.get('livemode') : null;
+		} catch (Exception failed) {
+			result.failure = failed;
+		}
+		return result;
+	}
+
+	/**
+	 * Reads a received event: fetches it back from Stripe by its id and uses only that copy, so a
+	 * forged post changes nothing (R-PEV2). One Stripe does not have is Rejected.
+	 */
 	public static PaymentService.Outcome read(Payment_Event__c event) {
 		PaymentService.Outcome outcome = new PaymentService.Outcome(event);
-		Map<String, Object> body = parse(event.Payload__c);
+		Map<String, Object> body = fetch(text(parse(event.Payload__c).get('id')));
+		if (body == null) {
+			return outcome.nothing(
+				'Rejected',
+				BarnHelp.text('Payments', 'Payments_Event_NotFoundAtStripe')
+			);
+		}
+		event.Event_Key__c = 'stripe:' + text(body.get('id'));
+		event.Event_Type__c = text(body.get('type'))?.left(100);
 		Map<String, Object> data = mapOf(body.get('data'));
 		Map<String, Object> obj = mapOf(data.get('object'));
 		Map<String, Object> metadata = mapOf(obj.get('metadata'));

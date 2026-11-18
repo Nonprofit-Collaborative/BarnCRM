@@ -8,6 +8,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 	public static final Set<String> NAMES = new Set<String>{
 		'Accounting_Export',
 		'Address_Verification_Admin',
+		'Address_Verification_User',
 		'BarnCRM_Access_Manager',
 		'BarnCRM_Accounts_Tab',
 		'BarnCRM_Admin',

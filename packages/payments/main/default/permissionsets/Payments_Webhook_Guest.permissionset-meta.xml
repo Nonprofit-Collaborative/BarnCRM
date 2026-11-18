@@ -3,11 +3,20 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Payments Webhook Guest</label>
   <description>
-    For a Salesforce Site guest user only: receives Stripe and PayPal events. Grants the webhook
-    receiver Apex class, and no object or field.
+    For a Site guest user only: receives Stripe and PayPal events and lets a public page start a
+    checkout. The webhook receiver class and principal access to both credentials (never their
+    values); no object or field.
   </description>
   <classAccesses>
     <apexClass>PaymentWebhookRest</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_PayPal-Barn_PayPal_App</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Stripe-Barn_Stripe_Key</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
 </PermissionSet>

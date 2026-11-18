@@ -6,8 +6,11 @@
  * of the transaction it is in; the one write here, a new shared product's id, follows the last.
  */
 public with sharing class PaymentPayPal {
-	public static final String LIVE_BASE = 'https://api-m.paypal.com';
-	public static final String TEST_BASE = 'https://api-m.sandbox.paypal.com';
+	/** The External Credential behind both Named Credentials (canonical model R-PK1). */
+	public static final String CREDENTIAL = NamespaceUtil.qualify('Barn_PayPal');
+	public static final String LIVE_BASE = 'callout:' + NamespaceUtil.qualify('Barn_PayPal_Live');
+	public static final String TEST_BASE =
+		'callout:' + NamespaceUtil.qualify('Barn_PayPal_Sandbox');
 	/** Where a payer changes the funding source of their automatic payments (Update Card). */
 	public static final String AUTOPAY = 'https://www.paypal.com/myaccount/autopay/';
 	public static final String AUTOPAY_TEST = 'https://www.sandbox.paypal.com/myaccount/autopay/';
@@ -111,8 +114,8 @@ public with sharing class PaymentPayPal {
 		HttpResponse answer = remembered
 			? send(SUBSCRIPTIONS, plan.subscription(planId, ref, successUrl, cancelUrl), ref)
 			: null;
-		Payment_Keys__c keys = PaymentService.keys();
-		String product = keys.PayPal_Product_Id__c;
+		Payments_Settings__c stored = PaymentService.settings();
+		String product = stored.PayPal_Product_Id__c;
 		if (answer == null || refused(answer)) {
 			String fresh = remembered ? '-' + ref : '';
 			HttpResponse made = product == null
@@ -150,9 +153,12 @@ public with sharing class PaymentPayPal {
 		payment.Subscription_Id__c = payment.Checkout_Id__c;
 		payment.Plan_Key__c = plan.key;
 		payment.Plan_Id__c = planId;
-		if (product != null && !product.equals(keys.PayPal_Product_Id__c)) {
-			keys.PayPal_Product_Id__c = product;
-			update as system keys;
+		if (product != null && !product.equals(stored.PayPal_Product_Id__c)) {
+			Payments_Settings__c change = new Payments_Settings__c(
+				Id = stored.Id,
+				PayPal_Product_Id__c = product
+			);
+			update as system change;
 		}
 	}
 
@@ -426,7 +432,7 @@ public with sharing class PaymentPayPal {
 	private static Boolean verify(Payment_Event__c event) {
 		// Apex names ignore case, so this cannot be called `headers` beside HEADERS.
 		Map<String, Object> sent = PaymentStripe.parse(event.Headers__c);
-		String webhookId = PaymentService.keys().PayPal_Webhook_Id__c;
+		String webhookId = PaymentService.settings().PayPal_Webhook_Id__c;
 		if (String.isBlank(webhookId) || String.isBlank(event.Payload__c)) {
 			return false;
 		}
@@ -455,10 +461,8 @@ public with sharing class PaymentPayPal {
 			PaymentStripe.parse(response.getBody()).get('verification_status') == 'SUCCESS';
 	}
 
-	// The org's own PayPal keys live in the protected setting Payment_Keys__c, not a Named
-	// Credential (ADR-0201 payments module, decision 7): the same setting holds the webhook id
-	// and Stripe's signing secret, which Apex must read, so one write-only place holds them all.
-	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
+	// Every call goes through the Barn_PayPal_Live or Barn_PayPal_Sandbox Named Credential (base);
+	// after sign-in, with the short-lived access token PayPal issued for this transaction.
 	private static HttpResponse send(String path, String body, String requestId) {
 		HttpRequest request = new HttpRequest();
 		request.setEndpoint(base() + path);
@@ -473,32 +477,61 @@ public with sharing class PaymentPayPal {
 		return new Http().send(request);
 	}
 
-	// Signs in with the client id and secret from Payment_Keys__c (see send).
-	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
+	/**
+	 * Signs in with the client credentials grant. The client id and secret are the Barn_PayPal
+	 * External Credential's principal parameters: the Basic header is a merge-field formula that
+	 * Salesforce fills, so Apex never holds them (ADR-NEXT
+	 * `NEXT-provider-secrets-named-credentials.md`). The running user needs principal access.
+	 */
 	private static String accessToken() {
 		if (token != null) {
 			return token;
 		}
-		Payment_Keys__c keys = PaymentService.keys();
+		HttpResponse response = signIn();
+		token = PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('access_token'));
+		if (token == null) {
+			throw new CalloutException('PayPal sign-in failed: ' + response.getStatusCode());
+		}
+		return token;
+	}
+
+	private static HttpResponse signIn() {
+		String credential = '$Credential.' + CREDENTIAL;
 		HttpRequest request = new HttpRequest();
 		request.setEndpoint(base() + '/v1/oauth2/token');
 		request.setMethod('POST');
 		request.setTimeout(20000);
 		request.setHeader(
 			'Authorization',
-			'Basic ' +
-			EncodingUtil.base64Encode(
-				Blob.valueOf(keys.PayPal_Client_Id__c + ':' + keys.PayPal_Client_Secret__c)
-			)
+			'Basic {!BASE64ENCODE(BLOB(' +
+				credential +
+				'.ClientId & ":" & ' +
+				credential +
+				'.ClientSecret))}'
 		);
 		request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
 		request.setBody('grant_type=client_credentials');
-		HttpResponse response = new Http().send(request);
-		token = PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('access_token'));
-		if (token == null) {
-			throw new CalloutException('PayPal sign-in failed: ' + response.getStatusCode());
+		return new Http().send(request);
+	}
+
+	/**
+	 * A test sign-in for Check Connection on Payments Setup, in the current mode. Never throws
+	 * and writes nothing: `ok` when PayPal issued a token, else PayPal's status or the exception
+	 * (no principal access, or nothing entered on the principal) for the caller to log.
+	 */
+	public static PaymentStripe.Connection checkConnection() {
+		PaymentStripe.Connection result = new PaymentStripe.Connection();
+		try {
+			HttpResponse response = signIn();
+			result.statusCode = response.getStatusCode();
+			result.ok =
+				result.statusCode == 200 &&
+				PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('access_token')) !=
+				null;
+		} catch (Exception failed) {
+			result.failure = failed;
 		}
-		return token;
+		return result;
 	}
 
 	/** A refund's capture id, from its `up` link (`.../v2/payments/captures/{id}`), or null. */

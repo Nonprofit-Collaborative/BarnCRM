@@ -4,8 +4,8 @@
  * the installer gets Address Verification Admin, then BarnCRM Admin holders do
  * (`ModuleAccessSyncs`), both queued because an assignment is a setup object write.
  *
- * No key is set at install and nothing is looked up until the keys are entered on Address
- * Verification Setup.
+ * No key is shipped and nothing is looked up until the provider's key is entered on its External
+ * Credential in Setup and Check Connection succeeds on Address Verification Setup (R-AV4).
  */
 @NamespaceAccessible
 public with sharing class AddressVerificationPostInstall implements InstallHandler, ModuleSetup {

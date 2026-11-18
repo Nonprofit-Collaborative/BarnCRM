@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Stripe_Connected__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Set by Check Connection on Payments Setup when a call through the Barn_Stripe Named Credential succeeds (canonical model R-PK1). Written by Payments only; not a setting and not a secret.</description>
+  <externalId>false</externalId>
+  <label>Stripe Connected</label>
+  <type>Checkbox</type>
+</CustomField>

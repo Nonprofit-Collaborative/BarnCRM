@@ -155,7 +155,9 @@ You should see: **Verified** with today's date a moment after saving a deliverab
 **Failed** when the service could not confirm it (check the street and postal code), or
 **Unverified** while it waits. Changing the street, city, state, postal code or country sets it
 back to Unverified until it is checked again. If your admin turned on corrections, a verified
-address may show the service's spelling, such as "St" for "Street". See
+address may show the service's spelling, such as "St" for "Street". If your addresses stay
+Unverified until the next day, your admin has not given you the **Address Verification User**
+permission set, so they are checked overnight instead. See
 [Address Verification](../admin-guide/address-verification.md).
 
 ## To Set a Person's Email Addresses

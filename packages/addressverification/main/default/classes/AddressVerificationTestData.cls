@@ -14,7 +14,10 @@ public class AddressVerificationTestData {
 		return TestUsers.adminWith(ADMIN);
 	}
 
-	/** The provider chosen and its keys entered, with the other choices given. */
+	/**
+	 * The provider chosen and connected (as Check Connection leaves it; the key itself lives on
+	 * its External Credential, which a test cannot fill), with the other choices given.
+	 */
 	public static void connect(String provider, Boolean corrections) {
 		Address_Verification_Settings__c settings = Address_Verification_Settings__c.getOrgDefaults();
 		settings.SetupOwnerId = UserInfo.getOrganizationId();
@@ -23,13 +26,8 @@ public class AddressVerificationTestData {
 		settings.Verify_On_Save__c = true;
 		settings.Recheck_Months__c = 12;
 		settings.Nightly_Limit__c = 200;
+		settings.Connected_Provider__c = provider;
 		upsert settings;
-		Address_Verification_Keys__c keys = Address_Verification_Keys__c.getOrgDefaults();
-		keys.SetupOwnerId = UserInfo.getOrganizationId();
-		keys.Smarty_Auth_Id__c = 'auth-id-1111';
-		keys.Smarty_Auth_Token__c = 'auth-token-2222';
-		keys.Google_Api_Key__c = 'AIza-3333';
-		upsert keys;
 	}
 
 	/** Current addresses of one organization, inserted without the module's handler queueing. */

@@ -56,7 +56,7 @@ private class PaymentServiceTest {
 			PaymentsTestData.connect(PaymentService.STRIPE);
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
 				.answer(
-					'stripe.com',
+					'checkout/sessions',
 					200,
 					'{"id":"cs_test_1","url":"https://checkout.stripe.com/c/pay/cs_test_1"}'
 				);
@@ -74,10 +74,19 @@ private class PaymentServiceTest {
 				started.get('checkoutUrl')
 			);
 			Assert.areEqual(PaymentService.PENDING, started.get('status'), 'Starts Pending');
-			HttpRequest sent = mock.last('stripe.com');
+			HttpRequest sent = mock.last('checkout/sessions');
 			Assert.isTrue(
 				sent.getBody().contains('unit_amount%5D=2500'),
 				'In cents: ' + sent.getBody()
+			);
+			Assert.isTrue(
+				sent.getEndpoint().startsWith('callout:' + PaymentStripe.CREDENTIAL + '/v1/'),
+				'Through the Named Credential: ' + sent.getEndpoint()
+			);
+			Assert.areEqual(
+				'Bearer {!$Credential.' + PaymentStripe.CREDENTIAL + '.SecretKey}',
+				sent.getHeader('Authorization'),
+				'The key is a merge field Salesforce fills, never a value Apex holds'
 			);
 			Assert.areEqual(
 				started.get('reference'),
@@ -120,6 +129,13 @@ private class PaymentServiceTest {
 			);
 			Assert.isTrue(order.getBody().contains('"value":"10.50"'), order.getBody());
 			Assert.areEqual('Bearer tok', order.getHeader('Authorization'), 'Signed in');
+			String signIn = mock.last('oauth2/token').getHeader('Authorization');
+			Assert.isTrue(
+				signIn.startsWith(
+					'Basic {!BASE64ENCODE(BLOB($Credential.' + PaymentPayPal.CREDENTIAL
+				),
+				'The client id and secret are merge fields: ' + signIn
+			);
 		}
 	}
 
@@ -141,7 +157,7 @@ private class PaymentServiceTest {
 			badCurrency.put('currency', 'dollars');
 			assertRefused(api, badCurrency, 'bad currency');
 			PaymentsTestData.processors()
-				.answer('stripe.com', 400, '{"error":{"message":"No such price"}}');
+				.answer('checkout/sessions', 400, '{"error":{"message":"No such price"}}');
 			assertRefused(api, checkout(5), 'processor error');
 			Assert.areEqual(
 				0,
@@ -261,6 +277,87 @@ private class PaymentServiceTest {
 				new List<String>{ 'paymentChanged:Pending>Paid', 'paymentChanged:Paid>Refunded' },
 				told,
 				'The listener is told of each move'
+			);
+		}
+	}
+
+	@IsTest
+	static void aStripeEventIsUsedOnlyAsStripeHasIt() {
+		System.runAs(PaymentsTestData.admin()) {
+			PaymentsTestData.connect(PaymentService.STRIPE);
+			Payment__c payment = PaymentsTestData.payment(
+				PaymentService.STRIPE,
+				PaymentService.PENDING,
+				25
+			);
+			// Posted as paid, but Stripe's own copy says the checkout expired.
+			Payment_Event__c forged = PaymentsTestData.event(
+				PaymentService.STRIPE,
+				'stripe:evt_x',
+				PaymentsTestData.stripeEvent(
+					'evt_x',
+					'checkout.session.completed',
+					new Map<String, Object>{
+						'client_reference_id' => payment.Reference__c,
+						'payment_status' => 'paid'
+					}
+				),
+				null
+			);
+			Payment_Event__c unknown = PaymentsTestData.event(
+				PaymentService.STRIPE,
+				'stripe:evt_none',
+				'{"id":"evt_none","type":"checkout.session.completed"}',
+				null
+			);
+			Payment_Event__c later = PaymentsTestData.event(
+				PaymentService.STRIPE,
+				'stripe:evt_down',
+				'{"id":"evt_down","type":"charge.refunded"}',
+				null
+			);
+			PaymentsTestData.Processors mock = PaymentsTestData.processors()
+				.answer(
+					'events/evt_x',
+					200,
+					PaymentsTestData.stripeEvent(
+						'evt_x',
+						'checkout.session.expired',
+						new Map<String, Object>{ 'client_reference_id' => payment.Reference__c }
+					)
+				)
+				.answer('events/evt_none', 404, '{"error":{"message":"No such event"}}')
+				.answer('events/evt_down', 500, '{"error":{"message":"Try again"}}');
+
+			Test.startTest();
+			runOnce();
+			Test.stopTest();
+
+			Assert.areEqual(
+				PaymentService.CANCELLED,
+				PaymentsTestData.reread(payment.Id).Status__c,
+				'Stripe\'s copy is applied, never the posted body'
+			);
+			Assert.areEqual('Applied', PaymentsTestData.rereadEvent(forged.Id).Status__c);
+			Assert.areEqual(
+				'Bearer {!$Credential.' + PaymentStripe.CREDENTIAL + '.SecretKey}',
+				mock.last('events/evt_x').getHeader('Authorization'),
+				'Fetched through the Named Credential'
+			);
+			Payment_Event__c rejected = PaymentsTestData.rereadEvent(unknown.Id);
+			Assert.areEqual('Rejected', rejected.Status__c, 'Stripe has no such event');
+			Assert.areEqual(
+				BarnHelp.text('Payments', 'Payments_Event_NotFoundAtStripe').abbreviate(255),
+				rejected.Message__c
+			);
+			Assert.areEqual(
+				'Received',
+				PaymentsTestData.rereadEvent(later.Id).Status__c,
+				'A failed fetch is read again by the next run'
+			);
+			Assert.isTrue(
+				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0,
+				'The failed fetch is logged'
 			);
 		}
 	}
