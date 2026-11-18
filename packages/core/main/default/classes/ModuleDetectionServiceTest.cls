@@ -457,6 +457,29 @@ private class ModuleDetectionServiceTest {
 	}
 
 	@IsTest
+	static void aModuleIsBetaWhenItsCatalogRowSaysSoAndCoreNever() {
+		System.runAs(TestUsers.admin()) {
+			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
+			ModuleDetectionService.givingPresentOverride = false;
+			BarnCRM_Module__mdt beta = catalogRow('Events', 'Standard;Nonprofit', null, 5);
+			beta.Beta__c = true;
+			ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{
+				beta,
+				catalogRow('Mailings', 'Standard;Nonprofit', null, 6)
+			};
+			chooseSuite(ModuleDetectionService.SUITE_STANDARD);
+
+			Test.startTest();
+			Map<String, ModuleDetectionService.ModuleInfo> modules = byName();
+			Test.stopTest();
+
+			Assert.isFalse(modules.get('Core').beta, 'Core is not in beta');
+			Assert.isTrue(modules.get('Events').beta, 'The catalog row marks it as beta');
+			Assert.isFalse(modules.get('Mailings').beta, 'Clearing Beta removes the badge');
+		}
+	}
+
+	@IsTest
 	static void aModuleIsNonprofitOnlyWhenItsEditionsLeaveOutTheStandardEdition() {
 		System.runAs(TestUsers.admin()) {
 			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();

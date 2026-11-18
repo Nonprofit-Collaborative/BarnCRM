@@ -15,6 +15,9 @@ identity step, and a first gift to check everything with, which makes nine steps
 numbers the steps as they appear with Giving installed and marks what comes from Giving.
 Without Giving, the steps after step three move up by one.
 
+The modules step lists each module with a **Beta** badge beside its name: every module is in
+Beta right now (D-211). Core has no badge.
+
 Nothing it asks is permanent, except that a feature once on stays on. Every answer is a
 setting you can change later on the BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
 changes. The edition is the one answer you give once, and you give it before the assistant:

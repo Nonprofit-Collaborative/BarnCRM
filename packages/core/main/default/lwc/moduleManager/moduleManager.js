@@ -8,6 +8,7 @@ import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallR
 import finishSetup from '@salesforce/apex/ModuleManagerController.finishSetup';
 import FINISH_SETUP from '@salesforce/label/c.Core_ModuleSetup_FinishButton';
 
+import BETA from '@salesforce/label/c.Core_ModuleManager_Beta';
 import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
 import STATUS_NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
@@ -54,6 +55,7 @@ export default class ModuleManager extends LightningElement {
   installedPackagesUrl = INSTALLED_PACKAGES_URL;
 
   labels = {
+    beta: BETA,
     learnMore: LEARN_MORE,
     newTab: NEW_TAB,
     install: INSTALL,

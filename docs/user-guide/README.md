@@ -10,6 +10,8 @@ Each page is a set of short recipes ("To do X: 1. 2. 3.") using the names you se
 
 What you can do depends on the role your admin gave you on the Access page (for example Fundraising Staff, Team Member or Read Only) and on which modules your organization uses. If a tab, button or panel in this guide is missing for you, ask your admin.
 
+Every BarnCRM module is in Beta right now: a **Beta** badge beside a module's name on the Home page Modules card means it is still maturing and may change. Core is not marked.
+
 ## Pages
 
 ### Getting Started

@@ -165,6 +165,26 @@ describe('c-module-manager', () => {
     expect(row(element, 'Volunteers').querySelector('[data-id="open-app"]')).toBeNull();
   });
 
+  it('shows a Beta badge beside a module the catalog marks as beta, never beside Core', async () => {
+    const base = state('On');
+    getState.mockResolvedValue({
+      ...base,
+      modules: base.modules.map((module) => ({ ...module, beta: module.name !== 'Core' }))
+    });
+    const element = await build();
+
+    const badge = row(element, 'Giving').querySelector('[data-id="beta"]');
+    expect(badge).not.toBeNull();
+    expect(badge.label).toBe('c.Core_ModuleManager_Beta');
+    expect(row(element, 'Core').querySelector('[data-id="beta"]')).toBeNull();
+  });
+
+  it('shows no Beta badge once the catalog row stops marking the module', async () => {
+    const element = await build();
+
+    expect(row(element, 'Giving').querySelector('[data-id="beta"]')).toBeNull();
+  });
+
   it('shows no app link for a module that is not installed', async () => {
     getState.mockResolvedValue(state('NotInstalled'));
     const element = await build();

@@ -42,4 +42,8 @@
     <field>Extensions__c</field>
     <value xsi:type="xsd:string">NightlyStepProvider: RollupsNightlyJobProvider</value>
   </values>
+  <values>
+    <field>Beta__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
 </CustomMetadata>

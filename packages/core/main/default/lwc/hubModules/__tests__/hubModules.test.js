@@ -105,6 +105,22 @@ describe('c-hub-modules', () => {
     expect(all(element, 'module-row')).toHaveLength(0);
   });
 
+  it('shows a Beta badge beside a beta module only', async () => {
+    getState.mockResolvedValue({
+      canEdit: true,
+      modules: [
+        { name: 'Core', status: 'On', canSwitch: false },
+        { name: 'Giving', status: 'On', canSwitch: true, beta: true }
+      ]
+    });
+    const element = await build();
+
+    const badges = all(element, 'beta');
+    expect(badges).toHaveLength(1);
+    expect(badges[0].label).toBe('c.Core_ModuleManager_Beta');
+    expect(all(element, 'module-row')[0].querySelector('[data-id="beta"]')).toBeNull();
+  });
+
   it('names a module by its BarnCRM label when it has one', async () => {
     getState.mockResolvedValue({
       canEdit: true,
