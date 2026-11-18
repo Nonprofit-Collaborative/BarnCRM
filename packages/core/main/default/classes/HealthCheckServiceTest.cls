@@ -373,7 +373,7 @@ private class HealthCheckServiceTest {
 			System.assertEquals(
 				null,
 				find(HealthCheckService.run(), 'mirror_module_absent'),
-				'Mirror is a nonprofit module, so the Standard Edition is not told about it.'
+				'The gift mirrors are in a nonprofit module, so the Standard Edition is not told.'
 			);
 		}
 	}
@@ -415,7 +415,7 @@ private class HealthCheckServiceTest {
 			System.assertEquals(
 				null,
 				find(HealthCheckService.run(), 'mirror_module_absent'),
-				'With Mirror installed there is nothing to suggest.'
+				'With the gift mirrors installed there is nothing to suggest.'
 			);
 		}
 	}

@@ -1,8 +1,8 @@
-# Giving: Gifts, Funds and Batches
+# Fundraising: Gifts, Funds and Batches
 
 Scripts for entering gifts (Gifts tab, Quick Gift Entry, gift batches, import), funds, appeals, in-kind gifts and closed accounting periods. Setup detail: [Gifts](../admin-guide/gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-13). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Fundraising deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-13). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
 
 ## T-GIFT-01: Funds and the Default Fund
 
@@ -13,7 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-13), that fund is the only **General Fund** and the other 7 are sample funds. |
 | 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Totals Last Updated** are read only. |
-| 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
+| 3 | Open **BarnCRM Settings**, **Fundraising**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
 | 5 | Reopen **General Fund**. | **Is Default** is now unticked: only one default exists. |
 | 6 | Edit **General Fund**, tick **Is Default** again, and save. Reopen `Test Fund`. | `Test Fund` is no longer the default. |
@@ -36,7 +36,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Click the **Related** tab and look at the **Gift Allocations** list. | One allocation: **General Fund**, 250.00. |
 | 5 | Open the allocation, click **Edit**, set **Amount** to `100`, save. | Refused: "The allocations of this gift total 100.00, but the gift is 250.00. The difference is 150.00." |
 | 6 | Cancel the edit. | The allocation stays 250.00. |
-| 7 | Check the gift's action bar. | **Edit** and **Refund or Write Off** show. **Delete** does not (Giving Staff cannot delete). |
+| 7 | Check the gift's action bar. | **Edit** and **Refund or Write Off** show. **Delete** does not (Fundraising Staff Access cannot delete). |
 | 8 | Open Harper Garcia from the **Donor Contact** link and refresh after a few seconds. | The **Giving** section shows **Total Giving** including the 250 and **Totals Last Updated** close to now (in **Giving Details**). On the **Related** tab, the **Gifts** list shows the new gift first. |
 
 **Cleanup:** none; T-GIFT-03 and other pages reuse the gift.
@@ -62,7 +62,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-GIFT-04: Quick Gift Entry
 
 **Purpose:** confirm the one-screen form saves gifts with defaults, Save and new keeps the shared values, and a double save is blocked.
-**Prerequisites:** staff; General Fund is the default. In **BarnCRM Settings**, **Giving**, set **Default appeal** to `Annual Fund` (as admin).
+**Prerequisites:** staff; General Fund is the default. In **BarnCRM Settings**, **Fundraising**, set **Default appeal** to `Annual Fund` (as admin).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -182,7 +182,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Pick **Harper Garcia** on line 1 and set its **Amount** to `100`. **Add Line** for **Luis Garcia** with **Amount** `-40`. | Status: Balanced (100 less 40 is 60). |
 | 4 | Click **Create Gifts**. | "Some lines are not finished..." Line 2 shows "This line needs an amount greater than zero. Money that went back is recorded as a refund on the gift, not here." No gift is created. |
 | 5 | Set line 2's **Amount** to `40` and line 1's to `20`, then click **Save**. Do not create the gifts. | "Lines saved." Status: Balanced. |
-| 6 | As read-only, open **Gift Batches**, list view **Open Batches**, open `Bad lines`. | "You can see this batch but not change it or create its gifts. Ask your BarnCRM admin for the Giving Staff permission set, or for edit access to this batch." No **Add Line**, **Save** or **Create Gifts**. |
+| 6 | As read-only, open **Gift Batches**, list view **Open Batches**, open `Bad lines`. | "You can see this batch but not change it or create its gifts. Ask your BarnCRM admin for the Fundraising Staff Access permission set, or for edit access to this batch." No **Add Line**, **Save** or **Create Gifts**. |
 | 7 | As read-only, look at the **Gift Batches** tab header. | No **New** button. |
 
 **Cleanup:** as admin, delete batch `Bad lines` (staff cannot delete a batch).
@@ -194,7 +194,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, **Accounting Periods**, **Open**. | Card **Accounting Periods** with **Books Closed Through** and "No period is closed." |
+| 1 | Open **BarnCRM Settings**, **Fundraising**, **Accounting Periods**, **Open**. | Card **Accounting Periods** with **Books Closed Through** and "No period is closed." |
 | 2 | Set **Books Closed Through** to today, click **Save**. | Refused: "The books can be closed through the day before yesterday at the latest..." |
 | 3 | Set it to the last day of last month (on the 1st or 2nd, the month before), click **Save**. | "Saved. The books are closed through the date shown." |
 | 4 | On **Quick Gift Entry**, enter a gift for Harper Garcia, 20, Cash, **Gift Date** in last month. Save. | Not saved; the message starts "The books are closed through", naming the date. |
@@ -230,7 +230,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 **Cleanup:** none after undo.
 
-## T-GIFT-12: Giving Access by Permission Set
+## T-GIFT-12: Fundraising Access by Permission Set
 
 **Purpose:** confirm what staff and read-only users can and cannot do with gifts and funds.
 **Prerequisites:** staff, then read-only, then admin; any sample gift; for step 6, a user with no BarnCRM role.
@@ -242,19 +242,19 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | As read-only, open the **BarnCRM Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
 | 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add Credit** is disabled. |
 | 5 | As read-only, open a person with gifts in the BarnCRM Fundraising app. | The **Giving** section and **Gifts** list show; there is no **Enter a Gift** button. |
-| 6 | As admin, on BarnCRM Settings, **Access**, give the user with no role the **BarnCRM Admin** role. Wait up to an hour, or run `ModuleAccessSyncs.requestFor('Giving');` in Anonymous Apex. In Setup, open the user's **Permission Set Assignments**. | **Giving Admin** is assigned, without anyone giving it. Cleanup: remove the role and Giving Admin. |
+| 6 | As admin, on BarnCRM Settings, **Access**, give the user with no role the **BarnCRM Admin** role. Wait up to an hour, or run `ModuleAccessSyncs.requestFor('Giving');` in Anonymous Apex. In Setup, open the user's **Permission Set Assignments**. | **Fundraising Admin** is assigned, without anyone giving it. Cleanup: remove the role and Fundraising Admin. |
 
 **Cleanup:** none.
 
 ## T-GIFT-13: A New Org Starts with a Default Fund
 
-**Purpose:** a freshly deployed Giving org already has one default fund, so the first gift works without any setup.
+**Purpose:** a freshly deployed Fundraising org already has one default fund, so the first gift works without any setup.
 **Prerequisites:** a new org deployed with `scripts/org/deploy-packages.sh` (default settings) or installed as packages, with no fund created by hand and no sample data loaded. Admin user.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **Funds** tab, list view **All Funds**. | Exactly one fund: **General Fund**, **Active** ticked, **Restricted** and **Accounting Code** empty, **Is Default** ticked. |
-| 2 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows **General Fund**, not blank. |
+| 2 | Open **BarnCRM Settings**, **Fundraising**. | **Default fund** shows **General Fund**, not blank. |
 | 3 | Open the **Home** tab and the Setup Assistant step **Pick your default fund and appeal**. | The fund picker shows **General Fund** already chosen. |
 | 4 | Enter a gift for any person without choosing a fund. | It saves, with one allocation for the whole amount to **General Fund**. |
 | 5 | Rename the fund to `Annual Giving` and untick **Is Default**. Run the deploy script (or reinstall the package) again. | No second **General Fund** appears. **All Funds** still shows one fund, named `Annual Giving`, and the Default Fund setting is blank. |
@@ -280,11 +280,11 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-15: Sample Data Reuses the Org's Default Fund
 
 **Purpose:** loading sample data on an org that already has a default fund does not add a second General Fund, and removing it leaves the org's fund.
-**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-13), no sample data loaded.
+**Prerequisites:** admin; a new Fundraising org with its starting **General Fund** as the default (T-GIFT-13), no sample data loaded.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Giving installed. | The load finishes. |
+| 1 | Open **BarnCRM Settings**, **Sample Data**, and load the sample data with Fundraising installed. | The load finishes. |
 | 2 | Open the **Funds** tab, list view **All Funds**. | One **General Fund** (yours, still the default) and seven sample funds, 8 in all. |
 | 3 | Open **General Fund** and its gifts. | Sample gifts are allocated to it. |
 | 4 | Select **Remove Sample Data** and confirm. | The removal finishes. |
@@ -295,11 +295,11 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-16: Split a Gift Across Funds with Edit Funds
 
 **Purpose:** the gift page's **Edit Funds** splits a gift in one save, keeps the split adding up, and respects the posting lock.
-**Prerequisites:** T-GIFT-01; an active fund **Building Fund**; the **Gift Allocations** card on the Gift record page; a test user with **Giving Staff** and one with **Giving Admin**.
+**Prerequisites:** T-GIFT-01; an active fund **Building Fund**; the **Gift Allocations** card on the Gift record page; a test user with **Fundraising Staff Access** and one with **Fundraising Admin**.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the Giving Staff user, enter a 200.00 gift with no fund and open it. | **Gift Allocations** shows one row: General Fund, 200.00, 100%, and an **Edit Funds** button. |
+| 1 | As the Fundraising Staff Access user, enter a 200.00 gift with no fund and open it. | **Gift Allocations** shows one row: General Fund, 200.00, 100%, and an **Edit Funds** button. |
 | 2 | Click **Edit Funds**. | One row (General Fund, 200.00, 100%), **Add a Fund**, a green "Left to assign: $0.00" badge, **Save** and **Cancel**. |
 | 3 | Set the row's **Percent** to `50`. | **Amount** becomes 100.00; the badge turns amber, "Left to assign: $100.00"; **Save** is off. |
 | 4 | Click **Add a Fund**. | A second row with **Amount** 100.00 and no fund; a bar with one divider appears under the rows. |
@@ -308,8 +308,8 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 7 | Drag the divider back to the middle with the mouse or a finger. | The split returns to about 50% each and the totals still leave 0.00 to assign. |
 | 8 | Choose **General Fund** in the second row too. | A warning: "Each fund can be chosen once. Put all of its amount on one row." **Save** is off. Choose **Building Fund** again. |
 | 9 | Click **Save**. | "Funds saved. The gift's allocations now match the split." Two rows, General Fund and Building Fund, adding up to 200.00. Building Fund's **Total Raised** includes its share after the next rollup. |
-| 10 | Still as the Giving Staff user, click **Edit Funds**, delete the Building Fund row, set General Fund to 200.00, click **Save**. | Saved: one row, General Fund 200.00. Giving Staff may delete Gift Allocations (plan D-176). |
-| 11 | Split the gift again (General Fund 100.00, Building Fund 100.00), then as the Giving Admin user repeat step 10. | Saved: one row, General Fund 200.00. |
+| 10 | Still as the Fundraising Staff Access user, click **Edit Funds**, delete the Building Fund row, set General Fund to 200.00, click **Save**. | Saved: one row, General Fund 200.00. Fundraising Staff Access may delete Gift Allocations (plan D-176). |
+| 11 | Split the gift again (General Fund 100.00, Building Fund 100.00), then as the Fundraising Admin user repeat step 10. | Saved: one row, General Fund 200.00. |
 | 12 | Mark the gift posted on the **Accounting Export** page and reopen it. | **Edit Funds** is gone; an info notice reads "This gift is in the books (posted to accounting, or dated in a closed period), so its funds and amounts to each cannot change. Record a refund instead." |
 
 **Cleanup:** unpost the gift from its **Posting** card, then delete it.
@@ -329,8 +329,8 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 ## T-GIFT-18: Giving at a Glance in the BarnCRM App
 
-**Purpose:** Core's person and organization pages show Giving's summary card, and Enter a Gift opens Quick Gift Entry for that donor.
-**Prerequisites:** staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded.
+**Purpose:** Core's person and organization pages show Fundraising's summary card, and Enter a Gift opens Quick Gift Entry for that donor.
+**Prerequisites:** staff (Fundraising Staff Access); a read-only user with Fundraising Read Only; sample data loaded.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -339,14 +339,14 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | Save a gift of 25, go back to Harper and refresh. | **Total Giving** has gone up by 25 and **Last Gift Date** is today. |
 | 4 | Open **The Garcia Family** and an organization that gave. | Each shows the card with its own figures. |
 | 5 | As the read-only user, open Harper Garcia. | The card shows without **Enter a Gift**. |
-| 6 | As a user with no Giving permission set, open Harper Garcia. | No card; the sidebar starts with the next card. |
+| 6 | As a user with no Fundraising permission set, open Harper Garcia. | No card; the sidebar starts with the next card. |
 
 **Cleanup:** refund or delete the gift from step 3.
 
 ## T-GIFT-19: Stock, Planned and Donor-Advised Fund Gift Details
 
 **Purpose:** a gift carries stock, planned gift and gift source details, the fields show when they apply, and the DAF and Stock report lists the gifts (G-21, G-31).
-**Prerequisites:** staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded.
+**Prerequisites:** staff (Fundraising Staff Access); a read-only user with Fundraising Read Only; sample data loaded.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -355,7 +355,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | Enter a second gift for Luis Garcia: **Amount** `1000`, **Payment Method** `Check`. Edit it: **Gift Source** `Donor-Advised Fund`, **Gift Source Name** `Example Charitable Fund`. Save. | **Gift Source Name** shows once **Gift Source** is set. **Stock Symbol** and **Shares** are not shown on a check. |
 | 4 | Open Luis Garcia. | **Total Giving** went up by 6,000: the donor is still credited. |
 | 5 | Edit the check gift: **Planned Gift Type** `Bequest`. Save. | Saved; the value shows. |
-| 6 | In **Reports**, folder **BarnCRM Giving**, run **DAF and Stock Gifts This Year**. | Both gifts are listed with **Gift Source**, **Gift Source Name**, **Stock Symbol** and **Shares**; the total is 6,000. |
+| 6 | In **Reports**, folder **BarnCRM Fundraising**, run **DAF and Stock Gifts This Year**. | Both gifts are listed with **Gift Source**, **Gift Source Name**, **Stock Symbol** and **Shares**; the total is 6,000. |
 | 7 | As the read-only user, open the stock gift. | The details show and cannot be edited. |
 
 **Cleanup:** delete both gifts.
@@ -363,7 +363,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-20: Donor Panel in Quick Gift Entry
 
 **Purpose:** choosing a donor in Quick Gift Entry shows their household, totals, recent gifts and open pledges and recurring gifts, read only.
-**Prerequisites:** staff (Giving Staff); sample data loaded; a person donor with a household, at least four gifts and an Active pledge with a scheduled payment still open.
+**Prerequisites:** staff (Fundraising Staff Access); sample data loaded; a person donor with a household, at least four gifts and an Active pledge with a scheduled payment still open.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -391,7 +391,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 ## T-GIFT-22: NPSP Funds, Levels and Recurring Donations Kit
 
-**Purpose:** confirm the kit copies NPSP General Accounting Units, levels and recurring donations into Giving and never changes NPSP.
+**Purpose:** confirm the kit copies NPSP General Accounting Units, levels and recurring donations into Fundraising and never changes NPSP.
 **Prerequisites:** admin; an org with NPSP installed (a test org, never production); in NPSP, a General Accounting Unit "Building Fund", a level "Friend" (100 to 499.99), an open monthly recurring donation of 25 for a contact with a next payment date next month, an open one of 60 every 3 months (Installment Period Monthly, Installment Frequency 3) for a second contact, and a closed yearly one of 500 for an organization.
 
 | Step | Action | Expected result |
@@ -430,7 +430,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 1 | Send the form for amount 25, then choose the back link on Stripe's checkout. | Back on the appeal page with "Your payment was cancelled and nothing was charged". |
 | 2 | Wait for processing; open the appeal's gifts. | A **Pending** gift of 25 with a **Payment Reference**; after Payments cancels the abandoned checkout, **Cancelled**. |
 | 3 | Send the form with the amount blank or 0. | The form refuses a blank amount; for 0, "something went wrong" and nothing is stored. |
-| 4 | Send the form for amount 3. | "Something went wrong", no checkout, nothing stored; the Error Log says the amount is below the page minimum of 5.00 (**Donation Page Minimum Amount** in Settings, Giving section). |
+| 4 | Send the form for amount 3. | "Something went wrong", no checkout, nothing stored; the Error Log says the amount is below the page minimum of 5.00 (**Donation Page Minimum Amount** in Settings, Fundraising section). |
 | 5 | Open **Health Check** after editing the "Give" form to remove the `amount` question and publishing it. | `Donation Forms Without an Amount Question` links Winter Coats. Put the question back and publish: the finding is gone. |
 | 6 | On Payments Setup, clear the Stripe keys; reload the page. | The appeal shows with "Online giving for this appeal is not open right now" and no form. |
 

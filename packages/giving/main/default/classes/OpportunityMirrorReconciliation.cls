@@ -81,28 +81,28 @@ public with sharing class OpportunityMirrorReconciliation {
 	public static Comparison compare(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
 			);
 		}
 		if (fromDate > toDate) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 		}
 		if (!OpportunityMirrorService.isAvailable()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_Unavailable')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Unavailable')
 			);
 		}
 		// User mode reads of a field the viewer cannot see fail with the platform's own words.
 		if (!Gift__c.Opportunity_Id__c.getDescribe().isAccessible()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoLinkAccess')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoLinkAccess')
 			);
 		}
 		if (!canReadOpportunities()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoOpportunityRead')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoOpportunityRead')
 			);
 		}
 		String opportunityObject = OpportunityMirrorService.opportunityType()
@@ -113,7 +113,7 @@ public with sharing class OpportunityMirrorReconciliation {
 		// Each gift can cost a second row for its Opportunity, each won one a check for a gift.
 		if (4 * cap > Limits.getLimitQueryRows() - Limits.getQueryRows()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorTooMany')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany')
 			);
 		}
 		List<SObject> won = OpportunityMirrorSelector.wonInRange(
@@ -124,7 +124,7 @@ public with sharing class OpportunityMirrorReconciliation {
 		);
 		if (won.size() > maxRecords) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorTooMany')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany')
 			);
 		}
 
@@ -145,7 +145,7 @@ public with sharing class OpportunityMirrorReconciliation {
 		for (List<Gift__c> chunk : Database.query(OpportunityMirrorSelector.GIFTS_IN_RANGE_QUERY)) {
 			if (result.giftCount + chunk.size() > maxRecords) {
 				throw new ReconciliationException(
-					BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorTooMany')
+					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany')
 				);
 			}
 			for (Gift__c gift : chunk) {

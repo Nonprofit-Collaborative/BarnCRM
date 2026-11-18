@@ -59,7 +59,7 @@ import sys
 # merged total, 2,427. TARGET follows plan AR-01's expected suite of about 2,400.
 # W10: Programs_NightlyJobs_SchedulesName moved to the Programs help catalog; lowered to 2,426.
 # N-09: raised by 1 for Mirror_Access_AddOnProviderRequests, the Access page sentence of the
-# Provider Requests set Mirror ships now that Salesforce Records Sync is Mirror for Giving's
+# Provider Requests set Mirror ships now that Salesforce Records Sync is Fundraising's
 # (an Access Add-On row names its sentence as a label, which AccessService reads by name).
 BUDGET = 2427
 TARGET = 2400

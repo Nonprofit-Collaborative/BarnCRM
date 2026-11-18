@@ -4,7 +4,7 @@
   <defaultValue>"Off"</defaultValue>
   <description>
     Which way the Opportunity mirror copies: Off, GiftsToOpportunities or OpportunitiesToGifts.
-    Empty reads as Off. Set in the Giving section of BarnCRM Settings.
+    Empty reads as Off. Set in the Fundraising section of BarnCRM Settings.
   </description>
   <externalId>false</externalId>
   <inlineHelpText>

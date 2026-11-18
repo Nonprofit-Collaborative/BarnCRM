@@ -2,7 +2,7 @@
 
 A gift is one thing that arrived: money, stock or goods, from one donor, on one date. This page covers entering a gift, reading the gift page, and recording who else deserves credit for it. To change a gift after it is entered, see [Refunds and write-offs](refunds.md); a gift is never edited away.
 
-Before you start: open the **BarnCRM Fundraising** app. You need the **Fundraising Staff** role (it carries the **Giving Staff** permission set). If the **Quick Gift Entry** tab is missing, ask your admin ([Access](../admin-guide/access.md)).
+Before you start: open the **BarnCRM Fundraising** app. You need the **Fundraising Staff** role (it carries the **Fundraising Staff Access** permission set). If the **Quick Gift Entry** tab is missing, ask your admin ([Access](../admin-guide/access.md)).
 
 ## To Enter a Gift with Quick Gift Entry
 
@@ -75,7 +75,7 @@ In the **BarnCRM** app, a person, household or organization page has a **Giving 
 2. Read the **Giving at a Glance** card.
 3. To record a gift, click **Enter a Gift** on the card. Quick Gift Entry opens with the donor filled in.
 
-You should see: the card's figures move once the gift is saved and the page is refreshed. No card means you have no Giving permission set; no **Enter a Gift** button means you can read gifts but not enter them.
+You should see: the card's figures move once the gift is saved and the page is refreshed. No card means you have no Fundraising permission set; no **Enter a Gift** button means you can read gifts but not enter them.
 
 ## To Read a Gift Page
 
@@ -109,7 +109,7 @@ Use this when a donor asks for part of a gift to go to another fund, for example
 
 You should see: "Funds saved. The gift's allocations now match the split." and one row per fund. With two or more funds you can also drag a divider on the bar under the rows, or select it and press the arrow keys, to move money between the two funds beside it.
 
-If **Edit Funds** is missing and the card says "This gift is in the books", the gift is posted to accounting or dated in a closed period: record a refund instead, or ask your bookkeeper. **Giving Staff** and **Giving Admin** can remove a fund from a gift; if the editor says you cannot, ask your BarnCRM admin.
+If **Edit Funds** is missing and the card says "This gift is in the books", the gift is posted to accounting or dated in a closed period: record a refund instead, or ask your bookkeeper. **Fundraising Staff Access** and **Fundraising Admin** can remove a fund from a gift; if the editor says you cannot, ask your BarnCRM admin.
 
 ## To Add a Soft Credit
 

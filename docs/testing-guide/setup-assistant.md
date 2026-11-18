@@ -4,7 +4,7 @@ Scripts for first-run setup, the Setup Assistant's steps, sample data load and r
 
 Before you start: an org from [Before you test](before-you-test.md), with every module deployed and sample data loaded unless a script says otherwise. T-SA-01 and T-SA-02 need fresh orgs of their own, because first-run setup shows only once.
 
-With Giving installed the assistant has nine steps; with Core alone it has eight and every step after **Confirm How Households Are Named** moves up by one. Step numbers below are the nine-step ones.
+With Fundraising installed the assistant has nine steps; with Core alone it has eight and every step after **Confirm How Households Are Named** moves up by one. Step numbers below are the nine-step ones.
 
 ## T-SA-01: First-Run Setup, Every Feature On
 
@@ -16,7 +16,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 |---|---|---|
 | 1 | As staff, open the **BarnCRM** app. | A window over the home page reads "An administrator needs to finish setting up BarnCRM." and nothing else. There is no **Finish Setup** button. |
 | 2 | As staff, open the **BarnCRM Settings** tab. | The same window, with the same sentence. |
-| 3 | As admin, open the **BarnCRM** app. | A window titled **Set Up BarnCRM**: "Two questions before BarnCRM is ready. You are asked them once." It asks **Which edition?** as two cards, **Standard Edition** ("The full core suite of BarnCRM tools.") and **Nonprofit Edition** ("The core suite plus the nonprofit tools, starting with Giving."), each with an icon, and **What should BarnCRM turn on?** **Turn on all the default core features** is selected. Under them: "No module is installed now. Install modules later from BarnCRM Settings, Modules." The window has no close button. |
+| 3 | As admin, open the **BarnCRM** app. | A window titled **Set Up BarnCRM**: "Two questions before BarnCRM is ready. You are asked them once." It asks **Which edition?** as two cards, **Standard Edition** ("The full core suite of BarnCRM tools.") and **Nonprofit Edition** ("The core suite plus the nonprofit tools, starting with Fundraising."), each with an icon, and **What should BarnCRM turn on?** **Turn on all the default core features** is selected. Under them: "No module is installed now. Install modules later from BarnCRM Settings, Modules." The window has no close button. |
 | 4 | Look at **Finish Setup** before choosing an edition. | It is disabled. |
 | 5 | Press Escape, then press Tab several times. | The window stays open and focus stays inside it. |
 | 6 | Tab to the edition cards and press the Right arrow until **Nonprofit Edition** is selected. | The **Nonprofit Edition** card shows as selected. **Finish Setup** is enabled. |
@@ -52,11 +52,11 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM** app, **Home**. | A **Setup Checklist** card listing all nine steps, each with a progress ring and a **Done**, **Skipped** or **To Do** badge; step 1 has a check mark and **Done**. Only the first step not done (usually step 2) is open. **Setup Checklist** shows once, as the card title, and the only count is "{n} of 9 steps done". Step names are in Title Case. There is no **Back** button. |
-| 2 | Click **1. Choose Your Edition** in the list. | Step 1 opens in place and step 2 closes. "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Giving is installed. Its steps are part of this setup." |
+| 2 | Click **1. Choose Your Edition** in the list. | Step 1 opens in place and step 2 closes. "Edition: **Nonprofit Edition**", "The edition is chosen once." and a **How to Change It Later** link. No edition choice and no **Confirm and Continue**. "Fundraising is installed. Its steps are part of this setup." |
 | 3 | Click **Next**. | Step 2, **Confirm How BarnCRM Fits Your Org**: "Your org uses Person Accounts. Household membership is tracked with one record per person, so a person can be in more than one household and everything you have keeps working." **Recommended for your org**, and **How BarnCRM fits this org** set to **Standalone**. (On the platform-only shape: "This looks like a fresh org, with no other household model and no Person Accounts. BarnCRM can run on its own.") |
 | 4 | Open **How BarnCRM fits this org**. | Only **Standalone** (no NPSP or Nonprofit Cloud is in this org). |
 | 5 | Click **Confirm and Continue**. | Step 3, **Confirm How Households Are Named**, opens with the household naming panel and its preview, and "This step is marked done as soon as you save an answer." **BarnCRM Settings**, **General**, **Coexistence mode** now reads **Standalone**. |
-| 6 | Click **Next**. | Step 4 (with Giving, the default fund and appeal step; with Core alone, the access step). |
+| 6 | Click **Next**. | Step 4 (with Fundraising, the default fund and appeal step; with Core alone, the access step). |
 | 7 | Click **Skip for Now**. | The next step opens. The skipped step shows a warning ring and **Skipped**. |
 | 8 | Reload the page. | The assistant opens on the skipped step again (a skipped step is not finished). |
 
@@ -74,7 +74,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 1 | Go to step 5, **Give Your Colleagues Access**. | **Person** and **Role** pickers, **Give Access**, a **Create a User in Setup** link and a **Set Up Automatic Access** link. |
 | 2 | Choose **Read Only Tester** in **Person** and **Read Only** in **Role**. Click **Give Access**. | "Access given. Add another person, or continue." |
 | 3 | Open **BarnCRM Settings**, **Access** in another tab. | **Read Only Tester** is on the **Read Only** card. |
-| 4 | Back in the assistant, click **Next**, to step 6, **Set Your Organization's Identity**. | **Legal name, as registered** and an **Organization Address** block: **Street**, **Street 2**, **City**, **State** and **Zip Code** on one row, **Country**. No address box is marked required while the address is blank. With Giving, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
+| 4 | Back in the assistant, click **Next**, to step 6, **Set Your Organization's Identity**. | **Legal name, as registered** and an **Organization Address** block: **Street**, **Street 2**, **City**, **State** and **Zip Code** on one row, **Country**. No address box is marked required while the address is blank. With Fundraising, the receipt fields and upload buttons too, with the note "Uploaded files belong to the person who uploads them and stay attached to that person's user record, because Salesforce attaches every uploaded file to a record. Upload from an account that will stay active." |
 | 5 | Enter `Riverside Test Trust` as the legal name and `1 Main St` in **Street**. **Street**, **City**, **State** and **Zip Code** become marked required. Click **Save**. | Nothing is saved: the required boxes are marked. |
 | 6 | Enter `Springfield` in **City**, `IL` in **State** and `62701` in **Zip Code**, leave **Street 2** and **Country** blank, and click **Save**. | The step finishes and the assistant moves on. |
 | 7 | Open **BarnCRM Settings**, **Organization**. | **Organization legal name** reads Riverside Test Trust; the **Organization Address** block shows 1 Main St, Springfield, IL, 62701. Open **General**: **Recent Changes** lists the name and the four address parts. |
@@ -88,18 +88,18 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants, BarnCRM Mirror and BarnCRM Mirror for Giving, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
+| 1 | Go to step 7, **Choose Which Modules to Turn On**. | Core, BarnCRM Rollup Builder, BarnCRM Fundraising, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM Grants and BarnCRM Mirror, each **Present** or **Not installed** with **What this module does**. Then "To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings." |
 | 2 | Click **Next**. | Step 8, **Bring In Your Data**, with **Load the Sample Data** and **Open Super Importer**. Step 7 shows as done. |
 | 3 | Click **Load the Sample Data**. | The **Sample Data** card opens inside the step with status **Loaded** and **Load Sample Data** disabled. |
 | 4 | Click **Open Super Importer**. | Super Importer opens. Go back to **Home**. |
-| 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check That Everything Works**, opens. With Giving, an **Enter Your First Gift** control is offered. The forward button reads **Finish**. |
+| 5 | Click **Next** on step 8. | Step 8 shows as done. Step 9, **Check That Everything Works**, opens. With Fundraising, an **Enter Your First Gift** control is offered. The forward button reads **Finish**. |
 
 **Cleanup:** None.
 
 ## T-SA-06: Finish, Reopen and Start Again
 
 **Purpose:** confirm the completion screen, the Setup complete tile, Reopen setup and Start setup again.
-**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: click any step marked **To Do** or **Skipped** and finish it (for the Giving step, pick a fund and an appeal and click **Save**).
+**Prerequisites:** admin user, after T-SA-05, with every step before 9 done: click any step marked **To Do** or **Skipped** and finish it (for the Fundraising step, pick a fund and an appeal and click **Save**).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -122,10 +122,10 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 2 | Click **Remove Sample Data**. | A dialog "Remove Sample Data?": "This permanently deletes every household, contact, and organization created by the sample data loader. Records you entered yourself are not affected." with **Confirm** and **Cancel**. |
 | 3 | Click **Cancel**. | Nothing changes. |
 | 4 | Click **Remove Sample Data** and **Confirm**. | Status **Removing**; both buttons are disabled. The card refreshes by itself. |
-| 5 | Wait until it changes (a few minutes with Giving). | Status **Not loaded**, a "Sample data removed." toast, **Load Sample Data** enabled, **Remove Sample Data** disabled. |
+| 5 | Wait until it changes (a few minutes with Fundraising). | Status **Not loaded**, a "Sample data removed." toast, **Load Sample Data** enabled, **Remove Sample Data** disabled. |
 | 6 | Open **Households** and search for `Garcia`, then `Staff Household`. | Neither is found. |
 | 7 | Search **Contacts** for `Rita Real`. | Rita Real is still there. |
-| 8 | With Giving, open the **Gifts** tab, **All** list view. | No sample gifts remain. |
+| 8 | With Fundraising, open the **Gifts** tab, **All** list view. | No sample gifts remain. |
 | 9 | Run **Health Check** in **BarnCRM Settings** and look for addresses with no owner. | No address is reported without a person, household or organization; no sample address is left behind. An address you gave Rita Real is still there. |
 
 **Cleanup:** run T-SA-08 to load the sample data again.
@@ -143,7 +143,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 4 | Open the bell. | One notification, **Sample data load finished**: "200 households, 440 people and 25 organizations are ready to explore." |
 | 5 | Click the notification. | **BarnCRM Settings** opens on **General**. |
 | 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. In the simple way of belonging, **Primary Contact** names its first person, and so does every other sample household's (a list view with a Primary Contact column shows none blank). |
-| 7 | With Giving, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
+| 7 | With Fundraising, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
 | 8 | On an org where **Households** is **Off** (for example one where first-run setup left it unticked), load sample data, then open the **Accounts** tab and search for "Garcia". | **The Garcia Family** is named from its people, with both greetings and a member count filled in. No sample household is named just "Household". |
 | 9 | Back on **Sample Data**, read the tiles; then open **Find**, **Saved Queries**, and **Data Manager**, **Backup Sets**. | A **Saved Queries** tile shows 3. Find lists **Sample: People in Rochester**, **Sample: People Born Before 1960** and **Sample: Organizations Backup**, and each runs. Backup Sets lists **Sample: Organizations Backup**. |
 | 10 | Open Susan Patel's household, then Susan Patel. | The household's addresses include a **Seasonal** address in Naples, FL from 1 December to 31 March. Susan's activity history holds the completed meeting **Call before the winter move**. |

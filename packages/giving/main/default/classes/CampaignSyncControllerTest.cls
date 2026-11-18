@@ -10,7 +10,7 @@ private class CampaignSyncControllerTest {
 	}
 
 	private static void switchOn(Boolean enabled) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Campaign_Sync_Enabled__c = enabled;
 		upsert settings;
 	}
@@ -127,8 +127,8 @@ private class CampaignSyncControllerTest {
 			Test.stopTest();
 			Assert.areEqual(
 				CampaignSyncService.isAvailable()
-					? BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_SwitchedOff')
-					: BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_Unavailable'),
+					? BarnHelp.text('Giving', 'Mirror_CampaignSync_SwitchedOff')
+					: BarnHelp.text('Giving', 'Mirror_CampaignSync_Unavailable'),
 				message,
 				'Nothing starts, and the page says why.'
 			);
@@ -142,27 +142,27 @@ private class CampaignSyncControllerTest {
 			Assert.isNull(CampaignSyncController.refusal(status), 'Everything allows it.');
 			status.running = true;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_Running'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_Running'),
 				CampaignSyncController.refusal(status)
 			);
 			status.canSync = false;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_NoCampaignAccess'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_NoCampaignAccess'),
 				CampaignSyncController.refusal(status)
 			);
 			status.canManage = false;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_NoManagePermission'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_NoManagePermission'),
 				CampaignSyncController.refusal(status)
 			);
 			status.switchedOn = false;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_SwitchedOff'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_SwitchedOff'),
 				CampaignSyncController.refusal(status)
 			);
 			status.available = false;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_Unavailable'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_Unavailable'),
 				CampaignSyncController.refusal(status)
 			);
 		}

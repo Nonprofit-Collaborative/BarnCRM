@@ -51,7 +51,7 @@ had none).
 2. **Log the computer into the org.** Run `sf org login web --alias pilot` and sign in as the
    administrator. For the rehearsal, add `--instance-url https://test.salesforce.com`.
 3. **Build the mapping.** From the repository folder, run
-   `python3 scripts/migration/build_mapping.py --packages core,rollups,giving,mirror,mirrorgiving --output mapping.json`,
+   `python3 scripts/migration/build_mapping.py --packages core,rollups,giving,mirror --output mapping.json`,
    listing the BarnCRM packages you have installed. It prints how many kinds of record it will
    copy and which it leaves out, and why.
 4. **Write down your settings.** Open **BarnCRM Settings** and go through every section. Step 7
@@ -60,7 +60,7 @@ had none).
 5. **Stop the scheduled jobs.** A package cannot be removed while one of its jobs is scheduled.
    With Rollup Builder, on the **Rollup Builder** tab of **BarnCRM Admin**, click **Stop the nightly
    recalculation**. In BarnCRM Settings: on **Error Log**, click **Stop**; on **Addresses**, under **Seasonal Address Swap**, stop the nightly
-   swap. With Giving, on **Commitments**, click **Stop the nightly jobs**. With Mirror for Giving, on
+   swap. With Fundraising, on **Commitments**, click **Stop the nightly jobs**, and on
    **Opportunity Mirror**, click **Stop Nightly Run**. With Mirror, turn off **Send Cases to a
    service provider** and wait past the next quarter past the hour, when the hourly Case check
    removes itself. If automation is paused, click **Resume
@@ -74,17 +74,17 @@ had none).
    It writes one file per kind of record into the `pilot-export` folder and prints a count for
    each. The folder holds every person's details: keep it on an encrypted disk, never email it,
    and delete it at step 16.
-8. **Remove the pilot packages**, last installed first: Mirror for Giving, then Mirror and any
-   other module, then Giving, then Rollup Builder, then Core. In Setup, **Installed Packages**, click **Uninstall** beside each one, or
+8. **Remove the pilot packages**, last installed first: Mirror and any
+   other module, then Fundraising, then Rollup Builder, then Core. In Setup, **Installed Packages**, click **Uninstall** beside each one, or
    run `sf package uninstall --package <04t of that package> --target-org pilot --wait 30`
    (`sf package installed list --target-org pilot` shows the identifiers). If Salesforce refuses
    because one of your own reports, flows or fields uses a BarnCRM component, it lists them:
    note each one, delete it (after saving a copy if you need it), and try again.
-9. **Install the managed packages**, Core first, then Rollup Builder, then Giving, then Mirror,
-   then Mirror for Giving and any other module:
+9. **Install the managed packages**, Core first, then Rollup Builder, then Fundraising, then Mirror
+   and any other module:
    `sf package install --package <04t> --target-org pilot --security-type AdminsOnly --wait 30`.
 10. **Get ready to load.** Give yourself the **BarnCRM Admin** role again on the **Access** page.
-    With Giving, also give yourself the Override Receipt Lock and Override Posting Lock
+    With Fundraising, also give yourself the Override Receipt Lock and Override Posting Lock
     permissions for the day (see [Gifts](gifts.md) and
     [Posting and closed periods](posting-and-closed-periods.md)): without them, receipted and
     posted gifts are refused on the way back in. In BarnCRM Settings, **Automation**, pause all
@@ -117,12 +117,12 @@ had none).
   the sandbox, where it costs nothing.
 - **"Unable to uninstall: scheduled jobs" at step 8.** A job is still scheduled. Go back to step
   5; Setup, **Scheduled Jobs**, shows what is left.
-- **Receipted or posted gifts in `refused.csv`** (with Giving). The override permissions from
+- **Receipted or posted gifts in `refused.csv`** (with Fundraising). The override permissions from
   step 10 were missing. Grant them and run step 11 again: only the refused records are retried.
 - **Record numbers changed.** Records named by a running number (relationships and
-  affiliations, for example, and with Giving, gifts) get new numbers when they are loaded back.
+  affiliations, for example, and with Fundraising, gifts) get new numbers when they are loaded back.
   The kit loads them in their original order so the numbers stay close, but numbers skipped by
-  records deleted long ago close up. Any number you typed yourself, and with Giving, receipt
+  records deleted long ago close up. Any number you typed yourself, and with Fundraising, receipt
   numbers, are kept exactly.
 - **History and undo do not come across.** Field history and the 30-day window for undoing an
   import end at the move. Created and last modified dates and names come across only if

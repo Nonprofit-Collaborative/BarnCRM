@@ -31,7 +31,7 @@ for **Error Log**, a telescope for
 **Addresses** a map. On Data Manager, Org Optimizer, Duplicate Matching, Find and Import the
 page name appears once, in the page header, and the tool below it starts with what it is for.
 
-Module tabs follow the same rule: every Giving, Volunteers, Programs, Logic Models, Rollup
+Module tabs follow the same rule: every Fundraising, Volunteers, Programs, Logic Models, Rollup
 Builder and Mirror tab has its own icon, never one shared with another BarnCRM tab (for
 example a stack of cash for **Gifts**, a trophy for **Donor Levels**, a chalkboard for **Logic
 Models**, a sailboat for **Programs**). The full list is in the contributor guide's
@@ -51,7 +51,7 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Org Optimizer, Duplicate Matching, Automation, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Record Inspector | The **Inspect This Record** button at the top of the right column on Contact and Account pages (it has no tab in the apps, D-183) |
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
-| Gifts and everything around them (Giving module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
+| Gifts and everything around them (Fundraising module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
 | Forms and form submissions (Forms module) | The **BarnCRM Forms** app, and **BarnCRM** or **BarnCRM Console** |
 | Events, speakers and venues (Event Management module) | The **BarnCRM Events** app, and **BarnCRM** or **BarnCRM Console** |
@@ -95,10 +95,9 @@ need not switch apps. The modules with no app have their pages only here:
 | Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
 |---|---|---|
 | Rollup Builder | | Rollup Builder |
-| Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters |
+| Fundraising | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Donor Level Ladder, Stewardship Plan Setup, Pledge Reminders, Receipt Letters, Campaign Sync, Opportunity Mirror, Gift Transaction Mirror, Accounting Export |
 | Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Provider Requests |
-| Mirror for Giving | | Campaign Sync, Opportunity Mirror, Accounting Export |
 | Forms | Forms, Form Submissions | |
 | Event Management | Events Home, Event Calendar, Events, Event Speakers, Venues | |
 | Portal Builder | | Portals, Portal Accesses |
@@ -115,7 +114,7 @@ record page from any app, since its module makes that page the org default.
   of every module it deployed itself, as its last step. Nothing to do. Each run sets the four
   apps to exactly Core's pages plus those of the modules it deployed.
 - **Removing a module from a source install**: before deleting the module's components, set the
-  apps back without its pages, naming only the module folders you keep (here Giving and
+  apps back without its pages, naming only the module folders you keep (here Fundraising and
   Rollups):
 
   ```
@@ -179,7 +178,7 @@ person what they can act on:
 | **Files That Arrive Regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
 | **Quick Links**: People, Households, Organizations and Find | Everyone |
 | **Import a File** quick link | Anyone who can run an import (create Import Batches) |
-| Module quick links: **Enter a Gift** (Giving), **Log Hours** (Volunteers), **Enroll** (Programs, for someone who can create enrollments) | Everyone, while that module is installed and turned on in the Module Manager. Each module's links come from its row in the module catalog (`Quick_Links__c` on BarnCRM Module), never from module code; the one-line description under each comes from Core's in-app help text (BarnHelp), like the other quick links' |
+| Module quick links: **Enter a Gift** (Fundraising), **Log Hours** (Volunteers), **Enroll** (Programs, for someone who can create enrollments) | Everyone, while that module is installed and turned on in the Module Manager. Each module's links come from its row in the module catalog (`Quick_Links__c` on BarnCRM Module), never from module code; the one-line description under each comes from Core's in-app help text (BarnHelp), like the other quick links' |
 | **BarnCRM Settings** quick link | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
@@ -238,7 +237,7 @@ Admin role.
 2. Read the **Setup Checklist**. It lists every step with a progress ring and a **Done**,
    **Skipped** or **To Do** badge, opens the first step you have not finished, and counts how
    far you have got, for example "3 of 9 steps done" (eight steps with Core alone, nine with
-   Giving). The steps are guided: each one is done here, on the home page.
+   Fundraising). The steps are guided: each one is done here, on the home page.
 3. The first step, **Choose Your Edition**, is already **Done**: you chose the edition in the
    first-run setup window, and the step only shows that answer.
 4. The next step, **Confirm How BarnCRM Fits Your Org**, says what it found in
@@ -270,7 +269,7 @@ Admin role.
    Automation** link to the Automation section of BarnCRM Settings. The warning disappears by
    itself when the pause expires.
 10. Look at **Modules**. It lists BarnCRM Core and each module installed in your org (with
-    Giving, that is Giving), each with its app's logo, and says for each whether it is on or
+    Fundraising, that is Fundraising), each with its app's logo, and says for each whether it is on or
     installed and off. Click
     **Open the Module Manager** to turn a module on or off.
 11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Import a

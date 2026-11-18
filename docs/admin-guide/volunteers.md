@@ -38,7 +38,7 @@ screen and recurring shifts.
 - Volunteers is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
 - It needs the **BarnCRM Rollup Builder** module installed first: the volunteer totals are
   rollups. Install order is BarnCRM Core, BarnCRM Rollup Builder, then BarnCRM Volunteers.
-- Giving is not needed.
+- Fundraising is not needed.
 
 ## Installing
 
@@ -88,7 +88,7 @@ each role its Volunteers set:
 | BarnCRM role | Volunteers set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Volunteers Admin | Everything, including deleting a record entered by accident |
-| Team Member, Fundraising Staff (Giving) | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
+| Team Member, Fundraising Staff (Fundraising) | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
 | Read Only | Volunteers Read Only | Look at jobs, shifts, sign-ups and volunteer details; sees no hours entries (see below) |
 
 Whoever approves hours also needs **Volunteers Coordinator**: everything Staff does, plus see
@@ -193,7 +193,7 @@ adding a row, click the card's **Refresh** button to see it.
 - **On a record page of your own**, open it in the Lightning App Builder, drag the **Volunteer
   Readiness** component onto it, add a field section with the volunteer fields, and save. To
   have both giving and volunteering on one page, clone
-  **Giving Contact Record Page** (a packaged page is replaced on upgrade), add the component to
+  **Fundraising Contact Record Page** (a packaged page is replaced on upgrade), add the component to
   the copy, and assign the copy.
 
 **Nothing is blocked.** A person whose steps are not current can still be signed up and log
@@ -516,7 +516,7 @@ A coordinator can give a volunteer a PDF letter stating their hours (for a schoo
 requirement, court ordered service or an employer's matching program) or a certificate of
 service. Each one counts only **Approved** hours with a **Date Worked** in the period chosen, and
 only the hours the coordinator can see. It is saved as a file on the person's record (the
-**Files** list), and that file is the record that it was given. Giving is not needed.
+**Files** list), and that file is the record that it was given. Fundraising is not needed.
 
 **Who can.** Making a letter needs the **Manage Volunteers** permission, which the Volunteers
 Coordinator and Volunteers Admin sets give. Only Volunteers Admin edits templates.
@@ -757,8 +757,8 @@ The fiscal year is your org's fiscal year in Setup (shown read only in **BarnCRM
 the hours or sign-up is saved, by anyone who saves it (a total is read only for every role, so
 nobody types one), and the nightly run checks every total again.
 
-**No "last calculated" line on people without Giving.** The line that says when a person's or a
-household's totals were last worked out comes from the Giving module. In an org without Giving,
+**No "last calculated" line on people without Fundraising.** The line that says when a person's or a
+household's totals were last worked out comes from the Fundraising module. In an org without Fundraising,
 volunteer totals on people are still right, but no such line shows. Jobs and shifts always have
 their own **Totals Last Updated**.
 

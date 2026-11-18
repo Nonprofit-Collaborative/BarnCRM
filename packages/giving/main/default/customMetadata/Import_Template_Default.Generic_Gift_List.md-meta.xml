@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">A list of gifts with the donor on each row: donor name and email, amount, date, payment method, payment reference and fund. With the Giving module installed each row becomes a gift for its donor; without it the donor columns load and the gift columns are kept with the row.</value>
+    <value xsi:type="xsd:string">A list of gifts with the donor on each row: donor name and email, amount, date, payment method, payment reference and fund. With the Fundraising module installed each row becomes a gift for its donor; without it the donor columns load and the gift columns are kept with the row.</value>
   </values>
   <values>
     <field>Column_Mapping_JSON__c</field>

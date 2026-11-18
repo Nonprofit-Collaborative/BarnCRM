@@ -250,7 +250,7 @@ private class InboundGiftServiceTest {
 				Assert.isTrue(entry.Message__c.contains('donor_not_found'), 'The code is named.');
 				Assert.isFalse(
 					entry.Message__c.contains(
-						BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorDonorEmailNotFound')
+						BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorDonorEmailNotFound')
 					),
 					'The message stays in the response, out of the log.'
 				);

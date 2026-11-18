@@ -11,7 +11,7 @@ import { iconFor } from 'c/barnIcons';
  * allow and refuses in words; the page shows the state, the counts, and the one button.
  */
 export default class CampaignSync extends LightningElement {
-  helpReady = isHelpLoaded('MirrorGiving');
+  helpReady = isHelpLoaded('Giving');
 
   /**
    * What this page needs from Setup, shown by Core's settingsSetupNotes with its Open in Setup
@@ -21,26 +21,26 @@ export default class CampaignSync extends LightningElement {
     {
       key: 'campaignAccess',
       get what() {
-        return helpText('MirrorGiving', 'Mirror_SetupNote_CampaignSync_What');
+        return helpText('Giving', 'Mirror_SetupNote_CampaignSync_What');
       },
       get why() {
-        return helpText('MirrorGiving', 'Mirror_SetupNote_CampaignSync_Why');
+        return helpText('Giving', 'Mirror_SetupNote_CampaignSync_Why');
       },
       get steps() {
-        return helpText('MirrorGiving', 'Mirror_SetupNote_CampaignSync_Steps');
+        return helpText('Giving', 'Mirror_SetupNote_CampaignSync_Steps');
       },
       link: 'permissionSets'
     },
     {
       key: 'marketingUser',
       get what() {
-        return helpText('MirrorGiving', 'Mirror_SetupNote_MarketingUser_What');
+        return helpText('Giving', 'Mirror_SetupNote_MarketingUser_What');
       },
       get why() {
-        return helpText('MirrorGiving', 'Mirror_SetupNote_MarketingUser_Why');
+        return helpText('Giving', 'Mirror_SetupNote_MarketingUser_Why');
       },
       get steps() {
-        return helpText('MirrorGiving', 'Mirror_SetupNote_MarketingUser_Steps');
+        return helpText('Giving', 'Mirror_SetupNote_MarketingUser_Steps');
       },
       link: 'users'
     }
@@ -49,26 +49,26 @@ export default class CampaignSync extends LightningElement {
   labels = {
     title,
     get intro() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_Intro');
+      return helpText('Giving', 'Mirror_CampaignSync_Intro');
     },
     get unavailable() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_Unavailable');
+      return helpText('Giving', 'Mirror_CampaignSync_Unavailable');
     },
     get switchedOff() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_SwitchedOff');
+      return helpText('Giving', 'Mirror_CampaignSync_SwitchedOff');
     },
     get switchedOn() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_SwitchedOn');
+      return helpText('Giving', 'Mirror_CampaignSync_SwitchedOn');
     },
     get noCampaignAccess() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_NoCampaignAccess');
+      return helpText('Giving', 'Mirror_CampaignSync_NoCampaignAccess');
     },
     get noManagePermission() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_NoManagePermission');
+      return helpText('Giving', 'Mirror_CampaignSync_NoManagePermission');
     },
     syncAll: syncAllLabel,
     get running() {
-      return helpText('MirrorGiving', 'Mirror_CampaignSync_Running');
+      return helpText('Giving', 'Mirror_CampaignSync_Running');
     }
   };
 
@@ -80,7 +80,7 @@ export default class CampaignSync extends LightningElement {
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('MirrorGiving').then(() => {
+      loadHelp('Giving').then(() => {
         this.helpReady = true;
       });
     }
@@ -118,7 +118,7 @@ export default class CampaignSync extends LightningElement {
     }
     const linked = `${this.status.linkedCount}${this.status.linkedCountCapped ? '+' : ''}`;
     const appeals = `${this.status.appealCount}${this.status.appealCountCapped ? '+' : ''}`;
-    return helpText('MirrorGiving', 'Mirror_CampaignSync_Counts')
+    return helpText('Giving', 'Mirror_CampaignSync_Counts')
       .replace('{0}', linked)
       .replace('{1}', appeals);
   }
@@ -168,7 +168,7 @@ export default class CampaignSync extends LightningElement {
   messageOf(failure) {
     return (
       (failure && failure.body && failure.body.message) ||
-      helpText('MirrorGiving', 'Mirror_CampaignSync_ErrorFailed')
+      helpText('Giving', 'Mirror_CampaignSync_ErrorFailed')
     );
   }
 }

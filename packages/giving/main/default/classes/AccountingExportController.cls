@@ -84,7 +84,7 @@ public with sharing class AccountingExportController {
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ErrorFailed')
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFailed')
 			);
 		}
 	}
@@ -118,7 +118,7 @@ public with sharing class AccountingExportController {
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ErrorFailed')
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFailed')
 			);
 		}
 	}
@@ -127,7 +127,7 @@ public with sharing class AccountingExportController {
 	private static void requireExport() {
 		if (!FeatureManagement.checkPermission(EXPORT_PERMISSION)) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_NoExportPermission')
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission')
 			);
 		}
 	}

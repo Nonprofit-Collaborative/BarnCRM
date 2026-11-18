@@ -167,7 +167,7 @@ install must never fail because of a bootstrap step, so every failure goes to th
 instead.
 
 Core creates no Rollup Definitions: the engine is the BarnCRM Rollup Builder module, and
-its `RollupsPostInstall` creates the shipped ones (ADR-0029, ADR-0125). Giving makes the
+its `RollupsPostInstall` creates the shipped ones (ADR-0029, ADR-0125). Fundraising makes the
 same call from `GivingPostInstall` for its own.
 
 Once package versions exist, `sfdx-project.json` names it for the Core package directory:

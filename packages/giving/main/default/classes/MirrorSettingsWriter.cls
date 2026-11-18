@@ -3,7 +3,7 @@
  * the last completed run and its summary of the Opportunity mirror (R-OM8, ADR-0038 point 4) and
  * of the Gift Transaction mirror (R-GT6), read by each mirror's page and by Health Check.
  *
- * A run executes as the administrator who started or scheduled it, and Mirror Settings is a
+ * A run executes as the administrator who started or scheduled it, and Giving Settings is a
  * protected setting nobody edits outside the BarnCRM Settings console, so the run cannot save
  * it in user mode. Only the two run keys are written: when a record exists it is locked and only
  * they are updated, so a direction or start date saved meanwhile is never undone; when none
@@ -13,8 +13,8 @@
 public without sharing class MirrorSettingsWriter {
 	public static void recordOpportunityMirrorRun(Datetime ranAt, String summary) {
 		record(
-			Mirror_Settings__c.Opportunity_Mirror_Last_Run__c,
-			Mirror_Settings__c.Opportunity_Mirror_Last_Summary__c,
+			Giving_Settings__c.Opportunity_Mirror_Last_Run__c,
+			Giving_Settings__c.Opportunity_Mirror_Last_Summary__c,
 			ranAt,
 			summary
 		);
@@ -23,8 +23,8 @@ public without sharing class MirrorSettingsWriter {
 	/** The Gift Transaction mirror's last completed run and its summary (X-07, R-GT6). */
 	public static void recordGiftTransactionMirrorRun(Datetime ranAt, String summary) {
 		record(
-			Mirror_Settings__c.Gift_Transaction_Mirror_Last_Run__c,
-			Mirror_Settings__c.Gift_Transaction_Mirror_Last_Summary__c,
+			Giving_Settings__c.Gift_Transaction_Mirror_Last_Run__c,
+			Giving_Settings__c.Gift_Transaction_Mirror_Last_Summary__c,
 			ranAt,
 			summary
 		);
@@ -36,12 +36,12 @@ public without sharing class MirrorSettingsWriter {
 		Datetime ranAt,
 		String summary
 	) {
-		Mirror_Settings__c keys = new Mirror_Settings__c();
+		Giving_Settings__c keys = new Giving_Settings__c();
 		keys.put(runField, ranAt);
 		keys.put(summaryField, summary == null ? null : summary.left(255));
 		Id stored = lockStored();
 		if (stored == null) {
-			Mirror_Settings__c created = (Mirror_Settings__c) Mirror_Settings__c.SObjectType.newSObject(
+			Giving_Settings__c created = (Giving_Settings__c) Giving_Settings__c.SObjectType.newSObject(
 				null,
 				true
 			);
@@ -66,9 +66,9 @@ public without sharing class MirrorSettingsWriter {
 	/** The org-level record's Id, locked until the transaction ends, or null when none exists. */
 	private static Id lockStored() {
 		Id org = UserInfo.getOrganizationId();
-		List<Mirror_Settings__c> stored = [
+		List<Giving_Settings__c> stored = [
 			SELECT Id
-			FROM Mirror_Settings__c
+			FROM Giving_Settings__c
 			WHERE SetupOwnerId = :org
 			WITH SYSTEM_MODE
 			LIMIT 1

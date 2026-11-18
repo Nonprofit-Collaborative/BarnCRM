@@ -211,7 +211,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 |---|---|---|
 | Volunteer Portal | `volunteer.json`, Volunteers | Open Shifts (Sign Up), My Shifts (Cancel Sign-Up), My Hours (view and log), My Profile |
 | Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
-| Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
+| Donor Portal | `donor.json`, Fundraising | My Fundraising, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
 | Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
 | Applicant Portal | `applicant.json`, Scholarships | Open Cycles (Apply), My Applications (Withdraw), My Awards (Accept Award), My Reports and Conditions, My Details |
 | Member Portal | `member.json`, Memberships | My Membership (Pay Dues), My Directory Listing (edit: show me to other members, where I am, about me), Member Directory (searchable) |

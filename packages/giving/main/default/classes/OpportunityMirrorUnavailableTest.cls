@@ -23,7 +23,7 @@ private class OpportunityMirrorUnavailableTest {
 	}
 
 	private static void choose(String direction) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Opportunity_Mirror_Direction__c = direction;
 		settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
 		upsert settings;
@@ -210,7 +210,7 @@ private class OpportunityMirrorUnavailableTest {
 			Assert.isFalse(status.canRun, 'And that no run can.');
 			for (String action : refusals.keySet()) {
 				Assert.areEqual(
-					BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_Unavailable'),
+					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Unavailable'),
 					refusals.get(action),
 					action + ' is refused in words, before anything starts.'
 				);
@@ -228,12 +228,12 @@ private class OpportunityMirrorUnavailableTest {
 				OpportunityMirrorSchedulable.schedule();
 			}
 			OpportunityMirrorService.unavailableForTest = true;
-			MirrorGivingHealthCheckExtension.nowForTest = System.now().addDays(3);
+			GiftMirrorHealthChecks.nowForTest = System.now().addDays(3);
 			List<HealthCheckService.Finding> findings;
 
 			Test.startTest();
 			System.runAs(admin) {
-				findings = new MirrorGivingHealthCheckExtension().findings();
+				findings = GiftMirrorHealthChecks.findings();
 			}
 			Test.stopTest();
 

@@ -54,7 +54,7 @@ public with sharing class GiftTransactionMirrorService {
 		}
 
 		public override String orphanTemplate() {
-			return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogOrphan');
+			return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogOrphan');
 		}
 
 		/** Writes the grouped refusals as Warnings, in one statement. */
@@ -64,8 +64,8 @@ public with sharing class GiftTransactionMirrorService {
 			}
 			refusals.write(
 				CONTEXT,
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogOne'),
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogMany')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogOne'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogMany')
 			);
 		}
 	}
@@ -81,7 +81,7 @@ public with sharing class GiftTransactionMirrorService {
 	 * an empty setting and a direction this version does not offer.
 	 */
 	public static String direction() {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		String chosen = settings?.Gift_Transaction_Mirror_Direction__c;
 		return chosen != null &&
 			chosen.trim() == GIFTS_TO_GIFT_TRANSACTIONS
@@ -96,7 +96,7 @@ public with sharing class GiftTransactionMirrorService {
 
 	/** The Status value that means paid in this org, as set, or the shipped default (R-GT2). */
 	public static String paidStatus() {
-		String typed = Mirror_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Status__c;
+		String typed = Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Status__c;
 		return String.isBlank(typed) ? DEFAULT_PAID_STATUS : typed.trim();
 	}
 
@@ -105,7 +105,7 @@ public with sharing class GiftTransactionMirrorService {
 	 * nightly run started by anyone uses the same day, and read once per transaction.
 	 */
 	public static Date startDate() {
-		Datetime start = Mirror_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Start__c;
+		Datetime start = Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Start__c;
 		if (start == null) {
 			return null;
 		}
@@ -128,12 +128,12 @@ public with sharing class GiftTransactionMirrorService {
 		String status = paidStatus();
 		if (!GiftTransactionMirrorSchema.isActiveStatus(status)) {
 			return String.format(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_UnknownStatus'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_UnknownStatus'),
 				new List<Object>{ status }
 			);
 		}
 		if (startDate() == null) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoStartDate');
+			return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoStartDate');
 		}
 		return null;
 	}
@@ -200,10 +200,7 @@ public with sharing class GiftTransactionMirrorService {
 			Id typed = MirrorSync.idOf(gift.Gift_Transaction_Id__c, giftTransaction);
 			if (typed == null) {
 				gift.Gift_Transaction_Id__c.addError(
-					BarnHelp.text(
-						'MirrorGiving',
-						'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'
-					)
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_InvalidGiftTransactionId')
 				);
 			} else {
 				gift.Gift_Transaction_Id__c = String.valueOf(typed);
@@ -231,10 +228,10 @@ public with sharing class GiftTransactionMirrorService {
 		MirrorSync.warnLeftBehind(
 			linked,
 			Gift__c.Gift_Transaction_Id__c,
-			BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_DeletedKept'),
+			BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_DeletedKept'),
 			CONTEXT,
-			BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogDeletedOne'),
-			BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogDeletedMany')
+			BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogDeletedOne'),
+			BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogDeletedMany')
 		);
 	}
 
@@ -276,7 +273,7 @@ public with sharing class GiftTransactionMirrorService {
 				result.failed++;
 				result.refusals.add(
 					BarnHelp.text(
-						'MirrorGiving',
+						'Giving',
 						'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'
 					),
 					gift.Name,
@@ -388,7 +385,7 @@ public with sharing class GiftTransactionMirrorService {
 			if (donorOf(gift) == null) {
 				result.failed++;
 				result.refusals.add(
-					BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoAccount'),
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoAccount'),
 					gift.Name,
 					gift.Id
 				);
@@ -403,7 +400,7 @@ public with sharing class GiftTransactionMirrorService {
 			if (existing == null) {
 				result.failed++;
 				result.refusals.add(
-					BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_Missing'),
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Missing'),
 					gift.Name,
 					gift.Id
 				);
@@ -556,10 +553,7 @@ public with sharing class GiftTransactionMirrorService {
 			} else {
 				result.refusals.add(
 					String.format(
-						BarnHelp.text(
-							'MirrorGiving',
-							'Mirror_GiftTransactionMirror_DesignationRefused'
-						),
+						BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_DesignationRefused'),
 						new List<Object>{ MirrorSync.messageOf(saved[i].getErrors()) }
 					),
 					insertedFor[i].Name,

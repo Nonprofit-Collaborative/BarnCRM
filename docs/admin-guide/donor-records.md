@@ -1,4 +1,4 @@
-# A Donor's Giving on Their Record
+# A Donor's Fundraising on Their Record
 
 ## What It Does
 
@@ -16,22 +16,22 @@ Nothing here is calculated on the page. The totals are the rollups BarnCRM keeps
 
 ## How to Turn It On
 
-Nothing to do: it arrives with the Giving module. BarnCRM Giving ships two record pages,
-**Giving Contact Record Page** and **Giving Account Record Page**, and the BarnCRM Fundraising app
+Nothing to do: it arrives with the Fundraising module. BarnCRM Fundraising ships two record pages,
+**Fundraising Contact Record Page** and **Fundraising Account Record Page**, and the BarnCRM Fundraising app
 opens people, households and organizations on them.
 
 Two things to know:
 
 - **In the BarnCRM app, records open on Core's pages, with a Giving at a Glance card.** With
-  Giving installed, the top of the sidebar on a person, household or organization shows
+  Fundraising installed, the top of the sidebar on a person, household or organization shows
   **Giving at a Glance**: **Total Giving**, **Last Gift Date**, **Donor Level** and an
   **Enter a Gift** button that opens Quick Gift Entry with the donor filled in. Nothing to
-  turn on. The card shows only to people with a Giving permission set, and the button only
-  to people who can create gifts. Without Giving the card is not there. If your staff should
-  see the whole Giving page in the BarnCRM app instead, open Setup, then
-  **Lightning App Builder**, edit **Giving Contact Record Page**, choose **Activation**,
+  turn on. The card shows only to people with a Fundraising permission set, and the button only
+  to people who can create gifts. Without Fundraising the card is not there. If your staff should
+  see the whole Fundraising page in the BarnCRM app instead, open Setup, then
+  **Lightning App Builder**, edit **Fundraising Contact Record Page**, choose **Activation**,
   then **App, Record Type, and Profile**, and assign it to the BarnCRM app on desktop and
-  phone. Do the same for **Giving Account Record Page**. This is the one step that needs
+  phone. Do the same for **Fundraising Account Record Page**. This is the one step that needs
   Setup, because a page can only be assigned to another package's app there.
 - **If your organization has its own Contact or Account record page,** it keeps showing
   wherever you assigned it. To add giving to it instead, open it in the Lightning App Builder

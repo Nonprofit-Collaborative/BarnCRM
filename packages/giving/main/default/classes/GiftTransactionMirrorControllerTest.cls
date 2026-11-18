@@ -9,7 +9,7 @@ private class GiftTransactionMirrorControllerTest {
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS;
 			settings.Gift_Transaction_Mirror_Status__c = 'Pending';
 			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
@@ -98,11 +98,11 @@ private class GiftTransactionMirrorControllerTest {
 					.differenceCount
 			);
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder'),
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 				refusalOf(new Action('compare'))
 			);
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_Running'),
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Running'),
 				refusalOf(new Action('copyBackwards')),
 				'A second run waits for the first.'
 			);
@@ -122,7 +122,7 @@ private class GiftTransactionMirrorControllerTest {
 
 			Test.startTest();
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder'),
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 				refusalOf(new Action('copyBackwards')),
 				'An end date before the start is refused before anything starts.'
 			);
@@ -140,28 +140,28 @@ private class GiftTransactionMirrorControllerTest {
 			GiftTransactionMirrorSchema.absentForTest = true;
 			Assert.isFalse(GiftTransactionMirrorController.getStatus().available);
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_Unavailable'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable'),
 				refusalOf(new Action('run'))
 			);
 
 			GiftTransactionMirrorSchema.absentForTest = false;
 			GiftTransactionMirrorSchema.useStandIns();
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDatesRequired'),
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'),
 				refusalOf(new Action('copyNoDates'))
 			);
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Gift_Transaction_Mirror_Start__c = null;
 			upsert as system settings;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoStartDate'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoStartDate'),
 				refusalOf(new Action('schedule')),
 				'Not ready (R-GT2).'
 			);
 			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.OFF;
 			upsert as system settings;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_SwitchedOff'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_SwitchedOff'),
 				refusalOf(new Action('run'))
 			);
 		}
@@ -176,7 +176,7 @@ private class GiftTransactionMirrorControllerTest {
 		System.runAs(ana) {
 			for (String action : new List<String>{ 'status', 'stop', 'compare' }) {
 				Assert.areEqual(
-					BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoUsePermission'),
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoUsePermission'),
 					refusalOf(new Action(action)),
 					action
 				);

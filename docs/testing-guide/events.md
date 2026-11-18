@@ -168,7 +168,7 @@ statuses, the totals and the one-per-organization rule.
 | 6 | Menu **Add Deliverable**: `Banner at the entrance`, Other, **Save**. | `1/4`; the new item is listed. |
 | 7 | Menu **Edit**: Status **Committed**. Save. | The line above the table reads Committed and confirmed: 5,000. |
 | 8 | Choose **No Level**, pick `Beta Org`. Edit it: Status **Confirmed**, Amount `1500`. | A second sponsor with no level; the total reads 6,500. |
-| 9 | Menu **Edit** on `Acme Software`: paste into **Linked Record** the identifier of any Giving gift (only if Giving is installed). | With Giving: its name shows under the sponsor. Without Giving, or an identifier of anything else: no name and no error. |
+| 9 | Menu **Edit** on `Acme Software`: paste into **Linked Record** the identifier of any Fundraising gift (only if Fundraising is installed). | With Fundraising: its name shows under the sponsor. Without Fundraising, or an identifier of anything else: no name and no error. |
 | 10 | On the level `Gold` menu, **Remove**, confirm. | The level is gone; `Acme Software` stays with no level and its checklist. |
 | 11 | Menu **Remove** on `Beta Org`, confirm. | The sponsor and its checklist are gone; the organization is still in BarnCRM. |
 | 12 | As read-only, open **Sponsors**. | The lists show; no Add Level, no Add Sponsor, and the menus offer only Remove for staff (hidden or refused). |

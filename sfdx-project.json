@@ -187,20 +187,6 @@
       "versionNumber": "1.21.0.NEXT",
       "postInstallScript": "MirrorPostInstall",
       "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
-    },
-    {
-      "path": "packages/mirrorgiving",
-      "default": false,
-      "package": "BarnCRM Mirror for Giving",
-      "versionName": "v1.21",
-      "versionNumber": "1.21.0.NEXT",
-      "postInstallScript": "MirrorGivingPostInstall",
-      "dependencies": [
-        { "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" },
-        { "package": "BarnCRM Rollup Builder", "versionNumber": "1.21.0.LATEST" },
-        { "package": "BarnCRM Giving", "versionNumber": "1.21.0.LATEST" },
-        { "package": "BarnCRM Mirror", "versionNumber": "1.21.0.LATEST" }
-      ]
     }
   ],
   "packageAliases": {}

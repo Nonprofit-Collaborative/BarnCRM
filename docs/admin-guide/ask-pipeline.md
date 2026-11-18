@@ -4,7 +4,7 @@
 
 An ask is a request you plan to make, or have made, to one donor: "ask the Garcia family for 5,000 for the new roof by March." The Ask Pipeline keeps every open ask in one place, shows which step each one is at, and records how it ended. Fundraisers see it as a board of cards, one column per step.
 
-It does this without the Salesforce Opportunity object. Giving runs on a Salesforce Platform license, so BarnCRM keeps its own **Ask** record (numbered ASK-000001, ASK-000002 and so on; asks created before release 0.15 keep their eight digit numbers).
+It does this without the Salesforce Opportunity object. Fundraising runs on a Salesforce Platform license, so BarnCRM keeps its own **Ask** record (numbered ASK-000001, ASK-000002 and so on; asks created before release 0.15 keep their eight digit numbers).
 
 Things to hold on to:
 
@@ -15,15 +15,15 @@ Things to hold on to:
 
 ## How to Turn It On
 
-It is part of Giving, so there is no separate switch. Give people one of these permission sets (BarnCRM Settings, **Access**):
+It is part of Fundraising, so there is no separate switch. Give people one of these permission sets (BarnCRM Settings, **Access**):
 
-- **Giving Staff**: creates and edits asks. Cannot delete.
-- **Giving Admin**: also deletes asks.
-- **Giving Read Only**: sees the board and the asks, and cannot change them.
+- **Fundraising Staff Access**: creates and edits asks. Cannot delete.
+- **Fundraising Admin**: also deletes asks.
+- **Fundraising Read Only**: sees the board and the asks, and cannot change them.
 
 Then set your stages, or leave the defaults.
 
-1. Open **BarnCRM Settings** and choose the **Giving** section.
+1. Open **BarnCRM Settings** and choose the **Fundraising** section.
 2. Find **Ask stages**. Type the stage names in order, separated by semicolons.
 3. Save.
 
@@ -55,7 +55,7 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 
 ## A Five-Minute Walkthrough
 
-1. Open **BarnCRM Settings**, **Giving**. Leave **Ask stages** empty to use the defaults.
+1. Open **BarnCRM Settings**, **Fundraising**. Leave **Ask stages** empty to use the defaults.
 2. Open the **BarnCRM Fundraising** app and the **Ask Pipeline** tab. The board shows five empty columns.
 3. Choose **New Ask**. Pick a **Donor Contact**, type an **Ask Amount** of 1,000 and a **Target Date**, and save. The card is in **Identified**.
 4. Drag the card to **Cultivating**. The column counts and totals change.

@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Access page: what Accounting Export grants</shortDescription>
-    <value>Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no Giving set beside it.</value>
+    <value>Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no Fundraising set beside it.</value>
   </labels>
   <labels>
     <fullName>Mirror_Access_AddOnInboundGifts</fullName>

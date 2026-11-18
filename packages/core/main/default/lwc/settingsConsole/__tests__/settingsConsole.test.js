@@ -1756,7 +1756,7 @@ describe('c-settings-console', () => {
 
   describe('Section list groups (UX PR 6)', () => {
     it('groups sections with icons, puts unknown ones in More and Error Log last', async () => {
-      const names = ['General', 'Error Log', 'Giving', 'Kennels', 'Access', 'Import'];
+      const names = ['General', 'Error Log', 'Fundraising', 'Kennels', 'Access', 'Import'];
       getConsoleModel.mockResolvedValue({
         canEdit: true,
         sections: names.map((name) => ({ name, settings: [] }))
@@ -1780,7 +1780,7 @@ describe('c-settings-console', () => {
       expect(items.map((item) => item.name)).toEqual([
         'General',
         'Import',
-        'Giving',
+        'Fundraising',
         'Kennels',
         'Access',
         'Error Log'

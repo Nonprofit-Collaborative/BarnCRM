@@ -87,7 +87,7 @@ public with sharing class InboundGiftRequest {
 			request.amount <= 0 ||
 			request.amount != request.amount.setScale(2, System.RoundingMode.DOWN)
 		) {
-			return invalid(BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorAmount'));
+			return invalid(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorAmount'));
 		}
 
 		if (String.isBlank(request.paymentMethod)) {
@@ -98,7 +98,7 @@ public with sharing class InboundGiftRequest {
 		if (paymentMethod == null) {
 			return invalid(
 				String.format(
-					BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorPaymentMethod'),
+					BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorPaymentMethod'),
 					new List<String>{ String.join(methods.values(), ', ') }
 				)
 			);
@@ -114,13 +114,13 @@ public with sharing class InboundGiftRequest {
 		Boolean byId = String.isNotBlank(request.donorId);
 		Boolean byEmail = String.isNotBlank(request.donorEmail);
 		if (byId && byEmail) {
-			return invalid(BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorDonorBoth'));
+			return invalid(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorDonorBoth'));
 		}
 		if (!byId && !byEmail) {
-			return invalid(BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorDonorMissing'));
+			return invalid(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorDonorMissing'));
 		}
 		if (String.isNotBlank(request.fundId) && String.isNotBlank(request.fundCode)) {
-			return invalid(BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorFundBoth'));
+			return invalid(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorFundBoth'));
 		}
 		return null;
 	}
@@ -147,14 +147,14 @@ public with sharing class InboundGiftRequest {
 
 	private static String required(String field) {
 		return String.format(
-			BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorRequired'),
+			BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorRequired'),
 			new List<String>{ field }
 		);
 	}
 
 	private static String tooLong(String field, Integer limitLength) {
 		return String.format(
-			BarnHelp.text('MirrorGiving', 'Mirror_InboundGift_ErrorTooLong'),
+			BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorTooLong'),
 			new List<String>{ field, String.valueOf(limitLength) }
 		);
 	}

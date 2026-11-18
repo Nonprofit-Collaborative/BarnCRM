@@ -25,7 +25,7 @@ private class OpportunityMirrorRunTest {
 	}
 
 	private static void choose(String direction) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Opportunity_Mirror_Direction__c = direction;
 		upsert settings;
 	}
@@ -95,10 +95,10 @@ private class OpportunityMirrorRunTest {
 		Assert.isNull(OpportunityMirrorBatch.run(), 'And none can start.');
 	}
 
-	private static Mirror_Settings__c stored() {
+	private static Giving_Settings__c stored() {
 		return [
 			SELECT Opportunity_Mirror_Last_Run__c, Opportunity_Mirror_Last_Summary__c
-			FROM Mirror_Settings__c
+			FROM Giving_Settings__c
 			WITH SYSTEM_MODE
 			LIMIT 1
 		];
@@ -236,7 +236,7 @@ private class OpportunityMirrorRunTest {
 				AccessLevel.SYSTEM_MODE
 			)[0];
 			Assert.areEqual(130, (Decimal) copy.get('Amount'), 'The skipped change is put right.');
-			Mirror_Settings__c recorded = stored();
+			Giving_Settings__c recorded = stored();
 			Assert.isTrue(
 				recorded.Opportunity_Mirror_Last_Run__c >= before,
 				'The run is recorded.'
@@ -274,7 +274,7 @@ private class OpportunityMirrorRunTest {
 	@IsTest
 	static void aRecordTypeTheOrgDoesNotHaveMakesNoGifts() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS;
 			settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
 			settings.Opportunity_Mirror_Record_Types__c = 'No_Such_Record_Type';
@@ -315,7 +315,7 @@ private class OpportunityMirrorRunTest {
 	@IsTest
 	static void masterInTheRecordTypeListIsLeftOutAndNamedOnce() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Opportunity_Mirror_Direction__c = OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS;
 			settings.Opportunity_Mirror_Start__c = Datetime.newInstance(2026, 1, 1);
 			settings.Opportunity_Mirror_Record_Types__c = 'Master';
@@ -347,7 +347,7 @@ private class OpportunityMirrorRunTest {
 			];
 			Assert.areEqual(1, warned.size(), 'One Warning a run, not a silent run.');
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_MasterRecordType'),
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_MasterRecordType'),
 				warned[0].Message__c,
 				'It says why Master matches nothing and what to do.'
 			);
@@ -469,7 +469,7 @@ private class OpportunityMirrorRunTest {
 	static void theStartDateIsReadInTheOrgTimeZone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Datetime start = Datetime.newInstanceGmt(2026, 1, 1, 3, 0, 0);
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Opportunity_Mirror_Start__c = start;
 			upsert settings;
 			String zone = [SELECT TimeZoneSidKey FROM Organization LIMIT 1].TimeZoneSidKey;

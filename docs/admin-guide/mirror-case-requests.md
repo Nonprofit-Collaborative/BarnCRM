@@ -13,7 +13,7 @@ resolve it, when it was last synced, and the last error if a send failed. Nothin
 the Case itself, so Mirror adds no fields to Case.
 
 It is off until you turn it on, and it needs the provider to set your org up first. Mirror needs
-only BarnCRM Core: no nonprofit module (Giving or any other) is required for Case requests.
+only BarnCRM Core: no nonprofit module (Fundraising or any other) is required for Case requests.
 
 ## Before You Start
 

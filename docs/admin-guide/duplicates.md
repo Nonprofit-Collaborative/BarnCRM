@@ -387,7 +387,7 @@ choose to save anyway.
    roles deliberately do not, so staff ask an admin to merge two people. Merging two
    households needs no Delete permission (see
    [Household merge and split](household-merge-split.md)). This is Salesforce's own merge, and it keeps
-   the activities and files of both (and, with Giving, their gifts). BarnCRM then adds the
+   the activities and files of both (and, with Fundraising, their gifts). BarnCRM then adds the
    kept person to any household the other one belonged to, and recalculates their totals
    straight away. A household the other person leaves empty is kept, not deleted, because
    records can still point at it: merge it into the kept person's household with **Merge Households** (step 6).
@@ -510,7 +510,7 @@ suggestions. The details are in the **Error Log**, under the context "Duplicate 
 cause and scan again: pairs already found are not suggested twice.
 
 **After merging two people, an empty household is left.** That is on purpose. Records made
-while the other person lived there (with Giving, their gifts) still name that household. Until you merge it, Health Check
+while the other person lived there (with Fundraising, their gifts) still name that household. Until you merge it, Health Check
 lists it under **Households have nobody in them**. Merge it into the kept person's household
 from this panel or with **Merge or Split** on the household's page.
 

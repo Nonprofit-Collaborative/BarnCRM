@@ -1,6 +1,6 @@
 {
   "Admin": {
-    "label": "Giving Admin",
+    "label": "Fundraising Admin",
     "description": ["Maria configures giving and fixes mistakes: funds, appeals, gifts, refunds and", "write-offs, including deleting a record entered by accident."],
     "add": {
       "classAccesses": {
@@ -79,7 +79,7 @@
     }
   },
   "Read_Only": {
-    "label": "Giving Read Only",
+    "label": "Fundraising Read Only",
     "description": ["Tom and Jen look at the giving numbers without being able to change them. The Gift panel", "loads, and every action on it fails, because the package writes in user mode."],
     "readOnly": true,
     "remove": {

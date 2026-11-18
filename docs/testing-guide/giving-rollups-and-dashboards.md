@@ -1,17 +1,17 @@
-# Giving: Rollups and Dashboards
+# Fundraising: Rollups and Dashboards
 
-Scripts for the giving totals on donors, funds and appeals, the Giving Overview dashboard and the retention reports. Setup detail: [Rollups](../admin-guide/rollups.md), [Giving dashboard](../admin-guide/giving-dashboard.md), [Retention reports](../admin-guide/retention-reports.md).
+Scripts for the giving totals on donors, funds and appeals, the Giving Overview dashboard and the retention reports. Setup detail: [Rollups](../admin-guide/rollups.md), [Fundraising dashboard](../admin-guide/giving-dashboard.md), [Retention reports](../admin-guide/retention-reports.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Giving deployed and sample data loaded unless a script says otherwise. Building, editing and switching off your own rollups is covered in [Rollup Builder](rollup-builder.md); this page tests the giving totals Giving ships.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Fundraising deployed and sample data loaded unless a script says otherwise. Building, editing and switching off your own rollups is covered in [Rollup Builder](rollup-builder.md); this page tests the giving totals Fundraising ships.
 
 For every script on this page:
 
-- In **BarnCRM Settings**, **Giving**, set **Default fund** to **General Fund** and save.
+- In **BarnCRM Settings**, **Fundraising**, set **Default fund** to **General Fund** and save.
 - "Enter a gift" means: in the **BarnCRM Fundraising** app, open **Quick Gift Entry**, choose **Person**, pick the **Donor**, type the **Amount**, set **Payment Method** to **Check** and **Fund** to **General Fund**, then select **Save**.
 - Totals are recalculated a few seconds after a save. Refresh the record page before reading a total.
 - Sample data: **The Garcia Family** holds three gifts from Harper Garcia (250, 55 and 80, all Received). **Sofia Ali** and her household have no gifts. **Charlotte Williams** gave once (1,450) and all of it was refunded.
 
-## T-GRD-01: Recalculate Every Giving Total
+## T-GRD-01: Recalculate Every Fundraising Total
 
 **Purpose:** Confirm the shipped giving totals are listed and Recalculate all fills them in.
 **Prerequisites:** admin (see [Test users](before-you-test.md#test-users)).
@@ -81,10 +81,10 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In the **BarnCRM Fundraising** app, open **Dashboards**, folder **BarnCRM Giving**, **Giving Overview**. | The dashboard shows **Gifts this month**, **This month, day by day**, **Giving by month**, **Giving by fund, this year**, **Giving by appeal, this year** and **Top donors, this year**, with numbers from the sample data. |
+| 1 | In the **BarnCRM Fundraising** app, open **Dashboards**, folder **BarnCRM Fundraising**, **Giving Overview**. | The dashboard shows **Gifts this month**, **This month, day by day**, **Giving by month**, **Giving by fund, this year**, **Giving by appeal, this year** and **Top donors, this year**, with numbers from the sample data. |
 | 2 | Note **Gifts this month**. Enter a gift from **Sofia Ali** for 7777. Back on the dashboard select **Refresh**. | **Gifts this month** is 7777 higher. Today's bar in **This month, day by day** includes it. |
 | 3 | Refund all 7777 of that gift. Refresh the dashboard. | **Gifts this month** is back to the step 2 starting value: the original and its refund cancel. |
-| 4 | Open **Reports**, folder **BarnCRM Giving**, **Recent Gifts**. | The 7777 gift (Status Refunded) and its -7777 refund are both listed, newest first. |
+| 4 | Open **Reports**, folder **BarnCRM Fundraising**, **Recent Gifts**. | The 7777 gift (Status Refunded) and its -7777 refund are both listed, newest first. |
 | 5 | Open **Top Donors This Year** from the same folder. | Rows are households, largest first. |
 | 6 | Open **In-kind Gifts This Year**. | Lists in-kind gifts from the sample data; none appear in the money charts. |
 
@@ -99,13 +99,13 @@ For every script on this page:
 |---|---|---|
 | 1 | As staff, open **Giving Overview**. | The six components show numbers. |
 | 2 | As read-only, open **Giving Overview**. | The six components show numbers. |
-| 3 | As read-only, open **Reports**, folder **BarnCRM Giving**, **Giving by Month**. | The report runs. The folder is shared read only, so the report cannot be saved over. |
-| 4 | As staff, open the same report. | The report runs: Giving Staff, like Giving Read Only, carries Salesforce's **Run Reports**. |
-| 5 | As admin, in Setup, remove **Giving Staff** from the staff user. | Saved. |
+| 3 | As read-only, open **Reports**, folder **BarnCRM Fundraising**, **Giving by Month**. | The report runs. The folder is shared read only, so the report cannot be saved over. |
+| 4 | As staff, open the same report. | The report runs: Fundraising Staff Access, like Fundraising Read Only, carries Salesforce's **Run Reports**. |
+| 5 | As admin, in Setup, remove **Fundraising Staff Access** from the staff user. | Saved. |
 | 6 | As staff, open **Giving Overview**. | The components still show numbers: the dashboard runs as its specified user, not as the viewer. The staff user still cannot open gifts or run the reports themselves. |
 | 7 | As admin, open **Giving Overview**, **Edit**, open the dashboard's properties and read **View dashboard as**. | It names the admin who deployed the package. |
 
-**Cleanup:** Give the staff user **Giving Staff** again.
+**Cleanup:** Give the staff user **Fundraising Staff Access** again.
 
 ## T-GRD-07: Retention Reports
 
@@ -114,7 +114,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **Reports**, folder **BarnCRM Giving**, open **LYBUNT Donors**. | Rows are donors (households, organizations), sorted by giving last year, largest first. |
+| 1 | In **Reports**, folder **BarnCRM Fundraising**, open **LYBUNT Donors**. | Rows are donors (households, organizations), sorted by giving last year, largest first. |
 | 2 | Open the first row's donor. | **Giving Last Year** above 0, **Giving This Year** 0 or empty, **Last Gift Date** in last fiscal year. |
 | 3 | Open **SYBUNT Donors**. | Grouped by the fiscal year of the donor's last gift, newest group first. The first group holds the same donors as LYBUNT. |
 | 4 | Open **New Versus Retained Donors**. | Outer groups by fiscal year of first gift. Earlier years split into **Gave last fiscal year** and **Did not give last fiscal year**. Sofia Ali's household (first gift today, T-GRD-02) is in the current year's group. |
@@ -157,14 +157,14 @@ For every script on this page:
 | 4 | Click **Gifts**. | The **Thank-Yous** page opens. Go back and click **My Asks Due This Month**: the Asks list view of that name opens. |
 | 5 | Click **Enter a Gift**. | Quick Gift Entry opens. |
 | 6 | On Fundraising Home, read **Fundraising Setup**. | Four tiles, each with its tab's icon and one line: **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**. Click each: its page opens. |
-| 7 | Read the charts. | **Giving by Month** (a column per month) and **Open Asks by Stage** (a bar per stage) show sample data, in Salesforce's own colors, and follow dark mode when it is on. Click one: its report opens from the **BarnCRM Giving** folder. |
+| 7 | Read the charts. | **Giving by Month** (a column per month) and **Open Asks by Stage** (a bar per stage) show sample data, in Salesforce's own colors, and follow dark mode when it is on. Click one: its report opens from the **BarnCRM Fundraising** folder. |
 | 8 | As staff, open Fundraising Home. | The figures and **Enter a Gift** show. **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters** only. |
 | 9 | As read-only, open Fundraising Home. | The figures show; **Enter a Gift** does not; **Fundraising Setup** has **Pledge Reminders** and **Receipt Letters**. |
 | 10 | As admin, open the **BarnCRM** app's **Home**. | Beside **Errors**, the **Errors by Day** chart shows the last 30 days of Error and Critical Error Log entries. As staff, the chart does not show. |
 | 11 | On a phone, open BarnCRM Fundraising. | Fundraising Home shows the figures two across, then Enter a Gift, then the setup tiles and charts stacked. |
 | 12 | As admin, on Fundraising Home read **More**. | Eight tiles, each with an icon and one line: **Asks**, **Scheduled Payments**, **Funds**, **Appeals**, **Tributes**, **Donor Segments**, **Recurring Donor Health**, **Dashboards**. Click **Funds**: the Funds list opens. Go back and click **Donor Segments**: its page opens. Go back and click **Dashboards**: the Dashboards home opens. |
 | 13 | Open the App Launcher and search `Appeals`. | **Appeals** is listed and opens its list. |
-| 14 | In an org with the Giving module and no gifts yet (a new scratch org before sample data), open Fundraising Home as admin. | **Record Your First Gift** shows with **Enter a Gift** and **Import a File**. **Import a File** opens the **Import** tab. Save one gift and reload: the panel is gone and the figures show. |
+| 14 | In an org with the Fundraising module and no gifts yet (a new scratch org before sample data), open Fundraising Home as admin. | **Record Your First Gift** shows with **Enter a Gift** and **Import a File**. **Import a File** opens the **Import** tab. Save one gift and reload: the panel is gone and the figures show. |
 
 **Cleanup:** None.
 
@@ -184,7 +184,7 @@ For every script on this page:
 | 6 | New event: **Card Expiring**, Donor Email donor B's email, Card Expires the last day of next month. | Matched to donor B's gift by email; its **Card Expires** is set and the gift is listed with the card reason at 10.00 a month. |
 | 7 | New event: **Cancelled**, Subscription Id `sub_none`. | Match Status **Unmatched**. The page says one processor event matches no recurring gift. |
 | 8 | Edit that event, set **Commitment** to donor A's gift, save. | Matched; donor A's gift shows **Cancelled at Processor** and is listed with the cancelled reason. Its Status is still Active. |
-| 9 | In **BarnCRM Settings**, **Giving**, set **Card expiry warning days** to 0 and reopen the page. | Donor B's gift leaves the list. Set it back to 60. |
+| 9 | In **BarnCRM Settings**, **Fundraising**, set **Card expiry warning days** to 0 and reopen the page. | Donor B's gift leaves the list. Set it back to 60. |
 | 10 | As staff without access to donor B's gift, open the page. | Donor B's gift is not counted or listed. |
 
 **Cleanup:** Delete the four events, the task and the two commitments.

@@ -371,7 +371,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-22: Report Subscriptions
 
 **Purpose:** Confirm BarnCRM's reports are listed, a subscription is created for the person through the org connection, a second save updates it, and a missing connection is explained.
-**Prerequisites:** admin with **BarnCRM Metadata Admin**, Customize Application, Modify Metadata and Salesforce's Subscribe to Reports; Giving installed for its reports. For step 1 the org connection is not set up; from step 2 it is set up and connected (see [Creating a New Field From an Import](../admin-guide/import-new-fields.md)). Fewer than 7 report subscriptions of your own.
+**Prerequisites:** admin with **BarnCRM Metadata Admin**, Customize Application, Modify Metadata and Salesforce's Subscribe to Reports; Fundraising installed for its reports. For step 1 the org connection is not set up; from step 2 it is set up and connected (see [Creating a New Field From an Import](../admin-guide/import-new-fields.md)). Fewer than 7 report subscriptions of your own.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -387,7 +387,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 ## T-HC-23: Skew Findings and a Report That Stops Early
 
 **Purpose:** Confirm Health Check reports a fund with very many gifts, and that a run near Salesforce's limits reports the checks it left instead of failing.
-**Prerequisites:** admin with BarnCRM Admin; Giving installed; a test fund you may change. Workbench or the Developer Console to set a field the page does not show.
+**Prerequisites:** admin with BarnCRM Admin; Fundraising installed; a test fund you may change. Workbench or the Developer Console to set a field the page does not show.
 
 | Step | Action | Expected result |
 |---|---|---|

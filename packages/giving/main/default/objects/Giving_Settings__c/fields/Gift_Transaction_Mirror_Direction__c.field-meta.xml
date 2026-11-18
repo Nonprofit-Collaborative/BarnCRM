@@ -4,7 +4,7 @@
   <defaultValue>"Off"</defaultValue>
   <description>
     Whether the Gift Transaction mirror copies gifts to Nonprofit Cloud Gift Transactions: Off or
-    GiftsToGiftTransactions. Empty reads as Off. Set in the Giving section of BarnCRM Settings.
+    GiftsToGiftTransactions. Empty reads as Off. Set in the Fundraising section of BarnCRM Settings.
   </description>
   <externalId>false</externalId>
   <inlineHelpText>

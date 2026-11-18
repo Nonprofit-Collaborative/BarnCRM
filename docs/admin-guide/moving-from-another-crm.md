@@ -1,11 +1,11 @@
 # Moving From Another CRM
 
-**Package:** Giving | **Release:** 1.9 (MIG-07)
+**Package:** Fundraising | **Release:** 1.9 (MIG-07)
 
 ## What It Does
 
 If your donors and gifts are in DonorPerfect, Bloomerang, Little Green Light, Neon CRM, CiviCRM
-or Raiser's Edge NXT, BarnCRM Giving ships a ready-made import template for each one's gift
+or Raiser's Edge NXT, BarnCRM Fundraising ships a ready-made import template for each one's gift
 export. You export the gifts with each donor's name, email and address from the other system,
 and load the file through the **Import** tab like any other file, with a preview first and an
 undo afterwards. Each donor is found by email address, or created when nobody has it; each gift
@@ -29,7 +29,7 @@ that column on the column step. Columns the template does not name are ignored.
 
 ## How to Turn It On
 
-There is nothing to turn on. Giving adds the six templates when it is installed, and an upgrade
+There is nothing to turn on. Fundraising adds the six templates when it is installed, and an upgrade
 adds any template a later version ships, so the **Import** tab lists them. An upgrade never
 changes a template you have edited. If one is missing, open **BarnCRM Settings**, **Health**,
 and select **Restore Import Templates**. Switch off a template you do not need on the

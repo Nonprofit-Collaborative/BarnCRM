@@ -21,16 +21,16 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: the link to the Giving installer</shortDescription>
-        <value>Open the Giving Installer</value>
+        <shortDescription>Setup assistant: the link to the Fundraising installer</shortDescription>
+        <value>Open the Fundraising Installer</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ReadAbout</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Setup assistant: the link to Giving's description</shortDescription>
-        <value>Read About Giving</value>
+        <shortDescription>Setup assistant: the link to Fundraising's description</shortDescription>
+        <value>Read About Fundraising</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_CheckAgain</fullName>

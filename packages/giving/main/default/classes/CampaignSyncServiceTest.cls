@@ -25,7 +25,7 @@ private class CampaignSyncServiceTest {
 	}
 
 	private static void switchOn(Boolean enabled) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Campaign_Sync_Enabled__c = enabled;
 		upsert settings;
 	}
@@ -494,7 +494,7 @@ private class CampaignSyncServiceTest {
 			Test.stopTest();
 			Assert.isFalse(saved.isSuccess(), 'An Account identifier is not a Campaign (R-CS8).');
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_InvalidCampaignId'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_InvalidCampaignId'),
 				saved.getErrors()[0].getMessage(),
 				'The refusal says what the field must hold.'
 			);

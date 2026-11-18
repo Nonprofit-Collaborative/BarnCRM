@@ -20,11 +20,11 @@ A module ships its own permission sets, and a Core role cannot include them. The
 people in one of two ways:
 
 - **Every module's sets follow the roles for you.** Each module gives its Admin set to every
-  BarnCRM Admin (Giving Admin included), its Staff set to every Team Member, and its Read Only
+  BarnCRM Admin (Fundraising Admin included), its Staff set to every Team Member, and its Read Only
   set to every Read Only holder, at the latest within an hour. Fundraising Staff gets every
   staff set Team Member gets except **Programs Staff**, which carries case notes: give a
   fundraiser who works a program the Team Member role as well.
-- **A few sets are chosen per person, on this page.** Giving Staff and Giving Read Only for
+- **A few sets are chosen per person, on this page.** Fundraising Staff Access and Fundraising Read Only for
   anyone outside Fundraising Staff (donor amounts and receipts are given deliberately),
   **Volunteers Coordinator** for whoever approves volunteer hours, and the Mirror sets are under
   "Extra Permissions" below, beside the person's role.
@@ -33,13 +33,13 @@ You never need Setup for either. If you would rather have a module set given aut
 every new user, a Salesforce user access policy can do it: see
 [Automatic access](automatic-access.md).
 
-BarnCRM Core ships three roles. The Fundraising Staff role comes with the Giving module,
-so it is listed only where Giving is installed, which makes four:
+BarnCRM Core ships three roles. The Fundraising Staff role comes with the Fundraising module,
+so it is listed only where Fundraising is installed, which makes four:
 
 | Role | Who it is for | What it gives |
 |---|---|---|
 | BarnCRM Admin | The person who configures the app, usually you | Everything, including BarnCRM Settings, saving Custom Metadata, matching logic and setting up Create New Field in an import |
-| Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
+| Fundraising Staff (with Fundraising) | Development and fundraising staff | Day to day work with people, households, and giving, including the Fundraising Staff Access permission set |
 | Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus each installed module's staff access (programs, volunteer shifts and hours, and so on) |
 | Read Only | Board members, auditors, and anyone who should look but not change | Read access, no editing |
 
@@ -69,36 +69,36 @@ settings show them. That reaches every account and contact in the org, so give t
 people you trust with all of them. To hold it back from someone, add a muting permission set to
 the role in Setup.
 
-Gifts and commitments (pledges and recurring gifts) are private, and no Giving permission set,
-Giving Admin included, gives View All on them. A person sees the gifts and commitments they own,
+Gifts and commitments (pledges and recurring gifts) are private, and no Fundraising permission set,
+Fundraising Admin included, gives View All on them. A person sees the gifts and commitments they own,
 plus the ones your role hierarchy and sharing settings give them; a system administrator sees
 them all through the profile's **View All Data**. If fundraisers should see each other's gifts
 and commitments, give them roles above the owners or a sharing rule in Setup.
 
-## Who Can Read a Donor's Receipts and Tax Statements (with Giving)
+## Who Can Read a Donor's Receipts and Tax Statements (with Fundraising)
 
-This section applies only when the Giving module is installed. Nobody sees a receipt PDF unless they hold one of the Giving module's permission sets. This is
+This section applies only when the Fundraising module is installed. Nobody sees a receipt PDF unless they hold one of the Fundraising module's permission sets. This is
 worth stating plainly, because a file in Salesforce is reached through the record it is attached
 to, not through the record it is about.
 
 | Person | What they hold | Can they open a receipt PDF |
 |---|---|---|
-| Maria, who configures BarnCRM | BarnCRM Admin, plus Giving Admin | Yes |
-| David, who enters the gifts | Fundraising Staff, which includes Giving Staff | Yes |
-| Tom, on the board | Read Only, plus Giving Read Only | Yes, read only |
-| Priya, who coordinates volunteers | Team Member, and no Giving set | No |
-| Sam, in programs | Team Member, and no Giving set | No |
+| Maria, who configures BarnCRM | BarnCRM Admin, plus Fundraising Admin | Yes |
+| David, who enters the gifts | Fundraising Staff, which includes Fundraising Staff Access | Yes |
+| Tom, on the board | Read Only, plus Fundraising Read Only | Yes, read only |
+| Priya, who coordinates volunteers | Team Member, and no Fundraising set | No |
+| Sam, in programs | Team Member, and no Fundraising set | No |
 
 Priya and Sam can open the donor's household and the donor's contact record, because that is
 their job. What they cannot open is the receipt or the year-end statement, because a receipt PDF
 is attached to the **Receipt** record and, for a single gift receipt, to the **Gift**, and both
-of those need a Giving permission set. It is deliberately not attached to the household or the
+of those need a Fundraising permission set. It is deliberately not attached to the household or the
 contact: attaching it there would have handed every donor's tax history, and your organization's
 tax identification number, to everyone who can read a contact.
 
 So to find a donor's receipt, open the donor, then the **Receipts** related list, then the receipt,
 then the file on it. If somebody says they cannot see receipts on a donor's record, that is this,
-and the fix is a Giving permission set, which you give them under "Extra Permissions" below.
+and the fix is a Fundraising permission set, which you give them under "Extra Permissions" below.
 
 Nobody can edit or delete a receipt PDF, whatever they hold. See
 [Receipts and year-end statements](receipts.md).
@@ -136,7 +136,7 @@ Three things control who can use the page:
    Creating users is one of the few things Salesforce does not let an app do for you, so
    that step happens in Setup. See "What still needs Setup" below.
 
-Giving the extra permissions (see "Extra Permissions" below) needs the same two
+Fundraising the extra permissions (see "Extra Permissions" below) needs the same two
 permissions as giving a role.
 
 ## A Five-Minute Walkthrough
@@ -145,7 +145,7 @@ Maria has just hired David to run a program. His Salesforce user already exists.
 Here is how she gives him access, checks it, and takes it away again.
 
 1. Open the BarnCRM app and click the **BarnCRM Settings** tab.
-2. In the left navigation, choose **Access**. You see a card for each role (four with Giving,
+2. In the left navigation, choose **Access**. You see a card for each role (four with Fundraising,
    three without), each with a short description and the people who currently hold that role. On a fresh install only your
    own name appears, on the **BarnCRM Admin** card.
 3. In the **Find a person** box, type `David`. Matching active users appear as you type,
@@ -157,8 +157,8 @@ Here is how she gives him access, checks it, and takes it away again.
    on the Team Member card, and the number in brackets beside the role name goes up
    by one.
 7. David can now sign in and see households and contacts. He does not see BarnCRM
-   Settings, because that belongs to the BarnCRM Admin role. If your org has Giving, he
-   does not see gifts yet either: for that he also needs **Giving Staff**, which you give him
+   Settings, because that belongs to the BarnCRM Admin role. If your org has Fundraising, he
+   does not see gifts yet either: for that he also needs **Fundraising Staff Access**, which you give him
    on this page under "Extra Permissions" below (or give him the Fundraising Staff role,
    which includes it).
 8. To take the role away, find David's name on the Team Member card and click
@@ -191,17 +191,17 @@ A module's sets are listed after them, only where that module is installed:
 | Extra permission | Module | What it lets the person do |
 |---|---|---|
 | Volunteers Coordinator | Volunteers | Approve, reject and correct everyone's volunteer hours, and manage skills, requirements and onboarding steps, on top of what the person's role gives. |
-| Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. Every BarnCRM Admin gets it automatically. |
-| Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
-| Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
+| Fundraising Admin | Fundraising | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. Every BarnCRM Admin gets it automatically. |
+| Fundraising Staff Access | Fundraising | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
+| Fundraising Read Only | Fundraising | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
 | Provider Requests | Mirror | See the Provider Requests tab: the Cases sent to a service provider, with the provider's request number, status and resolution (read only). See [Cases Sent to a Service Provider](mirror-case-requests.md). |
-| Salesforce Records Sync | Mirror for Giving | Open the Campaign Sync, Opportunity Mirror and Gift Transaction Mirror pages and edit the IDs they keep. Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in Setup (and, for Campaigns, the Marketing User box on the person's user). Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror: BarnCRM gives it to everyone who held one of them, who keep the old set until the next release. It no longer includes the Provider Requests tab: give Provider Requests for that. |
-| Accounting Export | Mirror for Giving | Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no Giving set beside it. Which gifts appear still follows your org's sharing. |
-| Inbound Gifts | Mirror for Giving | For an integration, flow or AI assistant user only: record gifts another system sends, through the Inbound Gift API or the Record Inbound Gift action. It needs nothing else from BarnCRM. |
+| Salesforce Records Sync | Fundraising | Open the Campaign Sync, Opportunity Mirror and Gift Transaction Mirror pages and edit the IDs they keep. Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in Setup (and, for Campaigns, the Marketing User box on the person's user). Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror: BarnCRM gives it to everyone who held one of them, who keep the old set until the next release. It no longer includes the Provider Requests tab: give Provider Requests for that. |
+| Accounting Export | Fundraising | Download gifts as a CSV file for your accounting system and mark them posted. Reads the gift fields the file shows, so it needs no other Fundraising set beside it. Which gifts appear still follows your org's sharing. |
+| Inbound Gifts | Fundraising | For an integration, flow or AI assistant user only: record gifts another system sends, through the Inbound Gift API or the Record Inbound Gift action. It needs nothing else from BarnCRM. |
 
 The other module sets (Volunteers Admin, Staff and Read Only, Rollup Builder, and every other
 module's) are not listed, because they follow the roles automatically (see the top of this page):
-removing one here would only be undone within the hour. The same holds for Giving Admin given to
+removing one here would only be undone within the hour. The same holds for Fundraising Admin given to
 a BarnCRM Admin.
 
 These are the only permissions this section gives. It never lists or assigns any other
@@ -312,7 +312,7 @@ Access, and give them the BarnCRM Admin role.", with the number of attempts in p
 {0}. Do what it says: on this page, give the installer the BarnCRM Admin role.
 
 **You edited one of the shipped roles in Setup and now an upgrade has undone your change.**
-The shipped roles (three with BarnCRM Core, and Fundraising Staff with the Giving module)
+The shipped roles (three with BarnCRM Core, and Fundraising Staff with the Fundraising module)
 are replaced on every upgrade, so any change you make to them is lost. That is deliberate: it is what keeps the roles correct for you. If
 your organization needs something extra, create your own permission set in Setup for just
 that extra piece and assign it alongside the role. Your own permission sets are never

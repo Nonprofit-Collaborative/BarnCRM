@@ -19,7 +19,7 @@ private class GiftTransactionMirrorServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS;
 			settings.Gift_Transaction_Mirror_Status__c = 'Received';
 			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
@@ -91,7 +91,7 @@ private class GiftTransactionMirrorServiceTest {
 	}
 
 	private static void setPaidStatus(String status) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Gift_Transaction_Mirror_Status__c = status;
 		upsert as system settings;
 	}
@@ -178,13 +178,13 @@ private class GiftTransactionMirrorServiceTest {
 				'A status that is not an active value is named.'
 			);
 
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Gift_Transaction_Mirror_Status__c = 'Received';
 			settings.Gift_Transaction_Mirror_Start__c = null;
 			settings.Gift_Transaction_Mirror_Direction__c = 'Backwards';
 			upsert as system settings;
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoStartDate'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoStartDate'),
 				GiftTransactionMirrorService.notReadyReason()
 			);
 			Assert.areEqual(
@@ -360,10 +360,7 @@ private class GiftTransactionMirrorServiceTest {
 				'A typed value that is not a Gift Transaction is refused (R-GT9).'
 			);
 			Assert.areEqual(
-				BarnHelp.text(
-					'MirrorGiving',
-					'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'
-				),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'),
 				refused.getErrors()[0].getMessage()
 			);
 

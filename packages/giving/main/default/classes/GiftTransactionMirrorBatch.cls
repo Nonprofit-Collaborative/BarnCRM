@@ -65,11 +65,11 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 	}
 
 	protected override String pausedText() {
-		return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_RunPaused');
+		return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_RunPaused');
 	}
 
 	protected override String switchedOffText() {
-		return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_RunSwitchedOff');
+		return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_RunSwitchedOff');
 	}
 
 	protected override MirrorSync.Result runTotals() {
@@ -82,22 +82,22 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 
 	protected override String notReadyReason() {
 		if (!GiftTransactionMirrorService.isAvailable()) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_Unavailable');
+			return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable');
 		}
 		String notReady = GiftTransactionMirrorService.notReadyReason();
 		if (notReady == null && !GiftTransactionMirrorService.canRun()) {
-			notReady = BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoAccess');
+			notReady = BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoAccess');
 		}
 		return notReady == null
 			? null
 			: String.format(
-					BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_RunNotReady'),
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_RunNotReady'),
 					new List<Object>{ notReady }
 			  );
 	}
 
 	protected override Database.QueryLocator locator() {
-		Datetime lastRun = Mirror_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c;
+		Datetime lastRun = Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c;
 		return Database.getQueryLocatorWithBinds(
 			GiftTransactionMirrorSelector.giftsToCopyQuery(fromDate != null, lastRun != null),
 			new Map<String, Object>{
@@ -140,7 +140,7 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 		totals.writeRefusals();
 		if (noHeadroom) {
 			ErrorLogger.logMessage(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogNoHeadroom'),
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogNoHeadroom'),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
 			);
@@ -164,7 +164,7 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 	@TestVisible
 	private static String summaryOf(GiftTransactionMirrorService.Result totals) {
 		String summary = String.format(
-			BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_LogRun'),
+			BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_LogRun'),
 			new List<Object>{
 				totals.created,
 				totals.updated,
@@ -178,7 +178,7 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 		return totals.designationsUnavailable
 			? summary +
 			  ' ' +
-			  BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_DesignationsUnavailable')
+			  BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_DesignationsUnavailable')
 			: summary;
 	}
 }

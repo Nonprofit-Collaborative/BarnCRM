@@ -40,6 +40,7 @@ ALLOWED_LITERALS = {
     "NamespaceUtilTest.cls": "resolves a module object name without the module",
     "LinkedRecords.cls": "the optional-module objects a link may name, found by describe (EV-09)",
     "BarnCRMShippedPermissionSets.cls": "every shipped set, never offered by C-65 (generated)",
+    "SettingSections.cls": "the Fundraising settings section's name, which is the word, not the app (D-210)",
 }
 
 # Module catalog records (BarnCRM_Module__mdt): their Probe_Object__c values name a module

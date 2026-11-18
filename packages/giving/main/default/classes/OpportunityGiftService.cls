@@ -39,7 +39,7 @@ public with sharing class OpportunityGiftService {
 	 * in the org's default time zone, so a nightly run started by anyone uses the same day.
 	 */
 	public static Date startDate() {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		Datetime start = settings?.Opportunity_Mirror_Start__c;
 		if (start == null) {
 			return null;
@@ -97,7 +97,7 @@ public with sharing class OpportunityGiftService {
 	}
 
 	private static List<String> listedRecordTypes() {
-		String listed = Mirror_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Record_Types__c;
+		String listed = Giving_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Record_Types__c;
 		List<String> names = new List<String>();
 		for (String name : String.isBlank(listed) ? new List<String>() : listed.split(',')) {
 			if (String.isNotBlank(name)) {
@@ -162,10 +162,10 @@ public with sharing class OpportunityGiftService {
 			Id accountId = (Id) opportunity.get('AccountId');
 			String refusal = amount == null ||
 				amount <= 0
-				? BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_AmountNotAboveZero')
+				? BarnHelp.text('Giving', 'Mirror_OpportunityMirror_AmountNotAboveZero')
 				: (contactId == null &&
 						accountId == null
-						? BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoDonor')
+						? BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoDonor')
 						: null);
 			if (refusal != null) {
 				result.failed++;

@@ -44,7 +44,6 @@ PACKAGES = {
     "memberships": "Memberships",
     "addressverification": "AddressVerification",
     "mirror": "Mirror",
-    "mirrorgiving": "MirrorGiving",
     "corporatehub": "CorporateHub",
     "lwcbuilder": "LwcBuilder",
     "scholarships": "Scholarships",

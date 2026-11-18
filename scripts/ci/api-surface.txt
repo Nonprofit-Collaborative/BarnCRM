@@ -1491,6 +1491,8 @@ giving/AskNextAskDateHandler.cls | public AskNextAskDateHandler()
 giving/AskNextAskDateHandler.cls | public class AskNextAskDateHandler
 giving/AskTriggerHandler.cls | public AskTriggerHandler()
 giving/AskTriggerHandler.cls | public class AskTriggerHandler
+giving/CampaignSyncTriggerHandler.cls | public CampaignSyncTriggerHandler()
+giving/CampaignSyncTriggerHandler.cls | public class CampaignSyncTriggerHandler
 giving/CommitmentTriggerHandler.cls | public CommitmentTriggerHandler()
 giving/CommitmentTriggerHandler.cls | public class CommitmentTriggerHandler
 giving/DonorLevelTriggerHandler.cls | public DonorLevelTriggerHandler()
@@ -1530,6 +1532,8 @@ giving/GiftService.cls | public static Map<Id,String> applyChosenFundsEach(List<
 giving/GiftService.cls | public static Set<Id> applyChosenFunds(List<Gift__c>,Map<Id,Id>)
 giving/GiftSoftCreditHandler.cls | public GiftSoftCreditHandler()
 giving/GiftSoftCreditHandler.cls | public class GiftSoftCreditHandler
+giving/GiftTransactionMirrorTriggerHandler.cls | public GiftTransactionMirrorTriggerHandler()
+giving/GiftTransactionMirrorTriggerHandler.cls | public class GiftTransactionMirrorTriggerHandler
 giving/GiftTriggerHandler.cls | public GiftTriggerHandler()
 giving/GiftTriggerHandler.cls | public class GiftTriggerHandler
 giving/GivingDataProtectionExtension.cls | public GivingDataProtectionExtension()
@@ -1562,12 +1566,43 @@ giving/GivingWhereUsedExtension.cls | public GivingWhereUsedExtension()
 giving/GivingWhereUsedExtension.cls | public class GivingWhereUsedExtension
 giving/HouseholdSoftCreditHandler.cls | public HouseholdSoftCreditHandler()
 giving/HouseholdSoftCreditHandler.cls | public class HouseholdSoftCreditHandler
+giving/InboundGift.cls | global Date giftDate
+giving/InboundGift.cls | global Decimal amount
+giving/InboundGift.cls | global InboundGift()
+giving/InboundGift.cls | global String appealId
+giving/InboundGift.cls | global String donorEmail
+giving/InboundGift.cls | global String donorId
+giving/InboundGift.cls | global String externalId
+giving/InboundGift.cls | global String fundCode
+giving/InboundGift.cls | global String fundId
+giving/InboundGift.cls | global String paymentMethod
+giving/InboundGift.cls | global String paymentReference
+giving/InboundGift.cls | global class InboundGift
+giving/InboundGiftAction.cls | global class InboundGiftAction
+giving/InboundGiftAction.cls | global static List<InboundGiftResult> record(List<InboundGift>)
+giving/InboundGiftResource.cls | global class InboundGiftResource
+giving/InboundGiftResource.cls | global static void create()
+giving/InboundGiftResult.cls | global Id giftId
+giving/InboundGiftResult.cls | global String errorCode
+giving/InboundGiftResult.cls | global String message
+giving/InboundGiftResult.cls | global String outcome
+giving/InboundGiftResult.cls | global class InboundGiftResult
 giving/InstallmentTriggerHandler.cls | public InstallmentTriggerHandler()
 giving/InstallmentTriggerHandler.cls | public class InstallmentTriggerHandler
+giving/NpcGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+giving/NpcGiftsKit.cls | public MigrationCheck verify(String)
+giving/NpcGiftsKit.cls | public NpcGiftsKit()
+giving/NpcGiftsKit.cls | public class NpcGiftsKit
+giving/NpspGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
+giving/NpspGiftsKit.cls | public MigrationCheck verify(String)
+giving/NpspGiftsKit.cls | public NpspGiftsKit()
+giving/NpspGiftsKit.cls | public class NpspGiftsKit
 giving/NpspGivingKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
 giving/NpspGivingKit.cls | public MigrationCheck verify(String)
 giving/NpspGivingKit.cls | public NpspGivingKit()
 giving/NpspGivingKit.cls | public class NpspGivingKit
+giving/OpportunityMirrorTriggerHandler.cls | public OpportunityMirrorTriggerHandler()
+giving/OpportunityMirrorTriggerHandler.cls | public class OpportunityMirrorTriggerHandler
 giving/ReceiptRenderer.cls | public interface ReceiptRenderer
 giving/RecurringGiftEventHandler.cls | public RecurringGiftEventHandler()
 giving/RecurringGiftEventHandler.cls | public class RecurringGiftEventHandler
@@ -1628,47 +1663,6 @@ mirror/NpcRelationsKit.cls | public List<Map<String,Object>> rows(String,List<SO
 mirror/NpcRelationsKit.cls | public MigrationCheck verify(String)
 mirror/NpcRelationsKit.cls | public NpcRelationsKit()
 mirror/NpcRelationsKit.cls | public class NpcRelationsKit
-mirrorgiving/CampaignSyncTriggerHandler.cls | public CampaignSyncTriggerHandler()
-mirrorgiving/CampaignSyncTriggerHandler.cls | public class CampaignSyncTriggerHandler
-mirrorgiving/GiftTransactionMirrorTriggerHandler.cls | public GiftTransactionMirrorTriggerHandler()
-mirrorgiving/GiftTransactionMirrorTriggerHandler.cls | public class GiftTransactionMirrorTriggerHandler
-mirrorgiving/InboundGift.cls | global Date giftDate
-mirrorgiving/InboundGift.cls | global Decimal amount
-mirrorgiving/InboundGift.cls | global InboundGift()
-mirrorgiving/InboundGift.cls | global String appealId
-mirrorgiving/InboundGift.cls | global String donorEmail
-mirrorgiving/InboundGift.cls | global String donorId
-mirrorgiving/InboundGift.cls | global String externalId
-mirrorgiving/InboundGift.cls | global String fundCode
-mirrorgiving/InboundGift.cls | global String fundId
-mirrorgiving/InboundGift.cls | global String paymentMethod
-mirrorgiving/InboundGift.cls | global String paymentReference
-mirrorgiving/InboundGift.cls | global class InboundGift
-mirrorgiving/InboundGiftAction.cls | global class InboundGiftAction
-mirrorgiving/InboundGiftAction.cls | global static List<InboundGiftResult> record(List<InboundGift>)
-mirrorgiving/InboundGiftResource.cls | global class InboundGiftResource
-mirrorgiving/InboundGiftResource.cls | global static void create()
-mirrorgiving/InboundGiftResult.cls | global Id giftId
-mirrorgiving/InboundGiftResult.cls | global String errorCode
-mirrorgiving/InboundGiftResult.cls | global String message
-mirrorgiving/InboundGiftResult.cls | global String outcome
-mirrorgiving/InboundGiftResult.cls | global class InboundGiftResult
-mirrorgiving/MirrorGivingHealthCheckExtension.cls | public MirrorGivingHealthCheckExtension()
-mirrorgiving/MirrorGivingHealthCheckExtension.cls | public class MirrorGivingHealthCheckExtension
-mirrorgiving/MirrorGivingNightlyJobProvider.cls | public MirrorGivingNightlyJobProvider()
-mirrorgiving/MirrorGivingNightlyJobProvider.cls | public class MirrorGivingNightlyJobProvider
-mirrorgiving/MirrorGivingPostInstall.cls | public MirrorGivingPostInstall()
-mirrorgiving/MirrorGivingPostInstall.cls | public class MirrorGivingPostInstall
-mirrorgiving/NpcGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
-mirrorgiving/NpcGiftsKit.cls | public MigrationCheck verify(String)
-mirrorgiving/NpcGiftsKit.cls | public NpcGiftsKit()
-mirrorgiving/NpcGiftsKit.cls | public class NpcGiftsKit
-mirrorgiving/NpspGiftsKit.cls | public List<Map<String,Object>> rows(String,List<SObject>)
-mirrorgiving/NpspGiftsKit.cls | public MigrationCheck verify(String)
-mirrorgiving/NpspGiftsKit.cls | public NpspGiftsKit()
-mirrorgiving/NpspGiftsKit.cls | public class NpspGiftsKit
-mirrorgiving/OpportunityMirrorTriggerHandler.cls | public OpportunityMirrorTriggerHandler()
-mirrorgiving/OpportunityMirrorTriggerHandler.cls | public class OpportunityMirrorTriggerHandler
 payments/PaymentWebhookRest.cls | global class PaymentWebhookRest
 payments/PaymentWebhookRest.cls | global static void receive()
 payments/PaymentsApi.cls | public PaymentsApi()

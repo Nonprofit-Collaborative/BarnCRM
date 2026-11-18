@@ -8,7 +8,7 @@
  * never themselves gifts the mirror copies. The absent path is forced with `absentForTest`.
  */
 @IsTest(
-	testFor='ApexClass:GiftTransactionMirrorBatch, ApexClass:GiftTransactionMirrorSchedulable, ApexClass:GiftTransactionMirrorReconciliation, ApexClass:MirrorGivingHealthCheckExtension, ApexClass:MirrorGivingNightlyJobProvider, ApexClass:MirrorSettingsWriter'
+	testFor='ApexClass:GiftTransactionMirrorBatch, ApexClass:GiftTransactionMirrorSchedulable, ApexClass:GiftTransactionMirrorReconciliation, ApexClass:GiftMirrorHealthChecks, ApexClass:GivingNightlyJobProvider, ApexClass:MirrorSettingsWriter'
 )
 private class GiftTransactionMirrorRunTest {
 	private static final String RUN_CONTEXT = 'Gift Transaction mirror: run';
@@ -20,7 +20,7 @@ private class GiftTransactionMirrorRunTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.ensureDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Gift_Transaction_Mirror_Direction__c = GiftTransactionMirrorService.GIFTS_TO_GIFT_TRANSACTIONS;
 			settings.Gift_Transaction_Mirror_Status__c = PAID;
 			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
@@ -108,7 +108,7 @@ private class GiftTransactionMirrorRunTest {
 		List<Error_Log__c> warnings = logged('Warning');
 		Assert.areEqual(1, warnings.size());
 		Assert.isTrue(warnings[0].Message__c.contains('no Nonprofit Cloud Gift Transactions'));
-		Assert.isNull(Mirror_Settings__c.getOrgDefaults().Gift_Transaction_Mirror_Last_Run__c);
+		Assert.isNull(Giving_Settings__c.getOrgDefaults().Gift_Transaction_Mirror_Last_Run__c);
 	}
 
 	@IsTest
@@ -129,7 +129,7 @@ private class GiftTransactionMirrorRunTest {
 			info[0].Message__c.startsWith('Gift Transaction mirror run: 1 '),
 			info[0].Message__c
 		);
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		Assert.isNotNull(settings.Gift_Transaction_Mirror_Last_Run__c, 'The run is recorded.');
 		Assert.areEqual(info[0].Message__c, settings.Gift_Transaction_Mirror_Last_Summary__c);
 		Assert.areEqual(PAID, settings.Gift_Transaction_Mirror_Status__c, 'Settings are kept.');
@@ -147,7 +147,7 @@ private class GiftTransactionMirrorRunTest {
 			batch.finish(null);
 			Test.stopTest();
 		}
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		Assert.isNull(
 			settings.Gift_Transaction_Mirror_Last_Run__c,
 			'The watermark stays, so the failed gift is read again.'
@@ -157,7 +157,7 @@ private class GiftTransactionMirrorRunTest {
 
 	@IsTest
 	static void aRunThatIsNotReadyWarnsAndCopiesNothing() {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Gift_Transaction_Mirror_Start__c = null;
 		update settings;
 		System.runAs(maria()) {
@@ -188,7 +188,7 @@ private class GiftTransactionMirrorRunTest {
 				GiftTransactionMirrorBatch.summaryOf(totals)
 					.endsWith(
 						BarnHelp.text(
-							'MirrorGiving',
+							'Giving',
 							'Mirror_GiftTransactionMirror_DesignationsUnavailable'
 						)
 					)
@@ -218,7 +218,7 @@ private class GiftTransactionMirrorRunTest {
 			);
 
 			Assert.isFalse(reported(), 'Just scheduled: nothing to say yet.');
-			MirrorGivingHealthCheckExtension.nowForTest = System.now().addDays(3);
+			GiftMirrorHealthChecks.nowForTest = System.now().addDays(3);
 			Assert.isTrue(reported(), 'Three days without a run is reported.');
 			MirrorSettingsWriter.recordGiftTransactionMirrorRun(System.now().addDays(2), 'Ran');
 			Assert.isFalse(reported(), 'A run completed a day ago.');
@@ -232,13 +232,8 @@ private class GiftTransactionMirrorRunTest {
 	}
 
 	private static Boolean reported() {
-		for (
-			HealthCheckService.Finding finding : new MirrorGivingHealthCheckExtension().findings()
-		) {
-			if (
-				finding.getKey() ==
-				MirrorGivingHealthCheckExtension.GIFT_TRANSACTION_MIRROR_STALE_KEY
-			) {
+		for (HealthCheckService.Finding finding : GiftMirrorHealthChecks.findings()) {
+			if (finding.getKey() == GiftMirrorHealthChecks.GIFT_TRANSACTION_MIRROR_STALE_KEY) {
 				return true;
 			}
 		}
@@ -297,18 +292,18 @@ private class GiftTransactionMirrorRunTest {
 			assertRefused(
 				null,
 				GIFT_DATE,
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
 			);
 			assertRefused(
 				GIFT_DATE.addDays(1),
 				GIFT_DATE,
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 			GiftTransactionMirrorSchema.absentForTest = true;
 			assertRefused(
 				GIFT_DATE,
 				GIFT_DATE,
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_Unavailable')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable')
 			);
 		}
 	}

@@ -34,11 +34,11 @@ const REVOKE_DELAY_MS = 1000;
  * always marks the file on screen, and the server builds it again and compares its digest.
  */
 export default class AccountingExport extends LightningElement {
-  helpReady = isHelpLoaded('MirrorGiving');
+  helpReady = isHelpLoaded('Giving');
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('MirrorGiving').then(() => {
+      loadHelp('Giving').then(() => {
         this.helpReady = true;
       });
     }
@@ -49,10 +49,10 @@ export default class AccountingExport extends LightningElement {
   labels = {
     title,
     get intro() {
-      return helpText('MirrorGiving', 'Mirror_AccountingExport_Intro');
+      return helpText('Giving', 'Mirror_AccountingExport_Intro');
     },
     get visibility() {
-      return helpText('MirrorGiving', 'Mirror_AccountingExport_Visibility');
+      return helpText('Giving', 'Mirror_AccountingExport_Visibility');
     },
     from,
     to,
@@ -64,10 +64,10 @@ export default class AccountingExport extends LightningElement {
     onlyUnposted,
     markPosted: markPostedLabel,
     get markPostedHelp() {
-      return helpText('MirrorGiving', 'Mirror_AccountingExport_MarkPostedHelp');
+      return helpText('Giving', 'Mirror_AccountingExport_MarkPostedHelp');
     },
     get markNeedsAllFunds() {
-      return helpText('MirrorGiving', 'Mirror_AccountingExport_MarkNeedsAllFunds');
+      return helpText('Giving', 'Mirror_AccountingExport_MarkNeedsAllFunds');
     }
   };
 
@@ -95,7 +95,7 @@ export default class AccountingExport extends LightningElement {
     if (data) {
       this.methods = data.map((option) => ({ label: option.label, value: option.value }));
     } else if (error) {
-      this.error = helpText('MirrorGiving', 'Mirror_AccountingExport_ErrorFailed');
+      this.error = helpText('Giving', 'Mirror_AccountingExport_ErrorFailed');
     }
   }
 
@@ -151,7 +151,7 @@ export default class AccountingExport extends LightningElement {
     this.message = undefined;
     this.downloaded = undefined;
     if (!this.fromDate || !this.toDate) {
-      this.error = helpText('MirrorGiving', 'Mirror_AccountingExport_ErrorDatesRequired');
+      this.error = helpText('Giving', 'Mirror_AccountingExport_ErrorDatesRequired');
       return;
     }
     this.working = true;
@@ -159,20 +159,17 @@ export default class AccountingExport extends LightningElement {
       const choices = this.choices;
       const view = await exportGifts(choices);
       if (!view || !view.rowCount) {
-        this.message = helpText('MirrorGiving', 'Mirror_AccountingExport_NoGifts');
+        this.message = helpText('Giving', 'Mirror_AccountingExport_NoGifts');
         return;
       }
       this.save(view.fileName, view.csv);
       this.downloaded = { choices, digest: view.digest };
-      this.message = helpText('MirrorGiving', 'Mirror_AccountingExport_Summary')
+      this.message = helpText('Giving', 'Mirror_AccountingExport_Summary')
         .replace('{0}', view.rowCount)
         .replace('{1}', view.giftCount)
         .replace('{2}', this.money(view.total));
     } catch (failure) {
-      this.error = bodyMessage(
-        failure,
-        helpText('MirrorGiving', 'Mirror_AccountingExport_ErrorFailed')
-      );
+      this.error = bodyMessage(failure, helpText('Giving', 'Mirror_AccountingExport_ErrorFailed'));
     } finally {
       this.working = false;
     }
@@ -188,15 +185,9 @@ export default class AccountingExport extends LightningElement {
         digest: this.downloaded.digest
       });
       this.downloaded = undefined;
-      this.message = helpText('MirrorGiving', 'Mirror_AccountingExport_Marked').replace(
-        '{0}',
-        count
-      );
+      this.message = helpText('Giving', 'Mirror_AccountingExport_Marked').replace('{0}', count);
     } catch (failure) {
-      this.error = bodyMessage(
-        failure,
-        helpText('MirrorGiving', 'Mirror_AccountingExport_ErrorFailed')
-      );
+      this.error = bodyMessage(failure, helpText('Giving', 'Mirror_AccountingExport_ErrorFailed'));
     } finally {
       this.working = false;
     }

@@ -2,7 +2,7 @@
 
 A receipt is the numbered tax document for a gift; an acknowledgment is the thank-you. They are separate on purpose: the thank-you is yours to word, the receipt is not. This page also covers year-end statements, stewardship plans and the gift's **Posting** panel.
 
-Before you start: you need the **Fundraising Staff** role. Its **Giving Staff** permission set carries the **Issue Receipts** and **Send Acknowledgments** permissions. With **Giving Read Only** you can read receipts and open their PDFs, but not issue or send. The letters, the thank-you rules and receipt numbering are set up by your admin ([Receipts](../admin-guide/receipts.md), [Acknowledgments](../admin-guide/acknowledgments.md)).
+Before you start: you need the **Fundraising Staff** role. Its **Fundraising Staff Access** permission set carries the **Issue Receipts** and **Send Acknowledgments** permissions. With **Fundraising Read Only** you can read receipts and open their PDFs, but not issue or send. The letters, the thank-you rules and receipt numbering are set up by your admin ([Receipts](../admin-guide/receipts.md), [Acknowledgments](../admin-guide/acknowledgments.md)).
 
 ## To Issue a Receipt for a Gift
 
@@ -101,7 +101,7 @@ The **Posting** panel on a gift says whether the bookkeeper has exported it:
 - "Not in the books: Pending and in-kind gifts are in no accounting export, so this gift stays editable."
 - "Dated in a closed period ..." The books for that month are closed.
 
-Marking gifts posted, and unposting, need the **Post Gifts** permission, which only **Giving Admin** carries. See [Posting and closed periods](../admin-guide/posting-and-closed-periods.md).
+Marking gifts posted, and unposting, need the **Post Gifts** permission, which only **Fundraising Admin** carries. See [Posting and closed periods](../admin-guide/posting-and-closed-periods.md).
 
 ## Common Problems
 

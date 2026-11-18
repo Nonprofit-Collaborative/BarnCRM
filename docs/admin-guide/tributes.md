@@ -13,7 +13,7 @@ made in memory of their mother, not what it was worth.
 
 ## How to Turn It On
 
-Nothing to turn on. Tributes are part of the Giving module.
+Nothing to turn on. Tributes are part of the Fundraising module.
 
 One piece of first-time setup: the **Tribute** panel lives on a gift's record page, and
 BarnCRM ships a page called **Gift Record Page** with the panel already on it. Assign

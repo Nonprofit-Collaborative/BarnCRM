@@ -51,7 +51,7 @@ date, so there is time to renew, renegotiate or give notice.
 The **Boards and Committees** tab holds your board of directors and its committees. On a board's
 page the **Board** panel shows who holds a seat now, whose term ends soon (and who has reached the
 term limit), the skills the board wants that no member has, the board's open action items and,
-when your org uses BarnCRM Giving, the share of members who gave this fiscal year. Add a seat
+when your org uses BarnCRM Fundraising, the share of members who gave this fiscal year. Add a seat
 with **New** on the Board Members list: the person, role and term dates.
 
 ## Board Meetings

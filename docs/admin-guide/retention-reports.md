@@ -12,7 +12,7 @@ says in writing exactly who it counts.
 - **First to Second Gift Conversion**: of the people whose first gift fell in a completed
   fiscal year, how many have given a second one.
 
-They arrive with the Giving package, in the same **BarnCRM Giving** folder as the
+They arrive with the Fundraising package, in the same **BarnCRM Fundraising** folder as the
 dashboard reports, and they need no building and no filters set. They are ordinary
 Salesforce reports: open one, change a filter, save a copy of your own.
 
@@ -93,10 +93,10 @@ because they have not had the same amount of time.
    These reports read First Gift Date, Last Gift Date, Gift Count and Gifts Last Year, and a
    donor whose rollups have never run is invisible to them. After the first run the rollups
    keep themselves current as gifts are entered.
-3. **Give people access.** Assign the Giving module's **Giving Staff** or **Giving Read Only**
+3. **Give people access.** Assign the Fundraising module's **Fundraising Staff Access** or **Fundraising Read Only**
    permission set on the Access page (Extra Permissions), as for the dashboard. The report folder ships public read only, so
    the reports themselves need no sharing.
-4. Open the **BarnCRM Fundraising** app, choose **Reports**, then the **BarnCRM Giving** folder.
+4. Open the **BarnCRM Fundraising** app, choose **Reports**, then the **BarnCRM Fundraising** folder.
 
 Nothing else in Setup is required. There is no new setting to configure: the reports carry
 their own definitions.
@@ -105,7 +105,7 @@ their own definitions.
 
 Do this after the sample data is loaded, or in an org with a couple of years of gifts.
 
-1. Open **Reports**, folder **BarnCRM Giving**, and open **LYBUNT Donors**. Every row is a
+1. Open **Reports**, folder **BarnCRM Fundraising**, and open **LYBUNT Donors**. Every row is a
    donor to call. The list is sorted by what they gave last year, largest first, so the first
    twenty rows are the twenty conversations worth having first.
 2. Look at the **Totals Last Updated** column on any row. That is when this donor's

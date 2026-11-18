@@ -1,20 +1,15 @@
 /**
- * The class Core finds by name (in `HealthCheckExtensions.EXTENSION_CLASSES`) and calls to add
- * Mirror for Giving's findings to the one Health Check report (ADR-0057, as the ADR on the
- * Opportunity mirror amends it; X-01, R-OM8).
+ * Fundraising's gift mirror findings, added to the one Health Check report by
+ * `GivingHealthCheckExtension` (ADR-0057, as the ADR on the Opportunity mirror amends it; X-01,
+ * R-OM8; ADR-NEXT mirror independence).
  *
  * One finding per mirror, for the Opportunity mirror and the Gift Transaction mirror (X-07): its
  * nightly run is scheduled, a direction is chosen and the automation is switched on, yet no run
  * has completed for more than two days. The run executes as the person who scheduled it, so when
  * that person is deactivated or loses access every run fails before it starts and nothing else
  * says so. Asked only of a viewer who may manage settings, as Core's own settings checks are.
- * Mirror's own finding (the household drift report) stays in `MirrorHealthCheckExtension`.
- *
- * `@NamespaceAccessible` for the reason `GivingHealthCheckExtension` is: Core resolves it with
- * `Type.forName` under ADR-0017.
  */
-@NamespaceAccessible
-public with sharing class MirrorGivingHealthCheckExtension implements HealthCheckExtension {
+public with sharing class GiftMirrorHealthChecks {
 	public static final String MIRROR_STALE_KEY = 'opportunity_mirror_not_run';
 	public static final String GIFT_TRANSACTION_MIRROR_STALE_KEY = 'gift_transaction_mirror_not_run';
 	private static final Integer STALE_DAYS = 2;
@@ -23,12 +18,7 @@ public with sharing class MirrorGivingHealthCheckExtension implements HealthChec
 	@TestVisible
 	private static Datetime nowForTest;
 
-	@NamespaceAccessible
-	public MirrorGivingHealthCheckExtension() {
-		return;
-	}
-
-	public List<HealthCheckService.Finding> findings() {
+	public static List<HealthCheckService.Finding> findings() {
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		for (
 			HealthCheckService.Finding stale : new List<HealthCheckService.Finding>{
@@ -54,7 +44,7 @@ public with sharing class MirrorGivingHealthCheckExtension implements HealthChec
 		}
 		Datetime since = staleSince(
 			OpportunityMirrorSchedulable.scheduledAt(),
-			Mirror_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c
+			Giving_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c
 		);
 		return since == null
 			? null
@@ -62,7 +52,7 @@ public with sharing class MirrorGivingHealthCheckExtension implements HealthChec
 					MIRROR_STALE_KEY,
 					Label.Mirror_HealthCheck_MirrorNotRunTitle,
 					String.format(
-						BarnHelp.text('MirrorGiving', 'Mirror_HealthCheck_MirrorNotRunDetail'),
+						BarnHelp.text('Giving', 'Mirror_HealthCheck_MirrorNotRunDetail'),
 						new List<Object>{ since.format() }
 					),
 					HealthCheckService.SEVERITY_WARNING,
@@ -81,7 +71,7 @@ public with sharing class MirrorGivingHealthCheckExtension implements HealthChec
 		}
 		Datetime since = staleSince(
 			GiftTransactionMirrorSchedulable.scheduledAt(),
-			Mirror_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c
+			Giving_Settings__c.getOrgDefaults()?.Gift_Transaction_Mirror_Last_Run__c
 		);
 		return since == null
 			? null
@@ -90,7 +80,7 @@ public with sharing class MirrorGivingHealthCheckExtension implements HealthChec
 					Label.Mirror_HealthCheck_GiftTransactionMirrorNotRunTitle,
 					String.format(
 						BarnHelp.text(
-							'MirrorGiving',
+							'Giving',
 							'Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail'
 						),
 						new List<Object>{ since.format() }

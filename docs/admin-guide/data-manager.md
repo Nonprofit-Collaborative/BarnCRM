@@ -34,7 +34,7 @@ section and kind of job is shown only to people who may use it:
 
 | Group | Tile or section | Needs a file? | Opens | Who sees it |
 |---|---|---|---|---|
-| **Bring Data In** | **Super Importer** ("Add or update records from a spreadsheet.") | Yes | The **Super Importer** tab (API name `Import`): people and organizations, gifts with Giving, any one kind of record, records with their related records, or deleting the records a file lists, with a preview first | Administrators |
+| **Bring Data In** | **Super Importer** ("Add or update records from a spreadsheet.") | Yes | The **Super Importer** tab (API name `Import`): people and organizations, gifts with Fundraising, any one kind of record, records with their related records, or deleting the records a file lists, with a preview first | Administrators |
 | **Bring Data In** | **Import Files** ("Load documents and attachments from a zip into Files, each linked to its record.") | Yes (a zip) | The Import Files panel, on this page in place of the tiles, with **Back to Data Manager** above it: choose the zip, **Dry Run**, **Load Files**, and your recent loads with **Undo Load** ([Import Files](files-import.md)) | Administrators |
 | **Find and Change** | **Find** ("Find records, then save or export them.") | No | The **Find** tab: find records, save the query, export them to a file | Anyone with **Find and Export Records** |
 | **Find and Change** | **Grid** ("Edit a saved query's records, and their related records, in one table.") | No | The **Find** tab on the Grid view: a saved query's records and up to two kinds of related record in editable tables, saved as named grids ([Grid](grid.md)) | Anyone with **Find and Export Records**; editing also needs **Bulk Update Records** |
@@ -78,7 +78,7 @@ the Recycle Bin, and **Undo** brings them back (section 4).
 **Import Templates.** A template remembers how a file's columns match BarnCRM fields, so every
 file with the same layout (for example, a monthly donations export) opens already matched.
 BarnCRM ships some (**People and Organizations List**, called **Generic contact list** in an
-older org, **Organization List**, **Couples and Households**, **Relationships** and **Affiliations**, and with Giving the gift and
+older org, **Organization List**, **Couples and Households**, **Relationships** and **Affiliations**, and with Fundraising the gift and
 migration templates). To make your own, open **Super Importer** and choose **One Kind of
 Record** in the first step (**What Are You Importing?**): choose the object, type a
 **Template name**, and select **Create** ([Importing](importing.md), section 9); for a people
@@ -124,7 +124,7 @@ first, so nothing is undone by a stray click:
 
 | Job | What Undo does | How you confirm |
 |---|---|---|
-| Import | Removes the people, households, organizations (and gifts, with Giving) it created and puts back the values it changed, keeping anything that has since gained a life of its own ([Importing](importing.md), section 5) | The box counts what it would remove and put back, by kind; press **Undo This Import** |
+| Import | Removes the people, households, organizations (and gifts, with Fundraising) it created and puts back the values it changed, keeping anything that has since gained a life of its own ([Importing](importing.md), section 5) | The box counts what it would remove and put back, by kind; press **Undo This Import** |
 | Super Transformer run | Puts back the values it changed ([Super Transformer runs and undo](bulk-update.md)) | Type the number of values it puts back |
 | Bulk delete | Brings the records back from the Recycle Bin ([Bulk delete](bulk-delete.md)) | Type the number of records it brings back |
 

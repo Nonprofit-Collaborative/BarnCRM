@@ -138,7 +138,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 2 | On the board add seats: Ade Chair, term 2, started a year ago, ends in 20 days, Skills Finance; Bea Member, term 1, ends in two years; Cy Member, ended last month. | The Board panel lists Ade and Bea only; Ade shows **At Term Limit**; a warning says one term ends within the reminder window. |
 | 3 | Read the skills matrix. | Finance 1, Legal 0; "Skills wanted that no current member holds: Legal." |
 | 4 | Run **Corporate Hub reminders** now on the Nightly Jobs page, then again. | One bell notification to the board's owner naming Ade; none the second time. |
-| 5 | With Giving installed, give Ade a gift dated this fiscal year. Reload. | "50% of current members gave this fiscal year." Without Giving the line is absent. |
+| 5 | With Fundraising installed, give Ade a gift dated this fiscal year. Reload. | "50% of current members gave this fiscal year." Without Fundraising the line is absent. |
 | 6 | Give Bea an age range, then turn on **Show board demographics** in Settings, **Corporate Hub**. | Bea's age range shows on the panel; turned off again, it is hidden. |
 
 **Cleanup:** None.

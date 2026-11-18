@@ -59,7 +59,7 @@ Events**, choose the **Commitment** on each, and it is applied then.
    object **Recurring Gift Event**. Map the event type as one of the five values, the date,
    the subscription id, the customer email, the card expiry (last day of the month), the
    amount, the decline reason and the event id.
-3. Run it as a Salesforce user with **Giving Staff**; that user does not need to see the
+3. Run it as a Salesforce user with **Fundraising Staff Access**; that user does not need to see the
    commitments.
 
 Store each gift's subscription id in **Processor Subscription Id** on its commitment when you
@@ -67,7 +67,7 @@ can: matching by id is exact, matching by email is a fallback.
 
 ## Settings
 
-**BarnCRM Settings**, Giving section:
+**BarnCRM Settings**, Fundraising section:
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -80,12 +80,12 @@ The matching and updating can be switched off on the **Automation** page (regist
 
 | Permission set | Recurring Donor Health page | Recurring Gift Events | Health fields on Commitment |
 |---|---|---|---|
-| Giving Admin | Yes | Create, edit, delete; sees all | Edit |
-| Giving Staff | Yes | Create and edit their own | Read; edit Processor Subscription Id |
-| Giving Read Only | Yes | Read their own | Read |
+| Fundraising Admin | Yes | Create, edit, delete; sees all | Edit |
+| Fundraising Staff Access | Yes | Create and edit their own | Read; edit Processor Subscription Id |
+| Fundraising Read Only | Yes | Read their own | Read |
 
 The page shows each person only the commitments they may see (commitments are private), so its
-figures are that person's share. Giving Admin sees all.
+figures are that person's share. Fundraising Admin sees all.
 
 ## Good to Know
 

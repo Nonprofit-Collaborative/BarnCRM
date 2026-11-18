@@ -7,7 +7,7 @@ public with sharing class OpportunityMirrorController {
 	private static final String CONTEXT = 'OpportunityMirrorController';
 	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
 		CONTEXT,
-		'MirrorGiving',
+		'Giving',
 		'Mirror_OpportunityMirror_ErrorFailed'
 	);
 	/**
@@ -68,17 +68,17 @@ public with sharing class OpportunityMirrorController {
 		Status current = checked(false);
 		if (current.direction != OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_CopyAgainGiftsOnly')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_CopyAgainGiftsOnly')
 			);
 		}
 		if (fromDate == null || toDate == null) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
 			);
 		}
 		if (fromDate > toDate) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 		}
 		try {
@@ -107,7 +107,7 @@ public with sharing class OpportunityMirrorController {
 		Status current = status();
 		if (!current.canManage) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoManagePermission')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission')
 			);
 		}
 		try {
@@ -134,7 +134,7 @@ public with sharing class OpportunityMirrorController {
 	private static void requireUse() {
 		if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoUsePermission')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoUsePermission')
 			);
 		}
 	}
@@ -157,19 +157,19 @@ public with sharing class OpportunityMirrorController {
 	@TestVisible
 	private static String refusal(Status current, Boolean scheduling) {
 		if (!current.available) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_Unavailable');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Unavailable');
 		}
 		if (current.direction == OpportunityMirrorService.OFF) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_SwitchedOff');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_SwitchedOff');
 		}
 		if (!current.canManage) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoManagePermission');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission');
 		}
 		if (!current.canRun) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoOpportunityAccess');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoOpportunityAccess');
 		}
 		if (current.running && !scheduling) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_Running');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Running');
 		}
 		return null;
 	}
@@ -183,7 +183,7 @@ public with sharing class OpportunityMirrorController {
 		current.canRun = canRun(current.direction);
 		current.running = OpportunityMirrorSchedulable.isRunning();
 		current.nextRunAt = OpportunityMirrorSchedulable.nextRunAt();
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		current.lastRunAt = settings?.Opportunity_Mirror_Last_Run__c;
 		current.lastSummary = settings?.Opportunity_Mirror_Last_Summary__c;
 		return current;

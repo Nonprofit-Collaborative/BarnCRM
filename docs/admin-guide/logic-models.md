@@ -59,7 +59,7 @@ You never assign the Logic Models permission sets by hand. Give people their Bar
 | BarnCRM role | Logic Models set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model and choosing where an indicator's results come from |
-| Team Member, Fundraising Staff (Giving) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, evidence, indicators and periods; never deletes a whole model |
+| Team Member, Fundraising Staff (Fundraising) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, evidence, indicators and periods; never deletes a whole model |
 | Read Only | Logic Models Read Only | Look at logic models, evidence, indicators and results |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when
@@ -325,7 +325,7 @@ you choose, the target, the result and the progress (**Met** or a percent).
 - **Download Printable Report** saves one web page with the table and the model's name. Open it
   in your browser and print it.
 - **Download PDF** saves the same page as a PDF, landscape, ready to send to a funder. Salesforce's
-  own PDF service makes it (the one that makes Giving's receipts); nothing is stored and nothing
+  own PDF service makes it (the one that makes Fundraising's receipts); nothing is stored and nothing
   is sent anywhere else.
 
 Everyone who can open the model can see and download its report, including Read Only users. The

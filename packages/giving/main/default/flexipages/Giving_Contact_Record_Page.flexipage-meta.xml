@@ -1162,7 +1162,7 @@
     <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Giving Contact Record Page</masterLabel>
+  <masterLabel>Fundraising Contact Record Page</masterLabel>
   <sobjectType>Contact</sobjectType>
   <template>
     <name>flexipage:recordHomeTemplateDesktop</name>

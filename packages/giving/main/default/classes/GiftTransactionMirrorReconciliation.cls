@@ -85,7 +85,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		// Each gift can cost a second row for its Gift Transaction, each one a check for a gift.
 		if (4 * cap > Limits.getLimitQueryRows() - Limits.getQueryRows()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_ErrorTooMany')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_ErrorTooMany')
 			);
 		}
 		List<SObject> paid = GiftTransactionMirrorSelector.giftTransactionsInRange(
@@ -110,7 +110,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		);
 		if (paid.size() > maxRecords || gifts.size() > maxRecords) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_ErrorTooMany')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_ErrorTooMany')
 			);
 		}
 
@@ -185,24 +185,24 @@ public with sharing class GiftTransactionMirrorReconciliation {
 	private static void checkReady(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
 			);
 		}
 		if (fromDate > toDate) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 		}
 		if (!GiftTransactionMirrorService.isAvailable()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_Unavailable')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable')
 			);
 		}
 		String status = GiftTransactionMirrorService.paidStatus();
 		if (!GiftTransactionMirrorSchema.isActiveStatus(status)) {
 			throw new ReconciliationException(
 				String.format(
-					BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_UnknownStatus'),
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_UnknownStatus'),
 					new List<Object>{ status }
 				)
 			);
@@ -210,12 +210,12 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		// User mode reads of a field the viewer cannot see fail with the platform's own words.
 		if (!Gift__c.Gift_Transaction_Id__c.getDescribe().isAccessible()) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoLinkAccess')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoLinkAccess')
 			);
 		}
 		if (!GiftTransactionMirrorSchema.canRead(GiftTransactionMirrorSchema.read())) {
 			throw new ReconciliationException(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoRead')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoRead')
 			);
 		}
 	}

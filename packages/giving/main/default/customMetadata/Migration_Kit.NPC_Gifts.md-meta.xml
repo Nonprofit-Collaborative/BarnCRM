@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Copies Nonprofit Cloud campaigns, gift designations, gift commitments, paid gift transactions and gift soft credits into BarnCRM Giving, in this org. Each gift keeps its Gift Transaction ID, so the Gift Transaction mirror never copies it back. Nonprofit Cloud itself is never changed.</value>
+    <value xsi:type="xsd:string">Copies Nonprofit Cloud campaigns, gift designations, gift commitments, paid gift transactions and gift soft credits into BarnCRM Fundraising, in this org. Each gift keeps its Gift Transaction ID, so the Gift Transaction mirror never copies it back. Nonprofit Cloud itself is never changed.</value>
   </values>
   <values>
     <field>Steps_JSON__c</field>
@@ -20,7 +20,7 @@
     <field>Retire_Checklist_JSON__c</field>
     <value
       xsi:type="xsd:string"
-    >[{"key":"entry","text":"Record new gifts in BarnCRM Giving only: point online giving, payment processors and gift entry at BarnCRM, so no gift is recorded in both."},{"key":"mirror","text":"In BarnCRM Settings, keep the Gift Transaction mirror on (Gifts to Gift Transactions) only if Nonprofit Cloud donor summaries must stay current; copied gifts already carry their Gift Transaction ID and are never copied back."},{"key":"commitments","text":"Stop any processor or schedule that creates gift transactions for Nonprofit Cloud gift commitments once their BarnCRM commitments take over."},{"key":"rollups","text":"Review Data Processing Engine definitions and reports that read gift transactions, once BarnCRM's donor totals are what you report on."}]</value>
+    >[{"key":"entry","text":"Record new gifts in BarnCRM Fundraising only: point online giving, payment processors and gift entry at BarnCRM, so no gift is recorded in both."},{"key":"mirror","text":"In BarnCRM Settings, keep the Gift Transaction mirror on (Gifts to Gift Transactions) only if Nonprofit Cloud donor summaries must stay current; copied gifts already carry their Gift Transaction ID and are never copied back."},{"key":"commitments","text":"Stop any processor or schedule that creates gift transactions for Nonprofit Cloud gift commitments once their BarnCRM commitments take over."},{"key":"rollups","text":"Review Data Processing Engine definitions and reports that read gift transactions, once BarnCRM's donor totals are what you report on."}]</value>
   </values>
   <values>
     <field>Extension_Class__c</field>

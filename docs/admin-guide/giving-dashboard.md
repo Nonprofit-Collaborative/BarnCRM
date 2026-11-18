@@ -1,10 +1,10 @@
-# Giving Dashboard
+# Fundraising Dashboard
 
 ## What It Does
 
-The Giving dashboard answers the four questions a board asks, without anybody building a
+The Fundraising dashboard answers the four questions a board asks, without anybody building a
 report: how much came in this month, which funds it went to, which appeals produced it,
-and who the largest donors are this year. It arrives with the Giving package as a set of
+and who the largest donors are this year. It arrives with the Fundraising package as a set of
 reports and one dashboard, already filtered to the current month and the current year, so
 Tom can open it the day after installation and read real numbers.
 
@@ -15,23 +15,23 @@ else sees.
 ## How to Turn It On
 
 1. Open the **BarnCRM Fundraising** app from the app launcher. Tap **Dashboards**, open the
-   **BarnCRM Giving** folder, and open **Giving Overview**.
+   **BarnCRM Fundraising** folder, and open **Giving Overview**.
 2. Check who the dashboard reads as. It ships set to run as one specified user, and the
    running user is the admin who installed or deployed the package. Every person who opens
    it sees the gifts that user can see, whatever their own access to gifts, so share the
-   **BarnCRM Giving** folder only with people who are allowed to see that data. To change
+   **BarnCRM Fundraising** folder only with people who are allowed to see that data. To change
    the running user, open the dashboard, choose **Edit**, open the dashboard's properties,
    and in **View dashboard as** choose a person who can see all gifts. Save. (A dashboard
    that reads as each viewer is not shipped: Salesforce caps those per edition, and a full
    install exceeds the cap in Developer Edition. A viewer-aware version is planned for the
    Advanced Reporting module.)
 3. Give people access. In BarnCRM Settings, open **Access** and assign the
-   **Fundraising Staff** role, which includes the Giving module's **Giving Staff**
+   **Fundraising Staff** role, which includes the Fundraising module's **Fundraising Staff Access**
    permission set. Someone who should only look gets the **Read Only** role and, in
-   the Access page's Extra Permissions, the **Giving Read Only** permission set. Without one of the Giving
+   the Access page's Extra Permissions, the **Fundraising Read Only** permission set. Without one of the Fundraising
    permission sets a person cannot read gifts, so the dashboard has nothing to show them.
    The report and dashboard folders themselves ship as
-   public read only, so nothing has to be shared by hand. **Giving Admin** builds reports and
+   public read only, so nothing has to be shared by hand. **Fundraising Admin** builds reports and
    dashboards of its own and changes a shipped one by saving a copy; it does not edit or delete
    everything in public folders.
 4. Optional, and worth the ten seconds: with the dashboard open, choose **Subscribe** and
@@ -44,7 +44,7 @@ Nothing here requires Salesforce Setup.
 Do this as Tom, from the sample data, after at least a few gifts exist.
 
 1. Open the app launcher and choose **BarnCRM Fundraising**. Choose **Dashboards**, then the
-   **BarnCRM Giving** folder, then **Giving Overview**.
+   **BarnCRM Fundraising** folder, then **Giving Overview**.
 2. Read the top left number: **Gifts this month**. It is the total of every gift received
    since the first of this month. Under it, the daily chart shows which days produced it,
    which is how you tell one large gift from a steady week.
@@ -73,7 +73,7 @@ Do this as Tom, from the sample data, after at least a few gifts exist.
 this dashboard doesn't have permission to run reports." The dashboard reads as whoever is
 looking at it, so this is a permission problem, not a dashboard problem: that person cannot
 run reports or cannot read gifts. Assign them the Fundraising Staff or Read Only role in
-BarnCRM Settings under Access, and the Giving module's permission set under Extra Permissions on the same page. See
+BarnCRM Settings under Access, and the Fundraising module's permission set under Extra Permissions on the same page. See
 step 3 above.
 
 **The numbers look too small.** The money charts count gifts with the status **Received**,
@@ -110,7 +110,7 @@ report in the same folder, or the In-kind value figure on the donor, and see
 
 **Someone changes the shared report.** The reports live in a shared folder and a person
 with edit access can save over them. Ask staff to use **Save As** and keep their copies in
-their own folder. If a packaged report is changed by mistake, an upgrade of the Giving
+their own folder. If a packaged report is changed by mistake, an upgrade of the Fundraising
 package does not restore it, so keep the edits in copies from the start.
 
 **Top donors looks like it is missing your largest supporter.** Top donors groups by

@@ -538,8 +538,7 @@ private class ModuleDetectionServiceTest {
 				'Giving',
 				'Volunteers',
 				'Programs',
-				'Funders',
-				'MirrorGiving'
+				'Funders'
 			};
 			for (String name : modules) {
 				Assert.isTrue(shipped.containsKey(name), name + ' has a catalog row');

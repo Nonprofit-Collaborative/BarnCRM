@@ -25,7 +25,7 @@ first (by hand or with [Importing](importing.md)) and then the gift sent again.
 
 ## How to Turn It On
 
-The Mirror for Giving module has to be installed. The Flow action needs nothing else.
+The BarnCRM Fundraising module has to be installed. The Flow action needs nothing else.
 
 The web address needs a Salesforce user for the sending system to sign in as, and that
 sign-in is set up in Salesforce Setup. It cannot be avoided: how outside systems
@@ -38,7 +38,7 @@ the processor's support team.
 2. **Give it the Inbound Gifts permission set, and nothing else from BarnCRM.** It
    holds exactly what recording a gift needs: reading people, organizations, funds, appeals
    and acknowledgment rules; creating gifts, their fund allocations and the household soft
-   credits Giving adds; and the web address. It cannot edit or delete a donor, edit or
+   credits Fundraising adds; and the web address. It cannot edit or delete a donor, edit or
    delete a gift, change a fund, or read the Error Log, so a leaked key can do little more
    than send gifts. Give it on the Access page, under Extra Permissions: no BarnCRM role includes a module's permission sets.
 3. **Let it see your donors.** It finds a donor only among the people and organizations it

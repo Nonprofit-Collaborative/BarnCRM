@@ -62,11 +62,11 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 	}
 
 	protected override String pausedText() {
-		return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_RunPaused');
+		return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_RunPaused');
 	}
 
 	protected override String switchedOffText() {
-		return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_RunSwitchedOff');
+		return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_RunSwitchedOff');
 	}
 
 	protected override MirrorSync.Result runTotals() {
@@ -86,7 +86,7 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 		if (makesGifts()) {
 			return wonOpportunities();
 		}
-		Datetime lastRun = Mirror_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c;
+		Datetime lastRun = Giving_Settings__c.getOrgDefaults()?.Opportunity_Mirror_Last_Run__c;
 		return Database.getQueryLocatorWithBinds(
 			OpportunityMirrorSelector.giftsToCopyQuery(fromDate != null, lastRun != null),
 			new Map<String, Object>{
@@ -108,7 +108,7 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 			// Once a run: a mistyped name otherwise matches nothing without a word.
 			ErrorLogger.logMessage(
 				String.format(
-					BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_UnknownRecordTypes'),
+					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_UnknownRecordTypes'),
 					new List<Object>{ String.join(unknown, ', ') }
 				),
 				LOG_CONTEXT,
@@ -118,7 +118,7 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 		if (OpportunityGiftService.listsMasterRecordType()) {
 			// Master is a real name, so it is not unknown, yet it matches no Opportunity.
 			ErrorLogger.logMessage(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_MasterRecordType'),
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_MasterRecordType'),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
 			);
@@ -158,8 +158,8 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 		}
 		return String.format(
 			makesGifts()
-				? BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_LogRunGifts')
-				: BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_LogRunOpportunities'),
+				? BarnHelp.text('Giving', 'Mirror_OpportunityMirror_LogRunGifts')
+				: BarnHelp.text('Giving', 'Mirror_OpportunityMirror_LogRunOpportunities'),
 			new List<Object>{
 				totals.created,
 				totals.updated,

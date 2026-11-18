@@ -29,14 +29,14 @@ without a switch runs whenever its module is on):
 
 | Time | Job | Module | Switched on and off |
 |---|---|---|---|
-| 1:15, 1:45, 3:00, 3:30 | Installment top up, installments overdue, donor levels, ask reminders | Giving | **Nightly Jobs** panel, each on its own (on unless switched off) |
-| 1:30 | Opportunity mirror | Mirror for Giving | Opportunity mirror page, while a direction is chosen |
-| 1:35 | Gift Transaction mirror | Mirror for Giving | Gift Transaction mirror page, while the mirror is on |
+| 1:15, 1:45, 3:00, 3:30 | Installment top up, installments overdue, donor levels, ask reminders | Fundraising | **Nightly Jobs** panel, each on its own (on unless switched off) |
+| 1:30 | Opportunity mirror | Fundraising | Opportunity mirror page, while a direction is chosen |
+| 1:35 | Gift Transaction mirror | Fundraising | Gift Transaction mirror page, while the mirror is on |
 | 1:40 | Cases Sent to a Service Provider: makes sure the hourly check (**BarnCRM Mirror: Case requests hourly**, at a quarter past each hour, working only while a request or a Case of the chosen Type is open) is scheduled, and checks once | Mirror | **Nightly Jobs** panel, while **Send Cases to a service provider** is on; switching it off stops the hourly check (see [Cases Sent to a Service Provider](mirror-case-requests.md)) |
 | 2:00 (the **Time of the Nightly Run** setting) | Rollup recalculation | Rollup Builder | Rollups page |
-| 2:45 | Acknowledgment emails | Giving | Acknowledgments page (off until switched on) |
+| 2:45 | Acknowledgment emails | Fundraising | Acknowledgments page (off until switched on) |
 | 3:00 | Volunteer schedules | Volunteers | No switch |
-| 3:15 | Pledge reminders | Giving | Pledge Reminders page (off until switched on) |
+| 3:15 | Pledge reminders | Fundraising | Pledge Reminders page (off until switched on) |
 | 3:30 | Indicator results | Logic Models | No switch |
 | 5:45 | Territory assignment (records with no territory yet) | Territory Management | **Nightly Jobs** panel (off until switched on) |
 | 6:00 | Grant reminders | Grants | No switch |
@@ -49,8 +49,8 @@ full recalculation** setting says otherwise) and over what changed on the other 
 
 The donor levels pass writes a donor only when its level or scores changed.
 
-Modules add their own jobs to the same run when they are installed (Rollup Builder, Giving,
-Mirror, Mirror for Giving, Volunteers, Logic Models, Grants). The Nightly Jobs panel lists every job your org has.
+Modules add their own jobs to the same run when they are installed (Rollup Builder, Fundraising,
+Mirror, Volunteers, Logic Models, Grants). The Nightly Jobs panel lists every job your org has.
 
 ## Where to Find It
 
@@ -67,7 +67,7 @@ The panel shows:
 
 A result other than Done comes with a short reason. Done With Errors means the job finished but
 some of its records failed: the [Error Log](error-log.md) has the details. A job that keeps its
-own summary of what it did (the Giving installment, reminder and acknowledgment jobs) shows it
+own summary of what it did (the Fundraising installment, reminder and acknowledgment jobs) shows it
 under its result, and a job that is on but did not run when the last nightly run did is marked
 **Missed Last Run**.
 
@@ -75,14 +75,14 @@ People who can manage BarnCRM Settings also see, on each job's row:
 
 - **Turn On** or **Turn Off**, for a job with a switch of its own. It saves at once, for the
   whole organization, and turning a job on schedules the nightly run when it is not scheduled.
-- **Run Now**, for a job that is safe to start by hand at any time (the Giving installment top
+- **Run Now**, for a job that is safe to start by hand at any time (the Fundraising installment top
   up, installments overdue, pledge reminders and ask reminders). It starts the job's work now
   without waiting for tonight; the job still runs tonight as usual. Donor levels and
   acknowledgment emails have no **Run Now** here: the Donor Levels page has its own
   **Recalculate Now**, and acknowledgments are sent from the Acknowledgments page.
 
-This panel replaces the Giving module's own **Nightly Jobs** page and tab, which earlier versions
-had: every module's jobs, Giving's included, are on this one panel.
+This panel replaces the Fundraising module's own **Nightly Jobs** page and tab, which earlier versions
+had: every module's jobs, Fundraising's included, are on this one panel.
 
 ## How to Turn It On
 

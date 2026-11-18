@@ -37,9 +37,9 @@ year's application from it.
 
 - Grants is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
 - It needs only BarnCRM Core installed first.
-- It does not need the Programs, Giving or Logic Models modules. With Programs installed, a grant
-  can name a program; with Giving installed, it can name the Giving fund its money is booked to,
-  and the Board Dashboard reads Giving's totals.
+- It does not need the Programs, Fundraising or Logic Models modules. With Programs installed, a grant
+  can name a program; with Fundraising installed, it can name the Giving fund its money is booked to,
+  and the Board Dashboard reads Fundraising's totals.
 
 ## Installing
 
@@ -67,7 +67,7 @@ You never assign the Grants permission sets by hand. Give people their BarnCRM r
 | BarnCRM role | Grants set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Grants Admin | Everything, including deleting a grant |
-| Fundraising Staff (Giving) | Grants Staff | Create and edit grants and move them through the stages; add, change and remove requirements, payments and restricted fund entries; never delete a grant |
+| Fundraising Staff (Fundraising) | Grants Staff | Create and edit grants and move them through the stages; add, change and remove requirements, payments and restricted fund entries; never delete a grant |
 | Team Member | Grants Staff | The same as Fundraising Staff |
 | Read Only | Grants Read Only | Look at grants, the pipeline and the calendar |
 
@@ -216,33 +216,33 @@ Submitted** only to people who can change requirements.
 The **Board Dashboard** tab is the Grants app's home and answers the questions a board asks
 about money, for the current fiscal year. Everyone with a Grants set sees it; it only reads, and
 it stores nothing. At the top, tiles show **Revenue This Fiscal Year**, **Awarded This Fiscal
-Year**, with Giving **Gifts to funds**, and, with restricted fund tracking, **Restricted Grants:
+Year**, with Fundraising **Gifts to funds**, and, with restricted fund tracking, **Restricted Grants:
 Balance**. Under them, a tile for each Grants tab the person can open (Grant Pipeline, Grant
 Calendar, Grants, Grant Requirements, Grant Answers and, for admins, Funder Report Templates).
 
 - **Revenue Mix**: grants awarded this fiscal year (stage Awarded, decision date this fiscal year)
-  totaled by **Funding Source**, and, with Giving, one more line for gifts designated to funds
+  totaled by **Funding Source**, and, with Fundraising, one more line for gifts designated to funds
   this fiscal year. Each line shows its amount and share as a bar. Grants with no funding source show as
   "Not set"; fill it in so the mix is right.
 - **Concentration**: the organizations giving the most, each with its share of that revenue (its
-  grants awarded plus, with Giving, its Giving This Year). The dashboard flags a single source
+  grants awarded plus, with Fundraising, its Giving This Year). The dashboard flags a single source
   above 25 percent, or the five largest together above 50 percent, as a risk to discuss: losing
   one funder would hurt. These thresholds are common board guidance and are fixed, not settings.
-- **Restricted Balances**: with Giving, each active restricted fund and what it raised this
+- **Restricted Balances**: with Fundraising, each active restricted fund and what it raised this
   fiscal year. Once restricted fund tracking (F-03) is installed, each restricted grant's balance
   (received less spent and released) is listed too.
 
-Without Giving, or for someone without access to it, the dashboard shows the grant figures alone.
+Without Fundraising, or for someone without access to it, the dashboard shows the grant figures alone.
 Each person sees totals of the records they can read. For a board packet, click **Print**: the
 browser's print dialog opens with the app's header and navigation left off.
 
-**A grant also recorded as a Giving gift is counted twice.** The dashboard adds grants and gifts
+**A grant also recorded as a Fundraising gift is counted twice.** The dashboard adds grants and gifts
 side by side and does not match one to the other, so a grant whose payment you also enter as a
 gift designated to a fund appears in the grant lines and again in the gifts line, and its funder's
 share in **Concentration** includes both. Record each award in one place (the grant, or the gift),
 or read the two lines knowing they overlap.
 
-If grant money is recorded both on the grant and as a gift in Giving, it counts in both lines;
+If grant money is recorded both on the grant and as a gift in Fundraising, it counts in both lines;
 record each payment in one place.
 
 ## Grant Requirements
@@ -503,10 +503,10 @@ import past payments and entries.
 
 ### The Giving Fund a Grant Is Booked To
 
-With the Giving module installed, the grant's page has a **Giving Fund** card. Choose the fund the
-organization books this money to in Giving and click **Save**. Like the program, the grant stores
-the fund's record ID, so Grants works without Giving; without Giving the card is not shown. Grants
-reads only the fund's name: Giving's own fund totals count the gifts you record in Giving, and the
+With the Fundraising module installed, the grant's page has a **Giving Fund** card. Choose the fund the
+organization books this money to in Fundraising and click **Save**. Like the program, the grant stores
+the fund's record ID, so Grants works without Fundraising; without Fundraising the card is not shown. Grants
+reads only the fund's name: Fundraising's own fund totals count the gifts you record in Fundraising, and the
 grant's restricted ledger counts its entries, so nothing is counted twice.
 
 ## The Grant Calendar Tab

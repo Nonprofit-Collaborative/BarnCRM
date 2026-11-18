@@ -1,40 +1,48 @@
 /**
- * Mirror for Giving's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the Opportunity
- * mirror's run is in tonight's run only while a direction is chosen, and its page switches it on
- * and off.
+ * Fundraising's gift mirror steps of the nightly run (ADR-0166 nightly-job-dispatcher), added by
+ * `GivingNightlyJobProvider`: the Opportunity mirror's run is in tonight's run only while a
+ * direction is chosen, and its page switches it on and off.
  */
-@IsTest(testFor='ApexClass:MirrorGivingNightlyJobProvider, ApexClass:OpportunityMirrorSchedulable')
-private class MirrorGivingNightlyJobProviderTest {
+@IsTest(
+	testFor='ApexClass:GivingNightlyJobProvider, ApexClass:OpportunityMirrorSchedulable, ApexClass:GiftTransactionMirrorSchedulable'
+)
+private class GiftMirrorNightlyStepsTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.adminWith('Giving_Admin');
 	}
 
 	private static void choose(String direction) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Opportunity_Mirror_Direction__c = direction;
 		upsert settings;
 	}
 
-	private static NightlyStep opportunityStep() {
-		for (NightlyStep step : new MirrorGivingNightlyJobProvider().nightlySteps()) {
-			if (step.key == OpportunityMirrorSchedulable.JOB_NAME) {
+	private static NightlyStep stepNamed(String key) {
+		for (NightlyStep step : new GivingNightlyJobProvider().nightlySteps()) {
+			if (step.key == key) {
 				return step;
 			}
 		}
 		return null;
 	}
 
+	private static NightlyStep opportunityStep() {
+		return stepNamed(OpportunityMirrorSchedulable.JOB_NAME);
+	}
+
 	@IsTest
 	static void bothMirrorsAreStepsAtTheirTimes() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			List<NightlyStep> steps = new MirrorGivingNightlyJobProvider().nightlySteps();
+			NightlyStep opportunity = opportunityStep();
+			NightlyStep giftTransaction = stepNamed(GiftTransactionMirrorSchedulable.JOB_NAME);
 
-			Assert.areEqual(2, steps.size(), 'The two mirrors; Case requests are Mirror\'s.');
-			Assert.areEqual(90, steps[0].minute, '1:30');
-			Assert.areEqual(95, steps[1].minute, '1:35');
-			Assert.areEqual(System.Label.Mirror_OpportunityMirror_Title, steps[0].label);
-			Assert.isTrue(steps[0].switchDefault, 'Shipped on.');
+			Assert.isNotNull(opportunity, 'The Opportunity mirror is a Fundraising step.');
+			Assert.isNotNull(giftTransaction, 'So is the Gift Transaction mirror.');
+			Assert.areEqual(90, opportunity.minute, '1:30');
+			Assert.areEqual(95, giftTransaction.minute, '1:35');
+			Assert.areEqual(System.Label.Mirror_OpportunityMirror_Title, opportunity.label);
+			Assert.isTrue(opportunity.switchDefault, 'Shipped on.');
 		}
 	}
 

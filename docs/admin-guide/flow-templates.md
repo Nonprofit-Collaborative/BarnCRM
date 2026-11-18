@@ -92,7 +92,7 @@ copy pauses and bypasses exactly as BarnCRM's own automation does. Keep that ste
 | Event: fill venue from the venue record | None | It only fills an empty Venue Name or Venue Address from the venue picked on an event, which a record-triggered flow with a lookup and two assignments can copy if you want different text. Switch it off to type venue details yourself. |
 | Session: fill room from the room record | None | It only copies a newly picked room's name into Room, and its capacity into an empty Capacity, which a record-triggered flow can copy. Switch it off to type room names yourself. |
 
-With Giving, Giving's automations are listed on the same page. Their templates are not built
+With Fundraising, Fundraising's automations are listed on the same page. Their templates are not built
 yet, and this page lists them when they are.
 
 ## A Five-Minute Walkthrough

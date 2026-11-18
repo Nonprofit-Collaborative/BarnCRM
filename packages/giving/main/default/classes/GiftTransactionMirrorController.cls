@@ -8,7 +8,7 @@ public with sharing class GiftTransactionMirrorController {
 	private static final String CONTEXT = 'GiftTransactionMirrorController';
 	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
 		CONTEXT,
-		'MirrorGiving',
+		'Giving',
 		'Mirror_OpportunityMirror_ErrorFailed'
 	);
 	/**
@@ -74,12 +74,12 @@ public with sharing class GiftTransactionMirrorController {
 		Status current = checked(false);
 		if (fromDate == null || toDate == null) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
 			);
 		}
 		if (fromDate > toDate) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_ErrorDateOrder')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 		}
 		try {
@@ -109,7 +109,7 @@ public with sharing class GiftTransactionMirrorController {
 		Status current = status();
 		if (!current.canManage) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoManagePermission')
+				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission')
 			);
 		}
 		try {
@@ -139,7 +139,7 @@ public with sharing class GiftTransactionMirrorController {
 	private static void requireUse() {
 		if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
 			throw UserErrors.message(
-				BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoUsePermission')
+				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoUsePermission')
 			);
 		}
 	}
@@ -163,22 +163,22 @@ public with sharing class GiftTransactionMirrorController {
 	@TestVisible
 	private static String refusal(Status current, Boolean scheduling) {
 		if (!current.available) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_Unavailable');
+			return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable');
 		}
 		if (current.direction == GiftTransactionMirrorService.OFF) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_SwitchedOff');
+			return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_SwitchedOff');
 		}
 		if (!current.canManage) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_NoManagePermission');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission');
 		}
 		if (current.notReadyReason != null) {
 			return current.notReadyReason;
 		}
 		if (!current.canRun) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_GiftTransactionMirror_NoAccess');
+			return BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoAccess');
 		}
 		if (current.running && !scheduling) {
-			return BarnHelp.text('MirrorGiving', 'Mirror_OpportunityMirror_Running');
+			return BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Running');
 		}
 		return null;
 	}
@@ -196,7 +196,7 @@ public with sharing class GiftTransactionMirrorController {
 		current.canRun = GiftTransactionMirrorService.canRun();
 		current.running = GiftTransactionMirrorSchedulable.isRunning();
 		current.nextRunAt = GiftTransactionMirrorSchedulable.nextRunAt();
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		current.lastRunAt = settings?.Gift_Transaction_Mirror_Last_Run__c;
 		current.lastSummary = settings?.Gift_Transaction_Mirror_Last_Summary__c;
 		return current;

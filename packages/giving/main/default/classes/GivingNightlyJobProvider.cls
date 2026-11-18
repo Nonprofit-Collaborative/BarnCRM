@@ -1,8 +1,11 @@
 /**
- * The class Core finds by name (registered in its catalog row) to add Giving's steps to the
+ * The class Core finds by name (registered in its catalog row) to add Fundraising's steps to the
  * one nightly run (ADR-0166 nightly-job-dispatcher): the five jobs `GivingScheduler` switches
  * together (the pledge reminders among them, shipped off because they email donors, G-37), then
- * the acknowledgment send, switched on its own page and shipped off for the same reason.
+ * the acknowledgment send, switched on its own page and shipped off for the same reason, then
+ * the nightly runs of the two gift mirrors (X-01, X-07), each in tonight's run only while that
+ * mirror's direction is chosen and its object exists, and switched on its own page (ADR-NEXT
+ * mirror independence).
  *
  * `@NamespaceAccessible` for the reason `GivingHealthCheckExtension` is: Core resolves it with
  * `Type.forName` under ADR-0017.
@@ -22,6 +25,8 @@ public with sharing class GivingNightlyJobProvider implements NightlyStepProvide
 					Giving_Settings__c.getOrgDefaults().Acknowledgments_Last_Run_Summary__c
 				)
 		);
+		steps.add(OpportunityMirrorSchedulable.step());
+		steps.add(GiftTransactionMirrorSchedulable.step());
 		return steps;
 	}
 }

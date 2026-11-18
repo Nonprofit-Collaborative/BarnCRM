@@ -4,7 +4,7 @@ Scripts for the Import wizard: templates, preview, commit, rejected rows, row ru
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
-The **Super Importer** tab opens from the **Data Manager** tab: select the **Super Importer** tile. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
+The **Super Importer** tab opens from the **Data Manager** tab: select the **Super Importer** tile. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Fundraising module's templates and are tested with Fundraising.
 
 `import-test-1.csv` (5 rows: 3 new people, 1 existing sample person, 1 row with no last name):
 
@@ -227,13 +227,13 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 ## T-IMP-12: What Are You Importing?
 
 **Purpose:** confirm each card on the first step opens what it should, the Gifts and Delete cards show only where they apply, and the line under a template says what it creates.
-**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Super Transformer and Bulk Delete](bulk-update-and-delete.md)).
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Fundraising installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Super Transformer and Bulk Delete](bulk-update-and-delete.md)).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Super Importer tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Several Kinds of Record in One File** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
 | 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
-| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic Gift List**), the first is chosen, and **Next** is enabled. |
+| 3 | In an org with Fundraising installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic Gift List**), the first is chosen, and **Next** is enabled. |
 | 3a | Tab to the cards and press the arrow keys. | The choice moves from card to card like radio buttons, and what shows below follows the chosen card. |
 | 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
 | 5 | Log in as an admin without **Bulk Delete Records** and open the Super Importer tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |

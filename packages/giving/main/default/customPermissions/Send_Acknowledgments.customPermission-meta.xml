@@ -2,8 +2,9 @@
 <CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     Send waiting thank yous: run the email send, produce a letter merge file, mark a letter run
-    sent (G-12). Acknowledgment records stay package written. Granted to Giving Staff and Giving
-    Admin.
+    sent (G-12). Acknowledgment records stay package written. Granted to Fundraising Staff Access
+    and
+    Fundraising Admin.
   </description>
   <isLicensed>false</isLicensed>
   <label>Send Acknowledgments</label>

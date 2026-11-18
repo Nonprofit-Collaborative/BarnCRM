@@ -35,15 +35,15 @@ removed again, so the next run does not leave a second one beside it.
 
 ## How to Turn It On
 
-You need the Mirror for Giving module installed (with Giving and Mirror), and a Salesforce edition that has Campaigns (Sales
+You need the BarnCRM Fundraising module installed, and a Salesforce edition that has Campaigns (Sales
 Cloud, Service Cloud, or Nonprofit Cloud). An org on Salesforce Platform licenses only has no
 Campaigns, and the Campaign sync page says so.
 
 1. Give yourself the **Salesforce Records Sync** permission set on the Access page, under Extra
    Permissions: the roles there do not include it.
-2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
+2. Open **BarnCRM Settings**, choose **Fundraising**, and switch on **Copy appeals to
    Campaigns**.
-3. Still in **Giving**, open **Campaign Sync**. It shows how many appeals have a Campaign.
+3. Still in **Fundraising**, open **Campaign Sync**. It shows how many appeals have a Campaign.
    It counts up to 10,000 appeals; past that a number reads `10000+`. Click **Sync All Appeals** once, so the appeals you already had get their Campaigns.
 
 **Who gets a Campaign when they save an appeal.** The Campaign is created with the access of
@@ -78,7 +78,7 @@ time, as Data Loader does by default, is copied as usual.
 Do this as Maria, in an org that has Campaigns, with the sample data loaded and Campaign
 sync switched on as above.
 
-1. Open **BarnCRM Settings**, **Giving**, **Campaign Sync**. Note the numbers: for
+1. Open **BarnCRM Settings**, **Fundraising**, **Campaign Sync**. Note the numbers: for
    example `0 of 6 appeals have a Campaign.`
 2. Click **Sync All Appeals**. The page says the sync has started. Wait a minute and reload
    the page: every appeal now has a Campaign.

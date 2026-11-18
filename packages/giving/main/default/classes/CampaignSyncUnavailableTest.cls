@@ -10,7 +10,7 @@ private class CampaignSyncUnavailableTest {
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Campaign_Sync_Enabled__c = true;
 			upsert settings;
 		}
@@ -115,7 +115,7 @@ private class CampaignSyncUnavailableTest {
 
 			Assert.isFalse(status.available, 'The page says Campaign sync cannot work here.');
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_Unavailable'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_Unavailable'),
 				refusal,
 				'Sync all appeals is refused in words, before anything starts.'
 			);

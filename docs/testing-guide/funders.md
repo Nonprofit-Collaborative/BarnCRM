@@ -3,8 +3,8 @@
 Scripts for the funder pipeline (F-01), reporting requirements with reminders (F-02), award schedules (F-05), restricted funds (F-03), the Grant Calendar (F-08), government award fields (F-04), the answer library (F-14), links to Logic Models outcomes (L-06), funder report templates (F-06), the board dashboard (F-07), the Grant Finder (F-09), application checklists (F-10), grant documents (F-11), budget versus awarded (F-12) and renewals (F-13). Setup detail: [Grants](../admin-guide/funders.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core, Rollup Builder
-and Grants deployed. Programs and Giving are optional; T-FUN-04 needs Programs and T-FUN-10
-Giving for their second halves. Grants
+and Grants deployed. Programs and Fundraising are optional; T-FUN-04 needs Programs and T-FUN-10
+Fundraising for their second halves. Grants
 works on the platform-only shape. Give the testers their roles on the **Access** page: admin
 (Admin role), staff (Fundraising Staff role) and read-only (Read Only role). Each gets its Grants
 permission set from the role. Have one organization, `Lakeside Foundation`, with a contact,
@@ -172,7 +172,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 ## T-FUN-10: Restricted Funds and the Giving Fund
 
-**Purpose:** confirm the restricted ledger, its totals, the entries written for received payments, and the Giving Fund card with and without Giving.
+**Purpose:** confirm the restricted ledger, its totals, the entries written for received payments, and the Giving Fund card with and without Fundraising.
 **Prerequisites:** admin, staff and read-only; a grant `Restricted Award` to `Lakeside Foundation`, **Awarded**, **Amount Awarded** 10,000, award dates this year, with **Restricted** ticked and one **Expected** payment of 10,000.
 
 | Step | Action | Expected result |
@@ -183,8 +183,8 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | Change the payment's **Amount** to 9,000, then its **Received Date** to the first of the month. | The Received entry follows: 9,000, dated the first. |
 | 5 | Set the payment to **Expected**. | The Received entry is removed; the Spent entry stays. |
 | 6 | Untick **Restricted**, add a second payment of 500 as **Received**. | No entry is added. |
-| 7 | Without Giving: look for the **Giving Fund** card. | There is none. Typing text into **Giving Fund** on the grant is refused. |
-| 8 | With Giving: choose an active fund on the card and click **Save**. | `Saved.` and the fund's name; the grant's **Giving Fund** holds an 18-character ID. Choose **No fund** and save to clear it. |
+| 7 | Without Fundraising: look for the **Giving Fund** card. | There is none. Typing text into **Giving Fund** on the grant is refused. |
+| 8 | With Fundraising: choose an active fund on the card and click **Save**. | `Saved.` and the fund's name; the grant's **Giving Fund** holds an 18-character ID. Choose **No fund** and save to clear it. |
 | 9 | As read-only, open the grant. | The entries and totals show; no **New** on the entries and the fund is shown by name. |
 | 10 | Load sample data and open **Youth Programs Award**. | **Restricted** is ticked: Received 17,500, Spent 6,000 (`Tutor stipends`), balance 11,500. |
 | 11 | As the admin, delete `Restricted Award`. | Its entries and payments go with it. |
@@ -285,14 +285,14 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 ## T-FUN-16: Board Dashboard
 
 **Purpose:** confirm the board dashboard's revenue mix, concentration flags and restricted balances (F-07, R-GN9).
-**Prerequisites:** Giving installed; staff with Giving read access and staff without it; no other grants awarded this fiscal year. Two organizations, `Lakeside Foundation` and `State Agency`. Awarded with a decision date this fiscal year: `Federal award` (Lakeside, 30,000, Funding Source Federal) and `State award` (State Agency, 20,000, no funding source). Awarded two fiscal years ago: `Old award` (Lakeside, 99,000). In Giving, gifts this fiscal year of 12,000 to an active restricted fund `Scholarships` and 38,000 to an unrestricted fund, 5,000 of it from `Lakeside Foundation`.
+**Prerequisites:** Fundraising installed; staff with Fundraising read access and staff without it; no other grants awarded this fiscal year. Two organizations, `Lakeside Foundation` and `State Agency`. Awarded with a decision date this fiscal year: `Federal award` (Lakeside, 30,000, Funding Source Federal) and `State award` (State Agency, 20,000, no funding source). Awarded two fiscal years ago: `Old award` (Lakeside, 99,000). In Fundraising, gifts this fiscal year of 12,000 to an active restricted fund `Scholarships` and 38,000 to an unrestricted fund, 5,000 of it from `Lakeside Foundation`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff with Giving access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
+| 1 | As staff with Fundraising access, open the **BarnCRM Grants** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Grants tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
 | 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`, each with a bar; one amber notice holding the two warnings: Lakeside gives 35% (above 25 percent), and the five largest give more than half. |
 | 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
-| 4 | As staff without Giving access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
+| 4 | As staff without Fundraising access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
 | 5 | As the admin, give `State award` the Funding Source **State**; reload as staff. | `Not set` is replaced by `State`. |
 | 6 | With restricted fund tracking (F-03) installed, mark `Federal award` restricted and record 10,000 received; reload. | Under **Restricted Grants: Balance**, `Federal award` 10,000, and a **Restricted Grants: Balance** tile of 10,000. |
 | 7 | Click **Print**. | The print preview shows the dashboard without the app's header, navigation, Print button or tool tiles. |
@@ -385,7 +385,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | **BarnCRM Settings**, **Modules**. | The row reads **BarnCRM Grants**, not BarnCRM Funders. In Setup Assistant step 7 the same name shows. |
-| 2 | **BarnCRM Settings**: read the Fundraising group. | It lists **Giving**, **Receipts** and **Grants**; **Grants** shows the five reminder, Grant Finder and renewal settings. |
+| 2 | **BarnCRM Settings**: read the Fundraising group. | It lists **Fundraising**, **Receipts** and **Grants**; **Grants** shows the five reminder, Grant Finder and renewal settings. |
 | 3 | In Setup, **Permission Sets**. | The three sets read **Grants Admin**, **Grants Staff** and **Grants Read Only**; Setup, **Custom Settings** lists **Grants Settings**. |
 | 4 | Open the **BarnCRM Grants** app, then **Grant Finder** with the Grant Finder setting off. | The tab says to turn it on in **BarnCRM Settings, Grants**. |
 | 5 | In App Builder, find the Board Dashboard component. | It is named **Grants Board Dashboard**. |

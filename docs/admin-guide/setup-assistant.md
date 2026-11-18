@@ -9,11 +9,11 @@ makes each answer easy, and it remembers where you got to. Close the browser in 
 of step four and come back tomorrow: the assistant opens on step four.
 
 How many steps you see depends on what is installed. BarnCRM Core on its own asks eight
-questions, starting with which edition you want. When the **Giving** module is installed as
-well, Giving adds its own: a step for the default fund and appeal, the receipt details on the
+questions, starting with which edition you want. When the **Fundraising** module is installed as
+well, Fundraising adds its own: a step for the default fund and appeal, the receipt details on the
 identity step, and a first gift to check everything with, which makes nine steps. This page
-numbers the steps as they appear with Giving installed and marks what comes from Giving.
-Without Giving, the steps after step three move up by one.
+numbers the steps as they appear with Fundraising installed and marks what comes from Fundraising.
+Without Fundraising, the steps after step three move up by one.
 
 Nothing it asks is permanent, except that a feature once on stays on. Every answer is a
 setting you can change later on the BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
@@ -76,7 +76,7 @@ Two things sit outside the assistant, because Salesforce does not let an app do 
 
 ## A Five-Minute Walkthrough, and Then the Nine Steps
 
-Maria has just installed BarnCRM Core and the Giving module in her organization's
+Maria has just installed BarnCRM Core and the Fundraising module in her organization's
 Salesforce org. That org has Person Accounts turned on, which matters in step two and
 nowhere else. She has half an hour before her next meeting.
 
@@ -87,9 +87,9 @@ ready than to go and find:
 
 - Your organization's legal name as it appears on your official filings.
 - Your mailing address as you want it printed.
-- With Giving: your tax identification number (in the United States, your EIN).
-- With Giving: your logo, as a PNG or JPG file.
-- With Giving: a scan of the signature that goes on receipt letters, if you use one.
+- With Fundraising: your tax identification number (in the United States, your EIN).
+- With Fundraising: your logo, as a PNG or JPG file.
+- With Fundraising: a scan of the signature that goes on receipt letters, if you use one.
 
 ### Step 1: Choose Your Edition
 
@@ -103,24 +103,24 @@ General." The moment the window is finished, the checklist reloads and marks thi
 
 - **Standard Edition**: the full core suite of tools, including households, people, organizations, relationships, addresses,
   importing and everything else in BarnCRM Core. Nothing more to install.
-- **Nonprofit Edition**: everything in the Standard Edition, plus the nonprofit tools, starting with the Giving
-  module for gifts, funds and receipts. Giving is a separate package.
+- **Nonprofit Edition**: everything in the Standard Edition, plus the nonprofit tools, starting with the Fundraising
+  module for gifts, funds and receipts. Fundraising is a separate package.
 
 - **Standard Edition:** nothing more to do here. Click **Next**.
-- **Nonprofit Edition, Giving already installed:** the step says "Giving is installed. Its
+- **Nonprofit Edition, Fundraising already installed:** the step says "Fundraising is installed. Its
   steps are part of this setup." Click **Next**.
-- **Nonprofit Edition, Giving not installed yet:** the step says "The
-  Nonprofit Edition needs the Giving module, which is not installed yet." Click **Open the
-  Giving installer**. Salesforce's install screen opens in a new tab: choose who to install
+- **Nonprofit Edition, Fundraising not installed yet:** the step says "The
+  Nonprofit Edition needs the Fundraising module, which is not installed yet." Click **Open the
+  Fundraising installer**. Salesforce's install screen opens in a new tab: choose who to install
   for (**Install for Admins Only** is the safe choice; you give people access in step five),
   click **Install**, and wait for the email that says it finished. Come back to this tab and
-  click **Check Again**. The step now says Giving is installed, and Giving's own steps join
+  click **Check Again**. The step now says Fundraising is installed, and Fundraising's own steps join
   the assistant.
 
 BarnCRM never installs anything for you: Salesforce does not let one app install another, and
-you should see and approve what goes into your org. If the step says "The Giving install
-link is not published yet.", there is no installable version of Giving to link to yet: click
-**Read about Giving**, and ask whoever gave you BarnCRM for the install link.
+you should see and approve what goes into your org. If the step says "The Fundraising install
+link is not published yet.", there is no installable version of Fundraising to link to yet: click
+**Read about Fundraising**, and ask whoever gave you BarnCRM for the install link.
 
 Choosing an edition loads no sample data and changes no records. With the Nonprofit Edition,
 step seven also offers the nonprofit modules; with the Standard Edition, BarnCRM shows none of
@@ -199,22 +199,22 @@ default, and puts it back.
 **What she decides:** whether her households are a Family or a Household. That is genuinely
 the whole decision.
 
-### Step 4: Pick Your Default Fund and Appeal (Giving)
+### Step 4: Pick Your Default Fund and Appeal (Fundraising)
 
-This step comes with the **Giving** module, which is a separate package. Without Giving the
+This step comes with the **Fundraising** module, which is a separate package. Without Fundraising the
 step is not there at all, and the assistant goes straight from naming to access.
 
 You get two pickers: the fund a gift belongs to when nobody says otherwise (usually your
 general operating fund) and the appeal it is credited to (usually a general or unsolicited
 appeal). Choose them and click **Save**. The pickers only offer real funds and appeals, and
 anything else is refused, so a default can never point at the wrong kind of record. If you
-install Giving after finishing setup, this step appears as **To Do** the next time you open
+install Fundraising after finishing setup, this step appears as **To Do** the next time you open
 the home page.
 
 A new org already has a **General Fund**, created at install and set as the default, so the
 fund picker opens with **General Fund** chosen and the step counts as done once you reach
 it. Change it only if another fund should catch undesignated gifts. If the org already had
-funds or a default when Giving was installed, nothing is chosen for you.
+funds or a default when Fundraising was installed, nothing is chosen for you.
 
 **What Maria sees:** her General Fund, already chosen, and her Unsolicited appeal in the
 pickers. She picks the appeal and clicks **Save**.
@@ -230,7 +230,7 @@ one. Give access to as many colleagues as you like, one at a time. The roles are
 | Role | Who it is for |
 |---|---|
 | BarnCRM Admin | Maria: everything, including settings |
-| Fundraising Staff (comes with Giving) | David: gifts, donors, receipts |
+| Fundraising Staff (comes with Fundraising) | David: gifts, donors, receipts |
 | Team Member | Priya: day to day work with people and households, plus each installed module's staff access, such as programs, shifts and hours |
 | Read Only | Tom and Jen: see everything, change nothing |
 
@@ -259,7 +259,7 @@ This is the form the "before you start" list was for. Core asks for two things:
   and **Country** are optional. If a required part is missing when you click **Save**, the
   step tells you which and saves nothing.
 
-With the Giving module installed, the same form also asks for what your receipts print:
+With the Fundraising module installed, the same form also asks for what your receipts print:
 
 - **Tax identification number** (EIN in the United States).
 - **Logo**: click **Upload logo** and choose the file. The logo appears under the button
@@ -268,7 +268,7 @@ With the Giving module installed, the same form also asks for what your receipts
 - **Signer name and title**, for example `Ana Ruiz` and `Executive Director`.
 
 Click **Save**. The step completes when the legal name is filled in, because that is the
-one a letter (or, with Giving, a receipt) cannot be printed without.
+one a letter (or, with Fundraising, a receipt) cannot be printed without.
 
 Two things to know about the uploaded files. They are stored as Salesforce files owned by
 whoever uploads them, and they are attached to that person's user record, because
@@ -295,8 +295,8 @@ GitHub). A module that is not installed and has a published version also has an
   BarnCRM Rollup Builder and the other modules both editions offer (BarnCRM Mirror among
   them), plus any module that is already installed. It offers no nonprofit modules.
 - With the Nonprofit Edition chosen, it shows Core and every module, among them BarnCRM Rollup
-  Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
-  Grants, BarnCRM Mirror and BarnCRM Mirror for Giving.
+  Builder, BarnCRM Fundraising, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models,
+  BarnCRM Grants and BarnCRM Mirror.
 
 Core is always present. The rest are separate packages, and a module that is not installed
 leaves nothing behind in your org: no objects, no tabs, no automation. Installing one means
@@ -315,7 +315,7 @@ To turn an installed module on or off, or to see what uninstalling one would del
 
 Click **Next** when you have read it. The step marks itself done.
 
-**What Maria sees:** every package, Core and Giving present, the rest not
+**What Maria sees:** every package, Core and Fundraising present, the rest not
 installed. She makes a note to read about Volunteers this afternoon.
 
 ### Step 8: Bring in Your Data
@@ -338,8 +338,8 @@ still being cleaned up.
 
 ### Step 9: Check That Everything Works
 
-Follow the short walkthrough: add a person and see their household appear. With the Giving
-module installed, the step also has **Enter Your First Gift**, which opens the Giving
+Follow the short walkthrough: add a person and see their household appear. With the Fundraising
+module installed, the step also has **Enter Your First Gift**, which opens the Fundraising
 module's own gift entry screen: enter one gift, save it, and you have proved the whole chain
 works, from donor to household to gift. Come back to the home page afterwards and click
 **Finish**.
@@ -366,14 +366,14 @@ finished, because it is.
 - **Uploading the logo from a colleague's login, then deactivating them.** The file belongs
   to the person who uploaded it. Upload the logo and the signature from an account that
   will stay active, ideally the administrator's.
-- **Putting the everyday name in the legal name box.** Letters (and, with Giving, receipts)
+- **Putting the everyday name in the legal name box.** Letters (and, with Fundraising, receipts)
   have to carry the name your official filings carry. If they differ, the legal name goes in step six.
 - **Expecting the assistant to install a module.** No app can install another package for
   you. Step one and step seven open Salesforce's installer in a new tab, where you click
-  through the install yourself. A module's steps (Giving's, for example) appear once you
+  through the install yourself. A module's steps (Fundraising's, for example) appear once you
   come back and click **Check Again**, or reload the home page.
 - **Choosing the Nonprofit Edition and closing the installer tab before it finishes.** The
-  edition is saved, but Giving is not installed until Salesforce's install email arrives.
+  edition is saved, but Fundraising is not installed until Salesforce's install email arrives.
   Open the installer again from step one, or from step seven.
 - **Looking for the edition choice after step one.** The step shows the saved edition
   read-only. Change it in BarnCRM Settings, as [Editions](editions.md) describes.

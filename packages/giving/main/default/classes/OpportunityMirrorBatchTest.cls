@@ -21,7 +21,7 @@ private class OpportunityMirrorBatchTest {
 	}
 
 	private static void choose(String direction, Date startDate) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Opportunity_Mirror_Direction__c = direction;
 		settings.Opportunity_Mirror_Start__c = startDate == null
 			? null

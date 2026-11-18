@@ -15,7 +15,7 @@ private class CampaignSyncBatchTest {
 				new Appeal__c(Name = 'Gala', Parent_Appeal__c = parent.Id, Active__c = true)
 			};
 			// Switched on only now, so none of the appeals above has a Campaign yet.
-			Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 			settings.Campaign_Sync_Enabled__c = true;
 			upsert settings;
 		}

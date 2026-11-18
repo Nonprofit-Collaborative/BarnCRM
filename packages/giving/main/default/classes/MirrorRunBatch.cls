@@ -5,7 +5,7 @@
  * Automation page, or the mirror says it is not ready. The pause and the switch are checked again
  * for each chunk. Refusals are gathered across the chunks and written when the run ends, with a
  * summary at Info, and a run that is not a range records when it started and its summary on
- * Mirror Settings, as the point from which the next run rechecks linked gifts changed since.
+ * Giving Settings, as the point from which the next run rechecks linked gifts changed since.
  */
 public abstract with sharing class MirrorRunBatch implements Database.Batchable<SObject>, Database.Stateful {
 	// Core's constant for this severity is not namespace accessible, so its value is repeated.
@@ -52,7 +52,7 @@ public abstract with sharing class MirrorRunBatch implements Database.Batchable<
 	protected virtual Boolean recorded() {
 		return true;
 	}
-	/** Records the run on Mirror Settings. */
+	/** Records the run on Giving Settings. */
 	protected abstract void recordRun(Datetime startedAt, String summary);
 
 	// ------------------------------------------------------------------------------- the run

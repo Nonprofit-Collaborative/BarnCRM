@@ -1,17 +1,17 @@
 /**
- * Mirror for Giving's Health Check finding (X-01, R-OM8): a scheduled Opportunity mirror run that has not
+ * Fundraising's gift mirror Health Check finding (X-01, R-OM8): a scheduled Opportunity mirror run that has not
  * completed for more than two days is reported to Maria, in Core's one report, and only when the
  * mirror is scheduled, on, and she may manage settings.
  */
-@IsTest(testFor='ApexClass:MirrorGivingHealthCheckExtension')
-private class MirrorGivingHealthCheckExtensionTest {
+@IsTest(testFor='ApexClass:GiftMirrorHealthChecks')
+private class GiftMirrorHealthChecksTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.adminWith('Giving_Admin');
 	}
 
 	private static void choose(String direction) {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		settings.Opportunity_Mirror_Direction__c = direction;
 		upsert settings;
 	}
@@ -25,7 +25,7 @@ private class MirrorGivingHealthCheckExtensionTest {
 
 	private static Boolean reported(List<HealthCheckService.Finding> findings) {
 		for (HealthCheckService.Finding finding : findings) {
-			if (finding.getKey() == MirrorGivingHealthCheckExtension.MIRROR_STALE_KEY) {
+			if (finding.getKey() == GiftMirrorHealthChecks.MIRROR_STALE_KEY) {
 				return true;
 			}
 		}
@@ -41,9 +41,9 @@ private class MirrorGivingHealthCheckExtensionTest {
 		choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 		System.runAs(maria()) {
 			OpportunityMirrorSchedulable.schedule();
-			MirrorGivingHealthCheckExtension.nowForTest = System.now().addDays(3);
+			GiftMirrorHealthChecks.nowForTest = System.now().addDays(3);
 			Assert.isFalse(
-				reported(new MirrorGivingHealthCheckExtension().findings()),
+				reported(GiftMirrorHealthChecks.findings()),
 				'Without Opportunity there is no run to be late.'
 			);
 		}
@@ -62,17 +62,17 @@ private class MirrorGivingHealthCheckExtensionTest {
 			System.runAs(admin) {
 				OpportunityMirrorSchedulable.schedule();
 				Assert.isFalse(
-					reported(new MirrorGivingHealthCheckExtension().findings()),
+					reported(GiftMirrorHealthChecks.findings()),
 					'Just scheduled: nothing to say yet.'
 				);
-				MirrorGivingHealthCheckExtension.nowForTest = System.now().addDays(3);
+				GiftMirrorHealthChecks.nowForTest = System.now().addDays(3);
 				Assert.isTrue(
 					reported(HealthCheckService.run()),
-					'Core finds Mirror for Giving by name.'
+					'Core finds Fundraising by name.'
 				);
 				MirrorSettingsWriter.recordOpportunityMirrorRun(System.now().addDays(2), 'Ran');
 				Assert.isFalse(
-					reported(new MirrorGivingHealthCheckExtension().findings()),
+					reported(GiftMirrorHealthChecks.findings()),
 					'A run completed a day ago.'
 				);
 			}
@@ -87,7 +87,7 @@ private class MirrorGivingHealthCheckExtensionTest {
 				assertNothingReported();
 				return;
 			}
-			MirrorGivingHealthCheckExtension.nowForTest = System.now().addDays(3);
+			GiftMirrorHealthChecks.nowForTest = System.now().addDays(3);
 			User admin = maria();
 			User viewer = TestDataFactory.createUserOnTheRunningUsersProfile(
 				'Ana',
@@ -96,21 +96,18 @@ private class MirrorGivingHealthCheckExtensionTest {
 			choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 			Test.startTest();
 			System.runAs(admin) {
-				Assert.isFalse(
-					reported(new MirrorGivingHealthCheckExtension().findings()),
-					'Not scheduled.'
-				);
+				Assert.isFalse(reported(GiftMirrorHealthChecks.findings()), 'Not scheduled.');
 				OpportunityMirrorSchedulable.schedule();
 			}
 			System.runAs(viewer) {
 				Assert.isFalse(
-					reported(new MirrorGivingHealthCheckExtension().findings()),
+					reported(GiftMirrorHealthChecks.findings()),
 					'Only a viewer who may manage settings is told.'
 				);
 			}
 			choose(OpportunityMirrorService.OFF);
 			System.runAs(admin) {
-				Assert.isFalse(reported(new MirrorGivingHealthCheckExtension().findings()), 'Off.');
+				Assert.isFalse(reported(GiftMirrorHealthChecks.findings()), 'Off.');
 			}
 			Test.stopTest();
 		}

@@ -67,29 +67,29 @@ const KINDS = {
     columnLinkedDate: columnCloseDate,
     linkedDate: 'closeDate',
     texts: () => ({
-      intro: helpText('MirrorGiving', 'Mirror_OpportunityMirror_Intro'),
-      unavailable: helpText('MirrorGiving', 'Mirror_OpportunityMirror_Unavailable'),
-      switchedOff: helpText('MirrorGiving', 'Mirror_OpportunityMirror_SwitchedOff'),
-      noAccess: helpText('MirrorGiving', 'Mirror_OpportunityMirror_NoOpportunityAccess'),
-      reconciliationIntro: helpText('MirrorGiving', 'Mirror_OpportunityMirror_ReconciliationIntro')
+      intro: helpText('Giving', 'Mirror_OpportunityMirror_Intro'),
+      unavailable: helpText('Giving', 'Mirror_OpportunityMirror_Unavailable'),
+      switchedOff: helpText('Giving', 'Mirror_OpportunityMirror_SwitchedOff'),
+      noAccess: helpText('Giving', 'Mirror_OpportunityMirror_NoOpportunityAccess'),
+      reconciliationIntro: helpText('Giving', 'Mirror_OpportunityMirror_ReconciliationIntro')
     }),
     setupNote: () => ({
       key: 'opportunityAccess',
-      what: helpText('MirrorGiving', 'Mirror_SetupNote_Mirror_What'),
-      why: helpText('MirrorGiving', 'Mirror_SetupNote_Mirror_Why'),
-      steps: helpText('MirrorGiving', 'Mirror_SetupNote_Mirror_Steps'),
+      what: helpText('Giving', 'Mirror_SetupNote_Mirror_What'),
+      why: helpText('Giving', 'Mirror_SetupNote_Mirror_Why'),
+      steps: helpText('Giving', 'Mirror_SetupNote_Mirror_Steps'),
       link: 'permissionSets'
     }),
     directionText(status, day) {
       if (status.direction === GIFTS_TO_OPPORTUNITIES) {
-        return helpText('MirrorGiving', 'Mirror_OpportunityMirror_DirectionGifts');
+        return helpText('Giving', 'Mirror_OpportunityMirror_DirectionGifts');
       }
       return status.startDate
         ? fill(
-            helpText('MirrorGiving', 'Mirror_OpportunityMirror_DirectionOpportunities'),
+            helpText('Giving', 'Mirror_OpportunityMirror_DirectionOpportunities'),
             day(status.startDate)
           )
-        : helpText('MirrorGiving', 'Mirror_OpportunityMirror_NoStartDate');
+        : helpText('Giving', 'Mirror_OpportunityMirror_NoStartDate');
     },
     /** Copy again copies gifts, so only Gifts to Opportunities offers it. */
     copiesAgain: (status) => status.direction === GIFTS_TO_OPPORTUNITIES
@@ -111,25 +111,22 @@ const KINDS = {
     columnLinkedDate: columnTransactionDate,
     linkedDate: 'transactionDate',
     texts: () => ({
-      intro: helpText('MirrorGiving', 'Mirror_GiftTransactionMirror_Intro'),
-      unavailable: helpText('MirrorGiving', 'Mirror_GiftTransactionMirror_Unavailable'),
-      switchedOff: helpText('MirrorGiving', 'Mirror_GiftTransactionMirror_SwitchedOff'),
-      noAccess: helpText('MirrorGiving', 'Mirror_GiftTransactionMirror_NoAccess'),
-      reconciliationIntro: helpText(
-        'MirrorGiving',
-        'Mirror_GiftTransactionMirror_ReconciliationIntro'
-      )
+      intro: helpText('Giving', 'Mirror_GiftTransactionMirror_Intro'),
+      unavailable: helpText('Giving', 'Mirror_GiftTransactionMirror_Unavailable'),
+      switchedOff: helpText('Giving', 'Mirror_GiftTransactionMirror_SwitchedOff'),
+      noAccess: helpText('Giving', 'Mirror_GiftTransactionMirror_NoAccess'),
+      reconciliationIntro: helpText('Giving', 'Mirror_GiftTransactionMirror_ReconciliationIntro')
     }),
     setupNote: () => ({
       key: 'fundraisingUser',
-      what: helpText('MirrorGiving', 'Mirror_SetupNote_GiftTransactionMirror_What'),
-      why: helpText('MirrorGiving', 'Mirror_SetupNote_GiftTransactionMirror_Why'),
-      steps: helpText('MirrorGiving', 'Mirror_SetupNote_GiftTransactionMirror_Steps'),
+      what: helpText('Giving', 'Mirror_SetupNote_GiftTransactionMirror_What'),
+      why: helpText('Giving', 'Mirror_SetupNote_GiftTransactionMirror_Why'),
+      steps: helpText('Giving', 'Mirror_SetupNote_GiftTransactionMirror_Steps'),
       link: 'permissionSets'
     }),
     directionText(status, day) {
       return fill(
-        helpText('MirrorGiving', 'Mirror_GiftTransactionMirror_DirectionGifts'),
+        helpText('Giving', 'Mirror_GiftTransactionMirror_DirectionGifts'),
         status.startDate ? day(status.startDate) : '',
         status.paidStatus
       );
@@ -148,7 +145,7 @@ export default class MirrorPage extends LightningElement {
   /** `opportunity` or `giftTransaction`. */
   @api kind;
 
-  helpReady = isHelpLoaded('MirrorGiving');
+  helpReady = isHelpLoaded('Giving');
   status;
   comparison;
   working = false;
@@ -179,7 +176,7 @@ export default class MirrorPage extends LightningElement {
       ...mirror.texts(),
       loading,
       title: mirror.title,
-      noManagePermission: helpText('MirrorGiving', 'Mirror_OpportunityMirror_NoManagePermission'),
+      noManagePermission: helpText('Giving', 'Mirror_OpportunityMirror_NoManagePermission'),
       runNow: runNowLabel,
       scheduleNightly,
       stopSchedule,
@@ -234,7 +231,7 @@ export default class MirrorPage extends LightningElement {
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('MirrorGiving').then(() => {
+      loadHelp('Giving').then(() => {
         this.helpReady = true;
       });
     }
@@ -295,23 +292,23 @@ export default class MirrorPage extends LightningElement {
   get scheduleText() {
     return this.view.scheduled
       ? fill(nextRun, this.moment(this.status.nextRunAt))
-      : helpText('MirrorGiving', 'Mirror_OpportunityMirror_NotScheduled');
+      : helpText('Giving', 'Mirror_OpportunityMirror_NotScheduled');
   }
 
   get lastRunText() {
     return this.status.lastRunAt
       ? fill(
-          helpText('MirrorGiving', 'Mirror_OpportunityMirror_LastRun'),
+          helpText('Giving', 'Mirror_OpportunityMirror_LastRun'),
           this.moment(this.status.lastRunAt),
           this.status.lastSummary || ''
         )
-      : helpText('MirrorGiving', 'Mirror_OpportunityMirror_NoLastRun');
+      : helpText('Giving', 'Mirror_OpportunityMirror_NoLastRun');
   }
 
   get runningText() {
     return this.justStarted
-      ? helpText('MirrorGiving', 'Mirror_OpportunityMirror_Started')
-      : helpText('MirrorGiving', 'Mirror_OpportunityMirror_Running');
+      ? helpText('Giving', 'Mirror_OpportunityMirror_Started')
+      : helpText('Giving', 'Mirror_OpportunityMirror_Running');
   }
 
   get copyAgainShown() {
@@ -343,8 +340,8 @@ export default class MirrorPage extends LightningElement {
   get differenceText() {
     return differenceTextOf(this.comparison, {
       noDifferences,
-      differenceCount: helpText('MirrorGiving', 'Mirror_OpportunityMirror_DifferenceCount'),
-      differenceCountAll: helpText('MirrorGiving', 'Mirror_OpportunityMirror_DifferenceCountAll')
+      differenceCount: helpText('Giving', 'Mirror_OpportunityMirror_DifferenceCount'),
+      differenceCountAll: helpText('Giving', 'Mirror_OpportunityMirror_DifferenceCountAll')
     });
   }
 
@@ -409,7 +406,7 @@ export default class MirrorPage extends LightningElement {
   messageOf(failure) {
     return (
       (failure && failure.body && failure.body.message) ||
-      helpText('MirrorGiving', 'Mirror_OpportunityMirror_ErrorFailed')
+      helpText('Giving', 'Mirror_OpportunityMirror_ErrorFailed')
     );
   }
 }

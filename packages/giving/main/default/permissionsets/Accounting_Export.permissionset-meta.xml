@@ -4,7 +4,7 @@
   <label>Accounting Export</label>
   <description>
     For the bookkeeper: downloads gifts as a CSV file and marks them posted. Reads the gift fields
-    the file shows, so no Giving set is needed beside it; which gifts appear follows sharing.
+    the file shows, so no Fundraising set is needed beside it; which gifts appear follows sharing.
   </description>
   <classAccesses>
     <apexClass>AccountingExportController</apexClass>

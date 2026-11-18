@@ -5,7 +5,7 @@ defaulting, brand-aware receipts and numbering, brand-restricted visibility, and
 letters, thank yous and portals. Setup detail:
 [Brands and Legal Entities](../admin-guide/brands.md).
 
-Before you start: an org from [Before you test](before-you-test.md) with Core and Giving deployed,
+Before you start: an org from [Before you test](before-you-test.md) with Core and Fundraising deployed,
 an admin user and a staff user (see [Test users](before-you-test.md#test-users)), and the
 organization legal name filled in.
 
@@ -56,7 +56,7 @@ organization legal name filled in.
 ## T-BRAND-04: Brand on Gifts and Brand-Aware Receipts
 
 **Purpose:** confirm a new gift takes a brand and its receipt prints the brand.
-**Prerequisites:** T-BRAND-03; Giving deployed with its brand fields.
+**Prerequisites:** T-BRAND-03; Fundraising deployed with its brand fields.
 **Smoke:** no
 
 | Step | Action | Expected result |
@@ -91,7 +91,7 @@ organization legal name filled in.
 ## T-BRAND-06: Brand-Aware Letters, Thank Yous and Portals
 
 **Purpose:** confirm volunteer letters, thank-you emails and portals use the record's brand.
-**Prerequisites:** T-BRAND-02 with **Use brands** on; Volunteers, Giving acknowledgments and Portal Builder set up; `Barn Thrift` has a phone, a **Letter Signature**, a **Primary Color** and a **Sender Email** that is a verified Organization-Wide Address.
+**Prerequisites:** T-BRAND-02 with **Use brands** on; Volunteers, Fundraising acknowledgments and Portal Builder set up; `Barn Thrift` has a phone, a **Letter Signature**, a **Primary Color** and a **Sender Email** that is a verified Organization-Wide Address.
 **Smoke:** no
 
 | Step | Action | Expected result |

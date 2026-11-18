@@ -56,7 +56,7 @@ public with sharing class CampaignSyncBatch implements Database.Batchable<SObjec
 		}
 		ErrorLogger.logMessage(
 			BarnHelp.text(
-				'MirrorGiving',
+				'Giving',
 				'Mirror_CampaignSync_LogRunSummary',
 				new List<Object>{
 					childrenOnly ? 2 : 1,

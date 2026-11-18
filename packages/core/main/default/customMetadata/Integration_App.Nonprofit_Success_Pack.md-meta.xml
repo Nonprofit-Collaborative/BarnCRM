@@ -12,7 +12,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">NPSP adds households, gifts, recurring donations, relationships and customizable rollups to Salesforce. BarnCRM covers the same ground with its own Core and Giving modules.</value>
+    <value xsi:type="xsd:string">NPSP adds households, gifts, recurring donations, relationships and customizable rollups to Salesforce. BarnCRM covers the same ground with its own Core and Fundraising modules.</value>
   </values>
   <values>
     <field>Maintainer__c</field>
@@ -32,7 +32,7 @@
   </values>
   <values>
     <field>Related_Module__c</field>
-    <value xsi:type="xsd:string">BarnCRM Core, Giving and Rollup Builder</value>
+    <value xsi:type="xsd:string">BarnCRM Core, Fundraising and Rollup Builder</value>
   </values>
   <values>
     <field>Compatibility__c</field>

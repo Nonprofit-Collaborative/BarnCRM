@@ -74,13 +74,12 @@ body:
       options:
         - Core
         - Rollup Builder
-        - Giving
+        - Fundraising
         - Volunteers
         - Programs
         - Grants
         - Event Management
         - Mirror
-        - Mirror for Giving
         - Not sure
     validations:
       required: true

@@ -98,7 +98,7 @@ public with sharing class CampaignSyncService {
 
 	/** The Copy appeals to Campaigns setting, off at install (R-CS1). */
 	public static Boolean isSwitchedOn() {
-		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
+		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		return settings != null && settings.Campaign_Sync_Enabled__c == true;
 	}
 
@@ -155,7 +155,7 @@ public with sharing class CampaignSyncService {
 				noAccessLogged = true;
 				ErrorLogger.logMessage(
 					BarnHelp.text(
-						'MirrorGiving',
+						'Giving',
 						'Mirror_CampaignSync_LogNoAccess',
 						new List<Object>{ scope.size() }
 					),
@@ -171,7 +171,7 @@ public with sharing class CampaignSyncService {
 			if (!noHeadroomLogged) {
 				noHeadroomLogged = true;
 				ErrorLogger.logMessage(
-					BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_LogNoHeadroom'),
+					BarnHelp.text('Giving', 'Mirror_CampaignSync_LogNoHeadroom'),
 					CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -236,10 +236,10 @@ public with sharing class CampaignSyncService {
 				result.failed++;
 				log(
 					String.format(
-						BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_LogFailed'),
+						BarnHelp.text('Giving', 'Mirror_CampaignSync_LogFailed'),
 						new List<Object>{
 							appeal.Name,
-							BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_InvalidCampaignId')
+							BarnHelp.text('Giving', 'Mirror_CampaignSync_InvalidCampaignId')
 						}
 					),
 					appeal
@@ -335,7 +335,7 @@ public with sharing class CampaignSyncService {
 			}
 			log(
 				BarnHelp.text(
-					'MirrorGiving',
+					'Giving',
 					'Mirror_CampaignSync_LogOrphan',
 					new List<Object>{
 						String.valueOf(orphans[i].Id),
@@ -397,7 +397,7 @@ public with sharing class CampaignSyncService {
 				result.failed++;
 				log(
 					String.format(
-						BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_LogMissing'),
+						BarnHelp.text('Giving', 'Mirror_CampaignSync_LogMissing'),
 						new List<Object>{ appeal.Name }
 					),
 					appeal
@@ -510,7 +510,7 @@ public with sharing class CampaignSyncService {
 		Id typed = MirrorSync.idOf(appeal.Campaign_Id__c, campaignType());
 		if (typed == null) {
 			appeal.Campaign_Id__c.addError(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_InvalidCampaignId')
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_InvalidCampaignId')
 			);
 			return false;
 		}
@@ -579,7 +579,7 @@ public with sharing class CampaignSyncService {
 		}
 		log(
 			String.format(
-				BarnHelp.text('MirrorGiving', 'Mirror_CampaignSync_LogFailed'),
+				BarnHelp.text('Giving', 'Mirror_CampaignSync_LogFailed'),
 				new List<Object>{ appeal.Name, String.join(messages, ' ') }
 			),
 			appeal

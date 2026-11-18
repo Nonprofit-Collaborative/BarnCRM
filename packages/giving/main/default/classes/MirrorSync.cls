@@ -191,7 +191,7 @@ public with sharing class MirrorSync {
 			if (countByMessage.containsKey(message) || order.size() < MESSAGES_KEPT - 1) {
 				return message;
 			}
-			return BarnHelp.text('MirrorGiving', 'Mirror_Sync_OtherMessages');
+			return BarnHelp.text('Giving', 'Mirror_Sync_OtherMessages');
 		}
 
 		/** How many records were refused, across every message. */

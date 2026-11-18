@@ -132,7 +132,12 @@ CAPS = {
     # donors crossing a recency cutoff; 676,573 measured, raised by the 2,283 added plus 2%.
     # Lowered for D-200 S1 and S6 (release 1.23: the access sync became Core's catalog data and
     # the Nightly Jobs page Core's nightly card): 667,059 measured, plus about 0.5%.
-    "giving": 670_400,
+    # N-15 (release 1.27, D-210, ADR-NEXT mirror independence): Mirror for Giving folded in
+    # (the gift mirrors, Campaign sync, the inbound gift API, the accounting export and the gift
+    # kits; its post-install, nightly provider and Health Check extension merged into this
+    # package's own). 669,576 here and 196,129 there before (capped 670,400 and 199,900);
+    # 864,050 measured together, plus about 0.5%.
+    "giving": 868_400,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -365,16 +370,11 @@ CAPS = {
     # plus about 2%. Lowered for the shared gift mirror base (D-200 S5, release 1.23:
     # MirrorRunBatch, MirrorSync.Result and storeLinks): 221,165 measured, plus about 2%.
     # N-09 (release 1.27, ADR-NEXT mirror independence): the gift mirrors, Campaign sync, the
-    # inbound gift API, the accounting export and the gift migration kits moved to Mirror for
-    # Giving (below). Mirror keeps the Case bridge, now hourly (N-10: CaseProviderRequestsHourly
-    # and the guard), the Nonprofit Cloud household and relationships kits and the drift
-    # finding: 31,483 measured, plus about 2%.
+    # inbound gift API, the accounting export and the gift migration kits moved out (since N-15
+    # into the giving package, above). Mirror keeps the Case bridge, now hourly (N-10:
+    # CaseProviderRequestsHourly and the guard), the Nonprofit Cloud household and relationships
+    # kits and the drift finding: 31,483 measured, plus about 2%.
     "mirror": 32_100,
-    # Mirror for Giving (N-09): everything gift-related from Mirror (above, 221,165 before the
-    # split), plus its own Health Check extension, nightly provider and post-install, and the
-    # longer help catalog name: 196,008 measured, plus about 2%. Mirror and Mirror for Giving
-    # together: 227,491, 6,326 more than Mirror alone before.
-    "mirrorgiving": 199_900,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

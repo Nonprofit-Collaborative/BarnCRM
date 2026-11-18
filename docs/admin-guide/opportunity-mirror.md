@@ -49,7 +49,7 @@ An Opportunity without a record type (Salesforce shows it as `Master`) stores no
 at all, so no ticked record type matches it and no gift is made from it; to include those
 Opportunities, tick none. If `Master` is ever in the saved list, a run leaves it out and says
 so in a Warning in the Error Log. The start date is read in your organization's default time zone. The gift then gets its fund,
-household and thank-you status from your Giving settings, like any gift. A gift is never
+household and thank-you status from your Fundraising settings, like any gift. A gift is never
 changed afterwards, even if its Opportunity is: the reconciliation shows the difference.
 
 Nothing is ever deleted. Deleting a gift leaves its Opportunity, and the Error Log gets one
@@ -60,17 +60,17 @@ every Opportunity and gift where it is.
 
 ## How to Turn It On
 
-You need the Mirror for Giving module and a Salesforce edition with Opportunities (Sales Cloud, Service
+You need the BarnCRM Fundraising module and a Salesforce edition with Opportunities (Sales Cloud, Service
 Cloud, NPSP or Nonprofit Cloud). An org on Salesforce Platform licenses only has none, and the
 Opportunity mirror page says so.
 
 1. Give yourself the **Salesforce Records Sync** permission set on the Access page, under Extra
    Permissions: the roles there do not include it.
-2. Open **BarnCRM Settings**, choose **Giving**, and set **Opportunity mirror direction**.
+2. Open **BarnCRM Settings**, choose **Fundraising**, and set **Opportunity mirror direction**.
    For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts; while it says **Not set**, none do.
    Until it is set, no Opportunity becomes a gift, so that a switch in an org with years of
    Opportunities does not create, and thank donors for, a gift for every one of them.
-3. Still in **Giving**, open **Opportunity Mirror** (the row shows only to someone with the
+3. Still in **Fundraising**, open **Opportunity Mirror** (the row shows only to someone with the
    permission set). Click **Run Now** once, to copy what you already have, and **Schedule
    nightly run**, which switches the mirror on in [BarnCRM Nightly Jobs](nightly-jobs.md), the
    one nightly run, so the mirror catches up every night at 1:30 AM (or when the step before
@@ -91,7 +91,7 @@ gifts the run takes longer to start, which does not matter at 1:30 AM.
 **Two switches, one of them in charge.** **Opportunity mirror direction** decides what the
 mirror does. The **Opportunity mirror** row on the Automation page is the switch every BarnCRM automation has: switched off, it stops the copy made when a gift is saved and the runs.
 While automation is paused, or the switch is off, a run does nothing and the Error Log says so
-once: Giving's own rules are paused too, and a gift made then would never get its household or
+once: Fundraising's own rules are paused too, and a gift made then would never get its household or
 fund.
 
 **Very large saves.** The copy starts only while half of the save's Salesforce limits are still
@@ -103,7 +103,7 @@ copied as usual.
 
 Do this as Maria, in an org that has Opportunities, with the sample data loaded.
 
-1. In **BarnCRM Settings**, **Giving**, set **Opportunity mirror direction** to **Gifts to
+1. In **BarnCRM Settings**, **Fundraising**, set **Opportunity mirror direction** to **Gifts to
    Opportunities** and save.
 2. Open **Opportunity Mirror** and click **Run Now**. Wait a minute, then open the
    **Reconciliation** section, choose this year, and click **Compare**. The gift count and total

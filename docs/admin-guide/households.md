@@ -229,7 +229,7 @@ it done for you next time.
 
 If the setting is on, check what is credited to the household first. A household that still
 has gifts or other records credited to it, such as volunteer hours, is never deleted, even
-when nobody belongs to it any more (with Giving, its gifts and pledges; with Volunteers, its
+when nobody belongs to it any more (with Fundraising, its gifts and pledges; with Volunteers, its
 volunteer hours): a gift stays with the household it was given from, and deleting the
 household would leave those records with no household at all. This is the ordinary outcome
 when someone with a giving or volunteering history moves out on their own, so it is not
@@ -262,7 +262,7 @@ place to change it.
 
 **"I moved someone and their history stayed behind."**
 That is deliberate. Moving a person moves the person, not the history of the household
-they left (with Giving, that includes the household's gifts). Use merge on the household record page when you want to combine two
+they left (with Fundraising, that includes the household's gifts). Use merge on the household record page when you want to combine two
 households and their history. A household left with nobody in it but with gifts or other
 records credited to it, such as volunteer hours, is kept, even when "Delete a household once
 it is empty" is on, so that history always has a household to belong to.

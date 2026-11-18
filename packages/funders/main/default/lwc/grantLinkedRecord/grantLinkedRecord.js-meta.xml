@@ -4,7 +4,7 @@
   <description>
     A linked-record card on a grant's page: the program the grant pays for (F-01, canonical model
     29ZH R-GN4) or the Giving fund its money is booked to (F-03, 29ZH R-GN8), chosen from the
-    Programs or Giving module where it is installed.
+    Programs or Fundraising module where it is installed.
   </description>
   <isExposed>true</isExposed>
   <masterLabel>Grant Linked Record</masterLabel>

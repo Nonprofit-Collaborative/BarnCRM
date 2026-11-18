@@ -168,9 +168,7 @@ private class MirrorSyncTest {
 			Integer shared = 0;
 			for (Error_Log__c entry : logged) {
 				if (
-					entry.Message__c.contains(
-						BarnHelp.text('MirrorGiving', 'Mirror_Sync_OtherMessages')
-					)
+					entry.Message__c.contains(BarnHelp.text('Giving', 'Mirror_Sync_OtherMessages'))
 				) {
 					shared++;
 					Assert.isTrue(

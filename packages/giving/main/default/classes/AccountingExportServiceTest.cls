@@ -196,7 +196,7 @@ private class AccountingExportServiceTest {
 			);
 
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ErrorTooManyRows'),
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorTooManyRows'),
 				refusal
 			);
 			Assert.areEqual(5, atTheLimit.rowCount, 'Exactly the limit is still a file.');
@@ -225,17 +225,19 @@ private class AccountingExportServiceTest {
 			Id notAFund = [SELECT Id FROM Contact LIMIT 1].Id;
 			Map<String, List<Object>> cases = new Map<String, List<Object>>{
 				BarnHelp.text(
-					'MirrorGiving',
+					'Giving',
 					'Mirror_AccountingExport_ErrorDatesRequired'
 				) => new List<Object>{ null, AUGUST_LAST, null, null },
 				BarnHelp.text(
-					'MirrorGiving',
+					'Giving',
 					'Mirror_AccountingExport_ErrorDateOrder'
 				) => new List<Object>{ AUGUST_LAST, AUGUST_FIRST, null, null },
-				BarnHelp.text(
-					'MirrorGiving',
-					'Mirror_AccountingExport_ErrorFund'
-				) => new List<Object>{ AUGUST_FIRST, AUGUST_LAST, notAFund, null },
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFund') => new List<Object>{
+					AUGUST_FIRST,
+					AUGUST_LAST,
+					notAFund,
+					null
+				},
 				Label.Giving_QuickGiftEntry_ErrorTypeInvalid => new List<Object>{
 					AUGUST_FIRST,
 					AUGUST_LAST,
@@ -319,12 +321,12 @@ private class AccountingExportServiceTest {
 			}
 
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_NoExportPermission'),
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission'),
 				exportRefusal,
 				'Giving Admin can see every gift but does not hold Export Accounting.'
 			);
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_NoExportPermission'),
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission'),
 				markRefusal
 			);
 		}
@@ -377,12 +379,9 @@ private class AccountingExportServiceTest {
 		Assert.areEqual(5, view.rowCount);
 		Assert.areEqual(410, view.total);
 		Assert.areEqual(64, view.digest.length(), 'A SHA-256 in hex');
+		Assert.areEqual(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDateOrder'), refusal);
 		Assert.areEqual(
-			BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ErrorDateOrder'),
-			refusal
-		);
-		Assert.areEqual(
-			BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ChangedSinceDownload'),
+			BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'),
 			markRefusal
 		);
 	}
@@ -526,10 +525,7 @@ private class AccountingExportServiceTest {
 					Assert.fail('The full file no longer matches the first download');
 				} catch (AccountingExportService.ExportException refused) {
 					Assert.areEqual(
-						BarnHelp.text(
-							'MirrorGiving',
-							'Mirror_AccountingExport_ChangedSinceDownload'
-						),
+						BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'),
 						refused.getMessage()
 					);
 				}
@@ -558,7 +554,7 @@ private class AccountingExportServiceTest {
 				Assert.fail('A split gift would be locked with half of it exported');
 			} catch (AccountingExportService.ExportException refused) {
 				Assert.areEqual(
-					BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_MarkNeedsAllFunds'),
+					BarnHelp.text('Giving', 'Mirror_AccountingExport_MarkNeedsAllFunds'),
 					refused.getMessage()
 				);
 			}
@@ -598,10 +594,7 @@ private class AccountingExportServiceTest {
 					// package checks only that the refusal is Giving's, not one of its own.
 					Assert.isFalse(String.isBlank(refused.getMessage()), 'Refused with a reason');
 					Assert.areNotEqual(
-						BarnHelp.text(
-							'MirrorGiving',
-							'Mirror_AccountingExport_ChangedSinceDownload'
-						),
+						BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'),
 						refused.getMessage(),
 						'Refused for the missing permission, not for a changed file'
 					);
@@ -669,7 +662,7 @@ private class AccountingExportServiceTest {
 			}
 
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ChangedSinceDownload'),
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'),
 				markAfter(jen, digest)
 			);
 		}
@@ -689,7 +682,7 @@ private class AccountingExportServiceTest {
 			update new Gift_Allocation__c(Id = building.Id, Fund__c = general.Id);
 
 			Assert.areEqual(
-				BarnHelp.text('MirrorGiving', 'Mirror_AccountingExport_ChangedSinceDownload'),
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'),
 				markAfter(jen, digest)
 			);
 		}

@@ -160,4 +160,4 @@ in the **Matching Logic** area of the **Duplicate Matching** tab; see
 | Match sources | On the Duplicate Matching tab, Matching Logic: add, edit, deactivate; deactivate and activate a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
 | Rollups, import templates | No | BarnCRM copies the shipped entries into the Rollups and Import pages, which is where you add and change your own. |
 | Automations, settings | No | These describe BarnCRM's own code and pages. An entry you added would point at nothing. |
-| Receipt templates (Giving) | No | Copied into the Receipt Letters page, where you edit your own. |
+| Receipt templates (Fundraising) | No | Copied into the Receipt Letters page, where you edit your own. |

@@ -16,7 +16,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Nonprofit Cloud Fundraising records gifts, commitments and designations in Salesforce standard objects. BarnCRM Giving covers the same ground with its own objects.</value>
+    <value xsi:type="xsd:string">Nonprofit Cloud Fundraising records gifts, commitments and designations in Salesforce standard objects. BarnCRM Fundraising covers the same ground with its own objects.</value>
   </values>
   <values>
     <field>Maintainer__c</field>
@@ -32,15 +32,15 @@
   </values>
   <values>
     <field>Related_Module__c</field>
-    <value xsi:type="xsd:string">BarnCRM Giving</value>
+    <value xsi:type="xsd:string">BarnCRM Fundraising</value>
   </values>
   <values>
     <field>Compatibility__c</field>
-    <value xsi:type="xsd:string">BarnCRM runs beside Nonprofit Cloud and never changes its records. Avoid recording the same gift in both. With Giving and Mirror installed, the Nonprofit Cloud gifts kit copies designations, commitments, paid gift transactions and soft credits in this org, each gift linked to its transaction so the Gift Transaction mirror never copies it back.</value>
+    <value xsi:type="xsd:string">BarnCRM runs beside Nonprofit Cloud and never changes its records. Avoid recording the same gift in both. With Fundraising installed, the Nonprofit Cloud gifts kit copies designations, commitments, paid gift transactions and soft credits in this org, each gift linked to its transaction so the Gift Transaction mirror never copies it back.</value>
   </values>
   <values>
     <field>Migration_Path__c</field>
-    <value xsi:type="xsd:string">Start Migration (with Giving and Mirror installed); the Migrating From Nonprofit Cloud admin guide page.</value>
+    <value xsi:type="xsd:string">Start Migration (with Fundraising installed); the Migrating From Nonprofit Cloud admin guide page.</value>
   </values>
   <values>
     <field>Show_Only_When_Installed__c</field>

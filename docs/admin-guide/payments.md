@@ -10,7 +10,7 @@ straight from the payer to your account. BarnCRM never holds money and never see
 card number.
 
 On its own, Payments takes no payments: the modules that charge (Event Management's paid
-registration, Giving's online donations, memberships, donor portal payments) use it as they
+registration, Fundraising's online donations, memberships, donor portal payments) use it as they
 arrive in later releases. Until then you can install it, enter your keys and check the setup.
 
 ## How to Turn It On
@@ -43,7 +43,7 @@ You never assign the Payments permission sets by hand. Give people their BarnCRM
 | BarnCRM role | Payments set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Payments Admin | Everything: the settings, Payments Setup, every payment and processor event |
-| Team Member, Fundraising Staff (Giving) | Payments Staff | See payments |
+| Team Member, Fundraising Staff (Fundraising) | Payments Staff | See payments |
 | Read Only | Payments Read Only | See payments |
 
 Nobody changes a payment's status by hand: it comes only from the processor.
@@ -213,7 +213,7 @@ with no dependency on Payments: see the
 - **Automatic Recurring Payments on without the subscription events** in the webhook: the first
   payment is recorded, but renewals, failed charges and card updates are not.
 
-## Other Giving Tools
+## Other Fundraising Tools
 
 Givebutter, Donorbox and similar tools are connected through Zapier, not through Payments: see
 [Online Giving Through Zapier](online-giving-zapier.md).

@@ -2,7 +2,7 @@
 
 Scripts for quick manual checks of keyboard use, screen reader labels, dialog focus, zoom and the Salesforce mobile app. Setup detail: [Record pages](../admin-guide/record-pages.md) and [BarnCRM Settings](../admin-guide/barncrm-settings.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Use a desktop browser (Chrome or Edge) at 100 percent zoom for keyboard scripts, and keep the mouse out of reach. The full device checklist for phones is the [Mobile audit](../contributor-guide/scale-and-mobile-test-plan.md#mobile-audit) in the scale and mobile test plan; T-A11Y-09 is the short version.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Fundraising deployed and sample data loaded unless a script says otherwise. Use a desktop browser (Chrome or Edge) at 100 percent zoom for keyboard scripts, and keep the mouse out of reach. The full device checklist for phones is the [Mobile audit](../contributor-guide/scale-and-mobile-test-plan.md#mobile-audit) in the scale and mobile test plan; T-A11Y-09 is the short version.
 
 These scripts cover what a person has to judge. Missing labels, button icons with no alternative text, images with no `alt` and a positive `tabindex` are caught earlier, by the accessibility assertion in each component's Jest test (see the [CI guide](../contributor-guide/ci.md), static step 4), so a failure there is a build failure, not a test script to run.
 
@@ -78,7 +78,7 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 ## T-A11Y-05: Keyboard Only in Quick Gift Entry
 
 **Purpose:** Confirm a gift can be entered without a mouse, that an error moves focus to the field to fix, and that **Save and New** puts focus back on the donor.
-**Prerequisites:** staff user with Giving Staff; sample data loaded (donor Harper Garcia).
+**Prerequisites:** staff user with Fundraising Staff Access; sample data loaded (donor Harper Garcia).
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -141,7 +141,7 @@ These scripts cover what a person has to judge. Missing labels, button icons wit
 ## T-A11Y-09: Household and Gift Pages and Staff Quick Actions on the Salesforce Mobile App
 
 **Purpose:** Confirm household and gift record pages are readable and editable on a phone, and that the quick actions staff use in the field (Enter a Gift, Log Hours, Record Service, Event Check-In) fit and save there (D-200).
-**Prerequisites:** staff user with Giving Staff, signed in to the Salesforce mobile app on a phone (or a device simulator, and say so in your results); sample data loaded. For steps 6 to 9, the Volunteers, Programs and Events modules installed and the user holding their Staff sets; skip a step whose module is not installed and say so.
+**Prerequisites:** staff user with Fundraising Staff Access, signed in to the Salesforce mobile app on a phone (or a device simulator, and say so in your results); sample data loaded. For steps 6 to 9, the Volunteers, Programs and Events modules installed and the user holding their Staff sets; skip a step whose module is not installed and say so.
 
 | Step | Action | Expected result |
 |---|---|---|
