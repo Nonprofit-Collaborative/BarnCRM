@@ -10,7 +10,7 @@
     <values><field>Component__c</field><value xsi:nil="true" /></values>
     <values><field>Navigation_Target__c</field><value xsi:type="xsd:string">Address_Verification_Setup</value></values>
     <values><field>Navigation_Label__c</field><value xsi:type="xsd:string">Address Verification Setup</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">Enter your provider keys, see whether each is set, and verify the addresses waiting now. Keys are never shown again once saved.</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">See where to enter your provider key in Setup, check the connection, and verify the addresses waiting now. Keys are never shown or stored by BarnCRM.</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">150</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
 </CustomMetadata>

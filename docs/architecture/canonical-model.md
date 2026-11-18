@@ -17073,12 +17073,16 @@ administrator can see what the processor said.
 
 ### Rules
 
-**R-PEV1 Used once.** A Stripe event takes its key on arrival, after its signature is checked; a
-PayPal event takes it only after PayPal confirms it. A second event with a key already used is
-dropped (Stripe) or marked Ignored (PayPal).
+**R-PEV1 Used once.** A Stripe event takes its key on arrival (its id, so a resend is dropped)
+and again from the copy fetched from Stripe; a PayPal event takes it only after PayPal confirms
+it. A second event with a key already used is dropped on arrival (Stripe) or marked Ignored when
+processed.
 
-**R-PEV2 Verified before use.** Only a verified event changes a payment. A PayPal event PayPal
-does not confirm is Rejected.
+**R-PEV2 Verified before use.** Only a verified event changes a payment. A Stripe event is never
+used as posted: processing fetches it back from Stripe by its id (`GET /v1/events/{id}`) through
+the `Barn_Stripe` Named Credential and uses only that copy; one Stripe does not have is Rejected,
+and a fetch that fails in transport or with a Stripe error leaves it Received for the next run
+(R-PEV4). A PayPal event PayPal does not confirm is Rejected.
 
 **R-PEV3 The guest only stores.** The receiver inserts the event and reads nothing; processing
 runs as the administrator who scheduled it.
@@ -17120,6 +17124,19 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | Mode | text | yes (defaults Test) | Test or Live. Test takes no real money. |
 | Automatic Recurring Payments | checkbox | yes (defaults off) | A checkout started with an interval is a processor subscription (R-PAY6). |
 | Currency | text | yes (defaults USD) | The three-letter currency used when a module does not name one. |
+| Stripe Connected | checkbox | no (defaults off) | Set by Check Connection on the Payments Setup page: a call through the `Barn_Stripe` Named Credential succeeded. Not a setting; written by Payments only (R-PK1). |
+| PayPal Connected | checkbox | no (defaults off) | The same for PayPal's sign-in through `Barn_PayPal_Live` or `Barn_PayPal_Sandbox`. |
+| PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. Not a secret; entered on the Payments Setup page. |
+| PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
+
+### Rules
+
+**R-PK1 No secret is stored here.** The processors' secrets (Stripe secret key, PayPal client id
+and secret) are External Credential principal parameters (`Barn_Stripe`, `Barn_PayPal`), entered
+by an administrator in Setup and merged into callouts by Salesforce; Apex never reads them. Stripe
+needs no signing secret (R-PEV2). The four fields above it are written by Payments' Apex only and
+no Setting Definition shows them. A processor is ready when it is connected (and, for PayPal, its
+webhook id is entered).
 
 ### Salesforce implementation
 
@@ -17131,48 +17148,36 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 | Mode | `Mode__c` | Text(10), default "Test" |
 | Currency | `Currency__c` | Text(3), default "USD" |
 | Automatic Recurring Payments | `Recurring_Payments__c` | Checkbox, default false |
+| Stripe Connected | `Stripe_Connected__c` | Checkbox, default false |
+| PayPal Connected | `PayPal_Connected__c` | Checkbox, default false |
+| PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
+| PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
 
 - **Setting Definitions:** `Payments_Processor`, `Payments_Mode`, `Payments_Currency`,
   `Payments_Recurring`, `Payments_Setup_Page`, section Payments.
+- **Credentials (no secret values shipped):** External Credential `Barn_Stripe` (Custom, named
+  principal `Barn_Stripe_Key`, parameter `SecretKey`) behind Named Credential `Barn_Stripe`
+  (`https://api.stripe.com`); External Credential `Barn_PayPal` (Custom, named principal
+  `Barn_PayPal_App`, parameters `ClientId`, `ClientSecret`) behind `Barn_PayPal_Live`
+  (`https://api-m.paypal.com`) and `Barn_PayPal_Sandbox` (`https://api-m.sandbox.paypal.com`).
+  Principal access: `Payments_Staff` and `Payments_Admin` (staff start checkouts; the processing
+  job runs as the admin who scheduled it) and `Payments_Webhook_Guest` (a public page's guest
+  starts checkouts). `Payments_Read_Only` has none.
 
 ---
 
-## 29PAY4. Payment Keys
+## 29PAY4. Payment Keys (removed)
 
-### Definition
-
-The organization's own processor keys, written on the Payments Setup page and never shown again
-(only whether each is set and its last four characters), and the PayPal catalog product the
-account's subscription plans share (R-PAY7).
-
-### Attributes
-
-| Attribute | Type | Required | Definition |
-|---|---|---|---|
-| Stripe Secret Key | text | for Stripe | `sk_test_...` or `sk_live_...` (or a restricted `rk_` key). |
-| Stripe Webhook Secret | text | for Stripe | The endpoint's signing secret, `whsec_...`. |
-| PayPal Client Id | text | for PayPal | The REST app's client id. |
-| PayPal Client Secret | text | for PayPal | The REST app's secret. |
-| PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. |
-| PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
-
-### Rules
-
-**R-PK1 Granted to no one.** No permission set grants the setting; only Payments' Apex reads it,
-and the setup page never returns a key.
+Removed in canonical model 1.67 (N-13, D-209). Its secrets moved to External Credentials and its
+two non-secret ids, with the connection flags, to Payments Settings (29PAY3, R-PK1).
 
 ### Salesforce implementation
 
-- **Object:** `Payment_Keys__c`, hierarchy custom setting, visibility Protected.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Stripe Secret Key | `Stripe_Secret_Key__c` | Text(255) |
-| Stripe Webhook Secret | `Stripe_Webhook_Secret__c` | Text(255) |
-| PayPal Client Id | `PayPal_Client_Id__c` | Text(255) |
-| PayPal Client Secret | `PayPal_Client_Secret__c` | Text(255) |
-| PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
-| PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
+- Until N-13 (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`) this was the Protected
+  hierarchy custom setting `Payment_Keys__c`, with `Stripe_Secret_Key__c`,
+  `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`,
+  `PayPal_Webhook_Id__c` and `PayPal_Product_Id__c`. Nothing was packaged, so it was removed,
+  not migrated.
 
 ---
 
@@ -18688,6 +18693,7 @@ The Address Verification module's org-wide choices (C-46, D-112; ADR-0209
 | Apply Corrections | boolean | yes (defaults false) | A verified address also takes the provider's standardized street, city, state and postal code. |
 | Re-Check After (Months) | number | yes (defaults 12) | A verified address is looked up again after this many months; 0 never. |
 | Nightly Limit | number | yes (defaults 200) | The most addresses the nightly step looks up in one night. |
+| Connected Provider | text | no | The provider whose Check Connection last succeeded (R-AV4). Not a setting; written by the setup page only. |
 
 ### Rules
 
@@ -18705,8 +18711,12 @@ blank or United States country. On save, one queued job takes up to 50; the nigh
 Unverified addresses and Verified ones older than Re-Check After, oldest first, at most Nightly
 Limit. A provider error leaves the address Unverified.
 
-**R-AV4 Keys are never shown.** The keys live in 29AV2, granted to no permission set; the setup
-page returns only whether each is set and its last four characters.
+**R-AV4 No key is stored in Salesforce data.** Each provider's key is an External Credential
+principal parameter (Smarty: `Barn_Smarty`, `AuthId` and `AuthToken`, sent as an
+`Authorization: Basic` header; Google: `Barn_Google_Address`, `ApiKey`, sent as the
+`X-Goog-Api-Key` header), entered by an administrator in Setup and merged into the callout by
+Salesforce; Apex never reads it. Connected Provider records which provider's Check Connection on
+the setup page last succeeded; lookups run only while it is the chosen provider.
 
 ### Salesforce implementation
 
@@ -18719,7 +18729,15 @@ page returns only whether each is set and its last four characters.
 | Apply Corrections | `Apply_Corrections__c` | Checkbox, default false |
 | Re-Check After (Months) | `Recheck_Months__c` | Number(3, 0), default 12 |
 | Nightly Limit | `Nightly_Limit__c` | Number(5, 0), default 200 |
+| Connected Provider | `Connected_Provider__c` | Text(20) |
 
+- **Credentials (no secret values shipped):** External Credential `Barn_Smarty` (Custom, named
+  principal `Barn_Smarty_Key`, parameters `AuthId`, `AuthToken`) behind Named Credential
+  `Barn_Smarty` (`https://us-street.api.smarty.com`); External Credential `Barn_Google_Address`
+  (Custom, named principal `Barn_Google_Address_Key`, parameter `ApiKey`) behind
+  `Barn_Google_Address` (`https://addressvalidation.googleapis.com`). Principal access:
+  `Address_Verification_Admin` (setup page, nightly step) and `Address_Verification_User`
+  (everyone whose address saves are looked up on save).
 - **Setting Definitions:** `Address_Verification_Provider`, `Address_Verification_On_Save`,
   `Address_Verification_Corrections`, `Address_Verification_Recheck`,
   `Address_Verification_Nightly_Limit`, `Address_Verification_Setup_Page`, section Addresses.
@@ -18729,30 +18747,17 @@ page returns only whether each is set and its last four characters.
 
 ---
 
-## 29AV2. Address Verification Keys
+## 29AV2. Address Verification Keys (removed)
 
-### Definition
-
-The organization's own provider keys, written on the Address Verification Setup page and never
-shown again (R-AV4).
-
-### Attributes
-
-| Attribute | Type | Required | Definition |
-|---|---|---|---|
-| Smarty Auth ID | text | for Smarty | The secret key pair's Auth ID. |
-| Smarty Auth Token | text | for Smarty | The secret key pair's Auth Token. |
-| Google API Key | text | for Google | A key with the Address Validation API enabled. |
+Removed in canonical model 1.67 (N-13, D-209). The keys are External Credential principal
+parameters (R-AV4); Connected Provider (29AV1) replaced the setting's readiness test.
 
 ### Salesforce implementation
 
-- **Object:** `Address_Verification_Keys__c`, hierarchy custom setting, visibility Protected.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Smarty Auth ID | `Smarty_Auth_Id__c` | Text(255) |
-| Smarty Auth Token | `Smarty_Auth_Token__c` | Text(255) |
-| Google API Key | `Google_Api_Key__c` | Text(255) |
+- Until N-13 (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`) this was the Protected
+  hierarchy custom setting `Address_Verification_Keys__c`, with `Smarty_Auth_Id__c`,
+  `Smarty_Auth_Token__c` and `Google_Api_Key__c`. Nothing was packaged, so it was removed, not
+  migrated.
 
 ---
 
@@ -19334,6 +19339,7 @@ mirrors the primary member).
 | 1.65 | 2026-11-14 | Forms with submissions deletable by Forms administrators only (N-04, D-208, release 1.27; ADR-NEXT `NEXT-forms-delete-with-submissions.md`). Form Submission (29ZY): Form becomes Lookup(Form), set null on delete (was master-detail), sharing Public Read/Write; Form Version becomes set null on delete (was restrict); new Form Name (`Form_Name__c`, Text(80)) and Version Number (`Version_Number__c`, Number(6, 0)), rule R-FS8. Form (29ZW): rule R-FM4 and the Forms custom permission Manage Forms (`Forms_Manage`). |
 | 1.66 | 2026-11-14 | Fewer custom objects (D-208, N-11; ADR-NEXT `NEXT-fewer-custom-objects.md`). Four Core objects removed, 203 to 199 in the suite. `Merge_Journal__c` becomes the Admin Journal (Section 10A, R-AJ1) with `Kind__c` (Merge, Scan, Deactivation, Migration, Household Adoption) and takes the rows and fields of `Automation_Snapshot__c` (`Items__c`, `Message__c`, `Restored_At__c`), `Migration_Run__c` (`Kit__c`, `State_JSON__c`) and `Household_Adoption__c` (`Account_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`; its note moves to `Notes__c`); `Status__c` carries every kind's values with no default. Import Batch's `Migration_Run__c` is replaced by `Migration_Journal__c`. `Duplicate_Reason__c` is removed: a match reason is a `Duplicate_Dismissal__c` row with the new `Kind__c` Match Reason, keyed by the set in `Pair_Key__c`. |
 | 1.67 | 2026-11-14 | Gift mirrors folded into Fundraising (N-15, D-210, release 1.27; ADR-NEXT `NEXT-mirror-independence.md`). The Mirror for Giving package is removed: its attributes on Appeal, Gift and Fund, list views, code and permission sets ship in Fundraising (`packages/giving`, the Giving module renamed BarnCRM Fundraising). The eleven gift mirror keys (Campaign sync, Opportunity mirror and Gift Transaction mirror) move from `Mirror_Settings__c` to `Giving_Settings__c` with unchanged names and types; `Mirror_Settings__c` keeps the Case request keys only. No object added or removed. |
+| 1.68 | 2026-11-18 | Provider secrets in Named Credentials (N-13, D-209; ADR-NEXT `NEXT-provider-secrets-named-credentials.md`, amending ADR-0220). Two objects removed, 199 to 197 in the suite: `Payment_Keys__c` (29PAY4) and `Address_Verification_Keys__c` (29AV2). `Payments_Settings__c` gains `Stripe_Connected__c`, `PayPal_Connected__c` (Checkbox) and takes `PayPal_Webhook_Id__c` (Text(64)) and `PayPal_Product_Id__c` (Text(50)); `Address_Verification_Settings__c` gains `Connected_Provider__c` (Text(20)). Removed fields: `Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`, `Smarty_Auth_Id__c`, `Smarty_Auth_Token__c`, `Google_Api_Key__c`. R-PK1, R-AV4, R-PEV1 and R-PEV2 rewritten: a Stripe event is fetched back from Stripe and only that copy is used. |
 
 ---
 ## 32. Entity ownership by package
@@ -19517,7 +19523,6 @@ included; standard objects the packages extend are named by the entity that gove
 | Payment | Payments | 1.4 (PAY-01) | 29PAY1 |
 | Payment Event | Payments | 1.4 (PAY-01) | 29PAY2 |
 | Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |
-| Payment Keys | Payments | 1.4 (PAY-01) | 29PAY4 |
 | Built Component | LWC Builder | 1.19 (LB-01, LB-02) | 29LB1 |
 | LWC Builder Settings | LWC Builder | 1.19 (LB-01, LB-02) | 29LB2 |
 | Award Program | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG1 |
@@ -19565,7 +19570,6 @@ included; standard objects the packages extend are named by the entity that gove
 | Member Certification | Memberships | 1.17 (G-22e) | 29MEM6 |
 | Continuing Credit | Memberships | 1.17 (G-22e) | 29MEM7 |
 | Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
-| Address Verification Keys | Address Verification | 1.15 (C-46) | 29AV2 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,
 so nothing below that is nonprofit-specific ships in Core.

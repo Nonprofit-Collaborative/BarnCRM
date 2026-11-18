@@ -2,8 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Payments Setup page: the receiver address for each processor, whether each key is
-    entered, Save Keys and Clear.
+    The Payments Setup page: the receiver address for each processor, whether it is connected,
+    its credential steps, Check Connection, Disconnect and the PayPal webhook id.
   </description>
   <isExposed>true</isExposed>
   <masterLabel>Payments Setup</masterLabel>

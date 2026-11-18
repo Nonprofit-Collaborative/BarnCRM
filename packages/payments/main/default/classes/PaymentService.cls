@@ -91,11 +91,6 @@ public with sharing class PaymentService {
 		return s == null ? new Payments_Settings__c() : s;
 	}
 
-	public static Payment_Keys__c keys() {
-		Payment_Keys__c k = Payment_Keys__c.getOrgDefaults();
-		return k == null ? new Payment_Keys__c() : k;
-	}
-
 	public static String mode() {
 		return settings().Mode__c == LIVE ? LIVE : TEST;
 	}
@@ -104,15 +99,15 @@ public with sharing class PaymentService {
 		return settings().Processor__c == PAYPAL ? PAYPAL : STRIPE;
 	}
 
-	/** True when every key the processor needs is entered. */
+	/**
+	 * True when the processor is connected: Check Connection on Payments Setup reached it through
+	 * its Named Credential (R-PK1), and for PayPal the webhook id is entered. No secret is read.
+	 */
 	public static Boolean isReady(String processor) {
-		Payment_Keys__c k = keys();
+		Payments_Settings__c s = settings();
 		return processor == PAYPAL
-			? String.isNotBlank(k.PayPal_Client_Id__c) &&
-			  String.isNotBlank(k.PayPal_Client_Secret__c) &&
-			  String.isNotBlank(k.PayPal_Webhook_Id__c)
-			: String.isNotBlank(k.Stripe_Secret_Key__c) &&
-			  String.isNotBlank(k.Stripe_Webhook_Secret__c);
+			? s.PayPal_Connected__c == true && String.isNotBlank(s.PayPal_Webhook_Id__c)
+			: s.Stripe_Connected__c == true;
 	}
 
 	// ---- Starting a checkout ----

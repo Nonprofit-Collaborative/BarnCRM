@@ -65,7 +65,7 @@ is confirmed, then **Received** (dated the day it was paid), or **Cancelled** if
 checkout without paying. A refund made at the processor sets the gift to **Refunded**. The
 payment's identifier is in the gift's **Payment Reference**.
 
-If Payments is not installed or its keys are missing, the page shows the appeal and says online
+If Payments is not installed or its processor is not connected, the page shows the appeal and says online
 giving is not open. Recurring online gifts are not offered yet.
 
 Against card testing (stolen cards tried with tiny gifts), a page refuses a gift below

@@ -11,7 +11,13 @@ card number.
 
 On its own, Payments takes no payments: the modules that charge (Event Management's paid
 registration, Fundraising's online donations, memberships, donor portal payments) use it as they
-arrive in later releases. Until then you can install it, enter your keys and check the setup.
+arrive in later releases. Until then you can install it, connect your processor and check the
+setup.
+
+Your processor's secrets (the Stripe secret key, the PayPal client id and secret) are entered in
+Salesforce **Setup**, on External Credentials that Payments ships empty. Salesforce keeps them
+encrypted and adds them to each call to the processor; BarnCRM's code never reads, shows or
+stores them.
 
 ## How to Turn It On
 
@@ -48,6 +54,10 @@ You never assign the Payments permission sets by hand. Give people their BarnCRM
 
 Nobody changes a payment's status by hand: it comes only from the processor.
 
+Payments Staff, Payments Admin and Payments Webhook Guest also give access to the processor
+credentials (never their values), so the people and public pages that start checkouts can call
+the processor. Payments Read Only does not.
+
 ## Setting Up (About 20 Minutes)
 
 ### 1. Choose in BarnCRM Settings
@@ -70,35 +80,58 @@ requires these steps in **Setup**, and no app can do them for you:
 2. Select **New**, give the Site a label and name, and save.
 3. **Activate** the Site.
 4. Open **Health Check** in the Settings console and select **Give Payments Webhook Guest** if it
-   is listed. It gives the Site's guest user one permission: the address the processor calls.
+   is listed. It gives the Site's guest user the address the processor calls and access to the
+   processor credentials (never their values), so public pages on the Site can start checkouts.
    The guest user gets no access to any record.
+
+### Entering a Secret in Setup
+
+Each processor's card on **Payments Setup** names its External Credential, principal and
+parameters, with the steps. In general:
+
+1. **Setup > Named Credentials**, then the **External Credentials** tab.
+2. Open the credential (**BarnCRM Stripe** or **BarnCRM PayPal**).
+3. Under **Principals**, edit the principal (`Barn_Stripe_Key` or `Barn_PayPal_App`).
+4. Add each **Authentication Parameter**, named exactly as the card says, with its value, and
+   save. To change a secret later, edit the parameter's value the same way.
+5. Back on **Payments Setup**, select **Check Connection**.
+
+With a namespaced package install, the names on the card carry the package prefix; use them as
+shown.
 
 ### 2. Connect Stripe
 
 1. In your Stripe Dashboard, turn on **Test mode** (while Mode is Test).
 2. **Developers > API keys**: copy the **Secret key** (`sk_test_...`). A restricted key with
-   write access to Checkout Sessions works too.
-3. Open **Payments Setup** in BarnCRM. Copy the **Stripe address** it shows, for example
+   write access to Checkout Sessions and read access to Events and Balance works too.
+3. In Setup, on the **BarnCRM Stripe** External Credential, principal `Barn_Stripe_Key`, add the
+   parameter `SecretKey` with that key (see [Entering a Secret in Setup](#entering-a-secret-in-setup)).
+4. Open **Payments Setup** in BarnCRM and select **Check Connection** on the Stripe card. It
+   reads **Connected** and says which mode the key is for.
+5. Copy the **Stripe address** Payments Setup shows, for example
    `https://yourorg.my.salesforce-sites.com/services/apexrest/barncrm/payments/v1/stripe`.
-4. In Stripe, **Developers > Webhooks > Add endpoint**: paste the address and choose these
+6. In Stripe, **Developers > Webhooks > Add endpoint**: paste the address and choose these
    events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
    `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`,
    `payment_intent.payment_failed`, and, for automatic recurring payments, `invoice.paid`,
-   `invoice.payment_failed` and `customer.subscription.deleted`. Save, then reveal the
-   **Signing secret** (`whsec_...`).
-5. In **Payments Setup**, paste the secret key and the signing secret and select **Save Keys**.
+   `invoice.payment_failed` and `customer.subscription.deleted`. Save. You do not need the
+   signing secret: BarnCRM fetches each event back from Stripe with your secret key and uses only
+   Stripe's own copy, so a forged message is never applied.
 
 ### 3. Connect PayPal
 
 1. At developer.paypal.com, **Apps & Credentials**: choose **Sandbox** (while Mode is Test) and
    create an app. Copy its **Client ID** and **Secret**.
-2. In the app, **Add Webhook**: paste the **PayPal address** from **Payments Setup** and choose
+2. In Setup, on the **BarnCRM PayPal** External Credential, principal `Barn_PayPal_App`, add the
+   parameters `ClientId` and `ClientSecret`. One app's credentials serve the mode you are in:
+   **BarnCRM PayPal Sandbox** is used in Test mode and **BarnCRM PayPal Live** in Live mode.
+3. In the app, **Add Webhook**: paste the **PayPal address** from **Payments Setup** and choose
    **Checkout order approved**, **Payment capture completed**, **Payment capture denied**,
    **Payment capture refunded** and **Payment capture reversed**, and, for automatic recurring
    payments, **Payment sale completed**, **Billing subscription payment failed** and **Billing
    subscription cancelled**. Save, and copy the **Webhook ID** PayPal shows.
-3. In **Payments Setup**, paste the client id, the secret and the webhook id and select **Save
-   Keys**.
+4. In **Payments Setup**, paste the webhook id and select **Save Webhook ID**, then select
+   **Check Connection** on the PayPal card.
 
 ### 4. Schedule Processing
 
@@ -114,16 +147,27 @@ Stripe's test card `4242 4242 4242 4242` or a PayPal sandbox buyer. Within 15 mi
 payment shows **Paid** on the **Payments** tab. Refund it in the processor's dashboard: the
 payment shows **Refunded** at the next run.
 
-To go live: in the processor switch to live mode, create the live webhook the same way, enter
-the live keys in **Payments Setup**, then set **Mode** to **Live**. Payments started in test
-mode keep Mode **Test**, so reports can leave them out.
+To go live: in the processor switch to live mode, create the live webhook the same way, replace
+the secrets on the External Credential in Setup with the live ones (and, for PayPal, save the
+live webhook id), set **Mode** to **Live**, then select **Check Connection** again. Payments
+started in test mode keep Mode **Test**, so reports can leave them out.
 
 ## The Payments Setup Page
 
-For each processor it shows the address to give the processor and whether each key is set,
-with only its last four characters. Keys are never shown again once saved: to change one, type
-the new value and save. Leave a box empty to keep the key you saved before. **Clear** removes
-all of one processor's keys.
+It shows the address to give each processor and, for each processor, a card with:
+
+- **Connected** or **Not connected**: whether **Check Connection** last succeeded.
+- The External Credential, principal and parameter names to fill in Setup, with the steps.
+- **Check Connection**: one call to the processor through its Named Credential, as you
+  (Stripe: reads your balance, which also says whether the key is live; PayPal: signs in, in the
+  current mode). Success marks the processor connected; failure says why, marks it not
+  connected and writes the detail to the Error Log. Checkouts start only for a connected
+  processor.
+- For PayPal, the **PayPal Webhook ID** box and **Save Webhook ID**.
+- **Disconnect**: marks the processor not connected (and, for PayPal, clears the webhook id).
+  The secrets stay on the External Credential until you remove them in Setup.
+
+BarnCRM never shows a secret: it cannot read one.
 
 ## Payments and Their Status
 
@@ -140,7 +184,10 @@ reports them.
 
 **Payment Events** lists every message the processors sent, with what was done with it
 (Applied, Ignored, Rejected, Failed) and why. Each processor message is used once, however many
-times it is sent. A run reads up to 20 messages and stops early after a minute of waiting on
+times it is sent. A Stripe message is fetched back from Stripe before it is used: if Stripe has
+no event with that id in your account, the message is **Rejected** ("Stripe has no event with
+this ID"); if Stripe cannot be reached, it stays **Received**, the Error Log says why, and it is
+tried again at the next run. A run reads up to 20 messages and stops early after a minute of waiting on
 PayPal, leaving the rest **Received** for the next run. A message whose processor could not be
 reached stays **Received** and is tried again at the next run. Abandoned checkouts are cancelled
 50 at a time in a job of their own.
@@ -184,8 +231,9 @@ the donor use Update Card.
 
 | Check | What to do |
 |---|---|
-| Payment Keys Are Missing | Enter the keys for the processor in **Payments Setup**. |
-| Stripe Key Does Not Match the Mode | A `sk_live_` key with Mode Test, or `sk_test_` with Mode Live. Enter the right key or change Mode. |
+| Payment Processor Is Not Connected | Enter the processor's secrets on its External Credential in Setup, then select **Check Connection** on **Payments Setup** (PayPal also needs its webhook id). |
+| Payment Processor Connection Failed | Stripe is connected but a test call now fails (Health Check calls Stripe each time it runs). Check the secret on the External Credential principal and your permission sets, then **Check Connection**. |
+| Stripe Key Does Not Match the Mode | A live key with Mode Test, or a test key with Mode Live. Enter the right key in Setup or change Mode. |
 | No Active Site for Payments | Set up a Site (above). |
 | A Site Guest User Can't Receive Payment News | Select **Give Payments Webhook Guest**. |
 | Payment Processing Is Not Scheduled | Select **Schedule Payment Processing**. |
@@ -203,10 +251,15 @@ with no dependency on Payments: see the
   PayPal sandbox credentials fail to sign in when Mode is Live.
 - **The webhook pointed at the Salesforce login address** instead of the Site address shown on
   Payments Setup: the processor gets an error and nothing is recorded.
-- **The PayPal webhook created before the keys are saved**: until the client id, secret and
-  webhook id are saved, the PayPal address refuses every message and stores nothing. PayPal
-  retries, so save the keys soon after adding the webhook. Event types the module does not use
-  are acknowledged and not stored.
+- **The webhook created before the processor is connected**: until **Check Connection** has
+  succeeded (and, for PayPal, the webhook id is saved), the processor's address refuses every
+  message and stores nothing. Stripe and PayPal retry, so connect soon after adding the webhook.
+  Event types the module does not use are acknowledged and not stored.
+- **Secrets entered without Check Connection**: the processor stays **Not connected** and no
+  checkout starts until you select it.
+- **Someone without a Payments permission set starting a checkout**: the call to the processor
+  fails, because only the Payments sets give access to the credential. Give them a BarnCRM role
+  on the Access page.
 - **Processing not scheduled, or scheduled by a user who was then deactivated**: payments stay
   Pending. Health Check reports both.
 - **Refunding in BarnCRM**: there is no refund button; refund in the processor's dashboard.

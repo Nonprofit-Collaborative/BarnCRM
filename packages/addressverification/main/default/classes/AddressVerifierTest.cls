@@ -40,9 +40,21 @@ private class AddressVerifierTest {
 			Assert.areEqual('Verified', after.Verification_Status__c, 'Verified');
 			Assert.areEqual(Date.today(), after.Latest_Verified_Date__c, 'Dated today');
 			Assert.areEqual('100 main street', after.Street__c, 'The street is left alone');
+			HttpRequest sent = smarty.requests[0];
+			String credential = AddressVerifier.credential(AddressVerifier.SMARTY);
 			Assert.isTrue(
-				smarty.requests[0].getEndpoint().contains('auth-id=auth-id-1111'),
-				'The org own key is sent'
+				sent.getEndpoint().startsWith('callout:' + credential + '/street-address?'),
+				'Through the Named Credential: ' + sent.getEndpoint()
+			);
+			Assert.isFalse(sent.getEndpoint().contains('auth-'), 'No key in the address');
+			Assert.areEqual(
+				'Basic {!BASE64ENCODE(BLOB($Credential.' +
+					credential +
+					'.AuthId & ":" & $Credential.' +
+					credential +
+					'.AuthToken))}',
+				sent.getHeader('Authorization'),
+				'The key pair is a merge field Salesforce fills, never a value Apex holds'
 			);
 		}
 	}
@@ -75,6 +87,17 @@ private class AddressVerifierTest {
 				'CA',
 				((Map<String, Object>) sent.get('address')).get('regionCode'),
 				'The country name is sent as its code'
+			);
+			String credential = AddressVerifier.credential(AddressVerifier.GOOGLE);
+			Assert.areEqual(
+				'callout:' + credential + '/v1:validateAddress',
+				google.requests[0].getEndpoint(),
+				'Through the Named Credential, no key in the address'
+			);
+			Assert.areEqual(
+				'{!$Credential.' + credential + '.ApiKey}',
+				google.requests[0].getHeader('X-Goog-Api-Key'),
+				'The key goes in the header Google reads'
 			);
 		}
 	}
@@ -164,9 +187,55 @@ private class AddressVerifierTest {
 		}
 	}
 
+	/** A callout that fails before any answer, as one without principal access does. */
+	private class NoAccess implements HttpCalloutMock {
+		public Integer calls = 0;
+
+		public HttpResponse respond(HttpRequest request) {
+			calls++;
+			throw new CalloutException('We could not access the credential');
+		}
+	}
+
 	@IsTest
-	static void nothingIsLookedUpWithoutKeys() {
+	static void aCredentialFailureStopsTheRunAndIsLoggedOnce() {
 		System.runAs(AddressVerificationTestData.admin()) {
+			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
+			List<Address__c> rows = AddressVerificationTestData.addresses(3, null);
+			NoAccess noAccess = new NoAccess();
+			Test.setMock(HttpCalloutMock.class, noAccess);
+
+			Test.startTest();
+			AddressVerifier.verify(idsOf(rows));
+			Test.stopTest();
+
+			Assert.areEqual(1, noAccess.calls, 'The rest wait for the nightly step');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'AddressVerifier.lookUp'
+					WITH SYSTEM_MODE
+				],
+				'One cause, logged once'
+			);
+			Assert.areEqual(
+				'Unverified',
+				AddressVerificationTestData.reread(rows[0].Id).Verification_Status__c,
+				'Left Unverified'
+			);
+		}
+	}
+
+	@IsTest
+	static void nothingIsLookedUpWhileTheChosenProviderIsNotConnected() {
+		System.runAs(AddressVerificationTestData.admin()) {
+			// Google was connected, but Smarty is the provider chosen.
+			AddressVerificationTestData.connect(AddressVerifier.GOOGLE, false);
+			Address_Verification_Settings__c settings = Address_Verification_Settings__c.getOrgDefaults();
+			settings.Provider__c = AddressVerifier.SMARTY;
+			update settings;
 			Address__c home = AddressVerificationTestData.addresses(1, null)[0];
 			AddressVerificationTestData.Provider smarty = new AddressVerificationTestData.Provider(
 				200,

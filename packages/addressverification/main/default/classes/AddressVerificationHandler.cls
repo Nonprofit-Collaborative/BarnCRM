@@ -4,10 +4,10 @@
  * the Automation page that Pause All covers; the dispatcher skips it while the module is off.
  *
  * Before a change to the street, city, state, postal code or country is saved, the address goes
- * back to Unverified. After the save, with Verify On Save on and the keys entered, one queued job
- * looks up the new and changed Current addresses, up to `AddressVerifier.PER_TRANSACTION`; the
- * rest, and saves made inside a batch or a queued job, wait for the nightly step. Saves the
- * module makes itself are skipped. Never fails a save.
+ * back to Unverified. After the save, with Verify On Save on and the provider connected, one
+ * queued job looks up the new and changed Current addresses, up to
+ * `AddressVerifier.PER_TRANSACTION`; the rest, and saves made inside a batch or a queued job, wait
+ * for the nightly step. Saves the module makes itself are skipped. Never fails a save.
  */
 @NamespaceAccessible
 public with sharing class AddressVerificationHandler extends TriggerHandler {

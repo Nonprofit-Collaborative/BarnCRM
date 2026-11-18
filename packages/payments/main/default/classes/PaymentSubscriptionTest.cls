@@ -113,14 +113,18 @@ private class PaymentSubscriptionTest {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
-				.answer('stripe.com', 200, '{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}');
+				.answer(
+					'checkout/sessions',
+					200,
+					'{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}'
+				);
 			PaymentsApi api = new PaymentsApi();
 
 			Test.startTest();
 			api.call('startCheckout', checkout());
 			Test.stopTest();
 
-			String sent = mock.last('stripe.com').getBody();
+			String sent = mock.last('checkout/sessions').getBody();
 			Assert.isTrue(sent.contains('mode=payment'), 'One payment, as before: ' + sent);
 			Assert.isFalse(sent.contains('recurring'), sent);
 			Assert.isFalse(
@@ -136,14 +140,18 @@ private class PaymentSubscriptionTest {
 			PaymentsTestData.connect(PaymentService.STRIPE);
 			recurringOn();
 			PaymentsTestData.Processors mock = PaymentsTestData.processors()
-				.answer('stripe.com', 200, '{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}');
+				.answer(
+					'checkout/sessions',
+					200,
+					'{"id":"cs_1","url":"https://checkout.stripe.com/c/1"}'
+				);
 			PaymentsApi api = new PaymentsApi();
 
 			Test.startTest();
 			api.call('startCheckout', checkout());
 			Test.stopTest();
 
-			String sent = mock.last('stripe.com').getBody();
+			String sent = mock.last('checkout/sessions').getBody();
 			Assert.isTrue(
 				(Boolean) api.call('isReady', new Map<String, Object>{ 'recurring' => true }),
 				'Ready once on'
@@ -190,7 +198,7 @@ private class PaymentSubscriptionTest {
 			// R-PAY7: the plan and product are remembered for the next payer.
 			Assert.areEqual(PLAN_KEY, payment.Plan_Key__c, 'Mode, currency, amount, interval');
 			Assert.areEqual('P-1', payment.Plan_Id__c, 'The plan it uses');
-			Assert.areEqual('PROD-1', Payment_Keys__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual('PROD-1', Payments_Settings__c.getOrgDefaults().PayPal_Product_Id__c);
 			Assert.areEqual(
 				'plan-' + PLAN_KEY + '-PROD-1',
 				mock.last('billing/plans').getHeader('PayPal-Request-Id'),
@@ -211,9 +219,9 @@ private class PaymentSubscriptionTest {
 
 	/** PayPal's shared product and the plan a first payer's subscription already uses. */
 	private static void remembered(String product, String plan) {
-		Payment_Keys__c keys = Payment_Keys__c.getOrgDefaults();
-		keys.PayPal_Product_Id__c = product;
-		update as system keys;
+		Payments_Settings__c stored = Payments_Settings__c.getOrgDefaults();
+		stored.PayPal_Product_Id__c = product;
+		update as system stored;
 		if (plan != null) {
 			Payment__c earlier = first(PaymentService.PAYPAL, 'I-0');
 			earlier.Plan_Key__c = PLAN_KEY;
@@ -364,7 +372,7 @@ private class PaymentSubscriptionTest {
 			Assert.areEqual('P-1', payment.Plan_Id__c, 'A plan on the new product');
 			Assert.areEqual(1, calls(mock, 'catalogs/products'), 'One new product');
 			Assert.areEqual(2, calls(mock, 'billing/plans'), 'Refused once, then made');
-			Assert.areEqual('PROD-1', Payment_Keys__c.getOrgDefaults().PayPal_Product_Id__c);
+			Assert.areEqual('PROD-1', Payments_Settings__c.getOrgDefaults().PayPal_Product_Id__c);
 		}
 	}
 

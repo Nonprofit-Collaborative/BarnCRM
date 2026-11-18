@@ -23,18 +23,25 @@ No consumer is a dependency, and no consumer depends on this package (the seam b
 ## Contents
 
 - Objects: `Payment__c` (29PAY1), `Payment_Event__c` (29PAY2); settings `Payments_Settings__c`
-  (29PAY3) and the keys `Payment_Keys__c` (29PAY4, granted to no one).
+  (29PAY3, which holds no secret: connection flags and the PayPal webhook and product ids).
 - `PaymentsApi`: the seam (`System.Callable`).
 - `PaymentService`: starting a checkout, the status moves (R-PAY1, R-PAY2) and telling listeners.
 - `PaymentStripe`, `PaymentPayPal`: each processor's checkout call, event reading and
-  verification.
+  verification (a Stripe event is fetched back from Stripe; a PayPal event is verified by
+  PayPal), and Check Connection.
 - `PaymentWebhookRest`: the receiver, `/services/apexrest/barncrm/payments/v1/stripe` and
   `/paypal`, for the Site guest (`Payments_Webhook_Guest`).
 - `PaymentEventProcessor`: four jobs every 15 minutes, scheduled from Health Check.
 - `PaymentsHealthCheckExtension`, `PaymentsSetupController` and the `paymentsSetup` page.
 - Permission sets `Payments_Admin`, `Payments_Staff`, `Payments_Read_Only` (given by
-  `PaymentsAccessSync`) and `Payments_Webhook_Guest`.
-- Remote Site Settings for `api.stripe.com`, `api-m.paypal.com` and `api-m.sandbox.paypal.com`.
+  `PaymentsAccessSync`) and `Payments_Webhook_Guest`; all but Read Only give principal access
+  to both External Credentials.
+- External Credentials `Barn_Stripe` (principal `Barn_Stripe_Key`, parameter `SecretKey`) and
+  `Barn_PayPal` (principal `Barn_PayPal_App`, parameters `ClientId`, `ClientSecret`), shipped
+  with no value; Named Credentials `Barn_Stripe` (`api.stripe.com`), `Barn_PayPal_Live`
+  (`api-m.paypal.com`) and `Barn_PayPal_Sandbox` (`api-m.sandbox.paypal.com`). Apex merges the
+  secrets into headers and never reads them (ADR-NEXT
+  `NEXT-provider-secrets-named-credentials.md`).
 
 ## The Payment Seam
 

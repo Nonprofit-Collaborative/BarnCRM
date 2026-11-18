@@ -6,6 +6,12 @@
  * write in one transaction. Only Verification Status and Latest Verified Date are written, plus
  * the standardized street, city, state and postal code when Apply Corrections is on. Writes run
  * in user mode as the person whose save or job it is; a refused write is logged, never raised.
+ *
+ * Every lookup goes through the provider's Named Credential (`Barn_Smarty`, `Barn_Google_Address`);
+ * the key is the External Credential principal's, merged into a header by Salesforce and never
+ * read by Apex (R-AV4; ADR-NEXT `NEXT-provider-secrets-named-credentials.md`). The person whose
+ * save or job it is needs principal access: Address Verification Admin or Address Verification
+ * User. Without it the lookup fails, is logged, and the address stays Unverified for the night.
  */
 public with sharing class AddressVerifier {
 	public static final String MODULE = 'AddressVerification';
@@ -53,12 +59,16 @@ public with sharing class AddressVerifier {
 		'france' => 'FR',
 		'mexico' => 'MX'
 	};
-	private static final String SMARTY_URL = 'https://us-street.api.smarty.com/street-address';
-	private static final String GOOGLE_URL = 'https://addressvalidation.googleapis.com/v1:validateAddress';
+	/** Paths under the `Barn_Smarty` and `Barn_Google_Address` Named Credentials. */
+	private static final String SMARTY_PATH = '/street-address';
+	private static final String GOOGLE_PATH = '/v1:validateAddress';
 	private static final String CONTEXT = 'AddressVerifier';
 
 	/** True while the module saves addresses, so its own handler leaves them alone (R-AV2). */
 	public static Boolean writing = false;
+
+	/** Set when a lookup's callout failed outright; the rest of the run is left for later. */
+	private static Boolean calloutFailed = false;
 
 	/** What one lookup found: a status, and the standardized parts when verified. */
 	public class Outcome {
@@ -96,18 +106,40 @@ public with sharing class AddressVerifier {
 		return settings().Provider__c == GOOGLE ? GOOGLE : SMARTY;
 	}
 
-	/** The org's keys. Read in Apex only: no permission set grants the setting (R-AV4). */
-	public static Address_Verification_Keys__c keys() {
-		return Address_Verification_Keys__c.getOrgDefaults();
+	/**
+	 * Whether the chosen provider is connected: Check Connection on the setup page last reached it
+	 * through its Named Credential (R-AV4). No key is read; Apex never holds one.
+	 */
+	public static Boolean isReady() {
+		return settings().Connected_Provider__c == provider();
 	}
 
-	/** Whether the chosen provider's keys are entered. */
-	public static Boolean isReady() {
-		Address_Verification_Keys__c stored = keys();
-		return provider() == GOOGLE
-			? String.isNotBlank(stored.Google_Api_Key__c)
-			: String.isNotBlank(stored.Smarty_Auth_Id__c) &&
-			  String.isNotBlank(stored.Smarty_Auth_Token__c);
+	/** The Named Credential of a provider, qualified for this org. */
+	public static String credential(String provider) {
+		return NamespaceUtil.qualify(provider == GOOGLE ? 'Barn_Google_Address' : 'Barn_Smarty');
+	}
+
+	/**
+	 * A test lookup of one known address through the provider's Named Credential, for Check
+	 * Connection. Never throws and writes nothing: the HTTP status (200 when the provider took the
+	 * key), or null with the exception in `failure` (no principal access, nothing entered).
+	 */
+	public static Integer checkConnection(String provider, List<Exception> failure) {
+		Address__c sample = new Address__c(
+			Street__c = '1600 Amphitheatre Pkwy',
+			City__c = 'Mountain View',
+			State__c = 'CA',
+			Postal_Code__c = '94043',
+			Country__c = 'US'
+		);
+		try {
+			return new Http()
+				.send(provider == GOOGLE ? googleRequest(sample) : smartyRequest(sample))
+				.getStatusCode();
+		} catch (Exception failed) {
+			failure.add(failed);
+			return null;
+		}
 	}
 
 	/** Whether the module is turned on in the Module Manager. */
@@ -146,7 +178,7 @@ public with sharing class AddressVerifier {
 			if (!supports(address) || String.isBlank(address.Street__c)) {
 				continue;
 			}
-			if (System.currentTimeMillis() - started > calloutBudgetMs) {
+			if (calloutFailed || System.currentTimeMillis() - started > calloutBudgetMs) {
 				break;
 			}
 			Outcome outcome = lookUp(address);
@@ -223,29 +255,49 @@ public with sharing class AddressVerifier {
 		}
 	}
 
-	/** One lookup; null when the provider did not answer usefully (the address stays as it is). */
+	/**
+	 * One lookup; null when the provider did not answer usefully (the address stays as it is). A
+	 * callout that fails before any answer (no principal access for this person, nothing entered
+	 * on the credential, or the network) stops the run's other lookups, so one cause is logged
+	 * once, not once per address.
+	 */
 	@TestVisible
 	private static Outcome lookUp(Address__c address) {
 		try {
 			return provider() == GOOGLE ? google(address) : smarty(address);
+		} catch (CalloutException failed) {
+			calloutFailed = true;
+			ErrorLogger.log(failed, CONTEXT + '.lookUp', address.Id);
+			return null;
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, CONTEXT + '.lookUp', address.Id);
 			return null;
 		}
 	}
 
-	private static Outcome smarty(Address__c address) {
-		Address_Verification_Keys__c stored = keys();
+	/**
+	 * Smarty's secret key pair goes in an `Authorization: Basic` header (Smarty accepts it there
+	 * as well as in the query string), merged by Salesforce from the `Barn_Smarty` External
+	 * Credential, so the key never appears in Apex or in a logged address.
+	 */
+	private static HttpRequest smartyRequest(Address__c address) {
+		String principal = '$Credential.' + credential(SMARTY);
 		HttpRequest request = new HttpRequest();
 		request.setMethod('GET');
 		request.setTimeout(20000);
+		request.setHeader(
+			'Authorization',
+			'Basic {!BASE64ENCODE(BLOB(' +
+				principal +
+				'.AuthId & ":" & ' +
+				principal +
+				'.AuthToken))}'
+		);
 		request.setEndpoint(
-			SMARTY_URL +
-				'?auth-id=' +
-				encode(stored.Smarty_Auth_Id__c) +
-				'&auth-token=' +
-				encode(stored.Smarty_Auth_Token__c) +
-				'&candidates=1&street=' +
+			'callout:' +
+				credential(SMARTY) +
+				SMARTY_PATH +
+				'?candidates=1&street=' +
 				encode(address.Street__c) +
 				'&city=' +
 				encode(address.City__c) +
@@ -254,7 +306,11 @@ public with sharing class AddressVerifier {
 				'&zipcode=' +
 				encode(address.Postal_Code__c)
 		);
-		HttpResponse response = new Http().send(request);
+		return request;
+	}
+
+	private static Outcome smarty(Address__c address) {
+		HttpResponse response = new Http().send(smartyRequest(address));
 		if (response.getStatusCode() != 200) {
 			return null;
 		}
@@ -281,7 +337,11 @@ public with sharing class AddressVerifier {
 		return outcome;
 	}
 
-	private static Outcome google(Address__c address) {
+	/**
+	 * Google's key goes in the `X-Goog-Api-Key` header, merged by Salesforce from the
+	 * `Barn_Google_Address` External Credential.
+	 */
+	private static HttpRequest googleRequest(Address__c address) {
 		Map<String, Object> given = new Map<String, Object>{
 			'addressLines' => linesOf(address.Street__c),
 			'locality' => address.City__c,
@@ -298,9 +358,14 @@ public with sharing class AddressVerifier {
 		request.setMethod('POST');
 		request.setTimeout(20000);
 		request.setHeader('Content-Type', 'application/json');
-		request.setEndpoint(GOOGLE_URL + '?key=' + encode(keys().Google_Api_Key__c));
+		request.setHeader('X-Goog-Api-Key', '{!$Credential.' + credential(GOOGLE) + '.ApiKey}');
+		request.setEndpoint('callout:' + credential(GOOGLE) + GOOGLE_PATH);
 		request.setBody(JSON.serialize(new Map<String, Object>{ 'address' => given }, true));
-		HttpResponse response = new Http().send(request);
+		return request;
+	}
+
+	private static Outcome google(Address__c address) {
+		HttpResponse response = new Http().send(googleRequest(address));
 		if (response.getStatusCode() != 200) {
 			return null;
 		}

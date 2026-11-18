@@ -67,7 +67,8 @@ Result: 203 to 199 custom objects (Core 30 to 26), under the Enterprise Edition 
   is the constraint ADR-0017 records. Needs an owner decision.
 - **Merging two module settings objects of one package.** None exists outside the protected
   secret settings (`Payment_Keys__c`, `Address_Verification_Keys__c`), excluded pending the
-  owner's secrets decision.
+  owner's secrets decision. (Since removed: D-209 moved the secrets to Named Credentials, see
+  ADR-NEXT `NEXT-provider-secrets-named-credentials.md`, 199 to 197 objects.)
 - **`Rollup_Run_Lock__c` into `Rollup_Settings__c`.** The run lock is a `FOR UPDATE` on one row.
   `Rollup_Settings__c` is also written by record saves (`Processor_Requested_At__c`, D-200 P13),
   so saves would queue behind run starts, which ADR-0116 avoids ("only the start is locked,

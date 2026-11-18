@@ -367,7 +367,7 @@ reads **Failed** and the **Error Log** says why; fix the cause and use **Send Pa
 BarnCRM issues no refunds and stores no card details: refund in your Stripe or PayPal dashboard
 and the refund is recorded here. Cancelling a paid registration does not refund it. Payment Status,
 Amount Paid, Payment Key and Payment Link are set only by BarnCRM. Health Check warns when **Take
-payment online** is on and Payments is not installed or its keys are missing; until it is ready,
+payment online** is on and Payments is not installed or its processor is not connected; until it is ready,
 form registrations are confirmed at once as before.
 
 ### Public Event Page

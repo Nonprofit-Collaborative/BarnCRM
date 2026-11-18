@@ -1,7 +1,7 @@
 import { createElement } from 'lwc';
 import AddressVerificationSetup from 'c/addressVerificationSetup';
 import getSetup from '@salesforce/apex/AddressVerificationController.getSetup';
-import saveKeys from '@salesforce/apex/AddressVerificationController.saveKeys';
+import checkConnection from '@salesforce/apex/AddressVerificationController.checkConnection';
 import clearKeys from '@salesforce/apex/AddressVerificationController.clearKeys';
 import verifyWaiting from '@salesforce/apex/AddressVerificationController.verifyWaiting';
 
@@ -11,7 +11,7 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/apex/AddressVerificationController.saveKeys',
+  '@salesforce/apex/AddressVerificationController.checkConnection',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -26,19 +26,33 @@ jest.mock(
   { virtual: true }
 );
 
+const credentials = (smartyConnected) => [
+  {
+    provider: 'Smarty',
+    connected: smartyConnected,
+    externalCredential: 'Barn_Smarty',
+    principal: 'Barn_Smarty_Key',
+    parameters: 'AuthId, AuthToken'
+  },
+  {
+    provider: 'Google',
+    connected: false,
+    externalCredential: 'Barn_Google_Address',
+    principal: 'Barn_Google_Address_Key',
+    parameters: 'ApiKey'
+  }
+];
+
 const SETUP = {
   provider: 'Smarty',
   ready: true,
   canManage: true,
-  keys: [
-    { name: 'smartyAuthId', provider: 'Smarty', lastFour: 'a1b2' },
-    { name: 'smartyAuthToken', provider: 'Smarty', lastFour: 'c3d4' },
-    { name: 'googleApiKey', provider: 'Google', lastFour: null }
-  ]
+  credentials: credentials(true)
 };
 
 const flush = () =>
   Promise.resolve()
+    .then(() => Promise.resolve())
     .then(() => Promise.resolve())
     .then(() => Promise.resolve());
 
@@ -53,7 +67,6 @@ async function render(setup) {
 }
 
 const find = (element, id) => element.shadowRoot.querySelector(`[data-id="${id}"]`);
-const keyInputs = (element, id) => find(element, id).querySelectorAll('lightning-input');
 
 describe('c-address-verification-setup', () => {
   afterEach(() => {
@@ -63,45 +76,58 @@ describe('c-address-verification-setup', () => {
     jest.clearAllMocks();
   });
 
-  it('shows each key as entered or not, never its value', async () => {
+  it('shows each provider connected or not and where its key goes, with no key box', async () => {
     const element = await render(SETUP);
-    const smarty = keyInputs(element, 'smarty');
-    expect(smarty.length).toBe(2);
-    expect(smarty[0].type).toBe('password');
-    expect(smarty[0].value).toBe('');
-    expect(smarty[0].placeholder).toBe('c.AddressVerification_Setup_KeySet');
-    expect(keyInputs(element, 'google')[0].placeholder).toBe(
-      'c.AddressVerification_Setup_KeyNotSet'
+    expect(find(element, 'status-smarty').textContent).toBe(
+      'c.AddressVerification_Setup_StatusConnected'
     );
+    expect(find(element, 'status-google').textContent).toBe(
+      'c.AddressVerification_Setup_StatusNotConnected'
+    );
+    expect(find(element, 'steps-google').textContent).toBe(
+      'c.AddressVerification_Setup_CredentialSteps'
+    );
+    expect(element.shadowRoot.querySelectorAll('lightning-input').length).toBe(0);
     expect(find(element, 'verify').disabled).toBe(false);
   });
 
   it('locks everything for someone who cannot manage settings', async () => {
     const element = await render({ ...SETUP, canManage: false });
     expect(find(element, 'no-manage')).not.toBeNull();
-    expect(find(element, 'save').disabled).toBe(true);
+    expect(find(element, 'check-smarty').disabled).toBe(true);
     expect(find(element, 'verify').disabled).toBe(true);
   });
 
-  it('cannot start a check before the keys are entered', async () => {
+  it('cannot start a check before the provider is connected', async () => {
     const element = await render({ ...SETUP, ready: false });
     expect(find(element, 'verify').disabled).toBe(true);
   });
 
-  it('saves only what was typed and empties the boxes after', async () => {
-    const element = await render(SETUP);
-    const box = keyInputs(element, 'google')[0];
-    box.value = 'AIza-new';
-    box.dispatchEvent(new CustomEvent('change'));
-    saveKeys.mockResolvedValue(SETUP);
-    find(element, 'save').click();
+  it('checks a connection, shows what was found and reloads the status', async () => {
+    const element = await render({ ...SETUP, ready: false, credentials: credentials(false) });
+    checkConnection.mockResolvedValue('Smarty is connected.');
+    getSetup.mockResolvedValue(SETUP);
+    find(element, 'check-smarty').click();
     await flush();
-    expect(saveKeys).toHaveBeenCalledWith({ keys: { googleApiKey: 'AIza-new' } });
-    expect(find(element, 'message').message).toBe('c.AddressVerification_Setup_Saved');
-    expect(keyInputs(element, 'google')[0].value).toBe('');
+    expect(checkConnection).toHaveBeenCalledWith({ provider: 'Smarty' });
+    const message = find(element, 'message');
+    expect(message.message).toBe('Smarty is connected.');
+    expect(message.variant).toBe('success');
+    expect(find(element, 'status-smarty').textContent).toBe(
+      'c.AddressVerification_Setup_StatusConnected'
+    );
   });
 
-  it('clears one provider and shows a refusal', async () => {
+  it('says plainly when a check fails', async () => {
+    const element = await render({ ...SETUP, credentials: credentials(false) });
+    checkConnection.mockResolvedValue('Google could not be reached.');
+    getSetup.mockResolvedValue({ ...SETUP, credentials: credentials(false) });
+    find(element, 'check-google').click();
+    await flush();
+    expect(find(element, 'message').variant).toBe('warning');
+  });
+
+  it('disconnects one provider and shows a refusal', async () => {
     const element = await render(SETUP);
     clearKeys.mockRejectedValue({ body: { message: 'Not allowed.' } });
     find(element, 'clear-smarty').click();

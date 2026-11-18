@@ -291,7 +291,10 @@ CAPS = {
     # 2026-11-12; raised by the 759 added, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 69,664 measured, plus about 2%.
-    "payments": 71_100,
+    # Named Credentials (N-13, D-209, ADR-NEXT provider secrets): Stripe events fetched back from
+    # Stripe, Check Connection for both processors and the Health Check credential test, in place
+    # of the HMAC check and the key fields, 73,461 measured 2026-11-18, plus about 2%.
+    "payments": 74_900,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
@@ -354,7 +357,10 @@ CAPS = {
     # 2026-11-11, plus about 2 percent.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 22,528 measured, plus about 2%.
-    "addressverification": 23_000,
+    # Named Credentials (N-13, D-209, ADR-NEXT provider secrets): Check Connection, the setup
+    # page's credential list and stopping a run at the first credential failure, 24,072 measured
+    # 2026-11-18, plus about 2%.
+    "addressverification": 24_550,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
