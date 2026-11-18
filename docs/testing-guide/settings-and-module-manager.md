@@ -99,7 +99,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core**, **BarnCRM Rollup Builder** and **BarnCRM Mirror** (offered in both editions) first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Fundraising**, **BarnCRM Volunteers**, **BarnCRM Programs** and **BarnCRM Grants**. There is no **BarnCRM Mirror for Giving** row. Deployed modules say **Installed**; Programs and Grants say **Not installed**. Every row has **What this module does**. |
+| 1 | Open **BarnCRM Settings**, **Modules**. | Rows for **Core**, **BarnCRM Rollup Builder** and **BarnCRM Mirror** (offered in both editions) first, then a **Nonprofit Modules** section at the bottom with rows for **BarnCRM Fundraising**, **BarnCRM Volunteers**, **BarnCRM Programs** and **BarnCRM Grants**. Deployed modules say **Installed**; Programs and Grants say **Not installed**. Every row has **What this module does**. |
 | 2 | Look at a **Not installed** row. | "No install link is published for this module yet." (no module has a published install version on main). |
 | 3 | Look at the **Core** row. | **Installed**, with no **Turn Off** button. |
 | 4 | On the **BarnCRM Volunteers** row, click **Turn Off**. | The row says **Installed and off**. **Turn On** replaces **Turn Off**. |
@@ -295,7 +295,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 ## T-SET-10: Custom Metadata: Relationship Types
 
-**Purpose:** confirm a person who can save Custom Metadata (BarnCRM Admin or Metadata Admin) can add, archive and restore a relationship type, that a missing picklist value is refused, and that match sources are no longer on this page (they are tested in [T-DUP-06 and T-DUP-07](duplicates.md#t-dup-06-a-deactivated-match-source-finds-nothing)).
+**Purpose:** confirm a person who can save Custom Metadata (BarnCRM Admin or Metadata Admin) can add, archive and restore a relationship type, that a missing picklist value is refused, and that match sources are not on this page (they are tested in [T-DUP-06 and T-DUP-07](duplicates.md#t-dup-06-a-deactivated-match-source-finds-nothing)).
 **Prerequisites:** admin user holding **BarnCRM Admin**, which includes the permission to save Custom Metadata. Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
 
 | Step | Action | Expected result |
@@ -515,13 +515,13 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 
 ## T-SET-22: Nightly Job Names, Template Names and Descriptions
 
-**Purpose:** confirm nightly jobs are named in one style and a job scheduled under its earlier name is still recognized, and that shipped names read in title casing.
-**Prerequisites:** the admin user; Fundraising and Programs installed; ideally an org whose Fundraising nightly jobs were scheduled before 0.15.
+**Purpose:** confirm nightly jobs are named in one style and that shipped names read in title casing.
+**Prerequisites:** the admin user; Fundraising and Programs installed.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | Each job scheduled before the upgrade (such as "BarnCRM Giving: ask reminders") shows as scheduled; none is offered for scheduling again or shown twice. |
-| 2 | In an org where they were never scheduled, choose **Schedule Nightly Jobs**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
+| 1 | In an org where they were never scheduled, choose **Schedule Nightly Jobs**, then open Setup, **Scheduled Jobs**. | The names read "BarnCRM Giving Installment Top Up", "BarnCRM Giving Installments Overdue", "BarnCRM Giving Donor Levels" and "BarnCRM Giving Ask Reminders". When scheduled, the other two read "BarnCRM Giving Acknowledgments" and "BarnCRM Giving Pledge Reminders". |
+| 2 | Open **BarnCRM Settings**, **General**, panel **Nightly Jobs**. | Each scheduled job shows as scheduled; none is offered for scheduling again or shown twice. |
 | 3 | Open **Data Manager**, select **Import a File**, and open the **Template** picker. | Template names are in title casing, for example "Generic Gift List" and "NPSP: Opportunities and Payments". A template you renamed keeps your name. |
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 
@@ -564,12 +564,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 ## T-SET-25: One Nightly Run
 
 **Purpose:** confirm every nightly job runs from the one schedule, in order, and the panel shows each job's result.
-**Prerequisites:** the admin user. For step 1, an org upgraded from a version whose nightly jobs were scheduled one by one.
+**Prerequisites:** the admin user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | After the upgrade, open Setup, **Scheduled Jobs**. | One **BarnCRM Nightly Jobs** job at midnight, plus **BarnCRM Tab Access Check**; none of the old BarnCRM nightly jobs remain. |
-| 2 | Open **BarnCRM Settings**, **General**, **Nightly Jobs**. | Says the run is scheduled; lists each job in time order with its time and On or Off. A job that was scheduled before the upgrade reads On. |
+| 1 | Open Setup, **Scheduled Jobs**. | One **BarnCRM Nightly Jobs** job at midnight, plus **BarnCRM Tab Access Check**; no other BarnCRM nightly job. |
+| 2 | Open **BarnCRM Settings**, **General**, **Nightly Jobs**. | Says the run is scheduled; lists each job in time order with its time and On or Off. |
 | 3 | Delete **BarnCRM Nightly Jobs** in Setup, then reload the panel. | Says it is not scheduled and shows **Schedule Nightly Jobs**. Health Check lists **Nightly Jobs Are Not Scheduled**. |
 | 4 | Press **Schedule Nightly Jobs**. | The panel says it is scheduled. |
 | 5 | On the **Error Log** section, press **Stop Daily Run**; back on **Nightly Jobs**. | The Error Log digest reads Off; the run stays scheduled. |

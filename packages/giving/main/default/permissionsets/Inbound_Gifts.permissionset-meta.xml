@@ -4,8 +4,7 @@
   <label>Inbound Gifts</label>
   <description>
     The only set an integration, flow or AI assistant user needs to record gifts through the
-    Inbound Gift API or the Record Inbound Gift action. Replaces Inbound Gift API and Record
-    Inbound Gift Action.
+    Inbound Gift API or the Record Inbound Gift action.
   </description>
   <classAccesses>
     <apexClass>InboundGiftAction</apexClass>

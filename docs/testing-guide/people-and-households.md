@@ -281,7 +281,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
 | 9 | As the staff user, open the household from step 7. On **Members** select **Add Member**, add `Zztest` `Rt`, then open the household's **Addresses** card. | Before the add the panel shows **No Members Yet**; the **Add Member** dialog opens and the new person shows as a tile. **Addresses** shows **No Addresses Yet** with **Add Address**. Nothing asks for a record type. |
 | 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Auto: Households Tab** permission set's record type settings. | **BarnCRM Auto: Households Tab** is assigned; it grants no record type. |
-| 11 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
+| 11 | As admin, open the **BarnCRM Staff** permission set and its record type settings. | **Household** is not listed; staff can still open and edit households. |
 
 **Cleanup:** none (Households cannot be turned off).
 
@@ -303,23 +303,6 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 9 | In the Platform-only org, choose **BarnCRM Organization** and save. Give it to your profile in Setup (Record Type Settings), then import a file with one person and the organization `Zztest Rt Org 4`. | Saved. `Zztest Rt Org 4` is created as **BarnCRM Organization** and is on the **Organizations** tab. Run **Health Check**: no **You Cannot Use the Record Type for Organizations**. |
 
 **Cleanup:** set the setting back to its first value (and take **BarnCRM Organization** off your profile); delete `Zztest Rt Org`, `Zztest Rt Org 4` and the imported people.
-
-## T-HH-20: An Org Already Running BarnCRM Keeps Its Organizations
-
-**Purpose:** after BarnCRM stops shipping its Organization record type, an org that ran an earlier version keeps its organizations once **Record type for organizations** is set.
-**Prerequisites:** admin; an org deployed before this change, with organizations and households (for example a test org with sample data).
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | Before the deploy, open the **Organizations** tab and note how many records it lists. | A count to compare. |
-| 2 | Deploy this version. Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows a record type, never blank. **No record type** is offered only when the org has no Account record type besides Household and person account ones. |
-| 3 | Set **Record type for organizations** to the record type your organizations use and save. | Saved, and listed in **Recent Changes**. |
-| 4 | Open the **Organizations** tab and the **Households** tab. | The Organizations tab lists the same records as in step 1; the Households tab lists the same records as before. |
-| 5 | As a staff user, open a household and an organization. | The same sections and panels as before (T-HH-13): the organization shows **Is Organization** checked, with the **Affiliations** panel. |
-| 6 | If step 3 kept **Organization**: before giving it to your profile, run **Health Check**, then load sample data. Then give **Organization** to your profile (Setup, Profiles, Record Type Settings) and run Health Check again. | Before: Health Check warns **You Cannot Use the Record Type for Organizations**, naming Organization, and **Load Sample Data** refuses with a message naming it. After: no such warning. |
-| 7 | If step 3 chose another record type: move any accounts still on **Organization** to it, then in Setup, Object Manager, Account, Record Types, deactivate **Organization**. Reopen **BarnCRM Settings**, **General**. | **Record type for organizations** still shows your choice, and Organization is no longer among its choices. The Organizations tab lists the same records as in step 1. |
-
-**Cleanup:** none.
 
 ## T-HH-21: Adopt NPSP Households
 

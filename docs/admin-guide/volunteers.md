@@ -298,8 +298,8 @@ Remaining** goes below zero, as before. Turn it on and:
   reminder before the shift.
 
 **Slots Filled** counts places, not sign-ups, and leaves out Cancelled and Waitlisted sign-ups.
-If you installed Volunteers before release 1.6, edit the **Volunteer shift slots filled** rollup
-in Rollup Builder to match: Sum of **Places**, where **Status** is not Cancelled or Waitlisted.
+The **Volunteer shift slots filled** rollup in Rollup Builder is the Sum of **Places**, where
+**Status** is not Cancelled or Waitlisted.
 
 ## Group and Standing Sign-Ups
 

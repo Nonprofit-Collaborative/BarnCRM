@@ -46,7 +46,7 @@ removed and the values it changed are put back (section 5).
 Import is part of the **Data Manager** feature, which on a new install is off until you turn
 it on: choose **Turn On** in the **Data Manager** row in **BarnCRM Settings**, **General**
 (or leave it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). Once it
-is on, the **Super Importer** tab (called **Import** in earlier versions) is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Super Importer**
+is on, the **Super Importer** tab is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Super Importer**
 (see [Data Manager](data-manager.md)). If you do not see the tile, ask whoever set up your org
 to give you the BarnCRM Admin role on the **Access** page.
 
@@ -195,7 +195,7 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
 9. The results screen shows the same four counts for what actually happened, the run log,
    and links to the records. **See Every Row** opens the list of every row of this import
    (the data job's **Import Rows**), so a row you want to look at, or report on, is one click
-   away. The **Import Rows** tab no longer sits in the Admin app's navigation; this link, and a
+   away. The **Import Rows** tab is not in the Admin app's navigation; this link, and a
    rejected row's own page, are how you reach it. Select **Download**, then **Download Results**, to get every row of the file back as
    a CSV with what became of it: its outcome (Created, Updated, Matched, Rejected or Skipped),
    the Salesforce record IDs it resulted in (person, second person, household, organization,

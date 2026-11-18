@@ -43,8 +43,7 @@ no switch of its own. If **Health Check** says the nightly run is not scheduled,
 all nightly jobs** fix schedules it.
 
 Then open the **Logic Models** tab, which joins the BarnCRM apps (and is in the App Launcher).
-Logic Models has no app of its own: the two-tab BarnCRM Logic Models app was retired in release
-1.24 (D-200 R6). A logic model opens on its builder page in every app, as the object's default
+Logic Models has no app of its own (D-200 R6). A logic model opens on its builder page in every app, as the object's default
 record page.
 
 Logic Models has no org-wide settings yet: each logic model is set up on its own record.

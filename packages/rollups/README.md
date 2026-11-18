@@ -5,7 +5,7 @@
 The rollup engine and the Rollup Builder: totals on households, people, organizations and
 module records, calculated from definitions an administrator creates and edits in the app,
 with Instantly, Every night or Both modes, a queue with retry, and a full nightly run
-(ADR-0082). Moved out of Core into its own module by ADR-0125
+(ADR-0082). A module of its own by ADR-0125
 (`docs/architecture/decisions/0125-rollup-builder-module.md`).
 
 ## Depends on

@@ -279,7 +279,7 @@ with Core only, made with `scripts/org/create-scratch-org.sh`.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Deploy Mirror alone: `sf project deploy start --source-dir packages/mirror --target-org <alias>`. | The deploy succeeds; Fundraising and Rollup Builder are not in the org. |
-| 2 | Open **BarnCRM Settings**, **Modules** with the Standard Edition chosen. | **BarnCRM Mirror** is listed (offered in both editions) and says **Installed**. **BarnCRM Fundraising** is not listed, and no **BarnCRM Mirror for Giving** row exists in either edition. |
+| 2 | Open **BarnCRM Settings**, **Modules** with the Standard Edition chosen. | **BarnCRM Mirror** is listed (offered in both editions) and says **Installed**. **BarnCRM Fundraising** is not listed. |
 | 3 | Open **Access**, **Extra Permissions**, and give yourself **Provider Requests**. | The card reads "See the Provider Requests tab..."; the **Provider Requests** tab opens with no rows. |
 | 4 | Open **General**, **Nightly Jobs**. | No Opportunity mirror or Gift Transaction mirror step is listed (those are Fundraising's). |
 | 5 | Choose the Nonprofit Edition and open **Modules** again. | **BarnCRM Fundraising** is listed under **Nonprofit Modules**, **Not installed**, and its row says "Install these first: ..." naming Rollup Builder only, never Mirror. |
@@ -309,14 +309,14 @@ setting off.
 ## T-MIR-19: Fundraising Gift Mirrors Without Mirror
 
 **Purpose:** confirm the gift mirrors install with Fundraising alone, with their settings on
-Fundraising's own settings object, and that no Mirror for Giving package is left (N-15, D-210).
+Fundraising's own settings object (N-15, D-210).
 **Prerequisites:** a fresh scratch org (Person Accounts or `sales-cloud` shape, so Campaign and
 Opportunity exist) made with `scripts/org/create-scratch-org.sh`, with Core, Rollup Builder and
 Fundraising deployed by `scripts/org/deploy-packages.sh` and Mirror not deployed; admin user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Modules** with the Nonprofit Edition chosen. | **BarnCRM Fundraising** says **Installed**. **BarnCRM Mirror** says **Not installed**. No **BarnCRM Mirror for Giving** row exists. |
+| 1 | Open **BarnCRM Settings**, **Modules** with the Nonprofit Edition chosen. | **BarnCRM Fundraising** says **Installed**. **BarnCRM Mirror** says **Not installed**. |
 | 2 | Open **Fundraising**, **Gift Mirrors and Exports**. | **Copy appeals to campaigns**, **Opportunity mirror direction**, **Gift Transaction mirror direction** and **Gift Transaction mirror paid status** show their defaults (off, Off, Off, `Paid`). |
 | 3 | Tick **Copy appeals to campaigns** and save. | The save succeeds. Recent changes lists it. |
 | 4 | Open **Access**, **Extra Permissions**. | **Salesforce Records Sync**, **Accounting Export** and **Inbound Gifts** are offered with the Fundraising sets. |

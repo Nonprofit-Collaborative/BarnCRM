@@ -11,11 +11,11 @@ gracefully.
 
 The gift features (Opportunity mirror, Campaign sync, Gift Transaction mirror, the inbound gift
 API, the accounting export and the gift migration kits) are part of **BarnCRM Fundraising**
-(`packages/giving`) since release 1.27 (N-09, N-15, ADR-NEXT mirror independence).
+(`packages/giving`) (N-09, N-15, ADR-NEXT mirror independence).
 
 ## First ships in
 
-Iteration **0.6**. Core only since release 1.27.
+Iteration **0.6**.
 
 ## Depends on
 

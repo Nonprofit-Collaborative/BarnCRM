@@ -40,9 +40,7 @@ stop mattering once BarnCRM is on AppExchange.
 | **Every package** | **4,324,007** | **4,122** | **89** |
 | **Org limit** | 6,000,000 (can be raised) | 5,000 | 200 Enterprise, 2,000 Unlimited, 400 Developer |
 
-Measured 2026-11-04; the Mirror and Fundraising rows 2026-11-14, when Mirror's gift parts
-moved to Fundraising (the Fundraising row adds the 196,008 characters and 42 labels they
-brought). The install pre-check below measures the release you are installing,
+Measured 2026-11-04; the Mirror and Fundraising rows 2026-11-14. The install pre-check below measures the release you are installing,
 against your org.
 
 **More room for Apex code.** If the pre-check says your Apex code will not fit, install fewer

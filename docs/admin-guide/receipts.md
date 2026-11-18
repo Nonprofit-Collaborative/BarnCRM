@@ -96,10 +96,6 @@ one of its kind off. Only one letter of each kind is in use at a time. Whether a
 switch or a restore worked stays on the page as a notice above the tabs until your next
 action, so you never miss it.
 
-If you edited a letter before this editor existed and gave it your own header, the next time
-you open it check the top: the old shipped letterhead is removed for you, but a header you
-wrote yourself is not, and your name would then print twice. Delete it and save.
-
 **You cannot delete the tax sentences by deleting them from the template.** BarnCRM adds
 them to every document regardless of what the letter says. That is deliberate: those
 sentences are what makes the document a valid receipt.

@@ -272,8 +272,7 @@ pledge balance) on your own Stripe or PayPal checkout page. BarnCRM holds no mon
 a card. It needs the **Payments** module with your keys entered; without them the donor is told
 paying online isn't available. When the processor reports the payment, a **Received** gift
 appears on the pledge, dated the day it was paid, and is linked to the payment it covers. A
-refund at the processor sets it to **Refunded**. A portal saved before this release keeps its
-template: paste the new `donor.json` to add the button.
+refund at the processor sets it to **Refunded**.
 
 **Automatic payments and Update Card (donor template, PAY-04).** With **Automatic Recurring
 Payments** on in the Payments settings, **Pay Online** on a recurring gift sets up automatic

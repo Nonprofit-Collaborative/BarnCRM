@@ -65,8 +65,7 @@ Open **BarnCRM Settings**, choose **General**, and find the **Nightly Jobs** pan
 Fundraising's five among them, each on its own row. Four of the five ship on and the pledge
 reminders ship off; the steps run only once the nightly run is scheduled, so choose
 **Schedule Nightly Jobs** on the panel if it says the run is not scheduled. **Turn On** or **Turn Off** on a
-row switches that one job and leaves the others as they were (1.23, D-200; the Fundraising Nightly
-Jobs page that switched all five together is retired).
+row switches that one job and leaves the others as they were (D-200).
 
 | Job | Runs at | What it does |
 |---|---|---|

@@ -63,8 +63,7 @@ stored as an account is given no household, on save or in the catch-up. A person
 belongs to a household is left in it, and nobody is caught up while **Create households
 automatically** is off. The other four features are not caught up: records added or imported before
 Addresses, Relationships, Affiliations or Preferred Email is on are not processed when it is
-turned on, so finish first-run setup before you add or import people. An org upgraded from an
-earlier release keeps every feature on and is not held.
+turned on, so finish first-run setup before you add or import people.
 
 - **Someone with the BarnCRM Admin role** (Manage BarnCRM Settings) sees two questions:
   1. **Which edition**: two cards, **Standard Edition** and **Nonprofit Edition**, each with an
@@ -91,9 +90,7 @@ earlier release keeps every feature on and is not held.
   button. **Close**, the close button or Escape closes the window, and it shows again the next
   time they open either page, until an administrator finishes.
 
-An org that had already chosen an edition before this release never sees the window, and an
-upgraded org with no edition is given the recommended one by the upgrade. If someone set the
-edition in Salesforce Setup on a new install, the window still shows, with that edition
+If someone set the edition in Salesforce Setup on a new install, the window still shows, with that edition
 already selected, because the features have not been chosen yet. Finishing with every feature
 unticked still finishes setup: the window does not come back.
 
@@ -106,8 +103,7 @@ upgrade: nothing you chose changes. To run the steps by hand, run
 ## Features (General)
 
 Features come with BarnCRM Core. On a new install every feature is off until you turn it on,
-in first-run setup or here. An org upgraded from a release before features existed has every
-feature on, so nothing it already used disappears.
+in first-run setup or here.
 
 The **General** section starts with **Edition** (read-only, see [Editions](editions.md)) and
 then **Features**: one row per feature, each with a short description and its state. Above
@@ -313,8 +309,7 @@ a lot of their own automation.
 
 ### People and Households
 
-People and Households is one section for the settings that used to be on two, Households and
-Relationships. No setting changed: each keeps its value, its default and its name. Duplicates
+People and Households holds the settings for households and relationships. Duplicates
 are not here: they have their own **Duplicate Matching** section, right after this one.
 
 | Box | Settings |
@@ -324,9 +319,8 @@ are not here: they have their own **Duplicate Matching** section, right after th
 | Household Names and Greetings | The **Preview and Recompute** naming panel (the three patterns); Include people who have died in names |
 | Relationships | Keep both sides of relationships in step |
 
-A link that opens the old **Households** or **Relationships** section, such as a bookmark, a
-job notification or a Health Check fix, opens People and Households scrolled to the
-**Households** or **Relationships** box. The Setup Assistant's naming step opens the
+A link to households or relationships settings, such as a job notification or a Health Check
+fix, opens People and Households scrolled to the **Households** or **Relationships** box. The Setup Assistant's naming step opens the
 **Household Names and Greetings** box, and Health Check's fix for people hidden from their
 households opens the **People** box.
 
@@ -393,28 +387,6 @@ BarnCRM's permission sets give no Account record type, so the people who create 
 need the chosen one from their profile or a permission set of your own. Without it, import
 rejects the rows that would create an organization, sample data refuses to load, and Health
 Check warns **You Cannot Use the Record Type for Organizations**, each naming the record type.
-
-**Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
-**Organization** record type and your accounts as they are, and this row keeps it, but
-BarnCRM's permission sets stop giving it. Salesforce never lets an upgrade or a deployment
-delete a record type, so the upgrade cannot remove it for you: only an administrator can, in
-Setup. Do one of these:
-
-- **Keep Organization.** Give it to the profiles (or a permission set of your own) of everyone
-  who creates organizations, in Setup, Profiles, Record Type Settings. Nothing else to do.
-- **Use a record type of your own, or none.**
-  1. Choose your record type here and save. For no record type, skip this step: **No record
-     type** is offered once Organization is deactivated (step 3) and your org has no other
-     Account record type.
-  2. If accounts of Organization should still count as organizations, change their record
-     type to the one you chose (for example with a list view's mass edit or an import).
-     Accounts left on Organization stop counting as organizations.
-  3. In Setup, Object Manager, Account, Record Types, deactivate **Organization**. BarnCRM
-     counts only active record types, so it then leaves Organization out of this row's
-     choices, and **No record type** applies when no other Account record type is left. If
-     you would rather remove it entirely, delete it there once it is inactive; Salesforce asks
-     for the record type to give any accounts still on it, so choose the one you picked in
-     step 1, never Household. With no record type, deactivating is enough: leave it inactive.
 
 ## You Never Type an Identifier
 
@@ -598,5 +570,5 @@ changes.
 | A setting's value | The settings record of the module that owns it, one field per setting. Core's is BarnCRM Settings; a module such as Fundraising brings its own. |
 | A row in Recent Changes | Setting Change: setting name, old value, new value, changed by, changed at |
 | The list of settings the console shows | Setting Definition, a package-shipped list that upgrades bring you |
-| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; `NoneChosen` when first-run setup was finished with every feature unticked; empty, on an org upgraded from before features existed, means all on) |
+| Which features are on | BarnCRM Settings, Features Turned On (a comma-separated list; `None` on a new install until first-run setup; `NoneChosen` when first-run setup was finished with every feature unticked) |
 | Which modules are off | BarnCRM Settings, Modules Turned Off |
