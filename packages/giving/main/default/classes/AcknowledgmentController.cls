@@ -199,7 +199,7 @@ public with sharing class AcknowledgmentController {
 				}
 			}
 			if (!rules.isEmpty()) {
-				Database.update(rules, true, AccessLevel.USER_MODE);
+				update as user rules;
 			}
 			return currentView();
 		} catch (Exception failure) {

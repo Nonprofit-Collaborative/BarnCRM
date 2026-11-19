@@ -114,7 +114,7 @@ public with sharing class ReceiptTemplateService {
 		}
 		chosen.Active__c = true;
 		toDeactivate.add(chosen);
-		Database.update(toDeactivate, true, AccessLevel.USER_MODE);
+		update as user toDeactivate;
 	}
 
 	/** Saves a body an administrator edited. The letter is theirs; the tax sentences are not. */
@@ -125,32 +125,9 @@ public with sharing class ReceiptTemplateService {
 				BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate')
 			);
 		}
-		Database.update(
-			new List<Receipt_Template__c>{
-				new Receipt_Template__c(Id = templateId, Body__c = body)
-			},
-			true,
-			AccessLevel.USER_MODE
-		);
-	}
-
-	/**
-	 * The letter as the editor shows it: the stored body without the letterhead block the
-	 * shipped letters used to open with (ADR-0065 point 3). The package prints the letterhead
-	 * itself now, so the editor never offers it, and the next save stores the letter without it.
-	 * A body without that block is returned unchanged.
-	 */
-	public static String letterOf(String body) {
-		if (
-			String.isBlank(body) || !body.contains(ReceiptContentBuilder.LEGACY_LETTERHEAD_MARKER)
-		) {
-			return body;
-		}
-		Matcher found = LEGACY_LETTERHEAD.matcher(body);
-		if (!found.find()) {
-			return body;
-		}
-		return (body.substring(0, found.start()) + body.substring(found.end())).trim();
+		update as user new List<Receipt_Template__c>{
+			new Receipt_Template__c(Id = templateId, Body__c = body)
+		};
 	}
 
 	/**
@@ -195,10 +172,6 @@ public with sharing class ReceiptTemplateService {
 	}
 
 	// ----------------------------------------------------------------------- internals
-
-	private static final Pattern LEGACY_LETTERHEAD = Pattern.compile(
-		'(?s)<div class="letterhead">.*?</div>\\s*'
-	);
 
 	/** A cash gift with nothing given in return, held in memory only. */
 	private static Gift__c sampleGift(Decimal amount, Date giftDate) {

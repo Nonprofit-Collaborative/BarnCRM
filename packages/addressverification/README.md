@@ -29,6 +29,6 @@ Release **1.15** (C-46).
 - External Credentials `Barn_Smarty` (principal `Barn_Smarty_Key`, parameters `AuthId`,
   `AuthToken`) and `Barn_Google_Address` (principal `Barn_Google_Address_Key`, parameter
   `ApiKey`), shipped with no value, and Named Credentials of the same names. Apex merges the keys
-  into headers and never reads them (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`).
+  into headers and never reads them (ADR-0229).
 - Permission sets `Address_Verification_Admin` (the setup tab and credential access) and
   `Address_Verification_User` (credential access only, for lookups on save; assigned in Setup).

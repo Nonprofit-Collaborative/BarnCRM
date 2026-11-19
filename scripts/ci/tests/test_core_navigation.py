@@ -138,7 +138,7 @@ class IconRegistry(unittest.TestCase):
 
 class AppHeaderColor(unittest.TestCase):
     def test_every_app_uses_the_barncrm_header_colors(self):
-        # ADR-NEXT (Patch brand): every app, admin and module apps included, has the Barn Navy
+        # ADR-0224 (Patch brand): every app, admin and module apps included, has the Barn Navy
         # header #1E2A3A, so switching apps stays in BarnCRM; the logo says which app.
         pattern = os.path.join(ROOT, "packages", "*", "main", "default", "applications", "*.app-meta.xml")
         for path in sorted(glob.glob(pattern)):

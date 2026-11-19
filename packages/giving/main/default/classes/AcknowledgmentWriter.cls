@@ -41,15 +41,15 @@ public without sharing class AcknowledgmentWriter {
 		if (rows == null || rows.isEmpty()) {
 			return;
 		}
-		Database.update(rows, true, AccessLevel.SYSTEM_MODE);
+		update as system rows;
 	}
 
 	public static void insertRun(Acknowledgment_Run__c run) {
-		Database.insert(new List<Acknowledgment_Run__c>{ run }, true, AccessLevel.SYSTEM_MODE);
+		insert as system new List<Acknowledgment_Run__c>{ run };
 	}
 
 	public static void updateRun(Acknowledgment_Run__c run) {
-		Database.update(new List<Acknowledgment_Run__c>{ run }, true, AccessLevel.SYSTEM_MODE);
+		update as system new List<Acknowledgment_Run__c>{ run };
 	}
 
 	/**
@@ -60,7 +60,7 @@ public without sharing class AcknowledgmentWriter {
 		if (gifts == null || gifts.isEmpty()) {
 			return;
 		}
-		Database.update(gifts, true, AccessLevel.SYSTEM_MODE);
+		update as system gifts;
 	}
 
 	/**
@@ -85,7 +85,7 @@ public without sharing class AcknowledgmentWriter {
 			VersionData = Blob.valueOf(csv),
 			Origin = 'H'
 		);
-		Database.insert(new List<ContentVersion>{ version }, true, AccessLevel.SYSTEM_MODE);
+		insert as system new List<ContentVersion>{ version };
 
 		Id documentId = [
 			SELECT ContentDocumentId
@@ -116,17 +116,13 @@ public without sharing class AcknowledgmentWriter {
 	private static Boolean internalOnlyRefused = false;
 
 	private static void linkMergeFile(Id documentId, Id runId, String visibility) {
-		Database.insert(
-			new List<ContentDocumentLink>{
-				new ContentDocumentLink(
-					ContentDocumentId = documentId,
-					LinkedEntityId = runId,
-					ShareType = 'V',
-					Visibility = visibility
-				)
-			},
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		insert as system new List<ContentDocumentLink>{
+			new ContentDocumentLink(
+				ContentDocumentId = documentId,
+				LinkedEntityId = runId,
+				ShareType = 'V',
+				Visibility = visibility
+			)
+		};
 	}
 }

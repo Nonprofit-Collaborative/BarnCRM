@@ -82,7 +82,10 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In Stripe, **Developers > Events**, open the `charge.refunded` event and select **Resend**. | Stripe reports a 200 answer. **Payment Events** gains no new row and the payment is unchanged. |
-| 2 | From a terminal, `curl -X POST <Stripe address> -d '{}'`. | The answer is 400. No Payment Event is added. |
+| 2 | From a terminal, `curl -X POST <Stripe address> -d '{}'` (the full address, with its `token=`). | The answer is 400. No Payment Event is added. |
+| 2a | `curl -i -X POST <Stripe address without ?token=...> -d '{}'`, then again with a wrong token. | Both answers are 404 with an empty body. No Payment Event is added. |
+| 2b | On **Payments Setup**, select **Regenerate Token** and confirm. Post to the old address. | The addresses show a new token and the old address answers 404. Put the new address in Stripe and PayPal. |
+| 2c | Optional: with the receiver at its hourly cap (500 events from one processor in an hour), post again. | The answer is 429; the **Error Log** gains one Warning for the hour (not one per post) and **Health Check** shows `Payment Receiver Hit Its Hourly Limit`. |
 | 3 | `curl -X POST <Stripe address> -H 'Content-Type: application/json' -d '{"id":"evt_forged123","type":"checkout.session.completed","data":{"object":{"client_reference_id":"<a Pending payment Id>"}}}'`, then process. | The answer is 200 and a Payment Event `stripe:evt_forged123` is **Received**. After processing it is **Rejected**, "Stripe has no event with this ID", and the payment is still **Pending**. |
 | 4 | Post the same body with `"type":"customer.created"`. | The answer is 200 and nothing is stored: Payments does not use that type. |
 

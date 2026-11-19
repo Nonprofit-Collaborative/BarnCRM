@@ -84,7 +84,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | On **Automation**, switch **Address Verification** off. Change the street of a verified address. | It keeps its old Verification Status; nothing is looked up. |
 | 2 | Switch it back on and change the street again. | Unverified, then checked within a minute. |
-| 3 | Sign in as a staff user (Team Member) without **Address Verification User** and open BarnCRM Settings. Change the street of an address. | No Address Verification Setup tab. The address is **Unverified** and stays so (it waits for the nightly check); the **Error Log** has one row for the credential, however many addresses the save changed. |
-| 4 | As admin, assign **Address Verification User** to that staff user in Setup. As the staff user, change the street again. | Checked within a minute. |
+| 3 | Sign in as a staff user (Team Member) without **Address Verification User** and open BarnCRM Settings. Change the street of an address. | No Address Verification Setup tab. The address is **Unverified** and stays so (it waits for the nightly check); no lookup is queued, and the **Error Log** has one Warning (context `AddressVerifier.noAccess`) for the day, however many saves or addresses. |
+| 4 | As admin, open the **Access** page: **Address Verification User** is among the extra permissions and no staff user holds it until you add it. Add it to that staff user. As the staff user, change the street again. | Checked within a minute. |
 
 **Cleanup:** Remove Address Verification User from the staff user.

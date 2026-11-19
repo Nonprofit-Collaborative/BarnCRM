@@ -13,8 +13,7 @@ Salesforce reports need a report type for each object path, cannot total related
 row except through rollup fields, and a dashboard filter reaches only widgets whose source
 reports carry the same field. Dashboards run as one running user unless dynamic dashboards are
 used, which are limited by edition and count. BarnCRM's modules each ship dashboards that hit
-these limits. The suite is also trying to add fewer custom objects (ADR-NEXT
-`NEXT-fewer-custom-objects.md`), and Core must run on a Platform-only org (ADR-0013).
+these limits. The suite is also trying to add fewer custom objects (ADR-0227), and Core must run on a Platform-only org (ADR-0013).
 
 ## Decision
 

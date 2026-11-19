@@ -28,6 +28,6 @@ public with sharing class GiftPostingWriter {
 		if (gifts == null || gifts.isEmpty()) {
 			return;
 		}
-		Database.update(gifts, true, AccessLevel.SYSTEM_MODE);
+		update as system gifts;
 	}
 }

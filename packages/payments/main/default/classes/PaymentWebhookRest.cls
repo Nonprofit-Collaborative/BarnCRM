@@ -2,8 +2,11 @@
  * The webhook receiver (ADR-0201 `0201-payments-module.md`, decisions 4 and 5; R-PEV1, R-PEV3),
  * on the org's Salesforce Site for its guest user (`Payments_Webhook_Guest`):
  *
- *   POST <site URL>/services/apexrest/barncrm/payments/v1/stripe
- *   POST <site URL>/services/apexrest/barncrm/payments/v1/paypal
+ *   POST <site URL>/services/apexrest/barncrm/payments/v1/stripe?token=<token>
+ *   POST <site URL>/services/apexrest/barncrm/payments/v1/paypal?token=<token>
+ *
+ * The token is a random value BarnCRM makes (Payments Setup shows the full address, ADR-0229
+ * amended); a post without it, or with another, is answered 404 and stores nothing.
  *
  * It only stores: one Payment Event, Received, in system mode (the guest has no object access),
  * and makes no callout, so the guest needs no credential to receive. Neither processor's post is
@@ -48,7 +51,7 @@ global with sharing class PaymentWebhookRest {
 		String processor = path.endsWith('/stripe')
 			? PaymentService.STRIPE
 			: (path.endsWith('/paypal') ? PaymentService.PAYPAL : null);
-		if (processor == null) {
+		if (processor == null || !PaymentService.tokenMatches(request.params.get('token'))) {
 			return 404;
 		}
 		if (request.requestBody == null || request.requestBody.size() > MAX_BYTES) {
@@ -120,6 +123,17 @@ global with sharing class PaymentWebhookRest {
 				WITH SYSTEM_MODE
 			] >= HOURLY_LIMIT
 		) {
+			if (PaymentService.noteCapHit()) {
+				ErrorLogger.logMessage(
+					'The Payments receiver reached its hourly limit of ' +
+						HOURLY_LIMIT +
+						' events for ' +
+						processor +
+						' and is refusing more until the hour passes.',
+					CONTEXT,
+					ErrorLogger.SEVERITY_WARNING
+				);
+			}
 			return 429;
 		}
 		Database.SaveResult saved = Database.insert(event, false, AccessLevel.SYSTEM_MODE);

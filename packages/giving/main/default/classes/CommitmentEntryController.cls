@@ -147,7 +147,7 @@ public with sharing class CommitmentEntryController {
 		}
 		try {
 			Commitment__c commitment = draftOrNull(input);
-			Database.insert(commitment, true, AccessLevel.USER_MODE);
+			insert as user commitment;
 			result.commitmentId = commitment.Id;
 			result.success = true;
 		} catch (DmlException refused) {

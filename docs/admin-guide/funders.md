@@ -106,7 +106,7 @@ A grant's page groups its panels into tabs, on a phone too:
 
 | Tab | What is on it |
 |---|---|
-| Overview | The grant's details, and the Program and Giving Fund cards (each only with its module). |
+| Overview | The grant's details, and the Program and Fund cards (each only with its module). |
 | Money | The Award Schedule card, the Payments list and the Restricted Fund Entries list. |
 | Reporting | The Requirements list, the Logic Model Outcomes card (with Logic Models) and the Funder Report card. |
 | Writing | The Answer Library card. |
@@ -162,7 +162,7 @@ organizations moves the grants to the one you keep.
 With the Programs module installed, the grant's page has a **Program** card. Choose the program
 from the list and click **Save**; choose **No program** to clear it. Without Programs the card
 is not shown at all (staff cannot install a module, so the page does not ask them to). The
-Giving Fund and Logic Model Outcomes cards do the same without their module. The grant stores the
+Fund and Logic Model Outcomes cards do the same without their module. The grant stores the
 program's record ID, so Grants works without Programs; if the program is later deleted, the card
 says the program cannot be found and you can choose another.
 
@@ -501,9 +501,9 @@ Ticking **Restricted** after payments came in adds no entries for them: add thos
 automation is **Grant payment received** on the **Automation** page; switch it off while you
 import past payments and entries.
 
-### The Giving Fund a Grant Is Booked To
+### The Fund a Grant Is Booked To
 
-With the Fundraising module installed, the grant's page has a **Giving Fund** card. Choose the fund the
+With the Fundraising module installed, the grant's page has a **Fund** card. Choose the fund the
 organization books this money to in Fundraising and click **Save**. Like the program, the grant stores
 the fund's record ID, so Grants works without Fundraising; without Fundraising the card is not shown. Grants
 reads only the fund's name: Fundraising's own fund totals count the gifts you record in Fundraising, and the

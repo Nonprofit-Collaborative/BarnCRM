@@ -6,7 +6,7 @@
  *
  * Every call goes through the `Barn_Stripe` Named Credential; the secret key is its External
  * Credential's principal parameter, merged into the header by Salesforce, never read by Apex
- * (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`, amending ADR-0220).
+ * (ADR-0229, amending ADR-0220).
  */
 public with sharing class PaymentStripe {
 	public static final String CREDENTIAL = NamespaceUtil.qualify('Barn_Stripe');

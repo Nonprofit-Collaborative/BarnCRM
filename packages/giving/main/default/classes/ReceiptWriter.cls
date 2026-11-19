@@ -35,38 +35,30 @@ public without sharing class ReceiptWriter {
 		if (receipts == null || receipts.isEmpty()) {
 			return;
 		}
-		Database.insert(receipts, true, AccessLevel.SYSTEM_MODE);
+		insert as system receipts;
 	}
 
 	public static void updateReceipts(List<Receipt__c> receipts) {
 		if (receipts == null || receipts.isEmpty()) {
 			return;
 		}
-		Database.update(receipts, true, AccessLevel.SYSTEM_MODE);
+		update as system receipts;
 	}
 
 	public static void insertRun(Receipt_Run__c run) {
-		Database.insert(new List<Receipt_Run__c>{ run }, true, AccessLevel.SYSTEM_MODE);
+		insert as system new List<Receipt_Run__c>{ run };
 	}
 
 	public static void updateRun(Receipt_Run__c run) {
-		Database.update(new List<Receipt_Run__c>{ run }, true, AccessLevel.SYSTEM_MODE);
+		update as system new List<Receipt_Run__c>{ run };
 	}
 
 	public static void insertSequence(Receipt_Number_Sequence__c sequence) {
-		Database.insert(
-			new List<Receipt_Number_Sequence__c>{ sequence },
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		insert as system new List<Receipt_Number_Sequence__c>{ sequence };
 	}
 
 	public static void updateSequence(Receipt_Number_Sequence__c sequence) {
-		Database.update(
-			new List<Receipt_Number_Sequence__c>{ sequence },
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		update as system new List<Receipt_Number_Sequence__c>{ sequence };
 	}
 
 	/**
@@ -85,7 +77,7 @@ public without sharing class ReceiptWriter {
 		if (templates == null || templates.isEmpty()) {
 			return;
 		}
-		Database.insert(templates, true, AccessLevel.SYSTEM_MODE);
+		insert as system templates;
 	}
 
 	/**
@@ -127,7 +119,7 @@ public without sharing class ReceiptWriter {
 			VersionData = bytes,
 			Origin = 'H'
 		);
-		Database.insert(new List<ContentVersion>{ version }, true, AccessLevel.SYSTEM_MODE);
+		insert as system new List<ContentVersion>{ version };
 
 		Id documentId = [
 			SELECT ContentDocumentId
@@ -187,7 +179,7 @@ public without sharing class ReceiptWriter {
 				)
 			);
 		}
-		Database.insert(links, true, AccessLevel.SYSTEM_MODE);
+		insert as system links;
 	}
 
 	/**

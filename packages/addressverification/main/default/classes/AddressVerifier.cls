@@ -9,7 +9,7 @@
  *
  * Every lookup goes through the provider's Named Credential (`Barn_Smarty`, `Barn_Google_Address`);
  * the key is the External Credential principal's, merged into a header by Salesforce and never
- * read by Apex (R-AV4; ADR-NEXT `NEXT-provider-secrets-named-credentials.md`). The person whose
+ * read by Apex (R-AV4; ADR-0229). The person whose
  * save or job it is needs principal access: Address Verification Admin or Address Verification
  * User. Without it the lookup fails, is logged, and the address stays Unverified for the night.
  */
@@ -112,6 +112,58 @@ public with sharing class AddressVerifier {
 	 */
 	public static Boolean isReady() {
 		return settings().Connected_Provider__c == provider();
+	}
+
+	private static final List<String> ACCESS_SETS = new List<String>{
+		'Address_Verification_User',
+		'Address_Verification_Admin'
+	};
+	@TestVisible
+	private static Boolean userAccess;
+	@TestVisible
+	private static Boolean noAccessChecked = false;
+
+	/**
+	 * Whether the person saving holds `Address_Verification_User` or `Address_Verification_Admin`
+	 * (the principal access a lookup on save runs with), read once per transaction. A person
+	 * without it is not looked up on save; the nightly step covers their addresses.
+	 */
+	public static Boolean canLookUpOnSave() {
+		if (userAccess == null) {
+			Id me = UserInfo.getUserId();
+			userAccess =
+				[
+					SELECT COUNT()
+					FROM PermissionSetAssignment
+					WHERE AssigneeId = :me AND PermissionSet.Name IN :ACCESS_SETS
+					WITH SYSTEM_MODE
+				] > 0;
+		}
+		return userAccess;
+	}
+
+	/** Logs the missing access as one Warning a day, not one per save. */
+	public static void logNoAccessOnce() {
+		if (noAccessChecked) {
+			return;
+		}
+		noAccessChecked = true;
+		Datetime dayAgo = Datetime.now().addDays(-1);
+		String context = CONTEXT + '.noAccess';
+		if (
+			[
+				SELECT COUNT()
+				FROM Error_Log__c
+				WHERE Context__c = :context AND CreatedDate > :dayAgo
+				WITH SYSTEM_MODE
+			] == 0
+		) {
+			ErrorLogger.logMessage(
+				'An address was saved by someone without Address Verification User or Admin, so it waits for the nightly check. Give them the permission set on the Access page to look up their saves at once.',
+				context,
+				ErrorLogger.SEVERITY_WARNING
+			);
+		}
 	}
 
 	/** The Named Credential of a provider, qualified for this org. */

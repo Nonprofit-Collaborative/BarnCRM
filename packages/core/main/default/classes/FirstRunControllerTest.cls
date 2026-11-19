@@ -56,7 +56,7 @@ private class FirstRunControllerTest {
 	@IsTest
 	static void finishingWithEveryFeatureAlreadyOnStillGivesTheToolTabs() {
 		System.runAs(TestUsers.admin()) {
-			// An org built from source: no feature list saved, so every feature is on already.
+			// No feature list saved: a test reads every feature on (FeatureSwitchService's seam).
 			TestSettings.neverSetUp();
 			FirstRunController.startTabCheckInTests = true;
 

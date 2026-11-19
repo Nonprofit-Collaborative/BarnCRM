@@ -9,7 +9,7 @@
  */
 public with sharing class PledgeReminderScheduler implements Schedulable {
 	/** The name the scheduled job carries, so the page can find it again. */
-	public static final String JOB_NAME = 'BarnCRM Giving Pledge Reminders';
+	public static final String JOB_NAME = 'BarnCRM Fundraising Pledge Reminders';
 
 	private static final String LOG_CONTEXT = 'PledgeReminderScheduler.execute';
 

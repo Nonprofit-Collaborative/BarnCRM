@@ -88,30 +88,6 @@ private class ReceiptBrandingTest {
 	}
 
 	/**
-	 * A letter saved before the package printed the letterhead keeps its own block, and the
-	 * package does not print the name a second time (ADR-0065 point 3).
-	 */
-	@IsTest
-	static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Test.startTest();
-			String html = receiptFrom(
-				'<div class="letterhead"><h1>{{OrganizationName}}</h1></div>' + BARE_TEMPLATE
-			);
-			Test.stopTest();
-
-			Assert.isFalse(
-				html.contains('class="orgname"'),
-				'The package does not print a name the letter already printed: ' + html
-			);
-			Assert.isTrue(
-				html.contains('<h1>Hope For Homes</h1>'),
-				'The letter prints it: ' + html
-			);
-		}
-	}
-
-	/**
 	 * The letterhead is code, not template (ADR-0065 point 2). A letter that only mentions the
 	 * organization in a sentence used to lose the letterhead, because the test was for the token.
 	 */

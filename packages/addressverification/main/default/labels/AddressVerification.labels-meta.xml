@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>AddressVerification_Access_AddOnUser</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what Address Verification User grants</shortDescription>
+        <value>Looks up this person's new and changed addresses as they save, on top of what the person's role gives. Without it their addresses wait for the nightly check.</value>
+    </labels>
+</CustomLabels>

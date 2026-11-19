@@ -6,7 +6,7 @@
  * `Type.forName` under ADR-0017, so it must be a public type with a public no-argument
  * constructor. The class itself does nothing but hand off to `HealthCheckGivingChecks`, which
  * is where the actual questions and their answers live, and to `GiftMirrorHealthChecks` for the
- * stalled gift mirror runs (ADR-NEXT mirror independence).
+ * stalled gift mirror runs (ADR-0228).
  */
 @NamespaceAccessible
 public with sharing class GivingHealthCheckExtension implements HealthCheckExtension {

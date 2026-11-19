@@ -12,7 +12,7 @@
 # behind dynamic Apex (see docs/product-plan.md Section 4.2), and from the gift mirror files of
 # packages/giving under the stricter rule below. packages/mirror is not in DIRS below.
 #
-# Fundraising's gift mirrors (packages/giving, ADR-NEXT mirror independence)
+# Fundraising's gift mirrors (packages/giving, ADR-0228)
 # ---------------------------------------------------------------------------
 # BarnCRM Fundraising (the giving package) holds the Opportunity mirror, Campaign sync, the Gift
 # Transaction mirror, the inbound gift API, the accounting export and the NPSP and Nonprofit

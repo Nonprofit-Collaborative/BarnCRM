@@ -135,15 +135,11 @@ public with sharing class EventPayments {
 		registration.Payment_Key__c = String.valueOf(started.get('paymentId'));
 		registration.Payment_Link__c = String.valueOf(started.get('checkoutUrl'));
 		registration.Payment_Status__c = LINK_SENT;
-		Database.update(
-			new Event_Registration__c(
-				Id = registration.Id,
-				Payment_Key__c = registration.Payment_Key__c,
-				Payment_Link__c = registration.Payment_Link__c,
-				Payment_Status__c = LINK_SENT
-			),
-			true,
-			AccessLevel.SYSTEM_MODE
+		update as system new Event_Registration__c(
+			Id = registration.Id,
+			Payment_Key__c = registration.Payment_Key__c,
+			Payment_Link__c = registration.Payment_Link__c,
+			Payment_Status__c = LINK_SENT
 		);
 		return emailLink(registration);
 	}
@@ -248,9 +244,9 @@ public with sharing class EventPayments {
 					)
 				);
 			}
-			Database.update(attendees, true, AccessLevel.SYSTEM_MODE);
+			update as system attendees;
 		}
-		Database.update(change, true, AccessLevel.SYSTEM_MODE);
+		update as system change;
 	}
 
 	private static Id idOf(Object value) {

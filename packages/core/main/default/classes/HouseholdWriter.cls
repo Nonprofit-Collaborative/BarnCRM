@@ -331,10 +331,10 @@ public with sharing class HouseholdWriter {
 		List<Household_Member__c> promoted
 	) {
 		if (created != null && !created.isEmpty()) {
-			Database.insert(created, true, AccessLevel.SYSTEM_MODE);
+			insert as system created;
 		}
 		if (promoted != null && !promoted.isEmpty()) {
-			Database.update(promoted, true, AccessLevel.SYSTEM_MODE);
+			update as system promoted;
 		}
 	}
 

@@ -220,7 +220,7 @@ public with sharing class StewardshipPlanController {
 			);
 		}
 		try {
-			Database.delete(new Stewardship_Plan_Step__c(Id = stepId), true, AccessLevel.USER_MODE);
+			delete as user new Stewardship_Plan_Step__c(Id = stepId);
 		} catch (DmlException refused) {
 			throw UserErrors.message(readable(refused));
 		} catch (Exception failure) {
@@ -258,7 +258,7 @@ public with sharing class StewardshipPlanController {
 			return;
 		}
 		try {
-			Database.update(reordered, true, AccessLevel.USER_MODE);
+			update as user reordered;
 		} catch (DmlException refused) {
 			throw UserErrors.message(readable(refused));
 		} catch (Exception failure) {
@@ -303,7 +303,7 @@ public with sharing class StewardshipPlanController {
 
 	private static void save(SObject record) {
 		try {
-			Database.upsert(record, true, AccessLevel.USER_MODE);
+			upsert as user record;
 		} catch (DmlException refused) {
 			throw UserErrors.message(readable(refused));
 		} catch (Exception failure) {

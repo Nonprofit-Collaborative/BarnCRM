@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Merge_Journal_Retention_Days__c</fullName>
   <defaultValue>365</defaultValue>
-  <description>Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08, R-NJ8). Read as 365 when empty, held between 30 and 3650.</description>
+  <description>Days an Admin Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08, R-NJ8). Read as 365 when empty, held between 30 and 3650.</description>
   <externalId>false</externalId>
   <inlineHelpText>Days a merge is kept, and can be undone, before its journal is deleted.</inlineHelpText>
   <label>Days to keep merge history</label>

@@ -226,13 +226,9 @@ public with sharing class EventRegistrationService {
 		}
 		update as user totals;
 		if (holdForPayment) {
-			Database.update(
-				new Event_Registration__c(
-					Id = registration.Id,
-					Payment_Status__c = EventPayments.UNPAID
-				),
-				true,
-				AccessLevel.SYSTEM_MODE
+			update as system new Event_Registration__c(
+				Id = registration.Id,
+				Payment_Status__c = EventPayments.UNPAID
 			);
 			EventPayments.queueCheckouts();
 		}

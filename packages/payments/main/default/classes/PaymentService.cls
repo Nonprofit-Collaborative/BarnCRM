@@ -110,6 +110,47 @@ public with sharing class PaymentService {
 			: s.Stripe_Connected__c == true;
 	}
 
+	// ---- The receiver's address token (pre-batch review M1) ----
+
+	/** The token a processor's post must carry; made and saved on first need, or replaced. */
+	public static String webhookToken(Boolean replace) {
+		Payments_Settings__c s = settings();
+		if (replace == true || String.isBlank(s.Webhook_Token__c)) {
+			s.SetupOwnerId = UserInfo.getOrganizationId();
+			s.Webhook_Token__c = EncodingUtil.convertToHex(Crypto.generateAesKey(256));
+			upsert as system s;
+		}
+		return s.Webhook_Token__c;
+	}
+
+	/** True when the post's token is the saved one; every character is compared, so timing tells nothing. */
+	public static Boolean tokenMatches(String given) {
+		String saved = settings().Webhook_Token__c;
+		if (String.isBlank(saved) || given == null) {
+			return false;
+		}
+		Integer wrong = Math.abs(given.length() - saved.length());
+		for (Integer i = 0; i < saved.length(); i++) {
+			if (i >= given.length() || given.charAt(i) != saved.charAt(i)) {
+				wrong++;
+			}
+		}
+		return wrong == 0;
+	}
+
+	/** Records a refusal at the hourly cap; true for the first one in an hour (the one to log). */
+	public static Boolean noteCapHit() {
+		Payments_Settings__c s = settings();
+		Datetime now = Datetime.now();
+		if (s.Webhook_Cap_Hit_At__c != null && s.Webhook_Cap_Hit_At__c > now.addHours(-1)) {
+			return false;
+		}
+		s.SetupOwnerId = UserInfo.getOrganizationId();
+		s.Webhook_Cap_Hit_At__c = now;
+		upsert as system s;
+		return true;
+	}
+
 	// ---- Starting a checkout ----
 
 	/**

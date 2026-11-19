@@ -167,7 +167,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 			for (Id documentId : documentIds) {
 				documents.add(new ContentDocument(Id = documentId));
 			}
-			Database.delete(documents, true, AccessLevel.SYSTEM_MODE);
+			delete as system documents;
 		}
 	}
 
@@ -200,7 +200,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 			}
 		}
 		if (!cleared.isEmpty()) {
-			Database.update(cleared, true, AccessLevel.USER_MODE);
+			update as user cleared;
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.CLEARED,
@@ -268,7 +268,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 		if (updates.isEmpty()) {
 			return changes;
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		if (!cancelled.isEmpty()) {
 			changes.add(
 				new PersonErasure.Change(
@@ -297,7 +297,7 @@ public with sharing class VolunteersErasureExtension implements PersonErasureExt
 		if (rows.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.delete(rows, true, AccessLevel.USER_MODE);
+		delete as user rows;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.DELETED,
