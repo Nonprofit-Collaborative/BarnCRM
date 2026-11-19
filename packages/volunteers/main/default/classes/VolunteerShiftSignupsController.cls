@@ -127,7 +127,7 @@ public with sharing class VolunteerShiftSignupsController {
 			signup.Account__c = personId;
 		}
 		try {
-			Database.insert(new List<Volunteer_Signup__c>{ signup }, true, AccessLevel.USER_MODE);
+			insert as user new List<Volunteer_Signup__c>{ signup };
 			return panelFor(shiftId);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, shiftId);
@@ -150,13 +150,9 @@ public with sharing class VolunteerShiftSignupsController {
 				throw UserErrors.message(actionFailed());
 			}
 			Integer hoursBefore = VolunteerSignupSelector.countHoursFor(signupId);
-			Database.update(
-				new List<Volunteer_Signup__c>{
-					new Volunteer_Signup__c(Id = signupId, Status__c = wanted)
-				},
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new List<Volunteer_Signup__c>{
+				new Volunteer_Signup__c(Id = signupId, Status__c = wanted)
+			};
 			Panel panel = panelFor(signup.Volunteer_Shift__c);
 			Integer hoursAfter = VolunteerSignupSelector.countHoursFor(signupId);
 			panel.hoursWritten = hoursAfter > hoursBefore;
@@ -194,15 +190,11 @@ public with sharing class VolunteerShiftSignupsController {
 				for (Volunteer_Signup__c signup : open) {
 					signup.Status__c = STATUS_NO_SHOW;
 				}
-				Database.update(open, true, AccessLevel.USER_MODE);
+				update as user open;
 			}
-			Database.update(
-				new List<Volunteer_Shift__c>{
-					new Volunteer_Shift__c(Id = shiftId, Status__c = STATUS_SHIFT_COMPLETED)
-				},
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new List<Volunteer_Shift__c>{
+				new Volunteer_Shift__c(Id = shiftId, Status__c = STATUS_SHIFT_COMPLETED)
+			};
 			return panelFor(shiftId);
 		} catch (Exception failure) {
 			Database.rollback(before);

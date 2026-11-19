@@ -70,7 +70,7 @@ public with sharing class VolunteerLetterTemplateTriggerHandler extends TriggerH
 		for (Volunteer_Letter_Template__c other : others) {
 			other.Active__c = false;
 		}
-		Database.update(others, true, AccessLevel.SYSTEM_MODE);
+		update as system others;
 	}
 
 	private List<Volunteer_Letter_Template__c> templates() {

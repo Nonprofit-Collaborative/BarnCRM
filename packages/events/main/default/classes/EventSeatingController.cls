@@ -209,10 +209,10 @@ public with sharing class EventSeatingController {
 			);
 			if (String.isBlank(input.id)) {
 				table.Event__c = input.eventId;
-				Database.insert(table, true, AccessLevel.USER_MODE);
+				insert as user table;
 			} else {
 				table.Id = input.id;
-				Database.update(table, true, AccessLevel.USER_MODE);
+				update as user table;
 			}
 			return table.Id;
 		} catch (DmlException e) {
@@ -231,7 +231,7 @@ public with sharing class EventSeatingController {
 	@AuraEnabled
 	public static void deleteTable(Id tableId) {
 		try {
-			Database.delete(new Event_Table__c(Id = tableId), true, AccessLevel.USER_MODE);
+			delete as user new Event_Table__c(Id = tableId);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -296,7 +296,7 @@ public with sharing class EventSeatingController {
 					)
 				);
 			}
-			Database.update(changes, true, AccessLevel.USER_MODE);
+			update as user changes;
 			return changes.size();
 		} catch (AuraHandledException refused) {
 			throw refused;
@@ -318,14 +318,10 @@ public with sharing class EventSeatingController {
 	@AuraEnabled
 	public static void saveNeeds(Id attendeeId, String dietary, String access) {
 		try {
-			Database.update(
-				new Event_Attendee__c(
-					Id = attendeeId,
-					Dietary_Needs__c = String.isBlank(dietary) ? null : dietary.trim(),
-					Access_Needs__c = String.isBlank(access) ? null : access.trim()
-				),
-				true,
-				AccessLevel.USER_MODE
+			update as user new Event_Attendee__c(
+				Id = attendeeId,
+				Dietary_Needs__c = String.isBlank(dietary) ? null : dietary.trim(),
+				Access_Needs__c = String.isBlank(access) ? null : access.trim()
 			);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));

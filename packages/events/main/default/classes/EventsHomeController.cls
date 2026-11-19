@@ -161,7 +161,7 @@ public with sharing class EventsHomeController {
 				}
 				copies.add(copyAt(source, start));
 			}
-			Database.insert(copies, true, AccessLevel.USER_MODE);
+			insert as user copies;
 			copyTicketTypes(source, copies);
 			copyTracks(source, copies);
 			return copies.size();
@@ -231,7 +231,7 @@ public with sharing class EventsHomeController {
 				made.add(clone);
 			}
 		}
-		Database.insert(made, true, AccessLevel.USER_MODE);
+		insert as user made;
 	}
 
 	/** Each occurrence gets the event's tracks; its sessions are planned anew. */
@@ -252,7 +252,7 @@ public with sharing class EventsHomeController {
 			}
 		}
 		if (!made.isEmpty()) {
-			Database.insert(made, true, AccessLevel.USER_MODE);
+			insert as user made;
 		}
 	}
 

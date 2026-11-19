@@ -17,7 +17,7 @@ public without sharing class DonorLevelWriter {
 		if (moved == null || moved.isEmpty()) {
 			return;
 		}
-		Database.update(moved, true, AccessLevel.SYSTEM_MODE);
+		update as system moved;
 	}
 
 	/**

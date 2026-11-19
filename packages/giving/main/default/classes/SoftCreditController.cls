@@ -92,7 +92,7 @@ public with sharing class SoftCreditController {
 			} else {
 				credit.Account__c = personId;
 			}
-			Database.insert(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);
+			insert as user new List<Soft_Credit__c>{ credit };
 			return panelFor(giftId);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, giftId);
@@ -125,7 +125,7 @@ public with sharing class SoftCreditController {
 				);
 			}
 			Id giftId = credit.Gift__c;
-			Database.delete(new List<Soft_Credit__c>{ credit }, true, AccessLevel.USER_MODE);
+			delete as user new List<Soft_Credit__c>{ credit };
 			return panelFor(giftId);
 		} catch (AuraHandledException refused) {
 			throw refused;

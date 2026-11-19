@@ -182,11 +182,11 @@ public with sharing class QuickGiftEntryController {
 			insertGift(gift, split);
 			Tribute__c tribute = input.toTribute(gift.Id);
 			if (tribute != null) {
-				Database.insert(tribute, true, AccessLevel.USER_MODE);
+				insert as user tribute;
 			}
 			Boolean applyChosenFundWasApplied = true;
 			if (split) {
-				Database.insert(input.toAllocations(gift.Id), true, AccessLevel.USER_MODE);
+				insert as user input.toAllocations(gift.Id);
 			} else {
 				applyChosenFundWasApplied = applyChosenFund(
 					gift,
@@ -222,7 +222,7 @@ public with sharing class QuickGiftEntryController {
 		Boolean callerSuppression = GiftService.suppressDefaultAllocations;
 		try {
 			GiftService.suppressDefaultAllocations = split || callerSuppression;
-			Database.insert(gift, true, AccessLevel.USER_MODE);
+			insert as user gift;
 		} finally {
 			GiftService.suppressDefaultAllocations = callerSuppression;
 		}

@@ -208,7 +208,7 @@ public with sharing class AskPipelineController {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'));
 		}
 		try {
-			Database.update(new Ask__c(Id = askId, Stage__c = stage), true, AccessLevel.USER_MODE);
+			update as user new Ask__c(Id = askId, Stage__c = stage);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -231,11 +231,7 @@ public with sharing class AskPipelineController {
 			throw UserErrors.message(BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'));
 		}
 		try {
-			Database.update(
-				new Ask__c(Id = askId, Outcome__c = AskRules.OUTCOME_OPEN),
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new Ask__c(Id = askId, Outcome__c = AskRules.OUTCOME_OPEN);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -275,7 +271,7 @@ public with sharing class AskPipelineController {
 				Database.rollback(beforeClose);
 				return result;
 			}
-			Database.update(closing, true, AccessLevel.USER_MODE);
+			update as user closing;
 			result.success = true;
 			return result;
 		} catch (DmlException e) {
@@ -382,7 +378,7 @@ public with sharing class AskPipelineController {
 			ask.Appeal__c,
 			ask.Fund__c
 		);
-		Database.insert(pledge, true, AccessLevel.USER_MODE);
+		insert as user pledge;
 		closing.Commitment__c = pledge.Id;
 		result.commitmentId = pledge.Id;
 		return null;

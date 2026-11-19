@@ -180,7 +180,7 @@ public with sharing class SessionScheduleController {
 				);
 			}
 			if (!sessions.isEmpty()) {
-				Database.insert(sessions, true, AccessLevel.USER_MODE);
+				insert as user sessions;
 			}
 			schedule.created = sessions.size();
 			return schedule;
@@ -223,7 +223,7 @@ public with sharing class SessionScheduleController {
 				Start_Time__c = starts,
 				End_Time__c = ends
 			);
-			Database.insert(saved, true, AccessLevel.USER_MODE);
+			insert as user saved;
 			schedule.scheduleId = saved.Id;
 			schedule.created = SessionScheduleService.run(new Set<Id>{ saved.Id });
 			return schedule;

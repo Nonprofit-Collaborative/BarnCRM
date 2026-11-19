@@ -105,7 +105,7 @@ public with sharing class ProgramRosterController {
 			enrollment.Account__c = personId;
 		}
 		try {
-			Database.insert(new List<Enrollment__c>{ enrollment }, true, AccessLevel.USER_MODE);
+			insert as user new List<Enrollment__c>{ enrollment };
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, programId);
@@ -124,11 +124,9 @@ public with sharing class ProgramRosterController {
 			if (programId == null) {
 				throw UserErrors.message(failed());
 			}
-			Database.update(
-				new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Stage__c = wanted) },
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new List<Enrollment__c>{
+				new Enrollment__c(Id = enrollmentId, Stage__c = wanted)
+			};
 			return rosterFor(programId, showEnded == true);
 		} catch (Exception failure) {
 			throw ERRORS.wrap(failure, CONTEXT, enrollmentId);

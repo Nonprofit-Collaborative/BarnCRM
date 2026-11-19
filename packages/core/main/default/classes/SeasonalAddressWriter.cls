@@ -34,7 +34,7 @@ public without sharing class SeasonalAddressWriter {
 		if (updates == null || updates.isEmpty()) {
 			return;
 		}
-		Database.update(updates, true, AccessLevel.SYSTEM_MODE);
+		update as system updates;
 	}
 
 	/**

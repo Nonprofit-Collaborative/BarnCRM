@@ -36,7 +36,7 @@ public without sharing class PledgeReminderWriter {
 		if (rows == null || rows.isEmpty()) {
 			return;
 		}
-		Database.update(rows, true, AccessLevel.SYSTEM_MODE);
+		update as system rows;
 	}
 
 	/** Updates rows one by one, reporting each, for settling after an all-or-none update failed. */

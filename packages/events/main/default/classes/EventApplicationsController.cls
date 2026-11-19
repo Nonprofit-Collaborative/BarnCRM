@@ -343,12 +343,11 @@ public with sharing class EventApplicationsController {
 			review.Weighted_Score__c = weighted;
 			review.Criteria_Scores__c = scores == null ? null : JSON.serialize(scores);
 			review.Notes__c = notes;
-			Database.upsert(review, true, AccessLevel.USER_MODE);
+			upsert as user review;
 			if (application.Status__c == 'Submitted') {
-				Database.update(
-					new Speaker_Application__c(Id = applicationId, Status__c = 'In Review'),
-					true,
-					AccessLevel.USER_MODE
+				update as user new Speaker_Application__c(
+					Id = applicationId,
+					Status__c = 'In Review'
 				);
 			}
 		} catch (AuraHandledException refused) {
@@ -399,7 +398,7 @@ public with sharing class EventApplicationsController {
 					speakerFor(application.Event__c, presenter);
 				}
 			}
-			Database.update(change, true, AccessLevel.USER_MODE);
+			update as user change;
 			if (notify == true) {
 				result.notice = sendNotice(application, decision);
 				stampNotice(application, result.notice);
@@ -434,7 +433,7 @@ public with sharing class EventApplicationsController {
 			return existing[0].Id;
 		}
 		Event_Speaker__c speaker = new Event_Speaker__c(Event__c = eventId, Contact__c = contactId);
-		Database.insert(speaker, true, AccessLevel.USER_MODE);
+		insert as user speaker;
 		return speaker.Id;
 	}
 
@@ -472,7 +471,7 @@ public with sharing class EventApplicationsController {
 		} else {
 			change.Notice_Result__c = noticeText(notice).left(255);
 		}
-		Database.update(change, true, AccessLevel.USER_MODE);
+		update as user change;
 	}
 
 	/** The sentence for a notice that did not go out. */

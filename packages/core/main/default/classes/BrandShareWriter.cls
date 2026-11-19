@@ -12,7 +12,7 @@
 public without sharing class BrandShareWriter {
 	public static void updateRecords(List<SObject> rows) {
 		if (rows != null && !rows.isEmpty()) {
-			Database.update(rows, true, AccessLevel.SYSTEM_MODE);
+			update as system rows;
 		}
 	}
 

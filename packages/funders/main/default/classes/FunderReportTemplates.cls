@@ -50,7 +50,7 @@ public with sharing class FunderReportTemplates {
 					)
 				);
 			}
-			Database.insert(created, true, AccessLevel.SYSTEM_MODE);
+			insert as system created;
 			return created;
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, INSTALL_CONTEXT);

@@ -148,11 +148,7 @@ public with sharing class EventAgendaController {
 	@AuraEnabled
 	public static void moveSession(Id sessionId, Id trackId) {
 		try {
-			Database.update(
-				new Event_Session__c(Id = sessionId, Track__c = trackId),
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new Event_Session__c(Id = sessionId, Track__c = trackId);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {

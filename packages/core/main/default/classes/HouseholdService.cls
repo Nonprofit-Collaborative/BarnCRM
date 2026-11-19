@@ -936,7 +936,7 @@ public with sharing class HouseholdService {
 			ending.add(ended);
 		}
 		if (!ending.isEmpty()) {
-			Database.update(ending, true, AccessLevel.USER_MODE);
+			update as user ending;
 		}
 		HOUSEHOLD_ID_BY_PERSON.clear();
 		return ending;

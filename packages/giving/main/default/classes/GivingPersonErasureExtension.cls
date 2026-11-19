@@ -129,7 +129,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.ENDED,
@@ -167,7 +167,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (credits.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.delete(credits, true, AccessLevel.USER_MODE);
+		delete as user credits;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.DELETED,
@@ -246,7 +246,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
@@ -295,7 +295,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.SYSTEM_MODE);
+		update as system updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
@@ -336,7 +336,7 @@ public with sharing class GivingPersonErasureExtension implements PersonErasureE
 		if (updates.isEmpty()) {
 			return new List<PersonErasure.Change>();
 		}
-		Database.update(updates, true, AccessLevel.USER_MODE);
+		update as user updates;
 		return new List<PersonErasure.Change>{
 			new PersonErasure.Change(
 				PersonErasure.ENDED,

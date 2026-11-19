@@ -34,7 +34,7 @@ public with sharing class FundDefaultsService {
 			Is_Default__c = true
 		);
 		// Marking it the default also saves the Default Fund key, in the same transaction.
-		Database.insert(fund, true, AccessLevel.SYSTEM_MODE);
+		insert as system fund;
 		return fund;
 	}
 
