@@ -6,8 +6,7 @@
     per item, by Kind: Merge (one merge, R-DP10), Scan and Deactivation (an automation snapshot,
     Section 10A), Migration (one Migration Kit run, Section 29ZS) and Household Adoption (one
     adopted Account, Section 29ZQ). Every query reads one kind. Private: a row belongs to the
-    administrator whose tool wrote it, and BarnCRM Admin sees and changes all of them (ADR-NEXT
-    fewer custom objects).
+    administrator whose tool wrote it, and BarnCRM Admin sees and changes all of them (ADR-0227).
   </description>
   <enableActivities>false</enableActivities>
   <enableBulkApi>true</enableBulkApi>

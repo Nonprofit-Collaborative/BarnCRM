@@ -412,7 +412,7 @@ public with sharing class DuplicateService {
 	 * Match Reason, keyed by the set. Best effort: a reason only explains a suggestion, so one
 	 * that cannot be written never fails the pair.
 	 *
-	 * System mode on purpose (ADR-NEXT fewer custom objects): reasons share the dismissal
+	 * System mode on purpose (ADR-0227): reasons share the dismissal
 	 * object, which only administrators may create, and the person whose scan wrote the
 	 * suggestion (in user mode, above) must still get its reason, as they did when reasons
 	 * had their own object. Nothing typed by a person reaches it: the text is the match

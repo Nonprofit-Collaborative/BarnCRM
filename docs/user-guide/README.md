@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM main f69141c1c (landing batch L, with batch K). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-n at 40915b25c (batch N: releases 1.26 to 1.28). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 

@@ -40,8 +40,7 @@ No consumer is a dependency, and no consumer depends on this package (the seam b
   `Barn_PayPal` (principal `Barn_PayPal_App`, parameters `ClientId`, `ClientSecret`), shipped
   with no value; Named Credentials `Barn_Stripe` (`api.stripe.com`), `Barn_PayPal_Live`
   (`api-m.paypal.com`) and `Barn_PayPal_Sandbox` (`api-m.sandbox.paypal.com`). Apex merges the
-  secrets into headers and never reads them (ADR-NEXT
-  `NEXT-provider-secrets-named-credentials.md`).
+  secrets into headers and never reads them (ADR-0229).
 
 ## The Payment Seam
 

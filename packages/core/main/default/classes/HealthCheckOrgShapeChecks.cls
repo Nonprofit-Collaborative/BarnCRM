@@ -16,8 +16,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * Gift Transaction mirror among them) are installed without referencing them at compile
 	 * time. It is the class Core already discovers for that package's Health Check findings
 	 * (`HealthCheckExtensions.EXTENSION_CLASSES`, ADR-0057), so the name is a contract the
-	 * package keeps anyway. The gift mirrors are part of Fundraising (ADR-NEXT mirror
-	 * independence), so Fundraising installed means they are.
+	 * package keeps anyway. The gift mirrors are part of Fundraising (ADR-0228), so Fundraising installed means they are.
 	 */
 	private static final String MIRROR_MARKER_CLASS = 'GivingHealthCheckExtension';
 	/** The module catalog key of the package that holds the gift mirrors. */

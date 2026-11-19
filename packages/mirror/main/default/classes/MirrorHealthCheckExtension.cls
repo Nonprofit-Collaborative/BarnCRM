@@ -5,7 +5,7 @@
  * Mirror's finding is the household drift report (MIG-02b): Accounts whose Household Model and
  * Nonprofit Cloud household group disagree. The gift mirrors' findings (a scheduled run that has
  * not completed) are BarnCRM Fundraising's (`GiftMirrorHealthChecks`), so Mirror installs with
- * Core alone (N-09, ADR-NEXT mirror independence).
+ * Core alone (N-09, ADR-0228).
  *
  * `@NamespaceAccessible` for the reason `GivingHealthCheckExtension` is: Core resolves it with
  * `Type.forName` under ADR-0017.

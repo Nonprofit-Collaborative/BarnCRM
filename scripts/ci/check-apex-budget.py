@@ -132,7 +132,7 @@ CAPS = {
     # donors crossing a recency cutoff; 676,573 measured, raised by the 2,283 added plus 2%.
     # Lowered for D-200 S1 and S6 (release 1.23: the access sync became Core's catalog data and
     # the Nightly Jobs page Core's nightly card): 667,059 measured, plus about 0.5%.
-    # N-15 (release 1.27, D-210, ADR-NEXT mirror independence): Mirror for Giving folded in
+    # N-15 (release 1.27, D-210, ADR-0228): Mirror for Giving folded in
     # (the gift mirrors, Campaign sync, the inbound gift API, the accounting export and the gift
     # kits; its post-install, nightly provider and Health Check extension merged into this
     # package's own). 669,576 here and 196,129 there before (capped 670,400 and 199,900);
@@ -291,7 +291,7 @@ CAPS = {
     # 2026-11-12; raised by the 759 added, plus about 2%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 69,664 measured, plus about 2%.
-    # Named Credentials (N-13, D-209, ADR-NEXT provider secrets): Stripe events fetched back from
+    # Named Credentials (N-13, D-209, ADR-0229): Stripe events fetched back from
     # Stripe, Check Connection for both processors and the Health Check credential test, in place
     # of the HMAC check and the key fields, 73,461 measured 2026-11-18, plus about 2%.
     "payments": 74_900,
@@ -357,7 +357,7 @@ CAPS = {
     # 2026-11-11, plus about 2 percent.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 22,528 measured, plus about 2%.
-    # Named Credentials (N-13, D-209, ADR-NEXT provider secrets): Check Connection, the setup
+    # Named Credentials (N-13, D-209, ADR-0229): Check Connection, the setup
     # page's credential list and stopping a run at the first credential failure, 24,072 measured
     # 2026-11-18, plus about 2%.
     "addressverification": 24_550,
@@ -375,7 +375,7 @@ CAPS = {
     # provider (D-201: CaseProviderRequests and its flow action): 221,790 measured,
     # plus about 2%. Lowered for the shared gift mirror base (D-200 S5, release 1.23:
     # MirrorRunBatch, MirrorSync.Result and storeLinks): 221,165 measured, plus about 2%.
-    # N-09 (release 1.27, ADR-NEXT mirror independence): the gift mirrors, Campaign sync, the
+    # N-09 (release 1.27, ADR-0228): the gift mirrors, Campaign sync, the
     # inbound gift API, the accounting export and the gift migration kits moved out (since N-15
     # into the giving package, above). Mirror keeps the Case bridge, now hourly (N-10:
     # CaseProviderRequestsHourly and the guard), the Nonprofit Cloud household and relationships

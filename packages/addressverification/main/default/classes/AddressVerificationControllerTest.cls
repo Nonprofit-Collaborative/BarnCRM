@@ -1,7 +1,7 @@
 /**
  * Address Verification Setup, Health Check and the nightly step (ADR-0209 address verification
- * module, decisions 3, 5 and 7, as amended by ADR-NEXT
- * `NEXT-provider-secrets-named-credentials.md`; R-AV4): the page names where each key goes and
+ * module, decisions 3, 5 and 7, as amended by ADR-0229;
+ * R-AV4): the page names where each key goes and
  * never holds one; Check Connection looks one address up through the Named Credential and records
  * the provider as connected only when it answered; a first save keeps the shipped choices;
  * Disconnect forgets one provider; someone who cannot manage settings changes nothing; Health

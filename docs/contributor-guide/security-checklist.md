@@ -123,7 +123,7 @@ Site's guest user only.
   sends them only as `{!$Credential...}` merge fields in a header of a Named Credential callout,
   so no Apex, user or API can read one; the setup pages show names and steps, never a value.
   Readiness is a non-secret flag set by Check Connection. See the ADR on provider secrets in
-  Named Credentials (ADR-NEXT, `NEXT-provider-secrets-named-credentials.md`, amending ADR-0220).
+  Named Credentials (ADR-0229, amending ADR-0220).
 - [ ] `System.debug` only as the last resort when logging itself fails, with the exception
   message and no record contents. No `console.*` in LWC.
 

@@ -1,6 +1,5 @@
 /**
- * The Payments Setup page (ADR-0201 `0201-payments-module.md`, decision 7, as amended by ADR-NEXT
- * `NEXT-provider-secrets-named-credentials.md`): the receiver address of each active Site, for
+ * The Payments Setup page (ADR-0201 `0201-payments-module.md`, decision 7, as amended by ADR-0229): the receiver address of each active Site, for
  * each processor; where each processor's secrets go in Setup (External Credential, principal and
  * parameter names, qualified for this org); whether each processor is connected, with Check
  * Connection; and the PayPal webhook id, the one value still typed here (not a secret, shown by
