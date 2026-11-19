@@ -1,4 +1,4 @@
-# ADR-NEXT: Mirror depends on Core only; the gift mirrors are part of Fundraising, with dynamic-only standard-object references; the Case status check runs hourly while Cases are open
+# ADR-0228: Mirror depends on Core only; the gift mirrors are part of Fundraising, with dynamic-only standard-object references; the Case status check runs hourly while Cases are open
 
 **Status:** Accepted
 **Date:** 2026-11-14

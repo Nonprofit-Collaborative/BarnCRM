@@ -1,6 +1,6 @@
 /**
  * The Address Verification Setup page (ADR-0209 `0209-address-verification-module.md`,
- * decisions 3 and 5, as amended by ADR-NEXT `NEXT-provider-secrets-named-credentials.md`;
+ * decisions 3 and 5, as amended by ADR-0229;
  * canonical model R-AV4): which provider is chosen and whether it is connected; where each
  * provider's key goes in Setup (External Credential, principal and parameter names, qualified for
  * this org); Check Connection, Clear and Verify Waiting Addresses. No key passes through here.

@@ -1,6 +1,5 @@
 /**
- * Payments Setup (ADR-0201 payments module, decision 7, as amended by ADR-NEXT
- * `NEXT-provider-secrets-named-credentials.md`): it shows each Site's receiver addresses, where
+ * Payments Setup (ADR-0201 payments module, decision 7, as amended by ADR-0229): it shows each Site's receiver addresses, where
  * each processor's secrets go in Setup and whether it is connected, and the PayPal webhook id by
  * its last four characters; Check Connection calls the processor through its Named Credential and
  * records the answer; Disconnect forgets one processor; someone who cannot manage settings cannot

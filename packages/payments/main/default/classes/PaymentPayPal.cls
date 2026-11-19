@@ -480,8 +480,7 @@ public with sharing class PaymentPayPal {
 	/**
 	 * Signs in with the client credentials grant. The client id and secret are the Barn_PayPal
 	 * External Credential's principal parameters: the Basic header is a merge-field formula that
-	 * Salesforce fills, so Apex never holds them (ADR-NEXT
-	 * `NEXT-provider-secrets-named-credentials.md`). The running user needs principal access.
+	 * Salesforce fills, so Apex never holds them (ADR-0229). The running user needs principal access.
 	 */
 	private static String accessToken() {
 		if (token != null) {

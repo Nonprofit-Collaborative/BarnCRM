@@ -1048,8 +1048,8 @@ names recompute and the waiting rollups.
 
 ### Definition
 
-The one object where admin tools keep what they need to show progress or be undone (ADR-NEXT
-`NEXT-fewer-custom-objects.md`, N-11): one row per item, with a Kind naming the tool. Kinds:
+The one object where admin tools keep what they need to show progress or be undone (ADR-0227,
+N-11): one row per item, with a Kind naming the tool. Kinds:
 **Scan** (one read of the org's automation through the org connection) and **Deactivation**
 (one run of **Deactivate Org Flows and Validation Rules**, with each item's state before and
 after; C-60, plan D-184, ADR-0174 "Deactivate org automation with a snapshot and restore"),
@@ -1442,7 +1442,7 @@ default; the two choices are stored as text (ADR-0019).
 | `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
 | `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
 | `Generic_Merge_Enabled__c` | boolean | false | Whether the Merge Records area of the Duplicate Matching tab is offered (R-DP11). Off on install; nothing else changes while it is off. |
-| `Merge_Journal_Retention_Days__c` | integer | 365 | Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
+| `Merge_Journal_Retention_Days__c` | integer | 365 | Days an Admin Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
 
 ### Record retention keys
 
@@ -8043,7 +8043,7 @@ rule's; R-DP2 to R-DP5 apply as to any pair. The set still names an active rule 
 object, as the platform requires (any active rule stands in, so Salesforce's own Duplicate
 Record Sets tab shows the pair under that rule), and a pass with no active rule writes no
 source pair either. The reason is kept in a Duplicate Dismissal row of Kind Match Reason, keyed
-by the set (ADR-NEXT `NEXT-fewer-custom-objects.md`), and shown on the review list (the rule's
+by the set (ADR-0227), and shown on the review list (the rule's
 name is shown otherwise). It is written, read and deleted in system mode, since it holds only a
 source's label and the dismissal object is creatable by administrators only; it is deleted with
 its suggestion when dismissed or closed by a merge. A reason row whose set
@@ -8205,7 +8205,7 @@ Transaction mirror (X-07, Section 29C1) adds one attribute to Gift, one to Fund 
 that settings object, and is the only place a Nonprofit Cloud object is named, by string,
 through describe.
 
-Since release 1.27 (N-09, N-15, D-210, ADR-NEXT mirror independence) **Mirror**
+Since release 1.27 (N-09, N-15, D-210, ADR-0228) **Mirror**
 (`packages/mirror`, depends on Core only) keeps `Mirror_Settings__c` with the Case request keys
 only, Provider Request (Section 29C2) and the Nonprofit Cloud households and relationships kits.
 **Fundraising** (`packages/giving`, never depending on Mirror) ships every attribute and list
@@ -13578,8 +13578,8 @@ stop being one.
   Household Adoption, written by the adoption job in system mode, with `Account_Id__c`,
   `Run_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`, `Status__c` (Adopted,
   Undone, Not Restored) and the note in `Notes__c` (at most 255 characters), as declared there.
-  Every query here reads Kind Household Adoption only. Until N-11 (ADR-NEXT
-  `NEXT-fewer-custom-objects.md`) this was the object `Household_Adoption__c` (`HA-{000000}`,
+  Every query here reads Kind Household Adoption only. Until N-11 (ADR-0227)
+  this was the object `Household_Adoption__c` (`HA-{000000}`,
   note in `Note__c`), read-only to BarnCRM Admin; the role may now also edit an adoption row's
   Status or delete it, as for a merge row, while its own fields stay read-only.
 
@@ -13751,8 +13751,8 @@ writes, switches off or uninstalls the product migrated from.
 - **Runs** are Admin Journal rows (`Merge_Journal__c`, Section 10A) of Kind Migration, with
   `Kit__c` (always written), `Status__c` (`In Progress`, set when the run starts, or `Complete`)
   and `State_JSON__c`, as declared there; every query reads Kind Migration only. Import Batch
-  points at its run through `Migration_Journal__c` (Section 16). Until N-11 (ADR-NEXT
-  `NEXT-fewer-custom-objects.md`) a run was the object `Migration_Run__c` (`MR-{0000}`), and
+  points at its run through `Migration_Journal__c` (Section 16). Until N-11 (ADR-0227)
+  a run was the object `Migration_Run__c` (`MR-{0000}`), and
   the Import Batch lookup had that name.
 
 - **Classes:** `MigrationKitService` (catalog, run state, order, verification),
@@ -17173,7 +17173,7 @@ two non-secret ids, with the connection flags, to Payments Settings (29PAY3, R-P
 
 ### Salesforce implementation
 
-- Until N-13 (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`) this was the Protected
+- Until N-13 (ADR-0229) this was the Protected
   hierarchy custom setting `Payment_Keys__c`, with `Stripe_Secret_Key__c`,
   `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`,
   `PayPal_Webhook_Id__c` and `PayPal_Product_Id__c`. Nothing was packaged, so it was removed,
@@ -18754,7 +18754,7 @@ parameters (R-AV4); Connected Provider (29AV1) replaced the setting's readiness 
 
 ### Salesforce implementation
 
-- Until N-13 (ADR-NEXT `NEXT-provider-secrets-named-credentials.md`) this was the Protected
+- Until N-13 (ADR-0229) this was the Protected
   hierarchy custom setting `Address_Verification_Keys__c`, with `Smarty_Auth_Id__c`,
   `Smarty_Auth_Token__c` and `Google_Api_Key__c`. Nothing was packaged, so it was removed, not
   migrated.
@@ -19336,10 +19336,11 @@ mirrors the primary member).
 | 1.62 | 2026-11-13 | Home quick links from the module catalog (D-200 R7, release 1.24). `BarnCRM_Module__mdt` gains Quick Links (`Quick_Links__c`): Giving's Enter a Gift, Volunteers' Log Hours and Programs' Enroll replace the hard-coded Quick Gift Entry tile. |
 | 1.63 | 2026-11-13 | BarnCRM Logic Models app retired (D-200 R6, release 1.24; D-130 amended). No object or field added. The `BarnCRM_Logic_Models` app and its permission set visibilities go; the Logic Model record page becomes the object's org default (Large and Small); the module's catalog row has no App Name. The Logic Models tab stays in the BarnCRM apps and the App Launcher. |
 | 1.64 | 2026-11-13 | Sample data for Memberships and Scholarships (release 1.25). `Membership_Level__c`, `Membership_Term__c` and `Award_Program__c` each gain `Sample_Data__c` (Checkbox, default false), the mark the sample data loader sets so the set is counted and removed in one action; children go with their parent. No other object or rule changes. |
-| 1.65 | 2026-11-14 | Forms with submissions deletable by Forms administrators only (N-04, D-208, release 1.27; ADR-NEXT `NEXT-forms-delete-with-submissions.md`). Form Submission (29ZY): Form becomes Lookup(Form), set null on delete (was master-detail), sharing Public Read/Write; Form Version becomes set null on delete (was restrict); new Form Name (`Form_Name__c`, Text(80)) and Version Number (`Version_Number__c`, Number(6, 0)), rule R-FS8. Form (29ZW): rule R-FM4 and the Forms custom permission Manage Forms (`Forms_Manage`). |
-| 1.66 | 2026-11-14 | Fewer custom objects (D-208, N-11; ADR-NEXT `NEXT-fewer-custom-objects.md`). Four Core objects removed, 203 to 199 in the suite. `Merge_Journal__c` becomes the Admin Journal (Section 10A, R-AJ1) with `Kind__c` (Merge, Scan, Deactivation, Migration, Household Adoption) and takes the rows and fields of `Automation_Snapshot__c` (`Items__c`, `Message__c`, `Restored_At__c`), `Migration_Run__c` (`Kit__c`, `State_JSON__c`) and `Household_Adoption__c` (`Account_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`; its note moves to `Notes__c`); `Status__c` carries every kind's values with no default. Import Batch's `Migration_Run__c` is replaced by `Migration_Journal__c`. `Duplicate_Reason__c` is removed: a match reason is a `Duplicate_Dismissal__c` row with the new `Kind__c` Match Reason, keyed by the set in `Pair_Key__c`. |
-| 1.67 | 2026-11-14 | Gift mirrors folded into Fundraising (N-15, D-210, release 1.27; ADR-NEXT `NEXT-mirror-independence.md`). The Mirror for Giving package is removed: its attributes on Appeal, Gift and Fund, list views, code and permission sets ship in Fundraising (`packages/giving`, the Giving module renamed BarnCRM Fundraising). The eleven gift mirror keys (Campaign sync, Opportunity mirror and Gift Transaction mirror) move from `Mirror_Settings__c` to `Giving_Settings__c` with unchanged names and types; `Mirror_Settings__c` keeps the Case request keys only. No object added or removed. |
-| 1.68 | 2026-11-18 | Provider secrets in Named Credentials (N-13, D-209; ADR-NEXT `NEXT-provider-secrets-named-credentials.md`, amending ADR-0220). Two objects removed, 199 to 197 in the suite: `Payment_Keys__c` (29PAY4) and `Address_Verification_Keys__c` (29AV2). `Payments_Settings__c` gains `Stripe_Connected__c`, `PayPal_Connected__c` (Checkbox) and takes `PayPal_Webhook_Id__c` (Text(64)) and `PayPal_Product_Id__c` (Text(50)); `Address_Verification_Settings__c` gains `Connected_Provider__c` (Text(20)). Removed fields: `Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`, `Smarty_Auth_Id__c`, `Smarty_Auth_Token__c`, `Google_Api_Key__c`. R-PK1, R-AV4, R-PEV1 and R-PEV2 rewritten: a Stripe event is fetched back from Stripe and only that copy is used. |
+| 1.65 | 2026-11-14 | Forms with submissions deletable by Forms administrators only (N-04, D-208, release 1.27; ADR-0225). Form Submission (29ZY): Form becomes Lookup(Form), set null on delete (was master-detail), sharing Public Read/Write; Form Version becomes set null on delete (was restrict); new Form Name (`Form_Name__c`, Text(80)) and Version Number (`Version_Number__c`, Number(6, 0)), rule R-FS8. Form (29ZW): rule R-FM4 and the Forms custom permission Manage Forms (`Forms_Manage`). |
+| 1.66 | 2026-11-14 | Fewer custom objects (D-208, N-11; ADR-0227). Four Core objects removed, 203 to 199 in the suite. `Merge_Journal__c` becomes the Admin Journal (Section 10A, R-AJ1) with `Kind__c` (Merge, Scan, Deactivation, Migration, Household Adoption) and takes the rows and fields of `Automation_Snapshot__c` (`Items__c`, `Message__c`, `Restored_At__c`), `Migration_Run__c` (`Kit__c`, `State_JSON__c`) and `Household_Adoption__c` (`Account_Id__c`, `Previous_Record_Type_Id__c`, `Previous_Values__c`; its note moves to `Notes__c`); `Status__c` carries every kind's values with no default. Import Batch's `Migration_Run__c` is replaced by `Migration_Journal__c`. `Duplicate_Reason__c` is removed: a match reason is a `Duplicate_Dismissal__c` row with the new `Kind__c` Match Reason, keyed by the set in `Pair_Key__c`. |
+| 1.67 | 2026-11-14 | Gift mirrors folded into Fundraising (N-15, D-210, release 1.27; ADR-0228). The Mirror for Giving package is removed: its attributes on Appeal, Gift and Fund, list views, code and permission sets ship in Fundraising (`packages/giving`, the Giving module renamed BarnCRM Fundraising). The eleven gift mirror keys (Campaign sync, Opportunity mirror and Gift Transaction mirror) move from `Mirror_Settings__c` to `Giving_Settings__c` with unchanged names and types; `Mirror_Settings__c` keeps the Case request keys only. No object added or removed. |
+| 1.68 | 2026-11-18 | Provider secrets in Named Credentials (N-13, D-209; ADR-0229, amending ADR-0220). Two objects removed, 199 to 197 in the suite: `Payment_Keys__c` (29PAY4) and `Address_Verification_Keys__c` (29AV2). `Payments_Settings__c` gains `Stripe_Connected__c`, `PayPal_Connected__c` (Checkbox) and takes `PayPal_Webhook_Id__c` (Text(64)) and `PayPal_Product_Id__c` (Text(50)); `Address_Verification_Settings__c` gains `Connected_Provider__c` (Text(20)). Removed fields: `Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`, `Smarty_Auth_Id__c`, `Smarty_Auth_Token__c`, `Google_Api_Key__c`. R-PK1, R-AV4, R-PEV1 and R-PEV2 rewritten: a Stripe event is fetched back from Stripe and only that copy is used. |
+| 1.69 | 2026-11-18 | Beta badge on every module (D-211, N-14, release 1.27). `BarnCRM_Module__mdt` gains Beta (`Beta__c`, Checkbox, default false), ticked on every shipped module record: the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside the module name. No object added or removed. |
 
 ---
 ## 32. Entity ownership by package

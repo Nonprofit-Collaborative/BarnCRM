@@ -21,8 +21,7 @@ public with sharing class NpspHouseholdAdoptionService {
 
 	/**
 	 * Each adopted Account is an Admin Journal (`Merge_Journal__c`) row of this kind; the other
-	 * kinds belong to other admin tools, so every query here reads this kind only (ADR-NEXT
-	 * fewer custom objects).
+	 * kinds belong to other admin tools, so every query here reads this kind only (ADR-0227).
 	 */
 	public static final String KIND_ADOPTION = 'Household Adoption';
 	public static final String STATUS_ADOPTED = 'Adopted';

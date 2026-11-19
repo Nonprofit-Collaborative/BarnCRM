@@ -9,7 +9,7 @@
  *
  * Every lookup goes through the provider's Named Credential (`Barn_Smarty`, `Barn_Google_Address`);
  * the key is the External Credential principal's, merged into a header by Salesforce and never
- * read by Apex (R-AV4; ADR-NEXT `NEXT-provider-secrets-named-credentials.md`). The person whose
+ * read by Apex (R-AV4; ADR-0229). The person whose
  * save or job it is needs principal access: Address Verification Admin or Address Verification
  * User. Without it the lookup fails, is logged, and the address stays Unverified for the night.
  */

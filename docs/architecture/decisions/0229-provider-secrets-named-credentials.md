@@ -1,4 +1,4 @@
-# ADR-NEXT: Provider Secrets in Named Credentials, and Stripe Events Fetched Back from Stripe
+# ADR-0229: Provider Secrets in Named Credentials, and Stripe Events Fetched Back from Stripe
 
 **Status:** Accepted (owner decision)
 **Date:** 2026-11-18

@@ -9,7 +9,7 @@ names, class names and developer names use `Giving`.
 Gifts, funds and allocations, commitments (pledges and recurring gifts) and installments, soft
 credits, tributes, matching gifts, appeals, acknowledgments and receipts, giving rollups and
 dashboards, and gift batches. Also the gift bridges to standard Salesforce and Nonprofit Cloud
-objects and outside systems (N-15, ADR-NEXT mirror independence): the Opportunity mirror,
+objects and outside systems (N-15, ADR-0228): the Opportunity mirror,
 Campaign sync, the Gift Transaction mirror, the inbound gift REST API, the accounting export
 and the NPSP and Nonprofit Cloud gift migration kits.
 

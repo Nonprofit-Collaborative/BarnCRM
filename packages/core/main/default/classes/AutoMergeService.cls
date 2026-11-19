@@ -27,8 +27,7 @@ public with sharing class AutoMergeService {
 
 	/**
 	 * A merge is an Admin Journal (`Merge_Journal__c`) row of this kind; the other kinds belong
-	 * to other admin tools, so every merge query reads this kind only (ADR-NEXT fewer custom
-	 * objects).
+	 * to other admin tools, so every merge query reads this kind only (ADR-0227).
 	 */
 	public static final String KIND_MERGE = 'Merge';
 	public static final String MERGED = 'Merged';

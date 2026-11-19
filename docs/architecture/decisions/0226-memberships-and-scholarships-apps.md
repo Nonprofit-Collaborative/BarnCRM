@@ -1,4 +1,4 @@
-# ADR-NEXT: Memberships and Scholarships Ship Their Own Apps
+# ADR-0226: Memberships and Scholarships Ship Their Own Apps
 
 **Status:** Accepted (owner decision, 2026-11-14)
 **Date:** 2026-11-14

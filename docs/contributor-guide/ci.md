@@ -60,7 +60,7 @@ Salesforce org is needed for this job. Steps:
    appears in source.
 6. `scripts/ci/check-standard-objects.sh`, failing the build if a standard Salesforce
    object is referenced outside `packages/mirror` and the gift mirror classes of
-   `packages/giving` (ADR-NEXT mirror independence: there only in string literals, checked with
+   `packages/giving` (ADR-0228: there only in string literals, checked with
    comments and strings blanked, so a static reference still fails), and separately if any Apex or metadata
    file names a Nonprofit Cloud object. The second half covers the fundraising objects, the
    objects a household is actually built out of there (`PartyRelationshipGroup`, whose Type

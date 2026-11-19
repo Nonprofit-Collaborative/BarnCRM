@@ -23,7 +23,7 @@ public with sharing class MigrationKitService {
 	public static final String FAILED = 'Failed';
 	private static final String IN_PROGRESS = 'In Progress';
 	private static final String RUN_COMPLETE = 'Complete';
-	/** A run is an Admin Journal row of this kind (ADR-NEXT fewer custom objects). */
+	/** A run is an Admin Journal row of this kind (ADR-0227). */
 	@TestVisible
 	private static final String KIND_RUN = 'Migration';
 	private static final Integer MAX_HOPS = 5;

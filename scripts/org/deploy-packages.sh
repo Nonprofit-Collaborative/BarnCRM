@@ -980,7 +980,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(projects)
   # Address Verification depends on Core only (ADR-0209 address verification module).
   MODULES+=(addressverification)
-  # Mirror depends on Core only (N-09, ADR-NEXT mirror independence); the gift mirrors are
+  # Mirror depends on Core only (N-09, ADR-0228); the gift mirrors are
   # Fundraising's (the giving package, deployed above).
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")

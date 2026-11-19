@@ -1,4 +1,4 @@
-# ADR-NEXT: A Forms Administrator Deletes a Form With Submissions, and the Submissions Stay
+# ADR-0225: A Forms Administrator Deletes a Form With Submissions, and the Submissions Stay
 
 **Status:** Accepted (owner decision, 2026-11-14)
 **Date:** 2026-11-14

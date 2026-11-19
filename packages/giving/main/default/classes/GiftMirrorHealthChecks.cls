@@ -1,7 +1,7 @@
 /**
  * Fundraising's gift mirror findings, added to the one Health Check report by
  * `GivingHealthCheckExtension` (ADR-0057, as the ADR on the Opportunity mirror amends it; X-01,
- * R-OM8; ADR-NEXT mirror independence).
+ * R-OM8; ADR-0228).
  *
  * One finding per mirror, for the Opportunity mirror and the Gift Transaction mirror (X-07): its
  * nightly run is scheduled, a direction is chosen and the automation is switched on, yet no run
