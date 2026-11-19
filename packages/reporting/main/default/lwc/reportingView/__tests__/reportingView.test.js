@@ -12,6 +12,11 @@ jest.mock('@salesforce/apex/ReportingQueryService.page', () => ({ default: jest.
   virtual: true
 });
 jest.mock('c/findCsv', () => ({ ...jest.requireActual('c/findCsv'), downloadCsv: jest.fn() }));
+// A cap of two rows stands in for the 100,000 one export holds.
+jest.mock('c/reportingModel', () => ({
+  ...jest.requireActual('c/reportingModel'),
+  MAX_EXPORT_ROWS: 2
+}));
 
 const LIST = {
   title: 'Donors',
@@ -84,6 +89,8 @@ describe('c-reporting-view', () => {
     await flush();
     expect(readPage).toHaveBeenCalledTimes(2);
     expect(readPage.mock.calls[1][0].afterId).toBe('003000000000001AAA');
+    // An export says so, for the server's Export Reports check, in pages of 2,000.
+    expect(readPage.mock.calls[0][0]).toMatchObject({ forExport: true, pageSize: 2000 });
     const [base, columns, rows] = downloadCsv.mock.calls[0];
     expect(base).toBe('Donors');
     expect(columns.map((column) => column.label)).toEqual(['Name', 'Email']);
@@ -153,10 +160,49 @@ describe('c-reporting-view', () => {
     const element = await mount({ report: { ...TOTALS, view: { type: 'table' } } });
     await flush();
     const request = JSON.parse(readPage.mock.calls[0][0].requestJson);
-    expect(request.fields).toEqual(['Fund__c', 'Fund__r.Name', 'Amount__c']);
+    expect(request.groups).toEqual([{ field: 'Fund__c' }]);
+    expect(request.fields).toBeUndefined();
+    expect(readPage.mock.calls[0][0]).toMatchObject({ forExport: false, pageSize: 5000 });
     const cells = element.shadowRoot.querySelectorAll('[data-id="table"] td');
     expect(cells[0].textContent).toBe('General');
     expect(cells[1].textContent).toBe('$12.00');
+  });
+
+  it('stops an export at the most one export holds and says so', async () => {
+    runReport.mockResolvedValue({ rows: [{ Id: '003000000000001AAA', Name: 'Ana' }] });
+    const page = (index) => ({
+      rows: [{ Id: `00300000000000${index}AAA`, Name: `P${index}` }],
+      lastId: `00300000000000${index}AAA`,
+      done: false
+    });
+    readPage.mockResolvedValueOnce(page(1)).mockResolvedValueOnce(page(2));
+    const element = await mount({ report: LIST, canExport: true });
+    find(element, 'export').click();
+    await flush();
+    await flush();
+    expect(readPage).toHaveBeenCalledTimes(2);
+    expect(downloadCsv.mock.calls[0][2]).toHaveLength(2);
+    expect(find(element, 'export-status').textContent).toBe('c.Reporting_ExportCapped');
+  });
+
+  it('runs one scan at a time across views', async () => {
+    runReport.mockResolvedValue({ scan: true });
+    let finishFirst;
+    readPage
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishFirst = resolve;
+          })
+      )
+      .mockResolvedValue({ rows: [], lastId: null, done: true });
+    await mount({ report: { ...TOTALS, view: { type: 'table' } } });
+    await mount({ report: { ...TOTALS, view: { type: 'table' } } });
+    expect(readPage).toHaveBeenCalledTimes(1);
+    finishFirst({ rows: [], lastId: null, done: true });
+    await flush();
+    await flush();
+    expect(readPage).toHaveBeenCalledTimes(2);
   });
 
   it('says what stops the report and what a dashboard filter does not narrow', async () => {

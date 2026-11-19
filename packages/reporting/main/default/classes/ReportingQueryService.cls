@@ -25,6 +25,7 @@ public with sharing class ReportingQueryService {
 	public static final Integer MAX_MEASURES = 4;
 	public static final Integer MAX_SUMMARIES = 3;
 	public static final Integer MAX_PAGE = 5000;
+	public static final Integer MAX_FIELDS = 20;
 	public static final Integer GROUP_LIMIT = 2000;
 	/** The most records one aggregate query totals before the browser reads them in pages. */
 	@TestVisible
@@ -74,7 +75,8 @@ public with sharing class ReportingQueryService {
 		List<Map<String, Object>> groups = new List<Map<String, Object>>();
 		List<Map<String, Object>> measures = new List<Map<String, Object>>();
 		List<Map<String, Object>> summaries = new List<Map<String, Object>>();
-		Set<String> fields = new Set<String>();
+		/** The export's columns once each, whatever their case, by lower-case path; never Id. */
+		Map<String, String> fields = new Map<String, String>();
 	}
 
 	/** The objects a report may start from: the user's queryable custom objects, Account, Contact, User. */
@@ -156,21 +158,47 @@ public with sharing class ReportingQueryService {
 		}
 	}
 
+	/** True when the person has Salesforce's Export Reports permission, which export needs. */
+	public static Boolean canExport() {
+		for (UserPermissionAccess access : [
+			SELECT PermissionsExportReport
+			FROM UserPermissionAccess
+			WITH USER_MODE
+			LIMIT 1
+		]) {
+			return access.PermissionsExportReport;
+		}
+		return false;
+	}
+
 	/**
-	 * One page of the report's records in Id order after `afterId`: its columns (or, for a scan,
-	 * the grouping and total fields) and related totals. Export and scans read every record
-	 * this way, at most 5,000 a call, each call within its own limits.
+	 * One page of the report's records in Id order after `afterId`, each call within its own
+	 * limits. An export (`forExport`) reads a list report's columns and related totals, at most
+	 * 2,000 a call, and needs Export Reports. A scan reads only the fields the report's groupings
+	 * and totals use, worked out here, at most 5,000 a call.
 	 */
 	@AuraEnabled
-	public static Map<String, Object> page(String requestJson, String afterId, Integer pageSize) {
+	public static Map<String, Object> page(
+		String requestJson,
+		String afterId,
+		Integer pageSize,
+		Boolean forExport
+	) {
 		try {
 			Request request = read(requestJson);
-			Integer size = pageSize == null ? MAX_PAGE : Math.max(1, Math.min(pageSize, MAX_PAGE));
-			Set<String> fields = new Set<String>(request.fields);
-			fields.remove('Id');
+			Boolean exporting = forExport == true;
+			if (exporting != request.measures.isEmpty()) {
+				throw invalid();
+			}
+			if (exporting && !canExport()) {
+				throw new ReportingException(BarnHelp.text('Reporting', 'Reporting_Error_NoExport'));
+			}
+			List<String> fields = exporting ? request.fields.values() : scanFields(request);
+			Integer most = exporting ? QueryCompiler.EXPORT_PAGE_SIZE : MAX_PAGE;
+			Integer size = pageSize == null ? most : Math.max(1, Math.min(pageSize, most));
 			QueryCompiler.Compiled compiled = QueryCompiler.compileSelection(
 				request.queryJson,
-				fields.isEmpty() ? new Set<String>{ 'Id' } : fields,
+				fields.isEmpty() ? new Set<String>{ 'Id' } : new Set<String>(fields),
 				null
 			);
 			Map<String, Object> binds = new Map<String, Object>(compiled.binds);
@@ -192,12 +220,56 @@ public with sharing class ReportingQueryService {
 			);
 			return new Map<String, Object>{
 				'rows' => rows,
-				'summaries' => summaries(request, rows),
+				'summaries' => exporting
+					? summaries(request, rows)
+					: new List<Map<String, Object>>(),
 				'lastId' => rows.isEmpty() ? null : rows[rows.size() - 1].Id,
 				'done' => rows.size() < size
 			};
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);
+		}
+	}
+
+	/**
+	 * The fields a scan reads, each grouping and total checked as `run` checks it: the grouping
+	 * fields with their record names, and the totalled fields. Money is not totalled from pages
+	 * when the org has more than one currency, since each record holds its own currency.
+	 */
+	private static List<String> scanFields(Request request) {
+		Map<String, String> fields = new Map<String, String>();
+		for (Map<String, Object> groupSpec : request.groups) {
+			String path = (String) groupSpec.get('field');
+			Schema.DescribeFieldResult field = QueryCompiler.resolve(request.objectName, path);
+			bucketed(field, path, (String) groupSpec.get('bucket'));
+			addField(fields, path);
+			addField(fields, labelPath(request.objectName, field, path));
+		}
+		Boolean multiCurrency = UserInfo.isMultiCurrencyOrganization();
+		for (Map<String, Object> spec : request.measures) {
+			measure(request.objectName, spec);
+			String fn = String.valueOf(spec.get('fn')).toLowerCase();
+			if (fn == 'count') {
+				continue;
+			}
+			String path = (String) spec.get('path');
+			if (
+				multiCurrency &&
+				fn != 'countdistinct' &&
+				QueryCompiler.resolve(request.objectName, path).getType() ==
+				Schema.DisplayType.CURRENCY
+			) {
+				throw refusal(BarnHelp.text('Reporting', 'Reporting_Error_ScanCurrency'), path);
+			}
+			addField(fields, path);
+		}
+		return fields.values();
+	}
+
+	/** Adds a field path once, whatever its case; Id is always read, so never added. */
+	private static void addField(Map<String, String> fields, String path) {
+		if (path != null && path.toLowerCase() != 'id') {
+			fields.put(path.toLowerCase(), path);
 		}
 	}
 
@@ -219,7 +291,7 @@ public with sharing class ReportingQueryService {
 			String path = (String) groupSpec.get('field');
 			Schema.DescribeFieldResult field = QueryCompiler.resolve(request.objectName, path);
 			List<String> expressions = bucketed(field, path, (String) groupSpec.get('bucket'));
-			String label = labelPath(field, path);
+			String label = labelPath(request.objectName, field, path);
 			widths.add(expressions.size());
 			labelled.add(label != null);
 			if (label != null) {
@@ -314,9 +386,8 @@ public with sharing class ReportingQueryService {
 				new List<String>{ lookupName + ' IN :reportParentIds' }
 			);
 			if (!fits(fromWhere, binds)) {
-				throw refusal(
-					BarnHelp.text('Reporting', 'Reporting_Error_TooManyRelated'),
-					childObject
+				throw new ReportingException(
+					BarnHelp.text('Reporting', 'Reporting_Error_TooManyRelated')
 				);
 			}
 			Map<String, Object> values = new Map<String, Object>();
@@ -423,9 +494,14 @@ public with sharing class ReportingQueryService {
 
 	/**
 	 * For a grouping by a lookup, the path to its record's Name, so a group shows a name rather
-	 * than an Id; null when the lookup's object has no Name or the user cannot read it.
+	 * than an Id. The path is checked as the user like any other; null (the group shows its Id)
+	 * when it does not resolve, or its Name is not readable or cannot be grouped.
 	 */
-	private static String labelPath(Schema.DescribeFieldResult field, String path) {
+	private static String labelPath(
+		String objectName,
+		Schema.DescribeFieldResult field,
+		String path
+	) {
 		if (
 			field.getType() != Schema.DisplayType.REFERENCE ||
 			field.getRelationshipName() == null ||
@@ -433,13 +509,14 @@ public with sharing class ReportingQueryService {
 		) {
 			return null;
 		}
-		Schema.DescribeSObjectResult target = field.getReferenceTo()[0]
-			.getDescribe(SObjectDescribeOptions.DEFERRED);
-		if (!target.isAccessible() || !target.fields.getMap().containsKey('name')) {
+		String prefix = path.contains('.') ? path.substringBeforeLast('.') + '.' : '';
+		String label = prefix + field.getRelationshipName() + '.Name';
+		try {
+			Schema.DescribeFieldResult name = QueryCompiler.resolve(objectName, label);
+			return name.isAccessible() && name.isGroupable() ? label : null;
+		} catch (Exception unresolved) {
 			return null;
 		}
-		String prefix = path.contains('.') ? path.substringBeforeLast('.') + '.' : '';
-		return prefix + field.getRelationshipName() + '.Name';
 	}
 
 	/** Reads a request, checks its shape and limits, and refuses an object not offered. */
@@ -467,8 +544,8 @@ public with sharing class ReportingQueryService {
 		if (!request.groups.isEmpty() && request.measures.isEmpty()) {
 			throw invalid();
 		}
-		for (Object field : entries(raw.get('fields'), 40)) {
-			request.fields.add(String.valueOf(field));
+		for (Object field : entries(raw.get('fields'), MAX_FIELDS)) {
+			addField(request.fields, String.valueOf(field));
 		}
 		return request;
 	}

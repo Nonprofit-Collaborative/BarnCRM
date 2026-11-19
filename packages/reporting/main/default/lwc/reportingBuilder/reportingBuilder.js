@@ -97,7 +97,7 @@ export default class ReportingBuilder extends LightningElement {
       const row = await load({ documentId });
       const definition = JSON.parse(row.definition);
       this.saved = row;
-      this.sharing = definition.sharing || null;
+      this.sharing = row.sharing || null;
       this.report = normalizeReport({ ...definition, title: row.title });
       this.preview = this.report;
       this.loadChildren();
@@ -846,18 +846,15 @@ export default class ReportingBuilder extends LightningElement {
     this.busy = true;
     this.error = '';
     try {
-      const definition = {
-        ...this.report,
-        ...(documentId && this.sharing ? { sharing: this.sharing } : {})
-      };
+      // Sharing never goes with a save; only Share changes it (ReportingLibrary.share).
       const row = await save({
         kind: REPORT_KIND,
         documentId,
         title,
-        definitionJson: JSON.stringify(definition)
+        definitionJson: JSON.stringify(this.report)
       });
       this.saved = row;
-      this.sharing = documentId ? this.sharing : null;
+      this.sharing = row.sharing || null;
       this.notice = format(helpText('Reporting', 'Reporting_Saved'), row.title);
       this.dispatchEvent(new CustomEvent('saved', { detail: { row } }));
     } catch (error) {
@@ -882,7 +879,7 @@ export default class ReportingBuilder extends LightningElement {
       const sharing = event.detail.sharing;
       const row = await share({ documentId: this.saved.id, sharingJson: JSON.stringify(sharing) });
       this.saved = row;
-      this.sharing = sharing;
+      this.sharing = row.sharing || sharing;
       this.sharingOpen = false;
       this.notice = helpText('Reporting', 'Reporting_Shared');
     } catch (error) {

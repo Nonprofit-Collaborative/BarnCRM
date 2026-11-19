@@ -66,9 +66,9 @@ const SAVED_ROW = {
   canEdit: true,
   definition: JSON.stringify({
     object: 'Contact',
-    columns: [{ path: 'Name', label: 'Name' }],
-    sharing: { users: [{ id: '005000000000002AAA', name: 'Ben', access: 'view' }], groups: [] }
-  })
+    columns: [{ path: 'Name', label: 'Name' }]
+  }),
+  sharing: { users: [{ id: '005000000000002AAA', name: 'Ben', access: 'view' }], groups: [] }
 };
 
 function flush() {
@@ -184,7 +184,7 @@ describe('c-reporting-builder', () => {
     expect(find(element, 'view').value).toBe('table');
   });
 
-  it('opens a saved report, keeps its sharing on save, shares and deletes', async () => {
+  it('opens a saved report, saves without sharing, shares and deletes', async () => {
     load.mockResolvedValue(SAVED_ROW);
     save.mockResolvedValue(SAVED_ROW);
     share.mockResolvedValue(SAVED_ROW);
@@ -200,11 +200,13 @@ describe('c-reporting-builder', () => {
     await flush();
     const definition = JSON.parse(save.mock.calls[0][0].definitionJson);
     expect(save.mock.calls[0][0].documentId).toBe('069000000000001AAA');
-    expect(definition.sharing.users[0].id).toBe('005000000000002AAA');
+    // Sharing never goes with a save, so a stale save cannot change who has access.
+    expect(definition.sharing).toBeUndefined();
 
     find(element, 'share').click();
     await flush();
     const panel = find(element, 'share-panel');
+    expect(panel.sharing.users[0].id).toBe('005000000000002AAA');
     panel.dispatchEvent(
       new CustomEvent('save', { detail: { sharing: { users: [], groups: [] } } })
     );

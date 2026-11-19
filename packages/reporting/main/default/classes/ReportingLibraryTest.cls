@@ -115,15 +115,96 @@ private class ReportingLibraryTest {
 			);
 		}
 		System.runAs(ownerUser()) {
-			String definition = String.valueOf(ReportingLibrary.load(documentId).get('definition'));
+			Map<String, Object> loaded = ReportingLibrary.load(documentId);
 			Assert.isTrue(
-				definition.contains(String.valueOf(viewer.Id)),
+				JSON.serialize(loaded.get('sharing')).contains(String.valueOf(viewer.Id)),
 				'A collaborator\'s save keeps the owner\'s sharing'
 			);
+			Assert.isFalse(
+				String.valueOf(loaded.get('definition')).contains('sharing'),
+				'Sharing never travels inside the definition'
+			);
+			// A stale save sending its own sharing changes nobody's access.
+			ReportingLibrary.save(
+				ReportingLibrary.REPORT,
+				documentId,
+				'Orgs',
+				'{"version":1,"object":"Account","sharing":{}}'
+			);
+		}
+		System.runAs(viewer) {
+			Assert.areEqual(1, ReportingLibrary.listSaved().size(), 'Still shared after a save');
+			Assert.isNull(ReportingLibrary.load(documentId).get('sharing'), 'Shown to its owner only');
+		}
+		System.runAs(ownerUser()) {
 			ReportingLibrary.share(documentId, '{}');
 		}
 		System.runAs(viewer) {
 			Assert.areEqual(0, ReportingLibrary.listSaved().size(), 'Unshared again');
+		}
+	}
+
+	@IsTest
+	static void aCollaboratorCannotShareItFurther() {
+		User viewer = viewerUser();
+		User reader = TestUsers.fromSetup('Reader');
+		Id documentId;
+		System.runAs(ownerUser()) {
+			documentId = saveAsOwner();
+			ReportingLibrary.share(documentId, sharing('users', viewer.Id, 'edit'));
+			for (ContentVersion version : [
+				SELECT SharingOption
+				FROM ContentVersion
+				WHERE ContentDocumentId = :documentId
+			]) {
+				Assert.areEqual('R', version.SharingOption, 'Every version restricts sharing');
+			}
+		}
+		System.runAs(viewer) {
+			Boolean refused = false;
+			try {
+				insert new ContentDocumentLink(
+					ContentDocumentId = documentId,
+					LinkedEntityId = reader.Id,
+					ShareType = 'V',
+					Visibility = 'AllUsers'
+				);
+			} catch (DmlException e) {
+				refused = true;
+			}
+			Assert.isTrue(refused, 'A collaborator cannot share it from the Files tab');
+		}
+	}
+
+	@IsTest
+	static void sharingAndDeletingNeedTheSavePermission() {
+		User reader = TestUsers.fromSetup('Reader');
+		System.runAs(reader) {
+			ContentVersion own = new ContentVersion(
+				Title = 'Orgs',
+				PathOnClient = 'definition.' + ReportingLibrary.REPORT,
+				VersionData = Blob.valueOf(DEFINITION)
+			);
+			insert own;
+			Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :own.Id]
+			.ContentDocumentId;
+			Integer refused = 0;
+			try {
+				ReportingLibrary.share(documentId, '{}');
+			} catch (AuraHandledException e) {
+				refused++;
+			}
+			try {
+				ReportingLibrary.remove(documentId);
+			} catch (AuraHandledException e) {
+				refused++;
+			}
+			Assert.areEqual(2, refused, 'Read Only can neither share nor delete');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM ContentDocument WHERE Id = :documentId],
+				'Still there'
+			);
 		}
 	}
 

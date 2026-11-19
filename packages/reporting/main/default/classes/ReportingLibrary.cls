@@ -6,12 +6,15 @@
  *
  * Who may see one is Files sharing, enforced by the platform: the owner, and the people the
  * owner shares it with through a ContentDocumentLink to each person (Viewer, or Collaborator
- * when they may change it). Sharing with a public group links each person in the group now; the
- * definition keeps the owner's choices (`sharing`), and every save or share by the owner links
- * the group's people again, so a newcomer is added and someone who left is removed. Every read
- * and write here runs in user mode, so nobody reaches a definition the platform would not show
- * them, and a definition never grants access to records: whoever opens it sees what their own
- * access allows (ReportingQueryService).
+ * when they may change it). Every version is saved with sharing restricted (SharingOption R), so
+ * only the owner can share or unlink it, never a Collaborator from the Files tab. Sharing with a
+ * public group links each of its direct members now. The owner's choices (`sharing`) are kept
+ * with the file but only `share` writes them: `save` never takes them from the browser and
+ * carries the stored ones forward, so a stale save cannot change who has access, and `share`
+ * links a group's direct members again, adding newcomers and removing people who left. Every
+ * read and write here runs in user mode, so nobody reaches a definition the platform would not
+ * show them, and a definition never grants access to records: whoever opens it sees what their
+ * own access allows (ReportingQueryService).
  */
 public with sharing class ReportingLibrary {
 	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
@@ -39,18 +42,9 @@ public with sharing class ReportingLibrary {
 	@AuraEnabled
 	public static Map<String, Object> getContext() {
 		try {
-			Boolean canExport = false;
-			for (UserPermissionAccess access : [
-				SELECT PermissionsExportReport
-				FROM UserPermissionAccess
-				WITH USER_MODE
-				LIMIT 1
-			]) {
-				canExport = access.PermissionsExportReport;
-			}
 			return new Map<String, Object>{
 				'canSave' => FeatureManagement.checkPermission(SAVE_PERMISSION),
-				'canExport' => canExport,
+				'canExport' => ReportingQueryService.canExport(),
 				'userId' => UserInfo.getUserId()
 			};
 		} catch (Exception e) {
@@ -58,7 +52,7 @@ public with sharing class ReportingLibrary {
 		}
 	}
 
-	/** Every saved report and dashboard the person can open, by title. */
+	/** Every saved report and dashboard the person can open, by title, the first 1,000. */
 	@AuraEnabled
 	public static List<Map<String, Object>> listSaved() {
 		try {
@@ -87,7 +81,10 @@ public with sharing class ReportingLibrary {
 		}
 	}
 
-	/** One saved report or dashboard, with its definition. */
+	/**
+	 * One saved report or dashboard, with its definition. The owner's sharing choices come apart
+	 * from it (`sharing`, for the owner only), so the browser never sends them back with a save.
+	 */
 	@AuraEnabled
 	public static Map<String, Object> load(Id documentId) {
 		try {
@@ -96,7 +93,12 @@ public with sharing class ReportingLibrary {
 				version,
 				myShareTypes(new List<ContentVersion>{ version })
 			);
-			row.put('definition', version.VersionData.toString());
+			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
+				version.VersionData.toString()
+			);
+			Object sharing = definition.remove('sharing');
+			row.put('definition', JSON.serialize(definition));
+			row.put('sharing', row.get('mine') == true ? sharing : null);
 			return row;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);
@@ -105,8 +107,9 @@ public with sharing class ReportingLibrary {
 
 	/**
 	 * Saves a report or dashboard: a new file when `documentId` is empty, otherwise a new version
-	 * of one the person owns or may change. A person who is not the owner keeps the owner's
-	 * sharing as it was. Returns the saved row.
+	 * of one the person owns or may change. Sharing is never read from the browser: a new file is
+	 * private, and a new version keeps the stored sharing and every link as they are (only
+	 * `share` changes them). Returns the saved row.
 	 */
 	@AuraEnabled
 	public static Map<String, Object> save(
@@ -116,14 +119,10 @@ public with sharing class ReportingLibrary {
 		String definitionJson
 	) {
 		try {
-			if (!FeatureManagement.checkPermission(SAVE_PERMISSION)) {
-				throw new ReportingLibraryException(
-					BarnHelp.text('Reporting', 'Reporting_Error_NoSave')
-				);
-			}
+			requireSave();
 			Map<String, Object> definition = parse(kind, title, definitionJson);
+			definition.remove('sharing');
 			if (documentId == null) {
-				definition.remove('sharing');
 				ContentVersion created = newVersion(null, kind, title, definition);
 				insert as user created;
 				documentId = [
@@ -144,14 +143,11 @@ public with sharing class ReportingLibrary {
 						BarnHelp.text('Reporting', 'Reporting_Error_NoEdit')
 					);
 				}
-				Object sharing = row.get('mine') == true
-					? definition.get('sharing')
-					: sharingOf(current);
-				definition.put('sharing', sharing);
-				insert as user newVersion(documentId, kind, title, definition);
-				if (row.get('mine') == true) {
-					reconcile(documentId, sharing);
+				Object sharing = sharingOf(current);
+				if (sharing != null) {
+					definition.put('sharing', sharing);
 				}
+				insert as user newVersion(documentId, kind, title, definition);
 			}
 			return load(documentId);
 		} catch (Exception e) {
@@ -161,11 +157,13 @@ public with sharing class ReportingLibrary {
 
 	/**
 	 * The owner's sharing: `{users: [{id, name, access}], groups: [...]}`, access `view` or
-	 * `edit`. Stored with the definition and applied as one link per person.
+	 * `edit`. Stored with the file and applied as one link per person, a group's direct members
+	 * as they are now. The only place sharing changes.
 	 */
 	@AuraEnabled
 	public static Map<String, Object> share(Id documentId, String sharingJson) {
 		try {
+			requireSave();
 			ContentVersion current = latest(documentId);
 			if (current.ContentDocument.OwnerId != UserInfo.getUserId()) {
 				throw new ReportingLibraryException(
@@ -189,6 +187,7 @@ public with sharing class ReportingLibrary {
 	@AuraEnabled
 	public static void remove(Id documentId) {
 		try {
+			requireSave();
 			ContentVersion current = latest(documentId);
 			if (current.ContentDocument.OwnerId != UserInfo.getUserId()) {
 				throw new ReportingLibraryException(
@@ -346,6 +345,13 @@ public with sharing class ReportingLibrary {
 		}
 	}
 
+	/** Saving, sharing and deleting need the Advanced Reporting Staff or Admin permission set. */
+	private static void requireSave() {
+		if (!FeatureManagement.checkPermission(SAVE_PERMISSION)) {
+			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_NoSave'));
+		}
+	}
+
 	private static Map<String, Object> parse(String kind, String title, String definitionJson) {
 		Object parsed;
 		try {
@@ -378,7 +384,9 @@ public with sharing class ReportingLibrary {
 			ContentDocumentId = documentId,
 			Title = title.trim(),
 			PathOnClient = 'definition.' + kind,
-			VersionData = Blob.valueOf(JSON.serialize(definition))
+			VersionData = Blob.valueOf(JSON.serialize(definition)),
+			// Restricted: only the owner shares or unlinks it, never a Collaborator.
+			SharingOption = 'R'
 		);
 	}
 
