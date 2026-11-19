@@ -334,12 +334,12 @@ public with sharing class ProjectRevenue implements Schedulable {
 		}
 		// Access mode: the caller's, passed as `mode`, written out so each save names its mode.
 		if (mode == AccessLevel.USER_MODE) {
-			Database.insert(byKey.values(), true, AccessLevel.USER_MODE);
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			insert as user byKey.values();
+			update as user changed;
 		} else {
 			// System mode: the nightly run, as whoever scheduled it (ADR-0021).
-			Database.insert(byKey.values(), true, AccessLevel.SYSTEM_MODE);
-			Database.update(changed, true, AccessLevel.SYSTEM_MODE);
+			insert as system byKey.values();
+			update as system changed;
 		}
 	}
 

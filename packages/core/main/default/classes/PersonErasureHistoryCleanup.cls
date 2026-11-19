@@ -30,7 +30,7 @@ public with sharing class PersonErasureHistoryCleanup implements Queueable {
 					AccessLevel.USER_MODE
 				);
 				if (!rows.isEmpty()) {
-					Database.delete(rows, true, AccessLevel.USER_MODE);
+					delete as user rows;
 				}
 			} catch (Exception refused) {
 				ErrorLogger.log(refused, 'PersonErasureHistoryCleanup.' + historyObject);

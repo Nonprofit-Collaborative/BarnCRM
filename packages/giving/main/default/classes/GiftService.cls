@@ -548,10 +548,10 @@ public with sharing class GiftService {
 	public static Set<Id> applyChosenFunds(List<Gift__c> gifts, Map<Id, Id> fundIdByGiftId) {
 		ChosenFundPlan plan = planChosenFunds(gifts, fundIdByGiftId);
 		if (!plan.added.isEmpty()) {
-			Database.insert(plan.added, true, AccessLevel.USER_MODE);
+			insert as user plan.added;
 		}
 		if (!plan.changed.isEmpty()) {
-			Database.update(plan.changed, true, AccessLevel.USER_MODE);
+			update as user plan.changed;
 		}
 		return plan.notApplied;
 	}

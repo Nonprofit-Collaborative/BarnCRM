@@ -262,7 +262,7 @@ public with sharing class EventSponsorsController {
 			if (!levels.isEmpty()) {
 				sponsor.Amount__c = levels[0].Amount__c;
 			}
-			Database.insert(sponsor, true, AccessLevel.USER_MODE);
+			insert as user sponsor;
 			if (!levels.isEmpty()) {
 				List<Sponsor_Deliverable__c> checklist = new List<Sponsor_Deliverable__c>();
 				for (
@@ -279,7 +279,7 @@ public with sharing class EventSponsorsController {
 					);
 				}
 				if (!checklist.isEmpty()) {
-					Database.insert(checklist, true, AccessLevel.USER_MODE);
+					insert as user checklist;
 				}
 			}
 			return sponsor.Id;
@@ -329,11 +329,7 @@ public with sharing class EventSponsorsController {
 	@AuraEnabled
 	public static void setDeliverableStatus(Id deliverableId, String status) {
 		try {
-			Database.update(
-				new Sponsor_Deliverable__c(Id = deliverableId, Status__c = status),
-				true,
-				AccessLevel.USER_MODE
-			);
+			update as user new Sponsor_Deliverable__c(Id = deliverableId, Status__c = status);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -350,7 +346,7 @@ public with sharing class EventSponsorsController {
 	@AuraEnabled
 	public static void removeSponsor(Id sponsorId) {
 		try {
-			Database.delete(new Event_Sponsor__c(Id = sponsorId), true, AccessLevel.USER_MODE);
+			delete as user new Event_Sponsor__c(Id = sponsorId);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -515,7 +511,7 @@ public with sharing class EventSponsorsController {
 
 	private static void save(SObject record, String method) {
 		try {
-			Database.insert(record, true, AccessLevel.USER_MODE);
+			insert as user record;
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {

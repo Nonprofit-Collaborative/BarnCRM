@@ -785,7 +785,7 @@ public with sharing class AccessService {
 			return;
 		}
 		try {
-			Database.insert(toInsert, true, AccessLevel.USER_MODE);
+			insert as user toInsert;
 		} catch (Exception e) {
 			throw logAndWrap(
 				e,
@@ -863,16 +863,12 @@ public with sharing class AccessService {
 		) {
 			return true;
 		}
-		Database.insert(
-			new List<PermissionSetAssignment>{
-				new PermissionSetAssignment(
-					AssigneeId = userId,
-					PermissionSetId = permissionSetRecord.Id
-				)
-			},
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		insert as system new List<PermissionSetAssignment>{
+			new PermissionSetAssignment(
+				AssigneeId = userId,
+				PermissionSetId = permissionSetRecord.Id
+			)
+		};
 		return true;
 	}
 
@@ -902,16 +898,9 @@ public with sharing class AccessService {
 		if (assignmentSelector.countAssignmentInSystemMode(groupRecord.Id, userId) > 0) {
 			return true;
 		}
-		Database.insert(
-			new List<PermissionSetAssignment>{
-				new PermissionSetAssignment(
-					AssigneeId = userId,
-					PermissionSetGroupId = groupRecord.Id
-				)
-			},
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		insert as system new List<PermissionSetAssignment>{
+			new PermissionSetAssignment(AssigneeId = userId, PermissionSetGroupId = groupRecord.Id)
+		};
 		return true;
 	}
 
@@ -959,7 +948,7 @@ public with sharing class AccessService {
 			}
 		}
 		try {
-			Database.delete(toDelete, true, AccessLevel.USER_MODE);
+			delete as user toDelete;
 		} catch (Exception e) {
 			throw logAndWrap(
 				e,

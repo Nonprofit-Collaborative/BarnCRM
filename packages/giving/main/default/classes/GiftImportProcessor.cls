@@ -560,11 +560,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		Set<Id> notApplied = GiftService.applyChosenFunds(records, fundIdByGiftId);
 		for (Id fundId : fundIdByGiftId.values()) {
 			if (fundsRefusedForTest.contains(fundId)) {
-				Database.insert(
-					new Fund__c(Name = WRITTEN_BEFORE_REFUSAL, Active__c = false),
-					true,
-					AccessLevel.USER_MODE
-				);
+				insert as user new Fund__c(Name = WRITTEN_BEFORE_REFUSAL, Active__c = false);
 				throw new DmlException('Refused for the test.');
 			}
 		}

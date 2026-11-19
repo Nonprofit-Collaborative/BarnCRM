@@ -9,10 +9,7 @@
  * scheduler used to make two or three queries of its own. Scheduling or aborting through this
  * class forgets what was read, so a later question in the same transaction sees the change.
  *
- * A name is matched by `nameKey`, which ignores case, colons and repeated spaces. The job names
- * were put in one style (QA-F6: "BarnCRM Giving Ask Reminders", not "BarnCRM Giving: ask
- * reminders"), and a long-lived org keeps a job scheduled under the old spelling until someone
- * stops it, so the old spelling has to keep reading as the same job.
+ * A name is matched by `nameKey`, which ignores case and repeated spaces.
  *
  * The setup objects are read in system mode: an administrator without View Setup must still
  * see whether a job the package owns is running, and only the package's own jobs are read.
@@ -24,13 +21,10 @@ public with sharing class ScheduledJobSelector {
 	/** The package's scheduled jobs by `nameKey`, read once per transaction; null until asked. */
 	private static Map<String, CronTrigger> byName;
 
-	/**
-	 * What a job name is matched by: lower case, colons read as spaces, spaces collapsed. So
-	 * "BarnCRM Giving: ask reminders" and "BarnCRM Giving Ask Reminders" are the same job.
-	 */
+	/** What a job name is matched by: lower case, spaces collapsed. */
 	@NamespaceAccessible
 	public static String nameKey(String jobName) {
-		return jobName == null ? null : jobName.replace(':', ' ').normalizeSpace().toLowerCase();
+		return jobName == null ? null : jobName.normalizeSpace().toLowerCase();
 	}
 
 	/** The Id of the trigger behind the named scheduled Apex job, or null when there is none. */

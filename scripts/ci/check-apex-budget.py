@@ -89,6 +89,8 @@ CAPS = {
     # Raised 2026-11-14 for the release 1.27 Core fixes (D-208: OrgDate for org-wide date
     # rules, the Error Log key's exception type and frame, the match key fill's end-of-run mark
     # and warning, Run Remaining Checks): 2,274,807 measured, plus about 0.1%.
+    # Batch O trim (O-01, D-207): 2,275,872 measured 2026-11-19 (upgrade-only code out, the
+    # feature list fill in, DML statements); kept, since size plus 2% would raise it.
     "core": 2_277_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
@@ -195,7 +197,8 @@ CAPS = {
     # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 115,433 measured with S2, plus about 2%.
-    "funders": 117_800,
+    # Lowered at the batch O trim (O-01, D-207): 113,738 measured 2026-11-19, plus about 2%.
+    "funders": 116_100,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
@@ -246,7 +249,8 @@ CAPS = {
     # measured, plus about 1%.
     # Lowered for D-200 S1 (release 1.23: the access sync and installer access moved to Core's
     # catalog data): 227,251 measured with S2, plus about 1.5%.
-    "events": 231_000,
+    # Lowered at the batch O trim (O-01, D-207): 224,739 measured 2026-11-19, plus about 2%.
+    "events": 229_300,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.

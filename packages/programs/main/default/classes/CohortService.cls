@@ -111,11 +111,9 @@ public with sharing class CohortService {
 		if (enrollment == null || enrollment.Cohort__c != cohortId) {
 			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'));
 		}
-		Database.update(
-			new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Cohort__c = null) },
-			true,
-			AccessLevel.USER_MODE
-		);
+		update as user new List<Enrollment__c>{
+			new Enrollment__c(Id = enrollmentId, Cohort__c = null)
+		};
 	}
 
 	/** The name of the person an enrollment names, as far as the user can see it. */

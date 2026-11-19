@@ -255,10 +255,10 @@ public with sharing class GiftBatchController {
 			}
 		}
 		if (!updates.isEmpty()) {
-			Database.update(updates, true, AccessLevel.USER_MODE);
+			update as user updates;
 		}
 		if (!inserts.isEmpty()) {
-			Database.insert(inserts, true, AccessLevel.USER_MODE);
+			insert as user inserts;
 		}
 	}
 
@@ -272,7 +272,7 @@ public with sharing class GiftBatchController {
 			}
 		}
 		if (!doomed.isEmpty()) {
-			Database.delete(doomed, true, AccessLevel.USER_MODE);
+			delete as user doomed;
 		}
 	}
 

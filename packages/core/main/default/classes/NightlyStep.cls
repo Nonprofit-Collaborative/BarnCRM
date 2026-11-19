@@ -9,7 +9,7 @@
  */
 @NamespaceAccessible
 public with sharing class NightlyStep {
-	/** The step's key: the name its own scheduled job carried before the nightly run. */
+	/** The step's key. */
 	@NamespaceAccessible
 	public final String key;
 
@@ -43,7 +43,7 @@ public with sharing class NightlyStep {
 	private final Schedulable work;
 
 	/**
-	 * @param key the name the step's job was scheduled under
+	 * @param key the step's key
 	 * @param label the step's name, from a custom label
 	 * @param hour the hour of its usual time, 0 to 23
 	 * @param minute the minute of its usual time

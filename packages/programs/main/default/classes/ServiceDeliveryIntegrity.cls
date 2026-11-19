@@ -122,6 +122,6 @@ public without sharing class ServiceDeliveryIntegrity {
 			}
 			plain.add(written);
 		}
-		Database.update(plain, true, AccessLevel.SYSTEM_MODE);
+		update as system plain;
 	}
 }

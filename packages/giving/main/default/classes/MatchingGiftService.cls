@@ -130,7 +130,7 @@ public with sharing class MatchingGiftService {
 			// Writing the other side of the link fires this handler again for the partner gift.
 			// The credits are therefore worked out after this line and not before it, so that
 			// the pass that gets there first inserts them and this one sees them and stops.
-			Database.update(updateById.values(), true, AccessLevel.USER_MODE);
+			update as user updateById.values();
 		}
 		insertCredits(missingCreditsFor(employeePersonByEmployerGift, giftById));
 		syncReversalCredits(involved);
@@ -320,7 +320,7 @@ public with sharing class MatchingGiftService {
 
 	private static void insertCredits(List<Soft_Credit__c> credits) {
 		if (credits != null && !credits.isEmpty()) {
-			Database.insert(credits, true, AccessLevel.USER_MODE);
+			insert as user credits;
 		}
 	}
 
@@ -330,7 +330,7 @@ public with sharing class MatchingGiftService {
 			SoftCreditService.ROLE_MATCHED_DONOR
 		);
 		if (!toDelete.isEmpty()) {
-			Database.delete(toDelete, true, AccessLevel.USER_MODE);
+			delete as user toDelete;
 		}
 	}
 

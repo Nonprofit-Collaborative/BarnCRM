@@ -203,7 +203,7 @@ public with sharing class ProjectInvoicePayments {
 				)
 			);
 		}
-		Database.update(changes.values(), true, AccessLevel.SYSTEM_MODE);
+		update as system changes.values();
 	}
 
 	/** Total less Amount Paid. */

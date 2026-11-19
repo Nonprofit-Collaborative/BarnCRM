@@ -219,7 +219,7 @@ public with sharing class PersonErasure {
 				personId
 			);
 			// Bookkeeping the person erasing may not edit (R-ER5, ADR-0021).
-			Database.insert(audit, true, AccessLevel.SYSTEM_MODE);
+			insert as system audit;
 			result.erasureId = audit.Id;
 			result.erased = true;
 		} catch (Exception failed) {
@@ -453,7 +453,7 @@ public with sharing class PersonErasure {
 		if (records.isEmpty()) {
 			return;
 		}
-		Database.delete(records, true, AccessLevel.USER_MODE);
+		delete as user records;
 		deletedIds.addAll(ids(records));
 		add(result, DELETED, type, ids(records), null);
 	}
@@ -534,7 +534,7 @@ public with sharing class PersonErasure {
 			}
 		}
 		if (!updates.isEmpty()) {
-			Database.update(updates, true, AccessLevel.USER_MODE);
+			update as user updates;
 		}
 		return ids(updates);
 	}
@@ -652,7 +652,7 @@ public with sharing class PersonErasure {
 		}
 		Set<Id> releasedIds = new Map<Id, Account>(released).keySet();
 		if (!released.isEmpty()) {
-			Database.update(released, true, AccessLevel.USER_MODE);
+			update as user released;
 			// The Account trigger names a released household too; asked here as well so the
 			// erasure does not rest on that automation being on. Naming twice changes nothing.
 			HouseholdNamingService.applyNaming(releasedIds);
@@ -1003,7 +1003,7 @@ public with sharing class PersonErasure {
 
 	/** Saves the clearing and reports it under this label, with this note. */
 	private static void save(Clearing clearing, Result result, String objectLabel, String note) {
-		Database.update(clearing.record, true, AccessLevel.USER_MODE);
+		update as user clearing.record;
 		List<Id> one = new List<Id>{ clearing.record.Id };
 		add(result, CLEARED, objectLabel, one, clearing.cleared, note);
 		if (!clearing.required.isEmpty()) {

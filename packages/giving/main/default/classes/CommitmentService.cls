@@ -300,13 +300,13 @@ public with sharing class CommitmentService {
 		toDelete = withoutLinkedGifts(toDelete);
 
 		if (!toInsert.isEmpty()) {
-			Database.insert(toInsert, true, AccessLevel.USER_MODE);
+			insert as user toInsert;
 		}
 		if (!toUpdate.isEmpty()) {
-			Database.update(toUpdate, true, AccessLevel.USER_MODE);
+			update as user toUpdate;
 		}
 		if (!toDelete.isEmpty()) {
-			Database.delete(toDelete, true, AccessLevel.USER_MODE);
+			delete as user toDelete;
 		}
 	}
 
@@ -415,7 +415,7 @@ public with sharing class CommitmentService {
 			}
 		}
 		if (!updates.isEmpty()) {
-			Database.update(updates, true, AccessLevel.USER_MODE);
+			update as user updates;
 		}
 		return touched;
 	}
@@ -443,7 +443,7 @@ public with sharing class CommitmentService {
 			}
 		}
 		if (!changed.isEmpty()) {
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			update as user changed;
 		}
 	}
 
@@ -491,7 +491,7 @@ public with sharing class CommitmentService {
 			}
 		}
 		if (!changed.isEmpty()) {
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			update as user changed;
 		}
 	}
 
@@ -523,7 +523,7 @@ public with sharing class CommitmentService {
 			}
 		}
 		if (!changed.isEmpty()) {
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			update as user changed;
 		}
 	}
 
@@ -599,7 +599,7 @@ public with sharing class CommitmentService {
 			}
 		}
 		if (!changed.isEmpty()) {
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			update as user changed;
 		}
 		return changed.size();
 	}
@@ -653,7 +653,7 @@ public with sharing class CommitmentService {
 			changed.add(new Commitment__c(Id = commitment.Id, Status__c = target));
 		}
 		if (!changed.isEmpty()) {
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			update as user changed;
 		}
 	}
 
@@ -668,7 +668,7 @@ public with sharing class CommitmentService {
 			}
 		}
 		if (!changed.isEmpty()) {
-			Database.update(changed, true, AccessLevel.USER_MODE);
+			update as user changed;
 		}
 	}
 

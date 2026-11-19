@@ -195,7 +195,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 				joinMembers(sources, journal);
 			}
 			if (!journal.isEmpty()) {
-				Database.insert(journal.values(), true, AccessLevel.SYSTEM_MODE);
+				insert as system journal.values();
 			}
 		} catch (Exception e) {
 			// An Account is never left adopted without the row that undoes it.

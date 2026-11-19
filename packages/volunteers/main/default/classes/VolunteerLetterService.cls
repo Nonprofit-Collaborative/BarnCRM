@@ -208,7 +208,7 @@ public with sharing class VolunteerLetterService {
 				)
 			);
 		}
-		Database.insert(files, true, AccessLevel.USER_MODE);
+		insert as user files;
 		for (ContentVersion file : files) {
 			outcome.versionIds.add(file.Id);
 		}

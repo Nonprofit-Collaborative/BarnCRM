@@ -246,8 +246,8 @@ public with sharing class EventSpeakersController {
 				WHERE Event_Speaker__c = :speakerId
 				WITH USER_MODE
 			];
-			Database.delete(links, true, AccessLevel.USER_MODE);
-			Database.delete(new Event_Speaker__c(Id = speakerId), true, AccessLevel.USER_MODE);
+			delete as user links;
+			delete as user new Event_Speaker__c(Id = speakerId);
 		} catch (DmlException e) {
 			Database.rollback(savepoint);
 			throw UserErrors.message(e.getDmlMessage(0));
@@ -260,7 +260,7 @@ public with sharing class EventSpeakersController {
 
 	private static void save(SObject record, String method) {
 		try {
-			Database.insert(record, true, AccessLevel.USER_MODE);
+			insert as user record;
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {

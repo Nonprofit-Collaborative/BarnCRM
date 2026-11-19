@@ -12,8 +12,7 @@ public with sharing class TabAccessScheduler implements Schedulable {
 	/** The name the scheduled job carries, so it is found again rather than doubled. */
 	public static final String JOB_NAME = 'BarnCRM Tab Access Check';
 
-	/** Every hour, on the hour. The job was nightly ('0 0 1 * * ?') before 2026-10-29. */
-	@TestVisible
+	/** Every hour, on the hour. */
 	private static final String HOURLY_CRON = '0 0 * * * ?';
 
 	public void execute(SchedulableContext context) {
@@ -21,16 +20,8 @@ public with sharing class TabAccessScheduler implements Schedulable {
 		ModuleAccessSyncs.requestAll();
 	}
 
-	/**
-	 * Starts the hourly check, or does nothing when it is already scheduled hourly. A job an
-	 * earlier version scheduled nightly is aborted and scheduled again under the same name, so
-	 * an install or upgrade moves it to the hourly cron and never leaves two.
-	 */
+	/** Starts the hourly check, or does nothing when it is already scheduled. */
 	public static Id start() {
-		String cron = ScheduledJobSelector.cronExpressionByName(JOB_NAME);
-		if (cron != null && cron != HOURLY_CRON) {
-			ScheduledJobSelector.stopNamed(JOB_NAME);
-		}
 		return ScheduledJobSelector.ensure(JOB_NAME, HOURLY_CRON, new TabAccessScheduler());
 	}
 

@@ -220,7 +220,7 @@ public with sharing class GrantPipelineController {
 			if (stage == GrantService.STAGE_AWARDED && amountAwarded != null) {
 				grant.Amount_Awarded__c = amountAwarded;
 			}
-			Database.update(grant, true, AccessLevel.USER_MODE);
+			update as user grant;
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
@@ -265,7 +265,7 @@ public with sharing class GrantPipelineController {
 			if (restricted != null) {
 				grant.Restricted__c = restricted;
 			}
-			Database.update(grant, true, AccessLevel.USER_MODE);
+			update as user grant;
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {

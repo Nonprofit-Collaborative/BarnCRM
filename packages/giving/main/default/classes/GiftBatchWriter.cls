@@ -32,15 +32,11 @@ public with sharing class GiftBatchWriter {
 		for (Id rowId : giftIdByRowId.keySet()) {
 			rows.add(new Gift_Batch_Row__c(Id = rowId, Gift__c = giftIdByRowId.get(rowId)));
 		}
-		Database.update(rows, true, AccessLevel.SYSTEM_MODE);
+		update as system rows;
 	}
 
 	/** Closes the batch. The validation rule `Posted_Batch_Is_Final` keeps it closed. */
 	public static void markPosted(Id batchId) {
-		Database.update(
-			new Gift_Batch__c(Id = batchId, Status__c = STATUS_POSTED),
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
+		update as system new Gift_Batch__c(Id = batchId, Status__c = STATUS_POSTED);
 	}
 }

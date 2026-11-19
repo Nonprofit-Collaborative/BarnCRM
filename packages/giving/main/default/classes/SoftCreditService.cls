@@ -169,7 +169,7 @@ public with sharing class SoftCreditService {
 		}
 		List<Soft_Credit__c> existing = SoftCreditSelector.selectAutomaticForGifts(giftIds);
 		if (!existing.isEmpty()) {
-			Database.delete(existing, true, AccessLevel.USER_MODE);
+			delete as user existing;
 		}
 	}
 
@@ -283,13 +283,13 @@ public with sharing class SoftCreditService {
 		}
 
 		if (!toDelete.isEmpty()) {
-			Database.delete(toDelete, true, AccessLevel.USER_MODE);
+			delete as user toDelete;
 		}
 		if (!toUpdate.isEmpty()) {
-			Database.update(toUpdate, true, AccessLevel.USER_MODE);
+			update as user toUpdate;
 		}
 		if (!toInsert.isEmpty()) {
-			Database.insert(toInsert, true, AccessLevel.USER_MODE);
+			insert as user toInsert;
 		}
 	}
 

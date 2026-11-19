@@ -35,7 +35,7 @@ public without sharing class RelationshipUpkeepWriter {
 		if (mirrors == null || mirrors.isEmpty()) {
 			return;
 		}
-		Database.undelete(mirrors, true, AccessLevel.SYSTEM_MODE);
+		undelete as system mirrors;
 	}
 
 	/** Creates other sides. */
@@ -43,7 +43,7 @@ public without sharing class RelationshipUpkeepWriter {
 		if (mirrors == null || mirrors.isEmpty()) {
 			return;
 		}
-		Database.insert(mirrors, true, AccessLevel.SYSTEM_MODE);
+		insert as system mirrors;
 	}
 
 	/** Updates other sides, and the back pointer on the side that was saved. */
@@ -51,7 +51,7 @@ public without sharing class RelationshipUpkeepWriter {
 		if (records == null || records.isEmpty()) {
 			return;
 		}
-		Database.update(records, true, AccessLevel.SYSTEM_MODE);
+		update as system records;
 	}
 
 	/** Deletes the other sides of relationships the user has just deleted. */
@@ -59,6 +59,6 @@ public without sharing class RelationshipUpkeepWriter {
 		if (mirrors == null || mirrors.isEmpty()) {
 			return;
 		}
-		Database.delete(mirrors, true, AccessLevel.SYSTEM_MODE);
+		delete as system mirrors;
 	}
 }
