@@ -33,6 +33,9 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 
 	/** True when the org has the native group and membership objects and the user may read them. */
 	public override Boolean available() {
+		if (availableForTest != null) {
+			return availableForTest;
+		}
 		return readable(GROUP_OBJECT) && readable(MEMBER_OBJECT);
 	}
 
@@ -71,18 +74,13 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 					ErrorLogger.SEVERITY_WARNING
 				);
 			} else {
-				List<Map<String, Object>> rows = new List<Map<String, Object>>();
-				for (
-					SObject row : Database.queryWithBinds(
+				members = members(
+					nativeRows(
 						memberQuery +
 						' FROM AccountContactRelation WHERE AccountId IN :accountIds ORDER BY Id', // detection-only: text
-						new Map<String, Object>{ 'accountIds' => accountIds },
-						AccessLevel.USER_MODE
+						accountIds
 					)
-				) {
-					rows.add(row.getPopulatedFieldsAsMap());
-				}
-				members = members(rows);
+				);
 			}
 		}
 		for (Account account : [
@@ -120,7 +118,9 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	/** The membership fields the running user can read, lower case. */
 	private static Set<String> readableMemberFields() {
 		Set<String> result = new Set<String>();
-		Schema.SObjectType type = NamespaceUtil.globalDescribe().get(MEMBER_OBJECT);
+		Schema.SObjectType type = memberTypeForTest != null
+			? memberTypeForTest
+			: NamespaceUtil.globalDescribe().get(MEMBER_OBJECT);
 		if (type == null) {
 			return result;
 		}
@@ -225,18 +225,43 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 			return counts;
 		}
 		for (
-			SObject row : Database.queryWithBinds(
+			Map<String, Object> row : nativeRows(
 				'SELECT AccountId, COUNT(Id) n FROM AccountContactRelation' + // detection-only: text
 					' WHERE AccountId IN :accountIds' +
 					memberFilter(readableMemberFields()) +
 					' GROUP BY AccountId',
-				new Map<String, Object>{ 'accountIds' => accountIds },
-				AccessLevel.USER_MODE
+				accountIds
 			)
 		) {
 			counts.put((Id) row.get('AccountId'), (Integer) row.get('n'));
 		}
 		return counts;
+	}
+
+	/** Test seams: the native objects present, the membership object's type, and the rows a query returns. */
+	@TestVisible
+	private static Boolean availableForTest;
+	@TestVisible
+	private static Schema.SObjectType memberTypeForTest;
+	@TestVisible
+	private static List<Map<String, Object>> nativeRowsForTest;
+
+	/** The rows of one native query, read in the running user's access, as maps of populated fields. */
+	private static List<Map<String, Object>> nativeRows(String soql, Set<Id> accountIds) {
+		if (nativeRowsForTest != null) {
+			return nativeRowsForTest;
+		}
+		List<Map<String, Object>> rows = new List<Map<String, Object>>();
+		for (
+			SObject row : Database.queryWithBinds(
+				soql,
+				new Map<String, Object>{ 'accountIds' => accountIds },
+				AccessLevel.USER_MODE
+			)
+		) {
+			rows.add(row.getPopulatedFieldsAsMap());
+		}
+		return rows;
 	}
 
 	/** Nonprofit Cloud never creates BarnCRM-style households, so upkeep has nothing to wait for. */

@@ -175,6 +175,24 @@ private class SummitEventsAdapterTest {
 	}
 
 	@IsTest
+	static void scheduledRunStartsNothingWithoutSummit() {
+		System.runAs(staff()) {
+			Test.startTest();
+			new SummitEventsScheduler().execute(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SummitEventsBatch'],
+				'The scheduled step starts no import without Summit'
+			);
+			NightlyStep step = SummitEventsScheduler.step();
+			Assert.areEqual(SummitEventsScheduler.JOB_NAME, step.key, 'The step carries its key in the nightly run');
+			Assert.areEqual(7 * 60 + 15, step.minute, 'The import runs at 7:15 AM, before the reminders');
+		}
+	}
+
+	@IsTest
 	static void doesNothingWithoutSummit() {
 		System.runAs(staff()) {
 			Boolean noLocator = false;
