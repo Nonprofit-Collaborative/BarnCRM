@@ -226,9 +226,9 @@ Released** and **Restricted Balance** change at once.
 A balance below zero means more was spent than came in so far, which is normal for a
 reimbursement grant.
 
-## To Name the Giving Fund
+## To Name the Fund
 
-With Fundraising installed, choose the fund the money is booked to on the grant's **Giving Fund**
+With Fundraising installed, choose the fund the money is booked to on the grant's **Fund**
 card and click **Save**.
 
 You should see: `Saved.` and the fund's name on the card.

@@ -170,9 +170,9 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 **Cleanup:** Remove sample data; delete `Not Yet` as the admin.
 
-## T-FUN-10: Restricted Funds and the Giving Fund
+## T-FUN-10: Restricted Funds and the Fund Card
 
-**Purpose:** confirm the restricted ledger, its totals, the entries written for received payments, and the Giving Fund card with and without Fundraising.
+**Purpose:** confirm the restricted ledger, its totals, the entries written for received payments, and the Fund card with and without Fundraising.
 **Prerequisites:** admin, staff and read-only; a grant `Restricted Award` to `Lakeside Foundation`, **Awarded**, **Amount Awarded** 10,000, award dates this year, with **Restricted** ticked and one **Expected** payment of 10,000.
 
 | Step | Action | Expected result |
@@ -183,8 +183,8 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | Change the payment's **Amount** to 9,000, then its **Received Date** to the first of the month. | The Received entry follows: 9,000, dated the first. |
 | 5 | Set the payment to **Expected**. | The Received entry is removed; the Spent entry stays. |
 | 6 | Untick **Restricted**, add a second payment of 500 as **Received**. | No entry is added. |
-| 7 | Without Fundraising: look for the **Giving Fund** card. | There is none. Typing text into **Giving Fund** on the grant is refused. |
-| 8 | With Fundraising: choose an active fund on the card and click **Save**. | `Saved.` and the fund's name; the grant's **Giving Fund** holds an 18-character ID. Choose **No fund** and save to clear it. |
+| 7 | Without Fundraising: look for the **Fund** card. | There is none. Typing text into **Fund** on the grant is refused. |
+| 8 | With Fundraising: choose an active fund on the card and click **Save**. | `Saved.` and the fund's name; the grant's **Fund** holds an 18-character ID. Choose **No fund** and save to clear it. |
 | 9 | As read-only, open the grant. | The entries and totals show; no **New** on the entries and the fund is shown by name. |
 | 10 | Load sample data and open **Youth Programs Award**. | **Restricted** is ticked: Received 17,500, Spent 6,000 (`Tutor stipends`), balance 11,500. |
 | 11 | As the admin, delete `Restricted Award`. | Its entries and payments go with it. |
@@ -384,7 +384,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | **BarnCRM Settings**, **Modules**. | The row reads **BarnCRM Grants**, not BarnCRM Funders. In Setup Assistant step 7 the same name shows. |
+| 1 | **BarnCRM Settings**, **Modules**. | The row reads **BarnCRM Grants**. In Setup Assistant step 7 the same name shows. |
 | 2 | **BarnCRM Settings**: read the Fundraising group. | It lists **Fundraising**, **Receipts** and **Grants**; **Grants** shows the five reminder, Grant Finder and renewal settings. |
 | 3 | In Setup, **Permission Sets**. | The three sets read **Grants Admin**, **Grants Staff** and **Grants Read Only**; Setup, **Custom Settings** lists **Grants Settings**. |
 | 4 | Open the **BarnCRM Grants** app, then **Grant Finder** with the Grant Finder setting off. | The tab says to turn it on in **BarnCRM Settings, Grants**. |

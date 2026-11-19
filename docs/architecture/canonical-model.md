@@ -12712,7 +12712,7 @@ government award fields (F-04) describe a government award (R-GN10).
 | Program | record identifier (text) | no | The program the grant pays for, when the Programs module is installed. A record identifier, not a reference: Funders never depends on Programs (R-GN4). |
 | Owner | reference(User) | yes | The staff member responsible (the record owner). Reminders fall back to the owner (R-GQ3). |
 | Restricted | boolean | yes (defaults false) | The funder limited the money to a purpose or a period; its received payments are entered in the restricted ledger (R-GP3). |
-| Giving Fund | record identifier (text) | no | The Giving fund the money is booked to, when the Giving module is installed. A record identifier, not a reference: Funders never depends on Giving (R-GN8). |
+| Fund | record identifier (text) | no | The Fundraising fund the money is booked to, when the Giving module is installed. A record identifier, not a reference: Funders never depends on Giving (R-GN8). |
 | Restricted Received | currency (derived) | no | Sum of the grant's Received entries (R-FE2). |
 | Restricted Spent | currency (derived) | no | Sum of its Spent entries (R-FE2). |
 | Restricted Released | currency (derived) | no | Sum of its Released entries (R-FE2). |
@@ -12839,7 +12839,7 @@ second one. The renewal history is the chain of Renewal Of links both ways, at m
 | Program | `Program_Id__c` | Text(18) |
 | Sample Data | `Sample_Data__c` | Checkbox, default false |
 | Restricted | `Restricted__c` | Checkbox, default false |
-| Giving Fund | `Fund_Id__c` | Text(18) |
+| Fund | `Fund_Id__c` | Text(18) |
 | Restricted Received | `Restricted_Received__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Received |
 | Restricted Spent | `Restricted_Spent__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Spent |
 | Restricted Released | `Restricted_Released__c` | Roll-up summary: SUM of `Grant_Fund_Entry__c.Amount__c` where Type is Released |
@@ -19597,7 +19597,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Logic Models tab, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and its catalog row's access maps (ADR-0154 `0154-logic-models-module.md`). No app of its own since release 1.24 (D-200 R6): the Logic Models tab joins the BarnCRM apps, and the Logic Model record page, which carries the builder panel (`logicModelBuilder`), is the object's org default |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and its catalog row's access maps (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
 | Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and its catalog row's access maps (ADR-0177 `0177-events-module.md`). App `BarnCRM_Events` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Events Home, Event Calendar, Events, Event Speakers and Venues tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Event record page, the object's org default, carries the event's tabs |
-| Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
+| Grant Calendar tab, Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
 | Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and its catalog row's access maps (ADR-0175 `0175-forms-module.md`). App `BarnCRM_Forms` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Forms and Form Submissions tabs also join BarnCRM and BarnCRM Console at deploy (D-188, ADR-0192); the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 | Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and its catalog row's access maps (ADR-0196 `0196-corporate-hub-module.md`). App `BarnCRM_Corporate_Hub` (ADR-0223 module apps, left out of scratch and Developer Edition orgs); the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs also join BarnCRM and BarnCRM Console (ADR-0192) |
