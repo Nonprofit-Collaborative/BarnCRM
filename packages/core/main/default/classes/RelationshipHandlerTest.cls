@@ -24,11 +24,7 @@ private class RelationshipHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c parent = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Parent'
-			);
+			Relationship__c parent = RelationshipTestDataFactory.between(people[0], people[1], 'Parent');
 			parent.End_Date__c = Date.today().addDays(-1);
 
 			Test.startTest();
@@ -36,11 +32,7 @@ private class RelationshipHandlerTest {
 			Test.stopTest();
 
 			Assert.areEqual('Child', parent.Reciprocal_Type__c, 'The reciprocal type is filled in');
-			Assert.areEqual(
-				'Former',
-				parent.Status__c,
-				'And a relationship with an end date is not current'
-			);
+			Assert.areEqual('Former', parent.Status__c, 'And a relationship with an end date is not current');
 		}
 	}
 
@@ -51,11 +43,7 @@ private class RelationshipHandlerTest {
 			AutomationControl.bypass(MAINTENANCE);
 			AutomationControl.bypass(VALIDATION);
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			insert saved;
 			AutomationControl.clearBypass(MAINTENANCE);
 			AutomationControl.clearBypass(VALIDATION);
@@ -84,20 +72,12 @@ private class RelationshipHandlerTest {
 			AutomationControl.bypass(MAINTENANCE);
 			AutomationControl.bypass(VALIDATION);
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Parent'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Parent');
 			saved.Reciprocal_Type__c = 'Child';
 			insert saved;
 			AutomationControl.clearBypass(MAINTENANCE);
 			AutomationControl.clearBypass(VALIDATION);
-			Assert.areEqual(
-				1,
-				RelationshipTestDataFactory.allRelationships().size(),
-				'Nothing has run yet'
-			);
+			Assert.areEqual(1, RelationshipTestDataFactory.allRelationships().size(), 'Nothing has run yet');
 
 			Test.startTest();
 			driveAfterInsert(new RelationshipMaintenanceHandler(), new List<SObject>{ saved });
@@ -105,18 +85,10 @@ private class RelationshipHandlerTest {
 			Test.stopTest();
 
 			List<Relationship__c> all = RelationshipTestDataFactory.allRelationships();
-			Assert.areEqual(
-				2,
-				all.size(),
-				'The maintenance handler gives the relationship its side'
-			);
+			Assert.areEqual(2, all.size(), 'The maintenance handler gives the relationship its side');
 			Relationship__c other = all[0].Id == saved.Id ? all[1] : all[0];
 			Assert.areEqual(people[1].Id, other.Contact__c, 'Described from the other person');
-			Assert.areEqual(
-				'Child',
-				other.Type__c,
-				'The parent of someone is that person\'s child'
-			);
+			Assert.areEqual('Child', other.Type__c, 'The parent of someone is that person\'s child');
 		}
 	}
 
@@ -125,11 +97,7 @@ private class RelationshipHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
-			Relationship__c toSelf = RelationshipTestDataFactory.between(
-				people[0],
-				people[0],
-				'Friend'
-			);
+			Relationship__c toSelf = RelationshipTestDataFactory.between(people[0], people[0], 'Friend');
 
 			Test.startTest();
 			driveBeforeInsert(new RelationshipMaintenanceHandler(), new List<SObject>{ toSelf });
@@ -158,10 +126,7 @@ private class RelationshipHandlerTest {
 			);
 			Test.stopTest();
 
-			Assert.isFalse(
-				result.isSuccess(),
-				'Switching the reciprocal upkeep off does not switch the rules off'
-			);
+			Assert.isFalse(result.isSuccess(), 'Switching the reciprocal upkeep off does not switch the rules off');
 			Assert.isTrue(
 				result.getErrors()[0].getMessage().contains('two different people'),
 				'And the message still says why'
@@ -193,11 +158,7 @@ private class RelationshipHandlerTest {
 				result.isSuccess(),
 				'The duplicate check is exactly what an import needs and it is still there'
 			);
-			Assert.areEqual(
-				1,
-				RelationshipTestDataFactory.allRelationships().size(),
-				'And nothing was written'
-			);
+			Assert.areEqual(1, RelationshipTestDataFactory.allRelationships().size(), 'And nothing was written');
 		}
 	}
 
@@ -205,9 +166,7 @@ private class RelationshipHandlerTest {
 
 	/** Switches the maintenance automation off the way the Automation page does, and only it. */
 	private static void switchMaintenanceOff() {
-		TestDataFactory.insertAutomationSettings(
-			new Map<String, Boolean>{ MAINTENANCE => false, VALIDATION => true }
-		);
+		TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ MAINTENANCE => false, VALIDATION => true });
 		Assert.isFalse(AutomationControl.isEnabled(MAINTENANCE), 'The upkeep is off');
 		Assert.isTrue(AutomationControl.isEnabled(VALIDATION), 'The checks are on');
 	}

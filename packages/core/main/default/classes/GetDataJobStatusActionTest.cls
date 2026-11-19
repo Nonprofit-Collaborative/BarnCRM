@@ -55,29 +55,17 @@ private class GetDataJobStatusActionTest {
 	@IsTest
 	static void anythingElseIsNotFound() {
 		System.runAs(TestUsers.admin()) {
-			Account notAJob = TestDataFactory.organization(
-				new Account(Name = 'The Union Foundation')
-			);
+			Account notAJob = TestDataFactory.organization(new Account(Name = 'The Union Foundation'));
 			insert notAJob;
 
 			Test.startTest();
 			List<GetDataJobStatusAction.Result> results = GetDataJobStatusAction.getStatus(
-				new List<GetDataJobStatusAction.Request>{
-					request(notAJob.Id),
-					request('not an id'),
-					request(null)
-				}
+				new List<GetDataJobStatusAction.Request>{ request(notAJob.Id), request('not an id'), request(null) }
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'),
-				results[0].errorMessage
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'),
-				results[1].errorMessage
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'), results[0].errorMessage);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'), results[1].errorMessage);
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_AgentActions_NoDataJobs'),
 				results[2].errorMessage,
@@ -99,9 +87,7 @@ private class GetDataJobStatusActionTest {
 			// The message catalog is read once per transaction; count only the requests' queries.
 			BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound');
 			Integer queriesBefore = Limits.getQueries();
-			List<GetDataJobStatusAction.Result> results = GetDataJobStatusAction.getStatus(
-				requests
-			);
+			List<GetDataJobStatusAction.Result> results = GetDataJobStatusAction.getStatus(requests);
 			Integer queriesUsed = Limits.getQueries() - queriesBefore;
 			Test.stopTest();
 
@@ -132,16 +118,11 @@ private class GetDataJobStatusActionTest {
 
 		Test.startTest();
 		System.runAs(outsider) {
-			results = GetDataJobStatusAction.getStatus(
-				new List<GetDataJobStatusAction.Request>{ request(job.Id) }
-			);
+			results = GetDataJobStatusAction.getStatus(new List<GetDataJobStatusAction.Request>{ request(job.Id) });
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Core', 'Core_AgentActions_NoAccess'),
-			results[0].errorMessage
-		);
+		Assert.areEqual(BarnHelp.text('Core', 'Core_AgentActions_NoAccess'), results[0].errorMessage);
 		Assert.isNull(results[0].status, 'Nothing of the job is shown');
 	}
 

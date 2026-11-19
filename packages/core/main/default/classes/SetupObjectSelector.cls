@@ -145,10 +145,7 @@ public with sharing class SetupObjectSelector {
 		for (EmailTemplate row : [
 			SELECT Id, DeveloperName, NamespacePrefix, IsActive
 			FROM EmailTemplate
-			WHERE
-				DeveloperName IN :developerNames
-				AND (NamespacePrefix = :ns
-				OR NamespacePrefix = NULL)
+			WHERE DeveloperName IN :developerNames AND (NamespacePrefix = :ns OR NamespacePrefix = NULL)
 			WITH SYSTEM_MODE
 		]) {
 			String key = row.DeveloperName.toLowerCase();
@@ -170,9 +167,7 @@ public with sharing class SetupObjectSelector {
 	@NamespaceAccessible
 	public static Id emailTemplateId(String developerName, Boolean activeOnly) {
 		if (String.isNotBlank(developerName)) {
-			for (
-				Id found : emailTemplateIds(new Set<String>{ developerName }, activeOnly).values()
-			) {
+			for (Id found : emailTemplateIds(new Set<String>{ developerName }, activeOnly).values()) {
 				return found;
 			}
 		}

@@ -25,10 +25,7 @@ private class ProjectsSampleDataTest {
 	private static void turnOnRequests() {
 		SettingsService.saveValues(
 			'Projects_Settings__c',
-			new Map<String, Object>{
-				'Requests_Enabled__c' => true,
-				'Change_Requests_Enabled__c' => true
-			}
+			new Map<String, Object>{ 'Requests_Enabled__c' => true, 'Change_Requests_Enabled__c' => true }
 		);
 	}
 
@@ -88,41 +85,13 @@ private class ProjectsSampleDataTest {
 				],
 				'Two milestones'
 			);
-			Assert.areEqual(
-				12,
-				[SELECT COUNT() FROM Project_Task__c WITH SYSTEM_MODE],
-				'Twelve tasks in all'
-			);
-			Assert.areEqual(
-				11,
-				[SELECT COUNT() FROM Time_Entry__c WITH SYSTEM_MODE],
-				'Eleven time entries'
-			);
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Project_Expense__c WITH SYSTEM_MODE],
-				'Three expenses'
-			);
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Project_Status_Update__c WITH SYSTEM_MODE],
-				'Three status updates'
-			);
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Project_Assignment__c WITH SYSTEM_MODE],
-				'Two assignments'
-			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Project_Resource__c WHERE Sample_Data__c = TRUE],
-				'One resource'
-			);
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Resource_Request__c WITH SYSTEM_MODE],
-				'Two resource requests'
-			);
+			Assert.areEqual(12, [SELECT COUNT() FROM Project_Task__c WITH SYSTEM_MODE], 'Twelve tasks in all');
+			Assert.areEqual(11, [SELECT COUNT() FROM Time_Entry__c WITH SYSTEM_MODE], 'Eleven time entries');
+			Assert.areEqual(3, [SELECT COUNT() FROM Project_Expense__c WITH SYSTEM_MODE], 'Three expenses');
+			Assert.areEqual(3, [SELECT COUNT() FROM Project_Status_Update__c WITH SYSTEM_MODE], 'Three status updates');
+			Assert.areEqual(2, [SELECT COUNT() FROM Project_Assignment__c WITH SYSTEM_MODE], 'Two assignments');
+			Assert.areEqual(1, [SELECT COUNT() FROM Project_Resource__c WHERE Sample_Data__c = TRUE], 'One resource');
+			Assert.areEqual(2, [SELECT COUNT() FROM Resource_Request__c WITH SYSTEM_MODE], 'Two resource requests');
 			Assert.areEqual(
 				3,
 				[SELECT COUNT() FROM Project_Request__c WHERE Sample_Data__c = TRUE],
@@ -165,17 +134,9 @@ private class ProjectsSampleDataTest {
 	static void theRemovalTakesTheSampleSetAndLeavesRealRecords() {
 		System.runAs(admin()) {
 			turnOnRequests();
-			Project__c real = new Project__c(
-				Name = 'Real Project',
-				Type__c = 'Internal',
-				Status__c = 'Active'
-			);
+			Project__c real = new Project__c(Name = 'Real Project', Type__c = 'Internal', Status__c = 'Active');
 			insert as user real;
-			insert as user new Project_Task__c(
-				Name = 'Real Task',
-				Project__c = real.Id,
-				Status__c = 'Not Started'
-			);
+			insert as user new Project_Task__c(Name = 'Real Task', Project__c = real.Id, Status__c = 'Not Started');
 			insert as user new Project_Request__c(
 				Subject__c = 'Real Request',
 				Priority__c = 'Medium',
@@ -200,11 +161,7 @@ private class ProjectsSampleDataTest {
 				[SELECT COUNT() FROM Time_Entry__c WITH SYSTEM_MODE],
 				'The sample hours went with their projects'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Project_Request__c WITH SYSTEM_MODE],
-				'The real request stays'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Project_Request__c WITH SYSTEM_MODE], 'The real request stays');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Project_Resource__c WHERE Sample_Data__c = TRUE],

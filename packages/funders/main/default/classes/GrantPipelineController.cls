@@ -165,20 +165,11 @@ public with sharing class GrantPipelineController {
 				AccessLevel.USER_MODE
 			)[0];
 			board.awardedCount = (Integer) awarded.get('total');
-			board.awardedAmount = awarded.get('amount') == null
-				? 0
-				: (Decimal) awarded.get('amount');
+			board.awardedAmount = awarded.get('amount') == null ? 0 : (Decimal) awarded.get('amount');
 
 			// The same reader as the Grant Calendar (GrantDeadlineSelector), overdue included.
 			Date horizon = Date.today().addDays(DEADLINE_DAYS);
-			for (
-				Grant__c grant : GrantDeadlineSelector.applications(
-					null,
-					horizon,
-					mineOnly,
-					MAX_DEADLINES
-				)
-			) {
+			for (Grant__c grant : GrantDeadlineSelector.applications(null, horizon, mineOnly, MAX_DEADLINES)) {
 				Card row = toCard(grant);
 				row.kind = KIND_APPLICATION;
 				board.deadlines.add(row);
@@ -208,9 +199,7 @@ public with sharing class GrantPipelineController {
 	@AuraEnabled
 	public static void moveStage(Id grantId, String stage, Decimal amountAwarded) {
 		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		if (grantId == null || !GrantService.STAGES.contains(stage)) {
 			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'));
@@ -244,9 +233,7 @@ public with sharing class GrantPipelineController {
 		Boolean restricted
 	) {
 		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		if (grantId == null) {
 			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'));
@@ -297,9 +284,7 @@ public with sharing class GrantPipelineController {
 	@AuraEnabled
 	public static FundersUndoState markSubmitted(Id requirementId) {
 		if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		try {
 			return GrantRequirementService.markSubmitted(requirementId);
@@ -315,9 +300,7 @@ public with sharing class GrantPipelineController {
 	@AuraEnabled
 	public static void undoSubmitted(Id requirementId, String status, Date submittedDate) {
 		if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		Boolean undone;
 		try {

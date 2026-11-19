@@ -41,10 +41,7 @@ private class MigrationTemplatesTest {
 	private static String personMode = ImportTemplateService.PERSON_MODE_CONTACTS;
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	private static Fund__c fund(String name, Boolean isDefault) {
@@ -86,20 +83,14 @@ private class MigrationTemplatesTest {
 	private static void given(String key, List<Map<String, String>> rowsByTarget) {
 		template = shipped(key);
 		Map<String, String> sourceByTarget = new Map<String, String>();
-		for (
-			ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c)
-				.getColumns()
-		) {
+		for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 			sourceByTarget.put(column.getTarget(), column.getSource());
 		}
 		List<Map<String, String>> file = new List<Map<String, String>>();
 		for (Map<String, String> byTarget : rowsByTarget) {
 			Map<String, String> row = new Map<String, String>();
 			for (String target : byTarget.keySet()) {
-				Assert.isTrue(
-					sourceByTarget.containsKey(target),
-					key + ' loads no column into ' + target
-				);
+				Assert.isTrue(sourceByTarget.containsKey(target), key + ' loads no column into ' + target);
 				row.put(sourceByTarget.get(target), byTarget.get(target));
 			}
 			file.add(row);
@@ -155,9 +146,7 @@ private class MigrationTemplatesTest {
 	private static List<String> statuses(List<Import_Row__c> rows) {
 		List<String> result = new List<String>();
 		for (Import_Row__c row : rows) {
-			result.add(
-				row.Status__c + (row.Error_Message__c == null ? '' : ': ' + row.Error_Message__c)
-			);
+			result.add(row.Status__c + (row.Error_Message__c == null ? '' : ': ' + row.Error_Message__c));
 		}
 		return result;
 	}
@@ -219,20 +208,12 @@ private class MigrationTemplatesTest {
 			Test.stopTest();
 
 			Map<String, Import_Template_Default__mdt> shippedByKey = new Map<String, Import_Template_Default__mdt>();
-			for (
-				Import_Template_Default__mdt row : ImportTemplateSelector.selectShippedDefaults()
-			) {
+			for (Import_Template_Default__mdt row : ImportTemplateSelector.selectShippedDefaults()) {
 				shippedByKey.put(row.Template_Key__c, row);
 			}
 			Map<String, Import_Template__c> copiedByKey = new Map<String, Import_Template__c>();
 			for (Import_Template__c copied : [
-				SELECT
-					Name,
-					Template_Key__c,
-					Column_Mapping_JSON__c,
-					Matching_Rule__c,
-					Is_Package_Default__c,
-					Active__c
+				SELECT Name, Template_Key__c, Column_Mapping_JSON__c, Matching_Rule__c, Is_Package_Default__c, Active__c
 				FROM Import_Template__c
 			]) {
 				copiedByKey.put(copied.Template_Key__c, copied);
@@ -310,11 +291,7 @@ private class MigrationTemplatesTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			Contact ana = TestDataFactory.person(
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Okafor',
-					Email = 'ana.okafor@example.org'
-				)
+				new Contact(FirstName = 'Ana', LastName = 'Okafor', Email = 'ana.okafor@example.org')
 			);
 			insert ana;
 			fund('General Fund', true);
@@ -322,14 +299,7 @@ private class MigrationTemplatesTest {
 			Appeal__c spring = new Appeal__c(Name = 'Spring Appeal', Active__c = true);
 			insert spring;
 			Map<String, String> first = fromAna(
-				designatedGift(
-					'6gt-1001',
-					'250.00',
-					'2025-03-15',
-					'Credit Card',
-					'Scholarships',
-					'250.00'
-				)
+				designatedGift('6gt-1001', '250.00', '2025-03-15', 'Credit Card', 'Scholarships', '250.00')
 			);
 			first.put('Gift.Payment_Reference__c', 'ch_3PqR1001');
 			first.put('Gift.Appeal', 'Spring Appeal');
@@ -337,57 +307,18 @@ private class MigrationTemplatesTest {
 				'npc_gift_transactions',
 				new List<Map<String, String>>{
 					first,
-					fromAna(
-						designatedGift(
-							'6gt-1002',
-							'100.00',
-							'2025-04-01',
-							'Check',
-							'General Fund',
-							'100.00'
-						)
-					),
-					fromAna(
-						designatedGift(
-							'6gt-1003',
-							'500.00',
-							'2025-05-20',
-							'Check',
-							'Scholarships',
-							'300.00'
-						)
-					),
-					fromAna(
-						designatedGift(
-							'6gt-1003',
-							'500.00',
-							'2025-05-20',
-							'Check',
-							'General Fund',
-							'200.00'
-						)
-					)
+					fromAna(designatedGift('6gt-1002', '100.00', '2025-04-01', 'Check', 'General Fund', '100.00')),
+					fromAna(designatedGift('6gt-1003', '500.00', '2025-05-20', 'Check', 'Scholarships', '300.00')),
+					fromAna(designatedGift('6gt-1003', '500.00', '2025-05-20', 'Check', 'General Fund', '200.00'))
 				}
 			);
 
 			List<Import_Row__c> preview = dryRunThenCommit();
 
 			List<Import_Row__c> committed = ImportTestDataFactory.reload(batch.Id);
-			Assert.areEqual(
-				statuses(preview),
-				statuses(committed),
-				'The commit does what the dry run said.'
-			);
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				committed[0].Status__c,
-				why(committed[0])
-			);
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				committed[1].Status__c,
-				why(committed[1])
-			);
+			Assert.areEqual(statuses(preview), statuses(committed), 'The commit does what the dry run said.');
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, committed[0].Status__c, why(committed[0]));
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, committed[1].Status__c, why(committed[1]));
 			for (Integer index = 2; index < 4; index++) {
 				Assert.areEqual(
 					ImportRowProcessor.STATUS_REJECTED,
@@ -396,8 +327,7 @@ private class MigrationTemplatesTest {
 				);
 				Assert.isTrue(
 					committed[index].Error_Message__c.contains('500'),
-					'Saying the split does not add up to the gift: ' +
-					committed[index].Error_Message__c
+					'Saying the split does not add up to the gift: ' + committed[index].Error_Message__c
 				);
 			}
 
@@ -409,32 +339,20 @@ private class MigrationTemplatesTest {
 			);
 			Gift__c card = gifts.get('6gt-1001');
 			Assert.areEqual(250, card.Amount__c, 'The original amount.');
-			Assert.areEqual(
-				Date.newInstance(2025, 3, 15),
-				card.Gift_Date__c,
-				'The transaction date.'
-			);
+			Assert.areEqual(Date.newInstance(2025, 3, 15), card.Gift_Date__c, 'The transaction date.');
 			Assert.areEqual('Card', card.Type__c, 'Credit Card is Card.');
 			Assert.areEqual('ch_3PqR1001', card.Payment_Reference__c, 'The payment identifier.');
 			Assert.areEqual(spring.Id, card.Appeal__c, 'The campaign is the appeal of that name.');
 			Assert.areEqual(batch.Id, card.Created_By_Import_Batch__c, 'Tagged for undo.');
 			Assert.areEqual(1, card.Gift_Allocations__r.size(), 'One designation, one allocation.');
-			Assert.areEqual(
-				'Scholarships',
-				card.Gift_Allocations__r[0].Fund__r.Name,
-				'To the designated fund.'
-			);
+			Assert.areEqual('Scholarships', card.Gift_Allocations__r[0].Fund__r.Name, 'To the designated fund.');
 			Assert.areEqual(250, card.Gift_Allocations__r[0].Amount__c, 'For the whole gift.');
 			Assert.areEqual(
 				'General Fund',
 				gifts.get('6gt-1002').Gift_Allocations__r[0].Fund__r.Name,
 				'The second gift to its own designation.'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Contact],
-				'The donor is found by email, not made again.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'The donor is found by email, not made again.');
 			Assert.areEqual(ana.Id, card.Donor_Contact__c, 'Who gave the first gift.');
 			Assert.areEqual(ana.Id, gifts.get('6gt-1002').Donor_Contact__c, 'And the second.');
 		}
@@ -475,10 +393,7 @@ private class MigrationTemplatesTest {
 
 			List<Import_Row__c> committed = ImportTestDataFactory.reload(batch.Id);
 			Assert.areEqual(
-				new List<String>{
-					ImportRowProcessor.STATUS_CREATED,
-					ImportRowProcessor.STATUS_CREATED
-				},
+				new List<String>{ ImportRowProcessor.STATUS_CREATED, ImportRowProcessor.STATUS_CREATED },
 				statuses(committed),
 				'Both gifts load.'
 			);
@@ -487,11 +402,7 @@ private class MigrationTemplatesTest {
 			Assert.areEqual(2, gifts.size(), 'Two gifts.');
 			for (Gift__c gift : gifts.values()) {
 				Assert.areEqual(1, gift.Gift_Allocations__r.size(), 'Each allocated once.');
-				Assert.areEqual(
-					'General Fund',
-					gift.Gift_Allocations__r[0].Fund__r.Name,
-					'To the default fund.'
-				);
+				Assert.areEqual('General Fund', gift.Gift_Allocations__r[0].Fund__r.Name, 'To the default fund.');
 			}
 			Assert.areEqual('Cash', gifts.get('6gt-2001').Type__c, 'Payment method as exported.');
 			Assert.areEqual(2, [SELECT COUNT() FROM Contact], 'One donor each.');
@@ -529,10 +440,7 @@ private class MigrationTemplatesTest {
 				FROM Account
 				WHERE Name = 'Riverside Foundation'
 			];
-			Assert.isTrue(
-				AccountKinds.isOrganization(foundation.RecordTypeId),
-				'Created as an organization.'
-			);
+			Assert.isTrue(AccountKinds.isOrganization(foundation.RecordTypeId), 'Created as an organization.');
 			Gift__c gift = giftsByExternalId().get('6gt-3001');
 			Assert.areEqual(foundation.Id, gift.Donor_Account__c, 'Which gave the gift.');
 			Assert.isNull(gift.Donor_Contact__c, 'Nobody else did.');
@@ -586,11 +494,7 @@ private class MigrationTemplatesTest {
 				Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, why(row));
 				Assert.isNotNull(row.Household__c, 'Each person has a household.');
 			}
-			Assert.areNotEqual(
-				committed[0].Household__c,
-				committed[1].Household__c,
-				'Of their own.'
-			);
+			Assert.areNotEqual(committed[0].Household__c, committed[1].Household__c, 'Of their own.');
 			Contact ana = [
 				SELECT
 					Salutation,
@@ -614,16 +518,10 @@ private class MigrationTemplatesTest {
 			Assert.areEqual('Portland', ana.MailingCity, 'Mailing address.');
 			// BarnCRM Admin grants the consent fields, so an opt-out in the file is never
 			// dropped: the grant is asserted, then the value.
-			Assert.isTrue(
-				importerMayEdit(Contact.HasOptedOutOfEmail),
-				'BarnCRM Admin may write the email opt-out.'
-			);
+			Assert.isTrue(importerMayEdit(Contact.HasOptedOutOfEmail), 'BarnCRM Admin may write the email opt-out.');
 			Assert.isTrue(ana.HasOptedOutOfEmail, 'Her email opt-out comes with her.');
 			Assert.isFalse(ana.DoNotCall, 'And her phone preference.');
-			Assert.isTrue(
-				importerMayEdit(Contact.DoNotCall),
-				'BarnCRM Admin may write do not call.'
-			);
+			Assert.isTrue(importerMayEdit(Contact.DoNotCall), 'BarnCRM Admin may write do not call.');
 			Assert.isTrue(
 				[SELECT DoNotCall FROM Contact WHERE LastName = 'Lee'].DoNotCall,
 				'His do not call comes with him.'
@@ -662,16 +560,7 @@ private class MigrationTemplatesTest {
 			given(
 				'npc_gift_transactions',
 				new List<Map<String, String>>{
-					fromAna(
-						designatedGift(
-							'6gt-1001',
-							'250.00',
-							'2025-03-15',
-							'Credit Card',
-							'Scholarships',
-							'250.00'
-						)
-					)
+					fromAna(designatedGift('6gt-1001', '250.00', '2025-03-15', 'Credit Card', 'Scholarships', '250.00'))
 				}
 			);
 			Integer accountsBefore = [SELECT COUNT() FROM Account];
@@ -680,11 +569,7 @@ private class MigrationTemplatesTest {
 
 			List<Import_Row__c> committed = ImportTestDataFactory.reload(batch.Id);
 			Assert.areEqual(statuses(preview), statuses(committed), 'As the dry run said.');
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				committed[0].Status__c,
-				why(committed[0])
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, committed[0].Status__c, why(committed[0]));
 			Gift__c gift = giftsByExternalId().get('6gt-1001');
 			Assert.areEqual(ana.Id, gift.Donor_Account__c, 'Given by the person account found.');
 			Assert.areEqual(
@@ -692,11 +577,7 @@ private class MigrationTemplatesTest {
 				[SELECT COUNT() FROM Account],
 				'Nobody was created: the donor was found by email.'
 			);
-			Assert.areEqual(
-				'Scholarships',
-				gift.Gift_Allocations__r[0].Fund__r.Name,
-				'To the designated fund.'
-			);
+			Assert.areEqual('Scholarships', gift.Gift_Allocations__r[0].Fund__r.Name, 'To the designated fund.');
 		}
 	}
 
@@ -769,17 +650,9 @@ private class MigrationTemplatesTest {
 			Assert.areEqual('503-555-0105', ana.Phone, 'And the phone to use.');
 			Assert.areEqual('Engineer', ana.Title, 'Title.');
 			Assert.areEqual(Date.newInstance(1980, 6, 1), ana.Birthdate, 'Birthdate.');
-			Assert.areEqual(
-				'ana.okafor@example.org',
-				ana.Personal_Email__c,
-				'Home email is personal.'
-			);
+			Assert.areEqual('ana.okafor@example.org', ana.Personal_Email__c, 'Home email is personal.');
 			Assert.areEqual('aokafor@example.com', ana.Work_Email__c, 'Work email.');
-			Assert.areEqual(
-				'Personal',
-				ana.Preferred_Email__c,
-				'The preferred one, by the same name.'
-			);
+			Assert.areEqual('Personal', ana.Preferred_Email__c, 'The preferred one, by the same name.');
 			Assert.areEqual('ana.okafor@example.org', ana.Email, 'And the email to use.');
 			Contact robert = [
 				SELECT Deceased__c, DoNotCall, HomePhone, Phone, Preferred_Phone__c
@@ -787,26 +660,15 @@ private class MigrationTemplatesTest {
 				WHERE LastName = 'Hale'
 			];
 			Assert.areEqual('503-555-0106', robert.HomePhone, 'Home phone comes across.');
-			Assert.isNull(
-				robert.Preferred_Phone__c,
-				'A preferred phone BarnCRM has no word for is empty.'
-			);
+			Assert.isNull(robert.Preferred_Phone__c, 'A preferred phone BarnCRM has no word for is empty.');
 			Assert.isNull(robert.Phone, 'So the ordinary phone is not touched.');
 			Assert.isTrue(robert.Deceased__c, 'Deceased comes across.');
-			Assert.isTrue(
-				importerMayEdit(Contact.DoNotCall),
-				'BarnCRM Admin may write do not call.'
-			);
+			Assert.isTrue(importerMayEdit(Contact.DoNotCall), 'BarnCRM Admin may write do not call.');
 			Assert.isTrue(robert.DoNotCall, 'So does do not call.');
 		}
 	}
 
-	private static Map<String, String> payment(
-		String externalId,
-		String amount,
-		String paymentDate,
-		String method
-	) {
+	private static Map<String, String> payment(String externalId, String amount, String paymentDate, String method) {
 		return new Map<String, String>{
 			'Gift.External_Id__c' => externalId,
 			'Gift.Amount__c' => amount,
@@ -825,30 +687,20 @@ private class MigrationTemplatesTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			TestDataFactory.defaultSettings();
 			insert TestDataFactory.person(
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Okafor',
-					Email = 'ana.okafor@example.org'
-				)
+				new Contact(FirstName = 'Ana', LastName = 'Okafor', Email = 'ana.okafor@example.org')
 			);
 			fund('General Fund', true);
 			Appeal__c yearEnd = new Appeal__c(Name = 'Year End 2024', Active__c = true);
 			insert yearEnd;
-			Map<String, String> first = fromAna(
-				payment('a0B-0001', '150.00', '2024-12-10', 'Credit Card')
-			);
+			Map<String, String> first = fromAna(payment('a0B-0001', '150.00', '2024-12-10', 'Credit Card'));
 			first.put('Gift.Appeal', 'Year End 2024');
-			Map<String, String> memorial = fromAna(
-				payment('a0B-0002', '50.00', '2025-01-15', 'Check')
-			);
+			Map<String, String> memorial = fromAna(payment('a0B-0002', '50.00', '2025-01-15', 'Check'));
 			memorial.put('Gift.Payment_Reference__c', '3312');
 			memorial.put('Tribute.Type__c', 'In memory of');
 			memorial.put('Tribute.Honoree_Name__c', 'Grace Okafor');
 			memorial.put('Tribute.Notification_Recipient_Name__c', 'Ben Okafor');
 			memorial.put('Tribute.Message__c', 'With love from Ana');
-			Map<String, String> unconverted = fromAna(
-				payment('a0B-0003', '25.00', '2025-02-01', 'Cash')
-			);
+			Map<String, String> unconverted = fromAna(payment('a0B-0003', '25.00', '2025-02-01', 'Cash'));
 			unconverted.put('Tribute.Type__c', 'Honor');
 			unconverted.put('Tribute.Honoree_Name__c', 'Grace Okafor');
 			given('npsp_payments', new List<Map<String, String>>{ first, memorial, unconverted });
@@ -857,16 +709,8 @@ private class MigrationTemplatesTest {
 
 			List<Import_Row__c> committed = ImportTestDataFactory.reload(batch.Id);
 			Assert.areEqual(statuses(preview), statuses(committed), 'As the dry run said.');
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				committed[0].Status__c,
-				why(committed[0])
-			);
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				committed[1].Status__c,
-				why(committed[1])
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, committed[0].Status__c, why(committed[0]));
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, committed[1].Status__c, why(committed[1]));
 			Assert.areEqual(
 				ImportRowProcessor.STATUS_REJECTED,
 				committed[2].Status__c,
@@ -879,21 +723,13 @@ private class MigrationTemplatesTest {
 			);
 
 			Map<String, Gift__c> gifts = giftsByExternalId();
-			Assert.areEqual(
-				new Set<String>{ 'a0B-0001', 'a0B-0002' },
-				gifts.keySet(),
-				'A gift per paid payment.'
-			);
+			Assert.areEqual(new Set<String>{ 'a0B-0001', 'a0B-0002' }, gifts.keySet(), 'A gift per paid payment.');
 			Gift__c card = gifts.get('a0B-0001');
 			Assert.areEqual(150, card.Amount__c, 'The payment amount.');
 			Assert.areEqual(Date.newInstance(2024, 12, 10), card.Gift_Date__c, 'The payment date.');
 			Assert.areEqual('Card', card.Type__c, 'Credit Card is Card.');
 			Assert.areEqual(yearEnd.Id, card.Appeal__c, 'The campaign is the appeal of that name.');
-			Assert.areEqual(
-				'General Fund',
-				card.Gift_Allocations__r[0].Fund__r.Name,
-				'Default fund.'
-			);
+			Assert.areEqual('General Fund', card.Gift_Allocations__r[0].Fund__r.Name, 'Default fund.');
 			Tribute__c tribute = [
 				SELECT Type__c, Honoree_Name__c, Notification_Recipient_Name__c, Message__c
 				FROM Tribute__c
@@ -903,16 +739,8 @@ private class MigrationTemplatesTest {
 			Assert.areEqual('Grace Okafor', tribute.Honoree_Name__c, 'Honoree.');
 			Assert.areEqual('Ben Okafor', tribute.Notification_Recipient_Name__c, 'Who to tell.');
 			Assert.areEqual('With love from Ana', tribute.Message__c, 'And what to say.');
-			Assert.areEqual(
-				'3312',
-				gifts.get('a0B-0002').Payment_Reference__c,
-				'The check number.'
-			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Contact],
-				'The donor was found, not made again.'
-			);
+			Assert.areEqual('3312', gifts.get('a0B-0002').Payment_Reference__c, 'The check number.');
+			Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'The donor was found, not made again.');
 		}
 	}
 
@@ -936,10 +764,7 @@ private class MigrationTemplatesTest {
 				FROM Account
 				WHERE Name = 'Hillside Rotary Club'
 			];
-			Assert.isTrue(
-				AccountKinds.isOrganization(organization.RecordTypeId),
-				'An organization.'
-			);
+			Assert.isTrue(AccountKinds.isOrganization(organization.RecordTypeId), 'An organization.');
 			Gift__c gift = giftsByExternalId().get('a0B-0101');
 			Assert.areEqual(organization.Id, gift.Donor_Account__c, 'Which gave the gift.');
 			Assert.isNull(gift.Donor_Contact__c, 'Nobody else did.');

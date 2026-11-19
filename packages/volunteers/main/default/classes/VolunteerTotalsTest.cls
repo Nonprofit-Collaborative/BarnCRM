@@ -80,13 +80,7 @@ private class VolunteerTotalsTest {
 
 	private static Volunteer_Shift__c shift() {
 		return [
-			SELECT
-				Id,
-				Volunteer_Job__c,
-				Total_Hours__c,
-				Slots_Filled__c,
-				Slots_Remaining__c,
-				Rollups_Last_Calculated__c
+			SELECT Id, Volunteer_Job__c, Total_Hours__c, Slots_Filled__c, Slots_Remaining__c, Rollups_Last_Calculated__c
 			FROM Volunteer_Shift__c
 			WITH SYSTEM_MODE
 			LIMIT 1
@@ -102,17 +96,8 @@ private class VolunteerTotalsTest {
 		return entry(shift(), contactId, hours, worked);
 	}
 
-	private static Volunteer_Hours__c entry(
-		Volunteer_Shift__c onShift,
-		Id contactId,
-		Decimal hours,
-		Date worked
-	) {
-		Volunteer_Hours__c record = VolunteersTestData.newHours(
-			contactId,
-			onShift.Volunteer_Job__c,
-			hours
-		);
+	private static Volunteer_Hours__c entry(Volunteer_Shift__c onShift, Id contactId, Decimal hours, Date worked) {
+		Volunteer_Hours__c record = VolunteersTestData.newHours(contactId, onShift.Volunteer_Job__c, hours);
 		record.Volunteer_Shift__c = onShift.Id;
 		record.Date_Worked__c = worked;
 		return record;
@@ -137,9 +122,7 @@ private class VolunteerTotalsTest {
 			for (Automation_Registry__mdt row : [
 				SELECT Object_Name__c, Execution_Order__c, Enabled_By_Default__c, Module__c
 				FROM Automation_Registry__mdt
-				WHERE
-					Handler_Class__c = 'RollupTriggerHandler'
-					AND Object_Name__c IN :new Set<String>{ HOURS, SIGNUPS }
+				WHERE Handler_Class__c = 'RollupTriggerHandler' AND Object_Name__c IN :new Set<String>{ HOURS, SIGNUPS }
 			]) {
 				byObject.put(row.Object_Name__c, row);
 			}
@@ -151,11 +134,7 @@ private class VolunteerTotalsTest {
 			for (Automation_Registry__mdt row : byObject.values()) {
 				Assert.areEqual(90, row.Execution_Order__c, 'After the module\'s own rules');
 				Assert.isTrue(row.Enabled_By_Default__c, 'On from install');
-				Assert.areEqual(
-					'Volunteers',
-					row.Module__c,
-					'Turning Volunteers off stops its rollups too (R-VR2)'
-				);
+				Assert.areEqual('Volunteers', row.Module__c, 'Turning Volunteers off stops its rollups too (R-VR2)');
 			}
 		}
 	}
@@ -178,11 +157,7 @@ private class VolunteerTotalsTest {
 			};
 			insert entries;
 
-			Assert.areEqual(
-				0,
-				valueOf(rivera().Volunteer_Hours_Total__c),
-				'Submitted adds nothing'
-			);
+			Assert.areEqual(0, valueOf(rivera().Volunteer_Hours_Total__c), 'Submitted adds nothing');
 			Assert.areEqual(0, valueOf(job().Total_Hours__c), 'Nothing on the job yet');
 			Assert.areEqual(0, valueOf(shift().Total_Hours__c), 'Nothing on the shift yet');
 			nextSave();
@@ -242,11 +217,7 @@ private class VolunteerTotalsTest {
 			nextSave();
 
 			VolunteerHoursService.reject(new Set<Id>{ three.Id }, 'Logged twice');
-			Assert.areEqual(
-				0,
-				valueOf(rivera().Volunteer_Hours_Total__c),
-				'Rejected: nothing approved is left'
-			);
+			Assert.areEqual(0, valueOf(rivera().Volunteer_Hours_Total__c), 'Rejected: nothing approved is left');
 			Assert.areEqual(0, valueOf(shift().Total_Hours__c), 'Nothing on the shift');
 			Assert.isNull(rivera().Last_Volunteer_Date__c, 'No approved day is left');
 			nextSave();
@@ -345,16 +316,8 @@ private class VolunteerTotalsTest {
 			Assert.isTrue(written.size() >= 200, 'At least one full queue run is written');
 			Assert.isFalse(written.removeAll(queued), 'Nobody is both written and waiting');
 			written.addAll(queued);
-			Assert.areEqual(
-				idsOf(people),
-				written,
-				'Every person has their total, or is queued for it'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE],
-				'Nothing failed'
-			);
+			Assert.areEqual(idsOf(people), written, 'Every person has their total, or is queued for it');
+			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'Nothing failed');
 		}
 	}
 
@@ -439,21 +402,9 @@ private class VolunteerTotalsTest {
 	@IsTest
 	static void everyRoleReadsTheTotalsAndNoneTypesThem() {
 		Map<String, List<String>> setsByRole = new Map<String, List<String>>{
-			'Coordinator' => new List<String>{
-				'BarnCRM_Staff',
-				'Rollup_Builder_User',
-				'Volunteers_Coordinator'
-			},
-			'Staffer' => new List<String>{
-				'BarnCRM_Staff',
-				'Rollup_Builder_User',
-				'Volunteers_Staff'
-			},
-			'Reader' => new List<String>{
-				'BarnCRM_Read_Only',
-				'Rollup_Builder_User',
-				'Volunteers_Read_Only'
-			}
+			'Coordinator' => new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User', 'Volunteers_Coordinator' },
+			'Staffer' => new List<String>{ 'BarnCRM_Staff', 'Rollup_Builder_User', 'Volunteers_Staff' },
+			'Reader' => new List<String>{ 'BarnCRM_Read_Only', 'Rollup_Builder_User', 'Volunteers_Read_Only' }
 		};
 		Integer checked = 0;
 		Test.startTest();

@@ -23,12 +23,7 @@ private class ReportingQueryServiceTest {
 	}
 
 	private static Map<String, Object> query(String objectName, List<String> fields) {
-		return new Map<String, Object>{
-			'version' => 1,
-			'object' => objectName,
-			'fields' => fields,
-			'limit' => 200
-		};
+		return new Map<String, Object>{ 'version' => 1, 'object' => objectName, 'fields' => fields, 'limit' => 200 };
 	}
 
 	private static String request(Map<String, Object> query, Map<String, Object> extra) {
@@ -41,9 +36,7 @@ private class ReportingQueryServiceTest {
 		List<Account> accounts = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
 			accounts.add(
-				TestDataFactory.organization(
-					new Account(Name = 'Org ' + i, NumberOfEmployees = 10 * (i + 1))
-				)
+				TestDataFactory.organization(new Account(Name = 'Org ' + i, NumberOfEmployees = 10 * (i + 1)))
 			);
 		}
 		insert accounts;
@@ -59,21 +52,13 @@ private class ReportingQueryServiceTest {
 			}
 			Assert.isTrue(names.contains('Account'), 'Account is offered');
 			Assert.isTrue(names.contains('Contact'), 'Contact is offered');
-			Assert.isTrue(
-				names.contains(NamespaceUtil.qualify('Saved_Query__c')),
-				'A custom object'
-			);
-			Assert.isFalse(
-				names.contains(NamespaceUtil.qualify('BarnCRM_Settings__c')),
-				'A custom setting is not'
-			);
+			Assert.isTrue(names.contains(NamespaceUtil.qualify('Saved_Query__c')), 'A custom object');
+			Assert.isFalse(names.contains(NamespaceUtil.qualify('BarnCRM_Settings__c')), 'A custom setting is not');
 			Assert.isFalse(names.contains('Group'), 'Other standard objects are not');
 
 			Boolean contactsFound = false;
 			for (Map<String, String> child : ReportingQueryService.listChildren('Account')) {
-				contactsFound |=
-					child.get('object') == 'Contact' &&
-					child.get('field') == 'AccountId';
+				contactsFound |= child.get('object') == 'Contact' && child.get('field') == 'AccountId';
 			}
 			Assert.isTrue(contactsFound, 'A Contact is a related record of an Account');
 		}
@@ -88,10 +73,7 @@ private class ReportingQueryServiceTest {
 		}
 		System.runAs(ben) {
 			insert new Saved_Query__c(Name = 'Ben Query', Object_Name__c = 'Contact');
-			String table = request(
-				query('Saved_Query__c', new List<String>{ 'Name' }),
-				new Map<String, Object>()
-			);
+			String table = request(query('Saved_Query__c', new List<String>{ 'Name' }), new Map<String, Object>());
 			List<SObject> rows = (List<SObject>) ReportingQueryService.run(table).get('rows');
 			Assert.areEqual(1, rows.size(), 'Saved queries are private: Ben sees his own only');
 			Assert.areEqual('Ben Query', rows[0].get('Name'), 'His own');
@@ -99,9 +81,7 @@ private class ReportingQueryServiceTest {
 			String grouped = request(
 				query('Saved_Query__c', new List<String>{ 'Name' }),
 				new Map<String, Object>{
-					'groups' => new List<Object>{
-						new Map<String, Object>{ 'field' => 'Object_Name__c' }
-					},
+					'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'Object_Name__c' } },
 					'measures' => new List<Object>{ new Map<String, Object>{ 'fn' => 'count' } }
 				}
 			);
@@ -117,10 +97,7 @@ private class ReportingQueryServiceTest {
 			Boolean refused = false;
 			try {
 				ReportingQueryService.run(
-					request(
-						query('Saved_Query__c', new List<String>{ 'Name' }),
-						new Map<String, Object>()
-					)
+					request(query('Saved_Query__c', new List<String>{ 'Name' }), new Map<String, Object>())
 				);
 			} catch (AuraHandledException e) {
 				refused = true;
@@ -137,9 +114,7 @@ private class ReportingQueryServiceTest {
 				request(
 					query('Account', new List<String>{ 'Name' }),
 					new Map<String, Object>{
-						'groups' => new List<Object>{
-							new Map<String, Object>{ 'field' => 'OwnerId' }
-						},
+						'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'OwnerId' } },
 						'measures' => new List<Object>{
 							new Map<String, Object>{ 'fn' => 'count' },
 							new Map<String, Object>{ 'fn' => 'avg', 'path' => 'NumberOfEmployees' }
@@ -182,8 +157,7 @@ private class ReportingQueryServiceTest {
 			Assert.areEqual(1, totalRows.size(), 'A total with no grouping is one row');
 			Assert.areEqual(
 				30,
-				((Decimal) ((List<Object>) ((Map<String, Object>) totalRows[0]).get('values'))[0])
-					.intValue(),
+				((Decimal) ((List<Object>) ((Map<String, Object>) totalRows[0]).get('values'))[0]).intValue(),
 				'The metric'
 			);
 
@@ -201,17 +175,11 @@ private class ReportingQueryServiceTest {
 					}
 				)
 			);
-			Map<String, Object> month = (Map<String, Object>) ((List<Object>) byMonth.get(
-				'groups'
-			))[0];
+			Map<String, Object> month = (Map<String, Object>) ((List<Object>) byMonth.get('groups'))[0];
 			List<Object> keys = (List<Object>) ((List<Object>) month.get('keys'))[0];
 			Assert.areEqual(2, keys.size(), 'A month is its year and its number');
 			Assert.areEqual(Date.today().year(), keys[0], 'This year');
-			Assert.areEqual(
-				30,
-				((Decimal) ((List<Object>) month.get('values'))[0]).intValue(),
-				'Ten plus twenty'
-			);
+			Assert.areEqual(30, ((Decimal) ((List<Object>) month.get('values'))[0]).intValue(), 'Ten plus twenty');
 		}
 	}
 
@@ -225,9 +193,7 @@ private class ReportingQueryServiceTest {
 				request(
 					accounts,
 					new Map<String, Object>{
-						'groups' => new List<Object>{
-							new Map<String, Object>{ 'field' => 'Name' }
-						},
+						'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'Name' } },
 						'measures' => new List<Object>{ new Map<String, Object>{ 'fn' => 'count' } }
 					}
 				)
@@ -279,19 +245,12 @@ private class ReportingQueryServiceTest {
 			System.runAs(person) {
 				String exportRequest = request(
 					query('Account', new List<String>{ 'Name' }),
-					new Map<String, Object>{
-						'fields' => new List<Object>{ 'Name', 'name', 'ID', 'NumberOfEmployees' }
-					}
+					new Map<String, Object>{ 'fields' => new List<Object>{ 'Name', 'name', 'ID', 'NumberOfEmployees' } }
 				);
 				Boolean allowed = ReportingQueryService.canExport();
 				Boolean refused = false;
 				try {
-					Map<String, Object> exported = ReportingQueryService.page(
-						exportRequest,
-						null,
-						null,
-						true
-					);
+					Map<String, Object> exported = ReportingQueryService.page(exportRequest, null, null, true);
 					Assert.isNotNull(exported.get('rows'), 'A page of rows');
 				} catch (AuraHandledException e) {
 					refused = true;
@@ -313,10 +272,7 @@ private class ReportingQueryServiceTest {
 		Boolean refused = false;
 		try {
 			ReportingQueryService.read(
-				request(
-					query('Account', new List<String>{ 'Name' }),
-					new Map<String, Object>{ 'fields' => tooMany }
-				)
+				request(query('Account', new List<String>{ 'Name' }), new Map<String, Object>{ 'fields' => tooMany })
 			);
 		} catch (ReportingQueryService.ReportingException e) {
 			refused = true;
@@ -348,11 +304,7 @@ private class ReportingQueryServiceTest {
 					people,
 					new Map<String, Object>{
 						'summaries' => new List<Object>{
-							new Map<String, Object>{
-								'object' => 'Account',
-								'field' => 'OwnerId',
-								'fn' => 'count'
-							},
+							new Map<String, Object>{ 'object' => 'Account', 'field' => 'OwnerId', 'fn' => 'count' },
 							new Map<String, Object>{
 								'object' => 'Account',
 								'field' => 'OwnerId',
@@ -392,19 +344,13 @@ private class ReportingQueryServiceTest {
 			List<String> attempts = new List<String>{
 				'not json',
 				'{"query": "SELECT Id FROM Account"}',
-				request(
-					query('Account WHERE Name != null', new List<String>{ 'Name' }),
-					new Map<String, Object>()
-				),
+				request(query('Account WHERE Name != null', new List<String>{ 'Name' }), new Map<String, Object>()),
 				request(query('Group', new List<String>{ 'Name' }), new Map<String, Object>()),
 				request(
 					query(NamespaceUtil.qualify('BarnCRM_Settings__c'), new List<String>{ 'Name' }),
 					new Map<String, Object>()
 				),
-				request(
-					query('Account', new List<String>{ 'Name) FROM User --' }),
-					new Map<String, Object>()
-				),
+				request(query('Account', new List<String>{ 'Name) FROM User --' }), new Map<String, Object>()),
 				request(
 					query('Account', new List<String>{ 'Name' }),
 					new Map<String, Object>{
@@ -418,10 +364,7 @@ private class ReportingQueryServiceTest {
 					query('Account', new List<String>{ 'Name' }),
 					new Map<String, Object>{
 						'groups' => new List<Object>{
-							new Map<String, Object>{
-								'field' => 'CreatedDate',
-								'bucket' => 'month) FROM User --'
-							}
+							new Map<String, Object>{ 'field' => 'CreatedDate', 'bucket' => 'month) FROM User --' }
 						},
 						'measures' => new List<Object>{ new Map<String, Object>{ 'fn' => 'count' } }
 					}
@@ -429,9 +372,7 @@ private class ReportingQueryServiceTest {
 				request(
 					query('Account', new List<String>{ 'Name' }),
 					new Map<String, Object>{
-						'groups' => new List<Object>{
-							new Map<String, Object>{ 'field' => 'Name' }
-						},
+						'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'Name' } },
 						'measures' => new List<Object>{
 							new Map<String, Object>{ 'fn' => 'SUM(Id) x, COUNT', 'path' => 'Id' }
 						}
@@ -440,12 +381,8 @@ private class ReportingQueryServiceTest {
 				request(
 					query('Account', new List<String>{ 'Name' }),
 					new Map<String, Object>{
-						'groups' => new List<Object>{
-							new Map<String, Object>{ 'field' => 'Name' }
-						},
-						'measures' => new List<Object>{
-							new Map<String, Object>{ 'fn' => 'sum', 'path' => 'Name' }
-						}
+						'groups' => new List<Object>{ new Map<String, Object>{ 'field' => 'Name' } },
+						'measures' => new List<Object>{ new Map<String, Object>{ 'fn' => 'sum', 'path' => 'Name' } }
 					}
 				),
 				request(
@@ -458,11 +395,7 @@ private class ReportingQueryServiceTest {
 					query('Account', new List<String>{ 'Name' }),
 					new Map<String, Object>{
 						'summaries' => new List<Object>{
-							new Map<String, Object>{
-								'object' => 'Contact',
-								'field' => 'OwnerId',
-								'fn' => 'count'
-							}
+							new Map<String, Object>{ 'object' => 'Contact', 'field' => 'OwnerId', 'fn' => 'count' }
 						}
 					}
 				)
@@ -483,9 +416,7 @@ private class ReportingQueryServiceTest {
 					request(
 						query('Account', new List<String>{ 'Name' }),
 						new Map<String, Object>{
-							'measures' => new List<Object>{
-								new Map<String, Object>{ 'fn' => 'count' }
-							}
+							'measures' => new List<Object>{ new Map<String, Object>{ 'fn' => 'count' } }
 						}
 					),
 					'001\' OR Id != null',
@@ -512,9 +443,7 @@ private class ReportingQueryServiceTest {
 					}
 				}
 			);
-			List<SObject> rows = (List<SObject>) ReportingQueryService.run(
-					request(quoted, new Map<String, Object>())
-				)
+			List<SObject> rows = (List<SObject>) ReportingQueryService.run(request(quoted, new Map<String, Object>()))
 				.get('rows');
 			Assert.areEqual(0, rows.size(), 'A quoted value is a bound value, not SOQL');
 		}

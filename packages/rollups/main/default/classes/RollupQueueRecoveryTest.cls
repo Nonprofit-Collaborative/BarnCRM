@@ -33,18 +33,14 @@ private class RollupQueueRecoveryTest {
 
 	private static Account organization() {
 		Account created = TestDataFactory.organization(
-			new Account(
-				Name = 'Organization',
-				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-			)
+			new Account(Name = 'Organization', RecordTypeId = AccountKindsTestData.organizationRecordTypeId())
 		);
 		insert created;
 		return created;
 	}
 
 	private static Integer countOn(Id organizationId) {
-		Integer count = [SELECT NumberOfEmployees FROM Account WHERE Id = :organizationId]
-		.NumberOfEmployees;
+		Integer count = [SELECT NumberOfEmployees FROM Account WHERE Id = :organizationId].NumberOfEmployees;
 		return count == null ? 0 : count;
 	}
 
@@ -64,9 +60,7 @@ private class RollupQueueRecoveryTest {
 			insert staffCount();
 			Account organization = organization();
 			AutomationControl.bypass('Core_Rollups_Contact');
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Ames', AccountId = organization.Id)
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = organization.Id));
 			AutomationControl.clearBypass('Core_Rollups_Contact');
 			insert new Rollup_Queue__c(
 				Target_Object__c = 'Account',
@@ -110,13 +104,9 @@ private class RollupQueueRecoveryTest {
 			insert stuck;
 			Test.setCreatedDate(stuck.Id, Datetime.now().addHours(-2));
 
-			HealthCheckService.Finding finding = new RollupsHealthCheckExtension.RollupQueueCheck()
-				.run();
+			HealthCheckService.Finding finding = new RollupsHealthCheckExtension.RollupQueueCheck().run();
 			Assert.areEqual('rollup_queue_stuck', finding.getKey(), 'Waiting two hours is stuck');
-			Assert.isTrue(
-				finding.getFixTarget().contains('Rollup_Builder'),
-				'Fixed in Needs attention'
-			);
+			Assert.isTrue(finding.getFixTarget().contains('Rollup_Builder'), 'Fixed in Needs attention');
 
 			insert new Rollup_Queue__c(
 				Target_Object__c = 'Account',
@@ -126,22 +116,11 @@ private class RollupQueueRecoveryTest {
 				Status__c = RollupQueue.STATUS_FAILED
 			);
 			finding = new RollupsHealthCheckExtension.RollupQueueCheck().run();
-			Assert.areEqual(
-				'rollup_queue_failed',
-				finding.getKey(),
-				'A failed entry is the finding to act on first'
-			);
-			Assert.areEqual(
-				HealthCheckService.SEVERITY_WARNING,
-				finding.getSeverity(),
-				'It is a warning'
-			);
+			Assert.areEqual('rollup_queue_failed', finding.getKey(), 'A failed entry is the finding to act on first');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.getSeverity(), 'It is a warning');
 
 			delete [SELECT Id FROM Rollup_Queue__c];
-			Assert.isNull(
-				new RollupsHealthCheckExtension.RollupQueueCheck().run(),
-				'An empty queue is no finding'
-			);
+			Assert.isNull(new RollupsHealthCheckExtension.RollupQueueCheck().run(), 'An empty queue is no finding');
 		}
 	}
 

@@ -52,9 +52,7 @@ public with sharing class AcknowledgmentService {
 		List<Gift__c> undecided = new List<Gift__c>();
 		for (Gift__c gift : gifts) {
 			if (
-				AcknowledgmentRuleService.STATUS_DO_NOT_ACKNOWLEDGE.equals(
-					gift.Acknowledgment_Status__c
-				) ||
+				AcknowledgmentRuleService.STATUS_DO_NOT_ACKNOWLEDGE.equals(gift.Acknowledgment_Status__c) ||
 				AcknowledgmentRuleService.STATUS_ACKNOWLEDGED.equals(gift.Acknowledgment_Status__c)
 			) {
 				continue;
@@ -80,18 +78,12 @@ public with sharing class AcknowledgmentService {
 				gift.Acknowledgment_Status__c = AcknowledgmentRuleService.STATUS_NOT_REQUIRED;
 				continue;
 			}
-			AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(
-				gift,
-				rules,
-				earlierDonors
-			);
+			AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(gift, rules, earlierDonors);
 			if (match == null) {
 				// No rule covers this gift, so the package has no opinion about it (R-AK1).
 				continue;
 			}
-			gift.Acknowledgment_Status__c = AcknowledgmentRuleService.CHANNEL_NONE.equals(
-					match.channel
-				)
+			gift.Acknowledgment_Status__c = AcknowledgmentRuleService.CHANNEL_NONE.equals(match.channel)
 				? AcknowledgmentRuleService.STATUS_NOT_REQUIRED
 				: AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE;
 		}
@@ -115,12 +107,8 @@ public with sharing class AcknowledgmentService {
 			if (before == null) {
 				continue;
 			}
-			Boolean nowQueued = AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE.equals(
-				gift.Acknowledgment_Status__c
-			);
-			Boolean wasQueued = AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE.equals(
-				before.Acknowledgment_Status__c
-			);
+			Boolean nowQueued = AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE.equals(gift.Acknowledgment_Status__c);
+			Boolean wasQueued = AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE.equals(before.Acknowledgment_Status__c);
 			if (nowQueued && !wasQueued) {
 				requeued.add(gift.Id);
 			}
@@ -171,11 +159,7 @@ public with sharing class AcknowledgmentService {
 		List<String> unreachable = new List<String>();
 
 		for (Gift__c gift : gifts) {
-			AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(
-				gift,
-				rules,
-				earlierDonors
-			);
+			AcknowledgmentRuleService.RuleMatch match = AcknowledgmentRuleService.matchFor(gift, rules, earlierDonors);
 			if (match == null || !AcknowledgmentRuleService.CHANNEL_EMAIL.equals(match.channel)) {
 				// A letter gift and an unmatched gift are both somebody else's business.
 				continue;
@@ -201,10 +185,7 @@ public with sharing class AcknowledgmentService {
 			ErrorLogger.logMessage(
 				String.format(
 					BarnHelp.text('Giving', 'Giving_Acknowledgment_NoRecipient'),
-					new List<String>{
-						String.valueOf(unreachable.size()),
-						String.join(unreachable, ', ')
-					}
+					new List<String>{ String.valueOf(unreachable.size()), String.join(unreachable, ', ') }
 				),
 				CONTEXT_SEND,
 				ErrorLogger.SEVERITY_WARNING,
@@ -215,12 +196,8 @@ public with sharing class AcknowledgmentService {
 			return counts;
 		}
 
-		Map<Id, Contact> recipients = AcknowledgmentSelector.contactsById(
-			new Set<Id>(recipientIds)
-		);
-		Map<String, Id> templateIds = GivingEmailTemplates.idsByDeveloperName(
-			developerNamesOf(matches)
-		);
+		Map<Id, Contact> recipients = AcknowledgmentSelector.contactsById(new Set<Id>(recipientIds));
+		Map<String, Id> templateIds = GivingEmailTemplates.idsByDeveloperName(developerNamesOf(matches));
 
 		// Pass two: claim. The row is written before anything is sent, so the claim is real.
 		List<Acknowledgment__c> rows = new List<Acknowledgment__c>();
@@ -278,9 +255,7 @@ public with sharing class AcknowledgmentService {
 					sendable[index].Id,
 					row.Recipient_Contact__c,
 					templateId,
-					brandSenders.containsKey(sendable[index].Id)
-						? brandSenders.get(sendable[index].Id)
-						: fromAddressId
+					brandSenders.containsKey(sendable[index].Id) ? brandSenders.get(sendable[index].Id) : fromAddressId
 				)
 			);
 			messageRows.add(row);
@@ -373,9 +348,7 @@ public with sharing class AcknowledgmentService {
 				recipientByGift.put(gift.Id, recipientId);
 			}
 		}
-		Set<Id> optedOutContacts = AcknowledgmentSelector.optedOutOfEmail(
-			new Set<Id>(recipientByGift.values())
-		);
+		Set<Id> optedOutContacts = AcknowledgmentSelector.optedOutOfEmail(new Set<Id>(recipientByGift.values()));
 		for (Id giftId : recipientByGift.keySet()) {
 			if (optedOutContacts.contains(recipientByGift.get(giftId))) {
 				giftIds.add(giftId);
@@ -412,9 +385,7 @@ public with sharing class AcknowledgmentService {
 
 	public static void requireSendPermission() {
 		if (!canSend()) {
-			throw new AcknowledgmentException(
-				BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission')
-			);
+			throw new AcknowledgmentException(BarnHelp.text('Giving', 'Giving_Acknowledgment_NoPermission'));
 		}
 	}
 

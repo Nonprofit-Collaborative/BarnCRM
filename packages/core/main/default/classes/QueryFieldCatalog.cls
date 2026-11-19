@@ -174,12 +174,7 @@ public with sharing class QueryFieldCatalog {
 			return objectsRead.get(key);
 		}
 		Schema.DescribeSObjectResult found = NamespaceUtil.describe(objectApiName);
-		if (
-			found == null ||
-			!found.isAccessible() ||
-			!found.isQueryable() ||
-			isSystemObject(found)
-		) {
+		if (found == null || !found.isAccessible() || !found.isQueryable() || isSystemObject(found)) {
 			throw unknownObject(objectApiName);
 		}
 		objectsRead.put(key, found);
@@ -205,9 +200,7 @@ public with sharing class QueryFieldCatalog {
 			current = describeObject(lookup.getReferenceTo()[0].getDescribe().getName());
 		}
 		String leafName = segments[segments.size() - 1];
-		Schema.SObjectField leaf = NAME.matcher(leafName).matches()
-			? current.fields.getMap().get(leafName)
-			: null;
+		Schema.SObjectField leaf = NAME.matcher(leafName).matches() ? current.fields.getMap().get(leafName) : null;
 		if (leaf == null || !isOffered(leaf.getDescribe())) {
 			throw unknownField(path);
 		}

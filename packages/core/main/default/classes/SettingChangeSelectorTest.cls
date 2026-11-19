@@ -43,11 +43,7 @@ private class SettingChangeSelectorTest {
 			List<Setting_Change__c> withZero = SettingChangeSelector.getRecent(0);
 			Test.stopTest();
 
-			Assert.areEqual(
-				5,
-				withoutLimit.size(),
-				'No number means the default of ten, and there are five'
-			);
+			Assert.areEqual(5, withoutLimit.size(), 'No number means the default of ten, and there are five');
 			Assert.areEqual(5, withZero.size(), 'Zero means the same');
 		}
 	}

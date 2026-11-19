@@ -60,9 +60,7 @@ private class RollupRecalcActionTest {
 			insert child;
 
 			Test.startTest();
-			RollupRecalcAction.recalculate(
-				new List<RollupRecalcAction.Request>{ request(child, null) }
-			);
+			RollupRecalcAction.recalculate(new List<RollupRecalcAction.Request>{ request(child, null) });
 			Test.stopTest();
 
 			System.Assert.areEqual(1, countOn(parent.Id), 'The flow action counted the new record');
@@ -78,9 +76,7 @@ private class RollupRecalcActionTest {
 			insert new List<Account>{ oldParent, newParent };
 			Account child = organization('Child', oldParent.Id);
 			insert child;
-			RollupRecalcAction.recalculate(
-				new List<RollupRecalcAction.Request>{ request(child, null) }
-			);
+			RollupRecalcAction.recalculate(new List<RollupRecalcAction.Request>{ request(child, null) });
 			System.Assert.areEqual(1, countOn(oldParent.Id), 'Counted under its first parent');
 
 			Account prior = child.clone(true, true, true, true);
@@ -88,16 +84,10 @@ private class RollupRecalcActionTest {
 			update child;
 
 			Test.startTest();
-			RollupRecalcAction.recalculate(
-				new List<RollupRecalcAction.Request>{ request(child, prior) }
-			);
+			RollupRecalcAction.recalculate(new List<RollupRecalcAction.Request>{ request(child, prior) });
 			Test.stopTest();
 
-			System.Assert.areEqual(
-				0,
-				countOn(oldParent.Id),
-				'The prior values marked the old parent'
-			);
+			System.Assert.areEqual(0, countOn(oldParent.Id), 'The prior values marked the old parent');
 			System.Assert.areEqual(1, countOn(newParent.Id), 'The new parent counts it');
 		}
 	}
@@ -110,9 +100,7 @@ private class RollupRecalcActionTest {
 			insert parent;
 			Account child = organization('Child', parent.Id);
 			insert child;
-			RollupRecalcAction.recalculate(
-				new List<RollupRecalcAction.Request>{ request(child, null) }
-			);
+			RollupRecalcAction.recalculate(new List<RollupRecalcAction.Request>{ request(child, null) });
 
 			RollupRecalcAction.Request deleting = request(child, null);
 			deleting.deleting = true;
@@ -188,9 +176,7 @@ private class RollupRecalcActionTest {
 			}
 
 			Test.startTest();
-			RollupRecalcAction.recalculate(
-				new List<RollupRecalcAction.Request>{ request(child, null) }
-			);
+			RollupRecalcAction.recalculate(new List<RollupRecalcAction.Request>{ request(child, null) });
 			Test.stopTest();
 
 			System.Assert.isNull(countOn(parent.Id), 'Paused automation leaves the total alone');
@@ -203,9 +189,7 @@ private class RollupRecalcActionTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Test.startTest();
 			RollupRecalcAction.recalculate(null);
-			RollupRecalcAction.recalculate(
-				new List<RollupRecalcAction.Request>{ new RollupRecalcAction.Request() }
-			);
+			RollupRecalcAction.recalculate(new List<RollupRecalcAction.Request>{ new RollupRecalcAction.Request() });
 			Test.stopTest();
 
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Queue__c], 'Nothing was queued');

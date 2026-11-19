@@ -14,18 +14,11 @@ private class InboundGiftAccessTest {
 	@TestSetup
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			User integration = TestDataFactory.createUser(
-				'InboundOnly',
-				new List<String>{ 'Inbound_Gifts' }
-			);
+			User integration = TestDataFactory.createUser('InboundOnly', new List<String>{ 'Inbound_Gifts' });
 			TestDataFactory.pausedSettings(1);
 			insert new List<Fund__c>{
 				new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true),
-				new Fund__c(
-					Name = 'Building Fund',
-					Active__c = true,
-					Accounting_Code__c = BUILDING_CODE
-				)
+				new Fund__c(Name = 'Building Fund', Active__c = true, Accounting_Code__c = BUILDING_CODE)
 			};
 			insert new Appeal__c(Name = 'Spring Appeal');
 			Account household = TestDataFactory.household(
@@ -118,15 +111,9 @@ private class InboundGiftAccessTest {
 					(SELECT Fund__r.Accounting_Code__c, Amount__c FROM Gift_Allocations__r)
 				FROM Gift__c
 			];
-			Assert.areEqual(
-				[SELECT Id FROM Contact WHERE Email = :EMAIL].Id,
-				recorded.Donor_Contact__c
-			);
+			Assert.areEqual([SELECT Id FROM Contact WHERE Email = :EMAIL].Id, recorded.Donor_Contact__c);
 			Assert.areEqual(1, recorded.Gift_Allocations__r.size());
-			Assert.areEqual(
-				BUILDING_CODE,
-				recorded.Gift_Allocations__r[0].Fund__r.Accounting_Code__c
-			);
+			Assert.areEqual(BUILDING_CODE, recorded.Gift_Allocations__r[0].Fund__r.Accounting_Code__c);
 			Assert.areEqual(50, recorded.Gift_Allocations__r[0].Amount__c);
 			Assert.areEqual(
 				1,
@@ -162,11 +149,7 @@ private class InboundGiftAccessTest {
 				Test.stopTest();
 			}
 
-			Assert.areEqual(
-				InboundGiftResult.OUTCOME_CREATED,
-				results[0].outcome,
-				results[0].message
-			);
+			Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, results[0].outcome, results[0].message);
 		}
 	}
 
@@ -194,10 +177,7 @@ private class InboundGiftAccessTest {
 			for (InboundGiftResult result : results) {
 				Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, result.outcome, result.message);
 			}
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__r.Name = 'General Fund']
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Gift_Allocation__c WHERE Fund__r.Name = 'General Fund']);
 		}
 	}
 }

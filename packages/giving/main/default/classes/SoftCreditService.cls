@@ -48,10 +48,7 @@ public with sharing class SoftCreditService {
 	 * or unreadable setting is treated as on, because that is what the package ships with.
 	 */
 	public static Boolean automaticHouseholdCreditsEnabled() {
-		Object stored = SettingsService.getValue(
-			SETTINGS_OBJECT,
-			SETTING_AUTOMATIC_HOUSEHOLD_CREDITS
-		);
+		Object stored = SettingsService.getValue(SETTINGS_OBJECT, SETTING_AUTOMATIC_HOUSEHOLD_CREDITS);
 		if (stored == null) {
 			return true;
 		}
@@ -244,10 +241,7 @@ public with sharing class SoftCreditService {
 	 * a different role. The two callers pass disjoint roles, so each one's existing list is its
 	 * own: passing credits of one role against wanted credits of another would delete them.
 	 */
-	public static void reconcileAutomaticCredits(
-		Map<String, Soft_Credit__c> wanted,
-		List<Soft_Credit__c> existing
-	) {
+	public static void reconcileAutomaticCredits(Map<String, Soft_Credit__c> wanted, List<Soft_Credit__c> existing) {
 		List<Soft_Credit__c> toUpdate = new List<Soft_Credit__c>();
 		List<Soft_Credit__c> toDelete = new List<Soft_Credit__c>();
 		Set<String> seen = new Set<String>();
@@ -266,11 +260,7 @@ public with sharing class SoftCreditService {
 				// Only the fields being changed: a user mode update of the row as read would
 				// also carry the master detail to the gift, which nobody may edit.
 				toUpdate.add(
-					new Soft_Credit__c(
-						Id = credit.Id,
-						Amount__c = target.Amount__c,
-						Percent__c = target.Percent__c
-					)
+					new Soft_Credit__c(Id = credit.Id, Amount__c = target.Amount__c, Percent__c = target.Percent__c)
 				);
 			}
 		}
@@ -293,13 +283,7 @@ public with sharing class SoftCreditService {
 		}
 	}
 
-	private static Soft_Credit__c build(
-		Id giftId,
-		Id personId,
-		String role,
-		Decimal amount,
-		Decimal giftAmount
-	) {
+	private static Soft_Credit__c build(Id giftId, Id personId, String role, Decimal amount, Decimal giftAmount) {
 		Soft_Credit__c credit = new Soft_Credit__c(
 			Gift__c = giftId,
 			Role__c = role,

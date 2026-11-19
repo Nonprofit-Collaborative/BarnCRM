@@ -14,10 +14,7 @@ private class RollupDlrsImportTest {
 	static void createTestUser() {
 		// Built once for the class rather than in every test that runs as her.
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 		}
 	}
 
@@ -26,12 +23,7 @@ private class RollupDlrsImportTest {
 	}
 
 	/** An active DLRS rollup of child organizations into their parent, with these values. */
-	private static RollupDlrs.Definition dlrs(
-		String key,
-		String operation,
-		String field,
-		Map<String, Object> extra
-	) {
+	private static RollupDlrs.Definition dlrs(String key, String operation, String field, Map<String, Object> extra) {
 		Map<String, Object> values = new Map<String, Object>{
 			'Active__c' => true,
 			'ParentObject__c' => 'Account',
@@ -45,9 +37,7 @@ private class RollupDlrsImportTest {
 		return RollupDlrsFake.rollup(key, values);
 	}
 
-	private static Map<String, RollupDlrsImport.Candidate> byKey(
-		List<RollupDlrsImport.Candidate> candidates
-	) {
+	private static Map<String, RollupDlrsImport.Candidate> byKey(List<RollupDlrsImport.Candidate> candidates) {
 		Map<String, RollupDlrsImport.Candidate> found = new Map<String, RollupDlrsImport.Candidate>();
 		for (RollupDlrsImport.Candidate candidate : candidates) {
 			found.put(candidate.key, candidate);
@@ -77,10 +67,7 @@ private class RollupDlrsImportTest {
 				RollupDlrsImport.importRollups(new List<String>{ 'Anything' }, null).isEmpty(),
 				'Nothing copied'
 			);
-			Assert.isFalse(
-				RollupBuilderController.getModel().canImportFromDlrs,
-				'The Builder offers no import'
-			);
+			Assert.isFalse(RollupBuilderController.getModel().canImportFromDlrs, 'The Builder offers no import');
 		}
 	}
 
@@ -89,9 +76,7 @@ private class RollupDlrsImportTest {
 		// An administrator creates David: a user on the standard profile cannot insert a user.
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) });
 			String message;
 			System.runAs(david) {
 				try {
@@ -100,11 +85,7 @@ private class RollupDlrsImportTest {
 					message = refused.getMessage();
 				}
 			}
-			Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
-				message,
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'), message, 'Refused');
 		}
 	}
 
@@ -139,12 +120,7 @@ private class RollupDlrsImportTest {
 						COUNT_FIELD,
 						new Map<String, Object>{ 'FieldToAggregate__c' => 'NumberOfEmployees' }
 					),
-					dlrs(
-						'R_Count',
-						'Count',
-						COUNT_FIELD,
-						new Map<String, Object>{ 'FieldToAggregate__c' => 'Id' }
-					),
+					dlrs('R_Count', 'Count', COUNT_FIELD, new Map<String, Object>{ 'FieldToAggregate__c' => 'Id' }),
 					dlrs(
 						'R_Distinct',
 						'Count Distinct',
@@ -155,19 +131,13 @@ private class RollupDlrsImportTest {
 						'R_List',
 						'Concatenate',
 						TEXT_FIELD,
-						new Map<String, Object>{
-							'FieldToAggregate__c' => 'Name',
-							'ConcatenateDelimiter__c' => ', '
-						}
+						new Map<String, Object>{ 'FieldToAggregate__c' => 'Name', 'ConcatenateDelimiter__c' => ', ' }
 					),
 					dlrs(
 						'R_List_Distinct',
 						'Concatenate  Distinct',
 						TEXT_FIELD,
-						new Map<String, Object>{
-							'FieldToAggregate__c' => 'Name',
-							'ConcatenateDelimiter__c' => '; '
-						}
+						new Map<String, Object>{ 'FieldToAggregate__c' => 'Name', 'ConcatenateDelimiter__c' => '; ' }
 					),
 					dlrs(
 						'R_First',
@@ -187,18 +157,11 @@ private class RollupDlrsImportTest {
 							'FieldToOrderBy__c' => 'CreatedDate ASC NULLS LAST'
 						}
 					),
-					dlrs(
-						'R_Inactive',
-						'Sum',
-						COUNT_FIELD,
-						new Map<String, Object>{ 'Active__c' => false }
-					)
+					dlrs('R_Inactive', 'Sum', COUNT_FIELD, new Map<String, Object>{ 'Active__c' => false })
 				}
 			);
 
-			Map<String, RollupDlrsImport.Candidate> found = byKey(
-				RollupDlrsImport.getCandidates(null)
-			);
+			Map<String, RollupDlrsImport.Candidate> found = byKey(RollupDlrsImport.getCandidates(null));
 
 			Map<String, String> aggregateByKey = new Map<String, String>{
 				'R_Sum' => 'SUM',
@@ -228,10 +191,7 @@ private class RollupDlrsImportTest {
 			Assert.areEqual('Semicolon', found.get('R_List_Distinct').draft.delimiter, 'Semicolon');
 			Assert.areEqual('CreatedDate', found.get('R_First').draft.orderByField, 'Order');
 			Assert.isFalse(
-				found.get('R_First')
-					.notes.contains(
-						BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteBlanksLast')
-					),
+				found.get('R_First').notes.contains(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteBlanksLast')),
 				'NULLS LAST is how BarnCRM orders already'
 			);
 			Assert.isTrue(
@@ -335,21 +295,14 @@ private class RollupDlrsImportTest {
 				}
 			);
 
-			Map<String, RollupDlrsImport.Candidate> found = byKey(
-				RollupDlrsImport.getCandidates(null)
-			);
+			Map<String, RollupDlrsImport.Candidate> found = byKey(RollupDlrsImport.getCandidates(null));
 
 			RollupDlrsImport.Candidate counted = found.get('Counted_Field');
 			Assert.isTrue(counted.importable, String.valueOf(counted.reasons));
-			Map<String, Object> filter = (Map<String, Object>) JSON.deserializeUntyped(
-				counted.draft.filterJson
-			);
+			Map<String, Object> filter = (Map<String, Object>) JSON.deserializeUntyped(counted.draft.filterJson);
 			Assert.areEqual('(1) AND 2', filter.get('logic'), 'The criteria and the counted field');
 			Assert.isTrue(
-				startsLike(
-					counted.notes,
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCountField')
-				),
+				startsLike(counted.notes, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCountField')),
 				'Said'
 			);
 			Assert.isTrue(counted.draft.includeDeleted, 'All rows include deleted records');
@@ -359,37 +312,23 @@ private class RollupDlrsImportTest {
 			Assert.areEqual('LAST', newest.draft.aggregate, 'A descending First is a Last');
 			Assert.isNull(newest.draft.rowLimit, 'No row limit on a single value');
 			Assert.isTrue(
-				newest.notes.contains(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteRowLimitFirst')
-				),
+				newest.notes.contains(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteRowLimitFirst')),
 				'Said'
 			);
 			Assert.isTrue(
-				newest.notes.contains(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteSystemMode')
-				),
+				newest.notes.contains(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteSystemMode')),
 				'Said'
 			);
 			Assert.isTrue(
-				startsLike(
-					newest.notes,
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCalledByCode')
-				),
+				startsLike(newest.notes, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteCalledByCode')),
 				'Said'
 			);
-			Assert.areEqual(
-				RollupService.MODE_BOTH,
-				newest.draft.mode,
-				'Updated as records change'
-			);
+			Assert.areEqual(RollupService.MODE_BOTH, newest.draft.mode, 'Updated as records change');
 
 			RollupDlrsImport.Candidate unordered = found.get('Unordered_Name');
 			Assert.areEqual('Name', unordered.draft.orderByField, 'Ordered by the field itself');
 			Assert.isTrue(
-				startsLike(
-					unordered.notes,
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoOrder')
-				),
+				startsLike(unordered.notes, BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoOrder')),
 				'Said'
 			);
 
@@ -414,22 +353,14 @@ private class RollupDlrsImportTest {
 			);
 
 			RollupDlrsImport.Candidate plain = found.get('Names_Plain');
-			Assert.areEqual(
-				RollupService.MODE_SCHEDULED,
-				plain.draft.mode,
-				'Nightly stays nightly'
-			);
+			Assert.areEqual(RollupService.MODE_SCHEDULED, plain.draft.mode, 'Nightly stays nightly');
 			Assert.areEqual('Comma', plain.draft.delimiter, 'No delimiter is a comma');
 			Assert.isTrue(
-				plain.notes.contains(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoDelimiter')
-				),
+				plain.notes.contains(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteNoDelimiter')),
 				'Said'
 			);
 			Assert.isTrue(
-				plain.notes.contains(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteBlanksLast')
-				),
+				plain.notes.contains(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsNoteBlanksLast')),
 				'Said'
 			);
 
@@ -524,9 +455,7 @@ private class RollupDlrsImportTest {
 				}
 			);
 
-			Map<String, RollupDlrsImport.Candidate> found = byKey(
-				RollupDlrsImport.getCandidates(null)
-			);
+			Map<String, RollupDlrsImport.Candidate> found = byKey(RollupDlrsImport.getCandidates(null));
 
 			Map<String, String> templateByKey = new Map<String, String>{
 				'Median' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOperation'),
@@ -534,10 +463,7 @@ private class RollupDlrsImportTest {
 				'Two_Orders' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOrder'),
 				'Blanks_First' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonOrder'),
 				'Limited_Last' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonRowLimit'),
-				'Long_Delimiter' => BarnHelp.text(
-					'Rollups',
-					'Core_RollupBuilder_DlrsReasonDelimiter'
-				),
+				'Long_Delimiter' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonDelimiter'),
 				'No_Path' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonPath'),
 				'Filled' => BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonFilled'),
 				'Wrong_Type' => BarnHelp.text('Rollups', 'Core_Rollups_ErrorTextTarget')
@@ -560,11 +486,7 @@ private class RollupDlrsImportTest {
 				Assert.areEqual(RollupDlrsImport.REFUSED, row.outcome, row.key);
 				Assert.isNotNull(row.reason, row.key + ' says why');
 			}
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Rollup_Definition__c WITH USER_MODE],
-				'Nothing copied'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Rollup_Definition__c WITH USER_MODE], 'Nothing copied');
 		}
 	}
 
@@ -598,10 +520,7 @@ private class RollupDlrsImportTest {
 				first[0].confirmation,
 				'What to ask before turning it on'
 			);
-			Assert.isTrue(
-				RollupBuilderController.getModel().canImportFromDlrs,
-				'The Builder offers the import'
-			);
+			Assert.isTrue(RollupBuilderController.getModel().canImportFromDlrs, 'The Builder offers the import');
 			Rollup_Definition__c copy = [
 				SELECT Name, Definition_Key__c, Active__c, Aggregate__c
 				FROM Rollup_Definition__c
@@ -617,22 +536,15 @@ private class RollupDlrsImportTest {
 	@IsTest
 	static void theCompareStepShowsBothValuesAndSavesNothing() {
 		System.runAs(maria()) {
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) }
-			);
-			Account parent = TestDataFactory.organization(
-				new Account(Name = 'Parent Org', Member_Count__c = 2)
-			);
-			Account stale = TestDataFactory.organization(
-				new Account(Name = 'Stale Org', Member_Count__c = 7)
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) });
+			Account parent = TestDataFactory.organization(new Account(Name = 'Parent Org', Member_Count__c = 2));
+			Account stale = TestDataFactory.organization(new Account(Name = 'Stale Org', Member_Count__c = 7));
 			insert new List<Account>{ parent, stale };
 			insert new List<Account>{
 				TestDataFactory.organization(new Account(Name = 'Child 1', ParentId = parent.Id)),
 				TestDataFactory.organization(new Account(Name = 'Child 2', ParentId = parent.Id))
 			};
-			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0]
-				.recordId;
+			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0].recordId;
 
 			Test.startTest();
 			List<RollupDlrsImport.Comparison> compared = RollupDlrsImport.compare(copyId);
@@ -649,8 +561,7 @@ private class RollupDlrsImportTest {
 			Assert.isNotNull(byRecord.get(stale.Id).difference, 'Says how');
 			Assert.areEqual(
 				7,
-				[SELECT Member_Count__c FROM Account WHERE Id = :stale.Id WITH USER_MODE]
-				.Member_Count__c,
+				[SELECT Member_Count__c FROM Account WHERE Id = :stale.Id WITH USER_MODE].Member_Count__c,
 				'Nothing written'
 			);
 		}
@@ -659,11 +570,8 @@ private class RollupDlrsImportTest {
 	@IsTest
 	static void aCopyIsTurnedOnOnlyWithTheConfirmationWhichIsRecorded() {
 		System.runAs(maria()) {
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) }
-			);
-			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0]
-				.recordId;
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) });
+			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0].recordId;
 
 			String refusal;
 			try {
@@ -671,14 +579,9 @@ private class RollupDlrsImportTest {
 			} catch (AuraHandledException refused) {
 				refusal = refused.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsActivateNeedsConfirm'),
-				refusal,
-				'Asks'
-			);
+			Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsActivateNeedsConfirm'), refusal, 'Asks');
 			Assert.isFalse(
-				[SELECT Active__c FROM Rollup_Definition__c WHERE Id = :copyId WITH USER_MODE]
-				.Active__c,
+				[SELECT Active__c FROM Rollup_Definition__c WHERE Id = :copyId WITH USER_MODE].Active__c,
 				'Still off'
 			);
 
@@ -686,8 +589,7 @@ private class RollupDlrsImportTest {
 
 			Assert.areEqual(RollupDlrsImport.ACTIVE, turnedOn.outcome, 'Turned on');
 			Assert.isTrue(
-				[SELECT Active__c FROM Rollup_Definition__c WHERE Id = :copyId WITH USER_MODE]
-				.Active__c,
+				[SELECT Active__c FROM Rollup_Definition__c WHERE Id = :copyId WITH USER_MODE].Active__c,
 				'On'
 			);
 			List<Setting_Change__c> changes = [
@@ -704,9 +606,7 @@ private class RollupDlrsImportTest {
 			RollupDlrsImport.Candidate again = RollupDlrsImport.getCandidates(null)[0];
 			Assert.isFalse(again.importable, 'Not copied twice');
 			Assert.isTrue(
-				again.reasons.contains(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonAlreadyOn')
-				),
+				again.reasons.contains(BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsReasonAlreadyOn')),
 				'Already on'
 			);
 		}
@@ -719,14 +619,8 @@ private class RollupDlrsImportTest {
 			'same number' => new List<Object>{ 2, 2.0 },
 			'same text' => new List<Object>{ 'a, b', 'a, b' },
 			'blank text' => new List<Object>{ '', null },
-			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareBlankZero') => new List<Object>{
-				0,
-				null
-			},
-			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareDiffer') => new List<Object>{
-				'a',
-				'b'
-			}
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareBlankZero') => new List<Object>{ 0, null },
+			BarnHelp.text('Rollups', 'Core_RollupBuilder_DlrsCompareDiffer') => new List<Object>{ 'a', 'b' }
 		};
 		for (String expected : valuesByExpected.keySet()) {
 			RollupEngine.Preview preview = new RollupEngine.Preview();

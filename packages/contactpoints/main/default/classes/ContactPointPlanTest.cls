@@ -11,9 +11,7 @@ private class ContactPointPlanTest {
 		ContactPointPlan.ADDRESS
 	};
 
-	private static Map<String, ContactPointPlan.Desired> byKey(
-		List<ContactPointPlan.Desired> plan
-	) {
+	private static Map<String, ContactPointPlan.Desired> byKey(List<ContactPointPlan.Desired> plan) {
 		Map<String, ContactPointPlan.Desired> result = new Map<String, ContactPointPlan.Desired>();
 		for (ContactPointPlan.Desired wanted : plan) {
 			result.put(wanted.key(), wanted);
@@ -26,10 +24,7 @@ private class ContactPointPlanTest {
 		Assert.areEqual('PersonEmail', ContactPointPlan.accountFieldFor('Email'));
 		Assert.areEqual('PersonHomePhone', ContactPointPlan.accountFieldFor('HomePhone'));
 		Assert.areEqual('Phone', ContactPointPlan.accountFieldFor('Phone'));
-		Assert.areEqual(
-			'Personal_Email__pc',
-			ContactPointPlan.accountFieldFor('Personal_Email__c')
-		);
+		Assert.areEqual('Personal_Email__pc', ContactPointPlan.accountFieldFor('Personal_Email__c'));
 		Assert.areEqual(
 			ContactPointPlan.personFields().size(),
 			ContactPointPlan.accountFields().size(),
@@ -49,9 +44,7 @@ private class ContactPointPlanTest {
 			'Phone' => '555.010.0002'
 		};
 
-		Map<String, ContactPointPlan.Desired> plan = byKey(
-			ContactPointPlan.plan(person, null, ALL_KINDS)
-		);
+		Map<String, ContactPointPlan.Desired> plan = byKey(ContactPointPlan.plan(person, null, ALL_KINDS));
 
 		Assert.areEqual(4, plan.size(), 'Two emails and two phones: duplicates are one copy');
 		ContactPointPlan.Desired personal = plan.get('Email|Personal_Email__c');
@@ -83,11 +76,7 @@ private class ContactPointPlanTest {
 				'Type__c' => 'Home',
 				'Status__c' => 'Current'
 			},
-			new Map<String, Object>{
-				'Id' => 'a01000000000002',
-				'Street__c' => '9 Old Rd',
-				'Status__c' => 'Former'
-			},
+			new Map<String, Object>{ 'Id' => 'a01000000000002', 'Street__c' => '9 Old Rd', 'Status__c' => 'Former' },
 			new Map<String, Object>{ 'Id' => 'a01000000000003' }
 		};
 
@@ -106,10 +95,7 @@ private class ContactPointPlanTest {
 
 	@IsTest
 	static void differencesAndMatchKeys() {
-		Map<String, Object> wanted = new Map<String, Object>{
-			'EmailAddress' => 'a@b.example',
-			'IsPrimary' => true
-		};
+		Map<String, Object> wanted = new Map<String, Object>{ 'EmailAddress' => 'a@b.example', 'IsPrimary' => true };
 		Assert.isTrue(
 			ContactPointPlan.differences(
 					wanted,
@@ -139,19 +125,11 @@ private class ContactPointPlanTest {
 		List<String> compared = new List<String>{ 'Email', 'Phone' };
 		Contact lower = TestDataFactory.person(new Contact(Email = 'a@b.example'));
 		Assert.isTrue(
-			ContactPointPlan.anyChanged(
-				TestDataFactory.person(new Contact(Email = 'A@b.example')),
-				lower,
-				compared
-			),
+			ContactPointPlan.anyChanged(TestDataFactory.person(new Contact(Email = 'A@b.example')), lower, compared),
 			'Values differing only in capitals are a change'
 		);
 		Assert.isFalse(
-			ContactPointPlan.anyChanged(
-				TestDataFactory.person(new Contact(Email = 'a@b.example')),
-				lower,
-				compared
-			),
+			ContactPointPlan.anyChanged(TestDataFactory.person(new Contact(Email = 'a@b.example')), lower, compared),
 			'The same values are not'
 		);
 		Assert.areEqual(
@@ -161,9 +139,7 @@ private class ContactPointPlanTest {
 				new Map<String, Object>{ 'TelephoneNumber' => '(555) 010-0001' }
 			)
 		);
-		Assert.isNull(
-			ContactPointPlan.matchKey(ContactPointPlan.ADDRESS, new Map<String, Object>())
-		);
+		Assert.isNull(ContactPointPlan.matchKey(ContactPointPlan.ADDRESS, new Map<String, Object>()));
 		Assert.isTrue(ContactPointPlan.plan(null, null, ALL_KINDS).isEmpty(), 'No person, no plan');
 	}
 

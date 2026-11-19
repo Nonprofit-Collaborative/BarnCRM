@@ -12,12 +12,7 @@ public with sharing class IntegrationController {
 		try {
 			return IntegrationAppService.getApps();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				false,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage')
-			);
+			throw UserErrors.wrap(e, false, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage'));
 		}
 	}
 }

@@ -21,12 +21,7 @@ public with sharing class OpportunityMirrorContext {
 	public static final String CAMPAIGN_FIELD = 'CampaignId';
 	public static final String DONOR_ROLE = 'Donor';
 	/** The Opportunity field each copied gift attribute is compared on (R-OM3). */
-	public static final List<String> COMPARED = new List<String>{
-		'Amount',
-		'CloseDate',
-		'StageName',
-		'AccountId'
-	};
+	public static final List<String> COMPARED = new List<String>{ 'Amount', 'CloseDate', 'StageName', 'AccountId' };
 
 	private static Schema.SObjectType resolvedOpportunity;
 	private static Schema.SObjectType resolvedRole;
@@ -43,8 +38,7 @@ public with sharing class OpportunityMirrorContext {
 
 	public OpportunityMirrorContext(List<Gift__c> gifts) {
 		Schema.DescribeSObjectResult describe = opportunityType().getDescribe();
-		Schema.SObjectField campaignField = describe.fields.getMap()
-			.get(CAMPAIGN_FIELD.toLowerCase());
+		Schema.SObjectField campaignField = describe.fields.getMap().get(CAMPAIGN_FIELD.toLowerCase());
 		campaignType = CampaignSyncService.campaignType();
 		hasCampaign =
 			campaignField != null &&
@@ -54,17 +48,13 @@ public with sharing class OpportunityMirrorContext {
 			campaignField.getDescribe().isCreateable() &&
 			campaignField.getDescribe().isUpdateable() &&
 			Appeal__c.Campaign_Id__c.getDescribe().isAccessible();
-		Schema.RecordTypeInfo donation = describe.getRecordTypeInfosByDeveloperName()
-			.get(DONATION_RECORD_TYPE);
+		Schema.RecordTypeInfo donation = describe.getRecordTypeInfosByDeveloperName().get(DONATION_RECORD_TYPE);
 		donationRecordTypeId = donation != null &&
 			donation.isActive() &&
 			donation.isAvailable()
 			? donation.getRecordTypeId()
 			: null;
-		donorRoleExists = hasActiveValue(
-			roleType().getDescribe().fields.getMap().get('role'),
-			DONOR_ROLE
-		);
+		donorRoleExists = hasActiveValue(roleType().getDescribe().fields.getMap().get('role'), DONOR_ROLE);
 
 		Set<Id> linkedIds = new Set<Id>();
 		Set<Id> appealIds = new Set<Id>();
@@ -123,9 +113,7 @@ public with sharing class OpportunityMirrorContext {
 		if (gift.Donor_Contact__c != null) {
 			return gift.Donor_Contact__c;
 		}
-		return gift.Donor_Account__c == null
-			? null
-			: personContactByAccount.get(gift.Donor_Account__c);
+		return gift.Donor_Account__c == null ? null : personContactByAccount.get(gift.Donor_Account__c);
 	}
 
 	/**
@@ -139,10 +127,7 @@ public with sharing class OpportunityMirrorContext {
 		if (stageName != null) {
 			opportunity.put('StageName', stageName);
 		}
-		opportunity.put(
-			'AccountId',
-			gift.Donor_Account__c != null ? gift.Donor_Account__c : gift.Household__c
-		);
+		opportunity.put('AccountId', gift.Donor_Account__c != null ? gift.Donor_Account__c : gift.Household__c);
 		if (hasCampaign) {
 			Id campaignId = gift.Appeal__c == null
 				? null
@@ -155,9 +140,7 @@ public with sharing class OpportunityMirrorContext {
 	/** What only a new Opportunity gets: its name and the Donation record type. */
 	public void prepareNew(SObject opportunity, Gift__c gift) {
 		Id donor = gift.Donor_Contact__c != null ? gift.Donor_Contact__c : gift.Donor_Account__c;
-		String donorName = names.containsKey(donor)
-			? names.get(donor)
-			: Label.Mirror_OpportunityMirror_UnknownDonor;
+		String donorName = names.containsKey(donor) ? names.get(donor) : Label.Mirror_OpportunityMirror_UnknownDonor;
 		opportunity.put(
 			'Name',
 			String.format(

@@ -141,8 +141,7 @@ public with sharing class AutoMergeService {
 				setIds.add((Id) parts[0]);
 			}
 		}
-		Set<Id> openSets = new Map<Id, DuplicateRecordSet>(DuplicateSelector.setsByIds(setIds))
-			.keySet();
+		Set<Id> openSets = new Map<Id, DuplicateRecordSet>(DuplicateSelector.setsByIds(setIds)).keySet();
 		List<String> mergeable = MergeRuleService.mergeableFields();
 		Map<Id, Contact> byId = new Map<Id, Contact>(readPeople(people, mergeable));
 		Map<Id, Integer> members = memberCounts(byId.values());
@@ -184,11 +183,7 @@ public with sharing class AutoMergeService {
 					items[0].RecordId.getSObjectType() == Contact.SObjectType &&
 					items[1].RecordId.getSObjectType() == Contact.SObjectType
 				) {
-					DuplicateService.Pair pair = new DuplicateService.Pair(
-						items[0].RecordId,
-						items[1].RecordId,
-						null
-					);
+					DuplicateService.Pair pair = new DuplicateService.Pair(items[0].RecordId, items[1].RecordId, null);
 					pairs.add(pair);
 					setByKey.put(pair.key, found.Id);
 				}
@@ -199,11 +194,7 @@ public with sharing class AutoMergeService {
 			window = DuplicateSelector.openSetsAfter(SETS_PER_READ, window[window.size() - 1]);
 			reads++;
 		}
-		for (
-			DuplicateService.Pair pair : DuplicateService.withoutDismissed(
-				DuplicateService.actionablePairs(pairs)
-			)
-		) {
+		for (DuplicateService.Pair pair : DuplicateService.withoutDismissed(DuplicateService.actionablePairs(pairs))) {
 			refs.add(ref(setByKey.get(pair.key), pair.left, pair.right));
 		}
 		return refs;
@@ -226,8 +217,7 @@ public with sharing class AutoMergeService {
 		Boolean sameName =
 			String.isNotEmpty(firstName) &&
 			firstName.equals(FuzzyMatch.normalize((String) b.get('FirstName'))) &&
-			FuzzyMatch.normalize((String) a.get('LastName'))
-				.equals(FuzzyMatch.normalize((String) b.get('LastName')));
+			FuzzyMatch.normalize((String) a.get('LastName')).equals(FuzzyMatch.normalize((String) b.get('LastName')));
 		if (!sameName) {
 			return false;
 		}
@@ -301,11 +291,7 @@ public with sharing class AutoMergeService {
 	}
 
 	private static String ref(Id setId, Id first, Id second) {
-		return (setId == null ? '' : String.valueOf(setId)) +
-			SEPARATOR +
-			first +
-			SEPARATOR +
-			second;
+		return (setId == null ? '' : String.valueOf(setId)) + SEPARATOR + first + SEPARATOR + second;
 	}
 
 	private static String text(Object value) {
@@ -396,16 +382,9 @@ public with sharing class AutoMergeService {
 					);
 				}
 				Moved records = moved.get(pair.mergedId);
-				Database.MergeResult result = Database.merge(
-					master,
-					pair.mergedId,
-					false,
-					AccessLevel.USER_MODE
-				);
+				Database.MergeResult result = Database.merge(master, pair.mergedId, false, AccessLevel.USER_MODE);
 				if (!result.isSuccess()) {
-					throw new DuplicateService.DuplicateException(
-						result.getErrors()[0].getMessage()
-					);
+					throw new DuplicateService.DuplicateException(result.getErrors()[0].getMessage());
 				}
 				List<Id> added = addedMemberships(pair.survivorId, membershipsBefore);
 				if (!added.isEmpty()) {
@@ -497,8 +476,7 @@ public with sharing class AutoMergeService {
 		}
 		for (Schema.ChildRelationship link : type.getDescribe().getChildRelationships()) {
 			Schema.DescribeFieldResult field = link.getField().getDescribe();
-			Schema.DescribeSObjectResult child = link.getChildSObject()
-				.getDescribe(SObjectDescribeOptions.DEFERRED);
+			Schema.DescribeSObjectResult child = link.getChildSObject().getDescribe(SObjectDescribeOptions.DEFERRED);
 			// Memberships are not moved by the merge: see ADDED_MEMBERSHIPS. Duplicate record
 			// items are removed by it, so there is nothing to move back.
 			if (
@@ -602,11 +580,7 @@ public with sharing class AutoMergeService {
 			notesById.put(journal.Id, new List<String>());
 			mergedIds.add(journal.Merged_Id__c);
 		}
-		List<Database.UndeleteResult> results = Database.undelete(
-			mergedIds,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.UndeleteResult> results = Database.undelete(mergedIds, false, AccessLevel.USER_MODE);
 		List<Merge_Journal__c> restored = new List<Merge_Journal__c>();
 		for (Integer i = 0; i < journals.size(); i++) {
 			if (results[i].isSuccess()) {
@@ -618,10 +592,7 @@ public with sharing class AutoMergeService {
 				.add(
 					String.format(
 						BarnHelp.text('Core', 'Core_AutoMerge_NoteNotUndeleted'),
-						new List<Object>{
-							journals[i].Merged_Name__c,
-							results[i].getErrors()[0].getMessage()
-						}
+						new List<Object>{ journals[i].Merged_Name__c, results[i].getErrors()[0].getMessage() }
 					)
 				);
 		}
@@ -629,10 +600,7 @@ public with sharing class AutoMergeService {
 	}
 
 	/** Puts back the changed values, one object at a time (people, or a C-62 merge's object). */
-	private static void restoreValues(
-		List<Merge_Journal__c> journals,
-		Map<Id, List<String>> notesById
-	) {
+	private static void restoreValues(List<Merge_Journal__c> journals, Map<Id, List<String>> notesById) {
 		Map<Schema.SObjectType, List<Merge_Journal__c>> byType = new Map<Schema.SObjectType, List<Merge_Journal__c>>();
 		for (Merge_Journal__c journal : journals) {
 			Schema.SObjectType type = Id.valueOf(journal.Survivor_Id__c).getSObjectType();
@@ -696,8 +664,7 @@ public with sharing class AutoMergeService {
 				continue;
 			}
 			if (survivor == null) {
-				notesById.get(journal.Id)
-					.add(BarnHelp.text('Core', 'Core_AutoMerge_NoteSurvivorGone'));
+				notesById.get(journal.Id).add(BarnHelp.text('Core', 'Core_AutoMerge_NoteSurvivorGone'));
 				continue;
 			}
 			Map<String, Object> putBack = new Map<String, Object>{
@@ -747,9 +714,7 @@ public with sharing class AutoMergeService {
 			if (String.isBlank(journal.Moved_Records__c)) {
 				continue;
 			}
-			Map<String, Object> byLink = (Map<String, Object>) JSON.deserializeUntyped(
-				journal.Moved_Records__c
-			);
+			Map<String, Object> byLink = (Map<String, Object>) JSON.deserializeUntyped(journal.Moved_Records__c);
 			for (String key : byLink.keySet()) {
 				if (key == ADDED_MEMBERSHIPS || key == ADDED_FILES) {
 					continue;
@@ -802,19 +767,10 @@ public with sharing class AutoMergeService {
 						// that automation keeps (a household's Primary Contact, recomputed when
 						// the memberships come back with the undelete) is back before this runs.
 						// Anything else was moved since.
-						addOnce(
-							notesById,
-							owner,
-							BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordMovedSince'),
-							key
-						);
+						addOnce(notesById, owner, BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordMovedSince'), key);
 					}
 				}
-				List<Database.SaveResult> saves = Database.update(
-					moves,
-					false,
-					AccessLevel.USER_MODE
-				);
+				List<Database.SaveResult> saves = Database.update(moves, false, AccessLevel.USER_MODE);
 				for (Integer i = 0; i < saves.size(); i++) {
 					if (!saves[i].isSuccess()) {
 						addOnce(
@@ -827,12 +783,7 @@ public with sharing class AutoMergeService {
 				}
 			} catch (Exception unreadable) {
 				for (Merge_Journal__c owner : new Set<Merge_Journal__c>(owners.values())) {
-					addOnce(
-						notesById,
-						owner,
-						BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
-						key
-					);
+					addOnce(notesById, owner, BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'), key);
 				}
 				continue;
 			}
@@ -856,10 +807,7 @@ public with sharing class AutoMergeService {
 	 * since is left and noted. Deleted with the user's access, so the membership trigger
 	 * recounts and renames the households.
 	 */
-	private static void removeAddedMemberships(
-		List<Merge_Journal__c> journals,
-		Map<Id, List<String>> notesById
-	) {
+	private static void removeAddedMemberships(List<Merge_Journal__c> journals, Map<Id, List<String>> notesById) {
 		Map<Id, Merge_Journal__c> ownerByRow = new Map<Id, Merge_Journal__c>();
 		for (Merge_Journal__c journal : journals) {
 			if (String.isBlank(journal.Moved_Records__c)) {
@@ -890,19 +838,10 @@ public with sharing class AutoMergeService {
 					removing.add(row);
 					removingOwners.add(owner);
 				} else {
-					addOnce(
-						notesById,
-						owner,
-						BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordMovedSince'),
-						key
-					);
+					addOnce(notesById, owner, BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordMovedSince'), key);
 				}
 			}
-			List<Database.DeleteResult> results = Database.delete(
-				removing,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.DeleteResult> results = Database.delete(removing, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < results.size(); i++) {
 				if (!results[i].isSuccess()) {
 					addOnce(
@@ -915,12 +854,7 @@ public with sharing class AutoMergeService {
 			}
 		} catch (Exception unreadable) {
 			for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByRow.values())) {
-				addOnce(
-					notesById,
-					owner,
-					BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
-					key
-				);
+				addOnce(notesById, owner, BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'), key);
 			}
 		}
 	}
@@ -965,17 +899,13 @@ public with sharing class AutoMergeService {
 	}
 
 	/** Undo of `shareFiles`: removes the links the merge added; a link gone already needs nothing. */
-	private static void removeAddedFiles(
-		List<Merge_Journal__c> journals,
-		Map<Id, List<String>> notesById
-	) {
+	private static void removeAddedFiles(List<Merge_Journal__c> journals, Map<Id, List<String>> notesById) {
 		Map<Id, Merge_Journal__c> ownerByLink = new Map<Id, Merge_Journal__c>();
 		for (Merge_Journal__c journal : journals) {
 			if (String.isBlank(journal.Moved_Records__c)) {
 				continue;
 			}
-			Object rows = ((Map<String, Object>) JSON.deserializeUntyped(journal.Moved_Records__c))
-				.get(ADDED_FILES);
+			Object rows = ((Map<String, Object>) JSON.deserializeUntyped(journal.Moved_Records__c)).get(ADDED_FILES);
 			for (Object rowId : rows == null ? new List<Object>() : (List<Object>) rows) {
 				ownerByLink.put((Id) String.valueOf(rowId), journal);
 			}
@@ -992,11 +922,7 @@ public with sharing class AutoMergeService {
 				WHERE Id IN :linkIds
 				WITH USER_MODE
 			];
-			List<Database.DeleteResult> results = Database.delete(
-				removing,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.DeleteResult> results = Database.delete(removing, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < results.size(); i++) {
 				if (!results[i].isSuccess()) {
 					addOnce(
@@ -1009,23 +935,13 @@ public with sharing class AutoMergeService {
 			}
 		} catch (Exception unreadable) {
 			for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByLink.values())) {
-				addOnce(
-					notesById,
-					owner,
-					BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
-					key
-				);
+				addOnce(notesById, owner, BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'), key);
 			}
 		}
 	}
 
 	/** One note per journal, link and kind, however many records it is about. */
-	private static void addOnce(
-		Map<Id, List<String>> notesById,
-		Merge_Journal__c owner,
-		String format,
-		String key
-	) {
+	private static void addOnce(Map<Id, List<String>> notesById, Merge_Journal__c owner, String format, String key) {
 		String line = String.format(format, new List<Object>{ key });
 		List<String> lines = notesById.get(owner.Id);
 		if (!lines.contains(line)) {

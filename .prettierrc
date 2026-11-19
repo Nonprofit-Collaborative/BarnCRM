@@ -8,7 +8,7 @@
     {
       "files": "*.{cls,trigger}",
       "options": {
-        "printWidth": 100,
+        "printWidth": 120,
         "tabWidth": 4,
         "useTabs": true,
         "apexInsertFinalNewline": true

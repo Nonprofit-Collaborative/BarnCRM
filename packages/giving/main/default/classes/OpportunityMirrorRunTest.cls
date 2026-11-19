@@ -54,8 +54,7 @@ private class OpportunityMirrorRunTest {
 	private static Integer countOpportunities() {
 		return OpportunityMirrorService.isAvailable()
 			? Database.countQuery(
-					'SELECT COUNT() FROM ' +
-					OpportunityMirrorService.opportunityType().getDescribe().getName(),
+					'SELECT COUNT() FROM ' + OpportunityMirrorService.opportunityType().getDescribe().getName(),
 					AccessLevel.SYSTEM_MODE
 			  )
 			: 0;
@@ -123,10 +122,7 @@ private class OpportunityMirrorRunTest {
 			List<Error_Log__c> logged = runLogs();
 			Assert.areEqual(1, logged.size(), 'One Info entry.');
 			Assert.isTrue(logged[0].Message__c.contains('paused'), logged[0].Message__c);
-			Assert.isNull(
-				stored().Opportunity_Mirror_Last_Run__c,
-				'A skipped run is not recorded.'
-			);
+			Assert.isNull(stored().Opportunity_Mirror_Last_Run__c, 'A skipped run is not recorded.');
 		}
 	}
 
@@ -182,18 +178,9 @@ private class OpportunityMirrorRunTest {
 			Assert.areEqual(1, countOpportunities(), 'Only the chunk before the change.');
 			List<Error_Log__c> logged = runLogs();
 			Assert.areEqual(1, logged.size(), 'One Info entry: the summary.');
-			Assert.isTrue(
-				logged[0].Message__c.contains('3 left for the next run'),
-				logged[0].Message__c
-			);
-			Assert.isTrue(
-				logged[0].Message__c.contains('paused'),
-				'It says why: ' + logged[0].Message__c
-			);
-			Assert.isNull(
-				stored().Opportunity_Mirror_Last_Run__c,
-				'An interrupted run is not recorded.'
-			);
+			Assert.isTrue(logged[0].Message__c.contains('3 left for the next run'), logged[0].Message__c);
+			Assert.isTrue(logged[0].Message__c.contains('paused'), 'It says why: ' + logged[0].Message__c);
+			Assert.isNull(stored().Opportunity_Mirror_Last_Run__c, 'An interrupted run is not recorded.');
 		}
 	}
 
@@ -237,10 +224,7 @@ private class OpportunityMirrorRunTest {
 			)[0];
 			Assert.areEqual(130, (Decimal) copy.get('Amount'), 'The skipped change is put right.');
 			Giving_Settings__c recorded = stored();
-			Assert.isTrue(
-				recorded.Opportunity_Mirror_Last_Run__c >= before,
-				'The run is recorded.'
-			);
+			Assert.isTrue(recorded.Opportunity_Mirror_Last_Run__c >= before, 'The run is recorded.');
 			Assert.isTrue(
 				recorded.Opportunity_Mirror_Last_Summary__c.contains('1 updated'),
 				recorded.Opportunity_Mirror_Last_Summary__c
@@ -298,11 +282,7 @@ private class OpportunityMirrorRunTest {
 			Assert.areEqual(1, named.size(), 'The unknown name is named once a run.');
 			Assert.isTrue(named[0].Message__c.contains('No_Such_Record_Type'), 'By its name.');
 			Assert.isTrue(
-				OpportunityMirrorSelector.wonOpportunitiesQuery(
-						'Opportunity',
-						new List<String>{ 'Id' },
-						true
-					)
+				OpportunityMirrorSelector.wonOpportunitiesQuery('Opportunity', new List<String>{ 'Id' }, true)
 					.contains('RecordTypeId IN :recordTypeIds'),
 				'The run filters on it (R-OM7).'
 			);
@@ -398,9 +378,7 @@ private class OpportunityMirrorRunTest {
 					OpportunityGiftService.isLinkDuplicate(
 						duplicate,
 						noFields,
-						'duplicate value found: ' +
-							link +
-							' duplicates value on record with id: a0B000000000001AAA'
+						'duplicate value found: ' + link + ' duplicates value on record with id: a0B000000000001AAA'
 					),
 					'The link, as a whole word of the message.'
 				);
@@ -418,9 +396,7 @@ private class OpportunityMirrorRunTest {
 					OpportunityGiftService.isLinkDuplicate(
 						duplicate,
 						noFields,
-						'duplicate value found: ' +
-							other +
-							' duplicates value on record with id: a0B000000000001AAA'
+						'duplicate value found: ' + other + ' duplicates value on record with id: a0B000000000001AAA'
 					),
 					'Another unique field is not the link.'
 				);

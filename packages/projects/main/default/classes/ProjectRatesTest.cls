@@ -4,9 +4,7 @@
  * change of date re-prices an entry that is not yet approved; Apply Rates fills older entries;
  * and with rate cards off nothing is written.
  */
-@IsTest(
-	testFor='ApexClass:ProjectRates, ApexClass:ProjectEntryHandler, ApexTrigger:TimeEntryTrigger'
-)
+@IsTest(testFor='ApexClass:ProjectRates, ApexClass:ProjectEntryHandler, ApexTrigger:TimeEntryTrigger')
 private class ProjectRatesTest {
 	@TestSetup
 	static void setup() {
@@ -77,11 +75,7 @@ private class ProjectRatesTest {
 			Test.stopTest();
 
 			Assert.areEqual(175, read(now.Id).Bill_Rate__c, 'The person card covers today');
-			Assert.areEqual(
-				80,
-				read(now.Id).Cost_Rate__c,
-				'No cost on the person card: the role cost'
-			);
+			Assert.areEqual(80, read(now.Id).Cost_Rate__c, 'No cost on the person card: the role cost');
 			Assert.areEqual(350, read(now.Id).Amount__c, 'Hours times bill rate');
 			Assert.areEqual(150, read(before.Id).Bill_Rate__c, 'Before the person card: the role');
 			Assert.areEqual(80, read(before.Id).Cost_Rate__c, 'The role cost');
@@ -134,8 +128,7 @@ private class ProjectRatesTest {
 			Assert.isNull(saved.Status__c, 'No status with approvals off');
 			Assert.areEqual(
 				5,
-				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :project.Id WITH SYSTEM_MODE]
-				.Actual_Hours__c,
+				[SELECT Actual_Hours__c FROM Project__c WHERE Id = :project.Id WITH SYSTEM_MODE].Actual_Hours__c,
 				'Hours count as before'
 			);
 		}
@@ -149,14 +142,7 @@ private class ProjectRatesTest {
 			Project__c project = cards(developer);
 			List<Time_Entry__c> entries = new List<Time_Entry__c>();
 			for (Integer i = 0; i < 200; i++) {
-				entries.add(
-					entry(
-						project.Id,
-						i < 100 ? developer.Id : UserInfo.getUserId(),
-						Date.today(),
-						1
-					)
-				);
+				entries.add(entry(project.Id, i < 100 ? developer.Id : UserInfo.getUserId(), Date.today(), 1));
 			}
 
 			Test.startTest();
@@ -193,11 +179,7 @@ private class ProjectRatesTest {
 			Integer filled = ProjectRates.applyRates();
 
 			Assert.areEqual(3, filled, 'Every entry without a rate');
-			Assert.areEqual(
-				175,
-				read(older[0].Id).Bill_Rate__c,
-				'Approved time gets its first rate'
-			);
+			Assert.areEqual(175, read(older[0].Id).Bill_Rate__c, 'Approved time gets its first rate');
 			Assert.areEqual(175, read(older[2].Id).Bill_Rate__c, 'Open time too');
 			Assert.areEqual(0, ProjectRates.applyRates(), 'A second run finds none');
 		}
@@ -206,10 +188,7 @@ private class ProjectRatesTest {
 				ProjectRates.applyRates();
 				Assert.fail('Staff cannot apply rates');
 			} catch (Projects.ProjectsException refused) {
-				Assert.isTrue(
-					refused.getMessage().contains('Manage Projects'),
-					refused.getMessage()
-				);
+				Assert.isTrue(refused.getMessage().contains('Manage Projects'), refused.getMessage());
 			}
 		}
 	}

@@ -86,34 +86,22 @@ public with sharing class HealthCheckHouseholdChecks {
 			Set<Id> excluded = new Set<Id>(personTypes);
 			excluded.add(householdType);
 			// Counted as Data Quality counts them, one rule for both.
-			count = HouseholdOrphanSelector.countPeopleWithoutMembership(
-				householdType,
-				countCap + 1
-			);
+			count = HouseholdOrphanSelector.countPeopleWithoutMembership(householdType, countCap + 1);
 			first.addAll(HouseholdOrphanSelector.contactsWithoutMembership(excluded, LINKS_SHOWN));
 			if (!personTypes.isEmpty()) {
 				if (first.size() < LINKS_SHOWN) {
 					first.addAll(
-						HouseholdOrphanSelector.personAccountsWithoutMembership(
-							personTypes,
-							LINKS_SHOWN - first.size()
-						)
+						HouseholdOrphanSelector.personAccountsWithoutMembership(personTypes, LINKS_SHOWN - first.size())
 					);
 				}
 			}
 			detail = BarnHelp.text('Core', 'Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail');
-			detailOne = BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne'
-			);
+			detailOne = BarnHelp.text('Core', 'Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne');
 		} else {
 			count = HouseholdOrphanSelector.countContactsWithoutAccount(countCap + 1);
 			first.addAll(HouseholdOrphanSelector.contactsWithoutAccount(LINKS_SHOWN));
 			detail = BarnHelp.text('Core', 'Core_HealthCheck_PeopleWithoutHouseholdContactDetail');
-			detailOne = BarnHelp.text(
-				'Core',
-				'Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne'
-			);
+			detailOne = BarnHelp.text('Core', 'Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne');
 		}
 		return orphanFinding(
 			'people_without_household',
@@ -176,10 +164,7 @@ public with sharing class HealthCheckHouseholdChecks {
 			return null;
 		}
 		String counted = count > countCap
-			? String.format(
-					System.Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ countCap.format() }
-			  )
+			? String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ countCap.format() })
 			: count.format();
 		String text = HealthCheckService.forCount(count, detailOne, detail, new List<Object>());
 		if (count == 1 && first.size() == 1) {

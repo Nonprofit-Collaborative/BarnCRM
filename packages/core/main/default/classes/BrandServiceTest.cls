@@ -62,9 +62,7 @@ private class BrandServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Brand__c only = brand('Thrift Store', null, true);
 			insert new Brand_Assignment__c(Brand__c = only.Id, User__c = UserInfo.getUserId());
-			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
-				new Brand_Assignment__c()
-			};
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{ new Brand_Assignment__c() };
 
 			Test.startTest();
 			BrandService.applyDefaults(records, null);
@@ -112,8 +110,7 @@ private class BrandServiceTest {
 				VersionData = Blob.valueOf('png')
 			);
 			insert logo;
-			Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :logo.Id]
-			.ContentDocumentId;
+			Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :logo.Id].ContentDocumentId;
 
 			Test.startTest();
 			Map<Id, Id> whileOff = BrandService.senderIdsFor(new Set<Id>{ store.Id });
@@ -144,11 +141,7 @@ private class BrandServiceTest {
 			Test.startTest();
 			second.Is_Default__c = true;
 			update second;
-			insert new Brand_Assignment__c(
-				Brand__c = second.Id,
-				User__c = me,
-				Is_Primary__c = true
-			);
+			insert new Brand_Assignment__c(Brand__c = second.Id, User__c = me, Is_Primary__c = true);
 			Boolean duplicateRefused = false;
 			try {
 				insert new Brand_Assignment__c(Brand__c = second.Id, User__c = me);
@@ -214,11 +207,7 @@ private class BrandServiceTest {
 			Test.stopTest();
 
 			for (Brand_Assignment__c record : records) {
-				Assert.areEqual(
-					mine.Id,
-					record.Brand__c,
-					'A parent with no brand field is skipped'
-				);
+				Assert.areEqual(mine.Id, record.Brand__c, 'A parent with no brand field is skipped');
 			}
 		}
 	}
@@ -321,10 +310,7 @@ private class BrandServiceTest {
 			turnOn(true, false);
 			BrandShareJob.syncGroups();
 		}
-		Assert.isTrue(
-			BrandShareJob.groupsByBrand().isEmpty(),
-			'Off removes the groups, and their shares'
-		);
+		Assert.isTrue(BrandShareJob.groupsByBrand().isEmpty(), 'Off removes the groups, and their shares');
 	}
 
 	@IsTest

@@ -28,11 +28,7 @@ private class FormPublicPolicyTest {
 			Assert.isNull(FormPublicPolicy.problem(definition), 'Nothing refused');
 			Assert.areEqual(3, FormPublicPolicy.minSeconds(definition), 'Its seconds');
 			Assert.areEqual(10, FormPublicPolicy.hourlyLimit(definition), 'Its limit');
-			Assert.areEqual(
-				'Thanks for signing up.',
-				FormPublicPolicy.confirmation(definition),
-				'Its thank you'
-			);
+			Assert.areEqual('Thanks for signing up.', FormPublicPolicy.confirmation(definition), 'Its thank you');
 			Map<String, Object> plain = FormsTestData.definition();
 			Assert.isFalse(FormPublicPolicy.isPublic(plain), 'Not public without the block');
 			Assert.areEqual(50, FormPublicPolicy.hourlyLimit(plain), 'The default limit');
@@ -44,8 +40,7 @@ private class FormPublicPolicyTest {
 	static void overwritingLookupsAndFormsObjectsAreRefused() {
 		System.runAs(admin()) {
 			Map<String, Object> overwrite = FormsTestData.publicDefinition(10);
-			firstRecord(overwrite)
-				.put('matching', new Map<String, Object>{ 'onMatch' => 'overwrite' });
+			firstRecord(overwrite).put('matching', new Map<String, Object>{ 'onMatch' => 'overwrite' });
 			Assert.isNotNull(FormPublicPolicy.problem(overwrite), 'Overwrite refused');
 
 			Map<String, Object> lookup = FormsTestData.publicDefinition(10);

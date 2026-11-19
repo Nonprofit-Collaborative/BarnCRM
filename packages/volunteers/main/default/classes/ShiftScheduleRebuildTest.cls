@@ -93,10 +93,7 @@ private class ShiftScheduleRebuildTest {
 				atTheLongest > 0 && atTheLongest * 182 < Limits.getLimitDmlRows(),
 				'At 26 weeks a save removes shifts for some schedules, and their worst case fits.'
 			);
-			Assert.isTrue(
-				atTheShortest > atTheLongest,
-				'A shorter horizon leaves room for more schedules.'
-			);
+			Assert.isTrue(atTheShortest > atTheLongest, 'A shorter horizon leaves room for more schedules.');
 		}
 	}
 
@@ -286,9 +283,7 @@ private class ShiftScheduleRebuildTest {
 	static void theQueuedRemovalKeepsAShiftBookedOrCancelledSinceTheSave() {
 		System.runAs(admin()) {
 			Id scheduleId = allSchedules()[0].Id;
-			Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(
-				new Set<Id>{ scheduleId }
-			);
+			Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(new Set<Id>{ scheduleId });
 			Assert.areEqual(SHIFTS_EACH, removable.size(), 'Every future shift is removable.');
 			List<Volunteer_Shift__c> shifts = shiftsOf(scheduleId);
 			book(shifts[0].Id);
@@ -312,9 +307,7 @@ private class ShiftScheduleRebuildTest {
 	static void aJobRemovesItsShareAndPassesTheRestOn() {
 		System.runAs(admin()) {
 			Id scheduleId = allSchedules()[0].Id;
-			Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(
-				new Set<Id>{ scheduleId }
-			);
+			Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(new Set<Id>{ scheduleId });
 			ShiftScheduleRemovalJob.shiftsPerJobOverride = 10;
 
 			Test.startTest();
@@ -336,9 +329,7 @@ private class ShiftScheduleRebuildTest {
 	@IsTest
 	static void aRemovalWithNoQueueableJobLeftIsLoggedNotThrown() {
 		System.runAs(admin()) {
-			Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(
-				new Set<Id>{ allSchedules()[0].Id }
-			);
+			Set<Id> removable = ShiftScheduleService.removableFutureShiftIds(new Set<Id>{ allSchedules()[0].Id });
 
 			Test.startTest();
 			for (Integer i = 0; i < Limits.getLimitQueueableJobs(); i++) {

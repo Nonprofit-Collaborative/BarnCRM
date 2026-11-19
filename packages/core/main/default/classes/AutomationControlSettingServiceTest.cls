@@ -41,10 +41,7 @@ private class AutomationControlSettingServiceTest {
 			Assert.isFalse(before[0].pauseAll, 'Both boxes show off by default');
 			Assert.isFalse(before[0].bypass, 'Both boxes show off by default');
 			Assert.isTrue(after[0].pauseAll, 'Pause All saved for the whole organization');
-			Assert.isTrue(
-				AutomationControlSettingService.pausedForEveryone(),
-				'Paused for everyone'
-			);
+			Assert.isTrue(AutomationControlSettingService.pausedForEveryone(), 'Paused for everyone');
 			Assert.areEqual(1, changesNamed('Automation Control:'), 'The change is recorded');
 			Assert.areEqual(
 				1,
@@ -81,14 +78,10 @@ private class AutomationControlSettingServiceTest {
 
 			Test.startTest();
 			AutomationControlSettingService.add(profileId);
-			BarnCRM_Automation_Control__c added = BarnCRM_Automation_Control__c.getValues(
-				profileId
-			);
+			BarnCRM_Automation_Control__c added = BarnCRM_Automation_Control__c.getValues(profileId);
 			List<AutomationControlSettingService.ControlRow> listed = AutomationControlSettingService.rows();
 			AutomationControlSettingService.save(profileId, true, false);
-			BarnCRM_Automation_Control__c saved = BarnCRM_Automation_Control__c.getValues(
-				profileId
-			);
+			BarnCRM_Automation_Control__c saved = BarnCRM_Automation_Control__c.getValues(profileId);
 			AutomationControlSettingService.remove(profileId);
 			Test.stopTest();
 
@@ -138,13 +131,7 @@ private class AutomationControlSettingServiceTest {
 			List<String> messages = new List<String>();
 
 			Test.startTest();
-			for (
-				String owner : new List<String>{
-					UserInfo.getOrganizationId(),
-					notAnOwner.Id,
-					'junk'
-				}
-			) {
+			for (String owner : new List<String>{ UserInfo.getOrganizationId(), notAnOwner.Id, 'junk' }) {
 				try {
 					if (owner == UserInfo.getOrganizationId()) {
 						AutomationControlSettingService.remove(owner);
@@ -171,10 +158,7 @@ private class AutomationControlSettingServiceTest {
 
 	@IsTest
 	static void someoneWithoutManageSettingsCannotChangeAnything() {
-		User staff = TestUsers.standardUserWith(
-			'AutoControlStaff',
-			new List<String>{ 'BarnCRM_Staff' }
-		);
+		User staff = TestUsers.standardUserWith('AutoControlStaff', new List<String>{ 'BarnCRM_Staff' });
 		System.runAs(staff) {
 			Integer refused = 0;
 
@@ -247,10 +231,7 @@ private class AutomationControlSettingServiceTest {
 					'The description names the Automation Name to use'
 				);
 				AutomationControlSettingService.removeFlow(listedName);
-				removedAgain = AutomationSettingSelector.selectByNames(
-						new Set<String>{ listedName }
-					)
-					.isEmpty();
+				removedAgain = AutomationSettingSelector.selectByNames(new Set<String>{ listedName }).isEmpty();
 			}
 			Test.stopTest();
 

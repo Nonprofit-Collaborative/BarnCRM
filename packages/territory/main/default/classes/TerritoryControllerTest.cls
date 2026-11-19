@@ -64,11 +64,7 @@ private class TerritoryControllerTest {
 				TerritoryController.startRun(TerritoryRunBatch.MODE_PREVIEW, false);
 				Assert.fail('A second run waits');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Territory', 'Territory_Error_Busy'),
-					refused.getMessage(),
-					'Told why'
-				);
+				Assert.areEqual(BarnHelp.text('Territory', 'Territory_Error_Busy'), refused.getMessage(), 'Told why');
 			}
 			Test.stopTest();
 
@@ -115,11 +111,7 @@ private class TerritoryControllerTest {
 				TerritoryController.undoRun(preview.Id);
 				Assert.fail('A preview has nothing to undo');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Territory', 'Territory_Error_NoJob'),
-					refused.getMessage(),
-					'Told why'
-				);
+				Assert.areEqual(BarnHelp.text('Territory', 'Territory_Error_NoJob'), refused.getMessage(), 'Told why');
 			}
 		}
 	}
@@ -152,9 +144,7 @@ private class TerritoryControllerTest {
 
 			Map<String, Object> page = TerritoryController.getPage();
 
-			Map<String, Object> shown = (Map<String, Object>) ((List<Object>) page.get(
-				'territories'
-			))[0];
+			Map<String, Object> shown = (Map<String, Object>) ((List<Object>) page.get('territories'))[0];
 			List<Object> members = (List<Object>) shown.get('members');
 			Assert.areEqual(1, members.size(), 'The member is listed');
 			Map<String, Object> member = (Map<String, Object>) members[0];
@@ -165,11 +155,7 @@ private class TerritoryControllerTest {
 				Map<String, Object> run = (Map<String, Object>) item;
 				if (run.get('canUndo') == true) {
 					undoable++;
-					Assert.areEqual(
-						ImportBatchService.STATUS_COMPLETE,
-						run.get('jobStatus'),
-						'The job status is read'
-					);
+					Assert.areEqual(ImportBatchService.STATUS_COMPLETE, run.get('jobStatus'), 'The job status is read');
 				}
 			}
 			Assert.areEqual(1, undoable, 'Only the run with a finished Data job can be undone');

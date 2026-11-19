@@ -97,9 +97,7 @@ public with sharing class DataManagerController {
 		Boolean loadsGifts = ImportMapping.parse(template.Column_Mapping_JSON__c)
 			.mappedEntities()
 			.contains(GIFT_ENTITY);
-		return loadsGifts
-			? System.Label.Core_Import_KindGiftsTitle
-			: System.Label.Core_DataManager_LoadsPeople;
+		return loadsGifts ? System.Label.Core_Import_KindGiftsTitle : System.Label.Core_DataManager_LoadsPeople;
 	}
 
 	private static Boolean canImport() {

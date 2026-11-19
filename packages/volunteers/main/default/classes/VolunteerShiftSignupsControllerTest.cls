@@ -18,14 +18,8 @@ private class VolunteerShiftSignupsControllerTest {
 			COORDINATOR,
 			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 		);
-		TestUsers.standardUserWith(
-			STAFFER,
-			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-		);
-		TestUsers.standardUserWith(
-			READER,
-			new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' }
-		);
+		TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
+		TestUsers.standardUserWith(READER, new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' });
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.volunteerSettings(true, true);
@@ -117,10 +111,7 @@ private class VolunteerShiftSignupsControllerTest {
 				panel.signups[0].recordId,
 				VolunteerSignupService.STATUS_ATTENDED
 			);
-			noShow = VolunteerShiftSignupsController.setStatus(
-				panel.signups[1].recordId,
-				'No show'
-			);
+			noShow = VolunteerShiftSignupsController.setStatus(panel.signups[1].recordId, 'No show');
 		}
 		Test.stopTest();
 
@@ -145,9 +136,7 @@ private class VolunteerShiftSignupsControllerTest {
 		List<Contact> people = peopleOwnedBy(STAFFER, 1);
 		Id signupId;
 		System.runAs(user(STAFFER)) {
-			signupId = VolunteerShiftSignupsController.addSignup(shiftId(), people[0].Id, null)
-				.signups[0]
-				.recordId;
+			signupId = VolunteerShiftSignupsController.addSignup(shiftId(), people[0].Id, null).signups[0].recordId;
 		}
 		VolunteerShiftSignupsController.Panel panel;
 		String refused = '';

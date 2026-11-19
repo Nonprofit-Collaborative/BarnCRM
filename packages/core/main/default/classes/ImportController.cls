@@ -393,9 +393,7 @@ public with sharing class ImportController {
 			template.Organization_Matching_Rule__c
 		);
 		view.organizationMatchField = template.Organization_Match_Field__c;
-		view.severalMatches = ImportTemplateService.normalizedSeveralMatches(
-			template.Several_Matches__c
-		);
+		view.severalMatches = ImportTemplateService.normalizedSeveralMatches(template.Several_Matches__c);
 		view.useDuplicateRules = template.Use_Duplicate_Rules__c == true;
 		describeLoad(template, view);
 		return view;
@@ -419,10 +417,7 @@ public with sharing class ImportController {
 			view.organizationFields = ImportFieldCatalog.organizationFields();
 			view.contactRules = ImportDuplicateRuleMatcher.hasActiveRule(Contact.SObjectType);
 			view.accountRules = ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType);
-			view.personAccountRules = ImportDuplicateRuleMatcher.hasActiveRule(
-				Account.SObjectType,
-				true
-			);
+			view.personAccountRules = ImportDuplicateRuleMatcher.hasActiveRule(Account.SObjectType, true);
 			return view;
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ImportController.getMatchFields', true);
@@ -506,11 +501,7 @@ public with sharing class ImportController {
 				names.add(sheet.name);
 				headers.add(sheet.headers == null ? new List<String>() : sheet.headers);
 			}
-			ImportObjectSchema.Detection found = ImportObjectSchema.detectObject(
-				fileName,
-				names,
-				headers
-			);
+			ImportObjectSchema.Detection found = ImportObjectSchema.detectObject(fileName, names, headers);
 			ObjectSuggestionView view = new ObjectSuggestionView();
 			view.objectName = found.suggested;
 			view.objectLabel = found.labels.get(found.suggested);
@@ -536,9 +527,7 @@ public with sharing class ImportController {
 		try {
 			enforcePermission();
 			return objectTemplateView(
-				ImportTemplateSelector.selectById(
-					ImportTemplateService.createObjectTemplate(name, objectName).Id
-				)
+				ImportTemplateSelector.selectById(ImportTemplateService.createObjectTemplate(name, objectName).Id)
 			);
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ImportController.createObjectTemplate', true);
@@ -567,10 +556,7 @@ public with sharing class ImportController {
 	public static TemplateView createSeveralObjectsTemplate(String name, List<String> objectNames) {
 		try {
 			enforcePermission();
-			Import_Template__c created = ImportTemplateService.createSeveralObjectsTemplate(
-				name,
-				objectNames
-			);
+			Import_Template__c created = ImportTemplateService.createSeveralObjectsTemplate(name, objectNames);
 			return objectTemplateView(ImportTemplateSelector.selectById(created.Id));
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ImportController.createSeveralObjectsTemplate', true);
@@ -646,28 +632,18 @@ public with sharing class ImportController {
 	 * the joined sheets have.
 	 */
 	@AuraEnabled
-	public static String suggestSheetMapping(
-		String templateId,
-		String objectName,
-		List<String> headers
-	) {
+	public static String suggestSheetMapping(String templateId, String objectName, List<String> headers) {
 		try {
 			enforcePermission();
 			Import_Template__c template = ImportTemplateSelector.selectById(templateId);
 			List<Schema.SObjectType> types = new List<Schema.SObjectType>();
 			if (template != null) {
 				ImportMapping saved = ImportMapping.parse(template.Column_Mapping_JSON__c);
-				for (
-					ImportObjectSchema.Step step : ImportObjectSchema.listedSteps(template, saved)
-				) {
+				for (ImportObjectSchema.Step step : ImportObjectSchema.listedSteps(template, saved)) {
 					types.add(step.type);
 				}
 			}
-			return ImportObjectSchema.suggestSeveralMapping(
-					types,
-					ImportObjectSchema.typeNamed(objectName),
-					headers
-				)
+			return ImportObjectSchema.suggestSeveralMapping(types, ImportObjectSchema.typeNamed(objectName), headers)
 				.serialize();
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ImportController.suggestSheetMapping', true);
@@ -683,9 +659,7 @@ public with sharing class ImportController {
 	public static List<FieldChoice> getObjectFields(String templateId) {
 		try {
 			enforcePermission();
-			Schema.SObjectType type = ImportObjectSchema.typeOf(
-				ImportTemplateSelector.selectById(templateId)
-			);
+			Schema.SObjectType type = ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId));
 			return fieldChoices(type, ImportMapping.ENTITY_RECORD, null, null);
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ImportController.getObjectFields', true);
@@ -714,18 +688,10 @@ public with sharing class ImportController {
 	public static List<FieldChoice> getRelatedFields(String templateId, String related) {
 		try {
 			enforcePermission();
-			Schema.SObjectType type = ImportObjectSchema.typeOf(
-				ImportTemplateSelector.selectById(templateId)
-			);
+			Schema.SObjectType type = ImportObjectSchema.typeOf(ImportTemplateSelector.selectById(templateId));
 			String chosen = related == null ? '' : related;
-			Schema.SObjectType relatedType = ImportObjectSchema.typeNamed(
-				chosen.substringBefore('.')
-			);
-			String parentField = ImportObjectSchema.relatedParentField(
-				type,
-				relatedType,
-				chosen.substringAfter('.')
-			);
+			Schema.SObjectType relatedType = ImportObjectSchema.typeNamed(chosen.substringBefore('.'));
+			String parentField = ImportObjectSchema.relatedParentField(type, relatedType, chosen.substringAfter('.'));
 			return parentField == null
 				? new List<FieldChoice>()
 				: fieldChoices(relatedType, ImportMapping.ENTITY_RELATED, parentField, related);
@@ -752,9 +718,7 @@ public with sharing class ImportController {
 		String objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
 		for (ImportMapping.Target target : ImportObjectSchema.writableFields(type)) {
 			if (
-				parentField != null &&
-				(target.value == ImportObjectSchema.ID_ATTRIBUTE ||
-				target.value == parentField)
+				parentField != null && (target.value == ImportObjectSchema.ID_ATTRIBUTE || target.value == parentField)
 			) {
 				continue;
 			}
@@ -762,10 +726,7 @@ public with sharing class ImportController {
 			choice.value = entity + '.' + target.value;
 			choice.label = related == null
 				? target.label
-				: String.format(
-						Label.Core_Format_Pair,
-						new List<String>{ objectLabel, target.label }
-				  );
+				: String.format(Label.Core_Format_Pair, new List<String>{ objectLabel, target.label });
 			Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, target.value);
 			if (token != null && token.getDescribe().getType() == Schema.DisplayType.REFERENCE) {
 				choice.isLookup = true;
@@ -1133,9 +1094,7 @@ public with sharing class ImportController {
 			if (String.isBlank(batchId)) {
 				return page;
 			}
-			page.cursor = cursor == null
-				? ImportRowSelector.openCursor(Id.valueOf(batchId), status)
-				: cursor;
+			page.cursor = cursor == null ? ImportRowSelector.openCursor(Id.valueOf(batchId), status) : cursor;
 			page.total = page.cursor.getNumRecords();
 			Integer start = startIndex == null || startIndex < 0 ? 0 : startIndex;
 			Integer size = pageSize == null ||
@@ -1193,11 +1152,7 @@ public with sharing class ImportController {
 	 * @param sampleRowsJson the first rows of the file, each a map of column name to value
 	 */
 	@AuraEnabled
-	public static ChangesPreview previewChanges(
-		String source,
-		String transformsJson,
-		String sampleRowsJson
-	) {
+	public static ChangesPreview previewChanges(String source, String transformsJson, String sampleRowsJson) {
 		try {
 			enforcePermission();
 			ChangesPreview preview = new ChangesPreview();
@@ -1211,10 +1166,7 @@ public with sharing class ImportController {
 				Map<String, Object> row = (Map<String, Object>) rows[i];
 				for (String column : row.keySet()) {
 					Object value = row.get(column);
-					values.put(
-						ImportMapping.key(column),
-						value == null ? null : String.valueOf(value).trim()
-					);
+					values.put(ImportMapping.key(column), value == null ? null : String.valueOf(value).trim());
 				}
 				ChangedValue sample = new ChangedValue();
 				sample.rowNumber = i + 2;
@@ -1254,9 +1206,7 @@ public with sharing class ImportController {
 			for (Integer i = 0; i < rows.size() && i < CHANGED_SAMPLE_ROWS; i++) {
 				for (List<String> cell : ImportRowProcessor.changedValues(rows[i], mapping)) {
 					ChangedValue changed = new ChangedValue();
-					changed.rowNumber = rows[i].Row_Number__c == null
-						? null
-						: rows[i].Row_Number__c.intValue();
+					changed.rowNumber = rows[i].Row_Number__c == null ? null : rows[i].Row_Number__c.intValue();
 					changed.column = cell[0];
 					changed.before = cell[1];
 					changed.after = cell[2];

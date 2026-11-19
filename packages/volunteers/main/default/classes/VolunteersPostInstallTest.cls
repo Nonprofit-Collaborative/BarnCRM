@@ -31,11 +31,7 @@ private class VolunteersPostInstallTest {
 	static void theInstallerGetsVolunteersAdminOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Volunteers_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Volunteers_Admin' }).Id;
 			User member = TestUsers.standardUser('Member');
 			insert new PermissionSetAssignment(
 				AssigneeId = member.Id,

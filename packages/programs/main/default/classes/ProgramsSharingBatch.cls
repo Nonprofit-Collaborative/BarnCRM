@@ -13,10 +13,7 @@ public without sharing class ProgramsSharingBatch implements Database.Batchable<
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
-		return Database.getQueryLocator(
-			'SELECT Id FROM ' + type.getDescribe().getName(),
-			AccessLevel.SYSTEM_MODE
-		);
+		return Database.getQueryLocator('SELECT Id FROM ' + type.getDescribe().getName(), AccessLevel.SYSTEM_MODE);
 	}
 
 	public void execute(Database.BatchableContext context, List<SObject> records) {

@@ -38,12 +38,7 @@ public with sharing class VolunteerLetterService {
 	 * Merges the letter for each person without saving anything, for a preview or before a
 	 * generation. A person who cannot get a letter has a skip reason instead of a body.
 	 */
-	public static List<Letter> mergeLetters(
-		List<Id> personIds,
-		Id templateId,
-		Date fromDate,
-		Date toDate
-	) {
+	public static List<Letter> mergeLetters(List<Id> personIds, Id templateId, Date fromDate, Date toDate) {
 		return mergeWith(personIds, loadTemplate(templateId), fromDate, toDate);
 	}
 
@@ -53,9 +48,7 @@ public with sharing class VolunteerLetterService {
 			? null
 			: VolunteerLetterSelector.template(templateId);
 		if (template == null || String.isBlank(template.Body__c)) {
-			throw new VolunteerLetterException(
-				BarnHelp.text('Volunteers', 'Volunteers_Letter_TemplateNotFound')
-			);
+			throw new VolunteerLetterException(BarnHelp.text('Volunteers', 'Volunteers_Letter_TemplateNotFound'));
 		}
 		if (template.Active__c != true) {
 			throw new VolunteerLetterException(
@@ -75,13 +68,9 @@ public with sharing class VolunteerLetterService {
 	public static Id activeTemplateIdForType(String letterType) {
 		requireManage();
 		if (String.isBlank(letterType)) {
-			throw new VolunteerLetterException(
-				BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired')
-			);
+			throw new VolunteerLetterException(BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired'));
 		}
-		Volunteer_Letter_Template__c template = VolunteerLetterSelector.activeTemplateOfType(
-			letterType.trim()
-		);
+		Volunteer_Letter_Template__c template = VolunteerLetterSelector.activeTemplateOfType(letterType.trim());
 		if (template == null || String.isBlank(template.Body__c)) {
 			throw new VolunteerLetterException(
 				String.format(
@@ -105,9 +94,7 @@ public with sharing class VolunteerLetterService {
 
 	private static void requirePeriod(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null || fromDate > toDate) {
-			throw new VolunteerLetterException(
-				BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod')
-			);
+			throw new VolunteerLetterException(BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'));
 		}
 	}
 
@@ -126,9 +113,7 @@ public with sharing class VolunteerLetterService {
 		Map<Id, Set<Id>> brandsByPerson = new Map<Id, Set<Id>>();
 		collectHours(people, fromDate, toDate, totals, jobLists, brandsByPerson);
 
-		String organizationName = escape(
-			BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
-		);
+		String organizationName = escape(BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c);
 		Map<String, String> shared = new Map<String, String>{
 			'OrganizationName' => organizationName,
 			'OrganizationAddress' => escape(OrganizationAddress.oneLine()),
@@ -191,12 +176,7 @@ public with sharing class VolunteerLetterService {
 			}
 			String title = String.format(
 					Label.Volunteers_Letter_FileTitle,
-					new List<Object>{
-						template.Name,
-						letter.personName,
-						fromDate.format(),
-						toDate.format()
-					}
+					new List<Object>{ template.Name, letter.personName, fromDate.format(), toDate.format() }
 				)
 				.left(255);
 			files.add(
@@ -221,10 +201,7 @@ public with sharing class VolunteerLetterService {
 	 */
 	public static String titlePrefix(String templateName) {
 		String marker = '<<person>>';
-		return String.format(
-				Label.Volunteers_Letter_FileTitle,
-				new List<Object>{ templateName, marker, '', '' }
-			)
+		return String.format(Label.Volunteers_Letter_FileTitle, new List<Object>{ templateName, marker, '', '' })
 			.substringBefore(marker);
 	}
 
@@ -238,9 +215,7 @@ public with sharing class VolunteerLetterService {
 
 	public static void requireManage() {
 		if (!VolunteerHoursService.canManage()) {
-			throw new VolunteerLetterException(
-				BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission')
-			);
+			throw new VolunteerLetterException(BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission'));
 		}
 	}
 
@@ -271,17 +246,11 @@ public with sharing class VolunteerLetterService {
 		Map<Id, Person> found = new Map<Id, Person>();
 		if (!contactIds.isEmpty()) {
 			for (Contact person : VolunteerLetterSelector.contacts(contactIds)) {
-				found.put(
-					person.Id,
-					new Person(person.Name, person.FirstName, person.Preferred_Name__c)
-				);
+				found.put(person.Id, new Person(person.Name, person.FirstName, person.Preferred_Name__c));
 			}
 		}
 		for (Account person : VolunteerLetterSelector.personAccounts(accountIds)) {
-			found.put(
-				person.Id,
-				new Person(person.Name, (String) person.get('FirstName'), person.Preferred_Name__c)
-			);
+			found.put(person.Id, new Person(person.Name, (String) person.get('FirstName'), person.Preferred_Name__c));
 		}
 		return found;
 	}
@@ -298,13 +267,7 @@ public with sharing class VolunteerLetterService {
 		if (people.isEmpty()) {
 			return;
 		}
-		for (
-			AggregateResult row : VolunteerLetterSelector.approvedHoursByJob(
-				people,
-				fromDate,
-				toDate
-			)
-		) {
+		for (AggregateResult row : VolunteerLetterSelector.approvedHoursByJob(people, fromDate, toDate)) {
 			Id personId = (Id) row.get('Contact__c');
 			if (personId == null || !people.contains(personId)) {
 				personId = (Id) row.get('Account__c');
@@ -358,9 +321,7 @@ public with sharing class VolunteerLetterService {
 		Map<String, String> logos = new Map<String, String>();
 		for (Id personId : brandsByPerson.keySet()) {
 			Set<Id> brands = brandsByPerson.get(personId);
-			BrandService.Profile brand = brands.size() == 1
-				? profiles.get(new List<Id>(brands)[0])
-				: null;
+			BrandService.Profile brand = brands.size() == 1 ? profiles.get(new List<Id>(brands)[0]) : null;
 			if (brand == null) {
 				continue;
 			}
@@ -379,10 +340,7 @@ public with sharing class VolunteerLetterService {
 			String logoId = brand.logoDocumentId;
 			if (String.isNotBlank(logoId) && !logos.containsKey(logoId)) {
 				String path = BrandService.logoPath(logoId);
-				logos.put(
-					logoId,
-					path == null ? '' : '<img class="logo" src="' + escape(path) + '" alt=""/>'
-				);
+				logos.put(logoId, path == null ? '' : '<img class="logo" src="' + escape(path) + '" alt=""/>');
 			}
 			tokens.put('BrandLogo', String.isBlank(logoId) ? '' : logos.get(logoId));
 			result.put(personId, tokens);

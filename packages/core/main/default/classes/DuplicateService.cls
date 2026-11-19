@@ -145,22 +145,14 @@ public with sharing class DuplicateService {
 			if (stubFails) {
 				throw new DuplicateException('Matcher failure simulated in a test.');
 			}
-			List<Datacloud.FindDuplicatesResult> results = Datacloud.FindDuplicatesByIds.findDuplicatesByIds(
-				recordIds
-			);
+			List<Datacloud.FindDuplicatesResult> results = Datacloud.FindDuplicatesByIds.findDuplicatesByIds(recordIds);
 			for (Integer index = 0; index < results.size() && index < recordIds.size(); index++) {
-				for (
-					Datacloud.DuplicateResult duplicateResult : results[index].getDuplicateResults()
-				) {
+				for (Datacloud.DuplicateResult duplicateResult : results[index].getDuplicateResults()) {
 					String ruleName = duplicateResult.getDuplicateRule();
 					for (Datacloud.MatchResult matchResult : duplicateResult.getMatchResults()) {
 						for (Datacloud.MatchRecord matched : matchResult.getMatchRecords()) {
 							SObject record = matched.getRecord();
-							if (
-								record != null &&
-								record.Id != null &&
-								record.Id.getSObjectType() == sourceType
-							) {
+							if (record != null && record.Id != null && record.Id.getSObjectType() == sourceType) {
 								found.add(new Pair(recordIds[index], record.Id, ruleName));
 							}
 						}
@@ -307,9 +299,7 @@ public with sharing class DuplicateService {
 		if (first == null || second == null) {
 			return false;
 		}
-		if (
-			sameValue(MatchSourceService.phone(first.Phone), MatchSourceService.phone(second.Phone))
-		) {
+		if (sameValue(MatchSourceService.phone(first.Phone), MatchSourceService.phone(second.Phone))) {
 			return true;
 		}
 		Boolean samePostal = sameValue(
@@ -320,15 +310,11 @@ public with sharing class DuplicateService {
 			MatchSourceService.street(first.BillingStreet),
 			MatchSourceService.street(second.BillingStreet)
 		);
-		Boolean sameCity = sameValue(
-			FuzzyMatch.normalize(first.BillingCity),
-			FuzzyMatch.normalize(second.BillingCity)
-		);
+		Boolean sameCity = sameValue(FuzzyMatch.normalize(first.BillingCity), FuzzyMatch.normalize(second.BillingCity));
 		if (sameStreet && (samePostal || sameCity)) {
 			return true;
 		}
-		return samePostal &&
-			sameValue(FuzzyMatch.normalize(first.Name), FuzzyMatch.normalize(second.Name));
+		return samePostal && sameValue(FuzzyMatch.normalize(first.Name), FuzzyMatch.normalize(second.Name));
 	}
 
 	/** Both filled in and exactly equal; a blank never matches a blank. */
@@ -384,16 +370,10 @@ public with sharing class DuplicateService {
 			List<DuplicateRecordItem> items = new List<DuplicateRecordItem>();
 			for (Integer index = 0; index < writable.size(); index++) {
 				items.add(
-					new DuplicateRecordItem(
-						DuplicateRecordSetId = sets[index].Id,
-						RecordId = writable[index].left
-					)
+					new DuplicateRecordItem(DuplicateRecordSetId = sets[index].Id, RecordId = writable[index].left)
 				);
 				items.add(
-					new DuplicateRecordItem(
-						DuplicateRecordSetId = sets[index].Id,
-						RecordId = writable[index].right
-					)
+					new DuplicateRecordItem(DuplicateRecordSetId = sets[index].Id, RecordId = writable[index].right)
 				);
 			}
 			Database.insert(items, AccessLevel.USER_MODE);
@@ -511,24 +491,14 @@ public with sharing class DuplicateService {
 		String cleanReason = String.isBlank(reason) ? null : reason.trim().left(255);
 		for (String key : keys) {
 			dismissals.add(
-				new Duplicate_Dismissal__c(
-					Kind__c = KIND_DISMISSAL,
-					Pair_Key__c = key,
-					Reason__c = cleanReason
-				)
+				new Duplicate_Dismissal__c(Kind__c = KIND_DISMISSAL, Pair_Key__c = key, Reason__c = cleanReason)
 			);
 		}
 		Integer written = 0;
 		Savepoint beforeWrite = Database.setSavepoint();
 		try {
 			if (!dismissals.isEmpty()) {
-				for (
-					Database.SaveResult saved : Database.insert(
-						dismissals,
-						false,
-						AccessLevel.USER_MODE
-					)
-				) {
+				for (Database.SaveResult saved : Database.insert(dismissals, false, AccessLevel.USER_MODE)) {
 					if (saved.isSuccess()) {
 						written++;
 					} else {
@@ -572,9 +542,7 @@ public with sharing class DuplicateService {
 		if (duplicateRecordSetId == null) {
 			return;
 		}
-		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(
-			new Set<Id>{ duplicateRecordSetId }
-		);
+		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(new Set<Id>{ duplicateRecordSetId });
 		if (!sets.isEmpty()) {
 			Database.delete(sets, AccessLevel.USER_MODE);
 		}
@@ -588,29 +556,19 @@ public with sharing class DuplicateService {
 	 */
 	public static DuplicateRecordSet requireSet(Id duplicateRecordSetId) {
 		if (duplicateRecordSetId == null) {
-			throw new DuplicateException(
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion')
-			);
+			throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion'));
 		}
-		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(
-			new Set<Id>{ duplicateRecordSetId }
-		);
+		List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(new Set<Id>{ duplicateRecordSetId });
 		if (sets.isEmpty()) {
-			throw new DuplicateException(
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion')
-			);
+			throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion'));
 		}
 		if (sets[0].DuplicateRecordItems.size() < 2) {
-			throw new DuplicateException(
-				BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable')
-			);
+			throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable'));
 		}
 		for (DuplicateRecordItem item : sets[0].DuplicateRecordItems) {
 			Schema.SObjectType itemType = item.RecordId.getSObjectType();
 			if (itemType != Contact.SObjectType && itemType != Account.SObjectType) {
-				throw new DuplicateException(
-					BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable')
-				);
+				throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable'));
 			}
 		}
 		return sets[0];

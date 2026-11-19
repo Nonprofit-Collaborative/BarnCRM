@@ -45,9 +45,7 @@ private class ModuleSetupsTest {
 			stubbedPackages();
 			RevisedSetup giving = new RevisedSetup();
 			ModuleSetups.overrides.put('Giving', giving);
-			SettingsService.saveBookkeeping(
-				new Map<String, Object>{ 'Modules_Setup_Run__c' => 'Core,Giving' }
-			);
+			SettingsService.saveBookkeeping(new Map<String, Object>{ 'Modules_Setup_Run__c' => 'Core,Giving' });
 
 			Boolean pendingBefore = ModuleSetups.isPending('Giving', ModuleSetups.ran());
 			ModuleSetups.finish(new List<String>{ 'Giving' });
@@ -116,10 +114,7 @@ private class ModuleSetupsTest {
 		return null;
 	}
 
-	private static ModuleManagerService.ModuleStatus row(
-		ModuleManagerController.ManagerState state,
-		String name
-	) {
+	private static ModuleManagerService.ModuleStatus row(ModuleManagerController.ManagerState state, String name) {
 		for (ModuleManagerService.ModuleStatus status : state.modules) {
 			if (status.name == name) {
 				return status;
@@ -182,11 +177,7 @@ private class ModuleSetupsTest {
 					finding.fixTarget,
 					'Fixed by Finish Setup'
 				);
-				Assert.areEqual(
-					System.Label.Core_ModuleSetup_FinishButton,
-					finding.fixLabel,
-					'Its button'
-				);
+				Assert.areEqual(System.Label.Core_ModuleSetup_FinishButton, finding.fixLabel, 'Its button');
 			}
 		}
 	}
@@ -212,14 +203,8 @@ private class ModuleSetupsTest {
 				Assert.areEqual(1, stubs.get(ModuleSetups.CORE).timesRun, 'Core setup ran');
 				Assert.areEqual(1, stubs.get('Giving').timesRun, 'Giving setup ran');
 				Assert.areEqual(maria.Id, stubs.get('Giving').installer, 'Maria is the installer');
-				Assert.isTrue(
-					ModuleSetups.ran().containsAll(new Set<String>{ 'core', 'giving' }),
-					'Both marked'
-				);
-				Assert.isTrue(
-					report.fixOutcome.contains(String.join(finding.fixScope, ', ')),
-					'Says which'
-				);
+				Assert.isTrue(ModuleSetups.ran().containsAll(new Set<String>{ 'core', 'giving' }), 'Both marked');
+				Assert.isTrue(report.fixOutcome.contains(String.join(finding.fixScope, ', ')), 'Says which');
 				for (HealthCheckService.Finding after : report.findings) {
 					Assert.areNotEqual('module_setup_not_run', after.key, 'The finding is gone');
 				}
@@ -236,13 +221,9 @@ private class ModuleSetupsTest {
 
 			System.runAs(maria) {
 				Test.startTest();
-				ModuleManagerController.ManagerState first = ModuleManagerController.finishSetup(
-					'Giving'
-				);
+				ModuleManagerController.ManagerState first = ModuleManagerController.finishSetup('Giving');
 				Boolean pendingBefore = row(first, ModuleSetups.CORE).setupPending;
-				ModuleManagerController.ManagerState second = ModuleManagerController.finishSetup(
-					'Giving'
-				);
+				ModuleManagerController.ManagerState second = ModuleManagerController.finishSetup('Giving');
 				Test.stopTest();
 
 				Assert.areEqual(2, stubs.get('Giving').timesRun, 'Pressed twice, run twice');
@@ -271,10 +252,7 @@ private class ModuleSetupsTest {
 
 			System.runAs(priya) {
 				try {
-					HealthCheckController.applyFix(
-						ModuleSetups.FIX_KEY,
-						new List<String>{ 'Core' }
-					);
+					HealthCheckController.applyFix(ModuleSetups.FIX_KEY, new List<String>{ 'Core' });
 					Assert.fail('Health Check refuses Priya');
 				} catch (AuraHandledException expected) {
 					Assert.isNotNull(expected.getMessage(), 'With a sentence');

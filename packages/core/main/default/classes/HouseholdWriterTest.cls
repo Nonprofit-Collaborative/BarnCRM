@@ -13,8 +13,7 @@ private class HouseholdWriterTest {
 
 	/** Failures logged, counted on their entries: repeats share one entry (R-E7). */
 	private static Integer loggedErrors() {
-		Decimal total = (Decimal) [SELECT SUM(Occurrences__c) total FROM Error_Log__c][0]
-			.get('total');
+		Decimal total = (Decimal) [SELECT SUM(Occurrences__c) total FROM Error_Log__c][0].get('total');
 		return total == null ? 0 : total.intValue();
 	}
 
@@ -54,14 +53,8 @@ private class HouseholdWriterTest {
 
 			Test.startTest();
 			Assert.isTrue(HouseholdWriter.createHouseholds(null).isEmpty(), 'Create null');
-			Assert.isTrue(
-				HouseholdWriter.createHouseholds(new List<Account>()).isEmpty(),
-				'Create empty'
-			);
-			Assert.isTrue(
-				HouseholdWriter.updateHouseholdsReportingRefusals(null).isEmpty(),
-				'Update null'
-			);
+			Assert.isTrue(HouseholdWriter.createHouseholds(new List<Account>()).isEmpty(), 'Create empty');
+			Assert.isTrue(HouseholdWriter.updateHouseholdsReportingRefusals(null).isEmpty(), 'Update null');
 			Assert.isTrue(
 				HouseholdWriter.updateHouseholdsReportingRefusals(new List<Account>()).isEmpty(),
 				'Update empty'
@@ -70,20 +63,11 @@ private class HouseholdWriterTest {
 			HouseholdWriter.createMemberships(null);
 			HouseholdWriter.createMemberships(new List<Household_Member__c>());
 			Assert.isTrue(HouseholdWriter.linkContactsToHouseholds(null).isEmpty(), 'Link null');
-			Assert.isTrue(
-				HouseholdWriter.linkContactsToHouseholds(new List<Contact>()).isEmpty(),
-				'Link empty'
-			);
+			Assert.isTrue(HouseholdWriter.linkContactsToHouseholds(new List<Contact>()).isEmpty(), 'Link empty');
 			HouseholdWriter.saveMergedMemberships(null, null);
-			HouseholdWriter.saveMergedMemberships(
-				new List<Household_Member__c>(),
-				new List<Household_Member__c>()
-			);
+			HouseholdWriter.saveMergedMemberships(new List<Household_Member__c>(), new List<Household_Member__c>());
 			HouseholdWriter.collapseMemberships(null, null);
-			HouseholdWriter.collapseMemberships(
-				new List<Household_Member__c>(),
-				new List<Household_Member__c>()
-			);
+			HouseholdWriter.collapseMemberships(new List<Household_Member__c>(), new List<Household_Member__c>());
 			HouseholdWriter.deleteHouseholds(null);
 			HouseholdWriter.deleteHouseholds(new List<Account>());
 			HouseholdWriter.deleteMemberships(null);
@@ -107,9 +91,7 @@ private class HouseholdWriterTest {
 			Integer before = loggedErrors();
 
 			Test.startTest();
-			Set<Id> reported = HouseholdWriter.updateHouseholdsReportingRefusals(
-				new List<Account>{ kept, refused }
-			);
+			Set<Id> reported = HouseholdWriter.updateHouseholdsReportingRefusals(new List<Account>{ kept, refused });
 			Test.stopTest();
 
 			Assert.areEqual(new Set<Id>{ refused.Id }, reported, 'Only the refused household');
@@ -211,10 +193,7 @@ private class HouseholdWriterTest {
 			);
 			Test.stopTest();
 
-			Assert.isTrue(
-				loggedErrors() >= before + 2,
-				'A refused update and a refused delete are each logged'
-			);
+			Assert.isTrue(loggedErrors() >= before + 2, 'A refused update and a refused delete are each logged');
 		}
 	}
 
@@ -249,9 +228,7 @@ private class HouseholdWriterTest {
 			Test.startTest();
 			HouseholdWriter.deleteHouseholds(new List<Account>{ emptied });
 			HouseholdWriter.deleteMemberships(new List<Household_Member__c>{ rows[0] });
-			HouseholdWriter.undeleteMemberships(
-				new List<Household_Member__c>{ new Household_Member__c() }
-			);
+			HouseholdWriter.undeleteMemberships(new List<Household_Member__c>{ new Household_Member__c() });
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -267,15 +244,9 @@ private class HouseholdWriterTest {
 			Integer before = loggedErrors();
 
 			Test.startTest();
-			HouseholdWriter.deleteHouseholds(
-				new List<Account>{ TestDataFactory.organization(new Account()) }
-			);
-			HouseholdWriter.deleteMemberships(
-				new List<Household_Member__c>{ new Household_Member__c() }
-			);
-			HouseholdWriter.undeleteMemberships(
-				new List<Household_Member__c>{ new Household_Member__c() }
-			);
+			HouseholdWriter.deleteHouseholds(new List<Account>{ TestDataFactory.organization(new Account()) });
+			HouseholdWriter.deleteMemberships(new List<Household_Member__c>{ new Household_Member__c() });
+			HouseholdWriter.undeleteMemberships(new List<Household_Member__c>{ new Household_Member__c() });
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -297,16 +268,8 @@ private class HouseholdWriterTest {
 			HouseholdWriter.deleteHouseholds(new List<Account>{ emptied });
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Household_Member__c WHERE Id IN :rows],
-				'The memberships are gone'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Account WHERE Id = :emptied.Id],
-				'So is the emptied household'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Household_Member__c WHERE Id IN :rows], 'The memberships are gone');
+			Assert.areEqual(0, [SELECT COUNT() FROM Account WHERE Id = :emptied.Id], 'So is the emptied household');
 		}
 	}
 
@@ -342,10 +305,7 @@ private class HouseholdWriterTest {
 			Test.startTest();
 			System.runAs(maria) {
 				Assert.isTrue(HouseholdWriter.canCreateHouseholds(), 'Maria may create one');
-				saves = HouseholdWriter.createHouseholdsForUser(
-					new List<Account>{ household },
-					new Set<Id>()
-				);
+				saves = HouseholdWriter.createHouseholdsForUser(new List<Account>{ household }, new Set<Id>());
 			}
 			Test.stopTest();
 
@@ -374,11 +334,7 @@ private class HouseholdWriterTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'),
-				message,
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'), message, 'Refused');
 			Assert.areEqual(0, householdsNamed('Reader Household'), 'Nothing was created');
 		}
 	}
@@ -398,11 +354,7 @@ private class HouseholdWriterTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'),
-				message,
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'), message, 'Refused');
 			Assert.areEqual(0, householdsNamed('Field Household'), 'Nothing was created');
 		}
 	}
@@ -410,8 +362,7 @@ private class HouseholdWriterTest {
 	@IsTest
 	static void aTouchedHouseholdThePersonCannotEditIsRefusedAndNothingIsCreated() {
 		System.runAs(TestUsers.admin()) {
-			String orgDefault = [SELECT DefaultAccountAccess FROM Organization LIMIT 1]
-			.DefaultAccountAccess;
+			String orgDefault = [SELECT DefaultAccountAccess FROM Organization LIMIT 1].DefaultAccountAccess;
 			if (orgDefault == 'Edit' || orgDefault == 'ReadEditTransfer') {
 				// Everyone edits every account here, so no household is one staff cannot edit.
 				Assert.isNotNull(orgDefault, 'Only a public read and write org skips this');
@@ -431,11 +382,7 @@ private class HouseholdWriterTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateNoHouseholdAccess'),
-				message,
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoHouseholdAccess'), message, 'Refused');
 			Assert.areEqual(0, householdsNamed('Split Household'), 'Nothing was created');
 		}
 	}
@@ -445,10 +392,7 @@ private class HouseholdWriterTest {
 		System.runAs(TestUsers.admin()) {
 			Id other;
 			for (Schema.RecordTypeInfo info : Schema.SObjectType.Account.getRecordTypeInfos()) {
-				if (
-					!info.isMaster() &&
-					info.getRecordTypeId() != HouseholdService.householdRecordTypeId()
-				) {
+				if (!info.isMaster() && info.getRecordTypeId() != HouseholdService.householdRecordTypeId()) {
 					other = info.getRecordTypeId();
 					break;
 				}
@@ -464,20 +408,14 @@ private class HouseholdWriterTest {
 			System.runAs(maria) {
 				message = refusalFor(
 					new List<Account>{
-						TestDataFactory.organization(
-							new Account(Name = 'Other Type', RecordTypeId = other)
-						)
+						TestDataFactory.organization(new Account(Name = 'Other Type', RecordTypeId = other))
 					},
 					null
 				);
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
-				message,
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'), message, 'Refused');
 			Assert.areEqual(0, householdsNamed('Other Type'), 'Nothing was created');
 		}
 	}
@@ -545,19 +483,12 @@ private class HouseholdWriterTest {
 				]
 				.AccountId;
 				editSaved = Database.update(
-						new Account(
-							Id = householdId,
-							Name = 'The Nortega Home',
-							Custom_Name__c = true
-						),
+						new Account(Id = householdId, Name = 'The Nortega Home', Custom_Name__c = true),
 						AccessLevel.USER_MODE
 					)
 					.isSuccess();
 				try {
-					Database.insert(
-						HouseholdTestDataFactory.newHousehold('Past BarnCRM'),
-						AccessLevel.USER_MODE
-					);
+					Database.insert(HouseholdTestDataFactory.newHousehold('Past BarnCRM'), AccessLevel.USER_MODE);
 				} catch (DmlException refused) {
 					directInsertRefused = true;
 				}

@@ -23,18 +23,13 @@ private class CustomMetadataManagerControllerTest {
 	}
 
 	private static User maria() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Metadata_Admin' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Metadata_Admin' });
 	}
 
 	private static CustomMetadataManagerService.RowInput closeFriend() {
 		CustomMetadataManagerService.RowInput input = new CustomMetadataManagerService.RowInput();
 		input.label = 'Close friend';
-		input.values = new Map<String, String>{
-			'Type__c' => 'Friend',
-			'Reciprocal_Type__c' => 'Friend'
-		};
+		input.values = new Map<String, String>{ 'Type__c' => 'Friend', 'Reciprocal_Type__c' => 'Friend' };
 		return input;
 	}
 
@@ -135,21 +130,9 @@ private class CustomMetadataManagerControllerTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'),
-			saveMessage,
-			'Validation message'
-		);
-		Assert.areEqual(
-			BarnHelp.text('Core', 'Core_CmdtManager_RecordNotFound'),
-			archiveMessage,
-			'Unknown row'
-		);
-		Assert.areEqual(
-			BarnHelp.text('Core', 'Core_CmdtManager_LoadError'),
-			outcomeMessage,
-			'Bad Id'
-		);
+		Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'), saveMessage, 'Validation message');
+		Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_RecordNotFound'), archiveMessage, 'Unknown row');
+		Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_LoadError'), outcomeMessage, 'Bad Id');
 	}
 
 	@IsTest
@@ -169,11 +152,7 @@ private class CustomMetadataManagerControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_CmdtManager_PermissionRequired'),
-				message,
-				'Refused first'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_PermissionRequired'), message, 'Refused first');
 		}
 	}
 

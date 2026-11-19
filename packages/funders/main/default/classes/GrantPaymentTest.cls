@@ -11,10 +11,7 @@ private class GrantPaymentTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Gpayreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gpayreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static final Date START = Date.newInstance(2027, 1, 1);
@@ -75,10 +72,7 @@ private class GrantPaymentTest {
 				WHERE Id = :expected.Id
 			]
 			.Received_Date__c;
-			update new Grant_Payment__c(
-				Id = expected.Id,
-				Status__c = GrantPaymentService.STATUS_RECEIVED
-			);
+			update new Grant_Payment__c(Id = expected.Id, Status__c = GrantPaymentService.STATUS_RECEIVED);
 			Test.stopTest();
 
 			Map<Id, Grant_Payment__c> saved = new Map<Id, Grant_Payment__c>(
@@ -133,19 +127,11 @@ private class GrantPaymentTest {
 			Assert.areEqual(2, built.payments.size(), 'Two payments');
 			Assert.areEqual(START, built.payments[0].dueDate, 'In date order');
 			Assert.areEqual(25000, built.amountScheduled, 'All of it scheduled');
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'),
-				again,
-				'Not twice'
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'), again, 'Not twice');
 			Assert.areEqual('Annual', built.frequency, 'The frequency is kept on the grant');
 			Assert.areEqual(5, before.frequencies.size(), 'Five frequencies to choose from');
 			Assert.isNotNull(before.fieldLabels.get('dueDate'), 'Headings from field labels');
-			Assert.areEqual(
-				GrantPaymentService.STATUS_RECEIVED,
-				after.payments[0].status,
-				'Marked'
-			);
+			Assert.areEqual(GrantPaymentService.STATUS_RECEIVED, after.payments[0].status, 'Marked');
 			Assert.areEqual(Date.today(), after.payments[0].receivedDate, 'Dated today');
 			Assert.areEqual(12500, after.amountReceived, 'Counted received');
 		}
@@ -155,62 +141,25 @@ private class GrantPaymentTest {
 	static void rowsThatDoNotFitTheAwardAreRefused() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			Grant__c grant = award();
-			Grant__c applied = GrantTestData.grant(
-				'Applied',
-				grant.Funder__c,
-				GrantService.STAGE_APPLIED
-			);
+			Grant__c applied = GrantTestData.grant('Applied', grant.Funder__c, GrantService.STAGE_APPLIED);
 			insert applied;
 
 			Test.startTest();
 			String shortTotal = refusalOf(grant.Id, rows(new List<Object>{ '2027-01-01', 100 }));
 			String outside = refusalOf(grant.Id, rows(new List<Object>{ '2029-01-01', 25000 }));
-			String zero = refusalOf(
-				grant.Id,
-				rows(new List<Object>{ '2027-01-01', 25000, '2027-06-01', 0 })
-			);
+			String zero = refusalOf(grant.Id, rows(new List<Object>{ '2027-01-01', 25000, '2027-06-01', 0 }));
 			String empty = refusalOf(grant.Id, '[]');
 			String unreadable = refusalOf(grant.Id, 'not json');
-			String notAwarded = refusalOf(
-				applied.Id,
-				rows(new List<Object>{ '2027-01-01', 25000 })
-			);
+			String notAwarded = refusalOf(applied.Id, rows(new List<Object>{ '2027-01-01', 25000 }));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
-				shortTotal,
-				'Must add up'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
-				outside,
-				'Within the period'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
-				zero,
-				'Above zero'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
-				empty,
-				'Something to save'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'),
-				unreadable,
-				'Readable'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'),
-				notAwarded,
-				'Awarded only'
-			);
-			Assert.isFalse(
-				GrantScheduleController.getSchedule(applied.Id).canBuild,
-				'Not offered before the award'
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'), shortTotal, 'Must add up');
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'), outside, 'Within the period');
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'), zero, 'Above zero');
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'), empty, 'Something to save');
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'), unreadable, 'Readable');
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Schedule_CannotBuild'), notAwarded, 'Awarded only');
+			Assert.isFalse(GrantScheduleController.getSchedule(applied.Id).canBuild, 'Not offered before the award');
 			Assert.areEqual(0, [SELECT COUNT() FROM Grant_Payment__c], 'Nothing saved');
 		}
 	}
@@ -244,27 +193,15 @@ private class GrantPaymentTest {
 			seen = GrantScheduleController.getSchedule(grant.Id);
 			Test.stopTest();
 		}
-		Assert.areEqual(
-			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
-			markRefusal,
-			'Cannot mark'
-		);
-		Assert.areEqual(
-			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
-			saveRefusal,
-			'Cannot build'
-		);
+		Assert.areEqual(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'), markRefusal, 'Cannot mark');
+		Assert.areEqual(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'), saveRefusal, 'Cannot build');
 		Assert.areEqual(1, seen.payments.size(), 'Reads the schedule');
 		Assert.isFalse(seen.canMarkReceived, 'Mark Received not offered');
 		Assert.isFalse(seen.canBuild, 'Build not offered');
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			delete grant;
 		}
-		Assert.areEqual(
-			0,
-			[SELECT COUNT() FROM Grant_Payment__c WITH SYSTEM_MODE],
-			'Deleted with the grant'
-		);
+		Assert.areEqual(0, [SELECT COUNT() FROM Grant_Payment__c WITH SYSTEM_MODE], 'Deleted with the grant');
 	}
 
 	@IsTest
@@ -291,11 +228,7 @@ private class GrantPaymentTest {
 			GrantScheduleController.undoReceived(previous.id, previous.status, previous.dateValue);
 			String again;
 			try {
-				GrantScheduleController.undoReceived(
-					previous.id,
-					previous.status,
-					previous.dateValue
-				);
+				GrantScheduleController.undoReceived(previous.id, previous.status, previous.dateValue);
 			} catch (AuraHandledException e) {
 				again = e.getMessage();
 			}
@@ -327,10 +260,7 @@ private class GrantPaymentTest {
 				again,
 				'A payment no longer Received is left alone'
 			);
-			Assert.isFalse(
-				GrantPaymentService.undoReceived(payment.Id, 'Cancelled', null),
-				'Only back to Expected'
-			);
+			Assert.isFalse(GrantPaymentService.undoReceived(payment.Id, 'Cancelled', null), 'Only back to Expected');
 		}
 	}
 
@@ -345,10 +275,6 @@ private class GrantPaymentTest {
 				refusal = e.getMessage();
 			}
 		}
-		Assert.areEqual(
-			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
-			refusal,
-			'Refused'
-		);
+		Assert.areEqual(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'), refusal, 'Refused');
 	}
 }

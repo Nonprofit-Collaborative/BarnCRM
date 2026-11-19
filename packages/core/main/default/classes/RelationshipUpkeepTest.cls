@@ -42,10 +42,7 @@ private class RelationshipUpkeepTest {
 			Assert.isFalse(Schema.SObjectType.Contact.isUpdateable(), 'Nor edit the other person');
 
 			Test.startTest();
-			Database.insert(
-				RelationshipTestDataFactory.between(people[0], people[1], 'Spouse'),
-				AccessLevel.USER_MODE
-			);
+			Database.insert(RelationshipTestDataFactory.between(people[0], people[1], 'Spouse'), AccessLevel.USER_MODE);
 			Test.stopTest();
 		}
 
@@ -66,11 +63,7 @@ private class RelationshipUpkeepTest {
 
 		System.runAs(narrow) {
 			RelationshipTestDataFactory.quietOtherAutomations();
-			Relationship__c mine = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c mine = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			Database.insert(mine, AccessLevel.USER_MODE);
 
 			Test.startTest();
@@ -79,11 +72,7 @@ private class RelationshipUpkeepTest {
 				AccessLevel.USER_MODE
 			);
 			Relationship__c other = otherSideOf(people[1].Id);
-			Assert.areEqual(
-				'Married in 2004',
-				other.Description__c,
-				'The edit reached the other side'
-			);
+			Assert.areEqual('Married in 2004', other.Description__c, 'The edit reached the other side');
 
 			Database.delete(new Relationship__c(Id = mine.Id), AccessLevel.USER_MODE);
 			Test.stopTest();
@@ -109,9 +98,7 @@ private class RelationshipUpkeepTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Relationship__c> batch = new List<Relationship__c>();
 			for (Integer i = 0; i < 200; i++) {
-				batch.add(
-					RelationshipTestDataFactory.between(people[2 * i], people[2 * i + 1], 'Friend')
-				);
+				batch.add(RelationshipTestDataFactory.between(people[2 * i], people[2 * i + 1], 'Friend'));
 			}
 
 			Test.startTest();
@@ -142,10 +129,7 @@ private class RelationshipUpkeepTest {
 	 * row; Read Only already reads them.
 	 */
 	private static User narrowUser() {
-		User narrow = TestUsers.peopleReaderWith(
-			'Narrow',
-			new List<String>{ READ_ONLY_PERMISSION_SET }
-		);
+		User narrow = TestUsers.peopleReaderWith('Narrow', new List<String>{ READ_ONLY_PERMISSION_SET });
 		List<String> fields = new List<String>{
 			'Contact__c',
 			'Person_Account__c',
@@ -158,10 +142,7 @@ private class RelationshipUpkeepTest {
 			'Description__c'
 		};
 		System.runAs(new User(Id = UserInfo.getUserId())) {
-			PermissionSet grant = new PermissionSet(
-				Name = ENTRY_PERMISSION_SET,
-				Label = ENTRY_PERMISSION_SET
-			);
+			PermissionSet grant = new PermissionSet(Name = ENTRY_PERMISSION_SET, Label = ENTRY_PERMISSION_SET);
 			insert as system grant;
 			insert as system new ObjectPermissions(
 				ParentId = grant.Id,
@@ -184,10 +165,7 @@ private class RelationshipUpkeepTest {
 				);
 			}
 			insert as system edits;
-			insert as system new PermissionSetAssignment(
-				AssigneeId = narrow.Id,
-				PermissionSetId = grant.Id
-			);
+			insert as system new PermissionSetAssignment(AssigneeId = narrow.Id, PermissionSetId = grant.Id);
 		}
 		return narrow;
 	}

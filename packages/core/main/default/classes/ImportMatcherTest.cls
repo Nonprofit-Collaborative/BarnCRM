@@ -37,15 +37,8 @@ private class ImportMatcherTest {
 				new Set<String>{ 'ana@example.org', 'BEN@EXAMPLE.ORG', 'nobody@example.org' }
 			);
 			Test.stopTest();
-			Assert.areEqual(
-				2,
-				sharedKeys(found),
-				'Both known emails match and the unknown one does not.'
-			);
-			Assert.isNotNull(
-				found.get('ana@example.org'),
-				'Keyed by the email folded to lower case.'
-			);
+			Assert.areEqual(2, sharedKeys(found), 'Both known emails match and the unknown one does not.');
+			Assert.isNotNull(found.get('ana@example.org'), 'Keyed by the email folded to lower case.');
 			Assert.areEqual(
 				found.get('ana@example.org'),
 				found.get(ImportMatcher.firstNameKey('ana@example.org', 'Ana')),
@@ -65,11 +58,7 @@ private class ImportMatcherTest {
 				}
 			);
 			Test.stopTest();
-			Assert.areEqual(
-				1,
-				sharedKeys(found),
-				'Only the name at the right postal code matches.'
-			);
+			Assert.areEqual(1, sharedKeys(found), 'Only the name at the right postal code matches.');
 		}
 	}
 
@@ -99,9 +88,7 @@ private class ImportMatcherTest {
 			Set<String> externalIds = new Set<String>();
 			for (Integer i = 0; i < 250; i++) {
 				emails.add('row' + i + '@example.org');
-				namePostalKeys.add(
-					ImportMatcher.nameAndPostalKey('Row' + i, '9720' + Math.mod(i, 10))
-				);
+				namePostalKeys.add(ImportMatcher.nameAndPostalKey('Row' + i, '9720' + Math.mod(i, 10)));
 				externalIds.add('EXT-' + i);
 			}
 
@@ -116,8 +103,7 @@ private class ImportMatcherTest {
 
 			Assert.isTrue(
 				queriesUsed < 20,
-				'A 250-row import chunk across several rules stays far under the query limit, got ' +
-				queriesUsed
+				'A 250-row import chunk across several rules stays far under the query limit, got ' + queriesUsed
 			);
 		}
 	}
@@ -130,10 +116,7 @@ private class ImportMatcherTest {
 				'A row with no postal code cannot be matched on name plus postal code.'
 			);
 			Assert.isNull(ImportMatcher.nameAndPostalKey(null, '97201'), 'Nor one with no name.');
-			Assert.isNotNull(
-				ImportMatcher.nameAndPostalKey('Ramirez', '97201'),
-				'Both parts, a key.'
-			);
+			Assert.isNotNull(ImportMatcher.nameAndPostalKey('Ramirez', '97201'), 'Both parts, a key.');
 		}
 	}
 
@@ -151,11 +134,7 @@ private class ImportMatcherTest {
 				organizationRecordType
 			);
 			Test.stopTest();
-			Assert.areEqual(
-				1,
-				found.size(),
-				'The organization is found by its name, ignoring case.'
-			);
+			Assert.areEqual(1, found.size(), 'The organization is found by its name, ignoring case.');
 		}
 	}
 
@@ -211,9 +190,7 @@ private class ImportMatcherTest {
 			Database.DMLOptions options = new Database.DMLOptions();
 			options.DuplicateRuleHeader.AllowSave = true;
 			Database.insert(
-				TestDataFactory.person(
-					new Contact(LastName = 'Noreadramirez', Email = 'noread.ana@example.org')
-				),
+				TestDataFactory.person(new Contact(LastName = 'Noreadramirez', Email = 'noread.ana@example.org')),
 				options
 			);
 			User reader = new User(
@@ -235,9 +212,7 @@ private class ImportMatcherTest {
 			Test.startTest();
 			System.runAs(reader) {
 				ImportMatcher.forgetHeldKeys();
-				byEmail = ImportMatcher.contactsByEmail(
-					new Set<String>{ 'noread.ana@example.org' }
-				);
+				byEmail = ImportMatcher.contactsByEmail(new Set<String>{ 'noread.ana@example.org' });
 				byPostal = ImportMatcher.contactsByNameAndPostalCode(
 					new Set<String>{ ImportMatcher.nameAndPostalKey('Noreadramirez', '97201') }
 				);
@@ -250,8 +225,7 @@ private class ImportMatcherTest {
 				'The email field is named for the run log: ' + ImportMatcher.unreadableFields()
 			);
 			Assert.isTrue(
-				ImportMatcher.unreadableFields()
-					.contains(Contact.MailingPostalCode.getDescribe().getLabel()),
+				ImportMatcher.unreadableFields().contains(Contact.MailingPostalCode.getDescribe().getLabel()),
 				'So is the postal code.'
 			);
 		}

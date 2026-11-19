@@ -78,19 +78,14 @@ public with sharing class MembershipService {
 			if (term.Member_Since__c == null) {
 				term.Member_Since__c = before == null
 					? term.Start_Date__c
-					: (before.Member_Since__c != null
-							? before.Member_Since__c
-							: before.Start_Date__c);
+					: (before.Member_Since__c != null ? before.Member_Since__c : before.Start_Date__c);
 			}
 		}
 	}
 
 	/** The last day of a term starting on `starts`, or null when the level does not expire. */
 	public static Date endOf(Date starts, Membership_Level__c level) {
-		Integer months = level == null ||
-			level.Term_Months__c == null
-			? 12
-			: level.Term_Months__c.intValue();
+		Integer months = level == null || level.Term_Months__c == null ? 12 : level.Term_Months__c.intValue();
 		return starts == null || months <= 0 ? null : starts.addMonths(months).addDays(-1);
 	}
 
@@ -124,27 +119,17 @@ public with sharing class MembershipService {
 		for (Renewal request : requests) {
 			Membership_Term__c old = olds.get(request.termId);
 			if (old == null) {
-				throw new MembershipException(
-					BarnHelp.text('Memberships', 'Memberships_Error_NotFound')
-				);
+				throw new MembershipException(BarnHelp.text('Memberships', 'Memberships_Error_NotFound'));
 			}
 			if (old.Status__c != CURRENT && old.Status__c != GRACE && old.Status__c != LAPSED) {
-				throw new MembershipException(
-					BarnHelp.text('Memberships', 'Memberships_Error_CannotRenew')
-				);
+				throw new MembershipException(BarnHelp.text('Memberships', 'Memberships_Error_CannotRenew'));
 			}
-			Membership_Level__c level = levels.get(
-				request.levelId != null ? request.levelId : old.Level__c
-			);
+			Membership_Level__c level = levels.get(request.levelId != null ? request.levelId : old.Level__c);
 			if (level == null) {
-				throw new MembershipException(
-					BarnHelp.text('Memberships', 'Memberships_Error_NoLevel')
-				);
+				throw new MembershipException(BarnHelp.text('Memberships', 'Memberships_Error_NoLevel'));
 			}
 			Boolean continues = old.Status__c != LAPSED && old.End_Date__c != null;
-			Date starts = continues
-				? old.End_Date__c.addDays(1)
-				: (request.onDate != null ? request.onDate : today());
+			Date starts = continues ? old.End_Date__c.addDays(1) : (request.onDate != null ? request.onDate : today());
 			made.add(
 				new Membership_Term__c(
 					Level__c = level.Id,
@@ -153,18 +138,14 @@ public with sharing class MembershipService {
 					Status__c = CURRENT,
 					Start_Date__c = starts,
 					End_Date__c = endOf(starts, level),
-					Member_Since__c = old.Member_Since__c != null
-						? old.Member_Since__c
-						: old.Start_Date__c,
+					Member_Since__c = old.Member_Since__c != null ? old.Member_Since__c : old.Start_Date__c,
 					Previous_Term__c = old.Id,
 					Origin__c = continues ? 'Renewal' : 'Rejoin',
 					Source__c = request.source,
 					Dues__c = level.Dues__c,
 					Amount_Paid__c = request.amountPaid,
 					Gift_Id__c = request.giftId,
-					Commitment_Id__c = request.commitmentId != null
-						? request.commitmentId
-						: old.Commitment_Id__c,
+					Commitment_Id__c = request.commitmentId != null ? request.commitmentId : old.Commitment_Id__c,
 					Payment_Id__c = request.paymentId,
 					Directory_Opt_In__c = old.Directory_Opt_In__c,
 					Directory_Location__c = old.Directory_Location__c,

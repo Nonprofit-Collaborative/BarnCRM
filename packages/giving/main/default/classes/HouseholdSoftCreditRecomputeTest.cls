@@ -23,9 +23,7 @@ private class HouseholdSoftCreditRecomputeTest {
 		List<Account> households = new List<Account>();
 		for (Integer i = 0; i < howMany; i++) {
 			households.add(
-				TestDataFactory.household(
-					new Account(Name = 'Household ' + i, RecordTypeId = householdType)
-				)
+				TestDataFactory.household(new Account(Name = 'Household ' + i, RecordTypeId = householdType))
 			);
 		}
 		Database.insert(households, AccessLevel.SYSTEM_MODE);
@@ -85,9 +83,7 @@ private class HouseholdSoftCreditRecomputeTest {
 	static void aBulkLoadOfPeopleIsCappedAtFiftyHouseholdsAndTheRestIsLogged() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Set<Id> households = new Set<Id>(
-				householdsWithGifts(
-					HouseholdSoftCreditRecompute.HOUSEHOLDS_PER_TRANSACTION_CAP + 10
-				)
+				householdsWithGifts(HouseholdSoftCreditRecompute.HOUSEHOLDS_PER_TRANSACTION_CAP + 10)
 			);
 
 			Test.startTest();
@@ -117,11 +113,7 @@ private class HouseholdSoftCreditRecomputeTest {
 				queuedBefore,
 				'Every slot this transaction may use is taken'
 			);
-			Assert.areEqual(
-				queuedBefore,
-				queuedAfter,
-				'The next request takes none and does not throw'
-			);
+			Assert.areEqual(queuedBefore, queuedAfter, 'The next request takes none and does not throw');
 		}
 	}
 

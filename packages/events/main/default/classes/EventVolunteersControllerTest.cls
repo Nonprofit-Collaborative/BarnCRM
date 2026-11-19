@@ -37,9 +37,7 @@ private class EventVolunteersControllerTest {
 	static void showsNothingWhenNoModuleKeepsVolunteerJobs() {
 		System.runAs(staff()) {
 			Event__c event = conference();
-			EventVolunteersController.Volunteers result = EventVolunteersController.getVolunteers(
-				event.Id
-			);
+			EventVolunteersController.Volunteers result = EventVolunteersController.getVolunteers(event.Id);
 			Assert.areEqual(EventVolunteerExtensions.isAvailable(), result.available);
 			if (!result.available) {
 				Assert.isTrue(result.jobs.isEmpty());
@@ -55,22 +53,10 @@ private class EventVolunteersControllerTest {
 		}
 		System.runAs(staffWithVolunteers()) {
 			Event__c event = conference();
-			String jobId = EventVolunteersController.addJob(
-				event.Id,
-				' Registration Desk ',
-				'Greet'
-			);
+			String jobId = EventVolunteersController.addJob(event.Id, ' Registration Desk ', 'Greet');
 			Assert.isNotNull(jobId);
-			EventVolunteersController.addShift(
-				event.Id,
-				jobId,
-				event.Start__c,
-				event.Start__c.addHours(4),
-				3
-			);
-			EventVolunteersController.Volunteers result = EventVolunteersController.getVolunteers(
-				event.Id
-			);
+			EventVolunteersController.addShift(event.Id, jobId, event.Start__c, event.Start__c.addHours(4), 3);
+			EventVolunteersController.Volunteers result = EventVolunteersController.getVolunteers(event.Id);
 			Assert.isTrue(result.available);
 			Assert.areEqual(1, result.jobs.size());
 			Assert.areEqual('Registration Desk', result.jobs[0].name);
@@ -95,13 +81,7 @@ private class EventVolunteersControllerTest {
 			List<Datetime> ends = new List<Datetime>{ start.addHours(1), start.addHours(1), start };
 			for (Integer i = 0; i < needs.size(); i++) {
 				try {
-					EventVolunteersController.addShift(
-						event.Id,
-						event.Id,
-						start,
-						ends[i],
-						needs[i]
-					);
+					EventVolunteersController.addShift(event.Id, event.Id, start, ends[i], needs[i]);
 					Assert.fail('A bad shift is refused: ' + i);
 				} catch (AuraHandledException refused) {
 					Assert.isNotNull(refused);

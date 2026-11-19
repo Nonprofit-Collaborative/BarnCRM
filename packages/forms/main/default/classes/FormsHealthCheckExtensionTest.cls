@@ -41,10 +41,7 @@ private class FormsHealthCheckExtensionTest {
 
 			Set<String> found = keys(extension.findings());
 			Assert.isTrue(found.contains('forms_public_no_site'), 'No Site: ' + found);
-			Assert.isTrue(
-				found.contains(FormsHealthCheckExtension.FIX_SCHEDULE),
-				'Not scheduled: ' + found
-			);
+			Assert.isTrue(found.contains(FormsHealthCheckExtension.FIX_SCHEDULE), 'Not scheduled: ' + found);
 
 			Test.startTest();
 			String done = extension.runFix(
@@ -68,23 +65,14 @@ private class FormsHealthCheckExtensionTest {
 			Form__c form = FormsTestData.publicVolunteerInterest(50);
 			FormsHealthCheckExtension extension = new FormsHealthCheckExtension();
 
-			Assert.isTrue(
-				keys(extension.findings()).contains(FormsHealthCheckExtension.FIX_GUEST),
-				'Reported'
-			);
+			Assert.isTrue(keys(extension.findings()).contains(FormsHealthCheckExtension.FIX_GUEST), 'Reported');
 			Assert.areEqual(
 				new List<String>{ 'Zzforms Site' },
 				extension.fixScope(FormsHealthCheckExtension.FIX_GUEST),
 				'Names the Site'
 			);
-			extension.runFix(
-				FormsHealthCheckExtension.FIX_GUEST,
-				new List<String>{ 'Zzforms Site' }
-			);
-			Assert.isFalse(
-				keys(extension.findings()).contains(FormsHealthCheckExtension.FIX_GUEST),
-				'Given'
-			);
+			extension.runFix(FormsHealthCheckExtension.FIX_GUEST, new List<String>{ 'Zzforms Site' });
+			Assert.isFalse(keys(extension.findings()).contains(FormsHealthCheckExtension.FIX_GUEST), 'Given');
 			Assert.isNotNull(extension.fixLabel(FormsHealthCheckExtension.FIX_GUEST), 'Labelled');
 			Assert.isNull(extension.fixLabel('other'), 'Not its key');
 			Assert.areEqual(

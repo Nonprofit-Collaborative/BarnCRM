@@ -8,21 +8,14 @@ private class FundersHealthCheckExtensionTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Hcfunders',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Hcfunders', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	/** `Finding.key` is `@AuraEnabled` only, so it is read through JSON. */
-	private static Map<String, Map<String, Object>> byKey(
-		List<HealthCheckService.Finding> findings
-	) {
+	private static Map<String, Map<String, Object>> byKey(List<HealthCheckService.Finding> findings) {
 		Map<String, Map<String, Object>> result = new Map<String, Map<String, Object>>();
 		for (HealthCheckService.Finding finding : findings) {
-			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(
-				JSON.serialize(finding)
-			);
+			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(finding));
 			result.put((String) fields.get('key'), fields);
 		}
 		return result;
@@ -78,16 +71,8 @@ private class FundersHealthCheckExtensionTest {
 			Account funder = GrantTestData.funder('Lakeside Foundation');
 			Grant__c grant = GrantTestData.grant('Award', funder.Id, GrantService.STAGE_AWARDED);
 			insert grant;
-			Grant_Requirement__c late = GrantTestData.requirement(
-				'Late',
-				grant.Id,
-				today.addDays(-1)
-			);
-			Grant_Requirement__c done = GrantTestData.requirement(
-				'Done',
-				grant.Id,
-				today.addDays(-1)
-			);
+			Grant_Requirement__c late = GrantTestData.requirement('Late', grant.Id, today.addDays(-1));
+			Grant_Requirement__c done = GrantTestData.requirement('Done', grant.Id, today.addDays(-1));
 			done.Status__c = GrantRequirementService.STATUS_WAIVED;
 			Grant_Requirement__c inTime = GrantTestData.requirement('In time', grant.Id, today);
 			insert new List<Grant_Requirement__c>{ late, done, inTime };
@@ -135,20 +120,11 @@ private class FundersHealthCheckExtensionTest {
 			);
 			Test.stopTest();
 
-			Map<String, Object> cappedFields = (Map<String, Object>) JSON.deserializeUntyped(
-				JSON.serialize(capped)
-			);
-			Map<String, Object> singleFields = (Map<String, Object>) JSON.deserializeUntyped(
-				JSON.serialize(single)
-			);
+			Map<String, Object> cappedFields = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(capped));
+			Map<String, Object> singleFields = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(single));
 			Assert.isTrue(
 				((String) cappedFields.get('title'))
-					.contains(
-						String.format(
-							Label.Core_HealthCheck_OrphansMoreThan,
-							new List<Object>{ '1' }
-						)
-					),
+					.contains(String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '1' })),
 				'Past the cap it says more than'
 			);
 			Assert.areEqual('one', singleFields.get('title'), 'One has its own wording');

@@ -59,21 +59,14 @@ public without sharing class VolunteerIntegritySelector {
 	}
 
 	/** The sign-ups on these shifts that name one of these people, for R-VU2. */
-	public static List<Volunteer_Signup__c> selectSignupsFor(
-		Set<Id> shiftIds,
-		Set<Id> contactIds,
-		Set<Id> accountIds
-	) {
+	public static List<Volunteer_Signup__c> selectSignupsFor(Set<Id> shiftIds, Set<Id> contactIds, Set<Id> accountIds) {
 		if (shiftIds == null || shiftIds.isEmpty()) {
 			return new List<Volunteer_Signup__c>();
 		}
 		return [
 			SELECT Id, Volunteer_Shift__c, Contact__c, Account__c
 			FROM Volunteer_Signup__c
-			WHERE
-				Volunteer_Shift__c IN :shiftIds
-				AND (Contact__c IN :contactIds
-				OR Account__c IN :accountIds)
+			WHERE Volunteer_Shift__c IN :shiftIds AND (Contact__c IN :contactIds OR Account__c IN :accountIds)
 			WITH SYSTEM_MODE
 		];
 	}
@@ -125,10 +118,7 @@ public without sharing class VolunteerIntegritySelector {
 			[
 				SELECT Id, Contact__c, Account__c, Contact__r.AccountId
 				FROM Volunteer_Requirement__c
-				WHERE
-					Contact__c IN :contactIds
-					OR Account__c IN :accountIds
-					OR Contact__r.AccountId IN :accountIds
+				WHERE Contact__c IN :contactIds OR Account__c IN :accountIds OR Contact__r.AccountId IN :accountIds
 				WITH SYSTEM_MODE
 			]
 		);
@@ -136,10 +126,7 @@ public without sharing class VolunteerIntegritySelector {
 			[
 				SELECT Id, Contact__c, Account__c, Contact__r.AccountId
 				FROM Volunteer_Skill__c
-				WHERE
-					Contact__c IN :contactIds
-					OR Account__c IN :accountIds
-					OR Contact__r.AccountId IN :accountIds
+				WHERE Contact__c IN :contactIds OR Account__c IN :accountIds OR Contact__r.AccountId IN :accountIds
 				WITH SYSTEM_MODE
 			]
 		);

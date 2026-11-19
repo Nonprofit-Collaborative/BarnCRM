@@ -27,15 +27,8 @@ private class BulkJobSupportTest {
 			BulkJobSupport.journalFailure(journal, 'Contact', null, refused.getErrors());
 
 			Assert.areEqual(1, journal.size(), 'One entry');
-			Assert.areEqual(
-				ImportJournalService.ACTION_FAILED,
-				journal[0].get('action'),
-				'A failure'
-			);
-			Assert.isFalse(
-				String.isBlank((String) journal[0].get('reason')),
-				'With the reason given'
-			);
+			Assert.areEqual(ImportJournalService.ACTION_FAILED, journal[0].get('action'), 'A failure');
+			Assert.isFalse(String.isBlank((String) journal[0].get('reason')), 'With the reason given');
 		}
 	}
 }

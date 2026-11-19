@@ -80,11 +80,7 @@ public with sharing class DonorSegmentController {
 
 	/** One export page; the page asks again with `lastId` until `done` or the export limit. */
 	@AuraEnabled
-	public static DonorSegmentService.Rows exportPage(
-		String segmentId,
-		String layout,
-		String afterId
-	) {
+	public static DonorSegmentService.Rows exportPage(String segmentId, String layout, String afterId) {
 		try {
 			requirePermission();
 			return DonorSegmentService.exportPage(idOf(segmentId), layout, afterId);

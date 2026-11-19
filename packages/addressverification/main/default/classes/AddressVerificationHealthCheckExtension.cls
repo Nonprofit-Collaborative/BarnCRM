@@ -32,10 +32,7 @@ public with sharing class AddressVerificationHealthCheckExtension implements Hea
 				found.add(
 					new HealthCheckService.Finding(
 						'address_verification_keys_missing',
-						BarnHelp.text(
-							'AddressVerification',
-							'AddressVerification_Health_KeysMissingTitle'
-						),
+						BarnHelp.text('AddressVerification', 'AddressVerification_Health_KeysMissingTitle'),
 						BarnHelp.text(
 							'AddressVerification',
 							'AddressVerification_Health_KeysMissingDetail',
@@ -52,10 +49,7 @@ public with sharing class AddressVerificationHealthCheckExtension implements Hea
 				found.add(
 					new HealthCheckService.Finding(
 						'address_verification_waiting',
-						BarnHelp.text(
-							'AddressVerification',
-							'AddressVerification_Health_WaitingTitle'
-						),
+						BarnHelp.text('AddressVerification', 'AddressVerification_Health_WaitingTitle'),
 						BarnHelp.text(
 							'AddressVerification',
 							'AddressVerification_Health_WaitingDetail',

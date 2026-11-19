@@ -21,10 +21,7 @@ public with sharing class OpportunityMirrorTriggerHandler extends TriggerHandler
 	}
 
 	public override void beforeUpdate() {
-		OpportunityMirrorService.syncBeforeSave(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		OpportunityMirrorService.syncBeforeSave((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 
 	public override void afterDelete() {

@@ -121,9 +121,7 @@ public with sharing class RollupInstantTotals {
 			List<ObjectState> states = new List<ObjectState>();
 			for (String objectName : types.keySet()) {
 				Integer count = rollupsByObject.get(objectName);
-				states.add(
-					stateOf(types.get(objectName), count == null ? 0 : count, triggers, triggerable)
-				);
+				states.add(stateOf(types.get(objectName), count == null ? 0 : count, triggers, triggerable));
 			}
 			return sortedByLabel(states);
 		} catch (Exception caught) {
@@ -216,10 +214,7 @@ public with sharing class RollupInstantTotals {
 			String objectLabel = type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
 			AutomationControl.ensureSwitch(
 				automationName,
-				String.format(
-					Label.Rollups_RollupBuilder_InstantSwitchName,
-					new List<Object>{ objectLabel }
-				),
+				String.format(Label.Rollups_RollupBuilder_InstantSwitchName, new List<Object>{ objectLabel }),
 				name,
 				String.format(
 					BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantSwitchDescription'),
@@ -333,14 +328,8 @@ public with sharing class RollupInstantTotals {
 		String testName = testClassNameFor(objectApiName);
 		Compression.ZipWriter zip = new Compression.ZipWriter();
 		zip.addEntry('package.xml', Blob.valueOf(packageXml(objectApiName, true)));
-		zip.addEntry(
-			'triggers/' + triggerName + '.trigger',
-			Blob.valueOf(triggerSource(objectApiName))
-		);
-		zip.addEntry(
-			'triggers/' + triggerName + '.trigger-meta.xml',
-			Blob.valueOf(metaXml('ApexTrigger'))
-		);
+		zip.addEntry('triggers/' + triggerName + '.trigger', Blob.valueOf(triggerSource(objectApiName)));
+		zip.addEntry('triggers/' + triggerName + '.trigger-meta.xml', Blob.valueOf(metaXml('ApexTrigger')));
 		zip.addEntry('classes/' + testName + '.cls', Blob.valueOf(testSource(objectApiName)));
 		zip.addEntry('classes/' + testName + '.cls-meta.xml', Blob.valueOf(metaXml('ApexClass')));
 		return zip.getArchive();
@@ -359,12 +348,7 @@ public with sharing class RollupInstantTotals {
 	private static ObjectState stateOf(Schema.SObjectType type) {
 		String name = apiNameOf(type);
 		Integer count = instantRollupsByObject().get(name);
-		return stateOf(
-			type,
-			count == null ? 0 : count,
-			triggersByName(),
-			triggerableAmong(new Set<String>{ name })
-		);
+		return stateOf(type, count == null ? 0 : count, triggersByName(), triggerableAmong(new Set<String>{ name }));
 	}
 
 	private static ObjectState stateOf(
@@ -537,9 +521,7 @@ public with sharing class RollupInstantTotals {
 	private static Schema.SObjectType requireType(String objectApiName) {
 		Schema.SObjectType type = SettingsService.typeByName(objectApiName);
 		if (type == null) {
-			throw new RollupService.RollupServiceException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
-			);
+			throw new RollupService.RollupServiceException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject'));
 		}
 		return type;
 	}

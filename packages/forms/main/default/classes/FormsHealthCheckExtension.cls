@@ -97,10 +97,7 @@ public with sharing class FormsHealthCheckExtension implements HealthCheckExtens
 						HealthCheckService.SEVERITY_WARNING
 					)
 					.withScope(scopeOf(FIX_SCHEDULE))
-					.withFix(
-						labelOf(FIX_SCHEDULE),
-						HealthCheckService.FIX_ACTION_PREFIX + FIX_SCHEDULE
-					)
+					.withFix(labelOf(FIX_SCHEDULE), HealthCheckService.FIX_ACTION_PREFIX + FIX_SCHEDULE)
 			);
 		}
 		Datetime before = Datetime.now().addMinutes(-WAIT_MINUTES);
@@ -123,19 +120,8 @@ public with sharing class FormsHealthCheckExtension implements HealthCheckExtens
 		}
 	}
 
-	private static HealthCheckService.Finding finding(
-		String key,
-		String title,
-		String detail,
-		String severity
-	) {
-		return new HealthCheckService.Finding(
-			key,
-			title,
-			detail,
-			severity,
-			HealthCheckService.CATEGORY_SETTINGS
-		);
+	private static HealthCheckService.Finding finding(String key, String title, String detail, String severity) {
+		return new HealthCheckService.Finding(key, title, detail, severity, HealthCheckService.CATEGORY_SETTINGS);
 	}
 
 	/** The names of active Sites whose guest user lacks the public forms permission set. */
@@ -172,10 +158,7 @@ public with sharing class FormsHealthCheckExtension implements HealthCheckExtens
 		return [
 				SELECT COUNT()
 				FROM ObjectPermissions
-				WHERE
-					ParentId IN :permissionSetIds
-					AND SobjectType IN ('Contact', 'Account')
-					AND PermissionsRead = TRUE
+				WHERE ParentId IN :permissionSetIds AND SobjectType IN ('Contact', 'Account') AND PermissionsRead = TRUE
 				WITH SYSTEM_MODE
 			] > 0;
 	}
@@ -209,9 +192,7 @@ public with sharing class FormsHealthCheckExtension implements HealthCheckExtens
 		if (fixKey == FIX_GUEST) {
 			return BarnHelp.text('Forms', 'Forms_Health_GuestAccessFix');
 		}
-		return fixKey == FIX_SCHEDULE
-			? BarnHelp.text('Forms', 'Forms_Health_NotScheduledFix')
-			: null;
+		return fixKey == FIX_SCHEDULE ? BarnHelp.text('Forms', 'Forms_Health_NotScheduledFix') : null;
 	}
 
 	public String runFix(String fixKey, List<String> scope) {
@@ -228,10 +209,7 @@ public with sharing class FormsHealthCheckExtension implements HealthCheckExtens
 		for (FormsSites.SiteInfo site : FormsSites.active()) {
 			if (permissionSet != null && names.contains(site.name) && site.guestUserId != null) {
 				added.add(
-					new PermissionSetAssignment(
-						AssigneeId = site.guestUserId,
-						PermissionSetId = permissionSet.Id
-					)
+					new PermissionSetAssignment(AssigneeId = site.guestUserId, PermissionSetId = permissionSet.Id)
 				);
 			}
 		}

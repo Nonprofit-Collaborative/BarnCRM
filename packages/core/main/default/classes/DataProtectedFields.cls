@@ -187,9 +187,7 @@ public with sharing class DataProtectedFields {
 	}
 
 	private static Boolean isOwnBookkeeping(String ownLocalName) {
-		return ownLocalName != null &&
-			BOOKKEEPING.contains(ownLocalName) &&
-			!ordinaryForTest.contains(ownLocalName);
+		return ownLocalName != null && BOOKKEEPING.contains(ownLocalName) && !ordinaryForTest.contains(ownLocalName);
 	}
 
 	/** Whether this object is a Salesforce setup or security object, which Setup manages. */
@@ -208,20 +206,14 @@ public with sharing class DataProtectedFields {
 	 * number fields are not counted here; `isProtected` covers them too.
 	 */
 	@NamespaceAccessible
-	public static Boolean isKeptByThePackage(
-		Schema.SObjectType type,
-		Schema.DescribeFieldResult field
-	) {
+	public static Boolean isKeptByThePackage(Schema.SObjectType type, Schema.DescribeFieldResult field) {
 		if (type == null || field == null) {
 			return false;
 		}
 		String name = field.getName().toLowerCase();
 		String own = field.isCustom() ? ownLocalName(name) : null;
-		Set<String> targets = rollupTargetsOf(
-			type.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-		);
-		return (own != null &&
-			(KEPT_BY_THE_PACKAGE.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX))) ||
+		Set<String> targets = rollupTargetsOf(type.getDescribe(SObjectDescribeOptions.DEFERRED).getName());
+		return (own != null && (KEPT_BY_THE_PACKAGE.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX))) ||
 			targets.contains(name) ||
 			targets.contains(localName(name));
 	}
@@ -245,8 +237,7 @@ public with sharing class DataProtectedFields {
 	/** Whether this field of this object is never written. */
 	@NamespaceAccessible
 	public static Boolean isProtected(Schema.SObjectType type, String fieldName) {
-		return String.isNotBlank(fieldName) &&
-			fieldNames(type).contains(fieldName.trim().toLowerCase());
+		return String.isNotBlank(fieldName) && fieldNames(type).contains(fieldName.trim().toLowerCase());
 	}
 
 	/**
@@ -254,11 +245,7 @@ public with sharing class DataProtectedFields {
 	 * the household naming patterns keep (R-H8). An organization's name is not protected.
 	 */
 	@NamespaceAccessible
-	public static Boolean isProtectedOnRecord(
-		Schema.SObjectType type,
-		String fieldName,
-		Id recordTypeId
-	) {
+	public static Boolean isProtectedOnRecord(Schema.SObjectType type, String fieldName, Id recordTypeId) {
 		return type == Account.SObjectType &&
 			'name'.equalsIgnoreCase(String.isBlank(fieldName) ? '' : fieldName.trim()) &&
 			recordTypeId != null &&
@@ -281,8 +268,7 @@ public with sharing class DataProtectedFields {
 				field.isAutoNumber() ||
 				targets.contains(name) ||
 				targets.contains(localName(name)) ||
-				(own != null &&
-				(KEPT_BY_THE_PACKAGE.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX)))
+				(own != null && (KEPT_BY_THE_PACKAGE.contains(own) || own.endsWith(LAST_CALCULATED_SUFFIX)))
 			) {
 				result.add(name);
 			}
@@ -331,9 +317,7 @@ public with sharing class DataProtectedFields {
 	private static Map<String, Set<String>> reportedRollupTargets() {
 		try {
 			RollupEngineExtension engine = RollupEngineExtensions.find();
-			Map<String, Set<String>> reported = engine == null
-				? null
-				: engine.targetFieldsByObject();
+			Map<String, Set<String>> reported = engine == null ? null : engine.targetFieldsByObject();
 			return reported == null ? new Map<String, Set<String>>() : reported;
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'DataProtectedFields.rollupTargetsOf');

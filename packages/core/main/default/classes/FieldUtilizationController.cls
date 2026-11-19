@@ -142,9 +142,7 @@ public with sharing class FieldUtilizationController {
 		try {
 			requirePermission();
 			Map<String, Option> byLabel = new Map<String, Option>();
-			for (
-				Schema.DescribeSObjectResult described : FieldUtilizationService.offeredObjects()
-			) {
+			for (Schema.DescribeSObjectResult described : FieldUtilizationService.offeredObjects()) {
 				Option option = new Option();
 				option.value = described.getName();
 				option.label = described.getLabel();
@@ -171,20 +169,14 @@ public with sharing class FieldUtilizationController {
 			Plan planned = new Plan();
 			planned.objectName = described.getName();
 			planned.objectLabel = described.getLabel();
-			planned.total = FieldUtilizationService.sum(
-				FieldUtilizationService.totalsByRecordType(described)
-			);
+			planned.total = FieldUtilizationService.sum(FieldUtilizationService.totalsByRecordType(described));
 			planned.largeObjectLimit = FieldUtilizationService.largeObjectLimit();
 			planned.tooLarge = planned.total > planned.largeObjectLimit;
 			planned.chunkSize = planned.total > FieldUtilizationService.LARGE_OBJECT_ROWS
 				? FieldUtilizationService.LARGE_CHUNK_SIZE
 				: FieldUtilizationService.CHUNK_SIZE;
 			if (!planned.tooLarge && planned.total > 0) {
-				for (
-					Schema.DescribeFieldResult field : FieldUtilizationService.countableFields(
-						described
-					)
-				) {
+				for (Schema.DescribeFieldResult field : FieldUtilizationService.countableFields(described)) {
 					FieldInfo info = new FieldInfo();
 					info.fieldName = field.getName();
 					info.fieldLabel = field.getLabel();
@@ -228,9 +220,7 @@ public with sharing class FieldUtilizationController {
 			}
 			Map<String, Integer> totals = FieldUtilizationService.totalsByRecordType(described);
 			requireNotTooLarge(FieldUtilizationService.sum(totals));
-			Map<String, Schema.DescribeFieldResult> fields = FieldUtilizationService.countableFieldsByName(
-				described
-			);
+			Map<String, Schema.DescribeFieldResult> fields = FieldUtilizationService.countableFieldsByName(described);
 			RecordTypeLabels labels = new RecordTypeLabels(described);
 			Exception firstFailure;
 			for (String fieldName : new Set<String>(fieldNames)) {
@@ -240,13 +230,7 @@ public with sharing class FieldUtilizationController {
 				}
 				try {
 					List<CountRow> counted = new List<CountRow>();
-					for (
-						Field_Utilization_Snapshot__c row : FieldUtilizationService.count(
-							described,
-							field,
-							totals
-						)
-					) {
+					for (Field_Utilization_Snapshot__c row : FieldUtilizationService.count(described, field, totals)) {
 						counted.add(toRow(row, labels));
 					}
 					describeInto(counted, described, field);
@@ -284,16 +268,13 @@ public with sharing class FieldUtilizationController {
 					)
 				);
 			}
-			Map<String, Schema.DescribeFieldResult> fields = FieldUtilizationService.countableFieldsByName(
-				described
-			);
+			Map<String, Schema.DescribeFieldResult> fields = FieldUtilizationService.countableFieldsByName(described);
 			Map<String, Schema.RecordTypeInfo> recordTypes = described.getRecordTypeInfosByDeveloperName();
 			List<Field_Utilization_Snapshot__c> snapshots = new List<Field_Utilization_Snapshot__c>();
 			for (CountRow row : sent) {
 				Schema.DescribeFieldResult field = row == null ? null : fields.get(row.fieldName);
 				Boolean knownType =
-					field != null &&
-					(String.isBlank(row.recordType) || recordTypes.containsKey(row.recordType));
+					field != null && (String.isBlank(row.recordType) || recordTypes.containsKey(row.recordType));
 				if (!knownType || row.total == null || row.total <= 0) {
 					continue;
 				}
@@ -323,9 +304,7 @@ public with sharing class FieldUtilizationController {
 			Schema.DescribeSObjectResult described = requireObject(objectName);
 			History listed = new History();
 			listed.canDelete = canDeleteSnapshots();
-			List<FieldUtilizationHistory.Run> runs = FieldUtilizationHistory.latest(
-				described.getName()
-			);
+			List<FieldUtilizationHistory.Run> runs = FieldUtilizationHistory.latest(described.getName());
 			Map<Id, String> names = FieldUtilizationHistory.namesOf(runs);
 			for (FieldUtilizationHistory.Run run : runs) {
 				SnapshotInfo info = new SnapshotInfo();
@@ -356,12 +335,7 @@ public with sharing class FieldUtilizationController {
 				return rows;
 			}
 			RecordTypeLabels labels = new RecordTypeLabels(described);
-			for (
-				Field_Utilization_Snapshot__c row : FieldUtilizationSelector.rowsAt(
-					described.getName(),
-					takenAt
-				)
-			) {
+			for (Field_Utilization_Snapshot__c row : FieldUtilizationSelector.rowsAt(described.getName(), takenAt)) {
 				rows.add(toRow(row, labels));
 			}
 			return rows;
@@ -381,23 +355,16 @@ public with sharing class FieldUtilizationController {
 			requirePermission();
 			Schema.DescribeSObjectResult described = requireObject(objectName);
 			if (!canDeleteSnapshots()) {
-				throw new FieldUtilizationException(
-					BarnHelp.text('Core', 'Core_FieldUtilization_DeleteNoAccess')
-				);
+				throw new FieldUtilizationException(BarnHelp.text('Core', 'Core_FieldUtilization_DeleteNoAccess'));
 			}
 			if (takenAt == null) {
 				return 0;
 			}
-			List<Field_Utilization_Snapshot__c> rows = FieldUtilizationSelector.idsAt(
-				described.getName(),
-				takenAt
-			);
+			List<Field_Utilization_Snapshot__c> rows = FieldUtilizationSelector.idsAt(described.getName(), takenAt);
 			try {
 				Database.delete(rows, AccessLevel.USER_MODE);
 			} catch (DmlException notAllowed) {
-				throw new FieldUtilizationException(
-					BarnHelp.text('Core', 'Core_FieldUtilization_DeleteFailed')
-				);
+				throw new FieldUtilizationException(BarnHelp.text('Core', 'Core_FieldUtilization_DeleteFailed'));
 			}
 			return rows.size();
 		} catch (Exception caught) {
@@ -495,11 +462,7 @@ public with sharing class FieldUtilizationController {
 			planned.total = PicklistUsageService.total(described);
 			planned.tooLarge = planned.total > planned.largeObjectLimit;
 			if (!planned.tooLarge) {
-				for (
-					Schema.DescribeFieldResult field : PicklistUsageService.picklistFields(
-						described
-					)
-				) {
+				for (Schema.DescribeFieldResult field : PicklistUsageService.picklistFields(described)) {
 					FieldInfo info = new FieldInfo();
 					info.fieldName = field.getName();
 					info.fieldLabel = field.getLabel();
@@ -532,9 +495,7 @@ public with sharing class FieldUtilizationController {
 			}
 			Integer total = PicklistUsageService.total(described);
 			requireNotTooLarge(total);
-			Map<String, Schema.DescribeFieldResult> fields = PicklistUsageService.picklistFieldsByName(
-				described
-			);
+			Map<String, Schema.DescribeFieldResult> fields = PicklistUsageService.picklistFieldsByName(described);
 			Boolean dated = PicklistUsageService.dateField(described) != null;
 			Exception firstFailure;
 			for (String fieldName : new Set<String>(fieldNames)) {
@@ -552,11 +513,7 @@ public with sharing class FieldUtilizationController {
 				}
 				Boolean withDates = dated && PicklistUsageService.datesFit(total);
 				try {
-					PicklistUsageService.FieldResult usage = PicklistUsageService.usage(
-						described,
-						field,
-						withDates
-					);
+					PicklistUsageService.FieldResult usage = PicklistUsageService.usage(described, field, withDates);
 					if (dated && !withDates) {
 						result.datesPending.add(field.getName());
 					}
@@ -599,11 +556,7 @@ public with sharing class FieldUtilizationController {
 	 * be an Id of the same kind of record; the size limit is enforced here too.
 	 */
 	@AuraEnabled
-	public static PicklistDates getPicklistLastUsed(
-		String objectName,
-		List<String> fieldNames,
-		String afterId
-	) {
+	public static PicklistDates getPicklistLastUsed(String objectName, List<String> fieldNames, String afterId) {
 		try {
 			requirePermission();
 			Schema.DescribeSObjectResult described = requireObject(objectName);
@@ -616,20 +569,14 @@ public with sharing class FieldUtilizationController {
 			}
 			Id after = startAfter(described, afterId);
 			requireNotTooLarge(PicklistUsageService.total(described));
-			Map<String, Schema.DescribeFieldResult> known = PicklistUsageService.picklistFieldsByName(
-				described
-			);
+			Map<String, Schema.DescribeFieldResult> known = PicklistUsageService.picklistFieldsByName(described);
 			List<Schema.DescribeFieldResult> fields = new List<Schema.DescribeFieldResult>();
 			for (String fieldName : new Set<String>(fieldNames)) {
 				if (known.containsKey(fieldName)) {
 					fields.add(known.get(fieldName));
 				}
 			}
-			PicklistUsageService.ScanResult scanned = PicklistUsageService.lastUsed(
-				described,
-				fields,
-				after
-			);
+			PicklistUsageService.ScanResult scanned = PicklistUsageService.lastUsed(described, fields, after);
 			for (String fieldName : scanned.lastUsed.keySet()) {
 				Map<String, Datetime> newest = scanned.lastUsed.get(fieldName);
 				for (String value : newest.keySet()) {
@@ -698,9 +645,7 @@ public with sharing class FieldUtilizationController {
 		row.recordTypeLabel = labels.labelOf(snapshot.Record_Type__c);
 		row.filled = snapshot.Filled_Count__c == null ? 0 : snapshot.Filled_Count__c.intValue();
 		row.total = snapshot.Record_Count__c == null ? 0 : snapshot.Record_Count__c.intValue();
-		row.percent = row.total == 0
-			? null
-			: (Decimal.valueOf(row.filled) * 100).divide(row.total, 1);
+		row.percent = row.total == 0 ? null : (Decimal.valueOf(row.filled) * 100).divide(row.total, 1);
 		row.sampled = snapshot.Sampled__c == true;
 		return row;
 	}
@@ -715,9 +660,7 @@ public with sharing class FieldUtilizationController {
 		Schema.DescribeFieldResult field
 	) {
 		Boolean required = FieldUtilizationService.isRequired(field);
-		FieldUtilizationService.FieldDefault fieldDefault = FieldUtilizationService.defaultOf(
-			field
-		);
+		FieldUtilizationService.FieldDefault fieldDefault = FieldUtilizationService.defaultOf(field);
 		Boolean sampled = false;
 		for (CountRow row : rows) {
 			row.required = required;
@@ -730,11 +673,7 @@ public with sharing class FieldUtilizationController {
 		}
 		Map<String, Integer> atDefault;
 		try {
-			atDefault = FieldUtilizationService.atDefaultByRecordType(
-				described,
-				field,
-				fieldDefault
-			);
+			atDefault = FieldUtilizationService.atDefaultByRecordType(described, field, fieldDefault);
 		} catch (System.QueryException refused) {
 			atDefault = null;
 		}
@@ -742,21 +681,14 @@ public with sharing class FieldUtilizationController {
 			return;
 		}
 		for (CountRow row : rows) {
-			Integer found = atDefault.containsKey(row.recordType)
-				? atDefault.get(row.recordType)
-				: 0;
+			Integer found = atDefault.containsKey(row.recordType) ? atDefault.get(row.recordType) : 0;
 			row.atDefault = Math.min(found, row.total);
-			row.atDefaultPercent = row.total == 0
-				? null
-				: (Decimal.valueOf(row.atDefault) * 100).divide(row.total, 1);
+			row.atDefaultPercent = row.total == 0 ? null : (Decimal.valueOf(row.atDefault) * 100).divide(row.total, 1);
 		}
 	}
 
 	private static Boolean canDeleteSnapshots() {
-		return Field_Utilization_Snapshot__c.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
-			.isDeletable();
+		return Field_Utilization_Snapshot__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable();
 	}
 
 	private static Schema.DescribeSObjectResult requireObject(String objectName) {
@@ -785,9 +717,7 @@ public with sharing class FieldUtilizationController {
 
 	private static void requirePermission() {
 		if (!FeatureManagement.checkPermission(PERMISSION)) {
-			throw new FieldUtilizationException(
-				BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired')
-			);
+			throw new FieldUtilizationException(BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired'));
 		}
 	}
 

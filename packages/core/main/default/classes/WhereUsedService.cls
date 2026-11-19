@@ -156,10 +156,7 @@ public with sharing class WhereUsedService {
 			for (Object condition : listOf(((Map<String, Object>) parsed).get('conditions'))) {
 				if (
 					condition instanceof Map<String, Object> &&
-					matchesPath(
-						fromObject,
-						stringOf(((Map<String, Object>) condition).get('field'))
-					)
+					matchesPath(fromObject, stringOf(((Map<String, Object>) condition).get('field')))
 				) {
 					return true;
 				}
@@ -198,9 +195,7 @@ public with sharing class WhereUsedService {
 					if (child.getRelationshipName() != null) {
 						byName.put(
 							child.getRelationshipName().toLowerCase(),
-							child.getChildSObject()
-								.getDescribe(SObjectDescribeOptions.DEFERRED)
-								.getName()
+							child.getChildSObject().getDescribe(SObjectDescribeOptions.DEFERRED).getName()
 						);
 					}
 				}
@@ -227,9 +222,7 @@ public with sharing class WhereUsedService {
 			if (!fieldMaps.containsKey(key)) {
 				fieldMaps.put(
 					key,
-					NamespaceUtil.objectType(canonical)
-						.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.fields.getMap()
+					NamespaceUtil.objectType(canonical).getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap()
 				);
 			}
 			return fieldMaps.get(key);
@@ -247,8 +240,7 @@ public with sharing class WhereUsedService {
 						// Stored documents name this package's relationships without its prefix.
 						byRelationship.put(relationship.toLowerCase(), described);
 						byRelationship.put(
-							relationship.toLowerCase()
-								.removeStart(NamespaceUtil.prefix().toLowerCase()),
+							relationship.toLowerCase().removeStart(NamespaceUtil.prefix().toLowerCase()),
 							described
 						);
 					}
@@ -357,9 +349,7 @@ public with sharing class WhereUsedService {
 			Reference that = (Reference) other;
 			Integer byKind = (kindLabel == null ? '' : kindLabel)
 				.compareTo(that.kindLabel == null ? '' : that.kindLabel);
-			return byKind != 0
-				? byKind
-				: (name == null ? '' : name).compareTo(that.name == null ? '' : that.name);
+			return byKind != 0 ? byKind : (name == null ? '' : name).compareTo(that.name == null ? '' : that.name);
 		}
 	}
 
@@ -410,10 +400,7 @@ public with sharing class WhereUsedService {
 		Schema.SObjectType type = NamespaceUtil.objectType(objectName);
 		if (type == null) {
 			throw new WhereUsedException(
-				String.format(
-					BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoObject'),
-					new List<Object>{ objectName }
-				)
+				String.format(BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoObject'), new List<Object>{ objectName })
 			);
 		}
 		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
@@ -473,10 +460,7 @@ public with sharing class WhereUsedService {
 		Map<String, Reference> byKey = new Map<String, Reference>();
 		List<Reference> ordered = new List<Reference>();
 		for (Reference reference : found) {
-			String key =
-				reference.kind +
-				'|' +
-				(reference.recordId == null ? reference.name : reference.recordId);
+			String key = reference.kind + '|' + (reference.recordId == null ? reference.name : reference.recordId);
 			Reference existing = byKey.get(key);
 			if (existing == null) {
 				byKey.put(key, reference);
@@ -529,12 +513,7 @@ public with sharing class WhereUsedService {
 	}
 
 	/** Each part of a query document (R-SQ1, R-SQ8, R-SQ9) that names the target. */
-	private static void addQueryParts(
-		Target target,
-		String base,
-		Map<String, Object> document,
-		Reference reference
-	) {
+	private static void addQueryParts(Target target, String base, Map<String, Object> document, Reference reference) {
 		for (Object path : listOf(document.get('fields'))) {
 			if (target.matchesPath(base, stringOf(path))) {
 				reference.addPart(System.Label.Core_Find_Columns);
@@ -629,9 +608,7 @@ public with sharing class WhereUsedService {
 			}
 			if (!reference.parts.isEmpty()) {
 				found.add(
-					reference.withBreaks(
-							BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedTransform')
-						)
+					reference.withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedTransform'))
 						.withEdit('Bulk_Update', null)
 				);
 			}
@@ -644,10 +621,7 @@ public with sharing class WhereUsedService {
 		if (node instanceof Map<String, Object>) {
 			Map<String, Object> entry = (Map<String, Object>) node;
 			for (String key : new List<String>{ 'field', 'source' }) {
-				if (
-					entry.get(key) instanceof String &&
-					target.matchesPath(base, (String) entry.get(key))
-				) {
+				if (entry.get(key) instanceof String && target.matchesPath(base, (String) entry.get(key))) {
 					return true;
 				}
 			}
@@ -677,8 +651,7 @@ public with sharing class WhereUsedService {
 			Reference reference = importReference(template);
 			if (
 				target.isObject() &&
-				(target.isObject(template.Target_Object__c) ||
-				target.isObject(template.Related_Object__c))
+				(target.isObject(template.Target_Object__c) || target.isObject(template.Related_Object__c))
 			) {
 				reference.addPart(System.Label.Core_WhereUsed_PartObject);
 			}
@@ -707,10 +680,7 @@ public with sharing class WhereUsedService {
 	 * `Related` entities load its target and related objects, whoever asks.
 	 */
 	@NamespaceAccessible
-	public static List<Reference> importColumnReferences(
-		Target target,
-		Map<String, String> entityObjects
-	) {
+	public static List<Reference> importColumnReferences(Target target, Map<String, String> entityObjects) {
 		List<Reference> found = new List<Reference>();
 		Boolean withOneObject = entityObjects.containsKey(ImportMapping.ENTITY_CONTACT_1);
 		for (Import_Template__c template : WhereUsedSelector.importTemplates()) {
@@ -737,10 +707,7 @@ public with sharing class WhereUsedService {
 			List<Object> defaults = listOf(mapping.get('defaults'));
 			defaults.addAll(listOf(parsed(template.Default_Values_JSON__c).get('defaults')));
 			for (Object entry : defaults) {
-				if (
-					entry instanceof Map<String, Object> &&
-					columnNames(target, objects, (Map<String, Object>) entry)
-				) {
+				if (entry instanceof Map<String, Object> && columnNames(target, objects, (Map<String, Object>) entry)) {
 					reference.addPart(System.Label.Core_WhereUsed_PartDefault);
 				}
 			}
@@ -752,11 +719,7 @@ public with sharing class WhereUsedService {
 	}
 
 	/** A column or default whose `Entity.Attribute` target, or lookup field, is the target. */
-	private static Boolean columnNames(
-		Target target,
-		Map<String, String> objects,
-		Map<String, Object> column
-	) {
+	private static Boolean columnNames(Target target, Map<String, String> objects, Map<String, Object> column) {
 		String mapped = stringOf(column.get('target'));
 		if (String.isBlank(mapped) || !mapped.contains('.')) {
 			return false;
@@ -767,10 +730,7 @@ public with sharing class WhereUsedService {
 		}
 		String attribute = mapped.substringAfter('.');
 		return target.matchesField(objectName, attribute) ||
-			target.matchesField(
-				target.objectOfLookup(objectName, attribute),
-				stringOf(column.get('lookupField'))
-			);
+			target.matchesField(target.objectOfLookup(objectName, attribute), stringOf(column.get('lookupField')));
 	}
 
 	private static Reference importReference(Import_Template__c template) {
@@ -929,9 +889,7 @@ public with sharing class WhereUsedService {
 		}
 		try {
 			Object value = System.JSON.deserializeUntyped(json);
-			return value instanceof Map<String, Object>
-				? (Map<String, Object>) value
-				: new Map<String, Object>();
+			return value instanceof Map<String, Object> ? (Map<String, Object>) value : new Map<String, Object>();
 		} catch (Exception unreadable) {
 			return new Map<String, Object>();
 		}
@@ -940,9 +898,7 @@ public with sharing class WhereUsedService {
 	/** A JSON value as a list; an empty list when it is anything else. */
 	@NamespaceAccessible
 	public static List<Object> listOf(Object value) {
-		return value instanceof List<Object>
-			? new List<Object>((List<Object>) value)
-			: new List<Object>();
+		return value instanceof List<Object> ? new List<Object>((List<Object>) value) : new List<Object>();
 	}
 
 	private static String stringOf(Object value) {

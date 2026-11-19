@@ -29,21 +29,10 @@ private class EventDashboardControllerTest {
 	private static String plan(Datetime start) {
 		return JSON.serialize(
 			new Map<String, Object>{
-				'tracks' => new List<Object>{
-					new Map<String, Object>{ 'name' => 'Admins', 'sortOrder' => 1 }
-				},
+				'tracks' => new List<Object>{ new Map<String, Object>{ 'name' => 'Admins', 'sortOrder' => 1 } },
 				'ticketTypes' => new List<Object>{
-					new Map<String, Object>{
-						'name' => 'Attendee',
-						'price' => 25,
-						'sortOrder' => 1
-					},
-					new Map<String, Object>{
-						'name' => 'Speaker',
-						'price' => 0,
-						'quantity' => 10,
-						'sortOrder' => 2
-					}
+					new Map<String, Object>{ 'name' => 'Attendee', 'price' => 25, 'sortOrder' => 1 },
+					new Map<String, Object>{ 'name' => 'Speaker', 'price' => 0, 'quantity' => 10, 'sortOrder' => 2 }
 				},
 				'sessions' => new List<Object>{
 					new Map<String, Object>{
@@ -70,17 +59,13 @@ private class EventDashboardControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference();
 			EventDashboardController.templatesForTest = '{"templates":[]}';
-			EventDashboardController.Dashboard before = EventDashboardController.getDashboard(
-				event.Id
-			);
+			EventDashboardController.Dashboard before = EventDashboardController.getDashboard(event.Id);
 			Assert.areEqual(0, before.sessions);
 			Assert.areEqual(0, before.speakers);
 			Assert.areEqual('Open', before.eventStatus);
 			Assert.isTrue(before.canApplyTemplate);
 			EventDashboardController.applyPlan(event.Id, plan(event.Start__c));
-			EventDashboardController.Dashboard after = EventDashboardController.getDashboard(
-				event.Id
-			);
+			EventDashboardController.Dashboard after = EventDashboardController.getDashboard(event.Id);
 			Assert.areEqual(2, after.ticketTypes);
 			Assert.areEqual(1, after.tracks);
 			Assert.areEqual(2, after.sessions);
@@ -92,13 +77,8 @@ private class EventDashboardControllerTest {
 	static void readsThePackagedTemplatesWhenNoneIsInjected() {
 		System.runAs(staff()) {
 			Event__c event = conference();
-			EventDashboardController.Dashboard result = EventDashboardController.getDashboard(
-				event.Id
-			);
-			Assert.isTrue(
-				result.templatesJson.contains('"templates"'),
-				'The packaged template file is read'
-			);
+			EventDashboardController.Dashboard result = EventDashboardController.getDashboard(event.Id);
+			Assert.isTrue(result.templatesJson.contains('"templates"'), 'The packaged template file is read');
 		}
 	}
 
@@ -110,20 +90,10 @@ private class EventDashboardControllerTest {
 			Contact sam = TestDataFactory.person(new Contact(LastName = 'Lee'));
 			insert as user new List<Contact>{ ana, sam };
 			insert as user new List<Event_Speaker__c>{
-				new Event_Speaker__c(
-					Event__c = event.Id,
-					Contact__c = ana.Id,
-					Status__c = 'Confirmed'
-				),
-				new Event_Speaker__c(
-					Event__c = event.Id,
-					Contact__c = sam.Id,
-					Status__c = 'Invited'
-				)
+				new Event_Speaker__c(Event__c = event.Id, Contact__c = ana.Id, Status__c = 'Confirmed'),
+				new Event_Speaker__c(Event__c = event.Id, Contact__c = sam.Id, Status__c = 'Invited')
 			};
-			EventDashboardController.Dashboard result = EventDashboardController.getDashboard(
-				event.Id
-			);
+			EventDashboardController.Dashboard result = EventDashboardController.getDashboard(event.Id);
 			Assert.areEqual(2, result.speakers);
 			Assert.areEqual(1, result.confirmedSpeakers);
 		}
@@ -177,9 +147,7 @@ private class EventDashboardControllerTest {
 			// list is sent, as the browser's plan always has (JSON leaves a missing list null).
 			String bad = JSON.serialize(
 				new Map<String, Object>{
-					'tracks' => new List<Object>{
-						new Map<String, Object>{ 'name' => 'Admins', 'sortOrder' => 1 }
-					},
+					'tracks' => new List<Object>{ new Map<String, Object>{ 'name' => 'Admins', 'sortOrder' => 1 } },
 					'ticketTypes' => new List<Object>(),
 					'sessions' => new List<Object>{
 						new Map<String, Object>{
@@ -195,11 +163,7 @@ private class EventDashboardControllerTest {
 				EventDashboardController.applyPlan(event.Id, bad);
 				Assert.fail('A broken plan is refused');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					0,
-					[SELECT COUNT() FROM Event_Track__c WHERE Event__c = :event.Id],
-					'Rolled back'
-				);
+				Assert.areEqual(0, [SELECT COUNT() FROM Event_Track__c WHERE Event__c = :event.Id], 'Rolled back');
 				Assert.areNotEqual(
 					BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed'),
 					refused.getMessage(),

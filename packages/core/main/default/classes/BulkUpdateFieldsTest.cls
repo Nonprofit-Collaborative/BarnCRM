@@ -64,8 +64,7 @@ private class BulkUpdateFieldsTest {
 					System.Assert.fail('A rollup target is refused');
 				} catch (BulkUpdateFields.BulkUpdateException refused) {
 					System.Assert.isTrue(
-						refused.getMessage()
-							.contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonKept')),
+						refused.getMessage().contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonKept')),
 						'The refusal says BarnCRM calculates it: ' + refused.getMessage()
 					);
 				}
@@ -84,10 +83,7 @@ private class BulkUpdateFieldsTest {
 						System.Assert.fail(objectName + ' is the package\'s own');
 					} catch (BulkUpdateFields.BulkUpdateException refused) {
 						System.Assert.isTrue(
-							refused.getMessage()
-								.contains(
-									BarnHelp.text('Core', 'Core_BulkUpdate_ReasonBookkeeping')
-								),
+							refused.getMessage().contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonBookkeeping')),
 							refused.getMessage()
 						);
 					}
@@ -97,8 +93,7 @@ private class BulkUpdateFieldsTest {
 					System.Assert.fail('Users are changed in Setup');
 				} catch (BulkUpdateFields.BulkUpdateException refused) {
 					System.Assert.isTrue(
-						refused.getMessage()
-							.contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonSetup')),
+						refused.getMessage().contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonSetup')),
 						refused.getMessage()
 					);
 				}
@@ -142,12 +137,7 @@ private class BulkUpdateFieldsTest {
 				) {
 					intoEmail.add(option.value);
 				}
-				for (
-					QueryFieldCatalog.PicklistOption option : BulkUpdateFields.copySources(
-						'Contact',
-						'Title'
-					)
-				) {
+				for (QueryFieldCatalog.PicklistOption option : BulkUpdateFields.copySources('Contact', 'Title')) {
 					intoText.add(option.value);
 				}
 			}
@@ -185,8 +175,7 @@ private class BulkUpdateFieldsTest {
 					System.Assert.fail('Refused: ' + refused[1]);
 				} catch (BulkUpdateFields.BulkUpdateException expected) {
 					System.Assert.isTrue(
-						expected.getMessage()
-							.contains(((Schema.DescribeFieldResult) refused[0]).getLabel()),
+						expected.getMessage().contains(((Schema.DescribeFieldResult) refused[0]).getLabel()),
 						'The refusal names the field'
 					);
 				}

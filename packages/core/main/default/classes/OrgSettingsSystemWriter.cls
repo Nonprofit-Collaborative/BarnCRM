@@ -52,11 +52,7 @@ public without sharing class OrgSettingsSystemWriter {
 	 * had none. Passing it saves a second read of a row this transaction already holds.
 	 */
 	@NamespaceAccessible
-	public static void saveOver(
-		Schema.SObjectType type,
-		SObject stored,
-		Map<Schema.SObjectField, Object> values
-	) {
+	public static void saveOver(Schema.SObjectType type, SObject stored, Map<Schema.SObjectField, Object> values) {
 		requireSettingsType(type);
 		if (values == null || values.isEmpty()) {
 			return;
@@ -68,10 +64,7 @@ public without sharing class OrgSettingsSystemWriter {
 			putAll(created, values);
 			if (insertFirst(created)) {
 				if (type == BarnCRM_Settings__c.SObjectType) {
-					Database.update(
-						SettingsService.blanksAfterFirstSave(created),
-						AccessLevel.SYSTEM_MODE
-					);
+					Database.update(SettingsService.blanksAfterFirstSave(created), AccessLevel.SYSTEM_MODE);
 				}
 			} else {
 				// Another run (the seasonal job and the digest on a new org, say) created the
@@ -103,11 +96,7 @@ public without sharing class OrgSettingsSystemWriter {
 		}
 	}
 
-	private static void updateKeys(
-		Schema.SObjectType type,
-		Id recordId,
-		Map<Schema.SObjectField, Object> values
-	) {
+	private static void updateKeys(Schema.SObjectType type, Id recordId, Map<Schema.SObjectField, Object> values) {
 		SObject changes = type.newSObject(recordId);
 		putAll(changes, values);
 		Database.update(changes, AccessLevel.SYSTEM_MODE);

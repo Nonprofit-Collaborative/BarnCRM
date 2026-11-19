@@ -63,12 +63,8 @@ public with sharing class StewardshipCommitmentHandler extends TriggerHandler {
 			if (!StewardshipService.COMMITMENT_ACTIVE.equals(commitment.Status__c)) {
 				continue;
 			}
-			Commitment__c previous = before == null
-				? null
-				: (Commitment__c) before.get(commitment.Id);
-			if (
-				previous == null || !StewardshipService.COMMITMENT_ACTIVE.equals(previous.Status__c)
-			) {
+			Commitment__c previous = before == null ? null : (Commitment__c) before.get(commitment.Id);
+			if (previous == null || !StewardshipService.COMMITMENT_ACTIVE.equals(previous.Status__c)) {
 				started.add(commitment);
 			}
 		}

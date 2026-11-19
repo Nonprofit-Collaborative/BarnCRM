@@ -32,9 +32,7 @@ private class RollupRecalcErrorHandlerTest {
 		List<Account> organizations = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			organizations.add(
-				TestDataFactory.organization(
-					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
-				)
+				TestDataFactory.organization(new Account(Name = 'Organization ' + i, RecordTypeId = organizationType))
 			);
 		}
 		insert organizations;
@@ -59,11 +57,7 @@ private class RollupRecalcErrorHandlerTest {
 		// as the trigger receives it.
 		return (BatchApexErrorEvent) JSON.deserialize(
 			JSON.serialize(
-				new Map<String, Object>{
-					'AsyncApexJobId' => jobId,
-					'Phase' => phase,
-					'JobScope' => jobScope
-				}
+				new Map<String, Object>{ 'AsyncApexJobId' => jobId, 'Phase' => phase, 'JobScope' => jobScope }
 			),
 			BatchApexErrorEvent.class
 		);
@@ -118,9 +112,7 @@ private class RollupRecalcErrorHandlerTest {
 				}
 			);
 			Integer queuedBefore = queuedIds('Account').size();
-			RollupRecalcErrorHandler.handle(
-				new List<BatchApexErrorEvent>{ event(ours, 'EXECUTE', organization.Id) }
-			);
+			RollupRecalcErrorHandler.handle(new List<BatchApexErrorEvent>{ event(ours, 'EXECUTE', organization.Id) });
 			Integer queuedAfter = queuedIds('Account').size();
 			Test.stopTest();
 
@@ -143,9 +135,7 @@ private class RollupRecalcErrorHandlerTest {
 			Id first = RollupService.startNightlyRun();
 			Id running = RollupFullRecalcBatch.runningJobId();
 			Id second = RollupService.startNightlyRun();
-			Integer handedOver = RollupService.runFullRecalculation(
-				new List<Rollup_Definition__c>{ definition }
-			);
+			Integer handedOver = RollupService.runFullRecalculation(new List<Rollup_Definition__c>{ definition });
 			Test.stopTest();
 			Test.getEventBus().deliver();
 

@@ -35,12 +35,7 @@ private class RollupNightlyBatchTest {
 			new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => field,
-						'operator' => operator,
-						'value' => value
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => field, 'operator' => operator, 'value' => value }
 				}
 			}
 		);
@@ -52,9 +47,7 @@ private class RollupNightlyBatchTest {
 		List<Account> organizations = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			organizations.add(
-				TestDataFactory.organization(
-					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
-				)
+				TestDataFactory.organization(new Account(Name = 'Organization ' + i, RecordTypeId = organizationType))
 			);
 		}
 		insert organizations;
@@ -63,11 +56,7 @@ private class RollupNightlyBatchTest {
 			for (Integer j = 0; j < people; j++) {
 				contacts.add(
 					TestDataFactory.person(
-						new Contact(
-							LastName = 'Person ' + j,
-							AccountId = organization.Id,
-							Birthdate = birthdate
-						)
+						new Contact(LastName = 'Person ' + j, AccountId = organization.Id, Birthdate = birthdate)
 					)
 				);
 			}
@@ -99,10 +88,7 @@ private class RollupNightlyBatchTest {
 		return new Map<Id, Account>(organizations).keySet();
 	}
 
-	private static RollupNightlyBatch.Plan runPlan(
-		List<Rollup_Definition__c> definitions,
-		Datetime since
-	) {
+	private static RollupNightlyBatch.Plan runPlan(List<Rollup_Definition__c> definitions, Datetime since) {
 		RollupNightlyBatch.Plan plan = RollupNightlyBatch.plan(definitions, since);
 		if (!plan.passes.isEmpty()) {
 			new RollupNightlyBatch(plan, 0).runInline();
@@ -149,10 +135,7 @@ private class RollupNightlyBatchTest {
 			Datetime since = Datetime.now().addMinutes(5);
 
 			Test.startTest();
-			RollupNightlyBatch.Plan plan = runPlan(
-				new List<Rollup_Definition__c>{ definition },
-				since
-			);
+			RollupNightlyBatch.Plan plan = runPlan(new List<Rollup_Definition__c>{ definition }, since);
 
 			Assert.isTrue(queued('Account').isEmpty(), 'Nothing changed, nothing queued');
 			Assert.isTrue(plan.passes[0].edges.isEmpty(), 'No window, no edges');
@@ -193,10 +176,7 @@ private class RollupNightlyBatchTest {
 			Datetime since = Datetime.now().addMinutes(5);
 
 			Test.startTest();
-			RollupNightlyBatch.Plan plan = runPlan(
-				new List<Rollup_Definition__c>{ definition },
-				since
-			);
+			RollupNightlyBatch.Plan plan = runPlan(new List<Rollup_Definition__c>{ definition }, since);
 
 			Assert.areEqual(2, plan.passes[0].edges.size(), 'The leaving and arriving edges');
 			Set<Id> ids = queued('Account');
@@ -212,10 +192,7 @@ private class RollupNightlyBatchTest {
 			Integer month = RollupDateWindow.fiscalYearStartMonth();
 			Date fiscalStart = Date.newInstance(2026, month, 1);
 			RollupNightlyBatch.todayOverride = fiscalStart.addDays(40);
-			Datetime since = Datetime.newInstance(
-				fiscalStart.addDays(39),
-				Time.newInstance(2, 0, 0, 0)
-			);
+			Datetime since = Datetime.newInstance(fiscalStart.addDays(39), Time.newInstance(2, 0, 0, 0));
 
 			Rollup_Definition__c scheduled = peopleCount(null);
 			scheduled.Mode__c = RollupService.MODE_SCHEDULED;
@@ -248,10 +225,7 @@ private class RollupNightlyBatchTest {
 
 			// The first night of a fiscal year, which is also a new calendar year in January.
 			RollupNightlyBatch.todayOverride = fiscalStart;
-			Datetime lastYear = Datetime.newInstance(
-				fiscalStart.addDays(-1),
-				Time.newInstance(2, 0, 0, 0)
-			);
+			Datetime lastYear = Datetime.newInstance(fiscalStart.addDays(-1), Time.newInstance(2, 0, 0, 0));
 			RollupNightlyBatch.Plan turnover = RollupNightlyBatch.plan(all, lastYear);
 			Assert.isTrue(turnover.everywhere.contains(fiscal), 'A new fiscal year: everywhere');
 			Assert.areEqual(
@@ -297,8 +271,7 @@ private class RollupNightlyBatchTest {
 			Assert.isNotNull(started, 'The full run started');
 			Assert.areEqual(
 				2,
-				[SELECT NumberOfEmployees FROM Account WHERE Id = :organizations[0].Id]
-				.NumberOfEmployees,
+				[SELECT NumberOfEmployees FROM Account WHERE Id = :organizations[0].Id].NumberOfEmployees,
 				'Counted by the full run'
 			);
 			Assert.isNotNull(RollupNightlyBatch.coveredFrom(), 'The full run covered the night');

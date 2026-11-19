@@ -9,11 +9,7 @@ public with sharing class ScholarshipReviews {
 	public static final String SUBMITTED = 'Submitted';
 	public static final String RECUSED = 'Recused';
 	/** Applications that can be reviewed. */
-	public static final Set<String> REVIEWABLE = new Set<String>{
-		'Submitted',
-		'Eligible',
-		'In Review'
-	};
+	public static final Set<String> REVIEWABLE = new Set<String>{ 'Submitted', 'Eligible', 'In Review' };
 	private static final Integer MAX_ROWS = 2000;
 
 	/** One rubric criterion. */
@@ -57,9 +53,7 @@ public with sharing class ScholarshipReviews {
 					Map<String, Object> raw = (Map<String, Object>) item;
 					Criterion one = criterion(
 						String.valueOf(raw.get('key')),
-						raw.get('label') == null
-							? String.valueOf(raw.get('key'))
-							: String.valueOf(raw.get('label')),
+						raw.get('label') == null ? String.valueOf(raw.get('key')) : String.valueOf(raw.get('label')),
 						SettingsService.toNumber(raw.get('max')) ?? 10,
 						SettingsService.toNumber(raw.get('weight')) ?? 1
 					);
@@ -73,14 +67,7 @@ public with sharing class ScholarshipReviews {
 			}
 		}
 		if (criteria.isEmpty()) {
-			criteria.add(
-				criterion(
-					'overall',
-					BarnHelp.text('Scholarships', 'Scholarships_Review_Overall'),
-					10,
-					1
-				)
-			);
+			criteria.add(criterion('overall', BarnHelp.text('Scholarships', 'Scholarships_Review_Overall'), 10, 1));
 		}
 		return criteria;
 	}
@@ -89,9 +76,7 @@ public with sharing class ScholarshipReviews {
 	public static Decimal score(List<Criterion> criteria, Map<String, Object> scores) {
 		Decimal total = 0;
 		for (Criterion one : criteria) {
-			Decimal given = scores == null
-				? 0
-				: (SettingsService.toNumber(scores.get(one.key)) ?? 0);
+			Decimal given = scores == null ? 0 : (SettingsService.toNumber(scores.get(one.key)) ?? 0);
 			total += Math.max(0, Math.min(given, one.max)) * one.weight;
 		}
 		return total.setScale(2);
@@ -116,16 +101,11 @@ public with sharing class ScholarshipReviews {
 		];
 		Application_Review__c review = own(applicationId);
 		if (review == null) {
-			review = new Application_Review__c(
-				Application__c = applicationId,
-				Reviewer__c = UserInfo.getUserId()
-			);
+			review = new Application_Review__c(Application__c = applicationId, Reviewer__c = UserInfo.getUserId());
 		}
 		if (action == 'recuse') {
 			if (String.isBlank(reason)) {
-				throw Scholarships.refuse(
-					BarnHelp.text('Scholarships', 'Scholarships_Review_ReasonNeeded')
-				);
+				throw Scholarships.refuse(BarnHelp.text('Scholarships', 'Scholarships_Review_ReasonNeeded'));
 			}
 			review.Status__c = RECUSED;
 			review.Recusal_Reason__c = reason.abbreviate(255);
@@ -206,11 +186,7 @@ public with sharing class ScholarshipReviews {
 					break;
 				}
 				created.add(
-					new Application_Review__c(
-						Application__c = application.Id,
-						Reviewer__c = next,
-						Status__c = ASSIGNED
-					)
+					new Application_Review__c(Application__c = application.Id, Reviewer__c = next, Status__c = ASSIGNED)
 				);
 				already.add(next);
 				load.put(next, load.get(next) + 1);
@@ -228,11 +204,7 @@ public with sharing class ScholarshipReviews {
 		}
 		Scholarships.notify(
 			notified,
-			BarnHelp.text(
-				'Scholarships',
-				'Scholarships_Notify_Assigned',
-				new List<Object>{ cycle.Name }
-			),
+			BarnHelp.text('Scholarships', 'Scholarships_Notify_Assigned', new List<Object>{ cycle.Name }),
 			cycle.Id
 		);
 		return created.size();
@@ -302,15 +274,11 @@ public with sharing class ScholarshipReviews {
 			BoardRow row = new BoardRow();
 			row.id = application.Id;
 			row.name = application.Name;
-			row.applicant = hideApplicants
-				? null
-				: application.Organization__r?.Name ?? application.Contact__r?.Name;
+			row.applicant = hideApplicants ? null : application.Organization__r?.Name ?? application.Contact__r?.Name;
 			row.status = application.Status__c;
 			row.requested = application.Amount_Requested__c;
 			row.average = application.Average_Score__c;
-			row.submitted = application.Review_Count__c == null
-				? 0
-				: application.Review_Count__c.intValue();
+			row.submitted = application.Review_Count__c == null ? 0 : application.Review_Count__c.intValue();
 			row.rank = application.Average_Score__c == null ? null : ++rank;
 			rows.add(row);
 		}

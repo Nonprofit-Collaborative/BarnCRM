@@ -6,9 +6,7 @@
  * A test may start one batch job, so each test starts at most one pass through the service
  * and drives the others through the processor itself, the way the platform would.
  */
-@IsTest(
-	testFor='ApexClass:ImportBatchService, ApexClass:ImportProcessorBatch, ApexClass:ImportController'
-)
+@IsTest(testFor='ApexClass:ImportBatchService, ApexClass:ImportProcessorBatch, ApexClass:ImportController')
 private class ImportRetryRejectsTest {
 	private static final Integer FILE_ROWS = 200;
 	/** Every tenth row of the file has no last name, so 20 rows are rejected. */
@@ -90,9 +88,7 @@ private class ImportRetryRejectsTest {
 		ImportBatchService.beginPass(batchId);
 		Import_Batch__c stamp = new Import_Batch__c(
 			Id = batchId,
-			Status__c = dryRun
-				? ImportBatchService.STATUS_DRY_RUN
-				: ImportBatchService.STATUS_COMMITTING
+			Status__c = dryRun ? ImportBatchService.STATUS_DRY_RUN : ImportBatchService.STATUS_COMMITTING
 		);
 		if (!retrying) {
 			stamp.Is_Dry_Run__c = dryRun;
@@ -147,11 +143,7 @@ private class ImportRetryRejectsTest {
 			Test.stopTest();
 
 			Import_Batch__c after = ImportBatchSelector.selectById(batch.Id);
-			Assert.areEqual(
-				ImportBatchService.STATUS_DRY_RUN_COMPLETE,
-				after.Status__c,
-				'Previewed.'
-			);
+			Assert.areEqual(ImportBatchService.STATUS_DRY_RUN_COMPLETE, after.Status__c, 'Previewed.');
 			Assert.areEqual(REJECTS, after.Rows_Created__c, 'It counts only the fixed rows.');
 			Assert.areEqual(0, after.Rows_Rejected__c, 'None of them rejected.');
 			Assert.areEqual(FILE_ROWS - REJECTS, [SELECT COUNT() FROM Contact], 'Nothing written.');
@@ -254,10 +246,7 @@ private class ImportRetryRejectsTest {
 				ImportBatchService.stageRows(batch.Id, fixedRows(), 2);
 				Assert.fail('A finished import takes rows only through a retry.');
 			} catch (ImportException e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'),
-					e.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'), e.getMessage());
 			}
 		}
 	}
@@ -280,17 +269,10 @@ private class ImportRetryRejectsTest {
 				'Only the file rows remain.'
 			);
 			try {
-				ImportBatchService.stageRows(
-					batch.Id,
-					fixedRows(),
-					ImportBatchService.MAX_RETRY_ROWS - REJECTS + 3
-				);
+				ImportBatchService.stageRows(batch.Id, fixedRows(), ImportBatchService.MAX_RETRY_ROWS - REJECTS + 3);
 				Assert.fail('A page past the cap is refused.');
 			} catch (ImportException e) {
-				Assert.isTrue(
-					e.getMessage().contains(ImportBatchService.MAX_RETRY_ROWS.format()),
-					'It names the cap.'
-				);
+				Assert.isTrue(e.getMessage().contains(ImportBatchService.MAX_RETRY_ROWS.format()), 'It names the cap.');
 			}
 		}
 	}

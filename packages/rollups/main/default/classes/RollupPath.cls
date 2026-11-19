@@ -79,8 +79,7 @@ public with sharing class RollupPath {
 	}
 
 	public static Boolean isToken(String segment) {
-		return TOKEN_HOUSEHOLD.equalsIgnoreCase(segment) ||
-			TOKEN_HOUSEHOLD_MEMBERS.equalsIgnoreCase(segment);
+		return TOKEN_HOUSEHOLD.equalsIgnoreCase(segment) || TOKEN_HOUSEHOLD_MEMBERS.equalsIgnoreCase(segment);
 	}
 
 	/**

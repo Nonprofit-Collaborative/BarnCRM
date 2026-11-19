@@ -3,9 +3,7 @@
  * enrollment is proven, marks it paid, exports it and starts next year's renewal (R-SG1, R-SG9 to
  * R-SG12). Staff cannot decide or mark paid.
  */
-@IsTest(
-	testFor='ApexClass:ScholarshipAwards, ApexClass:AwardPaymentRulesHandler, ApexTrigger:AwardPaymentTrigger'
-)
+@IsTest(testFor='ApexClass:ScholarshipAwards, ApexClass:AwardPaymentRulesHandler, ApexTrigger:AwardPaymentTrigger')
 private class ScholarshipAwardsTest {
 	@TestSetup
 	static void setup() {
@@ -17,11 +15,7 @@ private class ScholarshipAwardsTest {
 		System.runAs(ScholarshipsTestData.admin()) {
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
 			Contact lee = ScholarshipsTestData.person('Lee');
-			Award_Application__c application = ScholarshipsTestData.application(
-				cycle.Id,
-				lee.Id,
-				'In Review'
-			);
+			Award_Application__c application = ScholarshipsTestData.application(cycle.Id, lee.Id, 'In Review');
 
 			Test.startTest();
 			Id awardId = ScholarshipAwards.decide(application.Id, true, 1000);
@@ -52,15 +46,10 @@ private class ScholarshipAwardsTest {
 			Assert.areEqual('Active', award.Status__c, 'Accepted, then active once scheduled');
 			Assert.areEqual(Date.today(), award.Letter_Sent_Date__c, 'Letter dated');
 			Assert.areEqual(3, scheduled, 'Three payments');
-			Assert.areEqual(
-				1000,
-				award.Scheduled_Amount__c,
-				'The remainder lands on the last payment'
-			);
+			Assert.areEqual(1000, award.Scheduled_Amount__c, 'The remainder lands on the last payment');
 			Assert.areEqual(
 				5000 - 1000,
-				[SELECT Remaining_Budget__c FROM Award_Cycle__c WHERE Id = :cycle.Id]
-				.Remaining_Budget__c,
+				[SELECT Remaining_Budget__c FROM Award_Cycle__c WHERE Id = :cycle.Id].Remaining_Budget__c,
 				'Budget left'
 			);
 
@@ -88,11 +77,7 @@ private class ScholarshipAwardsTest {
 			}
 			ScholarshipAwards.setRequirement(condition.Id, 'Met');
 			ScholarshipAwards.markPaid(payments[0].Id, null, 'Check', '1001');
-			Assert.areEqual(
-				333.33,
-				[SELECT Paid_Amount__c FROM Award__c WHERE Id = :awardId].Paid_Amount__c,
-				'Paid'
-			);
+			Assert.areEqual(333.33, [SELECT Paid_Amount__c FROM Award__c WHERE Id = :awardId].Paid_Amount__c, 'Paid');
 
 			List<ScholarshipAwards.Payment> exported = ScholarshipAwards.export(
 				Date.today().addDays(-1),
@@ -102,8 +87,7 @@ private class ScholarshipAwardsTest {
 			Assert.areEqual('Lee', exported[0].recipient, 'With its recipient');
 			Assert.areEqual(
 				Date.today(),
-				[SELECT Exported_Date__c FROM Award_Payment__c WHERE Id = :payments[0].Id]
-				.Exported_Date__c,
+				[SELECT Exported_Date__c FROM Award_Payment__c WHERE Id = :payments[0].Id].Exported_Date__c,
 				'Stamped'
 			);
 		}
@@ -113,11 +97,7 @@ private class ScholarshipAwardsTest {
 	static void aConditionNamingNoPaymentHoldsThemAllAndDeclineDeclines() {
 		System.runAs(ScholarshipsTestData.admin()) {
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
-			Award_Application__c declined = ScholarshipsTestData.application(
-				cycle.Id,
-				null,
-				'In Review'
-			);
+			Award_Application__c declined = ScholarshipsTestData.application(cycle.Id, null, 'In Review');
 			Assert.isNull(ScholarshipAwards.decide(declined.Id, false, null), 'No award');
 			Assert.areEqual(
 				'Declined',
@@ -125,16 +105,10 @@ private class ScholarshipAwardsTest {
 				'Declined'
 			);
 			Award__c award = ScholarshipsTestData.award(cycle.Id, null, null, 500);
-			insert new Award_Requirement__c(
-				Award__c = award.Id,
-				Name = 'Signed agreement',
-				Type__c = 'Condition'
-			);
+			insert new Award_Requirement__c(Award__c = award.Id, Name = 'Signed agreement', Type__c = 'Condition');
 			List<Award_Payment__c> rows = new List<Award_Payment__c>();
 			for (Integer i = 0; i < 200; i++) {
-				rows.add(
-					new Award_Payment__c(Award__c = award.Id, Amount__c = 1, Status__c = 'Paid')
-				);
+				rows.add(new Award_Payment__c(Award__c = award.Id, Amount__c = 1, Status__c = 'Paid'));
 			}
 			Test.startTest();
 			List<Database.SaveResult> results = Database.insert(rows, false);

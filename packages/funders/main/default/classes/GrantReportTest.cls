@@ -3,9 +3,7 @@
  * an edited copy is kept (R-FT3), only active templates with a body are offered (R-FT1), and the
  * report data carries the grant's values and requirements for the browser merge.
  */
-@IsTest(
-	testFor='ApexClass:FunderReportTemplates, ApexClass:GrantReportController, ApexClass:FundersPostInstall'
-)
+@IsTest(testFor='ApexClass:FunderReportTemplates, ApexClass:GrantReportController, ApexClass:FundersPostInstall')
 private class GrantReportTest {
 	private static final String STAFF = 'Funders_Staff';
 
@@ -49,11 +47,7 @@ private class GrantReportTest {
 		Grant__c grant;
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			FunderReportTemplates.installDefaultsDuringInstall();
-			insert as user new Funder_Report_Template__c(
-				Name = 'Retired',
-				Body__c = '<p>x</p>',
-				Active__c = false
-			);
+			insert as user new Funder_Report_Template__c(Name = 'Retired', Body__c = '<p>x</p>', Active__c = false);
 			Account funder = GrantTestData.funder('Lakeside Foundation');
 			grant = GrantTestData.grant('Reading <Grant>', funder.Id, GrantService.STAGE_AWARDED);
 			grant.Amount_Awarded__c = 25000;
@@ -61,11 +55,7 @@ private class GrantReportTest {
 			grant.Award_End_Date__c = Date.newInstance(2026, 12, 31);
 			grant.Award_Number__c = 'S287C250001';
 			insert as user grant;
-			insert as user GrantTestData.requirement(
-				'Final report',
-				grant.Id,
-				Date.newInstance(2027, 1, 31)
-			);
+			insert as user GrantTestData.requirement('Final report', grant.Id, Date.newInstance(2027, 1, 31));
 		}
 		System.runAs(TestUsers.adminWith(STAFF)) {
 			Test.startTest();
@@ -74,11 +64,7 @@ private class GrantReportTest {
 
 			Assert.areEqual(1, data.templates.size(), 'Only the active template');
 			Assert.areEqual('Grant report', data.templates[0].get('name'), 'The shipped one');
-			Assert.areEqual(
-				'Reading <Grant>',
-				data.grant.get('GrantName'),
-				'Raw: the browser escapes'
-			);
+			Assert.areEqual('Reading <Grant>', data.grant.get('GrantName'), 'Raw: the browser escapes');
 			Assert.areEqual('Lakeside Foundation', data.grant.get('FunderName'), 'Funder');
 			Assert.areEqual(25000, (Decimal) data.grant.get('AmountAwarded'), 'Amount');
 			Assert.areEqual('S287C250001', data.grant.get('AwardNumber'), 'Award number');

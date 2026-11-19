@@ -82,10 +82,7 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, true, false, false);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'coexistence_mode_unset'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'coexistence_mode_unset');
 
 			System.assertNotEquals(null, finding, 'An unconfirmed mode is reported.');
 			System.assertEquals(
@@ -107,16 +104,9 @@ private class HealthCheckServiceTest {
 			CoexistenceService.setMode(CoexistenceService.MODE_STANDALONE);
 			OrgShapeDetector.overrideShape = shape(true, false, false, false);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'coexistence_mode_mismatch'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'coexistence_mode_mismatch');
 
-			System.assertNotEquals(
-				null,
-				finding,
-				'A mode that does not match the org is reported.'
-			);
+			System.assertNotEquals(null, finding, 'A mode that does not match the org is reported.');
 			System.assertEquals(
 				HealthCheckService.SEVERITY_WARNING,
 				finding.severity,
@@ -131,17 +121,10 @@ private class HealthCheckServiceTest {
 			OrgShapeDetector.overrideShape = shape(true, false, false, false);
 			CoexistenceService.setMode(CoexistenceService.MODE_NPSP);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'coexistence_mode_match'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'coexistence_mode_match');
 
 			System.assertNotEquals(null, finding, 'Health Check says when something is right.');
-			System.assertEquals(
-				HealthCheckService.SEVERITY_INFO,
-				finding.severity,
-				'A matching mode is information.'
-			);
+			System.assertEquals(HealthCheckService.SEVERITY_INFO, finding.severity, 'A matching mode is information.');
 		}
 	}
 
@@ -152,15 +135,10 @@ private class HealthCheckServiceTest {
 			// Saved straight through the settings write: CoexistenceService would now propose
 			// the junction alongside the mode in a Person Accounts org, which is the fix itself.
 			SettingsService.saveValues(
-				new Map<String, Object>{
-					CoexistenceService.KEY_COEXISTENCE_MODE => CoexistenceService.MODE_STANDALONE
-				}
+				new Map<String, Object>{ CoexistenceService.KEY_COEXISTENCE_MODE => CoexistenceService.MODE_STANDALONE }
 			);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'membership_mode_person_accounts'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'membership_mode_person_accounts');
 
 			System.assertNotEquals(null, finding, 'This combination is always reported.');
 			System.assertEquals(
@@ -210,10 +188,7 @@ private class HealthCheckServiceTest {
 			insert HouseholdTestDataFactory.newContact('Maria', 'Garcia');
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'membership_data_hidden'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'membership_data_hidden');
 
 			System.assertNotEquals(null, finding, 'Membership the mode cannot see is reported.');
 			System.assertEquals(
@@ -248,10 +223,7 @@ private class HealthCheckServiceTest {
 			insert maria;
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'membership_data_hidden'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'membership_data_hidden');
 
 			System.assertNotEquals(null, finding, 'A person the mode cannot see is reported.');
 			System.assertEquals(
@@ -301,10 +273,7 @@ private class HealthCheckServiceTest {
 			OrgShapeDetector.overrideShape = shape(false, true, false, false);
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'household_creation_disabled'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'household_creation_disabled');
 
 			System.assertNotEquals(null, finding, 'The state is always reported.');
 			System.assertEquals(
@@ -347,9 +316,7 @@ private class HealthCheckServiceTest {
 	static void contactMembershipWithAutomaticHouseholdsOffIsNotReported() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, false, false, false);
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 
@@ -366,9 +333,7 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, false, true, false);
 			HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_STANDARD }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_STANDARD });
 
 			System.assertEquals(
 				null,
@@ -383,14 +348,9 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, false, true, false);
 			HealthCheckOrgShapeChecks.mirrorInstalledOverride = false;
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT });
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'mirror_module_absent'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'mirror_module_absent');
 
 			System.assertNotEquals(null, finding, 'The gift mirror is worth mentioning once.');
 			System.assertEquals(
@@ -473,11 +433,7 @@ private class HealthCheckServiceTest {
 
 				HealthCheckService.Finding finding = find(HealthCheckService.run(), 'no_admin');
 
-				System.assertNotEquals(
-					null,
-					finding,
-					'An org where nobody can administer BarnCRM is told so.'
-				);
+				System.assertNotEquals(null, finding, 'An org where nobody can administer BarnCRM is told so.');
 				System.assertEquals(
 					HealthCheckService.SEVERITY_ERROR,
 					finding.severity,
@@ -567,10 +523,7 @@ private class HealthCheckServiceTest {
 				OrgShapeDetector.overrideShape = shape(false, false, false, false);
 				HealthCheckService.accessCountsOverride = new FixedAccessCounts(1, 3);
 
-				HealthCheckService.Finding finding = find(
-					HealthCheckService.run(),
-					'users_without_access'
-				);
+				HealthCheckService.Finding finding = find(HealthCheckService.run(), 'users_without_access');
 
 				System.assertNotEquals(
 					null,
@@ -648,10 +601,7 @@ private class HealthCheckServiceTest {
 			// A pause set from the page has its resume scheduled with it (R-A5).
 			AutomationResumeJob.scheduleAt(paused.Automation_Paused_Until__c);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'automation_paused'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'automation_paused');
 
 			System.assertNotEquals(null, finding, 'A pause is always visible while it is on.');
 			System.assertEquals(
@@ -688,10 +638,7 @@ private class HealthCheckServiceTest {
 				finding.fixTarget,
 				'The fix is the Automation page, where Resume is.'
 			);
-			Assert.isNull(
-				find(findings, 'automation_paused'),
-				'One finding about the pause, not two.'
-			);
+			Assert.isNull(find(findings, 'automation_paused'), 'One finding about the pause, not two.');
 		}
 	}
 
@@ -702,10 +649,7 @@ private class HealthCheckServiceTest {
 			TestDataFactory.pausedSettings(AutomationControl.LONGEST_PAUSE_HOURS + 24);
 			AutomationResumeJob.scheduleAt(System.now().addHours(1));
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'automation_paused_no_resume'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'automation_paused_no_resume');
 
 			Assert.isNotNull(finding, 'No page pause ends this late, so the job is not its end.');
 			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
@@ -717,23 +661,15 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, false, false, false);
 			BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
-			settings.Error_Digest_Last_Run__c = System.now()
-				.addDays(-HealthCheckSettingsChecks.DIGEST_STALE_DAYS - 1);
+			settings.Error_Digest_Last_Run__c = System.now().addDays(-HealthCheckSettingsChecks.DIGEST_STALE_DAYS - 1);
 			TestDataFactory.saveSettings(settings);
 			ErrorDigestScheduler.start();
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'error_digest_stale'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'error_digest_stale');
 
 			Assert.isNotNull(finding, 'Scheduled, but silent for three days.');
 			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
-			Assert.areEqual(
-				SettingSections.ERROR_LOG,
-				finding.fixTarget,
-				'Fixed where it is scheduled.'
-			);
+			Assert.areEqual(SettingSections.ERROR_LOG, finding.fixTarget, 'Fixed where it is scheduled.');
 		}
 	}
 
@@ -742,8 +678,7 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, false, false, false);
 			BarnCRM_Settings__c settings = TestDataFactory.defaultSettings();
-			settings.Error_Digest_Last_Run__c = System.now()
-				.addDays(-HealthCheckSettingsChecks.DIGEST_STALE_DAYS - 1);
+			settings.Error_Digest_Last_Run__c = System.now().addDays(-HealthCheckSettingsChecks.DIGEST_STALE_DAYS - 1);
 			TestDataFactory.saveSettings(settings);
 
 			Assert.isNull(
@@ -754,10 +689,7 @@ private class HealthCheckServiceTest {
 			settings.Error_Digest_Last_Run__c = System.now().addHours(-3);
 			TestDataFactory.saveSettings(settings);
 			ErrorDigestScheduler.start();
-			Assert.isNull(
-				find(HealthCheckService.run(), 'error_digest_stale'),
-				'Scheduled and ran this morning.'
-			);
+			Assert.isNull(find(HealthCheckService.run(), 'error_digest_stale'), 'Scheduled and ran this morning.');
 		}
 	}
 
@@ -766,21 +698,14 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(false, false, false, false);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'automation_running'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'automation_running');
 
 			System.assertNotEquals(
 				null,
 				finding,
 				'Maria is told automation is running, so silence never has to be interpreted.'
 			);
-			System.assertEquals(
-				HealthCheckService.SEVERITY_INFO,
-				finding.severity,
-				'Working normally is information.'
-			);
+			System.assertEquals(HealthCheckService.SEVERITY_INFO, finding.severity, 'Working normally is information.');
 		}
 	}
 
@@ -792,11 +717,7 @@ private class HealthCheckServiceTest {
 
 			List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
-			System.assertEquals(
-				null,
-				find(findings, 'automation_paused'),
-				'A pause that has expired is not news.'
-			);
+			System.assertEquals(null, find(findings, 'automation_paused'), 'A pause that has expired is not news.');
 			System.assertNotEquals(
 				null,
 				find(findings, 'automation_running'),
@@ -825,16 +746,9 @@ private class HealthCheckServiceTest {
 			System.runAs(maria) {
 				OrgShapeDetector.overrideShape = shape(false, false, false, false);
 
-				HealthCheckService.Finding finding = find(
-					HealthCheckService.run(),
-					'error_log_new'
-				);
+				HealthCheckService.Finding finding = find(HealthCheckService.run(), 'error_log_new');
 
-				System.assertNotEquals(
-					null,
-					finding,
-					'A new error is surfaced where Maria will see it.'
-				);
+				System.assertNotEquals(null, finding, 'A new error is surfaced where Maria will see it.');
 				System.assertEquals(
 					HealthCheckService.SEVERITY_WARNING,
 					finding.severity,
@@ -873,8 +787,7 @@ private class HealthCheckServiceTest {
 			System.runAs(maria) {
 				OrgShapeDetector.overrideShape = shape(false, false, false, false);
 				Integer rowsBefore = Limits.getQueryRows();
-				HealthCheckService.Finding finding = new HealthCheckSettingsChecks.ErrorLogCheck()
-					.run();
+				HealthCheckService.Finding finding = new HealthCheckSettingsChecks.ErrorLogCheck().run();
 				Integer rowsSpent = Limits.getQueryRows() - rowsBefore;
 
 				System.assertNotEquals(null, finding, 'The flood is still a finding.');
@@ -936,10 +849,7 @@ private class HealthCheckServiceTest {
 			System.runAs(maria) {
 				OrgShapeDetector.overrideShape = shape(false, false, false, false);
 
-				HealthCheckService.Finding finding = find(
-					HealthCheckService.run(),
-					'error_log_new'
-				);
+				HealthCheckService.Finding finding = find(HealthCheckService.run(), 'error_log_new');
 
 				System.assertNotEquals(null, finding, 'Past the cap there is still a finding.');
 				String counted = String.format(
@@ -967,10 +877,7 @@ private class HealthCheckServiceTest {
 			);
 
 			AccountKinds.usableOverride = false;
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'organization_record_type_unavailable'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'organization_record_type_unavailable');
 			System.assertNotEquals(
 				null,
 				finding,
@@ -996,10 +903,7 @@ private class HealthCheckServiceTest {
 			FiscalYearSelector.customFiscalYearsOverride = true;
 			FiscalYearSelector.setTestStartMonth(7);
 
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'custom_fiscal_year'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'custom_fiscal_year');
 
 			System.assertNotEquals(
 				null,
@@ -1016,11 +920,7 @@ private class HealthCheckServiceTest {
 				finding.severity,
 				'Information: an org may keep its custom year on purpose.'
 			);
-			System.assertEquals(
-				null,
-				finding.fixTarget,
-				'Only Setup can change it, so there is no fix button.'
-			);
+			System.assertEquals(null, finding.fixTarget, 'Only Setup can change it, so there is no fix button.');
 		}
 	}
 
@@ -1068,18 +968,14 @@ private class HealthCheckServiceTest {
 				'And named as an administrator reads them: ' + skipped.detail
 			);
 			Assert.isFalse(
-				skipped.detail.contains('org_shape') ||
-				skipped.detail.contains('household_ownership_skew'),
+				skipped.detail.contains('org_shape') || skipped.detail.contains('household_ownership_skew'),
 				'Never by internal key: ' + skipped.detail
 			);
 			Assert.isTrue(
 				skipped.detail.contains('Address Verification'),
 				'A module extension by its module name: ' + skipped.detail
 			);
-			Assert.isFalse(
-				skipped.detail.contains('_extension'),
-				'Not by its key: ' + skipped.detail
-			);
+			Assert.isFalse(skipped.detail.contains('_extension'), 'Not by its key: ' + skipped.detail);
 			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, skipped.severity);
 		}
 	}
@@ -1111,9 +1007,7 @@ private class HealthCheckServiceTest {
 			Assert.areEqual(1, stored.warnings, 'Stored with its Not Checked warning');
 
 			HealthCheckService.queryBudget = 80;
-			HealthCheckService.Report remaining = HealthCheckService.buildRemainingReport(
-				first.skippedChecks
-			);
+			HealthCheckService.Report remaining = HealthCheckService.buildRemainingReport(first.skippedChecks);
 
 			Assert.isTrue(remaining.skippedChecks.isEmpty(), 'Nothing left this time');
 			Assert.isNull(find(remaining.findings, 'not_checked'), 'No Not Checked warning');
@@ -1158,9 +1052,7 @@ private class HealthCheckServiceTest {
 			HealthCheckService.Report none = HealthCheckService.buildRemainingReport(
 				new List<String>{ 'no_such_check' }
 			);
-			HealthCheckService.Report empty = HealthCheckService.buildRemainingReport(
-				new List<String>()
-			);
+			HealthCheckService.Report empty = HealthCheckService.buildRemainingReport(new List<String>());
 
 			Assert.isTrue(none.findings.isEmpty(), 'An unknown key runs nothing: ' + none.findings);
 			Assert.isTrue(empty.findings.isEmpty(), 'No keys, nothing to run');
@@ -1182,11 +1074,7 @@ private class HealthCheckServiceTest {
 				failed.severity,
 				'One check failing is a warning about the report, not an error about the org.'
 			);
-			System.assertNotEquals(
-				null,
-				find(findings, 'org_shape'),
-				'The other eight answers are still there.'
-			);
+			System.assertNotEquals(null, find(findings, 'org_shape'), 'The other eight answers are still there.');
 			System.assertNotEquals(
 				null,
 				find(findings, 'coexistence_mode_unset'),
@@ -1200,9 +1088,7 @@ private class HealthCheckServiceTest {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(true, false, false, false);
 			HealthCheckService.faultInjection = new BrokenCheck();
-			HealthCheckService.loggerFault = new BrokenCheckException(
-				'The Error Log is unwritable.'
-			);
+			HealthCheckService.loggerFault = new BrokenCheckException('The Error Log is unwritable.');
 
 			List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
@@ -1273,11 +1159,7 @@ private class HealthCheckServiceTest {
 				find(findings, 'check_failed_giving_extension'),
 				'An org with no extension installed is an ordinary org shape, not a failure.'
 			);
-			System.assertNotEquals(
-				null,
-				find(findings, 'org_shape'),
-				'The rest of the report runs.'
-			);
+			System.assertNotEquals(null, find(findings, 'org_shape'), 'The rest of the report runs.');
 		}
 	}
 
@@ -1285,10 +1167,7 @@ private class HealthCheckServiceTest {
 	static void anExtensionThatThrowsDoesNotTakeTheReportDown() {
 		System.runAs(TestUsers.admin()) {
 			OrgShapeDetector.overrideShape = shape(true, false, false, false);
-			HealthCheckExtensions.overrides.put(
-				'GivingHealthCheckExtension',
-				new BrokenExtension()
-			);
+			HealthCheckExtensions.overrides.put('GivingHealthCheckExtension', new BrokenExtension());
 
 			List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
@@ -1325,10 +1204,7 @@ private class HealthCheckServiceTest {
 					}
 				)
 			);
-			HealthCheckExtensions.overrides.put(
-				'MirrorHealthCheckExtension',
-				new BrokenExtension()
-			);
+			HealthCheckExtensions.overrides.put('MirrorHealthCheckExtension', new BrokenExtension());
 
 			List<HealthCheckService.Finding> findings = HealthCheckService.run();
 
@@ -1498,10 +1374,7 @@ private class HealthCheckServiceTest {
 		return orgShape;
 	}
 
-	private static HealthCheckService.Finding find(
-		List<HealthCheckService.Finding> findings,
-		String key
-	) {
+	private static HealthCheckService.Finding find(List<HealthCheckService.Finding> findings, String key) {
 		for (HealthCheckService.Finding finding : findings) {
 			if (key.equals(finding.key)) {
 				return finding;
@@ -1588,10 +1461,7 @@ private class HealthCheckServiceTest {
 				finding.severity,
 				'A collision is a problem, an administrator should look at'
 			);
-			System.assert(
-				finding.detail.contains('1'),
-				'The finding names how many Accounts collide'
-			);
+			System.assert(finding.detail.contains('1'), 'The finding names how many Accounts collide');
 		}
 	}
 
@@ -1639,10 +1509,7 @@ private class HealthCheckServiceTest {
 			HouseholdSelector.nativeHouseholdCollisionCountOverride = 0;
 
 			Test.startTest();
-			HealthCheckService.Finding finding = find(
-				HealthCheckService.run(),
-				'native_households'
-			);
+			HealthCheckService.Finding finding = find(HealthCheckService.run(), 'native_households');
 			Test.stopTest();
 
 			Assert.isTrue(

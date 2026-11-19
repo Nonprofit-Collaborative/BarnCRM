@@ -42,9 +42,7 @@ public without sharing class ReceiptNumberSequence {
 	 */
 	public static String seriesKeyFor(String receiptType, Integer statementYear) {
 		if (String.isBlank(receiptType) || statementYear == null) {
-			throw new ReceiptNumberSequenceException(
-				BarnHelp.text('Giving', 'Giving_Receipt_SeriesIncomplete')
-			);
+			throw new ReceiptNumberSequenceException(BarnHelp.text('Giving', 'Giving_Receipt_SeriesIncomplete'));
 		}
 		return receiptType + '-' + String.valueOf(statementYear);
 	}
@@ -71,17 +69,8 @@ public without sharing class ReceiptNumberSequence {
 	 * (see `reconcile`). ADR-0016 records it as an open item for the v0.4 performance baseline,
 	 * which is where the contention can actually be measured.
 	 */
-	public static List<String> allocate(
-		String receiptType,
-		Integer statementYear,
-		Integer howMany
-	) {
-		return allocate(
-			receiptType,
-			statementYear,
-			howMany,
-			seriesKeyFor(receiptType, statementYear)
-		);
+	public static List<String> allocate(String receiptType, Integer statementYear, Integer howMany) {
+		return allocate(receiptType, statementYear, howMany, seriesKeyFor(receiptType, statementYear));
 	}
 
 	/** The prefix a scoped series is created with (C-47f); null for the organization series. */
@@ -92,23 +81,13 @@ public without sharing class ReceiptNumberSequence {
 	 * created with its prefix. Without an ID or a prefix the organization series is used, so two
 	 * series never share a prefix by accident. The same all or nothing rule as `allocateOne`.
 	 */
-	public static String allocateOne(
-		String receiptType,
-		Integer statementYear,
-		Id scopeId,
-		String prefix
-	) {
+	public static String allocateOne(String receiptType, Integer statementYear, Id scopeId, String prefix) {
 		if (scopeId == null || String.isBlank(prefix)) {
 			return allocateOne(receiptType, statementYear);
 		}
 		scopedPrefix = prefix;
 		try {
-			return allocate(
-				receiptType,
-				statementYear,
-				1,
-				scopedKey(receiptType, statementYear, scopeId)
-			)[0];
+			return allocate(receiptType, statementYear, 1, scopedKey(receiptType, statementYear, scopeId))[0];
 		} finally {
 			scopedPrefix = null;
 		}
@@ -118,12 +97,7 @@ public without sharing class ReceiptNumberSequence {
 		return seriesKeyFor(receiptType, statementYear) + (scopeId == null ? '' : '-' + scopeId);
 	}
 
-	private static List<String> allocate(
-		String receiptType,
-		Integer statementYear,
-		Integer howMany,
-		String key
-	) {
+	private static List<String> allocate(String receiptType, Integer statementYear, Integer howMany, String key) {
 		if (howMany == null || howMany < 1) {
 			return new List<String>();
 		}
@@ -133,9 +107,7 @@ public without sharing class ReceiptNumberSequence {
 			series = lockSeries(key);
 		}
 		if (series == null) {
-			throw new ReceiptNumberSequenceException(
-				BarnHelp.text('Giving', 'Giving_Receipt_SeriesUnavailable')
-			);
+			throw new ReceiptNumberSequenceException(BarnHelp.text('Giving', 'Giving_Receipt_SeriesUnavailable'));
 		}
 
 		Integer first = series.Next_Counter__c.intValue();

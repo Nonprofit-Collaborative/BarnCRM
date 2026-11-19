@@ -63,9 +63,7 @@ public with sharing class FindInlineEditService {
 		for (Id recordId : ids) {
 			SObject record = current.get(recordId);
 			if (record == null) {
-				summary.errors.add(
-					rowError(recordId, BarnHelp.text('Core', 'Core_Find_ErrorEditNotFound'))
-				);
+				summary.errors.add(rowError(recordId, BarnHelp.text('Core', 'Core_Find_ErrorEditNotFound')));
 				continue;
 			}
 			SObject change = type.newSObject(recordId);
@@ -98,25 +96,10 @@ public with sharing class FindInlineEditService {
 			Id recordId = toSave[i].Id;
 			if (results[i].isSuccess()) {
 				summary.saved++;
-				journal.add(
-					ImportJournalService.updated(
-						objectName,
-						recordId,
-						null,
-						beforeOf[i],
-						afterOf[i]
-					)
-				);
+				journal.add(ImportJournalService.updated(objectName, recordId, null, beforeOf[i], afterOf[i]));
 			} else {
-				summary.errors.add(
-					rowError(recordId, BulkJobSupport.message(results[i].getErrors()))
-				);
-				BulkJobSupport.journalFailure(
-					journal,
-					objectName,
-					recordId,
-					results[i].getErrors()
-				);
+				summary.errors.add(rowError(recordId, BulkJobSupport.message(results[i].getErrors())));
+				BulkJobSupport.journalFailure(journal, objectName, recordId, results[i].getErrors());
 			}
 		}
 		if (!journal.isEmpty()) {
@@ -128,10 +111,7 @@ public with sharing class FindInlineEditService {
 	}
 
 	/** The edits by record, each field found in describe and each value typed for it. */
-	private static Map<Id, Map<String, Object>> readEdits(
-		Schema.SObjectType type,
-		String editsJson
-	) {
+	private static Map<Id, Map<String, Object>> readEdits(Schema.SObjectType type, String editsJson) {
 		List<Object> rows;
 		try {
 			rows = (List<Object>) JSON.deserializeUntyped(editsJson);
@@ -139,14 +119,10 @@ public with sharing class FindInlineEditService {
 			rows = null;
 		}
 		if (rows == null || rows.isEmpty()) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'));
 		}
 		if (rows.size() > MAX_RECORDS) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_Find_ErrorEditTooMany')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_Find_ErrorEditTooMany'));
 		}
 		Map<String, Schema.DescribeFieldResult> fieldByName = new Map<String, Schema.DescribeFieldResult>();
 		Map<Id, Map<String, Object>> wantedById = new Map<Id, Map<String, Object>>();
@@ -173,9 +149,7 @@ public with sharing class FindInlineEditService {
 			}
 		}
 		if (wantedById.isEmpty()) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'));
 		}
 		return wantedById;
 	}
@@ -185,14 +159,10 @@ public with sharing class FindInlineEditService {
 		try {
 			recordId = Id.valueOf(String.valueOf(raw));
 		} catch (Exception notAnId) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_Find_ErrorEditRecord')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_Find_ErrorEditRecord'));
 		}
 		if (recordId.getSObjectType() != type) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_Find_ErrorEditRecord')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_Find_ErrorEditRecord'));
 		}
 		return recordId;
 	}
@@ -233,12 +203,7 @@ public with sharing class FindInlineEditService {
 			'filter' => new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => 'Id',
-						'operator' => 'in',
-						'value' => idList
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => 'Id', 'operator' => 'in', 'value' => idList }
 				}
 			}
 		};

@@ -62,11 +62,7 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
 		// Each entry point records its own failures and returns, so nothing here throws.
 		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
 		FunderReportTemplates.installDefaultsDuringInstall();
-		ShippedDefaultUpgrades.apply(
-			MODULE_KEY,
-			Funders_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(MODULE_KEY, Funders_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(MODULE_KEY);
 		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}

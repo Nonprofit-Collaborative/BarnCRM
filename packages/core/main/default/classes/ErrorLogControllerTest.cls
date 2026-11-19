@@ -66,10 +66,7 @@ private class ErrorLogControllerTest {
 	@IsTest
 	static void markingAnEntryTwiceChangesNothingTheSecondTime() {
 		System.runAs(TestUsers.admin()) {
-			Error_Log__c entry = TestDataFactory.insertErrorLogs(
-				1,
-				ErrorLogger.STATUS_ACKNOWLEDGED
-			)[0];
+			Error_Log__c entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_ACKNOWLEDGED)[0];
 
 			Test.startTest();
 			ErrorLogController.ErrorLogTileView tile = ErrorLogController.acknowledge(entry.Id);
@@ -133,10 +130,7 @@ private class ErrorLogControllerTest {
 		User staff;
 		System.runAs(TestUsers.admin()) {
 			entry = TestDataFactory.insertErrorLogs(1, ErrorLogger.STATUS_NEW)[0];
-			staff = TestUsers.standardUserWith(
-				'BugReportStaff',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			staff = TestUsers.standardUserWith('BugReportStaff', new List<String>{ 'BarnCRM_Staff' });
 		}
 
 		System.runAs(staff) {
@@ -154,11 +148,7 @@ private class ErrorLogControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Test context 0',
-				report.get('context'),
-				'Staff see where it happened.'
-			);
+			Assert.areEqual('Test context 0', report.get('context'), 'Staff see where it happened.');
 			Assert.isNull(
 				report.get('technicalDetail'),
 				'Staff may not read Technical Detail, so the report leaves it out.'

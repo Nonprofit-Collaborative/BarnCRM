@@ -1,9 +1,6 @@
 @IsTest(testFor='ApexClass:ReportSubscriptions, ApexClass:OrgToolingApi')
 private class ReportSubscriptionsTest {
-	private static final List<String> CONNECTION_ADMIN = new List<String>{
-		'BarnCRM_Admin',
-		'BarnCRM_Metadata_Admin'
-	};
+	private static final List<String> CONNECTION_ADMIN = new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Metadata_Admin' };
 	// 15 characters, so Apex adds the right case suffix and JSON.deserialize accepts it.
 	private static final Id REPORT_ID = '00O000000000001';
 
@@ -27,13 +24,9 @@ private class ReportSubscriptionsTest {
 			response.setStatusCode(status);
 			String endpoint = request.getEndpoint();
 			if (status >= 300) {
-				response.setBody(
-					'[{"message":"Session expired","errorCode":"INVALID_SESSION_ID"}]'
-				);
+				response.setBody('[{"message":"Session expired","errorCode":"INVALID_SESSION_ID"}]');
 			} else if (endpoint.contains('/limits')) {
-				response.setBody(
-					'{"userLimit":{"max":7,"remaining":' + String.valueOf(remaining) + '}}'
-				);
+				response.setBody('{"userLimit":{"max":7,"remaining":' + String.valueOf(remaining) + '}}');
 			} else if (request.getMethod() == 'GET') {
 				response.setBody(existing);
 			} else {
@@ -142,18 +135,9 @@ private class ReportSubscriptionsTest {
 			Assert.areEqual(3, sent.size(), 'Existing, limit, create.');
 			HttpRequest created = sent[2];
 			Assert.areEqual('POST', created.getMethod(), 'Created.');
-			Assert.isTrue(
-				created.getEndpoint().endsWith('/analytics/notifications'),
-				'The notifications API.'
-			);
-			Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(
-				created.getBody()
-			);
-			Assert.areEqual(
-				'lightningReportSubscribe',
-				body.get('source'),
-				'A report subscription.'
-			);
+			Assert.isTrue(created.getEndpoint().endsWith('/analytics/notifications'), 'The notifications API.');
+			Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(created.getBody());
+			Assert.areEqual('lightningReportSubscribe', body.get('source'), 'A report subscription.');
 			Map<String, Object> schedule = (Map<String, Object>) body.get('schedule');
 			Assert.areEqual('weekly', schedule.get('frequency'), 'Weekly.');
 			Map<String, Object> details = (Map<String, Object>) schedule.get('details');
@@ -165,10 +149,7 @@ private class ReportSubscriptionsTest {
 	@IsTest
 	static void updatesTheSubscriptionThePersonAlreadyHas() {
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
-			Test.setMock(
-				HttpCalloutMock.class,
-				new AnalyticsMock('[{"id":"0Au000000000009AAA"}]', 0, 200)
-			);
+			Test.setMock(HttpCalloutMock.class, new AnalyticsMock('[{"id":"0Au000000000009AAA"}]', 0, 200));
 			Test.startTest();
 			String failure = ReportSubscriptions.save(weekly(), 'LYBUNT Donors');
 			Test.stopTest();
@@ -187,11 +168,7 @@ private class ReportSubscriptionsTest {
 			String failure = ReportSubscriptions.save(weekly(), 'LYBUNT Donors');
 			Test.stopTest();
 			Assert.areEqual(
-				BarnHelp.text(
-					'Core',
-					'Core_ReportSubscriptions_LimitReached',
-					new List<Object>{ 7 }
-				),
+				BarnHelp.text('Core', 'Core_ReportSubscriptions_LimitReached', new List<Object>{ 7 }),
 				failure,
 				'In words, with the limit.'
 			);

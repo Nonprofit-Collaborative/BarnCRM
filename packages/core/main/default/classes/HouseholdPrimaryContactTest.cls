@@ -19,12 +19,7 @@ private class HouseholdPrimaryContactTest {
 		return record;
 	}
 
-	private static Household_Member__c membership(
-		Id householdId,
-		Id personId,
-		String role,
-		Boolean isPrimary
-	) {
+	private static Household_Member__c membership(Id householdId, Id personId, String role, Boolean isPrimary) {
 		Household_Member__c record = new Household_Member__c(
 			Household__c = householdId,
 			Role__c = role,
@@ -40,8 +35,7 @@ private class HouseholdPrimaryContactTest {
 	}
 
 	private static Id primaryContactOf(Id householdId) {
-		return [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE]
-		.Primary_Contact__c;
+		return [SELECT Primary_Contact__c FROM Account WHERE Id = :householdId WITH SYSTEM_MODE].Primary_Contact__c;
 	}
 
 	@IsTest
@@ -95,10 +89,7 @@ private class HouseholdPrimaryContactTest {
 			Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
 			insert new List<Contact>{ john, jane };
 			Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
-			insert new List<Household_Member__c>{
-				johns,
-				membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
-			};
+			insert new List<Household_Member__c>{ johns, membership(smiths.Id, jane.Id, 'Spouse or Partner', false) };
 
 			Test.startTest();
 			update new Household_Member__c(Id = johns.Id, End_Date__c = OrgDate.today());
@@ -120,10 +111,7 @@ private class HouseholdPrimaryContactTest {
 			Contact jane = HouseholdTestDataFactory.newContact('Mrs.', 'Jane', 'Smith');
 			insert new List<Contact>{ john, jane };
 			Household_Member__c johns = membership(smiths.Id, john.Id, 'Head', true);
-			insert new List<Household_Member__c>{
-				johns,
-				membership(smiths.Id, jane.Id, 'Spouse or Partner', false)
-			};
+			insert new List<Household_Member__c>{ johns, membership(smiths.Id, jane.Id, 'Spouse or Partner', false) };
 
 			Test.startTest();
 			delete new Household_Member__c(Id = johns.Id);
@@ -151,9 +139,7 @@ private class HouseholdPrimaryContactTest {
 			insert maria;
 			Contact behindMaria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert behindMaria;
-			PersonRecordSelector.personContactIdOverride = new Map<Id, Id>{
-				maria.Id => behindMaria.Id
-			};
+			PersonRecordSelector.personContactIdOverride = new Map<Id, Id>{ maria.Id => behindMaria.Id };
 
 			Test.startTest();
 			insert membership(garcias.Id, maria.Id, 'Head', true);
@@ -176,9 +162,7 @@ private class HouseholdPrimaryContactTest {
 				return;
 			}
 			Id personType = OrgShapeDetector.creatablePersonRecordTypeId();
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			// Kept when emptied, so the household is still there for the person to come back to.
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
@@ -395,11 +379,7 @@ private class HouseholdPrimaryContactTest {
 			update new Account(Id = shelter.Id, Primary_Contact__c = ada.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				ada.Id,
-				primaryContactOf(shelter.Id),
-				'R-O3: not a mirror on an organization'
-			);
+			Assert.areEqual(ada.Id, primaryContactOf(shelter.Id), 'R-O3: not a mirror on an organization');
 		}
 	}
 
@@ -416,11 +396,7 @@ private class HouseholdPrimaryContactTest {
 			update new Account(Id = smiths.Id, Primary_Contact__c = john.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				john.Id,
-				primaryContactOf(smiths.Id),
-				'In contact mode the field is the mark'
-			);
+			Assert.areEqual(john.Id, primaryContactOf(smiths.Id), 'In contact mode the field is the mark');
 		}
 	}
 
@@ -439,15 +415,8 @@ private class HouseholdPrimaryContactTest {
 			};
 
 			Test.startTest();
-			HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(
-				survivor.Id,
-				other.Id
-			);
-			HouseholdMergeService.mergeHouseholds(
-				survivor.Id,
-				other.Id,
-				new HouseholdMergeService.MergeChoices(null)
-			);
+			HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(survivor.Id, other.Id);
+			HouseholdMergeService.mergeHouseholds(survivor.Id, other.Id, new HouseholdMergeService.MergeChoices(null));
 			Test.stopTest();
 
 			for (HouseholdMergeService.FieldChoice choice : preview.fields) {

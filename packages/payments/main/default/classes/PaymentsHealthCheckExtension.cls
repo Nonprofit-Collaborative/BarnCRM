@@ -36,8 +36,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		if (
 			!HealthCheckService.canManageSettings() ||
-			ModuleManagerService.turnedOff()
-				.contains(PaymentsPostInstall.MODULE_KEY.toLowerCase()) ||
+			ModuleManagerService.turnedOff().contains(PaymentsPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Payment_Event__c.isAccessible()
 		) {
 			return found;
@@ -57,11 +56,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 				finding(
 					'payments_keys_missing',
 					BarnHelp.text('Payments', 'Payments_Health_KeysMissingTitle'),
-					BarnHelp.text(
-						'Payments',
-						'Payments_Health_KeysMissingDetail',
-						new List<Object>{ processor }
-					),
+					BarnHelp.text('Payments', 'Payments_Health_KeysMissingDetail', new List<Object>{ processor }),
 					HealthCheckService.SEVERITY_WARNING
 				)
 			);
@@ -99,10 +94,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 						HealthCheckService.SEVERITY_WARNING
 					)
 					.withScope(scopeOf(FIX_SCHEDULE))
-					.withFix(
-						labelOf(FIX_SCHEDULE),
-						HealthCheckService.FIX_ACTION_PREFIX + FIX_SCHEDULE
-					)
+					.withFix(labelOf(FIX_SCHEDULE), HealthCheckService.FIX_ACTION_PREFIX + FIX_SCHEDULE)
 			);
 		}
 		Datetime before = Datetime.now().addMinutes(-WAIT_MINUTES);
@@ -189,19 +181,8 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		}
 	}
 
-	private static HealthCheckService.Finding finding(
-		String key,
-		String title,
-		String detail,
-		String severity
-	) {
-		return new HealthCheckService.Finding(
-			key,
-			title,
-			detail,
-			severity,
-			HealthCheckService.CATEGORY_SETTINGS
-		);
+	private static HealthCheckService.Finding finding(String key, String title, String detail, String severity) {
+		return new HealthCheckService.Finding(key, title, detail, severity, HealthCheckService.CATEGORY_SETTINGS);
 	}
 
 	/** The names of active Sites whose guest user lacks the receiver's permission set. */
@@ -210,9 +191,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		for (PermissionSetAssignment assignment : [
 			SELECT AssigneeId
 			FROM PermissionSetAssignment
-			WHERE
-				PermissionSet.Name = :GUEST_PERMISSION_SET
-				AND AssigneeId IN :PaymentSites.guestUserIds()
+			WHERE PermissionSet.Name = :GUEST_PERMISSION_SET AND AssigneeId IN :PaymentSites.guestUserIds()
 			WITH SYSTEM_MODE
 		]) {
 			granted.add(assignment.AssigneeId);
@@ -245,9 +224,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		if (fixKey == FIX_GUEST) {
 			return BarnHelp.text('Payments', 'Payments_Health_GuestAccessFix');
 		}
-		return fixKey == FIX_SCHEDULE
-			? BarnHelp.text('Payments', 'Payments_Health_NotScheduledFix')
-			: null;
+		return fixKey == FIX_SCHEDULE ? BarnHelp.text('Payments', 'Payments_Health_NotScheduledFix') : null;
 	}
 
 	public String runFix(String fixKey, List<String> scope) {
@@ -264,10 +241,7 @@ public with sharing class PaymentsHealthCheckExtension implements HealthCheckExt
 		for (PaymentSites.SiteInfo site : PaymentSites.active()) {
 			if (permissionSet != null && names.contains(site.name) && site.guestUserId != null) {
 				added.add(
-					new PermissionSetAssignment(
-						AssigneeId = site.guestUserId,
-						PermissionSetId = permissionSet.Id
-					)
+					new PermissionSetAssignment(AssigneeId = site.guestUserId, PermissionSetId = permissionSet.Id)
 				);
 			}
 		}

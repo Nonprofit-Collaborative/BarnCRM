@@ -12,12 +12,7 @@
  */
 @NamespaceAccessible
 public with sharing class ScholarshipFormAttachment implements FormAttachmentExtension {
-	private static final Set<String> UPDATABLE = new Set<String>{
-		'Draft',
-		'Submitted',
-		'Eligible',
-		'Ineligible'
-	};
+	private static final Set<String> UPDATABLE = new Set<String>{ 'Draft', 'Submitted', 'Eligible', 'Ineligible' };
 
 	@NamespaceAccessible
 	public ScholarshipFormAttachment() {
@@ -94,11 +89,7 @@ public with sharing class ScholarshipFormAttachment implements FormAttachmentExt
 	}
 
 	/** R-SG5: the application this submission fills, created when the person has none. */
-	private static Id application(
-		FormSubmissionReceipt receipt,
-		Schema.SObjectType kind,
-		String answers
-	) {
+	private static Id application(FormSubmissionReceipt receipt, Schema.SObjectType kind, String answers) {
 		Award_Application__c row;
 		Id cycleId;
 		if (kind == Award_Application__c.SObjectType) {
@@ -115,10 +106,7 @@ public with sharing class ScholarshipFormAttachment implements FormAttachmentExt
 				for (Award_Application__c existing : [
 					SELECT Id, Status__c, Cycle__c
 					FROM Award_Application__c
-					WHERE
-						Cycle__c = :cycleId
-						AND Contact__c = :receipt.personId
-						AND Status__c != 'Withdrawn'
+					WHERE Cycle__c = :cycleId AND Contact__c = :receipt.personId AND Status__c != 'Withdrawn'
 					WITH USER_MODE
 					LIMIT 1
 				]) {
@@ -142,9 +130,7 @@ public with sharing class ScholarshipFormAttachment implements FormAttachmentExt
 			Submitted_Date__c = Date.today(),
 			Form_Submission_Key__c = receipt.submissionId,
 			Status__c = unmet == null ? 'Submitted' : (unmet.isEmpty() ? 'Eligible' : 'Ineligible'),
-			Eligibility_Notes__c = unmet == null || unmet.isEmpty()
-				? null
-				: String.join(unmet, '\n')
+			Eligibility_Notes__c = unmet == null || unmet.isEmpty() ? null : String.join(unmet, '\n')
 		);
 		if (row == null) {
 			filled.Cycle__c = cycleId;
@@ -188,12 +174,7 @@ public with sharing class ScholarshipFormAttachment implements FormAttachmentExt
 				Object given = answers == null ? null : answers.get(key);
 				if (!met(op, given, rule.get('value'))) {
 					unmet.add(
-						key +
-							' ' +
-							op +
-							(rule.get('value') == null
-								? ''
-								: ' ' + String.valueOf(rule.get('value')))
+						key + ' ' + op + (rule.get('value') == null ? '' : ' ' + String.valueOf(rule.get('value')))
 					);
 				}
 			}

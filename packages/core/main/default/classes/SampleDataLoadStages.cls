@@ -63,9 +63,7 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
 
 		List<Account> organizationAccounts = new List<Account>();
 		for (Map<String, Object> organization : data.organizations) {
-			organizationAccounts.add(
-				buildOrganizationAccount(organization, organizationRecordTypeId)
-			);
+			organizationAccounts.add(buildOrganizationAccount(organization, organizationRecordTypeId));
 		}
 
 		// No user is given the Household record type (ADR-0141), so households are
@@ -124,9 +122,7 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
 			// A household made by adding its first person has that person as its Primary
 			// Contact. These households were made empty in stage one, so each gets the first
 			// of its people in the file, as the product path would have given it.
-			HouseholdService.seedMissingPrimaryContacts(
-				firstPersonByHousehold(contactsToInsert, householdIds)
-			);
+			HouseholdService.seedMissingPrimaryContacts(firstPersonByHousehold(contactsToInsert, householdIds));
 		}
 		// Sample data always arrives settled: member count, primary, name and both greetings.
 		// The triggers that settle a household do not run while Household Upkeep is off (or
@@ -222,10 +218,7 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
 		return acct;
 	}
 
-	private static Account buildOrganizationAccount(
-		Map<String, Object> organization,
-		Id recordTypeId
-	) {
+	private static Account buildOrganizationAccount(Map<String, Object> organization, Id recordTypeId) {
 		Account acct = new Account();
 		acct.RecordTypeId = recordTypeId;
 		acct.Sample_Data__c = true;
@@ -274,9 +267,7 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
 		// DEFERRED skips loading child relationships this method never uses. NOPMD:
 		// EagerlyLoadedDescribeSObjectResult flags any getDescribe() call regardless of
 		// the DEFERRED option, which is the rule's own recommended fix.
-		Schema.DescribeSObjectResult describeResult = sobjectType.getDescribe( // NOPMD
-			Schema.SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult describeResult = sobjectType.getDescribe(Schema.SObjectDescribeOptions.DEFERRED); // NOPMD
 		Map<String, Schema.RecordTypeInfo> infosByDeveloperName = describeResult.getRecordTypeInfosByDeveloperName();
 		Schema.RecordTypeInfo info = infosByDeveloperName.get(developerName);
 		if (info == null) {

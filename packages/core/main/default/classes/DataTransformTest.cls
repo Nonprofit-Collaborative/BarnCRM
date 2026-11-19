@@ -53,16 +53,8 @@ private class DataTransformTest {
 			Assert.areEqual('ana@example.org', one(step('lower'), 'ANA@Example.ORG'));
 			Assert.areEqual('Ramirez-Lopez', one(step('proper'), 'RAMIREZ-LOPEZ'));
 			Assert.areEqual('Mary Ann 2nd', one(step('proper'), 'mary ANN 2nd'));
-			Assert.areEqual(
-				'O\'neil',
-				one(step('proper'), 'o\'NEIL'),
-				'An apostrophe is in the word.'
-			);
-			Assert.areEqual(
-				'Élodie',
-				one(step('proper'), 'éLODIE'),
-				'Letters beyond A to Z count.'
-			);
+			Assert.areEqual('O\'neil', one(step('proper'), 'o\'NEIL'), 'An apostrophe is in the word.');
+			Assert.areEqual('Élodie', one(step('proper'), 'éLODIE'), 'Letters beyond A to Z count.');
 		}
 	}
 
@@ -91,10 +83,7 @@ private class DataTransformTest {
 	@IsTest
 	static void findsAndReplacesLiteralText() {
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				'12 Main Street',
-				one(replaceStep('St.', 'Street', false, false), '12 Main st.')
-			);
+			Assert.areEqual('12 Main Street', one(replaceStep('St.', 'Street', false, false), '12 Main st.'));
 			Assert.areEqual(
 				'12 Main st.',
 				one(replaceStep('St.', 'Street', true, false), '12 Main st.'),
@@ -119,11 +108,7 @@ private class DataTransformTest {
 		System.runAs(TestUsers.admin()) {
 			DataTransform.Step whole = replaceStep('CA', 'California', false, true);
 			Assert.areEqual('California', one(whole, 'ca'));
-			Assert.areEqual(
-				'CAL',
-				one(whole, 'CAL'),
-				'A value that only contains the text is kept.'
-			);
+			Assert.areEqual('CAL', one(whole, 'CAL'), 'A value that only contains the text is kept.');
 			Assert.areEqual('ca', one(replaceStep('CA', 'California', true, true), 'ca'));
 		}
 	}
@@ -144,30 +129,14 @@ private class DataTransformTest {
 		System.runAs(TestUsers.admin()) {
 			DataTransform.Step add = step('append');
 			add.columns = new List<String>{ 'Middle', ' LAST ' };
-			Map<String, String> row = new Map<String, String>{
-				'middle' => 'M',
-				'last' => 'Ramirez'
-			};
-			Assert.areEqual(
-				'Ana M Ramirez',
-				DataTransform.apply(new List<DataTransform.Step>{ add }, 'Ana', row)
-			);
+			Map<String, String> row = new Map<String, String>{ 'middle' => 'M', 'last' => 'Ramirez' };
+			Assert.areEqual('Ana M Ramirez', DataTransform.apply(new List<DataTransform.Step>{ add }, 'Ana', row));
 			row.put('middle', '');
-			Assert.areEqual(
-				'Ana Ramirez',
-				DataTransform.apply(new List<DataTransform.Step>{ add }, 'Ana', row)
-			);
+			Assert.areEqual('Ana Ramirez', DataTransform.apply(new List<DataTransform.Step>{ add }, 'Ana', row));
 			add.separator = ', ';
-			Assert.areEqual(
-				'Ramirez',
-				DataTransform.apply(new List<DataTransform.Step>{ add }, null, row)
-			);
+			Assert.areEqual('Ramirez', DataTransform.apply(new List<DataTransform.Step>{ add }, null, row));
 			Assert.isNull(
-				DataTransform.apply(
-					new List<DataTransform.Step>{ add },
-					null,
-					new Map<String, String>()
-				),
+				DataTransform.apply(new List<DataTransform.Step>{ add }, null, new Map<String, String>()),
 				'Nothing to add leaves the value as it was.'
 			);
 		}
@@ -180,11 +149,7 @@ private class DataTransformTest {
 			Assert.areEqual('2025-12-31', one(dateStep('MDY'), '12-31-2025 10:30'));
 			Assert.areEqual('2025-01-05', one(dateStep('YMD'), '2025.1.5'));
 			Assert.areEqual('2024-02-29', one(dateStep('MDY'), '2/29/24'), 'A leap day is a day.');
-			Assert.areEqual(
-				'1987-03-04',
-				one(dateStep('MDY'), '3/4/87'),
-				'A year of 50 or more is 19xx.'
-			);
+			Assert.areEqual('1987-03-04', one(dateStep('MDY'), '3/4/87'), 'A year of 50 or more is 19xx.');
 		}
 	}
 
@@ -193,11 +158,7 @@ private class DataTransformTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual('2/29/2025', one(dateStep('MDY'), '2/29/2025'), 'Not a leap year.');
 			Assert.areEqual('31/12/2025', one(dateStep('MDY'), '31/12/2025'), 'No 31st month.');
-			Assert.areEqual(
-				'Dec 31 2025',
-				one(dateStep('MDY'), 'Dec 31 2025'),
-				'Only two numbers.'
-			);
+			Assert.areEqual('Dec 31 2025', one(dateStep('MDY'), 'Dec 31 2025'), 'Only two numbers.');
 			Assert.areEqual('1/2/123', one(dateStep('MDY'), '1/2/123'), 'A three-digit year.');
 			Assert.areEqual('', one(dateStep('MDY'), ''));
 		}
@@ -208,11 +169,7 @@ private class DataTransformTest {
 		System.runAs(TestUsers.admin()) {
 			DataTransform.Step fill = step('ifBlank');
 			fill.value = 'none given';
-			List<DataTransform.Step> steps = new List<DataTransform.Step>{
-				step('trim'),
-				fill,
-				step('proper')
-			};
+			List<DataTransform.Step> steps = new List<DataTransform.Step>{ step('trim'), fill, step('proper') };
 			Assert.areEqual('None Given', DataTransform.apply(steps, '   ', null));
 			Assert.areEqual('Ana Ramirez', DataTransform.apply(steps, ' ANA   RAMIREZ', null));
 		}
@@ -243,10 +200,7 @@ private class DataTransformTest {
 			);
 			Assert.isTrue(
 				found.contains(
-					String.format(
-						BarnHelp.text('Core', 'Core_Transform_ErrorUnknown'),
-						new List<String>{ 'evaluate' }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Transform_ErrorUnknown'), new List<String>{ 'evaluate' })
 				)
 			);
 			Assert.isTrue(found.contains(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsText')));
@@ -255,15 +209,10 @@ private class DataTransformTest {
 			Assert.isTrue(found.contains(BarnHelp.text('Core', 'Core_Transform_ErrorTooLong')));
 			Assert.isTrue(
 				found.contains(
-					String.format(
-						BarnHelp.text('Core', 'Core_Transform_ErrorNeedsColumns'),
-						new List<String>{ '5' }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Transform_ErrorNeedsColumns'), new List<String>{ '5' })
 				)
 			);
-			Assert.isTrue(
-				DataTransform.problems(new List<DataTransform.Step>{ step('trim') }).isEmpty()
-			);
+			Assert.isTrue(DataTransform.problems(new List<DataTransform.Step>{ step('trim') }).isEmpty());
 			Assert.isTrue(DataTransform.problems(null).isEmpty());
 		}
 	}
@@ -278,18 +227,11 @@ private class DataTransformTest {
 			Assert.isTrue(
 				DataTransform.problems(steps)
 					.contains(
-						String.format(
-							BarnHelp.text('Core', 'Core_Transform_ErrorTooMany'),
-							new List<String>{ '10' }
-						)
+						String.format(BarnHelp.text('Core', 'Core_Transform_ErrorTooMany'), new List<String>{ '10' })
 					)
 			);
 			steps.add(step('lower'));
-			Assert.areEqual(
-				'ABC',
-				DataTransform.apply(steps, 'abc', null),
-				'Steps past the tenth are not run.'
-			);
+			Assert.areEqual('ABC', DataTransform.apply(steps, 'abc', null), 'Steps past the tenth are not run.');
 		}
 	}
 
@@ -301,10 +243,7 @@ private class DataTransformTest {
 			);
 			Assert.areEqual(3, steps.size());
 			Assert.areEqual('ABC', DataTransform.apply(steps, 'abc', null));
-			Assert.isTrue(
-				DataTransform.parse('not json').isEmpty(),
-				'Unreadable reads as no steps.'
-			);
+			Assert.isTrue(DataTransform.parse('not json').isEmpty(), 'Unreadable reads as no steps.');
 			Assert.isTrue(DataTransform.parse(null).isEmpty());
 			Assert.areEqual('abc', DataTransform.apply(null, 'abc', null));
 		}
@@ -344,11 +283,7 @@ private class DataTransformTest {
 		return result;
 	}
 
-	private static DataTransform.Step partStep(
-		String separator,
-		Integer position,
-		Boolean fromEnd
-	) {
+	private static DataTransform.Step partStep(String separator, Integer position, Boolean fromEnd) {
 		DataTransform.Step result = step(DataTransform.OP_PART);
 		result.separator = separator;
 		result.position = position;
@@ -366,24 +301,12 @@ private class DataTransformTest {
 	@IsTest
 	static void mapsValuesFromATable() {
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				'California',
-				one(mapStep(null, false), ' ca '),
-				'Trimmed, any capitals.'
-			);
+			Assert.areEqual('California', one(mapStep(null, false), ' ca '), 'Trimmed, any capitals.');
 			Assert.areEqual('New York', one(mapStep(null, false), 'NY'));
 			Assert.areEqual('TX', one(mapStep(null, false), 'TX'), 'Not listed is kept.');
-			Assert.areEqual(
-				'Other',
-				one(mapStep('Other', false), 'TX'),
-				'Or becomes anything else.'
-			);
+			Assert.areEqual('Other', one(mapStep('Other', false), 'TX'), 'Or becomes anything else.');
 			Assert.areEqual('', one(mapStep('Other', false), ''), 'An empty value stays empty.');
-			Assert.areEqual(
-				'Small ca',
-				one(mapStep(null, true), 'ca'),
-				'Match capitals tells ca from CA.'
-			);
+			Assert.areEqual('Small ca', one(mapStep(null, true), 'ca'), 'Match capitals tells ca from CA.');
 		}
 	}
 
@@ -437,11 +360,7 @@ private class DataTransformTest {
 				'A stored date with a time reads.'
 			);
 			Assert.areEqual('soon', one(shiftStep(4, 'days'), 'soon'), 'Not a date is kept.');
-			Assert.areEqual(
-				'3999-12-31',
-				one(shiftStep(1200, 'months'), '3999-12-31'),
-				'Past 4000 is kept.'
-			);
+			Assert.areEqual('3999-12-31', one(shiftStep(1200, 'months'), '3999-12-31'), 'Past 4000 is kept.');
 			String today = String.valueOf(Date.today()).left(10);
 			DataTransform.Step always = step(DataTransform.OP_TODAY);
 			Assert.areEqual(today, one(always, 'Ana'));
@@ -507,12 +426,7 @@ private class DataTransformTest {
 			DataTransform.Step add = step('append');
 			add.columns = new List<String>{ 'Last' };
 			DataTransform.Step fix = replaceStep('st.', 'Street', false, false);
-			List<DataTransform.Step> steps = new List<DataTransform.Step>{
-				step('trim'),
-				step('proper'),
-				fix,
-				add
-			};
+			List<DataTransform.Step> steps = new List<DataTransform.Step>{ step('trim'), step('proper'), fix, add };
 			List<String> results = new List<String>();
 			Test.startTest();
 			for (Integer i = 0; i < 200; i++) {

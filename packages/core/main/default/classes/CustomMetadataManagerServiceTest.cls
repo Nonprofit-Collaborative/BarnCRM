@@ -55,8 +55,7 @@ private class CustomMetadataManagerServiceTest {
 
 	private static void stubRows(List<CustomMetadataManagerSelector.StoredRow> rows) {
 		CustomMetadataManagerSelector.rowsOverride = new Map<String, List<CustomMetadataManagerSelector.StoredRow>>{
-			Relationship_Type__mdt.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getName() => rows
+			Relationship_Type__mdt.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() => rows
 		};
 	}
 
@@ -111,10 +110,7 @@ private class CustomMetadataManagerServiceTest {
 			CustomMetadataManagerService.deployer = deployer;
 
 			Test.startTest();
-			Id jobId = CustomMetadataManagerService.save(
-				TYPE_NAME,
-				input(null, 'Close friend', 'Friend', 'Friend')
-			);
+			Id jobId = CustomMetadataManagerService.save(TYPE_NAME, input(null, 'Close friend', 'Friend', 'Friend'));
 			Test.stopTest();
 
 			Assert.areEqual(FAKE_JOB, jobId, 'The page waits on the deployment Id');
@@ -134,11 +130,7 @@ private class CustomMetadataManagerServiceTest {
 			Assert.areEqual('Friend', values.get('Type__c'), 'Type deployed');
 			Assert.areEqual('Friend', values.get('Reciprocal_Type__c'), 'Reciprocal deployed');
 			Assert.areEqual(true, values.get('Active__c'), 'A new row is active');
-			Assert.areEqual(
-				false,
-				values.get('Is_Shipped__c'),
-				'A new row is never marked shipped'
-			);
+			Assert.areEqual(false, values.get('Is_Shipped__c'), 'A new row is never marked shipped');
 			Assert.isNotNull(deployer.callback, 'The outcome is recorded by the callback');
 		}
 	}
@@ -179,10 +171,7 @@ private class CustomMetadataManagerServiceTest {
 			Id offJob = CustomMetadataManagerService.setArchived(TYPE_NAME, 'Grandparent', true);
 			CustomMetadataManagerService.setArchived(TYPE_NAME, 'Spouse', true);
 			String bothOff = SettingsService.getSettings().Relationship_Types_Turned_Off__c;
-			CustomMetadataManagerService.TypeView view = viewNamed(
-				CustomMetadataManagerService.getTypes(),
-				TYPE_NAME
-			);
+			CustomMetadataManagerService.TypeView view = viewNamed(CustomMetadataManagerService.getTypes(), TYPE_NAME);
 			Id onJob = CustomMetadataManagerService.setArchived(TYPE_NAME, 'Spouse', false);
 			Test.stopTest();
 
@@ -246,10 +235,7 @@ private class CustomMetadataManagerServiceTest {
 	static void relationshipTypesAreHiddenWhileRelationshipsAreOff() {
 		System.runAs(TestUsers.admin()) {
 			shippedSpouseAndOwnFriend();
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.ADDRESSES
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.ADDRESSES);
 			String refused;
 
 			Test.startTest();
@@ -287,8 +273,7 @@ private class CustomMetadataManagerServiceTest {
 					new List<Object>{
 						'Mentor',
 						Relationship__c.Type__c.getDescribe().getLabel(),
-						Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabel()
+						Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
 					}
 				),
 				message,
@@ -330,22 +315,12 @@ private class CustomMetadataManagerServiceTest {
 			String noReciprocal = refusal(input(null, 'Close friend', 'Friend', ''));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'),
-				noName,
-				'Name required'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_CmdtManager_NameTooLong'),
-				longName,
-				'Name limit'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'), noName, 'Name required');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_NameTooLong'), longName, 'Name limit');
 			Assert.areEqual(
 				String.format(
 					BarnHelp.text('Core', 'Core_CmdtManager_FieldRequired'),
-					new List<Object>{
-						Relationship_Type__mdt.Reciprocal_Type__c.getDescribe().getLabel()
-					}
+					new List<Object>{ Relationship_Type__mdt.Reciprocal_Type__c.getDescribe().getLabel() }
 				),
 				noReciprocal,
 				'The reciprocal is required'
@@ -368,9 +343,7 @@ private class CustomMetadataManagerServiceTest {
 
 			Test.startTest();
 			CustomMetadataManagerService.setArchived(TYPE_NAME, 'Org_New_friend', true);
-			Map<String, Object> archived = valuesOf(
-				(Metadata.CustomMetadata) deployer.container.getMetadata()[0]
-			);
+			Map<String, Object> archived = valuesOf((Metadata.CustomMetadata) deployer.container.getMetadata()[0]);
 			try {
 				CustomMetadataManagerService.setArchived(TYPE_NAME, 'Org_Old_friend', false);
 			} catch (CustomMetadataManagerService.CustomMetadataManagerException e) {
@@ -394,11 +367,7 @@ private class CustomMetadataManagerServiceTest {
 			String message = refusal(input(null, 'Close friend', 'Friend', 'Friend'));
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_CmdtManager_DeployRefused'),
-				message,
-				'Says what to turn on'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_DeployRefused'), message, 'Says what to turn on');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Custom metadata'],
@@ -422,10 +391,7 @@ private class CustomMetadataManagerServiceTest {
 			for (Integer i = 0; i < 10; i++) {
 				made.add(CustomMetadataManagerService.newDeveloperName('Close friend', rows));
 			}
-			String cleaned = CustomMetadataManagerService.newDeveloperName(
-				'  Mentor / mentee!! ',
-				rows
-			);
+			String cleaned = CustomMetadataManagerService.newDeveloperName('  Mentor / mentee!! ', rows);
 			String symbols = CustomMetadataManagerService.newDeveloperName('***', rows);
 			String longName = CustomMetadataManagerService.newDeveloperName('B'.repeat(40), rows);
 			Test.stopTest();
@@ -466,10 +432,7 @@ private class CustomMetadataManagerServiceTest {
 				'Relationship types, merge rules and history fields: match sources have their own page'
 			);
 			Assert.isNotNull(viewNamed(types, 'Merge_Rule__mdt'), 'Merge rules are listed here');
-			Assert.isNotNull(
-				viewNamed(types, 'History_Field__mdt'),
-				'Field History Keeper fields are listed here'
-			);
+			Assert.isNotNull(viewNamed(types, 'History_Field__mdt'), 'Field History Keeper fields are listed here');
 			Assert.isNull(viewNamed(types, SOURCE_TYPE), 'Match sources are not listed here');
 			CustomMetadataManagerService.TypeView view = viewNamed(types, TYPE_NAME);
 			Assert.isNotNull(view, 'Named without a namespace');
@@ -497,19 +460,13 @@ private class CustomMetadataManagerServiceTest {
 				Integer shipped = 0;
 				for (CustomMetadataManagerService.RowView view : type.rows) {
 					if (!view.developerName.startsWith(CustomMetadataManagerService.ORG_PREFIX)) {
-						Assert.isTrue(
-							view.shipped,
-							view.developerName + ' ships and must be marked shipped'
-						);
+						Assert.isTrue(view.shipped, view.developerName + ' ships and must be marked shipped');
 						shipped++;
 					}
 				}
 				shippedByType.put(type.typeName, shipped);
 			}
-			Assert.isTrue(
-				shippedByType.get(TYPE_NAME) >= 11,
-				'The eleven shipped relationship types are read'
-			);
+			Assert.isTrue(shippedByType.get(TYPE_NAME) >= 11, 'The eleven shipped relationship types are read');
 			// Match sources are checked the same way by MatchSourceControllerTest.
 		}
 	}
@@ -550,8 +507,7 @@ private class CustomMetadataManagerServiceTest {
 
 	private static void stubSources(List<CustomMetadataManagerSelector.StoredRow> rows) {
 		CustomMetadataManagerSelector.rowsOverride = new Map<String, List<CustomMetadataManagerSelector.StoredRow>>{
-			Match_Source__mdt.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getName() => rows
+			Match_Source__mdt.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() => rows
 		};
 	}
 
@@ -596,24 +552,12 @@ private class CustomMetadataManagerServiceTest {
 			CustomMetadataManagerService.deployer = deployer;
 
 			Test.startTest();
-			Id offJob = CustomMetadataManagerService.setArchived(
-				SOURCE_TYPE,
-				'Address_Person',
-				true
-			);
+			Id offJob = CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Person', true);
 			String listed = SettingsService.getSettings().Match_Sources_Turned_Off__c;
-			Id onJob = CustomMetadataManagerService.setArchived(
-				SOURCE_TYPE,
-				'Address_Person',
-				false
-			);
+			Id onJob = CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Person', false);
 			Assert.isNull(deployer.container, 'Turning a shipped source off or on deploys nothing');
 			// A shipped source archived the old way (ADR-0133) is deployed active again.
-			Id legacyJob = CustomMetadataManagerService.setArchived(
-				SOURCE_TYPE,
-				'Address_Household',
-				false
-			);
+			Id legacyJob = CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Household', false);
 			Metadata.CustomMetadata restored = (Metadata.CustomMetadata) deployer.container.getMetadata()[0];
 			CustomMetadataManagerService.RowInput edit = sourceInput(
 				'Address__c',
@@ -629,27 +573,17 @@ private class CustomMetadataManagerServiceTest {
 			Assert.isNull(offJob, 'Turning off is saved at once');
 			Assert.isNull(onJob, 'So is turning on');
 			Assert.areEqual('Address_Person', listed, 'Listed while off');
-			Assert.isTrue(
-				String.isBlank(SettingsService.getSettings().Match_Sources_Turned_Off__c),
-				'Turned on again'
-			);
+			Assert.isTrue(String.isBlank(SettingsService.getSettings().Match_Sources_Turned_Off__c), 'Turned on again');
 			Assert.isNotNull(legacyJob, 'The archived shipped row is deployed');
 			Assert.areEqual(
-				NamespaceUtil.prefix() +
-					'Match_Source.' +
-					NamespaceUtil.prefix() +
-					'Address_Household',
+				NamespaceUtil.prefix() + 'Match_Source.' + NamespaceUtil.prefix() + 'Address_Household',
 				restored.fullName,
 				'By its packaged name'
 			);
 			Map<String, Object> values = valuesOf(restored);
 			Assert.areEqual(true, values.get('Active__c'), 'Restored');
 			Assert.areEqual(true, values.get('Is_Shipped__c'), 'Still marked shipped');
-			Assert.areEqual(
-				'Street__c',
-				values.get('Value_Field__c'),
-				'Values deployed as shipped'
-			);
+			Assert.areEqual('Street__c', values.get('Value_Field__c'), 'Values deployed as shipped');
 			Assert.areEqual(
 				String.format(
 					BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'),
@@ -669,31 +603,17 @@ private class CustomMetadataManagerServiceTest {
 			CustomMetadataManagerService.deployer = deployer;
 
 			Test.startTest();
-			String noObject = sourceRefusal(
-				sourceInput('No_Such_Thing__c', 'Street__c', null, 'Contact__c', 'Email')
-			);
-			String noField = sourceRefusal(
-				sourceInput('Address__c', 'No_Such_Field__c', null, 'Contact__c', 'Email')
-			);
-			String notLookup = sourceRefusal(
-				sourceInput('Address__c', 'Street__c', null, 'City__c', 'Email')
-			);
+			String noObject = sourceRefusal(sourceInput('No_Such_Thing__c', 'Street__c', null, 'Contact__c', 'Email'));
+			String noField = sourceRefusal(sourceInput('Address__c', 'No_Such_Field__c', null, 'Contact__c', 'Email'));
+			String notLookup = sourceRefusal(sourceInput('Address__c', 'Street__c', null, 'City__c', 'Email'));
 			// OwnerId is a lookup, but to a user: no person or household behind it.
-			String notAPersonLookup = sourceRefusal(
-				sourceInput('Contact', 'Email', null, 'OwnerId', 'Email')
-			);
-			String notText = sourceRefusal(
-				sourceInput('Address__c', 'Is_Default__c', null, 'Contact__c', 'Email')
-			);
+			String notAPersonLookup = sourceRefusal(sourceInput('Contact', 'Email', null, 'OwnerId', 'Email'));
+			String notText = sourceRefusal(sourceInput('Address__c', 'Is_Default__c', null, 'Contact__c', 'Email'));
 			String postalNotText = sourceRefusal(
 				sourceInput('Address__c', 'Street__c', 'Is_Default__c', 'Contact__c', 'Address')
 			);
-			String noPostal = sourceRefusal(
-				sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Address')
-			);
-			String notAChoice = sourceRefusal(
-				sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Fax')
-			);
+			String noPostal = sourceRefusal(sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Address'));
+			String notAChoice = sourceRefusal(sourceInput('Address__c', 'Street__c', null, 'Contact__c', 'Fax'));
 			String accepted = sourceRefusal(
 				sourceInput('Address__c', 'Street__c', 'Postal_Code__c', 'Contact__c', 'Address')
 			);
@@ -707,14 +627,8 @@ private class CustomMetadataManagerServiceTest {
 				noObject,
 				'An object the org does not have is refused'
 			);
-			Assert.isTrue(
-				noField.contains('No_Such_Field__c'),
-				'A missing field is named: ' + noField
-			);
-			Assert.isTrue(
-				notLookup.contains('City__c'),
-				'A parent that is not a lookup: ' + notLookup
-			);
+			Assert.isTrue(noField.contains('No_Such_Field__c'), 'A missing field is named: ' + noField);
+			Assert.isTrue(notLookup.contains('City__c'), 'A parent that is not a lookup: ' + notLookup);
 			Assert.isTrue(
 				notAPersonLookup != null && notAPersonLookup.contains('OwnerId'),
 				'A lookup to anything but a contact, account or Individual: ' + notAPersonLookup
@@ -728,16 +642,10 @@ private class CustomMetadataManagerServiceTest {
 			);
 			Assert.areEqual(notTextMessage, notText, 'A value field that is not text');
 			Assert.areEqual(notTextMessage, postalNotText, 'A postal field that is not text');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_MatchSource_PostalRequired'),
-				noPostal,
-				'Address needs postal'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_MatchSource_PostalRequired'), noPostal, 'Address needs postal');
 			Assert.isNotNull(notAChoice, 'Normalization is one of its choices');
 			Assert.isNull(accepted, 'A source the org can use is saved');
-			Map<String, Object> values = valuesOf(
-				(Metadata.CustomMetadata) deployer.container.getMetadata()[0]
-			);
+			Map<String, Object> values = valuesOf((Metadata.CustomMetadata) deployer.container.getMetadata()[0]);
 			Assert.areEqual(false, values.get('Is_Shipped__c'), 'Her source is her own');
 			Assert.areEqual(true, values.get('Active__c'), 'A new source is active');
 		}
@@ -758,8 +666,7 @@ private class CustomMetadataManagerServiceTest {
 
 			Assert.areEqual(
 				false,
-				valuesOf((Metadata.CustomMetadata) deployer.container.getMetadata()[0])
-					.get('Active__c'),
+				valuesOf((Metadata.CustomMetadata) deployer.container.getMetadata()[0]).get('Active__c'),
 				'An archive is never refused by the org checks'
 			);
 		}

@@ -43,9 +43,7 @@ private class FilesImportServiceTest {
 			Contact other = TestDataFactory.person(new Contact(LastName = 'Jones'));
 			insert other;
 			delete other;
-			List<String> unseen = FilesImportController.check(
-				new List<String>{ person.Id, other.Id, 'not an id', '' }
-			);
+			List<String> unseen = FilesImportController.check(new List<String>{ person.Id, other.Id, 'not an id', '' });
 			Assert.isFalse(unseen.contains(String.valueOf(person.Id)), 'A record the person sees.');
 			Assert.isTrue(unseen.contains(String.valueOf(other.Id)), 'Deleted.');
 			Assert.isTrue(unseen.contains('not an id'));
@@ -84,11 +82,7 @@ private class FilesImportServiceTest {
 				ORDER BY ContentDocument.Title
 			];
 			Assert.areEqual(2, links.size());
-			Assert.areEqual(
-				'letter-2',
-				links[0].ContentDocument.Title,
-				'File name less extension.'
-			);
+			Assert.areEqual('letter-2', links[0].ContentDocument.Title, 'File name less extension.');
 			Assert.areEqual('Pledge letter', links[1].ContentDocument.Title);
 
 			FilesImportService.JobView finished = FilesImportController.finish(jobId);
@@ -116,10 +110,7 @@ private class FilesImportServiceTest {
 			Id jobId = FilesImportController.start('letters.zip', 2);
 			FilesImportController.addFiles(
 				jobId,
-				new List<FilesImportService.IncomingFile>{
-					file(1, person.Id, 'One'),
-					file(2, person.Id, 'Two')
-				}
+				new List<FilesImportService.IncomingFile>{ file(1, person.Id, 'One'), file(2, person.Id, 'Two') }
 			);
 			FilesImportController.finish(jobId);
 			ContentVersion first = [
@@ -152,10 +143,7 @@ private class FilesImportServiceTest {
 				FilesImportController.undo(jobId, 2);
 				Assert.fail('Once only.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone'), refused.getMessage());
 			}
 		}
 	}
@@ -184,10 +172,7 @@ private class FilesImportServiceTest {
 				);
 				Assert.fail('Finished.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_FilesImport_ErrorJobGone'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_FilesImport_ErrorJobGone'), refused.getMessage());
 			}
 			try {
 				FilesImportController.start('big.zip', FilesImportService.MAX_FILES + 1);
@@ -200,20 +185,14 @@ private class FilesImportServiceTest {
 
 	@IsTest
 	static void someoneWithoutManageSettingsIsRefused() {
-		User staff = TestUsers.standardUserWith(
-			'FilesStaff',
-			new List<String>{ 'BarnCRM_Find_And_Export' }
-		);
+		User staff = TestUsers.standardUserWith('FilesStaff', new List<String>{ 'BarnCRM_Find_And_Export' });
 		System.runAs(staff) {
 			Assert.isNull(FilesImportController.getJobs());
 			try {
 				FilesImportController.start('letters.zip', 1);
 				Assert.fail('Refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_FilesImport_ErrorNoPermission'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_FilesImport_ErrorNoPermission'), refused.getMessage());
 			}
 		}
 	}

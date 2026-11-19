@@ -21,11 +21,7 @@ public with sharing class PersonErasureHistoryCleanup implements Queueable {
 			String parentField = key.substringAfter('.');
 			try {
 				List<SObject> rows = Database.queryWithBinds(
-					'SELECT Id FROM ' +
-						historyObject +
-						' WHERE ' +
-						parentField +
-						' IN :ids LIMIT 10000',
+					'SELECT Id FROM ' + historyObject + ' WHERE ' + parentField + ' IN :ids LIMIT 10000',
 					new Map<String, Object>{ 'ids' => targets.get(key) },
 					AccessLevel.USER_MODE
 				);

@@ -75,11 +75,7 @@ private class RollupsEngineExtensionTest {
 			engine.afterMerge('Account', new List<SObject>());
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Rollup_Queue__c],
-				'Nothing was waiting, so nothing was queued'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Queue__c], 'Nothing was waiting, so nothing was queued');
 		}
 	}
 
@@ -91,8 +87,7 @@ private class RollupsEngineExtensionTest {
 				'Bulk tools refuse rollup definitions as the package bookkeeping'
 			);
 			Assert.isTrue(
-				DataProtectedFields.fieldNames(Rollup_Definition__c.SObjectType)
-					.contains('last_calculated__c'),
+				DataProtectedFields.fieldNames(Rollup_Definition__c.SObjectType).contains('last_calculated__c'),
 				'A Last Calculated stamp is the package own'
 			);
 		}

@@ -45,16 +45,8 @@ private class ImportSeveralObjectsTest {
 	private static ImportMapping organizationsAndAffiliations() {
 		ImportMapping mapping = new ImportMapping();
 		mapping.objects = new List<ImportMapping.ObjectStep>{
-			new ImportMapping.ObjectStep(
-				'Affiliation__c',
-				ImportObjectSchema.OPERATION_INSERT,
-				null
-			),
-			new ImportMapping.ObjectStep(
-				'Account',
-				ImportObjectSchema.OPERATION_UPDATE_BY_FIELD,
-				'Name'
-			)
+			new ImportMapping.ObjectStep('Affiliation__c', ImportObjectSchema.OPERATION_INSERT, null),
+			new ImportMapping.ObjectStep('Account', ImportObjectSchema.OPERATION_UPDATE_BY_FIELD, 'Name')
 		};
 		mapping.columns.add(new ImportMapping.Column('Org', 'Account.Name'));
 		mapping.columns.add(new ImportMapping.Column('Phone', 'Account.Phone'));
@@ -118,11 +110,7 @@ private class ImportSeveralObjectsTest {
 		for (Integer i = 0; i < count; i++) {
 			result.add(
 				TestDataFactory.organization(
-					new Account(
-						Name = 'Org ' + i,
-						Phone = '555-0000',
-						RecordTypeId = organizationType
-					)
+					new Account(Name = 'Org ' + i, Phone = '555-0000', RecordTypeId = organizationType)
 				)
 			);
 		}
@@ -131,9 +119,7 @@ private class ImportSeveralObjectsTest {
 	}
 
 	private static Contact person() {
-		Contact created = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-		);
+		Contact created = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 		insert created;
 		return created;
 	}
@@ -256,9 +242,7 @@ private class ImportSeveralObjectsTest {
 				Contact ana = person();
 				given(
 					organizationsAndAffiliations(),
-					new List<Map<String, String>>{
-						row('Org 0', '555-1111', ana.Id, 'R'.repeat(300))
-					}
+					new List<Map<String, String>>{ row('Org 0', '555-1111', ana.Id, 'R'.repeat(300)) }
 				);
 
 				Test.startTest();
@@ -272,11 +256,7 @@ private class ImportSeveralObjectsTest {
 					staged.Error_Message__c.startsWith(affiliation + ': '),
 					'For its child: ' + staged.Error_Message__c
 				);
-				Assert.areEqual(
-					'555-1111',
-					[SELECT Phone FROM Account WHERE Id = :org.Id].Phone,
-					'The parent stays.'
-				);
+				Assert.areEqual('555-1111', [SELECT Phone FROM Account WHERE Id = :org.Id].Phone, 'The parent stays.');
 				Assert.areEqual(String.valueOf(org.Id), staged.Gift_Id__c, 'As its record.');
 				Assert.areEqual(0, [SELECT COUNT() FROM Affiliation__c], 'No child.');
 			}
@@ -302,11 +282,7 @@ private class ImportSeveralObjectsTest {
 						// The organizations sheet, staged first.
 						new Map<String, String>{ 'Org' => 'Org 0', 'Phone' => '555-1111' },
 						// The affiliations sheet, naming its organization by name.
-						new Map<String, String>{
-							'Organization' => 'Org 0',
-							'Person' => ana.Id,
-							'Role' => 'Member'
-						}
+						new Map<String, String>{ 'Organization' => 'Org 0', 'Person' => ana.Id, 'Role' => 'Member' }
 					}
 				);
 
@@ -373,13 +349,7 @@ private class ImportSeveralObjectsTest {
 				);
 				insert ana;
 				ImportMapping mapping = organizationsAndAffiliations();
-				mapping.objects.add(
-					new ImportMapping.ObjectStep(
-						'Contact',
-						ImportObjectSchema.OPERATION_UPDATE,
-						null
-					)
-				);
+				mapping.objects.add(new ImportMapping.ObjectStep('Contact', ImportObjectSchema.OPERATION_UPDATE, null));
 				mapping.columns.add(new ImportMapping.Column('Person Id', 'Contact.Id'));
 				mapping.columns.add(new ImportMapping.Column('Title', 'Contact.Title'));
 				Map<String, String> values = row('Org 0', null, ana.Id, 'Member');
@@ -437,14 +407,7 @@ private class ImportSeveralObjectsTest {
 				ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
 				Datetime undoStartedAt = Datetime.now();
 				for (String pass : ImportUndoBatch.passes()) {
-					ImportUndoBatch job = new ImportUndoBatch(
-						batch.Id,
-						view.total,
-						pass,
-						0,
-						false,
-						undoStartedAt
-					);
+					ImportUndoBatch job = new ImportUndoBatch(batch.Id, view.total, pass, 0, false, undoStartedAt);
 					Database.QueryLocatorIterator records = job.start(null).iterator();
 					while (records.hasNext()) {
 						job.execute(null, new List<SObject>{ records.next() });
@@ -475,11 +438,7 @@ private class ImportSeveralObjectsTest {
 		ImportMapping mapping = organizationsAndAffiliations();
 		mapping.objects.add(
 			0,
-			new ImportMapping.ObjectStep(
-				'Saved_Query__c',
-				ImportObjectSchema.OPERATION_INSERT,
-				null
-			)
+			new ImportMapping.ObjectStep('Saved_Query__c', ImportObjectSchema.OPERATION_INSERT, null)
 		);
 		mapping.columns.add(new ImportMapping.Column('Query', 'Saved_Query__c.Name'));
 		mapping.columns.add(new ImportMapping.Column('About', 'Saved_Query__c.Object_Name__c'));
@@ -519,14 +478,7 @@ private class ImportSeveralObjectsTest {
 		ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
 		Datetime undoStartedAt = Datetime.now();
 		for (String pass : ImportUndoBatch.passes()) {
-			ImportUndoBatch job = new ImportUndoBatch(
-				batch.Id,
-				view.total,
-				pass,
-				0,
-				false,
-				undoStartedAt
-			);
+			ImportUndoBatch job = new ImportUndoBatch(batch.Id, view.total, pass, 0, false, undoStartedAt);
 			Database.QueryLocatorIterator records = job.start(null).iterator();
 			List<SObject> scope = new List<SObject>();
 			while (records.hasNext()) {
@@ -548,10 +500,7 @@ private class ImportSeveralObjectsTest {
 			System.runAs(admin()) {
 				Account org = organizations(1)[0];
 				Contact ana = person();
-				given(
-					queriesAndAffiliations(),
-					new List<Map<String, String>>{ queryRow(0, ana.Id, TOO_LONG) }
-				);
+				given(queriesAndAffiliations(), new List<Map<String, String>>{ queryRow(0, ana.Id, TOO_LONG) });
 				committing();
 				chunk(2, 2, false);
 				Import_Row__c failed = [
@@ -677,10 +626,7 @@ private class ImportSeveralObjectsTest {
 			System.runAs(admin()) {
 				organizations(1);
 				Contact ana = person();
-				given(
-					queriesAndAffiliations(),
-					new List<Map<String, String>>{ queryRow(0, ana.Id, TOO_LONG) }
-				);
+				given(queriesAndAffiliations(), new List<Map<String, String>>{ queryRow(0, ana.Id, TOO_LONG) });
 				chunk(2, 2, false);
 				delete [SELECT Id FROM Saved_Query__c WHERE Name = 'Zzretry 0'];
 				Import_Row__c failed = rows()[0];

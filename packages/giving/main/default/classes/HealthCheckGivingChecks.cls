@@ -100,9 +100,7 @@ public with sharing class HealthCheckGivingChecks {
 		}
 		if (check == CHECK_GIFT_OWNERSHIP_SKEW) {
 			// DEFERRED: no child relationships are read. NOPMD: the rule flags DEFERRED too.
-			Schema.DescribeSObjectResult gift = Gift__c.SObjectType.getDescribe( // NOPMD
-				Schema.SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult gift = Gift__c.SObjectType.getDescribe(Schema.SObjectDescribeOptions.DEFERRED); // NOPMD
 			return HealthCheckSkew.ownership(
 				CHECK_GIFT_OWNERSHIP_SKEW,
 				gift.getName(),
@@ -162,10 +160,7 @@ public with sharing class HealthCheckGivingChecks {
 			.withLinks(links);
 	}
 
-	private static void addIfAny(
-		List<HealthCheckService.Finding> findings,
-		HealthCheckService.Finding finding
-	) {
+	private static void addIfAny(List<HealthCheckService.Finding> findings, HealthCheckService.Finding finding) {
 		if (finding != null) {
 			findings.add(finding);
 		}
@@ -195,19 +190,13 @@ public with sharing class HealthCheckGivingChecks {
 		}
 
 		String counted = failures.capped == true
-			? String.format(
-					Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ failures.count.format() }
-			  )
+			? String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ failures.count.format() })
 			: String.valueOf(failures.count);
 		List<Object> count = new List<Object>{ counted };
 		return new HealthCheckService.Finding(
 				'receipt_generation_failed',
 				String.format(Label.Giving_HealthCheck_ReceiptFailedManyTitle, count),
-				String.format(
-					BarnHelp.text('Giving', 'Giving_HealthCheck_ReceiptFailedManyDetail'),
-					count
-				),
+				String.format(BarnHelp.text('Giving', 'Giving_HealthCheck_ReceiptFailedManyDetail'), count),
 				HealthCheckService.SEVERITY_WARNING,
 				HealthCheckService.CATEGORY_SETTINGS
 			)
@@ -273,9 +262,7 @@ public with sharing class HealthCheckGivingChecks {
 		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
 		for (
 			SObject form : Database.query(
-				'SELECT Id FROM ' +
-					String.escapeSingleQuotes(String.valueOf(formType)) +
-					' WHERE Id IN :formIds',
+				'SELECT Id FROM ' + String.escapeSingleQuotes(String.valueOf(formType)) + ' WHERE Id IN :formIds',
 				AccessLevel.SYSTEM_MODE
 			)
 		) {
@@ -309,17 +296,9 @@ public with sharing class HealthCheckGivingChecks {
 		} catch (Exception unreadable) {
 			return false;
 		}
-		for (
-			Object step : steps instanceof List<Object> ? (List<Object>) steps : new List<Object>()
-		) {
-			Object fields = step instanceof Map<String, Object>
-				? ((Map<String, Object>) step).get('fields')
-				: null;
-			for (
-				Object field : fields instanceof List<Object>
-					? (List<Object>) fields
-					: new List<Object>()
-			) {
+		for (Object step : steps instanceof List<Object> ? (List<Object>) steps : new List<Object>()) {
+			Object fields = step instanceof Map<String, Object> ? ((Map<String, Object>) step).get('fields') : null;
+			for (Object field : fields instanceof List<Object> ? (List<Object>) fields : new List<Object>()) {
 				if (
 					field instanceof Map<String, Object> &&
 					((Map<String, Object>) field).get('key') == GivingDonationPage.ANSWER_AMOUNT
@@ -355,10 +334,7 @@ public with sharing class HealthCheckGivingChecks {
 				HealthCheckService.SEVERITY_WARNING,
 				HealthCheckService.CATEGORY_ACCESS
 			)
-			.withFix(
-				Label.Giving_HealthCheck_OverrideLockFix,
-				HealthCheckService.FIX_CUSTOM_PERMISSIONS_URL
-			);
+			.withFix(Label.Giving_HealthCheck_OverrideLockFix, HealthCheckService.FIX_CUSTOM_PERMISSIONS_URL);
 	}
 
 	/**
@@ -397,10 +373,7 @@ public with sharing class HealthCheckGivingChecks {
 		List<Gift__c> first = HealthCheckGivingSelector.unpostedInClosedPeriod(closed, LINKS_SHOWN);
 
 		String counted = count > countCap
-			? String.format(
-					Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ countCap.format() }
-			  )
+			? String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ countCap.format() })
 			: count.format();
 
 		String text = BarnHelp.text('Giving', 'Giving_HealthCheck_UnpostedClosedPeriodDetail');
@@ -420,10 +393,7 @@ public with sharing class HealthCheckGivingChecks {
 
 		return new HealthCheckService.Finding(
 				'unposted_gifts_closed_period',
-				String.format(
-					Label.Giving_HealthCheck_UnpostedClosedPeriodTitle,
-					new List<Object>{ counted }
-				),
+				String.format(Label.Giving_HealthCheck_UnpostedClosedPeriodTitle, new List<Object>{ counted }),
 				text,
 				HealthCheckService.SEVERITY_WARNING,
 				HealthCheckService.CATEGORY_SETTINGS

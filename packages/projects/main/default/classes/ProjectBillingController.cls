@@ -7,11 +7,7 @@
  */
 public with sharing class ProjectBillingController {
 	private static final String CONTEXT = 'ProjectBillingController';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Projects',
-			'Projects_Error_Generic'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Projects', 'Projects_Error_Generic')
 		.showingDml();
 
 	/**
@@ -124,11 +120,7 @@ public with sharing class ProjectBillingController {
 	 * asked, each with its lines; stamps Exported Date. The CSV is built in the browser.
 	 */
 	@AuraEnabled
-	public static List<ProjectViews.Invoice> exportInvoices(
-		Date fromDate,
-		Date toDate,
-		Boolean includeExported
-	) {
+	public static List<ProjectViews.Invoice> exportInvoices(Date fromDate, Date toDate, Boolean includeExported) {
 		try {
 			ProjectBilling.requireBilling();
 			if (fromDate == null || toDate == null || toDate < fromDate) {
@@ -150,31 +142,20 @@ public with sharing class ProjectBillingController {
 					Account__r.Name,
 					Project__r.Name,
 					(
-						SELECT
-							Line_Type__c,
-							Description__c,
-							Service_Date__c,
-							Quantity__c,
-							Unit_Price__c,
-							Amount__c
+						SELECT Line_Type__c, Description__c, Service_Date__c, Quantity__c, Unit_Price__c, Amount__c
 						FROM Lines__r
 						ORDER BY Service_Date__c
 						LIMIT 500
 					)
 				FROM Project_Invoice__c
-				WHERE
-					Status__c IN :billed
-					AND Invoice_Date__c >= :fromDate
-					AND Invoice_Date__c <= :toDate
+				WHERE Status__c IN :billed AND Invoice_Date__c >= :fromDate AND Invoice_Date__c <= :toDate
 				WITH USER_MODE
 				ORDER BY Invoice_Date__c, Name
 				LIMIT 2000
 			]) {
 				if (includeExported == true || invoice.Exported_Date__c == null) {
 					invoices.add(new ProjectViews.Invoice(invoice));
-					stamps.add(
-						new Project_Invoice__c(Id = invoice.Id, Exported_Date__c = Date.today())
-					);
+					stamps.add(new Project_Invoice__c(Id = invoice.Id, Exported_Date__c = Date.today()));
 				}
 			}
 			update as user stamps;

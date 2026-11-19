@@ -11,20 +11,12 @@ private class PortalApiTest {
 		TestUsers.adminWith('Portal_Admin');
 	}
 
-	private static Map<String, Object> call(
-		String method,
-		String route,
-		Map<String, Object> body,
-		String token
-	) {
+	private static Map<String, Object> call(String method, String route, Map<String, Object> body, String token) {
 		RestRequest request = new RestRequest();
 		request.requestURI = '/services/apexrest/barncrm/portal/v1/' + route;
 		request.httpMethod = method;
 		if (route.contains('?')) {
-			request.addParameter(
-				route.substringAfter('?').substringBefore('='),
-				route.substringAfter('=')
-			);
+			request.addParameter(route.substringAfter('?').substringBefore('='), route.substringAfter('='));
 		}
 		if (body != null) {
 			request.requestBody = Blob.valueOf(JSON.serialize(body));

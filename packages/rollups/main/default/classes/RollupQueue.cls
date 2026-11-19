@@ -175,10 +175,7 @@ public without sharing class RollupQueue implements Queueable {
 	 * @param definitionIdsByTarget the definitions, by the same names; a missing or empty set
 	 *        means every active definition on the entity
 	 */
-	public static void add(
-		Map<String, Set<Id>> idsByTarget,
-		Map<String, Set<Id>> definitionIdsByTarget
-	) {
+	public static void add(Map<String, Set<Id>> idsByTarget, Map<String, Set<Id>> definitionIdsByTarget) {
 		List<Rollup_Queue__c> entries = new List<Rollup_Queue__c>();
 		for (String target : idsByTarget == null ? new Set<String>() : idsByTarget.keySet()) {
 			entries.addAll(
@@ -202,11 +199,7 @@ public without sharing class RollupQueue implements Queueable {
 	 * @param messageById the platform's message for each record
 	 * @param attemptsSoFar the attempts already made before this one
 	 */
-	public static void retryLater(
-		String targetObject,
-		Map<Id, String> messageById,
-		Integer attemptsSoFar
-	) {
+	public static void retryLater(String targetObject, Map<Id, String> messageById, Integer attemptsSoFar) {
 		retryLater(targetObject, messageById, attemptsSoFar, null);
 	}
 
@@ -516,8 +509,7 @@ public without sharing class RollupQueue implements Queueable {
 	}
 
 	private static Boolean noQueueableJobsLeft() {
-		return noQueueableJobsLeftForTest == true ||
-			Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs();
+		return noQueueableJobsLeftForTest == true || Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs();
 	}
 
 	/** Test seam: stands in for the stamp; null reads it. */
@@ -539,8 +531,7 @@ public without sharing class RollupQueue implements Queueable {
 		Datetime requestedAt = requestedAtForTest != null
 			? requestedAtForTest
 			: Rollup_Settings__c.getOrgDefaults().Processor_Requested_At__c;
-		return requestedAt != null &&
-			requestedAt > Datetime.now().addMinutes(-REQUEST_FRESH_MINUTES);
+		return requestedAt != null && requestedAt > Datetime.now().addMinutes(-REQUEST_FRESH_MINUTES);
 	}
 
 	/** Queues a processor and notes when it is due, so saves can tell one is coming. */
@@ -565,9 +556,7 @@ public without sharing class RollupQueue implements Queueable {
 			if (stored == null) {
 				OrgSettingsSystemWriter.save(
 					Rollup_Settings__c.SObjectType,
-					new Map<Schema.SObjectField, Object>{
-						Rollup_Settings__c.Processor_Requested_At__c => dueAt
-					}
+					new Map<Schema.SObjectField, Object>{ Rollup_Settings__c.Processor_Requested_At__c => dueAt }
 				);
 				return;
 			}
@@ -594,11 +583,7 @@ public without sharing class RollupQueue implements Queueable {
 		readyEventsPublished++;
 		Database.SaveResult result = EventBus.publish(new Rollup_Queue_Ready__e());
 		if (!result.isSuccess()) {
-			ErrorLogger.logMessage(
-				result.getErrors()[0].getMessage(),
-				'RollupQueue.announceReady',
-				'Warning'
-			);
+			ErrorLogger.logMessage(result.getErrors()[0].getMessage(), 'RollupQueue.announceReady', 'Warning');
 		}
 	}
 
@@ -644,10 +629,7 @@ public without sharing class RollupQueue implements Queueable {
 			: [
 					SELECT COUNT()
 					FROM AsyncApexJob
-					WHERE
-						JobType = 'Queueable'
-						AND ApexClass.Name = :CLASS_NAME
-						AND Status IN ('Queued', 'Holding')
+					WHERE JobType = 'Queueable' AND ApexClass.Name = :CLASS_NAME AND Status IN ('Queued', 'Holding')
 					WITH SYSTEM_MODE
 			  ];
 		if (waiting == 0) {
@@ -696,10 +678,7 @@ public without sharing class RollupQueue implements Queueable {
 				? RollupSelector.selectActiveByIds(definitionIds)
 				: targetType == null
 						? new List<Rollup_Definition__c>()
-						: RollupSelector.selectActiveForTarget(
-								String.valueOf(targetType),
-								RollupService.everyMode()
-						  );
+						: RollupSelector.selectActiveForTarget(String.valueOf(targetType), RollupService.everyMode());
 			// Until the split below, every record is charged if the run stops (R-RQ3).
 			drain.takenIds.addAll(slice.idsByTarget.get(target));
 			// R-RQ6: a record whose source rows would stop this run goes to the batch route, and
@@ -749,12 +728,7 @@ public without sharing class RollupQueue implements Queueable {
 			}
 			recalculationRows += Limits.getQueryRows() - rowsBefore;
 			if (!result.failed.isEmpty()) {
-				retryLater(
-					target,
-					result.failed,
-					slice.attemptsByTarget.get(target),
-					definitionIds
-				);
+				retryLater(target, result.failed, slice.attemptsByTarget.get(target), definitionIds);
 				failed += result.failed.size();
 			}
 		}
@@ -812,9 +786,7 @@ public without sharing class RollupQueue implements Queueable {
 
 		/** The definitions to run for this target entity, or null for every one. */
 		public Set<Id> definitionIdsFor(String target) {
-			return this.everyDefinition.contains(target)
-				? null
-				: this.definitionIdsByTarget.get(target);
+			return this.everyDefinition.contains(target) ? null : this.definitionIdsByTarget.get(target);
 		}
 
 		public void addDefinitions(String target, Rollup_Queue__c entry) {
@@ -864,9 +836,7 @@ public without sharing class RollupQueue implements Queueable {
 				retryTarget = target;
 				maxIds = retrySlice(attempts, sliceSize);
 			}
-			Set<Id> taken = slice.idsByTarget.containsKey(target)
-				? slice.idsByTarget.get(target)
-				: new Set<Id>();
+			Set<Id> taken = slice.idsByTarget.containsKey(target) ? slice.idsByTarget.get(target) : new Set<Id>();
 			Set<Id> merged = new Set<Id>(taken);
 			merged.addAll(idsOf(entry));
 			if (!taken.isEmpty() && merged.size() > maxIds) {
@@ -887,11 +857,8 @@ public without sharing class RollupQueue implements Queueable {
 		if (entry.Attempts__c == null || entry.Attempts__c <= 0) {
 			return false;
 		}
-		String refused = BarnHelp.text('Rollups', 'Core_Rollups_QueueSaveFailed')
-			.substringBefore('{0}');
-		return String.isBlank(refused) ||
-			entry.Last_Error__c == null ||
-			!entry.Last_Error__c.startsWith(refused);
+		String refused = BarnHelp.text('Rollups', 'Core_Rollups_QueueSaveFailed').substringBefore('{0}');
+		return String.isBlank(refused) || entry.Last_Error__c == null || !entry.Last_Error__c.startsWith(refused);
 	}
 
 	/** The identifiers a retried entry gives one run: a quarter as many per attempt, at least 1. */
@@ -903,9 +870,7 @@ public without sharing class RollupQueue implements Queueable {
 	/** Adds an entry's identifiers to the slice, splitting off what the limit leaves over. */
 	private static void takeEntry(Slice slice, Rollup_Queue__c entry, Integer sliceSize) {
 		String target = String.isBlank(entry.Target_Object__c) ? '' : entry.Target_Object__c;
-		Set<Id> taken = slice.idsByTarget.containsKey(target)
-			? slice.idsByTarget.get(target)
-			: new Set<Id>();
+		Set<Id> taken = slice.idsByTarget.containsKey(target) ? slice.idsByTarget.get(target) : new Set<Id>();
 		List<Id> ids = idsOf(entry);
 		Set<Id> merged = new Set<Id>(taken);
 		merged.addAll(ids);
@@ -935,10 +900,7 @@ public without sharing class RollupQueue implements Queueable {
 		slice.addDefinitions(target, entry);
 		Integer attempts = entry.Attempts__c == null ? 0 : entry.Attempts__c.intValue();
 		Integer highest = slice.attemptsByTarget.get(target);
-		slice.attemptsByTarget.put(
-			target,
-			highest == null ? attempts : Math.max(highest, attempts)
-		);
+		slice.attemptsByTarget.put(target, highest == null ? attempts : Math.max(highest, attempts));
 	}
 
 	/** The identifiers an entry holds; anything that is not one is dropped. */
@@ -965,18 +927,9 @@ public without sharing class RollupQueue implements Queueable {
 	private static List<Rollup_Queue__c> selectDue(Integer maxEntries) {
 		Datetime now = Datetime.now();
 		return [
-			SELECT
-				Id,
-				Target_Object__c,
-				Record_Ids__c,
-				Definition_Ids__c,
-				Attempts__c,
-				Last_Error__c
+			SELECT Id, Target_Object__c, Record_Ids__c, Definition_Ids__c, Attempts__c, Last_Error__c
 			FROM Rollup_Queue__c
-			WHERE
-				Status__c = :STATUS_PENDING
-				AND (Next_Attempt__c = NULL
-				OR Next_Attempt__c <= :now)
+			WHERE Status__c = :STATUS_PENDING AND (Next_Attempt__c = NULL OR Next_Attempt__c <= :now)
 			WITH SYSTEM_MODE
 			ORDER BY CreatedDate, Id
 			LIMIT :maxEntries
@@ -1035,9 +988,7 @@ public without sharing class RollupQueue implements Queueable {
 	 * code stays safe everywhere at the cost of one Ready event per five runs.
 	 */
 	private static Boolean atChainDepthLimit() {
-		Integer depth = stackDepthForTest != null
-			? stackDepthForTest
-			: AsyncInfo.getCurrentQueueableStackDepth();
+		Integer depth = stackDepthForTest != null ? stackDepthForTest : AsyncInfo.getCurrentQueueableStackDepth();
 		if (depth == null) {
 			return false;
 		}
@@ -1071,11 +1022,7 @@ public without sharing class RollupQueue implements Queueable {
 		public Boolean finished = false;
 
 		public void execute(System.FinalizerContext context) {
-			if (
-				this.finished ||
-				this.held.isEmpty() ||
-				context.getResult() == System.ParentJobResult.SUCCESS
-			) {
+			if (this.finished || this.held.isEmpty() || context.getResult() == System.ParentJobResult.SUCCESS) {
 				return;
 			}
 			Exception thrown = context.getException();
@@ -1169,9 +1116,7 @@ public without sharing class RollupQueue implements Queueable {
 	 */
 	private static void deleteForGood(List<Rollup_Queue__c> entries) {
 		List<Id> gone = new List<Id>();
-		for (
-			Database.DeleteResult result : Database.delete(entries, false, AccessLevel.SYSTEM_MODE)
-		) {
+		for (Database.DeleteResult result : Database.delete(entries, false, AccessLevel.SYSTEM_MODE)) {
 			if (result.isSuccess() && result.getId() != lastEntryId) {
 				gone.add(result.getId());
 			}

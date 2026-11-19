@@ -158,9 +158,7 @@ public with sharing class ImportHeaderParser {
 		for (String spelling : keys.keySet()) {
 			Double shorter = Math.min(spelling.length(), key.length());
 			Double longer = Math.max(spelling.length(), key.length());
-			if (
-				String.isNotBlank(keys.get(spelling)) && shorter / longer >= GUESS_MIN_LENGTH_RATIO
-			) {
+			if (String.isNotBlank(keys.get(spelling)) && shorter / longer >= GUESS_MIN_LENGTH_RATIO) {
 				spellings.add(spelling);
 			}
 		}
@@ -186,11 +184,7 @@ public with sharing class ImportHeaderParser {
 	 * fields name neither.
 	 */
 	@NamespaceAccessible
-	public static Resolved resolve(
-		String header,
-		Map<String, String> objectKeys,
-		FieldKeys fields
-	) {
+	public static Resolved resolve(String header, Map<String, String> objectKeys, FieldKeys fields) {
 		String text = clean(header);
 		Map<String, Resolved> found = readings(explicitSplits(text), objectKeys, fields, false);
 		if (found.isEmpty()) {
@@ -205,11 +199,7 @@ public with sharing class ImportHeaderParser {
 	 * passes only the objects a template loads, so the guesses stay few.
 	 */
 	@NamespaceAccessible
-	public static Resolved resolveOrGuess(
-		String header,
-		Map<String, String> objectKeys,
-		FieldKeys fields
-	) {
+	public static Resolved resolveOrGuess(String header, Map<String, String> objectKeys, FieldKeys fields) {
 		String text = clean(header);
 		List<List<String>> explicit = explicitSplits(text);
 		List<List<String>> underscores = underscoreSplits(text);
@@ -232,11 +222,7 @@ public with sharing class ImportHeaderParser {
 	 * names one.
 	 */
 	@NamespaceAccessible
-	public static String objectOfHeaders(
-		List<String> headers,
-		Map<String, String> objectKeys,
-		FieldKeys fields
-	) {
+	public static String objectOfHeaders(List<String> headers, Map<String, String> objectKeys, FieldKeys fields) {
 		Map<String, Integer> counts = new Map<String, Integer>();
 		String best;
 		Integer bestCount = 0;
@@ -245,8 +231,7 @@ public with sharing class ImportHeaderParser {
 			if (each == null) {
 				continue;
 			}
-			Integer count =
-				(counts.containsKey(each.objectName) ? counts.get(each.objectName) : 0) + 1;
+			Integer count = (counts.containsKey(each.objectName) ? counts.get(each.objectName) : 0) + 1;
 			counts.put(each.objectName, count);
 			if (count > bestCount) {
 				best = each.objectName;
@@ -309,10 +294,7 @@ public with sharing class ImportHeaderParser {
 	/** As `objectOfNameOrGuess`, for a file name with its extension. */
 	@NamespaceAccessible
 	public static Found objectOfFileNameOrGuess(String fileName, Map<String, String> objectKeys) {
-		return objectOfNameOrGuess(
-			clean(fileName).replaceAll('\\.[A-Za-z0-9]{1,5}$', ''),
-			objectKeys
-		);
+		return objectOfNameOrGuess(clean(fileName).replaceAll('\\.[A-Za-z0-9]{1,5}$', ''), objectKeys);
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -387,9 +369,7 @@ public with sharing class ImportHeaderParser {
 	) {
 		Map<String, Resolved> found = new Map<String, Resolved>();
 		for (List<String> split : splits) {
-			Found objectFound = withGuesses
-				? find(split[0], objectKeys)
-				: asFound(match(split[0], objectKeys));
+			Found objectFound = withGuesses ? find(split[0], objectKeys) : asFound(match(split[0], objectKeys));
 			Found fieldFound = objectFound == null
 				? null
 				: withGuesses

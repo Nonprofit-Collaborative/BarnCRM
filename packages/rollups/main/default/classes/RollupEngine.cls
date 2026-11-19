@@ -54,10 +54,7 @@ public with sharing class RollupEngine {
 		if (targetType == null || parentIds == null || parentIds.isEmpty()) {
 			return new Result();
 		}
-		return recalculate(
-			parentIds,
-			RollupSelector.selectActiveForTarget(String.valueOf(targetType), EVERY_MODE)
-		);
+		return recalculate(parentIds, RollupSelector.selectActiveForTarget(String.valueOf(targetType), EVERY_MODE));
 	}
 
 	/**
@@ -85,16 +82,9 @@ public with sharing class RollupEngine {
 	}
 
 	/** One plan per target entity; a definition naming an entity the org lacks is refused. */
-	private static List<RollupPlanner.Plan> plansFor(
-		List<Rollup_Definition__c> definitions,
-		Result result
-	) {
+	private static List<RollupPlanner.Plan> plansFor(List<Rollup_Definition__c> definitions, Result result) {
 		Map<String, List<Rollup_Definition__c>> byTarget = new Map<String, List<Rollup_Definition__c>>();
-		for (
-			Rollup_Definition__c definition : definitions == null
-				? new List<Rollup_Definition__c>()
-				: definitions
-		) {
+		for (Rollup_Definition__c definition : definitions == null ? new List<Rollup_Definition__c>() : definitions) {
 			String target = String.isBlank(definition.Target_Object__c)
 				? ''
 				: definition.Target_Object__c.toLowerCase();
@@ -147,10 +137,7 @@ public with sharing class RollupEngine {
 	public static Preview preview(Rollup_Definition__c definition, Id targetId) {
 		Preview preview = new Preview();
 		Result result = new Result();
-		List<RollupPlanner.Plan> plans = plansFor(
-			new List<Rollup_Definition__c>{ definition },
-			result
-		);
+		List<RollupPlanner.Plan> plans = plansFor(new List<Rollup_Definition__c>{ definition }, result);
 		if (plans.isEmpty() || targetId == null) {
 			return preview;
 		}
@@ -200,11 +187,7 @@ public with sharing class RollupEngine {
 	 * @param parentIds the target records
 	 * @param answer the values by definition index and record
 	 */
-	public static Result writeCalculated(
-		RollupPlanner.Plan plan,
-		Set<Id> parentIds,
-		RollupAggregator.Answer answer
-	) {
+	public static Result writeCalculated(RollupPlanner.Plan plan, Set<Id> parentIds, RollupAggregator.Answer answer) {
 		Result result = new Result();
 		result.refused.addAll(plan.refused);
 		if (parentIds == null || parentIds.isEmpty() || plan.definitions.isEmpty()) {
@@ -273,18 +256,13 @@ public with sharing class RollupEngine {
 			String aggregate = definition.Aggregate__c.toUpperCase();
 			// Read only for a text list, so a caller that queried a definition without the
 			// delimiter still runs every other aggregate.
-			String separator = aggregate.startsWith('TEXT_LIST')
-				? RollupPlanner.separatorOf(definition)
-				: null;
+			String separator = aggregate.startsWith('TEXT_LIST') ? RollupPlanner.separatorOf(definition) : null;
 			Schema.SObjectField field = plan.targetFields[i];
 			Boolean toTargetCurrency =
 				converts &&
 				aggregate != 'COUNT' &&
 				field.getDescribe().getType() == Schema.DisplayType.CURRENCY &&
-				RollupCurrency.isCurrencyPath(
-					definition.Source_Object__c,
-					definition.Source_Field__c
-				);
+				RollupCurrency.isCurrencyPath(definition.Source_Object__c, definition.Source_Field__c);
 			Map<Id, RollupAggregator.Tally> tallies = answer.tallies.get(i);
 			for (Id targetId : admittedByDefinition[i]) {
 				SObject current = stored.get(targetId);
@@ -292,8 +270,7 @@ public with sharing class RollupEngine {
 					continue;
 				}
 				RollupAggregator.Tally tally = tallies == null ? null : tallies.get(targetId);
-				Object value = (tally == null ? new RollupAggregator.Tally() : tally)
-					.result(aggregate, separator);
+				Object value = (tally == null ? new RollupAggregator.Tally() : tally).result(aggregate, separator);
 				if (toTargetCurrency && value != null) {
 					value = RollupCurrency.fromCorporate(
 						RollupAggregator.toDecimal(value),
@@ -310,9 +287,7 @@ public with sharing class RollupEngine {
 	}
 
 	/** The target filters, by where clause, that are simple enough to test in Apex. */
-	private static Map<String, List<RollupFilterParser.TextEquality>> inApexFilters(
-		RollupPlanner.Plan plan
-	) {
+	private static Map<String, List<RollupFilterParser.TextEquality>> inApexFilters(RollupPlanner.Plan plan) {
 		Map<String, List<RollupFilterParser.TextEquality>> inApex = new Map<String, List<RollupFilterParser.TextEquality>>();
 		for (Integer i = 0; i < plan.targetFilters.size(); i++) {
 			String targetFilter = plan.targetFilters[i];
@@ -335,10 +310,7 @@ public with sharing class RollupEngine {
 	 * to case. Null when a record holds a blank where a test looks, so SOQL answers instead.
 	 */
 	@TestVisible
-	private static Set<Id> passingInApex(
-		List<RollupFilterParser.TextEquality> equalities,
-		Map<Id, SObject> stored
-	) {
+	private static Set<Id> passingInApex(List<RollupFilterParser.TextEquality> equalities, Map<Id, SObject> stored) {
 		Set<Id> passing = new Set<Id>();
 		for (SObject record : stored.values()) {
 			Boolean admits = true;
@@ -383,11 +355,7 @@ public with sharing class RollupEngine {
 					: null;
 				try {
 					if (passing == null) {
-						passing = RollupAggregator.passing(
-							plan.targetType,
-							targetFilter,
-							targetIds
-						);
+						passing = RollupAggregator.passing(plan.targetType, targetFilter, targetIds);
 					}
 				} catch (Exception refused) {
 					// A target filter the org cannot query writes nothing rather than everything.

@@ -59,18 +59,12 @@ public with sharing class HealthCheckSkew {
 		Map<String, Object> binds,
 		String pluralLabel
 	) {
-		Map<String, Object> allBinds = binds == null
-			? new Map<String, Object>()
-			: new Map<String, Object>(binds);
+		Map<String, Object> allBinds = binds == null ? new Map<String, Object>() : new Map<String, Object>(binds);
 		String filter = String.isBlank(condition) ? '' : ' WHERE ' + condition;
 		Map<Id, Integer> sampled = new Map<Id, Integer>();
 		for (
 			SObject row : Database.queryWithBinds(
-				'SELECT OwnerId FROM ' +
-					objectName +
-					filter +
-					' ORDER BY CreatedDate DESC LIMIT ' +
-					SAMPLE_SIZE,
+				'SELECT OwnerId FROM ' + objectName + filter + ' ORDER BY CreatedDate DESC LIMIT ' + SAMPLE_SIZE,
 				allBinds,
 				AccessLevel.SYSTEM_MODE
 			)

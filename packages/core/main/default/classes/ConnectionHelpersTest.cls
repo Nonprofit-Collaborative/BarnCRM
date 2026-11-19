@@ -39,10 +39,7 @@ private class ConnectionHelpersTest {
 	static void aBlankStatusIsCurrentAndADeliberateFormerStays() {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(ConnectionStatus.CURRENT, ConnectionStatus.settle(null, null, null));
-			Assert.areEqual(
-				ConnectionStatus.FORMER,
-				ConnectionStatus.settle(ConnectionStatus.FORMER, null, null)
-			);
+			Assert.areEqual(ConnectionStatus.FORMER, ConnectionStatus.settle(ConnectionStatus.FORMER, null, null));
 		}
 	}
 

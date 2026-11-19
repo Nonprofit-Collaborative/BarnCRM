@@ -32,15 +32,9 @@ private class MembershipPaymentsTest {
 	}
 
 	private static Membership_Term__c term(String status, String email) {
-		Membership_Level__c level = new Membership_Level__c(
-			Name = 'Individual',
-			Dues__c = 50,
-			Term_Months__c = 12
-		);
+		Membership_Level__c level = new Membership_Level__c(Name = 'Individual', Dues__c = 50, Term_Months__c = 12);
 		insert as user level;
-		Contact member = TestDataFactory.person(
-			new Contact(LastName = 'Zzmem Payer', Email = email)
-		);
+		Contact member = TestDataFactory.person(new Contact(LastName = 'Zzmem Payer', Email = email));
 		insert as user member;
 		Membership_Term__c term = new Membership_Term__c(
 			Level__c = level.Id,
@@ -84,8 +78,7 @@ private class MembershipPaymentsTest {
 			Assert.areEqual(current.Id, asked.get('sourceRecordId'), 'for this term');
 			Assert.areEqual(
 				LINK,
-				[SELECT Pay_Link__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE]
-				.Pay_Link__c,
+				[SELECT Pay_Link__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE].Pay_Link__c,
 				'the link is on the term'
 			);
 			Assert.areEqual(1, sender.received.size(), 'emailed to the member');
@@ -104,17 +97,13 @@ private class MembershipPaymentsTest {
 				'Payments not ready'
 			);
 			MembershipPayments.apiOverride = new FakePayments(true);
-			Assert.areEqual(
-				BarnHelp.text('Memberships', 'Memberships_Error_NoEmail'),
-				refusal(noEmail.Id),
-				'no email'
-			);
+			Assert.areEqual(BarnHelp.text('Memberships', 'Memberships_Error_NoEmail'), refusal(noEmail.Id), 'no email');
 			Assert.areEqual(
 				BarnHelp.text('Memberships', 'Memberships_Error_NotFound'),
 				refusal(
 					Id.valueOf(
-						Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getKeyPrefix() + '000000000001'
+						Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+						'000000000001'
 					)
 				),
 				'no term'
@@ -207,8 +196,7 @@ private class MembershipPaymentsTest {
 			Test.stopTest();
 
 			Assert.isNull(
-				[SELECT Pay_Link__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE]
-				.Pay_Link__c,
+				[SELECT Pay_Link__c FROM Membership_Term__c WHERE Id = :current.Id WITH USER_MODE].Pay_Link__c,
 				'No link was stored'
 			);
 			Assert.isTrue(sender.received.isEmpty(), 'Nothing was emailed');
@@ -232,8 +220,8 @@ private class MembershipPaymentsTest {
 			RecordingEmailSender sender = new RecordingEmailSender();
 			MembershipPayments.emailSender = sender;
 			Id gone = Id.valueOf(
-				Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000002'
+				Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000002'
 			);
 
 			Test.startTest();
@@ -280,8 +268,7 @@ private class MembershipPaymentsTest {
 			listener.call('paymentChanged', payment);
 			Assert.areEqual(
 				'Cancelled',
-				[SELECT Status__c FROM Membership_Term__c WHERE Id = :paid[0].Id WITH USER_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Membership_Term__c WHERE Id = :paid[0].Id WITH USER_MODE].Status__c,
 				'a refund cancels the term it paid'
 			);
 			Assert.isNull(listener.call('somethingElse', payment), 'other calls are ignored');
@@ -322,10 +309,7 @@ private class MembershipPaymentsTest {
 			MembershipPayments.apiOverride = new FakePayments(true);
 			Membership_Term__c current = term('Current', 'payer@example.org');
 			MembershipsPortalExtension portal = new MembershipsPortalExtension();
-			Assert.isTrue(
-				portal.actionNames().contains(MembershipsPortalExtension.PAY_DUES),
-				'offers Pay Dues'
-			);
+			Assert.isTrue(portal.actionNames().contains(MembershipsPortalExtension.PAY_DUES), 'offers Pay Dues');
 			Test.startTest();
 			Assert.areEqual(
 				BarnHelp.text('Memberships', 'Memberships_Portal_LinkSent'),

@@ -90,25 +90,14 @@ private class MirrorSyncTest {
 			List<Error_Log__c> logged = warnings();
 			Assert.areEqual(2, logged.size(), 'One Warning per distinct message.');
 			// Long text cannot be sorted in a query, so the two are told apart by what they say.
-			String one = logged[0].Message__c.contains('G-99')
-				? logged[0].Message__c
-				: logged[1].Message__c;
-			String many = logged[0].Message__c.contains('G-99')
-				? logged[1].Message__c
-				: logged[0].Message__c;
-			Assert.areEqual(
-				'Could not copy "G-99": Amount is missing.',
-				one,
-				'A message about one record names it.'
-			);
+			String one = logged[0].Message__c.contains('G-99') ? logged[0].Message__c : logged[1].Message__c;
+			String many = logged[0].Message__c.contains('G-99') ? logged[1].Message__c : logged[0].Message__c;
+			Assert.areEqual('Could not copy "G-99": Amount is missing.', one, 'A message about one record names it.');
 			Assert.isTrue(
 				many.startsWith('Could not copy 13 records (G-1, G-2,'),
 				'A message about many gives the count and the first names: ' + many
 			);
-			Assert.isTrue(
-				many.contains('G-10 and 3 more'),
-				'Only ten names are spelled out: ' + many
-			);
+			Assert.isTrue(many.contains('G-10 and 3 more'), 'Only ten names are spelled out: ' + many);
 		}
 	}
 
@@ -125,26 +114,17 @@ private class MirrorSyncTest {
 	@IsTest
 	static void aShareOfTheQueryAndDmlLimitsMustBeLeft() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Assert.isTrue(
-				MirrorSync.hasHeadroom(7, 4, 600, 0.4, 0.5),
-				'A fresh transaction has room.'
-			);
+			Assert.isTrue(MirrorSync.hasHeadroom(7, 4, 600, 0.4, 0.5), 'A fresh transaction has room.');
 			// Far more than a fixed margin leaves, and still not half the limit.
 			MirrorSync.simulatedQueriesUsed = Limits.getLimitQueries() / 2;
-			Assert.isTrue(
-				MirrorSync.hasHeadroom(7, 4, 600),
-				'The fixed margin alone would start a copy here.'
-			);
+			Assert.isTrue(MirrorSync.hasHeadroom(7, 4, 600), 'The fixed margin alone would start a copy here.');
 			Assert.isFalse(
 				MirrorSync.hasHeadroom(7, 4, 600, 0.4, 0.5),
 				'Half the queries are spent, which the org\'s own Opportunity automation may need.'
 			);
 			MirrorSync.simulatedQueriesUsed = null;
 			MirrorSync.simulatedDmlStatementsUsed = Limits.getLimitDmlStatements() / 2;
-			Assert.isFalse(
-				MirrorSync.hasHeadroom(7, 4, 600, 0.4, 0.5),
-				'The same for DML statements.'
-			);
+			Assert.isFalse(MirrorSync.hasHeadroom(7, 4, 600, 0.4, 0.5), 'The same for DML statements.');
 		}
 	}
 
@@ -167,9 +147,7 @@ private class MirrorSyncTest {
 			Assert.areEqual(MirrorSync.MESSAGES_KEPT, logged.size(), 'At most the kept messages.');
 			Integer shared = 0;
 			for (Error_Log__c entry : logged) {
-				if (
-					entry.Message__c.contains(BarnHelp.text('Giving', 'Mirror_Sync_OtherMessages'))
-				) {
+				if (entry.Message__c.contains(BarnHelp.text('Giving', 'Mirror_Sync_OtherMessages'))) {
 					shared++;
 					Assert.isTrue(
 						entry.Message__c.startsWith('Could not copy 71 records'),

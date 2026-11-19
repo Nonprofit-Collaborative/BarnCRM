@@ -14,12 +14,7 @@ public with sharing class DuplicateRulesStarter {
 	public static final String ACTIVE = 'Active';
 	public static final String INACTIVE = 'Inactive';
 	private static final Set<String> BUSY = new Set<String>{ 'Activating', 'Deactivating' };
-	private static final Set<String> UNFINISHED = new Set<String>{
-		'Holding',
-		'Queued',
-		'Preparing',
-		'Processing'
-	};
+	private static final Set<String> UNFINISHED = new Set<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
 	private static final Integer MAX_TRIES = 15;
 
 	/** Set only by tests: matching rule status by developer name, as a test cannot create one. */
@@ -148,9 +143,7 @@ public with sharing class DuplicateRulesStarter {
 				}
 			}
 			if (needed.isEmpty()) {
-				throw new StarterException(
-					BarnHelp.text('Core', 'Core_DuplicateStarter_NothingToDo')
-				);
+				throw new StarterException(BarnHelp.text('Core', 'Core_DuplicateStarter_NothingToDo'));
 			}
 			AsyncStarter.queue(new StarterJob(needed, 0), 'DuplicateRulesStarter');
 			return view();
@@ -171,14 +164,10 @@ public with sharing class DuplicateRulesStarter {
 	private static void requireConnection() {
 		ImportNewFieldService.Connection connection = ImportNewFieldService.connection();
 		if (!connection.canCreate) {
-			throw new StarterException(
-				BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission')
-			);
+			throw new StarterException(BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission'));
 		}
 		if (!connection.connected) {
-			throw new StarterException(
-				BarnHelp.text('Core', 'Core_DuplicateStarter_ConnectionNeeded')
-			);
+			throw new StarterException(BarnHelp.text('Core', 'Core_DuplicateStarter_ConnectionNeeded'));
 		}
 	}
 
@@ -196,9 +185,7 @@ public with sharing class DuplicateRulesStarter {
 		}
 		Map<String, String> matchStatus = matchStatuses();
 		Map<String, List<DuplicateRule>> rulesByObject = new Map<String, List<DuplicateRule>>();
-		for (
-			DuplicateRule rule : DuplicateSelector.rulesFor(new Set<String>{ 'Contact', 'Account' })
-		) {
+		for (DuplicateRule rule : DuplicateSelector.rulesFor(new Set<String>{ 'Contact', 'Account' })) {
 			if (!rulesByObject.containsKey(rule.SobjectType)) {
 				rulesByObject.put(rule.SobjectType, new List<DuplicateRule>());
 			}
@@ -207,11 +194,7 @@ public with sharing class DuplicateRulesStarter {
 		for (Recommended each : recommended()) {
 			List<DuplicateRule> rules = rulesByObject.get(each.objectName);
 			result.sets.add(
-				setView(
-					each,
-					matchStatus.get(each.matchName),
-					rules == null ? new List<DuplicateRule>() : rules
-				)
+				setView(each, matchStatus.get(each.matchName), rules == null ? new List<DuplicateRule>() : rules)
 			);
 		}
 		return result;
@@ -219,11 +202,7 @@ public with sharing class DuplicateRulesStarter {
 
 	/** One set's state, the action it needs, and the steps that action takes, in words. */
 	@TestVisible
-	private static SetView setView(
-		Recommended each,
-		String matchStatus,
-		List<DuplicateRule> rules
-	) {
+	private static SetView setView(Recommended each, String matchStatus, List<DuplicateRule> rules) {
 		SetView result = new SetView();
 		result.key = each.key;
 		result.heading = heading(each.key);
@@ -263,22 +242,14 @@ public with sharing class DuplicateRulesStarter {
 			List<Object> match = new List<Object>{ each.matchName, each.objectName };
 			List<Object> rule = new List<Object>{ each.ruleName, each.objectName };
 			if (result.matchState == MISSING) {
-				result.steps.add(
-					BarnHelp.text('Core', 'Core_DuplicateStarter_StepCreateMatch', match)
-				);
+				result.steps.add(BarnHelp.text('Core', 'Core_DuplicateStarter_StepCreateMatch', match));
 			} else if (result.matchState != ACTIVE) {
-				result.steps.add(
-					BarnHelp.text('Core', 'Core_DuplicateStarter_StepRepairMatch', match)
-				);
+				result.steps.add(BarnHelp.text('Core', 'Core_DuplicateStarter_StepRepairMatch', match));
 			}
 			if (result.ruleState == MISSING) {
-				result.steps.add(
-					BarnHelp.text('Core', 'Core_DuplicateStarter_StepCreateRule', rule)
-				);
+				result.steps.add(BarnHelp.text('Core', 'Core_DuplicateStarter_StepCreateRule', rule));
 			} else if (result.ruleState != ACTIVE) {
-				result.steps.add(
-					BarnHelp.text('Core', 'Core_DuplicateStarter_StepRepairRule', rule)
-				);
+				result.steps.add(BarnHelp.text('Core', 'Core_DuplicateStarter_StepRepairRule', rule));
 			}
 		}
 		return result;
@@ -321,10 +292,7 @@ public with sharing class DuplicateRulesStarter {
 		return [
 				SELECT COUNT()
 				FROM AsyncApexJob
-				WHERE
-					JobType = 'Queueable'
-					AND ApexClass.Name = 'DuplicateRulesStarter'
-					AND Status IN :UNFINISHED
+				WHERE JobType = 'Queueable' AND ApexClass.Name = 'DuplicateRulesStarter' AND Status IN :UNFINISHED
 				WITH SYSTEM_MODE
 			] > 0;
 	}
@@ -346,12 +314,7 @@ public with sharing class DuplicateRulesStarter {
 			this(keys, attempt, new List<String>(), new List<String>());
 		}
 
-		private StarterJob(
-			List<String> keys,
-			Integer attempt,
-			List<String> done,
-			List<String> failed
-		) {
+		private StarterJob(List<String> keys, Integer attempt, List<String> done, List<String> failed) {
 			this.keys = keys;
 			this.attempt = attempt;
 			this.done = done;
@@ -375,11 +338,7 @@ public with sharing class DuplicateRulesStarter {
 			}
 			for (String key : waiting) {
 				failed.add(
-					BarnHelp.text(
-						'Core',
-						'Core_DuplicateStarter_StillActivating',
-						new List<Object>{ heading(key) }
-					)
+					BarnHelp.text('Core', 'Core_DuplicateStarter_StillActivating', new List<Object>{ heading(key) })
 				);
 			}
 			finish();
@@ -416,10 +375,7 @@ public with sharing class DuplicateRulesStarter {
 		private List<String> writeRules() {
 			Map<String, String> status = matchStatuses();
 			Map<String, Boolean> activeRule = new Map<String, Boolean>();
-			Map<String, Integer> countByObject = new Map<String, Integer>{
-				'Contact' => 0,
-				'Account' => 0
-			};
+			Map<String, Integer> countByObject = new Map<String, Integer>{ 'Contact' => 0, 'Account' => 0 };
 			for (DuplicateRule rule : DuplicateSelector.rulesFor(countByObject.keySet())) {
 				activeRule.put(rule.DeveloperName, rule.IsActive == true);
 				countByObject.put(rule.SobjectType, countByObject.get(rule.SobjectType) + 1);
@@ -451,14 +407,9 @@ public with sharing class DuplicateRulesStarter {
 				for (Recommended each : ready) {
 					// An existing rule keeps the last place; a new one goes after the org's rules.
 					Integer count = countByObject.get(each.objectName);
-					bodies.add(
-						ruleXml(each, activeRule.containsKey(each.ruleName) ? count : count + 1)
-					);
+					bodies.add(ruleXml(each, activeRule.containsKey(each.ruleName) ? count : count + 1));
 				}
-				Set<String> refused = record(
-					OrgMetadataApi.upsertMetadata('DuplicateRule', bodies),
-					ready
-				);
+				Set<String> refused = record(OrgMetadataApi.upsertMetadata('DuplicateRule', bodies), ready);
 				for (Recommended each : ready) {
 					if (!refused.contains(each.key)) {
 						done.add(heading(each.key));
@@ -560,10 +511,7 @@ public with sharing class DuplicateRulesStarter {
 		return OrgMetadataApi.element('fullName', each.objectName + '.' + each.ruleName) +
 			OrgMetadataApi.element('actionOnInsert', 'Allow') +
 			OrgMetadataApi.element('actionOnUpdate', 'Allow') +
-			OrgMetadataApi.element(
-				'alertText',
-				BarnHelp.text('Core', 'Core_DuplicateStarter_AlertText')
-			) +
+			OrgMetadataApi.element('alertText', BarnHelp.text('Core', 'Core_DuplicateStarter_AlertText')) +
 			OrgMetadataApi.element('description', summary(each.key)) +
 			filter +
 			OrgMetadataApi.wrap(

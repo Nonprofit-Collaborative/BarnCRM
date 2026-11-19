@@ -22,8 +22,7 @@ public with sharing class GrantReminderService {
 
 	/** Whether a run should start: the module is on and at least one reminder setting is on. */
 	public static Boolean isActive() {
-		return !ModuleManagerService.turnedOff()
-				.contains(FundersPostInstall.MODULE_KEY.toLowerCase()) &&
+		return !ModuleManagerService.turnedOff().contains(FundersPostInstall.MODULE_KEY.toLowerCase()) &&
 			(FundersSettings.reminderTasksEnabled() || FundersSettings.reminderEmailsEnabled());
 	}
 
@@ -51,9 +50,7 @@ public with sharing class GrantReminderService {
 
 	/** The person to remind: the active assignee, else the grant's active owner, else null. */
 	public static Id recipientFor(Grant_Requirement__c requirement, Set<Id> activeUsers) {
-		if (
-			requirement.Assigned_To__c != null && activeUsers.contains(requirement.Assigned_To__c)
-		) {
+		if (requirement.Assigned_To__c != null && activeUsers.contains(requirement.Assigned_To__c)) {
 			return requirement.Assigned_To__c;
 		}
 		Id owner = requirement.Grant__r == null ? null : requirement.Grant__r.OwnerId;
@@ -102,11 +99,7 @@ public with sharing class GrantReminderService {
 			for (Integer i = 0; i < due.size(); i++) {
 				tasks.add(taskFor(due[i], recipients[i]));
 			}
-			List<Database.SaveResult> saved = Database.insert(
-				tasks,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			List<Database.SaveResult> saved = Database.insert(tasks, false, AccessLevel.SYSTEM_MODE);
 			String failure;
 			for (Integer i = 0; i < due.size(); i++) {
 				if (saved[i].isSuccess()) {
@@ -129,12 +122,7 @@ public with sharing class GrantReminderService {
 
 		List<Grant_Requirement__c> stamps = new List<Grant_Requirement__c>();
 		for (Grant_Requirement__c requirement : ready) {
-			stamps.add(
-				new Grant_Requirement__c(
-					Id = requirement.Id,
-					Reminder_Sent_For__c = requirement.Due_Date__c
-				)
-			);
+			stamps.add(new Grant_Requirement__c(Id = requirement.Id, Reminder_Sent_For__c = requirement.Due_Date__c));
 		}
 		List<Database.SaveResult> stamped = Database.update(stamps, false, AccessLevel.SYSTEM_MODE);
 		List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>();
@@ -182,20 +170,12 @@ public with sharing class GrantReminderService {
 		logShortfall(BarnHelp.text('Funders', 'Funders_Reminder_SendFailed'), failed, due, failure);
 	}
 
-	private static void logShortfall(
-		String template,
-		Integer count,
-		List<Object> outOf,
-		String why
-	) {
+	private static void logShortfall(String template, Integer count, List<Object> outOf, String why) {
 		if (count <= 0) {
 			return;
 		}
 		ErrorLogger.logMessage(
-			String.format(
-				template,
-				new List<Object>{ count, outOf.size(), why == null ? '' : why }
-			),
+			String.format(template, new List<Object>{ count, outOf.size(), why == null ? '' : why }),
 			LOG_CONTEXT,
 			ErrorLogger.SEVERITY_WARNING
 		);
@@ -220,10 +200,7 @@ public with sharing class GrantReminderService {
 
 	/** The reminder email, addressed by user record so no outside address is used. */
 	@TestVisible
-	private static Messaging.SingleEmailMessage messageFor(
-		Grant_Requirement__c requirement,
-		Id recipient
-	) {
+	private static Messaging.SingleEmailMessage messageFor(Grant_Requirement__c requirement, Id recipient) {
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setTargetObjectId(recipient);
 		message.setSaveAsActivity(false);
@@ -234,11 +211,7 @@ public with sharing class GrantReminderService {
 			)
 		);
 		message.setPlainTextBody(
-			describe(requirement) +
-				'\n\n' +
-				URL.getOrgDomainUrl().toExternalForm() +
-				'/' +
-				requirement.Grant__c
+			describe(requirement) + '\n\n' + URL.getOrgDomainUrl().toExternalForm() + '/' + requirement.Grant__c
 		);
 		return message;
 	}
@@ -254,12 +227,7 @@ public with sharing class GrantReminderService {
 			: requirement.Grant__r.Funder__r.Name;
 		return String.format(
 			BarnHelp.text('Funders', 'Funders_Reminder_Body'),
-			new List<Object>{
-				requirement.Name,
-				grantName(requirement),
-				funder,
-				requirement.Due_Date__c.format()
-			}
+			new List<Object>{ requirement.Name, grantName(requirement), funder, requirement.Due_Date__c.format() }
 		);
 	}
 }

@@ -35,16 +35,8 @@ private class ReceiptFileAccessTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact reyes = GivingTestDataFactory.insertHouseholdContact(
-					'The Reyes Family',
-					'Ana',
-					'Reyes'
-				);
-				insert ReceiptTestDataFactory.plainCashGift(
-					reyes.Id,
-					250,
-					Date.newInstance(YEAR, 3, 1)
-				);
+				Contact reyes = GivingTestDataFactory.insertHouseholdContact('The Reyes Family', 'Ana', 'Reyes');
+				insert ReceiptTestDataFactory.plainCashGift(reyes.Id, 250, Date.newInstance(YEAR, 3, 1));
 				Receipt__c statement = issueOneStatement();
 
 				Set<Id> linked = linkedEntitiesFor(statement.Content_Document_Id__c);
@@ -73,16 +65,8 @@ private class ReceiptFileAccessTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact haddad = GivingTestDataFactory.insertHouseholdContact(
-					'The Haddad Family',
-					'Nour',
-					'Haddad'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					haddad.Id,
-					300,
-					Date.newInstance(YEAR, 4, 2)
-				);
+				Contact haddad = GivingTestDataFactory.insertHouseholdContact('The Haddad Family', 'Nour', 'Haddad');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(haddad.Id, 300, Date.newInstance(YEAR, 4, 2));
 				insert gift;
 
 				Test.startTest();
@@ -123,21 +107,10 @@ private class ReceiptFileAccessTest {
 	static void programStaffWithNoGivingPermissionSetCannotReachAStatementThroughTheDonor() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
-				User coordinator = TestDataFactory.createUser(
-					'Priya',
-					new List<String>{ 'BarnCRM_Staff' }
-				);
+				User coordinator = TestDataFactory.createUser('Priya', new List<String>{ 'BarnCRM_Staff' });
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact osei = GivingTestDataFactory.insertHouseholdContact(
-					'The Osei Family',
-					'Kofi',
-					'Osei'
-				);
-				insert ReceiptTestDataFactory.plainCashGift(
-					osei.Id,
-					400,
-					Date.newInstance(YEAR, 5, 1)
-				);
+				Contact osei = GivingTestDataFactory.insertHouseholdContact('The Osei Family', 'Kofi', 'Osei');
+				insert ReceiptTestDataFactory.plainCashGift(osei.Id, 400, Date.newInstance(YEAR, 5, 1));
 				Receipt__c statement = issueOneStatement();
 				Id household = osei.AccountId;
 				Id documentId = statement.Content_Document_Id__c;
@@ -187,16 +160,8 @@ private class ReceiptFileAccessTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact diallo = GivingTestDataFactory.insertHouseholdContact(
-					'The Diallo Family',
-					'Awa',
-					'Diallo'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					diallo.Id,
-					90,
-					Date.newInstance(YEAR, 6, 6)
-				);
+				Contact diallo = GivingTestDataFactory.insertHouseholdContact('The Diallo Family', 'Awa', 'Diallo');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(diallo.Id, 90, Date.newInstance(YEAR, 6, 6));
 				insert gift;
 
 				Test.startTest();
@@ -208,15 +173,9 @@ private class ReceiptFileAccessTest {
 					FROM Receipt__c
 					WHERE Id = :issued.Id
 				];
-				List<ContentDocumentLink> links = linksOtherThanTheOwner(
-					stored.Content_Document_Id__c
-				);
+				List<ContentDocumentLink> links = linksOtherThanTheOwner(stored.Content_Document_Id__c);
 
-				Assert.areEqual(
-					2,
-					links.size(),
-					'The receipt and the gift, which is what was linked.'
-				);
+				Assert.areEqual(2, links.size(), 'The receipt and the gift, which is what was linked.');
 				for (ContentDocumentLink link : links) {
 					Assert.areEqual(
 						'V',
@@ -228,9 +187,7 @@ private class ReceiptFileAccessTest {
 					// value, and AllUsers there reaches the same internal users (ADR-0034), so AllUsers is
 					// accepted only when the platform refused InternalUsers in this very run.
 					Assert.areEqual(
-						ReceiptWriter.orgRefusesInternalOnlyLinks == true
-							? 'AllUsers'
-							: 'InternalUsers',
+						ReceiptWriter.orgRefusesInternalOnlyLinks == true ? 'AllUsers' : 'InternalUsers',
 						link.Visibility,
 						'A receipt is an internal document: no external user reaches one through a link ' +
 						'this package created.'
@@ -249,11 +206,7 @@ private class ReceiptFileAccessTest {
 	static void linkingAReceiptDocumentToADonorRecordIsRefused() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			ReceiptTestDataFactory.setUpReceipting();
-			Contact ferreira = GivingTestDataFactory.insertHouseholdContact(
-				'The Ferreira Family',
-				'Luis',
-				'Ferreira'
-			);
+			Contact ferreira = GivingTestDataFactory.insertHouseholdContact('The Ferreira Family', 'Luis', 'Ferreira');
 
 			Test.startTest();
 			try {
@@ -266,8 +219,7 @@ private class ReceiptFileAccessTest {
 			} catch (ReceiptWriter.ReceiptFileLinkException refused) {
 				Assert.isTrue(
 					refused.getMessage().contains('Contact'),
-					'The message names the object that was refused, so the mistake is obvious: ' +
-					refused.getMessage()
+					'The message names the object that was refused, so the mistake is obvious: ' + refused.getMessage()
 				);
 			}
 			Test.stopTest();

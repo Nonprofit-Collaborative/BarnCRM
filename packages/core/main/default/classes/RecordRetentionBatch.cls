@@ -84,11 +84,7 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	/** As a step of the nightly run: starts the first pass. */
 	public void execute(SchedulableContext context) {
-		AsyncStarter.batch(
-			new RecordRetentionBatch(SETTING_CHANGES),
-			CHUNK_SIZE,
-			'RecordRetentionBatch'
-		);
+		AsyncStarter.batch(new RecordRetentionBatch(SETTING_CHANGES), CHUNK_SIZE, 'RecordRetentionBatch');
 	}
 
 	/** The step: twenty past one. No switch. The import row cleanup is its pass 7. */
@@ -108,19 +104,13 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {
 		List<String> failures = new List<String>();
-		for (
-			Database.DeleteResult result : Database.delete(scope, false, AccessLevel.SYSTEM_MODE)
-		) {
+		for (Database.DeleteResult result : Database.delete(scope, false, AccessLevel.SYSTEM_MODE)) {
 			if (!result.isSuccess()) {
 				failures.add(result.getId() + ': ' + result.getErrors()[0].getMessage());
 			}
 		}
 		if (!failures.isEmpty()) {
-			ErrorLogger.logMessage(
-				String.join(failures, '\n').left(30000),
-				LOG_CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessage(String.join(failures, '\n').left(30000), LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		}
 	}
 

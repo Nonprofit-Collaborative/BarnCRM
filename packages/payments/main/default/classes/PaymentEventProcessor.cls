@@ -30,11 +30,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 	/** Schedules the four jobs as the running user; those already scheduled are kept. */
 	public static void schedule() {
 		for (Integer minute : MINUTES) {
-			ScheduledJobSelector.ensure(
-				jobName(minute),
-				'0 ' + minute + ' * * * ?',
-				new PaymentEventProcessor()
-			);
+			ScheduledJobSelector.ensure(jobName(minute), '0 ' + minute + ' * * * ?', new PaymentEventProcessor());
 		}
 	}
 
@@ -111,11 +107,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 						new PaymentService.Outcome(event)
 							.nothing(
 								'Failed',
-								BarnHelp.text(
-									'Payments',
-									'Payments_Event_Failed',
-									new List<Object>{ e.getMessage() }
-								)
+								BarnHelp.text('Payments', 'Payments_Event_Failed', new List<Object>{ e.getMessage() })
 							)
 					);
 				}
@@ -147,11 +139,7 @@ public with sharing class PaymentEventProcessor implements Schedulable {
 				new Payment_Event__c(
 					Id = outcome.event.Id,
 					Status__c = 'Failed',
-					Message__c = BarnHelp.text(
-							'Payments',
-							'Payments_Event_Failed',
-							new List<Object>{ e.getMessage() }
-						)
+					Message__c = BarnHelp.text('Payments', 'Payments_Event_Failed', new List<Object>{ e.getMessage() })
 						.abbreviate(255)
 				)
 			);

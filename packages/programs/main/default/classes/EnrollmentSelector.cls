@@ -36,11 +36,7 @@ public with sharing class EnrollmentSelector {
 	 * The enrollments naming these contacts or this account, newest start first, at most
 	 * `howMany`, with their program's name.
 	 */
-	public static List<Enrollment__c> selectForPerson(
-		Set<Id> contactIds,
-		Id accountId,
-		Integer howMany
-	) {
+	public static List<Enrollment__c> selectForPerson(Set<Id> contactIds, Id accountId, Integer howMany) {
 		return [
 			SELECT Id, Program__c, Program__r.Name, Stage__c, Start_Date__c, End_Date__c
 			FROM Enrollment__c
@@ -53,9 +49,7 @@ public with sharing class EnrollmentSelector {
 
 	/** The contacts of this account: for a person account, its one contact. */
 	public static Set<Id> selectContactIdsOf(Id accountId) {
-		return new Map<Id, Contact>(
-				[SELECT Id FROM Contact WHERE AccountId = :accountId WITH USER_MODE LIMIT 2]
-			)
+		return new Map<Id, Contact>([SELECT Id FROM Contact WHERE AccountId = :accountId WITH USER_MODE LIMIT 2])
 			.keySet();
 	}
 
@@ -78,11 +72,7 @@ public with sharing class EnrollmentSelector {
 	 * The program's enrollments at these stages, newest start first, at most `howMany`, with the
 	 * name of the person each names.
 	 */
-	public static List<Enrollment__c> selectRoster(
-		Id programId,
-		Set<String> stages,
-		Integer howMany
-	) {
+	public static List<Enrollment__c> selectRoster(Id programId, Set<String> stages, Integer howMany) {
 		if (stages == null || stages.isEmpty()) {
 			return new List<Enrollment__c>();
 		}

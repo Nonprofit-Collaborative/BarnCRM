@@ -24,10 +24,7 @@ private class ImportControllerTest {
 
 	private static Import_Template__c permittedTemplate() {
 		ImportController.permissionOverride = true;
-		return ImportTestDataFactory.template(
-			ImportTestDataFactory.donorMapping(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		return ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL);
 	}
 
 	/** A page's position, so a failed assertion on an org run says what came back. */
@@ -80,19 +77,14 @@ private class ImportControllerTest {
 			Test.stopTest();
 			Assert.isFalse(templates.isEmpty(), 'The shipped mappings are offered on first use.');
 			Assert.isNotNull(templates[0].name, 'Each one has a name to show.');
-			Assert.isNotNull(
-				templates[0].mapping,
-				'And its mapping, so the picker can start from it.'
-			);
+			Assert.isNotNull(templates[0].mapping, 'And its mapping, so the picker can start from it.');
 		}
 	}
 
 	@IsTest
 	static void suggestsTheObjectAFilePointsAt() {
 		// One candidate object, so the suggestion is unique by construction in any org.
-		ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{
-			Affiliation__c.SObjectType
-		};
+		ImportObjectSchema.detectionObjectsForTest = new List<Schema.SObjectType>{ Affiliation__c.SObjectType };
 		System.runAs(TestUsers.admin()) {
 			ImportController.permissionOverride = true;
 
@@ -101,10 +93,7 @@ private class ImportControllerTest {
 				'Affiliations.xlsx',
 				'[{"name":"Sheet1","headers":["Role"]},{"name":"Other","headers":null}]'
 			);
-			ImportController.ObjectSuggestionView none = ImportController.suggestObject(
-				'budget.csv',
-				null
-			);
+			ImportController.ObjectSuggestionView none = ImportController.suggestObject('budget.csv', null);
 			Test.stopTest();
 
 			String affiliation = String.valueOf(Affiliation__c.SObjectType);
@@ -130,11 +119,7 @@ private class ImportControllerTest {
 			Test.stopTest();
 
 			Map<String, String> targets = ImportMapping.parse(document).targetsBySourceKey();
-			Assert.areEqual(
-				'Contact1.Email',
-				targets.get('email'),
-				'A known heading is suggested.'
-			);
+			Assert.areEqual('Contact1.Email', targets.get('email'), 'A known heading is suggested.');
 			Assert.isFalse(
 				targets.containsKey('board seat expiry'),
 				'And one nobody recognizes loads nothing rather than being guessed at.'
@@ -164,10 +149,7 @@ private class ImportControllerTest {
 			);
 
 			Test.startTest();
-			String document = ImportController.suggestMapping(
-				template.Id,
-				new List<String>{ 'Last Name', 'Email' }
-			);
+			String document = ImportController.suggestMapping(template.Id, new List<String>{ 'Last Name', 'Email' });
 			Test.stopTest();
 
 			Map<String, String> bySource = new Map<String, String>();
@@ -219,17 +201,9 @@ private class ImportControllerTest {
 				FROM Import_Template__c
 				WHERE Id = :template.Id
 			];
-			Assert.areEqual(
-				'Never match',
-				matching.Payment_Matching__c,
-				'Payment matching is kept.'
-			);
+			Assert.areEqual('Never match', matching.Payment_Matching__c, 'Payment matching is kept.');
 			Assert.areEqual(10, matching.Match_Date_Window_Days__c, 'With its window.');
-			Assert.areEqual(
-				'donors.csv',
-				view.fileName,
-				'With the name the administrator uploaded.'
-			);
+			Assert.areEqual('donors.csv', view.fileName, 'With the name the administrator uploaded.');
 			Assert.isTrue(
 				[SELECT Column_Mapping_JSON__c FROM Import_Template__c WHERE Id = :template.Id]
 					.Column_Mapping_JSON__c.contains('Contact1.Phone'),
@@ -328,11 +302,7 @@ private class ImportControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, total, 'One row staged.');
-			Assert.areEqual(
-				2,
-				ImportTestDataFactory.reload(batch.Id)[0].Row_Number__c,
-				'File row two.'
-			);
+			Assert.areEqual(2, ImportTestDataFactory.reload(batch.Id)[0].Row_Number__c, 'File row two.');
 		}
 	}
 
@@ -399,10 +369,7 @@ private class ImportControllerTest {
 				rejected[0].errorMessage,
 				'With the reason the administrator can act on.'
 			);
-			Assert.isNotNull(
-				rejected[0].values,
-				'And the original values, for the exceptions file.'
-			);
+			Assert.isNotNull(rejected[0].values, 'And the original values, for the exceptions file.');
 		}
 	}
 
@@ -426,12 +393,8 @@ private class ImportControllerTest {
 						Import_Batch__c = batch.Id,
 						Row_Number__c = i + 2,
 						Raw_Values_JSON__c = '{"Last Name":"Row ' + i + '"}',
-						Status__c = rejected
-							? ImportRowProcessor.STATUS_REJECTED
-							: ImportRowProcessor.STATUS_PENDING,
-						Error_Message__c = rejected
-							? BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing')
-							: null
+						Status__c = rejected ? ImportRowProcessor.STATUS_REJECTED : ImportRowProcessor.STATUS_PENDING,
+						Error_Message__c = rejected ? BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing') : null
 					)
 				);
 			}
@@ -464,16 +427,8 @@ private class ImportControllerTest {
 			Test.stopTest();
 
 			String pages = ' Pages: ' + String.join(trace, '; ');
-			Assert.areEqual(
-				expectedRejected,
-				page.total,
-				'The cursor holds every rejected row.' + pages
-			);
-			Assert.areEqual(
-				expectedRejected,
-				read.size(),
-				'And every one of them is read.' + pages
-			);
+			Assert.areEqual(expectedRejected, page.total, 'The cursor holds every rejected row.' + pages);
+			Assert.areEqual(expectedRejected, read.size(), 'And every one of them is read.' + pages);
 			Assert.areEqual(5, calls, 'In pages of 500.' + pages);
 			Assert.isFalse(page.hasMore, 'Then the read says it is done.' + pages);
 			Integer previous = 0;
@@ -506,12 +461,7 @@ private class ImportControllerTest {
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 199; i++) {
 				values.add(
-					ImportTestDataFactory.donorRow(
-						'Person' + i,
-						'Surname' + i,
-						'results' + i + '@example.org',
-						null
-					)
+					ImportTestDataFactory.donorRow('Person' + i, 'Surname' + i, 'results' + i + '@example.org', null)
 				);
 			}
 			// No last name: rejected, with a reason and no record.
@@ -524,13 +474,7 @@ private class ImportControllerTest {
 			Database.executeBatch(new ImportProcessorBatch(batch.Id, false), 200);
 			Test.stopTest();
 
-			ImportController.RowPage page = ImportController.getRowPage(
-				batch.Id,
-				null,
-				null,
-				0,
-				2000
-			);
+			ImportController.RowPage page = ImportController.getRowPage(batch.Id, null, null, 0, 2000);
 			Assert.areEqual(200, page.rows.size(), 'Every row, whatever its outcome.');
 			Assert.isFalse(page.hasMore, 'In one page. ' + pageText(page));
 			Map<String, Id> contactByEmail = new Map<String, Id>();
@@ -571,13 +515,7 @@ private class ImportControllerTest {
 				Gift_Id__c = recordId
 			);
 
-			ImportController.RowPage page = ImportController.getRowPage(
-				batch.Id,
-				null,
-				null,
-				0,
-				10
-			);
+			ImportController.RowPage page = ImportController.getRowPage(batch.Id, null, null, 0, 10);
 
 			Assert.areEqual(1, page.rows.size(), 'The one row.');
 			Assert.areEqual(recordId, page.rows[0].resultingRecordId, 'With its record.');
@@ -637,10 +575,7 @@ private class ImportControllerTest {
 				tooLarge.nextIndex,
 				'The next page starts after the first. ' + pageText(tooLarge)
 			);
-			Assert.isTrue(
-				tooLarge.hasMore,
-				'So the rest is left for the next page. ' + pageText(tooLarge)
-			);
+			Assert.isTrue(tooLarge.hasMore, 'So the rest is left for the next page. ' + pageText(tooLarge));
 			Assert.areEqual(
 				2100 - ImportController.MAX_PAGE_ROWS,
 				noSize.rows.size(),
@@ -648,17 +583,9 @@ private class ImportControllerTest {
 			);
 			Assert.areEqual(2100, noSize.nextIndex, 'It ends at the end. ' + pageText(noSize));
 			Assert.isFalse(noSize.hasMore, 'Which ends the read. ' + pageText(noSize));
-			Assert.areEqual(
-				0,
-				pastTheEnd.rows.size(),
-				'A start past the end reads nothing. ' + pageText(pastTheEnd)
-			);
+			Assert.areEqual(0, pastTheEnd.rows.size(), 'A start past the end reads nothing. ' + pageText(pastTheEnd));
 			Assert.isFalse(pastTheEnd.hasMore, 'And says it is done. ' + pageText(pastTheEnd));
-			Assert.areEqual(
-				0,
-				noBatch.total,
-				'No batch, no rows, and no cursor opened. ' + pageText(noBatch)
-			);
+			Assert.areEqual(0, noBatch.total, 'No batch, no rows, and no cursor opened. ' + pageText(noBatch));
 			Assert.isNull(noBatch.cursor, 'So no cursor counts against the daily limit.');
 		}
 	}
@@ -758,9 +685,7 @@ private class ImportControllerTest {
 		batch.Completed_At__c = Datetime.now().addMinutes(1);
 		batch.Undo_Deadline__c = Datetime.now().addDays(30);
 		update batch;
-		insert TestDataFactory.person(
-			new Contact(LastName = 'Ramirez', Created_By_Import_Batch__c = batch.Id)
-		);
+		insert TestDataFactory.person(new Contact(LastName = 'Ramirez', Created_By_Import_Batch__c = batch.Id));
 		return batch;
 	}
 

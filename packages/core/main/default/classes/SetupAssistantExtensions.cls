@@ -11,9 +11,7 @@
 public with sharing class SetupAssistantExtensions {
 	/** The class names dependent packages register, in the order they are asked. */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>{
-		'GivingSetupAssistantExtension'
-	};
+	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'GivingSetupAssistantExtension' };
 
 	/** Injected by Core's tests, since no other package is there to resolve. */
 	@TestVisible

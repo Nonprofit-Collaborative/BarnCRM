@@ -117,24 +117,13 @@ private class CampaignSyncServiceTest {
 				Assert.isNull(saved.Campaign_Id__c, 'Without Campaign the sync does nothing.');
 				return;
 			}
-			Assert.isNotNull(
-				saved.Campaign_Id__c,
-				'The Campaign is linked in the same save (R-CS3).'
-			);
+			Assert.isNotNull(saved.Campaign_Id__c, 'The Campaign is linked in the same save (R-CS3).');
 			SObject copy = campaign(saved.Campaign_Id__c);
 			Assert.areEqual('Spring appeal', copy.get('Name'), 'Name is copied.');
-			Assert.areEqual(
-				saved.Description__c,
-				copy.get('Description'),
-				'Description is copied.'
-			);
+			Assert.areEqual(saved.Description__c, copy.get('Description'), 'Description is copied.');
 			Assert.areEqual(saved.Start_Date__c, copy.get('StartDate'), 'Start Date is copied.');
 			Assert.areEqual(saved.End_Date__c, copy.get('EndDate'), 'End Date is copied.');
-			Assert.areEqual(
-				25000,
-				(Decimal) copy.get('ExpectedRevenue'),
-				'Goal is Expected Revenue.'
-			);
+			Assert.areEqual(25000, (Decimal) copy.get('ExpectedRevenue'), 'Goal is Expected Revenue.');
 			Assert.areEqual(1200, (Decimal) copy.get('ActualCost'), 'Cost is Actual Cost.');
 			Assert.areEqual(true, copy.get('IsActive'), 'Active is copied.');
 			Assert.isNull(copy.get('ParentId'), 'No parent appeal, no parent Campaign.');
@@ -158,24 +147,15 @@ private class CampaignSyncServiceTest {
 			Test.startTest();
 			System.runAs(admin) {
 				update new Appeal__c(Id = spring.Id, Name = 'spring appeal', Goal__c = 30000);
-				SObject handEdited = CampaignSyncService.campaignType()
-					.newSObject(Id.valueOf(link));
+				SObject handEdited = CampaignSyncService.campaignType().newSObject(Id.valueOf(link));
 				handEdited.put('Description', 'Edited on the Campaign');
 				update handEdited;
 			}
 			Test.stopTest();
 
 			SObject copy = campaign(link);
-			Assert.areEqual(
-				'spring appeal',
-				copy.get('Name'),
-				'A change of case alone is still a change.'
-			);
-			Assert.areEqual(
-				30000,
-				(Decimal) copy.get('ExpectedRevenue'),
-				'The new goal is copied.'
-			);
+			Assert.areEqual('spring appeal', copy.get('Name'), 'A change of case alone is still a change.');
+			Assert.areEqual(30000, (Decimal) copy.get('ExpectedRevenue'), 'The new goal is copied.');
 			Appeal__c appeal = reread(spring.Id);
 			Assert.areEqual(
 				'The spring letter to every donor.',
@@ -262,9 +242,7 @@ private class CampaignSyncServiceTest {
 
 			Test.startTest();
 			System.runAs(admin) {
-				CampaignSyncService.syncSaved(
-					new List<Appeal__c>{ reread(child.Id), reread(parent.Id) }
-				);
+				CampaignSyncService.syncSaved(new List<Appeal__c>{ reread(child.Id), reread(parent.Id) });
 			}
 			Test.stopTest();
 			Assert.areEqual(
@@ -298,19 +276,12 @@ private class CampaignSyncServiceTest {
 			Test.startTest();
 			System.runAs(david) {
 				insert spring;
-				result = CampaignSyncService.syncBeforeSave(
-					new List<Appeal__c>{ springAppeal() },
-					null
-				);
+				result = CampaignSyncService.syncBeforeSave(new List<Appeal__c>{ springAppeal() }, null);
 			}
 			Test.stopTest();
 			Assert.isNull(reread(spring.Id).Campaign_Id__c, 'The appeal saves without a Campaign.');
 			if (CampaignSyncService.isAvailable()) {
-				Assert.areEqual(
-					1,
-					result.skipped,
-					'It is skipped and logged, not refused (R-CS4).'
-				);
+				Assert.areEqual(1, result.skipped, 'It is skipped and logged, not refused (R-CS4).');
 			}
 		}
 	}
@@ -387,11 +358,7 @@ private class CampaignSyncServiceTest {
 			Integer logWrites = Limits.getPublishImmediateDML() - logWritesBefore;
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				logWrites,
-				'Two hundred refusals are logged in one statement (R-CS5).'
-			);
+			Assert.areEqual(1, logWrites, 'Two hundred refusals are logged in one statement (R-CS5).');
 			Assert.areEqual(200, countWarnings(), 'Each refused appeal still has its own Warning.');
 			Assert.areEqual(
 				200,
@@ -408,9 +375,7 @@ private class CampaignSyncServiceTest {
 			Assert.isTrue(CampaignSyncService.hasHeadroom(200), 'A fresh transaction has room.');
 			MirrorSync.simulatedQueriesUsed = Limits.getLimitQueries() - 5;
 			List<Appeal__c> first = new List<Appeal__c>{ springAppeal() };
-			List<Appeal__c> second = new List<Appeal__c>{
-				new Appeal__c(Name = 'Autumn appeal', Active__c = true)
-			};
+			List<Appeal__c> second = new List<Appeal__c>{ new Appeal__c(Name = 'Autumn appeal', Active__c = true) };
 			Test.startTest();
 			System.runAs(admin) {
 				insert first;
@@ -427,10 +392,7 @@ private class CampaignSyncServiceTest {
 
 			MirrorSync.simulatedQueriesUsed = null;
 			MirrorSync.simulatedDmlStatementsUsed = Limits.getLimitDmlStatements() - 5;
-			Assert.isFalse(
-				CampaignSyncService.hasHeadroom(1),
-				'Running out of DML statements stops the copy too.'
-			);
+			Assert.isFalse(CampaignSyncService.hasHeadroom(1), 'Running out of DML statements stops the copy too.');
 		}
 	}
 
@@ -480,9 +442,7 @@ private class CampaignSyncServiceTest {
 			if (!CampaignSyncService.isAvailable()) {
 				return;
 			}
-			Account notACampaign = TestDataFactory.organization(
-				new Account(Name = 'Riverside Foundation')
-			);
+			Account notACampaign = TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 			insert notACampaign;
 			Appeal__c spring = springAppeal();
 			spring.Campaign_Id__c = notACampaign.Id;
@@ -549,8 +509,7 @@ private class CampaignSyncServiceTest {
 			}
 			Appeal__c saved = reread(spring.Id);
 			System.runAs(admin) {
-				delete CampaignSyncService.campaignType()
-					.newSObject(Id.valueOf(saved.Campaign_Id__c));
+				delete CampaignSyncService.campaignType().newSObject(Id.valueOf(saved.Campaign_Id__c));
 			}
 			Appeal__c edited = saved.clone(true, true, true, true);
 			edited.Goal__c = 40000;

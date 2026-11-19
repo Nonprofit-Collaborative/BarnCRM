@@ -140,11 +140,7 @@ private class CaseProviderRequestsHourlyTest {
 	@IsTest
 	static void aJobOnAnotherCronIsReplacedNotDoubled() {
 		System.runAs(TestUsers.admin()) {
-			System.schedule(
-				CaseProviderRequestsHourly.JOB_NAME,
-				'0 0 1 * * ?',
-				new CaseProviderRequestsHourly()
-			);
+			System.schedule(CaseProviderRequestsHourly.JOB_NAME, '0 0 1 * * ?', new CaseProviderRequestsHourly());
 			ScheduledJobSelector.forget();
 
 			CaseProviderRequestsHourly.ensure();

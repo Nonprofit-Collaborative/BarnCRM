@@ -46,9 +46,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	/** Health Check: Match Keys Not Filled, with a button that fills them (D-200 P6). */
 	public class FilledCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
-			List<String> scope = HealthCheckService.fixScope(
-				HealthCheckService.FIX_KEY_FILL_MATCH_KEYS
-			);
+			List<String> scope = HealthCheckService.fixScope(HealthCheckService.FIX_KEY_FILL_MATCH_KEYS);
 			if (scope.isEmpty()) {
 				return null;
 			}
@@ -61,8 +59,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 				)
 				.withFix(
 					BarnHelp.text('Core', 'Core_HealthCheck_MatchKeysFix'),
-					HealthCheckService.FIX_ACTION_PREFIX +
-					HealthCheckService.FIX_KEY_FILL_MATCH_KEYS
+					HealthCheckService.FIX_ACTION_PREFIX + HealthCheckService.FIX_KEY_FILL_MATCH_KEYS
 				)
 				.withScope(scope);
 		}
@@ -94,9 +91,7 @@ public with sharing class AddressMatchKeyHandler extends TriggerHandler {
 	 * address has been given its key.
 	 */
 	public static Boolean usable(MatchSourceService.Source source) {
-		Schema.DescribeSObjectResult described = Address__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult described = Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		return source.normalization == MatchSourceService.ADDRESS &&
 			source.objectName == described.getName() &&
 			source.valueField == Address__c.Street__c.getDescribe().getName() &&

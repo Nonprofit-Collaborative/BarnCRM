@@ -37,17 +37,9 @@ private class MatchingGiftServiceTest {
 			);
 
 			List<Soft_Credit__c> credits = RecognitionTestData.creditsFor(data.employerGift.Id);
-			System.assertEquals(
-				1,
-				credits.size(),
-				'The employee is recognized on the company gift'
-			);
+			System.assertEquals(1, credits.size(), 'The employee is recognized on the company gift');
 			System.assertEquals(data.ana.Id, credits[0].Contact__c, 'Ana is the credited person');
-			System.assertEquals(
-				SoftCreditService.ROLE_MATCHED_DONOR,
-				credits[0].Role__c,
-				'The role says why'
-			);
+			System.assertEquals(SoftCreditService.ROLE_MATCHED_DONOR, credits[0].Role__c, 'The role says why');
 			System.assertEquals(500, credits[0].Amount__c, 'The credit is the match, whole');
 		}
 	}
@@ -147,11 +139,7 @@ private class MatchingGiftServiceTest {
 			Test.stopTest();
 
 			Gift__c saved = [SELECT Matched_Gift__c FROM Gift__c WHERE Id = :data.employeeGift.Id];
-			System.assertEquals(
-				data.employerGift.Id,
-				saved.Matched_Gift__c,
-				'A blank employer is not an objection'
-			);
+			System.assertEquals(data.employerGift.Id, saved.Matched_Gift__c, 'A blank employer is not an objection');
 		}
 	}
 
@@ -271,11 +259,7 @@ private class MatchingGiftServiceTest {
 			Database.SaveResult result = Database.update(data.employerGift, false);
 			Test.stopTest();
 
-			System.assertEquals(
-				false,
-				result.isSuccess(),
-				'The link is refused on the record itself'
-			);
+			System.assertEquals(false, result.isSuccess(), 'The link is refused on the record itself');
 			System.assertEquals(
 				0,
 				RecognitionTestData.creditsFor(data.employerGift.Id).size(),

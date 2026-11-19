@@ -22,9 +22,7 @@ private class GivingSelectorTest {
 			insert gift;
 
 			Test.startTest();
-			List<Gift__c> withAllocations = GiftSelector.selectWithAllocations(
-				new Set<Id>{ gift.Id }
-			);
+			List<Gift__c> withAllocations = GiftSelector.selectWithAllocations(new Set<Id>{ gift.Id });
 			Map<Id, Gift__c> amounts = GiftSelector.selectAmountsById(new Set<Id>{ gift.Id });
 			List<Gift__c> plain = GiftSelector.selectById(new Set<Id>{ gift.Id });
 			Test.stopTest();
@@ -84,12 +82,8 @@ private class GivingSelectorTest {
 			Account organization = GivingTestDataFactory.insertOrganization('Riverside Foundation');
 
 			Test.startTest();
-			Map<Id, String> names = GivingAccountSelector.selectRecordTypeNamesById(
-				new Set<Id>{ organization.Id }
-			);
-			Map<Id, String> nothing = GivingAccountSelector.selectRecordTypeNamesById(
-				new Set<Id>()
-			);
+			Map<Id, String> names = GivingAccountSelector.selectRecordTypeNamesById(new Set<Id>{ organization.Id });
+			Map<Id, String> nothing = GivingAccountSelector.selectRecordTypeNamesById(new Set<Id>());
 			Test.stopTest();
 
 			System.assert(

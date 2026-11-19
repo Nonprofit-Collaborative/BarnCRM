@@ -10,11 +10,7 @@
  * (Address Card Fields, R-AD10), those this user can read.
  */
 public with sharing class AddressMoveController {
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-		null,
-		'Core',
-		'Core_Address_MoveFailed'
-	);
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(null, 'Core', 'Core_Address_MoveFailed');
 
 	/** Whether the Addresses feature is on: the card shows nothing while it is off (D-185). */
 	@AuraEnabled(cacheable=true)
@@ -131,22 +127,15 @@ public with sharing class AddressMoveController {
 			}
 			Id householdType = HouseholdService.householdRecordTypeId();
 			if (recordId.getSObjectType() == Account.SObjectType) {
-				for (
-					Account record : HouseholdSelector.getAccountRecordTypes(
-						new Set<Id>{ recordId }
-					)
-				) {
-					context.isHousehold =
-						householdType != null &&
-						record.RecordTypeId == householdType;
+				for (Account record : HouseholdSelector.getAccountRecordTypes(new Set<Id>{ recordId })) {
+					context.isHousehold = householdType != null && record.RecordTypeId == householdType;
 				}
 			}
 			if (context.isHousehold) {
 				return context;
 			}
 			Set<Id> person = new Set<Id>{ recordId };
-			Set<Id> householdIds = HouseholdService.currentHouseholdIdsByPerson(person)
-				.get(recordId);
+			Set<Id> householdIds = HouseholdService.currentHouseholdIdsByPerson(person).get(recordId);
 			Id own = HouseholdService.getHouseholdIdsFor(person).get(recordId);
 			Map<Id, String> names = AddressSelector.selectNames(null, householdIds);
 			if (names.containsKey(own)) {
@@ -167,9 +156,7 @@ public with sharing class AddressMoveController {
 	public static MovePreview getMovePreview(Id householdId) {
 		try {
 			MovePreview preview = new MovePreview();
-			AddressService.HouseholdMove move = AddressService.householdMoves(
-					new Set<Id>{ householdId }
-				)
+			AddressService.HouseholdMove move = AddressService.householdMoves(new Set<Id>{ householdId })
 				.get(householdId);
 			if (move == null) {
 				return preview;
@@ -199,9 +186,7 @@ public with sharing class AddressMoveController {
 		Savepoint before = Database.setSavepoint();
 		try {
 			AddressService.updateEveryonesAddress(
-				new Map<Id, Set<Id>>{
-					householdId => alsoMove == null ? new Set<Id>() : new Set<Id>(alsoMove)
-				}
+				new Map<Id, Set<Id>>{ householdId => alsoMove == null ? new Set<Id>() : new Set<Id>(alsoMove) }
 			);
 		} catch (Exception caught) {
 			Database.rollback(before);
@@ -221,9 +206,7 @@ public with sharing class AddressMoveController {
 			}
 		}
 		Map<Id, String> names = AddressSelector.selectNames(contactIds, accountIds);
-		Map<Id, Contact> details = AddressSelector.selectDistinguishingDetails(
-			sharingANameAmong(names, contactIds)
-		);
+		Map<Id, Contact> details = AddressSelector.selectDistinguishingDetails(sharingANameAmong(names, contactIds));
 		List<Choice> choices = new List<Choice>();
 		for (Id personId : names.keySet()) {
 			choices.add(new Choice(personId, told(names.get(personId), details.get(personId))));
@@ -265,10 +248,7 @@ public with sharing class AddressMoveController {
 			);
 		}
 		if (fields.containsKey('Email') && String.isNotBlank(detail.Email)) {
-			return String.format(
-				System.Label.Core_Format_Parenthetical,
-				new List<Object>{ name, detail.Email }
-			);
+			return String.format(System.Label.Core_Format_Parenthetical, new List<Object>{ name, detail.Email });
 		}
 		return name;
 	}

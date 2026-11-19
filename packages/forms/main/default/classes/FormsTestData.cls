@@ -32,16 +32,10 @@ public class FormsTestData {
 					'title' => 'Guardian',
 					'showWhen' => new Map<String, Object>{
 						'all' => new List<Object>{
-							new Map<String, Object>{
-								'field' => 'age',
-								'op' => 'lessThan',
-								'value' => 18
-							}
+							new Map<String, Object>{ 'field' => 'age', 'op' => 'lessThan', 'value' => 18 }
 						}
 					},
-					'fields' => new List<Object>{
-						field('guardian', 'text', true, 'person', 'Description')
-					}
+					'fields' => new List<Object>{ field('guardian', 'text', true, 'person', 'Description') }
 				}
 			},
 			'records' => new List<Object>{
@@ -51,10 +45,7 @@ public class FormsTestData {
 					'key' => 'link',
 					'kind' => 'related',
 					'object' => 'Affiliation__c',
-					'links' => new Map<String, Object>{
-						'Contact__c' => 'person',
-						'Organization__c' => 'employer'
-					},
+					'links' => new Map<String, Object>{ 'Contact__c' => 'person', 'Organization__c' => 'employer' },
 					'values' => new Map<String, Object>{ 'Status__c' => 'Current' }
 				}
 			}
@@ -75,10 +66,7 @@ public class FormsTestData {
 			'required' => required
 		};
 		if (record != null) {
-			field.put(
-				'target',
-				new Map<String, Object>{ 'record' => record, 'field' => targetField }
-			);
+			field.put('target', new Map<String, Object>{ 'record' => record, 'field' => targetField });
 		}
 		return field;
 	}
@@ -128,9 +116,7 @@ public class FormsTestData {
 	public static Form__c publicWithFileAndSaving() {
 		Map<String, Object> definition = publicDefinition(50);
 		((Map<String, Object>) definition.get('public')).put('saveForLater', true);
-		Map<String, Object> firstStep = (Map<String, Object>) ((List<Object>) definition.get(
-			'steps'
-		))[0];
+		Map<String, Object> firstStep = (Map<String, Object>) ((List<Object>) definition.get('steps'))[0];
 		((List<Object>) firstStep.get('fields')).add(field('cv', 'file', false, null, null));
 		return publicForm(definition);
 	}
@@ -139,9 +125,7 @@ public class FormsTestData {
 	public static Form__c publicForm(Map<String, Object> definition) {
 		Form__c form = published('Public Volunteer Interest', definition);
 		update as user new Form__c(Id = form.Id, Public__c = true);
-		FormIntakeService.giveKey(
-			[SELECT Id FROM Form_Version__c WHERE Form__c = :form.Id WITH USER_MODE][0].Id
-		);
+		FormIntakeService.giveKey([SELECT Id FROM Form_Version__c WHERE Form__c = :form.Id WITH USER_MODE][0].Id);
 		return form;
 	}
 }

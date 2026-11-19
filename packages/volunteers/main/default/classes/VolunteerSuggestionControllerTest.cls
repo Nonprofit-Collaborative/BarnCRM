@@ -16,10 +16,7 @@ private class VolunteerSuggestionControllerTest {
 			COORDINATOR,
 			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 		);
-		TestUsers.standardUserWith(
-			READER,
-			new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' }
-		);
+		TestUsers.standardUserWith(READER, new List<String>{ 'BarnCRM_Read_Only', 'Volunteers_Read_Only' });
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.volunteerSettings(false, false);
@@ -72,17 +69,11 @@ private class VolunteerSuggestionControllerTest {
 			Volunteer_Shift__c shift = theShift();
 			Contact person = volunteer('Person', 'Active', null);
 			Contact plain = volunteer('Plain', 'Active', null);
-			Account personAccount = TestDataFactory.organization(
-				new Account(Name = 'Person Account Stand In')
-			);
+			Account personAccount = TestDataFactory.organization(new Account(Name = 'Person Account Stand In'));
 			insert personAccount;
-			VolunteerSuggestionController.accountsBehindForTest = new Map<Id, Id>{
-				person.Id => personAccount.Id
-			};
+			VolunteerSuggestionController.accountsBehindForTest = new Map<Id, Id>{ person.Id => personAccount.Id };
 
-			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(
-				shift.Id
-			);
+			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(shift.Id);
 
 			Assert.isNotNull(find(result, personAccount.Id), 'Suggested by the account.');
 			Assert.isNull(find(result, person.Id), 'Not by the contact behind it.');
@@ -104,17 +95,11 @@ private class VolunteerSuggestionControllerTest {
 			dropped.Status__c = 'Cancelled';
 			insert dropped;
 
-			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(
-				shift.Id
-			);
+			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(shift.Id);
 
 			Assert.isTrue(result.canBook, 'An admin can book an open shift.');
 			Assert.areEqual('Saturday', result.weekday, 'The shift is on a Saturday.');
-			Assert.areEqual(
-				1,
-				result.candidates.size(),
-				'Not signed up (any status), Active only.'
-			);
+			Assert.areEqual(1, result.candidates.size(), 'Not signed up (any status), Active only.');
 			Assert.areEqual(fit.Id, result.candidates[0].personId, 'The free active volunteer.');
 			Assert.areEqual(
 				new List<String>{ 'Saturday', 'Sunday' },
@@ -135,29 +120,13 @@ private class VolunteerSuggestionControllerTest {
 			Contact keen = volunteer('Keen', 'Active', null);
 			Contact other = volunteer('Other', 'Active', null);
 			insert new List<Volunteer_Skill__c>{
-				new Volunteer_Skill__c(
-					Contact__c = skilled.Id,
-					Skill__c = forklift.Id,
-					Type__c = 'Skill'
-				),
+				new Volunteer_Skill__c(Contact__c = skilled.Id, Skill__c = forklift.Id, Type__c = 'Skill'),
 				// Not a skill the job asks for: left out of the facts.
-				new Volunteer_Skill__c(
-					Contact__c = skilled.Id,
-					Skill__c = spanish.Id,
-					Type__c = 'Skill'
-				),
-				new Volunteer_Skill__c(
-					Contact__c = keen.Id,
-					Skill__c = forklift.Id,
-					Type__c = 'Interest'
-				)
+				new Volunteer_Skill__c(Contact__c = skilled.Id, Skill__c = spanish.Id, Type__c = 'Skill'),
+				new Volunteer_Skill__c(Contact__c = keen.Id, Skill__c = forklift.Id, Type__c = 'Interest')
 			};
 			VolunteersTestData.volunteerSettings(false, false);
-			Volunteer_Hours__c hours = VolunteersTestData.newHours(
-				skilled.Id,
-				shift.Volunteer_Job__c,
-				6
-			);
+			Volunteer_Hours__c hours = VolunteersTestData.newHours(skilled.Id, shift.Volunteer_Job__c, 6);
 			insert hours;
 			insert new List<Volunteer_Requirement__c>{
 				new Volunteer_Requirement__c(
@@ -166,16 +135,10 @@ private class VolunteerSuggestionControllerTest {
 					Status__c = 'Completed',
 					Completed_Date__c = Date.today().addDays(-5)
 				),
-				new Volunteer_Requirement__c(
-					Contact__c = keen.Id,
-					Type__c = 'Orientation',
-					Status__c = 'In progress'
-				)
+				new Volunteer_Requirement__c(Contact__c = keen.Id, Type__c = 'Orientation', Status__c = 'In progress')
 			};
 
-			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(
-				shift.Id
-			);
+			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(shift.Id);
 
 			Assert.areEqual(
 				new List<Id>{ forklift.Id },
@@ -193,8 +156,7 @@ private class VolunteerSuggestionControllerTest {
 			Assert.areEqual('none', c.onboarding, 'No steps, no signal.');
 			Assert.areEqual(0, c.hoursOnJob, 'No hours.');
 			Assert.areEqual(
-				[SELECT Hours__c FROM Volunteer_Hours__c WHERE Status__c = 'Approved' LIMIT 1]
-				.Hours__c,
+				[SELECT Hours__c FROM Volunteer_Hours__c WHERE Status__c = 'Approved' LIMIT 1].Hours__c,
 				a.hoursOnJob,
 				'Approved hours on this job.'
 			);
@@ -208,9 +170,7 @@ private class VolunteerSuggestionControllerTest {
 			volunteer('Fit', 'Active', null);
 			update new Volunteer_Shift__c(Id = shift.Id, Status__c = 'Cancelled');
 
-			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(
-				shift.Id
-			);
+			VolunteerSuggestionController.Suggestions result = VolunteerSuggestionController.getSuggestions(shift.Id);
 
 			Assert.isFalse(result.canBook, 'A cancelled shift is not offered volunteers.');
 			Assert.isTrue(result.candidates.isEmpty(), 'And nobody is listed.');
@@ -238,16 +198,12 @@ private class VolunteerSuggestionControllerTest {
 			// Made by the coordinator, so what private sharing lets them see is not in question.
 			volunteer('Fit', 'Active', 'Saturday');
 			Id shiftId = theShift().Id;
-			VolunteerSuggestionController.Suggestions before = VolunteerSuggestionController.getSuggestions(
-				shiftId
-			);
+			VolunteerSuggestionController.Suggestions before = VolunteerSuggestionController.getSuggestions(shiftId);
 			Assert.areEqual(1, before.candidates.size(), 'One person to suggest.');
 
 			VolunteerShiftSignupsController.addSignup(shiftId, before.candidates[0].personId, null);
 
-			VolunteerSuggestionController.Suggestions after = VolunteerSuggestionController.getSuggestions(
-				shiftId
-			);
+			VolunteerSuggestionController.Suggestions after = VolunteerSuggestionController.getSuggestions(shiftId);
 			Assert.isTrue(after.candidates.isEmpty(), 'Booked, so no longer suggested.');
 		}
 	}

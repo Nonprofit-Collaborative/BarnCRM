@@ -92,11 +92,7 @@ private class CorporateHubSampleDataTest {
 				[SELECT COUNT() FROM Compliance_Obligation__c WHERE Sample_Data__c = TRUE],
 				'Five obligations'
 			);
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Compliance_Cycle__c WITH SYSTEM_MODE],
-				'Three past cycles'
-			);
+			Assert.areEqual(3, [SELECT COUNT() FROM Compliance_Cycle__c WITH SYSTEM_MODE], 'Three past cycles');
 			Assert.areEqual(
 				5,
 				[
@@ -118,11 +114,7 @@ private class CorporateHubSampleDataTest {
 				WHERE Name = 'Board of Directors'
 				WITH SYSTEM_MODE
 			];
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Board__c WHERE Sample_Data__c = TRUE],
-				'A board and a committee'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Board__c WHERE Sample_Data__c = TRUE], 'A board and a committee');
 			Assert.areEqual(
 				5,
 				[
@@ -133,26 +125,10 @@ private class CorporateHubSampleDataTest {
 				],
 				'Five seats on the board'
 			);
-			Assert.areEqual(
-				7,
-				[SELECT COUNT() FROM Board_Member__c WITH SYSTEM_MODE],
-				'Seven seats in all'
-			);
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Board_Meeting__c WITH SYSTEM_MODE],
-				'Three meetings'
-			);
-			Assert.areEqual(
-				9,
-				[SELECT COUNT() FROM Meeting_Attendee__c WITH SYSTEM_MODE],
-				'Nine attendees'
-			);
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Board_Motion__c WITH SYSTEM_MODE],
-				'Two motions'
-			);
+			Assert.areEqual(7, [SELECT COUNT() FROM Board_Member__c WITH SYSTEM_MODE], 'Seven seats in all');
+			Assert.areEqual(3, [SELECT COUNT() FROM Board_Meeting__c WITH SYSTEM_MODE], 'Three meetings');
+			Assert.areEqual(9, [SELECT COUNT() FROM Meeting_Attendee__c WITH SYSTEM_MODE], 'Nine attendees');
+			Assert.areEqual(2, [SELECT COUNT() FROM Board_Motion__c WITH SYSTEM_MODE], 'Two motions');
 			Board_Motion__c passed = [
 				SELECT Votes_For__c, Abstentions__c
 				FROM Board_Motion__c
@@ -161,11 +137,7 @@ private class CorporateHubSampleDataTest {
 			];
 			Assert.areEqual(3, passed.Votes_For__c, 'Three votes for');
 			Assert.areEqual(1, passed.Abstentions__c, 'One abstention');
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Meeting_Action_Item__c WITH SYSTEM_MODE],
-				'Three action items'
-			);
+			Assert.areEqual(3, [SELECT COUNT() FROM Meeting_Action_Item__c WITH SYSTEM_MODE], 'Three action items');
 		}
 	}
 
@@ -180,11 +152,7 @@ private class CorporateHubSampleDataTest {
 				Version__c = 1
 			);
 			insert as user real;
-			Board__c realBoard = new Board__c(
-				Name = 'Real Board',
-				Type__c = 'Board',
-				Status__c = 'Active'
-			);
+			Board__c realBoard = new Board__c(Name = 'Real Board', Type__c = 'Board', Status__c = 'Active');
 			insert as user realBoard;
 
 			Test.startTest();
@@ -226,16 +194,8 @@ private class CorporateHubSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Board_Member__c WITH SYSTEM_MODE],
-				'No sample people, no seats'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Board_Vote__c WITH SYSTEM_MODE],
-				'No sample people, no votes'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Board_Member__c WITH SYSTEM_MODE], 'No sample people, no seats');
+			Assert.areEqual(0, [SELECT COUNT() FROM Board_Vote__c WITH SYSTEM_MODE], 'No sample people, no votes');
 			Assert.areEqual(
 				5,
 				[SELECT COUNT() FROM Hub_Document__c WHERE Sample_Data__c = TRUE],

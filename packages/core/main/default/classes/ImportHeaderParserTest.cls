@@ -58,11 +58,7 @@ private class ImportHeaderParserTest {
 	}
 
 	private static String read(String header) {
-		ImportHeaderParser.Resolved found = ImportHeaderParser.resolve(
-			header,
-			objects(),
-			new TestFields()
-		);
+		ImportHeaderParser.Resolved found = ImportHeaderParser.resolve(header, objects(), new TestFields());
 		return found == null ? null : found.objectName + '.' + found.fieldName;
 	}
 
@@ -172,12 +168,7 @@ private class ImportHeaderParserTest {
 		Assert.areEqual(
 			'Contact',
 			ImportHeaderParser.objectOfHeaders(
-				new List<String>{
-					'Notes',
-					'Account.Account Name',
-					'Contact.First Name',
-					'Phone (Contact)'
-				},
+				new List<String>{ 'Notes', 'Account.Account Name', 'Contact.First Name', 'Phone (Contact)' },
 				objects(),
 				new TestFields()
 			),
@@ -193,17 +184,10 @@ private class ImportHeaderParserTest {
 			'A tie goes to the first named.'
 		);
 		Assert.isNull(
-			ImportHeaderParser.objectOfHeaders(
-				new List<String>{ 'First Name', 'Email' },
-				objects(),
-				new TestFields()
-			),
+			ImportHeaderParser.objectOfHeaders(new List<String>{ 'First Name', 'Email' }, objects(), new TestFields()),
 			'Field names alone name no object.'
 		);
-		Assert.isNull(
-			ImportHeaderParser.objectOfHeaders(null, objects(), new TestFields()),
-			'No headings.'
-		);
+		Assert.isNull(ImportHeaderParser.objectOfHeaders(null, objects(), new TestFields()), 'No headings.');
 	}
 
 	@IsTest
@@ -279,10 +263,7 @@ private class ImportHeaderParserTest {
 		found = ImportHeaderParser.find('EMAIL', contactFields());
 		Assert.areEqual('Email', found.name, 'Exact ignoring case.');
 		Assert.isFalse(found.guessed, 'Still exact.');
-		Assert.isNull(
-			ImportHeaderParser.match('Frist Name', contactFields()),
-			'match stays exact.'
-		);
+		Assert.isNull(ImportHeaderParser.match('Frist Name', contactFields()), 'match stays exact.');
 	}
 
 	@IsTest
@@ -301,10 +282,7 @@ private class ImportHeaderParserTest {
 				null
 			}
 		) {
-			Assert.isNull(
-				ImportHeaderParser.find(header, contactFields()),
-				'"' + header + '" must not be guessed.'
-			);
+			Assert.isNull(ImportHeaderParser.find(header, contactFields()), '"' + header + '" must not be guessed.');
 		}
 		Assert.isNull(ImportHeaderParser.guess('Frist Name', null), 'No keys, no guess.');
 		Map<String, String> person = new Map<String, String>();
@@ -325,10 +303,7 @@ private class ImportHeaderParserTest {
 		Map<String, String> shared = new Map<String, String>();
 		ImportHeaderParser.putKey(shared, 'Shift', 'Shift__c');
 		ImportHeaderParser.putKey(shared, 'Shift', 'Other_Shift__c');
-		Assert.isNull(
-			ImportHeaderParser.guess('Shifts', shared),
-			'A spelling two names share is never offered.'
-		);
+		Assert.isNull(ImportHeaderParser.guess('Shifts', shared), 'A spelling two names share is never offered.');
 	}
 
 	@IsTest
@@ -340,11 +315,7 @@ private class ImportHeaderParserTest {
 			'Mobile Phon (Contact)' => 'Contact.MobilePhone'
 		};
 		for (String header : expected.keySet()) {
-			ImportHeaderParser.Resolved found = ImportHeaderParser.resolveOrGuess(
-				header,
-				objects(),
-				new TestFields()
-			);
+			ImportHeaderParser.Resolved found = ImportHeaderParser.resolveOrGuess(header, objects(), new TestFields());
 			Assert.isNotNull(found, 'A guess for "' + header + '".');
 			Assert.areEqual(
 				expected.get(header),
@@ -360,14 +331,7 @@ private class ImportHeaderParserTest {
 			new TestFields()
 		);
 		Assert.isFalse(exact.guessed, 'An exact two-part heading is not flagged.');
-		for (
-			String header : new List<String>{
-				'Contcts.Shoe Size',
-				'Donor.Phone',
-				'Contact.Account',
-				'Frist Name'
-			}
-		) {
+		for (String header : new List<String>{ 'Contcts.Shoe Size', 'Donor.Phone', 'Contact.Account', 'Frist Name' }) {
 			Assert.isNull(
 				ImportHeaderParser.resolveOrGuess(header, objects(), new TestFields()),
 				'"' + header + '" must not be guessed.'
@@ -377,10 +341,7 @@ private class ImportHeaderParserTest {
 
 	@IsTest
 	static void guessesTheObjectASheetOrFileIsNamedFor() {
-		ImportHeaderParser.Found found = ImportHeaderParser.objectOfNameOrGuess(
-			'Contcts',
-			objects()
-		);
+		ImportHeaderParser.Found found = ImportHeaderParser.objectOfNameOrGuess('Contcts', objects());
 		Assert.areEqual('Contact', found.name, 'A typo of a tab name.');
 		Assert.isTrue(found.guessed, 'Flagged.');
 		found = ImportHeaderParser.objectOfFileNameOrGuess('Contcts export 2026.csv', objects());

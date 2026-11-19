@@ -97,23 +97,18 @@ public with sharing class GiftTransactionMirrorSchema {
 	@TestVisible
 	private static void useStandIns() {
 		Names standIn = new Names();
-		standIn.transactionObject = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getName();
+		standIn.transactionObject = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		standIn.donorField = Gift__c.Donor_Account__c.getDescribe().getName();
 		standIn.dateField = Gift__c.Gift_Date__c.getDescribe().getName();
 		standIn.amountField = Gift__c.Amount__c.getDescribe().getName();
 		standIn.currentAmountField = null;
 		standIn.statusField = Gift__c.Status__c.getDescribe().getName();
 		standIn.nameField = 'Name';
-		standIn.linkObject = Gift_Allocation__c.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
-			.getName();
+		standIn.linkObject = Gift_Allocation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		standIn.linkTransactionField = Gift_Allocation__c.Gift__c.getDescribe().getName();
 		standIn.linkDesignationField = Gift_Allocation__c.Fund__c.getDescribe().getName();
 		standIn.linkAmountField = Gift_Allocation__c.Amount__c.getDescribe().getName();
-		standIn.designationObject = Fund__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getName();
+		standIn.designationObject = Fund__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		standIn.createdAlso.put(Gift__c.Type__c.getDescribe().getName(), 'Cash');
 		names = standIn;
 		standInTypes = new Map<String, Schema.SObjectType>{
@@ -155,12 +150,7 @@ public with sharing class GiftTransactionMirrorSchema {
 
 	/** What a Gift Transaction must let a run write for the copy to work. */
 	public static List<String> requiredToCreate() {
-		return new List<String>{
-			names.donorField,
-			names.dateField,
-			names.amountField,
-			names.statusField
-		};
+		return new List<String>{ names.donorField, names.dateField, names.amountField, names.statusField };
 	}
 
 	/** What the reconciliation reads from a Gift Transaction. */
@@ -288,9 +278,7 @@ public with sharing class GiftTransactionMirrorSchema {
 
 	/** The Gift Designation object, or null where it is absent or not in the expected shape. */
 	public static Schema.SObjectType designationType() {
-		return isAvailable() && designationShaped
-			? describedOf(names.designationObject).type
-			: null;
+		return isAvailable() && designationShaped ? describedOf(names.designationObject).type : null;
 	}
 
 	/** The designation junction object, or null where it is absent or not in the expected shape. */
@@ -304,11 +292,7 @@ public with sharing class GiftTransactionMirrorSchema {
 	}
 
 	private static List<String> designationFields() {
-		return new List<String>{
-			names.linkTransactionField,
-			names.linkDesignationField,
-			names.linkAmountField
-		};
+		return new List<String>{ names.linkTransactionField, names.linkDesignationField, names.linkAmountField };
 	}
 
 	// ------------------------------------------------------------------------------- helpers
@@ -389,8 +373,7 @@ public with sharing class GiftTransactionMirrorSchema {
 	}
 
 	private static Boolean refersTo(Schema.DescribeFieldResult field, Schema.SObjectType target) {
-		return isType(field, Schema.DisplayType.REFERENCE) &&
-			field.getReferenceTo().contains(target);
+		return isType(field, Schema.DisplayType.REFERENCE) && field.getReferenceTo().contains(target);
 	}
 
 	private static Boolean isType(Schema.DescribeFieldResult field, Schema.DisplayType type) {

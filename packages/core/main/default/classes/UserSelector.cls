@@ -20,11 +20,7 @@ public with sharing class UserSelector {
 		return [
 			SELECT Id, Name, Email, Username, IsActive
 			FROM User
-			WHERE
-				IsActive = TRUE
-				AND UserType != :GUEST_USER_TYPE
-				AND (Name LIKE :pattern
-				OR Email LIKE :pattern)
+			WHERE IsActive = TRUE AND UserType != :GUEST_USER_TYPE AND (Name LIKE :pattern OR Email LIKE :pattern)
 			WITH USER_MODE
 			ORDER BY Name
 			LIMIT :resultLimit

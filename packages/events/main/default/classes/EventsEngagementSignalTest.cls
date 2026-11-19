@@ -49,18 +49,11 @@ private class EventsEngagementSignalTest {
 					'EventsEngagementSignal'
 				)
 				.newInstance();
-			Map<Id, Decimal> totals = signal.totals(
-				new Set<Id>{ jane },
-				Date.today().addMonths(-12)
-			);
+			Map<Id, Decimal> totals = signal.totals(new Set<Id>{ jane }, Date.today().addMonths(-12));
 			Test.stopTest();
 
 			Assert.areEqual(2, attendees.size(), 'Jane was registered for both events');
-			Assert.areEqual(
-				attendees[0].Contact__c,
-				attendees[1].Contact__c,
-				'Matched as one person'
-			);
+			Assert.areEqual(attendees[0].Contact__c, attendees[1].Contact__c, 'Matched as one person');
 			Assert.areEqual('Events', signal.key(), 'The Events part');
 			Assert.areEqual(1, totals.get(jane), 'Only the event in the window counts');
 		}

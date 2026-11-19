@@ -67,11 +67,7 @@ public with sharing class HouseholdSoftCreditRecompute implements Queueable {
 		if (System.isFuture() || Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
 			// No async slot to take. The credits are corrected the next time each gift is saved.
 			ErrorLogger.logMessage(
-				BarnHelp.text(
-					'Giving',
-					'Giving_SoftCredits_RecomputeDeferred',
-					new List<Object>{ pending.size() }
-				),
+				BarnHelp.text('Giving', 'Giving_SoftCredits_RecomputeDeferred', new List<Object>{ pending.size() }),
 				CONTEXT,
 				'Warning'
 			);

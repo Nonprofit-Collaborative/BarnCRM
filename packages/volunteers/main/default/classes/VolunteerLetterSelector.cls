@@ -67,11 +67,7 @@ public with sharing class VolunteerLetterSelector {
 	}
 
 	/** Approved hours in the period, summed per person and job, with the job's brand (C-47b). */
-	public static List<AggregateResult> approvedHoursByJob(
-		Set<Id> personIds,
-		Date fromDate,
-		Date toDate
-	) {
+	public static List<AggregateResult> approvedHoursByJob(Set<Id> personIds, Date fromDate, Date toDate) {
 		return [
 			SELECT
 				Contact__c,
@@ -93,11 +89,7 @@ public with sharing class VolunteerLetterSelector {
 	}
 
 	/** Each person (contact or person account) with approved hours in the period, up to a cap. */
-	public static List<AggregateResult> peopleWithApprovedHours(
-		Date fromDate,
-		Date toDate,
-		Integer cap
-	) {
+	public static List<AggregateResult> peopleWithApprovedHours(Date fromDate, Date toDate, Integer cap) {
 		return [
 			SELECT Contact__c, Account__c
 			FROM Volunteer_Hours__c

@@ -55,9 +55,7 @@ public with sharing class HealthCheckAccessChecks {
 		}
 	}
 
-	private static HealthCheckService.Finding noAdminFinding(
-		HealthCheckService.AccessCounts counts
-	) {
+	private static HealthCheckService.Finding noAdminFinding(HealthCheckService.AccessCounts counts) {
 		Integer admins = counts.administrators();
 		if (admins > 0) {
 			return null;
@@ -73,9 +71,7 @@ public with sharing class HealthCheckAccessChecks {
 			.withFix(System.Label.Core_HealthCheck_AccessFix, HealthCheckService.SECTION_ACCESS);
 	}
 
-	private static HealthCheckService.Finding usersWithoutAccessFinding(
-		HealthCheckService.AccessCounts counts
-	) {
+	private static HealthCheckService.Finding usersWithoutAccessFinding(HealthCheckService.AccessCounts counts) {
 		Integer without = counts.usersWithoutAccess();
 		if (without <= 0) {
 			return null;

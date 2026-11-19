@@ -13,11 +13,7 @@
  */
 public with sharing class SessionScheduleController {
 	private static final String CONTEXT = 'Schedule sessions panel';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Programs',
-			'Programs_Fail_Schedule'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Programs', 'Programs_Fail_Schedule')
 		.showingDml();
 	/** The most sessions created in one action. */
 	public static final Integer MAX_SESSIONS = 200;
@@ -129,9 +125,7 @@ public with sharing class SessionScheduleController {
 		String endTime
 	) {
 		if (serviceId == null) {
-			throw UserErrors.message(
-				BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired')
-			);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired'));
 		}
 		Set<Date> unique = new Set<Date>(dates == null ? new List<Date>() : dates);
 		unique.remove(null);
@@ -140,10 +134,7 @@ public with sharing class SessionScheduleController {
 		}
 		if (unique.size() > MAX_SESSIONS) {
 			throw UserErrors.message(
-				String.format(
-					BarnHelp.text('Programs', 'Programs_Schedule_TooMany'),
-					new List<Object>{ MAX_SESSIONS }
-				)
+				String.format(BarnHelp.text('Programs', 'Programs_Schedule_TooMany'), new List<Object>{ MAX_SESSIONS })
 			);
 		}
 		Time starts = parsedTime(startTime);
@@ -209,8 +200,7 @@ public with sharing class SessionScheduleController {
 		try {
 			Schedule schedule = scheduleFor(recordId);
 			Option service = offeredService(schedule, serviceId);
-			String name =
-				service.label + (schedule.cohortName == null ? '' : ', ' + schedule.cohortName);
+			String name = service.label + (schedule.cohortName == null ? '' : ', ' + schedule.cohortName);
 			Session_Schedule__c saved = new Session_Schedule__c(
 				Name = name.left(NAME_LENGTH),
 				Program__c = schedule.programId,
@@ -286,9 +276,7 @@ public with sharing class SessionScheduleController {
 	}
 
 	private static Preview previewOf(Id scheduleId) {
-		Session_Schedule__c schedule = scheduleId == null
-			? null
-			: SessionScheduleSelector.forPreview(scheduleId);
+		Session_Schedule__c schedule = scheduleId == null ? null : SessionScheduleSelector.forPreview(scheduleId);
 		if (schedule == null) {
 			throw UserErrors.message(failed());
 		}
@@ -297,14 +285,9 @@ public with sharing class SessionScheduleController {
 		preview.turnedOff = SessionScheduleService.isTurnedOff();
 		preview.createdThrough = schedule.Created_Through__c;
 		preview.through = SessionScheduleService.lastDay(schedule);
-		preview.canCreate =
-			preview.active &&
-			!preview.turnedOff &&
-			Schema.SObjectType.Session__c.isCreateable();
+		preview.canCreate = preview.active && !preview.turnedOff && Schema.SObjectType.Session__c.isCreateable();
 		preview.canRemove = !preview.turnedOff && Schema.SObjectType.Session__c.isDeletable();
-		List<Date> missing = SessionScheduleService.missingDays(
-				new List<Session_Schedule__c>{ schedule }
-			)
+		List<Date> missing = SessionScheduleService.missingDays(new List<Session_Schedule__c>{ schedule })
 			.get(schedule.Id);
 		preview.missing = missing == null ? 0 : missing.size();
 		return preview;
@@ -337,8 +320,7 @@ public with sharing class SessionScheduleController {
 			schedule.services.add(option);
 		}
 		schedule.canSchedule = Schema.SObjectType.Session__c.isCreateable();
-		schedule.canSaveSchedule =
-			schedule.canSchedule && Schema.SObjectType.Session_Schedule__c.isCreateable();
+		schedule.canSaveSchedule = schedule.canSchedule && Schema.SObjectType.Session_Schedule__c.isCreateable();
 		return schedule;
 	}
 

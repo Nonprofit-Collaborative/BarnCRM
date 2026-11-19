@@ -134,21 +134,11 @@ private class ImportRowProcessorTest {
 				)
 			);
 			ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
-			mapping.columns.add(
-				new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail')
-			);
+			mapping.columns.add(new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail'));
 			mapping.columns.add(new ImportMapping.Column('Do Not Call', 'Contact1.DoNotCall'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
-			Map<String, String> row = ImportTestDataFactory.donorRow(
-				'Ana',
-				'Ramirez',
-				'ana@example.org',
-				null
-			);
+			Map<String, String> row = ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', null);
 			row.put('Email Opt Out', 'Yes');
 			row.put('Do Not Call', 'No');
 			ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ row });
@@ -207,11 +197,7 @@ private class ImportRowProcessorTest {
 
 			Assert.areEqual(0, outcome.created, 'Nobody new was created.');
 			Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'There is still one Ana Ramirez.');
-			Assert.areEqual(
-				1,
-				outcome.matched + outcome.updated,
-				'The row matched the person already there.'
-			);
+			Assert.areEqual(1, outcome.matched + outcome.updated, 'The row matched the person already there.');
 		}
 	}
 
@@ -243,12 +229,7 @@ private class ImportRowProcessorTest {
 		System.runAs(TestUsers.admin()) {
 			given(
 				new List<Map<String, String>>{
-					ImportTestDataFactory.donorRow(
-						'Ana',
-						'Ramirez',
-						'ana@example.org',
-						'Rose City'
-					),
+					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City'),
 					ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', 'Rose City')
 				}
 			);
@@ -273,18 +254,8 @@ private class ImportRowProcessorTest {
 			insert AccountKindsTestData.organization('Rose City');
 			given(
 				new List<Map<String, String>>{
-					ImportTestDataFactory.donorRow(
-						'Ana',
-						'Ramirez',
-						'ana@example.org',
-						'Rose City'
-					),
-					ImportTestDataFactory.donorRow(
-						'Ben',
-						'Okafor',
-						'ben@example.org',
-						'Hillside Bakery'
-					)
+					ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', 'Rose City'),
+					ImportTestDataFactory.donorRow('Ben', 'Okafor', 'ben@example.org', 'Hillside Bakery')
 				}
 			);
 			AccountKinds.usableOverride = false;
@@ -293,10 +264,7 @@ private class ImportRowProcessorTest {
 			Test.stopTest();
 
 			List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
-			Assert.isNotNull(
-				rows[0].Organization__c,
-				'An organization Salesforce has still matches.'
-			);
+			Assert.isNotNull(rows[0].Organization__c, 'An organization Salesforce has still matches.');
 			Assert.areEqual(
 				ImportRowProcessor.STATUS_REJECTED,
 				rows[1].Status__c,
@@ -415,10 +383,7 @@ private class ImportRowProcessorTest {
 		ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
 		mapping.columns.add(new ImportMapping.Column('Born', 'Contact1.Birthdate'));
 		mapping.columns.add(new ImportMapping.Column('Title', 'Contact1.Title'));
-		template = ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 		batch = ImportTestDataFactory.batch(template);
 		ImportTestDataFactory.rows(batch, values);
 	}
@@ -510,10 +475,7 @@ private class ImportRowProcessorTest {
 			TestDataFactory.defaultSettings();
 			ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
 			mapping.columns.add(new ImportMapping.Column('Revenue', 'Organization.AnnualRevenue'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(batch, values);
 
@@ -588,22 +550,13 @@ private class ImportRowProcessorTest {
 			ImportMapping mapping = new ImportMapping();
 			mapping.columns.add(new ImportMapping.Column('Donor', 'Contact1.FullName'));
 			mapping.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(
 				batch,
 				new List<Map<String, String>>{
-					new Map<String, String>{
-						'Donor' => 'Ana Ramirez',
-						'Email' => 'ana@example.org'
-					},
-					new Map<String, String>{
-						'Donor' => 'Okafor, Ben',
-						'Email' => 'ben@example.org'
-					}
+					new Map<String, String>{ 'Donor' => 'Ana Ramirez', 'Email' => 'ana@example.org' },
+					new Map<String, String>{ 'Donor' => 'Okafor, Ben', 'Email' => 'ben@example.org' }
 				}
 			);
 
@@ -615,21 +568,9 @@ private class ImportRowProcessorTest {
 			for (Contact record : [SELECT FirstName, LastName, Email FROM Contact]) {
 				byEmail.put(record.Email, record);
 			}
-			Assert.areEqual(
-				'Ana',
-				byEmail.get('ana@example.org').FirstName,
-				'First name from "Ana Ramirez".'
-			);
-			Assert.areEqual(
-				'Ramirez',
-				byEmail.get('ana@example.org').LastName,
-				'And the last name.'
-			);
-			Assert.areEqual(
-				'Ben',
-				byEmail.get('ben@example.org').FirstName,
-				'The comma form reads too.'
-			);
+			Assert.areEqual('Ana', byEmail.get('ana@example.org').FirstName, 'First name from "Ana Ramirez".');
+			Assert.areEqual('Ramirez', byEmail.get('ana@example.org').LastName, 'And the last name.');
+			Assert.areEqual('Ben', byEmail.get('ben@example.org').FirstName, 'The comma form reads too.');
 			Assert.areEqual('Okafor', byEmail.get('ben@example.org').LastName, 'Surname first.');
 		}
 	}
@@ -642,19 +583,12 @@ private class ImportRowProcessorTest {
 			mapping.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
 			mapping.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
 			mapping.columns.add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(
 				batch,
 				new List<Map<String, String>>{
-					new Map<String, String>{
-						'Email' => 'ana@example.org',
-						'Last Name' => 'Ramirez',
-						'Amount' => '100'
-					}
+					new Map<String, String>{ 'Email' => 'ana@example.org', 'Last Name' => 'Ramirez', 'Amount' => '100' }
 				}
 			);
 
@@ -666,10 +600,7 @@ private class ImportRowProcessorTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, outcome.created, 'The person still loaded.');
-			Assert.isFalse(
-				outcome.notes.isEmpty(),
-				'And the run log says the gift column did not.'
-			);
+			Assert.isFalse(outcome.notes.isEmpty(), 'And the run log says the gift column did not.');
 		}
 	}
 
@@ -748,10 +679,7 @@ private class ImportRowProcessorTest {
 
 	/** One row naming a household and the two people who live in it. */
 	private static void givenACoupleOnOneRow(String personMode) {
-		template = ImportTestDataFactory.template(
-			coupleMapping(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		template = ImportTestDataFactory.template(coupleMapping(), ImportTemplateService.RULE_EMAIL);
 		template.Person_Mode__c = personMode;
 		update template;
 		batch = ImportTestDataFactory.batch(template);
@@ -806,10 +734,7 @@ private class ImportRowProcessorTest {
 				households[0].Name,
 				'Named from the row, which is what the household column on the row means.'
 			);
-			Assert.isTrue(
-				households[0].Custom_Name__c,
-				'And named by hand, so naming leaves it be.'
-			);
+			Assert.isTrue(households[0].Custom_Name__c, 'And named by hand, so naming leaves it be.');
 			Assert.areEqual(
 				2,
 				[
@@ -840,22 +765,14 @@ private class ImportRowProcessorTest {
 
 			List<Account> households = households();
 			Assert.areEqual(1, households.size(), 'One row of two people is still one household.');
-			Assert.areEqual(
-				'The Garcia Lee Household',
-				households[0].Name,
-				'Named from the row here too.'
-			);
+			Assert.areEqual('The Garcia Lee Household', households[0].Name, 'Named from the row here too.');
 			Assert.isTrue(households[0].Custom_Name__c, 'And named by hand.');
 			Assert.areEqual(
 				2,
 				[SELECT COUNT() FROM Contact WHERE AccountId = :households[0].Id],
 				'Both people point at it, which is what contact mode means.'
 			);
-			Assert.areEqual(
-				2,
-				households[0].Member_Count__c,
-				'And the household counts both of them.'
-			);
+			Assert.areEqual(2, households[0].Member_Count__c, 'And the household counts both of them.');
 		}
 	}
 
@@ -887,12 +804,7 @@ private class ImportRowProcessorTest {
 				HouseholdService.personAccountOverride = true;
 				PersonRecordSelector.personRecordOverride = true;
 				PersonRecordSelector.personOverridesByName = new Map<String, HouseholdService.Person>{
-					'Maria Garcia' => HouseholdTestDataFactory.person(
-						'Ms.',
-						'Maria',
-						'Garcia',
-						'Head'
-					),
+					'Maria Garcia' => HouseholdTestDataFactory.person('Ms.', 'Maria', 'Garcia', 'Head'),
 					'Wei Lee' => HouseholdTestDataFactory.person('Mr.', 'Wei', 'Lee', null)
 				};
 				OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
@@ -939,11 +851,7 @@ private class ImportRowProcessorTest {
 				'And they are two different people.'
 			);
 			Import_Row__c row = ImportTestDataFactory.reload(batch.Id)[0];
-			Assert.areEqual(
-				households[0].Id,
-				row.Household__c,
-				'The row records the household it resolved to.'
-			);
+			Assert.areEqual(households[0].Id, row.Household__c, 'The row records the household it resolved to.');
 		}
 	}
 
@@ -955,16 +863,11 @@ private class ImportRowProcessorTest {
 	static void aSecondPersonWithNobodyToJoinStillGetsAHousehold() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-			template = ImportTestDataFactory.template(
-				coupleMapping(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(coupleMapping(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(
 				batch,
-				new List<Map<String, String>>{
-					new Map<String, String>{ 'First 2' => 'Wei', 'Last 2' => 'Lee' }
-				}
+				new List<Map<String, String>>{ new Map<String, String>{ 'First 2' => 'Wei', 'Last 2' => 'Lee' } }
 			);
 
 			Test.startTest();
@@ -979,11 +882,7 @@ private class ImportRowProcessorTest {
 				.Created_By_Import_Batch__c,
 				'Which carries the import tag, because the import made it.'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Household_Member__c],
-				'Joined to it by one membership row.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Household_Member__c], 'Joined to it by one membership row.');
 		}
 	}
 
@@ -997,12 +896,7 @@ private class ImportRowProcessorTest {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
 			insert TestDataFactory.person(
-				new Contact(
-					FirstName = 'Ana',
-					LastName = 'Ramirez',
-					Email = 'ana@example.org',
-					MailingCity = 'Salem'
-				)
+				new Contact(FirstName = 'Ana', LastName = 'Ramirez', Email = 'ana@example.org', MailingCity = 'Salem')
 			);
 			given(
 				new List<Map<String, String>>{
@@ -1013,11 +907,7 @@ private class ImportRowProcessorTest {
 			run(false);
 			Test.stopTest();
 
-			List<Import_Journal__c> pages = ImportJournalService.pages(
-				batch.Id,
-				ImportJournalService.PHASE_COMMIT,
-				10
-			);
+			List<Import_Journal__c> pages = ImportJournalService.pages(batch.Id, ImportJournalService.PHASE_COMMIT, 10);
 			Assert.areEqual(1, pages.size(), 'The chunk wrote one journal page.');
 			List<Map<String, Object>> entries = ImportJournalService.entries(pages[0]);
 			Assert.areEqual(1, entries.size(), 'One record was updated.');
@@ -1058,10 +948,7 @@ private class ImportRowProcessorTest {
 			mapping.columns.add(new ImportMapping.Column('First Name', 'Contact1.FirstName'));
 			mapping.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
 			mapping.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(
 				batch,
@@ -1089,15 +976,8 @@ private class ImportRowProcessorTest {
 			Map<String, Object> entry = ImportJournalService.entries(
 				ImportJournalService.pages(batch.Id, ImportJournalService.PHASE_COMMIT, 10)[0]
 			)[0];
-			Map<String, Object> name = (Map<String, Object>) ((Map<String, Object>) entry.get(
-					'fields'
-				))
-				.get('Name');
-			Assert.areEqual(
-				String.valueOf(household.Id),
-				(String) entry.get('id'),
-				'The entry names the household.'
-			);
+			Map<String, Object> name = (Map<String, Object>) ((Map<String, Object>) entry.get('fields')).get('Name');
+			Assert.areEqual(String.valueOf(household.Id), (String) entry.get('id'), 'The entry names the household.');
 			Assert.areEqual(household.Name, name.get('before'), 'With the name it had before.');
 		}
 	}
@@ -1119,9 +999,7 @@ private class ImportRowProcessorTest {
 				)
 			);
 		}
-		values.add(
-			ImportTestDataFactory.donorRow('Lonely', '', 'lonely@example.org', 'Lonely Employer')
-		);
+		values.add(ImportTestDataFactory.donorRow('Lonely', '', 'lonely@example.org', 'Lonely Employer'));
 		return values;
 	}
 
@@ -1154,10 +1032,7 @@ private class ImportRowProcessorTest {
 				'None for the rejected row.'
 			);
 			Import_Row__c rejected = ImportTestDataFactory.reload(batch.Id)[199];
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing'),
-				rejected.Error_Message__c
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing'), rejected.Error_Message__c);
 			Assert.isNull(rejected.Organization__c, 'Pointing at nothing it did not create.');
 		}
 	}
@@ -1180,10 +1055,7 @@ private class ImportRowProcessorTest {
 			mapping.columns.add(new ImportMapping.Column('Last 2', 'Contact2.LastName'));
 			mapping.columns.add(new ImportMapping.Column('Email 2', 'Contact2.Email'));
 			mapping.columns.add(new ImportMapping.Column('Employer', 'Organization.Name'));
-			template = ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 			batch = ImportTestDataFactory.batch(template);
 			List<Map<String, String>> values = new List<Map<String, String>>();
 			for (Integer i = 0; i < 200; i++) {
@@ -1258,9 +1130,7 @@ private class ImportRowProcessorTest {
 		) {
 			if (throwOnResolve) {
 				// Something saved before the failure, as a gift would be, must not survive it.
-				insert as user TestDataFactory.organization(
-					new Account(Name = 'Saved before the failure')
-				);
+				insert as user TestDataFactory.organization(new Account(Name = 'Saved before the failure'));
 				throw new IllegalArgumentException('stub failed');
 			}
 			sawDryRun = dryRun;
@@ -1292,11 +1162,7 @@ private class ImportRowProcessorTest {
 			return new List<Schema.SObjectType>();
 		}
 
-		public Map<Id, String> reasonsToKeep(
-			Id batchId,
-			Schema.SObjectType type,
-			Set<Id> recordIds
-		) {
+		public Map<Id, String> reasonsToKeep(Id batchId, Schema.SObjectType type, Set<Id> recordIds) {
 			return new Map<Id, String>();
 		}
 	}
@@ -1307,28 +1173,19 @@ private class ImportRowProcessorTest {
 		mapping.columns.add(new ImportMapping.Column('Email', 'Contact1.Email'));
 		mapping.columns.add(new ImportMapping.Column('Last Name', 'Contact1.LastName'));
 		mapping.columns.add(new ImportMapping.Column('Amount', 'Gift.Amount__c'));
-		template = ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 		batch = ImportTestDataFactory.batch(template);
 		ImportTestDataFactory.rows(batch, values);
 	}
 
 	private static Map<String, String> giftRow(String email, String lastName, String amount) {
-		return new Map<String, String>{
-			'Email' => email,
-			'Last Name' => lastName,
-			'Amount' => amount
-		};
+		return new Map<String, String>{ 'Email' => email, 'Last Name' => lastName, 'Amount' => amount };
 	}
 
 	private static Map<String, Import_Row__c> rowsByEmail() {
 		Map<String, Import_Row__c> result = new Map<String, Import_Row__c>();
 		for (Import_Row__c row : ImportTestDataFactory.reload(batch.Id)) {
-			Map<String, Object> raw = (Map<String, Object>) JSON.deserializeUntyped(
-				row.Raw_Values_JSON__c
-			);
+			Map<String, Object> raw = (Map<String, Object>) JSON.deserializeUntyped(row.Raw_Values_JSON__c);
 			result.put((String) raw.get('Email'), row);
 		}
 		return result;
@@ -1337,9 +1194,7 @@ private class ImportRowProcessorTest {
 	@IsTest
 	static void theProcessorSeesThePeopleCoreResolved() {
 		System.runAs(TestUsers.admin()) {
-			givenGiftRows(
-				new List<Map<String, String>>{ giftRow('ana@example.org', 'Ramirez', '50') }
-			);
+			givenGiftRows(new List<Map<String, String>>{ giftRow('ana@example.org', 'Ramirez', '50') });
 			StubProcessor stub = new StubProcessor();
 			ImportEntityProcessors.processorOverride = stub;
 
@@ -1349,17 +1204,9 @@ private class ImportRowProcessorTest {
 
 			Id contactId = [SELECT Id FROM Contact LIMIT 1].Id;
 			Import_Row__c seen = stub.seen.values()[0];
-			Assert.areEqual(
-				contactId,
-				seen.Contact_1__c,
-				'The row carried the donor when offered.'
-			);
+			Assert.areEqual(contactId, seen.Contact_1__c, 'The row carried the donor when offered.');
 			Assert.isNotNull(seen.Household__c, 'And the household.');
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_PENDING,
-				seen.Status__c,
-				'Pending, not final.'
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_PENDING, seen.Status__c, 'Pending, not final.');
 			Assert.areEqual(
 				'50',
 				stub.seenEntities.get(seen.Id).get('Gift').get('Amount__c'),
@@ -1367,20 +1214,11 @@ private class ImportRowProcessorTest {
 			);
 			Assert.isFalse(stub.sawDryRun, 'A commit is not a dry run.');
 			Assert.areEqual(1, outcome.created, 'The row counts once.');
-			Assert.isTrue(
-				outcome.fileAmount == 50,
-				'The amount read is handed back for control totals.'
-			);
-			Assert.isTrue(
-				outcome.notes.contains('stub note'),
-				'The processor note is in the run log.'
-			);
+			Assert.isTrue(outcome.fileAmount == 50, 'The amount read is handed back for control totals.');
+			Assert.isTrue(outcome.notes.contains('stub note'), 'The processor note is in the run log.');
 			Assert.isFalse(
 				outcome.notes.contains(
-					String.format(
-						BarnHelp.text('Core', 'Core_Import_LogEntitiesNotLoaded'),
-						new List<String>{ 'Gift' }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Import_LogEntitiesNotLoaded'), new List<String>{ 'Gift' })
 				),
 				'Nothing says the gift columns were not loaded when a processor loaded them.'
 			);
@@ -1407,16 +1245,8 @@ private class ImportRowProcessorTest {
 
 			Map<String, Import_Row__c> rows = rowsByEmail();
 			Import_Row__c rejected = rows.get('ana@example.org');
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_REJECTED,
-				rejected.Status__c,
-				'Rejection wins.'
-			);
-			Assert.areEqual(
-				'No fund named Nowhere.',
-				rejected.Error_Message__c,
-				'With its reason.'
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_REJECTED, rejected.Status__c, 'Rejection wins.');
+			Assert.areEqual('No fund named Nowhere.', rejected.Error_Message__c, 'With its reason.');
 			Assert.areEqual(
 				ImportRowProcessor.STATUS_CREATED,
 				rows.get('ben@example.org').Status__c,
@@ -1440,10 +1270,7 @@ private class ImportRowProcessorTest {
 			);
 			Assert.areEqual(2, outcome.rejected, 'Two rows rejected.');
 			Assert.areEqual(2, outcome.created, 'Two created.');
-			Assert.isTrue(
-				outcome.fileAmount == 30,
-				'Every readable amount counts, rejected or not.'
-			);
+			Assert.isTrue(outcome.fileAmount == 30, 'Every readable amount counts, rejected or not.');
 		}
 	}
 
@@ -1534,9 +1361,7 @@ private class ImportRowProcessorTest {
 	@IsTest
 	static void aDryRunOffersTheRowsWithoutWriting() {
 		System.runAs(TestUsers.admin()) {
-			givenGiftRows(
-				new List<Map<String, String>>{ giftRow('ana@example.org', 'Ramirez', '50') }
-			);
+			givenGiftRows(new List<Map<String, String>>{ giftRow('ana@example.org', 'Ramirez', '50') });
 			StubProcessor stub = new StubProcessor();
 			ImportEntityProcessors.processorOverride = stub;
 

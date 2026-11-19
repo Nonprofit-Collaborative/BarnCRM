@@ -66,20 +66,12 @@ private class PaymentWebhookRestTest {
 	@IsTest
 	static void postsThatCannotBeAStripeEventAreRefused() {
 		System.runAs(PaymentsTestData.admin()) {
-			String body = PaymentsTestData.stripeEvent(
-				'evt_8',
-				'charge.refunded',
-				new Map<String, Object>()
-			);
+			String body = PaymentsTestData.stripeEvent('evt_8', 'charge.refunded', new Map<String, Object>());
 			Assert.areEqual(400, stripe(body), 'Refused while Stripe is not connected');
 			PaymentsTestData.connect(PaymentService.STRIPE);
 
 			Assert.areEqual(400, stripe('{"type":"charge.refunded"}'), 'No event id');
-			Assert.areEqual(
-				400,
-				stripe('{"id":"ch_1","type":"charge.refunded"}'),
-				'Not an event id'
-			);
+			Assert.areEqual(400, stripe('{"id":"ch_1","type":"charge.refunded"}'), 'Not an event id');
 			Assert.areEqual(400, stripe('not json'), 'Not an event');
 			Assert.areEqual(
 				200,
@@ -99,11 +91,7 @@ private class PaymentWebhookRestTest {
 	static void aPayPalEventIsKeptWithItsHeaders() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.PAYPAL);
-			String body = PaymentsTestData.payPalEvent(
-				'WH-7',
-				'PAYMENT.CAPTURE.COMPLETED',
-				new Map<String, Object>()
-			);
+			String body = PaymentsTestData.payPalEvent('WH-7', 'PAYMENT.CAPTURE.COMPLETED', new Map<String, Object>());
 			Map<String, String> headers = (Map<String, String>) JSON.deserialize(
 				PaymentsTestData.payPalHeaders(),
 				Map<String, String>.class
@@ -111,16 +99,8 @@ private class PaymentWebhookRestTest {
 			Map<String, String> partial = headers.clone();
 			partial.remove('paypal-transmission-sig');
 
-			Assert.areEqual(
-				400,
-				PaymentWebhookRest.store(request('paypal', body, partial)),
-				'Unsigned'
-			);
-			Assert.areEqual(
-				200,
-				PaymentWebhookRest.store(request('paypal', body, headers)),
-				'Kept'
-			);
+			Assert.areEqual(400, PaymentWebhookRest.store(request('paypal', body, partial)), 'Unsigned');
+			Assert.areEqual(200, PaymentWebhookRest.store(request('paypal', body, headers)), 'Kept');
 
 			Payment_Event__c stored = [
 				SELECT Event_Key__c, Event_Id__c, Headers__c, Processor__c
@@ -129,18 +109,12 @@ private class PaymentWebhookRestTest {
 			];
 			Assert.isNull(stored.Event_Key__c, 'Keyed only once PayPal verifies it');
 			Assert.areEqual('WH-7', stored.Event_Id__c, 'Its id');
-			Assert.isTrue(
-				stored.Headers__c.contains('paypal-transmission-sig'),
-				'Headers kept to verify'
-			);
+			Assert.isTrue(stored.Headers__c.contains('paypal-transmission-sig'), 'Headers kept to verify');
 		}
 	}
 
 	private static Map<String, String> payPalHeaders() {
-		return (Map<String, String>) JSON.deserialize(
-			PaymentsTestData.payPalHeaders(),
-			Map<String, String>.class
-		);
+		return (Map<String, String>) JSON.deserialize(PaymentsTestData.payPalHeaders(), Map<String, String>.class);
 	}
 
 	private static Integer payPal(String body) {
@@ -150,11 +124,7 @@ private class PaymentWebhookRestTest {
 	@IsTest
 	static void nothingIsStoredForPayPalUntilItIsConnected() {
 		System.runAs(PaymentsTestData.admin()) {
-			String body = PaymentsTestData.payPalEvent(
-				'WH-6',
-				'PAYMENT.CAPTURE.COMPLETED',
-				new Map<String, Object>()
-			);
+			String body = PaymentsTestData.payPalEvent('WH-6', 'PAYMENT.CAPTURE.COMPLETED', new Map<String, Object>());
 
 			Assert.areEqual(400, payPal(body), 'Refused while PayPal is not set up');
 			Assert.areEqual(0, storedEvents(), 'Nothing stored');
@@ -168,20 +138,10 @@ private class PaymentWebhookRestTest {
 
 			Assert.areEqual(
 				200,
-				payPal(
-					PaymentsTestData.payPalEvent(
-						'WH-5',
-						'CUSTOMER.DISPUTE.CREATED',
-						new Map<String, Object>()
-					)
-				),
+				payPal(PaymentsTestData.payPalEvent('WH-5', 'CUSTOMER.DISPUTE.CREATED', new Map<String, Object>())),
 				'A type the job does not act on is acknowledged, so PayPal stops sending it'
 			);
-			Assert.areEqual(
-				400,
-				payPal('{"id":"WH-4","event_type":"PAYMENT.CAPTURE.COMPLETED"}'),
-				'No resource'
-			);
+			Assert.areEqual(400, payPal('{"id":"WH-4","event_type":"PAYMENT.CAPTURE.COMPLETED"}'), 'No resource');
 			Assert.areEqual(400, payPal('not json'), 'Not an event');
 			Assert.areEqual(0, storedEvents(), 'Nothing stored');
 		}
@@ -235,21 +195,11 @@ private class PaymentWebhookRestTest {
 				);
 			}
 			Database.insert(flood, AccessLevel.SYSTEM_MODE);
-			String stripeBody = PaymentsTestData.stripeEvent(
-				'evt_7',
-				'charge.refunded',
-				new Map<String, Object>()
-			);
+			String stripeBody = PaymentsTestData.stripeEvent('evt_7', 'charge.refunded', new Map<String, Object>());
 
 			Assert.areEqual(
 				429,
-				payPal(
-					PaymentsTestData.payPalEvent(
-						'WH-3',
-						'PAYMENT.CAPTURE.COMPLETED',
-						new Map<String, Object>()
-					)
-				),
+				payPal(PaymentsTestData.payPalEvent('WH-3', 'PAYMENT.CAPTURE.COMPLETED', new Map<String, Object>())),
 				'PayPal is at its cap'
 			);
 			String second = PaymentsTestData.payPalEvent(
@@ -270,10 +220,7 @@ private class PaymentWebhookRestTest {
 				],
 				'One Warning for the hour, not one per refused post'
 			);
-			Assert.isNotNull(
-				PaymentService.settings().Webhook_Cap_Hit_At__c,
-				'Health Check can see the cap was hit'
-			);
+			Assert.isNotNull(PaymentService.settings().Webhook_Cap_Hit_At__c, 'Health Check can see the cap was hit');
 			Assert.areEqual(
 				200,
 				stripe(stripeBody),
@@ -291,11 +238,7 @@ private class PaymentWebhookRestTest {
 			PaymentWebhookRest.receive();
 
 			Assert.areEqual(400, RestContext.response.statusCode, 'Refused');
-			Assert.areEqual(
-				'{}',
-				RestContext.response.responseBody.toString(),
-				'Says nothing more'
-			);
+			Assert.areEqual('{}', RestContext.response.responseBody.toString(), 'Says nothing more');
 		}
 	}
 }

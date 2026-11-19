@@ -50,10 +50,7 @@ public with sharing class AffiliationService {
 	 * copies are passed in as well so that a person who has just lost an affiliation, or has
 	 * just had one moved to somebody else, is settled too.
 	 */
-	public static void refreshPrimaries(
-		List<Affiliation__c> records,
-		List<Affiliation__c> previous
-	) {
+	public static void refreshPrimaries(List<Affiliation__c> records, List<Affiliation__c> previous) {
 		Set<Id> personIds = new Set<Id>();
 		Set<Id> justSaved = new Set<Id>();
 		collectPeople(records, personIds, justSaved);
@@ -76,11 +73,7 @@ public with sharing class AffiliationService {
 		recompute(personIds, new Set<Id>());
 	}
 
-	private static void collectPeople(
-		List<Affiliation__c> records,
-		Set<Id> personIds,
-		Set<Id> justSaved
-	) {
+	private static void collectPeople(List<Affiliation__c> records, Set<Id> personIds, Set<Id> justSaved) {
 		if (records == null) {
 			return;
 		}
@@ -102,10 +95,7 @@ public with sharing class AffiliationService {
 	private static void recompute(Set<Id> personIds, Set<Id> justSaved) {
 		Map<Id, List<Affiliation__c>> byPerson = new Map<Id, List<Affiliation__c>>();
 		for (Affiliation__c affiliation : AffiliationUpkeepSelector.selectForPrimary(personIds)) {
-			Id personId = PersonReference.idOf(
-				affiliation.Contact__c,
-				affiliation.Person_Account__c
-			);
+			Id personId = PersonReference.idOf(affiliation.Contact__c, affiliation.Person_Account__c);
 			if (personId == null) {
 				continue;
 			}
@@ -127,9 +117,7 @@ public with sharing class AffiliationService {
 			for (Affiliation__c affiliation : affiliations) {
 				Boolean shouldBePrimary = chosen != null && affiliation.Id == chosen.Id;
 				if (affiliation.Is_Primary__c == true && !shouldBePrimary) {
-					flagsToClear.add(
-						new Affiliation__c(Id = affiliation.Id, Is_Primary__c = false)
-					);
+					flagsToClear.add(new Affiliation__c(Id = affiliation.Id, Is_Primary__c = false));
 				}
 			}
 		}
@@ -147,20 +135,14 @@ public with sharing class AffiliationService {
 	 * nothing in this save to go on, the newest wins. Nothing is promoted on its own: a person
 	 * with no flagged affiliation has no primary organization, which is the honest answer.
 	 */
-	private static Affiliation__c choosePrimary(
-		List<Affiliation__c> affiliations,
-		Set<Id> justSaved
-	) {
+	private static Affiliation__c choosePrimary(List<Affiliation__c> affiliations, Set<Id> justSaved) {
 		if (affiliations == null || affiliations.isEmpty()) {
 			return null;
 		}
 		Affiliation__c fromThisSave;
 		Affiliation__c newest;
 		for (Affiliation__c affiliation : affiliations) {
-			if (
-				affiliation.Is_Primary__c != true ||
-				affiliation.Status__c == ConnectionStatus.FORMER
-			) {
+			if (affiliation.Is_Primary__c != true || affiliation.Status__c == ConnectionStatus.FORMER) {
 				continue;
 			}
 			if (justSaved != null && justSaved.contains(affiliation.Id)) {

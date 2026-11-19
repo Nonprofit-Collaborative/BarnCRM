@@ -26,10 +26,7 @@ private class ImportValuesTest {
 			Assert.isFalse(ImportValues.same(null, 'Ana'));
 			Assert.isFalse(ImportValues.same('text', 5), 'Text is no number.');
 			Id userId = UserInfo.getUserId();
-			Assert.isTrue(
-				ImportValues.same(String.valueOf(userId).left(15), userId),
-				'An ID in either length.'
-			);
+			Assert.isTrue(ImportValues.same(String.valueOf(userId).left(15), userId), 'An ID in either length.');
 			Test.stopTest();
 		}
 	}
@@ -50,10 +47,7 @@ private class ImportValuesTest {
 			Assert.areNotEqual(ImportValues.digest('P', 'key'), ImportValues.digest('O', 'key'));
 			Assert.isNull(ImportValues.idOrNull('not an id'));
 			Assert.isNull(ImportValues.idOrNull(' '));
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				ImportValues.idOrNull(' ' + UserInfo.getUserId() + ' ')
-			);
+			Assert.areEqual(UserInfo.getUserId(), ImportValues.idOrNull(' ' + UserInfo.getUserId() + ' '));
 			Assert.areEqual(7, ImportValues.rowNumber(new Import_Row__c(Row_Number__c = 7)));
 			Assert.isNull(ImportValues.rowNumber(null));
 		}
@@ -65,10 +59,7 @@ private class ImportValuesTest {
 	}
 
 	private static void reads(Decimal expected, Decimal actual, String why) {
-		Assert.isTrue(
-			actual != null && actual == expected,
-			'Expected ' + expected + ', read ' + actual + '. ' + why
-		);
+		Assert.isTrue(actual != null && actual == expected, 'Expected ' + expected + ', read ' + actual + '. ' + why);
 	}
 
 	@IsTest
@@ -85,11 +76,7 @@ private class ImportValuesTest {
 			reads(1250000, ImportValues.number('1,250,000', '.', ','));
 			reads(12.5, ImportValues.number('12.5%', '.', ','));
 			reads(0.5, ImportValues.number('.5', '.', ','));
-			reads(
-				1234.5,
-				ImportValues.number('1.234,5', '.', ','),
-				'Both marks: the later is the decimal.'
-			);
+			reads(1234.5, ImportValues.number('1.234,5', '.', ','), 'Both marks: the later is the decimal.');
 			// Germany: comma for decimals, point for groups.
 			reads(1250.5, ImportValues.number('1.250,50 €', ',', '.'));
 			reads(1.5, ImportValues.number('1,5', ',', '.'));
@@ -103,10 +90,7 @@ private class ImportValuesTest {
 
 			// Anything that would be a guess is refused.
 			Assert.isNull(ImportValues.number('1,25', '.', ','), 'A comma that groups nothing.');
-			Assert.isNull(
-				ImportValues.number('1.250', ',', ''),
-				'A thousand or one and a quarter.'
-			);
+			Assert.isNull(ImportValues.number('1.250', ',', ''), 'A thousand or one and a quarter.');
 			Assert.isNull(ImportValues.number('1.2.3,4', '.', ','));
 			Assert.isNull(ImportValues.number('1,234,5.6', '.', ','));
 			Assert.isNull(ImportValues.number('(-45)', '.', ','), 'Negative twice.');

@@ -8,11 +8,7 @@
  */
 public with sharing class ProjectApprovalsController {
 	private static final String CONTEXT = 'ProjectApprovalsController';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Projects',
-			'Projects_Error_Generic'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Projects', 'Projects_Error_Generic')
 		.showingDml();
 
 	public class Queue {
@@ -88,12 +84,7 @@ public with sharing class ProjectApprovalsController {
 				LIMIT 2000
 			]) {
 				decided.add(
-					new Time_Entry__c(
-						Id = entry.Id,
-						Status__c = status,
-						Approved_By__c = me,
-						Rejection_Reason__c = why
-					)
+					new Time_Entry__c(Id = entry.Id, Status__c = status, Approved_By__c = me, Rejection_Reason__c = why)
 				);
 			}
 			for (Project_Expense__c expense : [

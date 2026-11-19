@@ -33,12 +33,7 @@ private class RollupChangeDetectionTest {
 			new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => field,
-						'operator' => 'equals',
-						'value' => 'x'
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => field, 'operator' => 'equals', 'value' => 'x' }
 				}
 			}
 		);
@@ -68,11 +63,7 @@ private class RollupChangeDetectionTest {
 	private static Set<Id> definitionIds(RollupChanges.Marked result) {
 		Set<Id> ids = new Set<Id>();
 		List<Rollup_Definition__c> named = result.definitionsFor('Account');
-		for (
-			Rollup_Definition__c definition : named == null
-				? new List<Rollup_Definition__c>()
-				: named
-		) {
+		for (Rollup_Definition__c definition : named == null ? new List<Rollup_Definition__c>() : named) {
 			ids.add(definition.Id);
 		}
 		return ids;
@@ -106,13 +97,7 @@ private class RollupChangeDetectionTest {
 		}
 
 		RollupChanges.Marked run(List<Rollup_Definition__c> definitions) {
-			return RollupChanges.forSave(
-				'Account',
-				this.records,
-				this.oldRecords,
-				false,
-				definitions
-			);
+			return RollupChanges.forSave('Account', this.records, this.oldRecords, false, definitions);
 		}
 	}
 
@@ -268,14 +253,7 @@ private class RollupChangeDetectionTest {
 			);
 			Test.stopTest();
 
-			Set<Id> everyNewParent = new Set<Id>{
-				parent(1),
-				parent(2),
-				parent(3),
-				parent(4),
-				parent(50),
-				parent(6)
-			};
+			Set<Id> everyNewParent = new Set<Id>{ parent(1), parent(2), parent(3), parent(4), parent(50), parent(6) };
 			Assert.areEqual(everyNewParent, marked(inserted), 'An insert marks every record');
 			Assert.areEqual(everyNewParent, marked(restored), 'So does an undelete');
 			Assert.areEqual(

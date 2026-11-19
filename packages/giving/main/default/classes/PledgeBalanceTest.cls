@@ -127,11 +127,7 @@ private class PledgeBalanceTest {
 			Installment__c first = firstPaymentOf(pledge.Id);
 			Assert.areEqual('Partially paid', first.Status__c, 'Sixty of the hundred is paid.');
 			Assert.areEqual(60, first.Paid_Amount__c, 'The payment\'s paid amount.');
-			Assert.areEqual(
-				240,
-				GivingRollupTestData.person(person.Id).Pledge_Balance__c,
-				'Ana\'s pledge balance.'
-			);
+			Assert.areEqual(240, GivingRollupTestData.person(person.Id).Pledge_Balance__c, 'Ana\'s pledge balance.');
 			Assert.areEqual(
 				240,
 				GivingRollupTestData.account(person.AccountId).Pledge_Balance__c,
@@ -165,11 +161,7 @@ private class PledgeBalanceTest {
 			Installment__c first = firstPaymentOf(pledge.Id);
 			Assert.areEqual('Scheduled', first.Status__c, 'The payment is unpaid again.');
 			Assert.areEqual(0, first.Paid_Amount__c, 'The payment\'s paid amount.');
-			Assert.areEqual(
-				100,
-				GivingRollupTestData.person(person.Id).Pledge_Balance__c,
-				'Ana\'s pledge balance.'
-			);
+			Assert.areEqual(100, GivingRollupTestData.person(person.Id).Pledge_Balance__c, 'Ana\'s pledge balance.');
 			Assert.areEqual(
 				100,
 				GivingRollupTestData.account(person.AccountId).Pledge_Balance__c,

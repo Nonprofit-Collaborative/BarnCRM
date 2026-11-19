@@ -68,9 +68,7 @@ public class TestDataFactory {
 	}
 
 	@NamespaceAccessible
-	public static List<Automation_Setting__c> insertAutomationSettings(
-		Map<String, Boolean> enabledByName
-	) {
+	public static List<Automation_Setting__c> insertAutomationSettings(Map<String, Boolean> enabledByName) {
 		List<Automation_Setting__c> settings = new List<Automation_Setting__c>();
 		for (String automationName : enabledByName.keySet()) {
 			settings.add(automationSetting(automationName, enabledByName.get(automationName)));
@@ -116,9 +114,7 @@ public class TestDataFactory {
 	 */
 	@NamespaceAccessible
 	public static User createUser(String lastName, List<String> permissionSetNames) {
-		return TestUsers.grantStandardFieldAccess(
-			TestUsers.standardUserWith(lastName, permissionSetNames)
-		);
+		return TestUsers.grantStandardFieldAccess(TestUsers.standardUserWith(lastName, permissionSetNames));
 	}
 
 	/**
@@ -131,10 +127,7 @@ public class TestDataFactory {
 	 * user (see "The org test gate" in docs/contributor-guide/ci.md).
 	 */
 	@NamespaceAccessible
-	public static User createUserOnTheRunningUsersProfile(
-		String lastName,
-		List<String> permissionSetNames
-	) {
+	public static User createUserOnTheRunningUsersProfile(String lastName, List<String> permissionSetNames) {
 		return TestUsers.onRunningProfileWith(lastName, permissionSetNames);
 	}
 
@@ -293,11 +286,7 @@ public class TestDataFactory {
 			if (record.get(field.getName()) != null) {
 				continue;
 			}
-			Object value = sampleValue(
-				field.getType(),
-				field.getLength(),
-				firstActiveValue(field.getPicklistValues())
-			);
+			Object value = sampleValue(field.getType(), field.getLength(), firstActiveValue(field.getPicklistValues()));
 			if (value != null) {
 				record.put(field.getName(), value);
 			}
@@ -348,11 +337,7 @@ public class TestDataFactory {
 	 * right (a lookup, a compound or binary field).
 	 */
 	@TestVisible
-	private static Object sampleValue(
-		Schema.DisplayType type,
-		Integer length,
-		String picklistValue
-	) {
+	private static Object sampleValue(Schema.DisplayType type, Integer length, String picklistValue) {
 		switch on type {
 			when STRING, TEXTAREA, ENCRYPTEDSTRING {
 				return length != null && length > 0 && length < 4 ? 'Test'.left(length) : 'Test';

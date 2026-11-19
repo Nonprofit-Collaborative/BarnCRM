@@ -69,9 +69,7 @@ public with sharing class RecordServiceController {
 					WITH USER_MODE
 				]) {
 					form.enrollmentId = enrollment.Id;
-					form.personId = enrollment.Contact__c != null
-						? enrollment.Contact__c
-						: enrollment.Account__c;
+					form.personId = enrollment.Contact__c != null ? enrollment.Contact__c : enrollment.Account__c;
 					if (enrollment.Contact__c != null) {
 						form.personObjectApiName = 'Contact';
 						form.personFilterField = null;
@@ -117,9 +115,7 @@ public with sharing class RecordServiceController {
 				Service__c = serviceId,
 				Delivery_Date__c = deliveryDate,
 				Attendance__c = attendance,
-				Quantity__c = ServiceDeliveryService.isAbsence(attendance)
-					? 0
-					: (quantity == null ? 1 : quantity),
+				Quantity__c = ServiceDeliveryService.isAbsence(attendance) ? 0 : (quantity == null ? 1 : quantity),
 				Enrollment__c = enrollmentId
 			);
 			if (personId.getSObjectType() == Contact.SObjectType) {
@@ -149,9 +145,7 @@ public with sharing class RecordServiceController {
 				ORDER BY Program__r.Name, Name
 				LIMIT :MAX_SERVICES
 			]) {
-				form.services.add(
-					option(service.Program__r.Name + ': ' + service.Name, service.Id)
-				);
+				form.services.add(option(service.Program__r.Name + ': ' + service.Name, service.Id));
 			}
 		}
 		if (form.services.size() == 1) {
@@ -160,10 +154,7 @@ public with sharing class RecordServiceController {
 	}
 
 	private static void addAttendance(Form form) {
-		for (
-			Schema.PicklistEntry entry : Service_Delivery__c.Attendance__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Service_Delivery__c.Attendance__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				form.attendance.add(option(entry.getLabel(), entry.getValue()));
 			}

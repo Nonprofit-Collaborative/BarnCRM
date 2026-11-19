@@ -28,11 +28,7 @@ private class AcknowledgmentLetterMergeTest {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				AcknowledgmentTestData.enable();
 				letterRule();
-				Contact donor = AcknowledgmentTestData.insertDonor(
-					'Ada',
-					'Byron',
-					'ada@example.org'
-				);
+				Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 				insert new List<Gift__c>{
 					GivingTestDataFactory.buildGift(donor.Id, 1500),
 					GivingTestDataFactory.buildGift(donor.Id, 2500)
@@ -76,9 +72,7 @@ private class AcknowledgmentLetterMergeTest {
 				ContentDocumentLink link = [
 					SELECT Visibility, ShareType
 					FROM ContentDocumentLink
-					WHERE
-						ContentDocumentId = :run.Merge_File_Document_Id__c
-						AND LinkedEntityId = :run.Id
+					WHERE ContentDocumentId = :run.Merge_File_Document_Id__c AND LinkedEntityId = :run.Id
 					LIMIT 1
 				];
 				Assert.areEqual(
@@ -148,11 +142,7 @@ private class AcknowledgmentLetterMergeTest {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				AcknowledgmentTestData.enable();
 				letterRule();
-				Contact donor = AcknowledgmentTestData.insertDonor(
-					'Alan',
-					'Turing',
-					'alan@example.org'
-				);
+				Contact donor = AcknowledgmentTestData.insertDonor('Alan', 'Turing', 'alan@example.org');
 				Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 1500);
 				insert gift;
 
@@ -179,8 +169,7 @@ private class AcknowledgmentLetterMergeTest {
 				);
 				Assert.areEqual(
 					AcknowledgmentRuleService.STATUS_ACKNOWLEDGED,
-					[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id]
-					.Acknowledgment_Status__c,
+					[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id].Acknowledgment_Status__c,
 					'And the gift is stamped from the ledger, the same way an emailed one is (R-AK6).'
 				);
 				Assert.areEqual(
@@ -199,11 +188,7 @@ private class AcknowledgmentLetterMergeTest {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				AcknowledgmentTestData.enable();
 				letterRule();
-				Contact donor = AcknowledgmentTestData.insertDonor(
-					'Ada',
-					'Byron',
-					'ada@example.org'
-				);
+				Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 				Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 1500);
 				insert gift;
 

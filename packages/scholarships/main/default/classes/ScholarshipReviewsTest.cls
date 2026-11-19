@@ -18,30 +18,16 @@ private class ScholarshipReviewsTest {
 		Assert.areEqual(2, criteria.size(), 'Two criteria');
 		Assert.areEqual(
 			22,
-			ScholarshipReviews.score(
-				criteria,
-				new Map<String, Object>{ 'need' => 8, 'essay' => '6' }
-			),
+			ScholarshipReviews.score(criteria, new Map<String, Object>{ 'need' => 8, 'essay' => '6' }),
 			'8 x 2 + 6'
 		);
 		Assert.areEqual(
 			20,
-			ScholarshipReviews.score(
-				criteria,
-				new Map<String, Object>{ 'need' => 15, 'essay' => -3 }
-			),
+			ScholarshipReviews.score(criteria, new Map<String, Object>{ 'need' => 15, 'essay' => -3 }),
 			'Capped at the max, never below 0'
 		);
-		Assert.areEqual(
-			'overall',
-			ScholarshipReviews.rubric('not json')[0].key,
-			'Unreadable is one overall score'
-		);
-		Assert.areEqual(
-			'overall',
-			ScholarshipReviews.rubric(null)[0].key,
-			'Blank is one overall score'
-		);
+		Assert.areEqual('overall', ScholarshipReviews.rubric('not json')[0].key, 'Unreadable is one overall score');
+		Assert.areEqual('overall', ScholarshipReviews.rubric(null)[0].key, 'Blank is one overall score');
 	}
 
 	@IsTest
@@ -77,11 +63,7 @@ private class ScholarshipReviewsTest {
 			];
 			Assert.areEqual(22, scored.Average_Score__c, 'Weighted score counts');
 			Assert.areEqual(1, scored.Review_Count__c, 'One submitted');
-			Assert.areEqual(
-				ScholarshipReviews.RECUSED,
-				ScholarshipReviews.own(second.Id).Status__c,
-				'Recused'
-			);
+			Assert.areEqual(ScholarshipReviews.RECUSED, ScholarshipReviews.own(second.Id).Status__c, 'Recused');
 			try {
 				ScholarshipReviews.saveOwn(second.Id, null, null, 'recuse', ' ');
 				Assert.fail('A recusal needs a reason');
@@ -97,11 +79,7 @@ private class ScholarshipReviewsTest {
 		User reviewerA = ScholarshipsTestData.staff('ReviewerA');
 		User reviewerB = ScholarshipsTestData.staff('ReviewerB');
 		System.runAs(admin) {
-			Group panel = new Group(
-				Name = 'Test Panel',
-				DeveloperName = 'Test_Scholarship_Panel',
-				Type = 'Regular'
-			);
+			Group panel = new Group(Name = 'Test Panel', DeveloperName = 'Test_Scholarship_Panel', Type = 'Regular');
 			insert panel;
 			insert new List<GroupMember>{
 				new GroupMember(GroupId = panel.Id, UserOrGroupId = reviewerA.Id),
@@ -146,11 +124,7 @@ private class ScholarshipReviewsTest {
 				],
 				'Even load'
 			);
-			Assert.areEqual(
-				4,
-				[SELECT COUNT() FROM Award_Application__c WHERE Status__c = 'In Review'],
-				'In Review'
-			);
+			Assert.areEqual(4, [SELECT COUNT() FROM Award_Application__c WHERE Status__c = 'In Review'], 'In Review');
 			Assert.areEqual(0, ScholarshipReviews.assign(cycle.Id), 'A second press adds nothing');
 			Assert.isFalse(Scholarships.sentTitles.isEmpty(), 'Reviewers are told');
 		}
@@ -173,26 +147,14 @@ private class ScholarshipReviewsTest {
 				'In Review'
 			);
 			insert new List<Application_Review__c>{
-				new Application_Review__c(
-					Application__c = low.Id,
-					Status__c = 'Submitted',
-					Score__c = 4
-				),
-				new Application_Review__c(
-					Application__c = high.Id,
-					Status__c = 'Submitted',
-					Score__c = 9
-				)
+				new Application_Review__c(Application__c = low.Id, Status__c = 'Submitted', Score__c = 4),
+				new Application_Review__c(Application__c = high.Id, Status__c = 'Submitted', Score__c = 9)
 			};
 			List<ScholarshipReviews.BoardRow> rows = ScholarshipReviews.board(cycle.Id, true);
 			Assert.areEqual(high.Id, rows[0].id, 'Highest first');
 			Assert.areEqual(1, rows[0].rank, 'Ranked');
 			Assert.isNull(rows[0].applicant, 'Blind hides the applicant');
-			Assert.areEqual(
-				'High',
-				ScholarshipReviews.board(cycle.Id, false)[0].applicant,
-				'Shown otherwise'
-			);
+			Assert.areEqual('High', ScholarshipReviews.board(cycle.Id, false)[0].applicant, 'Shown otherwise');
 		}
 		System.runAs(staff) {
 			try {

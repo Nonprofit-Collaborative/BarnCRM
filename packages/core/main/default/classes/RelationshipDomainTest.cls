@@ -110,10 +110,7 @@ private class RelationshipDomainTest {
 			);
 			Test.stopTest();
 
-			Assert.isFalse(
-				result.isSuccess(),
-				'The other side already exists, so this is a duplicate'
-			);
+			Assert.isFalse(result.isSuccess(), 'The other side already exists, so this is a duplicate');
 		}
 	}
 
@@ -140,11 +137,7 @@ private class RelationshipDomainTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Parent'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Parent');
 
 			Test.startTest();
 			insert saved;
@@ -155,11 +148,7 @@ private class RelationshipDomainTest {
 				FROM Relationship__c
 				WHERE Id = :saved.Id
 			];
-			Assert.areEqual(
-				'Child',
-				reloaded.Reciprocal_Type__c,
-				'The reciprocal type is filled in'
-			);
+			Assert.areEqual('Child', reloaded.Reciprocal_Type__c, 'The reciprocal type is filled in');
 		}
 	}
 
@@ -168,11 +157,7 @@ private class RelationshipDomainTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			saved.End_Date__c = Date.today().addDays(-1);
 			insert saved;
 
@@ -181,11 +166,7 @@ private class RelationshipDomainTest {
 			Test.stopTest();
 
 			for (Relationship__c record : RelationshipTestDataFactory.allRelationships()) {
-				Assert.areEqual(
-					'Current',
-					record.Status__c,
-					'Clearing the end date returns both sides to current'
-				);
+				Assert.areEqual('Current', record.Status__c, 'Clearing the end date returns both sides to current');
 			}
 		}
 	}
@@ -195,11 +176,7 @@ private class RelationshipDomainTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c saved = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c saved = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			saved.End_Date__c = Date.today();
 
 			Test.startTest();
@@ -223,15 +200,10 @@ private class RelationshipDomainTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c onFile = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Spouse'
-			);
+			Relationship__c onFile = RelationshipTestDataFactory.between(people[0], people[1], 'Spouse');
 			insert onFile;
 			Assert.isFalse(
-				RelationshipUpkeepSelector.selectByFromPersonIds(new Set<Id>{ people[0].Id })
-					.isEmpty(),
+				RelationshipUpkeepSelector.selectByFromPersonIds(new Set<Id>{ people[0].Id }).isEmpty(),
 				'The system mode selector finds the row'
 			);
 			RelationshipDomain.hiddenForTest = new Set<Id>{ onFile.Id };
@@ -245,11 +217,7 @@ private class RelationshipDomainTest {
 
 			Assert.isFalse(result.isSuccess(), 'A hidden duplicate is still refused');
 			String message = result.getErrors()[0].getMessage();
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Relationship_DuplicateHidden'),
-				message,
-				'Generic message'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Relationship_DuplicateHidden'), message, 'Generic message');
 			Assert.isFalse(message.contains('RL-'), 'No record number');
 			Assert.isFalse(message.contains('Garcia'), 'No name');
 		}

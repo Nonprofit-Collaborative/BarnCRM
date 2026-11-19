@@ -153,11 +153,7 @@ private class SampleDataSetTest {
 		System.assertEquals(3, data.chunkCount(), '250 members chunk at 100 into three jobs');
 		System.assertEquals(100, data.membersInChunk(0).size());
 		System.assertEquals(100, data.membersInChunk(1).size());
-		System.assertEquals(
-			50,
-			data.membersInChunk(2).size(),
-			'the last chunk holds the remainder'
-		);
+		System.assertEquals(50, data.membersInChunk(2).size(), 'the last chunk holds the remainder');
 		System.assertEquals(0, data.membersInChunk(3).size(), 'nothing past the last chunk');
 		System.assertEquals(0, data.membersInChunk(-1).size(), 'a negative chunk holds nothing');
 	}
@@ -175,12 +171,8 @@ private class SampleDataSetTest {
 	static void testRejectsBlankAndUnparseableBodies() {
 		Integer rejectedCount = 0;
 		rejectedCount += assertRejects('', 'a blank body is not sample data') ? 1 : 0;
-		rejectedCount += assertRejects('not json at all', 'an unparseable body is not sample data')
-			? 1
-			: 0;
-		rejectedCount += assertRejects('[1,2,3]', 'a JSON array is not the expected object')
-			? 1
-			: 0;
+		rejectedCount += assertRejects('not json at all', 'an unparseable body is not sample data') ? 1 : 0;
+		rejectedCount += assertRejects('[1,2,3]', 'a JSON array is not the expected object') ? 1 : 0;
 		Assert.areEqual(3, rejectedCount, 'all three malformed bodies must be rejected');
 	}
 
@@ -188,36 +180,24 @@ private class SampleDataSetTest {
 	static void testRejectsMissingOrNullHouseholds() {
 		Map<String, Object> missing = validRoot();
 		missing.remove('households');
-		Boolean missingRejected = assertRejects(
-			missing,
-			'a payload with no households key is invalid'
-		);
+		Boolean missingRejected = assertRejects(missing, 'a payload with no households key is invalid');
 
 		Map<String, Object> nulled = validRoot();
 		nulled.put('households', null);
 		Boolean nulledRejected = assertRejects(nulled, 'a payload with null households is invalid');
 
-		Assert.isTrue(
-			missingRejected && nulledRejected,
-			'both a missing and a null households key must be rejected'
-		);
+		Assert.isTrue(missingRejected && nulledRejected, 'both a missing and a null households key must be rejected');
 	}
 
 	@IsTest
 	static void testRejectsMissingOrNullOrganizations() {
 		Map<String, Object> missing = validRoot();
 		missing.remove('organizations');
-		Boolean missingRejected = assertRejects(
-			missing,
-			'a payload with no organizations key is invalid'
-		);
+		Boolean missingRejected = assertRejects(missing, 'a payload with no organizations key is invalid');
 
 		Map<String, Object> nulled = validRoot();
 		nulled.put('organizations', null);
-		Boolean nulledRejected = assertRejects(
-			nulled,
-			'a payload with null organizations is invalid'
-		);
+		Boolean nulledRejected = assertRejects(nulled, 'a payload with null organizations is invalid');
 
 		Assert.isTrue(
 			missingRejected && nulledRejected,
@@ -231,10 +211,7 @@ private class SampleDataSetTest {
 		household.remove('members');
 		Map<String, Object> missing = validRoot();
 		missing.put('households', new List<Object>{ household });
-		Boolean missingRejected = assertRejects(
-			missing,
-			'a household with no members key is invalid'
-		);
+		Boolean missingRejected = assertRejects(missing, 'a household with no members key is invalid');
 
 		Map<String, Object> nullMembers = validHousehold();
 		nullMembers.put('members', null);
@@ -242,44 +219,29 @@ private class SampleDataSetTest {
 		nulled.put('households', new List<Object>{ nullMembers });
 		Boolean nulledRejected = assertRejects(nulled, 'a household with null members is invalid');
 
-		Assert.isTrue(
-			missingRejected && nulledRejected,
-			'both a missing and a null members key must be rejected'
-		);
+		Assert.isTrue(missingRejected && nulledRejected, 'both a missing and a null members key must be rejected');
 	}
 
 	@IsTest
 	static void testRejectsMissingRequiredNames() {
 		Map<String, Object> noLastName = validHousehold();
-		noLastName.put(
-			'members',
-			new List<Object>{ new Map<String, Object>{ 'firstName' => 'Maria' } }
-		);
+		noLastName.put('members', new List<Object>{ new Map<String, Object>{ 'firstName' => 'Maria' } });
 		Map<String, Object> memberRoot = validRoot();
 		memberRoot.put('households', new List<Object>{ noLastName });
-		Boolean noLastNameRejected = assertRejects(
-			memberRoot,
-			'a member with no last name is invalid'
-		);
+		Boolean noLastNameRejected = assertRejects(memberRoot, 'a member with no last name is invalid');
 
 		Map<String, Object> noOrgName = validOrganization();
 		noOrgName.put('name', null);
 		Map<String, Object> orgRoot = validRoot();
 		orgRoot.put('organizations', new List<Object>{ noOrgName });
-		Boolean noOrgNameRejected = assertRejects(
-			orgRoot,
-			'an organization with no name is invalid'
-		);
+		Boolean noOrgNameRejected = assertRejects(orgRoot, 'an organization with no name is invalid');
 
 		Map<String, Object> customNoName = validHousehold();
 		customNoName.put('customName', true);
 		customNoName.put('name', null);
 		Map<String, Object> customRoot = validRoot();
 		customRoot.put('households', new List<Object>{ customNoName });
-		Boolean customNoNameRejected = assertRejects(
-			customRoot,
-			'a custom-named household with no name is invalid'
-		);
+		Boolean customNoNameRejected = assertRejects(customRoot, 'a custom-named household with no name is invalid');
 
 		Assert.isTrue(
 			noLastNameRejected && noOrgNameRejected && customNoNameRejected,
@@ -293,17 +255,11 @@ private class SampleDataSetTest {
 		noKey.put('key', null);
 		Map<String, Object> keyless = validRoot();
 		keyless.put('households', new List<Object>{ noKey });
-		Boolean keylessRejected = assertRejects(
-			keyless,
-			'a household with no key cannot be matched to its members'
-		);
+		Boolean keylessRejected = assertRejects(keyless, 'a household with no key cannot be matched to its members');
 
 		Map<String, Object> duplicates = validRoot();
 		duplicates.put('households', new List<Object>{ validHousehold(), validHousehold() });
-		Boolean duplicatesRejected = assertRejects(
-			duplicates,
-			'two households cannot share one key'
-		);
+		Boolean duplicatesRejected = assertRejects(duplicates, 'two households cannot share one key');
 
 		Assert.isTrue(
 			keylessRejected && duplicatesRejected,

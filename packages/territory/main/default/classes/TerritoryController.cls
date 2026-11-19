@@ -86,9 +86,7 @@ public with sharing class TerritoryController {
 				);
 			}
 			if (TerritoryRunBatch.busy()) {
-				throw new TerritoryRunBatch.TerritoryException(
-					BarnHelp.text('Territory', 'Territory_Error_Busy')
-				);
+				throw new TerritoryRunBatch.TerritoryException(BarnHelp.text('Territory', 'Territory_Error_Busy'));
 			}
 			List<String> kinds = TerritoryRunBatch.kindsToRun();
 			if (kinds.isEmpty()) {
@@ -129,9 +127,7 @@ public with sharing class TerritoryController {
 				LIMIT 1
 			];
 			if (runs.isEmpty() || String.isBlank(runs[0].Data_Job_Id__c)) {
-				throw new TerritoryRunBatch.TerritoryException(
-					BarnHelp.text('Territory', 'Territory_Error_NoJob')
-				);
+				throw new TerritoryRunBatch.TerritoryException(BarnHelp.text('Territory', 'Territory_Error_NoJob'));
 			}
 			Id jobId = runs[0].Data_Job_Id__c;
 			return ImportUndoService.start(jobId, ImportUndoService.preview(jobId).getTotal());
@@ -194,9 +190,7 @@ public with sharing class TerritoryController {
 		);
 		List<Map<String, Object>> shown = new List<Map<String, Object>>();
 		for (Territory_Run__c run : runs) {
-			Import_Batch__c job = String.isBlank(run.Data_Job_Id__c)
-				? null
-				: jobs.get(run.Data_Job_Id__c);
+			Import_Batch__c job = String.isBlank(run.Data_Job_Id__c) ? null : jobs.get(run.Data_Job_Id__c);
 			shown.add(
 				new Map<String, Object>{
 					'id' => run.Id,

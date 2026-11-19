@@ -9,10 +9,7 @@ private class DonationMatcherTest {
 	@TestSetup
 	static void createTestUser() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 		}
 	}
 
@@ -106,10 +103,7 @@ private class DonationMatcherTest {
 	static void theClosestPaymentForTheAmountWinsAndIsClaimedOnce() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-			List<Installment__c> payments = pledge(
-				ana.Id,
-				new Map<Integer, Decimal>{ 11 => 100, 17 => 100, 15 => 95 }
-			);
+			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 11 => 100, 17 => 100, 15 => 95 });
 			List<GiftImportRow> gifts = new List<GiftImportRow>{
 				gift(ana.Id, ana.AccountId, 100),
 				gift(ana.Id, ana.AccountId, 100),
@@ -132,12 +126,8 @@ private class DonationMatcherTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
-			List<GiftImportRow> firstChunk = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
-			List<GiftImportRow> secondChunk = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
+			List<GiftImportRow> firstChunk = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
+			List<GiftImportRow> secondChunk = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
 
 			match(null, firstChunk);
 			Integer paying = new DonationMatcher(null).carryClaims(firstChunk);
@@ -159,20 +149,13 @@ private class DonationMatcherTest {
 			upsert settings;
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 18 => 95 });
-			List<GiftImportRow> bySettings = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 95)
-			};
-			List<GiftImportRow> byTemplate = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
+			List<GiftImportRow> bySettings = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 95) };
+			List<GiftImportRow> byTemplate = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
 
 			match(null, bySettings);
 			match(template(null, 3, 5), byTemplate);
 
-			Assert.isNull(
-				bySettings[0].installmentId,
-				'Three days is outside the org window of 1.'
-			);
+			Assert.isNull(bySettings[0].installmentId, 'Three days is outside the org window of 1.');
 			Assert.areEqual(payments[0].Id, byTemplate[0].installmentId, 'Within 3 days and 5.');
 		}
 	}
@@ -203,18 +186,14 @@ private class DonationMatcherTest {
 	static void twoPaymentsEquallyCloseAreATieNamingBoth() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-			List<Installment__c> payments = pledge(
-				ana.Id,
-				new Map<Integer, Decimal>{ 13 => 100, 17 => 100 }
-			);
+			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 13 => 100, 17 => 100 });
 			List<GiftImportRow> gifts = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
 
 			match(null, gifts);
 
 			Assert.isNull(gifts[0].installmentId, 'Not guessed.');
 			Assert.isTrue(
-				gifts[0].error.contains(payments[0].Name) &&
-				gifts[0].error.contains(payments[1].Name),
+				gifts[0].error.contains(payments[0].Name) && gifts[0].error.contains(payments[1].Name),
 				'Both are named: ' + gifts[0].error
 			);
 		}
@@ -225,20 +204,14 @@ private class DonationMatcherTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
 			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
-			List<GiftImportRow> always = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
+			List<GiftImportRow> always = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
 			List<GiftImportRow> never = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
 			List<GiftImportRow> only = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 50) };
 			GiftImportRow loaded = gift(ana.Id, ana.AccountId, 100);
 			loaded.externalId = 'TX-1';
 			loaded.matchedExisting = true;
 
-			Assert.areEqual(
-				0,
-				match(template(DonationMatcher.ALWAYS_CREATE, null, null), always),
-				'None.'
-			);
+			Assert.areEqual(0, match(template(DonationMatcher.ALWAYS_CREATE, null, null), always), 'None.');
 			match(template(DonationMatcher.NEVER_MATCH, null, null), never);
 			match(template(DonationMatcher.MATCH_ONLY, null, null), only);
 			new DonationMatcher(template(DonationMatcher.NEVER_MATCH, null, null))
@@ -247,11 +220,7 @@ private class DonationMatcherTest {
 			Assert.isNull(always[0].installmentId, 'Always create does not look.');
 			Assert.isNull(always[0].error, 'And creates.');
 			Assert.isTrue(never[0].error.contains(payments[0].Name), 'Never match names it.');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Import_ErrorMatchOnlyNone'),
-				only[0].error,
-				'Match only.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Import_ErrorMatchOnlyNone'), only[0].error, 'Match only.');
 			Assert.isTrue(loaded.error.contains('TX-1'), 'A gift already loaded is refused too.');
 		}
 	}
@@ -305,21 +274,13 @@ private class DonationMatcherTest {
 				FROM Import_Row__c
 				WHERE Import_Batch__c = :batch.Id
 			];
-			Assert.areEqual(
-				ImportRowProcessor.STATUS_CREATED,
-				after.Status__c,
-				'Created: ' + after.Error_Message__c
-			);
+			Assert.areEqual(ImportRowProcessor.STATUS_CREATED, after.Status__c, 'Created: ' + after.Error_Message__c);
 			Gift__c made = [
 				SELECT Installment__c, Commitment__c
 				FROM Gift__c
 				WHERE Id = :after.Gift_Id__c
 			];
-			Assert.areEqual(
-				payments[0].Id,
-				made.Installment__c,
-				'The gift pays the 14 March payment.'
-			);
+			Assert.areEqual(payments[0].Id, made.Installment__c, 'The gift pays the 14 March payment.');
 			Assert.areEqual(payments[0].Commitment__c, made.Commitment__c, 'Of the pledge.');
 			Assert.areEqual(
 				'Paid',
@@ -373,13 +334,11 @@ private class DonationMatcherTest {
 				Gift__c made = [SELECT Id FROM Gift__c WHERE Installment__c = :payments[0].Id];
 				Assert.areEqual(
 					'Completed',
-					[SELECT Status__c FROM Commitment__c WHERE Id = :payments[0].Commitment__c]
-					.Status__c,
+					[SELECT Status__c FROM Commitment__c WHERE Id = :payments[0].Commitment__c].Status__c,
 					'The imported payment completed the pledge.'
 				);
 				// The undo asks the module what to keep, then deletes the rest as the importer.
-				kept = new GiftImportProcessor()
-					.reasonsToKeep(batch.Id, Gift__c.SObjectType, new Set<Id>{ made.Id });
+				kept = new GiftImportProcessor().reasonsToKeep(batch.Id, Gift__c.SObjectType, new Set<Id>{ made.Id });
 				if (!kept.containsKey(made.Id)) {
 					Database.delete(made, true, AccessLevel.USER_MODE);
 				}
@@ -394,8 +353,7 @@ private class DonationMatcherTest {
 			);
 			Assert.areEqual(
 				'Active',
-				[SELECT Status__c FROM Commitment__c WHERE Id = :payments[0].Commitment__c]
-				.Status__c,
+				[SELECT Status__c FROM Commitment__c WHERE Id = :payments[0].Commitment__c].Status__c,
 				'And the pledge is open again.'
 			);
 		}
@@ -407,43 +365,25 @@ private class DonationMatcherTest {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
 			pledge(ana.Id, new Map<Integer, Decimal>{ 15 => 100 });
 			Import_Batch__c recorded = new Import_Batch__c(
-				Processor_Settings_JSON__c = new DonationMatcher(
-						template(DonationMatcher.MATCH_OR_CREATE, 3, 0)
-					)
+				Processor_Settings_JSON__c = new DonationMatcher(template(DonationMatcher.MATCH_OR_CREATE, 3, 0))
 					.record()
 			);
-			List<GiftImportRow> heldToTheRecord = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
-			List<GiftImportRow> noRecord = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
-			List<GiftImportRow> unreadable = new List<GiftImportRow>{
-				gift(ana.Id, ana.AccountId, 100)
-			};
+			List<GiftImportRow> heldToTheRecord = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
+			List<GiftImportRow> noRecord = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
+			List<GiftImportRow> unreadable = new List<GiftImportRow>{ gift(ana.Id, ana.AccountId, 100) };
 			// The template was changed to Always create after the dry run.
 			Import_Template__c now = template(DonationMatcher.ALWAYS_CREATE, null, null);
 
 			System.runAs(maria()) {
 				DonationMatcher.forRun(recorded, now, false).match(heldToTheRecord);
 				DonationMatcher.forRun(new Import_Batch__c(), now, false).match(noRecord);
-				DonationMatcher.forRun(
-						new Import_Batch__c(Processor_Settings_JSON__c = 'not a record'),
-						now,
-						false
-					)
+				DonationMatcher.forRun(new Import_Batch__c(Processor_Settings_JSON__c = 'not a record'), now, false)
 					.match(unreadable);
 			}
 
 			Assert.isNotNull(heldToTheRecord[0].installmentId, 'The commit does what was shown.');
-			Assert.isNull(
-				noRecord[0].installmentId,
-				'A batch dry run before records follows the template.'
-			);
-			Assert.isNull(
-				unreadable[0].installmentId,
-				'And so does one whose record cannot be read.'
-			);
+			Assert.isNull(noRecord[0].installmentId, 'A batch dry run before records follows the template.');
+			Assert.isNull(unreadable[0].installmentId, 'And so does one whose record cannot be read.');
 		}
 	}
 
@@ -498,23 +438,13 @@ private class DonationMatcherTest {
 				runPass(batch.Id, true);
 				afterDryRun = ImportBatchSelector.selectById(batch.Id);
 				// Between the preview and the commit, somebody says nothing may match.
-				update new Import_Template__c(
-					Id = template.Id,
-					Payment_Matching__c = DonationMatcher.NEVER_MATCH
-				);
+				update new Import_Template__c(Id = template.Id, Payment_Matching__c = DonationMatcher.NEVER_MATCH);
 				runPass(batch.Id, false);
 				Test.stopTest();
 			}
 
-			Assert.isNotNull(
-				afterDryRun.Processor_Settings_JSON__c,
-				'The dry run recorded its values.'
-			);
-			Assert.areEqual(
-				1,
-				afterDryRun.Rows_Created__c,
-				'It showed the gift paying the payment.'
-			);
+			Assert.isNotNull(afterDryRun.Processor_Settings_JSON__c, 'The dry run recorded its values.');
+			Assert.areEqual(1, afterDryRun.Rows_Created__c, 'It showed the gift paying the payment.');
 			Import_Row__c after = [
 				SELECT Status__c, Error_Message__c, Gift_Id__c
 				FROM Import_Row__c
@@ -575,14 +505,8 @@ private class DonationMatcherTest {
 				Test.stopTest();
 			}
 
-			Assert.isTrue(
-				first.contains(DonationMatcher.MATCH_OR_CREATE),
-				'The first dry run: ' + first
-			);
-			Assert.isTrue(
-				second.contains(DonationMatcher.MATCH_ONLY),
-				'The second replaced it: ' + second
-			);
+			Assert.isTrue(first.contains(DonationMatcher.MATCH_OR_CREATE), 'The first dry run: ' + first);
+			Assert.isTrue(second.contains(DonationMatcher.MATCH_ONLY), 'The second replaced it: ' + second);
 			Assert.isTrue(second.contains('"matchDateWindowDays":3'), 'Window and all: ' + second);
 			Assert.areEqual(
 				ImportRowProcessor.STATUS_REJECTED,

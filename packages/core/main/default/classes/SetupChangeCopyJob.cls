@@ -25,12 +25,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 
 	private static final String LOG_CONTEXT = 'SetupChangeCopyJob';
 	private static final String TRAIL_FIELDS = 'Id, Action, Section, Display, CreatedDate, CreatedBy.Name, DelegateUser';
-	private static final List<String> UNFINISHED = new List<String>{
-		'Holding',
-		'Queued',
-		'Preparing',
-		'Processing'
-	};
+	private static final List<String> UNFINISHED = new List<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
 
 	/** True for the delete pass, false for the copy pass. */
 	@TestVisible
@@ -73,13 +68,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 
 	/** The copy as a step of the nightly run, while Org Optimizer is on (R-SU8). */
 	public static NightlyStep step() {
-		return new NightlyStep(
-				JOB_NAME,
-				System.Label.Core_HealthCheck_JobSetupChanges,
-				1,
-				30,
-				new SetupChangeCopyJob()
-			)
+		return new NightlyStep(JOB_NAME, System.Label.Core_HealthCheck_JobSetupChanges, 1, 30, new SetupChangeCopyJob())
 			.activeWhen(featureOn());
 	}
 
@@ -91,10 +80,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 		return [
 				SELECT COUNT()
 				FROM AsyncApexJob
-				WHERE
-					JobType = 'BatchApex'
-					AND ApexClass.Name = 'SetupChangeCopyJob'
-					AND Status IN :UNFINISHED
+				WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SetupChangeCopyJob' AND Status IN :UNFINISHED
 				WITH SYSTEM_MODE
 			] > 0;
 	}
@@ -130,10 +116,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		if (!featureOn()) {
 			// R-SU8: while Org Optimizer is off, the run copies and deletes nothing, quietly.
-			return Database.getQueryLocator(
-				'SELECT Id FROM Setup_Change__c WHERE Id = null',
-				AccessLevel.SYSTEM_MODE
-			);
+			return Database.getQueryLocator('SELECT Id FROM Setup_Change__c WHERE Id = null', AccessLevel.SYSTEM_MODE);
 		}
 		if (purging) {
 			return Database.getQueryLocatorWithBinds(
@@ -163,10 +146,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
 			);
-			return Database.getQueryLocator(
-				'SELECT Id FROM Setup_Change__c WHERE Id = null',
-				AccessLevel.SYSTEM_MODE
-			);
+			return Database.getQueryLocator('SELECT Id FROM Setup_Change__c WHERE Id = null', AccessLevel.SYSTEM_MODE);
 		}
 	}
 
@@ -248,10 +228,7 @@ public without sharing class SetupChangeCopyJob implements Schedulable, Database
 			return;
 		}
 		ErrorLogger.logMessage(
-			String.format(
-				template,
-				new List<String>{ String.valueOf(failures.size()), failures[0] }
-			),
+			String.format(template, new List<String>{ String.valueOf(failures.size()), failures[0] }),
 			LOG_CONTEXT,
 			ErrorLogger.SEVERITY_WARNING
 		);

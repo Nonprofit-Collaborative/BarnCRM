@@ -69,11 +69,7 @@ public with sharing class SetupAssistantController {
 		try {
 			return buildState();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
 		}
 	}
 
@@ -84,11 +80,7 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.markComplete(stepKey);
 			return buildState();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
 		}
 	}
 
@@ -99,11 +91,7 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.markSkipped(stepKey);
 			return buildState();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
 		}
 	}
 
@@ -114,11 +102,7 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.reset();
 			return buildState();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
 		}
 	}
 
@@ -136,11 +120,7 @@ public with sharing class SetupAssistantController {
 		try {
 			return editionModel();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_LoadErrorMessage'));
 		}
 	}
 
@@ -156,11 +136,7 @@ public with sharing class SetupAssistantController {
 			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
 			return editionModel();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage'));
 		}
 	}
 
@@ -198,11 +174,7 @@ public with sharing class SetupAssistantController {
 			SetupAssistantService.markComplete('coexistence');
 			return buildState();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage'));
 		}
 	}
 
@@ -221,9 +193,7 @@ public with sharing class SetupAssistantController {
 		}
 		Map<String, Map<String, Object>> byObject = acceptedValues(step, values);
 		if (byObject.isEmpty()) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_SetupAssistant_NothingToSaveError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_SetupAssistant_NothingToSaveError'));
 		}
 		// A step can span two settings objects (Core's and a module's): all of it or none.
 		Savepoint beforeSave = Database.setSavepoint();
@@ -235,11 +205,7 @@ public with sharing class SetupAssistantController {
 		} catch (Exception e) {
 			Database.rollback(beforeSave);
 			SettingsService.clearCaches();
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_SaveErrorMessage'));
 		}
 		return buildState();
 	}
@@ -285,19 +251,13 @@ public with sharing class SetupAssistantController {
 	public static SetupState assignAccess(Id userId, String roleDeveloperName) {
 		requireEdit();
 		if (userId == null || String.isBlank(roleDeveloperName)) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_SetupAssistant_NothingToSaveError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_SetupAssistant_NothingToSaveError'));
 		}
 		try {
 			AccessService.assignRole(userId, roleDeveloperName);
 			return buildState();
 		} catch (Exception e) {
-			throw UserErrors.wrap(
-				e,
-				ERROR_CONTEXT,
-				BarnHelp.text('Core', 'Core_SetupAssistant_AccessErrorMessage')
-			);
+			throw UserErrors.wrap(e, ERROR_CONTEXT, BarnHelp.text('Core', 'Core_SetupAssistant_AccessErrorMessage'));
 		}
 	}
 
@@ -397,26 +357,18 @@ public with sharing class SetupAssistantController {
 		try {
 			recordId = Id.valueOf(text);
 		} catch (Exception notAnId) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_SetupAssistant_WrongRecordTypeError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_SetupAssistant_WrongRecordTypeError'));
 		}
-		String actual = recordId.getSObjectType()
-			.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getName();
+		String actual = recordId.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		if (String.isBlank(expectedObject) || !expectedObject.equalsIgnoreCase(actual)) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_SetupAssistant_WrongRecordTypeError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_SetupAssistant_WrongRecordTypeError'));
 		}
 		return String.valueOf(recordId);
 	}
 
 	private static void requireEdit() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
 		}
 	}
 }

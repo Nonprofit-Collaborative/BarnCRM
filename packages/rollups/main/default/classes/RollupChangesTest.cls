@@ -45,12 +45,7 @@ private class RollupChangesTest {
 			new Map<String, Object>{
 				'version' => 1,
 				'conditions' => new List<Object>{
-					new Map<String, Object>{
-						'id' => 1,
-						'field' => field,
-						'operator' => operator,
-						'value' => value
-					}
+					new Map<String, Object>{ 'id' => 1, 'field' => field, 'operator' => operator, 'value' => value }
 				}
 			}
 		);
@@ -149,11 +144,7 @@ private class RollupChangesTest {
 				'The total it left and the total it joined'
 			);
 			Assert.isTrue(unread.isEmpty(), 'A change to nothing the rollup reads marks nothing');
-			Assert.areEqual(
-				new Set<Id>{ oldParent },
-				markedAccounts(deleted),
-				'A delete: the old one'
-			);
+			Assert.areEqual(new Set<Id>{ oldParent }, markedAccounts(deleted), 'A delete: the old one');
 		}
 	}
 
@@ -170,24 +161,16 @@ private class RollupChangesTest {
 			Contact ana = TestDataFactory.person(
 				new Contact(FirstName = 'Ana', LastName = 'Nolan', AccountId = nolan.Id)
 			);
-			Contact bea = TestDataFactory.person(
-				new Contact(FirstName = 'Bea', LastName = 'Lee', AccountId = lee.Id)
-			);
+			Contact bea = TestDataFactory.person(new Contact(FirstName = 'Bea', LastName = 'Lee', AccountId = lee.Id));
 			insert new List<Contact>{ ana, bea };
-			Rollup_Definition__c perHousehold = definition(
-				'Affiliation__c',
-				'Contact__c > {Household}',
-				null
-			);
+			Rollup_Definition__c perHousehold = definition('Affiliation__c', 'Contact__c > {Household}', null);
 			Id affiliationId = fakeId(Affiliation__c.SObjectType);
 
 			Test.startTest();
 			RollupChanges.Marked marked = RollupChanges.forSave(
 				'Affiliation__c',
 				new List<SObject>{ new Affiliation__c(Id = affiliationId, Contact__c = bea.Id) },
-				new Map<Id, SObject>{
-					affiliationId => new Affiliation__c(Id = affiliationId, Contact__c = ana.Id)
-				},
+				new Map<Id, SObject>{ affiliationId => new Affiliation__c(Id = affiliationId, Contact__c = ana.Id) },
 				false,
 				new List<Rollup_Definition__c>{ perHousehold }
 			);
@@ -219,18 +202,14 @@ private class RollupChangesTest {
 			Test.startTest();
 			RollupChanges.Marked moved = RollupChanges.forSave(
 				'Contact',
-				new List<SObject>{
-					new Contact(Id = ana.Id, AccountId = lee.Id, LastName = 'Nolan')
-				},
+				new List<SObject>{ new Contact(Id = ana.Id, AccountId = lee.Id, LastName = 'Nolan') },
 				new Map<Id, SObject>{ ana.Id => before },
 				false,
 				definitions
 			);
 			RollupChanges.Marked renamed = RollupChanges.forSave(
 				'Contact',
-				new List<SObject>{
-					new Contact(Id = ana.Id, AccountId = nolan.Id, LastName = 'Lee')
-				},
+				new List<SObject>{ new Contact(Id = ana.Id, AccountId = nolan.Id, LastName = 'Lee') },
 				new Map<Id, SObject>{ ana.Id => before },
 				false,
 				definitions
@@ -252,35 +231,25 @@ private class RollupChangesTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account riverbend = organization('Riverbend');
 			insert riverbend;
-			Contact ana = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Okafor')
-			);
+			Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Okafor'));
 			insert ana;
 			insert new Affiliation__c(Contact__c = ana.Id, Organization__c = riverbend.Id);
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
-				definition(
-					'Affiliation__c',
-					'Organization__c',
-					filter('Contact__r.Deceased__c', 'equals', false)
-				)
+				definition('Affiliation__c', 'Organization__c', filter('Contact__r.Deceased__c', 'equals', false))
 			};
 			Contact before = new Contact(Id = ana.Id, LastName = 'Okafor', Deceased__c = false);
 
 			Test.startTest();
 			RollupChanges.Marked marked = RollupChanges.forSave(
 				'Contact',
-				new List<SObject>{
-					new Contact(Id = ana.Id, LastName = 'Okafor', Deceased__c = true)
-				},
+				new List<SObject>{ new Contact(Id = ana.Id, LastName = 'Okafor', Deceased__c = true) },
 				new Map<Id, SObject>{ ana.Id => before },
 				false,
 				definitions
 			);
 			RollupChanges.Marked unread = RollupChanges.forSave(
 				'Contact',
-				new List<SObject>{
-					new Contact(Id = ana.Id, LastName = 'Other', Deceased__c = false)
-				},
+				new List<SObject>{ new Contact(Id = ana.Id, LastName = 'Other', Deceased__c = false) },
 				new Map<Id, SObject>{ ana.Id => before },
 				false,
 				definitions
@@ -305,9 +274,7 @@ private class RollupChangesTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Account riverbend = organization('Riverbend');
 			insert riverbend;
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Okafor', AccountId = riverbend.Id)
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Okafor', AccountId = riverbend.Id));
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
 				definition('Contact', 'AccountId', filter('Account.Description', 'equals', 'Board'))
 			};
@@ -316,9 +283,7 @@ private class RollupChangesTest {
 			Test.startTest();
 			RollupChanges.Marked marked = RollupChanges.forSave(
 				'Account',
-				new List<SObject>{
-					new Account(Id = riverbend.Id, Name = 'Riverbend', Description = 'Board')
-				},
+				new List<SObject>{ new Account(Id = riverbend.Id, Name = 'Riverbend', Description = 'Board') },
 				new Map<Id, SObject>{ riverbend.Id => before },
 				false,
 				definitions
@@ -351,11 +316,7 @@ private class RollupChangesTest {
 			};
 
 			Test.startTest();
-			RollupDependents.beforeDelete(
-				Account.SObjectType,
-				new List<SObject>{ nolan },
-				definitions
-			);
+			RollupDependents.beforeDelete(Account.SObjectType, new List<SObject>{ nolan }, definitions);
 			RollupChanges.Marked deleted = RollupChanges.afterDelete(
 				'Account',
 				new List<SObject>{ nolan },
@@ -376,10 +337,7 @@ private class RollupChangesTest {
 				'The organization the deleted membership counted towards'
 			);
 			Assert.isTrue(handedOver.isEmpty(), 'Held targets are handed over once');
-			Assert.isTrue(
-				markedAccounts(restored).contains(riverbend.Id),
-				'And again when the household is restored'
-			);
+			Assert.isTrue(markedAccounts(restored).contains(riverbend.Id), 'And again when the household is restored');
 		}
 	}
 
@@ -459,25 +417,14 @@ private class RollupChangesTest {
 			);
 			fund.Source_Field__c = 'Start_Date__c';
 
-			Set<String> reads = RollupChanges.readsOf(
-				fund,
-				RollupPath.parse(fund.Relationship_Path__c)
-			);
+			Set<String> reads = RollupChanges.readsOf(fund, RollupPath.parse(fund.Relationship_Path__c));
 
 			Assert.areEqual(
-				new Set<String>{
-					'Start_Date__c',
-					'Contact__r.Deceased__c',
-					'Contact__c',
-					'Organization__c'
-				},
+				new Set<String>{ 'Start_Date__c', 'Contact__r.Deceased__c', 'Contact__c', 'Organization__c' },
 				reads,
 				'Source, filter and every path alternative'
 			);
-			Assert.isTrue(
-				RollupFilterParser.fieldsOf('not a filter').isEmpty(),
-				'An unreadable filter names nothing'
-			);
+			Assert.isTrue(RollupFilterParser.fieldsOf('not a filter').isEmpty(), 'An unreadable filter names nothing');
 		}
 	}
 }

@@ -64,9 +64,7 @@ private class SettingsServiceTest {
 			stubDefinitions();
 
 			Test.startTest();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -75,11 +73,7 @@ private class SettingsServiceTest {
 				'Maria expects the pattern she typed to be the one in force'
 			);
 			List<Setting_Change__c> changes = SettingChangeSelector.getRecent(10);
-			Assert.areEqual(
-				1,
-				changes.size(),
-				'One changed setting writes exactly one audit record'
-			);
+			Assert.areEqual(1, changes.size(), 'One changed setting writes exactly one audit record');
 			Assert.areEqual(
 				'BarnCRM_Settings__c.' + TEXT_KEY,
 				changes[0].Setting_Name__c,
@@ -90,16 +84,8 @@ private class SettingsServiceTest {
 				changes[0].Old_Value__c,
 				'A setting that had never been set has no old value: unset is null, not empty text'
 			);
-			Assert.areEqual(
-				'The {LastName} Family',
-				changes[0].New_Value__c,
-				'The audit record holds the new value'
-			);
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				changes[0].Changed_By__c,
-				'The audit record names who changed it'
-			);
+			Assert.areEqual('The {LastName} Family', changes[0].New_Value__c, 'The audit record holds the new value');
+			Assert.areEqual(UserInfo.getUserId(), changes[0].Changed_By__c, 'The audit record names who changed it');
 		}
 	}
 
@@ -126,14 +112,10 @@ private class SettingsServiceTest {
 	static void savingWithoutChangingAnythingRecordsNothing() {
 		System.runAs(TestUsers.admin()) {
 			stubDefinitions();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 
 			Test.startTest();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -159,11 +141,7 @@ private class SettingsServiceTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				SettingChangeSelector.getRecent(10).size(),
-				'One audit record per changed setting'
-			);
+			Assert.areEqual(3, SettingChangeSelector.getRecent(10).size(), 'One audit record per changed setting');
 			Assert.areEqual(
 				false,
 				SettingsService.getValue(CHECKBOX_KEY),
@@ -181,14 +159,10 @@ private class SettingsServiceTest {
 	static void recordsAChangeThatIsOnlyACapitalLetter() {
 		System.runAs(TestUsers.admin()) {
 			stubDefinitions();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} household' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} household' });
 
 			Test.startTest();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Household' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Household' });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -223,14 +197,11 @@ private class SettingsServiceTest {
 
 			Test.startTest();
 			try {
-				SettingsService.saveValues(
-					new Map<String, Object>{ 'Coexistence_Mode__c' => 'SomethingElse' }
-				);
+				SettingsService.saveValues(new Map<String, Object>{ 'Coexistence_Mode__c' => 'SomethingElse' });
 			} catch (SettingsService.SettingsException e) {
 				refused = true;
 				Assert.isTrue(
-					e.getMessage()
-						.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
+					e.getMessage().endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
 					'The message says the value is not one this setting takes: ' + e.getMessage()
 				);
 			}
@@ -248,9 +219,7 @@ private class SettingsServiceTest {
 
 			Test.startTest();
 			try {
-				SettingsService.saveValues(
-					new Map<String, Object>{ 'Not_A_Setting__c' => 'anything' }
-				);
+				SettingsService.saveValues(new Map<String, Object>{ 'Not_A_Setting__c' => 'anything' });
 			} catch (SettingsService.SettingsException e) {
 				refused = true;
 				Assert.areEqual(
@@ -278,9 +247,7 @@ private class SettingsServiceTest {
 
 			Test.startTest();
 			try {
-				SettingsService.saveValues(
-					new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-				);
+				SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 			} catch (SettingsService.SettingsException e) {
 				refused = true;
 			}
@@ -298,9 +265,7 @@ private class SettingsServiceTest {
 
 			Test.startTest();
 			try {
-				SettingsService.saveValues(
-					new Map<String, Object>{ DATETIME_KEY => 'next Tuesday' }
-				);
+				SettingsService.saveValues(new Map<String, Object>{ DATETIME_KEY => 'next Tuesday' });
 			} catch (SettingsService.SettingsException e) {
 				refused = true;
 				Assert.areEqual(
@@ -352,14 +317,8 @@ private class SettingsServiceTest {
 			Test.stopTest();
 
 			Assert.isTrue(refused, 'Reading a setting that does not exist is refused');
-			Assert.isFalse(
-				SettingsService.hasKey('Not_A_Setting__c'),
-				'The org does not have that setting'
-			);
-			Assert.isTrue(
-				SettingsService.hasKey(TEXT_KEY),
-				'The org does have the household name pattern'
-			);
+			Assert.isFalse(SettingsService.hasKey('Not_A_Setting__c'), 'The org does not have that setting');
+			Assert.isTrue(SettingsService.hasKey(TEXT_KEY), 'The org does have the household name pattern');
 		}
 	}
 
@@ -388,19 +347,13 @@ private class SettingsServiceTest {
 	static void readsCoreSettingsByNameAsWellAsByDefault() {
 		System.runAs(TestUsers.admin()) {
 			stubDefinitions();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 
 			Test.startTest();
 			Object named = SettingsService.getValue('BarnCRM_Settings__c', TEXT_KEY);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'The {LastName} Family',
-				named,
-				'Naming Core\'s own object reads the same value'
-			);
+			Assert.areEqual('The {LastName} Family', named, 'Naming Core\'s own object reads the same value');
 			Assert.isTrue(
 				SettingsService.hasKey('BarnCRM_Settings__c', TEXT_KEY),
 				'Core owns the household name pattern'
@@ -421,10 +374,7 @@ private class SettingsServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			for (Integer row = 0; row < 200; row++) {
-				Assert.isTrue(
-					SettingsService.hasKey('BarnCRM_Settings__c', TEXT_KEY),
-					'Row ' + row
-				);
+				Assert.isTrue(SettingsService.hasKey('BarnCRM_Settings__c', TEXT_KEY), 'Row ' + row);
 				Assert.isFalse(
 					SettingsService.hasKey('Not_A_Settings_Object__c', TEXT_KEY),
 					'An object the org lacks has no keys, row ' + row
@@ -437,10 +387,7 @@ private class SettingsServiceTest {
 				SettingsService.typeByName(' barncrm_settings__c '),
 				'The cached lookup ignores case and spacing, like the describe it replaces'
 			);
-			Assert.isNull(
-				SettingsService.typeByName('Not_A_Settings_Object__c'),
-				'Absent stays null'
-			);
+			Assert.isNull(SettingsService.typeByName('Not_A_Settings_Object__c'), 'Absent stays null');
 		}
 	}
 
@@ -452,11 +399,7 @@ private class SettingsServiceTest {
 			BarnCRM_Settings__c second = SettingsService.getSettings();
 			Test.stopTest();
 
-			Assert.areNotEqual(
-				null,
-				first,
-				'An org that has never saved still gets a settings record'
-			);
+			Assert.areNotEqual(null, first, 'An org that has never saved still gets a settings record');
 			Assert.areEqual(first, second, 'The second read comes from the cache');
 		}
 	}
@@ -502,11 +445,7 @@ private class SettingsServiceTest {
 			settings.Household_Membership_Mode__c = 'Junction';
 			TestDataFactory.saveSettings(settings);
 
-			Assert.areEqual(
-				'Junction',
-				SettingsService.householdMembershipMode(),
-				'Maria chose junction membership.'
-			);
+			Assert.areEqual('Junction', SettingsService.householdMembershipMode(), 'Maria chose junction membership.');
 		}
 	}
 
@@ -553,11 +492,7 @@ private class SettingsServiceTest {
 				Assert.areEqual(
 					formula,
 					formula.trim(),
-					'The default formula for ' +
-						fieldName +
-						' carries no padding: "' +
-						formula +
-						'"'
+					'The default formula for ' + fieldName + ' carries no padding: "' + formula + '"'
 				);
 				Assert.areEqual(
 					formula.removeStart('"').removeEnd('"'),
@@ -572,9 +507,7 @@ private class SettingsServiceTest {
 			}
 
 			Assert.isTrue(
-				SettingsService.COEXISTENCE_MODES.contains(
-					SettingsService.COEXISTENCE_MODE_DEFAULT
-				),
+				SettingsService.COEXISTENCE_MODES.contains(SettingsService.COEXISTENCE_MODE_DEFAULT),
 				'And the code default is itself one of the offered values.'
 			);
 			Assert.isTrue(
@@ -588,11 +521,7 @@ private class SettingsServiceTest {
 	static void everyChangeIsRecordedWithWhoWhenAndWhat() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			SettingsService.logChange(
-				'Household naming pattern',
-				'The {LastName} Family',
-				'{LastName}'
-			);
+			SettingsService.logChange('Household naming pattern', 'The {LastName} Family', '{LastName}');
 			SettingsService.logChange('  ', 'something', 'something else');
 			Test.stopTest();
 
@@ -641,18 +570,12 @@ private class SettingsServiceTest {
 			stubDefinitions();
 
 			Test.startTest();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 			Test.stopTest();
 
 			BarnCRM_Settings__c stored = SettingsService.getSettings();
 			Assert.isNotNull(stored.Id, 'Saving one value creates the org level record');
-			Assert.areEqual(
-				'The {LastName} Family',
-				stored.Household_Name_Pattern__c,
-				'With the value that was saved'
-			);
+			Assert.areEqual('The {LastName} Family', stored.Household_Name_Pattern__c, 'With the value that was saved');
 			Assert.isTrue(
 				stored.Relationship_Auto_Reciprocal__c,
 				'And the shipped defaults it never asked about, rather than a false nobody chose'
@@ -717,9 +640,7 @@ private class SettingsServiceTest {
 			Id recordId = staleCopyThenAnotherSave();
 
 			Test.startTest();
-			SettingsService.saveValues(
-				new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ TEXT_KEY => 'The {LastName} Family' });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -813,11 +734,7 @@ private class SettingsServiceTest {
 			Assert.areEqual(expected, tooHigh, 'and so is above it');
 			Assert.isNotNull(notANumber, 'Something that is not a number is refused');
 			Assert.isNull(highest, 'The ends of the range are accepted');
-			Assert.areEqual(
-				2000,
-				Integer.valueOf(SettingsService.getValue('Import_Chunk_Size__c')),
-				'and saved'
-			);
+			Assert.areEqual(2000, Integer.valueOf(SettingsService.getValue('Import_Chunk_Size__c')), 'and saved');
 		}
 	}
 
@@ -915,9 +832,7 @@ private class SettingsServiceTest {
 				}
 			}
 			String none = refusalOf(key, AccountKinds.NO_RECORD_TYPE);
-			String candidate = offered.isEmpty()
-				? null
-				: refusalOf(key, offered[0].getDeveloperName());
+			String candidate = offered.isEmpty() ? null : refusalOf(key, offered[0].getDeveloperName());
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -930,8 +845,7 @@ private class SettingsServiceTest {
 				Assert.isNull(none, 'No record type is accepted where the org has no candidate');
 			} else {
 				Assert.isTrue(
-					none != null &&
-					none.contains(BarnHelp.text('Core', 'Core_Settings_NoRecordTypeNotAllowed')),
+					none != null && none.contains(BarnHelp.text('Core', 'Core_Settings_NoRecordTypeNotAllowed')),
 					'No record type is refused where a candidate exists, saying why'
 				);
 			}
@@ -981,15 +895,8 @@ private class SettingsServiceTest {
 				'A value the field does not list as active is refused: ' + refused
 			);
 			Assert.isNull(accepted, 'An active value is accepted');
-			Assert.areEqual(
-				active,
-				BarnCRM_Settings__c.getOrgDefaults().Address_Card_Fields__c,
-				'Saved org-wide'
-			);
-			Assert.isNull(
-				refusalOf('Address_Card_Fields__c', active),
-				'The stored value saves again unchanged'
-			);
+			Assert.areEqual(active, BarnCRM_Settings__c.getOrgDefaults().Address_Card_Fields__c, 'Saved org-wide');
+			Assert.isNull(refusalOf('Address_Card_Fields__c', active), 'The stored value saves again unchanged');
 		}
 	}
 
@@ -1043,10 +950,7 @@ private class SettingsServiceTest {
 			String otherCase = refusalOf('Error_Digest_Frequency__c', active.toLowerCase());
 			Test.stopTest();
 
-			Assert.isNull(
-				keptDefault,
-				'The shown default saves although the field does not list it'
-			);
+			Assert.isNull(keptDefault, 'The shown default saves although the field does not list it');
 			Assert.isNotNull(otherCase, 'An active value in another case is refused');
 		}
 	}
@@ -1156,10 +1060,7 @@ private class SettingsServiceTest {
 				SettingsService.getValue('Organization_Street__c'),
 				'The street is saved'
 			);
-			Assert.isNull(
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Street_2__c,
-				'Street 2 stays optional'
-			);
+			Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Organization_Street_2__c, 'Street 2 stays optional');
 			Assert.areEqual(4, SettingChangeSelector.getRecent(10).size(), 'One change per part');
 		}
 	}
@@ -1177,10 +1078,7 @@ private class SettingsServiceTest {
 			SettingsService.saveValues(blanks);
 			Test.stopTest();
 
-			Assert.isNull(
-				SettingsService.getValue('Organization_City__c'),
-				'A blank address is a valid answer'
-			);
+			Assert.isNull(SettingsService.getValue('Organization_City__c'), 'A blank address is a valid answer');
 		}
 	}
 
@@ -1196,14 +1094,8 @@ private class SettingsServiceTest {
 			Assert.isNotNull(refusal, 'A city alone is not an address');
 			Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_Street), 'Street');
 			Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_State), 'State');
-			Assert.isTrue(
-				refusal.contains(System.Label.Core_OrganizationAddress_PostalCode),
-				'Zip Code'
-			);
-			Assert.isNull(
-				SettingsService.getValue('Organization_City__c'),
-				'A refused save writes nothing'
-			);
+			Assert.isTrue(refusal.contains(System.Label.Core_OrganizationAddress_PostalCode), 'Zip Code');
+			Assert.isNull(SettingsService.getValue('Organization_City__c'), 'A refused save writes nothing');
 			Assert.isTrue(SettingChangeSelector.getRecent(10).isEmpty(), 'And records no change');
 		}
 	}
@@ -1278,10 +1170,7 @@ private class SettingsServiceTest {
 				),
 				'And so does a number'
 			);
-			Assert.isNull(
-				BarnCRM_Settings__c.getOrgDefaults().Id,
-				'Reading the default writes nothing'
-			);
+			Assert.isNull(BarnCRM_Settings__c.getOrgDefaults().Id, 'Reading the default writes nothing');
 			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'And audits nothing.');
 		}
 	}
@@ -1351,11 +1240,7 @@ private class SettingsServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(
 				'The {LastName} Family',
-				SettingsService.getEffectiveValue(
-					SettingsService.CORE_SETTINGS_OBJECT,
-					TEXT_KEY,
-					'Text'
-				),
+				SettingsService.getEffectiveValue(SettingsService.CORE_SETTINGS_OBJECT, TEXT_KEY, 'Text'),
 				'A pattern nobody has set shows the one the household names are built from'
 			);
 		}

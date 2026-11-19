@@ -19,12 +19,7 @@ public with sharing class HubCompliance {
 	 * @param notes free text
 	 * @return the new cycle's Id, so its evidence can be attached to it
 	 */
-	public static Id completeCycle(
-		Id obligationId,
-		Date completedOn,
-		String outcome,
-		String notes
-	) {
+	public static Id completeCycle(Id obligationId, Date completedOn, String outcome, String notes) {
 		Compliance_Obligation__c obligation = [
 			SELECT Id, Due_Date__c, Recurrence__c
 			FROM Compliance_Obligation__c

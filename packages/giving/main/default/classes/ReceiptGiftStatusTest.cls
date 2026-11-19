@@ -14,11 +14,7 @@ private class ReceiptGiftStatusTest {
 			ReceiptService.issueForGift(giftId);
 			Assert.fail(why);
 		} catch (ReceiptService.ReceiptServiceException refused) {
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Receipt_GiftNotReceived'),
-				refused.getMessage(),
-				why
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Receipt_GiftNotReceived'), refused.getMessage(), why);
 		}
 	}
 
@@ -27,16 +23,8 @@ private class ReceiptGiftStatusTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact donor = GivingTestDataFactory.insertHouseholdContact(
-					'The Mbeki Family',
-					'Thandi',
-					'Mbeki'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					donor.Id,
-					60,
-					Date.newInstance(2026, 2, 3)
-				);
+				Contact donor = GivingTestDataFactory.insertHouseholdContact('The Mbeki Family', 'Thandi', 'Mbeki');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(donor.Id, 60, Date.newInstance(2026, 2, 3));
 				gift.Status__c = 'Pending';
 				insert gift;
 

@@ -15,21 +15,9 @@ private class GivingContactMergeTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
 			RollupService.ensureDefaults();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Okafor Family',
-				'Ana',
-				'Okafor'
-			);
-			Contact bea = GivingTestDataFactory.insertHouseholdContact(
-				'The Lindqvist Family',
-				'Bea',
-				'Lindqvist'
-			);
-			Contact wei = GivingTestDataFactory.insertHouseholdContact(
-				'The Lee Family',
-				'Wei',
-				'Lee'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Okafor Family', 'Ana', 'Okafor');
+			Contact bea = GivingTestDataFactory.insertHouseholdContact('The Lindqvist Family', 'Bea', 'Lindqvist');
+			Contact wei = GivingTestDataFactory.insertHouseholdContact('The Lee Family', 'Wei', 'Lee');
 			Gift__c hers = GivingTestDataFactory.buildGift(ana.Id, 100);
 			Gift__c other = GivingTestDataFactory.buildGift(bea.Id, 50);
 			Gift__c solicited = GivingTestDataFactory.buildGift(wei.Id, 500);

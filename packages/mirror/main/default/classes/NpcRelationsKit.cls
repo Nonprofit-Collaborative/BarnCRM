@@ -52,9 +52,7 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 					null
 				)
 			) {
-				wanted.add(
-					pair((String) link.get('ContactId'), (String) link.get('RelatedContactId'))
-				);
+				wanted.add(pair((String) link.get('ContactId'), (String) link.get('RelatedContactId')));
 			}
 			for (Relationship__c held : [
 				SELECT Contact__c, Related_Contact__c
@@ -102,10 +100,7 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 	 * round, only the row whose person Id sorts first.
 	 */
 	@TestVisible
-	private static List<Map<String, Object>> oneSide(
-		List<Map<String, Object>> rows,
-		Set<String> reversed
-	) {
+	private static List<Map<String, Object>> oneSide(List<Map<String, Object>> rows, Set<String> reversed) {
 		List<Map<String, Object>> result = new List<Map<String, Object>>();
 		for (Map<String, Object> row : rows) {
 			String contact = (String) row.get('ContactId');
@@ -119,10 +114,7 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 
 	/** The affiliation rows with an organization, each role list as text. */
 	@TestVisible
-	private static List<Map<String, Object>> organizations(
-		List<Map<String, Object>> rows,
-		Set<String> skipped
-	) {
+	private static List<Map<String, Object>> organizations(List<Map<String, Object>> rows, Set<String> skipped) {
 		List<Map<String, Object>> result = new List<Map<String, Object>>();
 		for (Map<String, Object> row : rows) {
 			if (skipped.contains((String) row.get('AccountId'))) {
@@ -214,10 +206,6 @@ public with sharing class NpcRelationsKit implements MigrationKitExtension {
 			return new List<SObject>();
 		}
 		// Every name is Nonprofit Cloud's own, fixed here; the only value is a bind.
-		return Database.queryWithBinds(
-			query,
-			new Map<String, Object>{ 'ids' => ids },
-			AccessLevel.USER_MODE
-		);
+		return Database.queryWithBinds(query, new Map<String, Object>{ 'ids' => ids }, AccessLevel.USER_MODE);
 	}
 }

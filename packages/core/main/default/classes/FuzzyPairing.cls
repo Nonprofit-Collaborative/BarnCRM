@@ -49,11 +49,7 @@ public with sharing class FuzzyPairing {
 	 */
 	public static List<DuplicateService.Pair> pairsFor(List<Id> recordIds) {
 		List<DuplicateService.Pair> result = new List<DuplicateService.Pair>();
-		if (
-			recordIds == null ||
-			recordIds.isEmpty() ||
-			recordIds[0].getSObjectType() != Contact.SObjectType
-		) {
+		if (recordIds == null || recordIds.isEmpty() || recordIds[0].getSObjectType() != Contact.SObjectType) {
 			return result;
 		}
 		try {
@@ -119,11 +115,7 @@ public with sharing class FuzzyPairing {
 				String reason = reasonFor(person, other, threshold);
 				if (reason != null) {
 					seen.add(key);
-					DuplicateService.Pair pair = new DuplicateService.Pair(
-						person.Id,
-						other.Id,
-						null
-					);
+					DuplicateService.Pair pair = new DuplicateService.Pair(person.Id, other.Id, null);
 					pair.reason = reason;
 					result.add(pair);
 				}
@@ -148,9 +140,7 @@ public with sharing class FuzzyPairing {
 		Boolean sameHousehold = household != null && household == (Id) value(second, 'AccountId');
 		String shared = sharedValue(first, second, sameHousehold);
 		if (shared == null) {
-			return sameHousehold && similarity == 1
-				? Label.Core_DuplicateManagement_ReasonSameHousehold
-				: null;
+			return sameHousehold && similarity == 1 ? Label.Core_DuplicateManagement_ReasonSameHousehold : null;
 		}
 		return String.format(
 			Label.Core_DuplicateManagement_ReasonSimilarNames,
@@ -180,9 +170,7 @@ public with sharing class FuzzyPairing {
 			MatchSourceService.postalCode((String) value(first, 'MailingPostalCode')),
 			MatchSourceService.postalCode((String) value(second, 'MailingPostalCode'))
 		);
-		return !sameHousehold && samePostal
-			? Label.Core_DuplicateManagement_SharedPostalCode
-			: null;
+		return !sameHousehold && samePostal ? Label.Core_DuplicateManagement_SharedPostalCode : null;
 	}
 
 	private static Boolean same(String first, String second) {

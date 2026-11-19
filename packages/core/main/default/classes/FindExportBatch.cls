@@ -80,12 +80,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	 * @param tag six hex digits naming this export's files
 	 * @param rowLimit the export row limit
 	 */
-	public FindExportBatch(
-		String queryJson,
-		Map<String, String> labelsByPath,
-		String tag,
-		Integer rowLimit
-	) {
+	public FindExportBatch(String queryJson, Map<String, String> labelsByPath, String tag, Integer rowLimit) {
 		this.queryJson = queryJson;
 		this.labelsByPath = new Map<String, String>();
 		if (labelsByPath != null) {
@@ -116,11 +111,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 				labels.add(cell(String.isBlank(label) ? path : label, false));
 			}
 			header = String.join(labels, ',');
-			return Database.getQueryLocatorWithBinds(
-				compiled.soql,
-				compiled.binds,
-				AccessLevel.USER_MODE
-			);
+			return Database.getQueryLocatorWithBinds(compiled.soql, compiled.binds, AccessLevel.USER_MODE);
 		} catch (Exception e) {
 			failed = true;
 			if (!(e instanceof QueryCompiler.QueryCompilerException)) {
@@ -176,12 +167,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 			firstDocumentId
 		);
 		if (archiveJobId != null) {
-			BulkDeleteService.afterArchiveExport(
-				archiveJobId,
-				failed,
-				rowsWritten,
-				titleOf(objectName, tag, 1)
-			);
+			BulkDeleteService.afterArchiveExport(archiveJobId, failed, rowsWritten, titleOf(objectName, tag, 1));
 		}
 		if (backupJobId != null) {
 			BackupSetService.afterExport(
@@ -257,10 +243,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 		if (value instanceof Decimal) {
 			return ((Decimal) value).toPlainString();
 		}
-		Boolean numeric =
-			value instanceof Integer ||
-			value instanceof Long ||
-			value instanceof Double;
+		Boolean numeric = value instanceof Integer || value instanceof Long || value instanceof Double;
 		return cell(String.valueOf(value), numeric);
 	}
 
@@ -275,12 +258,7 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 		if (!numeric && result.length() > 0 && '=+-@\t\r'.contains(result.left(1))) {
 			result = '\'' + result;
 		}
-		if (
-			result.contains(',') ||
-			result.contains('"') ||
-			result.contains('\r') ||
-			result.contains('\n')
-		) {
+		if (result.contains(',') || result.contains('"') || result.contains('\r') || result.contains('\n')) {
 			result = '"' + result.replace('"', '""') + '"';
 		}
 		return result;

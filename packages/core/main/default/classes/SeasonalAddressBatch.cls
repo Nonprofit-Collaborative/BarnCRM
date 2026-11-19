@@ -46,9 +46,7 @@ public with sharing class SeasonalAddressBatch implements Database.Batchable<SOb
 	/** No work while the Addresses feature is off (ADR-0124): the locator then finds nothing. */
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		if (!addressesOn()) {
-			return Database.getQueryLocator(
-				[SELECT Id FROM Address__c WHERE Id = NULL WITH SYSTEM_MODE]
-			);
+			return Database.getQueryLocator([SELECT Id FROM Address__c WHERE Id = NULL WITH SYSTEM_MODE]);
 		}
 		return new SeasonalAddressSelector().seasonalLocator();
 	}

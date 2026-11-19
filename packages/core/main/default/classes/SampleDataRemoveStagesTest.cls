@@ -130,11 +130,7 @@ private class SampleDataRemoveStagesTest {
 				[SELECT COUNT() FROM Affiliation__c WHERE Sample_Data__c = TRUE],
 				'affiliations wait for their stage'
 			);
-			System.assertEquals(
-				200,
-				[SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE],
-				'and so do the people'
-			);
+			System.assertEquals(200, [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE], 'and so do the people');
 
 			batch.execute(null, new List<Integer>{ 1 });
 			System.assertEquals(
@@ -205,13 +201,9 @@ private class SampleDataRemoveStagesTest {
 	static void testRemovalLeavesRecordsTheLoaderDidNotCreate() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			loadTwoHundredHouseholds();
-			Account ownHousehold = TestDataFactory.household(
-				new Account(Name = 'A real household')
-			);
+			Account ownHousehold = TestDataFactory.household(new Account(Name = 'A real household'));
 			insert ownHousehold;
-			Contact ownPerson = TestDataFactory.person(
-				new Contact(LastName = 'Real', AccountId = ownHousehold.Id)
-			);
+			Contact ownPerson = TestDataFactory.person(new Contact(LastName = 'Real', AccountId = ownHousehold.Id));
 			insert ownPerson;
 
 			SampleDataRemoveStages stages = new SampleDataRemoveStages();
@@ -267,13 +259,9 @@ private class SampleDataRemoveStagesTest {
 				WHERE Sample_Data__c = TRUE
 				LIMIT 1
 			];
-			Account ownHousehold = TestDataFactory.household(
-				new Account(Name = 'A real household')
-			);
+			Account ownHousehold = TestDataFactory.household(new Account(Name = 'A real household'));
 			insert ownHousehold;
-			Contact ownPerson = TestDataFactory.person(
-				new Contact(LastName = 'Real', AccountId = ownHousehold.Id)
-			);
+			Contact ownPerson = TestDataFactory.person(new Contact(LastName = 'Real', AccountId = ownHousehold.Id));
 			insert ownPerson;
 			insert new List<Address__c>{
 				homeAddress(sampleHousehold.Id, null, '1 Sample Household Way'),
@@ -322,11 +310,7 @@ private class SampleDataRemoveStagesTest {
 				[SELECT COUNT() FROM Address__c WHERE Street__c = '3 Administrator Way'],
 				'an address on a person the admin entered is not touched'
 			);
-			System.assertEquals(
-				0,
-				new SampleDataSelector().getSampleAddressIds().size(),
-				'nothing is left to find'
-			);
+			System.assertEquals(0, new SampleDataSelector().getSampleAddressIds().size(), 'nothing is left to find');
 		}
 	}
 
@@ -338,11 +322,7 @@ private class SampleDataRemoveStagesTest {
 
 			List<Integer> order = (List<Integer>) batch.start(null);
 
-			System.assertEquals(
-				new List<Integer>{ 0 },
-				order,
-				'the platform allows one execute of a batch in a test'
-			);
+			System.assertEquals(new List<Integer>{ 0 }, order, 'the platform allows one execute of a batch in a test');
 		}
 	}
 
@@ -383,11 +363,7 @@ private class SampleDataRemoveStagesTest {
 				new SampleDataSelector().hasRunningRemoveJob(),
 				'the status card can see the removal'
 			);
-			System.assertEquals(
-				false,
-				new SampleDataSelector().hasRunningLoadJob(),
-				'and tell it from a load'
-			);
+			System.assertEquals(false, new SampleDataSelector().hasRunningLoadJob(), 'and tell it from a load');
 			Test.stopTest();
 
 			System.assertEquals(
@@ -395,11 +371,7 @@ private class SampleDataRemoveStagesTest {
 				[SELECT COUNT() FROM Relationship__c WHERE Sample_Data__c = TRUE],
 				'the test context ran the first stage, which deletes the connections'
 			);
-			System.assertEquals(
-				200,
-				[SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE],
-				'and only that stage'
-			);
+			System.assertEquals(200, [SELECT COUNT() FROM Contact WHERE Sample_Data__c = TRUE], 'and only that stage');
 		}
 	}
 }

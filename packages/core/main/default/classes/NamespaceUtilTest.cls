@@ -73,16 +73,9 @@ private class NamespaceUtilTest {
 
 		Map<String, String> names = NamespaceUtil.tabApiNames(new List<String>{ 'Find', 'Import' });
 
-		Assert.areEqual(
-			'example__Find',
-			names.get('Find'),
-			'Lightning opens the tab by its qualified name.'
-		);
+		Assert.areEqual('example__Find', names.get('Find'), 'Lightning opens the tab by its qualified name.');
 		Assert.areEqual('example__Import', names.get('Import'), 'Every tab asked for is answered.');
-		Assert.isTrue(
-			NamespaceUtil.tabApiNames(null).isEmpty(),
-			'Nothing asked for, nothing answered.'
-		);
+		Assert.isTrue(NamespaceUtil.tabApiNames(null).isEmpty(), 'Nothing asked for, nothing answered.');
 	}
 
 	/** This package's prefix and another package's, kept apart from the names they go on. */
@@ -113,21 +106,13 @@ private class NamespaceUtilTest {
 
 	@IsTest
 	static void fieldLabelAndDescribeReadTheOrg() {
-		Assert.areEqual(
-			Contact.LastName,
-			NamespaceUtil.field(Contact.SObjectType, 'lastname'),
-			'Any case'
-		);
+		Assert.areEqual(Contact.LastName, NamespaceUtil.field(Contact.SObjectType, 'lastname'), 'Any case');
 		Assert.areEqual(
 			Contact.LastName.getDescribe().getLabel(),
 			NamespaceUtil.fieldLabel(Contact.SObjectType, 'LastName'),
 			'Its label'
 		);
-		Assert.areEqual(
-			'No_Field__c',
-			NamespaceUtil.fieldLabel(Contact.SObjectType, 'No_Field__c'),
-			'Name'
-		);
+		Assert.areEqual('No_Field__c', NamespaceUtil.fieldLabel(Contact.SObjectType, 'No_Field__c'), 'Name');
 		Assert.areEqual('Contact', NamespaceUtil.describe('Contact').getName(), 'Described');
 		Assert.isNull(NamespaceUtil.describe('No_Such_Barn_Object__c'), 'Null, not an exception');
 	}
@@ -157,19 +142,13 @@ private class NamespaceUtilTest {
 
 	@IsTest
 	static void objectTypeNeverPicksAnotherPackagesObject() {
-		stubDescribe(
-			OWN,
-			new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType }
-		);
+		stubDescribe(OWN, new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType });
 		Assert.isNull(
 			NamespaceUtil.objectType('Address__c'),
 			'Under a namespace, NPSP\'s Address__c is not BarnCRM\'s'
 		);
 
-		stubDescribe(
-			'',
-			new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType }
-		);
+		stubDescribe('', new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType });
 		Assert.isNull(
 			NamespaceUtil.objectType('Address__c'),
 			'Without a namespace, NPSP\'s Address__c is not BarnCRM\'s either'
@@ -241,18 +220,11 @@ private class NamespaceUtilTest {
 		NamespaceUtil.typesByName.clear();
 		NamespaceUtil.orgDescribe = null;
 
-		Assert.areEqual(
-			Contact.SObjectType,
-			NamespaceUtil.objectType('Contact'),
-			'Read from the org'
-		);
+		Assert.areEqual(Contact.SObjectType, NamespaceUtil.objectType('Contact'), 'Read from the org');
 		Assert.isNotNull(NamespaceUtil.orgDescribe, 'The describe is kept for the transaction');
 		Map<String, Schema.SObjectType> kept = NamespaceUtil.orgDescribe;
 		Assert.areEqual(Account.SObjectType, NamespaceUtil.objectType('Account'), 'A new name');
-		Assert.isTrue(
-			kept === NamespaceUtil.orgDescribe,
-			'The second name reuses the same describe'
-		);
+		Assert.isTrue(kept === NamespaceUtil.orgDescribe, 'The second name reuses the same describe');
 
 		stubDescribe(OWN, new Map<String, Schema.SObjectType>{ 'account' => User.SObjectType });
 		Assert.areEqual(
@@ -283,10 +255,7 @@ private class NamespaceUtilTest {
 		Assert.isFalse(theirs === mine, 'Another running user reads it afresh');
 		Assert.isTrue(theirs.containsKey('contact'), 'Their describe');
 		Assert.isFalse(mineAgain === theirs, 'Back as the first user, read afresh again');
-		Assert.isTrue(
-			mineAgain === NamespaceUtil.globalDescribe(),
-			'And kept again while the user stays the same'
-		);
+		Assert.isTrue(mineAgain === NamespaceUtil.globalDescribe(), 'And kept again while the user stays the same');
 	}
 
 	@IsTest

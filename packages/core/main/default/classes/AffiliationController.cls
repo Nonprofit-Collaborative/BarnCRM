@@ -42,9 +42,7 @@ public with sharing class AffiliationController {
 		}
 		Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
 		if (personTypes != null && !personTypes.isEmpty()) {
-			for (
-				Account record : HouseholdSelector.getAccountRecordTypes(new Set<Id>{ recordId })
-			) {
+			for (Account record : HouseholdSelector.getAccountRecordTypes(new Set<Id>{ recordId })) {
 				if (personTypes.contains(record.RecordTypeId)) {
 					context.ownerField = personAccount;
 					return context;

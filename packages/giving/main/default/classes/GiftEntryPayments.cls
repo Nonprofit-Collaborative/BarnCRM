@@ -25,13 +25,7 @@ public with sharing class GiftEntryPayments {
 		public Date giftDate;
 		public Decimal amount;
 
-		public Request(
-			String key,
-			Id donorContactId,
-			Id donorAccountId,
-			Date giftDate,
-			Decimal amount
-		) {
+		public Request(String key, Id donorContactId, Id donorAccountId, Date giftDate, Decimal amount) {
 			this.key = key;
 			this.donorContactId = donorContactId;
 			this.donorAccountId = donorAccountId;
@@ -80,9 +74,7 @@ public with sharing class GiftEntryPayments {
 			for (Integer position : positionsOf(request, households, positionsByOwner)) {
 				own.add(candidates[position]);
 			}
-			Set<Id> suggested = new Map<Id, Installment__c>(
-					matcher.matching(request.giftDate, request.amount, own)
-				)
+			Set<Id> suggested = new Map<Id, Installment__c>(matcher.matching(request.giftDate, request.amount, own))
 				.keySet();
 			Choices choices = new Choices();
 			choices.key = request.key;
@@ -106,10 +98,7 @@ public with sharing class GiftEntryPayments {
 	 * is its donor's (R-DM2, read in the saving user's mode), that payment with its commitment.
 	 * A key missing from the result chose a payment it may not pay.
 	 */
-	public static Map<String, Installment__c> confirm(
-		List<Request> requests,
-		Map<String, Id> chosenByKey
-	) {
+	public static Map<String, Installment__c> confirm(List<Request> requests, Map<String, Id> chosenByKey) {
 		Map<String, Installment__c> confirmed = new Map<String, Installment__c>();
 		Set<Id> chosenIds = new Set<Id>(chosenByKey.values());
 		chosenIds.remove(null);
@@ -139,9 +128,7 @@ public with sharing class GiftEntryPayments {
 			probes.add(
 				new Gift__c(
 					Donor_Contact__c = request.donorContactId,
-					Donor_Account__c = request.donorContactId == null
-						? request.donorAccountId
-						: null
+					Donor_Account__c = request.donorContactId == null ? request.donorAccountId : null
 				)
 			);
 		}
@@ -153,10 +140,7 @@ public with sharing class GiftEntryPayments {
 		return households;
 	}
 
-	private static List<Installment__c> openFor(
-		List<Request> requests,
-		Map<String, Id> households
-	) {
+	private static List<Installment__c> openFor(List<Request> requests, Map<String, Id> households) {
 		Set<Id> donorIds = new Set<Id>();
 		for (Request request : requests) {
 			if (request.hasDonor()) {
@@ -170,8 +154,7 @@ public with sharing class GiftEntryPayments {
 		if (donorIds.isEmpty() && householdIds.isEmpty()) {
 			return new List<Installment__c>();
 		}
-		return new InstallmentSelector()
-			.selectOpenForDonors(donorIds, householdIds, MAXIMUM_CANDIDATES);
+		return new InstallmentSelector().selectOpenForDonors(donorIds, householdIds, MAXIMUM_CANDIDATES);
 	}
 
 	/**
@@ -211,13 +194,7 @@ public with sharing class GiftEntryPayments {
 		Map<Id, Set<Integer>> positionsByOwner
 	) {
 		Set<Integer> found = new Set<Integer>();
-		for (
-			Id owner : new List<Id>{
-				request.donorContactId,
-				request.donorAccountId,
-				households.get(request.key)
-			}
-		) {
+		for (Id owner : new List<Id>{ request.donorContactId, request.donorAccountId, households.get(request.key) }) {
 			if (owner != null && positionsByOwner.containsKey(owner)) {
 				found.addAll(positionsByOwner.get(owner));
 			}
@@ -241,37 +218,22 @@ public with sharing class GiftEntryPayments {
 			commitment.Household__c == household);
 	}
 
-	private static Choice choiceFor(
-		Installment__c candidate,
-		Boolean suggested,
-		Map<String, String> typeLabels
-	) {
+	private static Choice choiceFor(Installment__c candidate, Boolean suggested, Map<String, String> typeLabels) {
 		Commitment__c commitment = candidate.Commitment__r;
 		String type = typeLabels.get(commitment.Type__c);
-		String commitmentName = String.isBlank(type)
-			? commitment.Name
-			: type + ' ' + commitment.Name;
+		String commitmentName = String.isBlank(type) ? commitment.Name : type + ' ' + commitment.Name;
 		String described = Label.Giving_GiftEntryPays_Choice
 			.replace('{0}', commitmentName)
-			.replace(
-				'{1}',
-				candidate.Sequence__c == null
-					? ''
-					: String.valueOf(candidate.Sequence__c.intValue())
-			)
+			.replace('{1}', candidate.Sequence__c == null ? '' : String.valueOf(candidate.Sequence__c.intValue()))
 			.replace('{2}', candidate.Due_Date__c == null ? '' : candidate.Due_Date__c.format())
 			.replace(
 				'{3}',
-				candidate.Expected_Amount__c == null
-					? ''
-					: String.valueOf(candidate.Expected_Amount__c.setScale(2))
+				candidate.Expected_Amount__c == null ? '' : String.valueOf(candidate.Expected_Amount__c.setScale(2))
 			);
 		Choice choice = new Choice();
 		choice.value = candidate.Id;
 		choice.suggested = suggested;
-		choice.label = suggested
-			? Label.Giving_GiftEntryPays_SuggestedChoice.replace('{0}', described)
-			: described;
+		choice.label = suggested ? Label.Giving_GiftEntryPays_SuggestedChoice.replace('{0}', described) : described;
 		return choice;
 	}
 

@@ -58,9 +58,7 @@ private class VolunteerReminderServiceTest {
 	private static List<Volunteer_Signup__c> due() {
 		List<Volunteer_Signup__c> found = new List<Volunteer_Signup__c>();
 		Datetime now = ShiftScheduleService.now();
-		Datetime windowEnd = VolunteerReminderService.windowEnd(
-			VolunteerSettings.reminderLeadDays()
-		);
+		Datetime windowEnd = VolunteerReminderService.windowEnd(VolunteerSettings.reminderLeadDays());
 		for (Volunteer_Signup__c signup : [
 			SELECT
 				Id,
@@ -117,21 +115,11 @@ private class VolunteerReminderServiceTest {
 
 			Assert.areEqual(1, firstRun, 'The booking is stamped after its reminder.');
 			Assert.areEqual(0, secondRun, 'Nothing is due on the second run.');
-			Assert.areEqual(
-				1,
-				stub.received.size(),
-				'One email in two runs: one reminder per booking.'
-			);
+			Assert.areEqual(1, stub.received.size(), 'One email in two runs: one reminder per booking.');
 			Messaging.SingleEmailMessage sent = stub.received[0];
 			Assert.areEqual('ana@example.org', sent.getToAddresses()[0], 'To the Contact address.');
-			Assert.isTrue(
-				sent.getSubject().contains('Food pantry sort'),
-				'The subject names the job.'
-			);
-			Assert.isTrue(
-				sent.getPlainTextBody().startsWith('Hello Ana,'),
-				'Greets by first name.'
-			);
+			Assert.isTrue(sent.getSubject().contains('Food pantry sort'), 'The subject names the job.');
+			Assert.isTrue(sent.getPlainTextBody().startsWith('Hello Ana,'), 'Greets by first name.');
 			Assert.isTrue(sent.getPlainTextBody().contains('Church hall'), 'Names the place.');
 		}
 	}
@@ -191,11 +179,7 @@ private class VolunteerReminderServiceTest {
 
 			runBatch();
 
-			Assert.areEqual(
-				1,
-				stub.received.size(),
-				'A shift six days out is inside a seven day lead.'
-			);
+			Assert.areEqual(1, stub.received.size(), 'A shift six days out is inside a seven day lead.');
 		}
 	}
 
@@ -250,11 +234,7 @@ private class VolunteerReminderServiceTest {
 			settings(true, 1);
 			Volunteer_Shift__c shift = shiftIn(3, null);
 			book(shift.Id, person('Rivera', 'ana@example.org', false), 'Signed up');
-			Volunteer_Signup__c gone = book(
-				shift.Id,
-				person('Okafor', 'obi@example.org', false),
-				'Signed up'
-			);
+			Volunteer_Signup__c gone = book(shift.Id, person('Okafor', 'obi@example.org', false), 'Signed up');
 			List<Volunteer_Signup__c> chunk = due();
 			// Deleted after the run read it: its stamp cannot be saved.
 			delete gone;
@@ -312,10 +292,7 @@ private class VolunteerReminderServiceTest {
 
 			runBatch();
 
-			Assert.isTrue(
-				stub.received[0].getPlainTextBody().startsWith('Hello,'),
-				'No name, no "null".'
-			);
+			Assert.isTrue(stub.received[0].getPlainTextBody().startsWith('Hello,'), 'No name, no "null".');
 		}
 	}
 
@@ -361,11 +338,7 @@ private class VolunteerReminderServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(420, steps[1].minute, 'At seven in the morning.');
-			Assert.areEqual(
-				Label.Volunteers_NightlyJobs_RemindersName,
-				steps[1].label,
-				'Its label.'
-			);
+			Assert.areEqual(Label.Volunteers_NightlyJobs_RemindersName, steps[1].label, 'Its label.');
 			Assert.areEqual(1, stub.received.size(), 'The job ran the reminders.');
 		}
 	}

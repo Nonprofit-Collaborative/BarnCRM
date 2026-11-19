@@ -61,11 +61,7 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 	}
 
 	/** Starts the org's own hosted checkout for the answer `amount` (decision 4). */
-	public Map<String, Object> startCheckout(
-		Id recordId,
-		Map<String, Object> answers,
-		String returnUrl
-	) {
+	public Map<String, Object> startCheckout(Id recordId, Map<String, Object> answers, String returnUrl) {
 		Appeal__c appeal = published(recordId);
 		if (appeal == null || formOf(appeal) == null) {
 			return null;
@@ -83,9 +79,7 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 					'successUrl' => returnUrl + '&payment=done',
 					'cancelUrl' => returnUrl + '&payment=cancelled',
 					'payerName' => String.isBlank(name) ? null : name,
-					'payerEmail' => String.isBlank(text(given, 'email'))
-						? null
-						: text(given, 'email'),
+					'payerEmail' => String.isBlank(text(given, 'email')) ? null : text(given, 'email'),
 					'sourceRecordId' => appeal.Id,
 					'listener' => GivingDonations.LISTENER
 				}
@@ -122,11 +116,7 @@ public without sharing class GivingDonationPage implements PublicPageExtension, 
 		Decimal given = SettingsService.toNumber(amount);
 		if (given == null || given < minimum) {
 			throw new DonationPageException(
-				BarnHelp.text(
-					'Giving',
-					'Giving_Donate_BelowMinimum',
-					new List<Object>{ minimum.setScale(2).format() }
-				)
+				BarnHelp.text('Giving', 'Giving_Donate_BelowMinimum', new List<Object>{ minimum.setScale(2).format() })
 			);
 		}
 		Object recent = payments.call(

@@ -88,14 +88,7 @@ private class ImportObjectUndoTest {
 	private static void undo(Integer total) {
 		Datetime undoStartedAt = Datetime.now();
 		for (String pass : ImportUndoBatch.passes()) {
-			ImportUndoBatch job = new ImportUndoBatch(
-				batch.Id,
-				total,
-				pass,
-				0,
-				false,
-				undoStartedAt
-			);
+			ImportUndoBatch job = new ImportUndoBatch(batch.Id, total, pass, 0, false, undoStartedAt);
 			Database.QueryLocatorIterator records = job.start(null).iterator();
 			while (records.hasNext()) {
 				job.execute(null, new List<SObject>{ records.next() });
@@ -133,8 +126,7 @@ private class ImportObjectUndoTest {
 				Assert.areEqual(MANY / 2, view.updates, 'The values it changed are counted.');
 				Assert.areEqual(1, view.others.size(), 'Under one object.');
 				Assert.areEqual(
-					Duplicate_Dismissal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Duplicate_Dismissal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					view.others[0].label,
 					'Labelled as the org labels it.'
 				);
@@ -164,9 +156,7 @@ private class ImportObjectUndoTest {
 			User maria = admin();
 			System.runAs(maria) {
 				commitUpsert(
-					new List<Map<String, String>>{
-						new Map<String, String>{ 'Pair Key' => 'Mine', 'Reason' => 'New' }
-					}
+					new List<Map<String, String>>{ new Map<String, String>{ 'Pair Key' => 'Mine', 'Reason' => 'New' } }
 				);
 				// A journal entry naming somebody else's record, as a tampered page would.
 				ImportJournalService.write(
@@ -193,10 +183,7 @@ private class ImportObjectUndoTest {
 				'The record the import created is.'
 			);
 			Assert.isTrue(
-				undoJournal()
-					.contains(
-						BarnHelp.text('Core', 'Core_Import_UndoKeptNotCreatedByImport').left(40)
-					),
+				undoJournal().contains(BarnHelp.text('Core', 'Core_Import_UndoKeptNotCreatedByImport').left(40)),
 				'The kept record is journaled with why.'
 			);
 		}

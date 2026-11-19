@@ -49,9 +49,7 @@ private class FormCatalogExtensionsTest {
 	private static void register(FormCatalogExtension extension) {
 		FormCatalogExtensions.EXTENSION_CLASSES.clear();
 		FormCatalogExtensions.EXTENSION_CLASSES.add(WORKS);
-		FormCatalogExtensions.overrides = new Map<String, FormCatalogExtension>{
-			WORKS => extension
-		};
+		FormCatalogExtensions.overrides = new Map<String, FormCatalogExtension>{ WORKS => extension };
 	}
 
 	@IsTest
@@ -76,9 +74,7 @@ private class FormCatalogExtensionsTest {
 			Test.startTest();
 			Boolean available = FormCatalogExtensions.isAvailable();
 			List<FormCatalogEntry> forms = FormCatalogExtensions.publicForms();
-			List<FormCatalogEntry> questions = FormCatalogExtensions.questions(
-				UserInfo.getUserId()
-			);
+			List<FormCatalogEntry> questions = FormCatalogExtensions.questions(UserInfo.getUserId());
 			String link = FormCatalogExtensions.publicLink(UserInfo.getUserId(), null);
 			Test.stopTest();
 			Assert.isTrue(available);
@@ -94,9 +90,7 @@ private class FormCatalogExtensionsTest {
 			register(new Failing());
 			Test.startTest();
 			List<FormCatalogEntry> forms = FormCatalogExtensions.publicForms();
-			List<FormCatalogEntry> questions = FormCatalogExtensions.questions(
-				UserInfo.getUserId()
-			);
+			List<FormCatalogEntry> questions = FormCatalogExtensions.questions(UserInfo.getUserId());
 			String link = FormCatalogExtensions.publicLink(UserInfo.getUserId(), null);
 			Test.stopTest();
 			Assert.isTrue(forms.isEmpty());

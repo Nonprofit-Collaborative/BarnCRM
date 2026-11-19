@@ -29,17 +29,11 @@ public with sharing class AcknowledgmentLetterMerge {
 	};
 
 	/** One CSV, one row per gift, with the header first. */
-	public static String csvFor(
-		List<Gift__c> gifts,
-		List<AcknowledgmentRuleService.RuleMatch> matches
-	) {
+	public static String csvFor(List<Gift__c> gifts, List<AcknowledgmentRuleService.RuleMatch> matches) {
 		List<String> lines = new List<String>{ String.join(HEADERS, ',') };
 		for (Integer index = 0; index < gifts.size(); index++) {
 			Gift__c gift = gifts[index];
-			String ruleName = index < matches.size() &&
-				matches[index] != null
-				? matches[index].ruleName
-				: '';
+			String ruleName = index < matches.size() && matches[index] != null ? matches[index].ruleName : '';
 			lines.add(
 				String.join(
 					new List<String>{
@@ -67,14 +61,7 @@ public with sharing class AcknowledgmentLetterMerge {
 	 * Characters that make a spreadsheet read a cell as a formula, the same set Mirror's
 	 * accounting export guards against (`AccountingExportService`).
 	 */
-	private static final Set<String> FORMULA_STARTS = new Set<String>{
-		'=',
-		'+',
-		'-',
-		'@',
-		'\t',
-		'\r'
-	};
+	private static final Set<String> FORMULA_STARTS = new Set<String>{ '=', '+', '-', '@', '\t', '\r' };
 
 	/** A plain number, such as a negative amount, which is a value and never a formula. */
 	private static final Pattern PLAIN_NUMBER = Pattern.compile('^-?[0-9]+(\\.[0-9]+)?$');
@@ -93,15 +80,10 @@ public with sharing class AcknowledgmentLetterMerge {
 		if (String.isBlank(value)) {
 			return '';
 		}
-		String cell = FORMULA_STARTS.contains(value.left(1)) &&
-			!PLAIN_NUMBER.matcher(value).matches()
+		String cell = FORMULA_STARTS.contains(value.left(1)) && !PLAIN_NUMBER.matcher(value).matches()
 			? '\'' + value
 			: value;
-		Boolean needsQuoting =
-			cell.contains(',') ||
-			cell.contains('"') ||
-			cell.contains('\n') ||
-			cell.contains('\r');
+		Boolean needsQuoting = cell.contains(',') || cell.contains('"') || cell.contains('\n') || cell.contains('\r');
 		if (!needsQuoting) {
 			return cell;
 		}
@@ -125,16 +107,10 @@ public with sharing class AcknowledgmentLetterMerge {
 	 * and the donor's first name or the organization's name when there is not.
 	 */
 	public static String greetingOf(Gift__c gift) {
-		if (
-			gift.Household__r != null &&
-			String.isNotBlank(gift.Household__r.Household_Informal_Greeting__c)
-		) {
+		if (gift.Household__r != null && String.isNotBlank(gift.Household__r.Household_Informal_Greeting__c)) {
 			return gift.Household__r.Household_Informal_Greeting__c;
 		}
-		if (
-			gift.Donor_Account__r != null &&
-			String.isNotBlank(gift.Donor_Account__r.Household_Informal_Greeting__c)
-		) {
+		if (gift.Donor_Account__r != null && String.isNotBlank(gift.Donor_Account__r.Household_Informal_Greeting__c)) {
 			return gift.Donor_Account__r.Household_Informal_Greeting__c;
 		}
 		if (gift.Donor_Contact__r != null && String.isNotBlank(gift.Donor_Contact__r.FirstName)) {

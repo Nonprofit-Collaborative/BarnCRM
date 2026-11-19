@@ -35,9 +35,7 @@ private class RollupServiceTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			SettingsService.saveValues(
 				RollupService.SETTINGS_OBJECT,
-				new Map<String, Object>{
-					RollupService.MODE_DEFAULT_SETTING => RollupService.MODE_SCHEDULED
-				}
+				new Map<String, Object>{ RollupService.MODE_DEFAULT_SETTING => RollupService.MODE_SCHEDULED }
 			);
 			SettingsService.clearCaches();
 
@@ -100,11 +98,7 @@ private class RollupServiceTest {
 			Test.stopTest();
 
 			System.Assert.areEqual(1, firstRun, 'The shipped default is created once');
-			System.Assert.areEqual(
-				0,
-				secondRun,
-				'And never again, so an upgrade leaves an edit alone (R-R6)'
-			);
+			System.Assert.areEqual(0, secondRun, 'And never again, so an upgrade leaves an edit alone (R-R6)');
 
 			List<Rollup_Definition__c> created = [
 				SELECT Definition_Key__c, Is_Package_Default__c, Active__c, Mode__c
@@ -145,11 +139,7 @@ private class RollupServiceTest {
 			Test.stopTest();
 
 			System.Assert.areEqual(0, created, 'The caller is told that nothing was created');
-			System.Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Rollup_Definition__c],
-				'And nothing was'
-			);
+			System.Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Definition__c], 'And nothing was');
 			List<Error_Log__c> logged = [
 				SELECT Context__c, Technical_Detail__c
 				FROM Error_Log__c
@@ -199,29 +189,15 @@ private class RollupServiceTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			insert new List<Rollup_Definition__c>{
 				memberCount(RollupService.MODE_REAL_TIME, true),
-				memberCountNamed(
-					'Scheduled only',
-					'Core_Scheduled_Only',
-					RollupService.MODE_SCHEDULED,
-					true
-				),
-				memberCountNamed(
-					'Turned off',
-					'Core_Turned_Off',
-					RollupService.MODE_REAL_TIME,
-					false
-				)
+				memberCountNamed('Scheduled only', 'Core_Scheduled_Only', RollupService.MODE_SCHEDULED, true),
+				memberCountNamed('Turned off', 'Core_Turned_Off', RollupService.MODE_REAL_TIME, false)
 			};
 
 			List<Rollup_Definition__c> forRealTime = RollupSelector.selectActiveForModes(
 				new Set<String>{ RollupService.MODE_REAL_TIME, RollupService.MODE_BOTH }
 			);
 
-			System.Assert.areEqual(
-				1,
-				forRealTime.size(),
-				'A scheduled rollup and an inactive one both stay out'
-			);
+			System.Assert.areEqual(1, forRealTime.size(), 'A scheduled rollup and an inactive one both stay out');
 			System.Assert.areEqual(
 				'Core_Household_Member_Count',
 				forRealTime[0].Definition_Key__c,
@@ -245,10 +221,7 @@ private class RollupServiceTest {
 				FROM Rollup_Definition__c
 				WHERE Id = :definition.Id
 			];
-			System.Assert.isNotNull(
-				stamped.Last_Calculated__c,
-				'R-R5: the console can say when this rollup last ran'
-			);
+			System.Assert.isNotNull(stamped.Last_Calculated__c, 'R-R5: the console can say when this rollup last ran');
 			System.Assert.isFalse(RollupService.isStale(), 'A rollup that just ran is not overdue');
 		}
 	}
@@ -272,10 +245,7 @@ private class RollupServiceTest {
 			insert memberCount(RollupService.MODE_BOTH, true);
 
 			System.Assert.isNull(RollupService.lastCalculated(), 'Nothing has run');
-			System.Assert.isTrue(
-				RollupService.isStale(),
-				'Which the Hub tile says out loud (plan Section 4.10)'
-			);
+			System.Assert.isTrue(RollupService.isStale(), 'Which the Hub tile says out loud (plan Section 4.10)');
 		}
 	}
 
@@ -343,9 +313,7 @@ private class RollupServiceTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			try {
 				RollupService.recalculate(null);
-				System.Assert.fail(
-					'An unknown definition is refused with a message an admin can act on'
-				);
+				System.Assert.fail('An unknown definition is refused with a message an admin can act on');
 			} catch (RollupService.RollupServiceException expected) {
 				System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
 			}
@@ -370,28 +338,15 @@ private class RollupServiceTest {
 			insert new List<Account>{ survivor, untouched };
 			insert new List<Account>{
 				TestDataFactory.organization(
-					new Account(
-						Name = 'Child',
-						RecordTypeId = organizationType,
-						ParentId = survivor.Id
-					)
+					new Account(Name = 'Child', RecordTypeId = organizationType, ParentId = survivor.Id)
 				),
 				TestDataFactory.organization(
-					new Account(
-						Name = 'Other',
-						RecordTypeId = organizationType,
-						ParentId = untouched.Id
-					)
+					new Account(Name = 'Other', RecordTypeId = organizationType, ParentId = untouched.Id)
 				)
 			};
 			insert new List<Rollup_Definition__c>{
 				childCount('Core_Merge_Live', 'NumberOfEmployees', RollupService.MODE_BOTH, true),
-				childCount(
-					'Core_Merge_Nightly',
-					'AnnualRevenue',
-					RollupService.MODE_SCHEDULED,
-					true
-				),
+				childCount('Core_Merge_Nightly', 'AnnualRevenue', RollupService.MODE_SCHEDULED, true),
 				childCount('Core_Merge_Off', 'Member_Count__c', RollupService.MODE_BOTH, false)
 			};
 			// MasterRecordId cannot be written, so the deleted record is built as the trigger has it.
@@ -434,10 +389,7 @@ private class RollupServiceTest {
 				after.get(survivor.Id).NumberOfEmployees,
 				'The live total is recalculated in the same save'
 			);
-			System.Assert.isNull(
-				after.get(survivor.Id).AnnualRevenue,
-				'A nightly total waits for the nightly run'
-			);
+			System.Assert.isNull(after.get(survivor.Id).AnnualRevenue, 'A nightly total waits for the nightly run');
 			System.Assert.areEqual(
 				7,
 				after.get(survivor.Id).Member_Count__c,
@@ -499,12 +451,7 @@ private class RollupServiceTest {
 		}
 	}
 
-	private static Rollup_Definition__c childCount(
-		String key,
-		String targetField,
-		String mode,
-		Boolean active
-	) {
+	private static Rollup_Definition__c childCount(String key, String targetField, String mode, Boolean active) {
 		Rollup_Definition__c definition = memberCountNamed(key, key, mode, active);
 		definition.Source_Object__c = 'Account';
 		definition.Relationship_Path__c = 'ParentId';
@@ -512,12 +459,7 @@ private class RollupServiceTest {
 		return definition;
 	}
 
-	private static Rollup_Definition__c memberCountNamed(
-		String name,
-		String key,
-		String mode,
-		Boolean active
-	) {
+	private static Rollup_Definition__c memberCountNamed(String name, String key, String mode, Boolean active) {
 		Rollup_Definition__c definition = memberCount(mode, active);
 		definition.Name = name;
 		definition.Definition_Key__c = key;

@@ -49,15 +49,9 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 		changes.add(
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
-				Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getLabelPlural(),
+				Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 				ids,
-				new List<String>{
-					'Directory_Opt_In__c',
-					'Directory_Location__c',
-					'Directory_Bio__c',
-					'Notes__c'
-				}
+				new List<String>{ 'Directory_Opt_In__c', 'Directory_Location__c', 'Directory_Bio__c', 'Notes__c' }
 			)
 		);
 		return changes;
@@ -77,16 +71,12 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 			Schema.SObjectType.Continuing_Credit__c.isUpdateable() &&
 			Schema.SObjectType.Continuing_Credit__c.fields.Activity__c.isUpdateable();
 		if (!allowed) {
-			throw new PersonErasure.ErasureException(
-				BarnHelp.text('Memberships', 'Memberships_Erase_NeedAccess')
-			);
+			throw new PersonErasure.ErasureException(BarnHelp.text('Memberships', 'Memberships_Erase_NeedAccess'));
 		}
 	}
 
 	/** R-MEM13: the notes on the person's certifications and the activity text of their credits. */
-	private static List<PersonErasure.Change> eraseCertifications(
-		List<Member_Certification__c> holdings
-	) {
+	private static List<PersonErasure.Change> eraseCertifications(List<Member_Certification__c> holdings) {
 		List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
 		if (holdings.isEmpty()) {
 			return changes;
@@ -104,8 +94,7 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 		changes.add(
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
-				Member_Certification__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getLabelPlural(),
+				Member_Certification__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 				holdingIds,
 				new List<String>{ 'Notes__c' }
 			)
@@ -119,8 +108,7 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 			changes.add(
 				new PersonErasure.Change(
 					PersonErasure.CLEARED,
-					Continuing_Credit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					Continuing_Credit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					creditIds,
 					new List<String>{ 'Activity__c' }
 				)

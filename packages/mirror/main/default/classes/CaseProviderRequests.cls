@@ -28,11 +28,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 	private static final Integer PER_STATUS_CALL = 200;
 	private static final String CASE_OBJECT = 'Case';
 	private static final String CASE_FIELDS = 'Id, CaseNumber, Subject, Description, Priority, SuppliedName, SuppliedEmail, Contact.Name, Contact.Email';
-	private static final Set<String> FINISHED = new Set<String>{
-		'Resolved',
-		'Closed',
-		'Cancelled'
-	};
+	private static final Set<String> FINISHED = new Set<String>{ 'Resolved', 'Closed', 'Cancelled' };
 	private static final String CONTEXT = 'CaseProviderRequests';
 	@TestVisible
 	private static Boolean unavailableForTest = false;
@@ -154,9 +150,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 			.isEmpty();
 		return pending ||
 			!Database.queryWithBinds(
-					'SELECT Id FROM ' +
-						CASE_OBJECT +
-						' WHERE Type = :caseType AND IsClosed = FALSE LIMIT 1',
+					'SELECT Id FROM ' + CASE_OBJECT + ' WHERE Type = :caseType AND IsClosed = FALSE LIMIT 1',
 					new Map<String, Object>{ 'caseType' => chosenType() },
 					AccessLevel.USER_MODE
 				)
@@ -187,12 +181,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 				changed.put(row.Case_Id__c, row);
 			}
 		}
-		Database.upsert(
-			changed.values(),
-			Provider_Request__c.Case_Id__c,
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		Database.upsert(changed.values(), Provider_Request__c.Case_Id__c, false, AccessLevel.SYSTEM_MODE);
 		if (!failures.isEmpty()) {
 			ErrorLogger.logMessages(failures, CONTEXT, ErrorLogger.SEVERITY_WARNING);
 		}
@@ -275,9 +264,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 			Map<String, Object> body = new Map<String, Object>{
 				'orgId' => UserInfo.getOrganizationId(),
 				'reference' => caseNumber,
-				'subject' => String.isBlank((String) record.get('Subject'))
-					? caseNumber
-					: record.get('Subject'),
+				'subject' => String.isBlank((String) record.get('Subject')) ? caseNumber : record.get('Subject'),
 				'description' => record.get('Description'),
 				'priority' => record.get('Priority'),
 				'requesterName' => contact?.get('Name') ?? record.get('SuppliedName'),
@@ -293,13 +280,10 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 				Synced__c = Datetime.now()
 			);
 			HttpResponse answer = call('POST', ENDPOINT, JSON.serialize(body), caseNumber);
-			if (
-				answer != null && (answer.getStatusCode() == 200 || answer.getStatusCode() == 201)
-			) {
+			if (answer != null && (answer.getStatusCode() == 200 || answer.getStatusCode() == 201)) {
 				Map<String, Object> accepted = objectIn(answer, caseNumber);
 				if (accepted == null) {
-					row.Error__c = BarnHelp.text('Mirror', 'Mirror_CaseRequests_ErrorUnreadable')
-						.abbreviate(255);
+					row.Error__c = BarnHelp.text('Mirror', 'Mirror_CaseRequests_ErrorUnreadable').abbreviate(255);
 				} else {
 					keep(row, accepted);
 					row.Error__c = null;
@@ -385,10 +369,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		return rows;
 	}
 
-	private List<Provider_Request__c> read(
-		List<String> refs,
-		Map<String, Provider_Request__c> byNumber
-	) {
+	private List<Provider_Request__c> read(List<String> refs, Map<String, Provider_Request__c> byNumber) {
 		List<Provider_Request__c> rows = new List<Provider_Request__c>();
 		String query =
 			'?orgId=' +
@@ -411,11 +392,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		}
 		if (!(body.get('requests') instanceof List<Object>)) {
 			failures.add(
-				BarnHelp.text(
-					'Mirror',
-					'Mirror_CaseRequests_Unreadable',
-					new List<Object>{ what, 'requests' }
-				)
+				BarnHelp.text('Mirror', 'Mirror_CaseRequests_Unreadable', new List<Object>{ what, 'requests' })
 			);
 			return rows;
 		}
@@ -478,11 +455,7 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		} catch (Exception failed) {
 			calloutMillis += System.currentTimeMillis() - startedAt;
 			failures.add(
-				BarnHelp.text(
-					'Mirror',
-					'Mirror_CaseRequests_NotReached',
-					new List<Object>{ what, failed.getMessage() }
-				)
+				BarnHelp.text('Mirror', 'Mirror_CaseRequests_NotReached', new List<Object>{ what, failed.getMessage() })
 			);
 			return null;
 		}
@@ -493,20 +466,14 @@ public with sharing class CaseProviderRequests implements Queueable, Database.Al
 		if (answer == null) {
 			return BarnHelp.text('Mirror', 'Mirror_CaseRequests_ErrorNotReached');
 		}
-		return BarnHelp.text(
-				'Mirror',
-				'Mirror_CaseRequests_ErrorRefused',
-				new List<Object>{ answer.getStatusCode() }
-			)
+		return BarnHelp.text('Mirror', 'Mirror_CaseRequests_ErrorRefused', new List<Object>{ answer.getStatusCode() })
 			.abbreviate(255);
 	}
 
 	/** The Case Type the hourly check sends, default Service Provider. */
 	private static String chosenType() {
 		Mirror_Settings__c settings = Mirror_Settings__c.getOrgDefaults();
-		return String.isBlank(settings?.Case_Requests_Type__c)
-			? 'Service Provider'
-			: settings.Case_Requests_Type__c;
+		return String.isBlank(settings?.Case_Requests_Type__c) ? 'Service Provider' : settings.Case_Requests_Type__c;
 	}
 
 	@TestVisible

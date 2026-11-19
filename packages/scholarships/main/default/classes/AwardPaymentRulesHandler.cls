@@ -30,11 +30,7 @@ public with sharing class AwardPaymentRulesHandler extends TriggerHandler {
 		Set<Id> awardIds = new Set<Id>();
 		for (Award_Payment__c row : rows) {
 			Award_Payment__c old = before == null ? null : before.get(row.Id);
-			if (
-				row.Status__c == ScholarshipAwards.PAID &&
-				(old == null ||
-				old.Status__c != ScholarshipAwards.PAID)
-			) {
+			if (row.Status__c == ScholarshipAwards.PAID && (old == null || old.Status__c != ScholarshipAwards.PAID)) {
 				becomingPaid.add(row);
 				awardIds.add(row.Award__c);
 			}

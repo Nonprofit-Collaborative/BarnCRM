@@ -20,10 +20,7 @@ private class FormDeleteGuardTest {
 
 	/** Someone who may delete any record (the running profile) but is not a Forms administrator. */
 	private static User notFormsAdmin() {
-		return TestUsers.onRunningProfileWith(
-			'Zzformdel',
-			new List<String>{ TestUsers.CORE_ADMIN }
-		);
+		return TestUsers.onRunningProfileWith('Zzformdel', new List<String>{ TestUsers.CORE_ADMIN });
 	}
 
 	private static Form_Version__c versionOf(Id formId) {
@@ -102,21 +99,13 @@ private class FormDeleteGuardTest {
 		Database.DeleteResult result;
 		System.runAs(other) {
 			Test.startTest();
-			result = Database.delete(
-				new Form__c(Id = submission.Form__c),
-				false,
-				AccessLevel.USER_MODE
-			);
+			result = Database.delete(new Form__c(Id = submission.Form__c), false, AccessLevel.USER_MODE);
 			Test.stopTest();
 		}
 
 		Assert.isFalse(result.isSuccess(), 'Only a Forms administrator may delete it');
 		Assert.areEqual(
-			BarnHelp.text(
-				'Forms',
-				'Forms_Delete_FormHasSubmissions',
-				new List<Object>{ FORM_NAME }
-			),
+			BarnHelp.text('Forms', 'Forms_Delete_FormHasSubmissions', new List<Object>{ FORM_NAME }),
 			result.getErrors()[0].getMessage(),
 			'The message names the form and says to close it instead'
 		);
@@ -194,9 +183,7 @@ private class FormDeleteGuardTest {
 			delete as user new Form__c(Id = submission.Form__c);
 
 			Test.startTest();
-			FormSubmissionController.SubmissionView view = FormSubmissionController.getSubmission(
-				submission.Id
-			);
+			FormSubmissionController.SubmissionView view = FormSubmissionController.getSubmission(submission.Id);
 			String refused;
 			try {
 				FormSubmitService.reprocess(submission.Id);

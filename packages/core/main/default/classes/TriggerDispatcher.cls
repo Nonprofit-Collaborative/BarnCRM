@@ -159,23 +159,13 @@ public with sharing class TriggerDispatcher {
 		}
 		Boolean totalsOnly = isRollupWrite(objectApiName, context.operation);
 		List<Registered> handlers = new List<Registered>();
-		for (
-			Automation_Registry__mdt entry : AutomationRegistrySelector.selectForObject(
-				objectApiName
-			)
-		) {
-			if (
-				totalsOnly &&
-				entry.Always_Runs__c != true &&
-				entry.Runs_On_Rollup_Writes__c != true
-			) {
+		for (Automation_Registry__mdt entry : AutomationRegistrySelector.selectForObject(objectApiName)) {
+			if (totalsOnly && entry.Always_Runs__c != true && entry.Runs_On_Rollup_Writes__c != true) {
 				continue;
 			}
 			TriggerHandler handler = instantiate(entry, objectApiName);
 			if (handler != null) {
-				handlers.add(
-					new Registered(handler, entry.DeveloperName, entry.Always_Runs__c == true)
-				);
+				handlers.add(new Registered(handler, entry.DeveloperName, entry.Always_Runs__c == true));
 			}
 		}
 		new TriggerRun('Trigger dispatch: ' + objectApiName, context, handlers).start();
@@ -238,9 +228,7 @@ public with sharing class TriggerDispatcher {
 
 		Registered(TriggerHandler handler, String registeredName, Boolean alwaysRuns) {
 			this.handler = handler;
-			this.automationName = String.isBlank(registeredName)
-				? handler.getName()
-				: registeredName;
+			this.automationName = String.isBlank(registeredName) ? handler.getName() : registeredName;
 			this.alwaysRuns = alwaysRuns == true;
 		}
 
@@ -278,8 +266,7 @@ public with sharing class TriggerDispatcher {
 			if (this.paused == null) {
 				// The timed pause, or the BarnCRM Automation Control setting that applies to the
 				// person saving (Pause All or Bypass), read alongside each other.
-				this.paused =
-					AutomationControl.isOffForRunningUser() || AutomationControl.isPaused();
+				this.paused = AutomationControl.isOffForRunningUser() || AutomationControl.isPaused();
 			}
 			return this.paused;
 		}
@@ -359,10 +346,7 @@ public with sharing class TriggerDispatcher {
 			spend.stop();
 			ErrorLogger.log(failed.error, failed.automationName, firstRecordId(context));
 			if (!Trigger.isExecuting || size == 0) {
-				throw new TriggerDispatcherException(
-					Label.Core_Automation_UnexpectedError,
-					failed.error
-				);
+				throw new TriggerDispatcherException(Label.Core_Automation_UnexpectedError, failed.error);
 			}
 			if (beforeRun == null || failed.alwaysRuns) {
 				refuse(allRows(size));
@@ -376,12 +360,7 @@ public with sharing class TriggerDispatcher {
 				narrow(open, spend);
 			}
 			if (!refusedMessages.isEmpty()) {
-				ErrorLogger.logMessages(
-					refusedMessages,
-					refusedIds,
-					logContext,
-					ErrorLogger.SEVERITY_WARNING
-				);
+				ErrorLogger.logMessages(refusedMessages, refusedIds, logContext, ErrorLogger.SEVERITY_WARNING);
 			}
 		}
 
@@ -494,10 +473,7 @@ public with sharing class TriggerDispatcher {
 				} catch (Exception cannotRefuse) {
 					// A record the platform will not take a message on: the whole save is
 					// refused instead, as before this contract, and the failure is already logged.
-					throw new TriggerDispatcherException(
-						Label.Core_Automation_UnexpectedError,
-						cannotRefuse
-					);
+					throw new TriggerDispatcherException(Label.Core_Automation_UnexpectedError, cannotRefuse);
 				}
 				if (!narrowing) {
 					continue;
@@ -509,9 +485,7 @@ public with sharing class TriggerDispatcher {
 				);
 				// A help catalog that cannot be read must not cost the entry its place in the log.
 				refusedMessages.add(
-					String.isBlank(note)
-						? Label.Core_Automation_UnexpectedError + ' (' + (row + 1) + ')'
-						: note
+					String.isBlank(note) ? Label.Core_Automation_UnexpectedError + ' (' + (row + 1) + ')' : note
 				);
 				refusedIds.add(record.Id);
 			}
@@ -547,9 +521,7 @@ public with sharing class TriggerDispatcher {
 		if (records == null) {
 			return null;
 		}
-		List<SObject> part = (List<SObject>) Type.forName(
-				'List<' + String.valueOf(records.getSObjectType()) + '>'
-			)
+		List<SObject> part = (List<SObject>) Type.forName('List<' + String.valueOf(records.getSObjectType()) + '>')
 			.newInstance();
 		for (Integer row : rows) {
 			part.add(records[row]);
@@ -557,11 +529,7 @@ public with sharing class TriggerDispatcher {
 		return part;
 	}
 
-	private static Map<Id, SObject> mapOf(
-		List<SObject> records,
-		Map<Id, SObject> byId,
-		List<Integer> rows
-	) {
+	private static Map<Id, SObject> mapOf(List<SObject> records, Map<Id, SObject> byId, List<Integer> rows) {
 		if (records == null || byId == null) {
 			return null;
 		}
@@ -595,13 +563,7 @@ public with sharing class TriggerDispatcher {
 	}
 
 	private static Context currentContext() {
-		return new Context(
-			Trigger.operationType,
-			Trigger.new,
-			Trigger.newMap,
-			Trigger.old,
-			Trigger.oldMap
-		);
+		return new Context(Trigger.operationType, Trigger.new, Trigger.newMap, Trigger.old, Trigger.oldMap);
 	}
 
 	/**
@@ -643,10 +605,7 @@ public with sharing class TriggerDispatcher {
 	 * a warning in the Error Log rather than failing the save: one broken automation must not
 	 * stop a person entering data.
 	 */
-	private static TriggerHandler instantiate(
-		Automation_Registry__mdt entry,
-		String objectApiName
-	) {
+	private static TriggerHandler instantiate(Automation_Registry__mdt entry, String objectApiName) {
 		String className = entry.Handler_Class__c;
 		if (String.isBlank(className)) {
 			skip(className, objectApiName);

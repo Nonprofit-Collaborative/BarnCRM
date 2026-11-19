@@ -114,22 +114,16 @@ global with sharing class ProjectRequestApi {
 				if (faultForTest) {
 					throw new FaultForTestException();
 				}
-				List<Project_Request__c> existing = raceForTest
-					? new List<Project_Request__c>()
-					: byKey(key);
+				List<Project_Request__c> existing = raceForTest ? new List<Project_Request__c>() : byKey(key);
 				if (!existing.isEmpty()) {
 					return new Answer(200, view(existing[0]));
 				}
-				Integer limitPerHour = connection.Hourly_Limit__c == null
-					? 60
-					: connection.Hourly_Limit__c.intValue();
+				Integer limitPerHour = connection.Hourly_Limit__c == null ? 60 : connection.Hourly_Limit__c.intValue();
 				if (
 					[
 						SELECT COUNT()
 						FROM Project_Request__c
-						WHERE
-							Connection__c = :connection.Id
-							AND CreatedDate >= :Datetime.now().addHours(-1)
+						WHERE Connection__c = :connection.Id AND CreatedDate >= :Datetime.now().addHours(-1)
 						WITH SYSTEM_MODE
 					] >= limitPerHour
 				) {
@@ -138,32 +132,16 @@ global with sharing class ProjectRequestApi {
 				Project_Request__c request = new Project_Request__c(
 					Subject__c = subject,
 					Description__c = describe(body),
-					Type__c = choice(
-						body.get('type'),
-						Project_Request__c.Type__c,
-						'Service Request'
-					),
-					Priority__c = choice(
-						body.get('priority'),
-						Project_Request__c.Priority__c,
-						'Medium'
-					),
-					Category__c = choice(
-						body.get('category'),
-						Project_Request__c.Category__c,
-						'General'
-					),
+					Type__c = choice(body.get('type'), Project_Request__c.Type__c, 'Service Request'),
+					Priority__c = choice(body.get('priority'), Project_Request__c.Priority__c, 'Medium'),
+					Category__c = choice(body.get('category'), Project_Request__c.Category__c, 'General'),
 					Channel__c = ProjectRequestHandler.PARTNER,
 					Connection__c = connection.Id,
 					Account__c = connection.Account__c,
 					External_Reference__c = reference,
 					External_Key__c = key
 				);
-				Database.SaveResult saved = Database.insert(
-					request,
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
+				Database.SaveResult saved = Database.insert(request, false, AccessLevel.SYSTEM_MODE);
 				if (!saved.isSuccess()) {
 					// The same request sent twice at once: the other call saved it first, and
 					// the unique key refused this one. Answer as a repeat does.
@@ -184,14 +162,7 @@ global with sharing class ProjectRequestApi {
 					201,
 					view(
 						[
-							SELECT
-								Id,
-								Name,
-								Status__c,
-								Priority__c,
-								Due_Date__c,
-								Resolution__c,
-								External_Reference__c
+							SELECT Id, Name, Status__c, Priority__c, Due_Date__c, Resolution__c, External_Reference__c
 							FROM Project_Request__c
 							WHERE Id = :saved.getId()
 							WITH SYSTEM_MODE
@@ -210,14 +181,7 @@ global with sharing class ProjectRequestApi {
 		/** The request already saved under this connection's key, if there is one. */
 		List<Project_Request__c> byKey(String key) {
 			return [
-				SELECT
-					Id,
-					Name,
-					Status__c,
-					Priority__c,
-					Due_Date__c,
-					Resolution__c,
-					External_Reference__c
+				SELECT Id, Name, Status__c, Priority__c, Due_Date__c, Resolution__c, External_Reference__c
 				FROM Project_Request__c
 				WHERE External_Key__c = :key
 				WITH SYSTEM_MODE
@@ -249,14 +213,7 @@ global with sharing class ProjectRequestApi {
 				}
 				List<Map<String, Object>> found = new List<Map<String, Object>>();
 				for (Project_Request__c request : [
-					SELECT
-						Id,
-						Name,
-						Status__c,
-						Priority__c,
-						Due_Date__c,
-						Resolution__c,
-						External_Reference__c
+					SELECT Id, Name, Status__c, Priority__c, Due_Date__c, Resolution__c, External_Reference__c
 					FROM Project_Request__c
 					WHERE Connection__c = :connection.Id AND External_Reference__c IN :refs
 					WITH SYSTEM_MODE

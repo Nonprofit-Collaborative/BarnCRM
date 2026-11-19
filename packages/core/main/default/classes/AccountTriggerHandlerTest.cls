@@ -32,18 +32,11 @@ private class AccountTriggerHandlerTest {
 	static void clearingTheCustomNameBoxRenamesTheHousehold() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account household = HouseholdTestDataFactory.newHousehold(
-				'The Reverend and Mrs. Smith'
-			);
+			Account household = HouseholdTestDataFactory.newHousehold('The Reverend and Mrs. Smith');
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 
 			Test.startTest();
@@ -62,18 +55,11 @@ private class AccountTriggerHandlerTest {
 	static void clearingTheCustomNameBoxLeavesANativeHouseholdAlone() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			Account household = HouseholdTestDataFactory.newHousehold(
-				'Name kept by Nonprofit Cloud'
-			);
+			Account household = HouseholdTestDataFactory.newHousehold('Name kept by Nonprofit Cloud');
 			household.Custom_Name__c = true;
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			insert TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 			OrgShapeDetector.OrgShape shape = new OrgShapeDetector.OrgShape();
 			shape.hasNativeHouseholdGroups = true;
@@ -101,11 +87,7 @@ private class AccountTriggerHandlerTest {
 			Id household = [SELECT AccountId FROM Contact WHERE Id = :john.Id].AccountId;
 
 			Test.startTest();
-			update new Account(
-				Id = household,
-				Custom_Name__c = true,
-				Name = 'The Reverend and Mrs. Smith'
-			);
+			update new Account(Id = household, Custom_Name__c = true, Name = 'The Reverend and Mrs. Smith');
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -122,9 +104,7 @@ private class AccountTriggerHandlerTest {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 
 			Test.startTest();
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Community Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			insert organization;
 			update new Account(Id = organization.Id, Custom_Name__c = false);
 			Test.stopTest();
@@ -151,9 +131,7 @@ private class AccountTriggerHandlerTest {
 	@IsTest
 	static void householdsForPeopleStoredAsAccountsFollowTheOneCreationSetting() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			HouseholdService.personAccountOverride = true;
@@ -225,11 +203,7 @@ private class AccountTriggerHandlerTest {
 				memberships[0].Household__r.RecordTypeId,
 				'The household is a household'
 			);
-			Assert.areEqual(
-				'The Garcia Family',
-				memberships[0].Household__r.Name,
-				'And it is named from her surname'
-			);
+			Assert.areEqual('The Garcia Family', memberships[0].Household__r.Name, 'And it is named from her surname');
 			Assert.areEqual(1, memberships[0].Household__r.Member_Count__c, 'And counts her');
 			Assert.areEqual('Head', memberships[0].Role__c, 'She heads her own household');
 			Assert.isTrue(memberships[0].Is_Primary__c, 'And is its primary member');
@@ -251,9 +225,7 @@ private class AccountTriggerHandlerTest {
 	@IsTest
 	static void deletingAPersonStoredAsAnAccountSettlesTheirHousehold() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Account person = personInAHousehold();
@@ -290,9 +262,7 @@ private class AccountTriggerHandlerTest {
 	@IsTest
 	static void deletingTheLastPersonStoredAsAnAccountKeepsTheHouseholdForTheUndelete() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			Assert.isTrue(settings.Delete_Empty_Households__c, 'The tidy-up is on');
 			Account person = personInAHousehold();
 			Id household = [SELECT Household__c FROM Household_Member__c].Household__c;
@@ -326,9 +296,7 @@ private class AccountTriggerHandlerTest {
 				// Proven on every shape by the test above; the reason is checked and logged.
 				return;
 			}
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			settings.Auto_Create_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			SObject person = Account.SObjectType.newSObject();
@@ -338,11 +306,7 @@ private class AccountTriggerHandlerTest {
 			insert person;
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
-			insert new Household_Member__c(
-				Household__c = household.Id,
-				Account__c = person.Id,
-				Is_Primary__c = true
-			);
+			insert new Household_Member__c(Household__c = household.Id, Account__c = person.Id, Is_Primary__c = true);
 			delete person;
 			Assert.areEqual(
 				1,
@@ -374,9 +338,7 @@ private class AccountTriggerHandlerTest {
 	@IsTest
 	static void restoringAPersonStoredAsAnAccountPutsThemBackInTheirHousehold() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Account person = personInAHousehold();
@@ -410,9 +372,7 @@ private class AccountTriggerHandlerTest {
 	@IsTest
 	static void markingAPersonStoredAsAnAccountDeceasedRewritesTheirHouseholdWording() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_JUNCTION
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Account person = personInAHousehold();
@@ -461,11 +421,7 @@ private class AccountTriggerHandlerTest {
 		Database.insert(household, AccessLevel.SYSTEM_MODE);
 		Account person = TestDataFactory.organization(new Account(Name = 'Maria Garcia'));
 		insert person;
-		insert new Household_Member__c(
-			Household__c = household.Id,
-			Account__c = person.Id,
-			Is_Primary__c = true
-		);
+		insert new Household_Member__c(Household__c = household.Id, Account__c = person.Id, Is_Primary__c = true);
 		return person;
 	}
 }

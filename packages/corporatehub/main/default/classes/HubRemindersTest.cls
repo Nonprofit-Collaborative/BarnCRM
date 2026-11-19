@@ -3,9 +3,7 @@
  * notice date, a lapsed agreement renews or expires, and the settings switch reminders off
  * (R-AG1, R-CR1, 29CH6; ADR-0166).
  */
-@IsTest(
-	testFor='ApexClass:HubReminders, ApexClass:CorporateHubNightlyJobProvider, ApexClass:CorporateHubSettings'
-)
+@IsTest(testFor='ApexClass:HubReminders, ApexClass:CorporateHubNightlyJobProvider, ApexClass:CorporateHubSettings')
 private class HubRemindersTest {
 	private static final String ADMIN_SET = 'Corporate_Hub_Admin';
 
@@ -58,9 +56,7 @@ private class HubRemindersTest {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Board__c board = new Board__c(Name = 'Board', Type__c = 'Board', Status__c = 'Active');
 			insert board;
-			Contact ade = TestDataFactory.person(
-				new Contact(FirstName = 'Ade', LastName = 'Member')
-			);
+			Contact ade = TestDataFactory.person(new Contact(FirstName = 'Ade', LastName = 'Member'));
 			insert ade;
 			Board_Member__c seat = new Board_Member__c(
 				Board__c = board.Id,
@@ -74,16 +70,11 @@ private class HubRemindersTest {
 			new HubReminders().execute(null);
 			new HubReminders().execute(null);
 
-			Assert.areEqual(
-				1,
-				HubReminders.sentTitles.size(),
-				'One reminder for the ending term (R-BM2)'
-			);
+			Assert.areEqual(1, HubReminders.sentTitles.size(), 'One reminder for the ending term (R-BM2)');
 			Assert.isTrue(HubReminders.sentTitles[0].contains('Ade Member'), 'Names the member');
 			Assert.areEqual(
 				seat.Term_End__c,
-				[SELECT Reminded_For__c FROM Board_Member__c WHERE Id = :seat.Id WITH USER_MODE]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Board_Member__c WHERE Id = :seat.Id WITH USER_MODE].Reminded_For__c,
 				'Marked'
 			);
 		}
@@ -132,14 +123,12 @@ private class HubRemindersTest {
 			);
 			Assert.areEqual(
 				Date.today().addDays(10),
-				[SELECT Reminded_For__c FROM Agreement__c WHERE Id = :lease.Id WITH USER_MODE]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Agreement__c WHERE Id = :lease.Id WITH USER_MODE].Reminded_For__c,
 				'The lease is reminded for its notice date'
 			);
 			Assert.areEqual(
 				policy.Review_Date__c,
-				[SELECT Reminded_For__c FROM Hub_Document__c WHERE Id = :policy.Id WITH USER_MODE]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Hub_Document__c WHERE Id = :policy.Id WITH USER_MODE].Reminded_For__c,
 				'The review too'
 			);
 		}
@@ -192,11 +181,7 @@ private class HubRemindersTest {
 				[SELECT Status__c FROM Agreement__c WHERE Id = :ending.Id WITH USER_MODE].Status__c,
 				'No renewal: expired'
 			);
-			Assert.areEqual(
-				0,
-				HubReminders.sentTitles.size(),
-				'Reminders switched off send nothing'
-			);
+			Assert.areEqual(0, HubReminders.sentTitles.size(), 'Reminders switched off send nothing');
 		}
 	}
 

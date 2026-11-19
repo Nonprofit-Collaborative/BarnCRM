@@ -22,11 +22,7 @@ private class GivingNightlyJobProviderTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<NightlyStep> steps = new GivingNightlyJobProvider().nightlySteps();
 
-			Assert.areEqual(
-				8,
-				steps.size(),
-				'Five jobs, the acknowledgments and the two gift mirrors.'
-			);
+			Assert.areEqual(8, steps.size(), 'Five jobs, the acknowledgments and the two gift mirrors.');
 			Map<String, NightlyStep> byKey = new Map<String, NightlyStep>();
 			for (NightlyStep step : steps) {
 				byKey.put(step.key, step);

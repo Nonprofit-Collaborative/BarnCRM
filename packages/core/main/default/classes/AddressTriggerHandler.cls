@@ -103,18 +103,13 @@ public with sharing class AddressTriggerHandler extends TriggerHandler {
 	 * address without changing where it points should not rewrite every household
 	 * member's mailing address.
 	 */
-	private List<Address__c> changedAddresses(
-		List<Address__c> records,
-		Map<Id, SObject> previousById
-	) {
+	private List<Address__c> changedAddresses(List<Address__c> records, Map<Id, SObject> previousById) {
 		List<Address__c> changed = new List<Address__c>();
 		if (records == null) {
 			return changed;
 		}
 		for (Address__c address : records) {
-			Address__c old = previousById == null
-				? null
-				: (Address__c) previousById.get(address.Id);
+			Address__c old = previousById == null ? null : (Address__c) previousById.get(address.Id);
 			if (old == null || moved(address, old)) {
 				changed.add(address);
 			}

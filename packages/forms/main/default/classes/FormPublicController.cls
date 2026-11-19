@@ -107,13 +107,7 @@ public with sharing class FormPublicController {
 		Integer step
 	) {
 		try {
-			return FormIntakeService.saveDraft(
-				ticket,
-				FormRules.jsonMap(answersJson),
-				trap,
-				email,
-				step
-			);
+			return FormIntakeService.saveDraft(ticket, FormRules.jsonMap(answersJson), trap, email, step);
 		} catch (Exception e) {
 			throw failed(e, '.saveDraft');
 		}

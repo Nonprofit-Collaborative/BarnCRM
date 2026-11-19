@@ -16,11 +16,7 @@ private class AskPipelineControllerTest {
 	private static Contact donor(String lastName) {
 		HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		GivingTestDataFactory.ensureDefaultFund();
-		return GivingTestDataFactory.insertHouseholdContact(
-			'The ' + lastName + ' Family',
-			'Jordan',
-			lastName
-		);
+		return GivingTestDataFactory.insertHouseholdContact('The ' + lastName + ' Family', 'Jordan', lastName);
 	}
 
 	private static Ask__c ask(Id contactId, String stage, Decimal amount) {
@@ -106,11 +102,7 @@ private class AskPipelineControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Cultivating',
-				[SELECT Stage__c FROM Ask__c WHERE Id = :open.Id].Stage__c,
-				'Moved.'
-			);
+			Assert.areEqual('Cultivating', [SELECT Stage__c FROM Ask__c WHERE Id = :open.Id].Stage__c, 'Moved.');
 			Assert.isTrue(
 				refusal != null && refusal.contains('Negotiating'),
 				'A stage not in the list is refused by name.'
@@ -127,10 +119,7 @@ private class AskPipelineControllerTest {
 			Ask__c open = ask(lee.Id, 'Asked', 2500);
 			open.Appeal__c = spring.Id;
 			insert open;
-			AskPipelineController.CloseInput input = won(
-				open.Id,
-				AskPipelineController.RESULT_GIFT
-			);
+			AskPipelineController.CloseInput input = won(open.Id, AskPipelineController.RESULT_GIFT);
 			input.amount = 2000;
 			input.giftDate = System.today();
 			input.giftType = 'Check';
@@ -167,10 +156,7 @@ private class AskPipelineControllerTest {
 			Contact lee = donor('Lee');
 			Ask__c open = ask(lee.Id, 'Asked', 1000);
 			insert open;
-			AskPipelineController.CloseInput input = won(
-				open.Id,
-				AskPipelineController.RESULT_PLEDGE
-			);
+			AskPipelineController.CloseInput input = won(open.Id, AskPipelineController.RESULT_PLEDGE);
 			input.amount = 1000;
 			input.payments = 3;
 			input.frequency = 'Monthly';
@@ -182,12 +168,7 @@ private class AskPipelineControllerTest {
 
 			Assert.isTrue(result.success, 'Closed: ' + result.error);
 			Commitment__c pledge = [
-				SELECT
-					Type__c,
-					Expected_Total__c,
-					Amount__c,
-					Installments_Planned__c,
-					Donor_Contact__c
+				SELECT Type__c, Expected_Total__c, Amount__c, Installments_Planned__c, Donor_Contact__c
 				FROM Commitment__c
 				WHERE Id = :result.commitmentId
 			];
@@ -196,11 +177,7 @@ private class AskPipelineControllerTest {
 			Assert.areEqual(333.33, pledge.Amount__c, 'In equal payments.');
 			Assert.areEqual(3, pledge.Installments_Planned__c, 'Three of them.');
 			Assert.areEqual(lee.Id, pledge.Donor_Contact__c, 'From the ask donor.');
-			Assert.areEqual(
-				pledge.Id,
-				[SELECT Commitment__c FROM Ask__c WHERE Id = :open.Id].Commitment__c,
-				'Linked.'
-			);
+			Assert.areEqual(pledge.Id, [SELECT Commitment__c FROM Ask__c WHERE Id = :open.Id].Commitment__c, 'Linked.');
 		}
 	}
 
@@ -216,32 +193,18 @@ private class AskPipelineControllerTest {
 			insert open;
 
 			Test.startTest();
-			AskPipelineController.CloseInput wrong = won(
-				open.Id,
-				AskPipelineController.RESULT_LINK
-			);
+			AskPipelineController.CloseInput wrong = won(open.Id, AskPipelineController.RESULT_LINK);
 			wrong.linkedId = parkGift.Id;
 			AskPipelineController.CloseResult refused = AskPipelineController.closeAsk(wrong);
-			AskPipelineController.CloseInput right = won(
-				open.Id,
-				AskPipelineController.RESULT_LINK
-			);
+			AskPipelineController.CloseInput right = won(open.Id, AskPipelineController.RESULT_LINK);
 			right.linkedId = leeGift.Id;
 			AskPipelineController.CloseResult linked = AskPipelineController.closeAsk(right);
 			Test.stopTest();
 
 			Assert.isFalse(refused.success, 'Another donor gift is refused.');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Ask_ErrorWrongDonor'),
-				refused.error,
-				'And says why.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorWrongDonor'), refused.error, 'And says why.');
 			Assert.isTrue(linked.success, 'The donor gift is linked: ' + linked.error);
-			Assert.areEqual(
-				leeGift.Id,
-				[SELECT Gift__c FROM Ask__c WHERE Id = :open.Id].Gift__c,
-				'Linked.'
-			);
+			Assert.areEqual(leeGift.Id, [SELECT Gift__c FROM Ask__c WHERE Id = :open.Id].Gift__c, 'Linked.');
 		}
 	}
 
@@ -251,10 +214,7 @@ private class AskPipelineControllerTest {
 			Contact lee = donor('Lee');
 			Ask__c open = ask(lee.Id, 'Asked', 400);
 			insert open;
-			AskPipelineController.CloseInput input = won(
-				open.Id,
-				AskPipelineController.RESULT_GIFT
-			);
+			AskPipelineController.CloseInput input = won(open.Id, AskPipelineController.RESULT_GIFT);
 			input.amount = 0;
 			input.giftDate = System.today();
 			input.giftType = 'Check';
@@ -300,16 +260,8 @@ private class AskPipelineControllerTest {
 				[SELECT Outcome__c FROM Ask__c WHERE Id = :open.Id].Outcome__c,
 				'Declined.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Ask_ErrorOutcome'),
-				notClosed.error,
-				'Open is no close.'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'),
-				missing.error,
-				'Nothing to close.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorOutcome'), notClosed.error, 'Open is no close.');
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'), missing.error, 'Nothing to close.');
 		}
 	}
 
@@ -321,17 +273,11 @@ private class AskPipelineControllerTest {
 			insert open;
 		}
 		// A read-only profile, so the profile grants no edit the permission set does not.
-		User reader = TestUsers.peopleReaderWith(
-			'AskReader',
-			new List<String>{ 'Giving_Read_Only' }
-		);
+		User reader = TestUsers.peopleReaderWith('AskReader', new List<String>{ 'Giving_Read_Only' });
 		System.runAs(reader) {
 			Test.startTest();
 			AskPipelineController.Board board = AskPipelineController.getBoard(false);
-			AskPipelineController.CloseInput input = won(
-				open.Id,
-				AskPipelineController.RESULT_LATER
-			);
+			AskPipelineController.CloseInput input = won(open.Id, AskPipelineController.RESULT_LATER);
 			AskPipelineController.CloseResult result = AskPipelineController.closeAsk(input);
 			String refusal;
 			try {
@@ -343,16 +289,8 @@ private class AskPipelineControllerTest {
 
 			Assert.areEqual(1, board.cards.size(), 'A reader sees the ask.');
 			Assert.isFalse(board.canEdit, 'But may not change it.');
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'),
-				result.error,
-				'Closing refused.'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'),
-				refusal,
-				'Moving refused.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'), result.error, 'Closing refused.');
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorNoPermission'), refusal, 'Moving refused.');
 		}
 	}
 
@@ -369,11 +307,7 @@ private class AskPipelineControllerTest {
 			AskPipelineController.Board after = AskPipelineController.getBoard(true);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				before.recentlyClosed.size(),
-				'The closed ask is in Recently Closed.'
-			);
+			Assert.areEqual(1, before.recentlyClosed.size(), 'The closed ask is in Recently Closed.');
 			Assert.areEqual(AskRules.OUTCOME_DECLINED, before.recentlyClosed[0].outcome);
 			Assert.isNotNull(before.recentlyClosed[0].closedDate, 'With the day it closed.');
 			Assert.areEqual(0, before.cards.size(), 'And not among the open cards.');
@@ -405,16 +339,9 @@ private class AskPipelineControllerTest {
 			} catch (AuraHandledException e) {
 				missing = e.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'),
-				missing,
-				'Nothing to reopen.'
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Giving_Ask_ErrorNotFound'), missing, 'Nothing to reopen.');
 		}
-		User reader = TestUsers.peopleReaderWith(
-			'AskReopenReader',
-			new List<String>{ 'Giving_Read_Only' }
-		);
+		User reader = TestUsers.peopleReaderWith('AskReopenReader', new List<String>{ 'Giving_Read_Only' });
 		System.runAs(reader) {
 			String refusal;
 			try {

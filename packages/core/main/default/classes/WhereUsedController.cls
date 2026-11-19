@@ -16,11 +16,7 @@ public with sharing class WhereUsedController {
 			}
 			return WhereUsedService.find(objectName, fieldName);
 		} catch (Exception caught) {
-			throw UserErrors.wrap(
-				caught,
-				'Where Used',
-				!(caught instanceof WhereUsedService.WhereUsedException)
-			);
+			throw UserErrors.wrap(caught, 'Where Used', !(caught instanceof WhereUsedService.WhereUsedException));
 		}
 	}
 }

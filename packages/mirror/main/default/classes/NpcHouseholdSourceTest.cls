@@ -131,11 +131,7 @@ private class NpcHouseholdSourceTest {
 					'Roles' => 'Cousin;Daughter',
 					'IsActive' => true
 				},
-				new Map<String, Object>{
-					'AccountId' => lee,
-					'ContactId' => bo,
-					'IsActive' => false
-				}
+				new Map<String, Object>{ 'AccountId' => lee, 'ContactId' => bo, 'IsActive' => false }
 			}
 		);
 		List<NpspHouseholdSource.Member> lees = members.get(lee);
@@ -158,10 +154,7 @@ private class NpcHouseholdSourceTest {
 				'BarnCRM households are never candidates'
 			);
 			Assert.areEqual(
-				new List<String>{
-					HouseholdSelector.MODEL_CONVERTED,
-					HouseholdSelector.MODEL_NATIVE
-				},
+				new List<String>{ HouseholdSelector.MODEL_CONVERTED, HouseholdSelector.MODEL_NATIVE },
 				binds.get('keptModels'),
 				'Converted and Nonprofit Cloud households are left as they are'
 			);
@@ -179,26 +172,16 @@ private class NpcHouseholdSourceTest {
 			Assert.isTrue(source.read(new Set<Id>()).isEmpty(), 'an empty set asks for none');
 			Assert.isTrue(source.memberCounts(null).isEmpty(), 'no counts for no accounts');
 			Assert.isTrue(source.memberCounts(new Set<Id>()).isEmpty(), 'an empty set counts none');
-			Assert.areEqual(
-				0,
-				source.verify('somethingElse').source,
-				'only the households step is checked'
-			);
+			Assert.areEqual(0, source.verify('somethingElse').source, 'only the households step is checked');
 			Assert.areEqual(0, source.verify('somethingElse').done, 'and nothing is done there');
 			if (!source.available()) {
 				Assert.isTrue(
 					source.memberCounts(new Set<Id>{ plain.Id }).isEmpty(),
 					'without the native objects nothing is counted'
 				);
-				Assert.isNull(
-					source.read(new Set<Id>{ plain.Id })[0].primaryContactId,
-					'no primary'
-				);
+				Assert.isNull(source.read(new Set<Id>{ plain.Id })[0].primaryContactId, 'no primary');
 			}
-			Assert.isFalse(
-				NpcHouseholdSource.readable('not_a_real_object__c'),
-				'unknown is unreadable'
-			);
+			Assert.isFalse(NpcHouseholdSource.readable('not_a_real_object__c'), 'unknown is unreadable');
 		}
 	}
 
@@ -221,11 +204,7 @@ private class NpcHouseholdSourceTest {
 					'IsActive' => false,
 					'EndDate' => ended
 				},
-				new Map<String, Object>{
-					'AccountId' => kim,
-					'ContactId' => ann,
-					'Roles' => 'Other'
-				}
+				new Map<String, Object>{ 'AccountId' => kim, 'ContactId' => ann, 'Roles' => 'Other' }
 			}
 		);
 
@@ -245,10 +224,7 @@ private class NpcHouseholdSourceTest {
 			for (Integer i = 0; i < 3; i++) {
 				back.add(
 					TestDataFactory.household(
-						new Account(
-							Name = 'Drift Back ' + i,
-							Household_Model__c = HouseholdSelector.MODEL_CONVERTED
-						)
+						new Account(Name = 'Drift Back ' + i, Household_Model__c = HouseholdSelector.MODEL_CONVERTED)
 					)
 				);
 			}
@@ -269,16 +245,10 @@ private class NpcHouseholdSourceTest {
 			Account settled = HouseholdTestDataFactory.newHousehold('Drift Settled');
 			settled.Household_Model__c = HouseholdSelector.MODEL_CONVERTED;
 			Account pinnedNoGroup = TestDataFactory.household(
-				new Account(
-					Name = 'Drift Pinned',
-					Household_Model__c = HouseholdSelector.MODEL_NATIVE
-				)
+				new Account(Name = 'Drift Pinned', Household_Model__c = HouseholdSelector.MODEL_NATIVE)
 			);
 			Account convertedBack = TestDataFactory.household(
-				new Account(
-					Name = 'Drift Converted Back',
-					Household_Model__c = HouseholdSelector.MODEL_CONVERTED
-				)
+				new Account(Name = 'Drift Converted Back', Household_Model__c = HouseholdSelector.MODEL_CONVERTED)
 			);
 			Account waiting = TestDataFactory.organization(new Account(Name = 'Drift Waiting'));
 			Database.insert(

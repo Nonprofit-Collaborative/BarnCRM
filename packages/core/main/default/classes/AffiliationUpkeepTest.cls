@@ -47,11 +47,7 @@ private class AffiliationUpkeepTest {
 				'The test user really cannot edit the person, or this test proves nothing'
 			);
 
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[1],
-				'Program Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[1], 'Program Officer');
 			work.Is_Primary__c = true;
 
 			Test.startTest();
@@ -92,11 +88,7 @@ private class AffiliationUpkeepTest {
 
 		System.runAs(narrow) {
 			RelationshipTestDataFactory.quietOtherAutomations();
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Trustee'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Trustee');
 			work.Is_Primary__c = true;
 
 			Test.startTest();
@@ -110,11 +102,7 @@ private class AffiliationUpkeepTest {
 			WHERE Id = :people[0].Id
 			WITH SYSTEM_MODE
 		];
-		Assert.areEqual(
-			orgs[0].Id,
-			reloaded.Primary_Affiliation__c,
-			'A person held as an account carries it too'
-		);
+		Assert.areEqual(orgs[0].Id, reloaded.Primary_Affiliation__c, 'A person held as an account carries it too');
 	}
 
 	@IsTest
@@ -132,11 +120,7 @@ private class AffiliationUpkeepTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Affiliation__c> batch = new List<Affiliation__c>();
 			for (Contact person : people) {
-				Affiliation__c work = RelationshipTestDataFactory.affiliation(
-					person,
-					orgs[0],
-					'Member'
-				);
+				Affiliation__c work = RelationshipTestDataFactory.affiliation(person, orgs[0], 'Member');
 				work.Is_Primary__c = true;
 				batch.add(work);
 			}
@@ -180,10 +164,7 @@ private class AffiliationUpkeepTest {
 	 * universally required field takes no field access row; Read Only already reads it.
 	 */
 	private static User narrowUser() {
-		User narrow = TestUsers.peopleReaderWith(
-			'Narrow',
-			new List<String>{ READ_ONLY_PERMISSION_SET }
-		);
+		User narrow = TestUsers.peopleReaderWith('Narrow', new List<String>{ READ_ONLY_PERMISSION_SET });
 		List<String> fields = new List<String>{
 			'Contact__c',
 			'Person_Account__c',
@@ -195,10 +176,7 @@ private class AffiliationUpkeepTest {
 			'Description__c'
 		};
 		System.runAs(new User(Id = UserInfo.getUserId())) {
-			PermissionSet grant = new PermissionSet(
-				Name = ENTRY_PERMISSION_SET,
-				Label = ENTRY_PERMISSION_SET
-			);
+			PermissionSet grant = new PermissionSet(Name = ENTRY_PERMISSION_SET, Label = ENTRY_PERMISSION_SET);
 			insert as system grant;
 			insert as system new ObjectPermissions(
 				ParentId = grant.Id,
@@ -220,10 +198,7 @@ private class AffiliationUpkeepTest {
 				);
 			}
 			insert as system edits;
-			insert as system new PermissionSetAssignment(
-				AssigneeId = narrow.Id,
-				PermissionSetId = grant.Id
-			);
+			insert as system new PermissionSetAssignment(AssigneeId = narrow.Id, PermissionSetId = grant.Id);
 		}
 		return narrow;
 	}

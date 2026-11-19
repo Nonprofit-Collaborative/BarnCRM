@@ -96,11 +96,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
 	 * Saves one chunk's changes and journals each record. A record whose fields already hold
 	 * the new values is not saved: there is nothing to put back.
 	 */
-	private void apply(
-		BulkUpdateService.Plan checked,
-		List<SObject> records,
-		List<Map<String, Object>> journal
-	) {
+	private void apply(BulkUpdateService.Plan checked, List<SObject> records, List<Map<String, Object>> journal) {
 		List<SObject> toSave = new List<SObject>();
 		List<Map<String, Object>> beforeOf = new List<Map<String, Object>>();
 		List<Map<String, Object>> afterOf = new List<Map<String, Object>>();
@@ -164,23 +160,10 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
 			Id recordId = toSave[i].Id;
 			if (results[i].isSuccess()) {
 				updated++;
-				journal.add(
-					ImportJournalService.updated(
-						checked.objectName,
-						recordId,
-						null,
-						beforeOf[i],
-						afterOf[i]
-					)
-				);
+				journal.add(ImportJournalService.updated(checked.objectName, recordId, null, beforeOf[i], afterOf[i]));
 			} else {
 				failedRecords++;
-				BulkJobSupport.journalFailure(
-					journal,
-					checked.objectName,
-					recordId,
-					results[i].getErrors()
-				);
+				BulkJobSupport.journalFailure(journal, checked.objectName, recordId, results[i].getErrors());
 			}
 		}
 	}
@@ -213,9 +196,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
 				updated + unchanged + noLongerMatching + failedRecords,
 				journalIncomplete
 			);
-			job.Status__c = failed
-				? ImportBatchService.STATUS_FAILED
-				: ImportBatchService.STATUS_COMPLETE;
+			job.Status__c = failed ? ImportBatchService.STATUS_FAILED : ImportBatchService.STATUS_COMPLETE;
 			job.Completed_At__c = Datetime.now();
 			job.Rows_Updated__c = updated;
 			job.Rows_Matched__c = unchanged;

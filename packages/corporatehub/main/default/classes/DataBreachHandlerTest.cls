@@ -12,12 +12,7 @@ private class DataBreachHandlerTest {
 	}
 
 	private static Data_Breach__c breach(String name, String risk) {
-		return new Data_Breach__c(
-			Name = name,
-			Status__c = 'Open',
-			Risk__c = risk,
-			Discovered_At__c = Datetime.now()
-		);
+		return new Data_Breach__c(Name = name, Status__c = 'Open', Risk__c = risk, Discovered_At__c = Datetime.now());
 	}
 
 	private static Map<Id, Data_Breach__c> reload(List<Data_Breach__c> rows) {
@@ -47,10 +42,7 @@ private class DataBreachHandlerTest {
 			Assert.areEqual(1, HubReminders.sentTitles.size(), 'One bell on insert');
 			Assert.isTrue(HubReminders.sentTitles[0].contains('Lost laptop'), 'Names the breach');
 			Date deadline = Date.today().addDays(3);
-			Assert.isTrue(
-				HubReminders.sentTitles[0].contains(deadline.format()),
-				'Carries the deadline date'
-			);
+			Assert.isTrue(HubReminders.sentTitles[0].contains(deadline.format()), 'Carries the deadline date');
 			Assert.areEqual(
 				deadline,
 				reload(new List<Data_Breach__c>{ row }).get(row.Id).Reminded_For__c,
@@ -73,9 +65,7 @@ private class DataBreachHandlerTest {
 
 			Assert.isTrue(HubReminders.sentTitles.isEmpty(), 'Nothing to report, nothing sent');
 			Assert.isNull(
-				reload(new List<Data_Breach__c>{ unlikely, reported })
-					.get(unlikely.Id)
-					.Reminded_For__c,
+				reload(new List<Data_Breach__c>{ unlikely, reported }).get(unlikely.Id).Reminded_For__c,
 				'Not stamped'
 			);
 		}

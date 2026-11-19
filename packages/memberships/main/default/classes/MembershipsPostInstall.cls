@@ -41,11 +41,7 @@ public with sharing class MembershipsPostInstall implements InstallHandler, Modu
 
 	/** The install's steps for the given installer (null for nobody), then the setup marker. */
 	public void runSetup(Id installerId) {
-		ShippedDefaultUpgrades.apply(
-			MODULE_KEY,
-			Memberships_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(MODULE_KEY, Memberships_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(MODULE_KEY);
 		ModuleAccessSyncs.setUp(MODULE_KEY, installerId);
 	}

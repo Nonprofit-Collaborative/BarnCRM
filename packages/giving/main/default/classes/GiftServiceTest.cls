@@ -28,11 +28,7 @@ private class GiftServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c fresh = (Gift__c) Gift__c.SObjectType.newSObject(null, true);
 
-			System.assertEquals(
-				Date.today(),
-				fresh.Gift_Date__c,
-				'A new gift defaults its Gift Date to today.'
-			);
+			System.assertEquals(Date.today(), fresh.Gift_Date__c, 'A new gift defaults its Gift Date to today.');
 		}
 	}
 
@@ -42,45 +38,19 @@ private class GiftServiceTest {
 			Gift__c original = insertGift(250);
 
 			Test.startTest();
-			Id refundId = GiftService.refund(
-				original.Id,
-				100,
-				'Donor asked for the misdirected portion back'
-			);
+			Id refundId = GiftService.refund(original.Id, 100, 'Donor asked for the misdirected portion back');
 			Test.stopTest();
 
 			Gift__c refund = [
-				SELECT
-					Id,
-					Amount__c,
-					Status__c,
-					Original_Gift__c,
-					Refund_Reason__c,
-					Gift_Date__c,
-					Donor_Contact__c
+				SELECT Id, Amount__c, Status__c, Original_Gift__c, Refund_Reason__c, Gift_Date__c, Donor_Contact__c
 				FROM Gift__c
 				WHERE Id = :refundId
 			];
 			System.assertEquals(-100, refund.Amount__c, 'A refund is a negative gift.');
-			System.assertEquals(
-				'Received',
-				refund.Status__c,
-				'The refund itself is a transaction that happened.'
-			);
-			System.assertEquals(
-				original.Id,
-				refund.Original_Gift__c,
-				'It is linked to the original.'
-			);
-			System.assertEquals(
-				Date.today(),
-				refund.Gift_Date__c,
-				'It is dated the day it was made.'
-			);
-			System.assert(
-				refund.Refund_Reason__c.contains('misdirected'),
-				'The reason is carried on the refund.'
-			);
+			System.assertEquals('Received', refund.Status__c, 'The refund itself is a transaction that happened.');
+			System.assertEquals(original.Id, refund.Original_Gift__c, 'It is linked to the original.');
+			System.assertEquals(Date.today(), refund.Gift_Date__c, 'It is dated the day it was made.');
+			System.assert(refund.Refund_Reason__c.contains('misdirected'), 'The reason is carried on the refund.');
 
 			Gift__c reloaded = [
 				SELECT Id, Status__c, Amount__c
@@ -191,11 +161,7 @@ private class GiftServiceTest {
 			System.assertEquals(original.Id, writeOff.Original_Gift__c, 'Linked to the original.');
 
 			Gift__c reloaded = [SELECT Id, Status__c FROM Gift__c WHERE Id = :original.Id];
-			System.assertEquals(
-				'Written off',
-				reloaded.Status__c,
-				'The original says what happened.'
-			);
+			System.assertEquals('Written off', reloaded.Status__c, 'The original says what happened.');
 		}
 	}
 
@@ -284,11 +250,7 @@ private class GiftServiceTest {
 				FROM Gift_Allocation__c
 				WHERE Gift__c = :gift.Id
 			];
-			System.assertEquals(
-				flagged.Id,
-				allocation.Fund__c,
-				'A stale setting does not stop David entering a gift.'
-			);
+			System.assertEquals(flagged.Id, allocation.Fund__c, 'A stale setting does not stop David entering a gift.');
 		}
 	}
 
@@ -375,28 +337,20 @@ private class GiftServiceTest {
 			}
 			// A gift the platform cannot attach an allocation to: its record is not there.
 			Gift__c missing = new Gift__c(
-				Id = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getKeyPrefix() + '000000000001',
+				Id = Gift__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001',
 				Amount__c = 10
 			);
 
 			Test.startTest();
 			Map<Id, String> notApplied = GiftService.applyChosenFundsEach(
 				new List<Gift__c>{ kept, split, missing },
-				new Map<Id, Id>{
-					kept.Id => building.Id,
-					split.Id => building.Id,
-					missing.Id => building.Id
-				}
+				new Map<Id, Id>{ kept.Id => building.Id, split.Id => building.Id, missing.Id => building.Id }
 			);
 			Test.stopTest();
 
 			Assert.areEqual(2, notApplied.size(), String.valueOf(notApplied));
 			Assert.isTrue(notApplied.containsKey(split.Id));
-			Assert.isNull(
-				notApplied.get(split.Id),
-				'Already split: nothing for the platform to say.'
-			);
+			Assert.isNull(notApplied.get(split.Id), 'Already split: nothing for the platform to say.');
 			Assert.isNotNull(notApplied.get(missing.Id), 'The platform says why it refused.');
 			Assert.areEqual(
 				building.Id,

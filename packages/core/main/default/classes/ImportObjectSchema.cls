@@ -106,9 +106,7 @@ public with sharing class ImportObjectSchema {
 		}
 		String lower = objectName.trim().toLowerCase();
 		Schema.SObjectType found = globalDescribe.get(lower);
-		return found != null
-			? found
-			: globalDescribe.get(NamespaceUtil.prefix().toLowerCase() + lower);
+		return found != null ? found : globalDescribe.get(NamespaceUtil.prefix().toLowerCase() + lower);
 	}
 
 	/** The template's load operation; an empty or unknown one is Insert. */
@@ -137,18 +135,13 @@ public with sharing class ImportObjectSchema {
 	@NamespaceAccessible
 	public static String operationFor(Schema.SObjectType type, Import_Template__c template) {
 		String chosen = operationOf(template);
-		return updatesOnly(type) &&
-			!neverCreates(chosen) &&
-			chosen != OPERATION_DELETE
-			? OPERATION_UPDATE
-			: chosen;
+		return updatesOnly(type) && !neverCreates(chosen) && chosen != OPERATION_DELETE ? OPERATION_UPDATE : chosen;
 	}
 
 	/** Whether a lookup that finds no record leaves the lookup empty rather than rejecting. */
 	@NamespaceAccessible
 	public static Boolean leavesLookupEmpty(Import_Template__c template) {
-		return template != null &&
-			LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(template.Lookup_Not_Found__c);
+		return template != null && LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(template.Lookup_Not_Found__c);
 	}
 
 	/**
@@ -206,9 +199,7 @@ public with sharing class ImportObjectSchema {
 		}
 		List<Schema.DescribeSObjectResult> result = new List<Schema.DescribeSObjectResult>();
 		for (Schema.SObjectType type : globalDescribe.values()) {
-			Schema.DescribeSObjectResult described = type.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 			Boolean writable = updatesOnly(type)
 				? described.isUpdateable()
 				: described.isCreateable() || described.isUpdateable();
@@ -273,11 +264,7 @@ public with sharing class ImportObjectSchema {
 	 * @param headersBySheet each sheet's headings, in the same order
 	 */
 	@NamespaceAccessible
-	public static Detection detectObject(
-		String fileName,
-		List<String> sheetNames,
-		List<List<String>> headersBySheet
-	) {
+	public static Detection detectObject(String fileName, List<String> sheetNames, List<List<String>> headersBySheet) {
 		List<Schema.DescribeSObjectResult> loadable = new List<Schema.DescribeSObjectResult>();
 		if (detectionObjectsForTest == null) {
 			loadable = loadableDescribes();
@@ -335,10 +322,7 @@ public with sharing class ImportObjectSchema {
 		Map<String, String> keys
 	) {
 		for (Integer i = 0; i < sheetNames.size(); i++) {
-			ImportHeaderParser.Found named = ImportHeaderParser.objectOfNameOrGuess(
-				sheetNames[i],
-				keys
-			);
+			ImportHeaderParser.Found named = ImportHeaderParser.objectOfNameOrGuess(sheetNames[i], keys);
 			if (named != null) {
 				result.bySheet[i] = named.name;
 				result.guessedBySheet[i] = named.guessed;
@@ -349,10 +333,7 @@ public with sharing class ImportObjectSchema {
 			}
 		}
 		if (result.suggested == null) {
-			ImportHeaderParser.Found named = ImportHeaderParser.objectOfFileNameOrGuess(
-				fileName,
-				keys
-			);
+			ImportHeaderParser.Found named = ImportHeaderParser.objectOfFileNameOrGuess(fileName, keys);
 			if (named != null) {
 				result.suggested = named.name;
 				result.suggestedGuessed = named.guessed;
@@ -401,12 +382,8 @@ public with sharing class ImportObjectSchema {
 		}
 		Map<String, String> keys = objectKeys(listed);
 		DescribedFieldKeys fields = new DescribedFieldKeys();
-		Map<String, String> known = sheetType == null
-			? new Map<String, String>()
-			: fieldKeys(sheetType);
-		String sheetName = sheetType == null
-			? null
-			: sheetType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+		Map<String, String> known = sheetType == null ? new Map<String, String>() : fieldKeys(sheetType);
+		String sheetName = sheetType == null ? null : sheetType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		List<String> given = headers == null ? new List<String>() : headers;
 		List<String> targets = new List<String>();
 		List<Boolean> named = new List<Boolean>();
@@ -416,11 +393,7 @@ public with sharing class ImportObjectSchema {
 			String field = known.get(normalized(header));
 			String target = field == null ? null : sheetName + '.' + field;
 			if (target == null) {
-				ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
-					header,
-					keys,
-					fields
-				);
+				ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(header, keys, fields);
 				target = reading == null ? null : reading.objectName + '.' + reading.fieldName;
 			}
 			named.add(target != null);
@@ -432,19 +405,11 @@ public with sharing class ImportObjectSchema {
 		for (Integer i = 0; i < given.size(); i++) {
 			String target = null;
 			if (!named[i]) {
-				String field = sheetName == null
-					? null
-					: ImportHeaderParser.guess(given[i], guessable);
+				String field = sheetName == null ? null : ImportHeaderParser.guess(given[i], guessable);
 				target = field == null ? null : sheetName + '.' + field;
 				if (target == null) {
-					ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
-						given[i],
-						keys,
-						fields
-					);
-					target = reading == null || !reading.guessed
-						? null
-						: reading.objectName + '.' + reading.fieldName;
+					ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(given[i], keys, fields);
+					target = reading == null || !reading.guessed ? null : reading.objectName + '.' + reading.fieldName;
 				}
 			}
 			Boolean guessMaps = target != null && used.add(target.toLowerCase());
@@ -529,12 +494,7 @@ public with sharing class ImportObjectSchema {
 	public static List<String> operationsFor(Schema.SObjectType type) {
 		List<String> result = updatesOnly(type)
 			? new List<String>{ OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD }
-			: new List<String>{
-					OPERATION_INSERT,
-					OPERATION_UPDATE,
-					OPERATION_UPDATE_BY_FIELD,
-					OPERATION_UPSERT
-			  };
+			: new List<String>{ OPERATION_INSERT, OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD, OPERATION_UPSERT };
 		if (deleteRefusal(type) == null) {
 			result.add(OPERATION_DELETE);
 		}
@@ -630,11 +590,7 @@ public with sharing class ImportObjectSchema {
 		}
 		for (Schema.SObjectField token : fieldsOf(type).values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
-			if (
-				MATCH_TYPES.contains(field.getType()) &&
-				field.isAccessible() &&
-				field.isFilterable()
-			) {
+			if (MATCH_TYPES.contains(field.getType()) && field.isAccessible() && field.isFilterable()) {
 				byLabel.put(
 					field.getLabel() + '|' + field.getName(),
 					new ImportMapping.Target(field.getName(), field.getLabel())
@@ -699,9 +655,7 @@ public with sharing class ImportObjectSchema {
 		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 		if (!large.containsKey(type)) {
 			Integer counted = Database.countQueryWithBinds(
-				'SELECT COUNT() FROM ' +
-					String.escapeSingleQuotes(described.getName()) +
-					' LIMIT :cap',
+				'SELECT COUNT() FROM ' + String.escapeSingleQuotes(described.getName()) + ' LIMIT :cap',
 				new Map<String, Object>{ 'cap' => largeObjectRows + 1 },
 				AccessLevel.USER_MODE
 			);
@@ -712,11 +666,7 @@ public with sharing class ImportObjectSchema {
 		}
 		return String.format(
 			BarnHelp.text('Core', 'Core_Import_ErrorFieldNotSelective'),
-			new List<String>{
-				labelOf(type, fieldName),
-				described.getLabelPlural(),
-				largeObjectRows.format()
-			}
+			new List<String>{ labelOf(type, fieldName), described.getLabelPlural(), largeObjectRows.format() }
 		);
 	}
 
@@ -727,10 +677,7 @@ public with sharing class ImportObjectSchema {
 	 * only, as is a field that is not a lookup of this object.
 	 */
 	@NamespaceAccessible
-	public static List<ImportMapping.Target> parentFields(
-		Schema.SObjectType type,
-		String lookupName
-	) {
+	public static List<ImportMapping.Target> parentFields(Schema.SObjectType type, String lookupName) {
 		List<ImportMapping.Target> result = new List<ImportMapping.Target>{
 			new ImportMapping.Target(ID_ATTRIBUTE, Label.Core_Import_RecordIdOption)
 		};
@@ -821,11 +768,7 @@ public with sharing class ImportObjectSchema {
 		Map<String, String> known = fieldKeys(type);
 		Map<String, String> thisObject = type == null
 			? new Map<String, String>()
-			: objectKeys(
-					new List<Schema.DescribeSObjectResult>{
-						type.getDescribe(SObjectDescribeOptions.DEFERRED)
-					}
-			  );
+			: objectKeys(new List<Schema.DescribeSObjectResult>{ type.getDescribe(SObjectDescribeOptions.DEFERRED) });
 		DescribedFieldKeys fields = new DescribedFieldKeys();
 		Set<String> used = new Set<String>();
 		List<String> targets = new List<String>();
@@ -833,11 +776,7 @@ public with sharing class ImportObjectSchema {
 		for (String header : headers) {
 			String field = known.get(normalized(header));
 			if (field == null && !thisObject.isEmpty()) {
-				ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
-					header,
-					thisObject,
-					fields
-				);
+				ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(header, thisObject, fields);
 				field = reading == null ? null : reading.fieldName;
 			}
 			named.add(field != null);
@@ -850,10 +789,8 @@ public with sharing class ImportObjectSchema {
 				// A heading naming this object reads as object plus field, so it never takes
 				// a whole-heading guess; one naming another object is not guessed onto this
 				// one at all (D-150).
-				Boolean namesThis =
-					!thisObject.isEmpty() && ImportHeaderParser.namesObject(headers[i], thisObject);
-				Boolean namesOther =
-					!namesThis && ImportHeaderParser.namesObject(headers[i], allObjectKeys());
+				Boolean namesThis = !thisObject.isEmpty() && ImportHeaderParser.namesObject(headers[i], thisObject);
+				Boolean namesOther = !namesThis && ImportHeaderParser.namesObject(headers[i], allObjectKeys());
 				if (!namesThis && !namesOther) {
 					field = ImportHeaderParser.guess(headers[i], guessable);
 				}
@@ -869,11 +806,7 @@ public with sharing class ImportObjectSchema {
 			Boolean guessMaps = field != null && used.add(field);
 			String target = guessMaps ? field : targets[i];
 			mapping.columns.add(
-				column(
-					headers[i],
-					target == null ? null : ImportMapping.ENTITY_RECORD + '.' + target,
-					guessMaps
-				)
+				column(headers[i], target == null ? null : ImportMapping.ENTITY_RECORD + '.' + target, guessMaps)
 			);
 		}
 		return mapping;
@@ -958,10 +891,7 @@ public with sharing class ImportObjectSchema {
 				return cannotDelete;
 			}
 		} else if (updatesOnly(type) && !neverCreates(operation)) {
-			return String.format(
-				BarnHelp.text('Core', 'Core_Import_ErrorPeopleUpdateOnly'),
-				plural
-			);
+			return String.format(BarnHelp.text('Core', 'Core_Import_ErrorPeopleUpdateOnly'), plural);
 		}
 		if (!canRun(described, operation)) {
 			return String.format(BarnHelp.text('Core', 'Core_Import_ErrorObjectNoAccess'), plural);
@@ -1004,9 +934,7 @@ public with sharing class ImportObjectSchema {
 		if (key != null && givesEveryRow(given, key)) {
 			return String.format(
 				BarnHelp.text('Core', 'Core_Import_ErrorKeyForEveryRow'),
-				new List<String>{
-					key == ID_ATTRIBUTE ? Label.Core_Import_RecordIdOption : labelOf(type, key)
-				}
+				new List<String>{ key == ID_ATTRIBUTE ? Label.Core_Import_RecordIdOption : labelOf(type, key) }
 			);
 		}
 		String slow = slowSearch(type, key, given);
@@ -1058,11 +986,7 @@ public with sharing class ImportObjectSchema {
 	 * record; else null.
 	 */
 	@NamespaceAccessible
-	public static String relatedParentField(
-		Schema.SObjectType parent,
-		Schema.SObjectType related,
-		String fieldName
-	) {
+	public static String relatedParentField(Schema.SObjectType parent, Schema.SObjectType related, String fieldName) {
 		Schema.SObjectField token = related == null ? null : fieldNamed(related, fieldName);
 		return parent != null && token != null ? pointsAt(token.getDescribe(), parent) : null;
 	}
@@ -1070,11 +994,7 @@ public with sharing class ImportObjectSchema {
 	/** The field's name when it points at this object alone and may be filled in, or null. */
 	private static String pointsAt(Schema.DescribeFieldResult field, Schema.SObjectType parent) {
 		List<Schema.SObjectType> parents = field.getReferenceTo();
-		return parents.size() == 1 &&
-			parents[0] == parent &&
-			field.isCreateable()
-			? field.getName()
-			: null;
+		return parents.size() == 1 && parents[0] == parent && field.isCreateable() ? field.getName() : null;
 	}
 
 	/**
@@ -1094,9 +1014,7 @@ public with sharing class ImportObjectSchema {
 			if (field == null || insertRefusal(child) != null) {
 				continue;
 			}
-			Schema.DescribeSObjectResult described = child.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = child.getDescribe(SObjectDescribeOptions.DEFERRED);
 			String label = String.format(
 				Label.Core_Format_Parenthetical,
 				new List<String>{ described.getLabel(), labelOf(child, field) }
@@ -1190,9 +1108,7 @@ public with sharing class ImportObjectSchema {
 
 		/** The object's label, or the name the mapping gives when the org has no such object. */
 		public String label() {
-			return type == null
-				? entity
-				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+			return type == null ? entity : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
 		}
 	}
 
@@ -1229,21 +1145,13 @@ public with sharing class ImportObjectSchema {
 		// Related records (R-IT17) are a second step: always created, linked to the row's record.
 		record.groupsRepeats = true;
 		Step related = new Step();
-		related.template = stepTemplate(
-			template,
-			template.Related_Object__c,
-			OPERATION_INSERT,
-			null
-		);
+		related.template = stepTemplate(template, template.Related_Object__c, OPERATION_INSERT, null);
 		related.template.Use_Duplicate_Rules__c = false;
 		related.mapping = given.forEntity(ImportMapping.ENTITY_RELATED);
 		related.entity = ImportMapping.ENTITY_RELATED;
 		related.type = relatedTypeOf(template);
 		related.related = true;
-		related.links.put(
-			0,
-			relatedParentField(record.type, related.type, template.Related_Parent_Field__c)
-		);
+		related.links.put(0, relatedParentField(record.type, related.type, template.Related_Parent_Field__c));
 		result.add(related);
 		return result;
 	}
@@ -1254,11 +1162,7 @@ public with sharing class ImportObjectSchema {
 	 * step links to every earlier step its object points at; a parent that finds records by a
 	 * key groups its repeated keys, and the first such step keeps the row's digest.
 	 */
-	private static List<Step> severalSteps(
-		Import_Template__c template,
-		ImportMapping mapping,
-		Boolean mappedOnly
-	) {
+	private static List<Step> severalSteps(Import_Template__c template, ImportMapping mapping, Boolean mappedOnly) {
 		List<Step> listed = new List<Step>();
 		for (ImportMapping.ObjectStep each : mapping.objects) {
 			if (each == null || String.isBlank(each.entity)) {
@@ -1283,8 +1187,7 @@ public with sharing class ImportObjectSchema {
 				String field = linkField(step.type, ordered[parent].type);
 				if (field != null) {
 					step.links.put(parent, field);
-					ordered[parent].groupsRepeats =
-						operationOf(ordered[parent].template) != OPERATION_INSERT;
+					ordered[parent].groupsRepeats = operationOf(ordered[parent].template) != OPERATION_INSERT;
 				}
 			}
 		}
@@ -1369,9 +1272,7 @@ public with sharing class ImportObjectSchema {
 		}
 		List<String> names = new List<String>();
 		String preferred = null;
-		String parentName = localName(
-				parent.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
-			)
+		String parentName = localName(parent.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase())
 			.removeEnd('__c');
 		for (Schema.SObjectField token : fieldsOf(child).values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
@@ -1417,9 +1318,7 @@ public with sharing class ImportObjectSchema {
 			if (type == null) {
 				return BarnHelp.text('Core', 'Core_Data_ObjectUnknown');
 			}
-			Schema.DescribeSObjectResult described = type.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 			if (!listed.add(described.getName().toLowerCase())) {
 				return String.format(
 					BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsRepeated'),
@@ -1435,16 +1334,11 @@ public with sharing class ImportObjectSchema {
 				continue;
 			}
 			Schema.SObjectType type = typeNamed(ImportMapping.entityOf(column.target));
-			String name = type == null
-				? ''
-				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase();
+			String name = type == null ? '' : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase();
 			if (!listed.contains(name)) {
 				return String.format(
 					BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsColumn'),
-					new List<String>{
-						column.source,
-						ImportMapping.entityOf(column.target).abbreviate(80)
-					}
+					new List<String>{ column.source, ImportMapping.entityOf(column.target).abbreviate(80) }
 				);
 			}
 		}
@@ -1464,10 +1358,7 @@ public with sharing class ImportObjectSchema {
 		for (Step step : steps) {
 			String refused = refusal(step.template, step.mapping);
 			if (refused != null) {
-				return String.format(
-					Label.Core_Format_Pair,
-					new List<String>{ step.label(), refused }
-				);
+				return String.format(Label.Core_Format_Pair, new List<String>{ step.label(), refused });
 			}
 		}
 		return null;
@@ -1496,14 +1387,9 @@ public with sharing class ImportObjectSchema {
 			if (
 				assignment != null &&
 				!ImportMapping.isIgnored(assignment.target) &&
-				ImportMapping.ENTITY_RECORD.equalsIgnoreCase(
-					ImportMapping.entityOf(assignment.target)
-				) &&
+				ImportMapping.ENTITY_RECORD.equalsIgnoreCase(ImportMapping.entityOf(assignment.target)) &&
 				String.isNotBlank(assignment.value) &&
-				mapsField(
-					new Set<String>{ ImportMapping.attributeOf(assignment.target).toLowerCase() },
-					fieldName
-				)
+				mapsField(new Set<String>{ ImportMapping.attributeOf(assignment.target).toLowerCase() }, fieldName)
 			) {
 				return true;
 			}
@@ -1529,12 +1415,7 @@ public with sharing class ImportObjectSchema {
 	@NamespaceAccessible
 	public static String unreadable(String value, Schema.DescribeFieldResult field) {
 		Integer length = field.getLength();
-		if (
-			TEXT_TYPES.contains(field.getType()) &&
-			length != null &&
-			length > 0 &&
-			value.length() > length
-		) {
+		if (TEXT_TYPES.contains(field.getType()) && length != null && length > 0 && value.length() > length) {
 			return String.format(
 				BarnHelp.text('Core', 'Core_Import_ErrorValueTooLong'),
 				new List<String>{ field.getLabel(), String.valueOf(length) }
@@ -1603,26 +1484,10 @@ public with sharing class ImportObjectSchema {
 	}
 
 	/** The spellings a file uses for a ticked checkbox, lower case (canonical model R-IT11). */
-	private static final Set<String> CHECKED = new Set<String>{
-		'true',
-		'yes',
-		'y',
-		'1',
-		'x',
-		'checked',
-		'on',
-		't'
-	};
+	private static final Set<String> CHECKED = new Set<String>{ 'true', 'yes', 'y', '1', 'x', 'checked', 'on', 't' };
 
 	/** The spellings a file uses for a cleared checkbox, lower case (canonical model R-IT11). */
-	private static final Set<String> CLEARED = new Set<String>{
-		'false',
-		'no',
-		'n',
-		'0',
-		'off',
-		'f'
-	};
+	private static final Set<String> CLEARED = new Set<String>{ 'false', 'no', 'n', '0', 'off', 'f' };
 
 	/**
 	 * A checkbox value as every import reads it (R-IT11): true or false, ignoring case and
@@ -1753,9 +1618,7 @@ public with sharing class ImportObjectSchema {
 		return text == null ? '' : text.toLowerCase().replaceAll('[^a-z0-9]', '');
 	}
 
-	private static List<ImportMapping.Target> sortedValues(
-		Map<String, ImportMapping.Target> byLabel
-	) {
+	private static List<ImportMapping.Target> sortedValues(Map<String, ImportMapping.Target> byLabel) {
 		List<String> labels = new List<String>(byLabel.keySet());
 		labels.sort();
 		List<ImportMapping.Target> result = new List<ImportMapping.Target>();

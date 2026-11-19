@@ -99,12 +99,7 @@ public class RecognitionTestData {
 		return gift;
 	}
 
-	public static Soft_Credit__c manualCredit(
-		Id giftId,
-		Id contactId,
-		String role,
-		Decimal amount
-	) {
+	public static Soft_Credit__c manualCredit(Id giftId, Id contactId, String role, Decimal amount) {
 		Soft_Credit__c credit = new Soft_Credit__c(
 			Gift__c = giftId,
 			Contact__c = contactId,
@@ -117,11 +112,7 @@ public class RecognitionTestData {
 	}
 
 	public static Tribute__c tribute(Id giftId, String tributeType, String honoreeName) {
-		return new Tribute__c(
-			Gift__c = giftId,
-			Type__c = tributeType,
-			Honoree_Name__c = honoreeName
-		);
+		return new Tribute__c(Gift__c = giftId, Type__c = tributeType, Honoree_Name__c = honoreeName);
 	}
 
 	public static List<Soft_Credit__c> creditsFor(Id giftId) {

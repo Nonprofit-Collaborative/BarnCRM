@@ -55,15 +55,11 @@ public with sharing class EventProposalReview {
 				criterion.weight > MAX_WEIGHT ||
 				!seen.add(criterion.label.toLowerCase())
 			) {
-				throw new IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Applications_CriteriaInvalid')
-				);
+				throw new IllegalArgumentException(BarnHelp.text('Events', 'Events_Applications_CriteriaInvalid'));
 			}
 		}
 		if (criteria.size() > MAX_CRITERIA) {
-			throw new IllegalArgumentException(
-				BarnHelp.text('Events', 'Events_Applications_CriteriaInvalid')
-			);
+			throw new IllegalArgumentException(BarnHelp.text('Events', 'Events_Applications_CriteriaInvalid'));
 		}
 		return criteria;
 	}
@@ -85,9 +81,7 @@ public with sharing class EventProposalReview {
 				score = null;
 			}
 			if (score == null || score < 1 || score > 5) {
-				throw new IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Applications_ScoreEach')
-				);
+				throw new IllegalArgumentException(BarnHelp.text('Events', 'Events_Applications_ScoreEach'));
 			}
 			total += criterion.weight * score;
 			weights += criterion.weight;
@@ -112,9 +106,7 @@ public with sharing class EventProposalReview {
 		} catch (IllegalArgumentException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (JSONException unreadable) {
-			throw UserErrors.message(
-				BarnHelp.text('Events', 'Events_Applications_CriteriaInvalid')
-			);
+			throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_CriteriaInvalid'));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.saveCriteria', eventId);
 			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
@@ -137,11 +129,7 @@ public with sharing class EventProposalReview {
 			];
 			if (current.size() >= MAX_PRESENTERS) {
 				throw new IllegalArgumentException(
-					BarnHelp.text(
-						'Events',
-						'Events_Applications_PresenterLimit',
-						new List<Object>{ MAX_PRESENTERS }
-					)
+					BarnHelp.text('Events', 'Events_Applications_PresenterLimit', new List<Object>{ MAX_PRESENTERS })
 				);
 			}
 			Boolean twice = contactId == application.Contact__c;
@@ -149,9 +137,7 @@ public with sharing class EventProposalReview {
 				twice |= presenter.Contact__c == contactId;
 			}
 			if (twice) {
-				throw new IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Applications_PresenterTwice')
-				);
+				throw new IllegalArgumentException(BarnHelp.text('Events', 'Events_Applications_PresenterTwice'));
 			}
 			Proposal_Presenter__c presenter = new Proposal_Presenter__c(
 				Speaker_Application__c = applicationId,
@@ -211,10 +197,7 @@ public with sharing class EventProposalReview {
 			]) {
 				if (!already.contains(application.Id)) {
 					assignments.add(
-						new Speaker_Review__c(
-							Speaker_Application__c = application.Id,
-							Reviewer__c = reviewerId
-						)
+						new Speaker_Review__c(Speaker_Application__c = application.Id, Reviewer__c = reviewerId)
 					);
 				}
 			}
@@ -252,9 +235,7 @@ public with sharing class EventProposalReview {
 			LIMIT 1
 		];
 		if (found.isEmpty() || !UNDECIDED.contains(found[0].Status__c)) {
-			throw new IllegalArgumentException(
-				BarnHelp.text('Events', 'Events_Applications_Decided')
-			);
+			throw new IllegalArgumentException(BarnHelp.text('Events', 'Events_Applications_Decided'));
 		}
 		return found[0];
 	}

@@ -32,10 +32,7 @@ global with sharing class GetDataJobStatusAction {
 		@InvocableVariable(label='Data Job Id' description='The job\'s record id.')
 		global String jobId;
 
-		@InvocableVariable(
-			label='Name'
-			description='The job\'s name, as shown on the import results screen.'
-		)
+		@InvocableVariable(label='Name' description='The job\'s name, as shown on the import results screen.')
 		global String name;
 
 		@InvocableVariable(
@@ -50,10 +47,7 @@ global with sharing class GetDataJobStatusAction {
 		)
 		global String status;
 
-		@InvocableVariable(
-			label='Is Dry Run'
-			description='True when the job only checked the rows and saved nothing.'
-		)
+		@InvocableVariable(label='Is Dry Run' description='True when the job only checked the rows and saved nothing.')
 		global Boolean isDryRun;
 
 		@InvocableVariable(label='File Name' description='The name of the file imported, if any.')
@@ -83,10 +77,7 @@ global with sharing class GetDataJobStatusAction {
 		@InvocableVariable(label='Started At' description='When the job started.')
 		global Datetime startedAt;
 
-		@InvocableVariable(
-			label='Completed At'
-			description='When the job finished. Empty while it is running.'
-		)
+		@InvocableVariable(label='Completed At' description='When the job finished. Empty while it is running.')
 		global Datetime completedAt;
 
 		@InvocableVariable(
@@ -129,10 +120,7 @@ global with sharing class GetDataJobStatusAction {
 			results = allFailed(asked.size(), BarnHelp.text('Core', 'Core_AgentActions_NoAccess'));
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, Label.Core_AgentActions_ErrorContext);
-			results = allFailed(
-				asked.size(),
-				BarnHelp.text('Core', 'Core_AgentActions_Unexpected')
-			);
+			results = allFailed(asked.size(), BarnHelp.text('Core', 'Core_AgentActions_Unexpected'));
 		}
 		return results;
 	}
@@ -151,9 +139,7 @@ global with sharing class GetDataJobStatusAction {
 			}
 			wantsLatest = wantsLatest || namesNoJob(request);
 		}
-		Map<Id, Import_Batch__c> result = new Map<Id, Import_Batch__c>(
-			ImportBatchSelector.selectByIds(jobIds)
-		);
+		Map<Id, Import_Batch__c> result = new Map<Id, Import_Batch__c>(ImportBatchSelector.selectByIds(jobIds));
 		if (wantsLatest) {
 			List<Import_Batch__c> latest = ImportBatchSelector.selectRecent(1);
 			result.put(null, latest.isEmpty() ? null : latest[0]);

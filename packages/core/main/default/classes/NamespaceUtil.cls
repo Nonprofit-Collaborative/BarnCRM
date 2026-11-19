@@ -118,10 +118,7 @@ public with sharing class NamespaceUtil {
 
 	/** The same lookup in a describe field map the caller already holds. */
 	@NamespaceAccessible
-	public static Schema.SObjectField field(
-		Map<String, Schema.SObjectField> fields,
-		String localName
-	) {
+	public static Schema.SObjectField field(Map<String, Schema.SObjectField> fields, String localName) {
 		if (fields == null || String.isBlank(localName)) {
 			return null;
 		}
@@ -190,9 +187,7 @@ public with sharing class NamespaceUtil {
 			return null;
 		}
 		String packagePrefix = prefix();
-		Type found = String.isBlank(packagePrefix)
-			? null
-			: Type.forName(packagePrefix.removeEnd('__'), className);
+		Type found = String.isBlank(packagePrefix) ? null : Type.forName(packagePrefix.removeEnd('__'), className);
 		return found == null ? Type.forName(className) : found;
 	}
 
@@ -209,10 +204,7 @@ public with sharing class NamespaceUtil {
 			return null;
 		}
 		if (!expected.isAssignableFrom(found)) {
-			ErrorLogger.log(
-				new System.TypeException(className + ' does not implement ' + expected.getName()),
-				context
-			);
+			ErrorLogger.log(new System.TypeException(className + ' does not implement ' + expected.getName()), context);
 			return null;
 		}
 		try {
@@ -233,8 +225,6 @@ public with sharing class NamespaceUtil {
 			return parameterName;
 		}
 		String packagePrefix = prefix();
-		return String.isBlank(packagePrefix)
-			? 'c__' + parameterName
-			: packagePrefix + parameterName;
+		return String.isBlank(packagePrefix) ? 'c__' + parameterName : packagePrefix + parameterName;
 	}
 }

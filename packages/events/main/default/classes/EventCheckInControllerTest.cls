@@ -24,12 +24,7 @@ private class EventCheckInControllerTest {
 			Capacity__c = 1
 		);
 		insert as user record;
-		insert as user new Ticket_Type__c(
-			Event__c = record.Id,
-			Name = 'General',
-			Price__c = 20,
-			Active__c = true
-		);
+		insert as user new Ticket_Type__c(Event__c = record.Id, Name = 'General', Price__c = 20, Active__c = true);
 		return record;
 	}
 
@@ -109,11 +104,7 @@ private class EventCheckInControllerTest {
 				WITH USER_MODE
 			];
 			Assert.areEqual(1, result.registered, 'Counted as in');
-			Assert.areEqual(
-				'Attended',
-				walkIn.Status__c,
-				'The page sets Attended, not the request'
-			);
+			Assert.areEqual('Attended', walkIn.Status__c, 'The page sets Attended, not the request');
 			Assert.areEqual('Staff', walkIn.Event_Registration__r.Source__c, 'Staff source');
 			Assert.isTrue(badJson, 'Unreadable request refused');
 		}

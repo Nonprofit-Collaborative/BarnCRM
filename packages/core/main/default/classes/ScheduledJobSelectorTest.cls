@@ -82,11 +82,7 @@ private class ScheduledJobSelectorTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			Id before = ScheduledJobSelector.triggerIdByName(OTHER_JOB);
-			Id scheduled = ScheduledJobSelector.schedule(
-				OTHER_JOB,
-				DAILY,
-				new ErrorDigestScheduler()
-			);
+			Id scheduled = ScheduledJobSelector.schedule(OTHER_JOB, DAILY, new ErrorDigestScheduler());
 			Id afterSchedule = ScheduledJobSelector.triggerIdByName(OTHER_JOB);
 			ScheduledJobSelector.abort(scheduled);
 			Id afterAbort = ScheduledJobSelector.triggerIdByName(OTHER_JOB);
@@ -109,21 +105,15 @@ private class ScheduledJobSelectorTest {
 			ScheduledJobSelector.ownerOverride = gone;
 			ScheduledJobSelector.forget();
 			List<String> afterLeaving = ScheduledJobSelector.namesOwnedByInactiveUsers();
-			HealthCheckService.Finding finding = new HealthCheckSettingsChecks.InactiveOwnerJobsCheck()
-				.run();
+			HealthCheckService.Finding finding = new HealthCheckSettingsChecks.InactiveOwnerJobsCheck().run();
 			Test.stopTest();
 
-			Assert.isFalse(
-				whileActive.contains(OTHER_JOB),
-				'A job of an active owner is not named'
-			);
+			Assert.isFalse(whileActive.contains(OTHER_JOB), 'A job of an active owner is not named');
 			Assert.isTrue(afterLeaving.contains(OTHER_JOB), 'The job is named');
 			Assert.areEqual('jobs_inactive_owner', finding.key, 'Health Check says so');
 			Assert.areEqual(afterLeaving, finding.fixScope, 'and its fix covers exactly those');
 			Assert.isTrue(
-				finding.fixTarget.endsWith(
-					HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
-				),
+				finding.fixTarget.endsWith(HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS),
 				'The finding carries the reschedule fix'
 			);
 		}

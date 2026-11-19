@@ -57,10 +57,7 @@ public with sharing class HealthCheckExtensions {
 				extension = found.get(className);
 			}
 			if (extension != null) {
-				byKey.put(
-					className.removeEnd('HealthCheckExtension').toLowerCase() + '_extension',
-					extension
-				);
+				byKey.put(className.removeEnd('HealthCheckExtension').toLowerCase() + '_extension', extension);
 			}
 		}
 		return byKey;

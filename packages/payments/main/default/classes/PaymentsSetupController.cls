@@ -142,10 +142,7 @@ public with sharing class PaymentsSetupController {
 			: BarnHelp.text(
 					'Payments',
 					'Payments_Setup_CheckFailed',
-					new List<Object>{
-						processor,
-						found.statusCode == null ? '-' : String.valueOf(found.statusCode)
-					}
+					new List<Object>{ processor, found.statusCode == null ? '-' : String.valueOf(found.statusCode) }
 			  );
 		return result;
 	}
@@ -227,25 +224,15 @@ public with sharing class PaymentsSetupController {
 			if (site.url != null) {
 				Receiver receiver = new Receiver();
 				receiver.site = site.name;
-				receiver.stripeUrl =
-					site.url +
-					PaymentSites.RECEIVER_PATH +
-					'stripe?token=' +
-					token;
-				receiver.payPalUrl =
-					site.url +
-					PaymentSites.RECEIVER_PATH +
-					'paypal?token=' +
-					token;
+				receiver.stripeUrl = site.url + PaymentSites.RECEIVER_PATH + 'stripe?token=' + token;
+				receiver.payPalUrl = site.url + PaymentSites.RECEIVER_PATH + 'paypal?token=' + token;
 				result.receivers.add(receiver);
 			}
 		}
 		KeyStatus webhook = new KeyStatus();
 		webhook.name = WEBHOOK_ID;
 		webhook.processor = PaymentService.PAYPAL;
-		webhook.lastFour = String.isBlank(stored.PayPal_Webhook_Id__c)
-			? null
-			: stored.PayPal_Webhook_Id__c.right(4);
+		webhook.lastFour = String.isBlank(stored.PayPal_Webhook_Id__c) ? null : stored.PayPal_Webhook_Id__c.right(4);
 		result.keys.add(webhook);
 		result.credentials.add(
 			credential(
@@ -264,9 +251,7 @@ public with sharing class PaymentsSetupController {
 				PaymentPayPal.CREDENTIAL,
 				'Barn_PayPal_App',
 				'ClientId, ClientSecret',
-				PaymentPayPal.LIVE_BASE.removeStart('callout:') +
-					', ' +
-					PaymentPayPal.TEST_BASE.removeStart('callout:')
+				PaymentPayPal.LIVE_BASE.removeStart('callout:') + ', ' + PaymentPayPal.TEST_BASE.removeStart('callout:')
 			)
 		);
 		return result;

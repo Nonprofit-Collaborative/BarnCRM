@@ -86,20 +86,11 @@ public with sharing class ProgramDashboardController {
 			fillPrograms(result, byProgram);
 			return result;
 		} catch (Exception failure) {
-			throw UserErrors.wrap(
-				failure,
-				false,
-				CONTEXT,
-				BarnHelp.text('Programs', 'Programs_Fail_Dashboard')
-			);
+			throw UserErrors.wrap(failure, false, CONTEXT, BarnHelp.text('Programs', 'Programs_Fail_Dashboard'));
 		}
 	}
 
-	private static void countEnrollments(
-		Map<Id, ProgramFigures> byProgram,
-		Date fromDate,
-		Date toDate
-	) {
+	private static void countEnrollments(Map<Id, ProgramFigures> byProgram, Date fromDate, Date toDate) {
 		Set<String> open = EnrollmentService.OPEN_STAGES;
 		for (AggregateResult row : [
 			SELECT Program__c program, COUNT(Id) total
@@ -130,11 +121,7 @@ public with sharing class ProgramDashboardController {
 		}
 	}
 
-	private static void countDeliveries(
-		Map<Id, ProgramFigures> byProgram,
-		Date fromDate,
-		Date toDate
-	) {
+	private static void countDeliveries(Map<Id, ProgramFigures> byProgram, Date fromDate, Date toDate) {
 		for (AggregateResult row : [
 			SELECT Service__r.Program__c program, Attendance__c attendance, COUNT(Id) total
 			FROM Service_Delivery__c
@@ -151,11 +138,7 @@ public with sharing class ProgramDashboardController {
 	}
 
 	/** People counted without names (P-12) in the period, per program; never mixed into the named counts. */
-	private static void countAnonymous(
-		Map<Id, ProgramFigures> byProgram,
-		Date fromDate,
-		Date toDate
-	) {
+	private static void countAnonymous(Map<Id, ProgramFigures> byProgram, Date fromDate, Date toDate) {
 		for (AggregateResult row : [
 			SELECT Service__r.Program__c program, SUM(People_Served__c) total
 			FROM Service_Count__c
@@ -183,11 +166,7 @@ public with sharing class ProgramDashboardController {
 	 * Per program the same pair runs once per program with a Present delivery, while the query
 	 * budget allows; any programs past it fall back to one grouped distinct count.
 	 */
-	private static Integer countPeople(
-		Map<Id, ProgramFigures> byProgram,
-		Date fromDate,
-		Date toDate
-	) {
+	private static Integer countPeople(Map<Id, ProgramFigures> byProgram, Date fromDate, Date toDate) {
 		Set<Id> served = new Set<Id>();
 		Boolean anyPresent = false;
 		for (Id programId : byProgram.keySet()) {
@@ -221,8 +200,7 @@ public with sharing class ProgramDashboardController {
 				WITH USER_MODE
 				GROUP BY Service__r.Program__c
 			]) {
-				figuresOf(byProgram, row).peopleServed =
-					(Integer) row.get('contacts') + (Integer) row.get('accounts');
+				figuresOf(byProgram, row).peopleServed = (Integer) row.get('contacts') + (Integer) row.get('accounts');
 			}
 		}
 		return anyPresent ? peopleInPeriod(fromDate, toDate) : 0;
@@ -237,10 +215,7 @@ public with sharing class ProgramDashboardController {
 					Id IN (
 						SELECT Contact__c
 						FROM Service_Delivery__c
-						WHERE
-							Delivery_Date__c >= :fromDate
-							AND Delivery_Date__c <= :toDate
-							AND Attendance__c = :PRESENT
+						WHERE Delivery_Date__c >= :fromDate AND Delivery_Date__c <= :toDate AND Attendance__c = :PRESENT
 					)
 				WITH USER_MODE
 			] +
@@ -251,10 +226,7 @@ public with sharing class ProgramDashboardController {
 					Id IN (
 						SELECT Account__c
 						FROM Service_Delivery__c
-						WHERE
-							Delivery_Date__c >= :fromDate
-							AND Delivery_Date__c <= :toDate
-							AND Attendance__c = :PRESENT
+						WHERE Delivery_Date__c >= :fromDate AND Delivery_Date__c <= :toDate AND Attendance__c = :PRESENT
 					)
 				WITH USER_MODE
 			];
@@ -332,10 +304,7 @@ public with sharing class ProgramDashboardController {
 		}
 	}
 
-	private static ProgramFigures figuresOf(
-		Map<Id, ProgramFigures> byProgram,
-		AggregateResult row
-	) {
+	private static ProgramFigures figuresOf(Map<Id, ProgramFigures> byProgram, AggregateResult row) {
 		Id programId = (Id) row.get('program');
 		if (!byProgram.containsKey(programId)) {
 			byProgram.put(programId, new ProgramFigures());

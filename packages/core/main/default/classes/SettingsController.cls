@@ -184,9 +184,7 @@ public with sharing class SettingsController {
 			return getConsoleModel();
 		}
 		if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
 		}
 		try {
 			Map<String, Map<String, Object>> byObject = groupByObject(values);
@@ -285,12 +283,8 @@ public with sharing class SettingsController {
 			for (Setting_Change__c record : recent) {
 				ChangeModel change = new ChangeModel();
 				change.id = record.Id;
-				String stored = record.Setting_Name__c == null
-					? ''
-					: record.Setting_Name__c.toLowerCase();
-				change.settingName = labels.containsKey(stored)
-					? labels.get(stored)
-					: record.Setting_Name__c;
+				String stored = record.Setting_Name__c == null ? '' : record.Setting_Name__c.toLowerCase();
+				change.settingName = labels.containsKey(stored) ? labels.get(stored) : record.Setting_Name__c;
 				change.oldValue = shownValue(record.Old_Value__c, choices.get(stored));
 				change.newValue = shownValue(record.New_Value__c, choices.get(stored));
 				if (stored == featuresStoredName()) {
@@ -361,10 +355,7 @@ public with sharing class SettingsController {
 			String renamed = ModuleDetectionService.SUITE_BY_OLD_VALUE.get(oldValue);
 			editionLabels.put(oldValue, editionLabels.get(renamed.toLowerCase()));
 		}
-		choices.put(
-			(SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c').toLowerCase(),
-			editionLabels
-		);
+		choices.put((SettingsService.CORE_SETTINGS_OBJECT + '.Suite__c').toLowerCase(), editionLabels);
 		// A Record Type row logs the record type's API name; it reads as the record type's label.
 		for (Setting_Definition__mdt definition : SettingDefinitionSelector.getAll()) {
 			if (
@@ -380,10 +371,7 @@ public with sharing class SettingsController {
 			Map<String, String> byName = new Map<String, String>{
 				AccountKinds.NO_RECORD_TYPE.toLowerCase() => System.Label.Core_Settings_NoRecordType
 			};
-			for (
-				Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getRecordTypeInfos()
-			) {
+			for (Schema.RecordTypeInfo info : type.getDescribe(SObjectDescribeOptions.DEFERRED).getRecordTypeInfos()) {
 				if (!info.isMaster()) {
 					byName.put(info.getDeveloperName().toLowerCase(), info.getName());
 				}
@@ -412,16 +400,10 @@ public with sharing class SettingsController {
 	 * reads its current name. A record the user cannot read, or that is gone, is left out and
 	 * shows as the plain fallback (Core_Settings_RecordUnavailable).
 	 */
-	private static Map<Id, String> recordNamesFor(
-		List<Setting_Change__c> changes,
-		Set<String> recordSettings
-	) {
+	private static Map<Id, String> recordNamesFor(List<Setting_Change__c> changes, Set<String> recordSettings) {
 		Map<Schema.SObjectType, Set<Id>> idsByType = new Map<Schema.SObjectType, Set<Id>>();
 		for (Setting_Change__c change : changes) {
-			if (
-				change.Setting_Name__c == null ||
-				!recordSettings.contains(change.Setting_Name__c.toLowerCase())
-			) {
+			if (change.Setting_Name__c == null || !recordSettings.contains(change.Setting_Name__c.toLowerCase())) {
 				continue;
 			}
 			for (String value : new List<String>{ change.Old_Value__c, change.New_Value__c }) {
@@ -468,9 +450,7 @@ public with sharing class SettingsController {
 		if (recordId == null) {
 			return stored;
 		}
-		return names.containsKey(recordId)
-			? names.get(recordId)
-			: System.Label.Core_Settings_RecordUnavailable;
+		return names.containsKey(recordId) ? names.get(recordId) : System.Label.Core_Settings_RecordUnavailable;
 	}
 
 	private static Id asId(String value) {
@@ -509,11 +489,7 @@ public with sharing class SettingsController {
 		List<String> names = new List<String>();
 		for (String part : stored.split(',')) {
 			String key = part.trim();
-			if (
-				String.isBlank(key) ||
-				key == FeatureSwitchService.NONE_ON ||
-				key == FeatureSwitchService.NONE_CHOSEN
-			) {
+			if (String.isBlank(key) || key == FeatureSwitchService.NONE_ON || key == FeatureSwitchService.NONE_CHOSEN) {
 				continue;
 			}
 			names.add(FeatureController.nameOf(key));
@@ -652,9 +628,7 @@ public with sharing class SettingsController {
 			return true;
 		}
 		String prefix = NamespaceUtil.prefix();
-		return !name.contains('__') &&
-			String.isNotBlank(prefix) &&
-			FeatureManagement.checkPermission(prefix + name);
+		return !name.contains('__') && String.isNotBlank(prefix) && FeatureManagement.checkPermission(prefix + name);
 	}
 
 	/** The rows of the Core features that are off, read once per transaction (ADR-0124). */
@@ -676,10 +650,8 @@ public with sharing class SettingsController {
 	private static final String NPC_CONVERSION_ROW = 'NPC_Household_Conversion';
 
 	private static Boolean isHiddenByProduct(Setting_Definition__mdt definition) {
-		return NPSP_ADOPTION_ROW.equals(definition.DeveloperName) &&
-			!NpspHouseholdAdoptionService.isOffered() ||
-			NPC_CONVERSION_ROW.equals(definition.DeveloperName) &&
-			!NpspHouseholdAdoptionService.isNpcOffered();
+		return NPSP_ADOPTION_ROW.equals(definition.DeveloperName) && !NpspHouseholdAdoptionService.isOffered() ||
+			NPC_CONVERSION_ROW.equals(definition.DeveloperName) && !NpspHouseholdAdoptionService.isNpcOffered();
 	}
 
 	/** Rows that open Org Optimizer, for those who can open it (admin-14). */
@@ -738,9 +710,7 @@ public with sharing class SettingsController {
 		}
 		SettingModel setting = new SettingModel();
 		setting.settingsObject = settingsObject;
-		setting.module = String.isBlank(definition.Module__c)
-			? CORE_MODULE
-			: definition.Module__c.trim();
+		setting.module = String.isBlank(definition.Module__c) ? CORE_MODULE : definition.Module__c.trim();
 		setting.key = isComponent ? definition.DeveloperName : definition.Setting_Key__c;
 		setting.label = definition.MasterLabel;
 		setting.description = definition.Description__c;
@@ -749,16 +719,12 @@ public with sharing class SettingsController {
 		setting.maxValue = definition.Max_Value__c;
 		// A row that still names the old Households or Relationships page shows on People and
 		// Households (P1), so a module or a row not yet moved never makes a page of its own.
-		setting.section = String.isBlank(definition.Section__c)
-			? ''
-			: SettingSections.pageFor(definition.Section__c);
+		setting.section = String.isBlank(definition.Section__c) ? '' : SettingSections.pageFor(definition.Section__c);
 		setting.component = definition.Component__c;
 		// Rows name a packaged tab or object as written; Lightning needs it qualified.
 		setting.navigationTarget = NamespaceUtil.qualify(definition.Navigation_Target__c);
 		setting.navigationLabel = definition.Navigation_Label__c;
-		setting.helpUrl = String.isBlank(definition.Help_Path__c)
-			? null
-			: HELP_BASE + definition.Help_Path__c;
+		setting.helpUrl = String.isBlank(definition.Help_Path__c) ? null : HELP_BASE + definition.Help_Path__c;
 		setting.options = toOptions(definition);
 		if (!addRecordChoices(definition, setting)) {
 			return null;
@@ -794,15 +760,10 @@ public with sharing class SettingsController {
 			// flexible way for an org with Person Accounts or Nonprofit Cloud.
 			setting.value = SettingsService.householdMembershipMode();
 		} else if (
-			String.isBlank(setting.value) &&
-			SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject)
+			String.isBlank(setting.value) && SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject)
 		) {
-			String key = definition.Setting_Key__c == null
-				? ''
-				: definition.Setting_Key__c.toLowerCase();
-			setting.value = BLANK_SHOWS_AS.containsKey(key)
-				? BLANK_SHOWS_AS.get(key)
-				: setting.value;
+			String key = definition.Setting_Key__c == null ? '' : definition.Setting_Key__c.toLowerCase();
+			setting.value = BLANK_SHOWS_AS.containsKey(key) ? BLANK_SHOWS_AS.get(key) : setting.value;
 		}
 		Boolean isCheckbox = TYPE_CHECKBOX.equalsIgnoreCase(definition.Data_Type__c);
 		setting.checked = isCheckbox && value == true;
@@ -810,14 +771,8 @@ public with sharing class SettingsController {
 		setting.unsavedDefault =
 			!isCheckbox &&
 			String.isNotBlank(setting.value) &&
-			String.isBlank(
-				SettingsService.asText(
-					SettingsService.getValue(settingsObject, definition.Setting_Key__c)
-				)
-			);
-		String detected = setting.unsavedDefault
-			? detectedValue(settingsObject, definition.Setting_Key__c)
-			: null;
+			String.isBlank(SettingsService.asText(SettingsService.getValue(settingsObject, definition.Setting_Key__c)));
+		String detected = setting.unsavedDefault ? detectedValue(settingsObject, definition.Setting_Key__c) : null;
 		setting.detectionMayChange = detected != null && !detected.equals(setting.value);
 		describeBlankText(definition, settingsObject, setting);
 		return setting;
@@ -843,8 +798,7 @@ public with sharing class SettingsController {
 		if (
 			!TYPE_TEXT.equalsIgnoreCase(definition.Data_Type__c) ||
 			String.isNotBlank(setting.value) ||
-			!(organizationPage ||
-			SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject))
+			!(organizationPage || SettingsService.CORE_SETTINGS_OBJECT.equalsIgnoreCase(settingsObject))
 		) {
 			return;
 		}
@@ -893,17 +847,10 @@ public with sharing class SettingsController {
 	 * choices, read from describe (ADR-0074, R-AD10, ADR-0141). False when the row names an
 	 * object this org does not have, which leaves the row out as a missing settings object does.
 	 */
-	private static Boolean addRecordChoices(
-		Setting_Definition__mdt definition,
-		SettingModel setting
-	) {
+	private static Boolean addRecordChoices(Setting_Definition__mdt definition, SettingModel setting) {
 		Boolean isRecord = SettingsService.RECORD.equalsIgnoreCase(definition.Data_Type__c);
-		Boolean isRecordType = SettingsService.RECORD_TYPE.equalsIgnoreCase(
-			definition.Data_Type__c
-		);
-		Boolean isRecordTypes = SettingsService.RECORD_TYPE_LIST.equalsIgnoreCase(
-			definition.Data_Type__c
-		);
+		Boolean isRecordType = SettingsService.RECORD_TYPE.equalsIgnoreCase(definition.Data_Type__c);
+		Boolean isRecordTypes = SettingsService.RECORD_TYPE_LIST.equalsIgnoreCase(definition.Data_Type__c);
 		Boolean isFields = SettingsService.FIELD_LIST.equalsIgnoreCase(definition.Data_Type__c);
 		if (SettingsService.PICKLIST_FROM_FIELD.equalsIgnoreCase(definition.Data_Type__c)) {
 			// The field's active values, or a plain text box while this org lacks the field.
@@ -968,10 +915,7 @@ public with sharing class SettingsController {
 	 * another.
 	 */
 	private static void keepShownValue(SettingModel setting) {
-		if (
-			!SettingsService.PICKLIST_FROM_FIELD.equalsIgnoreCase(setting.dataType) ||
-			String.isBlank(setting.value)
-		) {
+		if (!SettingsService.PICKLIST_FROM_FIELD.equalsIgnoreCase(setting.dataType) || String.isBlank(setting.value)) {
 			return;
 		}
 		for (Option option : setting.options) {
@@ -987,10 +931,7 @@ public with sharing class SettingsController {
 
 	private static List<Option> toOptions(Setting_Definition__mdt definition) {
 		List<Option> options = new List<Option>();
-		if (
-			!TYPE_PICKLIST.equalsIgnoreCase(definition.Data_Type__c) ||
-			String.isBlank(definition.Picklist_Values__c)
-		) {
+		if (!TYPE_PICKLIST.equalsIgnoreCase(definition.Data_Type__c) || String.isBlank(definition.Picklist_Values__c)) {
 			return options;
 		}
 		for (String pair : definition.Picklist_Values__c.split(';')) {

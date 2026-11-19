@@ -16,14 +16,8 @@ private class ReceiptSentenceLabelsTest {
 			'The only goods or services provided in exchange for this contribution were intangible religious benefits.',
 			ReceiptContentBuilder.SENTENCE_INTANGIBLE_RELIGIOUS
 		);
-		System.assertEquals(
-			'the goods or services described below',
-			ReceiptContentBuilder.IN_KIND_AMOUNT_PHRASE
-		);
-		System.assertEquals(
-			'No value stated (gift of goods or services)',
-			ReceiptContentBuilder.AMOUNT_NOT_STATED
-		);
+		System.assertEquals('the goods or services described below', ReceiptContentBuilder.IN_KIND_AMOUNT_PHRASE);
+		System.assertEquals('No value stated (gift of goods or services)', ReceiptContentBuilder.AMOUNT_NOT_STATED);
 		System.assertEquals('Not valued', ReceiptContentBuilder.IN_KIND_LINE_AMOUNT);
 		System.assertEquals(
 			'Gifts of goods or services are listed above without a value and are not part of the total, because determining the value of donated property is the donor\'s responsibility.',
@@ -33,11 +27,7 @@ private class ReceiptSentenceLabelsTest {
 
 	@IsTest
 	static void quidProQuoSentenceFillsItsFormatParameters() {
-		Gift__c gift = new Gift__c(
-			Amount__c = 1250,
-			Benefit_Value__c = 100,
-			Benefit_Description__c = ' a dinner '
-		);
+		Gift__c gift = new Gift__c(Amount__c = 1250, Benefit_Value__c = 100, Benefit_Description__c = ' a dinner ');
 
 		List<String> sentences = ReceiptContentBuilder.taxSentencesFor(gift);
 
@@ -55,9 +45,7 @@ private class ReceiptSentenceLabelsTest {
 		String sentence = ReceiptContentBuilder.taxSentencesFor(gift)[0];
 
 		System.assert(
-			sentence.startsWith(
-				'In exchange for this contribution you received goods or services. '
-			),
+			sentence.startsWith('In exchange for this contribution you received goods or services. '),
 			sentence
 		);
 		System.assert(sentence.endsWith('which is $0.00.'), sentence);

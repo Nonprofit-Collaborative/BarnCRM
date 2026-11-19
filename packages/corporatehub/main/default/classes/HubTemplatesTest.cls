@@ -32,11 +32,7 @@ private class HubTemplatesTest {
 				FROM Processing_Activity__c
 				WITH USER_MODE
 			];
-			Assert.areEqual(
-				21,
-				loaded,
-				'Eight obligations, eight policies and five processing activities'
-			);
+			Assert.areEqual(21, loaded, 'Eight obligations, eight policies and five processing activities');
 			Assert.areEqual(0, again, 'Never twice');
 			Assert.areEqual(8, obligations.size(), 'Eight obligations');
 			Assert.areEqual(8, policies.size(), 'Eight policies');
@@ -46,19 +42,13 @@ private class HubTemplatesTest {
 			}
 			for (Compliance_Obligation__c row : obligations) {
 				Assert.areEqual('Off', row.Status__c, row.Template_Key__c + ' arrives Off');
-				Assert.isTrue(
-					row.Instructions__c.containsIgnoreCase('not legal advice'),
-					row.Template_Key__c
-				);
+				Assert.isTrue(row.Instructions__c.containsIgnoreCase('not legal advice'), row.Template_Key__c);
 				Assert.areEqual(UserInfo.getUserId(), row.OwnerId, 'Owned by whoever added it');
 			}
 			Integer needsAcknowledgment = 0;
 			for (Hub_Document__c row : policies) {
 				Assert.areEqual('Draft', row.Status__c, row.Template_Key__c + ' arrives Draft');
-				Assert.isTrue(
-					row.Summary__c.containsIgnoreCase('not legal advice'),
-					row.Template_Key__c
-				);
+				Assert.isTrue(row.Summary__c.containsIgnoreCase('not legal advice'), row.Template_Key__c);
 				needsAcknowledgment += row.Requires_Acknowledgment__c ? 1 : 0;
 			}
 			Assert.areEqual(

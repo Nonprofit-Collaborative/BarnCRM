@@ -59,17 +59,11 @@ private class OpportunityMirrorUnavailableTest {
 			if (action == 'runNow') {
 				OpportunityMirrorController.runNow();
 			} else if (action == 'copyAgain') {
-				OpportunityMirrorController.copyRangeAgain(
-					Date.newInstance(2026, 9, 1),
-					Date.newInstance(2026, 9, 30)
-				);
+				OpportunityMirrorController.copyRangeAgain(Date.newInstance(2026, 9, 1), Date.newInstance(2026, 9, 30));
 			} else if (action == 'schedule') {
 				OpportunityMirrorController.schedule();
 			} else {
-				OpportunityMirrorController.compare(
-					Date.newInstance(2026, 9, 1),
-					Date.newInstance(2026, 9, 30)
-				);
+				OpportunityMirrorController.compare(Date.newInstance(2026, 9, 1), Date.newInstance(2026, 9, 30));
 			}
 		} catch (AuraHandledException refused) {
 			return refused.getMessage();
@@ -156,11 +150,7 @@ private class OpportunityMirrorUnavailableTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				result.created + result.updated + result.failed,
-				'Nothing is copied.'
-			);
+			Assert.areEqual(0, result.created + result.updated + result.failed, 'Nothing is copied.');
 			Assert.isNull(job, 'No run starts.');
 			Assert.areEqual(0, countLinked(), 'No gift is linked.');
 			Assert.areEqual(0, countLogged(), 'Nothing is logged.');
@@ -198,9 +188,7 @@ private class OpportunityMirrorUnavailableTest {
 			Test.startTest();
 			System.runAs(maria()) {
 				status = OpportunityMirrorController.getStatus();
-				for (
-					String action : new List<String>{ 'runNow', 'copyAgain', 'schedule', 'compare' }
-				) {
+				for (String action : new List<String>{ 'runNow', 'copyAgain', 'schedule', 'compare' }) {
 					refusals.put(action, refusalOf(action));
 				}
 			}

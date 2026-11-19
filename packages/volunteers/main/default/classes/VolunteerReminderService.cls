@@ -88,9 +88,7 @@ public with sharing class VolunteerReminderService {
 				lastFailure = sent[i].error;
 			}
 			if (i >= sent.size() || !sent[i].sent) {
-				unstamp.add(
-					new Volunteer_Signup__c(Id = messageSignups[i].Id, Reminder_Sent_On__c = null)
-				);
+				unstamp.add(new Volunteer_Signup__c(Id = messageSignups[i].Id, Reminder_Sent_On__c = null));
 			}
 		}
 		if (!unstamp.isEmpty()) {
@@ -99,11 +97,7 @@ public with sharing class VolunteerReminderService {
 			ErrorLogger.logMessage(
 				String.format(
 					BarnHelp.text('Volunteers', 'Volunteers_Reminders_SendFailed'),
-					new List<Object>{
-						unstamp.size(),
-						signups.size(),
-						lastFailure == null ? '' : lastFailure
-					}
+					new List<Object>{ unstamp.size(), signups.size(), lastFailure == null ? '' : lastFailure }
 				),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
@@ -126,10 +120,7 @@ public with sharing class VolunteerReminderService {
 
 	/** One reminder, addressed to the booking's Contact. */
 	@TestVisible
-	private static Messaging.SingleEmailMessage messageFor(
-		Volunteer_Signup__c signup,
-		String zone
-	) {
+	private static Messaging.SingleEmailMessage messageFor(Volunteer_Signup__c signup, String zone) {
 		Volunteer_Shift__c shift = signup.Volunteer_Shift__r;
 		String jobName = shift.Volunteer_Job__r == null ? '' : shift.Volunteer_Job__r.Name;
 		String whenText = shift.Start_Time__c.format(WHEN_FORMAT, zone);
@@ -137,9 +128,7 @@ public with sharing class VolunteerReminderService {
 			whenText += ' - ' + shift.End_Time__c.format(TIME_FORMAT, zone);
 		}
 		// A person account booked with no Contact (QA-F3) is read from the account by name.
-		SObject person = signup.Contact__c != null
-			? (SObject) signup.Contact__r
-			: signup.getSObject('Account__r');
+		SObject person = signup.Contact__c != null ? (SObject) signup.Contact__r : signup.getSObject('Account__r');
 		String firstName = (String) person.get('FirstName');
 		String email = (String) person.get(
 			signup.Contact__c != null ? 'Email' : VolunteerReminderSelector.PERSON_EMAIL
@@ -168,22 +157,13 @@ public with sharing class VolunteerReminderService {
 		body += '\n\n' + BarnHelp.text('Volunteers', 'Volunteers_Reminders_Closing');
 		String page = signup.Contact__c == null ? null : personalPageLink(signup.Id);
 		if (page != null) {
-			body +=
-				'\n\n' +
-				BarnHelp.text(
-					'Volunteers',
-					'Volunteers_Reminders_PersonalPage',
-					new List<Object>{ page }
-				);
+			body += '\n\n' + BarnHelp.text('Volunteers', 'Volunteers_Reminders_PersonalPage', new List<Object>{ page });
 		}
 
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ email });
 		message.setSubject(
-			String.format(
-				BarnHelp.text('Volunteers', 'Volunteers_Reminders_Subject'),
-				new List<Object>{ jobName }
-			)
+			String.format(BarnHelp.text('Volunteers', 'Volunteers_Reminders_Subject'), new List<Object>{ jobName })
 		);
 		message.setPlainTextBody(body);
 		message.setSaveAsActivity(false);

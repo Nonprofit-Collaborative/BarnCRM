@@ -102,18 +102,9 @@ private class VolunteerSampleDataTest {
 	}
 
 	private static void assertTheWholeSet() {
-		Assert.areEqual(
-			3,
-			[SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
-		);
-		Assert.areEqual(
-			4,
-			[SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
-		);
-		Assert.areEqual(
-			4,
-			[SELECT COUNT() FROM Job_Skill__c WHERE Job__r.Sample_Data__c = TRUE WITH SYSTEM_MODE]
-		);
+		Assert.areEqual(3, [SELECT COUNT() FROM Volunteer_Job__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]);
+		Assert.areEqual(4, [SELECT COUNT() FROM Skill__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]);
+		Assert.areEqual(4, [SELECT COUNT() FROM Job_Skill__c WHERE Job__r.Sample_Data__c = TRUE WITH SYSTEM_MODE]);
 		Assert.areEqual(
 			1,
 			[
@@ -147,9 +138,7 @@ private class VolunteerSampleDataTest {
 			[
 				SELECT COUNT()
 				FROM Volunteer_Hours__c
-				WHERE
-					Status__c = :VolunteerHoursService.STATUS_REJECTED
-					AND Rejection_Reason__c = NULL
+				WHERE Status__c = :VolunteerHoursService.STATUS_REJECTED AND Rejection_Reason__c = NULL
 				WITH SYSTEM_MODE
 			],
 			'A rejected entry says why'
@@ -220,11 +209,7 @@ private class VolunteerSampleDataTest {
 			insert VolunteersTestData.newHours(realPerson.Id, realJob.Id, 2);
 			Skill__c realSkill = new Skill__c(Name = 'Real skill', Active__c = true);
 			insert realSkill;
-			insert new Volunteer_Skill__c(
-				Contact__c = realPerson.Id,
-				Skill__c = realSkill.Id,
-				Type__c = 'Skill'
-			);
+			insert new Volunteer_Skill__c(Contact__c = realPerson.Id, Skill__c = realSkill.Id, Type__c = 'Skill');
 			VolunteerSampleDataLoader.removeChunkSize = 25;
 
 			Test.startTest();
@@ -259,9 +244,7 @@ private class VolunteerSampleDataTest {
 	}
 
 	private static String nameOf(Id recordId) {
-		return (String) Database.query(
-				'SELECT Name FROM ' + recordId.getSObjectType() + ' WHERE Id = :recordId'
-			)[0]
+		return (String) Database.query('SELECT Name FROM ' + recordId.getSObjectType() + ' WHERE Id = :recordId')[0]
 			.get('Name');
 	}
 
@@ -270,11 +253,7 @@ private class VolunteerSampleDataTest {
 	}
 
 	private static Volunteer_Job__c sampleJob(String name) {
-		Volunteer_Job__c job = new Volunteer_Job__c(
-			Name = name,
-			Active__c = true,
-			Sample_Data__c = true
-		);
+		Volunteer_Job__c job = new Volunteer_Job__c(Name = name, Active__c = true, Sample_Data__c = true);
 		insert job;
 		return job;
 	}
@@ -285,11 +264,7 @@ private class VolunteerSampleDataTest {
 			Contact sampler = samplePeople(1)[0];
 			Contact realPerson = VolunteersTestData.contact('Real', null);
 			Volunteer_Job__c job = sampleJob();
-			Volunteer_Shift__c booked = VolunteersTestData.newShift(
-				job.Id,
-				VolunteersTestData.SHIFT_START,
-				3
-			);
+			Volunteer_Shift__c booked = VolunteersTestData.newShift(job.Id, VolunteersTestData.SHIFT_START, 3);
 			Volunteer_Shift__c worked = VolunteersTestData.newShift(
 				job.Id,
 				VolunteersTestData.SHIFT_START.addDays(1),
@@ -312,11 +287,7 @@ private class VolunteerSampleDataTest {
 			insert realHours;
 			// A second sample job nothing real points at, with a shift a sample person was on.
 			Volunteer_Job__c spare = sampleJob('Spare sample job');
-			Volunteer_Shift__c spareShift = VolunteersTestData.newShift(
-				spare.Id,
-				VolunteersTestData.SHIFT_START,
-				3
-			);
+			Volunteer_Shift__c spareShift = VolunteersTestData.newShift(spare.Id, VolunteersTestData.SHIFT_START, 3);
 			insert spareShift;
 			insert VolunteersTestData.newSignup(spareShift.Id, sampler.Id);
 			String person = nameOf(realPerson.Id);
@@ -340,11 +311,7 @@ private class VolunteerSampleDataTest {
 				warning.contains(
 					String.format(
 						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptShift'),
-						new List<Object>{
-							nameOf(booked.Id),
-							person,
-							Label.Volunteers_SampleData_KeptSignup
-						}
+						new List<Object>{ nameOf(booked.Id), person, Label.Volunteers_SampleData_KeptSignup }
 					)
 				),
 				'It names the booked shift and who is on it: ' + warning
@@ -353,11 +320,7 @@ private class VolunteerSampleDataTest {
 				warning.contains(
 					String.format(
 						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptShift'),
-						new List<Object>{
-							nameOf(worked.Id),
-							person,
-							Label.Volunteers_SampleData_KeptHours
-						}
+						new List<Object>{ nameOf(worked.Id), person, Label.Volunteers_SampleData_KeptHours }
 					)
 				),
 				'It names the worked shift and who has hours there: ' + warning
@@ -387,8 +350,7 @@ private class VolunteerSampleDataTest {
 			);
 			Assert.areEqual(
 				worked.Id,
-				[SELECT Volunteer_Shift__c FROM Volunteer_Hours__c WHERE Id = :realHours.Id]
-				.Volunteer_Shift__c,
+				[SELECT Volunteer_Shift__c FROM Volunteer_Hours__c WHERE Id = :realHours.Id].Volunteer_Shift__c,
 				'The real entry still names its shift'
 			);
 			Assert.areEqual(
@@ -412,10 +374,7 @@ private class VolunteerSampleDataTest {
 			delete [SELECT Id FROM Volunteer_Hours__c WHERE Id = :realHours.Id];
 			removeEverything();
 			Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Job__c WHERE Id = :job.Id]);
-			Assert.isFalse(
-				new VolunteersSampleData().hasSampleRecords(),
-				'Nothing is left once the retry has run'
-			);
+			Assert.isFalse(new VolunteersSampleData().hasSampleRecords(), 'Nothing is left once the retry has run');
 		}
 	}
 
@@ -434,11 +393,7 @@ private class VolunteerSampleDataTest {
 			);
 			insert new List<Volunteer_Skill__c>{
 				realRow,
-				new Volunteer_Skill__c(
-					Contact__c = sampler.Id,
-					Skill__c = skill.Id,
-					Type__c = 'Skill'
-				)
+				new Volunteer_Skill__c(Contact__c = sampler.Id, Skill__c = skill.Id, Type__c = 'Skill')
 			};
 
 			// A real job asking for a second sample skill keeps it too; a third goes.
@@ -509,11 +464,7 @@ private class VolunteerSampleDataTest {
 		System.runAs(admin()) {
 			VolunteersTestData.volunteerSettings(false, true);
 			Contact person = samplePeople(1)[0];
-			Volunteer_Job__c job = new Volunteer_Job__c(
-				Name = 'Sample job',
-				Active__c = true,
-				Sample_Data__c = true
-			);
+			Volunteer_Job__c job = new Volunteer_Job__c(Name = 'Sample job', Active__c = true, Sample_Data__c = true);
 			insert job;
 			List<Volunteer_Hours__c> entries = new List<Volunteer_Hours__c>();
 			for (Integer i = 0; i < 251; i++) {
@@ -575,10 +526,7 @@ private class VolunteerSampleDataTest {
 				new VolunteersSampleData.RemoveStages().name(),
 				'The removal names itself in the Error Log'
 			);
-			Assert.areEqual(
-				'VolunteerSampleDataStages',
-				new VolunteersSampleData.LoadStages().name()
-			);
+			Assert.areEqual('VolunteerSampleDataStages', new VolunteersSampleData.LoadStages().name());
 			Assert.isFalse(String.isBlank(module.countLabel()), 'The card has its wording');
 			Assert.areEqual(0, module.countLoaded(), 'Nothing loaded yet');
 			Assert.isFalse(module.hasSampleRecords(), 'No sample job or skill yet');
@@ -601,10 +549,7 @@ private class VolunteerSampleDataTest {
 			new VolunteersSampleData().enqueueLoad();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataStageBatch']
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataStageBatch']);
 		}
 	}
 
@@ -617,8 +562,7 @@ private class VolunteerSampleDataTest {
 
 			// With nothing to remove it finishes at once and hands on, so two batches may run.
 			Assert.isTrue(
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'] >=
-				1,
+				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'SampleDataRemoveBatch'] >= 1,
 				'The Volunteers removal runs in Core\'s removal batch'
 			);
 		}

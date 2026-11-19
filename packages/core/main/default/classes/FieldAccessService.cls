@@ -195,9 +195,7 @@ public with sharing class FieldAccessService {
 			try {
 				ids.add(Id.valueOf(String.valueOf(value)));
 			} catch (Exception notAnId) {
-				throw new FieldAccessException(
-					BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed')
-				);
+				throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'));
 			}
 		}
 		if (ids.isEmpty()) {
@@ -205,19 +203,13 @@ public with sharing class FieldAccessService {
 		}
 		if (ids.size() > MAX_SETS) {
 			throw new FieldAccessException(
-				String.format(
-					BarnHelp.text('Core', 'Core_FieldAccess_TooManySets'),
-					new List<Object>{ MAX_SETS }
-				)
+				String.format(BarnHelp.text('Core', 'Core_FieldAccess_TooManySets'), new List<Object>{ MAX_SETS })
 			);
 		}
 		Map<Id, PermissionSet> found = new Map<Id, PermissionSet>(
 			(List<PermissionSet>) Database.queryWithBinds(
 				'SELECT Id, Label, Name FROM PermissionSet WHERE ' + ELIGIBLE + ' AND Id IN :ids',
-				new Map<String, Object>{
-					'ids' => ids,
-					'shipped' => BarnCRMShippedPermissionSets.NAMES
-				},
+				new Map<String, Object>{ 'ids' => ids, 'shipped' => BarnCRMShippedPermissionSets.NAMES },
 				AccessLevel.USER_MODE
 			)
 		);
@@ -245,9 +237,7 @@ public with sharing class FieldAccessService {
 	}
 
 	/** The fields Salesforce lets anyone give or take, by API name (R-FA3). */
-	public static Map<String, Schema.DescribeFieldResult> permissionableFields(
-		Schema.DescribeSObjectResult described
-	) {
+	public static Map<String, Schema.DescribeFieldResult> permissionableFields(Schema.DescribeSObjectResult described) {
 		Map<String, Schema.DescribeFieldResult> result = new Map<String, Schema.DescribeFieldResult>();
 		for (Schema.SObjectField token : described.fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
@@ -375,11 +365,7 @@ public with sharing class FieldAccessService {
 			}
 		}
 		Map<String, ObjectPermissions> objectNow = objectRows(sets.keySet(), objects.keySet());
-		Map<String, FieldPermissions> fieldNow = fieldRows(
-			sets.keySet(),
-			fieldItems.keySet(),
-			removedObjects
-		);
+		Map<String, FieldPermissions> fieldNow = fieldRows(sets.keySet(), fieldItems.keySet(), removedObjects);
 		Plan result = new Plan();
 		result.document = document;
 		result.setCount = sets.size();
@@ -443,9 +429,7 @@ public with sharing class FieldAccessService {
 				if (!rowKey.startsWith(prefix) || asked.contains(row.Field.toLowerCase())) {
 					continue;
 				}
-				Schema.DescribeFieldResult field = fields.get(
-					row.Field.substringAfter('.').toLowerCase()
-				);
+				Schema.DescribeFieldResult field = fields.get(row.Field.substringAfter('.').toLowerCase());
 				Change change = newChange(permissionSet, described, field, row.Id, accessOf(row));
 				if (field == null) {
 					change.fieldName = row.Field.substringAfter('.');
@@ -507,13 +491,9 @@ public with sharing class FieldAccessService {
 
 	private static Map<String, Object> parse(String changeJson) {
 		try {
-			Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
-				changeJson
-			);
+			Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(changeJson);
 			if (document.get('version') != 1 || !(document.get('items') instanceof List<Object>)) {
-				throw new FieldAccessException(
-					BarnHelp.text('Core', 'Core_FieldAccess_BadDocument')
-				);
+				throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_BadDocument'));
 			}
 			return document;
 		} catch (FieldAccessException known) {
@@ -530,10 +510,7 @@ public with sharing class FieldAccessService {
 		}
 		if (raw.size() > MAX_ITEMS) {
 			throw new FieldAccessException(
-				String.format(
-					BarnHelp.text('Core', 'Core_FieldAccess_TooManyItems'),
-					new List<Object>{ MAX_ITEMS }
-				)
+				String.format(BarnHelp.text('Core', 'Core_FieldAccess_TooManyItems'), new List<Object>{ MAX_ITEMS })
 			);
 		}
 		List<Item> result = new List<Item>();
@@ -546,9 +523,7 @@ public with sharing class FieldAccessService {
 			item.described = requireObject((String) entry.get('object'));
 			item.access = String.valueOf(entry.get('access'));
 			if (item.access != READ && item.access != EDIT && item.access != NONE) {
-				throw new FieldAccessException(
-					BarnHelp.text('Core', 'Core_FieldAccess_BadDocument')
-				);
+				throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_BadDocument'));
 			}
 			String fieldName = (String) entry.get('field');
 			if (String.isNotBlank(fieldName)) {
@@ -592,16 +567,11 @@ public with sharing class FieldAccessService {
 		Plan checked = plan(changeJson);
 		Integer count = checked.changes.size();
 		if (count == 0) {
-			throw new FieldAccessException(
-				BarnHelp.text('Core', 'Core_FieldAccess_NothingToChange')
-			);
+			throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_NothingToChange'));
 		}
 		if (count > maxRows) {
 			throw new FieldAccessException(
-				String.format(
-					BarnHelp.text('Core', 'Core_FieldAccess_TooManyRows'),
-					new List<Object>{ count, maxRows }
-				)
+				String.format(BarnHelp.text('Core', 'Core_FieldAccess_TooManyRows'), new List<Object>{ count, maxRows })
 			);
 		}
 		if (confirmedCount != count) {
@@ -659,12 +629,7 @@ public with sharing class FieldAccessService {
 		);
 	}
 
-	private static void journal(
-		List<Change> changes,
-		List<Database.SaveResult> saved,
-		String action,
-		Result result
-	) {
+	private static void journal(List<Change> changes, List<Database.SaveResult> saved, String action, Result result) {
 		for (Integer i = 0; i < changes.size(); i++) {
 			Change change = changes[i];
 			if (saved[i].isSuccess()) {
@@ -713,11 +678,7 @@ public with sharing class FieldAccessService {
 			return row;
 		}
 		row = change.rowId == null
-			? new FieldPermissions(
-					ParentId = change.setId,
-					SobjectType = change.objectName,
-					Field = change.target()
-			  )
+			? new FieldPermissions(ParentId = change.setId, SobjectType = change.objectName, Field = change.target())
 			: new FieldPermissions(Id = change.rowId);
 		row.put('PermissionsRead', access.read);
 		row.put('PermissionsEdit', access.edit);
@@ -823,19 +784,14 @@ public with sharing class FieldAccessService {
 			change.objectName = isObject ? target : target.substringBefore('.');
 			change.fieldName = isObject ? null : target.substringAfter('.');
 			change.rowId = row?.Id;
-			change.now = isObject
-				? accessOf((ObjectPermissions) row)
-				: accessOf((FieldPermissions) row);
+			change.now = isObject ? accessOf((ObjectPermissions) row) : accessOf((FieldPermissions) row);
 			change.after = accessFrom(each.get('before'));
 			Access left = accessFrom(each.get('after'));
 			Boolean removed = each.get('action') == ImportJournalService.ACTION_DELETED;
 			Boolean untouched = removed ? row == null : row != null && change.now.same(left);
 			if (!untouched) {
 				result.kept++;
-				Map<String, Object> keptEntry = entry(
-					ImportJournalService.ACTION_NOT_RESTORED,
-					change
-				);
+				Map<String, Object> keptEntry = entry(ImportJournalService.ACTION_NOT_RESTORED, change);
 				keptEntry.put('reason', BarnHelp.text('Core', 'Core_FieldAccess_ChangedSince'));
 				result.entries.add(keptEntry);
 				continue;

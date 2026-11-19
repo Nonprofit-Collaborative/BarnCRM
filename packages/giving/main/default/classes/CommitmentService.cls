@@ -30,11 +30,7 @@ public with sharing class CommitmentService {
 	 * negative gift that reverses it (Received, linked to the same commitment and installment)
 	 * takes the amount back off, so what is paid is the net of the two (R-G3).
 	 */
-	public static final Set<String> PAID_GIFT_STATUSES = new Set<String>{
-		'Received',
-		'Refunded',
-		'Written off'
-	};
+	public static final Set<String> PAID_GIFT_STATUSES = new Set<String>{ 'Received', 'Refunded', 'Written off' };
 	@TestVisible
 	private static final String INSTALLMENT_SCHEDULED = 'Scheduled';
 	@TestVisible
@@ -82,9 +78,7 @@ public with sharing class CommitmentService {
 				commitment.Installments_Planned__c != null &&
 				commitment.Installments_Planned__c > 0
 			) {
-				commitment.Expected_Total__c = (commitment.Amount__c *
-					commitment.Installments_Planned__c)
-					.setScale(2);
+				commitment.Expected_Total__c = (commitment.Amount__c * commitment.Installments_Planned__c).setScale(2);
 			}
 		}
 	}
@@ -96,11 +90,7 @@ public with sharing class CommitmentService {
 	 */
 	public static List<Installment__c> buildSchedule(Commitment__c commitment) {
 		List<Installment__c> plan = new List<Installment__c>();
-		if (
-			commitment == null ||
-			commitment.Amount__c == null ||
-			commitment.Start_Date__c == null
-		) {
+		if (commitment == null || commitment.Amount__c == null || commitment.Start_Date__c == null) {
 			return plan;
 		}
 		if (commitment.Amount__c <= 0) {
@@ -110,9 +100,7 @@ public with sharing class CommitmentService {
 		if (count <= 0) {
 			return plan;
 		}
-		Decimal expectedTotal = TYPE_PLEDGE.equals(commitment.Type__c)
-			? commitment.Expected_Total__c
-			: null;
+		Decimal expectedTotal = TYPE_PLEDGE.equals(commitment.Type__c) ? commitment.Expected_Total__c : null;
 		Decimal runningTotal = 0;
 		for (Integer index = 0; index < count; index++) {
 			Date dueDate = dueDateFor(commitment, index);
@@ -146,10 +134,7 @@ public with sharing class CommitmentService {
 	@TestVisible
 	private static Integer plannedCount(Commitment__c commitment) {
 		if (TYPE_PLEDGE.equals(commitment.Type__c)) {
-			if (
-				commitment.Installments_Planned__c != null &&
-				commitment.Installments_Planned__c > 0
-			) {
+			if (commitment.Installments_Planned__c != null && commitment.Installments_Planned__c > 0) {
 				return Math.min(commitment.Installments_Planned__c.intValue(), MAX_SCHEDULE_LENGTH);
 			}
 			if (commitment.Expected_Total__c != null && commitment.Expected_Total__c > 0) {
@@ -213,11 +198,7 @@ public with sharing class CommitmentService {
 		if (day < 1) {
 			day = 1;
 		}
-		return Date.newInstance(
-			firstOfMonth.year(),
-			firstOfMonth.month(),
-			Math.min(day, daysInMonth)
-		);
+		return Date.newInstance(firstOfMonth.year(), firstOfMonth.month(), Math.min(day, daysInMonth));
 	}
 
 	// ------------------------------------------------------------------- generation
@@ -253,10 +234,7 @@ public with sharing class CommitmentService {
 		List<Installment__c> toDelete = new List<Installment__c>();
 
 		for (Commitment__c commitment : commitments) {
-			if (
-				STATUS_CANCELLED.equals(commitment.Status__c) ||
-				STATUS_PAUSED.equals(commitment.Status__c)
-			) {
+			if (STATUS_CANCELLED.equals(commitment.Status__c) || STATUS_PAUSED.equals(commitment.Status__c)) {
 				continue;
 			}
 			List<Installment__c> plan = buildSchedule(commitment);
@@ -449,9 +427,7 @@ public with sharing class CommitmentService {
 
 	@TestVisible
 	private static String statusFor(Installment__c installment, Decimal paid, Date cutoff) {
-		Decimal expected = installment.Expected_Amount__c == null
-			? 0
-			: installment.Expected_Amount__c;
+		Decimal expected = installment.Expected_Amount__c == null ? 0 : installment.Expected_Amount__c;
 		if (expected > 0 && paid >= expected) {
 			return INSTALLMENT_PAID;
 		}
@@ -476,10 +452,7 @@ public with sharing class CommitmentService {
 		Map<Id, Decimal> paidByCommitment = selector.sumPaidGifts(commitmentIds);
 		List<Commitment__c> changed = new List<Commitment__c>();
 		for (Commitment__c commitment : selector.selectByIds(commitmentIds)) {
-			if (
-				!TYPE_PLEDGE.equals(commitment.Type__c) ||
-				!STATUS_ACTIVE.equals(commitment.Status__c)
-			) {
+			if (!TYPE_PLEDGE.equals(commitment.Type__c) || !STATUS_ACTIVE.equals(commitment.Status__c)) {
 				continue;
 			}
 			if (commitment.Expected_Total__c == null || commitment.Expected_Total__c <= 0) {
@@ -566,10 +539,7 @@ public with sharing class CommitmentService {
 	 */
 	public static void refuseDeletingOpenCommitmentDonors(List<SObject> records) {
 		for (SObject record : records) {
-			if (
-				donorsWithOpenCommitments.contains(record.Id) &&
-				record.get('MasterRecordId') == null
-			) {
+			if (donorsWithOpenCommitments.contains(record.Id) && record.get('MasterRecordId') == null) {
 				record.addError(BarnHelp.text('Giving', 'Giving_Commitment_DonorDeleteBlocked'));
 			}
 		}
@@ -583,8 +553,7 @@ public with sharing class CommitmentService {
 	 */
 	public static Integer markOverdue() {
 		Date cutoff = Date.today().addDays(-graceDays());
-		List<Installment__c> candidates = new InstallmentSelector()
-			.selectUnpaidDueBefore(cutoff, MAX_OVERDUE_ROWS);
+		List<Installment__c> candidates = new InstallmentSelector().selectUnpaidDueBefore(cutoff, MAX_OVERDUE_ROWS);
 		if (candidates.isEmpty()) {
 			return 0;
 		}
@@ -619,21 +588,13 @@ public with sharing class CommitmentService {
 
 	/** Stops generation and marks the unpaid installments Skipped (R-CM3). */
 	public static void cancel(Set<Id> commitmentIds) {
-		transition(
-			commitmentIds,
-			STATUS_CANCELLED,
-			new Set<String>{ STATUS_ACTIVE, STATUS_PAUSED }
-		);
+		transition(commitmentIds, STATUS_CANCELLED, new Set<String>{ STATUS_ACTIVE, STATUS_PAUSED });
 		skipUnpaidInstallments(commitmentIds);
 	}
 
 	/** Ends a commitment that has been paid in full or that staff consider finished. */
 	public static void complete(Set<Id> commitmentIds) {
-		transition(
-			commitmentIds,
-			STATUS_COMPLETED,
-			new Set<String>{ STATUS_ACTIVE, STATUS_PAUSED }
-		);
+		transition(commitmentIds, STATUS_COMPLETED, new Set<String>{ STATUS_ACTIVE, STATUS_PAUSED });
 	}
 
 	private static void transition(Set<Id> commitmentIds, String target, Set<String> allowedFrom) {
@@ -646,9 +607,7 @@ public with sharing class CommitmentService {
 				continue;
 			}
 			if (!allowedFrom.contains(commitment.Status__c)) {
-				throw new CommitmentException(
-					BarnHelp.text('Giving', 'Giving_Commitment_TransitionNotAllowed')
-				);
+				throw new CommitmentException(BarnHelp.text('Giving', 'Giving_Commitment_TransitionNotAllowed'));
 			}
 			changed.add(new Commitment__c(Id = commitment.Id, Status__c = target));
 		}
@@ -659,10 +618,7 @@ public with sharing class CommitmentService {
 
 	private static void skipUnpaidInstallments(Set<Id> commitmentIds) {
 		List<Installment__c> changed = new List<Installment__c>();
-		for (
-			Installment__c installment : new InstallmentSelector()
-				.selectByCommitmentIds(commitmentIds)
-		) {
+		for (Installment__c installment : new InstallmentSelector().selectByCommitmentIds(commitmentIds)) {
 			if (isUnpaid(installment)) {
 				changed.add(statusChange(installment.Id, INSTALLMENT_SKIPPED));
 			}
@@ -751,17 +707,14 @@ public with sharing class CommitmentService {
 	@TestVisible
 	private static Boolean isUnpaid(Installment__c installment) {
 		if (
-			INSTALLMENT_PAID.equals(installment.Status__c) ||
-			INSTALLMENT_PARTIALLY_PAID.equals(installment.Status__c)
+			INSTALLMENT_PAID.equals(installment.Status__c) || INSTALLMENT_PARTIALLY_PAID.equals(installment.Status__c)
 		) {
 			return false;
 		}
 		return installment.Paid_Amount__c == null || installment.Paid_Amount__c == 0;
 	}
 
-	private static Map<Id, List<Installment__c>> groupByCommitment(
-		List<Installment__c> installments
-	) {
+	private static Map<Id, List<Installment__c>> groupByCommitment(List<Installment__c> installments) {
 		Map<Id, List<Installment__c>> grouped = new Map<Id, List<Installment__c>>();
 		for (Installment__c installment : installments) {
 			if (!grouped.containsKey(installment.Commitment__c)) {

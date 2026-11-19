@@ -73,8 +73,7 @@ private class InboundGiftRequestTest {
 			twoFunds.fundCode = '4100';
 			twoFunds.fundId = fakeId(Fund__c.SObjectType);
 			InboundGift longReference = gift('v:10', 10);
-			longReference.paymentReference = 'r'
-				.repeat(InboundGiftRequest.MAX_PAYMENT_REFERENCE + 1);
+			longReference.paymentReference = 'r'.repeat(InboundGiftRequest.MAX_PAYMENT_REFERENCE + 1);
 
 			List<InboundGift> malformed = new List<InboundGift>{
 				noId,
@@ -98,11 +97,7 @@ private class InboundGiftRequestTest {
 
 			for (InboundGiftResult result : results) {
 				Assert.areEqual(InboundGiftResult.OUTCOME_REJECTED, result.outcome);
-				Assert.areEqual(
-					InboundGiftResult.ERROR_INVALID_FIELD,
-					result.errorCode,
-					result.message
-				);
+				Assert.areEqual(InboundGiftResult.ERROR_INVALID_FIELD, result.errorCode, result.message);
 				Assert.areEqual(400, InboundGiftResult.httpStatus(result));
 				Assert.isNull(result.giftId);
 			}
@@ -145,9 +140,7 @@ private class InboundGiftRequestTest {
 			Id giftId = fakeId(Gift__c.SObjectType);
 			Assert.areEqual(
 				201,
-				InboundGiftResult.httpStatus(
-					InboundGiftResult.recorded(InboundGiftResult.OUTCOME_CREATED, giftId, 'x')
-				)
+				InboundGiftResult.httpStatus(InboundGiftResult.recorded(InboundGiftResult.OUTCOME_CREATED, giftId, 'x'))
 			);
 			Assert.areEqual(
 				200,

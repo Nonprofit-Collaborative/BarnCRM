@@ -36,11 +36,7 @@ public with sharing class ProjectsPostInstall implements InstallHandler, ModuleS
 
 	/** The install's steps, then the module's key added to the setup marker. Never throws. */
 	public void runSetup(Id installerId) {
-		ShippedDefaultUpgrades.apply(
-			MODULE_KEY,
-			Projects_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(MODULE_KEY, Projects_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		fillReturnUrl();
 		ModuleSetups.markRan(MODULE_KEY);
 		try {

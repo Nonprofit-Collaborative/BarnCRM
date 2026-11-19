@@ -51,10 +51,7 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 			if (stepKey == 'planSteps') {
 				planStep(row);
 			} else {
-				row.put(
-					START_COLUMN,
-					startOf((String) row.get(NEXT_FIELD), (String) row.get(ESTABLISHED_FIELD))
-				);
+				row.put(START_COLUMN, startOf((String) row.get(NEXT_FIELD), (String) row.get(ESTABLISHED_FIELD)));
 				row.put(
 					FREQUENCY_COLUMN,
 					frequencyOf(
@@ -81,10 +78,7 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 		if (stepKey != 'parity') {
 			return null;
 		}
-		Set<String> levels = names(
-			'SELECT Name FROM npsp~Level__c WHERE npsp~Active__c = true',
-			'Name'
-		);
+		Set<String> levels = names('SELECT Name FROM npsp~Level__c WHERE npsp~Active__c = true', 'Name');
 		Set<String> plans = names('SELECT Id FROM npsp~Engagement_Plan_Template__c', 'Id');
 		Integer done =
 			[SELECT COUNT() FROM Donor_Level__c WHERE Name IN :levels WITH USER_MODE] +
@@ -106,12 +100,7 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 	private static void planStep(Map<String, Object> row) {
 		String days = (String) row.get('npsp.Days_After__c');
 		row.put('Order', String.isBlank(days) ? '0' : days);
-		row.put(
-			'AssignTo',
-			String.isBlank((String) row.get('npsp.Assigned_To__c'))
-				? 'Record owner'
-				: 'Specific user'
-		);
+		row.put('AssignTo', String.isBlank((String) row.get('npsp.Assigned_To__c')) ? 'Record owner' : 'Specific user');
 	}
 
 	/**

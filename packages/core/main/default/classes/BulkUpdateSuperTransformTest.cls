@@ -6,9 +6,7 @@
  *
  * No org has run these yet; they are written against the behaviour the class documents.
  */
-@IsTest(
-	testFor='ApexClass:BulkUpdateController, ApexClass:BulkUpdateService, ApexClass:BulkUpdateFields'
-)
+@IsTest(testFor='ApexClass:BulkUpdateController, ApexClass:BulkUpdateService, ApexClass:BulkUpdateFields')
 private class BulkUpdateSuperTransformTest {
 	private static final Integer HOW_MANY = 30;
 	private static final Integer ALREADY = 4;
@@ -18,9 +16,7 @@ private class BulkUpdateSuperTransformTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Shelbyville Pantry')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Shelbyville Pantry'));
 			insert organization;
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < HOW_MANY; index++) {
@@ -72,13 +68,7 @@ private class BulkUpdateSuperTransformTest {
 	}
 
 	private static final String SET_COORDINATOR = JSON.serialize(
-		new List<Object>{
-			new Map<String, Object>{
-				'field' => 'Title',
-				'action' => 'set',
-				'value' => 'Coordinator'
-			}
-		}
+		new List<Object>{ new Map<String, Object>{ 'field' => 'Title', 'action' => 'set', 'value' => 'Coordinator' } }
 	);
 
 	@IsTest
@@ -142,11 +132,7 @@ private class BulkUpdateSuperTransformTest {
 				SET_COORDINATOR
 			);
 			System.Assert.areEqual(HOW_MANY, shown.count, 'The count is of every match');
-			System.Assert.areEqual(
-				BulkUpdateService.MAX_SAMPLE_SIZE,
-				shown.sample.size(),
-				'At most 25 shown'
-			);
+			System.Assert.areEqual(BulkUpdateService.MAX_SAMPLE_SIZE, shown.sample.size(), 'At most 25 shown');
 			for (BulkUpdateService.SampleRecord record : shown.sample) {
 				BulkUpdateService.FieldChange title = record.changes[0];
 				System.Assert.areEqual('Coordinator', title.after, 'The value to set');
@@ -191,9 +177,7 @@ private class BulkUpdateSuperTransformTest {
 	static void bookkeepingObjectsAndBadDocumentsAreRefused() {
 		System.runAs(named('Maria')) {
 			try {
-				BulkUpdateController.countMatches(
-					query(NamespaceUtil.qualify('Import_Batch__c'), null)
-				);
+				BulkUpdateController.countMatches(query(NamespaceUtil.qualify('Import_Batch__c'), null));
 				System.Assert.fail('Data jobs cannot be changed');
 			} catch (AuraHandledException refused) {
 				System.Assert.isFalse(

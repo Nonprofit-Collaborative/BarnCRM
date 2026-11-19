@@ -14,9 +14,7 @@ private class FundraisingHomeControllerTest {
 		}
 	}
 
-	private static Map<String, FundraisingHomeController.Tile> byName(
-		FundraisingHomeController.HomeView view
-	) {
+	private static Map<String, FundraisingHomeController.Tile> byName(FundraisingHomeController.HomeView view) {
 		Map<String, FundraisingHomeController.Tile> tiles = new Map<String, FundraisingHomeController.Tile>();
 		for (FundraisingHomeController.Tile tile : view.tiles) {
 			tiles.put(tile.name, tile);
@@ -44,13 +42,7 @@ private class FundraisingHomeControllerTest {
 
 			Map<String, FundraisingHomeController.Tile> tiles = byName(view);
 			Assert.areEqual(
-				new Set<String>{
-					'giftsToThank',
-					'installmentsOverdue',
-					'myAsksDue',
-					'openBatches',
-					'runningPlans'
-				},
+				new Set<String>{ 'giftsToThank', 'installmentsOverdue', 'myAsksDue', 'openBatches', 'runningPlans' },
 				tiles.keySet(),
 				'An administrator can read every object behind the five figures.'
 			);
@@ -63,11 +55,7 @@ private class FundraisingHomeControllerTest {
 				'The figure is named by the object label, not a custom label.'
 			);
 			Assert.areEqual('Open', batches.badgeLabel, 'The badge is the Open picklist label.');
-			Assert.areEqual(
-				'Open_Batches',
-				batches.filterName,
-				'It opens the Open Batches list view.'
-			);
+			Assert.areEqual('Open_Batches', batches.filterName, 'It opens the Open Batches list view.');
 			Assert.areEqual(
 				NamespaceUtil.qualify('Acknowledgments'),
 				tiles.get('giftsToThank').tabName,
@@ -85,12 +73,7 @@ private class FundraisingHomeControllerTest {
 			);
 			Assert.isTrue(view.canEnterGift, 'An administrator may create gifts.');
 			Assert.areEqual(
-				new Set<String>{
-					'Donor_Levels',
-					'Stewardship_Plans',
-					'Pledge_Reminders',
-					'Receipts'
-				},
+				new Set<String>{ 'Donor_Levels', 'Stewardship_Plans', 'Pledge_Reminders', 'Receipts' },
 				setupNames(view),
 				'An administrator with Manage BarnCRM Settings sees every setup tile.'
 			);
@@ -139,9 +122,7 @@ private class FundraisingHomeControllerTest {
 	@IsTest
 	static void theFirstRunPanelGoesOnceAGiftExists() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact donor = TestDataFactory.person(
-				new Contact(FirstName = 'Ada', LastName = 'First')
-			);
+			Contact donor = TestDataFactory.person(new Contact(FirstName = 'Ada', LastName = 'First'));
 			insert donor;
 			// A gift saves only with a default fund to allocate it to.
 			GivingTestDataFactory.ensureDefaultFund();
@@ -164,10 +145,7 @@ private class FundraisingHomeControllerTest {
 
 	@IsTest
 	static void aReaderCannotEnterAGiftAndSeesNoOrgWideSetup() {
-		User reader = TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-		);
+		User reader = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' });
 		System.runAs(reader) {
 			Test.startTest();
 			FundraisingHomeController.HomeView view = FundraisingHomeController.getHome();
@@ -184,10 +162,7 @@ private class FundraisingHomeControllerTest {
 				'A reader may open the pages that list what they can read.'
 			);
 			Assert.isFalse(view.tiles.isEmpty(), 'A reader still sees the figures they can read.');
-			Assert.isFalse(
-				view.firstRun,
-				'The first-run panel is for someone who can enter gifts.'
-			);
+			Assert.isFalse(view.firstRun, 'The first-run panel is for someone who can enter gifts.');
 			Assert.isFalse(view.moreTiles.isEmpty(), 'A reader sees the More lists they can read.');
 		}
 	}
@@ -200,18 +175,11 @@ private class FundraisingHomeControllerTest {
 				'X',
 				FundraisingHomeController.COUNT_CAP + 1
 			);
-			Assert.areEqual(
-				FundraisingHomeController.COUNT_CAP,
-				tile.count,
-				'The count stops at the cap.'
-			);
+			Assert.areEqual(FundraisingHomeController.COUNT_CAP, tile.count, 'The count stops at the cap.');
 			Assert.isTrue(tile.capped, 'The page shows the cap with a plus.');
 			Assert.areEqual(
 				'Nope',
-				FundraisingHomeController.picklistLabel(
-					Schema.SObjectType.Gift_Batch__c.fields.Status__c,
-					'Nope'
-				),
+				FundraisingHomeController.picklistLabel(Schema.SObjectType.Gift_Batch__c.fields.Status__c, 'Nope'),
 				'A value the picklist does not have falls back to itself.'
 			);
 		}

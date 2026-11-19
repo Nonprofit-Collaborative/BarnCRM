@@ -60,12 +60,7 @@ private class SoftCreditTriggerHandlerTest {
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 500);
 
 			Test.startTest();
-			Soft_Credit__c credit = RecognitionTestData.manualCredit(
-				gift.Id,
-				solicitor.Id,
-				'Solicitor',
-				250
-			);
+			Soft_Credit__c credit = RecognitionTestData.manualCredit(gift.Id, solicitor.Id, 'Solicitor', 250);
 			Test.stopTest();
 
 			Soft_Credit__c saved = [
@@ -121,11 +116,7 @@ private class SoftCreditTriggerHandlerTest {
 			);
 			Test.stopTest();
 
-			System.assertEquals(
-				false,
-				result.isSuccess(),
-				'One number or the other, not two that differ'
-			);
+			System.assertEquals(false, result.isSuccess(), 'One number or the other, not two that differ');
 		}
 	}
 
@@ -139,21 +130,12 @@ private class SoftCreditTriggerHandlerTest {
 
 			Test.startTest();
 			Database.SaveResult result = Database.insert(
-				new Soft_Credit__c(
-					Gift__c = gift.Id,
-					Contact__c = helper.Id,
-					Role__c = 'Other',
-					Amount__c = 500
-				),
+				new Soft_Credit__c(Gift__c = gift.Id, Contact__c = helper.Id, Role__c = 'Other', Amount__c = 500),
 				false
 			);
 			Test.stopTest();
 
-			System.assertEquals(
-				false,
-				result.isSuccess(),
-				'Role Other needs the organization\'s wording'
-			);
+			System.assertEquals(false, result.isSuccess(), 'Role Other needs the organization\'s wording');
 		}
 	}
 }

@@ -60,9 +60,7 @@ public with sharing class MirrorSync {
 	 * a margin for the other automation in the same transaction.
 	 */
 	public static Boolean hasHeadroom(Integer queries, Integer statements, Integer rows) {
-		Integer queriesUsed = simulatedQueriesUsed != null
-			? simulatedQueriesUsed
-			: Limits.getQueries();
+		Integer queriesUsed = simulatedQueriesUsed != null ? simulatedQueriesUsed : Limits.getQueries();
 		Integer statementsUsed = simulatedDmlStatementsUsed != null
 			? simulatedDmlStatementsUsed
 			: Limits.getDmlStatements();
@@ -79,16 +77,10 @@ public with sharing class MirrorSync {
 	 * standard object runs the org's own automation on it, which can be heavy (NPSP's rollups on
 	 * Opportunity), so a copy started with little CPU left would fail the whole save.
 	 */
-	public static Boolean hasHeadroom(
-		Integer queries,
-		Integer statements,
-		Integer rows,
-		Decimal cpuShareLeft
-	) {
+	public static Boolean hasHeadroom(Integer queries, Integer statements, Integer rows, Decimal cpuShareLeft) {
 		Integer cpuUsed = simulatedCpuTimeUsed != null ? simulatedCpuTimeUsed : Limits.getCpuTime();
 		Integer cpuLimit = Limits.getLimitCpuTime();
-		return hasHeadroom(queries, statements, rows) &&
-			(cpuLimit - cpuUsed) >= cpuLimit * cpuShareLeft;
+		return hasHeadroom(queries, statements, rows) && (cpuLimit - cpuUsed) >= cpuLimit * cpuShareLeft;
 	}
 
 	/**
@@ -104,9 +96,7 @@ public with sharing class MirrorSync {
 		Decimal cpuShareLeft,
 		Decimal limitShareLeft
 	) {
-		Integer queriesUsed = simulatedQueriesUsed != null
-			? simulatedQueriesUsed
-			: Limits.getQueries();
+		Integer queriesUsed = simulatedQueriesUsed != null ? simulatedQueriesUsed : Limits.getQueries();
 		Integer statementsUsed = simulatedDmlStatementsUsed != null
 			? simulatedDmlStatementsUsed
 			: Limits.getDmlStatements();
@@ -224,12 +214,7 @@ public with sharing class MirrorSync {
 				Integer howMany = countByMessage.get(key);
 				List<String> names = namesByMessage.get(key);
 				if (howMany == 1) {
-					messages.add(
-						String.format(
-							oneTemplate,
-							new List<Object>{ names.isEmpty() ? '' : names[0], key }
-						)
-					);
+					messages.add(String.format(oneTemplate, new List<Object>{ names.isEmpty() ? '' : names[0], key }));
 				} else {
 					String listed = String.join(names, ', ');
 					if (howMany > names.size()) {
@@ -238,9 +223,7 @@ public with sharing class MirrorSync {
 							new List<Object>{ listed, howMany - names.size() }
 						);
 					}
-					messages.add(
-						String.format(manyTemplate, new List<Object>{ howMany, listed, key })
-					);
+					messages.add(String.format(manyTemplate, new List<Object>{ howMany, listed, key }));
 				}
 				recordIds.add(firstRecordByMessage.get(key));
 			}
@@ -351,20 +334,13 @@ public with sharing class MirrorSync {
 		if (orphans.isEmpty()) {
 			return unlinked;
 		}
-		List<Database.DeleteResult> deleted = Database.delete(
-			orphans,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.DeleteResult> deleted = Database.delete(orphans, false, AccessLevel.USER_MODE);
 		for (Integer i = 0; i < deleted.size(); i++) {
 			if (!deleted[i].isSuccess()) {
 				result.refusals.add(
 					String.format(
 						result.orphanTemplate(),
-						new List<Object>{
-							String.valueOf(orphans[i].Id),
-							messageOf(deleted[i].getErrors())
-						}
+						new List<Object>{ String.valueOf(orphans[i].Id), messageOf(deleted[i].getErrors()) }
 					),
 					orphanedFor[i].Name,
 					orphanedFor[i].Id

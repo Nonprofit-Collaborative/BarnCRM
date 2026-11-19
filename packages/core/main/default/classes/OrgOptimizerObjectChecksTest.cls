@@ -19,18 +19,12 @@ private class OrgOptimizerObjectChecksTest {
 			Assert.isTrue(near.count >= 1, 'Account has more than one custom field.');
 			Assert.isTrue(
 				String.join(near.examples, '|')
-					.contains(
-						Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
-					),
+					.contains(Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()),
 				'Account is named: ' + near.examples
 			);
 
 			OrgOptimizerObjectChecks.fieldLimitOverride = 100000;
-			Assert.areEqual(
-				0,
-				OrgOptimizerObjectChecks.nearFieldLimit().count,
-				'Nothing is near an enormous limit.'
-			);
+			Assert.areEqual(0, OrgOptimizerObjectChecks.nearFieldLimit().count, 'Nothing is near an enormous limit.');
 		}
 	}
 
@@ -42,10 +36,7 @@ private class OrgOptimizerObjectChecksTest {
 			Integer unusedBefore = before.count;
 			Assert.isTrue(unusedBefore >= 1, 'With no records, the Household type is unused.');
 
-			Database.insert(
-				HouseholdTestDataFactory.newHousehold('The Used Household'),
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.insert(HouseholdTestDataFactory.newHousehold('The Used Household'), AccessLevel.SYSTEM_MODE);
 
 			OrgOptimizerSetupController.Finding after = OrgOptimizerObjectChecks.unusedRecordTypes();
 			Assert.areEqual(unusedBefore - 1, after.count, 'A household now uses its type.');

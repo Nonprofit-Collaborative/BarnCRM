@@ -54,9 +54,7 @@ public with sharing class HouseholdOfPersonController {
 				: householdIdFromContact(personId);
 			return toViews(householdsAsUser(householdIds));
 		} catch (Exception e) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_HouseholdPanel_OfPersonLoadFailed')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_HouseholdPanel_OfPersonLoadFailed'));
 		}
 	}
 
@@ -70,27 +68,19 @@ public with sharing class HouseholdOfPersonController {
 	public static void makePrimary(Id householdId, Id personId) {
 		try {
 			if (householdId == null || personId == null) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_HouseholdPanel_NotAMember')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_HouseholdPanel_NotAMember'));
 			}
 			List<Household_Member__c> changed = new List<Household_Member__c>();
 			Boolean found = false;
 			for (Household_Member__c membership : currentMembershipsAsUser(householdId)) {
-				Boolean isPerson =
-					membership.Contact__c == personId ||
-					membership.Account__c == personId;
+				Boolean isPerson = membership.Contact__c == personId || membership.Account__c == personId;
 				found = found || isPerson;
 				if (membership.Is_Primary__c != isPerson) {
-					changed.add(
-						new Household_Member__c(Id = membership.Id, Is_Primary__c = isPerson)
-					);
+					changed.add(new Household_Member__c(Id = membership.Id, Is_Primary__c = isPerson));
 				}
 			}
 			if (!found) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_HouseholdPanel_NotAMember')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_HouseholdPanel_NotAMember'));
 			}
 			if (!changed.isEmpty()) {
 				Database.update(changed, AccessLevel.USER_MODE);
@@ -99,9 +89,7 @@ public with sharing class HouseholdOfPersonController {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
 			ErrorLogger.log(e, Label.Core_Households_ErrorContextMembership, householdId);
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_HouseholdPanel_MakePrimaryFailed')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_HouseholdPanel_MakePrimaryFailed'));
 		}
 	}
 
@@ -143,13 +131,9 @@ public with sharing class HouseholdOfPersonController {
 	public static void addExistingPerson(Id householdId, Id personId) {
 		try {
 			if (householdId == null || personId == null) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingPerson')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingPerson'));
 			}
-			HouseholdService.addMembers(
-				new Map<Id, Set<Id>>{ householdId => new Set<Id>{ personId } }
-			);
+			HouseholdService.addMembers(new Map<Id, Set<Id>>{ householdId => new Set<Id>{ personId } });
 		} catch (HouseholdException e) {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
@@ -166,17 +150,10 @@ public with sharing class HouseholdOfPersonController {
 	 * addExistingPerson uses.
 	 */
 	@AuraEnabled
-	public static void addNewPerson(
-		Id householdId,
-		String salutation,
-		String firstName,
-		String lastName
-	) {
+	public static void addNewPerson(Id householdId, String salutation, String firstName, String lastName) {
 		try {
 			if (householdId == null || String.isBlank(lastName)) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'));
 			}
 			SObject person = newPerson(salutation, firstName, lastName);
 			if (!HouseholdService.isJunctionMode()) {
@@ -193,9 +170,7 @@ public with sharing class HouseholdOfPersonController {
 			} finally {
 				HouseholdService.resumeAutomaticCreation();
 			}
-			HouseholdService.addMembers(
-				new Map<Id, Set<Id>>{ householdId => new Set<Id>{ person.Id } }
-			);
+			HouseholdService.addMembers(new Map<Id, Set<Id>>{ householdId => new Set<Id>{ person.Id } });
 		} catch (HouseholdException e) {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
@@ -326,9 +301,7 @@ public with sharing class HouseholdOfPersonController {
 			HouseholdView view = new HouseholdView();
 			view.householdId = household.Id;
 			view.name = household.Name;
-			view.memberCount = household.Member_Count__c == null
-				? 0
-				: household.Member_Count__c.intValue();
+			view.memberCount = household.Member_Count__c == null ? 0 : household.Member_Count__c.intValue();
 			view.formalGreeting = household.Household_Formal_Greeting__c;
 			result.add(view);
 		}

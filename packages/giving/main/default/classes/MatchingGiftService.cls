@@ -82,10 +82,7 @@ public with sharing class MatchingGiftService {
 			creditsToRemoveFor.add(oldPartnerId);
 			Gift__c oldPartner = giftById.get(oldPartnerId);
 			if (oldPartner != null && oldPartner.Matched_Gift__c == giftId) {
-				updateById.put(
-					oldPartnerId,
-					new Gift__c(Id = oldPartnerId, Matched_Gift__c = null)
-				);
+				updateById.put(oldPartnerId, new Gift__c(Id = oldPartnerId, Matched_Gift__c = null));
 			}
 		}
 
@@ -105,9 +102,7 @@ public with sharing class MatchingGiftService {
 			Gift__c employerGift = isOrganizationGift(edited) ? edited : partner;
 			Gift__c employeeGift = employerGift.Id == edited.Id ? partner : edited;
 			if (!isOrganizationGift(employerGift)) {
-				record.addError(
-					BarnHelp.text('Giving', 'Giving_MatchingGift_EmployerMustBeOrganization')
-				);
+				record.addError(BarnHelp.text('Giving', 'Giving_MatchingGift_EmployerMustBeOrganization'));
 				continue;
 			}
 			String problem = problemWith(employerGift, employeeGift);
@@ -163,10 +158,7 @@ public with sharing class MatchingGiftService {
 		}
 		SoftCreditService.reconcileAutomaticCredits(
 			wanted,
-			SoftCreditSelector.selectAutomaticForGifts(
-				reversalGiftIds,
-				SoftCreditService.ROLE_MATCHED_DONOR
-			)
+			SoftCreditSelector.selectAutomaticForGifts(reversalGiftIds, SoftCreditService.ROLE_MATCHED_DONOR)
 		);
 	}
 
@@ -206,10 +198,7 @@ public with sharing class MatchingGiftService {
 		}
 		for (Soft_Credit__c credit : credits) {
 			Id creditedId = credit.Contact__c != null ? credit.Contact__c : credit.Account__c;
-			Decimal reversedAmount = SoftCreditService.amountOf(
-				credit.Percent__c,
-				reversal.Amount__c
-			);
+			Decimal reversedAmount = SoftCreditService.amountOf(credit.Percent__c, reversal.Amount__c);
 			if (creditedId == null || reversedAmount == null) {
 				continue;
 			}
@@ -246,9 +235,7 @@ public with sharing class MatchingGiftService {
 			)
 		) {
 			Id creditedId = existing.Contact__c != null ? existing.Contact__c : existing.Account__c;
-			alreadyCredited.add(
-				String.valueOf(existing.Gift__c) + ':' + String.valueOf(creditedId)
-			);
+			alreadyCredited.add(String.valueOf(existing.Gift__c) + ':' + String.valueOf(creditedId));
 		}
 		for (Id employerGiftId : employeePersonByEmployerGift.keySet()) {
 			Id employeePersonId = employeePersonByEmployerGift.get(employerGiftId);
@@ -256,11 +243,7 @@ public with sharing class MatchingGiftService {
 			if (employeePersonId == null || employerGift == null) {
 				continue;
 			}
-			if (
-				alreadyCredited.contains(
-					String.valueOf(employerGiftId) + ':' + String.valueOf(employeePersonId)
-				)
-			) {
+			if (alreadyCredited.contains(String.valueOf(employerGiftId) + ':' + String.valueOf(employeePersonId))) {
 				continue;
 			}
 			credits.add(
@@ -287,10 +270,7 @@ public with sharing class MatchingGiftService {
 		if (isOrganizationGift(employeeGift) || donorPersonOf(employeeGift) == null) {
 			return BarnHelp.text('Giving', 'Giving_MatchingGift_EmployeeMustBePerson');
 		}
-		if (
-			linkedElsewhere(employeeGift, employerGift.Id) ||
-			linkedElsewhere(employerGift, employeeGift.Id)
-		) {
+		if (linkedElsewhere(employeeGift, employerGift.Id) || linkedElsewhere(employerGift, employeeGift.Id)) {
 			return BarnHelp.text('Giving', 'Giving_MatchingGift_AlreadyLinked');
 		}
 		if (isClosedOut(employerGift) || isClosedOut(employeeGift)) {
@@ -343,9 +323,7 @@ public with sharing class MatchingGiftService {
 		return gift != null &&
 			gift.Donor_Account__c != null &&
 			gift.Donor_Account__r != null &&
-			AccountKinds.isOrganizationRecordTypeName(
-				gift.Donor_Account__r.RecordType?.DeveloperName
-			);
+			AccountKinds.isOrganizationRecordTypeName(gift.Donor_Account__r.RecordType?.DeveloperName);
 	}
 
 	private static Boolean linkedElsewhere(Gift__c gift, Id intendedPartnerId) {

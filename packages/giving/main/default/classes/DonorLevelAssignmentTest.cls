@@ -7,9 +7,7 @@
  * thing under test here is the placement, not the arithmetic of the total (which G-02 owns and
  * `GiftRollupRefundTest` already asserts).
  */
-@IsTest(
-	testFor='ApexClass:DonorLevelBatch, ApexClass:DonorLevelService, ApexClass:DonorLevelSchedulable'
-)
+@IsTest(testFor='ApexClass:DonorLevelBatch, ApexClass:DonorLevelService, ApexClass:DonorLevelSchedulable')
 private class DonorLevelAssignmentTest {
 	private static final String FRIEND = 'Friend';
 	private static final String SUSTAINER = 'Sustainer';
@@ -19,16 +17,8 @@ private class DonorLevelAssignmentTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Donor_Level__c>{
-				new Donor_Level__c(
-					Name = FRIEND,
-					Minimum_Amount__c = 100,
-					Maximum_Amount__c = 1000
-				),
-				new Donor_Level__c(
-					Name = SUSTAINER,
-					Minimum_Amount__c = 1000,
-					Maximum_Amount__c = 5000
-				),
+				new Donor_Level__c(Name = FRIEND, Minimum_Amount__c = 100, Maximum_Amount__c = 1000),
+				new Donor_Level__c(Name = SUSTAINER, Minimum_Amount__c = 1000, Maximum_Amount__c = 5000),
 				new Donor_Level__c(Name = LEADERSHIP, Minimum_Amount__c = 5000)
 			};
 			Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
@@ -122,8 +112,7 @@ private class DonorLevelAssignmentTest {
 			Assert.areEqual(
 				levelId(LEADERSHIP),
 				demoted.Previous_Donor_Level__c,
-				'The rung she left is retained, so the movement is visible to the person who has to ' +
-				'act on it.'
+				'The rung she left is retained, so the movement is visible to the person who has to ' + 'act on it.'
 			);
 		}
 	}
@@ -165,9 +154,7 @@ private class DonorLevelAssignmentTest {
 			List<Account> households = new List<Account>();
 			for (Integer index = 0; index < 25; index++) {
 				households.add(
-					TestDataFactory.household(
-						new Account(Name = 'Household ' + index, Total_Giving__c = 3000)
-					)
+					TestDataFactory.household(new Account(Name = 'Household ' + index, Total_Giving__c = 3000))
 				);
 			}
 			insert households;
@@ -251,11 +238,7 @@ private class DonorLevelAssignmentTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
-				people.add(
-					TestDataFactory.person(
-						new Contact(LastName = 'Donor ' + index, Total_Giving__c = 5500)
-					)
-				);
+				people.add(TestDataFactory.person(new Contact(LastName = 'Donor ' + index, Total_Giving__c = 5500)));
 			}
 
 			Test.startTest();
@@ -276,18 +259,10 @@ private class DonorLevelAssignmentTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
 			// A real schedule hands execute a context; stopTest fires it and its batch.
-			System.schedule(
-				'DonorLevelAssignmentTest nightly',
-				'0 0 3 * * ?',
-				new DonorLevelSchedulable()
-			);
+			System.schedule('DonorLevelAssignmentTest nightly', '0 0 3 * * ?', new DonorLevelSchedulable());
 			Test.stopTest();
 
-			Assert.areEqual(
-				200,
-				DonorLevelSchedulable.CHUNK_SIZE,
-				'The pass works 200 donors a chunk'
-			);
+			Assert.areEqual(200, DonorLevelSchedulable.CHUNK_SIZE, 'The pass works 200 donors a chunk');
 			Assert.isTrue(
 				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'DonorLevelBatch'] >= 1,
 				'The schedule starts the donor level batch'

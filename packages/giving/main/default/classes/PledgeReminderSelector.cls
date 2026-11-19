@@ -9,11 +9,7 @@ public with sharing class PledgeReminderSelector {
 	public static final Integer QUEUE_LIMIT = 2000;
 
 	/** The installment statuses that still owe money (R-DM2). */
-	private static final Set<String> OPEN_STATUSES = new Set<String>{
-		'Scheduled',
-		'Overdue',
-		'Partially paid'
-	};
+	private static final Set<String> OPEN_STATUSES = new Set<String>{ 'Scheduled', 'Overdue', 'Partially paid' };
 
 	/** Steps that fire, soonest first. */
 	public static List<Pledge_Reminder_Step__c> activeSteps() {
@@ -72,11 +68,7 @@ public with sharing class PledgeReminderSelector {
 	}
 
 	/** The same installments as a list, capped, for the page's "due next run" counts. */
-	public static List<Installment__c> openInstallments(
-		Date fromDate,
-		Date toDate,
-		Integer maximum
-	) {
+	public static List<Installment__c> openInstallments(Date fromDate, Date toDate, Integer maximum) {
 		List<Installment__c> found = new List<Installment__c>();
 		for (Installment__c installment : [
 			SELECT
@@ -126,11 +118,7 @@ public with sharing class PledgeReminderSelector {
 		for (Contact person : [
 			SELECT Id
 			FROM Contact
-			WHERE
-				Id IN :contactIds
-				AND (HasOptedOutOfEmail = TRUE
-				OR Email = NULL
-				OR IsEmailBounced = TRUE)
+			WHERE Id IN :contactIds AND (HasOptedOutOfEmail = TRUE OR Email = NULL OR IsEmailBounced = TRUE)
 			WITH SYSTEM_MODE
 		]) {
 			blocked.add(person.Id);
@@ -165,10 +153,7 @@ public with sharing class PledgeReminderSelector {
 				Commitment__r.Donor_Account__r.BillingPostalCode,
 				Commitment__r.Donor_Account__r.BillingCountry
 			FROM Pledge_Reminder__c
-			WHERE
-				Channel__c = 'Letter'
-				AND Status__c = 'Queued'
-				AND Letter_File_Document_Id__c = NULL
+			WHERE Channel__c = 'Letter' AND Status__c = 'Queued' AND Letter_File_Document_Id__c = NULL
 			WITH USER_MODE
 			ORDER BY CreatedDate ASC, Id ASC
 			LIMIT :maximum
@@ -180,10 +165,7 @@ public with sharing class PledgeReminderSelector {
 		return [
 			SELECT Id, Status__c, Letter_File_Document_Id__c
 			FROM Pledge_Reminder__c
-			WHERE
-				Channel__c = 'Letter'
-				AND Status__c = 'Queued'
-				AND Letter_File_Document_Id__c != NULL
+			WHERE Channel__c = 'Letter' AND Status__c = 'Queued' AND Letter_File_Document_Id__c != NULL
 			WITH USER_MODE
 			ORDER BY CreatedDate ASC, Id ASC
 			LIMIT 10000

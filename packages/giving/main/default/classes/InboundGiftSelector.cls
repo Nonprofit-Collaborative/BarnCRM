@@ -46,9 +46,7 @@ public with sharing class InboundGiftSelector {
 		if (fundIds == null || fundIds.isEmpty()) {
 			return new Set<Id>();
 		}
-		return new Map<Id, Fund__c>(
-				[SELECT Id FROM Fund__c WHERE Id IN :fundIds AND Active__c = TRUE WITH USER_MODE]
-			)
+		return new Map<Id, Fund__c>([SELECT Id FROM Fund__c WHERE Id IN :fundIds AND Active__c = TRUE WITH USER_MODE])
 			.keySet();
 	}
 
@@ -57,10 +55,7 @@ public with sharing class InboundGiftSelector {
 		if (appealIds == null || appealIds.isEmpty()) {
 			return new Set<Id>();
 		}
-		return new Map<Id, Appeal__c>(
-				[SELECT Id FROM Appeal__c WHERE Id IN :appealIds WITH USER_MODE]
-			)
-			.keySet();
+		return new Map<Id, Appeal__c>([SELECT Id FROM Appeal__c WHERE Id IN :appealIds WITH USER_MODE]).keySet();
 	}
 
 	/** Which of these accounts exist and can be seen. */
@@ -68,8 +63,7 @@ public with sharing class InboundGiftSelector {
 		if (accountIds == null || accountIds.isEmpty()) {
 			return new Set<Id>();
 		}
-		return new Map<Id, Account>([SELECT Id FROM Account WHERE Id IN :accountIds WITH USER_MODE])
-			.keySet();
+		return new Map<Id, Account>([SELECT Id FROM Account WHERE Id IN :accountIds WITH USER_MODE]).keySet();
 	}
 
 	/**

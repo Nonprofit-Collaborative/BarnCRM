@@ -35,20 +35,10 @@ private class ContactTriggerHandlerTest {
 			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
 			Database.insert(household, AccessLevel.SYSTEM_MODE);
 			Contact john = TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mr.',
-					FirstName = 'John',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mr.', FirstName = 'John', LastName = 'Smith', AccountId = household.Id)
 			);
 			Contact jane = TestDataFactory.person(
-				new Contact(
-					Salutation = 'Mrs.',
-					FirstName = 'Jane',
-					LastName = 'Smith',
-					AccountId = household.Id
-				)
+				new Contact(Salutation = 'Mrs.', FirstName = 'Jane', LastName = 'Smith', AccountId = household.Id)
 			);
 			insert new List<Contact>{ john, jane };
 
@@ -68,9 +58,7 @@ private class ContactTriggerHandlerTest {
 	@IsTest
 	static void deletingTheLastMemberKeepsTheHouseholdSoTheyCanBeRestored() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Assert.isTrue(settings.Delete_Empty_Households__c, 'The tidy-up is on');
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
@@ -99,9 +87,7 @@ private class ContactTriggerHandlerTest {
 	@IsTest
 	static void restoringAPersonPutsTheCountBack() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -124,9 +110,7 @@ private class ContactTriggerHandlerTest {
 	@IsTest
 	static void movingSomeoneByEditingTheirHouseholdRecountsBoth() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
@@ -256,16 +240,8 @@ private class ContactTriggerHandlerTest {
 				FROM Account
 				WHERE Id = :household.Id
 			];
-			Assert.areEqual(
-				1,
-				after.Member_Count__c,
-				'The household counts only the people still in it'
-			);
-			Assert.areEqual(
-				'Maria',
-				after.Household_Informal_Greeting__c,
-				'Luis is no longer greeted once he is gone'
-			);
+			Assert.areEqual(1, after.Member_Count__c, 'The household counts only the people still in it');
+			Assert.areEqual('Maria', after.Household_Informal_Greeting__c, 'Luis is no longer greeted once he is gone');
 		}
 	}
 
@@ -295,14 +271,10 @@ private class ContactTriggerHandlerTest {
 			for (Integer i = 0; i < leaving.size(); i++) {
 				// The first chunk of 200 is all in the first household, the rest in the second.
 				Id householdId = i < 200 ? first.Id : second.Id;
-				rows.add(
-					new Household_Member__c(Household__c = householdId, Contact__c = leaving[i].Id)
-				);
+				rows.add(new Household_Member__c(Household__c = householdId, Contact__c = leaving[i].Id));
 			}
 			rows.add(new Household_Member__c(Household__c = first.Id, Contact__c = staysFirst.Id));
-			rows.add(
-				new Household_Member__c(Household__c = second.Id, Contact__c = staysSecond.Id)
-			);
+			rows.add(new Household_Member__c(Household__c = second.Id, Contact__c = staysSecond.Id));
 			insert rows;
 
 			Test.startTest();
@@ -317,11 +289,7 @@ private class ContactTriggerHandlerTest {
 				after.get(first.Id).Member_Count__c,
 				'The first chunk\'s household is recounted to the one person still in it'
 			);
-			Assert.areEqual(
-				1,
-				after.get(second.Id).Member_Count__c,
-				'The second chunk\'s household is recounted too'
-			);
+			Assert.areEqual(1, after.get(second.Id).Member_Count__c, 'The second chunk\'s household is recounted too');
 			Assert.areEqual(
 				2,
 				[SELECT COUNT() FROM Household_Member__c],
@@ -395,9 +363,7 @@ private class ContactTriggerHandlerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-			Account employer = TestDataFactory.organization(
-				new Account(Name = 'Riverside Library')
-			);
+			Account employer = TestDataFactory.organization(new Account(Name = 'Riverside Library'));
 			Database.insert(new List<Account>{ household, employer }, AccessLevel.SYSTEM_MODE);
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
@@ -449,10 +415,7 @@ private class ContactTriggerHandlerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Households_ErrorPersonToOrganization'),
-				refused
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Households_ErrorPersonToOrganization'), refused);
 			Assert.areEqual(
 				household,
 				[SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId,

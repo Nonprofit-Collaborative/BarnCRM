@@ -113,10 +113,7 @@ public with sharing class CampaignSyncService {
 		}
 		Schema.DescribeSObjectResult campaign = campaignType().getDescribe();
 		Schema.DescribeFieldResult link = Appeal__c.Campaign_Id__c.getDescribe();
-		return campaign.isCreateable() &&
-			campaign.isUpdateable() &&
-			link.isAccessible() &&
-			link.isUpdateable();
+		return campaign.isCreateable() && campaign.isUpdateable() && link.isAccessible() && link.isUpdateable();
 	}
 
 	// ------------------------------------------------------------------------- the two callers
@@ -154,11 +151,7 @@ public with sharing class CampaignSyncService {
 			if (oldById == null && !noAccessLogged) {
 				noAccessLogged = true;
 				ErrorLogger.logMessage(
-					BarnHelp.text(
-						'Giving',
-						'Mirror_CampaignSync_LogNoAccess',
-						new List<Object>{ scope.size() }
-					),
+					BarnHelp.text('Giving', 'Mirror_CampaignSync_LogNoAccess', new List<Object>{ scope.size() }),
 					CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -274,11 +267,7 @@ public with sharing class CampaignSyncService {
 	 * Saves each appeal whose link changed, with partial success. An appeal that is refused is
 	 * counted as failed, and a Campaign created for it in this call is deleted again.
 	 */
-	private static void storeLinks(
-		List<Appeal__c> appeals,
-		Map<Id, String> linkBefore,
-		Result result
-	) {
+	private static void storeLinks(List<Appeal__c> appeals, Map<Id, String> linkBefore, Result result) {
 		List<Appeal__c> links = new List<Appeal__c>();
 		List<Appeal__c> linkedFor = new List<Appeal__c>();
 		for (Appeal__c appeal : appeals) {
@@ -320,11 +309,7 @@ public with sharing class CampaignSyncService {
 		if (orphans.isEmpty()) {
 			return;
 		}
-		List<Database.DeleteResult> deleted = Database.delete(
-			orphans,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.DeleteResult> deleted = Database.delete(orphans, false, AccessLevel.USER_MODE);
 		for (Integer i = 0; i < deleted.size(); i++) {
 			if (deleted[i].isSuccess()) {
 				continue;
@@ -337,11 +322,7 @@ public with sharing class CampaignSyncService {
 				BarnHelp.text(
 					'Giving',
 					'Mirror_CampaignSync_LogOrphan',
-					new List<Object>{
-						String.valueOf(orphans[i].Id),
-						orphanedFor[i].Name,
-						String.join(messages, ' ')
-					}
+					new List<Object>{ String.valueOf(orphans[i].Id), orphanedFor[i].Name, String.join(messages, ' ') }
 				),
 				orphanedFor[i]
 			);
@@ -414,11 +395,7 @@ public with sharing class CampaignSyncService {
 		}
 
 		if (!inserts.isEmpty()) {
-			List<Database.SaveResult> saved = Database.insert(
-				inserts,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> saved = Database.insert(inserts, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				if (saved[i].isSuccess()) {
 					insertedFor[i].Campaign_Id__c = saved[i].getId();
@@ -430,11 +407,7 @@ public with sharing class CampaignSyncService {
 			}
 		}
 		if (!updates.isEmpty()) {
-			List<Database.SaveResult> saved = Database.update(
-				updates,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> saved = Database.update(updates, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				if (saved[i].isSuccess()) {
 					result.updated++;
@@ -464,9 +437,7 @@ public with sharing class CampaignSyncService {
 		List<Appeal__c> fixedFor = new List<Appeal__c>();
 		for (Integer i = 0; i < appeals.size(); i++) {
 			Appeal__c appeal = appeals[i];
-			Appeal__c parent = appeal.Parent_Appeal__c == null
-				? null
-				: inScope.get(appeal.Parent_Appeal__c);
+			Appeal__c parent = appeal.Parent_Appeal__c == null ? null : inScope.get(appeal.Parent_Appeal__c);
 			if (appeal.Campaign_Id__c == null || parent == null || parent.Campaign_Id__c == null) {
 				continue;
 			}
@@ -509,9 +480,7 @@ public with sharing class CampaignSyncService {
 		}
 		Id typed = MirrorSync.idOf(appeal.Campaign_Id__c, campaignType());
 		if (typed == null) {
-			appeal.Campaign_Id__c.addError(
-				BarnHelp.text('Giving', 'Mirror_CampaignSync_InvalidCampaignId')
-			);
+			appeal.Campaign_Id__c.addError(BarnHelp.text('Giving', 'Mirror_CampaignSync_InvalidCampaignId'));
 			return false;
 		}
 		appeal.Campaign_Id__c = String.valueOf(typed);
@@ -528,11 +497,7 @@ public with sharing class CampaignSyncService {
 			!MirrorSync.same(appeal.Campaign_Id__c, old.Campaign_Id__c);
 	}
 
-	private static Id parentCampaignId(
-		Appeal__c appeal,
-		Map<Id, Appeal__c> inScope,
-		Map<Id, String> parentCampaigns
-	) {
+	private static Id parentCampaignId(Appeal__c appeal, Map<Id, Appeal__c> inScope, Map<Id, String> parentCampaigns) {
 		if (appeal.Parent_Appeal__c == null) {
 			return null;
 		}

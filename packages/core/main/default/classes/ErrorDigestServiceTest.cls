@@ -60,16 +60,8 @@ private class ErrorDigestServiceTest {
 				entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW),
 				entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW),
 				entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW),
-				entry(
-					'Seasonal address swap',
-					ErrorLogger.SEVERITY_WARNING,
-					ErrorLogger.STATUS_NEW
-				),
-				entry(
-					'Seasonal address swap',
-					ErrorLogger.SEVERITY_WARNING,
-					ErrorLogger.STATUS_NEW
-				),
+				entry('Seasonal address swap', ErrorLogger.SEVERITY_WARNING, ErrorLogger.STATUS_NEW),
+				entry('Seasonal address swap', ErrorLogger.SEVERITY_WARNING, ErrorLogger.STATUS_NEW),
 				entry('Already looked at', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_RESOLVED),
 				entry('Older failure', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW)
 			};
@@ -90,18 +82,10 @@ private class ErrorDigestServiceTest {
 			}
 
 			Assert.isTrue(outcome.sent, 'Something was new, so a digest went out.');
-			Assert.areEqual(
-				10,
-				outcome.entries,
-				'Every occurrence: 4 + 2 + 4, not the resolved one.'
-			);
+			Assert.areEqual(10, outcome.entries, 'Every occurrence: 4 + 2 + 4, not the resolved one.');
 			List<Messaging.SingleEmailMessage> sent = MAIL.received;
 			Assert.areEqual(1, sent.size(), 'One message, to the one listed user.');
-			Assert.areEqual(
-				jen.Id,
-				sent[0].getTargetObjectId(),
-				'Addressed to Jen, found by email.'
-			);
+			Assert.areEqual(jen.Id, sent[0].getTargetObjectId(), 'Addressed to Jen, found by email.');
 			Assert.isFalse(sent[0].getSaveAsActivity(), 'No activity is logged against Jen.');
 			Assert.isTrue(sent[0].getSubject().contains('10'), 'The subject gives the count.');
 
@@ -109,18 +93,12 @@ private class ErrorDigestServiceTest {
 			Assert.isTrue(body.contains('Household naming: 4'), 'Counted by source.');
 			Assert.isTrue(body.contains('Seasonal address swap: 2'), 'Every source.');
 			Assert.isTrue(body.contains('Older failure: 4'), 'Repeats in the window count.');
-			Assert.isTrue(
-				body.contains('Error: 8') && body.contains('Warning: 2'),
-				'And by severity.'
-			);
+			Assert.isTrue(body.contains('Error: 8') && body.contains('Warning: 2'), 'And by severity.');
 			Assert.isTrue(body.contains('/' + logs[0].Id), 'Each listed entry links to itself.');
 			Assert.isFalse(body.contains(logs[5].Id), 'A resolved entry is not listed.');
 			Assert.isFalse(body.contains('Garcia'), 'The message is never copied.');
 			Assert.isFalse(body.contains('DmlException'), 'Nor the technical detail.');
-			Assert.isFalse(
-				body.contains(FakeIds.of(Account.SObjectType, 1)),
-				'Nor the record it names.'
-			);
+			Assert.isFalse(body.contains(FakeIds.of(Account.SObjectType, 1)), 'Nor the record it names.');
 
 			BarnCRM_Settings__c after = settings();
 			Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'The window moved on.');
@@ -150,10 +128,7 @@ private class ErrorDigestServiceTest {
 			Assert.isFalse(outcome.sent, 'Nothing new, nothing sent.');
 			Assert.isTrue(MAIL.received.isEmpty(), 'Not a single message.');
 			BarnCRM_Settings__c after = settings();
-			Assert.isNotNull(
-				after.Error_Digest_Covered_Until__c,
-				'An empty window is still covered.'
-			);
+			Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'An empty window is still covered.');
 			Assert.isTrue(
 				after.Error_Digest_Last_Run_Summary__c.startsWith(
 					Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')
@@ -212,9 +187,7 @@ private class ErrorDigestServiceTest {
 
 			Assert.isFalse(early.sent, 'Two days into the week, the scheduled run waits.');
 			Assert.isTrue(
-				early.summary.startsWith(
-					Label.Core_ErrorDigest_SummaryNotDue.substringBefore('{0}')
-				),
+				early.summary.startsWith(Label.Core_ErrorDigest_SummaryNotDue.substringBefore('{0}')),
 				'And says when it will be due.'
 			);
 			Assert.isTrue(due.sent, 'Seven days on, it sends.');
@@ -226,11 +199,7 @@ private class ErrorDigestServiceTest {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
 			User admin = maria();
-			setDigest(
-				null,
-				ErrorDigestService.FREQUENCY_DAILY,
-				System.now().addMinutes(-(24 * 60 - 5))
-			);
+			setDigest(null, ErrorDigestService.FREQUENCY_DAILY, System.now().addMinutes(-(24 * 60 - 5)));
 			insert entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW);
 			ErrorDigestService.emailSender = MAIL;
 
@@ -241,10 +210,7 @@ private class ErrorDigestServiceTest {
 				Test.stopTest();
 			}
 
-			Assert.isTrue(
-				outcome.sent,
-				'The 07:00 run is due even when yesterday ended at 07:00:05.'
-			);
+			Assert.isTrue(outcome.sent, 'The 07:00 run is due even when yesterday ended at 07:00:05.');
 		}
 	}
 
@@ -265,19 +231,14 @@ private class ErrorDigestServiceTest {
 			// Whether this org may send email is its own setting; both outcomes are correct ones.
 			BarnCRM_Settings__c after = settings();
 			if (outcome.sent) {
-				Assert.isNotNull(
-					after.Error_Digest_Covered_Until__c,
-					'Sent, so the window moved on.'
-				);
+				Assert.isNotNull(after.Error_Digest_Covered_Until__c, 'Sent, so the window moved on.');
 			} else {
 				Assert.isNull(
 					after.Error_Digest_Covered_Until__c,
 					'Not sent, so the next run tries the same window again.'
 				);
 				Assert.isTrue(
-					outcome.summary.startsWith(
-						Label.Core_ErrorDigest_SummaryNotSent.substringBefore('{0}')
-					),
+					outcome.summary.startsWith(Label.Core_ErrorDigest_SummaryNotSent.substringBefore('{0}')),
 					'And the run says why.'
 				);
 			}
@@ -291,9 +252,7 @@ private class ErrorDigestServiceTest {
 			User admin = maria();
 			List<Error_Log__c> logs = new List<Error_Log__c>();
 			for (Integer i = 0; i < 5; i++) {
-				logs.add(
-					entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW)
-				);
+				logs.add(entry('Household naming', ErrorLogger.SEVERITY_ERROR, ErrorLogger.STATUS_NEW));
 			}
 			insert logs;
 			ErrorDigestService.entryCap = 3;
@@ -393,10 +352,7 @@ private class ErrorDigestServiceTest {
 			failedJob();
 			limitAt(85, 100);
 			// Under the threshold: not reported.
-			OrgOptimizerStorageController.limitsOverride.put(
-				'FileStorageMB',
-				new List<Integer>{ 79, 100 }
-			);
+			OrgOptimizerStorageController.limitsOverride.put('FileStorageMB', new List<Integer>{ 79, 100 });
 
 			ErrorDigestService.Outcome outcome = sendAs(admin);
 
@@ -404,16 +360,11 @@ private class ErrorDigestServiceTest {
 			Messaging.SingleEmailMessage message = MAIL.received[0];
 			Assert.areEqual(Label.Core_AdminDigest_Subject, message.getSubject());
 			String body = message.getPlainTextBody();
-			Assert.isTrue(
-				body.contains(Label.Core_AdminDigest_Heading),
-				'The summary has a heading.'
-			);
+			Assert.isTrue(body.contains(Label.Core_AdminDigest_Heading), 'The summary has a heading.');
 			Assert.isTrue(body.contains('Data Storage MB: 85% (85 of 100)'), 'Limit is named.');
 			Assert.isFalse(body.contains('File Storage'), 'A limit under 80% is left out.');
 			Assert.isTrue(
-				body.contains(
-					String.format(Label.Core_AdminDigest_FailedJobs, new List<Object>{ '1' })
-				),
+				body.contains(String.format(Label.Core_AdminDigest_FailedJobs, new List<Object>{ '1' })),
 				'The failed job is counted.'
 			);
 			Assert.isTrue(body.contains(Label.Core_ErrorDigest_Footer), 'The footer closes it.');
@@ -563,17 +514,11 @@ private class ErrorDigestServiceTest {
 				// in the second after `now` was taken would fall outside a window ending at `now`.
 				summary = AdminDigestSummary.build(now.addDays(-7), System.now());
 			}
-			Assert.areEqual(
-				2,
-				summary.setupChanges,
-				'R-SU7: changes kept inside the window count.'
-			);
+			Assert.areEqual(2, summary.setupChanges, 'R-SU7: changes kept inside the window count.');
 			Assert.isTrue(summary.hasContent(), 'Setup changes alone are worth an email.');
 			String joined = String.join(AdminDigestSummary.lines(summary, 'https://x'), '\n');
 			Assert.isTrue(
-				joined.contains(
-					String.format(Label.Core_AdminDigest_SetupChanges, new List<Object>{ '2' })
-				),
+				joined.contains(String.format(Label.Core_AdminDigest_SetupChanges, new List<Object>{ '2' })),
 				'The count is in the summary.'
 			);
 		}
@@ -612,14 +557,8 @@ private class ErrorDigestServiceTest {
 				WHERE SetupOwnerId = :UserInfo.getOrganizationId()
 			];
 			Assert.isNotNull(saved.Error_Digest_Last_Run__c, 'The run is recorded.');
-			Assert.isTrue(
-				saved.Relationship_Auto_Reciprocal__c,
-				'A feature that ships on stays on.'
-			);
-			Assert.isTrue(
-				saved.Auto_Create_Households__c,
-				'Households are still created by default.'
-			);
+			Assert.isTrue(saved.Relationship_Auto_Reciprocal__c, 'A feature that ships on stays on.');
+			Assert.isTrue(saved.Auto_Create_Households__c, 'Households are still created by default.');
 			Assert.isNull(saved.Coexistence_Mode__c, 'Nobody confirmed a coexistence mode.');
 			Assert.isNull(saved.Household_Membership_Mode__c, 'Nobody chose a membership mode.');
 		}

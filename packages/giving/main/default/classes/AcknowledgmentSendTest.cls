@@ -84,8 +84,7 @@ private class AcknowledgmentSendTest {
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_NOT_REQUIRED,
 				saved.get(pending.Id).Acknowledgment_Status__c,
-				'A pending gift leaves the queue rather than sitting in it until somebody notices ' +
-				'(R-AK8).'
+				'A pending gift leaves the queue rather than sitting in it until somebody notices ' + '(R-AK8).'
 			);
 		}
 	}
@@ -101,19 +100,14 @@ private class AcknowledgmentSendTest {
 				null
 			);
 			insert silent;
-			Contact donor = AcknowledgmentTestData.insertDonor(
-				'Grace',
-				'Hopper',
-				'grace@example.org'
-			);
+			Contact donor = AcknowledgmentTestData.insertDonor('Grace', 'Hopper', 'grace@example.org');
 
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 40);
 			insert gift;
 
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_NOT_REQUIRED,
-				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id]
-				.Acknowledgment_Status__c,
+				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id].Acknowledgment_Status__c,
 				'A rule whose channel is None is the organization saying this kind of gift does not ' +
 				'get a thank you, which is Not required rather than Do not acknowledge (R-AK4).'
 			);
@@ -125,11 +119,7 @@ private class AcknowledgmentSendTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			AcknowledgmentTestData.enable();
 			emailRule();
-			Contact donor = AcknowledgmentTestData.insertDonor(
-				'Alan',
-				'Turing',
-				'alan@example.org'
-			);
+			Contact donor = AcknowledgmentTestData.insertDonor('Alan', 'Turing', 'alan@example.org');
 
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 500);
 			gift.Acknowledgment_Status__c = AcknowledgmentRuleService.STATUS_DO_NOT_ACKNOWLEDGE;
@@ -139,8 +129,7 @@ private class AcknowledgmentSendTest {
 
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_DO_NOT_ACKNOWLEDGE,
-				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id]
-				.Acknowledgment_Status__c,
+				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id].Acknowledgment_Status__c,
 				'Do not acknowledge is a persons instruction about one gift, and editing the gift ' +
 				'does not undo it (R-AK6).'
 			);
@@ -195,11 +184,7 @@ private class AcknowledgmentSendTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			AcknowledgmentTestData.enable();
 			emailRule();
-			Contact donor = AcknowledgmentTestData.insertDonor(
-				'Ada',
-				'Lovelace',
-				'ada@example.org'
-			);
+			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Lovelace', 'ada@example.org');
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
 			insert gift;
 
@@ -217,22 +202,12 @@ private class AcknowledgmentSendTest {
 			Assert.areEqual(1, sender.received.size(), 'One message reached the platform.');
 
 			List<Acknowledgment__c> rows = [
-				SELECT
-					Status__c,
-					Channel__c,
-					Template__c,
-					Recipient_Email__c,
-					Gift_Key__c,
-					Sent_On__c
+				SELECT Status__c, Channel__c, Template__c, Recipient_Email__c, Gift_Key__c, Sent_On__c
 				FROM Acknowledgment__c
 				WHERE Gift__c = :gift.Id
 			];
 			Assert.areEqual(1, rows.size(), 'One thank you produces one row, not two.');
-			Assert.areEqual(
-				AcknowledgmentService.STATUS_SENT,
-				rows[0].Status__c,
-				'The row says it went.'
-			);
+			Assert.areEqual(AcknowledgmentService.STATUS_SENT, rows[0].Status__c, 'The row says it went.');
 			Assert.areEqual(
 				'BarnCRM_Thank_You',
 				rows[0].Template__c,
@@ -251,8 +226,7 @@ private class AcknowledgmentSendTest {
 			);
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_ACKNOWLEDGED,
-				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id]
-				.Acknowledgment_Status__c,
+				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id].Acknowledgment_Status__c,
 				'The gifts summary is written from the ledger (R-AK6).'
 			);
 		}
@@ -263,11 +237,7 @@ private class AcknowledgmentSendTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			AcknowledgmentTestData.enable();
 			emailRule();
-			Contact donor = AcknowledgmentTestData.insertDonor(
-				'Ada',
-				'Lovelace',
-				'ada@example.org'
-			);
+			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Lovelace', 'ada@example.org');
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
 			insert gift;
 
@@ -285,11 +255,7 @@ private class AcknowledgmentSendTest {
 				second.sent,
 				'The second run over the same gift sends nothing: the claim key is held (R-AK7).'
 			);
-			Assert.areEqual(
-				1,
-				sender.received.size(),
-				'And the platform was handed one message in total, not two.'
-			);
+			Assert.areEqual(1, sender.received.size(), 'And the platform was handed one message in total, not two.');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Acknowledgment__c WHERE Gift__c = :gift.Id],
@@ -304,11 +270,7 @@ private class AcknowledgmentSendTest {
 			AcknowledgmentTestData.enable();
 			emailRule();
 			Contact first = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
-			Contact second = AcknowledgmentTestData.insertDonor(
-				'Alan',
-				'Turing',
-				'alan@example.org'
-			);
+			Contact second = AcknowledgmentTestData.insertDonor('Alan', 'Turing', 'alan@example.org');
 			Gift__c good = GivingTestDataFactory.buildGift(first.Id, 100);
 			Gift__c bad = GivingTestDataFactory.buildGift(second.Id, 200);
 			insert new List<Gift__c>{ good, bad };
@@ -351,10 +313,8 @@ private class AcknowledgmentSendTest {
 			);
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE,
-				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :bad.Id]
-				.Acknowledgment_Status__c,
-				'The gift that was not thanked for is still waiting, which is the whole point of ' +
-				'retrying it.'
+				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :bad.Id].Acknowledgment_Status__c,
+				'The gift that was not thanked for is still waiting, which is the whole point of ' + 'retrying it.'
 			);
 		}
 	}
@@ -364,11 +324,7 @@ private class AcknowledgmentSendTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			AcknowledgmentTestData.enable();
 			emailRule();
-			Contact donor = AcknowledgmentTestData.insertDonor(
-				'Ada',
-				'Lovelace',
-				'ada@example.org'
-			);
+			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Lovelace', 'ada@example.org');
 			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 250);
 			insert gift;
 
@@ -418,21 +374,15 @@ private class AcknowledgmentSendTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, counts.sent, 'There was nobody to email, so nothing was sent.');
-			Assert.areEqual(
-				1,
-				counts.errors,
-				'It is counted, so the run says something needs doing.'
-			);
+			Assert.areEqual(1, counts.errors, 'It is counted, so the run says something needs doing.');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Acknowledgment__c WHERE Gift__c = :gift.Id],
-				'And no row is written: nothing was attempted, so there is nothing to record on the ' +
-				'donor (R-AK9).'
+				'And no row is written: nothing was attempted, so there is nothing to record on the ' + 'donor (R-AK9).'
 			);
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_TO_ACKNOWLEDGE,
-				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id]
-				.Acknowledgment_Status__c,
+				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id].Acknowledgment_Status__c,
 				'The gift stays in the queue, where a letter rule or a corrected contact picks it up.'
 			);
 		}
@@ -445,11 +395,7 @@ private class AcknowledgmentSendTest {
 			emailRule();
 			Contact ada = AcknowledgmentTestData.insertDonor('Ada', 'Lovelace', 'ada@example.org');
 			Contact grace = AcknowledgmentTestData.insertDonor('Grace', 'Hopper', 'gh@example.org');
-			Contact mary = AcknowledgmentTestData.insertDonor(
-				'Mary',
-				'Somerville',
-				'm@example.org'
-			);
+			Contact mary = AcknowledgmentTestData.insertDonor('Mary', 'Somerville', 'm@example.org');
 			update new List<Contact>{
 				new Contact(Id = grace.Id, HasOptedOutOfEmail = true),
 				new Contact(Id = mary.Id, HasOptedOutOfEmail = true)
@@ -472,11 +418,7 @@ private class AcknowledgmentSendTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				sender.received.size(),
-				'Only Ada, who did not opt out, is emailed.'
-			);
+			Assert.areEqual(1, sender.received.size(), 'Only Ada, who did not opt out, is emailed.');
 			Assert.areEqual(1, counts.sent, 'One thank you went.');
 			Assert.areEqual(0, counts.errors, 'An opt-out is not an error (R-AK13).');
 			Assert.areEqual(
@@ -510,8 +452,7 @@ private class AcknowledgmentSendTest {
 
 			Assert.areEqual(
 				AcknowledgmentRuleService.STATUS_NOT_REQUIRED,
-				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id]
-				.Acknowledgment_Status__c,
+				[SELECT Acknowledgment_Status__c FROM Gift__c WHERE Id = :gift.Id].Acknowledgment_Status__c,
 				'With acknowledgments off, the rules do not run at all and the status the gift was ' +
 				'saved with stands (R-AK5).'
 			);

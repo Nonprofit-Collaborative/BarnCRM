@@ -116,9 +116,7 @@ public with sharing class SampleDataLoader {
 			throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_LoadInProgress'));
 		}
 		if (hasRunningRemoveJob()) {
-			throw new SampleDataException(
-				BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress')
-			);
+			throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'));
 		}
 		SampleDataSelector selector = new SampleDataSelector();
 		if (
@@ -219,9 +217,7 @@ public with sharing class SampleDataLoader {
 			throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_LoadInProgress'));
 		}
 		if (hasRunningRemoveJob()) {
-			throw new SampleDataException(
-				BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress')
-			);
+			throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'));
 		}
 		Counts result = status();
 		SampleDataModules.startRemoval();

@@ -92,9 +92,7 @@ public with sharing class GenericMergeService {
 	/** The object of that name when this person may merge its records, else null. */
 	public static Schema.SObjectType offeredType(String objectName) {
 		Schema.SObjectType type = NamespaceUtil.objectType(objectName);
-		return type != null && isOffered(type.getDescribe(SObjectDescribeOptions.DEFERRED))
-			? type
-			: null;
+		return type != null && isOffered(type.getDescribe(SObjectDescribeOptions.DEFERRED)) ? type : null;
 	}
 
 	private static Boolean isOffered(Schema.DescribeSObjectResult described) {
@@ -135,12 +133,7 @@ public with sharing class GenericMergeService {
 		Map<Id, SObject> records = read(type, firstId, secondId, fields);
 		SObject first = records.get(firstId);
 		SObject second = records.get(secondId);
-		Map<String, Object> wins = MergeRuleService.winningValues(
-			first,
-			second,
-			fields,
-			scopeOf(described)
-		);
+		Map<String, Object> wins = MergeRuleService.winningValues(first, second, fields, scopeOf(described));
 		Comparison result = new Comparison();
 		result.objectLabel = described.getLabel();
 		result.firstName = nameOf(first);
@@ -164,12 +157,7 @@ public with sharing class GenericMergeService {
 	 * value, every related record moves to the kept record, and the other goes to the Recycle
 	 * Bin. All or nothing, journaled for undo.
 	 */
-	public static Outcome mergeRecords(
-		String objectName,
-		Id keepId,
-		Id otherId,
-		List<String> fromOther
-	) {
+	public static Outcome mergeRecords(String objectName, Id keepId, Id otherId, List<String> fromOther) {
 		Schema.SObjectType type = requireType(objectName, keepId, otherId);
 		Map<String, String> choosable = new Map<String, String>();
 		for (String name : choosableFields(type)) {
@@ -180,18 +168,14 @@ public with sharing class GenericMergeService {
 			String field = name == null ? null : choosable.get(name.toLowerCase());
 			if (field == null) {
 				throw new DuplicateService.DuplicateException(
-					String.format(
-						BarnHelp.text('Core', 'Core_GenericMerge_ErrorField'),
-						new List<Object>{ name }
-					)
+					String.format(BarnHelp.text('Core', 'Core_GenericMerge_ErrorField'), new List<Object>{ name })
 				);
 			}
 			taking.add(field);
 		}
 		Map<Id, SObject> records = read(type, keepId, otherId, taking);
 		refuseLostRecords(type, otherId);
-		AutoMergeService.Moved moved = AutoMergeService.movedRecords(type, new Set<Id>{ otherId })
-			.get(otherId);
+		AutoMergeService.Moved moved = AutoMergeService.movedRecords(type, new Set<Id>{ otherId }).get(otherId);
 		if (!moved.notes.isEmpty()) {
 			throw new DuplicateService.DuplicateException(
 				String.format(
@@ -285,17 +269,12 @@ public with sharing class GenericMergeService {
 				continue;
 			}
 			Schema.DescribeFieldResult field = link.getField().getDescribe();
-			Schema.DescribeSObjectResult child = link.getChildSObject()
-				.getDescribe(SObjectDescribeOptions.DEFERRED);
+			Schema.DescribeSObjectResult child = link.getChildSObject().getDescribe(SObjectDescribeOptions.DEFERRED);
 			if (!child.isCustom() || (field.isUpdateable() && child.isUpdateable())) {
 				continue;
 			}
 			Integer held = Database.countQueryWithBinds(
-				'SELECT COUNT() FROM ' +
-					child.getName() +
-					' WHERE ' +
-					field.getName() +
-					' = :otherId LIMIT 1',
+				'SELECT COUNT() FROM ' + child.getName() + ' WHERE ' + field.getName() + ' = :otherId LIMIT 1',
 				new Map<String, Object>{ 'otherId' => otherId },
 				AccessLevel.SYSTEM_MODE
 			);
@@ -314,17 +293,12 @@ public with sharing class GenericMergeService {
 
 	private static Schema.SObjectType requireType(String objectName, Id firstId, Id secondId) {
 		if (SettingsService.getSettings().Generic_Merge_Enabled__c != true) {
-			throw new DuplicateService.DuplicateException(
-				BarnHelp.text('Core', 'Core_GenericMerge_ErrorOff')
-			);
+			throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_GenericMerge_ErrorOff'));
 		}
 		Schema.SObjectType type = offeredType(objectName);
 		if (type == null) {
 			throw new DuplicateService.DuplicateException(
-				String.format(
-					BarnHelp.text('Core', 'Core_GenericMerge_ErrorObject'),
-					new List<Object>{ objectName }
-				)
+				String.format(BarnHelp.text('Core', 'Core_GenericMerge_ErrorObject'), new List<Object>{ objectName })
 			);
 		}
 		if (
@@ -334,20 +308,13 @@ public with sharing class GenericMergeService {
 			firstId.getSObjectType() != type ||
 			secondId.getSObjectType() != type
 		) {
-			throw new DuplicateService.DuplicateException(
-				BarnHelp.text('Core', 'Core_GenericMerge_ErrorPair')
-			);
+			throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_GenericMerge_ErrorPair'));
 		}
 		return type;
 	}
 
 	/** Both records in user mode, with these fields, the name and the dates the rules read. */
-	private static Map<Id, SObject> read(
-		Schema.SObjectType type,
-		Id firstId,
-		Id secondId,
-		List<String> fields
-	) {
+	private static Map<Id, SObject> read(Schema.SObjectType type, Id firstId, Id secondId, List<String> fields) {
 		Map<String, String> names = new Map<String, String>{
 			'id' => 'Id',
 			'name' => 'Name',
@@ -369,9 +336,7 @@ public with sharing class GenericMergeService {
 			)
 		);
 		if (records.size() < 2) {
-			throw new DuplicateService.DuplicateException(
-				BarnHelp.text('Core', 'Core_GenericMerge_ErrorNotFound')
-			);
+			throw new DuplicateService.DuplicateException(BarnHelp.text('Core', 'Core_GenericMerge_ErrorNotFound'));
 		}
 		return records;
 	}

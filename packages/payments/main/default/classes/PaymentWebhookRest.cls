@@ -77,25 +77,15 @@ global with sharing class PaymentWebhookRest {
 			}
 		}
 		// A type the processing job does not act on is acknowledged and not stored.
-		Set<String> acted = processor == PaymentService.PAYPAL
-			? PaymentPayPal.EVENT_TYPES
-			: PaymentStripe.EVENT_TYPES;
-		if (
-			!acted.contains(
-				PaymentStripe.text(
-					body.get(processor == PaymentService.STRIPE ? 'type' : 'event_type')
-				)
-			)
-		) {
+		Set<String> acted = processor == PaymentService.PAYPAL ? PaymentPayPal.EVENT_TYPES : PaymentStripe.EVENT_TYPES;
+		if (!acted.contains(PaymentStripe.text(body.get(processor == PaymentService.STRIPE ? 'type' : 'event_type')))) {
 			return 200;
 		}
 		Payment_Event__c event = new Payment_Event__c(
 			Processor__c = processor,
 			Status__c = 'Received',
 			Event_Id__c = eventId,
-			Event_Type__c = PaymentStripe.text(
-					body.get(processor == PaymentService.STRIPE ? 'type' : 'event_type')
-				)
+			Event_Type__c = PaymentStripe.text(body.get(processor == PaymentService.STRIPE ? 'type' : 'event_type'))
 				?.left(100),
 			Payload__c = raw
 		);

@@ -9,10 +9,8 @@ private class DataDictionaryControllerTest {
 			SObjectDescribeOptions.DEFERRED
 		)
 		.getName();
-	private static final String PAIR_KEY = Duplicate_Dismissal__c.Pair_Key__c.getDescribe()
-		.getName();
-	private static final String IS_ORGANIZATION = Account.Is_Organization__c.getDescribe()
-		.getName();
+	private static final String PAIR_KEY = Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getName();
+	private static final String IS_ORGANIZATION = Account.Is_Organization__c.getDescribe().getName();
 	private static final String ROW_STATUS = Import_Row__c.Status__c.getDescribe().getName();
 
 	@TestSetup
@@ -92,10 +90,7 @@ private class DataDictionaryControllerTest {
 			Assert.isFalse(String.isBlank(formula.formula), 'The formula text is shown.');
 			DataDictionaryController.FieldRow status = byName(rows).get(ROW_STATUS);
 			String first = Import_Row__c.Status__c.getDescribe().getPicklistValues()[0].getValue();
-			Assert.isTrue(
-				status.picklistValues.startsWith(first),
-				'Active picklist values are listed in order.'
-			);
+			Assert.isTrue(status.picklistValues.startsWith(first), 'Active picklist values are listed in order.');
 			DataDictionaryController.FieldRow parent = byName(account).get('ParentId');
 			Assert.areEqual('Account', parent.relatedTo, 'A lookup names what it points to.');
 		}
@@ -165,10 +160,7 @@ private class DataDictionaryControllerTest {
 			Assert.isTrue(byValue.get(DISMISSAL).isDefault, 'A BarnCRM object is chosen to start.');
 			Assert.isFalse(
 				byValue.containsKey(
-					Field_Utilization_Snapshot__c.SObjectType.getDescribe(
-							SObjectDescribeOptions.DEFERRED
-						)
-						.getName()
+					Field_Utilization_Snapshot__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
 				),
 				'The snapshot table is not documented.'
 			);
@@ -190,11 +182,7 @@ private class DataDictionaryControllerTest {
 				}
 			}
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'),
-				refusal,
-				'Refused.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'), refusal, 'Refused.');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'),
 				listRefusal,
@@ -228,10 +216,7 @@ private class DataDictionaryControllerTest {
 				.get('ApexTrigger|AccountTrigger');
 			Assert.isNotNull(accountTrigger, 'Core\'s Account trigger is listed.');
 			Assert.areEqual('Active', accountTrigger.status, 'It is active.');
-			Assert.isTrue(
-				accountTrigger.detail.contains('before insert'),
-				'With the events it runs on.'
-			);
+			Assert.isTrue(accountTrigger.detail.contains('before insert'), 'With the events it runs on.');
 			Assert.isNotNull(accountTrigger.apiVersion, 'And its API version.');
 		}
 	}
@@ -242,27 +227,17 @@ private class DataDictionaryControllerTest {
 			DataDictionaryController.AutomationInventory inventory;
 			System.runAs(maria()) {
 				inventory = DataDictionaryController.getAutomation(
-					Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getName()
+					Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
 				);
 			}
 
 			Map<String, DataDictionaryController.AutomationRow> found = automationByKey(inventory);
 			Assert.isNotNull(found.get('ApexTrigger|AffiliationTrigger'), 'Its trigger is listed.');
-			DataDictionaryController.AutomationRow flow = found.get(
-				'Flow|Template_Affiliation_Primary'
-			);
+			DataDictionaryController.AutomationRow flow = found.get('Flow|Template_Affiliation_Primary');
 			Assert.isNotNull(flow, 'A flow that a record of the object triggers is listed.');
 			Assert.areEqual('After save', flow.detail, 'With the point in the save it runs at.');
-			Assert.areEqual(
-				'Inactive',
-				flow.status,
-				'A template flow ships inactive until an admin turns it on.'
-			);
-			Assert.isNull(
-				found.get('Flow|Template_Account_Address_Capture'),
-				'Another object\'s flow is not listed.'
-			);
+			Assert.areEqual('Inactive', flow.status, 'A template flow ships inactive until an admin turns it on.');
+			Assert.isNull(found.get('Flow|Template_Account_Address_Capture'), 'Another object\'s flow is not listed.');
 		}
 	}
 

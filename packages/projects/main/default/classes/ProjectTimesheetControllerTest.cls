@@ -62,16 +62,9 @@ private class ProjectTimesheetControllerTest {
 				);
 				Assert.fail('Saving is refused while off');
 			} catch (AuraHandledException refused) {
-				Assert.isTrue(
-					refused.getMessage().contains('Approve time and expenses'),
-					refused.getMessage()
-				);
+				Assert.isTrue(refused.getMessage().contains('Approve time and expenses'), refused.getMessage());
 			}
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Time_Entry__c WITH SYSTEM_MODE],
-				'Nothing was added'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Time_Entry__c WITH SYSTEM_MODE], 'Nothing was added');
 		}
 	}
 
@@ -102,18 +95,14 @@ private class ProjectTimesheetControllerTest {
 			edit.id = week.entries[0].id;
 			Assert.areEqual(
 				1,
-				ProjectTimesheetController.saveWeek(
-					new List<ProjectTimesheetController.Cell>{ edit }
-				),
+				ProjectTimesheetController.saveWeek(new List<ProjectTimesheetController.Cell>{ edit }),
 				'Changed one'
 			);
 
 			Assert.areEqual(2, ProjectTimesheetController.submitWeek(monday), 'Both submitted');
 			edit.hours = 6;
 			try {
-				ProjectTimesheetController.saveWeek(
-					new List<ProjectTimesheetController.Cell>{ edit }
-				);
+				ProjectTimesheetController.saveWeek(new List<ProjectTimesheetController.Cell>{ edit });
 				Assert.fail('Submitted hours are locked to the person');
 			} catch (AuraHandledException locked) {
 				Assert.isTrue(locked.getMessage().contains('locked'), locked.getMessage());
@@ -121,9 +110,7 @@ private class ProjectTimesheetControllerTest {
 			Assert.areEqual(2, ProjectTimesheetController.recallWeek(monday), 'Recalled');
 			Assert.areEqual(
 				1,
-				ProjectTimesheetController.saveWeek(
-					new List<ProjectTimesheetController.Cell>{ edit }
-				),
+				ProjectTimesheetController.saveWeek(new List<ProjectTimesheetController.Cell>{ edit }),
 				'Open again'
 			);
 			Test.stopTest();
@@ -171,26 +158,14 @@ private class ProjectTimesheetControllerTest {
 			project = ProjectsTestData.project('Active', null);
 		}
 		System.runAs(staffer) {
-			Id added = ProjectTimesheetController.addExpense(
-				project.Id,
-				Date.today(),
-				'Travel',
-				42.5,
-				true,
-				'Train'
-			);
+			Id added = ProjectTimesheetController.addExpense(project.Id, Date.today(), 'Travel', 42.5, true, 'Train');
 			ProjectTimesheetController.Week week = ProjectTimesheetController.getWeek(Date.today());
 			Assert.areEqual(1, week.expenses.size(), 'On the page');
 			Assert.areEqual('Open', week.expenses[0].status, 'Open (R-PM13)');
-			Assert.areEqual(
-				1,
-				ProjectTimesheetController.submitWeek(Date.today()),
-				'Submitted with the week'
-			);
+			Assert.areEqual(1, ProjectTimesheetController.submitWeek(Date.today()), 'Submitted with the week');
 			Assert.areEqual(
 				'Submitted',
-				[SELECT Status__c FROM Project_Expense__c WHERE Id = :added WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Project_Expense__c WHERE Id = :added WITH SYSTEM_MODE].Status__c,
 				'Submitted'
 			);
 		}

@@ -40,17 +40,10 @@ private class ReceiptLetterEditorTest {
 				html.contains('class="orgname"'),
 				'The letterhead the package prints is in the preview: ' + html
 			);
-			Assert.isTrue(
-				html.contains(ReceiptContentBuilder.SENTENCE_NO_GOODS),
-				'So are the tax sentences: ' + html
-			);
+			Assert.isTrue(html.contains(ReceiptContentBuilder.SENTENCE_NO_GOODS), 'So are the tax sentences: ' + html);
 			Assert.isFalse(html.contains('<body>'), 'Only the inside of the document comes back.');
 			Assert.areEqual(dmlBefore, Limits.getDmlStatements(), 'A preview writes nothing.');
-			Assert.areEqual(
-				receiptsBefore,
-				[SELECT COUNT() FROM Receipt__c],
-				'And issues no receipt.'
-			);
+			Assert.areEqual(receiptsBefore, [SELECT COUNT() FROM Receipt__c], 'And issues no receipt.');
 		}
 	}
 
@@ -75,10 +68,7 @@ private class ReceiptLetterEditorTest {
 				html.countMatches('<table class="gifts">'),
 				'The lines print once, where the letter put them: ' + html
 			);
-			Assert.isTrue(
-				html.contains('$100.00') && html.contains('$250.00'),
-				'Both sample gifts are lines: ' + html
-			);
+			Assert.isTrue(html.contains('$100.00') && html.contains('$250.00'), 'Both sample gifts are lines: ' + html);
 		}
 	}
 
@@ -88,10 +78,7 @@ private class ReceiptLetterEditorTest {
 			ReceiptTemplateService.managePermission = false;
 			Test.startTest();
 			try {
-				ReceiptController.previewTemplate(
-					ReceiptNumberSequence.TYPE_PER_GIFT,
-					'<p>Dear {{DonorName}}.</p>'
-				);
+				ReceiptController.previewTemplate(ReceiptNumberSequence.TYPE_PER_GIFT, '<p>Dear {{DonorName}}.</p>');
 				Assert.fail('A user who may not edit letters previewed one.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(

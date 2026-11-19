@@ -197,16 +197,8 @@ private class IndicatorResultsBatchTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			// Private saved queries of the admin: the runner sees none of them.
 			insert as user new List<Saved_Query__c>{
-				new Saved_Query__c(
-					Name = 'Counted',
-					Object_Name__c = 'Contact',
-					Query_JSON__c = '{}'
-				),
-				new Saved_Query__c(
-					Name = 'Counted',
-					Object_Name__c = 'Contact',
-					Query_JSON__c = '{}'
-				)
+				new Saved_Query__c(Name = 'Counted', Object_Name__c = 'Contact', Query_JSON__c = '{}'),
+				new Saved_Query__c(Name = 'Counted', Object_Name__c = 'Contact', Query_JSON__c = '{}')
 			};
 			Id elementId = newElement();
 			Saved_Query__c source = new Saved_Query__c(
@@ -221,11 +213,7 @@ private class IndicatorResultsBatchTest {
 				Source__c = 'Computed',
 				Source_Query__c = source.Id,
 				Source_Definition__c = JSON.serialize(
-					new Map<String, Object>{
-						'version' => 1,
-						'dateField' => 'CreatedDate',
-						'function' => 'count'
-					}
+					new Map<String, Object>{ 'version' => 1, 'dateField' => 'CreatedDate', 'function' => 'count' }
 				)
 			);
 			insert as user computed;
@@ -354,11 +342,7 @@ private class IndicatorResultsBatchTest {
 			Indicator_Period__c period = new Indicator_Period__c(Name = 'Q1');
 			period.putSObject('Indicator__r', new Indicator__c(Name = 'Parent'));
 
-			Assert.areEqual(
-				'Parent',
-				IndicatorResultsBatch.valueAt(period, 'Indicator__r.Name'),
-				'Followed'
-			);
+			Assert.areEqual('Parent', IndicatorResultsBatch.valueAt(period, 'Indicator__r.Name'), 'Followed');
 			Assert.areEqual('Q1', IndicatorResultsBatch.valueAt(period, 'Name'), 'Direct');
 		}
 	}

@@ -6,9 +6,7 @@
 private class PersonErasureControllerTest {
 	@TestSetup
 	static void createTestUsers() {
-		TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' }
-		);
+		TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' });
 		TestUsers.admin();
 	}
 
@@ -25,13 +23,9 @@ private class PersonErasureControllerTest {
 
 	@IsTest
 	static void anUnexpectedFailureReachesTheScreenAsTheGenericMessageAndIsLogged() {
-		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' }
-		)) {
+		System.runAs(TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' })) {
 			Contact person = jordan();
-			PersonErasureExtensions.overrides = new List<PersonErasureExtension>{
-				new BrokenExtension()
-			};
+			PersonErasureExtensions.overrides = new List<PersonErasureExtension>{ new BrokenExtension() };
 
 			Test.startTest();
 			for (Boolean erasing : new List<Boolean>{ false, true }) {
@@ -60,68 +54,42 @@ private class PersonErasureControllerTest {
 					WHERE Context__c = 'PersonErasureController'
 				][0]
 				.get('total');
-			Assert.areEqual(
-				2,
-				failures.intValue(),
-				'Each failure is in the Error Log for the administrator'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Erasure__c],
-				'And nothing was recorded as erased'
-			);
+			Assert.areEqual(2, failures.intValue(), 'Each failure is in the Error Log for the administrator');
+			Assert.areEqual(0, [SELECT COUNT() FROM Erasure__c], 'And nothing was recorded as erased');
 		}
 	}
 
 	@IsTest
 	static void somethingThatIsNotAPersonIsRefusedInItsOwnWords() {
-		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' }
-		)) {
+		System.runAs(TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' })) {
 			PersonErasureExtensions.noneForTest = true;
 			Contact person = jordan();
 			try {
 				PersonErasureController.preview(UserInfo.getUserId());
 				Assert.fail('A user is not a person to erase');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Erase_NotAPerson'),
-					refused.getMessage(),
-					'Its own words'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Erase_NotAPerson'), refused.getMessage(), 'Its own words');
 			}
 		}
 	}
 
 	private static Contact jordan() {
 		HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Jordan', LastName = 'Lee')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Jordan', LastName = 'Lee'));
 		insert person;
 		return person;
 	}
 
 	@IsTest
 	static void previewsThenErases() {
-		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' }
-		)) {
+		System.runAs(TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Erase_People' })) {
 			PersonErasureExtensions.noneForTest = true;
 			Contact person = jordan();
 
 			PersonErasure.Result preview = PersonErasureController.preview(person.Id);
-			PersonErasure.Result done = PersonErasureController.erase(
-				person.Id,
-				'Jordan Lee',
-				'PR-1'
-			);
+			PersonErasure.Result done = PersonErasureController.erase(person.Id, 'Jordan Lee', 'PR-1');
 
-			Assert.areEqual(
-				'Jordan Lee',
-				preview.personName,
-				'The preview names the person to type'
-			);
+			Assert.areEqual('Jordan Lee', preview.personName, 'The preview names the person to type');
 			Assert.isFalse(preview.erased, 'The preview erased nothing');
 			Assert.isTrue(done.erased, 'Erased');
 			Assert.isNotNull(done.erasureId, 'With its audit record');

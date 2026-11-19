@@ -35,14 +35,8 @@ private class RollupEngineGivingTest {
 			GivingRollupTestData.installShippedRollups();
 
 			Test.startTest();
-			RollupEngine.Result first = RollupEngine.recalculate(
-				new Set<Id>{ general.Id },
-				Fund__c.SObjectType
-			);
-			RollupEngine.Result second = RollupEngine.recalculate(
-				new Set<Id>{ general.Id },
-				Fund__c.SObjectType
-			);
+			RollupEngine.Result first = RollupEngine.recalculate(new Set<Id>{ general.Id }, Fund__c.SObjectType);
+			RollupEngine.Result second = RollupEngine.recalculate(new Set<Id>{ general.Id }, Fund__c.SObjectType);
 			Test.stopTest();
 
 			Fund__c fund = [

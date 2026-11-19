@@ -36,9 +36,7 @@ private class EventSpeakersControllerTest {
 	}
 
 	private static Contact person() {
-		Contact record = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = 'Garcia')
-		);
+		Contact record = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 		insert as user record;
 		return record;
 	}
@@ -126,11 +124,7 @@ private class EventSpeakersControllerTest {
 
 			Assert.isTrue(refused, 'The same speaker twice in a session is refused');
 			Assert.areEqual(1, result.speakers[0].assignments.size(), 'One assignment');
-			Assert.areEqual(
-				'Keynote',
-				result.speakers[0].assignments[0].sessionName,
-				'In the keynote'
-			);
+			Assert.areEqual('Keynote', result.speakers[0].assignments[0].sessionName, 'In the keynote');
 			Assert.areEqual('Speaker', result.speakers[0].assignments[0].role, 'With the role');
 			Assert.areEqual(1, result.sessions.size(), 'The event sessions to choose from');
 		}
@@ -141,10 +135,7 @@ private class EventSpeakersControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
 			Event_Session__c keynote = session(event, 'Keynote');
-			Id otherSpeaker = EventSpeakersController.addSpeaker(
-				conference('Second Event').Id,
-				person().Id
-			);
+			Id otherSpeaker = EventSpeakersController.addSpeaker(conference('Second Event').Id, person().Id);
 
 			Test.startTest();
 			Boolean refused = false;

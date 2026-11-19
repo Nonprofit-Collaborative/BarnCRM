@@ -90,12 +90,7 @@ public without sharing class RollupClearBatch implements Database.Batchable<SObj
 		for (Id recordId : stored.keySet()) {
 			blank.put(recordId, new Map<Schema.SObjectField, Object>{ field => null });
 		}
-		RollupWriter.TotalsWrite write = RollupWriter.writeTotals(
-			targetType,
-			stored,
-			blank,
-			Datetime.now()
-		);
+		RollupWriter.TotalsWrite write = RollupWriter.writeTotals(targetType, stored, blank, Datetime.now());
 		this.cleared += write.written.size();
 		this.refused += write.failed.size();
 	}

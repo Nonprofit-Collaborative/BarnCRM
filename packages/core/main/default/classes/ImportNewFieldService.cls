@@ -29,11 +29,7 @@ public with sharing class ImportNewFieldService {
 		'Url',
 		'Picklist'
 	};
-	private static final Set<String> DECIMAL_TYPES = new Set<String>{
-		'Number',
-		'Currency',
-		'Percent'
-	};
+	private static final Set<String> DECIMAL_TYPES = new Set<String>{ 'Number', 'Currency', 'Percent' };
 	/** Words Salesforce or SOQL treat specially; refused as a field's name to stay clear of them. */
 	private static final Set<String> RESERVED = new Set<String>(
 		('id name owner type select from where and or not null true false like in order group ' +
@@ -115,9 +111,7 @@ public with sharing class ImportNewFieldService {
 			WITH USER_MODE
 			LIMIT 1
 		];
-		return !access.isEmpty() &&
-			access[0].PermissionsCustomizeApplication &&
-			access[0].PermissionsModifyMetadata;
+		return !access.isEmpty() && access[0].PermissionsCustomizeApplication && access[0].PermissionsModifyMetadata;
 	}
 
 	/** Whether Set Up Connection has created the Named Credential. */
@@ -146,9 +140,7 @@ public with sharing class ImportNewFieldService {
 			return calloutStatusOverride == ENABLED;
 		}
 		try {
-			return String.valueOf(
-					ConnectApi.NamedCredentials.getNamedCredential(CONNECTION).calloutStatus
-				) == ENABLED;
+			return String.valueOf(ConnectApi.NamedCredentials.getNamedCredential(CONNECTION).calloutStatus) == ENABLED;
 		} catch (Exception e) {
 			return false;
 		}
@@ -209,38 +201,23 @@ public with sharing class ImportNewFieldService {
 			found.add(BarnHelp.text('Core', 'Core_ImportNewField_LabelRequired'));
 		}
 		String name = request.apiName == null ? '' : request.apiName.trim();
-		if (
-			name.length() > NAME_LIMIT ||
-			!Pattern.matches('[A-Za-z][A-Za-z0-9]*(_[A-Za-z0-9]+)*', name)
-		) {
+		if (name.length() > NAME_LIMIT || !Pattern.matches('[A-Za-z][A-Za-z0-9]*(_[A-Za-z0-9]+)*', name)) {
 			found.add(BarnHelp.text('Core', 'Core_ImportNewField_NameInvalid'));
 		} else if (RESERVED.contains(name.toLowerCase())) {
 			found.add(
-				String.format(
-					BarnHelp.text('Core', 'Core_ImportNewField_NameReserved'),
-					new List<String>{ name }
-				)
+				String.format(BarnHelp.text('Core', 'Core_ImportNewField_NameReserved'), new List<String>{ name })
 			);
 		} else if (
-			objectType != null &&
-			objectType.getDescribe().fields.getMap().containsKey((name + '__c').toLowerCase())
+			objectType != null && objectType.getDescribe().fields.getMap().containsKey((name + '__c').toLowerCase())
 		) {
 			found.add(BarnHelp.text('Core', 'Core_ImportNewField_NameTaken'));
 		}
 		if (!TYPES.contains(request.type)) {
 			found.add(BarnHelp.text('Core', 'Core_ImportNewField_TypeInvalid'));
-		} else if (
-			request.type == 'Text' &&
-			(request.length == null ||
-			request.length < 1 ||
-			request.length > 255)
-		) {
+		} else if (request.type == 'Text' && (request.length == null || request.length < 1 || request.length > 255)) {
 			found.add(BarnHelp.text('Core', 'Core_ImportNewField_LengthInvalid'));
 		} else if (
-			DECIMAL_TYPES.contains(request.type) &&
-			(request.scale == null ||
-			request.scale < 0 ||
-			request.scale > 8)
+			DECIMAL_TYPES.contains(request.type) && (request.scale == null || request.scale < 0 || request.scale > 8)
 		) {
 			found.add(BarnHelp.text('Core', 'Core_ImportNewField_ScaleInvalid'));
 		} else if (request.type == 'Picklist' && !validValues(request.values)) {
@@ -279,9 +256,7 @@ public with sharing class ImportNewFieldService {
 		if (!found.isEmpty()) {
 			throw new NewFieldException(String.join(found, ' '));
 		}
-		request.objectApiName = NamespaceUtil.objectType(request.objectApiName)
-			.getDescribe()
-			.getName();
+		request.objectApiName = NamespaceUtil.objectType(request.objectApiName).getDescribe().getName();
 		return AsyncStarter.queue(new CreateFieldJob(request), 'ImportNewFieldService');
 	}
 
@@ -334,12 +309,7 @@ public with sharing class ImportNewFieldService {
 		}
 
 		public void execute(QueueableContext queued) {
-			grantAccess(
-				request.objectApiName,
-				request.apiName + '__c',
-				request.permissionSetId,
-				logContext
-			);
+			grantAccess(request.objectApiName, request.apiName + '__c', request.permissionSetId, logContext);
 		}
 	}
 
@@ -368,9 +338,7 @@ public with sharing class ImportNewFieldService {
 		List<String> messages = texts(root, 'message');
 		return String.format(
 			BarnHelp.text('Core', 'Core_ImportNewField_Refused'),
-			new List<String>{
-				messages.isEmpty() ? response.getStatus() : String.join(messages, ' ')
-			}
+			new List<String>{ messages.isEmpty() ? response.getStatus() : String.join(messages, ' ') }
 		);
 	}
 
@@ -457,22 +425,14 @@ public with sharing class ImportNewFieldService {
 	 * whose row Salesforce refuses, and each skip is logged in words and returned. System
 	 * mode: the running user already holds Modify Metadata, which can deploy the same change.
 	 */
-	public static List<String> grantAccess(
-		String objectApiName,
-		String fieldName,
-		Id chosenId,
-		String logContext
-	) {
+	public static List<String> grantAccess(String objectApiName, String fieldName, Id chosenId, String logContext) {
 		String ns = NamespaceUtil.prefix().removeEnd('__');
 		Map<Id, Boolean> editById = new Map<Id, Boolean>();
 		Map<Id, String> labelById = new Map<Id, String>();
 		for (PermissionSet each : [
 			SELECT Id, Name, Label
 			FROM PermissionSet
-			WHERE
-				(Name IN :GRANTS.keySet()
-				AND NamespacePrefix = :(String.isBlank(ns) ? null : ns))
-				OR Id = :chosenId
+			WHERE (Name IN :GRANTS.keySet() AND NamespacePrefix = :(String.isBlank(ns) ? null : ns)) OR Id = :chosenId
 			WITH SYSTEM_MODE
 		]) {
 			editById.put(each.Id, each.Id == chosenId || GRANTS.get(each.Name) == true);
@@ -484,18 +444,13 @@ public with sharing class ImportNewFieldService {
 		for (ObjectPermissions each : [
 			SELECT ParentId
 			FROM ObjectPermissions
-			WHERE
-				ParentId IN :editById.keySet()
-				AND SobjectType = :objectApiName
-				AND PermissionsRead = TRUE
+			WHERE ParentId IN :editById.keySet() AND SobjectType = :objectApiName AND PermissionsRead = TRUE
 			WITH SYSTEM_MODE
 		]) {
 			canRead.add(each.ParentId);
 		}
 		Schema.SObjectType objectType = NamespaceUtil.objectType(objectApiName);
-		String objectLabel = objectType == null
-			? objectApiName
-			: objectType.getDescribe().getLabel();
+		String objectLabel = objectType == null ? objectApiName : objectType.getDescribe().getLabel();
 		for (Id parentId : new List<Id>(editById.keySet())) {
 			if (!canRead.contains(parentId)) {
 				editById.remove(parentId);
@@ -528,11 +483,7 @@ public with sharing class ImportNewFieldService {
 		for (Id parentId : editById.keySet()) {
 			FieldPermissions row = byParent.containsKey(parentId)
 				? byParent.get(parentId)
-				: new FieldPermissions(
-						ParentId = parentId,
-						SobjectType = objectApiName,
-						Field = field
-				  );
+				: new FieldPermissions(ParentId = parentId, SobjectType = objectApiName, Field = field);
 			row.PermissionsRead = true;
 			row.PermissionsEdit = row.PermissionsEdit == true || editById.get(parentId);
 			(row.Id == null ? added : changed).add(row);

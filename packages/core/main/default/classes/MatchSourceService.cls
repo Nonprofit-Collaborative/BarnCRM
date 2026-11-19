@@ -79,9 +79,7 @@ public with sharing class MatchSourceService {
 	/** True for a shipped source listed in `Match_Sources_Turned_Off__c` (D-184). */
 	public static Boolean isTurnedOff(Match_Source__mdt row) {
 		return row.Is_Shipped__c == true &&
-			CustomMetadataManagerService.namesIn(
-					SettingsService.getSettings().Match_Sources_Turned_Off__c
-				)
+			CustomMetadataManagerService.namesIn(SettingsService.getSettings().Match_Sources_Turned_Off__c)
 				.contains(row.DeveloperName.toLowerCase());
 	}
 
@@ -184,17 +182,14 @@ public with sharing class MatchSourceService {
 			String name = INDIVIDUAL_FIELDS.get(target);
 			Boolean present =
 				name != null &&
-				target.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.fields.getMap()
-					.containsKey(name.toLowerCase());
+				target.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().containsKey(name.toLowerCase());
 			individualFieldByTarget.put(target, present ? name : null);
 		}
 		return individualFieldByTarget.get(target);
 	}
 
 	private static Boolean isIndividual(Schema.SObjectType type) {
-		return type != null &&
-			type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() == INDIVIDUAL;
+		return type != null && type.getDescribe(SObjectDescribeOptions.DEFERRED).getName() == INDIVIDUAL;
 	}
 
 	/**
@@ -204,18 +199,13 @@ public with sharing class MatchSourceService {
 	@TestVisible
 	private static Boolean appliesTo(Source source, Schema.SObjectType target) {
 		for (
-			Schema.SObjectType referenced : source.objectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			Schema.SObjectType referenced : source.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.fields.getMap()
 				.get(source.parentField)
 				.getDescribe()
 				.getReferenceTo()
 		) {
-			if (
-				referenced == target ||
-				(isIndividual(referenced) && individualFieldOf(target) != null)
-			) {
+			if (referenced == target || (isIndividual(referenced) && individualFieldOf(target) != null)) {
 				return true;
 			}
 		}
@@ -226,9 +216,7 @@ public with sharing class MatchSourceService {
 	public static String reasonFor(Source source) {
 		String format = source.normalization == EMAIL
 			? Label.Core_Duplicates_ReasonEmail
-			: source.normalization == PHONE
-					? Label.Core_Duplicates_ReasonPhone
-					: Label.Core_Duplicates_ReasonAddress;
+			: source.normalization == PHONE ? Label.Core_Duplicates_ReasonPhone : Label.Core_Duplicates_ReasonAddress;
 		return String.format(format, new List<Object>{ source.label });
 	}
 
@@ -284,10 +272,7 @@ public with sharing class MatchSourceService {
 	 * name. One lookup per source for the whole list. A source that cannot be read is logged and
 	 * skipped.
 	 */
-	public static List<Set<Id>> holdersOfPeople(
-		Schema.SObjectType target,
-		List<Map<String, String>> people
-	) {
+	public static List<Set<Id>> holdersOfPeople(Schema.SObjectType target, List<Map<String, String>> people) {
 		List<Set<Id>> result = new List<Set<Id>>();
 		Map<String, List<Set<String>>> keysByKind = new Map<String, List<Set<String>>>{
 			EMAIL => new List<Set<String>>(),
@@ -301,10 +286,7 @@ public with sharing class MatchSourceService {
 			keysByKind.get(PHONE).add(keysOf(PHONE, given, PHONE_ATTRIBUTES));
 			Set<String> addresses = new Set<String>();
 			for (String street : ADDRESS_ATTRIBUTES.keySet()) {
-				String found = address(
-					given.get(street),
-					given.get(ADDRESS_ATTRIBUTES.get(street))
-				);
+				String found = address(given.get(street), given.get(ADDRESS_ATTRIBUTES.get(street)));
 				if (found != null) {
 					addresses.add(found);
 				}
@@ -340,11 +322,7 @@ public with sharing class MatchSourceService {
 		return result;
 	}
 
-	private static Set<String> keysOf(
-		String normalization,
-		Map<String, String> values,
-		List<String> attributes
-	) {
+	private static Set<String> keysOf(String normalization, Map<String, String> values, List<String> attributes) {
 		Set<String> keys = new Set<String>();
 		for (String attribute : attributes) {
 			String found = key(normalization, values.get(attribute), null);
@@ -355,11 +333,7 @@ public with sharing class MatchSourceService {
 		return keys;
 	}
 
-	private static List<DuplicateService.Pair> pairsOn(
-		Source source,
-		Schema.SObjectType target,
-		Set<Id> records
-	) {
+	private static List<DuplicateService.Pair> pairsOn(Source source, Schema.SObjectType target, Set<Id> records) {
 		List<DuplicateService.Pair> result = new List<DuplicateService.Pair>();
 		Map<String, Set<Id>> heldHere = owners(
 			source,
@@ -432,11 +406,7 @@ public with sharing class MatchSourceService {
 	 * reached its row cap, or was skipped because the transaction had too little left, is left
 	 * out: its holders were not all read, so it could be a value shared by more than ten.
 	 */
-	public static Map<String, Set<Id>> ownersOf(
-		Source source,
-		Schema.SObjectType target,
-		Set<String> keys
-	) {
+	public static Map<String, Set<Id>> ownersOf(Source source, Schema.SObjectType target, Set<String> keys) {
 		List<SObject> rows = new List<SObject>();
 		// Keys whose lookup was cut short (M5): any of them may be held by more than ten
 		// records the lookup did not read, so none of them is used.
@@ -579,14 +549,7 @@ public with sharing class MatchSourceService {
 		Set<Id> parents = new Set<Id>(records);
 		String individualField = individualFieldOf(target);
 		if (individualField != null) {
-			for (
-				SObject holder : MatchSourceSelector.holdersOfIndividuals(
-					target,
-					individualField,
-					records,
-					null
-				)
-			) {
+			for (SObject holder : MatchSourceSelector.holdersOfIndividuals(target, individualField, records, null)) {
 				parents.add((Id) holder.get(individualField));
 			}
 		}
@@ -616,12 +579,7 @@ public with sharing class MatchSourceService {
 		String individualField = individualFieldOf(target);
 		if (individualField != null && !individuals.isEmpty()) {
 			for (
-				SObject holder : MatchSourceSelector.holdersOfIndividuals(
-					target,
-					individualField,
-					null,
-					individuals
-				)
+				SObject holder : MatchSourceSelector.holdersOfIndividuals(target, individualField, null, individuals)
 			) {
 				Id individual = (Id) holder.get(individualField);
 				if (!holdersByIndividual.containsKey(individual)) {
@@ -713,12 +671,7 @@ public with sharing class MatchSourceService {
 			return null;
 		}
 		List<String> words = new List<String>();
-		for (
-			String word : value.toLowerCase()
-				.replaceAll('[^a-z0-9]+', ' ')
-				.normalizeSpace()
-				.split(' ')
-		) {
+		for (String word : value.toLowerCase().replaceAll('[^a-z0-9]+', ' ').normalizeSpace().split(' ')) {
 			if (String.isNotBlank(word)) {
 				words.add(STREET_WORDS.containsKey(word) ? STREET_WORDS.get(word) : word);
 			}
@@ -753,9 +706,7 @@ public with sharing class MatchSourceService {
 		for (String name : values.keySet()) {
 			fields.put(NamespaceUtil.qualify(name), values.get(name));
 		}
-		return resolve(
-			(Match_Source__mdt) JSON.deserialize(JSON.serialize(fields), Match_Source__mdt.class)
-		);
+		return resolve((Match_Source__mdt) JSON.deserialize(JSON.serialize(fields), Match_Source__mdt.class));
 	}
 
 	/**
@@ -763,22 +714,13 @@ public with sharing class MatchSourceService {
 	 * as the scan would find them: the value normalized, and nothing for a value held by more
 	 * records than a value may be. Empty when the value normalizes to nothing.
 	 */
-	public static Map<Schema.SObjectType, Set<Id>> holdersOfValue(
-		Source source,
-		String value,
-		String postal
-	) {
+	public static Map<Schema.SObjectType, Set<Id>> holdersOfValue(Source source, String value, String postal) {
 		Map<Schema.SObjectType, Set<Id>> result = new Map<Schema.SObjectType, Set<Id>>();
 		String normalized = key(source.normalization, value, postal);
 		if (normalized == null) {
 			return result;
 		}
-		for (
-			Schema.SObjectType target : new List<Schema.SObjectType>{
-				Contact.SObjectType,
-				Account.SObjectType
-			}
-		) {
+		for (Schema.SObjectType target : new List<Schema.SObjectType>{ Contact.SObjectType, Account.SObjectType }) {
 			if (!appliesTo(source, target)) {
 				continue;
 			}
@@ -811,10 +753,7 @@ public with sharing class MatchSourceService {
 		Schema.SObjectType type = NamespaceUtil.objectType(objectName);
 		if (type == null) {
 			throw new CustomMetadataManagerService.CustomMetadataManagerException(
-				String.format(
-					BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
-					new List<Object>{ objectName }
-				)
+				String.format(BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'), new List<Object>{ objectName })
 			);
 		}
 		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
@@ -823,11 +762,7 @@ public with sharing class MatchSourceService {
 			requireField(fields, (String) values.get('Value_Field__c'), described.getLabel()),
 			described.getLabel()
 		);
-		Schema.SObjectField parent = requireField(
-			fields,
-			(String) values.get('Parent_Field__c'),
-			described.getLabel()
-		);
+		Schema.SObjectField parent = requireField(fields, (String) values.get('Parent_Field__c'), described.getLabel());
 		if (!isPersonOrHouseholdLookup(parent)) {
 			throw new CustomMetadataManagerService.CustomMetadataManagerException(
 				String.format(
@@ -848,11 +783,7 @@ public with sharing class MatchSourceService {
 	}
 
 	/** The parents a source can resolve to a person or a household. */
-	private static final Set<String> PARENT_OBJECTS = new Set<String>{
-		'Contact',
-		'Account',
-		'Individual'
-	};
+	private static final Set<String> PARENT_OBJECTS = new Set<String>{ 'Contact', 'Account', 'Individual' };
 
 	private static Boolean isPersonOrHouseholdLookup(Schema.SObjectField token) {
 		return !parentObjectsOf(token.getDescribe()).isEmpty();

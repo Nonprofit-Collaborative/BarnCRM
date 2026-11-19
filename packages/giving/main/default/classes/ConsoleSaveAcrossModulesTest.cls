@@ -19,10 +19,7 @@ private class ConsoleSaveAcrossModulesTest {
 
 			Test.startTest();
 			SettingsController.ConsoleModel model = SettingsController.save(
-				new Map<String, Object>{
-					CORE_KEY => 'The {LastName} Household',
-					GIVING_KEY => '12-3456789'
-				}
+				new Map<String, Object>{ CORE_KEY => 'The {LastName} Household', GIVING_KEY => '12-3456789' }
 			);
 			Test.stopTest();
 

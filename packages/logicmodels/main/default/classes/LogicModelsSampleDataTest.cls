@@ -50,11 +50,7 @@ private class LogicModelsSampleDataTest {
 	private static Logic_Model__c organizationModel() {
 		Logic_Model__c own = new Logic_Model__c(Name = 'Our theory of change');
 		insert own;
-		insert new Logic_Model_Element__c(
-			Logic_Model__c = own.Id,
-			Name = 'Our staff',
-			Type__c = 'Input'
-		);
+		insert new Logic_Model_Element__c(Logic_Model__c = own.Id, Name = 'Our staff', Type__c = 'Input');
 		return own;
 	}
 
@@ -109,10 +105,7 @@ private class LogicModelsSampleDataTest {
 			Assert.areEqual(String.valueOf(programs.get(TUTORING)), reading.Program_Id__c);
 			Assert.areEqual(reading.Program_Id__c, reading.Scope_Key__c, 'The program scope.');
 			Assert.isTrue(reading.Sample_Data__c, 'Flagged for removal.');
-			Assert.areEqual(
-				String.valueOf(programs.get(PANTRY)),
-				byName.get('Food pantry logic model').Program_Id__c
-			);
+			Assert.areEqual(String.valueOf(programs.get(PANTRY)), byName.get('Food pantry logic model').Program_Id__c);
 
 			String model = reading.Name;
 			Assert.areEqual(4, partsOf(model, 'Input'), 'Four inputs.');
@@ -135,10 +128,7 @@ private class LogicModelsSampleDataTest {
 				[
 					SELECT COUNT()
 					FROM Logic_Model_Element__c
-					WHERE
-						Logic_Model__r.Name = :model
-						AND Type__c = 'Outcome'
-						AND Indicator_Count__c = 0
+					WHERE Logic_Model__r.Name = :model AND Type__c = 'Outcome' AND Indicator_Count__c = 0
 				],
 				'Every tutoring outcome has an indicator, so Things to Look At is clear.'
 			);
@@ -159,8 +149,7 @@ private class LogicModelsSampleDataTest {
 			Assert.areEqual(8, [SELECT COUNT() FROM Assumption_Evidence__c], 'Evidence.');
 			Assert.areEqual(
 				4,
-				[SELECT COUNT_DISTINCT(Strength__c) strengths FROM Assumption_Evidence__c][0]
-					.get('strengths'),
+				[SELECT COUNT_DISTINCT(Strength__c) strengths FROM Assumption_Evidence__c][0].get('strengths'),
 				'Every strength, challenges included.'
 			);
 			Assert.areEqual(11, [SELECT COUNT() FROM Indicator__c], 'Indicators.');

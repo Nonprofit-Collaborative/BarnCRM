@@ -82,12 +82,7 @@ public with sharing class FormSubmitService {
 	 * @param contextRecordId the record the form was filled from, or null
 	 * @param files `{ key: { name, data } }`, data in base64, or null
 	 */
-	public static Result submit(
-		Id formId,
-		Map<String, Object> answers,
-		Id contextRecordId,
-		Map<String, Object> files
-	) {
+	public static Result submit(Id formId, Map<String, Object> answers, Id contextRecordId, Map<String, Object> files) {
 		Form__c form = publishedForm(formId);
 		Form_Version__c version = latestVersion(form);
 		Map<String, Object> definition = FormRules.parse(version.Definition__c);
@@ -196,11 +191,7 @@ public with sharing class FormSubmitService {
 	 * Why a public submission is held rather than written, or null (R-FS6): a mapping the
 	 * allowlist refuses, or a record it was filled from that no module names this form for.
 	 */
-	private static String publicRefusal(
-		Form__c form,
-		Form_Submission__c submission,
-		Map<String, Object> definition
-	) {
+	private static String publicRefusal(Form__c form, Form_Submission__c submission, Map<String, Object> definition) {
 		String problem = FormPublicPolicy.problem(definition);
 		if (problem != null) {
 			return problem;
@@ -279,15 +270,10 @@ public with sharing class FormSubmitService {
 					submission.Organization__c = written.recordId;
 				}
 			}
-			FormFiles.share(
-				submission.Id,
-				new List<Id>{ submission.Person__c, submission.Organization__c }
-			);
+			FormFiles.share(submission.Id, new List<Id>{ submission.Person__c, submission.Organization__c });
 			submission.Status__c = PROCESSED;
 			submission.Message__c = null;
-			List<String> failures = FormAttachmentExtensions.notify(
-				receipt(form, submission, counted, ids, contextId)
-			);
+			List<String> failures = FormAttachmentExtensions.notify(receipt(form, submission, counted, ids, contextId));
 			if (!failures.isEmpty()) {
 				submission.Status__c = NEEDS_REVIEW;
 				submission.Message__c = BarnHelp.text(
@@ -328,13 +314,7 @@ public with sharing class FormSubmitService {
 	}
 
 	/** Puts a submission back as it was before a rolled back attempt, with a new status. */
-	private static void held(
-		Result result,
-		Form_Submission__c submission,
-		Id person,
-		Id organization,
-		String status
-	) {
+	private static void held(Result result, Form_Submission__c submission, Id person, Id organization, String status) {
 		result.records.clear();
 		submission.Person__c = person;
 		submission.Organization__c = organization;
@@ -391,9 +371,7 @@ public with sharing class FormSubmitService {
 			entry.rule = matching.get('rule') == null
 				? (entry.kind == 'organization' ? 'name' : 'emailThenNamePostal')
 				: String.valueOf(matching.get('rule'));
-			entry.onMatch = matching.get('onMatch') == null
-				? 'fillBlanks'
-				: String.valueOf(matching.get('onMatch'));
+			entry.onMatch = matching.get('onMatch') == null ? 'fillBlanks' : String.valueOf(matching.get('onMatch'));
 			byKey.put(entry.key, entry);
 			if (entry.kind == 'person') {
 				people.add(entry);
@@ -456,10 +434,7 @@ public with sharing class FormSubmitService {
 			}
 		}
 		Schema.SObjectType type = typeOf(entry.objectName);
-		Map<String, Schema.SObjectField> fieldMap = type.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fieldMap = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		Written written = new Written();
 		written.key = entry.key;
 		written.kind = entry.kind;
@@ -475,15 +450,11 @@ public with sharing class FormSubmitService {
 			written.action = fill(type, fieldMap, entry, matched) ? 'updated' : 'matched';
 			return written;
 		}
-		String nameField = entry.kind == 'person'
-			? 'LastName'
-			: (entry.kind == 'organization' ? 'Name' : null);
+		String nameField = entry.kind == 'person' ? 'LastName' : (entry.kind == 'organization' ? 'Name' : null);
 		if (nameField != null && text(entry.fields, nameField) == null) {
 			return null;
 		}
-		Id recordTypeId = entry.kind == 'organization'
-			? AccountKinds.organizationRecordTypeId()
-			: null;
+		Id recordTypeId = entry.kind == 'organization' ? AccountKinds.organizationRecordTypeId() : null;
 		// With no record type the field is left unset: an explicit null is refused (ADR-0141).
 		// Defaults are not loaded here: the platform applies them on insert, and loading them
 		// would set fields the user may not be able to edit, which a user mode insert refuses.
@@ -528,11 +499,7 @@ public with sharing class FormSubmitService {
 				names.add(describedField(fieldMap, objectName, fieldName).getName());
 			}
 			current = Database.queryWithBinds(
-				'SELECT Id, ' +
-					String.join(names, ', ') +
-					' FROM ' +
-					objectName +
-					' WHERE Id = :recordId',
+				'SELECT Id, ' + String.join(names, ', ') + ' FROM ' + objectName + ' WHERE Id = :recordId',
 				new Map<String, Object>{ 'recordId' => recordId },
 				AccessLevel.USER_MODE
 			)[0];
@@ -601,10 +568,7 @@ public with sharing class FormSubmitService {
 		ImportMatcher.forgetHeldKeys();
 		String key = ImportMatcher.nameKey(text(entry.fields, 'Name'));
 		if (key != null) {
-			Map<String, Id> found = ImportMatcher.accountsByName(
-				new Set<String>{ key },
-				recordTypeId
-			);
+			Map<String, Id> found = ImportMatcher.accountsByName(new Set<String>{ key }, recordTypeId);
 			if (found.containsKey(key)) {
 				if (ImportMatcher.isHeldByMany(key)) {
 					throw ambiguous(Account.SObjectType);
@@ -628,11 +592,7 @@ public with sharing class FormSubmitService {
 	}
 
 	/** The org's own duplicate rules, when one is active: one match is taken, several held. */
-	private static Id byDuplicateRules(
-		Schema.SObjectType type,
-		Map<String, Object> fields,
-		Id recordTypeId
-	) {
+	private static Id byDuplicateRules(Schema.SObjectType type, Map<String, Object> fields, Id recordTypeId) {
 		Map<String, String> values = duplicateRuleValues(fields);
 		if (values.isEmpty()) {
 			return null;
@@ -672,9 +632,7 @@ public with sharing class FormSubmitService {
 	private static Schema.SObjectType typeOf(String objectName) {
 		Schema.SObjectType type = NamespaceUtil.objectType(objectName);
 		if (type == null) {
-			throw new FormException(
-				BarnHelp.text('Forms', 'Forms_Submit_NoObject', new List<Object>{ objectName })
-			);
+			throw new FormException(BarnHelp.text('Forms', 'Forms_Submit_NoObject', new List<Object>{ objectName }));
 		}
 		return type;
 	}
@@ -687,11 +645,7 @@ public with sharing class FormSubmitService {
 		Schema.SObjectField field = NamespaceUtil.field(fieldMap, fieldName);
 		if (field == null) {
 			throw new FormException(
-				BarnHelp.text(
-					'Forms',
-					'Forms_Submit_NoField',
-					new List<Object>{ objectName, fieldName }
-				)
+				BarnHelp.text('Forms', 'Forms_Submit_NoField', new List<Object>{ objectName, fieldName })
 			);
 		}
 		return field.getDescribe();

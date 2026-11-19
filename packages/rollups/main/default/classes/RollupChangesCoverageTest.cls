@@ -61,10 +61,7 @@ private class RollupChangesCoverageTest {
 			collected.add(targeting('  '), new Set<Id>{ first });
 			collected.add(targeting('Account'), null);
 			collected.add(targeting('Account'), new Set<Id>{ null });
-			Assert.isTrue(
-				collected.isEmpty(),
-				'No definition, a blank target, no ids, or a null id marks nothing'
-			);
+			Assert.isTrue(collected.isEmpty(), 'No definition, a blank target, no ids, or a null id marks nothing');
 
 			collected.add(targeting('ACCOUNT'), new Set<Id>{ first, null });
 			RollupChanges.Marked other = new RollupChanges.Marked();
@@ -93,13 +90,7 @@ private class RollupChangesCoverageTest {
 			child.ParentId = FakeIds.of(Account.SObjectType, 6);
 
 			Assert.isTrue(
-				RollupChanges.forSave(
-						'Not_An_Object__c',
-						new List<SObject>{ child },
-						null,
-						false,
-						definitions
-					)
+				RollupChanges.forSave('Not_An_Object__c', new List<SObject>{ child }, null, false, definitions)
 					.isEmpty(),
 				'An entity the org does not have marks nothing'
 			);
@@ -108,17 +99,11 @@ private class RollupChangesCoverageTest {
 				'No records marks nothing'
 			);
 			Assert.isTrue(
-				RollupChanges.forSave('Account', new List<SObject>(), null, false, definitions)
-					.isEmpty(),
+				RollupChanges.forSave('Account', new List<SObject>(), null, false, definitions).isEmpty(),
 				'An empty save marks nothing'
 			);
 			Assert.isTrue(
-				RollupChanges.afterDelete(
-						'Not_An_Object__c',
-						new List<SObject>{ child },
-						definitions
-					)
-					.isEmpty(),
+				RollupChanges.afterDelete('Not_An_Object__c', new List<SObject>{ child }, definitions).isEmpty(),
 				'A delete of an unknown entity marks nothing'
 			);
 			Assert.isTrue(
@@ -131,22 +116,12 @@ private class RollupChangesCoverageTest {
 			);
 			Assert.areEqual(
 				new Set<Id>{ child.ParentId },
-				marked(
-					RollupChanges.forSave(
-						'Account',
-						new List<SObject>{ child },
-						null,
-						false,
-						definitions
-					)
-				),
+				marked(RollupChanges.forSave('Account', new List<SObject>{ child }, null, false, definitions)),
 				'The same save does mark the parent once the entity is real'
 			);
 			Assert.areEqual(
 				new Set<Id>{ child.ParentId },
-				marked(
-					RollupChanges.afterDelete('Account', new List<SObject>{ child }, definitions)
-				),
+				marked(RollupChanges.afterDelete('Account', new List<SObject>{ child }, definitions)),
 				'And so does its delete'
 			);
 		}
@@ -188,11 +163,7 @@ private class RollupChangesCoverageTest {
 				marked(saved),
 				'The readable definition still marks its parent'
 			);
-			Assert.areEqual(
-				new Set<Id>{ child.ParentId },
-				marked(deleted),
-				'And still does on a delete'
-			);
+			Assert.areEqual(new Set<Id>{ child.ParentId }, marked(deleted), 'And still does on a delete');
 		}
 	}
 
@@ -218,26 +189,18 @@ private class RollupChangesCoverageTest {
 				new List<SObject>{ saved },
 				null,
 				false,
-				new List<Rollup_Definition__c>{
-					definition('Affiliation__c', 'Contact__c > AccountId')
-				}
+				new List<Rollup_Definition__c>{ definition('Affiliation__c', 'Contact__c > AccountId') }
 			);
 			RollupChanges.Marked twoSteps = RollupChanges.forSave(
 				'Affiliation__c',
 				new List<SObject>{ saved },
 				null,
 				false,
-				new List<Rollup_Definition__c>{
-					definition('Affiliation__c', 'Contact__c > AccountId > ParentId')
-				}
+				new List<Rollup_Definition__c>{ definition('Affiliation__c', 'Contact__c > AccountId > ParentId') }
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				new Set<Id>{ parent.Id },
-				marked(oneStep),
-				'The account the person is on'
-			);
+			Assert.areEqual(new Set<Id>{ parent.Id }, marked(oneStep), 'The account the person is on');
 			Assert.areEqual(
 				new Set<Id>{ grandparent.Id },
 				marked(twoSteps),
@@ -249,9 +212,7 @@ private class RollupChangesCoverageTest {
 	@IsTest
 	static void aPathThatCannotBeWalkedMarksNothingAndIsLogged() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			Contact ana = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Okafor')
-			);
+			Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Okafor'));
 			insert ana;
 			Id affiliationId = FakeIds.of(Affiliation__c.SObjectType, 1);
 			Affiliation__c saved = new Affiliation__c(Id = affiliationId, Contact__c = ana.Id);
@@ -269,16 +230,11 @@ private class RollupChangesCoverageTest {
 				new List<SObject>{ saved },
 				null,
 				false,
-				new List<Rollup_Definition__c>{
-					definition('Affiliation__c', 'Contact__c > NoSuchReference')
-				}
+				new List<Rollup_Definition__c>{ definition('Affiliation__c', 'Contact__c > NoSuchReference') }
 			);
 			Test.stopTest();
 
-			Assert.isTrue(
-				unknownFirst.isEmpty(),
-				'A reference the entity does not have marks nothing'
-			);
+			Assert.isTrue(unknownFirst.isEmpty(), 'A reference the entity does not have marks nothing');
 			Assert.isTrue(
 				unknownSecond.isEmpty(),
 				'A second step the query cannot read marks nothing and does not throw'
@@ -298,9 +254,7 @@ private class RollupChangesCoverageTest {
 			Contact ben = TestDataFactory.person(
 				new Contact(FirstName = 'Ben', LastName = 'Nolan', AccountId = nolan.Id)
 			);
-			Contact cal = TestDataFactory.person(
-				new Contact(FirstName = 'Cal', LastName = 'Lee', AccountId = lee.Id)
-			);
+			Contact cal = TestDataFactory.person(new Contact(FirstName = 'Cal', LastName = 'Lee', AccountId = lee.Id));
 			insert new List<Contact>{ ana, ben, cal };
 			List<Rollup_Definition__c> definitions = new List<Rollup_Definition__c>{
 				definition('Affiliation__c', 'Contact__c > {HouseholdMembers}')
@@ -317,12 +271,8 @@ private class RollupChangesCoverageTest {
 			);
 			RollupChanges.Marked moved = RollupChanges.forSave(
 				'Contact',
-				new List<SObject>{
-					new Contact(Id = ana.Id, AccountId = lee.Id, LastName = 'Nolan')
-				},
-				new Map<Id, SObject>{
-					ana.Id => new Contact(Id = ana.Id, AccountId = nolan.Id, LastName = 'Nolan')
-				},
+				new List<SObject>{ new Contact(Id = ana.Id, AccountId = lee.Id, LastName = 'Nolan') },
+				new Map<Id, SObject>{ ana.Id => new Contact(Id = ana.Id, AccountId = nolan.Id, LastName = 'Nolan') },
 				false,
 				definitions
 			);
@@ -400,10 +350,7 @@ private class RollupChangesCoverageTest {
 				expected.add(oldParent);
 				expected.add(newParent);
 				now.add(new Account(Id = childId, Name = 'Child ' + i, ParentId = newParent));
-				before.put(
-					childId,
-					new Account(Id = childId, Name = 'Child ' + i, ParentId = oldParent)
-				);
+				before.put(childId, new Account(Id = childId, Name = 'Child ' + i, ParentId = oldParent));
 			}
 
 			Test.startTest();
@@ -416,11 +363,7 @@ private class RollupChangesCoverageTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				400,
-				moved.size(),
-				'Two hundred records leave one parent and join another'
-			);
+			Assert.areEqual(400, moved.size(), 'Two hundred records leave one parent and join another');
 			Assert.areEqual(expected, marked(moved), 'Every one of the 400 parents is marked');
 		}
 	}
@@ -436,35 +379,18 @@ private class RollupChangesCoverageTest {
 				fields
 			);
 			Assert.isTrue(local.contains('name'), 'A plain attribute is read as itself');
-			Assert.isTrue(
-				local.contains('parentid'),
-				'A standard reference is read through its Id'
-			);
-			Assert.isFalse(
-				local.contains('nosuchfield__c'),
-				'An attribute the entity does not have is dropped'
-			);
-			Assert.isFalse(
-				local.contains('owner__c'),
-				'A custom reference the entity does not have is dropped too'
-			);
+			Assert.isTrue(local.contains('parentid'), 'A standard reference is read through its Id');
+			Assert.isFalse(local.contains('nosuchfield__c'), 'An attribute the entity does not have is dropped');
+			Assert.isFalse(local.contains('owner__c'), 'A custom reference the entity does not have is dropped too');
 
-			Account before = TestDataFactory.organization(
-				new Account(Name = 'Old', NumberOfEmployees = 1)
-			);
-			Account after = TestDataFactory.organization(
-				new Account(Name = 'Old', NumberOfEmployees = 2)
-			);
+			Account before = TestDataFactory.organization(new Account(Name = 'Old', NumberOfEmployees = 1));
+			Account after = TestDataFactory.organization(new Account(Name = 'Old', NumberOfEmployees = 2));
 			Assert.isFalse(
 				RollupChanges.changed(new Set<String>{ 'name' }, after, before),
 				'The same name is no change'
 			);
 			Assert.isTrue(
-				RollupChanges.changed(
-					new Set<String>{ 'name', 'numberofemployees' },
-					after,
-					before
-				),
+				RollupChanges.changed(new Set<String>{ 'name', 'numberofemployees' }, after, before),
 				'A different head count is'
 			);
 		}

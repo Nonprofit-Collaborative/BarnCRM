@@ -12,10 +12,7 @@ private class RollupAttentionControllerTest {
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-		);
+		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 	}
 
 	@IsTest
@@ -53,9 +50,7 @@ private class RollupAttentionControllerTest {
 			Record_Count__c = ids.size(),
 			Status__c = status,
 			Attempts__c = attempts,
-			Last_Error__c = status == RollupQueue.STATUS_FAILED
-				? 'A validation rule refused it.'
-				: null
+			Last_Error__c = status == RollupQueue.STATUS_FAILED ? 'A validation rule refused it.' : null
 		);
 	}
 
@@ -101,10 +96,7 @@ private class RollupAttentionControllerTest {
 			}
 			System.Assert.areEqual(new Set<String>{ 'Rivera Household', 'Chen Household' }, names);
 			System.Assert.isFalse(attention.nightlyScheduled, 'The nightly run is off');
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRunNever'),
-				attention.lastRun
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_LastRunNever'), attention.lastRun);
 		}
 	}
 
@@ -115,10 +107,7 @@ private class RollupAttentionControllerTest {
 			System.runAs(maria()) {
 				attention = RollupAttentionController.getAttention();
 			}
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_RollupBuilder_NothingWaiting'),
-				attention.waiting
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_NothingWaiting'), attention.waiting);
 			System.Assert.isTrue(attention.failed.isEmpty());
 		}
 	}
@@ -190,10 +179,7 @@ private class RollupAttentionControllerTest {
 					message = refused.getMessage();
 				}
 			}
-			System.Assert.areEqual(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
-				message
-			);
+			System.Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'), message);
 			System.Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Rollup_Queue__c WHERE Status__c = :RollupQueue.STATUS_FAILED]

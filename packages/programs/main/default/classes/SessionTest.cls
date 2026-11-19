@@ -21,9 +21,7 @@ private class SessionTest {
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -32,11 +30,7 @@ private class SessionTest {
 	private static Service__c tutoring() {
 		Program__c program = new Program__c(Name = 'After School');
 		insert program;
-		Service__c service = new Service__c(
-			Program__c = program.Id,
-			Name = 'Tutoring',
-			Unit_Of_Measure__c = 'hours'
-		);
+		Service__c service = new Service__c(Program__c = program.Id, Name = 'Tutoring', Unit_Of_Measure__c = 'hours');
 		insert service;
 		return service;
 	}
@@ -75,10 +69,7 @@ private class SessionTest {
 		return session;
 	}
 
-	private static ServiceDeliveryLogController.Row rowOf(
-		ServiceDeliveryLogController.Log log,
-		Id person
-	) {
+	private static ServiceDeliveryLogController.Row rowOf(ServiceDeliveryLogController.Log log, Id person) {
 		for (ServiceDeliveryLogController.Row row : log.rows) {
 			if (row.key == person) {
 				return row;
@@ -113,9 +104,7 @@ private class SessionTest {
 			Date second = Date.newInstance(2027, 3, 9);
 
 			Test.startTest();
-			SessionScheduleController.Schedule offered = SessionScheduleController.getSchedule(
-				spring.Id
-			);
+			SessionScheduleController.Schedule offered = SessionScheduleController.getSchedule(spring.Id);
 			SessionScheduleController.Schedule done = SessionScheduleController.scheduleSessions(
 				spring.Id,
 				service.Id,
@@ -125,11 +114,7 @@ private class SessionTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				spring.Start_Date__c,
-				offered.startDate,
-				'The cohort\'s dates offered.'
-			);
+			Assert.areEqual(spring.Start_Date__c, offered.startDate, 'The cohort\'s dates offered.');
 			Assert.areEqual(1, offered.services.size(), 'The program\'s active service.');
 			Assert.isTrue(offered.canSchedule, 'The admin may schedule.');
 			Assert.areEqual(2, done.created, 'One per distinct date.');
@@ -225,12 +210,7 @@ private class SessionTest {
 				null,
 				null
 			);
-			List<Date> taken = SessionScheduleController.getTakenDays(
-				spring.Id,
-				service.Id,
-				first,
-				third
-			);
+			List<Date> taken = SessionScheduleController.getTakenDays(spring.Id, service.Id, first, third);
 			SessionScheduleController.Schedule twice = SessionScheduleController.scheduleSessions(
 				spring.Id,
 				service.Id,
@@ -271,11 +251,7 @@ private class SessionTest {
 			insert other;
 			Service__c meal = new Service__c(Program__c = other.Id, Name = 'Meal');
 			insert meal;
-			Service__c inactive = new Service__c(
-				Program__c = service.Program__c,
-				Name = 'Old',
-				Active__c = false
-			);
+			Service__c inactive = new Service__c(Program__c = service.Program__c, Name = 'Old', Active__c = false);
 			insert inactive;
 			List<Date> tooMany = new List<Date>();
 			for (Integer i = 0; i <= SessionScheduleController.MAX_SESSIONS; i++) {
@@ -289,13 +265,7 @@ private class SessionTest {
 				try {
 					switch on attempt {
 						when 0 {
-							SessionScheduleController.scheduleSessions(
-								service.Program__c,
-								meal.Id,
-								one,
-								null,
-								null
-							);
+							SessionScheduleController.scheduleSessions(service.Program__c, meal.Id, one, null, null);
 						}
 						when 1 {
 							SessionScheduleController.scheduleSessions(
@@ -349,11 +319,7 @@ private class SessionTest {
 				refusals[0],
 				'Not its service.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired'),
-				refusals[1],
-				'Not active.'
-			);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Schedule_ServiceRequired'), refusals[1], 'Not active.');
 			Assert.areEqual(
 				String.format(
 					BarnHelp.text('Programs', 'Programs_Schedule_TooMany'),
@@ -410,9 +376,7 @@ private class SessionTest {
 			Session__c session = sessionOf(service, spring.Id, Date.newInstance(2027, 3, 2));
 
 			Test.startTest();
-			ServiceDeliveryLogController.Log before = ServiceDeliveryLogController.getSessionLog(
-				session.Id
-			);
+			ServiceDeliveryLogController.Log before = ServiceDeliveryLogController.getSessionLog(session.Id);
 			ServiceDeliveryLogController.Log after = ServiceDeliveryLogController.saveSession(
 				session.Id,
 				new List<ServiceDeliveryLogController.Entry>{
@@ -423,9 +387,7 @@ private class SessionTest {
 			ServiceDeliveryLogController.Row anaRow = rowOf(after, ana.Contact__c);
 			ServiceDeliveryLogController.Log again = ServiceDeliveryLogController.saveSession(
 				session.Id,
-				new List<ServiceDeliveryLogController.Entry>{
-					entry(ana, anaRow.deliveryId, 'Present', 3)
-				}
+				new List<ServiceDeliveryLogController.Entry>{ entry(ana, anaRow.deliveryId, 'Present', 3) }
 			);
 			Test.stopTest();
 
@@ -455,8 +417,7 @@ private class SessionTest {
 			}
 			Assert.areEqual(
 				SessionAttendance.HELD,
-				[SELECT Status__c FROM Session__c WHERE Id = :session.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Session__c WHERE Id = :session.Id WITH SYSTEM_MODE].Status__c,
 				'R-SE2: saving marks it Held.'
 			);
 		}
@@ -481,9 +442,7 @@ private class SessionTest {
 			insert earlier;
 
 			Test.startTest();
-			ServiceDeliveryLogController.Log before = ServiceDeliveryLogController.getSessionLog(
-				session.Id
-			);
+			ServiceDeliveryLogController.Log before = ServiceDeliveryLogController.getSessionLog(session.Id);
 			// Sent as new, as a page opened before the earlier row was made would.
 			ServiceDeliveryLogController.saveSession(
 				session.Id,
@@ -574,9 +533,7 @@ private class SessionTest {
 			update session;
 
 			Test.startTest();
-			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getSessionLog(
-				session.Id
-			);
+			ServiceDeliveryLogController.Log log = ServiceDeliveryLogController.getSessionLog(session.Id);
 			String refusal;
 			try {
 				ServiceDeliveryLogController.saveSession(
@@ -590,10 +547,7 @@ private class SessionTest {
 
 			Assert.isTrue(log.cancelled, 'R-SE3.');
 			Assert.isFalse(log.canEdit, 'No controls on a cancelled session.');
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Session_CancelledNoAttendance'),
-				refusal
-			);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Session_CancelledNoAttendance'), refusal);
 			Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c WITH SYSTEM_MODE]);
 		}
 	}
@@ -667,15 +621,9 @@ private class SessionTest {
 	@IsTest
 	static void namesAndTimesAreReadAsWritten() {
 		System.runAs(admin()) {
-			Assert.areEqual(
-				80,
-				SessionScheduleController.sessionName('x'.repeat(100), Date.today()).length()
-			);
+			Assert.areEqual(80, SessionScheduleController.sessionName('x'.repeat(100), Date.today()).length());
 			Assert.isNull(SessionScheduleController.parsedTime(' '));
-			Assert.areEqual(
-				Time.newInstance(9, 5, 0, 0),
-				SessionScheduleController.parsedTime('09:05')
-			);
+			Assert.areEqual(Time.newInstance(9, 5, 0, 0), SessionScheduleController.parsedTime('09:05'));
 		}
 	}
 }

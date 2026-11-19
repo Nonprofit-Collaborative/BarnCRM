@@ -82,8 +82,7 @@ public with sharing class EventRegistrationsController {
 				Schema.SObjectType.Event_Attendee__c.isCreateable();
 			result.canChange = Schema.SObjectType.Event_Attendee__c.isUpdateable();
 			result.canSendPaymentLink =
-				Schema.SObjectType.Event_Registration__c.isUpdateable() &&
-				EventPayments.api() != null;
+				Schema.SObjectType.Event_Registration__c.isUpdateable() && EventPayments.api() != null;
 			result.currencyCode = UserInfo.getDefaultCurrency();
 			labels(
 				result,
@@ -95,13 +94,7 @@ public with sharing class EventRegistrationsController {
 				result,
 				Schema.SObjectType.Event_Registration__c.fields.getMap(),
 				'Event_Registration__c',
-				new List<String>{
-					'Name',
-					'Contact__c',
-					'Promo_Code__c',
-					'Source__c',
-					'Payment_Status__c'
-				}
+				new List<String>{ 'Name', 'Contact__c', 'Promo_Code__c', 'Source__c', 'Payment_Status__c' }
 			);
 			labels(
 				result,
@@ -157,10 +150,7 @@ public with sharing class EventRegistrationsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getRegistrations', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Registrations_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Registrations_LoadFailed'));
 		}
 	}
 
@@ -232,9 +222,7 @@ public with sharing class EventRegistrationsController {
 	public static String sendPaymentLink(Id registrationId) {
 		try {
 			if (!Schema.SObjectType.Event_Registration__c.isUpdateable()) {
-				throw new EventPayments.PaymentLinkException(
-					BarnHelp.text('Events', 'Events_Shared_NotSaved')
-				);
+				throw new EventPayments.PaymentLinkException(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 			}
 			String outcome = EventPayments.sendLink(registrationId);
 			return outcome == EventTemplateMail.SENT

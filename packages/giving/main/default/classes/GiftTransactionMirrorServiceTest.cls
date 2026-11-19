@@ -54,9 +54,7 @@ private class GiftTransactionMirrorServiceTest {
 
 	private static Gift__c reread(Id giftId) {
 		return (Gift__c) Database.queryWithBinds(
-			'SELECT ' +
-				GiftTransactionMirrorSelector.GIFT_FIELDS +
-				' FROM Gift__c WHERE Id = :giftId',
+			'SELECT ' + GiftTransactionMirrorSelector.GIFT_FIELDS + ' FROM Gift__c WHERE Id = :giftId',
 			new Map<String, Object>{ 'giftId' => giftId },
 			AccessLevel.SYSTEM_MODE
 		)[0];
@@ -108,33 +106,17 @@ private class GiftTransactionMirrorServiceTest {
 				GiftTransactionMirrorService.isAvailable(),
 				'Without Gift Transaction the mirror is unavailable (R-GT1).'
 			);
-			Assert.isFalse(
-				GiftTransactionMirrorService.isOn(),
-				'A chosen direction does not switch it on.'
-			);
+			Assert.isFalse(GiftTransactionMirrorService.isOn(), 'A chosen direction does not switch it on.');
 			Assert.isFalse(GiftTransactionMirrorService.canRun(), 'No run could work.');
-			Assert.isFalse(
-				GiftTransactionMirrorSchema.canWriteDesignations(),
-				'Nor write designations.'
-			);
+			Assert.isFalse(GiftTransactionMirrorSchema.canWriteDesignations(), 'Nor write designations.');
 			Assert.isNull(GiftTransactionMirrorSchema.objectName(), 'No object name is resolved.');
-			Assert.isTrue(
-				GiftTransactionMirrorSchema.creatable().isEmpty(),
-				'No field is writable.'
-			);
-			Assert.isFalse(
-				GiftTransactionMirrorSchema.isActiveStatus('Paid'),
-				'No status is known.'
-			);
+			Assert.isTrue(GiftTransactionMirrorSchema.creatable().isEmpty(), 'No field is writable.');
+			Assert.isFalse(GiftTransactionMirrorSchema.isActiveStatus('Paid'), 'No status is known.');
 
 			GiftTransactionMirrorService.Result result = GiftTransactionMirrorService.copyGifts(
 				new List<Gift__c>{ gift }
 			);
-			Assert.areEqual(
-				0,
-				result.created + result.failed + result.unchanged,
-				'A run copies nothing.'
-			);
+			Assert.areEqual(0, result.created + result.failed + result.unchanged, 'A run copies nothing.');
 
 			gift.Gift_Transaction_Id__c = 'anything typed';
 			update as user gift;
@@ -161,10 +143,7 @@ private class GiftTransactionMirrorServiceTest {
 			Assert.isTrue(GiftTransactionMirrorService.isOn(), 'Available and chosen: on.');
 			Assert.isTrue(GiftTransactionMirrorService.canRun(), 'Maria can run it.');
 			Assert.areEqual(Date.newInstance(2026, 1, 1), GiftTransactionMirrorService.startDate());
-			Assert.isNull(
-				GiftTransactionMirrorService.notReadyReason(),
-				'Status and start date are set.'
-			);
+			Assert.isNull(GiftTransactionMirrorService.notReadyReason(), 'Status and start date are set.');
 
 			setPaidStatus(null);
 			Assert.areEqual(
@@ -211,19 +190,11 @@ private class GiftTransactionMirrorServiceTest {
 			String linked = reread(gift.Id).Gift_Transaction_Id__c;
 			Assert.isNotNull(linked, 'And its identifier is stored on the gift.');
 			Gift__c created = standIn(linked);
-			Assert.areEqual(
-				gift.Household__c,
-				created.Donor_Account__c,
-				'The donor is the household.'
-			);
+			Assert.areEqual(gift.Household__c, created.Donor_Account__c, 'The donor is the household.');
 			Assert.areEqual(GIFT_DATE, created.Gift_Date__c);
 			Assert.areEqual(100, created.Amount__c);
 			Assert.areEqual('Received', created.Status__c, 'With the paid status.');
-			Assert.areEqual(
-				0,
-				first.designated,
-				'A Gift Transaction that has a designation gets none (R-GT5).'
-			);
+			Assert.areEqual(0, first.designated, 'A Gift Transaction that has a designation gets none (R-GT5).');
 
 			GiftTransactionMirrorService.Result again = GiftTransactionMirrorService.copyGifts(
 				new List<Gift__c>{ reread(gift.Id) }
@@ -276,9 +247,7 @@ private class GiftTransactionMirrorServiceTest {
 			Assert.areEqual(2, result.created);
 			Assert.areEqual(1, result.designated, 'The linked fund becomes a designation (R-GT5).');
 			Assert.areEqual(1, result.undesignated, 'The unlinked fund is counted, not guessed.');
-			List<Gift_Allocation__c> written = designationsOf(
-				reread(designated.Id).Gift_Transaction_Id__c
-			);
+			List<Gift_Allocation__c> written = designationsOf(reread(designated.Id).Gift_Transaction_Id__c);
 			Assert.areEqual(1, written.size());
 			Assert.areEqual(designation.Id, written[0].Fund__c);
 			Assert.areEqual(100, written[0].Amount__c);
@@ -305,11 +274,7 @@ private class GiftTransactionMirrorServiceTest {
 				new List<Gift__c>{ noAccount, invalid, gone, pending }
 			);
 			Assert.areEqual(0, result.created);
-			Assert.areEqual(
-				3,
-				result.failed,
-				'No account, an invalid link and a missing Gift Transaction.'
-			);
+			Assert.areEqual(3, result.failed, 'No account, an invalid link and a missing Gift Transaction.');
 			Assert.areEqual(1, result.unchanged, 'A pending gift is not copied (R-GT3).');
 
 			Test.startTest();
@@ -355,10 +320,7 @@ private class GiftTransactionMirrorServiceTest {
 
 			gift.Gift_Transaction_Id__c = 'G-000001';
 			Database.SaveResult refused = Database.update(gift, false, AccessLevel.USER_MODE);
-			Assert.isFalse(
-				refused.isSuccess(),
-				'A typed value that is not a Gift Transaction is refused (R-GT9).'
-			);
+			Assert.isFalse(refused.isSuccess(), 'A typed value that is not a Gift Transaction is refused (R-GT9).');
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'),
 				refused.getErrors()[0].getMessage()

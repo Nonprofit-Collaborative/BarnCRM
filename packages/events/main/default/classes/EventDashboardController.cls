@@ -140,10 +140,7 @@ public with sharing class EventDashboardController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getDashboard', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Dashboard_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Dashboard_LoadFailed'));
 		}
 	}
 
@@ -161,19 +158,13 @@ public with sharing class EventDashboardController {
 		try {
 			Plan plan = parse(planJson);
 			if (hasRecords(eventId)) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Dashboard_NotEmpty')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Dashboard_NotEmpty'));
 			}
 			Map<String, Event_Track__c> tracks = new Map<String, Event_Track__c>();
 			for (TrackPlan item : plan.tracks) {
 				tracks.put(
 					item.name,
-					new Event_Track__c(
-						Event__c = eventId,
-						Name = item.name,
-						Sort_Order__c = item.sortOrder
-					)
+					new Event_Track__c(Event__c = eventId, Name = item.name, Sort_Order__c = item.sortOrder)
 				);
 			}
 			insert as user tracks.values();
@@ -215,10 +206,7 @@ public with sharing class EventDashboardController {
 			if (e instanceof System.IllegalArgumentException) {
 				throw UserErrors.message(e.getMessage());
 			}
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed'));
 		}
 	}
 
@@ -255,9 +243,7 @@ public with sharing class EventDashboardController {
 	private static Plan parse(String planJson) {
 		Plan plan = (Plan) JSON.deserialize(planJson, Plan.class);
 		if (plan == null) {
-			throw new System.IllegalArgumentException(
-				BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed')
-			);
+			throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed'));
 		}
 		return plan;
 	}

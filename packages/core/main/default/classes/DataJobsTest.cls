@@ -27,11 +27,7 @@ private class DataJobsTest {
 			for (Decimal configured : expected.keySet()) {
 				settings.Bulk_Chunk_Size__c = configured;
 				TestDataFactory.saveSettings(settings);
-				Assert.areEqual(
-					expected.get(configured),
-					DataJobs.chunkSize(),
-					'Set ' + configured
-				);
+				Assert.areEqual(expected.get(configured), DataJobs.chunkSize(), 'Set ' + configured);
 			}
 		}
 	}
@@ -44,8 +40,8 @@ private class DataJobsTest {
 				Operation__c = BulkUpdateService.OPERATION_UPDATE,
 				Status__c = ImportBatchService.STATUS_COMMITTING,
 				Is_Dry_Run__c = false,
-				Job_Id__c = AsyncApexJob.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getKeyPrefix() + '000000000001AAA',
+				Job_Id__c = AsyncApexJob.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+					'000000000001AAA',
 				Undo_Deadline__c = Datetime.now().addDays(1)
 			);
 			insert job;
@@ -53,11 +49,7 @@ private class DataJobsTest {
 			Integer before = Limits.getQueries();
 			DataJobs.State state = DataJobs.stateOf(job, true);
 			Assert.areEqual(1, Limits.getQueries() - before, 'One read of the job');
-			Assert.areEqual(
-				ImportBatchService.STATUS_FAILED,
-				state.status,
-				'No job behind it: it was aborted'
-			);
+			Assert.areEqual(ImportBatchService.STATUS_FAILED, state.status, 'No job behind it: it was aborted');
 			Assert.isFalse(state.running);
 			Assert.isTrue(String.isBlank(state.refusal), 'An aborted job can be undone');
 			Assert.isNull(state.chunksDone, 'No progress for a job that is not running');
@@ -78,9 +70,7 @@ private class DataJobsTest {
 				Undo_Deadline__c = Datetime.now().addDays(1)
 			);
 			insert job;
-			Contact changed = TestDataFactory.person(
-				new Contact(LastName = 'Okafor', MailingCity = 'Portland')
-			);
+			Contact changed = TestDataFactory.person(new Contact(LastName = 'Okafor', MailingCity = 'Portland'));
 			insert changed;
 			ImportJournalService.write(
 				job.Id,

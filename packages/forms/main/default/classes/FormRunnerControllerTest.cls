@@ -50,11 +50,7 @@ private class FormRunnerControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				FormSubmitService.PROCESSED,
-				result.status,
-				'Processed: ' + result.message
-			);
+			Assert.areEqual(FormSubmitService.PROCESSED, result.status, 'Processed: ' + result.message);
 			Assert.areEqual(
 				FormSubmitService.INVALID,
 				FormRunnerController.submit(form.Id, '', null, null).status,

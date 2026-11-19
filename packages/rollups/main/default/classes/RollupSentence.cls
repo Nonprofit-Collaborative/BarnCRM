@@ -27,9 +27,7 @@ public with sharing class RollupSentence {
 	public static String of(Rollup_Definition__c definition) {
 		Schema.SObjectType sourceType = SettingsService.typeByName(definition.Source_Object__c);
 		Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
-		String aggregate = definition.Aggregate__c == null
-			? ''
-			: definition.Aggregate__c.toUpperCase();
+		String aggregate = definition.Aggregate__c == null ? '' : definition.Aggregate__c.toUpperCase();
 		Boolean readsField = !READS_NO_FIELD.contains(aggregate);
 		String sentence = String.format(
 			readsField
@@ -110,17 +108,13 @@ public with sharing class RollupSentence {
 			}
 			Schema.SObjectField field = reached == null
 				? null
-				: reached.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.fields.getMap()
-						.get(segment.toLowerCase());
+				: reached.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get(segment.toLowerCase());
 			String label = segment;
 			reached = null;
 			if (field != null) {
 				Schema.DescribeFieldResult described = field.getDescribe();
 				label = described.getLabel().removeEndIgnoreCase(' ID');
-				reached = described.getReferenceTo().size() == 1
-					? described.getReferenceTo()[0]
-					: null;
+				reached = described.getReferenceTo().size() == 1 ? described.getReferenceTo()[0] : null;
 			}
 			text = String.isBlank(text) ? label : text + ' > ' + label;
 		}
@@ -134,9 +128,7 @@ public with sharing class RollupSentence {
 		}
 		Schema.SObjectField field = type == null
 			? null
-			: type.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.fields.getMap()
-					.get(fieldName.toLowerCase());
+			: type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().get(fieldName.toLowerCase());
 		return field == null ? fieldName : field.getDescribe().getLabel();
 	}
 

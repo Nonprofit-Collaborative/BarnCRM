@@ -45,9 +45,7 @@ public with sharing class AskSelector {
 			? [
 					SELECT Outcome__c outcome, COUNT(Id) asks, SUM(Amount__c) amount
 					FROM Ask__c
-					WHERE
-						Outcome__c IN :AskRules.CLOSED_OUTCOMES
-						AND Closed_Date__c = THIS_FISCAL_YEAR
+					WHERE Outcome__c IN :AskRules.CLOSED_OUTCOMES AND Closed_Date__c = THIS_FISCAL_YEAR
 					WITH USER_MODE
 					GROUP BY Outcome__c
 			  ]
@@ -161,10 +159,7 @@ public with sharing class AskSelector {
 						Donor_Account__r.Name,
 						Owner.Name
 					FROM Ask__c
-					WHERE
-						Outcome__c IN :AskRules.CLOSED_OUTCOMES
-						AND Closed_Date__c >= :since
-						AND OwnerId = :ownerId
+					WHERE Outcome__c IN :AskRules.CLOSED_OUTCOMES AND Closed_Date__c >= :since AND OwnerId = :ownerId
 					WITH USER_MODE
 					ORDER BY Closed_Date__c DESC, Name
 					LIMIT :maxRows

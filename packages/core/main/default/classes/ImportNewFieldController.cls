@@ -76,11 +76,7 @@ public with sharing class ImportNewFieldController {
 	}
 
 	@AuraEnabled
-	public static ImportNewFieldService.Outcome checkField(
-		Id jobId,
-		String objectApiName,
-		String apiName
-	) {
+	public static ImportNewFieldService.Outcome checkField(Id jobId, String objectApiName, String apiName) {
 		try {
 			return ImportNewFieldService.check(jobId, objectApiName, apiName);
 		} catch (Exception e) {

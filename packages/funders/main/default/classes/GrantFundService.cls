@@ -79,12 +79,7 @@ public with sharing class GrantFundService {
 				AccessLevel.USER_MODE
 			)
 		) {
-			options.add(
-				new Map<String, String>{
-					'value' => (String) fund.Id,
-					'label' => (String) fund.get('Name')
-				}
-			);
+			options.add(new Map<String, String>{ 'value' => (String) fund.Id, 'label' => (String) fund.get('Name') });
 		}
 		return options;
 	}
@@ -119,9 +114,7 @@ public with sharing class GrantFundService {
 			Schema.SObjectType type = fundType();
 			Id parsed = GrantService.asId(fundId);
 			if (type == null || parsed == null || parsed.getSObjectType() != type) {
-				throw new GrantService.GrantException(
-					BarnHelp.text('Funders', 'Funders_Grant_BadFund')
-				);
+				throw new GrantService.GrantException(BarnHelp.text('Funders', 'Funders_Grant_BadFund'));
 			}
 			value = String.valueOf(parsed);
 		}

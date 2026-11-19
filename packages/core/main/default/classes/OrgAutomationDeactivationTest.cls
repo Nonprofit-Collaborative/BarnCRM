@@ -5,10 +5,7 @@
  */
 @IsTest(testFor='ApexClass:OrgAutomationDeactivation')
 private class OrgAutomationDeactivationTest {
-	private static final List<String> CONNECTION_ADMIN = new List<String>{
-		'BarnCRM_Admin',
-		'BarnCRM_Metadata_Admin'
-	};
+	private static final List<String> CONNECTION_ADMIN = new List<String>{ 'BarnCRM_Admin', 'BarnCRM_Metadata_Admin' };
 	private static final String FLOW_ID = '300000000000001AAA';
 	private static final String PKG_FLOW_ID = '300000000000002AAA';
 	private static final String RULE_ID = '03d000000000001AAA';
@@ -160,31 +157,21 @@ private class OrgAutomationDeactivationTest {
 			Merge_Journal__c snapshot = new Merge_Journal__c(
 				Kind__c = 'Deactivation',
 				Status__c = 'Running',
-				Items__c = JSON.serialize(
-					new List<OrgAutomationDeactivation.Item>{ flow, rule, refused }
-				)
+				Items__c = JSON.serialize(new List<OrgAutomationDeactivation.Item>{ flow, rule, refused })
 			);
 			insert snapshot;
 			ToolingMock mock = new ToolingMock();
 			Test.setMock(HttpCalloutMock.class, mock);
 			Test.startTest();
-			System.enqueueJob(
-				new OrgAutomationDeactivation(snapshot.Id, OrgAutomationDeactivation.MODE_APPLY)
-			);
+			System.enqueueJob(new OrgAutomationDeactivation(snapshot.Id, OrgAutomationDeactivation.MODE_APPLY));
 			Test.stopTest();
 
 			Map<String, OrgAutomationDeactivation.Item> items = itemsOf(snapshot.Id);
 			Assert.areEqual(OrgAutomationDeactivation.RESULT_CHANGED, items.get(FLOW_ID).result);
 			Assert.areEqual(OrgAutomationDeactivation.RESULT_CHANGED, items.get(RULE_ID).result);
-			Assert.areEqual(
-				OrgAutomationDeactivation.RESULT_FAILED,
-				items.get(REFUSED_RULE_ID).result
-			);
+			Assert.areEqual(OrgAutomationDeactivation.RESULT_FAILED, items.get(REFUSED_RULE_ID).result);
 			Assert.isTrue(items.get(REFUSED_RULE_ID).message.contains('The formula has an error'));
-			Assert.areEqual(
-				'Partial',
-				[SELECT Status__c FROM Merge_Journal__c WHERE Id = :snapshot.Id].Status__c
-			);
+			Assert.areEqual('Partial', [SELECT Status__c FROM Merge_Journal__c WHERE Id = :snapshot.Id].Status__c);
 			Assert.isTrue(mock.writes[0].contains('"activeVersionNumber":0'), mock.writes[0]);
 			Assert.isTrue(mock.writes[1].contains('"active":false'), mock.writes[1]);
 		}
@@ -203,9 +190,7 @@ private class OrgAutomationDeactivationTest {
 			Merge_Journal__c snapshot = new Merge_Journal__c(
 				Kind__c = 'Deactivation',
 				Status__c = 'Done',
-				Items__c = JSON.serialize(
-					new List<OrgAutomationDeactivation.Item>{ flow, untouched }
-				)
+				Items__c = JSON.serialize(new List<OrgAutomationDeactivation.Item>{ flow, untouched })
 			);
 			insert snapshot;
 			ToolingMock mock = new ToolingMock();
@@ -223,10 +208,7 @@ private class OrgAutomationDeactivationTest {
 			];
 			Assert.areEqual('Restored', after.Status__c);
 			Assert.isNotNull(after.Restored_At__c);
-			Assert.areEqual(
-				OrgAutomationDeactivation.RESULT_CHANGED,
-				itemsOf(snapshot.Id).get(FLOW_ID).restoreResult
-			);
+			Assert.areEqual(OrgAutomationDeactivation.RESULT_CHANGED, itemsOf(snapshot.Id).get(FLOW_ID).restoreResult);
 		}
 	}
 
@@ -238,33 +220,23 @@ private class OrgAutomationDeactivationTest {
 			try {
 				OrgAutomationController.deactivate(
 					JSON.serialize(
-						new List<OrgAutomationDeactivation.Item>{
-							item('ApexTrigger', '01q000000000001AAA')
-						}
+						new List<OrgAutomationDeactivation.Item>{ item('ApexTrigger', '01q000000000001AAA') }
 					)
 				);
 			} catch (AuraHandledException caught) {
 				refused = caught.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems'),
-				refused
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems'), refused);
 
 			insert new Merge_Journal__c(Kind__c = 'Deactivation', Status__c = 'Running');
 			try {
 				OrgAutomationController.deactivate(
-					JSON.serialize(
-						new List<OrgAutomationDeactivation.Item>{ item('Flow', FLOW_ID) }
-					)
+					JSON.serialize(new List<OrgAutomationDeactivation.Item>{ item('Flow', FLOW_ID) })
 				);
 			} catch (AuraHandledException caught) {
 				refused = caught.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_AlreadyRunning'),
-				refused
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_AutomationDeactivate_AlreadyRunning'), refused);
 		}
 	}
 
@@ -277,17 +249,11 @@ private class OrgAutomationDeactivationTest {
 		failed.result = OrgAutomationDeactivation.RESULT_FAILED;
 		Assert.areEqual(
 			'Done',
-			OrgAutomationDeactivation.finalStatus(
-				new List<OrgAutomationDeactivation.Item>{ changed },
-				false
-			)
+			OrgAutomationDeactivation.finalStatus(new List<OrgAutomationDeactivation.Item>{ changed }, false)
 		);
 		Assert.areEqual(
 			'Failed',
-			OrgAutomationDeactivation.finalStatus(
-				new List<OrgAutomationDeactivation.Item>{ failed },
-				false
-			)
+			OrgAutomationDeactivation.finalStatus(new List<OrgAutomationDeactivation.Item>{ failed }, false)
 		);
 	}
 }

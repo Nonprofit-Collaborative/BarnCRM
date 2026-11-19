@@ -75,8 +75,7 @@ private class OrgDateTest {
 	static void readsTheOrgTimeZoneWithoutAnOverride() {
 		// runs-as: deploying user (reads the org's own time zone, the same for every user)
 		orgIn(null);
-		String expected = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1]
-		.TimeZoneSidKey;
+		String expected = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1].TimeZoneSidKey;
 
 		Assert.areEqual(expected, OrgDate.zone().getID(), 'The org default time zone');
 		Assert.areEqual(
@@ -116,10 +115,7 @@ private class OrgDateTest {
 				Start_Date__c = OrgDate.today().addDays(-30),
 				End_Date__c = OrgDate.today()
 			);
-			Assert.isTrue(
-				OrgDate.today() > Date.today(),
-				'By her own date the membership has not ended yet'
-			);
+			Assert.isTrue(OrgDate.today() > Date.today(), 'By her own date the membership has not ended yet');
 
 			Assert.areEqual(
 				0,

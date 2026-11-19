@@ -74,10 +74,7 @@ public with sharing class AddressVerificationHandler extends TriggerHandler {
 		List<Id> ids = new List<Id>();
 		for (SObject record : records) {
 			String status = (String) record.get(Address__c.Status__c);
-			if (
-				(status == null || status == 'Current') &&
-				ids.size() < AddressVerifier.PER_TRANSACTION
-			) {
+			if ((status == null || status == 'Current') && ids.size() < AddressVerifier.PER_TRANSACTION) {
 				ids.add(record.Id);
 			}
 		}

@@ -98,19 +98,10 @@ private class ImportMatcherStandInFieldsTest {
 			Set<String> emails = new Set<String>{ 'ana@example.org' };
 
 			Assert.isTrue(ImportMatcher.personAccountsByEmail(emails, null).isEmpty(), 'No types');
-			Assert.isTrue(
-				ImportMatcher.personAccountsByEmail(emails, new Set<Id>()).isEmpty(),
-				'Empty types'
-			);
+			Assert.isTrue(ImportMatcher.personAccountsByEmail(emails, new Set<Id>()).isEmpty(), 'Empty types');
 			Assert.isTrue(ImportMatcher.personAccountsByEmail(null, types).isEmpty(), 'No emails');
-			Assert.isTrue(
-				ImportMatcher.personAccountsByEmail(new Set<String>(), types).isEmpty(),
-				'Empty emails'
-			);
-			Assert.isTrue(
-				ImportMatcher.personAccountsByNameAndPostalCode(null, types).isEmpty(),
-				'No keys'
-			);
+			Assert.isTrue(ImportMatcher.personAccountsByEmail(new Set<String>(), types).isEmpty(), 'Empty emails');
+			Assert.isTrue(ImportMatcher.personAccountsByNameAndPostalCode(null, types).isEmpty(), 'No keys');
 			Assert.isTrue(
 				ImportMatcher.personAccountsByNameAndPostalCode(
 						new Set<String>{ ImportMatcher.nameAndPostalKey('Ramirez', '97201') },
@@ -166,16 +157,8 @@ private class ImportMatcherStandInFieldsTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				byShipping.Id,
-				found.get(shippingKey),
-				'Found by the person postal code'
-			);
-			Assert.areEqual(
-				byBilling.Id,
-				found.get(billingKey),
-				'Found by the billing postal code'
-			);
+			Assert.areEqual(byShipping.Id, found.get(shippingKey), 'Found by the person postal code');
+			Assert.areEqual(byBilling.Id, found.get(billingKey), 'Found by the billing postal code');
 			Assert.isFalse(found.values().contains(elsewhere.Id), 'Another address is not matched');
 		}
 	}
@@ -194,10 +177,7 @@ private class ImportMatcherStandInFieldsTest {
 			String key = ImportMatcher.nameAndPostalKey('Ramirez', '97201');
 
 			Test.startTest();
-			ImportMatcher.personAccountsByNameAndPostalCode(
-				new Set<String>{ key },
-				new Set<Id>{ organizationType() }
-			);
+			ImportMatcher.personAccountsByNameAndPostalCode(new Set<String>{ key }, new Set<Id>{ organizationType() });
 			Test.stopTest();
 
 			Assert.isTrue(ImportMatcher.wasCutOff(key), 'Another holder may exist unseen');
@@ -206,9 +186,7 @@ private class ImportMatcherStandInFieldsTest {
 				[
 					SELECT COUNT()
 					FROM Error_Log__c
-					WHERE
-						Severity__c = :ErrorLogger.SEVERITY_WARNING
-						AND Context__c = 'ImportMatcher'
+					WHERE Severity__c = :ErrorLogger.SEVERITY_WARNING AND Context__c = 'ImportMatcher'
 				],
 				'The cut off is logged once'
 			);

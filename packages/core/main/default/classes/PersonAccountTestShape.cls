@@ -25,9 +25,7 @@ public class PersonAccountTestShape {
 	 */
 	@NamespaceAccessible
 	public static String skipReason() {
-		Schema.DescribeSObjectResult account = Account.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
+		Schema.DescribeSObjectResult account = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
 		if (!OrgShapeDetector.hasPersonAccounts()) {
 			Assert.isFalse(
 				account.fields.getMap().containsKey('personcontactid'),

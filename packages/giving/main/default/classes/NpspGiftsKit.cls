@@ -14,12 +14,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	@TestVisible
 	private static final String KIT = 'NPSP_Gifts';
 	/** The soft credit roles BarnCRM has besides Household Member and Other. */
-	private static final List<String> ROLES = new List<String>{
-		'Matched Donor',
-		'Solicitor',
-		'Honoree',
-		'Influencer'
-	};
+	private static final List<String> ROLES = new List<String>{ 'Matched Donor', 'Solicitor', 'Honoree', 'Influencer' };
 
 	/** One part of a gift's split: a fund's name and amount (also the Nonprofit Cloud kit's). */
 	public class Part {
@@ -120,8 +115,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	@TestVisible
 	private static void giftRow(Map<String, Object> row, List<String> payment, List<Part> split) {
 		String primary = (String) row.get('npsp.Primary_Contact__c');
-		Boolean person =
-			row.get('Account.npe01.SYSTEM_IsIndividual__c') == 'true' && String.isNotBlank(primary);
+		Boolean person = row.get('Account.npe01.SYSTEM_IsIndividual__c') == 'true' && String.isNotBlank(primary);
 		row.put('Donor', person ? 'Contact1' : 'Organization');
 		row.put('ContactId', person ? primary : '');
 		row.put('OrganizationId', person ? '' : row.get('AccountId'));
@@ -152,10 +146,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 		}
 		for (Integer index = 0; index < Math.min(split.size(), 5); index++) {
 			row.put('Fund' + (index + 1), split[index].fund);
-			row.put(
-				'Amount' + (index + 1),
-				split[index].amount == null ? '' : split[index].amount.toPlainString()
-			);
+			row.put('Amount' + (index + 1), split[index].amount == null ? '' : split[index].amount.toPlainString());
 		}
 	}
 
@@ -172,8 +163,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 			)
 		) {
 			partial.put(
-				(String) credit.get(n('npsp~Opportunity__c')) +
-				(String) credit.get(n('npsp~Contact__c')),
+				(String) credit.get(n('npsp~Opportunity__c')) + (String) credit.get(n('npsp~Contact__c')),
 				(Decimal) credit.get(n('npsp~Amount__c'))
 			);
 		}
@@ -182,9 +172,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 			creditRow(
 				row,
 				(String) row.get(ofAccount ? 'npsp.Role__c' : 'Role'),
-				ofAccount
-					? null
-					: partial.get((String) row.get('OpportunityId') + (String) row.get('ContactId'))
+				ofAccount ? null : partial.get((String) row.get('OpportunityId') + (String) row.get('ContactId'))
 			);
 		}
 	}
@@ -198,12 +186,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	private static void creditRow(Map<String, Object> row, String role, Decimal partialAmount) {
 		putRole(row, role);
 		if (!row.containsKey('npsp.Role__c')) {
-			row.put(
-				'Amount',
-				partialAmount != null
-					? partialAmount.toPlainString()
-					: row.get('Opportunity.Amount')
-			);
+			row.put('Amount', partialAmount != null ? partialAmount.toPlainString() : row.get('Opportunity.Amount'));
 		}
 	}
 
@@ -214,9 +197,7 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	public static void putRole(Map<String, Object> row, String role) {
 		String chosen = 'Other';
 		for (String known : ROLES) {
-			chosen = known.equalsIgnoreCase(String.isBlank(role) ? '' : role.trim())
-				? known
-				: chosen;
+			chosen = known.equalsIgnoreCase(String.isBlank(role) ? '' : role.trim()) ? known : chosen;
 		}
 		row.put('CreditRole', chosen);
 		row.put('CustomRole', chosen != 'Other' ? '' : String.isBlank(role) ? 'Soft Credit' : role);
@@ -241,17 +222,10 @@ public with sharing class NpspGiftsKit implements MigrationKitExtension {
 	/** The records of an NPSP object, in the user's access; none when NPSP lacks the object. */
 	@TestVisible
 	private static List<SObject> read(String objectName, String query, Set<String> ids) {
-		if (
-			ids.isEmpty() ||
-			!NamespaceUtil.globalDescribe().containsKey(n(objectName).toLowerCase())
-		) {
+		if (ids.isEmpty() || !NamespaceUtil.globalDescribe().containsKey(n(objectName).toLowerCase())) {
 			return new List<SObject>();
 		}
 		// Every name is NPSP's own, fixed here; the only value is a bind.
-		return Database.queryWithBinds(
-			n(query),
-			new Map<String, Object>{ 'ids' => ids },
-			AccessLevel.USER_MODE
-		);
+		return Database.queryWithBinds(n(query), new Map<String, Object>{ 'ids' => ids }, AccessLevel.USER_MODE);
 	}
 }

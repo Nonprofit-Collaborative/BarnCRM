@@ -12,9 +12,7 @@ private class PaymentsSetupControllerTest {
 		TestUsers.adminWith(PaymentsTestData.ADMIN);
 	}
 
-	private static Map<String, PaymentsSetupController.Credential> byProcessor(
-		PaymentsSetupController.Setup setup
-	) {
+	private static Map<String, PaymentsSetupController.Credential> byProcessor(PaymentsSetupController.Setup setup) {
 		Map<String, PaymentsSetupController.Credential> found = new Map<String, PaymentsSetupController.Credential>();
 		for (PaymentsSetupController.Credential credential : setup.credentials) {
 			found.put(credential.processor, credential);
@@ -39,20 +37,13 @@ private class PaymentsSetupControllerTest {
 			String token = PaymentService.webhookToken(false);
 			Assert.isTrue(token.length() >= 32, 'A token was made on first need');
 			Assert.areEqual(
-				'https://zzpay.example.org/services/apexrest/barncrm/payments/v1/stripe?token=' +
-				token,
+				'https://zzpay.example.org/services/apexrest/barncrm/payments/v1/stripe?token=' + token,
 				setup.receivers[0].stripeUrl,
 				'The Stripe address'
 			);
-			Assert.isTrue(
-				setup.receivers[0].payPalUrl.endsWith('/v1/paypal?token=' + token),
-				'The PayPal address'
-			);
+			Assert.isTrue(setup.receivers[0].payPalUrl.endsWith('/v1/paypal?token=' + token), 'The PayPal address');
 			PaymentsSetupController.Setup replaced = PaymentsSetupController.regenerateToken();
-			Assert.isFalse(
-				replaced.receivers[0].stripeUrl.endsWith('token=' + token),
-				'Regenerate gives a new token'
-			);
+			Assert.isFalse(replaced.receivers[0].stripeUrl.endsWith('token=' + token), 'Regenerate gives a new token');
 			Assert.areEqual(
 				PaymentService.webhookToken(false),
 				replaced.receivers[0].stripeUrl.substringAfter('token='),
@@ -91,15 +82,9 @@ private class PaymentsSetupControllerTest {
 				new Map<String, String>{ 'payPalWebhookId' => '  WH-98765  ' }
 			);
 			Assert.areEqual('8765', saved.keys[0].lastFour, 'Saved, trimmed');
-			Assert.areEqual(
-				'WH-98765',
-				Payments_Settings__c.getOrgDefaults().PayPal_Webhook_Id__c,
-				'Stored'
-			);
+			Assert.areEqual('WH-98765', Payments_Settings__c.getOrgDefaults().PayPal_Webhook_Id__c, 'Stored');
 
-			PaymentsSetupController.Setup cleared = PaymentsSetupController.clearKeys(
-				PaymentService.PAYPAL
-			);
+			PaymentsSetupController.Setup cleared = PaymentsSetupController.clearKeys(PaymentService.PAYPAL);
 			Assert.isFalse(byProcessor(cleared).get(PaymentService.PAYPAL).connected);
 			Assert.isNull(cleared.keys[0].lastFour, 'The webhook id too');
 			Assert.isTrue(byProcessor(cleared).get(PaymentService.STRIPE).connected, 'Kept');
@@ -121,9 +106,7 @@ private class PaymentsSetupControllerTest {
 				.answer('balance', 200, '{"object":"balance","livemode":false}');
 
 			Test.startTest();
-			PaymentsSetupController.Setup connected = PaymentsSetupController.checkConnection(
-				PaymentService.STRIPE
-			);
+			PaymentsSetupController.Setup connected = PaymentsSetupController.checkConnection(PaymentService.STRIPE);
 			Test.stopTest();
 
 			Assert.isTrue(connected.checkOk, 'Stripe answered');
@@ -148,21 +131,15 @@ private class PaymentsSetupControllerTest {
 	static void aFailedCheckStopsTheProcessorBeingUsed() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			PaymentsTestData.processors()
-				.answer('balance', 401, '{"error":{"message":"Invalid API Key"}}');
+			PaymentsTestData.processors().answer('balance', 401, '{"error":{"message":"Invalid API Key"}}');
 
 			Test.startTest();
-			PaymentsSetupController.Setup refused = PaymentsSetupController.checkConnection(
-				PaymentService.STRIPE
-			);
+			PaymentsSetupController.Setup refused = PaymentsSetupController.checkConnection(PaymentService.STRIPE);
 			Test.stopTest();
 
 			Assert.isFalse(refused.checkOk, 'A bad key');
 			Assert.isTrue(refused.checkMessage.contains('401'), refused.checkMessage);
-			Assert.isFalse(
-				PaymentService.isReady(PaymentService.STRIPE),
-				'Not used until a check succeeds'
-			);
+			Assert.isFalse(PaymentService.isReady(PaymentService.STRIPE), 'Not used until a check succeeds');
 		}
 	}
 
@@ -170,13 +147,10 @@ private class PaymentsSetupControllerTest {
 	static void checkConnectionSaysWhenTheStripeKeyIsForTheOtherMode() {
 		System.runAs(PaymentsTestData.admin()) {
 			PaymentsTestData.connect(PaymentService.STRIPE);
-			PaymentsTestData.processors()
-				.answer('balance', 200, '{"object":"balance","livemode":true}');
+			PaymentsTestData.processors().answer('balance', 200, '{"object":"balance","livemode":true}');
 
 			Test.startTest();
-			PaymentsSetupController.Setup checked = PaymentsSetupController.checkConnection(
-				PaymentService.STRIPE
-			);
+			PaymentsSetupController.Setup checked = PaymentsSetupController.checkConnection(PaymentService.STRIPE);
 			Test.stopTest();
 
 			Assert.isTrue(checked.checkOk, 'Connected');
@@ -200,9 +174,7 @@ private class PaymentsSetupControllerTest {
 				.answer('oauth2/token', 200, '{"access_token":"tok"}');
 
 			Test.startTest();
-			PaymentsSetupController.Setup checked = PaymentsSetupController.checkConnection(
-				PaymentService.PAYPAL
-			);
+			PaymentsSetupController.Setup checked = PaymentsSetupController.checkConnection(PaymentService.PAYPAL);
 			Test.stopTest();
 
 			Assert.isTrue(checked.checkOk, 'Signed in');
@@ -221,9 +193,7 @@ private class PaymentsSetupControllerTest {
 			PaymentsTestData.processors().answer('oauth2/token', 401, '{"error":"invalid_client"}');
 
 			Test.startTest();
-			PaymentsSetupController.Setup refused = PaymentsSetupController.checkConnection(
-				PaymentService.PAYPAL
-			);
+			PaymentsSetupController.Setup refused = PaymentsSetupController.checkConnection(PaymentService.PAYPAL);
 			Test.stopTest();
 
 			Assert.isFalse(refused.checkOk, 'Refused');
@@ -248,15 +218,10 @@ private class PaymentsSetupControllerTest {
 
 	@IsTest
 	static void someoneWhoCannotManageSettingsCannotChangeAnything() {
-		User staff = TestUsers.standardUserWith(
-			'Zzpay Staff',
-			new List<String>{ 'Payments_Staff' }
-		);
+		User staff = TestUsers.standardUserWith('Zzpay Staff', new List<String>{ 'Payments_Staff' });
 		System.runAs(staff) {
 			try {
-				PaymentsSetupController.saveKeys(
-					new Map<String, String>{ 'payPalWebhookId' => 'WH-X' }
-				);
+				PaymentsSetupController.saveKeys(new Map<String, String>{ 'payPalWebhookId' => 'WH-X' });
 				Assert.fail('Refused');
 			} catch (AuraHandledException e) {
 				Assert.isNotNull(e.getMessage(), 'Says why');
@@ -269,10 +234,7 @@ private class PaymentsSetupControllerTest {
 			}
 		}
 		System.runAs(PaymentsTestData.admin()) {
-			Assert.isNull(
-				Payments_Settings__c.getOrgDefaults().PayPal_Webhook_Id__c,
-				'Nothing saved'
-			);
+			Assert.isNull(Payments_Settings__c.getOrgDefaults().PayPal_Webhook_Id__c, 'Nothing saved');
 		}
 	}
 }

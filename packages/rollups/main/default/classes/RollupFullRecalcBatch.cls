@@ -46,12 +46,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 	private static final String LOG_CONTEXT = 'RollupFullRecalcBatch';
 	/** The class name the platform records on each pass's job, read by the error handler. */
 	public static final String CLASS_NAME = 'RollupFullRecalcBatch';
-	private static final Set<String> RUNNING = new Set<String>{
-		'Holding',
-		'Queued',
-		'Preparing',
-		'Processing'
-	};
+	private static final Set<String> RUNNING = new Set<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
 
 	/** The largest chunk the platform gives a batch over a query. */
 	private static final Integer LARGEST_SCOPE = 2000;
@@ -224,11 +219,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 	@TestVisible
 	private static RollupFullRecalcBatch firstPass(List<Rollup_Definition__c> definitions) {
 		Map<String, List<Rollup_Definition__c>> byTarget = new Map<String, List<Rollup_Definition__c>>();
-		for (
-			Rollup_Definition__c definition : definitions == null
-				? new List<Rollup_Definition__c>()
-				: definitions
-		) {
+		for (Rollup_Definition__c definition : definitions == null ? new List<Rollup_Definition__c>() : definitions) {
 			Schema.SObjectType targetType = SettingsService.typeByName(definition.Target_Object__c);
 			if (targetType == null) {
 				continue;
@@ -291,9 +282,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 	}
 
 	private Map<String, Object> binds() {
-		return this.onlyIds == null
-			? new Map<String, Object>()
-			: new Map<String, Object>{ 'onlyIds' => this.onlyIds };
+		return this.onlyIds == null ? new Map<String, Object>() : new Map<String, Object>{ 'onlyIds' => this.onlyIds };
 	}
 
 	/** Takes the records that fit this chunk's budget, holds back the rest, and recalculates. */
@@ -352,9 +341,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		}
 		RollupQueue.add(
 			new Map<String, Set<Id>>{ target.name => ids },
-			definitionIds.isEmpty()
-				? null
-				: new Map<String, Set<Id>>{ target.name => definitionIds }
+			definitionIds.isEmpty() ? null : new Map<String, Set<Id>>{ target.name => definitionIds }
 		);
 	}
 
@@ -452,12 +439,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 
 	private RollupFullRecalcBatch nextPass() {
 		if (!this.later.isEmpty()) {
-			return new RollupFullRecalcBatch(
-				this.run,
-				this.targetIndex,
-				this.later,
-				this.scope / SHRINK_BY
-			);
+			return new RollupFullRecalcBatch(this.run, this.targetIndex, this.later, this.scope / SHRINK_BY);
 		}
 		clearResolvedEntries(currentTarget());
 		if (this.targetIndex + 1 < this.run.targets.size()) {
@@ -533,11 +515,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		Map<Id, Datetime> stamps = new Map<Id, Datetime>();
 		for (Target target : this.run.targets) {
 			for (Rollup_Definition__c definition : target.definitions) {
-				if (
-					definition.Id != null &&
-					!target.stopped &&
-					!this.run.refused.contains(definition.Id)
-				) {
+				if (definition.Id != null && !target.stopped && !this.run.refused.contains(definition.Id)) {
 					stamps.put(definition.Id, finishedAt);
 				}
 			}
@@ -555,10 +533,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 			ErrorLogger.logMessage(
 				String.format(
 					BarnHelp.text('Rollups', 'Core_Rollups_FullRunSummary'),
-					new List<String>{
-						String.valueOf(this.run.failed),
-						String.valueOf(this.run.stoppedChunks)
-					}
+					new List<String>{ String.valueOf(this.run.failed), String.valueOf(this.run.stoppedChunks) }
 				),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
@@ -570,11 +545,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 			this.run.stoppedChunks > 0,
 			String.format(
 				BarnHelp.text('Rollups', 'Core_JobNotice_RollupsBody'),
-				new List<Object>{
-					this.run.written.format(),
-					this.run.failed.format(),
-					this.run.stoppedChunks.format()
-				}
+				new List<Object>{ this.run.written.format(), this.run.failed.format(), this.run.stoppedChunks.format() }
 			),
 			JobNotifier.SECTION_ROLLUPS
 		);
@@ -602,14 +573,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 	public static Progress progress() {
 		Progress answer = new Progress();
 		for (AsyncApexJob job : [
-			SELECT
-				Id,
-				Status,
-				JobItemsProcessed,
-				TotalJobItems,
-				NumberOfErrors,
-				CreatedDate,
-				CompletedDate
+			SELECT Id, Status, JobItemsProcessed, TotalJobItems, NumberOfErrors, CreatedDate, CompletedDate
 			FROM AsyncApexJob
 			WHERE JobType = 'BatchApex' AND ApexClass.Name = :CLASS_NAME
 			WITH SYSTEM_MODE

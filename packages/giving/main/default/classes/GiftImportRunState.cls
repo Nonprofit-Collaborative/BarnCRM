@@ -90,9 +90,6 @@ public with sharing class GiftImportRunState {
 	 * digits (64 bits) keep a file of half a million rows well clear of a collision.
 	 */
 	public static String key(String externalId) {
-		return EncodingUtil.convertToHex(
-				Crypto.generateDigest('MD5', Blob.valueOf(externalId.toLowerCase()))
-			)
-			.left(16);
+		return EncodingUtil.convertToHex(Crypto.generateDigest('MD5', Blob.valueOf(externalId.toLowerCase()))).left(16);
 	}
 }

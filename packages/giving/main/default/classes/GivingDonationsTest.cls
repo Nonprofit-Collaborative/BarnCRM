@@ -72,9 +72,7 @@ private class GivingDonationsTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Dana', LastName = 'Zzdonor')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Dana', LastName = 'Zzdonor'));
 		insert as user person;
 		return person;
 	}
@@ -132,11 +130,7 @@ private class GivingDonationsTest {
 			Map<String, Object> started = new GivingDonationPage()
 				.startCheckout(
 					open.Id,
-					new Map<String, Object>{
-						'amount' => 40,
-						'email' => 'dana@example.org',
-						'firstName' => 'Dana'
-					},
+					new Map<String, Object>{ 'amount' => 40, 'email' => 'dana@example.org', 'firstName' => 'Dana' },
 					'https://give.example.org/FormsPublic?record=' + open.Id
 				);
 
@@ -145,9 +139,7 @@ private class GivingDonationsTest {
 			Assert.areEqual('Winter Coats', payments.asked.get('description'));
 			Assert.areEqual('Dana', payments.asked.get('payerName'));
 			Assert.areEqual(GivingDonations.LISTENER, payments.asked.get('listener'));
-			Assert.isTrue(
-				String.valueOf(payments.asked.get('successUrl')).endsWith('payment=done')
-			);
+			Assert.isTrue(String.valueOf(payments.asked.get('successUrl')).endsWith('payment=done'));
 			Assert.isNull(
 				new GivingDonationPage().startCheckout(appeal(false).Id, null, null),
 				'An unpublished appeal takes no payment'
@@ -177,10 +169,7 @@ private class GivingDonationsTest {
 				);
 			Gift__c paid = gift();
 			new GivingDonations()
-				.call(
-					'paymentChanged',
-					new Map<String, Object>{ 'paymentId' => 'pay-1', 'status' => 'Refunded' }
-				);
+				.call('paymentChanged', new Map<String, Object>{ 'paymentId' => 'pay-1', 'status' => 'Refunded' });
 
 			Assert.areEqual('Pending', pending.Status__c, 'Written once, Pending');
 			Assert.areEqual(open.Id, pending.Appeal__c);
@@ -201,10 +190,7 @@ private class GivingDonationsTest {
 			Appeal__c open = appeal(true);
 
 			Object answered = new GivingDonations()
-				.call(
-					'paymentChanged',
-					new Map<String, Object>{ 'paymentId' => 'pay-1', 'status' => 'Paid' }
-				);
+				.call('paymentChanged', new Map<String, Object>{ 'paymentId' => 'pay-1', 'status' => 'Paid' });
 			Integer before = [SELECT COUNT() FROM Gift__c WITH USER_MODE];
 			new GivingDonationPage().received(receipt(open.Id, donor().Id));
 
@@ -252,14 +238,8 @@ private class GivingDonationsTest {
 					'paymentsChanged',
 					new Map<String, Object>{
 						'payments' => new List<Object>{
-							new Map<String, Object>{
-								'paymentId' => 'pay-late',
-								'status' => 'Paid'
-							},
-							new Map<String, Object>{
-								'paymentId' => 'pay-back',
-								'status' => 'Refunded'
-							}
+							new Map<String, Object>{ 'paymentId' => 'pay-late', 'status' => 'Paid' },
+							new Map<String, Object>{ 'paymentId' => 'pay-back', 'status' => 'Refunded' }
 						}
 					}
 				);
@@ -274,16 +254,8 @@ private class GivingDonationsTest {
 			]) {
 				statuses.put(gift.Payment_Reference__c, gift.Status__c);
 			}
-			Assert.areEqual(
-				'Received',
-				statuses.get('pay-late'),
-				'Cancelled, then Pending, then Received'
-			);
-			Assert.areEqual(
-				'Refunded',
-				statuses.get('pay-back'),
-				'Pending, then Received, then Refunded'
-			);
+			Assert.areEqual('Received', statuses.get('pay-late'), 'Cancelled, then Pending, then Received');
+			Assert.areEqual('Refunded', statuses.get('pay-back'), 'Pending, then Received, then Refunded');
 		}
 	}
 
@@ -296,16 +268,13 @@ private class GivingDonationsTest {
 			List<Object> told = new List<Object>();
 			for (Integer i = 0; i < 26; i++) {
 				gifts.add(onlineGift(open.Id, donorId, 'pay-bulk-' + i, 'Pending'));
-				told.add(
-					new Map<String, Object>{ 'paymentId' => 'pay-bulk-' + i, 'status' => 'Paid' }
-				);
+				told.add(new Map<String, Object>{ 'paymentId' => 'pay-bulk-' + i, 'status' => 'Paid' });
 			}
 			insert as user gifts;
 
 			Test.startTest();
 			Integer before = Limits.getQueries();
-			new GivingDonations()
-				.call('paymentsChanged', new Map<String, Object>{ 'payments' => told });
+			new GivingDonations().call('paymentsChanged', new Map<String, Object>{ 'payments' => told });
 			Integer used = Limits.getQueries() - before;
 			Test.stopTest();
 

@@ -9,8 +9,7 @@ public with sharing class PaymentPayPal {
 	/** The External Credential behind both Named Credentials (canonical model R-PK1). */
 	public static final String CREDENTIAL = NamespaceUtil.qualify('Barn_PayPal');
 	public static final String LIVE_BASE = 'callout:' + NamespaceUtil.qualify('Barn_PayPal_Live');
-	public static final String TEST_BASE =
-		'callout:' + NamespaceUtil.qualify('Barn_PayPal_Sandbox');
+	public static final String TEST_BASE = 'callout:' + NamespaceUtil.qualify('Barn_PayPal_Sandbox');
 	/** Where a payer changes the funding source of their automatic payments (Update Card). */
 	public static final String AUTOPAY = 'https://www.paypal.com/myaccount/autopay/';
 	public static final String AUTOPAY_TEST = 'https://www.sandbox.paypal.com/myaccount/autopay/';
@@ -60,12 +59,7 @@ public with sharing class PaymentPayPal {
 			: String.valueOf(payment.Amount__c.setScale(2));
 		String ref = payment.Reference__c;
 		if (interval != null) {
-			subscribe(
-				payment,
-				new Terms(payment, value, interval.toUpperCase(), intervalCount),
-				successUrl,
-				cancelUrl
-			);
+			subscribe(payment, new Terms(payment, value, interval.toUpperCase(), intervalCount), successUrl, cancelUrl);
 			return;
 		}
 		Map<String, Object> order = new Map<String, Object>{
@@ -75,10 +69,7 @@ public with sharing class PaymentPayPal {
 					'reference_id' => payment.Reference__c,
 					'custom_id' => payment.Reference__c,
 					'description' => payment.Description__c.abbreviate(127),
-					'amount' => new Map<String, Object>{
-						'currency_code' => payment.Currency_Code__c,
-						'value' => value
-					}
+					'amount' => new Map<String, Object>{ 'currency_code' => payment.Currency_Code__c, 'value' => value }
 				}
 			},
 			'payment_source' => new Map<String, Object>{
@@ -102,12 +93,7 @@ public with sharing class PaymentPayPal {
 	 * account) is replaced once. PayPal-Request-Id is keyed by the plan key, so checkouts at the
 	 * same moment make one plan. Every callout comes first; the product id is written last.
 	 */
-	private static void subscribe(
-		Payment__c payment,
-		Terms plan,
-		String successUrl,
-		String cancelUrl
-	) {
+	private static void subscribe(Payment__c payment, Terms plan, String successUrl, String cancelUrl) {
 		String ref = payment.Reference__c;
 		String planId = new PlanReader().latest(plan.key);
 		Boolean remembered = planId != null;
@@ -154,10 +140,7 @@ public with sharing class PaymentPayPal {
 		payment.Plan_Key__c = plan.key;
 		payment.Plan_Id__c = planId;
 		if (product != null && !product.equals(stored.PayPal_Product_Id__c)) {
-			Payments_Settings__c change = new Payments_Settings__c(
-				Id = stored.Id,
-				PayPal_Product_Id__c = product
-			);
+			Payments_Settings__c change = new Payments_Settings__c(Id = stored.Id, PayPal_Product_Id__c = product);
 			update as system change;
 		}
 	}
@@ -180,10 +163,7 @@ public with sharing class PaymentPayPal {
 			this.value = value;
 			this.unit = unit;
 			this.every = every;
-			key = String.join(
-				new List<Object>{ PaymentService.mode(), currencyCode, value, unit, every },
-				':'
-			);
+			key = String.join(new List<Object>{ PaymentService.mode(), currencyCode, value, unit, every }, ':');
 		}
 
 		String body(String product) {
@@ -217,9 +197,7 @@ public with sharing class PaymentPayPal {
 							}
 						}
 					},
-					'payment_preferences' => new Map<String, Object>{
-						'payment_failure_threshold' => 3
-					}
+					'payment_preferences' => new Map<String, Object>{ 'payment_failure_threshold' => 3 }
 				}
 			);
 		}
@@ -292,10 +270,7 @@ public with sharing class PaymentPayPal {
 
 	private static void refuse(HttpResponse response) {
 		ErrorLogger.logMessage(
-			'PayPal answered ' +
-				response.getStatusCode() +
-				': ' +
-				response.getBody().abbreviate(200),
+			'PayPal answered ' + response.getStatusCode() + ': ' + response.getBody().abbreviate(200),
 			CONTEXT + '.startCheckout',
 			ErrorLogger.SEVERITY_ERROR
 		);
@@ -311,10 +286,7 @@ public with sharing class PaymentPayPal {
 	public static PaymentService.Outcome read(Payment_Event__c event) {
 		PaymentService.Outcome outcome = new PaymentService.Outcome(event);
 		if (!verify(event)) {
-			return outcome.nothing(
-				'Rejected',
-				BarnHelp.text('Payments', 'Payments_Event_NotVerified')
-			);
+			return outcome.nothing('Rejected', BarnHelp.text('Payments', 'Payments_Event_NotVerified'));
 		}
 		Map<String, Object> body = PaymentStripe.parse(event.Payload__c);
 		event.Event_Key__c = 'paypal:' + PaymentStripe.text(body.get('id'));
@@ -345,9 +317,7 @@ public with sharing class PaymentPayPal {
 				}
 				change.reference = PaymentStripe.text(resource.get('custom'));
 				change.processorPaymentId = PaymentStripe.text(resource.get('id'));
-				change.amount = SettingsService.toNumber(
-					PaymentStripe.mapOf(resource.get('amount')).get('total')
-				);
+				change.amount = SettingsService.toNumber(PaymentStripe.mapOf(resource.get('amount')).get('total'));
 				change.status = PaymentService.PAID;
 				change.subscriptionEvent = PaymentService.CHARGE_SUCCEEDED;
 			}
@@ -367,12 +337,8 @@ public with sharing class PaymentPayPal {
 				change.detail = BarnHelp.text('Payments', 'Payments_Detail_Declined');
 			}
 			when 'PAYMENT.CAPTURE.REFUNDED' {
-				Map<String, Object> breakdown = PaymentStripe.mapOf(
-					resource.get('seller_payable_breakdown')
-				);
-				Map<String, Object> total = PaymentStripe.mapOf(
-					breakdown.get('total_refunded_amount')
-				);
+				Map<String, Object> breakdown = PaymentStripe.mapOf(resource.get('seller_payable_breakdown'));
+				Map<String, Object> total = PaymentStripe.mapOf(breakdown.get('total_refunded_amount'));
 				if (total.isEmpty()) {
 					total = PaymentStripe.mapOf(resource.get('amount'));
 				}
@@ -396,9 +362,7 @@ public with sharing class PaymentPayPal {
 	/** Captures an approved order; the capture's result becomes the change's status. */
 	private static void capture(PaymentService.Change change) {
 		HttpResponse response = send(
-			'/v2/checkout/orders/' +
-				EncodingUtil.urlEncode(change.checkoutId, 'UTF-8') +
-				'/capture',
+			'/v2/checkout/orders/' + EncodingUtil.urlEncode(change.checkoutId, 'UTF-8') + '/capture',
 			'{}',
 			change.reference + '-capture'
 		);
@@ -417,9 +381,7 @@ public with sharing class PaymentPayPal {
 		List<Object> captures = payments.get('captures') instanceof List<Object>
 			? (List<Object>) payments.get('captures')
 			: new List<Object>();
-		Map<String, Object> first = captures.isEmpty()
-			? new Map<String, Object>()
-			: PaymentStripe.mapOf(captures[0]);
+		Map<String, Object> first = captures.isEmpty() ? new Map<String, Object>() : PaymentStripe.mapOf(captures[0]);
 		change.processorPaymentId = PaymentStripe.text(first.get('id'));
 		String status = PaymentStripe.text(first.get('status'));
 		change.status = status == 'COMPLETED'
@@ -442,20 +404,11 @@ public with sharing class PaymentPayPal {
 			if (String.isBlank(value)) {
 				return false;
 			}
-			fields.add(
-				JSON.serialize(name.removeStart('paypal-').replace('-', '_')) +
-					':' +
-					JSON.serialize(value)
-			);
+			fields.add(JSON.serialize(name.removeStart('paypal-').replace('-', '_')) + ':' + JSON.serialize(value));
 		}
 		fields.add('"webhook_id":' + JSON.serialize(webhookId));
 		// The event goes back exactly as received, so PayPal checks the bytes it signed.
-		String request =
-			'{' +
-			String.join(fields, ',') +
-			',"webhook_event":' +
-			event.Payload__c +
-			'}';
+		String request = '{' + String.join(fields, ',') + ',"webhook_event":' + event.Payload__c + '}';
 		HttpResponse response = send('/v1/notifications/verify-webhook-signature', request, null);
 		return response.getStatusCode() == 200 &&
 			PaymentStripe.parse(response.getBody()).get('verification_status') == 'SUCCESS';
@@ -502,11 +455,7 @@ public with sharing class PaymentPayPal {
 		request.setTimeout(20000);
 		request.setHeader(
 			'Authorization',
-			'Basic {!BASE64ENCODE(BLOB(' +
-				credential +
-				'.ClientId & ":" & ' +
-				credential +
-				'.ClientSecret))}'
+			'Basic {!BASE64ENCODE(BLOB(' + credential + '.ClientId & ":" & ' + credential + '.ClientSecret))}'
 		);
 		request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
 		request.setBody('grant_type=client_credentials');
@@ -525,8 +474,7 @@ public with sharing class PaymentPayPal {
 			result.statusCode = response.getStatusCode();
 			result.ok =
 				result.statusCode == 200 &&
-				PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('access_token')) !=
-				null;
+				PaymentStripe.text(PaymentStripe.parse(response.getBody()).get('access_token')) != null;
 		} catch (Exception failed) {
 			result.failure = failed;
 		}

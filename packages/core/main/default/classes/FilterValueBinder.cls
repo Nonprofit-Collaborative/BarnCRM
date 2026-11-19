@@ -131,16 +131,10 @@ public with sharing class FilterValueBinder {
 			return fieldPath + (operator == 'in' ? ' IN ' : ' NOT IN ') + bindList(rawValue);
 		}
 		if (operator == 'contains') {
-			return fieldPath +
-				' LIKE ' +
-				bindPattern('%' + SoqlText.escapeLike(text(rawValue)) + '%');
+			return fieldPath + ' LIKE ' + bindPattern('%' + SoqlText.escapeLike(text(rawValue)) + '%');
 		}
 		if (operator == 'does not contain') {
-			return '(NOT ' +
-				fieldPath +
-				' LIKE ' +
-				bindPattern('%' + SoqlText.escapeLike(text(rawValue)) + '%') +
-				')';
+			return '(NOT ' + fieldPath + ' LIKE ' + bindPattern('%' + SoqlText.escapeLike(text(rawValue)) + '%') + ')';
 		}
 		if (operator == 'starts with') {
 			return fieldPath + ' LIKE ' + bindPattern(SoqlText.escapeLike(text(rawValue)) + '%');
@@ -201,10 +195,7 @@ public with sharing class FilterValueBinder {
 				return Date.valueOf(raw);
 			}
 			if (type == Schema.DisplayType.DATETIME) {
-				return (Datetime) JSON.deserialize(
-					'"' + raw.replace('"', '') + '"',
-					Datetime.class
-				);
+				return (Datetime) JSON.deserialize('"' + raw.replace('"', '') + '"', Datetime.class);
 			}
 			if (ID_TYPES.contains(type)) {
 				return String.valueOf(Id.valueOf(raw));
@@ -223,9 +214,7 @@ public with sharing class FilterValueBinder {
 	}
 
 	private String bindList(Object rawValue) {
-		List<Object> values = rawValue instanceof List<Object>
-			? (List<Object>) rawValue
-			: new List<Object>{ rawValue };
+		List<Object> values = rawValue instanceof List<Object> ? (List<Object>) rawValue : new List<Object>{ rawValue };
 		List<String> typed = new List<String>();
 		for (Object value : values) {
 			typed.add((String) coerce(value));
@@ -293,10 +282,7 @@ public with sharing class FilterValueBinder {
 
 	private RollupFilterParser.RollupFilterException valueDoesNotFit() {
 		return new RollupFilterParser.RollupFilterException(
-			String.format(
-				BarnHelp.text('Core', 'Core_Filter_ErrorValueType'),
-				new List<Object>{ path }
-			)
+			String.format(BarnHelp.text('Core', 'Core_Filter_ErrorValueType'), new List<Object>{ path })
 		);
 	}
 }

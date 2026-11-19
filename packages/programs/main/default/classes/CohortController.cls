@@ -10,11 +10,7 @@
  */
 public with sharing class CohortController {
 	private static final String CONTEXT = 'Cohort members panel';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Programs',
-			'Programs_Fail_Cohort'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Programs', 'Programs_Fail_Cohort')
 		.showingDml();
 	/** The most people listed, and the most added in one action. */
 	public static final Integer MAX_SHOWN = 200;
@@ -95,10 +91,7 @@ public with sharing class CohortController {
 		}
 		if (enrollments.size() + people.size() > MAX_SHOWN) {
 			throw UserErrors.message(
-				String.format(
-					BarnHelp.text('Programs', 'Programs_Cohort_TooMany'),
-					new List<Object>{ MAX_SHOWN }
-				)
+				String.format(BarnHelp.text('Programs', 'Programs_Cohort_TooMany'), new List<Object>{ MAX_SHOWN })
 			);
 		}
 		try {
@@ -168,17 +161,11 @@ public with sharing class CohortController {
 		for (Integer i = 0; i < found.size() && i < MAX_SHOWN; i++) {
 			result.members.add(memberFor(found[i]));
 		}
-		for (
-			Enrollment__c open : CohortSelector.selectWithoutCohort(cohort.Program__c, MAX_SHOWN)
-		) {
+		for (Enrollment__c open : CohortSelector.selectWithoutCohort(cohort.Program__c, MAX_SHOWN)) {
 			result.candidates.add(memberFor(open));
 		}
-		Schema.DescribeSObjectResult describe = Enrollment__c.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		);
-		result.canEdit =
-			describe.isUpdateable() &&
-			Schema.SObjectType.Enrollment__c.fields.Cohort__c.isUpdateable();
+		Schema.DescribeSObjectResult describe = Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED);
+		result.canEdit = describe.isUpdateable() && Schema.SObjectType.Enrollment__c.fields.Cohort__c.isUpdateable();
 		result.canEnroll = result.canEdit && describe.isCreateable();
 		result.hasPersonAccounts = HouseholdService.isPersonAccountOrg();
 		result.personFilterField = result.hasPersonAccounts ? PERSON_ACCOUNT_FILTER_FIELD : null;

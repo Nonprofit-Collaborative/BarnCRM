@@ -48,11 +48,7 @@ public with sharing class ProjectHealth implements Schedulable {
 			];
 			if (records.size() >= MAX_ROWS) {
 				ErrorLogger.logMessage(
-					BarnHelp.text(
-						'Projects',
-						'Projects_Health_CapReached',
-						new List<Object>{ MAX_ROWS }
-					),
+					BarnHelp.text('Projects', 'Projects_Health_CapReached', new List<Object>{ MAX_ROWS }),
 					'ProjectHealth',
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -108,18 +104,13 @@ public with sharing class ProjectHealth implements Schedulable {
 				// R-PM20: the budget is Budget Hours plus approved change requests' hours.
 				Decimal budget = project.Budget_Hours__c == null
 					? null
-					: project.Budget_Hours__c +
-					  (project.Change_Hours__c == null ? 0 : project.Change_Hours__c);
+					: project.Budget_Hours__c + (project.Change_Hours__c == null ? 0 : project.Change_Hours__c);
 				Decimal used = project.Actual_Hours__c == null ? 0 : project.Actual_Hours__c;
 				if (budget != null && budget > 0) {
 					Decimal percent = (used * 100 / budget).setScale(0);
 					if (used > budget) {
 						reasons.add(
-							BarnHelp.text(
-								'Projects',
-								'Projects_Health_OverBudget',
-								new List<Object>{ used, budget }
-							)
+							BarnHelp.text('Projects', 'Projects_Health_OverBudget', new List<Object>{ used, budget })
 						);
 						offTrack = true;
 					} else if (percent >= warning) {
@@ -140,9 +131,7 @@ public with sharing class ProjectHealth implements Schedulable {
 			}
 			String joined = reasons.isEmpty() ? null : String.join(reasons, '\n');
 			if (health != project.Health__c || joined != project.Health_Reasons__c) {
-				changed.add(
-					new Project__c(Id = project.Id, Health__c = health, Health_Reasons__c = joined)
-				);
+				changed.add(new Project__c(Id = project.Id, Health__c = health, Health_Reasons__c = joined));
 			}
 		}
 		return changed;
@@ -152,11 +141,7 @@ public with sharing class ProjectHealth implements Schedulable {
 	 * The lines for late work by project: a milestone past its due date, or a task past it by
 	 * At Risk Days or more. At most five are named; the rest are counted.
 	 */
-	private static Map<Id, List<String>> lateWork(
-		List<Project__c> records,
-		Date today,
-		AccessLevel mode
-	) {
+	private static Map<Id, List<String>> lateWork(List<Project__c> records, Date today, AccessLevel mode) {
 		Map<Id, List<String>> lines = new Map<Id, List<String>>();
 		Map<Id, Integer> more = new Map<Id, Integer>();
 		Set<Id> active = new Set<Id>();
@@ -196,21 +181,12 @@ public with sharing class ProjectHealth implements Schedulable {
 						: BarnHelp.text('Projects', 'Projects_Health_LateTask', args)
 				);
 			} else {
-				more.put(
-					task.Project__c,
-					(more.containsKey(task.Project__c) ? more.get(task.Project__c) : 0) + 1
-				);
+				more.put(task.Project__c, (more.containsKey(task.Project__c) ? more.get(task.Project__c) : 0) + 1);
 			}
 		}
 		for (Id projectId : more.keySet()) {
 			lines.get(projectId)
-				.add(
-					BarnHelp.text(
-						'Projects',
-						'Projects_Health_MoreLate',
-						new List<Object>{ more.get(projectId) }
-					)
-				);
+				.add(BarnHelp.text('Projects', 'Projects_Health_MoreLate', new List<Object>{ more.get(projectId) }));
 		}
 		return lines;
 	}

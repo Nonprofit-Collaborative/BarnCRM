@@ -10,12 +10,7 @@ private class IntegrationAppServiceTest {
 		TestUsers.admin();
 	}
 
-	private static Integration_App__mdt product(
-		String name,
-		String category,
-		String detection,
-		Decimal order
-	) {
+	private static Integration_App__mdt product(String name, String category, String detection, Decimal order) {
 		return new Integration_App__mdt(
 			DeveloperName = name,
 			MasterLabel = name.replace('_', ' '),
@@ -76,17 +71,11 @@ private class IntegrationAppServiceTest {
 			AppInfoLookup apps = listed();
 			Test.stopTest();
 
-			Assert.isTrue(
-				apps.get('Packaged').installed,
-				'A packaged object is found by its prefix'
-			);
+			Assert.isTrue(apps.get('Packaged').installed, 'A packaged object is found by its prefix');
 			Assert.isTrue(apps.get('Plain').installed, 'An unpackaged object is found by its name');
 			Assert.isTrue(apps.get('Either').installed, 'Any one of the objects is enough');
 			Assert.isFalse(apps.get('Absent').installed, 'No object here means not installed');
-			Assert.isFalse(
-				apps.get('Unknowable').installed,
-				'A row naming no object cannot be told'
-			);
+			Assert.isFalse(apps.get('Unknowable').installed, 'A row naming no object cannot be told');
 		}
 	}
 
@@ -188,38 +177,17 @@ private class IntegrationAppServiceTest {
 			Integration_App__mdt blank = product('Blank', 'Complement', null, 3);
 			Integration_App__mdt odd = product('Odd', 'Complement', null, 4);
 			odd.Status__c = 'Whatever';
-			IntegrationAppService.catalogOverride = new List<Integration_App__mdt>{
-				done,
-				planned,
-				blank,
-				odd
-			};
+			IntegrationAppService.catalogOverride = new List<Integration_App__mdt>{ done, planned, blank, odd };
 			IntegrationAppService.objectNamesOverride = new Set<String>();
 
 			Test.startTest();
 			AppInfoLookup apps = listed();
 			Test.stopTest();
 
-			Assert.areEqual(
-				IntegrationAppService.STATUS_AVAILABLE,
-				apps.get('Done').status,
-				'Available'
-			);
-			Assert.areEqual(
-				IntegrationAppService.STATUS_IN_PROGRESS,
-				apps.get('Planned').status,
-				'In progress'
-			);
-			Assert.areEqual(
-				IntegrationAppService.STATUS_IN_PROGRESS,
-				apps.get('Blank').status,
-				'Blank is in progress'
-			);
-			Assert.areEqual(
-				IntegrationAppService.STATUS_IN_PROGRESS,
-				apps.get('Odd').status,
-				'Unknown is in progress'
-			);
+			Assert.areEqual(IntegrationAppService.STATUS_AVAILABLE, apps.get('Done').status, 'Available');
+			Assert.areEqual(IntegrationAppService.STATUS_IN_PROGRESS, apps.get('Planned').status, 'In progress');
+			Assert.areEqual(IntegrationAppService.STATUS_IN_PROGRESS, apps.get('Blank').status, 'Blank is in progress');
+			Assert.areEqual(IntegrationAppService.STATUS_IN_PROGRESS, apps.get('Odd').status, 'Unknown is in progress');
 		}
 	}
 
@@ -259,10 +227,7 @@ private class IntegrationAppServiceTest {
 			Test.stopTest();
 
 			// DLRS competes with BarnCRM rollups, so it is listed only where it is installed.
-			Assert.isNull(
-				none.get('Declarative_Lookup_Rollup_Summaries'),
-				'DLRS is hidden while it is not installed'
-			);
+			Assert.isNull(none.get('Declarative_Lookup_Rollup_Summaries'), 'DLRS is hidden while it is not installed');
 			Assert.isTrue(
 				some.get('Declarative_Lookup_Rollup_Summaries').installed,
 				'DLRS is listed, as Installed, once it is'
@@ -284,10 +249,7 @@ private class IntegrationAppServiceTest {
 				some.get('Memberships_Essentials')?.category,
 				'It is listed, as an alternative, once installed'
 			);
-			Assert.isNull(
-				none.get('Volunteers_for_Salesforce'),
-				'Volunteers for Salesforce is hidden'
-			);
+			Assert.isNull(none.get('Volunteers_for_Salesforce'), 'Volunteers for Salesforce is hidden');
 			Assert.isNotNull(some.get('Volunteers_for_Salesforce'), 'It is listed once installed');
 			Assert.isTrue(some.get('Volunteers_for_Salesforce').installed, 'And says Installed');
 			Assert.isTrue(some.get('Summit_Events_App').installed, 'Summit is detected');

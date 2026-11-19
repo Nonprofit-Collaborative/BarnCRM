@@ -39,26 +39,18 @@ public with sharing class RelationshipDomain {
 			return;
 		}
 		for (Relationship__c record : records) {
-			Relationship__c previous = previousById == null
-				? null
-				: (Relationship__c) previousById.get(record.Id);
+			Relationship__c previous = previousById == null ? null : (Relationship__c) previousById.get(record.Id);
 			// Worked out when there is none yet or the type changed, and otherwise left as
 			// it is. A one-way mapping (Employer contact to Colleague) gives the other side a
 			// reciprocal the mapping would not give back, and recomputing it on every edit of
 			// that side would quietly retype the original.
 			Boolean typeChanged =
 				previous != null &&
-				(record.Type__c == null
-					? previous.Type__c != null
-					: !record.Type__c.equals(previous.Type__c));
+				(record.Type__c == null ? previous.Type__c != null : !record.Type__c.equals(previous.Type__c));
 			if (String.isBlank(record.Reciprocal_Type__c) || typeChanged) {
 				record.Reciprocal_Type__c = RelationshipService.reciprocalOf(record.Type__c);
 			}
-			record.Status__c = ConnectionStatus.settle(
-				record.Status__c,
-				record.End_Date__c,
-				previous?.End_Date__c
-			);
+			record.Status__c = ConnectionStatus.settle(record.Status__c, record.End_Date__c, previous?.End_Date__c);
 		}
 	}
 
@@ -93,9 +85,7 @@ public with sharing class RelationshipDomain {
 
 	/** False, with the record refused, when it newly takes a type that is turned off. */
 	private static Boolean checkType(Relationship__c record, Map<Id, SObject> previousById) {
-		Relationship__c previous = previousById == null
-			? null
-			: (Relationship__c) previousById.get(record.Id);
+		Relationship__c previous = previousById == null ? null : (Relationship__c) previousById.get(record.Id);
 		Boolean newType = previous == null || record.Type__c != previous.Type__c;
 		if (newType && RelationshipService.isTurnedOff(record.Type__c)) {
 			record.addError(
@@ -147,10 +137,7 @@ public with sharing class RelationshipDomain {
 	 * people in front of us is read once, keyed, and matched; records inside this same save
 	 * are matched against each other from the same map.
 	 */
-	private static void rejectDuplicates(
-		List<Relationship__c> records,
-		Map<Id, SObject> previousById
-	) {
+	private static void rejectDuplicates(List<Relationship__c> records, Map<Id, SObject> previousById) {
 		Set<Id> fromPeople = new Set<Id>();
 		for (Relationship__c record : records) {
 			fromPeople.add(PersonReference.idOf(record.Contact__c, record.Person_Account__c));
@@ -171,9 +158,7 @@ public with sharing class RelationshipDomain {
 				visibleById.put(shown.Id, shown);
 			}
 		}
-		for (
-			Relationship__c existing : RelationshipUpkeepSelector.selectByFromPersonIds(fromPeople)
-		) {
+		for (Relationship__c existing : RelationshipUpkeepSelector.selectByFromPersonIds(fromPeople)) {
 			// A record in this same save is compared as it is about to be, not as it was.
 			if (beingSaved.contains(existing.Id)) {
 				continue;
@@ -220,10 +205,7 @@ public with sharing class RelationshipDomain {
 	/** How a record identifies itself: this person, that person, this type; null when unknown. */
 	public static String keyOf(Relationship__c record) {
 		String fromKey = PersonReference.keyOf(record.Contact__c, record.Person_Account__c);
-		String toKey = PersonReference.keyOf(
-			record.Related_Contact__c,
-			record.Related_Person_Account__c
-		);
+		String toKey = PersonReference.keyOf(record.Related_Contact__c, record.Related_Person_Account__c);
 		if (fromKey == null || toKey == null || String.isBlank(record.Type__c)) {
 			return null;
 		}

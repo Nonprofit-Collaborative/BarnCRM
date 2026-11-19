@@ -4,9 +4,7 @@
  * Builder set is not enough without Manage BarnCRM Settings, a total never goes to the user
  * record or setup objects, and the author must be able to write the target and read the source.
  */
-@IsTest(
-	testFor='ApexClass:RollupDefinitionGuard, ApexTrigger:RollupDefinitionTrigger, ApexClass:RollupWriter'
-)
+@IsTest(testFor='ApexClass:RollupDefinitionGuard, ApexTrigger:RollupDefinitionTrigger, ApexClass:RollupWriter')
 private class RollupDefinitionGuardTest {
 	@TestSetup
 	static void createTestUser() {
@@ -32,10 +30,7 @@ private class RollupDefinitionGuardTest {
 	private static User builderOnly() {
 		User builder;
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			builder = TestUsers.standardUserWith(
-				'Builderonly',
-				new List<String>{ 'Rollup_Builder_Admin' }
-			);
+			builder = TestUsers.standardUserWith('Builderonly', new List<String>{ 'Rollup_Builder_Admin' });
 		}
 		return builder;
 	}
@@ -51,23 +46,12 @@ private class RollupDefinitionGuardTest {
 
 		Test.startTest();
 		System.runAs(builder) {
-			saved = Database.insert(
-				definition('Test_Guard_Create'),
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			saved = Database.insert(definition('Test_Guard_Create'), false, AccessLevel.SYSTEM_MODE);
 		}
 		Test.stopTest();
 
-		Assert.isFalse(
-			saved.isSuccess(),
-			'A save from outside the Builder still needs the permission'
-		);
-		Assert.areEqual(
-			BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'),
-			firstError(saved),
-			'Says why'
-		);
+		Assert.isFalse(saved.isSuccess(), 'A save from outside the Builder still needs the permission');
+		Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'), firstError(saved), 'Says why');
 	}
 
 	@IsTest
@@ -92,8 +76,7 @@ private class RollupDefinitionGuardTest {
 		Assert.isFalse(result.isSuccess(), 'Retargeting needs the permission');
 		Assert.areEqual(
 			'NumberOfEmployees',
-			[SELECT Target_Field__c FROM Rollup_Definition__c WHERE Id = :saved.Id WITH SYSTEM_MODE]
-			.Target_Field__c,
+			[SELECT Target_Field__c FROM Rollup_Definition__c WHERE Id = :saved.Id WITH SYSTEM_MODE].Target_Field__c,
 			'The target is unchanged'
 		);
 	}
@@ -131,16 +114,10 @@ private class RollupDefinitionGuardTest {
 	static void onlyObjectsATotalMayGoToAreAllowed() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			Assert.isTrue(RollupDefinitionGuard.isAllowedTarget('Account'), 'Account holds totals');
-			Assert.isTrue(
-				RollupDefinitionGuard.isAllowedTarget('Gift__c'),
-				'An org object holds totals'
-			);
+			Assert.isTrue(RollupDefinitionGuard.isAllowedTarget('Gift__c'), 'An org object holds totals');
 			Assert.isFalse(RollupDefinitionGuard.isAllowedTarget('User'), 'Never the user record');
 			Assert.isFalse(RollupDefinitionGuard.isAllowedTarget('PermissionSet'), 'Never setup');
-			Assert.isFalse(
-				RollupDefinitionGuard.isAllowedTarget('Rollup_Queue__c'),
-				'Never BarnCRM bookkeeping'
-			);
+			Assert.isFalse(RollupDefinitionGuard.isAllowedTarget('Rollup_Queue__c'), 'Never BarnCRM bookkeeping');
 			Assert.isFalse(RollupDefinitionGuard.isAllowedTarget(' '), 'Never a blank');
 		}
 	}
@@ -157,11 +134,7 @@ private class RollupDefinitionGuardTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'),
-			problem,
-			'Says why'
-		);
+		Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorTargetNotWritable'), problem, 'Says why');
 	}
 
 	@IsTest
@@ -178,11 +151,7 @@ private class RollupDefinitionGuardTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Rollups', 'Core_Rollups_ErrorFieldNotReadable'),
-			problem,
-			'Says why'
-		);
+		Assert.areEqual(BarnHelp.text('Rollups', 'Core_Rollups_ErrorFieldNotReadable'), problem, 'Says why');
 	}
 
 	@IsTest
@@ -217,9 +186,6 @@ private class RollupDefinitionGuardTest {
 			WITH SYSTEM_MODE
 		];
 		Assert.isNotNull(stored.Last_Calculated__c, 'The package wrote and stamped its own row');
-		Assert.isFalse(
-			RollupDefinitionGuard.shippedDefaultsSaving,
-			'The trust ends with the shipped save'
-		);
+		Assert.isFalse(RollupDefinitionGuard.shippedDefaultsSaving, 'The trust ends with the shipped save');
 	}
 }

@@ -67,19 +67,13 @@ public with sharing class OpportunityMirrorController {
 	public static Status copyRangeAgain(Date fromDate, Date toDate) {
 		Status current = checked(false);
 		if (current.direction != OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_CopyAgainGiftsOnly')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_CopyAgainGiftsOnly'));
 		}
 		if (fromDate == null || toDate == null) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'));
 		}
 		if (fromDate > toDate) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'));
 		}
 		try {
 			OpportunityMirrorBatch.runRange(fromDate, toDate);
@@ -106,9 +100,7 @@ public with sharing class OpportunityMirrorController {
 	public static Status stop() {
 		Status current = status();
 		if (!current.canManage) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission'));
 		}
 		try {
 			OpportunityMirrorSchedulable.stop();
@@ -133,9 +125,7 @@ public with sharing class OpportunityMirrorController {
 
 	private static void requireUse() {
 		if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoUsePermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoUsePermission'));
 		}
 	}
 
@@ -193,8 +183,7 @@ public with sharing class OpportunityMirrorController {
 	private static Boolean canRun(String direction) {
 		if (direction != OpportunityMirrorService.OPPORTUNITIES_TO_GIFTS) {
 			// A run stores each new link on its gift in user mode.
-			return OpportunityMirrorService.canCopy() &&
-				Gift__c.Opportunity_Id__c.getDescribe().isUpdateable();
+			return OpportunityMirrorService.canCopy() && Gift__c.Opportunity_Id__c.getDescribe().isUpdateable();
 		}
 		if (!OpportunityMirrorService.isAvailable()) {
 			return false;

@@ -29,12 +29,7 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 
 	private static final Map<Schema.SObjectType, KeyRule> RULES = new Map<Schema.SObjectType, KeyRule>{
 		Promo_Code__c.SObjectType => new KeyRule('Code_Key__c', 'Event__c', 'Name', true),
-		Event_Speaker__c.SObjectType => new KeyRule(
-			'Speaker_Key__c',
-			'Event__c',
-			'Contact__c',
-			false
-		),
+		Event_Speaker__c.SObjectType => new KeyRule('Speaker_Key__c', 'Event__c', 'Contact__c', false),
 		Session_Speaker__c.SObjectType => new KeyRule(
 			'Assignment_Key__c',
 			'Event_Session__c',
@@ -161,9 +156,7 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 		if (groupId == null || value == null || String.isBlank(String.valueOf(value))) {
 			return null;
 		}
-		String part = rule.isText
-			? ((String) value).toUpperCase()
-			: String.valueOf(Id.valueOf(String.valueOf(value)));
+		String part = rule.isText ? ((String) value).toUpperCase() : String.valueOf(Id.valueOf(String.valueOf(value)));
 		return String.valueOf(Id.valueOf(String.valueOf(groupId))) + ':' + part;
 	}
 

@@ -35,10 +35,7 @@ public with sharing class SessionAttendance {
 			!log.cancelled &&
 			Schema.SObjectType.Service_Delivery__c.isCreateable() &&
 			Schema.SObjectType.Service_Delivery__c.isUpdateable();
-		for (
-			Schema.PicklistEntry entry : Service_Delivery__c.Attendance__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Service_Delivery__c.Attendance__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				ServiceDeliveryLogController.Option option = new ServiceDeliveryLogController.Option();
 				option.label = entry.getLabel();
@@ -49,9 +46,7 @@ public with sharing class SessionAttendance {
 
 		Integer most = ServiceDeliveryLogController.MAX_SHOWN;
 		Map<Id, Service_Delivery__c> deliveryByPerson = new Map<Id, Service_Delivery__c>();
-		for (
-			Service_Delivery__c delivery : CohortSelector.selectSessionDeliveries(session, most + 1)
-		) {
+		for (Service_Delivery__c delivery : CohortSelector.selectSessionDeliveries(session, most + 1)) {
 			Id person = personOf(delivery.Contact__c, delivery.Account__c);
 			// The session's own rows come first, so they win over a row it would adopt.
 			if (person != null && !deliveryByPerson.containsKey(person)) {
@@ -59,16 +54,8 @@ public with sharing class SessionAttendance {
 			}
 		}
 		List<Enrollment__c> open = session.Cohort__c != null
-			? CohortSelector.selectMembers(
-					session.Cohort__c,
-					EnrollmentService.OPEN_STAGES,
-					most + 1
-			  )
-			: EnrollmentSelector.selectRoster(
-					session.Service__r.Program__c,
-					EnrollmentService.OPEN_STAGES,
-					most + 1
-			  );
+			? CohortSelector.selectMembers(session.Cohort__c, EnrollmentService.OPEN_STAGES, most + 1)
+			: EnrollmentSelector.selectRoster(session.Service__r.Program__c, EnrollmentService.OPEN_STAGES, most + 1);
 		log.moreThanShown = open.size() > most;
 		Set<Id> listed = new Set<Id>();
 		for (Integer i = 0; i < open.size() && i < most; i++) {
@@ -98,9 +85,7 @@ public with sharing class SessionAttendance {
 			row.contactId = delivery.Contact__c;
 			row.accountId = delivery.Account__c;
 			row.enrollmentId = delivery.Enrollment__c;
-			row.personName = delivery.Contact__c != null
-				? delivery.Contact__r?.Name
-				: delivery.Account__r?.Name;
+			row.personName = delivery.Contact__c != null ? delivery.Contact__r?.Name : delivery.Account__r?.Name;
 			fill(row, delivery);
 			log.rows.add(row);
 		}
@@ -111,9 +96,7 @@ public with sharing class SessionAttendance {
 	public static Integer save(Id sessionId, List<ServiceDeliveryLogController.Entry> entries) {
 		Session__c session = checkedSession(sessionId);
 		if (session.Status__c == CANCELLED) {
-			throw UserErrors.message(
-				BarnHelp.text('Programs', 'Programs_Session_CancelledNoAttendance')
-			);
+			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Session_CancelledNoAttendance'));
 		}
 		Set<String> allowed = new Set<String>(ServiceDeliveryService.ATTENDANCE);
 		List<Service_Delivery__c> toInsert = new List<Service_Delivery__c>();

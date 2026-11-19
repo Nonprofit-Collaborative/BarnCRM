@@ -56,9 +56,7 @@ public with sharing class RollupDateWindow {
 		Integer resolvedOffset = offset == null ? 0 : offset;
 		Integer startMonth = fiscalYearStartMonth();
 		Date today = todayOverride == null ? Date.today() : todayOverride;
-		Integer currentFiscalStartYear = today.month() >= startMonth
-			? today.year()
-			: today.year() - 1;
+		Integer currentFiscalStartYear = today.month() >= startMonth ? today.year() : today.year() - 1;
 		Date windowStart = Date.newInstance(currentFiscalStartYear + resolvedOffset, startMonth, 1);
 		return new Window(windowStart, windowStart.addYears(1));
 	}
@@ -72,11 +70,7 @@ public with sharing class RollupDateWindow {
 	 * attribute to bound is a definition that cannot be built, and it is refused rather than
 	 * silently returning every record.
 	 */
-	public static String toWhereClause(
-		Boolean fiscalYearAware,
-		Integer offset,
-		String dateFieldName
-	) {
+	public static String toWhereClause(Boolean fiscalYearAware, Integer offset, String dateFieldName) {
 		if (fiscalYearAware != true) {
 			return '';
 		}

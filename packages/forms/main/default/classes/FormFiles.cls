@@ -135,11 +135,7 @@ public inherited sharing class FormFiles {
 			for (Id target : targets) {
 				if (!linked.contains('' + document + target)) {
 					links.add(
-						new ContentDocumentLink(
-							ContentDocumentId = document,
-							LinkedEntityId = target,
-							ShareType = 'V'
-						)
+						new ContentDocumentLink(ContentDocumentId = document, LinkedEntityId = target, ShareType = 'V')
 					);
 				}
 			}

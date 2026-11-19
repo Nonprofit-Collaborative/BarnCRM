@@ -102,9 +102,7 @@ private class RelationshipRestoreTest {
 		List<Contact> people = RelationshipTestDataFactory.contacts(2 * howMany, 'Restore');
 		List<Relationship__c> batch = new List<Relationship__c>();
 		for (Integer i = 0; i < howMany; i++) {
-			batch.add(
-				RelationshipTestDataFactory.between(people[2 * i], people[2 * i + 1], 'Spouse')
-			);
+			batch.add(RelationshipTestDataFactory.between(people[2 * i], people[2 * i + 1], 'Spouse'));
 		}
 		insert as system batch;
 		Set<Id> ids = new Set<Id>();

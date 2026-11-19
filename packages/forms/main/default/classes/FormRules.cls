@@ -60,9 +60,7 @@ public with sharing class FormRules {
 		} catch (JSONException notJson) {
 			parsed = null;
 		}
-		return parsed instanceof Map<String, Object>
-			? (Map<String, Object>) parsed
-			: new Map<String, Object>();
+		return parsed instanceof Map<String, Object> ? (Map<String, Object>) parsed : new Map<String, Object>();
 	}
 
 	/** The definition's steps, never null. */
@@ -189,10 +187,7 @@ public with sharing class FormRules {
 	 * Which questions show, by key: a question shows when its step does and its condition
 	 * holds, reading a hidden question's answer as not given.
 	 */
-	public static Map<String, Boolean> visibility(
-		Map<String, Object> definition,
-		Map<String, Object> answers
-	) {
+	public static Map<String, Boolean> visibility(Map<String, Object> definition, Map<String, Object> answers) {
 		Map<String, Boolean> shown = new Map<String, Boolean>();
 		Map<String, Object> counted = new Map<String, Object>();
 		for (Map<String, Object> step : steps(definition)) {
@@ -292,10 +287,7 @@ public with sharing class FormRules {
 	}
 
 	/** The problem codes of every showing question, by field key. Empty when it can be sent. */
-	public static Map<String, String> checkAll(
-		Map<String, Object> definition,
-		Map<String, Object> answers
-	) {
+	public static Map<String, String> checkAll(Map<String, Object> definition, Map<String, Object> answers) {
 		Map<String, Boolean> shown = visibility(definition, answers);
 		Map<String, String> problems = new Map<String, String>();
 		for (Map<String, Object> field : allFields(definition)) {
@@ -314,10 +306,7 @@ public with sharing class FormRules {
 	 * The answers that count: showing questions only, keys the form has only, text trimmed,
 	 * numbers as numbers, a checkbox always true or false, blanks left out.
 	 */
-	public static Map<String, Object> countedAnswers(
-		Map<String, Object> definition,
-		Map<String, Object> answers
-	) {
+	public static Map<String, Object> countedAnswers(Map<String, Object> definition, Map<String, Object> answers) {
 		Map<String, Boolean> shown = visibility(definition, answers);
 		Map<String, Object> counted = new Map<String, Object>();
 		for (Map<String, Object> field : allFields(definition)) {

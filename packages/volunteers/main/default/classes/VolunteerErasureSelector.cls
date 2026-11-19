@@ -42,10 +42,7 @@ public without sharing class VolunteerErasureSelector {
 		];
 	}
 
-	public static List<Volunteer_Requirement__c> requirementsOf(
-		Set<Id> contacts,
-		Set<Id> accounts
-	) {
+	public static List<Volunteer_Requirement__c> requirementsOf(Set<Id> contacts, Set<Id> accounts) {
 		return [
 			SELECT Id
 			FROM Volunteer_Requirement__c

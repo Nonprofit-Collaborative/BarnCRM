@@ -378,20 +378,11 @@ public with sharing class ImportMapping {
 		String attribute = attributeOf(target);
 		if (
 			attribute == null ||
-			!(ENTITY_CONTACT_1.equalsIgnoreCase(entity) ||
-			ENTITY_CONTACT_2.equalsIgnoreCase(entity))
+			!(ENTITY_CONTACT_1.equalsIgnoreCase(entity) || ENTITY_CONTACT_2.equalsIgnoreCase(entity))
 		) {
 			return false;
 		}
-		for (
-			String identifying : new List<String>{
-				'FirstName',
-				'LastName',
-				'Email',
-				'Id',
-				ATTRIBUTE_FULL_NAME
-			}
-		) {
+		for (String identifying : new List<String>{ 'FirstName', 'LastName', 'Email', 'Id', ATTRIBUTE_FULL_NAME }) {
 			if (identifying.equalsIgnoreCase(attribute)) {
 				return true;
 			}
@@ -552,9 +543,7 @@ public with sharing class ImportMapping {
 		for (String target : targetsBySourceKey().values()) {
 			String entity = entityOf(target);
 			String attribute = attributeOf(target);
-			Boolean isPerson =
-				ENTITY_CONTACT_1.equalsIgnoreCase(entity) ||
-				ENTITY_CONTACT_2.equalsIgnoreCase(entity);
+			Boolean isPerson = ENTITY_CONTACT_1.equalsIgnoreCase(entity) || ENTITY_CONTACT_2.equalsIgnoreCase(entity);
 			if (
 				isPerson &&
 				(ATTRIBUTE_FULL_NAME.equalsIgnoreCase(attribute) ||
@@ -563,9 +552,7 @@ public with sharing class ImportMapping {
 			) {
 				return true;
 			}
-			if (
-				ENTITY_ORGANIZATION.equalsIgnoreCase(entity) && 'Name'.equalsIgnoreCase(attribute)
-			) {
+			if (ENTITY_ORGANIZATION.equalsIgnoreCase(entity) && 'Name'.equalsIgnoreCase(attribute)) {
 				return true;
 			}
 		}

@@ -57,10 +57,7 @@ private class NpspGivingKitTest {
 					);
 				}
 				if (key.startsWith('recurring')) {
-					Assert.isTrue(
-						template.Column_Mapping_JSON__c.contains('Record.Donor_'),
-						key + ' names the donor'
-					);
+					Assert.isTrue(template.Column_Mapping_JSON__c.contains('Record.Donor_'), key + ' names the donor');
 				}
 			}
 		}
@@ -133,15 +130,9 @@ private class NpspGivingKitTest {
 				TestDataFactory.organization(new Account(Name = 'Kit One')),
 				TestDataFactory.organization(new Account(Name = 'Kit Two'))
 			};
-			Set<String> found = NpspGivingKit.names(
-				'SELECT Name FROM Account WHERE Name LIKE \'Kit %\'',
-				'Name'
-			);
+			Set<String> found = NpspGivingKit.names('SELECT Name FROM Account WHERE Name LIKE \'Kit %\'', 'Name');
 			Assert.areEqual(new Set<String>{ 'Kit One', 'Kit Two' }, found, 'both accounts');
-			Assert.isTrue(
-				NpspGivingKit.names('SELECT Name FROM npsp~Level__c', 'Name').isEmpty(),
-				'no NPSP, no names'
-			);
+			Assert.isTrue(NpspGivingKit.names('SELECT Name FROM npsp~Level__c', 'Name').isEmpty(), 'no NPSP, no names');
 		}
 	}
 
@@ -149,13 +140,7 @@ private class NpspGivingKitTest {
 	static void stepsReadingNpspObjectsAreRefusedWithoutThem() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			NpspGivingKit extension = new NpspGivingKit();
-			for (
-				String key : new List<String>{
-					'recurringPeople',
-					'recurringOrganizations',
-					'planSteps'
-				}
-			) {
+			for (String key : new List<String>{ 'recurringPeople', 'recurringOrganizations', 'planSteps' }) {
 				try {
 					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
 				} catch (Exception refused) {
@@ -187,10 +172,7 @@ private class NpspGivingKitTest {
 	@IsTest
 	static void theParityStepCountsNothingWithoutNpsp() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			MigrationKitService.Step step = MigrationKitService.stepNamed(
-				MigrationKitService.kitNamed(KIT),
-				'parity'
-			);
+			MigrationKitService.Step step = MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), 'parity');
 			Assert.areEqual('tool', step.kind, 'a tool step');
 			MigrationCheck check = new NpspGivingKit().verify('parity');
 			Assert.areEqual(0, check.source, 'no NPSP levels or plans in a test org');

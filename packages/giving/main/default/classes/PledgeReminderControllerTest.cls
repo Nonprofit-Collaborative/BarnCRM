@@ -14,12 +14,7 @@ private class PledgeReminderControllerTest {
 	static void theDefaultPageSaysOffAndListsStepsWithTheirTemplates() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new List<Pledge_Reminder_Step__c>{
-				PledgeReminderTestData.buildStep(
-					'Week late',
-					7,
-					'Email',
-					PledgeReminderTestData.TEMPLATE
-				),
+				PledgeReminderTestData.buildStep('Week late', 7, 'Email', PledgeReminderTestData.TEMPLATE),
 				PledgeReminderTestData.buildStep('Lost', 14, 'Email', 'No_Such_Template'),
 				PledgeReminderTestData.buildStep('Letter', 30, 'Letter', null)
 			};
@@ -45,10 +40,7 @@ private class PledgeReminderControllerTest {
 				PledgeReminderController.sendNow();
 				Assert.fail('A send while off must be refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_PledgeReminders_Disabled'), refused.getMessage());
 			}
 		}
 	}
@@ -71,9 +63,7 @@ private class PledgeReminderControllerTest {
 			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
 			Commitment__c pledge = PledgeReminderTestData.insertPledge(donor.Id, 7);
 			PledgeReminderService.process(
-				new List<Installment__c>{
-					PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7))
-				}
+				new List<Installment__c>{ PledgeReminderTestData.installmentDue(pledge.Id, Date.today().addDays(-7)) }
 			);
 
 			Assert.areEqual(1, PledgeReminderController.getPage().lettersWaiting);

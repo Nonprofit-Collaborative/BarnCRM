@@ -65,10 +65,7 @@ private class GivingSetupAssistantExtensionTest {
 			);
 			Map<String, Object> defaults = stepByKey(steps, 'funddefaults');
 			System.assertEquals(4, defaults.get('position'));
-			System.assertEquals(
-				Label.Giving_SetupAssistant_FundAppealStepLabel,
-				defaults.get('label')
-			);
+			System.assertEquals(Label.Giving_SetupAssistant_FundAppealStepLabel, defaults.get('label'));
 			System.assertEquals(true, defaults.get('advanceOnSave'));
 		}
 	}
@@ -77,10 +74,7 @@ private class GivingSetupAssistantExtensionTest {
 	static void asksForTheReceiptFieldsOnTheOrganizationStep() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			Map<String, Object> identity = stepByKey(
-				asList(SetupAssistantService.getSteps()),
-				'identity'
-			);
+			Map<String, Object> identity = stepByKey(asList(SetupAssistantService.getSteps()), 'identity');
 			Test.stopTest();
 
 			System.assertEquals(
@@ -113,20 +107,12 @@ private class GivingSetupAssistantExtensionTest {
 	static void endsWithTheFirstGiftButton() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			Map<String, Object> verify = stepByKey(
-				asList(SetupAssistantService.getSteps()),
-				'verify'
-			);
+			Map<String, Object> verify = stepByKey(asList(SetupAssistantService.getSteps()), 'verify');
 			Test.stopTest();
 
-			Map<String, Object> button = (Map<String, Object>) ((List<Object>) verify.get(
-				'fields'
-			))[0];
+			Map<String, Object> button = (Map<String, Object>) ((List<Object>) verify.get('fields'))[0];
 			System.assertEquals(SetupAssistantService.FIELD_NAVIGATE, button.get('fieldType'));
-			System.assertEquals(
-				NamespaceUtil.qualify('Quick_Gift_Entry'),
-				button.get('navigationTarget')
-			);
+			System.assertEquals(NamespaceUtil.qualify('Quick_Gift_Entry'), button.get('navigationTarget'));
 		}
 	}
 
@@ -139,14 +125,9 @@ private class GivingSetupAssistantExtensionTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Integer checked = 0;
 			Test.startTest();
-			for (
-				SetupAssistantService.Step step : new GivingSetupAssistantExtension()
-					.contributions()
-			) {
+			for (SetupAssistantService.Step step : new GivingSetupAssistantExtension().contributions()) {
 				for (
-					Object field : (List<Object>) ((Map<String, Object>) JSON.deserializeUntyped(
-							JSON.serialize(step)
-						))
+					Object field : (List<Object>) ((Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(step)))
 						.get('fields')
 				) {
 					Map<String, Object> declared = (Map<String, Object>) field;

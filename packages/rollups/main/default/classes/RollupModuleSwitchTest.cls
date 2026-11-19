@@ -33,18 +33,14 @@ private class RollupModuleSwitchTest {
 
 	private static Account organization() {
 		Account created = TestDataFactory.organization(
-			new Account(
-				Name = 'Organization',
-				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-			)
+			new Account(Name = 'Organization', RecordTypeId = AccountKindsTestData.organizationRecordTypeId())
 		);
 		insert created;
 		return created;
 	}
 
 	private static Integer countOn(Id organizationId) {
-		Integer count = [SELECT NumberOfEmployees FROM Account WHERE Id = :organizationId]
-		.NumberOfEmployees;
+		Integer count = [SELECT NumberOfEmployees FROM Account WHERE Id = :organizationId].NumberOfEmployees;
 		return count == null ? 0 : count;
 	}
 
@@ -113,9 +109,7 @@ private class RollupModuleSwitchTest {
 			ModuleManagerService.turnOff(RollupService.MODULE_NAME);
 
 			Test.startTest();
-			Contact person = TestDataFactory.person(
-				new Contact(LastName = 'Ames', AccountId = employer.Id)
-			);
+			Contact person = TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = employer.Id));
 			insert person;
 			RollupRecalcAction.Request request = new RollupRecalcAction.Request();
 			request.record = person;
@@ -130,11 +124,7 @@ private class RollupModuleSwitchTest {
 			Test.stopTest();
 
 			Assert.isTrue(RollupService.isTurnedOff(), 'The module is off');
-			Assert.areEqual(
-				ModuleManagerService.STATUS_OFF,
-				moduleRow().getStatus(),
-				'The Module Manager says so'
-			);
+			Assert.areEqual(ModuleManagerService.STATUS_OFF, moduleRow().getStatus(), 'The Module Manager says so');
 			Assert.isTrue(moduleRow().getCanSwitch(), 'And offers the switch');
 			Assert.areEqual(0, countOn(employer.Id), 'No entry point counted Ames');
 			Assert.areEqual(0, [SELECT COUNT() FROM Rollup_Queue__c], 'Nothing was queued');

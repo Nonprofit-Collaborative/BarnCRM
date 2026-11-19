@@ -225,11 +225,7 @@ public with sharing class OrgOptimizerSetupController {
 		finding.kind = check.kind;
 		try {
 			String soql = check.key == failCheck ? check.soql + ' BROKEN' : check.soql;
-			List<SObject> rows = Database.queryWithBinds(
-				soql + ' LIMIT :readUpTo',
-				binds,
-				AccessLevel.USER_MODE
-			);
+			List<SObject> rows = Database.queryWithBinds(soql + ' LIMIT :readUpTo', binds, AccessLevel.USER_MODE);
 			finding.moreThan = rows.size() > COUNT_CAP;
 			finding.count = Math.min(rows.size(), COUNT_CAP);
 			for (Integer index = 0; index < Math.min(rows.size(), EXAMPLES); index++) {
@@ -252,12 +248,7 @@ public with sharing class OrgOptimizerSetupController {
 
 	/** Days without a run before a report is listed, from BarnCRM Settings. */
 	public static Integer reportDays() {
-		return bounded(
-			'Unused_Report_Days__c',
-			DEFAULT_REPORT_DAYS,
-			MIN_REPORT_DAYS,
-			MAX_REPORT_DAYS
-		);
+		return bounded('Unused_Report_Days__c', DEFAULT_REPORT_DAYS, MIN_REPORT_DAYS, MAX_REPORT_DAYS);
 	}
 
 	/** The API version below which Apex, triggers and flows are listed, from BarnCRM Settings. */

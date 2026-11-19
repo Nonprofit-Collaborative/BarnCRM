@@ -19,17 +19,11 @@ private class InboundGiftServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true);
 			insert new List<Fund__c>{
-				new Fund__c(
-					Name = 'Building Fund',
-					Active__c = true,
-					Accounting_Code__c = BUILDING_CODE
-				),
+				new Fund__c(Name = 'Building Fund', Active__c = true, Accounting_Code__c = BUILDING_CODE),
 				new Fund__c(Name = 'Old Roof Fund', Active__c = false, Accounting_Code__c = '4999')
 			};
 			insert new Appeal__c(Name = 'Spring Appeal');
-			insert TestDataFactory.person(
-				new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = LUIS_EMAIL)
-			);
+			insert TestDataFactory.person(new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = LUIS_EMAIL));
 			insert TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 		}
 	}
@@ -44,9 +38,7 @@ private class InboundGiftServiceTest {
 	 * donors with it), so a test that runs as that user gives it the donor to own.
 	 */
 	private static void addOwnDonor(User owner) {
-		Account household = TestDataFactory.household(
-			new Account(Name = 'The Garcia Household', OwnerId = owner.Id)
-		);
+		Account household = TestDataFactory.household(new Account(Name = 'The Garcia Household', OwnerId = owner.Id));
 		insert household;
 		insert TestDataFactory.person(
 			new Contact(
@@ -109,10 +101,7 @@ private class InboundGiftServiceTest {
 				FROM Gift__c
 				WHERE Id = :result.giftId
 			];
-			Assert.areEqual(
-				[SELECT Id FROM Contact WHERE Email = :OWN_DONOR_EMAIL].Id,
-				recorded.Donor_Contact__c
-			);
+			Assert.areEqual([SELECT Id FROM Contact WHERE Email = :OWN_DONOR_EMAIL].Id, recorded.Donor_Contact__c);
 			Assert.isNull(recorded.Donor_Account__c);
 			Assert.areEqual(50, recorded.Amount__c);
 			Assert.areEqual(Date.newInstance(2026, 9, 20), recorded.Gift_Date__c);
@@ -151,11 +140,7 @@ private class InboundGiftServiceTest {
 
 			Assert.areEqual(InboundGiftResult.OUTCOME_EXISTING, second.outcome);
 			Assert.areEqual(200, InboundGiftResult.httpStatus(second));
-			Assert.areEqual(
-				first.giftId,
-				second.giftId,
-				'External Id ignores case, as its index does.'
-			);
+			Assert.areEqual(first.giftId, second.giftId, 'External Id ignores case, as its index does.');
 			Assert.areEqual(1, [SELECT COUNT() FROM Gift__c]);
 			Assert.isNull([SELECT Payment_Reference__c FROM Gift__c].Payment_Reference__c);
 		}
@@ -199,11 +184,7 @@ private class InboundGiftServiceTest {
 			);
 
 			Assert.areEqual(InboundGiftResult.ERROR_INVALID_FIELD, results[0].errorCode);
-			Assert.areEqual(
-				InboundGiftResult.OUTCOME_CREATED,
-				results[1].outcome,
-				results[1].message
-			);
+			Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, results[1].outcome, results[1].message);
 			Assert.areEqual(InboundGiftResult.ERROR_INVALID_FIELD, results[2].errorCode);
 			Assert.areEqual(1, [SELECT COUNT() FROM Gift__c]);
 			Assert.areEqual(0, InboundGiftService.record(new List<InboundGift>()).size());
@@ -242,16 +223,11 @@ private class InboundGiftServiceTest {
 			Assert.areEqual(3, logged.size(), 'Every refusal is logged.');
 			Assert.areEqual('Warning', logged[0].Severity__c);
 			for (Error_Log__c entry : logged) {
-				Assert.isFalse(
-					entry.Message__c.contains('nobody@example.org'),
-					'No personal data.'
-				);
+				Assert.isFalse(entry.Message__c.contains('nobody@example.org'), 'No personal data.');
 				Assert.isTrue(entry.Message__c.contains('stripe:ch_'), 'The external id is named.');
 				Assert.isTrue(entry.Message__c.contains('donor_not_found'), 'The code is named.');
 				Assert.isFalse(
-					entry.Message__c.contains(
-						BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorDonorEmailNotFound')
-					),
+					entry.Message__c.contains(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorDonorEmailNotFound')),
 					'The message stays in the response, out of the log.'
 				);
 			}
@@ -290,11 +266,7 @@ private class InboundGiftServiceTest {
 			}
 
 			Assert.areEqual(InboundGiftResult.ERROR_NOT_SAVED, result.errorCode, result.message);
-			Assert.areEqual(
-				422,
-				InboundGiftResult.httpStatus(result),
-				'Not 500: resending cannot help.'
-			);
+			Assert.areEqual(422, InboundGiftResult.httpStatus(result), 'Not 500: resending cannot help.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c]);
 		}
 	}
@@ -308,17 +280,11 @@ private class InboundGiftServiceTest {
 			kept.fundCode = BUILDING_CODE;
 			InboundGiftService.designationRefusedInTest = new Set<String>{ 'retry:1' };
 
-			List<InboundGiftResult> results = InboundGiftService.record(
-				new List<InboundGift>{ refused, kept }
-			);
+			List<InboundGiftResult> results = InboundGiftService.record(new List<InboundGift>{ refused, kept });
 
 			Assert.areEqual(InboundGiftResult.ERROR_NOT_SAVED, results[0].errorCode);
 			Assert.isNull(results[0].giftId, 'Its first save was undone.');
-			Assert.areEqual(
-				InboundGiftResult.OUTCOME_CREATED,
-				results[1].outcome,
-				results[1].message
-			);
+			Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, results[1].outcome, results[1].message);
 			List<Gift__c> saved = [
 				SELECT External_Id__c, (SELECT Fund__c FROM Gift_Allocations__r)
 				FROM Gift__c
@@ -342,12 +308,7 @@ private class InboundGiftServiceTest {
 			InboundGiftResult result = recordOne(grant);
 
 			Gift__c recorded = [
-				SELECT
-					Donor_Account__c,
-					Donor_Contact__c,
-					Type__c,
-					Appeal__c,
-					(SELECT Fund__c FROM Gift_Allocations__r)
+				SELECT Donor_Account__c, Donor_Contact__c, Type__c, Appeal__c, (SELECT Fund__c FROM Gift_Allocations__r)
 				FROM Gift__c
 				WHERE Id = :result.giftId
 			];
@@ -411,11 +372,7 @@ private class InboundGiftServiceTest {
 			InboundGiftResult today = recordOne(gift('p:today', 10));
 
 			Assert.areEqual(InboundGiftResult.ERROR_NOT_SAVED, result.errorCode);
-			Assert.areEqual(
-				422,
-				InboundGiftResult.httpStatus(result),
-				'Not worth retrying as sent'
-			);
+			Assert.areEqual(422, InboundGiftResult.httpStatus(result), 'Not worth retrying as sent');
 			Assert.isTrue(
 				result.message.contains('The books are closed through'),
 				'The lock says why: ' + result.message
@@ -512,11 +469,7 @@ private class InboundGiftServiceTest {
 			Assert.areEqual(InboundGiftResult.ERROR_INVALID_REQUEST, notJson.errorCode);
 			Assert.areEqual(InboundGiftResult.ERROR_INVALID_REQUEST, empty.errorCode);
 			Assert.areEqual(400, InboundGiftResult.httpStatus(empty));
-			Assert.areEqual(
-				InboundGiftResult.OUTCOME_CREATED,
-				wellFormed.outcome,
-				wellFormed.message
-			);
+			Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, wellFormed.outcome, wellFormed.message);
 			Gift__c recorded = [SELECT Gift_Date__c, Type__c, Amount__c FROM Gift__c];
 			Assert.areEqual(Date.newInstance(2026, 9, 1), recorded.Gift_Date__c);
 			Assert.areEqual('Check', recorded.Type__c);
@@ -546,20 +499,10 @@ private class InboundGiftServiceTest {
 			InboundGift byContactId = gift('pa:2', 10);
 			byContactId.donorEmail = null;
 			byContactId.donorId = personContactId;
-			List<InboundGiftResult> results = InboundGiftService.record(
-				new List<InboundGift>{ byEmail, byContactId }
-			);
+			List<InboundGiftResult> results = InboundGiftService.record(new List<InboundGift>{ byEmail, byContactId });
 
-			Assert.areEqual(
-				InboundGiftResult.OUTCOME_CREATED,
-				results[0].outcome,
-				results[0].message
-			);
-			Assert.areEqual(
-				InboundGiftResult.OUTCOME_CREATED,
-				results[1].outcome,
-				results[1].message
-			);
+			Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, results[0].outcome, results[0].message);
+			Assert.areEqual(InboundGiftResult.OUTCOME_CREATED, results[1].outcome, results[1].message);
 			List<Gift__c> recorded = [SELECT Donor_Account__c, Donor_Contact__c FROM Gift__c];
 			Assert.areEqual(2, recorded.size(), 'Both gifts were recorded.');
 			for (Gift__c gift : recorded) {

@@ -35,9 +35,7 @@ public with sharing class EventPayments {
 
 	/** Payments' seam, or null when Payments is not installed. */
 	public static Callable api() {
-		return apiForTest != null
-			? apiForTest
-			: (Callable) NamespaceUtil.build('PaymentsApi', Callable.class, CONTEXT);
+		return apiForTest != null ? apiForTest : (Callable) NamespaceUtil.build('PaymentsApi', Callable.class, CONTEXT);
 	}
 
 	/** R-ERG5: whether a form registration that owes money waits for payment now. */
@@ -165,10 +163,7 @@ public with sharing class EventPayments {
 	private static String returnUrl(Event__c event) {
 		String link;
 		try {
-			link = FormCatalogExtensions.publicLink(
-				Id.valueOf(event.Registration_Form_Key__c.trim()),
-				null
-			);
+			link = FormCatalogExtensions.publicLink(Id.valueOf(event.Registration_Form_Key__c.trim()), null);
 		} catch (Exception noForm) {
 			link = null;
 		}
@@ -202,9 +197,7 @@ public with sharing class EventPayments {
 		Event_Registration__c registration = found[0];
 		Decimal amount = (Decimal) payment.get('amount');
 		// Apex names ignore case, so this may not be called `refunded` (the REFUNDED constant).
-		Decimal amountRefunded = payment.get('amountRefunded') == null
-			? 0
-			: (Decimal) payment.get('amountRefunded');
+		Decimal amountRefunded = payment.get('amountRefunded') == null ? 0 : (Decimal) payment.get('amountRefunded');
 		String status = String.valueOf(payment.get('status'));
 		Event_Registration__c change = new Event_Registration__c(Id = registration.Id);
 		Boolean cancel = false;
@@ -238,10 +231,7 @@ public with sharing class EventPayments {
 				WITH SYSTEM_MODE
 			]) {
 				attendees.add(
-					new Event_Attendee__c(
-						Id = attendee.Id,
-						Status__c = EventRegistrationService.STATUS_CANCELLED
-					)
+					new Event_Attendee__c(Id = attendee.Id, Status__c = EventRegistrationService.STATUS_CANCELLED)
 				);
 			}
 			update as system attendees;

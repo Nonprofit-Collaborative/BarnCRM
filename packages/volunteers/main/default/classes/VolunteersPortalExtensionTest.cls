@@ -16,11 +16,7 @@ private class VolunteersPortalExtensionTest {
 
 	private static Volunteer_Shift__c futureShift(Integer needed) {
 		Volunteer_Job__c job = VolunteersTestData.job('Pantry Sort');
-		Volunteer_Shift__c shift = VolunteersTestData.newShift(
-			job.Id,
-			Datetime.now().addDays(7),
-			3
-		);
+		Volunteer_Shift__c shift = VolunteersTestData.newShift(job.Id, Datetime.now().addDays(7), 3);
 		shift.Volunteers_Needed__c = needed;
 		insert shift;
 		return shift;
@@ -38,15 +34,11 @@ private class VolunteersPortalExtensionTest {
 	static void coreFindsBothActionsByName() {
 		System.runAs(coordinator()) {
 			Assert.isTrue(
-				PortalActionExtensions.forAction(
-					'Volunteers.SignUp'
-				) instanceof VolunteersPortalExtension,
+				PortalActionExtensions.forAction('Volunteers.SignUp') instanceof VolunteersPortalExtension,
 				'Sign up is offered'
 			);
 			Assert.isTrue(
-				PortalActionExtensions.forAction(
-					'Volunteers.CancelSignup'
-				) instanceof VolunteersPortalExtension,
+				PortalActionExtensions.forAction('Volunteers.CancelSignup') instanceof VolunteersPortalExtension,
 				'Cancel is offered'
 			);
 		}
@@ -63,19 +55,12 @@ private class VolunteersPortalExtensionTest {
 			String first = extension.run(VolunteersPortalExtension.SIGN_UP, sam.Id, shift.Id);
 			String second = extension.run(VolunteersPortalExtension.SIGN_UP, sam.Id, shift.Id);
 			List<Volunteer_Signup__c> signups = signupsOf(shift.Id);
-			String cancelled = extension.run(
-				VolunteersPortalExtension.CANCEL,
-				sam.Id,
-				signups[0].Id
-			);
+			String cancelled = extension.run(VolunteersPortalExtension.CANCEL, sam.Id, signups[0].Id);
 			String again = extension.run(VolunteersPortalExtension.SIGN_UP, sam.Id, shift.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_SignedUp'), first);
-			Assert.areEqual(
-				BarnHelp.text('Volunteers', 'Volunteers_Portal_AlreadySignedUp'),
-				second
-			);
+			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_AlreadySignedUp'), second);
 			Assert.areEqual(1, signups.size(), 'One sign-up, never two');
 			Assert.areEqual(sam.Id, signups[0].Contact__c, 'For the verified person');
 			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_Cancelled'), cancelled);
@@ -103,32 +88,14 @@ private class VolunteersPortalExtensionTest {
 
 			Test.startTest();
 			extension.run(VolunteersPortalExtension.SIGN_UP, people[0].Id, oneSlot.Id);
-			String full = extension.run(
-				VolunteersPortalExtension.SIGN_UP,
-				people[1].Id,
-				oneSlot.Id
-			);
-			String pastMessage = extension.run(
-				VolunteersPortalExtension.SIGN_UP,
-				people[1].Id,
-				past.Id
-			);
-			String closedMessage = extension.run(
-				VolunteersPortalExtension.SIGN_UP,
-				people[1].Id,
-				closed.Id
-			);
+			String full = extension.run(VolunteersPortalExtension.SIGN_UP, people[1].Id, oneSlot.Id);
+			String pastMessage = extension.run(VolunteersPortalExtension.SIGN_UP, people[1].Id, past.Id);
+			String closedMessage = extension.run(VolunteersPortalExtension.SIGN_UP, people[1].Id, closed.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftFull'), full);
-			Assert.areEqual(
-				BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftClosed'),
-				pastMessage
-			);
-			Assert.areEqual(
-				BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftClosed'),
-				closedMessage
-			);
+			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftClosed'), pastMessage);
+			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftClosed'), closedMessage);
 			Assert.areEqual(1, signupsOf(oneSlot.Id).size(), 'Only the first person got the slot');
 			Assert.isTrue(signupsOf(past.Id).isEmpty(), 'Nothing on a past shift');
 		}
@@ -143,21 +110,9 @@ private class VolunteersPortalExtensionTest {
 
 			Test.startTest();
 			extension.run(VolunteersPortalExtension.SIGN_UP, people[0].Id, oneSlot.Id);
-			extension.run(
-				VolunteersPortalExtension.CANCEL,
-				people[0].Id,
-				signupsOf(oneSlot.Id)[0].Id
-			);
-			String taken = extension.run(
-				VolunteersPortalExtension.SIGN_UP,
-				people[1].Id,
-				oneSlot.Id
-			);
-			String returning = extension.run(
-				VolunteersPortalExtension.SIGN_UP,
-				people[0].Id,
-				oneSlot.Id
-			);
+			extension.run(VolunteersPortalExtension.CANCEL, people[0].Id, signupsOf(oneSlot.Id)[0].Id);
+			String taken = extension.run(VolunteersPortalExtension.SIGN_UP, people[1].Id, oneSlot.Id);
+			String returning = extension.run(VolunteersPortalExtension.SIGN_UP, people[0].Id, oneSlot.Id);
 			Test.stopTest();
 
 			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_SignedUp'), taken);

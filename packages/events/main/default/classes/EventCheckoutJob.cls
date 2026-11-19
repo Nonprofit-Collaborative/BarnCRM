@@ -39,10 +39,7 @@ public with sharing class EventCheckoutJob implements Queueable, Database.Allows
 	@TestVisible
 	private static Boolean markFailed(Id registrationId) {
 		Database.SaveResult saved = Database.update(
-			new Event_Registration__c(
-				Id = registrationId,
-				Payment_Status__c = EventPayments.FAILED
-			),
+			new Event_Registration__c(Id = registrationId, Payment_Status__c = EventPayments.FAILED),
 			false,
 			AccessLevel.SYSTEM_MODE
 		);

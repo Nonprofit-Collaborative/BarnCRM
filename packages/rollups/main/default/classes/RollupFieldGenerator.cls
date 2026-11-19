@@ -79,9 +79,7 @@ public with sharing class RollupFieldGenerator {
 					BarnHelp.text('Rollups', 'Core_RollupEase_FieldKindProblem')
 				);
 			}
-			Schema.DescribeSObjectResult described = targetType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = targetType.getDescribe(SObjectDescribeOptions.DEFERRED);
 			String name = nameFor(trimmed);
 			if (String.isBlank(name)) {
 				throw new RollupService.RollupServiceException(
@@ -91,10 +89,7 @@ public with sharing class RollupFieldGenerator {
 			String apiName = name + '__c';
 			if (described.fields.getMap().containsKey(apiName.toLowerCase())) {
 				throw new RollupService.RollupServiceException(
-					String.format(
-						BarnHelp.text('Rollups', 'Core_RollupEase_FieldExists'),
-						new List<String>{ apiName }
-					)
+					String.format(BarnHelp.text('Rollups', 'Core_RollupEase_FieldExists'), new List<String>{ apiName })
 				);
 			}
 			String objectName = described.getName();
@@ -122,10 +117,7 @@ public with sharing class RollupFieldGenerator {
 					new List<String>{ KINDS.get(kind), trimmed, name }
 				),
 				BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepAccess'),
-				String.format(
-					BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepBack'),
-					new List<String>{ trimmed }
-				)
+				String.format(BarnHelp.text('Rollups', 'Core_RollupEase_FieldStepBack'), new List<String>{ trimmed })
 			};
 			return field;
 		} catch (Exception caught) {
@@ -171,10 +163,7 @@ public with sharing class RollupFieldGenerator {
 				(kind == 'NUMBER' ? 'Number' : 'Currency') +
 				'</type>\n    <unique>false</unique>\n';
 		} else if (kind == 'DATE' || kind == 'DATETIME') {
-			body +=
-				'    <required>false</required>\n    <type>' +
-				(kind == 'DATE' ? 'Date' : 'DateTime') +
-				'</type>\n';
+			body += '    <required>false</required>\n    <type>' + (kind == 'DATE' ? 'Date' : 'DateTime') + '</type>\n';
 		} else if (kind == 'TEXT') {
 			body += '    <length>255</length>\n    <required>false</required>\n    <type>Text</type>\n    <unique>false</unique>\n';
 		} else if (kind == 'LONGTEXT') {

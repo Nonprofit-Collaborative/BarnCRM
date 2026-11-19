@@ -47,10 +47,7 @@ private class GivingSmallClassesCoverageTest {
 				empty,
 				'So is no document at all'
 			);
-			Assert.isTrue(
-				renderer.describe().contains('Blob.toPdf'),
-				'It says which service it uses'
-			);
+			Assert.isTrue(renderer.describe().contains('Blob.toPdf'), 'It says which service it uses');
 		}
 	}
 
@@ -147,10 +144,7 @@ private class GivingSmallClassesCoverageTest {
 			}
 
 			for (Gift__c gift : gifts) {
-				Assert.isFalse(
-					gift.hasErrors(),
-					'A plan that could not start never stops a gift being saved'
-				);
+				Assert.isFalse(gift.hasErrors(), 'A plan that could not start never stops a gift being saved');
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'And no plan was made');
 		}
@@ -187,11 +181,7 @@ private class GivingSmallClassesCoverageTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Donor' + i, LastName = 'Nobody')
-					)
-				);
+				people.add(TestDataFactory.person(new Contact(FirstName = 'Donor' + i, LastName = 'Nobody')));
 			}
 			insert people;
 
@@ -225,10 +215,7 @@ private class GivingSmallClassesCoverageTest {
 			);
 			Assert.areEqual(
 				'The address bounced.',
-				AcknowledgmentService.failureReasonOf(
-					EmailSendOutcome.failed('The address bounced.'),
-					unknown
-				),
+				AcknowledgmentService.failureReasonOf(EmailSendOutcome.failed('The address bounced.'), unknown),
 				'A reason is shown as the platform gave it'
 			);
 		}

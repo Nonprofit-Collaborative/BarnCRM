@@ -57,12 +57,7 @@ private class NpspGiftsKitTest {
 						key + ' loads ' + targetByStep.get(key)
 					);
 				}
-				for (
-					ImportMapping.Column column : ImportMapping.parse(
-							template.Column_Mapping_JSON__c
-						)
-						.getColumns()
-				) {
+				for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 					String heading = column.getSource();
 					Assert.isTrue(
 						step.fields.contains(heading) || ADDED.contains(heading) || heading == 'Id',
@@ -112,11 +107,7 @@ private class NpspGiftsKitTest {
 			'npsp.Primary_Contact__c' => '003000000000002AAA',
 			'Account.npe01.SYSTEM_IsIndividual__c' => 'false'
 		};
-		NpspGiftsKit.giftRow(
-			row,
-			null,
-			new List<NpspGiftsKit.Part>{ new NpspGiftsKit.Part('Building Fund', 500) }
-		);
+		NpspGiftsKit.giftRow(row, null, new List<NpspGiftsKit.Part>{ new NpspGiftsKit.Part('Building Fund', 500) });
 		Assert.areEqual('Organization', row.get('Donor'), 'the organization gives');
 		Assert.areEqual('001000000000002AAA', row.get('OrganizationId'), 'its account');
 		Assert.areEqual('Other', row.get('Method'), 'no paid payment');
@@ -139,11 +130,7 @@ private class NpspGiftsKitTest {
 		Assert.areEqual('50', many.get('Amount5'), 'its amount as text');
 
 		Map<String, Object> mismatch = new Map<String, Object>();
-		NpspGiftsKit.putSplit(
-			mismatch,
-			new List<NpspGiftsKit.Part>{ new NpspGiftsKit.Part('Part Fund', 40) },
-			'100'
-		);
+		NpspGiftsKit.putSplit(mismatch, new List<NpspGiftsKit.Part>{ new NpspGiftsKit.Part('Part Fund', 40) }, '100');
 		Assert.areEqual('40', mismatch.get('Amount1'), 'one part of the gift stays a split');
 
 		Map<String, Object> none = new Map<String, Object>();
@@ -165,11 +152,7 @@ private class NpspGiftsKitTest {
 			}
 		};
 		NpspGiftsKit.shapeGifts(gifts);
-		Assert.areEqual(
-			'Organization',
-			gifts[0].get('Donor'),
-			'no primary contact, so the account'
-		);
+		Assert.areEqual('Organization', gifts[0].get('Donor'), 'no primary contact, so the account');
 		Assert.areEqual('Other', gifts[0].get('Method'), 'no paid payment');
 		Assert.areEqual('', gifts[0].get('Reference'), 'no reference');
 		Assert.isFalse(gifts[0].containsKey('Fund1'), 'no allocations, no split');
@@ -181,10 +164,7 @@ private class NpspGiftsKitTest {
 				'Role' => 'Influencer',
 				'Opportunity.Amount' => '90'
 			},
-			new Map<String, Object>{
-				'OpportunityId' => '006000000000003AAA',
-				'npsp.Role__c' => 'Friend'
-			}
+			new Map<String, Object>{ 'OpportunityId' => '006000000000003AAA', 'npsp.Role__c' => 'Friend' }
 		};
 		NpspGiftsKit.shapeCredits(credits);
 		Assert.areEqual('Influencer', credits[0].get('CreditRole'), 'a contact credit role');
@@ -204,10 +184,7 @@ private class NpspGiftsKitTest {
 				NpspGiftsKit.read('Contact', query, new Set<String>{ ana.Id }).size(),
 				'the record is read'
 			);
-			Assert.isTrue(
-				NpspGiftsKit.read('Contact', query, new Set<String>()).isEmpty(),
-				'no ids, no query'
-			);
+			Assert.isTrue(NpspGiftsKit.read('Contact', query, new Set<String>()).isEmpty(), 'no ids, no query');
 			Assert.isTrue(
 				NpspGiftsKit.read('npsp~Allocation__c', query, new Set<String>{ ana.Id }).isEmpty(),
 				'no NPSP, no records'
@@ -236,18 +213,10 @@ private class NpspGiftsKitTest {
 	@IsTest
 	static void stepsReadingNpspObjectsAreRefusedWithoutThemAndContactCreditsStage() {
 		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				'Rollup_Builder_Admin',
-				'Giving_Admin',
-				'Salesforce_Records_Sync'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
 			NpspGiftsKit extension = new NpspGiftsKit();
-			List<Map<String, Object>> credits = extension.rows(
-				'contactCredits',
-				new List<SObject>()
-			);
+			List<Map<String, Object>> credits = extension.rows('contactCredits', new List<SObject>());
 			Assert.isTrue(credits.isEmpty(), 'no records, no staged credits');
 			for (String key : new List<String>{ 'gifts', 'accountCredits' }) {
 				try {
@@ -277,10 +246,7 @@ private class NpspGiftsKitTest {
 		Assert.areEqual('Soft Credit', partial.get('CustomRole'), 'keeps the NPSP name');
 		Assert.areEqual('150', partial.get('Amount'), 'the partial amount');
 
-		Map<String, Object> ofAccount = new Map<String, Object>{
-			'npsp.Role__c' => null,
-			'npsp.Amount__c' => '50'
-		};
+		Map<String, Object> ofAccount = new Map<String, Object>{ 'npsp.Role__c' => null, 'npsp.Amount__c' => '50' };
 		NpspGiftsKit.creditRow(ofAccount, null, null);
 		Assert.areEqual('Soft Credit', ofAccount.get('CustomRole'), 'a blank role');
 		Assert.isFalse(ofAccount.containsKey('Amount'), 'an account credit keeps its amount');

@@ -100,19 +100,13 @@ private class RecognitionControllerTest {
 			Account garcias = RecognitionTestData.household('The Garcia Family');
 			Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, 'Rosa Garcia');
 			tribute.Notification_Recipient_Contact__c = ana.Id;
 			insert tribute;
 
 			Test.startTest();
 			TributeController.TributeView before = TributeController.getTribute(gift.Id);
-			TributeController.TributeView after = TributeController.markNotificationSent(
-				tribute.Id
-			);
+			TributeController.TributeView after = TributeController.markNotificationSent(tribute.Id);
 			Test.stopTest();
 
 			System.assertEquals('Rosa Garcia', before.honoreeName, 'The honoree is named');
@@ -130,11 +124,7 @@ private class RecognitionControllerTest {
 			Account garcias = RecognitionTestData.household('The Garcia Family');
 			Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				'Rosa Garcia'
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, 'Rosa Garcia');
 			insert tribute;
 
 			Test.startTest();
@@ -160,11 +150,7 @@ private class RecognitionControllerTest {
 			Account foundation = RecognitionTestData.organization('The Rosa Garcia Foundation');
 			Contact ana = RecognitionTestData.person('Ana', 'Garcia', garcias.Id);
 			Gift__c gift = RecognitionTestData.gift(ana.Id, null, 100);
-			Tribute__c tribute = RecognitionTestData.tribute(
-				gift.Id,
-				TributeService.TYPE_IN_MEMORY_OF,
-				null
-			);
+			Tribute__c tribute = RecognitionTestData.tribute(gift.Id, TributeService.TYPE_IN_MEMORY_OF, null);
 			tribute.Honoree_Account__c = foundation.Id;
 			tribute.Notification_Recipient_Account__c = foundation.Id;
 

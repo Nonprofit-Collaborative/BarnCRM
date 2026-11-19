@@ -33,11 +33,7 @@ private class StewardshipPlanControllerTest {
 		);
 	}
 
-	private static StewardshipPlanController.TemplateModel model(
-		Id recordId,
-		String name,
-		String key
-	) {
+	private static StewardshipPlanController.TemplateModel model(Id recordId, String name, String key) {
 		StewardshipPlanController.TemplateModel input = new StewardshipPlanController.TemplateModel();
 		input.recordId = recordId;
 		input.name = name;
@@ -64,9 +60,7 @@ private class StewardshipPlanControllerTest {
 				step(welcome.Id, 2, 'Send the packet'),
 				step(welcome.Id, 1, 'Call to say thank you')
 			};
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 			insert person;
 			insert new Stewardship_Plan__c(
 				Stewardship_Plan_Template__c = welcome.Id,
@@ -87,15 +81,8 @@ private class StewardshipPlanControllerTest {
 				shown.steps[0].subject,
 				'In the order they are laid out rather than the order they were created.'
 			);
-			Assert.areEqual(
-				1,
-				shown.runningPlans,
-				'And the number an edit will not reach, which is what R-SP7 costs.'
-			);
-			Assert.isFalse(
-				page.triggerEvents.isEmpty(),
-				'The events are offered in the words of the field itself.'
-			);
+			Assert.areEqual(1, shown.runningPlans, 'And the number an edit will not reach, which is what R-SP7 costs.');
+			Assert.isFalse(page.triggerEvents.isEmpty(), 'The events are offered in the words of the field itself.');
 			Assert.isFalse(page.assignTo.isEmpty(), 'So are the ways a step can be assigned.');
 		}
 	}
@@ -104,9 +91,7 @@ private class StewardshipPlanControllerTest {
 	static void aPlanIsCreatedFromThePageWithoutOpeningAnObjectTab() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			Id created = StewardshipPlanController.saveTemplate(
-				model(null, 'Pledge welcome', 'pledge_welcome')
-			);
+			Id created = StewardshipPlanController.saveTemplate(model(null, 'Pledge welcome', 'pledge_welcome'));
 			Test.stopTest();
 
 			Assert.isNotNull(created, 'The page created the plan.');
@@ -134,9 +119,7 @@ private class StewardshipPlanControllerTest {
 	static void aNewPlanGetsAKeyMadeFromItsName() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Test.startTest();
-			Id created = StewardshipPlanController.saveTemplate(
-				model(null, '  First gift: welcome!  ', null)
-			);
+			Id created = StewardshipPlanController.saveTemplate(model(null, '  First gift: welcome!  ', null));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -235,8 +218,7 @@ private class StewardshipPlanControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(
-				[SELECT Active__c FROM Stewardship_Plan_Template__c WHERE Id = :welcome.Id]
-				.Active__c,
+				[SELECT Active__c FROM Stewardship_Plan_Template__c WHERE Id = :welcome.Id].Active__c,
 				'The switch an administrator uses most often does not need the record opened.'
 			);
 		}
@@ -258,11 +240,7 @@ private class StewardshipPlanControllerTest {
 				WHERE Id = :added
 			];
 			Assert.areEqual(2, saved.Order__c, 'A step added without an order goes last.');
-			Assert.areEqual(
-				'Send the packet',
-				saved.Subject__c,
-				'With the subject that was typed.'
-			);
+			Assert.areEqual('Send the packet', saved.Subject__c, 'With the subject that was typed.');
 		}
 	}
 
@@ -278,20 +256,13 @@ private class StewardshipPlanControllerTest {
 			insert steps;
 
 			Test.startTest();
-			StewardshipPlanController.reorderSteps(
-				welcome.Id,
-				new List<Id>{ steps[2].Id, steps[0].Id, steps[1].Id }
-			);
+			StewardshipPlanController.reorderSteps(welcome.Id, new List<Id>{ steps[2].Id, steps[0].Id, steps[1].Id });
 			Test.stopTest();
 
 			Map<Id, Stewardship_Plan_Step__c> saved = new Map<Id, Stewardship_Plan_Step__c>(
 				[SELECT Id, Order__c FROM Stewardship_Plan_Step__c WHERE Id IN :steps]
 			);
-			Assert.areEqual(
-				1,
-				saved.get(steps[2].Id).Order__c,
-				'The step moved to the top is first.'
-			);
+			Assert.areEqual(1, saved.get(steps[2].Id).Order__c, 'The step moved to the top is first.');
 			Assert.areEqual(2, saved.get(steps[0].Id).Order__c, 'The others follow it.');
 			Assert.areEqual(3, saved.get(steps[1].Id).Order__c, 'In the order they were given.');
 		}

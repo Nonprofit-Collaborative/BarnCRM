@@ -80,10 +80,7 @@ private class CoreHandlerCoverageTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				unsaved.hasErrors(),
-				'An address with no account to belong to is refused'
-			);
+			Assert.isTrue(unsaved.hasErrors(), 'An address with no account to belong to is refused');
 			Assert.areEqual(
 				BarnHelp.text('Core', 'Core_Address_PropagationFailed'),
 				onlyMessage(unsaved),
@@ -195,32 +192,25 @@ private class CoreHandlerCoverageTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Program Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Program Officer');
 			work.Is_Primary__c = true;
 			insert work;
 			Assert.areEqual(
 				orgs[0].Id,
-				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id]
-				.Primary_Affiliation__c,
+				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id].Primary_Affiliation__c,
 				'Saving the affiliation makes its organization the primary one'
 			);
 
 			delete work;
 			Assert.isNull(
-				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id]
-				.Primary_Affiliation__c,
+				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id].Primary_Affiliation__c,
 				'Deleting the only affiliation leaves the person with no primary one'
 			);
 
 			undelete work;
 			Assert.areEqual(
 				orgs[0].Id,
-				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id]
-				.Primary_Affiliation__c,
+				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id].Primary_Affiliation__c,
 				'Restoring it gives the person their primary organization back'
 			);
 
@@ -234,8 +224,7 @@ private class CoreHandlerCoverageTest {
 			Assert.areEqual('Former', ended.Status__c, 'An affiliation with an end date has ended');
 			Assert.isFalse(ended.Is_Primary__c, 'A former affiliation is never the primary one');
 			Assert.isNull(
-				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id]
-				.Primary_Affiliation__c,
+				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id].Primary_Affiliation__c,
 				'So the person has no primary organization any more'
 			);
 		}
@@ -249,11 +238,7 @@ private class CoreHandlerCoverageTest {
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
 			List<Affiliation__c> all = new List<Affiliation__c>();
 			for (Contact person : people) {
-				Affiliation__c work = RelationshipTestDataFactory.affiliation(
-					person,
-					orgs[0],
-					'Member'
-				);
+				Affiliation__c work = RelationshipTestDataFactory.affiliation(person, orgs[0], 'Member');
 				work.Is_Primary__c = true;
 				all.add(work);
 			}
@@ -279,11 +264,7 @@ private class CoreHandlerCoverageTest {
 				'Ending all 200 clears the primary organization of all 200'
 			);
 			delete all;
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Affiliation__c],
-				'And the delete of 200 goes through'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Affiliation__c], 'And the delete of 200 goes through');
 		}
 	}
 
@@ -293,11 +274,7 @@ private class CoreHandlerCoverageTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c ended = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Chair'
-			);
+			Affiliation__c ended = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Chair');
 			ended.End_Date__c = OrgDate.today().addDays(-5);
 			insert ended;
 			Assert.areEqual(
@@ -374,14 +351,7 @@ private class CoreHandlerCoverageTest {
 				clearOverrides();
 			}
 
-			for (
-				Affiliation__c record : new List<Affiliation__c>{
-					inserted,
-					updated,
-					deleted,
-					restored
-				}
-			) {
+			for (Affiliation__c record : new List<Affiliation__c>{ inserted, updated, deleted, restored }) {
 				Assert.areEqual(
 					BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed'),
 					onlyMessage(record),
@@ -403,9 +373,7 @@ private class CoreHandlerCoverageTest {
 				TriggerHandler.testNew = new List<SObject>{ inserted };
 				checks.beforeInsert();
 				TriggerHandler.testNew = new List<SObject>{ updated };
-				TriggerHandler.testOldMap = new Map<Id, SObject>{
-					updated.Id => updated.clone(true)
-				};
+				TriggerHandler.testOldMap = new Map<Id, SObject>{ updated.Id => updated.clone(true) };
 				checks.beforeUpdate();
 				clearOverrides();
 			}
@@ -415,11 +383,7 @@ private class CoreHandlerCoverageTest {
 				onlyMessage(inserted),
 				'On insert'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed'),
-				onlyMessage(updated),
-				'On update'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed'), onlyMessage(updated), 'On update');
 		}
 	}
 
@@ -451,11 +415,7 @@ private class CoreHandlerCoverageTest {
 		System.runAs(TestUsers.admin()) {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-			Relationship__c parent = RelationshipTestDataFactory.between(
-				people[0],
-				people[1],
-				'Parent'
-			);
+			Relationship__c parent = RelationshipTestDataFactory.between(people[0], people[1], 'Parent');
 			insert parent;
 			Assert.areEqual(
 				2,
@@ -570,14 +530,7 @@ private class CoreHandlerCoverageTest {
 				clearOverrides();
 			}
 
-			for (
-				Relationship__c record : new List<Relationship__c>{
-					inserted,
-					updated,
-					deleted,
-					restored
-				}
-			) {
+			for (Relationship__c record : new List<Relationship__c>{ inserted, updated, deleted, restored }) {
 				Assert.areEqual(
 					BarnHelp.text('Core', 'Core_Relationship_SyncFailed'),
 					onlyMessage(record),
@@ -599,23 +552,13 @@ private class CoreHandlerCoverageTest {
 				TriggerHandler.testNew = new List<SObject>{ inserted };
 				checks.beforeInsert();
 				TriggerHandler.testNew = new List<SObject>{ updated };
-				TriggerHandler.testOldMap = new Map<Id, SObject>{
-					updated.Id => updated.clone(true)
-				};
+				TriggerHandler.testOldMap = new Map<Id, SObject>{ updated.Id => updated.clone(true) };
 				checks.beforeUpdate();
 				clearOverrides();
 			}
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Relationship_SyncFailed'),
-				onlyMessage(inserted),
-				'On insert'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Relationship_SyncFailed'),
-				onlyMessage(updated),
-				'On update'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Relationship_SyncFailed'), onlyMessage(inserted), 'On insert');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Relationship_SyncFailed'), onlyMessage(updated), 'On update');
 		}
 	}
 

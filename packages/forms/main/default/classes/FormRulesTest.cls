@@ -98,11 +98,7 @@ private class FormRulesTest {
 		);
 		Assert.isTrue(
 			FormRules.evaluate(
-				new Map<String, Object>{
-					'field' => 'd',
-					'op' => 'lessThan',
-					'value' => '2026-01-02'
-				},
+				new Map<String, Object>{ 'field' => 'd', 'op' => 'lessThan', 'value' => '2026-01-02' },
 				answers
 			),
 			'Dates compare as dates'
@@ -115,10 +111,7 @@ private class FormRulesTest {
 			'Text is not ordered'
 		);
 		Assert.isTrue(
-			FormRules.evaluate(
-				new Map<String, Object>{ 'field' => 'c', 'op' => 'equals', 'value' => 'TRUE' },
-				answers
-			),
+			FormRules.evaluate(new Map<String, Object>{ 'field' => 'c', 'op' => 'equals', 'value' => 'TRUE' }, answers),
 			'A checkbox reads as true or false'
 		);
 		Assert.isFalse(
@@ -134,22 +127,12 @@ private class FormRulesTest {
 			'belowMin',
 			FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'number', 'min' => 5 }, '4')
 		);
-		Assert.isNull(
-			FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'phone' }, '+1 (555) 123-4567')
-		);
-		Assert.isNull(
-			FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'date' }, '2028-02-29')
-		);
-		Assert.areEqual(
-			'badDate',
-			FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'date' }, '2026-02-30')
-		);
+		Assert.isNull(FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'phone' }, '+1 (555) 123-4567'));
+		Assert.isNull(FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'date' }, '2028-02-29'));
+		Assert.areEqual('badDate', FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'date' }, '2026-02-30'));
 		Assert.areEqual(
 			'tooLong',
-			FormRules.checkAnswer(
-				new Map<String, Object>{ 'type' => 'textarea' },
-				'x'.repeat(32769)
-			)
+			FormRules.checkAnswer(new Map<String, Object>{ 'type' => 'textarea' }, 'x'.repeat(32769))
 		);
 		Assert.isFalse(FormRules.isDate('2026-13-01'), 'No thirteenth month');
 	}

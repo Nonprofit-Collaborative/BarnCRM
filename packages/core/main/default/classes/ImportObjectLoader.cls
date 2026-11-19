@@ -122,9 +122,7 @@ public with sharing class ImportObjectLoader {
 			writeBack(lines, steps, outcome);
 			return outcome;
 		}
-		if (
-			ImportObjectSchema.operationOf(steps[0].template) == ImportObjectSchema.OPERATION_DELETE
-		) {
+		if (ImportObjectSchema.operationOf(steps[0].template) == ImportObjectSchema.OPERATION_DELETE) {
 			// Delete by record Id (R-BD7) only checks each row; the bulk delete job deletes.
 			checkDeletes(batch, steps[0].type, itemsOf(lines, 0));
 			writeBack(lines, steps, outcome);
@@ -218,10 +216,7 @@ public with sharing class ImportObjectLoader {
 		for (Import_Row__c row : rows) {
 			ImportRowProcessor.startPass(row, pass);
 			Line line = new Line(row);
-			Map<String, Map<String, String>> byEntity = ImportRowProcessor.valuesByEntity(
-				row,
-				mapping
-			);
+			Map<String, Map<String, String>> byEntity = ImportRowProcessor.valuesByEntity(row, mapping);
 			Map<String, Map<String, String>> own = bare == null
 				? byEntity
 				: ImportRowProcessor.valuesByEntity(row, bare);
@@ -243,10 +238,7 @@ public with sharing class ImportObjectLoader {
 	}
 
 	/** One entity's values of a row, the entity's name compared ignoring capitals. */
-	private static Map<String, String> valuesOf(
-		Map<String, Map<String, String>> byEntity,
-		String entity
-	) {
+	private static Map<String, String> valuesOf(Map<String, Map<String, String>> byEntity, String entity) {
 		if (byEntity.containsKey(entity)) {
 			return byEntity.get(entity);
 		}
@@ -259,11 +251,7 @@ public with sharing class ImportObjectLoader {
 	}
 
 	/** Gives each record of a step its row's records of the earlier steps it points at. */
-	private static void attachParents(
-		List<Line> lines,
-		ImportObjectSchema.Step step,
-		Integer index
-	) {
+	private static void attachParents(List<Line> lines, ImportObjectSchema.Step step, Integer index) {
 		for (Line line : lines) {
 			Item item = line.items[index];
 			if (item == null) {
@@ -307,11 +295,7 @@ public with sharing class ImportObjectLoader {
 	 * row's other records link to it, so a retry never makes a second copy. A record that is
 	 * gone is created again.
 	 */
-	private static void reuseLoaded(
-		Import_Batch__c batch,
-		List<Line> lines,
-		List<ImportObjectSchema.Step> steps
-	) {
+	private static void reuseLoaded(Import_Batch__c batch, List<Line> lines, List<ImportObjectSchema.Step> steps) {
 		readLoaded(batch, lines);
 		for (Integer index = 0; index < steps.size(); index++) {
 			ImportObjectSchema.Step step = steps[index];
@@ -442,15 +426,9 @@ public with sharing class ImportObjectLoader {
 		List<Map<String, Object>> updates,
 		List<List<Map<String, Object>>> createdPages
 	) {
-		Boolean written = ImportJournalService.write(
-			batchId,
-			ImportJournalService.PHASE_COMMIT,
-			updates
-		);
+		Boolean written = ImportJournalService.write(batchId, ImportJournalService.PHASE_COMMIT, updates);
 		for (List<Map<String, Object>> created : createdPages) {
-			written =
-				ImportJournalService.write(batchId, ImportJournalService.PHASE_CREATED, created) &&
-				written;
+			written = ImportJournalService.write(batchId, ImportJournalService.PHASE_CREATED, created) && written;
 		}
 		return written;
 	}
@@ -545,9 +523,7 @@ public with sharing class ImportObjectLoader {
 		ImportRowProcessor.Outcome outcome
 	) {
 		for (String fieldName : step.links.values()) {
-			Schema.SObjectField token = fieldName == null
-				? null
-				: ImportObjectSchema.fieldNamed(type, fieldName);
+			Schema.SObjectField token = fieldName == null ? null : ImportObjectSchema.fieldNamed(type, fieldName);
 			if (token == null) {
 				continue;
 			}
@@ -564,17 +540,10 @@ public with sharing class ImportObjectLoader {
 	}
 
 	/** A column mapped to a link field is not read for the rows that have a parent on the row. */
-	private static void skipLinkedColumn(
-		List<Item> items,
-		Plan planned,
-		ImportRowProcessor.Outcome outcome
-	) {
+	private static void skipLinkedColumn(List<Item> items, Plan planned, ImportRowProcessor.Outcome outcome) {
 		Boolean skipped = false;
 		for (Item item : items) {
-			if (
-				item.held.containsKey(planned.attribute) &&
-				item.parents.containsKey(planned.field.getName())
-			) {
+			if (item.held.containsKey(planned.attribute) && item.parents.containsKey(planned.field.getName())) {
 				item.held.remove(planned.attribute);
 				skipped = true;
 			}
@@ -607,9 +576,7 @@ public with sharing class ImportObjectLoader {
 						: BarnHelp.text('Core', 'Core_Import_ErrorParentNotSaved');
 					break;
 				}
-				Object held = item.stored == null
-					? null
-					: item.stored.getPopulatedFieldsAsMap().get(fieldName);
+				Object held = item.stored == null ? null : item.stored.getPopulatedFieldsAsMap().get(fieldName);
 				if (!item.creates && held != null) {
 					continue;
 				}
@@ -712,11 +679,7 @@ public with sharing class ImportObjectLoader {
 	}
 
 	/** Converts each row's values to their fields' types; one that cannot be read rejects it. */
-	private static void readValues(
-		List<Item> items,
-		Map<String, Plan> plans,
-		Set<String> clearing
-	) {
+	private static void readValues(List<Item> items, Map<String, Plan> plans, Set<String> clearing) {
 		for (Item item : items) {
 			if (item.error != null) {
 				continue;
@@ -740,10 +703,7 @@ public with sharing class ImportObjectLoader {
 					item.error = problem;
 					break;
 				}
-				item.values.put(
-					planned.field.getName(),
-					ImportObjectSchema.typed(value, planned.field)
-				);
+				item.values.put(planned.field.getName(), ImportObjectSchema.typed(value, planned.field));
 			}
 		}
 	}
@@ -850,9 +810,7 @@ public with sharing class ImportObjectLoader {
 	 */
 	private static Found parentsById(Plan planned, Set<String> values) {
 		Found result = new Found();
-		Set<Schema.SObjectType> allowed = new Set<Schema.SObjectType>(
-			planned.field.getReferenceTo()
-		);
+		Set<Schema.SObjectType> allowed = new Set<Schema.SObjectType>(planned.field.getReferenceTo());
 		Map<Schema.SObjectType, Set<Id>> idsByType = new Map<Schema.SObjectType, Set<Id>>();
 		// A 15 and an 18 character form of one ID are one record, named by both values.
 		Map<Id, List<String>> valuesById = new Map<Id, List<String>>();
@@ -905,12 +863,7 @@ public with sharing class ImportObjectLoader {
 	 * `several`, and the one kept is the first created, or the most recently changed when the
 	 * template says so (R-IT9). The field name comes from describe, never from the file.
 	 */
-	private static Found findBy(
-		Schema.SObjectType type,
-		String fieldName,
-		Set<String> keys,
-		Boolean mostRecent
-	) {
+	private static Found findBy(Schema.SObjectType type, String fieldName, Set<String> keys, Boolean mostRecent) {
 		Found result = new Found();
 		Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, fieldName);
 		if (token == null || !token.getDescribe().isFilterable()) {
@@ -931,12 +884,7 @@ public with sharing class ImportObjectLoader {
 				}
 				result.several.add(key);
 				Datetime heldChanged = changedAt.get(held);
-				if (
-					mostRecent &&
-					changed != null &&
-					(heldChanged == null ||
-					changed >= heldChanged)
-				) {
+				if (mostRecent && changed != null && (heldChanged == null || changed >= heldChanged)) {
 					result.ids.put(key, record.Id);
 				}
 			}
@@ -1005,11 +953,7 @@ public with sharing class ImportObjectLoader {
 	 * Reads what each found record holds now, rejecting a row whose record the user can no
 	 * longer see.
 	 */
-	private static void readRecords(
-		Schema.SObjectType type,
-		List<Item> items,
-		Map<String, Plan> plans
-	) {
+	private static void readRecords(Schema.SObjectType type, List<Item> items, Map<String, Plan> plans) {
 		Map<Id, SObject> stored = readStored(type, items, plans);
 		for (Item item : items) {
 			if (item.error != null || item.recordId == null) {
@@ -1025,8 +969,7 @@ public with sharing class ImportObjectLoader {
 	/** Whether the operation can create a record, the only rows duplicate rules are asked of. */
 	@TestVisible
 	private static Boolean createsRecords(String operation) {
-		return operation == ImportObjectSchema.OPERATION_INSERT ||
-			operation == ImportObjectSchema.OPERATION_UPSERT;
+		return operation == ImportObjectSchema.OPERATION_INSERT || operation == ImportObjectSchema.OPERATION_UPSERT;
 	}
 
 	/**
@@ -1056,13 +999,7 @@ public with sharing class ImportObjectLoader {
 				continue;
 			}
 			if (item.creates) {
-				probes.add(
-					ImportDuplicateRuleMatcher.probe(
-						type,
-						probeValues(item, plans),
-						recordTypeOf(item)
-					)
-				);
+				probes.add(ImportDuplicateRuleMatcher.probe(type, probeValues(item, plans), recordTypeOf(item)));
 				asked.add(item);
 			} else if (item.recordId != null) {
 				taken.add(item.recordId);
@@ -1095,10 +1032,7 @@ public with sharing class ImportObjectLoader {
 				continue;
 			}
 			if (taken.contains(matched)) {
-				asked[i].error = BarnHelp.text(
-					'Core',
-					'Core_Import_ErrorDuplicateRuleRecordRepeated'
-				);
+				asked[i].error = BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleRecordRepeated');
 				continue;
 			}
 			taken.add(matched);
@@ -1114,12 +1048,7 @@ public with sharing class ImportObjectLoader {
 	 * earlier chunk created or loaded are set aside first: a commit's earlier update changes
 	 * when a record was last changed, so keeping them could choose otherwise than the dry run.
 	 */
-	private static Id chosenByRule(
-		Item item,
-		List<SObject> found,
-		Map<String, Boolean> earlier,
-		Boolean mostRecent
-	) {
+	private static Id chosenByRule(Item item, List<SObject> found, Map<String, Boolean> earlier, Boolean mostRecent) {
 		List<SObject> kept = new List<SObject>();
 		Boolean loadedEarlier = false;
 		for (SObject matched : found) {
@@ -1164,11 +1093,7 @@ public with sharing class ImportObjectLoader {
 	 * is filled in; no other record can hold the row's key, or the key itself would have found
 	 * it.
 	 */
-	private static void rejectKeyConflicts(
-		Schema.SObjectType type,
-		String keyField,
-		List<Item> items
-	) {
+	private static void rejectKeyConflicts(Schema.SObjectType type, String keyField, List<Item> items) {
 		Schema.SObjectField token = ImportObjectSchema.fieldNamed(type, keyField);
 		if (token == null) {
 			return;
@@ -1203,11 +1128,7 @@ public with sharing class ImportObjectLoader {
 	 * earlier row, of a record the user can see now. A row that passes is Matched, with the
 	 * record as its Resulting Record, which the bulk delete job reads.
 	 */
-	private static void checkDeletes(
-		Import_Batch__c batch,
-		Schema.SObjectType type,
-		List<Item> items
-	) {
+	private static void checkDeletes(Import_Batch__c batch, Schema.SObjectType type, List<Item> items) {
 		for (Item item : items) {
 			if (item.error == null) {
 				keyOf(item, type, ImportObjectSchema.OPERATION_DELETE, null);
@@ -1229,16 +1150,8 @@ public with sharing class ImportObjectLoader {
 	}
 
 	/** The row's record key: its record ID under Update, its upsert value under Upsert. */
-	private static void keyOf(
-		Item item,
-		Schema.SObjectType type,
-		String operation,
-		String keyField
-	) {
-		if (
-			operation == ImportObjectSchema.OPERATION_UPDATE ||
-			operation == ImportObjectSchema.OPERATION_DELETE
-		) {
+	private static void keyOf(Item item, Schema.SObjectType type, String operation, String keyField) {
+		if (operation == ImportObjectSchema.OPERATION_UPDATE || operation == ImportObjectSchema.OPERATION_DELETE) {
 			String value = item.held.get(ImportObjectSchema.ID_ATTRIBUTE.toLowerCase());
 			Id candidate = ImportValues.idOrNull(value);
 			if (candidate == null) {
@@ -1277,12 +1190,7 @@ public with sharing class ImportObjectLoader {
 	}
 
 	/** Finds each upsert row's record by its key; none found means the row creates one. */
-	private static void matchKeys(
-		List<Item> items,
-		Schema.SObjectType type,
-		String keyField,
-		Boolean mostRecent
-	) {
+	private static void matchKeys(List<Item> items, Schema.SObjectType type, String keyField, Boolean mostRecent) {
 		Set<String> keys = new Set<String>();
 		for (Item item : items) {
 			if (item.error == null) {
@@ -1314,11 +1222,7 @@ public with sharing class ImportObjectLoader {
 	 * digest, so with several objects only the first keyed object's repeats are found across
 	 * chunks; the others' only within the chunk (R-IT20).
 	 */
-	private static void rejectRepeats(
-		Import_Batch__c batch,
-		List<Item> items,
-		Boolean keepsDigest
-	) {
+	private static void rejectRepeats(Import_Batch__c batch, List<Item> items, Boolean keepsDigest) {
 		Set<String> digests = new Set<String>();
 		for (Item item : items) {
 			if (item.error == null && item.key != null) {
@@ -1353,11 +1257,7 @@ public with sharing class ImportObjectLoader {
 	 * change can be compared and its value before journaled. A field the user cannot read is
 	 * never written to a record that exists (`decide`).
 	 */
-	private static Map<Id, SObject> readStored(
-		Schema.SObjectType type,
-		List<Item> items,
-		Map<String, Plan> plans
-	) {
+	private static Map<Id, SObject> readStored(Schema.SObjectType type, List<Item> items, Map<String, Plan> plans) {
 		Set<Id> ids = new Set<Id>();
 		for (Item item : items) {
 			if (item.error == null && item.recordId != null) {
@@ -1412,8 +1312,7 @@ public with sharing class ImportObjectLoader {
 				continue;
 			}
 			Map<String, Object> kept = new Map<String, Object>();
-			Id recordType = item.stored == null ||
-				!item.stored.getPopulatedFieldsAsMap().containsKey('RecordTypeId')
+			Id recordType = item.stored == null || !item.stored.getPopulatedFieldsAsMap().containsKey('RecordTypeId')
 				? null
 				: (Id) item.stored.get('RecordTypeId');
 			for (String name : item.values.keySet()) {
@@ -1423,9 +1322,7 @@ public with sharing class ImportObjectLoader {
 					// A new record has nothing to clear (R-IT19).
 					continue;
 				}
-				if (
-					clears && (!field.isNillable() || field.getType() == Schema.DisplayType.BOOLEAN)
-				) {
+				if (clears && (!field.isNillable() || field.getType() == Schema.DisplayType.BOOLEAN)) {
 					outcome.notes.add(
 						String.format(
 							BarnHelp.text('Core', 'Core_Import_LogCannotClear'),
@@ -1436,18 +1333,14 @@ public with sharing class ImportObjectLoader {
 				}
 				if (!mayWrite(field, item.creates)) {
 					outcome.notes.add(noAccess(field));
-				} else if (
-					!item.creates && DataProtectedFields.isProtectedOnRecord(type, name, recordType)
-				) {
+				} else if (!item.creates && DataProtectedFields.isProtectedOnRecord(type, name, recordType)) {
 					outcome.notes.add(
 						String.format(
 							BarnHelp.text('Core', 'Core_Import_LogFieldProtected'),
 							new List<String>{ field.getLabel() }
 						)
 					);
-				} else if (
-					item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))
-				) {
+				} else if (item.creates || !ImportValues.same(item.stored.get(name), item.values.get(name))) {
 					kept.put(name, item.values.get(name));
 					outcome.cleared += clears ? 1 : 0;
 				}
@@ -1497,11 +1390,7 @@ public with sharing class ImportObjectLoader {
 			if (created[i].isSuccess()) {
 				item.recordId = created[i].getId();
 				createdEntries.add(
-					ImportJournalService.created(
-						objectName,
-						item.recordId,
-						ImportValues.rowNumber(item.row)
-					)
+					ImportJournalService.created(objectName, item.recordId, ImportValues.rowNumber(item.row))
 				);
 			} else {
 				item.error = ImportRowProcessor.message(created[i]);
@@ -1598,11 +1487,7 @@ public with sharing class ImportObjectLoader {
 				if (item.leader.error != null) {
 					item.error = firstRowFailed(step);
 				}
-			} else if (
-				item.follows &&
-				!dryRun &&
-				operation != ImportObjectSchema.OPERATION_UPDATE
-			) {
+			} else if (item.follows && !dryRun && operation != ImportObjectSchema.OPERATION_UPDATE) {
 				earlier.add(item);
 			}
 		}
@@ -1707,9 +1592,7 @@ public with sharing class ImportObjectLoader {
 			// Ticked so the rows a looser rule matched can be read before a commit (R-IT16).
 			row.Duplicate_Rule_Match__c = result.ruleMatch && error == null;
 			if (row.Duplicate_Rule_Match__c) {
-				outcome.notes.add(
-					BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatchesRecords')
-				);
+				outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatchesRecords'));
 			}
 			// A parent saved for a row whose related record failed stays its resulting record.
 			Item first = result.first;
@@ -1741,12 +1624,7 @@ public with sharing class ImportObjectLoader {
 		Map<String, Id> loaded = new Map<String, Id>(line.loaded);
 		for (Integer index = 0; index < steps.size(); index++) {
 			Item item = line.items[index];
-			if (
-				item != null &&
-				item.error == null &&
-				item.recordId != null &&
-				(item.reused || item.creates)
-			) {
+			if (item != null && item.error == null && item.recordId != null && (item.reused || item.creates)) {
 				loaded.put(steps[index].entity.toLowerCase(), item.recordId);
 			}
 		}
@@ -1783,10 +1661,7 @@ public with sharing class ImportObjectLoader {
 			}
 			if (item.error != null && error == null) {
 				error = several && !step.everyRow
-					? String.format(
-							Label.Core_Format_Pair,
-							new List<String>{ step.label(), item.error }
-					  )
+					? String.format(Label.Core_Format_Pair, new List<String>{ step.label(), item.error })
 					: item.error;
 			}
 			creates = creates || (item.error == null && item.creates);

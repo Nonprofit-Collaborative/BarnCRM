@@ -35,8 +35,7 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
 		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
 		if (
 			!HealthCheckService.canManageSettings() ||
-			ModuleManagerService.turnedOff()
-				.contains(FundersPostInstall.MODULE_KEY.toLowerCase()) ||
+			ModuleManagerService.turnedOff().contains(FundersPostInstall.MODULE_KEY.toLowerCase()) ||
 			!Schema.SObjectType.Grant__c.isAccessible()
 		) {
 			return found;
@@ -121,10 +120,7 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
 	) {
 		Integer howMany = records.size();
 		String counted = howMany > countCap
-			? String.format(
-					Label.Core_HealthCheck_OrphansMoreThan,
-					new List<Object>{ countCap.format() }
-			  )
+			? String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ countCap.format() })
 			: howMany.format();
 		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
 		for (Integer i = 0; i < howMany && i < LINKS_SHOWN; i++) {

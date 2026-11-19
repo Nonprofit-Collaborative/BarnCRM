@@ -55,11 +55,7 @@ private class ContactPointBulkSyncTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, duringSave, 'Nothing copied inside the save');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE],
-				'Nothing failed'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'Nothing failed');
 			Assert.areEqual(
 				(ContactPointSyncService.QUEUE_ABOVE + 1) * 2,
 				[

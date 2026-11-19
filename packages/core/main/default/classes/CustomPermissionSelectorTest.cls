@@ -20,9 +20,7 @@ private class CustomPermissionSelectorTest {
 	static void aPermissionNoPackageShipsIsHeldByNobody() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			CustomPermissionSelector.Holders holders = CustomPermissionSelector.holders(
-				ABSENT_PERMISSION
-			);
+			CustomPermissionSelector.Holders holders = CustomPermissionSelector.holders(ABSENT_PERMISSION);
 			Test.stopTest();
 
 			System.assertEquals(
@@ -38,11 +36,7 @@ private class CustomPermissionSelectorTest {
 					'Platform-only org shape: Giving is not installed, the permission does not ' +
 					'exist, and Core answers rather than failing.'
 			);
-			System.assertEquals(
-				0,
-				holders.names.size(),
-				'With no holders there are no names to print.'
-			);
+			System.assertEquals(0, holders.names.size(), 'With no holders there are no names to print.');
 		}
 	}
 
@@ -79,16 +73,8 @@ private class CustomPermissionSelectorTest {
 		System.runAs(TestUsers.admin()) {
 			CustomPermissionSelector.Holders holders = CustomPermissionSelector.holders(null);
 
-			System.assertEquals(
-				0,
-				holders.total,
-				'A missing name is not a question, so it does not become a finding.'
-			);
-			System.assertEquals(
-				true,
-				holders.readable,
-				'Nothing failed: there was simply nothing to ask.'
-			);
+			System.assertEquals(0, holders.total, 'A missing name is not a question, so it does not become a finding.');
+			System.assertEquals(true, holders.readable, 'Nothing failed: there was simply nothing to ask.');
 		}
 	}
 
@@ -113,9 +99,7 @@ private class CustomPermissionSelectorTest {
 			User maria = HealthCheckTestHelper.mariaWithManageSettings();
 
 			Test.startTest();
-			List<Id> holders = CustomPermissionSelector.holderIds(
-				HealthCheckService.MANAGE_SETTINGS
-			);
+			List<Id> holders = CustomPermissionSelector.holderIds(HealthCheckService.MANAGE_SETTINGS);
 			List<Id> nobody = CustomPermissionSelector.holderIds(ABSENT_PERMISSION);
 			List<Id> blank = CustomPermissionSelector.holderIds(' ');
 			Test.stopTest();
@@ -177,10 +161,7 @@ private class CustomPermissionSelectorTest {
 				WHERE IsOwnedByProfile = TRUE AND ProfileId = :TestUsers.standardProfileId()
 				LIMIT 1
 			];
-			insert as system new SetupEntityAccess(
-				ParentId = profileOwned.Id,
-				SetupEntityId = permission.Id
-			);
+			insert as system new SetupEntityAccess(ParentId = profileOwned.Id, SetupEntityId = permission.Id);
 
 			Test.startTest();
 			CustomPermissionSelector.Holders holders = CustomPermissionSelector.holders(
@@ -190,8 +171,7 @@ private class CustomPermissionSelectorTest {
 
 			System.assertEquals(true, holders.readable, 'The admin can read the setup objects.');
 			System.assert(
-				new Set<Id>(CustomPermissionSelector.holderIds(HealthCheckService.MANAGE_SETTINGS))
-					.contains(plain.Id),
+				new Set<Id>(CustomPermissionSelector.holderIds(HealthCheckService.MANAGE_SETTINGS)).contains(plain.Id),
 				'A user holds the permission through the profile that owns the permission set.'
 			);
 			System.assert(holders.total >= 1, 'The profile holder is counted.');

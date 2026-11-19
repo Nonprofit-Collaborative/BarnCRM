@@ -31,10 +31,7 @@ private class GivingPostInstallTest {
 
 			Map<String, Rollup_Definition__c> byKey = definitionsByKey();
 			List<String> shippedKeys = shippedGivingKeys();
-			Assert.isFalse(
-				shippedKeys.isEmpty(),
-				'The package ships rollup defaults to materialize.'
-			);
+			Assert.isFalse(shippedKeys.isEmpty(), 'The package ships rollup defaults to materialize.');
 			for (String key : shippedKeys) {
 				Assert.isTrue(
 					byKey.containsKey(key),
@@ -84,11 +81,7 @@ private class GivingPostInstallTest {
 				'An upgrade creates no second copy of a rollup that is already here.'
 			);
 			Rollup_Definition__c afterUpgrade = definitionsByKey().get('Household_Total_Giving');
-			Assert.areEqual(
-				householdGiving.Id,
-				afterUpgrade.Id,
-				'It is the same record, not a replacement.'
-			);
+			Assert.areEqual(householdGiving.Id, afterUpgrade.Id, 'It is the same record, not a replacement.');
 			Assert.isFalse(
 				afterUpgrade.Active__c,
 				'A rollup the admin switched off stays off across an upgrade (R-R6).'
@@ -195,14 +188,8 @@ private class GivingPostInstallTest {
 			);
 			for (String type : byType.keySet()) {
 				Receipt_Template__c letter = byType.get(type);
-				Assert.isTrue(
-					letter.Active__c,
-					'It arrives switched on, so a receipt can be issued.'
-				);
-				Assert.isFalse(
-					String.isBlank(letter.Body__c),
-					'It carries the shipped wording: ' + letter.Name
-				);
+				Assert.isTrue(letter.Active__c, 'It arrives switched on, so a receipt can be issued.');
+				Assert.isFalse(String.isBlank(letter.Body__c), 'It carries the shipped wording: ' + letter.Name);
 			}
 		}
 	}

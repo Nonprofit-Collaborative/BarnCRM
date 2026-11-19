@@ -211,9 +211,7 @@ private class AddressHistoryTest {
 			insert anasOwn;
 
 			Test.startTest();
-			AddressService.updateEveryonesAddress(
-				new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id } }
-			);
+			AddressService.updateEveryonesAddress(new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id } });
 			Test.stopTest();
 
 			Address__c ended = [
@@ -336,11 +334,7 @@ private class AddressHistoryTest {
 			Assert.isTrue(back.Is_Default__c, 'They moved back.');
 			Assert.areEqual('Current', back.Status__c, 'The primary is never Former.');
 			Assert.isNull(back.End_Date__c, 'Its end date is cleared.');
-			Assert.areEqual(
-				'Current',
-				addressAt(garcia.Id, NEW_STREET).Status__c,
-				'Set as Primary ends nothing.'
-			);
+			Assert.areEqual('Current', addressAt(garcia.Id, NEW_STREET).Status__c, 'Set as Primary ends nothing.');
 		}
 	}
 
@@ -434,10 +428,7 @@ private class AddressHistoryTest {
 		System.runAs(rita) {
 			seen = [SELECT Status__c FROM Address__c WHERE Id = :home.Id WITH USER_MODE];
 			try {
-				Database.update(
-					new Address__c(Id = home.Id, Status__c = 'Undeliverable'),
-					AccessLevel.USER_MODE
-				);
+				Database.update(new Address__c(Id = home.Id, Status__c = 'Undeliverable'), AccessLevel.USER_MODE);
 			} catch (Exception expected) {
 				refused = true;
 			}
@@ -541,9 +532,7 @@ private class AddressHistoryTest {
 			Database.insert(households, AccessLevel.SYSTEM_MODE);
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
-				people.add(
-					AddressTestDataFactory.newContact('Pat', 'Family' + index, households[index].Id)
-				);
+				people.add(AddressTestDataFactory.newContact('Pat', 'Family' + index, households[index].Id));
 			}
 			insert people;
 			for (Contact person : people) {
@@ -599,16 +588,8 @@ private class AddressHistoryTest {
 			insert moved;
 			Test.stopTest();
 
-			Assert.areEqual(
-				given,
-				addressAt(garcia.Id, NEW_STREET).Start_Date__c,
-				'The start date given stays.'
-			);
-			Assert.areEqual(
-				'Former',
-				addressAt(garcia.Id, HOME_STREET).Status__c,
-				'It is still a move.'
-			);
+			Assert.areEqual(given, addressAt(garcia.Id, NEW_STREET).Start_Date__c, 'The start date given stays.');
+			Assert.areEqual('Former', addressAt(garcia.Id, HOME_STREET).Status__c, 'It is still a move.');
 		}
 	}
 
@@ -664,9 +645,7 @@ private class AddressHistoryTest {
 	 * the new fields. Written in its own context, apart from the records the test saves.
 	 */
 	private static void withoutHistoryFieldAccess(String permissionSetName) {
-		String objectName = Address__c.SObjectType
-			.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getName();
+		String objectName = Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		List<String> fields = new List<String>();
 		for (
 			Schema.SObjectField token : new List<Schema.SObjectField>{

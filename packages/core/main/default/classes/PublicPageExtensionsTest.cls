@@ -52,11 +52,7 @@ private class PublicPageExtensionsTest {
 			return null;
 		}
 
-		public Map<String, Object> startCheckout(
-			Id recordId,
-			Map<String, Object> answers,
-			String returnUrl
-		) {
+		public Map<String, Object> startCheckout(Id recordId, Map<String, Object> answers, String returnUrl) {
 			String amount = String.valueOf(answers.get('amount'));
 			return new Map<String, Object>{ 'checkoutUrl' => returnUrl + '#' + amount };
 		}
@@ -115,9 +111,7 @@ private class PublicPageExtensionsTest {
 	private static void register(PublicPageExtension extension) {
 		PublicPageExtensions.EXTENSION_CLASSES.clear();
 		PublicPageExtensions.EXTENSION_CLASSES.add(PAGES_CLASS);
-		PublicPageExtensions.overrides = new Map<String, PublicPageExtension>{
-			PAGES_CLASS => extension
-		};
+		PublicPageExtensions.overrides = new Map<String, PublicPageExtension>{ PAGES_CLASS => extension };
 	}
 
 	private static Id accountId() {
@@ -147,14 +141,8 @@ private class PublicPageExtensionsTest {
 			register(new Publishing());
 			Id recordId = accountId();
 
-			Assert.isFalse(
-				(Boolean) PublicPageExtensions.page(recordId).get('signed'),
-				'Plain address'
-			);
-			Assert.isTrue(
-				(Boolean) PublicPageExtensions.page(recordId, true).get('signed'),
-				'Signed'
-			);
+			Assert.isFalse((Boolean) PublicPageExtensions.page(recordId).get('signed'), 'Plain address');
+			Assert.isTrue((Boolean) PublicPageExtensions.page(recordId, true).get('signed'), 'Signed');
 			Assert.isFalse(PublicPageExtensions.isSignedRequest(), 'Only while the page is built');
 		}
 	}

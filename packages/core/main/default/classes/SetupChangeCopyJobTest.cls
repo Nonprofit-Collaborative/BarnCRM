@@ -27,27 +27,15 @@ private class SetupChangeCopyJobTest {
 		if (author != null) {
 			row.put(
 				'CreatedBy',
-				new Map<String, Object>{
-					'attributes' => new Map<String, Object>{ 'type' => 'User' },
-					'Name' => author
-				}
+				new Map<String, Object>{ 'attributes' => new Map<String, Object>{ 'type' => 'User' }, 'Name' => author }
 			);
 		}
-		return ((List<SObject>) JSON.deserialize(
-			JSON.serialize(new List<Object>{ row }),
-			List<SObject>.class
-		))[0];
+		return ((List<SObject>) JSON.deserialize(JSON.serialize(new List<Object>{ row }), List<SObject>.class))[0];
 	}
 
 	private static List<Setup_Change__c> kept() {
 		return [
-			SELECT
-				Audit_Trail_Id__c,
-				Changed_At__c,
-				Changed_By__c,
-				Section__c,
-				Action__c,
-				Display__c
+			SELECT Audit_Trail_Id__c, Changed_At__c, Changed_By__c, Section__c, Action__c, Display__c
 			FROM Setup_Change__c
 			WITH SYSTEM_MODE
 			ORDER BY Changed_At__c
@@ -110,14 +98,8 @@ private class SetupChangeCopyJobTest {
 	static void theDeletePassRemovesOnlyChangesPastTheRetention() {
 		keepFor(365);
 		insert as system new List<Setup_Change__c>{
-			new Setup_Change__c(
-				Audit_Trail_Id__c = 'old',
-				Changed_At__c = Datetime.now().addDays(-400)
-			),
-			new Setup_Change__c(
-				Audit_Trail_Id__c = 'new',
-				Changed_At__c = Datetime.now().addDays(-300)
-			)
+			new Setup_Change__c(Audit_Trail_Id__c = 'old', Changed_At__c = Datetime.now().addDays(-400)),
+			new Setup_Change__c(Audit_Trail_Id__c = 'new', Changed_At__c = Datetime.now().addDays(-300))
 		};
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
@@ -133,10 +115,7 @@ private class SetupChangeCopyJobTest {
 	@IsTest
 	static void aRunWhileOrgOptimizerIsOffCopiesAndDeletesNothing() {
 		TestSettings.newInstall();
-		insert as system new Setup_Change__c(
-			Audit_Trail_Id__c = 'old',
-			Changed_At__c = Datetime.now().addDays(-4000)
-		);
+		insert as system new Setup_Change__c(Audit_Trail_Id__c = 'old', Changed_At__c = Datetime.now().addDays(-4000));
 		System.runAs(TestUsers.admin()) {
 			Assert.isFalse(SetupChangeCopyJob.featureOn(), 'A new install starts with it off.');
 			Test.startTest();
@@ -182,10 +161,7 @@ private class SetupChangeCopyJobTest {
 	@IsTest
 	static void aRunReadsTheRealTrailAndChainsTheDeletePass() {
 		// Something kept now, so the run reads only the newest seconds of the org's trail.
-		insert as system new Setup_Change__c(
-			Audit_Trail_Id__c = 'marker',
-			Changed_At__c = Datetime.now()
-		);
+		insert as system new Setup_Change__c(Audit_Trail_Id__c = 'marker', Changed_At__c = Datetime.now());
 		SetupChangeCopyJob.chainPurge = false;
 		Boolean started;
 		Boolean runningAfterStart;
@@ -216,10 +192,7 @@ private class SetupChangeCopyJobTest {
 	@IsTest
 	static void theNightlyCopySchedulesOnceAndIsAHealthCheckJob() {
 		// The scheduled run fires at stopTest: something kept now keeps its read to seconds.
-		insert as system new Setup_Change__c(
-			Audit_Trail_Id__c = 'marker',
-			Changed_At__c = Datetime.now()
-		);
+		insert as system new Setup_Change__c(Audit_Trail_Id__c = 'marker', Changed_At__c = Datetime.now());
 		SetupChangeCopyJob.chainPurge = false;
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
@@ -231,20 +204,13 @@ private class SetupChangeCopyJobTest {
 			Assert.isTrue(SetupChangeCopyJob.isScheduled(), 'It is scheduled.');
 			NightlyStep listed = SetupChangeCopyJob.step();
 			Assert.areEqual(90, listed.minute, 'Half past one in the nightly run.');
-			Assert.areEqual(
-				Label.Core_HealthCheck_JobSetupChanges,
-				listed.label,
-				'Named from a label.'
-			);
+			Assert.areEqual(Label.Core_HealthCheck_JobSetupChanges, listed.label, 'Named from a label.');
 		}
 	}
 
 	@IsTest
 	static void theScheduleStartsACopy() {
-		insert as system new Setup_Change__c(
-			Audit_Trail_Id__c = 'marker',
-			Changed_At__c = Datetime.now()
-		);
+		insert as system new Setup_Change__c(Audit_Trail_Id__c = 'marker', Changed_At__c = Datetime.now());
 		SetupChangeCopyJob.chainPurge = false;
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();

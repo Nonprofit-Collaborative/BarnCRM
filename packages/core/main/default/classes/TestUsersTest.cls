@@ -23,11 +23,7 @@ private class TestUsersTest {
 			WITH SYSTEM_MODE
 		];
 		Assert.areEqual(1, held, 'The test user holds the packaged BarnCRM Admin set.');
-		Assert.areNotEqual(
-			UserInfo.getUserId(),
-			admin.Id,
-			'The test user is never the person running the tests.'
-		);
+		Assert.areNotEqual(UserInfo.getUserId(), admin.Id, 'The test user is never the person running the tests.');
 		System.runAs(admin) {
 			Assert.isTrue(
 				FeatureManagement.checkPermission('Manage_BarnCRM_Settings'),
@@ -53,10 +49,7 @@ private class TestUsersTest {
 		Assert.areEqual(fromSetup[0].Id, TestUsers.admin().Id, 'The same user comes back.');
 		Assert.areEqual(
 			TestUsers.admin().Id,
-			TestUsers.withPermissionSets(
-					new List<String>{ TestUsers.CORE_ADMIN, TestUsers.CORE_ADMIN }
-				)
-				.Id,
+			TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, TestUsers.CORE_ADMIN }).Id,
 			'The same set of permission sets, named twice, is the same user.'
 		);
 		Assert.areEqual(
@@ -74,11 +67,7 @@ private class TestUsersTest {
 
 		Assert.areEqual(built.Id, found.Id, 'The user built under that last name.');
 		// The org keeps an email address in lower case, so the saved one is compared that way.
-		Assert.areEqual(
-			built.Email.toLowerCase(),
-			found.Email.toLowerCase(),
-			'With the fields the builders set.'
-		);
+		Assert.areEqual(built.Email.toLowerCase(), found.Email.toLowerCase(), 'With the fields the builders set.');
 		Assert.areEqual(built.ProfileId, found.ProfileId, 'On the profile it was built on.');
 	}
 
@@ -134,9 +123,6 @@ private class TestUsersTest {
 			profileGrants(TestUsers.minimumAccessProfileId(), false),
 			'Minimum access, by name or not, reads nothing'
 		);
-		Assert.isFalse(
-			profileGrants(TestUsers.readOnlyProfileId(), true),
-			'Read only, by name or not, edits nothing'
-		);
+		Assert.isFalse(profileGrants(TestUsers.readOnlyProfileId(), true), 'Read only, by name or not, edits nothing');
 	}
 }

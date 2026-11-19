@@ -36,9 +36,7 @@ public with sharing class EngagementScoreJob implements Database.Batchable<SObje
 	/** Every person, or none while scoring is off. */
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		if (!EngagementScore.isOn()) {
-			return Database.getQueryLocator(
-				[SELECT Id FROM Contact WHERE Id = NULL WITH SYSTEM_MODE]
-			);
+			return Database.getQueryLocator([SELECT Id FROM Contact WHERE Id = NULL WITH SYSTEM_MODE]);
 		}
 		return Database.getQueryLocator(
 			[SELECT Id, LastActivityDate, Engagement_Score__c FROM Contact WITH SYSTEM_MODE]
@@ -64,26 +62,13 @@ public with sharing class EngagementScoreJob implements Database.Batchable<SObje
 		List<Contact> changed = new List<Contact>();
 		for (Contact person : people) {
 			Integer score = scores.get(person.Id);
-			if (
-				person.Engagement_Score__c == null ||
-				person.Engagement_Score__c.intValue() != score
-			) {
-				changed.add(
-					new Contact(
-						Id = person.Id,
-						Engagement_Score__c = score,
-						Engagement_Scored_On__c = today
-					)
-				);
+			if (person.Engagement_Score__c == null || person.Engagement_Score__c.intValue() != score) {
+				changed.add(new Contact(Id = person.Id, Engagement_Score__c = score, Engagement_Scored_On__c = today));
 			}
 		}
 		List<String> failures = new List<String>();
 		Integer saved = 0;
-		List<Database.SaveResult> results = Database.update(
-			changed,
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.SaveResult> results = Database.update(changed, false, AccessLevel.SYSTEM_MODE);
 		for (Integer i = 0; i < results.size(); i++) {
 			if (results[i].isSuccess()) {
 				saved++;

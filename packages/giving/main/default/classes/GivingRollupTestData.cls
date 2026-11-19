@@ -111,20 +111,12 @@ public class GivingRollupTestData {
 		Id householdType = HouseholdService.householdRecordTypeId();
 		List<Account> households = new List<Account>();
 		for (String lastName : lastNames) {
-			households.add(
-				new Account(Name = 'The ' + lastName + ' Family', RecordTypeId = householdType)
-			);
+			households.add(new Account(Name = 'The ' + lastName + ' Family', RecordTypeId = householdType));
 		}
 		Database.insert(households, AccessLevel.SYSTEM_MODE);
 		List<Contact> people = new List<Contact>();
 		for (Integer i = 0; i < lastNames.size(); i++) {
-			people.add(
-				new Contact(
-					FirstName = 'Test',
-					LastName = lastNames[i],
-					AccountId = households[i].Id
-				)
-			);
+			people.add(new Contact(FirstName = 'Test', LastName = lastNames[i], AccountId = households[i].Id));
 		}
 		insert people;
 		return people;

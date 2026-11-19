@@ -77,13 +77,7 @@ private class ImportObjectDuplicateRuleTest {
 
 	private static List<Import_Row__c> rows() {
 		return [
-			SELECT
-				Row_Number__c,
-				Status__c,
-				Error_Message__c,
-				Gift_Id__c,
-				Several_Matches__c,
-				Duplicate_Rule_Match__c
+			SELECT Row_Number__c, Status__c, Error_Message__c, Gift_Id__c, Several_Matches__c, Duplicate_Rule_Match__c
 			FROM Import_Row__c
 			WHERE Import_Batch__c = :batch.Id
 			WITH SYSTEM_MODE
@@ -146,10 +140,7 @@ private class ImportObjectDuplicateRuleTest {
 				for (Integer i = 0; i < MANY; i++) {
 					values.add(row('N' + i, 'New'));
 					if (i < MANY / 2) {
-						ImportDuplicateRuleMatcher.stubMatches.put(
-							'n' + i,
-							new List<Id>{ existing[i].Id }
-						);
+						ImportDuplicateRuleMatcher.stubMatches.put('n' + i, new List<Id>{ existing[i].Id });
 					}
 				}
 				given(ImportObjectSchema.OPERATION_INSERT, values);
@@ -166,9 +157,7 @@ private class ImportObjectDuplicateRuleTest {
 				Assert.areEqual(MANY / 2, allAfterPreview, 'The dry run writes nothing.');
 				Assert.areEqual(MANY / 2, ticked, 'The dry run ticks the rows the rules matched.');
 				Assert.isTrue(
-					preview.notes.contains(
-						BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatchesRecords')
-					),
+					preview.notes.contains(BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatchesRecords')),
 					'And says so in the run log.'
 				);
 				Assert.areEqual(preview.updated, committed.updated, 'The commit decides the same.');
@@ -178,11 +167,7 @@ private class ImportObjectDuplicateRuleTest {
 					[SELECT COUNT() FROM Duplicate_Dismissal__c],
 					'No second copy of a matched record.'
 				);
-				Assert.areEqual(
-					'New',
-					reread(existing[0].Id).Reason__c,
-					'The matched record takes the row values.'
-				);
+				Assert.areEqual('New', reread(existing[0].Id).Reason__c, 'The matched record takes the row values.');
 				Assert.areEqual(MANY / 2, ruleMatchedRows(), 'Ticked after the commit too.');
 				Assert.areEqual(
 					MANY / 2,
@@ -227,18 +212,12 @@ private class ImportObjectDuplicateRuleTest {
 				Assert.areEqual(
 					String.format(
 						BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleKeyDiffers'),
-						new List<String>{
-							Schema.SObjectType.Duplicate_Dismissal__c.fields.Pair_Key__c.getLabel()
-						}
+						new List<String>{ Schema.SObjectType.Duplicate_Dismissal__c.fields.Pair_Key__c.getLabel() }
 					),
 					loaded[1].Error_Message__c,
 					'A match holding another key is rejected.'
 				);
-				Assert.areEqual(
-					2,
-					[SELECT COUNT() FROM Duplicate_Dismissal__c],
-					'Nothing is created.'
-				);
+				Assert.areEqual(2, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'Nothing is created.');
 			}
 		}
 	}
@@ -293,10 +272,7 @@ private class ImportObjectDuplicateRuleTest {
 				ImportDuplicateRuleMatcher.stubMatches = new Map<String, List<Id>>{
 					'n0' => new List<Id>{ existing[0].Id, existing[1].Id }
 				};
-				given(
-					ImportObjectSchema.OPERATION_INSERT,
-					new List<Map<String, String>>{ row('N0', 'New') }
-				);
+				given(ImportObjectSchema.OPERATION_INSERT, new List<Map<String, String>>{ row('N0', 'New') });
 
 				Test.startTest();
 				ImportRowProcessor.Outcome rejected = run(true);
@@ -356,10 +332,7 @@ private class ImportObjectDuplicateRuleTest {
 				.Id;
 				// The rules would now call the record the first chunk created a match.
 				ImportDuplicateRuleMatcher.stubMatches.put('n3', new List<Id>{ createdByImport });
-				ImportRowProcessor.Outcome second = chunk(
-					new List<Import_Row__c>{ staged[3], staged[4] },
-					false
-				);
+				ImportRowProcessor.Outcome second = chunk(new List<Import_Row__c>{ staged[3], staged[4] }, false);
 				Test.stopTest();
 
 				List<Import_Row__c> loaded = rows();
@@ -405,9 +378,7 @@ private class ImportObjectDuplicateRuleTest {
 
 				Assert.areEqual(2, committed.created, 'Nothing is rejected: ' + rowErrors());
 				Assert.isTrue(
-					committed.notes.contains(
-						BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleRecords')
-					),
+					committed.notes.contains(BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleRecords')),
 					'The run log says the rules were not asked.'
 				);
 			}
@@ -438,10 +409,7 @@ private class ImportObjectDuplicateRuleTest {
 					ImportObjectLoader.createsRecords(ImportObjectSchema.OPERATION_UPDATE_BY_FIELD),
 					'An update by a field creates nothing either.'
 				);
-				Assert.isTrue(
-					ImportObjectLoader.createsRecords(ImportObjectSchema.OPERATION_UPSERT),
-					'An upsert can.'
-				);
+				Assert.isTrue(ImportObjectLoader.createsRecords(ImportObjectSchema.OPERATION_UPSERT), 'An upsert can.');
 			}
 		}
 	}
@@ -469,11 +437,7 @@ private class ImportObjectDuplicateRuleTest {
 					rows()[1].Error_Message__c,
 					'Said in words.'
 				);
-				Assert.areEqual(
-					1,
-					[SELECT COUNT() FROM Duplicate_Dismissal__c],
-					'No possible duplicate is created.'
-				);
+				Assert.areEqual(1, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'No possible duplicate is created.');
 			}
 		}
 	}

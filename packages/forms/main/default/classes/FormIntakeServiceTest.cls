@@ -60,15 +60,8 @@ private class FormIntakeServiceTest {
 			Assert.isNotNull(view, 'The public form loads');
 			Assert.isFalse(view.definition.contains('records'), 'No records are published');
 			Assert.isFalse(view.definition.contains('LastName'), 'No field names are published');
-			Assert.areEqual(
-				3,
-				view.ticket.split(':').size(),
-				'The ticket is version, time, signature'
-			);
-			Assert.isNull(
-				FormPublicController.getForm('not an id', null),
-				'Nonsense finds nothing'
-			);
+			Assert.areEqual(3, view.ticket.split(':').size(), 'The ticket is version, time, signature');
+			Assert.isNull(FormPublicController.getForm('not an id', null), 'Nonsense finds nothing');
 			Assert.isNull(
 				FormPublicController.getForm(FormsTestData.volunteerInterest().Id, null),
 				'A form that is not public is not served'
@@ -102,9 +95,7 @@ private class FormIntakeServiceTest {
 			Assert.areEqual(
 				FormIntakeService.EXPIRED,
 				submit(
-						ticket.substringBeforeLast(':') +
-							':' +
-							ticket.substringAfterLast(':').swapCase(),
+						ticket.substringBeforeLast(':') + ':' + ticket.substringAfterLast(':').swapCase(),
 						sam(),
 						null,
 						null
@@ -183,11 +174,7 @@ private class FormIntakeServiceTest {
 			FormSubmitService.Result result = FormSubmitService.processReceived(submissionId);
 			Test.stopTest();
 
-			Assert.areEqual(
-				FormSubmitService.PROCESSED,
-				result.status,
-				'Processed: ' + result.message
-			);
+			Assert.areEqual(FormSubmitService.PROCESSED, result.status, 'Processed: ' + result.message);
 			Contact after = [
 				SELECT MailingPostalCode
 				FROM Contact
@@ -208,9 +195,7 @@ private class FormIntakeServiceTest {
 			FormIntakeService.actAsGuest = true;
 			submit(ticketAfterWaiting(form.Id), sam(), null, gala.Id);
 
-			FormSubmitService.Result result = FormSubmitService.processReceived(
-				submissions()[0].Id
-			);
+			FormSubmitService.Result result = FormSubmitService.processReceived(submissions()[0].Id);
 
 			Assert.areEqual(FormSubmitService.NEEDS_REVIEW, result.status, 'Held');
 			Assert.areEqual(
@@ -235,11 +220,7 @@ private class FormIntakeServiceTest {
 			Assert.isNotNull(claim, 'A public form signs a claim');
 
 			String ticket = ticketAfterWaiting(form.Id);
-			Assert.areEqual(
-				FormIntakeService.CLOSED,
-				submit(ticket, sam(), null, gala.Id).status,
-				'No signature'
-			);
+			Assert.areEqual(FormIntakeService.CLOSED, submit(ticket, sam(), null, gala.Id).status, 'No signature');
 			Assert.areEqual(
 				FormIntakeService.CLOSED,
 				submit(ticket, sam(), null, gala.Id + '.' + claim.reverse()).status,
@@ -283,16 +264,11 @@ private class FormIntakeServiceTest {
 
 			RestContext.response = new RestResponse();
 			RestContext.request.requestBody = Blob.valueOf(
-				JSON.serialize(
-					new Map<String, Object>{ 'ticket' => view.get('ticket'), 'answers' => sam() }
-				)
+				JSON.serialize(new Map<String, Object>{ 'ticket' => view.get('ticket'), 'answers' => sam() })
 			);
 			FormPublicRest.submit();
 
-			Assert.isTrue(
-				RestContext.response.responseBody.toString().contains('Received'),
-				'Received'
-			);
+			Assert.isTrue(RestContext.response.responseBody.toString().contains('Received'), 'Received');
 			Assert.areEqual('Processed', submissions()[0].Status__c, 'Processed as the caller');
 			Assert.areEqual(
 				1,

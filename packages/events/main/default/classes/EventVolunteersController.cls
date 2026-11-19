@@ -75,9 +75,7 @@ public with sharing class EventVolunteersController {
 				result.eventStart = record.Start__c;
 				result.eventEnd = record.End__c;
 			}
-			for (
-				EventVolunteerJob job : EventVolunteerExtensions.jobsFor(String.valueOf(eventId))
-			) {
+			for (EventVolunteerJob job : EventVolunteerExtensions.jobsFor(String.valueOf(eventId))) {
 				JobRow row = new JobRow();
 				row.id = job.id;
 				row.name = job.name;
@@ -98,10 +96,7 @@ public with sharing class EventVolunteersController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getVolunteers', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Volunteers_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Volunteers_LoadFailed'));
 		}
 	}
 
@@ -117,9 +112,7 @@ public with sharing class EventVolunteersController {
 	public static String addJob(Id eventId, String name, String description) {
 		try {
 			if (String.isBlank(name)) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Volunteers_NameRequired')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Volunteers_NameRequired'));
 			}
 			return EventVolunteerExtensions.createJob(
 				String.valueOf(eventId),
@@ -143,24 +136,10 @@ public with sharing class EventVolunteersController {
 	 * @return the new shift's identifier
 	 */
 	@AuraEnabled
-	public static String addShift(
-		Id eventId,
-		Id jobId,
-		Datetime startTime,
-		Datetime endTime,
-		Integer needed
-	) {
+	public static String addShift(Id eventId, Id jobId, Datetime startTime, Datetime endTime, Integer needed) {
 		try {
-			if (
-				startTime == null ||
-				endTime == null ||
-				endTime <= startTime ||
-				needed == null ||
-				needed < 1
-			) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Volunteers_BadShift')
-				);
+			if (startTime == null || endTime == null || endTime <= startTime || needed == null || needed < 1) {
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Volunteers_BadShift'));
 			}
 			return EventVolunteerExtensions.createShift(jobId, startTime, endTime, needed);
 		} catch (Exception e) {

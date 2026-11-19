@@ -35,9 +35,7 @@ private class VolunteerMinorsTest {
 	private static void consentRequired(Boolean required) {
 		OrgSettingsSystemWriter.save(
 			Volunteer_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Volunteer_Settings__c.Minor_Consent_Required__c => required
-			}
+			new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Minor_Consent_Required__c => required }
 		);
 		SettingsService.clearCaches();
 	}
@@ -109,11 +107,7 @@ private class VolunteerMinorsTest {
 			List<Volunteer_Requirement__c> steps = consentSteps();
 			Assert.areEqual(1, steps.size(), 'One step, for the minor.');
 			Assert.areEqual(byName.get('Minor'), steps[0].Contact__c, 'For the minor.');
-			Assert.areEqual(
-				byName.get('Guardian'),
-				steps[0].Guardian__c,
-				'The guardian the form named.'
-			);
+			Assert.areEqual(byName.get('Guardian'), steps[0].Guardian__c, 'The guardian the form named.');
 			Assert.areEqual('Not started', steps[0].Status__c, 'To be completed by a coordinator.');
 		}
 	}
@@ -123,10 +117,7 @@ private class VolunteerMinorsTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			consentRequired(true);
 			Id minor = people().get('Minor');
-			insert new Volunteer_Requirement__c(
-				Contact__c = minor,
-				Type__c = VolunteerMinors.TYPE_CONSENT
-			);
+			insert new Volunteer_Requirement__c(Contact__c = minor, Type__c = VolunteerMinors.TYPE_CONSENT);
 
 			Test.startTest();
 			List<Volunteer_Signup__c> saved = signUp(new List<Id>{ minor });

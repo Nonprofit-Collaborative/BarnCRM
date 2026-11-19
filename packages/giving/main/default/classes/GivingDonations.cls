@@ -102,8 +102,7 @@ public with sharing class GivingDonations implements Callable {
 		List<Map<String, Object>> told = new List<Map<String, Object>>();
 		String key = action == 'subscriptionsChanged' ? 'changes' : 'payments';
 		if (
-			(action == 'paymentsChanged' || action == 'subscriptionsChanged') &&
-			args?.get(key) instanceof List<Object>
+			(action == 'paymentsChanged' || action == 'subscriptionsChanged') && args?.get(key) instanceof List<Object>
 		) {
 			for (Object one : (List<Object>) args.get(key)) {
 				if (one instanceof Map<String, Object>) {
@@ -132,10 +131,7 @@ public with sharing class GivingDonations implements Callable {
 	private static void paymentsChanged(List<Map<String, Object>> payments) {
 		Map<String, Map<String, Object>> byReference = new Map<String, Map<String, Object>>();
 		for (Map<String, Object> payment : payments) {
-			if (
-				payment.get('paymentId') != null &&
-				giftStatus(String.valueOf(payment.get('status'))) != null
-			) {
+			if (payment.get('paymentId') != null && giftStatus(String.valueOf(payment.get('status'))) != null) {
 				byReference.put(String.valueOf(payment.get('paymentId')), payment);
 			}
 		}
@@ -287,10 +283,8 @@ public with sharing class GivingDonations implements Callable {
 				(commitment.Processor_Customer_Id__c == null &&
 				customer != null)
 			) {
-				commitment.Processor_Subscription_Id__c = commitment.Processor_Subscription_Id__c ??
-					subscription;
-				commitment.Processor_Customer_Id__c = commitment.Processor_Customer_Id__c ??
-					customer;
+				commitment.Processor_Subscription_Id__c = commitment.Processor_Subscription_Id__c ?? subscription;
+				commitment.Processor_Customer_Id__c = commitment.Processor_Customer_Id__c ?? customer;
 				filled.put(commitment.Id, commitment);
 			}
 			if (type != null && eventKey != null) {
@@ -326,10 +320,7 @@ public with sharing class GivingDonations implements Callable {
 			ORDER BY MasterLabel
 			LIMIT 1
 		]) {
-			Set<String> ids = new Set<String>{
-				String.valueOf(found.Id),
-				String.valueOf(found.Id).left(15)
-			};
+			Set<String> ids = new Set<String>{ String.valueOf(found.Id), String.valueOf(found.Id).left(15) };
 			for (SiteDetail detail : [
 				SELECT SecureUrl
 				FROM SiteDetail
@@ -382,10 +373,7 @@ public with sharing class GivingDonations implements Callable {
 		for (Gift__c gift : [
 			SELECT Id, Status__c, Gift_Date__c, Payment_Reference__c
 			FROM Gift__c
-			WHERE
-				Payment_Reference__c IN :references
-				AND (Appeal__c != NULL
-				OR Commitment__c != NULL)
+			WHERE Payment_Reference__c IN :references AND (Appeal__c != NULL OR Commitment__c != NULL)
 			WITH USER_MODE
 			LIMIT 2000
 		]) {

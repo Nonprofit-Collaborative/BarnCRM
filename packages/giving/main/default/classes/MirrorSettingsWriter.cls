@@ -41,10 +41,7 @@ public without sharing class MirrorSettingsWriter {
 		keys.put(summaryField, summary == null ? null : summary.left(255));
 		Id stored = lockStored();
 		if (stored == null) {
-			Giving_Settings__c created = (Giving_Settings__c) Giving_Settings__c.SObjectType.newSObject(
-				null,
-				true
-			);
+			Giving_Settings__c created = (Giving_Settings__c) Giving_Settings__c.SObjectType.newSObject(null, true);
 			created.SetupOwnerId = UserInfo.getOrganizationId();
 			created.put(runField, keys.get(runField));
 			created.put(summaryField, keys.get(summaryField));

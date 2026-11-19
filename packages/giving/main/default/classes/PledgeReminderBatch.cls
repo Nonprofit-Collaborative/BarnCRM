@@ -53,12 +53,6 @@ public with sharing class PledgeReminderBatch implements Database.Batchable<SObj
 			}
 		);
 		PledgeReminderService.recordLastRun(summary);
-		JobNotifier.aboutSettings(
-			notifyUserId,
-			Label.Giving_JobNotice_PledgeReminders,
-			false,
-			summary,
-			GIVING_SECTION
-		);
+		JobNotifier.aboutSettings(notifyUserId, Label.Giving_JobNotice_PledgeReminders, false, summary, GIVING_SECTION);
 	}
 }

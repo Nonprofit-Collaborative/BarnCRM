@@ -109,11 +109,7 @@ public with sharing class ProjectRevenue implements Schedulable {
 			Integer total = done + batch.size();
 			if (more && total >= MAX_ROWS) {
 				ErrorLogger.logMessage(
-					BarnHelp.text(
-						'Projects',
-						'Projects_Revenue_CapReached',
-						new List<Object>{ MAX_ROWS }
-					),
+					BarnHelp.text('Projects', 'Projects_Revenue_CapReached', new List<Object>{ MAX_ROWS }),
 					'ProjectRevenue',
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -150,11 +146,7 @@ public with sharing class ProjectRevenue implements Schedulable {
 
 	/** R-PM19: each billed project's row for the month: earned through its end less earlier rows. */
 	@TestVisible
-	private static List<Project_Revenue__c> recognize(
-		List<Project__c> projects,
-		Date month,
-		AccessLevel mode
-	) {
+	private static List<Project_Revenue__c> recognize(List<Project__c> projects, Date month, AccessLevel mode) {
 		List<Project_Revenue__c> rows = new List<Project_Revenue__c>();
 		List<Project__c> billed = new List<Project__c>();
 		for (Project__c project : projects) {
@@ -176,16 +168,11 @@ public with sharing class ProjectRevenue implements Schedulable {
 				mode
 			)
 		) {
-			earlier.put(
-				(Id) sum.get('p'),
-				new List<Decimal>{ num(sum.get('r')), num(sum.get('c')) }
-			);
+			earlier.put((Id) sum.get('p'), new List<Decimal>{ num(sum.get('r')), num(sum.get('c')) });
 		}
 		for (Project__c project : billed) {
 			Decimal[] upTo = earned.get(project.Id);
-			Decimal[] past = earlier.containsKey(project.Id)
-				? earlier.get(project.Id)
-				: new List<Decimal>{ 0, 0 };
+			Decimal[] past = earlier.containsKey(project.Id) ? earlier.get(project.Id) : new List<Decimal>{ 0, 0 };
 			String method = ProjectBilling.billingType(project);
 			rows.add(
 				new Project_Revenue__c(
@@ -195,9 +182,7 @@ public with sharing class ProjectRevenue implements Schedulable {
 					Method__c = method,
 					Recognized_Amount__c = upTo[0] - past[0],
 					Cost_Amount__c = upTo[1] - past[1],
-					Percent_Complete__c = method == ProjectBilling.FIXED_FEE
-						? num(project.Percent_Complete__c)
-						: null
+					Percent_Complete__c = method == ProjectBilling.FIXED_FEE ? num(project.Percent_Complete__c) : null
 				)
 			);
 		}
@@ -220,12 +205,8 @@ public with sharing class ProjectRevenue implements Schedulable {
 		for (Project__c project : projects) {
 			out.put(project.Id, new List<Decimal>{ 0, 0 });
 		}
-		Map<String, Object> binds = new Map<String, Object>{
-			'ids' => byId.keySet(),
-			'through' => through
-		};
-		String counted =
-			' WHERE Project__c IN :ids AND Date__c <= :through AND ' + ProjectBilling.COUNTED;
+		Map<String, Object> binds = new Map<String, Object>{ 'ids' => byId.keySet(), 'through' => through };
+		String counted = ' WHERE Project__c IN :ids AND Date__c <= :through AND ' + ProjectBilling.COUNTED;
 		// Access mode: the caller's, passed as `mode`.
 		for (
 			AggregateResult sum : (List<AggregateResult>) Database.queryWithBinds(
@@ -240,10 +221,7 @@ public with sharing class ProjectRevenue implements Schedulable {
 		) {
 			Decimal[] totals = out.get((Id) sum.get('p'));
 			Project__c project = byId.get((Id) sum.get('p'));
-			if (
-				sum.get('b') == true &&
-				ProjectBilling.billingType(project) == ProjectBilling.TIME_AND_MATERIALS
-			) {
+			if (sum.get('b') == true && ProjectBilling.billingType(project) == ProjectBilling.TIME_AND_MATERIALS) {
 				totals[0] += num(sum.get('a'));
 			}
 			totals[1] += withCost ? num(sum.get('c')) : 0;
@@ -285,8 +263,7 @@ public with sharing class ProjectRevenue implements Schedulable {
 					num(project.Percent_Complete__c) /
 					100;
 			} else if (type == ProjectBilling.RETAINER) {
-				out.get(project.Id)[0] +=
-					num(project.Retainer_Amount__c) * months(project, through);
+				out.get(project.Id)[0] += num(project.Retainer_Amount__c) * months(project, through);
 			}
 		}
 		return out;
@@ -344,9 +321,7 @@ public with sharing class ProjectRevenue implements Schedulable {
 	}
 
 	private static String key(Id projectId, Date month) {
-		return projectId +
-			'-' +
-			Datetime.newInstance(month, Time.newInstance(12, 0, 0, 0)).format('yyyy-MM');
+		return projectId + '-' + Datetime.newInstance(month, Time.newInstance(12, 0, 0, 0)).format('yyyy-MM');
 	}
 
 	private static Decimal num(Object value) {

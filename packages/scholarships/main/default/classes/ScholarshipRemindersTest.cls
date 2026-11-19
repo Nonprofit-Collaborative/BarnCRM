@@ -24,12 +24,7 @@ private class ScholarshipRemindersTest {
 				Open_Date__c = Date.today()
 			);
 			insert planned;
-			Award__c award = ScholarshipsTestData.award(
-				open.Id,
-				null,
-				ScholarshipsTestData.person('Lee').Id,
-				500
-			);
+			Award__c award = ScholarshipsTestData.award(open.Id, null, ScholarshipsTestData.person('Lee').Id, 500);
 			Award_Requirement__c report = new Award_Requirement__c(
 				Award__c = award.Id,
 				Name = 'Progress report',
@@ -37,11 +32,7 @@ private class ScholarshipRemindersTest {
 				Due_Date__c = Date.today().addDays(5)
 			);
 			insert report;
-			Assert.areEqual(
-				1,
-				new ScholarshipsNightlyJobProvider().nightlySteps().size(),
-				'One step'
-			);
+			Assert.areEqual(1, new ScholarshipsNightlyJobProvider().nightlySteps().size(), 'One step');
 			Assert.isTrue(ScholarshipsSettings.remindersEnabled(), 'Ships on');
 			Assert.isFalse(ScholarshipsSettings.emailRecipients(), 'Email ships off');
 			Assert.areEqual(14, ScholarshipsSettings.reminderDays(), 'Ships 14');
@@ -56,15 +47,10 @@ private class ScholarshipRemindersTest {
 				[SELECT Status__c FROM Award_Cycle__c WHERE Id = :open.Id].Status__c,
 				'Closed for applications'
 			);
-			Assert.areEqual(
-				'Open',
-				[SELECT Status__c FROM Award_Cycle__c WHERE Id = :planned.Id].Status__c,
-				'Opened'
-			);
+			Assert.areEqual('Open', [SELECT Status__c FROM Award_Cycle__c WHERE Id = :planned.Id].Status__c, 'Opened');
 			Assert.areEqual(
 				report.Due_Date__c,
-				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :report.Id]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :report.Id].Reminded_For__c,
 				'Reminded for the date'
 			);
 			Assert.areEqual(1, Scholarships.sentTitles.size(), 'Once, not twice');
@@ -113,17 +99,9 @@ private class ScholarshipRemindersTest {
 			FormCatalogTestSupport.install(new Catalog());
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
 			String formKey = String.valueOf(cycle.Program__c);
-			update new Award_Cycle__c(
-				Id = cycle.Id,
-				Application_Form_Key__c = formKey,
-				Report_Form_Key__c = formKey
-			);
+			update new Award_Cycle__c(Id = cycle.Id, Application_Form_Key__c = formKey, Report_Form_Key__c = formKey);
 			Contact lee = ScholarshipsTestData.person('Lee');
-			Award_Application__c draft = ScholarshipsTestData.application(
-				cycle.Id,
-				lee.Id,
-				'Draft'
-			);
+			Award_Application__c draft = ScholarshipsTestData.application(cycle.Id, lee.Id, 'Draft');
 			Award__c award = ScholarshipsTestData.award(cycle.Id, null, lee.Id, 500);
 			Award_Requirement__c report = requirement(award.Id, 'Progress report', 3);
 
@@ -153,12 +131,7 @@ private class ScholarshipRemindersTest {
 		System.runAs(ScholarshipsTestData.admin()) {
 			saveSettings(true, false);
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
-			Award__c award = ScholarshipsTestData.award(
-				cycle.Id,
-				null,
-				ScholarshipsTestData.person('Lee').Id,
-				500
-			);
+			Award__c award = ScholarshipsTestData.award(cycle.Id, null, ScholarshipsTestData.person('Lee').Id, 500);
 			Award_Requirement__c first = requirement(award.Id, 'First report', 2);
 			Award_Requirement__c second = requirement(award.Id, 'Second report', 4);
 			ScholarshipReminders.maxReminders = 1;
@@ -169,13 +142,11 @@ private class ScholarshipRemindersTest {
 
 			Assert.areEqual(1, Scholarships.sentTitles.size(), 'Only one reminder tonight');
 			Assert.isNotNull(
-				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :first.Id]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :first.Id].Reminded_For__c,
 				'The earliest due date goes first'
 			);
 			Assert.isNull(
-				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :second.Id]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :second.Id].Reminded_For__c,
 				'The rest wait for the next night'
 			);
 
@@ -185,8 +156,7 @@ private class ScholarshipRemindersTest {
 			new ScholarshipReminders().execute(null);
 			Assert.isTrue(Scholarships.sentTitles.isEmpty(), 'Reminders off sends none');
 			Assert.isNull(
-				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :second.Id]
-				.Reminded_For__c,
+				[SELECT Reminded_For__c FROM Award_Requirement__c WHERE Id = :second.Id].Reminded_For__c,
 				'Nothing is marked'
 			);
 		}

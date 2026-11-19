@@ -17,11 +17,7 @@ public with sharing class VolunteerRecognitionJob implements Database.Batchable<
 		if (ShiftScheduleService.isTurnedOff() || !VolunteerSettings.recognitionEnabled()) {
 			return null;
 		}
-		return AsyncStarter.batch(
-			new VolunteerRecognitionJob(),
-			CHUNK_SIZE,
-			'VolunteerRecognitionJob'
-		);
+		return AsyncStarter.batch(new VolunteerRecognitionJob(), CHUNK_SIZE, 'VolunteerRecognitionJob');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
@@ -82,45 +78,20 @@ public with sharing class VolunteerRecognitionJob implements Database.Batchable<
 		];
 		for (Contact person : people) {
 			Integer reached = highestReached(milestones, person.Volunteer_Hours_Total__c);
-			if (
-				reached != null &&
-				(person.Last_Hour_Milestone__c == null ||
-				reached > person.Last_Hour_Milestone__c)
-			) {
+			if (reached != null && (person.Last_Hour_Milestone__c == null || reached > person.Last_Hour_Milestone__c)) {
 				List<Object> args = new List<Object>{ person.Name, reached.format() };
-				milestoneTasks.add(
-					task(
-						person,
-						BarnHelp.text('Volunteers', 'Volunteers_Recognition_Milestone', args)
-					)
-				);
+				milestoneTasks.add(task(person, BarnHelp.text('Volunteers', 'Volunteers_Recognition_Milestone', args)));
 				stamped.add(new Contact(Id = person.Id, Last_Hour_Milestone__c = reached));
 			}
 			Date since = person.Volunteer_Since__c;
-			if (
-				since != null &&
-				since < today &&
-				since.month() == today.month() &&
-				since.day() == today.day()
-			) {
-				List<Object> args = new List<Object>{
-					person.Name,
-					(today.year() - since.year()).format()
-				};
+			if (since != null && since < today && since.month() == today.month() && since.day() == today.day()) {
+				List<Object> args = new List<Object>{ person.Name, (today.year() - since.year()).format() };
 				anniversaries.add(
 					task(
 						person,
 						today.year() - since.year() == 1
-							? BarnHelp.text(
-									'Volunteers',
-									'Volunteers_Recognition_AnniversaryOne',
-									args
-							  )
-							: BarnHelp.text(
-									'Volunteers',
-									'Volunteers_Recognition_Anniversary',
-									args
-							  )
+							? BarnHelp.text('Volunteers', 'Volunteers_Recognition_AnniversaryOne', args)
+							: BarnHelp.text('Volunteers', 'Volunteers_Recognition_Anniversary', args)
 					)
 				);
 			}

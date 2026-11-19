@@ -63,9 +63,7 @@ public with sharing class GivingScheduler {
 					new DonorLevelSchedulable()
 				)
 				.withSwitch(true),
-			PledgeReminderScheduler.step()
-				.withSummary(settings.Pledge_Reminders_Last_Run_Summary__c)
-				.runnableNow(),
+			PledgeReminderScheduler.step().withSummary(settings.Pledge_Reminders_Last_Run_Summary__c).runnableNow(),
 			new NightlyStep(
 					ASK_JOB_NAME,
 					System.Label.Giving_NightlyJobs_AskRemindersName,

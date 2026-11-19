@@ -53,11 +53,7 @@ private class AcknowledgmentControllerTest {
 				view.emailQueue,
 				'The two small gifts from a person with an address are the emails waiting.'
 			);
-			Assert.areEqual(
-				1,
-				view.letterQueue,
-				'The 2500 gift is a letter, by the major gift rule.'
-			);
+			Assert.areEqual(1, view.letterQueue, 'The 2500 gift is a letter, by the major gift rule.');
 			Assert.areEqual(
 				1,
 				view.withoutRecipient,
@@ -95,11 +91,7 @@ private class AcknowledgmentControllerTest {
 				'A gift waiting that no rule covers is shown, because otherwise an incomplete set of ' +
 				'rules looks exactly like an empty queue.'
 			);
-			Assert.areEqual(
-				0,
-				view.emailQueue,
-				'And it is not counted as something about to be sent.'
-			);
+			Assert.areEqual(0, view.emailQueue, 'And it is not counted as something about to be sent.');
 		}
 	}
 

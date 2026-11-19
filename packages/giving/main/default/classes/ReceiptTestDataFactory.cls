@@ -187,12 +187,7 @@ public class ReceiptTestDataFactory {
 	 * The same gift with the fair market value named, so a test can assert that its own figure
 	 * reaches no rendered document (R-RC12).
 	 */
-	public static Gift__c inKindGift(
-		Id donorContactId,
-		String description,
-		Decimal value,
-		Date giftDate
-	) {
+	public static Gift__c inKindGift(Id donorContactId, String description, Decimal value, Date giftDate) {
 		Gift__c gift = GivingTestDataFactory.buildGift(donorContactId, 0);
 		gift.Type__c = 'In-kind';
 		gift.Gift_Date__c = giftDate;

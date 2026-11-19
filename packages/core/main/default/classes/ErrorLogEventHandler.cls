@@ -27,12 +27,7 @@
  */
 public without sharing class ErrorLogEventHandler {
 	private static final String DEFAULT_SEVERITY = 'Error';
-	private static final Set<String> SEVERITIES = new Set<String>{
-		'Info',
-		'Warning',
-		'Error',
-		'Critical'
-	};
+	private static final Set<String> SEVERITIES = new Set<String>{ 'Info', 'Warning', 'Error', 'Critical' };
 
 	/** How long after an entry's first occurrence a repeat is counted on it. */
 	@TestVisible
@@ -48,9 +43,7 @@ public without sharing class ErrorLogEventHandler {
 	private static final Pattern TYPE_NAME = Pattern.compile('[A-Za-z_][A-Za-z0-9_.]*');
 
 	/** A stack frame in our own code, kept to its line: `Class.HouseholdService.save: line 12`. */
-	private static final Pattern FRAME = Pattern.compile(
-		'(?m)^\\s*((?:Class|Trigger)\\.[^\\s:]+: line \\d+)'
-	);
+	private static final Pattern FRAME = Pattern.compile('(?m)^\\s*((?:Class|Trigger)\\.[^\\s:]+: line \\d+)');
 
 	public static void handle(List<Error_Log_Event__e> events) {
 		if (events == null || events.isEmpty()) {
@@ -80,8 +73,7 @@ public without sharing class ErrorLogEventHandler {
 					toInsert.add(entry);
 					continue;
 				}
-				open.Occurrences__c =
-					(open.Occurrences__c == null ? 1 : open.Occurrences__c) + entry.Occurrences__c;
+				open.Occurrences__c = (open.Occurrences__c == null ? 1 : open.Occurrences__c) + entry.Occurrences__c;
 				addRecord(open, entry.Record_Reference__c, entry.Object_Name__c);
 				for (String recordId : idsIn(entry.Other_Record_Ids__c)) {
 					addRecord(open, recordId, entry.Object_Name__c);
@@ -97,8 +89,7 @@ public without sharing class ErrorLogEventHandler {
 			// accepted, not suppressed).
 			System.debug(
 				LoggingLevel.ERROR,
-				'BarnCRM could not write an Error Log record from an event: ' +
-				failedToLog.getMessage()
+				'BarnCRM could not write an Error Log record from an event: ' + failedToLog.getMessage()
 			);
 		}
 	}
@@ -112,9 +103,7 @@ public without sharing class ErrorLogEventHandler {
 			Technical_Detail__c = event.Technical_Detail__c,
 			Record_Reference__c = event.Record_Reference__c,
 			Object_Name__c = event.Object_Name__c,
-			Severity__c = SEVERITIES.contains(event.Severity__c)
-				? event.Severity__c
-				: DEFAULT_SEVERITY,
+			Severity__c = SEVERITIES.contains(event.Severity__c) ? event.Severity__c : DEFAULT_SEVERITY,
 			Status__c = 'New',
 			Occurrences__c = 1
 		);
@@ -177,13 +166,7 @@ public without sharing class ErrorLogEventHandler {
 		Map<String, Error_Log__c> byKey = new Map<String, Error_Log__c>();
 		Datetime since = System.now().addMinutes(-WINDOW_MINUTES);
 		for (Error_Log__c open : [
-			SELECT
-				Id,
-				Occurrence_Key__c,
-				Occurrences__c,
-				Record_Reference__c,
-				Object_Name__c,
-				Other_Record_Ids__c
+			SELECT Id, Occurrence_Key__c, Occurrences__c, Record_Reference__c, Object_Name__c, Other_Record_Ids__c
 			FROM Error_Log__c
 			WHERE Occurrence_Key__c IN :keys AND Timestamp__c >= :since AND Status__c = 'New'
 			WITH SYSTEM_MODE

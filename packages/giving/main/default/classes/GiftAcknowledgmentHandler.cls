@@ -25,10 +25,7 @@ public with sharing class GiftAcknowledgmentHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		AcknowledgmentService.applyRules(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		AcknowledgmentService.applyRules((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 
 	/**
@@ -37,9 +34,6 @@ public with sharing class GiftAcknowledgmentHandler extends TriggerHandler {
 	 * thanked for again, and it runs only when a person put the gift back in the queue (R-AK7).
 	 */
 	public override void afterUpdate() {
-		AcknowledgmentService.releaseClaims(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		AcknowledgmentService.releaseClaims((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 }

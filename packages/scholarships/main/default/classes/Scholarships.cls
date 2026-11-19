@@ -24,9 +24,7 @@ public with sharing class Scholarships {
 	/** Refuses, in words, anyone without Manage Scholarships. */
 	public static void requireManage() {
 		if (!canManage()) {
-			throw new ScholarshipException(
-				BarnHelp.text('Scholarships', 'Scholarships_Error_NoPermission')
-			);
+			throw new ScholarshipException(BarnHelp.text('Scholarships', 'Scholarships_Error_NoPermission'));
 		}
 	}
 

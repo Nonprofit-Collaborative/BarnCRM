@@ -18,9 +18,7 @@ public with sharing class CertificationService {
 	public static void grant(Id holdingId) {
 		Member_Certification__c holding = read(holdingId);
 		if (holding.Status__c == ACTIVE) {
-			throw new CertificationException(
-				BarnHelp.text('Memberships', 'Memberships_Cert_ErrorActive')
-			);
+			throw new CertificationException(BarnHelp.text('Memberships', 'Memberships_Cert_ErrorActive'));
 		}
 		Date today = MembershipService.today();
 		holding.Status__c = ACTIVE;
@@ -110,10 +108,7 @@ public with sharing class CertificationService {
 	/** The last day of a period of `months` from `start`, or null when it never ends. */
 	@TestVisible
 	private static Date endOf(Date start, Decimal months) {
-		return months == null ||
-			months <= 0
-			? null
-			: start.addMonths(months.intValue()).addDays(-1);
+		return months == null || months <= 0 ? null : start.addMonths(months.intValue()).addDays(-1);
 	}
 
 	public static Member_Certification__c read(Id holdingId) {
@@ -132,9 +127,7 @@ public with sharing class CertificationService {
 			LIMIT 1
 		];
 		if (found.isEmpty()) {
-			throw new CertificationException(
-				BarnHelp.text('Memberships', 'Memberships_Cert_ErrorNotFound')
-			);
+			throw new CertificationException(BarnHelp.text('Memberships', 'Memberships_Cert_ErrorNotFound'));
 		}
 		return found[0];
 	}

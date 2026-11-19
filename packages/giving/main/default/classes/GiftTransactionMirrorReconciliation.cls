@@ -84,9 +84,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		Integer cap = maxRecords + 1;
 		// Each gift can cost a second row for its Gift Transaction, each one a check for a gift.
 		if (4 * cap > Limits.getLimitQueryRows() - Limits.getQueryRows()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_ErrorTooMany')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_ErrorTooMany'));
 		}
 		List<SObject> paid = GiftTransactionMirrorSelector.giftTransactionsInRange(
 			objectName,
@@ -109,9 +107,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
 			AccessLevel.USER_MODE
 		);
 		if (paid.size() > maxRecords || gifts.size() > maxRecords) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_ErrorTooMany')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_ErrorTooMany'));
 		}
 
 		Comparison result = new Comparison();
@@ -131,9 +127,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
 			result.giftCount++;
 			result.giftTotal += gift.Amount__c == null ? 0 : gift.Amount__c;
 			if (gift.Gift_Transaction_Id__c == null) {
-				result.add(
-					pair(gift, null, Label.Mirror_GiftTransactionMirror_DiffNoGiftTransaction)
-				);
+				result.add(pair(gift, null, Label.Mirror_GiftTransactionMirror_DiffNoGiftTransaction));
 			} else if (paidById.containsKey(gift.Gift_Transaction_Id__c)) {
 				named.add(gift.Gift_Transaction_Id__c);
 				compareLinked(result, gift, paidById.get(gift.Gift_Transaction_Id__c), status);
@@ -167,9 +161,7 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		);
 		for (SObject giftTransaction : paid) {
 			if (unnamed.contains(String.valueOf(giftTransaction.Id))) {
-				result.add(
-					pair(null, giftTransaction, Label.Mirror_GiftTransactionMirror_DiffNoGift)
-				);
+				result.add(pair(null, giftTransaction, Label.Mirror_GiftTransactionMirror_DiffNoGift));
 			}
 		}
 		return result;
@@ -184,19 +176,13 @@ public with sharing class GiftTransactionMirrorReconciliation {
 	/** Refuses a comparison that cannot be made, in words the page shows. */
 	private static void checkReady(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'));
 		}
 		if (fromDate > toDate) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'));
 		}
 		if (!GiftTransactionMirrorService.isAvailable()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable'));
 		}
 		String status = GiftTransactionMirrorService.paidStatus();
 		if (!GiftTransactionMirrorSchema.isActiveStatus(status)) {
@@ -209,24 +195,15 @@ public with sharing class GiftTransactionMirrorReconciliation {
 		}
 		// User mode reads of a field the viewer cannot see fail with the platform's own words.
 		if (!Gift__c.Gift_Transaction_Id__c.getDescribe().isAccessible()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoLinkAccess')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoLinkAccess'));
 		}
 		if (!GiftTransactionMirrorSchema.canRead(GiftTransactionMirrorSchema.read())) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoRead')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoRead'));
 		}
 	}
 
 	/** Lists a linked gift whose Gift Transaction is gone or differs from it. */
-	private static void compareLinked(
-		Comparison result,
-		Gift__c gift,
-		SObject giftTransaction,
-		String status
-	) {
+	private static void compareLinked(Comparison result, Gift__c gift, SObject giftTransaction, String status) {
 		if (giftTransaction == null) {
 			Difference missing = pair(gift, null, Label.Mirror_GiftTransactionMirror_DiffMissing);
 			missing.giftTransactionId = gift.Gift_Transaction_Id__c;

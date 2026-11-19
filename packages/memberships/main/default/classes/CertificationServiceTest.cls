@@ -133,8 +133,7 @@ private class CertificationServiceTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Member_Certification__c made = holding(0, 12);
 			credit(made.Id, 1);
-			Id personId = [SELECT Contact__c FROM Member_Certification__c WHERE Id = :made.Id]
-			.Contact__c;
+			Id personId = [SELECT Contact__c FROM Member_Certification__c WHERE Id = :made.Id].Contact__c;
 			new MembershipsErasureExtension().erase(personId);
 			Assert.isNull(reread(made.Id).Notes__c);
 			Assert.isNull([SELECT Activity__c FROM Continuing_Credit__c LIMIT 1].Activity__c);

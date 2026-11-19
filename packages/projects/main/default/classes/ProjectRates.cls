@@ -67,13 +67,7 @@ public with sharing class ProjectRates {
 		List<Project_Rate__c> rates = new List<Project_Rate__c>();
 		if (earliest != null) {
 			rates = [
-				SELECT
-					User__c,
-					Role__c,
-					Bill_Rate__c,
-					Cost_Rate__c,
-					Effective_From__c,
-					Effective_To__c
+				SELECT User__c, Role__c, Bill_Rate__c, Cost_Rate__c, Effective_From__c, Effective_To__c
 				FROM Project_Rate__c
 				WHERE
 					(User__c IN :users
@@ -89,11 +83,7 @@ public with sharing class ProjectRates {
 			Project_Rate__c person = pick(rates, entry.User__c, null, entry.Date__c);
 			String role = roleOf(assignments, defaults, entry);
 			Project_Rate__c byRole = role == null ? null : pick(rates, null, role, entry.Date__c);
-			entry.Bill_Rate__c = first(
-				person?.Bill_Rate__c,
-				byRole?.Bill_Rate__c,
-				hourly.get(entry.Project__c)
-			);
+			entry.Bill_Rate__c = first(person?.Bill_Rate__c, byRole?.Bill_Rate__c, hourly.get(entry.Project__c));
 			entry.Cost_Rate__c = first(person?.Cost_Rate__c, byRole?.Cost_Rate__c, null);
 		}
 	}
@@ -135,19 +125,12 @@ public with sharing class ProjectRates {
 	}
 
 	/** The rate of a person or role in force on a day: the latest Effective From wins. */
-	private static Project_Rate__c pick(
-		List<Project_Rate__c> rates,
-		Id userId,
-		String role,
-		Date day
-	) {
+	private static Project_Rate__c pick(List<Project_Rate__c> rates, Id userId, String role, Date day) {
 		Project_Rate__c best;
 		for (Project_Rate__c rate : rates) {
 			Boolean matches = userId != null
 				? rate.User__c == userId
-				: rate.User__c == null &&
-				  rate.Role__c != null &&
-				  rate.Role__c.equalsIgnoreCase(role);
+				: rate.User__c == null && rate.Role__c != null && rate.Role__c.equalsIgnoreCase(role);
 			if (
 				matches &&
 				rate.Effective_From__c <= day &&
@@ -173,14 +156,10 @@ public with sharing class ProjectRates {
 	) {
 		String fallback;
 		for (Project_Assignment__c assignment : assignments) {
-			if (
-				assignment.Resource__c == entry.User__c &&
-				assignment.Project__c == entry.Project__c
-			) {
+			if (assignment.Resource__c == entry.User__c && assignment.Project__c == entry.Project__c) {
 				fallback = fallback == null ? assignment.Role__c : fallback;
 				if (
-					(assignment.Start_Date__c == null ||
-					assignment.Start_Date__c <= entry.Date__c) &&
+					(assignment.Start_Date__c == null || assignment.Start_Date__c <= entry.Date__c) &&
 					(assignment.End_Date__c == null ||
 					assignment.End_Date__c >= entry.Date__c)
 				) {

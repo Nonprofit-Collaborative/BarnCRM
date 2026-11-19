@@ -31,8 +31,7 @@ private class PaymentsPostInstallTest {
 	static void theInstallerGetsPaymentsAdminOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id holding = TestDataFactory.createUser('Holder', new List<String>{ 'Payments_Admin' })
-				.Id;
+			Id holding = TestDataFactory.createUser('Holder', new List<String>{ 'Payments_Admin' }).Id;
 			User reader = TestUsers.standardUser('Reader');
 			insert new PermissionSetAssignment(
 				AssigneeId = reader.Id,

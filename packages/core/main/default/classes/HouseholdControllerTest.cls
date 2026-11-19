@@ -23,21 +23,9 @@ private class HouseholdControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(5, rows.size(), 'Maria sees five sample households');
-			Assert.areEqual(
-				'The Smith Family',
-				rows[0].name,
-				'The first sample is a couple who share a surname'
-			);
-			Assert.areEqual(
-				'Mr. and Mrs. John Smith',
-				rows[0].formalGreeting,
-				'The formal greeting is combined'
-			);
-			Assert.areEqual(
-				'John and Jane',
-				rows[0].informalGreeting,
-				'The informal greeting names both'
-			);
+			Assert.areEqual('The Smith Family', rows[0].name, 'The first sample is a couple who share a surname');
+			Assert.areEqual('Mr. and Mrs. John Smith', rows[0].formalGreeting, 'The formal greeting is combined');
+			Assert.areEqual('John and Jane', rows[0].informalGreeting, 'The informal greeting names both');
 		}
 	}
 
@@ -54,11 +42,7 @@ private class HouseholdControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Smith Household',
-				rows[0].name,
-				'The preview uses the pattern, not the saved one'
-			);
+			Assert.areEqual('Smith Household', rows[0].name, 'The preview uses the pattern, not the saved one');
 		}
 	}
 
@@ -81,9 +65,7 @@ private class HouseholdControllerTest {
 			update new Account(Id = household.Id, Primary_Contact__c = john.Id);
 
 			Test.startTest();
-			List<HouseholdController.MemberView> members = HouseholdController.getMembers(
-				household.Id
-			);
+			List<HouseholdController.MemberView> members = HouseholdController.getMembers(household.Id);
 			Test.stopTest();
 
 			Assert.areEqual(1, members.size(), 'One member');
@@ -172,9 +154,7 @@ private class HouseholdControllerTest {
 	@IsTest
 	static void thePageOpensOnTheSavedPatterns() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Household_Name_Pattern__c = '{LastName} Household';
 			HouseholdTestDataFactory.save(settings);
 

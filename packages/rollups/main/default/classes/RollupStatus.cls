@@ -47,12 +47,7 @@ public with sharing class RollupStatus {
 	}
 
 	@TestVisible
-	private static State stateOf(
-		Rollup_Definition__c definition,
-		Boolean running,
-		Decimal waiting,
-		Decimal failed
-	) {
+	private static State stateOf(Rollup_Definition__c definition, Boolean running, Decimal waiting, Decimal failed) {
 		if (definition.Active__c != true) {
 			return new State(LEVEL_OFF, Label.Rollups_RollupEase_StatusOff);
 		}
@@ -66,18 +61,12 @@ public with sharing class RollupStatus {
 			);
 		}
 		if (running) {
-			return new State(
-				LEVEL_RUNNING,
-				BarnHelp.text('Rollups', 'Core_RollupEase_StatusRunning')
-			);
+			return new State(LEVEL_RUNNING, BarnHelp.text('Rollups', 'Core_RollupEase_StatusRunning'));
 		}
 		if (waiting != null && waiting > 0) {
 			return new State(
 				LEVEL_WAITING,
-				String.format(
-					Label.Rollups_RollupEase_StatusWaiting,
-					new List<String>{ waiting.format() }
-				)
+				String.format(Label.Rollups_RollupEase_StatusWaiting, new List<String>{ waiting.format() })
 			);
 		}
 		return new State(LEVEL_CLEAR, Label.Rollups_RollupEase_StatusClear);
@@ -108,9 +97,7 @@ public with sharing class RollupStatus {
 			ORDER BY CreatedDate
 			LIMIT :ENTRIES_READ
 		]) {
-			Map<Id, Decimal> counts = entry.Status__c == RollupQueue.STATUS_FAILED
-				? failed
-				: waiting;
+			Map<Id, Decimal> counts = entry.Status__c == RollupQueue.STATUS_FAILED ? failed : waiting;
 			Decimal records = entry.Record_Count__c == null ? 0 : entry.Record_Count__c;
 			for (Id definitionId : definitionsOf(entry, activeByTarget, known)) {
 				Decimal sum = counts.get(definitionId);

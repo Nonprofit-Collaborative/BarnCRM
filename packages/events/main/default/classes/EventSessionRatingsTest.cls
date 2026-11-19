@@ -33,10 +33,7 @@ private class EventSessionRatingsTest {
 		}
 
 		public String publicLink(Id formId, Id contextRecordId) {
-			return 'https://zzforms.example.org/FormsPublic?form=' +
-				formId +
-				'&record=' +
-				contextRecordId;
+			return 'https://zzforms.example.org/FormsPublic?form=' + formId + '&record=' + contextRecordId;
 		}
 	}
 
@@ -54,11 +51,7 @@ private class EventSessionRatingsTest {
 	}
 
 	private static Event_Session__c session(Event__c event, String name, String status) {
-		Event_Session__c record = new Event_Session__c(
-			Event__c = event.Id,
-			Name = name,
-			Status__c = status
-		);
+		Event_Session__c record = new Event_Session__c(Event__c = event.Id, Name = name, Status__c = status);
 		insert as user record;
 		return record;
 	}
@@ -113,8 +106,7 @@ private class EventSessionRatingsTest {
 			Assert.isTrue(result.links.get(talk.Id).endsWith('&record=' + talk.Id), 'Tied to it');
 			Assert.isTrue(refused, 'A form that is not public is refused');
 			Assert.isNull(
-				[SELECT Session_Rating_Form_Key__c FROM Event__c WITH USER_MODE LIMIT 1]
-				.Session_Rating_Form_Key__c,
+				[SELECT Session_Rating_Form_Key__c FROM Event__c WITH USER_MODE LIMIT 1].Session_Rating_Form_Key__c,
 				'Cleared'
 			);
 		}
@@ -127,9 +119,7 @@ private class EventSessionRatingsTest {
 			event.Session_Rating_Form_Key__c = FORM_KEY;
 			update as user event;
 			Event_Session__c talk = session(event, 'Talk A', 'Confirmed');
-			Contact ana = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Garcia')
-			);
+			Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 			insert as user ana;
 			Id speakerId = EventSpeakersController.addSpeaker(event.Id, ana.Id);
 			EventSpeakersController.assign(talk.Id, speakerId, 'Speaker');
@@ -146,9 +136,7 @@ private class EventSessionRatingsTest {
 			attachment.received(receipt(talk.Id, 'great', null));
 			attachment.received(receipt(talk.Id, null, null));
 			EventAgendaController.Agenda agenda = EventAgendaController.getAgenda(event.Id);
-			EventSpeakersController.Speakers speakers = EventSpeakersController.getSpeakers(
-				event.Id
-			);
+			EventSpeakersController.Speakers speakers = EventSpeakersController.getSpeakers(event.Id);
 			Test.stopTest();
 
 			Assert.isTrue(attachment.handles(Event_Session__c.SObjectType), 'Sessions handled');

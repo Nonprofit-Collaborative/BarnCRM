@@ -206,9 +206,7 @@ public with sharing class BrandService {
 			WITH USER_MODE
 			LIMIT 1
 		];
-		return versions.isEmpty()
-			? null
-			: '/sfc/servlet.shepherd/version/download/' + versions[0].Id;
+		return versions.isEmpty() ? null : '/sfc/servlet.shepherd/version/download/' + versions[0].Id;
 	}
 
 	/**
@@ -221,10 +219,7 @@ public with sharing class BrandService {
 		if (records == null || records.isEmpty() || !isEnabled()) {
 			return;
 		}
-		Map<String, Schema.SObjectField> fields = records[0]
-			.getSObjectType()
-			.getDescribe()
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = records[0].getSObjectType().getDescribe().fields.getMap();
 		if (!fields.containsKey(BRAND_FIELD.toLowerCase())) {
 			return;
 		}
@@ -338,13 +333,7 @@ public with sharing class BrandService {
 		for (String part : new List<String>{ 'City__c', 'State__c', 'Postal_Code__c' }) {
 			locality += String.isBlank((String) source.get(part)) ? '' : ' ' + source.get(part);
 		}
-		for (
-			Object line : new List<Object>{
-				source.get('Street__c'),
-				locality,
-				source.get('Country__c')
-			}
-		) {
+		for (Object line : new List<Object>{ source.get('Street__c'), locality, source.get('Country__c') }) {
 			if (String.isNotBlank((String) line)) {
 				lines.add(((String) line).trim());
 			}
@@ -376,10 +365,7 @@ public with sharing class BrandService {
 			others.add(clear);
 		}
 		// The type is the trigger's own object.
-		String query =
-			'SELECT Id FROM ' +
-			type +
-			' WHERE Is_Default__c = TRUE AND Id NOT IN :newDefaults';
+		String query = 'SELECT Id FROM ' + type + ' WHERE Is_Default__c = TRUE AND Id NOT IN :newDefaults';
 		for (SObject other : Database.query(query, AccessLevel.SYSTEM_MODE)) {
 			other.put('Is_Default__c', false);
 			others.add(other);

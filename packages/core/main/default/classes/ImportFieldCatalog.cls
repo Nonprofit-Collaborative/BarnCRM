@@ -97,11 +97,7 @@ public with sharing class ImportFieldCatalog {
 			target('Contact1.MailingStreet', person, Label.Core_Import_TargetAttributeStreet),
 			target('Contact1.MailingCity', person, Label.Core_Import_TargetAttributeCity),
 			target('Contact1.MailingState', person, Label.Core_Import_TargetAttributeState),
-			target(
-				'Contact1.MailingPostalCode',
-				person,
-				Label.Core_DuplicateManagement_SharedPostalCode
-			),
+			target('Contact1.MailingPostalCode', person, Label.Core_DuplicateManagement_SharedPostalCode),
 			target('Contact1.MailingCountry', person, Label.Core_Import_TargetAttributeCountry),
 			target('Contact2.FirstName', second, Label.Core_Import_TargetAttributeFirstName),
 			target('Contact2.LastName', second, Label.Core_Import_TargetAttributeLastName),
@@ -112,27 +108,11 @@ public with sharing class ImportFieldCatalog {
 			target('Organization.Name', organization, Label.Core_Import_TargetAttributeName),
 			target('Organization.Phone', organization, Label.Core_Import_TargetAttributePhone),
 			target('Organization.Website', organization, Label.Core_Import_TargetAttributeWebsite),
-			target(
-				'Organization.BillingStreet',
-				organization,
-				Label.Core_Import_TargetAttributeStreet
-			),
+			target('Organization.BillingStreet', organization, Label.Core_Import_TargetAttributeStreet),
 			target('Organization.BillingCity', organization, Label.Core_Import_TargetAttributeCity),
-			target(
-				'Organization.BillingState',
-				organization,
-				Label.Core_Import_TargetAttributeState
-			),
-			target(
-				'Organization.BillingPostalCode',
-				organization,
-				Label.Core_DuplicateManagement_SharedPostalCode
-			),
-			target(
-				'Organization.BillingCountry',
-				organization,
-				Label.Core_Import_TargetAttributeCountry
-			)
+			target('Organization.BillingState', organization, Label.Core_Import_TargetAttributeState),
+			target('Organization.BillingPostalCode', organization, Label.Core_DuplicateManagement_SharedPostalCode),
+			target('Organization.BillingCountry', organization, Label.Core_Import_TargetAttributeCountry)
 		};
 		// The role of the affiliation a row's person and organization make (R-AF5), offered
 		// when the user may set it.
@@ -150,10 +130,7 @@ public with sharing class ImportFieldCatalog {
 	}
 
 	private static ImportMapping.Target target(String value, String entityLabel, String attribute) {
-		return new ImportMapping.Target(
-			value,
-			String.format(entityLabel, new List<String>{ attribute })
-		);
+		return new ImportMapping.Target(value, String.format(entityLabel, new List<String>{ attribute }));
 	}
 
 	/** A person's fields, in contact terms whatever the person mode (R-IT3). */
@@ -169,34 +146,22 @@ public with sharing class ImportFieldCatalog {
 			)
 			.fields.getMap();
 		for (
-			Schema.SObjectField field : Account.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			Schema.SObjectField field : Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.fields.getMap()
 				.values()
 		) {
 			String name = field.getDescribe().getLocalName().toLowerCase();
 			// PersonEmail, PersonMailingCity and the __pc fields are a person account's.
-			if (
-				name.endsWith('__pc') ||
-				(name.startsWith('person') && contactFields.containsKey(name.substring(6)))
-			) {
+			if (name.endsWith('__pc') || (name.startsWith('person') && contactFields.containsKey(name.substring(6)))) {
 				skipped.add(name);
 			}
 		}
 		return offered(Account.SObjectType, skipped);
 	}
 
-	private static List<ImportMapping.Target> offered(
-		Schema.SObjectType type,
-		Set<String> skipped
-	) {
+	private static List<ImportMapping.Target> offered(Schema.SObjectType type, Set<String> skipped) {
 		List<FieldOption> options = new List<FieldOption>();
-		for (
-			Schema.SObjectField field : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
-		) {
+		for (Schema.SObjectField field : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
 			Schema.DescribeFieldResult describe = field.getDescribe();
 			String localName = describe.getLocalName().toLowerCase();
 			if (

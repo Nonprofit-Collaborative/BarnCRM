@@ -8,12 +8,7 @@
 public with sharing class EventAppointmentsController {
 	private static final String CONTEXT = 'EventAppointmentsController';
 	private static final Integer MAX_SLOTS = 100;
-	private static final Set<String> TARGET_STATUSES = new Set<String>{
-		'Open',
-		'Completed',
-		'No-Show',
-		'Cancelled'
-	};
+	private static final Set<String> TARGET_STATUSES = new Set<String>{ 'Open', 'Completed', 'No-Show', 'Cancelled' };
 
 	/** Everything the tab draws. */
 	public class Appointments {
@@ -79,23 +74,10 @@ public with sharing class EventAppointmentsController {
 				Schema.SObjectType.Event_Appointment__c.isUpdateable() &&
 				Schema.SObjectType.Event_Appointment__c.fields.Contact__c.isUpdateable();
 			Map<String, Schema.SObjectField> fields = Schema.SObjectType.Event_Appointment__c.fields.getMap();
-			for (
-				String name : new List<String>{
-					'Host__c',
-					'Contact__c',
-					'Status__c',
-					'Location__c'
-				}
-			) {
-				result.fieldLabels.put(
-					name,
-					NamespaceUtil.field(fields, name).getDescribe().getLabel()
-				);
+			for (String name : new List<String>{ 'Host__c', 'Contact__c', 'Status__c', 'Location__c' }) {
+				result.fieldLabels.put(name, NamespaceUtil.field(fields, name).getDescribe().getLabel());
 			}
-			result.fieldLabels.put(
-				'Start__c',
-				NamespaceUtil.field(fields, 'Start__c').getDescribe().getLabel()
-			);
+			result.fieldLabels.put('Start__c', NamespaceUtil.field(fields, 'Start__c').getDescribe().getLabel());
 			for (Event__c record : [
 				SELECT Start__c, End__c
 				FROM Event__c
@@ -131,10 +113,7 @@ public with sharing class EventAppointmentsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getAppointments', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Appointments_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Appointments_LoadFailed'));
 		}
 	}
 
@@ -153,11 +132,7 @@ public with sharing class EventAppointmentsController {
 			List<NewSlot> wanted = (List<NewSlot>) JSON.deserialize(slotsJson, List<NewSlot>.class);
 			if (wanted == null || wanted.isEmpty() || wanted.size() > MAX_SLOTS) {
 				throw new System.IllegalArgumentException(
-					BarnHelp.text(
-						'Events',
-						'Events_Appointments_BadSlots',
-						new List<Object>{ MAX_SLOTS }
-					)
+					BarnHelp.text('Events', 'Events_Appointments_BadSlots', new List<Object>{ MAX_SLOTS })
 				);
 			}
 			String hostName = '';
@@ -184,10 +159,7 @@ public with sharing class EventAppointmentsController {
 			ErrorLogger.log(e, CONTEXT + '.addSlots', eventId);
 			throw e instanceof System.IllegalArgumentException
 				? UserErrors.message(e.getMessage())
-				: UserErrors.wrapShowingDml(
-						e,
-						BarnHelp.text('Events', 'Events_Appointments_AddFailed')
-				  );
+				: UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Appointments_AddFailed'));
 		}
 	}
 
@@ -203,9 +175,7 @@ public with sharing class EventAppointmentsController {
 		try {
 			Event_Appointment__c slot = locked(appointmentId);
 			if (slot.Status__c != 'Open') {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Appointments_NotOpen')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Appointments_NotOpen'));
 			}
 			Integer busy = [
 				SELECT COUNT()
@@ -220,17 +190,11 @@ public with sharing class EventAppointmentsController {
 				WITH USER_MODE
 			];
 			if (busy > 0) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Appointments_PersonBusy')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Appointments_PersonBusy'));
 			}
 			// Only the changed fields: the locked row carries Event__c, a master-detail that
 			// cannot be reparented, which a user-mode update refuses as not editable.
-			update as user new Event_Appointment__c(
-				Id = slot.Id,
-				Contact__c = contactId,
-				Status__c = 'Booked'
-			);
+			update as user new Event_Appointment__c(Id = slot.Id, Contact__c = contactId, Status__c = 'Booked');
 		} catch (Exception e) {
 			fail(e, '.book', appointmentId);
 		}
@@ -247,20 +211,13 @@ public with sharing class EventAppointmentsController {
 	public static void setStatus(Id appointmentId, String status) {
 		try {
 			if (!TARGET_STATUSES.contains(status)) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Appointments_BadStatus')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Appointments_BadStatus'));
 			}
 			Event_Appointment__c slot = locked(appointmentId);
 			if ((status == 'Completed' || status == 'No-Show') && slot.Contact__c == null) {
-				throw new System.IllegalArgumentException(
-					BarnHelp.text('Events', 'Events_Appointments_NoPerson')
-				);
+				throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Appointments_NoPerson'));
 			}
-			Event_Appointment__c change = new Event_Appointment__c(
-				Id = slot.Id,
-				Status__c = status
-			);
+			Event_Appointment__c change = new Event_Appointment__c(Id = slot.Id, Status__c = status);
 			if (status == 'Open') {
 				change.Contact__c = null;
 			}
@@ -280,19 +237,14 @@ public with sharing class EventAppointmentsController {
 		]) {
 			return slot;
 		}
-		throw new System.IllegalArgumentException(
-			BarnHelp.text('Events', 'Events_Appointments_Gone')
-		);
+		throw new System.IllegalArgumentException(BarnHelp.text('Events', 'Events_Appointments_Gone'));
 	}
 
 	private static void fail(Exception e, String method, Id recordId) {
 		ErrorLogger.log(e, CONTEXT + method, recordId);
 		throw e instanceof System.IllegalArgumentException
 			? UserErrors.message(e.getMessage())
-			: UserErrors.wrapShowingDml(
-					e,
-					BarnHelp.text('Events', 'Events_Appointments_SaveFailed')
-			  );
+			: UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Appointments_SaveFailed'));
 	}
 
 	private static String title(String hostName, Datetime start) {

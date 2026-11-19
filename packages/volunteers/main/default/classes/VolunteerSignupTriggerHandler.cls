@@ -37,10 +37,7 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
 		if (!moved.isEmpty()) {
 			VolunteerSignupService.refuseSecondSignups(moved);
 		}
-		VolunteerCapacity.waitlistWhatDoesNotFit(
-			(List<Volunteer_Signup__c>) newRecords(),
-			previousById
-		);
+		VolunteerCapacity.waitlistWhatDoesNotFit((List<Volunteer_Signup__c>) newRecords(), previousById);
 		VolunteerMinors.flag((List<Volunteer_Signup__c>) newRecords(), previousById);
 	}
 
@@ -53,9 +50,7 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
 
 	/** R-VU8: places a deleted booking held go to the people waiting. */
 	public override void afterDelete() {
-		VolunteerCapacity.promote(
-			VolunteerCapacity.heldShifts((List<Volunteer_Signup__c>) oldRecords())
-		);
+		VolunteerCapacity.promote(VolunteerCapacity.heldShifts((List<Volunteer_Signup__c>) oldRecords()));
 	}
 
 	/**

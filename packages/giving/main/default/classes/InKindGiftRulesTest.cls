@@ -22,11 +22,7 @@ private class InKindGiftRulesTest {
 	static void makeData() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			GivingTestDataFactory.insertHouseholdContact(
-				'The Whitfield Family',
-				'Sam',
-				'Whitfield'
-			);
+			GivingTestDataFactory.insertHouseholdContact('The Whitfield Family', 'Sam', 'Whitfield');
 		}
 	}
 
@@ -65,11 +61,7 @@ private class InKindGiftRulesTest {
 				FROM Gift__c
 				LIMIT 1
 			];
-			Assert.areEqual(
-				IN_KIND,
-				saved.Type__c,
-				'The gift is recorded as goods rather than money.'
-			);
+			Assert.areEqual(IN_KIND, saved.Type__c, 'The gift is recorded as goods rather than money.');
 			Assert.areEqual(
 				0,
 				saved.Amount__c,
@@ -132,10 +124,7 @@ private class InKindGiftRulesTest {
 			DmlException refused = refusalFrom(gift);
 			Test.stopTest();
 
-			Assert.isNotNull(
-				refused,
-				'Goods are worth nothing or something, never less than nothing.'
-			);
+			Assert.isNotNull(refused, 'Goods are worth nothing or something, never less than nothing.');
 			Assert.isTrue(
 				refused.getMessage().contains('cannot be negative'),
 				'The message names the field: ' + refused.getMessage()

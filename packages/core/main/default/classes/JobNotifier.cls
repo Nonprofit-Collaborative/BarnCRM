@@ -106,13 +106,7 @@ public with sharing class JobNotifier {
 	 * @param recordId the job's own record
 	 */
 	@NamespaceAccessible
-	public static void aboutRecord(
-		Id recipientId,
-		String jobName,
-		Boolean stopped,
-		String body,
-		Id recordId
-	) {
+	public static void aboutRecord(Id recipientId, String jobName, Boolean stopped, String body, Id recordId) {
 		Notice notice = notice(recipientId, jobName, stopped, body);
 		notice.targetId = recordId;
 		send(notice);
@@ -124,13 +118,7 @@ public with sharing class JobNotifier {
 	 * @param section one of the SECTION constants
 	 */
 	@NamespaceAccessible
-	public static void aboutSettings(
-		Id recipientId,
-		String jobName,
-		Boolean stopped,
-		String body,
-		String section
-	) {
+	public static void aboutSettings(Id recipientId, String jobName, Boolean stopped, String body, String section) {
 		Notice notice = notice(recipientId, jobName, stopped, body);
 		notice.section = section;
 		send(notice);
@@ -191,9 +179,7 @@ public with sharing class JobNotifier {
 		Notice notice = new Notice();
 		notice.recipientId = recipientId;
 		notice.title = String.format(
-			stopped == true
-				? System.Label.Core_JobNotice_Stopped
-				: System.Label.Core_JobNotice_Finished,
+			stopped == true ? System.Label.Core_JobNotice_Stopped : System.Label.Core_JobNotice_Finished,
 			new List<Object>{ jobName }
 		);
 		notice.body = String.isBlank(body) ? notice.title : body;
@@ -262,9 +248,7 @@ public with sharing class JobNotifier {
 		return JSON.serialize(
 			new Map<String, Object>{
 				'type' => 'standard__navItemPage',
-				'attributes' => new Map<String, Object>{
-					'apiName' => NamespaceUtil.qualify(SETTINGS_TAB)
-				},
+				'attributes' => new Map<String, Object>{ 'apiName' => NamespaceUtil.qualify(SETTINGS_TAB) },
 				'state' => new Map<String, Object>{ NamespaceUtil.stateKey('section') => section }
 			}
 		);

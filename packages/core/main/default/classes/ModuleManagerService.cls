@@ -120,12 +120,7 @@ public with sharing class ModuleManagerService {
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
 		},
-		'Forms' => new List<String>{
-			'Form__c',
-			'Form_Draft__c',
-			'Form_Submission__c',
-			'Form_Version__c'
-		},
+		'Forms' => new List<String>{ 'Form__c', 'Form_Draft__c', 'Form_Submission__c', 'Form_Version__c' },
 		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' },
 		'Events' => new List<String>{
 			'Event__c',
@@ -464,9 +459,7 @@ public with sharing class ModuleManagerService {
 			if (apiName != null) {
 				apiNames.add(apiName);
 				RecordCount line = new RecordCount();
-				line.objectLabel = describes.get(apiName)
-					.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getLabelPlural();
+				line.objectLabel = describes.get(apiName).getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 				lines.add(line);
 			}
 		}
@@ -497,9 +490,7 @@ public with sharing class ModuleManagerService {
 				return row;
 			}
 		}
-		throw new ModuleManagerException(
-			BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError')
-		);
+		throw new ModuleManagerException(BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'));
 	}
 
 	private static void setTurnedOff(String moduleName, Boolean off) {
@@ -524,9 +515,7 @@ public with sharing class ModuleManagerService {
 		}
 		String joined = String.join(names, ',');
 		if (joined.length() > TURNED_OFF_LENGTH) {
-			throw new ModuleManagerException(
-				BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage')
-			);
+			throw new ModuleManagerException(BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
 		}
 		SettingsService.saveSystemValue(TURNED_OFF_KEY, joined);
 		AutomationControl.clearCache();

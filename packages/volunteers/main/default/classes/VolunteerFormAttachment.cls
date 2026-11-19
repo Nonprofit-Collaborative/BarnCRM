@@ -28,8 +28,7 @@ public with sharing class VolunteerFormAttachment implements FormAttachmentExten
 	}
 
 	public Boolean handles(Schema.SObjectType contextType) {
-		return contextType == Volunteer_Shift__c.SObjectType ||
-			contextType == Volunteer_Signup__c.SObjectType;
+		return contextType == Volunteer_Shift__c.SObjectType || contextType == Volunteer_Signup__c.SObjectType;
 	}
 
 	/** A sign-up is the person's own record, so its link carries a signed claim. */

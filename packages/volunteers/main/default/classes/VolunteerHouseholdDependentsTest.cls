@@ -88,11 +88,7 @@ private class VolunteerHouseholdDependentsTest {
 			insert hoursFor(ana.Id, 3);
 
 			Test.startTest();
-			HouseholdMergeService.mergeHouseholds(
-				kept,
-				ana.AccountId,
-				new HouseholdMergeService.MergeChoices(null)
-			);
+			HouseholdMergeService.mergeHouseholds(kept, ana.AccountId, new HouseholdMergeService.MergeChoices(null));
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -113,8 +109,7 @@ private class VolunteerHouseholdDependentsTest {
 			Test.startTest();
 			Set<Id> answer = new VolunteersHouseholdDependentsExtension()
 				.householdsWithDependents(new Set<Id>{ ana.AccountId, noHours });
-			Set<Id> none = new VolunteersHouseholdDependentsExtension()
-				.householdsWithDependents(new Set<Id>());
+			Set<Id> none = new VolunteersHouseholdDependentsExtension().householdsWithDependents(new Set<Id>());
 			Test.stopTest();
 
 			Assert.areEqual(new Set<Id>{ ana.AccountId }, answer, 'Only the household with hours');
@@ -131,11 +126,7 @@ private class VolunteerHouseholdDependentsTest {
 				return; // An org without person accounts has no such person.
 			}
 			Account household = VolunteersTestData.household('The Okafor Family');
-			insert new Household_Member__c(
-				Household__c = household.Id,
-				Account__c = person.Id,
-				Role__c = 'Head'
-			);
+			insert new Household_Member__c(Household__c = household.Id, Account__c = person.Id, Role__c = 'Head');
 			Volunteer_Hours__c entry = VolunteersTestData.newHours(null, jobId(), 2);
 			entry.Account__c = person.Id;
 			insert entry;

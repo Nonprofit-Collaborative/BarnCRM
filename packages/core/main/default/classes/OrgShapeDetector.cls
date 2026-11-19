@@ -116,9 +116,7 @@ public with sharing class OrgShapeDetector {
 		// treated as one that has them (ADR-0036). An org without the object counts zero
 		// (ADR-0130).
 		shape.nativeHouseholdGroupCount = OrgShapeSelector.nativeHouseholdGroupCount();
-		shape.hasNativeHouseholdGroups =
-			shape.nativeHouseholdGroupCount == null ||
-			shape.nativeHouseholdGroupCount > 0;
+		shape.hasNativeHouseholdGroups = shape.nativeHouseholdGroupCount == null || shape.nativeHouseholdGroupCount > 0;
 		shape.isMultiCurrency = UserInfo.isMultiCurrencyOrganization();
 		shape.platformEncryptionPossible = null;
 
@@ -149,9 +147,7 @@ public with sharing class OrgShapeDetector {
 			return cachedShape.hasPersonAccounts == true;
 		}
 		if (cachedHasPersonAccounts == null) {
-			cachedHasPersonAccounts = Account.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			cachedHasPersonAccounts = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.fields.getMap()
 				.containsKey(PERSON_ACCOUNT_FIELD.toLowerCase());
 		}
@@ -170,9 +166,7 @@ public with sharing class OrgShapeDetector {
 			return cachedShape.personAccountRecordTypeIds;
 		}
 		if (cachedPersonTypes == null) {
-			cachedPersonTypes = hasPersonAccounts()
-				? OrgShapeSelector.personTypeRecordTypeIds()
-				: new Set<Id>();
+			cachedPersonTypes = hasPersonAccounts() ? OrgShapeSelector.personTypeRecordTypeIds() : new Set<Id>();
 		}
 		return cachedPersonTypes;
 	}
@@ -215,9 +209,7 @@ public with sharing class OrgShapeDetector {
 		if (personTypes == null || personTypes.isEmpty()) {
 			return null;
 		}
-		Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<Id, Schema.RecordTypeInfo> infos = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.getRecordTypeInfosById();
 		Schema.RecordTypeInfo chosen;
 		for (Id recordTypeId : personTypes) {

@@ -125,16 +125,12 @@ public with sharing class BackupSetService {
 		if (query.OwnerId != UserInfo.getUserId()) {
 			throw new BackupSetException(BarnHelp.text('Core', 'Core_Find_ErrorNotYours'));
 		}
-		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
-			query.Query_JSON__c
-		);
+		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(query.Query_JSON__c);
 		document.remove(KEY);
 		Database.update(
 			new Saved_Query__c(
 				Id = query.Id,
-				Query_JSON__c = asSet == true
-					? marked(query.Query_JSON__c)
-					: JSON.serialize(document)
+				Query_JSON__c = asSet == true ? marked(query.Query_JSON__c) : JSON.serialize(document)
 			),
 			AccessLevel.USER_MODE
 		);
@@ -193,20 +189,11 @@ public with sharing class BackupSetService {
 		Database.insert(job, AccessLevel.SYSTEM_MODE);
 		String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
 		job.Job_Id__c = AsyncStarter.batch(
-			FindExportBatch.forBackup(
-				query.Query_JSON__c,
-				fields,
-				tag,
-				FindController.exportLimit(),
-				job.Id
-			),
+			FindExportBatch.forBackup(query.Query_JSON__c, fields, tag, FindController.exportLimit(), job.Id),
 			BulkDeleteService.BACKUP_PAGE_SIZE,
 			'BackupSetService'
 		);
-		Database.update(
-			new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c),
-			AccessLevel.SYSTEM_MODE
-		);
+		Database.update(new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c), AccessLevel.SYSTEM_MODE);
 		return job;
 	}
 
@@ -242,9 +229,7 @@ public with sharing class BackupSetService {
 			Database.update(
 				new Import_Batch__c(
 					Id = jobId,
-					Status__c = failed
-						? ImportBatchService.STATUS_FAILED
-						: ImportBatchService.STATUS_COMPLETE,
+					Status__c = failed ? ImportBatchService.STATUS_FAILED : ImportBatchService.STATUS_COMPLETE,
 					Completed_At__c = Datetime.now(),
 					Row_Count__c = rows,
 					File_Id__c = failed ? null : firstDocumentId,
@@ -280,10 +265,7 @@ public with sharing class BackupSetService {
 		view.fileName = job.File_Name__c;
 		view.log = job.Run_Log__c;
 		try {
-			view.setName = (String) ((Map<String, Object>) JSON.deserializeUntyped(
-					job.Operation_JSON__c
-				))
-				.get('name');
+			view.setName = (String) ((Map<String, Object>) JSON.deserializeUntyped(job.Operation_JSON__c)).get('name');
 		} catch (Exception notJson) {
 			view.setName = null;
 		}
@@ -306,9 +288,7 @@ public with sharing class BackupSetService {
 
 	private static void requireAllowed() {
 		if (!allowed()) {
-			throw new BackupSetException(
-				BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission')
-			);
+			throw new BackupSetException(BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'));
 		}
 	}
 }

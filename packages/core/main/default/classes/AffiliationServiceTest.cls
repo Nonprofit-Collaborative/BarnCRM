@@ -18,11 +18,7 @@ private class AffiliationServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Program Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Program Officer');
 			work.Is_Primary__c = true;
 
 			Test.startTest();
@@ -48,11 +44,7 @@ private class AffiliationServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Account> people = RelationshipTestDataFactory.peopleAsAccounts(1, 'Okafor');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Trustee'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Trustee');
 			work.Is_Primary__c = true;
 
 			Test.startTest();
@@ -78,27 +70,17 @@ private class AffiliationServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(2, 'Organization');
-			Affiliation__c first = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Officer'
-			);
+			Affiliation__c first = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Officer');
 			first.Is_Primary__c = true;
 			insert first;
-			Affiliation__c second = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[1],
-				'Chair'
-			);
+			Affiliation__c second = RelationshipTestDataFactory.affiliation(people[0], orgs[1], 'Chair');
 			second.Is_Primary__c = true;
 
 			Test.startTest();
 			insert second;
 			Test.stopTest();
 
-			Map<Id, Affiliation__c> byId = new Map<Id, Affiliation__c>(
-				RelationshipTestDataFactory.allAffiliations()
-			);
+			Map<Id, Affiliation__c> byId = new Map<Id, Affiliation__c>(RelationshipTestDataFactory.allAffiliations());
 			Assert.isFalse(byId.get(first.Id).Is_Primary__c, 'The first one is no longer primary');
 			Assert.isTrue(byId.get(second.Id).Is_Primary__c, 'The one just saved is');
 			Contact reloaded = [
@@ -106,11 +88,7 @@ private class AffiliationServiceTest {
 				FROM Contact
 				WHERE Id = :people[0].Id
 			];
-			Assert.areEqual(
-				orgs[1].Id,
-				reloaded.Primary_Affiliation__c,
-				'And the person follows it'
-			);
+			Assert.areEqual(orgs[1].Id, reloaded.Primary_Affiliation__c, 'And the person follows it');
 		}
 	}
 
@@ -120,11 +98,7 @@ private class AffiliationServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Officer');
 			work.Is_Primary__c = true;
 			insert work;
 
@@ -149,11 +123,7 @@ private class AffiliationServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Officer');
 			work.Is_Primary__c = true;
 			insert work;
 
@@ -173,11 +143,7 @@ private class AffiliationServiceTest {
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			Id householdBefore = [SELECT AccountId FROM Contact WHERE Id = :people[0].Id].AccountId;
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Officer');
 			work.Is_Primary__c = true;
 
 			Test.startTest();
@@ -201,11 +167,7 @@ private class AffiliationServiceTest {
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
 			List<Affiliation__c> batch = new List<Affiliation__c>();
 			for (Contact person : people) {
-				Affiliation__c work = RelationshipTestDataFactory.affiliation(
-					person,
-					orgs[0],
-					'Member'
-				);
+				Affiliation__c work = RelationshipTestDataFactory.affiliation(person, orgs[0], 'Member');
 				work.Is_Primary__c = true;
 				batch.add(work);
 			}
@@ -236,11 +198,7 @@ private class AffiliationServiceTest {
 			List<Account> orgs = RelationshipTestDataFactory.organizations(2, 'Organization');
 			List<Affiliation__c> both = new List<Affiliation__c>();
 			for (Account org : orgs) {
-				Affiliation__c work = RelationshipTestDataFactory.affiliation(
-					people[0],
-					org,
-					'Member'
-				);
+				Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], org, 'Member');
 				work.Is_Primary__c = true;
 				both.add(work);
 			}
@@ -266,11 +224,7 @@ private class AffiliationServiceTest {
 			RelationshipTestDataFactory.quietOtherAutomations();
 			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
 			List<Account> orgs = RelationshipTestDataFactory.organizations(1, 'Union Foundation');
-			Affiliation__c work = RelationshipTestDataFactory.affiliation(
-				people[0],
-				orgs[0],
-				'Program Officer'
-			);
+			Affiliation__c work = RelationshipTestDataFactory.affiliation(people[0], orgs[0], 'Program Officer');
 			work.Is_Primary__c = true;
 			insert work;
 
@@ -285,8 +239,7 @@ private class AffiliationServiceTest {
 
 			Assert.isTrue(forRole < forFlag, 'Role ' + forRole + ', flag ' + forFlag);
 			Assert.isNull(
-				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id]
-				.Primary_Affiliation__c,
+				[SELECT Primary_Affiliation__c FROM Contact WHERE Id = :people[0].Id].Primary_Affiliation__c,
 				'Moving the flag still settles the person'
 			);
 		}

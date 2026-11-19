@@ -43,11 +43,7 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 	/** Copies again every gift in the totals dated in the range (Gifts to Opportunities only). */
 	public static Id runRange(Date fromDate, Date toDate) {
 		return AsyncStarter.batch(
-			new OpportunityMirrorBatch(
-				OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES,
-				fromDate,
-				toDate
-			),
+			new OpportunityMirrorBatch(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES, fromDate, toDate),
 			CHUNK_SIZE,
 			'OpportunityMirrorBatch'
 		);
@@ -160,13 +156,7 @@ public with sharing class OpportunityMirrorBatch extends MirrorRunBatch {
 			makesGifts()
 				? BarnHelp.text('Giving', 'Mirror_OpportunityMirror_LogRunGifts')
 				: BarnHelp.text('Giving', 'Mirror_OpportunityMirror_LogRunOpportunities'),
-			new List<Object>{
-				totals.created,
-				totals.updated,
-				totals.unchanged,
-				totals.failed,
-				totals.skipped
-			}
+			new List<Object>{ totals.created, totals.updated, totals.unchanged, totals.failed, totals.skipped }
 		);
 	}
 

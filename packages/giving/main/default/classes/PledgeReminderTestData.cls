@@ -16,12 +16,7 @@ public class PledgeReminderTestData {
 		AcknowledgmentService.sendPermission = true;
 	}
 
-	public static Pledge_Reminder_Step__c buildStep(
-		String name,
-		Integer days,
-		String channel,
-		String template
-	) {
+	public static Pledge_Reminder_Step__c buildStep(String name, Integer days, String channel, String template) {
 		return new Pledge_Reminder_Step__c(
 			Name = name,
 			Days_From_Due__c = days,

@@ -72,13 +72,7 @@ private class ImportRelatedRecordsTest {
 
 	private static List<Import_Row__c> rows() {
 		return [
-			SELECT
-				Row_Number__c,
-				Status__c,
-				Error_Message__c,
-				Gift_Id__c,
-				Soft_Credit_Id__c,
-				Related_Status__c
+			SELECT Row_Number__c, Status__c, Error_Message__c, Gift_Id__c, Soft_Credit_Id__c, Related_Status__c
 			FROM Import_Row__c
 			WHERE Import_Batch__c = :batch.Id
 			WITH SYSTEM_MODE
@@ -102,11 +96,7 @@ private class ImportRelatedRecordsTest {
 		for (Integer i = 0; i < count; i++) {
 			result.add(
 				TestDataFactory.organization(
-					new Account(
-						Name = 'Org ' + i,
-						Phone = '555-0000',
-						RecordTypeId = organizationType
-					)
+					new Account(Name = 'Org ' + i, Phone = '555-0000', RecordTypeId = organizationType)
 				)
 			);
 		}
@@ -115,9 +105,7 @@ private class ImportRelatedRecordsTest {
 	}
 
 	private static Contact person() {
-		Contact created = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-		);
+		Contact created = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 		insert created;
 		return created;
 	}
@@ -229,16 +217,11 @@ private class ImportRelatedRecordsTest {
 				Assert.isTrue(
 					staged[3]
 						.Error_Message__c.startsWith(
-							BarnHelp.text('Core', 'Core_Import_ErrorRelatedRecord')
-								.substringBefore('{0}')
+							BarnHelp.text('Core', 'Core_Import_ErrorRelatedRecord').substringBefore('{0}')
 						),
 					'Said to be the related record: ' + staged[3].Error_Message__c
 				);
-				Assert.areEqual(
-					String.valueOf(orgs[1].Id),
-					staged[3].Gift_Id__c,
-					'Its parent stays.'
-				);
+				Assert.areEqual(String.valueOf(orgs[1].Id), staged[3].Gift_Id__c, 'Its parent stays.');
 				Assert.areEqual(
 					'555-0000',
 					[SELECT Phone FROM Account WHERE Id = :orgs[1].Id].Phone,
@@ -300,11 +283,7 @@ private class ImportRelatedRecordsTest {
 				Assert.areEqual(1, preview.updated, 'The parent would change.');
 				Assert.areEqual(1, preview.matched, 'The later row would only add.');
 				Assert.areEqual(1, preview.rejected, 'The row whose parent finds nothing.');
-				Assert.areEqual(
-					0,
-					[SELECT COUNT() FROM Affiliation__c],
-					'No related record is written.'
-				);
+				Assert.areEqual(0, [SELECT COUNT() FROM Affiliation__c], 'No related record is written.');
 				Assert.areEqual(
 					'555-0000',
 					[SELECT Phone FROM Account WHERE Name = 'Org 0'].Phone,
@@ -316,10 +295,7 @@ private class ImportRelatedRecordsTest {
 					'Nothing is journaled.'
 				);
 				Assert.areEqual(
-					String.format(
-						BarnHelp.text('Core', 'Core_Import_LogRelatedDryRun'),
-						new List<String>{ '2', '1' }
-					),
+					String.format(BarnHelp.text('Core', 'Core_Import_LogRelatedDryRun'), new List<String>{ '2', '1' }),
 					ImportObjectLoader.relatedLines(batch.Id, true)[0],
 					'The run log says what would be created.'
 				);
@@ -362,14 +338,7 @@ private class ImportRelatedRecordsTest {
 				ImportUndoService.Preview view = ImportUndoService.preview(batch.Id);
 				Datetime undoStartedAt = Datetime.now();
 				for (String pass : ImportUndoBatch.passes()) {
-					ImportUndoBatch job = new ImportUndoBatch(
-						batch.Id,
-						view.total,
-						pass,
-						0,
-						false,
-						undoStartedAt
-					);
+					ImportUndoBatch job = new ImportUndoBatch(batch.Id, view.total, pass, 0, false, undoStartedAt);
 					Database.QueryLocatorIterator records = job.start(null).iterator();
 					while (records.hasNext()) {
 						job.execute(null, new List<SObject>{ records.next() });

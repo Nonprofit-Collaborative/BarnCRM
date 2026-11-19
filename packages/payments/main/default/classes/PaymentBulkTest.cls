@@ -29,10 +29,7 @@ private class PaymentBulkTest {
 			for (Object one : payments) {
 				ids.add((Id) ((Map<String, Object>) one).get('paymentId'));
 			}
-			Assert.areEqual(
-				ids.size(),
-				[SELECT COUNT() FROM Payment__c WHERE Id IN :ids WITH SYSTEM_MODE]
-			);
+			Assert.areEqual(ids.size(), [SELECT COUNT() FROM Payment__c WHERE Id IN :ids WITH SYSTEM_MODE]);
 			bulkCalls.add(payments.size());
 			return true;
 		}
@@ -134,11 +131,7 @@ private class PaymentBulkTest {
 			new PaymentEventProcessor.Run().execute(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				new List<Integer>{ PaymentEventProcessor.PER_RUN },
-				bulkCalls,
-				'One call for the run'
-			);
+			Assert.areEqual(new List<Integer>{ PaymentEventProcessor.PER_RUN }, bulkCalls, 'One call for the run');
 			Assert.areEqual(
 				PaymentEventProcessor.PER_RUN,
 				[
@@ -256,10 +249,7 @@ private class PaymentBulkTest {
 			Payment_Event__c after = PaymentsTestData.rereadEvent(event.Id);
 			Assert.areEqual('Failed', after.Status__c, 'Not taken up again and again');
 			Assert.isTrue(String.isNotBlank(after.Message__c), 'With the reason');
-			Assert.isTrue(
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0,
-				'The failure is logged'
-			);
+			Assert.isTrue([SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0, 'The failure is logged');
 		}
 	}
 
@@ -276,11 +266,7 @@ private class PaymentBulkTest {
 			Test.stopTest();
 		}
 
-		Assert.areEqual(
-			PaymentService.PENDING,
-			PaymentsTestData.reread(stale.Id).Status__c,
-			'Nothing cancelled'
-		);
+		Assert.areEqual(PaymentService.PENDING, PaymentsTestData.reread(stale.Id).Status__c, 'Nothing cancelled');
 		Assert.isTrue([SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE] > 0, 'Logged');
 	}
 
@@ -309,10 +295,7 @@ private class PaymentBulkTest {
 			PaymentsApi api = new PaymentsApi();
 			Assert.areEqual(
 				1,
-				api.call(
-					'countRecent',
-					new Map<String, Object>{ 'sourceRecordId' => '001000000000009AAA' }
-				)
+				api.call('countRecent', new Map<String, Object>{ 'sourceRecordId' => '001000000000009AAA' })
 			);
 			Assert.areEqual(
 				0,

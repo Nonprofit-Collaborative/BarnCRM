@@ -8,14 +8,8 @@ private class SavedTransformServiceTest {
 	@TestSetup
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
-			);
-			TestDataFactory.createUser(
-				'Joel',
-				new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' });
+			TestDataFactory.createUser('Joel', new List<String>{ 'BarnCRM_Find_And_Export', 'BarnCRM_Bulk_Update' });
 			TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Find_And_Export' });
 		}
 	}
@@ -46,27 +40,17 @@ private class SavedTransformServiceTest {
 						'field' => 'Phone',
 						'action' => 'transform',
 						'transforms' => new List<Object>{
-							new Map<String, Object>{
-								'op' => 'digits',
-								'pattern' => '(###) ###-####',
-								'country' => '1'
-							}
+							new Map<String, Object>{ 'op' => 'digits', 'pattern' => '(###) ###-####', 'country' => '1' }
 						}
 					},
-					new Map<String, Object>{
-						'field' => 'Title',
-						'action' => 'set',
-						'value' => 'Coordinator'
-					}
+					new Map<String, Object>{ 'field' => 'Title', 'action' => 'set', 'value' => 'Coordinator' }
 				}
 			}
 		);
 	}
 
 	private static String withChanges(Object changes) {
-		return JSON.serialize(
-			new Map<String, Object>{ 'version' => 1, 'object' => 'Contact', 'changes' => changes }
-		);
+		return JSON.serialize(new Map<String, Object>{ 'version' => 1, 'object' => 'Contact', 'changes' => changes });
 	}
 
 	private static void assertRefused(String json, String name, String why) {
@@ -96,16 +80,9 @@ private class SavedTransformServiceTest {
 			System.assertEquals('Contact', entries[0].objectLabel);
 
 			SavedTransformService.SavedList loaded = SavedTransformService.load(saved.recordId);
-			System.assertEquals(
-				definition(),
-				loaded.definitionJson,
-				'The document is stored as sent.'
-			);
+			System.assertEquals(definition(), loaded.definitionJson, 'The document is stored as sent.');
 
-			SavedTransformService.SavedList renamed = SavedTransformService.rename(
-				saved.recordId,
-				'Phones'
-			);
+			SavedTransformService.SavedList renamed = SavedTransformService.rename(saved.recordId, 'Phones');
 			System.assertEquals('Phones', renamed.name);
 			System.assertEquals(
 				definition(),
@@ -119,10 +96,7 @@ private class SavedTransformServiceTest {
 	}
 
 	private static String withFilter(List<Object> conditions, String logic) {
-		Map<String, Object> filter = new Map<String, Object>{
-			'version' => 1,
-			'conditions' => conditions
-		};
+		Map<String, Object> filter = new Map<String, Object>{ 'version' => 1, 'conditions' => conditions };
 		if (logic != null) {
 			filter.put('logic', logic);
 		}
@@ -137,12 +111,7 @@ private class SavedTransformServiceTest {
 	}
 
 	private static Map<String, Object> condition(Integer id, String field) {
-		return new Map<String, Object>{
-			'id' => id,
-			'field' => field,
-			'operator' => 'equals',
-			'value' => 'x'
-		};
+		return new Map<String, Object>{ 'id' => id, 'field' => field, 'operator' => 'equals', 'value' => 'x' };
 	}
 
 	@IsTest
@@ -173,10 +142,7 @@ private class SavedTransformServiceTest {
 
 			SavedTransformService.SavedList twice = SavedTransformService.save(
 				'Twice',
-				withFilter(
-					new List<Object>{ condition(1, 'Gone__c'), condition(2, 'Gone__c') },
-					null
-				)
+				withFilter(new List<Object>{ condition(1, 'Gone__c'), condition(2, 'Gone__c') }, null)
 			);
 			System.assertEquals(
 				new List<String>{ 'Gone__c' },
@@ -211,20 +177,14 @@ private class SavedTransformServiceTest {
 	@IsTest
 	static void aNameIsKeptUniqueIgnoringCapitals() {
 		System.runAs(named('Maria')) {
-			SavedTransformService.SavedList first = SavedTransformService.save(
-				'Phones',
-				definition()
-			);
+			SavedTransformService.SavedList first = SavedTransformService.save('Phones', definition());
 			try {
 				SavedTransformService.save('PHONES', definition());
 				System.assert(false, 'A second list may not share the name.');
 			} catch (BulkUpdateFields.BulkUpdateException taken) {
 				System.assert(taken.getMessage().contains('PHONES'), taken.getMessage());
 			}
-			SavedTransformService.SavedList second = SavedTransformService.save(
-				'Other',
-				definition()
-			);
+			SavedTransformService.SavedList second = SavedTransformService.save('Other', definition());
 			try {
 				SavedTransformService.rename(second.recordId, 'phones');
 				System.assert(false, 'A rename may not take another list name.');
@@ -244,11 +204,7 @@ private class SavedTransformServiceTest {
 		System.runAs(named('Maria')) {
 			assertRefused(definition(), null, 'no name');
 			assertRefused(definition(), '   ', 'blank name');
-			assertRefused(
-				definition(),
-				'x'.repeat(SavedTransformService.MAX_NAME + 1),
-				'long name'
-			);
+			assertRefused(definition(), 'x'.repeat(SavedTransformService.MAX_NAME + 1), 'long name');
 		}
 	}
 
@@ -260,22 +216,14 @@ private class SavedTransformServiceTest {
 			assertRefused('[]', 'Array', 'not an object');
 			assertRefused(
 				JSON.serialize(
-					new Map<String, Object>{
-						'version' => 2,
-						'object' => 'Contact',
-						'changes' => new List<Object>()
-					}
+					new Map<String, Object>{ 'version' => 2, 'object' => 'Contact', 'changes' => new List<Object>() }
 				),
 				'Version',
 				'unknown version'
 			);
 			assertRefused(
 				JSON.serialize(
-					new Map<String, Object>{
-						'version' => 1,
-						'object' => 'Nothing__c',
-						'changes' => new List<Object>()
-					}
+					new Map<String, Object>{ 'version' => 1, 'object' => 'Nothing__c', 'changes' => new List<Object>() }
 				),
 				'Object',
 				'unknown object'
@@ -298,11 +246,7 @@ private class SavedTransformServiceTest {
 				'no changes list'
 			);
 			assertRefused(
-				withChanges(
-					new List<Object>{
-						new Map<String, Object>{ 'field' => 'Title', 'action' => 'shred' }
-					}
-				),
+				withChanges(new List<Object>{ new Map<String, Object>{ 'field' => 'Title', 'action' => 'shred' } }),
 				'Action',
 				'unknown action'
 			);
@@ -311,11 +255,7 @@ private class SavedTransformServiceTest {
 				'Field',
 				'no field'
 			);
-			assertRefused(
-				withChanges(new List<Object>{ 'Title' }),
-				'Shape',
-				'change is not an object'
-			);
+			assertRefused(withChanges(new List<Object>{ 'Title' }), 'Shape', 'change is not an object');
 			List<Object> tooMany = new List<Object>();
 			for (Integer count = 0; count <= BulkUpdateService.MAX_CHANGES; count++) {
 				tooMany.add(new Map<String, Object>{ 'field' => 'Title', 'action' => 'clear' });
@@ -358,22 +298,16 @@ private class SavedTransformServiceTest {
 				SavedTransformService.load(null);
 				System.assert(false, 'No list.');
 			} catch (BulkUpdateFields.BulkUpdateException gone) {
-				System.assertEquals(
-					BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'),
-					gone.getMessage()
-				);
+				System.assertEquals(BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'), gone.getMessage());
 			}
 			try {
 				SavedTransformService.remove(
-					Saved_Transform__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getKeyPrefix() + '000000000000'
+					Saved_Transform__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+					'000000000000'
 				);
 				System.assert(false, 'No list.');
 			} catch (BulkUpdateFields.BulkUpdateException gone) {
-				System.assertEquals(
-					BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'),
-					gone.getMessage()
-				);
+				System.assertEquals(BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'), gone.getMessage());
 			}
 		}
 	}
@@ -381,19 +315,10 @@ private class SavedTransformServiceTest {
 	@IsTest
 	static void theControllerRunsTheSameSteps() {
 		System.runAs(named('Maria')) {
-			SavedTransformService.SavedList saved = BulkUpdateController.saveSavedList(
-				'Via page',
-				definition()
-			);
+			SavedTransformService.SavedList saved = BulkUpdateController.saveSavedList('Via page', definition());
 			System.assertEquals(1, BulkUpdateController.getSavedLists().size());
-			System.assertEquals(
-				'Via page',
-				BulkUpdateController.loadSavedList(saved.recordId).name
-			);
-			System.assertEquals(
-				'Renamed',
-				BulkUpdateController.renameSavedList(saved.recordId, 'Renamed').name
-			);
+			System.assertEquals('Via page', BulkUpdateController.loadSavedList(saved.recordId).name);
+			System.assertEquals('Renamed', BulkUpdateController.renameSavedList(saved.recordId, 'Renamed').name);
 			BulkUpdateController.deleteSavedList(saved.recordId);
 			System.assertEquals(0, BulkUpdateController.getSavedLists().size());
 		}

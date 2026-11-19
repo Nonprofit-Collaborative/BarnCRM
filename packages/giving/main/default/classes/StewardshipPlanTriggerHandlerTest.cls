@@ -66,10 +66,7 @@ private class StewardshipPlanTriggerHandlerTest {
 				completed.Completed_Date__c,
 				'A plan completed by hand gets today as its completed date.'
 			);
-			Assert.isNull(
-				reload(plan.Id).Completed_Date__c,
-				'A reopened plan has no completed date.'
-			);
+			Assert.isNull(reload(plan.Id).Completed_Date__c, 'A reopened plan has no completed date.');
 		}
 	}
 

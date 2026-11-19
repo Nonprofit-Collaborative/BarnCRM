@@ -20,9 +20,6 @@ public with sharing class LogicModelScopeHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		LogicModelScope.apply(
-			(List<Logic_Model__c>) newRecords(),
-			(Map<Id, Logic_Model__c>) oldRecordsById()
-		);
+		LogicModelScope.apply((List<Logic_Model__c>) newRecords(), (Map<Id, Logic_Model__c>) oldRecordsById());
 	}
 }

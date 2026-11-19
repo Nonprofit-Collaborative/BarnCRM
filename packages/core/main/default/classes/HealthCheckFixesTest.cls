@@ -196,10 +196,7 @@ private class HealthCheckFixesTest {
 	static void missingAutomationSwitchesAreRestoredAndASwitchTurnedOffStaysOff() {
 		System.runAs(TestUsers.admin()) {
 			User maria = HealthCheckTestHelper.mariaWithManageSettings();
-			Automation_Registry__mdt lock = TestDataFactory.registryEntry(
-				'Test_Receipt_Lock',
-				true
-			);
+			Automation_Registry__mdt lock = TestDataFactory.registryEntry('Test_Receipt_Lock', true);
 			lock.Always_Runs__c = true;
 			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
 				TestDataFactory.registryEntry('Test_Household_Naming', true),
@@ -207,9 +204,7 @@ private class HealthCheckFixesTest {
 				lock
 			};
 			// Maria has already switched household naming off.
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ 'Test_Household_Naming' => false }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ 'Test_Household_Naming' => false });
 
 			System.runAs(maria) {
 				HealthCheckService.Finding finding = find('automation_switches_missing');
@@ -245,11 +240,7 @@ private class HealthCheckFixesTest {
 				byName.get('Test_Receipt_Lock').Always_Runs__c,
 				'An automation that always runs is restored as one.'
 			);
-			Assert.areEqual(
-				1,
-				changesLogged().size(),
-				'The fix is recorded in the change history.'
-			);
+			Assert.areEqual(1, changesLogged().size(), 'The fix is recorded in the change history.');
 		}
 	}
 
@@ -260,10 +251,7 @@ private class HealthCheckFixesTest {
 
 			System.runAs(maria) {
 				List<String> missing = ImportTemplateService.missingDefaultNames();
-				Assert.isFalse(
-					missing.isEmpty(),
-					'Core ships import templates, and a test org starts without any.'
-				);
+				Assert.isFalse(missing.isEmpty(), 'Core ships import templates, and a test org starts without any.');
 				HealthCheckService.Finding finding = find('import_templates_missing');
 				Assert.isNotNull(finding, 'Shipped templates the org does not have are reported.');
 
@@ -334,10 +322,7 @@ private class HealthCheckFixesTest {
 
 			System.runAs(maria) {
 				List<String> scope = HealthCheckService.fixScope(fixKey);
-				Assert.isTrue(
-					scope.contains(otherJob),
-					'The job of the deactivated owner is named'
-				);
+				Assert.isTrue(scope.contains(otherJob), 'The job of the deactivated owner is named');
 
 				// No startTest: the scheduled run must not execute inside the test.
 				HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);
@@ -360,23 +345,15 @@ private class HealthCheckFixesTest {
 					[
 						SELECT COUNT()
 						FROM Setting_Change__c
-						WHERE
-							Setting_Name__c = :('Health Check: ' +
-							System.Label.Core_HealthCheck_InactiveOwnerJobsFix)
+						WHERE Setting_Name__c = :('Health Check: ' + System.Label.Core_HealthCheck_InactiveOwnerJobsFix)
 					],
 					'The fix is recorded in the settings change history'
 				);
 			}
 			ScheduledJobSelector.ownerOverride = null;
 			ScheduledJobSelector.forget();
-			Assert.isNull(
-				ScheduledJobSelector.triggerIdByName(otherJob),
-				'The unknown job was stopped'
-			);
-			Assert.isNotNull(
-				ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName()),
-				'The known job runs again'
-			);
+			Assert.isNull(ScheduledJobSelector.triggerIdByName(otherJob), 'The unknown job was stopped');
+			Assert.isNotNull(ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName()), 'The known job runs again');
 		}
 	}
 
@@ -413,10 +390,7 @@ private class HealthCheckFixesTest {
 
 				Assert.isTrue(
 					report.fixOutcome.contains(
-						String.format(
-							System.Label.Core_HealthCheck_FixScheduled,
-							new List<Object>{ orgJob }
-						)
+						String.format(System.Label.Core_HealthCheck_FixScheduled, new List<Object>{ orgJob })
 					),
 					'The org\'s own job Health Check knows is scheduled again: ' + report.fixOutcome
 				);
@@ -432,14 +406,8 @@ private class HealthCheckFixesTest {
 			}
 			ScheduledJobSelector.ownerOverride = null;
 			ScheduledJobSelector.forget();
-			Assert.isNotNull(
-				ScheduledJobSelector.triggerIdByName(orgJob),
-				'The org\'s own job is scheduled again'
-			);
-			Assert.isNull(
-				ScheduledJobSelector.triggerIdByName(otherJob),
-				'The unknown job was stopped'
-			);
+			Assert.isNotNull(ScheduledJobSelector.triggerIdByName(orgJob), 'The org\'s own job is scheduled again');
+			Assert.isNull(ScheduledJobSelector.triggerIdByName(otherJob), 'The unknown job was stopped');
 		}
 	}
 

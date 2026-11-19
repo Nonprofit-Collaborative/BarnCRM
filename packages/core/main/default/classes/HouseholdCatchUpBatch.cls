@@ -66,11 +66,7 @@ public with sharing class HouseholdCatchUpBatch implements Database.Batchable<SO
 
 	private static Id enqueue(Boolean personAccounts) {
 		try {
-			return AsyncStarter.batch(
-				new HouseholdCatchUpBatch(personAccounts),
-				chunkSize,
-				LOG_CONTEXT
-			);
+			return AsyncStarter.batch(new HouseholdCatchUpBatch(personAccounts), chunkSize, LOG_CONTEXT);
 		} catch (Exception e) {
 			ErrorLogger.log(e, LOG_CONTEXT);
 			return null;
@@ -79,9 +75,7 @@ public with sharing class HouseholdCatchUpBatch implements Database.Batchable<SO
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		if (!runs()) {
-			return Database.getQueryLocator(
-				[SELECT Id FROM Contact WHERE Id = NULL WITH SYSTEM_MODE]
-			);
+			return Database.getQueryLocator([SELECT Id FROM Contact WHERE Id = NULL WITH SYSTEM_MODE]);
 		}
 		if (personAccounts) {
 			return HouseholdOrphanSelector.personAccountsWithoutMembershipLocator(

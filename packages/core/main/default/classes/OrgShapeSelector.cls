@@ -149,8 +149,7 @@ public with sharing class OrgShapeSelector {
 			}
 			if (anyIsEnough) {
 				// detection-only: one row, read from the literal above
-				return Database.query(NATIVE_HOUSEHOLD_GROUP_ANY_QUERY, AccessLevel.USER_MODE)
-					.size();
+				return Database.query(NATIVE_HOUSEHOLD_GROUP_ANY_QUERY, AccessLevel.USER_MODE).size();
 			}
 			// detection-only: the count itself, read from the literal above and never built by concatenation
 			return Database.countQuery(NATIVE_HOUSEHOLD_GROUP_COUNT_QUERY, AccessLevel.USER_MODE);

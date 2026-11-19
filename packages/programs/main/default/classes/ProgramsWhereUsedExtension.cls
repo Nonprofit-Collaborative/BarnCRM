@@ -40,9 +40,7 @@ public with sharing class ProgramsWhereUsedExtension implements WhereUsedExtensi
 							program.Name,
 							program.Id
 						)
-						.addPart(
-							Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel()
-						)
+						.addPart(Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel())
 						.withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
 						.withRecordEdit(program.Id)
 				);
@@ -58,9 +56,7 @@ public with sharing class ProgramsWhereUsedExtension implements WhereUsedExtensi
 			if (!(rule instanceof Map<String, Object>)) {
 				continue;
 			}
-			for (
-				Object condition : WhereUsedService.listOf(((Map<String, Object>) rule).get('all'))
-			) {
+			for (Object condition : WhereUsedService.listOf(((Map<String, Object>) rule).get('all'))) {
 				Object field = condition instanceof Map<String, Object>
 					? ((Map<String, Object>) condition).get('field')
 					: null;

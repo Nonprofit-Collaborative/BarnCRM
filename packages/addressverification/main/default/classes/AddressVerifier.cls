@@ -185,9 +185,7 @@ public with sharing class AddressVerifier {
 			Country__c = 'US'
 		);
 		try {
-			return new Http()
-				.send(provider == GOOGLE ? googleRequest(sample) : smartyRequest(sample))
-				.getStatusCode();
+			return new Http().send(provider == GOOGLE ? googleRequest(sample) : smartyRequest(sample)).getStatusCode();
 		} catch (Exception failed) {
 			failure.add(failed);
 			return null;
@@ -264,10 +262,7 @@ public with sharing class AddressVerifier {
 		List<Address__c> changes = new List<Address__c>();
 		for (Address__c address : looked) {
 			Outcome outcome = found.get(address.Id);
-			Address__c change = new Address__c(
-				Id = address.Id,
-				Verification_Status__c = outcome.status
-			);
+			Address__c change = new Address__c(Id = address.Id, Verification_Status__c = outcome.status);
 			if (outcome.status == VERIFIED) {
 				change.Latest_Verified_Date__c = Date.today();
 				if (correct) {
@@ -281,21 +276,12 @@ public with sharing class AddressVerifier {
 		}
 		writing = true;
 		try {
-			List<Database.SaveResult> results = Database.update(
-				changes,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> results = Database.update(changes, false, AccessLevel.USER_MODE);
 			List<Id> changedIds = new List<Id>();
 			for (SObject change : changes) {
 				changedIds.add(change.Id);
 			}
-			ErrorLogger.logFailures(
-				results,
-				changedIds,
-				CONTEXT + '.write',
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logFailures(results, changedIds, CONTEXT + '.write', ErrorLogger.SEVERITY_WARNING);
 		} finally {
 			writing = false;
 		}
@@ -339,11 +325,7 @@ public with sharing class AddressVerifier {
 		request.setTimeout(20000);
 		request.setHeader(
 			'Authorization',
-			'Basic {!BASE64ENCODE(BLOB(' +
-				principal +
-				'.AuthId & ":" & ' +
-				principal +
-				'.AuthToken))}'
+			'Basic {!BASE64ENCODE(BLOB(' + principal + '.AuthId & ":" & ' + principal + '.AuthToken))}'
 		);
 		request.setEndpoint(
 			'callout:' +
@@ -378,14 +360,11 @@ public with sharing class AddressVerifier {
 		}
 		Map<String, Object> parts = mapOf(candidate.get('components'));
 		Outcome outcome = new Outcome(VERIFIED);
-		outcome.street = joined(
-			new List<Object>{ candidate.get('delivery_line_1'), candidate.get('delivery_line_2') }
-		);
+		outcome.street = joined(new List<Object>{ candidate.get('delivery_line_1'), candidate.get('delivery_line_2') });
 		outcome.city = textOf(parts.get('city_name'));
 		outcome.state = textOf(parts.get('state_abbreviation'));
 		String plus4 = textOf(parts.get('plus4_code'));
-		outcome.postalCode =
-			textOf(parts.get('zipcode')) + (String.isBlank(plus4) ? '' : '-' + plus4);
+		outcome.postalCode = textOf(parts.get('zipcode')) + (String.isBlank(plus4) ? '' : '-' + plus4);
 		return outcome;
 	}
 
@@ -479,9 +458,7 @@ public with sharing class AddressVerifier {
 	}
 
 	private static Map<String, Object> mapOf(Object value) {
-		return value instanceof Map<String, Object>
-			? (Map<String, Object>) value
-			: new Map<String, Object>();
+		return value instanceof Map<String, Object> ? (Map<String, Object>) value : new Map<String, Object>();
 	}
 
 	private static String textOf(Object value) {

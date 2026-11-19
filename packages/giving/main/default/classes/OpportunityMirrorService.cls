@@ -26,11 +26,7 @@ public with sharing class OpportunityMirrorService {
 	public static final String CONTEXT = 'Opportunity mirror';
 
 	/** The statuses that count in the giving totals (ADR-0022), which are the ones copied. */
-	public static final Set<String> IN_TOTALS = new Set<String>{
-		'Received',
-		'Refunded',
-		'Written off'
-	};
+	public static final Set<String> IN_TOTALS = new Set<String>{ 'Received', 'Refunded', 'Written off' };
 
 	public static final String CAMPAIGN_FIELD = OpportunityMirrorContext.CAMPAIGN_FIELD;
 	public static final String DONOR_ROLE = OpportunityMirrorContext.DONOR_ROLE;
@@ -258,9 +254,7 @@ public with sharing class OpportunityMirrorService {
 		for (Gift__c gift : gifts) {
 			linkBefore.put(gift.Id, gift.Opportunity_Id__c);
 			if (String.isBlank(gift.Opportunity_Id__c) || idOf(gift) != null) {
-				gift.Opportunity_Id__c = String.isBlank(gift.Opportunity_Id__c)
-					? null
-					: String.valueOf(idOf(gift));
+				gift.Opportunity_Id__c = String.isBlank(gift.Opportunity_Id__c) ? null : String.valueOf(idOf(gift));
 				valid.add(gift);
 			} else {
 				result.failed++;
@@ -348,10 +342,7 @@ public with sharing class OpportunityMirrorService {
 		}
 		noAccessLogged = true;
 		ErrorLogger.logMessage(
-			String.format(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_LogNoAccess'),
-				new List<Object>{ howMany }
-			),
+			String.format(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_LogNoAccess'), new List<Object>{ howMany }),
 			CONTEXT,
 			ErrorLogger.SEVERITY_WARNING
 		);
@@ -401,11 +392,7 @@ public with sharing class OpportunityMirrorService {
 			String stage = keepsStage ? null : stage(IN_TOTALS.contains(gift.Status__c));
 			if (!keepsStage && stage == null) {
 				result.failed++;
-				result.refusals.add(
-					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoStage'),
-					nameOf(gift),
-					gift.Id
-				);
+				result.refusals.add(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoStage'), nameOf(gift), gift.Id);
 				continue;
 			}
 			SObject desired = context.desiredOpportunity(gift, stage);
@@ -418,11 +405,7 @@ public with sharing class OpportunityMirrorService {
 			SObject existing = context.current.get(Id.valueOf(gift.Opportunity_Id__c));
 			if (existing == null) {
 				result.failed++;
-				result.refusals.add(
-					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Missing'),
-					nameOf(gift),
-					gift.Id
-				);
+				result.refusals.add(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Missing'), nameOf(gift), gift.Id);
 				continue;
 			}
 			desired.Id = existing.Id;
@@ -439,11 +422,7 @@ public with sharing class OpportunityMirrorService {
 		}
 
 		if (!inserts.isEmpty()) {
-			List<Database.SaveResult> saved = Database.insert(
-				inserts,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> saved = Database.insert(inserts, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				if (saved[i].isSuccess()) {
 					insertedFor[i].Opportunity_Id__c = saved[i].getId();
@@ -457,11 +436,7 @@ public with sharing class OpportunityMirrorService {
 			}
 		}
 		if (!updates.isEmpty()) {
-			List<Database.SaveResult> saved = Database.update(
-				updates,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> saved = Database.update(updates, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				if (saved[i].isSuccess()) {
 					result.updated++;
@@ -480,11 +455,7 @@ public with sharing class OpportunityMirrorService {
 	 * has none, the donor put on the existing one where it names someone else. A role the platform
 	 * refuses is logged; the Opportunity stays.
 	 */
-	private static void writeContactRoles(
-		List<Gift__c> gifts,
-		OpportunityMirrorContext context,
-		Result result
-	) {
+	private static void writeContactRoles(List<Gift__c> gifts, OpportunityMirrorContext context, Result result) {
 		Map<Id, Gift__c> giftByOpportunity = new Map<Id, Gift__c>();
 		for (Gift__c gift : gifts) {
 			if (context.personOf(gift) != null) {
@@ -525,22 +496,14 @@ public with sharing class OpportunityMirrorService {
 			}
 		}
 		if (!inserts.isEmpty()) {
-			refuseRoles(
-				Database.insert(inserts, false, AccessLevel.USER_MODE),
-				insertedFor,
-				result
-			);
+			refuseRoles(Database.insert(inserts, false, AccessLevel.USER_MODE), insertedFor, result);
 		}
 		if (!updates.isEmpty()) {
 			refuseRoles(Database.update(updates, false, AccessLevel.USER_MODE), updatedFor, result);
 		}
 	}
 
-	private static void refuseRoles(
-		List<Database.SaveResult> saved,
-		List<Gift__c> savedFor,
-		Result result
-	) {
+	private static void refuseRoles(List<Database.SaveResult> saved, List<Gift__c> savedFor, Result result) {
 		for (Integer i = 0; i < saved.size(); i++) {
 			if (!saved[i].isSuccess()) {
 				result.refusals.add(
@@ -570,9 +533,7 @@ public with sharing class OpportunityMirrorService {
 		}
 		Id typed = idOf(gift);
 		if (typed == null) {
-			gift.Opportunity_Id__c.addError(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_InvalidOpportunityId')
-			);
+			gift.Opportunity_Id__c.addError(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_InvalidOpportunityId'));
 			return false;
 		}
 		gift.Opportunity_Id__c = String.valueOf(typed);

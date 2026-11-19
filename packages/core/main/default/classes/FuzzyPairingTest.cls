@@ -33,18 +33,10 @@ private class FuzzyPairingTest {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathan',
-							LastName = 'Fuzzy',
-							Email = 'jf@example.org'
-						)
+						new Contact(FirstName = 'Jonathan', LastName = 'Fuzzy', Email = 'jf@example.org')
 					),
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathon',
-							LastName = 'Fuzzy',
-							Email = 'JF@example.org '
-						)
+						new Contact(FirstName = 'Jonathon', LastName = 'Fuzzy', Email = 'JF@example.org ')
 					)
 				}
 			);
@@ -54,10 +46,7 @@ private class FuzzyPairingTest {
 			Assert.areEqual(1, pairs.size(), 'One pair, found once from both sides.');
 			Assert.isNull(pairs[0].ruleName, 'A name pair names no rule.');
 			Assert.isTrue(pairs[0].reason.contains('97%'), pairs[0].reason);
-			Assert.isTrue(
-				pairs[0].reason.contains(Label.Core_DuplicateManagement_SharedEmail),
-				pairs[0].reason
-			);
+			Assert.isTrue(pairs[0].reason.contains(Label.Core_DuplicateManagement_SharedEmail), pairs[0].reason);
 		}
 	}
 
@@ -67,18 +56,10 @@ private class FuzzyPairingTest {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathan',
-							LastName = 'Fuzzy',
-							Email = 'one@example.org'
-						)
+						new Contact(FirstName = 'Jonathan', LastName = 'Fuzzy', Email = 'one@example.org')
 					),
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathon',
-							LastName = 'Fuzzy',
-							Email = 'two@example.org'
-						)
+						new Contact(FirstName = 'Jonathon', LastName = 'Fuzzy', Email = 'two@example.org')
 					)
 				}
 			);
@@ -163,10 +144,7 @@ private class FuzzyPairingTest {
 			List<DuplicateService.Pair> pairs = FuzzyPairing.pairsFor(idsOf(people));
 
 			Assert.areEqual(1, pairs.size());
-			Assert.isTrue(
-				pairs[0].reason.contains(Label.Core_DuplicateManagement_SharedPostalCode),
-				pairs[0].reason
-			);
+			Assert.isTrue(pairs[0].reason.contains(Label.Core_DuplicateManagement_SharedPostalCode), pairs[0].reason);
 		}
 	}
 
@@ -191,25 +169,16 @@ private class FuzzyPairingTest {
 							Birthdate = Date.newInstance(1980, 1, 1)
 						)
 					),
-					TestDataFactory.person(
-						new Contact(FirstName = 'Sam', LastName = 'Fuzzy', Phone = '15550102000')
-					)
+					TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Fuzzy', Phone = '15550102000'))
 				}
 			);
 
 			List<DuplicateService.Pair> pairs = FuzzyPairing.pairsFor(idsOf(people));
 
-			Assert.areEqual(
-				2,
-				pairs.size(),
-				'The undated Sam pairs with each; the two dated do not.'
-			);
+			Assert.areEqual(2, pairs.size(), 'The undated Sam pairs with each; the two dated do not.');
 			for (DuplicateService.Pair pair : pairs) {
 				Assert.isTrue(pair.key.contains(people[2].Id), pair.key);
-				Assert.isTrue(
-					pair.reason.contains(Label.Core_DuplicateManagement_SharedPhone),
-					pair.reason
-				);
+				Assert.isTrue(pair.reason.contains(Label.Core_DuplicateManagement_SharedPhone), pair.reason);
 			}
 		}
 	}
@@ -252,25 +221,13 @@ private class FuzzyPairingTest {
 			List<Contact> people = insertPeople(
 				new List<Contact>{
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathan',
-							LastName = 'Fuzzy',
-							Email = 'jf@example.org'
-						)
+						new Contact(FirstName = 'Jonathan', LastName = 'Fuzzy', Email = 'jf@example.org')
 					),
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathon',
-							LastName = 'Fuzzy',
-							Email = 'jf@example.org'
-						)
+						new Contact(FirstName = 'Jonathon', LastName = 'Fuzzy', Email = 'jf@example.org')
 					),
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Jonathan.',
-							LastName = 'FUZZY',
-							Email = 'jf@example.org'
-						)
+						new Contact(FirstName = 'Jonathan.', LastName = 'FUZZY', Email = 'jf@example.org')
 					)
 				}
 			);
@@ -289,21 +246,13 @@ private class FuzzyPairingTest {
 			for (Integer i = 0; i < 251; i++) {
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Person' + i,
-							LastName = 'Bulkfuzz',
-							Email = 'p' + i + '@example.org'
-						)
+						new Contact(FirstName = 'Person' + i, LastName = 'Bulkfuzz', Email = 'p' + i + '@example.org')
 					)
 				);
 			}
 			people.add(
 				TestDataFactory.person(
-					new Contact(
-						FirstName = 'Person7',
-						LastName = 'Bulkfuzz',
-						Email = 'p7@example.org'
-					)
+					new Contact(FirstName = 'Person7', LastName = 'Bulkfuzz', Email = 'p7@example.org')
 				)
 			);
 			insertPeople(people);
@@ -339,12 +288,8 @@ private class FuzzyPairingTest {
 		System.runAs(TestUsers.admin()) {
 			people = insertPeople(
 				new List<Contact>{
-					TestDataFactory.person(
-						new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org')
-					),
-					TestDataFactory.person(
-						new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org')
-					)
+					TestDataFactory.person(new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org')),
+					TestDataFactory.person(new Contact(FirstName = 'Jo', LastName = 'Fuzzy', Email = 'jo@example.org'))
 				}
 			);
 		}

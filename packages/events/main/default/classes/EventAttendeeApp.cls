@@ -30,15 +30,7 @@ public without sharing class EventAttendeeApp {
 
 	/** The action names this class answers. */
 	public static Set<String> actionNames() {
-		return new Set<String>{
-			CONNECT,
-			ACCEPT,
-			DECLINE,
-			SEND_MESSAGE,
-			SEND_REPLY,
-			ADD_TO_AGENDA,
-			REMOVE_FROM_AGENDA
-		};
+		return new Set<String>{ CONNECT, ACCEPT, DECLINE, SEND_MESSAGE, SEND_REPLY, ADD_TO_AGENDA, REMOVE_FROM_AGENDA };
 	}
 
 	/** Runs one action for the verified person on one record; returns what to tell them. */
@@ -113,13 +105,7 @@ public without sharing class EventAttendeeApp {
 		return BarnHelp.text('Events', 'Events_App_RequestSent');
 	}
 
-	private static Attendee_Connection__c side(
-		Id eventId,
-		Id personId,
-		Id otherId,
-		Id otherAttendeeId,
-		String status
-	) {
+	private static Attendee_Connection__c side(Id eventId, Id personId, Id otherId, Id otherAttendeeId, String status) {
 		return new Attendee_Connection__c(
 			Event__c = eventId,
 			Contact__c = personId,
@@ -144,9 +130,7 @@ public without sharing class EventAttendeeApp {
 		];
 		List<Attendee_Connection__c> changes = new List<Attendee_Connection__c>();
 		Attendee_Connection__c mineChange = new Attendee_Connection__c(Id = mine.Id);
-		Attendee_Connection__c theirChange = theirs.isEmpty()
-			? null
-			: new Attendee_Connection__c(Id = theirs[0].Id);
+		Attendee_Connection__c theirChange = theirs.isEmpty() ? null : new Attendee_Connection__c(Id = theirs[0].Id);
 		if (accept) {
 			mineChange.Status__c = CONNECTED;
 			mineChange.Contact_Details__c = reachOf(mine.Other_Contact__c, mine.Event__c);
@@ -193,12 +177,7 @@ public without sharing class EventAttendeeApp {
 		if (sentToday(personId) >= DAILY_MESSAGES) {
 			return BarnHelp.text('Events', 'Events_App_TooMany');
 		}
-		insert as system message(
-			mine.Event__c,
-			personId,
-			mine.Other_Contact__c,
-			mine.Draft_Message__c
-		);
+		insert as system message(mine.Event__c, personId, mine.Other_Contact__c, mine.Draft_Message__c);
 		update as system new Attendee_Connection__c(Id = mine.Id, Draft_Message__c = null);
 		return BarnHelp.text('Events', 'Events_App_MessageSent');
 	}
@@ -231,12 +210,7 @@ public without sharing class EventAttendeeApp {
 		if (sentToday(personId) >= DAILY_MESSAGES) {
 			return BarnHelp.text('Events', 'Events_App_TooMany');
 		}
-		insert as system message(
-			received.Event__c,
-			personId,
-			received.From_Contact__c,
-			received.Reply__c
-		);
+		insert as system message(received.Event__c, personId, received.From_Contact__c, received.Reply__c);
 		update as system new Attendee_Message__c(Id = received.Id, Reply__c = null);
 		return BarnHelp.text('Events', 'Events_App_MessageSent');
 	}
@@ -343,10 +317,7 @@ public without sharing class EventAttendeeApp {
 		for (Event_Attendee__c row : [
 			SELECT Id, Networking_Contact__c
 			FROM Event_Attendee__c
-			WHERE
-				Contact__c = :personId
-				AND Event_Registration__r.Event__c = :eventId
-				AND Status__c != :CANCELLED
+			WHERE Contact__c = :personId AND Event_Registration__r.Event__c = :eventId AND Status__c != :CANCELLED
 			WITH SYSTEM_MODE
 			ORDER BY CreatedDate
 			LIMIT 1
@@ -371,9 +342,7 @@ public without sharing class EventAttendeeApp {
 	/** R-ACN1: one row per event, person and other person. */
 	@TestVisible
 	private static String pairKey(Id eventId, Id personId, Id otherId) {
-		return String.valueOf(eventId).left(15) +
-			String.valueOf(personId).left(15) +
-			String.valueOf(otherId).left(15);
+		return String.valueOf(eventId).left(15) + String.valueOf(personId).left(15) + String.valueOf(otherId).left(15);
 	}
 
 	/** R-AGI1: a person picks a session once. */

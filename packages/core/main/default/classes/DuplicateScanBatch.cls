@@ -94,9 +94,7 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
 		if (objectName == 'Account') {
 			return 'SELECT Id FROM Account WHERE RecordTypeId = :householdType';
 		}
-		return HouseholdService.isPersonAccountOrg()
-			? CONTACT_QUERY_WITHOUT_PERSON_ACCOUNTS
-			: CONTACT_QUERY;
+		return HouseholdService.isPersonAccountOrg() ? CONTACT_QUERY_WITHOUT_PERSON_ACCOUNTS : CONTACT_QUERY;
 	}
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {

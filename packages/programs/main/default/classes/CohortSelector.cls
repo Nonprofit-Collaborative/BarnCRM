@@ -54,21 +54,9 @@ public with sharing class CohortSelector {
 	 * The cohort's enrollments at these stages, newest start first, at most `howMany`, with the
 	 * name of the person each names.
 	 */
-	public static List<Enrollment__c> selectMembers(
-		Id cohortId,
-		Set<String> stages,
-		Integer howMany
-	) {
+	public static List<Enrollment__c> selectMembers(Id cohortId, Set<String> stages, Integer howMany) {
 		return [
-			SELECT
-				Id,
-				Name,
-				Stage__c,
-				Start_Date__c,
-				Contact__c,
-				Contact__r.Name,
-				Account__c,
-				Account__r.Name
+			SELECT Id, Name, Stage__c, Start_Date__c, Contact__c, Contact__r.Name, Account__c, Account__r.Name
 			FROM Enrollment__c
 			WHERE Cohort__c = :cohortId AND Stage__c IN :stages
 			WITH USER_MODE
@@ -80,20 +68,9 @@ public with sharing class CohortSelector {
 	/** The program's open enrollments in no cohort, at most `howMany`: who may be added. */
 	public static List<Enrollment__c> selectWithoutCohort(Id programId, Integer howMany) {
 		return [
-			SELECT
-				Id,
-				Name,
-				Stage__c,
-				Start_Date__c,
-				Contact__c,
-				Contact__r.Name,
-				Account__c,
-				Account__r.Name
+			SELECT Id, Name, Stage__c, Start_Date__c, Contact__c, Contact__r.Name, Account__c, Account__r.Name
 			FROM Enrollment__c
-			WHERE
-				Program__c = :programId
-				AND Cohort__c = NULL
-				AND Stage__c IN :EnrollmentService.OPEN_STAGES
+			WHERE Program__c = :programId AND Cohort__c = NULL AND Stage__c IN :EnrollmentService.OPEN_STAGES
 			WITH USER_MODE
 			ORDER BY Start_Date__c DESC NULLS LAST, Name
 			LIMIT :howMany
@@ -103,15 +80,7 @@ public with sharing class CohortSelector {
 	/** These enrollments, as far as the user can see them, with the person each names. */
 	public static List<Enrollment__c> selectEnrollments(Set<Id> enrollmentIds) {
 		return [
-			SELECT
-				Id,
-				Program__c,
-				Stage__c,
-				Cohort__c,
-				Contact__c,
-				Contact__r.Name,
-				Account__c,
-				Account__r.Name
+			SELECT Id, Program__c, Stage__c, Cohort__c, Contact__c, Contact__r.Name, Account__c, Account__r.Name
 			FROM Enrollment__c
 			WHERE Id IN :enrollmentIds
 			WITH USER_MODE
@@ -160,12 +129,7 @@ public with sharing class CohortSelector {
 	 * The days from `fromDate` to `toDate` that already have a session of this service for this
 	 * cohort (no cohort: the program-wide sessions), other than cancelled ones (R-SE4).
 	 */
-	public static Set<Date> selectSessionDays(
-		Id serviceId,
-		Id cohortId,
-		Date fromDate,
-		Date toDate
-	) {
+	public static Set<Date> selectSessionDays(Id serviceId, Id cohortId, Date fromDate, Date toDate) {
 		Set<Date> days = new Set<Date>();
 		for (Session__c session : [
 			SELECT Session_Date__c
@@ -193,10 +157,7 @@ public with sharing class CohortSelector {
 	 * The deliveries of this service on this day that name this session or no session, the
 	 * session's own first, oldest first, at most `howMany`.
 	 */
-	public static List<Service_Delivery__c> selectSessionDeliveries(
-		Session__c session,
-		Integer howMany
-	) {
+	public static List<Service_Delivery__c> selectSessionDeliveries(Session__c session, Integer howMany) {
 		return [
 			SELECT
 				Id,

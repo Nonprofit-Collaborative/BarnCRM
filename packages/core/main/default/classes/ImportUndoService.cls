@@ -106,10 +106,7 @@ public with sharing class ImportUndoService {
 						ImportJournalService.ACTION_UPDATED
 				  );
 		} else {
-			view.updates = ImportJournalService.entryCount(
-				batch.Id,
-				ImportJournalService.PHASE_COMMIT
-			);
+			view.updates = ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT);
 		}
 		if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
 			view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorNothingToUndo');
@@ -207,13 +204,8 @@ public with sharing class ImportUndoService {
 					String.valueOf(restored == null ? 0 : restored)
 				}
 			);
-			batch.Run_Log__c = (String.isBlank(batch.Run_Log__c)
-					? line
-					: batch.Run_Log__c + '\n' + line)
-				.right(32768);
-			batch.Status__c = failed == true
-				? ImportBatchService.STATUS_UNDO_FAILED
-				: ImportBatchService.STATUS_UNDONE;
+			batch.Run_Log__c = (String.isBlank(batch.Run_Log__c) ? line : batch.Run_Log__c + '\n' + line).right(32768);
+			batch.Status__c = failed == true ? ImportBatchService.STATUS_UNDO_FAILED : ImportBatchService.STATUS_UNDONE;
 			Database.update(batch, AccessLevel.SYSTEM_MODE);
 			JobNotifier.aboutRecord(
 				UserInfo.getUserId(),
@@ -260,10 +252,7 @@ public with sharing class ImportUndoService {
 			return BarnHelp.text('Core', 'Core_Import_UndoErrorDryRun');
 		}
 		String status = knownStatus == null ? effectiveStatus(batch) : knownStatus;
-		if (
-			ImportBatchService.STATUS_UNDOING.equals(status) ||
-			ImportBatchService.STATUS_UNDONE.equals(status)
-		) {
+		if (ImportBatchService.STATUS_UNDOING.equals(status) || ImportBatchService.STATUS_UNDONE.equals(status)) {
 			return BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone');
 		}
 		// A committed import keeps Is Dry Run cleared while it retries its rejected rows, so its
@@ -276,8 +265,7 @@ public with sharing class ImportUndoService {
 			ImportBatchService.STATUS_RETRYING.equals(status) ||
 			ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(status)) ||
 			batch.Undo_Deadline__c == null ||
-			(batch.Completed_At__c == null &&
-			!ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))
+			(batch.Completed_At__c == null && !ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))
 		) {
 			return BarnHelp.text('Core', 'Core_Import_UndoErrorNotCommitted');
 		}
@@ -384,9 +372,7 @@ public with sharing class ImportUndoService {
 		view.others = new List<TaggedCount>();
 		Integer otherTotal = 0;
 		for (Schema.SObjectType type : ImportEntityProcessors.taggedTypes()) {
-			Schema.DescribeSObjectResult described = type.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 			TaggedCount counted = new TaggedCount();
 			counted.objectName = described.getName();
 			counted.label = described.getLabelPlural();
@@ -417,10 +403,7 @@ public with sharing class ImportUndoService {
 	 */
 	private static List<TaggedCount> createdCounts(Id batchId) {
 		List<TaggedCount> result = new List<TaggedCount>();
-		Integer count = ImportJournalService.entryCount(
-			batchId,
-			ImportJournalService.PHASE_CREATED
-		);
+		Integer count = ImportJournalService.entryCount(batchId, ImportJournalService.PHASE_CREATED);
 		if (count == 0) {
 			return result;
 		}
@@ -432,12 +415,8 @@ public with sharing class ImportUndoService {
 		for (String objectName : byObject.keySet()) {
 			Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
 			TaggedCount each = new TaggedCount();
-			each.objectName = type == null
-				? objectName
-				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-			each.label = type == null
-				? objectName
-				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+			each.objectName = type == null ? objectName : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+			each.label = type == null ? objectName : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 			each.count = byObject.get(objectName);
 			counted += each.count;
 			result.add(each);

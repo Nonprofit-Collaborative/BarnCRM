@@ -22,11 +22,7 @@ private class ReportingPostInstallTest {
 	static void theInstallerGetsTheAdminSetOnceAndTheRolesTheirSets() {
 		System.runAs(TestUsers.admin()) {
 			Id fresh = TestDataFactory.createUser('Installer', new List<String>()).Id;
-			Id alreadyHolding = TestDataFactory.createUser(
-					'Holder',
-					new List<String>{ 'Reporting_Admin' }
-				)
-				.Id;
+			Id alreadyHolding = TestDataFactory.createUser('Holder', new List<String>{ 'Reporting_Admin' }).Id;
 			User member = TestUsers.standardUser('Member');
 			insert new PermissionSetAssignment(
 				AssigneeId = member.Id,

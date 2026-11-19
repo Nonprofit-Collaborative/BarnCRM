@@ -81,11 +81,7 @@ public with sharing class ReceiptLogoSource {
 		if (String.isBlank(source)) {
 			return '';
 		}
-		return '<img class="logo" src="' +
-			source.escapeHtml4() +
-			'" style="width: ' +
-			widthMm() +
-			'mm;" alt=""/>';
+		return '<img class="logo" src="' + source.escapeHtml4() + '" style="width: ' + widthMm() + 'mm;" alt=""/>';
 	}
 
 	/** Forgets what this transaction resolved. For tests, and for a batch that reuses a context. */
@@ -104,11 +100,7 @@ public with sharing class ReceiptLogoSource {
 		String source = null;
 		try {
 			if (ROUTE_DOCUMENT_SERVER.equalsIgnoreCase(selectedRoute)) {
-				source =
-					'/servlet/servlet.ImageServer?id=' +
-					documentId +
-					'&oid=' +
-					UserInfo.getOrganizationId();
+				source = '/servlet/servlet.ImageServer?id=' + documentId + '&oid=' + UserInfo.getOrganizationId();
 			} else {
 				Boolean embedded = ROUTE_EMBEDDED_IMAGE.equalsIgnoreCase(selectedRoute);
 				ContentVersion version = latestVersionOf(documentId, embedded);
@@ -156,9 +148,7 @@ public with sharing class ReceiptLogoSource {
 
 	private static String embeddedImage(ContentVersion version) {
 		String extension = version.FileExtension == null ? '' : version.FileExtension.toLowerCase();
-		String mediaType = MEDIA_TYPES.containsKey(extension)
-			? MEDIA_TYPES.get(extension)
-			: MEDIA_TYPES.get('png');
+		String mediaType = MEDIA_TYPES.containsKey(extension) ? MEDIA_TYPES.get(extension) : MEDIA_TYPES.get('png');
 		if (version.VersionData == null) {
 			return null;
 		}

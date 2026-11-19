@@ -115,11 +115,7 @@ private class HubBoardTest {
 				Status__c = 'Proposed'
 			);
 			insert as user motion;
-			Assert.areEqual(
-				3,
-				HubBoardController.openVoting(motion.Id),
-				'One vote per voting member'
-			);
+			Assert.areEqual(3, HubBoardController.openVoting(motion.Id), 'One vote per voting member');
 			Assert.areEqual(0, HubBoard.openVoting(motion.Id), 'Opening again adds nobody');
 			List<Board_Vote__c> votes = [
 				SELECT Id
@@ -268,11 +264,7 @@ private class HubBoardTest {
 			Board__c board = board();
 			HubBoardController.BoardView view = HubBoardController.getBoard(board.Id);
 			Assert.areEqual(3, view.seats.size(), 'The ended seat is not current');
-			Assert.areEqual(
-				new List<String>{ 'Finance', 'Legal' },
-				view.neededSkills,
-				'Skills wanted'
-			);
+			Assert.areEqual(new List<String>{ 'Finance', 'Legal' }, view.neededSkills, 'Skills wanted');
 			Assert.isTrue(view.seats[0].flag, 'The chair is at the two-term limit');
 			Assert.isFalse(view.showDemographics, 'Demographics ship off');
 			Id assessmentId = HubBoardController.startAssessment(board.Id);
@@ -304,11 +296,7 @@ private class HubBoardTest {
 				WHERE Board__c = :board.Id AND Role__c = 'Chair'
 				WITH USER_MODE
 			];
-			update as user new Board_Member__c(
-				Id = seat.Id,
-				Age_Range__c = '45 to 59',
-				Gender__c = 'Woman'
-			);
+			update as user new Board_Member__c(Id = seat.Id, Age_Range__c = '45 to 59', Gender__c = 'Woman');
 			Board_Meeting__c meeting = meeting(board.Id, 0);
 			HubBoard.inviteBoard(meeting.Id);
 			insert as user new Meeting_Action_Item__c(
@@ -350,11 +338,7 @@ private class HubBoardTest {
 			Assert.areEqual('File the 990', boardView.actionItems[0].name, 'By name');
 			Assert.isNotNull(boardView.actionItems[0].status, 'Shows who it is assigned to');
 			Assert.areEqual(1, meetingView.motions.size(), 'The motion');
-			Assert.areEqual(
-				new List<String>{ '0', '0', '0' },
-				meetingView.motions[0].values,
-				'No votes counted yet'
-			);
+			Assert.areEqual(new List<String>{ '0', '0', '0' }, meetingView.motions[0].values, 'No votes counted yet');
 			Boolean marked = false;
 			for (HubBoardController.Line line : meetingView.attendees) {
 				marked = marked || line.values == new List<String>{ 'packet', 'minutes' };
@@ -371,10 +355,7 @@ private class HubBoardTest {
 			board = board();
 			meeting = meeting(board.Id, 3);
 		}
-		User sam = TestUsers.standardUserWith(
-			'Sam',
-			new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' }
-		);
+		User sam = TestUsers.standardUserWith('Sam', new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' });
 		System.runAs(sam) {
 			HubBoardController.BoardView view = HubBoardController.getBoard(board.Id);
 			String refusal;
@@ -424,21 +405,9 @@ private class HubBoardTest {
 				Annual__c = true
 			);
 			insert as user policy;
-			Assert.areEqual(
-				1,
-				HubBoardController.getBoard(board.Id).documents.size(),
-				'Offered for disclosure'
-			);
-			Assert.areEqual(
-				3,
-				HubBoardController.requestFromBoard(board.Id, policy.Id),
-				'Three current seats'
-			);
-			Assert.areEqual(
-				0,
-				HubPolicy.requestFromBoard(policy.Id, board.Id),
-				'Not twice in a year'
-			);
+			Assert.areEqual(1, HubBoardController.getBoard(board.Id).documents.size(), 'Offered for disclosure');
+			Assert.areEqual(3, HubBoardController.requestFromBoard(board.Id, policy.Id), 'Three current seats');
+			Assert.areEqual(0, HubPolicy.requestFromBoard(policy.Id, board.Id), 'Not twice in a year');
 			Policy_Acknowledgment__c row = [
 				SELECT Key__c, Person__c, User__c
 				FROM Policy_Acknowledgment__c
@@ -446,10 +415,7 @@ private class HubBoardTest {
 				WITH USER_MODE
 				LIMIT 1
 			];
-			Assert.isTrue(
-				row.Key__c.contains(':' + Date.today().year() + ':'),
-				'The year is in the key'
-			);
+			Assert.isTrue(row.Key__c.contains(':' + Date.today().year() + ':'), 'The year is in the key');
 			Assert.isNull(row.User__c, 'A board member is a person, not a user');
 		}
 	}

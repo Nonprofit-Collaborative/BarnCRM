@@ -57,9 +57,7 @@ public with sharing class AccountingPeriodController {
 	public static PeriodView closeThrough(Date closeDate) {
 		try {
 			if (!canManage()) {
-				throw new AccountingPeriodException(
-					BarnHelp.text('Giving', 'Giving_Periods_PermissionRequired')
-				);
+				throw new AccountingPeriodException(BarnHelp.text('Giving', 'Giving_Periods_PermissionRequired'));
 			}
 			// Locked, so whether this save reopens a period, and the audit row's old value, are
 			// decided from what is stored, not from a value another person replaced a moment ago.
@@ -68,15 +66,11 @@ public with sharing class AccountingPeriodController {
 				return currentView();
 			}
 			if (closeDate != null && closeDate > latestAllowed()) {
-				throw new AccountingPeriodException(
-					BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday')
-				);
+				throw new AccountingPeriodException(BarnHelp.text('Giving', 'Giving_Periods_NotBeforeToday'));
 			}
 			Boolean reopens = current != null && (closeDate == null || closeDate < current);
 			if (reopens && !GiftPostingLock.canOverride()) {
-				throw new AccountingPeriodException(
-					BarnHelp.text('Giving', 'Giving_Periods_ReopenNeedsOverride')
-				);
+				throw new AccountingPeriodException(BarnHelp.text('Giving', 'Giving_Periods_ReopenNeedsOverride'));
 			}
 			AccountingPeriodWriter.saveClosedThrough(closeDate);
 			SettingsService.logChange(SETTING_NAME, asText(current), asText(closeDate));

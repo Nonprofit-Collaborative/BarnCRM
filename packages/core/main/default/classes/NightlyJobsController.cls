@@ -86,9 +86,7 @@ public with sharing class NightlyJobsController {
 	public static PanelView schedule() {
 		try {
 			if (!BarnCRMPermissions.canManageSettings()) {
-				throw new NightlyJobsException(
-					BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
-				);
+				throw new NightlyJobsException(BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'));
 			}
 			NightlyJobs.scheduleAll();
 			return currentView();
@@ -138,9 +136,7 @@ public with sharing class NightlyJobsController {
 	/** The step with this key, for someone who can manage BarnCRM Settings. */
 	private static NightlyStep managedStep(String key) {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new NightlyJobsException(
-				BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
-			);
+			throw new NightlyJobsException(BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'));
 		}
 		NightlyStep step = String.isBlank(key) ? null : NightlyJobs.step(key);
 		if (step == null) {
@@ -167,8 +163,7 @@ public with sharing class NightlyJobsController {
 			item.minute = step.minute;
 			item.isOn = NightlyJobs.isOn(step);
 			item.hasSwitch = step.hasSwitch();
-			item.switchedOn =
-				!step.hasSwitch() || NightlyJobs.isSwitchedOn(step.key, step.switchDefault);
+			item.switchedOn = !step.hasSwitch() || NightlyJobs.isSwitchedOn(step.key, step.switchDefault);
 			item.canRunNow = step.canRunNow == true;
 			item.summary = step.summary;
 			Nightly_Job__c row = rows.get(ScheduledJobSelector.nameKey(step.key));
@@ -212,10 +207,7 @@ public with sharing class NightlyJobsController {
 		if (String.isBlank(value)) {
 			return null;
 		}
-		for (
-			Schema.PicklistEntry entry : Nightly_Job__c.Last_Outcome__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Nightly_Job__c.Last_Outcome__c.getDescribe().getPicklistValues()) {
 			if (entry.getValue() == value) {
 				return entry.getLabel();
 			}

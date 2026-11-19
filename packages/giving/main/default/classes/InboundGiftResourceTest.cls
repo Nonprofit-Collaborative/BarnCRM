@@ -10,9 +10,7 @@ private class InboundGiftResourceTest {
 	static void setup() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true);
-			insert TestDataFactory.person(
-				new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = EMAIL)
-			);
+			insert TestDataFactory.person(new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = EMAIL));
 		}
 	}
 
@@ -52,10 +50,7 @@ private class InboundGiftResourceTest {
 
 			Assert.areEqual(201, first.get('status'));
 			Assert.areEqual('created', first.get('outcome'));
-			Assert.isFalse(
-				first.containsKey('errorCode'),
-				'Empty fields are left out of the body.'
-			);
+			Assert.isFalse(first.containsKey('errorCode'), 'Empty fields are left out of the body.');
 			Assert.areEqual(200, second.get('status'));
 			Assert.areEqual('existing', second.get('outcome'));
 			Assert.areEqual(first.get('giftId'), second.get('giftId'));
@@ -68,9 +63,7 @@ private class InboundGiftResourceTest {
 	@IsTest
 	static void badBodiesAndUnknownDonorsGetTheirDocumentedStatus() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Map<String, Object> unknownField = post(
-				'{"externalId":"x:1","amount":5,"colour":"red"}'
-			);
+			Map<String, Object> unknownField = post('{"externalId":"x:1","amount":5,"colour":"red"}');
 			Map<String, Object> missingAmount = post(
 				'{"externalId":"x:2","paymentMethod":"Card","donorEmail":"' + EMAIL + '"}'
 			);

@@ -113,12 +113,7 @@ public class HouseholdTestDataFactory {
 		return insertHouseholds(households);
 	}
 
-	public static HouseholdService.Person person(
-		String salutation,
-		String firstName,
-		String lastName,
-		String role
-	) {
+	public static HouseholdService.Person person(String salutation, String firstName, String lastName, String role) {
 		HouseholdService.Person result = new HouseholdService.Person();
 		result.salutation = salutation;
 		result.firstName = firstName;
@@ -205,9 +200,7 @@ public class HouseholdTestDataFactory {
 					new FieldPermissions(
 						ParentId = grant.Id,
 						SobjectType = String.valueOf(Household_Member__c.SObjectType),
-						Field = String.valueOf(Household_Member__c.SObjectType) +
-							'.' +
-							NamespaceUtil.qualify(field),
+						Field = String.valueOf(Household_Member__c.SObjectType) + '.' + NamespaceUtil.qualify(field),
 						PermissionsRead = true,
 						PermissionsEdit = mayCreate
 					)

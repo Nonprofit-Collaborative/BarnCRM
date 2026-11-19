@@ -133,8 +133,7 @@ private class ReceiptRendererFactoryTest {
 			Assert.areEqual(
 				1,
 				ReceiptTestDataFactory.probeConstructions,
-				'Constructing the probe directly increments its counter, which is how the counter ' +
-				'proves anything.'
+				'Constructing the probe directly increments its counter, which is how the counter ' + 'proves anything.'
 			);
 			Assert.isTrue(
 				built instanceof ReceiptRenderer,
@@ -208,8 +207,7 @@ private class ReceiptRendererFactoryTest {
 	static void theFallbackKeyIsPermittedAndSaysSoWhenItsClassIsNotInstalled() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.isTrue(
-				ReceiptRendererFactory.permittedKeys()
-					.contains(ReceiptRendererFactory.KEY_VISUALFORCE),
+				ReceiptRendererFactory.permittedKeys().contains(ReceiptRendererFactory.KEY_VISUALFORCE),
 				'ADR-0016 names the Visualforce fallback, so its key is on the allow-list.'
 			);
 			Assert.isNull(
@@ -246,10 +244,7 @@ private class ReceiptRendererFactoryTest {
 			Set<String> keys = ReceiptRendererFactory.permittedKeys();
 
 			Assert.areEqual(
-				new Set<String>{
-					ReceiptRendererFactory.KEY_BLOB_PDF,
-					ReceiptRendererFactory.KEY_VISUALFORCE
-				},
+				new Set<String>{ ReceiptRendererFactory.KEY_BLOB_PDF, ReceiptRendererFactory.KEY_VISUALFORCE },
 				keys,
 				'The list is closed: adding to it is a source change and a review, not a setting.'
 			);

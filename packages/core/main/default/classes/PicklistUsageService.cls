@@ -59,17 +59,11 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** The single-select picklist fields the person can read and group by, by label. */
-	public static List<Schema.DescribeFieldResult> picklistFields(
-		Schema.DescribeSObjectResult described
-	) {
+	public static List<Schema.DescribeFieldResult> picklistFields(Schema.DescribeSObjectResult described) {
 		List<Schema.DescribeFieldResult> fields = new List<Schema.DescribeFieldResult>();
 		for (Schema.SObjectField token : described.fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
-			if (
-				field.getType() == Schema.DisplayType.PICKLIST &&
-				field.isAccessible() &&
-				field.isGroupable()
-			) {
+			if (field.getType() == Schema.DisplayType.PICKLIST && field.isAccessible() && field.isGroupable()) {
 				fields.add(field);
 			}
 		}
@@ -78,9 +72,7 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** The picklist fields keyed by API name, for checking names a page sent back. */
-	public static Map<String, Schema.DescribeFieldResult> picklistFieldsByName(
-		Schema.DescribeSObjectResult described
-	) {
+	public static Map<String, Schema.DescribeFieldResult> picklistFieldsByName(Schema.DescribeSObjectResult described) {
 		Map<String, Schema.DescribeFieldResult> byName = new Map<String, Schema.DescribeFieldResult>();
 		for (Schema.DescribeFieldResult field : picklistFields(described)) {
 			byName.put(field.getName(), field);
@@ -115,8 +107,7 @@ public with sharing class PicklistUsageService {
 	 * MAX is charged one query row per record, COUNT one per value (R-FU12).
 	 */
 	public static Boolean datesFit(Integer total) {
-		return Limits.getQueryRows() + (total == null ? 0 : total) + MAX_VALUES + 1 <=
-			dateRowBudget;
+		return Limits.getQueryRows() + (total == null ? 0 : total) + MAX_VALUES + 1 <= dateRowBudget;
 	}
 
 	/** One chunk of Last Used dates: the newest date per field and value in the records read. */
@@ -199,17 +190,11 @@ public with sharing class PicklistUsageService {
 	}
 
 	/** The aggregate query behind usage: every name is escaped, the row cap is a constant. */
-	private static String usageQuery(
-		Schema.DescribeSObjectResult described,
-		String fieldName,
-		String dateField
-	) {
+	private static String usageQuery(Schema.DescribeSObjectResult described, String fieldName, String dateField) {
 		return 'SELECT ' +
 			String.escapeSingleQuotes(fieldName) +
 			' v, COUNT(Id) n' +
-			(dateField == null
-				? ''
-				: ', MAX(' + String.escapeSingleQuotes(dateField) + ') lastUsed') +
+			(dateField == null ? '' : ', MAX(' + String.escapeSingleQuotes(dateField) + ') lastUsed') +
 			' FROM ' +
 			String.escapeSingleQuotes(described.getName()) +
 			' GROUP BY ' +
@@ -258,10 +243,7 @@ public with sharing class PicklistUsageService {
 	 * first, most used first; the never used values follow, by label.
 	 */
 	@TestVisible
-	private static FieldResult combine(
-		Map<String, String> activeLabels,
-		Map<String, Usage> observed
-	) {
+	private static FieldResult combine(Map<String, String> activeLabels, Map<String, Usage> observed) {
 		FieldResult result = new FieldResult();
 		List<Usage> found = new List<Usage>();
 		for (String value : observed.keySet()) {

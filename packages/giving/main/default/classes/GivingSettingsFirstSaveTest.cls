@@ -22,11 +22,7 @@ private class GivingSettingsFirstSaveTest {
 	}
 
 	private static void assertNoRecordYet() {
-		Assert.areEqual(
-			0,
-			[SELECT COUNT() FROM Giving_Settings__c],
-			'The org has never saved its Giving settings'
-		);
+		Assert.areEqual(0, [SELECT COUNT() FROM Giving_Settings__c], 'The org has never saved its Giving settings');
 	}
 
 	private static Giving_Settings__c stored() {
@@ -60,10 +56,7 @@ private class GivingSettingsFirstSaveTest {
 			saved.Automatic_Household_Soft_Credits__c,
 			writer + ' left household soft credits on, as they ship'
 		);
-		Assert.isTrue(
-			saved.Receipt_Print_Logo__c,
-			writer + ' left the receipt logo on, as it ships'
-		);
+		Assert.isTrue(saved.Receipt_Print_Logo__c, writer + ' left the receipt logo on, as it ships');
 	}
 
 	@IsTest
@@ -76,11 +69,7 @@ private class GivingSettingsFirstSaveTest {
 			Test.stopTest();
 
 			Giving_Settings__c saved = stored();
-			Assert.areEqual(
-				'Sent 3 thank yous.',
-				saved.Acknowledgments_Last_Run_Summary__c,
-				'The run is recorded'
-			);
+			Assert.areEqual('Sent 3 thank yous.', saved.Acknowledgments_Last_Run_Summary__c, 'The run is recorded');
 			assertShippedOnKept(saved, 'AcknowledgmentService.recordLastRun');
 		}
 	}
@@ -96,11 +85,7 @@ private class GivingSettingsFirstSaveTest {
 			Test.stopTest();
 
 			Giving_Settings__c saved = stored();
-			Assert.areEqual(
-				completedAt,
-				saved.Donor_Levels_Last_Recalculated__c,
-				'The recalculation is stamped'
-			);
+			Assert.areEqual(completedAt, saved.Donor_Levels_Last_Recalculated__c, 'The recalculation is stamped');
 			assertShippedOnKept(saved, 'DonorLevelWriter.stampRecalculation');
 		}
 	}
@@ -141,11 +126,7 @@ private class GivingSettingsFirstSaveTest {
 			Test.stopTest();
 
 			Giving_Settings__c saved = stored();
-			Assert.areEqual(
-				completedAt,
-				saved.Installment_Top_Up_Last_Run__c,
-				'The run is recorded'
-			);
+			Assert.areEqual(completedAt, saved.Installment_Top_Up_Last_Run__c, 'The run is recorded');
 			assertShippedOnKept(saved, 'CommitmentService.recordTopUpRun');
 		}
 	}
@@ -161,11 +142,7 @@ private class GivingSettingsFirstSaveTest {
 			Test.stopTest();
 
 			Giving_Settings__c saved = stored();
-			Assert.areEqual(
-				completedAt,
-				saved.Installment_Overdue_Last_Run__c,
-				'The run is recorded'
-			);
+			Assert.areEqual(completedAt, saved.Installment_Overdue_Last_Run__c, 'The run is recorded');
 			assertShippedOnKept(saved, 'CommitmentService.recordOverdueRun');
 		}
 	}
@@ -198,14 +175,8 @@ private class GivingSettingsFirstSaveTest {
 			assertNoRecordYet();
 
 			Test.startTest();
-			Object autoApply = SettingsService.getValue(
-				'Giving_Settings__c',
-				'Auto_Apply_Gifts_To_Installments__c'
-			);
-			Object softCredits = SettingsService.getValue(
-				'Giving_Settings__c',
-				'Automatic_Household_Soft_Credits__c'
-			);
+			Object autoApply = SettingsService.getValue('Giving_Settings__c', 'Auto_Apply_Gifts_To_Installments__c');
+			Object softCredits = SettingsService.getValue('Giving_Settings__c', 'Automatic_Household_Soft_Credits__c');
 			Object logo = SettingsService.getValue('Giving_Settings__c', 'Receipt_Print_Logo__c');
 			Test.stopTest();
 
@@ -245,11 +216,7 @@ private class GivingSettingsFirstSaveTest {
 			Assert.isFalse(saved.Automatic_Household_Soft_Credits__c, 'So does this one');
 			Assert.isFalse(saved.Receipt_Print_Logo__c, 'And this one');
 			Assert.areEqual('GIFT-', saved.Receipt_Number_Prefix__c, 'Other keys are untouched');
-			Assert.areEqual(
-				completedAt,
-				saved.Installment_Overdue_Last_Run__c,
-				'Each run recorded'
-			);
+			Assert.areEqual(completedAt, saved.Installment_Overdue_Last_Run__c, 'Each run recorded');
 		}
 	}
 }

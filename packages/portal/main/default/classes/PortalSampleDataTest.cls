@@ -78,14 +78,8 @@ private class PortalSampleDataTest {
 			];
 			Assert.areEqual('Inactive', portal.Status__c, 'Nothing is open to anyone');
 			Assert.areEqual('Invited', portal.Access_Mode__c);
-			Map<String, Object> template = (Map<String, Object>) JSON.deserializeUntyped(
-				portal.Template__c
-			);
-			Assert.areEqual(
-				2,
-				((List<Object>) template.get('pages')).size(),
-				'The My Account template has two pages'
-			);
+			Map<String, Object> template = (Map<String, Object>) JSON.deserializeUntyped(portal.Template__c);
+			Assert.areEqual(2, ((List<Object>) template.get('pages')).size(), 'The My Account template has two pages');
 			Assert.areEqual(
 				3,
 				[
@@ -106,11 +100,7 @@ private class PortalSampleDataTest {
 				],
 				'One access is suspended'
 			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Portal_Session__c WITH SYSTEM_MODE],
-				'Nobody has signed in'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Portal_Session__c WITH SYSTEM_MODE], 'Nobody has signed in');
 		}
 	}
 
@@ -128,11 +118,7 @@ private class PortalSampleDataTest {
 			insert as user real;
 			Contact person = TestDataFactory.person(new Contact(LastName = 'Real Person'));
 			insert as user person;
-			insert as user new Portal_Access__c(
-				Portal__c = real.Id,
-				Person__c = person.Id,
-				Status__c = 'Active'
-			);
+			insert as user new Portal_Access__c(Portal__c = real.Id, Person__c = person.Id, Status__c = 'Active');
 
 			Test.startTest();
 			loadEverything();
@@ -141,11 +127,7 @@ private class PortalSampleDataTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Portal__c WHERE Sample_Data__c = TRUE]);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Portal__c WITH SYSTEM_MODE],
-				'The real portal stays'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Portal__c WITH SYSTEM_MODE], 'The real portal stays');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Portal_Access__c WITH SYSTEM_MODE],
@@ -161,10 +143,7 @@ private class PortalSampleDataTest {
 			loadEverything();
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Portal__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Portal__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE]);
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Portal_Access__c WITH SYSTEM_MODE],

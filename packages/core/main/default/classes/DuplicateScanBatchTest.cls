@@ -24,20 +24,15 @@ private class DuplicateScanBatchTest {
 	}
 
 	private static Boolean ruleActiveFor(String objectName) {
-		return DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName })
-			.contains(objectName);
+		return DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName }).contains(objectName);
 	}
 
 	private static List<Contact> twins(String firstName) {
 		String email = firstName.toLowerCase() + '.dupscan@example.org';
 		return (List<Contact>) insertAllowingDuplicates(
 			new List<Contact>{
-				TestDataFactory.person(
-					new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
-				),
-				TestDataFactory.person(
-					new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
-				)
+				TestDataFactory.person(new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)),
+				TestDataFactory.person(new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email))
 			}
 		);
 	}
@@ -55,37 +50,23 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = twins('Rosa');
 			matcherAnswers(people[0].Id, people[1].Id);
-			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-				new Set<String>{ 'Contact' }
-			);
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' });
 
 			Test.startTest();
 			Integer first = DuplicateScanBatch.scanChunk(people, rules);
 			Integer second = DuplicateScanBatch.scanChunk(people, rules);
 			Test.stopTest();
 
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Contact WHERE Id IN :people],
-				'The scan changes no record.'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Contact WHERE Id IN :people], 'The scan changes no record.');
 			if (!ruleActiveFor('Contact')) {
 				// Skipped: no active rule for people in this org, so no suggestion can be written.
 				Assert.areEqual(0, first + second, 'With no active rule nothing is written.');
 				return;
 			}
 			Assert.areEqual(1, first, 'A pair found from both sides is one suggestion.');
-			Assert.areEqual(
-				0,
-				second,
-				'A pair already waiting for a reviewer is not written twice.'
-			);
+			Assert.areEqual(0, second, 'A pair already waiting for a reviewer is not written twice.');
 			Assert.areEqual(1, [SELECT COUNT() FROM DuplicateRecordSet], 'Exactly one suggestion.');
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM DuplicateRecordItem],
-				'Of exactly two records.'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM DuplicateRecordItem], 'Of exactly two records.');
 		}
 	}
 
@@ -94,9 +75,7 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = twins('Iris');
 			matcherAnswers(people[0].Id, people[1].Id);
-			insert new Duplicate_Dismissal__c(
-				Pair_Key__c = DuplicateService.pairKey(people[0].Id, people[1].Id)
-			);
+			insert new Duplicate_Dismissal__c(Pair_Key__c = DuplicateService.pairKey(people[0].Id, people[1].Id));
 
 			Test.startTest();
 			Integer written = DuplicateScanBatch.scanChunk(
@@ -133,16 +112,8 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
 				new List<Account>{
-					inCity(
-						HouseholdTestDataFactory.newHousehold('The Hall Family'),
-						'8848 Highland Ln',
-						'43622'
-					),
-					inCity(
-						HouseholdTestDataFactory.newHousehold('The Shah-Duarte Family'),
-						'9719 Harbor Dr',
-						'43621'
-					),
+					inCity(HouseholdTestDataFactory.newHousehold('The Hall Family'), '8848 Highland Ln', '43622'),
+					inCity(HouseholdTestDataFactory.newHousehold('The Shah-Duarte Family'), '9719 Harbor Dr', '43621'),
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family'))
 				}
@@ -251,11 +222,7 @@ private class DuplicateScanBatchTest {
 				WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
 			];
 			Assert.areEqual(1, summary.size(), 'A finished scan says so once.');
-			Assert.areEqual(
-				ErrorLogger.SEVERITY_INFO,
-				summary[0].Severity__c,
-				'A clean scan is Info.'
-			);
+			Assert.areEqual(ErrorLogger.SEVERITY_INFO, summary[0].Severity__c, 'A clean scan is Info.');
 		}
 	}
 
@@ -267,18 +234,10 @@ private class DuplicateScanBatchTest {
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Lena',
-							LastName = 'Dupscan',
-							Email = 'lena.one@example.org'
-						)
+						new Contact(FirstName = 'Lena', LastName = 'Dupscan', Email = 'lena.one@example.org')
 					),
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Lena',
-							LastName = 'Dupscan',
-							Email = 'lena.two@example.org'
-						)
+						new Contact(FirstName = 'Lena', LastName = 'Dupscan', Email = 'lena.two@example.org')
 					)
 				}
 			);
@@ -329,11 +288,7 @@ private class DuplicateScanBatchTest {
 			Test.startTest();
 			Id jobId = DuplicateScanBatch.start();
 			// No stopTest: a scan chains its second object, which a test method cannot run.
-			Assert.areEqual(
-				anyActive,
-				jobId != null,
-				'A scan starts exactly when a rule is active (R-DP3).'
-			);
+			Assert.areEqual(anyActive, jobId != null, 'A scan starts exactly when a rule is active (R-DP3).');
 		}
 	}
 
@@ -344,10 +299,7 @@ private class DuplicateScanBatchTest {
 	@IsTest
 	static void theNextPassCarriesWhatTheFirstFoundIntoOneSummary() {
 		System.runAs(TestUsers.admin()) {
-			DuplicateScanBatch people = new DuplicateScanBatch(
-				'Contact',
-				new List<String>{ 'Account' }
-			);
+			DuplicateScanBatch people = new DuplicateScanBatch('Contact', new List<String>{ 'Account' });
 			people.written = 3;
 			people.failedChunks = 1;
 
@@ -400,16 +352,8 @@ private class DuplicateScanBatchTest {
 			}
 		);
 		insert new List<Address__c>{
-			new Address__c(
-				Contact__c = people[0].Id,
-				Street__c = '4 Elm Avenue',
-				Postal_Code__c = '60601'
-			),
-			new Address__c(
-				Contact__c = people[1].Id,
-				Street__c = '4 elm ave.',
-				Postal_Code__c = '60601'
-			)
+			new Address__c(Contact__c = people[0].Id, Street__c = '4 Elm Avenue', Postal_Code__c = '60601'),
+			new Address__c(Contact__c = people[1].Id, Street__c = '4 elm ave.', Postal_Code__c = '60601')
 		};
 		return people;
 	}
@@ -419,9 +363,7 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = neighboursOnlyBySource();
 			DuplicateService.stubMatches = new List<DuplicateService.Pair>();
-			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-				new Set<String>{ 'Contact' }
-			);
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' });
 
 			Test.startTest();
 			Integer written = DuplicateScanBatch.scanChunk(people, rules);
@@ -457,9 +399,7 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = neighboursOnlyBySource();
 			matcherAnswers(people[0].Id, people[1].Id);
-			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-				new Set<String>{ 'Contact' }
-			);
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' });
 
 			Test.startTest();
 			Integer written = DuplicateScanBatch.scanChunk(people, rules);
@@ -483,9 +423,7 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = neighboursOnlyBySource();
 			DuplicateService.stubMatches = new List<DuplicateService.Pair>();
-			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-				new Set<String>{ 'Contact' }
-			);
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' });
 			Integer written = DuplicateScanBatch.scanChunk(people, rules);
 			if (!ruleActiveFor('Contact')) {
 				// Skipped: the platform requires an active rule behind every suggestion.
@@ -575,9 +513,7 @@ private class DuplicateScanBatchTest {
 			};
 
 			Test.startTest();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ people[0].Id, people[1].Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ people[0].Id, people[1].Id });
 			Test.stopTest();
 
 			Set<String> reasons = new Set<String>();

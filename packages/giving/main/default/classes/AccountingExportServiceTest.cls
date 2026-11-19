@@ -20,20 +20,12 @@ private class AccountingExportServiceTest {
 				Is_Default__c = true,
 				Accounting_Code__c = '4000'
 			);
-			Fund__c building = new Fund__c(
-				Name = 'Building Fund',
-				Active__c = true,
-				Accounting_Code__c = '4100'
-			);
+			Fund__c building = new Fund__c(Name = 'Building Fund', Active__c = true, Accounting_Code__c = '4100');
 			insert new List<Fund__c>{ general, building };
-			Contact ana = TestDataFactory.person(
-				new Contact(FirstName = 'Ana', LastName = 'Garcia')
-			);
+			Contact ana = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Garcia'));
 			Contact formula = TestDataFactory.person(new Contact(LastName = '=SUM(A1)'));
 			insert new List<Contact>{ ana, formula };
-			Account riverside = TestDataFactory.organization(
-				new Account(Name = 'Riverside Foundation')
-			);
+			Account riverside = TestDataFactory.organization(new Account(Name = 'Riverside Foundation'));
 			insert riverside;
 
 			Gift__c check = gift(ana.Id, null, 100, 'Check', Date.newInstance(2026, 8, 5));
@@ -49,15 +41,7 @@ private class AccountingExportServiceTest {
 			// A Pending gift that will never be paid (R-G16): not money, so in no file.
 			Gift__c cancelled = gift(ana.Id, null, 65, 'Check', Date.newInstance(2026, 8, 14));
 			cancelled.Status__c = 'Cancelled';
-			insert new List<Gift__c>{
-				check,
-				split,
-				unallocated,
-				pending,
-				goods,
-				september,
-				cancelled
-			};
+			insert new List<Gift__c>{ check, split, unallocated, pending, goods, september, cancelled };
 			Gift__c refund = gift(null, riverside.Id, -40, 'Card', Date.newInstance(2026, 8, 25));
 			refund.Original_Gift__c = split.Id;
 			insert refund;
@@ -110,10 +94,7 @@ private class AccountingExportServiceTest {
 			Assert.areEqual(5, file.rowCount, file.csv);
 			Assert.areEqual(4, file.giftCount, 'The split gift is two rows and one gift.');
 			Assert.areEqual(410, file.total, 'The net: 100 + 300 + 50 - 40.');
-			Assert.isFalse(
-				file.csv.contains(',65.00'),
-				'The Cancelled gift is not money: ' + file.csv
-			);
+			Assert.isFalse(file.csv.contains(',65.00'), 'The Cancelled gift is not money: ' + file.csv);
 			List<String> rows = lines(file);
 			Assert.areEqual(
 				'Date,Gift Number,Original Gift,Donor,Fund,Accounting Code,Payment Method,Reference,Amount',
@@ -124,28 +105,15 @@ private class AccountingExportServiceTest {
 				rows[1].endsWith(',Ana Garcia,General Fund,4000,Check,"1042, ""first""",100.00'),
 				'A reference with a comma and quotes is quoted: ' + rows[1]
 			);
-			Assert.isTrue(
-				rows[2].contains(',Riverside Foundation,Building Fund,4100,Card,,200.00'),
-				rows[2]
-			);
-			Assert.isTrue(
-				rows[3].contains(',Riverside Foundation,General Fund,4000,Card,,100.00'),
-				rows[3]
-			);
+			Assert.isTrue(rows[2].contains(',Riverside Foundation,Building Fund,4100,Card,,200.00'), rows[2]);
+			Assert.isTrue(rows[3].contains(',Riverside Foundation,General Fund,4000,Card,,100.00'), rows[3]);
 			Gift__c split = [SELECT Name FROM Gift__c WHERE Amount__c = 300];
 			Assert.isTrue(rows[4].startsWith('2026-08-25,G-'), rows[4]);
-			Assert.isTrue(
-				rows[4].contains(',' + split.Name + ',Riverside Foundation,General Fund,'),
-				rows[4]
-			);
-			Assert.isTrue(
-				rows[4].endsWith(',-40.00'),
-				'A refund is its own negative row: ' + rows[4]
-			);
+			Assert.isTrue(rows[4].contains(',' + split.Name + ',Riverside Foundation,General Fund,'), rows[4]);
+			Assert.isTrue(rows[4].endsWith(',-40.00'), 'A refund is its own negative row: ' + rows[4]);
 			Assert.isTrue(
 				rows[5].endsWith(',\'=SUM(A1),,,Card,,50.00'),
-				'A gift with no allocation is still in the file, and a formula is defused: ' +
-				rows[5]
+				'A gift with no allocation is still in the file, and a formula is defused: ' + rows[5]
 			);
 		}
 	}
@@ -195,10 +163,7 @@ private class AccountingExportServiceTest {
 				false
 			);
 
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorTooManyRows'),
-				refusal
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorTooManyRows'), refusal);
 			Assert.areEqual(5, atTheLimit.rowCount, 'Exactly the limit is still a file.');
 		}
 	}
@@ -224,14 +189,18 @@ private class AccountingExportServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Id notAFund = [SELECT Id FROM Contact LIMIT 1].Id;
 			Map<String, List<Object>> cases = new Map<String, List<Object>>{
-				BarnHelp.text(
-					'Giving',
-					'Mirror_AccountingExport_ErrorDatesRequired'
-				) => new List<Object>{ null, AUGUST_LAST, null, null },
-				BarnHelp.text(
-					'Giving',
-					'Mirror_AccountingExport_ErrorDateOrder'
-				) => new List<Object>{ AUGUST_LAST, AUGUST_FIRST, null, null },
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDatesRequired') => new List<Object>{
+					null,
+					AUGUST_LAST,
+					null,
+					null
+				},
+				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDateOrder') => new List<Object>{
+					AUGUST_LAST,
+					AUGUST_FIRST,
+					null,
+					null
+				},
 				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFund') => new List<Object>{
 					AUGUST_FIRST,
 					AUGUST_LAST,
@@ -266,10 +235,7 @@ private class AccountingExportServiceTest {
 	@IsTest
 	static void theFileHoldsOnlyTheGiftsThePersonCanSee() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			User jen = TestDataFactory.createUser(
-				'Jen',
-				new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-			);
+			User jen = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' });
 			AccountingExportService.ExportFile file;
 			System.runAs(jen) {
 				file = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false);
@@ -297,25 +263,12 @@ private class AccountingExportServiceTest {
 			String exportRefusal;
 			String markRefusal;
 			try {
-				AccountingExportController.exportGifts(
-					AUGUST_FIRST,
-					AUGUST_LAST,
-					null,
-					null,
-					false
-				);
+				AccountingExportController.exportGifts(AUGUST_FIRST, AUGUST_LAST, null, null, false);
 			} catch (AuraHandledException refused) {
 				exportRefusal = refused.getMessage();
 			}
 			try {
-				AccountingExportController.markPosted(
-					AUGUST_FIRST,
-					AUGUST_LAST,
-					null,
-					null,
-					false,
-					'a digest'
-				);
+				AccountingExportController.markPosted(AUGUST_FIRST, AUGUST_LAST, null, null, false, 'a digest');
 			} catch (AuraHandledException refused) {
 				markRefusal = refused.getMessage();
 			}
@@ -325,10 +278,7 @@ private class AccountingExportServiceTest {
 				exportRefusal,
 				'Giving Admin can see every gift but does not hold Export Accounting.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission'),
-				markRefusal
-			);
+			Assert.areEqual(BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission'), markRefusal);
 		}
 	}
 
@@ -380,10 +330,7 @@ private class AccountingExportServiceTest {
 		Assert.areEqual(410, view.total);
 		Assert.areEqual(64, view.digest.length(), 'A SHA-256 in hex');
 		Assert.areEqual(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDateOrder'), refusal);
-		Assert.areEqual(
-			BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'),
-			markRefusal
-		);
+		Assert.areEqual(BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'), markRefusal);
 	}
 
 	// ------------------------------------------------------------------------------------
@@ -412,9 +359,7 @@ private class AccountingExportServiceTest {
 	@IsTest
 	static void accountingExportAloneBuildsTheFile() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			User jen = owningAugust(
-				TestDataFactory.createUser('Jen', new List<String>{ 'Accounting_Export' })
-			);
+			User jen = owningAugust(TestDataFactory.createUser('Jen', new List<String>{ 'Accounting_Export' }));
 			System.runAs(jen) {
 				AccountingExportService.ExportFile file = AccountingExportService.build(
 					AUGUST_FIRST,
@@ -454,22 +399,16 @@ private class AccountingExportServiceTest {
 				Assert.areEqual(4, marked, 'The four gifts in the file');
 				Assert.areEqual(
 					0,
-					AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, true)
-						.rowCount,
+					AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, true).rowCount,
 					'Every gift in August is posted'
 				);
 				Assert.areEqual(
 					5,
-					AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false)
-						.rowCount,
+					AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false).rowCount,
 					'The full file still holds them'
 				);
 			}
-			Assert.areEqual(
-				4,
-				[SELECT COUNT() FROM Gift__c WHERE Accounting_Posted_By__c = :jen.Id],
-				'Marked by Jen'
-			);
+			Assert.areEqual(4, [SELECT COUNT() FROM Gift__c WHERE Accounting_Posted_By__c = :jen.Id], 'Marked by Jen');
 			Assert.areEqual(
 				0,
 				[
@@ -489,14 +428,7 @@ private class AccountingExportServiceTest {
 			AccountingExportService.ExportFile file;
 			System.runAs(jen) {
 				file = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, true);
-				AccountingExportService.markPosted(
-					AUGUST_FIRST,
-					AUGUST_LAST,
-					null,
-					null,
-					true,
-					file.digest
-				);
+				AccountingExportService.markPosted(AUGUST_FIRST, AUGUST_LAST, null, null, true, file.digest);
 			}
 			Contact ana = [SELECT Id FROM Contact WHERE LastName = 'Garcia' LIMIT 1];
 			Gift__c late = gift(ana.Id, null, 60, 'Check', Date.newInstance(2026, 8, 28));
@@ -514,14 +446,7 @@ private class AccountingExportServiceTest {
 				Assert.areEqual(1, next.giftCount, 'Only the late gift');
 				Assert.areEqual(60, next.total);
 				try {
-					AccountingExportService.markPosted(
-						AUGUST_FIRST,
-						AUGUST_LAST,
-						null,
-						null,
-						false,
-						file.digest
-					);
+					AccountingExportService.markPosted(AUGUST_FIRST, AUGUST_LAST, null, null, false, file.digest);
 					Assert.fail('The full file no longer matches the first download');
 				} catch (AccountingExportService.ExportException refused) {
 					Assert.areEqual(
@@ -531,8 +456,7 @@ private class AccountingExportServiceTest {
 				}
 			}
 			Assert.isNull(
-				[SELECT Accounting_Posted_At__c FROM Gift__c WHERE Id = :late.Id]
-				.Accounting_Posted_At__c,
+				[SELECT Accounting_Posted_At__c FROM Gift__c WHERE Id = :late.Id].Accounting_Posted_At__c,
 				'Nothing marked by a stale click'
 			);
 		}
@@ -543,14 +467,7 @@ private class AccountingExportServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Fund__c building = [SELECT Id FROM Fund__c WHERE Name = 'Building Fund'];
 			try {
-				AccountingExportService.markPosted(
-					AUGUST_FIRST,
-					AUGUST_LAST,
-					building.Id,
-					null,
-					false,
-					null
-				);
+				AccountingExportService.markPosted(AUGUST_FIRST, AUGUST_LAST, building.Id, null, false, null);
 				Assert.fail('A split gift would be locked with half of it exported');
 			} catch (AccountingExportService.ExportException refused) {
 				Assert.areEqual(
@@ -565,29 +482,12 @@ private class AccountingExportServiceTest {
 	static void markingNeedsPostGifts() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User reader = owningAugust(
-				TestDataFactory.createUser(
-					'Reader',
-					new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-				)
+				TestDataFactory.createUser('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' })
 			);
 			System.runAs(reader) {
-				String digest = AccountingExportService.build(
-						AUGUST_FIRST,
-						AUGUST_LAST,
-						null,
-						null,
-						false
-					)
-					.digest;
+				String digest = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false).digest;
 				try {
-					AccountingExportService.markPosted(
-						AUGUST_FIRST,
-						AUGUST_LAST,
-						null,
-						null,
-						false,
-						digest
-					);
+					AccountingExportService.markPosted(AUGUST_FIRST, AUGUST_LAST, null, null, false, digest);
 					Assert.fail('Refused without Post Gifts');
 				} catch (AccountingExportService.ExportException refused) {
 					// The wording is Giving's protected label, which Giving's tests assert; this
@@ -609,14 +509,7 @@ private class AccountingExportServiceTest {
 		String refusal;
 		System.runAs(jen) {
 			try {
-				AccountingExportService.markPosted(
-					AUGUST_FIRST,
-					AUGUST_LAST,
-					null,
-					null,
-					false,
-					digest
-				);
+				AccountingExportService.markPosted(AUGUST_FIRST, AUGUST_LAST, null, null, false, digest);
 			} catch (AccountingExportService.ExportException refused) {
 				refusal = refused.getMessage();
 			}
@@ -632,8 +525,7 @@ private class AccountingExportServiceTest {
 	private static String downloadedDigest(User jen) {
 		String digest;
 		System.runAs(jen) {
-			digest = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false)
-				.digest;
+			digest = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false).digest;
 		}
 		return digest;
 	}

@@ -38,9 +38,7 @@ private class SponsorDeliverableTemplateTest {
 			Test.startTest();
 			Integer none = SponsorDeliverableTemplate.parse(null).size();
 			Integer blank = SponsorDeliverableTemplate.parse('  \n ').size();
-			List<SponsorDeliverableTemplate.Item> capped = SponsorDeliverableTemplate.parse(
-				String.join(lines, '\n')
-			);
+			List<SponsorDeliverableTemplate.Item> capped = SponsorDeliverableTemplate.parse(String.join(lines, '\n'));
 			Test.stopTest();
 
 			Assert.areEqual(0, none, 'No text, no items');

@@ -51,10 +51,7 @@ private class EventRegistrationServiceTest {
 		return input;
 	}
 
-	private static EventRegistrationService.Request request(
-		Event__c event,
-		EventPersonMatcher.PersonInput registrant
-	) {
+	private static EventRegistrationService.Request request(Event__c event, EventPersonMatcher.PersonInput registrant) {
 		EventRegistrationService.Request request = new EventRegistrationService.Request();
 		request.eventId = event.Id;
 		request.registrant = registrant;
@@ -89,10 +86,7 @@ private class EventRegistrationServiceTest {
 		System.runAs(staff()) {
 			Event__c event = gala(null);
 			ticket(event, 'General', 0, null);
-			EventRegistrationService.Request request = request(
-				event,
-				person('Sam', 'Lee', 'sam@example.org')
-			);
+			EventRegistrationService.Request request = request(event, person('Sam', 'Lee', 'sam@example.org'));
 			EventRegistrationService.GuestInput guest = new EventRegistrationService.GuestInput();
 			guest.person = person('Max', 'Lee', null);
 			request.guests.add(guest);
@@ -149,8 +143,7 @@ private class EventRegistrationServiceTest {
 			Assert.isTrue(refused, 'The code has no use left');
 			Assert.areEqual(
 				general.Id,
-				[SELECT Ticket_Type__c FROM Event_Attendee__c WITH USER_MODE LIMIT 1]
-				.Ticket_Type__c,
+				[SELECT Ticket_Type__c FROM Event_Attendee__c WITH USER_MODE LIMIT 1].Ticket_Type__c,
 				'Ticket found by name'
 			);
 		}
@@ -204,15 +197,11 @@ private class EventRegistrationServiceTest {
 	static void neverRegistersAPersonTwiceAndMarksAttendance() {
 		System.runAs(staff()) {
 			Event__c event = gala(null);
-			Contact jane = TestDataFactory.person(
-				new Contact(FirstName = 'Jane', LastName = 'Doe')
-			);
+			Contact jane = TestDataFactory.person(new Contact(FirstName = 'Jane', LastName = 'Doe'));
 			insert as user jane;
 			EventPersonMatcher.PersonInput chosen = new EventPersonMatcher.PersonInput();
 			chosen.contactId = jane.Id;
-			EventRegistrationService.Result result = EventRegistrationService.register(
-				request(event, chosen)
-			);
+			EventRegistrationService.Result result = EventRegistrationService.register(request(event, chosen));
 
 			Test.startTest();
 			Boolean refused = false;
@@ -229,8 +218,7 @@ private class EventRegistrationServiceTest {
 			Assert.isTrue(refused, 'Already registered');
 			Assert.areEqual(
 				'Attended',
-				[SELECT Status__c FROM Event_Attendee__c WHERE Id = :attendee.Id WITH USER_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Event_Attendee__c WHERE Id = :attendee.Id WITH USER_MODE].Status__c,
 				'Marked attended'
 			);
 			Assert.isTrue(result.amountOwed == 0, 'No ticket, nothing owed');
@@ -243,9 +231,7 @@ private class EventRegistrationServiceTest {
 			Event__c event = gala(null);
 			ticket(event, 'General', 5, null);
 			ticket(event, 'Student', 2, null);
-			Contact jane = TestDataFactory.person(
-				new Contact(FirstName = 'Jane', LastName = 'Doe')
-			);
+			Contact jane = TestDataFactory.person(new Contact(FirstName = 'Jane', LastName = 'Doe'));
 			insert as user jane;
 			EventFormAttachment attachment = new EventFormAttachment();
 			FormSubmissionReceipt receipt = new FormSubmissionReceipt();
@@ -286,16 +272,10 @@ private class EventRegistrationServiceTest {
 			};
 
 			Test.startTest();
-			EventRegistrationService.Request firstOnSale = request(
-				event,
-				person('Jane', 'Doe', 'jane@example.org')
-			);
+			EventRegistrationService.Request firstOnSale = request(event, person('Jane', 'Doe', 'jane@example.org'));
 			firstOnSale.source = EventRegistrationService.SOURCE_FORM;
 			EventRegistrationService.Result byForm = EventRegistrationService.register(firstOnSale);
-			EventRegistrationService.Request notYet = request(
-				event,
-				person('Sam', 'Lee', 'sam@example.org')
-			);
+			EventRegistrationService.Request notYet = request(event, person('Sam', 'Lee', 'sam@example.org'));
 			notYet.source = EventRegistrationService.SOURCE_FORM;
 			notYet.ticketType = 'Later';
 			String refused;
@@ -304,23 +284,14 @@ private class EventRegistrationServiceTest {
 			} catch (EventRegistrationService.RegistrationException e) {
 				refused = e.getMessage();
 			}
-			EventRegistrationService.Request byStaff = request(
-				event,
-				person('Sam', 'Lee', 'sam@example.org')
-			);
+			EventRegistrationService.Request byStaff = request(event, person('Sam', 'Lee', 'sam@example.org'));
 			byStaff.ticketType = 'Early';
-			EventRegistrationService.Result staffResult = EventRegistrationService.register(
-				byStaff
-			);
+			EventRegistrationService.Result staffResult = EventRegistrationService.register(byStaff);
 			Test.stopTest();
 
 			Assert.isTrue(byForm.amountOwed == 25, 'A blank ticket is the first on sale: General');
 			Assert.areEqual(
-				BarnHelp.text(
-					'Events',
-					'Events_Register_TicketNotOnSale',
-					new List<Object>{ 'Later' }
-				),
+				BarnHelp.text('Events', 'Events_Register_TicketNotOnSale', new List<Object>{ 'Later' }),
 				refused,
 				'A ticket not on sale yet is refused to a form'
 			);
@@ -341,10 +312,7 @@ private class EventRegistrationServiceTest {
 			Test.startTest();
 			List<String> refusals = new List<String>();
 			for (Event__c event : new List<Event__c>{ notYet, closed }) {
-				EventRegistrationService.Request byForm = request(
-					event,
-					person('Jane', 'Doe', 'jane@example.org')
-				);
+				EventRegistrationService.Request byForm = request(event, person('Jane', 'Doe', 'jane@example.org'));
 				byForm.source = EventRegistrationService.SOURCE_FORM;
 				try {
 					EventRegistrationService.register(byForm);

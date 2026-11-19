@@ -23,11 +23,7 @@ private class ProjectsPostInstallTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(
 				ProjectsSettings.myDomain(),
-				SettingsService.getEffectiveValue(
-					ProjectsSettings.SETTINGS_OBJECT,
-					'Invoice_Return_Url__c',
-					'Text'
-				),
+				SettingsService.getEffectiveValue(ProjectsSettings.SETTINGS_OBJECT, 'Invoice_Return_Url__c', 'Text'),
 				'Never blank, on an org the install never ran in'
 			);
 		}
@@ -46,39 +42,19 @@ private class ProjectsPostInstallTest {
 			Test.testInstall(new ProjectsPostInstall(), null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				held(TestUsers.admin().Id, 'Projects_Admin'),
-				'BarnCRM Admin holds Projects Admin'
-			);
-			Assert.areEqual(
-				1,
-				held(member.Id, 'Projects_Staff'),
-				'Team Member holds Projects Staff'
-			);
+			Assert.areEqual(1, held(TestUsers.admin().Id, 'Projects_Admin'), 'BarnCRM Admin holds Projects Admin');
+			Assert.areEqual(1, held(member.Id, 'Projects_Staff'), 'Team Member holds Projects Staff');
 			Assert.isTrue(
-				ModuleExtensions.forModule(
-					NightlyStepProvider.class,
-					'Projects'
-				) instanceof ProjectsNightlyJobProvider,
+				ModuleExtensions.forModule(NightlyStepProvider.class, 'Projects') instanceof ProjectsNightlyJobProvider,
 				'The catalog registers the provider'
 			);
 			List<NightlyStep> steps = new ProjectsNightlyJobProvider().nightlySteps();
-			Assert.areEqual(
-				ProjectHealth.JOB_NAME,
-				steps[0].key,
-				'The health step joins the nightly run'
-			);
+			Assert.areEqual(ProjectHealth.JOB_NAME, steps[0].key, 'The health step joins the nightly run');
 			Assert.areEqual(400, steps[0].minute, 'At 6:40 AM');
 			SettingsService.clearCaches();
 			Assert.areEqual(
 				Url.getOrgDomainUrl().toExternalForm(),
-				String.valueOf(
-					SettingsService.getValue(
-						ProjectsSettings.SETTINGS_OBJECT,
-						'Invoice_Return_Url__c'
-					)
-				),
+				String.valueOf(SettingsService.getValue(ProjectsSettings.SETTINGS_OBJECT, 'Invoice_Return_Url__c')),
 				'The return page is filled with My Domain, never blank'
 			);
 		}

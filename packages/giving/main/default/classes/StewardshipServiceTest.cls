@@ -19,11 +19,7 @@ private class StewardshipServiceTest {
 		}
 	}
 
-	private static Stewardship_Plan_Template__c template(
-		String name,
-		String event,
-		Decimal minimum
-	) {
+	private static Stewardship_Plan_Template__c template(String name, String event, Decimal minimum) {
 		return new Stewardship_Plan_Template__c(
 			Name = name,
 			Plan_Key__c = name.toLowerCase().replace(' ', '_'),
@@ -45,9 +41,7 @@ private class StewardshipServiceTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = 'Ramirez')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ramirez'));
 		insert person;
 		return person;
 	}
@@ -55,16 +49,9 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void aFirstGiftStartsThePlanAndLaysOutItsTasks() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c welcome = template(
-				WELCOME,
-				StewardshipService.EVENT_FIRST_GIFT,
-				null
-			);
+			Stewardship_Plan_Template__c welcome = template(WELCOME, StewardshipService.EVENT_FIRST_GIFT, null);
 			insert welcome;
-			insert new List<Stewardship_Plan_Step__c>{
-				step(welcome.Id, 1, 0),
-				step(welcome.Id, 2, 7)
-			};
+			insert new List<Stewardship_Plan_Step__c>{ step(welcome.Id, 1, 0), step(welcome.Id, 2, 7) };
 			Contact person = donor();
 
 			Test.startTest();
@@ -76,11 +63,7 @@ private class StewardshipServiceTest {
 				FROM Stewardship_Plan__c
 			];
 			Assert.areEqual(1, started.size(), 'The first gift started one plan.');
-			Assert.areEqual(
-				StewardshipService.STATUS_RUNNING,
-				started[0].Status__c,
-				'A plan starts running.'
-			);
+			Assert.areEqual(StewardshipService.STATUS_RUNNING, started[0].Status__c, 'A plan starts running.');
 			Assert.areEqual(person.Id, started[0].Contact__c, 'It runs for the donor.');
 			Assert.isNull(started[0].Account__c, 'And only one side of the donor pair is set.');
 			Assert.isNotNull(started[0].Gift__c, 'It records the gift that started it.');
@@ -108,11 +91,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void aSecondGiftDoesNotStartTheFirstGiftPlanAgain() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c welcome = template(
-				WELCOME,
-				StewardshipService.EVENT_FIRST_GIFT,
-				null
-			);
+			Stewardship_Plan_Template__c welcome = template(WELCOME, StewardshipService.EVENT_FIRST_GIFT, null);
 			insert welcome;
 			insert step(welcome.Id, 1, 0);
 			Contact person = donor();
@@ -133,11 +112,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void aGiftUnderTheThresholdStartsNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c major = template(
-				MAJOR,
-				StewardshipService.EVENT_GIFT_RECEIVED,
-				1000
-			);
+			Stewardship_Plan_Template__c major = template(MAJOR, StewardshipService.EVENT_GIFT_RECEIVED, 1000);
 			insert major;
 			insert step(major.Id, 1, 1);
 			Contact person = donor();
@@ -157,11 +132,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void anInactiveTemplateStartsNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c welcome = template(
-				WELCOME,
-				StewardshipService.EVENT_GIFT_RECEIVED,
-				null
-			);
+			Stewardship_Plan_Template__c welcome = template(WELCOME, StewardshipService.EVENT_GIFT_RECEIVED, null);
 			welcome.Active__c = false;
 			insert welcome;
 			insert step(welcome.Id, 1, 0);
@@ -182,11 +153,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void theSamePlanWillNotRunTwiceOnOneDonor() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c major = template(
-				MAJOR,
-				StewardshipService.EVENT_GIFT_RECEIVED,
-				null
-			);
+			Stewardship_Plan_Template__c major = template(MAJOR, StewardshipService.EVENT_GIFT_RECEIVED, null);
 			insert major;
 			insert step(major.Id, 1, 0);
 			Contact person = donor();
@@ -207,11 +174,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void startingByHandRefusesASecondRunAndSaysWhy() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c major = template(
-				MAJOR,
-				StewardshipService.EVENT_MANUAL,
-				null
-			);
+			Stewardship_Plan_Template__c major = template(MAJOR, StewardshipService.EVENT_MANUAL, null);
 			insert major;
 			insert step(major.Id, 1, 0);
 			Contact person = donor();
@@ -237,11 +200,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void startingByHandNeedsExactlyOneDonor() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c major = template(
-				MAJOR,
-				StewardshipService.EVENT_MANUAL,
-				null
-			);
+			Stewardship_Plan_Template__c major = template(MAJOR, StewardshipService.EVENT_MANUAL, null);
 			insert major;
 
 			Test.startTest();
@@ -264,11 +223,7 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void cancellingAPlanLeavesItsTasksAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c major = template(
-				MAJOR,
-				StewardshipService.EVENT_MANUAL,
-				null
-			);
+			Stewardship_Plan_Template__c major = template(MAJOR, StewardshipService.EVENT_MANUAL, null);
 			insert major;
 			insert step(major.Id, 1, 0);
 			Contact person = donor();
@@ -277,10 +232,7 @@ private class StewardshipServiceTest {
 
 			Test.startTest();
 			// Cancelled the way a person does it: Status changed on the plan record.
-			update new Stewardship_Plan__c(
-				Id = running.Id,
-				Status__c = StewardshipService.STATUS_CANCELLED
-			);
+			update new Stewardship_Plan__c(Id = running.Id, Status__c = StewardshipService.STATUS_CANCELLED);
 			Test.stopTest();
 
 			Stewardship_Plan__c after = [
@@ -288,11 +240,7 @@ private class StewardshipServiceTest {
 				FROM Stewardship_Plan__c
 				WHERE Id = :running.Id
 			];
-			Assert.areEqual(
-				StewardshipService.STATUS_CANCELLED,
-				after.Status__c,
-				'The plan says it was abandoned.'
-			);
+			Assert.areEqual(StewardshipService.STATUS_CANCELLED, after.Status__c, 'The plan says it was abandoned.');
 			Assert.isNotNull(after.Completed_Date__c, 'And when.');
 			Assert.areEqual(
 				tasksBefore,
@@ -305,21 +253,13 @@ private class StewardshipServiceTest {
 	@IsTest
 	static void twoHundredGiftsStayInsideTheLimits() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c major = template(
-				MAJOR,
-				StewardshipService.EVENT_GIFT_RECEIVED,
-				null
-			);
+			Stewardship_Plan_Template__c major = template(MAJOR, StewardshipService.EVENT_GIFT_RECEIVED, null);
 			insert major;
 			insert step(major.Id, 1, 0);
 
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Donor', LastName = 'Number' + i)
-					)
-				);
+				people.add(TestDataFactory.person(new Contact(FirstName = 'Donor', LastName = 'Number' + i)));
 			}
 			insert people;
 			List<Gift__c> gifts = new List<Gift__c>();
@@ -333,15 +273,10 @@ private class StewardshipServiceTest {
 			Integer queriesUsed = Limits.getQueries() - queriesBefore;
 			Test.stopTest();
 
-			Assert.areEqual(
-				200,
-				[SELECT COUNT() FROM Stewardship_Plan__c],
-				'Every donor got their plan.'
-			);
+			Assert.areEqual(200, [SELECT COUNT() FROM Stewardship_Plan__c], 'Every donor got their plan.');
 			Assert.isTrue(
 				queriesUsed < 40,
-				'Two hundred gifts cost a handful of queries, not one per gift. Used: ' +
-				queriesUsed
+				'Two hundred gifts cost a handful of queries, not one per gift. Used: ' + queriesUsed
 			);
 		}
 	}

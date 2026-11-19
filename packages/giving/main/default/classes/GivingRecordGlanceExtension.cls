@@ -61,11 +61,7 @@ public with sharing class GivingRecordGlanceExtension implements RecordGlanceExt
 		Map<String, Schema.SObjectField> fields = objectType.getDescribe().fields.getMap();
 		Decimal totalGiving = (Decimal) donor.get('Total_Giving__c');
 		SObject levelRecord = donor.getSObject('Donor_Level__r');
-		RecordGlance.Card card = new RecordGlance.Card(
-				'giving',
-				Label.Giving_Glance_Title,
-				'custom:custom41'
-			)
+		RecordGlance.Card card = new RecordGlance.Card('giving', Label.Giving_Glance_Title, 'custom:custom41')
 			.addCurrency(
 				NamespaceUtil.field(fields, 'Total_Giving__c').getDescribe().getLabel(),
 				totalGiving == null ? 0 : totalGiving
@@ -92,9 +88,7 @@ public with sharing class GivingRecordGlanceExtension implements RecordGlanceExt
 	private static Map<String, Object> enterGiftReference(Id donorId) {
 		return new Map<String, Object>{
 			'type' => 'standard__navItemPage',
-			'attributes' => new Map<String, Object>{
-				'apiName' => NamespaceUtil.prefix() + QUICK_GIFT_ENTRY
-			},
+			'attributes' => new Map<String, Object>{ 'apiName' => NamespaceUtil.prefix() + QUICK_GIFT_ENTRY },
 			'state' => new Map<String, Object>{ NamespaceUtil.stateKey('donorId') => donorId }
 		};
 	}
@@ -105,11 +99,7 @@ public with sharing class GivingRecordGlanceExtension implements RecordGlanceExt
 	 */
 	@TestVisible
 	private static String enterGiftLabel(Schema.SObjectType objectType) {
-		String actionName =
-			objectType.getDescribe().getName() +
-			'.' +
-			NamespaceUtil.prefix() +
-			ENTER_GIFT_ACTION;
+		String actionName = objectType.getDescribe().getName() + '.' + NamespaceUtil.prefix() + ENTER_GIFT_ACTION;
 		try {
 			List<QuickAction.DescribeQuickActionResult> described = QuickAction.describeQuickActions(
 				new List<String>{ actionName }

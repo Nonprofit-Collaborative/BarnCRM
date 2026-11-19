@@ -20,8 +20,7 @@ private class FiscalYearSelectorTest {
 			Test.stopTest();
 
 			System.assertEquals(
-				[SELECT FiscalYearStartMonth FROM Organization WITH SYSTEM_MODE LIMIT 1]
-				.FiscalYearStartMonth,
+				[SELECT FiscalYearStartMonth FROM Organization WITH SYSTEM_MODE LIMIT 1].FiscalYearStartMonth,
 				month,
 				'The month is the one Setup holds, with nothing in BarnCRM in between.'
 			);
@@ -62,8 +61,7 @@ private class FiscalYearSelectorTest {
 
 			FiscalYearSelector.setTestStartMonth(null);
 			System.assert(
-				FiscalYearSelector.fiscalYearStartMonth() >= 1 &&
-					FiscalYearSelector.fiscalYearStartMonth() <= 12,
+				FiscalYearSelector.fiscalYearStartMonth() >= 1 && FiscalYearSelector.fiscalYearStartMonth() <= 12,
 				'Null goes back to reading the org.'
 			);
 		}

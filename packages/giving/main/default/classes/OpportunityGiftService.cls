@@ -26,8 +26,7 @@ public with sharing class OpportunityGiftService {
 		List<String> fields = new List<String>{ 'Id', 'Name', 'Amount', 'CloseDate', 'AccountId' };
 		Schema.SObjectType opportunity = OpportunityMirrorService.opportunityType();
 		if (
-			opportunity != null &&
-			opportunity.getDescribe().fields.getMap().containsKey(CAMPAIGN_FIELD.toLowerCase())
+			opportunity != null && opportunity.getDescribe().fields.getMap().containsKey(CAMPAIGN_FIELD.toLowerCase())
 		) {
 			fields.add(CAMPAIGN_FIELD);
 		}
@@ -44,8 +43,7 @@ public with sharing class OpportunityGiftService {
 		if (start == null) {
 			return null;
 		}
-		String zone = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1]
-		.TimeZoneSidKey;
+		String zone = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1].TimeZoneSidKey;
 		return Date.valueOf(start.format('yyyy-MM-dd', zone));
 	}
 
@@ -108,9 +106,7 @@ public with sharing class OpportunityGiftService {
 	}
 
 	private static Map<String, Schema.RecordTypeInfo> recordTypesByName() {
-		return OpportunityMirrorService.opportunityType()
-			.getDescribe()
-			.getRecordTypeInfosByDeveloperName();
+		return OpportunityMirrorService.opportunityType().getDescribe().getRecordTypeInfosByDeveloperName();
 	}
 
 	/**
@@ -215,11 +211,7 @@ public with sharing class OpportunityGiftService {
 				continue;
 			}
 			result.failed++;
-			result.refusals.add(
-				String.join(messages, ' '),
-				(String) madeFrom[i].get('Name'),
-				madeFrom[i].Id
-			);
+			result.refusals.add(String.join(messages, ' '), (String) madeFrom[i].get('Name'), madeFrom[i].Id);
 		}
 		return result;
 	}

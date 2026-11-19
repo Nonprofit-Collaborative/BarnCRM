@@ -3,9 +3,7 @@
  * tab lists them in order with the event's capacity, and a code is used once per event, whatever
  * its case (EV-03, R-TT1 to R-TT4, R-PC1 to R-PC4).
  */
-@IsTest(
-	testFor='ApexClass:EventTicketsController, ApexClass:EventKeyHandler, ApexTrigger:PromoCodeTrigger'
-)
+@IsTest(testFor='ApexClass:EventTicketsController, ApexClass:EventKeyHandler, ApexTrigger:PromoCodeTrigger')
 private class EventTicketsControllerTest {
 	@TestSetup
 	static void createTestUser() {
@@ -67,11 +65,7 @@ private class EventTicketsControllerTest {
 			Assert.areEqual('early', result.codes[0].code, 'Spaces trimmed');
 			Assert.areEqual(general.Id, result.codes[0].ticketTypeId, 'Limited to General');
 			Assert.isTrue(result.canAddTicket && result.canAddCode, 'Staff may add');
-			Assert.areEqual(
-				'Price',
-				result.fieldLabels.get('Ticket_Type__c.Price__c'),
-				'Column labels'
-			);
+			Assert.areEqual('Price', result.fieldLabels.get('Ticket_Type__c.Price__c'), 'Column labels');
 		}
 	}
 
@@ -131,11 +125,7 @@ private class EventTicketsControllerTest {
 			};
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				codes,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> results = Database.insert(codes, false, AccessLevel.USER_MODE);
 			Test.stopTest();
 
 			Assert.isTrue(results[0].isSuccess(), 'The first VIP is saved');
@@ -205,11 +195,7 @@ private class EventTicketsControllerTest {
 	static void validationRulesGuardPricesAndDiscounts() {
 		System.runAs(staff()) {
 			Event__c event = gala();
-			Ticket_Type__c negative = new Ticket_Type__c(
-				Event__c = event.Id,
-				Name = 'Odd',
-				Price__c = -1
-			);
+			Ticket_Type__c negative = new Ticket_Type__c(Event__c = event.Id, Name = 'Odd', Price__c = -1);
 			Promo_Code__c tooMuch = new Promo_Code__c(
 				Event__c = event.Id,
 				Name = 'ALL',

@@ -83,14 +83,10 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 		List<Map<String, Object>> journal = new List<Map<String, Object>>();
 		try {
 			BulkDeleteService.Plan checked = BulkDeleteService.planFromDefinition(definition);
-			Set<Id> ids = checked.fromFile
-				? resultingRecords(records)
-				: new Map<Id, SObject>(records).keySet();
+			Set<Id> ids = checked.fromFile ? resultingRecords(records) : new Map<Id, SObject>(records).keySet();
 			List<SObject> current = checked.fromFile
 				? BulkDeleteService.readAgain(checked, ids)
-				: QueryCompiler.run(
-						QueryCompiler.compileSelection(checked.queryJson, checked.readFields(), ids)
-				  );
+				: QueryCompiler.run(QueryCompiler.compileSelection(checked.queryJson, checked.readFields(), ids));
 			current = checked.inFile(current);
 			noLongerMatching += ids.size() - current.size();
 			remove(checked, current, journal);
@@ -117,40 +113,21 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 	}
 
 	/** Deletes one chunk as the person and journals each record. */
-	private void remove(
-		BulkDeleteService.Plan checked,
-		List<SObject> records,
-		List<Map<String, Object>> journal
-	) {
+	private void remove(BulkDeleteService.Plan checked, List<SObject> records, List<Map<String, Object>> journal) {
 		if (records.isEmpty()) {
 			return;
 		}
-		List<Database.DeleteResult> results = Database.delete(
-			records,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.DeleteResult> results = Database.delete(records, false, AccessLevel.USER_MODE);
 		List<Id> deleted = new List<Id>();
 		for (Integer i = 0; i < results.size(); i++) {
 			SObject record = records[i];
 			if (results[i].isSuccess()) {
 				deletedRecords++;
 				deleted.add(record.Id);
-				journal.add(
-					ImportJournalService.deleted(
-						checked.objectName,
-						record.Id,
-						checked.nameOf(record)
-					)
-				);
+				journal.add(ImportJournalService.deleted(checked.objectName, record.Id, checked.nameOf(record)));
 			} else {
 				failedRecords++;
-				BulkJobSupport.journalFailure(
-					journal,
-					checked.objectName,
-					record.Id,
-					results[i].getErrors()
-				);
+				BulkJobSupport.journalFailure(journal, checked.objectName, record.Id, results[i].getErrors());
 			}
 		}
 		if (checked.emptyRecycleBin && !deleted.isEmpty()) {
@@ -188,29 +165,20 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 					  ),
 				String.format(
 					BarnHelp.text('Core', 'Core_BulkDelete_LogFinished'),
-					new List<Object>{
-						deletedRecords.format(),
-						noLongerMatching.format(),
-						failedRecords.format()
-					}
+					new List<Object>{ deletedRecords.format(), noLongerMatching.format(), failedRecords.format() }
 				) +
 				(emptying
 					? '\n' +
 					  String.format(
 							BarnHelp.text('Core', 'Core_Archive_LogEmptied'),
-							new List<Object>{
-								emptiedRecords.format(),
-								(deletedRecords - emptiedRecords).format()
-							}
+							new List<Object>{ emptiedRecords.format(), (deletedRecords - emptiedRecords).format() }
 					  )
 					: ''),
 				platformStopped,
 				deletedRecords + noLongerMatching + failedRecords,
 				journalIncomplete
 			);
-			job.Status__c = failed
-				? ImportBatchService.STATUS_FAILED
-				: ImportBatchService.STATUS_COMPLETE;
+			job.Status__c = failed ? ImportBatchService.STATUS_FAILED : ImportBatchService.STATUS_COMPLETE;
 			job.Completed_At__c = Datetime.now();
 			job.Rows_Deleted__c = deletedRecords;
 			job.Rows_Rejected__c = failedRecords;
@@ -221,11 +189,7 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 				failed,
 				String.format(
 					System.Label.Core_JobNotice_BulkDeleteBody,
-					new List<Object>{
-						deletedRecords.format(),
-						noLongerMatching.format(),
-						failedRecords.format()
-					}
+					new List<Object>{ deletedRecords.format(), noLongerMatching.format(), failedRecords.format() }
 				),
 				jobId
 			);

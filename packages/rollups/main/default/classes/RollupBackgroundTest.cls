@@ -35,9 +35,7 @@ private class RollupBackgroundTest {
 		List<Account> created = new List<Account>();
 		for (Integer i = 0; i < count; i++) {
 			created.add(
-				TestDataFactory.organization(
-					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType)
-				)
+				TestDataFactory.organization(new Account(Name = 'Organization ' + i, RecordTypeId = organizationType))
 			);
 		}
 		insert created;
@@ -51,10 +49,7 @@ private class RollupBackgroundTest {
 			FROM Account
 			WHERE Id IN :new Map<Id, Account>(organizations).keySet()
 		]) {
-			counts.put(
-				organization.Id,
-				organization.NumberOfEmployees == null ? 0 : organization.NumberOfEmployees
-			);
+			counts.put(organization.Id, organization.NumberOfEmployees == null ? 0 : organization.NumberOfEmployees);
 		}
 		return counts;
 	}
@@ -105,11 +100,8 @@ private class RollupBackgroundTest {
 			Account organization = organizations(1)[0];
 
 			Test.startTest();
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Ames', AccountId = organization.Id)
-			);
-			Integer countInTheSave = countsOn(new List<Account>{ organization })
-				.get(organization.Id);
+			insert TestDataFactory.person(new Contact(LastName = 'Ames', AccountId = organization.Id));
+			Integer countInTheSave = countsOn(new List<Account>{ organization }).get(organization.Id);
 			Integer queuedInTheSave = pending();
 			Test.stopTest();
 
@@ -140,22 +132,14 @@ private class RollupBackgroundTest {
 			for (Integer i = 0; i < 200; i++) {
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							LastName = 'Person ' + i,
-							AccountId = employers[Math.mod(i, EMPLOYER_COUNT)].Id
-						)
+						new Contact(LastName = 'Person ' + i, AccountId = employers[Math.mod(i, EMPLOYER_COUNT)].Id)
 					)
 				);
 			}
 			insert people;
 			List<Contact> moving = new List<Contact>();
 			for (Integer i = 0; i < 50; i++) {
-				moving.add(
-					new Contact(
-						Id = people[i].Id,
-						AccountId = employers[Math.mod(i + 1, EMPLOYER_COUNT)].Id
-					)
-				);
+				moving.add(new Contact(Id = people[i].Id, AccountId = employers[Math.mod(i + 1, EMPLOYER_COUNT)].Id));
 			}
 			update moving;
 			List<Contact> leaving = new List<Contact>();
@@ -196,10 +180,7 @@ private class RollupBackgroundTest {
 			byHousehold.Definition_Key__c = 'Test_Background_Household';
 			byHousehold.Relationship_Path__c = '{Household}';
 			byHousehold.Target_Field__c = 'AnnualRevenue';
-			List<Rollup_Definition__c> both = new List<Rollup_Definition__c>{
-				staffCount(),
-				byHousehold
-			};
+			List<Rollup_Definition__c> both = new List<Rollup_Definition__c>{ staffCount(), byHousehold };
 			insert both;
 			Map<String, List<Rollup_Definition__c>> marked = new Map<String, List<Rollup_Definition__c>>{
 				'Account' => both

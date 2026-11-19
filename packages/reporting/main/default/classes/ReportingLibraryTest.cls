@@ -28,19 +28,14 @@ private class ReportingLibraryTest {
 	}
 
 	private static Id saveAsOwner() {
-		return (Id) ReportingLibrary.save(ReportingLibrary.REPORT, null, 'Orgs', DEFINITION)
-			.get('id');
+		return (Id) ReportingLibrary.save(ReportingLibrary.REPORT, null, 'Orgs', DEFINITION).get('id');
 	}
 
 	private static String sharing(String key, Id entryId, String access) {
 		return JSON.serialize(
 			new Map<String, Object>{
 				key => new List<Object>{
-					new Map<String, Object>{
-						'id' => entryId,
-						'name' => 'Someone',
-						'access' => access
-					}
+					new Map<String, Object>{ 'id' => entryId, 'name' => 'Someone', 'access' => access }
 				}
 			}
 		);
@@ -67,8 +62,7 @@ private class ReportingLibraryTest {
 			);
 			Assert.areEqual('Organizations', saved.get('title'), 'Renamed by the new version');
 			Assert.isTrue(
-				String.valueOf(ReportingLibrary.load(documentId).get('definition'))
-					.contains('Organizations'),
+				String.valueOf(ReportingLibrary.load(documentId).get('definition')).contains('Organizations'),
 				'The latest version is loaded'
 			);
 			Assert.areEqual(1, ReportingLibrary.listSaved().size(), 'Still one report');
@@ -138,10 +132,7 @@ private class ReportingLibraryTest {
 		}
 		System.runAs(viewer) {
 			Assert.areEqual(1, ReportingLibrary.listSaved().size(), 'Still shared after a save');
-			Assert.isNull(
-				ReportingLibrary.load(documentId).get('sharing'),
-				'Shown to its owner only'
-			);
+			Assert.isNull(ReportingLibrary.load(documentId).get('sharing'), 'Shown to its owner only');
 		}
 		System.runAs(ownerUser()) {
 			ReportingLibrary.share(documentId, '{}');
@@ -192,8 +183,7 @@ private class ReportingLibraryTest {
 				VersionData = Blob.valueOf(DEFINITION)
 			);
 			insert own;
-			Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :own.Id]
-			.ContentDocumentId;
+			Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :own.Id].ContentDocumentId;
 			Integer refused = 0;
 			try {
 				ReportingLibrary.share(documentId, '{}');
@@ -206,11 +196,7 @@ private class ReportingLibraryTest {
 				refused++;
 			}
 			Assert.areEqual(2, refused, 'Read Only can neither share nor delete');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM ContentDocument WHERE Id = :documentId],
-				'Still there'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM ContentDocument WHERE Id = :documentId], 'Still there');
 		}
 	}
 

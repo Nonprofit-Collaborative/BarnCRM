@@ -221,10 +221,7 @@ public with sharing class MigrationKitService {
 		for (Migration_Kit__mdt kit : catalog()) {
 			if (kit.DeveloperName == kitKey) {
 				if (!IntegrationAppService.detectedKeys().contains(kit.Source_App__c)) {
-					throw refusal(
-						BarnHelp.text('Core', 'Core_Migration_ErrorNotDetected'),
-						kit.MasterLabel
-					);
+					throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorNotDetected'), kit.MasterLabel);
 				}
 				return kit;
 			}
@@ -242,10 +239,7 @@ public with sharing class MigrationKitService {
 				List<Step>.class
 			);
 		} catch (JSONException unreadable) {
-			throw refusal(
-				BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'),
-				unreadable.getMessage()
-			);
+			throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'), unreadable.getMessage());
 		}
 		Set<String> keys = new Set<String>();
 		for (Step step : parsed) {
@@ -256,15 +250,9 @@ public with sharing class MigrationKitService {
 				known = known && keys.contains(link?.step);
 			}
 			if (!known || String.isBlank(step.key) || !keys.add(step.key)) {
-				throw refusal(
-					BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'),
-					step == null ? '' : step.key
-				);
+				throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'), step == null ? '' : step.key);
 			}
-			if (
-				step.kind == KIND_IMPORT &&
-				(String.isBlank(step.source) || String.isBlank(step.templateKey))
-			) {
+			if (step.kind == KIND_IMPORT && (String.isBlank(step.source) || String.isBlank(step.templateKey))) {
 				throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'), step.key);
 			}
 		}
@@ -274,17 +262,9 @@ public with sharing class MigrationKitService {
 	/** The steps JSON with each filter value written as text (true becomes "true"). */
 	private static String filterValuesAsText(String stepsJson) {
 		Object read = JSON.deserializeUntyped(stepsJson);
-		for (
-			Object step : read instanceof List<Object> ? (List<Object>) read : new List<Object>()
-		) {
-			Object filters = step instanceof Map<String, Object>
-				? ((Map<String, Object>) step).get('filters')
-				: null;
-			for (
-				Object condition : filters instanceof List<Object>
-					? (List<Object>) filters
-					: new List<Object>()
-			) {
+		for (Object step : read instanceof List<Object> ? (List<Object>) read : new List<Object>()) {
+			Object filters = step instanceof Map<String, Object> ? ((Map<String, Object>) step).get('filters') : null;
+			for (Object condition : filters instanceof List<Object> ? (List<Object>) filters : new List<Object>()) {
 				if (condition instanceof Map<String, Object>) {
 					Map<String, Object> written = (Map<String, Object>) condition;
 					Object value = written.get('value');
@@ -302,10 +282,7 @@ public with sharing class MigrationKitService {
 		try {
 			return (List<Item>) JSON.deserialize(kit.Retire_Checklist_JSON__c, List<Item>.class);
 		} catch (JSONException unreadable) {
-			throw refusal(
-				BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'),
-				unreadable.getMessage()
-			);
+			throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'), unreadable.getMessage());
 		}
 	}
 
@@ -317,11 +294,7 @@ public with sharing class MigrationKitService {
 		if (extensionOverride.containsKey(name)) {
 			return extensionOverride.get(name);
 		}
-		return (MigrationKitExtension) NamespaceUtil.build(
-			name,
-			MigrationKitExtension.class,
-			CONTEXT
-		);
+		return (MigrationKitExtension) NamespaceUtil.build(name, MigrationKitExtension.class, CONTEXT);
 	}
 
 	// ---------------------------------------------------------------------------------- view
@@ -378,12 +351,7 @@ public with sharing class MigrationKitService {
 		return view;
 	}
 
-	private static StepView stepView(
-		Step step,
-		Import_Batch__c batch,
-		State state,
-		Boolean priorDone
-	) {
+	private static StepView stepView(Step step, Import_Batch__c batch, State state, Boolean priorDone) {
 		StepView shown = new StepView();
 		shown.key = step.key;
 		shown.label = step.label;
@@ -397,13 +365,10 @@ public with sharing class MigrationKitService {
 			shown.canMarkDone = priorDone && !markedDone;
 		} else {
 			shown.batchId = batch == null ? null : batch.Id;
-			shown.status = batch == null
-				? (markedDone ? DONE : NOT_STARTED)
-				: importStatus(batch.Status__c);
+			shown.status = batch == null ? (markedDone ? DONE : NOT_STARTED) : importStatus(batch.Status__c);
 			Boolean restartable = batch == null
 				? !markedDone
-				: shown.status == UNDONE ||
-				  ImportBatchService.STATUS_FAILED.equals(batch.Status__c);
+				: shown.status == UNDONE || ImportBatchService.STATUS_FAILED.equals(batch.Status__c);
 			shown.canStart = priorDone && restartable;
 			shown.canLoad = priorDone && shown.status == REVIEW;
 		}
@@ -428,22 +393,14 @@ public with sharing class MigrationKitService {
 		if (batchStatus == ImportBatchService.STATUS_UNDONE) {
 			return UNDONE;
 		}
-		if (
-			batchStatus == ImportBatchService.STATUS_FAILED ||
-			batchStatus == ImportBatchService.STATUS_UNDO_FAILED
-		) {
+		if (batchStatus == ImportBatchService.STATUS_FAILED || batchStatus == ImportBatchService.STATUS_UNDO_FAILED) {
 			return FAILED;
 		}
 		return RUNNING;
 	}
 
 	/** The verification numbers of a step (R-MR3). */
-	private static void verify(
-		StepView shown,
-		Step step,
-		Import_Batch__c batch,
-		MigrationKitExtension extension
-	) {
+	private static void verify(StepView shown, Step step, Import_Batch__c batch, MigrationKitExtension extension) {
 		MigrationCheck check = extension == null ? null : extension.verify(step.key);
 		Boolean checkAgrees = check == null || (check.source != null && check.source == check.done);
 		if (check != null) {
@@ -467,13 +424,10 @@ public with sharing class MigrationKitService {
 		shown.staged = batch == null ? 0 : whole(batch.Row_Count__c);
 		shown.loaded = batch == null
 			? 0
-			: whole(batch.Rows_Created__c) +
-			  whole(batch.Rows_Updated__c) +
-			  whole(batch.Rows_Matched__c);
+			: whole(batch.Rows_Created__c) + whole(batch.Rows_Updated__c) + whole(batch.Rows_Matched__c);
 		shown.rejected = batch == null ? 0 : whole(batch.Rows_Rejected__c);
 		// A kit's own check replaces the row counts, which an extension may reshape (R-MR3).
-		Boolean countsAgree =
-			check != null || (shown.sourceCount == shown.staged && shown.staged == shown.loaded);
+		Boolean countsAgree = check != null || (shown.sourceCount == shown.staged && shown.staged == shown.loaded);
 		shown.verified = shown.status == DONE && checkAgrees && countsAgree && shown.rejected == 0;
 	}
 
@@ -519,11 +473,7 @@ public with sharing class MigrationKitService {
 			false
 		);
 		Database.update(
-			new Import_Batch__c(
-				Id = batch.Id,
-				Migration_Journal__c = run.Id,
-				Migration_Step__c = step.key
-			),
+			new Import_Batch__c(Id = batch.Id, Migration_Journal__c = run.Id, Migration_Step__c = step.key),
 			AccessLevel.USER_MODE
 		);
 		AsyncStarter.batch(
@@ -623,10 +573,7 @@ public with sharing class MigrationKitService {
 			for (Map<String, Object> row : rows) {
 				String value = cell(row, link.column);
 				if (String.isNotBlank(value)) {
-					valueByDigest.put(
-						ImportRowFilter.digestOfValues(new List<String>{ value }),
-						value
-					);
+					valueByDigest.put(ImportRowFilter.digestOfValues(new List<String>{ value }), value);
 				}
 			}
 			if (earlier == null || valueByDigest.isEmpty()) {
@@ -637,10 +584,7 @@ public with sharing class MigrationKitService {
 			for (Import_Row__c staged : [
 				SELECT Row_Key__c, Gift_Id__c
 				FROM Import_Row__c
-				WHERE
-					Import_Batch__c = :earlier.Id
-					AND Row_Key__c IN :valueByDigest.keySet()
-					AND Gift_Id__c != NULL
+				WHERE Import_Batch__c = :earlier.Id AND Row_Key__c IN :valueByDigest.keySet() AND Gift_Id__c != NULL
 				WITH SYSTEM_MODE
 			]) {
 				made.put(valueByDigest.get(staged.Row_Key__c), staged.Gift_Id__c);
@@ -683,10 +627,7 @@ public with sharing class MigrationKitService {
 			template = ImportTemplateSelector.selectByKeys(keys).get(templateKey);
 		}
 		if (template == null) {
-			throw refusal(
-				BarnHelp.text('Core', 'Core_Migration_ErrorTemplateMissing'),
-				templateKey
-			);
+			throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorTemplateMissing'), templateKey);
 		}
 		return template;
 	}
@@ -705,11 +646,7 @@ public with sharing class MigrationKitService {
 		if (!runs.isEmpty() || create != true) {
 			return runs.isEmpty() ? null : runs[0];
 		}
-		Merge_Journal__c run = new Merge_Journal__c(
-			Kind__c = KIND_RUN,
-			Kit__c = kitKey,
-			Status__c = IN_PROGRESS
-		);
+		Merge_Journal__c run = new Merge_Journal__c(Kind__c = KIND_RUN, Kit__c = kitKey, Status__c = IN_PROGRESS);
 		Database.insert(run, AccessLevel.USER_MODE);
 		return run;
 	}
@@ -731,10 +668,7 @@ public with sharing class MigrationKitService {
 
 	private static void save(Merge_Journal__c run, State state) {
 		run.State_JSON__c = JSON.serialize(state);
-		Database.update(
-			new Merge_Journal__c(Id = run.Id, State_JSON__c = run.State_JSON__c),
-			AccessLevel.USER_MODE
-		);
+		Database.update(new Merge_Journal__c(Id = run.Id, State_JSON__c = run.State_JSON__c), AccessLevel.USER_MODE);
 	}
 
 	/** Complete once every step is done and every item ticked; reopened otherwise. */
@@ -742,10 +676,7 @@ public with sharing class MigrationKitService {
 		String status = complete ? RUN_COMPLETE : IN_PROGRESS;
 		if (run != null && run.Status__c != status) {
 			run.Status__c = status;
-			Database.update(
-				new Merge_Journal__c(Id = run.Id, Status__c = status),
-				AccessLevel.USER_MODE
-			);
+			Database.update(new Merge_Journal__c(Id = run.Id, Status__c = status), AccessLevel.USER_MODE);
 		}
 	}
 
@@ -798,10 +729,7 @@ public with sharing class MigrationKitService {
 			Schema.SObjectType type = NamespaceUtil.globalDescribe()
 				.get(step.source.trim().replace('.', '__').toLowerCase());
 			if (type == null || !type.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible()) {
-				throw refusal(
-					BarnHelp.text('Core', 'Core_Migration_ErrorUnknownName'),
-					step.source
-				);
+				throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorUnknownName'), step.source);
 			}
 			objectName = String.valueOf(type);
 			for (String field : step.fields == null ? new List<String>() : step.fields) {
@@ -811,9 +739,7 @@ public with sharing class MigrationKitService {
 				}
 			}
 			List<String> clauses = new List<String>();
-			for (
-				Condition condition : step.filters == null ? new List<Condition>() : step.filters
-			) {
+			for (Condition condition : step.filters == null ? new List<Condition>() : step.filters) {
 				String field = path(type, condition == null ? null : condition.field, true);
 				String operator = condition.op == 'notEquals' ? ' != ' : ' = ';
 				if (condition.value == null) {
@@ -883,15 +809,10 @@ public with sharing class MigrationKitService {
 		Schema.SObjectType at = start;
 		Integer index = 0;
 		while (index < parts.size()) {
-			Map<String, Schema.SObjectField> fields = at.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
-				.fields.getMap();
+			Map<String, Schema.SObjectField> fields = at.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 			Schema.DescribeFieldResult found;
 			Integer used = 0;
-			for (
-				Integer take = 1; take <= 2 && found == null && index + take <= parts.size(); take++
-			) {
+			for (Integer take = 1; take <= 2 && found == null && index + take <= parts.size(); take++) {
 				String name = take == 1 ? parts[index] : parts[index] + '__' + parts[index + 1];
 				Boolean last = index + take == parts.size();
 				found = last ? fieldNamed(fields, name) : relationshipNamed(fields, name);
@@ -950,25 +871,16 @@ public with sharing class MigrationKitService {
 				}
 			}
 		} catch (Exception unreadable) {
-			throw refusal(
-				BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'),
-				condition.field
-			);
+			throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'), condition.field);
 		}
 	}
 
-	private static Schema.DescribeFieldResult fieldNamed(
-		Map<String, Schema.SObjectField> fields,
-		String name
-	) {
+	private static Schema.DescribeFieldResult fieldNamed(Map<String, Schema.SObjectField> fields, String name) {
 		Schema.SObjectField field = fields.get(name.toLowerCase());
 		return field == null ? null : field.getDescribe();
 	}
 
-	private static Schema.DescribeFieldResult relationshipNamed(
-		Map<String, Schema.SObjectField> fields,
-		String name
-	) {
+	private static Schema.DescribeFieldResult relationshipNamed(Map<String, Schema.SObjectField> fields, String name) {
 		for (Schema.SObjectField field : fields.values()) {
 			Schema.DescribeFieldResult described = field.getDescribe();
 			if (
@@ -1018,8 +930,6 @@ public with sharing class MigrationKitService {
 	}
 
 	private static MigrationException refusal(String text, String value) {
-		return new MigrationException(
-			value == null ? text : String.format(text, new List<String>{ value })
-		);
+		return new MigrationException(value == null ? text : String.format(text, new List<String>{ value }));
 	}
 }

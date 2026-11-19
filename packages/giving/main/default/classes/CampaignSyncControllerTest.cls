@@ -51,11 +51,7 @@ private class CampaignSyncControllerTest {
 				status = CampaignSyncController.getStatus();
 			}
 			Test.stopTest();
-			Assert.areEqual(
-				CampaignSyncService.isAvailable(),
-				status.available,
-				'Read from the org.'
-			);
+			Assert.areEqual(CampaignSyncService.isAvailable(), status.available, 'Read from the org.');
 			Assert.isFalse(status.switchedOn, 'Off at install.');
 			Assert.areEqual(2, status.appealCount, 'Both appeals are counted.');
 			Assert.areEqual(0, status.linkedCount, 'Neither has a Campaign while the sync is off.');

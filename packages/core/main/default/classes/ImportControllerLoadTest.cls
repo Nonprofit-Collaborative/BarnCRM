@@ -38,10 +38,7 @@ private class ImportControllerLoadTest {
 					'Dismissals',
 					'duplicate_dismissal__c'
 				);
-				ImportController.TemplateView people = ImportController.createObjectTemplate(
-					'Corrections',
-					'Contact'
-				);
+				ImportController.TemplateView people = ImportController.createObjectTemplate('Corrections', 'Contact');
 				String refused;
 				try {
 					ImportController.createObjectTemplate('Batches', 'Import_Batch__c');
@@ -60,23 +57,12 @@ private class ImportControllerLoadTest {
 					sessions.targetObject.endsWithIgnoreCase('Duplicate_Dismissal__c'),
 					'Stored as describe names it.'
 				);
-				Assert.areEqual(
-					ImportObjectSchema.OPERATION_INSERT,
-					sessions.loadOperation,
-					'Insert.'
-				);
+				Assert.areEqual(ImportObjectSchema.OPERATION_INSERT, sessions.loadOperation, 'Insert.');
 				Assert.areEqual(4, sessions.loadOperations.size(), 'All four operations offered.');
-				Assert.areEqual(
-					ImportObjectSchema.OPERATION_UPDATE,
-					people.loadOperation,
-					'People start on Update.'
-				);
+				Assert.areEqual(ImportObjectSchema.OPERATION_UPDATE, people.loadOperation, 'People start on Update.');
 				Assert.areEqual(2, people.loadOperations.size(), 'And the two updates only.');
 				Assert.isNotNull(refused, 'The package bookkeeping is never a target.');
-				Assert.isTrue(
-					unnamed.contains(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName')),
-					'Named.'
-				);
+				Assert.isTrue(unnamed.contains(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName')), 'Named.');
 			}
 
 		}
@@ -98,9 +84,7 @@ private class ImportControllerLoadTest {
 
 				Test.startTest();
 				List<ImportMapping.Target> objects = ImportController.getLoadableObjects();
-				List<ImportController.FieldChoice> fields = ImportController.getObjectFields(
-					affiliations.Id
-				);
+				List<ImportController.FieldChoice> fields = ImportController.getObjectFields(affiliations.Id);
 				List<ImportMapping.Target> keys = ImportController.getKeyFields(dismissals.Id);
 				Test.stopTest();
 
@@ -125,10 +109,7 @@ private class ImportControllerLoadTest {
 		System.runAs(TestUsers.admin()) {
 			ImportController.permissionOverride = true;
 			System.runAs(admin()) {
-				Import_Template__c orgs = ImportTemplateService.createObjectTemplate(
-					'Organizations',
-					'Account'
-				);
+				Import_Template__c orgs = ImportTemplateService.createObjectTemplate('Organizations', 'Account');
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
 				choices.operation = ImportObjectSchema.OPERATION_UPDATE;
 				choices.related = 'Affiliation__c.Organization__c';
@@ -169,23 +150,17 @@ private class ImportControllerLoadTest {
 				Assert.isTrue(
 					byValue.get('Related.Role__c')
 						.label.startsWith(
-							Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-								.getLabel()
+							Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
 						),
 					'Named with the related object.'
 				);
 				Assert.isTrue(none.isEmpty(), 'Nothing for a field pointing elsewhere.');
 				Assert.areEqual(
-					Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabel(),
+					Affiliation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
 					shown.relatedLabel,
 					'The related object is named for what the template loads (D-136).'
 				);
-				Assert.areEqual(
-					'Affiliation__c.Organization__c',
-					shown.related,
-					'The saved choice is shown.'
-				);
+				Assert.areEqual('Affiliation__c.Organization__c', shown.related, 'The saved choice is shown.');
 			}
 		}
 	}
@@ -200,32 +175,19 @@ private class ImportControllerLoadTest {
 					'Affiliation__c'
 				);
 				ImportMapping saved = new ImportMapping();
-				ImportMapping.Column employer = new ImportMapping.Column(
-					'Employer',
-					'Record.Organization__c'
-				);
+				ImportMapping.Column employer = new ImportMapping.Column('Employer', 'Record.Organization__c');
 				employer.lookupField = 'Name';
 				saved.columns.add(employer);
 				ImportTestDataFactory.saveMapping(template.Id, saved.serialize(), null);
 
 				Test.startTest();
 				ImportMapping suggested = ImportMapping.parse(
-					ImportController.suggestMapping(
-						template.Id,
-						new List<String>{ 'Role', 'Employer' }
-					)
+					ImportController.suggestMapping(template.Id, new List<String>{ 'Role', 'Employer' })
 				);
 				Test.stopTest();
 
-				Assert.isTrue(
-					suggested.columns[0].target.endsWithIgnoreCase('Role__c'),
-					'A heading that is a field.'
-				);
-				Assert.areEqual(
-					'Name',
-					suggested.columns[1].lookupField,
-					'The saved lookup choice.'
-				);
+				Assert.isTrue(suggested.columns[0].target.endsWithIgnoreCase('Role__c'), 'A heading that is a field.');
+				Assert.areEqual('Name', suggested.columns[1].lookupField, 'The saved lookup choice.');
 			}
 
 		}
@@ -268,22 +230,11 @@ private class ImportControllerLoadTest {
 				Test.stopTest();
 
 				Import_Template__c stored = ImportTemplateSelector.selectById(template.Id);
-				Assert.areEqual(
-					ImportObjectSchema.OPERATION_UPSERT,
-					stored.Load_Operation__c,
-					'Op.'
-				);
+				Assert.areEqual(ImportObjectSchema.OPERATION_UPSERT, stored.Load_Operation__c, 'Op.');
 				Assert.isTrue(stored.Load_Match_Field__c.endsWithIgnoreCase('Pair_Key__c'), 'Key.');
-				Assert.areEqual(
-					ImportObjectSchema.LOOKUP_LEAVE_EMPTY,
-					stored.Lookup_Not_Found__c,
-					'Empty.'
-				);
+				Assert.areEqual(ImportObjectSchema.LOOKUP_LEAVE_EMPTY, stored.Lookup_Not_Found__c, 'Empty.');
 				Assert.isTrue(ImportTemplateService.usesMostRecent(stored), 'Most recent.');
-				Assert.isTrue(
-					unusable.contains('Reason__c'),
-					'A field that is not a key is refused.'
-				);
+				Assert.isTrue(unusable.contains('Reason__c'), 'A field that is not a key is refused.');
 			}
 
 		}
@@ -306,16 +257,10 @@ private class ImportControllerLoadTest {
 				source.Use_Duplicate_Rules__c = true;
 				source.Last_Import_Date__c = OrgDate.today();
 				update source;
-				Import_Template__c oneObject = ImportTemplateService.createObjectTemplate(
-					'Organizations',
-					'Account'
-				);
+				Import_Template__c oneObject = ImportTemplateService.createObjectTemplate('Organizations', 'Account');
 
 				Test.startTest();
-				ImportController.TemplateView copy = ImportController.copyTemplate(
-					source.Id,
-					'  Event sign-ups '
-				);
+				ImportController.TemplateView copy = ImportController.copyTemplate(source.Id, '  Event sign-ups ');
 				String unnamed;
 				try {
 					ImportController.copyTemplate(source.Id, ' ');
@@ -333,11 +278,7 @@ private class ImportControllerLoadTest {
 				Assert.areEqual('Event sign-ups', copy.name, 'The new name, trimmed.');
 				Assert.areNotEqual(source.Id, copy.id, 'A new template.');
 				Assert.areEqual(source.Column_Mapping_JSON__c, copy.mapping, 'Its columns.');
-				Assert.areEqual(
-					ImportTemplateService.RULE_NAME_POSTAL,
-					copy.matchingRule,
-					'Its matching.'
-				);
+				Assert.areEqual(ImportTemplateService.RULE_NAME_POSTAL, copy.matchingRule, 'Its matching.');
 				Assert.areEqual(
 					ImportTemplateService.SEVERAL_MOST_RECENT,
 					copy.severalMatches,
@@ -382,11 +323,7 @@ private class ImportControllerLoadTest {
 				ImportController.copyTemplate(source.Id, 'Another');
 				Assert.fail('Copying a template needs Manage BarnCRM Settings.');
 			} catch (Exception e) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'),
-					e.getMessage(),
-					'Refused.'
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'), e.getMessage(), 'Refused.');
 			}
 			Test.stopTest();
 			Assert.areEqual(1, [SELECT COUNT() FROM Import_Template__c], 'Nothing was created.');

@@ -80,10 +80,7 @@ public with sharing class DonorSegmentService {
 
 	/** Every saved query of people or organizations the person can read, their own first. */
 	public static List<Segment> segments() {
-		List<String> objects = new List<String>{
-			DonorSegmentTemplates.PEOPLE,
-			DonorSegmentTemplates.ORGANIZATIONS
-		};
+		List<String> objects = new List<String>{ DonorSegmentTemplates.PEOPLE, DonorSegmentTemplates.ORGANIZATIONS };
 		Id me = UserInfo.getUserId();
 		List<Segment> found = new List<Segment>();
 		for (Saved_Query__c query : [
@@ -156,10 +153,7 @@ public with sharing class DonorSegmentService {
 
 	/** How many records the segment holds, as the person (R-DS3). */
 	public static SegmentCount countRecords(Id segmentId) {
-		Integer counted = QueryCompiler.count(
-			requireSegment(segmentId).Query_JSON__c,
-			COUNT_CAP + 1
-		);
+		Integer counted = QueryCompiler.count(requireSegment(segmentId).Query_JSON__c, COUNT_CAP + 1);
 		SegmentCount result = new SegmentCount();
 		result.more = counted > COUNT_CAP;
 		result.count = Math.min(counted, COUNT_CAP);
@@ -172,10 +166,7 @@ public with sharing class DonorSegmentService {
 		List<String> fields = fieldsOf(query.Query_JSON__c);
 		Rows result = new Rows();
 		result.columns = columns(query.Object_Name__c, fields);
-		result.rows = flatten(
-			QueryCompiler.run(QueryCompiler.compile(query.Query_JSON__c)),
-			fields
-		);
+		result.rows = flatten(QueryCompiler.run(QueryCompiler.compile(query.Query_JSON__c)), fields);
 		return result;
 	}
 
@@ -185,25 +176,18 @@ public with sharing class DonorSegmentService {
 	 */
 	public static Rows exportPage(Id segmentId, String layout, String afterId) {
 		Saved_Query__c query = requireSegment(segmentId);
-		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
-			query.Query_JSON__c
-		);
+		Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(query.Query_JSON__c);
 		document.remove('children');
 		document.remove('aggregate');
 		if (layout == LAYOUT_MAILCHIMP || layout == LAYOUT_CONSTANT_CONTACT) {
 			if (query.Object_Name__c != DonorSegmentTemplates.PEOPLE) {
-				throw new SegmentException(
-					BarnHelp.text('Giving', 'Giving_Segments_ErrorPeopleOnly')
-				);
+				throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorPeopleOnly'));
 			}
 			document.put('fields', EMAIL_FIELDS);
 			Map<String, Object> filter = filterOf(document);
 			andCondition(filter, condition('Email', 'is not null', null));
 			andCondition(filter, condition('HasOptedOutOfEmail', 'equals', false));
-			andCondition(
-				filter,
-				condition(DonorSegmentTemplates.qualifyPath('Deceased__c'), 'equals', false)
-			);
+			andCondition(filter, condition(DonorSegmentTemplates.qualifyPath('Deceased__c'), 'equals', false));
 			document.put('filter', filter);
 		} else if (layout != LAYOUT_ALL) {
 			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorLayout'));
@@ -213,25 +197,17 @@ public with sharing class DonorSegmentService {
 		Rows result = new Rows();
 		result.columns = columns(query.Object_Name__c, fields);
 		List<SObject> records = QueryCompiler.run(
-			QueryCompiler.compileExportPage(
-				exportJson,
-				String.isBlank(afterId) ? null : Id.valueOf(afterId)
-			)
+			QueryCompiler.compileExportPage(exportJson, String.isBlank(afterId) ? null : Id.valueOf(afterId))
 		);
 		result.rows = flatten(records, fields);
 		result.done = records.size() < QueryCompiler.EXPORT_PAGE_SIZE;
-		result.lastId = records.isEmpty()
-			? afterId
-			: String.valueOf(records[records.size() - 1].Id);
+		result.lastId = records.isEmpty() ? afterId : String.valueOf(records[records.size() - 1].Id);
 		return result;
 	}
 
 	/** One R-R2 filter condition. */
 	public static Map<String, Object> condition(String field, String operator, Object value) {
-		Map<String, Object> built = new Map<String, Object>{
-			'field' => field,
-			'operator' => operator
-		};
+		Map<String, Object> built = new Map<String, Object>{ 'field' => field, 'operator' => operator };
 		if (value != null) {
 			built.put('value', value);
 		}
@@ -277,10 +253,7 @@ public with sharing class DonorSegmentService {
 			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorNotFound'));
 		}
 		String objectName = found[0].Object_Name__c;
-		if (
-			objectName != DonorSegmentTemplates.PEOPLE &&
-			objectName != DonorSegmentTemplates.ORGANIZATIONS
-		) {
+		if (objectName != DonorSegmentTemplates.PEOPLE && objectName != DonorSegmentTemplates.ORGANIZATIONS) {
 			throw new SegmentException(BarnHelp.text('Giving', 'Giving_Segments_ErrorNotSegment'));
 		}
 		return found[0];
@@ -322,9 +295,7 @@ public with sharing class DonorSegmentService {
 					? lookup.left(lookup.length() - 1) + 'c'
 					: lookup + 'Id';
 				String lookupLabel = QueryCompiler.resolve(objectName, lookupField).getLabel();
-				label = path.substringAfterLast('.') == 'Name'
-					? lookupLabel
-					: lookupLabel + ': ' + label;
+				label = path.substringAfterLast('.') == 'Name' ? lookupLabel : lookupLabel + ': ' + label;
 			}
 			column.label = label;
 			columns.add(column);

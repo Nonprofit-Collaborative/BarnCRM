@@ -14,9 +14,7 @@ private class CommitmentEntryTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 		insert person;
 		return person;
 	}
@@ -38,9 +36,7 @@ private class CommitmentEntryTest {
 			Contact person = donor();
 
 			Test.startTest();
-			CommitmentEntryController.SaveResult result = CommitmentEntryController.save(
-				pledgeInput(person.Id)
-			);
+			CommitmentEntryController.SaveResult result = CommitmentEntryController.save(pledgeInput(person.Id));
 			Test.stopTest();
 
 			Assert.isTrue(result.success, 'The pledge saves: ' + result.error);
@@ -62,11 +58,7 @@ private class CommitmentEntryTest {
 				ORDER BY Sequence__c
 			];
 			Assert.areEqual(3, schedule.size(), 'The triggers made the three payments.');
-			Assert.areEqual(
-				333.34,
-				schedule[2].Expected_Amount__c,
-				'The last payment takes up the rounding.'
-			);
+			Assert.areEqual(333.34, schedule[2].Expected_Amount__c, 'The last payment takes up the rounding.');
 		}
 	}
 
@@ -140,9 +132,7 @@ private class CommitmentEntryTest {
 				'A commitment needs a donor.'
 			);
 
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Harbor Foundation')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Harbor Foundation'));
 			insert organization;
 			CommitmentEntryController.EntryInput both = pledgeInput(donor().Id);
 			both.donorAccountId = organization.Id;
@@ -160,10 +150,7 @@ private class CommitmentEntryTest {
 			CommitmentEntryController.EntryInput input = pledgeInput(donor().Id);
 			input.total = null;
 
-			Assert.isNull(
-				CommitmentEntryController.preview(input),
-				'An incomplete pledge has no preview yet.'
-			);
+			Assert.isNull(CommitmentEntryController.preview(input), 'An incomplete pledge has no preview yet.');
 			Assert.areEqual(
 				BarnHelp.text('Giving', 'Giving_Ask_ErrorAmount'),
 				CommitmentEntryController.save(input).error,
@@ -177,9 +164,7 @@ private class CommitmentEntryTest {
 		System.runAs(staff()) {
 			Contact person = donor();
 
-			CommitmentEntryController.Defaults defaults = CommitmentEntryController.getDefaults(
-				person.Id
-			);
+			CommitmentEntryController.Defaults defaults = CommitmentEntryController.getDefaults(person.Id);
 
 			Assert.isTrue(defaults.canCreate, 'Giving Staff may create commitments.');
 			Assert.areEqual(String.valueOf(person.Id), defaults.donorId, 'The donor is prefilled.');
@@ -216,13 +201,7 @@ private class CommitmentEntryTest {
 			CommitmentEntry.paymentsThrough('Weekly', first, first.addDays(-1)),
 			'A last date before the first counts nothing.'
 		);
-		Assert.isNotNull(
-			CommitmentEntry.recurringProblem(null, 'Monthly', first),
-			'A recurring gift needs an amount.'
-		);
-		Assert.isNotNull(
-			CommitmentEntry.recurringProblem(10, null, first),
-			'A recurring gift needs a frequency.'
-		);
+		Assert.isNotNull(CommitmentEntry.recurringProblem(null, 'Monthly', first), 'A recurring gift needs an amount.');
+		Assert.isNotNull(CommitmentEntry.recurringProblem(10, null, first), 'A recurring gift needs a frequency.');
 	}
 }

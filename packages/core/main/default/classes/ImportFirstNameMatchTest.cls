@@ -29,10 +29,7 @@ private class ImportFirstNameMatchTest {
 			mapping.columns.add(new ImportMapping.Column(target, target));
 		}
 		Import_Batch__c batch = ImportTestDataFactory.batch(
-			ImportTestDataFactory.template(
-				mapping.serialize(),
-				ImportTemplateService.RULE_NAME_POSTAL
-			)
+			ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_NAME_POSTAL)
 		);
 		List<Map<String, String>> rows = new List<Map<String, String>>();
 		for (List<String> names : firstNames) {
@@ -87,25 +84,10 @@ private class ImportFirstNameMatchTest {
 		return ImportTestDataFactory.reload(batch.Id);
 	}
 
-	private static void assertCommitCountedAsPreviewed(
-		Import_Batch__c dryRun,
-		Import_Batch__c committed
-	) {
-		Assert.areEqual(
-			committed.Rows_Created__c,
-			dryRun.Rows_Created__c,
-			'Created, as previewed.'
-		);
-		Assert.areEqual(
-			committed.Rows_Matched__c,
-			dryRun.Rows_Matched__c,
-			'Matched, as previewed.'
-		);
-		Assert.areEqual(
-			committed.Rows_Updated__c,
-			dryRun.Rows_Updated__c,
-			'Updated, as previewed.'
-		);
+	private static void assertCommitCountedAsPreviewed(Import_Batch__c dryRun, Import_Batch__c committed) {
+		Assert.areEqual(committed.Rows_Created__c, dryRun.Rows_Created__c, 'Created, as previewed.');
+		Assert.areEqual(committed.Rows_Matched__c, dryRun.Rows_Matched__c, 'Matched, as previewed.');
+		Assert.areEqual(committed.Rows_Updated__c, dryRun.Rows_Updated__c, 'Updated, as previewed.');
 		Assert.areEqual(0, committed.Rows_Rejected__c, 'Nothing refused.');
 	}
 
@@ -134,22 +116,11 @@ private class ImportFirstNameMatchTest {
 			insert new List<Contact>{ smith('John'), smith('Jane') };
 
 			Test.startTest();
-			List<Import_Row__c> rows = load(
-				file(new List<List<String>>{ new List<String>{ 'Jane' } }),
-				200
-			);
+			List<Import_Row__c> rows = load(file(new List<List<String>>{ new List<String>{ 'Jane' } }), 200);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Jane',
-				firstNameOf(rows[0].Contact_1__c),
-				'Jane, found by first name.'
-			);
-			Assert.areEqual(
-				new List<String>{ 'John', 'Jane' },
-				smiths(),
-				'Nobody renamed or added.'
-			);
+			Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Jane, found by first name.');
+			Assert.areEqual(new List<String>{ 'John', 'Jane' }, smiths(), 'Nobody renamed or added.');
 		}
 	}
 
@@ -160,18 +131,11 @@ private class ImportFirstNameMatchTest {
 			insert smith('John');
 
 			Test.startTest();
-			List<Import_Row__c> rows = load(
-				file(new List<List<String>>{ new List<String>{ 'John' } }),
-				200
-			);
+			List<Import_Row__c> rows = load(file(new List<List<String>>{ new List<String>{ 'John' } }), 200);
 			Test.stopTest();
 
 			Assert.areEqual('John', firstNameOf(rows[0].Contact_1__c), 'John, not the older Jane.');
-			Assert.areEqual(
-				new List<String>{ 'Jane', 'John' },
-				smiths(),
-				'Nobody renamed or added.'
-			);
+			Assert.areEqual(new List<String>{ 'Jane', 'John' }, smiths(), 'Nobody renamed or added.');
 		}
 	}
 
@@ -191,18 +155,10 @@ private class ImportFirstNameMatchTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				rows[0].Contact_2__c,
-				rows[1].Contact_1__c,
-				'The Jane row is that Jane.'
-			);
+			Assert.areEqual(rows[0].Contact_2__c, rows[1].Contact_1__c, 'The Jane row is that Jane.');
 			Assert.areEqual('Mary', firstNameOf(rows[2].Contact_1__c), 'Mary is nobody else.');
 			// Jane is saved with the second people, after Mary, so the order says nothing here.
-			Assert.areEqual(
-				sorted(new List<String>{ 'John', 'Jane', 'Mary' }),
-				sorted(smiths()),
-				'Three people.'
-			);
+			Assert.areEqual(sorted(new List<String>{ 'John', 'Jane', 'Mary' }), sorted(smiths()), 'Three people.');
 			assertOneHousehold(rows[0].Contact_1__c, rows[0].Contact_2__c);
 			Assert.areEqual(rows[0].Household__c, rows[1].Household__c, 'Her row names it too.');
 		}
@@ -213,12 +169,7 @@ private class ImportFirstNameMatchTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			List<Import_Row__c> rows = load(
-				file(
-					new List<List<String>>{
-						new List<String>{ 'Jane' },
-						new List<String>{ 'John', 'Jane' }
-					}
-				),
+				file(new List<List<String>>{ new List<String>{ 'Jane' }, new List<String>{ 'John', 'Jane' } }),
 				200
 			);
 			Test.stopTest();
@@ -234,11 +185,7 @@ private class ImportFirstNameMatchTest {
 		Map<Id, Contact> couple = new Map<Id, Contact>(
 			[SELECT AccountId FROM Contact WHERE Id IN :new List<Id>{ john, jane }]
 		);
-		Assert.areEqual(
-			couple.get(john).AccountId,
-			couple.get(jane).AccountId,
-			'John and Jane share one household.'
-		);
+		Assert.areEqual(couple.get(john).AccountId, couple.get(jane).AccountId, 'John and Jane share one household.');
 		Assert.areEqual(
 			2,
 			[SELECT COUNT() FROM Contact WHERE AccountId = :couple.get(john).AccountId],
@@ -258,11 +205,7 @@ private class ImportFirstNameMatchTest {
 			for (Integer i = 0; i < 3; i++) {
 				elsewhere.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Al' + i,
-							LastName = 'Smith',
-							MailingPostalCode = '99999'
-						)
+						new Contact(FirstName = 'Al' + i, LastName = 'Smith', MailingPostalCode = '99999')
 					)
 				);
 			}
@@ -272,10 +215,7 @@ private class ImportFirstNameMatchTest {
 			ImportMatcher.rowCap = 3;
 
 			Test.startTest();
-			List<Import_Row__c> rows = load(
-				file(new List<List<String>>{ new List<String>{ 'John' } }),
-				200
-			);
+			List<Import_Row__c> rows = load(file(new List<List<String>>{ new List<String>{ 'John' } }), 200);
 			Test.stopTest();
 
 			Assert.areEqual(ImportRowProcessor.STATUS_MATCHED, rows[0].Status__c, 'John is found.');
@@ -291,10 +231,7 @@ private class ImportFirstNameMatchTest {
 			ImportMatcher.rowCap = 1;
 
 			Test.startTest();
-			List<Import_Row__c> rows = load(
-				file(new List<List<String>>{ new List<String>{ 'Jane' } }),
-				200
-			);
+			List<Import_Row__c> rows = load(file(new List<List<String>>{ new List<String>{ 'Jane' } }), 200);
 			Test.stopTest();
 
 			Assert.areEqual('Jane', firstNameOf(rows[0].Contact_1__c), 'Jane is created.');
@@ -317,24 +254,14 @@ private class ImportFirstNameMatchTest {
 
 			Test.startTest();
 			List<Import_Row__c> rows = load(
-				file(
-					new List<List<String>>{ new List<String>{ 'Mary' }, new List<String>{ 'Ann' } }
-				),
+				file(new List<List<String>>{ new List<String>{ 'Mary' }, new List<String>{ 'Ann' } }),
 				200
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Mary',
-				firstNameOf(rows[0].Contact_1__c),
-				'Mary, not the first Smith.'
-			);
+			Assert.areEqual('Mary', firstNameOf(rows[0].Contact_1__c), 'Mary, not the first Smith.');
 			Assert.areEqual('Ann', firstNameOf(rows[1].Contact_1__c), 'Ann is new, not a guess.');
-			Assert.areEqual(
-				new List<String>{ 'John', 'Jane', 'Bob', 'Mary', 'Ann' },
-				smiths(),
-				'Nobody renamed.'
-			);
+			Assert.areEqual(new List<String>{ 'John', 'Jane', 'Bob', 'Mary', 'Ann' }, smiths(), 'Nobody renamed.');
 		}
 	}
 
@@ -364,11 +291,7 @@ private class ImportFirstNameMatchTest {
 			assertCommitCountedAsPreviewed(dryRun, committed);
 			List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
 
-			Assert.areEqual(
-				rows[0].Contact_1__c,
-				rows[1].Contact_1__c,
-				'The couple row finds John.'
-			);
+			Assert.areEqual(rows[0].Contact_1__c, rows[1].Contact_1__c, 'The couple row finds John.');
 			Assert.areEqual(rows[1].Contact_2__c, rows[2].Contact_1__c, 'And the Jane row, Jane.');
 			Assert.areEqual(new List<String>{ 'John', 'Jane', 'Mary' }, smiths(), 'Three people.');
 		}
@@ -382,9 +305,7 @@ private class ImportFirstNameMatchTest {
 
 			Test.startTest();
 			List<Import_Row__c> rows = load(
-				file(
-					new List<List<String>>{ new List<String>{ 'JANE' }, new List<String>{ 'Jáne' } }
-				),
+				file(new List<List<String>>{ new List<String>{ 'JANE' }, new List<String>{ 'Jáne' } }),
 				200
 			);
 			Test.stopTest();
@@ -398,11 +319,7 @@ private class ImportFirstNameMatchTest {
 			// A row with no first name at this couple matches both: ImportMatchingRulesTest (R-IT9).
 			// Jane takes the file's capitals, since a correction of capitals is a change (R-IT11),
 			// but nobody becomes somebody else.
-			Assert.areEqual(
-				new List<String>{ 'John', 'JANE', 'Jáne' },
-				smiths(),
-				'Nobody renamed.'
-			);
+			Assert.areEqual(new List<String>{ 'John', 'JANE', 'Jáne' }, smiths(), 'Nobody renamed.');
 		}
 	}
 
@@ -419,9 +336,7 @@ private class ImportFirstNameMatchTest {
 		) {
 			mapping.columns.add(new ImportMapping.Column(target, target));
 		}
-		Import_Batch__c batch = ImportTestDataFactory.batch(
-			ImportTestDataFactory.template(mapping.serialize(), rule)
-		);
+		Import_Batch__c batch = ImportTestDataFactory.batch(ImportTestDataFactory.template(mapping.serialize(), rule));
 		ImportTestDataFactory.rows(batch, rows);
 		return batch;
 	}
@@ -455,8 +370,7 @@ private class ImportFirstNameMatchTest {
 			];
 			Assert.areEqual(batch.Id, jane.Created_By_Import_Batch__c, 'Undo would remove Jane.');
 			Assert.isNull(
-				[SELECT Created_By_Import_Batch__c FROM Contact WHERE Id = :john.Id]
-				.Created_By_Import_Batch__c,
+				[SELECT Created_By_Import_Batch__c FROM Contact WHERE Id = :john.Id].Created_By_Import_Batch__c,
 				'And leave John, whom the import never touched.'
 			);
 			Assert.areEqual(
@@ -474,10 +388,7 @@ private class ImportFirstNameMatchTest {
 			insert john;
 
 			Test.startTest();
-			List<Import_Row__c> rows = load(
-				file(new List<List<String>>{ new List<String>{ '' } }),
-				200
-			);
+			List<Import_Row__c> rows = load(file(new List<List<String>>{ new List<String>{ '' } }), 200);
 			Test.stopTest();
 
 			Assert.areEqual(john.Id, rows[0].Contact_1__c, 'No first name: found on the rest.');
@@ -488,16 +399,11 @@ private class ImportFirstNameMatchTest {
 	@IsTest
 	static void aHolderWithNoFirstNameIsNotTakenByARowWithOne() {
 		System.runAs(TestUsers.admin()) {
-			Contact unnamed = TestDataFactory.person(
-				new Contact(LastName = 'Smith', MailingPostalCode = '12345')
-			);
+			Contact unnamed = TestDataFactory.person(new Contact(LastName = 'Smith', MailingPostalCode = '12345'));
 			insert unnamed;
 
 			Test.startTest();
-			List<Import_Row__c> rows = load(
-				file(new List<List<String>>{ new List<String>{ 'Jane' } }),
-				200
-			);
+			List<Import_Row__c> rows = load(file(new List<List<String>>{ new List<String>{ 'Jane' } }), 200);
 			Test.stopTest();
 
 			Assert.areNotEqual(unnamed.Id, rows[0].Contact_1__c, 'Jane is somebody else.');
@@ -530,10 +436,7 @@ private class ImportFirstNameMatchTest {
 			Assert.areEqual(maryAnn.Id, rows[1].Contact_1__c, 'Inner spaces: Mary Ann.');
 			Assert.areEqual('J.', firstNameOf(rows[2].Contact_1__c), 'An initial is created.');
 			Assert.areEqual(3, [SELECT COUNT() FROM Contact], 'Only J. is added.');
-			Assert.isTrue(
-				'John'.equalsIgnoreCase(firstNameOf(john.Id).trim()),
-				'John is not renamed to J.'
-			);
+			Assert.isTrue('John'.equalsIgnoreCase(firstNameOf(john.Id).trim()), 'John is not renamed to J.');
 		}
 	}
 
@@ -542,9 +445,7 @@ private class ImportFirstNameMatchTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			List<Import_Row__c> together = load(
-				file(
-					new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }
-				),
+				file(new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }),
 				200
 			);
 			Test.stopTest();
@@ -554,9 +455,7 @@ private class ImportFirstNameMatchTest {
 
 			// Loaded again in one-row chunks: each row now finds its own person by first name.
 			List<Import_Row__c> again = load(
-				file(
-					new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }
-				),
+				file(new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }),
 				1
 			);
 			Assert.areEqual(together[0].Contact_1__c, again[0].Contact_1__c, 'John again.');
@@ -570,9 +469,7 @@ private class ImportFirstNameMatchTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			List<Import_Row__c> rows = load(
-				file(
-					new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }
-				),
+				file(new List<List<String>>{ new List<String>{ 'John' }, new List<String>{ 'Jane' } }),
 				1
 			);
 			Test.stopTest();
@@ -612,10 +509,7 @@ private class ImportFirstNameMatchTest {
 
 			Test.startTest();
 			List<Import_Row__c> rows = load(
-				fileOf(
-					ImportTemplateService.RULE_EMAIL,
-					new List<Map<String, String>>{ jane, unnamed }
-				),
+				fileOf(ImportTemplateService.RULE_EMAIL, new List<Map<String, String>>{ jane, unnamed }),
 				200
 			);
 			Test.stopTest();
@@ -635,11 +529,7 @@ private class ImportFirstNameMatchTest {
 			for (Integer i = 0; i < 200; i++) {
 				holders.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'John',
-							LastName = 'Smith' + i,
-							MailingPostalCode = '12345'
-						)
+						new Contact(FirstName = 'John', LastName = 'Smith' + i, MailingPostalCode = '12345')
 					)
 				);
 				values.add(row(Math.mod(i, 2) == 0 ? 'John' : 'Jane', 'Smith' + i));
@@ -663,16 +553,8 @@ private class ImportFirstNameMatchTest {
 			Import_Batch__c committed = ImportBatchSelector.selectById(batch.Id);
 			Assert.areEqual(100, committed.Rows_Created__c, 'One Jane per address.');
 			Assert.areEqual(100, committed.Rows_Matched__c, 'Each John found and unchanged.');
-			Assert.areEqual(
-				200,
-				[SELECT COUNT() FROM Contact WHERE FirstName = 'John'],
-				'No John renamed.'
-			);
-			Assert.areEqual(
-				100,
-				[SELECT COUNT() FROM Contact WHERE FirstName = 'Jane'],
-				'Jane x100.'
-			);
+			Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE FirstName = 'John'], 'No John renamed.');
+			Assert.areEqual(100, [SELECT COUNT() FROM Contact WHERE FirstName = 'Jane'], 'Jane x100.');
 		}
 	}
 }

@@ -81,9 +81,7 @@ public with sharing class FindRelatedRecords {
 		} catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
 			throw refusedRelated(childName);
 		}
-		Schema.SObjectField token = NAME.matcher(fieldName).matches()
-			? child.fields.getMap().get(fieldName)
-			: null;
+		Schema.SObjectField token = NAME.matcher(fieldName).matches() ? child.fields.getMap().get(fieldName) : null;
 		Schema.DescribeFieldResult lookup = token == null ? null : token.getDescribe();
 		if (
 			lookup == null ||
@@ -98,9 +96,7 @@ public with sharing class FindRelatedRecords {
 		FilterValueBinder bound;
 		try {
 			bound = RollupFilterParser.toBoundClause(
-				filter == null
-					? null
-					: (filter instanceof String ? (String) filter : JSON.serialize(filter)),
+				filter == null ? null : (filter instanceof String ? (String) filter : JSON.serialize(filter)),
 				child.getName(),
 				'rj' + index + '_'
 			);
@@ -111,14 +107,8 @@ public with sharing class FindRelatedRecords {
 		String head = 'Id' + operator + '(SELECT ' + lookup.getName() + ' FROM ' + child.getName();
 		Rendered rendered = new Rendered();
 		rendered.binds.putAll(bound.binds);
-		rendered.clause =
-			head +
-			(String.isBlank(bound.clause) ? '' : ' WHERE (' + bound.clause + ')') +
-			')';
-		rendered.display =
-			head +
-			(String.isBlank(bound.clause) ? '' : ' WHERE (' + bound.display() + ')') +
-			')';
+		rendered.clause = head + (String.isBlank(bound.clause) ? '' : ' WHERE (' + bound.clause + ')') + ')';
+		rendered.display = head + (String.isBlank(bound.clause) ? '' : ' WHERE (' + bound.display() + ')') + ')';
 		return rendered;
 	}
 
@@ -142,9 +132,7 @@ public with sharing class FindRelatedRecords {
 		List<Object> rawFields = entry.get('fields') instanceof List<Object>
 			? (List<Object>) entry.get('fields')
 			: new List<Object>();
-		Integer rows = entry.get('limit') == null
-			? MAX_CHILD_ROWS
-			: wholeNumber(entry.get('limit'));
+		Integer rows = entry.get('limit') == null ? MAX_CHILD_ROWS : wholeNumber(entry.get('limit'));
 		if (
 			rawFields.isEmpty() ||
 			rawFields.size() > MAX_CHILD_FIELDS ||
@@ -152,9 +140,7 @@ public with sharing class FindRelatedRecords {
 			rows < 1 ||
 			rows > MAX_CHILD_ROWS
 		) {
-			throw new QueryCompiler.QueryCompilerException(
-				BarnHelp.text('Core', 'Core_Find_ErrorChildColumn')
-			);
+			throw new QueryCompiler.QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorChildColumn'));
 		}
 		List<String> fields = new List<String>{ 'Id' };
 		for (Object rawField : rawFields) {
@@ -165,9 +151,7 @@ public with sharing class FindRelatedRecords {
 			}
 		}
 		Schema.SObjectField created = child.fields.getMap().get('CreatedDate');
-		String order = created != null && created.getDescribe().isSortable()
-			? 'CreatedDate DESC'
-			: 'Id';
+		String order = created != null && created.getDescribe().isSortable() ? 'CreatedDate DESC' : 'Id';
 		Rendered rendered = new Rendered();
 		rendered.clause =
 			'(SELECT ' +
@@ -184,9 +168,7 @@ public with sharing class FindRelatedRecords {
 	}
 
 	/** The child object of a relationship Find offers, or null. */
-	private static Schema.DescribeSObjectResult offeredChild(
-		Schema.ChildRelationship relationship
-	) {
+	private static Schema.DescribeSObjectResult offeredChild(Schema.ChildRelationship relationship) {
 		if (
 			relationship.getRelationshipName() == null ||
 			relationship.isDeprecatedAndHidden() ||
@@ -196,11 +178,7 @@ public with sharing class FindRelatedRecords {
 		}
 		Schema.DescribeSObjectResult child = relationship.getChildSObject()
 			.getDescribe(SObjectDescribeOptions.DEFERRED);
-		if (
-			!child.isAccessible() ||
-			!child.isQueryable() ||
-			QueryFieldCatalog.isSystemObject(child)
-		) {
+		if (!child.isAccessible() || !child.isQueryable() || QueryFieldCatalog.isSystemObject(child)) {
 			return null;
 		}
 		return child;
@@ -208,9 +186,7 @@ public with sharing class FindRelatedRecords {
 
 	private static Map<String, Object> asMap(Object raw) {
 		if (!(raw instanceof Map<String, Object>)) {
-			throw new QueryCompiler.QueryCompilerException(
-				BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
-			);
+			throw new QueryCompiler.QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
 		}
 		return (Map<String, Object>) raw;
 	}

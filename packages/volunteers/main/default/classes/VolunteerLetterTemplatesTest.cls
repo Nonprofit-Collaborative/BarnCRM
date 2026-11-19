@@ -34,10 +34,7 @@ private class VolunteerLetterTemplatesTest {
 		List<Volunteer_Letter_Template__c> again;
 		Test.startTest();
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-			update new Volunteer_Letter_Template__c(
-				Id = shipped('Hours_Letter').Id,
-				Body__c = '<p>Ours</p>'
-			);
+			update new Volunteer_Letter_Template__c(Id = shipped('Hours_Letter').Id, Body__c = '<p>Ours</p>');
 			again = VolunteerLetterTemplates.installDefaultsDuringInstall();
 		}
 		Test.stopTest();
@@ -80,8 +77,7 @@ private class VolunteerLetterTemplatesTest {
 				'One active hours letter.'
 			);
 			Assert.isTrue(
-				[SELECT Active__c FROM Volunteer_Letter_Template__c WHERE Name = 'Second']
-				.Active__c,
+				[SELECT Active__c FROM Volunteer_Letter_Template__c WHERE Name = 'Second'].Active__c,
 				'The last one saved is the active one.'
 			);
 			Assert.isTrue(shipped('Certificate').Active__c, 'Another type is untouched.');

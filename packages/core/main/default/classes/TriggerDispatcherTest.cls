@@ -150,20 +150,14 @@ private class TriggerDispatcherTest {
 
 			TriggerDispatcher.run(handler, contextFor(System.TriggerOperation.AFTER_INSERT));
 
-			Assert.areEqual(
-				1,
-				handler.runCount,
-				'A pause in the past must have expired by itself.'
-			);
+			Assert.areEqual(1, handler.runCount, 'A pause in the past must have expired by itself.');
 		}
 	}
 
 	@IsTest
 	static void aSwitchedOffAutomationStopsTheHandler() {
 		System.runAs(TestUsers.admin()) {
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ HANDLER_NAME => false }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ HANDLER_NAME => false });
 			RecordingHandler handler = new RecordingHandler();
 
 			TriggerDispatcher.run(handler, contextFor(System.TriggerOperation.BEFORE_INSERT));
@@ -200,16 +194,8 @@ private class TriggerDispatcherTest {
 				WHERE Context__c = :HANDLER_NAME
 			];
 			Assert.areEqual(1, logged.size(), 'The failure must be in the Error Log.');
-			Assert.areEqual(
-				ErrorLogger.SEVERITY_ERROR,
-				logged[0].Severity__c,
-				'Severity is Error.'
-			);
-			Assert.areEqual(
-				ErrorLogger.STATUS_NEW,
-				logged[0].Status__c,
-				'A new entry starts as New.'
-			);
+			Assert.areEqual(ErrorLogger.SEVERITY_ERROR, logged[0].Severity__c, 'Severity is Error.');
+			Assert.areEqual(ErrorLogger.STATUS_NEW, logged[0].Status__c, 'A new entry starts as New.');
 			Assert.isTrue(
 				logged[0].Technical_Detail__c.contains('IllegalArgumentException'),
 				'The technical detail names the exception type.'
@@ -249,15 +235,9 @@ private class TriggerDispatcherTest {
 	@IsTest
 	static void nothingHappensWithoutAHandlerOrAContext() {
 		System.runAs(TestUsers.admin()) {
-			TriggerDispatcher.run(
-				(TriggerHandler) null,
-				contextFor(System.TriggerOperation.BEFORE_INSERT)
-			);
+			TriggerDispatcher.run((TriggerHandler) null, contextFor(System.TriggerOperation.BEFORE_INSERT));
 			TriggerDispatcher.run(new RecordingHandler(), null);
-			TriggerDispatcher.run(
-				new RecordingHandler(),
-				new TriggerDispatcher.Context(null, null, null, null, null)
-			);
+			TriggerDispatcher.run(new RecordingHandler(), new TriggerDispatcher.Context(null, null, null, null, null));
 
 			Assert.areEqual(
 				0,
@@ -271,15 +251,10 @@ private class TriggerDispatcherTest {
 	static void theRegistryDecidesWhichHandlersRunForAnObject() {
 		System.runAs(TestUsers.admin()) {
 			TestRegisteredHandler.reset();
-			Automation_Registry__mdt registered = TestDataFactory.registryEntry(
-				'Registered_Test',
-				true
-			);
+			Automation_Registry__mdt registered = TestDataFactory.registryEntry('Registered_Test', true);
 			registered.Handler_Class__c = 'TestRegisteredHandler';
 			registered.Object_Name__c = 'Error_Log__c';
-			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
-				registered
-			};
+			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{ registered };
 
 			Test.startTest();
 			TriggerDispatcher.run('Error_Log__c', contextFor(System.TriggerOperation.AFTER_INSERT));
@@ -365,10 +340,7 @@ private class TriggerDispatcherTest {
 
 			Test.startTest();
 			try {
-				TriggerDispatcher.run(
-					'Error_Log__c',
-					contextFor(System.TriggerOperation.AFTER_INSERT)
-				);
+				TriggerDispatcher.run('Error_Log__c', contextFor(System.TriggerOperation.AFTER_INSERT));
 			} catch (TriggerDispatcher.TriggerDispatcherException expected) {
 				reported = true;
 			}
@@ -391,17 +363,10 @@ private class TriggerDispatcherTest {
 	static void aRegisteredAutomationRespectsItsOwnSwitch() {
 		System.runAs(TestUsers.admin()) {
 			TestRegisteredHandler.reset();
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ 'Registered_Test' => false }
-			);
-			Automation_Registry__mdt registered = TestDataFactory.registryEntry(
-				'Registered_Test',
-				true
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ 'Registered_Test' => false });
+			Automation_Registry__mdt registered = TestDataFactory.registryEntry('Registered_Test', true);
 			registered.Handler_Class__c = 'TestRegisteredHandler';
-			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
-				registered
-			};
+			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{ registered };
 
 			Test.startTest();
 			TriggerDispatcher.run('Error_Log__c', contextFor(System.TriggerOperation.AFTER_INSERT));
@@ -439,10 +404,7 @@ private class TriggerDispatcherTest {
 			TriggerDispatcher.startRollupWrite();
 			TriggerDispatcher.run('Contact', contextFor(System.TriggerOperation.AFTER_UPDATE));
 			Integer duringWrite = TestRegisteredHandler.runCount;
-			Boolean insertLimited = TriggerDispatcher.isRollupWrite(
-				'Contact',
-				System.TriggerOperation.AFTER_INSERT
-			);
+			Boolean insertLimited = TriggerDispatcher.isRollupWrite('Contact', System.TriggerOperation.AFTER_INSERT);
 			Boolean otherObjectLimited = TriggerDispatcher.isRollupWrite(
 				'Error_Log__c',
 				System.TriggerOperation.AFTER_UPDATE
@@ -465,19 +427,12 @@ private class TriggerDispatcherTest {
 			// Everything an administrator or a bulk operation could do to stop an automation, all at
 			// once: the row is switched off, the org is paused, and the name is bypassed.
 			TestDataFactory.pausedSettings(2);
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ 'Registered_Test' => false }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ 'Registered_Test' => false });
 			AutomationControl.bypass('Registered_Test');
-			Automation_Registry__mdt registered = TestDataFactory.registryEntry(
-				'Registered_Test',
-				true
-			);
+			Automation_Registry__mdt registered = TestDataFactory.registryEntry('Registered_Test', true);
 			registered.Handler_Class__c = 'TestRegisteredHandler';
 			registered.Always_Runs__c = true;
-			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
-				registered
-			};
+			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{ registered };
 
 			Test.startTest();
 			TriggerDispatcher.run('Error_Log__c', contextFor(System.TriggerOperation.AFTER_INSERT));
@@ -497,15 +452,10 @@ private class TriggerDispatcherTest {
 		System.runAs(TestUsers.admin()) {
 			TestRegisteredHandler.reset();
 			TestDataFactory.pausedSettings(2);
-			Automation_Registry__mdt registered = TestDataFactory.registryEntry(
-				'Registered_Test',
-				true
-			);
+			Automation_Registry__mdt registered = TestDataFactory.registryEntry('Registered_Test', true);
 			registered.Handler_Class__c = 'TestRegisteredHandler';
 			registered.Always_Runs__c = false;
-			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
-				registered
-			};
+			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{ registered };
 
 			Test.startTest();
 			TriggerDispatcher.run('Error_Log__c', contextFor(System.TriggerOperation.AFTER_INSERT));
@@ -524,10 +474,7 @@ private class TriggerDispatcherTest {
 		System.runAs(TestUsers.admin()) {
 			Automation_Registry__mdt missing = TestDataFactory.registryEntry('Missing_Test', true);
 			missing.Handler_Class__c = 'NoSuchHandlerClass';
-			Automation_Registry__mdt notAHandler = TestDataFactory.registryEntry(
-				'Wrong_Test',
-				true
-			);
+			Automation_Registry__mdt notAHandler = TestDataFactory.registryEntry('Wrong_Test', true);
 			notAHandler.Handler_Class__c = 'ErrorLogger';
 			notAHandler.Execution_Order__c = 30;
 			Automation_Registry__mdt noClass = TestDataFactory.registryEntry('Blank_Test', true);
@@ -578,11 +525,7 @@ private class TriggerDispatcherTest {
 			Set<Id> first = new Set<Id>{ records[0].Id, records[1].Id };
 			Set<Id> overlapping = new Set<Id>{ records[1].Id, records[2].Id };
 
-			Assert.areEqual(
-				first,
-				handler.claimRunFor('afterUpdate', first),
-				'The first claim hands back everything.'
-			);
+			Assert.areEqual(first, handler.claimRunFor('afterUpdate', first), 'The first claim hands back everything.');
 			Assert.areEqual(
 				new Set<Id>{ records[2].Id },
 				handler.claimRunFor('afterUpdate', overlapping),
@@ -596,10 +539,7 @@ private class TriggerDispatcherTest {
 				handler.claimRunFor('afterUpdate', new Set<Id>()).isEmpty(),
 				'Claiming nothing claims nothing.'
 			);
-			Assert.isTrue(
-				handler.claimRunFor('afterUpdate', null).isEmpty(),
-				'And neither does claiming null.'
-			);
+			Assert.isTrue(handler.claimRunFor('afterUpdate', null).isEmpty(), 'And neither does claiming null.');
 			Assert.areEqual(
 				new Set<Id>{ records[0].Id },
 				handler.claimRunFor('beforeUpdate', new Set<Id>{ records[0].Id }),
@@ -621,14 +561,9 @@ private class TriggerDispatcherTest {
 			TestRegisteredHandler.reset();
 			Automation_Registry__mdt registered = TestDataFactory.registryEntry('Bulk_Test', true);
 			registered.Handler_Class__c = 'TestRegisteredHandler';
-			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{
-				registered
-			};
+			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>{ registered };
 			// One DML of 400 records fires the trigger twice, in one transaction, with statics kept.
-			List<Error_Log__c> loaded = TestDataFactory.insertErrorLogs(
-				400,
-				ErrorLogger.STATUS_NEW
-			);
+			List<Error_Log__c> loaded = TestDataFactory.insertErrorLogs(400, ErrorLogger.STATUS_NEW);
 			Map<Id, SObject> firstChunk = new Map<Id, SObject>();
 			Map<Id, SObject> secondChunk = new Map<Id, SObject>();
 			for (Integer i = 0; i < loaded.size(); i++) {
@@ -668,11 +603,7 @@ private class TriggerDispatcherTest {
 	@IsTest
 	static void aHandlerNamesItselfAfterItsClass() {
 		System.runAs(TestUsers.admin()) {
-			Assert.areEqual(
-				HANDLER_NAME,
-				new RecordingHandler().getName(),
-				'A handler may override its name.'
-			);
+			Assert.areEqual(HANDLER_NAME, new RecordingHandler().getName(), 'A handler may override its name.');
 			Assert.areEqual(
 				'TriggerHandler',
 				new TriggerHandler().getName(),
@@ -703,11 +634,7 @@ private class TriggerDispatcherTest {
 			handler.afterDelete();
 			handler.afterUndelete();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Error_Log__c],
-				'The base handler does nothing.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c], 'The base handler does nothing.');
 		}
 	}
 
@@ -730,11 +657,7 @@ private class TriggerDispatcherTest {
 			TriggerHandler.testOld = (List<SObject>) records;
 			TriggerHandler.testOldMap = byId;
 
-			Assert.areEqual(
-				2,
-				handler.newRecords().size(),
-				'A test can hand a handler its records.'
-			);
+			Assert.areEqual(2, handler.newRecords().size(), 'A test can hand a handler its records.');
 			Assert.areEqual(byId.keySet(), handler.newRecordsById().keySet(), 'Keyed by id.');
 			Assert.areEqual(2, handler.oldRecords().size(), 'The same for the old records.');
 			Assert.areEqual(byId.keySet(), handler.oldRecordsById().keySet(), 'And their map.');

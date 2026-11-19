@@ -19,17 +19,13 @@ private class DeleteByFileTest {
 	private static final Integer MANY = 200;
 
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	/** `volunteers` contacts titled Volunteer and `staff` titled Staff, in name order. */
 	private static List<Contact> makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
@@ -82,10 +78,7 @@ private class DeleteByFileTest {
 		);
 		Assert.areEqual(volunteers.size(), outcome.matched, 'Each named record would go.');
 		Assert.areEqual(3, outcome.rejected, 'The repeat, the bad ID and the account.');
-		update new Import_Batch__c(
-			Id = batch.Id,
-			Status__c = ImportBatchService.STATUS_DRY_RUN_COMPLETE
-		);
+		update new Import_Batch__c(Id = batch.Id, Status__c = ImportBatchService.STATUS_DRY_RUN_COMPLETE);
 		return batch;
 	}
 
@@ -118,16 +111,11 @@ private class DeleteByFileTest {
 			System.runAs(deleter()) {
 				Import_Template__c template = deleteTemplate();
 				Assert.isTrue(
-					ImportObjectSchema.operationsFor(Contact.SObjectType)
-						.contains(ImportObjectSchema.OPERATION_DELETE),
+					ImportObjectSchema.operationsFor(Contact.SObjectType).contains(ImportObjectSchema.OPERATION_DELETE),
 					'Offered to a person who may bulk delete.'
 				);
 				batch = dryRun(template, volunteers);
-				Assert.areEqual(
-					MANY + 30,
-					[SELECT COUNT() FROM Contact],
-					'The dry run deletes nothing.'
-				);
+				Assert.areEqual(MANY + 30, [SELECT COUNT() FROM Contact], 'The dry run deletes nothing.');
 
 				BulkDeleteService.Preview preview = BulkDeleteService.filePreview(batch.Id);
 				Assert.areEqual(MANY, preview.count, 'The count to type is the Matched rows.');
@@ -138,19 +126,13 @@ private class DeleteByFileTest {
 					ImportBatchService.startCommit(batch.Id);
 					Assert.fail('The import commit is refused.');
 				} catch (ImportException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsConfirm'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsConfirm'), refused.getMessage());
 				}
 				try {
 					BulkDeleteService.startFromFile(batch.Id, MANY - 1);
 					Assert.fail('A count that is not the dry run count is refused.');
 				} catch (BulkDeleteService.BulkDeleteException refused) {
-					Assert.isTrue(
-						refused.getMessage().contains(MANY.format()),
-						refused.getMessage()
-					);
+					Assert.isTrue(refused.getMessage().contains(MANY.format()), refused.getMessage());
 				}
 			}
 			// Somebody deletes one of them after the dry run.
@@ -170,17 +152,12 @@ private class DeleteByFileTest {
 			Assert.areEqual(ImportBatchService.STATUS_COMPLETE, job.Status__c, job.Run_Log__c);
 			Assert.areEqual(BulkDeleteService.OPERATION_DELETE, job.Operation__c);
 			Assert.isTrue(job.Operation_JSON__c.contains('"source":"file"'), job.Operation_JSON__c);
-			Assert.areEqual(
-				MANY - 1,
-				job.Rows_Deleted__c,
-				'The one already gone is counted apart.'
-			);
+			Assert.areEqual(MANY - 1, job.Rows_Deleted__c, 'The one already gone is counted apart.');
 			Assert.areEqual(MANY - 1, journaledDeletes(job.Id), 'Each deleted Id is journaled.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact WHERE Title = 'Volunteer']);
 			Assert.areEqual(30, [SELECT COUNT() FROM Contact WHERE Title = 'Staff']);
 			Assert.isFalse(
-				new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10))
-					.containsKey(job.Id),
+				new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10)).containsKey(job.Id),
 				'It has left the import history.'
 			);
 		}
@@ -239,18 +216,10 @@ private class DeleteByFileTest {
 			}
 			System.runAs(deleter()) {
 				Import_Batch__c batch = dryRun(deleteTemplate(), volunteers);
-				BulkDeleteService.BackupPage first = BulkDeleteController.backupPage(
-					null,
-					batch.Id,
-					null
-				);
+				BulkDeleteService.BackupPage first = BulkDeleteController.backupPage(null, batch.Id, null);
 				Assert.areEqual(MANY, first.rows.size(), 'One full page.');
 				Assert.isFalse(first.done);
-				BulkDeleteService.BackupPage second = BulkDeleteController.backupPage(
-					null,
-					batch.Id,
-					first.lastId
-				);
+				BulkDeleteService.BackupPage second = BulkDeleteController.backupPage(null, batch.Id, first.lastId);
 				Assert.areEqual(0, second.rows.size(), 'Only the Matched rows.');
 				Assert.isTrue(second.done);
 				for (SObject row : first.rows) {
@@ -267,16 +236,12 @@ private class DeleteByFileTest {
 			List<Contact> volunteers = makePeople(2, 0);
 			System.runAs(TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN })) {
 				Assert.isFalse(
-					ImportObjectSchema.operationsFor(Contact.SObjectType)
-						.contains(ImportObjectSchema.OPERATION_DELETE)
+					ImportObjectSchema.operationsFor(Contact.SObjectType).contains(ImportObjectSchema.OPERATION_DELETE)
 				);
 				Import_Template__c template = deleteTemplate();
 				Assert.areEqual(
 					BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission'),
-					ImportObjectSchema.refusal(
-						template,
-						ImportMapping.parse(template.Column_Mapping_JSON__c)
-					)
+					ImportObjectSchema.refusal(template, ImportMapping.parse(template.Column_Mapping_JSON__c))
 				);
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
 				choices.operation = ImportObjectSchema.OPERATION_DELETE;

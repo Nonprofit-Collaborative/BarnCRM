@@ -11,9 +11,7 @@ private class GivingRecordGlanceExtensionTest {
 	}
 
 	private static Map<String, Object> view(RecordGlance.Card card) {
-		return card == null
-			? null
-			: (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(card));
+		return card == null ? null : (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(card));
 	}
 
 	private static Map<String, Object> tile(Map<String, Object> card, Integer index) {
@@ -27,26 +25,14 @@ private class GivingRecordGlanceExtensionTest {
 	@IsTest
 	static void aPersonGetsTheCardWithTotalsAndEnterAGift() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = GivingTestDataFactory.insertHouseholdContact(
-				'Glance Household',
-				'Gale',
-				'Glance'
-			);
+			Contact person = GivingTestDataFactory.insertHouseholdContact('Glance Household', 'Gale', 'Glance');
 			Test.startTest();
 			Map<String, Object> card = view(new GivingRecordGlanceExtension().glance(person.Id));
 			Test.stopTest();
 
 			Assert.isNotNull(card, 'A Giving admin sees the card');
-			Assert.areEqual(
-				Label.Giving_Glance_Title,
-				card.get('title'),
-				'The card is Giving at a Glance'
-			);
-			Assert.areEqual(
-				3,
-				((List<Object>) card.get('tiles')).size(),
-				'Total, last gift and donor level'
-			);
+			Assert.areEqual(Label.Giving_Glance_Title, card.get('title'), 'The card is Giving at a Glance');
+			Assert.areEqual(3, ((List<Object>) card.get('tiles')).size(), 'Total, last gift and donor level');
 			Assert.areEqual(
 				Schema.SObjectType.Contact.fields.Total_Giving__c.getLabel(),
 				tile(card, 0).get('label'),
@@ -57,11 +43,7 @@ private class GivingRecordGlanceExtensionTest {
 				(Decimal) tile(card, 0).get('numberValue'),
 				'A person who never gave shows zero, not blank'
 			);
-			Assert.areEqual(
-				1,
-				actions(card).size(),
-				'Someone who can create gifts gets Enter a Gift'
-			);
+			Assert.areEqual(1, actions(card).size(), 'Someone who can create gifts gets Enter a Gift');
 			Map<String, Object> action = (Map<String, Object>) actions(card)[0];
 			Map<String, Object> reference = (Map<String, Object>) JSON.deserializeUntyped(
 				(String) action.get('pageReference')
@@ -80,9 +62,7 @@ private class GivingRecordGlanceExtensionTest {
 	static void anOrganizationGetsTheCardToo() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Account organization = GivingTestDataFactory.insertOrganization('Glance Hardware');
-			Map<String, Object> card = view(
-				new GivingRecordGlanceExtension().glance(organization.Id)
-			);
+			Map<String, Object> card = view(new GivingRecordGlanceExtension().glance(organization.Id));
 			Assert.isNotNull(card, 'An organization has a card');
 			Assert.areEqual(
 				Schema.SObjectType.Account.fields.Last_Gift_Date__c.getLabel(),
@@ -110,9 +90,7 @@ private class GivingRecordGlanceExtensionTest {
 			Contact.class
 		);
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Map<String, Object> card = view(
-				GivingRecordGlanceExtension.card(donor, Contact.SObjectType)
-			);
+			Map<String, Object> card = view(GivingRecordGlanceExtension.card(donor, Contact.SObjectType));
 			Assert.areEqual(450, (Decimal) tile(card, 0).get('numberValue'), 'Total giving');
 			Assert.areEqual('2026-10-01', tile(card, 1).get('dateValue'), 'Last gift date');
 			Assert.areEqual('Friend', tile(card, 2).get('textValue'), 'Donor level name');
@@ -121,23 +99,13 @@ private class GivingRecordGlanceExtensionTest {
 
 	@IsTest
 	static void someoneWithoutGivingAccessGetsNoCard() {
-		User reader = TestUsers.peopleReaderWith(
-			'GlanceReader',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		);
+		User reader = TestUsers.peopleReaderWith('GlanceReader', new List<String>{ 'BarnCRM_Read_Only' });
 		Contact person;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			person = GivingTestDataFactory.insertHouseholdContact(
-				'Hidden Household',
-				'Hal',
-				'Hidden'
-			);
+			person = GivingTestDataFactory.insertHouseholdContact('Hidden Household', 'Hal', 'Hidden');
 		}
 		System.runAs(reader) {
-			Assert.isNull(
-				new GivingRecordGlanceExtension().glance(person.Id),
-				'No Giving access, no card'
-			);
+			Assert.isNull(new GivingRecordGlanceExtension().glance(person.Id), 'No Giving access, no card');
 			Assert.isNull(new GivingRecordGlanceExtension().glance(null), 'No record, no card');
 		}
 	}
@@ -150,19 +118,12 @@ private class GivingRecordGlanceExtensionTest {
 		);
 		Contact person;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			person = GivingTestDataFactory.insertHouseholdContact(
-				'Read Household',
-				'Rae',
-				'Reader'
-			);
+			person = GivingTestDataFactory.insertHouseholdContact('Read Household', 'Rae', 'Reader');
 		}
 		System.runAs(reader) {
 			Map<String, Object> card = view(new GivingRecordGlanceExtension().glance(person.Id));
 			Assert.isNotNull(card, 'A Giving reader sees the figures');
-			Assert.isTrue(
-				actions(card).isEmpty(),
-				'Only someone who can create a gift gets Enter a Gift'
-			);
+			Assert.isTrue(actions(card).isEmpty(), 'Only someone who can create a gift gets Enter a Gift');
 		}
 	}
 }

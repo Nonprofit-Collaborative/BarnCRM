@@ -59,10 +59,7 @@ public with sharing class AskReminderBatch implements Database.Batchable<SObject
 		try {
 			if (ACCOUNTS.equals(scopeObject)) {
 				if (!Test.isRunningTest() && AskReminderService.isEnabled()) {
-					Database.executeBatch(
-						new AskReminderBatch(CONTACTS, today, created, failed),
-						CHUNK_SIZE
-					);
+					Database.executeBatch(new AskReminderBatch(CONTACTS, today, created, failed), CHUNK_SIZE);
 				}
 				return;
 			}

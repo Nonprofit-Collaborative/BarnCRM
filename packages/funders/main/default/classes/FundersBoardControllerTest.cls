@@ -26,11 +26,7 @@ private class FundersBoardControllerTest {
 				awarded('State award', agency.Id, 20000, today, null),
 				awarded('Old award', lakeside.Id, 99000, today.addYears(-2), 'Federal')
 			};
-			Grant__c applied = GrantTestData.grant(
-				'Open request',
-				agency.Id,
-				GrantService.STAGE_APPLIED
-			);
+			Grant__c applied = GrantTestData.grant('Open request', agency.Id, GrantService.STAGE_APPLIED);
 			applied.Amount_Requested__c = 50000;
 			grants.add(applied);
 			insert as user grants;
@@ -48,13 +44,7 @@ private class FundersBoardControllerTest {
 		}
 	}
 
-	private static Grant__c awarded(
-		String name,
-		Id funderId,
-		Decimal amount,
-		Date decided,
-		String source
-	) {
+	private static Grant__c awarded(String name, Id funderId, Decimal amount, Date decided, String source) {
 		Grant__c grant = GrantTestData.grant(name, funderId, GrantService.STAGE_AWARDED);
 		grant.Amount_Awarded__c = amount;
 		grant.Decision_Date__c = decided;
@@ -62,12 +52,7 @@ private class FundersBoardControllerTest {
 		return grant;
 	}
 
-	private static SObject fundRecord(
-		Schema.SObjectType type,
-		String name,
-		Boolean restricted,
-		Decimal raised
-	) {
+	private static SObject fundRecord(Schema.SObjectType type, String name, Boolean restricted, Decimal raised) {
 		SObject record = type.newSObject();
 		record.put('Name', name);
 		record.put(NamespaceUtil.qualify('Active__c'), true);
@@ -88,11 +73,7 @@ private class FundersBoardControllerTest {
 			Assert.areEqual(30000, board.grantsBySource[0].amount, 'Federal awarded');
 			Assert.isNull(board.grantsBySource[1].key, 'A blank source');
 			Assert.areEqual(2, board.grantsByFunder.size(), 'Each funder');
-			Assert.areEqual(
-				'Lakeside Foundation',
-				board.grantsByFunder[0].name,
-				'Largest funder first'
-			);
+			Assert.areEqual('Lakeside Foundation', board.grantsByFunder[0].name, 'Largest funder first');
 			Assert.isTrue(board.givingAvailable, 'Giving read');
 			Assert.areEqual(50000, board.giftsThisYear, 'Every fund this year');
 			Assert.areEqual(1, board.givingByAccount.size(), 'Organizations that gave');

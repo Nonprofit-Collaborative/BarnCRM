@@ -60,11 +60,7 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 		if (indicatorIds == null || indicatorIds.isEmpty()) {
 			return null;
 		}
-		return AsyncStarter.batch(
-			new IndicatorResultsBatch(indicatorIds),
-			CHUNK_SIZE,
-			'IndicatorResultsBatch'
-		);
+		return AsyncStarter.batch(new IndicatorResultsBatch(indicatorIds), CHUNK_SIZE, 'IndicatorResultsBatch');
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
@@ -89,12 +85,7 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 	/** The query of the source records, or null when there is nothing to read. */
 	private String sourceQuery() {
 		List<Indicator__c> found = [
-			SELECT
-				Id,
-				Source__c,
-				Source_Query__c,
-				Source_Query__r.Query_JSON__c,
-				Source_Definition__c
+			SELECT Id, Source__c, Source_Query__c, Source_Query__r.Query_JSON__c, Source_Definition__c
 			FROM Indicator__c
 			WHERE Id = :indicatorId
 			WITH SYSTEM_MODE
@@ -111,9 +102,7 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 		}
 		definition = IndicatorSourceService.parse(indicator.Source_Definition__c);
 		if (definition == null) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Source_Invalid'));
 		}
 		Date today = Date.today();
 		Date earliest;
@@ -130,31 +119,22 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 			bucket.startDate = period.Start_Date__c;
 			bucket.endDate = period.End_Date__c;
 			buckets.add(bucket);
-			earliest = earliest == null ||
-				bucket.startDate < earliest
-				? bucket.startDate
-				: earliest;
+			earliest = earliest == null || bucket.startDate < earliest ? bucket.startDate : earliest;
 			latest = latest == null || bucket.endDate > latest ? bucket.endDate : latest;
 		}
 		if (buckets.isEmpty()) {
 			return null;
 		}
-		QueryCompiler.Compiled compiled = IndicatorSourceService.compile(
-			indicator.Source_Query__r.Query_JSON__c
-		);
+		QueryCompiler.Compiled compiled = IndicatorSourceService.compile(indicator.Source_Query__r.Query_JSON__c);
 		IndicatorSourceService.check(compiled.objectName, definition);
 		Boolean dateTimeField =
-			QueryCompiler.resolve(compiled.objectName, definition.dateField).getType() ==
-			Schema.DisplayType.DATETIME;
+			QueryCompiler.resolve(compiled.objectName, definition.dateField).getType() == Schema.DisplayType.DATETIME;
 
 		binds = new Map<String, Object>(compiled.binds);
 		binds.remove('rowLimit');
 		if (dateTimeField) {
 			binds.put('periodsFrom', Datetime.newInstance(earliest, Time.newInstance(0, 0, 0, 0)));
-			binds.put(
-				'periodsTo',
-				Datetime.newInstance(latest.addDays(1), Time.newInstance(0, 0, 0, 0))
-			);
+			binds.put('periodsTo', Datetime.newInstance(latest.addDays(1), Time.newInstance(0, 0, 0, 0)));
 		} else {
 			binds.put('periodsFrom', earliest);
 			binds.put('periodsTo', latest.addDays(1));
@@ -191,9 +171,7 @@ public without sharing class IndicatorResultsBatch implements Database.Batchable
 				if (definition.function == IndicatorSourceService.COUNT) {
 					bucket.total += 1;
 				} else if (definition.function == IndicatorSourceService.SUM) {
-					bucket.total += measured == null
-						? 0
-						: Decimal.valueOf(String.valueOf(measured));
+					bucket.total += measured == null ? 0 : Decimal.valueOf(String.valueOf(measured));
 				} else if (measured != null) {
 					bucket.seen.add(String.valueOf(measured));
 				}

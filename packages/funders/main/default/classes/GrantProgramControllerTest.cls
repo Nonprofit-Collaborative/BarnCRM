@@ -7,10 +7,7 @@ private class GrantProgramControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWithInstalledModules();
-		TestUsers.standardUserWith(
-			'Gpcreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gpcreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 		TestUsers.standardUser('Gpcnoaccess');
 	}
 
@@ -22,8 +19,7 @@ private class GrantProgramControllerTest {
 	}
 
 	private static String storedProgram(Id grantId) {
-		return [SELECT Program_Id__c FROM Grant__c WHERE Id = :grantId WITH SYSTEM_MODE]
-		.Program_Id__c;
+		return [SELECT Program_Id__c FROM Grant__c WHERE Id = :grantId WITH SYSTEM_MODE].Program_Id__c;
 	}
 
 	@IsTest
@@ -78,11 +74,7 @@ private class GrantProgramControllerTest {
 			Test.stopTest();
 
 			Assert.isNull(storedProgram(grant.Id), 'Cleared');
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Grant_BadProgram'),
-				refusal,
-				'A grant is not a program'
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Grant_BadProgram'), refusal, 'A grant is not a program');
 		}
 	}
 

@@ -47,10 +47,7 @@ public with sharing class GiftCommitmentHandler extends TriggerHandler {
 				CommitmentService.countsAsPaid(gift)
 			) {
 				Decimal removed = removedByCommitment.get(gift.Commitment__c);
-				removedByCommitment.put(
-					gift.Commitment__c,
-					(removed == null ? 0 : removed) - gift.Amount__c
-				);
+				removedByCommitment.put(gift.Commitment__c, (removed == null ? 0 : removed) - gift.Amount__c);
 			}
 		}
 		CommitmentService.applyGift(relevant);

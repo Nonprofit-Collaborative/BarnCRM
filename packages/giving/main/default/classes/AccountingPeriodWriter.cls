@@ -38,9 +38,7 @@ public with sharing class AccountingPeriodWriter {
 	public static void saveClosedThrough(Date closeDate) {
 		OrgSettingsSystemWriter.save(
 			Giving_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Giving_Settings__c.Books_Closed_Through__c => closeDate
-			}
+			new Map<Schema.SObjectField, Object>{ Giving_Settings__c.Books_Closed_Through__c => closeDate }
 		);
 	}
 }

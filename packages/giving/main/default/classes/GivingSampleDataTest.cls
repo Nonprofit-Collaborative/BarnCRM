@@ -24,18 +24,10 @@ private class GivingSampleDataTest {
 	/** A household, two people and an organization, flagged and keyed as Core's loader leaves them. */
 	private static void insertSamplePeople() {
 		Account household = TestDataFactory.household(
-			new Account(
-				Name = 'The Sample Family',
-				Sample_Data__c = true,
-				Sample_Data_Key__c = 'H001'
-			)
+			new Account(Name = 'The Sample Family', Sample_Data__c = true, Sample_Data_Key__c = 'H001')
 		);
 		Account organization = TestDataFactory.organization(
-			new Account(
-				Name = 'Cedar Valley Foundation',
-				Sample_Data__c = true,
-				Sample_Data_Key__c = ORGANIZATION_KEY
-			)
+			new Account(Name = 'Cedar Valley Foundation', Sample_Data__c = true, Sample_Data_Key__c = ORGANIZATION_KEY)
 		);
 		insert new List<Account>{ household, organization };
 		insert new List<Contact>{
@@ -85,13 +77,7 @@ private class GivingSampleDataTest {
 		};
 	}
 
-	private static Map<String, Object> gift(
-		String key,
-		String donor,
-		Integer daysAgo,
-		Decimal amount,
-		String status
-	) {
+	private static Map<String, Object> gift(String key, String donor, Integer daysAgo, Decimal amount, String status) {
 		return new Map<String, Object>{
 			'key' => key,
 			'donor' => donor,
@@ -103,9 +89,7 @@ private class GivingSampleDataTest {
 			'acknowledgmentStatus' => 'Acknowledged',
 			'paymentReference' => 'Check 1001',
 			'commitment' => null,
-			'allocations' => new List<Object>{
-				new Map<String, Object>{ 'fund' => 'General Fund', 'amount' => amount }
-			}
+			'allocations' => new List<Object>{ new Map<String, Object>{ 'fund' => 'General Fund', 'amount' => amount } }
 		};
 	}
 
@@ -137,9 +121,7 @@ private class GivingSampleDataTest {
 		reversal.put('refundReason', 'Card charged twice at the gala.');
 		reversal.put(
 			'allocations',
-			new List<Object>{
-				new Map<String, Object>{ 'fund' => 'General Fund', 'amount' => -500 }
-			}
+			new List<Object>{ new Map<String, Object>{ 'fund' => 'General Fund', 'amount' => -500 } }
 		);
 
 		Map<String, Object> tribute = new Map<String, Object>{
@@ -157,14 +139,8 @@ private class GivingSampleDataTest {
 		};
 
 		Map<String, Object> root = new Map<String, Object>{
-			'funds' => new List<Object>{
-				fund('General Fund', '4000'),
-				fund('Building Fund', '4100')
-			},
-			'appeals' => new List<Object>{
-				appeal('Annual Fund', null),
-				appeal('Spring Appeal', 'Annual Fund')
-			},
+			'funds' => new List<Object>{ fund('General Fund', '4000'), fund('Building Fund', '4100') },
+			'appeals' => new List<Object>{ appeal('Annual Fund', null), appeal('Spring Appeal', 'Annual Fund') },
 			'commitments' => new List<Object>{ pledge },
 			'gifts' => new List<Object>{
 				gift('G0001', PERSON_KEY, 30, 1000, 'Received'),
@@ -316,11 +292,7 @@ private class GivingSampleDataTest {
 				],
 				'the allocation in the file is the one the gift gets, not a default fund one'
 			);
-			System.assertEquals(
-				1,
-				[SELECT COUNT() FROM Tribute__c],
-				'the tribute named against its gift is loaded'
-			);
+			System.assertEquals(1, [SELECT COUNT() FROM Tribute__c], 'the tribute named against its gift is loaded');
 			System.assertEquals(
 				1,
 				[SELECT COUNT() FROM Soft_Credit__c WHERE Is_Automatic__c = FALSE],
@@ -358,11 +330,7 @@ private class GivingSampleDataTest {
 				reversal.Original_Gift__c,
 				'the negative gift names the gift it reverses, in a later insert than the original'
 			);
-			System.assertEquals(
-				-500,
-				reversal.Amount__c,
-				'the reversal carries the money back out'
-			);
+			System.assertEquals(-500, reversal.Amount__c, 'the reversal carries the money back out');
 			System.assertEquals(
 				'Card charged twice at the gala.',
 				reversal.Refund_Reason__c,
@@ -451,11 +419,7 @@ private class GivingSampleDataTest {
 			Test.stopTest();
 
 			System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'both halves of the pair went');
-			System.assertEquals(
-				0,
-				[SELECT COUNT() FROM Soft_Credit__c],
-				'and the credit with them'
-			);
+			System.assertEquals(0, [SELECT COUNT() FROM Soft_Credit__c], 'and the credit with them');
 		}
 	}
 
@@ -527,22 +491,14 @@ private class GivingSampleDataTest {
 				stageCount,
 				'the reversal, the four other gifts, the commitment, the appeals and the funds: one chunk each'
 			);
-			System.assertEquals(
-				0,
-				GivingSampleDataLoader.removeNext(),
-				'nothing is left for another stage to delete'
-			);
+			System.assertEquals(0, GivingSampleDataLoader.removeNext(), 'nothing is left for another stage to delete');
 			System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'no sample gift is left');
 			System.assertEquals(
 				0,
 				[SELECT COUNT() FROM Gift_Allocation__c],
 				'allocations go with the gift they belong to'
 			);
-			System.assertEquals(
-				0,
-				[SELECT COUNT() FROM Tribute__c],
-				'tributes go with the gift they belong to'
-			);
+			System.assertEquals(0, [SELECT COUNT() FROM Tribute__c], 'tributes go with the gift they belong to');
 			System.assertEquals(
 				0,
 				[SELECT COUNT() FROM Soft_Credit__c],
@@ -559,13 +515,7 @@ private class GivingSampleDataTest {
 		}
 	}
 
-	private static Map<String, Object> ask(
-		String key,
-		String donor,
-		String stage,
-		String outcome,
-		String commitment
-	) {
+	private static Map<String, Object> ask(String key, String donor, String stage, String outcome, String commitment) {
 		return new Map<String, Object>{
 			'key' => key,
 			'donor' => donor,
@@ -600,9 +550,7 @@ private class GivingSampleDataTest {
 			);
 
 			Test.startTest();
-			GivingSampleDataLoader.loadReferenceData(
-				GivingSampleDataSet.parse(JSON.serialize(root))
-			);
+			GivingSampleDataLoader.loadReferenceData(GivingSampleDataSet.parse(JSON.serialize(root)));
 			Test.stopTest();
 
 			System.assertEquals(
@@ -660,11 +608,7 @@ private class GivingSampleDataTest {
 			while (calls < 10 && GivingSampleDataLoader.removeNext() > 0) {
 				calls++;
 			}
-			System.assertEquals(
-				0,
-				[SELECT COUNT() FROM Ask__c],
-				'removal deletes every sample ask'
-			);
+			System.assertEquals(0, [SELECT COUNT() FROM Ask__c], 'removal deletes every sample ask');
 			System.assertEquals(0, [SELECT COUNT() FROM Commitment__c]);
 		}
 	}
@@ -732,11 +676,7 @@ private class GivingSampleDataTest {
 				FROM Fund__c
 				WHERE Id = :ownFund.Id
 			];
-			System.assertEquals(
-				false,
-				kept.Sample_Data__c,
-				'the org\'s fund is not flagged sample'
-			);
+			System.assertEquals(false, kept.Sample_Data__c, 'the org\'s fund is not flagged sample');
 			System.assertEquals(true, kept.Is_Default__c, 'and it is still the default');
 			System.assertEquals(
 				0,
@@ -793,11 +733,7 @@ private class GivingSampleDataTest {
 			// the fundraiser enters saves only when there is a default fund to allocate it to.
 			Fund__c ownFund = GivingTestDataFactory.buildFund('Our own fund', true);
 			insert ownFund;
-			Contact ownDonor = GivingTestDataFactory.insertHouseholdContact(
-				'The Real Family',
-				'Ada',
-				'Real'
-			);
+			Contact ownDonor = GivingTestDataFactory.insertHouseholdContact('The Real Family', 'Ada', 'Real');
 			Gift__c ownGift = GivingTestDataFactory.buildGift(ownDonor.Id, 40);
 			insert ownGift;
 
@@ -927,21 +863,13 @@ private class GivingSampleDataTest {
 
 			GivingSampleData module = new GivingSampleData();
 
-			System.assertEquals(
-				'Giving',
-				module.moduleName(),
-				'the module names itself the way Core knows it'
-			);
+			System.assertEquals('Giving', module.moduleName(), 'the module names itself the way Core knows it');
 			System.assertEquals(
 				System.Label.Core_Import_KindGiftsTitle,
 				module.countLabel(),
 				'the card is given the packaged label rather than a hard-coded word'
 			);
-			System.assertEquals(
-				5,
-				module.countLoaded(),
-				'the number the card shows is the sample gifts in the org'
-			);
+			System.assertEquals(5, module.countLoaded(), 'the number the card shows is the sample gifts in the org');
 		}
 	}
 
@@ -949,22 +877,10 @@ private class GivingSampleDataTest {
 	static void testChunksAtOneHundredGifts() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingSampleDataSet data = GivingSampleDataSet.parse(buildJson());
-			System.assertEquals(
-				5,
-				data.gifts.size(),
-				'the payload holds five gifts, which is one chunk'
-			);
+			System.assertEquals(5, data.gifts.size(), 'the payload holds five gifts, which is one chunk');
 			System.assertEquals(1, data.chunkCount(), 'five gifts need one chunk of a hundred');
-			System.assertEquals(
-				5,
-				data.giftsInChunk(0).size(),
-				'the only chunk holds every gift in the payload'
-			);
-			System.assertEquals(
-				0,
-				data.giftsInChunk(1).size(),
-				'a chunk past the end of the payload holds nothing'
-			);
+			System.assertEquals(5, data.giftsInChunk(0).size(), 'the only chunk holds every gift in the payload');
+			System.assertEquals(0, data.giftsInChunk(1).size(), 'a chunk past the end of the payload holds nothing');
 		}
 	}
 
@@ -976,11 +892,7 @@ private class GivingSampleDataTest {
 				'appeals' => new List<Object>(),
 				'commitments' => new List<Object>(),
 				'gifts' => new List<Object>{
-					new Map<String, Object>{
-						'key' => 'G0001',
-						'donor' => PERSON_KEY,
-						'daysAgo' => 10
-					}
+					new Map<String, Object>{ 'key' => 'G0001', 'donor' => PERSON_KEY, 'daysAgo' => 10 }
 				},
 				'tributes' => new List<Object>(),
 				'softCredits' => new List<Object>()
@@ -1013,11 +925,7 @@ private class GivingSampleDataTest {
 			Test.stopTest();
 
 			System.assertEquals(0, loaded, 'a gift with no donor in the org is skipped');
-			System.assertEquals(
-				0,
-				[SELECT COUNT() FROM Gift__c],
-				'nothing is inserted for a donor that is not there'
-			);
+			System.assertEquals(0, [SELECT COUNT() FROM Gift__c], 'nothing is inserted for a donor that is not there');
 		}
 	}
 }

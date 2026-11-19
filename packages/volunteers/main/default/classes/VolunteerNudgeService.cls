@@ -84,11 +84,7 @@ public with sharing class VolunteerNudgeService {
 				BarnHelp.text(
 					'Volunteers',
 					'Volunteers_Nudges_StampFailed',
-					new List<Object>{
-						held,
-						shifts.size(),
-						stampFailure == null ? '' : stampFailure
-					}
+					new List<Object>{ held, shifts.size(), stampFailure == null ? '' : stampFailure }
 				),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
@@ -133,11 +129,7 @@ public with sharing class VolunteerNudgeService {
 				BarnHelp.text(
 					'Volunteers',
 					'Volunteers_Nudges_SendFailed',
-					new List<Object>{
-						notSent,
-						messages.size(),
-						lastFailure == null ? '' : lastFailure
-					}
+					new List<Object>{ notSent, messages.size(), lastFailure == null ? '' : lastFailure }
 				),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
@@ -148,11 +140,7 @@ public with sharing class VolunteerNudgeService {
 
 	/** One nudge, addressed to the person's Contact email. */
 	@TestVisible
-	private static Messaging.SingleEmailMessage messageFor(
-		Volunteer_Shift__c shift,
-		Contact person,
-		String zone
-	) {
+	private static Messaging.SingleEmailMessage messageFor(Volunteer_Shift__c shift, Contact person, String zone) {
 		String jobName = shift.Volunteer_Job__r == null ? '' : shift.Volunteer_Job__r.Name;
 		String whenText = shift.Start_Time__c.format(WHEN_FORMAT, zone);
 		if (shift.End_Time__c != null) {
@@ -167,11 +155,7 @@ public with sharing class VolunteerNudgeService {
 		String body =
 			greeting +
 			'\n\n' +
-			BarnHelp.text(
-				'Volunteers',
-				'Volunteers_Nudges_Body',
-				new List<Object>{ jobName, whenText }
-			);
+			BarnHelp.text('Volunteers', 'Volunteers_Nudges_Body', new List<Object>{ jobName, whenText });
 		if (String.isNotBlank(shift.Location__c)) {
 			body +=
 				'\n' +
@@ -184,9 +168,7 @@ public with sharing class VolunteerNudgeService {
 
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ person.Email });
-		message.setSubject(
-			BarnHelp.text('Volunteers', 'Volunteers_Nudges_Subject', new List<Object>{ jobName })
-		);
+		message.setSubject(BarnHelp.text('Volunteers', 'Volunteers_Nudges_Subject', new List<Object>{ jobName }));
 		message.setPlainTextBody(body);
 		message.setSaveAsActivity(false);
 		return message;

@@ -141,11 +141,7 @@ public with sharing class PublicPageExtensions {
 	 * answer, since the form must then not be stored.
 	 */
 	@NamespaceAccessible
-	public static Map<String, Object> startCheckout(
-		Id recordId,
-		Map<String, Object> answers,
-		String returnUrl
-	) {
+	public static Map<String, Object> startCheckout(Id recordId, Map<String, Object> answers, String returnUrl) {
 		if (recordId == null) {
 			return null;
 		}
@@ -153,8 +149,7 @@ public with sharing class PublicPageExtensions {
 		for (PublicPageExtension extension : installed()) {
 			if (extension.handles(type) == true) {
 				return extension instanceof PublicCheckoutExtension
-					? ((PublicCheckoutExtension) extension)
-							.startCheckout(recordId, answers, returnUrl)
+					? ((PublicCheckoutExtension) extension).startCheckout(recordId, answers, returnUrl)
 					: null;
 			}
 		}

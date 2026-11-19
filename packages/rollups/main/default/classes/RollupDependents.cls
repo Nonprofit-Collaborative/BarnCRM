@@ -92,16 +92,9 @@ public without sharing class RollupDependents {
 			for (Schema.SObjectField reference : referencesTo(sourceType, changedType)) {
 				Schema.DescribeFieldResult describe = reference.getDescribe();
 				Set<Id> parents = oldRecords == null
-					? (describe.isCascadeDelete()
-							? new Map<Id, SObject>(records).keySet()
-							: new Set<Id>())
+					? (describe.isCascadeDelete() ? new Map<Id, SObject>(records).keySet() : new Set<Id>())
 					: changedParents(
-							readThroughFor(
-								definition,
-								changedType,
-								describe.getRelationshipName(),
-								changedFields
-							),
+							readThroughFor(definition, changedType, describe.getRelationshipName(), changedFields),
 							records,
 							oldRecords
 					  );
@@ -137,29 +130,16 @@ public without sharing class RollupDependents {
 		String relationshipName,
 		Map<String, Schema.SObjectField> parentFields
 	) {
-		String key =
-			String.valueOf(parentType) +
-			'|' +
-			relationshipName +
-			'|' +
-			RollupChanges.readKeyOf(definition);
+		String key = String.valueOf(parentType) + '|' + relationshipName + '|' + RollupChanges.readKeyOf(definition);
 		Set<String> onParent = THROUGH_BY_KEY.get(key);
 		if (onParent == null) {
-			onParent = readThrough(
-				RollupChanges.readsFor(definition),
-				relationshipName,
-				parentFields
-			);
+			onParent = readThrough(RollupChanges.readsFor(definition), relationshipName, parentFields);
 			THROUGH_BY_KEY.put(key, onParent);
 		}
 		return onParent;
 	}
 
-	private static Set<Id> changedParents(
-		Set<String> readThrough,
-		List<SObject> records,
-		Map<Id, SObject> oldRecords
-	) {
+	private static Set<Id> changedParents(Set<String> readThrough, List<SObject> records, Map<Id, SObject> oldRecords) {
 		Set<Id> parents = new Set<Id>();
 		if (readThrough.isEmpty()) {
 			// Nothing on the parent is read through this relationship, so no change of it counts.
@@ -205,10 +185,7 @@ public without sharing class RollupDependents {
 			AccessLevel.SYSTEM_MODE
 		);
 		for (Rollup_Definition__c definition : definitions) {
-			marked.add(
-				definition,
-				RollupChanges.targetsOf(RollupChanges.pathOf(definition), sourceType, rows)
-			);
+			marked.add(definition, RollupChanges.targetsOf(RollupChanges.pathOf(definition), sourceType, rows));
 		}
 	}
 
@@ -250,10 +227,7 @@ public without sharing class RollupDependents {
 		for (String read : reads) {
 			if (read.toLowerCase().startsWith(prefix)) {
 				onParent.addAll(
-					RollupChanges.localFields(
-						new Set<String>{ read.substring(prefix.length()) },
-						parentFields
-					)
+					RollupChanges.localFields(new Set<String>{ read.substring(prefix.length()) }, parentFields)
 				);
 			}
 		}

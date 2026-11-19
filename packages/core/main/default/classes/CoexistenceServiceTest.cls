@@ -45,11 +45,7 @@ private class CoexistenceServiceTest {
 			String applied = CoexistenceService.applyRecommendedIfUnset();
 			Test.stopTest();
 
-			System.assertEquals(
-				CoexistenceService.MODE_NPSP,
-				applied,
-				'NPSP org, NPSP coexistence.'
-			);
+			System.assertEquals(CoexistenceService.MODE_NPSP, applied, 'NPSP org, NPSP coexistence.');
 			System.assertEquals(
 				CoexistenceService.MODE_NPSP,
 				CoexistenceService.getCurrentMode(),
@@ -140,10 +136,7 @@ private class CoexistenceServiceTest {
 				CoexistenceService.setMode('Whatever');
 			} catch (CoexistenceService.CoexistenceException e) {
 				refused = true;
-				System.assert(
-					e.getMessage().contains('Whatever'),
-					'The message names the value that was refused.'
-				);
+				System.assert(e.getMessage().contains('Whatever'), 'The message names the value that was refused.');
 			}
 			System.assert(refused, 'An unknown mode is refused rather than saved.');
 		}
@@ -228,10 +221,7 @@ private class CoexistenceServiceTest {
 					CoexistenceService.applyMode('Whatever');
 				} catch (CoexistenceService.CoexistenceException e) {
 					refused = true;
-					System.assert(
-						e.getMessage().contains('Whatever'),
-						'The message names the value that was refused.'
-					);
+					System.assert(e.getMessage().contains('Whatever'), 'The message names the value that was refused.');
 				}
 				System.assert(refused, 'An unknown mode is refused rather than saved.');
 				System.assertEquals(
@@ -261,10 +251,7 @@ private class CoexistenceServiceTest {
 						'Priya is told what permission she needs and who to ask for it.'
 					);
 				}
-				System.assert(
-					refused,
-					'Changing how the whole package behaves needs the permission.'
-				);
+				System.assert(refused, 'Changing how the whole package behaves needs the permission.');
 				System.assertEquals(
 					null,
 					CoexistenceService.getCurrentMode(),
@@ -337,10 +324,7 @@ private class CoexistenceServiceTest {
 				refusal.contains('1 people'),
 				'The message says how many people would be affected: ' + refusal
 			);
-			System.assert(
-				refusal.contains('migration'),
-				'And that a migration is what it would take: ' + refusal
-			);
+			System.assert(refusal.contains('migration'), 'And that a migration is what it would take: ' + refusal);
 			System.assertEquals(
 				CoexistenceService.MEMBERSHIP_JUNCTION,
 				CoexistenceService.getMembershipMode(),
@@ -433,9 +417,7 @@ private class CoexistenceServiceTest {
 	 */
 	private static String attemptMembershipMode(String mode) {
 		try {
-			SettingsService.saveValues(
-				new Map<String, Object>{ CoexistenceService.KEY_MEMBERSHIP_MODE => mode }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ CoexistenceService.KEY_MEMBERSHIP_MODE => mode });
 			return null;
 		} catch (SettingsService.SettingsException refused) {
 			return refused.getMessage();

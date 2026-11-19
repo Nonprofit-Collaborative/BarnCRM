@@ -24,11 +24,7 @@ private class MergeRuleServiceTest {
 	}
 
 	private static Merge_Rule__mdt rule(String fieldName, String ruleName, Boolean active) {
-		return new Merge_Rule__mdt(
-			Field_Name__c = fieldName,
-			Rule__c = ruleName,
-			Active__c = active
-		);
+		return new Merge_Rule__mdt(Field_Name__c = fieldName, Rule__c = ruleName, Active__c = active);
 	}
 
 	private static void useDefault(String ruleName) {
@@ -133,15 +129,10 @@ private class MergeRuleServiceTest {
 				OLD,
 				new Map<String, Object>{ 'Email' => 'keep@example.org', 'Title' => 'Chair' }
 			);
-			Contact other = person(
-				OLD,
-				LATE,
-				new Map<String, Object>{ 'Email' => ' ', 'Title' => 'Head' }
-			);
+			Contact other = person(OLD, LATE, new Map<String, Object>{ 'Email' => ' ', 'Title' => 'Head' });
 
 			Assert.isTrue(
-				MergeRuleService.winningValues(master, other, new List<String>{ 'Email', 'Title' })
-					.isEmpty()
+				MergeRuleService.winningValues(master, other, new List<String>{ 'Email', 'Title' }).isEmpty()
 			);
 		}
 	}
@@ -209,26 +200,12 @@ private class MergeRuleServiceTest {
 				new Map<String, Object>{ 'Field_Name__c' => 'Email', 'Rule__c' => 'Most recent' }
 			);
 			MergeRuleService.validate(
-				new Map<String, Object>{
-					'Field_Name__c' => 'MailingAddress',
-					'Rule__c' => 'Not blank'
-				}
+				new Map<String, Object>{ 'Field_Name__c' => 'MailingAddress', 'Rule__c' => 'Not blank' }
 			);
-			for (
-				String refused : new List<String>{
-					'AccountId',
-					'OwnerId',
-					'Not_A_Field__c',
-					'Name',
-					null
-				}
-			) {
+			for (String refused : new List<String>{ 'AccountId', 'OwnerId', 'Not_A_Field__c', 'Name', null }) {
 				try {
 					MergeRuleService.validate(
-						new Map<String, Object>{
-							'Field_Name__c' => refused,
-							'Rule__c' => 'Not blank'
-						}
+						new Map<String, Object>{ 'Field_Name__c' => refused, 'Rule__c' => 'Not blank' }
 					);
 					Assert.fail(refused + ' is refused.');
 				} catch (CustomMetadataManagerService.CustomMetadataManagerException expected) {
@@ -237,18 +214,10 @@ private class MergeRuleServiceTest {
 			}
 			try {
 				new MergeRuleService.Validator()
-					.validate(
-						new Map<String, Object>{
-							'Field_Name__c' => 'Email',
-							'Rule__c' => 'Coin toss'
-						}
-					);
+					.validate(new Map<String, Object>{ 'Field_Name__c' => 'Email', 'Rule__c' => 'Coin toss' });
 				Assert.fail('An unknown rule is refused.');
 			} catch (CustomMetadataManagerService.CustomMetadataManagerException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_DuplicateManagement_RuleUnknown'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_DuplicateManagement_RuleUnknown'), expected.getMessage());
 			}
 		}
 	}
@@ -259,19 +228,10 @@ private class MergeRuleServiceTest {
 			MergeRuleService.rowsForTest = new List<Merge_Rule__mdt>{
 				rule('Email', MergeRuleService.MOST_RECENT, true)
 			};
-			List<String> fields = new List<String>{
-				'Email',
-				'Title',
-				'MailingStreet',
-				'MailingCity'
-			};
+			List<String> fields = new List<String>{ 'Email', 'Title', 'MailingStreet', 'MailingCity' };
 			Integer changed = 0;
 			for (Integer i = 0; i < 251; i++) {
-				Contact master = person(
-					OLD,
-					OLD,
-					new Map<String, Object>{ 'Email' => 'a' + i + '@example.org' }
-				);
+				Contact master = person(OLD, OLD, new Map<String, Object>{ 'Email' => 'a' + i + '@example.org' });
 				Contact other = person(
 					OLD,
 					LATE,

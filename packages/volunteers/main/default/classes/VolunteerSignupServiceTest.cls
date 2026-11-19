@@ -147,11 +147,7 @@ private class VolunteerSignupServiceTest {
 			insert signup;
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Volunteer_Hours__c],
-				'The coordinator types them.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Hours__c], 'The coordinator types them.');
 		}
 	}
 
@@ -271,10 +267,7 @@ private class VolunteerSignupServiceTest {
 			);
 
 			Test.startTest();
-			VolunteerSignupService.createHoursForAttendance(
-				new List<Volunteer_Signup__c>{ attended },
-				null
-			);
+			VolunteerSignupService.createHoursForAttendance(new List<Volunteer_Signup__c>{ attended }, null);
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Volunteer_Hours__c], 'No hours to write.');
@@ -288,11 +281,7 @@ private class VolunteerSignupServiceTest {
 					naming++;
 				}
 			}
-			Assert.areEqual(
-				1,
-				naming,
-				'A Warning names the sign-up, so the hours are typed by hand.'
-			);
+			Assert.areEqual(1, naming, 'A Warning names the sign-up, so the hours are typed by hand.');
 		}
 	}
 }

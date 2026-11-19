@@ -83,14 +83,7 @@ public with sharing class CorporateHubController {
 				.isEmpty();
 			for (Policy_Acknowledgment__c request : HubPolicy.myRequests()) {
 				home.requests.add(
-					row(
-						request.Id,
-						request.Document__r.Name,
-						request.Due_Date__c,
-						null,
-						null,
-						request.Document__c
-					)
+					row(request.Id, request.Document__r.Name, request.Due_Date__c, null, null, request.Document__c)
 				);
 			}
 			Date until = Date.today().addDays(OBLIGATION_DAYS);
@@ -122,18 +115,9 @@ public with sharing class CorporateHubController {
 				ORDER BY End_Date__c
 				LIMIT 50
 			]) {
-				Date due = agreement.Notice_Date__c == null
-					? agreement.End_Date__c
-					: agreement.Notice_Date__c;
+				Date due = agreement.Notice_Date__c == null ? agreement.End_Date__c : agreement.Notice_Date__c;
 				home.agreements.add(
-					row(
-						agreement.Id,
-						agreement.Name,
-						due,
-						agreement.Owner.Name,
-						agreement.Organization__r?.Name,
-						null
-					)
+					row(agreement.Id, agreement.Name, due, agreement.Owner.Name, agreement.Organization__r?.Name, null)
 				);
 			}
 			addPrivacy(home);
@@ -160,14 +144,7 @@ public with sharing class CorporateHubController {
 					new List<Object>{ request.Name }
 				);
 				home.privacy.add(
-					row(
-						request.Id,
-						title,
-						request.Due_Date__c,
-						request.Owner.Name,
-						request.Request_Type__c,
-						null
-					)
+					row(request.Id, title, request.Due_Date__c, request.Owner.Name, request.Request_Type__c, null)
 				);
 			}
 		}
@@ -175,10 +152,7 @@ public with sharing class CorporateHubController {
 			for (Data_Breach__c breach : [
 				SELECT Id, Name, Authority_Deadline__c, Owner.Name, Status__c
 				FROM Data_Breach__c
-				WHERE
-					Status__c != 'Closed'
-					AND Risk__c != 'Unlikely'
-					AND Authority_Notified_At__c = NULL
+				WHERE Status__c != 'Closed' AND Risk__c != 'Unlikely' AND Authority_Notified_At__c = NULL
 				WITH USER_MODE
 				ORDER BY Discovered_At__c
 				LIMIT 50
@@ -219,9 +193,7 @@ public with sharing class CorporateHubController {
 				} else {
 					result.outstanding++;
 				}
-				String who = request.User__c != null
-					? request.User__r.Name
-					: request.Person__r?.Name;
+				String who = request.User__c != null ? request.User__r.Name : request.Person__r?.Name;
 				Date onDate = done ? request.Acknowledged_On__c?.date() : request.Due_Date__c;
 				result.people.add(row(request.Id, who, onDate, null, request.Status__c, null));
 			}
@@ -278,12 +250,7 @@ public with sharing class CorporateHubController {
 	}
 
 	@AuraEnabled
-	public static Id completeCycle(
-		Id obligationId,
-		Date completedOn,
-		String outcome,
-		String notes
-	) {
+	public static Id completeCycle(Id obligationId, Date completedOn, String outcome, String notes) {
 		try {
 			return HubCompliance.completeCycle(obligationId, completedOn, outcome, notes);
 		} catch (Exception e) {
@@ -296,9 +263,7 @@ public with sharing class CorporateHubController {
 	public static Integer addMissingTemplates() {
 		try {
 			if (!HubPolicy.canManage()) {
-				throw new HubPolicy.PolicyException(
-					BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NoPermission')
-				);
+				throw new HubPolicy.PolicyException(BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NoPermission'));
 			}
 			return HubTemplates.loadMissing(null, false);
 		} catch (Exception e) {
@@ -306,14 +271,7 @@ public with sharing class CorporateHubController {
 		}
 	}
 
-	private static Row row(
-		Id id,
-		String name,
-		Date due,
-		String detail,
-		String status,
-		Id recordId
-	) {
+	private static Row row(Id id, String name, Date due, String detail, String status, Id recordId) {
 		Row line = new Row();
 		line.id = id;
 		line.name = name;

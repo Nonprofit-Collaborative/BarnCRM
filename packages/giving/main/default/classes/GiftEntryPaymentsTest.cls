@@ -9,10 +9,7 @@ private class GiftEntryPaymentsTest {
 	@TestSetup
 	static void createTestUser() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 		}
 	}
 
@@ -72,20 +69,13 @@ private class GiftEntryPaymentsTest {
 
 	/** A gift from this person of this amount on 15 March. */
 	private static GiftEntryPayments.Request request(String key, Id personId, Decimal amount) {
-		return new GiftEntryPayments.Request(
-			key,
-			personId,
-			null,
-			Date.newInstance(2026, 3, 15),
-			amount
-		);
+		return new GiftEntryPayments.Request(key, personId, null, Date.newInstance(2026, 3, 15), amount);
 	}
 
 	private static GiftEntryPayments.Choices choicesFor(GiftEntryPayments.Request request) {
 		GiftEntryPayments.Choices choices;
 		System.runAs(maria()) {
-			choices = GiftEntryPayments.forRequests(new List<GiftEntryPayments.Request>{ request })
-				.get(request.key);
+			choices = GiftEntryPayments.forRequests(new List<GiftEntryPayments.Request>{ request }).get(request.key);
 		}
 		return choices;
 	}
@@ -94,21 +84,14 @@ private class GiftEntryPaymentsTest {
 	static void theOnlyMatchingPaymentIsSuggestedAndChosen() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact ana = GivingTestDataFactory.insertHouseholdContact('Ramirez', 'Ana', 'Ramirez');
-			List<Installment__c> payments = pledge(
-				ana.Id,
-				new Map<Integer, Decimal>{ 1 => 100, 15 => 100, 16 => 50 }
-			);
+			List<Installment__c> payments = pledge(ana.Id, new Map<Integer, Decimal>{ 1 => 100, 15 => 100, 16 => 50 });
 
 			GiftEntryPayments.Choices choices = choicesFor(request('one', ana.Id, 100));
 
 			Assert.areEqual(3, choices.choices.size(), 'Every open payment of Ana is offered.');
 			Assert.areEqual(1, choices.suggestedCount, 'Only the 15 March payment of 100 matches.');
 			Assert.areEqual(payments[1].Id, choices.suggestedId, 'The only match is chosen.');
-			Assert.areEqual(
-				payments[0].Id,
-				choices.choices[0].value,
-				'Earliest due first, not the suggestion first.'
-			);
+			Assert.areEqual(payments[0].Id, choices.choices[0].value, 'Earliest due first, not the suggestion first.');
 			Assert.isTrue(choices.choices[1].suggested, 'The match is marked.');
 			Assert.isFalse(choices.choices[0].suggested, '1 March is outside the 7 day window.');
 			Assert.isFalse(choices.choices[2].suggested, '50 is not 100 at a tolerance of zero.');
@@ -146,11 +129,7 @@ private class GiftEntryPaymentsTest {
 			GiftEntryPayments.Choices forBen = choicesFor(request('ben', ben.Id, 100));
 			GiftEntryPayments.Choices forKim = choicesFor(request('kim', stranger.Id, 100));
 
-			Assert.areEqual(
-				payments[0].Id,
-				forBen.suggestedId,
-				'Ben pays Ana\'s household pledge.'
-			);
+			Assert.areEqual(payments[0].Id, forBen.suggestedId, 'Ben pays Ana\'s household pledge.');
 			Assert.isTrue(forKim.choices.isEmpty(), 'Another household owes nothing of Ana\'s.');
 		}
 	}
@@ -199,20 +178,13 @@ private class GiftEntryPaymentsTest {
 			Map<String, Installment__c> confirmed;
 			System.runAs(maria()) {
 				confirmed = GiftEntryPayments.confirm(
-					new List<GiftEntryPayments.Request>{
-						request('ana', ana.Id, 100),
-						request('kim', kim.Id, 100)
-					},
+					new List<GiftEntryPayments.Request>{ request('ana', ana.Id, 100), request('kim', kim.Id, 100) },
 					new Map<String, Id>{ 'ana' => payments[0].Id, 'kim' => payments[0].Id }
 				);
 			}
 
 			Assert.areEqual(payments[0].Id, confirmed.get('ana').Id, 'Ana may pay her own.');
-			Assert.areEqual(
-				payments[0].Commitment__c,
-				confirmed.get('ana').Commitment__c,
-				'The pledge comes with it.'
-			);
+			Assert.areEqual(payments[0].Commitment__c, confirmed.get('ana').Commitment__c, 'The pledge comes with it.');
 			Assert.isFalse(confirmed.containsKey('kim'), 'Kim may not pay Ana\'s pledge.');
 		}
 	}

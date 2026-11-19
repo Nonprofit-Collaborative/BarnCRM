@@ -89,9 +89,7 @@ public with sharing class ImportBatchService {
 		Boolean matchOnly
 	) {
 		if (expectedCount != null && expectedCount < 0) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorControlCountNegative')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorControlCountNegative'));
 		}
 		Import_Template__c template = ImportTemplateSelector.selectById(templateId);
 		if (template == null) {
@@ -125,28 +123,18 @@ public with sharing class ImportBatchService {
 	 * full name or email, or for the field people are matched on, is refused: every row would
 	 * then be one person.
 	 */
-	private static String fileValuesDocument(
-		Import_Template__c template,
-		List<ImportMapping.Assignment> fileValues
-	) {
+	private static String fileValuesDocument(Import_Template__c template, List<ImportMapping.Assignment> fileValues) {
 		if (fileValues == null || fileValues.isEmpty()) {
 			return null;
 		}
 		String personField = ImportTemplateService.RULE_EXTERNAL_ID.equals(
 				ImportTemplateService.normalizedRule(template.Matching_Rule__c)
 			)
-			? ImportMatcher.matchField(
-					ImportTemplateService.personType(template),
-					template.Person_Match_Field__c
-			  )
+			? ImportMatcher.matchField(ImportTemplateService.personType(template), template.Person_Match_Field__c)
 			: null;
 		ImportMapping document = new ImportMapping();
 		for (ImportMapping.Assignment given : fileValues) {
-			if (
-				given == null ||
-				ImportMapping.isIgnored(given.target) ||
-				String.isBlank(given.value)
-			) {
+			if (given == null || ImportMapping.isIgnored(given.target) || String.isBlank(given.value)) {
 				continue;
 			}
 			String target = given.target.trim();
@@ -174,11 +162,7 @@ public with sharing class ImportBatchService {
 	 * @return how many rows the batch now has
 	 */
 	@NamespaceAccessible
-	public static Integer stageRows(
-		Id batchId,
-		List<Map<String, Object>> rows,
-		Integer firstRowNumber
-	) {
+	public static Integer stageRows(Id batchId, List<Map<String, Object>> rows, Integer firstRowNumber) {
 		Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
 		if (batch == null) {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
@@ -253,8 +237,7 @@ public with sharing class ImportBatchService {
 		if (!keyed.isEmpty()) {
 			Database.update(keyed, AccessLevel.SYSTEM_MODE);
 		}
-		Integer total =
-			(batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue()) + staged.size();
+		Integer total = (batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue()) + staged.size();
 		// Only the two fields this writes: the read batch also holds fields no permission set
 		// may edit (Operation__c defaults to Import), which a user-mode save of it refuses.
 		Database.update(
@@ -388,9 +371,7 @@ public with sharing class ImportBatchService {
 		}
 		// A retry's file is the fixed rows, not the file the totals describe (R-IB17).
 		if (!isRetrying(batch) && !controlTotalsAgree(batch)) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer'));
 		}
 		refuseDeleteByFile(batch);
 		return start(batchId, false);
@@ -399,9 +380,8 @@ public with sharing class ImportBatchService {
 	/** A delete by file starts as a bulk delete, with the count confirmed (R-BD7), never here. */
 	private static void refuseDeleteByFile(Import_Batch__c batch) {
 		if (
-			ImportObjectSchema.operationOf(
-				ImportTemplateSelector.selectById(batch.Import_Template__c)
-			) == ImportObjectSchema.OPERATION_DELETE
+			ImportObjectSchema.operationOf(ImportTemplateSelector.selectById(batch.Import_Template__c)) ==
+			ImportObjectSchema.OPERATION_DELETE
 		) {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsConfirm'));
 		}
@@ -429,9 +409,7 @@ public with sharing class ImportBatchService {
 			return start(batchId, false);
 		}
 		if (!controlTotalsAgree(batch)) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer'));
 		}
 		Integer size = rowCount == null ? trialRows() : clampTrial(rowCount);
 		if (batch.Row_Count__c != null && size >= batch.Row_Count__c) {
@@ -493,9 +471,7 @@ public with sharing class ImportBatchService {
 	private static List<String> controlTotalLines(Import_Batch__c batch) {
 		List<String> lines = new List<String>();
 		if (batch.Expected_Count__c != null) {
-			String found = String.valueOf(
-				batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue()
-			);
+			String found = String.valueOf(batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue());
 			lines.add(
 				countAgrees(batch)
 					? String.format(
@@ -504,10 +480,7 @@ public with sharing class ImportBatchService {
 					  )
 					: String.format(
 							BarnHelp.text('Core', 'Core_Import_LogControlCountDiffers'),
-							new List<String>{
-								found,
-								String.valueOf(batch.Expected_Count__c.intValue())
-							}
+							new List<String>{ found, String.valueOf(batch.Expected_Count__c.intValue()) }
 					  )
 			);
 		}
@@ -524,10 +497,7 @@ public with sharing class ImportBatchService {
 						  )
 						: String.format(
 								BarnHelp.text('Core', 'Core_Import_LogControlAmountDiffers'),
-								new List<String>{
-									found,
-									batch.Expected_Amount__c.setScale(2).format()
-								}
+								new List<String>{ found, batch.Expected_Amount__c.setScale(2).format() }
 						  )
 				);
 			}
@@ -610,13 +580,7 @@ public with sharing class ImportBatchService {
 	 * @param afterRow commit only rows after this row number, the rest of a trial, or null
 	 * @param rowIds commit only these corrected rows (R-IB17a), or null
 	 */
-	private static Id start(
-		Id batchId,
-		Boolean dryRun,
-		Integer trialRows,
-		Decimal afterRow,
-		Set<Id> rowIds
-	) {
+	private static Id start(Id batchId, Boolean dryRun, Integer trialRows, Decimal afterRow, Set<Id> rowIds) {
 		// Locked, so two starts at once cannot both find no job running (R-IB13).
 		List<Import_Batch__c> locked = [
 			SELECT Id
@@ -652,10 +616,7 @@ public with sharing class ImportBatchService {
 		if (template == null) {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
 		}
-		ImportMapping mapping = ImportMapping.parse(
-				template.Column_Mapping_JSON__c,
-				template.Default_Values_JSON__c
-			)
+		ImportMapping mapping = ImportMapping.parse(template.Column_Mapping_JSON__c, template.Default_Values_JSON__c)
 			.withFileValues(batch.File_Values_JSON__c);
 		Boolean oneObject = ImportObjectSchema.loadsOneObject(template);
 		// A one-object template is refused for its own reasons, before any row is read (R-IT12).
@@ -664,9 +625,7 @@ public with sharing class ImportBatchService {
 			throw new ImportException(refused);
 		}
 		if (!oneObject && !mapping.identifiesSomebody()) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody'));
 		}
 		if (batch.Row_Count__c == null || batch.Row_Count__c <= 0) {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoRows'));
@@ -680,9 +639,7 @@ public with sharing class ImportBatchService {
 			ImportTemplateService.isPersonAccountMode(template) &&
 			OrgShapeDetector.detect().personAccountRecordTypeIds.isEmpty()
 		) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorPersonModeUnavailable')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorPersonModeUnavailable'));
 		}
 		// No reset of the staged rows: each chunk clears and stamps its own, so a pass costs the
 		// same two writes here however long the file (R-IB13).
@@ -788,9 +745,7 @@ public with sharing class ImportBatchService {
 	 */
 	@NamespaceAccessible
 	public static Import_Template__c templateFor(Import_Batch__c batch) {
-		Import_Template__c current = batch == null
-			? null
-			: ImportTemplateSelector.selectById(batch.Import_Template__c);
+		Import_Template__c current = batch == null ? null : ImportTemplateSelector.selectById(batch.Import_Template__c);
 		if (current == null) {
 			return null;
 		}
@@ -881,8 +836,7 @@ public with sharing class ImportBatchService {
 	}
 
 	private static Boolean mayBeRunning(Import_Batch__c batch) {
-		return batch != null &&
-			(STATUS_DRY_RUN.equals(batch.Status__c) || STATUS_COMMITTING.equals(batch.Status__c));
+		return batch != null && (STATUS_DRY_RUN.equals(batch.Status__c) || STATUS_COMMITTING.equals(batch.Status__c));
 	}
 
 	/** When the batch's job ended, or null when it has not or is no longer on record. */
@@ -945,10 +899,7 @@ public with sharing class ImportBatchService {
 			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
 		}
 		// Package bookkeeping (ADR-0021).
-		Database.update(
-			new Import_Batch__c(Id = batch.Id, Pass_Number__c = nextPass(batch)),
-			AccessLevel.SYSTEM_MODE
-		);
+		Database.update(new Import_Batch__c(Id = batch.Id, Pass_Number__c = nextPass(batch)), AccessLevel.SYSTEM_MODE);
 	}
 
 	private static Decimal nextPass(Import_Batch__c batch) {
@@ -991,16 +942,7 @@ public with sharing class ImportBatchService {
 		String processorSettings,
 		Boolean trial
 	) {
-		return finish(
-			batchId,
-			dryRun,
-			failed,
-			logLines,
-			fileAmount,
-			processorSettings,
-			trial,
-			false
-		);
+		return finish(batchId, dryRun, failed, logLines, fileAmount, processorSettings, trial, false);
 	}
 
 	/**
@@ -1122,10 +1064,7 @@ public with sharing class ImportBatchService {
 	@NamespaceAccessible
 	public static Integer undoWindowDays() {
 		Decimal days = SettingsService.storedNumber('Import_Undo_Retention_Days__c');
-		return days == null ||
-			days < 1
-			? UNDO_WINDOW_DAYS
-			: Math.min(days.intValue(), MAX_UNDO_WINDOW_DAYS);
+		return days == null || days < 1 ? UNDO_WINDOW_DAYS : Math.min(days.intValue(), MAX_UNDO_WINDOW_DAYS);
 	}
 
 	/** The stored values of the Import setting Delete Import Rows (R-IR5). */
@@ -1158,9 +1097,7 @@ public with sharing class ImportBatchService {
 		if (ROWS_NEVER.equals(choice)) {
 			return null;
 		}
-		return ROW_DAYS.containsKey(choice)
-			? ROW_DAYS.get(choice)
-			: ROW_DAYS.get(ROWS_AFTER_30_DAYS);
+		return ROW_DAYS.containsKey(choice) ? ROW_DAYS.get(choice) : ROW_DAYS.get(ROWS_AFTER_30_DAYS);
 	}
 
 	/**

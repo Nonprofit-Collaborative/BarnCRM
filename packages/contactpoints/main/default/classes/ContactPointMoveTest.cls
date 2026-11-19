@@ -35,9 +35,7 @@ private class ContactPointMoveTest {
 	}
 
 	private static Contact person(String lastName) {
-		return (Contact) TestDataFactory.pastDuplicateRules(
-			new Contact(FirstName = 'Ana', LastName = lastName)
-		);
+		return (Contact) TestDataFactory.pastDuplicateRules(new Contact(FirstName = 'Ana', LastName = lastName));
 	}
 
 	private static List<String> streets(Id parent) {
@@ -54,10 +52,7 @@ private class ContactPointMoveTest {
 	}
 
 	private static Id individualOf(Id contactId) {
-		return (Id) Database.query(
-				'SELECT IndividualId FROM Contact WHERE Id = :contactId',
-				AccessLevel.SYSTEM_MODE
-			)[0]
+		return (Id) Database.query('SELECT IndividualId FROM Contact WHERE Id = :contactId', AccessLevel.SYSTEM_MODE)[0]
 			.get('IndividualId');
 	}
 
@@ -150,11 +145,7 @@ private class ContactPointMoveTest {
 			insert rows;
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE],
-				'Nothing failed'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'Nothing failed');
 			Assert.areEqual(
 				201,
 				[
@@ -289,11 +280,7 @@ private class ContactPointMoveTest {
 			delete organization;
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE],
-				'Account saves are not touched'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Error_Log__c WITH SYSTEM_MODE], 'Account saves are not touched');
 			Assert.areEqual(0, [SELECT COUNT() FROM Contact_Point_Link__c WITH SYSTEM_MODE]);
 		}
 	}

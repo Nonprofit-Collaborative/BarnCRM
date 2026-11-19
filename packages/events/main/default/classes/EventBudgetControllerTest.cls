@@ -75,14 +75,8 @@ private class EventBudgetControllerTest {
 			Assert.areEqual(1, result.funding.size(), 'The funding line');
 			Assert.areEqual(100, result.registrationsPaid, 'What registrations paid');
 			Assert.areEqual(300, result.funding[0].received, 'Received');
-			Assert.isTrue(
-				result.canAddExpense && result.canAddFunding && result.canEdit,
-				'Staff edit'
-			);
-			Assert.isTrue(
-				result.fieldLabels.containsKey('Expense_Budgeted__c'),
-				'Labels for columns'
-			);
+			Assert.isTrue(result.canAddExpense && result.canAddFunding && result.canEdit, 'Staff edit');
+			Assert.isTrue(result.fieldLabels.containsKey('Expense_Budgeted__c'), 'Labels for columns');
 		}
 	}
 
@@ -90,16 +84,11 @@ private class EventBudgetControllerTest {
 	static void theDashboardShowsNetCost() {
 		System.runAs(staff()) {
 			Event__c event = conference();
-			Assert.isNull(
-				EventDashboardController.getDashboard(event.Id).netCost,
-				'No budget yet, no net cost'
-			);
+			Assert.isNull(EventDashboardController.getDashboard(event.Id).netCost, 'No budget yet, no net cost');
 			budget(event);
 
 			Test.startTest();
-			EventDashboardController.Dashboard result = EventDashboardController.getDashboard(
-				event.Id
-			);
+			EventDashboardController.Dashboard result = EventDashboardController.getDashboard(event.Id);
 			Test.stopTest();
 
 			Assert.areEqual(800, result.netCost, '1,200 less 300 less 100 (R-EXP1)');

@@ -13,19 +13,14 @@ private class RollupJobNotificationTest {
 	@IsTest
 	static void rollupRecalculationOpensRollups() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			insert new BarnCRM_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Job_Notifications__c = true
-			);
+			insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
 			SettingsService.clearCaches();
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
 			Account organization = TestDataFactory.organization(
 				new Account(Name = 'Food Bank', RecordTypeId = organizationType)
 			);
 			insert organization;
-			insert TestDataFactory.person(
-				new Contact(LastName = 'Volunteer', AccountId = organization.Id)
-			);
+			insert TestDataFactory.person(new Contact(LastName = 'Volunteer', AccountId = organization.Id));
 			Rollup_Definition__c definition = new Rollup_Definition__c(
 				Name = 'People per organization',
 				Definition_Key__c = 'Test_Q04_People_Per_Organization',
@@ -41,22 +36,13 @@ private class RollupJobNotificationTest {
 			insert definition;
 			JobNotifier.sentNotices().clear();
 
-			RollupFullRecalcBatch.firstPass(new List<Rollup_Definition__c>{ definition })
-				.runInline();
+			RollupFullRecalcBatch.firstPass(new List<Rollup_Definition__c>{ definition }).runInline();
 
 			Assert.areEqual(1, JobNotifier.sentNotices().size(), 'Exactly one notification');
 			JobNotifier.Notice notice = JobNotifier.sentNotices()[0];
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				notice.recipientId,
-				'To the person who started it'
-			);
+			Assert.areEqual(UserInfo.getUserId(), notice.recipientId, 'To the person who started it');
 			Assert.isNull(notice.targetId, 'No record');
-			Assert.areEqual(
-				JobNotifier.SECTION_ROLLUPS,
-				notice.section,
-				'Opening the Rollups section'
-			);
+			Assert.areEqual(JobNotifier.SECTION_ROLLUPS, notice.section, 'Opening the Rollups section');
 			Assert.areEqual(
 				String.format(
 					System.Label.Core_JobNotice_Finished,

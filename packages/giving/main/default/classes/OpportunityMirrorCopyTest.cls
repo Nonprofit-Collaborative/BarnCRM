@@ -65,11 +65,7 @@ private class OpportunityMirrorCopyTest {
 			fields.add(OpportunityMirrorService.CAMPAIGN_FIELD);
 		}
 		return Database.queryWithBinds(
-			'SELECT ' +
-				String.join(fields, ', ') +
-				' FROM ' +
-				opportunityObject() +
-				' WHERE Id = :opportunityId',
+			'SELECT ' + String.join(fields, ', ') + ' FROM ' + opportunityObject() + ' WHERE Id = :opportunityId',
 			new Map<String, Object>{ 'opportunityId' => opportunityId },
 			AccessLevel.SYSTEM_MODE
 		)[0];
@@ -86,19 +82,14 @@ private class OpportunityMirrorCopyTest {
 
 	private static List<SObject> primaryRoles(String opportunityId) {
 		return Database.queryWithBinds(
-			'SELECT ContactId FROM ' +
-				ROLE_OBJECT +
-				' WHERE OpportunityId = :opportunityId AND IsPrimary = TRUE',
+			'SELECT ContactId FROM ' + ROLE_OBJECT + ' WHERE OpportunityId = :opportunityId AND IsPrimary = TRUE',
 			new Map<String, Object>{ 'opportunityId' => opportunityId },
 			AccessLevel.SYSTEM_MODE
 		);
 	}
 
 	private static Integer countOpportunities() {
-		return Database.countQuery(
-			'SELECT COUNT() FROM ' + opportunityObject(),
-			AccessLevel.SYSTEM_MODE
-		);
+		return Database.countQuery('SELECT COUNT() FROM ' + opportunityObject(), AccessLevel.SYSTEM_MODE);
 	}
 
 	private static List<Error_Log__c> warnings() {
@@ -233,8 +224,7 @@ private class OpportunityMirrorCopyTest {
 			Test.stopTest();
 			Assert.areEqual(
 				spring.Id,
-				opportunity(reread(given.Id).Opportunity_Id__c)
-					.get(OpportunityMirrorService.CAMPAIGN_FIELD),
+				opportunity(reread(given.Id).Opportunity_Id__c).get(OpportunityMirrorService.CAMPAIGN_FIELD),
 				'The appeal\'s Campaign (R-OM3).'
 			);
 		}
@@ -260,20 +250,12 @@ private class OpportunityMirrorCopyTest {
 			}
 			Test.stopTest();
 			Gift__c saved = reread(given.Id);
-			Assert.areEqual(
-				String.valueOf(open.Id),
-				saved.Opportunity_Id__c,
-				'Kept in 18 characters.'
-			);
+			Assert.areEqual(String.valueOf(open.Id), saved.Opportunity_Id__c, 'Kept in 18 characters.');
 			SObject copy = opportunity(open.Id);
 			Assert.areEqual(250, (Decimal) copy.get('Amount'), 'The gift is copied onto it.');
 			Assert.areEqual(true, copy.get('IsWon'), 'A Received gift closes it as won.');
 			Assert.areEqual(1, countOpportunities(), 'No second Opportunity.');
-			Assert.areEqual(
-				luis().Id,
-				primaryRoles(open.Id)[0].get('ContactId'),
-				'Donor is primary.'
-			);
+			Assert.areEqual(luis().Id, primaryRoles(open.Id)[0].get('ContactId'), 'Donor is primary.');
 		}
 	}
 
@@ -360,10 +342,7 @@ private class OpportunityMirrorCopyTest {
 			Test.stopTest();
 			List<Error_Log__c> logged = warnings();
 			Assert.areEqual(1, logged.size(), 'One Warning for one message (R-OM6).');
-			Assert.isTrue(
-				logged[0].Message__c.contains('could not copy 3 gifts'),
-				logged[0].Message__c
-			);
+			Assert.isTrue(logged[0].Message__c.contains('could not copy 3 gifts'), logged[0].Message__c);
 		}
 	}
 
@@ -382,9 +361,7 @@ private class OpportunityMirrorCopyTest {
 			System.runAs(new User(Id = UserInfo.getUserId())) {
 				update new User(Id = rosa.Id, ProfileId = readOnly[0].Id);
 			}
-			Account household = TestDataFactory.household(
-				new Account(Name = 'The Ruiz Household', OwnerId = rosa.Id)
-			);
+			Account household = TestDataFactory.household(new Account(Name = 'The Ruiz Household', OwnerId = rosa.Id));
 			insert household;
 			Contact donor = TestDataFactory.person(
 				new Contact(LastName = 'Ruiz', AccountId = household.Id, OwnerId = rosa.Id)
@@ -426,17 +403,9 @@ private class OpportunityMirrorCopyTest {
 			for (Integer i : new List<Integer>{ 0, 2 }) {
 				String linked = reread(saved[i].getId()).Opportunity_Id__c;
 				Assert.isNotNull(linked, 'Linked after the retry.');
-				Assert.areEqual(
-					1,
-					primaryRoles(linked).size(),
-					'Linked to an Opportunity that exists.'
-				);
+				Assert.areEqual(1, primaryRoles(linked).size(), 'Linked to an Opportunity that exists.');
 			}
-			Assert.areEqual(
-				2,
-				countOpportunities(),
-				'None left over from the rolled-back attempt.'
-			);
+			Assert.areEqual(2, countOpportunities(), 'None left over from the rolled-back attempt.');
 		}
 	}
 
@@ -469,10 +438,7 @@ private class OpportunityMirrorCopyTest {
 			}
 			Assert.areEqual(200, countOpportunities(), 'Every gift copied.');
 			Assert.isTrue(queries - queriesOff <= 7, 'Queries: ' + queries + ' vs ' + queriesOff);
-			Assert.isTrue(
-				statements - statementsOff <= 4,
-				'Statements: ' + statements + ' vs ' + statementsOff
-			);
+			Assert.isTrue(statements - statementsOff <= 4, 'Statements: ' + statements + ' vs ' + statementsOff);
 		}
 	}
 
@@ -501,10 +467,7 @@ private class OpportunityMirrorCopyTest {
 			Assert.areEqual(2, logged.size(), 'One Warning per delete.');
 			String both = logged[0].Message__c + ' ' + logged[1].Message__c;
 			Assert.isTrue(both.contains('left in place'), both);
-			Assert.isTrue(
-				both.contains('makes a new gift'),
-				'Opportunities to Gifts says so: ' + both
-			);
+			Assert.isTrue(both.contains('makes a new gift'), 'Opportunities to Gifts says so: ' + both);
 		}
 	}
 
@@ -518,10 +481,7 @@ private class OpportunityMirrorCopyTest {
 				'Ana',
 				new List<String>{ 'Giving_Admin', 'Salesforce_Records_Sync' }
 			);
-			User admin = TestDataFactory.createUserOnTheRunningUsersProfile(
-				'Mia',
-				new List<String>{ 'Giving_Admin' }
-			);
+			User admin = TestDataFactory.createUserOnTheRunningUsersProfile('Mia', new List<String>{ 'Giving_Admin' });
 			if (!OpportunityMirrorService.isAvailable()) {
 				assertNothingMirrored();
 				return;
@@ -538,16 +498,11 @@ private class OpportunityMirrorCopyTest {
 				insert new FieldPermissions(
 					ParentId = link.Id,
 					SobjectType = String.valueOf(Gift__c.SObjectType),
-					Field = String.valueOf(Gift__c.SObjectType) +
-						'.' +
-						NamespaceUtil.qualify('Opportunity_Id__c'),
+					Field = String.valueOf(Gift__c.SObjectType) + '.' + NamespaceUtil.qualify('Opportunity_Id__c'),
 					PermissionsRead = true,
 					PermissionsEdit = true
 				);
-				insert new PermissionSetAssignment(
-					AssigneeId = admin.Id,
-					PermissionSetId = link.Id
-				);
+				insert new PermissionSetAssignment(AssigneeId = admin.Id, PermissionSetId = link.Id);
 				update new List<User>{
 					new User(Id = ana.Id, UserPermissionsMarketingUser = true),
 					new User(Id = admin.Id, UserPermissionsMarketingUser = true)

@@ -146,9 +146,7 @@ public with sharing class ScholarshipsController {
 					Application__r.Cycle__r.Name,
 					Application__r.Cycle__r.Close_Date__c
 				FROM Application_Review__c
-				WHERE
-					Reviewer__c = :UserInfo.getUserId()
-					AND Status__c = :ScholarshipReviews.ASSIGNED
+				WHERE Reviewer__c = :UserInfo.getUserId() AND Status__c = :ScholarshipReviews.ASSIGNED
 				WITH USER_MODE
 				ORDER BY CreatedDate
 				LIMIT 200
@@ -267,9 +265,7 @@ public with sharing class ScholarshipsController {
 			Map<String, Object> scores = String.isBlank(scoresJson)
 				? new Map<String, Object>()
 				: (Map<String, Object>) JSON.deserializeUntyped(scoresJson);
-			return new MyReview(
-				ScholarshipReviews.saveOwn(applicationId, scores, comments, action, reason)
-			);
+			return new MyReview(ScholarshipReviews.saveOwn(applicationId, scores, comments, action, reason));
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);
 		}
@@ -315,12 +311,7 @@ public with sharing class ScholarshipsController {
 	}
 
 	@AuraEnabled
-	public static Integer buildSchedule(
-		Id awardId,
-		Integer count,
-		Date firstDate,
-		Integer monthsApart
-	) {
+	public static Integer buildSchedule(Id awardId, Integer count, Date firstDate, Integer monthsApart) {
 		try {
 			return ScholarshipAwards.buildSchedule(awardId, count, firstDate, monthsApart);
 		} catch (Exception e) {

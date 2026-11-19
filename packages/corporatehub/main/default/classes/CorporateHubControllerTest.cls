@@ -75,13 +75,9 @@ private class CorporateHubControllerTest {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Hub_Document__c document = policy();
 			Integer asked = CorporateHubController.requestAcknowledgments(document.Id, null);
-			CorporateHubController.DocumentStatus before = CorporateHubController.getDocumentStatus(
-				document.Id
-			);
+			CorporateHubController.DocumentStatus before = CorporateHubController.getDocumentStatus(document.Id);
 			CorporateHubController.acknowledge(CorporateHubController.getHome().requests[0].id);
-			CorporateHubController.DocumentStatus after = CorporateHubController.getDocumentStatus(
-				document.Id
-			);
+			CorporateHubController.DocumentStatus after = CorporateHubController.getDocumentStatus(document.Id);
 
 			Assert.areEqual(1, before.version, 'Version 1');
 			Assert.isTrue(before.needsAcknowledgment, 'Needs reading');
@@ -93,17 +89,9 @@ private class CorporateHubControllerTest {
 
 			CorporateHubController.markReviewed(document.Id);
 			CorporateHubController.publishNewVersion(document.Id);
-			Assert.areEqual(
-				2,
-				CorporateHubController.getDocumentStatus(document.Id).version,
-				'Version 2'
-			);
+			Assert.areEqual(2, CorporateHubController.getDocumentStatus(document.Id).version, 'Version 2');
 			CorporateHubController.retire(document.Id);
-			Assert.areEqual(
-				'Retired',
-				CorporateHubController.getDocumentStatus(document.Id).status,
-				'Retired'
-			);
+			Assert.areEqual('Retired', CorporateHubController.getDocumentStatus(document.Id).status, 'Retired');
 		}
 	}
 
@@ -128,10 +116,7 @@ private class CorporateHubControllerTest {
 
 	@IsTest
 	static void aRefusalIsShownInItsOwnWordsAndAnythingElseIsLogged() {
-		User sam = TestUsers.standardUserWith(
-			'Sam',
-			new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' }
-		);
+		User sam = TestUsers.standardUserWith('Sam', new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' });
 		System.runAs(sam) {
 			try {
 				CorporateHubController.addMissingTemplates();

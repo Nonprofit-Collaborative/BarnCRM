@@ -13,9 +13,7 @@ public without sharing class VolunteerHealthCheckSelector {
 
 	private static void requireManageSettings() {
 		if (!HealthCheckService.canManageSettings()) {
-			throw new NotAllowedException(
-				BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_NeedsManageSettings')
-			);
+			throw new NotAllowedException(BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_NeedsManageSettings'));
 		}
 	}
 
@@ -25,9 +23,7 @@ public without sharing class VolunteerHealthCheckSelector {
 		return [
 			SELECT Id, Name
 			FROM Volunteer_Hours__c
-			WHERE
-				Status__c = :VolunteerHoursService.STATUS_SUBMITTED
-				AND CreatedDate < :enteredBefore
+			WHERE Status__c = :VolunteerHoursService.STATUS_SUBMITTED AND CreatedDate < :enteredBefore
 			WITH SYSTEM_MODE
 			ORDER BY CreatedDate
 			LIMIT :cap
@@ -35,10 +31,7 @@ public without sharing class VolunteerHealthCheckSelector {
 	}
 
 	/** Open shifts that ended before this moment, oldest first. */
-	public static List<Volunteer_Shift__c> openShiftsEndedBefore(
-		Datetime endedBefore,
-		Integer cap
-	) {
+	public static List<Volunteer_Shift__c> openShiftsEndedBefore(Datetime endedBefore, Integer cap) {
 		requireManageSettings();
 		return [
 			SELECT Id, Name
@@ -55,12 +48,7 @@ public without sharing class VolunteerHealthCheckSelector {
 	 * the horizon, and with nothing created yet or created only to before `createdBefore`. The
 	 * caller compares each with its own End Date.
 	 */
-	public static List<Shift_Schedule__c> schedulesShortOf(
-		Date today,
-		Date horizon,
-		Date createdBefore,
-		Integer cap
-	) {
+	public static List<Shift_Schedule__c> schedulesShortOf(Date today, Date horizon, Date createdBefore, Integer cap) {
 		requireManageSettings();
 		return [
 			SELECT Id, Name, End_Date__c, Created_Through__c

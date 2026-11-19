@@ -190,11 +190,7 @@ public with sharing class HouseholdService {
 			if (result != 0) {
 				return result;
 			}
-			if (
-				this.createdDate != null &&
-				that.createdDate != null &&
-				this.createdDate != that.createdDate
-			) {
+			if (this.createdDate != null && that.createdDate != null && this.createdDate != that.createdDate) {
 				return this.createdDate < that.createdDate ? -1 : 1;
 			}
 			result = compareText(this.firstName, that.firstName);
@@ -249,8 +245,7 @@ public with sharing class HouseholdService {
 	@NamespaceAccessible
 	public static Boolean isJunctionMode() {
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
-		return settings != null &&
-			MODE_JUNCTION.equalsIgnoreCase(settings.Household_Membership_Mode__c);
+		return settings != null && MODE_JUNCTION.equalsIgnoreCase(settings.Household_Membership_Mode__c);
 	}
 
 	@NamespaceAccessible
@@ -302,9 +297,7 @@ public with sharing class HouseholdService {
 		if (isJunctionMode()) {
 			addJunctionMembers(householdIds, result, asUser);
 		} else if (asUser) {
-			for (
-				Contact record : HouseholdSelector.getContactsByHouseholdIdsForDisplay(householdIds)
-			) {
+			for (Contact record : HouseholdSelector.getContactsByHouseholdIdsForDisplay(householdIds)) {
 				Id householdId = idValue(record.getPopulatedFieldsAsMap(), 'AccountId');
 				List<Person> bucket = householdId == null ? null : result.get(householdId);
 				if (bucket != null) {
@@ -322,11 +315,7 @@ public with sharing class HouseholdService {
 		return result;
 	}
 
-	private static void addJunctionMembers(
-		Set<Id> householdIds,
-		Map<Id, List<Person>> result,
-		Boolean asUser
-	) {
+	private static void addJunctionMembers(Set<Id> householdIds, Map<Id, List<Person>> result, Boolean asUser) {
 		List<Household_Member__c> memberships = asUser
 			? HouseholdSelector.getMembershipsForDisplay(householdIds)
 			: HouseholdSelector.getMemberships(householdIds);
@@ -384,10 +373,7 @@ public with sharing class HouseholdService {
 					// people on names no member at all.
 					continue;
 				}
-				source = unresolvedMember(
-					personId,
-					contactId != null ? SOURCE_CONTACT : SOURCE_ACCOUNT
-				);
+				source = unresolvedMember(personId, contactId != null ? SOURCE_CONTACT : SOURCE_ACCOUNT);
 			}
 			Person member = source.copy();
 			String role = textValue(values, 'Role__c');
@@ -481,17 +467,9 @@ public with sharing class HouseholdService {
 		if (personIds == null || personIds.isEmpty() || !isJunctionMode()) {
 			return result;
 		}
-		for (
-			Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)
-		) {
-			Id personId = membership.Contact__c != null
-				? membership.Contact__c
-				: membership.Account__c;
-			if (
-				personId != null &&
-				personIds.contains(personId) &&
-				membership.Household__c != null
-			) {
+		for (Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)) {
+			Id personId = membership.Contact__c != null ? membership.Contact__c : membership.Account__c;
+			if (personId != null && personIds.contains(personId) && membership.Household__c != null) {
 				result.add(membership.Household__c);
 			}
 		}
@@ -514,11 +492,7 @@ public with sharing class HouseholdService {
 			result.put(personId, new Set<Id>());
 		}
 		if (isJunctionMode()) {
-			for (
-				Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(
-					personIds
-				)
-			) {
+			for (Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)) {
 				Id personId = personOf(membership);
 				if (result.containsKey(personId) && membership.Household__c != null) {
 					result.get(personId).add(membership.Household__c);
@@ -561,10 +535,7 @@ public with sharing class HouseholdService {
 	 * @param oldRecords the same records before an update, or null for any other save
 	 */
 	@NamespaceAccessible
-	public static MembershipChange membershipChangeOf(
-		List<SObject> records,
-		Map<Id, SObject> oldRecords
-	) {
+	public static MembershipChange membershipChangeOf(List<SObject> records, Map<Id, SObject> oldRecords) {
 		MembershipChange change = new MembershipChange();
 		if (records == null || records.isEmpty()) {
 			return change;
@@ -583,9 +554,7 @@ public with sharing class HouseholdService {
 			}
 		} else if (changedType == Household_Member__c.SObjectType && junction) {
 			for (Household_Member__c row : (List<Household_Member__c>) records) {
-				Household_Member__c before = oldRecords == null
-					? null
-					: (Household_Member__c) oldRecords.get(row.Id);
+				Household_Member__c before = oldRecords == null ? null : (Household_Member__c) oldRecords.get(row.Id);
 				if (before != null && !membershipMoved(row, before)) {
 					continue;
 				}
@@ -686,25 +655,15 @@ public with sharing class HouseholdService {
 	 * @param survivorByMerged the survivor of each merged-away person
 	 */
 	@NamespaceAccessible
-	public static Set<Id> moveMembershipsToSurvivors(
-		List<Household_Member__c> removed,
-		Map<Id, Id> survivorByMerged
-	) {
+	public static Set<Id> moveMembershipsToSurvivors(List<Household_Member__c> removed, Map<Id, Id> survivorByMerged) {
 		Set<Id> affected = new Set<Id>();
-		if (
-			removed == null ||
-			removed.isEmpty() ||
-			survivorByMerged == null ||
-			survivorByMerged.isEmpty()
-		) {
+		if (removed == null || removed.isEmpty() || survivorByMerged == null || survivorByMerged.isEmpty()) {
 			return affected;
 		}
 		Set<Id> survivors = new Set<Id>(survivorByMerged.values());
 		Map<String, Household_Member__c> currentRowBySurvivorHousehold = new Map<String, Household_Member__c>();
 		Set<String> anyRowBySurvivorHousehold = new Set<String>();
-		for (
-			Household_Member__c existing : HouseholdSelector.getAllMembershipsForPeople(survivors)
-		) {
+		for (Household_Member__c existing : HouseholdSelector.getAllMembershipsForPeople(survivors)) {
 			Id personId = personOf(existing);
 			if (!survivors.contains(personId) || existing.Household__c == null) {
 				continue;
@@ -749,17 +708,11 @@ public with sharing class HouseholdService {
 			Id householdId = row.Household__c;
 			String key = survivorHouseholdKey(survivorId, householdId);
 			Boolean current = isCurrentMembership(row);
-			Boolean takesPrimary =
-				current &&
-				row.Is_Primary__c == true &&
-				!householdsWithPrimary.contains(householdId);
+			Boolean takesPrimary = current && row.Is_Primary__c == true && !householdsWithPrimary.contains(householdId);
 			if (current && currentRowBySurvivorHousehold.containsKey(key)) {
 				if (takesPrimary) {
 					Id survivorRowId = currentRowBySurvivorHousehold.get(key).Id;
-					promoted.put(
-						survivorRowId,
-						new Household_Member__c(Id = survivorRowId, Is_Primary__c = true)
-					);
+					promoted.put(survivorRowId, new Household_Member__c(Id = survivorRowId, Is_Primary__c = true));
 					householdsWithPrimary.add(householdId);
 					affected.add(householdId);
 				}
@@ -889,12 +842,8 @@ public with sharing class HouseholdService {
 			return affected;
 		}
 		List<Household_Member__c> removing = new List<Household_Member__c>();
-		for (
-			Household_Member__c membership : HouseholdSelector.getAllMembershipsForPeople(personIds)
-		) {
-			Id personId = membership.Contact__c != null
-				? membership.Contact__c
-				: membership.Account__c;
+		for (Household_Member__c membership : HouseholdSelector.getAllMembershipsForPeople(personIds)) {
+			Id personId = membership.Contact__c != null ? membership.Contact__c : membership.Account__c;
 			if (personId == null || !personIds.contains(personId)) {
 				continue;
 			}
@@ -922,9 +871,7 @@ public with sharing class HouseholdService {
 			return ending;
 		}
 		Date today = OrgDate.today();
-		for (
-			Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)
-		) {
+		for (Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)) {
 			Household_Member__c ended = new Household_Member__c(
 				Id = membership.Id,
 				End_Date__c = today,
@@ -959,14 +906,8 @@ public with sharing class HouseholdService {
 			return affected;
 		}
 		List<Household_Member__c> restoring = new List<Household_Member__c>();
-		for (
-			Household_Member__c membership : HouseholdSelector.getDeletedMembershipsForPeople(
-				personIds
-			)
-		) {
-			Id personId = membership.Contact__c != null
-				? membership.Contact__c
-				: membership.Account__c;
+		for (Household_Member__c membership : HouseholdSelector.getDeletedMembershipsForPeople(personIds)) {
+			Id personId = membership.Contact__c != null ? membership.Contact__c : membership.Account__c;
 			if (personId == null || !personIds.contains(personId)) {
 				continue;
 			}
@@ -1050,10 +991,7 @@ public with sharing class HouseholdService {
 	 * Working out the wording is logged and skipped if it fails, as applyNaming does, and a
 	 * household whose new wording is refused on save still gets its count and primary.
 	 */
-	private static void settleHouseholds(
-		List<Account> households,
-		Map<Id, List<Person>> membersByHousehold
-	) {
+	private static void settleHouseholds(List<Account> households, Map<Id, List<Person>> membersByHousehold) {
 		if (households.isEmpty()) {
 			return;
 		}
@@ -1080,10 +1018,7 @@ public with sharing class HouseholdService {
 				bookkept = true;
 			}
 			Id primaryId = primaryByHousehold.get(household.Id);
-			if (
-				primaryByHousehold.containsKey(household.Id) &&
-				household.Primary_Contact__c != primaryId
-			) {
+			if (primaryByHousehold.containsKey(household.Id) && household.Primary_Contact__c != primaryId) {
 				change.Primary_Contact__c = primaryId;
 				bookkept = true;
 			}
@@ -1141,9 +1076,7 @@ public with sharing class HouseholdService {
 			if (custom.isEmpty()) {
 				return;
 			}
-			Map<Id, List<Person>> membersByHousehold = getMembers(
-				new Map<Id, Account>(custom).keySet()
-			);
+			Map<Id, List<Person>> membersByHousehold = getMembers(new Map<Id, Account>(custom).keySet());
 			Boolean primaryFromField = !isJunctionMode();
 			List<Account> updates = new List<Account>();
 			for (Account household : custom) {
@@ -1215,9 +1148,7 @@ public with sharing class HouseholdService {
 				continue;
 			}
 			List<Person> members = membersByHousehold.get(household.Id);
-			Id primaryId = junction
-				? firstPrimaryId(members)
-				: memberOrNull(household.Primary_Contact__c, members);
+			Id primaryId = junction ? firstPrimaryId(members) : memberOrNull(household.Primary_Contact__c, members);
 			result.put(household.Id, primaryId);
 			if (primaryId != null && primaryId.getSObjectType() == Account.SObjectType) {
 				primariesStoredAsAccounts.add(primaryId);
@@ -1227,9 +1158,7 @@ public with sharing class HouseholdService {
 			return result;
 		}
 		// One read for every household in the pass, and none when no primary is an account.
-		Map<Id, Id> personContactByAccount = PersonRecordSelector.getPersonContactIds(
-			primariesStoredAsAccounts
-		);
+		Map<Id, Id> personContactByAccount = PersonRecordSelector.getPersonContactIds(primariesStoredAsAccounts);
 		for (Id householdId : result.keySet()) {
 			Id primaryId = result.get(householdId);
 			if (primaryId != null && primariesStoredAsAccounts.contains(primaryId)) {
@@ -1264,9 +1193,7 @@ public with sharing class HouseholdService {
 	) {
 		Map<Id, Account> result = new Map<Id, Account>();
 		try {
-			Set<Id> natives = HouseholdSelector.nativeHouseholdAccountsAmong(
-				new Map<Id, Account>(households).keySet()
-			);
+			Set<Id> natives = HouseholdSelector.nativeHouseholdAccountsAmong(new Map<Id, Account>(households).keySet());
 			HouseholdNamingService.Wording wording = new HouseholdNamingService.Wording();
 			// R-H5 reads the primary from the mode's own source of truth: the membership rows
 			// in junction mode (getMembers has already flagged it), the settled field in
@@ -1336,12 +1263,8 @@ public with sharing class HouseholdService {
 	 */
 	private static void resolveThroughJunction(Set<Id> personIds, Map<Id, Id> result) {
 		Map<Id, List<Household_Member__c>> byPerson = new Map<Id, List<Household_Member__c>>();
-		for (
-			Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)
-		) {
-			Id personId = membership.Contact__c != null
-				? membership.Contact__c
-				: membership.Account__c;
+		for (Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)) {
+			Id personId = membership.Contact__c != null ? membership.Contact__c : membership.Account__c;
 			if (personId == null || !personIds.contains(personId)) {
 				continue;
 			}
@@ -1464,10 +1387,7 @@ public with sharing class HouseholdService {
 	 * Nonprofit Cloud household counts as a household, and in junction mode the account is
 	 * an employer, so nothing is checked. Runs before update.
 	 */
-	public static void refuseLeavingHouseholdsForOrganizations(
-		List<Contact> records,
-		Map<Id, Contact> previousById
-	) {
+	public static void refuseLeavingHouseholdsForOrganizations(List<Contact> records, Map<Id, Contact> previousById) {
 		if (records == null || previousById == null || isJunctionMode()) {
 			return;
 		}
@@ -1514,10 +1434,7 @@ public with sharing class HouseholdService {
 		Set<Id> nativeHouseholds = HouseholdSelector.nativeHouseholdAccountsAmong(targets);
 		for (Contact record : leaving) {
 			if (!nativeHouseholds.contains(record.AccountId)) {
-				record.addError(
-					Contact.AccountId,
-					BarnHelp.text('Core', 'Core_Households_ErrorPersonToOrganization')
-				);
+				record.addError(Contact.AccountId, BarnHelp.text('Core', 'Core_Households_ErrorPersonToOrganization'));
 			}
 		}
 	}
@@ -1548,9 +1465,7 @@ public with sharing class HouseholdService {
 		Id recordTypeId = householdRecordTypeId();
 		if (recordTypeId == null) {
 			ErrorLogger.log(
-				new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')
-				),
+				new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')),
 				Label.Core_Households_ErrorContextMembership
 			);
 			return;
@@ -1562,9 +1477,7 @@ public with sharing class HouseholdService {
 				continue;
 			}
 			waiting.add(record);
-			households.add(
-				newHousehold(new List<Person>{ new Person(record) }, recordTypeId, settings)
-			);
+			households.add(newHousehold(new List<Person>{ new Person(record) }, recordTypeId, settings));
 		}
 		if (households.isEmpty()) {
 			return;
@@ -1772,8 +1685,7 @@ public with sharing class HouseholdService {
 	public static void saveAccountCopiesAsUser(List<SObject> copies) {
 		Map<Id, Id> carried = new Map<Id, Id>();
 		if (
-			!PRIMARY_CONTACTS_TO_SAVE.isEmpty() &&
-			Schema.SObjectType.Account.fields.Primary_Contact__c.isUpdateable()
+			!PRIMARY_CONTACTS_TO_SAVE.isEmpty() && Schema.SObjectType.Account.fields.Primary_Contact__c.isUpdateable()
 		) {
 			for (SObject copy : copies) {
 				Account waiting = PRIMARY_CONTACTS_TO_SAVE.get(copy.Id);
@@ -1906,8 +1818,7 @@ public with sharing class HouseholdService {
 			}
 			if (
 				record.AccountId != null &&
-				(households.contains(record.AccountId) ||
-				nativeHouseholds.contains(record.AccountId))
+				(households.contains(record.AccountId) || nativeHouseholds.contains(record.AccountId))
 			) {
 				continue;
 			}
@@ -1940,19 +1851,14 @@ public with sharing class HouseholdService {
 	 * created fails that person's own save (R-C1) rather than leaving them saved and
 	 * quietly householdless.
 	 */
-	private static void createHouseholdsAndMemberships(
-		List<Person> people,
-		Map<Id, SObject> recordsByPersonId
-	) {
+	private static void createHouseholdsAndMemberships(List<Person> people, Map<Id, SObject> recordsByPersonId) {
 		if (people == null || people.isEmpty()) {
 			return;
 		}
 		Id recordTypeId = householdRecordTypeId();
 		if (recordTypeId == null) {
 			ErrorLogger.log(
-				new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')
-				),
+				new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')),
 				Label.Core_Households_ErrorContextMembership
 			);
 			return;
@@ -1988,11 +1894,7 @@ public with sharing class HouseholdService {
 		}
 	}
 
-	private static Account newHousehold(
-		List<Person> members,
-		Id recordTypeId,
-		BarnCRM_Settings__c settings
-	) {
+	private static Account newHousehold(List<Person> members, Id recordTypeId, BarnCRM_Settings__c settings) {
 		String namePattern = settings == null ? null : settings.Household_Name_Pattern__c;
 		String formalPattern = settings == null ? null : settings.Formal_Greeting_Pattern__c;
 		String informalPattern = settings == null ? null : settings.Informal_Greeting_Pattern__c;
@@ -2002,14 +1904,8 @@ public with sharing class HouseholdService {
 			RecordTypeId = recordTypeId,
 			Custom_Name__c = false,
 			Member_Count__c = members.size(),
-			Household_Formal_Greeting__c = HouseholdNamingService.computeFormalGreeting(
-				members,
-				formalPattern
-			),
-			Household_Informal_Greeting__c = HouseholdNamingService.computeInformalGreeting(
-				members,
-				informalPattern
-			)
+			Household_Formal_Greeting__c = HouseholdNamingService.computeFormalGreeting(members, formalPattern),
+			Household_Informal_Greeting__c = HouseholdNamingService.computeInformalGreeting(members, informalPattern)
 		);
 	}
 
@@ -2034,31 +1930,19 @@ public with sharing class HouseholdService {
 	@NamespaceAccessible
 	public static void moveContact(Id contactId, Id targetHouseholdId, Id sourceHouseholdId) {
 		if (contactId == null || targetHouseholdId == null) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveMissingInput')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveMissingInput'));
 		}
 		// Somebody moving a person by hand is changing the household they chose, so they
 		// need edit access to it, checked against sharing the way a merge or a split checks
 		// both of its ends. The reads that follow run in system mode (ADR-0021) and would
 		// otherwise let a person be moved into a household the user cannot even see.
-		if (
-			!HouseholdSelector.getEditableIds(new Set<Id>{ targetHouseholdId })
-				.contains(targetHouseholdId)
-		) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNoEditAccess')
-			);
+		if (!HouseholdSelector.getEditableIds(new Set<Id>{ targetHouseholdId }).contains(targetHouseholdId)) {
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNoEditAccess'));
 		}
 		// The person and membership handlers are stood down for the move, and the households
 		// are settled once here, rather than once by each trigger and again by this method.
 		afterMembershipChange(
-			moveMembersWithoutUpkeep(
-				new Set<Id>{ contactId },
-				targetHouseholdId,
-				sourceHouseholdId,
-				false
-			)
+			moveMembersWithoutUpkeep(new Set<Id>{ contactId }, targetHouseholdId, sourceHouseholdId, false)
 		);
 	}
 
@@ -2094,9 +1978,7 @@ public with sharing class HouseholdService {
 	 * the dispatcher may run a chunk again narrowed to the rows still standing.
 	 */
 	@NamespaceAccessible
-	public static Map<Id, List<Household_Member__c>> removeMembershipsWithoutUpkeep(
-		Set<Id> personIds
-	) {
+	public static Map<Id, List<Household_Member__c>> removeMembershipsWithoutUpkeep(Set<Id> personIds) {
 		Map<Id, List<Household_Member__c>> result = new Map<Id, List<Household_Member__c>>();
 		for (Id personId : personIds) {
 			result.put(personId, new List<Household_Member__c>());
@@ -2121,10 +2003,7 @@ public with sharing class HouseholdService {
 	 * of what the handler holds, so that each after delete settles only its own records.
 	 */
 	@NamespaceAccessible
-	public static List<Household_Member__c> takeDeparting(
-		Map<Id, List<Household_Member__c>> held,
-		List<SObject> gone
-	) {
+	public static List<Household_Member__c> takeDeparting(Map<Id, List<Household_Member__c>> held, List<SObject> gone) {
 		List<Household_Member__c> result = new List<Household_Member__c>();
 		for (SObject record : gone) {
 			List<Household_Member__c> rows = held.remove(record.Id);
@@ -2189,82 +2068,49 @@ public with sharing class HouseholdService {
 	 * stays there. With no household named, every other current membership ends.
 	 */
 	@NamespaceAccessible
-	public static Set<Id> moveMembers(
-		Set<Id> personIds,
-		Id targetHouseholdId,
-		Id sourceHouseholdId
-	) {
+	public static Set<Id> moveMembers(Set<Id> personIds, Id targetHouseholdId, Id sourceHouseholdId) {
 		return move(personIds, targetHouseholdId, sourceHouseholdId, false);
 	}
 
-	private static Set<Id> move(
-		Set<Id> personIds,
-		Id targetHouseholdId,
-		Id sourceHouseholdId,
-		Boolean keepStartDates
-	) {
+	private static Set<Id> move(Set<Id> personIds, Id targetHouseholdId, Id sourceHouseholdId, Boolean keepStartDates) {
 		if (personIds == null || personIds.isEmpty() || targetHouseholdId == null) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveMissingInput')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveMissingInput'));
 		}
-		List<Account> targets = HouseholdSelector.getHouseholdsByIds(
-			new Set<Id>{ targetHouseholdId }
-		);
+		List<Account> targets = HouseholdSelector.getHouseholdsByIds(new Set<Id>{ targetHouseholdId });
 		if (targets.isEmpty()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		if (targets[0].RecordTypeId != householdRecordTypeId()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'));
 		}
 		Set<Id> contactPeople = idsOfType(personIds, Contact.SObjectType);
 		Set<Id> accountPeople = idsOfType(personIds, Account.SObjectType);
 		if (contactPeople.size() + accountPeople.size() != personIds.size()) {
 			// An id of any other object is not a person this service can move.
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		if (!accountPeople.isEmpty() && !isJunctionMode()) {
 			// A person stored as an account has no account reference of their own to move,
 			// so this org has to be in the flexible membership mode to move them at all.
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction'));
 		}
 		// Everybody named is read through the object that holds them, and everybody named
 		// has to exist. A merge or a split that names somebody who has since been deleted
 		// is refused rather than quietly moving the rest.
-		Map<Id, Contact> contacts = new Map<Id, Contact>(
-			HouseholdSelector.getContactsByIds(contactPeople)
-		);
+		Map<Id, Contact> contacts = new Map<Id, Contact>(HouseholdSelector.getContactsByIds(contactPeople));
 		if (contacts.size() != contactPeople.size()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		Set<Id> foundAsAccount = new Set<Id>();
 		for (Person person : PersonRecordSelector.getPersons(accountPeople)) {
 			foundAsAccount.add(person.id);
 		}
 		if (foundAsAccount.size() != accountPeople.size()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		Set<Id> affected = new Set<Id>{ targetHouseholdId };
 		if (isJunctionMode()) {
-			moveJunctionMembers(
-				personIds,
-				targetHouseholdId,
-				sourceHouseholdId,
-				keepStartDates,
-				affected
-			);
+			moveJunctionMembers(personIds, targetHouseholdId, sourceHouseholdId, keepStartDates, affected);
 		} else {
 			moveContactMembers(contacts.values(), targetHouseholdId, affected);
 		}
@@ -2276,11 +2122,7 @@ public with sharing class HouseholdService {
 	 * In contact mode the move is the person's own account reference, so everybody moves in
 	 * one update. Somebody already in the target is left alone.
 	 */
-	private static void moveContactMembers(
-		List<Contact> people,
-		Id targetHouseholdId,
-		Set<Id> affected
-	) {
+	private static void moveContactMembers(List<Contact> people, Id targetHouseholdId, Set<Id> affected) {
 		List<Contact> updates = new List<Contact>();
 		Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>();
 		for (Contact person : people) {
@@ -2330,9 +2172,7 @@ public with sharing class HouseholdService {
 				households.add(left.Id);
 			}
 		}
-		List<Id> leftBehind = new List<Id>(
-			relationsLeftBehind(leftHouseholdByContact, households, rows)
-		);
+		List<Id> leftBehind = new List<Id>(relationsLeftBehind(leftHouseholdByContact, households, rows));
 		if (!leftBehind.isEmpty()) {
 			Database.delete(leftBehind, false, AccessLevel.USER_MODE);
 		}
@@ -2386,11 +2226,7 @@ public with sharing class HouseholdService {
 		Set<Id> affected
 	) {
 		Boolean primaryIsFree = true;
-		for (
-			Household_Member__c membership : HouseholdSelector.getMemberships(
-				new Set<Id>{ targetHouseholdId }
-			)
-		) {
+		for (Household_Member__c membership : HouseholdSelector.getMemberships(new Set<Id>{ targetHouseholdId })) {
 			if (membership.Is_Primary__c == true) {
 				primaryIsFree = false;
 			}
@@ -2400,9 +2236,7 @@ public with sharing class HouseholdService {
 		Set<Id> wasPrimary = new Set<Id>();
 		Map<Id, Date> startByPerson = new Map<Id, Date>();
 		List<Household_Member__c> ended = new List<Household_Member__c>();
-		for (
-			Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)
-		) {
+		for (Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(personIds)) {
 			Id personId = personOf(membership);
 			if (personId == null || !personIds.contains(personId)) {
 				continue;
@@ -2416,15 +2250,10 @@ public with sharing class HouseholdService {
 			}
 			affected.add(membership.Household__c);
 			Date started = membership.Start_Date__c;
-			if (
-				started != null &&
-				(!startByPerson.containsKey(personId) || started < startByPerson.get(personId))
-			) {
+			if (started != null && (!startByPerson.containsKey(personId) || started < startByPerson.get(personId))) {
 				startByPerson.put(personId, started);
 			}
-			if (
-				String.isBlank(roleByPerson.get(personId)) && String.isNotBlank(membership.Role__c)
-			) {
+			if (String.isBlank(roleByPerson.get(personId)) && String.isNotBlank(membership.Role__c)) {
 				roleByPerson.put(personId, membership.Role__c);
 			}
 			if (membership.Is_Primary__c == true) {
@@ -2509,16 +2338,12 @@ public with sharing class HouseholdService {
 		Set<Id> found = new Set<Id>();
 		for (Account household : HouseholdSelector.getHouseholdsByIds(householdIds)) {
 			if (recordTypeId != null && household.RecordTypeId != recordTypeId) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'));
 			}
 			found.add(household.Id);
 		}
 		if (found.size() != householdIds.size()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		Map<Id, Id> accountBehindContact = PersonRecordSelector.getAccountsBehindPersonContacts(
 			idsOfType(everybody, Contact.SObjectType)
@@ -2527,26 +2352,19 @@ public with sharing class HouseholdService {
 			// The hidden contact behind a person stored as an account joins as that account,
 			// so the person has one membership, on the side the Account trigger maintains
 			// (PEOPLE-7).
-			personIdsByHouseholdId = withAccountsForPersonContacts(
-				personIdsByHouseholdId,
-				accountBehindContact
-			);
+			personIdsByHouseholdId = withAccountsForPersonContacts(personIdsByHouseholdId, accountBehindContact);
 			everybody = withAccountsForPersonContacts(everybody, accountBehindContact);
 		}
 		Set<Id> contactPeople = idsOfType(everybody, Contact.SObjectType);
 		Set<Id> accountPeople = idsOfType(everybody, Account.SObjectType);
 		if (contactPeople.size() + accountPeople.size() != everybody.size()) {
 			// An id of any other object is not a person this service can join.
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		if (!accountPeople.isEmpty() && !isJunctionMode()) {
 			// A person stored as an account has no account reference of their own, so only
 			// the flexible membership mode can hold them.
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNeedsJunction'));
 		}
 		affected.addAll(householdIds);
 		if (isJunctionMode()) {
@@ -2573,17 +2391,10 @@ public with sharing class HouseholdService {
 		return result;
 	}
 
-	private static Set<Id> withAccountsForPersonContacts(
-		Set<Id> people,
-		Map<Id, Id> accountBehindContact
-	) {
+	private static Set<Id> withAccountsForPersonContacts(Set<Id> people, Map<Id, Id> accountBehindContact) {
 		Set<Id> result = new Set<Id>();
 		for (Id personId : people) {
-			result.add(
-				accountBehindContact.containsKey(personId)
-					? accountBehindContact.get(personId)
-					: personId
-			);
+			result.add(accountBehindContact.containsKey(personId) ? accountBehindContact.get(personId) : personId);
 		}
 		return result;
 	}
@@ -2592,17 +2403,10 @@ public with sharing class HouseholdService {
 	 * One membership row per person who is not already a current member of the household
 	 * they are joining. Read once for everybody, written once.
 	 */
-	private static void joinThroughJunction(
-		Map<Id, Set<Id>> personIdsByHouseholdId,
-		Set<Id> everybody
-	) {
+	private static void joinThroughJunction(Map<Id, Set<Id>> personIdsByHouseholdId, Set<Id> everybody) {
 		Set<String> alreadyMembers = new Set<String>();
-		for (
-			Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(everybody)
-		) {
-			Id personId = membership.Contact__c != null
-				? membership.Contact__c
-				: membership.Account__c;
+		for (Household_Member__c membership : HouseholdSelector.getMembershipsForPeople(everybody)) {
+			Id personId = membership.Contact__c != null ? membership.Contact__c : membership.Account__c;
 			if (personId != null) {
 				alreadyMembers.add(membership.Household__c + ':' + personId);
 			}
@@ -2634,13 +2438,9 @@ public with sharing class HouseholdService {
 		Set<Id> contactPeople,
 		Set<Id> affected
 	) {
-		Map<Id, Contact> people = new Map<Id, Contact>(
-			HouseholdSelector.getContactsByIds(contactPeople)
-		);
+		Map<Id, Contact> people = new Map<Id, Contact>(HouseholdSelector.getContactsByIds(contactPeople));
 		if (people.size() != contactPeople.size()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'));
 		}
 		List<Contact> updates = new List<Contact>();
 		Map<Id, Id> leftHouseholdByContact = new Map<Id, Id>();
@@ -2671,12 +2471,7 @@ public with sharing class HouseholdService {
 	 * A membership row that points at the person through whichever object holds them, so
 	 * that an org storing people as accounts is joined up the same way as any other.
 	 */
-	private static Household_Member__c newMembership(
-		Id personId,
-		Id householdId,
-		String role,
-		Boolean isPrimary
-	) {
+	private static Household_Member__c newMembership(Id personId, Id householdId, String role, Boolean isPrimary) {
 		Household_Member__c membership = new Household_Member__c(
 			Household__c = householdId,
 			Role__c = role,
@@ -2706,9 +2501,7 @@ public with sharing class HouseholdService {
 		if (!created.isSuccess()) {
 			// HouseholdWriter has already logged why. Nobody is moved into a household
 			// that does not exist, so the split stops here rather than half happening.
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateFailed')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorCreateFailed'));
 		}
 		return created.getId();
 	}
@@ -2732,15 +2525,10 @@ public with sharing class HouseholdService {
 		return created.getId();
 	}
 
-	private static Database.SaveResult saveNewHousehold(
-		List<Person> members,
-		Set<Id> touchedHouseholdIds
-	) {
+	private static Database.SaveResult saveNewHousehold(List<Person> members, Set<Id> touchedHouseholdIds) {
 		Id recordTypeId = householdRecordTypeId();
 		if (recordTypeId == null) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing'));
 		}
 		List<Person> people = members == null ? new List<Person>() : members;
 		Account household = newHousehold(people, recordTypeId, SettingsService.getSettings());
@@ -2776,18 +2564,11 @@ public with sharing class HouseholdService {
 			return;
 		}
 		List<Account> households = HouseholdSelector.getHouseholdsByIds(householdIds);
-		Map<Id, Id> primaryByHousehold = settledPrimaries(
-			households,
-			getMembers(householdIds),
-			recordTypeId
-		);
+		Map<Id, Id> primaryByHousehold = settledPrimaries(households, getMembers(householdIds), recordTypeId);
 		List<Account> updates = new List<Account>();
 		for (Account household : households) {
 			Id primaryId = primaryByHousehold.get(household.Id);
-			if (
-				primaryByHousehold.containsKey(household.Id) &&
-				household.Primary_Contact__c != primaryId
-			) {
+			if (primaryByHousehold.containsKey(household.Id) && household.Primary_Contact__c != primaryId) {
 				updates.add(new Account(Id = household.Id, Primary_Contact__c = primaryId));
 			}
 		}
@@ -2870,10 +2651,7 @@ public with sharing class HouseholdService {
 	 * Called from the Account trigger before insert and before update.
 	 */
 	@NamespaceAccessible
-	public static void refuseHandSetPrimaryContacts(
-		List<Account> records,
-		Map<Id, Account> previousById
-	) {
+	public static void refuseHandSetPrimaryContacts(List<Account> records, Map<Id, Account> previousById) {
 		if (writingPrimaryContacts || records == null || records.isEmpty()) {
 			return;
 		}
@@ -2934,9 +2712,7 @@ public with sharing class HouseholdService {
 		for (Account record : checked) {
 			Id householdOfPrimary = accountByContact.get(record.Primary_Contact__c);
 			if (record.Id == null || householdOfPrimary != record.Id) {
-				record.Primary_Contact__c.addError(
-					BarnHelp.text('Core', 'Core_Households_PrimaryContactMustBeMember')
-				);
+				record.Primary_Contact__c.addError(BarnHelp.text('Core', 'Core_Households_PrimaryContactMustBeMember'));
 			}
 		}
 	}
@@ -2993,10 +2769,7 @@ public with sharing class HouseholdService {
 		if (!deletesEmptyHouseholds()) {
 			return;
 		}
-		deleteEmptyHouseholds(
-			HouseholdSelector.getHouseholdsByIds(householdIds),
-			getMembers(householdIds)
-		);
+		deleteEmptyHouseholds(HouseholdSelector.getHouseholdsByIds(householdIds), getMembers(householdIds));
 	}
 
 	private static Boolean deletesEmptyHouseholds() {
@@ -3005,10 +2778,7 @@ public with sharing class HouseholdService {
 	}
 
 	/** The same, from households and members the caller has already read. */
-	private static void deleteEmptyHouseholds(
-		List<Account> households,
-		Map<Id, List<Person>> membersByHousehold
-	) {
+	private static void deleteEmptyHouseholds(List<Account> households, Map<Id, List<Person>> membersByHousehold) {
 		if (!deletesEmptyHouseholds()) {
 			return;
 		}
@@ -3073,11 +2843,7 @@ public with sharing class HouseholdService {
 			// Not an error: an administrator is being told what was deliberately left alone,
 			// and why, so that the empty household on their list is explained rather than
 			// mysterious.
-			ErrorLogger.logMessages(
-				skipped,
-				Label.Core_Households_ErrorContextMembership,
-				ErrorLogger.SEVERITY_INFO
-			);
+			ErrorLogger.logMessages(skipped, Label.Core_Households_ErrorContextMembership, ErrorLogger.SEVERITY_INFO);
 		}
 		if (!deletable.isEmpty()) {
 			HouseholdWriter.deleteHouseholds(deletable);

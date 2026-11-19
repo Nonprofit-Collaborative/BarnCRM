@@ -54,9 +54,7 @@ private class GiftTransactionMirrorRunTest {
 
 	private static Gift__c reread(Id giftId) {
 		return (Gift__c) Database.queryWithBinds(
-			'SELECT ' +
-				GiftTransactionMirrorSelector.GIFT_FIELDS +
-				' FROM Gift__c WHERE Id = :giftId',
+			'SELECT ' + GiftTransactionMirrorSelector.GIFT_FIELDS + ' FROM Gift__c WHERE Id = :giftId',
 			new Map<String, Object>{ 'giftId' => giftId },
 			AccessLevel.SYSTEM_MODE
 		)[0];
@@ -97,10 +95,7 @@ private class GiftTransactionMirrorRunTest {
 			insertGift(100);
 			GiftTransactionMirrorSchema.absentForTest = true;
 			Assert.isNull(GiftTransactionMirrorBatch.run(), 'No run starts (R-GT1).');
-			Assert.isFalse(
-				NightlyJobs.isOn(GiftTransactionMirrorSchedulable.step()),
-				'Not in tonight\'s run.'
-			);
+			Assert.isFalse(NightlyJobs.isOn(GiftTransactionMirrorSchedulable.step()), 'Not in tonight\'s run.');
 			Test.startTest();
 			runInline(new GiftTransactionMirrorBatch(null, null));
 			Test.stopTest();
@@ -125,10 +120,7 @@ private class GiftTransactionMirrorRunTest {
 		}
 		List<Error_Log__c> info = logged('Info');
 		Assert.areEqual(1, info.size());
-		Assert.isTrue(
-			info[0].Message__c.startsWith('Gift Transaction mirror run: 1 '),
-			info[0].Message__c
-		);
+		Assert.isTrue(info[0].Message__c.startsWith('Gift Transaction mirror run: 1 '), info[0].Message__c);
 		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		Assert.isNotNull(settings.Gift_Transaction_Mirror_Last_Run__c, 'The run is recorded.');
 		Assert.areEqual(info[0].Message__c, settings.Gift_Transaction_Mirror_Last_Summary__c);
@@ -186,12 +178,7 @@ private class GiftTransactionMirrorRunTest {
 			totals.designationsUnavailable = true;
 			Assert.isTrue(
 				GiftTransactionMirrorBatch.summaryOf(totals)
-					.endsWith(
-						BarnHelp.text(
-							'Giving',
-							'Mirror_GiftTransactionMirror_DesignationsUnavailable'
-						)
-					)
+					.endsWith(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_DesignationsUnavailable'))
 			);
 			Assert.isTrue(GiftTransactionMirrorBatch.hasHeadroom(100), 'A fresh chunk has room.');
 		}
@@ -270,18 +257,12 @@ private class GiftTransactionMirrorRunTest {
 			for (GiftTransactionMirrorReconciliation.Difference difference : result.differences) {
 				reasonByKey.put(difference.key, difference.reason);
 			}
-			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_DiffAmount,
-				reasonByKey.get(String.valueOf(changed.Id))
-			);
+			Assert.areEqual(Label.Mirror_OpportunityMirror_DiffAmount, reasonByKey.get(String.valueOf(changed.Id)));
 			Assert.areEqual(
 				Label.Mirror_GiftTransactionMirror_DiffNoGiftTransaction,
 				reasonByKey.get(String.valueOf(notCopied.Id))
 			);
-			Assert.areEqual(
-				Label.Mirror_GiftTransactionMirror_DiffNoGift,
-				reasonByKey.get(String.valueOf(orphan.Id))
-			);
+			Assert.areEqual(Label.Mirror_GiftTransactionMirror_DiffNoGift, reasonByKey.get(String.valueOf(orphan.Id)));
 		}
 	}
 
@@ -289,22 +270,14 @@ private class GiftTransactionMirrorRunTest {
 	static void theReconciliationRefusesWhatItCannotCompare() {
 		System.runAs(maria()) {
 			GiftTransactionMirrorSchema.useStandIns();
-			assertRefused(
-				null,
-				GIFT_DATE,
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
-			);
+			assertRefused(null, GIFT_DATE, BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'));
 			assertRefused(
 				GIFT_DATE.addDays(1),
 				GIFT_DATE,
 				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
 			);
 			GiftTransactionMirrorSchema.absentForTest = true;
-			assertRefused(
-				GIFT_DATE,
-				GIFT_DATE,
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable')
-			);
+			assertRefused(GIFT_DATE, GIFT_DATE, BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_Unavailable'));
 		}
 	}
 

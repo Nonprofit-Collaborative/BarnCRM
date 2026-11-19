@@ -7,11 +7,7 @@
  */
 public with sharing class ProjectTimesheetController {
 	private static final String CONTEXT = 'ProjectTimesheetController';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Projects',
-			'Projects_Error_Generic'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Projects', 'Projects_Error_Generic')
 		.showingDml();
 	private static final Date A_MONDAY = Date.newInstance(1900, 1, 1);
 
@@ -151,9 +147,7 @@ public with sharing class ProjectTimesheetController {
 			List<Time_Entry__c> changed = new List<Time_Entry__c>();
 			for (Cell cell : cells == null ? new List<Cell>() : cells) {
 				if (cell.hours == null || cell.hours <= 0) {
-					throw Projects.refuse(
-						BarnHelp.text('Projects', 'Projects_Timesheet_HoursNeeded')
-					);
+					throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Timesheet_HoursNeeded'));
 				}
 				String notes = cell.notes == null ? null : cell.notes.abbreviate(255);
 				if (cell.id == null) {
@@ -193,9 +187,7 @@ public with sharing class ProjectTimesheetController {
 		try {
 			Integer count = move(weekStart, new List<String>{ 'Open', 'Rejected' }, 'Submitted');
 			if (count == 0) {
-				throw Projects.refuse(
-					BarnHelp.text('Projects', 'Projects_Timesheet_NothingToSubmit')
-				);
+				throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Timesheet_NothingToSubmit'));
 			}
 			return count;
 		} catch (Exception e) {
@@ -257,11 +249,7 @@ public with sharing class ProjectTimesheetController {
 		for (Time_Entry__c entry : [
 			SELECT Id
 			FROM Time_Entry__c
-			WHERE
-				User__c = :me
-				AND Date__c >= :monday
-				AND Date__c <= :monday.addDays(6)
-				AND Status__c IN :before
+			WHERE User__c = :me AND Date__c >= :monday AND Date__c <= :monday.addDays(6) AND Status__c IN :before
 			WITH USER_MODE
 			LIMIT 500
 		]) {
@@ -271,11 +259,7 @@ public with sharing class ProjectTimesheetController {
 			for (Project_Expense__c expense : [
 				SELECT Id
 				FROM Project_Expense__c
-				WHERE
-					User__c = :me
-					AND Date__c >= :monday
-					AND Date__c <= :monday.addDays(6)
-					AND Status__c IN :before
+				WHERE User__c = :me AND Date__c >= :monday AND Date__c <= :monday.addDays(6) AND Status__c IN :before
 				WITH USER_MODE
 				LIMIT 200
 			]) {

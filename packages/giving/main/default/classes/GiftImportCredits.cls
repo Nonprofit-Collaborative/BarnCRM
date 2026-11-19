@@ -50,11 +50,7 @@ public with sharing class GiftImportCredits {
 			);
 		}
 		item.creditParty = partyChoice(item.value(entity, 'Party'));
-		item.credit = new Soft_Credit__c(
-			Role__c = role,
-			Custom_Role__c = customRole,
-			Amount__c = amount
-		);
+		item.credit = new Soft_Credit__c(Role__c = role, Custom_Role__c = customRole, Amount__c = amount);
 	}
 
 	private static void readTribute(GiftImportRow item) {
@@ -82,29 +78,19 @@ public with sharing class GiftImportCredits {
 	}
 
 	/** A picklist value matched ignoring case; a missing or unknown one names the choices. */
-	private static String picklistValue(
-		Schema.DescribeFieldResult field,
-		String text,
-		String refusal
-	) {
+	private static String picklistValue(Schema.DescribeFieldResult field, String text, String refusal) {
 		List<String> accepted = new List<String>();
 		for (Schema.PicklistEntry entry : field.getPicklistValues()) {
 			if (!entry.isActive()) {
 				continue;
 			}
 			accepted.add(entry.getValue());
-			if (
-				text != null &&
-				(entry.getValue().equalsIgnoreCase(text) || entry.getLabel().equalsIgnoreCase(text))
-			) {
+			if (text != null && (entry.getValue().equalsIgnoreCase(text) || entry.getLabel().equalsIgnoreCase(text))) {
 				return entry.getValue();
 			}
 		}
 		throw new GiftImportRow.GiftImportException(
-			String.format(
-				refusal,
-				new List<String>{ text == null ? '' : text, String.join(accepted, ', ') }
-			)
+			String.format(refusal, new List<String>{ text == null ? '' : text, String.join(accepted, ', ') })
 		);
 	}
 
@@ -125,10 +111,7 @@ public with sharing class GiftImportCredits {
 			}
 		}
 		throw new GiftImportRow.GiftImportException(
-			String.format(
-				BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditPartyChoice'),
-				new List<String>{ text }
-			)
+			String.format(BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditPartyChoice'), new List<String>{ text })
 		);
 	}
 
@@ -159,10 +142,7 @@ public with sharing class GiftImportCredits {
 			}
 			if (party == null) {
 				if (!(dryRun && item.names(comingFrom))) {
-					item.error = BarnHelp.text(
-						'Giving',
-						'Giving_Import_ErrorSoftCreditPartyMissing'
-					);
+					item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorSoftCreditPartyMissing');
 				}
 			} else if (party.getSObjectType() == Contact.SObjectType) {
 				item.credit.Contact__c = party;
@@ -198,10 +178,7 @@ public with sharing class GiftImportCredits {
 
 		Map<String, Id> existing = new Map<String, Id>();
 		for (Soft_Credit__c credit : GiftImportSelector.selectCreditsOnGifts(creditedGiftIds)) {
-			existing.put(
-				creditKey(credit.Gift__c, credit.Contact__c, credit.Account__c, credit.Role__c),
-				credit.Id
-			);
+			existing.put(creditKey(credit.Gift__c, credit.Contact__c, credit.Account__c, credit.Role__c), credit.Id);
 		}
 		List<GiftImportRow> withCredit = new List<GiftImportRow>();
 		List<Soft_Credit__c> credits = new List<Soft_Credit__c>();
@@ -210,9 +187,7 @@ public with sharing class GiftImportCredits {
 				continue;
 			}
 			Soft_Credit__c credit = item.credit;
-			Id already = existing.get(
-				creditKey(item.giftId, credit.Contact__c, credit.Account__c, credit.Role__c)
-			);
+			Id already = existing.get(creditKey(item.giftId, credit.Contact__c, credit.Account__c, credit.Role__c));
 			if (already != null) {
 				item.row.Soft_Credit_Id__c = already;
 				continue;

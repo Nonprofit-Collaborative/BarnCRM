@@ -17,12 +17,7 @@ public with sharing class MembershipEmails {
 	 * Sends one email per term to its contact. Returns how many were sent. `stampField` is null
 	 * or a date field set to the term's end date (blank end dates stamp today).
 	 */
-	public static Integer send(
-		List<Membership_Term__c> terms,
-		Id templateId,
-		String stampField,
-		EmailSender sender
-	) {
+	public static Integer send(List<Membership_Term__c> terms, Id templateId, String stampField, EmailSender sender) {
 		if (terms.isEmpty()) {
 			return 0;
 		}
@@ -30,10 +25,7 @@ public with sharing class MembershipEmails {
 			List<Membership_Term__c> stamps = new List<Membership_Term__c>();
 			for (Membership_Term__c term : terms) {
 				Membership_Term__c stamp = new Membership_Term__c(Id = term.Id);
-				stamp.put(
-					stampField,
-					term.End_Date__c != null ? term.End_Date__c : MembershipService.today()
-				);
+				stamp.put(stampField, term.End_Date__c != null ? term.End_Date__c : MembershipService.today());
 				stamps.add(stamp);
 			}
 			update as system stamps;
@@ -65,10 +57,7 @@ public with sharing class MembershipEmails {
 					clear.put(stampField, null);
 				}
 				unstamp.add(clear);
-				lastFailure = i < outcomes.size() &&
-					outcomes[i].error != null
-					? outcomes[i].error
-					: lastFailure;
+				lastFailure = i < outcomes.size() && outcomes[i].error != null ? outcomes[i].error : lastFailure;
 			}
 		}
 		if (!unstamp.isEmpty()) {

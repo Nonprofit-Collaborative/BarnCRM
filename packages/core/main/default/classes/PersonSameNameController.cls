@@ -30,11 +30,7 @@ public with sharing class PersonSameNameController {
 	 * last name has two characters, the floor the Add Member search uses.
 	 */
 	@AuraEnabled(cacheable=true)
-	public static List<Match> findSameName(
-		String firstName,
-		String lastName,
-		Id excludeHouseholdId
-	) {
+	public static List<Match> findSameName(String firstName, String lastName, Id excludeHouseholdId) {
 		List<Match> result = new List<Match>();
 		String last = lastName == null ? '' : lastName.trim();
 		String first = firstName == null ? '' : firstName.trim();
@@ -54,11 +50,7 @@ public with sharing class PersonSameNameController {
 				return result;
 			}
 			Set<Id> alreadyIn = new Set<Id>();
-			Map<Id, Account> householdByPerson = householdsOf(
-				people,
-				excludeHouseholdId,
-				alreadyIn
-			);
+			Map<Id, Account> householdByPerson = householdsOf(people, excludeHouseholdId, alreadyIn);
 			for (Contact person : people) {
 				if (alreadyIn.contains(person.Id)) {
 					continue;
@@ -88,11 +80,7 @@ public with sharing class PersonSameNameController {
 	 * household, and in the flexible way of belonging the household of a current membership
 	 * row. The people who already belong to excludeHouseholdId are added to alreadyIn.
 	 */
-	private static Map<Id, Account> householdsOf(
-		List<Contact> people,
-		Id excludeHouseholdId,
-		Set<Id> alreadyIn
-	) {
+	private static Map<Id, Account> householdsOf(List<Contact> people, Id excludeHouseholdId, Set<Id> alreadyIn) {
 		Map<Id, Account> result = new Map<Id, Account>();
 		Id householdRecordTypeId = HouseholdService.householdRecordTypeId();
 		Set<Id> personIds = new Set<Id>();
@@ -103,10 +91,7 @@ public with sharing class PersonSameNameController {
 				householdRecordTypeId != null &&
 				person.Account.RecordTypeId == householdRecordTypeId
 			) {
-				result.put(
-					person.Id,
-					new Account(Id = person.AccountId, Name = person.Account.Name)
-				);
+				result.put(person.Id, new Account(Id = person.AccountId, Name = person.Account.Name));
 				if (person.AccountId == excludeHouseholdId) {
 					alreadyIn.add(person.Id);
 				}
@@ -128,10 +113,7 @@ public with sharing class PersonSameNameController {
 				if (!result.containsKey(membership.Contact__c)) {
 					result.put(
 						membership.Contact__c,
-						new Account(
-							Id = membership.Household__c,
-							Name = membership.Household__r.Name
-						)
+						new Account(Id = membership.Household__c, Name = membership.Household__r.Name)
 					);
 				}
 			}

@@ -33,20 +33,10 @@ public with sharing class CustomMetadataManagerSelector {
 		// The type and its field names come from the service's own registry, never from the
 		// caller, so nothing user supplied reaches this query; they are escaped regardless.
 		String soql = String.escapeSingleQuotes(
-			'SELECT ' +
-				String.join(columns, ', ') +
-				' FROM ' +
-				typeName +
-				' ORDER BY MasterLabel LIMIT 2000'
+			'SELECT ' + String.join(columns, ', ') + ' FROM ' + typeName + ' ORDER BY MasterLabel LIMIT 2000'
 		);
 		List<StoredRow> rows = new List<StoredRow>();
-		for (
-			SObject record : Database.queryWithBinds(
-				soql,
-				new Map<String, Object>(),
-				AccessLevel.SYSTEM_MODE
-			)
-		) {
+		for (SObject record : Database.queryWithBinds(soql, new Map<String, Object>(), AccessLevel.SYSTEM_MODE)) {
 			StoredRow row = new StoredRow();
 			row.developerName = (String) record.get('DeveloperName');
 			row.label = (String) record.get('MasterLabel');

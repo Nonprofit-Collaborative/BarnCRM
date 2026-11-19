@@ -8,10 +8,7 @@ private class GrantCalendarControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Gcalreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gcalreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static final Date FIRST = Date.newInstance(2027, 3, 1);
@@ -134,11 +131,7 @@ private class GrantCalendarControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Funders', 'Funders_Calendar_LoadFailed'),
-				refusal,
-				'Refused with a message'
-			);
+			Assert.areEqual(BarnHelp.text('Funders', 'Funders_Calendar_LoadFailed'), refusal, 'Refused with a message');
 		}
 	}
 }

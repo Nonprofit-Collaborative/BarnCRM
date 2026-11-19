@@ -25,11 +25,7 @@ private class ReceiptGenerationFailureSelectorTest {
 	static void aLongFailureHistoryIsCountedOnlyUpToTheCap() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			ReceiptTestDataFactory.setUpReceipting();
-			List<String> consumed = ReceiptNumberSequence.allocate(
-				ReceiptNumberSequence.TYPE_STATEMENT,
-				2026,
-				3
-			);
+			List<String> consumed = ReceiptNumberSequence.allocate(ReceiptNumberSequence.TYPE_STATEMENT, 2026, 3);
 			ReceiptNumberSequence.reconcile(ReceiptNumberSequence.TYPE_STATEMENT, 2026, null);
 
 			Test.startTest();

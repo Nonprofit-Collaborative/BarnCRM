@@ -3,9 +3,7 @@
  * builder's controller: the list saved and checked, Add Period to Every Indicator, Use the
  * Model's Periods, an indicator's own periods kept, and what readers may do.
  */
-@IsTest(
-	testFor='ApexClass:LogicModelPeriodService, ApexClass:LogicModelBuilderController, ApexClass:LogicModelService'
-)
+@IsTest(testFor='ApexClass:LogicModelPeriodService, ApexClass:LogicModelBuilderController, ApexClass:LogicModelService')
 private class LogicModelPeriodServiceTest {
 	private static final String ADMIN = 'Logic_Models_Admin';
 	private static final String Q1 = '{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}';
@@ -14,10 +12,7 @@ private class LogicModelPeriodServiceTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Logic_Models_Read_Only' });
 	}
 
 	/** A model with an output and two indicators; the first already has its own 2026 Q1. */
@@ -106,19 +101,13 @@ private class LogicModelPeriodServiceTest {
 			);
 			String twice = refusal(
 				fixture.modelId,
-				'[' +
-					Q1 +
-					', {"name": "Again", "startDate": "2026-01-01", "endDate": "2026-03-31"}]'
+				'[' + Q1 + ', {"name": "Again", "startDate": "2026-01-01", "endDate": "2026-03-31"}]'
 			);
 			String notAList = refusal(fixture.modelId, '{"name": "x"}');
 			String unreadable = refusal(fixture.modelId, '[{"name": "x", "startDate": "soon"}]');
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Periods_Invalid'),
-				noName,
-				'A name is needed'
-			);
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Periods_Invalid'), noName, 'A name is needed');
 			Assert.isTrue(backward.contains('Odd'), 'An end before the start names the period');
 			Assert.isTrue(twice.contains('Again'), 'The same dates twice names the second');
 			Assert.areEqual(LogicModelBuilderController.actionFailed(), notAList, 'Not a list');
@@ -172,10 +161,7 @@ private class LogicModelPeriodServiceTest {
 			LogicModelBuilderController.savePeriods(fixture.modelId, '[' + Q1 + ',' + Q2 + ']');
 
 			Test.startTest();
-			Map<String, Object> model = LogicModelBuilderController.useModelPeriods(
-				fixture.modelId,
-				fixture.firstId
-			);
+			Map<String, Object> model = LogicModelBuilderController.useModelPeriods(fixture.modelId, fixture.firstId);
 			Test.stopTest();
 
 			Assert.areEqual(1, model.get('added'), 'Only 2026 Q2: it has its own 2026 Q1');
@@ -194,11 +180,7 @@ private class LogicModelPeriodServiceTest {
 
 			Test.startTest();
 			try {
-				LogicModelBuilderController.addPeriodToEveryIndicator(
-					fixture.modelId,
-					'2030-01-01',
-					'2030-12-31'
-				);
+				LogicModelBuilderController.addPeriodToEveryIndicator(fixture.modelId, '2030-01-01', '2030-12-31');
 			} catch (AuraHandledException e) {
 				unknownPeriod = e.getMessage();
 			}
@@ -214,11 +196,7 @@ private class LogicModelPeriodServiceTest {
 				unknownPeriod,
 				'Not a model period'
 			);
-			Assert.areEqual(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'),
-				goneIndicator,
-				'Not found'
-			);
+			Assert.areEqual(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'), goneIndicator, 'Not found');
 		}
 	}
 

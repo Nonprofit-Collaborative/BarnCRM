@@ -78,9 +78,7 @@ public with sharing class EventCheckInController {
 			List<Event_Attendee__c> rows = [
 				SELECT Id, Name, Badge_Name__c, Contact__r.Email, Ticket_Type__r.Name, Status__c
 				FROM Event_Attendee__c
-				WHERE
-					Event_Registration__r.Event__c = :eventId
-					AND Status__c IN :EventRegistrationService.SEATED
+				WHERE Event_Registration__r.Event__c = :eventId AND Status__c IN :EventRegistrationService.SEATED
 				WITH USER_MODE
 				ORDER BY Name
 				LIMIT :ROW_LIMIT + 1
@@ -99,10 +97,7 @@ public with sharing class EventCheckInController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getCheckIn', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_CheckIn_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_CheckIn_LoadFailed'));
 		}
 	}
 
@@ -118,9 +113,7 @@ public with sharing class EventCheckInController {
 		try {
 			return EventRegistrationService.setStatus(
 				attendeeId,
-				undo == true
-					? EventRegistrationService.STATUS_REGISTERED
-					: EventRegistrationService.STATUS_ATTENDED
+				undo == true ? EventRegistrationService.STATUS_REGISTERED : EventRegistrationService.STATUS_ATTENDED
 			);
 		} catch (EventRegistrationService.RegistrationException refused) {
 			throw UserErrors.message(refused.getMessage());

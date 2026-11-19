@@ -94,12 +94,7 @@ public without sharing class PortalData {
 	 * Saves the person's changes to one record of a page, or creates one on a related page when
 	 * no record is named. Returns the record's id.
 	 */
-	public static Id save(
-		PortalAuth.Session session,
-		String pageKey,
-		String recordId,
-		Map<String, Object> values
-	) {
+	public static Id save(PortalAuth.Session session, String pageKey, String recordId, Map<String, Object> values) {
 		PortalTemplate.PageSpec page = pageOf(session, pageKey);
 		SObject target;
 		if (String.isBlank(recordId)) {
@@ -114,33 +109,19 @@ public without sharing class PortalData {
 			}
 			target = ownRecord(page, session.personId(), recordId);
 		}
-		applyValues(
-			page,
-			target,
-			values == null ? new Map<String, Object>() : values,
-			target.Id == null
-		);
+		applyValues(page, target, values == null ? new Map<String, Object>() : values, target.Id == null);
 		Database.SaveResult result = target.Id == null
 			? Database.insert(target, false, AccessLevel.SYSTEM_MODE)
 			: Database.update(target, false, AccessLevel.SYSTEM_MODE);
 		if (!result.isSuccess()) {
-			ErrorLogger.logMessage(
-				result.getErrors()[0].getMessage(),
-				CONTEXT + '.save',
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessage(result.getErrors()[0].getMessage(), CONTEXT + '.save', ErrorLogger.SEVERITY_WARNING);
 			throw new PortalAuth.RefusalException('save_failed');
 		}
 		return result.getId();
 	}
 
 	/** Runs a module's action on one record of a page, through Core's seam. */
-	public static String runAction(
-		PortalAuth.Session session,
-		String pageKey,
-		String recordId,
-		String actionName
-	) {
+	public static String runAction(PortalAuth.Session session, String pageKey, String recordId, String actionName) {
 		PortalTemplate.PageSpec page = pageOf(session, pageKey);
 		if (!page.extensionLabels.containsKey(actionName)) {
 			throw new PortalAuth.RefusalException('not_allowed');
@@ -197,9 +178,7 @@ public without sharing class PortalData {
 	private static List<Map<String, Object>> extensionList(PortalTemplate.PageSpec page) {
 		List<Map<String, Object>> out = new List<Map<String, Object>>();
 		for (String name : page.extensionLabels.keySet()) {
-			out.add(
-				new Map<String, Object>{ 'name' => name, 'label' => page.extensionLabels.get(name) }
-			);
+			out.add(new Map<String, Object>{ 'name' => name, 'label' => page.extensionLabels.get(name) });
 		}
 		return out;
 	}
@@ -252,10 +231,7 @@ public without sharing class PortalData {
 	/** The `valueField` values of the person's scope records that pass the scope's tests. */
 	private static Set<Id> scopeValues(PortalTemplate.ScopeSpec scope, Id personId) {
 		Map<String, Object> binds = new Map<String, Object>{ 'personId' => personId };
-		List<String> filters = new List<String>{
-			scope.personField + ' = :personId',
-			scope.valueField + ' != null'
-		};
+		List<String> filters = new List<String>{ scope.personField + ' = :personId', scope.valueField + ' != null' };
 		Integer index = 0;
 		for (PortalTemplate.Condition condition : scope.conditions) {
 			filters.add(conditionSoql(condition, 's' + index, binds));
@@ -286,11 +262,7 @@ public without sharing class PortalData {
 	}
 
 	@TestVisible
-	private static String conditionSoql(
-		PortalTemplate.Condition condition,
-		String name,
-		Map<String, Object> binds
-	) {
+	private static String conditionSoql(PortalTemplate.Condition condition, String name, Map<String, Object> binds) {
 		if (condition.op == 'isBlank') {
 			return condition.field + ' = null';
 		}
@@ -364,12 +336,7 @@ public without sharing class PortalData {
 			List<Map<String, String>> options = new List<Map<String, String>>();
 			for (Schema.PicklistEntry entry : spec.describe.getPicklistValues()) {
 				if (entry.isActive()) {
-					options.add(
-						new Map<String, String>{
-							'value' => entry.getValue(),
-							'label' => entry.getLabel()
-						}
-					);
+					options.add(new Map<String, String>{ 'value' => entry.getValue(), 'label' => entry.getLabel() });
 				}
 			}
 			info.put('options', options);

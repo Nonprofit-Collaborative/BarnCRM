@@ -41,9 +41,7 @@ public with sharing class OrgDate {
 	public static TimeZone zone() {
 		if (cachedZone == null) {
 			String zoneId = String.isNotBlank(zoneOverride) ? zoneOverride : readOrgZoneId();
-			cachedZone = String.isBlank(zoneId)
-				? UserInfo.getTimeZone()
-				: TimeZone.getTimeZone(zoneId);
+			cachedZone = String.isBlank(zoneId) ? UserInfo.getTimeZone() : TimeZone.getTimeZone(zoneId);
 		}
 		return cachedZone;
 	}

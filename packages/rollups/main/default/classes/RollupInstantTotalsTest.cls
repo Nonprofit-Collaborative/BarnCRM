@@ -35,11 +35,7 @@ private class RollupInstantTotalsTest {
 		RollupInstantTotals.triggersOverride = new List<RollupInstantTotals.GeneratedTrigger>();
 		if (triggerStatus != null) {
 			RollupInstantTotals.triggersOverride.add(
-				new RollupInstantTotals.GeneratedTrigger(
-					'BarnRollup_Account',
-					triggerStatus,
-					'Account'
-				)
+				new RollupInstantTotals.GeneratedTrigger('BarnRollup_Account', triggerStatus, 'Account')
 			);
 		}
 		RollupInstantTotals.triggerableOverride = new Set<String>{ 'Account', 'Contact' };
@@ -80,14 +76,9 @@ private class RollupInstantTotalsTest {
 				),
 				'The insert may be refused without failing the test.'
 			);
-			System.Assert.isTrue(
-				code.testSource.contains('.hasRun()'),
-				'The test asserts that the trigger ran.'
-			);
+			System.Assert.isTrue(code.testSource.contains('.hasRun()'), 'The test asserts that the trigger ran.');
 
-			Compression.ZipReader deploy = new Compression.ZipReader(
-				EncodingUtil.base64Decode(code.deployPackage)
-			);
+			Compression.ZipReader deploy = new Compression.ZipReader(EncodingUtil.base64Decode(code.deployPackage));
 			Set<String> entries = new Set<String>();
 			for (Compression.ZipEntry entry : deploy.getEntries()) {
 				entries.add(entry.getName());
@@ -109,11 +100,8 @@ private class RollupInstantTotalsTest {
 				'The package holds the code the Builder shows.'
 			);
 
-			Compression.ZipReader removal = new Compression.ZipReader(
-				EncodingUtil.base64Decode(code.removalPackage)
-			);
-			String destructive = removal.extract(removal.getEntry('destructiveChanges.xml'))
-				.toString();
+			Compression.ZipReader removal = new Compression.ZipReader(EncodingUtil.base64Decode(code.removalPackage));
+			String destructive = removal.extract(removal.getEntry('destructiveChanges.xml')).toString();
 			System.Assert.isTrue(
 				destructive.contains('<members>BarnRollup_Account</members>') &&
 				destructive.contains('<members>BarnRollup_Account_Test</members>'),
@@ -132,20 +120,11 @@ private class RollupInstantTotalsTest {
 			orgHas(null);
 			// AccountHistory is put in front as triggerable: the Builder never counts a history
 			// object, so no code is generated for it either (ADR-0136 and ADR-0138 agree).
-			RollupInstantTotals.triggerableOverride = new Set<String>{
-				'Contact',
-				'AccountHistory'
-			};
+			RollupInstantTotals.triggerableOverride = new Set<String>{ 'Contact', 'AccountHistory' };
 			Map<String, String> refusals = new Map<String, String>{
 				'Contact' => BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantBuiltInError'),
-				'Account' => BarnHelp.text(
-					'Rollups',
-					'Core_RollupBuilder_InstantNotAvailableError'
-				),
-				'AccountHistory' => BarnHelp.text(
-					'Rollups',
-					'Core_RollupBuilder_InstantNotAvailableError'
-				),
+				'Account' => BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantNotAvailableError'),
+				'AccountHistory' => BarnHelp.text('Rollups', 'Core_RollupBuilder_InstantNotAvailableError'),
 				'Not_An_Object__c' => BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownObject')
 			};
 			for (String objectName : refusals.keySet()) {
@@ -170,20 +149,12 @@ private class RollupInstantTotalsTest {
 
 			orgHas(null);
 			RollupInstantTotals.ObjectState state = accountState();
-			System.Assert.areEqual(
-				RollupInstantTotals.STATUS_NOT_SET_UP,
-				state.status,
-				'No trigger yet.'
-			);
+			System.Assert.areEqual(RollupInstantTotals.STATUS_NOT_SET_UP, state.status, 'No trigger yet.');
 			System.Assert.areEqual(1, state.instantRollups, 'One Both rollup counts accounts.');
 			System.Assert.areEqual('BarnRollup_Account', state.triggerName, 'Named for the steps.');
 
 			orgHas('Active');
-			System.Assert.areEqual(
-				RollupInstantTotals.STATUS_ON,
-				accountState().status,
-				'Deployed.'
-			);
+			System.Assert.areEqual(RollupInstantTotals.STATUS_ON, accountState().status, 'Deployed.');
 
 			orgHas('Inactive');
 			System.Assert.areEqual(
@@ -224,21 +195,11 @@ private class RollupInstantTotalsTest {
 			orgHas('Active');
 
 			Test.startTest();
-			RollupInstantTotals.ObjectState turnedOff = RollupInstantTotals.setTurnedOn(
-				'Account',
-				false
-			);
-			RollupInstantTotals.ObjectState turnedOn = RollupInstantTotals.setTurnedOn(
-				'Account',
-				true
-			);
+			RollupInstantTotals.ObjectState turnedOff = RollupInstantTotals.setTurnedOn('Account', false);
+			RollupInstantTotals.ObjectState turnedOn = RollupInstantTotals.setTurnedOn('Account', true);
 			Test.stopTest();
 
-			System.Assert.areEqual(
-				RollupInstantTotals.STATUS_OFF,
-				turnedOff.status,
-				'Off at once.'
-			);
+			System.Assert.areEqual(RollupInstantTotals.STATUS_OFF, turnedOff.status, 'Off at once.');
 			System.Assert.areEqual(RollupInstantTotals.STATUS_ON, turnedOn.status, 'On again.');
 			Automation_Setting__c row = [
 				SELECT Name, Object_Name__c, Is_Package_Default__c
@@ -294,10 +255,7 @@ private class RollupInstantTotalsTest {
 			);
 
 			orgHas('Inactive');
-			System.Assert.isFalse(
-				RollupService.hasInstantUpdates('Account'),
-				'Deployed but deactivated in Setup.'
-			);
+			System.Assert.isFalse(RollupService.hasInstantUpdates('Account'), 'Deployed but deactivated in Setup.');
 
 			orgHas('Active');
 			System.Assert.isTrue(RollupService.hasInstantUpdates('Account'), 'Deployed and on.');

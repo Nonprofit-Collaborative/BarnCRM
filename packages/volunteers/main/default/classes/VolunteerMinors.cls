@@ -21,10 +21,7 @@ public inherited sharing class VolunteerMinors {
 	public static Map<Id, Id> guardianByPerson = new Map<Id, Id>();
 
 	/** Before save: checks Consent Needed on the sign-ups of minors without current consent. */
-	public static void flag(
-		List<Volunteer_Signup__c> signups,
-		Map<Id, Volunteer_Signup__c> previousById
-	) {
+	public static void flag(List<Volunteer_Signup__c> signups, Map<Id, Volunteer_Signup__c> previousById) {
 		if (!VolunteerSettings.minorConsentRequired()) {
 			return;
 		}
@@ -32,14 +29,8 @@ public inherited sharing class VolunteerMinors {
 		Set<Id> contactIds = new Set<Id>();
 		Set<Id> shiftIds = new Set<Id>();
 		for (Volunteer_Signup__c signup : signups) {
-			Volunteer_Signup__c previous = previousById == null
-				? null
-				: previousById.get(signup.Id);
-			if (
-				signup.Contact__c != null &&
-				(previous == null ||
-				previous.Contact__c != signup.Contact__c)
-			) {
+			Volunteer_Signup__c previous = previousById == null ? null : previousById.get(signup.Id);
+			if (signup.Contact__c != null && (previous == null || previous.Contact__c != signup.Contact__c)) {
 				checked.add(signup);
 				contactIds.add(signup.Contact__c);
 				shiftIds.add(signup.Volunteer_Shift__c);
@@ -72,15 +63,8 @@ public inherited sharing class VolunteerMinors {
 		for (Volunteer_Signup__c signup : checked) {
 			Contact person = people.get(signup.Contact__c);
 			Volunteer_Shift__c shift = shifts.get(signup.Volunteer_Shift__c);
-			Date onTheDay = shift == null ||
-				shift.Start_Time__c == null
-				? Date.today()
-				: shift.Start_Time__c.date();
-			if (
-				person != null &&
-				!consented.contains(person.Id) &&
-				person.Birthdate.addYears(minorAge) > onTheDay
-			) {
+			Date onTheDay = shift == null || shift.Start_Time__c == null ? Date.today() : shift.Start_Time__c.date();
+			if (person != null && !consented.contains(person.Id) && person.Birthdate.addYears(minorAge) > onTheDay) {
 				signup.Consent_Needed__c = true;
 			}
 		}
@@ -90,15 +74,10 @@ public inherited sharing class VolunteerMinors {
 	 * After save: a Guardian consent requirement, Not started, for each flagged person whose sign-up
 	 * is new or changed person, unless an unfinished one is open. Returns how many were created.
 	 */
-	public static Integer requestConsent(
-		List<Volunteer_Signup__c> signups,
-		Map<Id, Volunteer_Signup__c> previousById
-	) {
+	public static Integer requestConsent(List<Volunteer_Signup__c> signups, Map<Id, Volunteer_Signup__c> previousById) {
 		Set<Id> contactIds = new Set<Id>();
 		for (Volunteer_Signup__c signup : signups) {
-			Volunteer_Signup__c previous = previousById == null
-				? null
-				: previousById.get(signup.Id);
+			Volunteer_Signup__c previous = previousById == null ? null : previousById.get(signup.Id);
 			if (
 				signup.Consent_Needed__c == true &&
 				signup.Contact__c != null &&

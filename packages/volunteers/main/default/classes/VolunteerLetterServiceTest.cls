@@ -19,13 +19,8 @@ private class VolunteerLetterServiceTest {
 				COORDINATOR,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 			);
-			TestUsers.standardUserWith(
-				STAFFER,
-				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-			);
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			settings.Organization_Legal_Name__c = 'Barn & <Co>';
 			settings.Organization_Street__c = '1 Main St';
@@ -121,10 +116,7 @@ private class VolunteerLetterServiceTest {
 		Test.stopTest();
 
 		Assert.isNull(letter.skipReason, 'The person has approved hours in the period.');
-		Assert.isTrue(
-			letter.body.contains(' 5.5 hours'),
-			'Approved, in period only: ' + letter.body
-		);
+		Assert.isTrue(letter.body.contains(' 5.5 hours'), 'Approved, in period only: ' + letter.body);
 		Assert.isTrue(letter.body.contains('<li>Food pantry: 3 hours</li>'), letter.body);
 		Assert.isTrue(letter.body.contains('<li>Front desk: 2.5 hours</li>'), letter.body);
 		Assert.isTrue(
@@ -138,18 +130,13 @@ private class VolunteerLetterServiceTest {
 				FROM ContentVersion
 				WHERE Id = :outcome.versionIds[0]
 			];
-			Assert.isTrue(
-				file.Title.startsWith('Certificate of volunteer service for '),
-				file.Title
-			);
+			Assert.isTrue(file.Title.startsWith('Certificate of volunteer service for '), file.Title);
 			Assert.areEqual(
 				1,
 				[
 					SELECT COUNT()
 					FROM ContentDocumentLink
-					WHERE
-						ContentDocumentId = :file.ContentDocumentId
-						AND LinkedEntityId = :person.Id
+					WHERE ContentDocumentId = :file.ContentDocumentId AND LinkedEntityId = :person.Id
 				],
 				'The file is linked to the person.'
 			);
@@ -167,11 +154,7 @@ private class VolunteerLetterServiceTest {
 		);
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			person = ownedContacts(1)[0];
-			update new Contact(
-				Id = person.Id,
-				LastName = '<b>Ruiz</b>',
-				Preferred_Name__c = '{Hours}'
-			);
+			update new Contact(Id = person.Id, LastName = '<b>Ruiz</b>', Preferred_Name__c = '{Hours}');
 			Volunteer_Job__c job = VolunteersTestData.job('<script>alert(1)</script>');
 			insert VolunteersTestData.newHours(person.Id, job.Id, 2);
 			insert template;
@@ -180,12 +163,7 @@ private class VolunteerLetterServiceTest {
 
 		Test.startTest();
 		System.runAs(user(COORDINATOR)) {
-			body = VolunteerLetterService.mergeLetters(
-					new List<Id>{ person.Id },
-					template.Id,
-					FROM_DATE,
-					TO_DATE
-				)[0]
+			body = VolunteerLetterService.mergeLetters(new List<Id>{ person.Id }, template.Id, FROM_DATE, TO_DATE)[0]
 				.body;
 		}
 		Test.stopTest();
@@ -248,12 +226,7 @@ private class VolunteerLetterServiceTest {
 		Test.startTest();
 		System.runAs(user(STAFFER)) {
 			try {
-				VolunteerLetterService.mergeLetters(
-					new List<Id>(),
-					hoursLetter,
-					FROM_DATE,
-					TO_DATE
-				);
+				VolunteerLetterService.mergeLetters(new List<Id>(), hoursLetter, FROM_DATE, TO_DATE);
 			} catch (VolunteerLetterService.VolunteerLetterException refused) {
 				byStaff = refused.getMessage();
 			}
@@ -265,12 +238,7 @@ private class VolunteerLetterServiceTest {
 		}
 		System.runAs(user(COORDINATOR)) {
 			try {
-				VolunteerLetterService.mergeLetters(
-					new List<Id>(),
-					hoursLetter,
-					TO_DATE,
-					FROM_DATE
-				);
+				VolunteerLetterService.mergeLetters(new List<Id>(), hoursLetter, TO_DATE, FROM_DATE);
 			} catch (VolunteerLetterService.VolunteerLetterException refused) {
 				reversed = refused.getMessage();
 			}
@@ -309,22 +277,12 @@ private class VolunteerLetterServiceTest {
 				}
 			) {
 				try {
-					VolunteerLetterService.generate(
-						new List<Id>(),
-						hoursLetter,
-						period[0],
-						period[1]
-					);
+					VolunteerLetterService.generate(new List<Id>(), hoursLetter, period[0], period[1]);
 				} catch (VolunteerLetterService.VolunteerLetterException refused) {
 					refusals.add(refused.getMessage());
 				}
 				try {
-					VolunteerLetterService.mergeLetters(
-						new List<Id>(),
-						hoursLetter,
-						period[0],
-						period[1]
-					);
+					VolunteerLetterService.mergeLetters(new List<Id>(), hoursLetter, period[0], period[1]);
 				} catch (VolunteerLetterService.VolunteerLetterException refused) {
 					refusals.add(refused.getMessage());
 				}
@@ -338,11 +296,7 @@ private class VolunteerLetterServiceTest {
 			new Set<String>(refusals),
 			'With the plain period message.'
 		);
-		Assert.areEqual(
-			0,
-			[SELECT COUNT() FROM ContentVersion WITH SYSTEM_MODE],
-			'No file was made.'
-		);
+		Assert.areEqual(0, [SELECT COUNT() FROM ContentVersion WITH SYSTEM_MODE], 'No file was made.');
 	}
 
 	@IsTest
@@ -363,12 +317,7 @@ private class VolunteerLetterServiceTest {
 
 		Test.startTest();
 		System.runAs(user(COORDINATOR)) {
-			outcome = VolunteerLetterService.generate(
-				idsOf(people),
-				templateId('Hours_Letter'),
-				FROM_DATE,
-				TO_DATE
-			);
+			outcome = VolunteerLetterService.generate(idsOf(people), templateId('Hours_Letter'), FROM_DATE, TO_DATE);
 			queries = Limits.getQueries();
 		}
 		Test.stopTest();
@@ -428,8 +377,7 @@ private class VolunteerLetterServiceTest {
 		if (person == null) {
 			// An org without person accounts (oi-test): this path runs on oi-pa.
 			Assert.isFalse(
-				OrgShapeDetector.hasPersonAccounts() &&
-				OrgShapeDetector.creatablePersonRecordTypeId() != null,
+				OrgShapeDetector.hasPersonAccounts() && OrgShapeDetector.creatablePersonRecordTypeId() != null,
 				'A person account could have been made.'
 			);
 			return;
@@ -512,10 +460,8 @@ private class VolunteerLetterServiceTest {
 			'One brand prints its name, entity, address, phone and signature'
 		);
 		Assert.isTrue(
-			bodies.get(people[1].Id)
-				.startsWith('Barn &amp; &lt;Co&gt;|Barn &amp; &lt;Co&gt;|1 Main St'),
-			'Jobs of two brands (one unbranded, no default) print the organization: ' +
-			bodies.get(people[1].Id)
+			bodies.get(people[1].Id).startsWith('Barn &amp; &lt;Co&gt;|Barn &amp; &lt;Co&gt;|1 Main St'),
+			'Jobs of two brands (one unbranded, no default) print the organization: ' + bodies.get(people[1].Id)
 		);
 	}
 }

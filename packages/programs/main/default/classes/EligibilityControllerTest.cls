@@ -15,17 +15,12 @@ private class EligibilityControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	/** A program with these rules and three open enrollments with these referral sources. */
 	private static Program__c programWith(String rules, List<String> sources) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		Program__c program = new Program__c(Name = 'Pantry', Eligibility_Rules__c = rules);
@@ -38,11 +33,7 @@ private class EligibilityControllerTest {
 		List<Enrollment__c> enrollments = new List<Enrollment__c>();
 		for (Integer i = 0; i < sources.size(); i++) {
 			enrollments.add(
-				new Enrollment__c(
-					Program__c = program.Id,
-					Contact__c = people[i].Id,
-					Referral_Source__c = sources[i]
-				)
+				new Enrollment__c(Program__c = program.Id, Contact__c = people[i].Id, Referral_Source__c = sources[i])
 			);
 		}
 		insert enrollments;
@@ -80,10 +71,7 @@ private class EligibilityControllerTest {
 			for (EligibilityController.Field field : state.fields) {
 				names.add(field.apiName);
 				if (field.apiName == 'Referral_Source__c') {
-					Assert.isTrue(
-						field.choices.contains('School'),
-						'A picklist offers its choices.'
-					);
+					Assert.isTrue(field.choices.contains('School'), 'A picklist offers its choices.');
 				} else if (field.apiName == 'Intake_Date__c') {
 					Assert.isTrue(field.choices.isEmpty(), 'A date field has no choices.');
 				}
@@ -126,23 +114,20 @@ private class EligibilityControllerTest {
 			);
 			Assert.areEqual(1, problems.size(), 'A field that is not offered is refused.');
 			Assert.isNull(
-				[SELECT Eligibility_Rules__c FROM Program__c WHERE Id = :program.Id]
-				.Eligibility_Rules__c,
+				[SELECT Eligibility_Rules__c FROM Program__c WHERE Id = :program.Id].Eligibility_Rules__c,
 				'Nothing was stored.'
 			);
 
 			Assert.isTrue(EligibilityController.saveRules(program.Id, RULES).isEmpty(), 'Sound.');
 			Assert.areEqual(
 				RULES,
-				[SELECT Eligibility_Rules__c FROM Program__c WHERE Id = :program.Id]
-				.Eligibility_Rules__c,
+				[SELECT Eligibility_Rules__c FROM Program__c WHERE Id = :program.Id].Eligibility_Rules__c,
 				'Stored.'
 			);
 
 			Assert.isTrue(EligibilityController.saveRules(program.Id, '  ').isEmpty(), 'Cleared.');
 			Assert.isNull(
-				[SELECT Eligibility_Rules__c FROM Program__c WHERE Id = :program.Id]
-				.Eligibility_Rules__c,
+				[SELECT Eligibility_Rules__c FROM Program__c WHERE Id = :program.Id].Eligibility_Rules__c,
 				'Blank clears the rules.'
 			);
 		}
@@ -153,11 +138,7 @@ private class EligibilityControllerTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Program__c program = programWith(RULES, new List<String>{ 'Self', 'School', 'Other' });
 
-			EligibilityController.Summary summary = EligibilityController.screen(
-				program.Id,
-				null,
-				false
-			);
+			EligibilityController.Summary summary = EligibilityController.screen(program.Id, null, false);
 
 			Assert.areEqual(1, summary.eligible, 'School.');
 			Assert.areEqual(1, summary.notEligible, 'Self.');
@@ -188,37 +169,17 @@ private class EligibilityControllerTest {
 			decided.Eligibility_Reason__c = 'Decided by hand';
 			update decided;
 
-			EligibilityController.Summary plain = EligibilityController.screen(
-				program.Id,
-				null,
-				false
-			);
+			EligibilityController.Summary plain = EligibilityController.screen(program.Id, null, false);
 			Assert.areEqual(1, plain.skipped, 'The hand decision is left alone.');
-			Assert.areEqual(
-				'Decided by hand',
-				bySource(program.Id).get('Self').Eligibility_Reason__c,
-				'Unchanged.'
-			);
+			Assert.areEqual('Decided by hand', bySource(program.Id).get('Self').Eligibility_Reason__c, 'Unchanged.');
 
-			EligibilityController.Summary single = EligibilityController.screen(
-				program.Id,
-				decided.Id,
-				false
-			);
+			EligibilityController.Summary single = EligibilityController.screen(program.Id, decided.Id, false);
 			Assert.areEqual(1, single.notEligible, 'One enrollment asked for is always screened.');
-			Assert.areEqual(
-				'Not Eligible',
-				bySource(program.Id).get('Self').Eligibility_Status__c,
-				'Changed.'
-			);
+			Assert.areEqual('Not Eligible', bySource(program.Id).get('Self').Eligibility_Status__c, 'Changed.');
 
 			decided.Eligibility_Status__c = 'Eligible';
 			update decided;
-			EligibilityController.Summary all = EligibilityController.screen(
-				program.Id,
-				null,
-				true
-			);
+			EligibilityController.Summary all = EligibilityController.screen(program.Id, null, true);
 			Assert.areEqual(0, all.skipped, 'Include decided screens everyone.');
 			Assert.areEqual(
 				'Not Eligible',
@@ -253,16 +214,10 @@ private class EligibilityControllerTest {
 				labels.put(field.apiName, field.label);
 			}
 			List<String> problems = EligibilityController.saveRules(program.Id, rules);
-			EligibilityController.Summary summary = EligibilityController.screen(
-				program.Id,
-				null,
-				true
-			);
+			EligibilityController.Summary summary = EligibilityController.screen(program.Id, null, true);
 
 			Assert.areEqual(
-				Schema.SObjectType.Contact.getLabel() +
-					': ' +
-					Schema.SObjectType.Contact.fields.Birthdate.getLabel(),
+				Schema.SObjectType.Contact.getLabel() + ': ' + Schema.SObjectType.Contact.fields.Birthdate.getLabel(),
 				labels.get('Contact__r.Birthdate'),
 				'Person fields are offered, named by their object.'
 			);
@@ -281,18 +236,10 @@ private class EligibilityControllerTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Program__c program = programWith(null, new List<String>{ 'Self' });
 
-			EligibilityController.Summary summary = EligibilityController.screen(
-				program.Id,
-				null,
-				false
-			);
+			EligibilityController.Summary summary = EligibilityController.screen(program.Id, null, false);
 
 			Assert.isTrue(summary.noRules, 'Nothing to apply.');
-			Assert.areEqual(
-				'Not Screened',
-				bySource(program.Id).get('Self').Eligibility_Status__c,
-				'Untouched.'
-			);
+			Assert.areEqual('Not Screened', bySource(program.Id).get('Self').Eligibility_Status__c, 'Untouched.');
 		}
 	}
 

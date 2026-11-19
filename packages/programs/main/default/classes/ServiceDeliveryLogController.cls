@@ -10,11 +10,7 @@
  */
 public with sharing class ServiceDeliveryLogController {
 	private static final String CONTEXT = 'Service delivery log panel';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Programs',
-			'Programs_Fail_Log'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Programs', 'Programs_Fail_Log')
 		.showingDml();
 	/** The most people listed: a bound on the read; the Service Deliveries tab lists them all. */
 	public static final Integer MAX_SHOWN = 200;
@@ -113,22 +109,12 @@ public with sharing class ServiceDeliveryLogController {
 	 */
 	@AuraEnabled
 	public static Log addCount(Id programId, Id serviceId, Date deliveryDate, Integer people) {
-		if (
-			programId == null ||
-			serviceId == null ||
-			deliveryDate == null ||
-			people == null ||
-			people < 0
-		) {
+		if (programId == null || serviceId == null || deliveryDate == null || people == null || people < 0) {
 			throw UserErrors.message(failed());
 		}
 		try {
 			Database.insert(
-				new Service_Count__c(
-					Service__c = serviceId,
-					Count_Date__c = deliveryDate,
-					People_Served__c = people
-				),
+				new Service_Count__c(Service__c = serviceId, Count_Date__c = deliveryDate, People_Served__c = people),
 				AccessLevel.USER_MODE
 			);
 			Log log = logFor(programId, serviceId, deliveryDate);
@@ -307,10 +293,7 @@ public with sharing class ServiceDeliveryLogController {
 		log.canEdit =
 			Schema.SObjectType.Service_Delivery__c.isCreateable() &&
 			Schema.SObjectType.Service_Delivery__c.isUpdateable();
-		for (
-			Schema.PicklistEntry entry : Service_Delivery__c.Attendance__c.getDescribe()
-				.getPicklistValues()
-		) {
+		for (Schema.PicklistEntry entry : Service_Delivery__c.Attendance__c.getDescribe().getPicklistValues()) {
 			if (entry.isActive()) {
 				Option option = new Option();
 				option.label = entry.getLabel();
@@ -359,9 +342,7 @@ public with sharing class ServiceDeliveryLogController {
 		Set<Id> listed = new Set<Id>();
 		for (Integer i = 0; i < open.size() && i < MAX_SHOWN; i++) {
 			Enrollment__c enrollment = open[i];
-			Id person = enrollment.Contact__c != null
-				? enrollment.Contact__c
-				: enrollment.Account__c;
+			Id person = enrollment.Contact__c != null ? enrollment.Contact__c : enrollment.Account__c;
 			if (person == null || listed.contains(person)) {
 				continue;
 			}
@@ -371,9 +352,7 @@ public with sharing class ServiceDeliveryLogController {
 			row.contactId = enrollment.Contact__c;
 			row.accountId = enrollment.Account__c;
 			row.enrollmentId = enrollment.Id;
-			row.personName = enrollment.Contact__c != null
-				? enrollment.Contact__r.Name
-				: enrollment.Account__r.Name;
+			row.personName = enrollment.Contact__c != null ? enrollment.Contact__r.Name : enrollment.Account__r.Name;
 			fill(row, deliveryByPerson.get(person));
 			log.rows.add(row);
 		}
@@ -388,9 +367,7 @@ public with sharing class ServiceDeliveryLogController {
 			row.contactId = delivery.Contact__c;
 			row.accountId = delivery.Account__c;
 			row.enrollmentId = delivery.Enrollment__c;
-			row.personName = delivery.Contact__c != null
-				? delivery.Contact__r.Name
-				: delivery.Account__r.Name;
+			row.personName = delivery.Contact__c != null ? delivery.Contact__r.Name : delivery.Account__r.Name;
 			fill(row, delivery);
 			log.rows.add(row);
 		}

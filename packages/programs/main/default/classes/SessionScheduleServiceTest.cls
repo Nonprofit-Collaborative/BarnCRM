@@ -68,20 +68,12 @@ private class SessionScheduleServiceTest {
 			Assert.areEqual(MONDAY.addDays(1), sessions[0].Session_Date__c, 'The first Tuesday.');
 			Assert.areEqual(Time.newInstance(17, 30, 0, 0), sessions[0].End_Time__c);
 			Assert.areEqual(SessionAttendance.SCHEDULED, sessions[0].Status__c);
-			Assert.isTrue(
-				sessions[0].Name.startsWith('Tutoring '),
-				'Named as the panel names one.'
-			);
+			Assert.isTrue(sessions[0].Name.startsWith('Tutoring '), 'Named as the panel names one.');
 			Assert.areEqual(
 				MONDAY.addDays(7 * 8),
-				[SELECT Created_Through__c FROM Session_Schedule__c WITH SYSTEM_MODE]
-				.Created_Through__c
+				[SELECT Created_Through__c FROM Session_Schedule__c WITH SYSTEM_MODE].Created_Through__c
 			);
-			Assert.areEqual(
-				0,
-				SessionScheduleService.run(new Set<Id>{ schedule.Id }),
-				'A second run creates nothing.'
-			);
+			Assert.areEqual(0, SessionScheduleService.run(new Set<Id>{ schedule.Id }), 'A second run creates nothing.');
 		}
 	}
 
@@ -109,10 +101,7 @@ private class SessionScheduleServiceTest {
 			days,
 			'From Start Date, weeks 0 and 2 of the pattern, through End Date.'
 		);
-		Assert.areEqual(
-			'Monday;Sunday',
-			SessionScheduleService.weekdayNames(new List<String>{ '0', '1' })
-		);
+		Assert.areEqual('Monday;Sunday', SessionScheduleService.weekdayNames(new List<String>{ '0', '1' }));
 	}
 
 	@IsTest
@@ -120,28 +109,16 @@ private class SessionScheduleServiceTest {
 		System.runAs(admin()) {
 			Service__c service = tutoring();
 			// A session the panel made on the first Tuesday, for everyone in the program.
-			insert new Session__c(
-				Name = 'Tutoring',
-				Service__c = service.Id,
-				Session_Date__c = MONDAY.addDays(1)
-			);
+			insert new Session__c(Name = 'Tutoring', Service__c = service.Id, Session_Date__c = MONDAY.addDays(1));
 			Session_Schedule__c schedule = scheduleOf(service, 'Tuesday', 1);
 			insert schedule;
 			SessionScheduleService.run(new Set<Id>{ schedule.Id });
 
 			Test.startTest();
-			update new Session_Schedule__c(
-				Id = schedule.Id,
-				Weekdays__c = 'Wednesday',
-				Active__c = false
-			);
+			update new Session_Schedule__c(Id = schedule.Id, Weekdays__c = 'Wednesday', Active__c = false);
 			Test.stopTest();
 
-			Assert.areEqual(
-				7,
-				sessionsOf(schedule.Id).size(),
-				'Eight Tuesdays less the one taken.'
-			);
+			Assert.areEqual(7, sessionsOf(schedule.Id).size(), 'Eight Tuesdays less the one taken.');
 			Assert.areEqual(8, [SELECT COUNT() FROM Session__c WITH SYSTEM_MODE], 'No duplicate.');
 			Assert.areEqual(
 				0,
@@ -154,9 +131,7 @@ private class SessionScheduleServiceTest {
 	@IsTest
 	static void removeFutureSessionsKeepsAttendedHeldAndCancelledSessions() {
 		System.runAs(admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			TestDataFactory.saveSettings(settings);
 			Service__c service = tutoring();
@@ -166,10 +141,7 @@ private class SessionScheduleServiceTest {
 			List<Session__c> sessions = sessionsOf(schedule.Id);
 			Contact person = HouseholdTestDataFactory.newContact('Pat', 'Lee');
 			insert person;
-			Enrollment__c enrollment = new Enrollment__c(
-				Program__c = service.Program__c,
-				Contact__c = person.Id
-			);
+			Enrollment__c enrollment = new Enrollment__c(Program__c = service.Program__c, Contact__c = person.Id);
 			insert enrollment;
 			insert new Service_Delivery__c(
 				Service__c = service.Id,
@@ -180,10 +152,7 @@ private class SessionScheduleServiceTest {
 			);
 			sessions[1].Status__c = SessionAttendance.CANCELLED;
 			update sessions[1];
-			update new Session_Schedule__c(
-				Id = schedule.Id,
-				Start_Time__c = Time.newInstance(15, 0, 0, 0)
-			);
+			update new Session_Schedule__c(Id = schedule.Id, Start_Time__c = Time.newInstance(15, 0, 0, 0));
 
 			Test.startTest();
 			Integer removed = SessionScheduleService.removeFutureSessions(schedule.Id);
@@ -192,11 +161,7 @@ private class SessionScheduleServiceTest {
 			Assert.areEqual(6, removed, 'Eight Tuesdays less the attended and the cancelled one.');
 			List<Session__c> after = sessionsOf(schedule.Id);
 			Assert.areEqual(8, after.size(), 'Recreated from the current pattern.');
-			Assert.areEqual(
-				Time.newInstance(16, 0, 0, 0),
-				after[0].Start_Time__c,
-				'Attended: kept.'
-			);
+			Assert.areEqual(Time.newInstance(16, 0, 0, 0), after[0].Start_Time__c, 'Attended: kept.');
 			Assert.areEqual(SessionAttendance.CANCELLED, after[1].Status__c, 'Cancelled: kept.');
 			Assert.areEqual(Time.newInstance(15, 0, 0, 0), after[2].Start_Time__c, 'Recreated.');
 		}
@@ -220,11 +185,7 @@ private class SessionScheduleServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(SessionScheduleBatch.JOB_NAME, steps[0].key);
-			Assert.areEqual(
-				9,
-				sessionsOf(schedules[0].Id).size(),
-				'Nine Mondays, today through the horizon day.'
-			);
+			Assert.areEqual(9, sessionsOf(schedules[0].Id).size(), 'Nine Mondays, today through the horizon day.');
 			Assert.areEqual(0, sessionsOf(schedules[1].Id).size(), 'Inactive: nothing.');
 		}
 	}
@@ -282,10 +243,7 @@ private class SessionScheduleServiceTest {
 	@IsTest
 	static void theHorizonFollowsWeeksAheadToCreateSessions() {
 		System.runAs(admin()) {
-			upsert new Programs_Settings__c(
-				SetupOwnerId = UserInfo.getOrganizationId(),
-				Session_Horizon_Weeks__c = 2
-			);
+			upsert new Programs_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Session_Horizon_Weeks__c = 2);
 			Service__c service = tutoring();
 			Session_Schedule__c schedule = scheduleOf(service, 'Monday', 1);
 			AutomationControl.bypass('Session_Schedule_Rules');
@@ -371,15 +329,9 @@ private class SessionScheduleServiceTest {
 			insert schedule;
 
 			Test.startTest();
-			SessionScheduleController.Preview before = SessionScheduleController.getSchedulePreview(
-				schedule.Id
-			);
-			SessionScheduleController.Preview created = SessionScheduleController.createSessionsNow(
-				schedule.Id
-			);
-			SessionScheduleController.Preview removed = SessionScheduleController.removeFutureSessions(
-				schedule.Id
-			);
+			SessionScheduleController.Preview before = SessionScheduleController.getSchedulePreview(schedule.Id);
+			SessionScheduleController.Preview created = SessionScheduleController.createSessionsNow(schedule.Id);
+			SessionScheduleController.Preview removed = SessionScheduleController.removeFutureSessions(schedule.Id);
 			String refusal;
 			try {
 				SessionScheduleController.getSchedulePreview(null);

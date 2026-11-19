@@ -100,10 +100,7 @@ private class FindRadiusTest {
 			System.Assert.areEqual(41.5, own.latitude, 'Its own geocode.');
 			System.Assert.isNull(own.note, 'No stand in.');
 			System.Assert.isNotNull(stand.note, 'The stand in says so.');
-			System.Assert.isTrue(
-				stand.latitude > 42 && stand.latitude < 43,
-				'The postal code center.'
-			);
+			System.Assert.isTrue(stand.latitude > 42 && stand.latitude < 43, 'The postal code center.');
 			try {
 				FindRadius.resolveCenter(neither.Id);
 				System.Assert.fail('No geocode and no postal code');
@@ -129,27 +126,19 @@ private class FindRadiusTest {
 
 			System.Assert.isTrue(ok.clause.contains('DISTANCE(MailingAddress, GEOLOCATION(:'));
 			System.Assert.isTrue(
-				ok.clause.startsWith(
-					'MailingLatitude >= :boxSouth AND MailingLatitude <= :boxNorth'
-				),
+				ok.clause.startsWith('MailingLatitude >= :boxSouth AND MailingLatitude <= :boxNorth'),
 				'A latitude box narrows the rows first: ' + ok.clause
 			);
 			System.Assert.isTrue(
 				ok.clause.contains('MailingLongitude >= :boxWest'),
 				'And a longitude box: ' + ok.clause
 			);
-			System.Assert.areEqual(
-				7,
-				ok.binds.size(),
-				'Latitude, longitude, miles and the four box edges are binds.'
-			);
+			System.Assert.areEqual(7, ok.binds.size(), 'Latitude, longitude, miles and the four box edges are binds.');
 			Decimal north = Decimal.valueOf((Double) ok.binds.get('boxNorth'));
 			System.Assert.isTrue(north > 42.6 && north < 42.7, 'About 25 miles north: ' + north);
 			FindRelatedRecords.Rendered polar = FindRadius.condition(
 				'Contact',
-				JSON.deserializeUntyped(
-					'{"field": "MailingAddress", "miles": 100, "latitude": 88.5, "longitude": 10}'
-				)
+				JSON.deserializeUntyped('{"field": "MailingAddress", "miles": 100, "latitude": 88.5, "longitude": 10}')
 			);
 			System.Assert.isFalse(
 				polar.clause.contains('boxWest'),
@@ -195,9 +184,7 @@ private class FindRadiusTest {
 			System.Assert.isTrue(names.contains('MailingAddress'), 'Mailing address.');
 			// An org can hide the other address from administrators with field-level security,
 			// and then it is not offered: only a place the user can read is.
-			Schema.SObjectField other = Contact.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
+			Schema.SObjectField other = Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				.fields.getMap()
 				.get('OtherAddress');
 			System.Assert.areEqual(
@@ -227,10 +214,7 @@ private class FindRadiusTest {
 			QueryCompiler.Compiled compiled = QueryCompiler.compile(document(25));
 			List<SObject> rows = QueryCompiler.run(compiled);
 
-			System.Assert.isTrue(
-				compiled.display.contains('DISTANCE(MailingAddress'),
-				compiled.display
-			);
+			System.Assert.isTrue(compiled.display.contains('DISTANCE(MailingAddress'), compiled.display);
 			System.Assert.areEqual(
 				new List<String>{ 'Near' },
 				lastNames(rows),
@@ -243,10 +227,7 @@ private class FindRadiusTest {
 			);
 			System.Assert.areEqual(
 				0,
-				QueryCompiler.countWithoutGeocode(
-					'{"version": 1, "object": "Contact", "fields": ["LastName"]}',
-					100
-				),
+				QueryCompiler.countWithoutGeocode('{"version": 1, "object": "Contact", "fields": ["LastName"]}', 100),
 				'No radius, nothing to explain.'
 			);
 		}
@@ -262,9 +243,7 @@ private class FindRadiusTest {
 				System.Assert.isTrue(expected.getMessage().contains('500'), expected.getMessage());
 			}
 			try {
-				QueryCompiler.compile(
-					'{"version": 1, "object": "Contact", "fields": ["LastName"], "radius": "near"}'
-				);
+				QueryCompiler.compile('{"version": 1, "object": "Contact", "fields": ["LastName"], "radius": "near"}');
 				System.Assert.fail('Not an object');
 			} catch (QueryCompiler.QueryCompilerException expected) {
 				System.Assert.areEqual(
@@ -279,10 +258,7 @@ private class FindRadiusTest {
 	@IsTest
 	static void theFindControllerRunsAResolvesAndListsForAPermittedUser() {
 		System.runAs(TestUsers.admin()) {
-			insert new List<Contact>{
-				contact('Near', 42.31, -71.05),
-				contact('Ungeocoded', null, null)
-			};
+			insert new List<Contact>{ contact('Near', 42.31, -71.05), contact('Ungeocoded', null, null) };
 			User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
 			System.runAs(maria) {
@@ -300,11 +276,7 @@ private class FindRadiusTest {
 				System.Assert.areEqual(1, result.rows.size(), 'The one near record.');
 				System.Assert.areEqual(1, result.withoutGeocode, 'One cannot be placed.');
 				System.Assert.isNull(plain.withoutGeocode, 'No radius, no count.');
-				System.Assert.areEqual(
-					withoutRadius + 1,
-					withRadius,
-					'A radius adds the one count, nothing else.'
-				);
+				System.Assert.areEqual(withoutRadius + 1, withRadius, 'A radius adds the one count, nothing else.');
 				System.Assert.isNotNull(center.latitude, 'A postal code resolves.');
 				System.Assert.isFalse(
 					FindController.listRadiusFields('Contact').isEmpty(),

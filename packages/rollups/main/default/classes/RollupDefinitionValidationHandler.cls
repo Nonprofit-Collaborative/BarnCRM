@@ -29,11 +29,7 @@ public with sharing class RollupDefinitionValidationHandler extends TriggerHandl
 	}
 
 	private void validate(List<Rollup_Definition__c> records, Map<Id, SObject> previousById) {
-		for (
-			Rollup_Definition__c record : records == null
-				? new List<Rollup_Definition__c>()
-				: records
-		) {
+		for (Rollup_Definition__c record : records == null ? new List<Rollup_Definition__c>() : records) {
 			if (previousById != null && !calculationChanged(record, previousById.get(record.Id))) {
 				continue;
 			}
@@ -46,17 +42,10 @@ public with sharing class RollupDefinitionValidationHandler extends TriggerHandl
 	}
 
 	/** R-R4a: each Bypass Permission set or changed in this save names a custom permission. */
-	private static void validateBypassPermissions(
-		List<Rollup_Definition__c> records,
-		Map<Id, SObject> previousById
-	) {
+	private static void validateBypassPermissions(List<Rollup_Definition__c> records, Map<Id, SObject> previousById) {
 		List<Rollup_Definition__c> checked = new List<Rollup_Definition__c>();
 		Set<String> developerNames = new Set<String>();
-		for (
-			Rollup_Definition__c record : records == null
-				? new List<Rollup_Definition__c>()
-				: records
-		) {
+		for (Rollup_Definition__c record : records == null ? new List<Rollup_Definition__c>() : records) {
 			String name = record.Bypass_Permission__c;
 			SObject previous = previousById == null ? null : previousById.get(record.Id);
 			if (

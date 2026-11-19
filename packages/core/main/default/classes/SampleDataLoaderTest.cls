@@ -24,11 +24,7 @@ private class SampleDataLoaderTest {
 	 * customNameFirst is true the first household carries a custom name so both the
 	 * computed-name and custom-name insert paths are exercised across the suite.
 	 */
-	private static String buildJson(
-		Integer householdCount,
-		Integer membersPerHousehold,
-		Boolean customNameFirst
-	) {
+	private static String buildJson(Integer householdCount, Integer membersPerHousehold, Boolean customNameFirst) {
 		List<Object> households = new List<Object>();
 		Integer emailIndex = 1;
 
@@ -52,11 +48,7 @@ private class SampleDataLoaderTest {
 		return JSON.serialize(root);
 	}
 
-	private static Map<String, Object> buildMember(
-		Integer householdIndex,
-		Integer memberIndex,
-		Integer emailIndex
-	) {
+	private static Map<String, Object> buildMember(Integer householdIndex, Integer memberIndex, Integer emailIndex) {
 		Map<String, Object> member = new Map<String, Object>();
 		member.put('key', 'H' + householdIndex + '-' + (memberIndex + 1));
 		member.put('firstName', 'Test' + emailIndex);
@@ -111,9 +103,7 @@ private class SampleDataLoaderTest {
 	 * households and one affiliation to the organization, so the third stage has work to do.
 	 */
 	private static String buildJsonWithConnections() {
-		Map<String, Object> root = (Map<String, Object>) JSON.deserializeUntyped(
-			buildJson(2, 2, false)
-		);
+		Map<String, Object> root = (Map<String, Object>) JSON.deserializeUntyped(buildJson(2, 2, false));
 
 		Map<String, Object> relationship = new Map<String, Object>();
 		relationship.put('person', 'H0-1');
@@ -224,11 +214,7 @@ private class SampleDataLoaderTest {
 			System.assertEquals(3, status.householdCount, 'three households should be inserted');
 			System.assertEquals(1, status.organizationCount, 'one organization should be inserted');
 			System.assertEquals(6, status.contactCount, 'three households of two members each');
-			System.assertEquals(
-				true,
-				status.loaded,
-				'status should report loaded once both stages run'
-			);
+			System.assertEquals(true, status.loaded, 'status should report loaded once both stages run');
 			System.assertEquals(false, status.loading, 'no load job should still be queued');
 		}
 	}
@@ -246,11 +232,7 @@ private class SampleDataLoaderTest {
 
 			SampleDataLoader.Counts status = SampleDataLoader.status();
 			System.assertEquals(2, status.householdCount, 'stage one should insert the households');
-			System.assertEquals(
-				1,
-				status.organizationCount,
-				'stage one should insert the organization'
-			);
+			System.assertEquals(1, status.organizationCount, 'stage one should insert the organization');
 			System.assertEquals(
 				0,
 				status.contactCount,
@@ -339,11 +321,7 @@ private class SampleDataLoaderTest {
 				message,
 				'the admin is told which record type and how to fix it, before any job starts'
 			);
-			System.assertEquals(
-				false,
-				SampleDataLoader.hasRunningLoadJob(),
-				'no load job is started'
-			);
+			System.assertEquals(false, SampleDataLoader.hasRunningLoadJob(), 'no load job is started');
 		}
 	}
 
@@ -357,11 +335,7 @@ private class SampleDataLoaderTest {
 
 			SampleDataLoader.Counts status = SampleDataLoader.status();
 			System.assertEquals(2, status.householdCount, 'both households should be inserted');
-			System.assertEquals(
-				4,
-				status.contactCount,
-				'both households of two people should load'
-			);
+			System.assertEquals(4, status.contactCount, 'both households of two people should load');
 			System.assertEquals(
 				4,
 				[SELECT COUNT() FROM Household_Member__c WHERE End_Date__c = NULL],
@@ -450,11 +424,7 @@ private class SampleDataLoaderTest {
 						'by adding its first person has: ' +
 						household
 				);
-				System.assertEquals(
-					household.Id,
-					household.Primary_Contact__r.AccountId,
-					'and is one of its members'
-				);
+				System.assertEquals(household.Id, household.Primary_Contact__r.AccountId, 'and is one of its members');
 			}
 		}
 	}
@@ -474,11 +444,7 @@ private class SampleDataLoaderTest {
 			Test.stopTest();
 
 			List<Account> households = [
-				SELECT
-					Name,
-					Member_Count__c,
-					Household_Formal_Greeting__c,
-					Household_Informal_Greeting__c
+				SELECT Name, Member_Count__c, Household_Formal_Greeting__c, Household_Informal_Greeting__c
 				FROM Account
 				WHERE Sample_Data__c = TRUE AND RecordType.DeveloperName = 'Household'
 			];
@@ -486,10 +452,7 @@ private class SampleDataLoaderTest {
 			for (Account household : households) {
 				Assert.areNotEqual('Household', household.Name, 'named from its people');
 				Assert.areEqual(2, household.Member_Count__c, 'both people counted');
-				Assert.isTrue(
-					String.isNotBlank(household.Household_Formal_Greeting__c),
-					'a formal greeting is set'
-				);
+				Assert.isTrue(String.isNotBlank(household.Household_Formal_Greeting__c), 'a formal greeting is set');
 				Assert.isTrue(
 					String.isNotBlank(household.Household_Informal_Greeting__c),
 					'an informal greeting is set'
@@ -509,24 +472,14 @@ private class SampleDataLoaderTest {
 			Test.stopTest();
 
 			Account custom = [
-				SELECT
-					Name,
-					Member_Count__c,
-					Household_Formal_Greeting__c,
-					Household_Informal_Greeting__c
+				SELECT Name, Member_Count__c, Household_Formal_Greeting__c, Household_Informal_Greeting__c
 				FROM Account
 				WHERE Sample_Data_Key__c = 'H0'
 			];
 			Assert.areEqual('The Test Family', custom.Name, 'a custom name is kept (R-H8)');
 			Assert.areEqual(2, custom.Member_Count__c, 'its people are counted');
-			Assert.isTrue(
-				String.isNotBlank(custom.Household_Formal_Greeting__c),
-				'it has a formal greeting'
-			);
-			Assert.isTrue(
-				String.isNotBlank(custom.Household_Informal_Greeting__c),
-				'it has an informal greeting'
-			);
+			Assert.isTrue(String.isNotBlank(custom.Household_Formal_Greeting__c), 'it has a formal greeting');
+			Assert.isTrue(String.isNotBlank(custom.Household_Informal_Greeting__c), 'it has an informal greeting');
 		}
 	}
 
@@ -590,19 +543,13 @@ private class SampleDataLoaderTest {
 				SampleDataLoader.remove();
 			} catch (SampleDataException e) {
 				refused++;
-				System.assertEquals(
-					BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'),
-					e.getMessage()
-				);
+				System.assertEquals(BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'), e.getMessage());
 			}
 			try {
 				SampleDataLoader.load();
 			} catch (SampleDataException e) {
 				refused++;
-				System.assertEquals(
-					BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'),
-					e.getMessage()
-				);
+				System.assertEquals(BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'), e.getMessage());
 			}
 			System.assertEquals(2, refused, 'neither starts while a removal runs');
 
@@ -634,11 +581,7 @@ private class SampleDataLoaderTest {
 
 			SampleDataLoader.runningJobOverride = false;
 			SampleDataLoader.Counts status = SampleDataLoader.status();
-			System.assertEquals(
-				1,
-				status.householdCount,
-				'the refused remove should delete nothing'
-			);
+			System.assertEquals(1, status.householdCount, 'the refused remove should delete nothing');
 		}
 	}
 
@@ -679,21 +622,9 @@ private class SampleDataLoaderTest {
 			runCoreRemoval();
 
 			SampleDataLoader.Counts afterStatus = SampleDataLoader.status();
-			System.assertEquals(
-				0,
-				afterStatus.householdCount,
-				'households should be gone after remove'
-			);
-			System.assertEquals(
-				0,
-				afterStatus.organizationCount,
-				'organizations should be gone after remove'
-			);
-			System.assertEquals(
-				0,
-				afterStatus.contactCount,
-				'contacts should be gone after remove'
-			);
+			System.assertEquals(0, afterStatus.householdCount, 'households should be gone after remove');
+			System.assertEquals(0, afterStatus.organizationCount, 'organizations should be gone after remove');
+			System.assertEquals(0, afterStatus.contactCount, 'contacts should be gone after remove');
 			System.assertEquals(false, afterStatus.loaded);
 		}
 	}
@@ -702,13 +633,9 @@ private class SampleDataLoaderTest {
 	static void testRemoveLeavesRecordsTheLoaderDidNotCreate() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			loadEverythingIncludingConnections(buildJsonWithConnections());
-			Account ownRecord = TestDataFactory.organization(
-				new Account(Name = 'A real household')
-			);
+			Account ownRecord = TestDataFactory.organization(new Account(Name = 'A real household'));
 			insert ownRecord;
-			Contact ownPerson = TestDataFactory.person(
-				new Contact(LastName = 'Real', AccountId = ownRecord.Id)
-			);
+			Contact ownPerson = TestDataFactory.person(new Contact(LastName = 'Real', AccountId = ownRecord.Id));
 			insert ownPerson;
 			Contact ownOtherPerson = TestDataFactory.person(
 				new Contact(LastName = 'Alsoreal', AccountId = ownRecord.Id)
@@ -770,11 +697,7 @@ private class SampleDataLoaderTest {
 			loadEverythingIncludingConnections(buildJsonWithConnections());
 
 			SampleDataLoader.Counts status = SampleDataLoader.status();
-			System.assertEquals(
-				1,
-				status.relationshipCount,
-				'the payload names one connection between two households'
-			);
+			System.assertEquals(1, status.relationshipCount, 'the payload names one connection between two households');
 			System.assertEquals(1, status.affiliationCount, 'the payload names one affiliation');
 
 			Relationship__c saved = [
@@ -783,11 +706,7 @@ private class SampleDataLoaderTest {
 				WHERE Sample_Data__c = TRUE
 				LIMIT 1
 			];
-			System.assertEquals(
-				'Friend',
-				saved.Type__c,
-				'the connection keeps the type it was given'
-			);
+			System.assertEquals('Friend', saved.Type__c, 'the connection keeps the type it was given');
 			System.assertNotEquals(
 				saved.Contact__c,
 				saved.Related_Contact__c,
@@ -800,11 +719,7 @@ private class SampleDataLoaderTest {
 				WHERE Sample_Data__c = TRUE
 				LIMIT 1
 			];
-			System.assertEquals(
-				'Board Member',
-				affiliation.Role__c,
-				'the affiliation keeps the role it was given'
-			);
+			System.assertEquals('Board Member', affiliation.Role__c, 'the affiliation keeps the role it was given');
 			System.assertNotEquals(
 				null,
 				affiliation.Organization__c,
@@ -859,21 +774,13 @@ private class SampleDataLoaderTest {
 			SampleDataLoader.Counts removed = SampleDataLoader.remove();
 			Test.stopTest();
 
-			System.assertEquals(
-				1,
-				module.removeCalls,
-				'the module is asked once to remove its own'
-			);
+			System.assertEquals(1, module.removeCalls, 'the module is asked once to remove its own');
 			System.assertEquals(
 				0,
 				SampleDataStageBatch.started.size(),
 				'Core\'s own removal waits for the module to hand back'
 			);
-			System.assertEquals(
-				1,
-				removed.moduleCounts.size(),
-				'the counts returned name the module that was removed'
-			);
+			System.assertEquals(1, removed.moduleCounts.size(), 'the counts returned name the module that was removed');
 			System.assertEquals(
 				12,
 				removed.moduleCounts[0].recordCount,
@@ -938,10 +845,7 @@ private class SampleDataLoaderTest {
 				SampleDataLoader.load();
 				Assert.fail('A load is refused while a module still has sample records');
 			} catch (SampleDataException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_SampleData_AlreadyLoaded'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_SampleData_AlreadyLoaded'), refused.getMessage());
 			}
 
 			module.keptSome = false;

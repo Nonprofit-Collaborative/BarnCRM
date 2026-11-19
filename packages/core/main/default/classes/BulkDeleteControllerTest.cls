@@ -33,19 +33,13 @@ private class BulkDeleteControllerTest {
 
 	private static void makeVolunteers(Integer howMany) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < howMany; index++) {
 			people.add(
 				TestDataFactory.person(
-					new Contact(
-						AccountId = organization.Id,
-						LastName = 'Person ' + index,
-						Title = 'Volunteer'
-					)
+					new Contact(AccountId = organization.Id, LastName = 'Person ' + index, Title = 'Volunteer')
 				)
 			);
 		}
@@ -53,9 +47,7 @@ private class BulkDeleteControllerTest {
 	}
 
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	@IsTest
@@ -102,11 +94,7 @@ private class BulkDeleteControllerTest {
 			System.Assert.areEqual(0, [SELECT COUNT() FROM Contact], 'Deleted');
 			System.runAs(deleter()) {
 				BulkDeleteController.JobView done = BulkDeleteController.getJob(started.recordId);
-				System.Assert.areEqual(
-					ImportBatchService.STATUS_COMPLETE,
-					done.status,
-					done.runLog
-				);
+				System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, done.status, done.runLog);
 				System.Assert.areEqual(200, done.deleted, 'Every record');
 				System.Assert.isTrue(done.canUndo, 'Within the window');
 				System.Assert.areEqual(200, done.recordsToUndo, 'The number to confirm');
@@ -121,10 +109,7 @@ private class BulkDeleteControllerTest {
 				} catch (AuraHandledException expected) {
 					System.Assert.isTrue(expected.getMessage().contains('200'), 'Names the count');
 				}
-				BulkDeleteController.JobView undoing = BulkDeleteController.undo(
-					started.recordId,
-					200
-				);
+				BulkDeleteController.JobView undoing = BulkDeleteController.undo(started.recordId, 200);
 				System.Assert.areEqual(ImportBatchService.STATUS_UNDOING, undoing.status);
 				System.Assert.isFalse(undoing.canUndo, 'Once only');
 			}
@@ -137,11 +122,7 @@ private class BulkDeleteControllerTest {
 		System.runAs(TestUsers.admin()) {
 			makeVolunteers(200);
 			System.runAs(deleter()) {
-				Import_Batch__c created = BulkDeleteService.createJob(
-					BulkDeleteService.plan(VOLUNTEERS),
-					200,
-					200
-				);
+				Import_Batch__c created = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 200, 200);
 				BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
 				List<SObject> scope = new List<SObject>();
 				Database.QueryLocatorIterator records = job.start(null).iterator();
@@ -184,8 +165,7 @@ private class BulkDeleteControllerTest {
 				beasJob = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 1, 1).Id;
 			}
 			System.runAs(admin) {
-				adminsJob = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 1, 1)
-					.Id;
+				adminsJob = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 1, 1).Id;
 			}
 
 			System.runAs(bea) {
@@ -222,11 +202,7 @@ private class BulkDeleteControllerTest {
 		System.runAs(TestUsers.admin()) {
 			makeVolunteers(3);
 			System.runAs(deleter()) {
-				BulkDeleteService.BackupPage page = BulkDeleteController.backupPage(
-					VOLUNTEERS,
-					null,
-					null
-				);
+				BulkDeleteService.BackupPage page = BulkDeleteController.backupPage(VOLUNTEERS, null, null);
 				System.Assert.areEqual('Contact', page.objectName, 'The object');
 				System.Assert.areEqual(3, page.rows.size(), 'Every match');
 				System.Assert.isTrue(page.done, 'One page was enough');

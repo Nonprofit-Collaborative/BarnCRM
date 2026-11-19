@@ -31,9 +31,7 @@ private class BulkDeleteBackupTest {
 
 	private static void makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
@@ -52,9 +50,7 @@ private class BulkDeleteBackupTest {
 	}
 
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	@IsTest
@@ -102,10 +98,7 @@ private class BulkDeleteBackupTest {
 				BulkDeleteController.backupPage(VOLUNTEERS, null, null);
 				Assert.fail('Refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission'), refused.getMessage());
 			}
 		}
 	}

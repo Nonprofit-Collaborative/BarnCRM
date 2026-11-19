@@ -29,10 +29,7 @@ public with sharing class OrgMetadataApi {
 		}
 		HttpRequest call = new HttpRequest();
 		call.setEndpoint(
-			'callout:' +
-				ImportNewFieldService.CONNECTION +
-				'/services/Soap/m/' +
-				ImportNewFieldService.API_VERSION
+			'callout:' + ImportNewFieldService.CONNECTION + '/services/Soap/m/' + ImportNewFieldService.API_VERSION
 		);
 		call.setMethod('POST');
 		call.setHeader('Content-Type', 'text/xml; charset=UTF-8');

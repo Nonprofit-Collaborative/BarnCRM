@@ -97,11 +97,7 @@ private class TerritorySampleDataTest {
 	@IsTest
 	static void theRemovalTakesTheSampleTerritoriesAndClearsAssignments() {
 		System.runAs(admin()) {
-			Territory__c real = new Territory__c(
-				Name = 'Real Region',
-				Routing__c = 'Keep Owner',
-				Priority__c = 5
-			);
+			Territory__c real = new Territory__c(Name = 'Real Region', Routing__c = 'Keep Owner', Priority__c = 5);
 			insert as user real;
 			Contact person = TestDataFactory.person(new Contact(LastName = 'Real Person'));
 			insert as user person;
@@ -133,8 +129,7 @@ private class TerritorySampleDataTest {
 				'The sample member went with the territory'
 			);
 			Assert.isNull(
-				[SELECT Territory__c FROM Contact WHERE Id = :person.Id WITH SYSTEM_MODE]
-				.Territory__c,
+				[SELECT Territory__c FROM Contact WHERE Id = :person.Id WITH SYSTEM_MODE].Territory__c,
 				'A record assigned to a sample territory is cleared, not deleted'
 			);
 		}

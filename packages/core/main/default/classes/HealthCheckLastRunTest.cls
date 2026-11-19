@@ -10,13 +10,7 @@ private class HealthCheckLastRunTest {
 	}
 
 	private static HealthCheckService.Finding finding(String key, String severity) {
-		return new HealthCheckService.Finding(
-			key,
-			key,
-			key,
-			severity,
-			HealthCheckService.CATEGORY_SETTINGS
-		);
+		return new HealthCheckService.Finding(key, key, key, severity, HealthCheckService.CATEGORY_SETTINGS);
 	}
 
 	private static HealthCheckService.Report reportWithOneOfEach(Boolean canManage) {
@@ -45,10 +39,7 @@ private class HealthCheckLastRunTest {
 			Assert.areEqual(2, after.warnings, 'Two to be aware of');
 			Assert.areEqual(1, after.infos, 'One for information');
 			Assert.areEqual(
-				String.format(
-					BarnHelp.text('Core', 'Core_HealthCheck_LastResult'),
-					new List<Object>{ 1, 2, 1 }
-				),
+				String.format(BarnHelp.text('Core', 'Core_HealthCheck_LastResult'), new List<Object>{ 1, 2, 1 }),
 				after.result,
 				'And read back as a sentence'
 			);

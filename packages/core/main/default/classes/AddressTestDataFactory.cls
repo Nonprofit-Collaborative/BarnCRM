@@ -19,12 +19,7 @@ public class AddressTestDataFactory {
 	 * @param stateCode a state code, such as `IL`
 	 * @param countryCode a country code, such as `US`
 	 */
-	public static void putStateAndCountry(
-		SObject record,
-		String prefix,
-		String stateCode,
-		String countryCode
-	) {
+	public static void putStateAndCountry(SObject record, String prefix, String stateCode, String countryCode) {
 		String suffix = AddressService.usesStateAndCountryPicklists() ? 'Code' : '';
 		record.put(prefix + 'Country' + suffix, countryCode);
 		record.put(prefix + 'State' + suffix, stateCode);
@@ -32,9 +27,7 @@ public class AddressTestDataFactory {
 
 	/** An organization account, not yet inserted. */
 	public static Account newOrganization(String name) {
-		return (Account) TestDataFactory.pastDuplicateRules(
-			AccountKindsTestData.organization(name)
-		);
+		return (Account) TestDataFactory.pastDuplicateRules(AccountKindsTestData.organization(name));
 	}
 
 	/** A person in the given household, not yet inserted. */

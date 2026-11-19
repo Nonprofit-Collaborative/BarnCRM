@@ -46,9 +46,7 @@ public without sharing class ProgramsSharing {
 		}
 		OrgSettingsSystemWriter.save(
 			Programs_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Programs_Settings__c.Private_Participants__c => wanted
-			}
+			new Map<Schema.SObjectField, Object>{ Programs_Settings__c.Private_Participants__c => wanted }
 		);
 		SettingsService.logChange(SETTING_NAME, presetName(stored), presetName(wanted));
 		requestApply();
@@ -109,8 +107,7 @@ public without sharing class ProgramsSharing {
 		if (groupId == null || (Test.isRunningTest() && !writeGroupInTests)) {
 			return;
 		}
-		Id everyone = [SELECT Id FROM Group WHERE Type = 'Organization' WITH SYSTEM_MODE LIMIT 1]
-		.Id;
+		Id everyone = [SELECT Id FROM Group WHERE Type = 'Organization' WITH SYSTEM_MODE LIMIT 1].Id;
 		List<GroupMember> members = [
 			SELECT Id
 			FROM GroupMember
@@ -120,10 +117,7 @@ public without sharing class ProgramsSharing {
 		if (isPrivate() && !members.isEmpty()) {
 			Database.delete(members, AccessLevel.SYSTEM_MODE);
 		} else if (!isPrivate() && members.isEmpty()) {
-			Database.insert(
-				new GroupMember(GroupId = groupId, UserOrGroupId = everyone),
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.insert(new GroupMember(GroupId = groupId, UserOrGroupId = everyone), AccessLevel.SYSTEM_MODE);
 		}
 	}
 

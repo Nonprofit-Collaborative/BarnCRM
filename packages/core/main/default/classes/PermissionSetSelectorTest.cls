@@ -15,17 +15,11 @@ private class PermissionSetSelectorTest {
 			PermissionSetSelector selector = new PermissionSetSelector();
 
 			Test.startTest();
-			PermissionSet found = selector.selectByNameInSystemMode(
-				AccessService.ADMIN_PERMISSION_SET
-			);
+			PermissionSet found = selector.selectByNameInSystemMode(AccessService.ADMIN_PERMISSION_SET);
 			Test.stopTest();
 
 			Assert.isNotNull(found, 'The BarnCRM Admin permission set ships with BarnCRM Core.');
-			Assert.areEqual(
-				AccessService.ADMIN_PERMISSION_SET,
-				found.Name,
-				'The wrong permission set came back.'
-			);
+			Assert.areEqual(AccessService.ADMIN_PERMISSION_SET, found.Name, 'The wrong permission set came back.');
 		}
 	}
 
@@ -35,16 +29,11 @@ private class PermissionSetSelectorTest {
 			PermissionSetSelector selector = new PermissionSetSelector();
 
 			Test.startTest();
-			PermissionSet missing = selector.selectByNameInSystemMode(
-				'No_Such_Permission_Set_Here'
-			);
+			PermissionSet missing = selector.selectByNameInSystemMode('No_Such_Permission_Set_Here');
 			PermissionSet blank = selector.selectByNameInSystemMode('  ');
 			Test.stopTest();
 
-			Assert.isNull(
-				missing,
-				'A permission set that does not exist should come back as nothing.'
-			);
+			Assert.isNull(missing, 'A permission set that does not exist should come back as nothing.');
 			Assert.isNull(blank, 'A blank name should come back as nothing without querying.');
 		}
 	}
@@ -60,10 +49,7 @@ private class PermissionSetSelectorTest {
 				new Set<String>{ 'BarnCRM_Bulk_Update', 'No_Such_Permission_Set_Here' },
 				namespacePrefix
 			);
-			List<PermissionSet> none = selector.selectPackagedByNames(
-				new Set<String>(),
-				namespacePrefix
-			);
+			List<PermissionSet> none = selector.selectPackagedByNames(new Set<String>(), namespacePrefix);
 			Test.stopTest();
 
 			Assert.areEqual(1, found.size(), 'Only the packaged set that exists should be found.');

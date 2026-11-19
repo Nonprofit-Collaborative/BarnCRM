@@ -35,9 +35,7 @@ private class CaseProviderRequestsTest {
 				response.setBody(JSON.serialize(new Map<String, Object>{ 'requests' => statuses }));
 				return response;
 			}
-			Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(
-				request.getBody()
-			);
+			Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(request.getBody());
 			response.setStatusCode(sendCode);
 			String raw = rawBodies.isEmpty() ? null : rawBodies.remove(0);
 			if (raw != null) {
@@ -125,11 +123,7 @@ private class CaseProviderRequestsTest {
 			Assert.isFalse(CaseProviderRequestsHourly.isScheduled(), 'Off: no hourly job');
 			Test.stopTest();
 			Assert.isFalse(CaseProviderRequests.step().active, 'Off: not in tonight run');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Provider_Request__c WITH SYSTEM_MODE],
-				'Nothing kept'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Provider_Request__c WITH SYSTEM_MODE], 'Nothing kept');
 		}
 	}
 
@@ -152,9 +146,7 @@ private class CaseProviderRequestsTest {
 			Assert.areEqual('New', row.Status__c, 'Provider status');
 			Assert.isNull(row.Error__c, 'No error');
 			Assert.areEqual(1, provider.received.size(), 'Sent once');
-			Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(
-				provider.received[0].getBody()
-			);
+			Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(provider.received[0].getBody());
 			Assert.areEqual(UserInfo.getOrganizationId(), body.get('orgId'), 'This org');
 			Assert.areEqual(record.get('CaseNumber'), body.get('reference'), 'Case Number');
 			Assert.areEqual('sam@example.org', body.get('requesterEmail'), 'Who asked');
@@ -282,8 +274,7 @@ private class CaseProviderRequestsTest {
 			Test.setMock(HttpCalloutMock.class, provider);
 
 			Test.startTest();
-			new CaseProviderRequests(new List<Id>{ first.Id, second.Id }, false)
-				.execute((QueueableContext) null);
+			new CaseProviderRequests(new List<Id>{ first.Id, second.Id }, false).execute((QueueableContext) null);
 			Test.stopTest();
 
 			Assert.areEqual(2, provider.received.size(), 'Both were sent');
@@ -320,8 +311,7 @@ private class CaseProviderRequestsTest {
 			CaseProviderRequests.calloutsLeftForTest = 1;
 
 			Test.startTest();
-			new CaseProviderRequests(new List<Id>{ first.Id, second.Id }, false)
-				.execute((QueueableContext) null);
+			new CaseProviderRequests(new List<Id>{ first.Id, second.Id }, false).execute((QueueableContext) null);
 			Test.stopTest();
 
 			Assert.areEqual(1, provider.received.size(), 'One callout, as allowed');

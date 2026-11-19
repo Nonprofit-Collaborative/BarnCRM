@@ -24,16 +24,8 @@ private class ReceiptVoidReissueTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact donor = GivingTestDataFactory.insertHouseholdContact(
-					'The Reyes Family',
-					'Ana',
-					'Reyes'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					donor.Id,
-					250,
-					Date.newInstance(2026, 3, 4)
-				);
+				Contact donor = GivingTestDataFactory.insertHouseholdContact('The Reyes Family', 'Ana', 'Reyes');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(donor.Id, 250, Date.newInstance(2026, 3, 4));
 				insert gift;
 
 				Receipt__c issued = ReceiptService.issueForGift(gift.Id);
@@ -47,11 +39,7 @@ private class ReceiptVoidReissueTest {
 				Test.stopTest();
 
 				Receipt__c after = ReceiptSelector.byId(issued.Id);
-				Assert.areEqual(
-					numberBefore,
-					after.Receipt_Number__c,
-					'The number does not change.'
-				);
+				Assert.areEqual(numberBefore, after.Receipt_Number__c, 'The number does not change.');
 				Assert.areEqual(amountBefore, after.Total_Amount__c, 'The amount does not change.');
 				Assert.areEqual(
 					documentBefore,
@@ -64,11 +52,7 @@ private class ReceiptVoidReissueTest {
 					'The stored document itself is byte for byte what the donor received.'
 				);
 				Assert.areEqual(ReceiptService.STATUS_VOID, after.Status__c, 'It is void.');
-				Assert.areEqual(
-					'Donor name was wrong',
-					after.Void_Reason__c,
-					'The void carries a reason.'
-				);
+				Assert.areEqual('Donor name was wrong', after.Void_Reason__c, 'The void carries a reason.');
 				Assert.isNotNull(after.Voided_On__c, 'The void carries a date.');
 			}
 
@@ -84,31 +68,16 @@ private class ReceiptVoidReissueTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact donor = GivingTestDataFactory.insertHouseholdContact(
-					'The Osei Family',
-					'Kofi',
-					'Osei'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					donor.Id,
-					500,
-					Date.newInstance(2026, 5, 9)
-				);
+				Contact donor = GivingTestDataFactory.insertHouseholdContact('The Osei Family', 'Kofi', 'Osei');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(donor.Id, 500, Date.newInstance(2026, 5, 9));
 				insert gift;
 				Receipt__c original = ReceiptService.issueForGift(gift.Id);
 
 				Test.startTest();
-				Receipt__c replacement = ReceiptService.voidAndReissue(
-					original.Id,
-					'Amount was keyed wrongly'
-				);
+				Receipt__c replacement = ReceiptService.voidAndReissue(original.Id, 'Amount was keyed wrongly');
 				Test.stopTest();
 
-				Assert.areEqual(
-					'HFH-2026-000001',
-					original.Receipt_Number__c,
-					'The first receipt is number one.'
-				);
+				Assert.areEqual('HFH-2026-000001', original.Receipt_Number__c, 'The first receipt is number one.');
 				Assert.areEqual(
 					'HFH-2026-000002',
 					replacement.Receipt_Number__c,
@@ -117,31 +86,15 @@ private class ReceiptVoidReissueTest {
 
 				Receipt__c voided = ReceiptSelector.byId(original.Id);
 				Receipt__c reissued = ReceiptSelector.byId(replacement.Id);
-				Assert.areEqual(
-					ReceiptService.STATUS_VOID,
-					voided.Status__c,
-					'The original is void.'
-				);
+				Assert.areEqual(ReceiptService.STATUS_VOID, voided.Status__c, 'The original is void.');
 				Assert.areEqual(
 					'Amount was keyed wrongly',
 					voided.Void_Reason__c,
 					'The void still carries the reason after the reissue.'
 				);
-				Assert.areEqual(
-					ReceiptService.STATUS_ISSUED,
-					reissued.Status__c,
-					'The replacement is issued.'
-				);
-				Assert.areEqual(
-					replacement.Id,
-					voided.Replaced_By__c,
-					'The original names its replacement.'
-				);
-				Assert.areEqual(
-					original.Id,
-					reissued.Replaces__c,
-					'The replacement names what it replaces.'
-				);
+				Assert.areEqual(ReceiptService.STATUS_ISSUED, reissued.Status__c, 'The replacement is issued.');
+				Assert.areEqual(replacement.Id, voided.Replaced_By__c, 'The original names its replacement.');
+				Assert.areEqual(original.Id, reissued.Replaces__c, 'The replacement names what it replaces.');
 				Assert.areEqual(
 					replacement.Receipt_Number__c,
 					[SELECT Receipt_Number__c FROM Gift__c WHERE Id = :gift.Id].Receipt_Number__c,
@@ -162,16 +115,8 @@ private class ReceiptVoidReissueTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Contact donor = GivingTestDataFactory.insertHouseholdContact(
-					'The Novak Family',
-					'Petra',
-					'Novak'
-				);
-				Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-					donor.Id,
-					120,
-					Date.newInstance(2026, 2, 2)
-				);
+				Contact donor = GivingTestDataFactory.insertHouseholdContact('The Novak Family', 'Petra', 'Novak');
+				Gift__c gift = ReceiptTestDataFactory.plainCashGift(donor.Id, 120, Date.newInstance(2026, 2, 2));
 				insert gift;
 				ReceiptService.issueForGift(gift.Id);
 

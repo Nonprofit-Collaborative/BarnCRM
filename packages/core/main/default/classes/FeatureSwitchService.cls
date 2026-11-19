@@ -279,11 +279,7 @@ public with sharing class FeatureSwitchService {
 	 * a household for the same person.
 	 */
 	public static String blockedReason(String key) {
-		if (
-			String.isNotBlank(key) &&
-			key.equalsIgnoreCase(HOUSEHOLD_UPKEEP) &&
-			NpspHouseholdSource.householdsInUse()
-		) {
+		if (String.isNotBlank(key) && key.equalsIgnoreCase(HOUSEHOLD_UPKEEP) && NpspHouseholdSource.householdsInUse()) {
 			return BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_NpspBlocked');
 		}
 		return null;
@@ -305,9 +301,7 @@ public with sharing class FeatureSwitchService {
 		for (String key : keys) {
 			Item feature = item(key);
 			if (feature == null) {
-				throw new FeatureSwitchException(
-					BarnHelp.text('Core', 'Core_Feature_UnknownKeyError')
-				);
+				throw new FeatureSwitchException(BarnHelp.text('Core', 'Core_Feature_UnknownKeyError'));
 			}
 			String lower = feature.key.toLowerCase();
 			if (!current.contains(lower) && !newKeys.contains(lower)) {
@@ -369,9 +363,7 @@ public with sharing class FeatureSwitchService {
 	public static void fillBlankList(Boolean isNewInstall) {
 		if (String.isBlank(SettingsService.getSettings().Features_Turned_On__c)) {
 			SettingsService.saveBookkeeping(
-				new Map<String, Object>{
-					ON_KEY => isNewInstall ? NONE_ON : String.join(allKeys(), ',')
-				}
+				new Map<String, Object>{ ON_KEY => isNewInstall ? NONE_ON : String.join(allKeys(), ',') }
 			);
 		}
 	}

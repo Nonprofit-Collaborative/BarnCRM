@@ -42,11 +42,7 @@ global with sharing class RollupApi {
 	 * @param oldRecords the same records before an update, by Id, or null for new records
 	 * @param deleting true when the records are being deleted
 	 */
-	global static void recalculateChanges(
-		List<SObject> records,
-		Map<Id, SObject> oldRecords,
-		Boolean deleting
-	) {
+	global static void recalculateChanges(List<SObject> records, Map<Id, SObject> oldRecords, Boolean deleting) {
 		Map<Schema.SObjectType, List<SObject>> recordsByType = new Map<Schema.SObjectType, List<SObject>>();
 		for (SObject record : records == null ? new List<SObject>() : records) {
 			if (record == null) {

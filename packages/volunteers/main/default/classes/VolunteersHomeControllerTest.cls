@@ -9,9 +9,7 @@ private class VolunteersHomeControllerTest {
 		TestUsers.adminWith(VolunteersTestData.ADMIN);
 	}
 
-	private static Map<String, VolunteersHomeController.Tile> byName(
-		List<VolunteersHomeController.Tile> tiles
-	) {
+	private static Map<String, VolunteersHomeController.Tile> byName(List<VolunteersHomeController.Tile> tiles) {
 		Map<String, VolunteersHomeController.Tile> found = new Map<String, VolunteersHomeController.Tile>();
 		for (VolunteersHomeController.Tile tile : tiles) {
 			found.put(tile.name, tile);
@@ -37,18 +35,11 @@ private class VolunteersHomeControllerTest {
 			insert waiting;
 
 			Test.startTest();
-			Map<String, VolunteersHomeController.Tile> tiles = byName(
-				VolunteersHomeController.getHome()
-			);
+			Map<String, VolunteersHomeController.Tile> tiles = byName(VolunteersHomeController.getHome());
 			Test.stopTest();
 
 			Assert.areEqual(
-				new Set<String>{
-					'hoursThisMonth',
-					'hoursValueThisMonth',
-					'hoursToApprove',
-					'shiftsNeedingPeople'
-				},
+				new Set<String>{ 'hoursThisMonth', 'hoursValueThisMonth', 'hoursToApprove', 'shiftsNeedingPeople' },
 				tiles.keySet(),
 				'An administrator reads every figure.'
 			);
@@ -77,10 +68,7 @@ private class VolunteersHomeControllerTest {
 
 	@IsTest
 	static void someoneWithoutVolunteersAccessSeesNoFigures() {
-		User outsider = TestUsers.standardUserWith(
-			'HomeOutsider',
-			new List<String>{ VolunteersTestData.CORE_STAFF }
-		);
+		User outsider = TestUsers.standardUserWith('HomeOutsider', new List<String>{ VolunteersTestData.CORE_STAFF });
 		List<VolunteersHomeController.Tile> tiles;
 		Test.startTest();
 		System.runAs(outsider) {

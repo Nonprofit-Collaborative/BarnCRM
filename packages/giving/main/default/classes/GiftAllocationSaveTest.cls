@@ -4,9 +4,7 @@
  * the split gift that is refused and the allocation that already holds the new amount, so the
  * allocation handlers can share what the gift save already read (D-143).
  */
-@IsTest(
-	testFor='ApexClass:GiftService, ApexClass:GiftAllocationTriggerHandler, ApexClass:GiftPostingLock'
-)
+@IsTest(testFor='ApexClass:GiftService, ApexClass:GiftAllocationTriggerHandler, ApexClass:GiftPostingLock')
 private class GiftAllocationSaveTest {
 	@TestSetup
 	static void makeData() {
@@ -98,10 +96,7 @@ private class GiftAllocationSaveTest {
 			};
 
 			Test.startTest();
-			Database.SaveResult result = Database.update(
-				new Gift__c(Id = gift.Id, Amount__c = 120),
-				false
-			);
+			Database.SaveResult result = Database.update(new Gift__c(Id = gift.Id, Amount__c = 120), false);
 			Test.stopTest();
 
 			Assert.isFalse(result.isSuccess(), 'The package cannot know which fund changed.');
@@ -118,8 +113,7 @@ private class GiftAllocationSaveTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Gift__c gift = gifts(1, 100)[0];
 			insert gift;
-			Gift_Allocation__c allocation = allocationsOf(new List<Gift__c>{ gift })
-				.get(gift.Id)[0];
+			Gift_Allocation__c allocation = allocationsOf(new List<Gift__c>{ gift }).get(gift.Id)[0];
 
 			Test.startTest();
 			update new Gift__c(Id = gift.Id, Amount__c = 80);

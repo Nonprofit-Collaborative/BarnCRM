@@ -61,10 +61,7 @@ private class NightlyJobsControllerTest {
 			twoSteps();
 
 			Test.startTest();
-			NightlyJobsController.PanelView afterOff = NightlyJobsController.setStep(
-				STEP_KEY,
-				false
-			);
+			NightlyJobsController.PanelView afterOff = NightlyJobsController.setStep(STEP_KEY, false);
 			NightlyJobsController.PanelView afterOn = NightlyJobsController.setStep(STEP_KEY, true);
 			NightlyJobsController.runStep(STEP_KEY);
 			Test.stopTest();
@@ -122,9 +119,7 @@ private class NightlyJobsControllerTest {
 	static void thePanelListsEachStepWithItsTimeSwitchAndLastResult() {
 		System.runAs(TestUsers.admin()) {
 			NightlyJobs.overrideStepsForTest(
-				new List<NightlyStep>{
-					new NightlyStep(STEP_KEY, 'Panel step', 2, 45, new NoWork()).withSwitch(false)
-				}
+				new List<NightlyStep>{ new NightlyStep(STEP_KEY, 'Panel step', 2, 45, new NoWork()).withSwitch(false) }
 			);
 			Nightly_Job__c row = NightlyJobs.rowFor(STEP_KEY);
 			row.Last_Started__c = Datetime.now().addHours(-3);
@@ -174,11 +169,7 @@ private class NightlyJobsControllerTest {
 			Assert.areEqual('done', NightlyJobsController.outcomeStatus('Done'), 'Done');
 			Assert.areEqual('failed', NightlyJobsController.outcomeStatus('Failed'), 'Failed');
 			Assert.areEqual('skipped', NightlyJobsController.outcomeStatus('Skipped'), 'Skipped');
-			Assert.areEqual(
-				'in-progress',
-				NightlyJobsController.outcomeStatus('Running'),
-				'Running'
-			);
+			Assert.areEqual('in-progress', NightlyJobsController.outcomeStatus('Running'), 'Running');
 			Assert.areEqual(
 				'attention',
 				NightlyJobsController.outcomeStatus('Done With Errors'),

@@ -95,8 +95,7 @@ public without sharing class ContactPointSyncService {
 		if (individualLinkExists == null) {
 			individualLinkExists =
 				describedType(INDIVIDUAL) != null &&
-				Schema.SObjectType.Contact.fields.getMap()
-					.containsKey(INDIVIDUAL_LINK.toLowerCase());
+				Schema.SObjectType.Contact.fields.getMap().containsKey(INDIVIDUAL_LINK.toLowerCase());
 		}
 		return individualLinkExists;
 	}
@@ -194,10 +193,7 @@ public without sharing class ContactPointSyncService {
 		groupByKindsLeft(personIds, null, KINDS_SYNCED_HERE, peopleByKinds, kindsByKey);
 		for (String key : peopleByKinds.keySet()) {
 			Set<String> kinds = kindsByKey.get(key);
-			syncOrQueue(
-				peopleByKinds.get(key),
-				kinds.size() == OBJECT_BY_KIND.size() ? null : kinds
-			);
+			syncOrQueue(peopleByKinds.get(key), kinds.size() == OBJECT_BY_KIND.size() ? null : kinds);
 		}
 	}
 
@@ -305,16 +301,10 @@ public without sharing class ContactPointSyncService {
 			Set<Id> people = peopleByKinds.get(key);
 			Set<String> kinds = kindsByKey.get(key);
 			try {
-				System.enqueueJob(
-					new Job(people, kinds.size() == OBJECT_BY_KIND.size() ? null : kinds)
-				);
+				System.enqueueJob(new Job(people, kinds.size() == OBJECT_BY_KIND.size() ? null : kinds));
 			} catch (Exception notQueued) {
 				ErrorLogger.logMessage(
-					BarnHelp.text(
-						'ContactPoints',
-						'ContactPoints_Log_NotQueued',
-						new List<Object>{ people.size() }
-					),
+					BarnHelp.text('ContactPoints', 'ContactPoints_Log_NotQueued', new List<Object>{ people.size() }),
 					CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -500,8 +490,7 @@ public without sharing class ContactPointSyncService {
 	}
 
 	private static Boolean hasEmailOrPhone(Contact person, Set<String> valueKinds) {
-		return !valueKinds.isEmpty() &&
-			ContactPointPlan.hasEmailOrPhone(person.getPopulatedFieldsAsMap(), valueKinds);
+		return !valueKinds.isEmpty() && ContactPointPlan.hasEmailOrPhone(person.getPopulatedFieldsAsMap(), valueKinds);
 	}
 
 	/**
@@ -522,11 +511,7 @@ public without sharing class ContactPointSyncService {
 			record.put('LastName', String.isBlank(lastName) ? '-' : lastName);
 			individuals.add(record);
 		}
-		List<Database.SaveResult> saved = Database.insert(
-			individuals,
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.SaveResult> saved = Database.insert(individuals, false, AccessLevel.SYSTEM_MODE);
 		List<SObject> links = new List<SObject>();
 		List<SObject> linkedPeople = new List<SObject>();
 		List<String> problems = new List<String>();
@@ -546,11 +531,7 @@ public without sharing class ContactPointSyncService {
 			}
 		}
 		if (!links.isEmpty()) {
-			List<Database.SaveResult> linked = Database.update(
-				links,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
+			List<Database.SaveResult> linked = Database.update(links, false, AccessLevel.SYSTEM_MODE);
 			for (Integer i = 0; i < linked.size(); i++) {
 				if (!linked[i].isSuccess()) {
 					problems.add(refusal('Individual', links[i].Id, linked[i].getErrors()));
@@ -665,11 +646,7 @@ public without sharing class ContactPointSyncService {
 			}
 			Set<Id> askedAbout = new Set<Id>();
 			for (Id personId : personIds) {
-				askedAbout.add(
-					accountByContact.containsKey(personId)
-						? accountByContact.get(personId)
-						: personId
-				);
+				askedAbout.add(accountByContact.containsKey(personId) ? accountByContact.get(personId) : personId);
 			}
 			Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(askedAbout);
 			Set<Id> householdIds = new Set<Id>(householdByPerson.values());
@@ -684,11 +661,7 @@ public without sharing class ContactPointSyncService {
 					}
 					peopleByHousehold
 						.get(householdId)
-						.add(
-							contactByAccount.containsKey(askedId)
-								? contactByAccount.get(askedId)
-								: askedId
-						);
+						.add(contactByAccount.containsKey(askedId) ? contactByAccount.get(askedId) : askedId);
 				}
 			}
 			Map<Id, List<Map<String, Object>>> result = new Map<Id, List<Map<String, Object>>>();
@@ -764,9 +737,7 @@ public without sharing class ContactPointSyncService {
 				result.get(link.Contact__c).add(link);
 				if (
 					link.Contact_Point_Id__c != null &&
-					wantedKeys.contains(
-						link.Contact__c + '|' + ContactPointPlan.keyOf(link.Kind__c, link.Source__c)
-					)
+					wantedKeys.contains(link.Contact__c + '|' + ContactPointPlan.keyOf(link.Kind__c, link.Source__c))
 				) {
 					if (!copyIdsByKind.containsKey(link.Kind__c)) {
 						copyIdsByKind.put(link.Kind__c, new Set<Id>());
@@ -776,9 +747,7 @@ public without sharing class ContactPointSyncService {
 			}
 			for (String kind : copyIdsByKind.keySet()) {
 				Set<Id> ids = copyIdsByKind.get(kind);
-				existing.putAll(
-					Database.query(selectOf(kind, ' WHERE Id IN :ids'), AccessLevel.SYSTEM_MODE)
-				);
+				existing.putAll(Database.query(selectOf(kind, ' WHERE Id IN :ids'), AccessLevel.SYSTEM_MODE));
 			}
 			return result;
 		}
@@ -866,9 +835,7 @@ public without sharing class ContactPointSyncService {
 			}
 			for (ContactPointPlan.Desired wanted : wantedByPerson.get(person.Id)) {
 				List<Contact_Point_Link__c> sameKey = linksByKey.get(wanted.key());
-				Contact_Point_Link__c link = sameKey == null || sameKey.isEmpty()
-					? null
-					: sameKey.remove(0);
+				Contact_Point_Link__c link = sameKey == null || sameKey.isEmpty() ? null : sameKey.remove(0);
 				if (parentId == null) {
 					// No Individual to hang a copy from: leave what is there.
 					continue;
@@ -899,12 +866,7 @@ public without sharing class ContactPointSyncService {
 			return false;
 		}
 
-		private void planOne(
-			Id personId,
-			Id parentId,
-			ContactPointPlan.Desired wanted,
-			Contact_Point_Link__c link
-		) {
+		private void planOne(Id personId, Id parentId, ContactPointPlan.Desired wanted, Contact_Point_Link__c link) {
 			SObject current = link == null ||
 				link.Contact_Point_Id__c == null
 				? null
@@ -932,10 +894,7 @@ public without sharing class ContactPointSyncService {
 				linksForCreated.add(link);
 				return;
 			}
-			Set<String> changed = ContactPointPlan.differences(
-				writable(wanted),
-				current.getPopulatedFieldsAsMap()
-			);
+			Set<String> changed = ContactPointPlan.differences(writable(wanted), current.getPopulatedFieldsAsMap());
 			if (!changed.isEmpty()) {
 				SObject changes = typeOf(wanted.kind).newSObject(current.Id);
 				putValues(changes, wanted, changed);
@@ -957,11 +916,7 @@ public without sharing class ContactPointSyncService {
 				// Sorted, so the IDs of each object come together (at most ten runs a save).
 				List<Id> deleteIds = new List<Id>(toDelete);
 				deleteIds.sort();
-				List<Database.DeleteResult> deleted = Database.delete(
-					deleteIds,
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
+				List<Database.DeleteResult> deleted = Database.delete(deleteIds, false, AccessLevel.SYSTEM_MODE);
 				for (Database.DeleteResult outcome : deleted) {
 					if (outcome.isSuccess()) {
 						result.deleted += 1;
@@ -973,11 +928,7 @@ public without sharing class ContactPointSyncService {
 			options.optAllOrNone = false;
 			options.allowFieldTruncation = true;
 			if (!toCreate.isEmpty()) {
-				List<Database.SaveResult> saved = Database.insert(
-					toCreate,
-					options,
-					AccessLevel.SYSTEM_MODE
-				);
+				List<Database.SaveResult> saved = Database.insert(toCreate, options, AccessLevel.SYSTEM_MODE);
 				for (Integer i = 0; i < saved.size(); i++) {
 					Contact_Point_Link__c link = linksForCreated[i];
 					if (saved[i].isSuccess()) {
@@ -991,19 +942,13 @@ public without sharing class ContactPointSyncService {
 				}
 			}
 			if (!toUpdate.isEmpty()) {
-				List<Database.SaveResult> saved = Database.update(
-					toUpdate,
-					options,
-					AccessLevel.SYSTEM_MODE
-				);
+				List<Database.SaveResult> saved = Database.update(toUpdate, options, AccessLevel.SYSTEM_MODE);
 				for (Integer i = 0; i < saved.size(); i++) {
 					if (saved[i].isSuccess()) {
 						result.updated += 1;
 					} else {
 						result.failed += 1;
-						problems.add(
-							refusal('Contact Point', toUpdate[i].Id, saved[i].getErrors())
-						);
+						problems.add(refusal('Contact Point', toUpdate[i].Id, saved[i].getErrors()));
 					}
 				}
 			}
@@ -1042,20 +987,10 @@ public without sharing class ContactPointSyncService {
 
 		private void saveLinks() {
 			if (!linksToSave.isEmpty()) {
-				List<Database.UpsertResult> saved = Database.upsert(
-					linksToSave,
-					false,
-					AccessLevel.SYSTEM_MODE
-				);
+				List<Database.UpsertResult> saved = Database.upsert(linksToSave, false, AccessLevel.SYSTEM_MODE);
 				for (Integer i = 0; i < saved.size(); i++) {
 					if (!saved[i].isSuccess()) {
-						problems.add(
-							refusal(
-								'Contact Point Link',
-								linksToSave[i].Contact__c,
-								saved[i].getErrors()
-							)
-						);
+						problems.add(refusal('Contact Point Link', linksToSave[i].Contact__c, saved[i].getErrors()));
 					}
 				}
 			}
@@ -1144,9 +1079,7 @@ public without sharing class ContactPointSyncService {
 			return result;
 		}
 		Map<String, Integer> linksByKey = new Map<String, Integer>();
-		for (
-			Contact_Point_Link__c link : links == null ? new List<Contact_Point_Link__c>() : links
-		) {
+		for (Contact_Point_Link__c link : links == null ? new List<Contact_Point_Link__c>() : links) {
 			String key = ContactPointPlan.keyOf(link.Kind__c, link.Source__c);
 			Integer count = linksByKey.get(key);
 			linksByKey.put(key, count == null ? 1 : count + 1);
@@ -1193,9 +1126,7 @@ public without sharing class ContactPointSyncService {
 		Map<String, Object> result = new Map<String, Object>();
 		Set<String> fields = cachedWritable(wanted.kind);
 		for (String field : wanted.values.keySet()) {
-			if (
-				fields.contains(field) && allowedValue(wanted.kind, field, wanted.values.get(field))
-			) {
+			if (fields.contains(field) && allowedValue(wanted.kind, field, wanted.values.get(field))) {
 				result.put(field, wanted.values.get(field));
 			}
 		}
@@ -1228,11 +1159,7 @@ public without sharing class ContactPointSyncService {
 		return picklistByField.get(key).contains(String.valueOf(value));
 	}
 
-	private static void putValues(
-		SObject target,
-		ContactPointPlan.Desired wanted,
-		Set<String> only
-	) {
+	private static void putValues(SObject target, ContactPointPlan.Desired wanted, Set<String> only) {
 		Map<String, Object> values = writable(wanted);
 		for (String field : values.keySet()) {
 			if (only.contains(field)) {

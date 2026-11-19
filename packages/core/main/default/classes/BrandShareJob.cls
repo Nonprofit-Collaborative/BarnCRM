@@ -105,9 +105,7 @@ public with sharing class BrandShareJob implements Queueable {
 				Id floor = cursor != null
 					? cursor
 					: Id.valueOf(
-							Brand_Assignment__c.SObjectType.getDescribe(
-									SObjectDescribeOptions.DEFERRED
-								)
+							Brand_Assignment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 								.getKeyPrefix() + '000000000000'
 					  );
 				for (Brand_Assignment__c row : [
@@ -193,9 +191,7 @@ public with sharing class BrandShareJob implements Queueable {
 			for (Id userId : members.get(brandId)) {
 				String key = '' + groups.get(brandId) + userId;
 				if (existing.remove(key) == null) {
-					added.add(
-						new GroupMember(GroupId = groups.get(brandId), UserOrGroupId = userId)
-					);
+					added.add(new GroupMember(GroupId = groups.get(brandId), UserOrGroupId = userId));
 				}
 			}
 		}
@@ -238,10 +234,7 @@ public with sharing class BrandShareJob implements Queueable {
 		for (AccountShare share : [
 			SELECT Id, AccountId, UserOrGroupId
 			FROM AccountShare
-			WHERE
-				AccountId IN :accountIds
-				AND UserOrGroupId IN :groups.values()
-				AND RowCause = 'Manual'
+			WHERE AccountId IN :accountIds AND UserOrGroupId IN :groups.values() AND RowCause = 'Manual'
 			WITH SYSTEM_MODE
 		]) {
 			if (!wanted.remove('' + share.AccountId + share.UserOrGroupId)) {
@@ -286,10 +279,7 @@ public with sharing class BrandShareJob implements Queueable {
 			WITH SYSTEM_MODE
 		]) {
 			try {
-				groups.put(
-					Id.valueOf(brandGroup.DeveloperName.removeStart(GROUP_PREFIX)),
-					brandGroup.Id
-				);
+				groups.put(Id.valueOf(brandGroup.DeveloperName.removeStart(GROUP_PREFIX)), brandGroup.Id);
 			} catch (StringException notOurs) {
 				continue;
 			}

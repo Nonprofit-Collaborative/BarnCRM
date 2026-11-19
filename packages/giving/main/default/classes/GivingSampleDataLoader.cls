@@ -122,10 +122,7 @@ public with sharing class GivingSampleDataLoader {
 		return idsByKey;
 	}
 
-	private static Map<String, Id> insertCommitments(
-		GivingSampleDataSet data,
-		Map<String, Id> referenceIdsByKey
-	) {
+	private static Map<String, Id> insertCommitments(GivingSampleDataSet data, Map<String, Id> referenceIdsByKey) {
 		GivingSampleDataSelector selector = new GivingSampleDataSelector();
 		Map<String, Id> peopleByKey = selector.samplePeopleByKey();
 		Map<String, Id> accountsByKey = selector.sampleAccountsByKey();
@@ -149,17 +146,13 @@ public with sharing class GivingSampleDataLoader {
 					Frequency__c = GivingSampleDataSet.asString(row.get('frequency')),
 					Amount__c = GivingSampleDataSet.toDecimal(row.get('amount')),
 					Expected_Total__c = GivingSampleDataSet.toDecimal(row.get('expectedTotal')),
-					Installments_Planned__c = GivingSampleDataSet.toDecimal(
-						row.get('installmentsPlanned')
-					),
+					Installments_Planned__c = GivingSampleDataSet.toDecimal(row.get('installmentsPlanned')),
 					Start_Date__c = GivingSampleDataSet.dateFor(row.get('startDaysAgo')),
 					End_Date__c = GivingSampleDataSet.dateFor(row.get('endDaysAgo')),
 					Day_of_Month__c = GivingSampleDataSet.toDecimal(row.get('dayOfMonth')),
 					Status__c = GivingSampleDataSet.asString(row.get('status')),
 					Fund__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('fund'))),
-					Appeal__c = referenceIdsByKey.get(
-						GivingSampleDataSet.asString(row.get('appeal'))
-					)
+					Appeal__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('appeal')))
 				)
 			);
 		}
@@ -194,10 +187,7 @@ public with sharing class GivingSampleDataLoader {
 					Sample_Data__c = true,
 					Donor_Contact__c = donorContact,
 					Donor_Account__c = donorAccount,
-					Stage__c = AskRules.matchStage(
-						GivingSampleDataSet.asString(row.get('stage')),
-						stages
-					),
+					Stage__c = AskRules.matchStage(GivingSampleDataSet.asString(row.get('stage')), stages),
 					Outcome__c = GivingSampleDataSet.asString(row.get('outcome')),
 					Amount__c = GivingSampleDataSet.toDecimal(row.get('amount')),
 					Target_Date__c = GivingSampleDataSet.dateFor(row.get('targetDaysAgo')),
@@ -206,12 +196,8 @@ public with sharing class GivingSampleDataLoader {
 					Next_Ask_Date__c = GivingSampleDataSet.dateFor(row.get('nextAskDaysAgo')),
 					Next_Step__c = GivingSampleDataSet.asString(row.get('nextStep')),
 					Fund__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('fund'))),
-					Appeal__c = referenceIdsByKey.get(
-						GivingSampleDataSet.asString(row.get('appeal'))
-					),
-					Commitment__c = referenceIdsByKey.get(
-						GivingSampleDataSet.asString(row.get('commitment'))
-					)
+					Appeal__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('appeal'))),
+					Commitment__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('commitment')))
 				)
 			);
 		}
@@ -267,13 +253,7 @@ public with sharing class GivingSampleDataLoader {
 			Map<String, Id> originalIdsByKey = originalsFor(reversals, selector);
 			originalIdsByKey.putAll(giftIdsByKey);
 			giftIdsByKey.putAll(
-				insertGifts(
-					reversals,
-					peopleByKey,
-					accountsByKey,
-					referenceIdsByKey,
-					originalIdsByKey
-				)
+				insertGifts(reversals, peopleByKey, accountsByKey, referenceIdsByKey, originalIdsByKey)
 			);
 		}
 		if (giftIdsByKey.isEmpty()) {
@@ -313,9 +293,7 @@ public with sharing class GivingSampleDataLoader {
 				continue;
 			}
 			keys.add(GivingSampleDataSet.asString(row.get('key')));
-			gifts.add(
-				buildGift(row, donorContact, donorAccount, referenceIdsByKey, originalsByKey)
-			);
+			gifts.add(buildGift(row, donorContact, donorAccount, referenceIdsByKey, originalsByKey));
 		}
 		if (gifts.isEmpty()) {
 			return new Map<String, Id>();
@@ -341,8 +319,7 @@ public with sharing class GivingSampleDataLoader {
 		String acknowledgment = GivingSampleDataSet.asString(row.get('acknowledgmentStatus'));
 		Gift__c gift = new Gift__c(
 			Sample_Data__c = true,
-			External_Id__c = GivingSampleData.EXTERNAL_ID_PREFIX +
-				GivingSampleDataSet.asString(row.get('key')),
+			External_Id__c = GivingSampleData.EXTERNAL_ID_PREFIX + GivingSampleDataSet.asString(row.get('key')),
 			Donor_Contact__c = donorContact,
 			Donor_Account__c = donorAccount,
 			Gift_Date__c = giftDate,
@@ -352,18 +329,12 @@ public with sharing class GivingSampleDataLoader {
 			Acknowledgment_Status__c = acknowledgment,
 			Payment_Reference__c = GivingSampleDataSet.asString(row.get('paymentReference')),
 			Appeal__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('appeal'))),
-			Commitment__c = referenceIdsByKey.get(
-				GivingSampleDataSet.asString(row.get('commitment'))
-			),
+			Commitment__c = referenceIdsByKey.get(GivingSampleDataSet.asString(row.get('commitment'))),
 			In_Kind_Description__c = GivingSampleDataSet.asString(row.get('inKindDescription')),
 			Fair_Market_Value__c = GivingSampleDataSet.toDecimal(row.get('fairMarketValue')),
 			Refund_Reason__c = GivingSampleDataSet.asString(row.get('refundReason')),
-			Original_Gift__c = originalsByKey.get(
-				GivingSampleDataSet.asString(row.get('originalGift'))
-			),
-			Matched_Gift__c = originalsByKey.get(
-				GivingSampleDataSet.asString(row.get('matchedGift'))
-			),
+			Original_Gift__c = originalsByKey.get(GivingSampleDataSet.asString(row.get('originalGift'))),
+			Matched_Gift__c = originalsByKey.get(GivingSampleDataSet.asString(row.get('matchedGift'))),
 			Stock_Symbol__c = GivingSampleDataSet.asString(row.get('stockSymbol')),
 			Stock_Shares__c = GivingSampleDataSet.toDecimal(row.get('stockShares')),
 			Gift_Source__c = GivingSampleDataSet.asString(row.get('giftSource')),
@@ -382,10 +353,7 @@ public with sharing class GivingSampleDataLoader {
 	 * how many gifts the file happens to hold, so the originals already inserted are looked up
 	 * rather than assumed.
 	 */
-	private static Map<String, Id> originalsFor(
-		List<Map<String, Object>> chunk,
-		GivingSampleDataSelector selector
-	) {
+	private static Map<String, Id> originalsFor(List<Map<String, Object>> chunk, GivingSampleDataSelector selector) {
 		Set<String> externalIds = new Set<String>();
 		for (Map<String, Object> row : chunk) {
 			for (String link : new List<String>{ 'originalGift', 'matchedGift' }) {
@@ -401,10 +369,7 @@ public with sharing class GivingSampleDataLoader {
 		}
 		Map<String, Id> byExternalId = selector.giftIdsByExternalId(externalIds);
 		for (String externalId : byExternalId.keySet()) {
-			byKey.put(
-				externalId.removeStart(GivingSampleData.EXTERNAL_ID_PREFIX),
-				byExternalId.get(externalId)
-			);
+			byKey.put(externalId.removeStart(GivingSampleData.EXTERNAL_ID_PREFIX), byExternalId.get(externalId));
 		}
 		return byKey;
 	}
@@ -421,9 +386,7 @@ public with sharing class GivingSampleDataLoader {
 				continue;
 			}
 			for (Map<String, Object> allocation : GivingSampleDataSet.allocationsOf(row)) {
-				Id fundId = referenceIdsByKey.get(
-					GivingSampleDataSet.asString(allocation.get('fund'))
-				);
+				Id fundId = referenceIdsByKey.get(GivingSampleDataSet.asString(allocation.get('fund')));
 				if (fundId == null) {
 					continue;
 				}
@@ -487,9 +450,7 @@ public with sharing class GivingSampleDataLoader {
 				new Tribute__c(
 					Gift__c = giftId,
 					Type__c = GivingSampleDataSet.asString(row.get('type')),
-					Honoree_Contact__c = peopleByKey.get(
-						GivingSampleDataSet.asString(row.get('honoreePerson'))
-					),
+					Honoree_Contact__c = peopleByKey.get(GivingSampleDataSet.asString(row.get('honoreePerson'))),
 					Honoree_Name__c = GivingSampleDataSet.asString(row.get('honoreeName')),
 					Notification_Recipient_Contact__c = peopleByKey.get(
 						GivingSampleDataSet.asString(row.get('recipientPerson'))

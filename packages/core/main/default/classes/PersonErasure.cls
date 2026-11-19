@@ -63,15 +63,8 @@ public with sharing class PersonErasure {
 	};
 
 	/** Checkboxes set rather than reset, so no mailing reaches an erased record. */
-	private static final Set<String> SET_FLAGS = new Set<String>{
-		'donotcall',
-		'persondonotcall',
-		'shouldforget'
-	};
-	private static final List<String> SET_FLAG_PREFIXES = new List<String>{
-		'hasoptedout',
-		'personhasoptedout'
-	};
+	private static final Set<String> SET_FLAGS = new Set<String>{ 'donotcall', 'persondonotcall', 'shouldforget' };
+	private static final List<String> SET_FLAG_PREFIXES = new List<String>{ 'hasoptedout', 'personhasoptedout' };
 
 	/** Address upkeep stood down while the erasure empties addresses itself. */
 	private static final List<String> ADDRESS_AUTOMATIONS = new List<String>{
@@ -207,17 +200,10 @@ public with sharing class PersonErasure {
 			result = run(person);
 			Erasure__c audit = new Erasure__c(
 				Erased_Record_Id__c = String.valueOf(personId),
-				Request_Reference__c = String.isBlank(requestReference)
-					? null
-					: requestReference.trim().left(80),
+				Request_Reference__c = String.isBlank(requestReference) ? null : requestReference.trim().left(80),
 				Details__c = details(result.changes).left(131072)
 			);
-			audit.put(
-				personId.getSObjectType() == Contact.SObjectType
-					? 'Contact__c'
-					: 'Person_Account__c',
-				personId
-			);
+			audit.put(personId.getSObjectType() == Contact.SObjectType ? 'Contact__c' : 'Person_Account__c', personId);
 			// Bookkeeping the person erasing may not edit (R-ER5, ADR-0021).
 			insert as system audit;
 			result.erasureId = audit.Id;
@@ -240,10 +226,7 @@ public with sharing class PersonErasure {
 			throw new ErasureException(BarnHelp.text('Core', 'Core_Erase_NotAPerson'));
 		}
 		List<SObject> found = readAll(type, new Set<Id>{ personId });
-		if (
-			found.isEmpty() ||
-			(type == Account.SObjectType && !PersonRecordSelector.isPersonRecord(found[0]))
-		) {
+		if (found.isEmpty() || (type == Account.SObjectType && !PersonRecordSelector.isPersonRecord(found[0]))) {
 			throw new ErasureException(BarnHelp.text('Core', 'Core_Erase_NotAPerson'));
 		}
 		String id18 = String.valueOf(personId);
@@ -286,13 +269,8 @@ public with sharing class PersonErasure {
 
 		// What will change, read before anything does.
 		String side = type == Contact.SObjectType ? 'Contact__c' : 'Person_Account__c';
-		String related = type == Contact.SObjectType
-			? 'Related_Contact__c'
-			: 'Related_Person_Account__c';
-		List<SObject> addresses = rows(
-			'SELECT Id FROM Address__c WHERE ' + side + ' IN :ids',
-			people
-		);
+		String related = type == Contact.SObjectType ? 'Related_Contact__c' : 'Related_Person_Account__c';
+		List<SObject> addresses = rows('SELECT Id FROM Address__c WHERE ' + side + ' IN :ids', people);
 		List<SObject> relationships = rows(
 			'SELECT Id, ' +
 				side +
@@ -334,12 +312,7 @@ public with sharing class PersonErasure {
 		refuseWithout(ids(affiliations), 'HasEditAccess', Affiliation__c.SObjectType, refused);
 		refuseWithout(ids(memberships), 'HasEditAccess', Household_Member__c.SObjectType, refused);
 		if (individual != null) {
-			refuseWithout(
-				new List<Id>{ individual.Id },
-				'HasEditAccess',
-				individual.getSObjectType(),
-				refused
-			);
+			refuseWithout(new List<Id>{ individual.Id }, 'HasEditAccess', individual.getSObjectType(), refused);
 		}
 		if (!refused.isEmpty()) {
 			throw new ErasureException(
@@ -373,9 +346,7 @@ public with sharing class PersonErasure {
 			remove(addresses, Address__c.SObjectType, result);
 			endConnections(relationships, side, people, related, result);
 			endConnections(affiliations, null, people, null, result);
-			List<Household_Member__c> closedMemberships = HouseholdService.endMembershipsFor(
-				people
-			);
+			List<Household_Member__c> closedMemberships = HouseholdService.endMembershipsFor(people);
 			add(
 				result,
 				ENDED,
@@ -426,10 +397,7 @@ public with sharing class PersonErasure {
 		} catch (Exception failed) {
 			ErrorLogger.log(failed, 'PersonErasure.run');
 			throw new ErasureException(
-				String.format(
-					BarnHelp.text('Core', 'Core_Erase_Refused'),
-					new List<String>{ failed.getMessage() }
-				)
+				String.format(BarnHelp.text('Core', 'Core_Erase_Refused'), new List<String>{ failed.getMessage() })
 			);
 		} finally {
 			for (PersonErasureStartExtension starting : started) {
@@ -558,17 +526,11 @@ public with sharing class PersonErasure {
 	 * anonymized too (R-ER3). `before` holds each household's wording as it was before the
 	 * erasure began, so a household with members left is reported with what really changed.
 	 */
-	private static void settleHouseholds(
-		Set<Id> householdIds,
-		Map<Id, Account> before,
-		Result result
-	) {
+	private static void settleHouseholds(Set<Id> householdIds, Map<Id, Account> before, Result result) {
 		if (householdIds.isEmpty()) {
 			return;
 		}
-		Map<Id, SObject> remaining = new Map<Id, SObject>(
-			readAll(Account.SObjectType, householdIds)
-		);
+		Map<Id, SObject> remaining = new Map<Id, SObject>(readAll(Account.SObjectType, householdIds));
 		Map<Id, Set<Id>> members = HouseholdService.getMemberPersonIds(remaining.keySet());
 		Id householdType = HouseholdService.householdRecordTypeId();
 		List<Id> gone = new List<Id>();
@@ -582,11 +544,7 @@ public with sharing class PersonErasure {
 			} else if (members.containsKey(householdId) && !members.get(householdId).isEmpty()) {
 				shared.add(householdId);
 			} else {
-				Clearing anonymous = plan(
-					household,
-					new Set<Schema.SObjectField>(),
-					Label.Core_Erase_HouseholdName
-				);
+				Clearing anonymous = plan(household, new Set<Schema.SObjectField>(), Label.Core_Erase_HouseholdName);
 				anonymous.record.put(Account.Custom_Name__c, true);
 				// The package keeps the greetings from plan(), so they are emptied, and
 				// listed, here: an emptied household keeps its last ones (R-H4).
@@ -603,10 +561,7 @@ public with sharing class PersonErasure {
 				}
 				refuseBlocked(anonymous);
 				remove(
-					rows(
-						'SELECT Id FROM Address__c WHERE Account__c IN :ids',
-						new Set<Id>{ householdId }
-					),
+					rows('SELECT Id FROM Address__c WHERE Account__c IN :ids', new Set<Id>{ householdId }),
 					Address__c.SObjectType,
 					result
 				);
@@ -643,10 +598,7 @@ public with sharing class PersonErasure {
 		Set<Id> natives = HouseholdSelector.nativeHouseholdAccountsAmong(shared);
 		List<Account> released = new List<Account>();
 		for (Id householdId : householdIds) {
-			if (
-				!natives.contains(householdId) &&
-				remaining.get(householdId).get('Custom_Name__c') == true
-			) {
+			if (!natives.contains(householdId) && remaining.get(householdId).get('Custom_Name__c') == true) {
 				released.add(new Account(Id = householdId, Custom_Name__c = false));
 			}
 		}
@@ -734,10 +686,7 @@ public with sharing class PersonErasure {
 			new Map<String, Object>{ 'recordId' => recordId },
 			AccessLevel.SYSTEM_MODE
 		);
-		String historyLabel = String.format(
-			Label.Core_Erase_HistoryOf,
-			new List<String>{ described.getLabel() }
-		);
+		String historyLabel = String.format(Label.Core_Erase_HistoryOf, new List<String>{ described.getLabel() });
 		if (history.getDescribe(SObjectDescribeOptions.DEFERRED).isDeletable()) {
 			String key = historyName + '.' + parentField;
 			if (!historyToDelete.containsKey(key)) {
@@ -745,21 +694,11 @@ public with sharing class PersonErasure {
 			}
 			historyToDelete.get(key).add(recordId);
 			result.changes.add(
-				new Change(
-					DELETED,
-					historyLabel,
-					howMany,
-					BarnHelp.text('Core', 'Core_Erase_NoteHistoryDeleted')
-				)
+				new Change(DELETED, historyLabel, howMany, BarnHelp.text('Core', 'Core_Erase_NoteHistoryDeleted'))
 			);
 		} else if (howMany > 0) {
 			result.changes.add(
-				new Change(
-					KEPT,
-					historyLabel,
-					howMany,
-					BarnHelp.text('Core', 'Core_Erase_NoteHistoryKept')
-				)
+				new Change(KEPT, historyLabel, howMany, BarnHelp.text('Core', 'Core_Erase_NoteHistoryKept'))
 			);
 		}
 	}
@@ -846,14 +785,7 @@ public with sharing class PersonErasure {
 
 	private static void noteByHand(List<Change> rows, String objectLabel, Integer howMany) {
 		if (howMany > 0) {
-			rows.add(
-				new Change(
-					KEPT,
-					objectLabel,
-					howMany,
-					BarnHelp.text('Core', 'Core_Erase_NoteByHand')
-				)
-			);
+			rows.add(new Change(KEPT, objectLabel, howMany, BarnHelp.text('Core', 'Core_Erase_NoteByHand')));
 		}
 	}
 
@@ -885,15 +817,10 @@ public with sharing class PersonErasure {
 	 * Every field of this record that can be emptied and holds a value, worked out from describe
 	 * (R-ER1). The name, or the surname where the object has one, becomes the placeholder.
 	 */
-	private static Clearing plan(
-		SObject record,
-		Set<Schema.SObjectField> keep,
-		String placeholder
-	) {
+	private static Clearing plan(SObject record, Set<Schema.SObjectField> keep, String placeholder) {
 		Schema.SObjectType type = record.getSObjectType();
 		Map<String, Object> values = record.getPopulatedFieldsAsMap();
-		Map<String, Schema.SObjectField> tokens = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> tokens = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		Clearing result = new Clearing();
 		result.record = type.newSObject(record.Id);
 		Boolean accountIsHousehold = accountIsHousehold(type, values);
@@ -901,18 +828,15 @@ public with sharing class PersonErasure {
 		// A household or other business account may not carry person account fields: the
 		// standard Person ones and the __pc copies of contact fields. A custom Account field
 		// such as Personal_Email__c is not one of them and is still cleared.
-		Boolean businessAccount =
-			type == Account.SObjectType && !PersonRecordSelector.isPersonRecord(record);
+		Boolean businessAccount = type == Account.SObjectType && !PersonRecordSelector.isPersonRecord(record);
 		for (Schema.DescribeFieldResult field : fieldsOf(type).values()) {
 			String name = field.getName().toLowerCase();
-			Boolean personField =
-				(!field.isCustom() && name.startsWith('person')) || name.endsWith('__pc');
+			Boolean personField = (!field.isCustom() && name.startsWith('person')) || name.endsWith('__pc');
 			if (
 				(businessAccount && personField) ||
 				NEVER_CLEARED.contains(name) ||
 				keep.contains(tokens.get(name)) ||
-				(!ERASED_THOUGH_KEPT.contains(name) &&
-				DataProtectedFields.isProtected(type, name)) ||
+				(!ERASED_THOUGH_KEPT.contains(name) && DataProtectedFields.isProtected(type, name)) ||
 				isCompound(field)
 			) {
 				continue;
@@ -976,9 +900,7 @@ public with sharing class PersonErasure {
 		Schema.DescribeFieldResult field,
 		Boolean accountIsHousehold
 	) {
-		return accountIsHousehold && field.getName() == 'AccountId'
-			? Label.Core_Section_Household
-			: field.getLabel();
+		return accountIsHousehold && field.getName() == 'AccountId' ? Label.Core_Section_Household : field.getLabel();
 	}
 
 	private static void refuseBlocked(Clearing clearing) {
@@ -987,9 +909,7 @@ public with sharing class PersonErasure {
 				String.format(
 					BarnHelp.text('Core', 'Core_Erase_CannotEditFields'),
 					new List<String>{
-						clearing.record.getSObjectType()
-							.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabel(),
+						clearing.record.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
 						String.join(clearing.blocked, ', ')
 					}
 				)
@@ -1041,9 +961,7 @@ public with sharing class PersonErasure {
 		if (!describedFields.containsKey(type)) {
 			Map<String, Schema.DescribeFieldResult> result = new Map<String, Schema.DescribeFieldResult>();
 			for (
-				Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.fields.getMap()
-					.values()
+				Schema.SObjectField token : type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()
 			) {
 				Schema.DescribeFieldResult field = token.getDescribe();
 				result.put(field.getName().toLowerCase(), field);
@@ -1108,9 +1026,7 @@ public with sharing class PersonErasure {
 		}
 		List<Id> all = recordIds;
 		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-		Boolean objectAllowed = access == 'HasDeleteAccess'
-			? described.isDeletable()
-			: described.isUpdateable();
+		Boolean objectAllowed = access == 'HasDeleteAccess' ? described.isDeletable() : described.isUpdateable();
 		Integer missing = objectAllowed ? 0 : all.size();
 		for (Integer start = 0; objectAllowed && start < all.size(); start += ACCESS_CHUNK) {
 			Set<Id> chunk = new Set<Id>();
@@ -1203,9 +1119,7 @@ public with sharing class PersonErasure {
 		};
 		List<String> lines = new List<String>();
 		for (Change change : changes) {
-			String action = shown.containsKey(change.action)
-				? shown.get(change.action)
-				: change.action;
+			String action = shown.containsKey(change.action) ? shown.get(change.action) : change.action;
 			String line = action + ' | ' + change.objectLabel + ' | ' + change.count;
 			if (!change.fields.isEmpty()) {
 				line += ' | ' + String.join(change.fields, ', ');
@@ -1222,9 +1136,7 @@ public with sharing class PersonErasure {
 	}
 
 	private static List<Id> ids(List<SObject> records) {
-		return records == null
-			? new List<Id>()
-			: new List<Id>(new Map<Id, SObject>(records).keySet());
+		return records == null ? new List<Id>() : new List<Id>(new Map<Id, SObject>(records).keySet());
 	}
 
 	private static String normalized(String value) {

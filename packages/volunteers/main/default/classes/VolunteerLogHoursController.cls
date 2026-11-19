@@ -8,11 +8,7 @@
 public with sharing class VolunteerLogHoursController {
 	private static final String PERSON_ACCOUNT_FILTER_FIELD = 'IsPersonAccount'; // detection-only: a record picker filter field, sent only after isPersonAccountOrg found person accounts
 	/** Sign-ups that still mean the person came or is coming. */
-	private static final Set<String> LIVE_SIGNUPS = new Set<String>{
-		'Signed up',
-		'Confirmed',
-		'Attended'
-	};
+	private static final Set<String> LIVE_SIGNUPS = new Set<String>{ 'Signed up', 'Confirmed', 'Attended' };
 
 	/** The form's starting values. */
 	public class Context {
@@ -126,11 +122,7 @@ public with sharing class VolunteerLogHoursController {
 		if (shift.Start_Time__c != null) {
 			context.dateWorked = ShiftScheduleService.orgDate(shift.Start_Time__c);
 		}
-		if (
-			shift.Start_Time__c != null &&
-			shift.End_Time__c != null &&
-			shift.End_Time__c > shift.Start_Time__c
-		) {
+		if (shift.Start_Time__c != null && shift.End_Time__c != null && shift.End_Time__c > shift.Start_Time__c) {
 			Decimal millis = shift.End_Time__c.getTime() - shift.Start_Time__c.getTime();
 			context.hours = (millis / 3600000).setScale(2);
 		}

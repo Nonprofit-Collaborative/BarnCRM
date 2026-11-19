@@ -14,19 +14,10 @@ private class ImportFileValuesTest {
 
 	private static Import_Template__c template() {
 		ImportMapping mapping = new ImportMapping();
-		for (
-			String target : new List<String>{
-				'Contact1.FirstName',
-				'Contact1.LastName',
-				'Contact1.MailingCity'
-			}
-		) {
+		for (String target : new List<String>{ 'Contact1.FirstName', 'Contact1.LastName', 'Contact1.MailingCity' }) {
 			mapping.columns.add(new ImportMapping.Column(target, target));
 		}
-		return ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		return ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 	}
 
 	private static Map<String, String> person(String firstName, String city) {
@@ -65,22 +56,12 @@ private class ImportFileValuesTest {
 			mapping.defaults.add(new ImportMapping.Assignment('Contact1.MailingCity', 'Eugene'));
 			mapping.defaults.add(new ImportMapping.Assignment('Household.Name', 'Kept'));
 
-			mapping.withFileValues(
-				'{"version":1,"defaults":[{"target":"contact1.mailingcity","value":"Portland"}]}'
-			);
+			mapping.withFileValues('{"version":1,"defaults":[{"target":"contact1.mailingcity","value":"Portland"}]}');
 
-			Assert.areEqual(
-				2,
-				mapping.defaults.size(),
-				'The default for the same target is replaced.'
-			);
+			Assert.areEqual(2, mapping.defaults.size(), 'The default for the same target is replaced.');
 			Assert.areEqual('Portland', mapping.defaults[0].value, 'The file value comes first.');
 			Assert.areEqual('Kept', mapping.defaults[1].value, 'Other defaults stay.');
-			Assert.areEqual(
-				2,
-				mapping.withFileValues(null).defaults.size(),
-				'No file values change nothing.'
-			);
+			Assert.areEqual(2, mapping.withFileValues(null).defaults.size(), 'No file values change nothing.');
 		}
 	}
 
@@ -116,11 +97,7 @@ private class ImportFileValuesTest {
 			Assert.areEqual(200, dryRun.Rows_Created__c, 'The dry run counts every row.');
 			Assert.areEqual(200, committed.Rows_Created__c, 'And the commit creates them.');
 			List<Import_Row__c> rows = ImportTestDataFactory.reload(batch.Id);
-			Assert.areEqual(
-				'Salem',
-				cityOf(rows[0].Contact_1__c),
-				'A row with its own value keeps it.'
-			);
+			Assert.areEqual('Salem', cityOf(rows[0].Contact_1__c), 'A row with its own value keeps it.');
 			Assert.areEqual(
 				'Portland',
 				cityOf(rows[1].Contact_1__c),
@@ -132,10 +109,7 @@ private class ImportFileValuesTest {
 				'Every blank row, and only those.'
 			);
 			Import_Batch__c stored = ImportBatchSelector.selectById(batch.Id);
-			Assert.isFalse(
-				stored.File_Values_JSON__c.contains('Phone'),
-				'A blank value is not kept.'
-			);
+			Assert.isFalse(stored.File_Values_JSON__c.contains('Phone'), 'A blank value is not kept.');
 		}
 	}
 
@@ -143,13 +117,7 @@ private class ImportFileValuesTest {
 	static void aFileValueNamingAPersonIsRefused() {
 		System.runAs(TestUsers.admin()) {
 			Import_Template__c template = template();
-			for (
-				String target : new List<String>{
-					'Contact1.LastName',
-					'Contact2.Email',
-					'Contact1.FullName'
-				}
-			) {
+			for (String target : new List<String>{ 'Contact1.LastName', 'Contact2.Email', 'Contact1.FullName' }) {
 				Boolean refused = false;
 				try {
 					ImportBatchService.create(
@@ -158,18 +126,13 @@ private class ImportFileValuesTest {
 						'one-person.csv',
 						null,
 						null,
-						new List<ImportMapping.Assignment>{
-							new ImportMapping.Assignment(target, 'x')
-						},
+						new List<ImportMapping.Assignment>{ new ImportMapping.Assignment(target, 'x') },
 						false
 					);
 				} catch (ImportException e) {
 					refused = e.getMessage().contains(target);
 				}
-				Assert.isTrue(
-					refused,
-					'Every row would be one person, so it is refused: ' + target
-				);
+				Assert.isTrue(refused, 'Every row would be one person, so it is refused: ' + target);
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Import_Batch__c], 'No batch is made.');
 			Assert.isFalse(
@@ -210,25 +173,15 @@ private class ImportFileValuesTest {
 			Test.stopTest();
 
 			Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
-			Assert.areEqual(
-				ImportTemplateService.RULE_NAME_POSTAL,
-				saved.Matching_Rule__c,
-				'The person rule.'
-			);
+			Assert.areEqual(ImportTemplateService.RULE_NAME_POSTAL, saved.Matching_Rule__c, 'The person rule.');
 			Assert.areEqual(
 				ImportTemplateService.SEVERAL_MOST_RECENT,
 				saved.Several_Matches__c,
 				'The several-matches choice.'
 			);
 			Import_Batch__c batch = ImportBatchSelector.selectById(view.id);
-			Assert.isTrue(
-				batch.File_Values_JSON__c.contains('Bend'),
-				'The file values, on the batch.'
-			);
-			Assert.isFalse(
-				String.valueOf(saved.Default_Values_JSON__c).contains('Bend'),
-				'And not on the template.'
-			);
+			Assert.isTrue(batch.File_Values_JSON__c.contains('Bend'), 'The file values, on the batch.');
+			Assert.isFalse(String.valueOf(saved.Default_Values_JSON__c).contains('Bend'), 'And not on the template.');
 		}
 	}
 
@@ -247,10 +200,7 @@ private class ImportFileValuesTest {
 				);
 			}
 			for (ImportController.MatchFieldView field : view.account) {
-				Assert.isNotNull(
-					ImportMatcher.matchField(Account.SObjectType, field.value),
-					'And each account field.'
-				);
+				Assert.isNotNull(ImportMatcher.matchField(Account.SObjectType, field.value), 'And each account field.');
 			}
 			Assert.isNull(
 				ImportMatcher.matchField(Contact.SObjectType, 'Email'),

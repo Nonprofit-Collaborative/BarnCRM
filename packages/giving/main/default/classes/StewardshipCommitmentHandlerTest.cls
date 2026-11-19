@@ -43,9 +43,7 @@ private class StewardshipCommitmentHandlerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 		insert person;
 		return person;
 	}
@@ -78,11 +76,7 @@ private class StewardshipCommitmentHandlerTest {
 				FROM Stewardship_Plan__c
 			];
 			Assert.areEqual(1, started.size(), 'A commitment that is already running has started.');
-			Assert.areEqual(
-				StewardshipService.STATUS_RUNNING,
-				started[0].Status__c,
-				'A plan starts running.'
-			);
+			Assert.areEqual(StewardshipService.STATUS_RUNNING, started[0].Status__c, 'A plan starts running.');
 			Assert.areEqual(person.Id, started[0].Contact__c, 'It runs for the donor.');
 			Assert.isNotNull(
 				started[0].Commitment__c,
@@ -248,11 +242,7 @@ private class StewardshipCommitmentHandlerTest {
 			activeTemplate();
 			List<Contact> donors = new List<Contact>();
 			for (Integer i = 0; i < 50; i++) {
-				donors.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Donor', LastName = 'Number ' + i)
-					)
-				);
+				donors.add(TestDataFactory.person(new Contact(FirstName = 'Donor', LastName = 'Number ' + i)));
 			}
 			insert donors;
 			List<Commitment__c> pledges = new List<Commitment__c>();
@@ -265,11 +255,7 @@ private class StewardshipCommitmentHandlerTest {
 			Integer queries = Limits.getQueries();
 			Test.stopTest();
 
-			Assert.areEqual(
-				50,
-				[SELECT COUNT() FROM Stewardship_Plan__c],
-				'Fifty pledges started fifty plans.'
-			);
+			Assert.areEqual(50, [SELECT COUNT() FROM Stewardship_Plan__c], 'Fifty pledges started fifty plans.');
 			Assert.isTrue(
 				queries < Limits.getLimitQueries(),
 				'And they cost a fixed number of queries rather than one per commitment.'
@@ -292,10 +278,7 @@ private class StewardshipCommitmentHandlerTest {
 				[SELECT COUNT() FROM Stewardship_Plan__c],
 				'There is nobody to steward, so nothing starts.'
 			);
-			Assert.isNotNull(
-				saved,
-				'And the save was attempted rather than blocked by stewardship.'
-			);
+			Assert.isNotNull(saved, 'And the save was attempted rather than blocked by stewardship.');
 		}
 	}
 }

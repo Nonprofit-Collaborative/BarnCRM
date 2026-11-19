@@ -66,17 +66,9 @@ private class ProjectStaffingControllerTest {
 				ProjectStaffingController.saveResource(UserInfo.getUserId(), null, 30, null, true);
 				Assert.fail('Saving is refused while off');
 			} catch (AuraHandledException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Projects', 'Projects_Staffing_Off'),
-					expected.getMessage(),
-					'In words'
-				);
+				Assert.areEqual(BarnHelp.text('Projects', 'Projects_Staffing_Off'), expected.getMessage(), 'In words');
 			}
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Project_Resource__c WITH SYSTEM_MODE],
-				'Nothing was written'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Project_Resource__c WITH SYSTEM_MODE], 'Nothing was written');
 		}
 	}
 
@@ -95,13 +87,7 @@ private class ProjectStaffingControllerTest {
 				'Consultant',
 				true
 			);
-			Id second = ProjectStaffingController.saveResource(
-				staff.Id,
-				'Training',
-				null,
-				null,
-				false
-			);
+			Id second = ProjectStaffingController.saveResource(staff.Id, 'Training', null, null, false);
 			ProjectStaffingController.Staffing staffing = ProjectStaffingController.getStaffing();
 			Test.stopTest();
 
@@ -207,13 +193,7 @@ private class ProjectStaffingControllerTest {
 			Test.stopTest();
 
 			Project_Assignment__c assignment = [
-				SELECT
-					Project__c,
-					Resource__c,
-					Role__c,
-					Planned_Hours__c,
-					Start_Date__c,
-					End_Date__c
+				SELECT Project__c, Resource__c, Role__c, Planned_Hours__c, Start_Date__c, End_Date__c
 				FROM Project_Assignment__c
 				WHERE Id = :assignmentId
 				WITH SYSTEM_MODE
@@ -242,11 +222,7 @@ private class ProjectStaffingControllerTest {
 					'In words'
 				);
 			}
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Project_Assignment__c WITH SYSTEM_MODE],
-				'No second assignment'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Project_Assignment__c WITH SYSTEM_MODE], 'No second assignment');
 		}
 	}
 
@@ -259,16 +235,10 @@ private class ProjectStaffingControllerTest {
 			update new Time_Entry__c(Id = open.Id, Status__c = 'Open');
 			Date monday = Date.today().toStartOfWeek();
 
-			List<ProjectReporting.Utilization> before = ProjectReporting.utilization(
-				monday,
-				monday.addDays(6)
-			);
+			List<ProjectReporting.Utilization> before = ProjectReporting.utilization(monday, monday.addDays(6));
 			turnOn();
 			resource(UserInfo.getUserId(), null, 24);
-			List<ProjectReporting.Utilization> after = ProjectReporting.utilization(
-				monday,
-				monday.addDays(6)
-			);
+			List<ProjectReporting.Utilization> after = ProjectReporting.utilization(monday, monday.addDays(6));
 
 			Assert.areEqual(6, before[0].logged, 'Open time is not logged');
 			Assert.areEqual(40, before[0].capacity, 'The setting while the part is off');

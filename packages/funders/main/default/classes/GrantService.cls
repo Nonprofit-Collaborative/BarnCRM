@@ -40,11 +40,7 @@ public with sharing class GrantService {
 		STAGE_INVITED
 	};
 
-	private static final Set<String> DECIDED = new Set<String>{
-		STAGE_AWARDED,
-		STAGE_DECLINED,
-		STAGE_WITHDRAWN
-	};
+	private static final Set<String> DECIDED = new Set<String>{ STAGE_AWARDED, STAGE_DECLINED, STAGE_WITHDRAWN };
 
 	private static final String PROGRAM_OBJECT = 'Program__c';
 	private static final Integer PROGRAM_LIMIT = 500;
@@ -95,11 +91,7 @@ public with sharing class GrantService {
 				programType = NamespaceUtil.packagedObjectType(PROGRAM_OBJECT);
 				looked = true;
 			}
-			if (
-				programId == null ||
-				(programType != null &&
-				programId.getSObjectType() != programType)
-			) {
+			if (programId == null || (programType != null && programId.getSObjectType() != programType)) {
 				grant.Program_Id__c.addError(BarnHelp.text('Funders', 'Funders_Grant_BadProgram'));
 				continue;
 			}
@@ -160,10 +152,7 @@ public with sharing class GrantService {
 			)
 		) {
 			options.add(
-				new Map<String, String>{
-					'value' => (String) program.Id,
-					'label' => (String) program.get('Name')
-				}
+				new Map<String, String>{ 'value' => (String) program.Id, 'label' => (String) program.get('Name') }
 			);
 		}
 		return options;

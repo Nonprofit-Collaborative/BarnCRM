@@ -83,9 +83,7 @@ public with sharing class FormsCatalogExtension implements FormCatalogExtension 
 			return questions;
 		}
 		try {
-			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-				definitionJson
-			);
+			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
 			for (Object step : listOf(definition.get('steps'))) {
 				for (Object field : listOf(((Map<String, Object>) step).get('fields'))) {
 					Map<String, Object> question = (Map<String, Object>) field;

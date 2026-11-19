@@ -35,11 +35,7 @@ public with sharing class ScholarshipsPostInstall implements InstallHandler, Mod
 
 	/** The install's steps, then the module's key added to the setup marker. Never throws. */
 	public void runSetup(Id installerId) {
-		ShippedDefaultUpgrades.apply(
-			MODULE_KEY,
-			Scholarships_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(MODULE_KEY, Scholarships_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(MODULE_KEY);
 		try {
 			ModuleAccessSyncs.requestFor(MODULE_KEY);

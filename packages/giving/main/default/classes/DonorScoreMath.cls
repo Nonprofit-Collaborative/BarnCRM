@@ -10,12 +10,7 @@
 public with sharing class DonorScoreMath {
 	public static final List<Decimal> DEFAULT_RECENCY_DAYS = new List<Decimal>{ 90, 180, 365, 730 };
 	public static final List<Decimal> DEFAULT_FREQUENCY_GIFTS = new List<Decimal>{ 6, 4, 2, 1 };
-	public static final List<Decimal> DEFAULT_MONETARY_AMOUNTS = new List<Decimal>{
-		5000,
-		1000,
-		250,
-		50
-	};
+	public static final List<Decimal> DEFAULT_MONETARY_AMOUNTS = new List<Decimal>{ 5000, 1000, 250, 50 };
 
 	public static final String CHAMPION = 'Champion';
 	public static final String LOYAL = 'Loyal';

@@ -12,11 +12,7 @@ private class ScholarshipFormAttachmentTest {
 		TestUsers.adminWith(ScholarshipsTestData.ADMIN_SET);
 	}
 
-	private static FormSubmissionReceipt receipt(
-		Id contextId,
-		Id personId,
-		Map<String, Object> answers
-	) {
+	private static FormSubmissionReceipt receipt(Id contextId, Id personId, Map<String, Object> answers) {
 		FormSubmissionReceipt receipt = new FormSubmissionReceipt();
 		receipt.contextRecordId = contextId;
 		receipt.personId = personId;
@@ -39,10 +35,7 @@ private class ScholarshipFormAttachmentTest {
 		);
 		Assert.areEqual(2, unmet.size(), 'atMost and the unknown op fail');
 		Assert.isNull(ScholarshipFormAttachment.unmetRules(null, answers), 'No rules');
-		Assert.isNull(
-			ScholarshipFormAttachment.unmetRules('{bad', answers),
-			'Unreadable rules are ignored'
-		);
+		Assert.isNull(ScholarshipFormAttachment.unmetRules('{bad', answers), 'Unreadable rules are ignored');
 	}
 
 	@IsTest
@@ -68,23 +61,11 @@ private class ScholarshipFormAttachmentTest {
 					}
 				)
 			);
-			seam.received(
-				receipt(
-					cycle.Id,
-					lee.Id,
-					new Map<String, Object>{ 'gpa' => 3.2, 'enrolled' => true }
-				)
-			);
+			seam.received(receipt(cycle.Id, lee.Id, new Map<String, Object>{ 'gpa' => 3.2, 'enrolled' => true }));
 			Test.stopTest();
 
 			Award_Application__c row = [
-				SELECT
-					Status__c,
-					Title__c,
-					Amount_Requested__c,
-					Eligibility_Notes__c,
-					Submitted_Date__c,
-					Answers__c
+				SELECT Status__c, Title__c, Amount_Requested__c, Eligibility_Notes__c, Submitted_Date__c, Answers__c
 				FROM Award_Application__c
 				WHERE Cycle__c = :cycle.Id
 			];
@@ -101,11 +82,7 @@ private class ScholarshipFormAttachmentTest {
 		System.runAs(ScholarshipsTestData.admin()) {
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, RULES);
 			Contact lee = ScholarshipsTestData.person('Lee');
-			Award_Application__c draft = ScholarshipsTestData.application(
-				cycle.Id,
-				lee.Id,
-				'Draft'
-			);
+			Award_Application__c draft = ScholarshipsTestData.application(cycle.Id, lee.Id, 'Draft');
 			Award__c award = ScholarshipsTestData.award(cycle.Id, draft.Id, lee.Id, 500);
 			Award_Requirement__c report = new Award_Requirement__c(
 				Award__c = award.Id,
@@ -114,20 +91,11 @@ private class ScholarshipFormAttachmentTest {
 			);
 			insert report;
 			ScholarshipFormAttachment seam = new ScholarshipFormAttachment();
-			Assert.isTrue(
-				seam.signedClaim(draft.Id),
-				'A person\'s own application needs a signed link'
-			);
+			Assert.isTrue(seam.signedClaim(draft.Id), 'A person\'s own application needs a signed link');
 
 			Test.startTest();
 			seam.received(receipt(draft.Id, null, new Map<String, Object>{ 'gpa' => 1 }));
-			seam.received(
-				receipt(
-					report.Id,
-					lee.Id,
-					new Map<String, Object>{ 'progress' => 'Finished first year' }
-				)
-			);
+			seam.received(receipt(report.Id, lee.Id, new Map<String, Object>{ 'progress' => 'Finished first year' }));
 			Test.stopTest();
 
 			Award_Application__c filled = [

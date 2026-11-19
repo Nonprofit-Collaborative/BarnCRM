@@ -32,10 +32,7 @@ private class FormFilesTest {
 
 	private static Map<String, Object> fileOf(String name, String text) {
 		return new Map<String, Object>{
-			'cv' => new Map<String, Object>{
-				'name' => name,
-				'data' => EncodingUtil.base64Encode(Blob.valueOf(text))
-			}
+			'cv' => new Map<String, Object>{ 'name' => name, 'data' => EncodingUtil.base64Encode(Blob.valueOf(text)) }
 		};
 	}
 
@@ -104,48 +101,28 @@ private class FormFilesTest {
 			String ticket = ticketAfterWaiting(form.Id);
 			Assert.areEqual(
 				'badFileType',
-				FormIntakeService.submit(ticket, lee('page.html'), null, null, null, null)
-					.problems.get('cv'),
+				FormIntakeService.submit(ticket, lee('page.html'), null, null, null, null).problems.get('cv'),
 				'A page is not a document'
 			);
 			Assert.areEqual(
 				'fileMissing',
-				FormIntakeService.submit(ticket, lee('cv.pdf'), null, null, null, null)
-					.problems.get('cv'),
+				FormIntakeService.submit(ticket, lee('cv.pdf'), null, null, null, null).problems.get('cv'),
 				'Named but not sent'
 			);
 			Assert.areEqual(
 				'fileMissing',
-				FormIntakeService.submit(
-						ticket,
-						lee('cv.pdf'),
-						null,
-						null,
-						fileOf('other.pdf', 'x'),
-						null
-					)
+				FormIntakeService.submit(ticket, lee('cv.pdf'), null, null, fileOf('other.pdf', 'x'), null)
 					.problems.get('cv'),
 				'Sent under another name'
 			);
 			String large = 'x'.repeat(FormFiles.MAX_BYTES + 1);
 			Assert.areEqual(
 				'fileTooLarge',
-				FormIntakeService.submit(
-						ticket,
-						lee('cv.pdf'),
-						null,
-						null,
-						fileOf('cv.pdf', large),
-						null
-					)
+				FormIntakeService.submit(ticket, lee('cv.pdf'), null, null, fileOf('cv.pdf', large), null)
 					.problems.get('cv'),
 				'Too large'
 			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Form_Submission__c WITH USER_MODE],
-				'Nothing stored'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Form_Submission__c WITH USER_MODE], 'Nothing stored');
 		}
 	}
 
@@ -160,11 +137,7 @@ private class FormFilesTest {
 				null,
 				JSON.serialize(fileOf('cv.txt', 'notes'))
 			);
-			Assert.areEqual(
-				FormSubmitService.PROCESSED,
-				result.status,
-				'Processed: ' + result.message
-			);
+			Assert.areEqual(FormSubmitService.PROCESSED, result.status, 'Processed: ' + result.message);
 			Assert.areEqual(
 				1,
 				[
@@ -223,11 +196,7 @@ private class FormFilesTest {
 				'The link opens the Site page'
 			);
 			Assert.areNotEqual(token, drafts[0].Token_Hash__c, 'The token is not stored');
-			Assert.areEqual(
-				FormIntakeService.hashOf(token),
-				drafts[0].Token_Hash__c,
-				'Its hash is'
-			);
+			Assert.areEqual(FormIntakeService.hashOf(token), drafts[0].Token_Hash__c, 'Its hash is');
 			Assert.isFalse(drafts[0].Answers__c.contains('cv.pdf'), 'Files are not saved');
 		}
 	}
@@ -280,30 +249,10 @@ private class FormFilesTest {
 			FormIntakeService.clockShiftMs = 10000;
 
 			Test.startTest();
-			String toLee = FormIntakeService.saveDraft(
-					ticket,
-					lee(null),
-					'',
-					'lee.zzcap@example.org',
-					0
-				)
+			String toLee = FormIntakeService.saveDraft(ticket, lee(null), '', 'lee.zzcap@example.org', 0).status;
+			String toAnyone = FormIntakeService.saveDraft(popularTicket, lee(null), '', 'sam.zzcap@example.org', 0)
 				.status;
-			String toAnyone = FormIntakeService.saveDraft(
-					popularTicket,
-					lee(null),
-					'',
-					'sam.zzcap@example.org',
-					0
-				)
-				.status;
-			String toSam = FormIntakeService.saveDraft(
-					ticket,
-					lee(null),
-					'',
-					'sam.zzcap@example.org',
-					0
-				)
-				.status;
+			String toSam = FormIntakeService.saveDraft(ticket, lee(null), '', 'sam.zzcap@example.org', 0).status;
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -343,10 +292,7 @@ private class FormFilesTest {
 				AccessLevel.SYSTEM_MODE
 			);
 			Assert.isNull(FormIntakeService.resume(form.Id, 'wrong'), 'Only the token finds it');
-			Assert.isNull(
-				FormPublicController.getForm(UserInfo.getUserId(), 'zztoken'),
-				'Not a form'
-			);
+			Assert.isNull(FormPublicController.getForm(UserInfo.getUserId(), 'zztoken'), 'Not a form');
 			FormIntakeService.PublicForm resumed = FormPublicController.getForm(form.Id, 'zztoken');
 			Assert.isTrue(resumed.answers.contains('Zzfiles'), 'The saved answers');
 			Assert.areEqual(0, resumed.step, 'The saved step');
@@ -363,11 +309,7 @@ private class FormFilesTest {
 				'zztoken'
 			);
 			Assert.areEqual(FormIntakeService.RECEIVED, receipt.status, 'Received');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Form_Draft__c WITH USER_MODE],
-				'The draft is forgotten'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Form_Draft__c WITH USER_MODE], 'The draft is forgotten');
 			Assert.isNull(FormIntakeService.resume(form.Id, 'zztoken'), 'The link is used up');
 		}
 	}

@@ -10,10 +10,7 @@ private class GrantRequirementTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Grqreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Grqreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static Grant_Requirement__c reread(Id requirementId) {
@@ -47,15 +44,9 @@ private class GrantRequirementTest {
 			Test.startTest();
 			insert new List<Grant_Requirement__c>{ open, accepted, typed };
 			Date beforeSubmitting = reread(open.Id).Submitted_Date__c;
-			update new Grant_Requirement__c(
-				Id = open.Id,
-				Status__c = GrantRequirementService.STATUS_IN_PROGRESS
-			);
+			update new Grant_Requirement__c(Id = open.Id, Status__c = GrantRequirementService.STATUS_IN_PROGRESS);
 			Date inProgress = reread(open.Id).Submitted_Date__c;
-			update new Grant_Requirement__c(
-				Id = open.Id,
-				Status__c = GrantRequirementService.STATUS_SUBMITTED
-			);
+			update new Grant_Requirement__c(Id = open.Id, Status__c = GrantRequirementService.STATUS_SUBMITTED);
 			Test.stopTest();
 
 			Assert.isNull(beforeSubmitting, 'Nothing while open');
@@ -88,11 +79,7 @@ private class GrantRequirementTest {
 	static void undoPutsASubmittedRequirementBack() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			Grant__c grant = grant();
-			Grant_Requirement__c report = GrantTestData.requirement(
-				'Report',
-				grant.Id,
-				Date.today().addDays(5)
-			);
+			Grant_Requirement__c report = GrantTestData.requirement('Report', grant.Id, Date.today().addDays(5));
 			report.Status__c = GrantRequirementService.STATUS_IN_PROGRESS;
 			insert report;
 
@@ -101,11 +88,7 @@ private class GrantRequirementTest {
 			GrantPipelineController.undoSubmitted(previous.id, previous.status, previous.dateValue);
 			String again;
 			try {
-				GrantPipelineController.undoSubmitted(
-					previous.id,
-					previous.status,
-					previous.dateValue
-				);
+				GrantPipelineController.undoSubmitted(previous.id, previous.status, previous.dateValue);
 			} catch (AuraHandledException e) {
 				again = e.getMessage();
 			}
@@ -132,21 +115,9 @@ private class GrantRequirementTest {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			Date today = Date.today();
 			Grant__c grant = grant();
-			Grant_Requirement__c soon = GrantTestData.requirement(
-				'Soon',
-				grant.Id,
-				today.addDays(5)
-			);
-			Grant_Requirement__c late = GrantTestData.requirement(
-				'Late',
-				grant.Id,
-				today.addDays(-2)
-			);
-			Grant_Requirement__c far = GrantTestData.requirement(
-				'Far',
-				grant.Id,
-				today.addDays(90)
-			);
+			Grant_Requirement__c soon = GrantTestData.requirement('Soon', grant.Id, today.addDays(5));
+			Grant_Requirement__c late = GrantTestData.requirement('Late', grant.Id, today.addDays(-2));
+			Grant_Requirement__c far = GrantTestData.requirement('Far', grant.Id, today.addDays(90));
 			insert new List<Grant_Requirement__c>{ soon, late, far };
 
 			Test.startTest();
@@ -188,23 +159,12 @@ private class GrantRequirementTest {
 				refusal = e.getMessage();
 			}
 			Test.stopTest();
-			Assert.isFalse(
-				GrantPipelineController.getBoard(false).canMarkSubmitted,
-				'Not offered to a reader'
-			);
+			Assert.isFalse(GrantPipelineController.getBoard(false).canMarkSubmitted, 'Not offered to a reader');
 		}
-		Assert.areEqual(
-			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
-			refusal,
-			'Refused'
-		);
+		Assert.areEqual(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'), refusal, 'Refused');
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			delete grant;
 		}
-		Assert.areEqual(
-			0,
-			[SELECT COUNT() FROM Grant_Requirement__c WITH SYSTEM_MODE],
-			'Deleted with the grant'
-		);
+		Assert.areEqual(0, [SELECT COUNT() FROM Grant_Requirement__c WITH SYSTEM_MODE], 'Deleted with the grant');
 	}
 }

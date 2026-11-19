@@ -77,9 +77,7 @@ public with sharing class LogicModelPeriodService {
 	}
 
 	private static Date dateOf(Object value) {
-		return value == null || String.isBlank(String.valueOf(value))
-			? null
-			: Date.valueOf(String.valueOf(value));
+		return value == null || String.isBlank(String.valueOf(value)) ? null : Date.valueOf(String.valueOf(value));
 	}
 
 	private static List<Period> periodsOfModel(Id modelId) {
@@ -90,9 +88,7 @@ public with sharing class LogicModelPeriodService {
 			WITH USER_MODE
 		];
 		if (models.isEmpty()) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'));
 		}
 		return parse(models[0].Periods__c);
 	}
@@ -130,31 +126,19 @@ public with sharing class LogicModelPeriodService {
 			}
 			if (period.endDate < period.startDate) {
 				throw new LogicModelService.BuilderException(
-					BarnHelp.text(
-						'LogicModels',
-						'LogicModels_Periods_EndBeforeStart',
-						new List<Object>{ period.name }
-					)
+					BarnHelp.text('LogicModels', 'LogicModels_Periods_EndBeforeStart', new List<Object>{ period.name })
 				);
 			}
 			if (!keys.add(period.key())) {
 				throw new LogicModelService.BuilderException(
-					BarnHelp.text(
-						'LogicModels',
-						'LogicModels_Periods_SameDates',
-						new List<Object>{ period.name }
-					)
+					BarnHelp.text('LogicModels', 'LogicModels_Periods_SameDates', new List<Object>{ period.name })
 				);
 			}
 			periods.add(period);
 		}
 		if (periods.size() > MAX_PERIODS) {
 			throw new LogicModelService.BuilderException(
-				BarnHelp.text(
-					'LogicModels',
-					'LogicModels_Periods_TooMany',
-					new List<Object>{ MAX_PERIODS }
-				)
+				BarnHelp.text('LogicModels', 'LogicModels_Periods_TooMany', new List<Object>{ MAX_PERIODS })
 			);
 		}
 		List<Map<String, Object>> stored = new List<Map<String, Object>>();
@@ -165,9 +149,7 @@ public with sharing class LogicModelPeriodService {
 			Id = modelId,
 			Periods__c = periods.isEmpty()
 				? null
-				: JSON.serialize(
-						new Map<String, Object>{ 'version' => VERSION, 'periods' => stored }
-				  )
+				: JSON.serialize(new Map<String, Object>{ 'version' => VERSION, 'periods' => stored })
 		);
 	}
 
@@ -201,17 +183,12 @@ public with sharing class LogicModelPeriodService {
 	public static Integer addToEvery(Id modelId, String startDate, String endDate) {
 		Period wanted = null;
 		for (Period period : periodsOfModel(modelId)) {
-			if (
-				String.valueOf(period.startDate) == startDate &&
-				String.valueOf(period.endDate) == endDate
-			) {
+			if (String.valueOf(period.startDate) == startDate && String.valueOf(period.endDate) == endDate) {
 				wanted = period;
 			}
 		}
 		if (wanted == null) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'));
 		}
 		List<Indicator__c> indicators = [
 			SELECT Id, (SELECT Start_Date__c, End_Date__c FROM Periods__r)
@@ -237,9 +214,7 @@ public with sharing class LogicModelPeriodService {
 			WITH USER_MODE
 		];
 		if (indicators.isEmpty()) {
-			throw new LogicModelService.BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
-			);
+			throw new LogicModelService.BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'));
 		}
 		return copy(indicators, periodsOfModel(modelId));
 	}
@@ -249,11 +224,7 @@ public with sharing class LogicModelPeriodService {
 		for (Indicator__c indicator : indicators) {
 			Set<String> taken = new Set<String>();
 			for (Indicator_Period__c existing : indicator.Periods__r) {
-				taken.add(
-					String.valueOf(existing.Start_Date__c) +
-						'|' +
-						String.valueOf(existing.End_Date__c)
-				);
+				taken.add(String.valueOf(existing.Start_Date__c) + '|' + String.valueOf(existing.End_Date__c));
 			}
 			for (Period period : periods) {
 				if (taken.contains(period.key())) {

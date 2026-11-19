@@ -24,12 +24,7 @@ private class BulkDeleteServiceTest {
 				new Map<String, Object>{
 					'version' => 1,
 					'conditions' => new List<Object>{
-						new Map<String, Object>{
-							'id' => 1,
-							'field' => field,
-							'operator' => 'equals',
-							'value' => value
-						}
+						new Map<String, Object>{ 'id' => 1, 'field' => field, 'operator' => 'equals', 'value' => value }
 					}
 				}
 			);
@@ -42,9 +37,7 @@ private class BulkDeleteServiceTest {
 	/** `volunteers` contacts titled Volunteer and `staff` titled Staff. */
 	private static void makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
@@ -63,9 +56,7 @@ private class BulkDeleteServiceTest {
 
 	/** A person holding the bulk delete permission set beside BarnCRM Admin (R-BD6). */
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	@IsTest
@@ -80,10 +71,7 @@ private class BulkDeleteServiceTest {
 			Test.stopTest();
 
 			System.Assert.areEqual(200, preview.count, 'Only matching records are counted');
-			System.Assert.areEqual(
-				BulkDeleteService.DEFAULT_RUN_LIMIT,
-				BulkDeleteService.runLimit()
-			);
+			System.Assert.areEqual(BulkDeleteService.DEFAULT_RUN_LIMIT, BulkDeleteService.runLimit());
 			System.Assert.areEqual(5, preview.sample.size(), 'Five named');
 			System.Assert.areEqual('Person 0000', preview.sample[0].name, 'In Id order, by name');
 			System.Assert.isNotNull(preview.cascades, 'The kinds deleted with each record');
@@ -114,10 +102,7 @@ private class BulkDeleteServiceTest {
 				if (!isCustomKind) {
 					seenStandard = true;
 				}
-				System.Assert.isFalse(
-					seenStandard && isCustomKind,
-					'BarnCRM kinds come before the standard ones'
-				);
+				System.Assert.isFalse(seenStandard && isCustomKind, 'BarnCRM kinds come before the standard ones');
 			}
 		}
 	}
@@ -222,8 +207,7 @@ private class BulkDeleteServiceTest {
 
 			Import_Batch__c job = BulkDeleteService.createJob(checked, 37, 37);
 			System.Assert.isFalse(
-				new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10))
-					.containsKey(job.Id),
+				new Map<Id, Import_Batch__c>(ImportBatchSelector.selectRecent(10)).containsKey(job.Id),
 				'The import history lists imports only'
 			);
 		}

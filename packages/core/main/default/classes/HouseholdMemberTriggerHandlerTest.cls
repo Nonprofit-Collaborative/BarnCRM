@@ -50,11 +50,7 @@ private class HouseholdMemberTriggerHandlerTest {
 
 			Account saved = reload();
 			Assert.areEqual(1, saved.Member_Count__c, 'John is counted');
-			Assert.areEqual(
-				'The Smith Family',
-				saved.Name,
-				'The household is named from its member'
-			);
+			Assert.areEqual('The Smith Family', saved.Name, 'The household is named from its member');
 		}
 	}
 
@@ -172,10 +168,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			second.Is_Primary__c = false;
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				new List<Household_Member__c>{ first, second },
-				false
-			);
+			List<Database.SaveResult> results = Database.insert(new List<Household_Member__c>{ first, second }, false);
 			Test.stopTest();
 
 			Assert.isTrue(results[0].isSuccess(), 'The first is saved');
@@ -235,10 +228,7 @@ private class HouseholdMemberTriggerHandlerTest {
 			both.Account__c = other.Id;
 
 			Test.startTest();
-			List<Database.SaveResult> results = Database.insert(
-				new List<Household_Member__c>{ nobody, both },
-				false
-			);
+			List<Database.SaveResult> results = Database.insert(new List<Household_Member__c>{ nobody, both }, false);
 			Test.stopTest();
 
 			Assert.isFalse(results[0].isSuccess(), 'A row naming nobody is refused (R-M4)');

@@ -36,9 +36,7 @@ private class VolunteerPersonDeleteHandlerTest {
 		List<Volunteer_Requirement__c> checks = new List<Volunteer_Requirement__c>();
 		List<Volunteer_Skill__c> skills = new List<Volunteer_Skill__c>();
 		for (SObject person : people) {
-			String field = person.getSObjectType() == Contact.SObjectType
-				? 'Contact__c'
-				: 'Account__c';
+			String field = person.getSObjectType() == Contact.SObjectType ? 'Contact__c' : 'Account__c';
 			Volunteer_Requirement__c check = new Volunteer_Requirement__c(
 				Type__c = 'Background check',
 				Status__c = 'Completed',
@@ -55,8 +53,7 @@ private class VolunteerPersonDeleteHandlerTest {
 	}
 
 	private static Integer rowsLeft() {
-		return [SELECT COUNT() FROM Volunteer_Requirement__c] +
-			[SELECT COUNT() FROM Volunteer_Skill__c];
+		return [SELECT COUNT() FROM Volunteer_Requirement__c] + [SELECT COUNT() FROM Volunteer_Skill__c];
 	}
 
 	@IsTest
@@ -112,9 +109,7 @@ private class VolunteerPersonDeleteHandlerTest {
 
 	/** The people as the trigger hands them to the handler: by Id, with their MasterRecordId. */
 	private static Map<Id, SObject> triggerOld(List<Contact> people) {
-		return new Map<Id, SObject>(
-			[SELECT Id, MasterRecordId FROM Contact WHERE Id IN :people ORDER BY Id]
-		);
+		return new Map<Id, SObject>([SELECT Id, MasterRecordId FROM Contact WHERE Id IN :people ORDER BY Id]);
 	}
 
 	private static void runDeletePass(Map<Id, SObject> people) {
@@ -172,11 +167,7 @@ private class VolunteerPersonDeleteHandlerTest {
 				failed += result.isSuccess() ? 0 : 1;
 			}
 			Assert.areEqual(1, failed, 'One row of the batch failed.');
-			Assert.areEqual(
-				0,
-				rowsLeft(),
-				'The rows of the people whose delete succeeded are deleted.'
-			);
+			Assert.areEqual(0, rowsLeft(), 'The rows of the people whose delete succeeded are deleted.');
 		}
 	}
 
@@ -198,11 +189,7 @@ private class VolunteerPersonDeleteHandlerTest {
 				[SELECT COUNT() FROM Volunteer_Requirement__c WHERE Contact__c = :kept.Id],
 				'The merge moved the background check to the person kept'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Volunteer_Skill__c WHERE Contact__c = :kept.Id],
-				'And the skill'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Volunteer_Skill__c WHERE Contact__c = :kept.Id], 'And the skill');
 		}
 	}
 

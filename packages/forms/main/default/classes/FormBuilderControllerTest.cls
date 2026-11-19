@@ -18,15 +18,9 @@ private class FormBuilderControllerTest {
 
 			Test.startTest();
 			FormBuilderController.BuilderView opened = FormBuilderController.getBuilder(form.Id);
-			FormBuilderController.BuilderView saved = FormBuilderController.saveDraft(
-				form.Id,
-				draft
-			);
+			FormBuilderController.BuilderView saved = FormBuilderController.saveDraft(form.Id, draft);
 			FormBuilderController.BuilderView first = FormBuilderController.publish(form.Id, draft);
-			FormBuilderController.BuilderView second = FormBuilderController.publish(
-				form.Id,
-				draft
-			);
+			FormBuilderController.BuilderView second = FormBuilderController.publish(form.Id, draft);
 			Test.stopTest();
 
 			Assert.isNull(opened.definition, 'A new form has no draft yet');
@@ -36,10 +30,7 @@ private class FormBuilderControllerTest {
 			Assert.areEqual(1, first.publishedVersion);
 			Assert.areEqual('Published', first.status);
 			Assert.areEqual(2, second.publishedVersion, 'Each publish is a new version');
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Form_Version__c WHERE Form__c = :form.Id WITH USER_MODE]
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Form_Version__c WHERE Form__c = :form.Id WITH USER_MODE]);
 		}
 	}
 
@@ -50,10 +41,7 @@ private class FormBuilderControllerTest {
 			insert as user form;
 			Map<String, Object> definition = FormsTestData.definition();
 			FormRules.allFields(definition)[0]
-				.put(
-					'target',
-					new Map<String, Object>{ 'record' => 'person', 'field' => 'No_Such_Field__c' }
-				);
+				.put('target', new Map<String, Object>{ 'record' => 'person', 'field' => 'No_Such_Field__c' });
 
 			String message;
 			Test.startTest();

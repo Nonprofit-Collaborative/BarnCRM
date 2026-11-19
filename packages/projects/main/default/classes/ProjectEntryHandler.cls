@@ -29,11 +29,7 @@ public with sharing class ProjectEntryHandler extends TriggerHandler {
 			return;
 		}
 		Boolean isTime = rows[0] instanceof Time_Entry__c;
-		if (
-			before == null &&
-			ProjectsSettings.approvalsEnabled() &&
-			(isTime || ProjectsSettings.expensesEnabled())
-		) {
+		if (before == null && ProjectsSettings.approvalsEnabled() && (isTime || ProjectsSettings.expensesEnabled())) {
 			for (SObject row : rows) {
 				if (row.get('Status__c') == null) {
 					row.put('Status__c', 'Open');
@@ -45,9 +41,7 @@ public with sharing class ProjectEntryHandler extends TriggerHandler {
 		}
 		List<SObject> toStamp = new List<SObject>();
 		for (SObject row : rows) {
-			if (
-				before == null ? row.get('Bill_Rate__c') == null : repriced(row, before.get(row.Id))
-			) {
+			if (before == null ? row.get('Bill_Rate__c') == null : repriced(row, before.get(row.Id))) {
 				toStamp.add(row);
 			}
 		}

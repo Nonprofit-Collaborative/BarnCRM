@@ -14,19 +14,13 @@ private class BulkUpdateControllerTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			noRollupTargets();
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Springfield Food Bank')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 			insert organization;
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < 200; index++) {
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							AccountId = organization.Id,
-							LastName = 'Person ' + index,
-							Title = 'Volunteer'
-						)
+						new Contact(AccountId = organization.Id, LastName = 'Person ' + index, Title = 'Volunteer')
 					)
 				);
 			}
@@ -55,13 +49,7 @@ private class BulkUpdateControllerTest {
 	);
 
 	private static final String SET_COORDINATOR = JSON.serialize(
-		new List<Object>{
-			new Map<String, Object>{
-				'field' => 'Title',
-				'action' => 'set',
-				'value' => 'Coordinator'
-			}
-		}
+		new List<Object>{ new Map<String, Object>{ 'field' => 'Title', 'action' => 'set', 'value' => 'Coordinator' } }
 	);
 
 	/**
@@ -80,10 +68,7 @@ private class BulkUpdateControllerTest {
 	@IsTest
 	static void bothPermissionsAreNeededAndFindSaysWhetherToOffer() {
 		System.runAs(TestUsers.admin()) {
-			User david = TestDataFactory.createUser(
-				'David',
-				new List<String>{ 'BarnCRM_Find_And_Export' }
-			);
+			User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Find_And_Export' });
 			System.runAs(david) {
 				System.Assert.isFalse(FindController.getPage().canBulkUpdate, 'Not offered');
 				BulkUpdateController.BulkUpdatePage page = BulkUpdateController.getPage(false);
@@ -102,10 +87,7 @@ private class BulkUpdateControllerTest {
 			}
 			System.runAs(maria()) {
 				System.Assert.isTrue(FindController.getPage().canBulkUpdate, 'Offered to an admin');
-				System.Assert.isTrue(
-					BulkUpdateController.getPage(false).allowed,
-					'Listed for an admin'
-				);
+				System.Assert.isTrue(BulkUpdateController.getPage(false).allowed, 'Listed for an admin');
 			}
 
 		}
@@ -162,11 +144,7 @@ private class BulkUpdateControllerTest {
 			);
 			Import_Batch__c job;
 			System.runAs(bea) {
-				job = BulkUpdateService.createJob(
-					BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
-					1,
-					1
-				);
+				job = BulkUpdateService.createJob(BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR), 1, 1);
 			}
 			Contact person = [SELECT Id FROM Contact LIMIT 1];
 			ImportJournalService.write(
@@ -185,11 +163,7 @@ private class BulkUpdateControllerTest {
 
 			BulkUpdateController.JobView view;
 			System.runAs(bea) {
-				System.Assert.areEqual(
-					1,
-					BulkUpdateController.getPage(false).jobs.size(),
-					'Listed'
-				);
+				System.Assert.areEqual(1, BulkUpdateController.getPage(false).jobs.size(), 'Listed');
 				view = BulkUpdateController.getJob(job.Id);
 			}
 			System.Assert.areEqual(1, view.failed, 'The refusal is counted');
@@ -208,10 +182,7 @@ private class BulkUpdateControllerTest {
 			BulkUpdateController.JobView started;
 			Test.startTest();
 			System.runAs(maria) {
-				System.Assert.isFalse(
-					BulkUpdateController.getTargets('Contact').isEmpty(),
-					'Fields are offered'
-				);
+				System.Assert.isFalse(BulkUpdateController.getTargets('Contact').isEmpty(), 'Fields are offered');
 				preview = BulkUpdateController.preview(VOLUNTEERS, SET_COORDINATOR);
 				started = BulkUpdateController.start(VOLUNTEERS, SET_COORDINATOR, preview.count);
 			}
@@ -238,12 +209,7 @@ private class BulkUpdateControllerTest {
 			User maria = maria();
 			Id jobId;
 			System.runAs(maria) {
-				jobId = BulkUpdateService.createJob(
-						BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
-						200,
-						200
-					)
-					.Id;
+				jobId = BulkUpdateService.createJob(BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR), 200, 200).Id;
 				BulkUpdateBatch job = new BulkUpdateBatch(jobId);
 				List<SObject> scope = new List<SObject>();
 				Database.QueryLocatorIterator records = job.start(null).iterator();
@@ -260,10 +226,7 @@ private class BulkUpdateControllerTest {
 					BulkUpdateController.undo(jobId, 199);
 					System.Assert.fail('200 values would be put back, not 199');
 				} catch (AuraHandledException refused) {
-					System.Assert.isTrue(
-						refused.getMessage().contains('200'),
-						refused.getMessage()
-					);
+					System.Assert.isTrue(refused.getMessage().contains('200'), refused.getMessage());
 				}
 				BulkUpdateController.undo(jobId, 200);
 			}
@@ -282,12 +245,7 @@ private class BulkUpdateControllerTest {
 			User maria = maria();
 			Id jobId;
 			System.runAs(maria) {
-				jobId = BulkUpdateService.createJob(
-						BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR),
-						200,
-						200
-					)
-					.Id;
+				jobId = BulkUpdateService.createJob(BulkUpdateService.plan(VOLUNTEERS, SET_COORDINATOR), 200, 200).Id;
 				BulkUpdateBatch job = new BulkUpdateBatch(jobId);
 				List<SObject> scope = new List<SObject>();
 				Database.QueryLocatorIterator records = job.start(null).iterator();

@@ -70,13 +70,7 @@ public with sharing class GrantReportController {
 					Award_Number__c,
 					Federal_Agency__c,
 					(
-						SELECT
-							Name,
-							toLabel(Type__c),
-							Due_Date__c,
-							toLabel(Status__c),
-							Submitted_Date__c,
-							Outcome_Id__c
+						SELECT Name, toLabel(Type__c), Due_Date__c, toLabel(Status__c), Submitted_Date__c, Outcome_Id__c
 						FROM Requirements__r
 						ORDER BY Due_Date__c, Name
 					)
@@ -107,11 +101,7 @@ public with sharing class GrantReportController {
 				}
 			}
 			data.requirementLabels = requirementLabels();
-			data.outcomes = GrantOutcomeService.outcomes(
-					linked,
-					grant.Award_Start_Date__c,
-					grant.Award_End_Date__c
-				)
+			data.outcomes = GrantOutcomeService.outcomes(linked, grant.Award_Start_Date__c, grant.Award_End_Date__c)
 				.values();
 			return data;
 		} catch (Exception e) {
@@ -123,9 +113,7 @@ public with sharing class GrantReportController {
 	private static Map<String, Object> grantValues(Grant__c grant) {
 		String organization = BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c;
 		return new Map<String, Object>{
-			'OrganizationName' => String.isBlank(organization)
-				? UserInfo.getOrganizationName()
-				: organization,
+			'OrganizationName' => String.isBlank(organization) ? UserInfo.getOrganizationName() : organization,
 			'Today' => Date.today(),
 			'GrantName' => grant.Name,
 			'FunderName' => grant.Funder__r?.Name,

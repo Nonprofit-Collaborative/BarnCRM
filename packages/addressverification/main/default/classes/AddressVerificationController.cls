@@ -69,11 +69,7 @@ public with sharing class AddressVerificationController {
 			ErrorLogger.log(failure[0], CONTEXT + '.checkConnection');
 		}
 		return ok
-			? BarnHelp.text(
-					'AddressVerification',
-					'AddressVerification_Setup_Connected',
-					new List<Object>{ provider }
-			  )
+			? BarnHelp.text('AddressVerification', 'AddressVerification_Setup_Connected', new List<Object>{ provider })
 			: BarnHelp.text(
 					'AddressVerification',
 					'AddressVerification_Setup_CheckFailed',
@@ -112,17 +108,13 @@ public with sharing class AddressVerificationController {
 
 	private static void refuseUnlessManager() {
 		if (!HealthCheckService.canManageSettings()) {
-			throw UserErrors.message(
-				BarnHelp.text('AddressVerification', 'AddressVerification_Setup_NoManage')
-			);
+			throw UserErrors.message(BarnHelp.text('AddressVerification', 'AddressVerification_Setup_NoManage'));
 		}
 	}
 
 	private static void refuseUnlessProvider(String provider) {
 		if (provider != AddressVerifier.SMARTY && provider != AddressVerifier.GOOGLE) {
-			throw UserErrors.message(
-				BarnHelp.text('AddressVerification', 'AddressVerification_Error_BadProvider')
-			);
+			throw UserErrors.message(BarnHelp.text('AddressVerification', 'AddressVerification_Error_BadProvider'));
 		}
 	}
 
@@ -155,21 +147,12 @@ public with sharing class AddressVerificationController {
 		result.ready = AddressVerifier.isReady();
 		result.canManage = HealthCheckService.canManageSettings();
 		String connected = AddressVerifier.settings().Connected_Provider__c;
-		result.credentials.add(
-			credential(AddressVerifier.SMARTY, connected, 'Barn_Smarty_Key', 'AuthId, AuthToken')
-		);
-		result.credentials.add(
-			credential(AddressVerifier.GOOGLE, connected, 'Barn_Google_Address_Key', 'ApiKey')
-		);
+		result.credentials.add(credential(AddressVerifier.SMARTY, connected, 'Barn_Smarty_Key', 'AuthId, AuthToken'));
+		result.credentials.add(credential(AddressVerifier.GOOGLE, connected, 'Barn_Google_Address_Key', 'ApiKey'));
 		return result;
 	}
 
-	private static Credential credential(
-		String provider,
-		String connected,
-		String principal,
-		String parameters
-	) {
+	private static Credential credential(String provider, String connected, String principal, String parameters) {
 		Credential c = new Credential();
 		c.provider = provider;
 		c.connected = connected == provider;

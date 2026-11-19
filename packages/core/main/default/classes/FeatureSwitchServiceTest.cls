@@ -64,10 +64,7 @@ private class FeatureSwitchServiceTest {
 			Assert.isTrue(hidden.contains('Duplicate_Review'), 'Feature rows are hidden');
 			Assert.isTrue(hidden.contains('Household_Name_Pattern'), 'Name pattern is hidden');
 			Assert.isTrue(hidden.contains('Formal_Greeting_Pattern'), 'Formal greeting is hidden');
-			Assert.isTrue(
-				hidden.contains('Informal_Greeting_Pattern'),
-				'Informal greeting is hidden'
-			);
+			Assert.isTrue(hidden.contains('Informal_Greeting_Pattern'), 'Informal greeting is hidden');
 			Assert.isFalse(relationshipsRun, 'A feature that is off runs no automation');
 		}
 	}
@@ -87,18 +84,12 @@ private class FeatureSwitchServiceTest {
 				SettingsService.getSettings().Features_Turned_On__c,
 				'Only the feature turned on is listed, once'
 			);
-			Assert.isTrue(
-				AutomationControl.isEnabled('Relationship_Reciprocal'),
-				'Its automation runs'
-			);
+			Assert.isTrue(AutomationControl.isEnabled('Relationship_Reciprocal'), 'Its automation runs');
 			Assert.isFalse(
 				FeatureSwitchService.hiddenSettingRows().contains('Relationship_Auto_Reciprocal'),
 				'Its settings row shows'
 			);
-			Assert.isFalse(
-				FeatureSwitchService.isOn(FeatureSwitchService.ADDRESSES),
-				'Other features stay off'
-			);
+			Assert.isFalse(FeatureSwitchService.isOn(FeatureSwitchService.ADDRESSES), 'Other features stay off');
 		}
 	}
 
@@ -109,10 +100,7 @@ private class FeatureSwitchServiceTest {
 
 			Test.startTest();
 			FeatureSwitchService.turnOn(
-				new Set<String>{
-					FeatureSwitchService.DATA_MANAGER,
-					FeatureSwitchService.HOUSEHOLD_UPKEEP
-				}
+				new Set<String>{ FeatureSwitchService.DATA_MANAGER, FeatureSwitchService.HOUSEHOLD_UPKEEP }
 			);
 			Test.stopTest();
 

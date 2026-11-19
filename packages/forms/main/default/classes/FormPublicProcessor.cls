@@ -25,11 +25,7 @@ public with sharing class FormPublicProcessor implements Schedulable {
 	/** Schedules the four jobs as the running user; those already scheduled are kept. */
 	public static void schedule() {
 		for (Integer minute : MINUTES) {
-			ScheduledJobSelector.ensure(
-				jobName(minute),
-				'0 ' + minute + ' * * * ?',
-				new FormPublicProcessor()
-			);
+			ScheduledJobSelector.ensure(jobName(minute), '0 ' + minute + ' * * * ?', new FormPublicProcessor());
 		}
 	}
 
@@ -103,11 +99,7 @@ public with sharing class FormPublicProcessor implements Schedulable {
 			update as user new Form_Submission__c(
 				Id = submissionId,
 				Status__c = FormSubmitService.FAILED,
-				Message__c = BarnHelp.text(
-						'Forms',
-						'Forms_Submit_Failed',
-						new List<Object>{ e.getMessage() }
-					)
+				Message__c = BarnHelp.text('Forms', 'Forms_Submit_Failed', new List<Object>{ e.getMessage() })
 					.abbreviate(255)
 			);
 		} catch (Exception again) {

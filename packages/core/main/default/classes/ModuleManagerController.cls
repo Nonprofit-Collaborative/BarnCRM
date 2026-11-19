@@ -85,11 +85,7 @@ public with sharing class ModuleManagerController {
 		}
 		try {
 			List<String> done = ModuleSetups.finish(new List<String>{ moduleName });
-			SettingsService.logChange(
-				System.Label.Core_ModuleSetup_FinishButton,
-				'',
-				String.join(done, ', ')
-			);
+			SettingsService.logChange(System.Label.Core_ModuleSetup_FinishButton, '', String.join(done, ', '));
 			return buildState();
 		} catch (Exception e) {
 			throw logged(e, BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage'));
@@ -124,10 +120,7 @@ public with sharing class ModuleManagerController {
 		state.showNonprofitModules = ModuleManagerService.showNonprofitModules();
 		state.otherRollupTools = new List<String>();
 		for (ModuleManagerService.ModuleStatus module : state.modules) {
-			if (
-				TOTALLING_MODULES.contains(module.name) &&
-				module.status != ModuleManagerService.STATUS_NOT_INSTALLED
-			) {
+			if (TOTALLING_MODULES.contains(module.name) && module.status != ModuleManagerService.STATUS_NOT_INSTALLED) {
 				state.otherRollupTools = OtherRollupTools.notices();
 				break;
 			}
@@ -137,16 +130,12 @@ public with sharing class ModuleManagerController {
 
 	private static AuraHandledException logged(Exception e, String fallback) {
 		ErrorLogger.log(e, ERROR_CONTEXT);
-		return UserErrors.message(
-			e instanceof ModuleManagerService.ModuleManagerException ? e.getMessage() : fallback
-		);
+		return UserErrors.message(e instanceof ModuleManagerService.ModuleManagerException ? e.getMessage() : fallback);
 	}
 
 	private static void requireEdit() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
 		}
 	}
 }

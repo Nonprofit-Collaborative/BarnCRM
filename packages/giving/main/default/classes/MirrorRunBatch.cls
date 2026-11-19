@@ -103,11 +103,7 @@ public abstract with sharing class MirrorRunBatch implements Database.Batchable<
 			return;
 		}
 		String summary = report();
-		ErrorLogger.logMessage(
-			skipReason == null ? summary : summary + ' ' + skipReason,
-			logContext(),
-			SEVERITY_INFO
-		);
+		ErrorLogger.logMessage(skipReason == null ? summary : summary + ' ' + skipReason, logContext(), SEVERITY_INFO);
 		if (fromDate == null && skipReason == null && recorded()) {
 			recordRun(startedAt, summary);
 		}

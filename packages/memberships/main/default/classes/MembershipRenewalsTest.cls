@@ -18,8 +18,8 @@ private class MembershipRenewalsTest {
 
 	private static Id fakeId(Integer n) {
 		return Id.valueOf(
-			Membership_Benefit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getKeyPrefix() + String.valueOf(n).leftPad(12, '0')
+			Membership_Benefit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+			String.valueOf(n).leftPad(12, '0')
 		);
 	}
 
@@ -64,15 +64,7 @@ private class MembershipRenewalsTest {
 
 	private static List<Membership_Term__c> termsOf(Id contactId) {
 		return [
-			SELECT
-				Id,
-				Status__c,
-				Level__r.Name,
-				Source__c,
-				Start_Date__c,
-				Gift_Id__c,
-				Origin__c,
-				Reminded_For__c
+			SELECT Id, Status__c, Level__r.Name, Source__c, Start_Date__c, Gift_Id__c, Origin__c, Reminded_For__c
 			FROM Membership_Term__c
 			WHERE Contact__c = :contactId
 			WITH USER_MODE
@@ -112,11 +104,7 @@ private class MembershipRenewalsTest {
 
 			List<Membership_Term__c> joined = termsOf(newcomer.Id);
 			Assert.areEqual(1, joined.size(), 'the newcomer joined');
-			Assert.areEqual(
-				'Family',
-				joined[0].Level__r.Name,
-				'at the highest level the gift meets'
-			);
+			Assert.areEqual('Family', joined[0].Level__r.Name, 'at the highest level the gift meets');
 			Assert.areEqual('Gift', joined[0].Source__c, 'paid by a gift');
 
 			List<Membership_Term__c> renewed = termsOf(renewer.Id);
@@ -343,18 +331,10 @@ private class MembershipRenewalsTest {
 		}
 		SObject gift = made('Gift__c', values);
 		// Giving may already have allocated the gift to the default fund.
-		if (
-			Database.countQuery(
-				'SELECT COUNT() FROM Gift_Allocation__c WHERE Gift__c = \'' + gift.Id + '\''
-			) == 0
-		) {
+		if (Database.countQuery('SELECT COUNT() FROM Gift_Allocation__c WHERE Gift__c = \'' + gift.Id + '\'') == 0) {
 			made(
 				'Gift_Allocation__c',
-				new Map<String, Object>{
-					'Gift__c' => gift.Id,
-					'Fund__c' => fundId,
-					'Amount__c' => amount
-				}
+				new Map<String, Object>{ 'Gift__c' => gift.Id, 'Fund__c' => fundId, 'Amount__c' => amount }
 			);
 		}
 		return gift;
@@ -372,11 +352,7 @@ private class MembershipRenewalsTest {
 			MembershipService.todayOverride = TODAY;
 			SObject fund = made(
 				'Fund__c',
-				new Map<String, Object>{
-					'Name' => 'Zzmem Dues',
-					'Active__c' => true,
-					'Is_Default__c' => true
-				}
+				new Map<String, Object>{ 'Name' => 'Zzmem Dues', 'Active__c' => true, 'Is_Default__c' => true }
 			);
 			insert as user new Membership_Level__c(
 				Name = 'Individual',
@@ -419,15 +395,10 @@ private class MembershipRenewalsTest {
 			Assert.areEqual(2, MembershipRenewals.lapse(), 'both ended terms moved');
 			Assert.areEqual(
 				'Lapsed',
-				[SELECT Status__c FROM Membership_Term__c WHERE Id = :single[0].Id WITH USER_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Membership_Term__c WHERE Id = :single[0].Id WITH USER_MODE].Status__c,
 				'no recurring gift: it lapses'
 			);
-			Assert.areEqual(
-				2,
-				termsOf(monthly.Id).size(),
-				'the active commitment renewed its term'
-			);
+			Assert.areEqual(2, termsOf(monthly.Id).size(), 'the active commitment renewed its term');
 		}
 	}
 }

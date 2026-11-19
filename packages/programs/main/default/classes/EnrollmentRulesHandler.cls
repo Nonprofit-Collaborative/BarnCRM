@@ -36,9 +36,7 @@ public with sharing class EnrollmentRulesHandler extends TriggerHandler {
 	}
 
 	public override void afterDelete() {
-		EnrollmentCapacity.promote(
-			EnrollmentCapacity.freedPrograms((List<Enrollment__c>) oldRecords(), null)
-		);
+		EnrollmentCapacity.promote(EnrollmentCapacity.freedPrograms((List<Enrollment__c>) oldRecords(), null));
 	}
 
 	public override void beforeUpdate() {

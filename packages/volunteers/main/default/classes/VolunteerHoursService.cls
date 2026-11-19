@@ -80,9 +80,7 @@ public with sharing class VolunteerHoursService {
 	public static StatusChange reject(Set<Id> hoursIds, String reason) {
 		requirePermission();
 		if (String.isBlank(reason)) {
-			throw new VolunteerHoursException(
-				BarnHelp.text('Volunteers', 'Volunteers_Hours_RejectionReasonRequired')
-			);
+			throw new VolunteerHoursException(BarnHelp.text('Volunteers', 'Volunteers_Hours_RejectionReasonRequired'));
 		}
 		String trimmed = reason.trim().abbreviate(255);
 		Datetime now = Datetime.now();
@@ -122,12 +120,9 @@ public with sharing class VolunteerHoursService {
 		Datetime now = Datetime.now();
 		for (Volunteer_Hours__c entry : entries) {
 			String named = String.isBlank(entry.Status__c) ? STATUS_SUBMITTED : entry.Status__c;
-			Boolean allowed =
-				named == STATUS_SUBMITTED || (named == STATUS_APPROVED && !approvalRequired);
+			Boolean allowed = named == STATUS_SUBMITTED || (named == STATUS_APPROVED && !approvalRequired);
 			if (!allowed) {
-				entry.addError(
-					BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')
-				);
+				entry.addError(BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval'));
 				continue;
 			}
 			if (approvalRequired) {
@@ -163,9 +158,7 @@ public with sharing class VolunteerHoursService {
 				entry.Approved_Date__c != previous.Approved_Date__c ||
 				entry.Rejection_Reason__c != previous.Rejection_Reason__c
 			) {
-				entry.addError(
-					BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')
-				);
+				entry.addError(BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval'));
 			}
 		}
 	}
@@ -177,9 +170,7 @@ public with sharing class VolunteerHoursService {
 	public static void refuseDeletingApproved(List<Volunteer_Hours__c> entries) {
 		for (Volunteer_Hours__c entry : entries) {
 			if (entry.Status__c == STATUS_APPROVED) {
-				entry.addError(
-					BarnHelp.text('Volunteers', 'Volunteers_Hours_ApprovedNotDeletable')
-				);
+				entry.addError(BarnHelp.text('Volunteers', 'Volunteers_Hours_ApprovedNotDeletable'));
 			}
 		}
 	}
@@ -238,20 +229,12 @@ public with sharing class VolunteerHoursService {
 
 	private static void requirePermission() {
 		if (!canManage()) {
-			throw new VolunteerHoursException(
-				BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission')
-			);
+			throw new VolunteerHoursException(BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission'));
 		}
 	}
 
 	/** An entry carrying only its Id and the four fields a verb moves. */
-	private static Volunteer_Hours__c move(
-		Id hoursId,
-		String status,
-		Id decidedBy,
-		Datetime decidedAt,
-		String reason
-	) {
+	private static Volunteer_Hours__c move(Id hoursId, String status, Id decidedBy, Datetime decidedAt, String reason) {
 		return new Volunteer_Hours__c(
 			Id = hoursId,
 			Status__c = status,

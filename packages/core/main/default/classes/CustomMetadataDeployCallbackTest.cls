@@ -69,16 +69,8 @@ private class CustomMetadataDeployCallbackTest {
 				BarnHelp.text('Core', 'Core_CmdtManager_DeployFailed'),
 				new List<Object>{ 'Mentor', failure.problem }
 			);
-			Assert.areEqual(
-				expected,
-				CustomMetadataManagerSelector.failureMessage(JOB),
-				'The reason'
-			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Setting_Change__c],
-				'Nothing changed, no audit'
-			);
+			Assert.areEqual(expected, CustomMetadataManagerSelector.failureMessage(JOB), 'The reason');
+			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'Nothing changed, no audit');
 		}
 	}
 
@@ -93,16 +85,8 @@ private class CustomMetadataDeployCallbackTest {
 			String none = CustomMetadataDeployCallback.reasonOf(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason'),
-				reason,
-				'Fallback'
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason'),
-				none,
-				'No result at all'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason'), reason, 'Fallback');
+			Assert.areEqual(BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason'), none, 'No result at all');
 		}
 	}
 }

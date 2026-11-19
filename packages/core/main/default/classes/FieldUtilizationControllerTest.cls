@@ -16,10 +16,7 @@ private class FieldUtilizationControllerTest {
 		// has no delete access on the snapshots. Without read access on the object she would be
 		// refused for that instead: a Standard User profile need not grant it.
 		System.runAs(TestUsers.admin()) {
-			User dana = TestDataFactory.createUser(
-				'DanaNoDelete',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			User dana = TestDataFactory.createUser('DanaNoDelete', new List<String>{ 'BarnCRM_Staff' });
 			SettingsTestPermissions.grantTo('Snapshot_No_Delete_Test', dana.Id);
 			// Built once for the class rather than in every test that runs as her.
 			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
@@ -33,19 +30,14 @@ private class FieldUtilizationControllerTest {
 	private static final String REASON = Duplicate_Dismissal__c.Reason__c.getDescribe().getName();
 	private static final String PHONE = Account.Phone.getDescribe().getName();
 	// Not named ACCOUNT: Apex names are case-insensitive, so that would shadow the Account type.
-	private static final String ACCOUNT_TYPE = Account.SObjectType.getDescribe(
-			SObjectDescribeOptions.DEFERRED
-		)
+	private static final String ACCOUNT_TYPE = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 		.getName();
 
 	private static User maria() {
 		return TestUsers.fromSetup('Maria');
 	}
 
-	private static List<Duplicate_Dismissal__c> insertDismissals(
-		Integer howMany,
-		Integer withReason
-	) {
+	private static List<Duplicate_Dismissal__c> insertDismissals(Integer howMany, Integer withReason) {
 		List<Duplicate_Dismissal__c> rows = new List<Duplicate_Dismissal__c>();
 		for (Integer i = 0; i < howMany; i++) {
 			rows.add(
@@ -141,9 +133,7 @@ private class FieldUtilizationControllerTest {
 					Account organization = AddressTestDataFactory.newOrganization('Barn Org ' + i);
 					organization.Phone = i < 80 ? '555-0100' : null;
 					accounts.add(organization);
-					Account household = HouseholdTestDataFactory.newHousehold(
-						'The Barn ' + i + ' Family'
-					);
+					Account household = HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family');
 					household.Phone = i < 20 ? '555-0199' : null;
 					accounts.add(household);
 				}
@@ -173,9 +163,7 @@ private class FieldUtilizationControllerTest {
 				List<Account> accounts = new List<Account>();
 				for (Integer i = 0; i < 20; i++) {
 					accounts.add(AddressTestDataFactory.newOrganization('Barn Org ' + i));
-					accounts.add(
-						HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family')
-					);
+					accounts.add(HouseholdTestDataFactory.newHousehold('The Barn ' + i + ' Family'));
 				}
 				Database.insert(accounts, AccessLevel.SYSTEM_MODE);
 				Test.startTest();
@@ -184,11 +172,7 @@ private class FieldUtilizationControllerTest {
 			}
 
 			Map<String, FieldUtilizationController.CountRow> rows = byRecordType(chunk.rows);
-			Assert.areEqual(
-				20,
-				rows.get(organizationKey()).total,
-				'Every organization is counted.'
-			);
+			Assert.areEqual(20, rows.get(organizationKey()).total, 'Every organization is counted.');
 			Assert.areEqual(
 				20,
 				rows.get('Household').filled,
@@ -217,11 +201,7 @@ private class FieldUtilizationControllerTest {
 
 			Assert.areEqual(1, chunk.rows.size(), 'Only organizations exist: one row.');
 			Assert.isTrue(chunk.rows[0].sampled, 'A long text field is sampled.');
-			Assert.areEqual(
-				FieldUtilizationService.SAMPLE_SIZE,
-				chunk.rows[0].total,
-				'Sample size.'
-			);
+			Assert.areEqual(FieldUtilizationService.SAMPLE_SIZE, chunk.rows[0].total, 'Sample size.');
 			Assert.areEqual(50, chunk.rows[0].filled, 'Every filled description in the sample.');
 		}
 	}
@@ -361,11 +341,7 @@ private class FieldUtilizationControllerTest {
 				refusal = refusalOf(DISMISSAL, new List<String>{ REASON });
 			}
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired'),
-				refusal,
-				'Refused.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired'), refusal, 'Refused.');
 		}
 	}
 
@@ -383,25 +359,19 @@ private class FieldUtilizationControllerTest {
 			}
 			Assert.isTrue(offered.contains(ACCOUNT_TYPE), 'Account.');
 			Assert.isTrue(
-				offered.contains(
-					Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-				),
+				offered.contains(Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()),
 				'Contact.'
 			);
 			Assert.isTrue(offered.contains(DISMISSAL), 'A custom object.');
 			Assert.isFalse(
 				offered.contains(
-					Field_Utilization_Snapshot__c.SObjectType.getDescribe(
-							SObjectDescribeOptions.DEFERRED
-						)
-						.getName()
+					Field_Utilization_Snapshot__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
 				),
 				'Never its own snapshots.'
 			);
 			Assert.isFalse(
 				offered.contains(
-					BarnCRM_Settings__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getName()
+					BarnCRM_Settings__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
 				),
 				'Never a custom setting.'
 			);
@@ -412,21 +382,15 @@ private class FieldUtilizationControllerTest {
 	static void formulaAndAutomaticFieldsAreLeftOutButCheckboxesAreCounted() {
 		System.runAs(TestUsers.admin()) {
 			Set<String> counted = FieldUtilizationService.countableFieldsByName(
-					Field_Utilization_Snapshot__c.SObjectType.getDescribe(
-						SObjectDescribeOptions.DEFERRED
-					)
+					Field_Utilization_Snapshot__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 				)
 				.keySet();
 			Assert.isTrue(
-				counted.contains(
-					Field_Utilization_Snapshot__c.Field_Name__c.getDescribe().getName()
-				),
+				counted.contains(Field_Utilization_Snapshot__c.Field_Name__c.getDescribe().getName()),
 				'Text.'
 			);
 			Assert.isFalse(
-				counted.contains(
-					Field_Utilization_Snapshot__c.Fill_Rate__c.getDescribe().getName()
-				),
+				counted.contains(Field_Utilization_Snapshot__c.Fill_Rate__c.getDescribe().getName()),
 				'Formula.'
 			);
 			Assert.isTrue(
@@ -548,10 +512,7 @@ private class FieldUtilizationControllerTest {
 
 	@IsTest
 	static void picklistAndCheckboxDefaultsAreCountedAtDefault() {
-		String batchObject = Import_Batch__c.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
-			.getName();
+		String batchObject = Import_Batch__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		String status = Import_Batch__c.Status__c.getDescribe().getName();
 		String dryRun = Import_Batch__c.Is_Dry_Run__c.getDescribe().getName();
 		String fileName = Import_Batch__c.File_Name__c.getDescribe().getName();
@@ -590,11 +551,7 @@ private class FieldUtilizationControllerTest {
 			Assert.areEqual(40.0, statusRow.atDefaultPercent, 'Of the ten counted.');
 
 			FieldUtilizationController.CountRow dryRunRow = byField.get(dryRun);
-			Assert.areEqual(
-				System.Label.Core_BulkUpdate_True,
-				dryRunRow.defaultValue,
-				'The checkbox default.'
-			);
+			Assert.areEqual(System.Label.Core_BulkUpdate_True, dryRunRow.defaultValue, 'The checkbox default.');
 			Assert.areEqual(10, dryRunRow.filled, 'A checkbox is never empty.');
 			Assert.areEqual(7, dryRunRow.atDefault, 'Seven batches kept the default.');
 			Assert.areEqual(70.0, dryRunRow.atDefaultPercent, 'As a percentage.');
@@ -759,11 +716,7 @@ private class FieldUtilizationControllerTest {
 				refusal,
 				'Refused without delete access.'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Field_Utilization_Snapshot__c],
-				'Nothing was deleted.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Field_Utilization_Snapshot__c], 'Nothing was deleted.');
 		}
 	}
 

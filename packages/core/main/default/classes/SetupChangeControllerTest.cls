@@ -14,31 +14,13 @@ private class SetupChangeControllerTest {
 		TestUsers.admin();
 		// runs-as: deploying user (the kept rows are written by the copy job, never by a person)
 		insert as system new List<Setup_Change__c>{
-			change(
-				'a',
-				NOON.addDays(-20),
-				'Pat Admin',
-				'Customize Accounts',
-				'Changed Phone field label'
-			),
-			change(
-				'b',
-				NOON.addDays(-10),
-				'Sam Admin',
-				'Manage Users',
-				'Changed profile for user Lee'
-			),
+			change('a', NOON.addDays(-20), 'Pat Admin', 'Customize Accounts', 'Changed Phone field label'),
+			change('b', NOON.addDays(-10), 'Sam Admin', 'Manage Users', 'Changed profile for user Lee'),
 			change('c', NOON, 'Pat Admin', 'Customize Accounts', 'Changed Website field help text')
 		};
 	}
 
-	private static Setup_Change__c change(
-		String id,
-		Datetime at,
-		String author,
-		String section,
-		String display
-	) {
+	private static Setup_Change__c change(String id, Datetime at, String author, String section, String display) {
 		return new Setup_Change__c(
 			Audit_Trail_Id__c = id,
 			Changed_At__c = at,
@@ -83,13 +65,7 @@ private class SetupChangeControllerTest {
 	static void theSearchFiltersByDaySectionAndWordsNewestFirst() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			SetupChangeController.Result all = SetupChangeController.getChanges(
-				null,
-				null,
-				null,
-				null,
-				null
-			);
+			SetupChangeController.Result all = SetupChangeController.getChanges(null, null, null, null, null);
 			SetupChangeController.Result days = SetupChangeController.getChanges(
 				'2026-02-27',
 				'2026-03-01',
@@ -142,21 +118,9 @@ private class SetupChangeControllerTest {
 	static void theSearchSaysWhenMoreMatchAndWhenItStoppedLooking() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			SetupChangeController.Result first = SetupChangeController.getChanges(
-				null,
-				null,
-				null,
-				null,
-				2
-			);
+			SetupChangeController.Result first = SetupChangeController.getChanges(null, null, null, null, 2);
 			SetupChangeController.scanCap = 2;
-			SetupChangeController.Result stopped = SetupChangeController.getChanges(
-				null,
-				null,
-				null,
-				'phone',
-				200
-			);
+			SetupChangeController.Result stopped = SetupChangeController.getChanges(null, null, null, 'phone', 200);
 			Test.stopTest();
 
 			Assert.areEqual(2, first.rows.size(), 'Only as many as asked for.');

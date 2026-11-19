@@ -118,11 +118,7 @@ private class WhatsNewControllerTest {
 			Assert.areEqual('0.7', shown[2].version);
 			Assert.areEqual('Nine', shown[1].notes[0].key);
 			Assert.areEqual('Ordered', shown[1].notes[1].key);
-			Assert.areEqual(
-				'Unordered',
-				shown[1].notes[2].key,
-				'A note without an order comes last.'
-			);
+			Assert.areEqual('Unordered', shown[1].notes[2].key, 'A note without an order comes last.');
 		}
 	}
 
@@ -159,11 +155,7 @@ private class WhatsNewControllerTest {
 				SELECT SetupOwnerId, Last_Seen_Version__c
 				FROM Whats_New_Seen__c
 			];
-			Assert.areEqual(
-				1,
-				rows.size(),
-				'No organization-wide or other record is written (R-WN1).'
-			);
+			Assert.areEqual(1, rows.size(), 'No organization-wide or other record is written (R-WN1).');
 			Assert.areEqual(person.Id, rows[0].SetupOwnerId);
 			Assert.areEqual('0.12', rows[0].Last_Seen_Version__c);
 		}
@@ -224,11 +216,7 @@ private class WhatsNewControllerTest {
 				new List<Release_Note__mdt>{ note('Five', '0.5', 1), note('Six', '0.6', 1) },
 				'garbage'
 			);
-			Assert.areEqual(
-				1,
-				shown.size(),
-				'A malformed stored version reads as never dismissed.'
-			);
+			Assert.areEqual(1, shown.size(), 'A malformed stored version reads as never dismissed.');
 			Assert.areEqual('0.6', shown[0].version);
 		}
 	}

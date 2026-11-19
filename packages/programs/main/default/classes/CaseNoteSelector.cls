@@ -57,9 +57,7 @@ public without sharing class CaseNoteSelector {
 		for (AggregateResult row : [
 			SELECT Enrollment__c enrollment
 			FROM Case_Note__c
-			WHERE
-				Enrollment__r.Program__r.Sample_Data__c = TRUE
-				AND Enrollment__r.Contact__r.Sample_Data__c = TRUE
+			WHERE Enrollment__r.Program__r.Sample_Data__c = TRUE AND Enrollment__r.Contact__r.Sample_Data__c = TRUE
 			WITH SYSTEM_MODE
 			GROUP BY Enrollment__c
 			LIMIT 2000

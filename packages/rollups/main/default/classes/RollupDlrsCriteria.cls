@@ -27,9 +27,7 @@ public with sharing class RollupDlrsCriteria {
 		'LAST_YEAR' => 'last year'
 	};
 	// Not called FIELD: Apex names ignore case, and a local `field` would hide it.
-	private static final Pattern FIELD_PATH = Pattern.compile(
-		'^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)?$'
-	);
+	private static final Pattern FIELD_PATH = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)?$');
 	private static final Pattern NUMERAL = Pattern.compile('^-?\\d+(\\.\\d+)?$');
 	private static final Pattern DATE_VALUE = Pattern.compile(
 		'^\\d{4}-\\d{2}-\\d{2}(T[0-9:.]+(Z|[+-]\\d{2}:?\\d{2}))?$'
@@ -60,9 +58,7 @@ public with sharing class RollupDlrsCriteria {
 				throw reader.unreadable(reader.position);
 			}
 		}
-		List<Map<String, Object>> alsoRequired = required == null
-			? new List<Map<String, Object>>()
-			: required;
+		List<Map<String, Object>> alsoRequired = required == null ? new List<Map<String, Object>>() : required;
 		for (Map<String, Object> condition : alsoRequired) {
 			String id = reader.add(condition);
 			logic = String.isBlank(logic) ? id : '(' + logic + ') AND ' + id;
@@ -71,11 +67,7 @@ public with sharing class RollupDlrsCriteria {
 			return null;
 		}
 		return JSON.serialize(
-			new Map<String, Object>{
-				'version' => 1,
-				'logic' => logic,
-				'conditions' => reader.conditions
-			}
+			new Map<String, Object>{ 'version' => 1, 'logic' => logic, 'conditions' => reader.conditions }
 		);
 	}
 
@@ -289,9 +281,7 @@ public with sharing class RollupDlrsCriteria {
 	}
 
 	private Boolean isWord(String word) {
-		return position < tokens.size() &&
-			!quoted[position] &&
-			tokens[position].equalsIgnoreCase(word);
+		return position < tokens.size() && !quoted[position] && tokens[position].equalsIgnoreCase(word);
 	}
 
 	private void expect(String token) {

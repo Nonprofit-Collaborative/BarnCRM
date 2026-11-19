@@ -21,10 +21,7 @@ public with sharing class GiftTransactionMirrorTriggerHandler extends TriggerHan
 	}
 
 	public override void beforeUpdate() {
-		GiftTransactionMirrorService.checkLinks(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		GiftTransactionMirrorService.checkLinks((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 
 	public override void afterDelete() {

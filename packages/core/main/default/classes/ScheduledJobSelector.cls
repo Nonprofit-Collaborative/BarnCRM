@@ -67,10 +67,7 @@ public with sharing class ScheduledJobSelector {
 	public static List<String> namesOwnedByInactiveUsers() {
 		Map<String, Id> ownerByName = new Map<String, Id>();
 		for (CronTrigger job : all().values()) {
-			ownerByName.put(
-				job.CronJobDetail.Name,
-				ownerOverride != null ? ownerOverride : job.OwnerId
-			);
+			ownerByName.put(job.CronJobDetail.Name, ownerOverride != null ? ownerOverride : job.OwnerId);
 		}
 		Set<Id> ownerIds = new Set<Id>(ownerByName.values());
 		Set<Id> inactive = new Set<Id>();

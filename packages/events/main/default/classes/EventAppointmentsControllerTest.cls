@@ -27,9 +27,7 @@ private class EventAppointmentsControllerTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = TestDataFactory.person(
-			new Contact(FirstName = 'Test', LastName = lastName)
-		);
+		Contact record = TestDataFactory.person(new Contact(FirstName = 'Test', LastName = lastName));
 		insert as user record;
 		return record;
 	}
@@ -60,9 +58,7 @@ private class EventAppointmentsControllerTest {
 				'Table 4'
 			);
 			Assert.areEqual(3, added);
-			EventAppointmentsController.Appointments result = EventAppointmentsController.getAppointments(
-				event.Id
-			);
+			EventAppointmentsController.Appointments result = EventAppointmentsController.getAppointments(event.Id);
 			Assert.areEqual(3, result.slots.size());
 			Assert.areEqual('Open', result.slots[0].status);
 			Assert.areEqual('Table 4', result.slots[0].location);
@@ -81,13 +77,7 @@ private class EventAppointmentsControllerTest {
 			Datetime start = Datetime.now().addDays(30);
 			Event__c event = conference(start);
 			Contact priya = person('Priya');
-			for (
-				String bad : new List<String>{
-					'[]',
-					slotsJson(start, 101),
-					slotsJson(start.addDays(2), 1)
-				}
-			) {
+			for (String bad : new List<String>{ '[]', slotsJson(start, 101), slotsJson(start.addDays(2), 1) }) {
 				try {
 					EventAppointmentsController.addSlots(event.Id, priya.Id, bad, null);
 					Assert.fail('A bad batch is refused');
@@ -109,20 +99,10 @@ private class EventAppointmentsControllerTest {
 			Event__c event = conference(start);
 			Contact priya = person('Priya');
 			Contact omar = person('Omar');
-			EventAppointmentsController.addSlots(
-				event.Id,
-				priya.Id,
-				slotsJson(start.addHours(1), 2),
-				null
-			);
+			EventAppointmentsController.addSlots(event.Id, priya.Id, slotsJson(start.addHours(1), 2), null);
 			Contact sam = person('Sam');
 			// A second host with a slot at the very same time as Priya's first slot.
-			EventAppointmentsController.addSlots(
-				event.Id,
-				sam.Id,
-				slotsJson(start.addHours(1), 1),
-				null
-			);
+			EventAppointmentsController.addSlots(event.Id, sam.Id, slotsJson(start.addHours(1), 1), null);
 			List<Event_Appointment__c> priyas = [
 				SELECT Id
 				FROM Event_Appointment__c
@@ -148,24 +128,17 @@ private class EventAppointmentsControllerTest {
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
 					omar.Id,
-					[SELECT Contact__c FROM Event_Appointment__c WHERE Id = :priyas[0].Id]
-					.Contact__c
+					[SELECT Contact__c FROM Event_Appointment__c WHERE Id = :priyas[0].Id].Contact__c
 				);
 			}
 			try {
 				EventAppointmentsController.book(samsSlot.Id, omar.Id);
 				Assert.fail('Omar is already booked at that time');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					'Open',
-					[SELECT Status__c FROM Event_Appointment__c WHERE Id = :samsSlot.Id].Status__c
-				);
+				Assert.areEqual('Open', [SELECT Status__c FROM Event_Appointment__c WHERE Id = :samsSlot.Id].Status__c);
 			}
 			EventAppointmentsController.book(priyas[1].Id, omar.Id);
-			Assert.areEqual(
-				'Booked',
-				[SELECT Status__c FROM Event_Appointment__c WHERE Id = :priyas[1].Id].Status__c
-			);
+			Assert.areEqual('Booked', [SELECT Status__c FROM Event_Appointment__c WHERE Id = :priyas[1].Id].Status__c);
 		}
 	}
 
@@ -176,28 +149,17 @@ private class EventAppointmentsControllerTest {
 			Event__c event = conference(start);
 			Contact priya = person('Priya');
 			Contact omar = person('Omar');
-			EventAppointmentsController.addSlots(
-				event.Id,
-				priya.Id,
-				slotsJson(start.addHours(1), 1),
-				null
-			);
+			EventAppointmentsController.addSlots(event.Id, priya.Id, slotsJson(start.addHours(1), 1), null);
 			Id slotId = [SELECT Id FROM Event_Appointment__c WHERE Host__c = :priya.Id].Id;
 			try {
 				EventAppointmentsController.setStatus(slotId, 'Completed');
 				Assert.fail('An open slot has nobody to complete');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					'Open',
-					[SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c
-				);
+				Assert.areEqual('Open', [SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c);
 			}
 			EventAppointmentsController.book(slotId, omar.Id);
 			EventAppointmentsController.setStatus(slotId, 'No-Show');
-			Assert.areEqual(
-				'No-Show',
-				[SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c
-			);
+			Assert.areEqual('No-Show', [SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c);
 			EventAppointmentsController.setStatus(slotId, 'Open');
 			Event_Appointment__c reopened = [
 				SELECT Status__c, Contact__c
@@ -207,18 +169,12 @@ private class EventAppointmentsControllerTest {
 			Assert.areEqual('Open', reopened.Status__c);
 			Assert.isNull(reopened.Contact__c, 'Releasing a slot clears the person');
 			EventAppointmentsController.setStatus(slotId, 'Cancelled');
-			Assert.areEqual(
-				'Cancelled',
-				[SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c
-			);
+			Assert.areEqual('Cancelled', [SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c);
 			try {
 				EventAppointmentsController.setStatus(slotId, 'Booked');
 				Assert.fail('Booked goes through book()');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					'Cancelled',
-					[SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c
-				);
+				Assert.areEqual('Cancelled', [SELECT Status__c FROM Event_Appointment__c WHERE Id = :slotId].Status__c);
 			}
 		}
 	}
@@ -245,10 +201,7 @@ private class EventAppointmentsControllerTest {
 				Start__c = start.addHours(1),
 				End__c = start.addHours(2)
 			);
-			Assert.isFalse(
-				Database.insert(noHost, false, AccessLevel.USER_MODE).isSuccess(),
-				'R-EAP3'
-			);
+			Assert.isFalse(Database.insert(noHost, false, AccessLevel.USER_MODE).isSuccess(), 'R-EAP3');
 			Event_Appointment__c backwards = new Event_Appointment__c(
 				Event__c = event.Id,
 				Name = 'Backwards',
@@ -256,10 +209,7 @@ private class EventAppointmentsControllerTest {
 				Start__c = start.addHours(2),
 				End__c = start.addHours(1)
 			);
-			Assert.isFalse(
-				Database.insert(backwards, false, AccessLevel.USER_MODE).isSuccess(),
-				'R-EAP1'
-			);
+			Assert.isFalse(Database.insert(backwards, false, AccessLevel.USER_MODE).isSuccess(), 'R-EAP1');
 		}
 	}
 
@@ -274,9 +224,7 @@ private class EventAppointmentsControllerTest {
 			event = conference(Datetime.now().addDays(30));
 		}
 		System.runAs(viewer) {
-			EventAppointmentsController.Appointments result = EventAppointmentsController.getAppointments(
-				event.Id
-			);
+			EventAppointmentsController.Appointments result = EventAppointmentsController.getAppointments(event.Id);
 			Assert.isFalse(result.canAdd, 'Read Only cannot add slots');
 			Assert.isFalse(result.canBook, 'Read Only cannot book');
 		}

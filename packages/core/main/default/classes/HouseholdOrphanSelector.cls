@@ -41,9 +41,7 @@ public with sharing class HouseholdOrphanSelector {
 				ORDER BY CreatedDate DESC
 				LIMIT :ERASED_READ_CAP
 			]) {
-				erased.add(
-					erasure.Contact__c != null ? erasure.Contact__c : erasure.Person_Account__c
-				);
+				erased.add(erasure.Contact__c != null ? erasure.Contact__c : erasure.Person_Account__c);
 			}
 		}
 		return erased;
@@ -97,10 +95,7 @@ public with sharing class HouseholdOrphanSelector {
 	 * of a person account is counted as the account below. Never empty: it always holds the
 	 * household type.
 	 */
-	public static Integer countContactsWithoutMembership(
-		Set<Id> excludedAccountTypes,
-		Integer cap
-	) {
+	public static Integer countContactsWithoutMembership(Set<Id> excludedAccountTypes, Integer cap) {
 		Date today = OrgDate.today();
 		return [
 			SELECT COUNT()
@@ -119,10 +114,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
-	public static List<Contact> contactsWithoutMembership(
-		Set<Id> excludedAccountTypes,
-		Integer howMany
-	) {
+	public static List<Contact> contactsWithoutMembership(Set<Id> excludedAccountTypes, Integer howMany) {
 		Date today = OrgDate.today();
 		return [
 			SELECT Id, Name
@@ -177,9 +169,7 @@ public with sharing class HouseholdOrphanSelector {
 	 * membership row, leaving out those whose account is of an excluded type, as
 	 * `contactsWithoutMembership` does. System mode for the reason above.
 	 */
-	public static Database.QueryLocator contactsWithoutMembershipLocator(
-		Set<Id> excludedAccountTypes
-	) {
+	public static Database.QueryLocator contactsWithoutMembershipLocator(Set<Id> excludedAccountTypes) {
 		Date today = OrgDate.today();
 		Set<Id> erasedIds = erasedPeople();
 		return Database.getQueryLocator(
@@ -217,9 +207,7 @@ public with sharing class HouseholdOrphanSelector {
 	 * the id is selected, so no person account field is named here (ADR-0013); the batch reads
 	 * the naming fields through `PersonRecordSelector`. System mode for the reason above.
 	 */
-	public static Database.QueryLocator personAccountsWithoutMembershipLocator(
-		Set<Id> personRecordTypeIds
-	) {
+	public static Database.QueryLocator personAccountsWithoutMembershipLocator(Set<Id> personRecordTypeIds) {
 		Date today = OrgDate.today();
 		Set<Id> erasedIds = erasedPeople();
 		return Database.getQueryLocator(
@@ -240,10 +228,7 @@ public with sharing class HouseholdOrphanSelector {
 	}
 
 	/** Junction mode, people stored as accounts: no current membership row names them. */
-	public static Integer countPersonAccountsWithoutMembership(
-		Set<Id> personRecordTypeIds,
-		Integer cap
-	) {
+	public static Integer countPersonAccountsWithoutMembership(Set<Id> personRecordTypeIds, Integer cap) {
 		Date today = OrgDate.today();
 		return [
 			SELECT COUNT()
@@ -261,10 +246,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
-	public static List<Account> personAccountsWithoutMembership(
-		Set<Id> personRecordTypeIds,
-		Integer howMany
-	) {
+	public static List<Account> personAccountsWithoutMembership(Set<Id> personRecordTypeIds, Integer howMany) {
 		Date today = OrgDate.today();
 		return [
 			SELECT Id, Name
@@ -296,10 +278,7 @@ public with sharing class HouseholdOrphanSelector {
 		];
 	}
 
-	public static List<Account> householdsWithoutContacts(
-		Id householdRecordTypeId,
-		Integer howMany
-	) {
+	public static List<Account> householdsWithoutContacts(Id householdRecordTypeId, Integer howMany) {
 		return [
 			SELECT Id, Name
 			FROM Account
@@ -323,21 +302,14 @@ public with sharing class HouseholdOrphanSelector {
 				AND Id NOT IN (
 					SELECT Household__c
 					FROM Household_Member__c
-					WHERE
-						(Contact__c != NULL
-						OR Account__c != NULL)
-						AND (End_Date__c = NULL
-						OR End_Date__c > :today)
+					WHERE (Contact__c != NULL OR Account__c != NULL) AND (End_Date__c = NULL OR End_Date__c > :today)
 				)
 			WITH USER_MODE
 			LIMIT :cap
 		];
 	}
 
-	public static List<Account> householdsWithoutMembers(
-		Id householdRecordTypeId,
-		Integer howMany
-	) {
+	public static List<Account> householdsWithoutMembers(Id householdRecordTypeId, Integer howMany) {
 		Date today = OrgDate.today();
 		return [
 			SELECT Id, Name
@@ -347,11 +319,7 @@ public with sharing class HouseholdOrphanSelector {
 				AND Id NOT IN (
 					SELECT Household__c
 					FROM Household_Member__c
-					WHERE
-						(Contact__c != NULL
-						OR Account__c != NULL)
-						AND (End_Date__c = NULL
-						OR End_Date__c > :today)
+					WHERE (Contact__c != NULL OR Account__c != NULL) AND (End_Date__c = NULL OR End_Date__c > :today)
 				)
 			WITH USER_MODE
 			ORDER BY CreatedDate, Id

@@ -9,11 +9,7 @@ private class InboundGiftActionTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			insert new Fund__c(Name = 'General Fund', Active__c = true, Is_Default__c = true);
 			insert TestDataFactory.person(
-				new Contact(
-					FirstName = 'Luis',
-					LastName = 'Garcia',
-					Email = 'luis.flow@example.org'
-				)
+				new Contact(FirstName = 'Luis', LastName = 'Garcia', Email = 'luis.flow@example.org')
 			);
 			InboundGift known = new InboundGift();
 			known.externalId = 'flow:ok';
@@ -25,9 +21,7 @@ private class InboundGiftActionTest {
 			stranger.donorEmail = 'nobody.flow@example.org';
 
 			Test.startTest();
-			List<InboundGiftResult> results = InboundGiftAction.record(
-				new List<InboundGift>{ known, stranger }
-			);
+			List<InboundGiftResult> results = InboundGiftAction.record(new List<InboundGift>{ known, stranger });
 			Test.stopTest();
 
 			Assert.areEqual(2, results.size());

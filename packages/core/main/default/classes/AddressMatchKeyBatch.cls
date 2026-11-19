@@ -73,10 +73,7 @@ public without sharing class AddressMatchKeyBatch implements Database.Batchable<
 			keyed.add(
 				new Address__c(
 					Id = address.Id,
-					Match_Key__c = AddressMatchKeyHandler.keyFor(
-						address.Street__c,
-						address.Postal_Code__c
-					)
+					Match_Key__c = AddressMatchKeyHandler.keyFor(address.Street__c, address.Postal_Code__c)
 				)
 			);
 			ids.add(address.Id);

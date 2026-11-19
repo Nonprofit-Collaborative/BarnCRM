@@ -176,10 +176,7 @@ public with sharing class PledgeReminderController {
 		view.emailsDue = due.emails;
 		view.lettersDue = due.letters;
 		view.withoutRecipient = due.withoutRecipient;
-		view.lettersWaiting = PledgeReminderSelector.lettersWithoutFile(
-				PledgeReminderService.LETTER_LIMIT
-			)
-			.size();
+		view.lettersWaiting = PledgeReminderSelector.lettersWithoutFile(PledgeReminderService.LETTER_LIMIT).size();
 		List<Pledge_Reminder__c> awaiting = PledgeReminderSelector.lettersAwaitingConfirmation();
 		view.lettersAwaitingConfirmation = awaiting.size();
 		view.lettersFileId = awaiting.isEmpty() ? null : awaiting[0].Letter_File_Document_Id__c;
@@ -196,9 +193,7 @@ public with sharing class PledgeReminderController {
 			view.days = step.Days_From_Due__c;
 			view.channel = step.Channel__c;
 			view.template = step.Email_Template__c;
-			String developerName = String.isBlank(step.Email_Template__c)
-				? null
-				: step.Email_Template__c.trim();
+			String developerName = String.isBlank(step.Email_Template__c) ? null : step.Email_Template__c.trim();
 			view.templateFound = developerName == null || templateNames.containsKey(developerName);
 			view.templateLabel = developerName == null ? null : templateNames.get(developerName);
 			view.active = step.Active__c;
@@ -214,9 +209,7 @@ public with sharing class PledgeReminderController {
 			view.id = reminder.Id;
 			view.name = reminder.Name;
 			view.pledgeName = reminder.Commitment__r == null ? null : reminder.Commitment__r.Name;
-			view.installmentName = reminder.Installment__r == null
-				? null
-				: reminder.Installment__r.Name;
+			view.installmentName = reminder.Installment__r == null ? null : reminder.Installment__r.Name;
 			view.stepName = reminder.Step_Name__c;
 			view.channel = reminder.Channel__c;
 			view.status = reminder.Status__c;

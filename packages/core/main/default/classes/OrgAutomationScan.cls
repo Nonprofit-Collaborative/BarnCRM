@@ -39,10 +39,7 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 
 	/** Saves a Running scan and queues the job; returns the snapshot's Id. */
 	public static Id start() {
-		Merge_Journal__c snapshot = new Merge_Journal__c(
-			Kind__c = KIND_SCAN,
-			Status__c = STATUS_RUNNING
-		);
+		Merge_Journal__c snapshot = new Merge_Journal__c(Kind__c = KIND_SCAN, Status__c = STATUS_RUNNING);
 		insert as user snapshot;
 		AsyncStarter.queue(new OrgAutomationScan(snapshot.Id), 'OrgAutomationScan');
 		return snapshot.Id;
@@ -89,16 +86,13 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 		// The setting's fields: a formula or flow that reads `$Setup` refers to them.
 		for (
 			Object each : OrgToolingApi.query(
-				'SELECT Id FROM CustomField WHERE TableEnumOrId IN (' +
-					OrgToolingApi.quoted(referenced) +
-					')'
+				'SELECT Id FROM CustomField WHERE TableEnumOrId IN (' + OrgToolingApi.quoted(referenced) + ')'
 			)
 		) {
 			referenced.add((String) ((Map<String, Object>) each).get('Id'));
 		}
 		List<Object> rules = OrgToolingApi.query(
-			'SELECT Id, ValidationName, Active, NamespacePrefix, EntityDefinitionId' +
-			' FROM ValidationRule LIMIT 2000'
+			'SELECT Id, ValidationName, Active, NamespacePrefix, EntityDefinitionId' + ' FROM ValidationRule LIMIT 2000'
 		);
 		List<Object> workflows = OrgToolingApi.query(
 			'SELECT Id, Name, TableEnumOrId, NamespacePrefix FROM WorkflowRule LIMIT 2000'
@@ -166,9 +160,7 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 		]) {
 			ids.add(each.Id);
 		}
-		String setting = BarnCRM_Automation_Control__c.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		String setting = BarnCRM_Automation_Control__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.getName();
 		for (
 			SObject entity : Database.queryWithBinds(

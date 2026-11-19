@@ -168,9 +168,7 @@ public with sharing class PaymentService {
 		String description = text(args, 'description');
 		String successUrl = text(args, 'successUrl');
 		String cancelUrl = text(args, 'cancelUrl');
-		String processor = String.isBlank(text(args, 'processor'))
-			? defaultProcessor()
-			: text(args, 'processor');
+		String processor = String.isBlank(text(args, 'processor')) ? defaultProcessor() : text(args, 'processor');
 		String currencyCode = (String.isBlank(text(args, 'currency'))
 				? (settings().Currency__c ?? 'USD')
 				: text(args, 'currency'))
@@ -191,9 +189,7 @@ public with sharing class PaymentService {
 			throw problem(BarnHelp.text('Payments', 'Payments_Error_BadCurrency'));
 		}
 		if (!isReady(processor)) {
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor }));
 		}
 		Payment__c payment = new Payment__c(
 			Status__c = PENDING,
@@ -226,9 +222,7 @@ public with sharing class PaymentService {
 			}
 		} catch (CalloutException e) {
 			ErrorLogger.log(e, CONTEXT + '.startCheckout');
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor }));
 		}
 		Database.insert(payment, AccessLevel.SYSTEM_MODE);
 		return payment;
@@ -250,9 +244,7 @@ public with sharing class PaymentService {
 			throw problem(BarnHelp.text('Payments', 'Payments_Error_BadUrl'));
 		}
 		if (!isReady(processor)) {
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_NotReady', new List<Object>{ processor }));
 		}
 		if (processor == PAYPAL) {
 			return mode() == LIVE ? PaymentPayPal.AUTOPAY : PaymentPayPal.AUTOPAY_TEST;
@@ -261,9 +253,7 @@ public with sharing class PaymentService {
 			return PaymentStripe.updateCardUrl(customer, subscription, back);
 		} catch (CalloutException e) {
 			ErrorLogger.log(e, CONTEXT + '.updateCard');
-			throw problem(
-				BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor })
-			);
+			throw problem(BarnHelp.text('Payments', 'Payments_Error_Processor', new List<Object>{ processor }));
 		}
 	}
 
@@ -495,10 +485,7 @@ public with sharing class PaymentService {
 			System.Savepoint before = Database.setSavepoint();
 			try {
 				((Callable) NamespaceUtil.build(name, Callable.class, CONTEXT + '.notify'))
-					?.call(
-						'subscriptionsChanged',
-						new Map<String, Object>{ 'changes' => news.get(name) }
-					);
+					?.call('subscriptionsChanged', new Map<String, Object>{ 'changes' => news.get(name) });
 			} catch (Exception e) {
 				Database.rollback(before);
 				ErrorLogger.log(e, CONTEXT + '.notify');
@@ -531,10 +518,7 @@ public with sharing class PaymentService {
 	private static Payment__c match(List<Payment__c> found, Change change) {
 		Payment__c first;
 		for (Payment__c p : found) {
-			if (
-				change.processorPaymentId != null &&
-				p.Processor_Payment_Id__c == change.processorPaymentId
-			) {
+			if (change.processorPaymentId != null && p.Processor_Payment_Id__c == change.processorPaymentId) {
 				return p;
 			}
 			if (
@@ -659,11 +643,7 @@ public with sharing class PaymentService {
 			List<Payment__c> mine = byListener.get(name);
 			Callable listener;
 			try {
-				listener = (Callable) NamespaceUtil.build(
-					name,
-					Callable.class,
-					CONTEXT + '.notify'
-				);
+				listener = (Callable) NamespaceUtil.build(name, Callable.class, CONTEXT + '.notify');
 			} catch (Exception e) {
 				ErrorLogger.log(e, CONTEXT + '.notify', mine[0].Id);
 			}
@@ -678,12 +658,7 @@ public with sharing class PaymentService {
 			}
 			System.Savepoint before = Database.setSavepoint();
 			try {
-				if (
-					listener.call(
-						'paymentsChanged',
-						new Map<String, Object>{ 'payments' => told }
-					) == true
-				) {
+				if (listener.call('paymentsChanged', new Map<String, Object>{ 'payments' => told }) == true) {
 					continue;
 				}
 			} catch (Exception e) {

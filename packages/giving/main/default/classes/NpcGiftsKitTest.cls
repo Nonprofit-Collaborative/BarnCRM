@@ -11,12 +11,7 @@ private class NpcGiftsKitTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				'Rollup_Builder_Admin',
-				'Giving_Admin',
-				'Salesforce_Records_Sync'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		);
 	}
 
@@ -54,12 +49,7 @@ private class NpcGiftsKitTest {
 	static void eachStepHasItsTemplateAndNamesOnlyWhatItReads() {
 		// The kit reads Mirror's Gift Designation ID on Fund, which Salesforce Records Sync grants.
 		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				'Rollup_Builder_Admin',
-				'Giving_Admin',
-				'Salesforce_Records_Sync'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
 			Migration_Kit__mdt kit = MigrationKitService.kitNamed(NpcGiftsKit.KIT);
 			ImportTemplateService.materializeDefaults();
@@ -86,12 +76,7 @@ private class NpcGiftsKitTest {
 						key + ' loads ' + targetByStep.get(key)
 					);
 				}
-				for (
-					ImportMapping.Column column : ImportMapping.parse(
-							template.Column_Mapping_JSON__c
-						)
-						.getColumns()
-				) {
+				for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 					String heading = column.getSource();
 					Assert.isTrue(
 						step.fields.contains(heading) || ADDED.contains(heading),
@@ -155,10 +140,7 @@ private class NpcGiftsKitTest {
 			'EffectiveTransactionPeriod' => 'Weekly',
 			'EffectiveTransactionInterval' => '2'
 		};
-		NpcGiftsKit.commitmentRow(
-			recurring,
-			new Map<String, String>{ '001000000000001AAA' => '003000000000001AAA' }
-		);
+		NpcGiftsKit.commitmentRow(recurring, new Map<String, String>{ '001000000000001AAA' => '003000000000001AAA' });
 		Assert.areEqual('Recurring', recurring.get('Type'), 'recurring');
 		Assert.areEqual('25', recurring.get('Amount'), 'each installment');
 		Assert.areEqual('Every two weeks', recurring.get('Frequency'), 'every other week');
@@ -183,12 +165,7 @@ private class NpcGiftsKitTest {
 	@IsTest
 	static void everyStepIsRefusedWithoutNonprofitCloudAndTheFundsCheckCountsNothing() {
 		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				'Rollup_Builder_Admin',
-				'Giving_Admin',
-				'Salesforce_Records_Sync'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
 			NpcGiftsKit extension = new NpcGiftsKit();
 			for (String key : new List<String>{ 'funds', 'gifts', 'commitments', 'credits' }) {
@@ -209,12 +186,7 @@ private class NpcGiftsKitTest {
 	@IsTest
 	static void everyStepsRowsAreShapedWhenNonprofitCloudHoldsNoSplitsOrTributes() {
 		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				'Rollup_Builder_Admin',
-				'Giving_Admin',
-				'Salesforce_Records_Sync'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
 			List<Map<String, Object>> gifts = NpcGiftsKit.shape(
 				'gifts',
@@ -265,10 +237,7 @@ private class NpcGiftsKitTest {
 			List<Map<String, Object>> funds = NpcGiftsKit.shape(
 				'funds',
 				new List<Map<String, Object>>{
-					new Map<String, Object>{
-						'Id' => '0gd000000000009AAA',
-						'Name' => 'Zzz Unmatched Designation'
-					}
+					new Map<String, Object>{ 'Id' => '0gd000000000009AAA', 'Name' => 'Zzz Unmatched Designation' }
 				}
 			);
 			Assert.areEqual(1, funds.size(), 'no fund has it yet');
@@ -278,27 +247,17 @@ private class NpcGiftsKitTest {
 	@IsTest
 	static void aReadReturnsWhatTheObjectHoldsAndNothingForAnUnknownFieldOrObject() {
 		System.runAs(TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				'Rollup_Builder_Admin',
-				'Giving_Admin',
-				'Salesforce_Records_Sync'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, 'Rollup_Builder_Admin', 'Giving_Admin', 'Salesforce_Records_Sync' }
 		)) {
 			Contact ana = TestDataFactory.person(new Contact(LastName = 'Giftskit'));
 			insert ana;
 			Assert.areEqual(
 				1,
-				NpcGiftsKit.read(
-						'SELECT Id FROM Contact WHERE Id IN :ids',
-						new Set<String>{ ana.Id }
-					)
-					.size(),
+				NpcGiftsKit.read('SELECT Id FROM Contact WHERE Id IN :ids', new Set<String>{ ana.Id }).size(),
 				'a present object is read'
 			);
 			Assert.isTrue(
-				NpcGiftsKit.read('SELECT Id FROM Contact WHERE Id IN :ids', new Set<String>())
-					.isEmpty(),
+				NpcGiftsKit.read('SELECT Id FROM Contact WHERE Id IN :ids', new Set<String>()).isEmpty(),
 				'no ids, no query'
 			);
 			Assert.isTrue(
@@ -306,10 +265,7 @@ private class NpcGiftsKitTest {
 				'an absent object reads as none'
 			);
 			Assert.isTrue(
-				NpcGiftsKit.read(
-						'SELECT No_Such_Field__c FROM Contact WHERE Id IN :ids',
-						new Set<String>{ ana.Id }
-					)
+				NpcGiftsKit.read('SELECT No_Such_Field__c FROM Contact WHERE Id IN :ids', new Set<String>{ ana.Id })
 					.isEmpty(),
 				'a field the object lacks reads as none'
 			);
@@ -329,15 +285,8 @@ private class NpcGiftsKitTest {
 			'Role' => null,
 			'SoftCreditAmount' => '75'
 		};
-		NpcGiftsKit.creditRow(
-			credit,
-			new Map<String, String>{ '001000000000004AAA' => '003000000000004AAA' }
-		);
-		Assert.areEqual(
-			'003000000000004AAA',
-			credit.get('ContactId'),
-			'the person account contact'
-		);
+		NpcGiftsKit.creditRow(credit, new Map<String, String>{ '001000000000004AAA' => '003000000000004AAA' });
+		Assert.areEqual('003000000000004AAA', credit.get('ContactId'), 'the person account contact');
 		Assert.areEqual('', credit.get('AccountId'), 'not an organization');
 		Assert.areEqual('Soft Credit', credit.get('CustomRole'), 'blank role');
 		Assert.areEqual('75', credit.get('Amount'), 'its own amount');

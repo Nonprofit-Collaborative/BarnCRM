@@ -81,18 +81,12 @@ private class QueryCompilerTest {
 			makeLogs(200, 20);
 
 			Test.startTest();
-			List<SObject> rows = QueryCompiler.run(
-				QueryCompiler.compile(query(ERRORS_ONLY, null, 2000))
-			);
+			List<SObject> rows = QueryCompiler.run(QueryCompiler.compile(query(ERRORS_ONLY, null, 2000)));
 			Test.stopTest();
 
 			System.Assert.areEqual(200, rows.size(), 'Only the matching records come back');
 			for (SObject row : rows) {
-				System.Assert.areEqual(
-					'Error',
-					row.get('Severity__c'),
-					'Each row matches the filter'
-				);
+				System.Assert.areEqual('Error', row.get('Severity__c'), 'Each row matches the filter');
 			}
 		}
 	}
@@ -105,9 +99,7 @@ private class QueryCompilerTest {
 	static void containsMatchesPercentAndUnderscoreLiterally() {
 		System.runAs(TestUsers.admin()) {
 			List<Error_Log__c> logs = new List<Error_Log__c>();
-			for (
-				String context : new List<String>{ 'Save 50%_off', 'Save 50 xoff', 'Save 50%xoff' }
-			) {
+			for (String context : new List<String>{ 'Save 50%_off', 'Save 50 xoff', 'Save 50%xoff' }) {
 				logs.add(
 					new Error_Log__c(
 						Timestamp__c = System.now(),
@@ -133,9 +125,7 @@ private class QueryCompilerTest {
 				}
 			);
 
-			List<SObject> rows = QueryCompiler.run(
-				QueryCompiler.compile(query(containsFilter, null, 200))
-			);
+			List<SObject> rows = QueryCompiler.run(QueryCompiler.compile(query(containsFilter, null, 200)));
 
 			System.Assert.areEqual(1, rows.size(), 'Only the literal match: ' + rows);
 			System.Assert.areEqual('Save 50%_off', rows[0].get('Context__c'));
@@ -148,13 +138,9 @@ private class QueryCompilerTest {
 			makeLogs(200, 0);
 			String document = query(null, '[{"field": "Context__c", "direction": "DESC"}]', 10);
 
-			List<SObject> firstPage = QueryCompiler.run(
-				QueryCompiler.compileExportPage(document, null)
-			);
+			List<SObject> firstPage = QueryCompiler.run(QueryCompiler.compileExportPage(document, null));
 			Id lastRead = firstPage[99].Id;
-			List<SObject> rest = QueryCompiler.run(
-				QueryCompiler.compileExportPage(document, lastRead)
-			);
+			List<SObject> rest = QueryCompiler.run(QueryCompiler.compileExportPage(document, lastRead));
 
 			System.Assert.areEqual(200, firstPage.size(), 'A page ignores the grid row count');
 			System.Assert.areEqual(100, rest.size(), 'The next page starts after the last Id read');
@@ -171,11 +157,7 @@ private class QueryCompilerTest {
 		System.runAs(TestUsers.admin()) {
 			makeLogs(200, 20);
 			String document = query(ERRORS_ONLY, null, 10);
-			QueryCompiler.Compiled compiled = QueryCompiler.compileSelection(
-				document,
-				new Set<String>{ 'Id' },
-				null
-			);
+			QueryCompiler.Compiled compiled = QueryCompiler.compileSelection(document, new Set<String>{ 'Id' }, null);
 			System.Assert.areEqual(
 				QueryCompiler.count(document, 1000),
 				QueryCompiler.count(compiled, 1000),
@@ -217,11 +199,7 @@ private class QueryCompilerTest {
 			String document = query(ERRORS_ONLY, null, 10);
 
 			System.Assert.areEqual(200, QueryCompiler.count(document, 1000), 'Only matches count');
-			System.Assert.areEqual(
-				150,
-				QueryCompiler.count(document, 150),
-				'A count stops at the cap'
-			);
+			System.Assert.areEqual(150, QueryCompiler.count(document, 150), 'A count stops at the cap');
 
 			Set<Id> chosen = new Map<Id, Error_Log__c>([SELECT Id FROM Error_Log__c]).keySet();
 			QueryCompiler.Compiled selection = QueryCompiler.compileSelection(
@@ -230,11 +208,7 @@ private class QueryCompilerTest {
 				chosen
 			);
 			List<SObject> rows = QueryCompiler.run(selection);
-			System.Assert.areEqual(
-				200,
-				rows.size(),
-				'Chosen records that do not match are left out'
-			);
+			System.Assert.areEqual(200, rows.size(), 'Chosen records that do not match are left out');
 			System.Assert.isTrue(
 				selection.soql.startsWith('SELECT Id, Message__c FROM Error_Log__c WHERE'),
 				'The document\'s columns and row count are ignored: ' + selection.soql
@@ -256,11 +230,7 @@ private class QueryCompilerTest {
 				'injected field' => '{"version": 1, "object": "Error_Log__c", "fields": ["Id FROM User"]}',
 				'no columns' => '{"version": 1, "object": "Error_Log__c", "fields": []}',
 				'too many rows' => query(null, null, 2001),
-				'bad direction' => query(
-					null,
-					'[{"field": "Context__c", "direction": "UP"}]',
-					null
-				),
+				'bad direction' => query(null, '[{"field": "Context__c", "direction": "UP"}]', null),
 				'unsortable' => query(null, '[{"field": "Message__c", "direction": "ASC"}]', null),
 				'bad filter' => query(
 					'{"version": 1, "conditions": [{"id": 1, "field": "Timestamp__c", "operator": "contains", "value": "x"}]}',
@@ -271,11 +241,7 @@ private class QueryCompilerTest {
 				// The right part with the wrong shape is refused, not a type error.
 				'sort by a bare name' => query(null, '["Context__c"]', null),
 				'object as a list' => '{"version": 1, "object": ["Error_Log__c"], "fields": ["Name"]}',
-				'conditions as names' => query(
-					'{"version": 1, "conditions": ["Context__c"]}',
-					null,
-					null
-				)
+				'conditions as names' => query('{"version": 1, "conditions": ["Context__c"]}', null, null)
 			};
 			for (String reason : refused.keySet()) {
 				try {

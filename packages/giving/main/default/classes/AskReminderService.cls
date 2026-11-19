@@ -44,12 +44,7 @@ public with sharing class AskReminderService {
 		return String.isBlank(text) ? true : Boolean.valueOf(text);
 	}
 
-	private static final List<String> UNFINISHED = new List<String>{
-		'Holding',
-		'Queued',
-		'Preparing',
-		'Processing'
-	};
+	private static final List<String> UNFINISHED = new List<String>{ 'Holding', 'Queued', 'Preparing', 'Processing' };
 
 	/**
 	 * Whether an ask reminder pass is waiting or running, whoever started it. Two passes at once
@@ -61,10 +56,7 @@ public with sharing class AskReminderService {
 		return [
 				SELECT COUNT()
 				FROM AsyncApexJob
-				WHERE
-					JobType = 'BatchApex'
-					AND ApexClass.Name = 'AskReminderBatch'
-					AND Status IN :UNFINISHED
+				WHERE JobType = 'BatchApex' AND ApexClass.Name = 'AskReminderBatch' AND Status IN :UNFINISHED
 				WITH SYSTEM_MODE
 			] > 0;
 	}

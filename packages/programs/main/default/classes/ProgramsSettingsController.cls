@@ -50,12 +50,7 @@ public with sharing class ProgramsSettingsController {
 		try {
 			ProgramsSharing.savePreset(privateParticipants);
 		} catch (Exception failure) {
-			throw UserErrors.wrap(
-				failure,
-				false,
-				CONTEXT,
-				BarnHelp.text('Programs', 'Programs_Fail_SettingsSave')
-			);
+			throw UserErrors.wrap(failure, false, CONTEXT, BarnHelp.text('Programs', 'Programs_Fail_SettingsSave'));
 		}
 		return getSettings();
 	}
@@ -87,12 +82,7 @@ public with sharing class ProgramsSettingsController {
 			}
 			return settings;
 		} catch (Exception failure) {
-			throw UserErrors.wrap(
-				failure,
-				false,
-				CONTEXT,
-				BarnHelp.text('Programs', 'Programs_Fail_SettingsLoad')
-			);
+			throw UserErrors.wrap(failure, false, CONTEXT, BarnHelp.text('Programs', 'Programs_Fail_SettingsLoad'));
 		}
 	}
 

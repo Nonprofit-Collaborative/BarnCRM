@@ -71,9 +71,7 @@ private class GiftTransactionMirrorControllerTest {
 	@IsTest
 	static void maryRunsSchedulesStopsAndCompares() {
 		System.runAs(maria()) {
-			TestDataFactory.clearScheduledJobs(
-				new List<String>{ GiftTransactionMirrorSchedulable.JOB_NAME }
-			);
+			TestDataFactory.clearScheduledJobs(new List<String>{ GiftTransactionMirrorSchedulable.JOB_NAME });
 			ScheduledJobSelector.forget();
 			GiftTransactionMirrorSchema.useStandIns();
 			Test.startTest();
@@ -83,18 +81,12 @@ private class GiftTransactionMirrorControllerTest {
 			Assert.isNull(status.notReadyReason, 'Ready.');
 			Assert.isTrue(status.canRun && status.canManage);
 
-			Assert.isTrue(
-				GiftTransactionMirrorController.runNow().running,
-				'Run Now starts a run.'
-			);
+			Assert.isTrue(GiftTransactionMirrorController.runNow().running, 'Run Now starts a run.');
 			Assert.isNotNull(GiftTransactionMirrorController.schedule().nextRunAt);
 			Assert.isNull(GiftTransactionMirrorController.stop().nextRunAt);
 			Assert.areEqual(
 				0,
-				GiftTransactionMirrorController.compare(
-						Date.newInstance(2026, 9, 1),
-						Date.newInstance(2026, 9, 30)
-					)
+				GiftTransactionMirrorController.compare(Date.newInstance(2026, 9, 1), Date.newInstance(2026, 9, 30))
 					.differenceCount
 			);
 			Assert.areEqual(
@@ -113,9 +105,7 @@ private class GiftTransactionMirrorControllerTest {
 	@IsTest
 	static void copyingARangeAgainChecksTheDatesThenStartsARun() {
 		System.runAs(maria()) {
-			TestDataFactory.clearScheduledJobs(
-				new List<String>{ GiftTransactionMirrorSchedulable.JOB_NAME }
-			);
+			TestDataFactory.clearScheduledJobs(new List<String>{ GiftTransactionMirrorSchedulable.JOB_NAME });
 			ScheduledJobSelector.forget();
 			GiftTransactionMirrorSchema.useStandIns();
 			Date day = Date.newInstance(2026, 9, 20);
@@ -169,10 +159,7 @@ private class GiftTransactionMirrorControllerTest {
 
 	@IsTest
 	static void thePageNeedsItsPermissionSet() {
-		User ana = TestDataFactory.createUserOnTheRunningUsersProfile(
-			'Ana',
-			new List<String>{ 'Giving_Admin' }
-		);
+		User ana = TestDataFactory.createUserOnTheRunningUsersProfile('Ana', new List<String>{ 'Giving_Admin' });
 		System.runAs(ana) {
 			for (String action : new List<String>{ 'status', 'stop', 'compare' }) {
 				Assert.areEqual(

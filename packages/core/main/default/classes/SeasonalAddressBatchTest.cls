@@ -31,19 +31,14 @@ private class SeasonalAddressBatchTest {
 				WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
 			];
 			Assert.areEqual(1, inUse.size(), 'A household has one address in use at a time.');
-			Assert.areEqual(
-				WINTER_CITY,
-				inUse[0].City__c,
-				'In January the household should be at its winter address.'
-			);
+			Assert.areEqual(WINTER_CITY, inUse[0].City__c, 'In January the household should be at its winter address.');
 			Assert.isNotNull(
 				SeasonalAddressService.lastRun(),
 				'The run must record when it finished, or the Hub has nothing to show.'
 			);
 			Assert.isTrue(
 				SeasonalAddressService.lastRunSummary().contains('1'),
-				'The summary should say one household moved, and reads: ' +
-				SeasonalAddressService.lastRunSummary()
+				'The summary should say one household moved, and reads: ' + SeasonalAddressService.lastRunSummary()
 			);
 		}
 	}
@@ -66,10 +61,7 @@ private class SeasonalAddressBatchTest {
 				[
 					SELECT COUNT()
 					FROM Address__c
-					WHERE
-						Account__c = :garcia.Id
-						AND Is_Default__c = TRUE
-						AND City__c = :WINTER_CITY
+					WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE AND City__c = :WINTER_CITY
 				],
 				'With Addresses off the household stays at its home address'
 			);
@@ -144,9 +136,7 @@ private class SeasonalAddressBatchTest {
 	/** The Seasonal Addresses switch, written below the console's save. */
 	private static void seasonalSwitch(Boolean enabled) {
 		OrgSettingsSystemWriter.save(
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => enabled
-			}
+			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => enabled }
 		);
 		SettingsService.clearCaches();
 		NightlyJobs.forget();
@@ -170,9 +160,7 @@ private class SeasonalAddressBatchTest {
 			];
 			seasonalSwitch(false);
 			Boolean scheduledAfterStop = SeasonalAddressScheduler.isScheduled();
-			Boolean inTonightsRun = NightlyJobs.isOn(
-				NightlyJobs.step(SeasonalAddressScheduler.JOB_NAME)
-			);
+			Boolean inTonightsRun = NightlyJobs.isOn(NightlyJobs.step(SeasonalAddressScheduler.JOB_NAME));
 			Test.stopTest();
 			Assert.isFalse(inTonightsRun, 'Switched off, the swap is left out of the nightly run.');
 
@@ -192,10 +180,7 @@ private class SeasonalAddressBatchTest {
 	static void stoppingTheJobLeavesTheAddressesWhereTheLastRunPutThem() {
 		System.runAs(TestUsers.admin()) {
 			Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
-			SeasonalAddressService.swapOwners(
-				new Set<Id>{ garcia.Id },
-				Date.newInstance(2027, 1, 15)
-			);
+			SeasonalAddressService.swapOwners(new Set<Id>{ garcia.Id }, Date.newInstance(2027, 1, 15));
 
 			seasonalSwitch(true);
 			Test.startTest();

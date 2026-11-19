@@ -152,11 +152,7 @@ private class RollupRegressionTargetsTest {
 				new Set<String>{ GivingRollupTestData.CONTACT_TOTAL }
 			)[0];
 			Assert.isNotNull(definition.Last_Calculated__c, 'The run finished');
-			Assert.areEqual(
-				100,
-				GivingRollupTestData.person(ana.Id).Total_Giving__c,
-				'And wrote the total'
-			);
+			Assert.areEqual(100, GivingRollupTestData.person(ana.Id).Total_Giving__c, 'And wrote the total');
 		}
 	}
 
@@ -178,10 +174,7 @@ private class RollupRegressionTargetsTest {
 
 			Test.startTest();
 			GivingRollupTestData.recalculate(
-				new Set<String>{
-					GivingRollupTestData.CONTACT_TOTAL,
-					GivingRollupTestData.HOUSEHOLD_TOTAL
-				}
+				new Set<String>{ GivingRollupTestData.CONTACT_TOTAL, GivingRollupTestData.HOUSEHOLD_TOTAL }
 			);
 			Test.stopTest();
 
@@ -213,27 +206,18 @@ private class RollupRegressionTargetsTest {
 
 			Test.startTest();
 			GivingRollupTestData.recalculate(keys);
-			Datetime markedWhileRunning = GivingRollupTestData.definitions(keys)[0]
-				.Last_Calculated__c;
+			Datetime markedWhileRunning = GivingRollupTestData.definitions(keys)[0].Last_Calculated__c;
 			Decimal totalWhileRunning = GivingRollupTestData.person(ana.Id).Total_Giving__c;
 			Test.stopTest();
 
 			if (markedWhileRunning != null) {
-				Assert.areEqual(
-					100,
-					totalWhileRunning,
-					'Marked calculated, so the total had to be written already'
-				);
+				Assert.areEqual(100, totalWhileRunning, 'Marked calculated, so the total had to be written already');
 			}
 			Assert.isNotNull(
 				GivingRollupTestData.definitions(keys)[0].Last_Calculated__c,
 				'Marked calculated once the run finished'
 			);
-			Assert.areEqual(
-				100,
-				GivingRollupTestData.person(ana.Id).Total_Giving__c,
-				'With the total written'
-			);
+			Assert.areEqual(100, GivingRollupTestData.person(ana.Id).Total_Giving__c, 'With the total written');
 		}
 	}
 }

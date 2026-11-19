@@ -9,9 +9,7 @@ public class GrantTestData {
 
 	/** An inserted funder organization. */
 	public static Account funder(String name) {
-		Account organization = (Account) TestDataFactory.pastDuplicateRules(
-			AccountKindsTestData.organization(name)
-		);
+		Account organization = (Account) TestDataFactory.pastDuplicateRules(AccountKindsTestData.organization(name));
 		insert organization;
 		return organization;
 	}

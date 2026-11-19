@@ -36,10 +36,7 @@ private class GivingEngagementSignalTest {
 					'GivingEngagementSignal'
 				)
 				.newInstance();
-			Map<Id, Decimal> totals = signal.totals(
-				new Set<Id>{ ana.Id, wei.Id },
-				Date.today().addMonths(-12)
-			);
+			Map<Id, Decimal> totals = signal.totals(new Set<Id>{ ana.Id, wei.Id }, Date.today().addMonths(-12));
 			Test.stopTest();
 
 			Assert.areEqual('Gifts', signal.key(), 'The Gifts part');

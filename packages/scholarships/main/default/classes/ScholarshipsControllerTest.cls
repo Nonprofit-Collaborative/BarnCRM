@@ -18,21 +18,12 @@ private class ScholarshipsControllerTest {
 				ScholarshipsTestData.person('Lee').Id,
 				'In Review'
 			);
-			insert new Application_Review__c(
-				Application__c = application.Id,
-				Reviewer__c = UserInfo.getUserId()
-			);
+			insert new Application_Review__c(Application__c = application.Id, Reviewer__c = UserInfo.getUserId());
 
 			Test.startTest();
 			ScholarshipsController.Home home = ScholarshipsController.getHome();
 			ScholarshipsController.Review review = ScholarshipsController.getReview(application.Id);
-			ScholarshipsController.saveReview(
-				application.Id,
-				'{"overall":7}',
-				'Good',
-				'submit',
-				null
-			);
+			ScholarshipsController.saveReview(application.Id, '{"overall":7}', 'Good', 'submit', null);
 			ScholarshipsController.Board board = ScholarshipsController.getBoard(cycle.Id);
 			Id awardId = ScholarshipsController.decide(application.Id, true, 800);
 			ScholarshipsController.respond(awardId, true);
@@ -49,11 +40,7 @@ private class ScholarshipsControllerTest {
 			Assert.areEqual(7, board.rows[0].average, 'Scored');
 			Assert.areEqual(2, panel.payments.size(), 'Two payments');
 			Assert.areEqual(0, panel.requirements.size(), 'No requirements');
-			Assert.areEqual(
-				1,
-				ScholarshipsController.getHome().due.size(),
-				'The first payment is due within 30 days'
-			);
+			Assert.areEqual(1, ScholarshipsController.getHome().due.size(), 'The first payment is due within 30 days');
 		}
 	}
 
@@ -129,11 +116,7 @@ private class ScholarshipsControllerTest {
 			} catch (AuraHandledException expected) {
 				noCycle = expected.getMessage();
 			}
-			insert new Award_Cycle__c(
-				Name = '2028',
-				Program__c = cycle.Program__c,
-				Status__c = 'Planned'
-			);
+			insert new Award_Cycle__c(Name = '2028', Program__c = cycle.Program__c, Status__c = 'Planned');
 			Id renewal = ScholarshipsController.startRenewal(awardId);
 			Test.stopTest();
 
@@ -177,19 +160,13 @@ private class ScholarshipsControllerTest {
 		System.runAs(ScholarshipsTestData.admin()) {
 			FormCatalogTestSupport.install(new Catalog());
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
-			update new Award_Cycle__c(
-				Id = cycle.Id,
-				Application_Form_Key__c = String.valueOf(cycle.Program__c)
-			);
+			update new Award_Cycle__c(Id = cycle.Id, Application_Form_Key__c = String.valueOf(cycle.Program__c));
 			Award_Application__c application = ScholarshipsTestData.application(
 				cycle.Id,
 				ScholarshipsTestData.person('Lee').Id,
 				'In Review'
 			);
-			insert new Application_Review__c(
-				Application__c = application.Id,
-				Reviewer__c = UserInfo.getUserId()
-			);
+			insert new Application_Review__c(Application__c = application.Id, Reviewer__c = UserInfo.getUserId());
 
 			Test.startTest();
 			ScholarshipsController.Board board = ScholarshipsController.getBoard(cycle.Id);

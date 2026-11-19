@@ -28,9 +28,7 @@ private class SetupAssistantControllerTest {
 			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
 			SetupAssistantTestExtension.useNone();
 			ModuleDetectionService.givingPresentOverride = false;
-			OtherRollupTools.overrideForTest(
-				new Set<String>{ OtherRollupTools.ROLLUP_HELPER_NAMESPACE }
-			);
+			OtherRollupTools.overrideForTest(new Set<String>{ OtherRollupTools.ROLLUP_HELPER_NAMESPACE });
 
 			SetupAssistantController.SetupState state = SetupAssistantController.getState();
 
@@ -133,10 +131,7 @@ private class SetupAssistantControllerTest {
 				'Nonprofit Cloud objects mean Nonprofit Cloud coexistence (plan Section 4.5)'
 			);
 			Assert.areEqual(
-				new List<String>{
-					SetupAssistantService.MODE_STANDALONE,
-					SetupAssistantService.MODE_NONPROFIT_CLOUD
-				},
+				new List<String>{ SetupAssistantService.MODE_STANDALONE, SetupAssistantService.MODE_NONPROFIT_CLOUD },
 				state.coexistence.modes,
 				'Standalone and the detected product, and not NPSP, which is not here'
 			);
@@ -177,10 +172,7 @@ private class SetupAssistantControllerTest {
 				stepByKey(state.steps, 'coexistence').completed,
 				'Confirming the mode is what finishes step one'
 			);
-			Assert.isNotNull(
-				state.elapsedMinutes,
-				'The clock starts at the first change Maria makes'
-			);
+			Assert.isNotNull(state.elapsedMinutes, 'The clock starts at the first change Maria makes');
 		}
 	}
 
@@ -193,16 +185,11 @@ private class SetupAssistantControllerTest {
 
 			Test.startTest();
 			SetupAssistantService.ensureStarted();
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT });
 			SetupAssistantController.SetupState state = SetupAssistantController.getState();
 			Test.stopTest();
 
-			Assert.isTrue(
-				stepByKey(state.steps, 'suite').completed,
-				'Saving the edition is what finishes step one'
-			);
+			Assert.isTrue(stepByKey(state.steps, 'suite').completed, 'Saving the edition is what finishes step one');
 			Assert.areEqual(
 				ModuleDetectionService.SUITE_NONPROFIT,
 				state.suite.currentSuite,
@@ -224,11 +211,7 @@ private class SetupAssistantControllerTest {
 				state.modules.size(),
 				'The modules step now offers Core and every module in the catalog'
 			);
-			Assert.areEqual(
-				8,
-				state.stepsTotal,
-				'No Giving step appears until Giving is installed'
-			);
+			Assert.areEqual(8, state.stepsTotal, 'No Giving step appears until Giving is installed');
 		}
 	}
 
@@ -251,11 +234,7 @@ private class SetupAssistantControllerTest {
 			Test.stopTest();
 
 			Assert.isNull(onAFreshOrg, 'A fresh org is left to choose for itself');
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_NONPROFIT,
-				withGiving,
-				'Giving here suggests it'
-			);
+			Assert.areEqual(ModuleDetectionService.SUITE_NONPROFIT, withGiving, 'Giving here suggests it');
 			Assert.areEqual(ModuleDetectionService.SUITE_NONPROFIT, withNpsp, 'So does NPSP');
 		}
 	}
@@ -285,18 +264,13 @@ private class SetupAssistantControllerTest {
 
 			Test.startTest();
 			try {
-				SetupAssistantController.applyCoexistence(
-					SetupAssistantService.MODE_NONPROFIT_CLOUD
-				);
+				SetupAssistantController.applyCoexistence(SetupAssistantService.MODE_NONPROFIT_CLOUD);
 			} catch (AuraHandledException e) {
 				refused = true;
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				refused,
-				'Nonprofit Cloud coexistence is not offered, so it is not accepted'
-			);
+			Assert.isTrue(refused, 'Nonprofit Cloud coexistence is not offered, so it is not accepted');
 			Assert.isNull(CoexistenceService.getCurrentMode(), 'And nothing was saved');
 		}
 	}
@@ -473,10 +447,7 @@ private class SetupAssistantControllerTest {
 			Test.stopTest();
 
 			Assert.isTrue(refused, 'The module settings object cannot be written here');
-			Assert.isNull(
-				savedLegalName(),
-				'The legal name, saved first, was rolled back with the failed half'
-			);
+			Assert.isNull(savedLegalName(), 'The legal name, saved first, was rolled back with the failed half');
 		}
 	}
 
@@ -535,9 +506,7 @@ private class SetupAssistantControllerTest {
 			try {
 				SetupAssistantController.saveStepValues(
 					SetupAssistantTestExtension.STEP_KEY,
-					new Map<String, Object>{
-						SetupAssistantTestExtension.RECORD_KEY => UserInfo.getUserId()
-					}
+					new Map<String, Object>{ SetupAssistantTestExtension.RECORD_KEY => UserInfo.getUserId() }
 				);
 			} catch (AuraHandledException e) {
 				message = e.getMessage();
@@ -565,11 +534,7 @@ private class SetupAssistantControllerTest {
 			SetupAssistantService.Step step = stepByKey(state.steps, 'data');
 			Assert.isTrue(step.skipped, 'The step is out of the way');
 			Assert.isFalse(step.completed, 'Skipping is not finishing');
-			Assert.areEqual(
-				0,
-				state.stepsCompleted,
-				'A skipped step does not count towards progress'
-			);
+			Assert.areEqual(0, state.stepsCompleted, 'A skipped step does not count towards progress');
 		}
 	}
 
@@ -579,9 +544,7 @@ private class SetupAssistantControllerTest {
 			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
 
 			Test.startTest();
-			SetupAssistantController.SetupState state = SetupAssistantController.completeStep(
-				'modules'
-			);
+			SetupAssistantController.SetupState state = SetupAssistantController.completeStep('modules');
 			Test.stopTest();
 
 			Assert.isTrue(
@@ -619,14 +582,9 @@ private class SetupAssistantControllerTest {
 			// context of its own here for the same reason.
 			Test.startTest();
 			System.runAs(new User(Id = UserInfo.getUserId())) {
-				SetupAssistantController.assignAccess(
-					UserInfo.getUserId(),
-					AccessService.ADMIN_ROLE
-				);
+				SetupAssistantController.assignAccess(UserInfo.getUserId(), AccessService.ADMIN_ROLE);
 			}
-			SetupAssistantController.SetupState state = SetupAssistantController.completeStep(
-				'access'
-			);
+			SetupAssistantController.SetupState state = SetupAssistantController.completeStep('access');
 			Test.stopTest();
 
 			String adminRole = AccessService.ADMIN_ROLE;
@@ -635,9 +593,7 @@ private class SetupAssistantControllerTest {
 				[
 					SELECT COUNT()
 					FROM PermissionSetAssignment
-					WHERE
-						AssigneeId = :UserInfo.getUserId()
-						AND PermissionSetGroup.DeveloperName = :adminRole
+					WHERE AssigneeId = :UserInfo.getUserId() AND PermissionSetGroup.DeveloperName = :adminRole
 				],
 				'The colleague holds the role'
 			);
@@ -675,11 +631,7 @@ private class SetupAssistantControllerTest {
 			SetupAssistantController.SetupState state = SetupAssistantController.reset();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				state.stepsCompleted,
-				'Every step Maria recorded is back on the list'
-			);
+			Assert.areEqual(0, state.stepsCompleted, 'Every step Maria recorded is back on the list');
 			Assert.isNull(state.elapsedMinutes, 'The clock starts again with the next change');
 		}
 	}
@@ -719,9 +671,7 @@ private class SetupAssistantControllerTest {
 	@IsTest
 	static void changesTheEditionFromTheConsoleAndAuditsIt() {
 		System.runAs(TestUsers.admin()) {
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => ModuleDetectionService.SUITE_NONPROFIT });
 
 			Test.startTest();
 			SetupAssistantController.EditionModel before = SetupAssistantController.getEdition();
@@ -830,10 +780,7 @@ private class SetupAssistantControllerTest {
 		return rows.isEmpty() ? null : rows[0].Organization_Legal_Name__c;
 	}
 
-	private static SetupAssistantService.Step stepByKey(
-		List<SetupAssistantService.Step> steps,
-		String key
-	) {
+	private static SetupAssistantService.Step stepByKey(List<SetupAssistantService.Step> steps, String key) {
 		for (SetupAssistantService.Step step : steps) {
 			if (step.key == key) {
 				return step;

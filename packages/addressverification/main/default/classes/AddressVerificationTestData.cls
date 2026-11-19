@@ -32,9 +32,7 @@ public class AddressVerificationTestData {
 
 	/** Current addresses of one organization, inserted without the module's handler queueing. */
 	public static List<Address__c> addresses(Integer count, String country) {
-		Account owner = (Account) TestDataFactory.fillOrgRequiredFields(
-			new Account(Name = 'Zzav Organization')
-		);
+		Account owner = (Account) TestDataFactory.fillOrgRequiredFields(new Account(Name = 'Zzav Organization'));
 		Database.insert(owner, AccessLevel.SYSTEM_MODE);
 		List<Address__c> rows = new List<Address__c>();
 		for (Integer i = 0; i < count; i++) {

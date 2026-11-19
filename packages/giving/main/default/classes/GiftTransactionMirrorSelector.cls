@@ -38,11 +38,7 @@ public with sharing class GiftTransactionMirrorSelector {
 	 *
 	 * @param fields the fields to read besides Id, from the schema, which knows which ones exist
 	 */
-	public static Map<Id, SObject> giftTransactionsById(
-		String objectName,
-		List<String> fields,
-		Set<Id> ids
-	) {
+	public static Map<Id, SObject> giftTransactionsById(String objectName, List<String> fields, Set<Id> ids) {
 		if (String.isBlank(objectName) || ids == null || ids.isEmpty()) {
 			return new Map<Id, SObject>();
 		}
@@ -74,11 +70,7 @@ public with sharing class GiftTransactionMirrorSelector {
 	}
 
 	/** Which of these Gift Transactions already have a designation, as the runner sees them. */
-	public static Set<Id> designatedTransactionIds(
-		String linkObject,
-		String transactionField,
-		Set<Id> transactionIds
-	) {
+	public static Set<Id> designatedTransactionIds(String linkObject, String transactionField, Set<Id> transactionIds) {
 		Set<Id> designated = new Set<Id>();
 		if (String.isBlank(linkObject) || transactionIds == null || transactionIds.isEmpty()) {
 			return designated;
@@ -167,12 +159,7 @@ public with sharing class GiftTransactionMirrorSelector {
 				' <= :toDate ORDER BY ' +
 				dateField +
 				', Id LIMIT :cap',
-			new Map<String, Object>{
-				'status' => status,
-				'fromDate' => fromDate,
-				'toDate' => toDate,
-				'cap' => cap
-			},
+			new Map<String, Object>{ 'status' => status, 'fromDate' => fromDate, 'toDate' => toDate, 'cap' => cap },
 			AccessLevel.USER_MODE
 		);
 	}

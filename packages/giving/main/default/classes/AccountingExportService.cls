@@ -35,21 +35,10 @@ public with sharing class AccountingExportService {
 		'Amount'
 	};
 
-	private static final Set<String> STATUSES = new Set<String>{
-		'Received',
-		'Refunded',
-		'Written off'
-	};
+	private static final Set<String> STATUSES = new Set<String>{ 'Received', 'Refunded', 'Written off' };
 	private static final String TYPE_IN_KIND = 'In-kind';
 	private static final String LINE_END = '\r\n';
-	private static final Set<String> FORMULA_STARTS = new Set<String>{
-		'=',
-		'+',
-		'-',
-		'@',
-		'\t',
-		'\r'
-	};
+	private static final Set<String> FORMULA_STARTS = new Set<String>{ '=', '+', '-', '@', '\t', '\r' };
 
 	/** A refusal the person can act on, in words. */
 	public class ExportException extends Exception {
@@ -82,22 +71,12 @@ public with sharing class AccountingExportService {
 	 * leaving out gifts already posted to accounting when `onlyUnposted` is set. An empty range
 	 * gives an ExportFile with no rows and no file.
 	 */
-	public static ExportFile build(
-		Date fromDate,
-		Date toDate,
-		Id fundId,
-		String paymentMethod,
-		Boolean onlyUnposted
-	) {
+	public static ExportFile build(Date fromDate, Date toDate, Id fundId, String paymentMethod, Boolean onlyUnposted) {
 		if (fromDate == null || toDate == null) {
-			throw new ExportException(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDatesRequired')
-			);
+			throw new ExportException(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDatesRequired'));
 		}
 		if (toDate < fromDate) {
-			throw new ExportException(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDateOrder')
-			);
+			throw new ExportException(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorDateOrder'));
 		}
 		if (fundId != null && fundId.getSObjectType() != Fund__c.SObjectType) {
 			throw new ExportException(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFund'));
@@ -113,9 +92,7 @@ public with sharing class AccountingExportService {
 		Builder builder = new Builder(onlyUnposted == true);
 		AccountingExportSelector.read(fromDate, toDate, fundId, methods, STATUSES, builder);
 		if (builder.overLimit) {
-			throw new ExportException(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorTooManyRows')
-			);
+			throw new ExportException(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorTooManyRows'));
 		}
 		return builder.finish();
 	}
@@ -137,15 +114,11 @@ public with sharing class AccountingExportService {
 		String downloadedDigest
 	) {
 		if (fundId != null) {
-			throw new ExportException(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_MarkNeedsAllFunds')
-			);
+			throw new ExportException(BarnHelp.text('Giving', 'Mirror_AccountingExport_MarkNeedsAllFunds'));
 		}
 		ExportFile again = build(fromDate, toDate, null, paymentMethod, onlyUnposted);
 		if (again.digest == null || again.digest != downloadedDigest) {
-			throw new ExportException(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload')
-			);
+			throw new ExportException(BarnHelp.text('Giving', 'Mirror_AccountingExport_ChangedSinceDownload'));
 		}
 		try {
 			return GiftPostingService.markPosted(again.giftIds);
@@ -183,14 +156,7 @@ public with sharing class AccountingExportService {
 			return add(gift.Id, gift, null, null, null, gift.Amount__c);
 		}
 
-		private Boolean add(
-			Id giftId,
-			Gift__c gift,
-			Id fundId,
-			String fund,
-			String code,
-			Decimal amount
-		) {
+		private Boolean add(Id giftId, Gift__c gift, Id fundId, String fund, String code, Decimal amount) {
 			if (onlyUnposted && gift.Accounting_Posted_At__c != null) {
 				return true;
 			}
@@ -220,12 +186,7 @@ public with sharing class AccountingExportService {
 			gifts.add(giftId);
 			keys.add(
 				String.join(
-					new List<String>{
-						giftId,
-						String.valueOf(gift.Gift_Date__c),
-						fundId,
-						value.toPlainString()
-					},
+					new List<String>{ giftId, String.valueOf(gift.Gift_Date__c), fundId, value.toPlainString() },
 					'|'
 				)
 			);
@@ -265,12 +226,7 @@ public with sharing class AccountingExportService {
 			return '';
 		}
 		String cell = FORMULA_STARTS.contains(value.left(1)) ? '\'' + value : value;
-		if (
-			cell.contains(',') ||
-			cell.contains('"') ||
-			cell.contains('\n') ||
-			cell.contains('\r')
-		) {
+		if (cell.contains(',') || cell.contains('"') || cell.contains('\n') || cell.contains('\r')) {
 			cell = '"' + cell.replace('"', '""') + '"';
 		}
 		return cell;

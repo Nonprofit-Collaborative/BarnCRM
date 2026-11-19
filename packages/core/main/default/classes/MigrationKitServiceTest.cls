@@ -62,11 +62,7 @@ private class MigrationKitServiceTest {
 		System.runAs(TestUsers.admin()) {
 			useKit(TWO_TOOLS, ONE_ITEM, null);
 			List<IntegrationAppService.AppInfo> apps = IntegrationController.getApps();
-			Assert.areEqual(
-				KIT,
-				apps[0].migrationKits[0].key,
-				'The installed product links its kit'
-			);
+			Assert.areEqual(KIT, apps[0].migrationKits[0].key, 'The installed product links its kit');
 			Assert.areEqual('Test Kit', apps[0].migrationKits[0].label, 'Named by its label');
 
 			IntegrationAppService.objectNamesOverride = new Set<String>();
@@ -78,10 +74,7 @@ private class MigrationKitServiceTest {
 				message = refused.getMessage();
 			}
 			Assert.areEqual(
-				String.format(
-					BarnHelp.text('Core', 'Core_Migration_ErrorNotDetected'),
-					new List<String>{ 'Test Kit' }
-				),
+				String.format(BarnHelp.text('Core', 'Core_Migration_ErrorNotDetected'), new List<String>{ 'Test Kit' }),
 				message,
 				'A kit whose product is gone is refused'
 			);
@@ -93,11 +86,7 @@ private class MigrationKitServiceTest {
 		System.runAs(TestUsers.admin()) {
 			useKit(TWO_TOOLS, ONE_ITEM, null);
 			MigrationKitService.KitView view = MigrationController.getKit(KIT);
-			Assert.areEqual(
-				MigrationKitService.NOT_STARTED,
-				view.steps[0].status,
-				'First is ready'
-			);
+			Assert.areEqual(MigrationKitService.NOT_STARTED, view.steps[0].status, 'First is ready');
 			Assert.areEqual(MigrationKitService.WAITING, view.steps[1].status, 'Second waits');
 			Assert.areEqual(
 				0,
@@ -111,11 +100,7 @@ private class MigrationKitServiceTest {
 			} catch (AuraHandledException refused) {
 				outOfOrder = refused.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Migration_ErrorOutOfOrder'),
-				outOfOrder,
-				'Steps run in order'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Migration_ErrorOutOfOrder'), outOfOrder, 'Steps run in order');
 
 			MigrationController.setToolStep(KIT, 'one', true);
 			String tooEarly;
@@ -137,33 +122,24 @@ private class MigrationKitServiceTest {
 			Assert.isTrue(view.complete, 'Every step done and every item ticked');
 			Assert.areEqual(
 				'Complete',
-				[SELECT Status__c FROM Merge_Journal__c WHERE Kind__c = 'Migration' LIMIT 1]
-				.Status__c,
+				[SELECT Status__c FROM Merge_Journal__c WHERE Kind__c = 'Migration' LIMIT 1].Status__c,
 				'The run is Complete'
 			);
 			view = MigrationController.setChecklistItem(KIT, 'off', false);
 			Assert.isFalse(view.complete, 'Unticking reopens it');
 			Assert.areEqual(
 				'In Progress',
-				[SELECT Status__c FROM Merge_Journal__c WHERE Kind__c = 'Migration' LIMIT 1]
-				.Status__c,
+				[SELECT Status__c FROM Merge_Journal__c WHERE Kind__c = 'Migration' LIMIT 1].Status__c,
 				'The run is open again'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Merge_Journal__c WHERE Kind__c = 'Migration'],
-				'One run per kit'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Merge_Journal__c WHERE Kind__c = 'Migration'], 'One run per kit');
 		}
 	}
 
 	@IsTest
 	static void anImportStepStagesItsSourceIntoADataJob() {
 		System.runAs(TestUsers.admin()) {
-			Import_Template__c template = ImportTemplateService.createObjectTemplate(
-				'Migration test',
-				'Contact'
-			);
+			Import_Template__c template = ImportTemplateService.createObjectTemplate('Migration test', 'Contact');
 			// A kit's template maps its columns; an unmapped one fails the dry run that follows.
 			ImportMapping mapping = new ImportMapping();
 			mapping.columns.add(new ImportMapping.Column('Id', 'Record.Id'));
@@ -172,24 +148,12 @@ private class MigrationKitServiceTest {
 			ImportTestDataFactory.saveMapping(template.Id, mapping.serialize(), null);
 			insert new List<Contact>{
 				TestDataFactory.person(
-					new Contact(
-						FirstName = 'Ana',
-						LastName = LAST_NAME,
-						Email = 'ana@example.invalid'
-					)
+					new Contact(FirstName = 'Ana', LastName = LAST_NAME, Email = 'ana@example.invalid')
 				),
 				TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = LAST_NAME)),
 				TestDataFactory.person(new Contact(FirstName = 'Cy', LastName = 'Someoneelse'))
 			};
-			useKit(
-				importStep(
-					template.Template_Key__c,
-					LAST_NAME,
-					'["FirstName","Email","Account.Name"]'
-				),
-				null,
-				null
-			);
+			useKit(importStep(template.Template_Key__c, LAST_NAME, '["FirstName","Email","Account.Name"]'), null, null);
 
 			Test.startTest();
 			MigrationKitService.KitView view = MigrationController.startStep(KIT, 'people');
@@ -205,9 +169,7 @@ private class MigrationKitServiceTest {
 			Assert.areEqual('people', batch.Migration_Step__c, 'Linked to its step');
 			Map<String, Object> values;
 			for (Import_Row__c row : [SELECT Raw_Values_JSON__c FROM Import_Row__c]) {
-				Map<String, Object> read = (Map<String, Object>) JSON.deserializeUntyped(
-					row.Raw_Values_JSON__c
-				);
+				Map<String, Object> read = (Map<String, Object>) JSON.deserializeUntyped(row.Raw_Values_JSON__c);
 				if (read.get('FirstName') == 'Ana') {
 					values = read;
 				}
@@ -221,10 +183,7 @@ private class MigrationKitServiceTest {
 			Assert.areNotEqual(MigrationKitService.NOT_STARTED, view.steps[0].status, 'Started');
 			Assert.areEqual(2, view.steps[0].sourceCount, 'Verification counts the source');
 			Assert.areEqual(2, view.steps[0].staged, 'And what was read');
-			Assert.isFalse(
-				view.steps[0].canStart,
-				'A started step cannot start again: ' + view.steps[0].status
-			);
+			Assert.isFalse(view.steps[0].canStart, 'A started step cannot start again: ' + view.steps[0].status);
 		}
 	}
 
@@ -287,11 +246,7 @@ private class MigrationKitServiceTest {
 			} catch (AuraHandledException refused) {
 				message = refused.getMessage();
 			}
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Migration_ErrorNoPermission'),
-				message,
-				'Refused in words'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Migration_ErrorNoPermission'), message, 'Refused in words');
 		}
 	}
 
@@ -303,11 +258,7 @@ private class MigrationKitServiceTest {
 				MigrationKitService.path(Contact.SObjectType, 'Account.Name', false),
 				'A relationship then a field'
 			);
-			Assert.areEqual(
-				'2026-11-11',
-				MigrationKitService.text(Date.newInstance(2026, 11, 11)),
-				'ISO date'
-			);
+			Assert.areEqual('2026-11-11', MigrationKitService.text(Date.newInstance(2026, 11, 11)), 'ISO date');
 			Assert.areEqual('12.50', MigrationKitService.text(12.50), 'Plain number');
 			Assert.areEqual('', MigrationKitService.text(null), 'Blank for nothing');
 			Assert.areEqual(
@@ -315,31 +266,16 @@ private class MigrationKitServiceTest {
 				MigrationKitService.importStatus('Dry run complete'),
 				'Preview done'
 			);
-			Assert.areEqual(
-				MigrationKitService.DONE,
-				MigrationKitService.importStatus('Complete'),
-				'Loaded'
-			);
-			Assert.areEqual(
-				MigrationKitService.RUNNING,
-				MigrationKitService.importStatus('Committing'),
-				'Loading'
-			);
-			Assert.areEqual(
-				MigrationKitService.FAILED,
-				MigrationKitService.importStatus('Undo failed'),
-				'Stuck'
-			);
+			Assert.areEqual(MigrationKitService.DONE, MigrationKitService.importStatus('Complete'), 'Loaded');
+			Assert.areEqual(MigrationKitService.RUNNING, MigrationKitService.importStatus('Committing'), 'Loading');
+			Assert.areEqual(MigrationKitService.FAILED, MigrationKitService.importStatus('Undo failed'), 'Stuck');
 		}
 	}
 
 	@IsTest
 	static void aLinkedColumnPointsAtWhatTheEarlierStepMoved() {
 		System.runAs(TestUsers.admin()) {
-			Import_Template__c template = ImportTemplateService.createObjectTemplate(
-				'Migration link test',
-				'Contact'
-			);
+			Import_Template__c template = ImportTemplateService.createObjectTemplate('Migration link test', 'Contact');
 			List<Contact> people = new List<Contact>{
 				TestDataFactory.person(new Contact(LastName = 'Source')),
 				TestDataFactory.person(new Contact(LastName = 'Moved')),
@@ -361,19 +297,13 @@ private class MigrationKitServiceTest {
 				null,
 				false
 			);
-			update new Import_Batch__c(
-				Id = batch.Id,
-				Migration_Journal__c = run.Id,
-				Migration_Step__c = 'first'
-			);
+			update new Import_Batch__c(Id = batch.Id, Migration_Journal__c = run.Id, Migration_Step__c = 'first');
 			// Rows are written by the data job in system mode; admins only read them.
 			insert as system new Import_Row__c(
 				Import_Batch__c = batch.Id,
 				Row_Number__c = 2,
 				Status__c = 'Created',
-				Row_Key__c = ImportRowFilter.digestOfValues(
-					new List<String>{ String.valueOf(people[0].Id) }
-				),
+				Row_Key__c = ImportRowFilter.digestOfValues(new List<String>{ String.valueOf(people[0].Id) }),
 				Gift_Id__c = people[1].Id
 			);
 			MigrationKitService.Step step = (MigrationKitService.Step) JSON.deserialize(
@@ -422,21 +352,14 @@ private class MigrationKitServiceTest {
 					'"}]}',
 				MigrationKitService.Step.class
 			);
-			Assert.areEqual(
-				1,
-				new MigrationKitService.Source(step).count(),
-				'notEquals leaves the named value out'
-			);
+			Assert.areEqual(1, new MigrationKitService.Source(step).count(), 'notEquals leaves the named value out');
 		}
 	}
 
 	@IsTest
 	static void aStagingJobThatCannotReadItsSourceMarksTheBatchFailedWithTheReason() {
 		System.runAs(TestUsers.admin()) {
-			Import_Template__c template = ImportTemplateService.createObjectTemplate(
-				'Migration failure',
-				'Contact'
-			);
+			Import_Template__c template = ImportTemplateService.createObjectTemplate('Migration failure', 'Contact');
 			Import_Batch__c batch = ImportTestDataFactory.batch(template);
 			useKit(importStep(template.Template_Key__c, LAST_NAME, '["Email"]'), null, null);
 

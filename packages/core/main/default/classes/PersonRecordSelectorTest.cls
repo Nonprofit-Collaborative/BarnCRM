@@ -14,15 +14,11 @@ private class PersonRecordSelectorTest {
 	static void nothingIsReadWhenTheOrgDoesNotStorePeopleAsAccounts() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = false;
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Community Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			insert organization;
 
 			Test.startTest();
-			List<HouseholdService.Person> people = PersonRecordSelector.getPersons(
-				new Set<Id>{ organization.Id }
-			);
+			List<HouseholdService.Person> people = PersonRecordSelector.getPersons(new Set<Id>{ organization.Id });
 			Test.stopTest();
 
 			Assert.areEqual(0, people.size(), 'The person branch does not run on this org shape');
@@ -132,11 +128,7 @@ private class PersonRecordSelectorTest {
 			Test.stopTest();
 
 			Assert.areEqual(record.Id, person.id, 'The person is the record');
-			Assert.areEqual(
-				HouseholdService.SOURCE_ACCOUNT,
-				person.sourceObject,
-				'The person came from an account'
-			);
+			Assert.areEqual(HouseholdService.SOURCE_ACCOUNT, person.sourceObject, 'The person came from an account');
 			Assert.isFalse(person.isDeceased, 'A missing or empty flag reads as false');
 		}
 	}
@@ -144,16 +136,12 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void anOrganizationIsNeverTakenForAPerson() {
 		System.runAs(TestUsers.admin()) {
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Riverside Community Trust')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Riverside Community Trust'));
 			insert organization;
 
 			Test.startTest();
 			Boolean isPerson = PersonRecordSelector.isPersonRecord(organization);
-			List<SObject> people = PersonRecordSelector.filterPeople(
-				new List<SObject>{ organization }
-			);
+			List<SObject> people = PersonRecordSelector.filterPeople(new List<SObject>{ organization });
 			Test.stopTest();
 
 			Assert.isFalse(isPerson, 'An organization is not a person');
@@ -165,11 +153,7 @@ private class PersonRecordSelectorTest {
 	static void nothingAtAllIsHandled() {
 		System.runAs(TestUsers.admin()) {
 			Assert.isFalse(PersonRecordSelector.isPersonRecord(null), 'No record means no person');
-			Assert.areEqual(
-				0,
-				PersonRecordSelector.filterPeople(null).size(),
-				'No list means no people'
-			);
+			Assert.areEqual(0, PersonRecordSelector.filterPeople(null).size(), 'No list means no people');
 		}
 	}
 
@@ -227,9 +211,7 @@ private class PersonRecordSelectorTest {
 	@IsTest
 	static void aChangeTheWordingIsNotBuiltFromIsIgnored() {
 		System.runAs(TestUsers.admin()) {
-			Account previous = TestDataFactory.organization(
-				new Account(Name = 'Maria Garcia', Deceased__c = false)
-			);
+			Account previous = TestDataFactory.organization(new Account(Name = 'Maria Garcia', Deceased__c = false));
 			Account record = TestDataFactory.organization(
 				new Account(
 					Name = 'Maria Garcia',
@@ -255,9 +237,7 @@ private class PersonRecordSelectorTest {
 			Account previous = TestDataFactory.household(
 				new Account(Name = 'Maria Garcia', Household_Role__c = 'Head')
 			);
-			Account record = TestDataFactory.household(
-				new Account(Name = 'Maria Garcia', Household_Role__c = 'Head')
-			);
+			Account record = TestDataFactory.household(new Account(Name = 'Maria Garcia', Household_Role__c = 'Head'));
 
 			Test.startTest();
 			Boolean noticed = PersonRecordSelector.namingChanged(record, previous);

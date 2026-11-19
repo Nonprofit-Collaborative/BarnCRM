@@ -68,24 +68,14 @@ private class OrgSettingsSystemWriterTest {
 				Coexistence_Mode__c = 'Standalone'
 			);
 			Test.startTest();
-			AutomationSettingsWriter.savePausedUntil(
-				OrgSettingsSystemWriter.lockStored(),
-				System.now().addHours(1)
-			);
+			AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), System.now().addHours(1));
 			AutomationSettingsWriter.savePausedUntil(OrgSettingsSystemWriter.lockStored(), null);
 			Test.stopTest();
 
 			BarnCRM_Settings__c saved = stored();
 			Assert.isNull(saved.Automation_Paused_Until__c, 'The pause is cleared.');
-			Assert.isFalse(
-				saved.Relationship_Auto_Reciprocal__c,
-				'A deliberate off is left alone.'
-			);
-			Assert.areEqual(
-				'Standalone',
-				saved.Coexistence_Mode__c,
-				'A chosen mode is left alone.'
-			);
+			Assert.isFalse(saved.Relationship_Auto_Reciprocal__c, 'A deliberate off is left alone.');
+			Assert.areEqual('Standalone', saved.Coexistence_Mode__c, 'A chosen mode is left alone.');
 		}
 	}
 

@@ -10,21 +10,14 @@ private class ProgramsHealthCheckExtensionTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
-		TestUsers.standardUserWith(
-			'Hcstaff',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Hcstaff', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	/** `Finding.key` is `@AuraEnabled` only, so it is read through JSON. */
-	private static Map<String, Map<String, Object>> byKey(
-		List<HealthCheckService.Finding> findings
-	) {
+	private static Map<String, Map<String, Object>> byKey(List<HealthCheckService.Finding> findings) {
 		Map<String, Map<String, Object>> result = new Map<String, Map<String, Object>>();
 		for (HealthCheckService.Finding finding : findings) {
-			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(
-				JSON.serialize(finding)
-			);
+			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(finding));
 			result.put((String) fields.get('key'), fields);
 		}
 		return result;
@@ -32,9 +25,7 @@ private class ProgramsHealthCheckExtensionTest {
 
 	/** Two open enrollments in ended programs, and one open in a running program. */
 	private static void enrollmentsInEndedPrograms() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Rivera');
@@ -66,10 +57,7 @@ private class ProgramsHealthCheckExtensionTest {
 
 			Assert.isNotNull(finding, 'The open enrollments are reported.');
 			Assert.areEqual(
-				String.format(
-					Label.Programs_HealthCheck_OpenAfterEndTitle,
-					new List<Object>{ '2' }
-				),
+				String.format(Label.Programs_HealthCheck_OpenAfterEndTitle, new List<Object>{ '2' }),
 				finding.get('title'),
 				'Only the two in ended programs count.'
 			);
@@ -89,12 +77,7 @@ private class ProgramsHealthCheckExtensionTest {
 			Assert.areEqual(
 				String.format(
 					Label.Programs_HealthCheck_OpenAfterEndTitle,
-					new List<Object>{
-						String.format(
-							Label.Core_HealthCheck_OrphansMoreThan,
-							new List<Object>{ '1' }
-						)
-					}
+					new List<Object>{ String.format(Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '1' }) }
 				),
 				capped.get('title'),
 				'A count past the cap says more than.'
@@ -158,8 +141,7 @@ private class ProgramsHealthCheckExtensionTest {
 
 			ProgramsHealthCheckExtension.npcProgramsOverride = false;
 			Assert.isFalse(
-				byKey(new ProgramsHealthCheckExtension().findings())
-					.containsKey(ProgramsHealthCheckExtension.NPC_KEY),
+				byKey(new ProgramsHealthCheckExtension().findings()).containsKey(ProgramsHealthCheckExtension.NPC_KEY),
 				'Not reported where those objects are absent.'
 			);
 

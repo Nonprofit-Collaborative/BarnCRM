@@ -18,11 +18,7 @@ private class ReceiptControllerTest {
 			'Sam',
 			familyName
 		);
-		Gift__c gift = ReceiptTestDataFactory.plainCashGift(
-			donor.Id,
-			amount,
-			Date.newInstance(2026, 1, 8)
-		);
+		Gift__c gift = ReceiptTestDataFactory.plainCashGift(donor.Id, amount, Date.newInstance(2026, 1, 8));
 		insert gift;
 		return gift;
 	}
@@ -81,9 +77,7 @@ private class ReceiptControllerTest {
 					issued.id,
 					'Spelled the donor name wrong'
 				);
-				ReceiptController.GiftReceiptState state = ReceiptController.getGiftReceiptState(
-					gift.Id
-				);
+				ReceiptController.GiftReceiptState state = ReceiptController.getGiftReceiptState(gift.Id);
 				Test.stopTest();
 
 				Assert.areEqual(ReceiptService.STATUS_ISSUED, issued.status, 'Issued');
@@ -92,16 +86,8 @@ private class ReceiptControllerTest {
 					replacement.receiptNumber,
 					'The replacement takes a new number'
 				);
-				Assert.areEqual(
-					ReceiptService.STATUS_ISSUED,
-					replacement.status,
-					'The replacement is live'
-				);
-				Assert.areEqual(
-					2,
-					state.receipts.size(),
-					'The gift lists the original and its replacement'
-				);
+				Assert.areEqual(ReceiptService.STATUS_ISSUED, replacement.status, 'The replacement is live');
+				Assert.areEqual(2, state.receipts.size(), 'The gift lists the original and its replacement');
 				Assert.isTrue(state.alreadyReceipted, 'The gift is receipted');
 				Assert.isTrue(state.canIssue, 'The person may issue');
 				Assert.areEqual(
@@ -118,14 +104,9 @@ private class ReceiptControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				ReceiptController.ReceiptView issued = ReceiptController.issue(
-					insertGift('Okoye', 80).Id
-				);
+				ReceiptController.ReceiptView issued = ReceiptController.issue(insertGift('Okoye', 80).Id);
 
-				ReceiptController.ReceiptView voided = ReceiptController.voidReceipt(
-					issued.id,
-					'Donor asked'
-				);
+				ReceiptController.ReceiptView voided = ReceiptController.voidReceipt(issued.id, 'Donor asked');
 
 				Assert.areEqual(ReceiptService.STATUS_VOID, voided.status, 'Void');
 				Assert.areEqual('Donor asked', voided.voidReason, 'With the reason given');
@@ -188,10 +169,7 @@ private class ReceiptControllerTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			System.runAs(ReceiptTestDataFactory.issuer()) {
 				ReceiptTestDataFactory.setUpReceipting();
-				Assert.isTrue(
-					ReceiptController.getCanManageTemplates(),
-					'This person may manage the letters'
-				);
+				Assert.isTrue(ReceiptController.getCanManageTemplates(), 'This person may manage the letters');
 				List<ReceiptController.TemplateView> letters = ReceiptController.getTemplates();
 				Assert.areEqual(2, letters.size(), 'A letter of each kind');
 				Id perGift;
@@ -260,9 +238,7 @@ private class ReceiptControllerTest {
 					blank = refused.getMessage();
 				}
 				try {
-					ReceiptController.activateTemplate(
-						FakeIds.of(Receipt_Template__c.SObjectType, 1)
-					);
+					ReceiptController.activateTemplate(FakeIds.of(Receipt_Template__c.SObjectType, 1));
 				} catch (AuraHandledException refused) {
 					missing = refused.getMessage();
 				}
@@ -334,11 +310,7 @@ private class ReceiptControllerTest {
 				} catch (AuraHandledException refused) {
 					message = refused.getMessage();
 				}
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Receipt_NoPermission'),
-					message,
-					'Refused in words'
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Receipt_NoPermission'), message, 'Refused in words');
 				Assert.areEqual(0, [SELECT COUNT() FROM Receipt_Run__c], 'No run was recorded');
 			}
 		}

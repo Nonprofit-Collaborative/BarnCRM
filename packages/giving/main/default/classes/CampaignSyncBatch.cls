@@ -40,10 +40,7 @@ public with sharing class CampaignSyncBatch implements Database.Batchable<SObjec
 	}
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
-		return Database.getQueryLocator(
-			CampaignSyncSelector.allAppealsQuery(childrenOnly),
-			AccessLevel.USER_MODE
-		);
+		return Database.getQueryLocator(CampaignSyncSelector.allAppealsQuery(childrenOnly), AccessLevel.USER_MODE);
 	}
 
 	public void execute(Database.BatchableContext context, List<SObject> scope) {

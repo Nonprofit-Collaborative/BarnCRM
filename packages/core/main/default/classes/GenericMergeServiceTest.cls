@@ -54,18 +54,12 @@ private class GenericMergeServiceTest {
 				GenericMergeService.offeredType(MAPPING),
 				'An import mapping is a BarnCRM object an admin may merge'
 			);
-			Assert.isTrue(
-				offered.containsKey(String.valueOf(Import_Template__c.SObjectType)),
-				'The list offers it'
-			);
+			Assert.isTrue(offered.containsKey(String.valueOf(Import_Template__c.SObjectType)), 'The list offers it');
 			Assert.isNull(
 				GenericMergeService.offeredType('Merge_Journal__c'),
 				'The merge journal is BarnCRM bookkeeping, never merged'
 			);
-			Assert.isNull(
-				GenericMergeService.offeredType('Contact'),
-				'People keep their own merge'
-			);
+			Assert.isNull(GenericMergeService.offeredType('Contact'), 'People keep their own merge');
 		}
 	}
 
@@ -87,10 +81,7 @@ private class GenericMergeServiceTest {
 				GenericMergeService.compare(MAPPING, first.Id, first.Id);
 				Assert.fail('A record cannot be merged with itself');
 			} catch (DuplicateService.DuplicateException expected) {
-				Assert.isTrue(
-					expected.getMessage().contains('two different'),
-					expected.getMessage()
-				);
+				Assert.isTrue(expected.getMessage().contains('two different'), expected.getMessage());
 			}
 			Test.stopTest();
 		}
@@ -103,11 +94,7 @@ private class GenericMergeServiceTest {
 			Import_Template__c first = mapping('Gifts 2025', null);
 			Import_Template__c second = mapping('Gifts 2025 copy', 'Year-end gifts');
 			Test.startTest();
-			GenericMergeService.Comparison compared = GenericMergeService.compare(
-				MAPPING,
-				first.Id,
-				second.Id
-			);
+			GenericMergeService.Comparison compared = GenericMergeService.compare(MAPPING, first.Id, second.Id);
 			Test.stopTest();
 
 			Assert.areEqual('Gifts 2025', compared.firstName, 'The first record by name');
@@ -124,10 +111,7 @@ private class GenericMergeServiceTest {
 			}
 			Assert.isNotNull(description, 'Description is compared');
 			Assert.isTrue(description.differs, 'Blank against a value differs');
-			Assert.isTrue(
-				description.takeSecond,
-				'Under Not blank the other value fills the kept record\'s blank'
-			);
+			Assert.isTrue(description.takeSecond, 'Under Not blank the other value fills the kept record\'s blank');
 		}
 	}
 
@@ -152,14 +136,12 @@ private class GenericMergeServiceTest {
 			Assert.isTrue(isDeleted(other.Id), 'The other mapping is in the Recycle Bin');
 			Assert.areEqual(
 				keep.Id,
-				[SELECT Import_Template__c FROM Import_Batch__c WHERE Id = :job.Id WITH SYSTEM_MODE]
-				.Import_Template__c,
+				[SELECT Import_Template__c FROM Import_Batch__c WHERE Id = :job.Id WITH SYSTEM_MODE].Import_Template__c,
 				'The job now points at the kept mapping'
 			);
 			Assert.areEqual(
 				'Year-end gifts',
-				[SELECT Description__c FROM Import_Template__c WHERE Id = :keep.Id WITH SYSTEM_MODE]
-				.Description__c,
+				[SELECT Description__c FROM Import_Template__c WHERE Id = :keep.Id WITH SYSTEM_MODE].Description__c,
 				'The kept mapping took the chosen value'
 			);
 			Merge_Journal__c journal = [
@@ -185,19 +167,16 @@ private class GenericMergeServiceTest {
 			Assert.isFalse(isDeleted(other.Id), 'Undo brings the real record back');
 			Assert.areEqual(
 				other.Id,
-				[SELECT Import_Template__c FROM Import_Batch__c WHERE Id = :job.Id WITH SYSTEM_MODE]
-				.Import_Template__c,
+				[SELECT Import_Template__c FROM Import_Batch__c WHERE Id = :job.Id WITH SYSTEM_MODE].Import_Template__c,
 				'The job is back on the restored mapping'
 			);
 			Assert.isNull(
-				[SELECT Description__c FROM Import_Template__c WHERE Id = :keep.Id WITH SYSTEM_MODE]
-				.Description__c,
+				[SELECT Description__c FROM Import_Template__c WHERE Id = :keep.Id WITH SYSTEM_MODE].Description__c,
 				'The kept mapping has its own value back'
 			);
 			Assert.areEqual(
 				AutoMergeService.UNDONE,
-				[SELECT Status__c FROM Merge_Journal__c WHERE Id = :journal.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Merge_Journal__c WHERE Id = :journal.Id WITH SYSTEM_MODE].Status__c,
 				'Undone in full'
 			);
 		}
@@ -217,11 +196,7 @@ private class GenericMergeServiceTest {
 			WITH SYSTEM_MODE
 		]
 		.ContentDocumentId;
-		insert new ContentDocumentLink(
-			LinkedEntityId = recordId,
-			ContentDocumentId = documentId,
-			ShareType = 'V'
-		);
+		insert new ContentDocumentLink(LinkedEntityId = recordId, ContentDocumentId = documentId, ShareType = 'V');
 		return documentId;
 	}
 
@@ -246,11 +221,7 @@ private class GenericMergeServiceTest {
 			Import_Template__c other = mapping('Gifts 2025 copy', null);
 			Id onlyOther = fileOn(other.Id, 'Only other');
 			Id shared = fileOn(other.Id, 'Shared');
-			insert new ContentDocumentLink(
-				LinkedEntityId = keep.Id,
-				ContentDocumentId = shared,
-				ShareType = 'V'
-			);
+			insert new ContentDocumentLink(LinkedEntityId = keep.Id, ContentDocumentId = shared, ShareType = 'V');
 			Test.startTest();
 			GenericMergeService.Outcome outcome = GenericMergeService.mergeRecords(
 				MAPPING,
@@ -287,8 +258,7 @@ private class GenericMergeServiceTest {
 			Assert.isTrue(after.contains(shared), 'A link the merge did not add stays');
 			Assert.areEqual(
 				AutoMergeService.UNDONE,
-				[SELECT Status__c FROM Merge_Journal__c WHERE Id = :journal.Id WITH SYSTEM_MODE]
-				.Status__c,
+				[SELECT Status__c FROM Merge_Journal__c WHERE Id = :journal.Id WITH SYSTEM_MODE].Status__c,
 				'Undone in full'
 			);
 		}
@@ -347,12 +317,7 @@ private class GenericMergeServiceTest {
 			Import_Template__c other = mapping('Gifts 2025 copy', null);
 			Test.startTest();
 			try {
-				GenericMergeService.mergeRecords(
-					MAPPING,
-					keep.Id,
-					other.Id,
-					new List<String>{ 'OwnerId' }
-				);
+				GenericMergeService.mergeRecords(MAPPING, keep.Id, other.Id, new List<String>{ 'OwnerId' });
 				Assert.fail('The owner is never taken from the other record');
 			} catch (DuplicateService.DuplicateException expected) {
 				Assert.isTrue(expected.getMessage().contains('OwnerId'), expected.getMessage());
@@ -366,11 +331,7 @@ private class GenericMergeServiceTest {
 	static void refusesWhenADetailRecordWouldBeDeleted() {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c job = ImportTestDataFactory.batch(mapping('Gifts 2025', null));
-			insert new Import_Row__c(
-				Import_Batch__c = job.Id,
-				Row_Number__c = 2,
-				Raw_Values_JSON__c = '{}'
-			);
+			insert new Import_Row__c(Import_Batch__c = job.Id, Row_Number__c = 2, Raw_Values_JSON__c = '{}');
 			Test.startTest();
 			try {
 				GenericMergeService.refuseLostRecords(Import_Batch__c.SObjectType, job.Id);
@@ -379,8 +340,7 @@ private class GenericMergeServiceTest {
 				Assert.isTrue(
 					expected.getMessage()
 						.contains(
-							Import_Row__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-								.getLabelPlural()
+							Import_Row__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural()
 						),
 					expected.getMessage()
 				);

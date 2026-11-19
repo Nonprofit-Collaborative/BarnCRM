@@ -56,9 +56,7 @@ public with sharing class ShiftScheduleRemovalJob implements Queueable {
 	private static void enqueue(List<Id> shiftIds) {
 		if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
 			ErrorLogger.logMessage(
-				'No queueable job was left to remove ' +
-					shiftIds.size() +
-					' future shifts of deleted shift schedules.',
+				'No queueable job was left to remove ' + shiftIds.size() + ' future shifts of deleted shift schedules.',
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
 			);

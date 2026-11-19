@@ -72,20 +72,13 @@ public with sharing class AccountingExportController {
 			view.giftCount = built.giftCount;
 			view.total = built.total;
 			view.digest = built.digest;
-			view.fileName =
-				'accounting-export-' +
-				String.valueOf(fromDate) +
-				'-to-' +
-				String.valueOf(toDate) +
-				'.csv';
+			view.fileName = 'accounting-export-' + String.valueOf(fromDate) + '-to-' + String.valueOf(toDate) + '.csv';
 			return view;
 		} catch (AccountingExportService.ExportException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFailed')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFailed'));
 		}
 	}
 
@@ -105,30 +98,19 @@ public with sharing class AccountingExportController {
 	) {
 		requireExport();
 		try {
-			return AccountingExportService.markPosted(
-				fromDate,
-				toDate,
-				fundId,
-				paymentMethod,
-				onlyUnposted,
-				digest
-			);
+			return AccountingExportService.markPosted(fromDate, toDate, fundId, paymentMethod, onlyUnposted, digest);
 		} catch (AccountingExportService.ExportException refused) {
 			throw UserErrors.message(refused.getMessage());
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFailed')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_AccountingExport_ErrorFailed'));
 		}
 	}
 
 	/** The export builds a file of every gift the person can see, so it needs its own permission. */
 	private static void requireExport() {
 		if (!FeatureManagement.checkPermission(EXPORT_PERMISSION)) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_AccountingExport_NoExportPermission'));
 		}
 	}
 }

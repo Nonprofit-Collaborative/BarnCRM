@@ -38,17 +38,10 @@ private class CrmGiftTemplatesTest {
 			for (String key : KEYS) {
 				Import_Template__c copied = byKey.get(key);
 				Assert.isNotNull(copied, key + ' is copied into the org');
-				Assert.areEqual(
-					'Email exact',
-					copied.Matching_Rule__c,
-					key + ' finds donors by email'
-				);
+				Assert.areEqual('Email exact', copied.Matching_Rule__c, key + ' finds donors by email');
 				Set<String> targets = new Set<String>();
 				Set<String> sources = new Set<String>();
-				for (
-					ImportMapping.Column column : ImportMapping.parse(copied.Column_Mapping_JSON__c)
-						.getColumns()
-				) {
+				for (ImportMapping.Column column : ImportMapping.parse(copied.Column_Mapping_JSON__c).getColumns()) {
 					targets.add(column.getTarget().toLowerCase());
 					String heading = column.getSource();
 					Assert.isTrue(sources.add(heading), key + ' names each heading once');

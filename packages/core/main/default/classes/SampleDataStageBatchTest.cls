@@ -62,10 +62,7 @@ private class SampleDataStageBatchTest {
 		}
 
 		public void runStage(Integer stage) {
-			Database.insert(
-				TestDataFactory.organization(new Account(Name = 'Stage ' + stage)),
-				AccessLevel.USER_MODE
-			);
+			Database.insert(TestDataFactory.organization(new Account(Name = 'Stage ' + stage)), AccessLevel.USER_MODE);
 			if (stage == failAt) {
 				throw new SampleDataException('stage ' + stage + ' failed');
 			}
@@ -95,13 +92,7 @@ private class SampleDataStageBatchTest {
 					}
 				);
 			}
-			households.add(
-				new Map<String, Object>{
-					'key' => 'H' + h,
-					'customName' => false,
-					'members' => members
-				}
-			);
+			households.add(new Map<String, Object>{ 'key' => 'H' + h, 'customName' => false, 'members' => members });
 		}
 		Map<String, Object> root = new Map<String, Object>{
 			'households' => households,
@@ -138,26 +129,14 @@ private class SampleDataStageBatchTest {
 			);
 
 			batch.execute(null, new List<Integer>{ 0 });
-			System.assertEquals(
-				100,
-				SampleDataLoader.status().householdCount,
-				'stage 0: households'
-			);
+			System.assertEquals(100, SampleDataLoader.status().householdCount, 'stage 0: households');
 			System.assertEquals(0, SampleDataLoader.status().contactCount, 'no people yet');
 
 			batch.execute(null, new List<Integer>{ 1 });
-			System.assertEquals(
-				100,
-				SampleDataLoader.status().contactCount,
-				'stage 1: first chunk'
-			);
+			System.assertEquals(100, SampleDataLoader.status().contactCount, 'stage 1: first chunk');
 
 			batch.execute(null, new List<Integer>{ 2 });
-			System.assertEquals(
-				200,
-				SampleDataLoader.status().contactCount,
-				'stage 2: second chunk'
-			);
+			System.assertEquals(200, SampleDataLoader.status().contactCount, 'stage 2: second chunk');
 			System.assertEquals(false, module.loadStarted, 'modules wait for the last stage');
 
 			batch.execute(null, new List<Integer>{ 3 });
@@ -188,11 +167,7 @@ private class SampleDataStageBatchTest {
 
 			List<Integer> order = (List<Integer>) batch.start(null);
 
-			System.assertEquals(
-				new List<Integer>{ 0 },
-				order,
-				'the platform allows one execute of a batch in a test'
-			);
+			System.assertEquals(new List<Integer>{ 0 }, order, 'the platform allows one execute of a batch in a test');
 		}
 	}
 
@@ -224,16 +199,11 @@ private class SampleDataStageBatchTest {
 				FROM Error_Log__c
 				WITH SYSTEM_MODE
 			]) {
-				if (
-					entry.Message__c == BarnHelp.text('Core', 'Core_SampleData_StoppedLogMessage')
-				) {
+				if (entry.Message__c == BarnHelp.text('Core', 'Core_SampleData_StoppedLogMessage')) {
 					pointed = entry.Technical_Detail__c != null;
 				}
 			}
-			System.assert(
-				pointed,
-				'the Error Log entry points to the admin guide and keeps the technical detail'
-			);
+			System.assert(pointed, 'the Error Log entry points to the admin guide and keeps the technical detail');
 		}
 	}
 
@@ -249,11 +219,7 @@ private class SampleDataStageBatchTest {
 			batch.finish(null);
 			Test.stopTest();
 
-			System.assertEquals(
-				false,
-				stages.finished,
-				'a batch that ran one of three stages does not hand over'
-			);
+			System.assertEquals(false, stages.finished, 'a batch that ran one of three stages does not hand over');
 		}
 	}
 
@@ -271,11 +237,7 @@ private class SampleDataStageBatchTest {
 				SampleDataStageBatch.started[0] instanceof SampleDataLoadStages,
 				'the batch runs Core\'s own stages first'
 			);
-			System.assertEquals(
-				100,
-				SampleDataLoader.status().householdCount,
-				'the batch ran the accounts stage'
-			);
+			System.assertEquals(100, SampleDataLoader.status().householdCount, 'the batch ran the accounts stage');
 		}
 	}
 }

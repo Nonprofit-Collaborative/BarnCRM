@@ -33,9 +33,7 @@ public with sharing class LogicModelService {
 			WITH USER_MODE
 		];
 		if (models.isEmpty()) {
-			throw new BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
-			);
+			throw new BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'));
 		}
 		Logic_Model__c model = models[0];
 		Schema.DescribeSObjectResult elements = Logic_Model_Element__c.SObjectType.getDescribe(
@@ -50,10 +48,7 @@ public with sharing class LogicModelService {
 			'canEdit' => elements.isCreateable() && elements.isUpdateable(),
 			'canDelete' => elements.isDeletable(),
 			'canSetSource' => Schema.SObjectType.Indicator__c.fields.Source__c.isUpdateable(),
-			'canRefresh' => Indicator_Period__c.SObjectType.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				)
-				.isUpdateable(),
+			'canRefresh' => Indicator_Period__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isUpdateable(),
 			'elements' => elementsOf(modelId),
 			'links' => linksOf(modelId),
 			'evidenceText' => evidenceText(),
@@ -131,12 +126,7 @@ public with sharing class LogicModelService {
 			Schema.PicklistEntry entry : Schema.SObjectType.Assumption_Evidence__c.fields.Strength__c.getPicklistValues()
 		) {
 			if (entry.isActive()) {
-				strengths.add(
-					new Map<String, String>{
-						'value' => entry.getValue(),
-						'label' => entry.getLabel()
-					}
-				);
+				strengths.add(new Map<String, String>{ 'value' => entry.getValue(), 'label' => entry.getLabel() });
 			}
 		}
 		return new Map<String, Object>{
@@ -216,14 +206,7 @@ public with sharing class LogicModelService {
 				Source_Status__c,
 				Computed_At__c,
 				(
-					SELECT
-						Id,
-						Name,
-						Start_Date__c,
-						End_Date__c,
-						Target_Value__c,
-						Result_Value__c,
-						Notes__c
+					SELECT Id, Name, Start_Date__c, End_Date__c, Target_Value__c, Result_Value__c, Notes__c
 					FROM Periods__r
 					ORDER BY Start_Date__c, End_Date__c
 				)
@@ -360,10 +343,7 @@ public with sharing class LogicModelService {
 			)
 		) {
 			options.add(
-				new Map<String, String>{
-					'value' => (String) program.Id,
-					'label' => (String) program.get('Name')
-				}
+				new Map<String, String>{ 'value' => (String) program.Id, 'label' => (String) program.get('Name') }
 			);
 		}
 		return options;
@@ -405,9 +385,7 @@ public with sharing class LogicModelService {
 				key == LogicModelScope.ORGANIZATION ||
 				Id.valueOf(key).getSObjectType() != type
 			) {
-				throw new BuilderException(
-					BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram')
-				);
+				throw new BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Scope_BadProgram'));
 			}
 			value = key;
 		}
@@ -535,10 +513,7 @@ public with sharing class LogicModelService {
 		for (Object row : orders) {
 			Map<String, Object> fields = (Map<String, Object>) row;
 			changes.add(
-				new Logic_Model_Element__c(
-					Id = idOf(fields, 'id'),
-					Sort_Order__c = number(fields, 'sortOrder')
-				)
+				new Logic_Model_Element__c(Id = idOf(fields, 'id'), Sort_Order__c = number(fields, 'sortOrder'))
 			);
 		}
 		update as user changes;
@@ -554,10 +529,7 @@ public with sharing class LogicModelService {
 	public static Id saveLink(Map<String, Object> fields) {
 		Id linkId = idOf(fields, 'id');
 		if (linkId != null) {
-			update as user new Logic_Model_Link__c(
-				Id = linkId,
-				Assumption__c = text(fields, 'assumption')
-			);
+			update as user new Logic_Model_Link__c(Id = linkId, Assumption__c = text(fields, 'assumption'));
 			return [
 				SELECT Logic_Model__c
 				FROM Logic_Model_Link__c
@@ -575,9 +547,7 @@ public with sharing class LogicModelService {
 			WITH USER_MODE
 		];
 		if (existing > 0) {
-			throw new BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_ArrowExists')
-			);
+			throw new BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_ArrowExists'));
 		}
 		Logic_Model_Link__c link = new Logic_Model_Link__c(
 			Logic_Model__c = idOf(fields, 'modelId'),
@@ -615,8 +585,7 @@ public with sharing class LogicModelService {
 		} else {
 			indicator.Id = indicatorId;
 			update as user indicator;
-			elementId = [SELECT Element__c FROM Indicator__c WHERE Id = :indicatorId WITH USER_MODE]
-			.Element__c;
+			elementId = [SELECT Element__c FROM Indicator__c WHERE Id = :indicatorId WITH USER_MODE].Element__c;
 		}
 		return modelOfElement(elementId);
 	}
@@ -633,8 +602,7 @@ public with sharing class LogicModelService {
 		Id periodId = idOf(fields, 'id');
 		Id indicatorId = periodId == null
 			? idOf(fields, 'indicatorId')
-			: [SELECT Indicator__c FROM Indicator_Period__c WHERE Id = :periodId WITH USER_MODE]
-			  .Indicator__c;
+			: [SELECT Indicator__c FROM Indicator_Period__c WHERE Id = :periodId WITH USER_MODE].Indicator__c;
 		Date startDate = day(fields, 'startDate');
 		Date endDate = day(fields, 'endDate');
 		Integer same = [
@@ -648,9 +616,7 @@ public with sharing class LogicModelService {
 			WITH USER_MODE
 		];
 		if (same > 0) {
-			throw new BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_PeriodExists')
-			);
+			throw new BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_PeriodExists'));
 		}
 		Indicator__c indicator = [
 			SELECT Element__c, Source__c
@@ -730,9 +696,7 @@ public with sharing class LogicModelService {
 			]
 			.Indicator__r.Element__r.Logic_Model__c;
 		} else {
-			throw new BuilderException(
-				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound')
-			);
+			throw new BuilderException(BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'));
 		}
 		Database.delete(recordId, true, AccessLevel.USER_MODE);
 		return modelId;

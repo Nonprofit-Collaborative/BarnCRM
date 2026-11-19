@@ -23,9 +23,7 @@ public with sharing class ProjectInvoicePayments {
 
 	/** Payments' seam, or null when Payments is not installed. */
 	public static Callable api() {
-		return apiForTest != null
-			? apiForTest
-			: (Callable) NamespaceUtil.build('PaymentsApi', Callable.class, CONTEXT);
+		return apiForTest != null ? apiForTest : (Callable) NamespaceUtil.build('PaymentsApi', Callable.class, CONTEXT);
 	}
 
 	/** Whether Send Payment Link shows: the setting is on and Payments is installed. */
@@ -118,18 +116,10 @@ public with sharing class ProjectInvoicePayments {
 			outcome = EmailSendOutcome.failed(e.getMessage());
 		}
 		if (outcome.sent) {
-			return BarnHelp.text(
-				'Projects',
-				'Projects_Invoice_LinkSent',
-				new List<Object>{ invoice.Contact__r.Email }
-			);
+			return BarnHelp.text('Projects', 'Projects_Invoice_LinkSent', new List<Object>{ invoice.Contact__r.Email });
 		}
 		ErrorLogger.logMessage(outcome.error, CONTEXT + '.sendLink', ErrorLogger.SEVERITY_WARNING);
-		return BarnHelp.text(
-			'Projects',
-			'Projects_Invoice_LinkNotEmailed',
-			new List<Object>{ outcome.error }
-		);
+		return BarnHelp.text('Projects', 'Projects_Invoice_LinkNotEmailed', new List<Object>{ outcome.error });
 	}
 
 	/**
@@ -171,11 +161,7 @@ public with sharing class ProjectInvoicePayments {
 			}
 			if (invoice.Status__c == ProjectBilling.VOIDED) {
 				ErrorLogger.logMessage(
-					BarnHelp.text(
-						'Projects',
-						'Projects_Invoice_VoidReport',
-						new List<Object>{ invoice.Name }
-					),
+					BarnHelp.text('Projects', 'Projects_Invoice_VoidReport', new List<Object>{ invoice.Name }),
 					CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);

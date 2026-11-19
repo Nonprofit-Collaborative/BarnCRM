@@ -90,13 +90,7 @@ private class RollupInstantTriggerTest {
 				null,
 				null
 			);
-			RollupInstantTrigger.handle(
-				System.TriggerOperation.AFTER_INSERT,
-				new List<SObject>(),
-				null,
-				null,
-				null
-			);
+			RollupInstantTrigger.handle(System.TriggerOperation.AFTER_INSERT, new List<SObject>(), null, null, null);
 			Test.stopTest();
 
 			System.Assert.areNotEqual(
@@ -143,10 +137,7 @@ private class RollupInstantTriggerTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			System.Assert.isFalse(RollupInstantTrigger.hasRun(), 'Nothing has called it yet.');
 			RollupInstantTrigger.run();
-			System.Assert.isTrue(
-				RollupInstantTrigger.hasRun(),
-				'The generated test asserts this after its insert.'
-			);
+			System.Assert.isTrue(RollupInstantTrigger.hasRun(), 'The generated test asserts this after its insert.');
 		}
 	}
 }

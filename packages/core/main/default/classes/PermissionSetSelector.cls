@@ -31,10 +31,7 @@ public with sharing class PermissionSetSelector {
 	 * @param namespacePrefix the package namespace without underscores, or null for none
 	 * @return the matching permission sets
 	 */
-	public List<PermissionSet> selectPackagedByNames(
-		Set<String> permissionSetNames,
-		String namespacePrefix
-	) {
+	public List<PermissionSet> selectPackagedByNames(Set<String> permissionSetNames, String namespacePrefix) {
 		if (permissionSetNames == null || permissionSetNames.isEmpty()) {
 			return new List<PermissionSet>();
 		}

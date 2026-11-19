@@ -97,8 +97,7 @@ private class ContactInsertHouseholdSaveTest {
 			Contact jane = HouseholdTestDataFactory.newContact('Jane', 'Smith');
 			jane.AccountId = smiths.Id;
 			insert jane;
-			Id before = [SELECT Primary_Contact__c FROM Account WHERE Id = :smiths.Id]
-			.Primary_Contact__c;
+			Id before = [SELECT Primary_Contact__c FROM Account WHERE Id = :smiths.Id].Primary_Contact__c;
 			Contact john = HouseholdTestDataFactory.newContact('John', 'Smith');
 			john.AccountId = smiths.Id;
 			john.MailingStreet = STREET;

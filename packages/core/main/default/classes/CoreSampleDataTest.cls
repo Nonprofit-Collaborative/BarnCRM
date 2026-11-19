@@ -22,11 +22,7 @@ private class CoreSampleDataTest {
 		for (String key : new List<String>{ 'H007', 'H008' }) {
 			households.add(
 				TestDataFactory.household(
-					new Account(
-						Name = 'Sample Household ' + key,
-						Sample_Data__c = true,
-						Sample_Data_Key__c = key
-					)
+					new Account(Name = 'Sample Household ' + key, Sample_Data__c = true, Sample_Data_Key__c = key)
 				)
 			);
 		}
@@ -83,11 +79,7 @@ private class CoreSampleDataTest {
 				WITH SYSTEM_MODE
 			]) {
 				QueryCompiler.Compiled compiled = QueryCompiler.compile(saved.Query_JSON__c);
-				Assert.areEqual(
-					saved.Object_Name__c,
-					compiled.objectName,
-					saved.Name + ' compiles in Find'
-				);
+				Assert.areEqual(saved.Object_Name__c, compiled.objectName, saved.Name + ' compiles in Find');
 				if (BackupSetService.isBackupSet(saved.Query_JSON__c)) {
 					backupSets++;
 				}
@@ -98,10 +90,7 @@ private class CoreSampleDataTest {
 				[
 					SELECT COUNT()
 					FROM Address__c
-					WHERE
-						Type__c = 'Seasonal'
-						AND Seasonal_Start_Month__c = 12
-						AND Account__r.Sample_Data__c = TRUE
+					WHERE Type__c = 'Seasonal' AND Seasonal_Start_Month__c = 12 AND Account__r.Sample_Data__c = TRUE
 					WITH SYSTEM_MODE
 				],
 				'Two winter addresses that cross the new year'
@@ -149,11 +138,7 @@ private class CoreSampleDataTest {
 				[SELECT COUNT() FROM Saved_Query__c WHERE Sample_Data__c = TRUE WITH SYSTEM_MODE],
 				'The sample queries are gone'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Saved_Query__c WITH SYSTEM_MODE],
-				'The real query stays'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Saved_Query__c WITH SYSTEM_MODE], 'The real query stays');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Address__c WHERE Type__c = 'Seasonal' WITH SYSTEM_MODE],

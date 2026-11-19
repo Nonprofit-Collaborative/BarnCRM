@@ -45,46 +45,24 @@ private class OpportunityMirrorSelectorTest {
 				'No role object, so no roles.'
 			);
 			Assert.isTrue(
-				OpportunityMirrorSelector.primaryRolesByOpportunity('PledgeRole__x', new Set<Id>())
-					.isEmpty(),
+				OpportunityMirrorSelector.primaryRolesByOpportunity('PledgeRole__x', new Set<Id>()).isEmpty(),
 				'No Opportunities, so no roles.'
 			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.namesById(null, null).isEmpty(),
-				'No one to name.'
-			);
+			Assert.isTrue(OpportunityMirrorSelector.namesById(null, null).isEmpty(), 'No one to name.');
 			Assert.isTrue(
 				OpportunityMirrorSelector.namesById(new Set<Id>(), new Set<Id>()).isEmpty(),
 				'Empty sets name no one.'
 			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.personContactIds(null).isEmpty(),
-				'No accounts.'
-			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.personContactIds(new Set<Id>()).isEmpty(),
-				'Empty accounts.'
-			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.personAccountByContact(null).isEmpty(),
-				'No contacts.'
-			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.personAccountByContact(new Set<Id>()).isEmpty(),
-				'Empty contacts.'
-			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.linkedOpportunityIds(null).isEmpty(),
-				'No identifiers.'
-			);
+			Assert.isTrue(OpportunityMirrorSelector.personContactIds(null).isEmpty(), 'No accounts.');
+			Assert.isTrue(OpportunityMirrorSelector.personContactIds(new Set<Id>()).isEmpty(), 'Empty accounts.');
+			Assert.isTrue(OpportunityMirrorSelector.personAccountByContact(null).isEmpty(), 'No contacts.');
+			Assert.isTrue(OpportunityMirrorSelector.personAccountByContact(new Set<Id>()).isEmpty(), 'Empty contacts.');
+			Assert.isTrue(OpportunityMirrorSelector.linkedOpportunityIds(null).isEmpty(), 'No identifiers.');
 			Assert.isTrue(
 				OpportunityMirrorSelector.linkedOpportunityIds(new Set<String>()).isEmpty(),
 				'Empty identifiers.'
 			);
-			Assert.isTrue(
-				OpportunityMirrorSelector.appealIdsByCampaignId(null).isEmpty(),
-				'No Campaigns.'
-			);
+			Assert.isTrue(OpportunityMirrorSelector.appealIdsByCampaignId(null).isEmpty(), 'No Campaigns.');
 			Assert.isTrue(
 				OpportunityMirrorSelector.appealIdsByCampaignId(new Set<String>()).isEmpty(),
 				'Empty Campaigns.'
@@ -111,8 +89,7 @@ private class OpportunityMirrorSelectorTest {
 		Assert.isFalse(uncopied.contains(':since'), 'No last-run filter.');
 		Assert.isFalse(uncopied.contains(':fromDate'), 'No range.');
 		Assert.isTrue(
-			OpportunityMirrorSelector.giftsToCopyQuery(false, true)
-				.contains('LastModifiedDate >= :since'),
+			OpportunityMirrorSelector.giftsToCopyQuery(false, true).contains('LastModifiedDate >= :since'),
 			'Linked gifts changed since the last run.'
 		);
 		String ranged = OpportunityMirrorSelector.giftsToCopyQuery(true);
@@ -131,10 +108,7 @@ private class OpportunityMirrorSelectorTest {
 			String typed = OpportunityMirrorSelector.wonOpportunitiesQuery(object1, fields, true);
 			Assert.isFalse(all.contains('RecordTypeId'), 'Every record type.');
 			Assert.isTrue(typed.contains('RecordTypeId IN :recordTypeIds'), 'Only chosen types.');
-			Assert.isTrue(
-				all.startsWith('SELECT Id, Name FROM ' + object1 + ' WHERE IsWon'),
-				'Won.'
-			);
+			Assert.isTrue(all.startsWith('SELECT Id, Name FROM ' + object1 + ' WHERE IsWon'), 'Won.');
 			Assert.isTrue(typed.endsWith('ORDER BY CloseDate, Id'), 'Oldest first.');
 		}
 	}
@@ -149,9 +123,7 @@ private class OpportunityMirrorSelectorTest {
 			Set<String> found;
 			Test.startTest();
 			System.runAs(userWith('Salesforce_Records_Sync')) {
-				found = OpportunityMirrorSelector.linkedOpportunityIds(
-					new Set<String>{ LINKED_ID, OTHER_ID }
-				);
+				found = OpportunityMirrorSelector.linkedOpportunityIds(new Set<String>{ LINKED_ID, OTHER_ID });
 			}
 			Test.stopTest();
 			Assert.areEqual(new Set<String>{ LINKED_ID }, found, 'Only the one a gift names.');
@@ -182,12 +154,8 @@ private class OpportunityMirrorSelectorTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Contact luis = [SELECT Id, AccountId FROM Contact WHERE LastName = 'Garcia' LIMIT 1];
 			Test.startTest();
-			Map<Id, Id> contactsByAccount = OpportunityMirrorSelector.personContactIds(
-				new Set<Id>{ luis.AccountId }
-			);
-			Map<Id, Id> accountsByContact = OpportunityMirrorSelector.personAccountByContact(
-				new Set<Id>{ luis.Id }
-			);
+			Map<Id, Id> contactsByAccount = OpportunityMirrorSelector.personContactIds(new Set<Id>{ luis.AccountId });
+			Map<Id, Id> accountsByContact = OpportunityMirrorSelector.personAccountByContact(new Set<Id>{ luis.Id });
 			Test.stopTest();
 			Assert.isTrue(contactsByAccount.isEmpty(), 'A household is not a person account.');
 			Assert.isTrue(accountsByContact.isEmpty(), 'A household member is not a person.');

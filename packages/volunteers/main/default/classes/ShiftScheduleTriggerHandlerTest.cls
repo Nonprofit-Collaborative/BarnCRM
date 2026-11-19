@@ -27,10 +27,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			COORDINATOR,
 			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 		);
-		TestUsers.standardUserWith(
-			STAFF,
-			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-		);
+		TestUsers.standardUserWith(STAFF, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
 		TestUsers.standardUserWith(
 			READ_ONLY,
 			new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Read_Only' }
@@ -131,8 +128,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			);
 			Assert.areEqual(
 				Date.newInstance(2026, 4, 13),
-				[SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :fresh.Id]
-				.Created_Through__c,
+				[SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :fresh.Id].Created_Through__c,
 				'Created Through moves to the horizon although Staff cannot edit it.'
 			);
 		}
@@ -171,10 +167,7 @@ private class ShiftScheduleTriggerHandlerTest {
 
 			Test.startTest();
 			System.runAs(user(COORDINATOR)) {
-				update new Shift_Schedule__c(
-					Id = before.Id,
-					Start_Time__c = Time.newInstance(10, 0, 0, 0)
-				);
+				update new Shift_Schedule__c(Id = before.Id, Start_Time__c = Time.newInstance(10, 0, 0, 0));
 			}
 			Test.stopTest();
 
@@ -184,11 +177,7 @@ private class ShiftScheduleTriggerHandlerTest {
 				schedule().Shifts_Kept__c,
 				'The booked shift is counted; the cancelled one is kept but not counted.'
 			);
-			Assert.areEqual(
-				8,
-				shifts.size(),
-				'Two past, two kept, and four recreated to the horizon.'
-			);
+			Assert.areEqual(8, shifts.size(), 'Two past, two kept, and four recreated to the horizon.');
 			assertOneShiftADay(shifts);
 			for (Integer i = 0; i < 4; i++) {
 				Assert.isTrue(
@@ -228,11 +217,7 @@ private class ShiftScheduleTriggerHandlerTest {
 
 			Assert.areEqual(original, idsOf(shiftsOf(before.Id)), 'The same shifts.');
 			Assert.isNull(schedule().Shifts_Kept__c, 'Nothing was removed, so nothing is counted.');
-			Assert.areEqual(
-				before.Created_Through__c,
-				schedule().Created_Through__c,
-				'Created Through is kept.'
-			);
+			Assert.areEqual(before.Created_Through__c, schedule().Created_Through__c, 'Created Through is kept.');
 		}
 	}
 
@@ -252,11 +237,7 @@ private class ShiftScheduleTriggerHandlerTest {
 
 			List<Volunteer_Shift__c> after = shiftsOf(before.Id);
 			Assert.isTrue(idsOf(after).containsAll(original), 'No shift is removed.');
-			Assert.areEqual(
-				original.size() + 2,
-				after.size(),
-				'The save fills 4 and 11 April at once.'
-			);
+			Assert.areEqual(original.size() + 2, after.size(), 'The save fills 4 and 11 April at once.');
 			assertOneShiftADay(after);
 			Assert.areEqual(
 				Date.newInstance(2026, 4, 13),
@@ -274,10 +255,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			Shift_Schedule__c before = schedule();
 			Test.startTest();
 			System.runAs(user(COORDINATOR)) {
-				update new Shift_Schedule__c(
-					Id = before.Id,
-					Start_Time__c = Time.newInstance(10, 0, 0, 0)
-				);
+				update new Shift_Schedule__c(Id = before.Id, Start_Time__c = Time.newInstance(10, 0, 0, 0));
 			}
 			Test.stopTest();
 			Assert.areEqual(
@@ -297,20 +275,10 @@ private class ShiftScheduleTriggerHandlerTest {
 		System.runAs(admin()) {
 			useMondayClock();
 			Shift_Schedule__c before = schedule();
-			update new Shift_Schedule__c(
-				Id = before.Id,
-				End_Date__c = Date.newInstance(2026, 3, 1)
-			);
-			Assert.areEqual(
-				1,
-				schedule().Shifts_Kept__c,
-				'The earlier end kept the booked 7 March.'
-			);
+			update new Shift_Schedule__c(Id = before.Id, End_Date__c = Date.newInstance(2026, 3, 1));
+			Assert.areEqual(1, schedule().Shifts_Kept__c, 'The earlier end kept the booked 7 March.');
 
-			update new Shift_Schedule__c(
-				Id = before.Id,
-				End_Date__c = Date.newInstance(2026, 4, 30)
-			);
+			update new Shift_Schedule__c(Id = before.Id, End_Date__c = Date.newInstance(2026, 4, 30));
 
 			Assert.isNull(schedule().Shifts_Kept__c, 'A later end changes no shift and clears it.');
 		}
@@ -354,22 +322,10 @@ private class ShiftScheduleTriggerHandlerTest {
 				afterEnding,
 				'Staff ended it: 21 and 28 March went, the past two and the kept two stay.'
 			);
-			Assert.areEqual(
-				1,
-				ended.Shifts_Kept__c,
-				'The booked shift is counted; the cancelled one is not.'
-			);
+			Assert.areEqual(1, ended.Shifts_Kept__c, 'The booked shift is counted; the cancelled one is not.');
 			Assert.isNull(ended.Created_Through__c, 'Created Through is cleared.');
-			Assert.areEqual(
-				8,
-				shiftsOf(before.Id).size(),
-				'Turning it on fills the horizon again from today.'
-			);
-			Assert.areEqual(
-				Date.newInstance(2026, 4, 13),
-				schedule().Created_Through__c,
-				'To the horizon.'
-			);
+			Assert.areEqual(8, shiftsOf(before.Id).size(), 'Turning it on fills the horizon again from today.');
+			Assert.areEqual(Date.newInstance(2026, 4, 13), schedule().Created_Through__c, 'To the horizon.');
 		}
 	}
 
@@ -383,19 +339,13 @@ private class ShiftScheduleTriggerHandlerTest {
 
 			Test.startTest();
 			System.runAs(user(COORDINATOR)) {
-				update new Shift_Schedule__c(
-					Id = before.Id,
-					End_Date__c = Date.newInstance(2026, 3, 20)
-				);
+				update new Shift_Schedule__c(Id = before.Id, End_Date__c = Date.newInstance(2026, 3, 20));
 			}
 			Test.stopTest();
 
 			Set<Id> left = idsOf(shiftsOf(before.Id));
 			Assert.areEqual(5, left.size(), 'Only 21 March went.');
-			Assert.isFalse(
-				left.contains(original[4].Id),
-				'21 March, after the new end, had no sign-up.'
-			);
+			Assert.isFalse(left.contains(original[4].Id), '21 March, after the new end, had no sign-up.');
 			Assert.isTrue(left.contains(original[5].Id), '28 March is kept: someone signed up.');
 			Assert.areEqual(1, schedule().Shifts_Kept__c, 'One shift after the end was kept.');
 		}
@@ -416,16 +366,9 @@ private class ShiftScheduleTriggerHandlerTest {
 				FROM Volunteer_Shift__c
 				WHERE Volunteer_Job__c = :before.Job__c
 			];
-			Assert.areEqual(
-				4,
-				left.size(),
-				'The two past shifts, the booked one and the cancelled one stay.'
-			);
+			Assert.areEqual(4, left.size(), 'The two past shifts, the booked one and the cancelled one stay.');
 			for (Volunteer_Shift__c shift : left) {
-				Assert.isNull(
-					shift.Shift_Schedule__c,
-					'A kept shift loses its link to the deleted schedule.'
-				);
+				Assert.isNull(shift.Shift_Schedule__c, 'A kept shift loses its link to the deleted schedule.');
 			}
 		}
 	}
@@ -438,9 +381,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			Id jobId = schedule().Job__c;
 			List<Shift_Schedule__c> many = new List<Shift_Schedule__c>();
 			for (Integer i = 0; i < 251; i++) {
-				many.add(
-					VolunteersTestData.newSchedule(jobId, 'Tuesday', Date.newInstance(2026, 3, 2))
-				);
+				many.add(VolunteersTestData.newSchedule(jobId, 'Tuesday', Date.newInstance(2026, 3, 2)));
 			}
 			// A test runs one batch chunk only, so the queued run takes all 251 itself.
 			ShiftScheduleBatch.chunkSizeOverride = 251;
@@ -471,10 +412,7 @@ private class ShiftScheduleTriggerHandlerTest {
 
 			Test.startTest();
 			System.runAs(user(COORDINATOR)) {
-				update new Shift_Schedule__c(
-					Id = before.Id,
-					Start_Time__c = Time.newInstance(10, 0, 0, 0)
-				);
+				update new Shift_Schedule__c(Id = before.Id, Start_Time__c = Time.newInstance(10, 0, 0, 0));
 			}
 			Test.stopTest();
 
@@ -492,8 +430,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			);
 			Assert.areEqual(
 				original[4].Id,
-				[SELECT Volunteer_Shift__c FROM Volunteer_Hours__c WHERE Id = :hours.Id]
-				.Volunteer_Shift__c,
+				[SELECT Volunteer_Shift__c FROM Volunteer_Hours__c WHERE Id = :hours.Id].Volunteer_Shift__c,
 				'The hours still name their shift.'
 			);
 			Assert.areEqual(8, shifts.size(), 'Four kept or past, and four recreated.');
@@ -510,10 +447,7 @@ private class ShiftScheduleTriggerHandlerTest {
 
 			Test.startTest();
 			System.runAs(user(COORDINATOR)) {
-				update new Shift_Schedule__c(
-					Id = before.Id,
-					End_Date__c = Date.newInstance(2026, 3, 20)
-				);
+				update new Shift_Schedule__c(Id = before.Id, End_Date__c = Date.newInstance(2026, 3, 20));
 			}
 			Shift_Schedule__c ended = schedule();
 			Integer afterEnding = shiftsOf(before.Id).size();
@@ -529,11 +463,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			);
 			Assert.areEqual(4, afterEnding, '21 and 28 March went.');
 			List<Volunteer_Shift__c> shifts = shiftsOf(before.Id);
-			Assert.areEqual(
-				8,
-				shifts.size(),
-				'21 and 28 March come back, and 4 and 11 April reach the horizon.'
-			);
+			Assert.areEqual(8, shifts.size(), '21 and 28 March come back, and 4 and 11 April reach the horizon.');
 			assertOneShiftADay(shifts);
 			Assert.isFalse(original.contains(shifts[4].Id), '21 March is a new record.');
 			Assert.areEqual(
@@ -570,8 +500,7 @@ private class ShiftScheduleTriggerHandlerTest {
 				'No run could be queued, so the nightly run creates the shifts.'
 			);
 			Assert.isNull(
-				[SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :fresh.Id]
-				.Created_Through__c,
+				[SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :fresh.Id].Created_Through__c,
 				'Nothing is recorded as created.'
 			);
 		}
@@ -591,11 +520,7 @@ private class ShiftScheduleTriggerHandlerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				shiftsBefore,
-				shiftsOf(before.Id).size(),
-				'The failed run creates no shift.'
-			);
+			Assert.areEqual(shiftsBefore, shiftsOf(before.Id).size(), 'The failed run creates no shift.');
 			Assert.areEqual(
 				before.Created_Through__c,
 				schedule().Created_Through__c,

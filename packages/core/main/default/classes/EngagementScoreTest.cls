@@ -3,9 +3,7 @@
  * arithmetic, signals found by name, and the nightly step. No module is present in Core's
  * tests, so stub signals are injected by class name.
  */
-@IsTest(
-	testFor='ApexClass:EngagementScore, ApexClass:EngagementScoreJob, ApexClass:EngagementScoreController'
-)
+@IsTest(testFor='ApexClass:EngagementScore, ApexClass:EngagementScoreJob, ApexClass:EngagementScoreController')
 private class EngagementScoreTest {
 	private static final Date TODAY = Date.newInstance(2026, 11, 11);
 	private static final String GIVING = 'GivingEngagementSignal';
@@ -72,41 +70,18 @@ private class EngagementScoreTest {
 	@IsTest
 	static void aMissingOrUnreadablePartKeepsItsDefaultAndMonthsIsHeldInRange() {
 		System.runAs(TestUsers.admin()) {
-			EngagementScore score = new EngagementScore(
-				'hours 10; Gifts -5, Events x, Bogus 9',
-				'Months 99, Gifts 0'
-			);
-			Assert.areEqual(
-				10,
-				score.weights.get('Hours'),
-				'A part written in any case and with semicolons is read'
-			);
+			EngagementScore score = new EngagementScore('hours 10; Gifts -5, Events x, Bogus 9', 'Months 99, Gifts 0');
+			Assert.areEqual(10, score.weights.get('Hours'), 'A part written in any case and with semicolons is read');
 			Assert.areEqual(40, score.weights.get('Gifts'), 'A negative weight keeps the default');
-			Assert.areEqual(
-				20,
-				score.weights.get('Events'),
-				'An unreadable number keeps the default'
-			);
+			Assert.areEqual(20, score.weights.get('Events'), 'An unreadable number keeps the default');
 			Assert.isFalse(score.weights.containsKey('Bogus'), 'An unknown part is ignored');
 			Assert.areEqual(60, score.targets.get('Months'), 'Months is held at 60 at most');
 			Assert.areEqual(1000, score.targets.get('Gifts'), 'A target must be above 0');
-			Assert.areEqual(
-				TODAY.addMonths(-60),
-				score.since(TODAY),
-				'The window starts Months months back'
-			);
+			Assert.areEqual(TODAY.addMonths(-60), score.since(TODAY), 'The window starts Months months back');
 
 			EngagementScore shipped = new EngagementScore(null, '');
-			Assert.areEqual(
-				15,
-				shipped.weights.get('Activity'),
-				'Empty settings read as the defaults'
-			);
-			Assert.areEqual(
-				90,
-				shipped.targets.get('Activity'),
-				'Empty settings read as the defaults'
-			);
+			Assert.areEqual(15, shipped.weights.get('Activity'), 'Empty settings read as the defaults');
+			Assert.areEqual(90, shipped.targets.get('Activity'), 'Empty settings read as the defaults');
 		}
 	}
 
@@ -124,22 +99,10 @@ private class EngagementScoreTest {
 				},
 				TODAY
 			);
-			Assert.areEqual(
-				100,
-				scores.get(FakeIds.of(Contact.SObjectType, 1)),
-				'Activity today is full marks'
-			);
-			Assert.areEqual(
-				50,
-				scores.get(FakeIds.of(Contact.SObjectType, 2)),
-				'Halfway through 90 days is half'
-			);
+			Assert.areEqual(100, scores.get(FakeIds.of(Contact.SObjectType, 1)), 'Activity today is full marks');
+			Assert.areEqual(50, scores.get(FakeIds.of(Contact.SObjectType, 2)), 'Halfway through 90 days is half');
 			Assert.areEqual(0, scores.get(FakeIds.of(Contact.SObjectType, 3)), 'No activity is 0');
-			Assert.areEqual(
-				0,
-				scores.get(FakeIds.of(Contact.SObjectType, 4)),
-				'Activity older than 90 days is 0'
-			);
+			Assert.areEqual(0, scores.get(FakeIds.of(Contact.SObjectType, 4)), 'Activity older than 90 days is 0');
 		}
 	}
 
@@ -161,9 +124,7 @@ private class EngagementScoreTest {
 			);
 			Assert.areEqual(
 				50,
-				new EngagementScore('Hours 0, Activity 0', null)
-					.scores(new List<Contact>{ ana }, TODAY)
-					.get(ana.Id),
+				new EngagementScore('Hours 0, Activity 0', null).scores(new List<Contact>{ ana }, TODAY).get(ana.Id),
 				'Only Gifts weighs anything, at one half'
 			);
 			Assert.areEqual(
@@ -203,11 +164,7 @@ private class EngagementScoreTest {
 	@IsTest
 	static void theNightlyStepSavesChangedScoresOnlyAndIsActiveWhileOn() {
 		System.runAs(TestUsers.admin()) {
-			signals(
-				new Map<String, EngagementSignalExtension>{
-					GIVING => new StubSignal('Gifts', 1000)
-				}
-			);
+			signals(new Map<String, EngagementSignalExtension>{ GIVING => new StubSignal('Gifts', 1000) });
 			Assert.isFalse(EngagementScoreJob.step().active, 'Off until turned on');
 			Assert.isFalse(EngagementScoreController.isFeatureOn(), 'The meter hides while off');
 			turnOn('Gifts 40, Activity 0');
@@ -234,11 +191,7 @@ private class EngagementScoreTest {
 			];
 			Assert.areEqual(20, scored.size(), 'Every person is read');
 			for (Contact each : scored) {
-				Assert.areEqual(
-					100,
-					each.Engagement_Score__c,
-					'Full gifts, the only weighted part'
-				);
+				Assert.areEqual(100, each.Engagement_Score__c, 'Full gifts, the only weighted part');
 				Assert.areEqual(
 					each.Id == unchanged.Id ? null : OrgDate.today(),
 					each.Engagement_Scored_On__c,

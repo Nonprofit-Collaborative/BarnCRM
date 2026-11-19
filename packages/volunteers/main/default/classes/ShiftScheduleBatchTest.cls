@@ -76,9 +76,7 @@ private class ShiftScheduleBatchTest {
 				[
 					SELECT COUNT()
 					FROM Shift_Schedule__c
-					WHERE
-						Id IN :schedules
-						AND Created_Through__c = :ShiftScheduleService.today().addDays(182)
+					WHERE Id IN :schedules AND Created_Through__c = :ShiftScheduleService.today().addDays(182)
 				],
 				'Each schedule records the horizon.'
 			);
@@ -89,10 +87,7 @@ private class ShiftScheduleBatchTest {
 	static void oneChunkOfTenDailySchedulesAtTheLongestHorizonFitsOneTransaction() {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			VolunteersTestData.shiftHorizonWeeks(26);
-			List<Shift_Schedule__c> schedules = saved(
-				ShiftScheduleBatch.CHUNK_SIZE,
-				String.join(WEEKDAYS, ';')
-			);
+			List<Shift_Schedule__c> schedules = saved(ShiftScheduleBatch.CHUNK_SIZE, String.join(WEEKDAYS, ';'));
 
 			Test.startTest();
 			ShiftScheduleBatch.startNightly();
@@ -117,8 +112,7 @@ private class ShiftScheduleBatchTest {
 			ShiftScheduleBatch.chunkSizeOverride = 1;
 
 			Test.startTest();
-			new ShiftScheduleGenerator(new Map<Id, Shift_Schedule__c>(schedules).keySet())
-				.execute(null);
+			new ShiftScheduleGenerator(new Map<Id, Shift_Schedule__c>(schedules).keySet()).execute(null);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -140,11 +134,7 @@ private class ShiftScheduleBatchTest {
 			List<NightlyStep> steps = new VolunteersNightlyJobProvider().nightlySteps();
 
 			Assert.areEqual(4, steps.size(), 'The schedule, reminder, nudge and thank-you runs.');
-			Assert.areEqual(
-				Label.Volunteers_NightlyJobs_SchedulesName,
-				steps[0].label,
-				'Its label.'
-			);
+			Assert.areEqual(Label.Volunteers_NightlyJobs_SchedulesName, steps[0].label, 'Its label.');
 			Assert.areEqual(180, steps[0].minute, 'At three in the morning.');
 			Assert.areEqual(VolunteersScheduler.JOB_NAME, steps[0].key, 'Keyed by its old name.');
 		}
@@ -170,10 +160,7 @@ private class ShiftScheduleBatchTest {
 			settings.Modules_Turned_Off__c = ShiftScheduleService.MODULE_NAME;
 			TestDataFactory.saveSettings(settings);
 			new VolunteersScheduler().execute(null);
-			Assert.isTrue(
-				ShiftScheduleService.isTurnedOff(),
-				'Off, so the job only logs that it skipped.'
-			);
+			Assert.isTrue(ShiftScheduleService.isTurnedOff(), 'Off, so the job only logs that it skipped.');
 			Assert.isNull(ShiftScheduleBatch.startNightly(), 'And the batch does not start.');
 		}
 	}

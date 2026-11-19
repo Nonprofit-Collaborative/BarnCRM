@@ -22,10 +22,7 @@ public with sharing class EnrollmentDatesHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		EnrollmentService.fillStageDates(
-			(List<Enrollment__c>) newRecords(),
-			(Map<Id, Enrollment__c>) oldRecordsById()
-		);
+		EnrollmentService.fillStageDates((List<Enrollment__c>) newRecords(), (Map<Id, Enrollment__c>) oldRecordsById());
 		EnrollmentService.fillEligibilityDates(
 			(List<Enrollment__c>) newRecords(),
 			(Map<Id, Enrollment__c>) oldRecordsById()

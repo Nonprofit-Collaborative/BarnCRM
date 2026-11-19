@@ -199,10 +199,7 @@ public with sharing class RollupTemplates {
 			item.needsField = true;
 			item.status = String.format(
 				BarnHelp.text('Rollups', 'Core_RollupEase_TplNeedsField'),
-				new List<String>{
-					spec.name,
-					targetType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
-				}
+				new List<String>{ spec.name, targetType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel() }
 			);
 			return item;
 		}
@@ -248,15 +245,7 @@ public with sharing class RollupTemplates {
 	@TestVisible
 	private static List<Spec> nonprofitStarter() {
 		List<Spec> specs = new List<Spec>();
-		specs.add(
-			giftSpec(
-				'averageGift',
-				Label.Rollups_RollupEase_TplAverageGift,
-				'CURRENCY',
-				PERSON,
-				'AVG'
-			)
-		);
+		specs.add(giftSpec('averageGift', Label.Rollups_RollupEase_TplAverageGift, 'CURRENCY', PERSON, 'AVG'));
 		Spec firstAmount = giftSpec(
 			'firstGiftAmount',
 			Label.Rollups_RollupEase_TplFirstGiftAmount,
@@ -275,35 +264,15 @@ public with sharing class RollupTemplates {
 		);
 		lastAmount.draft.orderByField = 'Gift_Date__c';
 		specs.add(lastAmount);
-		specs.add(
-			giftSpec(
-				'smallestGift',
-				Label.Rollups_RollupEase_TplSmallestGift,
-				'CURRENCY',
-				PERSON,
-				'MIN'
-			)
-		);
-		Spec thisYear = giftSpec(
-			'giftsThisYear',
-			Label.Rollups_RollupEase_TplGiftsThisYear,
-			'NUMBER',
-			PERSON,
-			'COUNT'
-		);
+		specs.add(giftSpec('smallestGift', Label.Rollups_RollupEase_TplSmallestGift, 'CURRENCY', PERSON, 'MIN'));
+		Spec thisYear = giftSpec('giftsThisYear', Label.Rollups_RollupEase_TplGiftsThisYear, 'NUMBER', PERSON, 'COUNT');
 		thisYear.draft.sourceField = null;
 		thisYear.draft.fiscalYearAware = true;
 		thisYear.draft.fiscalYearOffset = 0;
 		thisYear.draft.fiscalDateField = 'Gift_Date__c';
 		specs.add(thisYear);
 		specs.add(
-			giftSpec(
-				'appealAverageGift',
-				Label.Rollups_RollupEase_TplAppealAverageGift,
-				'CURRENCY',
-				APPEAL,
-				'AVG'
-			)
+			giftSpec('appealAverageGift', Label.Rollups_RollupEase_TplAppealAverageGift, 'CURRENCY', APPEAL, 'AVG')
 		);
 		Spec donors = giftSpec(
 			'appealDonors',
@@ -319,13 +288,7 @@ public with sharing class RollupTemplates {
 
 	/** A rollup of received gifts' amounts into a new field of a person or an appeal. */
 	@TestVisible
-	private static Spec giftSpec(
-		String key,
-		String name,
-		String fieldKind,
-		String targetObject,
-		String aggregate
-	) {
+	private static Spec giftSpec(String key, String name, String fieldKind, String targetObject, String aggregate) {
 		RollupBuilderController.Draft draft = new RollupBuilderController.Draft();
 		draft.name = name;
 		draft.targetObject = targetObject;
@@ -349,9 +312,7 @@ public with sharing class RollupTemplates {
 
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new RollupService.RollupServiceException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission')
-			);
+			throw new RollupService.RollupServiceException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorNoPermission'));
 		}
 	}
 }

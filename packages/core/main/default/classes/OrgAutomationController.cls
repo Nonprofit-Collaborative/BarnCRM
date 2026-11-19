@@ -23,8 +23,7 @@ public with sharing class OrgAutomationController {
 			ImportNewFieldService.Connection connection = ImportNewFieldService.connection();
 			result.canUseConnection = connection.canCreate;
 			result.connected = connection.connected;
-			result.isSandbox = [SELECT IsSandbox FROM Organization WITH SYSTEM_MODE LIMIT 1]
-			.IsSandbox;
+			result.isSandbox = [SELECT IsSandbox FROM Organization WITH SYSTEM_MODE LIMIT 1].IsSandbox;
 			result.snapshots = OrgAutomationDeactivation.recent();
 			return result;
 		} catch (Exception caught) {
@@ -80,9 +79,7 @@ public with sharing class OrgAutomationController {
 	@TestVisible
 	private static void requirePermission() {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw new OrgAutomationException(
-				BarnHelp.text('Core', 'Core_AutomationInventory_NoPermission')
-			);
+			throw new OrgAutomationException(BarnHelp.text('Core', 'Core_AutomationInventory_NoPermission'));
 		}
 	}
 
@@ -92,14 +89,10 @@ public with sharing class OrgAutomationController {
 		requirePermission();
 		ImportNewFieldService.Connection connection = ImportNewFieldService.connection();
 		if (!connection.canCreate) {
-			throw new OrgAutomationException(
-				BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission')
-			);
+			throw new OrgAutomationException(BarnHelp.text('Core', 'Core_AutomationInventory_NoConnectionPermission'));
 		}
 		if (!connection.connected) {
-			throw new OrgAutomationException(
-				BarnHelp.text('Core', 'Core_AutomationInventory_ConnectionNeeded')
-			);
+			throw new OrgAutomationException(BarnHelp.text('Core', 'Core_AutomationInventory_ConnectionNeeded'));
 		}
 	}
 }

@@ -33,14 +33,7 @@ public without sharing class AffiliationUpkeepSelector {
 			return new List<Affiliation__c>();
 		}
 		return [
-			SELECT
-				Id,
-				Contact__c,
-				Person_Account__c,
-				Organization__c,
-				Status__c,
-				Is_Primary__c,
-				CreatedDate
+			SELECT Id, Contact__c, Person_Account__c, Organization__c, Status__c, Is_Primary__c, CreatedDate
 			FROM Affiliation__c
 			WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
 			WITH SYSTEM_MODE
@@ -59,14 +52,7 @@ public without sharing class AffiliationUpkeepSelector {
 			return new List<Affiliation__c>();
 		}
 		return [
-			SELECT
-				Id,
-				Contact__c,
-				Person_Account__c,
-				Organization__c,
-				Role__c,
-				Start_Date__c,
-				End_Date__c
+			SELECT Id, Contact__c, Person_Account__c, Organization__c, Role__c, Start_Date__c, End_Date__c
 			FROM Affiliation__c
 			WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
 			WITH SYSTEM_MODE

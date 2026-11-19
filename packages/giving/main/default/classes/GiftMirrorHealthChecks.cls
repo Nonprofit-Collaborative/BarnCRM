@@ -79,10 +79,7 @@ public with sharing class GiftMirrorHealthChecks {
 					GIFT_TRANSACTION_MIRROR_STALE_KEY,
 					Label.Mirror_HealthCheck_GiftTransactionMirrorNotRunTitle,
 					String.format(
-						BarnHelp.text(
-							'Giving',
-							'Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail'
-						),
+						BarnHelp.text('Giving', 'Mirror_HealthCheck_GiftTransactionMirrorNotRunDetail'),
 						new List<Object>{ since.format() }
 					),
 					HealthCheckService.SEVERITY_WARNING,

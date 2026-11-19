@@ -28,10 +28,7 @@ private class ImportTemplateServiceTest {
 			];
 			Assert.areEqual(firstRun, templates.size(), 'One record per shipped template.');
 			for (Import_Template__c template : templates) {
-				Assert.isTrue(
-					template.Is_Package_Default__c,
-					'Each is marked as a shipped default.'
-				);
+				Assert.isTrue(template.Is_Package_Default__c, 'Each is marked as a shipped default.');
 			}
 		}
 	}
@@ -102,10 +99,7 @@ private class ImportTemplateServiceTest {
 			Test.startTest();
 			List<Import_Template__c> templates = ImportTemplateService.listActive();
 			Test.stopTest();
-			Assert.isFalse(
-				templates.isEmpty(),
-				'An org that has never imported still sees the shipped mappings.'
-			);
+			Assert.isFalse(templates.isEmpty(), 'An org that has never imported still sees the shipped mappings.');
 		}
 	}
 
@@ -120,11 +114,7 @@ private class ImportTemplateServiceTest {
 			changed.columns.add(new ImportMapping.Column('Phone', 'Contact1.Phone'));
 
 			Test.startTest();
-			ImportTestDataFactory.saveMapping(
-				template.Id,
-				changed.serialize(),
-				ImportTemplateService.RULE_NAME_POSTAL
-			);
+			ImportTestDataFactory.saveMapping(template.Id, changed.serialize(), ImportTemplateService.RULE_NAME_POSTAL);
 			Test.stopTest();
 
 			Import_Template__c after = [
@@ -137,10 +127,7 @@ private class ImportTemplateServiceTest {
 				after.Matching_Rule__c,
 				'The rule the administrator chose is stored.'
 			);
-			Assert.isTrue(
-				after.Column_Mapping_JSON__c.contains('Contact1.Phone'),
-				'And so is the column they added.'
-			);
+			Assert.isTrue(after.Column_Mapping_JSON__c.contains('Contact1.Phone'), 'And so is the column they added.');
 		}
 	}
 
@@ -156,11 +143,7 @@ private class ImportTemplateServiceTest {
 
 			Test.startTest();
 			try {
-				ImportTestDataFactory.saveMapping(
-					template.Id,
-					useless.serialize(),
-					ImportTemplateService.RULE_EMAIL
-				);
+				ImportTestDataFactory.saveMapping(template.Id, useless.serialize(), ImportTemplateService.RULE_EMAIL);
 				Assert.fail('A mapping that identifies nobody must be refused.');
 			} catch (ImportException e) {
 				Assert.areEqual(
@@ -235,8 +218,7 @@ private class ImportTemplateServiceTest {
 			Test.stopTest();
 			Assert.areEqual(
 				OrgDate.today(),
-				[SELECT Last_Import_Date__c FROM Import_Template__c WHERE Id = :template.Id]
-				.Last_Import_Date__c,
+				[SELECT Last_Import_Date__c FROM Import_Template__c WHERE Id = :template.Id].Last_Import_Date__c,
 				'The Hub can say how long it is since this feed was loaded.'
 			);
 		}
@@ -362,24 +344,13 @@ private class ImportTemplateServiceTest {
 			recurring('Monthly processor export', OrgDate.today().addDays(-3));
 			recurring('Quarterly partner list', OrgDate.today().addDays(-40));
 			recurring('Event sign-ups', null);
-			ImportTestDataFactory.template(
-				ImportTestDataFactory.donorMapping(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			ImportTestDataFactory.template(ImportTestDataFactory.donorMapping(), ImportTemplateService.RULE_EMAIL);
 
 			List<Import_Template__c> sources = ImportTemplateService.recurringSources();
 
 			Assert.areEqual(3, sources.size(), 'Only templates marked recurring are listed.');
-			Assert.areEqual(
-				'Event sign-ups',
-				sources[0].Source_Name__c,
-				'Never loaded comes first.'
-			);
-			Assert.areEqual(
-				'Quarterly partner list',
-				sources[1].Source_Name__c,
-				'Then the oldest.'
-			);
+			Assert.areEqual('Event sign-ups', sources[0].Source_Name__c, 'Never loaded comes first.');
+			Assert.areEqual('Quarterly partner list', sources[1].Source_Name__c, 'Then the oldest.');
 		}
 	}
 
@@ -416,11 +387,7 @@ private class ImportTemplateServiceTest {
 			ImportTestDataFactory.savePaymentMatching(template.Id, null, null, null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'Match only',
-				saved.Payment_Matching__c,
-				'Stored as the picklist spells it.'
-			);
+			Assert.areEqual('Match only', saved.Payment_Matching__c, 'Stored as the picklist spells it.');
 			Assert.areEqual(3, saved.Match_Date_Window_Days__c, 'The window.');
 			Assert.isTrue(saved.Match_Amount_Tolerance__c == 0.5, 'The tolerance.');
 			Assert.areEqual(
@@ -474,8 +441,7 @@ private class ImportTemplateServiceTest {
 	}
 
 	private static String otherMode() {
-		return ImportTemplateService.defaultPersonMode() ==
-			ImportTemplateService.PERSON_MODE_CONTACTS
+		return ImportTemplateService.defaultPersonMode() == ImportTemplateService.PERSON_MODE_CONTACTS
 			? ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS
 			: ImportTemplateService.PERSON_MODE_CONTACTS;
 	}
@@ -538,14 +504,7 @@ private class ImportTemplateServiceTest {
 			String missingField = '{"version":1,"columns":[{"source":"X","target":"Record.No_Such_Field__c"}]}';
 			String missingLookup = '{"version":1,"columns":[{"source":"X","target":"Record.User__c","lookupField":"No_Such_Lookup__c"}]}';
 			ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
-				oneObjectRow(
-					'No_Object',
-					'No_Such_Object__c',
-					ONE_OBJECT_MAPPING,
-					null,
-					null,
-					null
-				),
+				oneObjectRow('No_Object', 'No_Such_Object__c', ONE_OBJECT_MAPPING, null, null, null),
 				oneObjectRow('No_Field', 'Error_Log__c', missingField, null, null, null),
 				oneObjectRow('No_Lookup', 'Error_Log__c', missingLookup, null, null, null),
 				oneObjectRow(
@@ -589,14 +548,7 @@ private class ImportTemplateServiceTest {
 	static void onlyTheRowForTheOrgsPeopleModeIsMaterialized() {
 		System.runAs(TestUsers.admin()) {
 			ImportTemplateSelector.shippedOverride = new List<Import_Template_Default__mdt>{
-				oneObjectRow(
-					'Other_Mode',
-					'Error_Log__c',
-					ONE_OBJECT_MAPPING,
-					null,
-					null,
-					otherMode()
-				),
+				oneObjectRow('Other_Mode', 'Error_Log__c', ONE_OBJECT_MAPPING, null, null, otherMode()),
 				oneObjectRow(
 					'This_Mode',
 					'Error_Log__c',
@@ -638,10 +590,7 @@ private class ImportTemplateServiceTest {
 
 	private static Set<String> targetsOf(Import_Template__c template) {
 		Set<String> targets = new Set<String>();
-		for (
-			ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c)
-				.getColumns()
-		) {
+		for (ImportMapping.Column column : ImportMapping.parse(template.Column_Mapping_JSON__c).getColumns()) {
 			targets.add(column.target);
 		}
 		return targets;
@@ -667,15 +616,11 @@ private class ImportTemplateServiceTest {
 				targetsOf(organizations).contains('Organization.BillingStreet'),
 				'It reads organization columns: ' + targetsOf(organizations)
 			);
-			Assert.isFalse(
-				targetsOf(organizations).contains('Contact1.LastName'),
-				'And no person columns.'
-			);
+			Assert.isFalse(targetsOf(organizations).contains('Contact1.LastName'), 'And no person columns.');
 			Import_Template__c couples = byKey.get('couples_and_households');
 			Assert.areEqual('Couples and Households', couples.Name, 'Couples ships.');
 			Assert.isTrue(
-				targetsOf(couples).contains('Contact2.FirstName') &&
-				targetsOf(couples).contains('Household.Name'),
+				targetsOf(couples).contains('Contact2.FirstName') && targetsOf(couples).contains('Household.Name'),
 				'It reads a second person and the household name: ' + targetsOf(couples)
 			);
 		}
@@ -705,10 +650,7 @@ private class ImportTemplateServiceTest {
 				'The rename is for new installs only (D-136).'
 			);
 			Assert.isTrue(byKey.containsKey('organization_list'), 'Organization List is added.');
-			Assert.isTrue(
-				byKey.containsKey('couples_and_households'),
-				'Couples and Households is added.'
-			);
+			Assert.isTrue(byKey.containsKey('couples_and_households'), 'Couples and Households is added.');
 		}
 	}
 }

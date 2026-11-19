@@ -4,16 +4,11 @@
  * (R-GL4), goals seen as their enrollment is (R-GL1), notes about a goal (R-CN5), the optional
  * Logic Models outcome (R-GL5) and erasure (R-GL6).
  */
-@IsTest(
-	testFor='ApexClass:ServicePlanController, ApexClass:ServicePlanService, ApexClass:ServicePlanDatesHandler'
-)
+@IsTest(testFor='ApexClass:ServicePlanController, ApexClass:ServicePlanService, ApexClass:ServicePlanDatesHandler')
 private class ServicePlanTest {
 	private static final String ADMIN = 'Programs_Admin';
 	private static final List<String> STAFF = new List<String>{ 'BarnCRM_Staff', 'Programs_Staff' };
-	private static final List<String> READER = new List<String>{
-		'BarnCRM_Read_Only',
-		'Programs_Read_Only'
-	};
+	private static final List<String> READER = new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' };
 
 	// standardUserWith inserts a new user on every call, so each test keeps the one it made, and
 	// the planner, whom most tests need, is built once in setup and looked up once per test.
@@ -42,9 +37,7 @@ private class ServicePlanTest {
 
 	/** A person enrolled in a program, created by the admin and shared with whoever is named. */
 	private static Enrollment__c enrollment(List<Id> sharedWith) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		Contact person = HouseholdTestDataFactory.newContact('Pat', 'Rivera');
@@ -58,9 +51,7 @@ private class ServicePlanTest {
 		delete [
 			SELECT Id
 			FROM Enrollment__Share
-			WHERE
-				ParentId = :enrolled.Id
-				AND RowCause = :Schema.Enrollment__Share.RowCause.Programs_Participants__c
+			WHERE ParentId = :enrolled.Id AND RowCause = :Schema.Enrollment__Share.RowCause.Programs_Participants__c
 			WITH SYSTEM_MODE
 		];
 		List<Enrollment__Share> shares = new List<Enrollment__Share>();
@@ -116,11 +107,7 @@ private class ServicePlanTest {
 			);
 			plan = ServicePlanController.saveStep(
 				JSON.serialize(
-					new Map<String, Object>{
-						'goalId' => goalId,
-						'name' => 'Visit',
-						'targetDate' => '2027-01-10'
-					}
+					new Map<String, Object>{ 'goalId' => goalId, 'name' => 'Visit', 'targetDate' => '2027-01-10' }
 				)
 			);
 			goal.put('id', goalId);
@@ -151,11 +138,7 @@ private class ServicePlanTest {
 		Assert.areEqual(Date.newInstance(2027, 3, 1), goal.get('targetDate'));
 		List<Object> steps = (List<Object>) goal.get('steps');
 		Assert.areEqual(2, steps.size(), 'Both steps.');
-		Assert.areEqual(
-			'Visit',
-			((Map<String, Object>) steps[0]).get('name'),
-			'A dated step comes first.'
-		);
+		Assert.areEqual('Visit', ((Map<String, Object>) steps[0]).get('name'), 'A dated step comes first.');
 		Assert.isNotNull(plan.get('outcomesAvailable'), 'Says whether outcomes can be linked.');
 	}
 
@@ -191,13 +174,11 @@ private class ServicePlanTest {
 		Assert.areEqual(today, closed.Closed_Date__c, 'Closed today.');
 		Assert.areEqual(today, done.Completed_Date__c, 'Done today.');
 		Assert.isNull(
-			[SELECT Closed_Date__c FROM Goal__c WHERE Id = :goal.Id WITH SYSTEM_MODE]
-			.Closed_Date__c,
+			[SELECT Closed_Date__c FROM Goal__c WHERE Id = :goal.Id WITH SYSTEM_MODE].Closed_Date__c,
 			'Reopened, so no closed date.'
 		);
 		Assert.isNull(
-			[SELECT Completed_Date__c FROM Goal_Step__c WHERE Id = :step.Id WITH SYSTEM_MODE]
-			.Completed_Date__c,
+			[SELECT Completed_Date__c FROM Goal_Step__c WHERE Id = :step.Id WITH SYSTEM_MODE].Completed_Date__c,
 			'Reopened, so no completed date.'
 		);
 	}
@@ -216,10 +197,7 @@ private class ServicePlanTest {
 			);
 		}
 		Test.stopTest();
-		Assert.areEqual(
-			typed,
-			[SELECT Closed_Date__c FROM Goal__c WITH SYSTEM_MODE].Closed_Date__c
-		);
+		Assert.areEqual(typed, [SELECT Closed_Date__c FROM Goal__c WITH SYSTEM_MODE].Closed_Date__c);
 	}
 
 	@IsTest
@@ -279,12 +257,7 @@ private class ServicePlanTest {
 		Test.startTest();
 		Boolean staffDeleted = true;
 		System.runAs(planner()) {
-			staffDeleted = Database.delete(
-					new List<Goal__c>{ goal },
-					false,
-					AccessLevel.USER_MODE
-				)[0]
-				.isSuccess();
+			staffDeleted = Database.delete(new List<Goal__c>{ goal }, false, AccessLevel.USER_MODE)[0].isSuccess();
 		}
 		Map<String, Object> readerPlan;
 		String readerRefusal;
@@ -367,16 +340,9 @@ private class ServicePlanTest {
 		List<Object> listed = (List<Object>) goal.get('notes');
 		Assert.areEqual(3, listed.size(), 'The latest three notes.');
 		Assert.areEqual(4, goal.get('noteCount'), 'Counted in all.');
-		Assert.areEqual(
-			'Visit 0',
-			((Map<String, Object>) listed[0]).get('subject'),
-			'Newest first.'
-		);
+		Assert.areEqual('Visit 0', ((Map<String, Object>) listed[0]).get('subject'), 'Newest first.');
 		Assert.isTrue((Boolean) plan.get('canAddNote'), 'Staff may write notes.');
-		Assert.isFalse(
-			wrongEnrollment.isSuccess(),
-			'A goal of another enrollment is refused (R-CN5).'
-		);
+		Assert.isFalse(wrongEnrollment.isSuccess(), 'A goal of another enrollment is refused (R-CN5).');
 	}
 
 	@IsTest
@@ -475,11 +441,7 @@ private class ServicePlanTest {
 			Test.stopTest();
 
 			Assert.areEqual(2, offered.size(), 'This program\'s outcome and the organization\'s.');
-			Assert.areEqual(
-				(String) elements[0].Id,
-				offered[0].get('value'),
-				'The program\'s model first.'
-			);
+			Assert.areEqual((String) elements[0].Id, offered[0].get('value'), 'The program\'s model first.');
 			Map<String, Object> saved = (Map<String, Object>) goalsOf(plan)[0];
 			Assert.areEqual('Housed Pantry model', saved.get('outcomeName'));
 			Assert.isFalse((Boolean) saved.get('outcomeMissing'));
@@ -496,11 +458,7 @@ private class ServicePlanTest {
 		Enrollment__c enrolled = sharedEnrollment();
 		// An identifier the picker never offers stands for an outcome since deleted or moved.
 		String goneOutcome = (String) enrolled.Program__c;
-		Goal__c stored = new Goal__c(
-			Enrollment__c = enrolled.Id,
-			Name = 'Housed',
-			Outcome_Id__c = goneOutcome
-		);
+		Goal__c stored = new Goal__c(Enrollment__c = enrolled.Id, Name = 'Housed', Outcome_Id__c = goneOutcome);
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			insert stored;
 		}

@@ -40,11 +40,7 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 		if (!GiftTransactionMirrorService.isOn()) {
 			return null;
 		}
-		return AsyncStarter.batch(
-			new GiftTransactionMirrorBatch(null, null),
-			CHUNK_SIZE,
-			'GiftTransactionMirrorBatch'
-		);
+		return AsyncStarter.batch(new GiftTransactionMirrorBatch(null, null), CHUNK_SIZE, 'GiftTransactionMirrorBatch');
 	}
 
 	/** Copies again every gift of R-GT3 dated in the range. */
@@ -176,9 +172,7 @@ public with sharing class GiftTransactionMirrorBatch extends MirrorRunBatch {
 			}
 		);
 		return totals.designationsUnavailable
-			? summary +
-			  ' ' +
-			  BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_DesignationsUnavailable')
+			? summary + ' ' + BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_DesignationsUnavailable')
 			: summary;
 	}
 }

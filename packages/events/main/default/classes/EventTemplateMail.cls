@@ -46,9 +46,7 @@ public with sharing class EventTemplateMail {
 		message.setTreatTargetObjectAsRecipient(true);
 		message.setSaveAsActivity(false);
 		try {
-			List<EmailSendOutcome> outcomes = sender.send(
-				new List<Messaging.SingleEmailMessage>{ message }
-			);
+			List<EmailSendOutcome> outcomes = sender.send(new List<Messaging.SingleEmailMessage>{ message });
 			return !outcomes.isEmpty() && outcomes[0].sent ? SENT : SEND_FAILED;
 		} catch (Exception e) {
 			ErrorLogger.log(e, context, whatId);

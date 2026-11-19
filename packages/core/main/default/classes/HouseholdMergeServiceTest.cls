@@ -26,10 +26,7 @@ private class HouseholdMergeServiceTest {
 			Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
-			HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(
-				survivor.Id,
-				victim.Id
-			);
+			HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(survivor.Id, victim.Id);
 			Test.stopTest();
 
 			Assert.areEqual('The Garcia Family', preview.survivorName, 'The survivor is named');
@@ -38,10 +35,7 @@ private class HouseholdMergeServiceTest {
 			Assert.isTrue(byField.get('Name').inConflict, 'The two names disagree');
 			Assert.isTrue(byField.get('Anniversary__c').inConflict, 'Only one has an anniversary');
 			Assert.isFalse(byField.get('BillingCity').inConflict, 'Both are in the same city');
-			Assert.isFalse(
-				byField.get('BillingStreet').inConflict,
-				'Two empty values are not a disagreement'
-			);
+			Assert.isFalse(byField.get('BillingStreet').inConflict, 'Two empty values are not a disagreement');
 		}
 	}
 
@@ -56,10 +50,7 @@ private class HouseholdMergeServiceTest {
 			Id victimId = householdOf(wei.Id);
 
 			Test.startTest();
-			HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(
-				survivorId,
-				victimId
-			);
+			HouseholdMergeService.MergePreview preview = HouseholdMergeService.preview(survivorId, victimId);
 			Test.stopTest();
 
 			Assert.areEqual(2, preview.members.size(), 'Both people are listed');
@@ -100,10 +91,7 @@ private class HouseholdMergeServiceTest {
 				'Only a person related to both households blocks the platform merge'
 			);
 			Assert.isTrue(
-				HouseholdMergeService.sharedRelatedPeople(
-						survivorId,
-						new List<HouseholdSelector.NativeMembership>()
-					)
+				HouseholdMergeService.sharedRelatedPeople(survivorId, new List<HouseholdSelector.NativeMembership>())
 					.isEmpty(),
 				'Without Contacts to Multiple Accounts nobody is shared'
 			);
@@ -158,11 +146,7 @@ private class HouseholdMergeServiceTest {
 				'The reason is in the Error Log for a caller that catches the refusal'
 			);
 			Assert.areEqual(victimId, householdOf(wei.Id), 'Nobody was moved');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Account WHERE Id = :victimId],
-				'Both households are still there'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Account WHERE Id = :victimId], 'Both households are still there');
 		}
 	}
 
@@ -184,11 +168,7 @@ private class HouseholdMergeServiceTest {
 			Id victimId = householdOf(wei.Id);
 
 			Test.startTest();
-			HouseholdMergeService.mergeHouseholds(
-				survivorId,
-				victimId,
-				new HouseholdMergeService.MergeChoices(null)
-			);
+			HouseholdMergeService.mergeHouseholds(survivorId, victimId, new HouseholdMergeService.MergeChoices(null));
 			Test.stopTest();
 
 			Assert.areEqual(survivorId, householdOf(wei.Id), 'Wei moved to the survivor');
@@ -235,11 +215,7 @@ private class HouseholdMergeServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'),
-				message,
-				'Refused'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'), message, 'Refused');
 			Assert.areEqual(victimId, householdOf(wei.Id), 'Nobody was moved');
 			Assert.areEqual(
 				1,
@@ -256,10 +232,7 @@ private class HouseholdMergeServiceTest {
 	/** Whether this org relates contacts to several accounts, with a debug line either way. */
 	private static Boolean contactRelationsOn(String testName) {
 		Boolean isOn = Schema.getGlobalDescribe().containsKey(CONTACT_RELATION);
-		System.debug(
-			LoggingLevel.INFO,
-			testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off')
-		);
+		System.debug(LoggingLevel.INFO, testName + (isOn ? ': ran, relations are on' : ': skipped, relations are off'));
 		return isOn;
 	}
 
@@ -291,22 +264,14 @@ private class HouseholdMergeServiceTest {
 				result.customNameKept,
 				'Nobody chose a name and neither side was custom, so naming still owns it'
 			);
-			Assert.areEqual(
-				survivorId,
-				householdOf(wei.Id),
-				'Wei now belongs to the surviving household'
-			);
+			Assert.areEqual(survivorId, householdOf(wei.Id), 'Wei now belongs to the surviving household');
 			Account survivor = [
 				SELECT Name, Member_Count__c
 				FROM Account
 				WHERE Id = :survivorId
 			];
 			Assert.areEqual(2, survivor.Member_Count__c, 'The survivor counts both people');
-			Assert.areEqual(
-				'Garcia and Lee Household',
-				survivor.Name,
-				'The name was recalculated from both members'
-			);
+			Assert.areEqual('Garcia and Lee Household', survivor.Name, 'The name was recalculated from both members');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Account WHERE Id = :victimId AND IsDeleted = FALSE],
@@ -324,11 +289,7 @@ private class HouseholdMergeServiceTest {
 			insert new List<Contact>{ maria, wei };
 			Id survivorId = householdOf(maria.Id);
 			Id victimId = householdOf(wei.Id);
-			update new Account(
-				Id = victimId,
-				Name = 'The Reverend and Mrs. Garcia',
-				Custom_Name__c = true
-			);
+			update new Account(Id = victimId, Name = 'The Reverend and Mrs. Garcia', Custom_Name__c = true);
 
 			Test.startTest();
 			HouseholdMergeService.MergeResult result = HouseholdMergeService.mergeHouseholds(
@@ -348,17 +309,10 @@ private class HouseholdMergeServiceTest {
 				FROM Account
 				WHERE Id = :survivorId
 			];
-			Assert.areEqual(
-				'The Reverend and Mrs. Garcia',
-				survivor.Name,
-				'The wording the person chose stands'
-			);
+			Assert.areEqual('The Reverend and Mrs. Garcia', survivor.Name, 'The wording the person chose stands');
 			Assert.isTrue(survivor.Custom_Name__c, 'The household is now one nothing recomputes');
 			Assert.areEqual(2, survivor.Member_Count__c, 'The count is still brought up to date');
-			Assert.isTrue(
-				result.customNameKept,
-				'The screen is told the name is now held as a custom one'
-			);
+			Assert.isTrue(result.customNameKept, 'The screen is told the name is now held as a custom one');
 		}
 	}
 
@@ -399,10 +353,7 @@ private class HouseholdMergeServiceTest {
 				'A chosen name that naming would not produce is kept as a custom name'
 			);
 			Assert.areEqual(2, survivor.Member_Count__c, 'The count is still brought up to date');
-			Assert.isTrue(
-				result.customNameKept,
-				'The screen is told the name is now held as a custom one'
-			);
+			Assert.isTrue(result.customNameKept, 'The screen is told the name is now held as a custom one');
 		}
 	}
 
@@ -419,19 +370,14 @@ private class HouseholdMergeServiceTest {
 			insert new List<Contact>{ maria, wei };
 			Id survivorId = householdOf(maria.Id);
 			Id victimId = householdOf(wei.Id);
-			update new Account(
-				Id = victimId,
-				Household_Formal_Greeting__c = 'Dr. Wei Lee and family'
-			);
+			update new Account(Id = victimId, Household_Formal_Greeting__c = 'Dr. Wei Lee and family');
 
 			Test.startTest();
 			HouseholdMergeService.MergeResult result = HouseholdMergeService.mergeHouseholds(
 				survivorId,
 				victimId,
 				new HouseholdMergeService.MergeChoices(
-					new Map<String, String>{
-						'Household_Formal_Greeting__c' => HouseholdMergeService.KEEP_VICTIM
-					}
+					new Map<String, String>{ 'Household_Formal_Greeting__c' => HouseholdMergeService.KEEP_VICTIM }
 				)
 			);
 			Test.stopTest();
@@ -493,10 +439,7 @@ private class HouseholdMergeServiceTest {
 				survivor.Custom_Name__c,
 				'Naming gives that name anyway, so the household keeps following its members'
 			);
-			Assert.isFalse(
-				result.customNameKept,
-				'The screen is not told about a lock that did not happen'
-			);
+			Assert.isFalse(result.customNameKept, 'The screen is not told about a lock that did not happen');
 		}
 	}
 
@@ -534,10 +477,7 @@ private class HouseholdMergeServiceTest {
 
 			Assert.isFalse(canRead, 'The person really cannot read the anniversary');
 			Map<String, HouseholdMergeService.FieldChoice> fields = byFieldName(shown);
-			Assert.isFalse(
-				fields.containsKey('Anniversary__c'),
-				'The field the person cannot read is left out'
-			);
+			Assert.isFalse(fields.containsKey('Anniversary__c'), 'The field the person cannot read is left out');
 			Assert.isTrue(fields.containsKey('Name'), 'The rest of the comparison is shown');
 			Assert.areEqual(2, shown.members.size(), 'Both people are listed');
 		}
@@ -560,8 +500,7 @@ private class HouseholdMergeServiceTest {
 			Id survivorId = householdOf(maria.Id);
 			Id victimId = householdOf(wei.Id);
 			Assert.isTrue(
-				memberNamed(HouseholdMergeService.preview(survivorId, victimId), 'Wei Lee')
-					.isDeceased,
+				memberNamed(HouseholdMergeService.preview(survivorId, victimId), 'Wei Lee').isDeceased,
 				'A user who can read the field is told that he died'
 			);
 
@@ -610,11 +549,7 @@ private class HouseholdMergeServiceTest {
 				WHERE Id = :survivor.Id
 			];
 			Assert.areEqual('Berkeley', saved.BillingCity, 'The chosen address survives');
-			Assert.areEqual(
-				Date.newInstance(2010, 6, 12),
-				saved.Anniversary__c,
-				'The chosen anniversary survives'
-			);
+			Assert.areEqual(Date.newInstance(2010, 6, 12), saved.Anniversary__c, 'The chosen anniversary survives');
 			// Both households had a default address; the merge settlement (PEOPLE-15) keeps
 			// the one matching the chosen billing address.
 			List<Address__c> defaults = [
@@ -647,11 +582,7 @@ private class HouseholdMergeServiceTest {
 			};
 
 			Test.startTest();
-			HouseholdMergeService.mergeHouseholds(
-				survivor.Id,
-				victim.Id,
-				new HouseholdMergeService.MergeChoices(null)
-			);
+			HouseholdMergeService.mergeHouseholds(survivor.Id, victim.Id, new HouseholdMergeService.MergeChoices(null));
 			Test.stopTest();
 
 			Integer mariaRows = [
@@ -683,11 +614,7 @@ private class HouseholdMergeServiceTest {
 			Id victimId = householdOf(wei.Id);
 
 			Test.startTest();
-			HouseholdMergeService.mergeHouseholds(
-				survivorId,
-				victimId,
-				new HouseholdMergeService.MergeChoices(null)
-			);
+			HouseholdMergeService.mergeHouseholds(survivorId, victimId, new HouseholdMergeService.MergeChoices(null));
 			Test.stopTest();
 
 			Account gone = [SELECT MasterRecordId FROM Account WHERE Id = :victimId ALL ROWS];
@@ -719,11 +646,7 @@ private class HouseholdMergeServiceTest {
 				messages.add(e.getMessage());
 			}
 			try {
-				HouseholdMergeService.mergeHouseholds(
-					theirs.Id,
-					ours.Id,
-					new HouseholdMergeService.MergeChoices(null)
-				);
+				HouseholdMergeService.mergeHouseholds(theirs.Id, ours.Id, new HouseholdMergeService.MergeChoices(null));
 			} catch (HouseholdException e) {
 				messages.add(e.getMessage());
 			}
@@ -750,9 +673,7 @@ private class HouseholdMergeServiceTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Bay Area Food Bank')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Bay Area Food Bank'));
 			Database.insert(new List<Account>{ household, organization }, AccessLevel.SYSTEM_MODE);
 
 			String message;
@@ -853,10 +774,7 @@ private class HouseholdMergeServiceTest {
 	static void staffWithoutDeleteOnAccountCanMergeHouseholdsTheyMayEdit() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			User staff = TestUsers.minimumAccessUserWith(
-				'Mstaff',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			User staff = TestUsers.minimumAccessUserWith('Mstaff', new List<String>{ 'BarnCRM_Staff' });
 			Account survivor = HouseholdTestDataFactory.newHousehold('The Garcia Family');
 			Account victim = HouseholdTestDataFactory.newHousehold('Garcia Household');
 			Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
@@ -880,11 +798,7 @@ private class HouseholdMergeServiceTest {
 
 			Assert.isFalse(canDelete, 'The staff member really has no Delete on Account');
 			Assert.areEqual(survivorId, result.survivorId, 'The survivor is answered');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Account WHERE Id = :survivorId],
-				'The survivor stays'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Account WHERE Id = :survivorId], 'The survivor stays');
 			Assert.areEqual(
 				0,
 				[SELECT COUNT() FROM Account WHERE Id = :victimId AND IsDeleted = FALSE],
@@ -897,10 +811,7 @@ private class HouseholdMergeServiceTest {
 	static void minimumAccessStaffMoveMembersWhenMergingHouseholds() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			User staff = TestUsers.minimumAccessUserWith(
-				'Mmover',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			User staff = TestUsers.minimumAccessUserWith('Mmover', new List<String>{ 'BarnCRM_Staff' });
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
 			insert new List<Contact>{ maria, wei };
@@ -920,11 +831,7 @@ private class HouseholdMergeServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(survivorId, householdOf(maria.Id), 'Maria stays in the kept household');
-			Assert.areEqual(
-				survivorId,
-				householdOf(wei.Id),
-				'Wei was moved into the kept household'
-			);
+			Assert.areEqual(survivorId, householdOf(wei.Id), 'Wei was moved into the kept household');
 		}
 	}
 
@@ -964,10 +871,7 @@ private class HouseholdMergeServiceTest {
 	static void staffWhoCannotEditOneHouseholdAreRefused() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-			User staff = TestUsers.minimumAccessUserWith(
-				'Mstaff2',
-				new List<String>{ 'BarnCRM_Staff' }
-			);
+			User staff = TestUsers.minimumAccessUserWith('Mstaff2', new List<String>{ 'BarnCRM_Staff' });
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			System.runAs(staff) {
 				insert maria;
@@ -1045,9 +949,7 @@ private class HouseholdMergeServiceTest {
 			return true;
 		}
 		SObject share = Schema.getGlobalDescribe().get('AccountShare').newSObject();
-		Map<String, Schema.SObjectField> shareFields = share.getSObjectType()
-			.getDescribe()
-			.fields.getMap();
+		Map<String, Schema.SObjectField> shareFields = share.getSObjectType().getDescribe().fields.getMap();
 		share.put('AccountId', householdId);
 		share.put('UserOrGroupId', userId);
 		share.put('AccountAccessLevel', level);
@@ -1108,19 +1010,11 @@ private class HouseholdMergeServiceTest {
 			Database.insert(destination, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
-			Id result = HouseholdMergeService.split(
-				householdId,
-				new Set<Id>{ wei.Id },
-				destination.Id
-			);
+			Id result = HouseholdMergeService.split(householdId, new Set<Id>{ wei.Id }, destination.Id);
 			Test.stopTest();
 
 			Assert.areEqual(destination.Id, result, 'The destination is answered');
-			Assert.areEqual(
-				destination.Id,
-				householdOf(wei.Id),
-				'Wei moved to the household chosen'
-			);
+			Assert.areEqual(destination.Id, householdOf(wei.Id), 'Wei moved to the household chosen');
 			Assert.areEqual(
 				1,
 				[SELECT Member_Count__c FROM Account WHERE Id = :destination.Id].Member_Count__c,
@@ -1154,9 +1048,7 @@ private class HouseholdMergeServiceTest {
 	@IsTest
 	static void theEmptiedHouseholdStaysWhenTheOrgSaysSo() {
 		System.runAs(TestUsers.admin()) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Delete_Empty_Households__c = false;
 			HouseholdTestDataFactory.save(settings);
 			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
@@ -1299,11 +1191,7 @@ private class HouseholdMergeServiceTest {
 			Test.startTest();
 			System.runAs(reader) {
 				try {
-					HouseholdMergeService.split(
-						householdId,
-						new Set<Id>{ maria.Id },
-						destination.Id
-					);
+					HouseholdMergeService.split(householdId, new Set<Id>{ maria.Id }, destination.Id);
 				} catch (Exception e) {
 					message = e.getMessage();
 				}
@@ -1339,36 +1227,16 @@ private class HouseholdMergeServiceTest {
 			insert new List<Contact>{ ana, wei };
 			Date joined = Date.newInstance(2020, 1, 15);
 			insert new List<Household_Member__c>{
-				new Household_Member__c(
-					Household__c = victim.Id,
-					Contact__c = ana.Id,
-					Start_Date__c = joined
-				),
-				new Household_Member__c(
-					Household__c = other.Id,
-					Contact__c = ana.Id,
-					Start_Date__c = joined
-				),
-				new Household_Member__c(
-					Household__c = other.Id,
-					Contact__c = wei.Id,
-					Start_Date__c = joined
-				)
+				new Household_Member__c(Household__c = victim.Id, Contact__c = ana.Id, Start_Date__c = joined),
+				new Household_Member__c(Household__c = other.Id, Contact__c = ana.Id, Start_Date__c = joined),
+				new Household_Member__c(Household__c = other.Id, Contact__c = wei.Id, Start_Date__c = joined)
 			};
 
 			Test.startTest();
-			HouseholdMergeService.mergeHouseholds(
-				survivor.Id,
-				victim.Id,
-				new HouseholdMergeService.MergeChoices(null)
-			);
+			HouseholdMergeService.mergeHouseholds(survivor.Id, victim.Id, new HouseholdMergeService.MergeChoices(null));
 			Test.stopTest();
 
-			Assert.areEqual(
-				2,
-				currentMembers(other.Id),
-				'Ana is still in the other household, with Wei'
-			);
+			Assert.areEqual(2, currentMembers(other.Id), 'Ana is still in the other household, with Wei');
 			Assert.areEqual(
 				2,
 				[SELECT Member_Count__c FROM Account WHERE Id = :other.Id].Member_Count__c,
@@ -1380,11 +1248,7 @@ private class HouseholdMergeServiceTest {
 				WHERE Household__c = :survivor.Id AND Contact__c = :ana.Id AND End_Date__c = NULL
 			];
 			Assert.areEqual(1, inSurvivor.size(), 'Ana is in the survivor once');
-			Assert.areEqual(
-				joined,
-				inSurvivor[0].Start_Date__c,
-				'A merge keeps the date she joined the family'
-			);
+			Assert.areEqual(joined, inSurvivor[0].Start_Date__c, 'A merge keeps the date she joined the family');
 		}
 	}
 
@@ -1410,11 +1274,7 @@ private class HouseholdMergeServiceTest {
 
 			Assert.areEqual(1, currentMembers(source.Id), 'Maria stays where she was');
 			Assert.areEqual(1, currentMembers(destination), 'Ana is in the new household');
-			Assert.areEqual(
-				1,
-				currentMembers(other.Id),
-				'Ana is still in the household the split did not name'
-			);
+			Assert.areEqual(1, currentMembers(other.Id), 'Ana is still in the household the split did not name');
 		}
 	}
 

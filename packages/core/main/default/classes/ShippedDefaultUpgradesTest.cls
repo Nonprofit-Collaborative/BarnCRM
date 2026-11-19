@@ -43,10 +43,7 @@ private class ShippedDefaultUpgradesTest {
 			Assert.isTrue(stored().Error_Digest_Include_Admin_Summary__c, 'turned on once');
 			Assert.areEqual('core:1', stored().Shipped_Defaults_Applied__c, 'marked as applied');
 
-			update as system new BarnCRM_Settings__c(
-				Id = stored().Id,
-				Error_Digest_Include_Admin_Summary__c = false
-			);
+			update as system new BarnCRM_Settings__c(Id = stored().Id, Error_Digest_Include_Admin_Summary__c = false);
 			SettingsService.clearCaches();
 			ShippedDefaultUpgrades.apply('Core', BarnCRM_Settings__c.SObjectType, ADDED);
 			Assert.isFalse(
@@ -79,10 +76,7 @@ private class ShippedDefaultUpgradesTest {
 			SettingsService.clearCaches();
 			ShippedDefaultUpgrades.apply('Core', BarnCRM_Settings__c.SObjectType, ADDED);
 			Assert.areEqual('core:1', stored().Shipped_Defaults_Applied__c);
-			Assert.isTrue(
-				stored().Error_Digest_Include_Admin_Summary__c,
-				'the first save carries the shipped default'
-			);
+			Assert.isTrue(stored().Error_Digest_Include_Admin_Summary__c, 'the first save carries the shipped default');
 		}
 	}
 

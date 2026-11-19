@@ -19,10 +19,7 @@ private class VolunteerHoursImportTest {
 	@TestSetup
 	static void makeData() {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-			TestDataFactory.createUser(
-				IMPORTER,
-				new List<String>{ 'BarnCRM_Admin', 'Volunteers_Staff' }
-			);
+			TestDataFactory.createUser(IMPORTER, new List<String>{ 'BarnCRM_Admin', 'Volunteers_Staff' });
 			VolunteersTestData.job(JOB_NAME);
 		}
 	}
@@ -59,9 +56,7 @@ private class VolunteerHoursImportTest {
 	}
 
 	private static Schema.SObjectField personField(Import_Template__c shipped) {
-		return accountsHoldPeople(shipped)
-			? Volunteer_Hours__c.Account__c
-			: Volunteer_Hours__c.Contact__c;
+		return accountsHoldPeople(shipped) ? Volunteer_Hours__c.Account__c : Volunteer_Hours__c.Contact__c;
 	}
 
 	/** The emails of this many new people, as the template's people mode holds them. */
@@ -79,9 +74,7 @@ private class VolunteerHoursImportTest {
 				records.add(person);
 			} else {
 				records.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Vol', LastName = 'Unteer' + i, Email = email)
-					)
+					TestDataFactory.person(new Contact(FirstName = 'Vol', LastName = 'Unteer' + i, Email = email))
 				);
 			}
 		}
@@ -110,10 +103,7 @@ private class VolunteerHoursImportTest {
 	private static Import_Batch__c lastBatch;
 
 	/** Loads the rows with the shipped template as one chunk, committing. */
-	private static ImportRowProcessor.Outcome load(
-		Import_Template__c shipped,
-		List<Map<String, String>> values
-	) {
+	private static ImportRowProcessor.Outcome load(Import_Template__c shipped, List<Map<String, String>> values) {
 		Import_Batch__c batch = ImportTestDataFactory.batch(shipped);
 		ImportTestDataFactory.rows(batch, values);
 		ImportBatchService.beginPass(batch.Id);
@@ -175,9 +165,7 @@ private class VolunteerHoursImportTest {
 			);
 			Assert.isTrue(shipped.Active__c, 'Offered.');
 			Assert.isTrue(
-				shipped.Column_Mapping_JSON__c.contains(
-					accountsHoldPeople(shipped) ? 'PersonEmail' : '"Email"'
-				),
+				shipped.Column_Mapping_JSON__c.contains(accountsHoldPeople(shipped) ? 'PersonEmail' : '"Email"'),
 				'The person is found by email.'
 			);
 			Assert.isTrue(shipped.Column_Mapping_JSON__c.contains('"Name"'), 'The job by name.');
@@ -306,10 +294,7 @@ private class VolunteerHoursImportTest {
 			Assert.areEqual(0, outcome.created, 'Nothing loads Approved: ' + rejections());
 			Assert.areEqual(2, outcome.rejected, 'Each row is refused.');
 			Assert.isTrue(
-				rejections()
-					.contains(
-						BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')
-					),
+				rejections().contains(BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')),
 				'Says approval goes through a coordinator: ' + rejections()
 			);
 		}

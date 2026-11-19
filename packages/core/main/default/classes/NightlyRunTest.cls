@@ -117,9 +117,7 @@ private class NightlyRunTest {
 	@IsTest
 	static void theRunGivesUpWaitingAfterSixHours() {
 		System.runAs(TestUsers.admin()) {
-			only(
-				new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) }
-			);
+			only(new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) });
 			NightlyRun run = new NightlyRun();
 			run.begin();
 			run.advance();
@@ -158,9 +156,7 @@ private class NightlyRunTest {
 	@IsTest
 	static void aRunThatFindsAStepLeftRunningWaitsForItFirst() {
 		System.runAs(TestUsers.admin()) {
-			only(
-				new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) }
-			);
+			only(new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) });
 			Nightly_Job__c left = NightlyJobs.rowFor(SECOND);
 			left.Last_Outcome__c = NightlyJobs.RUNNING;
 			left.Last_Started__c = Datetime.now().addHours(-20);
@@ -173,11 +169,7 @@ private class NightlyRunTest {
 			Assert.areEqual(NightlyRun.WAIT, run.phase, 'It waits for what that step started');
 			Assert.areEqual(NightlyRun.POLL_MINUTES, NightlyRun.lastDelay, 'Checking again soon');
 			Nightly_Job__c superseded = row(SECOND);
-			Assert.areEqual(
-				NightlyJobs.GAVE_UP,
-				superseded.Last_Outcome__c,
-				'Recorded as given up'
-			);
+			Assert.areEqual(NightlyJobs.GAVE_UP, superseded.Last_Outcome__c, 'Recorded as given up');
 			Assert.isTrue(String.isNotBlank(superseded.Last_Message__c), 'And says why');
 
 			NightlyRun.busyOverride = 0;
@@ -213,9 +205,7 @@ private class NightlyRunTest {
 				// The org has a real run waiting, which a test must not stop.
 				return;
 			}
-			only(
-				new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) }
-			);
+			only(new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) });
 			NightlyRun run = new NightlyRun();
 			run.begin();
 			NightlyRun.chain = true;
@@ -273,9 +263,7 @@ private class NightlyRunTest {
 	@IsTest
 	static void aRunThatTakesOverWaitsForWhatIsStillAtWork() {
 		System.runAs(TestUsers.admin()) {
-			only(
-				new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) }
-			);
+			only(new List<NightlyStep>{ new NightlyStep(FIRST, 'First', 0, 0, new CountingWork()) });
 			Nightly_Job__c left = NightlyJobs.rowFor(SECOND);
 			left.Last_Outcome__c = NightlyJobs.RUNNING;
 			left.Last_Started__c = Datetime.now().addHours(-20);

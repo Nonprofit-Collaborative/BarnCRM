@@ -88,9 +88,7 @@ public with sharing class ImportRowCorrectionController {
 			}
 			String document = kept.isEmpty() ? null : JSON.serialize(kept);
 			if (document != null && document.length() > MAX_CORRECTIONS) {
-				throw new ImportException(
-					BarnHelp.text('Core', 'Core_Import_ErrorCorrectionsTooLong')
-				);
+				throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorCorrectionsTooLong'));
 			}
 			Database.update(
 				new Import_Row__c(Id = row.Id, Corrected_Values_JSON__c = document),
@@ -120,9 +118,7 @@ public with sharing class ImportRowCorrectionController {
 			enforcePermission();
 			Import_Row__c row = readRow(rowId);
 			if (!canEdit(row.Import_Batch__c)) {
-				throw new ImportException(
-					BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess')
-				);
+				throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess'));
 			}
 			return ImportBatchService.startRowRetry(row.Import_Batch__c, null);
 		} catch (Exception e) {
@@ -151,17 +147,14 @@ public with sharing class ImportRowCorrectionController {
 			shown.column = column;
 			shown.fileValue = text(raw.get(column));
 			shown.corrected = corrections.containsKey(column);
-			shown.correctedValue = shown.corrected
-				? text(corrections.get(column))
-				: shown.fileValue;
+			shown.correctedValue = shown.corrected ? text(corrections.get(column)) : shown.fileValue;
 			result.columns.add(shown);
 		}
 		if (ImportRowProcessor.STATUS_REJECTED.equals(row.Status__c)) {
 			result.refusal = refusal(row);
 			result.canCorrect = result.refusal == null;
 			if (result.canCorrect) {
-				result.fixedCount = ImportBatchService.fixedRowIds(row.Import_Batch__c, null)
-					.size();
+				result.fixedCount = ImportBatchService.fixedRowIds(row.Import_Batch__c, null).size();
 			}
 		}
 		return result;
@@ -175,9 +168,7 @@ public with sharing class ImportRowCorrectionController {
 		if (!canEdit(row.Id)) {
 			return BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess');
 		}
-		return ImportBatchService.rowRetryRefusal(
-			ImportBatchSelector.selectById(row.Import_Batch__c)
-		);
+		return ImportBatchService.rowRetryRefusal(ImportBatchSelector.selectById(row.Import_Batch__c));
 	}
 
 	/** The row, after every check a change must pass: permission, rejected, retry allowed. */
@@ -185,9 +176,7 @@ public with sharing class ImportRowCorrectionController {
 		enforcePermission();
 		Import_Row__c row = readRow(rowId);
 		if (!ImportRowProcessor.STATUS_REJECTED.equals(row.Status__c)) {
-			throw new ImportException(
-				BarnHelp.text('Core', 'Core_Import_ErrorCorrectOnlyRejected')
-			);
+			throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorCorrectOnlyRejected'));
 		}
 		String refused = refusal(row);
 		if (refused != null) {
@@ -224,9 +213,7 @@ public with sharing class ImportRowCorrectionController {
 			return new Map<String, Object>();
 		}
 		Object parsed = JSON.deserializeUntyped(document);
-		return parsed instanceof Map<String, Object>
-			? (Map<String, Object>) parsed
-			: new Map<String, Object>();
+		return parsed instanceof Map<String, Object> ? (Map<String, Object>) parsed : new Map<String, Object>();
 	}
 
 	private static String text(Object value) {

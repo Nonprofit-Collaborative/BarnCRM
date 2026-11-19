@@ -21,10 +21,7 @@ private class GrantOutcomeTest {
 	private static SObject record(String objectName, Map<String, Object> values) {
 		SObject row = type(objectName).newSObject();
 		for (String field : values.keySet()) {
-			row.put(
-				field.endsWith('__c') ? NamespaceUtil.qualify(field) : field,
-				values.get(field)
-			);
+			row.put(field.endsWith('__c') ? NamespaceUtil.qualify(field) : field, values.get(field));
 		}
 		return row;
 	}
@@ -103,45 +100,32 @@ private class GrantOutcomeTest {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
 			Grant_Requirement__c requirement = requirement();
 			if (type('Logic_Model_Element__c') == null) {
-				GrantOutcomeController.OutcomeCard card = GrantOutcomeController.getOutcomes(
-					requirement.Grant__c
-				);
+				GrantOutcomeController.OutcomeCard card = GrantOutcomeController.getOutcomes(requirement.Grant__c);
 				Assert.isFalse(card.available, 'Without Logic Models there is nothing to link');
 				return;
 			}
 			Map<String, Id> ids = logicModel();
 
 			Test.startTest();
-			GrantOutcomeController.OutcomeCard before = GrantOutcomeController.getOutcomes(
-				requirement.Grant__c
-			);
+			GrantOutcomeController.OutcomeCard before = GrantOutcomeController.getOutcomes(requirement.Grant__c);
 			GrantOutcomeController.setOutcome(requirement.Id, String.valueOf(ids.get('outcome')));
-			GrantOutcomeController.OutcomeCard after = GrantOutcomeController.getOutcomes(
-				requirement.Grant__c
-			);
+			GrantOutcomeController.OutcomeCard after = GrantOutcomeController.getOutcomes(requirement.Grant__c);
 			Test.stopTest();
 
 			Assert.isTrue(before.available, 'Logic Models is there');
 			Assert.isTrue(before.canEdit, 'The admin may choose');
 			Assert.areEqual(1, before.options.size(), 'Outcomes and outputs only, no activity');
-			Assert.areEqual(
-				'Reading: Students read at home',
-				before.options[0].get('label'),
-				'By model'
-			);
+			Assert.areEqual('Reading: Students read at home', before.options[0].get('label'), 'By model');
 			Assert.areEqual(1, before.rows.size(), 'The one requirement');
 			Assert.isNull(before.rows[0].outcomeId, 'Nothing linked yet');
 
 			GrantOutcomeController.Row row = after.rows[0];
 			Assert.areEqual(String.valueOf(ids.get('outcome')), row.outcomeId, 'Saved');
 			Assert.isFalse(row.missing, 'Found');
-			List<Map<String, Object>> indicators = (List<Map<String, Object>>) row.outcome.get(
-				'indicators'
-			);
+			List<Map<String, Object>> indicators = (List<Map<String, Object>>) row.outcome.get('indicators');
 			Assert.areEqual(1, indicators.size(), 'Its indicator');
 			Assert.areEqual('students', indicators[0].get('unit'), 'With its unit');
-			List<Map<String, Object>> periods = (List<Map<String, Object>>) indicators[0]
-				.get('periods');
+			List<Map<String, Object>> periods = (List<Map<String, Object>>) indicators[0].get('periods');
 			Assert.areEqual(1, periods.size(), 'Only the period in the award period');
 			Assert.areEqual('2026', periods[0].get('name'), 'The 2026 period');
 			Assert.areEqual(25, (Decimal) periods[0].get('result'), 'Its result');
@@ -175,10 +159,7 @@ private class GrantOutcomeTest {
 			String activityRefusal;
 			if (installed) {
 				try {
-					GrantOutcomeController.setOutcome(
-						requirement.Id,
-						String.valueOf(ids.get('activity'))
-					);
+					GrantOutcomeController.setOutcome(requirement.Id, String.valueOf(ids.get('activity')));
 				} catch (AuraHandledException e) {
 					activityRefusal = e.getMessage();
 				}
@@ -204,11 +185,7 @@ private class GrantOutcomeTest {
 				activityRefusal,
 				'Nor an activity'
 			);
-			Assert.areEqual(
-				String.valueOf(ids.get('outcome')),
-				stored(requirement.Id),
-				'Stored in full'
-			);
+			Assert.areEqual(String.valueOf(ids.get('outcome')), stored(requirement.Id), 'Stored in full');
 			GrantOutcomeController.setOutcome(requirement.Id, '');
 			Assert.isNull(stored(requirement.Id), 'Cleared');
 		}

@@ -57,14 +57,10 @@ private class RollupEngineExtensionsTest {
 			SettingsListeningEngine engine = new SettingsListeningEngine();
 			RollupEngineExtensions.extensionOverride = engine;
 
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 });
 
 			Assert.areEqual(
-				new List<String>{
-					'afterSettingsSaved BarnCRM_Settings__c {Error_Log_Retention_Days__c}'
-				},
+				new List<String>{ 'afterSettingsSaved BarnCRM_Settings__c {Error_Log_Retention_Days__c}' },
 				engine.calls,
 				'Told the settings object and the changed field, without a prefix'
 			);
@@ -78,16 +74,12 @@ private class RollupEngineExtensionsTest {
 			engine.fail = true;
 			RollupEngineExtensions.extensionOverride = engine;
 
-			SettingsService.saveValues(
-				new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 45 }
-			);
+			SettingsService.saveValues(new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 45 });
 
 			Assert.areEqual(1, engine.calls.size(), 'The engine was asked');
 			Assert.areEqual(
 				45,
-				Integer.valueOf(
-					String.valueOf(SettingsService.getValue('Error_Log_Retention_Days__c'))
-				),
+				Integer.valueOf(String.valueOf(SettingsService.getValue('Error_Log_Retention_Days__c'))),
 				'The setting is saved all the same'
 			);
 		}
@@ -117,9 +109,7 @@ private class RollupEngineExtensionsTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			RollupEngineExtension missing = RollupEngineExtensions.resolve('NoSuchEngineClass');
-			RollupEngineExtension wrongShape = RollupEngineExtensions.resolve(
-				'RollupEngineExtensions'
-			);
+			RollupEngineExtension wrongShape = RollupEngineExtensions.resolve('RollupEngineExtensions');
 			Test.stopTest();
 
 			Assert.isNull(missing, 'A class that is not there is absent');
@@ -170,10 +160,7 @@ private class RollupEngineExtensionsTest {
 			RollupEngineExtensions.extensionOverride = engine;
 
 			Test.startTest();
-			Boolean description = DataProtectedFields.isProtected(
-				Contact.SObjectType,
-				'Description'
-			);
+			Boolean description = DataProtectedFields.isProtected(Contact.SObjectType, 'Description');
 			Test.stopTest();
 
 			Assert.isTrue(description, 'A field the engine reports as a rollup target is kept');
@@ -187,10 +174,7 @@ private class RollupEngineExtensionsTest {
 			RollupEngineExtensions.noneForTest = true;
 
 			Test.startTest();
-			Boolean description = DataProtectedFields.isProtected(
-				Contact.SObjectType,
-				'Description'
-			);
+			Boolean description = DataProtectedFields.isProtected(Contact.SObjectType, 'Description');
 			Test.stopTest();
 
 			Assert.isFalse(description, 'No module, no rollup targets');
@@ -234,10 +218,7 @@ private class RollupEngineExtensionsTest {
 			RollupEngineExtensions.extensionOverride = new FailingEngine();
 
 			Test.startTest();
-			Boolean description = DataProtectedFields.isProtected(
-				Contact.SObjectType,
-				'Description'
-			);
+			Boolean description = DataProtectedFields.isProtected(Contact.SObjectType, 'Description');
 			Test.stopTest();
 
 			Assert.isFalse(description, 'No targets were reported, so none are kept');
@@ -258,9 +239,7 @@ private class RollupEngineExtensionsTest {
 		System.runAs(TestUsers.admin()) {
 			RollupEngineExtensions.noneForTest = true;
 			Account kept = TestDataFactory.organization(new Account(Name = 'Riverside Food Bank'));
-			Account merged = TestDataFactory.organization(
-				new Account(Name = 'Riverside Food Bank (old)')
-			);
+			Account merged = TestDataFactory.organization(new Account(Name = 'Riverside Food Bank (old)'));
 			insert new List<Account>{ kept, merged };
 
 			Test.startTest();

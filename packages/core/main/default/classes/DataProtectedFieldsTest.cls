@@ -57,9 +57,7 @@ private class DataProtectedFieldsTest {
 			DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
 			Test.startTest();
 			Boolean savedQueries = DataProtectedFields.isBookkeeping(Saved_Query__c.SObjectType);
-			Boolean dismissals = DataProtectedFields.isBookkeeping(
-				Duplicate_Dismissal__c.SObjectType
-			);
+			Boolean dismissals = DataProtectedFields.isBookkeeping(Duplicate_Dismissal__c.SObjectType);
 			Boolean contacts = DataProtectedFields.isBookkeeping(Contact.SObjectType);
 			Boolean users = DataProtectedFields.isSetup(User.SObjectType);
 			Boolean accounts = DataProtectedFields.isSetup(Account.SObjectType);
@@ -67,10 +65,7 @@ private class DataProtectedFieldsTest {
 				Contact.SObjectType,
 				Contact.Sample_Data_Key__c.getDescribe()
 			);
-			Boolean title = DataProtectedFields.isKeptByThePackage(
-				Contact.SObjectType,
-				Contact.Title.getDescribe()
-			);
+			Boolean title = DataProtectedFields.isKeptByThePackage(Contact.SObjectType, Contact.Title.getDescribe());
 			Test.stopTest();
 
 			Assert.isTrue(savedQueries, 'Saved queries are the package bookkeeping (from C-35).');
@@ -124,11 +119,7 @@ private class DataProtectedFieldsTest {
 				jobs,
 				'A standard object that is not a business record is refused by the rule.'
 			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Data_ObjectUnknown'),
-				missing,
-				'Nor an object the org lacks.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Data_ObjectUnknown'), missing, 'Nor an object the org lacks.');
 		}
 	}
 
@@ -185,16 +176,10 @@ private class DataProtectedFieldsTest {
 			Assert.isFalse(accountFields.contains('name'), 'An account name is not kept as such.');
 			Assert.isFalse(contactFields.contains('email'), 'Nor an email.');
 			Assert.isTrue(
-				DataProtectedFields.isProtected(
-					Contact.SObjectType,
-					' CREATED_BY_IMPORT_BATCH__C '
-				),
+				DataProtectedFields.isProtected(Contact.SObjectType, ' CREATED_BY_IMPORT_BATCH__C '),
 				'Asked ignoring case and spaces.'
 			);
-			Assert.isFalse(
-				DataProtectedFields.isProtected(Contact.SObjectType, ''),
-				'Nothing named.'
-			);
+			Assert.isFalse(DataProtectedFields.isProtected(Contact.SObjectType, ''), 'Nothing named.');
 			Assert.isTrue(DataProtectedFields.fieldNames(null).isEmpty(), 'No object, no fields.');
 		}
 	}
@@ -219,10 +204,7 @@ private class DataProtectedFieldsTest {
 			};
 
 			Test.startTest();
-			Boolean description = DataProtectedFields.isProtected(
-				Contact.SObjectType,
-				'Description'
-			);
+			Boolean description = DataProtectedFields.isProtected(Contact.SObjectType, 'Description');
 			Boolean site = DataProtectedFields.isProtected(Account.SObjectType, 'Site');
 			Boolean title = DataProtectedFields.isProtected(Contact.SObjectType, 'Title');
 			Test.stopTest();
@@ -240,21 +222,13 @@ private class DataProtectedFieldsTest {
 			Id organizationType = AccountKindsTestData.organizationRecordTypeId();
 
 			Test.startTest();
-			Boolean household = DataProtectedFields.isProtectedOnRecord(
-				Account.SObjectType,
-				'Name',
-				householdType
-			);
+			Boolean household = DataProtectedFields.isProtectedOnRecord(Account.SObjectType, 'Name', householdType);
 			Boolean organization = DataProtectedFields.isProtectedOnRecord(
 				Account.SObjectType,
 				'Name',
 				organizationType
 			);
-			Boolean other = DataProtectedFields.isProtectedOnRecord(
-				Account.SObjectType,
-				'Phone',
-				householdType
-			);
+			Boolean other = DataProtectedFields.isProtectedOnRecord(Account.SObjectType, 'Phone', householdType);
 			Test.stopTest();
 
 			Assert.isTrue(household, 'The household naming patterns keep a household name.');

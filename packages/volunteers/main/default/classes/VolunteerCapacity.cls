@@ -42,9 +42,7 @@ public inherited sharing class VolunteerCapacity {
 		Set<Id> shiftIds = new Set<Id>();
 		Set<Id> ownIds = new Set<Id>();
 		for (Volunteer_Signup__c signup : signups) {
-			Volunteer_Signup__c previous = previousById == null
-				? null
-				: previousById.get(signup.Id);
+			Volunteer_Signup__c previous = previousById == null ? null : previousById.get(signup.Id);
 			if (
 				BOOKING.contains(signup.Status__c) &&
 				signup.Volunteer_Shift__c != null &&
@@ -60,12 +58,7 @@ public inherited sharing class VolunteerCapacity {
 		if (candidates.isEmpty()) {
 			return;
 		}
-		List<SObject> fits = WaitlistQueue.fitting(
-			freePlaces(shiftIds, ownIds),
-			candidates,
-			SHIFT,
-			SIZE
-		);
+		List<SObject> fits = WaitlistQueue.fitting(freePlaces(shiftIds, ownIds), candidates, SHIFT, SIZE);
 		for (Volunteer_Signup__c candidate : candidates) {
 			if (!containsSame(fits, candidate)) {
 				candidate.Status__c = STATUS_WAITLISTED;
@@ -74,15 +67,10 @@ public inherited sharing class VolunteerCapacity {
 	}
 
 	/** After update: the shifts places were freed on (a booking cancelled, moved or made smaller). */
-	public static Set<Id> freedShifts(
-		List<Volunteer_Signup__c> signups,
-		Map<Id, Volunteer_Signup__c> previousById
-	) {
+	public static Set<Id> freedShifts(List<Volunteer_Signup__c> signups, Map<Id, Volunteer_Signup__c> previousById) {
 		Set<Id> freed = new Set<Id>();
 		for (Volunteer_Signup__c signup : signups) {
-			Volunteer_Signup__c previous = previousById == null
-				? null
-				: previousById.get(signup.Id);
+			Volunteer_Signup__c previous = previousById == null ? null : previousById.get(signup.Id);
 			if (previous == null || !holds(previous)) {
 				continue;
 			}
@@ -157,10 +145,7 @@ public inherited sharing class VolunteerCapacity {
 			WITH SYSTEM_MODE
 		]) {
 			// No limit is a number nothing reaches, so the shift still counts as open.
-			free.put(
-				shift.Id,
-				shift.Volunteers_Needed__c == null ? 1000000 : shift.Volunteers_Needed__c
-			);
+			free.put(shift.Id, shift.Volunteers_Needed__c == null ? 1000000 : shift.Volunteers_Needed__c);
 		}
 		if (free.isEmpty()) {
 			return free;
@@ -169,17 +154,11 @@ public inherited sharing class VolunteerCapacity {
 		for (Volunteer_Signup__c held : [
 			SELECT Volunteer_Shift__c, Group_Size__c
 			FROM Volunteer_Signup__c
-			WHERE
-				Volunteer_Shift__c IN :limited
-				AND Status__c NOT IN :NOT_HOLDING
-				AND Id NOT IN :leaveOut
+			WHERE Volunteer_Shift__c IN :limited AND Status__c NOT IN :NOT_HOLDING AND Id NOT IN :leaveOut
 			WITH SYSTEM_MODE
 			LIMIT 10000
 		]) {
-			free.put(
-				held.Volunteer_Shift__c,
-				free.get(held.Volunteer_Shift__c) - WaitlistQueue.placesOf(held, SIZE)
-			);
+			free.put(held.Volunteer_Shift__c, free.get(held.Volunteer_Shift__c) - WaitlistQueue.placesOf(held, SIZE));
 		}
 		return free;
 	}

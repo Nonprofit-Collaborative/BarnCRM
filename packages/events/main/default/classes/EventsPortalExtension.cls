@@ -102,11 +102,7 @@ public without sharing class EventsPortalExtension implements PortalActionExtens
 		if (current > 0) {
 			return BarnHelp.text('Events', 'Events_Portal_AlreadyApplied');
 		}
-		String title = BarnHelp.text(
-			'Events',
-			'Events_Portal_NewProposal',
-			new List<Object>{ event.Name }
-		);
+		String title = BarnHelp.text('Events', 'Events_Portal_NewProposal', new List<Object>{ event.Name });
 		insert as system new Speaker_Application__c(
 			Event__c = eventId,
 			Contact__c = personId,

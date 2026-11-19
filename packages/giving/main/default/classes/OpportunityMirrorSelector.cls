@@ -21,11 +21,7 @@ public with sharing class OpportunityMirrorSelector {
 	 *
 	 * @param fields the fields to read, from the service, which knows which ones the org has
 	 */
-	public static Map<Id, SObject> opportunitiesById(
-		String opportunityObject,
-		List<String> fields,
-		Set<Id> ids
-	) {
+	public static Map<Id, SObject> opportunitiesById(String opportunityObject, List<String> fields, Set<Id> ids) {
 		if (String.isBlank(opportunityObject) || ids == null || ids.isEmpty()) {
 			return new Map<Id, SObject>();
 		}
@@ -159,11 +155,7 @@ public with sharing class OpportunityMirrorSelector {
 	 * start date, oldest first (R-OM7), and when `byRecordType` of the record types bound as
 	 * `recordTypeIds`. Those already named by a gift are left out per chunk.
 	 */
-	public static String wonOpportunitiesQuery(
-		String opportunityObject,
-		List<String> fields,
-		Boolean byRecordType
-	) {
+	public static String wonOpportunitiesQuery(String opportunityObject, List<String> fields, Boolean byRecordType) {
 		return 'SELECT ' +
 			String.escapeSingleQuotes(String.join(fields, ', ')) +
 			' FROM ' +
@@ -222,9 +214,7 @@ public with sharing class OpportunityMirrorSelector {
 		}
 		for (
 			SObject person : Database.queryWithBinds(
-				'SELECT Id, AccountId FROM Contact WHERE Id IN :contactIds AND ' +
-					IS_PERSON_ACCOUNT_FIELD +
-					' = TRUE',
+				'SELECT Id, AccountId FROM Contact WHERE Id IN :contactIds AND ' + IS_PERSON_ACCOUNT_FIELD + ' = TRUE',
 				new Map<String, Object>{ 'contactIds' => contactIds },
 				AccessLevel.USER_MODE
 			)
@@ -248,12 +238,7 @@ public with sharing class OpportunityMirrorSelector {
 	 * The won Opportunities closed in the range the running user can see, oldest first, no more
 	 * than `cap`.
 	 */
-	public static List<SObject> wonInRange(
-		String opportunityObject,
-		Date fromDate,
-		Date toDate,
-		Integer cap
-	) {
+	public static List<SObject> wonInRange(String opportunityObject, Date fromDate, Date toDate, Integer cap) {
 		return Database.queryWithBinds(
 			'SELECT Id, Name, Amount, CloseDate, IsWon FROM ' +
 				String.escapeSingleQuotes(opportunityObject) +

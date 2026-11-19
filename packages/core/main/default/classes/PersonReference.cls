@@ -58,12 +58,7 @@ public with sharing class PersonReference {
 
 	/** True when both references name the same person, whichever object holds them. */
 	@NamespaceAccessible
-	public static Boolean isSamePerson(
-		Id firstContactId,
-		Id firstAccountId,
-		Id secondContactId,
-		Id secondAccountId
-	) {
+	public static Boolean isSamePerson(Id firstContactId, Id firstAccountId, Id secondContactId, Id secondAccountId) {
 		String first = keyOf(firstContactId, firstAccountId);
 		String second = keyOf(secondContactId, secondAccountId);
 		return first != null && first == second;

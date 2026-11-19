@@ -42,10 +42,7 @@ public with sharing class InboundGiftService {
 		InboundGift gift = null;
 		String problem = null;
 		try {
-			gift = (InboundGift) JSON.deserializeStrict(
-				body == null ? '' : body.toString(),
-				InboundGift.class
-			);
+			gift = (InboundGift) JSON.deserializeStrict(body == null ? '' : body.toString(), InboundGift.class);
 		} catch (Exception malformed) {
 			problem = malformed.getMessage();
 		}
@@ -138,10 +135,7 @@ public with sharing class InboundGiftService {
 					BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorRepeated')
 				);
 			} else {
-				answerFromRecordedGift(
-					item,
-					new Gift__c(Id = first.recordedGiftId, Amount__c = first.recordedAmount)
-				);
+				answerFromRecordedGift(item, new Gift__c(Id = first.recordedGiftId, Amount__c = first.recordedAmount));
 			}
 		}
 
@@ -229,16 +223,10 @@ public with sharing class InboundGiftService {
 			} else {
 				Id contactId = contactByEmail.get(ImportMatcher.emailKey(request.donorEmail));
 				donor = contactId == null ? null : donorByContact.get(contactId);
-				donorMissing = BarnHelp.text(
-					'Giving',
-					'Mirror_InboundGift_ErrorDonorEmailNotFound'
-				);
+				donorMissing = BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorDonorEmailNotFound');
 			}
 			if (donor == null) {
-				item.result = InboundGiftResult.rejected(
-					InboundGiftResult.ERROR_DONOR_NOT_FOUND,
-					donorMissing
-				);
+				item.result = InboundGiftResult.rejected(InboundGiftResult.ERROR_DONOR_NOT_FOUND, donorMissing);
 				continue;
 			}
 			if (donor.getSObjectType() == Contact.SObjectType) {
@@ -253,8 +241,7 @@ public with sharing class InboundGiftService {
 				Id named = InboundGiftRequest.asId(request.fundId);
 				item.fundId = activeFunds.contains(named) ? named : null;
 			}
-			Boolean fundNamed =
-				String.isNotBlank(request.fundCode) || String.isNotBlank(request.fundId);
+			Boolean fundNamed = String.isNotBlank(request.fundCode) || String.isNotBlank(request.fundId);
 			if (fundNamed && item.fundId == null) {
 				item.result = InboundGiftResult.rejected(
 					InboundGiftResult.ERROR_FUND_NOT_FOUND,
@@ -390,11 +377,7 @@ public with sharing class InboundGiftService {
 	}
 
 	/** Designation could not even be attempted: the attempt is undone and its gifts refused. */
-	private static void refuseAttempt(
-		Savepoint beforeAttempt,
-		List<InboundGiftRequest> saved,
-		Exception refused
-	) {
+	private static void refuseAttempt(Savepoint beforeAttempt, List<InboundGiftRequest> saved, Exception refused) {
 		Database.rollback(beforeAttempt);
 		for (InboundGiftRequest item : saved) {
 			item.giftId = null;
@@ -411,9 +394,7 @@ public with sharing class InboundGiftService {
 		if (duplicates.isEmpty()) {
 			return;
 		}
-		Map<String, Gift__c> recorded = InboundGiftSelector.giftsByExternalId(
-			externalIds(duplicates)
-		);
+		Map<String, Gift__c> recorded = InboundGiftSelector.giftsByExternalId(externalIds(duplicates));
 		for (InboundGiftRequest item : duplicates) {
 			Gift__c found = recorded.get(item.key);
 			if (found != null) {

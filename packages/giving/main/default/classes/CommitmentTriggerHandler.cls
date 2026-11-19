@@ -22,10 +22,7 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 
 	public override void beforeUpdate() {
 		CommitmentService.fillExpectedTotals((List<Commitment__c>) newRecords());
-		deriveHouseholds(
-			(List<Commitment__c>) newRecords(),
-			(Map<Id, Commitment__c>) oldRecordsById()
-		);
+		deriveHouseholds((List<Commitment__c>) newRecords(), (Map<Id, Commitment__c>) oldRecordsById());
 	}
 
 	public override void afterInsert() {
@@ -33,10 +30,7 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 	}
 
 	public override void afterUpdate() {
-		onAfterUpdate(
-			(List<Commitment__c>) newRecords(),
-			(Map<Id, Commitment__c>) oldRecordsById()
-		);
+		onAfterUpdate((List<Commitment__c>) newRecords(), (Map<Id, Commitment__c>) oldRecordsById());
 	}
 
 	public override void beforeDelete() {
@@ -75,9 +69,7 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 			? new Map<Id, Id>()
 			: HouseholdService.getHouseholdIdsFor(people);
 		for (Commitment__c commitment : needHousehold) {
-			Id person = commitment.Donor_Contact__c != null
-				? commitment.Donor_Contact__c
-				: commitment.Donor_Account__c;
+			Id person = commitment.Donor_Contact__c != null ? commitment.Donor_Contact__c : commitment.Donor_Account__c;
 			commitment.Household__c = person == null ? null : householdByPerson.get(person);
 		}
 	}
@@ -115,8 +107,7 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 	@TestVisible
 	private void onBeforeDelete(List<Commitment__c> commitments) {
 		Set<Id> commitmentIds = new Map<Id, Commitment__c>(commitments).keySet();
-		List<Installment__c> installments = new InstallmentSelector()
-			.selectByCommitmentIds(commitmentIds);
+		List<Installment__c> installments = new InstallmentSelector().selectByCommitmentIds(commitmentIds);
 		if (installments.isEmpty()) {
 			return;
 		}
@@ -126,9 +117,7 @@ public with sharing class CommitmentTriggerHandler extends TriggerHandler {
 		for (Installment__c installment : installments) {
 			Integer gifts = giftCounts.get(installment.Id);
 			Boolean paid =
-				(gifts != null && gifts > 0) ||
-				(installment.Paid_Amount__c != null &&
-				installment.Paid_Amount__c != 0);
+				(gifts != null && gifts > 0) || (installment.Paid_Amount__c != null && installment.Paid_Amount__c != 0);
 			if (paid) {
 				blocked.add(installment.Commitment__c);
 			}

@@ -6,11 +6,7 @@
  * changes.
  */
 public with sharing class ErrorLogController {
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-		null,
-		'Core',
-		'Core_ErrorLog_ActionFailed'
-	);
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(null, 'Core', 'Core_ErrorLog_ActionFailed');
 
 	private static final Integer DEFAULT_ROWS = 5;
 
@@ -90,9 +86,7 @@ public with sharing class ErrorLogController {
 		try {
 			Error_Log__c entry = ErrorLogSelector.selectForBugReport(entryIdOf(errorLogId));
 			if (entry == null) {
-				throw new ErrorLogControllerException(
-					BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
-				);
+				throw new ErrorLogControllerException(BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound'));
 			}
 			return new Map<String, Object>{
 				'context' => entry.Context__c,
@@ -110,21 +104,15 @@ public with sharing class ErrorLogController {
 	private static Id entryIdOf(String errorLogId) {
 		Id entryId = asRecordId(errorLogId);
 		if (entryId == null || entryId.getSObjectType() != Error_Log__c.SObjectType) {
-			throw new ErrorLogControllerException(
-				BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
-			);
+			throw new ErrorLogControllerException(BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound'));
 		}
 		return entryId;
 	}
 
 	private static Error_Log__c validatedEntry(String errorLogId) {
-		List<Error_Log__c> found = ErrorLogSelector.selectByIds(
-			new Set<Id>{ entryIdOf(errorLogId) }
-		);
+		List<Error_Log__c> found = ErrorLogSelector.selectByIds(new Set<Id>{ entryIdOf(errorLogId) });
 		if (found.isEmpty()) {
-			throw new ErrorLogControllerException(
-				BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound')
-			);
+			throw new ErrorLogControllerException(BarnHelp.text('Core', 'Core_ErrorLog_EntryNotFound'));
 		}
 		return found[0];
 	}

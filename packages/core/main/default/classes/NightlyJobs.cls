@@ -306,14 +306,7 @@ public with sharing class NightlyJobs {
 		if (rowsByKey == null) {
 			rowsByKey = new Map<String, Nightly_Job__c>();
 			for (Nightly_Job__c row : [
-				SELECT
-					Id,
-					Name,
-					Switch__c,
-					Last_Started__c,
-					Last_Finished__c,
-					Last_Outcome__c,
-					Last_Message__c
+				SELECT Id, Name, Switch__c, Last_Started__c, Last_Finished__c, Last_Outcome__c, Last_Message__c
 				FROM Nightly_Job__c
 				WITH SYSTEM_MODE
 				ORDER BY CreatedDate

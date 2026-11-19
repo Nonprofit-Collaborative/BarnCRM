@@ -30,10 +30,7 @@ private class ImportRecordIdMatchTest {
 		for (String target : COLUMNS) {
 			mapping.columns.add(new ImportMapping.Column(target, target));
 		}
-		return ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		return ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 	}
 
 	private static Map<String, String> row(String personId, String lastName, String email) {
@@ -47,9 +44,7 @@ private class ImportRecordIdMatchTest {
 	}
 
 	private static Id recordTypeId(String developerName) {
-		return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-			.get(developerName)
-			.getRecordTypeId();
+		return Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get(developerName).getRecordTypeId();
 	}
 
 	/** Runs one pass the way the platform drives the batch, in chunks of 200. */
@@ -75,11 +70,7 @@ private class ImportRecordIdMatchTest {
 		Import_Batch__c committed = run(batchId, false);
 		Assert.areEqual(dryRun.Rows_Created__c, committed.Rows_Created__c, 'Created as previewed.');
 		Assert.areEqual(dryRun.Rows_Updated__c, committed.Rows_Updated__c, 'Updated as previewed.');
-		Assert.areEqual(
-			dryRun.Rows_Rejected__c,
-			committed.Rows_Rejected__c,
-			'Rejected as previewed.'
-		);
+		Assert.areEqual(dryRun.Rows_Rejected__c, committed.Rows_Rejected__c, 'Rejected as previewed.');
 		return committed;
 	}
 
@@ -105,10 +96,7 @@ private class ImportRecordIdMatchTest {
 			);
 			insert ana;
 			Import_Batch__c batch = ImportTestDataFactory.batch(template());
-			ImportTestDataFactory.rows(
-				batch,
-				new List<Map<String, String>>{ row(ana.Id, 'Lopez', 'ana@new.test') }
-			);
+			ImportTestDataFactory.rows(batch, new List<Map<String, String>>{ row(ana.Id, 'Lopez', 'ana@new.test') });
 
 			Test.startTest();
 			Import_Batch__c committed = load(batch.Id);
@@ -119,11 +107,7 @@ private class ImportRecordIdMatchTest {
 			Assert.areEqual(1, committed.Rows_Updated__c, 'Updated, not created.');
 			Contact stored = [SELECT Email, MailingCity FROM Contact WHERE Id = :ana.Id];
 			Assert.areEqual('Bend', stored.MailingCity, 'The row is written to it.');
-			Assert.areEqual(
-				'ana@new.test',
-				stored.Email,
-				'Even the email the rule would match on.'
-			);
+			Assert.areEqual('ana@new.test', stored.Email, 'Even the email the rule would match on.');
 			Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Nobody added.');
 			Assert.isFalse(
 				String.valueOf(committed.Run_Log__c).contains(Contact.Id.getDescribe().getLabel()),
@@ -194,10 +178,7 @@ private class ImportRecordIdMatchTest {
 			List<Import_Row__c> staged = rowsOf(batch.Id);
 			Assert.areEqual(4, committed.Rows_Rejected__c, 'Every row rejected.');
 			Assert.areEqual(
-				format(
-					BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotPerson'),
-					organization.Id
-				),
+				format(BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotPerson'), organization.Id),
 				staged[0].Error_Message__c,
 				'An account is not a person here.'
 			);
@@ -207,10 +188,7 @@ private class ImportRecordIdMatchTest {
 				'A contact is not an organization.'
 			);
 			Assert.areEqual(
-				format(
-					BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotOrganization'),
-					household.Id
-				),
+				format(BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotOrganization'), household.Id),
 				staged[2].Error_Message__c,
 				'Nor is a household.'
 			);
@@ -243,11 +221,7 @@ private class ImportRecordIdMatchTest {
 			Test.stopTest();
 
 			Import_Row__c staged = rowsOf(batch.Id)[0];
-			Assert.areEqual(
-				organization.Id,
-				staged.Organization__c,
-				'The organization the ID names.'
-			);
+			Assert.areEqual(organization.Id, staged.Organization__c, 'The organization the ID names.');
 			Assert.areEqual(ana.Id, staged.Contact_1__c, 'A blank ID: matched by email.');
 			Assert.areEqual(
 				'Harbor Trust',
@@ -274,15 +248,7 @@ private class ImportRecordIdMatchTest {
 			);
 			insert ana;
 			Import_Template__c template = template();
-			Import_Batch__c batch = ImportBatchService.create(
-				template.Id,
-				null,
-				'updates.csv',
-				null,
-				null,
-				null,
-				true
-			);
+			Import_Batch__c batch = ImportBatchService.create(template.Id, null, 'updates.csv', null, null, null, true);
 			Map<String, String> newOrganization = row(null, 'Lopez', 'ana@example.test');
 			newOrganization.put('Organization.Name', 'New Trust');
 			ImportTestDataFactory.rows(
@@ -313,11 +279,7 @@ private class ImportRecordIdMatchTest {
 			);
 			Assert.areEqual(0, committed.Rows_Created__c, 'Nothing created.');
 			Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Nobody added.');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Account WHERE Name = 'New Trust'],
-				'No organization added.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Account WHERE Name = 'New Trust'], 'No organization added.');
 		}
 	}
 
@@ -326,9 +288,7 @@ private class ImportRecordIdMatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Contact> people = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				people.add(
-					TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Lopez' + i))
-				);
+				people.add(TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Lopez' + i)));
 			}
 			insert people;
 			List<Map<String, String>> values = new List<Map<String, String>>();
@@ -344,16 +304,8 @@ private class ImportRecordIdMatchTest {
 
 			Assert.areEqual(200, committed.Rows_Updated__c, 'Every row updated its record.');
 			Assert.areEqual(0, committed.Rows_Created__c, 'None created.');
-			Assert.areEqual(
-				0,
-				committed.Rows_Rejected__c,
-				'None rejected, though none has a name.'
-			);
-			Assert.areEqual(
-				200,
-				[SELECT COUNT() FROM Contact WHERE MailingCity = 'Bend'],
-				'Each written.'
-			);
+			Assert.areEqual(0, committed.Rows_Rejected__c, 'None rejected, though none has a name.');
+			Assert.areEqual(200, [SELECT COUNT() FROM Contact WHERE MailingCity = 'Bend'], 'Each written.');
 			Assert.areEqual(200, [SELECT COUNT() FROM Contact], 'Nobody added.');
 		}
 	}
@@ -365,11 +317,7 @@ private class ImportRecordIdMatchTest {
 			for (Integer i = 0; i < 100; i++) {
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Ana',
-							LastName = 'Lopez',
-							Email = 'ana' + i + '@a.test'
-						)
+						new Contact(FirstName = 'Ana', LastName = 'Lopez', Email = 'ana' + i + '@a.test')
 					)
 				);
 			}
@@ -405,10 +353,7 @@ private class ImportRecordIdMatchTest {
 		System.runAs(TestUsers.admin()) {
 			Assert.isTrue(ImportMapping.namesAPerson('Contact1.Id', null), 'Every row one person.');
 			Assert.isTrue(ImportMapping.namesAPerson('Contact2.id', null), 'Either person.');
-			Assert.isFalse(
-				ImportMapping.namesAPerson('Organization.Id', null),
-				'Every row one organization is fine.'
-			);
+			Assert.isFalse(ImportMapping.namesAPerson('Organization.Id', null), 'Every row one organization is fine.');
 		}
 	}
 }

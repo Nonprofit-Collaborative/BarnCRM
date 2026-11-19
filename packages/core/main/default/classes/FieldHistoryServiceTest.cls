@@ -21,9 +21,7 @@ private class FieldHistoryServiceTest {
 		HouseholdTestDataFactory.save(settings);
 		FieldHistoryService.rowsForTest = new List<History_Field__mdt>();
 		for (String name : fieldNames) {
-			FieldHistoryService.rowsForTest.add(
-				new History_Field__mdt(Field_Name__c = name, Active__c = true)
-			);
+			FieldHistoryService.rowsForTest.add(new History_Field__mdt(Field_Name__c = name, Active__c = true));
 		}
 	}
 
@@ -85,16 +83,13 @@ private class FieldHistoryServiceTest {
 			noAccess = TestUsers.minimumAccessUserWith('Zztest NoFls', new List<String>());
 		}
 		Id recordId =
-			Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
-			'000000000001';
+			Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001';
 		Test.startTest();
 		System.runAs(noAccess) {
 			FieldHistoryService.capture(
 				'Address__c',
 				new List<SObject>{ new Address__c(Id = recordId, City__c = 'Shelbyville') },
-				new Map<Id, SObject>{
-					recordId => new Address__c(Id = recordId, City__c = 'Springfield')
-				}
+				new Map<Id, SObject>{ recordId => new Address__c(Id = recordId, City__c = 'Springfield') }
 			);
 		}
 		Test.stopTest();
@@ -137,10 +132,7 @@ private class FieldHistoryServiceTest {
 			Assert.isFalse(FieldHistoryService.same(2.5, 2.6), 'Another number');
 			Assert.isTrue(FieldHistoryService.same(day, Date.newInstance(2026, 1, 2)), 'Same day');
 			Assert.isFalse(FieldHistoryService.same(day, day.addDays(1)), 'Another day');
-			Assert.isTrue(
-				FieldHistoryService.same(noon, Datetime.newInstanceGmt(2026, 1, 2, 12, 0, 0)),
-				'Same moment'
-			);
+			Assert.isTrue(FieldHistoryService.same(noon, Datetime.newInstanceGmt(2026, 1, 2, 12, 0, 0)), 'Same moment');
 			Assert.isFalse(FieldHistoryService.same(noon, noon.addSeconds(1)), 'Another moment');
 			Assert.isTrue(FieldHistoryService.same(true, true), 'Same checkbox');
 			Assert.isFalse(FieldHistoryService.same(true, false), 'A ticked checkbox');
@@ -222,9 +214,7 @@ private class FieldHistoryServiceTest {
 			Test.startTest();
 			Schema.DescribeFieldResult city = FieldHistoryService.keepable(CITY);
 			Schema.DescribeFieldResult person = FieldHistoryService.keepable('Contact.LastName');
-			Schema.DescribeFieldResult log = FieldHistoryService.keepable(
-				'Error_Log__c.Message__c'
-			);
+			Schema.DescribeFieldResult log = FieldHistoryService.keepable('Error_Log__c.Message__c');
 			Schema.DescribeFieldResult bare = FieldHistoryService.keepable('City__c');
 			Test.stopTest();
 
@@ -271,13 +261,9 @@ private class FieldHistoryServiceTest {
 			moveTo(places, 'Shelbyville');
 
 			Test.startTest();
-			FieldHistoryController.HistoryView whileOn = FieldHistoryController.getHistory(
-				places[0].Id
-			);
+			FieldHistoryController.HistoryView whileOn = FieldHistoryController.getHistory(places[0].Id);
 			turnOn(false, new List<String>{ CITY });
-			FieldHistoryController.HistoryView whileOff = FieldHistoryController.getHistory(
-				places[0].Id
-			);
+			FieldHistoryController.HistoryView whileOff = FieldHistoryController.getHistory(places[0].Id);
 			Test.stopTest();
 
 			Assert.isTrue(whileOn.enabled, 'The card is on');
@@ -290,8 +276,7 @@ private class FieldHistoryServiceTest {
 	static void aRecordThatCannotBeReadHasNoCard() {
 		System.runAs(TestUsers.admin()) {
 			Id missing =
-				Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
-				'000000000009';
+				Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000009';
 			Test.startTest();
 			try {
 				FieldHistoryController.getHistory(missing);
@@ -312,10 +297,9 @@ private class FieldHistoryServiceTest {
 		System.runAs(noAccess) {
 			try {
 				FieldHistoryController.restore(
-					Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getKeyPrefix() + '000000000001',
-					Field_History__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getKeyPrefix() + '000000000001',
+					Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '000000000001',
+					Field_History__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+					'000000000001',
 					'City__c'
 				);
 				Assert.fail('Restore is for admins');

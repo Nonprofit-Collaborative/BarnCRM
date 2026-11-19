@@ -4,9 +4,7 @@
  * so it is never billed twice, and Send, Mark Paid, Void, Print and Export Invoices do what the
  * admin guide says. With Create invoices off, or without Manage Projects, nothing happens.
  */
-@IsTest(
-	testFor='ApexClass:ProjectBilling, ApexClass:ProjectBillingController, ApexClass:ProjectInvoiceDocument'
-)
+@IsTest(testFor='ApexClass:ProjectBilling, ApexClass:ProjectBillingController, ApexClass:ProjectInvoiceDocument')
 private class ProjectBillingTest {
 	@TestSetup
 	static void setup() {
@@ -17,9 +15,7 @@ private class ProjectBillingTest {
 	public static void billing(Boolean turnedOn) {
 		OrgSettingsSystemWriter.save(
 			Projects_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Projects_Settings__c.Billing_Enabled__c => turnedOn
-			}
+			new Map<Schema.SObjectField, Object>{ Projects_Settings__c.Billing_Enabled__c => turnedOn }
 		);
 		SettingsService.clearCaches();
 	}
@@ -69,41 +65,24 @@ private class ProjectBillingTest {
 			insert expense;
 
 			Test.startTest();
-			Id invoiceId = ProjectBillingController.buildInvoice(
-				project.Id,
-				today.addDays(-7),
-				today
-			);
+			Id invoiceId = ProjectBillingController.buildInvoice(project.Id, today.addDays(-7), today);
 			Test.stopTest();
 
 			Project_Invoice__c invoice = [
-				SELECT
-					Status__c,
-					Total__c,
-					Account__c,
-					(SELECT Line_Type__c, Quantity__c FROM Lines__r)
+				SELECT Status__c, Total__c, Account__c, (SELECT Line_Type__c, Quantity__c FROM Lines__r)
 				FROM Project_Invoice__c
 				WHERE Id = :invoiceId
 			];
 			Assert.areEqual('Draft', invoice.Status__c, 'Built as a Draft');
-			Assert.areEqual(
-				3,
-				invoice.Lines__r.size(),
-				'Two Time lines (one per rate) and the expense'
-			);
-			Assert.areEqual(
-				100 * 100 + 2 * 150 + 50,
-				invoice.Total__c,
-				'Hourly Rate when no Bill Rate'
-			);
+			Assert.areEqual(3, invoice.Lines__r.size(), 'Two Time lines (one per rate) and the expense');
+			Assert.areEqual(100 * 100 + 2 * 150 + 50, invoice.Total__c, 'Hourly Rate when no Bill Rate');
 			Assert.areEqual(
 				101,
 				[SELECT COUNT() FROM Time_Entry__c WHERE Invoice_Line__r.Invoice__c = :invoiceId],
 				'Only billable time in the period is marked'
 			);
 			Assert.isNotNull(
-				[SELECT Invoice_Line__c FROM Project_Expense__c WHERE Id = :expense.Id]
-				.Invoice_Line__c,
+				[SELECT Invoice_Line__c FROM Project_Expense__c WHERE Id = :expense.Id].Invoice_Line__c,
 				'The expense is marked'
 			);
 			try {
@@ -174,10 +153,7 @@ private class ProjectBillingTest {
 
 			Database.DeleteResult sent = Database.delete(invoiceId, false);
 			Assert.isFalse(sent.isSuccess(), 'A Sent invoice stays');
-			Assert.isTrue(
-				sent.getErrors()[0].getMessage().contains('Only a Draft'),
-				'Says why and what to do'
-			);
+			Assert.isTrue(sent.getErrors()[0].getMessage().contains('Only a Draft'), 'Says why and what to do');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Time_Entry__c WHERE Invoice_Line__c != NULL],
@@ -211,11 +187,7 @@ private class ProjectBillingTest {
 				Assert.isTrue(expected.getMessage().contains('shorter period'), 'Asks for less');
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Project_Invoice__c], 'No invoice was made');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Time_Entry__c WHERE Invoice_Line__c != NULL],
-				'No time was marked'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Time_Entry__c WHERE Invoice_Line__c != NULL], 'No time was marked');
 		}
 	}
 
@@ -353,12 +325,7 @@ private class ProjectBillingTest {
 					Contact__r.Name,
 					Project__r.Name,
 					(
-						SELECT
-							Description__c,
-							Service_Date__c,
-							Quantity__c,
-							Unit_Price__c,
-							Amount__c
+						SELECT Description__c, Service_Date__c, Quantity__c, Unit_Price__c, Amount__c
 						FROM Lines__r
 					)
 				FROM Project_Invoice__c
@@ -402,11 +369,7 @@ private class ProjectBillingTest {
 			for (String label : ranges.keySet()) {
 				String refused;
 				try {
-					ProjectBillingController.exportInvoices(
-						ranges.get(label)[0],
-						ranges.get(label)[1],
-						null
-					);
+					ProjectBillingController.exportInvoices(ranges.get(label)[0], ranges.get(label)[1], null);
 				} catch (AuraHandledException e) {
 					refused = e.getMessage();
 				}
@@ -436,9 +399,7 @@ private class ProjectBillingTest {
 			Assert.areEqual(true, onProject.get('enabled'), 'Invoices are on');
 			Assert.areEqual(true, onProject.get('canManage'), 'The admin manages projects');
 			Assert.areEqual(
-				ProjectBilling.billingType(
-					[SELECT Billing_Type__c FROM Project__c WHERE Id = :project.Id]
-				),
+				ProjectBilling.billingType([SELECT Billing_Type__c FROM Project__c WHERE Id = :project.Id]),
 				onProject.get('billingType'),
 				'The type the project bills by'
 			);
@@ -459,11 +420,7 @@ private class ProjectBillingTest {
 
 			Assert.areEqual(true, actions.get('enabled'), 'Invoices are on');
 			Assert.areEqual(true, actions.get('canManage'), 'The admin may act');
-			Assert.areEqual(
-				ProjectBilling.DRAFT,
-				actions.get('status'),
-				'A new invoice is a draft'
-			);
+			Assert.areEqual(ProjectBilling.DRAFT, actions.get('status'), 'A new invoice is a draft');
 			Assert.areEqual(200, (Decimal) actions.get('balance'), 'Nothing paid yet');
 		}
 	}
@@ -478,10 +435,7 @@ private class ProjectBillingTest {
 			try {
 				ProjectBillingController.getInvoiceActions(missing);
 			} catch (AuraHandledException e) {
-				failed.put(
-					'actions',
-					e.getMessage() == BarnHelp.text('Projects', 'Projects_Error_Generic')
-				);
+				failed.put('actions', e.getMessage() == BarnHelp.text('Projects', 'Projects_Error_Generic'));
 			}
 			try {
 				ProjectBillingController.sendInvoice(missing);

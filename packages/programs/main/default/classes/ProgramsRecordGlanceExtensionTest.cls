@@ -12,15 +12,11 @@ private class ProgramsRecordGlanceExtensionTest {
 	}
 
 	private static Map<String, Object> view(RecordGlance.Card card) {
-		return card == null
-			? null
-			: (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(card));
+		return card == null ? null : (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(card));
 	}
 
 	private static Contact personWithOneOpenEnrollment() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		Contact ana = HouseholdTestDataFactory.newContact('Ana', 'Glance');
@@ -36,11 +32,7 @@ private class ProgramsRecordGlanceExtensionTest {
 				Start_Date__c = Date.today().addDays(-10),
 				End_Date__c = Date.today().addDays(-5)
 			),
-			new Enrollment__c(
-				Program__c = tutoring.Id,
-				Contact__c = ana.Id,
-				Start_Date__c = Date.today().addDays(-20)
-			)
+			new Enrollment__c(Program__c = tutoring.Id, Contact__c = ana.Id, Start_Date__c = Date.today().addDays(-20))
 		};
 		return ana;
 	}

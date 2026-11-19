@@ -164,9 +164,7 @@ public with sharing class NpspHouseholdAdoptionService {
 	}
 
 	private static String keyOf(String sourceKey) {
-		return sourceKey == NpspHouseholdSource.NPC
-			? NpspHouseholdSource.NPC
-			: NpspHouseholdSource.NPSP;
+		return sourceKey == NpspHouseholdSource.NPC ? NpspHouseholdSource.NPC : NpspHouseholdSource.NPSP;
 	}
 
 	/**
@@ -189,9 +187,7 @@ public with sharing class NpspHouseholdAdoptionService {
 		NpspHouseholdSource source = NpspHouseholdSource.forKey(key);
 		Integer count = source != null && source.available() ? countCandidates(source) : 0;
 		if (count == 0) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt'));
 		}
 		Integer runCount = Math.min(count, RUN_LIMIT);
 		if (confirmedCount == null || runCount > confirmedCount) {
@@ -291,10 +287,7 @@ public with sharing class NpspHouseholdAdoptionService {
 		}
 		Set<Id> ids = new Map<Id, SObject>(
 				Database.queryWithBinds(
-					'SELECT Id FROM Account WHERE ' +
-						condition +
-						' ORDER BY Id LIMIT ' +
-						SAMPLE_SIZE,
+					'SELECT Id FROM Account WHERE ' + condition + ' ORDER BY Id LIMIT ' + SAMPLE_SIZE,
 					source.binds(),
 					AccessLevel.USER_MODE
 				)
@@ -377,9 +370,7 @@ public with sharing class NpspHouseholdAdoptionService {
 	}
 
 	private static void requirePermission() {
-		Boolean allowed = permissionOverride != null
-			? permissionOverride
-			: BarnCRMPermissions.canManageSettings();
+		Boolean allowed = permissionOverride != null ? permissionOverride : BarnCRMPermissions.canManageSettings();
 		if (!allowed) {
 			throw UserErrors.message(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'));
 		}

@@ -119,12 +119,7 @@ public with sharing class FormRunnerController {
 	 * @param filesJson the files for file questions, `{ key: { name, data } }` as JSON, or blank
 	 */
 	@AuraEnabled
-	public static FormSubmitService.Result submit(
-		Id formId,
-		String answersJson,
-		Id contextRecordId,
-		String filesJson
-	) {
+	public static FormSubmitService.Result submit(Id formId, String answersJson, Id contextRecordId, String filesJson) {
 		try {
 			return FormSubmitService.submit(
 				formId,

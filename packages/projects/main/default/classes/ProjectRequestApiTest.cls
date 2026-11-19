@@ -13,10 +13,7 @@ private class ProjectRequestApiTest {
 	}
 
 	private static User intake() {
-		return TestUsers.minimumAccessUserWith(
-			'Intake',
-			new List<String>{ 'Projects_Request_Intake' }
-		);
+		return TestUsers.minimumAccessUserWith('Intake', new List<String>{ 'Projects_Request_Intake' });
 	}
 
 	/** Turns requests on (and outside requests when asked) and connects the caller. */
@@ -24,10 +21,7 @@ private class ProjectRequestApiTest {
 		System.runAs(ProjectsTestData.admin()) {
 			SettingsService.saveValues(
 				'Projects_Settings__c',
-				new Map<String, Object>{
-					'Requests_Enabled__c' => true,
-					'Requests_External_Enabled__c' => external
-				}
+				new Map<String, Object>{ 'Requests_Enabled__c' => true, 'Requests_External_Enabled__c' => external }
 			);
 			insert new Request_Connection__c(
 				Name = 'Partner Org',
@@ -65,9 +59,7 @@ private class ProjectRequestApiTest {
 	}
 
 	private static Map<String, Object> answer() {
-		return (Map<String, Object>) JSON.deserializeUntyped(
-			RestContext.response.responseBody.toString()
-		);
+		return (Map<String, Object>) JSON.deserializeUntyped(RestContext.response.responseBody.toString());
 	}
 
 	@IsTest
@@ -110,11 +102,7 @@ private class ProjectRequestApiTest {
 			Assert.areEqual('Service Request', saved.Type__c, 'Unknown type falls back');
 			Assert.areEqual('High', saved.Priority__c, 'Known priority kept');
 			Assert.isTrue(saved.Description__c.contains('pat@example.org'), 'Who asked');
-			Assert.areEqual(
-				ProjectsTestData.requestsQueueId(),
-				saved.OwnerId,
-				'Lands in the Requests queue'
-			);
+			Assert.areEqual(ProjectsTestData.requestsQueueId(), saved.OwnerId, 'Lands in the Requests queue');
 			Assert.isNotNull(saved.Connection__c, 'Connection linked');
 		}
 	}
@@ -154,11 +142,7 @@ private class ProjectRequestApiTest {
 			Assert.areEqual(400, post('{not json'), 'Not JSON');
 			Assert.areEqual(
 				400,
-				post(
-					JSON.serialize(
-						new Map<String, Object>{ 'orgId' => UserInfo.getOrganizationId() }
-					)
-				),
+				post(JSON.serialize(new Map<String, Object>{ 'orgId' => UserInfo.getOrganizationId() })),
 				'No reference or subject'
 			);
 		}

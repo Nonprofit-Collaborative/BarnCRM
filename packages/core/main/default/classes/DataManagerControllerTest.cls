@@ -19,9 +19,7 @@ private class DataManagerControllerTest {
 					Template_Key__c = 'data_manager_test_' + index,
 					Column_Mapping_JSON__c = ImportTestDataFactory.donorMapping(),
 					Default_Values_JSON__c = '{"version":1,"defaults":[]}',
-					Matching_Rule__c = ImportTemplateService.normalizedRule(
-						ImportTemplateService.RULE_EMAIL
-					),
+					Matching_Rule__c = ImportTemplateService.normalizedRule(ImportTemplateService.RULE_EMAIL),
 					Person_Mode__c = ImportTemplateService.PERSON_MODE_CONTACTS,
 					Is_Package_Default__c = false,
 					Is_Recurring__c = false,
@@ -56,11 +54,7 @@ private class DataManagerControllerTest {
 			DataManagerController.Mapping recurring = byName.get('Mapping 1000');
 			Assert.isTrue(recurring.isRecurring, 'A recurring mapping says so.');
 			Assert.areEqual('Monthly processor export', recurring.sourceName, 'With its source.');
-			Assert.areEqual(
-				Date.today().addDays(-3),
-				recurring.lastImportDate,
-				'And when last used.'
-			);
+			Assert.areEqual(Date.today().addDays(-3), recurring.lastImportDate, 'And when last used.');
 		}
 	}
 
@@ -72,10 +66,7 @@ private class DataManagerControllerTest {
 			rows[1].Target_Object__c = 'Relationship__c';
 			insert rows;
 			DataManagerController.permissionOverride = true;
-			SettingsService.saveSystemValue(
-				'Features_Turned_On__c',
-				FeatureSwitchService.ADDRESSES
-			);
+			SettingsService.saveSystemValue('Features_Turned_On__c', FeatureSwitchService.ADDRESSES);
 
 			Test.startTest();
 			List<DataManagerController.Mapping> whileOff = DataManagerController.getMappings();
@@ -123,8 +114,7 @@ private class DataManagerControllerTest {
 				'A people file with gift columns loads gifts'
 			);
 			Assert.areEqual(
-				Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getLabelPlural(),
+				Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 				loadsByName.get('Mapping 1002'),
 				'A one-object mapping names its object by its label'
 			);
@@ -170,10 +160,7 @@ private class DataManagerControllerTest {
 				DataManagerController.getMappings();
 				Assert.fail('A user without access to the mapping object is refused');
 			} catch (AuraHandledException refused) {
-				Assert.isFalse(
-					String.isBlank(refused.getMessage()),
-					'The screen is given the reason to show'
-				);
+				Assert.isFalse(String.isBlank(refused.getMessage()), 'The screen is given the reason to show');
 			}
 		}
 	}
@@ -188,11 +175,7 @@ private class DataManagerControllerTest {
 			List<DataManagerController.Mapping> mappings = DataManagerController.getMappings();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				mappings.size(),
-				'Without Manage BarnCRM Settings the card is empty.'
-			);
+			Assert.areEqual(0, mappings.size(), 'Without Manage BarnCRM Settings the card is empty.');
 		}
 	}
 

@@ -10,10 +10,7 @@ private class RollupsMigrationKitTest {
 	@TestSetup
 	static void createTestUser() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 		}
 	}
 
@@ -24,9 +21,7 @@ private class RollupsMigrationKitTest {
 	@IsTest
 	static void theCheckAgreesOnlyOnceTheCopyIsOn() {
 		System.runAs(maria()) {
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', COUNT_FIELD) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', COUNT_FIELD) });
 			RollupsMigrationKit kit = new RollupsMigrationKit();
 			Assert.isNull(kit.rows('copy', new List<SObject>()), 'No rows: the step is a tool');
 
@@ -34,8 +29,7 @@ private class RollupsMigrationKitTest {
 			Assert.areEqual(1, before.source, 'One active DLRS rollup');
 			Assert.areEqual(0, before.done, 'No copy yet');
 
-			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Count' }, null)[0]
-				.recordId;
+			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Count' }, null)[0].recordId;
 			Assert.areEqual(0, kit.verify('copy').done, 'A copy that is off does not count');
 
 			RollupDlrsImport.turnOn(copyId, true);
@@ -65,13 +59,11 @@ private class RollupsMigrationKitTest {
 				Assert.areEqual(stepByKit.get(kit.DeveloperName), step.get('key'), 'Its step');
 				Assert.areEqual('tool', step.get('kind'), 'Done in the Rollup Builder');
 				Assert.isFalse(
-					((List<Object>) JSON.deserializeUntyped(kit.Retire_Checklist_JSON__c))
-						.isEmpty(),
+					((List<Object>) JSON.deserializeUntyped(kit.Retire_Checklist_JSON__c)).isEmpty(),
 					'A retire checklist'
 				);
 				Assert.isTrue(
-					Type.forName(kit.Extension_Class__c)
-						.newInstance() instanceof MigrationKitExtension,
+					Type.forName(kit.Extension_Class__c).newInstance() instanceof MigrationKitExtension,
 					'Names this check'
 				);
 			}

@@ -13,10 +13,7 @@ private class SettingDefinitionSelectorTest {
 			List<Setting_Definition__mdt> rows = SettingDefinitionSelector.getAll();
 			Test.stopTest();
 
-			Assert.isNotNull(
-				rows,
-				'The console always gets a list, even in a package with no rows yet'
-			);
+			Assert.isNotNull(rows, 'The console always gets a list, even in a package with no rows yet');
 		}
 	}
 
@@ -44,11 +41,7 @@ private class SettingDefinitionSelectorTest {
 				rows.size(),
 				'Custom metadata cannot be created in a test, so tests supply rows directly'
 			);
-			Assert.areEqual(
-				'Households',
-				rows[0].Section__c,
-				'The row keeps the section it was given'
-			);
+			Assert.areEqual('Households', rows[0].Section__c, 'The row keeps the section it was given');
 		}
 	}
 }

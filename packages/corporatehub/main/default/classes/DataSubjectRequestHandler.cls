@@ -39,9 +39,7 @@ public with sharing class DataSubjectRequestHandler extends TriggerHandler {
 				request.Due_Date__c = due;
 				continue;
 			}
-			Data_Subject_Request__c before = oldById == null
-				? null
-				: (Data_Subject_Request__c) oldById.get(request.Id);
+			Data_Subject_Request__c before = oldById == null ? null : (Data_Subject_Request__c) oldById.get(request.Id);
 			if (
 				before != null &&
 				before.Received_Date__c != null &&

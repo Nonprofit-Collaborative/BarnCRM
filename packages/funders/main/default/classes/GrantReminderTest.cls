@@ -12,10 +12,7 @@ private class GrantReminderTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Grstaff',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Staff' }
-		);
+		TestUsers.standardUserWith('Grstaff', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Staff' });
 	}
 
 	private static User staff() {
@@ -82,11 +79,7 @@ private class GrantReminderTest {
 			RecordingEmailSender stub = new RecordingEmailSender();
 			GrantReminderService.emailSender = stub;
 			Grant__c grant = awardedGrant();
-			Grant_Requirement__c report = GrantTestData.requirement(
-				'Year 1 report',
-				grant.Id,
-				today.addDays(5)
-			);
+			Grant_Requirement__c report = GrantTestData.requirement('Year 1 report', grant.Id, today.addDays(5));
 			report.Assigned_To__c = staffId;
 			insert report;
 
@@ -113,11 +106,7 @@ private class GrantReminderTest {
 			Assert.areEqual(1, stub.received.size(), 'One email');
 			Assert.areEqual(staffId, stub.received[0].getTargetObjectId(), 'To the same person');
 			Assert.isFalse(stub.received[0].getSaveAsActivity(), 'The task is the activity');
-			Assert.areEqual(
-				today.addDays(5),
-				reread(report.Id).Reminder_Sent_For__c,
-				'Stamped with the due date'
-			);
+			Assert.areEqual(today.addDays(5), reread(report.Id).Reminder_Sent_For__c, 'Stamped with the due date');
 		}
 	}
 
@@ -130,26 +119,10 @@ private class GrantReminderTest {
 			Grant__c grant = awardedGrant();
 			Grant_Requirement__c moved = GrantTestData.requirement('Moved', grant.Id, today);
 			moved.Reminder_Sent_For__c = today.addDays(-7);
-			Grant_Requirement__c tooFar = GrantTestData.requirement(
-				'Too far',
-				grant.Id,
-				today.addDays(11)
-			);
-			Grant_Requirement__c overdue = GrantTestData.requirement(
-				'Overdue',
-				grant.Id,
-				today.addDays(-30)
-			);
-			Grant_Requirement__c tooOld = GrantTestData.requirement(
-				'Too old',
-				grant.Id,
-				today.addDays(-31)
-			);
-			Grant_Requirement__c done = GrantTestData.requirement(
-				'Done',
-				grant.Id,
-				today.addDays(2)
-			);
+			Grant_Requirement__c tooFar = GrantTestData.requirement('Too far', grant.Id, today.addDays(11));
+			Grant_Requirement__c overdue = GrantTestData.requirement('Overdue', grant.Id, today.addDays(-30));
+			Grant_Requirement__c tooOld = GrantTestData.requirement('Too old', grant.Id, today.addDays(-31));
+			Grant_Requirement__c done = GrantTestData.requirement('Done', grant.Id, today.addDays(2));
 			done.Status__c = GrantRequirementService.STATUS_SUBMITTED;
 			insert new List<Grant_Requirement__c>{ moved, tooFar, overdue, tooOld, done };
 
@@ -162,10 +135,7 @@ private class GrantReminderTest {
 			Assert.isNull(reread(tooFar.Id).Reminder_Sent_For__c, 'Past the lead time');
 			Assert.isNull(reread(tooOld.Id).Reminder_Sent_For__c, 'Over 30 days late');
 			Assert.areEqual(2, tasks().size(), 'A task each');
-			Assert.isFalse(
-				GrantReminderService.isDue(done, today, 10),
-				'A submitted requirement is never due'
-			);
+			Assert.isFalse(GrantReminderService.isDue(done, today, 10), 'A submitted requirement is never due');
 		}
 	}
 
@@ -180,14 +150,8 @@ private class GrantReminderTest {
 			);
 
 			Test.startTest();
-			Id whenActive = GrantReminderService.recipientFor(
-				requirement,
-				new Set<Id>{ assignee, ownerId }
-			);
-			Id whenInactive = GrantReminderService.recipientFor(
-				requirement,
-				new Set<Id>{ ownerId }
-			);
+			Id whenActive = GrantReminderService.recipientFor(requirement, new Set<Id>{ assignee, ownerId });
+			Id whenInactive = GrantReminderService.recipientFor(requirement, new Set<Id>{ ownerId });
 			Id nobody = GrantReminderService.recipientFor(requirement, new Set<Id>());
 			Test.stopTest();
 
@@ -292,11 +256,7 @@ private class GrantReminderTest {
 			GrantReminderScheduler.jobNameInUse = 'BarnCRM Grant Reminders test';
 			GrantReminderService.emailSender = new RecordingEmailSender();
 			Grant__c grant = awardedGrant();
-			Grant_Requirement__c report = GrantTestData.requirement(
-				'Report',
-				grant.Id,
-				Date.today().addDays(3)
-			);
+			Grant_Requirement__c report = GrantTestData.requirement('Report', grant.Id, Date.today().addDays(3));
 			report.Assigned_To__c = staffId;
 			insert report;
 			List<NightlyStep> steps = new FundersNightlyJobProvider().nightlySteps();
@@ -308,16 +268,9 @@ private class GrantReminderTest {
 			Assert.areEqual(1, steps.size(), 'One step');
 			Assert.areEqual(360, steps[0].minute, 'At six in the morning');
 			Assert.isFalse(steps[0].hasSwitch(), 'No switch of its own');
-			Assert.areEqual(
-				Date.today().addDays(3),
-				reread(report.Id).Reminder_Sent_For__c,
-				'The batch reminded it'
-			);
+			Assert.areEqual(Date.today().addDays(3), reread(report.Id).Reminder_Sent_For__c, 'The batch reminded it');
 			Assert.isTrue(
-				ModuleExtensions.forModule(
-					NightlyStepProvider.class,
-					'Funders'
-				) instanceof FundersNightlyJobProvider,
+				ModuleExtensions.forModule(NightlyStepProvider.class, 'Funders') instanceof FundersNightlyJobProvider,
 				'The catalog registers the provider'
 			);
 		}

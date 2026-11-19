@@ -12,11 +12,7 @@ public with sharing class ServiceDeliveryService {
 	public static final String UNEXCUSED_ABSENCE = 'Unexcused Absence';
 
 	/** The attendance values, in picklist order. */
-	public static final List<String> ATTENDANCE = new List<String>{
-		PRESENT,
-		EXCUSED_ABSENCE,
-		UNEXCUSED_ABSENCE
-	};
+	public static final List<String> ATTENDANCE = new List<String>{ PRESENT, EXCUSED_ABSENCE, UNEXCUSED_ABSENCE };
 
 	/** Whether this attendance is an absence, which delivers nothing (R-SD2). */
 	public static Boolean isAbsence(String attendance) {
@@ -55,8 +51,7 @@ public with sharing class ServiceDeliveryService {
 			// Ordered newest start first, so the first seen wins unless a later one is open.
 			if (
 				current == null ||
-				(!EnrollmentService.isOpen(current.Stage__c) &&
-				EnrollmentService.isOpen(enrollment.Stage__c))
+				(!EnrollmentService.isOpen(current.Stage__c) && EnrollmentService.isOpen(enrollment.Stage__c))
 			) {
 				best.put(key, enrollment);
 			}

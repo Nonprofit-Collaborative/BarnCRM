@@ -21,12 +21,7 @@ private class WhereUsedServiceTest {
 	private class FakeExtension implements WhereUsedExtension {
 		public List<WhereUsedService.Reference> references(WhereUsedService.Target target) {
 			return new List<WhereUsedService.Reference>{
-				new WhereUsedService.Reference(
-						'fake',
-						'Module Things',
-						'Fake ' + target.objectName,
-						null
-					)
+				new WhereUsedService.Reference('fake', 'Module Things', 'Fake ' + target.objectName, null)
 					.addPart('Field')
 			};
 		}
@@ -46,12 +41,7 @@ private class WhereUsedServiceTest {
 	}
 
 	private static Saved_Query__c query(String name, String objectName, String json) {
-		return new Saved_Query__c(
-			Name = name,
-			Object_Name__c = objectName,
-			Query_JSON__c = json,
-			Shared__c = true
-		);
+		return new Saved_Query__c(Name = name, Object_Name__c = objectName, Query_JSON__c = json, Shared__c = true);
 	}
 
 	private static Import_Template__c template(String name, String mapping) {
@@ -66,10 +56,7 @@ private class WhereUsedServiceTest {
 		);
 	}
 
-	private static List<WhereUsedService.Reference> ofKind(
-		WhereUsedService.Result result,
-		String kind
-	) {
+	private static List<WhereUsedService.Reference> ofKind(WhereUsedService.Result result, String kind) {
 		List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
 		for (WhereUsedService.Reference reference : result.references) {
 			if (reference.kind == kind) {
@@ -93,11 +80,7 @@ private class WhereUsedServiceTest {
 		System.runAs(TestUsers.admin()) {
 			noModules();
 			insert as system new List<Saved_Query__c>{
-				query(
-					'Columns',
-					'Contact',
-					'{"version":1,"object":"Contact","fields":["LastName","Email"]}'
-				),
+				query('Columns', 'Contact', '{"version":1,"object":"Contact","fields":["LastName","Email"]}'),
 				query(
 					'Filter',
 					'Contact',
@@ -123,11 +106,7 @@ private class WhereUsedServiceTest {
 					'Account',
 					'{"version":1,"object":"Account","fields":["Name"],"children":[{"relationship":"Contacts","fields":["Email"],"limit":5}]}'
 				),
-				query(
-					'Unrelated',
-					'Contact',
-					'{"version":1,"object":"Contact","fields":["LastName"]}'
-				),
+				query('Unrelated', 'Contact', '{"version":1,"object":"Contact","fields":["LastName"]}'),
 				query('Broken', 'Contact', 'not json')
 			};
 
@@ -138,24 +117,11 @@ private class WhereUsedServiceTest {
 			Assert.areEqual('Contact', result.objectName);
 			Assert.areEqual('Email', result.fieldName, 'The field is named as describe names it.');
 			Assert.isFalse(result.deletable, 'A standard field cannot be deleted.');
+			Assert.areEqual(6, ofKind(result, WhereUsedService.KIND_SAVED_QUERY).size(), 'Every query naming Email.');
+			Assert.areEqual(new List<String>{ System.Label.Core_Find_Columns }, named(result, 'Columns').parts);
+			Assert.areEqual(new List<String>{ System.Label.Core_WhereUsed_PartFilter }, named(result, 'Filter').parts);
 			Assert.areEqual(
-				6,
-				ofKind(result, WhereUsedService.KIND_SAVED_QUERY).size(),
-				'Every query naming Email.'
-			);
-			Assert.areEqual(
-				new List<String>{ System.Label.Core_Find_Columns },
-				named(result, 'Columns').parts
-			);
-			Assert.areEqual(
-				new List<String>{ System.Label.Core_WhereUsed_PartFilter },
-				named(result, 'Filter').parts
-			);
-			Assert.areEqual(
-				new List<String>{
-					System.Label.Core_WhereUsed_PartSort,
-					System.Label.Core_Find_SummaryFunction
-				},
+				new List<String>{ System.Label.Core_WhereUsed_PartSort, System.Label.Core_Find_SummaryFunction },
 				named(result, 'Sort And Summary').parts
 			);
 			Assert.areEqual(
@@ -175,14 +141,8 @@ private class WhereUsedServiceTest {
 			Assert.isNull(named(result, 'Broken'), 'An unreadable document matches nothing.');
 			WhereUsedService.Reference columns = named(result, 'Columns');
 			Assert.areEqual(NamespaceUtil.qualify('Find'), columns.editTab);
-			Assert.areEqual(
-				columns.recordId,
-				columns.editState.get(NamespaceUtil.stateKey('savedQueryId'))
-			);
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedQuery'),
-				columns.breaks
-			);
+			Assert.areEqual(columns.recordId, columns.editState.get(NamespaceUtil.stateKey('savedQueryId')));
+			Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedQuery'), columns.breaks);
 			Assert.areEqual(
 				'/lightning/n/' +
 					NamespaceUtil.qualify('Find') +
@@ -193,11 +153,7 @@ private class WhereUsedServiceTest {
 				columns.editUrl
 			);
 			Assert.areEqual(
-				'/lightning/n/' +
-					NamespaceUtil.qualify('Find') +
-					'?' +
-					NamespaceUtil.stateKey('object') +
-					'=Contact',
+				'/lightning/n/' + NamespaceUtil.qualify('Find') + '?' + NamespaceUtil.stateKey('object') + '=Contact',
 				result.findUrl
 			);
 		}
@@ -215,11 +171,7 @@ private class WhereUsedServiceTest {
 
 			WhereUsedService.Result result = WhereUsedService.find('Affiliation__c', 'Contact__c');
 
-			Assert.areEqual(
-				1,
-				result.references.size(),
-				'Contact__r.Email travels through Contact__c.'
-			);
+			Assert.areEqual(1, result.references.size(), 'Contact__r.Email travels through Contact__c.');
 		}
 	}
 
@@ -265,10 +217,7 @@ private class WhereUsedServiceTest {
 					'People',
 					'{"version":1,"columns":[{"source":"Job","target":"Contact1.Department"},{"source":"Mail","target":"Contact1.Email"}],"defaults":[]}'
 				),
-				template(
-					'Gifts Only',
-					'{"version":1,"columns":[{"source":"Amount","target":"Gift.Amount__c"}]}'
-				)
+				template('Gifts Only', '{"version":1,"columns":[{"source":"Amount","target":"Gift.Amount__c"}]}')
 			};
 			Import_Template__c oneObject = template(
 				'Affiliations',
@@ -277,11 +226,7 @@ private class WhereUsedServiceTest {
 			oneObject.Target_Object__c = 'Affiliation__c';
 			insert as system oneObject;
 			WhereUsedSelector.mergeRulesOverride = new List<Merge_Rule__mdt>{
-				new Merge_Rule__mdt(
-					MasterLabel = 'Department Rule',
-					Field_Name__c = 'Department',
-					Active__c = true
-				)
+				new Merge_Rule__mdt(MasterLabel = 'Department Rule', Field_Name__c = 'Department', Active__c = true)
 			};
 			MatchSourceSelector.allSourcesOverride = new List<Match_Source__mdt>{
 				new Match_Source__mdt(
@@ -299,22 +244,14 @@ private class WhereUsedServiceTest {
 				'A copy source names the field.'
 			);
 			Assert.areEqual(
-				new List<String>{
-					String.format(System.Label.Core_WhereUsed_PartColumn, new List<Object>{ 'Job' })
-				},
+				new List<String>{ String.format(System.Label.Core_WhereUsed_PartColumn, new List<Object>{ 'Job' }) },
 				named(result, 'People').parts
 			);
-			Assert.isNotNull(
-				named(result, 'Affiliations'),
-				'A lookup field names its parent by the field.'
-			);
+			Assert.isNotNull(named(result, 'Affiliations'), 'A lookup field names its parent by the field.');
 			Assert.isNull(named(result, 'Gifts Only'), 'Core does not read a module entity.');
 			Assert.areEqual(1, ofKind(result, WhereUsedService.KIND_MERGE_RULE).size());
 			Assert.areEqual(1, ofKind(result, WhereUsedService.KIND_MATCH_SOURCE).size());
-			Assert.areEqual(
-				NamespaceUtil.qualify('Duplicate_Matching'),
-				named(result, 'By Department').editTab
-			);
+			Assert.areEqual(NamespaceUtil.qualify('Duplicate_Matching'), named(result, 'By Department').editTab);
 		}
 	}
 
@@ -323,11 +260,7 @@ private class WhereUsedServiceTest {
 		System.runAs(TestUsers.admin()) {
 			noModules();
 			WhereUsedSelector.mergeRulesOverride = new List<Merge_Rule__mdt>{
-				new Merge_Rule__mdt(
-					MasterLabel = 'Mailing',
-					Field_Name__c = 'MailingAddress',
-					Active__c = true
-				)
+				new Merge_Rule__mdt(MasterLabel = 'Mailing', Field_Name__c = 'MailingAddress', Active__c = true)
 			};
 
 			WhereUsedService.Result result = WhereUsedService.find('Contact', 'MailingCity');
@@ -387,20 +320,10 @@ private class WhereUsedServiceTest {
 			);
 
 			Assert.areEqual(2, lastName.size(), 'The name pattern and the formal greeting.');
-			Assert.areEqual(
-				2,
-				firstName.size(),
-				'The formal greeting, and the informal one through its default.'
-			);
+			Assert.areEqual(2, firstName.size(), 'The formal greeting, and the informal one through its default.');
 			Assert.areEqual(0, salutation.size(), 'No pattern in use reads the salutation.');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_WhereUsed_BreaksPattern'),
-				lastName[0].breaks
-			);
-			Assert.areEqual(
-				'People and Households',
-				lastName[0].editState.get(NamespaceUtil.stateKey('section'))
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_BreaksPattern'), lastName[0].breaks);
+			Assert.areEqual('People and Households', lastName[0].editState.get(NamespaceUtil.stateKey('section')));
 		}
 	}
 
@@ -414,11 +337,7 @@ private class WhereUsedServiceTest {
 					'Address__c',
 					'{"version":1,"object":"Address__c","fields":["Contact__r.LastName"]}'
 				),
-				query(
-					'Not Contact',
-					'Address__c',
-					'{"version":1,"object":"Address__c","fields":["City__c"]}'
-				)
+				query('Not Contact', 'Address__c', '{"version":1,"object":"Address__c","fields":["City__c"]}')
 			};
 
 			WhereUsedService.Result result = WhereUsedService.find('Contact', null);
@@ -483,10 +402,7 @@ private class WhereUsedServiceTest {
 				WhereUsedController.findReferences('Contact', 'Email');
 				Assert.fail('A person without Manage BarnCRM Settings is refused.');
 			} catch (AuraHandledException expected) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoPermission'),
-					expected.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoPermission'), expected.getMessage());
 			}
 		}
 	}

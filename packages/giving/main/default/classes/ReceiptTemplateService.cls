@@ -43,9 +43,7 @@ public with sharing class ReceiptTemplateService {
 			template = ReceiptSelector.activeTemplate(receiptType);
 		}
 		if (template == null || String.isBlank(template.Body__c)) {
-			throw new ReceiptTemplateException(
-				BarnHelp.text('Giving', 'Giving_Receipt_NoActiveTemplate')
-			);
+			throw new ReceiptTemplateException(BarnHelp.text('Giving', 'Giving_Receipt_NoActiveTemplate'));
 		}
 		return template.Body__c;
 	}
@@ -98,16 +96,10 @@ public with sharing class ReceiptTemplateService {
 			}
 		}
 		if (chosen == null) {
-			throw new ReceiptTemplateException(
-				BarnHelp.text('Giving', 'Giving_Receipt_TemplateNotFound')
-			);
+			throw new ReceiptTemplateException(BarnHelp.text('Giving', 'Giving_Receipt_TemplateNotFound'));
 		}
 		for (Receipt_Template__c template : ReceiptSelector.allTemplates()) {
-			if (
-				template.Id != templateId &&
-				template.Type__c == chosen.Type__c &&
-				template.Active__c
-			) {
+			if (template.Id != templateId && template.Type__c == chosen.Type__c && template.Active__c) {
 				template.Active__c = false;
 				toDeactivate.add(template);
 			}
@@ -121,13 +113,9 @@ public with sharing class ReceiptTemplateService {
 	public static void saveBody(Id templateId, String body) {
 		requireManagePermission();
 		if (String.isBlank(body)) {
-			throw new ReceiptTemplateException(
-				BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate')
-			);
+			throw new ReceiptTemplateException(BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate'));
 		}
-		update as user new List<Receipt_Template__c>{
-			new Receipt_Template__c(Id = templateId, Body__c = body)
-		};
+		update as user new List<Receipt_Template__c>{ new Receipt_Template__c(Id = templateId, Body__c = body) };
 	}
 
 	/**
@@ -142,9 +130,7 @@ public with sharing class ReceiptTemplateService {
 	public static String preview(String receiptType, String body) {
 		requireManagePermission();
 		if (String.isBlank(body)) {
-			throw new ReceiptTemplateException(
-				BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate')
-			);
+			throw new ReceiptTemplateException(BarnHelp.text('Giving', 'Giving_Receipt_EmptyTemplate'));
 		}
 		Date today = Date.today();
 		String donor = Label.Giving_Receipt_PreviewDonor;
@@ -160,13 +146,7 @@ public with sharing class ReceiptTemplateService {
 				body
 			);
 		} else {
-			html = ReceiptContentBuilder.forGift(
-				sampleGift(100, today),
-				donor,
-				sampleNumber,
-				today,
-				body
-			);
+			html = ReceiptContentBuilder.forGift(sampleGift(100, today), donor, sampleNumber, today, body);
 		}
 		return html.substringAfter('<body>').substringBeforeLast('</body>');
 	}
@@ -175,12 +155,7 @@ public with sharing class ReceiptTemplateService {
 
 	/** A cash gift with nothing given in return, held in memory only. */
 	private static Gift__c sampleGift(Decimal amount, Date giftDate) {
-		return new Gift__c(
-			Amount__c = amount,
-			Gift_Date__c = giftDate,
-			Type__c = 'Cash',
-			Status__c = 'Received'
-		);
+		return new Gift__c(Amount__c = amount, Gift_Date__c = giftDate, Type__c = 'Cash', Status__c = 'Received');
 	}
 
 	/**
@@ -195,9 +170,7 @@ public with sharing class ReceiptTemplateService {
 
 	private static void requireManagePermission() {
 		if (!canManageTemplates()) {
-			throw new ReceiptTemplateException(
-				BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission')
-			);
+			throw new ReceiptTemplateException(BarnHelp.text('Giving', 'Giving_Receipt_NoTemplatePermission'));
 		}
 	}
 

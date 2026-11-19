@@ -21,11 +21,7 @@ private class SetupAssistantServiceTest {
 
 			Assert.areEqual(8, steps.size(), 'Core alone ships eight setup steps (ADR-0059, C-30)');
 			for (Integer i = 0; i < steps.size(); i++) {
-				Assert.areEqual(
-					i + 1,
-					steps[i].position,
-					'Steps are numbered in the order Maria works through them'
-				);
+				Assert.areEqual(i + 1, steps[i].position, 'Steps are numbered in the order Maria works through them');
 				Assert.isNotNull(steps[i].label, 'Every step is named in the language Maria uses');
 				Assert.isNotNull(steps[i].description, 'Every step says what it is for');
 				Assert.isNotNull(steps[i].completed, 'Every step says whether it is done');
@@ -49,16 +45,10 @@ private class SetupAssistantServiceTest {
 			Integer before = SetupAssistantService.countCompleted(SetupAssistantService.getSteps());
 
 			Test.startTest();
-			List<SetupAssistantService.Step> afterMarking = SetupAssistantService.markComplete(
-				'modules'
-			);
+			List<SetupAssistantService.Step> afterMarking = SetupAssistantService.markComplete('modules');
 			Test.stopTest();
 
-			Assert.areEqual(
-				before + 1,
-				SetupAssistantService.countCompleted(afterMarking),
-				'One more step is done'
-			);
+			Assert.areEqual(before + 1, SetupAssistantService.countCompleted(afterMarking), 'One more step is done');
 			Assert.isTrue(
 				stepByKey(afterMarking, 'modules').completed,
 				'The step Maria marked is the one that is done'
@@ -151,15 +141,8 @@ private class SetupAssistantServiceTest {
 			SetupAssistantService.markComplete('modules');
 			Test.stopTest();
 
-			Assert.isNotNull(
-				SetupAssistantService.getStartedAt(),
-				'The clock starts at the first change'
-			);
-			Assert.areEqual(
-				0,
-				SetupAssistantService.elapsedMinutes(),
-				'A test finishes setup in under a minute'
-			);
+			Assert.isNotNull(SetupAssistantService.getStartedAt(), 'The clock starts at the first change');
+			Assert.areEqual(0, SetupAssistantService.elapsedMinutes(), 'A test finishes setup in under a minute');
 		}
 	}
 
@@ -175,10 +158,7 @@ private class SetupAssistantServiceTest {
 			List<SetupAssistantService.Step> steps = SetupAssistantService.reset();
 			Test.stopTest();
 
-			Assert.isFalse(
-				stepByKey(steps, 'modules').completed,
-				'A step Maria recorded as done is back on the list'
-			);
+			Assert.isFalse(stepByKey(steps, 'modules').completed, 'A step Maria recorded as done is back on the list');
 			Assert.isFalse(stepByKey(steps, 'data').skipped, 'A skip is forgotten too');
 			Assert.isNull(SetupAssistantService.getStartedAt(), 'So is when setup started');
 			Assert.isTrue(
@@ -286,11 +266,7 @@ private class SetupAssistantServiceTest {
 				'A module step can finish when its setting has a value'
 			);
 			Assert.isTrue(steps[3].advanceOnSave, 'A one question step moves on once answered');
-			Assert.areEqual(
-				'Contact',
-				steps[3].fields[0].objectApiName,
-				'Its picker names its object'
-			);
+			Assert.areEqual('Contact', steps[3].fields[0].objectApiName, 'Its picker names its object');
 		}
 	}
 
@@ -339,11 +315,7 @@ private class SetupAssistantServiceTest {
 			List<SetupAssistantService.Step> steps = SetupAssistantService.getSteps();
 			Test.stopTest();
 
-			Assert.areEqual(
-				8,
-				steps.size(),
-				'A module that throws is left out, and setup still opens'
-			);
+			Assert.areEqual(8, steps.size(), 'A module that throws is left out, and setup still opens');
 		}
 	}
 
@@ -360,10 +332,7 @@ private class SetupAssistantServiceTest {
 		}
 	}
 
-	private static SetupAssistantService.Step stepByKey(
-		List<SetupAssistantService.Step> steps,
-		String key
-	) {
+	private static SetupAssistantService.Step stepByKey(List<SetupAssistantService.Step> steps, String key) {
 		for (SetupAssistantService.Step step : steps) {
 			if (step.key == key) {
 				return step;

@@ -5,9 +5,7 @@
  * ships no Platform Cache partition (ADR-0094). These tests read with
  * no test override, so they see the shipped rows and measure the real cost.
  */
-@IsTest(
-	testFor='ApexClass:AutomationRegistrySelector, ApexClass:SettingDefinitionSelector, ApexClass:SettingsService'
-)
+@IsTest(testFor='ApexClass:AutomationRegistrySelector, ApexClass:SettingDefinitionSelector, ApexClass:SettingsService')
 private class ConfigReadBudgetTest {
 	private static final String STAFF = 'BarnCRM_Staff';
 
@@ -24,9 +22,7 @@ private class ConfigReadBudgetTest {
 
 			Test.startTest();
 			Integer before = Limits.getQueries();
-			List<Automation_Registry__mdt> forContact = AutomationRegistrySelector.selectForObject(
-				'Contact'
-			);
+			List<Automation_Registry__mdt> forContact = AutomationRegistrySelector.selectForObject('Contact');
 			AutomationRegistrySelector.selectForObject('Account');
 			AutomationRegistrySelector.selectForFramework();
 			Integer used = Limits.getQueries() - before;
@@ -62,11 +58,7 @@ private class ConfigReadBudgetTest {
 				Assert.areEqual(entry.Handler_Class__c, free.Handler_Class__c, 'Same handler');
 				Assert.areEqual(entry.Module__c, free.Module__c, 'Same module');
 				Assert.areEqual(entry.Always_Runs__c, free.Always_Runs__c, 'Same always runs');
-				Assert.areEqual(
-					entry.Execution_Order__c,
-					free.Execution_Order__c,
-					'Same execution order'
-				);
+				Assert.areEqual(entry.Execution_Order__c, free.Execution_Order__c, 'Same execution order');
 			}
 		}
 	}
@@ -77,9 +69,7 @@ private class ConfigReadBudgetTest {
 			AutomationRegistrySelector.clearCache();
 
 			Test.startTest();
-			List<Automation_Registry__mdt> forContact = AutomationRegistrySelector.selectForObject(
-				'Contact'
-			);
+			List<Automation_Registry__mdt> forContact = AutomationRegistrySelector.selectForObject('Contact');
 			Test.stopTest();
 
 			for (Integer i = 1; i < forContact.size(); i++) {
@@ -99,9 +89,7 @@ private class ConfigReadBudgetTest {
 
 			Test.startTest();
 			List<Automation_Registry__mdt> framework = AutomationRegistrySelector.selectForFramework();
-			List<Automation_Registry__mdt> forContact = AutomationRegistrySelector.selectForObject(
-				'Contact'
-			);
+			List<Automation_Registry__mdt> forContact = AutomationRegistrySelector.selectForObject('Contact');
 			Test.stopTest();
 
 			Assert.isTrue(framework.isEmpty(), 'A test override replaces the shipped rows');

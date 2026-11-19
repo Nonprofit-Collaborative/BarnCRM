@@ -80,52 +80,31 @@ public with sharing class OpportunityMirrorReconciliation {
 	 */
 	public static Comparison compare(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'));
 		}
 		if (fromDate > toDate) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'));
 		}
 		if (!OpportunityMirrorService.isAvailable()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Unavailable')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_Unavailable'));
 		}
 		// User mode reads of a field the viewer cannot see fail with the platform's own words.
 		if (!Gift__c.Opportunity_Id__c.getDescribe().isAccessible()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoLinkAccess')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoLinkAccess'));
 		}
 		if (!canReadOpportunities()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoOpportunityRead')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoOpportunityRead'));
 		}
-		String opportunityObject = OpportunityMirrorService.opportunityType()
-			.getDescribe()
-			.getName();
+		String opportunityObject = OpportunityMirrorService.opportunityType().getDescribe().getName();
 		// Bound by name in the selector's gift query, as are the dates and statuses.
 		Integer cap = maxRecords + 1;
 		// Each gift can cost a second row for its Opportunity, each won one a check for a gift.
 		if (4 * cap > Limits.getLimitQueryRows() - Limits.getQueryRows()) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany'));
 		}
-		List<SObject> won = OpportunityMirrorSelector.wonInRange(
-			opportunityObject,
-			fromDate,
-			toDate,
-			cap
-		);
+		List<SObject> won = OpportunityMirrorSelector.wonInRange(opportunityObject, fromDate, toDate, cap);
 		if (won.size() > maxRecords) {
-			throw new ReconciliationException(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany')
-			);
+			throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany'));
 		}
 
 		Comparison result = new Comparison();
@@ -144,9 +123,7 @@ public with sharing class OpportunityMirrorReconciliation {
 		// Access mode: user mode, stated as WITH USER_MODE in the selector's query text.
 		for (List<Gift__c> chunk : Database.query(OpportunityMirrorSelector.GIFTS_IN_RANGE_QUERY)) {
 			if (result.giftCount + chunk.size() > maxRecords) {
-				throw new ReconciliationException(
-					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany')
-				);
+				throw new ReconciliationException(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorTooMany'));
 			}
 			for (Gift__c gift : chunk) {
 				result.giftCount++;
@@ -208,8 +185,7 @@ public with sharing class OpportunityMirrorReconciliation {
 
 	/** Whether the viewer can read Opportunities and each field the comparison shows. */
 	private static Boolean canReadOpportunities() {
-		Schema.DescribeSObjectResult opportunity = OpportunityMirrorService.opportunityType()
-			.getDescribe();
+		Schema.DescribeSObjectResult opportunity = OpportunityMirrorService.opportunityType().getDescribe();
 		if (!opportunity.isAccessible()) {
 			return false;
 		}

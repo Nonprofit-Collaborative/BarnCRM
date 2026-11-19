@@ -42,38 +42,23 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			target('SoftCredit.Party', Label.Giving_Import_TargetSoftCreditParty),
 			target('Tribute.Type__c', Label.Giving_Import_TargetTributeType),
 			target('Tribute.Honoree_Name__c', Label.Giving_Import_TargetTributeHonoree),
-			target(
-				'Tribute.Notification_Recipient_Name__c',
-				Label.Giving_Import_TargetTributeNotify
-			),
+			target('Tribute.Notification_Recipient_Name__c', Label.Giving_Import_TargetTributeNotify),
 			target('Tribute.Message__c', Label.Giving_Import_TargetTributeMessage)
 		};
 		if (BrandService.isEnabled()) {
 			// C-47d, after Gift: appeal; offered only while brands are on (R-BR2).
-			result.add(
-				6,
-				target('Gift.Brand', BarnHelp.text('Giving', 'Giving_Import_TargetBrand'))
-			);
+			result.add(6, target('Gift.Brand', BarnHelp.text('Giving', 'Giving_Import_TargetBrand')));
 		}
 		for (Integer index = 1; index <= GiftImportRow.MAX_PARTS; index++) {
 			List<String> partNumber = new List<String>{ String.valueOf(index) };
 			result.add(
-				target(
-					'Allocation.Fund' + index,
-					String.format(Label.Giving_Import_TargetFundPart, partNumber)
-				)
+				target('Allocation.Fund' + index, String.format(Label.Giving_Import_TargetFundPart, partNumber))
 			);
 			result.add(
-				target(
-					'Allocation.Amount' + index,
-					String.format(Label.Giving_Import_TargetAmountPart, partNumber)
-				)
+				target('Allocation.Amount' + index, String.format(Label.Giving_Import_TargetAmountPart, partNumber))
 			);
 			result.add(
-				target(
-					'Allocation.Percent' + index,
-					String.format(Label.Giving_Import_TargetPercentPart, partNumber)
-				)
+				target('Allocation.Percent' + index, String.format(Label.Giving_Import_TargetPercentPart, partNumber))
 			);
 		}
 		return result;
@@ -260,10 +245,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			}
 			Import_Row__c row = item.row;
 			Id person = row.Contact_1__c != null ? row.Contact_1__c : row.Person_1_Account__c;
-			Boolean personComing =
-				dryRun &&
-				person == null &&
-				item.names(ImportMapping.ENTITY_CONTACT_1);
+			Boolean personComing = dryRun && person == null && item.names(ImportMapping.ENTITY_CONTACT_1);
 			Boolean organizationComing =
 				dryRun &&
 				row.Organization__c == null &&
@@ -272,9 +254,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			if (choice == null) {
 				choice = person != null || personComing
 					? GiftImportRow.DONOR_CONTACT_1
-					: row.Organization__c != null || organizationComing
-							? GiftImportRow.DONOR_ORGANIZATION
-							: null;
+					: row.Organization__c != null || organizationComing ? GiftImportRow.DONOR_ORGANIZATION : null;
 			}
 			if (choice == null) {
 				item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorNoDonor');
@@ -289,18 +269,12 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			} else if (choice == GiftImportRow.DONOR_ORGANIZATION) {
 				item.donorAccountId = row.Organization__c;
 				if (row.Organization__c == null && !organizationComing) {
-					item.error = BarnHelp.text(
-						'Giving',
-						'Giving_Import_ErrorDonorOrganizationMissing'
-					);
+					item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorDonorOrganizationMissing');
 				}
 			} else {
 				item.donorAccountId = row.Household__c;
 				if (row.Household__c == null && !personComing) {
-					item.error = BarnHelp.text(
-						'Giving',
-						'Giving_Import_ErrorDonorHouseholdMissing'
-					);
+					item.error = BarnHelp.text('Giving', 'Giving_Import_ErrorDonorHouseholdMissing');
 				}
 			}
 		}
@@ -314,11 +288,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 	 * A row whose external ID names a gift already in the org, or one an earlier row of this
 	 * chunk makes, is that gift: the row is Matched and the gift is not changed.
 	 */
-	private static void matchExternalIds(
-		List<GiftImportRow> gifts,
-		Import_Batch__c batch,
-		Boolean dryRun
-	) {
+	private static void matchExternalIds(List<GiftImportRow> gifts, Import_Batch__c batch, Boolean dryRun) {
 		Id batchId = batch.Id;
 		Set<String> externalIds = new Set<String>();
 		for (GiftImportRow item : gifts) {
@@ -418,11 +388,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 		return result;
 	}
 
-	private static void insertGifts(
-		Import_Batch__c batch,
-		List<GiftImportRow> gifts,
-		Boolean split
-	) {
+	private static void insertGifts(Import_Batch__c batch, List<GiftImportRow> gifts, Boolean split) {
 		if (gifts.isEmpty()) {
 			return;
 		}
@@ -569,10 +535,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 
 	private static void refuseNotApplied(Set<Id> notApplied, Map<Id, GiftImportRow> byGiftId) {
 		for (Id giftId : notApplied) {
-			byGiftId.get(giftId).error = BarnHelp.text(
-				'Giving',
-				'Giving_GiftBatch_ErrorPostFailed'
-			);
+			byGiftId.get(giftId).error = BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorPostFailed');
 		}
 	}
 
@@ -616,11 +579,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			}
 		}
 		if (!unfinished.isEmpty()) {
-			List<Database.DeleteResult> results = Database.delete(
-				unfinished,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.DeleteResult> results = Database.delete(unfinished, false, AccessLevel.USER_MODE);
 			// Logged together, in one statement; a failed result carries no Id, so the gift's.
 			List<Exception> failed = new List<Exception>();
 			List<Id> ids = new List<Id>();
@@ -688,9 +647,7 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			} else if (GiftPostingLock.isLocked(gift, closed)) {
 				keep.put(gift.Id, BarnHelp.text('Giving', 'Giving_Import_UndoKeptClosedPeriod'));
 			} else if (gift.Gift_Date__c != null) {
-				donorIds.add(
-					gift.Donor_Contact__c != null ? gift.Donor_Contact__c : gift.Donor_Account__c
-				);
+				donorIds.add(gift.Donor_Contact__c != null ? gift.Donor_Contact__c : gift.Donor_Account__c);
 				years.add(gift.Gift_Date__c.year());
 			}
 		}
@@ -699,21 +656,12 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 			return;
 		}
 		Set<String> covered = new Set<String>();
-		for (
-			Receipt__c statement : GiftImportIntegritySelector.selectIssuedStatements(
-				donorIds,
-				years
-			)
-		) {
-			Id donor = statement.Donor_Contact__c != null
-				? statement.Donor_Contact__c
-				: statement.Donor_Account__c;
+		for (Receipt__c statement : GiftImportIntegritySelector.selectIssuedStatements(donorIds, years)) {
+			Id donor = statement.Donor_Contact__c != null ? statement.Donor_Contact__c : statement.Donor_Account__c;
 			covered.add(donor + ':' + statement.Statement_Year__c.intValue());
 		}
 		for (Gift__c gift : gifts) {
-			Id donor = gift.Donor_Contact__c != null
-				? gift.Donor_Contact__c
-				: gift.Donor_Account__c;
+			Id donor = gift.Donor_Contact__c != null ? gift.Donor_Contact__c : gift.Donor_Account__c;
 			if (
 				!keep.containsKey(gift.Id) &&
 				gift.Gift_Date__c != null &&
@@ -730,19 +678,10 @@ public with sharing class GiftImportProcessor implements ImportEntityProcessor {
 	 */
 	private static void keepDonorsOfKeptGifts(Map<Id, String> keep, Id batchId, Set<Id> recordIds) {
 		Set<Id> named = new Set<Id>();
-		for (
-			Gift__c gift : GiftImportIntegritySelector.selectImportedGiftsNaming(batchId, recordIds)
-		) {
-			named.addAll(
-				new List<Id>{ gift.Donor_Contact__c, gift.Donor_Account__c, gift.Household__c }
-			);
+		for (Gift__c gift : GiftImportIntegritySelector.selectImportedGiftsNaming(batchId, recordIds)) {
+			named.addAll(new List<Id>{ gift.Donor_Contact__c, gift.Donor_Account__c, gift.Household__c });
 		}
-		for (
-			Soft_Credit__c credit : GiftImportIntegritySelector.selectImportedCreditsNaming(
-				batchId,
-				recordIds
-			)
-		) {
+		for (Soft_Credit__c credit : GiftImportIntegritySelector.selectImportedCreditsNaming(batchId, recordIds)) {
 			named.addAll(new List<Id>{ credit.Contact__c, credit.Account__c });
 		}
 		for (Id recordId : named) {

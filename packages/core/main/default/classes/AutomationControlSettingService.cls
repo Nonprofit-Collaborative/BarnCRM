@@ -121,11 +121,7 @@ public with sharing class AutomationControlSettingService {
 		BarnCRM_Automation_Control__c stored = stored(owner);
 		Boolean targetPause = pauseAll == true;
 		Boolean targetBypass = bypass == true;
-		if (
-			stored != null &&
-			stored.Pause_All__c == targetPause &&
-			stored.Bypass__c == targetBypass
-		) {
+		if (stored != null && stored.Pause_All__c == targetPause && stored.Bypass__c == targetBypass) {
 			return;
 		}
 		BarnCRM_Automation_Control__c changed = stored == null
@@ -212,9 +208,7 @@ public with sharing class AutomationControlSettingService {
 			for (SObject flow : flows) {
 				String apiName = (String) flow.get('ApiName');
 				if (!listedNames.contains((FLOW_PREFIX + apiName).toLowerCase())) {
-					options.add(
-						new Option(apiName, (String) flow.get('Label') + ' (' + apiName + ')')
-					);
+					options.add(new Option(apiName, (String) flow.get('Label') + ' (' + apiName + ')'));
 				}
 			}
 		} catch (Exception unreadable) {
@@ -251,11 +245,7 @@ public with sharing class AutomationControlSettingService {
 			automationName,
 			(String) found[0].get('Label'),
 			(String) found[0].get('TriggerObjectOrEventLabel'),
-			BarnHelp.text(
-				'Core',
-				'Core_AutomationControl_OwnFlowDescription',
-				new List<Object>{ automationName }
-			)
+			BarnHelp.text('Core', 'Core_AutomationControl_OwnFlowDescription', new List<Object>{ automationName })
 		);
 		SettingsService.logChange('Automation: ' + automationName, null, 'Listed');
 	}
@@ -296,9 +286,7 @@ public with sharing class AutomationControlSettingService {
 		List<AsyncApexJob> running = [
 			SELECT Id
 			FROM AsyncApexJob
-			WHERE
-				ApexClass.Name IN :CATCH_UP_CLASSES
-				AND Status IN ('Holding', 'Queued', 'Preparing', 'Processing')
+			WHERE ApexClass.Name IN :CATCH_UP_CLASSES AND Status IN ('Holding', 'Queued', 'Preparing', 'Processing')
 			WITH SYSTEM_MODE
 			LIMIT 1
 		];
@@ -325,9 +313,7 @@ public with sharing class AutomationControlSettingService {
 
 	private static void requirePermission() {
 		if (!AutomationControl.canManage()) {
-			throw new AutomationControl.AutomationControlException(
-				Label.Core_Automation_NoPermission
-			);
+			throw new AutomationControl.AutomationControlException(Label.Core_Automation_NoPermission);
 		}
 	}
 
@@ -401,13 +387,7 @@ public with sharing class AutomationControlSettingService {
 		return kind == User.SObjectType ? LEVEL_USER : LEVEL_ORGANIZATION;
 	}
 
-	private static ControlRow row(
-		Id owner,
-		String name,
-		String level,
-		Boolean pauseAll,
-		Boolean bypass
-	) {
+	private static ControlRow row(Id owner, String name, String level, Boolean pauseAll, Boolean bypass) {
 		ControlRow shown = new ControlRow();
 		shown.ownerId = owner;
 		shown.ownerName = name;

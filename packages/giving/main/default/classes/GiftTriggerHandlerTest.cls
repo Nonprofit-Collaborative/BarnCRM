@@ -125,11 +125,7 @@ private class GiftTriggerHandlerTest {
 				FROM Gift__c
 				WHERE Id = :gift.Id
 			];
-			System.assertEquals(
-				person.Id,
-				saved.Donor_Account__c,
-				'A person held as an account is a donor account.'
-			);
+			System.assertEquals(person.Id, saved.Donor_Account__c, 'A person held as an account is a donor account.');
 			System.assertEquals(
 				HouseholdService.getHouseholdIdsFor(new Set<Id>{ person.Id }).get(person.Id),
 				saved.Household__c,
@@ -302,13 +298,11 @@ private class GiftTriggerHandlerTest {
 			System.assertEquals(
 				null,
 				[SELECT Receipt_Number__c FROM Gift__c WHERE Id = :gift.Id].Receipt_Number__c,
-				'Neither value was saved, so the gift is still unreceipted and Issue Receipt can ' +
-				'still receipt it.'
+				'Neither value was saved, so the gift is still unreceipted and Issue Receipt can ' + 'still receipt it.'
 			);
 			System.assert(
 				message.contains('receipt number'),
-				'A receipt number comes from the sequence, never from a person typing one in: ' +
-				message
+				'A receipt number comes from the sequence, never from a person typing one in: ' + message
 			);
 		}
 	}

@@ -153,9 +153,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 	 */
 	@TestVisible
 	private static Boolean mayGrantOutsideInstall(Id installerId) {
-		return installerId != null &&
-			installerId == UserInfo.getUserId() &&
-			AccessService.canAssignPermissionSets();
+		return installerId != null && installerId == UserInfo.getUserId() && AccessService.canAssignPermissionSets();
 	}
 
 	/**
@@ -194,11 +192,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		scheduleTabAccessCheck();
 		alignSeasonalAddresses();
 		scheduleNightlyRunOnANewInstall(isNewInstall);
-		ShippedDefaultUpgrades.apply(
-			ModuleSetups.CORE,
-			BarnCRM_Settings__c.SObjectType,
-			SHIPPED_ON_ADDED_IN_UPGRADES
-		);
+		ShippedDefaultUpgrades.apply(ModuleSetups.CORE, BarnCRM_Settings__c.SObjectType, SHIPPED_ON_ADDED_IN_UPGRADES);
 		ModuleSetups.markRan(ModuleSetups.CORE);
 		if (installerId == null) {
 			return;
@@ -317,10 +311,7 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		return [
 			SELECT COUNT()
 			FROM Error_Log__c
-			WHERE
-				(Context__c LIKE :pattern
-				OR Context__c = :moduleSetups)
-				AND Status__c = :statusNew
+			WHERE (Context__c LIKE :pattern OR Context__c = :moduleSetups) AND Status__c = :statusNew
 			WITH USER_MODE
 			LIMIT :readUpTo
 		];

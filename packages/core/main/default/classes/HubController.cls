@@ -139,9 +139,7 @@ public with sharing class HubController {
 		HomeModel model = new HomeModel();
 		model.canCreateHousehold = HouseholdWriter.canCreateHouseholds();
 		model.canCreatePerson = Schema.SObjectType.Contact.isCreateable();
-		model.canImport =
-			ModuleDetectionService.isImportPresent() &&
-			Schema.SObjectType.Import_Batch__c.isCreateable();
+		model.canImport = ModuleDetectionService.isImportPresent() && Schema.SObjectType.Import_Batch__c.isCreateable();
 		model.quickLinks = readQuickLinks();
 		model.canEdit = BarnCRMPermissions.canManageSettings();
 		model.automationPaused = readAutomationPaused();
@@ -183,9 +181,7 @@ public with sharing class HubController {
 				if (off.contains(row.DeveloperName.toLowerCase())) {
 					continue;
 				}
-				for (
-					String entry : (row.Quick_Links__c == null ? '' : row.Quick_Links__c).split(';')
-				) {
+				for (String entry : (row.Quick_Links__c == null ? '' : row.Quick_Links__c).split(';')) {
 					QuickLink link = quickLink(entry);
 					if (link != null) {
 						links.add(link);
@@ -253,18 +249,9 @@ public with sharing class HubController {
 			return null;
 		}
 		Map<String, String> lines = new Map<String, String>{
-			'Core_HubHome_QuickLinkEnterGiftLine' => BarnHelp.text(
-				'Core',
-				'Core_HubHome_QuickLinkEnterGiftLine'
-			),
-			'Core_HubHome_QuickLinkLogHoursLine' => BarnHelp.text(
-				'Core',
-				'Core_HubHome_QuickLinkLogHoursLine'
-			),
-			'Core_HubHome_QuickLinkEnrollLine' => BarnHelp.text(
-				'Core',
-				'Core_HubHome_QuickLinkEnrollLine'
-			)
+			'Core_HubHome_QuickLinkEnterGiftLine' => BarnHelp.text('Core', 'Core_HubHome_QuickLinkEnterGiftLine'),
+			'Core_HubHome_QuickLinkLogHoursLine' => BarnHelp.text('Core', 'Core_HubHome_QuickLinkLogHoursLine'),
+			'Core_HubHome_QuickLinkEnrollLine' => BarnHelp.text('Core', 'Core_HubHome_QuickLinkEnrollLine')
 		};
 		return lines.containsKey(value) ? lines.get(value) : value;
 	}
@@ -284,9 +271,7 @@ public with sharing class HubController {
 		link.label = parts[1].trim();
 		link.line = parts.size() > 2 ? lineFor(parts[2].trim()) : null;
 		if (target.endsWith(NEW_RECORD)) {
-			Schema.DescribeSObjectResult described = NamespaceUtil.describe(
-				target.removeEnd(NEW_RECORD)
-			);
+			Schema.DescribeSObjectResult described = NamespaceUtil.describe(target.removeEnd(NEW_RECORD));
 			if (described == null || !described.isCreateable()) {
 				return null;
 			}
@@ -346,9 +331,7 @@ public with sharing class HubController {
 			model.seasonalAddressLastRun = SeasonalAddressService.lastRun();
 			model.seasonalAddressLastRunSummary = SeasonalAddressService.lastRunSummary();
 			model.seasonalAddressScheduled = SeasonalAddressScheduler.isScheduled();
-			model.seasonalAddressStale = SeasonalAddressService.isStale(
-				model.seasonalAddressScheduled
-			);
+			model.seasonalAddressStale = SeasonalAddressService.isStale(model.seasonalAddressScheduled);
 		} catch (Exception e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 			model.seasonalAddressScheduled = false;
@@ -392,9 +375,7 @@ public with sharing class HubController {
 			model.newErrorCountCapped = newErrors > errorCountCap;
 			model.newErrorCount = Math.min(newErrors, errorCountCap);
 			Integer installProblems = CorePostInstall.countInstallProblemsUpTo(errorCountCap);
-			model.installProblemCount = installProblems == null
-				? null
-				: Math.min(installProblems, errorCountCap);
+			model.installProblemCount = installProblems == null ? null : Math.min(installProblems, errorCountCap);
 		} catch (Exception e) {
 			ErrorLogger.log(e, ERROR_CONTEXT);
 			model.newErrorCount = 0;

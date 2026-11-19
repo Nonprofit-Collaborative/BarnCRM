@@ -45,10 +45,7 @@ private class HouseholdDependentsExtensionsTest {
 	}
 
 	private static void askRegisteredClasses() {
-		Set<Id> asked = new Set<Id>{
-			FakeIds.of(Account.SObjectType, 1),
-			FakeIds.of(Account.SObjectType, 2)
-		};
+		Set<Id> asked = new Set<Id>{ FakeIds.of(Account.SObjectType, 1), FakeIds.of(Account.SObjectType, 2) };
 		Test.startTest();
 		HouseholdDependentsExtensions.EXTENSION_CLASSES.clear();
 		HouseholdDependentsExtensions.EXTENSION_CLASSES.add('ExtensionFakeWorks');
@@ -152,10 +149,7 @@ private class HouseholdDependentsExtensionsTest {
 			HouseholdService.deleteEmptyHouseholds(new Map<Id, Account>(households).keySet());
 			Test.stopTest();
 
-			Set<Id> remaining = new Map<Id, Account>(
-					[SELECT Id FROM Account WHERE Id IN :households]
-				)
-				.keySet();
+			Set<Id> remaining = new Map<Id, Account>([SELECT Id FROM Account WHERE Id IN :households]).keySet();
 			Assert.areEqual(credited, remaining, 'Exactly the credited households are kept');
 		}
 	}

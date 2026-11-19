@@ -84,8 +84,7 @@ public with sharing class PaymentStripe {
 					new Map<String, String>{
 						'mode' => 'setup',
 						'customer' => customerId,
-						'currency' => (PaymentService.settings().Currency__c ?? 'USD')
-							.toLowerCase(),
+						'currency' => (PaymentService.settings().Currency__c ?? 'USD').toLowerCase(),
 						'success_url' => back,
 						'cancel_url' => back,
 						'metadata[barncrm_subscription]' => subscriptionId
@@ -122,9 +121,7 @@ public with sharing class PaymentStripe {
 			List<String> pairs = new List<String>();
 			for (String key : form.keySet()) {
 				pairs.add(
-					EncodingUtil.urlEncode(key, 'UTF-8') +
-						'=' +
-						EncodingUtil.urlEncode(form.get(key) ?? '', 'UTF-8')
+					EncodingUtil.urlEncode(key, 'UTF-8') + '=' + EncodingUtil.urlEncode(form.get(key) ?? '', 'UTF-8')
 				);
 			}
 			request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -158,16 +155,13 @@ public with sharing class PaymentStripe {
 		if (String.isBlank(eventId) || !eventId.startsWith('evt_')) {
 			return null;
 		}
-		HttpResponse response = new Http()
-			.send(request('GET', 'events/' + EncodingUtil.urlEncode(eventId, 'UTF-8')));
+		HttpResponse response = new Http().send(request('GET', 'events/' + EncodingUtil.urlEncode(eventId, 'UTF-8')));
 		Map<String, Object> body = parse(response.getBody());
 		if (response.getStatusCode() == 404) {
 			return null;
 		}
 		if (response.getStatusCode() != 200 || text(body.get('id')) != eventId) {
-			throw new CalloutException(
-				'Stripe answered ' + response.getStatusCode() + ': ' + errorOf(body)
-			);
+			throw new CalloutException('Stripe answered ' + response.getStatusCode() + ': ' + errorOf(body));
 		}
 		return body;
 	}
@@ -200,10 +194,7 @@ public with sharing class PaymentStripe {
 		PaymentService.Outcome outcome = new PaymentService.Outcome(event);
 		Map<String, Object> body = fetch(text(parse(event.Payload__c).get('id')));
 		if (body == null) {
-			return outcome.nothing(
-				'Rejected',
-				BarnHelp.text('Payments', 'Payments_Event_NotFoundAtStripe')
-			);
+			return outcome.nothing('Rejected', BarnHelp.text('Payments', 'Payments_Event_NotFoundAtStripe'));
 		}
 		event.Event_Key__c = 'stripe:' + text(body.get('id'));
 		event.Event_Type__c = text(body.get('type'))?.left(100);
@@ -213,8 +204,7 @@ public with sharing class PaymentStripe {
 		String type = text(body.get('type'));
 		PaymentService.Change change = new PaymentService.Change();
 		change.reference = text(metadata.get('barncrm_reference'));
-		Datetime eventTime = body.get('created') instanceof Long ||
-			body.get('created') instanceof Integer
+		Datetime eventTime = body.get('created') instanceof Long || body.get('created') instanceof Integer
 			? Datetime.newInstance(Long.valueOf(String.valueOf(body.get('created'))) * 1000)
 			: null;
 		if (type != null && type.startsWith('checkout.session.')) {
@@ -231,11 +221,9 @@ public with sharing class PaymentStripe {
 		if (type != null && type.startsWith('invoice.')) {
 			// Older API versions name the subscription on the invoice, newer ones under parent.
 			Map<String, Object> details = mapOf(
-				mapOf(obj.get('parent')).get('subscription_details') ??
-					obj.get('subscription_details')
+				mapOf(obj.get('parent')).get('subscription_details') ?? obj.get('subscription_details')
 			);
-			change.subscriptionId = text(obj.get('subscription')) ??
-				text(details.get('subscription'));
+			change.subscriptionId = text(obj.get('subscription')) ?? text(details.get('subscription'));
 			change.reference = text(mapOf(details.get('metadata')).get('barncrm_reference'));
 			if (change.subscriptionId == null) {
 				return outcome;
@@ -245,10 +233,7 @@ public with sharing class PaymentStripe {
 			when 'invoice.paid' {
 				// Newer API versions put no payment intent on the invoice: its own id stands in.
 				change.processorPaymentId = text(obj.get('payment_intent')) ?? text(obj.get('id'));
-				change.amount = PaymentService.fromMinorUnits(
-					obj.get('amount_paid'),
-					text(obj.get('currency'))
-				);
+				change.amount = PaymentService.fromMinorUnits(obj.get('amount_paid'), text(obj.get('currency')));
 				change.status = PaymentService.PAID;
 				change.paidAt = eventTime;
 				change.subscriptionEvent = PaymentService.CHARGE_SUCCEEDED;
@@ -329,11 +314,7 @@ public with sharing class PaymentStripe {
 		change.subscriptionEvent = PaymentService.CARD_UPDATED;
 		Map<String, Object> card = mapOf(method.get('card'));
 		if (card.get('exp_year') instanceof Integer && card.get('exp_month') instanceof Integer) {
-			change.cardExpires = Date.newInstance(
-					(Integer) card.get('exp_year'),
-					(Integer) card.get('exp_month'),
-					1
-				)
+			change.cardExpires = Date.newInstance((Integer) card.get('exp_year'), (Integer) card.get('exp_month'), 1)
 				.addMonths(1)
 				.addDays(-1);
 		}
@@ -349,9 +330,7 @@ public with sharing class PaymentStripe {
 	}
 
 	public static Map<String, Object> mapOf(Object value) {
-		return value instanceof Map<String, Object>
-			? (Map<String, Object>) value
-			: new Map<String, Object>();
+		return value instanceof Map<String, Object> ? (Map<String, Object>) value : new Map<String, Object>();
 	}
 
 	public static String text(Object value) {

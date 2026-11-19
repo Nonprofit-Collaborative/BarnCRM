@@ -7,9 +7,7 @@
  * Duplicate dismissals stand for an org's own object, as in `ImportObjectLoaderTest`. Every test
  * runs as a minimal-profile user holding only BarnCRM Admin.
  */
-@IsTest(
-	testFor='ApexClass:ImportRowFilter, ApexClass:ImportMapping, ApexClass:ImportProcessorBatch'
-)
+@IsTest(testFor='ApexClass:ImportRowFilter, ApexClass:ImportMapping, ApexClass:ImportProcessorBatch')
 private class ImportRowRulesTest {
 	static {
 		DataProtectedFields.ordinaryForTest.add('duplicate_dismissal__c');
@@ -71,9 +69,7 @@ private class ImportRowRulesTest {
 		System.runAs(TestUsers.admin()) {
 			System.runAs(admin()) {
 				ImportMapping mapping = new ImportMapping();
-				mapping.skipRows = new List<ImportMapping.SkipRule>{
-					rule('Status', 'equals', 'cancelled')
-				};
+				mapping.skipRows = new List<ImportMapping.SkipRule>{ rule('Status', 'equals', 'cancelled') };
 				mapping.uniqueBy = new List<String>{ 'Email' };
 				Import_Batch__c batch = batchWith(mapping, ImportObjectSchema.OPERATION_UPSERT);
 
@@ -106,9 +102,7 @@ private class ImportRowRulesTest {
 				Assert.isTrue(repeat.Error_Message__c.contains('Email'), repeat.Error_Message__c);
 
 				Integer read = 0;
-				Database.QueryLocatorIterator rows = new ImportProcessorBatch(batch.Id, true)
-					.start(null)
-					.iterator();
+				Database.QueryLocatorIterator rows = new ImportProcessorBatch(batch.Id, true).start(null).iterator();
 				while (rows.hasNext()) {
 					Import_Row__c row = (Import_Row__c) rows.next();
 					Assert.areNotEqual(ImportRowProcessor.STATUS_SKIPPED, row.Status__c);
@@ -124,10 +118,7 @@ private class ImportRowRulesTest {
 					null
 				);
 				Assert.areEqual(0, finished.Rows_Rejected__c, 'Skipped is not rejected.');
-				Assert.isTrue(
-					finished.Run_Log__c.contains(String.valueOf(MANY - 45)),
-					finished.Run_Log__c
-				);
+				Assert.isTrue(finished.Run_Log__c.contains(String.valueOf(MANY - 45)), finished.Run_Log__c);
 			}
 		}
 	}
@@ -184,9 +175,7 @@ private class ImportRowRulesTest {
 			ImportMapping next = ImportMapping.parse(
 				ImportController.suggestMapping(template.Id, new List<String>{ 'Id', 'Reason' })
 			);
-			Assert.isTrue(
-				next.columns[0].transforms == null || next.columns[0].transforms.isEmpty()
-			);
+			Assert.isTrue(next.columns[0].transforms == null || next.columns[0].transforms.isEmpty());
 			Assert.areEqual(1, next.columns[1].transforms.size());
 			Assert.areEqual('trim', next.columns[1].transforms[0].op);
 
@@ -219,11 +208,7 @@ private class ImportRowRulesTest {
 		return ImportTemplateSelector.selectById(template.Id);
 	}
 
-	private static ImportRowProcessor.Outcome load(
-		Import_Template__c template,
-		Import_Batch__c batch,
-		Boolean dryRun
-	) {
+	private static ImportRowProcessor.Outcome load(Import_Template__c template, Import_Batch__c batch, Boolean dryRun) {
 		ImportBatchService.beginPass(batch.Id);
 		return ImportRowProcessor.process(
 			ImportBatchSelector.selectById(batch.Id),
@@ -303,14 +288,7 @@ private class ImportRowRulesTest {
 				Integer total = ImportUndoService.preview(batch.Id).total;
 				Datetime undoStartedAt = Datetime.now();
 				for (String pass : ImportUndoBatch.passes()) {
-					ImportUndoBatch job = new ImportUndoBatch(
-						batch.Id,
-						total,
-						pass,
-						0,
-						false,
-						undoStartedAt
-					);
+					ImportUndoBatch job = new ImportUndoBatch(batch.Id, total, pass, 0, false, undoStartedAt);
 					Database.QueryLocatorIterator records = job.start(null).iterator();
 					while (records.hasNext()) {
 						job.execute(null, new List<SObject>{ records.next() });

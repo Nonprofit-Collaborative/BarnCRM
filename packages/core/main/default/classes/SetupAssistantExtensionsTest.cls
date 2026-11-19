@@ -14,9 +14,7 @@ private class SetupAssistantExtensionsTest {
 	static void aClassThatIsNotInTheOrgIsNoExtension() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			SetupAssistantExtension found = SetupAssistantExtensions.resolve(
-				'NoSuchSetupAssistantExtensionC29'
-			);
+			SetupAssistantExtension found = SetupAssistantExtensions.resolve('NoSuchSetupAssistantExtensionC29');
 			Test.stopTest();
 
 			Assert.isNull(found, 'A module that is not installed contributes nothing');
@@ -28,9 +26,7 @@ private class SetupAssistantExtensionsTest {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
 			// A real class with a no-argument constructor that does not implement the interface.
-			SetupAssistantExtension found = SetupAssistantExtensions.resolve(
-				'SetupAssistantExtensions'
-			);
+			SetupAssistantExtension found = SetupAssistantExtensions.resolve('SetupAssistantExtensions');
 			Test.stopTest();
 
 			Assert.isNull(found, 'Only a class that implements the interface is used');
@@ -41,16 +37,11 @@ private class SetupAssistantExtensionsTest {
 	static void aClassThatImplementsTheInterfaceIsFound() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();
-			SetupAssistantExtension found = SetupAssistantExtensions.resolve(
-				'SetupAssistantTestExtension'
-			);
+			SetupAssistantExtension found = SetupAssistantExtensions.resolve('SetupAssistantTestExtension');
 			Test.stopTest();
 
 			Assert.isNotNull(found, 'An installed extension is built by its class name');
-			Assert.isTrue(
-				found instanceof SetupAssistantTestExtension,
-				'The class named is the class built'
-			);
+			Assert.isTrue(found instanceof SetupAssistantTestExtension, 'The class named is the class built');
 		}
 	}
 

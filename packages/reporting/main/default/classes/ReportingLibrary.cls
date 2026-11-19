@@ -27,10 +27,7 @@ public with sharing class ReportingLibrary {
 	public static final String DASHBOARD = 'barndash';
 	public static final String SAVE_PERMISSION = 'Reporting_Save';
 	private static final Set<String> KINDS = new Set<String>{ REPORT, DASHBOARD };
-	private static final Map<String, String> SHARE_TYPES = new Map<String, String>{
-		'view' => 'V',
-		'edit' => 'C'
-	};
+	private static final Map<String, String> SHARE_TYPES = new Map<String, String>{ 'view' => 'V', 'edit' => 'C' };
 	private static final Integer MAX_DEFINITION = 1000000;
 	private static final Integer MAX_PEOPLE = 500;
 
@@ -89,10 +86,7 @@ public with sharing class ReportingLibrary {
 	public static Map<String, Object> load(Id documentId) {
 		try {
 			ContentVersion version = latest(documentId);
-			Map<String, Object> row = describe(
-				version,
-				myShareTypes(new List<ContentVersion>{ version })
-			);
+			Map<String, Object> row = describe(version, myShareTypes(new List<ContentVersion>{ version }));
 			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
 				version.VersionData.toString()
 			);
@@ -112,12 +106,7 @@ public with sharing class ReportingLibrary {
 	 * `share` changes them). Returns the saved row.
 	 */
 	@AuraEnabled
-	public static Map<String, Object> save(
-		String kind,
-		Id documentId,
-		String title,
-		String definitionJson
-	) {
+	public static Map<String, Object> save(String kind, Id documentId, String title, String definitionJson) {
 		try {
 			requireSave();
 			Map<String, Object> definition = parse(kind, title, definitionJson);
@@ -134,14 +123,9 @@ public with sharing class ReportingLibrary {
 				.ContentDocumentId;
 			} else {
 				ContentVersion current = latest(documentId);
-				Map<String, Object> row = describe(
-					current,
-					myShareTypes(new List<ContentVersion>{ current })
-				);
+				Map<String, Object> row = describe(current, myShareTypes(new List<ContentVersion>{ current }));
 				if (current.FileExtension != kind || row.get('canEdit') != true) {
-					throw new ReportingLibraryException(
-						BarnHelp.text('Reporting', 'Reporting_Error_NoEdit')
-					);
+					throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_NoEdit'));
 				}
 				Object sharing = sharingOf(current);
 				if (sharing != null) {
@@ -166,9 +150,7 @@ public with sharing class ReportingLibrary {
 			requireSave();
 			ContentVersion current = latest(documentId);
 			if (current.ContentDocument.OwnerId != UserInfo.getUserId()) {
-				throw new ReportingLibraryException(
-					BarnHelp.text('Reporting', 'Reporting_Error_OwnerOnly')
-				);
+				throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_OwnerOnly'));
 			}
 			Object sharing = JSON.deserializeUntyped(sharingJson);
 			Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
@@ -190,9 +172,7 @@ public with sharing class ReportingLibrary {
 			requireSave();
 			ContentVersion current = latest(documentId);
 			if (current.ContentDocument.OwnerId != UserInfo.getUserId()) {
-				throw new ReportingLibraryException(
-					BarnHelp.text('Reporting', 'Reporting_Error_OwnerOnly')
-				);
+				throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_OwnerOnly'));
 			}
 			delete as user new ContentDocument(Id = documentId);
 		} catch (Exception e) {
@@ -217,13 +197,7 @@ public with sharing class ReportingLibrary {
 				ORDER BY Name
 				LIMIT 20
 			]) {
-				found.add(
-					new Map<String, Object>{
-						'id' => person.Id,
-						'name' => person.Name,
-						'kind' => 'user'
-					}
-				);
+				found.add(new Map<String, Object>{ 'id' => person.Id, 'name' => person.Name, 'kind' => 'user' });
 			}
 			for (Group publicGroup : [
 				SELECT Id, Name
@@ -234,11 +208,7 @@ public with sharing class ReportingLibrary {
 				LIMIT 20
 			]) {
 				found.add(
-					new Map<String, Object>{
-						'id' => publicGroup.Id,
-						'name' => publicGroup.Name,
-						'kind' => 'group'
-					}
+					new Map<String, Object>{ 'id' => publicGroup.Id, 'name' => publicGroup.Name, 'kind' => 'group' }
 				);
 			}
 			return found;
@@ -281,9 +251,7 @@ public with sharing class ReportingLibrary {
 		wanted.keySet().retainAll(active);
 		wanted.remove(UserInfo.getUserId());
 		if (wanted.size() > MAX_PEOPLE) {
-			throw new ReportingLibraryException(
-				BarnHelp.text('Reporting', 'Reporting_Error_TooManyPeople')
-			);
+			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_TooManyPeople'));
 		}
 		List<ContentDocumentLink> removed = new List<ContentDocumentLink>();
 		List<ContentDocumentLink> changed = new List<ContentDocumentLink>();
@@ -330,9 +298,7 @@ public with sharing class ReportingLibrary {
 			Id entryId = Id.valueOf(String.valueOf(item.get('id')));
 			String shareType = SHARE_TYPES.get(String.valueOf(item.get('access')));
 			if (entryId.getSObjectType() != kind || shareType == null) {
-				throw new ReportingLibraryException(
-					BarnHelp.text('Reporting', 'Reporting_Error_Definition')
-				);
+				throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_Definition'));
 			}
 			grant(shares, entryId, shareType);
 		}
@@ -348,9 +314,7 @@ public with sharing class ReportingLibrary {
 	/** Saving, sharing and deleting need the Advanced Reporting Staff or Admin permission set. */
 	private static void requireSave() {
 		if (!FeatureManagement.checkPermission(SAVE_PERMISSION)) {
-			throw new ReportingLibraryException(
-				BarnHelp.text('Reporting', 'Reporting_Error_NoSave')
-			);
+			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_NoSave'));
 		}
 	}
 
@@ -364,24 +328,15 @@ public with sharing class ReportingLibrary {
 			parsed = null;
 		}
 		if (!KINDS.contains(kind) || !(parsed instanceof Map<String, Object>)) {
-			throw new ReportingLibraryException(
-				BarnHelp.text('Reporting', 'Reporting_Error_Definition')
-			);
+			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_Definition'));
 		}
 		if (String.isBlank(title) || title.trim().length() > 255) {
-			throw new ReportingLibraryException(
-				BarnHelp.text('Reporting', 'Reporting_Error_Title')
-			);
+			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_Title'));
 		}
 		return (Map<String, Object>) parsed;
 	}
 
-	private static ContentVersion newVersion(
-		Id documentId,
-		String kind,
-		String title,
-		Map<String, Object> definition
-	) {
+	private static ContentVersion newVersion(Id documentId, String kind, String title, Map<String, Object> definition) {
 		return new ContentVersion(
 			ContentDocumentId = documentId,
 			Title = title.trim(),
@@ -408,16 +363,13 @@ public with sharing class ReportingLibrary {
 			LIMIT 1
 		];
 		if (found.isEmpty()) {
-			throw new ReportingLibraryException(
-				BarnHelp.text('Reporting', 'Reporting_Error_NotFound')
-			);
+			throw new ReportingLibraryException(BarnHelp.text('Reporting', 'Reporting_Error_NotFound'));
 		}
 		return found[0];
 	}
 
 	private static Object sharingOf(ContentVersion version) {
-		return ((Map<String, Object>) JSON.deserializeUntyped(version.VersionData.toString()))
-			.get('sharing');
+		return ((Map<String, Object>) JSON.deserializeUntyped(version.VersionData.toString())).get('sharing');
 	}
 
 	/** The person's own link type for each file: V viewer, C collaborator, I owner or inferred. */
@@ -441,10 +393,7 @@ public with sharing class ReportingLibrary {
 		return types;
 	}
 
-	private static Map<String, Object> describe(
-		ContentVersion version,
-		Map<Id, String> shareTypes
-	) {
+	private static Map<String, Object> describe(ContentVersion version, Map<Id, String> shareTypes) {
 		Boolean mine = version.ContentDocument.OwnerId == UserInfo.getUserId();
 		String shareType = shareTypes.get(version.ContentDocumentId);
 		return new Map<String, Object>{

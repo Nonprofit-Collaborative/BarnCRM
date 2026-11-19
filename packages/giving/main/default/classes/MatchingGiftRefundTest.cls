@@ -41,9 +41,7 @@ private class MatchingGiftRefundTest {
 				[SELECT Status__c FROM Gift__c WHERE Id = :data.employerGift.Id].Status__c,
 				'The whole match has gone back, so R-G3 moves the employer gift off Received.'
 			);
-			List<Soft_Credit__c> onEmployerGift = RecognitionTestData.creditsFor(
-				data.employerGift.Id
-			);
+			List<Soft_Credit__c> onEmployerGift = RecognitionTestData.creditsFor(data.employerGift.Id);
 			Assert.areEqual(
 				1,
 				onEmployerGift.size(),
@@ -107,9 +105,7 @@ private class MatchingGiftRefundTest {
 
 			Test.startTest();
 			RollupService.ensureDefaults();
-			RollupService.runFullRecalculation(
-				definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT })
-			);
+			RollupService.runFullRecalculation(definitionsFor(new Set<String>{ KEY_TOTAL, KEY_COUNT }));
 			Test.stopTest();
 
 			Contact recalculated = [
@@ -156,8 +152,7 @@ private class MatchingGiftRefundTest {
 			Assert.areEqual(
 				-500,
 				RecognitionTestData.creditsFor(writeOffId)[0].Amount__c,
-				'Money the organization never collected recognizes nobody, so the whole credit is ' +
-				'reversed.'
+				'Money the organization never collected recognizes nobody, so the whole credit is ' + 'reversed.'
 			);
 		}
 	}
@@ -173,11 +168,7 @@ private class MatchingGiftRefundTest {
 			Setup data = setUp();
 
 			Test.startTest();
-			Id refundId = GiftService.refund(
-				data.employerGift.Id,
-				500,
-				'Sent to the wrong charity'
-			);
+			Id refundId = GiftService.refund(data.employerGift.Id, 500, 'Sent to the wrong charity');
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -233,11 +224,7 @@ private class MatchingGiftRefundTest {
 			Setup data = setUp();
 			match(data.employeeGift.Id, data.employerGift.Id);
 			Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
-			Assert.areEqual(
-				1,
-				RecognitionTestData.creditsFor(refundId).size(),
-				'The reversal is there to be removed.'
-			);
+			Assert.areEqual(1, RecognitionTestData.creditsFor(refundId).size(), 'The reversal is there to be removed.');
 
 			Test.startTest();
 			match(data.employerGift.Id, null);

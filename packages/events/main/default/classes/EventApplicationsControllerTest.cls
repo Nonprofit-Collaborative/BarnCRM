@@ -3,9 +3,7 @@
  * score them, the best is accepted (the applicant becomes a speaker and gets the accepted notice
  * the settings name) and the other is declined (EV-06, R-SA1 to R-SA5).
  */
-@IsTest(
-	testFor='ApexClass:EventApplicationsController, ApexClass:EventsSettings, ApexClass:EventKeyHandler'
-)
+@IsTest(testFor='ApexClass:EventApplicationsController, ApexClass:EventsSettings, ApexClass:EventKeyHandler')
 private class EventApplicationsControllerTest {
 	@TestSetup
 	static void createTestUser() {
@@ -30,9 +28,7 @@ private class EventApplicationsControllerTest {
 	}
 
 	private static Speaker_Application__c application(Event__c event, String title, String email) {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = title, Email = email)
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = title, Email = email));
 		insert as user person;
 		Speaker_Application__c record = new Speaker_Application__c(
 			Event__c = event.Id,
@@ -80,18 +76,12 @@ private class EventApplicationsControllerTest {
 			EventApplicationsController.saveReview(weak.Id, 2, 'Thin', null);
 			EventApplicationsController.saveReview(strong.Id, 5, 'Great', null);
 			EventApplicationsController.saveReview(strong.Id, 4, 'Great, a little long', null);
-			EventApplicationsController.Applications result = EventApplicationsController.getApplications(
-				event.Id
-			);
+			EventApplicationsController.Applications result = EventApplicationsController.getApplications(event.Id);
 			Test.stopTest();
 
 			Assert.areEqual(2, result.applications.size(), 'Two applications');
 			Assert.areEqual('Strong', result.applications[0].name, 'Best average first');
-			Assert.areEqual(
-				1,
-				result.applications[0].reviewCount,
-				'A second save replaces the first'
-			);
+			Assert.areEqual(1, result.applications[0].reviewCount, 'A second save replaces the first');
 			Assert.areEqual(4, result.applications[0].myScore, 'The latest score is mine');
 			Assert.areEqual('In Review', result.applications[0].status, 'A review moves it along');
 			Assert.areEqual(4, result.applications[0].averageScore, 'Average of one score');
@@ -137,11 +127,7 @@ private class EventApplicationsControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual('Accepted', decision.status, 'Accepted');
-			Assert.areEqual(
-				EventApplicationsController.NOTICE_SENT,
-				decision.notice,
-				'Notice sent'
-			);
+			Assert.areEqual(EventApplicationsController.NOTICE_SENT, decision.notice, 'Notice sent');
 			Assert.areEqual(1, sender.received.size(), 'One email');
 			Assert.areEqual(talk.Id, sender.received[0].getWhatId(), 'Merged with the application');
 			Event_Speaker__c speaker = [
@@ -166,10 +152,7 @@ private class EventApplicationsControllerTest {
 		System.runAs(staff()) {
 			Event__c event = conference();
 			Speaker_Application__c talk = application(event, 'Talk', 'a@example.org');
-			Event_Speaker__c existing = new Event_Speaker__c(
-				Event__c = event.Id,
-				Contact__c = talk.Contact__c
-			);
+			Event_Speaker__c existing = new Event_Speaker__c(Event__c = event.Id, Contact__c = talk.Contact__c);
 			insert as user existing;
 
 			Test.startTest();
@@ -182,11 +165,7 @@ private class EventApplicationsControllerTest {
 
 			Assert.areEqual(existing.Id, decision.speakerId, 'The existing speaker is linked');
 			Assert.areEqual(1, [SELECT COUNT() FROM Event_Speaker__c], 'No second speaker');
-			Assert.areEqual(
-				EventApplicationsController.NOTICE_NONE,
-				decision.notice,
-				'No notice asked'
-			);
+			Assert.areEqual(EventApplicationsController.NOTICE_NONE, decision.notice, 'No notice asked');
 		}
 	}
 
@@ -207,11 +186,7 @@ private class EventApplicationsControllerTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				EventApplicationsController.NOTICE_SENT,
-				decision.notice,
-				'Notice sent'
-			);
+			Assert.areEqual(EventApplicationsController.NOTICE_SENT, decision.notice, 'Notice sent');
 			Assert.areEqual(1, sender.received.size(), 'One email');
 			Assert.areEqual(0, [SELECT COUNT() FROM Event_Speaker__c], 'No speaker made');
 		}
@@ -228,18 +203,13 @@ private class EventApplicationsControllerTest {
 
 			Test.startTest();
 			chooseTemplates(null, 'No_Such_Template');
-			String unknown = EventApplicationsController.decide(missing.Id, 'Declined', true)
-				.notice;
+			String unknown = EventApplicationsController.decide(missing.Id, 'Declined', true).notice;
 			makeTemplate('Speaker_Declined');
 			chooseTemplates(null, 'Speaker_Declined');
 			String blank = EventApplicationsController.decide(noEmail.Id, 'Declined', true).notice;
 			Test.stopTest();
 
-			Assert.areEqual(
-				EventApplicationsController.NOTICE_UNKNOWN_TEMPLATE,
-				unknown,
-				'Template not found'
-			);
+			Assert.areEqual(EventApplicationsController.NOTICE_UNKNOWN_TEMPLATE, unknown, 'Template not found');
 			Assert.areEqual(EventApplicationsController.NOTICE_NO_EMAIL, blank, 'No email address');
 			Assert.areEqual(0, sender.received.size(), 'Nothing sent');
 			Assert.areEqual(
@@ -258,24 +228,14 @@ private class EventApplicationsControllerTest {
 	@IsTest
 	static void theSpeakerNoticesShipWithTemplatesAndTheyAreTheDefaults() {
 		System.runAs(staff()) {
-			Assert.areEqual(
-				'BarnCRM_Speaker_Accepted',
-				EventsSettings.acceptNoticeTemplate(),
-				'Accepted'
-			);
-			Assert.areEqual(
-				'BarnCRM_Speaker_Declined',
-				EventsSettings.declineNoticeTemplate(),
-				'Declined'
-			);
+			Assert.areEqual('BarnCRM_Speaker_Accepted', EventsSettings.acceptNoticeTemplate(), 'Accepted');
+			Assert.areEqual('BarnCRM_Speaker_Declined', EventsSettings.declineNoticeTemplate(), 'Declined');
 			Assert.areEqual(
 				2,
 				[
 					SELECT COUNT()
 					FROM EmailTemplate
-					WHERE
-						DeveloperName IN ('BarnCRM_Speaker_Accepted', 'BarnCRM_Speaker_Declined')
-						AND IsActive = TRUE
+					WHERE DeveloperName IN ('BarnCRM_Speaker_Accepted', 'BarnCRM_Speaker_Declined') AND IsActive = TRUE
 				],
 				'Both shipped templates are in the org'
 			);

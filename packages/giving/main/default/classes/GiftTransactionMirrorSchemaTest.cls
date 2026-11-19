@@ -22,14 +22,8 @@ private class GiftTransactionMirrorSchemaTest {
 			Assert.isFalse(GiftTransactionMirrorSchema.isAvailable());
 			Assert.isNull(GiftTransactionMirrorSchema.objectName());
 			Assert.isFalse(GiftTransactionMirrorSchema.canRead(GiftTransactionMirrorSchema.read()));
-			Assert.isFalse(
-				GiftTransactionMirrorSchema.canCreate(
-					GiftTransactionMirrorSchema.requiredToCreate()
-				)
-			);
-			Assert.isFalse(
-				GiftTransactionMirrorSchema.canUpdate(GiftTransactionMirrorSchema.compared())
-			);
+			Assert.isFalse(GiftTransactionMirrorSchema.canCreate(GiftTransactionMirrorSchema.requiredToCreate()));
+			Assert.isFalse(GiftTransactionMirrorSchema.canUpdate(GiftTransactionMirrorSchema.compared()));
 			Assert.isTrue(GiftTransactionMirrorSchema.creatable().isEmpty());
 			Assert.isFalse(GiftTransactionMirrorSchema.isActiveStatus('Paid'));
 			Assert.isFalse(GiftTransactionMirrorSchema.hasOptional('Name'));
@@ -47,22 +41,13 @@ private class GiftTransactionMirrorSchemaTest {
 			Assert.areEqual(Gift__c.SObjectType, GiftTransactionMirrorSchema.objectType());
 			Assert.areEqual(names.transactionObject, GiftTransactionMirrorSchema.objectName());
 			Assert.isTrue(GiftTransactionMirrorSchema.canRead(GiftTransactionMirrorSchema.read()));
-			Assert.isTrue(
-				GiftTransactionMirrorSchema.canCreate(
-					GiftTransactionMirrorSchema.requiredToCreate()
-				)
-			);
-			Assert.isTrue(
-				GiftTransactionMirrorSchema.canUpdate(GiftTransactionMirrorSchema.compared())
-			);
+			Assert.isTrue(GiftTransactionMirrorSchema.canCreate(GiftTransactionMirrorSchema.requiredToCreate()));
+			Assert.isTrue(GiftTransactionMirrorSchema.canUpdate(GiftTransactionMirrorSchema.compared()));
 
 			Set<String> creatable = GiftTransactionMirrorSchema.creatable();
 			Assert.isTrue(creatable.containsAll(GiftTransactionMirrorSchema.requiredToCreate()));
 			Assert.isFalse(creatable.contains('Name'), 'A numbered name is never written.');
-			Assert.isTrue(
-				creatable.containsAll(names.createdAlso.keySet()),
-				'The stand-in values are written too.'
-			);
+			Assert.isTrue(creatable.containsAll(names.createdAlso.keySet()), 'The stand-in values are written too.');
 
 			Assert.isTrue(GiftTransactionMirrorSchema.isActiveStatus('Received'));
 			Assert.isFalse(GiftTransactionMirrorSchema.isActiveStatus('Settled'));
@@ -72,8 +57,7 @@ private class GiftTransactionMirrorSchemaTest {
 			Assert.isTrue(GiftTransactionMirrorSchema.canWriteDesignations(), 'R-GT5.');
 			Assert.areEqual(Fund__c.SObjectType, GiftTransactionMirrorSchema.designationType());
 			Assert.areEqual(
-				Gift_Allocation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getName(),
+				Gift_Allocation__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName(),
 				GiftTransactionMirrorSchema.linkObjectName()
 			);
 		}

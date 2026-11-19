@@ -80,23 +80,14 @@ private class EventVolunteerExtensionsTest {
 	static void aModuleListsAndCreates() {
 		System.runAs(TestUsers.admin()) {
 			Recording module = new Recording();
-			register(
-				new Map<String, EventVolunteerExtension>{
-					WORKS => (EventVolunteerExtension) module
-				}
-			);
+			register(new Map<String, EventVolunteerExtension>{ WORKS => (EventVolunteerExtension) module });
 			Assert.isTrue(EventVolunteerExtensions.isAvailable());
 			List<EventVolunteerJob> jobs = EventVolunteerExtensions.jobsFor('a01000000000001');
 			Assert.areEqual(1, jobs.size());
 			Assert.areEqual(4, jobs[0].shifts[0].needed);
 			EventVolunteerExtensions.createJob('a01000000000001', 'Setup', 'Chairs');
 			Assert.areEqual('a01000000000001', module.createdFor);
-			EventVolunteerExtensions.createShift(
-				UserInfo.getUserId(),
-				Datetime.now(),
-				Datetime.now().addHours(1),
-				2
-			);
+			EventVolunteerExtensions.createShift(UserInfo.getUserId(), Datetime.now(), Datetime.now().addHours(1), 2);
 			Assert.areEqual(1, module.shiftsMade);
 		}
 	}

@@ -43,11 +43,7 @@ public with sharing class FieldAccessRecordJob implements Queueable {
 		job.undoing = false;
 		job.setCount = plan.setCount;
 		job.definition = JSON.serialize(
-			new Map<String, Object>{
-				'version' => 1,
-				'change' => plan.document,
-				'confirmedCount' => confirmedCount
-			}
+			new Map<String, Object>{ 'version' => 1, 'change' => plan.document, 'confirmedCount' => confirmedCount }
 		);
 		System.enqueueJob(job);
 	}
@@ -80,9 +76,7 @@ public with sharing class FieldAccessRecordJob implements Queueable {
 		Import_Batch__c job = new Import_Batch__c(
 			Operation__c = FieldAccessService.OPERATION_ACCESS,
 			Operation_JSON__c = definition,
-			Status__c = changed > 0
-				? ImportBatchService.STATUS_COMPLETE
-				: ImportBatchService.STATUS_FAILED,
+			Status__c = changed > 0 ? ImportBatchService.STATUS_COMPLETE : ImportBatchService.STATUS_FAILED,
 			Is_Dry_Run__c = false,
 			Row_Count__c = changed + refused,
 			Rows_Created__c = 0,
@@ -95,13 +89,7 @@ public with sharing class FieldAccessRecordJob implements Queueable {
 			Undo_Deadline__c = startedAt.addDays(ImportBatchService.undoWindowDays()),
 			Run_Log__c = String.format(
 				BarnHelp.text('Core', 'Core_FieldAccess_LogApplied'),
-				new List<Object>{
-					byName,
-					startedAt.format(),
-					changed.format(),
-					setCount.format(),
-					refused.format()
-				}
+				new List<Object>{ byName, startedAt.format(), changed.format(), setCount.format(), refused.format() }
 			)
 		);
 		Database.insert(job, AccessLevel.SYSTEM_MODE);
@@ -122,13 +110,7 @@ public with sharing class FieldAccessRecordJob implements Queueable {
 			: ImportBatchService.STATUS_UNDONE;
 		String line = String.format(
 			BarnHelp.text('Core', 'Core_FieldAccess_LogUndone'),
-			new List<Object>{
-				byName,
-				startedAt.format(),
-				changed.format(),
-				kept.format(),
-				refused.format()
-			}
+			new List<Object>{ byName, startedAt.format(), changed.format(), kept.format(), refused.format() }
 		);
 		job.Run_Log__c = String.isBlank(job.Run_Log__c) ? line : job.Run_Log__c + '\n' + line;
 		Database.update(job, AccessLevel.SYSTEM_MODE);

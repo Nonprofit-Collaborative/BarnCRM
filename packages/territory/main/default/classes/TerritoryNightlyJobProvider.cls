@@ -19,13 +19,7 @@ public with sharing class TerritoryNightlyJobProvider implements NightlyStepProv
 
 	/** The step as BarnCRM's nightly run lists it, with a switch that ships off. */
 	public static NightlyStep step() {
-		return new NightlyStep(
-				JOB_NAME,
-				BarnHelp.text('Territory', 'Territory_Nightly_StepName'),
-				5,
-				45,
-				new Assign()
-			)
+		return new NightlyStep(JOB_NAME, BarnHelp.text('Territory', 'Territory_Nightly_StepName'), 5, 45, new Assign())
 			.withSwitch(false);
 	}
 

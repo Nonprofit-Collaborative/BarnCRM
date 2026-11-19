@@ -5,9 +5,7 @@
  * unpublished event has no page, and the list shows upcoming public events (EV-16, R-EV5;
  * ADR-0190 public event pages). Health Check reports a public event that cannot be shown.
  */
-@IsTest(
-	testFor='ApexClass:EventPublicPage, ApexClass:EventsHealthCheckExtension, ApexClass:EventsSettings'
-)
+@IsTest(testFor='ApexClass:EventPublicPage, ApexClass:EventsHealthCheckExtension, ApexClass:EventsSettings')
 private class EventPublicPageTest {
 	// Any record identifier stands for the form: Events never reads it.
 	private static final String FORM_KEY = 'a0B000000000001';
@@ -54,12 +52,7 @@ private class EventPublicPageTest {
 				Active__c = true,
 				Sort_Order__c = 2
 			),
-			new Ticket_Type__c(
-				Event__c = record.Id,
-				Name = 'Retired Ticket',
-				Price__c = 10,
-				Active__c = false
-			)
+			new Ticket_Type__c(Event__c = record.Id, Name = 'Retired Ticket', Price__c = 10, Active__c = false)
 		};
 		Contact pat = TestDataFactory.person(
 			new Contact(FirstName = 'Pat', LastName = 'Lee', Email = 'pat@example.org')
@@ -176,9 +169,7 @@ private class EventPublicPageTest {
 
 			List<Object> agenda = (List<Object>) section(page, 'agenda').get('items');
 			Assert.areEqual(1, agenda.size());
-			Assert.isTrue(
-				String.valueOf(((Map<String, Object>) agenda[0]).get('badges')).contains('Pat Lee')
-			);
+			Assert.isTrue(String.valueOf(((Map<String, Object>) agenda[0]).get('badges')).contains('Pat Lee'));
 			List<Object> speakers = (List<Object>) section(page, 'speakers').get('items');
 			Assert.areEqual(1, speakers.size());
 			Assert.areEqual('Pat Lee', ((Map<String, Object>) speakers[0]).get('title'));
@@ -194,10 +185,7 @@ private class EventPublicPageTest {
 
 			Assert.isNull(section(page, 'speakers'), 'Speakers not published');
 			Assert.isFalse(JSON.serialize(page).contains('Pat'), 'No speaker names at all');
-			Map<String, Object> general = (Map<String, Object>) ((List<Object>) section(
-					page,
-					'tickets'
-				)
+			Map<String, Object> general = (Map<String, Object>) ((List<Object>) section(page, 'tickets')
 				.get('items'))[0];
 			Assert.isTrue(((List<Object>) general.get('badges')).isEmpty(), 'No seats shown');
 		}
@@ -214,10 +202,7 @@ private class EventPublicPageTest {
 			event.Status__c = 'Draft';
 			update as user event;
 			Assert.isNull(pages.page(event.Id), 'Draft events have no page');
-			Assert.isTrue(
-				((List<Object>) pages.listPage().get('items')).isEmpty(),
-				'Draft events are not listed'
-			);
+			Assert.isTrue(((List<Object>) pages.listPage().get('items')).isEmpty(), 'Draft events are not listed');
 
 			event.Status__c = 'Open';
 			update as user event;

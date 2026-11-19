@@ -58,10 +58,7 @@ public class PaymentsTestData {
 			}
 			if (request.getEndpoint().startsWith(PaymentStripe.ENDPOINT + 'events/')) {
 				String stored = storedStripeEvent(
-					EncodingUtil.urlDecode(
-						request.getEndpoint().substringAfterLast('/events/'),
-						'UTF-8'
-					)
+					EncodingUtil.urlDecode(request.getEndpoint().substringAfterLast('/events/'), 'UTF-8')
 				);
 				if (stored != null) {
 					response.setStatusCode(200);
@@ -119,12 +116,7 @@ public class PaymentsTestData {
 		return payment;
 	}
 
-	public static Payment_Event__c event(
-		String processor,
-		String key,
-		String payload,
-		String headers
-	) {
+	public static Payment_Event__c event(String processor, String key, String payload, String headers) {
 		Payment_Event__c event = new Payment_Event__c(
 			Processor__c = processor,
 			Status__c = 'Received',
@@ -150,9 +142,7 @@ public class PaymentsTestData {
 
 	/** A PayPal event body. */
 	public static String payPalEvent(String id, String type, Map<String, Object> resource) {
-		return JSON.serialize(
-			new Map<String, Object>{ 'id' => id, 'event_type' => type, 'resource' => resource }
-		);
+		return JSON.serialize(new Map<String, Object>{ 'id' => id, 'event_type' => type, 'resource' => resource });
 	}
 
 	public static String payPalHeaders() {

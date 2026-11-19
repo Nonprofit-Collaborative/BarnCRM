@@ -71,9 +71,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 	/** Saves a Running snapshot of the chosen items and queues the snapshot job. */
 	public static Id start(List<Item> chosen) {
 		if (chosen == null || chosen.isEmpty() || chosen.size() > MAX_ITEMS) {
-			throw new DeactivationException(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems')
-			);
+			throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems'));
 		}
 		refuseWhileRunning();
 		List<Item> items = new List<Item>();
@@ -85,9 +83,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			item.name = each.name;
 			item.objectName = each.objectName;
 			if (!isValidItem(item)) {
-				throw new DeactivationException(
-					BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems')
-				);
+				throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_ChooseItems'));
 			}
 			items.add(item);
 		}
@@ -97,10 +93,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			Items__c = JSON.serialize(items)
 		);
 		insert as user snapshot;
-		AsyncStarter.queue(
-			new OrgAutomationDeactivation(snapshot.Id, MODE_SNAPSHOT),
-			'OrgAutomationDeactivation'
-		);
+		AsyncStarter.queue(new OrgAutomationDeactivation(snapshot.Id, MODE_SNAPSHOT), 'OrgAutomationDeactivation');
 		return snapshot.Id;
 	}
 
@@ -114,24 +107,17 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			(snapshot.Status__c != 'Done' &&
 			snapshot.Status__c != 'Partial')
 		) {
-			throw new DeactivationException(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_CannotRestore')
-			);
+			throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_CannotRestore'));
 		}
 		snapshot.Status__c = 'Restoring';
 		update as user snapshot;
-		AsyncStarter.queue(
-			new OrgAutomationDeactivation(snapshot.Id, MODE_RESTORE),
-			'OrgAutomationDeactivation'
-		);
+		AsyncStarter.queue(new OrgAutomationDeactivation(snapshot.Id, MODE_RESTORE), 'OrgAutomationDeactivation');
 		return snapshot.Id;
 	}
 
 	/** A flow definition (300) or validation rule (03d) Id of the kind named. */
 	private static Boolean isValidItem(Item item) {
-		String prefix = item.kind == KIND_FLOW
-			? '300'
-			: (item.kind == KIND_VALIDATION ? '03d' : null);
+		String prefix = item.kind == KIND_FLOW ? '300' : (item.kind == KIND_VALIDATION ? '03d' : null);
 		return prefix != null &&
 			item.recordId != null &&
 			Pattern.matches('[a-zA-Z0-9]{15}([a-zA-Z0-9]{3})?', item.recordId) &&
@@ -146,9 +132,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			WITH USER_MODE
 		];
 		if (running > 0) {
-			throw new DeactivationException(
-				BarnHelp.text('Core', 'Core_AutomationDeactivate_AlreadyRunning')
-			);
+			throw new DeactivationException(BarnHelp.text('Core', 'Core_AutomationDeactivate_AlreadyRunning'));
 		}
 	}
 
@@ -184,10 +168,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 		// A test cannot chain a queued job: it runs each job itself.
 		if (more && !Test.isRunningTest()) {
 			System.enqueueJob(
-				new OrgAutomationDeactivation(
-					snapshotId,
-					mode == MODE_RESTORE ? MODE_RESTORE : MODE_APPLY
-				)
+				new OrgAutomationDeactivation(snapshotId, mode == MODE_RESTORE ? MODE_RESTORE : MODE_APPLY)
 			);
 		}
 	}
@@ -247,8 +228,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 			return BarnHelp.text('Core', 'Core_AutomationDeactivate_NotFound');
 		}
 		Boolean barnFlow =
-			item.kind == KIND_FLOW &&
-			OrgAutomationInventory.BARN_FLOWS.contains((String) row.get('DeveloperName'));
+			item.kind == KIND_FLOW && OrgAutomationInventory.BARN_FLOWS.contains((String) row.get('DeveloperName'));
 		if (String.isNotBlank((String) row.get('NamespacePrefix')) || barnFlow) {
 			return BarnHelp.text('Core', 'Core_AutomationDeactivate_NotOwn');
 		}
@@ -281,9 +261,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 					OrgToolingApi.updateMetadata(
 						'FlowDefinition',
 						item.recordId,
-						new Map<String, Object>{
-							'activeVersionNumber' => restoring ? item.activeVersion : 0
-						}
+						new Map<String, Object>{ 'activeVersionNumber' => restoring ? item.activeVersion : 0 }
 					);
 				} else {
 					Map<String, Object> metadata = (Map<String, Object>) OrgToolingApi.read(
@@ -302,9 +280,7 @@ public with sharing class OrgAutomationDeactivation implements Queueable, Databa
 	}
 
 	private static Boolean isWaiting(Item item, Boolean restoring) {
-		return restoring
-			? item.result == RESULT_CHANGED && item.restoreResult == null
-			: item.result == RESULT_PENDING;
+		return restoring ? item.result == RESULT_CHANGED && item.restoreResult == null : item.result == RESULT_PENDING;
 	}
 
 	private static Boolean hasWaiting(List<Item> items, Boolean restoring) {

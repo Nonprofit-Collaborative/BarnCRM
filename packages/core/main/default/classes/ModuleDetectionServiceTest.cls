@@ -36,8 +36,7 @@ private class ModuleDetectionServiceTest {
 			for (ModuleDetectionService.ModuleInfo module : modules) {
 				Assert.isTrue(
 					module.docsUrl.endsWith('/README.md'),
-					'Every module links to its own README, not to the product plan: ' +
-					module.docsUrl
+					'Every module links to its own README, not to the product plan: ' + module.docsUrl
 				);
 			}
 		}
@@ -171,11 +170,7 @@ private class ModuleDetectionServiceTest {
 			String chosen = ModuleDetectionService.chosenSuite();
 			Test.stopTest();
 
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_STANDARD,
-				chosen,
-				'The saved choice is read'
-			);
+			Assert.areEqual(ModuleDetectionService.SUITE_STANDARD, chosen, 'The saved choice is read');
 			Assert.areEqual(
 				2 + standardExtras().size(),
 				modules.size(),
@@ -224,11 +219,7 @@ private class ModuleDetectionServiceTest {
 			String unknown = ModuleDetectionService.chosenSuite();
 			Test.stopTest();
 
-			Assert.areEqual(
-				ModuleDetectionService.SUITE_NONPROFIT,
-				lowerCase,
-				'Lower case is forgiven'
-			);
+			Assert.areEqual(ModuleDetectionService.SUITE_NONPROFIT, lowerCase, 'Lower case is forgiven');
 			Assert.areEqual(
 				ModuleDetectionService.SUITE_STANDARD,
 				oldValue,
@@ -268,15 +259,9 @@ private class ModuleDetectionServiceTest {
 				giving.installUrl,
 				'The suite step links to the same installer'
 			);
-			Assert.isNull(
-				byName.get('Volunteers').installUrl,
-				'Anything but a version Id is no link'
-			);
+			Assert.isNull(byName.get('Volunteers').installUrl, 'Anything but a version Id is no link');
 			Assert.isNull(byName.get('Programs').installUrl, 'An unpublished module has no link');
-			Assert.isNull(
-				byName.get('Core').installUrl,
-				'Core is here, so there is nothing to install'
-			);
+			Assert.isNull(byName.get('Core').installUrl, 'Core is here, so there is nothing to install');
 		}
 	}
 
@@ -285,18 +270,11 @@ private class ModuleDetectionServiceTest {
 		System.runAs(TestUsers.admin()) {
 			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
 			ModuleDetectionService.givingPresentOverride = true;
-			BarnCRM_Module__mdt row = catalogRow(
-				'Giving',
-				'Nonprofit',
-				FakeIds.ofPrefix('04t', 1),
-				10
-			);
+			BarnCRM_Module__mdt row = catalogRow('Giving', 'Nonprofit', FakeIds.ofPrefix('04t', 1), 10);
 			row.App_Name__c = 'Fundraising';
 			ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ row };
 			String appId = FakeIds.ofPrefix('06m', 1);
-			ModuleDetectionService.appIdsOverride = new Map<String, String>{
-				'Fundraising' => appId
-			};
+			ModuleDetectionService.appIdsOverride = new Map<String, String>{ 'Fundraising' => appId };
 
 			Test.startTest();
 			ModuleDetectionService.ModuleInfo giving = ModuleDetectionService.givingModule();
@@ -309,10 +287,7 @@ private class ModuleDetectionServiceTest {
 				giving.appUrl,
 				'An installed module links to its own app by Id, where its Settings tab lives'
 			);
-			Assert.isTrue(
-				giving.docsUrl.endsWith('/giving/README.md'),
-				'Its description is linked'
-			);
+			Assert.isTrue(giving.docsUrl.endsWith('/giving/README.md'), 'Its description is linked');
 		}
 	}
 
@@ -395,9 +370,7 @@ private class ModuleDetectionServiceTest {
 			BarnCRM_Module__mdt notHere = catalogRow('Events', 'Standard;Nonprofit', null, 5);
 			notHere.Staff_Tabs__c = 'Event__c';
 			ModuleDetectionService.catalogOverride = new List<BarnCRM_Module__mdt>{ here, notHere };
-			ModuleDetectionService.tabLabelsOverride = new Map<String, String>{
-				'Gift__c' => 'Gifts'
-			};
+			ModuleDetectionService.tabLabelsOverride = new Map<String, String>{ 'Gift__c' => 'Gifts' };
 
 			Map<String, ModuleDetectionService.ModuleInfo> byName = new Map<String, ModuleDetectionService.ModuleInfo>();
 			for (ModuleDetectionService.ModuleInfo info : ModuleDetectionService.getModules()) {
@@ -505,15 +478,9 @@ private class ModuleDetectionServiceTest {
 
 			Assert.isFalse(modules.get('Core').nonprofitOnly, 'Core is offered by every edition');
 			Assert.isTrue(modules.get('Giving').nonprofitOnly, 'Only the Nonprofit Edition');
-			Assert.isTrue(
-				modules.get('Mailings').nonprofitOnly,
-				'The edition value is not case sensitive'
-			);
+			Assert.isTrue(modules.get('Mailings').nonprofitOnly, 'The edition value is not case sensitive');
 			Assert.isFalse(modules.get('Events').nonprofitOnly, 'Both editions offer it');
-			Assert.isFalse(
-				modules.containsKey('Everywhere'),
-				'Not offered by the Nonprofit Edition'
-			);
+			Assert.isFalse(modules.containsKey('Everywhere'), 'Not offered by the Nonprofit Edition');
 			Assert.isFalse(standardOnly, 'The Standard Edition offers it');
 			Assert.isFalse(blank, 'A row that names no edition is not nonprofit only');
 			Assert.isFalse(missing, 'No row is not nonprofit only');
@@ -557,40 +524,19 @@ private class ModuleDetectionServiceTest {
 			Map<String, BarnCRM_Module__mdt> shipped = BarnCRM_Module__mdt.getAll();
 			Test.stopTest();
 
-			List<String> modules = new List<String>{
-				'Giving',
-				'Volunteers',
-				'Programs',
-				'Funders'
-			};
+			List<String> modules = new List<String>{ 'Giving', 'Volunteers', 'Programs', 'Funders' };
 			for (String name : modules) {
 				Assert.isTrue(shipped.containsKey(name), name + ' has a catalog row');
-				Assert.areEqual(
-					'Nonprofit',
-					shipped.get(name).Editions__c,
-					name + ' is nonprofit only'
-				);
+				Assert.areEqual('Nonprofit', shipped.get(name).Editions__c, name + ' is nonprofit only');
 			}
 			Assert.isTrue(
-				ModuleDetectionService.offeredIn(
-					shipped.get('Mirror'),
-					ModuleDetectionService.SUITE_STANDARD
-				) &&
-				ModuleDetectionService.offeredIn(
-					shipped.get('Mirror'),
-					ModuleDetectionService.SUITE_NONPROFIT
-				),
+				ModuleDetectionService.offeredIn(shipped.get('Mirror'), ModuleDetectionService.SUITE_STANDARD) &&
+				ModuleDetectionService.offeredIn(shipped.get('Mirror'), ModuleDetectionService.SUITE_NONPROFIT),
 				'BarnCRM Mirror needs no nonprofit module, so both editions are offered it (N-09)'
 			);
 			Assert.isTrue(
-				ModuleDetectionService.offeredIn(
-					shipped.get('Rollups'),
-					ModuleDetectionService.SUITE_STANDARD
-				) &&
-				ModuleDetectionService.offeredIn(
-					shipped.get('Rollups'),
-					ModuleDetectionService.SUITE_NONPROFIT
-				),
+				ModuleDetectionService.offeredIn(shipped.get('Rollups'), ModuleDetectionService.SUITE_STANDARD) &&
+				ModuleDetectionService.offeredIn(shipped.get('Rollups'), ModuleDetectionService.SUITE_NONPROFIT),
 				'BarnCRM Rollup Builder is offered to both editions'
 			);
 			BarnCRM_Module__mdt rollups = shipped.get('Rollups');
@@ -695,12 +641,7 @@ private class ModuleDetectionServiceTest {
 		return modules;
 	}
 
-	private static BarnCRM_Module__mdt catalogRow(
-		String name,
-		String editions,
-		String versionId,
-		Integer sortOrder
-	) {
+	private static BarnCRM_Module__mdt catalogRow(String name, String editions, String versionId, Integer sortOrder) {
 		return new BarnCRM_Module__mdt(
 			DeveloperName = name,
 			Editions__c = editions,
@@ -772,10 +713,7 @@ private class ModuleDetectionServiceTest {
 	}
 
 	private static void chooseSuite(String suite) {
-		insert new BarnCRM_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Suite__c = suite
-		);
+		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Suite__c = suite);
 		SettingsService.clearCaches();
 	}
 
@@ -792,11 +730,7 @@ private class ModuleDetectionServiceTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				givingPresent,
-				givingListed,
-				'The module list and the Giving check give the same answer'
-			);
+			Assert.areEqual(givingPresent, givingListed, 'The module list and the Giving check give the same answer');
 		}
 	}
 
@@ -819,10 +753,7 @@ private class ModuleDetectionServiceTest {
 			Boolean ownLooksLikeGiving = ModuleDetectionService.isGivingPresent();
 			Test.stopTest();
 
-			Assert.isFalse(
-				foreignLooksLikeGiving,
-				'Objects of the same name in another namespace are not Giving'
-			);
+			Assert.isFalse(foreignLooksLikeGiving, 'Objects of the same name in another namespace are not Giving');
 			Assert.isNull(foreignFund, 'Another package\'s Fund__c does not resolve');
 			Assert.isTrue(ownLooksLikeGiving, 'The package\'s own objects are found');
 			Assert.areEqual(

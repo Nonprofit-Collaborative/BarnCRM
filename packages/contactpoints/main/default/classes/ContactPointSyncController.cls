@@ -109,9 +109,7 @@ public with sharing class ContactPointSyncController {
 		current.running = ![
 				SELECT Id
 				FROM AsyncApexJob
-				WHERE
-					ApexClass.Name = :ContactPointBackfillBatch.CLASS_NAME
-					AND Status IN :RUNNING_STATUSES
+				WHERE ApexClass.Name = :ContactPointBackfillBatch.CLASS_NAME AND Status IN :RUNNING_STATUSES
 				WITH SYSTEM_MODE
 				LIMIT 1
 			]
@@ -138,36 +136,16 @@ public with sharing class ContactPointSyncController {
 		line.ready = false;
 		Schema.SObjectType type = ContactPointSyncService.typeOf(kind);
 		if (type == null) {
-			line.message = BarnHelp.text(
-				'ContactPoints',
-				'ContactPoints_Kind_Missing',
-				new List<Object>{ kind }
-			);
+			line.message = BarnHelp.text('ContactPoints', 'ContactPoints_Kind_Missing', new List<Object>{ kind });
 		} else if (!individuals) {
-			line.message = BarnHelp.text(
-				'ContactPoints',
-				'ContactPoints_Kind_NoIndividual',
-				new List<Object>{ kind }
-			);
+			line.message = BarnHelp.text('ContactPoints', 'ContactPoints_Kind_NoIndividual', new List<Object>{ kind });
 		} else if (!ContactPointSyncService.switchedOn(kind)) {
-			line.message = BarnHelp.text(
-				'ContactPoints',
-				'ContactPoints_Kind_Off',
-				new List<Object>{ kind }
-			);
+			line.message = BarnHelp.text('ContactPoints', 'ContactPoints_Kind_Off', new List<Object>{ kind });
 		} else {
 			line.ready = true;
 			line.message = type.getDescribe().isAccessible()
-				? BarnHelp.text(
-						'ContactPoints',
-						'ContactPoints_Kind_Ready',
-						new List<Object>{ kind }
-				  )
-				: BarnHelp.text(
-						'ContactPoints',
-						'ContactPoints_Kind_Restricted',
-						new List<Object>{ kind }
-				  );
+				? BarnHelp.text('ContactPoints', 'ContactPoints_Kind_Ready', new List<Object>{ kind })
+				: BarnHelp.text('ContactPoints', 'ContactPoints_Kind_Restricted', new List<Object>{ kind });
 		}
 		return line;
 	}

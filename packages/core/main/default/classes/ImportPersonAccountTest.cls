@@ -32,17 +32,14 @@ private class ImportPersonAccountTest {
 	}
 
 	private static Boolean personFieldsExist() {
-		return OrgShapeDetector.detect().hasPersonAccounts &&
-			ImportMatcher.accountHasField('PersonEmail');
+		return OrgShapeDetector.detect().hasPersonAccounts && ImportMatcher.accountHasField('PersonEmail');
 	}
 
 	private static String mapping() {
 		ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
 		mapping.columns.add(new ImportMapping.Column('Street', 'Contact1.MailingStreet'));
 		mapping.columns.add(new ImportMapping.Column('Zip', 'Contact1.MailingPostalCode'));
-		mapping.columns.add(
-			new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail')
-		);
+		mapping.columns.add(new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail'));
 		mapping.columns.add(new ImportMapping.Column('Do Not Call', 'Contact1.DoNotCall'));
 		mapping.columns.add(new ImportMapping.Column('Birthdate', 'Contact1.Birthdate'));
 		mapping.columns.add(new ImportMapping.Column('Title', 'Contact1.Title'));
@@ -50,12 +47,7 @@ private class ImportPersonAccountTest {
 	}
 
 	private static Map<String, String> anasRow(String title) {
-		Map<String, String> row = ImportTestDataFactory.donorRow(
-			'Ana',
-			'Ramirez',
-			'ana@example.org',
-			null
-		);
+		Map<String, String> row = ImportTestDataFactory.donorRow('Ana', 'Ramirez', 'ana@example.org', null);
 		row.put('Street', '12 Alder Street');
 		row.put('Zip', '97201');
 		row.put('Email Opt Out', 'Yes');
@@ -113,11 +105,7 @@ private class ImportPersonAccountTest {
 			Assert.areEqual(1, people.size(), 'One person account.');
 			SObject ana = people[0];
 			Assert.areEqual('ana@example.org', ana.get('PersonEmail'), 'The email stuck.');
-			Assert.areEqual(
-				'12 Alder Street',
-				ana.get('PersonMailingStreet'),
-				'So did the street.'
-			);
+			Assert.areEqual('12 Alder Street', ana.get('PersonMailingStreet'), 'So did the street.');
 			Assert.areEqual('Portland', ana.get('PersonMailingCity'), 'The city.');
 			Assert.areEqual('97201', ana.get('PersonMailingPostalCode'), 'The postal code.');
 			Assert.areEqual(true, ana.get('PersonHasOptedOutOfEmail'), 'The email opt-out.');
@@ -161,9 +149,7 @@ private class ImportPersonAccountTest {
 
 			Assert.areEqual(0, outcome.created, 'Nobody is created: ' + outcome.notes);
 			Assert.isTrue(
-				outcome.notes.contains(
-					BarnHelp.text('Core', 'Core_Import_LogPersonRecordTypeMissing')
-				),
+				outcome.notes.contains(BarnHelp.text('Core', 'Core_Import_LogPersonRecordTypeMissing')),
 				'The run log says why: ' + outcome.notes
 			);
 		}
@@ -248,10 +234,7 @@ private class ImportPersonAccountTest {
 				new Map<String, Object>{ 'batchId' => batch.Id },
 				AccessLevel.SYSTEM_MODE
 			);
-			Assert.isNotNull(
-				rows[0].Person_1_Key__c,
-				'The row carries the key a later chunk finds her by.'
-			);
+			Assert.isNotNull(rows[0].Person_1_Key__c, 'The row carries the key a later chunk finds her by.');
 		}
 	}
 
@@ -268,10 +251,7 @@ private class ImportPersonAccountTest {
 			}
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
 			Account existing = TestDataFactory.organization(
-				new Account(
-					RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId(),
-					BillingPostalCode = '97201'
-				)
+				new Account(RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId(), BillingPostalCode = '97201')
 			);
 			existing.put('FirstName', 'Ana');
 			existing.put('LastName', 'Ramirez');
@@ -284,11 +264,7 @@ private class ImportPersonAccountTest {
 			ImportRowProcessor.Outcome outcome = run(false);
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				outcome.created,
-				'She is found, not created again: ' + outcome.notes
-			);
+			Assert.areEqual(0, outcome.created, 'She is found, not created again: ' + outcome.notes);
 			Assert.areEqual(1, people().size(), 'Still one person account.');
 			Assert.areEqual(
 				existing.Id,
@@ -381,22 +357,13 @@ private class ImportPersonAccountTest {
 			System.runAs(new User(Id = UserInfo.getUserId())) {
 				insert reader;
 				PermissionSet access = new PermissionSet(
-					Name = 'Import_Mail_Only_' +
-						String.valueOf(Math.abs(Crypto.getRandomInteger())),
+					Name = 'Import_Mail_Only_' + String.valueOf(Math.abs(Crypto.getRandomInteger())),
 					Label = 'Import mail only'
 				);
 				insert access;
 				insert new List<ObjectPermissions>{
-					new ObjectPermissions(
-						ParentId = access.Id,
-						SobjectType = 'Account',
-						PermissionsRead = true
-					),
-					new ObjectPermissions(
-						ParentId = access.Id,
-						SobjectType = 'Contact',
-						PermissionsRead = true
-					)
+					new ObjectPermissions(ParentId = access.Id, SobjectType = 'Account', PermissionsRead = true),
+					new ObjectPermissions(ParentId = access.Id, SobjectType = 'Contact', PermissionsRead = true)
 				};
 				insert new FieldPermissions(
 					ParentId = access.Id,
@@ -404,10 +371,7 @@ private class ImportPersonAccountTest {
 					Field = 'Contact.MailingAddress',
 					PermissionsRead = true
 				);
-				insert new PermissionSetAssignment(
-					AssigneeId = reader.Id,
-					PermissionSetId = access.Id
-				);
+				insert new PermissionSetAssignment(AssigneeId = reader.Id, PermissionSetId = access.Id);
 			}
 
 			Test.startTest();
@@ -444,21 +408,14 @@ private class ImportPersonAccountTest {
 			secondOnly.columns.add(new ImportMapping.Column('First 2', 'Contact2.FirstName'));
 			secondOnly.columns.add(new ImportMapping.Column('Last 2', 'Contact2.LastName'));
 			secondOnly.columns.add(new ImportMapping.Column('Email 2', 'Contact2.Email'));
-			template = ImportTestDataFactory.template(
-				secondOnly.serialize(),
-				ImportTemplateService.RULE_EMAIL
-			);
+			template = ImportTestDataFactory.template(secondOnly.serialize(), ImportTemplateService.RULE_EMAIL);
 			template.Person_Mode__c = ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS;
 			update template;
 			batch = ImportTestDataFactory.batch(template);
 			ImportTestDataFactory.rows(
 				batch,
 				new List<Map<String, String>>{
-					new Map<String, String>{
-						'First 2' => 'Ben',
-						'Last 2' => 'Okafor',
-						'Email 2' => 'ben@example.org'
-					}
+					new Map<String, String>{ 'First 2' => 'Ben', 'Last 2' => 'Okafor', 'Email 2' => 'ben@example.org' }
 				}
 			);
 

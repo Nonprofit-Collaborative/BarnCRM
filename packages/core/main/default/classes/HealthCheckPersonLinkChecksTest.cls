@@ -34,17 +34,10 @@ private class HealthCheckPersonLinkChecksTest {
 		return byKey;
 	}
 
-	private static List<Relationship__c> relationshipsBetween(
-		List<Contact> people,
-		List<Contact> others
-	) {
+	private static List<Relationship__c> relationshipsBetween(List<Contact> people, List<Contact> others) {
 		List<Relationship__c> rows = new List<Relationship__c>();
 		for (Integer i = 0; i < people.size(); i++) {
-			Relationship__c row = RelationshipTestDataFactory.between(
-				people[i],
-				others[i],
-				'Sibling'
-			);
+			Relationship__c row = RelationshipTestDataFactory.between(people[i], others[i], 'Sibling');
 			row.Is_Reciprocal_Managed__c = false;
 			rows.add(row);
 		}
@@ -75,9 +68,7 @@ private class HealthCheckPersonLinkChecksTest {
 				'To the relationship record page.'
 			);
 			Assert.isTrue(
-				finding.detail.contains(
-					BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')
-				),
+				finding.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')),
 				'It says what to do next.'
 			);
 		}
@@ -151,9 +142,7 @@ private class HealthCheckPersonLinkChecksTest {
 				'To the affiliation record page.'
 			);
 			Assert.isTrue(
-				finding.detail.contains(
-					BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')
-				),
+				finding.detail.contains(BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')),
 				'It says what to do next.'
 			);
 		}
@@ -169,9 +158,7 @@ private class HealthCheckPersonLinkChecksTest {
 			relationshipsBetween(people, others);
 			List<Affiliation__c> affiliations = new List<Affiliation__c>();
 			for (Contact person : people) {
-				affiliations.add(
-					RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member')
-				);
+				affiliations.add(RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member'));
 			}
 			insert affiliations;
 
@@ -197,9 +184,7 @@ private class HealthCheckPersonLinkChecksTest {
 			List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
 			List<Affiliation__c> affiliations = new List<Affiliation__c>();
 			for (Contact person : people) {
-				affiliations.add(
-					RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member')
-				);
+				affiliations.add(RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member'));
 			}
 			insert affiliations;
 			delete people;
@@ -209,10 +194,7 @@ private class HealthCheckPersonLinkChecksTest {
 
 			Assert.isTrue(
 				finding.title.startsWith(
-					String.format(
-						System.Label.Core_HealthCheck_OrphansMoreThan,
-						new List<Object>{ '2' }
-					)
+					String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ '2' })
 				),
 				'Past the cap it says more than: ' + finding.title
 			);

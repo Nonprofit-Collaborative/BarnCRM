@@ -171,22 +171,14 @@ private class ImportObjectLoaderTest {
 				Assert.areEqual(MANY, preview.created, 'The dry run says every row creates.');
 				Assert.areEqual(0, afterPreview, 'And creates nothing.');
 				Assert.areEqual(0, journalAfterPreview, 'Nor journals anything.');
-				Assert.areEqual(
-					MANY,
-					committed.created,
-					'The commit creates every row: ' + rowErrors()
-				);
+				Assert.areEqual(MANY, committed.created, 'The commit creates every row: ' + rowErrors());
 				Assert.areEqual(MANY, dismissalsWith('Loaded'), 'All two hundred are there.');
 				Assert.areEqual(
 					MANY,
 					ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_CREATED),
 					'Every creation is journaled, since the object has no batch tag.'
 				);
-				Assert.areEqual(
-					2,
-					pages(ImportJournalService.PHASE_CREATED),
-					'At most a hundred creations to a page.'
-				);
+				Assert.areEqual(2, pages(ImportJournalService.PHASE_CREATED), 'At most a hundred creations to a page.');
 				for (Import_Row__c row : rows()) {
 					Assert.areEqual(ImportRowProcessor.STATUS_CREATED, row.Status__c, 'Created.');
 					Assert.isNotNull(row.Gift_Id__c, 'The resulting record is on the row.');
@@ -203,12 +195,7 @@ private class ImportObjectLoaderTest {
 				List<Duplicate_Dismissal__c> stored = dismissals(MANY, 'Old');
 				List<Map<String, String>> values = new List<Map<String, String>>();
 				for (Integer i = 0; i < MANY; i++) {
-					values.add(
-						new Map<String, String>{
-							'Id' => stored[i].Id,
-							'Reason' => i == 0 ? 'Old' : 'New'
-						}
-					);
+					values.add(new Map<String, String>{ 'Id' => stored[i].Id, 'Reason' => i == 0 ? 'Old' : 'New' });
 				}
 				given(
 					'Duplicate_Dismissal__c',
@@ -231,15 +218,11 @@ private class ImportObjectLoaderTest {
 				Import_Journal__c page = [
 					SELECT Entries_JSON__c
 					FROM Import_Journal__c
-					WHERE
-						Import_Batch__c = :batch.Id
-						AND Phase__c = :ImportJournalService.PHASE_COMMIT
+					WHERE Import_Batch__c = :batch.Id AND Phase__c = :ImportJournalService.PHASE_COMMIT
 					LIMIT 1
 				];
 				Map<String, Object> entry = ImportJournalService.entries(page)[0];
-				Map<String, Object> reason = (Map<String, Object>) ((Map<String, Object>) entry.get(
-						'fields'
-					))
+				Map<String, Object> reason = (Map<String, Object>) ((Map<String, Object>) entry.get('fields'))
 					.values()[0];
 				Assert.areEqual('Old', reason.get('before'), 'The value before is journaled.');
 				Assert.areEqual(
@@ -271,11 +254,7 @@ private class ImportObjectLoaderTest {
 				Assert.areEqual(MANY / 2, committed.updated, 'The half found: ' + rowErrors());
 				Assert.areEqual(MANY / 2, committed.created, 'The half not found is created.');
 				Assert.areEqual(MANY, dismissalsWith('New'), 'Every record holds the new reason.');
-				Assert.areEqual(
-					MANY,
-					[SELECT COUNT() FROM Duplicate_Dismissal__c],
-					'Nothing found was created again.'
-				);
+				Assert.areEqual(MANY, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'Nothing found was created again.');
 				Assert.areEqual(
 					MANY / 2,
 					ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_CREATED),
@@ -310,11 +289,7 @@ private class ImportObjectLoaderTest {
 				ImportRowProcessor.Outcome committed = run(false);
 				Test.stopTest();
 
-				Assert.areEqual(
-					MANY / 2,
-					preview.updated,
-					'The dry run finds the half that exists.'
-				);
+				Assert.areEqual(MANY / 2, preview.updated, 'The dry run finds the half that exists.');
 				Assert.areEqual(MANY / 2, preview.created, 'And says the rest would be created.');
 				Assert.areEqual(0, newAfterPreview, 'It changes nothing.');
 				Assert.areEqual(MANY / 2, allAfterPreview, 'And creates nothing.');
@@ -334,17 +309,13 @@ private class ImportObjectLoaderTest {
 	}
 
 	private static Account organization(String name) {
-		Account created = TestDataFactory.organization(
-			new Account(Name = name, RecordTypeId = organizationType())
-		);
+		Account created = TestDataFactory.organization(new Account(Name = name, RecordTypeId = organizationType()));
 		insert created;
 		return created;
 	}
 
 	private static Contact person(String lastName) {
-		Contact created = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = lastName)
-		);
+		Contact created = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = lastName));
 		insert created;
 		return created;
 	}
@@ -378,11 +349,7 @@ private class ImportObjectLoaderTest {
 			System.runAs(admin()) {
 				Contact ana = person('Ramirez');
 				Account rose = organization('Rose City Arts');
-				givenAffiliations(
-					new List<Map<String, String>>{
-						affiliation(ana.Id, 'rose city arts', 'Treasurer')
-					}
-				);
+				givenAffiliations(new List<Map<String, String>>{ affiliation(ana.Id, 'rose city arts', 'Treasurer') });
 
 				Test.startTest();
 				ImportRowProcessor.Outcome committed = run(false);
@@ -396,11 +363,7 @@ private class ImportObjectLoaderTest {
 				];
 				Assert.areEqual(ana.Id, loaded.Contact__c, 'The person by ID.');
 				Assert.areEqual(rose.Id, loaded.Organization__c, 'The organization by its name.');
-				Assert.areEqual(
-					Date.newInstance(2026, 1, 15),
-					loaded.Start_Date__c,
-					'The date read.'
-				);
+				Assert.areEqual(Date.newInstance(2026, 1, 15), loaded.Start_Date__c, 'The date read.');
 			}
 
 		}
@@ -411,9 +374,7 @@ private class ImportObjectLoaderTest {
 		System.runAs(TestUsers.admin()) {
 			System.runAs(admin()) {
 				Contact ana = person('Ramirez');
-				givenAffiliations(
-					new List<Map<String, String>>{ affiliation(ana.Id, 'Nobody Inc', 'Volunteer') }
-				);
+				givenAffiliations(new List<Map<String, String>>{ affiliation(ana.Id, 'Nobody Inc', 'Volunteer') });
 
 				Test.startTest();
 				ImportRowProcessor.Outcome rejecting = run(true);
@@ -421,11 +382,7 @@ private class ImportObjectLoaderTest {
 				ImportRowProcessor.Outcome leaving = run(true);
 				Test.stopTest();
 
-				Assert.areEqual(
-					1,
-					rejecting.rejected,
-					'No organization by that name rejects the row.'
-				);
+				Assert.areEqual(1, rejecting.rejected, 'No organization by that name rejects the row.');
 				Assert.areEqual(1, leaving.created, 'Leave it empty loads the rest of the row.');
 				Assert.isFalse(leaving.notes.isEmpty(), 'And the run log says so.');
 			}
@@ -440,29 +397,18 @@ private class ImportObjectLoaderTest {
 				Contact ana = person('Ramirez');
 				organization('Rose City Arts');
 				organization('Rose City Arts');
-				givenAffiliations(
-					new List<Map<String, String>>{
-						affiliation(ana.Id, 'Rose City Arts', 'Volunteer')
-					}
-				);
+				givenAffiliations(new List<Map<String, String>>{ affiliation(ana.Id, 'Rose City Arts', 'Volunteer') });
 
 				Test.startTest();
 				ImportRowProcessor.Outcome rejecting = run(true);
 				Boolean ticked = rows()[0].Several_Matches__c;
-				set(
-					Import_Template__c.Several_Matches__c,
-					ImportTemplateService.SEVERAL_MOST_RECENT
-				);
+				set(Import_Template__c.Several_Matches__c, ImportTemplateService.SEVERAL_MOST_RECENT);
 				ImportRowProcessor.Outcome taking = run(true);
 				Test.stopTest();
 
 				Assert.areEqual(1, rejecting.rejected, 'Several parents reject by default.');
 				Assert.isTrue(ticked, 'The row says several matched.');
-				Assert.areEqual(
-					1,
-					taking.created,
-					'The most recently changed is taken when asked.'
-				);
+				Assert.areEqual(1, taking.created, 'The most recently changed is taken when asked.');
 			}
 
 		}
@@ -480,11 +426,7 @@ private class ImportObjectLoaderTest {
 				organization('Rose City Arts');
 				Map<String, String> badDate = affiliation(ana.Id, 'Rose City Arts', 'Volunteer');
 				badDate.put('Since', 'soon');
-				Map<String, String> tooLong = affiliation(
-					ana.Id,
-					'Rose City Arts',
-					'x'.repeat(256)
-				);
+				Map<String, String> tooLong = affiliation(ana.Id, 'Rose City Arts', 'x'.repeat(256));
 				givenAffiliations(new List<Map<String, String>>{ badDate, tooLong });
 
 				Test.startTest();
@@ -546,32 +488,17 @@ private class ImportObjectLoaderTest {
 			System.runAs(admin()) {
 				List<Map<String, String>> values = dismissalRows(3, 'New');
 				values[2].put('Pair Key', 'k0');
-				given(
-					'Duplicate_Dismissal__c',
-					ImportObjectSchema.OPERATION_UPSERT,
-					dismissalColumns(),
-					values
-				);
+				given('Duplicate_Dismissal__c', ImportObjectSchema.OPERATION_UPSERT, dismissalColumns(), values);
 
 				Test.startTest();
 				ImportBatchService.beginPass(batch.Id);
 				List<Import_Row__c> staged = ImportTestDataFactory.reload(batch.Id);
-				ImportRowProcessor.Outcome first = chunk(
-					new List<Import_Row__c>{ staged[0], staged[1] },
-					false
-				);
-				ImportRowProcessor.Outcome second = chunk(
-					new List<Import_Row__c>{ staged[2] },
-					false
-				);
+				ImportRowProcessor.Outcome first = chunk(new List<Import_Row__c>{ staged[0], staged[1] }, false);
+				ImportRowProcessor.Outcome second = chunk(new List<Import_Row__c>{ staged[2] }, false);
 				Test.stopTest();
 
 				Assert.areEqual(2, first.created, 'The first chunk loads: ' + rowErrors());
-				Assert.areEqual(
-					1,
-					second.rejected,
-					'The same key, ignoring case, in a later chunk.'
-				);
+				Assert.areEqual(1, second.rejected, 'The same key, ignoring case, in a later chunk.');
 				Assert.areEqual(
 					BarnHelp.text('Core', 'Core_Import_ErrorRecordRepeated'),
 					rows()[2].Error_Message__c,
@@ -601,11 +528,7 @@ private class ImportObjectLoaderTest {
 
 				Assert.areEqual(1, committed.updated, 'The row that matches loads.');
 				Assert.areEqual(1, committed.rejected, 'The one that would create does not.');
-				Assert.areEqual(
-					1,
-					[SELECT COUNT() FROM Duplicate_Dismissal__c],
-					'Nothing created.'
-				);
+				Assert.areEqual(1, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'Nothing created.');
 			}
 
 		}
@@ -647,9 +570,7 @@ private class ImportObjectLoaderTest {
 					committed.notes.contains(
 						String.format(
 							BarnHelp.text('Core', 'Core_Import_LogFieldProtected'),
-							new List<String>{
-								Affiliation__c.Sample_Data__c.getDescribe().getLabel()
-							}
+							new List<String>{ Affiliation__c.Sample_Data__c.getDescribe().getLabel() }
 						)
 					),
 					'Named once in the run log.'
@@ -678,10 +599,7 @@ private class ImportObjectLoaderTest {
 				Test.stopTest();
 
 				Assert.areEqual(2, committed.rejected, 'People are not inserted here.');
-				Assert.isTrue(
-					rows()[0].Error_Message__c.contains('record ID'),
-					'The reason is on the row.'
-				);
+				Assert.isTrue(rows()[0].Error_Message__c.contains('record ID'), 'The reason is on the row.');
 				Assert.areEqual(
 					0,
 					[SELECT COUNT() FROM Contact WHERE LastName IN ('Ramirez', 'Chen')],

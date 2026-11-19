@@ -41,10 +41,7 @@ private class VolunteerHoursTriggerHandlerTest {
 			Test.stopTest();
 
 			Assert.areEqual(household.Id, credited, 'The household comes from the person.');
-			Assert.isNull(
-				reread(hours.Id).Household__c,
-				'A new person with no household leaves no household behind.'
-			);
+			Assert.isNull(reread(hours.Id).Household__c, 'A new person with no household leaves no household behind.');
 		}
 	}
 
@@ -54,11 +51,7 @@ private class VolunteerHoursTriggerHandlerTest {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			Account household = VolunteersTestData.household('The Nolan Family');
 			Contact person = VolunteersTestData.contact('Nolan', null);
-			insert new Household_Member__c(
-				Household__c = household.Id,
-				Contact__c = person.Id,
-				Role__c = 'Head'
-			);
+			insert new Household_Member__c(Household__c = household.Id, Contact__c = person.Id, Role__c = 'Head');
 			Volunteer_Hours__c hours = VolunteersTestData.newHours(person.Id, jobId(), 2);
 
 			Test.startTest();
@@ -82,11 +75,7 @@ private class VolunteerHoursTriggerHandlerTest {
 				return; // An org without person accounts has no such person.
 			}
 			Account household = VolunteersTestData.household('The Okafor Family');
-			insert new Household_Member__c(
-				Household__c = household.Id,
-				Account__c = person.Id,
-				Role__c = 'Head'
-			);
+			insert new Household_Member__c(Household__c = household.Id, Account__c = person.Id, Role__c = 'Head');
 			Volunteer_Hours__c hours = VolunteersTestData.newHours(null, jobId(), 2);
 			hours.Account__c = person.Id;
 
@@ -170,10 +159,7 @@ private class VolunteerHoursTriggerHandlerTest {
 				[
 					SELECT COUNT()
 					FROM Volunteer_Hours__c
-					WHERE
-						Household__c = :household.Id
-						AND Volunteer_Job__c = :jobId()
-						AND Status__c = 'Submitted'
+					WHERE Household__c = :household.Id AND Volunteer_Job__c = :jobId() AND Status__c = 'Submitted'
 				],
 				'Every entry has its household, its job and its starting status.'
 			);

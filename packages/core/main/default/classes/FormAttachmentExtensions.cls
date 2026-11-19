@@ -69,11 +69,7 @@ public with sharing class FormAttachmentExtensions {
 					return true;
 				}
 			} catch (Exception failed) {
-				ErrorLogger.log(
-					failed,
-					'FormAttachmentExtensions.signedClaimRequired',
-					contextRecordId
-				);
+				ErrorLogger.log(failed, 'FormAttachmentExtensions.signedClaimRequired', contextRecordId);
 				return true;
 			}
 		}

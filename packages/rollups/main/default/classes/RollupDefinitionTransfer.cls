@@ -59,8 +59,7 @@ public with sharing class RollupDefinitionTransfer {
 			List<Object> rollups = new List<Object>();
 			for (Rollup_Definition__c definition : RollupSelector.selectAllAsUser()) {
 				if (
-					definition.Is_Package_Default__c == true ||
-					(!chosen.isEmpty() && !chosen.contains(definition.Id))
+					definition.Is_Package_Default__c == true || (!chosen.isEmpty() && !chosen.contains(definition.Id))
 				) {
 					continue;
 				}
@@ -75,11 +74,7 @@ public with sharing class RollupDefinitionTransfer {
 				throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ExportNothing'));
 			}
 			return JSON.serializePretty(
-				new Map<String, Object>{
-					'format' => FORMAT,
-					'version' => FORMAT_VERSION,
-					'rollups' => rollups
-				}
+				new Map<String, Object>{ 'format' => FORMAT, 'version' => FORMAT_VERSION, 'rollups' => rollups }
 			);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught);
@@ -132,9 +127,7 @@ public with sharing class RollupDefinitionTransfer {
 				}
 				try {
 					if (String.isBlank(key) || key.length() > 80) {
-						throw refusal(
-							BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportUnreadable')
-						);
+						throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportUnreadable'));
 					}
 					if (!seen.add(key)) {
 						throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportTwice'));

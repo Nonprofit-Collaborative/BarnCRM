@@ -5,9 +5,7 @@
  * looks up a non-US address; a provider error changes nothing and is logged; a change makes an
  * address Unverified and queues its lookup; the nightly batch takes only waiting addresses.
  */
-@IsTest(
-	testFor='ApexClass:AddressVerifier, ApexClass:AddressVerificationJob, ApexClass:AddressVerificationHandler'
-)
+@IsTest(testFor='ApexClass:AddressVerifier, ApexClass:AddressVerificationJob, ApexClass:AddressVerificationHandler')
 private class AddressVerifierTest {
 	@TestSetup
 	static void createTestUser() {
@@ -80,9 +78,7 @@ private class AddressVerifierTest {
 			Assert.areEqual('Toronto', after.City__c, 'Standardized city');
 			Assert.areEqual('M5V 2T6', after.Postal_Code__c, 'Standardized postal code');
 			Assert.areEqual('Canada', after.Country__c, 'The country never changes');
-			Map<String, Object> sent = (Map<String, Object>) JSON.deserializeUntyped(
-				google.requests[0].getBody()
-			);
+			Map<String, Object> sent = (Map<String, Object>) JSON.deserializeUntyped(google.requests[0].getBody());
 			Assert.areEqual(
 				'CA',
 				((Map<String, Object>) sent.get('address')).get('regionCode'),
@@ -113,10 +109,7 @@ private class AddressVerifierTest {
 			AddressVerifier.writing = false;
 			Test.setMock(
 				HttpCalloutMock.class,
-				new AddressVerificationTestData.Provider(
-					200,
-					AddressVerificationTestData.GOOGLE_VAGUE
-				)
+				new AddressVerificationTestData.Provider(200, AddressVerificationTestData.GOOGLE_VAGUE)
 			);
 
 			Test.startTest();
@@ -160,10 +153,7 @@ private class AddressVerifierTest {
 		System.runAs(AddressVerificationTestData.admin()) {
 			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
 			Address__c home = AddressVerificationTestData.addresses(1, null)[0];
-			Test.setMock(
-				HttpCalloutMock.class,
-				new AddressVerificationTestData.Provider(401, 'Unauthorized')
-			);
+			Test.setMock(HttpCalloutMock.class, new AddressVerificationTestData.Provider(401, 'Unauthorized'));
 
 			Test.startTest();
 			AddressVerifier.verify(new List<Id>{ home.Id });
@@ -268,10 +258,7 @@ private class AddressVerifierTest {
 			AddressVerifier.writing = false;
 			Test.setMock(
 				HttpCalloutMock.class,
-				new AddressVerificationTestData.Provider(
-					200,
-					AddressVerificationTestData.SMARTY_FOUND
-				)
+				new AddressVerificationTestData.Provider(200, AddressVerificationTestData.SMARTY_FOUND)
 			);
 
 			Test.startTest();
@@ -281,11 +268,7 @@ private class AddressVerifierTest {
 
 			Address__c after = AddressVerificationTestData.reread(home.Id);
 			Assert.areEqual('Unverified', duringSave, 'Unverified as soon as it changes');
-			Assert.areEqual(
-				'Verified',
-				after.Verification_Status__c,
-				'Looked up by the queued job'
-			);
+			Assert.areEqual('Verified', after.Verification_Status__c, 'Looked up by the queued job');
 			Assert.areEqual(Date.today(), after.Latest_Verified_Date__c, 'Dated today');
 		}
 	}
@@ -294,18 +277,12 @@ private class AddressVerifierTest {
 	static void aSaveByAPersonWithoutPrincipalAccessWaitsForTheNightlyStepAndIsLoggedOnceADay() {
 		System.runAs(AddressVerificationTestData.admin()) {
 			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
-			Assert.isTrue(
-				AddressVerifier.canLookUpOnSave(),
-				'The admin set carries the principal access'
-			);
+			Assert.isTrue(AddressVerifier.canLookUpOnSave(), 'The admin set carries the principal access');
 			Address__c home = AddressVerificationTestData.addresses(1, null)[0];
 			AddressVerifier.userAccess = false;
 			Test.setMock(
 				HttpCalloutMock.class,
-				new AddressVerificationTestData.Provider(
-					200,
-					AddressVerificationTestData.SMARTY_FOUND
-				)
+				new AddressVerificationTestData.Provider(200, AddressVerificationTestData.SMARTY_FOUND)
 			);
 
 			Test.startTest();

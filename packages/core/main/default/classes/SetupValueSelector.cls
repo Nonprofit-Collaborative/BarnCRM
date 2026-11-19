@@ -27,8 +27,7 @@ public with sharing class SetupValueSelector {
 	public static Boolean supports(String settingsObject, String key) {
 		return String.isNotBlank(settingsObject) &&
 			ORGANIZATION.equalsIgnoreCase(settingsObject.trim()) &&
-			(KEY_ORGANIZATION_NAME.equalsIgnoreCase(key) ||
-			KEY_FISCAL_YEAR_START.equalsIgnoreCase(key));
+			(KEY_ORGANIZATION_NAME.equalsIgnoreCase(key) || KEY_FISCAL_YEAR_START.equalsIgnoreCase(key));
 	}
 
 	/** The value as a person reads it, or null when the key is not one this class shows. */

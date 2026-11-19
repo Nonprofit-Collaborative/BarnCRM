@@ -35,9 +35,7 @@ private class FindExportBatchTest {
 
 	private static void makePeople(Integer volunteers, Integer staff) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield, "Food" Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield, "Food" Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < volunteers + staff; index++) {
@@ -55,10 +53,7 @@ private class FindExportBatchTest {
 	}
 
 	private static void notifications() {
-		insert new BarnCRM_Settings__c(
-			SetupOwnerId = UserInfo.getOrganizationId(),
-			Job_Notifications__c = true
-		);
+		insert new BarnCRM_Settings__c(SetupOwnerId = UserInfo.getOrganizationId(), Job_Notifications__c = true);
 		SettingsService.clearCaches();
 	}
 
@@ -96,10 +91,7 @@ private class FindExportBatchTest {
 			run(
 				new FindExportBatch(
 					VOLUNTEERS,
-					new Map<String, String>{
-						'LastName' => 'Last Name',
-						'Account.Name' => 'Household'
-					},
+					new Map<String, String>{ 'LastName' => 'Last Name', 'Account.Name' => 'Household' },
 					'abc123',
 					FindController.exportLimit()
 				)
@@ -148,10 +140,7 @@ private class FindExportBatchTest {
 			Test.stopTest();
 			Assert.isTrue(Pattern.matches('[0-9a-f]{6}', started.tag), started.tag);
 
-			FindController.ServerExport status = FindController.serverExportStatus(
-				started.jobId,
-				started.tag
-			);
+			FindController.ServerExport status = FindController.serverExportStatus(started.jobId, started.tag);
 			Assert.isTrue(status.done, status.status);
 			Assert.isFalse(status.failed);
 			Assert.areEqual(1, status.files.size());
@@ -160,10 +149,7 @@ private class FindExportBatchTest {
 				FindController.serverExportStatus(started.jobId, '%');
 				Assert.fail('A tag that is not one is refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Find_ExportFilesNotFound'),
-					refused.getMessage()
-				);
+				Assert.areEqual(BarnHelp.text('Core', 'Core_Find_ExportFilesNotFound'), refused.getMessage());
 			}
 		}
 	}
@@ -177,10 +163,7 @@ private class FindExportBatchTest {
 			} catch (AuraHandledException refused) {
 				Assert.isNotNull(refused.getMessage());
 			}
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'FindExportBatch']
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'FindExportBatch']);
 		}
 	}
 }

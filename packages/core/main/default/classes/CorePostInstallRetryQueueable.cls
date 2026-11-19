@@ -95,10 +95,7 @@ public with sharing class CorePostInstallRetryQueueable implements Queueable {
 	 */
 	private void assignPermissionSet() {
 		try {
-			AccessService.assignPermissionSetDuringInstall(
-				installerId,
-				AccessService.ADMIN_PERMISSION_SET
-			);
+			AccessService.assignPermissionSetDuringInstall(installerId, AccessService.ADMIN_PERMISSION_SET);
 			// The switchable tabs come from the BarnCRM Tab sets (ADR-0124): one pass here
 			// gives the installer theirs at once; the install's own queued sync does the rest.
 			TabAccessService.syncNow();

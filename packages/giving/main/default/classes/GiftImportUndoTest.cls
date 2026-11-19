@@ -33,9 +33,7 @@ public class GiftImportUndoTest {
 
 	/** The second user the gift pass runs as: it deletes gifts, so it holds Giving Admin. */
 	private static User rollupQueue() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Admin', 'Giving_Staff' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'Giving_Admin', 'Giving_Staff' });
 	}
 
 	/**
@@ -213,10 +211,7 @@ public class GiftImportUndoTest {
 			AutomationControl.bypass('Giving_Rollups_Gift');
 			insert GivingTestDataFactory.buildGift(donor.Id, 50);
 			AutomationControl.clearBypass('Giving_Rollups_Gift');
-			Database.update(
-				new Contact(Id = donor.Id, Rollups_Last_Calculated__c = null),
-				AccessLevel.SYSTEM_MODE
-			);
+			Database.update(new Contact(Id = donor.Id, Rollups_Last_Calculated__c = null), AccessLevel.SYSTEM_MODE);
 			insert new Rollup_Queue__c(
 				Target_Object__c = 'Contact',
 				Record_Ids__c = String.valueOf(donor.Id),
@@ -275,11 +270,7 @@ public class GiftImportUndoTest {
 				[SELECT COUNT() FROM Contact WHERE Created_By_Import_Batch__c = :batchId],
 				'Only the edited person stays. ' + undoJournal(batchId)
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Contact WHERE Id = :edited.Id],
-				'And it is the one edited.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Contact WHERE Id = :edited.Id], 'And it is the one edited.');
 			Assert.areEqual(
 				1,
 				[SELECT COUNT() FROM Account WHERE Created_By_Import_Batch__c = :batchId],

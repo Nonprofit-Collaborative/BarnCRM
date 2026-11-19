@@ -95,9 +95,7 @@ private class DonorSegmentControllerTest {
 			Assert.isTrue(listed.people && listed.mine, 'A segment of the person own people.');
 			Assert.isFalse(listed.shared, 'Saved unshared.');
 
-			DonorSegmentService.SegmentCount counted = DonorSegmentController.countSegment(
-				page.savedId
-			);
+			DonorSegmentService.SegmentCount counted = DonorSegmentController.countSegment(page.savedId);
 			Assert.areEqual(
 				2,
 				counted.count,
@@ -152,8 +150,7 @@ private class DonorSegmentControllerTest {
 			Assert.areNotEqual(giftSearch.Id, page.savedId, 'A new segment, not the gift search.');
 			Assert.areEqual(
 				'Gift__c',
-				[SELECT Object_Name__c FROM Saved_Query__c WHERE Id = :giftSearch.Id]
-				.Object_Name__c,
+				[SELECT Object_Name__c FROM Saved_Query__c WHERE Id = :giftSearch.Id].Object_Name__c,
 				'The gift search is untouched.'
 			);
 		}
@@ -168,15 +165,10 @@ private class DonorSegmentControllerTest {
 			Contact noEmail = donor('NoEmail', 100, 0);
 			noEmail.Email = null;
 			insertDonors(new List<SObject>{ reachable, optedOut, noEmail });
-			Id segmentId = DonorSegmentController.saveFromTemplate('lapsed', 'Contact', 'Lapsed')
-				.savedId;
+			Id segmentId = DonorSegmentController.saveFromTemplate('lapsed', 'Contact', 'Lapsed').savedId;
 
 			for (String layout : new List<String>{ 'mailchimp', 'constantContact' }) {
-				DonorSegmentService.Rows page = DonorSegmentController.exportPage(
-					segmentId,
-					layout,
-					null
-				);
+				DonorSegmentService.Rows page = DonorSegmentController.exportPage(segmentId, layout, null);
 				Assert.areEqual(1, page.rows.size(), 'Only the emailable person: ' + layout);
 				Assert.areEqual('reachable@example.org', page.rows[0].get('Email'), layout);
 				Assert.areEqual(
@@ -192,11 +184,7 @@ private class DonorSegmentControllerTest {
 			Assert.areEqual(3, all.rows.size(), 'All Columns is the whole segment.');
 			Assert.areEqual(6, all.columns.size(), 'With the segment own columns.');
 
-			DonorSegmentService.Rows after = DonorSegmentController.exportPage(
-				segmentId,
-				'all',
-				all.lastId
-			);
+			DonorSegmentService.Rows after = DonorSegmentController.exportPage(segmentId, 'all', all.lastId);
 			Assert.areEqual(0, after.rows.size(), 'Nothing after the last Id read.');
 			Assert.areEqual(all.lastId, after.lastId, 'An empty page keeps the last Id.');
 		}
@@ -208,12 +196,7 @@ private class DonorSegmentControllerTest {
 			Account organization = AccountKindsTestData.organization('Acme Foundation');
 			organization.Giving_Last_Year__c = 500;
 			insertDonors(new List<SObject>{ organization });
-			Id segmentId = DonorSegmentController.saveFromTemplate(
-					'lapsed',
-					'Account',
-					'Lapsed organizations'
-				)
-				.savedId;
+			Id segmentId = DonorSegmentController.saveFromTemplate('lapsed', 'Account', 'Lapsed organizations').savedId;
 			Integer expected = [
 				SELECT COUNT()
 				FROM Account
@@ -234,19 +217,13 @@ private class DonorSegmentControllerTest {
 				DonorSegmentController.exportPage(segmentId, 'mailchimp', null);
 				Assert.fail('An email layout needs people.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Segments_ErrorPeopleOnly'),
-					messageOf(refused)
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Segments_ErrorPeopleOnly'), messageOf(refused));
 			}
 			try {
 				DonorSegmentController.exportPage(segmentId, 'fax', null);
 				Assert.fail('Only the three layouts exist.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Segments_ErrorLayout'),
-					messageOf(refused)
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Segments_ErrorLayout'), messageOf(refused));
 			}
 		}
 	}
@@ -292,18 +269,13 @@ private class DonorSegmentControllerTest {
 
 	@IsTest
 	static void withoutFindThePageIsClosed() {
-		User staffOnly = TestUsers.withPermissionSets(
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		User staffOnly = TestUsers.withPermissionSets(new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 		System.runAs(staffOnly) {
 			try {
 				DonorSegmentController.getPage();
 				Assert.fail('Segments are Find queries, so Find is required (R-DS6).');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Giving', 'Giving_Segments_ErrorNoPermission'),
-					messageOf(refused)
-				);
+				Assert.areEqual(BarnHelp.text('Giving', 'Giving_Segments_ErrorNoPermission'), messageOf(refused));
 			}
 		}
 	}
@@ -312,13 +284,8 @@ private class DonorSegmentControllerTest {
 	@IsTest
 	static void aJoinedConditionTakesTheNextNumberAndKeepsAnyLogic() {
 		Map<String, Object> plain = new Map<String, Object>{ 'version' => 1 };
-		DonorSegmentService.andCondition(
-			plain,
-			DonorSegmentService.condition('Email', 'is not null', null)
-		);
-		Map<String, Object> first = (Map<String, Object>) ((List<Object>) plain.get(
-			'conditions'
-		))[0];
+		DonorSegmentService.andCondition(plain, DonorSegmentService.condition('Email', 'is not null', null));
+		Map<String, Object> first = (Map<String, Object>) ((List<Object>) plain.get('conditions'))[0];
 		Assert.areEqual(1, first.get('id'), 'An empty filter starts at 1.');
 		Assert.isFalse(first.containsKey('value'), 'A null test carries no value.');
 		Assert.isNull(plain.get('logic'), 'No logic means every condition is joined by AND.');
@@ -326,10 +293,7 @@ private class DonorSegmentControllerTest {
 		Map<String, Object> withLogic = (Map<String, Object>) JSON.deserializeUntyped(
 			'{"version":1,"logic":"1 OR 7","conditions":[{"id":1},{"id":7}]}'
 		);
-		DonorSegmentService.andCondition(
-			withLogic,
-			DonorSegmentService.condition('Email', 'equals', 'a')
-		);
+		DonorSegmentService.andCondition(withLogic, DonorSegmentService.condition('Email', 'equals', 'a'));
 		Assert.areEqual('(1 OR 7) AND 8', withLogic.get('logic'), 'Numbered after the highest.');
 	}
 }

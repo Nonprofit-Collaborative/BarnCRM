@@ -47,9 +47,7 @@ private class FeatureControllerTest {
 			TestSettings.newInstall();
 
 			Test.startTest();
-			FeatureController.FeaturesModel model = FeatureController.turnOn(
-				FeatureSwitchService.AFFILIATIONS
-			);
+			FeatureController.FeaturesModel model = FeatureController.turnOn(FeatureSwitchService.AFFILIATIONS);
 			Test.stopTest();
 
 			for (FeatureController.FeatureRow row : model.features) {

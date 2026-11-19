@@ -32,12 +32,7 @@ public with sharing class ProjectFinancials {
 		String type = ProjectBilling.billingType(project);
 		Decimal[] earned = type == ProjectBilling.NOT_BILLED
 			? new List<Decimal>{ 0, 0 }
-			: ProjectRevenue.earned(
-						new List<Project__c>{ project },
-						Date.today(),
-						withCost,
-						AccessLevel.USER_MODE
-					)
+			: ProjectRevenue.earned(new List<Project__c>{ project }, Date.today(), withCost, AccessLevel.USER_MODE)
 					.get(projectId);
 		AggregateResult invoiced = [
 			SELECT SUM(Total__c) total
@@ -68,8 +63,7 @@ public with sharing class ProjectFinancials {
 		// Change Amount sums only Approved change requests, so it is 0 for a project with none.
 		Decimal budget = project.Budget_Amount__c == null
 			? null
-			: project.Budget_Amount__c +
-			  (project.Change_Amount__c == null ? 0 : project.Change_Amount__c);
+			: project.Budget_Amount__c + (project.Change_Amount__c == null ? 0 : project.Change_Amount__c);
 		return new Map<String, Object>{
 			'enabled' => true,
 			'canManage' => Projects.canManage(),

@@ -45,17 +45,10 @@ private class ImportFieldAccessTest {
 	private static void given() {
 		TestDataFactory.defaultSettings();
 		ImportMapping mapping = ImportMapping.parse(ImportTestDataFactory.donorMapping());
-		mapping.columns.add(
-			new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail')
-		);
+		mapping.columns.add(new ImportMapping.Column('Email Opt Out', 'Contact1.HasOptedOutOfEmail'));
 		mapping.columns.add(new ImportMapping.Column('Do Not Call', 'Contact1.DoNotCall'));
-		mapping.columns.add(
-			new ImportMapping.Column('Assistant', 'Contact1.' + UNGRANTED_ATTRIBUTE)
-		);
-		template = ImportTestDataFactory.template(
-			mapping.serialize(),
-			ImportTemplateService.RULE_EMAIL
-		);
+		mapping.columns.add(new ImportMapping.Column('Assistant', 'Contact1.' + UNGRANTED_ATTRIBUTE));
+		template = ImportTestDataFactory.template(mapping.serialize(), ImportTemplateService.RULE_EMAIL);
 		batch = ImportTestDataFactory.batch(template);
 		List<Map<String, String>> values = new List<Map<String, String>>();
 		for (String first : new List<String>{ 'Ana', 'Ben' }) {
@@ -120,8 +113,7 @@ private class ImportFieldAccessTest {
 			String note = noAccessNote(Contact.AssistantName);
 			Assert.isTrue(
 				preview.notes.contains(note),
-				'The dry run says the column will not load, before anything is committed: ' +
-				preview.notes
+				'The dry run says the column will not load, before anything is committed: ' + preview.notes
 			);
 			Assert.isTrue(committed.notes.contains(note), 'So does the commit: ' + committed.notes);
 			Integer mentions = 0;
@@ -156,11 +148,7 @@ private class ImportFieldAccessTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				2,
-				committed.created,
-				'Both people were created: ' + rowErrors() + ' ' + committed.notes
-			);
+			Assert.areEqual(2, committed.created, 'Both people were created: ' + rowErrors() + ' ' + committed.notes);
 			for (Contact created : [SELECT HasOptedOutOfEmail, DoNotCall FROM Contact]) {
 				Assert.isTrue(created.HasOptedOutOfEmail, 'The email opt-out from the file stuck.');
 				Assert.isTrue(created.DoNotCall, 'So did Do Not Call.');
@@ -169,10 +157,7 @@ private class ImportFieldAccessTest {
 				committed.notes.contains(noAccessNote(Contact.HasOptedOutOfEmail)),
 				'BarnCRM Admin may write the opt-outs, so none is reported skipped.'
 			);
-			Assert.isFalse(
-				committed.notes.contains(noAccessNote(Contact.DoNotCall)),
-				'Nor Do Not Call.'
-			);
+			Assert.isFalse(committed.notes.contains(noAccessNote(Contact.DoNotCall)), 'Nor Do Not Call.');
 		}
 	}
 }

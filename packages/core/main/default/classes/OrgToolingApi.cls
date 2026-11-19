@@ -39,11 +39,7 @@ public with sharing class OrgToolingApi {
 	}
 
 	/** Saves new Metadata on a Tooling record. */
-	public static void updateMetadata(
-		String objectName,
-		String recordId,
-		Map<String, Object> metadata
-	) {
+	public static void updateMetadata(String objectName, String recordId, Map<String, Object> metadata) {
 		send(
 			'PATCH',
 			'tooling/sobjects/' + objectName + '/' + recordId,

@@ -36,9 +36,7 @@ public with sharing class FormDeleteGuard extends TriggerHandler {
 			return;
 		}
 		Boolean forms = deleting.values()[0] instanceof Form__c;
-		Set<Id> answered = forms
-			? formsAnswered(deleting.keySet())
-			: versionsAnswered(deleting.keySet());
+		Set<Id> answered = forms ? formsAnswered(deleting.keySet()) : versionsAnswered(deleting.keySet());
 		if (answered.isEmpty()) {
 			return;
 		}
@@ -79,9 +77,7 @@ public with sharing class FormDeleteGuard extends TriggerHandler {
 				[
 					SELECT Id
 					FROM Form_Version__c
-					WHERE
-						Id IN :versionIds
-						AND Id IN (SELECT Form_Version__c FROM Form_Submission__c)
+					WHERE Id IN :versionIds AND Id IN (SELECT Form_Version__c FROM Form_Submission__c)
 					WITH SYSTEM_MODE
 				]
 			)

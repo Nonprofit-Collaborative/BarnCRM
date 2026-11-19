@@ -18,10 +18,7 @@ public with sharing class SampleDataRemoveBatch extends SampleDataStageBatch {
 	@NamespaceAccessible
 	public static Id startRemoval(SampleDataStages stages) {
 		SampleDataStageBatch.noteStarted(stages);
-		return Database.executeBatch(
-			new SampleDataRemoveBatch(stages),
-			SampleDataStageBatch.SCOPE_SIZE
-		);
+		return Database.executeBatch(new SampleDataRemoveBatch(stages), SampleDataStageBatch.SCOPE_SIZE);
 	}
 
 	protected override void notifyStopped() {

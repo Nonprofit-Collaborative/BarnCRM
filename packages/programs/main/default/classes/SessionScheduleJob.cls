@@ -34,10 +34,7 @@ public with sharing class SessionScheduleJob implements Queueable {
 			if (scheduleIds.size() <= SessionScheduleBatch.CHUNK_SIZE) {
 				SessionScheduleService.run(scheduleIds);
 			} else {
-				Database.executeBatch(
-					new SessionScheduleBatch(scheduleIds),
-					SessionScheduleBatch.CHUNK_SIZE
-				);
+				Database.executeBatch(new SessionScheduleBatch(scheduleIds), SessionScheduleBatch.CHUNK_SIZE);
 			}
 		} catch (Exception runFailure) {
 			// The nightly run tries these schedules again.

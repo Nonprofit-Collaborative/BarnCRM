@@ -4,9 +4,7 @@
  * approved time lands in the next month; Recognize Revenue redoes a month. With Show financials
  * and recognize revenue off, nothing is written.
  */
-@IsTest(
-	testFor='ApexClass:ProjectRevenue, ApexClass:ProjectsNightlyJobProvider, ApexClass:ProjectBilling'
-)
+@IsTest(testFor='ApexClass:ProjectRevenue, ApexClass:ProjectsNightlyJobProvider, ApexClass:ProjectBilling')
 public class ProjectRevenueTest {
 	@TestSetup
 	static void setup() {
@@ -16,9 +14,7 @@ public class ProjectRevenueTest {
 	public static void revenue(Boolean turnedOn) {
 		OrgSettingsSystemWriter.save(
 			Projects_Settings__c.SObjectType,
-			new Map<Schema.SObjectField, Object>{
-				Projects_Settings__c.Revenue_Enabled__c => turnedOn
-			}
+			new Map<Schema.SObjectField, Object>{ Projects_Settings__c.Revenue_Enabled__c => turnedOn }
 		);
 		SettingsService.clearCaches();
 	}
@@ -137,11 +133,7 @@ public class ProjectRevenueTest {
 			insert new List<Project__c>{ tm, fixed, retainer };
 			insert new List<Project_Task__c>{
 				new Project_Task__c(Project__c = fixed.Id, Name = 'Design', Status__c = 'Done'),
-				new Project_Task__c(
-					Project__c = fixed.Id,
-					Name = 'Build',
-					Status__c = 'Not Started'
-				)
+				new Project_Task__c(Project__c = fixed.Id, Name = 'Build', Status__c = 'Not Started')
 			};
 			insert entry(tm.Id, 1, twoAgo);
 
@@ -157,8 +149,7 @@ public class ProjectRevenueTest {
 			Assert.areEqual(redone, again, 'A rerun updates the same row');
 			Assert.areEqual(
 				200,
-				[SELECT Recognized_Amount__c FROM Project_Revenue__c WHERE Id = :redone]
-				.Recognized_Amount__c,
+				[SELECT Recognized_Amount__c FROM Project_Revenue__c WHERE Id = :redone].Recognized_Amount__c,
 				'Late time lands in the next closed month'
 			);
 			Project_Revenue__c fee = [
@@ -180,8 +171,7 @@ public class ProjectRevenueTest {
 			);
 			Assert.areEqual(
 				1000,
-				[SELECT Recognized_Revenue__c FROM Project__c WHERE Id = :retainer.Id]
-				.Recognized_Revenue__c,
+				[SELECT Recognized_Revenue__c FROM Project__c WHERE Id = :retainer.Id].Recognized_Revenue__c,
 				'Rolled up on the project'
 			);
 		}

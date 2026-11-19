@@ -107,13 +107,9 @@ private class AddressVerificationControllerTest {
 		System.runAs(AddressVerificationTestData.admin()) {
 			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
 
-			AddressVerificationController.Setup kept = AddressVerificationController.clearKeys(
-				'Google'
-			);
+			AddressVerificationController.Setup kept = AddressVerificationController.clearKeys('Google');
 			Assert.isTrue(byProvider(kept).get(AddressVerifier.SMARTY).connected, 'Smarty kept');
-			AddressVerificationController.Setup cleared = AddressVerificationController.clearKeys(
-				'Smarty'
-			);
+			AddressVerificationController.Setup cleared = AddressVerificationController.clearKeys('Smarty');
 			Assert.isFalse(byProvider(cleared).get(AddressVerifier.SMARTY).connected, 'Forgotten');
 			Assert.isFalse(cleared.ready, 'Nothing is looked up');
 			try {
@@ -136,23 +132,18 @@ private class AddressVerificationControllerTest {
 				Assert.isNotNull(expected.getMessage(), 'Refused with a message');
 			}
 		}
-		Assert.isNull(
-			Address_Verification_Settings__c.getOrgDefaults().Connected_Provider__c,
-			'Nothing saved'
-		);
+		Assert.isNull(Address_Verification_Settings__c.getOrgDefaults().Connected_Provider__c, 'Nothing saved');
 	}
 
 	@IsTest
 	static void healthCheckAndTheNightlyStepWaitForAConnection() {
 		System.runAs(AddressVerificationTestData.admin()) {
-			List<HealthCheckService.Finding> before = new AddressVerificationHealthCheckExtension()
-				.findings();
+			List<HealthCheckService.Finding> before = new AddressVerificationHealthCheckExtension().findings();
 			NightlyStep stepBefore = new AddressVerificationNightlyJobProvider().nightlySteps()[0];
 			String notStarted = AddressVerificationController.verifyWaiting();
 
 			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
-			List<HealthCheckService.Finding> after = new AddressVerificationHealthCheckExtension()
-				.findings();
+			List<HealthCheckService.Finding> after = new AddressVerificationHealthCheckExtension().findings();
 			NightlyStep stepAfter = new AddressVerificationNightlyJobProvider().nightlySteps()[0];
 
 			Assert.areEqual(1, before.size(), 'Not connected');
@@ -205,8 +196,7 @@ private class AddressVerificationControllerTest {
 				AddressVerificationHealthCheckExtension.waitingCount(),
 				'Both current, unverified addresses are now past the wait'
 			);
-			List<HealthCheckService.Finding> found = new AddressVerificationHealthCheckExtension()
-				.findings();
+			List<HealthCheckService.Finding> found = new AddressVerificationHealthCheckExtension().findings();
 
 			Assert.areEqual(1, found.size(), 'The waiting count is reported');
 			Assert.areEqual('address_verification_waiting', found[0].key, 'The finding');

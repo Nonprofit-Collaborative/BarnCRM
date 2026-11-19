@@ -146,20 +146,13 @@ public with sharing class BulkUpdateFields {
 	}
 
 	/** The fields the person may read that can be copied into this target, sorted by label. */
-	public static List<QueryFieldCatalog.PicklistOption> copySources(
-		String objectName,
-		String targetName
-	) {
+	public static List<QueryFieldCatalog.PicklistOption> copySources(String objectName, String targetName) {
 		Schema.SObjectType type = writableObject(objectName);
 		Schema.DescribeFieldResult target = writableField(type, targetName);
 		Map<String, QueryFieldCatalog.PicklistOption> byLabel = new Map<String, QueryFieldCatalog.PicklistOption>();
 		for (Schema.SObjectField token : fieldMap(type).values()) {
 			Schema.DescribeFieldResult source = token.getDescribe();
-			if (
-				source.getName() == target.getName() ||
-				!source.isAccessible() ||
-				!compatible(target, source)
-			) {
+			if (source.getName() == target.getName() || !source.isAccessible() || !compatible(target, source)) {
 				continue;
 			}
 			QueryFieldCatalog.PicklistOption option = new QueryFieldCatalog.PicklistOption();
@@ -194,10 +187,7 @@ public with sharing class BulkUpdateFields {
 	}
 
 	/** A field the person may bulk update, or a refusal naming it and saying why. */
-	public static Schema.DescribeFieldResult writableField(
-		Schema.SObjectType type,
-		Object rawName
-	) {
+	public static Schema.DescribeFieldResult writableField(Schema.SObjectType type, Object rawName) {
 		Schema.DescribeFieldResult field = ownField(type, rawName);
 		String reason = fieldReason(type, field);
 		if (reason != null) {
@@ -212,10 +202,7 @@ public with sharing class BulkUpdateFields {
 	}
 
 	/** Whether `source` may be copied into `target` (R-BU4). */
-	public static Boolean compatible(
-		Schema.DescribeFieldResult target,
-		Schema.DescribeFieldResult source
-	) {
+	public static Boolean compatible(Schema.DescribeFieldResult target, Schema.DescribeFieldResult source) {
 		Schema.DisplayType to = target.getType();
 		Schema.DisplayType given = source.getType();
 		if (!WRITABLE.contains(to)) {
@@ -225,9 +212,7 @@ public with sharing class BulkUpdateFields {
 			if (given != Schema.DisplayType.REFERENCE) {
 				return false;
 			}
-			Set<Schema.SObjectType> reachable = new Set<Schema.SObjectType>(
-				target.getReferenceTo()
-			);
+			Set<Schema.SObjectType> reachable = new Set<Schema.SObjectType>(target.getReferenceTo());
 			for (Schema.SObjectType parent : source.getReferenceTo()) {
 				if (reachable.contains(parent)) {
 					return true;
@@ -247,10 +232,7 @@ public with sharing class BulkUpdateFields {
 	/** A value to set, as the field's own type, or a refusal naming the field. */
 	public static Object typed(Schema.DescribeFieldResult field, Object raw) {
 		BulkUpdateException refused = new BulkUpdateException(
-			String.format(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorBadValue'),
-				new List<Object>{ field.getLabel() }
-			)
+			String.format(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorBadValue'), new List<Object>{ field.getLabel() })
 		);
 		if (raw == null || String.isBlank(String.valueOf(raw))) {
 			throw refused;
@@ -337,8 +319,7 @@ public with sharing class BulkUpdateFields {
 
 	/** Whether a target may be changed with transform steps: any writable type but a lookup (R-BU7). */
 	public static Boolean canTransform(Schema.DescribeFieldResult field) {
-		return WRITABLE.contains(field.getType()) &&
-			field.getType() != Schema.DisplayType.REFERENCE;
+		return WRITABLE.contains(field.getType()) && field.getType() != Schema.DisplayType.REFERENCE;
 	}
 
 	/**
@@ -462,11 +443,7 @@ public with sharing class BulkUpdateFields {
 	}
 
 	/** A restricted picklist takes only its active values; an open one takes any text. */
-	private static void checkPicklist(
-		Schema.DescribeFieldResult field,
-		String text,
-		BulkUpdateException refused
-	) {
+	private static void checkPicklist(Schema.DescribeFieldResult field, String text, BulkUpdateException refused) {
 		if (!field.isRestrictedPicklist()) {
 			return;
 		}

@@ -44,9 +44,7 @@ private class RollupsHealthCheckExtensionTest {
 	}
 
 	private static void shipOneRollup(String mode) {
-		RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{
-			memberCountDefault(mode)
-		};
+		RollupSelector.defaultsOverride = new List<Rollup_Definition_Default__mdt>{ memberCountDefault(mode) };
 	}
 
 	private static void shipTwoRollups() {
@@ -57,11 +55,7 @@ private class RollupsHealthCheckExtensionTest {
 	}
 
 	/** A definition already in the org, as the administrator left it. */
-	private static Rollup_Definition__c existingMemberCount(
-		String key,
-		Boolean active,
-		Boolean packageDefault
-	) {
+	private static Rollup_Definition__c existingMemberCount(String key, Boolean active, Boolean packageDefault) {
 		return new Rollup_Definition__c(
 			Name = key,
 			Definition_Key__c = key,
@@ -88,10 +82,7 @@ private class RollupsHealthCheckExtensionTest {
 	 * A finding from a run already made. A test that reads several findings asks Health Check
 	 * once, as the panel does: each full run costs a few dozen queries with every module there.
 	 */
-	private static HealthCheckService.Finding find(
-		List<HealthCheckService.Finding> findings,
-		String key
-	) {
+	private static HealthCheckService.Finding find(List<HealthCheckService.Finding> findings, String key) {
 		for (HealthCheckService.Finding finding : findings) {
 			if (key.equals(finding.getKey())) {
 				return finding;
@@ -144,8 +135,7 @@ private class RollupsHealthCheckExtensionTest {
 					'The finding names what the fix will create.'
 				);
 				Assert.areEqual(
-					HealthCheckService.FIX_ACTION_PREFIX +
-					RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
+					HealthCheckService.FIX_ACTION_PREFIX + RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
 					finding.getFixTarget(),
 					'It carries the restore fix.'
 				);
@@ -160,10 +150,7 @@ private class RollupsHealthCheckExtensionTest {
 				assertPressingAgainIsRefused(finding);
 				Test.stopTest();
 
-				Assert.isNull(
-					find(report, 'shipped_rollups_missing'),
-					'The re-run report no longer has the finding.'
-				);
+				Assert.isNull(find(report, 'shipped_rollups_missing'), 'The re-run report no longer has the finding.');
 				Assert.isTrue(
 					report.getFixOutcome().contains('Household member count'),
 					'The panel is told what the fix created.'
@@ -174,20 +161,13 @@ private class RollupsHealthCheckExtensionTest {
 					'Pressing the fix twice is pressing it once.'
 				);
 				List<Setting_Change__c> logged = changesLogged();
-				Assert.areEqual(
-					1,
-					logged.size(),
-					'The fix is recorded once in the change history.'
-				);
+				Assert.areEqual(1, logged.size(), 'The fix is recorded once in the change history.');
 				Assert.areEqual(
 					'Health Check: ' + System.Label.Rollups_HealthCheck_RollupsMissingFix,
 					logged[0].Setting_Name__c,
 					'Under the name of the button that made it.'
 				);
-				Assert.isTrue(
-					logged[0].New_Value__c.contains('Household member count'),
-					'Naming what it created.'
-				);
+				Assert.isTrue(logged[0].New_Value__c.contains('Household member count'), 'Naming what it created.');
 			}
 		}
 	}
@@ -219,11 +199,7 @@ private class RollupsHealthCheckExtensionTest {
 				WHERE Definition_Key__c = 'Core_Household_Member_Count'
 			];
 			Assert.isFalse(memberCount.Active__c, 'A total she switched off stays off (ADR-0048).');
-			Assert.areEqual(
-				2,
-				[SELECT COUNT() FROM Rollup_Definition__c],
-				'The missing one was created beside it.'
-			);
+			Assert.areEqual(2, [SELECT COUNT() FROM Rollup_Definition__c], 'The missing one was created beside it.');
 		}
 	}
 
@@ -296,19 +272,13 @@ private class RollupsHealthCheckExtensionTest {
 				RollupService.ensureDefaults();
 				List<HealthCheckService.Finding> found = HealthCheckService.run();
 				HealthCheckService.Finding finding = find(found, 'nightly_rollups_not_scheduled');
-				Assert.isNotNull(
-					finding,
-					'A rollup waiting on a run nobody scheduled is reported.'
-				);
+				Assert.isNotNull(finding, 'A rollup waiting on a run nobody scheduled is reported.');
 				Assert.areEqual(
 					HealthCheckService.SEVERITY_WARNING,
 					finding.getSeverity(),
 					'A rollup that recalculates only at night is going stale.'
 				);
-				Assert.isNull(
-					finding.getFixTarget(),
-					'One cause, one button: the nightly jobs fix.'
-				);
+				Assert.isNull(finding.getFixTarget(), 'One cause, one button: the nightly jobs fix.');
 
 				HealthCheckService.Finding jobs = find(found, 'nightly_jobs_not_scheduled');
 				Assert.isTrue(
@@ -328,10 +298,7 @@ private class RollupsHealthCheckExtensionTest {
 					find(report, 'nightly_rollups_not_scheduled'),
 					'The re-run report no longer has the rollup finding.'
 				);
-				Assert.isNull(
-					find(report, 'nightly_jobs_not_scheduled'),
-					'Nor the nightly jobs finding.'
-				);
+				Assert.isNull(find(report, 'nightly_jobs_not_scheduled'), 'Nor the nightly jobs finding.');
 				Assert.areEqual(
 					String.format(
 						System.Label.Core_HealthCheck_FixScheduled,
@@ -384,10 +351,7 @@ private class RollupsHealthCheckExtensionTest {
 			shipOneRollup('Both');
 
 			System.runAs(priya) {
-				Assert.isNull(
-					find('shipped_rollups_missing'),
-					'Only somebody who can press the fix is told about it.'
-				);
+				Assert.isNull(find('shipped_rollups_missing'), 'Only somebody who can press the fix is told about it.');
 				try {
 					HealthCheckController.applyFixFor(
 						RollupsHealthCheckExtension.FIX_KEY_RESTORE_ROLLUPS,
@@ -436,8 +400,7 @@ private class RollupsHealthCheckExtensionTest {
 
 			System.runAs(maria) {
 				Test.startTest();
-				List<HealthCheckService.Finding> found = new RollupsHealthCheckExtension()
-					.findings();
+				List<HealthCheckService.Finding> found = new RollupsHealthCheckExtension().findings();
 				Test.stopTest();
 
 				Boolean failedFound = false;
@@ -456,8 +419,7 @@ private class RollupsHealthCheckExtensionTest {
 
 			System.runAs(maria) {
 				Test.startTest();
-				List<HealthCheckService.Finding> found = new RollupsHealthCheckExtension()
-					.findings();
+				List<HealthCheckService.Finding> found = new RollupsHealthCheckExtension().findings();
 				Test.stopTest();
 
 				for (HealthCheckService.Finding finding : found) {

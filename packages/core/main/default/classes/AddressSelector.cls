@@ -12,10 +12,7 @@ public with sharing class AddressSelector {
 		return [
 			SELECT Id, Account__c, Contact__c, Person_Account__c
 			FROM Address__c
-			WHERE
-				Account__c IN :ownerIds
-				OR Contact__c IN :ownerIds
-				OR Person_Account__c IN :ownerIds
+			WHERE Account__c IN :ownerIds OR Contact__c IN :ownerIds OR Person_Account__c IN :ownerIds
 			WITH SYSTEM_MODE
 			LIMIT 10000
 		];
@@ -76,10 +73,7 @@ public with sharing class AddressSelector {
 				Latest_Verified_Date__c,
 				CreatedDate
 			FROM Address__c
-			WHERE
-				Account__c IN :ownerIds
-				OR Contact__c IN :ownerIds
-				OR Person_Account__c IN :ownerIds
+			WHERE Account__c IN :ownerIds OR Contact__c IN :ownerIds OR Person_Account__c IN :ownerIds
 			WITH USER_MODE
 			ORDER BY Is_Default__c DESC, CreatedDate DESC
 			LIMIT 10000
@@ -90,10 +84,7 @@ public with sharing class AddressSelector {
 	 * The addresses currently marked default for the given owners, leaving out any
 	 * address in excludeAddressIds. Used to keep one default per owner.
 	 */
-	public static List<Address__c> selectDefaultsByOwnerIds(
-		Set<Id> ownerIds,
-		Set<Id> excludeAddressIds
-	) {
+	public static List<Address__c> selectDefaultsByOwnerIds(Set<Id> ownerIds, Set<Id> excludeAddressIds) {
 		if (ownerIds == null || ownerIds.isEmpty()) {
 			return new List<Address__c>();
 		}
@@ -203,26 +194,16 @@ public with sharing class AddressSelector {
 	 * @param accountIds the accounts
 	 * @param extraFields further Account fields to read; null or empty for none
 	 */
-	public static List<Account> selectAccountBillingAddresses(
-		Set<Id> accountIds,
-		List<String> extraFields
-	) {
+	public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds, List<String> extraFields) {
 		if (accountIds == null || accountIds.isEmpty()) {
 			return new List<Account>();
 		}
-		List<String> fields = new List<String>{
-			'Id',
-			'BillingStreet',
-			'BillingCity',
-			'BillingPostalCode'
-		};
+		List<String> fields = new List<String>{ 'Id', 'BillingStreet', 'BillingCity', 'BillingPostalCode' };
 		if (extraFields != null) {
 			fields.addAll(extraFields);
 		}
 		return Database.queryWithBinds(
-			'SELECT ' +
-				String.join(fields, ', ') +
-				' FROM Account WHERE Id IN :accountIds LIMIT 10000',
+			'SELECT ' + String.join(fields, ', ') + ' FROM Account WHERE Id IN :accountIds LIMIT 10000',
 			new Map<String, Object>{ 'accountIds' => accountIds },
 			AccessLevel.USER_MODE
 		);
@@ -246,9 +227,7 @@ public with sharing class AddressSelector {
 		if (objectType == null || recordIds == null || recordIds.isEmpty()) {
 			return new List<SObject>();
 		}
-		Map<String, Schema.SObjectField> known = objectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<String, Schema.SObjectField> known = objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.fields
 			.getMap();
 		List<String> fields = new List<String>{ 'Id' };

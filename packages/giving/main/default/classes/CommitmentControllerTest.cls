@@ -9,9 +9,7 @@ private class CommitmentControllerTest {
 	}
 
 	private static Contact donor() {
-		Contact person = TestDataFactory.person(
-			new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-		);
+		Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 		insert person;
 		return person;
 	}
@@ -43,16 +41,10 @@ private class CommitmentControllerTest {
 			input.installmentsPlanned = 12;
 
 			Test.startTest();
-			CommitmentController.SchedulePreview preview = CommitmentController.getSchedulePreview(
-				input
-			);
+			CommitmentController.SchedulePreview preview = CommitmentController.getSchedulePreview(input);
 			Test.stopTest();
 
-			Assert.areEqual(
-				12,
-				preview.count,
-				'The preview shows the twelve payments the pledge implies.'
-			);
+			Assert.areEqual(12, preview.count, 'The preview shows the twelve payments the pledge implies.');
 			Assert.areEqual(1200, preview.expectedTotal, 'The preview totals what is expected.');
 			Assert.isFalse(preview.saved, 'Nothing was saved to produce the preview.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Installment__c], 'A preview writes nothing.');
@@ -74,10 +66,7 @@ private class CommitmentControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				refused,
-				'A preview without an amount asks for one rather than failing silently.'
-			);
+			Assert.isTrue(refused, 'A preview without an amount asks for one rather than failing silently.');
 		}
 	}
 
@@ -88,22 +77,12 @@ private class CommitmentControllerTest {
 			Commitment__c commitment = pledge(person.Id);
 
 			Test.startTest();
-			CommitmentController.SchedulePreview preview = CommitmentController.generateNow(
-				commitment.Id
-			);
+			CommitmentController.SchedulePreview preview = CommitmentController.generateNow(commitment.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				preview.count,
-				'Generate now creates the payments the commitment implies.'
-			);
+			Assert.areEqual(3, preview.count, 'Generate now creates the payments the commitment implies.');
 			Assert.isTrue(preview.saved, 'What comes back is the saved schedule.');
-			Assert.areEqual(
-				1,
-				preview.installments[0].sequence,
-				'The rows come back in schedule order.'
-			);
+			Assert.areEqual(1, preview.installments[0].sequence, 'The rows come back in schedule order.');
 		}
 	}
 
@@ -115,21 +94,11 @@ private class CommitmentControllerTest {
 			CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
 
 			Test.startTest();
-			CommitmentController.SchedulePreview preview = CommitmentController.getSchedule(
-				commitment.Id
-			);
+			CommitmentController.SchedulePreview preview = CommitmentController.getSchedule(commitment.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				preview.count,
-				'The component reads the schedule the commitment has.'
-			);
-			Assert.areEqual(
-				300,
-				preview.expectedTotal,
-				'The total is what the three payments expect.'
-			);
+			Assert.areEqual(3, preview.count, 'The component reads the schedule the commitment has.');
+			Assert.areEqual(300, preview.expectedTotal, 'The total is what the three payments expect.');
 			Assert.areEqual(
 				'Active',
 				preview.commitmentStatus,
@@ -169,17 +138,12 @@ private class CommitmentControllerTest {
 	 */
 	@IsTest
 	static void aReaderIsOfferedNoChangeAndIsToldWhy() {
-		User reader = TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-		);
+		User reader = TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' });
 		Commitment__c commitment;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			commitment = pledge(donor().Id);
 			CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
-			CommitmentController.SchedulePreview own = CommitmentController.getSchedule(
-				commitment.Id
-			);
+			CommitmentController.SchedulePreview own = CommitmentController.getSchedule(commitment.Id);
 			Assert.isTrue(own.canChange, 'An administrator may change the commitment.');
 			Assert.isTrue(own.canGenerate, 'An administrator may generate a schedule.');
 			// Commitments are private: the reader sees this one through a read share.
@@ -206,11 +170,7 @@ private class CommitmentControllerTest {
 
 		Assert.isFalse(seen.canChange, 'A reader is offered no status change.');
 		Assert.isFalse(seen.canGenerate, 'A reader is offered no schedule to generate.');
-		Assert.areEqual(
-			BarnHelp.text('Giving', 'Giving_Commitment_NoPermission'),
-			message,
-			'Told why.'
-		);
+		Assert.areEqual(BarnHelp.text('Giving', 'Giving_Commitment_NoPermission'), message, 'Told why.');
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Assert.areEqual(
 				'Active',
@@ -235,10 +195,7 @@ private class CommitmentControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.isTrue(
-				refused,
-				'An action the service does not offer is refused in plain language.'
-			);
+			Assert.isTrue(refused, 'An action the service does not offer is refused in plain language.');
 		}
 	}
 

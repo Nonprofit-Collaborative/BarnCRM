@@ -7,14 +7,10 @@ public with sharing class SampleDataSelector {
 	 * The batch class that runs every sample data load, Core's and each module's (a module's
 	 * stages run in Core's SampleDataStageBatch too), so one name covers the whole load.
 	 */
-	private static final Set<String> LOAD_JOB_CLASS_NAMES = new Set<String>{
-		'SampleDataStageBatch'
-	};
+	private static final Set<String> LOAD_JOB_CLASS_NAMES = new Set<String>{ 'SampleDataStageBatch' };
 
 	/** The batch class that runs every removal, Core's stages and each module's. */
-	private static final Set<String> REMOVE_JOB_CLASS_NAMES = new Set<String>{
-		'SampleDataRemoveBatch'
-	};
+	private static final Set<String> REMOVE_JOB_CLASS_NAMES = new Set<String>{ 'SampleDataRemoveBatch' };
 
 	/** AsyncApexJob statuses that mean a job has not finished yet. */
 	private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{

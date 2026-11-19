@@ -12,16 +12,11 @@ private class ServiceCountReferralTest {
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
 		TestUsers.standardUserWith('Writer', STAFF);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	private static Contact person(String lastName) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		Contact record = HouseholdTestDataFactory.newContact('Pat', lastName);
@@ -74,29 +69,16 @@ private class ServiceCountReferralTest {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Service__c service = dropIn();
 			try {
-				ServiceDeliveryLogController.addCount(
-					service.Program__c,
-					service.Id,
-					Date.today(),
-					-1
-				);
+				ServiceDeliveryLogController.addCount(service.Program__c, service.Id, Date.today(), -1);
 				Assert.fail('A negative count must be refused.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Programs', 'Programs_Fail_Log'),
-					refused.getMessage(),
-					'Plain words.'
-				);
+				Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_Log'), refused.getMessage(), 'Plain words.');
 			}
 			try {
 				ServiceDeliveryLogController.addCount(service.Program__c, null, Date.today(), 3);
 				Assert.fail('A count needs a service.');
 			} catch (AuraHandledException refused) {
-				Assert.areEqual(
-					BarnHelp.text('Programs', 'Programs_Fail_Log'),
-					refused.getMessage(),
-					'Plain words.'
-				);
+				Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_Log'), refused.getMessage(), 'Plain words.');
 			}
 		}
 	}
@@ -137,21 +119,9 @@ private class ServiceCountReferralTest {
 				Attendance__c = 'Present'
 			);
 			insert new List<Service_Count__c>{
-				new Service_Count__c(
-					Service__c = service.Id,
-					Count_Date__c = today,
-					People_Served__c = 30
-				),
-				new Service_Count__c(
-					Service__c = service.Id,
-					Count_Date__c = today,
-					People_Served__c = 4
-				),
-				new Service_Count__c(
-					Service__c = service.Id,
-					Count_Date__c = today.addYears(-2),
-					People_Served__c = 99
-				)
+				new Service_Count__c(Service__c = service.Id, Count_Date__c = today, People_Served__c = 30),
+				new Service_Count__c(Service__c = service.Id, Count_Date__c = today, People_Served__c = 4),
+				new Service_Count__c(Service__c = service.Id, Count_Date__c = today.addYears(-2), People_Served__c = 99)
 			};
 
 			ProgramDashboardController.Dashboard result = ProgramDashboardController.getDashboard(
@@ -215,10 +185,7 @@ private class ServiceCountReferralTest {
 	static void aReferralIsPrivateAndOutOfReachOfReadOnly() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Contact who = person('Private');
-			Enrollment__c enrolled = new Enrollment__c(
-				Program__c = dropIn().Program__c,
-				Contact__c = who.Id
-			);
+			Enrollment__c enrolled = new Enrollment__c(Program__c = dropIn().Program__c, Contact__c = who.Id);
 			insert enrolled;
 			insert new Referral__c(Contact__c = who.Id, Enrollment__c = enrolled.Id);
 		}
@@ -233,10 +200,7 @@ private class ServiceCountReferralTest {
 			'Reader',
 			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
 		)) {
-			Assert.isFalse(
-				Schema.SObjectType.Referral__c.isAccessible(),
-				'Read Only has no access to referrals.'
-			);
+			Assert.isFalse(Schema.SObjectType.Referral__c.isAccessible(), 'Read Only has no access to referrals.');
 		}
 	}
 
@@ -253,11 +217,7 @@ private class ServiceCountReferralTest {
 			List<PersonErasure.Change> changes = new ProgramsErasureExtension().erase(who.Id);
 
 			Assert.areEqual(1, changes.size(), 'One change: the referrals deleted.');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Referral__c],
-				'Only the other person referral is left.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Referral__c], 'Only the other person referral is left.');
 		}
 	}
 }

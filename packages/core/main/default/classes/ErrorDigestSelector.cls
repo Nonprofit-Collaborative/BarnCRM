@@ -72,10 +72,7 @@ public with sharing class ErrorDigestSelector {
 
 	/** An entry's Occurrences, at least 1: an entry written before R-E7 holds none. */
 	private static Integer occurrences(Error_Log__c entry) {
-		return entry.Occurrences__c == null ||
-			entry.Occurrences__c < 1
-			? 1
-			: entry.Occurrences__c.intValue();
+		return entry.Occurrences__c == null || entry.Occurrences__c < 1 ? 1 : entry.Occurrences__c.intValue();
 	}
 
 	private static void increment(Map<String, Integer> counts, String key, Integer times) {

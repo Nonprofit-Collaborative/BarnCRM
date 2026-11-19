@@ -12,15 +12,7 @@ public with sharing class ReportSubscriptions {
 	public static final String FAILED = 'Failed';
 	private static final String SOURCE = 'lightningReportSubscribe';
 	private static final Set<String> FREQUENCIES = new Set<String>{ 'daily', 'weekly', 'monthly' };
-	private static final Set<String> WEEKDAYS = new Set<String>{
-		'sun',
-		'mon',
-		'tue',
-		'wed',
-		'thu',
-		'fri',
-		'sat'
-	};
+	private static final Set<String> WEEKDAYS = new Set<String>{ 'sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat' };
 	private static final Integer MAX_REPORTS = 200;
 
 	public class ReportRow {
@@ -105,15 +97,11 @@ public with sharing class ReportSubscriptions {
 				);
 			}
 			if (!connection.connected) {
-				throw new SubscriptionException(
-					BarnHelp.text('Core', 'Core_ReportSubscriptions_ConnectionNeeded')
-				);
+				throw new SubscriptionException(BarnHelp.text('Core', 'Core_ReportSubscriptions_ConnectionNeeded'));
 			}
 			Choice chosen = (Choice) JSON.deserialize(scheduleJson, Choice.class);
 			if (!valid(chosen)) {
-				throw new SubscriptionException(
-					BarnHelp.text('Core', 'Core_ReportSubscriptions_ScheduleInvalid')
-				);
+				throw new SubscriptionException(BarnHelp.text('Core', 'Core_ReportSubscriptions_ScheduleInvalid'));
 			}
 			List<Report> found = [
 				SELECT Name
@@ -123,14 +111,9 @@ public with sharing class ReportSubscriptions {
 				LIMIT 1
 			];
 			if (found.isEmpty()) {
-				throw new SubscriptionException(
-					BarnHelp.text('Core', 'Core_ReportSubscriptions_ReportNotFound')
-				);
+				throw new SubscriptionException(BarnHelp.text('Core', 'Core_ReportSubscriptions_ReportNotFound'));
 			}
-			return AsyncStarter.queue(
-				new SubscribeJob(chosen, found[0].Name),
-				'ReportSubscriptions.subscribe'
-			);
+			return AsyncStarter.queue(new SubscribeJob(chosen, found[0].Name), 'ReportSubscriptions.subscribe');
 		} catch (Exception e) {
 			throw UserErrors.wrap(e, 'ReportSubscriptions.subscribe', true);
 		}
@@ -207,10 +190,7 @@ public with sharing class ReportSubscriptions {
 			'name' => reportName,
 			'recordId' => chosen.reportId,
 			'source' => SOURCE,
-			'schedule' => new Map<String, Object>{
-				'frequency' => chosen.frequency,
-				'details' => details
-			},
+			'schedule' => new Map<String, Object>{ 'frequency' => chosen.frequency, 'details' => details },
 			'thresholds' => new List<Object>{
 				new Map<String, Object>{
 					'type' => 'always',
@@ -218,9 +198,7 @@ public with sharing class ReportSubscriptions {
 					'actions' => new List<Object>{
 						new Map<String, Object>{
 							'type' => 'sendEmail',
-							'configuration' => new Map<String, Object>{
-								'recipients' => new List<Object>()
-							}
+							'configuration' => new Map<String, Object>{ 'recipients' => new List<Object>() }
 						}
 					}
 				}
@@ -242,8 +220,7 @@ public with sharing class ReportSubscriptions {
 		}
 
 		public void execute(QueueableContext context) {
-			String logContext =
-				LOG_CONTEXT + (context == null ? 'test' : String.valueOf(context.getJobId()));
+			String logContext = LOG_CONTEXT + (context == null ? 'test' : String.valueOf(context.getJobId()));
 			try {
 				String failure = save(chosen, reportName);
 				if (failure != null) {
@@ -272,9 +249,7 @@ public with sharing class ReportSubscriptions {
 			SOURCE +
 			'&recordId=' +
 			EncodingUtil.urlEncode(chosen.reportId, 'UTF-8');
-		List<Object> existing = (List<Object>) JSON.deserializeUntyped(
-			OrgToolingApi.rest('GET', query, null)
-		);
+		List<Object> existing = (List<Object>) JSON.deserializeUntyped(OrgToolingApi.rest('GET', query, null));
 		if (!existing.isEmpty()) {
 			String notificationId = String.valueOf(((Map<String, Object>) existing[0]).get('id'));
 			OrgToolingApi.rest('PUT', 'analytics/notifications/' + notificationId, body);

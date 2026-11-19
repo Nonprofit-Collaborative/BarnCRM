@@ -12,8 +12,6 @@ public class FormCatalogTestSupport {
 		String name = FormCatalogExtensions.EXTENSION_CLASSES[0];
 		FormCatalogExtensions.EXTENSION_CLASSES.clear();
 		FormCatalogExtensions.EXTENSION_CLASSES.add(name);
-		FormCatalogExtensions.overrides = new Map<String, FormCatalogExtension>{
-			name => extension
-		};
+		FormCatalogExtensions.overrides = new Map<String, FormCatalogExtension>{ name => extension };
 	}
 }

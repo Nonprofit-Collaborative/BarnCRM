@@ -38,9 +38,7 @@ private class ProgramSampleDataTest {
 	}
 
 	private static List<Contact> samplePeople(Integer howMany) {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		List<Contact> people = new List<Contact>();
@@ -153,10 +151,7 @@ private class ProgramSampleDataTest {
 				[SELECT COUNT() FROM Service_Delivery__c WHERE Session__c != NULL],
 				'Attendance for four people at two held sessions.'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Service_Delivery__c WHERE Attendance__c = 'Excused Absence']
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Service_Delivery__c WHERE Attendance__c = 'Excused Absence']);
 			Assert.areEqual(
 				0,
 				[
@@ -177,11 +172,7 @@ private class ProgramSampleDataTest {
 				[SELECT COUNT() FROM Goal__c WHERE Assigned_To__c = :UserInfo.getUserId()],
 				'Each assigned to the person who loaded them.'
 			);
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Goal__c WHERE Next_Review_Date__c < TODAY],
-				'One review is due.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Goal__c WHERE Next_Review_Date__c < TODAY], 'One review is due.');
 			Goal__c achieved = [SELECT Closed_Date__c FROM Goal__c WHERE Status__c = 'Achieved'];
 			Assert.areEqual(Date.today().addDays(-95), achieved.Closed_Date__c, 'Kept as loaded.');
 			Assert.areEqual(7, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);

@@ -208,12 +208,7 @@ public with sharing class RollupDlrs {
 	 * Visible to tests, which build DLRS-shaped rows with it.
 	 */
 	@TestVisible
-	private static Definition fromValues(
-		String key,
-		String label,
-		String source,
-		Map<String, Object> values
-	) {
+	private static Definition fromValues(String key, String label, String source, Map<String, Object> values) {
 		Map<String, Object> byName = new Map<String, Object>();
 		for (String name : values.keySet()) {
 			byName.put(name.toLowerCase(), values.get(name));
@@ -247,9 +242,7 @@ public with sharing class RollupDlrs {
 
 	private static String text(Map<String, Object> byName, String field) {
 		Object value = byName.get(field.toLowerCase());
-		return value == null || String.isBlank(String.valueOf(value))
-			? null
-			: String.valueOf(value).trim();
+		return value == null || String.isBlank(String.valueOf(value)) ? null : String.valueOf(value).trim();
 	}
 
 	/** Whether two object and field names are the same field, through describe when they resolve. */
@@ -260,18 +253,14 @@ public with sharing class RollupDlrs {
 		Schema.SObjectType typeA = SettingsService.typeByName(objectA);
 		Schema.SObjectType typeB = SettingsService.typeByName(objectB);
 		if (typeA == null || typeB == null) {
-			return objectA.equalsIgnoreCase(objectB.trim()) &&
-				fieldA.equalsIgnoreCase(fieldB.trim());
+			return objectA.equalsIgnoreCase(objectB.trim()) && fieldA.equalsIgnoreCase(fieldB.trim());
 		}
 		if (typeA != typeB) {
 			return false;
 		}
-		Map<String, Schema.SObjectField> fields = typeA.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = typeA.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		Schema.SObjectField a = fields.get(fieldA.toLowerCase());
-		return a != null
-			? a == fields.get(fieldB.trim().toLowerCase())
-			: fieldA.equalsIgnoreCase(fieldB.trim());
+		return a != null ? a == fields.get(fieldB.trim().toLowerCase()) : fieldA.equalsIgnoreCase(fieldB.trim());
 	}
 
 	/** Reads the org's DLRS rollups: the custom metadata type, then the older object. */
@@ -282,9 +271,7 @@ public with sharing class RollupDlrs {
 				return found;
 			}
 			String prefix = OtherRollupTools.DLRS_NAMESPACE + '__';
-			found.addAll(
-				readFrom(prefix, METADATA_TYPE, 'DeveloperName', 'MasterLabel', SOURCE_METADATA)
-			);
+			found.addAll(readFrom(prefix, METADATA_TYPE, 'DeveloperName', 'MasterLabel', SOURCE_METADATA));
 			found.addAll(readFrom(prefix, LEGACY_OBJECT, 'Name', 'Name', SOURCE_OBJECT));
 			return found;
 		}
@@ -308,8 +295,7 @@ public with sharing class RollupDlrs {
 		if (type == null) {
 			return found;
 		}
-		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		Set<String> selected = new Set<String>{ keyField, labelField };
 		Map<String, String> localByQualified = new Map<String, String>();
 		// Apex names ignore case, so this list is not called FIELDS: `fields` above would hide it.
@@ -330,24 +316,13 @@ public with sharing class RollupDlrs {
 			prefix +
 			localName +
 			' LIMIT 2000';
-		for (
-			SObject row : Database.queryWithBinds(
-				query,
-				new Map<String, Object>(),
-				AccessLevel.SYSTEM_MODE
-			)
-		) {
+		for (SObject row : Database.queryWithBinds(query, new Map<String, Object>(), AccessLevel.SYSTEM_MODE)) {
 			Map<String, Object> values = new Map<String, Object>();
 			for (String qualified : localByQualified.keySet()) {
 				values.put(localByQualified.get(qualified), row.get(qualified));
 			}
 			found.add(
-				fromValues(
-					String.valueOf(row.get(keyField)),
-					String.valueOf(row.get(labelField)),
-					source,
-					values
-				)
+				fromValues(String.valueOf(row.get(keyField)), String.valueOf(row.get(labelField)), source, values)
 			);
 		}
 		return found;

@@ -88,19 +88,11 @@ private class NpcHouseholdConversionTest {
 	 */
 	private static Id blankRecordTypeOnUpdate() {
 		Account probe = TestDataFactory.household(
-			new Account(
-				Name = 'Npc Convert Probe',
-				RecordTypeId = HouseholdService.householdRecordTypeId()
-			)
+			new Account(Name = 'Npc Convert Probe', RecordTypeId = HouseholdService.householdRecordTypeId())
 		);
 		Database.insert(probe, true, AccessLevel.SYSTEM_MODE);
-		Database.update(
-			new Account(Id = probe.Id, RecordTypeId = null),
-			true,
-			AccessLevel.SYSTEM_MODE
-		);
-		return [SELECT RecordTypeId FROM Account WHERE Id = :probe.Id WITH SYSTEM_MODE]
-		.RecordTypeId;
+		Database.update(new Account(Id = probe.Id, RecordTypeId = null), true, AccessLevel.SYSTEM_MODE);
+		return [SELECT RecordTypeId FROM Account WHERE Id = :probe.Id WITH SYSTEM_MODE].RecordTypeId;
 	}
 
 	private static Map<Id, Account> read(List<Account> accounts) {
@@ -152,20 +144,14 @@ private class NpcHouseholdConversionTest {
 				FROM Merge_Journal__c
 				WITH SYSTEM_MODE
 			]) {
-				Assert.isTrue(
-					row.Previous_Values__c.contains('Household_Model__c'),
-					'the model it had is journaled'
-				);
+				Assert.isTrue(row.Previous_Values__c.contains('Household_Model__c'), 'the model it had is journaled');
 			}
 			Assert.areEqual(
 				2,
 				NpspHouseholdAdoptionService.getStatus(NpspHouseholdSource.NPC).lastRun.adopted,
 				'the NPC panel shows its run'
 			);
-			Assert.isNull(
-				NpspHouseholdAdoptionService.getStatus(null).lastRun,
-				'the NPSP panel does not'
-			);
+			Assert.isNull(NpspHouseholdAdoptionService.getStatus(null).lastRun, 'the NPSP panel does not');
 			Assert.isTrue(NpspHouseholdAdoptionService.isNpcOffered(), 'NPC panel offered');
 		}
 	}
@@ -193,9 +179,7 @@ private class NpcHouseholdConversionTest {
 			Test.stopTest();
 
 			Map<Id, Account> after = read(accounts);
-			Id expectedType = leeBefore.RecordTypeId == null
-				? blankRecordTypeOnUpdate()
-				: leeBefore.RecordTypeId;
+			Id expectedType = leeBefore.RecordTypeId == null ? blankRecordTypeOnUpdate() : leeBefore.RecordTypeId;
 			// Lee is no longer a household, except where the org gives a blank record type on
 			// update its default and that default is the household type (a Platform org with
 			// no organization type): the record type it had is put back either way.
@@ -214,10 +198,7 @@ private class NpcHouseholdConversionTest {
 					after.get(lee.Id).Household_Model__c,
 					'Lee gets the model it had before the run'
 				);
-				Assert.isTrue(
-					membersOf(lee.Id).isEmpty(),
-					'the membership the run made is removed'
-				);
+				Assert.isTrue(membersOf(lee.Id).isEmpty(), 'the membership the run made is removed');
 			} else {
 				Assert.areEqual(
 					'Not Restored',
@@ -239,11 +220,7 @@ private class NpcHouseholdConversionTest {
 				WITH SYSTEM_MODE
 			];
 			Assert.areEqual('Not Restored', kept.Status__c, 'Kim has a member');
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_NpspAdoption_NoteHasMembers'),
-				kept.Notes__c,
-				'why'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_NpspAdoption_NoteHasMembers'), kept.Notes__c, 'why');
 		}
 	}
 
@@ -258,10 +235,7 @@ private class NpcHouseholdConversionTest {
 			new Household_Member__c(Household__c = second)
 		};
 		List<Database.DeleteResult> results = new List<Database.DeleteResult>{
-			(Database.DeleteResult) JSON.deserialize(
-				'{"success":true}',
-				Database.DeleteResult.class
-			),
+			(Database.DeleteResult) JSON.deserialize('{"success":true}', Database.DeleteResult.class),
 			(Database.DeleteResult) JSON.deserialize(
 				'{"success":false,"errors":[{"message":"locked","statusCode":"ENTITY_IS_LOCKED"}]}',
 				Database.DeleteResult.class

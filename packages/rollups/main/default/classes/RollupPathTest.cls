@@ -17,10 +17,7 @@ private class RollupPathTest {
 
 			System.Assert.areEqual(1, parsed.branches.size(), 'One alternative');
 			System.Assert.areEqual(1, parsed.branches[0].segments.size(), 'One segment');
-			System.Assert.isFalse(
-				parsed.needsHouseholdResolution(),
-				'A plain lookup needs no membership lookup'
-			);
+			System.Assert.isFalse(parsed.needsHouseholdResolution(), 'A plain lookup needs no membership lookup');
 		}
 	}
 
@@ -48,11 +45,7 @@ private class RollupPathTest {
 				parsed.branches[0].segments[0],
 				'The first alternative is tried first'
 			);
-			System.Assert.areEqual(
-				'Donor_Account__c',
-				parsed.branches[1].segments[0],
-				'Then the second'
-			);
+			System.Assert.areEqual('Donor_Account__c', parsed.branches[1].segments[0], 'Then the second');
 		}
 	}
 
@@ -61,10 +54,7 @@ private class RollupPathTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			RollupPath.Parsed parsed = RollupPath.parse('Donor_Contact__c > {Household}');
 
-			System.Assert.isTrue(
-				parsed.needsHouseholdResolution(),
-				'The household token is resolved, not walked'
-			);
+			System.Assert.isTrue(parsed.needsHouseholdResolution(), 'The household token is resolved, not walked');
 			System.Assert.areEqual(
 				new List<String>{ 'Donor_Contact__c' },
 				parsed.branches[0].referencePrefix(),

@@ -42,9 +42,7 @@ public without sharing class AutomationSettingsWriter {
 		OrgSettingsSystemWriter.saveOver(
 			BarnCRM_Settings__c.SObjectType,
 			stored,
-			new Map<Schema.SObjectField, Object>{
-				BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil
-			}
+			new Map<Schema.SObjectField, Object>{ BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil }
 		);
 	}
 

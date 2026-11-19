@@ -49,11 +49,7 @@ public with sharing class RollupService {
 
 	private static final Set<String> REAL_TIME_MODES = new Set<String>{ MODE_REAL_TIME, MODE_BOTH };
 	private static final Set<String> SCHEDULED_MODES = new Set<String>{ MODE_SCHEDULED, MODE_BOTH };
-	private static final Set<String> EVERY_MODE = new Set<String>{
-		MODE_REAL_TIME,
-		MODE_SCHEDULED,
-		MODE_BOTH
-	};
+	private static final Set<String> EVERY_MODE = new Set<String>{ MODE_REAL_TIME, MODE_SCHEDULED, MODE_BOTH };
 
 	/** The records the last merge recalculated, so a test can see only survivors were. */
 	@TestVisible
@@ -135,8 +131,7 @@ public with sharing class RollupService {
 				handler = handler.substringAfterLast('.');
 			}
 			if (
-				REAL_TIME_HANDLER.equalsIgnoreCase(handler) &&
-				SettingsService.typeByName(entry.Object_Name__c) == type
+				REAL_TIME_HANDLER.equalsIgnoreCase(handler) && SettingsService.typeByName(entry.Object_Name__c) == type
 			) {
 				return true;
 			}
@@ -198,9 +193,7 @@ public with sharing class RollupService {
 	 * (R-R4a, ADR-0136): a data migration user's saves neither recalculate nor queue them, and
 	 * the nightly run and Recalculate, which never call this, still cover them.
 	 */
-	private static List<Rollup_Definition__c> withoutBypassed(
-		List<Rollup_Definition__c> definitions
-	) {
+	private static List<Rollup_Definition__c> withoutBypassed(List<Rollup_Definition__c> definitions) {
 		List<Rollup_Definition__c> kept = new List<Rollup_Definition__c>();
 		for (Rollup_Definition__c definition : definitions) {
 			if (!isBypassed(definition.Bypass_Permission__c)) {
@@ -250,17 +243,8 @@ public with sharing class RollupService {
 	 * @param oldRecords the same records as they were, or null outside an update
 	 */
 	@NamespaceAccessible
-	public static void runRealTime(
-		String sourceObject,
-		List<SObject> changedRecords,
-		Map<Id, SObject> oldRecords
-	) {
-		if (
-			String.isBlank(sourceObject) ||
-			changedRecords == null ||
-			changedRecords.isEmpty() ||
-			isTurnedOff()
-		) {
+	public static void runRealTime(String sourceObject, List<SObject> changedRecords, Map<Id, SObject> oldRecords) {
+		if (String.isBlank(sourceObject) || changedRecords == null || changedRecords.isEmpty() || isTurnedOff()) {
 			return;
 		}
 		List<Rollup_Definition__c> definitions = realTimeForThisUser();
@@ -268,11 +252,7 @@ public with sharing class RollupService {
 			return;
 		}
 		if (Trigger.isExecuting && Trigger.isDelete) {
-			RollupDependents.beforeDelete(
-				SettingsService.typeByName(sourceObject),
-				changedRecords,
-				definitions
-			);
+			RollupDependents.beforeDelete(SettingsService.typeByName(sourceObject), changedRecords, definitions);
 			return;
 		}
 		recalculateNowOrQueue(
@@ -300,9 +280,7 @@ public with sharing class RollupService {
 		}
 		List<Rollup_Definition__c> definitions = realTimeForThisUser();
 		if (!definitions.isEmpty()) {
-			recalculateNowOrQueue(
-				RollupChanges.afterDelete(sourceObject, deletedRecords, definitions)
-			);
+			recalculateNowOrQueue(RollupChanges.afterDelete(sourceObject, deletedRecords, definitions));
 		}
 	}
 
@@ -399,11 +377,7 @@ public with sharing class RollupService {
 		private final Set<Id> survivorIds;
 		private final List<Rollup_Definition__c> definitions;
 
-		SurvivorRecalculation(
-			String target,
-			Set<Id> survivorIds,
-			List<Rollup_Definition__c> definitions
-		) {
+		SurvivorRecalculation(String target, Set<Id> survivorIds, List<Rollup_Definition__c> definitions) {
 			this.target = target;
 			this.survivorIds = survivorIds;
 			this.definitions = definitions;
@@ -470,18 +444,12 @@ public with sharing class RollupService {
 			return;
 		}
 		if (deleting == true) {
-			RollupChanges.Marked marked = RollupChanges.afterDelete(
-				sourceObject,
-				records,
-				definitions
-			);
+			RollupChanges.Marked marked = RollupChanges.afterDelete(sourceObject, records, definitions);
 			Map<String, Set<Id>> idsByTarget = idsByTargetOf(marked);
 			queue(idsByTarget, definitionsByTargetOf(marked, idsByTarget.keySet()));
 			return;
 		}
-		recalculateNowOrQueue(
-			RollupChanges.forSave(sourceObject, records, oldRecords, false, definitions)
-		);
+		recalculateNowOrQueue(RollupChanges.forSave(sourceObject, records, oldRecords, false, definitions));
 	}
 
 	/** Marked records keyed by each target entity's own API name; unknown entities are dropped. */
@@ -594,10 +562,7 @@ public with sharing class RollupService {
 		try {
 			for (String target : idsByTarget.keySet()) {
 				List<Rollup_Definition__c> definitions = definitionsByTarget.get(target);
-				RollupEngine.Result result = RollupEngine.recalculate(
-					idsByTarget.get(target),
-					definitions
-				);
+				RollupEngine.Result result = RollupEngine.recalculate(idsByTarget.get(target), definitions);
 				RollupQueue.retryLater(target, result.failed, 0, idsOf(definitions));
 			}
 		} catch (Exception stopped) {
@@ -654,20 +619,14 @@ public with sharing class RollupService {
 
 	/** The active definitions on this target entity, or only the one with this key or name. */
 	private static List<Rollup_Definition__c> named(String target, String rollup) {
-		List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(
-			target,
-			EVERY_MODE
-		);
+		List<Rollup_Definition__c> definitions = RollupSelector.selectActiveForTarget(target, EVERY_MODE);
 		if (String.isBlank(rollup)) {
 			return definitions;
 		}
 		String wanted = rollup.trim();
 		List<Rollup_Definition__c> matching = new List<Rollup_Definition__c>();
 		for (Rollup_Definition__c definition : definitions) {
-			if (
-				wanted.equalsIgnoreCase(definition.Definition_Key__c) ||
-				wanted.equalsIgnoreCase(definition.Name)
-			) {
+			if (wanted.equalsIgnoreCase(definition.Definition_Key__c) || wanted.equalsIgnoreCase(definition.Name)) {
 				matching.add(definition);
 			}
 		}
@@ -702,8 +661,7 @@ public with sharing class RollupService {
 		if (!canRecalculateNow(targetCount)) {
 			return false;
 		}
-		return plannedQueries(definitionsByTarget) <=
-			Limits.getLimitQueries() - Limits.getQueries();
+		return plannedQueries(definitionsByTarget) <= Limits.getLimitQueries() - Limits.getQueries();
 	}
 
 	/**
@@ -714,9 +672,7 @@ public with sharing class RollupService {
 	 * shared rather than test visible: Giving's save cost test budgets against it.
 	 */
 	@NamespaceAccessible
-	public static Integer plannedQueries(
-		Map<String, List<Rollup_Definition__c>> definitionsByTarget
-	) {
+	public static Integer plannedQueries(Map<String, List<Rollup_Definition__c>> definitionsByTarget) {
 		Integer planned = 0;
 		for (List<Rollup_Definition__c> definitions : definitionsByTarget.values()) {
 			if (definitions == null || definitions.isEmpty()) {
@@ -793,9 +749,7 @@ public with sharing class RollupService {
 	public static void recalculate(Id definitionId) {
 		Rollup_Definition__c definition = RollupSelector.selectById(definitionId);
 		if (definition == null) {
-			throw new RollupServiceException(
-				BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition')
-			);
+			throw new RollupServiceException(BarnHelp.text('Rollups', 'Core_Rollups_ErrorUnknownDefinition'));
 		}
 		runFullRecalculation(new List<Rollup_Definition__c>{ definition });
 	}
@@ -866,9 +820,7 @@ public with sharing class RollupService {
 				existingKeys.add(definition.Definition_Key__c.toLowerCase());
 			}
 			if (definition.Active__c == true && definition.Is_Package_Default__c != true) {
-				writtenTargets.add(
-					targetKey(definition.Target_Object__c, definition.Target_Field__c)
-				);
+				writtenTargets.add(targetKey(definition.Target_Object__c, definition.Target_Field__c));
 			}
 		}
 		Map<String, Boolean> presentByName = new Map<String, Boolean>();
@@ -882,11 +834,7 @@ public with sharing class RollupService {
 			}
 			existingKeys.add(key.toLowerCase());
 			Rollup_Definition__c definition = materialize(shippedDefault);
-			if (
-				writtenTargets.contains(
-					targetKey(shippedDefault.Target_Object__c, shippedDefault.Target_Field__c)
-				)
-			) {
+			if (writtenTargets.contains(targetKey(shippedDefault.Target_Object__c, shippedDefault.Target_Field__c))) {
 				plan.skippedNames.add(definition.Name);
 				continue;
 			}
@@ -975,9 +923,7 @@ public with sharing class RollupService {
 			Fiscal_Year_Aware__c = shippedDefault.Fiscal_Year_Aware__c == true,
 			Fiscal_Year_Offset__c = shippedDefault.Fiscal_Year_Offset__c,
 			Fiscal_Date_Field__c = shippedDefault.Fiscal_Date_Field__c,
-			Mode__c = String.isBlank(shippedDefault.Mode__c)
-				? defaultMode()
-				: shippedDefault.Mode__c,
+			Mode__c = String.isBlank(shippedDefault.Mode__c) ? defaultMode() : shippedDefault.Mode__c,
 			Is_Package_Default__c = true,
 			Active__c = shippedDefault.Default_Active__c == true
 		);

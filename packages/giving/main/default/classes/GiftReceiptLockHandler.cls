@@ -29,10 +29,7 @@ public with sharing class GiftReceiptLockHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		GiftService.enforceReceiptLock(
-			(List<Gift__c>) newRecords(),
-			(Map<Id, Gift__c>) oldRecordsById()
-		);
+		GiftService.enforceReceiptLock((List<Gift__c>) newRecords(), (Map<Id, Gift__c>) oldRecordsById());
 	}
 
 	public override void beforeDelete() {

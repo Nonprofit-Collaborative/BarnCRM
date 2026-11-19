@@ -18,9 +18,7 @@ private class EventProposalReviewTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = lastName)
-		);
+		Contact record = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = lastName));
 		insert as user record;
 		return record;
 	}
@@ -56,24 +54,15 @@ private class EventProposalReviewTest {
 		List<EventProposalReview.Criterion> criteria = EventProposalReview.validated(CRITERIA);
 		Assert.areEqual(
 			4.00,
-			EventProposalReview.weightedScore(
-				criteria,
-				new Map<String, Object>{ 'Relevance' => 5, 'Clarity' => 2 }
-			)
+			EventProposalReview.weightedScore(criteria, new Map<String, Object>{ 'Relevance' => 5, 'Clarity' => 2 })
 		);
 		Assert.areEqual(
 			4.33,
-			EventProposalReview.weightedScore(
-				criteria,
-				new Map<String, Object>{ 'Relevance' => 4, 'Clarity' => 5 }
-			)
+			EventProposalReview.weightedScore(criteria, new Map<String, Object>{ 'Relevance' => 4, 'Clarity' => 5 })
 		);
 		Assert.areEqual(
 			2.67,
-			EventProposalReview.weightedScore(
-				criteria,
-				new Map<String, Object>{ 'Relevance' => 3, 'Clarity' => 2 }
-			)
+			EventProposalReview.weightedScore(criteria, new Map<String, Object>{ 'Relevance' => 3, 'Clarity' => 2 })
 		);
 		for (
 			Map<String, Object> bad : new List<Map<String, Object>>{
@@ -123,31 +112,14 @@ private class EventProposalReviewTest {
 			} catch (AuraHandledException e) {
 				twice = true;
 			}
-			Integer assigned = EventProposalReview.assignReviewers(
-				new List<Id>{ talk.Id },
-				UserInfo.getUserId()
-			);
-			Integer again = EventProposalReview.assignReviewers(
-				new List<Id>{ talk.Id },
-				UserInfo.getUserId()
-			);
+			Integer assigned = EventProposalReview.assignReviewers(new List<Id>{ talk.Id }, UserInfo.getUserId());
+			Integer again = EventProposalReview.assignReviewers(new List<Id>{ talk.Id }, UserInfo.getUserId());
 			EventApplicationsController.Applications before = EventApplicationsController.getApplications(
 				talk.Event__c
 			);
-			EventApplicationsController.saveReview(
-				talk.Id,
-				null,
-				'Strong',
-				'{"Relevance":4,"Clarity":5}'
-			);
-			EventApplicationsController.Applications after = EventApplicationsController.getApplications(
-				talk.Event__c
-			);
-			EventApplicationsController.decide(
-				talk.Id,
-				EventApplicationsController.ACCEPTED,
-				false
-			);
+			EventApplicationsController.saveReview(talk.Id, null, 'Strong', '{"Relevance":4,"Clarity":5}');
+			EventApplicationsController.Applications after = EventApplicationsController.getApplications(talk.Event__c);
+			EventApplicationsController.decide(talk.Id, EventApplicationsController.ACCEPTED, false);
 			Test.stopTest();
 
 			Assert.isNotNull(presenterId, 'Presenter named');
@@ -204,17 +176,11 @@ private class EventProposalReviewTest {
 			}
 			Boolean sixth = false;
 			try {
-				EventProposalReview.addPresenter(
-					talk.Id,
-					people[EventProposalReview.MAX_PRESENTERS].Id,
-					'Speaker'
-				);
+				EventProposalReview.addPresenter(talk.Id, people[EventProposalReview.MAX_PRESENTERS].Id, 'Speaker');
 			} catch (AuraHandledException e) {
 				sixth = true;
 			}
-			EventProposalReview.removePresenter(
-				[SELECT Id FROM Proposal_Presenter__c WITH USER_MODE LIMIT 1].Id
-			);
+			EventProposalReview.removePresenter([SELECT Id FROM Proposal_Presenter__c WITH USER_MODE LIMIT 1].Id);
 			Boolean badCriteria = false;
 			try {
 				EventProposalReview.saveCriteria(talk.Event__c, '[{"label":"A","weight":0}]');

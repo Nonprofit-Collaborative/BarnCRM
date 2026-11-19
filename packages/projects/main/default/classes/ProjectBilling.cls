@@ -78,8 +78,7 @@ public with sharing class ProjectBilling {
 			)
 		) {
 			String what =
-				expense.Category__c +
-				(String.isBlank(expense.Description__c) ? '' : ': ' + expense.Description__c);
+				expense.Category__c + (String.isBlank(expense.Description__c) ? '' : ': ' + expense.Description__c);
 			add(lines, sources, 'Expense', what, expense.Date__c, 1);
 			lines[lines.size() - 1].Unit_Price__c = expense.Amount__c;
 			sources[sources.size() - 1].add(expense);
@@ -93,9 +92,7 @@ public with sharing class ProjectBilling {
 			rows += members.size();
 		}
 		if (rows > dmlRowCap) {
-			throw Projects.refuse(
-				BarnHelp.text('Projects', 'Projects_Invoice_TooMany', new List<Object>{ rows })
-			);
+			throw Projects.refuse(BarnHelp.text('Projects', 'Projects_Invoice_TooMany', new List<Object>{ rows }));
 		}
 		Project_Invoice__c invoice = new Project_Invoice__c(
 			Project__c = projectId,
@@ -203,33 +200,21 @@ public with sharing class ProjectBilling {
 
 	/** A blank Billing Type reads as Time and Materials (older projects). */
 	public static String billingType(Project__c project) {
-		return String.isBlank(project.Billing_Type__c)
-			? TIME_AND_MATERIALS
-			: project.Billing_Type__c;
+		return String.isBlank(project.Billing_Type__c) ? TIME_AND_MATERIALS : project.Billing_Type__c;
 	}
 
 	/** The invoice with its lines, refused unless it has the status asked for (any when null). */
 	private static Project_Invoice__c load(Id invoiceId, String status) {
 		requireBilling();
 		Project_Invoice__c invoice = [
-			SELECT
-				Id,
-				Status__c,
-				Total__c,
-				Invoice_Date__c,
-				Due_Date__c,
-				(SELECT Id FROM Lines__r LIMIT 2000)
+			SELECT Id, Status__c, Total__c, Invoice_Date__c, Due_Date__c, (SELECT Id FROM Lines__r LIMIT 2000)
 			FROM Project_Invoice__c
 			WHERE Id = :invoiceId
 			WITH USER_MODE
 		];
 		if (status != null && invoice.Status__c != status) {
 			throw Projects.refuse(
-				BarnHelp.text(
-					'Projects',
-					'Projects_Invoice_WrongStatus',
-					new List<Object>{ invoice.Status__c, status }
-				)
+				BarnHelp.text('Projects', 'Projects_Invoice_WrongStatus', new List<Object>{ invoice.Status__c, status })
 			);
 		}
 		return invoice;
@@ -299,10 +284,7 @@ public with sharing class ProjectBilling {
 		for (Project_Invoice_Line__c line : [
 			SELECT Service_Date__c
 			FROM Project_Invoice_Line__c
-			WHERE
-				Invoice__r.Project__c = :project.Id
-				AND Invoice__r.Status__c != :VOIDED
-				AND Line_Type__c = :RETAINER
+			WHERE Invoice__r.Project__c = :project.Id AND Invoice__r.Status__c != :VOIDED AND Line_Type__c = :RETAINER
 			WITH USER_MODE
 			LIMIT 2000
 		]) {
@@ -310,23 +292,14 @@ public with sharing class ProjectBilling {
 				billed.add(line.Service_Date__c.toStartOfMonth());
 			}
 		}
-		for (
-			Date month = periodStart.toStartOfMonth();
-			month <= periodEnd;
-			month = month.addMonths(1)
-		) {
+		for (Date month = periodStart.toStartOfMonth(); month <= periodEnd; month = month.addMonths(1)) {
 			if (!billed.contains(month)) {
-				String name = Datetime.newInstance(month, Time.newInstance(12, 0, 0, 0))
-					.format('MMMM yyyy');
+				String name = Datetime.newInstance(month, Time.newInstance(12, 0, 0, 0)).format('MMMM yyyy');
 				add(
 					lines,
 					sources,
 					RETAINER,
-					BarnHelp.text(
-						'Projects',
-						'Projects_Invoice_RetainerLine',
-						new List<Object>{ name }
-					),
+					BarnHelp.text('Projects', 'Projects_Invoice_RetainerLine', new List<Object>{ name }),
 					month,
 					1
 				);

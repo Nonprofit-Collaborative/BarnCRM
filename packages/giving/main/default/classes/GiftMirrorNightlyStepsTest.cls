@@ -51,10 +51,7 @@ private class GiftMirrorNightlyStepsTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			choose(OpportunityMirrorService.OFF);
 
-			Assert.isFalse(
-				NightlyJobs.isOn(opportunityStep()),
-				'A mirror that is Off has no run worth doing.'
-			);
+			Assert.isFalse(NightlyJobs.isOn(opportunityStep()), 'A mirror that is Off has no run worth doing.');
 		}
 	}
 

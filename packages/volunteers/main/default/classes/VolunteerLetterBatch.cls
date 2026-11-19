@@ -61,11 +61,7 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 
 	/** What a flow passes: the people, the letter type and the period. */
 	public class Request {
-		@InvocableVariable(
-			label='Person Ids'
-			description='Contact or person account Ids'
-			required=true
-		)
+		@InvocableVariable(label='Person Ids' description='Contact or person account Ids' required=true)
 		public List<Id> personIds;
 		@InvocableVariable(
 			label='Letter Type'
@@ -100,10 +96,7 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 		for (Request request : requests) {
 			String typeKey = request.letterType == null ? '' : request.letterType.trim();
 			if (!templateByType.containsKey(typeKey)) {
-				templateByType.put(
-					typeKey,
-					VolunteerLetterService.activeTemplateIdForType(typeKey)
-				);
+				templateByType.put(typeKey, VolunteerLetterService.activeTemplateIdForType(typeKey));
 			}
 			Id templateId = templateByType.get(typeKey);
 			String checkKey = templateId + '|' + request.fromDate + '|' + request.toDate;
@@ -196,11 +189,7 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 
 	/** The notification's body: the three counts, each skip reason, and where failures are. */
 	@TestVisible
-	private static String summary(
-		Integer made,
-		Map<String, Integer> skippedByReason,
-		Integer failed
-	) {
+	private static String summary(Integer made, Map<String, Integer> skippedByReason, Integer failed) {
 		Integer skipped = 0;
 		for (Integer count : skippedByReason.values()) {
 			skipped += count;

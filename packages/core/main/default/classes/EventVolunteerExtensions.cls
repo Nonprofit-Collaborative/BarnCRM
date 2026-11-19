@@ -8,9 +8,7 @@
 public with sharing class EventVolunteerExtensions {
 	/** The class names modules register. Volunteers registers its class here (EV-08). */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>{
-		'VolunteersEventExtension'
-	};
+	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'VolunteersEventExtension' };
 
 	/** Injected by tests by class name, since no module is there to resolve. */
 	@TestVisible

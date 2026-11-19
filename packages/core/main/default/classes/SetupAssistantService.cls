@@ -194,13 +194,7 @@ public with sharing class SetupAssistantService {
 		public Integer sortOrder;
 
 		@NamespaceAccessible
-		public StepField(
-			String fieldType,
-			Integer sortOrder,
-			String settingsObject,
-			String key,
-			String label
-		) {
+		public StepField(String fieldType, Integer sortOrder, String settingsObject, String key, String label) {
 			this.fieldType = fieldType;
 			this.sortOrder = sortOrder;
 			this.settingsObject = settingsObject;
@@ -243,13 +237,10 @@ public with sharing class SetupAssistantService {
 		List<Step> steps = definitions();
 		for (Step step : steps) {
 			step.completed =
-				marked.contains(step.key) ||
-				hasValue(step.completionSettingsObject, step.completionSettingKey);
+				marked.contains(step.key) || hasValue(step.completionSettingsObject, step.completionSettingKey);
 			step.skipped = skipped.contains(step.key) && !step.completed;
 			for (StepField field : step.fields) {
-				field.value = String.isBlank(field.key)
-					? null
-					: valueOf(field.settingsObject, field.key);
+				field.value = String.isBlank(field.key) ? null : valueOf(field.settingsObject, field.key);
 			}
 		}
 		return steps;
@@ -349,8 +340,7 @@ public with sharing class SetupAssistantService {
 			return chosen;
 		}
 		OrgShapeDetector.OrgShape shape = orgShape();
-		Boolean nonprofitProduct =
-			shape != null && (shape.hasNpsp == true || shape.hasIndustriesNonprofit == true);
+		Boolean nonprofitProduct = shape != null && (shape.hasNpsp == true || shape.hasIndustriesNonprofit == true);
 		return ModuleDetectionService.isGivingPresent() || nonprofitProduct
 			? ModuleDetectionService.SUITE_NONPROFIT
 			: null;
@@ -385,9 +375,7 @@ public with sharing class SetupAssistantService {
 	private static List<Step> setMembership(String settingKey, String stepKey, Boolean member) {
 		String key = stepKey == null ? '' : stepKey.trim();
 		if (!keys().contains(key)) {
-			throw new SetupStepException(
-				BarnHelp.text('Core', 'Core_SetupAssistant_UnknownStepError')
-			);
+			throw new SetupStepException(BarnHelp.text('Core', 'Core_SetupAssistant_UnknownStepError'));
 		}
 		Set<String> current = keysIn(settingKey);
 		if (member) {
@@ -619,13 +607,7 @@ public with sharing class SetupAssistantService {
 		for (Schema.SObjectField part : OrganizationAddress.partFields()) {
 			Schema.DescribeFieldResult describe = part.getDescribe();
 			identity.withField(
-				new StepField(
-						FIELD_ADDRESS,
-						addressSort++,
-						null,
-						describe.getLocalName(),
-						describe.getLabel()
-					)
+				new StepField(FIELD_ADDRESS, addressSort++, null, describe.getLocalName(), describe.getLabel())
 					.withLimits(describe.getLength(), null, null)
 			);
 		}

@@ -127,18 +127,11 @@ public with sharing class SeasonalAddressService {
 					new Address__c(
 						Id = currentDefault.Id,
 						Is_Default__c = false,
-						Replaced_By_Seasonal__c = currentDefault.Type__c !=
-							AddressService.TYPE_SEASONAL
+						Replaced_By_Seasonal__c = currentDefault.Type__c != AddressService.TYPE_SEASONAL
 					)
 				);
 			}
-			plan.updates.add(
-				new Address__c(
-					Id = winner.Id,
-					Is_Default__c = true,
-					Replaced_By_Seasonal__c = false
-				)
-			);
+			plan.updates.add(new Address__c(Id = winner.Id, Is_Default__c = true, Replaced_By_Seasonal__c = false));
 			plan.movedIn = true;
 			return plan;
 		}
@@ -153,9 +146,7 @@ public with sharing class SeasonalAddressService {
 			// happens when somebody set this address back as the default by hand during a
 			// season: the mark means "waiting to come back", and this address is already back.
 			if (currentDefault.Replaced_By_Seasonal__c == true) {
-				plan.updates.add(
-					new Address__c(Id = currentDefault.Id, Replaced_By_Seasonal__c = false)
-				);
+				plan.updates.add(new Address__c(Id = currentDefault.Id, Replaced_By_Seasonal__c = false));
 			}
 			return plan;
 		}
@@ -165,9 +156,7 @@ public with sharing class SeasonalAddressService {
 			return plan;
 		}
 		plan.updates.add(new Address__c(Id = currentDefault.Id, Is_Default__c = false));
-		plan.updates.add(
-			new Address__c(Id = restore.Id, Is_Default__c = true, Replaced_By_Seasonal__c = false)
-		);
+		plan.updates.add(new Address__c(Id = restore.Id, Is_Default__c = true, Replaced_By_Seasonal__c = false));
 		plan.movedBack = true;
 		return plan;
 	}
@@ -190,9 +179,7 @@ public with sharing class SeasonalAddressService {
 			return summary;
 		}
 
-		Map<Id, List<Address__c>> byOwner = groupByOwner(
-			SeasonalAddressSelector.selectAllForOwners(ownerIds)
-		);
+		Map<Id, List<Address__c>> byOwner = groupByOwner(SeasonalAddressSelector.selectAllForOwners(ownerIds));
 		List<String> warnings = new List<String>();
 		List<Id> collidingIds = new List<Id>();
 		List<Exception> failures = new List<Exception>();
@@ -225,12 +212,7 @@ public with sharing class SeasonalAddressService {
 				}
 			}
 		} finally {
-			ErrorLogger.logMessages(
-				warnings,
-				collidingIds,
-				LOG_CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessages(warnings, collidingIds, LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 			ErrorLogger.logEach(failures, failedOwnerIds, LOG_CONTEXT);
 		}
 		return summary;
@@ -239,10 +221,7 @@ public with sharing class SeasonalAddressService {
 	/** Records that a run finished and what it came to, for the Hub and the settings page. */
 	public static void recordRun(RunSummary summary, Datetime finishedAt) {
 		try {
-			SeasonalAddressWriter.recordRun(
-				finishedAt,
-				summary == null ? new RunSummary().text() : summary.text()
-			);
+			SeasonalAddressWriter.recordRun(finishedAt, summary == null ? new RunSummary().text() : summary.text());
 			SettingsService.clearCaches();
 		} catch (Exception recordFailed) {
 			// A run that worked and could not say so is still a run that worked, so this is
@@ -348,11 +327,7 @@ public with sharing class SeasonalAddressService {
 	private static Address__c oldest(List<Address__c> addresses) {
 		Address__c held = addresses[0];
 		for (Address__c address : addresses) {
-			if (
-				address.CreatedDate != null &&
-				held.CreatedDate != null &&
-				address.CreatedDate < held.CreatedDate
-			) {
+			if (address.CreatedDate != null && held.CreatedDate != null && address.CreatedDate < held.CreatedDate) {
 				held = address;
 			}
 		}

@@ -99,12 +99,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
 			failWhenAskedForTest();
 			RelationshipService.ensureReciprocals(records);
 		} catch (Exception thrown) {
-			reportFailure(
-				thrown,
-				records,
-				context,
-				BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
-			);
+			reportFailure(thrown, records, context, BarnHelp.text('Core', 'Core_Relationship_SyncFailed'));
 		}
 	}
 }

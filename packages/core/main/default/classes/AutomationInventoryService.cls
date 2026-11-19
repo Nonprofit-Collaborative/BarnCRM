@@ -145,18 +145,12 @@ public with sharing class AutomationInventoryService {
 		item.name = (String) row.get('Name');
 		item.apiName = item.name;
 		item.status = (String) row.get('Status');
-		item.apiVersion = row.get('ApiVersion') == null
-			? null
-			: ((Decimal) row.get('ApiVersion')).intValue();
+		item.apiVersion = row.get('ApiVersion') == null ? null : ((Decimal) row.get('ApiVersion')).intValue();
 		List<String> events = new List<String>();
 		for (String field : TRIGGER_FIELDS) {
 			if (row.get(field) == true) {
 				// UsageBeforeInsert reads "before insert".
-				events.add(
-					field.substringAfter('Usage')
-						.replaceAll('([a-z])([A-Z])', '$1 $2')
-						.toLowerCase()
-				);
+				events.add(field.substringAfter('Usage').replaceAll('([a-z])([A-Z])', '$1 $2').toLowerCase());
 			}
 		}
 		item.detail = String.join(events, ', ');
@@ -169,9 +163,7 @@ public with sharing class AutomationInventoryService {
 		item.name = (String) row.get('Label');
 		item.apiName = (String) row.get('ApiName');
 		item.status = row.get('IsActive') == true ? 'Active' : 'Inactive';
-		item.apiVersion = row.get('ApiVersion') == null
-			? null
-			: ((Decimal) row.get('ApiVersion')).intValue();
+		item.apiVersion = row.get('ApiVersion') == null ? null : ((Decimal) row.get('ApiVersion')).intValue();
 		String triggerType = (String) row.get('TriggerType');
 		String processType = (String) row.get('ProcessType');
 		List<String> parts = new List<String>();
@@ -179,11 +171,7 @@ public with sharing class AutomationInventoryService {
 			parts.add(PROCESS_TYPES.get(processType));
 		}
 		if (triggerType != null) {
-			parts.add(
-				FLOW_TRIGGERS.containsKey(triggerType)
-					? FLOW_TRIGGERS.get(triggerType)
-					: triggerType
-			);
+			parts.add(FLOW_TRIGGERS.containsKey(triggerType) ? FLOW_TRIGGERS.get(triggerType) : triggerType);
 		}
 		item.detail = String.join(parts, ', ');
 		return item;

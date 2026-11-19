@@ -35,17 +35,13 @@ private class BulkDeleteUndoTest {
 	);
 
 	private static User deleter() {
-		return TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' }
-		);
+		return TestUsers.withPermissionSets(new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Bulk_Delete' });
 	}
 
 	/** `count` volunteers, deleted by a bulk delete run now; returns the job's Id. */
 	private static Id deleteVolunteers(Integer count) {
 		DataProtectedFields.targetsOverride = new Map<String, Set<String>>();
-		Account organization = TestDataFactory.organization(
-			new Account(Name = 'Springfield Food Bank')
-		);
+		Account organization = TestDataFactory.organization(new Account(Name = 'Springfield Food Bank'));
 		insert organization;
 		List<Contact> people = new List<Contact>();
 		for (Integer index = 0; index < count; index++) {
@@ -60,11 +56,7 @@ private class BulkDeleteUndoTest {
 			);
 		}
 		insert people;
-		Import_Batch__c created = BulkDeleteService.createJob(
-			BulkDeleteService.plan(VOLUNTEERS),
-			count,
-			count
-		);
+		Import_Batch__c created = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), count, count);
 		BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
 		List<SObject> scope = new List<SObject>();
 		Database.QueryLocatorIterator records = job.start(null).iterator();
@@ -110,21 +102,13 @@ private class BulkDeleteUndoTest {
 				System.Assert.isTrue(preview.allowed, 'Undo is allowed: ' + preview.reason);
 				System.Assert.areEqual(200, preview.records, 'The records it deleted');
 				BulkDeleteService.undo(jobId, preview.records);
-				System.Assert.areEqual(
-					ImportBatchService.STATUS_UNDOING,
-					reread(jobId).Status__c,
-					'Latched'
-				);
+				System.Assert.areEqual(ImportBatchService.STATUS_UNDOING, reread(jobId).Status__c, 'Latched');
 			}
 			Test.stopTest();
 
 			System.Assert.areEqual(199, [SELECT COUNT() FROM Contact], 'All but the purged one');
 			Import_Batch__c done = reread(jobId);
-			System.Assert.areEqual(
-				ImportBatchService.STATUS_UNDONE,
-				done.Status__c,
-				done.Run_Log__c
-			);
+			System.Assert.areEqual(ImportBatchService.STATUS_UNDONE, done.Status__c, done.Run_Log__c);
 			System.Assert.isTrue(done.Run_Log__c.contains('198 brought back'), done.Run_Log__c);
 			List<Map<String, Object>> undone = new List<Map<String, Object>>();
 			for (Import_Journal__c page : [
@@ -135,15 +119,9 @@ private class BulkDeleteUndoTest {
 				undone.addAll(ImportJournalService.entries(page));
 			}
 			System.Assert.areEqual(1, undone.size(), 'Only the purged record is journaled');
-			System.Assert.areEqual(
-				ImportJournalService.ACTION_NOT_RESTORED,
-				undone[0].get('action')
-			);
+			System.Assert.areEqual(ImportJournalService.ACTION_NOT_RESTORED, undone[0].get('action'));
 			System.Assert.areEqual(String.valueOf(binned[1].Id), undone[0].get('id'));
-			System.Assert.areEqual(
-				BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged'),
-				undone[0].get('reason')
-			);
+			System.Assert.areEqual(BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged'), undone[0].get('reason'));
 		}
 	}
 
@@ -166,22 +144,14 @@ private class BulkDeleteUndoTest {
 			for (Integer index = 0; index < 200; index++) {
 				people.add(
 					TestDataFactory.person(
-						new Contact(
-							AccountId = households[index].Id,
-							LastName = 'Tidied ' + index,
-							Title = 'Volunteer'
-						)
+						new Contact(AccountId = households[index].Id, LastName = 'Tidied ' + index, Title = 'Volunteer')
 					)
 				);
 			}
 			insert people;
 			Id jobId;
 			System.runAs(deleter()) {
-				Import_Batch__c created = BulkDeleteService.createJob(
-					BulkDeleteService.plan(VOLUNTEERS),
-					200,
-					200
-				);
+				Import_Batch__c created = BulkDeleteService.createJob(BulkDeleteService.plan(VOLUNTEERS), 200, 200);
 				jobId = created.Id;
 				BulkDeleteBatch job = new BulkDeleteBatch(created.Id);
 				List<SObject> scope = new List<SObject>();
@@ -257,10 +227,7 @@ private class BulkDeleteUndoTest {
 			insert updateJob;
 			BulkDeleteService.UndoPreview preview = BulkDeleteService.undoPreview(updateJob.Id);
 			System.Assert.isFalse(preview.allowed, 'Refused');
-			System.Assert.areEqual(
-				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete'),
-				preview.reason
-			);
+			System.Assert.areEqual(BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete'), preview.reason);
 		}
 	}
 
@@ -274,24 +241,14 @@ private class BulkDeleteUndoTest {
 			}
 			ImportUndoService.Preview preview = ImportUndoService.preview(jobId);
 			System.Assert.isFalse(preview.allowed, 'Refused');
-			System.Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'),
-				preview.reason
-			);
+			System.Assert.areEqual(BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'), preview.reason);
 			try {
 				ImportUndoService.start(jobId, 0);
 				System.Assert.fail('Refused');
 			} catch (ImportException expected) {
-				System.Assert.areEqual(
-					BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'),
-					expected.getMessage()
-				);
+				System.Assert.areEqual(BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'), expected.getMessage());
 			}
-			System.Assert.areEqual(
-				ImportBatchService.STATUS_COMPLETE,
-				reread(jobId).Status__c,
-				'Not marked Undone'
-			);
+			System.Assert.areEqual(ImportBatchService.STATUS_COMPLETE, reread(jobId).Status__c, 'Not marked Undone');
 			System.Assert.isTrue(BulkDeleteService.undoPreview(jobId).allowed, 'Still undoable');
 		}
 	}

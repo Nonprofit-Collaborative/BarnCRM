@@ -55,9 +55,7 @@ private class VolunteerHoursServiceTest {
 
 			OrgSettingsSystemWriter.save(
 				Volunteer_Settings__c.SObjectType,
-				new Map<Schema.SObjectField, Object>{
-					Volunteer_Settings__c.Shift_Horizon_Weeks__c => 40
-				}
+				new Map<Schema.SObjectField, Object>{ Volunteer_Settings__c.Shift_Horizon_Weeks__c => 40 }
 			);
 			SettingsService.clearCaches();
 			Assert.areEqual(8, VolunteerSettings.shiftHorizonWeeks(), 'Out of range reads as 8.');
@@ -78,9 +76,7 @@ private class VolunteerHoursServiceTest {
 			Volunteer_Hours__c hours = entry();
 
 			Test.startTest();
-			List<Database.SaveResult> results = VolunteerHoursService.submit(
-				new List<Volunteer_Hours__c>{ hours }
-			);
+			List<Database.SaveResult> results = VolunteerHoursService.submit(new List<Volunteer_Hours__c>{ hours });
 			Test.stopTest();
 
 			Assert.isTrue(results[0].isSuccess(), 'Submitting saves the entry.');
@@ -132,10 +128,7 @@ private class VolunteerHoursServiceTest {
 			insert hours;
 
 			Test.startTest();
-			String byStatus = saveError(
-				new Volunteer_Hours__c(Id = hours.Id, Status__c = 'Approved'),
-				false
-			);
+			String byStatus = saveError(new Volunteer_Hours__c(Id = hours.Id, Status__c = 'Approved'), false);
 			String byApprover = saveError(
 				new Volunteer_Hours__c(Id = hours.Id, Approved_By__c = UserInfo.getUserId()),
 				false
@@ -166,11 +159,7 @@ private class VolunteerHoursServiceTest {
 			Test.startTest();
 			Assert.areEqual(1, VolunteerHoursService.approve(ids).moved, 'One entry approved.');
 			Volunteer_Hours__c approved = reread(hours.Id);
-			Assert.areEqual(
-				0,
-				VolunteerHoursService.approve(ids).moved,
-				'Approving twice moves nothing.'
-			);
+			Assert.areEqual(0, VolunteerHoursService.approve(ids).moved, 'Approving twice moves nothing.');
 
 			String locked = saveError(new Volunteer_Hours__c(Id = hours.Id, Hours__c = 5), false);
 			String deleted = '';
@@ -180,11 +169,7 @@ private class VolunteerHoursServiceTest {
 				deleted = refused.getDmlMessage(0);
 			}
 
-			Assert.areEqual(
-				1,
-				VolunteerHoursService.reject(ids, '  Wrong day  ').moved,
-				'Rejected.'
-			);
+			Assert.areEqual(1, VolunteerHoursService.reject(ids, '  Wrong day  ').moved, 'Rejected.');
 			Volunteer_Hours__c rejected = reread(hours.Id);
 
 			Assert.areEqual(1, VolunteerHoursService.reopen(ids).moved, 'Reopened.');
@@ -251,10 +236,7 @@ private class VolunteerHoursServiceTest {
 
 		Test.startTest();
 		System.runAs(TestUsers.admin()) {
-			Assert.isFalse(
-				VolunteerHoursService.canManage(),
-				'BarnCRM Admin alone does not manage volunteers.'
-			);
+			Assert.isFalse(VolunteerHoursService.canManage(), 'BarnCRM Admin alone does not manage volunteers.');
 			try {
 				VolunteerHoursService.approve(new Set<Id>{ hoursId });
 			} catch (VolunteerHoursService.VolunteerHoursException refused) {

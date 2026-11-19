@@ -75,9 +75,7 @@ public without sharing class RollupChanges {
 
 		public void addAll(Marked other) {
 			for (String targetObject : other.idsByTarget.keySet()) {
-				Map<Id, Rollup_Definition__c> definitions = other.definitionsByTarget.get(
-					targetObject
-				);
+				Map<Id, Rollup_Definition__c> definitions = other.definitionsByTarget.get(targetObject);
 				for (
 					Rollup_Definition__c definition : definitions == null
 						? new List<Rollup_Definition__c>()
@@ -173,11 +171,7 @@ public without sharing class RollupChanges {
 		if (oldRecords != null || restored == true) {
 			RollupDependents.forSave(changedType, records, oldRecords, definitions, marked);
 		}
-		markMembership(
-			definitions,
-			HouseholdService.membershipChangeOf(records, oldRecords),
-			marked
-		);
+		markMembership(definitions, HouseholdService.membershipChangeOf(records, oldRecords), marked);
 		return marked;
 	}
 
@@ -202,10 +196,7 @@ public without sharing class RollupChanges {
 				marked.add(definition, targetsOf(path, changedType, records));
 			}
 		}
-		HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(
-			records,
-			null
-		);
+		HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(records, null);
 		for (SObject record : records) {
 			Object survivor = record.getPopulatedFieldsAsMap().get('MasterRecordId');
 			if (survivor != null) {
@@ -242,12 +233,7 @@ public without sharing class RollupChanges {
 				} else if (token == RollupPath.TOKEN_HOUSEHOLD_MEMBERS) {
 					if (people == null) {
 						people = new Set<Id>(change.personIds);
-						for (
-							Set<Id> members : HouseholdService.getMemberPersonIds(
-									change.householdIds
-								)
-								.values()
-						) {
+						for (Set<Id> members : HouseholdService.getMemberPersonIds(change.householdIds).values()) {
 							people.addAll(members);
 						}
 					}
@@ -293,11 +279,7 @@ public without sharing class RollupChanges {
 	}
 
 	/** The targets these rows reach, through every alternative of the path. */
-	public static Set<Id> targetsOf(
-		RollupPath.Parsed path,
-		Schema.SObjectType sourceType,
-		List<SObject> rows
-	) {
+	public static Set<Id> targetsOf(RollupPath.Parsed path, Schema.SObjectType sourceType, List<SObject> rows) {
 		Set<Id> targets = new Set<Id>();
 		if (path == null || rows == null || rows.isEmpty()) {
 			return targets;
@@ -328,11 +310,7 @@ public without sharing class RollupChanges {
 	 * are none, the first reference read off each row, and further references walked by a query
 	 * of the record the first one names.
 	 */
-	private static Set<Id> reachedBy(
-		List<String> prefix,
-		Schema.SObjectType sourceType,
-		List<SObject> rows
-	) {
+	private static Set<Id> reachedBy(List<String> prefix, Schema.SObjectType sourceType, List<SObject> rows) {
 		Set<Id> reached = new Set<Id>();
 		if (prefix.isEmpty()) {
 			for (SObject row : rows) {
@@ -359,9 +337,7 @@ public without sharing class RollupChanges {
 		}
 		List<String> rest = new List<String>();
 		for (Integer i = 1; i < prefix.size(); i++) {
-			rest.add(
-				i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i])
-			);
+			rest.add(i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i]));
 		}
 		String expression = String.join(rest, '.');
 		Set<Id> further = new Set<Id>();
@@ -369,11 +345,7 @@ public without sharing class RollupChanges {
 		try {
 			// Segments are reference names RollupPath has already checked; ids are bound.
 			intermediates = Database.queryWithBinds(
-				'SELECT Id, ' +
-					expression +
-					' FROM ' +
-					String.valueOf(referenced[0]) +
-					' WHERE Id IN :reached',
+				'SELECT Id, ' + expression + ' FROM ' + String.valueOf(referenced[0]) + ' WHERE Id IN :reached',
 				new Map<String, Object>{ 'reached' => reached },
 				AccessLevel.SYSTEM_MODE
 			);
@@ -424,9 +396,7 @@ public without sharing class RollupChanges {
 			List<String> prefix = branch.referencePrefix();
 			List<String> parts = new List<String>();
 			for (Integer i = 0; i < prefix.size(); i++) {
-				parts.add(
-					i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i])
-				);
+				parts.add(i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i]));
 			}
 			if (!parts.isEmpty()) {
 				reads.add(String.join(parts, '.'));
@@ -517,10 +487,7 @@ public without sharing class RollupChanges {
 	}
 
 	/** The attributes on the entity itself that these reads start from, in lower case. */
-	public static Set<String> localFields(
-		Set<String> reads,
-		Map<String, Schema.SObjectField> fields
-	) {
+	public static Set<String> localFields(Set<String> reads, Map<String, Schema.SObjectField> fields) {
 		Set<String> local = new Set<String>();
 		for (String read : reads) {
 			String name = read.contains('.') ? referenceFieldFor(read.substringBefore('.')) : read;

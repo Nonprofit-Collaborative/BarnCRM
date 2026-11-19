@@ -53,9 +53,7 @@ public with sharing class HouseholdSoftCreditHandler extends TriggerHandler {
 			return households;
 		}
 		for (SObject record : records) {
-			String field = record.getSObjectType() == Household_Member__c.SObjectType
-				? 'Household__c'
-				: 'AccountId';
+			String field = record.getSObjectType() == Household_Member__c.SObjectType ? 'Household__c' : 'AccountId';
 			Id household = (Id) record.get(field);
 			Id priorHousehold = null;
 			if (priorById != null && priorById.containsKey((Id) record.get('Id'))) {

@@ -49,9 +49,7 @@ private class RollupFullRecalcBatchTest {
 		for (Integer i = 0; i < organizations.size(); i++) {
 			for (Integer j = 0; j < people[i]; j++) {
 				contacts.add(
-					TestDataFactory.person(
-						new Contact(LastName = 'Person ' + j, AccountId = organizations[i].Id)
-					)
+					TestDataFactory.person(new Contact(LastName = 'Person ' + j, AccountId = organizations[i].Id))
 				);
 			}
 		}
@@ -103,18 +101,11 @@ private class RollupFullRecalcBatchTest {
 			Test.stopTest();
 
 			Assert.isNotNull(jobId, 'The run started');
-			Assert.isNull(
-				markedWhileRunning,
-				'Not marked calculated before the totals are written'
-			);
+			Assert.isNull(markedWhileRunning, 'Not marked calculated before the totals are written');
 			Assert.isNotNull(lastCalculated(definition), 'Marked calculated once the run finished');
 			Map<Id, Integer> counts = countsOf(organizations);
 			for (Integer i = 0; i < organizations.size(); i++) {
-				Assert.areEqual(
-					Math.mod(i, 3),
-					counts.get(organizations[i].Id),
-					'Each organization\'s own people'
-				);
+				Assert.areEqual(Math.mod(i, 3), counts.get(organizations[i].Id), 'Each organization\'s own people');
 			}
 			RollupFullRecalcBatch.Progress progress = RollupFullRecalcBatch.progress();
 			Assert.areEqual(jobId, progress.jobId, 'The progress is the run\'s');
@@ -172,25 +163,16 @@ private class RollupFullRecalcBatchTest {
 			Rollup_Definition__c definition = peopleCount();
 			RollupFullRecalcBatch.rowBudget = 100;
 			RollupLargeParentBatch.largeParentRowsForTest = 100;
-			RollupFullRecalcBatch pass = RollupFullRecalcBatch.firstPass(
-				new List<Rollup_Definition__c>{ definition }
-			);
+			RollupFullRecalcBatch pass = RollupFullRecalcBatch.firstPass(new List<Rollup_Definition__c>{ definition });
 
 			Test.startTest();
-			pass.execute(
-				null,
-				[SELECT Id, NumberOfEmployees FROM Account WHERE Id IN :organizations ORDER BY Id]
-			);
+			pass.execute(null, [SELECT Id, NumberOfEmployees FROM Account WHERE Id IN :organizations ORDER BY Id]);
 			Set<Id> large = pass.large.clone();
 			Integer heldBack = pass.later.size();
 			pass.finish(null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				new Set<Id>{ anonymous.Id },
-				large,
-				'The large parent goes to the batch route'
-			);
+			Assert.areEqual(new Set<Id>{ anonymous.Id }, large, 'The large parent goes to the batch route');
 			Assert.areEqual(3, heldBack, 'Two records of 40 fit a budget of 100, three wait');
 			Map<Id, Integer> counts = countsOf(organizations);
 			Assert.areEqual(500, counts.get(anonymous.Id), 'No chunk calculated the large parent');
@@ -247,10 +229,7 @@ private class RollupFullRecalcBatchTest {
 	@IsTest
 	static void aStaleCountRecordStopsAtTheRowCeilingAndGoesToTheBatch() {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			List<Account> organizations = organizations(
-				new List<Integer>{ 1, 0 },
-				new List<Integer>{ 0, 0 }
-			);
+			List<Account> organizations = organizations(new List<Integer>{ 1, 0 }, new List<Integer>{ 0, 0 });
 			Account stale = organizations[0];
 			List<Account> children = new List<Account>();
 			for (Integer i = 0; i < 31; i++) {
@@ -329,9 +308,7 @@ private class RollupFullRecalcBatchTest {
 			Rollup_Queue__c elsewhere = resolved.clone();
 			elsewhere.Target_Object__c = 'Contact';
 			insert new List<Rollup_Queue__c>{ resolved, elsewhere };
-			RollupFullRecalcBatch pass = RollupFullRecalcBatch.firstPass(
-				new List<Rollup_Definition__c>{ definition }
-			);
+			RollupFullRecalcBatch pass = RollupFullRecalcBatch.firstPass(new List<Rollup_Definition__c>{ definition });
 			pass.run.startedAt = Datetime.now().addMinutes(1);
 
 			Test.startTest();

@@ -105,9 +105,7 @@ public with sharing class GiftAllocationController {
 			state.rows.add(row);
 		}
 		Boolean locked = isLocked(gift.Id) && !GiftPostingLock.canOverride();
-		state.lockedMessage = locked
-			? BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked')
-			: null;
+		state.lockedMessage = locked ? BarnHelp.text('Giving', 'Giving_Posting_AllocationLocked') : null;
 		state.canEdit =
 			!locked &&
 			gift.Amount__c != null &&
@@ -122,9 +120,7 @@ public with sharing class GiftAllocationController {
 			? new List<Gift__c>()
 			: GiftSelector.selectWithAllocations(new Set<Id>{ giftId });
 		if (found.isEmpty()) {
-			throw new GiftService.GiftServiceException(
-				BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound')
-			);
+			throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'));
 		}
 		return found[0];
 	}
@@ -142,26 +138,18 @@ public with sharing class GiftAllocationController {
 	/** Every row needs its own fund and an amount; the editor checks the same before saving. */
 	private static void requireComplete(List<AllocationInput> allocations) {
 		if (allocations == null || allocations.isEmpty()) {
-			throw new GiftService.GiftServiceException(
-				BarnHelp.text('Giving', 'Giving_FundSplit_NeedsFund')
-			);
+			throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_FundSplit_NeedsFund'));
 		}
 		Set<Id> funds = new Set<Id>();
 		for (AllocationInput input : allocations) {
 			if (input == null || input.fundId == null) {
-				throw new GiftService.GiftServiceException(
-					BarnHelp.text('Giving', 'Giving_FundSplit_NeedsFund')
-				);
+				throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_FundSplit_NeedsFund'));
 			}
 			if (input.amount == null || input.amount == 0) {
-				throw new GiftService.GiftServiceException(
-					BarnHelp.text('Giving', 'Giving_FundSplit_NeedsAmount')
-				);
+				throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_FundSplit_NeedsAmount'));
 			}
 			if (!funds.add(input.fundId)) {
-				throw new GiftService.GiftServiceException(
-					BarnHelp.text('Giving', 'Giving_FundSplit_DuplicateFund')
-				);
+				throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_FundSplit_DuplicateFund'));
 			}
 		}
 	}
@@ -172,9 +160,7 @@ public with sharing class GiftAllocationController {
 	 * or deleted. People who may not delete allocations can still move money between funds.
 	 */
 	private static void replace(Id giftId, List<AllocationInput> allocations) {
-		List<Gift_Allocation__c> existing = GiftAllocationSelector.selectByGiftIds(
-			new Set<Id>{ giftId }
-		);
+		List<Gift_Allocation__c> existing = GiftAllocationSelector.selectByGiftIds(new Set<Id>{ giftId });
 		Map<Id, Gift_Allocation__c> byFund = new Map<Id, Gift_Allocation__c>();
 		for (Gift_Allocation__c allocation : existing) {
 			if (allocation.Fund__c != null && !byFund.containsKey(allocation.Fund__c)) {
@@ -210,21 +196,9 @@ public with sharing class GiftAllocationController {
 			Decimal amount = input.amount.setScale(2, System.RoundingMode.HALF_UP);
 			if (!spare.isEmpty()) {
 				Gift_Allocation__c reused = spare.remove(0);
-				toUpdate.add(
-					new Gift_Allocation__c(
-						Id = reused.Id,
-						Fund__c = input.fundId,
-						Amount__c = amount
-					)
-				);
+				toUpdate.add(new Gift_Allocation__c(Id = reused.Id, Fund__c = input.fundId, Amount__c = amount));
 			} else {
-				toInsert.add(
-					new Gift_Allocation__c(
-						Gift__c = giftId,
-						Fund__c = input.fundId,
-						Amount__c = amount
-					)
-				);
+				toInsert.add(new Gift_Allocation__c(Gift__c = giftId, Fund__c = input.fundId, Amount__c = amount));
 			}
 		}
 
@@ -236,9 +210,7 @@ public with sharing class GiftAllocationController {
 		}
 		if (!spare.isEmpty()) {
 			if (!Schema.SObjectType.Gift_Allocation__c.isDeletable()) {
-				throw new GiftService.GiftServiceException(
-					BarnHelp.text('Giving', 'Giving_GiftAllocations_NoDelete')
-				);
+				throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_GiftAllocations_NoDelete'));
 			}
 			Database.delete(spare, AccessLevel.USER_MODE);
 		}

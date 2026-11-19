@@ -42,16 +42,10 @@ private class ReceiptContentRulesTest {
 				html.contains(ReceiptContentBuilder.SENTENCE_NO_GOODS),
 				'The no goods or services sentence is on the receipt: ' + html
 			);
-			Assert.isTrue(
-				html.contains('Hope For Homes'),
-				'The organization that issued it is named.'
-			);
+			Assert.isTrue(html.contains('Hope For Homes'), 'The organization that issued it is named.');
 			Assert.isTrue(html.contains('$250.00'), 'The amount is stated.');
 			Assert.isTrue(html.contains('12 April 2026'), 'The date of the gift is stated.');
-			Assert.isTrue(
-				html.contains('HFH-2026-000001'),
-				'The receipt number is on the document.'
-			);
+			Assert.isTrue(html.contains('HFH-2026-000001'), 'The receipt number is on the document.');
 		}
 	}
 
@@ -85,18 +79,9 @@ private class ReceiptContentRulesTest {
 				gift.Amount__c > ReceiptContentBuilder.QUID_PRO_QUO_THRESHOLD,
 				'This is the case the disclosure is required for.'
 			);
-			Assert.isTrue(
-				html.contains('two tickets to the harvest dinner'),
-				'The benefit is described: ' + html
-			);
-			Assert.isTrue(
-				html.contains('$40.00'),
-				'The good faith estimate of its value is stated.'
-			);
-			Assert.isTrue(
-				html.contains('$160.00'),
-				'The deductible amount, the payment less the benefit, is stated.'
-			);
+			Assert.isTrue(html.contains('two tickets to the harvest dinner'), 'The benefit is described: ' + html);
+			Assert.isTrue(html.contains('$40.00'), 'The good faith estimate of its value is stated.');
+			Assert.isTrue(html.contains('$160.00'), 'The deductible amount, the payment less the benefit, is stated.');
 			Assert.isFalse(
 				html.contains(ReceiptContentBuilder.SENTENCE_NO_GOODS),
 				'A receipt that discloses a benefit never also says none was provided.'
@@ -228,11 +213,7 @@ private class ReceiptContentRulesTest {
 	@IsTest
 	static void anInKindReceiptStatesNoValueWhereACashReceiptPrintsTheAmount() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Gift__c gift = ReceiptTestDataFactory.inKindGift(
-				null,
-				'Sixteen folding tables, used',
-				GIFT_DATE
-			);
+			Gift__c gift = ReceiptTestDataFactory.inKindGift(null, 'Sixteen folding tables, used', GIFT_DATE);
 
 			Test.startTest();
 			String html = ReceiptContentBuilder.forGift(
@@ -248,18 +229,12 @@ private class ReceiptContentRulesTest {
 				html.contains(ReceiptContentBuilder.AMOUNT_NOT_STATED),
 				'The document says no value is stated, rather than printing a figure: ' + html
 			);
-			Assert.isFalse(
-				html.contains('$0.00'),
-				'And it does not print a zero, which would read as nothing given.'
-			);
+			Assert.isFalse(html.contains('$0.00'), 'And it does not print a zero, which would read as nothing given.');
 			Assert.isFalse(
 				html.contains('$900.00'),
 				'The fair market value the organization recorded reaches no rendered document.'
 			);
-			Assert.isTrue(
-				html.contains('12 April 2026'),
-				'What the receipt does state is the date the goods arrived.'
-			);
+			Assert.isTrue(html.contains('12 April 2026'), 'What the receipt does state is the date the goods arrived.');
 			Assert.isTrue(
 				html.contains('Sixteen folding tables, used'),
 				'And what arrived, in the words the donor gave.'
@@ -275,11 +250,7 @@ private class ReceiptContentRulesTest {
 	@IsTest
 	static void aStatementListsInKindGiftsWithoutAValueAndOutsideTheTotal() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Gift__c cash = ReceiptTestDataFactory.plainCashGift(
-				null,
-				100,
-				Date.newInstance(2026, 2, 1)
-			);
+			Gift__c cash = ReceiptTestDataFactory.plainCashGift(null, 100, Date.newInstance(2026, 2, 1));
 			Gift__c goods = ReceiptTestDataFactory.inKindGift(
 				null,
 				'Twelve cases of tinned food for the pantry',
@@ -307,10 +278,7 @@ private class ReceiptContentRulesTest {
 				html.contains('<td class="amount">' + ReceiptContentBuilder.IN_KIND_LINE_AMOUNT),
 				'The in-kind line carries no amount: ' + html
 			);
-			Assert.isFalse(
-				html.contains('$750.00'),
-				'The value of the goods is nowhere on it: ' + html
-			);
+			Assert.isFalse(html.contains('$750.00'), 'The value of the goods is nowhere on it: ' + html);
 			// The sentence says "donor's", and every sentence is HTML escaped on its way into the
 			// document, so the document carries the escaped form.
 			Assert.isTrue(
@@ -330,11 +298,7 @@ private class ReceiptContentRulesTest {
 	@IsTest
 	static void aStatementLeavesAnInKindLineOutOfTheTotalItStates() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Gift__c cash = ReceiptTestDataFactory.plainCashGift(
-				null,
-				100,
-				Date.newInstance(2026, 2, 1)
-			);
+			Gift__c cash = ReceiptTestDataFactory.plainCashGift(null, 100, Date.newInstance(2026, 2, 1));
 			Gift__c goods = ReceiptTestDataFactory.inKindGift(
 				null,
 				'Two pallets of tinned food',
@@ -354,11 +318,7 @@ private class ReceiptContentRulesTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(
-				100,
-				total,
-				'The statement totals the money, and the goods add nothing to it.'
-			);
+			Assert.areEqual(100, total, 'The statement totals the money, and the goods add nothing to it.');
 			Assert.isTrue(
 				html.contains('Two pallets of tinned food'),
 				'The gift of goods is still on the statement, where the donor can see it.'
@@ -382,22 +342,10 @@ private class ReceiptContentRulesTest {
 	@IsTest
 	static void aConsolidatedStatementCarriesTheStatusOnEveryLine() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Gift__c received = ReceiptTestDataFactory.plainCashGift(
-				null,
-				100,
-				Date.newInstance(2026, 2, 1)
-			);
-			Gift__c refunded = ReceiptTestDataFactory.plainCashGift(
-				null,
-				300,
-				Date.newInstance(2026, 6, 1)
-			);
+			Gift__c received = ReceiptTestDataFactory.plainCashGift(null, 100, Date.newInstance(2026, 2, 1));
+			Gift__c refunded = ReceiptTestDataFactory.plainCashGift(null, 300, Date.newInstance(2026, 6, 1));
 			refunded.Status__c = 'Refunded';
-			Gift__c writtenOff = ReceiptTestDataFactory.plainCashGift(
-				null,
-				50,
-				Date.newInstance(2026, 9, 1)
-			);
+			Gift__c writtenOff = ReceiptTestDataFactory.plainCashGift(null, 50, Date.newInstance(2026, 9, 1));
 			writtenOff.Status__c = 'Written off';
 
 			Test.startTest();

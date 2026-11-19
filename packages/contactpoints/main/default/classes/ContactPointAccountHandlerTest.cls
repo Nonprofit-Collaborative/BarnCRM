@@ -13,10 +13,7 @@ private class ContactPointAccountHandlerTest {
 
 		List<String> watched = ContactPointAccountHandler.watchedFields();
 
-		Assert.isFalse(
-			ContactPointPlan.accountFields().isEmpty(),
-			'The plan names fields to watch'
-		);
+		Assert.isFalse(ContactPointPlan.accountFields().isEmpty(), 'The plan names fields to watch');
 		for (String field : ContactPointPlan.accountFields()) {
 			Assert.areEqual(
 				fields.containsKey(field.toLowerCase()),
@@ -24,9 +21,6 @@ private class ContactPointAccountHandlerTest {
 				field + ' is watched exactly when Account has it'
 			);
 		}
-		Assert.isTrue(
-			ContactPointAccountHandler.watchedFields() === watched,
-			'Found once a transaction, then reused'
-		);
+		Assert.isTrue(ContactPointAccountHandler.watchedFields() === watched, 'Found once a transaction, then reused');
 	}
 }

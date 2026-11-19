@@ -39,10 +39,7 @@ public with sharing class RollupFilterParser {
 		'not in' => 'not in'
 	};
 
-	private static final Set<String> NO_VALUE_OPERATORS = new Set<String>{
-		'is null',
-		'is not null'
-	};
+	private static final Set<String> NO_VALUE_OPERATORS = new Set<String>{ 'is null', 'is not null' };
 	private static final Set<String> LIST_OPERATORS = new Set<String>{ 'in', 'not in' };
 
 	/**
@@ -56,12 +53,8 @@ public with sharing class RollupFilterParser {
 	private static final String LAST_N_DAYS = 'last n days';
 	private static final Integer MAX_DAYS = 3650;
 	private static final Pattern DATE_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}$');
-	private static final Pattern DATETIME_VALUE = Pattern.compile(
-		'^\\d{4}-\\d{2}-\\d{2}T[0-9:.]+Z$'
-	);
-	private static final Pattern FIELD_NAME = Pattern.compile(
-		'^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
-	);
+	private static final Pattern DATETIME_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}T[0-9:.]+Z$');
+	private static final Pattern FIELD_NAME = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$');
 	private static final Pattern LOGIC_TOKEN = Pattern.compile('^(\\d+|AND|OR|NOT|\\(|\\))$');
 
 	/**
@@ -94,9 +87,7 @@ public with sharing class RollupFilterParser {
 			return false;
 		}
 		try {
-			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-				filterDocument
-			);
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
 			for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
 				String operator = ((String) ((Map<String, Object>) rawCondition).get('operator'))
 					?.toLowerCase()
@@ -129,18 +120,13 @@ public with sharing class RollupFilterParser {
 	 * again (ROLLUPS-12); anything else keeps its query.
 	 */
 	@NamespaceAccessible
-	public static List<TextEquality> textEqualities(
-		String filterDocument,
-		Schema.SObjectType entity
-	) {
+	public static List<TextEquality> textEqualities(String filterDocument, Schema.SObjectType entity) {
 		if (String.isBlank(filterDocument) || entity == null) {
 			return null;
 		}
 		List<TextEquality> equalities = new List<TextEquality>();
 		try {
-			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-				filterDocument
-			);
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
 			if (String.isNotBlank((String) parsed.get('logic'))) {
 				return null;
 			}
@@ -149,8 +135,7 @@ public with sharing class RollupFilterParser {
 				String field = (String) condition.get('field');
 				String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
 				Object value = condition.get('value');
-				Schema.DisplayType type = String.isBlank(field) ||
-					!FIELD_NAME.matcher(field).matches()
+				Schema.DisplayType type = String.isBlank(field) || !FIELD_NAME.matcher(field).matches()
 					? null
 					: typeAt(entity, field);
 				if (
@@ -184,27 +169,16 @@ public with sharing class RollupFilterParser {
 	}
 
 	/** The same, with bind names of the caller's own prefix (C-36, related records). */
-	public static FilterValueBinder toBoundClause(
-		String filterDocument,
-		String objectApiName,
-		String bindPrefix
-	) {
+	public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName, String bindPrefix) {
 		return toBoundClause(filterDocument, new FilterValueBinder(objectApiName, bindPrefix));
 	}
 
-	private static FilterValueBinder toBoundClause(
-		String filterDocument,
-		FilterValueBinder binder
-	) {
+	private static FilterValueBinder toBoundClause(String filterDocument, FilterValueBinder binder) {
 		binder.clause = compile(filterDocument, binder, null);
 		return binder;
 	}
 
-	private static String compile(
-		String filterDocument,
-		FilterValueBinder binder,
-		Schema.SObjectType entity
-	) {
+	private static String compile(String filterDocument, FilterValueBinder binder, Schema.SObjectType entity) {
 		if (String.isBlank(filterDocument)) {
 			return '';
 		}
@@ -225,14 +199,8 @@ public with sharing class RollupFilterParser {
 		}
 	}
 
-	private static String compile(
-		Map<String, Object> parsed,
-		FilterValueBinder binder,
-		Schema.SObjectType entity
-	) {
-		Integer version = parsed.get('version') == null
-			? SUPPORTED_VERSION
-			: Integer.valueOf(parsed.get('version'));
+	private static String compile(Map<String, Object> parsed, FilterValueBinder binder, Schema.SObjectType entity) {
+		Integer version = parsed.get('version') == null ? SUPPORTED_VERSION : Integer.valueOf(parsed.get('version'));
 		if (version != SUPPORTED_VERSION) {
 			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
 		}
@@ -274,9 +242,7 @@ public with sharing class RollupFilterParser {
 			return fields;
 		}
 		try {
-			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-				filterDocument
-			);
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
 			for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
 				String fieldName = (String) ((Map<String, Object>) rawCondition).get('field');
 				if (String.isNotBlank(fieldName) && FIELD_NAME.matcher(fieldName).matches()) {
@@ -323,9 +289,7 @@ public with sharing class RollupFilterParser {
 		}
 		Object rawValue = condition.get('value');
 		// Described only when a value could be read as a date, so a status filter costs nothing.
-		Boolean datesAsText = entity != null && looksLikeADate(rawValue)
-			? isNotADate(entity, fieldName)
-			: false;
+		Boolean datesAsText = entity != null && looksLikeADate(rawValue) ? isNotADate(entity, fieldName) : false;
 		if (LIST_OPERATORS.contains(operator)) {
 			List<Object> values = rawValue instanceof List<Object>
 				? (List<Object>) rawValue
@@ -345,11 +309,7 @@ public with sharing class RollupFilterParser {
 				likeValue('%' + SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
 		}
 		if (operator == 'starts with') {
-			return fieldName +
-				' ' +
-				comparison +
-				' ' +
-				likeValue(SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
+			return fieldName + ' ' + comparison + ' ' + likeValue(SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
 		}
 		return fieldName + ' ' + comparison + ' ' + renderValue(rawValue, datesAsText);
 	}
@@ -368,16 +328,9 @@ public with sharing class RollupFilterParser {
 	 * rendering every filter had before.
 	 */
 	private static Boolean looksLikeADate(Object rawValue) {
-		for (
-			Object value : rawValue instanceof List<Object>
-				? (List<Object>) rawValue
-				: new List<Object>{ rawValue }
-		) {
+		for (Object value : rawValue instanceof List<Object> ? (List<Object>) rawValue : new List<Object>{ rawValue }) {
 			String text = value instanceof String ? (String) value : null;
-			if (
-				text != null &&
-				(DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
-			) {
+			if (text != null && (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())) {
 				return true;
 			}
 		}
@@ -386,9 +339,7 @@ public with sharing class RollupFilterParser {
 
 	private static Boolean isNotADate(Schema.SObjectType entity, String fieldName) {
 		Schema.DisplayType type = typeAt(entity, fieldName);
-		return type != null &&
-			type != Schema.DisplayType.DATE &&
-			type != Schema.DisplayType.DATETIME;
+		return type != null && type != Schema.DisplayType.DATE && type != Schema.DisplayType.DATETIME;
 	}
 
 	/** The type of an attribute or a path such as `Gift__r.Status__c`, or null when unknown. */
@@ -410,15 +361,8 @@ public with sharing class RollupFilterParser {
 		return field == null ? null : field.getDescribe().getType();
 	}
 
-	private static Schema.SObjectType referencedThrough(
-		Schema.SObjectType entity,
-		String relationshipName
-	) {
-		for (
-			Schema.SObjectField field : entity.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.values()
-		) {
+	private static Schema.SObjectType referencedThrough(Schema.SObjectType entity, String relationshipName) {
+		for (Schema.SObjectField field : entity.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap().values()) {
 			Schema.DescribeFieldResult describe = field.getDescribe();
 			if (
 				describe.getType() == Schema.DisplayType.REFERENCE &&
@@ -460,10 +404,7 @@ public with sharing class RollupFilterParser {
 			return String.valueOf(value);
 		}
 		String text = String.valueOf(value);
-		if (
-			datesAsText != true &&
-			(DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
-		) {
+		if (datesAsText != true && (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())) {
 			return text;
 		}
 		return '\'' + String.escapeSingleQuotes(text) + '\'';
@@ -484,13 +425,7 @@ public with sharing class RollupFilterParser {
 			}
 			if (clauseByConditionId.containsKey(token)) {
 				rendered.add('(' + clauseByConditionId.get(token) + ')');
-			} else if (
-				upper == 'AND' ||
-				upper == 'OR' ||
-				upper == 'NOT' ||
-				upper == '(' ||
-				upper == ')'
-			) {
+			} else if (upper == 'AND' || upper == 'OR' || upper == 'NOT' || upper == '(' || upper == ')') {
 				rendered.add(upper);
 			} else {
 				throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);

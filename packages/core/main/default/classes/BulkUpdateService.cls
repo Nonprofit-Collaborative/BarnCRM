@@ -81,18 +81,11 @@ public with sharing class BulkUpdateService {
 				return false;
 			}
 			Object recordType = record.getPopulatedFieldsAsMap().get(RECORD_TYPE_FIELD);
-			return DataProtectedFields.isProtectedOnRecord(
-				Account.SObjectType,
-				target.getName(),
-				(Id) recordType
-			);
+			return DataProtectedFields.isProtectedOnRecord(Account.SObjectType, target.getName(), (Id) recordType);
 		}
 
 		public Map<String, Object> toMap() {
-			Map<String, Object> result = new Map<String, Object>{
-				'field' => target.getName(),
-				'action' => action
-			};
+			Map<String, Object> result = new Map<String, Object>{ 'field' => target.getName(), 'action' => action };
 			if (action == ACTION_SET) {
 				result.put('value', rawValue);
 			}
@@ -122,8 +115,7 @@ public with sharing class BulkUpdateService {
 				if (
 					objectType == Account.SObjectType &&
 					'Name'.equalsIgnoreCase(change.target.getName()) &&
-					Schema.SObjectType.Account.fields.getMap()
-						.containsKey(RECORD_TYPE_FIELD.toLowerCase())
+					Schema.SObjectType.Account.fields.getMap().containsKey(RECORD_TYPE_FIELD.toLowerCase())
 				) {
 					names.add(RECORD_TYPE_FIELD);
 				}
@@ -203,36 +195,24 @@ public with sharing class BulkUpdateService {
 				? new List<Object>()
 				: (List<Object>) JSON.deserializeUntyped(changesJson);
 		} catch (Exception unreadable) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'));
 		}
 		return plan(queryJson, rawChanges);
 	}
 
 	/** Checks a job's stored definition again, as the person running the job (R-BU1). */
 	public static Plan planFromDefinition(String definitionJson) {
-		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-			definitionJson
-		);
-		return plan(
-			JSON.serialize(definition.get('query')),
-			(List<Object>) definition.get('changes')
-		);
+		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
+		return plan(JSON.serialize(definition.get('query')), (List<Object>) definition.get('changes'));
 	}
 
 	private static Plan plan(String queryJson, List<Object> rawChanges) {
 		Plan result = new Plan();
 		result.queryJson = queryJson;
-		result.objectType = BulkUpdateFields.writableObject(
-			QueryCompiler.parse(queryJson).objectName
-		);
-		result.objectName = result.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getName();
+		result.objectType = BulkUpdateFields.writableObject(QueryCompiler.parse(queryJson).objectName);
+		result.objectName = result.objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 		if (rawChanges == null || rawChanges.isEmpty()) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'));
 		}
 		if (rawChanges.size() > MAX_CHANGES) {
 			throw new BulkUpdateFields.BulkUpdateException(
@@ -242,9 +222,7 @@ public with sharing class BulkUpdateService {
 		Set<String> targets = new Set<String>();
 		for (Object entry : rawChanges) {
 			if (!(entry instanceof Map<String, Object>)) {
-				throw new BulkUpdateFields.BulkUpdateException(
-					BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
-				);
+				throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'));
 			}
 			Change change = change(result.objectType, (Map<String, Object>) entry);
 			if (!targets.add(change.target.getName().toLowerCase())) {
@@ -262,18 +240,13 @@ public with sharing class BulkUpdateService {
 
 	private static Change change(Schema.SObjectType type, Map<String, Object> raw) {
 		Change change = new Change();
-		change.action = raw.get('action') == null
-			? ''
-			: String.valueOf(raw.get('action')).trim().toLowerCase();
+		change.action = raw.get('action') == null ? '' : String.valueOf(raw.get('action')).trim().toLowerCase();
 		change.target = BulkUpdateFields.writableField(type, raw.get('field'));
 		String label = change.target.getLabel();
 		if (change.action == ACTION_CLEAR) {
 			if (!change.target.isNillable()) {
 				throw new BulkUpdateFields.BulkUpdateException(
-					String.format(
-						BarnHelp.text('Core', 'Core_BulkUpdate_ErrorRequired'),
-						new List<Object>{ label }
-					)
+					String.format(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorRequired'), new List<Object>{ label })
 				);
 			}
 			return change;
@@ -301,9 +274,7 @@ public with sharing class BulkUpdateService {
 		if (change.action == ACTION_TRANSFORM) {
 			return withSteps(type, change, raw.get('transforms'));
 		}
-		throw new BulkUpdateFields.BulkUpdateException(
-			BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
-		);
+		throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'));
 	}
 
 	/**
@@ -315,10 +286,7 @@ public with sharing class BulkUpdateService {
 		String label = change.target.getLabel();
 		if (!BulkUpdateFields.canTransform(change.target)) {
 			throw new BulkUpdateFields.BulkUpdateException(
-				String.format(
-					BarnHelp.text('Core', 'Core_BulkUpdate_ErrorCannotTransform'),
-					new List<Object>{ label }
-				)
+				String.format(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorCannotTransform'), new List<Object>{ label })
 			);
 		}
 		change.steps = rawSteps instanceof List<Object>
@@ -326,10 +294,7 @@ public with sharing class BulkUpdateService {
 			: new List<DataTransform.Step>();
 		if (change.steps.isEmpty()) {
 			throw new BulkUpdateFields.BulkUpdateException(
-				String.format(
-					BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoSteps'),
-					new List<Object>{ label }
-				)
+				String.format(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoSteps'), new List<Object>{ label })
 			);
 		}
 		List<String> problems = DataTransform.problems(change.steps);
@@ -370,9 +335,7 @@ public with sharing class BulkUpdateService {
 
 	/** The preview with a sample of `sampleSize` records, held between 1 and MAX_SAMPLE_SIZE. */
 	public static Preview preview(String queryJson, String changesJson, Integer sampleSize) {
-		Integer size = sampleSize == null
-			? SAMPLE_SIZE
-			: Math.max(1, Math.min(sampleSize, MAX_SAMPLE_SIZE));
+		Integer size = sampleSize == null ? SAMPLE_SIZE : Math.max(1, Math.min(sampleSize, MAX_SAMPLE_SIZE));
 		Plan checked = plan(queryJson, changesJson);
 		Integer ceiling = runLimit();
 		Preview result = new Preview();
@@ -380,12 +343,9 @@ public with sharing class BulkUpdateService {
 		if (result.count > ceiling) {
 			throw new BulkUpdateFields.BulkUpdateException(overLimit(ceiling));
 		}
-		result.objectLabel = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.getLabelPlural();
+		result.objectLabel = checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
 		Set<String> fields = checked.readFields();
-		String nameField = DataJobs.nameField(
-			checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-		);
+		String nameField = DataJobs.nameField(checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED));
 		if (nameField != null) {
 			fields.add(nameField);
 		}
@@ -400,9 +360,7 @@ public with sharing class BulkUpdateService {
 		) {
 			SampleRecord shown = new SampleRecord();
 			shown.recordId = record.Id;
-			shown.name = nameField == null
-				? String.valueOf(record.Id)
-				: String.valueOf(record.get(nameField));
+			shown.name = nameField == null ? String.valueOf(record.Id) : String.valueOf(record.get(nameField));
 			for (Change change : checked.changes) {
 				FieldChange field = new FieldChange();
 				field.label = change.target.getLabel();
@@ -450,16 +408,10 @@ public with sharing class BulkUpdateService {
 	 * The job record is the package's own bookkeeping, written in system mode (ADR-0021); every
 	 * record the job changes is saved in the person's own mode.
 	 */
-	public static Import_Batch__c start(
-		String queryJson,
-		String changesJson,
-		Integer confirmedCount
-	) {
+	public static Import_Batch__c start(String queryJson, String changesJson, Integer confirmedCount) {
 		Plan checked = plan(queryJson, changesJson);
 		if (confirmedCount == null || confirmedCount < 1) {
-			throw new BulkUpdateFields.BulkUpdateException(
-				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm')
-			);
+			throw new BulkUpdateFields.BulkUpdateException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm'));
 		}
 		Integer ceiling = runLimit();
 		if (confirmedCount > ceiling) {
@@ -505,8 +457,7 @@ public with sharing class BulkUpdateService {
 					UserInfo.getName(),
 					now.format(),
 					count.format(),
-					checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural(),
+					checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 					confirmedCount.format()
 				}
 			)
@@ -517,12 +468,7 @@ public with sharing class BulkUpdateService {
 
 	/** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BU2). */
 	public static Integer runLimit() {
-		return DataJobs.wholeNumberSetting(
-			'Bulk_Update_Run_Limit__c',
-			MAX_RUN_LIMIT,
-			1,
-			MAX_RUN_LIMIT
-		);
+		return DataJobs.wholeNumberSetting('Bulk_Update_Run_Limit__c', MAX_RUN_LIMIT, 1, MAX_RUN_LIMIT);
 	}
 
 	public static String overLimit(Integer ceiling) {

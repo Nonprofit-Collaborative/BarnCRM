@@ -49,11 +49,7 @@ public with sharing class HealthCheckLastRun {
 			return;
 		}
 		List<Integer> counts = counts(remaining.findings);
-		save(
-			stored.errors + counts[0],
-			Math.max(0, stored.warnings - 1) + counts[1],
-			stored.infos + counts[2]
-		);
+		save(stored.errors + counts[0], Math.max(0, stored.warnings - 1) + counts[1], stored.infos + counts[2]);
 	}
 
 	/** Errors, warnings and the rest, in that order. */

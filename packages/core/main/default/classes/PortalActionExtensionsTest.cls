@@ -52,11 +52,7 @@ private class PortalActionExtensionsTest {
 			Test.stopTest();
 
 			Assert.isNotNull(found, 'The module offering the action is found past a broken one');
-			Assert.areEqual(
-				'Signed up',
-				found.run('Volunteers.SignUp', null, null),
-				'Its run is used'
-			);
+			Assert.areEqual('Signed up', found.run('Volunteers.SignUp', null, null), 'Its run is used');
 			Assert.isNull(missing, 'An action no module offers is absent');
 		}
 	}

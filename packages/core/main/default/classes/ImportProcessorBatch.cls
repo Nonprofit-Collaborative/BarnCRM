@@ -131,9 +131,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 	private Database.QueryLocator retryRows() {
 		Id owner = batchId;
 		Decimal after = retryAfter;
-		Set<String> replaced = dryRun
-			? new Set<String>()
-			: new Set<String>{ ImportRowProcessor.STATUS_REJECTED };
+		Set<String> replaced = dryRun ? new Set<String>() : new Set<String>{ ImportRowProcessor.STATUS_REJECTED };
 		// A fixed row skipped when it was staged (R-IT18) is never processed either.
 		String skipped = ImportRowProcessor.STATUS_SKIPPED;
 		return Database.getQueryLocator(
@@ -212,12 +210,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 		List<Import_Row__c> replaced = new List<Import_Row__c>();
 		for (Import_Row__c row : scope) {
 			if (row.Row_Number__c != null && row.Row_Number__c <= retryAfter) {
-				replaced.add(
-					new Import_Row__c(
-						Id = row.Id,
-						Status__c = ImportBatchService.ROW_STATUS_RETRIED
-					)
-				);
+				replaced.add(new Import_Row__c(Id = row.Id, Status__c = ImportBatchService.ROW_STATUS_RETRIED));
 			} else {
 				rest.add(row);
 			}

@@ -46,9 +46,7 @@ public with sharing class InboundGiftRequest {
 			Gift_Date__c = request.giftDate == null ? Date.today() : request.giftDate,
 			Type__c = paymentMethod,
 			Status__c = STATUS_RECEIVED,
-			Payment_Reference__c = String.isBlank(request.paymentReference)
-				? null
-				: request.paymentReference.trim(),
+			Payment_Reference__c = String.isBlank(request.paymentReference) ? null : request.paymentReference.trim(),
 			Donor_Contact__c = donorContactId,
 			Donor_Account__c = donorAccountId,
 			Appeal__c = appealId
@@ -83,10 +81,7 @@ public with sharing class InboundGiftRequest {
 		if (request.amount == null) {
 			return invalid(required('amount'));
 		}
-		if (
-			request.amount <= 0 ||
-			request.amount != request.amount.setScale(2, System.RoundingMode.DOWN)
-		) {
+		if (request.amount <= 0 || request.amount != request.amount.setScale(2, System.RoundingMode.DOWN)) {
 			return invalid(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorAmount'));
 		}
 
@@ -104,10 +99,7 @@ public with sharing class InboundGiftRequest {
 			);
 		}
 
-		if (
-			request.paymentReference != null &&
-			request.paymentReference.trim().length() > MAX_PAYMENT_REFERENCE
-		) {
+		if (request.paymentReference != null && request.paymentReference.trim().length() > MAX_PAYMENT_REFERENCE) {
 			return invalid(tooLong('paymentReference', MAX_PAYMENT_REFERENCE));
 		}
 
@@ -146,10 +138,7 @@ public with sharing class InboundGiftRequest {
 	}
 
 	private static String required(String field) {
-		return String.format(
-			BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorRequired'),
-			new List<String>{ field }
-		);
+		return String.format(BarnHelp.text('Giving', 'Mirror_InboundGift_ErrorRequired'), new List<String>{ field });
 	}
 
 	private static String tooLong(String field, Integer limitLength) {

@@ -21,11 +21,7 @@ private class RollupRegressionPathsTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
 			GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
-			GivingTestDataFactory.insertHouseholdContact(
-				'The Lindqvist Family',
-				'Bea',
-				'Lindqvist'
-			);
+			GivingTestDataFactory.insertHouseholdContact('The Lindqvist Family', 'Bea', 'Lindqvist');
 			GivingRollupTestData.installShippedRollups();
 		}
 	}
@@ -54,9 +50,7 @@ private class RollupRegressionPathsTest {
 			Assert.areEqual(1, organization.Gift_Count__c, 'Riverbend\'s gift count');
 			Assert.areEqual(
 				0,
-				GivingRollupTestData.valueOf(
-					GivingRollupTestData.account(ana().AccountId).Total_Giving__c
-				),
+				GivingRollupTestData.valueOf(GivingRollupTestData.account(ana().AccountId).Total_Giving__c),
 				'No household was credited'
 			);
 		}
@@ -77,18 +71,10 @@ private class RollupRegressionPathsTest {
 
 			Contact person = GivingRollupTestData.person(ana.Id);
 			GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
-			Assert.areEqual(
-				175,
-				person.Total_Giving__c,
-				'The corrected amount, not the sum of both'
-			);
+			Assert.areEqual(175, person.Total_Giving__c, 'The corrected amount, not the sum of both');
 			Assert.areEqual(1, person.Gift_Count__c, 'Still one gift');
 			Assert.areEqual(175, person.Largest_Gift__c, 'The largest gift is the corrected one');
-			Assert.areEqual(
-				175,
-				GivingRollupTestData.account(ana.AccountId).Total_Giving__c,
-				'The household follows'
-			);
+			Assert.areEqual(175, GivingRollupTestData.account(ana.AccountId).Total_Giving__c, 'The household follows');
 			// The fund side of a correction is asserted by movingAnAllocationMovesItBetweenFunds and
 			// aStatusChangeMovesTheFundTotal.
 		}
@@ -176,11 +162,7 @@ private class RollupRegressionPathsTest {
 			Test.stopTest();
 
 			Contact person = GivingRollupTestData.person(ana.Id);
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(person.Total_Giving__c),
-				'Nothing given'
-			);
+			Assert.areEqual(0, GivingRollupTestData.valueOf(person.Total_Giving__c), 'Nothing given');
 			Assert.areEqual(0, GivingRollupTestData.valueOf(person.Gift_Count__c), 'No gifts');
 		}
 	}
@@ -205,11 +187,7 @@ private class RollupRegressionPathsTest {
 			GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
 			Assert.areEqual(150, person.Total_Giving__c, 'Both gifts again');
 			Assert.areEqual(2, person.Gift_Count__c, 'Both gifts again');
-			Assert.areEqual(
-				150,
-				GivingRollupTestData.account(ana.AccountId).Total_Giving__c,
-				'The household follows'
-			);
+			Assert.areEqual(150, GivingRollupTestData.account(ana.AccountId).Total_Giving__c, 'The household follows');
 		}
 	}
 
@@ -235,11 +213,7 @@ private class RollupRegressionPathsTest {
 			GivingTestDataFactory.assertRollupWrote(newDonor.Total_Giving__c);
 			Assert.areEqual(100, newDonor.Total_Giving__c, 'Bea\'s gift');
 			Assert.areEqual(1, newDonor.Gift_Count__c, 'Bea\'s gift');
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(oldDonor.Total_Giving__c),
-				'Not Ana\'s'
-			);
+			Assert.areEqual(0, GivingRollupTestData.valueOf(oldDonor.Total_Giving__c), 'Not Ana\'s');
 			Assert.areEqual(0, GivingRollupTestData.valueOf(oldDonor.Gift_Count__c), 'Not Ana\'s');
 			Assert.areEqual(
 				100,
@@ -248,9 +222,7 @@ private class RollupRegressionPathsTest {
 			);
 			Assert.areEqual(
 				0,
-				GivingRollupTestData.valueOf(
-					GivingRollupTestData.account(ana.AccountId).Total_Giving__c
-				),
+				GivingRollupTestData.valueOf(GivingRollupTestData.account(ana.AccountId).Total_Giving__c),
 				'Ana\'s household no longer is'
 			);
 		}
@@ -287,16 +259,8 @@ private class RollupRegressionPathsTest {
 			Assert.areEqual(100, toFund.Total_Raised__c, 'Building has the money now');
 			Assert.areEqual(1, toFund.Gift_Count__c, 'And the gift');
 			Fund__c fromFund = GivingRollupTestData.fund(general.Id);
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(fromFund.Total_Raised__c),
-				'General does not'
-			);
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(fromFund.Gift_Count__c),
-				'General does not'
-			);
+			Assert.areEqual(0, GivingRollupTestData.valueOf(fromFund.Total_Raised__c), 'General does not');
+			Assert.areEqual(0, GivingRollupTestData.valueOf(fromFund.Gift_Count__c), 'General does not');
 		}
 	}
 
@@ -351,12 +315,7 @@ private class RollupRegressionPathsTest {
 				AutomationControl.bypass(rollup);
 			}
 			insert gift;
-			insert new Soft_Credit__c(
-				Gift__c = gift.Id,
-				Contact__c = bea.Id,
-				Role__c = 'Solicitor',
-				Amount__c = 75
-			);
+			insert new Soft_Credit__c(Gift__c = gift.Id, Contact__c = bea.Id, Role__c = 'Solicitor', Amount__c = 75);
 			for (String rollup : rollups) {
 				AutomationControl.clearBypass(rollup);
 			}
@@ -387,11 +346,7 @@ private class RollupRegressionPathsTest {
 				'Bea lost the credit'
 			);
 			Assert.areEqual(75, GivingRollupTestData.fund(general.Id).Total_Raised__c, 'Restored');
-			Assert.areEqual(
-				75,
-				GivingRollupTestData.person(bea.Id).Total_Soft_Credits__c,
-				'Bea has the credit again'
-			);
+			Assert.areEqual(75, GivingRollupTestData.person(bea.Id).Total_Soft_Credits__c, 'Bea has the credit again');
 		}
 	}
 
@@ -418,11 +373,7 @@ private class RollupRegressionPathsTest {
 			Assert.areEqual(400, survivor.Total_Giving__c, 'Both people\'s giving');
 			Assert.areEqual(2, survivor.Gift_Count__c, 'Both people\'s gifts');
 			Assert.areEqual(300, survivor.Largest_Gift__c, 'Bea\'s gift was the larger');
-			Assert.areEqual(
-				Date.today().addDays(-30),
-				survivor.First_Gift_Date__c,
-				'Bea\'s gift came first'
-			);
+			Assert.areEqual(Date.today().addDays(-30), survivor.First_Gift_Date__c, 'Bea\'s gift came first');
 		}
 	}
 
@@ -534,11 +485,7 @@ private class RollupRegressionPathsTest {
 			]) {
 				Assert.areEqual(300, household.Total_Giving__c, 'Each household follows');
 			}
-			Assert.areEqual(
-				300,
-				GivingRollupTestData.fund(general.Id).Gift_Count__c,
-				'Every gift on the fund'
-			);
+			Assert.areEqual(300, GivingRollupTestData.fund(general.Id).Gift_Count__c, 'Every gift on the fund');
 		}
 	}
 }

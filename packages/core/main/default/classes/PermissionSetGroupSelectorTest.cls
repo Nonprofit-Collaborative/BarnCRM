@@ -28,10 +28,7 @@ private class PermissionSetGroupSelectorTest {
 				names.contains(AccessService.ADMIN_ROLE),
 				'The BarnCRM Admin group ships with BarnCRM Core and should be found.'
 			);
-			Assert.isTrue(
-				names.contains('Read_Only'),
-				'The Read Only group ships with BarnCRM Core.'
-			);
+			Assert.isTrue(names.contains('Read_Only'), 'The Read Only group ships with BarnCRM Core.');
 		}
 	}
 
@@ -58,11 +55,7 @@ private class PermissionSetGroupSelectorTest {
 			Test.stopTest();
 
 			Assert.isNotNull(groupRecord, 'The Team Member group ships with BarnCRM Core.');
-			Assert.areEqual(
-				'Program_Staff',
-				groupRecord.DeveloperName,
-				'The wrong group came back.'
-			);
+			Assert.areEqual('Program_Staff', groupRecord.DeveloperName, 'The wrong group came back.');
 		}
 	}
 

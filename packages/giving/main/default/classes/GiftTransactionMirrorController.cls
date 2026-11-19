@@ -73,14 +73,10 @@ public with sharing class GiftTransactionMirrorController {
 	public static Status copyRangeAgain(Date fromDate, Date toDate) {
 		Status current = checked(false);
 		if (fromDate == null || toDate == null) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDatesRequired'));
 		}
 		if (fromDate > toDate) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'));
 		}
 		try {
 			GiftTransactionMirrorBatch.runRange(fromDate, toDate);
@@ -108,9 +104,7 @@ public with sharing class GiftTransactionMirrorController {
 		requireUse();
 		Status current = status();
 		if (!current.canManage) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_OpportunityMirror_NoManagePermission'));
 		}
 		try {
 			GiftTransactionMirrorSchedulable.stop();
@@ -122,10 +116,7 @@ public with sharing class GiftTransactionMirrorController {
 
 	/** The reconciliation for a range, as the person viewing can see it (R-GT10). */
 	@AuraEnabled
-	public static GiftTransactionMirrorReconciliation.Comparison compare(
-		Date fromDate,
-		Date toDate
-	) {
+	public static GiftTransactionMirrorReconciliation.Comparison compare(Date fromDate, Date toDate) {
 		requireUse();
 		try {
 			return GiftTransactionMirrorReconciliation.compare(fromDate, toDate);
@@ -138,9 +129,7 @@ public with sharing class GiftTransactionMirrorController {
 
 	private static void requireUse() {
 		if (!FeatureManagement.checkPermission(USE_PERMISSION)) {
-			throw UserErrors.message(
-				BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoUsePermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_NoUsePermission'));
 		}
 	}
 
@@ -189,9 +178,7 @@ public with sharing class GiftTransactionMirrorController {
 		current.direction = GiftTransactionMirrorService.direction();
 		current.paidStatus = GiftTransactionMirrorService.paidStatus();
 		current.startDate = GiftTransactionMirrorService.startDate();
-		current.notReadyReason = current.available
-			? GiftTransactionMirrorService.notReadyReason()
-			: null;
+		current.notReadyReason = current.available ? GiftTransactionMirrorService.notReadyReason() : null;
 		current.canManage = AutomationControl.canManage();
 		current.canRun = GiftTransactionMirrorService.canRun();
 		current.running = GiftTransactionMirrorSchedulable.isRunning();

@@ -161,30 +161,15 @@ private class OpportunityMirrorControllerTest {
 
 			Assert.areEqual(4, result.giftCount, 'Every gift in the totals dated in the range.');
 			Assert.areEqual(175, result.giftTotal, 'Their total.');
-			Assert.areEqual(
-				3,
-				result.opportunityCount,
-				'Matched, hand edited, and entered by hand.'
-			);
+			Assert.areEqual(3, result.opportunityCount, 'Matched, hand edited, and entered by hand.');
 			Assert.areEqual(275, result.opportunityTotal, 'Their total.');
 			Assert.areEqual(4, result.differenceCount, 'One row for each difference.');
 			Map<String, String> reasonByName = new Map<String, String>();
 			for (OpportunityMirrorReconciliation.Difference row : result.differences) {
-				reasonByName.put(
-					row.giftId != null ? String.valueOf(row.giftId) : row.opportunityName,
-					row.reason
-				);
+				reasonByName.put(row.giftId != null ? String.valueOf(row.giftId) : row.opportunityName, row.reason);
 			}
-			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_DiffAmount,
-				reasonByName.get(edited.Id),
-				'Hand edit.'
-			);
-			Assert.areEqual(
-				Label.Mirror_OpportunityMirror_DiffMissing,
-				reasonByName.get(orphaned.Id),
-				'Deleted.'
-			);
+			Assert.areEqual(Label.Mirror_OpportunityMirror_DiffAmount, reasonByName.get(edited.Id), 'Hand edit.');
+			Assert.areEqual(Label.Mirror_OpportunityMirror_DiffMissing, reasonByName.get(orphaned.Id), 'Deleted.');
 			Assert.areEqual(
 				Label.Mirror_OpportunityMirror_DiffNoOpportunity,
 				reasonByName.get(unlinked.Id),
@@ -380,10 +365,7 @@ private class OpportunityMirrorControllerTest {
 					BarnHelp.text('Giving', 'Mirror_OpportunityMirror_ErrorDateOrder'),
 					refusalOf(new Action('copyReversed'))
 				);
-				Assert.isTrue(
-					OpportunityMirrorController.copyRangeAgain(FROM_DATE, TO_DATE).running,
-					'Started.'
-				);
+				Assert.isTrue(OpportunityMirrorController.copyRangeAgain(FROM_DATE, TO_DATE).running, 'Started.');
 			}
 			Test.stopTest();
 		}
@@ -412,10 +394,7 @@ private class OpportunityMirrorControllerTest {
 	static void eachRefusalNamesItsOwnReason() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			OpportunityMirrorController.Status status = ready();
-			Assert.isNull(
-				OpportunityMirrorController.refusal(status, false),
-				'Everything allows it.'
-			);
+			Assert.isNull(OpportunityMirrorController.refusal(status, false), 'Everything allows it.');
 			status.running = true;
 			Assert.isNull(OpportunityMirrorController.refusal(status, true), 'Scheduling may.');
 			Assert.areEqual(

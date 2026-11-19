@@ -32,10 +32,7 @@ private class HouseholdOfPersonControllerTest {
 			Assert.areEqual(1, households.size(), 'John is in one household');
 			Assert.areEqual(household.Id, households[0].householdId, 'It is the one he points at');
 			Assert.areEqual(1, households[0].memberCount, 'The member count is shown');
-			Assert.isTrue(
-				String.isNotBlank(households[0].formalGreeting),
-				'The formal greeting is shown'
-			);
+			Assert.isTrue(String.isNotBlank(households[0].formalGreeting), 'The formal greeting is shown');
 			Assert.isTrue(String.isNotBlank(households[0].name), 'The household is named');
 		}
 	}
@@ -45,9 +42,7 @@ private class HouseholdOfPersonControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			HouseholdService.suspendAutomaticCreation();
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'The Union Foundation')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'The Union Foundation'));
 			insert organization;
 			Contact harper = HouseholdTestDataFactory.newContact('Ms.', 'Harper', 'Garcia');
 			harper.AccountId = organization.Id;
@@ -86,11 +81,7 @@ private class HouseholdOfPersonControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(1, households.size(), 'Maria is in one household');
-			Assert.areEqual(
-				household.Id,
-				households[0].householdId,
-				'It is the one her membership names'
-			);
+			Assert.areEqual(household.Id, households[0].householdId, 'It is the one her membership names');
 		}
 	}
 
@@ -235,9 +226,7 @@ private class HouseholdOfPersonControllerTest {
 			Test.setFixedSearchResults(new List<Id>{ wei.Id });
 
 			Test.startTest();
-			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
-				'Wei'
-			);
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople('Wei');
 			Test.stopTest();
 
 			Assert.areEqual(1, hits.size(), 'Wei is found by name');
@@ -271,9 +260,7 @@ private class HouseholdOfPersonControllerTest {
 			Test.setFixedSearchResults(indexed);
 
 			Test.startTest();
-			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
-				'Vantrees'
-			);
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople('Vantrees');
 			Test.stopTest();
 
 			Assert.areEqual(1, hits.size(), 'One person, offered once: ' + hits);
@@ -289,9 +276,7 @@ private class HouseholdOfPersonControllerTest {
 			insert wei;
 
 			Test.startTest();
-			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
-				'W'
-			);
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople('W');
 			Test.stopTest();
 
 			Assert.isTrue(hits.isEmpty(), 'One character is not enough to search on');
@@ -328,9 +313,7 @@ private class HouseholdOfPersonControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
 			HouseholdService.suspendAutomaticCreation();
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'The Union Foundation')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'The Union Foundation'));
 			insert organization;
 			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
 			insert maria;
@@ -376,10 +359,7 @@ private class HouseholdOfPersonControllerTest {
 				[
 					SELECT COUNT()
 					FROM Household_Member__c
-					WHERE
-						Household__c = :household.Id
-						AND (Contact__c = :personId
-						OR Account__c = :personId)
+					WHERE Household__c = :household.Id AND (Contact__c = :personId OR Account__c = :personId)
 				],
 				'The new contact is now a member of the household'
 			);
@@ -408,11 +388,7 @@ private class HouseholdOfPersonControllerTest {
 			Test.stopTest();
 
 			Contact created = [SELECT AccountId FROM Contact WHERE LastName = 'Lee' LIMIT 1];
-			Assert.areEqual(
-				household.Id,
-				created.AccountId,
-				'Wei is in the household he was added to'
-			);
+			Assert.areEqual(household.Id, created.AccountId, 'Wei is in the household he was added to');
 			Assert.areEqual(
 				householdsBefore,
 				[SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId],
@@ -445,11 +421,7 @@ private class HouseholdOfPersonControllerTest {
 				WHERE (Contact__c = :personId OR Account__c = :personId) AND End_Date__c = NULL
 			];
 			Assert.areEqual(1, memberships.size(), 'Wei belongs to one household, not two');
-			Assert.areEqual(
-				household.Id,
-				memberships[0].Household__c,
-				'It is the one he was added to'
-			);
+			Assert.areEqual(household.Id, memberships[0].Household__c, 'It is the one he was added to');
 		}
 	}
 
@@ -458,9 +430,7 @@ private class HouseholdOfPersonControllerTest {
 	static void theSearchOffersContactsWhereThereAreNoPersonAccounts() {
 		System.runAs(TestUsers.admin()) {
 			HouseholdService.personAccountOverride = false;
-			Contact found = TestDataFactory.person(
-				new Contact(FirstName = 'Zelda', LastName = 'Searchable')
-			);
+			Contact found = TestDataFactory.person(new Contact(FirstName = 'Zelda', LastName = 'Searchable'));
 			TestDataFactory.pastDuplicateRules(found);
 			insert found;
 			Test.setFixedSearchResults(new List<Id>{ found.Id });
@@ -471,10 +441,7 @@ private class HouseholdOfPersonControllerTest {
 
 			Assert.areEqual(1, hits.size(), 'The one contact with that name');
 			Assert.areEqual(found.Id, hits[0].id, 'It is that contact');
-			Assert.isTrue(
-				HouseholdOfPersonController.searchPeople('Z').isEmpty(),
-				'One character never runs a query'
-			);
+			Assert.isTrue(HouseholdOfPersonController.searchPeople('Z').isEmpty(), 'One character never runs a query');
 		}
 	}
 
@@ -539,11 +506,7 @@ private class HouseholdOfPersonControllerTest {
 
 			SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
 
-			Assert.areEqual(
-				Contact.SObjectType,
-				person.getSObjectType(),
-				'Contact mode always creates a contact'
-			);
+			Assert.areEqual(Contact.SObjectType, person.getSObjectType(), 'Contact mode always creates a contact');
 			Assert.areEqual('Wei', person.get('FirstName'), 'It carries the name entered');
 		}
 	}
@@ -605,10 +568,7 @@ private class HouseholdOfPersonControllerTest {
 				message,
 				'The screen is told in plain words that a last name is needed'
 			);
-			Assert.isTrue(
-				[SELECT COUNT() FROM Contact WHERE LastName = 'Lee'] == 0,
-				'Nothing was created'
-			);
+			Assert.isTrue([SELECT COUNT() FROM Contact WHERE LastName = 'Lee'] == 0, 'Nothing was created');
 		}
 	}
 
@@ -693,8 +653,7 @@ private class HouseholdOfPersonControllerTest {
 	 * the contact behind it.
 	 */
 	private static Id personIdOf(Id contactId) {
-		Id account = PersonRecordSelector.getAccountsBehindPersonContacts(new Set<Id>{ contactId })
-			.get(contactId);
+		Id account = PersonRecordSelector.getAccountsBehindPersonContacts(new Set<Id>{ contactId }).get(contactId);
 		return account != null ? account : contactId;
 	}
 

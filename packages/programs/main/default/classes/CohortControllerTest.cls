@@ -7,10 +7,7 @@
 private class CohortControllerTest {
 	private static final String ADMIN = 'Programs_Admin';
 	private static final List<String> STAFF = new List<String>{ 'BarnCRM_Staff', 'Programs_Staff' };
-	private static final List<String> READER = new List<String>{
-		'BarnCRM_Read_Only',
-		'Programs_Read_Only'
-	};
+	private static final List<String> READER = new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' };
 
 	@TestSetup
 	static void createTestUsers() {
@@ -22,9 +19,7 @@ private class CohortControllerTest {
 	}
 
 	private static void contactMode() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 	}
@@ -86,14 +81,8 @@ private class CohortControllerTest {
 			Assert.isTrue(before.canEdit && before.canEnroll, 'The admin may add and enroll.');
 			Assert.areEqual(3, after.added, 'Ana moved in; Ben and Cara enrolled in it.');
 			Assert.areEqual(2, after.failures.size(), 'Each refused alone.');
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Cohort_NotOpen'),
-				after.failures[0].message
-			);
-			Assert.areEqual(
-				new Set<String>{ 'Pat Ana', 'Pat Ben', 'Pat Cara' },
-				namesOf(after.members)
-			);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Cohort_NotOpen'), after.failures[0].message);
+			Assert.areEqual(new Set<String>{ 'Pat Ana', 'Pat Ben', 'Pat Cara' }, namesOf(after.members));
 			Assert.areEqual(0, after.candidates.size(), 'Nobody left to add.');
 			Enrollment__c benNew = [
 				SELECT Stage__c, Cohort__c, Start_Date__c
@@ -106,8 +95,7 @@ private class CohortControllerTest {
 			Assert.areEqual(Date.today(), benNew.Start_Date__c, 'Through the enrollment rules.');
 			Assert.areEqual(
 				null,
-				[SELECT Cohort__c FROM Enrollment__c WHERE Id = :caraEnded.Id WITH SYSTEM_MODE]
-				.Cohort__c,
+				[SELECT Cohort__c FROM Enrollment__c WHERE Id = :caraEnded.Id WITH SYSTEM_MODE].Cohort__c,
 				'An ended enrollment is left alone.'
 			);
 		}
@@ -125,10 +113,7 @@ private class CohortControllerTest {
 				Contact__c = person('Ana').Id,
 				Cohort__c = spring.Id
 			);
-			Enrollment__c ben = new Enrollment__c(
-				Program__c = course.Id,
-				Contact__c = person('Ben').Id
-			);
+			Enrollment__c ben = new Enrollment__c(Program__c = course.Id, Contact__c = person('Ben').Id);
 			insert new List<Enrollment__c>{ ana, ben };
 
 			Test.startTest();
@@ -144,11 +129,7 @@ private class CohortControllerTest {
 			Assert.areEqual(0, after.members.size(), 'Out of the cohort.');
 			Assert.areEqual(2, after.candidates.size(), 'Both may be added again.');
 			Assert.areEqual(2, [SELECT COUNT() FROM Enrollment__c WITH SYSTEM_MODE], 'Kept.');
-			Assert.areEqual(
-				BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'),
-				refusal,
-				'Not a member.'
-			);
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'), refusal, 'Not a member.');
 		}
 	}
 
@@ -163,11 +144,7 @@ private class CohortControllerTest {
 
 			Test.startTest();
 			Database.SaveResult wrongCohort = Database.insert(
-				new Enrollment__c(
-					Program__c = course.Id,
-					Contact__c = person('Ana').Id,
-					Cohort__c = elsewhere.Id
-				),
+				new Enrollment__c(Program__c = course.Id, Contact__c = person('Ana').Id, Cohort__c = elsewhere.Id),
 				false
 			);
 			Database.SaveResult backwards = Database.insert(

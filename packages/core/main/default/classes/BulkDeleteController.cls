@@ -131,18 +131,10 @@ public with sharing class BulkDeleteController {
 	 * is the count typed again to empty the Recycle Bin too, or null.
 	 */
 	@AuraEnabled
-	public static JobView startArchive(
-		String queryJson,
-		Integer confirmedCount,
-		Integer emptyConfirmedCount
-	) {
+	public static JobView startArchive(String queryJson, Integer confirmedCount, Integer emptyConfirmedCount) {
 		try {
 			requirePermission();
-			Import_Batch__c started = BulkDeleteService.startArchive(
-				queryJson,
-				confirmedCount,
-				emptyConfirmedCount
-			);
+			Import_Batch__c started = BulkDeleteService.startArchive(queryJson, confirmedCount, emptyConfirmedCount);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Start an archive');
@@ -168,11 +160,7 @@ public with sharing class BulkDeleteController {
 	 * they can be downloaded first (R-BD8): from a query, or from a delete by file's batch.
 	 */
 	@AuraEnabled
-	public static BulkDeleteService.BackupPage backupPage(
-		String queryJson,
-		String batchId,
-		String afterId
-	) {
+	public static BulkDeleteService.BackupPage backupPage(String queryJson, String batchId, String afterId) {
 		try {
 			if (String.isBlank(batchId)) {
 				requirePermission();
@@ -190,10 +178,7 @@ public with sharing class BulkDeleteController {
 	public static JobView startFile(String batchId, Integer confirmedCount) {
 		try {
 			requireDeletePermission();
-			Import_Batch__c started = BulkDeleteService.startFromFile(
-				Id.valueOf(batchId),
-				confirmedCount
-			);
+			Import_Batch__c started = BulkDeleteService.startFromFile(Id.valueOf(batchId), confirmedCount);
 			return toView(requireJob(started.Id), true);
 		} catch (Exception caught) {
 			throw ERRORS.wrap(caught, 'Start a delete by file');
@@ -232,9 +217,7 @@ public with sharing class BulkDeleteController {
 
 	private static void requirePermission() {
 		if (!hasPermission()) {
-			throw new BulkDeleteService.BulkDeleteException(
-				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission')
-			);
+			throw new BulkDeleteService.BulkDeleteException(BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission'));
 		}
 	}
 
@@ -246,18 +229,12 @@ public with sharing class BulkDeleteController {
 	/** For what reads no query: the list, progress, undo and a delete by file (R-BD6, R-BD7). */
 	private static void requireDeletePermission() {
 		if (!mayDelete()) {
-			throw new BulkDeleteService.BulkDeleteException(
-				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission')
-			);
+			throw new BulkDeleteService.BulkDeleteException(BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission'));
 		}
 	}
 
 	private static Import_Batch__c requireJob(String jobId) {
-		Import_Batch__c found = DataJobs.find(
-			JOB_FIELDS,
-			BulkDeleteService.OPERATION_DELETE,
-			jobId
-		);
+		Import_Batch__c found = DataJobs.find(JOB_FIELDS, BulkDeleteService.OPERATION_DELETE, jobId);
 		if (found == null) {
 			throw new BulkDeleteService.BulkDeleteException(
 				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete')
@@ -291,9 +268,7 @@ public with sharing class BulkDeleteController {
 			view.canUndo = undoPreview.allowed;
 			view.recordsToUndo = undoPreview.records;
 		}
-		view.failures = detail && view.failed > 0
-			? DataJobs.failures(job.Id)
-			: new List<DataJobs.Failure>();
+		view.failures = detail && view.failed > 0 ? DataJobs.failures(job.Id) : new List<DataJobs.Failure>();
 		return view;
 	}
 }

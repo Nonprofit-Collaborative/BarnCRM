@@ -11,10 +11,7 @@ private class GrantManagementTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(GrantTestData.ADMIN);
-		TestUsers.standardUserWith(
-			'Gmreader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
-		);
+		TestUsers.standardUserWith('Gmreader', new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' });
 	}
 
 	private static User reader() {
@@ -43,20 +40,12 @@ private class GrantManagementTest {
 					Assigned_To__c = UserInfo.getUserId()
 				),
 				new Grant_Checklist_Item__c(Name = 'Attach the budget', Stage__c = 'Applied'),
-				new Grant_Checklist_Item__c(
-					Name = 'Retired step',
-					Stage__c = 'Prospect',
-					Active__c = false
-				)
+				new Grant_Checklist_Item__c(Name = 'Retired step', Stage__c = 'Prospect', Active__c = false)
 			};
 			Account funder = GrantTestData.funder('Lakeside Foundation');
 			List<Grant__c> grants = new List<Grant__c>();
 			for (Integer i = 0; i < 60; i++) {
-				Grant__c grant = GrantTestData.grant(
-					'Grant ' + i,
-					funder.Id,
-					GrantService.STAGE_PROSPECT
-				);
+				Grant__c grant = GrantTestData.grant('Grant ' + i, funder.Id, GrantService.STAGE_PROSPECT);
 				grant.Application_Deadline__c = today.addDays(30);
 				grants.add(grant);
 			}
@@ -71,16 +60,8 @@ private class GrantManagementTest {
 
 			List<Grant_Requirement__c> tasks = requirementsOf(first.Id, 'Task');
 			Assert.areEqual(2, tasks.size(), 'One task per active item of each stage reached');
-			Assert.areEqual(
-				today.addDays(23),
-				tasks[0].Due_Date__c,
-				'Seven days before the deadline'
-			);
-			Assert.areEqual(
-				UserInfo.getUserId(),
-				tasks[0].Assigned_To__c,
-				'The item names who does it'
-			);
+			Assert.areEqual(today.addDays(23), tasks[0].Due_Date__c, 'Seven days before the deadline');
+			Assert.areEqual(UserInfo.getUserId(), tasks[0].Assigned_To__c, 'The item names who does it');
 			Assert.areEqual(today.addDays(30), tasks[1].Due_Date__c, 'Blank days: the deadline');
 			Assert.areEqual(0, added, 'Nothing missing, nothing added');
 			Assert.areEqual(
@@ -100,32 +81,16 @@ private class GrantManagementTest {
 	static void aTaskIsNeverDueBeforeTodayAndNoDeadlineGivesTwoWeeks() {
 		System.runAs(reader()) {
 			Date today = Date.today();
-			Assert.areEqual(
-				today,
-				GrantManagementService.dueDate(today.addDays(3), 10, today),
-				'Not in the past'
-			);
-			Assert.areEqual(
-				today.addDays(14),
-				GrantManagementService.dueDate(null, 10, today),
-				'No deadline'
-			);
-			Assert.areEqual(
-				today.addDays(5),
-				GrantManagementService.dueDate(today.addDays(5), null, today),
-				'On it'
-			);
+			Assert.areEqual(today, GrantManagementService.dueDate(today.addDays(3), 10, today), 'Not in the past');
+			Assert.areEqual(today.addDays(14), GrantManagementService.dueDate(null, 10, today), 'No deadline');
+			Assert.areEqual(today.addDays(5), GrantManagementService.dueDate(today.addDays(5), null, today), 'On it');
 		}
 	}
 
 	@IsTest
 	static void aTaskIsTickedDoneAndOpenAgain() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				GrantTestData.funder('Lakeside').Id,
-				'Prospect'
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', GrantTestData.funder('Lakeside').Id, 'Prospect');
 			insert grant;
 			Grant_Requirement__c task = GrantTestData.requirement('Call', grant.Id, Date.today());
 			task.Type__c = 'Task';
@@ -140,28 +105,16 @@ private class GrantManagementTest {
 			Map<String, Object> row = (Map<String, Object>) ((List<Object>) done.get('tasks'))[0];
 			Assert.isTrue((Boolean) row.get('done'), 'Done is a done status');
 			Assert.isTrue((Boolean) done.get('canEdit'), 'An admin can tick');
-			Assert.areEqual(
-				'Not Started',
-				requirementsOf(grant.Id, 'Task')[0].Status__c,
-				'Open again'
-			);
+			Assert.areEqual('Not Started', requirementsOf(grant.Id, 'Task')[0].Status__c, 'Open again');
 		}
 	}
 
 	@IsTest
 	static void documentsShowTheirLatestFile() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				GrantTestData.funder('Lakeside').Id,
-				'Prospect'
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', GrantTestData.funder('Lakeside').Id, 'Prospect');
 			insert grant;
-			Grant_Requirement__c letter = GrantTestData.requirement(
-				'Letter',
-				grant.Id,
-				Date.today()
-			);
+			Grant_Requirement__c letter = GrantTestData.requirement('Letter', grant.Id, Date.today());
 			letter.Type__c = 'Letter of Inquiry';
 			Grant_Requirement__c visit = GrantTestData.requirement('Visit', grant.Id, Date.today());
 			visit.Type__c = 'Site Visit';
@@ -232,20 +185,10 @@ private class GrantManagementTest {
 			}
 			Test.stopTest();
 
-			Map<String, Object> line = (Map<String, Object>) ((List<Object>) budget.get(
-				'lines'
-			))[0];
-			Assert.areEqual(
-				4000,
-				(Decimal) line.get('spent'),
-				'Only Spent entries count toward a line'
-			);
+			Map<String, Object> line = (Map<String, Object>) ((List<Object>) budget.get('lines'))[0];
+			Assert.areEqual(4000, (Decimal) line.get('spent'), 'Only Spent entries count toward a line');
 			Assert.areEqual(1000, (Decimal) budget.get('unassignedSpent'), 'Spent on no line');
-			Assert.areEqual(
-				25000,
-				(Decimal) budget.get('amountAwarded'),
-				'The grant amount to compare'
-			);
+			Assert.areEqual(25000, (Decimal) budget.get('amountAwarded'), 'The grant amount to compare');
 			Assert.isTrue(refused, 'A line of another grant is refused');
 		}
 	}
@@ -254,11 +197,7 @@ private class GrantManagementTest {
 	static void aRenewableAwardGetsItsRenewalAndStartsTheNextCycle() {
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			Date today = Date.today();
-			Grant__c grant = GrantTestData.grant(
-				'Literacy',
-				GrantTestData.funder('Lakeside').Id,
-				'Awarded'
-			);
+			Grant__c grant = GrantTestData.grant('Literacy', GrantTestData.funder('Lakeside').Id, 'Awarded');
 			grant.Amount_Requested__c = 30000;
 			grant.Amount_Awarded__c = 25000;
 			grant.Award_Start_Date__c = today;
@@ -302,11 +241,7 @@ private class GrantManagementTest {
 			Assert.areEqual(grant.Id, next.Renewal_Of__c, 'Linked to the award');
 			Assert.areEqual(25000, next.Amount_Requested__c, 'The award is the new request');
 			Assert.areEqual('Tutoring', next.Purpose__c, 'Copied');
-			Assert.areEqual(
-				18000,
-				next.Budget_Lines__r[0].Amount_Requested__c,
-				'Lines ask the awarded amounts'
-			);
+			Assert.areEqual(18000, next.Budget_Lines__r[0].Amount_Requested__c, 'Lines ask the awarded amounts');
 			try {
 				GrantManagementService.startRenewal(grant.Id);
 				Assert.fail('A second renewal is refused');
@@ -320,10 +255,7 @@ private class GrantManagementTest {
 			);
 			Map<String, Object> history = GrantManagementController.getRenewals(nextId);
 			Assert.areEqual(2, ((List<Object>) history.get('chain')).size(), 'Both years');
-			Assert.isFalse(
-				(Boolean) GrantManagementController.getRenewals(grant.Id).get('canStart'),
-				'Renewed once'
-			);
+			Assert.isFalse((Boolean) GrantManagementController.getRenewals(grant.Id).get('canStart'), 'Renewed once');
 		}
 	}
 
@@ -345,16 +277,9 @@ private class GrantManagementTest {
 			}
 			Test.stopTest();
 			Assert.isFalse((Boolean) checklist.get('canEdit'), 'Cannot tick');
-			Assert.isFalse(
-				(Boolean) GrantManagementController.getRenewals(grant.Id).get('canStart'),
-				'Not offered'
-			);
+			Assert.isFalse((Boolean) GrantManagementController.getRenewals(grant.Id).get('canStart'), 'Not offered');
 			Assert.isTrue(refused, 'Start Renewal is refused');
-			Assert.areEqual(
-				0,
-				GrantManagementController.addChecklistTasks(grant.Id),
-				'Adds nothing'
-			);
+			Assert.areEqual(0, GrantManagementController.addChecklistTasks(grant.Id), 'Adds nothing');
 		}
 	}
 

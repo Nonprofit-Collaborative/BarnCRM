@@ -72,8 +72,7 @@ private class DataProtectionExtensionsTest {
 			String.format(
 				BarnHelp.text('Core', 'Core_Data_ObjectBookkeeping'),
 				new List<String>{
-					Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-						.getLabelPlural()
+					Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural()
 				}
 			),
 			DataProtectedFields.objectRefusal(Relationship__c.SObjectType),

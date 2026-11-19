@@ -66,11 +66,7 @@ private class RollupMarkedDefinitionsTest {
 		for (Integer i = 0; i < ORGANIZATIONS; i++) {
 			created.add(
 				TestDataFactory.organization(
-					new Account(
-						Name = 'Organization ' + i,
-						RecordTypeId = organizationType,
-						AnnualRevenue = UNTOUCHED
-					)
+					new Account(Name = 'Organization ' + i, RecordTypeId = organizationType, AnnualRevenue = UNTOUCHED)
 				)
 			);
 		}
@@ -83,10 +79,7 @@ private class RollupMarkedDefinitionsTest {
 		for (Integer i = 0; i < PEOPLE; i++) {
 			created.add(
 				TestDataFactory.person(
-					new Contact(
-						LastName = 'Person ' + i,
-						AccountId = employers[Math.mod(i, ORGANIZATIONS)].Id
-					)
+					new Contact(LastName = 'Person ' + i, AccountId = employers[Math.mod(i, ORGANIZATIONS)].Id)
 				)
 			);
 		}
@@ -162,11 +155,7 @@ private class RollupMarkedDefinitionsTest {
 
 			Assert.isFalse(queued.isEmpty(), 'The save queued its organizations');
 			for (Rollup_Queue__c entry : queued) {
-				Assert.areEqual(
-					String.valueOf(staff.Id),
-					entry.Definition_Ids__c,
-					'Naming only the staff count'
-				);
+				Assert.areEqual(String.valueOf(staff.Id), entry.Definition_Ids__c, 'Naming only the staff count');
 			}
 			assertOnlyTheStaffCountRan(employers);
 		}
@@ -182,9 +171,7 @@ private class RollupMarkedDefinitionsTest {
 			insert new List<Rollup_Definition__c>{ staffCount(), childCount() };
 
 			Test.startTest();
-			RollupQueue.add(
-				new Map<String, Set<Id>>{ 'Account' => new Map<Id, Account>(employers).keySet() }
-			);
+			RollupQueue.add(new Map<String, Set<Id>>{ 'Account' => new Map<Id, Account>(employers).keySet() });
 			Test.stopTest();
 
 			for (Account organization : [

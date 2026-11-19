@@ -29,9 +29,7 @@ public with sharing class MigrationStageBatch implements Database.Batchable<SObj
 			// Nothing to read; finish marks the batch Failed with the reason.
 			failure = unreadable.getMessage();
 			ErrorLogger.log(unreadable, CONTEXT);
-			return Database.getQueryLocator(
-				[SELECT Id FROM Merge_Journal__c WHERE Id = NULL WITH USER_MODE]
-			);
+			return Database.getQueryLocator([SELECT Id FROM Merge_Journal__c WHERE Id = NULL WITH USER_MODE]);
 		}
 	}
 
@@ -42,9 +40,7 @@ public with sharing class MigrationStageBatch implements Database.Batchable<SObj
 		try {
 			Migration_Kit__mdt kit = MigrationKitService.kitNamed(kitKey);
 			MigrationKitExtension extension = MigrationKitService.extensionFor(kit);
-			List<Map<String, Object>> rows = extension == null
-				? null
-				: extension.rows(stepKey, records);
+			List<Map<String, Object>> rows = extension == null ? null : extension.rows(stepKey, records);
 			if (rows == null) {
 				rows = source().rows(records);
 			}
@@ -82,10 +78,7 @@ public with sharing class MigrationStageBatch implements Database.Batchable<SObj
 				true,
 				true,
 				new List<String>{
-					String.format(
-						BarnHelp.text('Core', 'Core_Migration_StagingFailed'),
-						new List<String>{ failure }
-					)
+					String.format(BarnHelp.text('Core', 'Core_Migration_StagingFailed'), new List<String>{ failure })
 				},
 				null,
 				null

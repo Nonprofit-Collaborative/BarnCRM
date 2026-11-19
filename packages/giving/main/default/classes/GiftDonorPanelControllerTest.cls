@@ -54,11 +54,7 @@ private class GiftDonorPanelControllerTest {
 
 			Assert.areEqual(person.AccountId, panel.householdId, 'Her household.');
 			Assert.areEqual('The Nolan Family', panel.householdName, 'By name.');
-			Assert.areEqual(
-				GiftDonorPanelController.ROWS,
-				panel.gifts.size(),
-				'Only the last three gifts.'
-			);
+			Assert.areEqual(GiftDonorPanelController.ROWS, panel.gifts.size(), 'Only the last three gifts.');
 			Assert.areEqual(110, panel.gifts[0].amount, 'Newest first: ten days ago.');
 			Assert.areEqual(130, panel.gifts[2].amount, 'Then twenty and thirty days ago.');
 			Assert.areEqual(1, panel.commitments.size(), 'The cancelled gift is not open.');
@@ -75,9 +71,7 @@ private class GiftDonorPanelControllerTest {
 			Account organization = GivingTestDataFactory.insertOrganization('Riverside Foundation');
 			insert GivingTestDataFactory.buildAccountGift(organization.Id, 500);
 
-			GiftDonorPanelController.Panel panel = GiftDonorPanelController.getPanel(
-				organization.Id
-			);
+			GiftDonorPanelController.Panel panel = GiftDonorPanelController.getPanel(organization.Id);
 
 			Assert.isNull(panel.householdId, 'An organization is no household member.');
 			Assert.areEqual(1, panel.gifts.size(), 'Its gift.');
@@ -98,17 +92,12 @@ private class GiftDonorPanelControllerTest {
 	static void aGiftOfficerSeesTheirDonorsGift() {
 		User officer;
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			officer = TestDataFactory.createUser(
-				'Officer',
-				new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-			);
+			officer = TestDataFactory.createUser('Officer', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 		}
 		GiftDonorPanelController.Panel panel;
 		Test.startTest();
 		System.runAs(officer) {
-			Contact donor = TestDataFactory.person(
-				new Contact(FirstName = 'Rosa', LastName = 'Park')
-			);
+			Contact donor = TestDataFactory.person(new Contact(FirstName = 'Rosa', LastName = 'Park'));
 			insert donor;
 			insert GivingTestDataFactory.buildGift(donor.Id, 75);
 			panel = GiftDonorPanelController.getPanel(donor.Id);

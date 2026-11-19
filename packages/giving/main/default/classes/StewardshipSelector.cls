@@ -15,9 +15,7 @@ public with sharing class StewardshipSelector {
 	 * in the order they are laid out. One query for templates and their children, so starting
 	 * plans for two hundred gifts costs the same two queries as starting one.
 	 */
-	public static List<Stewardship_Plan_Template__c> selectActiveTemplatesForEvents(
-		Set<String> events
-	) {
+	public static List<Stewardship_Plan_Template__c> selectActiveTemplatesForEvents(Set<String> events) {
 		if (events == null || events.isEmpty()) {
 			return new List<Stewardship_Plan_Template__c>();
 		}
@@ -83,10 +81,7 @@ public with sharing class StewardshipSelector {
 	 * The running plans for the given donors, which is what R-SP6 is checked against. Both donor
 	 * sides are asked for in one query rather than two, because a gift list mixes them.
 	 */
-	public static List<Stewardship_Plan__c> selectRunningPlansFor(
-		Set<Id> contactIds,
-		Set<Id> accountIds
-	) {
+	public static List<Stewardship_Plan__c> selectRunningPlansFor(Set<Id> contactIds, Set<Id> accountIds) {
 		Set<Id> contacts = contactIds == null ? new Set<Id>() : contactIds;
 		Set<Id> accounts = accountIds == null ? new Set<Id>() : accountIds;
 		if (contacts.isEmpty() && accounts.isEmpty()) {
@@ -132,9 +127,7 @@ public with sharing class StewardshipSelector {
 			WITH SYSTEM_MODE
 			LIMIT 10000
 		]) {
-			String key = String.valueOf(
-				gift.Donor_Contact__c == null ? gift.Donor_Account__c : gift.Donor_Contact__c
-			);
+			String key = String.valueOf(gift.Donor_Contact__c == null ? gift.Donor_Account__c : gift.Donor_Contact__c);
 			Integer seen = counts.get(key);
 			counts.put(key, seen == null ? 1 : seen + 1);
 		}

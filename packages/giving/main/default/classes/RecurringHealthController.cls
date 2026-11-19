@@ -104,12 +104,7 @@ public with sharing class RecurringHealthController {
 			}
 			return page;
 		} catch (Exception caught) {
-			throw UserErrors.wrap(
-				caught,
-				false,
-				CONTEXT,
-				BarnHelp.text('Giving', 'Giving_RecurringHealth_Unexpected')
-			);
+			throw UserErrors.wrap(caught, false, CONTEXT, BarnHelp.text('Giving', 'Giving_RecurringHealth_Unexpected'));
 		}
 	}
 
@@ -123,15 +118,9 @@ public with sharing class RecurringHealthController {
 				WHERE Id = :commitmentId
 				WITH USER_MODE
 			];
-			String donor = gift.Donor_Contact__c != null
-				? gift.Donor_Contact__r.Name
-				: gift.Donor_Account__r?.Name;
+			String donor = gift.Donor_Contact__c != null ? gift.Donor_Contact__r.Name : gift.Donor_Account__r?.Name;
 			Task followUp = new Task(
-				Subject = BarnHelp.text(
-						'Giving',
-						'Giving_RecurringHealth_TaskSubject',
-						new List<Object>{ donor }
-					)
+				Subject = BarnHelp.text('Giving', 'Giving_RecurringHealth_TaskSubject', new List<Object>{ donor })
 					.abbreviate(255),
 				ActivityDate = Date.today(),
 				Status = AskReminderService.TASK_STATUS,
@@ -143,10 +132,7 @@ public with sharing class RecurringHealthController {
 			insert as user followUp;
 			return followUp.Id;
 		} catch (Exception caught) {
-			throw UserErrors.wrapShowingDml(
-				caught,
-				BarnHelp.text('Giving', 'Giving_RecurringHealth_Unexpected')
-			);
+			throw UserErrors.wrapShowingDml(caught, BarnHelp.text('Giving', 'Giving_RecurringHealth_Unexpected'));
 		}
 	}
 
@@ -169,10 +155,7 @@ public with sharing class RecurringHealthController {
 		for (Installment__c late : [
 			SELECT Commitment__c
 			FROM Installment__c
-			WHERE
-				Status__c = 'Overdue'
-				AND Commitment__r.Type__c = 'Recurring'
-				AND Commitment__r.Status__c = 'Active'
+			WHERE Status__c = 'Overdue' AND Commitment__r.Type__c = 'Recurring' AND Commitment__r.Status__c = 'Active'
 			WITH USER_MODE
 			ORDER BY Due_Date__c
 			LIMIT :MAX_ROWS
@@ -210,26 +193,18 @@ public with sharing class RecurringHealthController {
 			Row row = new Row();
 			row.id = gift.Id;
 			row.name = gift.Name;
-			row.donorId = gift.Donor_Contact__c != null
-				? gift.Donor_Contact__c
-				: gift.Donor_Account__c;
-			row.donorName = gift.Donor_Contact__c != null
-				? gift.Donor_Contact__r.Name
-				: gift.Donor_Account__r?.Name;
+			row.donorId = gift.Donor_Contact__c != null ? gift.Donor_Contact__c : gift.Donor_Account__c;
+			row.donorName = gift.Donor_Contact__c != null ? gift.Donor_Contact__r.Name : gift.Donor_Account__r?.Name;
 			row.amount = gift.Amount__c;
 			row.frequency = gift.Frequency__c;
-			row.failedCharges = gift.Failed_Charges__c == null
-				? 0
-				: gift.Failed_Charges__c.intValue();
+			row.failedCharges = gift.Failed_Charges__c == null ? 0 : gift.Failed_Charges__c.intValue();
 			row.lastFailedCharge = gift.Last_Failed_Charge__c;
 			row.cardExpires = gift.Card_Expires__c != null &&
 				gift.Card_Expires__c <= expiryCutoff
 				? gift.Card_Expires__c
 				: null;
 			row.cancelledAtProcessor = gift.Processor_Cancelled__c;
-			row.overdueSince = gift.Installments__r.isEmpty()
-				? null
-				: gift.Installments__r[0].Due_Date__c;
+			row.overdueSince = gift.Installments__r.isEmpty() ? null : gift.Installments__r[0].Due_Date__c;
 			rows.add(row);
 		}
 		return rows;
@@ -240,15 +215,9 @@ public with sharing class RecurringHealthController {
 		Date since = Date.today().toStartOfMonth().addMonths(-11);
 		List<Month> months = new List<Month>();
 		for (AggregateResult total : [
-			SELECT
-				CALENDAR_YEAR(Gift_Date__c) y,
-				CALENDAR_MONTH(Gift_Date__c) m,
-				SUM(Amount__c) total
+			SELECT CALENDAR_YEAR(Gift_Date__c) y, CALENDAR_MONTH(Gift_Date__c) m, SUM(Amount__c) total
 			FROM Gift__c
-			WHERE
-				Commitment__r.Type__c = 'Recurring'
-				AND Status__c = 'Received'
-				AND Gift_Date__c >= :since
+			WHERE Commitment__r.Type__c = 'Recurring' AND Status__c = 'Received' AND Gift_Date__c >= :since
 			WITH USER_MODE
 			GROUP BY CALENDAR_YEAR(Gift_Date__c), CALENDAR_MONTH(Gift_Date__c)
 		]) {

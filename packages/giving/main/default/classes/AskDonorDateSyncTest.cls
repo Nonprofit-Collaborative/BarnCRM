@@ -49,25 +49,15 @@ private class AskDonorDateSyncTest {
 		System.runAs(staff()) {
 			Date today = Date.today();
 			Contact donor = person(null);
-			Ask__c soon = new Ask__c(
-				Donor_Contact__c = donor.Id,
-				Target_Date__c = today.addDays(10)
-			);
-			Ask__c later = new Ask__c(
-				Donor_Contact__c = donor.Id,
-				Target_Date__c = today.addDays(30)
-			);
+			Ask__c soon = new Ask__c(Donor_Contact__c = donor.Id, Target_Date__c = today.addDays(10));
+			Ask__c later = new Ask__c(Donor_Contact__c = donor.Id, Target_Date__c = today.addDays(30));
 			insert new List<Ask__c>{ soon, later };
 
 			update new Ask__c(Id = soon.Id, Target_Date__c = today.addDays(5));
 			Assert.areEqual(today.addDays(5), nextAskOf(donor.Id), 'Follows a new Target Date.');
 
 			update new Ask__c(Id = soon.Id, Outcome__c = 'Won');
-			Assert.areEqual(
-				today.addDays(30),
-				nextAskOf(donor.Id),
-				'The next open ask takes over.'
-			);
+			Assert.areEqual(today.addDays(30), nextAskOf(donor.Id), 'The next open ask takes over.');
 		}
 	}
 
@@ -76,10 +66,7 @@ private class AskDonorDateSyncTest {
 		System.runAs(staff()) {
 			Date today = Date.today();
 			Contact donor = person(null);
-			Ask__c ask = new Ask__c(
-				Donor_Contact__c = donor.Id,
-				Target_Date__c = today.addDays(15)
-			);
+			Ask__c ask = new Ask__c(Donor_Contact__c = donor.Id, Target_Date__c = today.addDays(15));
 			insert ask;
 			Assert.areEqual(today.addDays(15), nextAskOf(donor.Id), 'Set by the ask.');
 
@@ -94,10 +81,7 @@ private class AskDonorDateSyncTest {
 		System.runAs(staff()) {
 			Date today = Date.today();
 			Contact donor = person(null);
-			Ask__c ask = new Ask__c(
-				Donor_Contact__c = donor.Id,
-				Target_Date__c = today.addDays(15)
-			);
+			Ask__c ask = new Ask__c(Donor_Contact__c = donor.Id, Target_Date__c = today.addDays(15));
 			insert ask;
 			// Somebody moves the donor's date out by hand while the ask is open.
 			update new Contact(Id = donor.Id, Next_Ask_Date__c = today.addDays(90));
@@ -126,17 +110,10 @@ private class AskDonorDateSyncTest {
 		System.runAs(staff()) {
 			Date today = Date.today();
 			Contact donor = person(null);
-			Ask__c ask = new Ask__c(
-				Donor_Contact__c = donor.Id,
-				Target_Date__c = today.addDays(15)
-			);
+			Ask__c ask = new Ask__c(Donor_Contact__c = donor.Id, Target_Date__c = today.addDays(15));
 			insert ask;
 
-			update new Ask__c(
-				Id = ask.Id,
-				Outcome__c = 'Won',
-				Next_Ask_Date__c = today.addDays(365)
-			);
+			update new Ask__c(Id = ask.Id, Outcome__c = 'Won', Next_Ask_Date__c = today.addDays(365));
 
 			Assert.areEqual(today.addDays(365), nextAskOf(donor.Id), 'Ask again in a year.');
 		}
@@ -149,23 +126,12 @@ private class AskDonorDateSyncTest {
 			Contact blank = person(null);
 			Contact past = person(null);
 			Ask__c noTarget = new Ask__c(Donor_Contact__c = blank.Id);
-			Ask__c pastAgain = new Ask__c(
-				Donor_Contact__c = past.Id,
-				Target_Date__c = today.addDays(10)
-			);
+			Ask__c pastAgain = new Ask__c(Donor_Contact__c = past.Id, Target_Date__c = today.addDays(10));
 			insert new List<Ask__c>{ noTarget, pastAgain };
 
 			update new List<Ask__c>{
-				new Ask__c(
-					Id = noTarget.Id,
-					Outcome__c = 'Declined',
-					Next_Ask_Date__c = today.addDays(180)
-				),
-				new Ask__c(
-					Id = pastAgain.Id,
-					Outcome__c = 'Declined',
-					Next_Ask_Date__c = today.addDays(-1)
-				)
+				new Ask__c(Id = noTarget.Id, Outcome__c = 'Declined', Next_Ask_Date__c = today.addDays(180)),
+				new Ask__c(Id = pastAgain.Id, Outcome__c = 'Declined', Next_Ask_Date__c = today.addDays(-1))
 			};
 
 			Assert.areEqual(today.addDays(180), nextAskOf(blank.Id), 'A blank date takes it.');
@@ -180,31 +146,17 @@ private class AskDonorDateSyncTest {
 			Contact byHand = person(today.addDays(90));
 			Contact stillOpen = person(null);
 			Ask__c closing = new Ask__c(Donor_Contact__c = byHand.Id);
-			Ask__c first = new Ask__c(
-				Donor_Contact__c = stillOpen.Id,
-				Target_Date__c = today.addDays(10)
-			);
-			Ask__c second = new Ask__c(
-				Donor_Contact__c = stillOpen.Id,
-				Target_Date__c = today.addDays(40)
-			);
+			Ask__c first = new Ask__c(Donor_Contact__c = stillOpen.Id, Target_Date__c = today.addDays(10));
+			Ask__c second = new Ask__c(Donor_Contact__c = stillOpen.Id, Target_Date__c = today.addDays(40));
 			insert new List<Ask__c>{ closing, first, second };
 
 			update new List<Ask__c>{
-				new Ask__c(
-					Id = closing.Id,
-					Outcome__c = 'Won',
-					Next_Ask_Date__c = today.addDays(365)
-				),
+				new Ask__c(Id = closing.Id, Outcome__c = 'Won', Next_Ask_Date__c = today.addDays(365)),
 				new Ask__c(Id = first.Id, Outcome__c = 'Won', Next_Ask_Date__c = today.addDays(365))
 			};
 
 			Assert.areEqual(today.addDays(90), nextAskOf(byHand.Id), 'A date by hand is kept.');
-			Assert.areEqual(
-				today.addDays(40),
-				nextAskOf(stillOpen.Id),
-				'The open ask still sets the date.'
-			);
+			Assert.areEqual(today.addDays(40), nextAskOf(stillOpen.Id), 'The open ask still sets the date.');
 		}
 	}
 
@@ -212,14 +164,9 @@ private class AskDonorDateSyncTest {
 	static void deletingTheLastAskClearsAndAnOrganizationDonorIsKeptToo() {
 		System.runAs(staff()) {
 			Date today = Date.today();
-			Account foundation = TestDataFactory.organization(
-				new Account(Name = 'Rivera Foundation')
-			);
+			Account foundation = TestDataFactory.organization(new Account(Name = 'Rivera Foundation'));
 			insert foundation;
-			Ask__c ask = new Ask__c(
-				Donor_Account__c = foundation.Id,
-				Target_Date__c = today.addDays(25)
-			);
+			Ask__c ask = new Ask__c(Donor_Account__c = foundation.Id, Target_Date__c = today.addDays(25));
 			insert ask;
 			Assert.areEqual(today.addDays(25), nextAskOf(foundation.Id), 'Account donors too.');
 
@@ -243,10 +190,7 @@ private class AskDonorDateSyncTest {
 			Date today = Date.today();
 			Contact first = person(null);
 			Contact second = person(null);
-			Ask__c ask = new Ask__c(
-				Donor_Contact__c = first.Id,
-				Target_Date__c = today.addDays(12)
-			);
+			Ask__c ask = new Ask__c(Donor_Contact__c = first.Id, Target_Date__c = today.addDays(12));
 			insert ask;
 
 			update new Ask__c(Id = ask.Id, Donor_Contact__c = second.Id);
@@ -262,18 +206,12 @@ private class AskDonorDateSyncTest {
 			Date today = Date.today();
 			List<Contact> donors = new List<Contact>();
 			for (Integer i = 0; i < 200; i++) {
-				donors.add(
-					TestDataFactory.person(
-						new Contact(FirstName = 'Donor', LastName = 'Number ' + i)
-					)
-				);
+				donors.add(TestDataFactory.person(new Contact(FirstName = 'Donor', LastName = 'Number ' + i)));
 			}
 			insert donors;
 			List<Ask__c> asks = new List<Ask__c>();
 			for (Integer i = 0; i < 200; i++) {
-				asks.add(
-					new Ask__c(Donor_Contact__c = donors[i].Id, Target_Date__c = today.addDays(i))
-				);
+				asks.add(new Ask__c(Donor_Contact__c = donors[i].Id, Target_Date__c = today.addDays(i)));
 			}
 			Test.startTest();
 			insert asks;

@@ -20,9 +20,6 @@ public with sharing class GrantRenewalHandler extends TriggerHandler {
 	}
 
 	public override void afterUpdate() {
-		GrantManagementService.syncRenewals(
-			(List<Grant__c>) newRecords(),
-			(Map<Id, Grant__c>) oldRecordsById()
-		);
+		GrantManagementService.syncRenewals((List<Grant__c>) newRecords(), (Map<Id, Grant__c>) oldRecordsById());
 	}
 }

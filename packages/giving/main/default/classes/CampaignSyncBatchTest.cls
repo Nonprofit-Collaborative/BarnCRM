@@ -75,18 +75,14 @@ private class CampaignSyncBatchTest {
 			System.runAs(admin) {
 				CampaignSyncService.syncSaved(
 					(List<Appeal__c>) Database.queryWithBinds(
-						'SELECT ' +
-							CampaignSyncSelector.APPEAL_FIELDS +
-							' FROM Appeal__c WHERE Id = :galaId',
+						'SELECT ' + CampaignSyncSelector.APPEAL_FIELDS + ' FROM Appeal__c WHERE Id = :galaId',
 						new Map<String, Object>{ 'galaId' => gala.Id },
 						AccessLevel.SYSTEM_MODE
 					)
 				);
 				CampaignSyncService.syncSaved(
 					(List<Appeal__c>) Database.queryWithBinds(
-						'SELECT ' +
-							CampaignSyncSelector.APPEAL_FIELDS +
-							' FROM Appeal__c WHERE Id = :parentId',
+						'SELECT ' + CampaignSyncSelector.APPEAL_FIELDS + ' FROM Appeal__c WHERE Id = :parentId',
 						new Map<String, Object>{ 'parentId' => gala.Parent_Appeal__c },
 						AccessLevel.SYSTEM_MODE
 					)
@@ -169,8 +165,7 @@ private class CampaignSyncBatchTest {
 			Assert.areEqual(
 				campaignsBefore + 3,
 				Database.countQuery(
-					'SELECT COUNT() FROM ' +
-					CampaignSyncService.campaignType().getDescribe().getName(),
+					'SELECT COUNT() FROM ' + CampaignSyncService.campaignType().getDescribe().getName(),
 					AccessLevel.SYSTEM_MODE
 				),
 				'The Campaigns made for the refused appeals are deleted again (R-CS7).'

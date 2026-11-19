@@ -118,23 +118,17 @@ public with sharing class HouseholdWriter {
 	 */
 	public static Boolean canCreateHouseholds() {
 		Schema.DescribeSObjectResult account = Schema.SObjectType.Account;
-		return account.isCreateable() &&
-			account.isUpdateable() &&
-			HouseholdService.householdRecordTypeId() != null;
+		return account.isCreateable() && account.isUpdateable() && HouseholdService.householdRecordTypeId() != null;
 	}
 
 	private static void checkCreateAccess(List<Account> households, Set<Id> touchedHouseholdIds) {
 		Id recordTypeId = HouseholdService.householdRecordTypeId();
 		if (recordTypeId == null) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing'));
 		}
 		Schema.DescribeSObjectResult account = Schema.SObjectType.Account;
 		if (!account.isCreateable() || !account.isUpdateable()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'));
 		}
 		Map<String, Schema.SObjectField> fields = account.fields.getMap();
 		Set<String> checked = new Set<String>();
@@ -142,34 +136,22 @@ public with sharing class HouseholdWriter {
 			if (household.RecordTypeId == null) {
 				household.RecordTypeId = recordTypeId;
 			} else if (household.RecordTypeId != recordTypeId) {
-				throw new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold')
-				);
+				throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'));
 			}
 			for (String name : household.getPopulatedFieldsAsMap().keySet()) {
 				if (!checked.add(name.toLowerCase())) {
 					continue;
 				}
 				Schema.SObjectField field = fields.get(name);
-				if (
-					field != null &&
-					!BOOKKEEPING_FIELDS.contains(field) &&
-					!field.getDescribe().isCreateable()
-				) {
-					throw new HouseholdException(
-						BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess')
-					);
+				if (field != null && !BOOKKEEPING_FIELDS.contains(field) && !field.getDescribe().isCreateable()) {
+					throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'));
 				}
 			}
 		}
-		Set<Id> touched = touchedHouseholdIds == null
-			? new Set<Id>()
-			: new Set<Id>(touchedHouseholdIds);
+		Set<Id> touched = touchedHouseholdIds == null ? new Set<Id>() : new Set<Id>(touchedHouseholdIds);
 		touched.remove(null);
 		if (editableCount(touched) != touched.size()) {
-			throw new HouseholdException(
-				BarnHelp.text('Core', 'Core_Households_ErrorCreateNoHouseholdAccess')
-			);
+			throw new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorCreateNoHouseholdAccess'));
 		}
 	}
 
@@ -190,21 +172,14 @@ public with sharing class HouseholdWriter {
 		return editable;
 	}
 
-	private static List<Database.SaveResult> insertHouseholds(
-		List<Account> households,
-		Database.DMLOptions options
-	) {
+	private static List<Database.SaveResult> insertHouseholds(List<Account> households, Database.DMLOptions options) {
 		if (refuseCreatesForTest) {
 			Integer tooLong = Account.Name.getDescribe().getLength() + 1;
 			for (Account household : households) {
 				household.Name = 'x'.repeat(tooLong);
 			}
 		}
-		List<Database.SaveResult> saves = Database.insert(
-			households,
-			options,
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.SaveResult> saves = Database.insert(households, options, AccessLevel.SYSTEM_MODE);
 		logFailures(saves, Label.Core_Households_ErrorContextMembership);
 		return saves;
 	}
@@ -243,11 +218,7 @@ public with sharing class HouseholdWriter {
 		if (accounts == null || accounts.isEmpty()) {
 			return refused;
 		}
-		List<Database.SaveResult> saves = Database.update(
-			accounts,
-			householdSaveOptions(),
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.SaveResult> saves = Database.update(accounts, householdSaveOptions(), AccessLevel.SYSTEM_MODE);
 		logFailures(saves, Label.Core_NpspAdoption_ErrorContext);
 		for (Integer i = 0; i < saves.size(); i++) {
 			if (!saves[i].isSuccess()) {
@@ -275,11 +246,7 @@ public with sharing class HouseholdWriter {
 		if (households == null || households.isEmpty()) {
 			return refused;
 		}
-		List<Database.SaveResult> saves = Database.update(
-			households,
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.SaveResult> saves = Database.update(households, false, AccessLevel.SYSTEM_MODE);
 		logFailures(saves, Label.Core_Households_ErrorContextNaming);
 		for (Integer i = 0; i < saves.size(); i++) {
 			if (!saves[i].isSuccess()) {
@@ -297,11 +264,7 @@ public with sharing class HouseholdWriter {
 		if (memberships == null || memberships.isEmpty()) {
 			return;
 		}
-		List<Database.SaveResult> saves = Database.insert(
-			memberships,
-			false,
-			AccessLevel.SYSTEM_MODE
-		);
+		List<Database.SaveResult> saves = Database.insert(memberships, false, AccessLevel.SYSTEM_MODE);
 		logFailures(saves, Label.Core_Households_ErrorContextMembership);
 	}
 
@@ -326,10 +289,7 @@ public with sharing class HouseholdWriter {
 	 * fails the merge, so nothing is lost and the merged-away person's households are
 	 * untouched, rather than a membership quietly going missing.
 	 */
-	public static void saveMergedMemberships(
-		List<Household_Member__c> created,
-		List<Household_Member__c> promoted
-	) {
+	public static void saveMergedMemberships(List<Household_Member__c> created, List<Household_Member__c> promoted) {
 		if (created != null && !created.isEmpty()) {
 			insert as system created;
 		}
@@ -343,10 +303,7 @@ public with sharing class HouseholdWriter {
 	 * then the duplicate rows removed. System mode (upkeep, ADR-0021), and a refusal is
 	 * logged rather than thrown so one row cannot stop the rest of the settlement.
 	 */
-	public static void collapseMemberships(
-		List<Household_Member__c> promoted,
-		List<Household_Member__c> redundant
-	) {
+	public static void collapseMemberships(List<Household_Member__c> promoted, List<Household_Member__c> redundant) {
 		if (promoted != null && !promoted.isEmpty()) {
 			logFailures(
 				Database.update(promoted, false, AccessLevel.SYSTEM_MODE),
@@ -355,13 +312,7 @@ public with sharing class HouseholdWriter {
 		}
 		if (redundant != null && !redundant.isEmpty()) {
 			List<String> failed = new List<String>();
-			for (
-				Database.DeleteResult result : Database.delete(
-					redundant,
-					false,
-					AccessLevel.SYSTEM_MODE
-				)
-			) {
+			for (Database.DeleteResult result : Database.delete(redundant, false, AccessLevel.SYSTEM_MODE)) {
 				if (!result.isSuccess()) {
 					failed.add(firstMessage(result.getErrors()));
 				}
@@ -380,11 +331,7 @@ public with sharing class HouseholdWriter {
 			return;
 		}
 		try {
-			List<Database.DeleteResult> deletes = Database.delete(
-				households,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.DeleteResult> deletes = Database.delete(households, false, AccessLevel.USER_MODE);
 			List<String> failed = new List<String>();
 			for (Database.DeleteResult result : deletes) {
 				if (!result.isSuccess()) {
@@ -412,11 +359,7 @@ public with sharing class HouseholdWriter {
 			return;
 		}
 		try {
-			List<Database.DeleteResult> deletes = Database.delete(
-				memberships,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.DeleteResult> deletes = Database.delete(memberships, false, AccessLevel.USER_MODE);
 			List<String> failed = new List<String>();
 			for (Database.DeleteResult result : deletes) {
 				if (!result.isSuccess()) {
@@ -438,11 +381,7 @@ public with sharing class HouseholdWriter {
 			return;
 		}
 		try {
-			List<Database.UndeleteResult> restores = Database.undelete(
-				memberships,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.UndeleteResult> restores = Database.undelete(memberships, false, AccessLevel.USER_MODE);
 			List<String> failed = new List<String>();
 			for (Database.UndeleteResult result : restores) {
 				if (!result.isSuccess()) {
@@ -474,9 +413,7 @@ public with sharing class HouseholdWriter {
 		List<Exception> thrown = new List<Exception>();
 		for (String message : messages) {
 			thrown.add(
-				new HouseholdException(
-					BarnHelp.text('Core', 'Core_Households_ErrorSaveFailed') + ' ' + message
-				)
+				new HouseholdException(BarnHelp.text('Core', 'Core_Households_ErrorSaveFailed') + ' ' + message)
 			);
 		}
 		ErrorLogger.log(thrown, context);

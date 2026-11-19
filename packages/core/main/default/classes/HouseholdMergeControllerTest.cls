@@ -33,10 +33,7 @@ private class HouseholdMergeControllerTest {
 			Database.insert(new List<Account>{ survivor, victim }, AccessLevel.SYSTEM_MODE);
 
 			Test.startTest();
-			HouseholdMergeService.MergePreview preview = HouseholdMergeController.preview(
-				survivor.Id,
-				victim.Id
-			);
+			HouseholdMergeService.MergePreview preview = HouseholdMergeController.preview(survivor.Id, victim.Id);
 			Test.stopTest();
 
 			Assert.areEqual(survivor.Id, preview.survivorId, 'The survivor comes back');
@@ -84,19 +81,11 @@ private class HouseholdMergeControllerTest {
 			insert wei;
 
 			Test.startTest();
-			Id created = HouseholdMergeController.splitHousehold(
-				householdId,
-				new List<Id>{ wei.Id },
-				null
-			);
+			Id created = HouseholdMergeController.splitHousehold(householdId, new List<Id>{ wei.Id }, null);
 			Test.stopTest();
 
 			Assert.isNotNull(created, 'The screen is sent to the household that was created');
-			Assert.areEqual(
-				created,
-				[SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId,
-				'Wei is in it'
-			);
+			Assert.areEqual(created, [SELECT AccountId FROM Contact WHERE Id = :wei.Id].AccountId, 'Wei is in it');
 		}
 	}
 
@@ -105,19 +94,13 @@ private class HouseholdMergeControllerTest {
 		System.runAs(TestUsers.admin()) {
 			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-			Account organization = TestDataFactory.organization(
-				new Account(Name = 'Bay Area Food Bank')
-			);
+			Account organization = TestDataFactory.organization(new Account(Name = 'Bay Area Food Bank'));
 			Database.insert(new List<Account>{ household, organization }, AccessLevel.SYSTEM_MODE);
 
 			String message;
 			Test.startTest();
 			try {
-				HouseholdMergeController.mergeHouseholds(
-					household.Id,
-					organization.Id,
-					new Map<String, String>()
-				);
+				HouseholdMergeController.mergeHouseholds(household.Id, organization.Id, new Map<String, String>());
 			} catch (Exception e) {
 				message = e.getMessage();
 			}

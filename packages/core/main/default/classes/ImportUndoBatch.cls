@@ -66,10 +66,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	private static final String ROLLUP_STAMP_FIELD = 'Rollups_Last_Calculated__c';
 
 	/** Children never counted as something a record gained: the import's own bookkeeping. */
-	private static final Set<String> NOT_GAINED = new Set<String>{
-		'import_row__c',
-		'import_journal__c'
-	};
+	private static final Set<String> NOT_GAINED = new Set<String>{ 'import_row__c', 'import_journal__c' };
 
 	/**
 	 * The contact-to-account relation the platform creates by itself for every contact where
@@ -168,18 +165,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			LIMIT 1
 		]
 		.Operation__c;
-		String first = BulkUpdateService.OPERATION_UPDATE.equals(operation)
-			? PASS_RESTORE
-			: passes()[0];
+		String first = BulkUpdateService.OPERATION_UPDATE.equals(operation) ? PASS_RESTORE : passes()[0];
 		return AsyncStarter.batch(
-			new ImportUndoBatch(
-				batchId,
-				countedAtStart,
-				first,
-				0,
-				false,
-				toTheSecond(Datetime.now())
-			),
+			new ImportUndoBatch(batchId, countedAtStart, first, 0, false, toTheSecond(Datetime.now())),
 			scopeFor(first, batchId),
 			'ImportUndoBatch'
 		);
@@ -193,9 +181,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	private static List<String> passes() {
 		List<String> deletes = new List<String>();
 		for (Schema.SObjectType type : ImportEntityProcessors.taggedTypes()) {
-			deletes.add(
-				PASS_TAGGED_PREFIX + type.getDescribe(SObjectDescribeOptions.DEFERRED).getName()
-			);
+			deletes.add(PASS_TAGGED_PREFIX + type.getDescribe(SObjectDescribeOptions.DEFERRED).getName());
 		}
 		deletes.addAll(new List<String>{ PASS_CONTACTS, PASS_PERSON_ACCOUNTS, PASS_ACCOUNTS });
 		// Every tagged record is judged before anything is put back or deleted: either sets
@@ -235,13 +221,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	}
 
 	@TestVisible
-	private ImportUndoBatch(
-		Id batchId,
-		Integer countedAtStart,
-		String pass,
-		Integer restored,
-		Boolean failed
-	) {
+	private ImportUndoBatch(Id batchId, Integer countedAtStart, String pass, Integer restored, Boolean failed) {
 		this(batchId, countedAtStart, pass, restored, failed, toTheSecond(Datetime.now()));
 	}
 
@@ -270,14 +250,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		Id owner = batchId;
 		Import_Batch__c batch = [
-			SELECT
-				Completed_At__c,
-				Started_At__c,
-				Committed_By__c,
-				Retried_By__c,
-				Status__c,
-				Job_Id__c,
-				Operation__c
+			SELECT Completed_At__c, Started_At__c, Committed_By__c, Retried_By__c, Status__c, Job_Id__c, Operation__c
 			FROM Import_Batch__c
 			WHERE Id = :owner
 			WITH SYSTEM_MODE
@@ -286,9 +259,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		// A commit the platform aborted never finished: it ended when its job did, or, where
 		// that is no longer known, is taken to have ended when it started, so every change
 		// since, the committer's own included, is kept (R-IB9, R-IB13).
-		completedAt = batch.Completed_At__c == null
-			? ImportBatchService.jobEndedAt(batch)
-			: batch.Completed_At__c;
+		completedAt = batch.Completed_At__c == null ? ImportBatchService.jobEndedAt(batch) : batch.Completed_At__c;
 		if (completedAt == null) {
 			completedAt = batch.Started_At__c;
 		}
@@ -346,10 +317,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			[
 				SELECT Id, Name, Created_By_Import_Batch__c
 				FROM Account
-				WHERE
-					Created_By_Import_Batch__c = :owner
-					AND (RecordTypeId = NULL
-					OR RecordTypeId NOT IN :personTypes)
+				WHERE Created_By_Import_Batch__c = :owner AND (RecordTypeId = NULL OR RecordTypeId NOT IN :personTypes)
 				WITH SYSTEM_MODE
 			]
 		);
@@ -470,9 +438,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		}
 		Map<Id, SObject> current = new Map<Id, SObject>();
 		for (String objectName : idsByObject.keySet()) {
-			current.putAll(
-				read(objectName, fieldsByObject.get(objectName), idsByObject.get(objectName))
-			);
+			current.putAll(read(objectName, fieldsByObject.get(objectName), idsByObject.get(objectName)));
 		}
 		Map<Id, SObject> changes = new Map<Id, SObject>();
 		Map<Id, List<String>> changedFields = new Map<Id, List<String>>();
@@ -547,19 +513,9 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 				restored += changedFields.get(recordId).size();
 				continue;
 			}
-			String objectName = records[i]
-				.getSObjectType()
-				.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.getName();
+			String objectName = records[i].getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED).getName();
 			for (String field : changedFields.get(recordId)) {
-				journal.add(
-					notRestored(
-						objectName,
-						recordId,
-						field,
-						BulkJobSupport.message(results[i].getErrors())
-					)
-				);
+				journal.add(notRestored(objectName, recordId, field, BulkJobSupport.message(results[i].getErrors())));
 			}
 		}
 	}
@@ -608,10 +564,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		String key = objectName.toLowerCase();
 		if (!loadableByName.containsKey(key)) {
 			Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
-			loadableByName.put(
-				key,
-				type != null && DataProtectedFields.objectRefusal(type) == null ? type : null
-			);
+			loadableByName.put(key, type != null && DataProtectedFields.objectRefusal(type) == null ? type : null);
 		}
 		return loadableByName.get(key);
 	}
@@ -660,11 +613,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		}
 		return new Map<Id, SObject>(
 			Database.queryWithBinds(
-				'SELECT ' +
-					String.join(new List<String>(selected), ', ') +
-					' FROM ' +
-					objectName +
-					' WHERE Id IN :ids',
+				'SELECT ' + String.join(new List<String>(selected), ', ') + ' FROM ' + objectName + ' WHERE Id IN :ids',
 				new Map<String, Object>{ 'ids' => ids },
 				AccessLevel.SYSTEM_MODE
 			)
@@ -688,8 +637,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			stored instanceof Double
 		) {
 			try {
-				return Decimal.valueOf(String.valueOf(stored)) ==
-					Decimal.valueOf(String.valueOf(journaled));
+				return Decimal.valueOf(String.valueOf(stored)) == Decimal.valueOf(String.valueOf(journaled));
 			} catch (Exception notANumber) {
 				return false;
 			}
@@ -796,11 +744,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		if (toDelete.isEmpty()) {
 			return;
 		}
-		List<Database.DeleteResult> results = Database.delete(
-			toDelete,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.DeleteResult> results = Database.delete(toDelete, false, AccessLevel.USER_MODE);
 		for (Integer i = 0; i < results.size(); i++) {
 			if (!results[i].isSuccess()) {
 				journal.add(kept(toDelete[i], refusedBecause(results[i].getErrors())));
@@ -838,11 +782,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		}
 	}
 
-	private void deleteCreatedOf(
-		Schema.SObjectType type,
-		Set<Id> ids,
-		List<Map<String, Object>> journal
-	) {
+	private void deleteCreatedOf(Schema.SObjectType type, Set<Id> ids, List<Map<String, Object>> journal) {
 		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 		Boolean named = described.fields.getMap().containsKey('name');
 		List<SObject> found = Database.queryWithBinds(
@@ -860,9 +800,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			if (createdByTheCommit(record)) {
 				created.put(record.Id, record);
 			} else {
-				journal.add(
-					kept(record, BarnHelp.text('Core', 'Core_Import_UndoKeptNotCreatedByImport'))
-				);
+				journal.add(kept(record, BarnHelp.text('Core', 'Core_Import_UndoKeptNotCreatedByImport')));
 			}
 		}
 		if (created.isEmpty()) {
@@ -886,11 +824,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		if (toDelete.isEmpty()) {
 			return;
 		}
-		List<Database.DeleteResult> results = Database.delete(
-			toDelete,
-			false,
-			AccessLevel.USER_MODE
-		);
+		List<Database.DeleteResult> results = Database.delete(toDelete, false, AccessLevel.USER_MODE);
 		for (Integer i = 0; i < results.size(); i++) {
 			if (results[i].isSuccess()) {
 				createdGone++;
@@ -939,9 +873,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		List<Schema.ChildRelationship> relationships = checkedRelationships(type);
 		for (Integer i = 0; i < relationships.size(); i += RELATIONSHIPS_PER_QUERY) {
 			List<Schema.ChildRelationship> chunk = new List<Schema.ChildRelationship>();
-			for (
-				Integer j = i; j < Math.min(i + RELATIONSHIPS_PER_QUERY, relationships.size()); j++
-			) {
+			for (Integer j = i; j < Math.min(i + RELATIONSHIPS_PER_QUERY, relationships.size()); j++) {
 				chunk.add(relationships[j]);
 			}
 			markGained(keep, ids, type, chunk);
@@ -1041,8 +973,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	 * is judged by what the judging passes found before anything was put back or deleted.
 	 */
 	private void markEdited(Map<Id, String> keep, Set<Id> ids, Schema.SObjectType type) {
-		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
-			.fields.getMap();
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		Boolean hasActivities = fields.containsKey('lastactivitydate');
 		String stampField = rollupStampField(fields);
 		String query =
@@ -1061,10 +992,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			Datetime modified = (Datetime) row.get('LastModifiedDate');
 			Id modifiedBy = (Id) row.get('LastModifiedById');
 			Boolean duringUndo = modified >= undoStartedAt;
-			Boolean byTheUndo =
-				modifiedBy == UserInfo.getUserId() &&
-				duringUndo &&
-				modified <= checkedAt;
+			Boolean byTheUndo = modifiedBy == UserInfo.getUserId() && duringUndo && modified <= checkedAt;
 			Datetime stamp = stampField == null ? null : (Datetime) row.get(stampField);
 			Boolean byARollup = isRollupSave(modified, stamp);
 			// A rollup the import itself set off, stamped before its follow-on work settled.
@@ -1165,14 +1093,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			return;
 		}
 		try {
-			gainedFrom(
-				keep,
-				Database.queryWithBinds(
-					gainedQuery(type, relationships),
-					binds,
-					AccessLevel.SYSTEM_MODE
-				)
-			);
+			gainedFrom(keep, Database.queryWithBinds(gainedQuery(type, relationships), binds, AccessLevel.SYSTEM_MODE));
 		} catch (Exception e) {
 			// Not logged here: the half that holds the relationship that failed logs it.
 			Integer half = relationships.size() / 2;
@@ -1213,10 +1134,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	 * record. "Since" is after the commit completed, or during the commit by somebody other
 	 * than the committer (R-IB9); a row the undo itself made is not counted.
 	 */
-	private String gainedQuery(
-		Schema.SObjectType type,
-		List<Schema.ChildRelationship> relationships
-	) {
+	private String gainedQuery(Schema.SObjectType type, List<Schema.ChildRelationship> relationships) {
 		String since = completedAt == null ? 'CreatedDate != NULL' : 'CreatedDate > :completedAt';
 		if (startedAt != null && committedBy != null) {
 			since += ' OR (CreatedDate >= :startedAt AND CreatedById NOT IN :committers)';
@@ -1233,13 +1151,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 				? ' AND ' + ImportEntityProcessors.TAG_FIELD + ' != :importBatch'
 				: '';
 			subqueries.add(
-				'(SELECT Id FROM ' +
-					relationship.getRelationshipName() +
-					' WHERE (' +
-					filter +
-					')' +
-					own +
-					' LIMIT 1)'
+				'(SELECT Id FROM ' + relationship.getRelationshipName() + ' WHERE (' + filter + ')' + own + ' LIMIT 1)'
 			);
 		}
 		return 'SELECT Id, ' +
@@ -1274,9 +1186,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			Schema.DescribeSObjectResult child = relationship.getChildSObject()
 				.getDescribe(SObjectDescribeOptions.DEFERRED);
 			String childName = child.getName();
-			String localName = childName.countMatches('__') > 1
-				? childName.substringAfter('__')
-				: childName;
+			String localName = childName.countMatches('__') > 1 ? childName.substringAfter('__') : childName;
 			Map<String, Schema.SObjectField> childFields = child.fields.getMap();
 			if (
 				NOT_GAINED.contains(localName.toLowerCase()) ||
@@ -1302,12 +1212,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	 * that cannot see a gift would answer "nothing depends on this" for exactly the record it
 	 * must keep.
 	 */
-	private void markKept(
-		Map<Id, String> keep,
-		String query,
-		Map<String, Object> binds,
-		String reason
-	) {
+	private void markKept(Map<Id, String> keep, String query, Map<String, Object> binds, String reason) {
 		List<SObject> rows = guardQuery(keep, (Set<Id>) binds.get('ids'), query, binds);
 		if (rows == null) {
 			return;
@@ -1324,12 +1229,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	 * few queries, keeps every record it was asked about and returns null: not knowing is not
 	 * the same as knowing nothing depends on it.
 	 */
-	private List<SObject> guardQuery(
-		Map<Id, String> keep,
-		Set<Id> ids,
-		String query,
-		Map<String, Object> binds
-	) {
+	private List<SObject> guardQuery(Map<Id, String> keep, Set<Id> ids, String query, Map<String, Object> binds) {
 		if (!enoughQueries()) {
 			notChecked(keep, ids);
 			return null;
@@ -1352,8 +1252,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 	 * Past the aggregate limit the platform ends the chunk, which cannot be caught.
 	 */
 	private static Boolean enoughSubqueries(Integer relationships) {
-		return Limits.getAggregateQueries() + relationships <=
-			Limits.getLimitAggregateQueries() - SUBQUERY_RESERVE;
+		return Limits.getAggregateQueries() + relationships <= Limits.getLimitAggregateQueries() - SUBQUERY_RESERVE;
 	}
 
 	/** Keeps each record not already kept for a reason a check found. */
@@ -1378,12 +1277,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 		);
 	}
 
-	private static Map<String, Object> notRestored(
-		String objectName,
-		Id recordId,
-		String field,
-		String reason
-	) {
+	private static Map<String, Object> notRestored(String objectName, Id recordId, String field, String reason) {
 		return ImportJournalService.notRestored(objectName, recordId, field, reason);
 	}
 
@@ -1412,9 +1306,6 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
 			LIMIT 1
 		]
 		.Chunk_Size__c;
-		return chunkSize == null ||
-			chunkSize < 1
-			? MAX_CHUNK
-			: Math.min(chunkSize.intValue(), MAX_CHUNK);
+		return chunkSize == null || chunkSize < 1 ? MAX_CHUNK : Math.min(chunkSize.intValue(), MAX_CHUNK);
 	}
 }

@@ -53,9 +53,7 @@ private class FindRelatedRecordsTest {
 		for (Integer index = 0; index < 100; index++) {
 			pages.add(new Import_Journal__c(Import_Batch__c = jobs[index].Id, Phase__c = 'Commit'));
 			if (index < 50) {
-				pages.add(
-					new Import_Journal__c(Import_Batch__c = jobs[index].Id, Phase__c = 'Undo')
-				);
+				pages.add(new Import_Journal__c(Import_Batch__c = jobs[index].Id, Phase__c = 'Undo'));
 			}
 		}
 		insert pages;
@@ -107,10 +105,7 @@ private class FindRelatedRecordsTest {
 			List<SObject> rows = QueryCompiler.run(
 				QueryCompiler.compile(query(new List<Object>{ journals(false, null) }, null))
 			);
-			Integer counted = QueryCompiler.count(
-				query(new List<Object>{ journals(false, null) }, null),
-				1000
-			);
+			Integer counted = QueryCompiler.count(query(new List<Object>{ journals(false, null) }, null), 1000);
 			Test.stopTest();
 
 			System.Assert.areEqual(100, rows.size(), 'The jobs with no journal page at all');
@@ -125,19 +120,12 @@ private class FindRelatedRecordsTest {
 			String commitOnly = UNDO_ONLY.replace('Undo', 'Commit');
 
 			QueryCompiler.Compiled compiled = QueryCompiler.compile(
-				query(
-					new List<Object>{ journals(true, commitOnly), journals(false, UNDO_ONLY) },
-					null
-				)
+				query(new List<Object>{ journals(true, commitOnly), journals(false, UNDO_ONLY) }, null)
 			);
 
 			System.Assert.areEqual('Commit', compiled.binds.get('rj0_0'), 'The first entry');
 			System.Assert.areEqual('Undo', compiled.binds.get('rj1_0'), 'The second entry');
-			System.Assert.areEqual(
-				50,
-				QueryCompiler.run(compiled).size(),
-				'A commit page and no undo page'
-			);
+			System.Assert.areEqual(50, QueryCompiler.run(compiled).size(), 'A commit page and no undo page');
 		}
 	}
 
@@ -152,9 +140,7 @@ private class FindRelatedRecordsTest {
 			};
 
 			Test.startTest();
-			QueryCompiler.Compiled compiled = QueryCompiler.compile(
-				query(null, new List<Object>{ column })
-			);
+			QueryCompiler.Compiled compiled = QueryCompiler.compile(query(null, new List<Object>{ column }));
 			List<SObject> rows = QueryCompiler.run(compiled);
 			Test.stopTest();
 
@@ -174,11 +160,7 @@ private class FindRelatedRecordsTest {
 			}
 			System.Assert.areEqual(100, withPages, 'Every job with a journal page shows one');
 			System.Assert.isFalse(
-				QueryCompiler.compileSelection(
-						query(null, new List<Object>{ column }),
-						new Set<String>{ 'Id' },
-						null
-					)
+				QueryCompiler.compileSelection(query(null, new List<Object>{ column }), new Set<String>{ 'Id' }, null)
 					.soql.contains('(SELECT'),
 				'A bulk update selection ignores related record columns'
 			);
@@ -191,11 +173,7 @@ private class FindRelatedRecordsTest {
 			expectRefusal(
 				query(
 					new List<Object>{
-						new Map<String, Object>{
-							'object' => 'Error_Log__c',
-							'field' => 'User__c',
-							'has' => true
-						}
+						new Map<String, Object>{ 'object' => 'Error_Log__c', 'field' => 'User__c', 'has' => true }
 					},
 					null
 				),
@@ -206,28 +184,14 @@ private class FindRelatedRecordsTest {
 			);
 			expectRefusal(
 				query(
-					new List<Object>{
-						new Map<String, Object>{
-							'object' => 'No_Such_Object__c',
-							'field' => 'X__c'
-						}
-					},
+					new List<Object>{ new Map<String, Object>{ 'object' => 'No_Such_Object__c', 'field' => 'X__c' } },
 					null
 				),
-				String.format(
-					BarnHelp.text('Core', 'Core_Find_ErrorRelated'),
-					new List<Object>{ 'No_Such_Object__c' }
-				)
+				String.format(BarnHelp.text('Core', 'Core_Find_ErrorRelated'), new List<Object>{ 'No_Such_Object__c' })
 			);
 			expectRefusal(
-				query(
-					null,
-					new List<Object>{ new Map<String, Object>{ 'relationship' => 'Nothing_Here' } }
-				),
-				String.format(
-					BarnHelp.text('Core', 'Core_Find_ErrorRelated'),
-					new List<Object>{ 'Nothing_Here' }
-				)
+				query(null, new List<Object>{ new Map<String, Object>{ 'relationship' => 'Nothing_Here' } }),
+				String.format(BarnHelp.text('Core', 'Core_Find_ErrorRelated'), new List<Object>{ 'Nothing_Here' })
 			);
 			expectRefusal(
 				query(
@@ -243,14 +207,7 @@ private class FindRelatedRecordsTest {
 				BarnHelp.text('Core', 'Core_Find_ErrorChildColumn')
 			);
 			expectRefusal(
-				query(
-					new List<Object>{
-						journals(true, null),
-						journals(true, null),
-						journals(false, null)
-					},
-					null
-				),
+				query(new List<Object>{ journals(true, null), journals(true, null), journals(false, null) }, null),
 				BarnHelp.text('Core', 'Core_Find_ErrorRelatedCount')
 			);
 		}
@@ -262,9 +219,7 @@ private class FindRelatedRecordsTest {
 			User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
 			System.runAs(maria) {
-				List<FindRelatedRecords.ChildOption> options = FindController.listChildRelationships(
-					'Import_Batch__c'
-				);
+				List<FindRelatedRecords.ChildOption> options = FindController.listChildRelationships('Import_Batch__c');
 				FindRelatedRecords.ChildOption journalsOption = null;
 				for (FindRelatedRecords.ChildOption option : options) {
 					if (option.relationshipName == 'Import_Journals__r') {
@@ -272,11 +227,7 @@ private class FindRelatedRecordsTest {
 					}
 				}
 				System.Assert.isNotNull(journalsOption, 'The journal is offered: ' + options);
-				System.Assert.areEqual(
-					'Import_Journal__c',
-					journalsOption.objectName,
-					'Its object'
-				);
+				System.Assert.areEqual('Import_Journal__c', journalsOption.objectName, 'Its object');
 				System.Assert.areEqual('Import_Batch__c', journalsOption.field, 'Its lookup');
 				System.Assert.isTrue(journalsOption.filterable, 'It can be a condition');
 			}

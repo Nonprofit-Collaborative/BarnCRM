@@ -52,12 +52,7 @@ public with sharing class GrantCalendarController {
 			calendar.paymentLabel = Schema.SObjectType.Grant_Payment__c.getLabel();
 			calendar.requirementLabel = Schema.SObjectType.Grant_Requirement__c.getLabel();
 
-			List<Grant__c> applications = GrantDeadlineSelector.applications(
-				fromDate,
-				toDate,
-				mineOnly,
-				MAX_ROWS
-			);
+			List<Grant__c> applications = GrantDeadlineSelector.applications(fromDate, toDate, mineOnly, MAX_ROWS);
 			for (Grant__c grant : applications) {
 				GrantPipelineController.Card row = GrantPipelineController.toCard(grant);
 				row.kind = GrantPipelineController.KIND_APPLICATION;

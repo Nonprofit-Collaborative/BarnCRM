@@ -35,10 +35,7 @@ private class RollupsWhereUsedExtensionTest {
 		) {
 			if (reference.getName() == 'Staff with email') {
 				Assert.areEqual(NamespaceUtil.qualify('Rollup_Builder'), reference.getEditTab());
-				Assert.areEqual(
-					BarnHelp.text('Rollups', 'Core_RollupBuilder_WhereUsedBreaks'),
-					reference.getBreaks()
-				);
+				Assert.areEqual(BarnHelp.text('Rollups', 'Core_RollupBuilder_WhereUsedBreaks'), reference.getBreaks());
 				return reference.getParts();
 			}
 		}
@@ -59,22 +56,10 @@ private class RollupsWhereUsedExtensionTest {
 			List<String> none = partsFor('Contact', 'Department');
 			Test.stopTest();
 
-			Assert.areEqual(
-				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedSourceFilter },
-				filter
-			);
-			Assert.areEqual(
-				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedPath },
-				path
-			);
-			Assert.areEqual(
-				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedTargetField },
-				result
-			);
-			Assert.areEqual(
-				new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedCounts },
-				counted
-			);
+			Assert.areEqual(new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedSourceFilter }, filter);
+			Assert.areEqual(new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedPath }, path);
+			Assert.areEqual(new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedTargetField }, result);
+			Assert.areEqual(new List<String>{ System.Label.Rollups_RollupBuilder_WhereUsedCounts }, counted);
 			Assert.isTrue(
 				written.contains(System.Label.Rollups_RollupBuilder_WhereUsedWrites),
 				String.valueOf(written)
@@ -88,9 +73,7 @@ private class RollupsWhereUsedExtensionTest {
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
 			WhereUsedService.Target target = WhereUsedService.target('Contact', 'AccountId');
 
-			Assert.isTrue(
-				RollupsWhereUsedExtension.pathNames(target, 'Contact', 'ReportsToId | AccountId')
-			);
+			Assert.isTrue(RollupsWhereUsedExtension.pathNames(target, 'Contact', 'ReportsToId | AccountId'));
 			Assert.isFalse(RollupsWhereUsedExtension.pathNames(target, 'Contact', '{Household}'));
 			Assert.isFalse(RollupsWhereUsedExtension.pathNames(target, 'Contact', ''));
 		}

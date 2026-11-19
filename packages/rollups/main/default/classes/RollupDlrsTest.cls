@@ -13,10 +13,7 @@ private class RollupDlrsTest {
 	static void createTestUser() {
 		// Built once for the class rather than in every test that runs as her.
 		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-			TestDataFactory.createUser(
-				'Maria',
-				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-			);
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' });
 		}
 	}
 
@@ -69,23 +66,14 @@ private class RollupDlrsTest {
 		System.runAs(maria()) {
 			OtherRollupTools.overrideForTest(new Set<String>());
 
-			RollupBuilderController.SaveResult saved = RollupBuilderController.save(
-				childCount(true),
-				false
-			);
+			RollupBuilderController.SaveResult saved = RollupBuilderController.save(childCount(true), false);
 
 			Assert.isTrue(RollupDlrs.definitions().isEmpty(), 'Nothing is read without DLRS');
 			Assert.isNull(RollupDlrs.conflict('Account', FIELD), 'No field is shared');
 			Assert.isNull(saved.confirmation, 'Nothing is asked');
 			Assert.isNotNull(saved.recordId, 'The rollup saves as before');
-			Assert.isNull(
-				RollupController.getPage().rollups[0].otherToolConflict,
-				'The list asks nothing either'
-			);
-			Assert.isNull(
-				new RollupsHealthCheckExtension.SameFieldCheck().run(),
-				'Health Check has nothing to say'
-			);
+			Assert.isNull(RollupController.getPage().rollups[0].otherToolConflict, 'The list asks nothing either');
+			Assert.isNull(new RollupsHealthCheckExtension.SameFieldCheck().run(), 'Health Check has nothing to say');
 			Assert.isTrue(changes().isEmpty(), 'Nothing is recorded');
 		}
 	}
@@ -110,11 +98,7 @@ private class RollupDlrsTest {
 			// no records of DLRS's older object. Either way nothing fails.
 			OtherRollupTools.overrideForTest(new Set<String>{ OtherRollupTools.DLRS_NAMESPACE });
 			for (RollupDlrs.Definition read : RollupDlrs.definitions()) {
-				Assert.areEqual(
-					RollupDlrs.SOURCE_METADATA,
-					read.source,
-					'Only custom metadata is seen'
-				);
+				Assert.areEqual(RollupDlrs.SOURCE_METADATA, read.source, 'Only custom metadata is seen');
 			}
 		}
 	}
@@ -177,17 +161,12 @@ private class RollupDlrsTest {
 			RollupDlrs.Definition inactive = RollupDlrsFake.activeOn('Account', FIELD);
 			inactive.active = false;
 			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{
-					inactive,
-					RollupDlrsFake.activeOn('Account', 'NumberOfEmployees')
-				}
+				new List<RollupDlrs.Definition>{ inactive, RollupDlrsFake.activeOn('Account', 'NumberOfEmployees') }
 			);
 			Assert.isNull(RollupDlrs.activeOn('Account', FIELD), 'Inactive, or another field');
 
 			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{
-					RollupDlrsFake.activeOn('account', 'MEMBER_COUNT__C')
-				}
+				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('account', 'MEMBER_COUNT__C') }
 			);
 			Assert.isNotNull(RollupDlrs.activeOn('Account', FIELD), 'Names match in any case');
 			Assert.isTrue(
@@ -202,14 +181,9 @@ private class RollupDlrsTest {
 	@IsTest
 	static void theBuilderAsksFirstThenSavesAndRecordsTheAnswer() {
 		System.runAs(maria()) {
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) });
 
-			RollupBuilderController.SaveResult asked = RollupBuilderController.save(
-				childCount(true),
-				false
-			);
+			RollupBuilderController.SaveResult asked = RollupBuilderController.save(childCount(true), false);
 			Integer savedAfterAsking = [SELECT COUNT() FROM Rollup_Definition__c WITH USER_MODE];
 			RollupBuilderController.SaveResult saved = RollupBuilderController.saveSwitchingOffDlrs(
 				childCount(true),
@@ -238,14 +212,9 @@ private class RollupDlrsTest {
 	@IsTest
 	static void aRollupSavedOffIsNotAsked() {
 		System.runAs(maria()) {
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) });
 
-			RollupBuilderController.SaveResult saved = RollupBuilderController.save(
-				childCount(false),
-				false
-			);
+			RollupBuilderController.SaveResult saved = RollupBuilderController.save(childCount(false), false);
 
 			Assert.isNull(saved.confirmation, 'Off fills nothing, so nothing is asked');
 			Assert.isNotNull(saved.recordId, 'Saved');
@@ -256,9 +225,7 @@ private class RollupDlrsTest {
 	@IsTest
 	static void theSharedChecksRefuseWithoutAnAnswer() {
 		System.runAs(maria()) {
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) });
 
 			// What a file import calls: it cannot ask, so it refuses with the reason.
 			try {
@@ -267,10 +234,7 @@ private class RollupDlrsTest {
 			} catch (RollupService.RollupServiceException refused) {
 				Assert.isTrue(refused.getMessage().contains('Child Count'), 'Naming DLRS');
 			}
-			Assert.isNotNull(
-				RollupBuilderController.checkedRecord(childCount(true), true),
-				'With her word it passes'
-			);
+			Assert.isNotNull(RollupBuilderController.checkedRecord(childCount(true), true), 'With her word it passes');
 		}
 	}
 
@@ -278,14 +242,9 @@ private class RollupDlrsTest {
 	static void theListRefusesTheSwitchUntilTheAdminConfirms() {
 		System.runAs(maria()) {
 			Rollup_Definition__c definition = existing(false);
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) });
 
-			Assert.isNotNull(
-				RollupController.getPage().rollups[0].otherToolConflict,
-				'The list knows to ask'
-			);
+			Assert.isNotNull(RollupController.getPage().rollups[0].otherToolConflict, 'The list knows to ask');
 			try {
 				RollupController.setActive(definition.Id, true);
 				Assert.fail('Turning it on without an answer is refused');
@@ -307,12 +266,9 @@ private class RollupDlrsTest {
 	static void healthCheckNamesAFieldBothToolsFill() {
 		System.runAs(maria()) {
 			existing(true);
-			RollupDlrsFake.use(
-				new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) }
-			);
+			RollupDlrsFake.use(new List<RollupDlrs.Definition>{ RollupDlrsFake.activeOn('Account', FIELD) });
 
-			HealthCheckService.Finding finding = new RollupsHealthCheckExtension.SameFieldCheck()
-				.run();
+			HealthCheckService.Finding finding = new RollupsHealthCheckExtension.SameFieldCheck().run();
 
 			Assert.areEqual('rollup_two_tools_same_field', finding.getKey(), 'Reported');
 			Assert.isTrue(finding.getDetail().contains('Account.' + FIELD), 'Names the field');

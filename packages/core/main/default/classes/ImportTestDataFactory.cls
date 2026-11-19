@@ -24,8 +24,7 @@ public class ImportTestDataFactory {
 	public static Import_Template__c template(String mappingDocument, String matchingRule) {
 		Import_Template__c template = new Import_Template__c(
 			Name = 'Test contact list',
-			Template_Key__c = 'test_donor_list_' +
-				String.valueOf(Math.abs(Crypto.getRandomInteger())),
+			Template_Key__c = 'test_donor_list_' + String.valueOf(Math.abs(Crypto.getRandomInteger())),
 			Column_Mapping_JSON__c = mappingDocument,
 			Default_Values_JSON__c = '{"version":1,"defaults":[]}',
 			Matching_Rule__c = ImportTemplateService.normalizedRule(matchingRule),
@@ -50,25 +49,17 @@ public class ImportTestDataFactory {
 	}
 
 	/** As `saveMapping`, saving the load choices. */
-	public static Import_Template__c saveLoad(
-		Id templateId,
-		ImportTemplateService.LoadChoices load
-	) {
+	public static Import_Template__c saveLoad(Id templateId, ImportTemplateService.LoadChoices load) {
 		ImportTemplateService.UploadChoices choices = stored(templateId);
 		choices.load = load;
 		return ImportTemplateService.saveUpload(templateId, choices);
 	}
 
 	/** As `saveMapping`, saving the matching choices; their person rule is the template's. */
-	public static Import_Template__c saveMatching(
-		Id templateId,
-		ImportTemplateService.MatchingChoices matching
-	) {
+	public static Import_Template__c saveMatching(Id templateId, ImportTemplateService.MatchingChoices matching) {
 		ImportTemplateService.UploadChoices choices = stored(templateId);
 		choices.matchingRule = matching == null ? null : matching.personRule;
-		choices.matching = matching == null
-			? new ImportTemplateService.MatchingChoices()
-			: matching;
+		choices.matching = matching == null ? new ImportTemplateService.MatchingChoices() : matching;
 		return ImportTemplateService.saveUpload(templateId, choices);
 	}
 
@@ -127,10 +118,7 @@ public class ImportTestDataFactory {
 	 * a row's status and saved the inserted record was refused for a field it never touched.
 	 */
 	@NamespaceAccessible
-	public static List<Import_Row__c> rows(
-		Import_Batch__c batch,
-		List<Map<String, String>> values
-	) {
+	public static List<Import_Row__c> rows(Import_Batch__c batch, List<Map<String, String>> values) {
 		List<Import_Row__c> staged = new List<Import_Row__c>();
 		for (Integer i = 0; i < values.size(); i++) {
 			staged.add(
@@ -150,12 +138,7 @@ public class ImportTestDataFactory {
 
 	/** One row of a generic contact list. */
 	@NamespaceAccessible
-	public static Map<String, String> donorRow(
-		String firstName,
-		String lastName,
-		String email,
-		String organization
-	) {
+	public static Map<String, String> donorRow(String firstName, String lastName, String email, String organization) {
 		return new Map<String, String>{
 			'First Name' => firstName,
 			'Last Name' => lastName,

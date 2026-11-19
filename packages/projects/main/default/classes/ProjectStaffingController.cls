@@ -6,18 +6,10 @@
  */
 public with sharing class ProjectStaffingController {
 	private static final String CONTEXT = 'ProjectStaffingController';
-	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(
-			CONTEXT,
-			'Projects',
-			'Projects_Error_Generic'
-		)
+	private static final UserErrors.Screen ERRORS = new UserErrors.Screen(CONTEXT, 'Projects', 'Projects_Error_Generic')
 		.showingDml();
 	private static final Integer MAX_RANGE_DAYS = 182;
-	private static final List<String> NOT_COUNTED = new List<String>{
-		'Open',
-		'Submitted',
-		'Rejected'
-	};
+	private static final List<String> NOT_COUNTED = new List<String>{ 'Open', 'Submitted', 'Rejected' };
 
 	public class Staffing {
 		@AuraEnabled
@@ -57,10 +49,7 @@ public with sharing class ProjectStaffingController {
 			}
 			staffing.resources = resources();
 			staffing.requests = requests(null, null);
-			for (
-				Schema.PicklistEntry entry : Project_Resource__c.Skills__c.getDescribe()
-					.getPicklistValues()
-			) {
+			for (Schema.PicklistEntry entry : Project_Resource__c.Skills__c.getDescribe().getPicklistValues()) {
 				staffing.skills.add(entry.getValue());
 			}
 			return staffing;
@@ -115,11 +104,7 @@ public with sharing class ProjectStaffingController {
 			for (AggregateResult row : [
 				SELECT User__c userId, Date__c day, SUM(Hours__c) hours
 				FROM Time_Entry__c
-				WHERE
-					User__c != NULL
-					AND Date__c >= :fromDate
-					AND Date__c <= :toDate
-					AND Status__c NOT IN :NOT_COUNTED
+				WHERE User__c != NULL AND Date__c >= :fromDate AND Date__c <= :toDate AND Status__c NOT IN :NOT_COUNTED
 				WITH USER_MODE
 				GROUP BY User__c, Date__c
 				LIMIT 10000
@@ -175,11 +160,7 @@ public with sharing class ProjectStaffingController {
 				End_Date__c = request.End_Date__c
 			);
 			insert as user assignment;
-			update as user new Resource_Request__c(
-				Id = requestId,
-				Assignment__c = assignment.Id,
-				Status__c = 'Filled'
-			);
+			update as user new Resource_Request__c(Id = requestId, Assignment__c = assignment.Id, Status__c = 'Filled');
 			return assignment.Id;
 		} catch (Exception e) {
 			throw ERRORS.wrap(e);
@@ -226,13 +207,7 @@ public with sharing class ProjectStaffingController {
 	private static List<Project_Resource__c> resources() {
 		return ProjectResources.byUser(
 				[
-					SELECT
-						User__c,
-						User__r.Name,
-						Skills__c,
-						Weekly_Capacity_Hours__c,
-						Default_Role__c,
-						Active__c
+					SELECT User__c, User__r.Name, Skills__c, Weekly_Capacity_Hours__c, Default_Role__c, Active__c
 					FROM Project_Resource__c
 					WITH USER_MODE
 					ORDER BY CreatedDate
@@ -247,14 +222,7 @@ public with sharing class ProjectStaffingController {
 		Date starts = fromDate == null ? Date.newInstance(1900, 1, 1) : fromDate;
 		Date ends = toDate == null ? Date.newInstance(4000, 12, 31) : toDate;
 		return [
-			SELECT
-				Project__c,
-				Project__r.Name,
-				Role__c,
-				Skills__c,
-				Hours__c,
-				Start_Date__c,
-				End_Date__c
+			SELECT Project__c, Project__r.Name, Role__c, Skills__c, Hours__c, Start_Date__c, End_Date__c
 			FROM Resource_Request__c
 			WHERE
 				Status__c = 'Open'

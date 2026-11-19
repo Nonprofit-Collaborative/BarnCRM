@@ -108,8 +108,7 @@ public with sharing class DuplicateSelector {
 		if (rulesOverride != null) {
 			return rulesFor(new Set<String>{ objectName });
 		}
-		Boolean hasSubtype = Schema.SObjectType.DuplicateRule.fields.getMap()
-			.containsKey(SUBTYPE_FIELD.toLowerCase());
+		Boolean hasSubtype = Schema.SObjectType.DuplicateRule.fields.getMap().containsKey(SUBTYPE_FIELD.toLowerCase());
 		return Database.queryWithBinds(
 			'SELECT Id, SobjectType, IsActive' +
 				(hasSubtype ? ', ' + SUBTYPE_FIELD : '') +
@@ -336,10 +335,7 @@ public with sharing class DuplicateSelector {
 		return [
 				SELECT COUNT()
 				FROM AsyncApexJob
-				WHERE
-					JobType = 'BatchApex'
-					AND ApexClass.Name = :className
-					AND Status IN :SCAN_UNFINISHED
+				WHERE JobType = 'BatchApex' AND ApexClass.Name = :className AND Status IN :SCAN_UNFINISHED
 				WITH SYSTEM_MODE
 			] > 0;
 	}
@@ -443,10 +439,7 @@ public with sharing class DuplicateSelector {
 		}
 		return Database.queryWithBinds(
 			'SELECT ' +
-				selectList(
-					new List<String>{ 'Id', 'Name', 'BillingCity', 'BillingPostalCode' },
-					HOUSEHOLD_COMPARED
-				) +
+				selectList(new List<String>{ 'Id', 'Name', 'BillingCity', 'BillingPostalCode' }, HOUSEHOLD_COMPARED) +
 				' FROM Account WHERE Id IN :recordIds AND RecordTypeId = :householdType',
 			new Map<String, Object>{ 'recordIds' => recordIds, 'householdType' => householdType },
 			AccessLevel.USER_MODE

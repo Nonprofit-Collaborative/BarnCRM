@@ -28,9 +28,7 @@ private class EventsPortalExtensionTest {
 	}
 
 	private static Contact person(String lastName) {
-		Contact record = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = lastName)
-		);
+		Contact record = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = lastName));
 		insert as user record;
 		return record;
 	}
@@ -47,15 +45,11 @@ private class EventsPortalExtensionTest {
 	static void coreFindsBothActionsByName() {
 		System.runAs(staff()) {
 			Assert.isTrue(
-				PortalActionExtensions.forAction(
-					'Events.ApplyToSpeak'
-				) instanceof EventsPortalExtension,
+				PortalActionExtensions.forAction('Events.ApplyToSpeak') instanceof EventsPortalExtension,
 				'Apply is offered'
 			);
 			Assert.isTrue(
-				PortalActionExtensions.forAction(
-					'Events.WithdrawProposal'
-				) instanceof EventsPortalExtension,
+				PortalActionExtensions.forAction('Events.WithdrawProposal') instanceof EventsPortalExtension,
 				'Withdraw is offered'
 			);
 		}

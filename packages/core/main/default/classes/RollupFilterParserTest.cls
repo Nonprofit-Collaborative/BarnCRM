@@ -10,16 +10,8 @@
 private class RollupFilterParserTest {
 	@IsTest
 	static void emptyDocumentMeansEveryRecord() {
-		System.Assert.areEqual(
-			'',
-			RollupFilterParser.toWhereClause(null),
-			'A blank filter counts everything'
-		);
-		System.Assert.areEqual(
-			'',
-			RollupFilterParser.toWhereClause('   '),
-			'A blank filter counts everything'
-		);
+		System.Assert.areEqual('', RollupFilterParser.toWhereClause(null), 'A blank filter counts everything');
+		System.Assert.areEqual('', RollupFilterParser.toWhereClause('   '), 'A blank filter counts everything');
 		System.Assert.areEqual(
 			'',
 			RollupFilterParser.toWhereClause('{"version": 1, "conditions": []}'),
@@ -174,27 +166,17 @@ private class RollupFilterParserTest {
 			'{"version": 1, "conditions": [' +
 			'{"id": 1, "field": "Site", "operator": "equals", "value": "North"},' +
 			'{"id": 2, "field": "RecordType.DeveloperName", "operator": "Not Equals", "value": "Household"}]}';
-		List<RollupFilterParser.TextEquality> equalities = RollupFilterParser.textEqualities(
-			both,
-			Account.SObjectType
-		);
+		List<RollupFilterParser.TextEquality> equalities = RollupFilterParser.textEqualities(both, Account.SObjectType);
 		System.Assert.areEqual(2, equalities.size(), 'Both conditions');
 		System.Assert.areEqual('Site', equalities[0].field, 'The first field');
 		System.Assert.isFalse(equalities[0].negated, 'Equals');
 		System.Assert.areEqual('North', equalities[0].value, 'The first value');
-		System.Assert.areEqual(
-			'RecordType.DeveloperName',
-			equalities[1].field,
-			'A text field through a relationship'
-		);
+		System.Assert.areEqual('RecordType.DeveloperName', equalities[1].field, 'A text field through a relationship');
 		System.Assert.isTrue(equalities[1].negated, 'Not equals, whatever its case');
 
 		String one = '{"version": 1, "conditions": [{"id": 1, "field": "Site", "operator": "equals", "value": "North"}]}';
 		System.Assert.isNull(
-			RollupFilterParser.textEqualities(
-				one.replace('"equals"', '"contains"'),
-				Account.SObjectType
-			),
+			RollupFilterParser.textEqualities(one.replace('"equals"', '"contains"'), Account.SObjectType),
 			'Another operator is queried'
 		);
 		System.Assert.isNull(
@@ -215,10 +197,7 @@ private class RollupFilterParserTest {
 			),
 			'A logic string is queried'
 		);
-		System.Assert.isNull(
-			RollupFilterParser.textEqualities('{not json', Account.SObjectType),
-			'Unreadable'
-		);
+		System.Assert.isNull(RollupFilterParser.textEqualities('{not json', Account.SObjectType), 'Unreadable');
 		System.Assert.isNull(RollupFilterParser.textEqualities(one, null), 'No entity');
 	}
 
@@ -276,11 +255,7 @@ private class RollupFilterParserTest {
 			'{"version": 1, "conditions": [{"id": 1, "field": "Name", "operator": "equals", "value": "O\'Brien"}]}'
 		);
 
-		System.Assert.areEqual(
-			'Name = \'O\\\'Brien\'',
-			clause,
-			'The only place typing reaches a query is escaped'
-		);
+		System.Assert.areEqual('Name = \'O\\\'Brien\'', clause, 'The only place typing reaches a query is escaped');
 	}
 
 	@IsTest
@@ -314,9 +289,7 @@ private class RollupFilterParserTest {
 				'{"version": 1, "logic": "1 AND Name = 2", "conditions": ' +
 				'[{"id": 1, "field": "Name", "operator": "equals", "value": "x"}]}'
 			);
-			System.Assert.fail(
-				'Only condition numbers, brackets, AND, OR and NOT belong in the logic'
-			);
+			System.Assert.fail('Only condition numbers, brackets, AND, OR and NOT belong in the logic');
 		} catch (RollupFilterParser.RollupFilterException expected) {
 			System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
 		}
@@ -337,11 +310,7 @@ private class RollupFilterParserTest {
 				RollupFilterParser.toWhereClause(document);
 				System.Assert.fail('Must be refused: ' + document);
 			} catch (RollupFilterParser.RollupFilterException expected) {
-				System.Assert.areEqual(
-					System.Label.Core_Rollups_ErrorInvalidFilter,
-					expected.getMessage(),
-					document
-				);
+				System.Assert.areEqual(System.Label.Core_Rollups_ErrorInvalidFilter, expected.getMessage(), document);
 			}
 		}
 	}
@@ -350,9 +319,7 @@ private class RollupFilterParserTest {
 	static void aVersionThisPackageDoesNotKnowIsRefused() {
 		try {
 			RollupFilterParser.toWhereClause('{"version": 99, "conditions": []}');
-			System.Assert.fail(
-				'The version key exists so an unknown format is refused rather than guessed'
-			);
+			System.Assert.fail('The version key exists so an unknown format is refused rather than guessed');
 		} catch (RollupFilterParser.RollupFilterException expected) {
 			System.Assert.isNotNull(expected.getMessage(), 'The message names the problem');
 		}

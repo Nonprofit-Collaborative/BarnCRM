@@ -16,20 +16,13 @@ private class VolunteerLetterControllerTest {
 				COORDINATOR,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 			);
-			TestUsers.standardUserWith(
-				STAFFER,
-				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' }
-			);
+			TestUsers.standardUserWith(STAFFER, new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Staff' });
 			VolunteersTestData.contactModeWithoutAutomaticHouseholds();
 			VolunteersTestData.volunteerSettings(false, true);
 			VolunteerLetterTemplates.installDefaultsDuringInstall();
 			Contact person = VolunteersTestData.contact('Rivera', null);
 			update new Contact(Id = person.Id, OwnerId = coordinator.Id);
-			insert VolunteersTestData.newHours(
-				person.Id,
-				VolunteersTestData.job('Food pantry').Id,
-				3
-			);
+			insert VolunteersTestData.newHours(person.Id, VolunteersTestData.job('Food pantry').Id, 3);
 		}
 	}
 
@@ -59,18 +52,8 @@ private class VolunteerLetterControllerTest {
 		Test.startTest();
 		System.runAs(user(COORDINATOR)) {
 			context = VolunteerLetterController.getActionContext(personId());
-			preview = VolunteerLetterController.preview(
-				personId(),
-				hoursLetterId(),
-				FROM_DATE,
-				TO_DATE
-			);
-			saved = VolunteerLetterController.generate(
-				personId(),
-				hoursLetterId(),
-				FROM_DATE,
-				TO_DATE
-			);
+			preview = VolunteerLetterController.preview(personId(), hoursLetterId(), FROM_DATE, TO_DATE);
+			saved = VolunteerLetterController.generate(personId(), hoursLetterId(), FROM_DATE, TO_DATE);
 		}
 		Test.stopTest();
 
@@ -127,9 +110,7 @@ private class VolunteerLetterControllerTest {
 			blank = VolunteerLetterController.getActionContext(personId());
 		}
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			settings.Organization_Legal_Name__c = 'Barn Org';
 			TestDataFactory.saveSettings(settings);
@@ -191,12 +172,7 @@ private class VolunteerLetterControllerTest {
 		Test.startTest();
 		System.runAs(user(COORDINATOR)) {
 			context = VolunteerLetterController.getListContext();
-			everyone = VolunteerLetterController.startLetters(
-				hoursLetterId(),
-				FROM_DATE,
-				TO_DATE,
-				null
-			);
+			everyone = VolunteerLetterController.startLetters(hoursLetterId(), FROM_DATE, TO_DATE, null);
 			nobody = VolunteerLetterController.startLetters(
 				hoursLetterId(),
 				FROM_DATE.addYears(-5),
@@ -240,12 +216,7 @@ private class VolunteerLetterControllerTest {
 		}
 		System.runAs(user(STAFFER)) {
 			try {
-				VolunteerLetterController.startLetters(
-					template,
-					FROM_DATE,
-					TO_DATE,
-					new List<Id>{ person }
-				);
+				VolunteerLetterController.startLetters(template, FROM_DATE, TO_DATE, new List<Id>{ person });
 			} catch (AuraHandledException shown) {
 				refused = shown.getMessage();
 			}

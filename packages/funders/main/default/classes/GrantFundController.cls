@@ -49,15 +49,12 @@ public with sharing class GrantFundController {
 			}
 			card.fundId = grants[0].Fund_Id__c;
 			card.available = GrantFundService.fundsAvailable();
-			card.canEdit =
-				card.available && Schema.SObjectType.Grant__c.fields.Fund_Id__c.isUpdateable();
+			card.canEdit = card.available && Schema.SObjectType.Grant__c.fields.Fund_Id__c.isUpdateable();
 			if (!card.available) {
 				return card;
 			}
 			for (Map<String, String> fund : GrantFundService.funds()) {
-				card.options.add(
-					new GrantProgramController.Option(fund.get('label'), fund.get('value'))
-				);
+				card.options.add(new GrantProgramController.Option(fund.get('label'), fund.get('value')));
 			}
 			if (String.isNotBlank(card.fundId)) {
 				card.fundName = GrantFundService.fundName(card.fundId);
@@ -74,9 +71,7 @@ public with sharing class GrantFundController {
 	@AuraEnabled
 	public static void setFund(Id grantId, String fundId) {
 		if (!Schema.SObjectType.Grant__c.fields.Fund_Id__c.isUpdateable()) {
-			throw UserErrors.message(
-				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
-			);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'));
 		}
 		try {
 			GrantFundService.setFund(grantId, fundId);

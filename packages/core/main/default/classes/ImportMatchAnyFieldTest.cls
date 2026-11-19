@@ -68,20 +68,11 @@ private class ImportMatchAnyFieldTest {
 	private static ImportRowProcessor.Outcome run(Boolean dryRun) {
 		ImportBatchService.beginPass(batch.Id);
 		batch = ImportBatchSelector.selectById(batch.Id);
-		return ImportRowProcessor.process(
-			batch,
-			template,
-			mapping(),
-			ImportTestDataFactory.reload(batch.Id),
-			dryRun
-		);
+		return ImportRowProcessor.process(batch, template, mapping(), ImportTestDataFactory.reload(batch.Id), dryRun);
 	}
 
 	private static ImportMapping mapping() {
-		return ImportMapping.parse(
-			template.Column_Mapping_JSON__c,
-			template.Default_Values_JSON__c
-		);
+		return ImportMapping.parse(template.Column_Mapping_JSON__c, template.Default_Values_JSON__c);
 	}
 
 	private static List<Import_Row__c> rows() {
@@ -115,11 +106,7 @@ private class ImportMatchAnyFieldTest {
 
 	private static Account organization(String name, String phone) {
 		Account created = TestDataFactory.organization(
-			new Account(
-				Name = name,
-				Phone = phone,
-				RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-			)
+			new Account(Name = name, Phone = phone, RecordTypeId = AccountKindsTestData.organizationRecordTypeId())
 		);
 		insert created;
 		return created;
@@ -134,17 +121,11 @@ private class ImportMatchAnyFieldTest {
 	}
 
 	private static Map<String, String> affiliation(Id personId, String employer, String role) {
-		return new Map<String, String>{
-			'Person' => personId,
-			'Employer' => employer,
-			'Role' => role
-		};
+		return new Map<String, String>{ 'Person' => personId, 'Employer' => employer, 'Role' => role };
 	}
 
 	private static Contact person(String lastName, String email) {
-		Contact created = TestDataFactory.person(
-			new Contact(FirstName = 'Ana', LastName = lastName, Email = email)
-		);
+		Contact created = TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = lastName, Email = email));
 		insert created;
 		return created;
 	}
@@ -187,18 +168,12 @@ private class ImportMatchAnyFieldTest {
 				Assert.areEqual(
 					String.format(
 						BarnHelp.text('Core', 'Core_Import_ErrorNoRecordMatched'),
-						new List<String>{
-							Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getLabel()
-						}
+						new List<String>{ Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getLabel() }
 					),
 					rows()[MANY - 1].Error_Message__c,
 					'Named on its row.'
 				);
-				Assert.areEqual(
-					MANY,
-					[SELECT COUNT() FROM Duplicate_Dismissal__c],
-					'Nothing was created.'
-				);
+				Assert.areEqual(MANY, [SELECT COUNT() FROM Duplicate_Dismissal__c], 'Nothing was created.');
 				Assert.areEqual(
 					MANY - 1,
 					[SELECT COUNT() FROM Duplicate_Dismissal__c WHERE Reason__c = 'New'],
@@ -224,10 +199,7 @@ private class ImportMatchAnyFieldTest {
 				Test.startTest();
 				ImportRowProcessor.Outcome rejecting = run(true);
 				Import_Row__c rejected = rows()[0];
-				set(
-					Import_Template__c.Several_Matches__c,
-					ImportTemplateService.SEVERAL_MOST_RECENT
-				);
+				set(Import_Template__c.Several_Matches__c, ImportTemplateService.SEVERAL_MOST_RECENT);
 				ImportRowProcessor.Outcome taking = run(true);
 				Test.stopTest();
 
@@ -276,9 +248,7 @@ private class ImportMatchAnyFieldTest {
 				Assert.areEqual(
 					String.format(
 						BarnHelp.text('Core', 'Core_Import_ErrorMatchColumnMissing'),
-						new List<String>{
-							Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getLabel()
-						}
+						new List<String>{ Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getLabel() }
 					),
 					ImportObjectSchema.refusal(template, mapping()),
 					'A column must feed it.'
@@ -300,8 +270,7 @@ private class ImportMatchAnyFieldTest {
 					'People may be updated by a field.'
 				);
 				Assert.isFalse(
-					ImportObjectSchema.operationsFor(Contact.SObjectType)
-						.contains(ImportObjectSchema.OPERATION_UPSERT),
+					ImportObjectSchema.operationsFor(Contact.SObjectType).contains(ImportObjectSchema.OPERATION_UPSERT),
 					'But still not upserted.'
 				);
 				given(
@@ -313,10 +282,7 @@ private class ImportMatchAnyFieldTest {
 						new List<String>{ 'Title', 'Record.Title' }
 					},
 					new List<Map<String, String>>{
-						new Map<String, String>{
-							'Email' => 'ANA@example.org',
-							'Title' => 'Treasurer'
-						}
+						new Map<String, String>{ 'Email' => 'ANA@example.org', 'Title' => 'Treasurer' }
 					}
 				);
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
@@ -385,21 +351,9 @@ private class ImportMatchAnyFieldTest {
 				Assert.isFalse(offered.contains('Anniversary__c'), 'A date is not.');
 				List<Map<String, String>> values = new List<Map<String, String>>();
 				for (Integer i = 0; i < MANY; i++) {
-					values.add(
-						affiliation(
-							ana.Id,
-							Math.mod(i, 2) == 0 ? '555-0100' : ' 555-0101 ',
-							'Volunteer ' + i
-						)
-					);
+					values.add(affiliation(ana.Id, Math.mod(i, 2) == 0 ? '555-0100' : ' 555-0101 ', 'Volunteer ' + i));
 				}
-				given(
-					'Affiliation__c',
-					ImportObjectSchema.OPERATION_INSERT,
-					null,
-					affiliationColumns('Phone'),
-					values
-				);
+				given('Affiliation__c', ImportObjectSchema.OPERATION_INSERT, null, affiliationColumns('Phone'), values);
 
 				Test.startTest();
 				ImportRowProcessor.Outcome committed = run(false);
@@ -443,16 +397,11 @@ private class ImportMatchAnyFieldTest {
 					BarnHelp.text('Core', 'Core_Import_ErrorFieldNotSelective'),
 					new List<String>{
 						Account.Phone.getDescribe().getLabel(),
-						Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-							.getLabelPlural(),
+						Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural(),
 						'1'
 					}
 				);
-				Assert.areEqual(
-					expected,
-					ImportObjectSchema.refusal(template, mapping()),
-					'A phone is not indexed.'
-				);
+				Assert.areEqual(expected, ImportObjectSchema.refusal(template, mapping()), 'A phone is not indexed.');
 
 				Test.startTest();
 				ImportRowProcessor.Outcome refused = run(true);
@@ -473,10 +422,7 @@ private class ImportMatchAnyFieldTest {
 
 				dismissals(2, 'Old');
 				Assert.isNull(
-					ImportObjectSchema.unselective(
-						Duplicate_Dismissal__c.SObjectType,
-						'Pair_Key__c'
-					),
+					ImportObjectSchema.unselective(Duplicate_Dismissal__c.SObjectType, 'Pair_Key__c'),
 					'An External ID may always be searched.'
 				);
 				Assert.isNotNull(

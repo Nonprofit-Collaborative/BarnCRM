@@ -4,9 +4,7 @@
  * the module's offline message. A record no module publishes has no page (EV-16; ADR-0190 public
  * event pages, decisions 4, 6 and 7).
  */
-@IsTest(
-	testFor='ApexClass:FormIntakeService, ApexClass:FormPublicController, ApexClass:FormPublicRest'
-)
+@IsTest(testFor='ApexClass:FormIntakeService, ApexClass:FormPublicController, ApexClass:FormPublicRest')
 private class FormPublicPageTest {
 	@TestSetup
 	static void createTestUser() {
@@ -45,10 +43,7 @@ private class FormPublicPageTest {
 		}
 
 		public Map<String, Object> listPage() {
-			return new Map<String, Object>{
-				'title' => 'Upcoming Events',
-				'items' => new List<Object>()
-			};
+			return new Map<String, Object>{ 'title' => 'Upcoming Events', 'items' => new List<Object>() };
 		}
 	}
 
@@ -112,12 +107,8 @@ private class FormPublicPageTest {
 			Id recordId = venue();
 			String claim = FormIntakeService.claimFor(form.Id, recordId);
 
-			Map<String, Object> right = parsed(
-				FormPublicController.getPage(recordId + '.' + claim)
-			);
-			Map<String, Object> wrong = parsed(
-				FormPublicController.getPage(recordId + '.' + claim.reverse())
-			);
+			Map<String, Object> right = parsed(FormPublicController.getPage(recordId + '.' + claim));
+			Map<String, Object> wrong = parsed(FormPublicController.getPage(recordId + '.' + claim.reverse()));
 			Map<String, Object> plain = parsed(FormPublicController.getPage(recordId));
 
 			Assert.isTrue((Boolean) right.get('signed'), 'The right claim');
@@ -180,10 +171,7 @@ private class FormPublicPageTest {
 	static void aFormLinkThatNamesNoFormShowsNothing() {
 		System.runAs(admin()) {
 			Assert.isNull(FormPublicController.getForm('not an id', null), 'Not an id');
-			Assert.isNull(
-				FormPublicController.getForm(UserInfo.getUserId(), null),
-				'An id, but not a form'
-			);
+			Assert.isNull(FormPublicController.getForm(UserInfo.getUserId(), null), 'An id, but not a form');
 		}
 	}
 
@@ -208,10 +196,7 @@ private class FormPublicPageTest {
 			RestContext.request.addParameter('kind', 'events');
 			FormPublicRest.getForm();
 			Assert.areEqual(200, RestContext.response.statusCode, 'The list is served');
-			Assert.areEqual(
-				'Upcoming Events',
-				parsed(RestContext.response.responseBody.toString()).get('title')
-			);
+			Assert.areEqual('Upcoming Events', parsed(RestContext.response.responseBody.toString()).get('title'));
 			Assert.isNotNull(FormPublicController.listPages('events'));
 
 			RestContext.response = new RestResponse();
@@ -245,11 +230,7 @@ private class FormPublicPageTest {
 			return null;
 		}
 
-		public Map<String, Object> startCheckout(
-			Id recordId,
-			Map<String, Object> answers,
-			String returnUrl
-		) {
+		public Map<String, Object> startCheckout(Id recordId, Map<String, Object> answers, String returnUrl) {
 			if (fail) {
 				throw new CalloutException('The processor did not answer');
 			}
@@ -280,10 +261,7 @@ private class FormPublicPageTest {
 	@IsTest
 	static void aPageThatChargesSendsThePersonToCheckoutAndKeepsThePayment() {
 		System.runAs(admin()) {
-			FormIntakeService.Receipt receipt = sendFromPage(
-				FormsTestData.publicVolunteerInterest(50),
-				false
-			);
+			FormIntakeService.Receipt receipt = sendFromPage(FormsTestData.publicVolunteerInterest(50), false);
 
 			Assert.areEqual(FormIntakeService.RECEIVED, receipt.status, 'Stored');
 			Assert.areEqual('https://checkout.example.com/pay/123', receipt.checkoutUrl);
@@ -295,8 +273,7 @@ private class FormPublicPageTest {
 			];
 			Assert.areEqual(
 				'pay-123',
-				((Map<String, Object>) JSON.deserializeUntyped(stored.Answers__c))
-					.get(FormIntakeService.PAYMENT_KEY),
+				((Map<String, Object>) JSON.deserializeUntyped(stored.Answers__c)).get(FormIntakeService.PAYMENT_KEY),
 				'The payment is kept with the answers'
 			);
 		}
@@ -305,18 +282,11 @@ private class FormPublicPageTest {
 	@IsTest
 	static void aCheckoutThatFailsStoresNothing() {
 		System.runAs(admin()) {
-			FormIntakeService.Receipt receipt = sendFromPage(
-				FormsTestData.publicVolunteerInterest(50),
-				true
-			);
+			FormIntakeService.Receipt receipt = sendFromPage(FormsTestData.publicVolunteerInterest(50), true);
 
 			Assert.areEqual(FormIntakeService.FAILED, receipt.status, 'Asked to try again');
 			Assert.isNull(receipt.checkoutUrl, 'No checkout');
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Form_Submission__c WITH USER_MODE],
-				'Nothing was stored'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Form_Submission__c WITH USER_MODE], 'Nothing was stored');
 		}
 	}
 }

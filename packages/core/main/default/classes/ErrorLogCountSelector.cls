@@ -38,8 +38,8 @@ public with sharing class ErrorLogCountSelector {
 	 * told to them as nothing, never as a fault.
 	 */
 	public static Boolean isReadable() {
-		return Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.isAccessible() && Error_Log__c.Status__c.getDescribe().isAccessible();
+		return Error_Log__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible() &&
+			Error_Log__c.Status__c.getDescribe().isAccessible();
 	}
 
 	/**

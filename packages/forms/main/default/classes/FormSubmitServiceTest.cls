@@ -17,11 +17,7 @@ private class FormSubmitServiceTest {
 	}
 
 	/** Answers submitted with no files. */
-	private static FormSubmitService.Result submit(
-		Id formId,
-		Map<String, Object> answers,
-		Id contextRecordId
-	) {
+	private static FormSubmitService.Result submit(Id formId, Map<String, Object> answers, Id contextRecordId) {
 		return FormSubmitService.submit(formId, answers, contextRecordId, null);
 	}
 
@@ -59,11 +55,7 @@ private class FormSubmitServiceTest {
 			FormSubmitService.Result result = submit(form.Id, pat(), gala.Id);
 			Test.stopTest();
 
-			Assert.areEqual(
-				FormSubmitService.PROCESSED,
-				result.status,
-				'Processed: ' + result.message
-			);
+			Assert.areEqual(FormSubmitService.PROCESSED, result.status, 'Processed: ' + result.message);
 			Contact person = [
 				SELECT Id, FirstName, Email, MailingPostalCode
 				FROM Contact
@@ -97,11 +89,7 @@ private class FormSubmitServiceTest {
 			Assert.areEqual(3, result.records.size(), 'Three records written');
 			Assert.areEqual(1, FormsTestModule.heard.size(), 'The module heard it');
 			Assert.areEqual(person.Id, FormsTestModule.heard[0].personId, 'With the person');
-			Assert.areEqual(
-				link.Id,
-				FormsTestModule.heard[0].recordIds.get('link'),
-				'And every record'
-			);
+			Assert.areEqual(link.Id, FormsTestModule.heard[0].recordIds.get('link'), 'And every record');
 		}
 	}
 
@@ -123,17 +111,10 @@ private class FormSubmitServiceTest {
 			answers.put('guardian', 'Jo Zzform');
 
 			Test.startTest();
-			FormSubmitService.Result kept = submit(
-				FormsTestData.volunteerInterest().Id,
-				answers,
-				null
-			);
+			FormSubmitService.Result kept = submit(FormsTestData.volunteerInterest().Id, answers, null);
 			Map<String, Object> overwriting = FormsTestData.definition();
 			((Map<String, Object>) ((List<Object>) overwriting.get('records'))[0])
-				.put(
-					'matching',
-					new Map<String, Object>{ 'rule' => 'email', 'onMatch' => 'overwrite' }
-				);
+				.put('matching', new Map<String, Object>{ 'rule' => 'email', 'onMatch' => 'overwrite' });
 			FormSubmitService.Result overwritten = submit(
 				FormsTestData.published('Overwrite', overwriting).Id,
 				answers,
@@ -145,11 +126,7 @@ private class FormSubmitServiceTest {
 			Assert.areEqual('updated', kept.records[0].action, 'Found and filled');
 			Assert.areEqual(onFile.Id, kept.records[0].recordId, 'The person on file');
 			Assert.areEqual(1, kept.records.size(), 'No organization named, so none and no link');
-			Assert.areEqual(
-				FormSubmitService.PROCESSED,
-				overwritten.status,
-				'Overwritten: ' + overwritten.message
-			);
+			Assert.areEqual(FormSubmitService.PROCESSED, overwritten.status, 'Overwritten: ' + overwritten.message);
 			Contact after = [
 				SELECT Description, MailingPostalCode
 				FROM Contact
@@ -170,15 +147,9 @@ private class FormSubmitServiceTest {
 	static void aSharedEmailIsHeldForReviewAndProcessedAgain() {
 		System.runAs(admin()) {
 			List<Contact> couple = new List<Contact>{
-				TestDataFactory.person(
-					new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org')
-				),
-				TestDataFactory.person(
-					new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org')
-				),
-				TestDataFactory.person(
-					new Contact(FirstName = 'Sam', LastName = 'Zzform', Email = 'home@example.org')
-				)
+				TestDataFactory.person(new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org')),
+				TestDataFactory.person(new Contact(FirstName = 'Pat', LastName = 'Zzform', Email = 'home@example.org')),
+				TestDataFactory.person(new Contact(FirstName = 'Sam', LastName = 'Zzform', Email = 'home@example.org'))
 			};
 			insert as user couple;
 			Form__c form = FormsTestData.volunteerInterest();
@@ -198,11 +169,7 @@ private class FormSubmitServiceTest {
 			Assert.areEqual(FormSubmitService.NEEDS_REVIEW, held.status, 'Two Pats: never guessed');
 			Assert.isTrue(held.records.isEmpty(), 'Nothing written while held');
 			Assert.areEqual(couple[2].Id, samResult.records[0].recordId, 'Sam is told apart');
-			Assert.areEqual(
-				FormSubmitService.PROCESSED,
-				again.status,
-				'Processed again: ' + again.message
-			);
+			Assert.areEqual(FormSubmitService.PROCESSED, again.status, 'Processed again: ' + again.message);
 			Assert.areEqual(couple[1].Id, again.records[0].recordId, 'The person staff chose');
 			Assert.areEqual(
 				3,
@@ -229,10 +196,7 @@ private class FormSubmitServiceTest {
 			FormSubmitService.Result result = submit(form.Id, answers, null);
 
 			Assert.areEqual(FormSubmitService.INVALID, result.status);
-			Assert.areEqual(
-				new Map<String, String>{ 'last' => 'required', 'email' => 'badEmail' },
-				result.problems
-			);
+			Assert.areEqual(new Map<String, String>{ 'last' => 'required', 'email' => 'badEmail' }, result.problems);
 			Assert.areEqual(0, [SELECT COUNT() FROM Form_Submission__c WITH USER_MODE]);
 		}
 	}
@@ -242,13 +206,7 @@ private class FormSubmitServiceTest {
 		System.runAs(admin()) {
 			Map<String, Object> broken = FormsTestData.definition();
 			((List<Object>) broken.get('records'))
-				.add(
-					new Map<String, Object>{
-						'key' => 'extra',
-						'kind' => 'related',
-						'object' => 'No_Such_Object__c'
-					}
-				);
+				.add(new Map<String, Object>{ 'key' => 'extra', 'kind' => 'related', 'object' => 'No_Such_Object__c' });
 			Form__c form = FormsTestData.published('Broken', broken);
 			Map<String, Object> answers = pat();
 			answers.remove('employer');
@@ -281,11 +239,7 @@ private class FormSubmitServiceTest {
 			answers.remove('employer');
 
 			Test.startTest();
-			FormSubmitService.Result result = submit(
-				FormsTestData.volunteerInterest().Id,
-				answers,
-				gala.Id
-			);
+			FormSubmitService.Result result = submit(FormsTestData.volunteerInterest().Id, answers, gala.Id);
 			Test.stopTest();
 
 			Assert.areEqual(FormSubmitService.NEEDS_REVIEW, result.status);

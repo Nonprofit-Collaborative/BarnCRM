@@ -74,9 +74,7 @@ public with sharing class EventSurveyService {
 			WITH SYSTEM_MODE
 		]) {
 			Id formId = formId(attendee.Event_Registration__r.Event__r.Survey_Form_Key__c);
-			String link = formId == null
-				? null
-				: FormCatalogExtensions.publicLink(formId, attendee.Id);
+			String link = formId == null ? null : FormCatalogExtensions.publicLink(formId, attendee.Id);
 			if (link != null) {
 				links.put(attendee.Id, link);
 			}
@@ -89,9 +87,7 @@ public with sharing class EventSurveyService {
 		if (receipt == null || receipt.contextRecordId == null) {
 			return;
 		}
-		Event_Survey_Response__c response = new Event_Survey_Response__c(
-			Attendee__c = receipt.contextRecordId
-		);
+		Event_Survey_Response__c response = new Event_Survey_Response__c(Attendee__c = receipt.contextRecordId);
 		for (Event_Survey_Response__c existing : [
 			SELECT Id
 			FROM Event_Survey_Response__c
@@ -103,9 +99,7 @@ public with sharing class EventSurveyService {
 		}
 		response.Answers__c = answersJson(receipt.answers);
 		response.Submitted_On__c = Datetime.now();
-		response.Form_Submission_Key__c = receipt.submissionId == null
-			? null
-			: String.valueOf(receipt.submissionId);
+		response.Form_Submission_Key__c = receipt.submissionId == null ? null : String.valueOf(receipt.submissionId);
 		if (response.Id == null) {
 			insert as user response;
 		} else {
@@ -124,10 +118,7 @@ public with sharing class EventSurveyService {
 		Map<String, Object> clipped = new Map<String, Object>();
 		for (String key : source.keySet()) {
 			Object value = source.get(key);
-			clipped.put(
-				key,
-				value instanceof String ? ((String) value).left(CLIPPED_TEXT_LENGTH) : value
-			);
+			clipped.put(key, value instanceof String ? ((String) value).left(CLIPPED_TEXT_LENGTH) : value);
 		}
 		return JSON.serialize(clipped).left(MAX_ANSWERS_LENGTH);
 	}

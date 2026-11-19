@@ -58,15 +58,8 @@ private class AutomationControlTest {
 				'The audit row names the pause setting.'
 			);
 			Assert.isTrue(String.isBlank(audit[0].Old_Value__c), 'Nothing was paused before.');
-			Assert.isTrue(
-				String.isNotBlank(audit[0].New_Value__c),
-				'And now there is an end time.'
-			);
-			Assert.areEqual(
-				maria.Id,
-				audit[0].Changed_By__c,
-				'Maria made the change, not the admin.'
-			);
+			Assert.isTrue(String.isNotBlank(audit[0].New_Value__c), 'And now there is an end time.');
+			Assert.areEqual(maria.Id, audit[0].Changed_By__c, 'Maria made the change, not the admin.');
 		}
 	}
 
@@ -85,11 +78,7 @@ private class AutomationControlTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Setting_Change__c],
-				'Resuming is one audited change.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Setting_Change__c], 'Resuming is one audited change.');
 		}
 	}
 
@@ -134,10 +123,7 @@ private class AutomationControlTest {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.pausedSettings(-1);
 
-			Assert.isFalse(
-				AutomationControl.isPaused(),
-				'A pause in the past has ended by itself.'
-			);
+			Assert.isFalse(AutomationControl.isPaused(), 'A pause in the past has ended by itself.');
 			Assert.isNull(AutomationControl.pausedUntil(), 'So there is no banner.');
 		}
 	}
@@ -186,9 +172,7 @@ private class AutomationControlTest {
 	@IsTest
 	static void switchingOneAutomationOffIsAuditedAndTakesEffect() {
 		System.runAs(TestUsers.admin()) {
-			TestDataFactory.insertAutomationSettings(
-				new Map<String, Boolean>{ NAMING => true, HOUSEHOLDS => true }
-			);
+			TestDataFactory.insertAutomationSettings(new Map<String, Boolean>{ NAMING => true, HOUSEHOLDS => true });
 			User maria = barnCrmAdmin();
 			Assert.isTrue(AutomationControl.isEnabled(NAMING), 'It starts switched on.');
 
@@ -353,11 +337,7 @@ private class AutomationControlTest {
 				[SELECT Enabled__c FROM Automation_Setting__c WHERE Id = :lockRow.Id].Enabled__c,
 				'And the row was not changed.'
 			);
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Setting_Change__c],
-				'A refused change is not an audited change.'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Setting_Change__c], 'A refused change is not an audited change.');
 		}
 	}
 
@@ -400,10 +380,7 @@ private class AutomationControlTest {
 				AutomationControl.isEnabled('Shipped_But_Not_Materialized_Yet'),
 				'A newly shipped automation works from the moment it is installed.'
 			);
-			Assert.isFalse(
-				AutomationControl.isEnabled(null),
-				'An automation with no name does not.'
-			);
+			Assert.isFalse(AutomationControl.isEnabled(null), 'An automation with no name does not.');
 			Assert.isFalse(AutomationControl.isEnabled('  '), 'Nor one with an empty name.');
 		}
 	}
@@ -411,10 +388,7 @@ private class AutomationControlTest {
 	@IsTest
 	static void bypassIsPerNameAndPerTransaction() {
 		System.runAs(TestUsers.admin()) {
-			Assert.isFalse(
-				AutomationControl.isBypassed(NAMING),
-				'Nothing is bypassed to begin with.'
-			);
+			Assert.isFalse(AutomationControl.isBypassed(NAMING), 'Nothing is bypassed to begin with.');
 
 			AutomationControl.bypass(NAMING);
 			Assert.isTrue(AutomationControl.isBypassed(NAMING), 'This one is bypassed.');
@@ -455,15 +429,8 @@ private class AutomationControlTest {
 			];
 			Assert.areEqual(1, created.size(), 'The new automation has a row.');
 			Assert.isTrue(created[0].Enabled__c, 'On by default, as shipped.');
-			Assert.isTrue(
-				created[0].Is_Package_Default__c,
-				'And marked as one the package created.'
-			);
-			Assert.areEqual(
-				HOUSEHOLDS + 'Handler',
-				created[0].Handler_Class__c,
-				'With the handler from the registry.'
-			);
+			Assert.isTrue(created[0].Is_Package_Default__c, 'And marked as one the package created.');
+			Assert.areEqual(HOUSEHOLDS + 'Handler', created[0].Handler_Class__c, 'With the handler from the registry.');
 		}
 	}
 
@@ -472,11 +439,7 @@ private class AutomationControlTest {
 		System.runAs(TestUsers.admin()) {
 			AutomationRegistrySelector.registryOverride = new List<Automation_Registry__mdt>();
 
-			Assert.areEqual(
-				0,
-				AutomationControl.ensureDefaults(),
-				'v0.1 ships no registry records.'
-			);
+			Assert.areEqual(0, AutomationControl.ensureDefaults(), 'v0.1 ships no registry records.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Automation_Setting__c], 'So there is nothing.');
 		}
 	}
@@ -488,11 +451,7 @@ private class AutomationControlTest {
 				new Automation_Registry__mdt(Description__c = 'No developer name.')
 			};
 
-			Assert.areEqual(
-				0,
-				AutomationControl.ensureDefaults(),
-				'An entry with no name is skipped.'
-			);
+			Assert.areEqual(0, AutomationControl.ensureDefaults(), 'An entry with no name is skipped.');
 		}
 	}
 
@@ -514,11 +473,7 @@ private class AutomationControlTest {
 
 			Assert.isTrue(first, 'Even numbered automations are on.');
 			Assert.isFalse(last, 'Odd numbered ones are off.');
-			Assert.areEqual(
-				1,
-				queriesAfter - queriesBefore,
-				'The list is read once per transaction.'
-			);
+			Assert.areEqual(1, queriesAfter - queriesBefore, 'The list is read once per transaction.');
 		}
 	}
 }

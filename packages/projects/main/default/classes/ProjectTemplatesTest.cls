@@ -16,20 +16,10 @@ private class ProjectTemplatesTest {
 
 			Test.startTest();
 			List<ProjectTemplates.Template> listed = ProjectTemplates.available();
-			Id projectId = ProjectTemplates.create(
-				'salesforce_implementation',
-				'Our Rollout',
-				start,
-				null,
-				null
-			);
+			Id projectId = ProjectTemplates.create('salesforce_implementation', 'Our Rollout', start, null, null);
 			Test.stopTest();
 
-			Assert.areEqual(
-				'salesforce_implementation',
-				listed[0].key,
-				'The shipped templates come first'
-			);
+			Assert.areEqual('salesforce_implementation', listed[0].key, 'The shipped templates come first');
 			Assert.isTrue(listed[0].shipped, 'Marked as shipped');
 			Project__c project = [
 				SELECT
@@ -99,13 +89,7 @@ private class ProjectTemplatesTest {
 			);
 
 			Test.startTest();
-			Id copyId = ProjectTemplates.create(
-				template.Id,
-				null,
-				Date.newInstance(2026, 3, 1),
-				null,
-				null
-			);
+			Id copyId = ProjectTemplates.create(template.Id, null, Date.newInstance(2026, 3, 1), null, null);
 			Test.stopTest();
 
 			Project__c copy = [
@@ -122,18 +106,10 @@ private class ProjectTemplatesTest {
 			];
 			Assert.areEqual('Office Move', copy.Name, 'The template name when none is given');
 			Assert.isFalse(copy.Is_Template__c, 'The copy is not a template');
-			Assert.areEqual(
-				Date.newInstance(2026, 3, 31),
-				copy.Target_Date__c,
-				'Target moved with the start'
-			);
+			Assert.areEqual(Date.newInstance(2026, 3, 31), copy.Target_Date__c, 'Target moved with the start');
 			Assert.areEqual(40, copy.Budget_Hours__c, 'Budget copied');
 			Assert.areEqual('Not Started', copy.Tasks__r[0].Status__c, 'Tasks start fresh');
-			Assert.areEqual(
-				Date.newInstance(2026, 3, 5),
-				copy.Tasks__r[0].Due_Date__c,
-				'Due date moved'
-			);
+			Assert.areEqual(Date.newInstance(2026, 3, 5), copy.Tasks__r[0].Due_Date__c, 'Due date moved');
 			Assert.areEqual('Pack', copy.Tasks__r[0].Phase__r.Name, 'In the copied phase');
 			Assert.areEqual('Mover', copy.Assignments__r[0].Role__c, 'The role is copied');
 			Assert.isNull(copy.Assignments__r[0].Resource__c, 'The person is not');
@@ -150,13 +126,7 @@ private class ProjectTemplatesTest {
 		System.runAs(ProjectsTestData.admin()) {
 			Test.startTest();
 			try {
-				ProjectsController.createFromTemplate(
-					'no_such_template',
-					'X',
-					Date.today(),
-					null,
-					null
-				);
+				ProjectsController.createFromTemplate('no_such_template', 'X', Date.today(), null, null);
 				Assert.fail('An unknown template is refused');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
@@ -166,11 +136,7 @@ private class ProjectTemplatesTest {
 				);
 			}
 			Test.stopTest();
-			Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Project__c WITH SYSTEM_MODE],
-				'Nothing was made'
-			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Project__c WITH SYSTEM_MODE], 'Nothing was made');
 		}
 	}
 }

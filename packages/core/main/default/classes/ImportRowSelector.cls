@@ -66,9 +66,7 @@ public with sharing class ImportRowSelector {
 	 */
 	@NamespaceAccessible
 	public static Decimal passOf(Import_Batch__c batch) {
-		return batch != null && batch.isSet(Import_Batch__c.Pass_Number__c)
-			? batch.Pass_Number__c
-			: null;
+		return batch != null && batch.isSet(Import_Batch__c.Pass_Number__c) ? batch.Pass_Number__c : null;
 	}
 
 	/**
@@ -78,10 +76,7 @@ public with sharing class ImportRowSelector {
 	 * came before. In system mode (ADR-0021): the staged rows are the package's own bookkeeping.
 	 */
 	@NamespaceAccessible
-	public static Set<String> createdDigestsWrittenEarlier(
-		Import_Batch__c batch,
-		Set<String> digests
-	) {
+	public static Set<String> createdDigestsWrittenEarlier(Import_Batch__c batch, Set<String> digests) {
 		return createdDigestCounts(batch, digests).keySet();
 	}
 
@@ -91,10 +86,7 @@ public with sharing class ImportRowSelector {
 	 * alone (R-IB12).
 	 */
 	@NamespaceAccessible
-	public static Map<String, Integer> createdDigestCounts(
-		Import_Batch__c batch,
-		Set<String> digests
-	) {
+	public static Map<String, Integer> createdDigestCounts(Import_Batch__c batch, Set<String> digests) {
 		return digestsWrittenEarlier(
 			batch,
 			digests,
@@ -113,12 +105,8 @@ public with sharing class ImportRowSelector {
 	 * processor's key (R-IR6): for Giving, the external IDs of the gifts a dry run would load.
 	 */
 	@NamespaceAccessible
-	public static Set<String> processorDigestsWrittenEarlier(
-		Import_Batch__c batch,
-		Set<String> digests
-	) {
-		return digestsWrittenEarlier(batch, digests, new List<String>{ 'Processor_Key__c' })
-			.keySet();
+	public static Set<String> processorDigestsWrittenEarlier(Import_Batch__c batch, Set<String> digests) {
+		return digestsWrittenEarlier(batch, digests, new List<String>{ 'Processor_Key__c' }).keySet();
 	}
 
 	/**
@@ -129,10 +117,7 @@ public with sharing class ImportRowSelector {
 	 * earlier row loads is never loaded again. Rejected rows name none.
 	 */
 	@NamespaceAccessible
-	public static Map<String, Boolean> resultingRecordsWrittenEarlier(
-		Import_Batch__c batch,
-		Set<String> recordIds
-	) {
+	public static Map<String, Boolean> resultingRecordsWrittenEarlier(Import_Batch__c batch, Set<String> recordIds) {
 		Map<String, Boolean> found = new Map<String, Boolean>();
 		if (batch == null || batch.Id == null || recordIds == null || recordIds.isEmpty()) {
 			return found;
@@ -140,17 +125,11 @@ public with sharing class ImportRowSelector {
 		for (Import_Row__c row : [
 			SELECT Gift_Id__c, Status__c
 			FROM Import_Row__c
-			WHERE
-				Import_Batch__c = :batch.Id
-				AND Pass_Number__c = :passOf(batch)
-				AND Gift_Id__c IN :recordIds
+			WHERE Import_Batch__c = :batch.Id AND Pass_Number__c = :passOf(batch) AND Gift_Id__c IN :recordIds
 			WITH SYSTEM_MODE
 		]) {
 			Boolean created = row.Status__c == ImportRowProcessor.STATUS_CREATED;
-			found.put(
-				row.Gift_Id__c,
-				created || (found.containsKey(row.Gift_Id__c) && found.get(row.Gift_Id__c))
-			);
+			found.put(row.Gift_Id__c, created || (found.containsKey(row.Gift_Id__c) && found.get(row.Gift_Id__c)));
 		}
 		return found;
 	}
@@ -176,11 +155,7 @@ public with sharing class ImportRowSelector {
 	}
 
 	/** One slice, kept out of the caller's loop so no query sits lexically inside one. */
-	private static Map<String, Integer> digestSlice(
-		Import_Batch__c batch,
-		List<String> slice,
-		List<String> fields
-	) {
+	private static Map<String, Integer> digestSlice(Import_Batch__c batch, List<String> slice, List<String> fields) {
 		Set<String> wanted = new Set<String>(slice);
 		List<String> matches = new List<String>();
 		for (String field : fields) {
@@ -193,11 +168,7 @@ public with sharing class ImportRowSelector {
 				' AND Pass_Number__c = :pass AND (' +
 				String.join(matches, ' OR ') +
 				')',
-			new Map<String, Object>{
-				'batchId' => batch.Id,
-				'slice' => slice,
-				'pass' => passOf(batch)
-			},
+			new Map<String, Object>{ 'batchId' => batch.Id, 'slice' => slice, 'pass' => passOf(batch) },
 			AccessLevel.SYSTEM_MODE
 		);
 		Map<String, Integer> found = new Map<String, Integer>();
@@ -269,10 +240,7 @@ public with sharing class ImportRowSelector {
 				row.Person_1_Key__c,
 				row.Person_1_Name_Key__c
 			};
-			List<Object> rowOrganizations = new List<Object>{
-				row.Organization__c,
-				row.Organization_Key__c
-			};
+			List<Object> rowOrganizations = new List<Object>{ row.Organization__c, row.Organization_Key__c };
 			for (Object person : rowPeople) {
 				for (Object organization : rowOrganizations) {
 					if (person != null && organization != null) {

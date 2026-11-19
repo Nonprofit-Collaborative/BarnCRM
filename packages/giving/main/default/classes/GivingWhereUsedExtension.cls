@@ -24,10 +24,7 @@ public with sharing class GivingWhereUsedExtension implements WhereUsedExtension
 	}
 
 	public List<WhereUsedService.Reference> references(WhereUsedService.Target target) {
-		List<WhereUsedService.Reference> found = WhereUsedService.importColumnReferences(
-			target,
-			ENTITY_OBJECTS
-		);
+		List<WhereUsedService.Reference> found = WhereUsedService.importColumnReferences(target, ENTITY_OBJECTS);
 		found.addAll(settingReferences(target));
 		return found;
 	}
@@ -37,15 +34,10 @@ public with sharing class GivingWhereUsedExtension implements WhereUsedExtension
 	 * both Account and Contact. Its effective value counts, because that is what levels run on.
 	 */
 	@TestVisible
-	private static List<WhereUsedService.Reference> settingReferences(
-		WhereUsedService.Target target
-	) {
+	private static List<WhereUsedService.Reference> settingReferences(WhereUsedService.Target target) {
 		List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
 		String source = DonorLevelService.sourceField();
-		if (
-			!target.isObject() &&
-			(target.matchesField('Contact', source) || target.matchesField('Account', source))
-		) {
+		if (!target.isObject() && (target.matchesField('Contact', source) || target.matchesField('Account', source))) {
 			found.add(
 				WhereUsedService.settingReference(
 					Schema.Giving_Settings__c.Donor_Level_Source_Field__c.getDescribe().getLabel(),

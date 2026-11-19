@@ -31,8 +31,7 @@ public with sharing class EventEmailService {
 
 	/** Whether the module is on. */
 	public static Boolean moduleOn() {
-		return !ModuleManagerService.turnedOff()
-			.contains(EventsPostInstall.MODULE_KEY.toLowerCase());
+		return !ModuleManagerService.turnedOff().contains(EventsPostInstall.MODULE_KEY.toLowerCase());
 	}
 
 	/** Whether a phase has work to do tonight: the module and its setting are on. */
@@ -117,12 +116,7 @@ public with sharing class EventEmailService {
 			WHERE Id IN :attendees AND Status__c = :EventRegistrationService.STATUS_REGISTERED
 			WITH SYSTEM_MODE
 		]) {
-			updates.add(
-				new Event_Attendee__c(
-					Id = attendee.Id,
-					Status__c = EventRegistrationService.STATUS_NO_SHOW
-				)
-			);
+			updates.add(new Event_Attendee__c(Id = attendee.Id, Status__c = EventRegistrationService.STATUS_NO_SHOW));
 		}
 		Integer marked = 0;
 		for (Database.SaveResult saved : Database.update(updates, false, AccessLevel.SYSTEM_MODE)) {
@@ -163,11 +157,7 @@ public with sharing class EventEmailService {
 		Id templateId = templateIdFor(templateName);
 		if (templateId == null) {
 			ErrorLogger.logMessage(
-				BarnHelp.text(
-					'Events',
-					'Events_Emails_NoTemplate',
-					new List<Object>{ templateName }
-				),
+				BarnHelp.text('Events', 'Events_Emails_NoTemplate', new List<Object>{ templateName }),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
 			);
@@ -215,11 +205,7 @@ public with sharing class EventEmailService {
 				BarnHelp.text(
 					'Events',
 					'Events_Emails_SendFailed',
-					new List<Object>{
-						unstamp.size(),
-						sentTo.size(),
-						lastFailure == null ? '' : lastFailure
-					}
+					new List<Object>{ unstamp.size(), sentTo.size(), lastFailure == null ? '' : lastFailure }
 				),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING

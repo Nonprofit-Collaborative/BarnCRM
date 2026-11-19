@@ -48,9 +48,7 @@ public with sharing class FeatureController {
 	@AuraEnabled
 	public static FeaturesModel turnOn(String key) {
 		if (!BarnCRMPermissions.canManageSettings()) {
-			throw UserErrors.message(
-				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
-			);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'));
 		}
 		try {
 			FeatureSwitchService.turnOn(key);

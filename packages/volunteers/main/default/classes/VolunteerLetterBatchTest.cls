@@ -18,9 +18,7 @@ private class VolunteerLetterBatchTest {
 				COORDINATOR,
 				new List<String>{ VolunteersTestData.CORE_STAFF, 'Volunteers_Coordinator' }
 			);
-			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-				HouseholdTestDataFactory.MODE_CONTACT
-			);
+			BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 			settings.Auto_Create_Households__c = false;
 			settings.Job_Notifications__c = true;
 			TestDataFactory.saveSettings(settings);
@@ -94,9 +92,7 @@ private class VolunteerLetterBatchTest {
 		Test.startTest();
 		System.runAs(coordinator()) {
 			VolunteerLetterBatch.generateLetters(
-				new List<VolunteerLetterBatch.Request>{
-					requestFor(new List<Id>{ people[0].Id }, HOURS_LETTER)
-				}
+				new List<VolunteerLetterBatch.Request>{ requestFor(new List<Id>{ people[0].Id }, HOURS_LETTER) }
 			);
 		}
 		Test.stopTest();
@@ -126,10 +122,7 @@ private class VolunteerLetterBatchTest {
 		List<Contact> people;
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			people = ownedContacts(1);
-			update new Volunteer_Letter_Template__c(
-				Id = shippedTemplateId('Hours_Letter'),
-				Active__c = false
-			);
+			update new Volunteer_Letter_Template__c(Id = shippedTemplateId('Hours_Letter'), Active__c = false);
 		}
 		String noTemplate;
 		String blankType;
@@ -138,14 +131,10 @@ private class VolunteerLetterBatchTest {
 		Test.startTest();
 		System.runAs(coordinator()) {
 			noTemplate = refusalOf(
-				new List<VolunteerLetterBatch.Request>{
-					requestFor(new List<Id>{ people[0].Id }, HOURS_LETTER)
-				}
+				new List<VolunteerLetterBatch.Request>{ requestFor(new List<Id>{ people[0].Id }, HOURS_LETTER) }
 			);
 			blankType = refusalOf(
-				new List<VolunteerLetterBatch.Request>{
-					requestFor(new List<Id>{ people[0].Id }, ' ')
-				}
+				new List<VolunteerLetterBatch.Request>{ requestFor(new List<Id>{ people[0].Id }, ' ') }
 			);
 		}
 		Test.stopTest();
@@ -158,11 +147,7 @@ private class VolunteerLetterBatchTest {
 			noTemplate,
 			'A readable message names the type.'
 		);
-		Assert.areEqual(
-			BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired'),
-			blankType,
-			'A blank type too.'
-		);
+		Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired'), blankType, 'A blank type too.');
 		Assert.areEqual(jobsBefore, [SELECT COUNT() FROM AsyncApexJob], 'No job was started.');
 	}
 
@@ -172,10 +157,7 @@ private class VolunteerLetterBatchTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			people = ownedContacts(1);
 		}
-		VolunteerLetterBatch.Request reversed = requestFor(
-			new List<Id>{ people[0].Id },
-			HOURS_LETTER
-		);
+		VolunteerLetterBatch.Request reversed = requestFor(new List<Id>{ people[0].Id }, HOURS_LETTER);
 		reversed.fromDate = TO_DATE;
 		reversed.toDate = FROM_DATE;
 		String refusal;
@@ -187,11 +169,7 @@ private class VolunteerLetterBatchTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'),
-			refusal,
-			'The period is checked.'
-		);
+		Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'), refusal, 'The period is checked.');
 		Assert.areEqual(jobsBefore, [SELECT COUNT() FROM AsyncApexJob], 'No job was started.');
 	}
 
@@ -209,22 +187,12 @@ private class VolunteerLetterBatchTest {
 		Test.startTest();
 		System.runAs(coordinator()) {
 			try {
-				VolunteerLetterService.mergeLetters(
-					new List<Id>{ people[0].Id },
-					shipped,
-					FROM_DATE,
-					TO_DATE
-				);
+				VolunteerLetterService.mergeLetters(new List<Id>{ people[0].Id }, shipped, FROM_DATE, TO_DATE);
 			} catch (VolunteerLetterService.VolunteerLetterException refused) {
 				preview = refused.getMessage();
 			}
 			try {
-				VolunteerLetterService.generate(
-					new List<Id>{ people[0].Id },
-					shipped,
-					FROM_DATE,
-					TO_DATE
-				);
+				VolunteerLetterService.generate(new List<Id>{ people[0].Id }, shipped, FROM_DATE, TO_DATE);
 			} catch (VolunteerLetterService.VolunteerLetterException refused) {
 				generated = refused.getMessage();
 			}
@@ -273,9 +241,7 @@ private class VolunteerLetterBatchTest {
 		Assert.areEqual(2, job.lettersMade(), 'Two letters made.');
 		Assert.areEqual(1, job.peopleFailed(), 'The chunk with no template failed.');
 		Assert.areEqual(
-			new Map<String, Integer>{
-				BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours') => 1
-			},
+			new Map<String, Integer>{ BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours') => 1 },
 			job.peopleSkippedByReason(),
 			'One person skipped, with the reason.'
 		);
@@ -283,20 +249,10 @@ private class VolunteerLetterBatchTest {
 		Assert.areEqual(1, sent.size(), 'One notification, not one per chunk.');
 		Assert.areEqual(starter, sent[0].recipientId, 'To the person who started it.');
 		Assert.areEqual('Error Log', sent[0].section, 'Failures point to the Error Log.');
-		String body = VolunteerLetterBatch.summary(
-			job.lettersMade(),
-			job.peopleSkippedByReason(),
-			job.peopleFailed()
-		);
+		String body = VolunteerLetterBatch.summary(job.lettersMade(), job.peopleSkippedByReason(), job.peopleFailed());
 		Assert.isTrue(body.contains('2 letters made, 1 skipped, 1 failed.'), body);
-		Assert.isTrue(
-			body.contains(BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours')),
-			body
-		);
-		Assert.isTrue(
-			body.contains(BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersFailed')),
-			body
-		);
+		Assert.isTrue(body.contains(BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours')), body);
+		Assert.isTrue(body.contains(BarnHelp.text('Volunteers', 'Volunteers_JobNotice_LettersFailed')), body);
 		Assert.areEqual(
 			1,
 			[

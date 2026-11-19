@@ -51,14 +51,8 @@ private class SeasonalAddressSwitchTest {
 			delete [SELECT Id FROM BarnCRM_Settings__c];
 			SettingsService.clearCaches();
 
-			Assert.isFalse(
-				SeasonalAddressScheduler.isEnabled(),
-				'A new install has Seasonal Addresses off'
-			);
-			Assert.isFalse(
-				SeasonalAddressScheduler.isScheduled(),
-				'And nothing runs the swap behind its back'
-			);
+			Assert.isFalse(SeasonalAddressScheduler.isEnabled(), 'A new install has Seasonal Addresses off');
+			Assert.isFalse(SeasonalAddressScheduler.isScheduled(), 'And nothing runs the swap behind its back');
 			Assert.isFalse(inTonightsRun(), 'The nightly run leaves it out');
 		}
 	}
@@ -77,10 +71,7 @@ private class SeasonalAddressSwitchTest {
 			Assert.areEqual(1, runJobs(), 'The nightly run is scheduled, once');
 			Assert.areEqual(before + 1, allApexJobs(), 'And nothing else was scheduled');
 			Assert.isTrue(inTonightsRun(), 'The swap is in tonight\'s run');
-			Assert.isNotNull(
-				SeasonalAddressScheduler.nextRunAt(),
-				'The swap shows when it runs next'
-			);
+			Assert.isNotNull(SeasonalAddressScheduler.nextRunAt(), 'The swap shows when it runs next');
 		}
 	}
 
@@ -135,9 +126,7 @@ private class SeasonalAddressSwitchTest {
 
 			Test.startTest();
 			SettingsController.saveSettings(
-				new Map<String, Object>{
-					'Contact_Address_Change_Behavior__c' => 'Create personal address'
-				}
+				new Map<String, Object>{ 'Contact_Address_Change_Behavior__c' => 'Create personal address' }
 			);
 			Test.stopTest();
 

@@ -4,9 +4,7 @@
  * marks the invoice Paid, sets it back to Sent on a refund, or changes nothing. Payments is a
  * stand-in here, as it may not be installed beside Projects; the listener is called directly.
  */
-@IsTest(
-	testFor='ApexClass:ProjectInvoicePayments, ApexClass:ProjectInvoicePaymentListener, ApexClass:ProjectsSettings'
-)
+@IsTest(testFor='ApexClass:ProjectInvoicePayments, ApexClass:ProjectInvoicePaymentListener, ApexClass:ProjectsSettings')
 private class ProjectInvoicePaymentsTest {
 	private static final String LINK = 'https://checkout.stripe.com/c/pay/cs_test_1';
 
@@ -72,25 +70,13 @@ private class ProjectInvoicePaymentsTest {
 
 	private static Project_Invoice__c reload(Id invoiceId) {
 		return [
-			SELECT
-				Id,
-				Status__c,
-				Total__c,
-				Amount_Paid__c,
-				Paid_Date__c,
-				Payment_Key__c,
-				Payment_Link__c
+			SELECT Id, Status__c, Total__c, Amount_Paid__c, Paid_Date__c, Payment_Key__c, Payment_Link__c
 			FROM Project_Invoice__c
 			WHERE Id = :invoiceId
 		];
 	}
 
-	private static Map<String, Object> report(
-		Id invoiceId,
-		String status,
-		Decimal amount,
-		Decimal refunded
-	) {
+	private static Map<String, Object> report(Id invoiceId, String status, Decimal amount, Decimal refunded) {
 		return new Map<String, Object>{
 			'paymentId' => UserInfo.getOrganizationId(),
 			'sourceRecordId' => invoiceId,
@@ -126,10 +112,7 @@ private class ProjectInvoicePaymentsTest {
 			Assert.areEqual(LINK, after.Payment_Link__c, 'Link stored');
 			Assert.isTrue(message.contains('pat@example.org'), 'Emailed to the contact');
 			RecordingEmailSender sender = (RecordingEmailSender) ProjectInvoicePayments.emailSender;
-			Assert.isTrue(
-				sender.received[0].getPlainTextBody().contains(LINK),
-				'The link is in it'
-			);
+			Assert.isTrue(sender.received[0].getPlainTextBody().contains(LINK), 'The link is in it');
 		}
 	}
 
@@ -147,9 +130,7 @@ private class ProjectInvoicePaymentsTest {
 			Object handled = listener.call(
 				'paymentsChanged',
 				new Map<String, Object>{
-					'payments' => new List<Map<String, Object>>{
-						report(invoice.Id, 'Paid', 300, 0)
-					}
+					'payments' => new List<Map<String, Object>>{ report(invoice.Id, 'Paid', 300, 0) }
 				}
 			);
 			Project_Invoice__c paid = reload(invoice.Id);
@@ -184,9 +165,7 @@ private class ProjectInvoicePaymentsTest {
 			ProjectInvoicePayments.apply(new List<Map<String, Object>>{ older });
 			Project_Invoice__c afterOlder = reload(invoice.Id);
 			ProjectBilling.voidInvoice(invoice.Id);
-			ProjectInvoicePayments.apply(
-				new List<Map<String, Object>>{ report(invoice.Id, 'Paid', 300, 0) }
-			);
+			ProjectInvoicePayments.apply(new List<Map<String, Object>>{ report(invoice.Id, 'Paid', 300, 0) });
 			Test.stopTest();
 
 			Assert.areEqual('Sent', afterOlder.Status__c, 'Not the current key');

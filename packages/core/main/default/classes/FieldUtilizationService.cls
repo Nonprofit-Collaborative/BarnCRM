@@ -47,9 +47,7 @@ public with sharing class FieldUtilizationService {
 	public static List<Schema.DescribeSObjectResult> offeredObjects() {
 		List<Schema.DescribeSObjectResult> offered = new List<Schema.DescribeSObjectResult>();
 		for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
-			Schema.DescribeSObjectResult described = type.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			);
+			Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 			if (isCountable(described)) {
 				offered.add(described);
 			}
@@ -67,9 +65,7 @@ public with sharing class FieldUtilizationService {
 	}
 
 	/** The fields a person can fill in and the runner can read, by API name (R-FU2). */
-	public static List<Schema.DescribeFieldResult> countableFields(
-		Schema.DescribeSObjectResult described
-	) {
+	public static List<Schema.DescribeFieldResult> countableFields(Schema.DescribeSObjectResult described) {
 		Map<String, Schema.SObjectField> byName = described.fields.getMap();
 		List<String> names = new List<String>(byName.keySet());
 		names.sort();
@@ -105,19 +101,11 @@ public with sharing class FieldUtilizationService {
 	public static Map<String, Integer> totalsByRecordType(Schema.DescribeSObjectResult described) {
 		Map<String, Integer> totals = new Map<String, Integer>();
 		if (!groupsByRecordType(described)) {
-			totals.put(
-				NO_RECORD_TYPE,
-				Database.countQuery(soql('COUNT()', described, ''), AccessLevel.USER_MODE)
-			);
+			totals.put(NO_RECORD_TYPE, Database.countQuery(soql('COUNT()', described, ''), AccessLevel.USER_MODE));
 			return totals;
 		}
 		String query = soql('RecordTypeId, COUNT(Id) n', described, ' GROUP BY RecordTypeId');
-		for (
-			AggregateResult row : (List<AggregateResult>) Database.query(
-				query,
-				AccessLevel.USER_MODE
-			)
-		) {
+		for (AggregateResult row : (List<AggregateResult>) Database.query(query, AccessLevel.USER_MODE)) {
 			add(totals, recordTypeKey(described, row.get('RecordTypeId')), (Integer) row.get('n'));
 		}
 		return totals;
@@ -168,9 +156,7 @@ public with sharing class FieldUtilizationService {
 				continue;
 			}
 			Integer filledCount = filled.containsKey(recordType) ? filled.get(recordType) : 0;
-			rows.add(
-				snapshot(described.getName(), field, recordType, filledCount, recordCount, sampled)
-			);
+			rows.add(snapshot(described.getName(), field, recordType, filledCount, recordCount, sampled));
 		}
 		return rows;
 	}
@@ -216,10 +202,7 @@ public with sharing class FieldUtilizationService {
 	}
 
 	/** The developer name of a record type Id, or the no record type key. */
-	public static String recordTypeKey(
-		Schema.DescribeSObjectResult described,
-		Object recordTypeId
-	) {
+	public static String recordTypeKey(Schema.DescribeSObjectResult described, Object recordTypeId) {
 		if (recordTypeId == null) {
 			return NO_RECORD_TYPE;
 		}
@@ -291,9 +274,7 @@ public with sharing class FieldUtilizationService {
 		if (picklistDefault != null) {
 			found.value = picklistDefault;
 		} else if (type == Schema.DisplayType.BOOLEAN) {
-			found.value = literal instanceof Boolean
-				? (Boolean) literal
-				: 'true'.equalsIgnoreCase(text);
+			found.value = literal instanceof Boolean ? (Boolean) literal : 'true'.equalsIgnoreCase(text);
 		} else if (literal != null) {
 			found.value = NUMBERS.contains(type)
 				? (Object) Decimal.valueOf(String.valueOf(literal))
@@ -331,11 +312,7 @@ public with sharing class FieldUtilizationService {
 		Schema.DescribeFieldResult field,
 		FieldDefault fieldDefault
 	) {
-		if (
-			fieldDefault == null ||
-			fieldDefault.value == null ||
-			Limits.getQueries() >= Limits.getLimitQueries() - 1
-		) {
+		if (fieldDefault == null || fieldDefault.value == null || Limits.getQueries() >= Limits.getLimitQueries() - 1) {
 			return null;
 		}
 		return countByRecordType(
@@ -380,16 +357,8 @@ public with sharing class FieldUtilizationService {
 	private static final Pattern QUOTED = Pattern.compile('^"[^"\\\\]*"$|^\'[^\'\\\\]*\'$');
 	private static final Pattern PLAIN_NUMBER = Pattern.compile('^-?\\d+(\\.\\d+)?$');
 
-	private static Map<String, Integer> filledByRecordType(
-		Schema.DescribeSObjectResult described,
-		String fieldName
-	) {
-		return countByRecordType(
-			described,
-			String.escapeSingleQuotes(fieldName),
-			'',
-			new Map<String, Object>()
-		);
+	private static Map<String, Integer> filledByRecordType(Schema.DescribeSObjectResult described, String fieldName) {
+		return countByRecordType(described, String.escapeSingleQuotes(fieldName), '', new Map<String, Object>());
 	}
 
 	/** One `COUNT(countOf)` query grouped by record type, in user mode, keyed like the totals. */
@@ -407,11 +376,7 @@ public with sharing class FieldUtilizationService {
 		);
 		Map<String, Integer> counted = new Map<String, Integer>();
 		for (
-			AggregateResult row : (List<AggregateResult>) Database.queryWithBinds(
-				query,
-				binds,
-				AccessLevel.USER_MODE
-			)
+			AggregateResult row : (List<AggregateResult>) Database.queryWithBinds(query, binds, AccessLevel.USER_MODE)
 		) {
 			Object recordTypeId = grouped ? row.get('RecordTypeId') : null;
 			add(counted, recordTypeKey(described, recordTypeId), (Integer) row.get('n'));
@@ -431,8 +396,7 @@ public with sharing class FieldUtilizationService {
 		// twice (in any case), so the record type is added only when it is not already there.
 		Boolean sampledIsRecordType = 'RecordTypeId'.equalsIgnoreCase(fieldName);
 		String query = soql(
-			(grouped && !sampledIsRecordType ? 'RecordTypeId, ' : '') +
-			String.escapeSingleQuotes(fieldName),
+			(grouped && !sampledIsRecordType ? 'RecordTypeId, ' : '') + String.escapeSingleQuotes(fieldName),
 			described,
 			(ordered ? ' ORDER BY LastModifiedDate DESC' : '') + ' LIMIT ' + SAMPLE_SIZE
 		);
@@ -450,16 +414,8 @@ public with sharing class FieldUtilizationService {
 	 * One query's text. The object name and every field name in it come from describe (R-FU1)
 	 * and are escaped anyway; the rest is literal. Run in user mode by every caller.
 	 */
-	private static String soql(
-		String selectList,
-		Schema.DescribeSObjectResult described,
-		String tail
-	) {
-		return 'SELECT ' +
-			selectList +
-			' FROM ' +
-			String.escapeSingleQuotes(described.getName()) +
-			tail;
+	private static String soql(String selectList, Schema.DescribeSObjectResult described, String tail) {
+		return 'SELECT ' + selectList + ' FROM ' + String.escapeSingleQuotes(described.getName()) + tail;
 	}
 
 	private static void add(Map<String, Integer> counts, String key, Integer amount) {

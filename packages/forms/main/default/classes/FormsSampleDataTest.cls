@@ -86,10 +86,7 @@ private class FormsSampleDataTest {
 				forms.put(form.Name, form);
 				Map<String, Object> definition = FormRules.parse(form.Definition__c);
 				Assert.isFalse(FormRules.steps(definition).isEmpty(), form.Name + ' has steps');
-				Assert.isFalse(
-					FormRules.records(definition).isEmpty(),
-					form.Name + ' writes a record'
-				);
+				Assert.isFalse(FormRules.records(definition).isEmpty(), form.Name + ' writes a record');
 				Assert.isFalse(form.Public__c, form.Name + ' is not open to the public');
 			}
 			Assert.areEqual('Published', forms.get('Volunteer Sign-Up').Status__c);
@@ -118,11 +115,7 @@ private class FormsSampleDataTest {
 					'A version holds the definition as published'
 				);
 			}
-			Assert.areEqual(
-				5,
-				[SELECT COUNT() FROM Form_Submission__c WITH SYSTEM_MODE],
-				'Five submissions'
-			);
+			Assert.areEqual(5, [SELECT COUNT() FROM Form_Submission__c WITH SYSTEM_MODE], 'Five submissions');
 			Assert.areEqual(
 				1,
 				[

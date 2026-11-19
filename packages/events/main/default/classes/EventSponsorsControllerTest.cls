@@ -72,17 +72,10 @@ private class EventSponsorsControllerTest {
 			for (EventSponsorsController.DeliverableRow item : sponsor.deliverables) {
 				byName.put(item.name, item);
 			}
-			Assert.areEqual(
-				'Logo',
-				byName.get('Logo for the program').type,
-				'Typed from the first word'
-			);
+			Assert.areEqual('Logo', byName.get('Logo for the program').type, 'Typed from the first word');
 			Assert.areEqual('Other', byName.get('Thank you post').type, 'Anything else is Other');
 			Assert.areEqual('Pending', byName.get('Booth').status, 'Pending to start');
-			Assert.isTrue(
-				result.canAddSponsor && result.canAddLevel && result.canEdit,
-				'Staff may act'
-			);
+			Assert.isTrue(result.canAddSponsor && result.canAddLevel && result.canEdit, 'Staff may act');
 			Assert.isFalse(result.deliverableStatuses.isEmpty(), 'Statuses to choose from');
 			Assert.isFalse(result.deliverableTypes.isEmpty(), 'Types to choose from');
 		}
@@ -105,11 +98,7 @@ private class EventSponsorsControllerTest {
 				duplicate = true;
 			}
 			try {
-				EventSponsorsController.addSponsor(
-					event.Id,
-					organization('Beta Org').Id,
-					gold(other).Id
-				);
+				EventSponsorsController.addSponsor(event.Id, organization('Beta Org').Id, gold(other).Id);
 			} catch (AuraHandledException e) {
 				wrongEvent = true;
 			}
@@ -170,11 +159,7 @@ private class EventSponsorsControllerTest {
 	static void aLinkedRecordThatCannotBeLabelledShowsNoLabel() {
 		System.runAs(staff()) {
 			Event__c event = conference('Community Dreamin');
-			Id sponsorId = EventSponsorsController.addSponsor(
-				event.Id,
-				organization('Acme Software').Id,
-				null
-			);
+			Id sponsorId = EventSponsorsController.addSponsor(event.Id, organization('Acme Software').Id, null);
 			update as user new Event_Sponsor__c(
 				Id = sponsorId,
 				Linked_Record_Id__c = organization('Some Other Record').Id

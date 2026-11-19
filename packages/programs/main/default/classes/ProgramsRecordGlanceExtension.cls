@@ -22,9 +22,7 @@ public with sharing class ProgramsRecordGlanceExtension implements RecordGlanceE
 		if (recordId == null) {
 			return null;
 		}
-		PersonEnrollmentsController.PersonEnrollments person = PersonEnrollmentsController.getEnrollments(
-			recordId
-		);
+		PersonEnrollmentsController.PersonEnrollments person = PersonEnrollmentsController.getEnrollments(recordId);
 		if (person == null || person.canSee != true) {
 			return null;
 		}
@@ -34,16 +32,9 @@ public with sharing class ProgramsRecordGlanceExtension implements RecordGlanceE
 				open++;
 			}
 		}
-		RecordGlance.Card card = new RecordGlance.Card(
-				'programs',
-				Label.Programs_Glance_Title,
-				'custom:custom60'
-			)
+		RecordGlance.Card card = new RecordGlance.Card('programs', Label.Programs_Glance_Title, 'custom:custom60')
 			.addNumber(BarnHelp.text('Programs', 'Programs_Glance_OpenEnrollments'), open)
-			.addDate(
-				BarnHelp.text('Programs', 'Programs_Glance_LastService'),
-				person.lastServiceDate
-			);
+			.addDate(BarnHelp.text('Programs', 'Programs_Glance_LastService'), person.lastServiceDate);
 		if (Schema.SObjectType.Enrollment__c.isCreateable()) {
 			card.addAction(Label.Programs_Enroll, enrollReference(recordId));
 		}
@@ -78,9 +69,7 @@ public with sharing class ProgramsRecordGlanceExtension implements RecordGlanceE
 	private static Map<String, Object> recordServiceReference(Id personId) {
 		return new Map<String, Object>{
 			'type' => 'standard__navItemPage',
-			'attributes' => new Map<String, Object>{
-				'apiName' => NamespaceUtil.prefix() + RECORD_SERVICE_TAB
-			},
+			'attributes' => new Map<String, Object>{ 'apiName' => NamespaceUtil.prefix() + RECORD_SERVICE_TAB },
 			'state' => new Map<String, Object>{ NamespaceUtil.stateKey('personId') => personId }
 		};
 	}

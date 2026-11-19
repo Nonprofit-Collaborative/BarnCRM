@@ -78,10 +78,7 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 
 	/** The designations no fund has yet; a fund of the same name is the one gifts use. */
 	@TestVisible
-	private static List<Map<String, Object>> newFunds(
-		List<Map<String, Object>> rows,
-		Set<String> have
-	) {
+	private static List<Map<String, Object>> newFunds(List<Map<String, Object>> rows, Set<String> have) {
 		List<Map<String, Object>> result = new List<Map<String, Object>>();
 		for (Map<String, Object> row : rows) {
 			if (!hasFund((String) row.get('Id'), (String) row.get('Name'), have)) {
@@ -92,8 +89,7 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 	}
 
 	private static Boolean hasFund(String designationId, String name, Set<String> have) {
-		return have.contains(designationId) ||
-			(String.isNotBlank(name) && have.contains(name.trim().toLowerCase()));
+		return have.contains(designationId) || (String.isNotBlank(name) && have.contains(name.trim().toLowerCase()));
 	}
 
 	/** Every fund's Gift Designation ID and lowercased name, in the user's access. */
@@ -127,12 +123,7 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 		putDonor(row, people, 'ContactId', 'OrganizationId');
 		row.put('GiftTransactionId', row.get('Id'));
 		NpspGiftsKit.putSplit(row, split, (String) row.get('OriginalAmount'));
-		List<String> names = new List<String>{
-			'TributeType',
-			'HonoreeName',
-			'NotifyName',
-			'NotifyMessage'
-		};
+		List<String> names = new List<String>{ 'TributeType', 'HonoreeName', 'NotifyName', 'NotifyMessage' };
 		for (Integer index = 0; index < names.size(); index++) {
 			row.put(names[index], tribute == null || tribute[index] == null ? '' : tribute[index]);
 		}
@@ -149,16 +140,10 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 		Boolean recurring = String.isNotBlank(schedule) && schedule.containsIgnoreCase('recurring');
 		row.put('Type', recurring ? 'Recurring' : 'Pledge');
 		String next = (String) row.get('NextTransactionAmount');
-		row.put(
-			'Amount',
-			recurring && String.isNotBlank(next) ? next : row.get('ExpectedTotalCmtAmount')
-		);
+		row.put('Amount', recurring && String.isNotBlank(next) ? next : row.get('ExpectedTotalCmtAmount'));
 		row.put(
 			'Frequency',
-			frequency(
-				(String) row.get('EffectiveTransactionPeriod'),
-				(String) row.get('EffectiveTransactionInterval')
-			)
+			frequency((String) row.get('EffectiveTransactionPeriod'), (String) row.get('EffectiveTransactionInterval'))
 		);
 	}
 
@@ -196,10 +181,7 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 		row.put('AccountId', contact == null ? recipient : '');
 		NpspGiftsKit.putRole(row, (String) row.get('Role'));
 		String amount = (String) row.get('SoftCreditAmount');
-		row.put(
-			'Amount',
-			String.isNotBlank(amount) ? amount : row.get('GiftTransaction.OriginalAmount')
-		);
+		row.put('Amount', String.isNotBlank(amount) ? amount : row.get('GiftTransaction.OriginalAmount'));
 	}
 
 	/** The Donor choice and donor Id columns: a person account's contact, else the account. */
@@ -219,10 +201,7 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 	/** Each person account's contact, by account Id; none where person accounts are off. */
 	private static Map<String, String> personContacts(Set<String> ids) {
 		Map<String, String> result = new Map<String, String>();
-		if (
-			ids.isEmpty() ||
-			!Schema.SObjectType.Account.fields.getMap().containsKey('ispersonaccount')
-		) {
+		if (ids.isEmpty() || !Schema.SObjectType.Account.fields.getMap().containsKey('ispersonaccount')) {
 			return result;
 		}
 		for (
@@ -297,19 +276,12 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 	@TestVisible
 	private static List<SObject> read(String query, Set<String> ids) {
 		String objectName = query.substringAfter(' FROM ').substringBefore(' ').trim();
-		if (
-			(ids != null && ids.isEmpty()) ||
-			!NamespaceUtil.globalDescribe().containsKey(objectName.toLowerCase())
-		) {
+		if ((ids != null && ids.isEmpty()) || !NamespaceUtil.globalDescribe().containsKey(objectName.toLowerCase())) {
 			return new List<SObject>();
 		}
 		try {
 			// Every name is Nonprofit Cloud's own, fixed here; the only value is a bind.
-			return Database.queryWithBinds(
-				query,
-				new Map<String, Object>{ 'ids' => ids },
-				AccessLevel.USER_MODE
-			);
+			return Database.queryWithBinds(query, new Map<String, Object>{ 'ids' => ids }, AccessLevel.USER_MODE);
 		} catch (QueryException unreadable) {
 			ErrorLogger.log(unreadable, 'Nonprofit Cloud Gifts kit');
 			return new List<SObject>();

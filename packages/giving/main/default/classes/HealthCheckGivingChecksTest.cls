@@ -10,10 +10,7 @@ private class HealthCheckGivingChecksTest {
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	@TestSetup
@@ -22,11 +19,7 @@ private class HealthCheckGivingChecksTest {
 		TestUsers.adminWithInstalledModules();
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			List<Gift__c> gifts = GivingTestDataFactory.buildGifts(ana.Id, 3, 100);
 			for (Integer i = 0; i < gifts.size(); i++) {
 				gifts[i].Gift_Date__c = Date.today().toStartOfMonth().addDays(-1 - i);
@@ -62,8 +55,7 @@ private class HealthCheckGivingChecksTest {
 				System.assertEquals(
 					0,
 					findings.size(),
-					'With no period closed, nothing in the org is locked yet, so there is nothing ' +
-					'to report.'
+					'With no period closed, nothing in the org is locked yet, so there is nothing ' + 'to report.'
 				);
 			}
 
@@ -118,8 +110,7 @@ private class HealthCheckGivingChecksTest {
 				System.assertEquals(
 					0,
 					findings.size(),
-					'Every gift in the closed period is already posted, so there is nothing to ' +
-					'flag.'
+					'Every gift in the closed period is already posted, so there is nothing to ' + 'flag.'
 				);
 			}
 
@@ -135,11 +126,7 @@ private class HealthCheckGivingChecksTest {
 			System.runAs(jen) {
 				List<HealthCheckService.Finding> findings = HealthCheckGivingChecks.findings();
 
-				System.assertEquals(
-					1,
-					findings.size(),
-					'One finding for the three unposted gifts.'
-				);
+				System.assertEquals(1, findings.size(), 'One finding for the three unposted gifts.');
 				Map<String, Object> finding = asMap(findings[0]);
 				System.assertEquals('unposted_gifts_closed_period', finding.get('key'));
 				System.assertEquals(HealthCheckService.SEVERITY_WARNING, finding.get('severity'));
@@ -166,11 +153,7 @@ private class HealthCheckGivingChecksTest {
 	static void capExceededReportsMoreThan() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			quietReceiptChecks();
-			Contact ben = GivingTestDataFactory.insertHouseholdContact(
-				'The Okafor Family',
-				'Ben',
-				'Okafor'
-			);
+			Contact ben = GivingTestDataFactory.insertHouseholdContact('The Okafor Family', 'Ben', 'Okafor');
 			List<Gift__c> more = GivingTestDataFactory.buildGifts(ben.Id, 4, 50);
 			for (Integer i = 0; i < more.size(); i++) {
 				more[i].Gift_Date__c = lastClosedDay().addDays(-10 - i);
@@ -189,8 +172,7 @@ private class HealthCheckGivingChecksTest {
 				String title = (String) finding.get('title');
 				System.assert(
 					title.contains('More than 2'),
-					'The count stops at the cap of 2 and says so rather than counting every row: ' +
-					title
+					'The count stops at the cap of 2 and says so rather than counting every row: ' + title
 				);
 				System.assertEquals(
 					5,
@@ -211,11 +193,7 @@ private class HealthCheckGivingChecksTest {
 		ReceiptGenerationFailureSelector.resultOverride = receipts(true, 0);
 	}
 
-	private static CustomPermissionSelector.Holders holders(
-		Boolean readable,
-		Integer total,
-		List<String> names
-	) {
+	private static CustomPermissionSelector.Holders holders(Boolean readable, Integer total, List<String> names) {
 		CustomPermissionSelector.Holders result = new CustomPermissionSelector.Holders();
 		result.readable = readable;
 		result.total = total;
@@ -223,20 +201,14 @@ private class HealthCheckGivingChecksTest {
 		return result;
 	}
 
-	private static ReceiptGenerationFailureSelector.Result receipts(
-		Boolean available,
-		Integer count
-	) {
+	private static ReceiptGenerationFailureSelector.Result receipts(Boolean available, Integer count) {
 		ReceiptGenerationFailureSelector.Result result = new ReceiptGenerationFailureSelector.Result();
 		result.available = available;
 		result.count = count;
 		return result;
 	}
 
-	private static Map<String, Object> findByKey(
-		List<HealthCheckService.Finding> findings,
-		String key
-	) {
+	private static Map<String, Object> findByKey(List<HealthCheckService.Finding> findings, String key) {
 		for (HealthCheckService.Finding finding : findings) {
 			Map<String, Object> fields = asMap(finding);
 			if (fields.get('key') == key) {
@@ -261,10 +233,7 @@ private class HealthCheckGivingChecksTest {
 				new Fund__c(Name = 'Quiet', Active__c = true, Gift_Count__c = 3)
 			};
 			System.runAs(jen()) {
-				Map<String, Object> finding = findByKey(
-					HealthCheckGivingChecks.findings(),
-					'gift_lookup_skew'
-				);
+				Map<String, Object> finding = findByKey(HealthCheckGivingChecks.findings(), 'gift_lookup_skew');
 
 				Assert.isNotNull(finding, 'The busy fund is reported');
 				List<Object> links = (List<Object>) finding.get('links');
@@ -276,17 +245,10 @@ private class HealthCheckGivingChecksTest {
 	@IsTest
 	static void someoneHoldingTheReceiptLockOverrideIsNamed() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			HealthCheckGivingChecks.holdersOverride = holders(
-				true,
-				1,
-				new List<String>{ 'Dana Ellery' }
-			);
+			HealthCheckGivingChecks.holdersOverride = holders(true, 1, new List<String>{ 'Dana Ellery' });
 			User jen = jen();
 			System.runAs(jen) {
-				Map<String, Object> finding = findByKey(
-					HealthCheckGivingChecks.findings(),
-					'override_receipt_lock'
-				);
+				Map<String, Object> finding = findByKey(HealthCheckGivingChecks.findings(), 'override_receipt_lock');
 
 				System.assertNotEquals(null, finding, 'ADR-0024: a standing override is reported.');
 				System.assert(
@@ -315,10 +277,7 @@ private class HealthCheckGivingChecksTest {
 			);
 			User jen = jen();
 			System.runAs(jen) {
-				String detail = (String) findByKey(
-						HealthCheckGivingChecks.findings(),
-						'override_receipt_lock'
-					)
+				String detail = (String) findByKey(HealthCheckGivingChecks.findings(), 'override_receipt_lock')
 					.get('detail');
 
 				System.assert(detail.contains('Cara Nkemdi'), 'The named holders are in the line.');
@@ -353,11 +312,7 @@ private class HealthCheckGivingChecksTest {
 	@IsTest
 	static void theOverrideIsNotAskedOfSomeoneWhoCannotSeeOtherPeople() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			HealthCheckGivingChecks.holdersOverride = holders(
-				true,
-				1,
-				new List<String>{ 'Dana Ellery' }
-			);
+			HealthCheckGivingChecks.holdersOverride = holders(true, 1, new List<String>{ 'Dana Ellery' });
 			User david = david();
 			System.runAs(david) {
 				System.assertEquals(
@@ -381,11 +336,7 @@ private class HealthCheckGivingChecksTest {
 					'receipt_generation_failed_once'
 				);
 
-				System.assertNotEquals(
-					null,
-					finding,
-					'R-RC3: the reconciliation record is reported.'
-				);
+				System.assertNotEquals(null, finding, 'R-RC3: the reconciliation record is reported.');
 				System.assertEquals(HealthCheckService.SEVERITY_INFO, finding.get('severity'));
 				System.assertEquals(HealthCheckService.CATEGORY_SETTINGS, finding.get('category'));
 				System.assertEquals(ErrorLogCountSelector.listViewUrl(), finding.get('fixTarget'));
@@ -409,10 +360,7 @@ private class HealthCheckGivingChecksTest {
 					'Receipt generation is asked of every viewer, as it was in Core.'
 				);
 				System.assertEquals(HealthCheckService.SEVERITY_WARNING, finding.get('severity'));
-				System.assert(
-					((String) finding.get('title')).contains('9'),
-					'The title says how many.'
-				);
+				System.assert(((String) finding.get('title')).contains('9'), 'The title says how many.');
 				System.assertEquals(
 					null,
 					findByKey(findings, 'receipt_generation_failed_once'),
@@ -563,10 +511,7 @@ private class HealthCheckGivingChecksTest {
 			donationAppeal('Working coats', restored);
 			donationAppeal('Not a form', 'not-an-id');
 
-			Map<String, Object> finding = findByKey(
-				HealthCheckGivingChecks.findings(),
-				'donation_form_no_amount'
-			);
+			Map<String, Object> finding = findByKey(HealthCheckGivingChecks.findings(), 'donation_form_no_amount');
 
 			System.assertNotEquals(null, finding, 'R-AP5: a page with no amount cannot check out.');
 			System.assertEquals(HealthCheckService.SEVERITY_WARNING, finding.get('severity'));
@@ -630,21 +575,9 @@ private class HealthCheckGivingChecksTest {
 		System.assertEquals(false, HealthCheckGivingChecks.asksAmount(' '), 'Blank');
 		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{not json'), 'Unreadable');
 		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{}'), 'No steps');
-		System.assertEquals(
-			false,
-			HealthCheckGivingChecks.asksAmount('{"steps":"x"}'),
-			'Odd steps'
-		);
-		System.assertEquals(
-			false,
-			HealthCheckGivingChecks.asksAmount('{"steps":["x"]}'),
-			'Odd step'
-		);
-		System.assertEquals(
-			false,
-			HealthCheckGivingChecks.asksAmount('{"steps":[{}]}'),
-			'No fields'
-		);
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{"steps":"x"}'), 'Odd steps');
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{"steps":["x"]}'), 'Odd step');
+		System.assertEquals(false, HealthCheckGivingChecks.asksAmount('{"steps":[{}]}'), 'No fields');
 		System.assertEquals(
 			false,
 			HealthCheckGivingChecks.asksAmount('{"steps":[{"fields":["amount"]}]}'),

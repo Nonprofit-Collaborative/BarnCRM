@@ -32,10 +32,7 @@ public with sharing class EligibilityRules {
 		'isNotBlank'
 	};
 	private static final Set<String> LIST_OPERATORS = new Set<String>{ 'in', 'notIn' };
-	private static final Set<String> NO_VALUE_OPERATORS = new Set<String>{
-		'isBlank',
-		'isNotBlank'
-	};
+	private static final Set<String> NO_VALUE_OPERATORS = new Set<String>{ 'isBlank', 'isNotBlank' };
 	public static final Integer MAX_RULES = 50;
 	public static final Integer MAX_CONDITIONS = 10;
 	public static final Integer MAX_REASON = 255;
@@ -88,29 +85,20 @@ public with sharing class EligibilityRules {
 			String position = String.valueOf(i + 1);
 			if (!(rules[i] instanceof Map<String, Object>)) {
 				problems.add(
-					String.format(
-						BarnHelp.text('Programs', 'Programs_Elig_BadRule'),
-						new List<String>{ position }
-					)
+					String.format(BarnHelp.text('Programs', 'Programs_Elig_BadRule'), new List<String>{ position })
 				);
 				continue;
 			}
 			Map<String, Object> rule = (Map<String, Object>) rules[i];
 			if (!RESULTS.contains(text(rule, 'result'))) {
 				problems.add(
-					String.format(
-						BarnHelp.text('Programs', 'Programs_Elig_BadResult'),
-						new List<String>{ position }
-					)
+					String.format(BarnHelp.text('Programs', 'Programs_Elig_BadResult'), new List<String>{ position })
 				);
 			}
 			String reason = text(rule, 'reason');
 			if (String.isBlank(reason) || reason.length() > MAX_REASON) {
 				problems.add(
-					String.format(
-						BarnHelp.text('Programs', 'Programs_Elig_BadReason'),
-						new List<String>{ position }
-					)
+					String.format(BarnHelp.text('Programs', 'Programs_Elig_BadReason'), new List<String>{ position })
 				);
 			}
 			List<Object> conditions = itemsOf(rule, 'all');
@@ -185,10 +173,7 @@ public with sharing class EligibilityRules {
 		}
 		Map<String, Object> condition = (Map<String, Object>) item;
 		String field = text(condition, 'field');
-		if (
-			String.isBlank(field) ||
-			(allowedFields != null && !allowedFields.contains(field.toLowerCase()))
-		) {
+		if (String.isBlank(field) || (allowedFields != null && !allowedFields.contains(field.toLowerCase()))) {
 			return BarnHelp.text('Programs', 'Programs_Elig_BadField');
 		}
 		String operator = text(condition, 'operator');
@@ -247,9 +232,7 @@ public with sharing class EligibilityRules {
 		}
 		return operator == 'greaterThan'
 			? order > 0
-			: operator == 'greaterOrEqual'
-					? order >= 0
-					: operator == 'lessThan' ? order < 0 : order <= 0;
+			: operator == 'greaterOrEqual' ? order >= 0 : operator == 'lessThan' ? order < 0 : order <= 0;
 	}
 
 	/** A value as trimmed text; empty for null. Booleans read as true and false. */

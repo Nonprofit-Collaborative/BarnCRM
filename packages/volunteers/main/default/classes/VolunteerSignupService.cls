@@ -40,11 +40,7 @@ public with sharing class VolunteerSignupService {
 
 		Set<String> taken = new Set<String>();
 		for (
-			Volunteer_Signup__c existing : VolunteerIntegritySelector.selectSignupsFor(
-				shiftIds,
-				contactIds,
-				accountIds
-			)
+			Volunteer_Signup__c existing : VolunteerIntegritySelector.selectSignupsFor(shiftIds, contactIds, accountIds)
 		) {
 			if (!checkedIds.contains(existing.Id)) {
 				taken.add(keyOf(existing));
@@ -62,9 +58,7 @@ public with sharing class VolunteerSignupService {
 					shifts = VolunteerShiftSelector.selectByIds(shiftIds);
 				}
 				Volunteer_Shift__c shift = shifts.get(signup.Volunteer_Shift__c);
-				String shiftName = shift == null
-					? String.valueOf(signup.Volunteer_Shift__c)
-					: shift.Name;
+				String shiftName = shift == null ? String.valueOf(signup.Volunteer_Shift__c) : shift.Name;
 				signup.addError(
 					String.format(
 						BarnHelp.text('Volunteers', 'Volunteers_Signup_AlreadySignedUp'),
@@ -93,13 +87,9 @@ public with sharing class VolunteerSignupService {
 	) {
 		List<Volunteer_Signup__c> attended = new List<Volunteer_Signup__c>();
 		for (Volunteer_Signup__c signup : signups) {
-			Volunteer_Signup__c previous = previousById == null
-				? null
-				: previousById.get(signup.Id);
+			Volunteer_Signup__c previous = previousById == null ? null : previousById.get(signup.Id);
 			Boolean becameAttended =
-				signup.Status__c == STATUS_ATTENDED &&
-				(previous == null ||
-				previous.Status__c != STATUS_ATTENDED);
+				signup.Status__c == STATUS_ATTENDED && (previous == null || previous.Status__c != STATUS_ATTENDED);
 			if (becameAttended && personOf(signup) != null) {
 				attended.add(signup);
 			}
@@ -178,18 +168,14 @@ public with sharing class VolunteerSignupService {
 			return;
 		}
 		Map<Id, Integer> entriesBySignup = new Map<Id, Integer>();
-		for (
-			Volunteer_Hours__c live : VolunteerIntegritySelector.selectHoursNamingSignups(signupIds)
-		) {
+		for (Volunteer_Hours__c live : VolunteerIntegritySelector.selectHoursNamingSignups(signupIds)) {
 			Integer seen = entriesBySignup.get(live.Volunteer_Signup__c);
 			entriesBySignup.put(live.Volunteer_Signup__c, seen == null ? 1 : seen + 1);
 		}
 		for (Volunteer_Hours__c entry : restored) {
 			Integer named = entriesBySignup.get(entry.Volunteer_Signup__c);
 			if (named != null && named > 1) {
-				entry.addError(
-					BarnHelp.text('Volunteers', 'Volunteers_Hours_SecondEntryForSignup')
-				);
+				entry.addError(BarnHelp.text('Volunteers', 'Volunteers_Hours_SecondEntryForSignup'));
 			}
 		}
 	}

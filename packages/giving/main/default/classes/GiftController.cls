@@ -42,15 +42,11 @@ public with sharing class GiftController {
 	public static GiftSummary getGiftSummary(Id giftId) {
 		try {
 			if (giftId == null) {
-				throw new GiftService.GiftServiceException(
-					BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound')
-				);
+				throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'));
 			}
 			List<Gift__c> gifts = GiftSelector.selectWithAllocations(new Set<Id>{ giftId });
 			if (gifts.isEmpty()) {
-				throw new GiftService.GiftServiceException(
-					BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound')
-				);
+				throw new GiftService.GiftServiceException(BarnHelp.text('Giving', 'Giving_Gift_OriginalNotFound'));
 			}
 			GiftSummary summary = new GiftSummary(gifts[0]);
 			summary.canRefund = canRefund();
@@ -69,8 +65,7 @@ public with sharing class GiftController {
 	 * after a refused insert.
 	 */
 	private static Boolean canRefund() {
-		return Schema.SObjectType.Gift__c.isCreateable() &&
-			Schema.SObjectType.Gift_Allocation__c.isCreateable();
+		return Schema.SObjectType.Gift__c.isCreateable() && Schema.SObjectType.Gift_Allocation__c.isCreateable();
 	}
 
 	private static void requireRefundAccess() {
@@ -80,10 +75,7 @@ public with sharing class GiftController {
 	}
 
 	private static AuraHandledException asUserError(Exception cause) {
-		return UserErrors.wrapShowingDml(
-			cause,
-			BarnHelp.text('Giving', 'Giving_Gift_UnexpectedError')
-		);
+		return UserErrors.wrapShowingDml(cause, BarnHelp.text('Giving', 'Giving_Gift_UnexpectedError'));
 	}
 
 	/**
@@ -115,15 +107,9 @@ public with sharing class GiftController {
 			for (Gift_Allocation__c allocation : this.allocations) {
 				this.allocatedAmount += allocation.Amount__c == null ? 0 : allocation.Amount__c;
 			}
-			this.remainingAmount = source.Amount__c == null
-				? 0
-				: GiftService.remainingAmount(source);
-			this.reversedAmount =
-				(source.Amount__c == null ? 0 : source.Amount__c) - this.remainingAmount;
-			this.fullyReversed =
-				source.Amount__c != null &&
-				source.Amount__c > 0 &&
-				this.remainingAmount <= 0;
+			this.remainingAmount = source.Amount__c == null ? 0 : GiftService.remainingAmount(source);
+			this.reversedAmount = (source.Amount__c == null ? 0 : source.Amount__c) - this.remainingAmount;
+			this.fullyReversed = source.Amount__c != null && source.Amount__c > 0 && this.remainingAmount <= 0;
 		}
 	}
 }

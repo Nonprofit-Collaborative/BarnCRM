@@ -69,15 +69,9 @@ private class AddressDeleteHandlerTest {
 	@IsTest
 	static void aPersonsAddressGoesWithThemButAMergeKeepsIt() {
 		System.runAs(TestUsers.admin()) {
-			Contact sam = TestDataFactory.person(
-				new Contact(LastName = 'Rivera', FirstName = 'Sam')
-			);
-			Contact samuel = TestDataFactory.person(
-				new Contact(LastName = 'Rivera', FirstName = 'Samuel')
-			);
-			Contact ana = TestDataFactory.person(
-				new Contact(LastName = 'Ortiz', FirstName = 'Ana')
-			);
+			Contact sam = TestDataFactory.person(new Contact(LastName = 'Rivera', FirstName = 'Sam'));
+			Contact samuel = TestDataFactory.person(new Contact(LastName = 'Rivera', FirstName = 'Samuel'));
+			Contact ana = TestDataFactory.person(new Contact(LastName = 'Ortiz', FirstName = 'Ana'));
 			Database.insert(new List<Contact>{ sam, samuel, ana }, AccessLevel.SYSTEM_MODE);
 			Address__c samuels = addressOf(Address__c.Contact__c, samuel.Id, '9 Oak Road');
 			Address__c anas = addressOf(Address__c.Contact__c, ana.Id, '3 Pine Court');
@@ -110,13 +104,7 @@ private class AddressDeleteHandlerTest {
 			Database.insert(funders, AccessLevel.SYSTEM_MODE);
 			List<Address__c> offices = new List<Address__c>();
 			for (Account funder : funders) {
-				offices.add(
-					new Address__c(
-						Account__c = funder.Id,
-						Street__c = '1 Main Street',
-						Is_Default__c = true
-					)
-				);
+				offices.add(new Address__c(Account__c = funder.Id, Street__c = '1 Main Street', Is_Default__c = true));
 			}
 			Database.insert(offices, AccessLevel.SYSTEM_MODE);
 

@@ -175,9 +175,7 @@ public with sharing class DonorLevelSelector {
 		List<String> ranges = new List<String>();
 		Map<String, Object> binds = new Map<String, Object>();
 		for (Integer i = 0; i + 1 < edges.size(); i += 2) {
-			ranges.add(
-				'(Last_Gift_Date__c >= :from' + i + ' AND Last_Gift_Date__c <= :to' + i + ')'
-			);
+			ranges.add('(Last_Gift_Date__c >= :from' + i + ' AND Last_Gift_Date__c <= :to' + i + ')');
 			binds.put('from' + i, edges[i]);
 			binds.put('to' + i, edges[i + 1]);
 		}

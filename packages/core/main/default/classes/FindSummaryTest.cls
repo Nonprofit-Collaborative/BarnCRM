@@ -28,9 +28,7 @@ private class FindSummaryTest {
 		for (Integer index = 0; index < 200; index++) {
 			jobs.add(
 				new Import_Batch__c(
-					Status__c = index < 150
-						? ImportBatchService.STATUS_COMPLETE
-						: ImportBatchService.STATUS_FAILED,
+					Status__c = index < 150 ? ImportBatchService.STATUS_COMPLETE : ImportBatchService.STATUS_FAILED,
 					Rows_Updated__c = index < 150 ? index + 1 : 10
 				)
 			);
@@ -64,9 +62,7 @@ private class FindSummaryTest {
 				templates.add(
 					new Import_Template__c(
 						Name = 'Template ' + index,
-						Last_Import_Date__c = index < 150
-							? Date.newInstance(2026, 1, 5)
-							: Date.newInstance(2026, 2, 1)
+						Last_Import_Date__c = index < 150 ? Date.newInstance(2026, 1, 5) : Date.newInstance(2026, 2, 1)
 					)
 				);
 			}
@@ -89,11 +85,7 @@ private class FindSummaryTest {
 			Test.stopTest();
 
 			Map<String, Object> byGroup = lineValues(result);
-			System.Assert.areEqual(
-				150,
-				byGroup.get('2026-01-05'),
-				'Grouped by ' + byGroup.keySet()
-			);
+			System.Assert.areEqual(150, byGroup.get('2026-01-05'), 'Grouped by ' + byGroup.keySet());
 			System.Assert.areEqual(50, byGroup.get('2026-02-01'), 'The second date');
 			System.Assert.areEqual(
 				'2026-01-05',
@@ -118,20 +110,14 @@ private class FindSummaryTest {
 			Test.stopTest();
 
 			Map<String, Object> byGroup = lineValues(result);
-			System.Assert.areEqual(
-				150,
-				byGroup.get(ImportBatchService.STATUS_COMPLETE),
-				'Complete'
-			);
+			System.Assert.areEqual(150, byGroup.get(ImportBatchService.STATUS_COMPLETE), 'Complete');
 			System.Assert.areEqual(50, byGroup.get(ImportBatchService.STATUS_FAILED), 'Failed');
 			System.Assert.isTrue(
 				result.soql.startsWith('SELECT Status__c grp, COUNT(Id) val FROM Import_Batch__c'),
 				'The SOQL shown: ' + result.soql
 			);
 			System.Assert.isTrue(
-				result.soql.endsWith(
-					'GROUP BY Status__c ORDER BY Status__c NULLS FIRST LIMIT 2000'
-				),
+				result.soql.endsWith('GROUP BY Status__c ORDER BY Status__c NULLS FIRST LIMIT 2000'),
 				'Grouped and ordered: ' + result.soql
 			);
 			System.Assert.isFalse(result.capped, 'Two groups are not capped');
@@ -184,23 +170,14 @@ private class FindSummaryTest {
 			String runLogLabel = Schema.SObjectType.Import_Batch__c.fields.Run_Log__c.getLabel();
 			expectRefusal(
 				new Map<String, Object>{ 'function' => 'sum', 'field' => 'Run_Log__c' },
-				String.format(
-					BarnHelp.text('Core', 'Core_Find_ErrorSummaryField'),
-					new List<Object>{ runLogLabel }
-				)
+				String.format(BarnHelp.text('Core', 'Core_Find_ErrorSummaryField'), new List<Object>{ runLogLabel })
 			);
 			expectRefusal(
 				new Map<String, Object>{ 'function' => 'count', 'groupBy' => 'Run_Log__c' },
-				String.format(
-					BarnHelp.text('Core', 'Core_Find_ErrorSummaryGroup'),
-					new List<Object>{ runLogLabel }
-				)
+				String.format(BarnHelp.text('Core', 'Core_Find_ErrorSummaryGroup'), new List<Object>{ runLogLabel })
 			);
 			expectRefusal(
-				new Map<String, Object>{
-					'function' => 'sum',
-					'field' => 'Rows_Updated__c; DELETE'
-				},
+				new Map<String, Object>{ 'function' => 'sum', 'field' => 'Rows_Updated__c; DELETE' },
 				String.format(
 					BarnHelp.text('Core', 'Core_Filter_ErrorUnknownField'),
 					new List<Object>{ 'Rows_Updated__c; DELETE' }
@@ -217,16 +194,11 @@ private class FindSummaryTest {
 			FindSummary.SummaryResult result;
 
 			System.runAs(maria) {
-				result = FindController.summarize(
-					query(new Map<String, Object>{ 'function' => 'count' })
-				);
+				result = FindController.summarize(query(new Map<String, Object>{ 'function' => 'count' }));
 			}
 
 			System.Assert.areEqual(1, result.lines.size(), 'One line');
-			System.Assert.isTrue(
-				Integer.valueOf(result.lines[0].value) <= 200,
-				'Counted with her own access'
-			);
+			System.Assert.isTrue(Integer.valueOf(result.lines[0].value) <= 200, 'Counted with her own access');
 		}
 	}
 }

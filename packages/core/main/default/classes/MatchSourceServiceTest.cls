@@ -27,10 +27,7 @@ private class MatchSourceServiceTest {
 			NamespaceUtil.qualify('Parent_Field__c') => parentField,
 			NamespaceUtil.qualify('Normalization__c') => normalization
 		};
-		return (Match_Source__mdt) JSON.deserialize(
-			JSON.serialize(fields),
-			Match_Source__mdt.class
-		);
+		return (Match_Source__mdt) JSON.deserialize(JSON.serialize(fields), Match_Source__mdt.class);
 	}
 
 	@IsTest
@@ -82,10 +79,7 @@ private class MatchSourceServiceTest {
 			);
 			Assert.isNull(MatchSourceService.address('1 High Street', null), 'No postal code');
 			Assert.isNull(MatchSourceService.address(' , ', '02139'), 'No street');
-			Assert.isNull(
-				MatchSourceService.key('Fax', '1', null),
-				'An unknown normalization compares nothing'
-			);
+			Assert.isNull(MatchSourceService.key('Fax', '1', null), 'An unknown normalization compares nothing');
 		}
 	}
 
@@ -131,13 +125,7 @@ private class MatchSourceServiceTest {
 				names.add(source.developerName);
 			}
 			Assert.isTrue(
-				names.containsAll(
-					new Set<String>{
-						'Address_Person',
-						'Address_Household',
-						'Address_Person_Account'
-					}
-				),
+				names.containsAll(new Set<String>{ 'Address_Person', 'Address_Household', 'Address_Person_Account' }),
 				'Core\'s own address object is in every org: ' + names
 			);
 		}
@@ -149,14 +137,7 @@ private class MatchSourceServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(
 				JSON.serialize(
-					row(
-						'Address_Person',
-						'Address__c',
-						'Street__c',
-						'Postal_Code__c',
-						'Contact__c',
-						'Address'
-					)
+					row('Address_Person', 'Address__c', 'Street__c', 'Postal_Code__c', 'Contact__c', 'Address')
 				)
 			);
 			fields.put(NamespaceUtil.qualify('Is_Shipped__c'), true);
@@ -173,10 +154,7 @@ private class MatchSourceServiceTest {
 				'Address'
 			);
 			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{ shipped, own };
-			SettingsService.saveSystemValue(
-				'Match_Sources_Turned_Off__c',
-				'Address_Person,Address_Household'
-			);
+			SettingsService.saveSystemValue('Match_Sources_Turned_Off__c', 'Address_Person,Address_Household');
 
 			Test.startTest();
 			List<MatchSourceService.Source> sources = MatchSourceService.usableSources();
@@ -215,9 +193,7 @@ private class MatchSourceServiceTest {
 
 			Test.startTest();
 			List<MatchSourceService.Source> sources = MatchSourceService.usableSources();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ people[0].Id, people[1].Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ people[0].Id, people[1].Id });
 			Test.stopTest();
 
 			Set<String> names = new Set<String>();
@@ -260,40 +236,19 @@ private class MatchSourceServiceTest {
 	static void peopleSharingAnAddressHeldOnlyOnAddressRecordsArePaired() {
 		System.runAs(TestUsers.admin()) {
 			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-				row(
-					'Address_Person',
-					'Address__c',
-					'Street__c',
-					'Postal_Code__c',
-					'Contact__c',
-					'Address'
-				)
+				row('Address_Person', 'Address__c', 'Street__c', 'Postal_Code__c', 'Contact__c', 'Address')
 			};
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
 					TestDataFactory.person(new Contact(FirstName = 'Ana', LastName = 'Ruiz')),
-					TestDataFactory.person(
-						new Contact(FirstName = 'Anna', LastName = 'Ruiz-Lopez')
-					),
+					TestDataFactory.person(new Contact(FirstName = 'Anna', LastName = 'Ruiz-Lopez')),
 					TestDataFactory.person(new Contact(FirstName = 'Ben', LastName = 'Okafor'))
 				}
 			);
 			insert new List<Address__c>{
-				new Address__c(
-					Contact__c = people[0].Id,
-					Street__c = '12 North Main Street',
-					Postal_Code__c = '02139'
-				),
-				new Address__c(
-					Contact__c = people[1].Id,
-					Street__c = '12 n. MAIN st',
-					Postal_Code__c = '02139-4307'
-				),
-				new Address__c(
-					Contact__c = people[2].Id,
-					Street__c = '99 Elm Road',
-					Postal_Code__c = '02139'
-				)
+				new Address__c(Contact__c = people[0].Id, Street__c = '12 North Main Street', Postal_Code__c = '02139'),
+				new Address__c(Contact__c = people[1].Id, Street__c = '12 n. MAIN st', Postal_Code__c = '02139-4307'),
+				new Address__c(Contact__c = people[2].Id, Street__c = '99 Elm Road', Postal_Code__c = '02139')
 			};
 
 			Test.startTest();
@@ -324,18 +279,10 @@ private class MatchSourceServiceTest {
 				AddressTestDataFactory.newHousehold('Park Household')
 			};
 			insertAllowingDuplicates(homes);
-			List<String> phones = new List<String>{
-				'(555) 123-4567',
-				'+1 555.123.4567',
-				'555 999 0000'
-			};
+			List<String> phones = new List<String>{ '(555) 123-4567', '+1 555.123.4567', '555 999 0000' };
 			List<Contact> people = new List<Contact>();
 			for (Integer index = 0; index < homes.size(); index++) {
-				Contact person = AddressTestDataFactory.newContact(
-					'Sam',
-					'Member' + index,
-					homes[index].Id
-				);
+				Contact person = AddressTestDataFactory.newContact('Sam', 'Member' + index, homes[index].Id);
 				person.Phone = phones[index];
 				people.add(person);
 			}
@@ -376,9 +323,7 @@ private class MatchSourceServiceTest {
 			insertAllowingDuplicates(people);
 
 			Test.startTest();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ homes[0].Id, homes[1].Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ homes[0].Id, homes[1].Id });
 			Test.stopTest();
 
 			Assert.isTrue(pairs.isEmpty(), 'A shared mailbox pairs nobody: ' + pairs.size());
@@ -389,24 +334,13 @@ private class MatchSourceServiceTest {
 	static void aSourceThatCannotPointAtTheRecordsIsNotAsked() {
 		System.runAs(TestUsers.admin()) {
 			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-				row(
-					'Address_Household',
-					'Address__c',
-					'Street__c',
-					'Postal_Code__c',
-					'Account__c',
-					'Address'
-				)
+				row('Address_Household', 'Address__c', 'Street__c', 'Postal_Code__c', 'Account__c', 'Address')
 			};
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Ida', LastName = 'Nobody')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Ida', LastName = 'Nobody'));
 			insert person;
 
 			Test.startTest();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ person.Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ person.Id });
 			Integer queries = Limits.getQueries();
 			Test.stopTest();
 
@@ -451,14 +385,10 @@ private class MatchSourceServiceTest {
 				Assert.isNull(MatchSourceService.individualFieldOf(Contact.SObjectType));
 				return;
 			}
-			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-				emailByIndividual()
-			};
+			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{ emailByIndividual() };
 			List<Contact> people = new List<Contact>{
 				TestDataFactory.person(new Contact(LastName = 'Ivy', Email = 'ivy@example.org')),
-				TestDataFactory.person(
-					new Contact(LastName = 'Ivy-Lane', Email = 'IVY@example.org')
-				),
+				TestDataFactory.person(new Contact(LastName = 'Ivy-Lane', Email = 'IVY@example.org')),
 				TestDataFactory.person(new Contact(LastName = 'Other', Email = 'other@example.org'))
 			};
 			for (Integer index = 0; index < people.size(); index++) {
@@ -494,9 +424,7 @@ private class MatchSourceServiceTest {
 			if (ivys == null) {
 				return;
 			}
-			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-				emailByIndividual()
-			};
+			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{ emailByIndividual() };
 			List<Account> people = new List<Account>();
 			for (Integer index = 0; index < 2; index++) {
 				Account person = TestDataFactory.organization(
@@ -510,9 +438,7 @@ private class MatchSourceServiceTest {
 			insertAllowingDuplicates(people);
 
 			Test.startTest();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ people[0].Id, people[1].Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ people[0].Id, people[1].Id });
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -544,11 +470,7 @@ private class MatchSourceServiceTest {
 
 		Assert.areEqual('0%2%1%3%9%', numbered.get('Postal_Code__c'), 'By postal code');
 		Assert.areEqual('%12%', numbered.get('Street__c'), 'And the house number');
-		Assert.areEqual(
-			'%main%',
-			unnumbered.get('Street__c'),
-			'A word normalization shortened (n, st) is never used'
-		);
+		Assert.areEqual('%main%', unnumbered.get('Street__c'), 'A word normalization shortened (n, st) is never used');
 	}
 
 	@IsTest
@@ -570,11 +492,7 @@ private class MatchSourceServiceTest {
 
 			Test.startTest();
 			Integer before = Limits.getQueries();
-			Map<String, Set<Id>> found = MatchSourceService.ownersOf(
-				source,
-				Account.SObjectType,
-				keys
-			);
+			Map<String, Set<Id>> found = MatchSourceService.ownersOf(source, Account.SObjectType, keys);
 			Integer queries = Limits.getQueries() - before;
 			Test.stopTest();
 
@@ -591,14 +509,7 @@ private class MatchSourceServiceTest {
 	static void aLookupThatReachesItsCapIsCountedAndLoggedOnce() {
 		System.runAs(TestUsers.admin()) {
 			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-				row(
-					'Address_Person',
-					'Address__c',
-					'Street__c',
-					'Postal_Code__c',
-					'Contact__c',
-					'Address'
-				)
+				row('Address_Person', 'Address__c', 'Street__c', 'Postal_Code__c', 'Contact__c', 'Address')
 			};
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
@@ -607,16 +518,8 @@ private class MatchSourceServiceTest {
 				}
 			);
 			insert new List<Address__c>{
-				new Address__c(
-					Contact__c = people[0].Id,
-					Street__c = '3 Oak Lane',
-					Postal_Code__c = '30301'
-				),
-				new Address__c(
-					Contact__c = people[1].Id,
-					Street__c = '3 Oak Ln',
-					Postal_Code__c = '30301'
-				)
+				new Address__c(Contact__c = people[0].Id, Street__c = '3 Oak Lane', Postal_Code__c = '30301'),
+				new Address__c(Contact__c = people[1].Id, Street__c = '3 Oak Ln', Postal_Code__c = '30301')
 			};
 			MatchSourceSelector.maxRows = 1;
 
@@ -677,9 +580,7 @@ private class MatchSourceServiceTest {
 			MatchSourceSelector.maxRows = 5;
 
 			Test.startTest();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ homes[0].Id, homes[1].Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ homes[0].Id, homes[1].Id });
 			Test.stopTest();
 
 			Assert.isTrue(pairs.isEmpty(), 'A cut lookup pairs nobody: ' + pairs.size());
@@ -716,23 +617,17 @@ private class MatchSourceServiceTest {
 				row('Member_Email', 'Contact', 'Email', null, 'AccountId', 'Email')
 			};
 			List<Account> homes = householdsSharing('pair@example.org', 2);
-			Contact incoming = TestDataFactory.person(
-				new Contact(LastName = 'Desk', Email = 'pair@example.org')
-			);
+			Contact incoming = TestDataFactory.person(new Contact(LastName = 'Desk', Email = 'pair@example.org'));
 
 			Test.startTest();
 			// The message catalog is read once per transaction; count only the sources' queries.
 			BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject');
 			MatchSourceSelector.queryReserve = Limits.getLimitQueries();
 			Integer queriesBefore = Limits.getQueries();
-			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-				new List<Id>{ homes[0].Id, homes[1].Id }
-			);
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(new List<Id>{ homes[0].Id, homes[1].Id });
 			List<Set<Id>> found = MatchSourceService.holdersOfPeople(
 				Account.SObjectType,
-				new List<Map<String, String>>{
-					new Map<String, String>{ 'Email' => incoming.Email }
-				}
+				new List<Map<String, String>>{ new Map<String, String>{ 'Email' => incoming.Email } }
 			);
 			Integer queriesRun = Limits.getQueries() - queriesBefore;
 			Test.stopTest();

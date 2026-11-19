@@ -50,17 +50,9 @@ private class CorporateHubPortalExtensionTest {
 				Key__c = meeting.Id + ':' + ade.Id
 			);
 			insert as user attendee;
-			motion = new Board_Motion__c(
-				Meeting__c = meeting.Id,
-				Name = 'Budget',
-				Status__c = HubBoard.VOTING_OPEN
-			);
+			motion = new Board_Motion__c(Meeting__c = meeting.Id, Name = 'Budget', Status__c = HubBoard.VOTING_OPEN);
 			insert as user motion;
-			vote = new Board_Vote__c(
-				Motion__c = motion.Id,
-				Person__c = ade.Id,
-				Key__c = motion.Id + ':' + ade.Id
-			);
+			vote = new Board_Vote__c(Motion__c = motion.Id, Person__c = ade.Id, Key__c = motion.Id + ':' + ade.Id);
 			insert as user vote;
 			Hub_Document__c policy = new Hub_Document__c(
 				Name = 'Conflict of Interest',
@@ -81,10 +73,7 @@ private class CorporateHubPortalExtensionTest {
 		// The portal's integration user holds no Corporate Hub access and no Manage permission.
 		User integration = TestUsers.minimumAccessUserWith('Integration', new List<String>());
 		System.runAs(integration) {
-			Assert.isTrue(
-				portal().actionNames().contains(CorporateHubPortalExtension.ACKNOWLEDGE),
-				'Offered'
-			);
+			Assert.isTrue(portal().actionNames().contains(CorporateHubPortalExtension.ACKNOWLEDGE), 'Offered');
 			portal().run(CorporateHubPortalExtension.PACKET, ade.Id, attendee.Id);
 			String closed = portal().run(CorporateHubPortalExtension.MINUTES, ade.Id, attendee.Id);
 			Assert.areEqual(
@@ -94,10 +83,7 @@ private class CorporateHubPortalExtensionTest {
 			);
 		}
 		System.runAs(staff()) {
-			update as user new Board_Meeting__c(
-				Id = meeting.Id,
-				Minutes_Status__c = HubBoard.MINUTES_SUBMITTED
-			);
+			update as user new Board_Meeting__c(Id = meeting.Id, Minutes_Status__c = HubBoard.MINUTES_SUBMITTED);
 		}
 		System.runAs(integration) {
 			portal().run(CorporateHubPortalExtension.MINUTES, ade.Id, attendee.Id);

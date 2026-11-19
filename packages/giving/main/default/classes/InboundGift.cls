@@ -34,10 +34,7 @@ global with sharing class InboundGift {
 	)
 	global String paymentMethod;
 
-	@InvocableVariable(
-		label='Gift Date'
-		description='Optional. The day the money arrived. Today when left empty.'
-	)
+	@InvocableVariable(label='Gift Date' description='Optional. The day the money arrived. Today when left empty.')
 	global Date giftDate;
 
 	@InvocableVariable(
@@ -70,10 +67,7 @@ global with sharing class InboundGift {
 	)
 	global String fundId;
 
-	@InvocableVariable(
-		label='Appeal Id'
-		description='Optional. The record id of the appeal the gift responds to.'
-	)
+	@InvocableVariable(label='Appeal Id' description='Optional. The record id of the appeal the gift responds to.')
 	global String appealId;
 
 	/** Flow, the REST endpoint and subscriber Apex each build a gift field by field. */

@@ -99,10 +99,7 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
 			}
 			if (restart.contains(schedule.Id)) {
 				schedule.Created_Through__c = null;
-			} else if (
-				keepThrough.get(schedule.Id) != null &&
-				schedule.Created_Through__c > schedule.End_Date__c
-			) {
+			} else if (keepThrough.get(schedule.Id) != null && schedule.Created_Through__c > schedule.End_Date__c) {
 				// The days after the new end are gone, so a later End Date creates them again.
 				schedule.Created_Through__c = schedule.End_Date__c;
 			}
@@ -129,17 +126,12 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
 			if (schedule.Active__c != true) {
 				continue;
 			}
-			if (
-				old.Active__c != true ||
-				patternChanged(schedule, old) ||
-				schedule.End_Date__c != old.End_Date__c
-			) {
+			if (old.Active__c != true || patternChanged(schedule, old) || schedule.End_Date__c != old.End_Date__c) {
 				toRun.add(schedule.Id);
 				continue;
 			}
 			if (horizon == null) {
-				horizon = ShiftScheduleService.today()
-					.addDays(7 * VolunteerSettings.shiftHorizonWeeks());
+				horizon = ShiftScheduleService.today().addDays(7 * VolunteerSettings.shiftHorizonWeeks());
 			}
 			if (isShortOfHorizon(schedule, horizon)) {
 				toRun.add(schedule.Id);
@@ -184,10 +176,7 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
 	 * passed. A schedule that starts after the horizon has nothing to fill yet.
 	 */
 	private static Boolean isShortOfHorizon(Shift_Schedule__c schedule, Date horizon) {
-		Date untilDay = schedule.End_Date__c == null ||
-			schedule.End_Date__c > horizon
-			? horizon
-			: schedule.End_Date__c;
+		Date untilDay = schedule.End_Date__c == null || schedule.End_Date__c > horizon ? horizon : schedule.End_Date__c;
 		if (untilDay < ShiftScheduleService.today()) {
 			return false;
 		}
@@ -198,8 +187,6 @@ public with sharing class ShiftScheduleTriggerHandler extends TriggerHandler {
 	}
 
 	private static Boolean endsEarlier(Shift_Schedule__c schedule, Shift_Schedule__c old) {
-		return schedule.End_Date__c != null &&
-			(old.End_Date__c == null ||
-			schedule.End_Date__c < old.End_Date__c);
+		return schedule.End_Date__c != null && (old.End_Date__c == null || schedule.End_Date__c < old.End_Date__c);
 	}
 }

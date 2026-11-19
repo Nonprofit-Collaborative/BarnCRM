@@ -35,11 +35,7 @@ public with sharing class StewardshipService {
 	 * (canonical model Section 26, ADR-0022). Held here so the first gift test and the totals a
 	 * donor sees agree about what a gift is.
 	 */
-	public static final Set<String> COUNTABLE_STATUSES = new Set<String>{
-		'Received',
-		'Refunded',
-		'Written off'
-	};
+	public static final Set<String> COUNTABLE_STATUSES = new Set<String>{ 'Received', 'Refunded', 'Written off' };
 
 	/**
 	 * Starts every plan the given gifts call for.
@@ -83,9 +79,7 @@ public with sharing class StewardshipService {
 		Map<String, Integer> priorGifts = needsFirstGiftTest(templates)
 			? StewardshipSelector.countCountableGifts(donorIds, giftIds)
 			: new Map<String, Integer>();
-		Set<String> alreadyRunning = runningKeys(
-			StewardshipSelector.selectRunningPlansFor(contactIds, accountIds)
-		);
+		Set<String> alreadyRunning = runningKeys(StewardshipSelector.selectRunningPlansFor(contactIds, accountIds));
 
 		List<Stewardship_Plan__c> toStart = new List<Stewardship_Plan__c>();
 		List<Stewardship_Plan_Template__c> usedTemplates = new List<Stewardship_Plan_Template__c>();
@@ -93,9 +87,7 @@ public with sharing class StewardshipService {
 			if (!COUNTABLE_STATUSES.contains(gift.Status__c)) {
 				continue;
 			}
-			Id donorId = gift.Donor_Contact__c == null
-				? gift.Donor_Account__c
-				: gift.Donor_Contact__c;
+			Id donorId = gift.Donor_Contact__c == null ? gift.Donor_Account__c : gift.Donor_Contact__c;
 			if (donorId == null) {
 				continue;
 			}
@@ -109,9 +101,7 @@ public with sharing class StewardshipService {
 					continue;
 				}
 				alreadyRunning.add(key);
-				toStart.add(
-					plan(template.Id, gift.Donor_Contact__c, gift.Donor_Account__c, gift.Id)
-				);
+				toStart.add(plan(template.Id, gift.Donor_Contact__c, gift.Donor_Account__c, gift.Id));
 				usedTemplates.add(template);
 			}
 		}
@@ -152,9 +142,7 @@ public with sharing class StewardshipService {
 		if (contactIds.isEmpty() && accountIds.isEmpty()) {
 			return;
 		}
-		Set<String> alreadyRunning = runningKeys(
-			StewardshipSelector.selectRunningPlansFor(contactIds, accountIds)
-		);
+		Set<String> alreadyRunning = runningKeys(StewardshipSelector.selectRunningPlansFor(contactIds, accountIds));
 
 		List<Stewardship_Plan__c> toStart = new List<Stewardship_Plan__c>();
 		List<Stewardship_Plan_Template__c> usedTemplates = new List<Stewardship_Plan_Template__c>();
@@ -192,22 +180,14 @@ public with sharing class StewardshipService {
 	 */
 	public static Stewardship_Plan__c start(Id templateId, Id contactId, Id accountId) {
 		if (templateId == null) {
-			throw new StewardshipException(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNoTemplate')
-			);
+			throw new StewardshipException(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNoTemplate'));
 		}
 		if ((contactId == null) == (accountId == null)) {
-			throw new StewardshipException(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorOneDonor')
-			);
+			throw new StewardshipException(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorOneDonor'));
 		}
-		List<Stewardship_Plan_Template__c> found = StewardshipSelector.selectTemplateById(
-			templateId
-		);
+		List<Stewardship_Plan_Template__c> found = StewardshipSelector.selectTemplateById(templateId);
 		if (found.isEmpty() || found[0].Active__c != true) {
-			throw new StewardshipException(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNoTemplate')
-			);
+			throw new StewardshipException(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorNoTemplate'));
 		}
 		Id donorId = contactId == null ? accountId : contactId;
 		Set<String> running = runningKeys(
@@ -217,9 +197,7 @@ public with sharing class StewardshipService {
 			)
 		);
 		if (running.contains(runningKey(templateId, donorId))) {
-			throw new StewardshipException(
-				BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning')
-			);
+			throw new StewardshipException(BarnHelp.text('Giving', 'Giving_Stewardship_ErrorAlreadyRunning'));
 		}
 		Stewardship_Plan__c started = plan(templateId, contactId, accountId, null);
 		StewardshipWriter.startPlans(
@@ -239,13 +217,9 @@ public with sharing class StewardshipService {
 		if (template == null || template.Steps__r == null || startedPlan == null) {
 			return tasks;
 		}
-		Date startedOn = startedPlan.Started_Date__c == null
-			? System.today()
-			: startedPlan.Started_Date__c;
+		Date startedOn = startedPlan.Started_Date__c == null ? System.today() : startedPlan.Started_Date__c;
 		for (Stewardship_Plan_Step__c step : template.Steps__r) {
-			Integer offset = step.Days_After_Start__c == null
-				? 0
-				: Integer.valueOf(step.Days_After_Start__c);
+			Integer offset = step.Days_After_Start__c == null ? 0 : Integer.valueOf(step.Days_After_Start__c);
 			tasks.add(
 				new Task(
 					Subject = step.Subject__c,
@@ -277,11 +251,7 @@ public with sharing class StewardshipService {
 	}
 
 	/** Whether a template's conditions are met by this gift. */
-	private static Boolean applies(
-		Stewardship_Plan_Template__c template,
-		Gift__c gift,
-		Boolean isFirstGift
-	) {
+	private static Boolean applies(Stewardship_Plan_Template__c template, Gift__c gift, Boolean isFirstGift) {
 		if (EVENT_FIRST_GIFT.equals(template.Trigger_Event__c) && isFirstGift != true) {
 			return false;
 		}

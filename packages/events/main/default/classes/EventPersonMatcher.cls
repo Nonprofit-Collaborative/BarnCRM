@@ -42,9 +42,7 @@ public with sharing class EventPersonMatcher {
 			return Id.valueOf(input.contactId);
 		}
 		if (String.isBlank(input.lastName)) {
-			throw new AmbiguousPersonException(
-				BarnHelp.text('Events', 'Events_Register_LastNameNeeded')
-			);
+			throw new AmbiguousPersonException(BarnHelp.text('Events', 'Events_Register_LastNameNeeded'));
 		}
 		Id found = householdId == null ? null : inHousehold(input, householdId);
 		if (found == null) {
@@ -63,9 +61,7 @@ public with sharing class EventPersonMatcher {
 
 	/** A household member of the same first and last name, ignoring case and spacing. */
 	private static Id inHousehold(PersonInput input, Id householdId) {
-		List<HouseholdService.Person> members = HouseholdService.getMembersAsUser(
-				new Set<Id>{ householdId }
-			)
+		List<HouseholdService.Person> members = HouseholdService.getMembersAsUser(new Set<Id>{ householdId })
 			.get(householdId);
 		if (members == null) {
 			return null;

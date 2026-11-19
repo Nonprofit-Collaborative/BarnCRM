@@ -47,11 +47,7 @@ private class EligibilityRulesTest {
 
 	@IsTest
 	static void eachKindOfProblemIsReported() {
-		Assert.areEqual(
-			1,
-			EligibilityRules.validate('not json', FIELDS).size(),
-			'Unreadable JSON.'
-		);
+		Assert.areEqual(1, EligibilityRules.validate('not json', FIELDS).size(), 'Unreadable JSON.');
 		Assert.areEqual(
 			1,
 			EligibilityRules.validate('{"defaultResult":"Maybe","rules":[]}', FIELDS).size(),
@@ -59,20 +55,14 @@ private class EligibilityRulesTest {
 		);
 		Assert.areEqual(
 			1,
-			EligibilityRules.validate(
-					rules('{"field":"Other__c","operator":"equals","value":"x"}', 'Eligible'),
-					FIELDS
-				)
+			EligibilityRules.validate(rules('{"field":"Other__c","operator":"equals","value":"x"}', 'Eligible'), FIELDS)
 				.size(),
 			'A field that is not offered.'
 		);
 		Assert.areEqual(
 			1,
 			EligibilityRules.validate(
-					rules(
-						'{"field":"Referral_Source__c","operator":"like","value":"x"}',
-						'Eligible'
-					),
+					rules('{"field":"Referral_Source__c","operator":"like","value":"x"}', 'Eligible'),
 					FIELDS
 				)
 				.size(),
@@ -80,10 +70,7 @@ private class EligibilityRulesTest {
 		);
 		Assert.areEqual(
 			1,
-			EligibilityRules.validate(
-					rules('{"field":"Referral_Source__c","operator":"equals"}', 'Eligible'),
-					FIELDS
-				)
+			EligibilityRules.validate(rules('{"field":"Referral_Source__c","operator":"equals"}', 'Eligible'), FIELDS)
 				.size(),
 			'A missing value.'
 		);
@@ -98,19 +85,13 @@ private class EligibilityRulesTest {
 		);
 		Assert.areEqual(
 			1,
-			EligibilityRules.validate(
-					rules('{"field":"Referral_Source__c","operator":"isBlank"}', 'Perhaps'),
-					FIELDS
-				)
+			EligibilityRules.validate(rules('{"field":"Referral_Source__c","operator":"isBlank"}', 'Perhaps'), FIELDS)
 				.size(),
 			'A result that is not offered.'
 		);
 		Assert.areEqual(
 			1,
-			EligibilityRules.validate(
-					'{"rules":[{"id":"r1","all":[],"result":"Eligible","reason":"x"}]}',
-					FIELDS
-				)
+			EligibilityRules.validate('{"rules":[{"id":"r1","all":[],"result":"Eligible","reason":"x"}]}', FIELDS)
 				.size(),
 			'A rule needs a condition.'
 		);
@@ -142,10 +123,7 @@ private class EligibilityRulesTest {
 			'Too many rules.'
 		);
 		Assert.isTrue(
-			EligibilityRules.validate(
-					rules('{"field":"Other__c","operator":"equals","value":"x"}', 'Eligible'),
-					null
-				)
+			EligibilityRules.validate(rules('{"field":"Other__c","operator":"equals","value":"x"}', 'Eligible'), null)
 				.isEmpty(),
 			'Without a field list the field is not checked.'
 		);
@@ -266,11 +244,7 @@ private class EligibilityRulesTest {
 		Assert.areEqual('a', first.ruleId, 'Its id.');
 		Assert.areEqual(
 			'Eligible',
-			EligibilityRules.evaluate(
-					json,
-					new Map<String, Object>{ 'Referral_Source__c' => 'School' }
-				)
-				.status,
+			EligibilityRules.evaluate(json, new Map<String, Object>{ 'Referral_Source__c' => 'School' }).status,
 			'The second applies when the first does not.'
 		);
 		EligibilityRules.Result none = EligibilityRules.evaluate(
@@ -285,10 +259,6 @@ private class EligibilityRulesTest {
 			new Map<String, Object>()
 		);
 		Assert.areEqual('Review', plain.status, 'Review when no default is given.');
-		Assert.areEqual(
-			BarnHelp.text('Programs', 'Programs_Elig_NoRuleMatched'),
-			plain.reason,
-			'The label says so.'
-		);
+		Assert.areEqual(BarnHelp.text('Programs', 'Programs_Elig_NoRuleMatched'), plain.reason, 'The label says so.');
 	}
 }

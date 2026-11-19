@@ -14,10 +14,7 @@ private class CaseNoteTest {
 		TestUsers.adminWith(ADMIN);
 		TestUsers.standardUserWith('Writer', STAFF);
 		TestUsers.standardUserWith('Colleague', STAFF);
-		TestUsers.standardUserWith(
-			'Reader',
-			new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' }
-		);
+		TestUsers.standardUserWith('Reader', new List<String>{ 'BarnCRM_Read_Only', 'Programs_Read_Only' });
 	}
 
 	private static User writer() {
@@ -30,9 +27,7 @@ private class CaseNoteTest {
 
 	/** A person enrolled in a program, created by the admin. */
 	private static Enrollment__c enrollment() {
-		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(
-			HouseholdTestDataFactory.MODE_CONTACT
-		);
+		BarnCRM_Settings__c settings = HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 		settings.Auto_Create_Households__c = false;
 		TestDataFactory.saveSettings(settings);
 		Contact person = HouseholdTestDataFactory.newContact('Pat', 'Rivera');
@@ -53,11 +48,7 @@ private class CaseNoteTest {
 	}
 
 	private static Case_Note__c note(Id enrollmentId, String subject) {
-		return new Case_Note__c(
-			Enrollment__c = enrollmentId,
-			Subject__c = subject,
-			Note__c = 'Text'
-		);
+		return new Case_Note__c(Enrollment__c = enrollmentId, Subject__c = subject, Note__c = 'Text');
 	}
 
 	@IsTest
@@ -127,8 +118,7 @@ private class CaseNoteTest {
 			insert new List<Case_Note__c>{ note(enrolled.Id, 'One'), note(enrolled.Id, 'Two') };
 
 			Test.startTest();
-			List<PersonErasure.Change> changes = new ProgramsErasureExtension()
-				.erase(enrolled.Contact__c);
+			List<PersonErasure.Change> changes = new ProgramsErasureExtension().erase(enrolled.Contact__c);
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Case_Note__c], 'The notes are gone.');
@@ -156,8 +146,7 @@ private class CaseNoteTest {
 			update new Contact(Id = enrolled.Contact__c, AccountId = personRecord.Id);
 
 			Test.startTest();
-			List<PersonErasure.Change> changes = new ProgramsErasureExtension()
-				.erase(personRecord.Id);
+			List<PersonErasure.Change> changes = new ProgramsErasureExtension().erase(personRecord.Id);
 			Test.stopTest();
 
 			Assert.areEqual(0, [SELECT COUNT() FROM Case_Note__c], 'The note is found and gone.');
@@ -188,11 +177,7 @@ private class CaseNoteTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(
-			BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'),
-			refusal,
-			'Refused, with why.'
-		);
+		Assert.areEqual(BarnHelp.text('Programs', 'Programs_Erase_NeedProgramsAdmin'), refusal, 'Refused, with why.');
 		Assert.areEqual(1, [SELECT COUNT() FROM Case_Note__c], 'Nothing was deleted.');
 	}
 

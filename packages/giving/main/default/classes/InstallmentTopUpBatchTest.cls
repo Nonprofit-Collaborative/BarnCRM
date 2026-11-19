@@ -12,9 +12,7 @@ private class InstallmentTopUpBatchTest {
 	@IsTest
 	static void extendsEveryActiveRecurringCommitmentNotJustTheOldest() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 			insert person;
 			List<Commitment__c> recurring = new List<Commitment__c>();
 			for (Integer index = 0; index < 60; index++) {
@@ -61,10 +59,7 @@ private class InstallmentTopUpBatchTest {
 				FROM Installment__c
 				GROUP BY Commitment__c
 			]) {
-				installmentsByCommitment.put(
-					(Id) row.get('commitment'),
-					(Integer) row.get('installments')
-				);
+				installmentsByCommitment.put((Id) row.get('commitment'), (Integer) row.get('installments'));
 			}
 			Assert.areEqual(
 				new Map<Id, Commitment__c>(recurring).keySet(),
@@ -72,11 +67,7 @@ private class InstallmentTopUpBatchTest {
 				'Every one of the sixty commitments was reached, across more chunks than one.'
 			);
 			for (Integer installments : installmentsByCommitment.values()) {
-				Assert.areEqual(
-					2,
-					installments,
-					'Each was extended to the horizon: its start date and a year on.'
-				);
+				Assert.areEqual(2, installments, 'Each was extended to the horizon: its start date and a year on.');
 			}
 			Assert.areNotEqual(
 				null,
@@ -89,9 +80,7 @@ private class InstallmentTopUpBatchTest {
 	@IsTest
 	static void leavesAPausedCommitmentAlone() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact person = TestDataFactory.person(
-				new Contact(FirstName = 'Sarah', LastName = 'Nguyen')
-			);
+			Contact person = TestDataFactory.person(new Contact(FirstName = 'Sarah', LastName = 'Nguyen'));
 			insert person;
 			Commitment__c paused = new Commitment__c(
 				Type__c = 'Recurring',

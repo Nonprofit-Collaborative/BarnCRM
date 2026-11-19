@@ -48,12 +48,7 @@ private class RollupRegressionHouseholdsTest {
 	}
 
 	private static Soft_Credit__c solicitorCredit(Id giftId, Id contactId, Decimal amount) {
-		return new Soft_Credit__c(
-			Gift__c = giftId,
-			Contact__c = contactId,
-			Role__c = 'Solicitor',
-			Amount__c = amount
-		);
+		return new Soft_Credit__c(Gift__c = giftId, Contact__c = contactId, Role__c = 'Solicitor', Amount__c = amount);
 	}
 
 	// ------------------------------------------------------------------------- membership modes
@@ -80,11 +75,7 @@ private class RollupRegressionHouseholdsTest {
 			GivingTestDataFactory.assertRollupWrote(household.Total_Giving__c);
 			Assert.areEqual(120, household.Total_Giving__c, 'The household Ana is a member of');
 			Assert.areEqual(1, household.Gift_Count__c, 'One gift');
-			Assert.areEqual(
-				120,
-				GivingRollupTestData.person(ana.Id).Total_Giving__c,
-				'And Ana herself'
-			);
+			Assert.areEqual(120, GivingRollupTestData.person(ana.Id).Total_Giving__c, 'And Ana herself');
 		}
 	}
 
@@ -101,10 +92,7 @@ private class RollupRegressionHouseholdsTest {
 
 			Test.startTest();
 			GivingRollupTestData.recalculate(
-				new Set<String>{
-					GivingRollupTestData.HOUSEHOLD_TOTAL,
-					GivingRollupTestData.HOUSEHOLD_COUNT
-				}
+				new Set<String>{ GivingRollupTestData.HOUSEHOLD_TOTAL, GivingRollupTestData.HOUSEHOLD_COUNT }
 			);
 			Test.stopTest();
 
@@ -124,11 +112,7 @@ private class RollupRegressionHouseholdsTest {
 	@IsTest
 	static void aSoftCreditLandsOnTheHouseholdInContactMode() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			Gift__c gift = giftFromWei(500);
 			insert solicitorCredit(gift.Id, ana.Id, 500);
 			GivingRollupTestData.installShippedRollups();
@@ -138,17 +122,9 @@ private class RollupRegressionHouseholdsTest {
 			Test.stopTest();
 
 			Account household = GivingRollupTestData.account(ana.AccountId);
-			Assert.areEqual(
-				500,
-				household.Total_Soft_Credits__c,
-				'Ana\'s credit, on her household'
-			);
+			Assert.areEqual(500, household.Total_Soft_Credits__c, 'Ana\'s credit, on her household');
 			Assert.areEqual(1, household.Soft_Credit_Count__c, 'One gift recognized');
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(household.Total_Giving__c),
-				'Recognition is never giving'
-			);
+			Assert.areEqual(0, GivingRollupTestData.valueOf(household.Total_Giving__c), 'Recognition is never giving');
 		}
 	}
 
@@ -173,11 +149,7 @@ private class RollupRegressionHouseholdsTest {
 			Test.stopTest();
 
 			Account household = GivingRollupTestData.account(garcia.Id);
-			Assert.areEqual(
-				500,
-				household.Total_Soft_Credits__c,
-				'Ana\'s credit, on her household'
-			);
+			Assert.areEqual(500, household.Total_Soft_Credits__c, 'Ana\'s credit, on her household');
 			Assert.areEqual(1, household.Soft_Credit_Count__c, 'One gift recognized');
 		}
 	}
@@ -192,11 +164,7 @@ private class RollupRegressionHouseholdsTest {
 	static void aRefundedCreditNetsOutOfTheHouseholdTotal() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			RecognitionTestData.setAutomaticHouseholdCredits(true);
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			insert TestDataFactory.person(
 				new Contact(FirstName = 'Luis', LastName = 'Nolan', AccountId = ana.AccountId)
 			);
@@ -210,11 +178,7 @@ private class RollupRegressionHouseholdsTest {
 			Test.stopTest();
 
 			Account household = GivingRollupTestData.account(ana.AccountId);
-			Assert.areEqual(
-				300,
-				household.Total_Soft_Credits__c,
-				'Luis is recognized for what is held'
-			);
+			Assert.areEqual(300, household.Total_Soft_Credits__c, 'Luis is recognized for what is held');
 			Assert.areEqual(1, household.Soft_Credit_Count__c, 'Still one gift recognized');
 		}
 	}
@@ -226,11 +190,7 @@ private class RollupRegressionHouseholdsTest {
 	@IsTest
 	static void aSavedSoftCreditUpdatesTheHousehold() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 			GivingRollupTestData.installShippedRollups();
 
 			Test.startTest();
@@ -254,16 +214,8 @@ private class RollupRegressionHouseholdsTest {
 	@IsTest
 	static void aPersonWhoMovesTakesTheirSoftCreditsWithThem() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Contact ana = GivingTestDataFactory.insertHouseholdContact(
-				'The Nolan Family',
-				'Ana',
-				'Nolan'
-			);
-			Contact bea = GivingTestDataFactory.insertHouseholdContact(
-				'The Lindqvist Family',
-				'Bea',
-				'Lindqvist'
-			);
+			Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+			Contact bea = GivingTestDataFactory.insertHouseholdContact('The Lindqvist Family', 'Bea', 'Lindqvist');
 			GivingRollupTestData.installShippedRollups();
 
 			Test.startTest();
@@ -276,9 +228,7 @@ private class RollupRegressionHouseholdsTest {
 
 			Assert.areEqual(
 				0,
-				GivingRollupTestData.valueOf(
-					GivingRollupTestData.account(ana.AccountId).Total_Soft_Credits__c
-				),
+				GivingRollupTestData.valueOf(GivingRollupTestData.account(ana.AccountId).Total_Soft_Credits__c),
 				'The household Ana left'
 			);
 			Assert.areEqual(
@@ -320,11 +270,7 @@ private class RollupRegressionHouseholdsTest {
 
 			Account left = GivingRollupTestData.account(garcia.Id);
 			Account joined = GivingRollupTestData.account(lee.Id);
-			Assert.areEqual(
-				0,
-				GivingRollupTestData.valueOf(left.Total_Soft_Credits__c),
-				'The credit left Garcia'
-			);
+			Assert.areEqual(0, GivingRollupTestData.valueOf(left.Total_Soft_Credits__c), 'The credit left Garcia');
 			Assert.areEqual(500, joined.Total_Soft_Credits__c, 'And joined Lee');
 			Assert.areEqual(100, left.Total_Giving__c, 'Ana\'s gift stays with Garcia (R-G2)');
 			Assert.areEqual(500, joined.Total_Giving__c, 'Lee has only Wei\'s gift');

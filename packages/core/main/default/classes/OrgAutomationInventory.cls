@@ -69,9 +69,7 @@ public with sharing class OrgAutomationInventory {
 	private static final Pattern CHECKS_CONTROL = Pattern.compile(
 		'(?i)(TriggerDispatcher\\s*\\.\\s*run\\s*\\(|CheckAutomationAction|AutomationControl\\s*\\.|BarnCRM_Automation_Control__c)'
 	);
-	private static final Pattern DISPATCHED = Pattern.compile(
-		'TriggerDispatcher\\s*\\.\\s*run\\s*\\('
-	);
+	private static final Pattern DISPATCHED = Pattern.compile('TriggerDispatcher\\s*\\.\\s*run\\s*\\(');
 
 	/** A flow's trigger type, in words. */
 	private static final Map<String, String> FLOW_TRIGGERS = new Map<String, String>{
@@ -81,11 +79,7 @@ public with sharing class OrgAutomationInventory {
 		'Scheduled' => 'Scheduled',
 		'PlatformEvent' => 'Platform event'
 	};
-	private static final Set<String> PROCESS_TYPES = new Set<String>{
-		'Workflow',
-		'InvocableProcess',
-		'CustomEvent'
-	};
+	private static final Set<String> PROCESS_TYPES = new Set<String>{ 'Workflow', 'InvocableProcess', 'CustomEvent' };
 
 	/** One automation. Plain values, so the page and a CSV read it as JSON. */
 	public class Row {
@@ -182,9 +176,7 @@ public with sharing class OrgAutomationInventory {
 	public static Result build() {
 		Result result = new Result();
 		result.fieldPrefix = NamespaceUtil.prefix();
-		result.classPrefix = String.isBlank(result.fieldPrefix)
-			? ''
-			: result.fieldPrefix.removeEnd('__') + '.';
+		result.classPrefix = String.isBlank(result.fieldPrefix) ? '' : result.fieldPrefix.removeEnd('__') + '.';
 		try {
 			fail('Switches');
 			addSwitches(result);
@@ -207,10 +199,7 @@ public with sharing class OrgAutomationInventory {
 			result.truncated = read.size() > MAX_ROWS;
 			for (Integer i = 0; i < Math.min(read.size(), MAX_ROWS); i++) {
 				SObject flow = read[i];
-				if (
-					flow.get('TriggerType') != null ||
-					PROCESS_TYPES.contains((String) flow.get('ProcessType'))
-				) {
+				if (flow.get('TriggerType') != null || PROCESS_TYPES.contains((String) flow.get('ProcessType'))) {
 					flows.add(flow);
 				}
 			}
@@ -297,10 +286,7 @@ public with sharing class OrgAutomationInventory {
 			row.covered = found.covered.contains(rule.recordId) || found.covered.contains(rule.name)
 				? COVERED_YES
 				: COVERED_NO;
-			row.canDeactivate =
-				rule.kind == KIND_VALIDATION &&
-				row.owner == OWNER_ORG &&
-				rule.active == true;
+			row.canDeactivate = rule.kind == KIND_VALIDATION && row.owner == OWNER_ORG && rule.active == true;
 			result.rows.add(row);
 		}
 	}
@@ -343,15 +329,11 @@ public with sharing class OrgAutomationInventory {
 		row.status = flow.get('IsActive') == true ? STATUS_ACTIVE : STATUS_INACTIVE;
 		setObject(row, (String) flow.get('TriggerObjectOrEventId'));
 		String triggerType = (String) flow.get('TriggerType');
-		row.detail = FLOW_TRIGGERS.containsKey(triggerType)
-			? FLOW_TRIGGERS.get(triggerType)
-			: triggerType;
+		row.detail = FLOW_TRIGGERS.containsKey(triggerType) ? FLOW_TRIGGERS.get(triggerType) : triggerType;
 		row.owner = ownerOf((String) flow.get('NamespacePrefix'), BARN_FLOWS.contains(row.apiName));
 		// BarnCRM's templates start with the Check BarnCRM Automation action; an org's own flow
 		// is known to only once the org connection's scan has read what refers to the action.
-		row.covered = row.owner == OWNER_BARN
-			? COVERED_YES
-			: (row.owner == OWNER_ORG ? COVERED_UNKNOWN : COVERED_NO);
+		row.covered = row.owner == OWNER_BARN ? COVERED_YES : (row.owner == OWNER_ORG ? COVERED_UNKNOWN : COVERED_NO);
 		row.canDeactivate = row.owner == OWNER_ORG && row.status == STATUS_ACTIVE;
 		return row;
 	}
@@ -367,13 +349,8 @@ public with sharing class OrgAutomationInventory {
 		setObject(row, (String) each.get('TableEnumOrId'));
 		String body = (String) each.get('Body');
 		Boolean dispatched = body != null && DISPATCHED.matcher(body).find();
-		row.owner = ownerOf(
-			(String) each.get('NamespacePrefix'),
-			dispatched || BARN_EVENT_TRIGGERS.contains(row.name)
-		);
-		row.covered = body != null && CHECKS_CONTROL.matcher(body).find()
-			? COVERED_YES
-			: COVERED_NO;
+		row.owner = ownerOf((String) each.get('NamespacePrefix'), dispatched || BARN_EVENT_TRIGGERS.contains(row.name));
+		row.covered = body != null && CHECKS_CONTROL.matcher(body).find() ? COVERED_YES : COVERED_NO;
 		if (BARN_EVENT_TRIGGERS.contains(row.name) && row.owner == OWNER_BARN) {
 			row.covered = COVERED_NO;
 		}
@@ -390,11 +367,7 @@ public with sharing class OrgAutomationInventory {
 			}
 		) {
 			if (each.get(field) == true) {
-				events.add(
-					field.substringAfter('Usage')
-						.replaceAll('([a-z])([A-Z])', '$1 $2')
-						.toLowerCase()
-				);
+				events.add(field.substringAfter('Usage').replaceAll('([a-z])([A-Z])', '$1 $2').toLowerCase());
 			}
 		}
 		row.detail = String.join(events, ', ');
@@ -412,9 +385,7 @@ public with sharing class OrgAutomationInventory {
 
 	/** Sets the object's API name and label from a name, or a custom object's Id. */
 	public static void setObject(Row row, String nameOrId) {
-		row.objectName = namesByEntityId.containsKey(nameOrId)
-			? namesByEntityId.get(nameOrId)
-			: nameOrId;
+		row.objectName = namesByEntityId.containsKey(nameOrId) ? namesByEntityId.get(nameOrId) : nameOrId;
 		row.objectLabel = objectLabel(row.objectName);
 	}
 
@@ -422,12 +393,7 @@ public with sharing class OrgAutomationInventory {
 	public static void readEntityNames(Set<String> namesOrIds) {
 		Set<String> ids = new Set<String>();
 		for (String each : namesOrIds) {
-			if (
-				each != null &&
-				each.startsWith('01I') &&
-				(each.length() == 15 ||
-				each.length() == 18)
-			) {
+			if (each != null && each.startsWith('01I') && (each.length() == 15 || each.length() == 18)) {
 				ids.add(each);
 				ids.add(String.valueOf(Id.valueOf(each)));
 			}
@@ -460,13 +426,10 @@ public with sharing class OrgAutomationInventory {
 			return apiName;
 		}
 		if (!labelsByObject.containsKey(apiName)) {
-			Schema.SObjectType objectType = NamespaceUtil.globalDescribe()
-				.get(apiName.toLowerCase());
+			Schema.SObjectType objectType = NamespaceUtil.globalDescribe().get(apiName.toLowerCase());
 			labelsByObject.put(
 				apiName,
-				objectType == null
-					? apiName
-					: objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
+				objectType == null ? apiName : objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
 			);
 		}
 		return labelsByObject.get(apiName);

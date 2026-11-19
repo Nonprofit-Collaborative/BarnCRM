@@ -24,11 +24,7 @@ public class PortalTestData {
 						'fields' => new List<Object>{
 							new Map<String, Object>{ 'field' => 'FirstName' },
 							new Map<String, Object>{ 'field' => 'LastName' },
-							new Map<String, Object>{
-								'field' => 'MobilePhone',
-								'label' => 'Mobile',
-								'edit' => true
-							},
+							new Map<String, Object>{ 'field' => 'MobilePhone', 'label' => 'Mobile', 'edit' => true },
 							new Map<String, Object>{ 'field' => 'Description', 'edit' => true }
 						},
 						'actions' => new List<Object>{ 'update' }
@@ -40,31 +36,17 @@ public class PortalTestData {
 						'object' => 'Affiliation__c',
 						'personField' => 'Contact__c',
 						'fields' => new List<Object>{
-							new Map<String, Object>{
-								'field' => 'Organization__r.Name',
-								'label' => 'Organization'
-							},
-							new Map<String, Object>{
-								'field' => 'Role__c',
-								'edit' => true,
-								'required' => true
-							},
+							new Map<String, Object>{ 'field' => 'Organization__r.Name', 'label' => 'Organization' },
+							new Map<String, Object>{ 'field' => 'Role__c', 'edit' => true, 'required' => true },
 							new Map<String, Object>{ 'field' => 'Status__c' }
 						},
 						'where' => new List<Object>{
-							new Map<String, Object>{
-								'field' => 'Status__c',
-								'op' => 'equals',
-								'value' => 'Current'
-							}
+							new Map<String, Object>{ 'field' => 'Status__c', 'op' => 'equals', 'value' => 'Current' }
 						},
 						'orderBy' => 'Role__c ASC',
 						'actions' => new List<Object>{
 							'update',
-							new Map<String, Object>{
-								'extension' => 'Test.Thanks',
-								'label' => 'Say Thanks'
-							}
+							new Map<String, Object>{ 'extension' => 'Test.Thanks', 'label' => 'Say Thanks' }
 						}
 					}
 				}
@@ -134,11 +116,7 @@ public class PortalTestData {
 				new Map<String, Object>{ 'field' => 'Organization__r.Name' }
 			},
 			'where' => new List<Object>{
-				new Map<String, Object>{
-					'field' => 'Status__c',
-					'op' => 'equals',
-					'value' => 'Current'
-				}
+				new Map<String, Object>{ 'field' => 'Status__c', 'op' => 'equals', 'value' => 'Current' }
 			},
 			'calendar' => new Map<String, Object>{
 				'title' => 'Role__c',
@@ -158,11 +136,7 @@ public class PortalTestData {
 			'personField' => 'Contact__c',
 			'valueField' => valueField,
 			'where' => new List<Object>{
-				new Map<String, Object>{
-					'field' => 'Status__c',
-					'op' => 'equals',
-					'value' => 'Current'
-				}
+				new Map<String, Object>{ 'field' => 'Status__c', 'op' => 'equals', 'value' => 'Current' }
 			}
 		};
 	}

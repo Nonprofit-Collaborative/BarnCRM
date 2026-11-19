@@ -49,10 +49,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
 			(List<Household_Member__c>) newRecords(),
 			(Map<Id, Household_Member__c>) oldRecordsById()
 		);
-		refuseSecondPrimary(
-			(List<Household_Member__c>) newRecords(),
-			(Map<Id, Household_Member__c>) oldRecordsById()
-		);
+		refuseSecondPrimary((List<Household_Member__c>) newRecords(), (Map<Id, Household_Member__c>) oldRecordsById());
 	}
 
 	/**
@@ -74,11 +71,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
 		}
 		Household_Member__c record = records[0];
 		Date today = OrgDate.today();
-		if (
-			record.Is_Primary__c != true ||
-			record.Household__c == null ||
-			!isCurrent(record, today)
-		) {
+		if (record.Is_Primary__c != true || record.Household__c == null || !isCurrent(record, today)) {
 			return;
 		}
 		Household_Member__c previous = previousById == null ? null : previousById.get(record.Id);
@@ -90,24 +83,16 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
 		if (!becomesPrimary) {
 			return;
 		}
-		for (
-			Household_Member__c existing : HouseholdSelector.getMemberships(
-				new Set<Id>{ record.Household__c }
-			)
-		) {
+		for (Household_Member__c existing : HouseholdSelector.getMemberships(new Set<Id>{ record.Household__c })) {
 			if (existing.Is_Primary__c == true && existing.Id != record.Id) {
-				record.Is_Primary__c.addError(
-					BarnHelp.text('Core', 'Core_Households_ErrorSecondPrimary')
-				);
+				record.Is_Primary__c.addError(BarnHelp.text('Core', 'Core_Households_ErrorSecondPrimary'));
 				return;
 			}
 		}
 	}
 
 	private static Boolean isLoad() {
-		Quiddity current = quiddityOverride != null
-			? quiddityOverride
-			: Request.getCurrent().getQuiddity();
+		Quiddity current = quiddityOverride != null ? quiddityOverride : Request.getCurrent().getQuiddity();
 		return LOAD_QUIDDITIES.contains(current);
 	}
 
@@ -162,9 +147,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
 			if (personId == null || record.Household__c == null || !isCurrent(record, today)) {
 				continue;
 			}
-			Household_Member__c previous = previousById == null
-				? null
-				: previousById.get(record.Id);
+			Household_Member__c previous = previousById == null ? null : previousById.get(record.Id);
 			Boolean becomesCurrentMembership =
 				previous == null ||
 				personOf(previous) != personId ||
@@ -180,10 +163,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
 		}
 		Set<String> taken = new Set<String>();
 		for (Household_Member__c existing : HouseholdSelector.getMembershipsForPeople(personIds)) {
-			if (
-				existing.Household__c != null &&
-				(previousById == null || !previousById.containsKey(existing.Id))
-			) {
+			if (existing.Household__c != null && (previousById == null || !previousById.containsKey(existing.Id))) {
 				taken.add(existing.Household__c + ':' + personOf(existing));
 			}
 		}
@@ -191,11 +171,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
 			// The other rows in this same save count as they will be after it, not as they were.
 			Set<Id> checkedIds = new Map<Id, Household_Member__c>(checked).keySet();
 			for (Household_Member__c record : records) {
-				if (
-					!checkedIds.contains(record.Id) &&
-					personOf(record) != null &&
-					isCurrent(record, today)
-				) {
+				if (!checkedIds.contains(record.Id) && personOf(record) != null && isCurrent(record, today)) {
 					taken.add(record.Household__c + ':' + personOf(record));
 				}
 			}

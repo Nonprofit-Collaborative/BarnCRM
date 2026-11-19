@@ -28,9 +28,7 @@ public with sharing class QueryCompiler {
 	@NamespaceAccessible
 	public static final Integer EXPORT_PAGE_SIZE = 2000;
 	private static final Integer SUPPORTED_VERSION = 1;
-	private static final Pattern FIELD_PATH = Pattern.compile(
-		'^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
-	);
+	private static final Pattern FIELD_PATH = Pattern.compile('^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$');
 
 	/** The query document, read and checked. */
 	public class QueryDocument {
@@ -106,15 +104,11 @@ public with sharing class QueryCompiler {
 			throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorFieldCount'));
 		}
 		Object filter = raw.get('filter');
-		document.filter = filter == null
-			? null
-			: (filter instanceof String ? (String) filter : JSON.serialize(filter));
+		document.filter = filter == null ? null : (filter instanceof String ? (String) filter : JSON.serialize(filter));
 		if (raw.get('orderBy') instanceof List<Object>) {
 			List<Object> orderBy = (List<Object>) raw.get('orderBy');
 			if (orderBy.size() > 1) {
-				throw new QueryCompilerException(
-					BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
-				);
+				throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
 			}
 			if (!orderBy.isEmpty()) {
 				Map<String, Object> order = (Map<String, Object>) orderBy[0];
@@ -123,9 +117,7 @@ public with sharing class QueryCompiler {
 					? 'ASC'
 					: String.valueOf(order.get('direction')).toUpperCase();
 				if (direction != 'ASC' && direction != 'DESC') {
-					throw new QueryCompilerException(
-						BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
-					);
+					throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
 				}
 				document.orderDirection = direction;
 			}
@@ -143,17 +135,13 @@ public with sharing class QueryCompiler {
 		}
 		if (raw.get('aggregate') != null) {
 			if (!(raw.get('aggregate') instanceof Map<String, Object>)) {
-				throw new QueryCompilerException(
-					BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
-				);
+				throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
 			}
 			document.aggregate = (Map<String, Object>) raw.get('aggregate');
 		}
 		if (raw.get('radius') != null) {
 			if (!(raw.get('radius') instanceof Map<String, Object>)) {
-				throw new QueryCompilerException(
-					BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
-				);
+				throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
 			}
 			document.radius = (Map<String, Object>) raw.get('radius');
 		}
@@ -167,10 +155,7 @@ public with sharing class QueryCompiler {
 		Compiled compiled = selectAndWhere(document, null, null);
 		String order = '';
 		if (String.isNotBlank(document.orderField)) {
-			Schema.DescribeFieldResult sortField = resolve(
-				document.objectName,
-				document.orderField
-			);
+			Schema.DescribeFieldResult sortField = resolve(document.objectName, document.orderField);
 			if (!sortField.isSortable()) {
 				throw new QueryCompilerException(
 					String.format(
@@ -238,11 +223,7 @@ public with sharing class QueryCompiler {
 	 * records; the caller adds any order and row count. Territory Management's rules use it too.
 	 */
 	@NamespaceAccessible
-	public static Compiled compileSelection(
-		String queryJson,
-		Set<String> fieldNames,
-		Set<Id> onlyIds
-	) {
+	public static Compiled compileSelection(String queryJson, Set<String> fieldNames, Set<Id> onlyIds) {
 		QueryDocument document = parse(queryJson);
 		document.fields = new List<String>(fieldNames);
 		document.children.clear();
@@ -362,10 +343,7 @@ public with sharing class QueryCompiler {
 		Set<String> radiusBinds = new Set<String>();
 		if (document.radius != null) {
 			try {
-				FindRelatedRecords.Rendered near = FindRadius.condition(
-					objectName,
-					document.radius
-				);
+				FindRelatedRecords.Rendered near = FindRadius.condition(objectName, document.radius);
 				whereParts.add(near.clause);
 				shownParts.add(near.display);
 				binds.putAll(near.binds);
@@ -401,18 +379,14 @@ public with sharing class QueryCompiler {
 			compiled.fromWhereWithoutRadius =
 				' FROM ' +
 				objectName +
-				(partsWithoutRadius.isEmpty()
-					? ''
-					: ' WHERE ' + String.join(partsWithoutRadius, ' AND '));
+				(partsWithoutRadius.isEmpty() ? '' : ' WHERE ' + String.join(partsWithoutRadius, ' AND '));
 		}
 		compiled.fromWhere =
 			' FROM ' +
 			objectName +
 			(whereParts.isEmpty() ? '' : ' WHERE ' + String.join(whereParts, ' AND '));
-		compiled.soql =
-			selectFrom + (whereParts.isEmpty() ? '' : ' WHERE ' + String.join(whereParts, ' AND '));
-		compiled.display =
-			selectFrom + (shownParts.isEmpty() ? '' : ' WHERE ' + String.join(shownParts, ' AND '));
+		compiled.soql = selectFrom + (whereParts.isEmpty() ? '' : ' WHERE ' + String.join(whereParts, ' AND '));
+		compiled.display = selectFrom + (shownParts.isEmpty() ? '' : ' WHERE ' + String.join(shownParts, ' AND '));
 		return compiled;
 	}
 

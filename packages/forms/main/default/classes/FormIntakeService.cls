@@ -113,11 +113,7 @@ public without sharing class FormIntakeService {
 		Id given = idOrNull(idPart(recordId));
 		String claim = claimPart(recordId);
 		Boolean signed = false;
-		if (
-			given != null &&
-			String.isNotBlank(claim) &&
-			FormAttachmentExtensions.signedClaimRequired(given)
-		) {
+		if (given != null && String.isNotBlank(claim) && FormAttachmentExtensions.signedClaimRequired(given)) {
 			Id attached = FormAttachmentExtensions.formFor(given);
 			signed = attached != null && claim.equals(claimFor(attached, given));
 		}
@@ -255,11 +251,7 @@ public without sharing class FormIntakeService {
 	 * decision 3). The payment is kept in the answers under `_payment`. A failure stores nothing
 	 * and answers Failed, so the person can send again. False when the answers must not be stored.
 	 */
-	private static Boolean startCheckout(
-		Id contextId,
-		Map<String, Object> counted,
-		Receipt receipt
-	) {
+	private static Boolean startCheckout(Id contextId, Map<String, Object> counted, Receipt receipt) {
 		if (contextId == null) {
 			return true;
 		}
@@ -347,11 +339,7 @@ public without sharing class FormIntakeService {
 			Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
 			mail.setToAddresses(new List<String>{ address });
 			mail.setSubject(
-				BarnHelp.text(
-					'Forms',
-					'Forms_Resume_EmailSubject',
-					new List<Object>{ version.Form__r.Name }
-				)
+				BarnHelp.text('Forms', 'Forms_Resume_EmailSubject', new List<Object>{ version.Form__r.Name })
 			);
 			mail.setPlainTextBody(
 				BarnHelp.text(
@@ -374,10 +362,7 @@ public without sharing class FormIntakeService {
 	}
 
 	/** The answers that count, without file answers: files are chosen again on resuming. */
-	private static Map<String, Object> withoutFiles(
-		Map<String, Object> definition,
-		Map<String, Object> answers
-	) {
+	private static Map<String, Object> withoutFiles(Map<String, Object> definition, Map<String, Object> answers) {
 		Map<String, Object> counted = FormRules.countedAnswers(
 			definition,
 			answers == null ? new Map<String, Object>() : answers
@@ -404,12 +389,7 @@ public without sharing class FormIntakeService {
 		Long issued = parts[1].isNumeric() ? Long.valueOf(parts[1]) : -1;
 		Long age = now() - issued;
 		// equals, not ==: Apex compares text with == ignoring case, and a signature must match exactly.
-		if (
-			!ticketFor(version, issued).equals(ticket) ||
-			issued < 0 ||
-			age < 0 ||
-			age > TICKET_LIFE_MS
-		) {
+		if (!ticketFor(version, issued).equals(ticket) || issued < 0 || age < 0 || age > TICKET_LIFE_MS) {
 			receipt.status = EXPIRED;
 			return null;
 		}
@@ -433,11 +413,7 @@ public without sharing class FormIntakeService {
 	 * and in user mode (decision 2). A guest's waits for `FormPublicProcessor`.
 	 */
 	private static void processNowIfSignedIn(Id submissionId) {
-		if (
-			actAsGuest ||
-			UserInfo.getUserType() == 'Guest' ||
-			!Schema.SObjectType.Form_Submission__c.isUpdateable()
-		) {
+		if (actAsGuest || UserInfo.getUserType() == 'Guest' || !Schema.SObjectType.Form_Submission__c.isUpdateable()) {
 			return;
 		}
 		try {
@@ -451,10 +427,7 @@ public without sharing class FormIntakeService {
 	/** Gives a newly published version its signing key (decision 5). */
 	public static void giveKey(Id versionId) {
 		Database.update(
-			new Form_Version__c(
-				Id = versionId,
-				Signing_Key__c = EncodingUtil.convertToHex(Crypto.generateAesKey(256))
-			),
+			new Form_Version__c(Id = versionId, Signing_Key__c = EncodingUtil.convertToHex(Crypto.generateAesKey(256))),
 			AccessLevel.SYSTEM_MODE
 		);
 	}
@@ -516,14 +489,7 @@ public without sharing class FormIntakeService {
 
 	private static Form_Version__c latestPublicVersion(Id formId) {
 		List<Form_Version__c> versions = [
-			SELECT
-				Id,
-				Form__c,
-				Form__r.Name,
-				Form__r.Description__c,
-				Version__c,
-				Definition__c,
-				Signing_Key__c
+			SELECT Id, Form__c, Form__r.Name, Form__r.Description__c, Version__c, Definition__c, Signing_Key__c
 			FROM Form_Version__c
 			WHERE Form__c = :formId AND Form__r.Status__c = 'Published' AND Form__r.Public__c = TRUE
 			WITH SYSTEM_MODE
@@ -576,9 +542,7 @@ public without sharing class FormIntakeService {
 			WHERE Id = :given
 			WITH SYSTEM_MODE
 		];
-		return versions.isEmpty() || String.isBlank(versions[0].Signing_Key__c)
-			? null
-			: versions[0];
+		return versions.isEmpty() || String.isBlank(versions[0].Signing_Key__c) ? null : versions[0];
 	}
 
 	/** Public submissions and saved drafts in the last hour: both count toward the limit. */
@@ -603,20 +567,13 @@ public without sharing class FormIntakeService {
 	 * form, and 100 an hour for one form, or the form's hourly limit when that is lower. Links are
 	 * counted by their drafts, so a link already used to send the form no longer counts.
 	 */
-	private static Boolean tooManyLinks(
-		Form_Version__c version,
-		Map<String, Object> definition,
-		String addressKey
-	) {
+	private static Boolean tooManyLinks(Form_Version__c version, Map<String, Object> definition, String addressKey) {
 		Datetime hourAgo = Datetime.newInstance(now() - 60L * 60 * 1000);
 		Integer formCap = Math.min(FormPublicPolicy.hourlyLimit(definition), LINKS_PER_FORM_HOUR);
 		Integer toAddress = [
 			SELECT COUNT()
 			FROM Form_Draft__c
-			WHERE
-				Form__c = :version.Form__c
-				AND Address_Key__c = :addressKey
-				AND CreatedDate >= :hourAgo
+			WHERE Form__c = :version.Form__c AND Address_Key__c = :addressKey AND CreatedDate >= :hourAgo
 			WITH SYSTEM_MODE
 		];
 		if (toAddress >= LINKS_PER_ADDRESS_HOUR) {
@@ -690,9 +647,7 @@ public without sharing class FormIntakeService {
 			Blob.valueOf(signed),
 			EncodingUtil.convertFromHex(version.Signing_Key__c)
 		);
-		return signed +
-			':' +
-			EncodingUtil.base64Encode(mac).replace('+', '-').replace('/', '_').remove('=');
+		return signed + ':' + EncodingUtil.base64Encode(mac).replace('+', '-').replace('/', '_').remove('=');
 	}
 
 	private static Long now() {

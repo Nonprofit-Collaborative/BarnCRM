@@ -38,19 +38,9 @@ public with sharing class ReportingQueryService {
 		'max',
 		'countdistinct'
 	};
-	private static final Set<String> BUCKETS = new Set<String>{
-		'day',
-		'week',
-		'month',
-		'quarter',
-		'year'
-	};
+	private static final Set<String> BUCKETS = new Set<String>{ 'day', 'week', 'month', 'quarter', 'year' };
 	/** The standard objects a report may start from; every custom object the user reads too. */
-	private static final Set<String> STANDARD_OBJECTS = new Set<String>{
-		'Account',
-		'Contact',
-		'User'
-	};
+	private static final Set<String> STANDARD_OBJECTS = new Set<String>{ 'Account', 'Contact', 'User' };
 	private static final Set<Schema.DisplayType> NUMBERS = new Set<Schema.DisplayType>{
 		Schema.DisplayType.CURRENCY,
 		Schema.DisplayType.DOUBLE,
@@ -85,15 +75,10 @@ public with sharing class ReportingQueryService {
 		try {
 			List<Map<String, String>> options = new List<Map<String, String>>();
 			for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
-				Schema.DescribeSObjectResult described = type.getDescribe(
-					SObjectDescribeOptions.DEFERRED
-				);
+				Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
 				if (isReportable(described)) {
 					options.add(
-						new Map<String, String>{
-							'value' => described.getName(),
-							'label' => described.getLabel()
-						}
+						new Map<String, String>{ 'value' => described.getName(), 'label' => described.getLabel() }
 					);
 				}
 			}
@@ -147,10 +132,7 @@ public with sharing class ReportingQueryService {
 			if (request.measures.isEmpty()) {
 				QueryCompiler.Compiled compiled = QueryCompiler.compile(request.queryJson);
 				List<SObject> rows = QueryCompiler.run(compiled);
-				return new Map<String, Object>{
-					'rows' => rows,
-					'summaries' => summaries(request, rows)
-				};
+				return new Map<String, Object>{ 'rows' => rows, 'summaries' => summaries(request, rows) };
 			}
 			return grouped(request);
 		} catch (Exception e) {
@@ -178,12 +160,7 @@ public with sharing class ReportingQueryService {
 	 * and totals use, worked out here, at most 5,000 a call.
 	 */
 	@AuraEnabled
-	public static Map<String, Object> page(
-		String requestJson,
-		String afterId,
-		Integer pageSize,
-		Boolean forExport
-	) {
+	public static Map<String, Object> page(String requestJson, String afterId, Integer pageSize, Boolean forExport) {
 		try {
 			Request request = read(requestJson);
 			Boolean exporting = forExport == true;
@@ -191,9 +168,7 @@ public with sharing class ReportingQueryService {
 				throw invalid();
 			}
 			if (exporting && !canExport()) {
-				throw new ReportingException(
-					BarnHelp.text('Reporting', 'Reporting_Error_NoExport')
-				);
+				throw new ReportingException(BarnHelp.text('Reporting', 'Reporting_Error_NoExport'));
 			}
 			List<String> fields = exporting ? request.fields.values() : scanFields(request);
 			Integer most = exporting ? QueryCompiler.EXPORT_PAGE_SIZE : MAX_PAGE;
@@ -222,9 +197,7 @@ public with sharing class ReportingQueryService {
 			);
 			return new Map<String, Object>{
 				'rows' => rows,
-				'summaries' => exporting
-					? summaries(request, rows)
-					: new List<Map<String, Object>>(),
+				'summaries' => exporting ? summaries(request, rows) : new List<Map<String, Object>>(),
 				'lastId' => rows.isEmpty() ? null : rows[rows.size() - 1].Id,
 				'done' => rows.size() < size
 			};
@@ -258,8 +231,7 @@ public with sharing class ReportingQueryService {
 			if (
 				multiCurrency &&
 				fn != 'countdistinct' &&
-				QueryCompiler.resolve(request.objectName, path).getType() ==
-				Schema.DisplayType.CURRENCY
+				QueryCompiler.resolve(request.objectName, path).getType() == Schema.DisplayType.CURRENCY
 			) {
 				throw refusal(BarnHelp.text('Reporting', 'Reporting_Error_ScanCurrency'), path);
 			}
@@ -336,9 +308,7 @@ public with sharing class ReportingQueryService {
 			for (Integer m = 0; m < request.measures.size(); m++) {
 				values.add(row.get('m' + m));
 			}
-			groups.add(
-				new Map<String, Object>{ 'keys' => keys, 'labels' => labels, 'values' => values }
-			);
+			groups.add(new Map<String, Object>{ 'keys' => keys, 'labels' => labels, 'values' => values });
 		}
 		Boolean more = groups.size() > GROUP_LIMIT;
 		if (more) {
@@ -389,9 +359,7 @@ public with sharing class ReportingQueryService {
 				new List<String>{ lookupName + ' IN :reportParentIds' }
 			);
 			if (!fits(fromWhere, binds)) {
-				throw new ReportingException(
-					BarnHelp.text('Reporting', 'Reporting_Error_TooManyRelated')
-				);
+				throw new ReportingException(BarnHelp.text('Reporting', 'Reporting_Error_TooManyRelated'));
 			}
 			Map<String, Object> values = new Map<String, Object>();
 			for (
@@ -435,10 +403,7 @@ public with sharing class ReportingQueryService {
 	private static String measure(String objectName, Map<String, Object> spec) {
 		String fn = String.valueOf(spec.get('fn')).toLowerCase();
 		if (!FUNCTIONS.contains(fn)) {
-			throw refusal(
-				BarnHelp.text('Reporting', 'Reporting_Error_Function'),
-				fn.abbreviate(40)
-			);
+			throw refusal(BarnHelp.text('Reporting', 'Reporting_Error_Function'), fn.abbreviate(40));
 		}
 		if (fn == 'count') {
 			return 'COUNT(Id)';
@@ -457,22 +422,13 @@ public with sharing class ReportingQueryService {
 	}
 
 	/** The GROUP BY expressions of one grouping: a date in its bucket, anything else as it is. */
-	private static List<String> bucketed(
-		Schema.DescribeFieldResult field,
-		String path,
-		String bucket
-	) {
+	private static List<String> bucketed(Schema.DescribeFieldResult field, String path, String bucket) {
 		Schema.DisplayType type = field.getType();
 		String key = String.isBlank(bucket) ? 'day' : bucket.toLowerCase();
 		Boolean isDate = DATES.contains(type);
 		// A date and time field is never groupable as it is, but its date functions are.
-		Boolean groupable =
-			field.isGroupable() || (type == Schema.DisplayType.DATETIME && field.isFilterable());
-		if (
-			!groupable ||
-			(isDate && !BUCKETS.contains(key)) ||
-			(!isDate && String.isNotBlank(bucket))
-		) {
+		Boolean groupable = field.isGroupable() || (type == Schema.DisplayType.DATETIME && field.isFilterable());
+		if (!groupable || (isDate && !BUCKETS.contains(key)) || (!isDate && String.isNotBlank(bucket))) {
 			throw refusal(BarnHelp.text('Reporting', 'Reporting_Error_Group'), path);
 		}
 		if (!isDate) {
@@ -480,9 +436,7 @@ public with sharing class ReportingQueryService {
 		}
 		String local = type == Schema.DisplayType.DATETIME ? 'convertTimezone(' + path + ')' : path;
 		if (key == 'day') {
-			return new List<String>{
-				type == Schema.DisplayType.DATETIME ? 'DAY_ONLY(' + local + ')' : path
-			};
+			return new List<String>{ type == Schema.DisplayType.DATETIME ? 'DAY_ONLY(' + local + ')' : path };
 		}
 		List<String> parts = new List<String>{ 'CALENDAR_YEAR(' + local + ')' };
 		if (key == 'week') {
@@ -500,11 +454,7 @@ public with sharing class ReportingQueryService {
 	 * than an Id. The path is checked as the user like any other; null (the group shows its Id)
 	 * when it does not resolve, or its Name is not readable or cannot be grouped.
 	 */
-	private static String labelPath(
-		String objectName,
-		Schema.DescribeFieldResult field,
-		String path
-	) {
+	private static String labelPath(String objectName, Schema.DescribeFieldResult field, String path) {
 		if (
 			field.getType() != Schema.DisplayType.REFERENCE ||
 			field.getRelationshipName() == null ||
@@ -576,9 +526,7 @@ public with sharing class ReportingQueryService {
 
 	/** The describe of an object a report may read, or a refusal naming it. */
 	private static Schema.DescribeSObjectResult reportable(String objectName) {
-		Schema.DescribeSObjectResult described = String.isBlank(objectName)
-			? null
-			: NamespaceUtil.describe(objectName);
+		Schema.DescribeSObjectResult described = String.isBlank(objectName) ? null : NamespaceUtil.describe(objectName);
 		if (described == null || !isReportable(described)) {
 			throw refusal(
 				BarnHelp.text('Reporting', 'Reporting_Error_Object'),
@@ -601,9 +549,7 @@ public with sharing class ReportingQueryService {
 		if (conditions.isEmpty()) {
 			return fromWhere;
 		}
-		return fromWhere +
-			(fromWhere.contains(' WHERE ') ? ' AND ' : ' WHERE ') +
-			String.join(conditions, ' AND ');
+		return fromWhere + (fromWhere.contains(' WHERE ') ? ' AND ' : ' WHERE ') + String.join(conditions, ' AND ');
 	}
 
 	private static ReportingException refusal(String text, String detail) {

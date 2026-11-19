@@ -193,10 +193,7 @@ public with sharing class EventSponsorsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSponsors', eventId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Sponsors_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Sponsors_LoadFailed'));
 		}
 	}
 
@@ -234,11 +231,7 @@ public with sharing class EventSponsorsController {
 					.isEmpty()
 			) {
 				throw UserErrors.message(
-					BarnHelp.text(
-						'Events',
-						'Events_Sponsor_Duplicate',
-						new List<Object>{ accounts[0].Name }
-					)
+					BarnHelp.text('Events', 'Events_Sponsor_Duplicate', new List<Object>{ accounts[0].Name })
 				);
 			}
 			Event_Sponsor__c sponsor = new Event_Sponsor__c(
@@ -266,16 +259,10 @@ public with sharing class EventSponsorsController {
 			if (!levels.isEmpty()) {
 				List<Sponsor_Deliverable__c> checklist = new List<Sponsor_Deliverable__c>();
 				for (
-					SponsorDeliverableTemplate.Item item : SponsorDeliverableTemplate.parse(
-						levels[0].Deliverables__c
-					)
+					SponsorDeliverableTemplate.Item item : SponsorDeliverableTemplate.parse(levels[0].Deliverables__c)
 				) {
 					checklist.add(
-						new Sponsor_Deliverable__c(
-							Event_Sponsor__c = sponsor.Id,
-							Name = item.name,
-							Type__c = item.type
-						)
+						new Sponsor_Deliverable__c(Event_Sponsor__c = sponsor.Id, Name = item.name, Type__c = item.type)
 					);
 				}
 				if (!checklist.isEmpty()) {
@@ -306,9 +293,7 @@ public with sharing class EventSponsorsController {
 	@AuraEnabled
 	public static void addDeliverable(Id sponsorId, String name, String type) {
 		if (String.isBlank(name)) {
-			throw UserErrors.message(
-				BarnHelp.text('Events', 'Events_Sponsor_DeliverableNeedsName')
-			);
+			throw UserErrors.message(BarnHelp.text('Events', 'Events_Sponsor_DeliverableNeedsName'));
 		}
 		save(
 			new Sponsor_Deliverable__c(
@@ -426,10 +411,7 @@ public with sharing class EventSponsorsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getLeads', sponsorId);
-			throw UserErrors.wrapShowingDml(
-				e,
-				BarnHelp.text('Events', 'Events_Sponsors_LoadFailed')
-			);
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Sponsors_LoadFailed'));
 		}
 	}
 
@@ -467,10 +449,7 @@ public with sharing class EventSponsorsController {
 				'Deliverables_Total__c'
 			}
 		) {
-			result.fieldLabels.put(
-				name,
-				NamespaceUtil.field(sponsorFields, name).getDescribe().getLabel()
-			);
+			result.fieldLabels.put(name, NamespaceUtil.field(sponsorFields, name).getDescribe().getLabel());
 		}
 		Map<String, Schema.SObjectField> itemFields = Schema.SObjectType.Sponsor_Deliverable__c.fields.getMap();
 		for (String name : new List<String>{ 'Name', 'Type__c', 'Status__c', 'Due_Date__c' }) {
@@ -481,14 +460,8 @@ public with sharing class EventSponsorsController {
 		}
 		result.fieldLabels.put('Levels', Schema.SObjectType.Sponsorship_Level__c.getLabelPlural());
 		Map<String, Schema.SObjectField> levelFields = Schema.SObjectType.Sponsorship_Level__c.fields.getMap();
-		result.fieldLabels.put(
-			'LevelName',
-			NamespaceUtil.field(levelFields, 'Name').getDescribe().getLabel()
-		);
-		result.fieldLabels.put(
-			'LevelAmount',
-			NamespaceUtil.field(levelFields, 'Amount__c').getDescribe().getLabel()
-		);
+		result.fieldLabels.put('LevelName', NamespaceUtil.field(levelFields, 'Name').getDescribe().getLabel());
+		result.fieldLabels.put('LevelAmount', NamespaceUtil.field(levelFields, 'Amount__c').getDescribe().getLabel());
 		result.fieldLabels.put(
 			'LevelBenefits',
 			NamespaceUtil.field(levelFields, 'Benefits__c').getDescribe().getLabel()

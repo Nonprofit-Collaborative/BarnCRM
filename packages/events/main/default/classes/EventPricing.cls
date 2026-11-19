@@ -38,12 +38,7 @@ public with sharing class EventPricing {
 	 * The price with the code applied: a percent off rounded to the cent, an amount off capped
 	 * at the price, never below zero. A code that does not apply leaves the price as it is.
 	 */
-	public static Decimal priceWithCode(
-		Decimal price,
-		Promo_Code__c code,
-		Id ticketTypeId,
-		Datetime now
-	) {
+	public static Decimal priceWithCode(Decimal price, Promo_Code__c code, Id ticketTypeId, Datetime now) {
 		Decimal base = toCents(price);
 		if (!codeApplies(code, ticketTypeId, now)) {
 			return base / HUNDRED;
@@ -51,10 +46,7 @@ public with sharing class EventPricing {
 		Decimal value = code.Discount_Value__c == null ? ZERO : code.Discount_Value__c;
 		Decimal off = code.Discount_Type__c == DISCOUNT_AMOUNT
 			? toCents(value)
-			: (base *
-					Math.min(Math.max(value, ZERO), HUNDRED) /
-					HUNDRED)
-					.round(System.RoundingMode.HALF_UP);
+			: (base * Math.min(Math.max(value, ZERO), HUNDRED) / HUNDRED).round(System.RoundingMode.HALF_UP);
 		return Math.max(base - Math.max(off, ZERO), ZERO) / HUNDRED;
 	}
 

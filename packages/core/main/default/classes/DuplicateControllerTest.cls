@@ -29,10 +29,7 @@ private class DuplicateControllerTest {
 			new List<DuplicateService.Pair>{ new DuplicateService.Pair(first, second, null) },
 			null
 		);
-		if (
-			!DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName })
-				.contains(objectName)
-		) {
+		if (!DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName }).contains(objectName)) {
 			Assert.areEqual(0, written, 'With no active rule no suggestion can be written.');
 			return false;
 		}
@@ -75,16 +72,8 @@ private class DuplicateControllerTest {
 		System.runAs(TestUsers.admin()) {
 			List<Account> households = (List<Account>) insertAllowingDuplicates(
 				new List<Account>{
-					inCity(
-						HouseholdTestDataFactory.newHousehold('The Hall Family'),
-						'8848 Highland Ln',
-						'43622'
-					),
-					inCity(
-						HouseholdTestDataFactory.newHousehold('The Shah-Duarte Family'),
-						'9719 Harbor Dr',
-						'43621'
-					)
+					inCity(HouseholdTestDataFactory.newHousehold('The Hall Family'), '8848 Highland Ln', '43622'),
+					inCity(HouseholdTestDataFactory.newHousehold('The Shah-Duarte Family'), '9719 Harbor Dr', '43621')
 				}
 			);
 			if (!suggest(households[0].Id, households[1].Id)) {
@@ -115,32 +104,21 @@ private class DuplicateControllerTest {
 				new List<Account>{
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
 					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
-					inCity(
-						HouseholdTestDataFactory.newHousehold('The Dupview Household'),
-						'1 Other Road',
-						'43699'
-					)
+					inCity(HouseholdTestDataFactory.newHousehold('The Dupview Household'), '1 Other Road', '43699')
 				}
 			);
 			if (!suggest(households[0].Id, households[1].Id)) {
 				return;
 			}
 			DuplicateRecordSet found = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
-			insert new DuplicateRecordItem(
-				DuplicateRecordSetId = found.Id,
-				RecordId = households[2].Id
-			);
+			insert new DuplicateRecordItem(DuplicateRecordSetId = found.Id, RecordId = households[2].Id);
 
 			Test.startTest();
 			DuplicateController.DuplicateView view = DuplicateController.getView();
 			Test.stopTest();
 
 			Assert.areEqual(1, view.suggestions.size(), 'The suggestion is still shown.');
-			Assert.areEqual(
-				2,
-				view.suggestions[0].records.size(),
-				'Without the household that shares only the city.'
-			);
+			Assert.areEqual(2, view.suggestions[0].records.size(), 'Without the household that shares only the city.');
 			Assert.isTrue(view.suggestions[0].canMerge, 'The two left can be merged.');
 		}
 	}
@@ -151,18 +129,10 @@ private class DuplicateControllerTest {
 			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
 				new List<Contact>{
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Ana',
-							LastName = 'Dupview',
-							Email = 'ana.dupview@example.org'
-						)
+						new Contact(FirstName = 'Ana', LastName = 'Dupview', Email = 'ana.dupview@example.org')
 					),
 					TestDataFactory.person(
-						new Contact(
-							FirstName = 'Anna',
-							LastName = 'Dupview',
-							Email = 'anna.dupview@example.org'
-						)
+						new Contact(FirstName = 'Anna', LastName = 'Dupview', Email = 'anna.dupview@example.org')
 					)
 				}
 			);
@@ -178,10 +148,7 @@ private class DuplicateControllerTest {
 			Assert.areEqual(1, view.suggestions.size(), 'The one suggestion is listed.');
 			DuplicateController.SuggestionView suggestion = view.suggestions[0];
 			Assert.areEqual(2, suggestion.records.size(), 'Both people are named.');
-			Assert.isFalse(
-				suggestion.canMerge,
-				'People are merged with the platform merge, not here (R-DP4).'
-			);
+			Assert.isFalse(suggestion.canMerge, 'People are merged with the platform merge, not here (R-DP4).');
 			Assert.isTrue(
 				suggestion.records[0].detail.endsWith('@example.org'),
 				'A person is told apart by their email address.'
@@ -194,10 +161,7 @@ private class DuplicateControllerTest {
 				compared.get('Email').endsWith('@example.org'),
 				'The email is among the fields compared side by side.'
 			);
-			Assert.isTrue(
-				compared.containsKey('Account.Name'),
-				'The household is compared too, blank or not.'
-			);
+			Assert.isTrue(compared.containsKey('Account.Name'), 'The household is compared too, blank or not.');
 			Assert.areEqual(
 				Schema.SObjectType.Contact.fields.Phone.isAccessible(),
 				compared.containsKey('Phone'),
@@ -232,11 +196,7 @@ private class DuplicateControllerTest {
 				households[0].Id,
 				households[1].Id
 			);
-			Assert.areEqual(
-				households[0].Id,
-				preview.survivorId,
-				'The preview is the household merge preview.'
-			);
+			Assert.areEqual(households[0].Id, preview.survivorId, 'The preview is the household merge preview.');
 
 			Test.startTest();
 			DuplicateController.DuplicateView after = DuplicateController.mergeHouseholds(
@@ -248,11 +208,7 @@ private class DuplicateControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, after.suggestions.size(), 'The merged pair is no longer suggested.');
-			Assert.areEqual(
-				1,
-				[SELECT COUNT() FROM Account WHERE Id IN :households],
-				'Two households are now one.'
-			);
+			Assert.areEqual(1, [SELECT COUNT() FROM Account WHERE Id IN :households], 'Two households are now one.');
 			Assert.areEqual(0, after.dismissedCount, 'A merge is not a dismissal.');
 		}
 	}
@@ -267,17 +223,10 @@ private class DuplicateControllerTest {
 			Id setId = DuplicateController.getView().suggestions[0].setId;
 
 			Test.startTest();
-			DuplicateController.DuplicateView view = DuplicateController.dismiss(
-				setId,
-				'Neighbors'
-			);
+			DuplicateController.DuplicateView view = DuplicateController.dismiss(setId, 'Neighbors');
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				view.suggestions.size(),
-				'The dismissed pair is gone from the list.'
-			);
+			Assert.areEqual(0, view.suggestions.size(), 'The dismissed pair is gone from the list.');
 			Assert.areEqual(1, view.dismissedCount, 'And counted as dismissed.');
 		}
 	}
@@ -313,9 +262,7 @@ private class DuplicateControllerTest {
 			if (!suggest(households[0].Id, households[1].Id)) {
 				return;
 			}
-			HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{
-				households[1].Id
-			};
+			HouseholdSelector.accountsWithNativeHouseholdGroupsOverride = new Set<Id>{ households[1].Id };
 
 			Test.startTest();
 			DuplicateController.DuplicateView view = DuplicateController.getView();
@@ -415,11 +362,7 @@ private class DuplicateControllerTest {
 			DuplicateController.DuplicateView view = DuplicateController.getView();
 			Test.stopTest();
 
-			Assert.areEqual(
-				0,
-				view.suggestions.size(),
-				'Nothing on the panel can act on an organization (R-DP2).'
-			);
+			Assert.areEqual(0, view.suggestions.size(), 'Nothing on the panel can act on an organization (R-DP2).');
 		}
 	}
 
@@ -582,12 +525,7 @@ private class DuplicateControllerTest {
 
 			Test.startTest();
 			try {
-				DuplicateController.mergeHouseholds(
-					setId,
-					households[0].Id,
-					households[2].Id,
-					null
-				);
+				DuplicateController.mergeHouseholds(setId, households[0].Id, households[2].Id, null);
 				Assert.fail('A merge of a pair the suggestion does not name is refused.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
@@ -598,11 +536,7 @@ private class DuplicateControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				[SELECT COUNT() FROM Account WHERE Id IN :households],
-				'Nothing is merged.'
-			);
+			Assert.areEqual(3, [SELECT COUNT() FROM Account WHERE Id IN :households], 'Nothing is merged.');
 			Assert.areEqual(1, [SELECT COUNT() FROM DuplicateRecordSet], 'The suggestion stays.');
 		}
 	}
@@ -611,11 +545,7 @@ private class DuplicateControllerTest {
 	static void theLastScanLineSaysWhatTheScanFound() {
 		System.runAs(TestUsers.admin()) {
 			String said = 'Duplicate scan of Contact finished: 0 new possible duplicates recorded.';
-			ErrorLogger.logMessage(
-				said,
-				DuplicateScanBatch.LOG_CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+			ErrorLogger.logMessage(said, DuplicateScanBatch.LOG_CONTEXT, ErrorLogger.SEVERITY_WARNING);
 			Test.getEventBus().deliver();
 
 			Test.startTest();

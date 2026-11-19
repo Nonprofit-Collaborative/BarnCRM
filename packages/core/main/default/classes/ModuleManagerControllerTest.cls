@@ -35,16 +35,10 @@ private class ModuleManagerControllerTest {
 
 			Test.startTest();
 			ModuleManagerController.ManagerState opened = ModuleManagerController.getState();
-			ModuleManagerController.ManagerState off = ModuleManagerController.turnOff(
-				'Volunteers'
-			);
-			ModuleManagerController.ManagerState backOn = ModuleManagerController.turnOn(
-				'Volunteers'
-			);
+			ModuleManagerController.ManagerState off = ModuleManagerController.turnOff('Volunteers');
+			ModuleManagerController.ManagerState backOn = ModuleManagerController.turnOn('Volunteers');
 			Boolean granted = ModuleManagerController.grantAdminAccess('Volunteers');
-			List<ModuleManagerService.RecordCount> report = ModuleManagerController.uninstallReport(
-				'Volunteers'
-			);
+			List<ModuleManagerService.RecordCount> report = ModuleManagerController.uninstallReport('Volunteers');
 			Test.stopTest();
 
 			Assert.isTrue(opened.canEdit, 'Maria may switch modules');
@@ -70,10 +64,7 @@ private class ModuleManagerControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'),
-				message
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'), message);
 		}
 	}
 
@@ -105,11 +96,7 @@ private class ModuleManagerControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				3,
-				refused,
-				'Switching, counting and hiding the nonprofit modules all need the permission'
-			);
+			Assert.areEqual(3, refused, 'Switching, counting and hiding the nonprofit modules all need the permission');
 			Assert.isTrue(
 				ModuleManagerService.showNonprofitModules(),
 				'Nothing was saved, so the nonprofit modules still show'
@@ -138,14 +125,10 @@ private class ModuleManagerControllerTest {
 
 			Test.startTest();
 			ModuleManagerController.ManagerState fresh = ModuleManagerController.getState();
-			ModuleManagerController.ManagerState cleared = ModuleManagerController.saveShowNonprofitModules(
-				false
-			);
+			ModuleManagerController.ManagerState cleared = ModuleManagerController.saveShowNonprofitModules(false);
 			SettingsService.clearCaches();
 			Boolean stored = SettingsService.getSettings().Hide_Nonprofit_Modules__c;
-			ModuleManagerController.ManagerState shown = ModuleManagerController.saveShowNonprofitModules(
-				true
-			);
+			ModuleManagerController.ManagerState shown = ModuleManagerController.saveShowNonprofitModules(true);
 			Test.stopTest();
 
 			Assert.isTrue(fresh.showNonprofitModules, 'Shown until someone clears it');
@@ -156,10 +139,7 @@ private class ModuleManagerControllerTest {
 			for (ModuleManagerService.ModuleStatus module : cleared.modules) {
 				nonprofit.put(module.name, module.nonprofitOnly);
 			}
-			Assert.isTrue(
-				nonprofit.get('Volunteers'),
-				'A module only the Nonprofit Edition offers'
-			);
+			Assert.isTrue(nonprofit.get('Volunteers'), 'A module only the Nonprofit Edition offers');
 			Assert.isFalse(nonprofit.get('Rollups'), 'A module both editions offer');
 			Assert.isFalse(nonprofit.get('Core'), 'Core is never nonprofit only');
 			Assert.areEqual(
@@ -192,10 +172,7 @@ private class ModuleManagerControllerTest {
 
 			Assert.isTrue(state.showNonprofitModules, 'A saved row that never hid them shows them');
 			Assert.isTrue(ModuleManagerService.showNonprofitModules(), 'The service agrees');
-			Assert.isFalse(
-				SettingsService.getSettings().Hide_Nonprofit_Modules__c == true,
-				'Nothing was hidden'
-			);
+			Assert.isFalse(SettingsService.getSettings().Hide_Nonprofit_Modules__c == true, 'Nothing was hidden');
 		}
 	}
 
@@ -212,9 +189,7 @@ private class ModuleManagerControllerTest {
 			// Rollup Builder is found by its own object, so an org that has it is told too.
 			Boolean rollupsHere = false;
 			for (ModuleManagerService.ModuleStatus module : volunteersOnly.modules) {
-				rollupsHere |=
-					module.name == 'Rollups' &&
-					module.status != ModuleManagerService.STATUS_NOT_INSTALLED;
+				rollupsHere |= module.name == 'Rollups' && module.status != ModuleManagerService.STATUS_NOT_INSTALLED;
 			}
 			Assert.areEqual(
 				rollupsHere ? 1 : 0,

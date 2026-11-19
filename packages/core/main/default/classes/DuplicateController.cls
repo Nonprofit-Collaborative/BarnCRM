@@ -196,10 +196,7 @@ public with sharing class DuplicateController {
 			requirePermission();
 			requireSuggestionAccess();
 			// Checked before the merge: afterwards one of the two records no longer exists.
-			DuplicateService.requireSetOf(
-				duplicateRecordSetId,
-				new Set<Id>{ survivorId, victimId }
-			);
+			DuplicateService.requireSetOf(duplicateRecordSetId, new Set<Id>{ survivorId, victimId });
 			HouseholdMergeService.mergeHouseholds(
 				survivorId,
 				victimId,
@@ -217,11 +214,7 @@ public with sharing class DuplicateController {
 	private static DuplicateView currentView() {
 		DuplicateView view = new DuplicateView();
 		view.canManage = FeatureManagement.checkPermission(EDIT_PERMISSION);
-		for (
-			DuplicateRule rule : DuplicateSelector.rulesFor(
-				new Set<String>(DuplicateSelector.REVIEWED_OBJECTS)
-			)
-		) {
+		for (DuplicateRule rule : DuplicateSelector.rulesFor(new Set<String>(DuplicateSelector.REVIEWED_OBJECTS))) {
 			RuleView ruleView = new RuleView();
 			ruleView.objectName = rule.SobjectType;
 			ruleView.ruleLabel = rule.MasterLabel;
@@ -230,9 +223,7 @@ public with sharing class DuplicateController {
 			view.rules.add(ruleView);
 		}
 		view.dismissedCount = DuplicateSelector.dismissalCount();
-		Error_Log__c lastResult = DuplicateSelector.latestScanResult(
-			DuplicateScanBatch.LOG_CONTEXT
-		);
+		Error_Log__c lastResult = DuplicateSelector.latestScanResult(DuplicateScanBatch.LOG_CONTEXT);
 		if (lastResult != null) {
 			view.lastScanSummary = lastResult.Message__c;
 			view.lastScanHadFailures = lastResult.Severity__c != ErrorLogger.SEVERITY_INFO;
@@ -252,11 +243,7 @@ public with sharing class DuplicateController {
 		List<DuplicateRecordSet> window = DuplicateSelector.openSetsAfter(maxRead, null);
 		Integer windows = 1;
 		usable.addAll(suggestions(window));
-		while (
-			window.size() >= maxRead &&
-			usable.size() < MAX_SUGGESTIONS &&
-			windows < MAX_WINDOWS
-		) {
+		while (window.size() >= maxRead && usable.size() < MAX_SUGGESTIONS && windows < MAX_WINDOWS) {
 			window = DuplicateSelector.openSetsAfter(maxRead, window[window.size() - 1]);
 			windows++;
 			usable.addAll(suggestions(window));
@@ -357,10 +344,7 @@ public with sharing class DuplicateController {
 				view.records.add(record);
 			}
 			if (complete) {
-				view.canMerge =
-					view.records.size() == 2 &&
-					view.records[0].isHousehold &&
-					view.records[1].isHousehold;
+				view.canMerge = view.records.size() == 2 && view.records[0].isHousehold && view.records[1].isHousehold;
 				result.add(view);
 			}
 		}
@@ -399,9 +383,7 @@ public with sharing class DuplicateController {
 			addFields(view, household, householdFields);
 			result.put(household.Id, view);
 		}
-		List<Schema.DescribeFieldResult> personFields = DuplicateSelector.readable(
-			DuplicateSelector.PERSON_COMPARED
-		);
+		List<Schema.DescribeFieldResult> personFields = DuplicateSelector.readable(DuplicateSelector.PERSON_COMPARED);
 		for (Contact person : DuplicateSelector.contactsByIds(contactIds)) {
 			String householdName = person.Account == null ? null : person.Account.Name;
 			String detail = String.isNotBlank(person.Email)
@@ -409,29 +391,17 @@ public with sharing class DuplicateController {
 				: place(householdName, person.MailingPostalCode);
 			RecordView view = recordView(person.Id, person.Name, detail, false);
 			addFields(view, person, personFields);
-			view.fields.add(
-				fieldView('Account.Name', System.Label.Core_Section_Household, householdName)
-			);
+			view.fields.add(fieldView('Account.Name', System.Label.Core_Section_Household, householdName));
 			result.put(person.Id, view);
 		}
 		return result;
 	}
 
 	/** The compared fields of one record, in order, from what the selector read. */
-	private static void addFields(
-		RecordView view,
-		SObject record,
-		List<Schema.DescribeFieldResult> fields
-	) {
+	private static void addFields(RecordView view, SObject record, List<Schema.DescribeFieldResult> fields) {
 		for (Schema.DescribeFieldResult field : fields) {
 			Object value = record.get(field.getName());
-			view.fields.add(
-				fieldView(
-					field.getName(),
-					field.getLabel(),
-					value == null ? null : String.valueOf(value)
-				)
-			);
+			view.fields.add(fieldView(field.getName(), field.getLabel(), value == null ? null : String.valueOf(value)));
 		}
 	}
 
@@ -443,12 +413,7 @@ public with sharing class DuplicateController {
 		return field;
 	}
 
-	private static RecordView recordView(
-		Id recordId,
-		String name,
-		String detail,
-		Boolean isHousehold
-	) {
+	private static RecordView recordView(Id recordId, String name, String detail, Boolean isHousehold) {
 		RecordView view = new RecordView();
 		view.recordId = recordId;
 		view.name = name;

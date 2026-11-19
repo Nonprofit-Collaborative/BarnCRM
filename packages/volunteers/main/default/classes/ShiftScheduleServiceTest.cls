@@ -4,9 +4,7 @@
  * time zone are fixed (America/New_York, Monday 2 March 2026 at noon), so no test depends on
  * the day it runs or the org's time zone.
  */
-@IsTest(
-	testFor='ApexClass:ShiftScheduleService, ApexClass:ShiftScheduleSelector, ApexClass:VolunteerSettings'
-)
+@IsTest(testFor='ApexClass:ShiftScheduleService, ApexClass:ShiftScheduleSelector, ApexClass:VolunteerSettings')
 private class ShiftScheduleServiceTest {
 	private static final String ZONE = 'America/New_York';
 	private static final String RULES = 'Shift_Schedule_Rules';
@@ -127,10 +125,7 @@ private class ShiftScheduleServiceTest {
 			'The day of the autumn change: 9:00 EST.'
 		);
 		Assert.isNotNull(
-			ShiftScheduleService.toOrgDatetime(
-				Date.newInstance(2026, 3, 8),
-				Time.newInstance(2, 30, 0, 0)
-			),
+			ShiftScheduleService.toOrgDatetime(Date.newInstance(2026, 3, 8), Time.newInstance(2, 30, 0, 0)),
 			'A time the clocks skip still gives a start.'
 		);
 	}
@@ -140,11 +135,7 @@ private class ShiftScheduleServiceTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			useClock(MONDAY_NOON);
 			VolunteersTestData.shiftHorizonWeeks(2);
-			Shift_Schedule__c schedule = saved(
-				'Saturday;Sunday',
-				Date.newInstance(2026, 2, 28),
-				null
-			);
+			Shift_Schedule__c schedule = saved('Saturday;Sunday', Date.newInstance(2026, 2, 28), null);
 
 			Test.startTest();
 			Integer created = run(schedule.Id);
@@ -153,16 +144,8 @@ private class ShiftScheduleServiceTest {
 			List<Volunteer_Shift__c> shifts = shiftsOf(schedule.Id);
 			Assert.areEqual(4, created, 'Saturdays and Sundays from today to two weeks ahead.');
 			Assert.areEqual(4, shifts.size(), 'Four shifts saved.');
-			Assert.areEqual(
-				Datetime.newInstanceGmt(2026, 3, 7, 14, 0, 0),
-				shifts[0].Start_Time__c,
-				'9:00 EST.'
-			);
-			Assert.areEqual(
-				Datetime.newInstanceGmt(2026, 3, 7, 17, 0, 0),
-				shifts[0].End_Time__c,
-				'12:00 EST.'
-			);
+			Assert.areEqual(Datetime.newInstanceGmt(2026, 3, 7, 14, 0, 0), shifts[0].Start_Time__c, '9:00 EST.');
+			Assert.areEqual(Datetime.newInstanceGmt(2026, 3, 7, 17, 0, 0), shifts[0].End_Time__c, '12:00 EST.');
 			Assert.areEqual(
 				Datetime.newInstanceGmt(2026, 3, 8, 13, 0, 0),
 				shifts[1].Start_Time__c,
@@ -173,11 +156,7 @@ private class ShiftScheduleServiceTest {
 				shifts[3].Start_Time__c,
 				'Still 9:00 local a week on.'
 			);
-			Assert.areEqual(
-				'Food pantry sort: 8 Mar 2026, 9:00 AM',
-				shifts[1].Name,
-				'Named in the org time zone.'
-			);
+			Assert.areEqual('Food pantry sort: 8 Mar 2026, 9:00 AM', shifts[1].Name, 'Named in the org time zone.');
 			Assert.areEqual('Open', shifts[0].Status__c, 'Each shift is Open.');
 			Assert.areEqual(4, shifts[0].Volunteers_Needed__c, 'The schedule places are copied.');
 			Assert.areEqual(
@@ -193,11 +172,7 @@ private class ShiftScheduleServiceTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			useClock(MONDAY_NOON);
 			VolunteersTestData.shiftHorizonWeeks(2);
-			Shift_Schedule__c schedule = saved(
-				'Saturday;Sunday',
-				Date.newInstance(2026, 2, 28),
-				null
-			);
+			Shift_Schedule__c schedule = saved('Saturday;Sunday', Date.newInstance(2026, 2, 28), null);
 			run(schedule.Id);
 
 			Test.startTest();
@@ -210,16 +185,8 @@ private class ShiftScheduleServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(0, again, 'A second run creates nothing.');
-			Assert.areEqual(
-				0,
-				afterDelete,
-				'A deleted shift is not created again by the next run.'
-			);
-			Assert.areEqual(
-				1,
-				afterReset,
-				'With Created Through cleared, only the missing day is created.'
-			);
+			Assert.areEqual(0, afterDelete, 'A deleted shift is not created again by the next run.');
+			Assert.areEqual(1, afterReset, 'With Created Through cleared, only the missing day is created.');
 			Assert.areEqual(4, shiftsOf(schedule.Id).size(), 'No day holds two shifts.');
 		}
 	}
@@ -228,11 +195,7 @@ private class ShiftScheduleServiceTest {
 	static void aLongerHorizonExtendsAndAShorterOneRemovesNothing() {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			useClock(MONDAY_NOON);
-			Shift_Schedule__c schedule = saved(
-				'Saturday;Sunday',
-				Date.newInstance(2026, 2, 28),
-				null
-			);
+			Shift_Schedule__c schedule = saved('Saturday;Sunday', Date.newInstance(2026, 2, 28), null);
 
 			Test.startTest();
 			VolunteersTestData.shiftHorizonWeeks(1);

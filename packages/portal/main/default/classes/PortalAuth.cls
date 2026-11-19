@@ -101,9 +101,7 @@ public without sharing class PortalAuth {
 		Portal_Session__c session = pending(challenge, new Set<String>{ STAGE_CODE_SENT });
 		Portal_Access__c access = accessOf(session);
 		Portal__c portal = portalOf(access);
-		String expected = PortalTokens.hash(
-			session.Token_Hash__c + ':' + (code == null ? '' : code.trim())
-		);
+		String expected = PortalTokens.hash(session.Token_Hash__c + ':' + (code == null ? '' : code.trim()));
 		checkCodeWindow(session, access, PortalTokens.sameText(expected, session.Code_Hash__c));
 		session.Code_Hash__c = null;
 		Boolean enrolled = access.Second_Factor_Enrolled__c == true;
@@ -126,10 +124,7 @@ public without sharing class PortalAuth {
 	/** Checks the authenticator code after the emailed one, enrolling it when asked to. */
 	public static Map<String, Object> verifySecondFactor(String challenge, String code) {
 		requireEnabled();
-		Portal_Session__c session = pending(
-			challenge,
-			new Set<String>{ STAGE_SECOND_FACTOR, STAGE_ENROLL }
-		);
+		Portal_Session__c session = pending(challenge, new Set<String>{ STAGE_SECOND_FACTOR, STAGE_ENROLL });
 		Portal_Access__c access = accessOf(session);
 		Portal__c portal = portalOf(access);
 		Long step = freshStep(access, code);
@@ -236,10 +231,7 @@ public without sharing class PortalAuth {
 
 	/** Starts enrolment for a signed-in person on a portal with an Optional second factor. */
 	public static Map<String, Object> startEnrolment(Session session) {
-		if (
-			session.portal.Second_Factor__c == FACTOR_OFF ||
-			session.access.Second_Factor_Enrolled__c == true
-		) {
+		if (session.portal.Second_Factor__c == FACTOR_OFF || session.access.Second_Factor_Enrolled__c == true) {
 			throw new RefusalException('not_allowed');
 		}
 		session.access.Second_Factor_Secret__c = PortalTokens.newSecret();
@@ -357,12 +349,7 @@ public without sharing class PortalAuth {
 		return portalWide < setting(config.Emails_Per_Portal_Hour__c, 200, 10, 5000);
 	}
 
-	private static void sendCode(
-		Portal__c portal,
-		Portal_Access__c access,
-		String address,
-		String challenge
-	) {
+	private static void sendCode(Portal__c portal, Portal_Access__c access, String address, String challenge) {
 		String code = PortalTokens.newCode();
 		String tokenHash = PortalTokens.hash(challenge);
 		Integer minutes = setting(settings().Code_Minutes__c, 10, 2, 30);
@@ -380,16 +367,8 @@ public without sharing class PortalAuth {
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ address });
 		message.setSaveAsActivity(false);
-		String subject = BarnHelp.text(
-			'Portal',
-			'Portal_Code_Email_Subject',
-			new List<Object>{ portal.Name }
-		);
-		String body = BarnHelp.text(
-			'Portal',
-			'Portal_Code_Email_Body',
-			new List<Object>{ portal.Name, code, minutes }
-		);
+		String subject = BarnHelp.text('Portal', 'Portal_Code_Email_Subject', new List<Object>{ portal.Name });
+		String body = BarnHelp.text('Portal', 'Portal_Code_Email_Body', new List<Object>{ portal.Name, code, minutes });
 		message.setSubject(String.isBlank(subject) ? portal.Name : subject);
 		message.setPlainTextBody(String.isBlank(body) ? code : body);
 		String senderAddress = portal.Sender_Address__c;
@@ -424,14 +403,7 @@ public without sharing class PortalAuth {
 			throw new RefusalException('code_invalid');
 		}
 		List<Portal_Session__c> found = [
-			SELECT
-				Id,
-				Stage__c,
-				Token_Hash__c,
-				Code_Hash__c,
-				Code_Expires__c,
-				Attempts__c,
-				Portal_Access__c
+			SELECT Id, Stage__c, Token_Hash__c, Code_Hash__c, Code_Expires__c, Attempts__c, Portal_Access__c
 			FROM Portal_Session__c
 			WHERE Token_Hash__c = :PortalTokens.hash(challenge)
 			WITH SYSTEM_MODE
@@ -497,11 +469,7 @@ public without sharing class PortalAuth {
 	 * the right code, who already holds the inbox. Only a wrong code in time counts toward the
 	 * lockout (R-PA1).
 	 */
-	private static void checkCodeWindow(
-		Portal_Session__c session,
-		Portal_Access__c access,
-		Boolean correct
-	) {
+	private static void checkCodeWindow(Portal_Session__c session, Portal_Access__c access, Boolean correct) {
 		Boolean expired = session.Code_Expires__c == null || session.Code_Expires__c < now();
 		if (expired) {
 			session.Stage__c = STAGE_ENDED;
@@ -531,11 +499,9 @@ public without sharing class PortalAuth {
 		if (session.Attempts__c >= setting(config.Attempts_Per_Code__c, 5, 1, 10)) {
 			session.Stage__c = STAGE_ENDED;
 		}
-		access.Failed_Attempts__c =
-			(access.Failed_Attempts__c == null ? 0 : access.Failed_Attempts__c) + 1;
+		access.Failed_Attempts__c = (access.Failed_Attempts__c == null ? 0 : access.Failed_Attempts__c) + 1;
 		if (access.Failed_Attempts__c >= setting(config.Failures_Before_Lockout__c, 10, 3, 50)) {
-			access.Locked_Until__c = now()
-				.addMinutes(setting(config.Lockout_Minutes__c, 30, 5, 1440));
+			access.Locked_Until__c = now().addMinutes(setting(config.Lockout_Minutes__c, 30, 5, 1440));
 			access.Failed_Attempts__c = 0;
 			session.Stage__c = STAGE_ENDED;
 		}
@@ -544,11 +510,7 @@ public without sharing class PortalAuth {
 		throw new RefusalException('code_invalid');
 	}
 
-	private static Map<String, Object> activate(
-		Portal_Session__c session,
-		Portal_Access__c access,
-		Portal__c portal
-	) {
+	private static Map<String, Object> activate(Portal_Session__c session, Portal_Access__c access, Portal__c portal) {
 		String token = PortalTokens.newToken();
 		Datetime current = now();
 		Integer hours = setting(portal.Session_Hours__c, 8, 1, 720);

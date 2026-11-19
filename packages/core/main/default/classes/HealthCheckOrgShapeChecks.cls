@@ -80,8 +80,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 */
 	private static HealthCheckService.Finding npspUpkeepOverlapFinding() {
 		if (
-			!FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP) ||
-			!NpspHouseholdSource.householdsInUse()
+			!FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP) || !NpspHouseholdSource.householdsInUse()
 		) {
 			return null;
 		}
@@ -92,10 +91,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 				HealthCheckService.SEVERITY_WARNING,
 				HealthCheckService.CATEGORY_SETTINGS
 			)
-			.withFix(
-				System.Label.Core_HealthCheck_NpspUpkeepOverlapFix,
-				HealthCheckService.SECTION_GENERAL
-			);
+			.withFix(System.Label.Core_HealthCheck_NpspUpkeepOverlapFix, HealthCheckService.SECTION_GENERAL);
 	}
 
 	/** How many households here are already the Nonprofit Cloud native ones. */
@@ -202,10 +198,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 		if (!current.equals(recommended)) {
 			String detail = String.format(
 				BarnHelp.text('Core', 'Core_HealthCheck_ModeMismatchDetail'),
-				new List<Object>{
-					HealthCheckService.modeLabel(current),
-					HealthCheckService.modeLabel(recommended)
-				}
+				new List<Object>{ HealthCheckService.modeLabel(current), HealthCheckService.modeLabel(recommended) }
 			);
 			return new HealthCheckService.Finding(
 					'coexistence_mode_mismatch',
@@ -240,9 +233,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * as a contact, and warned, with the count, once people stored as accounts appear: those
 	 * people cannot join a household the simple way.
 	 */
-	private static HealthCheckService.Finding membershipModeFinding(
-		OrgShapeDetector.OrgShape shape
-	) {
+	private static HealthCheckService.Finding membershipModeFinding(OrgShapeDetector.OrgShape shape) {
 		if (shape == null || shape.hasPersonAccounts != true) {
 			return null;
 		}
@@ -258,15 +249,10 @@ public with sharing class HealthCheckOrgShapeChecks {
 					HealthCheckService.SEVERITY_ERROR,
 					HealthCheckService.CATEGORY_ORG_SHAPE
 				)
-				.withFix(
-					System.Label.Core_HealthCheck_MembershipFix,
-					HealthCheckService.FIX_APPLY_JUNCTION_MEMBERSHIP
-				);
+				.withFix(System.Label.Core_HealthCheck_MembershipFix, HealthCheckService.FIX_APPLY_JUNCTION_MEMBERSHIP);
 		}
 
-		Integer asAccounts = CoexistenceService.countPeopleStoredAsAccounts(
-			OrgShapeSelector.NATIVE_COUNT_CAP + 1
-		);
+		Integer asAccounts = CoexistenceService.countPeopleStoredAsAccounts(OrgShapeSelector.NATIVE_COUNT_CAP + 1);
 		if (asAccounts <= 0) {
 			return null;
 		}
@@ -288,10 +274,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 				HealthCheckService.SEVERITY_WARNING,
 				HealthCheckService.CATEGORY_ORG_SHAPE
 			)
-			.withFix(
-				System.Label.Core_HealthCheck_MembershipFix,
-				HealthCheckService.FIX_APPLY_JUNCTION_MEMBERSHIP
-			);
+			.withFix(System.Label.Core_HealthCheck_MembershipFix, HealthCheckService.FIX_APPLY_JUNCTION_MEMBERSHIP);
 	}
 
 	/**
@@ -303,9 +286,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * belonging nowhere, and nothing else says why.
 	 */
 	private static HealthCheckService.Finding membershipDataFinding() {
-		Boolean junction = CoexistenceService.MEMBERSHIP_JUNCTION.equals(
-			CoexistenceService.getMembershipMode()
-		);
+		Boolean junction = CoexistenceService.MEMBERSHIP_JUNCTION.equals(CoexistenceService.getMembershipMode());
 		Integer unseen = junction
 			? CoexistenceService.countPeopleLinkedWithoutMembershipRecords()
 			: CoexistenceService.countPeopleWithMembershipRecords();
@@ -334,10 +315,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 				HealthCheckService.SEVERITY_ERROR,
 				HealthCheckService.CATEGORY_SETTINGS
 			)
-			.withFix(
-				System.Label.Core_HealthCheck_MembershipHiddenFix,
-				HealthCheckService.SECTION_PEOPLE
-			);
+			.withFix(System.Label.Core_HealthCheck_MembershipHiddenFix, HealthCheckService.SECTION_PEOPLE);
 	}
 
 	/**
@@ -352,9 +330,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * there to see, and junction mode has no such field to notice.
 	 */
 	private static HealthCheckService.Finding householdCreationFinding() {
-		if (
-			!CoexistenceService.MEMBERSHIP_JUNCTION.equals(CoexistenceService.getMembershipMode())
-		) {
+		if (!CoexistenceService.MEMBERSHIP_JUNCTION.equals(CoexistenceService.getMembershipMode())) {
 			return null;
 		}
 		BarnCRM_Settings__c settings = SettingsService.getSettings();
@@ -381,9 +357,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	 * mutual exclusion working (product-plan Section 11.2 item 9): BarnCRM leaves these
 	 * households alone rather than renaming, re-greeting, or re-addressing them.
 	 */
-	private static HealthCheckService.Finding nativeHouseholdsFinding(
-		OrgShapeDetector.OrgShape shape
-	) {
+	private static HealthCheckService.Finding nativeHouseholdsFinding(OrgShapeDetector.OrgShape shape) {
 		if (shape == null || shape.hasNativeHouseholdGroups != true) {
 			return null;
 		}
@@ -470,9 +444,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 		return NamespaceUtil.resolveType(className) != null;
 	}
 
-	private static HealthCheckService.Finding multiCurrencyFinding(
-		OrgShapeDetector.OrgShape shape
-	) {
+	private static HealthCheckService.Finding multiCurrencyFinding(OrgShapeDetector.OrgShape shape) {
 		if (shape == null || shape.isMultiCurrency != true) {
 			return null;
 		}
@@ -494,10 +466,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 	private static String cappedCount(Integer count) {
 		Integer cap = OrgShapeSelector.NATIVE_COUNT_CAP;
 		if (count != null && count > cap) {
-			return String.format(
-				System.Label.Core_HealthCheck_OrphansMoreThan,
-				new List<Object>{ cap.format() }
-			);
+			return String.format(System.Label.Core_HealthCheck_OrphansMoreThan, new List<Object>{ cap.format() });
 		}
 		return String.valueOf(count);
 	}

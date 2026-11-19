@@ -83,10 +83,7 @@ public with sharing class GiftTransactionMirrorService {
 	public static String direction() {
 		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
 		String chosen = settings?.Gift_Transaction_Mirror_Direction__c;
-		return chosen != null &&
-			chosen.trim() == GIFTS_TO_GIFT_TRANSACTIONS
-			? GIFTS_TO_GIFT_TRANSACTIONS
-			: OFF;
+		return chosen != null && chosen.trim() == GIFTS_TO_GIFT_TRANSACTIONS ? GIFTS_TO_GIFT_TRANSACTIONS : OFF;
 	}
 
 	/** Whether the mirror copies in this org: it is available and its direction is chosen. */
@@ -111,8 +108,7 @@ public with sharing class GiftTransactionMirrorService {
 		}
 		if (start != cachedStartSetting) {
 			if (orgTimeZone == null) {
-				orgTimeZone = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1]
-				.TimeZoneSidKey;
+				orgTimeZone = [SELECT TimeZoneSidKey FROM Organization WITH SYSTEM_MODE LIMIT 1].TimeZoneSidKey;
 			}
 			cachedStartDate = Date.valueOf(start.format('yyyy-MM-dd', orgTimeZone));
 			cachedStartSetting = start;
@@ -187,10 +183,7 @@ public with sharing class GiftTransactionMirrorService {
 				continue;
 			}
 			Gift__c old = oldById == null ? null : oldById.get(gift.Id);
-			if (
-				old != null &&
-				MirrorSync.same(old.Gift_Transaction_Id__c, gift.Gift_Transaction_Id__c)
-			) {
+			if (old != null && MirrorSync.same(old.Gift_Transaction_Id__c, gift.Gift_Transaction_Id__c)) {
 				continue;
 			}
 			Schema.SObjectType giftTransaction = GiftTransactionMirrorSchema.objectType();
@@ -272,10 +265,7 @@ public with sharing class GiftTransactionMirrorService {
 			if (typed == null) {
 				result.failed++;
 				result.refusals.add(
-					BarnHelp.text(
-						'Giving',
-						'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'
-					),
+					BarnHelp.text('Giving', 'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'),
 					gift.Name,
 					gift.Id
 				);
@@ -311,11 +301,7 @@ public with sharing class GiftTransactionMirrorService {
 	 * `writable`: every copied field when `creating`, and only the compared ones otherwise.
 	 */
 	@TestVisible
-	private static Map<String, Object> desiredValues(
-		Gift__c gift,
-		Boolean creating,
-		Set<String> writable
-	) {
+	private static Map<String, Object> desiredValues(Gift__c gift, Boolean creating, Set<String> writable) {
 		GiftTransactionMirrorSchema.Names names = GiftTransactionMirrorSchema.names;
 		Map<String, Object> values = new Map<String, Object>();
 		values.put(names.donorField, donorOf(gift));
@@ -416,11 +402,7 @@ public with sharing class GiftTransactionMirrorService {
 		}
 
 		if (!inserts.isEmpty()) {
-			List<Database.SaveResult> saved = Database.insert(
-				inserts,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> saved = Database.insert(inserts, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				if (saved[i].isSuccess()) {
 					insertedFor[i].Gift_Transaction_Id__c = saved[i].getId();
@@ -433,11 +415,7 @@ public with sharing class GiftTransactionMirrorService {
 			}
 		}
 		if (!updates.isEmpty()) {
-			List<Database.SaveResult> saved = Database.update(
-				updates,
-				false,
-				AccessLevel.USER_MODE
-			);
+			List<Database.SaveResult> saved = Database.update(updates, false, AccessLevel.USER_MODE);
 			for (Integer i = 0; i < saved.size(); i++) {
 				if (saved[i].isSuccess()) {
 					result.updated++;
@@ -450,11 +428,7 @@ public with sharing class GiftTransactionMirrorService {
 		return result;
 	}
 
-	private static SObject recordOf(
-		Schema.SObjectType giftTransaction,
-		Id recordId,
-		Map<String, Object> values
-	) {
+	private static SObject recordOf(Schema.SObjectType giftTransaction, Id recordId, Map<String, Object> values) {
 		SObject record = recordId == null
 			? giftTransaction.newSObject(null, true)
 			: giftTransaction.newSObject(recordId);
@@ -518,20 +492,13 @@ public with sharing class GiftTransactionMirrorService {
 		Schema.SObjectType link = GiftTransactionMirrorSchema.linkType();
 		List<SObject> inserts = new List<SObject>();
 		List<Gift__c> insertedFor = new List<Gift__c>();
-		for (
-			Gift_Allocation__c allocation : GiftTransactionMirrorSelector.allocationsOf(
-				giftById.keySet()
-			)
-		) {
+		for (Gift_Allocation__c allocation : GiftTransactionMirrorSelector.allocationsOf(giftById.keySet())) {
 			Gift__c gift = giftById.get(allocation.Gift__c);
 			Id transactionId = Id.valueOf(gift.Gift_Transaction_Id__c);
 			if (designatedAlready.contains(transactionId)) {
 				continue;
 			}
-			Id designationId = MirrorSync.idOf(
-				allocation.Fund__r?.Gift_Designation_Id__c,
-				designation
-			);
+			Id designationId = MirrorSync.idOf(allocation.Fund__r?.Gift_Designation_Id__c, designation);
 			if (designationId == null) {
 				result.undesignated++;
 				continue;

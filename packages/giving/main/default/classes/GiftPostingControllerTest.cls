@@ -5,17 +5,11 @@
 @IsTest(testFor='ApexClass:GiftPostingController')
 private class GiftPostingControllerTest {
 	private static User jen() {
-		return TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' });
 	}
 
 	/** The default fund and the close date are an administrator's, set outside Jen's work. */
@@ -27,11 +21,7 @@ private class GiftPostingControllerTest {
 	}
 
 	private static Gift__c gift(Decimal amount, String status, Date giftDate) {
-		Contact ana = GivingTestDataFactory.insertHouseholdContact(
-			'The Nolan Family',
-			'Ana',
-			'Nolan'
-		);
+		Contact ana = GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
 		Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, amount);
 		gift.Status__c = status;
 		gift.Gift_Date__c = giftDate;
@@ -59,10 +49,7 @@ private class GiftPostingControllerTest {
 				Assert.isTrue(posted.canUnpost, 'Jen holds Post Gifts');
 				Assert.isFalse(posted.inClosedPeriod);
 
-				GiftPostingController.PostingState after = GiftPostingController.unpost(
-					gift.Id,
-					'Wrong fund'
-				);
+				GiftPostingController.PostingState after = GiftPostingController.unpost(gift.Id, 'Wrong fund');
 				Assert.isFalse(after.posted, 'Unposted');
 				Assert.isFalse(after.canUnpost, 'Nothing left to unpost');
 			}
@@ -128,10 +115,7 @@ private class GiftPostingControllerTest {
 					GiftPostingController.unpost(gift.Id, 'Typo');
 					Assert.fail('Refused');
 				} catch (AuraHandledException refused) {
-					Assert.areEqual(
-						BarnHelp.text('Giving', 'Giving_Posting_NoPermission'),
-						refused.getMessage()
-					);
+					Assert.areEqual(BarnHelp.text('Giving', 'Giving_Posting_NoPermission'), refused.getMessage());
 				}
 			}
 

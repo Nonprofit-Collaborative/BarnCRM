@@ -33,17 +33,11 @@ private class AddressMoveTest {
 			insert anasOwn;
 
 			Test.startTest();
-			List<Address__c> added = AddressService.useForWholeHousehold(
-				new Map<Id, Id>{ anasOwn.Id => garcia.Id }
-			);
+			List<Address__c> added = AddressService.useForWholeHousehold(new Map<Id, Id>{ anasOwn.Id => garcia.Id });
 			Test.stopTest();
 
 			Assert.areEqual(1, added.size(), 'The household gets one new address.');
-			Assert.areEqual(
-				OWN_STREET,
-				primaryStreetOf(garcia.Id),
-				'Ana\'s address is now the household\'s primary.'
-			);
+			Assert.areEqual(OWN_STREET, primaryStreetOf(garcia.Id), 'Ana\'s address is now the household\'s primary.');
 			Assert.areEqual(
 				1,
 				[
@@ -102,25 +96,15 @@ private class AddressMoveTest {
 			insert new List<Contact>{ ana, luis };
 			// Ana's household is the Nowaks'; she also belongs to the Garcias'.
 			insert new List<Household_Member__c>{
-				new Household_Member__c(
-					Household__c = nowak.Id,
-					Contact__c = ana.Id,
-					Is_Primary__c = true
-				),
+				new Household_Member__c(Household__c = nowak.Id, Contact__c = ana.Id, Is_Primary__c = true),
 				new Household_Member__c(Household__c = garcia.Id, Contact__c = ana.Id),
-				new Household_Member__c(
-					Household__c = garcia.Id,
-					Contact__c = luis.Id,
-					Is_Primary__c = true
-				)
+				new Household_Member__c(Household__c = garcia.Id, Contact__c = luis.Id, Is_Primary__c = true)
 			};
 			Address__c anasOwn = ownAddress(ana.Id);
 			insert anasOwn;
 
 			Test.startTest();
-			Map<Id, Set<Id>> households = HouseholdService.currentHouseholdIdsByPerson(
-				new Set<Id>{ ana.Id }
-			);
+			Map<Id, Set<Id>> households = HouseholdService.currentHouseholdIdsByPerson(new Set<Id>{ ana.Id });
 			String refusal;
 			try {
 				AddressService.useForWholeHousehold(new Map<Id, Id>{ anasOwn.Id => stranger.Id });
@@ -164,19 +148,13 @@ private class AddressMoveTest {
 			Test.startTest();
 			String refusal;
 			try {
-				AddressService.useForWholeHousehold(
-					new Map<Id, Id>{ householdAddress.Id => garcia.Id }
-				);
+				AddressService.useForWholeHousehold(new Map<Id, Id>{ householdAddress.Id => garcia.Id });
 			} catch (AddressService.AddressMoveException refused) {
 				refusal = refused.getMessage();
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Address_MoveNotAPersonsAddress'),
-				refusal,
-				'Refused.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Address_MoveNotAPersonsAddress'), refusal, 'Refused.');
 			Assert.isTrue(String.isNotBlank(refusal), 'The refusal says why.');
 		}
 	}
@@ -244,28 +222,15 @@ private class AddressMoveTest {
 			Assert.isNull(mailingStreetOf(luis.Id), 'In Manual the new primary reached nobody.');
 
 			Test.startTest();
-			AddressService.HouseholdMove move = AddressService.householdMoves(
-					new Set<Id>{ garcia.Id }
-				)
-				.get(garcia.Id);
-			AddressService.updateEveryonesAddress(
-				new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id, luis.Id } }
-			);
+			AddressService.HouseholdMove move = AddressService.householdMoves(new Set<Id>{ garcia.Id }).get(garcia.Id);
+			AddressService.updateEveryonesAddress(new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>{ ana.Id, luis.Id } });
 			Test.stopTest();
 
 			Assert.areEqual(WINTER_STREET, move.primary.Street__c, 'The household\'s primary.');
 			Assert.areEqual(new Set<Id>{ luis.Id }, move.taking, 'Only Luis takes it on his own.');
-			Assert.areEqual(
-				new Set<Id>{ ana.Id, sofia.Id },
-				move.withTheirOwn,
-				'Ana and Sofia have their own.'
-			);
+			Assert.areEqual(new Set<Id>{ ana.Id, sofia.Id }, move.withTheirOwn, 'Ana and Sofia have their own.');
 			Assert.areEqual(WINTER_STREET, mailingStreetOf(luis.Id), 'Luis moves.');
-			Assert.areEqual(
-				WINTER_STREET,
-				mailingStreetOf(ana.Id),
-				'Ana was ticked, so she moves.'
-			);
+			Assert.areEqual(WINTER_STREET, mailingStreetOf(ana.Id), 'Ana was ticked, so she moves.');
 			Assert.isFalse(
 				[SELECT Is_Default__c FROM Address__c WHERE Id = :anasOwn.Id].Is_Default__c,
 				'Her own address stays on file, no longer in use.'
@@ -289,11 +254,7 @@ private class AddressMoveTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(
-				BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'),
-				refusal,
-				'Refused.'
-			);
+			Assert.areEqual(BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'), refusal, 'Refused.');
 		}
 	}
 
@@ -330,10 +291,7 @@ private class AddressMoveTest {
 
 	@IsTest
 	static void aUserWhoMayNotEditPeopleIsRefusedAndNothingChanges() {
-		User reader = TestUsers.peopleReaderWith(
-			'MoveReader',
-			new List<String>{ 'BarnCRM_Read_Only' }
-		);
+		User reader = TestUsers.peopleReaderWith('MoveReader', new List<String>{ 'BarnCRM_Read_Only' });
 		Account garcia;
 		Contact luis;
 		Address__c anasOwn;
@@ -352,9 +310,7 @@ private class AddressMoveTest {
 		Integer refused = 0;
 		System.runAs(reader) {
 			try {
-				AddressService.updateEveryonesAddress(
-					new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>() }
-				);
+				AddressService.updateEveryonesAddress(new Map<Id, Set<Id>>{ garcia.Id => new Set<Id>() });
 			} catch (Exception noEdit) {
 				refused++;
 			}

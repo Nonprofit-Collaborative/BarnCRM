@@ -137,11 +137,7 @@ public with sharing class AddressService {
 		}
 		Map<Id, Address__c> newestByOwner = new Map<Id, Address__c>();
 		// Status (R-AD10) is read through withHistory: a Former address is the last choice.
-		for (
-			Address__c address : AddressSelector.withHistory(
-				AddressSelector.selectByOwnerIds(ownerIds)
-			)
-		) {
+		for (Address__c address : AddressSelector.withHistory(AddressSelector.selectByOwnerIds(ownerIds))) {
 			Id ownerId = ownerIdOf(address);
 			if (deletedIds.contains(address.Id) || ownerId == null) {
 				continue;
@@ -224,10 +220,7 @@ public with sharing class AddressService {
 	 *
 	 * @param previousById the addresses before an update, or null on insert
 	 */
-	public static void applyStatusBeforeSave(
-		List<Address__c> records,
-		Map<Id, SObject> previousById
-	) {
+	public static void applyStatusBeforeSave(List<Address__c> records, Map<Id, SObject> previousById) {
 		if (records == null) {
 			return;
 		}
@@ -235,13 +228,8 @@ public with sharing class AddressService {
 			if (String.isBlank(address.Status__c)) {
 				address.Status__c = STATUS_CURRENT;
 			}
-			Address__c previous = previousById == null
-				? null
-				: (Address__c) previousById.get(address.Id);
-			Boolean putInUse =
-				address.Is_Default__c == true &&
-				(previous == null ||
-				previous.Is_Default__c != true);
+			Address__c previous = previousById == null ? null : (Address__c) previousById.get(address.Id);
+			Boolean putInUse = address.Is_Default__c == true && (previous == null || previous.Is_Default__c != true);
 			if (putInUse && address.Status__c == STATUS_FORMER) {
 				address.Status__c = STATUS_CURRENT;
 				address.End_Date__c = null;
@@ -258,10 +246,7 @@ public with sharing class AddressService {
 	 * promotion after a delete) always put another in use in the same save, or run while
 	 * propagation is under way, so they are never refused.
 	 */
-	public static void refuseLeavingAnOwnerWithoutADefault(
-		List<Address__c> records,
-		Map<Id, SObject> previousById
-	) {
+	public static void refuseLeavingAnOwnerWithoutADefault(List<Address__c> records, Map<Id, SObject> previousById) {
 		if (records == null || previousById == null || isPropagating) {
 			return;
 		}
@@ -290,10 +275,7 @@ public with sharing class AddressService {
 		}
 		Set<Id> ownersWithAnotherDefault = new Set<Id>();
 		for (
-			Address__c other : AddressSelector.selectDefaultsByOwnerIds(
-				untickedByOwner.keySet(),
-				previousById.keySet()
-			)
+			Address__c other : AddressSelector.selectDefaultsByOwnerIds(untickedByOwner.keySet(), previousById.keySet())
 		) {
 			ownersWithAnotherDefault.add(ownerIdOf(other));
 		}
@@ -351,17 +333,8 @@ public with sharing class AddressService {
 		Set<Id> personAccounts = personAccountIdsAmong(crowdedAccounts);
 		List<String> personFields = personAccounts.isEmpty()
 			? null
-			: new List<String>{
-					PERSON_MAILING_STREET,
-					PERSON_MAILING_CITY,
-					PERSON_MAILING_POSTAL_CODE
-			  };
-		for (
-			Account owner : AddressSelector.selectAccountBillingAddresses(
-				crowdedAccounts,
-				personFields
-			)
-		) {
+			: new List<String>{ PERSON_MAILING_STREET, PERSON_MAILING_CITY, PERSON_MAILING_POSTAL_CODE };
+		for (Account owner : AddressSelector.selectAccountBillingAddresses(crowdedAccounts, personFields)) {
 			standardKeyByOwner.put(
 				owner.Id,
 				personAccounts.contains(owner.Id)
@@ -424,8 +397,7 @@ public with sharing class AddressService {
 	 * Contact_Address_Change_Behavior__c setting (Address Updates).
 	 */
 	public static void captureFromStandardFields(List<Account> accounts, List<Contact> contacts) {
-		Boolean nothingToDo =
-			(accounts == null || accounts.isEmpty()) && (contacts == null || contacts.isEmpty());
+		Boolean nothingToDo = (accounts == null || accounts.isEmpty()) && (contacts == null || contacts.isEmpty());
 		if (nothingToDo || isPropagating) {
 			return;
 		}
@@ -450,10 +422,7 @@ public with sharing class AddressService {
 	 * differs from the one before the save is looked at. Does nothing, and runs no query, in an
 	 * org with no person accounts.
 	 */
-	public static void capturePersonMailingChanges(
-		List<Account> accounts,
-		Map<Id, SObject> previousById
-	) {
+	public static void capturePersonMailingChanges(List<Account> accounts, Map<Id, SObject> previousById) {
 		if (accounts == null || accounts.isEmpty() || isPropagating) {
 			return;
 		}
@@ -465,8 +434,7 @@ public with sharing class AddressService {
 		for (Account account : accounts) {
 			SObject before = previousById == null ? null : previousById.get(account.Id);
 			if (
-				personTypes.contains(account.RecordTypeId) &&
-				(before == null || personMailingChanged(account, before))
+				personTypes.contains(account.RecordTypeId) && (before == null || personMailingChanged(account, before))
 			) {
 				moved.add(account);
 			}
@@ -499,10 +467,7 @@ public with sharing class AddressService {
 	 * is left alone, as the propagation leaves it alone (product-plan Section 11.2 item 9).
 	 * A person account is capturePersonMailingChanges' to capture, not this method's.
 	 */
-	public static void captureBillingChanges(
-		List<Account> accounts,
-		Map<Id, SObject> previousById
-	) {
+	public static void captureBillingChanges(List<Account> accounts, Map<Id, SObject> previousById) {
 		if (accounts == null || accounts.isEmpty() || previousById == null || isPropagating) {
 			return;
 		}
@@ -523,26 +488,14 @@ public with sharing class AddressService {
 		if (typedByAccount.isEmpty()) {
 			return;
 		}
-		for (
-			Id nativeHousehold : HouseholdSelector.nativeHouseholdAccountsAmong(
-				typedByAccount.keySet()
-			)
-		) {
+		for (Id nativeHousehold : HouseholdSelector.nativeHouseholdAccountsAmong(typedByAccount.keySet())) {
 			typedByAccount.remove(nativeHousehold);
 		}
 		if (typedByAccount.isEmpty()) {
 			return;
 		}
-		for (
-			Address__c existing : AddressSelector.selectDefaultsByOwnerIds(
-				typedByAccount.keySet(),
-				null
-			)
-		) {
-			if (
-				existing.Account__c != null &&
-				sameAddress(existing, typedByAccount.get(existing.Account__c))
-			) {
+		for (Address__c existing : AddressSelector.selectDefaultsByOwnerIds(typedByAccount.keySet(), null)) {
+			if (existing.Account__c != null && sameAddress(existing, typedByAccount.get(existing.Account__c))) {
 				typedByAccount.remove(existing.Account__c);
 			}
 		}
@@ -597,12 +550,8 @@ public with sharing class AddressService {
 			return false;
 		}
 		Integer today = (day.month() * 100) + day.day();
-		Integer start =
-			(address.Seasonal_Start_Month__c.intValue() * 100) +
-			address.Seasonal_Start_Day__c.intValue();
-		Integer finish =
-			(address.Seasonal_End_Month__c.intValue() * 100) +
-			address.Seasonal_End_Day__c.intValue();
+		Integer start = (address.Seasonal_Start_Month__c.intValue() * 100) + address.Seasonal_Start_Day__c.intValue();
+		Integer finish = (address.Seasonal_End_Month__c.intValue() * 100) + address.Seasonal_End_Day__c.intValue();
 		if (start <= finish) {
 			return today >= start && today <= finish;
 		}
@@ -650,15 +599,11 @@ public with sharing class AddressService {
 		for (Address__c source : sources) {
 			Id personId = source.Contact__c != null ? source.Contact__c : source.Person_Account__c;
 			if (personId == null) {
-				throw new AddressMoveException(
-					BarnHelp.text('Core', 'Core_Address_MoveNotAPersonsAddress')
-				);
+				throw new AddressMoveException(BarnHelp.text('Core', 'Core_Address_MoveNotAPersonsAddress'));
 			}
 			personIds.add(personId);
 		}
-		Map<Id, Set<Id>> householdsByPerson = HouseholdService.currentHouseholdIdsByPerson(
-			personIds
-		);
+		Map<Id, Set<Id>> householdsByPerson = HouseholdService.currentHouseholdIdsByPerson(personIds);
 		Map<Id, Id> ownHouseholdByPerson = HouseholdService.getHouseholdIdsFor(personIds);
 		Map<Id, Address__c> primaryByHousehold = new Map<Id, Address__c>();
 		for (
@@ -677,9 +622,7 @@ public with sharing class AddressService {
 			Id householdId = householdByAddressId.get(source.Id);
 			Set<Id> theirs = householdsByPerson.get(personId);
 			if (householdId == null || theirs == null || !theirs.contains(householdId)) {
-				throw new AddressMoveException(
-					BarnHelp.text('Core', 'Core_Address_MoveNotTheirHousehold')
-				);
+				throw new AddressMoveException(BarnHelp.text('Core', 'Core_Address_MoveNotTheirHousehold'));
 			}
 			if (source.Contact__c != null && ownHouseholdByPerson.get(personId) == householdId) {
 				released.put(personId, householdId);
@@ -914,10 +857,7 @@ public with sharing class AddressService {
 				return;
 			}
 			Map<Id, Address__c> replacedByOwner = new Map<Id, Address__c>();
-			List<Address__c> replaced = AddressSelector.selectDefaultsByOwnerIds(
-				newByOwner.keySet(),
-				keepIds
-			);
+			List<Address__c> replaced = AddressSelector.selectDefaultsByOwnerIds(newByOwner.keySet(), keepIds);
 			if (areNew) {
 				AddressSelector.withHistory(replaced);
 			}
@@ -932,10 +872,7 @@ public with sharing class AddressService {
 
 		/** A new primary starts today: with its insert when the user may set it, else after. */
 		public void start(Address__c moved) {
-			if (
-				moved.Id == null &&
-				Schema.SObjectType.Address__c.fields.Start_Date__c.isCreateable()
-			) {
+			if (moved.Id == null && Schema.SObjectType.Address__c.fields.Start_Date__c.isCreateable()) {
 				moved.Start_Date__c = OrgDate.today();
 			} else {
 				starting.add(moved);
@@ -953,10 +890,7 @@ public with sharing class AddressService {
 		 */
 		public void save() {
 			for (Address__c moved : starting) {
-				history.put(
-					moved.Id,
-					new Address__c(Id = moved.Id, Start_Date__c = OrgDate.today())
-				);
+				history.put(moved.Id, new Address__c(Id = moved.Id, Start_Date__c = OrgDate.today()));
 			}
 			Map<Id, Address__c> changed = new Map<Id, Address__c>();
 			for (Address__c change : history.values()) {
@@ -1012,11 +946,7 @@ public with sharing class AddressService {
 	 * two are the same place or the new one is seasonal. A Seasonal primary is not ended: the
 	 * address waiting for its season to end is, since that is the home the owner left.
 	 */
-	private static void recordMoves(
-		Map<Id, Address__c> replacedByOwner,
-		Map<Id, Address__c> newByOwner,
-		Move move
-	) {
+	private static void recordMoves(Map<Id, Address__c> replacedByOwner, Map<Id, Address__c> newByOwner, Move move) {
 		Map<Id, Address__c> history = move.history;
 		Map<Id, Address__c> endingByOwner = new Map<Id, Address__c>();
 		Set<Id> seasonalOwners = new Set<Id>();
@@ -1029,11 +959,7 @@ public with sharing class AddressService {
 			}
 		}
 		// Newest first, so the first one held for an owner is the one the swap would restore.
-		for (
-			Address__c waiting : AddressSelector.withHistory(
-				AddressSelector.selectWaitingForSeason(seasonalOwners)
-			)
-		) {
+		for (Address__c waiting : AddressSelector.withHistory(AddressSelector.selectWaitingForSeason(seasonalOwners))) {
 			if (!endingByOwner.containsKey(ownerIdOf(waiting))) {
 				endingByOwner.put(ownerIdOf(waiting), waiting);
 			}
@@ -1256,9 +1182,7 @@ public with sharing class AddressService {
 	 * When `keptForTheirOwn` is given, each household's members left out only for an address
 	 * of their own are put in it, for the Update Everyone's Address confirmation (R-AD9).
 	 */
-	private static Map<Id, Set<Id>> membersWhoTakeTheHouseholdAddress(
-		Map<Id, Set<Id>> membersByHousehold
-	) {
+	private static Map<Id, Set<Id>> membersWhoTakeTheHouseholdAddress(Map<Id, Set<Id>> membersByHousehold) {
 		return membersWhoTakeTheHouseholdAddress(membersByHousehold, null);
 	}
 
@@ -1307,12 +1231,7 @@ public with sharing class AddressService {
 			for (Id memberId : memberIds == null ? new Set<Id>() : memberIds) {
 				Id ownHousehold = ownHouseholdByPerson.get(memberId);
 				Boolean livesElsewhere = ownHousehold != null && ownHousehold != householdId;
-				if (
-					livesElsewhere ||
-					memberId == null ||
-					memberId == householdId ||
-					deceased.contains(memberId)
-				) {
+				if (livesElsewhere || memberId == null || memberId == householdId || deceased.contains(memberId)) {
 					continue;
 				}
 				if (withAnAddressOfTheirOwn.contains(memberId)) {
@@ -1350,11 +1269,7 @@ public with sharing class AddressService {
 				continue;
 			}
 			for (Id memberId : memberIds) {
-				if (
-					memberId != null &&
-					memberId != householdId &&
-					memberId.getSObjectType() != contactType
-				) {
+				if (memberId != null && memberId != householdId && memberId.getSObjectType() != contactType) {
 					accountIds.add(memberId);
 				}
 			}
@@ -1443,11 +1358,7 @@ public with sharing class AddressService {
 				if (memberId.getSObjectType() == contactType) {
 					contactUpdates.put(memberId, mailingCopy(memberId, address));
 				} else if (personAccountIds.contains(memberId)) {
-					Account personAccount = personMailingCopy(
-						memberId,
-						address,
-						accountUpdates.get(memberId)
-					);
+					Account personAccount = personMailingCopy(memberId, address, accountUpdates.get(memberId));
 					if (personAccount != null) {
 						accountUpdates.put(memberId, personAccount);
 					}
@@ -1491,12 +1402,7 @@ public with sharing class AddressService {
 	 * @param countryField the text country field, such as `BillingCountry`
 	 * @param address the address being copied
 	 */
-	private static void putStateAndCountry(
-		SObject record,
-		String stateField,
-		String countryField,
-		Address__c address
-	) {
+	private static void putStateAndCountry(SObject record, String stateField, String countryField, Address__c address) {
 		String state = address.State__c;
 		String country = address.Country__c;
 		if (!usesStateAndCountryPicklists()) {
@@ -1504,9 +1410,7 @@ public with sharing class AddressService {
 			record.put(countryField, country);
 			return;
 		}
-		String countryCode = String.isBlank(country)
-			? null
-			: countryCodeByText.get(country.trim().toUpperCase());
+		String countryCode = String.isBlank(country) ? null : countryCodeByText.get(country.trim().toUpperCase());
 		if (countryCode == null) {
 			record.put(countryField, country);
 		} else {
@@ -1578,9 +1482,7 @@ public with sharing class AddressService {
 			return false;
 		}
 		if (accountFields == null) {
-			accountFields = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields
-				.getMap();
+			accountFields = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
 		}
 		return accountFields.containsKey(PERSON_MAILING_STREET.toLowerCase());
 	}
@@ -1601,14 +1503,9 @@ public with sharing class AddressService {
 	 * of any other record type, gives none. The
 	 * people held as accounts are added to `people` instead, for the person capture.
 	 */
-	private static List<Address__c> billingAddressesOf(
-		List<Account> accounts,
-		List<Account> people
-	) {
+	private static List<Address__c> billingAddressesOf(List<Account> accounts, List<Account> people) {
 		List<Address__c> typed = new List<Address__c>();
-		Map<Id, Schema.RecordTypeInfo> recordTypes = Account.SObjectType.getDescribe(
-				SObjectDescribeOptions.DEFERRED
-			)
+		Map<Id, Schema.RecordTypeInfo> recordTypes = Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			.getRecordTypeInfosById();
 		Set<Id> personRecordTypeIds = OrgShapeDetector.personRecordTypeIds();
 		for (Account account : accounts) {
@@ -1622,8 +1519,7 @@ public with sharing class AddressService {
 				: recordTypes.get(account.RecordTypeId).getDeveloperName();
 			// Organizations are the accounts of the record type the org chose (ADR-0141).
 			Boolean isOrganization =
-				developerName != RECORD_TYPE_HOUSEHOLD &&
-				AccountKinds.isOrganizationRecordTypeName(developerName);
+				developerName != RECORD_TYPE_HOUSEHOLD && AccountKinds.isOrganizationRecordTypeName(developerName);
 			if (developerName != RECORD_TYPE_HOUSEHOLD && !isOrganization) {
 				continue;
 			}
@@ -1764,10 +1660,7 @@ public with sharing class AddressService {
 		}
 	}
 
-	private static void captureHouseholdAddresses(
-		List<Contact> contacts,
-		List<Address__c> toInsert
-	) {
+	private static void captureHouseholdAddresses(List<Contact> contacts, List<Address__c> toInsert) {
 		Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
 		Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(contactIds);
 		if (householdByPerson == null) {
@@ -1792,12 +1685,7 @@ public with sharing class AddressService {
 			return;
 		}
 		Map<Id, Address__c> defaultByHousehold = new Map<Id, Address__c>();
-		for (
-			Address__c address : AddressSelector.selectDefaultsByOwnerIds(
-				sourceByHousehold.keySet(),
-				null
-			)
-		) {
+		for (Address__c address : AddressSelector.selectDefaultsByOwnerIds(sourceByHousehold.keySet(), null)) {
 			if (address.Account__c != null) {
 				defaultByHousehold.put(address.Account__c, address);
 			}
@@ -1810,10 +1698,7 @@ public with sharing class AddressService {
 		}
 	}
 
-	private static void capturePersonalAddresses(
-		List<Contact> contacts,
-		List<Address__c> toInsert
-	) {
+	private static void capturePersonalAddresses(List<Contact> contacts, List<Address__c> toInsert) {
 		Set<Id> contactIds = new Map<Id, Contact>(contacts).keySet();
 		Map<Id, Address__c> defaultByContact = new Map<Id, Address__c>();
 		for (Address__c address : AddressSelector.selectDefaultsByOwnerIds(contactIds, null)) {
@@ -1858,12 +1743,7 @@ public with sharing class AddressService {
 		return a.equals(b);
 	}
 
-	private static Address__c newAddressFromContact(
-		Contact source,
-		String addressType,
-		Id accountId,
-		Id contactId
-	) {
+	private static Address__c newAddressFromContact(Contact source, String addressType, Id accountId, Id contactId) {
 		Address__c address = new Address__c(
 			Account__c = accountId,
 			Contact__c = contactId,
@@ -1893,9 +1773,7 @@ public with sharing class AddressService {
 		if (value == BEHAVIOR_MANUAL) {
 			return BEHAVIOR_MANUAL;
 		}
-		return value == BEHAVIOR_PERSONAL_ADDRESS
-			? BEHAVIOR_PERSONAL_ADDRESS
-			: BEHAVIOR_UPDATE_HOUSEHOLD;
+		return value == BEHAVIOR_PERSONAL_ADDRESS ? BEHAVIOR_PERSONAL_ADDRESS : BEHAVIOR_UPDATE_HOUSEHOLD;
 	}
 
 	/**
@@ -1915,13 +1793,7 @@ public with sharing class AddressService {
 		return householdMoveChosen || behavior() != BEHAVIOR_MANUAL;
 	}
 
-	private static Boolean hasAnyValue(
-		String street,
-		String city,
-		String state,
-		String postalCode,
-		String country
-	) {
+	private static Boolean hasAnyValue(String street, String city, String state, String postalCode, String country) {
 		return String.isNotBlank(street) ||
 			String.isNotBlank(city) ||
 			String.isNotBlank(state) ||

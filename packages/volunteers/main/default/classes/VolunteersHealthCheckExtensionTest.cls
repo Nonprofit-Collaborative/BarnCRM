@@ -18,17 +18,14 @@ private class VolunteersHealthCheckExtensionTest {
 	private static Map<String, Object> byKey(List<HealthCheckService.Finding> findings) {
 		Map<String, Object> result = new Map<String, Object>();
 		for (HealthCheckService.Finding finding : findings) {
-			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(
-				JSON.serialize(finding)
-			);
+			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(JSON.serialize(finding));
 			result.put((String) fields.get('key'), fields);
 		}
 		return result;
 	}
 
 	private static Map<String, Object> finding(String key) {
-		return (Map<String, Object>) byKey(new VolunteersHealthCheckExtension().findings())
-			.get(key);
+		return (Map<String, Object>) byKey(new VolunteersHealthCheckExtension().findings()).get(key);
 	}
 
 	@IsTest
@@ -64,32 +61,17 @@ private class VolunteersHealthCheckExtensionTest {
 	static void aShiftThatEndedAWeekAgoAndIsStillOpenIsReported() {
 		System.runAs(admin()) {
 			Volunteer_Job__c pantry = VolunteersTestData.job('Pantry');
-			Volunteer_Shift__c old = VolunteersTestData.newShift(
-				pantry.Id,
-				Datetime.now().addDays(-10),
-				3
-			);
-			Volunteer_Shift__c closed = VolunteersTestData.newShift(
-				pantry.Id,
-				Datetime.now().addDays(-10),
-				3
-			);
+			Volunteer_Shift__c old = VolunteersTestData.newShift(pantry.Id, Datetime.now().addDays(-10), 3);
+			Volunteer_Shift__c closed = VolunteersTestData.newShift(pantry.Id, Datetime.now().addDays(-10), 3);
 			closed.Status__c = 'Completed';
-			Volunteer_Shift__c recent = VolunteersTestData.newShift(
-				pantry.Id,
-				Datetime.now().addDays(-2),
-				3
-			);
+			Volunteer_Shift__c recent = VolunteersTestData.newShift(pantry.Id, Datetime.now().addDays(-2), 3);
 			insert new List<Volunteer_Shift__c>{ old, closed, recent };
 
 			Map<String, Object> open = finding('volunteer_past_shifts_open');
 
 			Assert.isNotNull(open, 'The old Open shift is reported');
 			Assert.areEqual(
-				String.format(
-					Label.Volunteers_HealthCheck_PastShiftsTitleOne,
-					new List<Object>{ '1' }
-				),
+				String.format(Label.Volunteers_HealthCheck_PastShiftsTitleOne, new List<Object>{ '1' }),
 				open.get('title'),
 				'Only that one, counted in the singular'
 			);
@@ -155,14 +137,10 @@ private class VolunteersHealthCheckExtensionTest {
 
 			Assert.areEqual(
 				today.addDays(5),
-				[SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :schedule.Id]
-				.Created_Through__c,
+				[SELECT Created_Through__c FROM Shift_Schedule__c WHERE Id = :schedule.Id].Created_Through__c,
 				'The run stops at the End Date'
 			);
-			Assert.isNull(
-				finding('volunteer_schedule_horizon'),
-				'Created through its End Date is as far as it goes'
-			);
+			Assert.isNull(finding('volunteer_schedule_horizon'), 'Created through its End Date is as far as it goes');
 		}
 	}
 
@@ -170,11 +148,7 @@ private class VolunteersHealthCheckExtensionTest {
 	static void aShippedVolunteerTotalTurnedOffIsReported() {
 		// Turning a total off is done in the Rollup Builder, which needs its own admin set.
 		User rollupAdmin = TestUsers.withPermissionSets(
-			new List<String>{
-				TestUsers.CORE_ADMIN,
-				VolunteersTestData.ADMIN,
-				'Rollup_Builder_Admin'
-			}
+			new List<String>{ TestUsers.CORE_ADMIN, VolunteersTestData.ADMIN, 'Rollup_Builder_Admin' }
 		);
 		System.runAs(rollupAdmin) {
 			RollupService.ensureDefaultsDuringInstall('VolunteersHealthCheckExtensionTest');
@@ -193,10 +167,7 @@ private class VolunteersHealthCheckExtensionTest {
 
 			Assert.isNotNull(off, 'The total turned off is reported');
 			Assert.isTrue(((String) off.get('title')).startsWith('1 '), 'Only that one');
-			Assert.isTrue(
-				((String) off.get('fixTarget')).endsWith('Rollup_Builder'),
-				'The fix opens Rollup Builder'
-			);
+			Assert.isTrue(((String) off.get('fixTarget')).endsWith('Rollup_Builder'), 'The fix opens Rollup Builder');
 		}
 	}
 
@@ -212,10 +183,7 @@ private class VolunteersHealthCheckExtensionTest {
 				all.containsKey('volunteer_past_shifts_open'),
 				'Core finds the Volunteers extension by name and folds its findings in'
 			);
-			Assert.isFalse(
-				all.containsKey('check_failed_volunteers_extension'),
-				'The extension did not fail'
-			);
+			Assert.isFalse(all.containsKey('check_failed_volunteers_extension'), 'The extension did not fail');
 		}
 	}
 

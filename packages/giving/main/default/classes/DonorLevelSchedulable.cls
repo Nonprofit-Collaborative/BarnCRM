@@ -45,11 +45,7 @@ public with sharing class DonorLevelSchedulable implements Schedulable {
 		}
 		Date today = today();
 		Integer month = FiscalYearSelector.fiscalYearStartMonth();
-		Date fiscalStart = Date.newInstance(
-			today.month() >= month ? today.year() : today.year() - 1,
-			month,
-			1
-		);
+		Date fiscalStart = Date.newInstance(today.month() >= month ? today.year() : today.year() - 1, month, 1);
 		if (fiscalStart > last.date()) {
 			return true;
 		}

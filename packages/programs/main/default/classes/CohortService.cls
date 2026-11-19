@@ -33,27 +33,16 @@ public with sharing class CohortService {
 		List<Enrollment__c> toInsert = new List<Enrollment__c>();
 		List<String> insertNames = new List<String>();
 
-		Map<Id, Enrollment__c> chosen = new Map<Id, Enrollment__c>(
-			CohortSelector.selectEnrollments(enrollmentIds)
-		);
+		Map<Id, Enrollment__c> chosen = new Map<Id, Enrollment__c>(CohortSelector.selectEnrollments(enrollmentIds));
 		for (Id enrollmentId : enrollmentIds) {
 			Enrollment__c enrollment = chosen.get(enrollmentId);
 			if (enrollment == null) {
 				outcome.refusals.add(
-					new Refusal(
-						String.valueOf(enrollmentId),
-						BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne')
-					)
+					new Refusal(String.valueOf(enrollmentId), BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'))
 				);
-			} else if (
-				enrollment.Program__c != cohort.Program__c ||
-				!EnrollmentService.isOpen(enrollment.Stage__c)
-			) {
+			} else if (enrollment.Program__c != cohort.Program__c || !EnrollmentService.isOpen(enrollment.Stage__c)) {
 				outcome.refusals.add(
-					new Refusal(
-						personNameOf(enrollment),
-						BarnHelp.text('Programs', 'Programs_Cohort_NotOpen')
-					)
+					new Refusal(personNameOf(enrollment), BarnHelp.text('Programs', 'Programs_Cohort_NotOpen'))
 				);
 			} else if (enrollment.Cohort__c != cohort.Id) {
 				toUpdate.add(new Enrollment__c(Id = enrollment.Id, Cohort__c = cohort.Id));
@@ -71,9 +60,7 @@ public with sharing class CohortService {
 				}
 			}
 			for (Id personId : personIds) {
-				String name = names.containsKey(personId)
-					? names.get(personId)
-					: String.valueOf(personId);
+				String name = names.containsKey(personId) ? names.get(personId) : String.valueOf(personId);
 				Enrollment__c open = openByPerson.get(personId);
 				if (open != null) {
 					if (open.Cohort__c != cohort.Id && !chosen.containsKey(open.Id)) {
@@ -111,9 +98,7 @@ public with sharing class CohortService {
 		if (enrollment == null || enrollment.Cohort__c != cohortId) {
 			throw UserErrors.message(BarnHelp.text('Programs', 'Programs_Cohort_NotFoundOne'));
 		}
-		update as user new List<Enrollment__c>{
-			new Enrollment__c(Id = enrollmentId, Cohort__c = null)
-		};
+		update as user new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Cohort__c = null) };
 	}
 
 	/** The name of the person an enrollment names, as far as the user can see it. */
@@ -127,11 +112,7 @@ public with sharing class CohortService {
 		return null;
 	}
 
-	private static void collect(
-		List<Database.SaveResult> results,
-		List<String> names,
-		Outcome outcome
-	) {
+	private static void collect(List<Database.SaveResult> results, List<String> names, Outcome outcome) {
 		for (Integer i = 0; i < results.size(); i++) {
 			if (results[i].isSuccess()) {
 				outcome.added++;
