@@ -1,6 +1,6 @@
 /**
- * Core features are off on a new install, all on after an upgrade, and turned on for good
- * (ADR-0124): a tool through Features Turned On, a feature group with its automations too.
+ * Core features are off on a new install, all on in an org already in use, and turned on for
+ * good (ADR-0124): a tool through Features Turned On, a feature group with its automations too.
  */
 @IsTest(testFor='ApexClass:FeatureSwitchService')
 private class FeatureSwitchServiceTest {
@@ -10,8 +10,24 @@ private class FeatureSwitchServiceTest {
 	}
 
 	@IsTest
-	static void anUpgradedOrgHasEveryFeatureOn() {
+	static void aBlankListMeansNoFeatureIsOn() {
 		System.runAs(TestUsers.admin()) {
+			TestSettings.neverSetUp();
+			FeatureSwitchService.blankIsAllOnInTests = false;
+
+			Assert.isTrue(FeatureSwitchService.featuresOn().isEmpty(), 'Blank: none on');
+			Assert.isFalse(FeatureSwitchService.awaitingFirstRun(), 'And no first-run setup');
+		}
+	}
+
+	@IsTest
+	static void anOrgInUseHasEveryFeatureOn() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.neverSetUp();
+			FeatureSwitchService.blankIsAllOnInTests = false;
+			FeatureSwitchService.fillBlankList(false);
+			FeatureSwitchService.fillBlankList(true);
+
 			Test.startTest();
 			Set<String> tabSets = FeatureSwitchService.tabSetsOn();
 			Set<String> hidden = FeatureSwitchService.hiddenSettingRows();

@@ -76,13 +76,6 @@ public with sharing class ReceiptContentBuilder {
 	private static final Set<String> RAW_TOKENS = new Set<String>{ 'GiftLines' };
 
 	/**
-	 * What marks a letter saved before the package printed the letterhead itself: the shipped
-	 * letters opened with `<div class="letterhead">`. While a stored letter still has it, that
-	 * block prints the name and the package prints the logo only (ADR-0065 point 3).
-	 */
-	public static final String LEGACY_LETTERHEAD_MARKER = 'class="letterhead"';
-
-	/**
 	 * The gift lines token as the rich text editor stores it, on a paragraph of its own. The
 	 * table replaces the whole paragraph, because a table inside a paragraph is not valid HTML.
 	 */
@@ -258,7 +251,7 @@ public with sharing class ReceiptContentBuilder {
 		String body = mergeTokens(templateBody, tokens);
 		return document(
 			'Receipt ' + receiptNumber,
-			brandingBlock(details, templateBody) +
+			brandingBlock(details) +
 				body +
 				amountNote(isInKind(gift)) +
 				taxBlock(taxSentencesFor(gift)) +
@@ -310,7 +303,7 @@ public with sharing class ReceiptContentBuilder {
 		String body = mergeTokens(templateBody, tokens);
 		return document(
 			'Statement ' + receiptNumber,
-			brandingBlock(details, templateBody) +
+			brandingBlock(details) +
 				body +
 				(templatePlacedLines ? '' : giftLines(gifts)) +
 				amountNote(anyInKind) +
@@ -439,30 +432,21 @@ public with sharing class ReceiptContentBuilder {
 	 * has one and has left it turned on, and the organization's name and address.
 	 *
 	 * The letterhead is code, not template (ADR-0065): a letter that merely mentions
-	 * `{{OrganizationName}}` in a sentence still gets it. The one exception is a letter saved
-	 * before that decision, which still carries its own letterhead block; that block prints the
-	 * name, so the package does not print it twice.
+	 * `{{OrganizationName}}` in a sentence still gets it.
 	 */
-	private static String brandingBlock(OrganizationDetails details, String templateBody) {
-		String logo = ReceiptLogoSource.imageTag(details.logoDocumentId);
-		Boolean templateHasOwnLetterhead =
-			templateBody != null && templateBody.contains(LEGACY_LETTERHEAD_MARKER);
-		if (String.isBlank(logo) && templateHasOwnLetterhead) {
-			return '';
+	private static String brandingBlock(OrganizationDetails details) {
+		String block =
+			'<div class="branding">' + ReceiptLogoSource.imageTag(details.logoDocumentId);
+		// C-47b: a brand prints its own name, then the legal name it receipts under.
+		if (String.isNotBlank(details.brandName) && details.brandName != details.legalName) {
+			block += '<p class="orgname">' + escape(details.brandName) + '</p>';
 		}
-		String block = '<div class="branding">' + logo;
-		if (!templateHasOwnLetterhead) {
-			// C-47b: a brand prints its own name, then the legal name it receipts under.
-			if (String.isNotBlank(details.brandName) && details.brandName != details.legalName) {
-				block += '<p class="orgname">' + escape(details.brandName) + '</p>';
-			}
-			block += '<p class="orgname">' + escape(details.legalName) + '</p>';
-			if (String.isNotBlank(details.address)) {
-				block +=
-					'<p class="orgaddress">' +
-					escape(details.address).replace('\n', '<br/>') +
-					'</p>';
-			}
+		block += '<p class="orgname">' + escape(details.legalName) + '</p>';
+		if (String.isNotBlank(details.address)) {
+			block +=
+				'<p class="orgaddress">' +
+				escape(details.address).replace('\n', '<br/>') +
+				'</p>';
 		}
 		return block + '</div>';
 	}
