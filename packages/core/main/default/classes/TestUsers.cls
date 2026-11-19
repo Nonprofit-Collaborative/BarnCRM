@@ -55,7 +55,8 @@ public class TestUsers {
 		'Territory_Admin',
 		'Memberships_Admin',
 		'Projects_Admin',
-		'Address_Verification_Admin'
+		'Address_Verification_Admin',
+		'Reporting_Admin'
 	};
 
 	/**

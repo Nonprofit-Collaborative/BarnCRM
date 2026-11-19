@@ -110,6 +110,7 @@ Rules:
 | projects | Project__c | Custom62: Chalkboard |
 | projects | Projects_Home | Custom64: Compass |
 | projects | Time_Entry__c | Custom95: Stopwatch |
+| reporting | Advanced_Reporting | Custom84: Presenter |
 | giving | Accounting_Export | Custom21: Computer |
 | giving | Campaign_Sync | Custom35: Microphone |
 | giving | Gift_Transaction_Mirror | Custom31: Car |
@@ -190,6 +191,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | corporatehub | hubBoardPanel | custom:custom47 | Board__c |
 | corporatehub | hubMeetingPanel | custom:custom84 | Board_Meeting__c |
 | lwcbuilder | lwcBuilderStudio | custom:custom34 | LWC_Builder |
+| reporting | reportingHome | custom:custom84 | Advanced_Reporting |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |

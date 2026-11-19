@@ -1,0 +1,21 @@
+<template>
+  <div class="picker" data-id="picker">
+    <template lwc:if={error}>
+      <c-barn-notice variant="error" message={error} data-id="error"></c-barn-notice>
+    </template>
+    <template for:each={steps} for:item="step">
+      <lightning-combobox
+        key={step.key}
+        class="step"
+        label={step.label}
+        options={step.options}
+        value={step.value}
+        required={required}
+        disabled={disabled}
+        data-index={step.index}
+        onchange={handlePick}
+        data-id="step"
+      ></lightning-combobox>
+    </template>
+  </div>
+</template>

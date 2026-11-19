@@ -1,0 +1,60 @@
+.toolbar {
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  align-items: flex-end;
+  padding: var(--slds-g-spacing-3, 0.75rem);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.filter {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  flex: 1 1 18rem;
+  min-width: 0;
+}
+
+.filter > c-reporting-range,
+.record {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.record {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.record__search,
+.record__pick {
+  flex: 1 1 9rem;
+  min-width: 0;
+}
+
+.widget {
+  height: calc(100% - var(--slds-g-spacing-3, 0.75rem));
+  padding: var(--slds-g-spacing-4, 1rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+  border-radius: var(--slds-g-radius-border-3, 0.5rem);
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+}
+
+.editor {
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  border-bottom: var(--slds-g-sizing-border-1, 1px) dashed var(--slds-g-color-border-2, #c9c9c9);
+}
+
+.editor lightning-button-icon {
+  margin-right: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.binding {
+  gap: var(--slds-g-spacing-1, 0.25rem);
+}

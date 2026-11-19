@@ -135,6 +135,15 @@
       "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
     },
     {
+      "path": "packages/reporting",
+      "default": false,
+      "package": "BarnCRM Advanced Reporting",
+      "versionName": "v1.21",
+      "versionNumber": "1.21.0.NEXT",
+      "postInstallScript": "ReportingPostInstall",
+      "dependencies": [{ "package": "BarnCRM Core", "versionNumber": "1.21.0.LATEST" }]
+    },
+    {
       "path": "packages/scholarships",
       "default": false,
       "package": "BarnCRM Scholarships and Outbound Grants",

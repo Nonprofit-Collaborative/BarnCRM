@@ -1,0 +1,316 @@
+<template>
+  <template lwc:if={isWidgetEditor}>
+    <c-reporting-builder
+      context={context}
+      objects={objects}
+      start={editReport}
+      for-widget
+      ondone={handleWidgetDone}
+      onclose={handleWidgetCancel}
+      data-id="widget-builder"
+    ></c-reporting-builder>
+  </template>
+  <template lwc:else>
+    <div class="dashboard" aria-busy={busy} data-id="dashboard">
+      <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-grid_align-spread slds-var-m-bottom_small">
+        <div class="slds-grid slds-grid_vertical-align-center">
+          <lightning-button-icon
+            icon-name="utility:back"
+            variant="border-filled"
+            alternative-text={labels.back}
+            title={labels.back}
+            onclick={handleBack}
+            class="slds-var-m-right_small"
+            data-id="back"
+          ></lightning-button-icon>
+          <div>
+            <h2 class="slds-text-heading_medium" data-id="heading">{heading}</h2>
+            <template lwc:if={dashboard.description}>
+              <p class="slds-text-body_small slds-text-color_weak" data-id="description">{dashboard.description}</p>
+            </template>
+          </div>
+        </div>
+        <div class="slds-grid slds-wrap toolbar">
+          <lightning-button icon-name="utility:refresh" label={labels.refresh} onclick={handleRefresh} data-id="refresh"></lightning-button>
+          <template lwc:if={canEditLayout}>
+            <lightning-button label={editToggleLabel} onclick={handleToggleEdit} data-id="edit"></lightning-button>
+          </template>
+          <template lwc:if={canSave}>
+            <lightning-button variant="brand" label={labels.save} onclick={handleSave} disabled={busy} data-id="save"></lightning-button>
+          </template>
+          <template lwc:if={canSaveAs}>
+            <lightning-button label={labels.saveAs} onclick={handleSaveAs} disabled={busy} data-id="save-as"></lightning-button>
+          </template>
+          <template lwc:if={isOwner}>
+            <lightning-button label={labels.share} onclick={handleShare} disabled={busy} data-id="share"></lightning-button>
+            <lightning-button
+              variant="destructive-text"
+              label={labels.delete}
+              onclick={handleDelete}
+              disabled={busy}
+              data-id="delete"
+            ></lightning-button>
+          </template>
+        </div>
+      </div>
+
+      <template lwc:if={error}>
+        <c-barn-notice variant="error" message={error} class="slds-var-m-bottom_small" data-id="error"></c-barn-notice>
+      </template>
+      <template lwc:if={notice}>
+        <c-barn-notice variant="success" message={notice} class="slds-var-m-bottom_small" data-id="notice"></c-barn-notice>
+      </template>
+      <template lwc:if={ownerText}>
+        <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small" data-id="owner">{ownerText}</p>
+      </template>
+      <template lwc:if={readOnly}>
+        <c-barn-notice variant="info" message={labels.readOnly} class="slds-var-m-bottom_small" data-id="read-only"></c-barn-notice>
+      </template>
+
+      <template lwc:if={sharingOpen}>
+        <c-reporting-share
+          title={dashboard.title}
+          sharing={sharing}
+          onsave={handleShareSave}
+          oncancel={handleShareCancel}
+          class="slds-var-m-bottom_medium"
+          data-id="share-panel"
+        ></c-reporting-share>
+      </template>
+
+      <template lwc:if={editing}>
+        <section class="slds-box slds-var-m-bottom_medium" aria-label={labels.layout} data-id="layout">
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input label={labels.title} value={dashboard.title} max-length="255" onchange={handleTitle} data-id="title"></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input label={labels.description} value={dashboard.description} onchange={handleDescription} data-id="description-input"></lightning-input>
+            </div>
+          </div>
+          <template lwc:if={canAddFilter}>
+            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.addFilter}</h3>
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                <lightning-combobox
+                  label={labels.filterKind}
+                  options={filterKindOptions}
+                  value={newFilterKind}
+                  onchange={handleNewFilterKind}
+                  data-id="filter-kind"
+                ></lightning-combobox>
+              </div>
+              <template lwc:if={isRecordFilter}>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                  <lightning-combobox
+                    label={labels.filterObject}
+                    options={objects}
+                    value={newFilterObject}
+                    onchange={handleNewFilterObject}
+                    data-id="filter-object"
+                  ></lightning-combobox>
+                </div>
+              </template>
+              <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                <lightning-input label={labels.filterLabel} value={newFilterLabel} onchange={handleNewFilterLabel} data-id="filter-label"></lightning-input>
+              </div>
+              <div class="slds-col slds-grow-none">
+                <lightning-button
+                  icon-name="utility:add"
+                  label={labels.addFilter}
+                  onclick={handleAddFilter}
+                  disabled={addFilterDisabled}
+                  data-id="add-filter"
+                ></lightning-button>
+              </div>
+            </div>
+          </template>
+          <template lwc:if={canAddWidget}>
+            <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.addWidget}</h3>
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+              <template lwc:if={hasSavedReports}>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <lightning-combobox
+                    label={labels.fromSaved}
+                    options={reportOptions}
+                    value={pickedReport}
+                    onchange={handlePickReport}
+                    data-id="pick-report"
+                  ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-grow-none">
+                  <lightning-button label={labels.addSaved} onclick={handleAddSaved} data-id="add-saved"></lightning-button>
+                </div>
+              </template>
+              <div class="slds-col slds-grow-none">
+                <lightning-button icon-name="utility:add" label={labels.newReport} onclick={handleNewWidget} data-id="new-widget"></lightning-button>
+              </div>
+            </div>
+          </template>
+        </section>
+      </template>
+
+      <template lwc:if={hasFilters}>
+        <section class="filters slds-var-m-bottom_medium" aria-label={labels.filters} data-id="filters">
+          <template for:each={filterRows} for:item="filter">
+            <div key={filter.key} class="filter" data-id="filter">
+              <template lwc:if={filter.isDate}>
+                <c-reporting-range
+                  label={filter.label}
+                  value={filter.dateValue}
+                  allow-any
+                  data-key={filter.key}
+                  onchange={handleDateValue}
+                ></c-reporting-range>
+              </template>
+              <template lwc:else>
+                <div class="record">
+                  <lightning-input
+                    type="search"
+                    label={filter.searchLabel}
+                    value={filter.search}
+                    data-key={filter.key}
+                    onchange={handleRecordSearch}
+                    class="record__search"
+                  ></lightning-input>
+                  <lightning-combobox
+                    label={filter.label}
+                    options={filter.options}
+                    value={filter.recordValue}
+                    data-key={filter.key}
+                    onchange={handleRecordValue}
+                    class="record__pick"
+                    data-id="record-pick"
+                  ></lightning-combobox>
+                </div>
+              </template>
+              <template lwc:if={editing}>
+                <lightning-button-icon
+                  icon-name="utility:close"
+                  variant="bare"
+                  alternative-text={filter.removeLabel}
+                  title={filter.removeLabel}
+                  data-key={filter.key}
+                  onclick={handleRemoveFilter}
+                  data-id="remove-filter"
+                ></lightning-button-icon>
+              </template>
+            </div>
+          </template>
+        </section>
+      </template>
+
+      <template lwc:if={hasWidgets}>
+        <div class="slds-grid slds-wrap slds-gutters_small" data-id="grid">
+          <template for:each={cards} for:item="card">
+            <div key={card.key} class={card.css}>
+              <article class="widget slds-var-m-bottom_small" data-id="widget">
+                <template lwc:if={editing}>
+                  <div class="slds-var-m-bottom_small editor" data-id="widget-editor">
+                    <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                      <div class="slds-col slds-grow">
+                        <lightning-input label={labels.widgetTitle} value={card.title} data-index={card.index} onchange={handleWidgetTitle}></lightning-input>
+                      </div>
+                      <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3">
+                        <lightning-combobox
+                          label={labels.size}
+                          options={sizeOptions}
+                          value={card.size}
+                          data-index={card.index}
+                          onchange={handleWidgetSize}
+                        ></lightning-combobox>
+                      </div>
+                    </div>
+                    <div class="slds-var-m-top_x-small">
+                      <lightning-button-icon
+                        icon-name="utility:edit"
+                        variant="border-filled"
+                        alternative-text={card.editLabel}
+                        title={card.editLabel}
+                        data-index={card.index}
+                        onclick={handleEditWidget}
+                        data-id="edit-widget"
+                      ></lightning-button-icon>
+                      <lightning-button-icon
+                        icon-name="utility:arrowup"
+                        variant="border-filled"
+                        alternative-text={card.upLabel}
+                        title={card.upLabel}
+                        disabled={card.first}
+                        data-index={card.index}
+                        data-step="up"
+                        onclick={handleWidgetMove}
+                      ></lightning-button-icon>
+                      <lightning-button-icon
+                        icon-name="utility:arrowdown"
+                        variant="border-filled"
+                        alternative-text={card.downLabel}
+                        title={card.downLabel}
+                        disabled={card.last}
+                        data-index={card.index}
+                        data-step="down"
+                        onclick={handleWidgetMove}
+                      ></lightning-button-icon>
+                      <lightning-button-icon
+                        icon-name="utility:delete"
+                        variant="border-filled"
+                        alternative-text={card.removeLabel}
+                        title={card.removeLabel}
+                        data-index={card.index}
+                        onclick={handleWidgetRemove}
+                        data-id="remove-widget"
+                      ></lightning-button-icon>
+                    </div>
+                    <template lwc:if={hasFilters}>
+                      <p class="slds-form-element__label slds-var-m-top_small">{labels.bindings}</p>
+                      <template for:each={card.bindings} for:item="binding">
+                        <div key={binding.key} class="slds-grid slds-grid_vertical-align-end binding">
+                          <template lwc:if={binding.throughText}>
+                            <p class="slds-col slds-text-body_small">{binding.label}: {binding.throughText}</p>
+                          </template>
+                          <template lwc:else>
+                            <c-reporting-field-picker
+                              class="slds-col"
+                              label={binding.label}
+                              object-api-name={binding.object}
+                              kind={binding.kind}
+                              value={binding.value}
+                              data-widget={binding.widgetKey}
+                              data-filter={binding.filterKey}
+                              onchange={handleBinding}
+                            ></c-reporting-field-picker>
+                          </template>
+                          <template lwc:if={binding.bound}>
+                            <lightning-button-icon
+                              icon-name="utility:close"
+                              variant="bare"
+                              alternative-text={binding.clearLabel}
+                              title={binding.clearLabel}
+                              data-widget={binding.widgetKey}
+                              data-filter={binding.filterKey}
+                              onclick={handleUnbind}
+                            ></lightning-button-icon>
+                          </template>
+                        </div>
+                      </template>
+                    </template>
+                  </div>
+                </template>
+                <c-reporting-view
+                  heading={card.title}
+                  report={card.report}
+                  unfiltered={card.unfiltered}
+                  can-export={canExport}
+                  data-id="widget-view"
+                ></c-reporting-view>
+              </article>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template lwc:else>
+        <c-barn-empty-state heading={labels.empty} message={labels.emptyHelp} data-id="empty"></c-barn-empty-state>
+      </template>
+    </div>
+  </template>
+</template>

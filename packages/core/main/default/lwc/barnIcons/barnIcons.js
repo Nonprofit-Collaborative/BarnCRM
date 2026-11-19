@@ -118,6 +118,8 @@ const ICONS = Object.freeze({
   Territory_Management: 'custom:custom34',
   // Address Verification
   Address_Verification_Setup: 'custom:custom73',
+  // Advanced Reporting
+  Advanced_Reporting: 'custom:custom84',
   // Memberships
   Membership_Level__c: 'custom:custom48',
   Membership_Term__c: 'custom:custom45',

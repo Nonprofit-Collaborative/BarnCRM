@@ -113,6 +113,9 @@ public with sharing class SettingSections {
 	/** The Project Management module's time tracking and health settings. */
 	@NamespaceAccessible
 	public static final String PROJECTS = 'Projects';
+	/** The Advanced Reporting module's row, which opens its Advanced Reporting tab. */
+	@NamespaceAccessible
+	public static final String REPORTING = 'Advanced Reporting';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -142,6 +145,7 @@ public with sharing class SettingSections {
 			TERRITORY,
 			MEMBERSHIPS,
 			PROJECTS,
+			REPORTING,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

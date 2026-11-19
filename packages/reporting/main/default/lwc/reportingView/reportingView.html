@@ -1,0 +1,125 @@
+<template>
+  <section class="view" aria-busy={loading} data-id="view">
+    <template lwc:if={helpReady}>
+      <template lwc:if={heading}>
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small slds-truncate" title={heading} data-id="heading">
+          {heading}
+        </h3>
+      </template>
+
+      <template lwc:if={problemText}>
+        <c-barn-notice variant="info" message={problemText} data-id="problem"></c-barn-notice>
+      </template>
+
+      <template lwc:if={error}>
+        <c-barn-notice variant="error" message={error} data-id="error"></c-barn-notice>
+      </template>
+
+      <template lwc:if={unfilteredText}>
+        <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small" data-id="unfiltered">
+          {unfilteredText}
+        </p>
+      </template>
+
+      <template lwc:if={loading}>
+        <div class="loading slds-var-p-vertical_medium" data-id="loading">
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+          <template lwc:if={scanText}>
+            <p class="slds-text-body_small slds-var-m-top_large" role="status" data-id="scan">{scanText}</p>
+            <lightning-button label={labels.stop} onclick={handleStop} class="slds-var-m-top_x-small" data-id="stop"></lightning-button>
+          </template>
+        </div>
+      </template>
+
+      <template lwc:if={isMetric}>
+        <c-barn-stat-tile
+          label={metricLabel}
+          value={metricValue}
+          format-style={metricStyle}
+          currency-code={currencyCode}
+          data-id="metric"
+        ></c-barn-stat-tile>
+      </template>
+
+      <template lwc:if={showChart}>
+        <c-reporting-chart chart={chart} summary={chartSummary} data-id="chart"></c-reporting-chart>
+      </template>
+
+      <template lwc:if={showTable}>
+        <template lwc:if={hasRows}>
+          <div class="table-wrap" data-id="table-wrap">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked" data-id="table">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <template for:each={table.headers} for:item="header">
+                    <th key={header.key} scope="col">
+                      <div class="slds-truncate" title={header.label}>{header.label}</div>
+                    </th>
+                  </template>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={shownRows} for:item="row">
+                  <tr key={row.key}>
+                    <template for:each={row.cells} for:item="cell">
+                      <td key={cell.key} data-label={cell.label}>
+                        <template lwc:if={cell.href}>
+                          <a href={cell.href}>{cell.text}</a>
+                        </template>
+                        <template lwc:else>{cell.text}</template>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <template lwc:if={rowsNote}>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small" data-id="rows-note">{rowsNote}</p>
+          </template>
+          <template lwc:if={canShowMore}>
+            <lightning-button
+              variant="base"
+              label={labels.showMore}
+              onclick={handleShowMore}
+              data-id="show-more"
+            ></lightning-button>
+          </template>
+        </template>
+        <template lwc:else>
+          <c-barn-empty-state heading={labels.noRows} size="small" data-id="empty"></c-barn-empty-state>
+        </template>
+      </template>
+
+      <template for:each={notes} for:item="note">
+        <p key={note.key} class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small" data-id="note">
+          {note.text}
+        </p>
+      </template>
+
+      <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-top_x-small actions">
+        <template lwc:if={isChart}>
+          <lightning-button
+            variant="base"
+            label={toggleLabel}
+            onclick={handleToggle}
+            class="slds-var-m-right_small"
+            data-id="toggle"
+          ></lightning-button>
+        </template>
+        <template lwc:if={showExport}>
+          <lightning-button
+            variant="base"
+            icon-name="utility:download"
+            label={exportLabel}
+            onclick={handleExport}
+            disabled={exporting}
+            class="slds-var-m-right_small"
+            data-id="export"
+          ></lightning-button>
+        </template>
+        <span class="slds-text-body_small slds-text-color_weak" role="status" data-id="export-status">{exportStatus}</span>
+      </div>
+    </template>
+  </section>
+</template>

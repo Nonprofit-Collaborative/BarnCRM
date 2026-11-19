@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>Picks one field for Advanced Reporting, crossing up to two lookups, from the fields the person can read (O-02).</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -1,0 +1,64 @@
+<template>
+  <fieldset class="range" data-id="range">
+    <legend class="slds-assistive-text">{label}</legend>
+    <lightning-combobox
+      class="part part_range"
+      label={label}
+      options={rangeOptions}
+      value={current.range}
+      disabled={disabled}
+      onchange={handleRange}
+      data-id="kind"
+    ></lightning-combobox>
+    <template lwc:if={showCount}>
+      <lightning-input
+        class="part part_number"
+        type="number"
+        min="0"
+        max="3650"
+        label={countLabel}
+        value={current.n}
+        disabled={disabled}
+        data-part="n"
+        onchange={handlePart}
+        data-id="n"
+      ></lightning-input>
+    </template>
+    <template lwc:if={showSecond}>
+      <lightning-input
+        class="part part_number"
+        type="number"
+        min="0"
+        max="3650"
+        label={labels.to}
+        value={current.m}
+        disabled={disabled}
+        data-part="m"
+        onchange={handlePart}
+        data-id="m"
+      ></lightning-input>
+    </template>
+    <template lwc:if={showDates}>
+      <lightning-input
+        class="part"
+        type="date"
+        label={labels.fromDate}
+        value={current.from}
+        disabled={disabled}
+        data-part="from"
+        onchange={handlePart}
+        data-id="from"
+      ></lightning-input>
+      <lightning-input
+        class="part"
+        type="date"
+        label={labels.toDate}
+        value={current.to}
+        disabled={disabled}
+        data-part="to"
+        onchange={handlePart}
+        data-id="to"
+      ></lightning-input>
+    </template>
+  </fieldset>
+</template>

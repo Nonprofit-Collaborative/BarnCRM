@@ -370,6 +370,11 @@ CAPS = {
     # Pre-batch review M2: no lookup is queued for a saver without principal access, and the
     # missing access is logged once a day, 25,364 measured 2026-11-19; raised by 850.
     "addressverification": 25_400,
+    # Advanced Reporting (O-02, D-202, D-207, ADR-NEXT advanced reporting): one query service
+    # (allow-listed by describe, user mode, binds only, aggregates and keyset pages), the library
+    # of saved reports and dashboards as Files with their sharing, and post-install, 28,060
+    # measured 2026-11-19, plus about 2%.
+    "reporting": 28_700,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.

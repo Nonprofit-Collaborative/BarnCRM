@@ -18890,6 +18890,80 @@ event (G-22e).
 
 ---
 
+## 29AR. Saved Report and Saved Dashboard (no object)
+
+### Definition
+
+A report or dashboard a person saved in Advanced Reporting (O-02, D-202, D-207; ADR-0231
+`0231-advanced-reporting.md`). Neither is a custom object: each is a Salesforce File owned by
+the person who saved it, whose latest version holds the definition as JSON. Dashboard templates
+use the same dashboard JSON, shipped in a static resource.
+
+### Attributes of a report definition
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| version | number | yes | Format version, 1. |
+| title | text | yes to save | The report's name. |
+| object | text | yes | The object reported on (API name, never prefixed). |
+| columns | list | no | Up to 20 of `{path, label, type, show?}`; `path` reaches through up to two lookups (`Fund__r.Name`); `show: "age"` shows a date as days since. |
+| filter | filter document | no | Conditions on the object, in Core's filter document format (Section 14). |
+| related | list | no | Up to 2 of `{object, field, label, has, filter?}`: records that have (or, `has: false`, have no) related records through `field`, optionally matching `filter`. |
+| dateRange | object | no | `{range, field, type, label?, n?, m?, from?, to?}`; `range` is one of TODAY, YESTERDAY, THIS_ and LAST_ WEEK, MONTH, QUARTER and YEAR, LAST_N_DAYS, NEXT_N_DAYS, LAST_N_MONTHS (`n`, 1 to 3650), BETWEEN_DAYS_AGO (`n` and `m`) or CUSTOM (`from`, `to`, ISO dates). |
+| groups | list | no | Up to 2 of `{field, label, type, bucket?, labelPath?, picklist?}`; `bucket` (day, week, month, quarter, year) groups a date; `labelPath` names a lookup group by its record's Name; `picklist` maps values to labels. |
+| measures | list | no | Up to 4 of `{fn, path?, label, type}`; `fn` is count, sum, avg, min, max or countDistinct. A report with measures totals; without, it lists records. |
+| summaries | list | no | Up to 3 related totals per row: `{object, field, fn, path?, label, type, filter?}`. |
+| sort | object | no | `{by, direction}`; `by` is a column path for a list, or `g1` (the first grouping) or `m0` to `m3` (a measure) for totals. |
+| limit | number | yes | Rows listed, or top groups shown: 1 to 2,000, default 200. |
+| view | object | yes | `{type, stacked}`; `type` is table, bar, column, line, donut or metric. |
+| sharing | object | no | The owner's sharing choices: `{users: [{id, name, access}], groups: [{id, name, access}]}`, `access` View or Edit. |
+
+### Attributes of a dashboard definition
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| version | number | yes | Format version, 1. |
+| title, description | text | title yes to save | Shown above the dashboard. |
+| filters | list | no | Up to 4 of `{key, kind, label, object?}`; `kind` is date or record (a record of `object`). |
+| widgets | list | yes | Up to 12 of `{key, title, size, report, bindings}`; `size` small, medium or large; `report` is a report definition; `bindings` maps a filter key to `{field, type?, related?}`, where `related: {object, field}` applies a record filter through related records (a gift's fund through its allocations). |
+| sharing | object | no | As for a report. |
+
+### Rules
+
+**R-AR1 A definition is a File.** A report is a ContentVersion with FileExtension `barnreport`,
+a dashboard `barndash`, owned by its saver. Each save is a new version of the same
+ContentDocument. Definitions are at most 1,000,000 characters.
+
+**R-AR2 Sharing is Files sharing.** The owner shares through a ContentDocumentLink to each
+person: ShareType V (Viewer) for View, C (Collaborator) for Edit. A public group is expanded to
+its active members when the owner saves or shares, and those links are rewritten each time, so
+membership changes apply then. At most 500 people. Only the owner shares or deletes; a person
+with Edit saves a new version and keeps the owner's sharing. Saving, sharing and deleting need
+the custom permission `Reporting_Save`.
+
+**R-AR3 Everything runs as the viewer.** Listing, loading, saving and running are user mode.
+Every object, field, relationship and function in a definition is checked against the viewer's
+describe before a query is built, and values are bound, never concatenated. A field the viewer
+cannot read stops the run with a message.
+
+**R-AR4 Large data volumes.** A totals report is counted first; within the aggregate query
+limits one aggregate query totals it, otherwise the browser reads the records in Id order in
+pages of 5,000 and totals them, up to 1,000,000 records, saying when totals are partial.
+
+**R-AR5 Names are portable.** Object and field names in a definition are never prefixed; the
+server resolves them against the org's describe, so a definition moves between orgs, with or
+without a namespace.
+
+### Salesforce implementation
+
+- **Object:** none. `ContentVersion` (FileExtension `barnreport` or `barndash`, VersionData the
+  JSON) and `ContentDocumentLink` (ShareType V or C, Visibility AllUsers).
+- **Custom permission:** `Reporting_Save`.
+- **Static resource:** `BarnReporting_Templates` (four dashboard definitions, each with the
+  objects it requires).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -19346,6 +19420,7 @@ mirrors the primary member).
 | 1.68 | 2026-11-18 | Provider secrets in Named Credentials (N-13, D-209; ADR-0229, amending ADR-0220). Two objects removed, 199 to 197 in the suite: `Payment_Keys__c` (29PAY4) and `Address_Verification_Keys__c` (29AV2). `Payments_Settings__c` gains `Stripe_Connected__c`, `PayPal_Connected__c` (Checkbox) and takes `PayPal_Webhook_Id__c` (Text(64)) and `PayPal_Product_Id__c` (Text(50)); `Address_Verification_Settings__c` gains `Connected_Provider__c` (Text(20)). Removed fields: `Stripe_Secret_Key__c`, `Stripe_Webhook_Secret__c`, `PayPal_Client_Id__c`, `PayPal_Client_Secret__c`, `Smarty_Auth_Id__c`, `Smarty_Auth_Token__c`, `Google_Api_Key__c`. R-PK1, R-AV4, R-PEV1 and R-PEV2 rewritten: a Stripe event is fetched back from Stripe and only that copy is used. |
 | 1.69 | 2026-11-18 | Beta badge on every module (D-211, N-14, release 1.27). `BarnCRM_Module__mdt` gains Beta (`Beta__c`, Checkbox, default false), ticked on every shipped module record: the Module Manager, the Setup Assistant's modules step and the Home Modules card show a Beta badge beside the module name. No object added or removed. |
 | 1.70 | 2026-11-19 | Receiver token (pre-batch review M1; ADR-0229 amended). `Payments_Settings__c` gains `Webhook_Token__c` (Text(64)) and `Webhook_Cap_Hit_At__c` (DateTime): the receiver stores a post only when it carries the token in its address, and records the first refusal at the hourly cap each hour. No object added or removed. |
+| 1.71 | 2026-11-19 | Advanced Reporting (O-02, D-202, D-207, release 1.29; ADR-0231 `0231-advanced-reporting.md`). No object or field added. Section 29AR records the saved report and dashboard JSON formats and their storage as Salesforce Files (`.barnreport`, `.barndash`) shared through ContentDocumentLink, with rules R-AR1 to R-AR5. |
 
 ---
 ## 32. Entity ownership by package
@@ -19531,6 +19606,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |
 | Built Component | LWC Builder | 1.19 (LB-01, LB-02) | 29LB1 |
 | LWC Builder Settings | LWC Builder | 1.19 (LB-01, LB-02) | 29LB2 |
+| Saved Report and Saved Dashboard (Files, no object) | Advanced Reporting | 1.29 (O-02) | 29AR |
 | Award Program | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG1 |
 | Award Cycle | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG2 |
 | Award Application | Scholarships and Outbound Grants | 1.12 (SG-02) | 29SG3 |

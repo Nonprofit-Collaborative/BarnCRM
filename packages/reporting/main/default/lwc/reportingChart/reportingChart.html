@@ -1,0 +1,38 @@
+<template>
+  <figure class="chart" data-id="chart">
+    <svg class="canvas" width="100%" height="100%" viewBox={chart.viewBox} role="img" aria-label={summary} preserveAspectRatio="xMidYMid meet" data-id="svg">
+      <template for:each={chart.lines} for:item="line">
+        <line key={line.key} x1={line.x1} x2={line.x2} y1={line.y1} y2={line.y2} class={line.css}></line>
+      </template>
+      <template for:each={chart.rects} for:item="rect">
+        <rect key={rect.key} x={rect.x} y={rect.y} width={rect.width} height={rect.height} class={rect.css}>
+          <title>{rect.title}</title>
+        </rect>
+      </template>
+      <template for:each={chart.paths} for:item="path">
+        <path key={path.key} d={path.d} class={path.css}>
+          <title>{path.title}</title>
+        </path>
+      </template>
+      <template for:each={chart.circles} for:item="circle">
+        <circle key={circle.key} cx={circle.cx} cy={circle.cy} r={circle.r} class={circle.css}>
+          <title>{circle.title}</title>
+        </circle>
+      </template>
+      <template for:each={chart.texts} for:item="text">
+        <text key={text.key} x={text.x} y={text.y} text-anchor={text.anchor} class={text.css}>{text.text}</text>
+      </template>
+    </svg>
+    <template lwc:if={hasLegend}>
+      <figcaption>
+        <ul class="slds-list_horizontal slds-wrap legend" data-id="legend">
+          <template for:each={chart.legend} for:item="entry">
+            <li key={entry.key} class="slds-var-m-right_small slds-var-m-bottom_xx-small">
+              <span class={entry.swatch}></span>{entry.label}
+            </li>
+          </template>
+        </ul>
+      </figcaption>
+    </template>
+  </figure>
+</template>

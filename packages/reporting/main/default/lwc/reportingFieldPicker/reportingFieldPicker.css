@@ -1,0 +1,11 @@
+.picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  align-items: flex-end;
+}
+
+.step {
+  flex: 1 1 12rem;
+  min-width: 0;
+}

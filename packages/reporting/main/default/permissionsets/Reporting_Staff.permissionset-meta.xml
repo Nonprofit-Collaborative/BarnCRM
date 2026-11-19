@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Advanced Reporting Staff</label>
+  <description>
+    Opens Advanced Reporting: builds, runs, saves and shares reports and dashboards, each read
+    with the person's own access. Given to Team Member and Fundraising Staff holders.
+  </description>
+  <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ReportingLibrary</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>ReportingQueryService</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Reporting_Save</name>
+  </customPermissions>
+  <tabSettings>
+    <tab>Advanced_Reporting</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>
