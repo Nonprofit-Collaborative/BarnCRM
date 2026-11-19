@@ -128,10 +128,12 @@ While the module is on, [Health Check](health-check.md) reports:
 | Permission set | Who gets it | What it allows |
 |---|---|---|
 | Address Verification Admin | BarnCRM Admin holders, and the installer | The Address Verification Setup tab, and access to both provider credentials (never their values) |
-| Address Verification User | Whoever you choose, in Setup | Access to both provider credentials (never their values), and nothing else |
+| Address Verification User | Whoever you choose, on the **Access** page (never given automatically) | Access to both provider credentials (never their values), and nothing else |
 
 A lookup on save runs as the person saving, and Salesforce lets it use the credential only when
-that person has access to it. Assign **Address Verification User** in Setup (**Permission Sets**)
-to staff whose saves should be checked at once. Without it, their new and changed addresses stay
-Unverified until the nightly check, which runs as the admin who scheduled it. Nobody can read a
-key: Salesforce keeps it encrypted on the External Credential.
+that person has access to it. In BarnCRM, open the **Access** page, choose **Address Verification
+User** among the extra permissions and add it to the staff whose saves should be checked at once
+(see [Access](access.md)). Without it, no lookup is queued when they save: their new and
+changed addresses stay Unverified until the nightly check, which runs as the admin who scheduled
+it, and the Error Log gets one Warning a day saying so, not one per save. Nobody can read a key:
+Salesforce keeps it encrypted on the External Credential.

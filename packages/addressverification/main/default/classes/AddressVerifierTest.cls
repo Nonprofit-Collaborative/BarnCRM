@@ -291,6 +291,51 @@ private class AddressVerifierTest {
 	}
 
 	@IsTest
+	static void aSaveByAPersonWithoutPrincipalAccessWaitsForTheNightlyStepAndIsLoggedOnceADay() {
+		System.runAs(AddressVerificationTestData.admin()) {
+			AddressVerificationTestData.connect(AddressVerifier.SMARTY, false);
+			Assert.isTrue(
+				AddressVerifier.canLookUpOnSave(),
+				'The admin set carries the principal access'
+			);
+			Address__c home = AddressVerificationTestData.addresses(1, null)[0];
+			AddressVerifier.userAccess = false;
+			Test.setMock(
+				HttpCalloutMock.class,
+				new AddressVerificationTestData.Provider(
+					200,
+					AddressVerificationTestData.SMARTY_FOUND
+				)
+			);
+
+			Test.startTest();
+			update new Address__c(Id = home.Id, Street__c = '1 oak street');
+			update new Address__c(Id = home.Id, Street__c = '2 oak street');
+			Test.stopTest();
+
+			Assert.areEqual(
+				'Unverified',
+				AddressVerificationTestData.reread(home.Id).Verification_Status__c,
+				'No lookup was queued: it waits for the nightly step'
+			);
+			Assert.areEqual(1, noAccessWarnings(), 'One Warning, not one per save');
+
+			AddressVerifier.noAccessChecked = false;
+			update new Address__c(Id = home.Id, Street__c = '3 oak street');
+			Assert.areEqual(1, noAccessWarnings(), 'Still one Warning within the day');
+		}
+	}
+
+	private static Integer noAccessWarnings() {
+		return [
+			SELECT COUNT()
+			FROM Error_Log__c
+			WHERE Context__c = 'AddressVerifier.noAccess' AND Severity__c = 'Warning'
+			WITH SYSTEM_MODE
+		];
+	}
+
+	@IsTest
 	static void aChangeElsewhereLeavesTheStatus() {
 		Address__c home;
 		System.runAs(AddressVerificationTestData.admin()) {
