@@ -415,7 +415,9 @@ public with sharing class PaymentPayPal {
 	}
 
 	// Every call goes through the Barn_PayPal_Live or Barn_PayPal_Sandbox Named Credential (base);
-	// after sign-in, with the short-lived access token PayPal issued for this transaction.
+	// after sign-in, with the short-lived access token PayPal issued for this transaction. The
+	// named credential rule flags any Authorization header; this one holds no stored secret.
+	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
 	private static HttpResponse send(String path, String body, String requestId) {
 		HttpRequest request = new HttpRequest();
 		request.setEndpoint(base() + path);
@@ -447,6 +449,9 @@ public with sharing class PaymentPayPal {
 		return token;
 	}
 
+	// The Basic header is an External Credential merge field Salesforce fills (ADR-0229), so Apex
+	// holds no secret; the named credential rule flags the header anyway.
+	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
 	private static HttpResponse signIn() {
 		String credential = '$Credential.' + CREDENTIAL;
 		HttpRequest request = new HttpRequest();

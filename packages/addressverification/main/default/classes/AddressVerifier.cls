@@ -318,6 +318,7 @@ public with sharing class AddressVerifier {
 	 * as well as in the query string), merged by Salesforce from the `Barn_Smarty` External
 	 * Credential, so the key never appears in Apex or in a logged address.
 	 */
+	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
 	private static HttpRequest smartyRequest(Address__c address) {
 		String principal = '$Credential.' + credential(SMARTY);
 		HttpRequest request = new HttpRequest();
