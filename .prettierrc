@@ -41,6 +41,7 @@
         "*.flow-meta.xml",
         "*.validationRule-meta.xml",
         "*.object-meta.xml",
+        "*.permissionset-meta.xml",
         "*.js-meta.xml",
         "*.prompt-meta.xml",
         "*.genAiPlugin-meta.xml",
